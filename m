@@ -1,25 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <carenas@gmail.com>) id 1dvOXy-0006v0-Ce
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:03:20 -0400
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1dvOXx-0006um-Vd
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:03:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <carenas@gmail.com>) id 1dvOXs-0001O9-7y
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1dvOXs-0001Ns-2h
 	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:03:14 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:33578)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <carenas@gmail.com>) id 1dvOXs-0001NZ-0t
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50474)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
+	id 1dvOXr-0001NQ-R5
 	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:03:08 -0400
-Received: by mail-pg0-x242.google.com with SMTP id i130so703727pgc.0
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 07:03:07 -0700 (PDT)
-From: =?UTF-8?q?Carlo=20Marcelo=20Arenas=20Bel=C3=B3n?= <carenas@gmail.com>
-Date: Fri, 22 Sep 2017 07:02:35 -0700
-Message-Id: <20170922140237.10869-5-carenas@gmail.com>
-In-Reply-To: <20170922140237.10869-1-carenas@gmail.com>
-References: <20170922140237.10869-1-carenas@gmail.com>
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8MDrZgm047393
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 10:03:03 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d4yxb9h4h-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 10:03:02 -0400
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
+	Fri, 22 Sep 2017 15:03:00 +0100
+References: <20170922083855.102341-1-borntraeger@de.ibm.com>
+	<20170922083855.102341-3-borntraeger@de.ibm.com>
+	<5e7ba7d5-82d4-f1e6-532a-37c2c445c227@linux.vnet.ibm.com>
+	<ccb6e3eb-320e-b5dd-f728-09d8cab440c4@de.ibm.com>
+From: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Date: Fri, 22 Sep 2017 16:02:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC 4/6] linux-user: refactor socket.h for sparc
+In-Reply-To: <ccb6e3eb-320e-b5dd-f728-09d8cab440c4@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <eee7e600-a8b0-6e23-580b-803f3b4e9efa@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH/RFC 2/3] s390x/ais: enable ais when
+ migration is available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,197 +45,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: rth@twiddle.net, laurent@vivier.eu, riku.voipio@iki.fi, =?UTF-8?q?Carlo=20Marcelo=20Arenas=20Bel=C3=B3n?= <carenas@gmail.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-fixes SOL_SOCKET and SO_LINGER at least
+On 22/09/2017 14:40, Christian Borntraeger wrote:
+>=20
+>=20
+> On 09/22/2017 02:13 PM, Pierre Morel wrote:
+>> On 22/09/2017 10:38, Christian Borntraeger wrote:
+>>> Instead of unconditionally enabling the KVM AIS capability
+>>> in the kvm arch init function, do this in the flic realize function
+>>> when we know if migration is available. This requires to initialize
+>>> flic before the CPUs.
+>>
+>> I am not sure to agree.
+>>
+>> AIS facility is used for PCI (currently only PCI)
+>> We want to support PCI emulation and PCI VFIO
+>>
+>>
+>> Not having AIS support in the host kernel or not supporting AISM in th=
+e host kernel does not affect the emulation.
+>> Neither virtio-pci nor TCG.
+>> The only devices, (currently), which can not work without AIS and is n=
+ot migratable without AISM are PCI VFIO devices.
+>=20
+> This patch enable the conditional enablement facility for the KVM host =
+mask. The cpu model enablement is done
+> differently for KVM and TCG anyway.
+> Right now AIS is only enabled for KVM. For TCG AIS is not implemented a=
+t all and disabled. So for whenever this
+> is fixed in TCG it can be handled then.
+>=20
+> And for emulated devices under KVM you still need the kernel support - =
+otherwise migration is really broken for
+> the nimm/dimm values.
+>=20
 
-Signed-off-by: Carlo Marcelo Arenas Belón <carenas@gmail.com>
----
- linux-user/socket.h         |  46 ++------------------
- linux-user/sparc/sockbits.h | 104 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 107 insertions(+), 43 deletions(-)
- create mode 100644 linux-user/sparc/sockbits.h
+Yes, that is right.
+I do not pretend that it is working directly.
 
-diff --git a/linux-user/socket.h b/linux-user/socket.h
-index 036270a6e4..dfa692286b 100644
---- a/linux-user/socket.h
-+++ b/linux-user/socket.h
-@@ -4,50 +4,10 @@
- #include "alpha/sockbits.h"
- #elif defined(TARGET_HPPA)
- #include "hppa/sockbits.h"
-+#elif defined(TARGET_SPARC)
-+#include "sparc/sockbits.h"
- #else
- 
--#if defined(TARGET_SPARC)
--    /** sock_type - Socket types
--     *
--     * Please notice that for binary compat reasons SPARC has to
--     * override the enum sock_type in include/linux/net.h, so
--     * we define ARCH_HAS_SOCKET_TYPES here.
--     *
--     * @SOCK_DGRAM - datagram (conn.less) socket
--     * @SOCK_STREAM - stream (connection) socket
--     * @SOCK_RAW - raw socket
--     * @SOCK_RDM - reliably-delivered message
--     * @SOCK_SEQPACKET - sequential packet socket
--     * @SOCK_DCCP - Datagram Congestion Control Protocol socket
--     * @SOCK_PACKET - linux specific way of getting packets at the dev level.
--     *                For writing rarp and other similar things on the user
--     *                level.
--     * @SOCK_CLOEXEC - sets the close-on-exec (FD_CLOEXEC) flag.
--     * @SOCK_NONBLOCK - sets the O_NONBLOCK file status flag.
--     */
--
--    #define ARCH_HAS_SOCKET_TYPES          1
--
--    enum sock_type {
--           TARGET_SOCK_STREAM      = 1,
--           TARGET_SOCK_DGRAM       = 2,
--           TARGET_SOCK_RAW         = 3,
--           TARGET_SOCK_RDM         = 4,
--           TARGET_SOCK_SEQPACKET   = 5,
--           TARGET_SOCK_DCCP        = 6,
--           TARGET_SOCK_PACKET      = 10,
--           TARGET_SOCK_CLOEXEC     = 020000000,
--           TARGET_SOCK_NONBLOCK    = 040000,
--    };
--
--    #define TARGET_SOCK_MAX (TARGET_SOCK_PACKET + 1)
--    #define TARGET_SOCK_TYPE_MASK    0xf  /* Covers up to TARGET_SOCK_MAX-1. */
--
--    #define TARGET_SO_PASSSEC        31
--#else
--    #define TARGET_SO_PASSSEC        34
--#endif
--
-     /* For setsockopt(2) */
-     #define TARGET_SOL_SOCKET      1
- 
-@@ -103,11 +63,11 @@
- 
-     #define TARGET_SO_PEERSEC              31
- 
-+    #define TARGET_SO_PASSSEC              34
- #endif
- 
- #ifndef ARCH_HAS_SOCKET_TYPES
-     /** sock_type - Socket types - default values
--     *
-      *
-      * @SOCK_STREAM - stream (connection) socket
-      * @SOCK_DGRAM - datagram (conn.less) socket
-diff --git a/linux-user/sparc/sockbits.h b/linux-user/sparc/sockbits.h
-new file mode 100644
-index 0000000000..d51ae5f84f
---- /dev/null
-+++ b/linux-user/sparc/sockbits.h
-@@ -0,0 +1,104 @@
-+#define TARGET_SOL_SOCKET                        0xffff
-+
-+#define TARGET_SO_DEBUG                          0x0001
-+#define TARGET_SO_PASSCRED                       0x0002
-+#define TARGET_SO_REUSEADDR                      0x0004
-+#define TARGET_SO_KEEPALIVE                      0x0008
-+#define TARGET_SO_DONTROUTE                      0x0010
-+#define TARGET_SO_BROADCAST                      0x0020
-+#define TARGET_SO_PEERCRED                       0x0040
-+#define TARGET_SO_LINGER                         0x0080
-+#define TARGET_SO_OOBINLINE                      0x0100
-+#define TARGET_SO_REUSEPORT                      0x0200
-+#define TARGET_SO_BSDCOMPAT                      0x0400
-+#define TARGET_SO_RCVLOWAT                       0x0800
-+#define TARGET_SO_SNDLOWAT                       0x1000
-+#define TARGET_SO_RCVTIMEO                       0x2000
-+#define TARGET_SO_SNDTIMEO                       0x4000
-+#define TARGET_SO_ACCEPTCONN                     0x8000
-+#define TARGET_SO_SNDBUF                         0x1001
-+#define TARGET_SO_RCVBUF                         0x1002
-+#define TARGET_SO_SNDBUFFORCE                    0x100a
-+#define TARGET_SO_RCVBUFFORCE                    0x100b
-+#define TARGET_SO_ERROR                          0x1007
-+#define TARGET_SO_TYPE                           0x1008
-+#define TARGET_SO_PROTOCOL                       0x1028
-+#define TARGET_SO_DOMAIN                         0x1029
-+#define TARGET_SO_NO_CHECK                       0x000b
-+#define TARGET_SO_PRIORITY                       0x000c
-+#define TARGET_SO_BINDTODEVICE                   0x000d
-+#define TARGET_SO_ATTACH_FILTER                  0x001a
-+#define TARGET_SO_DETACH_FILTER                  0x001b
-+#define TARGET_SO_GET_FILTER                     TARGET_SO_ATTACH_FILTER
-+#define TARGET_SO_PEERNAME                       0x001c
-+#define TARGET_SO_TIMESTAMP                      0x001d
-+#define TARGET_SCM_TIMESTAMP                     TARGET_SO_TIMESTAMP
-+#define TARGET_SO_PEERSEC                        0x001e
-+#define TARGET_SO_PASSSEC                        0x001f
-+#define TARGET_SO_TIMESTAMPNS                    0x0021
-+#define TARGET_SCM_TIMESTAMPNS                   TARGET_SO_TIMESTAMPNS
-+#define TARGET_SO_MARK                           0x0022
-+#define TARGET_SO_TIMESTAMPING                   0x0023
-+#define TARGET_SCM_TIMESTAMPING                  TARGET_SO_TIMESTAMPING
-+#define TARGET_SO_RXQ_OVFL                       0x0024
-+#define TARGET_SO_WIFI_STATUS                    0x0025
-+#define TARGET_SCM_WIFI_STATUS                   TARGET_SO_WIFI_STATUS
-+#define TARGET_SO_PEEK_OFF                       0x0026
-+#define TARGET_SO_NOFCS                          0x0027
-+#define TARGET_SO_LOCK_FILTER                    0x0028
-+#define TARGET_SO_SELECT_ERR_QUEUE               0x0029
-+#define TARGET_SO_BUSY_POLL                      0x0030
-+#define TARGET_SO_MAX_PACING_RATE                0x0031
-+#define TARGET_SO_BPF_EXTENSIONS                 0x0032
-+#define TARGET_SO_INCOMING_CPU                   0x0033
-+#define TARGET_SO_ATTACH_BPF                     0x0034
-+#define TARGET_SO_DETACH_BPF                     TARGET_SO_DETACH_FILTER
-+#define TARGET_SO_ATTACH_REUSEPORT_CBPF          0x0035
-+#define TARGET_SO_ATTACH_REUSEPORT_EBPF          0x0036
-+#define TARGET_SO_CNX_ADVICE                     0x0037
-+#define TARGET_SCM_TIMESTAMPING_OPT_STATS        0x0038
-+#define TARGET_SO_MEMINFO                        0x0039
-+#define TARGET_SO_INCOMING_NAPI_ID               0x003a
-+#define TARGET_SO_COOKIE                         0x003b
-+#define TARGET_SCM_TIMESTAMPING_PKTINFO          0x003c
-+#define TARGET_SO_PEERGROUPS                     0x003d
-+#define TARGET_SO_ZEROCOPY                       0x003e
-+#define TARGET_SO_SECURITY_AUTHENTICATION        0x5001
-+#define TARGET_SO_SECURITY_ENCRYPTION_TRANSPORT  0x5002
-+#define TARGET_SO_SECURITY_ENCRYPTION_NETWORK    0x5004
-+
-+/** sock_type - Socket types
-+ *
-+ * Please notice that for binary compat reasons SPARC has to
-+ * override the enum sock_type in include/linux/net.h, so
-+ * we define ARCH_HAS_SOCKET_TYPES here.
-+ *
-+ * @SOCK_STREAM - stream (connection) socket
-+ * @SOCK_DGRAM - datagram (conn.less) socket
-+ * @SOCK_RAW - raw socket
-+ * @SOCK_RDM - reliably-delivered message
-+ * @SOCK_SEQPACKET - sequential packet socket
-+ * @SOCK_DCCP - Datagram Congestion Control Protocol socket
-+ * @SOCK_PACKET - linux specific way of getting packets at the dev level.
-+ *                For writing rarp and other similar things on the user
-+ *                level.
-+ * @SOCK_CLOEXEC - sets the close-on-exec (FD_CLOEXEC) flag.
-+ * @SOCK_NONBLOCK - sets the O_NONBLOCK file status flag.
-+ */
-+
-+enum sock_type {
-+    TARGET_SOCK_STREAM      = 1,
-+    TARGET_SOCK_DGRAM       = 2,
-+    TARGET_SOCK_RAW         = 3,
-+    TARGET_SOCK_RDM         = 4,
-+    TARGET_SOCK_SEQPACKET   = 5,
-+    TARGET_SOCK_DCCP        = 6,
-+    TARGET_SOCK_PACKET      = 10,
-+    TARGET_SOCK_CLOEXEC     = 0x400000,
-+    TARGET_SOCK_NONBLOCK    = 0x4000,
-+};
-+
-+#define TARGET_SOCK_MAX (TARGET_SOCK_PACKET + 1)
-+#define TARGET_SOCK_TYPE_MASK 0xf  /* Covers up to TARGET_SOCK_MAX - 1. */
-+
-+#define ARCH_HAS_SOCKET_TYPES 1
--- 
-2.14.1
+To support AIS emulation we have some work to do there (the migration),=20
+in kvm_s390_inject_airq() and other functions using ais_supported, to=20
+use emulated values.
+
+Don't you think that we could use emulation instead of faulting when the=20
+kernel can not handle values needed for pass-through?
+
+We can fault at the moment a VFIO device is realized.
+Migration will be stopped on realizing VFIO PCI devices instead of flic.
+
+I can miss something, is there a reason not to do so?
+
+
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
