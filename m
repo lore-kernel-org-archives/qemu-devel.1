@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dvIU0-00036F-UJ
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:34:45 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dvIXp-0005Lc-OM
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:38:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dvIU0-0001wO-4a
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:34:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38620)
+	(envelope-from <cohuck@redhat.com>) id 1dvIXm-0005Jq-Ic
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:38:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40622)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dvITz-0001ve-VQ
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:34:44 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dvIXm-0005JU-9m
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:38:38 -0400
+Date: Fri, 22 Sep 2017 09:38:24 +0200
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri, 22 Sep 2017 09:34:32 +0200
-Message-Id: <20170922073432.2811-2-cohuck@redhat.com>
-In-Reply-To: <20170922073432.2811-1-cohuck@redhat.com>
-References: <20170922073432.2811-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 1/1] s390x/ais: for 2.10 stable: disable ais
- facility
+Message-ID: <20170922093824.58a83358.cohuck@redhat.com>
+In-Reply-To: <20170921185028.GK21016@localhost.localdomain>
+References: <1505811353-29151-1-git-send-email-thuth@redhat.com>
+	<20170921185028.GK21016@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH] qdev: Mark devices as non-hotpluggable
+ by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, mdroth@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-From: Christian Borntraeger <borntraeger@de.ibm.com>
+On Thu, 21 Sep 2017 15:50:28 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-The migration interface for ais was introduced with kernel 4.13
-but the capability itself had been active since 4.12. As migration
-support is considered necessary lets disable ais in the 2.10
-stable version. A proper fix and re-enablement will be done
-for qemu 2.11.
+> On Tue, Sep 19, 2017 at 10:55:53AM +0200, Thomas Huth wrote:
+> > Historically we've marked all devices as hotpluggable by default. However,
+> > most devices are not hotpluggable, and you also need a HotplugHandler to
+> > support these devices. So if the user tries to "device_add" or "device_del"
+> > such a non-hotpluggable device during runtime, either nothing really usable
+> > happens, or QEMU even crashes/aborts unexpectedly (see for example commit
+> > 84ebd3e8c7d4fe955b - "Mark diag288 watchdog as non-hotpluggable").
+> > So let's change this dangerous default behaviour and mark the devices as
+> > non-hotpluggable by default. Certain parent devices classes which are known
+> > as hotpluggable (e.g. PCI, USB, etc.) are marked with "hotpluggable = true",
+> > so that devices that are derived from these classes continue to work as
+> > expected.  
+> 
+> These seem to be missing:
+> * TYPE_CPU (or at least TYPE_X86_CPU and TYPE_S390_CPU)
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Message-Id: <20170921140834.14233-2-borntraeger@de.ibm.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- target/s390x/kvm.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+I think it would be better to set it for TYPE_CPU (and have
+architectures override if needed).
 
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 720cb1d833..ebb75cafaa 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -311,8 +311,13 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-         }
-     }
- 
--    /* Try to enable AIS facility */
--    kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
-+    /*
-+     * The migration interface for ais was introduced with kernel 4.13
-+     * but the capability itself had been active since 4.12. As migration
-+     * support is considered necessary let's disable ais in the 2.10
-+     * machine.
-+     */
-+    /* kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0); */
- 
-     qemu_mutex_init(&qemu_sigp_mutex);
- 
--- 
-2.13.5
+> * TYPE_VIRTIO_SERIAL_PORT
+> * TYPE_CCID_CARD
+> * TYPE_XENSYSDEV
+> 
+> Also, I don't think we need to set it for TYPE_CPU_CORE, just for
+> TYPE_SPAPR_CPU_CORE.
+
+> hw/s390x/s390-virtio-ccw.c:446:    mc->get_hotplug_handler = s390_get_hotplug_handler;
+> s390_get_hotplug_handler accepts:
+> * TYPE_CPU
+
+Nod.
+
+> hw/s390x/css-bridge.c=94=VirtualCssBus *virtual_css_bus_init(void)
+> hw/s390x/css-bridge.c:110:    qbus_set_hotplug_handler(bus, dev, &error_abort);
+> * This seems to be for TYPE_CCW_DEVICE
+
+Yes, it is.
+
+> 
+> hw/s390x/s390-pci-bus.c=548=static int s390_pcihost_init(SysBusDevice *dev)
+> hw/s390x/s390-pci-bus.c:564:    qbus_set_hotplug_handler(bus, DEVICE(dev), NULL);
+> hw/s390x/s390-pci-bus.c:568:    qbus_set_hotplug_handler(BUS(s->bus), DEVICE(s), NULL);
+> hw/s390x/s390-pci-bus.c=660=static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
+> hw/s390x/s390-pci-bus.c:676:        qbus_set_hotplug_handler(bus, DEVICE(s), errp);
+> * TYPE_PCI only, it seems.
+
+Yes.
