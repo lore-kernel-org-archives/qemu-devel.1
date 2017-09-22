@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dvNr8-0006i7-1T
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:18:59 -0400
+	(envelope-from <famz@redhat.com>) id 1dvNv9-0008CK-PS
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:23:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dvNr5-0002Us-CH
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:18:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53678)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dvNr5-0002Tk-5X
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:18:55 -0400
-References: <20170921213052.1765-1-david@redhat.com>
-	<9d640173-93fe-0850-9335-d545dd34b2de@twiddle.net>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <cd4dda74-77c1-27a2-7427-d963a51e06ca@redhat.com>
-Date: Fri, 22 Sep 2017 15:18:52 +0200
+	(envelope-from <famz@redhat.com>) id 1dvNv3-0004RA-Ra
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:23:07 -0400
+Date: Fri, 22 Sep 2017 21:22:54 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170922132254.GG32000@lemon>
+References: <20170915101008.16646-2-kwolf@redhat.com>
+	<20170922125559.11768-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <9d640173-93fe-0850-9335-d545dd34b2de@twiddle.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/kvm: fix and cleanup storing CPU
- status
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170922125559.11768-1-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] qemu-io: Drop write permissions
+ before read-only reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +24,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-On 22.09.2017 15:12, Richard Henderson wrote:
-> On 09/21/2017 04:30 PM, David Hildenbrand wrote:
->> +struct sigp_save_area {
->> +    uint64_t    fprs[16];                       /* 0x0000 */
->> +    uint64_t    grs[16];                        /* 0x0080 */
->> +    PSW         psw;                            /* 0x0100 */
->> +    uint8_t     pad_0x0110[0x0118 - 0x0110];    /* 0x0110 */
->> +    uint32_t    prefix;                         /* 0x0118 */
->> +    uint32_t    fpc;                            /* 0x011c */
->> +    uint8_t     pad_0x0120[0x0124 - 0x0120];    /* 0x0120 */
->> +    uint32_t    todpr;                          /* 0x0124 */
->> +    uint64_t    cputm;                          /* 0x0128 */
->> +    uint64_t    ckc;                            /* 0x0130 */
->> +    uint8_t     pad_0x0138[0x0140 - 0x0138];    /* 0x0138 */
->> +    uint32_t    ars[16];                        /* 0x0140 */
->> +    uint64_t    crs[16];                        /* 0x0384 */
->> +} QEMU_PACKED;
+On Fri, 09/22 14:55, Kevin Wolf wrote:
+> qemu-io provides a 'reopen' command that allows switching from writable
+> to read-only access. We need to make sure that we don't try to keep
+> write permissions to a BlockBackend that becomes read-only, otherwise
+> things are going to fail.
 > 
-> I don't believe you need to use QEMU_PACKED.  Unless the "addr" that's passed
-> in can really be arbitrary?  (If so, the memory returned by
-> cpu_physical_memory_map will be unaligned and so we do need the PACKED to force
-> the compiler to generate unaligned stores into the structure.)
-
-The address is either 0x1200 or it is masked with 0x7ffffe00u.
-
-So most probably this should be fine without QEMU_PACKED, right?
-
+> This requires a bdrv_drain() call because otherwise in-flight AIO
+> write requests could issue new internal requests while the permission
+> has already gone away, which would cause assertion failures. Draining
+> the queue doesn't break AIO requests in any new way, bdrv_reopen() would
+> drain it anyway only a few lines later.
 > 
->> QEMU_BUILD_BUG_ON(sizeof(*sa) != 512);
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qemu-io-cmds.c             | 12 ++++++++++++
+>  tests/qemu-iotests/187.out |  2 +-
+>  2 files changed, 13 insertions(+), 1 deletion(-)
 > 
-> Put this right next to the structure?
+> diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+> index 2811a89099..3727fb43f3 100644
+> --- a/qemu-io-cmds.c
+> +++ b/qemu-io-cmds.c
+> @@ -2010,6 +2010,18 @@ static int reopen_f(BlockBackend *blk, int argc, char **argv)
+>          return 0;
+>      }
+>  
+> +    if (!(flags & BDRV_O_RDWR)) {
+> +        uint64_t orig_perm, orig_shared_perm;
+> +
+> +        bdrv_drain(bs);
+> +
+> +        blk_get_perm(blk, &orig_perm, &orig_shared_perm);
+> +        blk_set_perm(blk,
+> +                     orig_perm & ~(BLK_PERM_WRITE | BLK_PERM_WRITE_UNCHANGED),
+> +                     orig_shared_perm,
+> +                     &error_abort);
+> +    }
+> +
+>      qopts = qemu_opts_find(&reopen_opts, NULL);
+>      opts = qopts ? qemu_opts_to_qdict(qopts, NULL) : NULL;
+>      qemu_opts_reset(&reopen_opts);
+> diff --git a/tests/qemu-iotests/187.out b/tests/qemu-iotests/187.out
+> index 68fb944cd5..30b987f71f 100644
+> --- a/tests/qemu-iotests/187.out
+> +++ b/tests/qemu-iotests/187.out
+> @@ -12,7 +12,7 @@ Start from read-write
+>  
+>  wrote 65536/65536 bytes at offset 0
+>  64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> -write failed: Operation not permitted
+> +Block node is read-only
+>  wrote 65536/65536 bytes at offset 0
+>  64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>  *** done
+> -- 
+> 2.13.5
 > 
 
-Wasn't aware that this can be moved outside of a function. Thanks!
-
-Thanks!
-
-> 
-> r~
-> 
-
-
--- 
-
-Thanks,
-
-David
+Reviewed-by: Fam Zheng <famz@redhat.com>
