@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51886)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dvQP5-0006Tu-8M
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 12:02:12 -0400
+	id 1dvQP3-0006Sa-UX
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 12:02:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dvQP3-0000Dp-Du
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 12:02:11 -0400
+	id 1dvQOz-0000BE-FE
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 12:02:09 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 22 Sep 2017 13:01:08 -0300
-Message-Id: <20170922160111.31885-9-f4bug@amsat.org>
+Date: Fri, 22 Sep 2017 13:01:07 -0300
+Message-Id: <20170922160111.31885-8-f4bug@amsat.org>
 In-Reply-To: <20170922154014.29350-1-f4bug@amsat.org>
 References: <20170922154014.29350-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 31/34] hw/net/rtl8139: use TYPE_PCI_RTL8139
+Subject: [Qemu-devel] [PATCH 30/34] hw/net/pcnet: use TYPE_PCI_PCNET
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,149 +26,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Magnus Damm <magnus.damm@gmail.com>, Jason Wang <jasowang@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-trivial@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Jason Wang <jasowang@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-trivial@nongnu.org
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/net/pci.h    | 1 +
- hw/arm/realview.c       | 3 ++-
- hw/arm/versatilepb.c    | 3 ++-
- hw/mips/mips_fulong2e.c | 3 ++-
- hw/net/rtl8139.c        | 7 +++----
- hw/sh4/r2d.c            | 5 +++--
- 6 files changed, 13 insertions(+), 9 deletions(-)
+ include/hw/net/pci.h | 1 +
+ hw/mips/mips_malta.c | 2 +-
+ hw/net/pcnet-pci.c   | 3 +--
+ hw/ppc/prep.c        | 3 ++-
+ 4 files changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/include/hw/net/pci.h b/include/hw/net/pci.h
-index 5ad5487a91..43ed3b0145 100644
+index 92111f86f3..5ad5487a91 100644
 --- a/include/hw/net/pci.h
 +++ b/include/hw/net/pci.h
-@@ -16,6 +16,7 @@
+@@ -15,6 +15,7 @@
+ 
  #define TYPE_PCI_E1000      "e1000"
  #define TYPE_PCI_E1000E     "e1000e"
- #define TYPE_PCI_PCNET      "pcnet"
-+#define TYPE_PCI_RTL8139    "rtl8139"
++#define TYPE_PCI_PCNET      "pcnet"
  
  PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,
                                 const char *default_model,
-diff --git a/hw/arm/realview.c b/hw/arm/realview.c
-index 87cd1e583c..35f0da28e4 100644
---- a/hw/arm/realview.c
-+++ b/hw/arm/realview.c
-@@ -20,6 +20,7 @@
- #include "sysemu/sysemu.h"
- #include "hw/boards.h"
- #include "hw/i2c/i2c.h"
-+#include "hw/net/pci.h"
- #include "sysemu/block-backend.h"
- #include "exec/address-spaces.h"
- #include "qemu/error-report.h"
-@@ -269,7 +270,7 @@ static void realview_init(MachineState *machine,
-             done_nic = 1;
-         } else {
-             if (pci_bus) {
--                pci_nic_init_nofail(nd, pci_bus, "rtl8139", NULL);
-+                pci_nic_init_nofail(nd, pci_bus, TYPE_PCI_RTL8139, NULL);
-             }
-         }
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index fb6a2f9363..921678fdb0 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -597,7 +597,7 @@ static void network_init(PCIBus *pci_bus)
+             /* The malta board has a PCNet card using PCI SLOT 11 */
+             default_devaddr = "0b";
+ 
+-        pci_nic_init_nofail(nd, pci_bus, "pcnet", default_devaddr);
++        pci_nic_init_nofail(nd, pci_bus, TYPE_PCI_PCNET, default_devaddr);
      }
-diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
-index 418792cd02..297aad78e1 100644
---- a/hw/arm/versatilepb.c
-+++ b/hw/arm/versatilepb.c
-@@ -18,6 +18,7 @@
- #include "sysemu/sysemu.h"
+ }
+ 
+diff --git a/hw/net/pcnet-pci.c b/hw/net/pcnet-pci.c
+index 0acf8a4879..878e2c89c1 100644
+--- a/hw/net/pcnet-pci.c
++++ b/hw/net/pcnet-pci.c
+@@ -29,6 +29,7 @@
+ 
+ #include "qemu/osdep.h"
  #include "hw/pci/pci.h"
- #include "hw/i2c/i2c.h"
 +#include "hw/net/pci.h"
- #include "hw/boards.h"
- #include "sysemu/block-backend.h"
- #include "exec/address-spaces.h"
-@@ -271,7 +272,7 @@ static void versatile_init(MachineState *machine, int board_id)
-             smc91c111_init(nd, 0x10010000, sic[25]);
-             done_smc = 1;
-         } else {
--            pci_nic_init_nofail(nd, pci_bus, "rtl8139", NULL);
-+            pci_nic_init_nofail(nd, pci_bus, TYPE_PCI_RTL8139, NULL);
-         }
-     }
-     if (machine_usb(machine)) {
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 7ebbffa8f2..fe618953c9 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -44,6 +44,7 @@
- #include "hw/timer/mc146818rtc.h"
- #include "hw/timer/i8254.h"
- #include "hw/input/i8042.h"
-+#include "hw/net/pci.h"
- #include "sysemu/blockdev.h"
- #include "exec/address-spaces.h"
- #include "sysemu/qtest.h"
-@@ -253,7 +254,7 @@ static void network_init (PCIBus *pci_bus)
-             default_devaddr = "07";
-         }
- 
--        pci_nic_init_nofail(nd, pci_bus, "rtl8139", default_devaddr);
-+        pci_nic_init_nofail(nd, pci_bus, TYPE_PCI_RTL8139, default_devaddr);
-     }
- }
- 
-diff --git a/hw/net/rtl8139.c b/hw/net/rtl8139.c
-index 3be24bbee7..0f952eceba 100644
---- a/hw/net/rtl8139.c
-+++ b/hw/net/rtl8139.c
-@@ -59,6 +59,7 @@
  #include "net/net.h"
- #include "net/eth.h"
  #include "hw/loader.h"
-+#include "hw/net/pci.h"
- #include "sysemu/sysemu.h"
- #include "qemu/iov.h"
+ #include "qemu/timer.h"
+@@ -46,8 +47,6 @@
+ //#define PCNET_DEBUG_TMD
+ //#define PCNET_DEBUG_MATCH
  
-@@ -90,10 +91,8 @@ static inline GCC_FMT_ATTR(1, 2) int DPRINTF(const char *fmt, ...)
- }
- #endif
- 
--#define TYPE_RTL8139 "rtl8139"
+-#define TYPE_PCI_PCNET "pcnet"
 -
- #define RTL8139(obj) \
--     OBJECT_CHECK(RTL8139State, (obj), TYPE_RTL8139)
-+     OBJECT_CHECK(RTL8139State, (obj), TYPE_PCI_RTL8139)
+ #define PCI_PCNET(obj) \
+      OBJECT_CHECK(PCIPCNetState, (obj), TYPE_PCI_PCNET)
  
- /* Symbolic offsets to registers. */
- enum RTL8139_registers {
-@@ -3437,7 +3436,7 @@ static void rtl8139_class_init(ObjectClass *klass, void *data)
- }
- 
- static const TypeInfo rtl8139_info = {
--    .name          = TYPE_RTL8139,
-+    .name          = TYPE_PCI_RTL8139,
-     .parent        = TYPE_PCI_DEVICE,
-     .instance_size = sizeof(RTL8139State),
-     .class_init    = rtl8139_class_init,
-diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
-index 16b9ed2db2..dde60b2bc2 100644
---- a/hw/sh4/r2d.c
-+++ b/hw/sh4/r2d.c
-@@ -39,6 +39,7 @@
- #include "hw/ide.h"
- #include "hw/loader.h"
- #include "hw/usb.h"
+diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+index fb330a1769..b2c7a62ebc 100644
+--- a/hw/ppc/prep.c
++++ b/hw/ppc/prep.c
+@@ -44,6 +44,7 @@
+ #include "hw/input/i8042.h"
+ #include "hw/isa/pc87312.h"
+ #include "hw/net/ne2000-isa.h"
 +#include "hw/net/pci.h"
- #include "hw/block/flash.h"
  #include "sysemu/block-backend.h"
- #include "exec/address-spaces.h"
-@@ -303,8 +304,8 @@ static void r2d_init(MachineState *machine)
+ #include "sysemu/arch_init.h"
+ #include "sysemu/kvm.h"
+@@ -800,7 +801,7 @@ static void ibm_40p_init(MachineState *machine)
+         pci_vga_init(pci_bus);
  
-     /* NIC: rtl8139 on-board, and 2 slots. */
-     for (i = 0; i < nb_nics; i++)
--        pci_nic_init_nofail(&nd_table[i], pci_bus,
--                            "rtl8139", i==0 ? "2" : NULL);
-+        pci_nic_init_nofail(&nd_table[i], pci_bus, TYPE_PCI_RTL8139,
-+                            i == 0 ? "2" : NULL);
- 
-     /* USB keyboard */
-     usb_create_simple(usb_bus_find(-1), "usb-kbd");
+         for (i = 0; i < nb_nics; i++) {
+-            pci_nic_init_nofail(&nd_table[i], pci_bus, "pcnet",
++            pci_nic_init_nofail(&nd_table[i], pci_bus, TYPE_PCI_PCNET,
+                                 i == 0 ? "3" : NULL);
+         }
+     }
 -- 
 2.14.1
