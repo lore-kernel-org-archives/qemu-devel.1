@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dvQ4o-0004mW-Hp
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 11:41:16 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dvQ4r-0004ph-JB
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 11:41:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dvQ4l-0003H4-CM
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 11:41:14 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43994)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dvQ4l-0003Fq-36
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 11:41:11 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dvQ4j-0004yI-7f
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 15:41:09 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E851A2E849E
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 15:41:08 +0000 (UTC)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dvQ4o-0003Jd-Fb
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 11:41:17 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Fri, 22 Sep 2017 12:39:52 -0300
+Message-Id: <20170922154014.29350-13-f4bug@amsat.org>
+In-Reply-To: <20170922154014.29350-1-f4bug@amsat.org>
+References: <20170922154014.29350-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 22 Sep 2017 15:33:17 -0000
-From: Carl Brassey <1718964@bugs.launchpad.net>
-Reply-To: Bug 1718964 <1718964@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <150609439728.30760.16378952760062218203.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1718964] [NEW] Memory leak when using websocket
- over a low speed network
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 12/34] misc: remove old i386 dependency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,231 +26,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Public bug reported:
-
-Description of problem
--------------------------
-
-When VNC is connected to QEMU via websocket over a low speed network
-(e.g. 300KB/S Wide Area Network), and there is a lot of frame buffer
-update, the VNC Client will get stuck, the cursor is almost impossible
-to move, which may result in accumulation of a large number of data in
-the QEMU process (memory consumption will keep increasing).
-
-
-Environment
--------------------------
-All of the following versions have been tested:
-
-QEMU: 2.5.1 / 2.6.0 / 2.8.1.1 / 2.9.0 / 2.10.0
-Host OS: Ubuntu 16.04 Server LTS / CentOS 7 x86_64_1611
-Guest OS: Windows 7 64bit / Ubuntu 16.04 Desktop LTS
-Client OS: Windows 7 64bit / Windows 10 64bit
-Client Browser: IE 11.0.9600 / Chrome 60.0.3112 / Firefox 55.0.2
-VNC Client: TigerVNC Viewer 1.8 / UltraVNC Viewer 1.2.1.5 / TightVNC Viewer=
- 2.8.8 =
-
-VNC Web Client: noVNC 0.5.1 / noVNC 0.61 / noVNC 0.62
-VNC Server: TigerVNC 1.8 / x11vnc 0.9.13 / TightVNC 2.8.8
-VNC Client: TigerVNC Viewer 1.8 / UltraVNC Viewer 1.2.1.5 / TightVNC Viewer=
- 2.8.8
-
-
-Steps to reproduce:
--------------------------
-100% reproducible.
-
-1. Launch a QEMU instance with websocket option:
-qemu-system-x86_64 -enable-kvm -m 6G ./win_x64.qcow2 -vnc :1,websocket=3D57=
-01
-
-2. Open VNC Web Client (noVNC/vnc.html) in browser and connect to QEMU
-VM via websocket
-
-3. Play a video (e.g. Watch YouTube) on VM (To produce a lot of frame
-buffer update)
-
-4. Limit (e.g. Use NetLimiter) the client inbound bandwidth to 300KB/S
-(To simulate a low speed WAN)
-
-5. Then client's output gets stuck(less than 1 fps), the cursor is
-almost impossible to move
-
-6. Observe QEMU process on the host, more and more data are accumulated
-in the process, the consumption of memory continues to keep increasing
-
-
-Current result:
--------------------------
-[Top - Initial status]
-  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND=
-         =
-
- 2725 root      20   0 7229144 5.910g  23024 S  16.3 18.9   0:12.84 qemu-sy=
-stem-x86_64
-
-[Top - After an hour's playing w/o limit (6-8MB/S)]
-  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND=
-         =
-
- 2725 root      20   0 7370284 6.046g  23132 S  28.0 19.3  35:58.15 qemu-sy=
-stem-x86_64
-
-[Top - Limit the bandwidth and continue to playing for another an hour (300=
-KB/S)]
-  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND=
-         =
-
- 2725 root      20   0 11.029g 8.853g  23132 S  20.0 28.2  72:14.17 qemu-sy=
-stem-x86_64
-
-Also test several other combinations in the same environment:
-
-1. Client(VNC Viewer) - Server(QEMU)
-2. Client(VNC Viewer) - Server(tigervnc/x11vnc/tightvnc)
-3. Client(noVNC)      - Server(tigervnc/x11vnc/tightvnc)
-
-Likewise, the client's inbound bandwidth is limited to 300KB/S, =
-
-although a lot of frame are lost, all of they still works (at least the mou=
-se is movable).
-
-It's found that when connect to QEMU via websocket, it never drop any frame=
-s.
-QEMU still sends a lot of data to its websocket even when the network is co=
-ngested, =
-
-the process is continually consuming more memory, then it gets stack.
-
-
-Expected results:
--------------------------
-When the network is poor (non-LAN), QEMU would reduce the VNC data send to =
-its websocket correspondingly, and the memory usage remains stable.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1718964
-
-Title:
-  Memory leak when using websocket over a low speed network
-
-Status in QEMU:
-  New
-
-Bug description:
-  Description of problem
-  -------------------------
-
-  When VNC is connected to QEMU via websocket over a low speed network
-  (e.g. 300KB/S Wide Area Network), and there is a lot of frame buffer
-  update, the VNC Client will get stuck, the cursor is almost impossible
-  to move, which may result in accumulation of a large number of data in
-  the QEMU process (memory consumption will keep increasing).
-
-  =
-
-  Environment
-  -------------------------
-  All of the following versions have been tested:
-
-  QEMU: 2.5.1 / 2.6.0 / 2.8.1.1 / 2.9.0 / 2.10.0
-  Host OS: Ubuntu 16.04 Server LTS / CentOS 7 x86_64_1611
-  Guest OS: Windows 7 64bit / Ubuntu 16.04 Desktop LTS
-  Client OS: Windows 7 64bit / Windows 10 64bit
-  Client Browser: IE 11.0.9600 / Chrome 60.0.3112 / Firefox 55.0.2
-  VNC Client: TigerVNC Viewer 1.8 / UltraVNC Viewer 1.2.1.5 / TightVNC View=
-er 2.8.8 =
-
-  VNC Web Client: noVNC 0.5.1 / noVNC 0.61 / noVNC 0.62
-  VNC Server: TigerVNC 1.8 / x11vnc 0.9.13 / TightVNC 2.8.8
-  VNC Client: TigerVNC Viewer 1.8 / UltraVNC Viewer 1.2.1.5 / TightVNC View=
-er 2.8.8
-
-  =
-
-  Steps to reproduce:
-  -------------------------
-  100% reproducible.
-
-  1. Launch a QEMU instance with websocket option:
-  qemu-system-x86_64 -enable-kvm -m 6G ./win_x64.qcow2 -vnc :1,websocket=3D=
-5701
-
-  2. Open VNC Web Client (noVNC/vnc.html) in browser and connect to QEMU
-  VM via websocket
-
-  3. Play a video (e.g. Watch YouTube) on VM (To produce a lot of frame
-  buffer update)
-
-  4. Limit (e.g. Use NetLimiter) the client inbound bandwidth to 300KB/S
-  (To simulate a low speed WAN)
-
-  5. Then client's output gets stuck(less than 1 fps), the cursor is
-  almost impossible to move
-
-  6. Observe QEMU process on the host, more and more data are
-  accumulated in the process, the consumption of memory continues to
-  keep increasing
-
-  =
-
-  Current result:
-  -------------------------
-  [Top - Initial status]
-    PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMA=
-ND         =
-
-   2725 root      20   0 7229144 5.910g  23024 S  16.3 18.9   0:12.84 qemu-=
-system-x86_64
-
-  [Top - After an hour's playing w/o limit (6-8MB/S)]
-    PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMA=
-ND         =
-
-   2725 root      20   0 7370284 6.046g  23132 S  28.0 19.3  35:58.15 qemu-=
-system-x86_64
-
-  [Top - Limit the bandwidth and continue to playing for another an hour (3=
-00KB/S)]
-    PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMA=
-ND         =
-
-   2725 root      20   0 11.029g 8.853g  23132 S  20.0 28.2  72:14.17 qemu-=
-system-x86_64
-
-  Also test several other combinations in the same environment:
-
-  1. Client(VNC Viewer) - Server(QEMU)
-  2. Client(VNC Viewer) - Server(tigervnc/x11vnc/tightvnc)
-  3. Client(noVNC)      - Server(tigervnc/x11vnc/tightvnc)
-
-  Likewise, the client's inbound bandwidth is limited to 300KB/S, =
-
-  although a lot of frame are lost, all of they still works (at least the m=
-ouse is movable).
-
-  It's found that when connect to QEMU via websocket, it never drop any fra=
-mes.
-  QEMU still sends a lot of data to its websocket even when the network is =
-congested, =
-
-  the process is continually consuming more memory, then it gets stack.
-
-  =
-
-  Expected results:
-  -------------------------
-  When the network is poor (non-LAN), QEMU would reduce the VNC data send t=
-o its websocket correspondingly, and the memory usage remains stable.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1718964/+subscriptions
+To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Anthony Perard <anthony.perard@citrix.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/audio/pcspk.c                    | 1 -
+ hw/i386/kvm/pci-assign.c            | 1 -
+ hw/i386/pci-assign-load-rom.c       | 1 -
+ hw/i386/xen/xen_platform.c          | 1 -
+ hw/isa/vt82c686.c                   | 1 -
+ hw/misc/ivshmem.c                   | 1 -
+ hw/misc/sga.c                       | 1 -
+ hw/pci-bridge/pci_expander_bridge.c | 1 -
+ monitor.c                           | 1 -
+ 9 files changed, 9 deletions(-)
+
+diff --git a/hw/audio/pcspk.c b/hw/audio/pcspk.c
+index 0206f7399b..908696d483 100644
+--- a/hw/audio/pcspk.c
++++ b/hw/audio/pcspk.c
+@@ -24,7 +24,6 @@
+ 
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+-#include "hw/i386/pc.h"
+ #include "hw/isa/isa.h"
+ #include "hw/audio/soundhw.h"
+ #include "audio/audio.h"
+diff --git a/hw/i386/kvm/pci-assign.c b/hw/i386/kvm/pci-assign.c
+index 33e20cb3e8..3f103a99db 100644
+--- a/hw/i386/kvm/pci-assign.c
++++ b/hw/i386/kvm/pci-assign.c
+@@ -25,7 +25,6 @@
+ #include <linux/kvm.h>
+ #include "qapi/error.h"
+ #include "hw/hw.h"
+-#include "hw/i386/pc.h"
+ #include "qemu/error-report.h"
+ #include "ui/console.h"
+ #include "hw/loader.h"
+diff --git a/hw/i386/pci-assign-load-rom.c b/hw/i386/pci-assign-load-rom.c
+index 43429b66be..2c3a60392e 100644
+--- a/hw/i386/pci-assign-load-rom.c
++++ b/hw/i386/pci-assign-load-rom.c
+@@ -4,7 +4,6 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "hw/hw.h"
+-#include "hw/i386/pc.h"
+ #include "qemu/error-report.h"
+ #include "ui/console.h"
+ #include "hw/loader.h"
+diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
+index 9ba7474566..880926f442 100644
+--- a/hw/i386/xen/xen_platform.c
++++ b/hw/i386/xen/xen_platform.c
+@@ -26,7 +26,6 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "hw/hw.h"
+-#include "hw/i386/pc.h"
+ #include "hw/ide.h"
+ #include "hw/pci/pci.h"
+ #include "hw/irq.h"
+diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
+index 50dc83df77..2484a956c7 100644
+--- a/hw/isa/vt82c686.c
++++ b/hw/isa/vt82c686.c
+@@ -12,7 +12,6 @@
+ 
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+-#include "hw/i386/pc.h"
+ #include "hw/isa/vt82c686.h"
+ #include "hw/i2c/i2c.h"
+ #include "hw/i2c/smbus.h"
+diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+index b3ef3ec1e3..971bd759f4 100644
+--- a/hw/misc/ivshmem.c
++++ b/hw/misc/ivshmem.c
+@@ -20,7 +20,6 @@
+ #include "qapi/error.h"
+ #include "qemu/cutils.h"
+ #include "hw/hw.h"
+-#include "hw/i386/pc.h"
+ #include "hw/pci/pci.h"
+ #include "hw/pci/msi.h"
+ #include "hw/pci/msix.h"
+diff --git a/hw/misc/sga.c b/hw/misc/sga.c
+index 03b006d6f0..97fd63f176 100644
+--- a/hw/misc/sga.c
++++ b/hw/misc/sga.c
+@@ -26,7 +26,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "hw/pci/pci.h"
+-#include "hw/i386/pc.h"
+ #include "hw/loader.h"
+ #include "sysemu/sysemu.h"
+ 
+diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expander_bridge.c
+index ff59abf208..3295af3d20 100644
+--- a/hw/pci-bridge/pci_expander_bridge.c
++++ b/hw/pci-bridge/pci_expander_bridge.c
+@@ -16,7 +16,6 @@
+ #include "hw/pci/pci_bus.h"
+ #include "hw/pci/pci_host.h"
+ #include "hw/pci/pci_bridge.h"
+-#include "hw/i386/pc.h"
+ #include "qemu/range.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/numa.h"
+diff --git a/monitor.c b/monitor.c
+index 058045b3cb..a1ae6a26f2 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -28,7 +28,6 @@
+ #include "hw/hw.h"
+ #include "monitor/qdev.h"
+ #include "hw/usb.h"
+-#include "hw/i386/pc.h"
+ #include "hw/pci/pci.h"
+ #include "sysemu/watchdog.h"
+ #include "hw/loader.h"
+-- 
+2.14.1
