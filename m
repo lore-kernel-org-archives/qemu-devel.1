@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jgross@suse.com>) id 1dvMgW-0006AE-Fm
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:04:00 -0400
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1dvMgx-0006Ly-NG
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:04:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jgross@suse.com>) id 1dvMgQ-0004dn-O1
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:03:56 -0400
-Received: from mx2.suse.de ([195.135.220.15]:60804 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jgross@suse.com>) id 1dvMgQ-0004c2-Hb
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:03:50 -0400
-References: <20170919115055.19278-1-jgross@suse.com>
-	<20170919115055.19278-3-jgross@suse.com>
-	<20170920150006.GB1859@perard.uk.xensource.com>
-From: Juergen Gross <jgross@suse.com>
-Message-ID: <912fbfb9-59b9-fceb-237f-3b201f6eaa38@suse.com>
-Date: Fri, 22 Sep 2017 14:03:47 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170920150006.GB1859@perard.uk.xensource.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH 2/2] xen: dont try setting max
- grants multiple times
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1dvMgu-0004td-Kq
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:04:23 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35935)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pradeepkiruvale@gmail.com>)
+	id 1dvMgu-0004tL-CV
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:04:20 -0400
+Received: by mail-wm0-x244.google.com with SMTP id r136so1089820wmf.3
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 05:04:20 -0700 (PDT)
+From: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Date: Fri, 22 Sep 2017 08:03:41 -0400
+Message-Id: <1506081825-14209-3-git-send-email-pradeep.jagadeesh@huawei.com>
+In-Reply-To: <1506081825-14209-1-git-send-email-pradeep.jagadeesh@huawei.com>
+References: <1506081825-14209-1-git-send-email-pradeep.jagadeesh@huawei.com>
+Subject: [Qemu-devel] [PATCH v12 2/6] qmp: Use ThrottleLimits structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +26,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: xen-devel@lists.xenproject.org, sstabellini@kernel.org, qemu-devel@nongnu.org, kraxel@redhat.com
+To: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-On 20/09/17 17:00, Anthony PERARD wrote:
-> On Tue, Sep 19, 2017 at 01:50:55PM +0200, Juergen Gross wrote:
->> Trying to call xengnttab_set_max_grants() with the same file handle
->> might fail on some kernels, as this operation is allowed only once.
->>
->> This is a problem for the qdisk backend as blk_connect() can be
->> called multiple times for a domain, e.g. in case grub-xen is being
->> used to boot it.
->>
->> So instead of letting the generic backend code open the gnttab device
->> do it in blk_connect() and close it again in blk_disconnect.
->>
->> Signed-off-by: Juergen Gross <jgross@suse.com>
->> ---
->>  hw/block/xen_disk.c | 12 +++++++++++-
->>  1 file changed, 11 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
->> index 6632746250..7cff8863cb 100644
->> --- a/hw/block/xen_disk.c
->> +++ b/hw/block/xen_disk.c
->> @@ -1220,6 +1220,12 @@ static int blk_connect(struct XenDevice *xendev)
->>      /* Add on the number needed for the ring pages */
->>      max_grants += blkdev->nr_ring_ref;
->>  
->> +    blkdev->xendev.gnttabdev = xengnttab_open(NULL, 0);
->> +    if (blkdev->xendev.gnttabdev == NULL) {
->> +        xen_pv_printf(xendev, 0, "xengnttab_open failed: %s\n",
->> +                      strerror(errno));
->> +        return -1;
->> +    }
->>      if (xengnttab_set_max_grants(blkdev->xendev.gnttabdev, max_grants)) {
->>          xen_pv_printf(xendev, 0, "xengnttab_set_max_grants failed: %s\n",
->>                        strerror(errno));
->> @@ -1327,6 +1333,11 @@ static void blk_disconnect(struct XenDevice *xendev)
->>          }
->>          blkdev->feature_persistent = false;
->>      }
->> +
->> +    if (blkdev->xendev.gnttabdev) {
->> +        xengnttab_close(blkdev->xendev.gnttabdev);
->> +        blkdev->xendev.gnttabdev = NULL;
->> +    }
-> 
-> I think blk_disconnect needs to be called from blk_free in case where
-> the gnttabdev is not closed (like it is done when blk or the sring are
-> not cleared, in blk_free).
+This patch factors out code to use the ThrottleLimits
+structure.
 
-Right. Just calling it always from blk_free() should do the job.
+Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+---
+ qapi/block-core.json | 75 +++-------------------------------------------------
+ 1 file changed, 3 insertions(+), 72 deletions(-)
 
-BTW: in practice this wouldn't be necessary as xen_pv_del_xendev()
-already does the close, but this is just good luck. Better closing it
-via blk_free() in case xen_pv_del_xendev() adds a test for
-DEVOPS_FLAG_NEED_GNTDEV.
-
-
-Thanks,
-
-Juergen
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index bb11815..5ca4597 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1824,86 +1824,17 @@
+ #
+ # A set of parameters describing block throttling.
+ #
+-# @device: Block device name (deprecated, use @id instead)
+-#
+ # @id: The name or QOM path of the guest device (since: 2.8)
+ #
+-# @bps: total throughput limit in bytes per second
+-#
+-# @bps_rd: read throughput limit in bytes per second
+-#
+-# @bps_wr: write throughput limit in bytes per second
+-#
+-# @iops: total I/O operations per second
+-#
+-# @iops_rd: read I/O operations per second
+-#
+-# @iops_wr: write I/O operations per second
+-#
+-# @bps_max: total throughput limit during bursts,
+-#                     in bytes (Since 1.7)
+-#
+-# @bps_rd_max: read throughput limit during bursts,
+-#                        in bytes (Since 1.7)
+-#
+-# @bps_wr_max: write throughput limit during bursts,
+-#                        in bytes (Since 1.7)
+-#
+-# @iops_max: total I/O operations per second during bursts,
+-#                      in bytes (Since 1.7)
+-#
+-# @iops_rd_max: read I/O operations per second during bursts,
+-#                         in bytes (Since 1.7)
+-#
+-# @iops_wr_max: write I/O operations per second during bursts,
+-#                         in bytes (Since 1.7)
+-#
+-# @bps_max_length: maximum length of the @bps_max burst
+-#                            period, in seconds. It must only
+-#                            be set if @bps_max is set as well.
+-#                            Defaults to 1. (Since 2.6)
+-#
+-# @bps_rd_max_length: maximum length of the @bps_rd_max
+-#                               burst period, in seconds. It must only
+-#                               be set if @bps_rd_max is set as well.
+-#                               Defaults to 1. (Since 2.6)
+-#
+-# @bps_wr_max_length: maximum length of the @bps_wr_max
+-#                               burst period, in seconds. It must only
+-#                               be set if @bps_wr_max is set as well.
+-#                               Defaults to 1. (Since 2.6)
+-#
+-# @iops_max_length: maximum length of the @iops burst
+-#                             period, in seconds. It must only
+-#                             be set if @iops_max is set as well.
+-#                             Defaults to 1. (Since 2.6)
+-#
+-# @iops_rd_max_length: maximum length of the @iops_rd_max
+-#                                burst period, in seconds. It must only
+-#                                be set if @iops_rd_max is set as well.
+-#                                Defaults to 1. (Since 2.6)
+-#
+-# @iops_wr_max_length: maximum length of the @iops_wr_max
+-#                                burst period, in seconds. It must only
+-#                                be set if @iops_wr_max is set as well.
+-#                                Defaults to 1. (Since 2.6)
+-#
+-# @iops_size: an I/O size in bytes (Since 1.7)
++# @device: Block device name (deprecated, use @id instead)
+ #
+ # @group: throttle group name (Since 2.4)
+ #
+ # Since: 1.1
+ ##
+ { 'struct': 'BlockIOThrottle',
+-  'data': { '*device': 'str', '*id': 'str', 'bps': 'int', 'bps_rd': 'int',
+-            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
+-            '*bps_max': 'int', '*bps_rd_max': 'int',
+-            '*bps_wr_max': 'int', '*iops_max': 'int',
+-            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
+-            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
+-            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+-            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
+-            '*iops_size': 'int', '*group': 'str' } }
++  'base': 'ThrottleLimits',
++  'data': { '*device': 'str', '*id': 'str', '*group': 'str' } }
+ 
+ ##
+ # @ThrottleLimits:
+-- 
+1.8.3.1
