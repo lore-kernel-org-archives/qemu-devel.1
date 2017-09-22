@@ -1,36 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dvLC5-0002ug-M9
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:28:26 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dvLEQ-0004Qt-Jk
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:30:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dvLC3-0003Ay-15
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:28:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49172)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dvLC2-0003AI-PP
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:28:22 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DD782C0733FA
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 10:28:21 +0000 (UTC)
-Date: Fri, 22 Sep 2017 11:28:08 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170922102808.GL12725@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1506070572-7549-1-git-send-email-peterx@redhat.com>
-	<1506070572-7549-2-git-send-email-peterx@redhat.com>
-	<20170922101652.GF9243@stefanha-x1.localdomain>
-	<4bf59c2a-8b21-0613-5575-3dfee2762633@redhat.com>
-	<20170922102049.GK12725@redhat.com>
-	<e993362e-3f72-add0-bb5e-1e74830dc396@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1dvLEP-0004t2-Dr
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:30:50 -0400
+Date: Fri, 22 Sep 2017 20:15:01 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170922101501.GI4998@umbus.fritz.box>
+References: <150600964184.30533.472565821627831467.stgit@bahia.lan>
+	<150600965332.30533.14702405809647835716.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="81JctsDUVPekGcy+"
 Content-Disposition: inline
-In-Reply-To: <e993362e-3f72-add0-bb5e-1e74830dc396@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] iothread: provide helpers for internal
- use
+In-Reply-To: <150600965332.30533.14702405809647835716.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] kvm: check KVM_CAP_SYNC_MMU with
+ kvm_vm_check_extension()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,52 +25,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-On Fri, Sep 22, 2017 at 12:26:16PM +0200, Paolo Bonzini wrote:
-> On 22/09/2017 12:20, Daniel P. Berrange wrote:
-> > On Fri, Sep 22, 2017 at 12:18:44PM +0200, Paolo Bonzini wrote:
-> >> On 22/09/2017 12:16, Stefan Hajnoczi wrote:
-> >>> I suggest adding internal IOThreads alongside user-created IOThreads
-> >>> instead of hiding them.  IOThread also needs a bool user_created field
-> >>> and a UserCreatableClass->can_be_deleted() function:
-> >>>
-> >>>   static bool iothread_can_be_deleted(UserCreatable *uc)
-> >>>   {
-> >>>       return IOTHREAD(uc)->user_created;
-> >>>   }
-> >>>
-> >>> This way users cannot delete internal IOThreads.
-> >>>
-> >>> But how should object ids be handled?  In theory existing -object
-> >>> iothread,id=<id> users could use any name.  How can QEMU generate ids
-> >>> for internal IOThreads without conflicting with existing users's ids?
-> >>
-> >> I would add an 'internal' boolean to query-iothreads' response and a new
-> >> 'show-internal' boolean to the command.  This way, applications that
-> >> request internal iothreads would know that the "primary key" is
-> >> (internal, id) rather than just the id.
-> > 
-> > What is the app going to do with iothreads if it sees "internal" flag
-> > set ? They have no way of knowing what part of QEMU internally is using
-> > this iothread, so I don't see that they can do anything intelligent
-> > once they find out they exist.
-> 
-> The application could apply them default settings for scheduler policy
-> or CPU affinity.
-> 
-> Unlike the main or the I/O thread, the monitor thread doesn't interrupt
-> the CPU, so it need not run at SCHED_FIFO even in real-time settings.
 
-There's no way for the application to know that. ALl it sees is that there
-is an extra unexpected IOthread created internally by QEMU. There's no way
-to decide whether it nedes SCHED_FIFO or not as we've no clue what it is
-being used for.
+--81JctsDUVPekGcy+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+On Thu, Sep 21, 2017 at 06:00:53PM +0200, Greg Kurz wrote:
+> On a server-class ppc host, this capability depends on the KVM type,
+> ie, HV or PR. If both KVM are present in the kernel, we will always
+> get the HV specific value, even if we explicitely requested PR on
+> the command line.
+>=20
+> This can have an impact if we're using hugepages or a balloon device.
+>=20
+> Since we've already created the VM at the time any user calls
+> kvm_has_sync_mmu(), switching to kvm_vm_check_extension() is
+> enough to fix any potential issue.
+>=20
+> It is okay for the other archs that also implement KVM_CAP_SYNC_MMU,
+> ie, mips, s390, x86 and arm, because they don't depend on the VM being
+> created or not.
+>=20
+> While here, let's cache the state of this extension in a bool variable,
+> since it has several users in the code, as suggested by Thomas Huth.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  accel/kvm/kvm-all.c    |    8 +++++---
+>  accel/stubs/kvm-stub.c |    4 ++--
+>  include/sysemu/kvm.h   |    2 +-
+>  3 files changed, 8 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index b0181d722083..4d96c1fee9fe 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -87,6 +87,7 @@ struct KVMState
+>  #endif
+>      int many_ioeventfds;
+>      int intx_set_mask;
+> +    bool sync_mmu;
+>      /* The man page (and posix) say ioctl numbers are signed int, but
+>       * they're not.  Linux, glibc and *BSD all treat ioctl numbers as
+>       * unsigned, and treating them as signed here can break things */
+> @@ -1665,6 +1666,8 @@ static int kvm_init(MachineState *ms)
+> =20
+>      s->many_ioeventfds =3D kvm_check_many_ioeventfds();
+> =20
+> +    s->sync_mmu =3D !!kvm_vm_check_extension(kvm_state, KVM_CAP_SYNC_MMU=
+);
+> +
+>      return 0;
+> =20
+>  err:
+> @@ -2131,10 +2134,9 @@ int kvm_device_access(int fd, int group, uint64_t =
+attr,
+>      return err;
+>  }
+> =20
+> -/* Return 1 on success, 0 on failure */
+> -int kvm_has_sync_mmu(void)
+> +bool kvm_has_sync_mmu(void)
+>  {
+> -    return kvm_check_extension(kvm_state, KVM_CAP_SYNC_MMU);
+> +    return kvm_state->sync_mmu;
+>  }
+> =20
+>  int kvm_has_vcpu_events(void)
+> diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
+> index 3965c528d348..c964af3e1c97 100644
+> --- a/accel/stubs/kvm-stub.c
+> +++ b/accel/stubs/kvm-stub.c
+> @@ -64,9 +64,9 @@ int kvm_cpu_exec(CPUState *cpu)
+>      abort();
+>  }
+> =20
+> -int kvm_has_sync_mmu(void)
+> +bool kvm_has_sync_mmu(void)
+>  {
+> -    return 0;
+> +    return false;
+>  }
+> =20
+>  int kvm_has_many_ioeventfds(void)
+> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+> index 3a458f50e9f4..bbf12a172339 100644
+> --- a/include/sysemu/kvm.h
+> +++ b/include/sysemu/kvm.h
+> @@ -207,7 +207,7 @@ extern KVMState *kvm_state;
+>  /* external API */
+> =20
+>  bool kvm_has_free_slot(MachineState *ms);
+> -int kvm_has_sync_mmu(void);
+> +bool kvm_has_sync_mmu(void);
+>  int kvm_has_vcpu_events(void);
+>  int kvm_has_robust_singlestep(void);
+>  int kvm_has_debugregs(void);
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--81JctsDUVPekGcy+
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnE4qUACgkQbDjKyiDZ
+s5INLg//e2Lwo8I5tRTLAYwE7sWVcBwd6WAEX42zA0XlBZNaZeVx2VwUquYN+i71
+PS732pAfybrpSz+sw5utnqdIJi2jYjMX+7iCloGFd1kuaUJ+8JZF2qoaB+cK3f1K
+u79p/lXy23OJLWXG4rzroh0SOmUhYV290VkiKlykpMUlk0oPsKxM8phgZOKmDZ4L
+fMAdCqA2ncsFaJa3vQIilbbYNYJSJW2BJdLKxHXa2hueL4noNR6cGpwrxqhewONm
+y3PLuCHvhnIAPyO0A6rdkXF6eBa8i5DA5EhAhvS6wcLaDGeAryfEahTbOYi7epOI
+I0LJzHFlaugCHfzduCTEZoTgtoSWIzHJktidEn+xq6SgM0sePx2Sg6CoD0lL306S
+9e55thY53KKo4KUuc1bB/ct8gV5epTbX4yoh+D2nZBg4P81wnrBqda3GXsqfLNnG
+mhp6xsE6SDEIgTC8sZOMmQ/A5Twf4V4kXPcqNFfmV23ge5FQT2vA79O8Oicj/ieC
+1Hha/0wIg2HXlejypuD4C6uMZri1AWrr/kv9GnnDaRp2V3E07UgSYGCr2sVYQngp
+jj7Kuhnak9uVbLcg75Kw5acByijlGF6FHiVkmyDESUPcTmC5+D3JM13JpXBTflV0
+MnNZitGLQ4eL0OTbWTTyrT7hy9fuGsVnJm0hDjBG/OtI4XCC53c=
+=/qkX
+-----END PGP SIGNATURE-----
+
+--81JctsDUVPekGcy+--
