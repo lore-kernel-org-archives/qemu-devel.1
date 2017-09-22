@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dvKlE-0007qu-9G
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:00:45 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dvKsY-0001en-99
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:08:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dvKl8-0000S9-On
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:00:40 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:45494)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dvKl8-0000Ra-GP
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:00:34 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id q124so2382297wmb.0
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 03:00:34 -0700 (PDT)
-References: <20170921162746.11761-1-pbonzini@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170921162746.11761-1-pbonzini@redhat.com>
-Date: Fri, 22 Sep 2017 11:00:35 +0100
-Message-ID: <87bmm3cat8.fsf@linaro.org>
+	(envelope-from <dgilbert@redhat.com>) id 1dvKsU-0007eP-TY
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:08:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47816)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dvKsU-0007eA-L0
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:08:10 -0400
+Date: Fri, 22 Sep 2017 11:08:02 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170922100802.GC2620@work-vm>
+References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
+	<1504081950-2528-18-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] atomic: update documentation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1504081950-2528-18-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 17/33] migration: new state
+ "postcopy-recover"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +28,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
+* Peter Xu (peterx@redhat.com) wrote:
+> Introducing new migration state "postcopy-recover". If a migration
+> procedure is paused and the connection is rebuilt afterward
+> successfully, we'll switch the source VM state from "postcopy-paused" to
+> the new state "postcopy-recover", then we'll do the resume logic in the
+> migration thread (along with the return path thread).
+> 
+> This patch only do the state switch on source side. Another following up
+> patch will handle the state switching on destination side using the same
+> status bit.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+(Although it's a little large, so you may want to split it)
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
 > ---
->  docs/devel/atomics.txt | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
->
-> diff --git a/docs/devel/atomics.txt b/docs/devel/atomics.txt
-> index 3ef5d85b1b..048e5f23cb 100644
-> --- a/docs/devel/atomics.txt
-> +++ b/docs/devel/atomics.txt
-> @@ -63,11 +63,22 @@ operations:
->      typeof(*ptr) atomic_fetch_sub(ptr, val)
->      typeof(*ptr) atomic_fetch_and(ptr, val)
->      typeof(*ptr) atomic_fetch_or(ptr, val)
-> +    typeof(*ptr) atomic_fetch_xor(ptr, val)
->      typeof(*ptr) atomic_xchg(ptr, val)
->      typeof(*ptr) atomic_cmpxchg(ptr, old, new)
->
->  all of which return the old value of *ptr.  These operations are
-> -polymorphic; they operate on any type that is as wide as an int.
-> +polymorphic; they operate on any type that is as wide as a pointer.
+>  migration/migration.c | 76 ++++++++++++++++++++++++++++++++++++++-------------
+>  qapi-schema.json      |  4 ++-
+>  2 files changed, 60 insertions(+), 20 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index deb947b..30dd566 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -495,6 +495,7 @@ static bool migration_is_setup_or_active(int state)
+>      case MIGRATION_STATUS_ACTIVE:
+>      case MIGRATION_STATUS_POSTCOPY_ACTIVE:
+>      case MIGRATION_STATUS_POSTCOPY_PAUSED:
+> +    case MIGRATION_STATUS_POSTCOPY_RECOVER:
+>      case MIGRATION_STATUS_SETUP:
+>          return true;
+>  
+> @@ -571,6 +572,7 @@ MigrationInfo *qmp_query_migrate(Error **errp)
+>      case MIGRATION_STATUS_CANCELLING:
+>      case MIGRATION_STATUS_POSTCOPY_ACTIVE:
+>      case MIGRATION_STATUS_POSTCOPY_PAUSED:
+> +    case MIGRATION_STATUS_POSTCOPY_RECOVER:
+>           /* TODO add some postcopy stats */
+>          info->has_status = true;
+>          info->has_total_time = true;
+> @@ -2035,6 +2037,13 @@ typedef enum MigThrError {
+>      MIG_THR_ERR_FATAL = 2,
+>  } MigThrError;
+>  
+> +/* Return zero if success, or <0 for error */
+> +static int postcopy_do_resume(MigrationState *s)
+> +{
+> +    /* TODO: do the resume logic */
+> +    return 0;
+> +}
 > +
-> +Similar operations return the new value of *ptr:
+>  /*
+>   * We don't return until we are in a safe state to continue current
+>   * postcopy migration.  Returns MIG_THR_ERR_RECOVERED if recovered, or
+> @@ -2043,29 +2052,55 @@ typedef enum MigThrError {
+>  static MigThrError postcopy_pause(MigrationState *s)
+>  {
+>      assert(s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
+> -    migrate_set_state(&s->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
+> -                      MIGRATION_STATUS_POSTCOPY_PAUSED);
+>  
+> -    /* Current channel is possibly broken. Release it. */
+> -    assert(s->to_dst_file);
+> -    qemu_file_shutdown(s->to_dst_file);
+> -    qemu_fclose(s->to_dst_file);
+> -    s->to_dst_file = NULL;
+> +    while (true) {
+> +        migrate_set_state(&s->state, s->state,
+> +                          MIGRATION_STATUS_POSTCOPY_PAUSED);
+>  
+> -    error_report("Detected IO failure for postcopy. "
+> -                 "Migration paused.");
+> +        /* Current channel is possibly broken. Release it. */
+> +        assert(s->to_dst_file);
+> +        qemu_file_shutdown(s->to_dst_file);
+> +        qemu_fclose(s->to_dst_file);
+> +        s->to_dst_file = NULL;
+>  
+> -    /*
+> -     * We wait until things fixed up. Then someone will setup the
+> -     * status back for us.
+> -     */
+> -    while (s->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
+> -        qemu_sem_wait(&s->postcopy_pause_sem);
+> -    }
+> +        error_report("Detected IO failure for postcopy. "
+> +                     "Migration paused.");
 > +
-> +    typeof(*ptr) atomic_inc_fetch(ptr)
-> +    typeof(*ptr) atomic_dec_fetch(ptr)
-> +    typeof(*ptr) atomic_add_fetch(ptr, val)
-> +    typeof(*ptr) atomic_sub_fetch(ptr, val)
-> +    typeof(*ptr) atomic_and_fetch(ptr, val)
-> +    typeof(*ptr) atomic_or_fetch(ptr, val)
-> +    typeof(*ptr) atomic_xor_fetch(ptr, val)
->
->  Sequentially consistent loads and stores can be done using:
-
-
+> +        /*
+> +         * We wait until things fixed up. Then someone will setup the
+> +         * status back for us.
+> +         */
+> +        while (s->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
+> +            qemu_sem_wait(&s->postcopy_pause_sem);
+> +        }
+>  
+> -    trace_postcopy_pause_continued();
+> +        if (s->state == MIGRATION_STATUS_POSTCOPY_RECOVER) {
+> +            /* Woken up by a recover procedure. Give it a shot */
+> +
+> +            /*
+> +             * Firstly, let's wake up the return path now, with a new
+> +             * return path channel.
+> +             */
+> +            qemu_sem_post(&s->postcopy_pause_rp_sem);
+>  
+> -    return MIG_THR_ERR_RECOVERED;
+> +            /* Do the resume logic */
+> +            if (postcopy_do_resume(s) == 0) {
+> +                /* Let's continue! */
+> +                trace_postcopy_pause_continued();
+> +                return MIG_THR_ERR_RECOVERED;
+> +            } else {
+> +                /*
+> +                 * Something wrong happened during the recovery, let's
+> +                 * pause again. Pause is always better than throwing
+> +                 * data away.
+> +                 */
+> +                continue;
+> +            }
+> +        } else {
+> +            /* This is not right... Time to quit. */
+> +            return MIG_THR_ERR_FATAL;
+> +        }
+> +    }
+>  }
+>  
+>  static MigThrError migration_detect_error(MigrationState *s)
+> @@ -2330,7 +2365,10 @@ void migrate_fd_connect(MigrationState *s)
+>      }
+>  
+>      if (resume) {
+> -        /* TODO: do the resume logic */
+> +        /* Wakeup the main migration thread to do the recovery */
+> +        migrate_set_state(&s->state, MIGRATION_STATUS_POSTCOPY_PAUSED,
+> +                          MIGRATION_STATUS_POSTCOPY_RECOVER);
+> +        qemu_sem_post(&s->postcopy_pause_sem);
+>          return;
+>      }
+>  
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index ba41f2c..989f95a 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -669,6 +669,8 @@
+>  #
+>  # @postcopy-paused: during postcopy but paused. (since 2.11)
+>  #
+> +# @postcopy-recover: trying to recover from a paused postcopy. (since 2.11)
+> +#
+>  # @completed: migration is finished.
+>  #
+>  # @failed: some error occurred during migration process.
+> @@ -682,7 +684,7 @@
+>  { 'enum': 'MigrationStatus',
+>    'data': [ 'none', 'setup', 'cancelling', 'cancelled',
+>              'active', 'postcopy-active', 'postcopy-paused',
+> -            'completed', 'failed', 'colo' ] }
+> +            'postcopy-recover', 'completed', 'failed', 'colo' ] }
+>  
+>  ##
+>  # @MigrationInfo:
+> -- 
+> 2.7.4
+> 
+> 
 --
-Alex Bennée
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
