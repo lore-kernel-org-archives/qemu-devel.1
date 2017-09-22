@@ -1,17 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dvPQm-0008AK-Lh
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:59:54 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dvPV4-0003Us-G2
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 11:04:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dvPQk-0004M2-SE
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:59:52 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 22 Sep 2017 16:00:06 +0100
-Message-Id: <1506092407-26985-20-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1506092407-26985-1-git-send-email-peter.maydell@linaro.org>
-References: <1506092407-26985-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 19/20] target/arm: Implement secure function
- return
+	(envelope-from <pbonzini@redhat.com>) id 1dvPV1-0007Tm-O1
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 11:04:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42888)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dvPV1-0007Sz-Fr
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 11:04:15 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8BE372CE909
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 15:04:14 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-117-77.ams2.redhat.com
+	[10.36.117.77])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 92D495D9CB
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 15:04:13 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 22 Sep 2017 17:04:10 +0200
+Message-Id: <20170922150410.20689-3-pbonzini@redhat.com>
+In-Reply-To: <20170922150410.20689-1-pbonzini@redhat.com>
+References: <20170922150410.20689-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 27/32] scsi: add multipath support to
+ qemu-pr-helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,225 +34,659 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: qemu-devel@nongnu.org
 
-Secure function return happens when a non-secure function has been
-called using BLXNS and so has a particular magic LR value (either
-0xfefffffe or 0xfeffffff). The function return via BX behaves
-specially when the new PC value is this magic value, in the same
-way that exception returns are handled.
+Proper support of persistent reservation for multipath devices requires
+communication with the multipath daemon, so that the reservation is
+registered and applied when a path comes up.  The device mapper
+utilities provide a library to do so; this patch makes qemu-pr-helper.c
+detect multipath devices and, when one is found, delegate the operation
+to libmpathpersist.
 
-Adjust our BX excret guards so that they recognize the function
-return magic number as well, and perform the function-return
-unstacking in do_v7m_exception_exit().
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/arm/internals.h |   7 +++
- target/arm/helper.c    | 115 +++++++++++++++++++++++++++++++++++++++++++++----
- target/arm/translate.c |  14 +++++-
- 3 files changed, 126 insertions(+), 10 deletions(-)
+ Makefile              |   3 +
+ configure             |  46 +++++++
+ docs/pr-manager.rst   |  27 ++++
+ include/scsi/utils.h  |   4 +
+ scsi/qemu-pr-helper.c | 346 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ scsi/utils.c          |  10 ++
+ 6 files changed, 433 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 1746737..43106a2 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -72,6 +72,13 @@ FIELD(V7M_EXCRET, DCRS, 5, 1)
- FIELD(V7M_EXCRET, S, 6, 1)
- FIELD(V7M_EXCRET, RES1, 7, 25) /* including the must-be-1 prefix */
+diff --git a/Makefile b/Makefile
+index 8406aeb8cb..4eb40376d2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -373,6 +373,9 @@ fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal
+ fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
  
-+/* Minimum value which is a magic number for exception return */
-+#define EXC_RETURN_MIN_MAGIC 0xff000000
-+/* Minimum number which is a magic number for function or exception return
-+ * when using v8M security extension
-+ */
-+#define FNC_RETURN_MIN_MAGIC 0xfefffffe
+ scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
++ifdef CONFIG_MPATH
++scsi/qemu-pr-helper$(EXESUF): LIBS += -ludev -lmultipath -lmpathpersist
++endif
+ 
+ qemu-img-cmds.h: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
+ 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
+diff --git a/configure b/configure
+index becc21a0fe..f6edc2a33f 100755
+--- a/configure
++++ b/configure
+@@ -290,6 +290,7 @@ netmap="no"
+ sdl=""
+ sdlabi=""
+ virtfs=""
++mpath=""
+ vnc="yes"
+ sparse="no"
+ vde=""
+@@ -936,6 +937,10 @@ for opt do
+   ;;
+   --enable-virtfs) virtfs="yes"
+   ;;
++  --disable-mpath) mpath="no"
++  ;;
++  --enable-mpath) mpath="yes"
++  ;;
+   --disable-vnc) vnc="no"
+   ;;
+   --enable-vnc) vnc="yes"
+@@ -1479,6 +1484,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   vnc-png         PNG compression for VNC server
+   cocoa           Cocoa UI (Mac OS X only)
+   virtfs          VirtFS
++  mpath           Multipath persistent reservation passthrough
+   xen             xen backend driver support
+   xen-pci-passthrough
+   brlapi          BrlAPI (Braile)
+@@ -3300,6 +3306,30 @@ else
+ fi
+ 
+ ##########################################
++# libmpathpersist probe
 +
- /* We use a few fake FSR values for internal purposes in M profile.
-  * M profile cores don't have A/R format FSRs, but currently our
-  * get_phys_addr() code assumes A/R profile and reports failures via
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 30dc2a9..888fe0a 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -6167,7 +6167,17 @@ void HELPER(v7m_bxns)(CPUARMState *env, uint32_t dest)
-      *  - if the return value is a magic value, do exception return (like BX)
-      *  - otherwise bit 0 of the return value is the target security state
-      */
--    if (dest >= 0xff000000) {
-+    uint32_t min_magic;
++if test "$mpath" != "no" ; then
++  cat > $TMPC <<EOF
++#include <libudev.h>
++#include <mpath_persist.h>
++unsigned mpath_mx_alloc_len = 1024;
++int logsink;
++int main(void) {
++    struct udev *udev = udev_new();
++    mpath_lib_init(udev);
++    return 0;
++}
++EOF
++  if compile_prog "" "-ludev -lmultipath -lmpathpersist" ; then
++    mpathpersist=yes
++  else
++    mpathpersist=no
++  fi
++else
++  mpathpersist=no
++fi
 +
-+    if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-+        /* Covers FNC_RETURN and EXC_RETURN magic */
-+        min_magic = FNC_RETURN_MIN_MAGIC;
-+    } else {
-+        /* EXC_RETURN magic only */
-+        min_magic = EXC_RETURN_MIN_MAGIC;
++##########################################
+ # libcap probe
+ 
+ if test "$cap" != "no" ; then
+@@ -5044,12 +5074,24 @@ if test "$softmmu" = yes ; then
+       fi
+       virtfs=no
+     fi
++    if test "$mpath" != no && test "$mpathpersist" = yes ; then
++      mpath=yes
++    else
++      if test "$mpath" = yes; then
++        error_exit "Multipath requires libmpathpersist devel"
++      fi
++      mpath=no
++    fi
+     tools="$tools scsi/qemu-pr-helper\$(EXESUF)"
+   else
+     if test "$virtfs" = yes; then
+       error_exit "VirtFS is supported only on Linux"
+     fi
+     virtfs=no
++    if test "$mpath" = yes; then
++      error_exit "Multipath is supported only on Linux"
++    fi
++    mpath=no
+   fi
+ fi
+ 
+@@ -5295,6 +5337,7 @@ echo "Audio drivers     $audio_drv_list"
+ echo "Block whitelist (rw) $block_drv_rw_whitelist"
+ echo "Block whitelist (ro) $block_drv_ro_whitelist"
+ echo "VirtFS support    $virtfs"
++echo "Multipath support $mpath"
+ echo "VNC support       $vnc"
+ if test "$vnc" = "yes" ; then
+     echo "VNC SASL support  $vnc_sasl"
+@@ -5738,6 +5781,9 @@ fi
+ if test "$virtfs" = "yes" ; then
+   echo "CONFIG_VIRTFS=y" >> $config_host_mak
+ fi
++if test "$mpath" = "yes" ; then
++  echo "CONFIG_MPATH=y" >> $config_host_mak
++fi
+ if test "$vhost_scsi" = "yes" ; then
+   echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
+ fi
+diff --git a/docs/pr-manager.rst b/docs/pr-manager.rst
+index 7107e59fb8..9b1de198b1 100644
+--- a/docs/pr-manager.rst
++++ b/docs/pr-manager.rst
+@@ -60,6 +60,7 @@ system service and supports the following option:
+ 
+ -d, --daemon              run in the background
+ -q, --quiet               decrease verbosity
++-v, --verbose             increase verbosity
+ -f, --pidfile=path        PID file when running as a daemon
+ -k, --socket=path         path to the socket
+ -T, --trace=trace-opts    tracing options
+@@ -82,3 +83,29 @@ its operation.  To do this, add the following options:
+ 
+ -u, --user=user           user to drop privileges to
+ -g, --group=group         group to drop privileges to
++
++---------------------------------------------
++Multipath devices and persistent reservations
++---------------------------------------------
++
++Proper support of persistent reservation for multipath devices requires
++communication with the multipath daemon, so that the reservation is
++registered and applied when a path is newly discovered or becomes online
++again.  :command:`qemu-pr-helper` can do this if the ``libmpathpersist``
++library was available on the system at build time.
++
++As of August 2017, a reservation key must be specified in ``multipath.conf``
++for ``multipathd`` to check for persistent reservation for newly
++discovered paths or reinstated paths.  The attribute can be added
++to the ``defaults`` section or the ``multipaths`` section; for example::
++
++    multipaths {
++        multipath {
++            wwid   XXXXXXXXXXXXXXXX
++            alias      yellow
++            reservation_key  0x123abc
++        }
 +    }
 +
-+    if (dest >= min_magic) {
-         /* This is an exception return magic value; put it where
-          * do_v7m_exception_exit() expects and raise EXCEPTION_EXIT.
-          * Note that if we ever add gen_ss_advance() singlestep support to
-@@ -6460,12 +6470,19 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-     bool exc_secure = false;
-     bool return_to_secure;
++Linking :program:`qemu-pr-helper` to ``libmpathpersist`` does not impede
++its usage on regular SCSI devices.
+diff --git a/include/scsi/utils.h b/include/scsi/utils.h
+index d301b31768..00a4bdb080 100644
+--- a/include/scsi/utils.h
++++ b/include/scsi/utils.h
+@@ -72,10 +72,14 @@ extern const struct SCSISense sense_code_IO_ERROR;
+ extern const struct SCSISense sense_code_I_T_NEXUS_LOSS;
+ /* Command aborted, Logical Unit failure */
+ extern const struct SCSISense sense_code_LUN_FAILURE;
++/* Command aborted, LUN Communication failure */
++extern const struct SCSISense sense_code_LUN_COMM_FAILURE;
+ /* Command aborted, Overlapped Commands Attempted */
+ extern const struct SCSISense sense_code_OVERLAPPED_COMMANDS;
+ /* LUN not ready, Capacity data has changed */
+ extern const struct SCSISense sense_code_CAPACITY_CHANGED;
++/* Unit attention, SCSI bus reset */
++extern const struct SCSISense sense_code_SCSI_BUS_RESET;
+ /* LUN not ready, Medium not present */
+ extern const struct SCSISense sense_code_UNIT_ATTENTION_NO_MEDIUM;
+ /* Unit attention, Power on, reset or bus device reset occurred */
+diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
+index e39efbd529..5f77c873e1 100644
+--- a/scsi/qemu-pr-helper.c
++++ b/scsi/qemu-pr-helper.c
+@@ -30,6 +30,12 @@
+ #include <pwd.h>
+ #include <grp.h>
  
--    /* We can only get here from an EXCP_EXCEPTION_EXIT, and
--     * gen_bx_excret() enforces the architectural rule
--     * that jumps to magic addresses don't have magic behaviour unless
--     * we're in Handler mode (compare pseudocode BXWritePC()).
-+    /* If we're not in Handler mode then jumps to magic exception-exit
-+     * addresses don't have magic behaviour. However for the v8M
-+     * security extensions the magic secure-function-return has to
-+     * work in thread mode too, so to avoid doing an extra check in
-+     * the generated code we allow exception-exit magic to also cause the
-+     * internal exception and bring us here in thread mode. Correct code
-+     * will never try to do this (the following insn fetch will always
-+     * fault) so we the overhead of having taken an unnecessary exception
-+     * doesn't matter.
-      */
--    assert(arm_v7m_is_handler_mode(env));
-+    if (!arm_v7m_is_handler_mode(env)) {
-+        return;
-+    }
++#ifdef CONFIG_MPATH
++#include <libudev.h>
++#include <mpath_cmd.h>
++#include <mpath_persist.h>
++#endif
++
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "qemu/cutils.h"
+@@ -60,6 +66,7 @@ static enum { RUNNING, TERMINATE, TERMINATING } state;
+ static QIOChannelSocket *server_ioc;
+ static int server_watch;
+ static int num_active_sockets = 1;
++static int noisy;
+ static int verbose;
  
-     /* In the spec pseudocode ExceptionReturn() is called directly
-      * from BXWritePC() and gets the full target PC value including
-@@ -6753,6 +6770,78 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-     qemu_log_mask(CPU_LOG_INT, "...successful exception return\n");
+ #ifdef CONFIG_LIBCAP
+@@ -204,9 +211,316 @@ static int do_sgio(int fd, const uint8_t *cdb, uint8_t *sense,
+     return r;
  }
  
-+static bool do_v7m_function_return(ARMCPU *cpu)
++/* Device mapper interface */
++
++#ifdef CONFIG_MPATH
++#define CONTROL_PATH "/dev/mapper/control"
++
++typedef struct DMData {
++    struct dm_ioctl dm;
++    uint8_t data[1024];
++} DMData;
++
++static int control_fd;
++
++static void *dm_ioctl(int ioc, struct dm_ioctl *dm)
 +{
-+    /* v8M security extensions magic function return.
-+     * We may either:
-+     *  (1) throw an exception (longjump)
-+     *  (2) return true if we successfully handled the function return
-+     *  (3) return false if we failed a consistency check and have
-+     *      pended a UsageFault that needs to be taken now
-+     *
-+     * At this point the magic return value is split between env->regs[15]
-+     * and env->thumb. We don't bother to reconstitute it because we don't
-+     * need it (all values are handled the same way).
-+     */
-+    CPUARMState *env = &cpu->env;
-+    uint32_t newpc, newpsr, newpsr_exc;
++    static DMData d;
++    memcpy(&d.dm, dm, sizeof(d.dm));
++    QEMU_BUILD_BUG_ON(sizeof(d.data) < sizeof(struct dm_target_spec));
 +
-+    qemu_log_mask(CPU_LOG_INT, "...really v7M secure function return\n");
-+
-+    {
-+        bool threadmode, spsel;
-+        TCGMemOpIdx oi;
-+        ARMMMUIdx mmu_idx;
-+        uint32_t *frame_sp_p;
-+        uint32_t frameptr;
-+
-+        /* Pull the return address and IPSR from the Secure stack */
-+        threadmode = !arm_v7m_is_handler_mode(env);
-+        spsel = env->v7m.control[M_REG_S] & R_V7M_CONTROL_SPSEL_MASK;
-+
-+        frame_sp_p = get_v7m_sp_ptr(env, true, threadmode, spsel);
-+        frameptr = *frame_sp_p;
-+
-+        /* These loads may throw an exception (for MPU faults). We want to
-+         * do them as secure, so work out what MMU index that is.
-+         */
-+        mmu_idx = arm_v7m_mmu_idx_for_secstate(env, true);
-+        oi = make_memop_idx(MO_LE, arm_to_core_mmu_idx(mmu_idx));
-+        newpc = helper_le_ldul_mmu(env, frameptr, oi, 0);
-+        newpsr = helper_le_ldul_mmu(env, frameptr + 4, oi, 0);
-+
-+        /* Consistency checks on new IPSR */
-+        newpsr_exc = newpsr & XPSR_EXCP;
-+        if (!((env->v7m.exception == 0 && newpsr_exc == 0) ||
-+              (env->v7m.exception == 1 && newpsr_exc != 0))) {
-+            /* Pend the fault and tell our caller to take it */
-+            env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
-+            armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE,
-+                                    env->v7m.secure);
-+            qemu_log_mask(CPU_LOG_INT,
-+                          "...taking INVPC UsageFault: "
-+                          "IPSR consistency check failed\n");
-+            return false;
-+        }
-+
-+        *frame_sp_p = frameptr + 8;
++    d.dm.version[0] = DM_VERSION_MAJOR;
++    d.dm.version[1] = 0;
++    d.dm.version[2] = 0;
++    d.dm.data_size = 1024;
++    d.dm.data_start = offsetof(DMData, data);
++    if (ioctl(control_fd, ioc, &d) < 0) {
++        return NULL;
 +    }
-+
-+    /* This invalidates frame_sp_p */
-+    switch_v7m_security_state(env, true);
-+    env->v7m.exception = newpsr_exc;
-+    env->v7m.control[M_REG_S] &= ~R_V7M_CONTROL_SFPA_MASK;
-+    if (newpsr & XPSR_SFPA) {
-+        env->v7m.control[M_REG_S] |= R_V7M_CONTROL_SFPA_MASK;
-+    }
-+    xpsr_write(env, 0, XPSR_IT);
-+    env->thumb = newpc & 1;
-+    env->regs[15] = newpc & ~1;
-+
-+    qemu_log_mask(CPU_LOG_INT, "...function return successful\n");
-+    return true;
++    memcpy(dm, &d.dm, sizeof(d.dm));
++    return &d.data;
 +}
 +
- static void arm_log_exception(int idx)
- {
-     if (qemu_loglevel_mask(CPU_LOG_INT)) {
-@@ -7034,8 +7123,18 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
-     case EXCP_IRQ:
-         break;
-     case EXCP_EXCEPTION_EXIT:
--        do_v7m_exception_exit(cpu);
--        return;
-+        if (env->regs[15] < EXC_RETURN_MIN_MAGIC) {
-+            /* Must be v8M security extension function return */
-+            assert(env->regs[15] >= FNC_RETURN_MIN_MAGIC);
-+            assert(arm_feature(env, ARM_FEATURE_M_SECURITY));
-+            if (do_v7m_function_return(cpu)) {
-+                return;
-+            }
-+        } else {
-+            do_v7m_exception_exit(cpu);
-+            return;
-+        }
-+        break;
-     default:
-         cpu_abort(cs, "Unhandled exception 0x%x\n", cs->exception_index);
-         return; /* Never happens.  Keep compiler happy.  */
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 53694bb..f5cca07 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -960,7 +960,8 @@ static inline void gen_bx_excret(DisasContext *s, TCGv_i32 var)
-      * s->base.is_jmp that we need to do the rest of the work later.
-      */
-     gen_bx(s, var);
--    if (s->v7m_handler_mode && arm_dc_feature(s, ARM_FEATURE_M)) {
-+    if (arm_dc_feature(s, ARM_FEATURE_M_SECURITY) ||
-+        (s->v7m_handler_mode && arm_dc_feature(s, ARM_FEATURE_M))) {
-         s->base.is_jmp = DISAS_BX_EXCRET;
-     }
- }
-@@ -969,9 +970,18 @@ static inline void gen_bx_excret_final_code(DisasContext *s)
- {
-     /* Generate the code to finish possible exception return and end the TB */
-     TCGLabel *excret_label = gen_new_label();
-+    uint32_t min_magic;
++static void *dm_dev_ioctl(int fd, int ioc, struct dm_ioctl *dm)
++{
++    struct stat st;
++    int r;
 +
-+    if (arm_dc_feature(s, ARM_FEATURE_M_SECURITY)) {
-+        /* Covers FNC_RETURN and EXC_RETURN magic */
-+        min_magic = FNC_RETURN_MIN_MAGIC;
-+    } else {
-+        /* EXC_RETURN magic only */
-+        min_magic = EXC_RETURN_MIN_MAGIC;
++    r = fstat(fd, &st);
++    if (r < 0) {
++        perror("fstat");
++        exit(1);
 +    }
++
++    dm->dev = st.st_rdev;
++    return dm_ioctl(ioc, dm);
++}
++
++static void dm_init(void)
++{
++    control_fd = open(CONTROL_PATH, O_RDWR);
++    if (control_fd < 0) {
++        perror("Cannot open " CONTROL_PATH);
++        exit(1);
++    }
++    struct dm_ioctl dm = { 0 };
++    if (!dm_ioctl(DM_VERSION, &dm)) {
++        perror("ioctl");
++        exit(1);
++    }
++    if (dm.version[0] != DM_VERSION_MAJOR) {
++        fprintf(stderr, "Unsupported device mapper interface");
++        exit(1);
++    }
++}
++
++/* Variables required by libmultipath and libmpathpersist.  */
++QEMU_BUILD_BUG_ON(PR_HELPER_DATA_SIZE > MPATH_MAX_PARAM_LEN);
++unsigned mpath_mx_alloc_len = PR_HELPER_DATA_SIZE;
++int logsink;
++
++static void multipath_pr_init(void)
++{
++    static struct udev *udev;
++
++    udev = udev_new();
++    mpath_lib_init(udev);
++}
++
++static int is_mpath(int fd)
++{
++    struct dm_ioctl dm = { .flags = DM_NOFLUSH_FLAG };
++    struct dm_target_spec *tgt;
++
++    tgt = dm_dev_ioctl(fd, DM_TABLE_STATUS, &dm);
++    if (!tgt) {
++        if (errno == ENXIO) {
++            return 0;
++        }
++        perror("ioctl");
++        exit(EXIT_FAILURE);
++    }
++    return !strncmp(tgt->target_type, "multipath", DM_MAX_TYPE_NAME);
++}
++
++static int mpath_reconstruct_sense(int fd, int r, uint8_t *sense)
++{
++    switch (r) {
++    case MPATH_PR_SUCCESS:
++        return GOOD;
++    case MPATH_PR_SENSE_NOT_READY:
++    case MPATH_PR_SENSE_MEDIUM_ERROR:
++    case MPATH_PR_SENSE_HARDWARE_ERROR:
++    case MPATH_PR_SENSE_ABORTED_COMMAND:
++        {
++            /* libmpathpersist ate the exact sense.  Try to find it by
++             * issuing TEST UNIT READY.
++             */
++            uint8_t cdb[6] = { TEST_UNIT_READY };
++            int sz = 0;
++            return do_sgio(fd, cdb, sense, NULL, &sz, SG_DXFER_NONE);
++        }
++
++    case MPATH_PR_SENSE_UNIT_ATTENTION:
++        /* Congratulations libmpathpersist, you ruined the Unit Attention...
++         * Return a heavyweight one.
++         */
++        scsi_build_sense(sense, SENSE_CODE(SCSI_BUS_RESET));
++        return CHECK_CONDITION;
++    case MPATH_PR_SENSE_INVALID_OP:
++        /* Only one valid sense.  */
++        scsi_build_sense(sense, SENSE_CODE(INVALID_OPCODE));
++        return CHECK_CONDITION;
++    case MPATH_PR_ILLEGAL_REQ:
++        /* Guess.  */
++        scsi_build_sense(sense, SENSE_CODE(INVALID_PARAM));
++        return CHECK_CONDITION;
++    case MPATH_PR_NO_SENSE:
++        scsi_build_sense(sense, SENSE_CODE(NO_SENSE));
++        return CHECK_CONDITION;
++
++    case MPATH_PR_RESERV_CONFLICT:
++        return RESERVATION_CONFLICT;
++
++    case MPATH_PR_OTHER:
++    default:
++        scsi_build_sense(sense, SENSE_CODE(LUN_COMM_FAILURE));
++        return CHECK_CONDITION;
++    }
++}
++
++static int multipath_pr_in(int fd, const uint8_t *cdb, uint8_t *sense,
++                           uint8_t *data, int sz)
++{
++    int rq_servact = cdb[1];
++    struct prin_resp resp;
++    size_t written;
++    int r;
++
++    switch (rq_servact) {
++    case MPATH_PRIN_RKEY_SA:
++    case MPATH_PRIN_RRES_SA:
++    case MPATH_PRIN_RCAP_SA:
++        break;
++    case MPATH_PRIN_RFSTAT_SA:
++        /* Nobody implements it anyway, so bail out. */
++    default:
++        /* Cannot parse any other output.  */
++        scsi_build_sense(sense, SENSE_CODE(INVALID_FIELD));
++        return CHECK_CONDITION;
++    }
++
++    r = mpath_persistent_reserve_in(fd, rq_servact, &resp, noisy, verbose);
++    if (r == MPATH_PR_SUCCESS) {
++        switch (rq_servact) {
++        case MPATH_PRIN_RKEY_SA:
++        case MPATH_PRIN_RRES_SA: {
++            struct prin_readdescr *out = &resp.prin_descriptor.prin_readkeys;
++            assert(sz >= 8);
++            written = MIN(out->additional_length + 8, sz);
++            stl_be_p(&data[0], out->prgeneration);
++            stl_be_p(&data[4], out->additional_length);
++            memcpy(&data[8], out->key_list, written - 8);
++            break;
++        }
++        case MPATH_PRIN_RCAP_SA: {
++            struct prin_capdescr *out = &resp.prin_descriptor.prin_readcap;
++            assert(sz >= 6);
++            written = 6;
++            stw_be_p(&data[0], out->length);
++            data[2] = out->flags[0];
++            data[3] = out->flags[1];
++            stw_be_p(&data[4], out->pr_type_mask);
++            break;
++        }
++        default:
++            scsi_build_sense(sense, SENSE_CODE(INVALID_OPCODE));
++            return CHECK_CONDITION;
++        }
++        assert(written <= sz);
++        memset(data + written, 0, sz - written);
++    }
++
++    return mpath_reconstruct_sense(fd, r, sense);
++}
++
++static int multipath_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
++                            const uint8_t *param, int sz)
++{
++    int rq_servact = cdb[1];
++    int rq_scope = cdb[2] >> 4;
++    int rq_type = cdb[2] & 0xf;
++    struct prout_param_descriptor paramp;
++    char transportids[PR_HELPER_DATA_SIZE];
++    int r;
++
++    switch (rq_servact) {
++    case MPATH_PROUT_REG_SA:
++    case MPATH_PROUT_RES_SA:
++    case MPATH_PROUT_REL_SA:
++    case MPATH_PROUT_CLEAR_SA:
++    case MPATH_PROUT_PREE_SA:
++    case MPATH_PROUT_PREE_AB_SA:
++    case MPATH_PROUT_REG_IGN_SA:
++        break;
++    case MPATH_PROUT_REG_MOV_SA:
++        /* Not supported by struct prout_param_descriptor.  */
++    default:
++        /* Cannot parse any other input.  */
++        scsi_build_sense(sense, SENSE_CODE(INVALID_FIELD));
++        return CHECK_CONDITION;
++    }
++
++    /* Convert input data, especially transport IDs, to the structs
++     * used by libmpathpersist (which, of course, will immediately
++     * do the opposite).
++     */
++    memset(&paramp, 0, sizeof(paramp));
++    memcpy(&paramp.key, &param[0], 8);
++    memcpy(&paramp.sa_key, &param[8], 8);
++    paramp.sa_flags = param[10];
++    if (sz > PR_OUT_FIXED_PARAM_SIZE) {
++        size_t transportid_len;
++        int i, j;
++        if (sz < PR_OUT_FIXED_PARAM_SIZE + 4) {
++            scsi_build_sense(sense, SENSE_CODE(INVALID_PARAM_LEN));
++            return CHECK_CONDITION;
++        }
++        transportid_len = ldl_be_p(&param[24]) + PR_OUT_FIXED_PARAM_SIZE + 4;
++        if (transportid_len > sz) {
++            scsi_build_sense(sense, SENSE_CODE(INVALID_PARAM));
++            return CHECK_CONDITION;
++        }
++        for (i = PR_OUT_FIXED_PARAM_SIZE + 4, j = 0; i < transportid_len; ) {
++            struct transportid *id = (struct transportid *) &transportids[j];
++            int len;
++
++            id->format_code = param[i] & 0xc0;
++            id->protocol_id = param[i] & 0x0f;
++            switch (param[i] & 0xcf) {
++            case 0:
++                /* FC transport.  */
++                if (i + 24 > transportid_len) {
++                    goto illegal_req;
++                }
++                memcpy(id->n_port_name, &param[i + 8], 8);
++                j += offsetof(struct transportid, n_port_name[8]);
++                i += 24;
++                break;
++            case 3:
++            case 0x43:
++                /* iSCSI transport.  */
++                len = lduw_be_p(&param[i + 2]);
++                if (len > 252 || (len & 3) || i + len + 4 > transportid_len) {
++                    /* For format code 00, the standard says the maximum is 223
++                     * plus the NUL terminator.  For format code 01 there is no
++                     * maximum length, but libmpathpersist ignores the first
++                     * byte of id->iscsi_name so our maximum is 252.
++                     */
++                    goto illegal_req;
++                }
++                if (memchr(&param[i + 4], 0, len) == NULL) {
++                    goto illegal_req;
++                }
++                memcpy(id->iscsi_name, &param[i + 2], len + 2);
++                j += offsetof(struct transportid, iscsi_name[len + 2]);
++                i += len + 4;
++                break;
++            case 6:
++                /* SAS transport.  */
++                if (i + 24 > transportid_len) {
++                    goto illegal_req;
++                }
++                memcpy(id->sas_address, &param[i + 4], 8);
++                j += offsetof(struct transportid, sas_address[8]);
++                i += 24;
++                break;
++            default:
++            illegal_req:
++                scsi_build_sense(sense, SENSE_CODE(INVALID_PARAM));
++                return CHECK_CONDITION;
++            }
++
++            paramp.trnptid_list[paramp.num_transportid++] = id;
++        }
++    }
++
++    r = mpath_persistent_reserve_out(fd, rq_servact, rq_scope, rq_type,
++                                     &paramp, noisy, verbose);
++    return mpath_reconstruct_sense(fd, r, sense);
++}
++#endif
++
+ static int do_pr_in(int fd, const uint8_t *cdb, uint8_t *sense,
+                     uint8_t *data, int *resp_sz)
+ {
++#ifdef CONFIG_MPATH
++    if (is_mpath(fd)) {
++        /* multipath_pr_in fills the whole input buffer.  */
++        return multipath_pr_in(fd, cdb, sense, data, *resp_sz);
++    }
++#endif
++
+     return do_sgio(fd, cdb, sense, data, resp_sz,
+                    SG_DXFER_FROM_DEV);
+ }
+@@ -214,7 +528,14 @@ static int do_pr_in(int fd, const uint8_t *cdb, uint8_t *sense,
+ static int do_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
+                      const uint8_t *param, int sz)
+ {
+-    int resp_sz = sz;
++    int resp_sz;
++#ifdef CONFIG_MPATH
++    if (is_mpath(fd)) {
++        return multipath_pr_out(fd, cdb, sense, param, sz);
++    }
++#endif
++
++    resp_sz = sz;
+     return do_sgio(fd, cdb, sense, (uint8_t *)param, &resp_sz,
+                    SG_DXFER_TO_DEV);
+ }
+@@ -525,6 +846,14 @@ static int drop_privileges(void)
+         return -1;
+     }
  
-     /* Is the new PC value in the magic range indicating exception return? */
--    tcg_gen_brcondi_i32(TCG_COND_GEU, cpu_R[15], 0xff000000, excret_label);
-+    tcg_gen_brcondi_i32(TCG_COND_GEU, cpu_R[15], min_magic, excret_label);
-     /* No: end the TB as we would for a DISAS_JMP */
-     if (is_singlestepping(s)) {
-         gen_singlestep_exception(s);
++#ifdef CONFIG_MPATH
++    /* For /dev/mapper/control ioctls */
++    if (capng_update(CAPNG_ADD, CAPNG_EFFECTIVE | CAPNG_PERMITTED,
++                     CAP_SYS_ADMIN) < 0) {
++        return -1;
++    }
++#endif
++
+     /* Change user/group id, retaining the capabilities.  Because file descriptors
+      * are passed via SCM_RIGHTS, we don't need supplementary groups (and in
+      * fact the helper can run as "nobody").
+@@ -541,7 +870,7 @@ static int drop_privileges(void)
+ 
+ int main(int argc, char **argv)
+ {
+-    const char *sopt = "hVk:fdT:u:g:q";
++    const char *sopt = "hVk:fdT:u:g:vq";
+     struct option lopt[] = {
+         { "help", no_argument, NULL, 'h' },
+         { "version", no_argument, NULL, 'V' },
+@@ -551,10 +880,12 @@ int main(int argc, char **argv)
+         { "trace", required_argument, NULL, 'T' },
+         { "user", required_argument, NULL, 'u' },
+         { "group", required_argument, NULL, 'g' },
++        { "verbose", no_argument, NULL, 'v' },
+         { "quiet", no_argument, NULL, 'q' },
+         { NULL, 0, NULL, 0 }
+     };
+     int opt_ind = 0;
++    int loglevel = 1;
+     int quiet = 0;
+     char ch;
+     Error *local_err = NULL;
+@@ -631,6 +962,9 @@ int main(int argc, char **argv)
+         case 'q':
+             quiet = 1;
+             break;
++        case 'v':
++            ++loglevel;
++            break;
+         case 'T':
+             g_free(trace_file);
+             trace_file = trace_opt_parse(optarg);
+@@ -650,7 +984,8 @@ int main(int argc, char **argv)
+     }
+ 
+     /* set verbosity */
+-    verbose = !quiet;
++    noisy = !quiet && (loglevel >= 3);
++    verbose = quiet ? 0 : MIN(loglevel, 3);
+ 
+     if (!trace_init_backends()) {
+         exit(EXIT_FAILURE);
+@@ -658,6 +993,11 @@ int main(int argc, char **argv)
+     trace_init_file(trace_file);
+     qemu_set_log(LOG_TRACE);
+ 
++#ifdef CONFIG_MPATH
++    dm_init();
++    multipath_pr_init();
++#endif
++
+     socket_activation = check_socket_activation();
+     if (socket_activation == 0) {
+         SocketAddress saddr;
+diff --git a/scsi/utils.c b/scsi/utils.c
+index fab60bdf20..5684951b12 100644
+--- a/scsi/utils.c
++++ b/scsi/utils.c
+@@ -206,6 +206,11 @@ const struct SCSISense sense_code_OVERLAPPED_COMMANDS = {
+     .key = ABORTED_COMMAND, .asc = 0x4e, .ascq = 0x00
+ };
+ 
++/* Command aborted, LUN Communication Failure */
++const struct SCSISense sense_code_LUN_COMM_FAILURE = {
++    .key = ABORTED_COMMAND, .asc = 0x08, .ascq = 0x00
++};
++
+ /* Unit attention, Capacity data has changed */
+ const struct SCSISense sense_code_CAPACITY_CHANGED = {
+     .key = UNIT_ATTENTION, .asc = 0x2a, .ascq = 0x09
+@@ -216,6 +221,11 @@ const struct SCSISense sense_code_RESET = {
+     .key = UNIT_ATTENTION, .asc = 0x29, .ascq = 0x00
+ };
+ 
++/* Unit attention, SCSI bus reset */
++const struct SCSISense sense_code_SCSI_BUS_RESET = {
++    .key = UNIT_ATTENTION, .asc = 0x29, .ascq = 0x02
++};
++
+ /* Unit attention, No medium */
+ const struct SCSISense sense_code_UNIT_ATTENTION_NO_MEDIUM = {
+     .key = UNIT_ATTENTION, .asc = 0x3a, .ascq = 0x00
 -- 
-2.7.4
+2.13.5
