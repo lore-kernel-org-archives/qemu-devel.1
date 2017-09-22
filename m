@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dvJtB-0007ZO-Jv
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 05:04:50 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dvJxQ-0000HD-LB
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 05:09:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dvJt7-0002NZ-KX
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 05:04:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48302)
+	(envelope-from <dgilbert@redhat.com>) id 1dvJxM-0004d7-Id
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 05:09:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52664)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dvJt7-0002N0-CM
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 05:04:45 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7E3B38125F
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 09:04:43 +0000 (UTC)
-Date: Fri, 22 Sep 2017 10:04:33 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170922090433.GC12725@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1506070572-7549-1-git-send-email-peterx@redhat.com>
-	<1506070572-7549-2-git-send-email-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dvJxM-0004cF-Af
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 05:09:08 -0400
+Date: Fri, 22 Sep 2017 10:09:01 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170922090900.GA2620@work-vm>
+References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
+	<1504081950-2528-16-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1506070572-7549-2-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] iothread: provide helpers for internal
- use
+In-Reply-To: <1504081950-2528-16-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 15/33] migration: pass MigrationState to
+ migrate_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,67 +29,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On Fri, Sep 22, 2017 at 04:56:10PM +0800, Peter Xu wrote:
-> IOThread is a general framework that contains IO loop environment and a
-> real thread behind.  It's also good to be used internally inside qemu.
-> Provide some helpers for it to create iothreads to be used internally.
+* Peter Xu (peterx@redhat.com) wrote:
+> Let the callers take the object, then pass it to migrate_init().
 > 
 > Signed-off-by: Peter Xu <peterx@redhat.com>
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
 > ---
->  include/sysemu/iothread.h |  8 ++++++++
->  iothread.c                | 21 +++++++++++++++++++++
->  2 files changed, 29 insertions(+)
+>  migration/migration.c | 7 ++-----
+>  migration/migration.h | 2 +-
+>  migration/savevm.c    | 5 ++++-
+>  3 files changed, 7 insertions(+), 7 deletions(-)
 > 
-> diff --git a/include/sysemu/iothread.h b/include/sysemu/iothread.h
-> index d2985b3..b07663f 100644
-> --- a/include/sysemu/iothread.h
-> +++ b/include/sysemu/iothread.h
-> @@ -46,4 +46,12 @@ AioContext *iothread_get_aio_context(IOThread *iothread);
->  void iothread_stop_all(void);
->  GMainContext *iothread_get_g_main_context(IOThread *iothread);
->  
-> +/*
-> + * Helpers used to allocate iothreads for internal use.  These
-> + * iothreads will not be seen by monitor clients when query using
-> + * "query-iothreads".
-> + */
-> +IOThread *iothread_create(const char *id, Error **errp);
-> +void iothread_destroy(IOThread *iothread);
-> +
->  #endif /* IOTHREAD_H */
-> diff --git a/iothread.c b/iothread.c
-> index 44c8944..74e400c 100644
-> --- a/iothread.c
-> +++ b/iothread.c
-> @@ -354,3 +354,24 @@ GMainContext *iothread_get_g_main_context(IOThread *iothread)
->  
->      return iothread->worker_context;
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 394e84b..15b8eb1 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1138,10 +1138,8 @@ bool migration_is_idle(void)
+>      return false;
 >  }
+>  
+> -MigrationState *migrate_init(void)
+> +void migrate_init(MigrationState *s)
+>  {
+> -    MigrationState *s = migrate_get_current();
+> -
+>      /*
+>       * Reinitialise all migration state, except
+>       * parameters/capabilities that the user set, and
+> @@ -1169,7 +1167,6 @@ MigrationState *migrate_init(void)
+>      migrate_set_state(&s->state, MIGRATION_STATUS_NONE, MIGRATION_STATUS_SETUP);
+>  
+>      s->total_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> -    return s;
+>  }
+>  
+>  static GSList *migration_blockers;
+> @@ -1277,7 +1274,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+>          migrate_set_block_incremental(s, true);
+>      }
+>  
+> -    s = migrate_init();
+> +    migrate_init(s);
+>  
+>      if (strstart(uri, "tcp:", &p)) {
+>          tcp_start_outgoing_migration(s, p, &local_err);
+> diff --git a/migration/migration.h b/migration/migration.h
+> index 338dfe3..b78b9bd 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -169,7 +169,7 @@ void migrate_fd_error(MigrationState *s, const Error *error);
+>  
+>  void migrate_fd_connect(MigrationState *s);
+>  
+> -MigrationState *migrate_init(void);
+> +void migrate_init(MigrationState *s);
+>  bool migration_is_blocked(Error **errp);
+>  /* True if outgoing migration has entered postcopy phase */
+>  bool migration_in_postcopy(void);
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index a3162c1..c9bccf7 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1224,8 +1224,11 @@ void qemu_savevm_state_cleanup(void)
+>  static int qemu_savevm_state(QEMUFile *f, Error **errp)
+>  {
+>      int ret;
+> -    MigrationState *ms = migrate_init();
+> +    MigrationState *ms = migrate_get_current();
+>      MigrationStatus status;
 > +
-> +static Object *iothread_get_internal_parent(void)
-> +{
-> +    return container_get(object_get_root(), "/internal-iothreads");
-> +}
-
-I tend to think we might benefit from having this generalized in the
-QOM API instead. We have object_get_objects_root() for things that
-are created by the mgmt app / user via CLI / QMP.  A parallel method
-object_get_internal_root() could be useful for cases like this where
-we want to create user-creatable objects, but not have them be
-visible to the mgmt app / user, as that would confuse the mgmt app.
-
-Example for this scenario - libvirt calls query-iothreads to identify
-IO thread PIDs, and would get very unhappy if the IOThread used by
-the monitor would appear in that response, which is why Peter has
-put it under /internal-iothreads. I think this scenario will apply
-more broadly, so benefit from us having a general helper in QOM.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> +    migrate_init(ms);
+> +
+>      ms->to_dst_file = f;
+>  
+>      if (migration_is_blocked(errp)) {
+> -- 
+> 2.7.4
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
