@@ -1,23 +1,48 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dvGvf-0000US-Bt
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 01:55:12 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dvH1i-0002Vc-F7
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:01:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dvGve-0007b4-8C
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 01:55:11 -0400
-Date: Fri, 22 Sep 2017 13:54:59 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170922055459.GG1397@lemon.lan>
-References: <20170914144032.14945-1-eblake@redhat.com>
-	<20170914144032.14945-4-eblake@redhat.com>
-	<20170920095711.GA4058@lemon.lan>
-	<0c239541-da93-33d0-1c0e-88e29de89e2c@redhat.com>
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dvH1f-0002QT-Px
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:01:26 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34356
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1dvH1f-0002Q3-L9
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:01:23 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8M5DxBk100817
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 02:01:19 -0400
+Received: from e23smtp05.au.ibm.com (e23smtp05.au.ibm.com [202.81.31.147])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2d4pnhk3q1-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 02:01:18 -0400
+Received: from localhost
+	by e23smtp05.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Fri, 22 Sep 2017 16:01:15 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <20170921053107.GD4998@umbus.fritz.box>
+References: <20170919082421.GU27153@umbus>
+	<871sn2hugn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920045524.GH5520@umbus.fritz.box>
+	<87y3pagdg0.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920061756.GJ5520@umbus.fritz.box>
+	<87vakdhnyn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920065700.GO5520@umbus.fritz.box>
+	<87poalhm74.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920115342.GQ5520@umbus.fritz.box>
+	<87377gpuyh.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170921053107.GD4998@umbus.fritz.box>
+Date: Fri, 22 Sep 2017 11:30:51 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0c239541-da93-33d0-1c0e-88e29de89e2c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 03/20] file-posix: Switch to
- .bdrv_co_block_status()
+Content-Type: text/plain
+Message-Id: <87y3p7nugc.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix cores per chip for multiple
+ cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +51,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org
 
-On Wed, 09/20 08:47, Eric Blake wrote:
-> On 09/20/2017 04:57 AM, Fam Zheng wrote:
-> > On Thu, 09/14 09:40, Eric Blake wrote:
-> >> We are gradually moving away from sector-based interfaces, towards
-> >> byte-based.  Update the file protocol driver accordingly.  In mapping
-> >> mode, note that the entire file is reported as allocated, so we can
-> >> take a shortcut and skip lseek().
-> >>
-> >> Signed-off-by: Eric Blake <eblake@redhat.com>
-> >>
-> 
-> >>
-> >> -    ret = find_allocation(bs, start, &data, &hole);
-> >> +    if (!mapping) {
-> >> +        *pnum = bytes;
-> >> +        *file = bs;
-> >> +        return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID |
-> >> +            (offset & BDRV_BLOCK_OFFSET_MASK);
-> >> +    }
-> > 
-> > I may be missing something, because the last time I tried to understand the
-> > rationale behind "mapping" was already some time ago: shouldn't we still
-> > distinguish hole and data? What will omitting BDRV_BLOCK_ZERO help?
-> 
-> Hmm, the commit message is slightly off (in part, because I switched the
-> sense of the bool flag between series revisions, but did not properly
-> update the commit text to match).  In mapping mode, we want to return as
-> much information as possible (the client is something like 'qemu-img
-> map'), including where the holes lie.  But when we are NOT in mapping
-> mode, we care more about learning which portions of the file are
-> described in the current layer of the backing chain, rather than
-> delegating to another layer, regardless of whether the read will see
-> data or zeroes.  By the time we are at the POSIX file protocol layer, we
-> know that every byte in the file system/block device has a 1:1 mapping
-> to the bytes that the guest will read (we do not delegate to any backing
-> file), so we can simply report the entire remainder of the file as
-> allocated without worrying about holes.
+David Gibson <david@gibson.dropbear.id.au> writes:
 
-Thanks, it would be good if this explanation can be added to the comment of
-"mapping" parameter, so it's easy to understand the actual intention in the
-future.
+>> >> 
+>> >> As smp_thread defaults to 1 in vl.c, similarly smp_cores also has the
+>> >> default value of 1 in vl.c. In powernv, we were setting nr-cores like
+>> >> this:
+>> >> 
+>> >>         object_property_set_int(chip, smp_cores, "nr-cores", &error_fatal);
+>> >> 
+>> >> Even when there were multiple cpus (-smp 4), when the guest boots up, we
+>> >> just get one core (i.e. smp_cores was 1) with single thread(smp_threads
+>> >> was 1), which is wrong as per the command-line that was provided.
+>> >
+>> > Right, so, -smp 4 defaults to 4 sockets, each with 1 core of 1
+>> > thread.  If you can't supply 4 sockets you should error, but you
+>> > shouldn't go and change the number of cores per socket.
+>> 
+>> OK, that makes sense now. And I do see that smp_cpus is 4 in the above
+>> case. Now looking more into it, i see that powernv has something called
+>> "num_chips", isnt this same as sockets ? Do we need num_chips separately?
+>
+> Ah, yes, I see.  It's probably still reasonable to keep num_chips as
+> an internal variable, rather than using (smp_cpus / smp_cores /
+> smp_threads) everywhere.  But we shouldn't have it as a direct
+> user-settable property, instead setting it from the -smp command line
+> option.
 
-> 
-> Here's where the mapping flag was added and semantics documented (in
-> series 3; whereas the current email is series 4):
-> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03542.html
-> 
-> So what I really need to do is fix the commit message to read:
-> 
-> In mapping mode, we must report as much information as possible about
-> where holes can be found; but when we don't care about mapping, the user
-> is more interested in how much of the guest view will come from the
-> current layer rather than delegating to some other BDS, and we can take
-> the shortcut that all of the remainder of the file fits that
-> description, and therefore take a shortcut and skip lseek() for a larger
-> *pnum result.
-> 
-> (the same comment probably applies to several other patches in the series)
-> 
+Something like the below works till num_chips=2, after that guest does
+not boot up. This might be some limitation within the OS, Cedric might
+have some clue. Otherwise, I see that multiple chips are created with
+single core having single thread.
 
-Fam
+    ppc/pnv: Use num_chips for multiple sockets
+    
+    When the user does not provide the cpu topology, e.g. "-smp 4", machine fails to
+    initialize 4 cpus. QEMU assumes smp_threads and smp_cores both as 1. Make sure
+    that we initialize multiple chips for this.
+    
+    Remove the user-settable property num_chips from machine command line option
+    
+    Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 9724719..fa501f9 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -709,7 +709,17 @@ static void ppc_powernv_init(MachineState *machine)
+         exit(1);
+     }
+ 
++    pnv->num_chips = smp_cpus / (smp_cores * smp_threads);
+     pnv->chips = g_new0(PnvChip *, pnv->num_chips);
++
++    if (smp_cpus != (smp_threads * pnv->num_chips * smp_cores)) {
++        error_report("cpu topology not balanced: "
++                     "chips (%u) * cores (%u) * threads (%u) != "
++                     "number of cpus (%u)",
++                     pnv->num_chips, smp_cores, smp_threads, smp_cpus);
++        exit(1);
++    }
++
+     for (i = 0; i < pnv->num_chips; i++) {
+         char chip_name[32];
+         Object *chip = object_new(chip_typename);
+@@ -1255,53 +1265,12 @@ static void pnv_pic_print_info(InterruptStatsProvider *obj,
+     }
+ }
+ 
+-static void pnv_get_num_chips(Object *obj, Visitor *v, const char *name,
+-                              void *opaque, Error **errp)
+-{
+-    visit_type_uint32(v, name, &POWERNV_MACHINE(obj)->num_chips, errp);
+-}
+-
+-static void pnv_set_num_chips(Object *obj, Visitor *v, const char *name,
+-                              void *opaque, Error **errp)
+-{
+-    PnvMachineState *pnv = POWERNV_MACHINE(obj);
+-    uint32_t num_chips;
+-    Error *local_err = NULL;
+-
+-    visit_type_uint32(v, name, &num_chips, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        return;
+-    }
+-
+-    /*
+-     * TODO: should we decide on how many chips we can create based
+-     * on #cores and Venice vs. Murano vs. Naples chip type etc...,
+-     */
+-    if (!is_power_of_2(num_chips) || num_chips > 4) {
+-        error_setg(errp, "invalid number of chips: '%d'", num_chips);
+-        return;
+-    }
+-
+-    pnv->num_chips = num_chips;
+-}
+-
+ static void powernv_machine_initfn(Object *obj)
+ {
+     PnvMachineState *pnv = POWERNV_MACHINE(obj);
+     pnv->num_chips = 1;
+ }
+ 
+-static void powernv_machine_class_props_init(ObjectClass *oc)
+-{
+-    object_class_property_add(oc, "num-chips", "uint32",
+-                              pnv_get_num_chips, pnv_set_num_chips,
+-                              NULL, NULL, NULL);
+-    object_class_property_set_description(oc, "num-chips",
+-                              "Specifies the number of processor chips",
+-                              NULL);
+-}
+-
+ static void powernv_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -1321,8 +1290,6 @@ static void powernv_machine_class_init(ObjectClass *oc, void *data)
+     xic->ics_get = pnv_ics_get;
+     xic->ics_resend = pnv_ics_resend;
+     ispc->print_info = pnv_pic_print_info;
+-
+-    powernv_machine_class_props_init(oc);
+ }
+ 
+ static const TypeInfo powernv_machine_info = {
