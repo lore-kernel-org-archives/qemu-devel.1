@@ -1,36 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dvP32-00066s-3O
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:35:21 -0400
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1dvP69-0007yU-Nq
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:38:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dvP2y-00064f-VZ
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:35:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46570)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dvP2y-000647-Nn
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:35:16 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CE0A41F56A
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 14:35:15 +0000 (UTC)
-Date: Fri, 22 Sep 2017 15:35:05 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170922143505.GB13709@stefanha-x1.localdomain>
-References: <1506070572-7549-1-git-send-email-peterx@redhat.com>
-	<1506070572-7549-2-git-send-email-peterx@redhat.com>
-	<20170922101652.GF9243@stefanha-x1.localdomain>
-	<4bf59c2a-8b21-0613-5575-3dfee2762633@redhat.com>
-	<20170922102049.GK12725@redhat.com>
-	<e993362e-3f72-add0-bb5e-1e74830dc396@redhat.com>
-	<20170922102808.GL12725@redhat.com>
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1dvP66-0007qW-J5
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:38:33 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51572)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
+	id 1dvP66-0007q7-A4
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:38:30 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8MEZEKG115629
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 10:38:26 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d53q3krbe-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 10:38:25 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
+	Fri, 22 Sep 2017 15:38:23 +0100
+References: <20170922083855.102341-1-borntraeger@de.ibm.com>
+	<20170922083855.102341-3-borntraeger@de.ibm.com>
+	<5e7ba7d5-82d4-f1e6-532a-37c2c445c227@linux.vnet.ibm.com>
+	<ccb6e3eb-320e-b5dd-f728-09d8cab440c4@de.ibm.com>
+	<eee7e600-a8b0-6e23-580b-803f3b4e9efa@linux.vnet.ibm.com>
+	<4a31c53b-98aa-747a-1402-1a93e74c565b@de.ibm.com>
+From: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Date: Fri, 22 Sep 2017 16:38:17 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170922102808.GL12725@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] iothread: provide helpers for internal
- use
+In-Reply-To: <4a31c53b-98aa-747a-1402-1a93e74c565b@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <3d27a8b0-b212-85f1-c59e-8ca9d972c476@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH/RFC 2/3] s390x/ais: enable ais when
+ migration is available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,58 +47,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel <qemu-devel@nongnu.org>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-On Fri, Sep 22, 2017 at 11:28:08AM +0100, Daniel P. Berrange wrote:
-> On Fri, Sep 22, 2017 at 12:26:16PM +0200, Paolo Bonzini wrote:
-> > On 22/09/2017 12:20, Daniel P. Berrange wrote:
-> > > On Fri, Sep 22, 2017 at 12:18:44PM +0200, Paolo Bonzini wrote:
-> > >> On 22/09/2017 12:16, Stefan Hajnoczi wrote:
-> > >>> I suggest adding internal IOThreads alongside user-created IOThreads
-> > >>> instead of hiding them.  IOThread also needs a bool user_created field
-> > >>> and a UserCreatableClass->can_be_deleted() function:
-> > >>>
-> > >>>   static bool iothread_can_be_deleted(UserCreatable *uc)
-> > >>>   {
-> > >>>       return IOTHREAD(uc)->user_created;
-> > >>>   }
-> > >>>
-> > >>> This way users cannot delete internal IOThreads.
-> > >>>
-> > >>> But how should object ids be handled?  In theory existing -object
-> > >>> iothread,id=<id> users could use any name.  How can QEMU generate ids
-> > >>> for internal IOThreads without conflicting with existing users's ids?
-> > >>
-> > >> I would add an 'internal' boolean to query-iothreads' response and a new
-> > >> 'show-internal' boolean to the command.  This way, applications that
-> > >> request internal iothreads would know that the "primary key" is
-> > >> (internal, id) rather than just the id.
-> > > 
-> > > What is the app going to do with iothreads if it sees "internal" flag
-> > > set ? They have no way of knowing what part of QEMU internally is using
-> > > this iothread, so I don't see that they can do anything intelligent
-> > > once they find out they exist.
-> > 
-> > The application could apply them default settings for scheduler policy
-> > or CPU affinity.
-> > 
-> > Unlike the main or the I/O thread, the monitor thread doesn't interrupt
-> > the CPU, so it need not run at SCHED_FIFO even in real-time settings.
-> 
-> There's no way for the application to know that. ALl it sees is that there
-> is an extra unexpected IOthread created internally by QEMU. There's no way
-> to decide whether it nedes SCHED_FIFO or not as we've no clue what it is
-> being used for.
+On 22/09/2017 16:07, Christian Borntraeger wrote:
+>=20
+>=20
+> On 09/22/2017 04:02 PM, Pierre Morel wrote:
+>> On 22/09/2017 14:40, Christian Borntraeger wrote:
+>>>
+>>>
+>>> On 09/22/2017 02:13 PM, Pierre Morel wrote:
+>>>> On 22/09/2017 10:38, Christian Borntraeger wrote:
+>>>>> Instead of unconditionally enabling the KVM AIS capability
+>>>>> in the kvm arch init function, do this in the flic realize function
+>>>>> when we know if migration is available. This requires to initialize
+>>>>> flic before the CPUs.
+>>>>
+>>>> I am not sure to agree.
+>>>>
+>>>> AIS facility is used for PCI (currently only PCI)
+>>>> We want to support PCI emulation and PCI VFIO
+>>>>
+>>>>
+>>>> Not having AIS support in the host kernel or not supporting AISM in =
+the host kernel does not affect the emulation.
+>>>> Neither virtio-pci nor TCG.
+>>>> The only devices, (currently), which can not work without AIS and is=
+ not migratable without AISM are PCI VFIO devices.
+>>>
+>>> This patch enable the conditional enablement facility for the KVM hos=
+t mask. The cpu model enablement is done
+>>> differently for KVM and TCG anyway.
+>>> Right now AIS is only enabled for KVM. For TCG AIS is not implemented=
+ at all and disabled. So for whenever this
+>>> is fixed in TCG it can be handled then.
+>>>
+>>> And for emulated devices under KVM you still need the kernel support =
+- otherwise migration is really broken for
+>>> the nimm/dimm values.
+>>>
+>>
+>> Yes, that is right.
+>> I do not pretend that it is working directly.
+>>
+>> To support AIS emulation we have some work to do there (the migration)=
+, in kvm_s390_inject_airq() and other functions using ais_supported, to u=
+se emulated values.
+>>
+>> Don't you think that we could use emulation instead of faulting when t=
+he kernel can not handle values needed for pass-through?
+>>
+>> We can fault at the moment a VFIO device is realized.
+>> Migration will be stopped on realizing VFIO PCI devices instead of fli=
+c.
+>>
+>> I can miss something, is there a reason not to do so?
+>=20
+> The problem is not vfio vs emulation. The problem is that for KVM the k=
+ernel is handling the interrupts.
+> and it holds the state of the interrupt controller (nimm/dimm) and with=
+out an interface to read/write these,
+> the PCI core will be in a wrong state after migration regarding AIS.
 
-For observability (troubleshooting, debugging, etc) I would like all
-IOThreads to be visible.  That makes it much easier to troubleshoot in a
-unified way rather than having to get at internal IOThreads through
-different means (e.g. gdb).
+I am aware of this.
 
-If QEMU uses a well-known ID for the internal monitor IOThread then
-libvirt could also interact with it (e.g. CPU affinity).
+>=20
+> Really, this patch just moves the supported host kernel from >=3D4.12 t=
+o >=3D4.13. It makes absolutely no
+> sense to start having a mixed interrupt stack (qemu + kernel) just to m=
+ake this work on 4.12.
+>=20
+>=20
 
-One day maybe the main loop thread will also be an internal IOThread.
+In fact it would have been for much more than just the 4.12
+But OK, I can understand that it makes no sense to discuss this now.
+The urgency is to fence 4.12.
+Eventually, we can discuss this later.
 
-Stefan
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
