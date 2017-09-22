@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=434883a06=anthony.perard@citrix.com>)
-	id 1dwW2t-00032s-Ro
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 12:15:48 -0400
+	(envelope-from <cota@braap.org>) id 1dwW4t-0003fJ-95
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 12:17:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=434883a06=anthony.perard@citrix.com>)
-	id 1dwW2q-0006I6-Ez
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 12:15:47 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:46006)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=434883a06=anthony.perard@citrix.com>)
-	id 1dwW2p-0006Hh-Nn
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 12:15:44 -0400
-Date: Mon, 25 Sep 2017 17:15:41 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20170925161541.GD25986@perard.uk.xensource.com>
-References: <1505498999-17427-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1505498999-17427-4-git-send-email-ian.jackson@eu.citrix.com>
+	(envelope-from <cota@braap.org>) id 1dwW4r-0006yR-6v
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 12:17:51 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:45199)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dwW4r-0006yF-2E
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 12:17:49 -0400
+Date: Fri, 22 Sep 2017 18:48:55 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170922224855.GA6905@flamenco>
+References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1505498999-17427-4-git-send-email-ian.jackson@eu.citrix.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 3/6] xen: restrict: use
- xentoolcore_restrict_all
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
+Subject: Re: [Qemu-devel] [PATCH v6 00/22] instrument: Add basic event
+ instrumentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,68 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ian Jackson <ian.jackson@eu.citrix.com>
-Cc: qemu-devel@nongnu.org, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>
+To: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Fri, Sep 15, 2017 at 07:09:56PM +0100, Ian Jackson wrote:
-> And insist that it works.
+On Wed, Sep 13, 2017 at 12:53:43 +0300, Lluís Vilanova wrote:
+> The instrumentation code is dynamically loaded as a library into QEMU either
+> when it starts or later using its remote control interfaces. The loaded code
+> only has access to function explicitly exported through the QI_VPUBLIC macro.
 > 
-> Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-> ---
->  include/hw/xen/xen_common.h | 26 ++------------------------
->  1 file changed, 2 insertions(+), 24 deletions(-)
-> 
-> diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-> index 86c7f26..b6cb024 100644
-> --- a/include/hw/xen/xen_common.h
-> +++ b/include/hw/xen/xen_common.h
-> @@ -12,6 +12,7 @@
->  
->  #include <xenctrl.h>
->  #include <xenstore.h>
-> +#include <xentoolcore.h>
->  #include <xen/io/xenbus.h>
->  
->  #include "hw/hw.h"
-> @@ -289,30 +290,7 @@ static inline int xen_modified_memory(domid_t domid, uint64_t first_pfn,
->  
->  static inline int xen_restrict(domid_t domid)
->  {
-> -    int rc;
-> -
-> -    /* Attempt to restrict devicemodel operations */
-> -    rc = xendevicemodel_restrict(xen_dmod, domid);
-> -    trace_xen_domid_restrict(rc ? errno : 0);
-> -
-> -    if (rc < 0) {
-> -        /*
-> -         * If errno is ENOTTY then restriction is not implemented so
-> -         * there's no point in trying to restrict other types of
-> -         * operation, but it should not be treated as a failure.
-> -         */
-> -        if (errno == ENOTTY) {
-> -            return 0;
-> -        }
-> -
-> -        return rc;
-> -    }
-> -
-> -    /* Restrict foreignmemory operations */
-> -    rc = xenforeignmemory_restrict(xen_fmem, domid);
-> -    trace_xen_domid_restrict(rc ? errno : 0);
-> -
-> -    return rc;
-> +    return xentoolcore_restrict_all(domid);
+> This series is branch 'devel-instrument' in
+> https://code.gso.ac.upc.edu/git/qemu-dbi.
 
-xentoolcore_restrict_all is going to need a compatibility stub, which
-can be done in this same header (xen_common.h).
+Is this up to date? That tree doesn't build for me with --enable-instrument; I
+get the same error I got in v4:
 
-I think we can keep the call to trace_xen_domid_restrict(), that's just
-a debug printf.
+  CC      x86_64-linux-user/instrument/state.o
+/data/src/qemu2/instrument/trace.c:13:30: fatal error: qemu-instr/trace.h: No such file or directory
+compilation terminated.
+/data/src/qemu2/rules.mak:66: recipe for target 'instrument/trace.o' failed
 
-Also, we could remove the compatibility stub for xendevicemodel_restrict
-and xenforeignmemory_restrict as there are not used anymore.
+Or maybe I'm doing something wrong?
+I'm configuring with `configure --target-list=x86_64-linux-user --enable-instrument'.
 
+Thanks,
 
--- 
-Anthony PERARD
+		Emilio
