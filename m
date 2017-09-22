@@ -1,42 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dvNGC-0007XB-H3
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:40:49 -0400
+	(envelope-from <clg@kaod.org>) id 1dvNHg-0000RZ-Dq
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:42:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dvNG7-0002Uy-Ay
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:40:48 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58588
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dvNG6-0002UY-VU
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:40:43 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8MCdKnA056059
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 08:40:39 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d505sj8dm-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 08:40:39 -0400
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 22 Sep 2017 13:40:36 +0100
-References: <20170922083855.102341-1-borntraeger@de.ibm.com>
-	<20170922083855.102341-3-borntraeger@de.ibm.com>
-	<5e7ba7d5-82d4-f1e6-532a-37c2c445c227@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 22 Sep 2017 14:40:31 +0200
+	(envelope-from <clg@kaod.org>) id 1dvNHb-0003lu-Fz
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:42:20 -0400
+Received: from 1.mo179.mail-out.ovh.net ([178.33.111.220]:56710)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dvNHb-0003jm-9a
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:42:15 -0400
+Received: from player690.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 9D037629F6
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 14:42:13 +0200 (CEST)
+References: <20170911171235.29331-1-clg@kaod.org>
+	<20170911171235.29331-2-clg@kaod.org> <20170919022719.GH27153@umbus>
+	<d3ee87a7-208e-a172-094b-6aeedf8c5840@kaod.org>
+	<20170922110040.GP4998@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <fc6b85f6-fa5b-7ed2-2635-72aceda74305@kaod.org>
+Date: Fri, 22 Sep 2017 14:42:07 +0200
 MIME-Version: 1.0
-In-Reply-To: <5e7ba7d5-82d4-f1e6-532a-37c2c445c227@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170922110040.GP4998@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <ccb6e3eb-320e-b5dd-f728-09d8cab440c4@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH/RFC 2/3] s390x/ais: enable ais when
- migration is available
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v2 01/21] ppc/xive: introduce a
+ skeleton for the sPAPR XIVE interrupt controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,32 +34,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
 
+On 09/22/2017 01:00 PM, David Gibson wrote:
+> On Tue, Sep 19, 2017 at 03:15:44PM +0200, C=E9dric Le Goater wrote:
+>> On 09/19/2017 04:27 AM, David Gibson wrote:
+>>> On Mon, Sep 11, 2017 at 07:12:15PM +0200, C=E9dric Le Goater wrote:
+>>>> Start with a couple of attributes for the XIVE sPAPR controller
+>>>> model. The number of provisionned IRQ is necessary to size the
+>>>> different internal XIVE tables, the number of CPUs is also.
+>>>>
+>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>>>
+>>> [snip]
+>>>
+>>>> +static void spapr_xive_realize(DeviceState *dev, Error **errp)
+>>>> +{
+>>>> +    sPAPRXive *xive =3D SPAPR_XIVE(dev);
+>>>> +
+>>>> +    if (!xive->nr_targets) {
+>>>> +        error_setg(errp, "Number of interrupt targets needs to be g=
+reater 0");
+>>>> +        return;
+>>>> +    }
+>>>> +    /* We need to be able to allocate at least the IPIs */
+>>>> +    if (!xive->nr_irqs || xive->nr_irqs < xive->nr_targets) {
+>>>> +        error_setg(errp, "Number of interrupts too small");
+>>>> +        return;
+>>>> +    }
+>>>> +}
+>>>> +
+>>>> +static Property spapr_xive_properties[] =3D {
+>>>> +    DEFINE_PROP_UINT32("nr-irqs", sPAPRXive, nr_irqs, 0),
+>>>> +    DEFINE_PROP_UINT32("nr-targets", sPAPRXive, nr_targets, 0),
+>>>
+>>> I'm a bit uneasy about the number of targets having to be set in
+>>> advance: this can make life awkward when CPUs are hotplugged.  I know
+>>> there's something similar in xics, but it has caused some hassles, an=
+d
+>>> we're starting to move away from it.
+>>>
+>>> Do you really need this?
+>>>
+>>
+>> Some of the internal table size depend on the number of cpus=20
+>> defined for the machine.
+>=20
+> Which ones?  My impression was that there needed to be at least #cpus
+> * #priority-levels EQs, but there could be more than that,=20
 
+euh no, not in spapr mode at least. There are 8 queues per cpu.
 
-On 09/22/2017 02:13 PM, Pierre Morel wrote:
-> On 22/09/2017 10:38, Christian Borntraeger wrote:
->> Instead of unconditionally enabling the KVM AIS capability
->> in the kvm arch init function, do this in the flic realize function
->> when we know if migration is available. This requires to initialize
->> flic before the CPUs.
-> 
-> I am not sure to agree.
-> 
-> AIS facility is used for PCI (currently only PCI)
-> We want to support PCI emulation and PCI VFIO
-> 
-> 
-> Not having AIS support in the host kernel or not supporting AISM in the host kernel does not affect the emulation.
-> Neither virtio-pci nor TCG.
-> The only devices, (currently), which can not work without AIS and is not migratable without AISM are PCI VFIO devices.
+> so it was no longer as tightly bound to the number if "interrupt server=
+s"> as xics.
 
-This patch enable the conditional enablement facility for the KVM host mask. The cpu model enablement is done
-differently for KVM and TCG anyway.
-Right now AIS is only enabled for KVM. For TCG AIS is not implemented at all and disabled. So for whenever this
-is fixed in TCG it can be handled then. 
+ah. I think I see what you mean, that we could allocate them on the=20
+fly when needed by some hcalls ?=20
 
-And for emulated devices under KVM you still need the kernel support - otherwise migration is really broken for
-the nimm/dimm values.
+The other place where I use the nr_targets is to provision the=20
+IRQ numbers for the IPIs but that could probably be done in some=20
+other way, specially it there is a IRQ allocator at the machine level.
+
+C. =20
+>> When the sPAPRXive object is instantiated,=20
+>> we use xics_max_server_number() to get the max number of cpus
+>> provisioned.
+>>
+>> C.
+>>
+>=20
