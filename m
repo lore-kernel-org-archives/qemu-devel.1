@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.kiszka@siemens.com>) id 1dvI5i-0002m9-AT
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:09:39 -0400
+	(envelope-from <thuth@redhat.com>) id 1dvIEE-0004lN-Ha
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:18:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.kiszka@siemens.com>) id 1dvI5e-0002rX-AZ
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:09:38 -0400
-Received: from goliath.siemens.de ([192.35.17.28]:41445)
+	(envelope-from <thuth@redhat.com>) id 1dvIEB-0000tE-A3
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:18:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59498)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
-	id 1dvI5e-0002qH-0K
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:09:34 -0400
-References: <20170920083647.14599-1-famz@redhat.com>
-From: Jan Kiszka <jan.kiszka@siemens.com>
-Message-ID: <df117864-4533-9527-d051-62a126e60794@siemens.com>
-Date: Fri, 22 Sep 2017 09:09:27 +0200
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dvIEB-0000re-3l
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:18:23 -0400
+References: <1506049617-25716-1-git-send-email-thuth@redhat.com>
+	<df8f9d2e-9b89-f5b2-3f2e-222cd08ff8df@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b9131ae0-3395-8e4f-1b4a-7e518d2341bc@redhat.com>
+Date: Fri, 22 Sep 2017 09:18:10 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170920083647.14599-1-famz@redhat.com>
+In-Reply-To: <df8f9d2e-9b89-f5b2-3f2e-222cd08ff8df@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] seccomp: Don't include libseccomp from
- QEMU header
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tests/boot-sector: Increase timeout to 600
+ seconds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Otubo <otubo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>, Victor Kaplansky <victork@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
 
-On 2017-09-20 10:36, Fam Zheng wrote:
-> The only prototype doesn't need anything from the lib header, and not
-> including it here allows files that include this header, for example
-> vl.c, to compile without the libseccomp cflags.
-> 
-> The breakage is since c3883e1f93 for environments where `pkg-config
-> --cflags libseccomp" is non-empty.
-> 
-> Reported-by: Jan Kiszka <jan.kiszka@siemens.com>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> 
-> ---
-> 
-> This is an alternative for
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04470.html
-> ([Qemu-devel] [PATCH] seccomp: Fix build)
-> ---
->  include/sysemu/seccomp.h | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/include/sysemu/seccomp.h b/include/sysemu/seccomp.h
-> index e67c2dc840..9b092aa23f 100644
-> --- a/include/sysemu/seccomp.h
-> +++ b/include/sysemu/seccomp.h
-> @@ -21,7 +21,5 @@
->  #define QEMU_SECCOMP_SET_SPAWN       (1 << 3)
->  #define QEMU_SECCOMP_SET_RESOURCECTL (1 << 4)
->  
-> -#include <seccomp.h>
-> -
->  int seccomp_start(uint32_t seccomp_opts);
->  #endif
-> 
+On 22.09.2017 08:21, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Thomas,
+>=20
+> On 09/22/2017 12:06 AM, Thomas Huth wrote:
+>> If QEMU has been compiled with the flags --enable-tcg-interpreter and
+>> --enable-debug, the guest is running incredibly slow. The pxe boot tes=
+t
+>=20
+> There already is a qtest_get_arch(), it might be convenient to have a
+> qtest_get_accel() at some point.
 
-Works fine for me as well and is indeed cleaner.
+The "accelerator" (or rather "decelerator") is still TCG in this case -
+it's just its backend that is so slow.
 
-Jan
+Anyway, Luk=C3=A1=C5=A1 recently reported that he could reproduce similar=
+ issues
+with systems that are under heavy stress:
 
--- 
-Siemens AG, Corporate Technology, CT RDA ITP SES-DE
-Corporate Competence Center Embedded Linux
+https://marc.info/?i=3Ddafbe774-2544-f64e-aad2-9cf957025e8d@redhat.com
+
+So I think we should apply this anyway, without any TCI-related checks.
+
+ Thomas
