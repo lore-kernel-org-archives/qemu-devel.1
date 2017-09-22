@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dvNkq-00049U-9K
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:12:33 -0400
+	(envelope-from <mprivozn@redhat.com>) id 1dvNnC-00058E-Kp
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:14:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dvNkn-0007c5-0m
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:12:28 -0400
-Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:38743)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dvNkm-0007b6-Ru
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:12:24 -0400
-Received: by mail-io0-x242.google.com with SMTP id e9so550411iod.5
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 06:12:23 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170921213052.1765-1-david@redhat.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <9d640173-93fe-0850-9335-d545dd34b2de@twiddle.net>
-Date: Fri, 22 Sep 2017 08:12:19 -0500
+	(envelope-from <mprivozn@redhat.com>) id 1dvNn9-0000aM-9H
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:14:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38878)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1dvNn9-0000Zh-2I
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:14:51 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 612677E43E
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 13:14:49 +0000 (UTC)
+From: Michal Privoznik <mprivozn@redhat.com>
+References: <cover.1504771369.git.mprivozn@redhat.com>
+Message-ID: <7296576e-9f52-f385-7bde-d5c6d9de71b7@redhat.com>
+Date: Fri, 22 Sep 2017 15:14:47 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170921213052.1765-1-david@redhat.com>
+In-Reply-To: <cover.1504771369.git.mprivozn@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/kvm: fix and cleanup storing CPU
- status
+Subject: Re: [Qemu-devel] [PATCH v5 0/3] watchdog.h: Drop local redefinition
+ of actions enum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +34,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com
 
-On 09/21/2017 04:30 PM, David Hildenbrand wrote:
-> +struct sigp_save_area {
-> +    uint64_t    fprs[16];                       /* 0x0000 */
-> +    uint64_t    grs[16];                        /* 0x0080 */
-> +    PSW         psw;                            /* 0x0100 */
-> +    uint8_t     pad_0x0110[0x0118 - 0x0110];    /* 0x0110 */
-> +    uint32_t    prefix;                         /* 0x0118 */
-> +    uint32_t    fpc;                            /* 0x011c */
-> +    uint8_t     pad_0x0120[0x0124 - 0x0120];    /* 0x0120 */
-> +    uint32_t    todpr;                          /* 0x0124 */
-> +    uint64_t    cputm;                          /* 0x0128 */
-> +    uint64_t    ckc;                            /* 0x0130 */
-> +    uint8_t     pad_0x0138[0x0140 - 0x0138];    /* 0x0138 */
-> +    uint32_t    ars[16];                        /* 0x0140 */
-> +    uint64_t    crs[16];                        /* 0x0384 */
-> +} QEMU_PACKED;
+On 09/07/2017 10:05 AM, Michal Privoznik wrote:
+> diff to v4:
+> - in 3/3 compare passed action string case insensitively to the qapi enum
+> 
+> Michal Privoznik (3):
+>   qapi: Rename WatchdogExpirationAction enum
+>   watchdog.h: Drop local redefinition of actions enum
+>   watchdog: Allow setting action on the fly
+> 
+>  hw/watchdog/watchdog.c    | 65 ++++++++++++++++++++++++-----------------------
+>  hw/watchdog/wdt_diag288.c |  6 ++---
+>  include/sysemu/watchdog.h | 12 ++-------
+>  monitor.c                 |  4 +--
+>  qapi-schema.json          |  9 +++++++
+>  qapi/run-state.json       |  6 ++---
+>  6 files changed, 52 insertions(+), 50 deletions(-)
+> 
 
-I don't believe you need to use QEMU_PACKED.  Unless the "addr" that's passed
-in can really be arbitrary?  (If so, the memory returned by
-cpu_physical_memory_map will be unaligned and so we do need the PACKED to force
-the compiler to generate unaligned stores into the structure.)
+Thanks for all the reviews. What do I need to get it pushed ;-)
 
-> QEMU_BUILD_BUG_ON(sizeof(*sa) != 512);
-
-Put this right next to the structure?
-
-
-r~
+Michal
