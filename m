@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dvSP1-0000nC-Ft
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 14:10:16 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dvSUi-0002oo-2f
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 14:16:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dvSP0-0003eM-Cb
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 14:10:15 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:50951)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dvSP0-0003e0-5b
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 14:10:14 -0400
-Received: by mail-wr0-x229.google.com with SMTP id w12so1497889wrc.7
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 11:10:14 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1dvSUf-00080E-AU
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 14:16:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38134)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dvSUf-0007z6-1z
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 14:16:05 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 80B85A0C12
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 18:16:03 +0000 (UTC)
+Date: Fri, 22 Sep 2017 15:15:59 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170922181559.GL21016@localhost.localdomain>
+References: <20170906094927.22376-1-cohuck@redhat.com>
+	<20170906132936.7cf49b24.cohuck@redhat.com>
+	<20170907081131.GB4461@dhcp-200-186.str.redhat.com>
+	<366021b7-c3f2-6be5-7b2d-d02ab8a8e793@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170922150410.20689-1-pbonzini@redhat.com>
-References: <20170922150410.20689-1-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 22 Sep 2017 19:09:52 +0100
-Message-ID: <CAFEAcA9NBEwdTRk2XD3CZ9+V6O-RqMMSJMGzDQwHbzgd46UU4A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/32] Misc patches for 2017-09-22 (v2)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <366021b7-c3f2-6be5-7b2d-d02ab8a8e793@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC] accel: default to an actually
+ available accelerator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +37,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Cornelia Huck <cohuck@redhat.com>, lvivier@redhat.com, thuth@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-On 22 September 2017 at 16:04, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> The following changes since commit b62b7ed0fc9c58e373b8946c9bd2e193be98da=
-e6:
->
->   Merge remote-tracking branch 'remotes/gkurz/tags/for-upstream' into sta=
-ging (2017-09-20 20:33:48 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 8acf7b48e0098198057db048340606c7fbfc6518:
->
->   chardev: remove context in chr_update_read_handler (2017-09-22 14:03:27=
- +0200)
->
-> v2 fixes some issues with the new qemu-pr-helper.  make install and syste=
-md
-> socket activation were broken.  I have now backported it to the Fedora QE=
-MU
-> packages to shake out any distro-level issues.
->
-> ----------------------------------------------------------------
-> * Speed up AddressSpaceDispatch creation (Alexey)
-> * Fix kvm.c assert (David)
-> * Memory fixes and further speedup (me)
-> * Persistent reservation manager infrastructure (me)
-> * virtio-serial: add enable_backend callback (Pavel)
-> * chardev GMainContext fixes (Peter)
+On Mon, Sep 11, 2017 at 01:51:54PM +0200, Paolo Bonzini wrote:
+> On 07/09/2017 10:11, Kevin Wolf wrote:
+> > Am 06.09.2017 um 13:29 hat Cornelia Huck geschrieben:
+> >> On Wed,  6 Sep 2017 11:49:27 +0200
+> >> Cornelia Huck <cohuck@redhat.com> wrote:
+> >>
+> >>> configure_accelerator() falls back to tcg if no accelerator has
+> >>> been specified. Formerly, we could be sure that tcg is always
+> >>> available; however, with --disable-tcg, this is not longer true,
+> >>> and you are not able to start qemu without explicitly specifying
+> >>> another accelerator on those builds.
+> >>>
+> >>> Instead, choose an accelerator in the order tcg->kvm->xen->hax.
+> >>>
+> >>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> >>> ---
+> >>>
+> >>> RFC mainly because this breaks iotest 186 in a different way on a
+> >>> tcg-less x86_64 build: Before, it fails with "-machine accel=tcg: No
+> >>> accelerator found"; afterwards, there seems to be a difference in
+> >>> output due to different autogenerated devices. Not sure how to handle
+> >>> that.
+> >>>
+> >>> cc:ing some hopefully interested folks (-ENOMAINTAINER again).
+> >>>
+> >>> ---
+> >>>  accel/accel.c              | 22 ++++++++++++++++++++--
+> >>>  arch_init.c                | 17 +++++++++++++++++
+> >>>  include/sysemu/arch_init.h |  2 ++
+> >>>  qemu-options.hx            |  6 ++++--
+> >>>  4 files changed, 43 insertions(+), 4 deletions(-)
+> >>>
+> >>> diff --git a/accel/accel.c b/accel/accel.c
+> >>> index 8ae40e1e13..26a3f32627 100644
+> >>> --- a/accel/accel.c
+> >>> +++ b/accel/accel.c
+> >>> @@ -68,6 +68,25 @@ static int accel_init_machine(AccelClass *acc, MachineState *ms)
+> >>>      return ret;
+> >>>  }
+> >>>  
+> >>> +static const char *default_accelerator(void)
+> >>> +{
+> >>> +    if (tcg_available()) {
+> >>> +        return "tcg";
+> >>> +    }
+> >>> +    if (kvm_available()) {
+> >>> +        return "kvm";
+> >>> +    }
+> >>> +    if (xen_available()) {
+> >>> +        return "xen";
+> >>> +    }
+> >>> +    if (hax_available()) {
+> >>> +        return "hax";
+> >>> +    }
+> >>> +    /* configure makes sure we have at least one accelerator */
+> >>> +    g_assert(false);
+> >>> +    return "";
+> >>> +}
+> >>> +
+> >>>  void configure_accelerator(MachineState *ms)
+> >>>  {
+> >>>      const char *accel, *p;
+> >>> @@ -79,8 +98,7 @@ void configure_accelerator(MachineState *ms)
+> >>>  
+> >>>      accel = qemu_opt_get(qemu_get_machine_opts(), "accel");
+> >>>      if (accel == NULL) {
+> >>> -        /* Use the default "accelerator", tcg */
+> >>> -        accel = "tcg";
+> >>> +        accel = default_accelerator();
+> >>
+> >> It actually may be easier to just switch the default to
+> >> "tcg:kvm:xen:hax". Haven't tested that, though.
+> > 
+> > This would have been my first thought and looks a bit simpler, so if
+> > it works, I'd go for it.
+> > 
+> > But the real reason why I'm replying: Should we add changing the default
+> > to "kvm:tcg" to the list of planned 3.0 changes? I am part of the group
+> > that intentionally uses TCG occasionally, but I think the majority of
+> > users wants to use KVM (or whatever the fastest option is on their
+> > system) whenever it is available.
+> 
+> Yes, the only thing to be clarified is the default family/model/stepping
+> for "-accel kvm".  "-cpu qemu64" with KVM uses an AMD f/m/s and Intel as
+> the vendor, and some software (IIRC the GMP testsuite or something like
+> that) doesn't like it.  We should probably change qemu64 to a core2
+> f/m/s or something like that when running under KVM.  Eduardo?
 
-In today's episode of "compiler whinges" we have
+The current f/m/s was supposed to make sense for both AMD and
+Intel CPUs, to avoid requiring per-cpu-vendor defaults.  If we
+find a more recent f/m/s combination that still makes some sense
+for both vendors, changing it will be very simple.
 
-/home/pm215/qemu/scsi/qemu-pr-helper.c: In function =E2=80=98main=E2=80=99:
-/home/pm215/qemu/scsi/qemu-pr-helper.c:912:5: error: comparison is
-always true due to limited range of data type [-Werror=3Dtype-limits]
-     while ((ch =3D getopt_long(argc, argv, sopt, lopt, &opt_ind)) !=3D -1)=
- {
-     ^
+Long term, however, we should probably add per-cpu-vendor
+defaults to make this more flexible.
 
-(reported by the gcc on my ppc64, s390x, aarch64, aarch32 setups).
-
-This one's a genuine bug, I think: ch is a char, which is unsigned on
-these systems, and so the loop would never terminate.
-
-thanks
--- PMM
+-- 
+Eduardo
