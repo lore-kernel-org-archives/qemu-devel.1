@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dvNwj-0000VS-Um
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dvNwk-0000Vs-IY
 	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:24:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dvNwh-00055N-9n
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:24:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:64721)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dvNwj-00056i-Nt
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:24:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36340)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dvNwh-000550-0v
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:24:43 -0400
+	id 1dvNwj-00056F-HA
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:24:45 -0400
 From: marcandre.lureau@redhat.com
-Date: Fri, 22 Sep 2017 15:24:11 +0200
-Message-Id: <20170922132412.9408-5-marcandre.lureau@redhat.com>
+Date: Fri, 22 Sep 2017 15:24:12 +0200
+Message-Id: <20170922132412.9408-6-marcandre.lureau@redhat.com>
 In-Reply-To: <20170922132412.9408-1-marcandre.lureau@redhat.com>
 References: <20170922132412.9408-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 4/5] fw_cfg: write vmcoreinfo details
+Subject: [Qemu-devel] [PATCH v3 5/5] RFC: fw_cfg: add DMA write operation in
+ sysfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,145 +33,51 @@ Cc: somlo@cmu.edu, qemu-devel@nongnu.org, mst@redhat.com, =?UTF-8?q?Marc-Andr=C3
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-If the "etc/vmcoreinfo" file is present, write the addr/size of the
-vmcoreinfo ELF note.
+Since qemu 2.9, DMA write operations are allowed. However, usage of this
+interface from kernel or user-space is strongly discouraged by the
+maintainers. This patch is meant for experimentations for now.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- drivers/firmware/qemu_fw_cfg.c | 80 ++++++++++++++++++++++++++++++++++++=
-+++++-
- 1 file changed, 79 insertions(+), 1 deletion(-)
+ drivers/firmware/qemu_fw_cfg.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cf=
 g.c
-index 19b4b4d31547..54b569da3257 100644
+index 54b569da3257..e2f2ad1c9c0c 100644
 --- a/drivers/firmware/qemu_fw_cfg.c
 +++ b/drivers/firmware/qemu_fw_cfg.c
-@@ -34,6 +34,7 @@
- #include <linux/io.h>
- #include <linux/ioport.h>
- #include <linux/dma-mapping.h>
-+#include <linux/crash_core.h>
-=20
- MODULE_AUTHOR("Gabriel L. Somlo <somlo@cmu.edu>");
- MODULE_DESCRIPTION("QEMU fw_cfg sysfs support");
-@@ -57,6 +58,8 @@ MODULE_LICENSE("GPL");
- /* fw_cfg "file name" is up to 56 characters (including terminating nul)=
- */
- #define FW_CFG_MAX_FILE_PATH 56
-=20
-+#define VMCOREINFO_FORMAT_ELF 0x1
-+
- /* platform device for dma mapping */
- static struct device *dev;
-=20
-@@ -107,7 +110,8 @@ static ssize_t fw_cfg_dma_transfer(void *address, u32=
- length, u32 control)
- 	dma_addr_t dma;
- 	ssize_t ret =3D length;
- 	enum dma_data_direction dir =3D
--		(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0);
-+		(control & FW_CFG_DMA_CTL_READ ? DMA_FROM_DEVICE : 0) |
-+		(control & FW_CFG_DMA_CTL_WRITE ? DMA_TO_DEVICE : 0);
-=20
- 	if (address && length) {
- 		dma_addr =3D dma_map_single(dev, address, length, dir);
-@@ -203,6 +207,46 @@ static ssize_t fw_cfg_read_blob(u16 key,
- 	return ret;
+@@ -524,9 +524,28 @@ static ssize_t fw_cfg_sysfs_read_raw(struct file *fi=
+lp, struct kobject *kobj,
+ 	return fw_cfg_read_blob(entry->f.select, buf, pos, count, true);
  }
 =20
-+/* write chunk of given fw_cfg blob (caller responsible for sanity-check=
-) */
-+static ssize_t fw_cfg_write_blob(u16 key,
-+				 void *buf, loff_t pos, size_t count)
++static ssize_t fw_cfg_sysfs_write_raw(struct file *filp, struct kobject =
+*kobj,
++				      struct bin_attribute *bin_attr,
++				      char *buf, loff_t pos, size_t count)
 +{
-+	u32 glk =3D -1U;
-+	acpi_status status;
-+	ssize_t ret =3D count;
++	struct fw_cfg_sysfs_entry *entry =3D to_entry(kobj);
 +
-+	/* If we have ACPI, ensure mutual exclusion against any potential
-+	 * device access by the firmware, e.g. via AML methods:
-+	 */
-+	status =3D acpi_acquire_global_lock(ACPI_WAIT_FOREVER, &glk);
-+	if (ACPI_FAILURE(status) && status !=3D AE_NOT_CONFIGURED) {
-+		/* Should never get here */
-+		WARN(1, "%s: Failed to lock ACPI!\n", __func__);
-+		memset(buf, 0, count);
-+		return -EBUSY;
-+	}
++	if (!fw_cfg_dma_enabled())
++		return -ENOTSUPP;
 +
-+	mutex_lock(&fw_cfg_dev_lock);
-+	if (pos =3D=3D 0) {
-+		ret =3D fw_cfg_dma_transfer(buf, count, key << 16
-+					  | FW_CFG_DMA_CTL_SELECT
-+					  | FW_CFG_DMA_CTL_WRITE);
-+	} else {
-+		iowrite16(fw_cfg_sel_endianness(key), fw_cfg_reg_ctrl);
-+		ret =3D fw_cfg_dma_transfer(0, pos, FW_CFG_DMA_CTL_SKIP);
-+		if (ret < 0)
-+			goto end;
-+		ret =3D fw_cfg_dma_transfer(buf, count, FW_CFG_DMA_CTL_WRITE);
-+	}
++	if (pos > entry->f.size)
++		return -EINVAL;
 +
-+end:
-+	mutex_unlock(&fw_cfg_dev_lock);
++	if (count > entry->f.size - pos)
++		count =3D entry->f.size - pos;
 +
-+	acpi_release_global_lock(glk);
-+
-+	return ret;
++	return fw_cfg_write_blob(entry->f.select, buf, pos, count);
 +}
 +
- /* clean up fw_cfg device i/o */
- static void fw_cfg_io_cleanup(void)
- {
-@@ -321,6 +365,35 @@ struct fw_cfg_sysfs_entry {
- 	struct list_head list;
+ static struct bin_attribute fw_cfg_sysfs_attr_raw =3D {
+-	.attr =3D { .name =3D "raw", .mode =3D S_IRUSR },
++	.attr =3D { .name =3D "raw", .mode =3D S_IRUSR | S_IWUSR },
+ 	.read =3D fw_cfg_sysfs_read_raw,
++	.write =3D fw_cfg_sysfs_write_raw,
  };
 =20
-+static ssize_t write_vmcoreinfo(const struct fw_cfg_file *f)
-+{
-+	struct vmci {
-+		__le16 host_format;
-+		__le16 guest_format;
-+		__le32 size;
-+		__le64 paddr;
-+	} __packed;
-+	struct vmci *data;
-+	ssize_t ret;
-+
-+	data =3D kmalloc(sizeof(struct vmci), GFP_KERNEL | GFP_DMA);
-+	if (!data)
-+		return -ENOMEM;
-+
-+	/* spare ourself reading host format support for now since we
-+	 * don't know what else to format - host may ignore ours
-+	 */
-+	*data =3D (struct vmci) {
-+		.guest_format =3D cpu_to_le16(VMCOREINFO_FORMAT_ELF),
-+		.size =3D cpu_to_le32(VMCOREINFO_NOTE_SIZE),
-+		.paddr =3D cpu_to_le64(paddr_vmcoreinfo_note())
-+	};
-+	ret =3D fw_cfg_write_blob(f->select, data, 0, sizeof(struct vmci));
-+
-+	kfree(data);
-+	return ret;
-+}
-+
- /* get fw_cfg_sysfs_entry from kobject member */
- static inline struct fw_cfg_sysfs_entry *to_entry(struct kobject *kobj)
- {
-@@ -560,6 +633,11 @@ static int fw_cfg_register_file(const struct fw_cfg_=
-file *f)
- 	int err;
- 	struct fw_cfg_sysfs_entry *entry;
-=20
-+	if (strcmp(f->name, "etc/vmcoreinfo") =3D=3D 0) {
-+		if (write_vmcoreinfo(f) < 0)
-+			pr_warn("fw_cfg: failed to write vmcoreinfo");
-+	}
-+
- 	/* allocate new entry */
- 	entry =3D kzalloc(sizeof(*entry), GFP_KERNEL);
- 	if (!entry)
+ /*
 --=20
 2.14.1.146.gd35faa819
