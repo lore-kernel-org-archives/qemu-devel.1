@@ -1,38 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dvPN4-0005lX-07
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:56:03 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dvPOQ-0006a8-H9
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:57:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dvPN0-0001x7-Q3
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:56:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48128)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dvPON-0002j5-De
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:57:26 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:12550 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dvPN0-0001wi-Fs
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:55:58 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4B307C0578F5
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 14:55:57 +0000 (UTC)
-Date: Fri, 22 Sep 2017 15:55:40 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170922145540.GQ12725@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1506070572-7549-1-git-send-email-peterx@redhat.com>
-	<1506070572-7549-2-git-send-email-peterx@redhat.com>
-	<20170922101652.GF9243@stefanha-x1.localdomain>
-	<4bf59c2a-8b21-0613-5575-3dfee2762633@redhat.com>
-	<20170922102049.GK12725@redhat.com>
-	<e993362e-3f72-add0-bb5e-1e74830dc396@redhat.com>
-	<20170922102808.GL12725@redhat.com>
-	<20170922143505.GB13709@stefanha-x1.localdomain>
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dvPON-0002hD-1V
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:57:23 -0400
+References: <cecb7a50-6913-0d88-59b4-805463aba790@virtuozzo.com>
+	<cd46a9e9-4e9d-9ac8-53ed-34ba1b6f4dc0@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <9a3ce498-040d-5d8f-41d0-a2a649771528@virtuozzo.com>
+Date: Fri, 22 Sep 2017 17:57:07 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170922143505.GB13709@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH 1/3] iothread: provide helpers for internal
- use
+In-Reply-To: <cd46a9e9-4e9d-9ac8-53ed-34ba1b6f4dc0@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] nbd structured reply
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,71 +29,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Wouter Verhelst <w@uter.be>, Alex Bligh <alex@alex.org.uk>
+Cc: qemu-devel <qemu-devel@nongnu.org>, nbd@other.debian.org
 
-On Fri, Sep 22, 2017 at 03:35:05PM +0100, Stefan Hajnoczi wrote:
-> On Fri, Sep 22, 2017 at 11:28:08AM +0100, Daniel P. Berrange wrote:
-> > On Fri, Sep 22, 2017 at 12:26:16PM +0200, Paolo Bonzini wrote:
-> > > On 22/09/2017 12:20, Daniel P. Berrange wrote:
-> > > > On Fri, Sep 22, 2017 at 12:18:44PM +0200, Paolo Bonzini wrote:
-> > > >> On 22/09/2017 12:16, Stefan Hajnoczi wrote:
-> > > >>> I suggest adding internal IOThreads alongside user-created IOThreads
-> > > >>> instead of hiding them.  IOThread also needs a bool user_created field
-> > > >>> and a UserCreatableClass->can_be_deleted() function:
-> > > >>>
-> > > >>>   static bool iothread_can_be_deleted(UserCreatable *uc)
-> > > >>>   {
-> > > >>>       return IOTHREAD(uc)->user_created;
-> > > >>>   }
-> > > >>>
-> > > >>> This way users cannot delete internal IOThreads.
-> > > >>>
-> > > >>> But how should object ids be handled?  In theory existing -object
-> > > >>> iothread,id=<id> users could use any name.  How can QEMU generate ids
-> > > >>> for internal IOThreads without conflicting with existing users's ids?
-> > > >>
-> > > >> I would add an 'internal' boolean to query-iothreads' response and a new
-> > > >> 'show-internal' boolean to the command.  This way, applications that
-> > > >> request internal iothreads would know that the "primary key" is
-> > > >> (internal, id) rather than just the id.
-> > > > 
-> > > > What is the app going to do with iothreads if it sees "internal" flag
-> > > > set ? They have no way of knowing what part of QEMU internally is using
-> > > > this iothread, so I don't see that they can do anything intelligent
-> > > > once they find out they exist.
-> > > 
-> > > The application could apply them default settings for scheduler policy
-> > > or CPU affinity.
-> > > 
-> > > Unlike the main or the I/O thread, the monitor thread doesn't interrupt
-> > > the CPU, so it need not run at SCHED_FIFO even in real-time settings.
-> > 
-> > There's no way for the application to know that. ALl it sees is that there
-> > is an extra unexpected IOthread created internally by QEMU. There's no way
-> > to decide whether it nedes SCHED_FIFO or not as we've no clue what it is
-> > being used for.
-> 
-> For observability (troubleshooting, debugging, etc) I would like all
-> IOThreads to be visible.  That makes it much easier to troubleshoot in a
-> unified way rather than having to get at internal IOThreads through
-> different means (e.g. gdb).
-> 
-> If QEMU uses a well-known ID for the internal monitor IOThread then
-> libvirt could also interact with it (e.g. CPU affinity).
+21.09.2017 16:55, Eric Blake wrote:
+> [updating CC to point to the correct new NBD list]
+>
+> On 09/21/2017 07:18 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Hi all!
+>>
+>> I'm about this:
+>>
+>> "A server SHOULD try to minimize the number of chunks sent in a reply,
+>> but MUST NOT mark a chunk as final if there is still a possibility of
+>> detecting an error before transmission of that chunk completes"
+>>
+>> What do we mean by "possibility"? Formally, such possibility exists
+>> always, so, we'll never mark a chunk as final.
+> Here's what is envisioned.  It is fairly easy to write a server that
+> receives an NBD_CMD_READ, issues the header reply, and only then
+> dispatches the I/O to collect the data from the file system to send
+> after the header.  But if you encounter EIO (or other problem) while
+> reading from the file system, you're stuck if you've already sent the
+> header.  In this scenario, if you mark the header being as final, you
+> are unable to report the EIO (it is one of the flaws with non-structured
+> reads that makes the spec say that if you detect an error after sending
+> the header, you have no choice but to terminate the connection).
+>
+> An alternative server implementation would buffer the header, perform
+> the I/O to collect data from the file system, and only when it is all
+> present in memory, it finally sends the reply to the client.  In this
+> scenario, since you wait until all data is buffered, you know up front
+> whether an error occurred while collecting the I/O, and can therefore
+> send the data as the final packet right away (whether error or success).
+>   However, it potentially requires more memory to buffer requests like
+> this, compared to the server that sends information piecemeal as soon as
+> it obtains data.
+>
+> The intent is not to detect errors in sending the data over the wire,
+> but in detecting errors in reading the data from the underlying storage
+> (or however else the data to be read is being collected).  A chunk must
+> not be marked final unless you can guarantee that there will be no
+> further errors in collecting data for the reply.
+>
+> If you have suggestions for improving the NBD spec wording, feel free to
+> propose a doc patch.
+>
 
-I don't think we should abuse ID values by turning them into stable
-ABI - currently they are opaque tokens whose value has no special
-meaning and make change at will over time.
+Thanks, now I understand.. However I don't have good idea of wording..
 
-If we need to be able to report the IOthread for the monitor, then it
-would have to be done via a formal API, but that turns the use of
-IOThreads for the monitor into a feature we have to keep indefinitely,
-even if we wanted to re-implement it differently later.
 
-Regards,
-Daniel
+Another thing: server can send several error and success chunks on 
+CMD_READ..
+
+The obvious behavior of client is to fail the whole read if it received 
+one error chunk.
+And, actually, client is not interesting in all following chunks for 
+this request. I think
+we need some additional negotiation flag for this, which says that error 
+chunk
+must be final.
+
+May be we need also a method (command) to cancel one of inflight 
+requests, but it
+is not so important.
+
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Best regards,
+Vladimir
