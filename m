@@ -1,43 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dvObx-0001PY-Jy
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:07:24 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dvOpO-0000bg-BD
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:21:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dvObs-0003Rr-LN
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:07:21 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39054)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dvObs-0003RY-Bk
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:07:16 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8ME5RQA093115
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 10:07:15 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d4yxb9wa5-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 10:07:14 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 22 Sep 2017 15:07:12 +0100
-References: <20170922083855.102341-1-borntraeger@de.ibm.com>
-	<20170922083855.102341-3-borntraeger@de.ibm.com>
-	<5e7ba7d5-82d4-f1e6-532a-37c2c445c227@linux.vnet.ibm.com>
-	<ccb6e3eb-320e-b5dd-f728-09d8cab440c4@de.ibm.com>
-	<eee7e600-a8b0-6e23-580b-803f3b4e9efa@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 22 Sep 2017 16:07:08 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dvOpK-00065I-FT
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:21:14 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:45995)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dvOpK-00064Z-8i
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:21:10 -0400
+Received: by mail-wm0-x232.google.com with SMTP id q124so4391832wmb.0
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 07:21:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <eee7e600-a8b0-6e23-580b-803f3b4e9efa@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <4a31c53b-98aa-747a-1402-1a93e74c565b@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH/RFC 2/3] s390x/ais: enable ais when
- migration is available
+In-Reply-To: <20170922122505.9413-1-quintela@redhat.com>
+References: <20170922122505.9413-1-quintela@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 22 Sep 2017 15:20:48 +0100
+Message-ID: <CAFEAcA9d+3ErHep8WWx1eD648W1uMq6fFYZZnBzGaF9=gbKrsw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/18] Migration PULL request (3rd try)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,56 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Juan Quintela <quintela@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>
 
+On 22 September 2017 at 13:24, Juan Quintela <quintela@redhat.com> wrote:
+> Hi
+>
+> From yesterday pull:
+> - s/__WORD_SIZE/HOST_LONG_BITS/
+> - rebase on top of today
+>
+> [2nd try]
+>
+> To make merges easier, this includes:
+> - Peter Xu reviewed patches from Postocpy recovery (3)
+> - Alexey reviewed pages from block postcopy (4)
+> - Vladimir reviewed patches (3)
+> - reviewed patches from Multifd (me)
+>
+> Please apply, Juan.
+>
+>
+> The following changes since commit a664607440511fdf8cff9d1c2afefbdbca1d1295:
+>
+>   Merge remote-tracking branch 'remotes/famz/tags/build-and-test-automation-pull-request' into staging (2017-09-22 12:14:28 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/juanquintela/qemu.git tags/migration/20170922-1
+>
+> for you to fetch changes up to 54ae0886b12c4934e84381af777d4df6147cc2ec:
+>
+>   migration: split ufd_version_check onto receive/request features part (2017-09-22 14:11:29 +0200)
+>
+> ----------------------------------------------------------------
+> migration/next for 20170922
 
+Applied, thanks.
 
-On 09/22/2017 04:02 PM, Pierre Morel wrote:
-> On 22/09/2017 14:40, Christian Borntraeger wrote:
->>
->>
->> On 09/22/2017 02:13 PM, Pierre Morel wrote:
->>> On 22/09/2017 10:38, Christian Borntraeger wrote:
->>>> Instead of unconditionally enabling the KVM AIS capability
->>>> in the kvm arch init function, do this in the flic realize function
->>>> when we know if migration is available. This requires to initialize
->>>> flic before the CPUs.
->>>
->>> I am not sure to agree.
->>>
->>> AIS facility is used for PCI (currently only PCI)
->>> We want to support PCI emulation and PCI VFIO
->>>
->>>
->>> Not having AIS support in the host kernel or not supporting AISM in the host kernel does not affect the emulation.
->>> Neither virtio-pci nor TCG.
->>> The only devices, (currently), which can not work without AIS and is not migratable without AISM are PCI VFIO devices.
->>
->> This patch enable the conditional enablement facility for the KVM host mask. The cpu model enablement is done
->> differently for KVM and TCG anyway.
->> Right now AIS is only enabled for KVM. For TCG AIS is not implemented at all and disabled. So for whenever this
->> is fixed in TCG it can be handled then.
->>
->> And for emulated devices under KVM you still need the kernel support - otherwise migration is really broken for
->> the nimm/dimm values.
->>
-> 
-> Yes, that is right.
-> I do not pretend that it is working directly.
-> 
-> To support AIS emulation we have some work to do there (the migration), in kvm_s390_inject_airq() and other functions using ais_supported, to use emulated values.
-> 
-> Don't you think that we could use emulation instead of faulting when the kernel can not handle values needed for pass-through?
-> 
-> We can fault at the moment a VFIO device is realized.
-> Migration will be stopped on realizing VFIO PCI devices instead of flic.
-> 
-> I can miss something, is there a reason not to do so?
-
-The problem is not vfio vs emulation. The problem is that for KVM the kernel is handling the interrupts.
-and it holds the state of the interrupt controller (nimm/dimm) and without an interface to read/write these, 
-the PCI core will be in a wrong state after migration regarding AIS.
-
-Really, this patch just moves the supported host kernel from >=4.12 to >=4.13. It makes absolutely no
-sense to start having a mixed interrupt stack (qemu + kernel) just to make this work on 4.12.
+-- PMM
