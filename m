@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dvUX8-00082E-MN
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:26:47 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dvUcq-0001qL-L1
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:32:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dvUX4-0005KJ-NR
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:26:46 -0400
-Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:34978)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1dvUX4-0005Jp-J0
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:26:42 -0400
-Received: by mail-it0-x242.google.com with SMTP id u2so1315836itb.2
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 13:26:42 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1dvUcm-0008PL-MX
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:32:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34436)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dvUcm-0008Oz-Db
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:32:36 -0400
+Date: Fri, 22 Sep 2017 21:32:28 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170922203227.GP2620@work-vm>
+References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
+	<1504081950-2528-33-git-send-email-peterx@redhat.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <20170922131819.GP12725@redhat.com>
-Date: Fri, 22 Sep 2017 16:26:40 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <BA02424C-0C79-4FAE-B191-18A9D0CDBAC8@gmail.com>
-References: <mailman.3351.1506066493.14747.qemu-devel@nongnu.org>
-	<726A2123-0371-407B-9270-6672DF66D511@gmail.com>
-	<20170922124405.GB32000@lemon> <20170922131819.GP12725@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 28/36] tests: Add ubuntu.i386 image
+Content-Disposition: inline
+In-Reply-To: <1504081950-2528-33-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 32/33] migration: allow migrate_incoming
+ for paused VM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +28,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
+* Peter Xu (peterx@redhat.com) wrote:
+> migrate_incoming command is previously only used when we were providing
+> "-incoming defer" in the command line, to defer the incoming migration
+> channel creation.
+> 
+> However there is similar requirement when we are paused during postcopy
+> migration. The old incoming channel might have been destroyed already.
+> We may need another new channel for the recovery to happen.
+> 
+> This patch leveraged the same interface, but allows the user to specify
+> incoming migration channel even for paused postcopy.
+> 
+> Meanwhile, now migration listening ports are always detached manually
+> using the tag, rather than using return values of dispatchers.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/exec.c      |  2 +-
+>  migration/fd.c        |  2 +-
+>  migration/migration.c | 39 +++++++++++++++++++++++++++++----------
+>  migration/socket.c    |  2 +-
+>  4 files changed, 32 insertions(+), 13 deletions(-)
+> 
+> diff --git a/migration/exec.c b/migration/exec.c
+> index ef1fb4c..26fc37d 100644
+> --- a/migration/exec.c
+> +++ b/migration/exec.c
+> @@ -49,7 +49,7 @@ static gboolean exec_accept_incoming_migration(QIOChannel *ioc,
+>  {
+>      migration_channel_process_incoming(ioc);
+>      object_unref(OBJECT(ioc));
+> -    return FALSE; /* unregister */
+> +    return TRUE; /* keep it registered */
+>  }
+>  
+>  /*
+> diff --git a/migration/fd.c b/migration/fd.c
+> index e9a548c..7d0aefa 100644
+> --- a/migration/fd.c
+> +++ b/migration/fd.c
+> @@ -49,7 +49,7 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
+>  {
+>      migration_channel_process_incoming(ioc);
+>      object_unref(OBJECT(ioc));
+> -    return FALSE; /* unregister */
+> +    return TRUE; /* keep it registered */
+>  }
+>  
+>  /*
+> diff --git a/migration/migration.c b/migration/migration.c
+> index daf356b..5812478 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -175,6 +175,17 @@ void migration_incoming_state_destroy(void)
+>      qemu_event_destroy(&mis->main_thread_load_event);
+>  }
+>  
+> +static bool migrate_incoming_detach_listen(MigrationIncomingState *mis)
+> +{
+> +    if (mis->listen_task_tag) {
+> +        /* Never fail */
+> +        g_source_remove(mis->listen_task_tag);
+> +        mis->listen_task_tag = 0;
+> +        return true;
+> +    }
+> +    return false;
+> +}
+> +
+>  static void migrate_generate_event(int new_state)
+>  {
+>      if (migrate_use_events()) {
+> @@ -432,10 +443,9 @@ void migration_fd_process_incoming(QEMUFile *f)
+>  
+>      /*
+>       * When reach here, we should not need the listening port any
+> -     * more. We'll detach the listening task soon, let's reset the
+> -     * listen task tag.
+> +     * more.  Detach the listening port explicitly.
+>       */
+> -    mis->listen_task_tag = 0;
+> +    migrate_incoming_detach_listen(mis);
+>  }
+>  
+>  /*
+> @@ -1291,14 +1301,25 @@ void migrate_del_blocker(Error *reason)
+>  void qmp_migrate_incoming(const char *uri, Error **errp)
+>  {
+>      Error *local_err = NULL;
+> -    static bool once = true;
+> +    MigrationIncomingState *mis = migration_incoming_get_current();
+>  
+> -    if (!deferred_incoming) {
+> -        error_setg(errp, "For use with '-incoming defer'");
+> +    if (!deferred_incoming &&
+> +        mis->state != MIGRATION_STATUS_POSTCOPY_PAUSED) {
+> +        error_setg(errp, "For use with '-incoming defer'"
+> +                   " or PAUSED postcopy migration only.");
+>          return;
+>      }
+> -    if (!once) {
+> -        error_setg(errp, "The incoming migration has already been started");
 
-> On Sep 22, 2017, at 9:18 AM, Daniel P. Berrange <berrange@redhat.com> =
-wrote:
->=20
-> On Fri, Sep 22, 2017 at 08:44:05PM +0800, Fam Zheng wrote:
->> On Fri, 09/22 08:10, Programmingkid wrote:
->>> Could a Darwin test be added? Both x86 and PowerPC versions would be =
-great.
->>=20
->> It's nice to cover macOS in our test, but to be honest I don't know =
-how to do
->> it. If there isn't any copyright problem, and if there are =
-instructions
->> available in wiki.qemu.org descirbing how to create such a guest step =
-by step
->> like [1], we can add one.
->=20
-> AFAICT we can not just provide or host OS-X images and let individual
-> devs run the without it being a license violation, so best avoided.
+What guards against someone doing a migrate_incoming after the succesful
+completion of an incoming migration?
+Also with RDMA the following won't happen so I'm not quite sure what
+state we're in.
 
-Actually Darwin and Mac OS X are not the same. Darwin is this =
-minimalistic environment and Mac OS X is built on top of that =
-environment. There would be no license problems when using Darwin only.
+When we get to non-blocking commands it's also a bit interesting - we
+could be getting an accept on the main thread at just the same time
+this is going down the OOB side.
 
-> IMHO it easier to just rely on Travis' OS-X builders for testing OS-X
-> platform builds, so that licensing compliance is their responsibility.
+Dave
 
-That might work for the x86 version of Mac OS X, but there doesn't =
-appear to be any support for the PowerPC version of Mac OS X.
+> +
+> +    /*
+> +     * Destroy existing listening task if exist. Logically this should
+> +     * not really happen at all (for either deferred migration or
+> +     * postcopy migration, we should both detached the listening
+> +     * task). So raise an error but still we safely detach it.
+> +     */
+> +    if (migrate_incoming_detach_listen(mis)) {
+> +        error_report("%s: detected existing listen channel, "
+> +                     "while it should not exist", __func__);
+> +        /* Continue */
+>      }
+>  
+>      qemu_start_incoming_migration(uri, &local_err);
+> @@ -1307,8 +1328,6 @@ void qmp_migrate_incoming(const char *uri, Error **errp)
+>          error_propagate(errp, local_err);
+>          return;
+>      }
+> -
+> -    once = false;
+>  }
+>  
+>  bool migration_is_blocked(Error **errp)
+> diff --git a/migration/socket.c b/migration/socket.c
+> index 6ee51ef..e3e453f 100644
+> --- a/migration/socket.c
+> +++ b/migration/socket.c
+> @@ -154,7 +154,7 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
+>  out:
+>      /* Close listening socket as its no longer needed */
+>      qio_channel_close(ioc, NULL);
+> -    return FALSE; /* unregister */
+> +    return TRUE; /* keep it registered */
+>  }
+>  
+>  
+> -- 
+> 2.7.4
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
