@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dvOwZ-00032H-2T
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:28:40 -0400
+	(envelope-from <thuth@redhat.com>) id 1dvP1Z-000536-6d
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:33:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dvOwV-0002Ia-4v
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:28:39 -0400
-Received: from mail-io0-x229.google.com ([2607:f8b0:4001:c06::229]:48097)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dvOwU-0002Hs-Vs
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:28:35 -0400
-Received: by mail-io0-x229.google.com with SMTP id e189so3454152ioa.4
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 07:28:33 -0700 (PDT)
-References: <20170922140338.6068-1-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <156237eb-1f40-9dbc-02b5-9827332bd432@linaro.org>
-Date: Fri, 22 Sep 2017 09:28:29 -0500
+	(envelope-from <thuth@redhat.com>) id 1dvP1U-0005D2-Ms
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:33:49 -0400
+References: <20170630183736.13222-1-rth@twiddle.net>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <1bcf9642-dcd0-148e-eda7-f3e7c33508bd@redhat.com>
+Date: Fri, 22 Sep 2017 16:33:40 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170922140338.6068-1-david@redhat.com>
+In-Reply-To: <20170630183736.13222-1-rth@twiddle.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] s390x/kvm: fix and cleanup storing CPU
- status
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] target/ppc: Use tcg_gen_lookup_and_goto_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +23,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On 09/22/2017 09:03 AM, David Hildenbrand wrote:
-> env->psa is a 64bit value, while we copy 4 bytes into the save area,
-> resulting always in 0 getting stored.
-> 
-> Let's try to reduce such errors by using a proper structure. While at
-> it, use correct cpu->be conversion (and get_psw_mask()), as we will be
-> reusing this code for TCG soon.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+On 30.06.2017 20:37, Richard Henderson wrote:
+> Cc: qemu-ppc@nongnu.org
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
 > ---
-> 
-> v1 -> v2:
->  - dropped QEMU_PACKED
->  - Moved QEMU_BUILD_BUG_ON()
->  - Retested if it works now
-> 
->  target/s390x/kvm.c | 62 ++++++++++++++++++++++++++++++++++++------------------
->  1 file changed, 42 insertions(+), 20 deletions(-)
+>  target/ppc/translate.c | 23 ++++++++---------------
+>  1 file changed, 8 insertions(+), 15 deletions(-)
+>=20
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index c0cd64d..9aa66f5 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -3419,7 +3419,7 @@ static inline bool use_goto_tb(DisasContext *ctx,=
+ target_ulong dest)
+>  }
+> =20
+>  /***                                Branch                            =
+     ***/
+> -static inline void gen_goto_tb(DisasContext *ctx, int n, target_ulong =
+dest)
+> +static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
+>  {
+>      if (NARROW_MODE(ctx)) {
+>          dest =3D (uint32_t) dest;
+> @@ -3441,7 +3441,7 @@ static inline void gen_goto_tb(DisasContext *ctx,=
+ int n, target_ulong dest)
+>                  gen_debug_exception(ctx);
+>              }
+>          }
+> -        tcg_gen_exit_tb(0);
+> +        tcg_gen_lookup_and_goto_ptr(cpu_nip);
+>      }
+>  }
+> =20
+> @@ -3479,7 +3479,7 @@ static void gen_b(DisasContext *ctx)
+>  #define BCOND_CTR 2
+>  #define BCOND_TAR 3
+> =20
+> -static inline void gen_bcond(DisasContext *ctx, int type)
+> +static void gen_bcond(DisasContext *ctx, int type)
+>  {
+>      uint32_t bo =3D BO(ctx->opcode);
+>      TCGLabel *l1;
+> @@ -3543,26 +3543,19 @@ static inline void gen_bcond(DisasContext *ctx,=
+ int type)
+>          } else {
+>              gen_goto_tb(ctx, 0, li);
+>          }
+> -        if ((bo & 0x14) !=3D 0x14) {
+> -            gen_set_label(l1);
+> -            gen_goto_tb(ctx, 1, ctx->nip);
+> -        }
+>      } else {
+>          if (NARROW_MODE(ctx)) {
+>              tcg_gen_andi_tl(cpu_nip, target, (uint32_t)~3);
+>          } else {
+>              tcg_gen_andi_tl(cpu_nip, target, ~3);
+>          }
+> -        tcg_gen_exit_tb(0);
+> -        if ((bo & 0x14) !=3D 0x14) {
+> -            gen_set_label(l1);
+> -            gen_update_nip(ctx, ctx->nip);
+> -            tcg_gen_exit_tb(0);
+> -        }
+> -    }
+> -    if (type =3D=3D BCOND_LR || type =3D=3D BCOND_CTR || type =3D=3D B=
+COND_TAR) {
+> +        tcg_gen_lookup_and_goto_ptr(cpu_nip);
+>          tcg_temp_free(target);
+>      }
+> +    if ((bo & 0x14) !=3D 0x14) {
+> +        gen_set_label(l1);
+> +        gen_goto_tb(ctx, 1, ctx->nip);
+> +    }
+>  }
+> =20
+>  static void gen_bc(DisasContext *ctx)
+>=20
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Using this patch increases the speed of the SLOF firmware boot quite a
+bit! The following simple test finishes at least 4 seconds faster when
+I've got this patch applied:
 
+time ppc64-softmmu/qemu-system-ppc64 -nographic -vga none \
+ -prom-env 'boot-command=3Dpower-off'
 
-r~
+I also can still run my big endian and my little endian pseries guest
+images successfully, so feel free to add my:
+
+Tested-by: Thomas Huth <thuth@redhat.com>
