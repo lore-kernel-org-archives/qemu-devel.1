@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jgross@suse.com>) id 1dvMPb-0008DQ-BQ
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:46:29 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dvMWh-0002Dr-R1
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:53:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jgross@suse.com>) id 1dvMPY-00026v-6k
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:46:27 -0400
-Received: from mx2.suse.de ([195.135.220.15]:58203 helo=mx1.suse.de)
+	(envelope-from <dgilbert@redhat.com>) id 1dvMWc-0006p8-Vh
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:53:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58212)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jgross@suse.com>) id 1dvMPX-00024f-T3
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:46:24 -0400
-References: <20170919115055.19278-1-jgross@suse.com>
-	<20170919115055.19278-2-jgross@suse.com>
-	<20170920145300.GA1859@perard.uk.xensource.com>
-From: Juergen Gross <jgross@suse.com>
-Message-ID: <55c1c15f-ead3-54a1-5269-a4149cc83005@suse.com>
-Date: Fri, 22 Sep 2017 13:46:20 +0200
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dvMWc-0006oq-M9
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:53:42 -0400
+Date: Fri, 22 Sep 2017 12:53:35 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170922115334.GI2620@work-vm>
+References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
+	<1504081950-2528-26-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170920145300.GA1859@perard.uk.xensource.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: de-DE
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] xen: add a global indicator for grant
- copy being available
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1504081950-2528-26-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 25/33] migration: setup ramstate for resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,118 +27,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, kraxel@redhat.com, sstabellini@kernel.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On 20/09/17 16:53, Anthony PERARD wrote:
-> On Tue, Sep 19, 2017 at 01:50:54PM +0200, Juergen Gross wrote:
->> The Xen qdisk backend needs to test whether grant copy operations is
->> available in the kernel. Unfortunately this collides with using
->> xengnttab_set_max_grants() on some kernels as this operation has to
->> be the first one after opening the gnttab device.
->>
->> In order to solve this problem test for the availability of grant copy
->> in xen_be_init() opening the gnttab device just for that purpose and
->> closing it again afterwards. Advertise the availability via a global
->> flag and use that flag in the qdisk backend.
->>
->> Signed-off-by: Juergen Gross <jgross@suse.com>
->> ---
->>  hw/block/xen_disk.c          | 18 ++++++------------
->>  hw/xen/xen_backend.c         | 11 +++++++++++
->>  include/hw/xen/xen_backend.h |  1 +
->>  3 files changed, 18 insertions(+), 12 deletions(-)
->>
->> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
->> index d42ed7070d..6632746250 100644
->> --- a/hw/block/xen_disk.c
->> +++ b/hw/block/xen_disk.c
->> @@ -121,9 +121,6 @@ struct XenBlkDev {
->>      unsigned int        persistent_gnt_count;
->>      unsigned int        max_grants;
->>  
->> -    /* Grant copy */
->> -    gboolean            feature_grant_copy;
->> -
->>      /* qemu block driver */
->>      DriveInfo           *dinfo;
->>      BlockBackend        *blk;
->> @@ -616,7 +613,7 @@ static void qemu_aio_complete(void *opaque, int ret)
->>          return;
->>      }
->>  
->> -    if (ioreq->blkdev->feature_grant_copy) {
->> +    if (xen_feature_grant_copy) {
->>          switch (ioreq->req.operation) {
->>          case BLKIF_OP_READ:
->>              /* in case of failure ioreq->aio_errors is increased */
->> @@ -638,7 +635,7 @@ static void qemu_aio_complete(void *opaque, int ret)
->>      }
->>  
->>      ioreq->status = ioreq->aio_errors ? BLKIF_RSP_ERROR : BLKIF_RSP_OKAY;
->> -    if (!ioreq->blkdev->feature_grant_copy) {
->> +    if (!xen_feature_grant_copy) {
->>          ioreq_unmap(ioreq);
->>      }
->>      ioreq_finish(ioreq);
->> @@ -698,7 +695,7 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
->>  {
->>      struct XenBlkDev *blkdev = ioreq->blkdev;
->>  
->> -    if (ioreq->blkdev->feature_grant_copy) {
->> +    if (xen_feature_grant_copy) {
->>          ioreq_init_copy_buffers(ioreq);
->>          if (ioreq->req.nr_segments && (ioreq->req.operation == BLKIF_OP_WRITE ||
->>              ioreq->req.operation == BLKIF_OP_FLUSH_DISKCACHE) &&
->> @@ -750,7 +747,7 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
->>      }
->>      default:
->>          /* unknown operation (shouldn't happen -- parse catches this) */
->> -        if (!ioreq->blkdev->feature_grant_copy) {
->> +        if (!xen_feature_grant_copy) {
->>              ioreq_unmap(ioreq);
->>          }
->>          goto err;
->> @@ -1010,18 +1007,15 @@ static int blk_init(struct XenDevice *xendev)
->>  
->>      blkdev->file_blk  = BLOCK_SIZE;
->>  
->> -    blkdev->feature_grant_copy =
->> -                (xengnttab_grant_copy(blkdev->xendev.gnttabdev, 0, NULL) == 0);
->> -
->>      xen_pv_printf(&blkdev->xendev, 3, "grant copy operation %s\n",
->> -                  blkdev->feature_grant_copy ? "enabled" : "disabled");
->> +                  xen_feature_grant_copy ? "enabled" : "disabled");
->>  
->>      /* fill info
->>       * blk_connect supplies sector-size and sectors
->>       */
->>      xenstore_write_be_int(&blkdev->xendev, "feature-flush-cache", 1);
->>      xenstore_write_be_int(&blkdev->xendev, "feature-persistent",
->> -                          !blkdev->feature_grant_copy);
->> +                          !xen_feature_grant_copy);
->>      xenstore_write_be_int(&blkdev->xendev, "info", info);
->>  
->>      xenstore_write_be_int(&blkdev->xendev, "max-ring-page-order",
->> diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
->> index c46cbb0759..00210627a9 100644
->> --- a/hw/xen/xen_backend.c
->> +++ b/hw/xen/xen_backend.c
->> @@ -44,6 +44,7 @@ BusState *xen_sysbus;
->>  /* public */
->>  struct xs_handle *xenstore = NULL;
->>  const char *xen_protocol;
->> +gboolean xen_feature_grant_copy;
+* Peter Xu (peterx@redhat.com) wrote:
+> After we updated the dirty bitmaps of ramblocks, we also need to update
+> the critical fields in RAMState to make sure it is ready for a resume.
 > 
-> I think it would be better if this was changed to bool instead of a
-> gboolean.
-
-Okay.
-
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/ram.c        | 37 ++++++++++++++++++++++++++++++++++++-
+>  migration/trace-events |  1 +
+>  2 files changed, 37 insertions(+), 1 deletion(-)
 > 
-> Beside that,
-> Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+> diff --git a/migration/ram.c b/migration/ram.c
+> index afabcf5..c5d9028 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1986,6 +1986,33 @@ static int ram_state_init(RAMState **rsp)
+>      return 0;
+>  }
+>  
+> +static void ram_state_resume_prepare(RAMState *rs)
+> +{
+> +    RAMBlock *block;
+> +    long pages = 0;
+> +
+> +    /*
+> +     * Postcopy is not using xbzrle/compression, so no need for that.
+> +     * Also, since source are already halted, we don't need to care
+> +     * about dirty page logging as well.
+> +     */
+> +
+> +    RAMBLOCK_FOREACH(block) {
+> +        pages += bitmap_count_one(block->bmap,
+> +                                  block->used_length >> TARGET_PAGE_BITS);
+> +    }
+> +
+> +    /* This may not be aligned with current bitmaps. Recalculate. */
+> +    rs->migration_dirty_pages = pages;
+> +
+> +    rs->last_seen_block = NULL;
+> +    rs->last_sent_block = NULL;
+> +    rs->last_page = 0;
+> +    rs->last_version = ram_list.version;
+> +
+> +    trace_ram_state_resume_prepare(pages);
 
-Thanks,
+Yes, I think this is fine;  I wonder what happens if pages is 0?
+However,
 
-Juergen
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> +}
+> +
+>  /*
+>   * Each of ram_save_setup, ram_save_iterate and ram_save_complete has
+>   * long-running RCU critical section.  When rcu-reclaims in the code
+> @@ -2909,8 +2936,16 @@ out:
+>  static int ram_resume_prepare(MigrationState *s, void *opaque)
+>  {
+>      RAMState *rs = *(RAMState **)opaque;
+> +    int ret;
+>  
+> -    return ram_dirty_bitmap_sync_all(s, rs);
+> +    ret = ram_dirty_bitmap_sync_all(s, rs);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    ram_state_resume_prepare(rs);
+> +
+> +    return 0;
+>  }
+>  
+>  static SaveVMHandlers savevm_ram_handlers = {
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 8962916..6e06283 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -85,6 +85,7 @@ ram_dirty_bitmap_sync_start(void) ""
+>  ram_dirty_bitmap_sync_wait(void) ""
+>  ram_dirty_bitmap_sync_notify(void) ""
+>  ram_dirty_bitmap_sync_complete(void) ""
+> +ram_state_resume_prepare(long v) "%ld"
+>  
+>  # migration/migration.c
+>  await_return_path_close_on_source_close(void) ""
+> -- 
+> 2.7.4
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
