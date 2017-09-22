@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dvIll-0004G0-OT
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:53:06 -0400
+	(envelope-from <otubo@redhat.com>) id 1dvImv-0005D9-Uk
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:54:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dvIlk-00034d-Gf
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:53:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35192)
+	(envelope-from <otubo@redhat.com>) id 1dvImr-0003nr-Ol
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:54:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33190)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dvIlk-00034K-9z
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:53:04 -0400
-References: <1505811353-29151-1-git-send-email-thuth@redhat.com>
-	<20170921185028.GK21016@localhost.localdomain>
-	<20170922093824.58a83358.cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f904821b-eeae-5d58-2130-b49483f08021@redhat.com>
-Date: Fri, 22 Sep 2017 09:52:53 +0200
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1dvImr-0003n5-Id
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:54:13 -0400
+Date: Fri, 22 Sep 2017 09:54:01 +0200
+From: Eduardo Otubo <otubo@redhat.com>
+Message-ID: <20170922075401.GA2933@vader>
+References: <20170920083647.14599-1-famz@redhat.com>
+	<df117864-4533-9527-d051-62a126e60794@siemens.com>
 MIME-Version: 1.0
-In-Reply-To: <20170922093824.58a83358.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] qdev: Mark devices as non-hotpluggable
- by default
+Content-Disposition: inline
+In-Reply-To: <df117864-4533-9527-d051-62a126e60794@siemens.com>
+Subject: Re: [Qemu-devel] [PATCH] seccomp: Don't include libseccomp from
+ QEMU header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: Jan Kiszka <jan.kiszka@siemens.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-On 22.09.2017 09:38, Cornelia Huck wrote:
-> On Thu, 21 Sep 2017 15:50:28 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
+On Fri, Sep 22, 2017 at 09:09:27AM +0200, Jan Kiszka wrote:
+> On 2017-09-20 10:36, Fam Zheng wrote:
+> > The only prototype doesn't need anything from the lib header, and not
+> > including it here allows files that include this header, for example
+> > vl.c, to compile without the libseccomp cflags.
+> > 
+> > The breakage is since c3883e1f93 for environments where `pkg-config
+> > --cflags libseccomp" is non-empty.
+> > 
+> > Reported-by: Jan Kiszka <jan.kiszka@siemens.com>
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+
+Acked-by: Eduardo Otubo <otubo@redhat.com>
+
+> > 
+> > ---
+> > 
+> > This is an alternative for
+> > 
+> > https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04470.html
+> > ([Qemu-devel] [PATCH] seccomp: Fix build)
+> > ---
+> >  include/sysemu/seccomp.h | 2 --
+> >  1 file changed, 2 deletions(-)
+> > 
+> > diff --git a/include/sysemu/seccomp.h b/include/sysemu/seccomp.h
+> > index e67c2dc840..9b092aa23f 100644
+> > --- a/include/sysemu/seccomp.h
+> > +++ b/include/sysemu/seccomp.h
+> > @@ -21,7 +21,5 @@
+> >  #define QEMU_SECCOMP_SET_SPAWN       (1 << 3)
+> >  #define QEMU_SECCOMP_SET_RESOURCECTL (1 << 4)
+> >  
+> > -#include <seccomp.h>
+> > -
+> >  int seccomp_start(uint32_t seccomp_opts);
+> >  #endif
+> > 
 > 
->> On Tue, Sep 19, 2017 at 10:55:53AM +0200, Thomas Huth wrote:
->>> Historically we've marked all devices as hotpluggable by default. However,
->>> most devices are not hotpluggable, and you also need a HotplugHandler to
->>> support these devices. So if the user tries to "device_add" or "device_del"
->>> such a non-hotpluggable device during runtime, either nothing really usable
->>> happens, or QEMU even crashes/aborts unexpectedly (see for example commit
->>> 84ebd3e8c7d4fe955b - "Mark diag288 watchdog as non-hotpluggable").
->>> So let's change this dangerous default behaviour and mark the devices as
->>> non-hotpluggable by default. Certain parent devices classes which are known
->>> as hotpluggable (e.g. PCI, USB, etc.) are marked with "hotpluggable = true",
->>> so that devices that are derived from these classes continue to work as
->>> expected.  
->>
->> These seem to be missing:
->> * TYPE_CPU (or at least TYPE_X86_CPU and TYPE_S390_CPU)
+> Works fine for me as well and is indeed cleaner.
 > 
-> I think it would be better to set it for TYPE_CPU (and have
-> architectures override if needed).
+> Jan
+> 
+> -- 
+> Siemens AG, Corporate Technology, CT RDA ITP SES-DE
+> Corporate Competence Center Embedded Linux
 
-Hmm, no, I think TYPE_CPU should stay non-notpluggable, and we should
-only do this for TYPE_X86_CPU, TYPE_S390_CPU and TYPE_SPAPR_CPU_CORE.
-Most CPU types are not hot-pluggable, so that should be the default.
-Having seen all those "device_add" crashes in the past weeks, I'm afraid
-that we'll run into weird problems again otherwise since people will
-keep forgetting to add "hotpluggable = false" for new CPU types that are
-not hotpluggable.
-
- Thomas
+-- 
+Eduardo Otubo
+Senior Software Engineer @ RedHat
