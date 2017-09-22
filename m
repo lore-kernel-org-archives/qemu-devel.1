@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dvLu6-0002c3-2s
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:13:55 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dvLxp-0003z4-0R
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:17:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dvLu5-0003nC-3z
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:13:54 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:49851)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dvLu4-0003mh-SX
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:13:53 -0400
-Received: by mail-wm0-x235.google.com with SMTP id r74so2909721wme.4
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 04:13:52 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1dvLxl-00064f-0J
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:17:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44806)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dvLxk-00064M-NX
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:17:40 -0400
+Date: Fri, 22 Sep 2017 12:17:33 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170922111733.GG2620@work-vm>
+References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
+	<1504081950-2528-24-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170922073432.2811-1-cohuck@redhat.com>
-References: <20170922073432.2811-1-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 22 Sep 2017 12:13:31 +0100
-Message-ID: <CAFEAcA-VVdA=BqauYt5BCKr=MCtNFFxgbFSGR9H2Hg+5inpeaA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/1] s390x bugfix (needed for stable)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1504081950-2528-24-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 23/33] migration: introduce
+ SaveVMHandlers.resume_prepare
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +28,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, zyimin@linux.vnet.ibm.com, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On 22 September 2017 at 08:34, Cornelia Huck <cohuck@redhat.com> wrote:
-> The following changes since commit 0a8066f0c068f1e318a1aacd7864fc00e455a37b:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170921' into staging (2017-09-21 17:42:27 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/cohuck/qemu tags/s390x-20170922
->
-> for you to fetch changes up to 3f2d07b3b01ea61126b382633ab4006320923048:
->
->   s390x/ais: for 2.10 stable: disable ais facility (2017-09-22 09:25:21 +0200)
->
-> ----------------------------------------------------------------
-> Fix an s390x migration breakage up for 2.10 stable.
-> This will be fixed properly for 2.11.
->
-> ----------------------------------------------------------------
->
-> Christian Borntraeger (1):
->   s390x/ais: for 2.10 stable: disable ais facility
->
->  target/s390x/kvm.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
->
+* Peter Xu (peterx@redhat.com) wrote:
+> This is hook function to be called when a postcopy migration wants to
+> resume from a failure. For each module, it should provide its own
+> recovery logic before we switch to the postcopy-active state.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Applied, thanks.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
--- PMM
+> ---
+>  include/migration/register.h |  2 ++
+>  migration/migration.c        | 20 +++++++++++++++++++-
+>  migration/savevm.c           | 25 +++++++++++++++++++++++++
+>  migration/savevm.h           |  1 +
+>  migration/trace-events       |  1 +
+>  5 files changed, 48 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/migration/register.h b/include/migration/register.h
+> index a0f1edd..b669362 100644
+> --- a/include/migration/register.h
+> +++ b/include/migration/register.h
+> @@ -41,6 +41,8 @@ typedef struct SaveVMHandlers {
+>      LoadStateHandler *load_state;
+>      int (*load_setup)(QEMUFile *f, void *opaque);
+>      int (*load_cleanup)(void *opaque);
+> +    /* Called when postcopy migration wants to resume from failure */
+> +    int (*resume_prepare)(MigrationState *s, void *opaque);
+>  } SaveVMHandlers;
+>  
+>  int register_savevm_live(DeviceState *dev,
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 4dc564a..19b7f3a5 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -2172,7 +2172,25 @@ typedef enum MigThrError {
+>  /* Return zero if success, or <0 for error */
+>  static int postcopy_do_resume(MigrationState *s)
+>  {
+> -    /* TODO: do the resume logic */
+> +    int ret;
+> +
+> +    /*
+> +     * Call all the resume_prepare() hooks, so that modules can be
+> +     * ready for the migration resume.
+> +     */
+> +    ret = qemu_savevm_state_resume_prepare(s);
+> +    if (ret) {
+> +        error_report("%s: resume_prepare() failure detected: %d",
+> +                     __func__, ret);
+> +        return ret;
+> +    }
+> +
+> +    /*
+> +     * TODO: handshake with dest using MIG_CMD_RESUME,
+> +     * MIG_RP_MSG_RESUME_ACK, then switch source state to
+> +     * "postcopy-active"
+> +     */
+> +
+>      return 0;
+>  }
+>  
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 7fd5390..b86c9c6 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1004,6 +1004,31 @@ void qemu_savevm_state_setup(QEMUFile *f)
+>      }
+>  }
+>  
+> +int qemu_savevm_state_resume_prepare(MigrationState *s)
+> +{
+> +    SaveStateEntry *se;
+> +    int ret;
+> +
+> +    trace_savevm_state_resume_prepare();
+> +
+> +    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +        if (!se->ops || !se->ops->resume_prepare) {
+> +            continue;
+> +        }
+> +        if (se->ops && se->ops->is_active) {
+> +            if (!se->ops->is_active(se->opaque)) {
+> +                continue;
+> +            }
+> +        }
+> +        ret = se->ops->resume_prepare(s, se->opaque);
+> +        if (ret < 0) {
+> +            return ret;
+> +        }
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+>  /*
+>   * this function has three return values:
+>   *   negative: there was one error, and we have -errno.
+> diff --git a/migration/savevm.h b/migration/savevm.h
+> index a5f3879..3193f04 100644
+> --- a/migration/savevm.h
+> +++ b/migration/savevm.h
+> @@ -31,6 +31,7 @@
+>  
+>  bool qemu_savevm_state_blocked(Error **errp);
+>  void qemu_savevm_state_setup(QEMUFile *f);
+> +int qemu_savevm_state_resume_prepare(MigrationState *s);
+>  void qemu_savevm_state_header(QEMUFile *f);
+>  int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy);
+>  void qemu_savevm_state_cleanup(void);
+> diff --git a/migration/trace-events b/migration/trace-events
+> index a929bc7..61b0d49 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -38,6 +38,7 @@ savevm_send_postcopy_run(void) ""
+>  savevm_send_postcopy_resume(void) ""
+>  savevm_send_recv_bitmap(char *name) "%s"
+>  savevm_state_setup(void) ""
+> +savevm_state_resume_prepare(void) ""
+>  savevm_state_header(void) ""
+>  savevm_state_iterate(void) ""
+>  savevm_state_cleanup(void) ""
+> -- 
+> 2.7.4
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
