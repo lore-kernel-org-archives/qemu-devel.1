@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dvHe8-00012T-8h
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:41:09 -0400
+	(envelope-from <marcel@redhat.com>) id 1dvHfa-0001mr-Fu
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:42:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dvHe5-0001Is-5h
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:41:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53632)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dvHe4-0001Ig-Vq
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:41:05 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dvHe2-00029D-VL
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 06:41:03 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D5A3E2E8490
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 06:41:02 +0000 (UTC)
+	(envelope-from <marcel@redhat.com>) id 1dvHfX-00024Q-Cq
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:42:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50192)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dvHfX-00022w-3i
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:42:35 -0400
+References: <1505942471-11260-1-git-send-email-zuban32s@gmail.com>
+	<f5dbe1a3-bb18-28ff-515b-e8a9ef924835@redhat.com>
+	<CAKSfGUAjsBb-zmwZPMcApL0p5mz8Futdpis0W6v_ry-3nhBypA@mail.gmail.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <527b0b71-0e0b-f9a1-3c11-7ce622ae06db@redhat.com>
+Date: Fri, 22 Sep 2017 09:42:30 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 22 Sep 2017 06:34:22 -0000
-From: ChristianEhrhardt <1718719@bugs.launchpad.net>
-Reply-To: Bug 1718719 <1718719@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150601012428.28823.10384460665730601462.malonedeb@gac.canonical.com>
-Message-Id: <150606206243.30646.1570377130776394901.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1718719] Re: qemu can't capture keys properly
- under wayland
+In-Reply-To: <CAKSfGUAjsBb-zmwZPMcApL0p5mz8Futdpis0W6v_ry-3nhBypA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/pci-bridge/pcie_pci_bridge: properly
+ handle MSI unavailability case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,66 +30,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Aleksandr Bezzubikov <zuban32s@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Hi Mathieu,
-thanks for the report but since we are up-to-date with qemu and I can't fin=
-d an obvious breakage we might have introduced for this, this should go to =
-qmeu-upstream in this case.
+On 21/09/2017 21:12, Aleksandr Bezzubikov wrote:
+> 2017-09-21 13:16 GMT+03:00 Marcel Apfelbaum <marcel@redhat.com>:
+>> Hi Aleksandr,
+>>
+>> On 21/09/2017 0:21, Aleksandr Bezzubikov wrote:
+>>>
+>>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+>>> ---
+>>>    hw/pci-bridge/pcie_pci_bridge.c | 24 ++++++++++++++++++------
+>>>    1 file changed, 18 insertions(+), 6 deletions(-)
+>>>
+>>
+>> Please add Eduardo's Reported-by tag and the
+>> actual failure in the commit message.
+>> You might even explain in the commit message that you
+>> moved msi prop to ON_OFF_AUTO_AUTO.
+> 
+> Should I send a new one, or resend, or just reply to this post?
+> 
 
-Furthermore are these actually two issues?:
-#1 - wayland crashes under spice
-     more of a wayland bug then I'd expect, but upstream qemu
-     might have heard of it and have good pointers
-#2 - new qemu does not recognize keys correctly with the default (SDL I'd t=
-hink) frontend?
-     That is worth to report upstream qemu for sure.
+A new version would be preferred.
 
-I added an upstream qemu (and a wayland) task and you can help them to
-recreate in case they have questions on how exactly to do so.
+>>
+>>
+>>> diff --git a/hw/pci-bridge/pcie_pci_bridge.c
+>>> b/hw/pci-bridge/pcie_pci_bridge.c
+>>> index 9aa5cc3..da562fe 100644
+>>> --- a/hw/pci-bridge/pcie_pci_bridge.c
+>>> +++ b/hw/pci-bridge/pcie_pci_bridge.c
+>>> @@ -65,10 +65,18 @@ static void pcie_pci_bridge_realize(PCIDevice *d,
+>>> Error **errp)
+>>>            goto aer_error;
+>>>        }
+>>>    +    Error *local_err = NULL;
+>>>        if (pcie_br->msi != ON_OFF_AUTO_OFF) {
+>>> -        rc = msi_init(d, 0, 1, true, true, errp);
+>>> +        rc = msi_init(d, 0, 1, true, true, &local_err);
+>>>            if (rc < 0) {
+>>> -            goto msi_error;
+>>> +            assert(rc == -ENOTSUP);
+>>> +            if (pcie_br->msi != ON_OFF_AUTO_ON) {
+>>> +                error_free(local_err);
+>>
+>>
+>> In that case it will fallback to legacy INTx, right?
+> 
+> Exactly. Maybe I should add this to the commit message.
+> 
 
-** Also affects: qemu
-   Importance: Undecided
-       Status: New
+With the above comment:
 
-** Also affects: wayland (Ubuntu)
-   Importance: Undecided
-       Status: New
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
--- =
+Thanks,
+Marcel
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1718719
-
-Title:
-  qemu can't capture keys properly under wayland
-
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  New
-Status in wayland package in Ubuntu:
-  New
-
-Bug description:
-  This appears to be different than the previous similar bugs; patches
-  do look to be applied to use libinput in the wayland case. Still:
-
-  unknown keycodes `(unnamed)', please report to qemu-devel@nongnu.org
-
-  I am using qemu-system-x86                       1:2.10+dfsg-0ubuntu1
-  on artful.
-
-  Many key inputs work correctly, but at boot the system will not
-  properly catch the arrow keys, the above error shows up immediately
-  after hitting Esc (for instance) to get to the boot menu. Booting from
-  CD onto a daily Ubuntu desktop image, I can't navigate the splash
-  menu.
-
-  The same works correctly through virt-manager (which uses spice
-  AFAICT, but wayland tends to crash when running virt-manager), and
-  things work if I switch my session to Xorg rather than wayland.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1718719/+subscriptions
+>>
+>> Thanks,
+>> Marcel
+>>
+>>
+>>> +            } else {
+>>> +                /* failed to satisfy user's explicit request for MSI */
+>>> +                error_propagate(errp, local_err);
+>>> +                goto msi_error;
+>>> +            }
+>>>            }
+>>>        }
+>>>        pci_register_bar(d, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
+>>> @@ -81,7 +89,7 @@ aer_error:
+>>>    pm_error:
+>>>        pcie_cap_exit(d);
+>>>    cap_error:
+>>> -    shpc_free(d);
+>>> +    shpc_cleanup(d, &pcie_br->shpc_bar);
+>>>    error:
+>>>        pci_bridge_exitfn(d);
+>>>    }
+>>> @@ -98,7 +106,9 @@ static void pcie_pci_bridge_reset(DeviceState *qdev)
+>>>    {
+>>>        PCIDevice *d = PCI_DEVICE(qdev);
+>>>        pci_bridge_reset(qdev);
+>>> -    msi_reset(d);
+>>> +    if (msi_present(d)) {
+>>> +        msi_reset(d);
+>>> +    }
+>>>        shpc_reset(d);
+>>>    }
+>>>    @@ -106,12 +116,14 @@ static void pcie_pci_bridge_write_config(PCIDevice
+>>> *d,
+>>>            uint32_t address, uint32_t val, int len)
+>>>    {
+>>>        pci_bridge_write_config(d, address, val, len);
+>>> -    msi_write_config(d, address, val, len);
+>>> +    if (msi_present(d)) {
+>>> +        msi_write_config(d, address, val, len);
+>>> +    }
+>>>        shpc_cap_write_config(d, address, val, len);
+>>>    }
+>>>      static Property pcie_pci_bridge_dev_properties[] = {
+>>> -        DEFINE_PROP_ON_OFF_AUTO("msi", PCIEPCIBridge, msi,
+>>> ON_OFF_AUTO_ON),
+>>> +        DEFINE_PROP_ON_OFF_AUTO("msi", PCIEPCIBridge, msi,
+>>> ON_OFF_AUTO_AUTO),
+>>>            DEFINE_PROP_END_OF_LIST(),
+>>>    };
+>>>
+>>
+>>
+> 
+> 
+> 
