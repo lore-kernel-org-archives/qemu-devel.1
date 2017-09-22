@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dvUSe-0005Hb-SW
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:22:09 -0400
+	(envelope-from <eblake@redhat.com>) id 1dvUWe-0007aJ-0z
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:26:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dvUSa-00039n-UK
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:22:08 -0400
-Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:34716)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1dvUSa-00039V-PD
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:22:04 -0400
-Received: by mail-io0-x243.google.com with SMTP id g32so258959ioj.1
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 13:22:04 -0700 (PDT)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <20170922124405.GB32000@lemon>
-Date: Fri, 22 Sep 2017 16:22:02 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <D76563D8-D9EB-47E2-9479-DC1A6C34DA3E@gmail.com>
-References: <mailman.3351.1506066493.14747.qemu-devel@nongnu.org>
-	<726A2123-0371-407B-9270-6672DF66D511@gmail.com>
-	<20170922124405.GB32000@lemon>
-Subject: Re: [Qemu-devel] [PULL 28/36] tests: Add ubuntu.i386 image
+	(envelope-from <eblake@redhat.com>) id 1dvUWa-00056T-1w
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:26:16 -0400
+References: <20170922161345.331-1-f4bug@amsat.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <cae93aba-ca97-1d21-354d-aab209ce05cd@redhat.com>
+Date: Fri, 22 Sep 2017 15:26:03 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170922161345.331-1-f4bug@amsat.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="QKpr6CPG6jWFjxP1jTLmd8I0f0PTlWhSV"
+Subject: Re: [Qemu-devel] [PATCH] scripts/orderfile: keep MAINTAINERS at
+ bottom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,30 +24,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Gerd Hoffmann <kraxel@redhat.com>, "Emilio G . Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--QKpr6CPG6jWFjxP1jTLmd8I0f0PTlWhSV
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, "Emilio G . Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Message-ID: <cae93aba-ca97-1d21-354d-aab209ce05cd@redhat.com>
+Subject: Re: [PATCH] scripts/orderfile: keep MAINTAINERS at bottom
+References: <20170922161345.331-1-f4bug@amsat.org>
+In-Reply-To: <20170922161345.331-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 09/22/2017 11:13 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  scripts/git.orderfile | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/scripts/git.orderfile b/scripts/git.orderfile
+> index ac699700b1..34619769c2 100644
+> --- a/scripts/git.orderfile
+> +++ b/scripts/git.orderfile
+> @@ -27,3 +27,4 @@ Makefile*
+>  # code
+>  *.c
+> =20
+> +MAINTAINERS
+
+Well, after any file that matches above, but before any file that
+doesn't match any pattern, so not strictly the end.
+
+But why not earlier with the build system?  Generally, if you are going
+to add a file, you are going to also tweak a Makefile to get it to build
+- at which point, a MAINTAINERS tweak feels more on par with a Makefile
+tweak.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-> On Sep 22, 2017, at 8:44 AM, Fam Zheng <famz@redhat.com> wrote:
->=20
-> On Fri, 09/22 08:10, Programmingkid wrote:
->> Could a Darwin test be added? Both x86 and PowerPC versions would be =
-great.
->=20
-> It's nice to cover macOS in our test, but to be honest I don't know =
-how to do
-> it. If there isn't any copyright problem, and if there are =
-instructions
-> available in wiki.qemu.org descirbing how to create such a guest step =
-by step
-> like [1], we can add one.
->=20
-> [1]: https://wiki.qemu.org/Hosts/BSD
->=20
-> Fam
+--QKpr6CPG6jWFjxP1jTLmd8I0f0PTlWhSV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Mac OS X is built on top of Darwin. Darwin is completely open source and =
-free. There are no copyright issues because it is released under the =
-Apple Public Source License.=20
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-I think I can make the directions available in the wiki soon.=20=
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnFcd0ACgkQp6FrSiUn
+Q2o6ywf7BAl5P9hknD37LOzo/t8F50TF1Ov7kzbdLSCEQpiN7IueJbg79m1b5qEf
+aAU2/6beqmK5Ay/5bAoDmmIbuoqr91vh0+Tlf1bJVjD8JGq1Z8hcLnbUhFqJOPvT
+XzkHSRlbtWOAcd75AKAQ93i8UHwSdXxlMIJdi4larVZ32t48MEWW9JaJ1pGlYHd2
+8OQRKBRutgD/96AcqdjGOYHU+8BqvJ4UNDAJz6o8cvI1E4gwd8jnaOrQe1gZOWSJ
+/OV987skPZr4Zm6gl+fpILLqAx3Us7w/eI/ettVoIEjRbiRQ8q5y+qpCXvAM29Na
+JwWrpFMsdp21o9yXIyCke3gvvZvY8g==
+=ZMy2
+-----END PGP SIGNATURE-----
+
+--QKpr6CPG6jWFjxP1jTLmd8I0f0PTlWhSV--
