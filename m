@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abhijit.ray.chaudhury@gmail.com>) id 1dvLMm-0006kK-O1
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:39:29 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dvLTu-0000T7-Tk
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:46:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abhijit.ray.chaudhury@gmail.com>) id 1dvLMm-0001Zf-15
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:39:28 -0400
-Received: from mail-it0-x22f.google.com ([2607:f8b0:4001:c0b::22f]:45924)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <abhijit.ray.chaudhury@gmail.com>)
-	id 1dvLMl-0001ZX-TC
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:39:27 -0400
-Received: by mail-it0-x22f.google.com with SMTP id x15so932504itb.0
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 03:39:27 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1dvLTu-0005vk-2F
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:46:50 -0400
+Date: Fri, 22 Sep 2017 12:46:38 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170922104638.GC12295@localhost.localdomain>
+References: <20170915101008.16646-1-kwolf@redhat.com>
+	<20170915101008.16646-2-kwolf@redhat.com>
+	<20170921135314.GD4677@localhost.localdomain>
 MIME-Version: 1.0
-From: Abhijit Ray Chaudhury <abhijit.ray.chaudhury@gmail.com>
-Date: Fri, 22 Sep 2017 16:09:26 +0530
-Message-ID: <CAACKNgWgNbvH_UV-nLUrcrN7F1jh9G2-ZAScm=Xv2OKhc6WyLQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Support for ARM CP15 registers via GDB interface of
- qemu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170921135314.GD4677@localhost.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/6] qemu-io: Reset qemuio_blk
+ permissions before each command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,16 +25,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-block@nongnu.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, eblake@redhat.com
 
-Hi,
+Am 21.09.2017 um 15:53 hat Kevin Wolf geschrieben:
+> Am 15.09.2017 um 12:10 hat Kevin Wolf geschrieben:
+> > qemu-io provides a 'reopen' command that allows switching from writable
+> > to read-only access. We need to make sure that we don't try to keep
+> > write permissions to a BlockBackend that becomes read-only, otherwise
+> > things are going to fail.
+> > 
+> > command() already makes sure to request any additional permissions that
+> > a qemu-io command requires, so just resetting the permissions to values
+> > that are safe for read-only images is enough to fix this.
+> > 
+> > As a side effect, this makes the output of qemu-iotests case 187 more
+> > consistent.
+> > 
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> 
+> This seems to break qemu-iotests 077 and 081 for raw. I'll look into
+> it tomorrow.
 
-I want to view ARM CP15 register sets via gdb when I am emulating arm.
-However I only see ARM Core Register Sets and NEON registers through
-gdb interface.
+The problem seems to be related to 'aio_write': We already reset the
+permissions while the request is still in flight and might still start
+new internal requests that aren't allowed any more. We would have to
+drain blk around resetting the permissions, but this would obviously
+defeat the purpose of the aio_* commands.
 
-Can you please let me know how to add cp15 register set support using
-gdb interface in qemu.
+I tried creating a separate temporary BB, but it doesn't seem to be that
+straightforward (still crashes during 'aio_flush'). It would also
+provide the wrong semantics, HMP 'qemu-io' commands are supposed to be
+executed on the exact BlockBackend that was given.
 
-Thanks in advance,
--Abhijit
+So unless someone has an idea how to salvage this patch, I'm afraid I'll
+just have to drop it. The original state isn't really correct either, but
+it errs on the side of having more permissions than necessary, so
+failure is less likely.
+
+Kevin
