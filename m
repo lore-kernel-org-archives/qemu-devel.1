@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dvEJ4-00068H-N4
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 23:07:11 -0400
+	(envelope-from <thuth@redhat.com>) id 1dvEQb-0007z7-79
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 23:14:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dvEJ1-0003gJ-JQ
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 23:07:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36750)
+	(envelope-from <thuth@redhat.com>) id 1dvEQY-00040e-3B
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 23:14:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54678)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dvEJ1-0003eJ-Ck
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 23:07:07 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dvEQX-0003ye-T5
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 23:14:54 -0400
+References: <20170921170209.9101-1-ehabkost@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 22 Sep 2017 05:06:57 +0200
-Message-Id: <1506049617-25716-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] tests/boot-sector: Increase timeout to 600
- seconds
+Message-ID: <7ad0e182-536b-42d8-5b80-bfcd03612a00@redhat.com>
+Date: Fri, 22 Sep 2017 05:14:46 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170921170209.9101-1-ehabkost@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Fix subsystem name for "Build
+ and test automation"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,37 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, Victor Kaplansky <victork@redhat.com>, Stefan Weil <sw@weilnetz.de>
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-If QEMU has been compiled with the flags --enable-tcg-interpreter and
---enable-debug, the guest is running incredibly slow. The pxe boot test
-can take up to 400 seconds when testing the pseries ppc64 machine. While
-we should still look for ways to speed up the test on the pseries machine,
-it's better to increase the timeout in this test to 600 seconds anyway to
-allow the test to pass successfully now with this unusal configuration
-already.
+On 21.09.2017 19:02, Eduardo Habkost wrote:
+> The subsystem name for the "Build test automation" section is
+> "-------------------------", because an actual subsystem name
+> line is missing:
+>=20
+>   $ ./scripts/get_maintainer.pl -f tests/docker/docker.py
+>   "Alex Benn=C3=A9e" <alex.bennee@linaro.org> (maintainer:-------------=
+----...)
+>   Fam Zheng <famz@redhat.com> (maintainer:-----------------...)
+>   "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org> (reviewer:-----------=
+------...)
+>   qemu-devel@nongnu.org (open list:-----------------...)
+>=20
+> Fix the issue by inserting a subsystem name line where
+> get_maintainer.pl expects it.
+>=20
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index e511ba780f..13c1ac65b7 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1896,6 +1896,7 @@ F: docs/block-replication.txt
+> =20
+>  Build and test automation
+>  -------------------------
+> +Build and test automation
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/boot-sector.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Would it make sense to use something more specific here? Like "Travis
+and Docker" or so? ... in case we add other subsections in the future?
 
-diff --git a/tests/boot-sector.c b/tests/boot-sector.c
-index 9ee8537..be29d5b 100644
---- a/tests/boot-sector.c
-+++ b/tests/boot-sector.c
-@@ -137,9 +137,9 @@ void boot_sector_test(void)
-     uint16_t signature;
-     int i;
- 
--    /* Wait at most 90 seconds */
-+    /* Wait at most 600 seconds (test is slow with TCI and --enable-debug) */
- #define TEST_DELAY (1 * G_USEC_PER_SEC / 10)
--#define TEST_CYCLES MAX((90 * G_USEC_PER_SEC / TEST_DELAY), 1)
-+#define TEST_CYCLES MAX((600 * G_USEC_PER_SEC / TEST_DELAY), 1)
- 
-     /* Poll until code has run and modified memory.  Once it has we know BIOS
-      * initialization is done.  TODO: check that IP reached the halt
--- 
-1.8.3.1
+ Thomas
