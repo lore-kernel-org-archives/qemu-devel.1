@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dvUFS-0002aI-Sz
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:08:31 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1dvUH5-0003fE-Hn
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:10:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dvUFN-0003Ev-TU
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:08:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52864)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dvUFN-0003ED-MX
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:08:25 -0400
-Date: Fri, 22 Sep 2017 21:08:16 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170922200816.GK2620@work-vm>
-References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
-	<1504081950-2528-28-git-send-email-peterx@redhat.com>
+	(envelope-from <hpoussin@reactos.org>) id 1dvUH4-00047Q-Jt
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:10:11 -0400
+References: <20170922154014.29350-1-f4bug@amsat.org>
+	<20170922154014.29350-21-f4bug@amsat.org>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <6f112b32-0089-b098-069c-17078d49e7b6@reactos.org>
+Date: Fri, 22 Sep 2017 22:09:47 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1504081950-2528-28-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 27/33] migration: free SocketAddress where
- allocated
+In-Reply-To: <20170922154014.29350-21-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 20/34] hw/timer/i8254: rename pit_init() ->
+ i8254_pit_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +25,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-ppc@nongnu.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Freeing the SocketAddress struct in socket_start_incoming_migration is
-> slightly confusing. Let's free the address in the same context where we
-> allocated it.
+Le 22/09/2017 à 17:40, Philippe Mathieu-Daudé a écrit :
+> - add entry for i82378 in MAINTAINERS
+> - remove the old i386/pc dependency
 > 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  migration/socket.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>   include/hw/timer/i8254.h          | 5 +++--
+>   include/hw/timer/i8254_internal.h | 2 +-
+>   hw/alpha/dp264.c                  | 2 +-
+>   hw/i386/pc.c                      | 2 +-
+>   hw/isa/i82378.c                   | 2 +-
+>   hw/mips/mips_fulong2e.c           | 2 +-
+>   hw/mips/mips_jazz.c               | 2 +-
+>   hw/mips/mips_malta.c              | 2 +-
+>   hw/mips/mips_r4k.c                | 2 +-
+>   hw/timer/i8254.c                  | 1 -
+>   hw/timer/i8254_common.c           | 1 -
+>   MAINTAINERS                       | 1 +
+>   12 files changed, 12 insertions(+), 12 deletions(-)
 > 
-> diff --git a/migration/socket.c b/migration/socket.c
-> index 757d382..9fc6cb3 100644
-> --- a/migration/socket.c
-> +++ b/migration/socket.c
-> @@ -168,7 +168,6 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
->  
->      if (qio_channel_socket_listen_sync(listen_ioc, saddr, errp) < 0) {
->          object_unref(OBJECT(listen_ioc));
-> -        qapi_free_SocketAddress(saddr);
->          return;
->      }
->  
-> @@ -177,7 +176,6 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
->                            socket_accept_incoming_migration,
->                            listen_ioc,
->                            (GDestroyNotify)object_unref);
-> -    qapi_free_SocketAddress(saddr);
->  }
->  
->  void tcp_start_incoming_migration(const char *host_port, Error **errp)
-> @@ -188,10 +186,12 @@ void tcp_start_incoming_migration(const char *host_port, Error **errp)
->          socket_start_incoming_migration(saddr, &err);
->      }
->      error_propagate(errp, err);
-> +    qapi_free_SocketAddress(saddr);
->  }
->  
->  void unix_start_incoming_migration(const char *path, Error **errp)
->  {
->      SocketAddress *saddr = unix_build_address(path);
->      socket_start_incoming_migration(saddr, errp);
-> +    qapi_free_SocketAddress(saddr);
->  }
-> -- 
-> 2.7.4
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
