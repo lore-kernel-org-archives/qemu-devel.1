@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dvIgS-0008BE-Nx
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:47:37 -0400
+	(envelope-from <famz@redhat.com>) id 1dvIgU-0008CG-6t
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:47:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dvIgR-00010L-Hp
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:47:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54090)
+	(envelope-from <famz@redhat.com>) id 1dvIgT-000116-7Q
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:47:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58222)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dvIgR-000103-CK
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:47:35 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dvIgT-00010q-1h
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:47:37 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 22 Sep 2017 15:46:39 +0800
-Message-Id: <20170922074659.30097-17-famz@redhat.com>
+Date: Fri, 22 Sep 2017 15:46:40 +0800
+Message-Id: <20170922074659.30097-18-famz@redhat.com>
 In-Reply-To: <20170922074659.30097-1-famz@redhat.com>
 References: <20170922074659.30097-1-famz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 16/36] buildsys: Move audio libs to per object
+Subject: [Qemu-devel] [PULL 17/36] buildsys: Move libcacard cflags/libs to
+ per object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,80 +31,54 @@ To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170907082918.7299-5-famz@redhat.com>
+Message-Id: <20170907082918.7299-8-famz@redhat.com>
 Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- audio/Makefile.objs |  5 +++++
- configure           | 15 ++++++++++-----
- 2 files changed, 15 insertions(+), 5 deletions(-)
+ configure            | 4 ++--
+ hw/usb/Makefile.objs | 6 ++++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/audio/Makefile.objs b/audio/Makefile.objs
-index c20695668f..8a5ede6e2b 100644
---- a/audio/Makefile.objs
-+++ b/audio/Makefile.objs
-@@ -12,3 +12,8 @@ common-obj-y +=3D wavcapture.o
-=20
- sdlaudio.o-cflags :=3D $(SDL_CFLAGS)
- sdlaudio.o-libs :=3D $(SDL_LIBS)
-+alsaaudio.o-libs :=3D $(ALSA_LIBS)
-+paaudio.o-libs :=3D $(PULSE_LIBS)
-+coreaudio.o-libs :=3D $(COREAUDIO_LIBS)
-+dsoundaudio.o-libs :=3D $(DSOUND_LIBS)
-+ossaudio.o-libs :=3D $(OSS_LIBS)
 diff --git a/configure b/configure
-index 3675ae816e..fd544e7b55 100755
+index fd544e7b55..c5d5f02c08 100755
 --- a/configure
 +++ b/configure
-@@ -3032,13 +3032,13 @@ for drv in $audio_drv_list; do
-     alsa)
-     audio_drv_probe $drv alsa/asoundlib.h -lasound \
-         "return snd_pcm_close((snd_pcm_t *)0);"
--    libs_softmmu=3D"-lasound $libs_softmmu"
-+    alsa_libs=3D"-lasound"
-     ;;
+@@ -4206,8 +4206,6 @@ if test "$smartcard" !=3D "no"; then
+     if $pkg_config libcacard; then
+         libcacard_cflags=3D$($pkg_config --cflags libcacard)
+         libcacard_libs=3D$($pkg_config --libs libcacard)
+-        QEMU_CFLAGS=3D"$QEMU_CFLAGS $libcacard_cflags"
+-        libs_softmmu=3D"$libs_softmmu $libcacard_libs"
+         smartcard=3D"yes"
+     else
+         if test "$smartcard" =3D "yes"; then
+@@ -5785,6 +5783,8 @@ fi
 =20
-     pa)
-     audio_drv_probe $drv pulse/pulseaudio.h "-lpulse" \
-         "pa_context_set_source_output_volume(NULL, 0, NULL, NULL, NULL);=
- return 0;"
--    libs_softmmu=3D"-lpulse $libs_softmmu"
-+    pulse_libs=3D"-lpulse"
-     audio_pt_int=3D"yes"
-     ;;
-=20
-@@ -3049,16 +3049,16 @@ for drv in $audio_drv_list; do
-     ;;
-=20
-     coreaudio)
--      libs_softmmu=3D"-framework CoreAudio $libs_softmmu"
-+      coreaudio_libs=3D"-framework CoreAudio"
-     ;;
-=20
-     dsound)
--      libs_softmmu=3D"-lole32 -ldxguid $libs_softmmu"
-+      dsound_libs=3D"-lole32 -ldxguid"
-       audio_win_int=3D"yes"
-     ;;
-=20
-     oss)
--      libs_softmmu=3D"$oss_lib $libs_softmmu"
-+      oss_libs=3D"$oss_lib"
-     ;;
-=20
-     wav)
-@@ -5512,6 +5512,11 @@ for drv in $audio_drv_list; do
-     def=3DCONFIG_$(echo $drv | LC_ALL=3DC tr '[a-z]' '[A-Z]')
-     echo "$def=3Dy" >> $config_host_mak
- done
-+echo "ALSA_LIBS=3D$alsa_libs" >> $config_host_mak
-+echo "PULSE_LIBS=3D$pulse_libs" >> $config_host_mak
-+echo "COREAUDIO_LIBS=3D$coreaudio_libs" >> $config_host_mak
-+echo "DSOUND_LIBS=3D$dsound_libs" >> $config_host_mak
-+echo "OSS_LIBS=3D$oss_libs" >> $config_host_mak
- if test "$audio_pt_int" =3D "yes" ; then
-   echo "CONFIG_AUDIO_PT_INT=3Dy" >> $config_host_mak
+ if test "$smartcard" =3D "yes" ; then
+   echo "CONFIG_SMARTCARD=3Dy" >> $config_host_mak
++  echo "SMARTCARD_CFLAGS=3D$libcacard_cflags" >> $config_host_mak
++  echo "SMARTCARD_LIBS=3D$libcacard_libs" >> $config_host_mak
  fi
+=20
+ if test "$libusb" =3D "yes" ; then
+diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
+index 757e365562..9aceb6cc3d 100644
+--- a/hw/usb/Makefile.objs
++++ b/hw/usb/Makefile.objs
+@@ -26,8 +26,10 @@ common-obj-$(CONFIG_USB_BLUETOOTH)    +=3D dev-bluetoo=
+th.o
+=20
+ ifeq ($(CONFIG_USB_SMARTCARD),y)
+ common-obj-y                          +=3D dev-smartcard-reader.o
+-common-obj-$(CONFIG_SMARTCARD)        +=3D ccid-card-passthru.o
+-common-obj-$(CONFIG_SMARTCARD)        +=3D ccid-card-emulated.o
++common-obj-$(CONFIG_SMARTCARD)        +=3D smartcard.mo
++smartcard.mo-objs :=3D ccid-card-passthru.o ccid-card-emulated.o
++smartcard.mo-cflags :=3D $(SMARTCARD_CFLAGS)
++smartcard.mo-libs :=3D $(SMARTCARD_LIBS)
+ endif
+=20
+ ifeq ($(CONFIG_POSIX),y)
 --=20
 2.13.5
