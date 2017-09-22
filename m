@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dvPV4-0003Uh-8a
+	(envelope-from <pbonzini@redhat.com>) id 1dvPV3-0003UE-Ns
 	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 11:04:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dvPV0-0007Sl-I0
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 11:04:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33015)
+	(envelope-from <pbonzini@redhat.com>) id 1dvPUz-0007Rt-8b
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 11:04:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60138)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dvPV0-0007S9-5I
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 11:04:14 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dvPUz-0007RT-0A
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 11:04:13 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 414B82CE913
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 15:04:13 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D69237EAB3
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 15:04:11 +0000 (UTC)
 Received: from donizetti.redhat.com (ovpn-117-77.ams2.redhat.com
 	[10.36.117.77])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 312205D9CB
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 15:04:12 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 37E115D9CB
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 15:04:11 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 22 Sep 2017 17:04:09 +0200
-Message-Id: <20170922150410.20689-2-pbonzini@redhat.com>
-In-Reply-To: <20170922150410.20689-1-pbonzini@redhat.com>
-References: <20170922150410.20689-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 26/32] scsi: build qemu-pr-helper
+Date: Fri, 22 Sep 2017 17:04:08 +0200
+Message-Id: <20170922150410.20689-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/32] Misc patches for 2017-09-22 (v2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,1010 +36,134 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Introduce a privileged helper to run persistent reservation commands.
-This lets virtual machines send persistent reservations without using
-CAP_SYS_RAWIO or out-of-tree patches.  The helper uses Unix permissions
-and SCM_RIGHTS to restrict access to processes that can access its socket
-and prove that they have an open file descriptor for a raw SCSI device.
+The following changes since commit b62b7ed0fc9c58e373b8946c9bd2e193be98da=
+e6:
 
-The next patch will also correct the usage of persistent reservations
-with multipath devices.
+  Merge remote-tracking branch 'remotes/gkurz/tags/for-upstream' into sta=
+ging (2017-09-20 20:33:48 +0100)
 
-It would also be possible to support for Linux's IOC_PR_* ioctls in
-the future, to support NVMe devices.  For now, however, only SCSI is
-supported.
+are available in the git repository at:
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- Makefile                   |   4 +-
- configure                  |  14 +-
- docs/interop/pr-helper.rst |  83 +++++
- docs/pr-manager.rst        |  33 ++
- scsi/pr-helper.h           |  41 +++
- scsi/qemu-pr-helper.c      | 735 +++++++++++++++++++++++++++++++++++++++++++++
- 6 files changed, 905 insertions(+), 5 deletions(-)
+  git://github.com/bonzini/qemu.git tags/for-upstream
+
+for you to fetch changes up to 8acf7b48e0098198057db048340606c7fbfc6518:
+
+  chardev: remove context in chr_update_read_handler (2017-09-22 14:03:27=
+ +0200)
+
+v2 fixes some issues with the new qemu-pr-helper.  make install and syste=
+md
+socket activation were broken.  I have now backported it to the Fedora QE=
+MU
+packages to shake out any distro-level issues.
+
+----------------------------------------------------------------
+* Speed up AddressSpaceDispatch creation (Alexey)
+* Fix kvm.c assert (David)
+* Memory fixes and further speedup (me)
+* Persistent reservation manager infrastructure (me)
+* virtio-serial: add enable_backend callback (Pavel)
+* chardev GMainContext fixes (Peter)
+
+----------------------------------------------------------------
+Alexey Kardashevskiy (17):
+      exec: Explicitly export target AS from address_space_translate_inte=
+rnal
+      memory: Open code FlatView rendering
+      memory: Move FlatView allocation to a helper
+      memory: Move AddressSpaceDispatch from AddressSpace to FlatView
+      memory: Remove AddressSpace pointer from AddressSpaceDispatch
+      memory: Switch memory from using AddressSpace to FlatView
+      memory: Cleanup after switching to FlatView
+      memory: Rename mem_begin/mem_commit/mem_add helpers
+      memory: Store physical root MR in FlatView
+      memory: Alloc dispatch tree where topology is generared
+      memory: Move address_space_update_ioeventfds
+      memory: Share FlatView's and dispatch trees between address spaces
+      memory: Do not allocate FlatView in address_space_init
+      memory: Rework "info mtree" to print flat views and dispatch trees
+      memory: Get rid of address_space_init_shareable
+      memory: Create FlatView directly
+      memory: Share special empty FlatView
+
+David Hildenbrand (1):
+      kvm: drop wrong assertion creating problems with pflash
+
+KONRAD Frederic (1):
+      memory: avoid a name clash with access macro
+
+Paolo Bonzini (8):
+      atomic: update documentation
+      memory: avoid "resurrection" of dead FlatViews
+      memory: trace FlatView creation and destruction
+      memory: seek FlatView sharing candidates among children subregions
+      scsi, file-posix: add support for persistent reservation management
+      scsi: build qemu-pr-helper
+      scsi: add multipath support to qemu-pr-helper
+      scsi: add persistent reservation manager using qemu-pr-helper
+
+Pavel Butsykin (1):
+      virtio-serial: add enable_backend callback
+
+Peter Xu (4):
+      chardev: new qemu_chr_be_update_read_handlers()
+      chardev: add Chardev.gcontext field
+      chardev: use per-dev context for io_add_watch_poll
+      chardev: remove context in chr_update_read_handler
+
+ Makefile                          |    7 +-
+ Makefile.objs                     |    1 +
+ accel/kvm/kvm-all.c               |    1 -
+ block/file-posix.c                |   30 ++
+ chardev/char-fd.c                 |    5 +-
+ chardev/char-fe.c                 |    7 +-
+ chardev/char-pty.c                |    5 +-
+ chardev/char-socket.c             |    7 +-
+ chardev/char-udp.c                |    5 +-
+ chardev/char.c                    |   11 +
+ configure                         |   60 ++-
+ cpus.c                            |    5 +-
+ docs/devel/atomics.txt            |   14 +-
+ docs/interop/pr-helper.rst        |   83 +++
+ docs/pr-manager.rst               |  111 ++++
+ exec.c                            |  330 +++++++-----
+ hmp-commands-info.hx              |    7 +-
+ hw/arm/armv7m.c                   |    9 +-
+ hw/char/virtio-console.c          |   21 +
+ hw/char/virtio-serial-bus.c       |    7 +
+ hw/intc/openpic_kvm.c             |    2 +-
+ include/chardev/char.h            |   13 +-
+ include/exec/memory-internal.h    |   16 +-
+ include/exec/memory.h             |   75 ++-
+ include/hw/arm/armv7m.h           |    2 +-
+ include/hw/virtio/virtio-serial.h |    3 +
+ include/qemu/atomic.h             |    8 +
+ include/qemu/typedefs.h           |    1 +
+ include/scsi/pr-manager.h         |   56 ++
+ include/scsi/utils.h              |    4 +
+ memory.c                          |  378 ++++++++++---
+ monitor.c                         |    3 +-
+ qapi/block-core.json              |    4 +
+ scsi/Makefile.objs                |    2 +
+ scsi/pr-helper.h                  |   41 ++
+ scsi/pr-manager-helper.c          |  302 +++++++++++
+ scsi/pr-manager.c                 |  109 ++++
+ scsi/qemu-pr-helper.c             | 1075 +++++++++++++++++++++++++++++++=
+++++++
+ scsi/trace-events                 |    3 +
+ scsi/utils.c                      |   10 +
+ target/arm/cpu.c                  |   16 +-
+ target/i386/cpu.c                 |    5 +-
+ trace-events                      |    3 +
+ vl.c                              |    3 +-
+ 44 files changed, 2550 insertions(+), 310 deletions(-)
  create mode 100644 docs/interop/pr-helper.rst
+ create mode 100644 docs/pr-manager.rst
+ create mode 100644 include/scsi/pr-manager.h
  create mode 100644 scsi/pr-helper.h
+ create mode 100644 scsi/pr-manager-helper.c
+ create mode 100644 scsi/pr-manager.c
  create mode 100644 scsi/qemu-pr-helper.c
-
-diff --git a/Makefile b/Makefile
-index eb831b98d1..8406aeb8cb 100644
---- a/Makefile
-+++ b/Makefile
-@@ -372,6 +372,8 @@ qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
- fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
- fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
- 
-+scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
-+
- qemu-img-cmds.h: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
- 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
- 
-@@ -488,7 +490,7 @@ clean:
- 	rm -f *.msi
- 	find . \( -name '*.so' -o -name '*.dll' -o -name '*.mo' -o -name '*.[oda]' \) -type f -exec rm {} +
- 	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga TAGS cscope.* *.pod *~ */*~
--	rm -f fsdev/*.pod
-+	rm -f fsdev/*.pod scsi/*.pod
- 	rm -f qemu-img-cmds.h
- 	rm -f ui/shader/*-vert.h ui/shader/*-frag.h
- 	@# May not be present in GENERATED_FILES
-diff --git a/configure b/configure
-index cb0f7ed0ab..becc21a0fe 100755
---- a/configure
-+++ b/configure
-@@ -5034,16 +5034,22 @@ if test "$want_tools" = "yes" ; then
-   fi
- fi
- if test "$softmmu" = yes ; then
--  if test "$virtfs" != no ; then
--    if test "$cap" = yes && test "$linux" = yes && test "$attr" = yes ; then
-+  if test "$linux" = yes; then
-+    if test "$virtfs" != no && test "$cap" = yes && test "$attr" = yes ; then
-       virtfs=yes
-       tools="$tools fsdev/virtfs-proxy-helper\$(EXESUF)"
-     else
-       if test "$virtfs" = yes; then
--        error_exit "VirtFS is supported only on Linux and requires libcap devel and libattr devel"
-+        error_exit "VirtFS requires libcap devel and libattr devel"
-       fi
-       virtfs=no
-     fi
-+    tools="$tools scsi/qemu-pr-helper\$(EXESUF)"
-+  else
-+    if test "$virtfs" = yes; then
-+      error_exit "VirtFS is supported only on Linux"
-+    fi
-+    virtfs=no
-   fi
- fi
- 
-@@ -6506,7 +6512,7 @@ fi
- 
- # build tree in object directory in case the source is not in the current directory
- DIRS="tests tests/tcg tests/tcg/cris tests/tcg/lm32 tests/libqos tests/qapi-schema tests/tcg/xtensa tests/qemu-iotests"
--DIRS="$DIRS docs docs/interop fsdev"
-+DIRS="$DIRS docs docs/interop fsdev scsi"
- DIRS="$DIRS pc-bios/optionrom pc-bios/spapr-rtas pc-bios/s390-ccw"
- DIRS="$DIRS roms/seabios roms/vgabios"
- DIRS="$DIRS qapi-generated"
-diff --git a/docs/interop/pr-helper.rst b/docs/interop/pr-helper.rst
-new file mode 100644
-index 0000000000..9f76d5bcf9
---- /dev/null
-+++ b/docs/interop/pr-helper.rst
-@@ -0,0 +1,83 @@
-+..
-+
-+======================================
-+Persistent reservation helper protocol
-+======================================
-+
-+QEMU's SCSI passthrough devices, ``scsi-block`` and ``scsi-generic``,
-+can delegate implementation of persistent reservations to an external
-+(and typically privileged) program.  Persistent Reservations allow
-+restricting access to block devices to specific initiators in a shared
-+storage setup.
-+
-+For a more detailed reference please refer the the SCSI Primary
-+Commands standard, specifically the section on Reservations and the
-+"PERSISTENT RESERVE IN" and "PERSISTENT RESERVE OUT" commands.
-+
-+This document describes the socket protocol used between QEMU's
-+``pr-manager-helper`` object and the external program.
-+
-+.. contents::
-+
-+Connection and initialization
-+-----------------------------
-+
-+All data transmitted on the socket is big-endian.
-+
-+After connecting to the helper program's socket, the helper starts a simple
-+feature negotiation process by writing four bytes corresponding to
-+the features it exposes (``supported_features``).  QEMU reads it,
-+then writes four bytes corresponding to the desired features of the
-+helper program (``requested_features``).
-+
-+If a bit is 1 in ``requested_features`` and 0 in ``supported_features``,
-+the corresponding feature is not supported by the helper and the connection
-+is closed.  On the other hand, it is acceptable for a bit to be 0 in
-+``requested_features`` and 1 in ``supported_features``; in this case,
-+the helper will not enable the feature.
-+
-+Right now no feature is defined, so the two parties always write four
-+zero bytes.
-+
-+Command format
-+--------------
-+
-+It is invalid to send multiple commands concurrently on the same
-+socket.  It is however possible to connect multiple sockets to the
-+helper and send multiple commands to the helper for one or more
-+file descriptors.
-+
-+A command consists of a request and a response.  A request consists
-+of a 16-byte SCSI CDB.  A file descriptor must be passed to the helper
-+together with the SCSI CDB using ancillary data.
-+
-+The CDB has the following limitations:
-+
-+- the command (stored in the first byte) must be one of 0x5E
-+  (PERSISTENT RESERVE IN) or 0x5F (PERSISTENT RESERVE OUT).
-+
-+- the allocation length (stored in bytes 7-8 of the CDB for PERSISTENT
-+  RESERVE IN) or parameter list length (stored in bytes 5-8 of the CDB
-+  for PERSISTENT RESERVE OUT) is limited to 8 KiB.
-+
-+For PERSISTENT RESERVE OUT, the parameter list is sent right after the
-+CDB.  The length of the parameter list is taken from the CDB itself.
-+
-+The helper's reply has the following structure:
-+
-+- 4 bytes for the SCSI status
-+
-+- 4 bytes for the payload size (nonzero only for PERSISTENT RESERVE IN
-+  and only if the SCSI status is 0x00, i.e. GOOD)
-+
-+- 96 bytes for the SCSI sense data
-+
-+- if the size is nonzero, the payload follows
-+
-+The sense data is always sent to keep the protocol simple, even though
-+it is only valid if the SCSI status is CHECK CONDITION (0x02).
-+
-+The payload size is always less than or equal to the allocation length
-+specified in the CDB for the PERSISTENT RESERVE IN command.
-+
-+If the protocol is violated, the helper closes the socket.
-diff --git a/docs/pr-manager.rst b/docs/pr-manager.rst
-index b6089fb57c..7107e59fb8 100644
---- a/docs/pr-manager.rst
-+++ b/docs/pr-manager.rst
-@@ -49,3 +49,36 @@ Alternatively, using ``-blockdev``::
-           -object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock
-           -blockdev node-name=hd,driver=raw,file.driver=host_device,file.filename=/dev/sdb,file.pr-manager=helper0
-           -device scsi-block,drive=hd
-+
-+----------------------------------
-+Invoking :program:`qemu-pr-helper`
-+----------------------------------
-+
-+QEMU provides an implementation of the persistent reservation helper,
-+called :program:`qemu-pr-helper`.  The helper should be started as a
-+system service and supports the following option:
-+
-+-d, --daemon              run in the background
-+-q, --quiet               decrease verbosity
-+-f, --pidfile=path        PID file when running as a daemon
-+-k, --socket=path         path to the socket
-+-T, --trace=trace-opts    tracing options
-+
-+By default, the socket and PID file are placed in the runtime state
-+directory, for example :file:`/var/run/qemu-pr-helper.sock` and
-+:file:`/var/run/qemu-pr-helper.pid`.  The PID file is not created
-+unless :option:`-d` is passed too.
-+
-+:program:`qemu-pr-helper` can also use the systemd socket activation
-+protocol.  In this case, the systemd socket unit should specify a
-+Unix stream socket, like this::
-+
-+    [Socket]
-+    ListenStream=/var/run/qemu-pr-helper.sock
-+
-+After connecting to the socket, :program:`qemu-pr-helper`` can optionally drop
-+root privileges, except for those capabilities that are needed for
-+its operation.  To do this, add the following options:
-+
-+-u, --user=user           user to drop privileges to
-+-g, --group=group         group to drop privileges to
-diff --git a/scsi/pr-helper.h b/scsi/pr-helper.h
-new file mode 100644
-index 0000000000..96c50a9e5f
---- /dev/null
-+++ b/scsi/pr-helper.h
-@@ -0,0 +1,41 @@
-+/* Definitions for QEMU's persistent reservation helper daemon
-+ *
-+ * Copyright (C) 2017 Red Hat, Inc.
-+ *
-+ * Author:
-+ *   Paolo Bonzini <pbonzini@redhat.com>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to
-+ * deal in the Software without restriction, including without limitation the
-+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-+ * sell copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-+ * IN THE SOFTWARE.
-+ */
-+#ifndef QEMU_PR_HELPER_H
-+#define QEMU_PR_HELPER_H 1
-+
-+#include <stdint.h>
-+
-+#define PR_HELPER_CDB_SIZE     16
-+#define PR_HELPER_SENSE_SIZE   96
-+#define PR_HELPER_DATA_SIZE    8192
-+
-+typedef struct PRHelperResponse {
-+    int32_t result;
-+    int32_t sz;
-+    uint8_t sense[PR_HELPER_SENSE_SIZE];
-+} PRHelperResponse;
-+
-+#endif
-diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
-new file mode 100644
-index 0000000000..e39efbd529
---- /dev/null
-+++ b/scsi/qemu-pr-helper.c
-@@ -0,0 +1,735 @@
-+/*
-+ * Privileged helper to handle persistent reservation commands for QEMU
-+ *
-+ * Copyright (C) 2017 Red Hat, Inc. <pbonzini@redhat.com>
-+ *
-+ * Author: Paolo Bonzini <pbonzini@redhat.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; under version 2 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include <getopt.h>
-+#include <sys/ioctl.h>
-+#include <linux/dm-ioctl.h>
-+#include <scsi/sg.h>
-+
-+#ifdef CONFIG_LIBCAP
-+#include <cap-ng.h>
-+#endif
-+#include <pwd.h>
-+#include <grp.h>
-+
-+#include "qapi/error.h"
-+#include "qemu-common.h"
-+#include "qemu/cutils.h"
-+#include "qemu/main-loop.h"
-+#include "qemu/error-report.h"
-+#include "qemu/config-file.h"
-+#include "qemu/bswap.h"
-+#include "qemu/log.h"
-+#include "qemu/systemd.h"
-+#include "qapi/util.h"
-+#include "qapi/qmp/qstring.h"
-+#include "io/channel-socket.h"
-+#include "trace/control.h"
-+#include "qemu-version.h"
-+
-+#include "block/aio.h"
-+#include "block/thread-pool.h"
-+
-+#include "scsi/constants.h"
-+#include "scsi/utils.h"
-+#include "pr-helper.h"
-+
-+#define PR_OUT_FIXED_PARAM_SIZE 24
-+
-+static char *socket_path;
-+static char *pidfile;
-+static enum { RUNNING, TERMINATE, TERMINATING } state;
-+static QIOChannelSocket *server_ioc;
-+static int server_watch;
-+static int num_active_sockets = 1;
-+static int verbose;
-+
-+#ifdef CONFIG_LIBCAP
-+static int uid = -1;
-+static int gid = -1;
-+#endif
-+
-+static void usage(const char *name)
-+{
-+    (printf) (
-+"Usage: %s [OPTIONS] FILE\n"
-+"Persistent Reservation helper program for QEMU\n"
-+"\n"
-+"  -h, --help                display this help and exit\n"
-+"  -V, --version             output version information and exit\n"
-+"\n"
-+"  -d, --daemon              run in the background\n"
-+"  -f, --pidfile=PATH        PID file when running as a daemon\n"
-+"                            (default '%s')\n"
-+"  -k, --socket=PATH         path to the unix socket\n"
-+"                            (default '%s')\n"
-+"  -T, --trace [[enable=]<pattern>][,events=<file>][,file=<file>]\n"
-+"                            specify tracing options\n"
-+#ifdef CONFIG_LIBCAP
-+"  -u, --user=USER           user to drop privileges to\n"
-+"  -g, --group=GROUP         group to drop privileges to\n"
-+#endif
-+"\n"
-+QEMU_HELP_BOTTOM "\n"
-+    , name, pidfile, socket_path);
-+}
-+
-+static void version(const char *name)
-+{
-+    printf(
-+"%s " QEMU_VERSION QEMU_PKGVERSION "\n"
-+"Written by Paolo Bonzini.\n"
-+"\n"
-+QEMU_COPYRIGHT "\n"
-+"This is free software; see the source for copying conditions.  There is NO\n"
-+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
-+    , name);
-+}
-+
-+static void write_pidfile(void)
-+{
-+    int pidfd;
-+    char pidstr[32];
-+
-+    pidfd = qemu_open(pidfile, O_CREAT|O_WRONLY, S_IRUSR|S_IWUSR);
-+    if (pidfd == -1) {
-+        error_report("Cannot open pid file, %s", strerror(errno));
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    if (lockf(pidfd, F_TLOCK, 0)) {
-+        error_report("Cannot lock pid file, %s", strerror(errno));
-+        goto fail;
-+    }
-+    if (ftruncate(pidfd, 0)) {
-+        error_report("Failed to truncate pid file");
-+        goto fail;
-+    }
-+
-+    snprintf(pidstr, sizeof(pidstr), "%d\n", getpid());
-+    if (write(pidfd, pidstr, strlen(pidstr)) != strlen(pidstr)) {
-+        error_report("Failed to write pid file");
-+        goto fail;
-+    }
-+    return;
-+
-+fail:
-+    unlink(pidfile);
-+    close(pidfd);
-+    exit(EXIT_FAILURE);
-+}
-+
-+/* SG_IO support */
-+
-+typedef struct PRHelperSGIOData {
-+    int fd;
-+    const uint8_t *cdb;
-+    uint8_t *sense;
-+    uint8_t *buf;
-+    int sz;              /* input/output */
-+    int dir;
-+} PRHelperSGIOData;
-+
-+static int do_sgio_worker(void *opaque)
-+{
-+    PRHelperSGIOData *data = opaque;
-+    struct sg_io_hdr io_hdr;
-+    int ret;
-+    int status;
-+    SCSISense sense_code;
-+
-+    memset(data->sense, 0, PR_HELPER_SENSE_SIZE);
-+    memset(&io_hdr, 0, sizeof(io_hdr));
-+    io_hdr.interface_id = 'S';
-+    io_hdr.cmd_len = PR_HELPER_CDB_SIZE;
-+    io_hdr.cmdp = (uint8_t *)data->cdb;
-+    io_hdr.sbp = data->sense;
-+    io_hdr.mx_sb_len = PR_HELPER_SENSE_SIZE;
-+    io_hdr.timeout = 1;
-+    io_hdr.dxfer_direction = data->dir;
-+    io_hdr.dxferp = (char *)data->buf;
-+    io_hdr.dxfer_len = data->sz;
-+    ret = ioctl(data->fd, SG_IO, &io_hdr);
-+    status = sg_io_sense_from_errno(ret < 0 ? errno : 0, &io_hdr,
-+                                    &sense_code);
-+    if (status == GOOD) {
-+        data->sz -= io_hdr.resid;
-+    } else {
-+        data->sz = 0;
-+    }
-+
-+    if (status == CHECK_CONDITION &&
-+        !(io_hdr.driver_status & SG_ERR_DRIVER_SENSE)) {
-+        scsi_build_sense(data->sense, sense_code);
-+    }
-+
-+    return status;
-+}
-+
-+static int do_sgio(int fd, const uint8_t *cdb, uint8_t *sense,
-+                    uint8_t *buf, int *sz, int dir)
-+{
-+    ThreadPool *pool = aio_get_thread_pool(qemu_get_aio_context());
-+    int r;
-+
-+    PRHelperSGIOData data = {
-+        .fd = fd,
-+        .cdb = cdb,
-+        .sense = sense,
-+        .buf = buf,
-+        .sz = *sz,
-+        .dir = dir,
-+    };
-+
-+    r = thread_pool_submit_co(pool, do_sgio_worker, &data);
-+    *sz = data.sz;
-+    return r;
-+}
-+
-+static int do_pr_in(int fd, const uint8_t *cdb, uint8_t *sense,
-+                    uint8_t *data, int *resp_sz)
-+{
-+    return do_sgio(fd, cdb, sense, data, resp_sz,
-+                   SG_DXFER_FROM_DEV);
-+}
-+
-+static int do_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
-+                     const uint8_t *param, int sz)
-+{
-+    int resp_sz = sz;
-+    return do_sgio(fd, cdb, sense, (uint8_t *)param, &resp_sz,
-+                   SG_DXFER_TO_DEV);
-+}
-+
-+/* Client */
-+
-+typedef struct PRHelperClient {
-+    QIOChannelSocket *ioc;
-+    Coroutine *co;
-+    int fd;
-+    uint8_t data[PR_HELPER_DATA_SIZE];
-+} PRHelperClient;
-+
-+typedef struct PRHelperRequest {
-+    int fd;
-+    size_t sz;
-+    uint8_t cdb[PR_HELPER_CDB_SIZE];
-+} PRHelperRequest;
-+
-+static int coroutine_fn prh_read(PRHelperClient *client, void *buf, int sz,
-+                                 Error **errp)
-+{
-+    int ret = 0;
-+
-+    while (sz > 0) {
-+        int *fds = NULL;
-+        size_t nfds = 0;
-+        int i;
-+        struct iovec iov;
-+        ssize_t n_read;
-+
-+        iov.iov_base = buf;
-+        iov.iov_len = sz;
-+        n_read = qio_channel_readv_full(QIO_CHANNEL(client->ioc), &iov, 1,
-+                                        &fds, &nfds, errp);
-+
-+        if (n_read == QIO_CHANNEL_ERR_BLOCK) {
-+            qio_channel_yield(QIO_CHANNEL(client->ioc), G_IO_IN);
-+            continue;
-+        }
-+        if (n_read <= 0) {
-+            ret = n_read ? n_read : -1;
-+            goto err;
-+        }
-+
-+        /* Stash one file descriptor per request.  */
-+        if (nfds) {
-+            bool too_many = false;
-+            for (i = 0; i < nfds; i++) {
-+                if (client->fd == -1) {
-+                    client->fd = fds[i];
-+                } else {
-+                    close(fds[i]);
-+                    too_many = true;
-+                }
-+            }
-+            g_free(fds);
-+            if (too_many) {
-+                ret = -1;
-+                goto err;
-+            }
-+        }
-+
-+        buf += n_read;
-+        sz -= n_read;
-+    }
-+
-+    return 0;
-+
-+err:
-+    if (client->fd != -1) {
-+        close(client->fd);
-+        client->fd = -1;
-+    }
-+    return ret;
-+}
-+
-+static int coroutine_fn prh_read_request(PRHelperClient *client,
-+                                         PRHelperRequest *req,
-+                                         PRHelperResponse *resp, Error **errp)
-+{
-+    uint32_t sz;
-+
-+    if (prh_read(client, req->cdb, sizeof(req->cdb), NULL) < 0) {
-+        return -1;
-+    }
-+
-+    if (client->fd == -1) {
-+        error_setg(errp, "No file descriptor in request.");
-+        return -1;
-+    }
-+
-+    if (req->cdb[0] != PERSISTENT_RESERVE_OUT &&
-+        req->cdb[0] != PERSISTENT_RESERVE_IN) {
-+        error_setg(errp, "Invalid CDB, closing socket.");
-+        goto out_close;
-+    }
-+
-+    sz = scsi_cdb_xfer(req->cdb);
-+    if (sz > sizeof(client->data)) {
-+        goto out_close;
-+    }
-+
-+    if (req->cdb[0] == PERSISTENT_RESERVE_OUT) {
-+        if (qio_channel_read_all(QIO_CHANNEL(client->ioc),
-+                                 (char *)client->data, sz,
-+                                 errp) < 0) {
-+            goto out_close;
-+        }
-+        if ((fcntl(client->fd, F_GETFL) & O_ACCMODE) == O_RDONLY) {
-+            scsi_build_sense(resp->sense, SENSE_CODE(INVALID_OPCODE));
-+            sz = 0;
-+        } else if (sz < PR_OUT_FIXED_PARAM_SIZE) {
-+            /* Illegal request, Parameter list length error.  This isn't fatal;
-+             * we have read the data, send an error without closing the socket.
-+             */
-+            scsi_build_sense(resp->sense, SENSE_CODE(INVALID_PARAM_LEN));
-+            sz = 0;
-+        }
-+        if (sz == 0) {
-+            resp->result = CHECK_CONDITION;
-+            close(client->fd);
-+            client->fd = -1;
-+        }
-+    }
-+
-+    req->fd = client->fd;
-+    req->sz = sz;
-+    client->fd = -1;
-+    return sz;
-+
-+out_close:
-+    close(client->fd);
-+    client->fd = -1;
-+    return -1;
-+}
-+
-+static int coroutine_fn prh_write_response(PRHelperClient *client,
-+                                           PRHelperRequest *req,
-+                                           PRHelperResponse *resp, Error **errp)
-+{
-+    ssize_t r;
-+    size_t sz;
-+
-+    if (req->cdb[0] == PERSISTENT_RESERVE_IN && resp->result == GOOD) {
-+        assert(resp->sz <= req->sz && resp->sz <= sizeof(client->data));
-+    } else {
-+        assert(resp->sz == 0);
-+    }
-+
-+    sz = resp->sz;
-+
-+    resp->result = cpu_to_be32(resp->result);
-+    resp->sz = cpu_to_be32(resp->sz);
-+    r = qio_channel_write_all(QIO_CHANNEL(client->ioc),
-+                              (char *) resp, sizeof(*resp), errp);
-+    if (r < 0) {
-+        return r;
-+    }
-+
-+    r = qio_channel_write_all(QIO_CHANNEL(client->ioc),
-+                              (char *) client->data,
-+                              sz, errp);
-+    return r < 0 ? r : 0;
-+}
-+
-+static void coroutine_fn prh_co_entry(void *opaque)
-+{
-+    PRHelperClient *client = opaque;
-+    Error *local_err = NULL;
-+    uint32_t flags;
-+    int r;
-+
-+    qio_channel_set_blocking(QIO_CHANNEL(client->ioc),
-+                             false, NULL);
-+    qio_channel_attach_aio_context(QIO_CHANNEL(client->ioc),
-+                                   qemu_get_aio_context());
-+
-+    /* A very simple negotiation for future extensibility.  No features
-+     * are defined so write 0.
-+     */
-+    flags = cpu_to_be32(0);
-+    r = qio_channel_write_all(QIO_CHANNEL(client->ioc),
-+                             (char *) &flags, sizeof(flags), NULL);
-+    if (r < 0) {
-+        goto out;
-+    }
-+
-+    r = qio_channel_read_all(QIO_CHANNEL(client->ioc),
-+                             (char *) &flags, sizeof(flags), NULL);
-+    if (be32_to_cpu(flags) != 0 || r < 0) {
-+        goto out;
-+    }
-+
-+    while (atomic_read(&state) == RUNNING) {
-+        PRHelperRequest req;
-+        PRHelperResponse resp;
-+        int sz;
-+
-+        sz = prh_read_request(client, &req, &resp, &local_err);
-+        if (sz < 0) {
-+            break;
-+        }
-+
-+        if (sz > 0) {
-+            num_active_sockets++;
-+            if (req.cdb[0] == PERSISTENT_RESERVE_OUT) {
-+                r = do_pr_out(req.fd, req.cdb, resp.sense,
-+                              client->data, sz);
-+                resp.sz = 0;
-+            } else {
-+                resp.sz = sizeof(client->data);
-+                r = do_pr_in(req.fd, req.cdb, resp.sense,
-+                             client->data, &resp.sz);
-+                resp.sz = MIN(resp.sz, sz);
-+            }
-+            num_active_sockets--;
-+            close(req.fd);
-+            if (r == -1) {
-+                break;
-+            }
-+            resp.result = r;
-+        }
-+
-+        if (prh_write_response(client, &req, &resp, &local_err) < 0) {
-+            break;
-+        }
-+    }
-+
-+    if (local_err) {
-+        if (verbose == 0) {
-+            error_free(local_err);
-+        } else {
-+            error_report_err(local_err);
-+        }
-+    }
-+
-+out:
-+    qio_channel_detach_aio_context(QIO_CHANNEL(client->ioc));
-+    object_unref(OBJECT(client->ioc));
-+    g_free(client);
-+}
-+
-+static gboolean accept_client(QIOChannel *ioc, GIOCondition cond, gpointer opaque)
-+{
-+    QIOChannelSocket *cioc;
-+    PRHelperClient *prh;
-+
-+    cioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
-+                                     NULL);
-+    if (!cioc) {
-+        return TRUE;
-+    }
-+
-+    prh = g_new(PRHelperClient, 1);
-+    prh->ioc = cioc;
-+    prh->fd = -1;
-+    prh->co = qemu_coroutine_create(prh_co_entry, prh);
-+    qemu_coroutine_enter(prh->co);
-+
-+    return TRUE;
-+}
-+
-+
-+/*
-+ * Check socket parameters compatibility when socket activation is used.
-+ */
-+static const char *socket_activation_validate_opts(void)
-+{
-+    if (socket_path != NULL) {
-+        return "Unix socket can't be set when using socket activation";
-+    }
-+
-+    return NULL;
-+}
-+
-+static void compute_default_paths(void)
-+{
-+    if (!socket_path) {
-+        socket_path = qemu_get_local_state_pathname("run/qemu-pr-helper.sock");
-+    }
-+}
-+
-+static void termsig_handler(int signum)
-+{
-+    atomic_cmpxchg(&state, RUNNING, TERMINATE);
-+    qemu_notify_event();
-+}
-+
-+static void close_server_socket(void)
-+{
-+    assert(server_ioc);
-+
-+    g_source_remove(server_watch);
-+    server_watch = -1;
-+    object_unref(OBJECT(server_ioc));
-+    num_active_sockets--;
-+}
-+
-+#ifdef CONFIG_LIBCAP
-+static int drop_privileges(void)
-+{
-+    /* clear all capabilities */
-+    capng_clear(CAPNG_SELECT_BOTH);
-+
-+    if (capng_update(CAPNG_ADD, CAPNG_EFFECTIVE | CAPNG_PERMITTED,
-+                     CAP_SYS_RAWIO) < 0) {
-+        return -1;
-+    }
-+
-+    /* Change user/group id, retaining the capabilities.  Because file descriptors
-+     * are passed via SCM_RIGHTS, we don't need supplementary groups (and in
-+     * fact the helper can run as "nobody").
-+     */
-+    if (capng_change_id(uid != -1 ? uid : getuid(),
-+                        gid != -1 ? gid : getgid(),
-+                        CAPNG_DROP_SUPP_GRP | CAPNG_CLEAR_BOUNDING)) {
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+#endif
-+
-+int main(int argc, char **argv)
-+{
-+    const char *sopt = "hVk:fdT:u:g:q";
-+    struct option lopt[] = {
-+        { "help", no_argument, NULL, 'h' },
-+        { "version", no_argument, NULL, 'V' },
-+        { "socket", required_argument, NULL, 'k' },
-+        { "pidfile", no_argument, NULL, 'f' },
-+        { "daemon", no_argument, NULL, 'd' },
-+        { "trace", required_argument, NULL, 'T' },
-+        { "user", required_argument, NULL, 'u' },
-+        { "group", required_argument, NULL, 'g' },
-+        { "quiet", no_argument, NULL, 'q' },
-+        { NULL, 0, NULL, 0 }
-+    };
-+    int opt_ind = 0;
-+    int quiet = 0;
-+    char ch;
-+    Error *local_err = NULL;
-+    char *trace_file = NULL;
-+    bool daemonize = false;
-+    unsigned socket_activation;
-+
-+    struct sigaction sa_sigterm;
-+    memset(&sa_sigterm, 0, sizeof(sa_sigterm));
-+    sa_sigterm.sa_handler = termsig_handler;
-+    sigaction(SIGTERM, &sa_sigterm, NULL);
-+    sigaction(SIGINT, &sa_sigterm, NULL);
-+    sigaction(SIGHUP, &sa_sigterm, NULL);
-+
-+    signal(SIGPIPE, SIG_IGN);
-+
-+    module_call_init(MODULE_INIT_TRACE);
-+    module_call_init(MODULE_INIT_QOM);
-+    qemu_add_opts(&qemu_trace_opts);
-+    qemu_init_exec_dir(argv[0]);
-+
-+    pidfile = qemu_get_local_state_pathname("run/qemu-pr-helper.pid");
-+
-+    while ((ch = getopt_long(argc, argv, sopt, lopt, &opt_ind)) != -1) {
-+        switch (ch) {
-+        case 'k':
-+            socket_path = optarg;
-+            if (socket_path[0] != '/') {
-+                error_report("socket path must be absolute");
-+                exit(EXIT_FAILURE);
-+            }
-+            break;
-+        case 'f':
-+            pidfile = optarg;
-+            break;
-+#ifdef CONFIG_LIBCAP
-+        case 'u': {
-+            unsigned long res;
-+            struct passwd *userinfo = getpwnam(optarg);
-+            if (userinfo) {
-+                uid = userinfo->pw_uid;
-+            } else if (qemu_strtoul(optarg, NULL, 10, &res) == 0 &&
-+                       (uid_t)res == res) {
-+                uid = res;
-+            } else {
-+                error_report("invalid user '%s'", optarg);
-+                exit(EXIT_FAILURE);
-+            }
-+            break;
-+        }
-+        case 'g': {
-+            unsigned long res;
-+            struct group *groupinfo = getgrnam(optarg);
-+            if (groupinfo) {
-+                gid = groupinfo->gr_gid;
-+            } else if (qemu_strtoul(optarg, NULL, 10, &res) == 0 &&
-+                       (gid_t)res == res) {
-+                gid = res;
-+            } else {
-+                error_report("invalid group '%s'", optarg);
-+                exit(EXIT_FAILURE);
-+            }
-+            break;
-+        }
-+#else
-+        case 'u':
-+        case 'g':
-+            error_report("-%c not supported by this %s", ch, argv[0]);
-+            exit(1);
-+#endif
-+        case 'd':
-+            daemonize = true;
-+            break;
-+        case 'q':
-+            quiet = 1;
-+            break;
-+        case 'T':
-+            g_free(trace_file);
-+            trace_file = trace_opt_parse(optarg);
-+            break;
-+        case 'V':
-+            version(argv[0]);
-+            exit(EXIT_SUCCESS);
-+            break;
-+        case 'h':
-+            usage(argv[0]);
-+            exit(EXIT_SUCCESS);
-+            break;
-+        case '?':
-+            error_report("Try `%s --help' for more information.", argv[0]);
-+            exit(EXIT_FAILURE);
-+        }
-+    }
-+
-+    /* set verbosity */
-+    verbose = !quiet;
-+
-+    if (!trace_init_backends()) {
-+        exit(EXIT_FAILURE);
-+    }
-+    trace_init_file(trace_file);
-+    qemu_set_log(LOG_TRACE);
-+
-+    socket_activation = check_socket_activation();
-+    if (socket_activation == 0) {
-+        SocketAddress saddr;
-+        compute_default_paths();
-+        saddr = (SocketAddress){
-+            .type = SOCKET_ADDRESS_TYPE_UNIX,
-+            .u.q_unix.path = g_strdup(socket_path)
-+        };
-+        server_ioc = qio_channel_socket_new();
-+        if (qio_channel_socket_listen_sync(server_ioc, &saddr, &local_err) < 0) {
-+            object_unref(OBJECT(server_ioc));
-+            error_report_err(local_err);
-+            return 1;
-+        }
-+        g_free(saddr.u.q_unix.path);
-+    } else {
-+        /* Using socket activation - check user didn't use -p etc. */
-+        const char *err_msg = socket_activation_validate_opts();
-+        if (err_msg != NULL) {
-+            error_report("%s", err_msg);
-+            exit(EXIT_FAILURE);
-+        }
-+
-+        /* Can only listen on a single socket.  */
-+        if (socket_activation > 1) {
-+            error_report("%s does not support socket activation with LISTEN_FDS > 1",
-+                         argv[0]);
-+            exit(EXIT_FAILURE);
-+        }
-+        server_ioc = qio_channel_socket_new_fd(FIRST_SOCKET_ACTIVATION_FD,
-+                                               &local_err);
-+        if (server_ioc == NULL) {
-+            error_report("Failed to use socket activation: %s",
-+                         error_get_pretty(local_err));
-+            exit(EXIT_FAILURE);
-+        }
-+        socket_path = NULL;
-+    }
-+
-+    if (qemu_init_main_loop(&local_err)) {
-+        error_report_err(local_err);
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    server_watch = qio_channel_add_watch(QIO_CHANNEL(server_ioc),
-+                                         G_IO_IN,
-+                                         accept_client,
-+                                         NULL, NULL);
-+
-+#ifdef CONFIG_LIBCAP
-+    if (drop_privileges() < 0) {
-+        error_report("Failed to drop privileges: %s", strerror(errno));
-+        exit(EXIT_FAILURE);
-+    }
-+#endif
-+
-+    if (daemonize) {
-+        if (daemon(0, 0) < 0) {
-+            error_report("Failed to daemonize: %s", strerror(errno));
-+            exit(EXIT_FAILURE);
-+        }
-+        write_pidfile();
-+    }
-+
-+    state = RUNNING;
-+    do {
-+        main_loop_wait(false);
-+        if (state == TERMINATE) {
-+            state = TERMINATING;
-+            close_server_socket();
-+        }
-+    } while (num_active_sockets > 0);
-+
-+    exit(EXIT_SUCCESS);
-+}
--- 
+ create mode 100644 scsi/trace-events
+--=20
 2.13.5
