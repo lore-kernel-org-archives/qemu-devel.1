@@ -1,37 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dvLbn-0003vR-Dn
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:55:02 -0400
+	(envelope-from <clg@kaod.org>) id 1dvLdh-00058M-Tl
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:56:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dvLbi-0000Q4-H5
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:54:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58508)
+	(envelope-from <clg@kaod.org>) id 1dvLdc-0001Ve-UN
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:56:57 -0400
+Received: from 4.mo179.mail-out.ovh.net ([46.105.36.149]:40482)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dvLbi-0000P0-7W
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:54:54 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0FE2B80460
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 10:54:53 +0000 (UTC)
-Date: Fri, 22 Sep 2017 18:54:45 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170922105445.GA19505@pxdev.xzpeter.org>
-References: <1506070572-7549-1-git-send-email-peterx@redhat.com>
-	<1506070572-7549-2-git-send-email-peterx@redhat.com>
-	<20170922090433.GC12725@redhat.com>
-	<20170922091430.GJ30661@pxdev.xzpeter.org>
-	<20170922093631.GG12725@redhat.com>
-	<4760b1a1-446d-fc2c-8794-8860bededc56@redhat.com>
-	<20170922094325.GH12725@redhat.com>
-	<d0992b81-d5d0-6957-d292-52be50a21ec7@redhat.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dvLdc-0001QO-LU
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 06:56:52 -0400
+Received: from player690.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 4E0A265011
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 12:56:46 +0200 (CEST)
+References: <20170919082421.GU27153@umbus>
+	<871sn2hugn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920045524.GH5520@umbus.fritz.box>
+	<87y3pagdg0.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920061756.GJ5520@umbus.fritz.box>
+	<87vakdhnyn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920065700.GO5520@umbus.fritz.box>
+	<87poalhm74.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920115342.GQ5520@umbus.fritz.box>
+	<87377gpuyh.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170921053107.GD4998@umbus.fritz.box>
+	<87y3p7nugc.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <15582716-0d6e-aa7e-e429-08e1078765a4@kaod.org>
+Date: Fri, 22 Sep 2017 12:56:40 +0200
 MIME-Version: 1.0
+In-Reply-To: <87y3p7nugc.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <d0992b81-d5d0-6957-d292-52be50a21ec7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] iothread: provide helpers for internal
- use
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix cores per chip for multiple
+ cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,104 +42,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org
 
-On Fri, Sep 22, 2017 at 12:14:04PM +0200, Paolo Bonzini wrote:
-> On 22/09/2017 11:43, Daniel P. Berrange wrote:
-> > On Fri, Sep 22, 2017 at 11:38:31AM +0200, Paolo Bonzini wrote:
-> >> On 22/09/2017 11:36, Daniel P. Berrange wrote:
-> >>> On Fri, Sep 22, 2017 at 05:14:30PM +0800, Peter Xu wrote:
-> >>>> On Fri, Sep 22, 2017 at 10:04:33AM +0100, Daniel P. Berrange wrote:
-> >>>>> On Fri, Sep 22, 2017 at 04:56:10PM +0800, Peter Xu wrote:
-> >>>>>> IOThread is a general framework that contains IO loop environment and a
-> >>>>>> real thread behind.  It's also good to be used internally inside qemu.
-> >>>>>> Provide some helpers for it to create iothreads to be used internally.
-> >>>>>>
-> >>>>>> Signed-off-by: Peter Xu <peterx@redhat.com>
-> >>>>>> ---
-> >>>>>>  include/sysemu/iothread.h |  8 ++++++++
-> >>>>>>  iothread.c                | 21 +++++++++++++++++++++
-> >>>>>>  2 files changed, 29 insertions(+)
-> >>>>>>
-> >>>>>> diff --git a/include/sysemu/iothread.h b/include/sysemu/iothread.h
-> >>>>>> index d2985b3..b07663f 100644
-> >>>>>> --- a/include/sysemu/iothread.h
-> >>>>>> +++ b/include/sysemu/iothread.h
-> >>>>>> @@ -46,4 +46,12 @@ AioContext *iothread_get_aio_context(IOThread *iothread);
-> >>>>>>  void iothread_stop_all(void);
-> >>>>>>  GMainContext *iothread_get_g_main_context(IOThread *iothread);
-> >>>>>>  
-> >>>>>> +/*
-> >>>>>> + * Helpers used to allocate iothreads for internal use.  These
-> >>>>>> + * iothreads will not be seen by monitor clients when query using
-> >>>>>> + * "query-iothreads".
-> >>>>>> + */
-> >>>>>> +IOThread *iothread_create(const char *id, Error **errp);
-> >>>>>> +void iothread_destroy(IOThread *iothread);
-> >>>>>> +
-> >>>>>>  #endif /* IOTHREAD_H */
-> >>>>>> diff --git a/iothread.c b/iothread.c
-> >>>>>> index 44c8944..74e400c 100644
-> >>>>>> --- a/iothread.c
-> >>>>>> +++ b/iothread.c
-> >>>>>> @@ -354,3 +354,24 @@ GMainContext *iothread_get_g_main_context(IOThread *iothread)
-> >>>>>>  
-> >>>>>>      return iothread->worker_context;
-> >>>>>>  }
-> >>>>>> +
-> >>>>>> +static Object *iothread_get_internal_parent(void)
-> >>>>>> +{
-> >>>>>> +    return container_get(object_get_root(), "/internal-iothreads");
-> >>>>>> +}
-> >>>>>
-> >>>>> I tend to think we might benefit from having this generalized in the
-> >>>>> QOM API instead. We have object_get_objects_root() for things that
-> >>>>> are created by the mgmt app / user via CLI / QMP.  A parallel method
-> >>>>> object_get_internal_root() could be useful for cases like this where
-> >>>>> we want to create user-creatable objects, but not have them be
-> >>>>> visible to the mgmt app / user, as that would confuse the mgmt app.
-> >>>>>
-> >>>>> Example for this scenario - libvirt calls query-iothreads to identify
-> >>>>> IO thread PIDs, and would get very unhappy if the IOThread used by
-> >>>>> the monitor would appear in that response, which is why Peter has
-> >>>>> put it under /internal-iothreads. I think this scenario will apply
-> >>>>> more broadly, so benefit from us having a general helper in QOM.
-> >>>>
-> >>>> Yeah, I can split the patch if we want it to be exposed to public.
-> >>>>
-> >>>> In that case, would the name "object_get_internal_root" be good?
-> >>>
-> >>> Yeah that's fine with me, but lets see if Paolo has any thoughts from
-> >>> the QOM side.
-> >>
-> >> No, I don't.  However, I wonder if query-iothreads should have an
-> >> argument to include internal iothreads.
-> > 
-> > I guess it depends whether we consider use of iothreads for migration
-> > to be a private impl detail that may be ripped out & replaced at any
-> > time, or a semi-public detail that apps may rely on.  Personally I
-> > would suggest it should be a private impl detail of migration code
-> > that is never exposed to anything outside QEMU, so we have flexibility
-> > to change it at will later.
+On 09/22/2017 08:00 AM, Nikunj A Dadhania wrote:
+> David Gibson <david@gibson.dropbear.id.au> writes:
 > 
-> As far as I understood it's not migration, it's the whole monitor that
-> moves to the iothread.  So it's a thing that lasts for the whole
-> existence of the QEMU process.  But I may be wrong.
+>>>>>
+>>>>> As smp_thread defaults to 1 in vl.c, similarly smp_cores also has the
+>>>>> default value of 1 in vl.c. In powernv, we were setting nr-cores like
+>>>>> this:
+>>>>>
+>>>>>         object_property_set_int(chip, smp_cores, "nr-cores", &error_fatal);
+>>>>>
+>>>>> Even when there were multiple cpus (-smp 4), when the guest boots up, we
+>>>>> just get one core (i.e. smp_cores was 1) with single thread(smp_threads
+>>>>> was 1), which is wrong as per the command-line that was provided.
+>>>>
+>>>> Right, so, -smp 4 defaults to 4 sockets, each with 1 core of 1
+>>>> thread.  If you can't supply 4 sockets you should error, but you
+>>>> shouldn't go and change the number of cores per socket.
+>>>
+>>> OK, that makes sense now. And I do see that smp_cpus is 4 in the above
+>>> case. Now looking more into it, i see that powernv has something called
+>>> "num_chips", isnt this same as sockets ? Do we need num_chips separately?
+>>
+>> Ah, yes, I see.  It's probably still reasonable to keep num_chips as
+>> an internal variable, rather than using (smp_cpus / smp_cores /
+>> smp_threads) everywhere.  But we shouldn't have it as a direct
+>> user-settable property, instead setting it from the -smp command line
+>> option.
+> 
+> Something like the below works till num_chips=2, after that guest does
+> not boot up. This might be some limitation within the OS, Cedric might
+> have some clue. Otherwise, I see that multiple chips are created with
+> single core having single thread.
+> 
+>     ppc/pnv: Use num_chips for multiple sockets
+>     
+>     When the user does not provide the cpu topology, e.g. "-smp 4", machine fails to
+>     initialize 4 cpus. QEMU assumes smp_threads and smp_cores both as 1. Make sure
+>     that we initialize multiple chips for this.
 
-Yes it is about the monitor thread.
+-smp 4          would give a machine with 4 sockets with 1 core
+-smp 4,cores=4  would give a machine with 1 socket  with 4 cores
 
-One thing to mention is that, it's not the whole monitor thread - my
-plan is only to handle QMP IOs in that thread (and execute oob
-commands only, while oob commands should be really rare).  Most of the
-QMP command dispatching and execution will still be in main thread
-(which I suppose should be most of the real workload).
+correct ?
 
-IMHO I would prefer user know nothing of this thread, or tune it in
-any way.  Maybe there will be a time when we would like user to tune
-monitor threads, but IMHO current OOB threading is not that far yet.
+C.
 
-Thanks,
-
--- 
-Peter Xu
+>     Remove the user-settable property num_chips from machine command line option
+>     
+>     Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+> 
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 9724719..fa501f9 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -709,7 +709,17 @@ static void ppc_powernv_init(MachineState *machine)
+>          exit(1);
+>      }
+>  
+> +    pnv->num_chips = smp_cpus / (smp_cores * smp_threads);
+>      pnv->chips = g_new0(PnvChip *, pnv->num_chips);
+> +
+> +    if (smp_cpus != (smp_threads * pnv->num_chips * smp_cores)) {
+> +        error_report("cpu topology not balanced: "
+> +                     "chips (%u) * cores (%u) * threads (%u) != "
+> +                     "number of cpus (%u)",
+> +                     pnv->num_chips, smp_cores, smp_threads, smp_cpus);
+> +        exit(1);
+> +    }
+> +
+>      for (i = 0; i < pnv->num_chips; i++) {
+>          char chip_name[32];
+>          Object *chip = object_new(chip_typename);
+> @@ -1255,53 +1265,12 @@ static void pnv_pic_print_info(InterruptStatsProvider *obj,
+>      }
+>  }
+>  
+> -static void pnv_get_num_chips(Object *obj, Visitor *v, const char *name,
+> -                              void *opaque, Error **errp)
+> -{
+> -    visit_type_uint32(v, name, &POWERNV_MACHINE(obj)->num_chips, errp);
+> -}
+> -
+> -static void pnv_set_num_chips(Object *obj, Visitor *v, const char *name,
+> -                              void *opaque, Error **errp)
+> -{
+> -    PnvMachineState *pnv = POWERNV_MACHINE(obj);
+> -    uint32_t num_chips;
+> -    Error *local_err = NULL;
+> -
+> -    visit_type_uint32(v, name, &num_chips, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> -        return;
+> -    }
+> -
+> -    /*
+> -     * TODO: should we decide on how many chips we can create based
+> -     * on #cores and Venice vs. Murano vs. Naples chip type etc...,
+> -     */
+> -    if (!is_power_of_2(num_chips) || num_chips > 4) {
+> -        error_setg(errp, "invalid number of chips: '%d'", num_chips);
+> -        return;
+> -    }
+> -
+> -    pnv->num_chips = num_chips;
+> -}
+> -
+>  static void powernv_machine_initfn(Object *obj)
+>  {
+>      PnvMachineState *pnv = POWERNV_MACHINE(obj);
+>      pnv->num_chips = 1;
+>  }
+>  
+> -static void powernv_machine_class_props_init(ObjectClass *oc)
+> -{
+> -    object_class_property_add(oc, "num-chips", "uint32",
+> -                              pnv_get_num_chips, pnv_set_num_chips,
+> -                              NULL, NULL, NULL);
+> -    object_class_property_set_description(oc, "num-chips",
+> -                              "Specifies the number of processor chips",
+> -                              NULL);
+> -}
+> -
+>  static void powernv_machine_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc = MACHINE_CLASS(oc);
+> @@ -1321,8 +1290,6 @@ static void powernv_machine_class_init(ObjectClass *oc, void *data)
+>      xic->ics_get = pnv_ics_get;
+>      xic->ics_resend = pnv_ics_resend;
+>      ispc->print_info = pnv_pic_print_info;
+> -
+> -    powernv_machine_class_props_init(oc);
+>  }
+>  
+>  static const TypeInfo powernv_machine_info = {
+> 
