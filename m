@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1dvk3N-000504-R2
-	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 09:01:06 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dvloy-0003ur-3b
+	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 10:54:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1dvk3I-0001mT-Va
-	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 09:01:05 -0400
-Received: from latin.grep.be ([46.4.76.168]:47915)
+	(envelope-from <peter.maydell@linaro.org>) id 1dvlox-0008Kb-BX
+	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 10:54:20 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:51398)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <wouter@grep.be>) id 1dvk3I-0001hZ-L1
-	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 09:01:00 -0400
-Date: Sat, 23 Sep 2017 15:00:36 +0200
-From: Wouter Verhelst <w@uter.be>
-Message-ID: <20170923130036.372fgo4uhm7yfuoc@grep.be>
-References: <cecb7a50-6913-0d88-59b4-805463aba790@virtuozzo.com>
-	<cd46a9e9-4e9d-9ac8-53ed-34ba1b6f4dc0@redhat.com>
-	<9a3ce498-040d-5d8f-41d0-a2a649771528@virtuozzo.com>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dvlox-0008Jk-4O
+	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 10:54:19 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id z39so2629826wrb.8
+	for <qemu-devel@nongnu.org>; Sat, 23 Sep 2017 07:54:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9a3ce498-040d-5d8f-41d0-a2a649771528@virtuozzo.com>
-Subject: Re: [Qemu-devel] nbd structured reply
+In-Reply-To: <20170922190853.1911-1-pbonzini@redhat.com>
+References: <20170922190853.1911-1-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 23 Sep 2017 15:53:56 +0100
+Message-ID: <CAFEAcA-dxO91e9E-P8EpO81ev+Fs=N-zMOYpx_faZ2SJ1DATmw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v3 00/32] Misc patches for 2017-09-22
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,24 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Eric Blake <eblake@redhat.com>, Alex Bligh <alex@alex.org.uk>, qemu-devel <qemu-devel@nongnu.org>, nbd@other.debian.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Sep 22, 2017 at 05:57:07PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> The obvious behavior of client is to fail the whole read if it received one
-> error chunk.
+On 22 September 2017 at 20:08, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> The following changes since commit b62b7ed0fc9c58e373b8946c9bd2e193be98dae6:
+>
+>   Merge remote-tracking branch 'remotes/gkurz/tags/for-upstream' into staging (2017-09-20 20:33:48 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to bb86d05f4afab3ebfee2e897e295d61dbd8cc28e:
+>
+>   chardev: remove context in chr_update_read_handler (2017-09-22 21:07:27 +0200)
+>
+> ----------------------------------------------------------------
+> * Speed up AddressSpaceDispatch creation (Alexey)
+> * Fix kvm.c assert (David)
+> * Memory fixes and further speedup (me)
+> * Persistent reservation manager infrastructure (me)
+> * virtio-serial: add enable_backend callback (Pavel)
+> * chardev GMainContext fixes (Peter)
+>
 
-Not necessarily.
+Applied, thanks.
 
-If a user-space program requests to read X bytes of data, but there is
-an error at X-N, then the obvious way to handle that is for the read()
-call to return with X-N bytes first, and for the next read() call to
-return with -1, and errno set to EIO.
-
-Structured reads allow for that kind of behaviour.
-
--- 
-Could you people please use IRC like normal people?!?
-
-  -- Amaya Rodrigo Sastre, trying to quiet down the buzz in the DebConf 2008
-     Hacklab
+-- PMM
