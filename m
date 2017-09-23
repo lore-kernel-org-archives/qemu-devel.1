@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dvd2R-0000e6-NZ
-	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 01:31:40 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dvfie-0000Xz-Bx
+	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 04:23:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dvd2O-0003Zo-KH
-	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 01:31:39 -0400
-Date: Sat, 23 Sep 2017 15:31:28 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170923053127.GA12504@umbus>
-References: <20170922154014.29350-1-f4bug@amsat.org>
-	<20170922154014.29350-7-f4bug@amsat.org>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dvfiZ-00039P-Dc
+	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 04:23:24 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:44095
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1dvfiZ-000394-5M
+	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 04:23:19 -0400
+References: <1506082711-16004-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<905d94b3-291b-0e55-e234-97fc2c85b6a6@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <4a9754d9-e73b-8e67-427e-9624d0486c91@ilande.co.uk>
+Date: Sat, 23 Sep 2017 09:23:02 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ew6BAiZeqk4r7MaW"
-Content-Disposition: inline
-In-Reply-To: <20170922154014.29350-7-f4bug@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH 06/34] ppc: remove duplicated includes
+In-Reply-To: <905d94b3-291b-0e55-e234-97fc2c85b6a6@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] pci: allow 32-bit PCI IO accesses to pass
+ through the PCI bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,80 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-trivial@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com, marcel@redhat.com
+
+On 22/09/17 23:18, Laszlo Ersek wrote:
+
+> On 09/22/17 14:18, Mark Cave-Ayland wrote:
+>> Whilst the underlying PCI bridge implementation supports 32-bit PCI IO
+>> accesses, unfortunately they are truncated at the legacy 64K limit.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> ---
+>>  hw/pci/pci_bridge.c |    3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+>> index 17feae5..a47d257 100644
+>> --- a/hw/pci/pci_bridge.c
+>> +++ b/hw/pci/pci_bridge.c
+>> @@ -379,7 +379,8 @@ void pci_bridge_initfn(PCIDevice *dev, const char *typename)
+>>      sec_bus->address_space_mem = &br->address_space_mem;
+>>      memory_region_init(&br->address_space_mem, OBJECT(br), "pci_bridge_pci", UINT64_MAX);
+>>      sec_bus->address_space_io = &br->address_space_io;
+>> -    memory_region_init(&br->address_space_io, OBJECT(br), "pci_bridge_io", 65536);
+>> +    memory_region_init(&br->address_space_io, OBJECT(br), "pci_bridge_io",
+>> +                       UINT32_MAX);
+>>      br->windows = pci_bridge_region_init(br);
+>>      QLIST_INIT(&sec_bus->child);
+>>      QLIST_INSERT_HEAD(&parent->child, sec_bus, sibling);
+>>
+> 
+> Based on the commit message, I assume this change is guest-visible. If
+> so, should it be made dependent on a compat property, so that it doesn't
+> cause problems with migration?
+
+In order to enable 32-bit IO accesses the PCI bridge needs to set bit 0
+in the IO_LIMIT and IO_BASE registers - this bit is read-only to guests,
+so unless a PCI bridge has this bit set then it's impossible for this
+change to be guest visible.
+
+I did a grep for PCI_IO_RANGE_TYPE_32 and didn't see any existing users
+(other than an upcoming patchset from me!), so this combined with the
+fact that without this patch the feature is broken makes me think that I
+am the first user and so existing guests won't have a problem.
 
 
---ew6BAiZeqk4r7MaW
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+ATB,
 
-On Fri, Sep 22, 2017 at 12:39:46PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> applied using ./scripts/clean-includes
->=20
-> not needed since 7ebaf795560
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
->  hw/ppc/spapr_hcall.c | 1 -
->  target/ppc/kvm.c     | 3 ---
->  2 files changed, 4 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 57bb411394..2aeee28fe6 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -13,7 +13,6 @@
->  #include "trace.h"
->  #include "kvm_ppc.h"
->  #include "hw/ppc/spapr_ovec.h"
-> -#include "qemu/error-report.h"
->  #include "mmu-book3s-v3.h"
-> =20
->  struct SPRSyncState {
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 1deaf106d2..c9105af393 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -47,9 +47,6 @@
->  #include "sysemu/hostmem.h"
->  #include "qemu/cutils.h"
->  #include "qemu/mmap-alloc.h"
-> -#if defined(TARGET_PPC64)
-> -#include "hw/ppc/spapr_cpu_core.h"
-> -#endif
->  #include "elf.h"
->  #include "sysemu/kvm_int.h"
-> =20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---ew6BAiZeqk4r7MaW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnF8a8ACgkQbDjKyiDZ
-s5KCqBAAiSKO4TjrW2Ipp83di9lFF0sBcVMp9Vu/YP2YtT8JOEe2xVyGSLft74Hw
-Kc6mVgNg0xrLX1LjaK2yp4+FPgU1p+z9VAs+uPrZQarV19+lPWHRoskmGzCS9kFq
-2WyRjkGimZMwDITQ72wjoufuFd5IkTWtM3D2H2XOs1uGEmlGqz9NLcThyqzbAsv5
-gAB13mHLcfyGbgot2ZwYoSN146UtzMC5xLLa7VH6iXdXVIttvr6RkQ2n6Ht0dE9t
-gj82BQxcq0MyE5+prhkXS/kBuz3D6M5Q0SXcD9zfuI6CCDwEpVeI6qxwbrGetpoi
-h6o80R0r4ymiAE4ot4Gdy9Nxf/O6SoLDN6PGM1+ZBeyby80oaqFK/BtWbpyasmf2
-uJ0EHwgRMnxoFIZ+yXKkuc6mbS5gLYJ7MBU0cxB9J116Jhf5IU2+jm4uZohtWuZM
-LreTDT/6fQT9HnQytzGxo7E80yKUP6OSuWi39kuTKeAUqsF/WhqEcXh5mdXVPicp
-6fSup7ww9iT6Y0do95vkF54s5O/fEd4EiR8mKwcrM+B23aXInTX76/w2cNiEQQA3
-ansoSTzljRaoV4+pgx/Pk5yxBbBpDjuzkIzv++U5VqFNRXaj4bUL5YqoGDVvFtDK
-Jt9Lrv/W/HgRf25cU54bVUL3PW+nra9TWAOONmJWD/+gWjejZUo=
-=iCzI
------END PGP SIGNATURE-----
-
---ew6BAiZeqk4r7MaW--
+Mark.
