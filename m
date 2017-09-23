@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dvd0H-0007Jd-UB
-	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 01:29:27 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dvd0H-0007Jb-EF
+	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 01:29:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dvd0G-0002Az-O8
+	(envelope-from <dgibson@ozlabs.org>) id 1dvd0E-00029a-AS
 	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 01:29:25 -0400
-Date: Sat, 23 Sep 2017 15:13:36 +1000
+Date: Sat, 23 Sep 2017 15:08:24 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170923051336.GC4998@umbus.fritz.box>
+Message-ID: <20170923050824.GW4998@umbus.fritz.box>
 References: <20170922154014.29350-1-f4bug@amsat.org>
-	<20170922160111.31885-6-f4bug@amsat.org>
+	<20170922154014.29350-2-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Efge0/SQAHHP+Pr2"
+	protocol="application/pgp-signature"; boundary="HKOZ/JADkehwFk9I"
 Content-Disposition: inline
-In-Reply-To: <20170922160111.31885-6-f4bug@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH 28/34] hw/net/e1000: use TYPE_PCI_E1000
+In-Reply-To: <20170922154014.29350-2-f4bug@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH 01/34] hw: use "qemu/osdep.h" as first
+ #include in source files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,15 +26,17 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Balaton Zoltan <balaton@eik.bme.hu>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-trivial@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-trivial@nongnu.org
 
 
---Efge0/SQAHHP+Pr2
+--HKOZ/JADkehwFk9I
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 22, 2017 at 01:01:05PM -0300, Philippe Mathieu-Daud=E9 wrote:
+On Fri, Sep 22, 2017 at 12:39:41PM -0300, Philippe Mathieu-Daud=E9 wrote:
+> applied using ./scripts/clean-includes
+>=20
 > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 
 ppc portion
@@ -41,91 +44,109 @@ ppc portion
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  include/hw/net/pci.h   | 2 ++
->  hw/alpha/dp264.c       | 3 ++-
->  hw/i386/pc.c           | 3 ++-
->  hw/ppc/ppc440_bamboo.c | 3 ++-
->  4 files changed, 8 insertions(+), 3 deletions(-)
+>  hw/acpi/ipmi-stub.c             | 1 +
+>  hw/audio/fmopl.c                | 1 -
+>  hw/cpu/core.c                   | 1 +
+>  hw/ppc/spapr_cpu_core.c         | 1 +
+>  hw/smbios/smbios_type_38-stub.c | 1 +
+>  hw/vfio/ccw.c                   | 2 +-
+>  hw/virtio/vhost-vsock.c         | 2 +-
+>  7 files changed, 6 insertions(+), 3 deletions(-)
 >=20
-> diff --git a/include/hw/net/pci.h b/include/hw/net/pci.h
-> index 529591b7f3..b24b5257a5 100644
-> --- a/include/hw/net/pci.h
-> +++ b/include/hw/net/pci.h
-> @@ -13,6 +13,8 @@
->  #include "hw/pci/pci.h"
->  #include "hw/pci/pci_bus.h"
+> diff --git a/hw/acpi/ipmi-stub.c b/hw/acpi/ipmi-stub.c
+> index 98b6dcee0d..f525f71c2d 100644
+> --- a/hw/acpi/ipmi-stub.c
+> +++ b/hw/acpi/ipmi-stub.c
+> @@ -7,6 +7,7 @@
+>   * See the COPYING file in the top-level directory.
+>   */
 > =20
-> +#define TYPE_PCI_E1000      "e1000"
-> +
->  PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,
->                                 const char *default_model,
->                                 const char *default_devaddr);
-> diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-> index df6dadf13f..65947fe1bf 100644
-> --- a/hw/alpha/dp264.c
-> +++ b/hw/alpha/dp264.c
-> @@ -21,6 +21,7 @@
->  #include "hw/timer/i8254.h"
->  #include "hw/input/i8042.h"
->  #include "hw/char/serial.h"
-> +#include "hw/net/pci.h"
->  #include "qemu/cutils.h"
+> +#include "qemu/osdep.h"
+>  #include "hw/acpi/ipmi.h"
 > =20
->  #define MAX_IDE_BUS 2
-> @@ -93,7 +94,7 @@ static void clipper_init(MachineState *machine)
+>  void build_acpi_ipmi_devices(Aml *table, BusState *bus)
+> diff --git a/hw/audio/fmopl.c b/hw/audio/fmopl.c
+> index 5cfb6a96dd..9f50a89b4a 100644
+> --- a/hw/audio/fmopl.c
+> +++ b/hw/audio/fmopl.c
+> @@ -34,7 +34,6 @@
+>  #include <math.h>
+>  //#include "driver.h"		/* use M.A.M.E. */
+>  #include "fmopl.h"
+> -#include "qemu/osdep.h"
+>  #ifndef PI
+>  #define PI 3.14159265358979323846
+>  #endif
+> diff --git a/hw/cpu/core.c b/hw/cpu/core.c
+> index bd578ab80c..7e42e2c87a 100644
+> --- a/hw/cpu/core.c
+> +++ b/hw/cpu/core.c
+> @@ -6,6 +6,7 @@
+>   * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+>   * See the COPYING file in the top-level directory.
+>   */
+> +#include "qemu/osdep.h"
+>  #include "hw/cpu/core.h"
+>  #include "qapi/visitor.h"
+>  #include "qapi/error.h"
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index c08ee7571a..4a4f0c60fe 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -6,6 +6,7 @@
+>   * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+>   * See the COPYING file in the top-level directory.
+>   */
+> +#include "qemu/osdep.h"
+>  #include "hw/cpu/core.h"
+>  #include "hw/ppc/spapr_cpu_core.h"
+>  #include "target/ppc/cpu.h"
+> diff --git a/hw/smbios/smbios_type_38-stub.c b/hw/smbios/smbios_type_38-s=
+tub.c
+> index 9528c2c28e..5b83c9b1f1 100644
+> --- a/hw/smbios/smbios_type_38-stub.c
+> +++ b/hw/smbios/smbios_type_38-stub.c
+> @@ -7,6 +7,7 @@
+>   * See the COPYING file in the top-level directory.
+>   */
 > =20
->      /* Network setup.  e1000 is good enough, failing Tulip support.  */
->      for (i =3D 0; i < nb_nics; i++) {
-> -        pci_nic_init_nofail(&nd_table[i], pci_bus, "e1000", NULL);
-> +        pci_nic_init_nofail(&nd_table[i], pci_bus, TYPE_PCI_E1000, NULL);
->      }
+> +#include "qemu/osdep.h"
+>  #include "hw/smbios/ipmi.h"
 > =20
->      /* IDE disk setup.  */
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 085577e066..3cdeb148aa 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -72,6 +72,7 @@
->  #include "hw/nmi.h"
->  #include "hw/i386/intel_iommu.h"
->  #include "hw/net/ne2000-isa.h"
-> +#include "hw/net/pci.h"
+>  void smbios_build_type_38_table(void)
+> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+> index a8baadf57a..4810fa0b50 100644
+> --- a/hw/vfio/ccw.c
+> +++ b/hw/vfio/ccw.c
+> @@ -11,11 +11,11 @@
+>   * directory.
+>   */
 > =20
->  /* debug PC/ISA interrupts */
->  //#define DEBUG_IRQ
-> @@ -1606,7 +1607,7 @@ void pc_nic_init(ISABus *isa_bus, PCIBus *pci_bus)
->          if (!pci_bus || (nd->model && strcmp(nd->model, "ne2k_isa") =3D=
-=3D 0)) {
->              pc_init_ne2k_isa(isa_bus, nd);
->          } else {
-> -            pci_nic_init_nofail(nd, pci_bus, "e1000", NULL);
-> +            pci_nic_init_nofail(nd, pci_bus, TYPE_PCI_E1000, NULL);
->          }
->      }
->      rom_reset_order_override();
-> diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
-> index f92d47f28d..6387dbda9f 100644
-> --- a/hw/ppc/ppc440_bamboo.c
-> +++ b/hw/ppc/ppc440_bamboo.c
-> @@ -24,6 +24,7 @@
->  #include "elf.h"
->  #include "exec/address-spaces.h"
->  #include "hw/char/serial.h"
-> +#include "hw/net/pci.h"
->  #include "hw/ppc/ppc.h"
->  #include "ppc405.h"
->  #include "sysemu/sysemu.h"
-> @@ -248,7 +249,7 @@ static void bamboo_init(MachineState *machine)
->          for (i =3D 0; i < nb_nics; i++) {
->              /* There are no PCI NICs on the Bamboo board, but there are
->               * PCI slots, so we can pick whatever default model we want.=
- */
-> -            pci_nic_init_nofail(&nd_table[i], pcibus, "e1000", NULL);
-> +            pci_nic_init_nofail(&nd_table[i], pcibus, TYPE_PCI_E1000, NU=
-LL);
->          }
->      }
+> +#include "qemu/osdep.h"
+>  #include <linux/vfio.h>
+>  #include <linux/vfio_ccw.h>
+>  #include <sys/ioctl.h>
 > =20
+> -#include "qemu/osdep.h"
+>  #include "qapi/error.h"
+>  #include "hw/sysbus.h"
+>  #include "hw/vfio/vfio.h"
+> diff --git a/hw/virtio/vhost-vsock.c b/hw/virtio/vhost-vsock.c
+> index 49e0022533..c11c1eb83e 100644
+> --- a/hw/virtio/vhost-vsock.c
+> +++ b/hw/virtio/vhost-vsock.c
+> @@ -11,8 +11,8 @@
+>   * top-level directory.
+>   */
+> =20
+> -#include <sys/ioctl.h>
+>  #include "qemu/osdep.h"
+> +#include <sys/ioctl.h>
+>  #include "standard-headers/linux/virtio_vsock.h"
+>  #include "qapi/error.h"
+>  #include "hw/virtio/virtio-bus.h"
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -133,24 +154,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Efge0/SQAHHP+Pr2
+--HKOZ/JADkehwFk9I
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnF7YAACgkQbDjKyiDZ
-s5IswxAApbvz6DAIapNCOmaJOc+n6ZJhZAoI5t6PPw4m0cQuSiHDcwvnr4yNUsNT
-hRPgH2N1xsEIrtI9wIfmeO8F4pin//RudWy7/qcOFkPN1cKJ7ydNTYLUztWEUdh3
-Ym9JoftZ7UKoesFHr9OirfvCQZt2DDkY5DISgq19/7O6NRf8wFK7WRkdluYg1KBK
-PQ7tx+NfabkwuAsjvXX4VFE4QexEyB7B2jkS1TepkRY4zheTSQXkQDKChGq42zF9
-5ctPbfOvhXVF79GYkSEOsqpnDWjYE1bn7OInExdoC054Zlcge333ecXFUwoFShsY
-rOHi288zfza95tmvG/wyOuSr+OiGkcF5U7OqYFfOKC5uJxI6/SkQjlFwiFKJoaoR
-PNXVDS7LMbTc0sDgONnO+o8GvSSSVxYvMzZeHgMzaPbr5wsgZ9H9S5TwpJlc0gwS
-t8B4KzmiKrlZ2lOOkGzwUTP7AHsDYQCw2ok7k9jRj6PeZxD0Rk9UOlD1/gB5U9y9
-X3xusg8oml15mG+58VR0YK694VnHC1mqE0zgaOBusYKQWeu4VIqu4eMvPnGi4IlY
-4x7uxKwVSsMs7hLuKjy9Tj3heVefoXdXYPX11g/wiAY1Dfk5R5l/JJf43sYRzZv3
-cl4qORoqedWDLiO38geTDTl/wSH1FDCa/Dh4IOkQqOlVGf3MZEQ=
-=4vs3
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnF7EYACgkQbDjKyiDZ
+s5Klqg/+KXzJ/Px0WQLiAd81GJ3ZXbVbQPpv1ZfRwxzZIG3e6UfNfinpBiW3W/+F
+DnrGfTrj+N26J5EyFdTlo9GRLL0A2L0Hn8odVHiP32AsUN/dRNCeEQ0l50GVubWd
+Wow41uxIJv4oOW7ZxKlDNcKdKl9nObQKYC42Kbr+WwhZ/rpHzZXNvGU2FCe+ItFx
+tWU3ZRDTmDws55KpjZzsLLurhKSvOVsc0I72T4XuzZniE8p6g/YTbvSL+OP+W68J
+P2bMJsct/tbtDAtPzYTuvikCkSVWndfX0osa0HbDBraa0It651m/A4c3zEktfrrI
+4oJQ2ptFQKVgCsVguN9oMUNd+HCOLWlEwGEElf7sltxc3Ob6tNsGC0is8vH8gltX
+KU5BkogI6SIe9sIzn0L3nbZAwTykIXfNx2SQ6LGBQw6sM1na3+4OLz86c23aC6Jp
+fMA0tocMXEJ9bqZSEvjGUW2t8ofbcUmke+p3ofSuXC6Gii4ZwHytrtohEBOLzeqJ
+nUdW7onL+2pLjn0diqOs+tSKww+GOaR977zIttPc6heBdHUF8X/7Lk6YAkqoS3Xk
+I3XdxLDQVzB+tMiKraictYDHRDxONzBdOx/FyJPA5rG4Kk99/z8F/E06neRBKSTZ
+eQOzhUibhAz40f31dio8yQtVHl9tgFW0wWvZLuLJCtHQk8grmak=
+=Gm9o
 -----END PGP SIGNATURE-----
 
---Efge0/SQAHHP+Pr2--
+--HKOZ/JADkehwFk9I--
