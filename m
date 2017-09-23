@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dvYOb-0002C2-DT
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 20:34:14 -0400
+	(envelope-from <chen_han_xiao@126.com>) id 1dvbK7-0003Yr-7S
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 23:41:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dvYOY-0004ye-99
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 20:34:13 -0400
-Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:52038)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dvYOY-0004yM-3i
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 20:34:10 -0400
-Received: by mail-oi0-x231.google.com with SMTP id f195so688760oih.8
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 17:34:09 -0700 (PDT)
-References: <1506092407-26985-1-git-send-email-peter.maydell@linaro.org>
-	<1506092407-26985-2-git-send-email-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <eeaae730-0316-5559-be2f-76499b87ae08@linaro.org>
-Date: Fri, 22 Sep 2017 19:34:04 -0500
+	(envelope-from <chen_han_xiao@126.com>) id 1dvbK4-0004A7-4d
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 23:41:47 -0400
+Received: from m15-57.126.com ([220.181.15.57]:48578)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <chen_han_xiao@126.com>) id 1dvbK3-00046a-7F
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 23:41:44 -0400
+Date: Sat, 23 Sep 2017 11:11:13 +0800 (CST)
+From: "Chen Hanxiao" <chen_han_xiao@126.com>
+In-Reply-To: <CAM1upfMHMYvkQNfqPFZqsz2rGC+X7UZECXAffMZ6Lnz4_Tn1AQ@mail.gmail.com>
+References: <1506048366-23368-1-git-send-email-chen_han_xiao@126.com>
+	<CAM1upfMHMYvkQNfqPFZqsz2rGC+X7UZECXAffMZ6Lnz4_Tn1AQ@mail.gmail.com>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-In-Reply-To: <1506092407-26985-2-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/20] nvic: Clear the vector arrays and
- prigroup on reset
+Message-ID: <2876b52e.1e20.15eacb7b1a3.Coremail.chen_han_xiao@126.com>
+Subject: Re: [Qemu-devel] [PATCH] qga-win: don't hang if vss hold writes
+ timeout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,27 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Tomoki Sekiyama <tomoki.sekiyama@gmail.com>
+Cc: mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org
 
-On 09/22/2017 09:59 AM, Peter Maydell wrote:
-> Reset for devices does not include an automatic clear of the
-> device state (unlike CPU state, where most of the state
-> structure is cleared to zero). Add some missing initialization
-> of NVIC state that meant that the device was left in the wrong
-> state if the guest did a warm reset.
-> 
-> (In particular, since we were resetting the computed state like
-> s->exception_prio but not all the state it was computed
-> from like s->vectors[x].active, the NVIC wound up in an
-> inconsistent state that could later trigger assertion failures.)
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/intc/armv7m_nvic.c | 5 +++++
->  1 file changed, 5 insertions(+)
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
+CuWcqCAyMDE3LTA5LTIzIDA1OjEyOjIw77yMIlRvbW9raSBTZWtpeWFtYSIgPHRvbW9raS5zZWtp
+eWFtYUBnbWFpbC5jb20+IOWGmemBk++8mgrCoAo+wqAKPiBUaGFua3MgZm9yIHlvdXIgcGF0Y2gu
+Cj4gV2hpY2ggdmVyc2lvbiBvZiBXaW5kb3dzIGhhdmUgeW91IGZvdW5kIHRoZSBoYW5nPwo+wqAK
+PsKgCiAgSSB0ZXN0ZWQgb24gd2luMDgsIHdpbiAwOCByMiBhbmQgd2luMjAxMi4KClFHQSB2ZXJz
+aW9uczoKCiAgVXNlIHRoZSBsYXRlc3QgcWdhLXdpbiBmcm9tIAogIGh0dHBzOi8vZmVkb3JhcGVv
+cGxlLm9yZy9ncm91cHMvdmlydC92aXJ0aW8td2luL2RpcmVjdC1kb3dubG9hZHMvYXJjaGl2ZS1x
+ZW11LWdhL3FlbXUtZ2Etd2luLTcuNC41LTEvCiAKICBhbmQgc3RhYmxlIGJyYW5jaCBmcm9tCiAg
+aHR0cHM6Ly9mZWRvcmFwZW9wbGUub3JnL2dyb3Vwcy92aXJ0L3ZpcnRpby13aW4vZGlyZWN0LWRv
+d25sb2Fkcy9hcmNoaXZlLXZpcnRpby92aXJ0aW8td2luLTAuMS4xMjYtMi92aXJ0aW8td2luLTAu
+MS4xMjYuaXNvCgogIEFsbCBvZiB0aGVtIGhhdmUgdGhlIHNhbWUgYmVoYXZpb3IuCgpIb3cgdG8g
+cmVwcm9kdWNlOgoKICBDb3B5IGEgYmlnIGZpbGUgaW4gZ3Vlc3QgKGZyb20gZDogdG8gYzopLCB0
+aGVuIGRvIGZzZnJlZXplIHdoZW4gSU8gaXMgaW4gcHJvZ3Jlc3MuCgogIEF0IHRoaXMgdGltZSwg
+d2UgaGFkIGEgdmVyeSBjaGFuY2UgdG8gc2VlIHRoYXQgcWdhIGhhbmcgZm9yIGEgbG9uZyB0aW1l
+LgoKICBMaWJ2aXJ0IHdpbGwgbm90IHJlY2lldmUgYSByZXBseS4KICBxZW11LWdhIHNlcnZpY2Ug
+ZXZlbiBkb24ndCBhbnN3ZXIgYG5ldCBzdG9wYCBjb21tYW5kLgoKClJlZ2FyZHMsCi0gQ2hlbgog
+CiAgCgo+IFJlZ2FyZHMsCj4gVG9tb2tpCj7CoAo+wqAKPiAyMDE3LTA5LTIyIDExOjQ2IEdNVCsw
+OTowMCBDaGVuIEhhbnhpYW8gPGNoZW5faGFuX3hpYW9AMTI2LmNvbT46Cj7CoAo+IEZyb206IENo
+ZW4gSGFueGlhbyA8Y2hlbmhhbnhpYW9AZ21haWwuY29tPgo+wqAKPsKgCj7CoAo+IFdoZW4gVk0g
+aXMgaW4gYSBoZWF2eSBJTywgaWYgdGhlIGNvbW1hbmQgImd1ZXN0LWZzZnJlZXplLWZyZWV6ZSIK
+PsKgCj4gaXMgZXhlY3V0ZWQsIFZTUyBtYXkgdGltZW91dCB3aGVuIHRyeWluZyB0byBob2xkIHdy
+aXRlcy4KPsKgCj7CoAo+wqAKPiBJbnNpZGUgZ3Vlc3QsIEV2ZW50IElEIDEyMjk4KFZTU19FUlJP
+Ul9IT0xEX1dSSVRFU19USU1FT1VUKQo+wqAKPiBpcyBsb2dnZWQgaW4gdGhlIEV2ZW50IFZpZXdl
+ci4KPsKgCj7CoAo+wqAKPiBBdCB0aGF0IHRpbWUsIGlmIHdlIGNhbGwgQWJvcnRCYWNrdXAsIHFn
+YSBtYXkgaGFuZyBmb3JldmVyLgo+wqAKPsKgCj7CoAo+IFRoaXMgcGF0Y2ggd2lsbCBzb2x2ZSB0
+aGlzIGlzc3Vlcy4KPsKgCj7CoAo+wqAKPiBTaWduZWQtb2ZmLWJ5OiBDaGVuIEhhbnhpYW8gPGNo
+ZW5oYW54aWFvQGdtYWlsLmNvbT4KPsKgCj4gLS0tCj7CoAo+IMKgcWdhL3Zzcy13aW4zMi9yZXF1
+ZXN0ZXIuY3BwIHwgMTIgKysrKysrKysrKysrCj7CoAo+IMKgMSBmaWxlIGNoYW5nZWQsIDEyIGlu
+c2VydGlvbnMoKykKPsKgCj7CoAo+wqAKPiBkaWZmIC0tZ2l0IGEvcWdhL3Zzcy13aW4zMi9yZXF1
+ZXN0ZXIuY3BwIGIvcWdhL3Zzcy13aW4zMi9yZXF1ZXN0ZXIuY3BwCj7CoAo+IGluZGV4IDMwMTc2
+MmQuLjNkOWM5NzEgMTAwNjQ0Cj7CoAo+IC0tLSBhL3FnYS92c3Mtd2luMzIvcmVxdWVzdGVyLmNw
+cAo+wqAKPiArKysgYi9xZ2EvdnNzLXdpbjMyL3JlcXVlc3Rlci5jcHAKPsKgCj4gQEAgLTQxOSw2
+ICs0MTksMTYgQEAgdm9pZCByZXF1ZXN0ZXJfZnJlZXplKGludCAqbnVtX3ZvbHMsIEVycm9yU2V0
+ICplcnJzZXQpCj7CoAo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgYnJlYWs7Cj7CoAo+IMKgIMKgIMKg
+IMKgIMKgfQo+wqAKPiDCoCDCoCDCoH0KPsKgCj4gKwo+wqAKPiArIMKgIMKgaWYgKHdhaXRfc3Rh
+dHVzID09IFdBSVRfVElNRU9VVCkgewo+wqAKPiArIMKgIMKgIMKgIMKgZXJyX3NldChlcnJzZXQs
+IEVfRkFJTCwKPsKgCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCJ0aW1lb3V0IHdoZW4gdHJ5
+IHRvIHJlY2VpdmUgRnJvemVuIGV2ZW50IGZyb20gVlNTIHByb3ZpZGVyIik7Cj7CoAo+ICsgwqAg
+wqAgwqAgwqAvKiBJZiB3ZSBhcmUgaGVyZSwgVlNTIGhhZCB0aW1lb3V0Lgo+wqAKPiArIMKgIMKg
+IMKgIMKgICogRG9uJ3QgY2FsbCBBYm9ydEJhY2t1cCwganVzdCByZXR1cm4gZGlyZWN0bHkuCj7C
+oAo+ICsgwqAgwqAgwqAgwqAgKi8KPsKgCj4gKyDCoCDCoCDCoCDCoGdvdG8gb3V0MTsKPsKgCj4g
+KyDCoCDCoH0KPsKgCj4gKwo+wqAKPiDCoCDCoCDCoGlmICh3YWl0X3N0YXR1cyAhPSBXQUlUX09C
+SkVDVF8wKSB7Cj7CoAo+IMKgIMKgIMKgIMKgIMKgZXJyX3NldChlcnJzZXQsIEVfRkFJTCwKPsKg
+Cj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAiY291bGRuJ3QgcmVjZWl2ZSBGcm96ZW4gZXZl
+bnQgZnJvbSBWU1MgcHJvdmlkZXIiKTsKPsKgCj4gQEAgLTQzMiw2ICs0NDIsOCBAQCBvdXQ6Cj7C
+oAo+IMKgIMKgIMKgaWYgKHZzc19jdHgucFZzc2JjKSB7Cj7CoAo+IMKgIMKgIMKgIMKgIMKgdnNz
+X2N0eC5wVnNzYmMtPkFib3J0QmFja3VwKCk7Cj7CoAo+IMKgIMKgIMKgfQo+wqAKPiArCj7CoAo+
+ICtvdXQxOgo+wqAKPiDCoCDCoCDCoHJlcXVlc3Rlcl9jbGVhbnVwKCk7Cj7CoAo+IMKgIMKgIMKg
+Q29VbmluaXRpYWxpemUoKTsKPsKgCj4gwqB9CgoKCgoKCgoKCgoKCgoKCgoKCgo=
