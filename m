@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen_han_xiao@126.com>) id 1dvbK7-0003Yr-7S
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 23:41:48 -0400
+	(envelope-from <tomoki.sekiyama@gmail.com>) id 1dvcxH-00065u-LZ
+	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 01:26:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen_han_xiao@126.com>) id 1dvbK4-0004A7-4d
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 23:41:47 -0400
-Received: from m15-57.126.com ([220.181.15.57]:48578)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen_han_xiao@126.com>) id 1dvbK3-00046a-7F
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 23:41:44 -0400
-Date: Sat, 23 Sep 2017 11:11:13 +0800 (CST)
-From: "Chen Hanxiao" <chen_han_xiao@126.com>
-In-Reply-To: <CAM1upfMHMYvkQNfqPFZqsz2rGC+X7UZECXAffMZ6Lnz4_Tn1AQ@mail.gmail.com>
+	(envelope-from <tomoki.sekiyama@gmail.com>) id 1dvcxG-0001M2-0r
+	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 01:26:19 -0400
+Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:48881)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tomoki.sekiyama@gmail.com>)
+	id 1dvcxF-0001Lv-Pi
+	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 01:26:17 -0400
+Received: by mail-oi0-x22b.google.com with SMTP id v188so1094162oia.5
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 22:26:17 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <2876b52e.1e20.15eacb7b1a3.Coremail.chen_han_xiao@126.com>
 References: <1506048366-23368-1-git-send-email-chen_han_xiao@126.com>
 	<CAM1upfMHMYvkQNfqPFZqsz2rGC+X7UZECXAffMZ6Lnz4_Tn1AQ@mail.gmail.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
-MIME-Version: 1.0
-Message-ID: <2876b52e.1e20.15eacb7b1a3.Coremail.chen_han_xiao@126.com>
+	<2876b52e.1e20.15eacb7b1a3.Coremail.chen_han_xiao@126.com>
+From: Tomoki Sekiyama <tomoki.sekiyama@gmail.com>
+Date: Sat, 23 Sep 2017 14:26:16 +0900
+Message-ID: <CAM1upfMr7dMLM3M1_xiPgxLr1RcjNgOrySxka=nEDKSgXG6C3Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH] qga-win: don't hang if vss hold writes
  timeout
 List-Id: <qemu-devel.nongnu.org>
@@ -28,54 +32,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tomoki Sekiyama <tomoki.sekiyama@gmail.com>
-Cc: mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org
+To: Chen Hanxiao <chen_han_xiao@126.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-CuWcqCAyMDE3LTA5LTIzIDA1OjEyOjIw77yMIlRvbW9raSBTZWtpeWFtYSIgPHRvbW9raS5zZWtp
-eWFtYUBnbWFpbC5jb20+IOWGmemBk++8mgrCoAo+wqAKPiBUaGFua3MgZm9yIHlvdXIgcGF0Y2gu
-Cj4gV2hpY2ggdmVyc2lvbiBvZiBXaW5kb3dzIGhhdmUgeW91IGZvdW5kIHRoZSBoYW5nPwo+wqAK
-PsKgCiAgSSB0ZXN0ZWQgb24gd2luMDgsIHdpbiAwOCByMiBhbmQgd2luMjAxMi4KClFHQSB2ZXJz
-aW9uczoKCiAgVXNlIHRoZSBsYXRlc3QgcWdhLXdpbiBmcm9tIAogIGh0dHBzOi8vZmVkb3JhcGVv
-cGxlLm9yZy9ncm91cHMvdmlydC92aXJ0aW8td2luL2RpcmVjdC1kb3dubG9hZHMvYXJjaGl2ZS1x
-ZW11LWdhL3FlbXUtZ2Etd2luLTcuNC41LTEvCiAKICBhbmQgc3RhYmxlIGJyYW5jaCBmcm9tCiAg
-aHR0cHM6Ly9mZWRvcmFwZW9wbGUub3JnL2dyb3Vwcy92aXJ0L3ZpcnRpby13aW4vZGlyZWN0LWRv
-d25sb2Fkcy9hcmNoaXZlLXZpcnRpby92aXJ0aW8td2luLTAuMS4xMjYtMi92aXJ0aW8td2luLTAu
-MS4xMjYuaXNvCgogIEFsbCBvZiB0aGVtIGhhdmUgdGhlIHNhbWUgYmVoYXZpb3IuCgpIb3cgdG8g
-cmVwcm9kdWNlOgoKICBDb3B5IGEgYmlnIGZpbGUgaW4gZ3Vlc3QgKGZyb20gZDogdG8gYzopLCB0
-aGVuIGRvIGZzZnJlZXplIHdoZW4gSU8gaXMgaW4gcHJvZ3Jlc3MuCgogIEF0IHRoaXMgdGltZSwg
-d2UgaGFkIGEgdmVyeSBjaGFuY2UgdG8gc2VlIHRoYXQgcWdhIGhhbmcgZm9yIGEgbG9uZyB0aW1l
-LgoKICBMaWJ2aXJ0IHdpbGwgbm90IHJlY2lldmUgYSByZXBseS4KICBxZW11LWdhIHNlcnZpY2Ug
-ZXZlbiBkb24ndCBhbnN3ZXIgYG5ldCBzdG9wYCBjb21tYW5kLgoKClJlZ2FyZHMsCi0gQ2hlbgog
-CiAgCgo+IFJlZ2FyZHMsCj4gVG9tb2tpCj7CoAo+wqAKPiAyMDE3LTA5LTIyIDExOjQ2IEdNVCsw
-OTowMCBDaGVuIEhhbnhpYW8gPGNoZW5faGFuX3hpYW9AMTI2LmNvbT46Cj7CoAo+IEZyb206IENo
-ZW4gSGFueGlhbyA8Y2hlbmhhbnhpYW9AZ21haWwuY29tPgo+wqAKPsKgCj7CoAo+IFdoZW4gVk0g
-aXMgaW4gYSBoZWF2eSBJTywgaWYgdGhlIGNvbW1hbmQgImd1ZXN0LWZzZnJlZXplLWZyZWV6ZSIK
-PsKgCj4gaXMgZXhlY3V0ZWQsIFZTUyBtYXkgdGltZW91dCB3aGVuIHRyeWluZyB0byBob2xkIHdy
-aXRlcy4KPsKgCj7CoAo+wqAKPiBJbnNpZGUgZ3Vlc3QsIEV2ZW50IElEIDEyMjk4KFZTU19FUlJP
-Ul9IT0xEX1dSSVRFU19USU1FT1VUKQo+wqAKPiBpcyBsb2dnZWQgaW4gdGhlIEV2ZW50IFZpZXdl
-ci4KPsKgCj7CoAo+wqAKPiBBdCB0aGF0IHRpbWUsIGlmIHdlIGNhbGwgQWJvcnRCYWNrdXAsIHFn
-YSBtYXkgaGFuZyBmb3JldmVyLgo+wqAKPsKgCj7CoAo+IFRoaXMgcGF0Y2ggd2lsbCBzb2x2ZSB0
-aGlzIGlzc3Vlcy4KPsKgCj7CoAo+wqAKPiBTaWduZWQtb2ZmLWJ5OiBDaGVuIEhhbnhpYW8gPGNo
-ZW5oYW54aWFvQGdtYWlsLmNvbT4KPsKgCj4gLS0tCj7CoAo+IMKgcWdhL3Zzcy13aW4zMi9yZXF1
-ZXN0ZXIuY3BwIHwgMTIgKysrKysrKysrKysrCj7CoAo+IMKgMSBmaWxlIGNoYW5nZWQsIDEyIGlu
-c2VydGlvbnMoKykKPsKgCj7CoAo+wqAKPiBkaWZmIC0tZ2l0IGEvcWdhL3Zzcy13aW4zMi9yZXF1
-ZXN0ZXIuY3BwIGIvcWdhL3Zzcy13aW4zMi9yZXF1ZXN0ZXIuY3BwCj7CoAo+IGluZGV4IDMwMTc2
-MmQuLjNkOWM5NzEgMTAwNjQ0Cj7CoAo+IC0tLSBhL3FnYS92c3Mtd2luMzIvcmVxdWVzdGVyLmNw
-cAo+wqAKPiArKysgYi9xZ2EvdnNzLXdpbjMyL3JlcXVlc3Rlci5jcHAKPsKgCj4gQEAgLTQxOSw2
-ICs0MTksMTYgQEAgdm9pZCByZXF1ZXN0ZXJfZnJlZXplKGludCAqbnVtX3ZvbHMsIEVycm9yU2V0
-ICplcnJzZXQpCj7CoAo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgYnJlYWs7Cj7CoAo+IMKgIMKgIMKg
-IMKgIMKgfQo+wqAKPiDCoCDCoCDCoH0KPsKgCj4gKwo+wqAKPiArIMKgIMKgaWYgKHdhaXRfc3Rh
-dHVzID09IFdBSVRfVElNRU9VVCkgewo+wqAKPiArIMKgIMKgIMKgIMKgZXJyX3NldChlcnJzZXQs
-IEVfRkFJTCwKPsKgCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCJ0aW1lb3V0IHdoZW4gdHJ5
-IHRvIHJlY2VpdmUgRnJvemVuIGV2ZW50IGZyb20gVlNTIHByb3ZpZGVyIik7Cj7CoAo+ICsgwqAg
-wqAgwqAgwqAvKiBJZiB3ZSBhcmUgaGVyZSwgVlNTIGhhZCB0aW1lb3V0Lgo+wqAKPiArIMKgIMKg
-IMKgIMKgICogRG9uJ3QgY2FsbCBBYm9ydEJhY2t1cCwganVzdCByZXR1cm4gZGlyZWN0bHkuCj7C
-oAo+ICsgwqAgwqAgwqAgwqAgKi8KPsKgCj4gKyDCoCDCoCDCoCDCoGdvdG8gb3V0MTsKPsKgCj4g
-KyDCoCDCoH0KPsKgCj4gKwo+wqAKPiDCoCDCoCDCoGlmICh3YWl0X3N0YXR1cyAhPSBXQUlUX09C
-SkVDVF8wKSB7Cj7CoAo+IMKgIMKgIMKgIMKgIMKgZXJyX3NldChlcnJzZXQsIEVfRkFJTCwKPsKg
-Cj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAiY291bGRuJ3QgcmVjZWl2ZSBGcm96ZW4gZXZl
-bnQgZnJvbSBWU1MgcHJvdmlkZXIiKTsKPsKgCj4gQEAgLTQzMiw2ICs0NDIsOCBAQCBvdXQ6Cj7C
-oAo+IMKgIMKgIMKgaWYgKHZzc19jdHgucFZzc2JjKSB7Cj7CoAo+IMKgIMKgIMKgIMKgIMKgdnNz
-X2N0eC5wVnNzYmMtPkFib3J0QmFja3VwKCk7Cj7CoAo+IMKgIMKgIMKgfQo+wqAKPiArCj7CoAo+
-ICtvdXQxOgo+wqAKPiDCoCDCoCDCoHJlcXVlc3Rlcl9jbGVhbnVwKCk7Cj7CoAo+IMKgIMKgIMKg
-Q29VbmluaXRpYWxpemUoKTsKPsKgCj4gwqB9CgoKCgoKCgoKCgoKCgoKCgoKCgo=
+2017-09-23 12:11 GMT+09:00 Chen Hanxiao <chen_han_xiao@126.com>:
+
+>
+> =E5=9C=A8 2017-09-23 05:12:20=EF=BC=8C"Tomoki Sekiyama" <tomoki.sekiyama@=
+gmail.com> =E5=86=99=E9=81=93=EF=BC=9A
+>
+> >
+> > Thanks for your patch.
+> > Which version of Windows have you found the hang?
+> >
+> >
+>   I tested on win08, win 08 r2 and win2012.
+>
+
+Thank you for the info.
+
+The patch looks good to me.
+
+Regards,
+Tomoki
+
+
+> QGA versions:
+>
+>   Use the latest qga-win from
+>   https://fedorapeople.org/groups/virt/virtio-win/direct-
+> downloads/archive-qemu-ga/qemu-ga-win-7.4.5-1/
+>
+>   and stable branch from
+>   https://fedorapeople.org/groups/virt/virtio-win/direct-
+> downloads/archive-virtio/virtio-win-0.1.126-2/virtio-win-0.1.126.iso
+>
+>   All of them have the same behavior.
+>
+> How to reproduce:
+>
+>   Copy a big file in guest (from d: to c:), then do fsfreeze when IO is i=
+n
+> progress.
+>
+>   At this time, we had a very chance to see that qga hang for a long time=
+.
+>
+>   Libvirt will not recieve a reply.
+>   qemu-ga service even don't answer `net stop` command.
+>
+>
+> Regards,
+> - Chen
+>
+>
+>
+> > Regards,
+> > Tomoki
+> >
+> >
+> > 2017-09-22 11:46 GMT+09:00 Chen Hanxiao <chen_han_xiao@126.com>:
+> >
+> > From: Chen Hanxiao <chenhanxiao@gmail.com>
+> >
+> >
+> >
+> > When VM is in a heavy IO, if the command "guest-fsfreeze-freeze"
+> >
+> > is executed, VSS may timeout when trying to hold writes.
+> >
+> >
+> >
+> > Inside guest, Event ID 12298(VSS_ERROR_HOLD_WRITES_TIMEOUT)
+> >
+> > is logged in the Event Viewer.
+> >
+> >
+> >
+> > At that time, if we call AbortBackup, qga may hang forever.
+> >
+> >
+> >
+> > This patch will solve this issues.
+> >
+> >
+> >
+> > Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
+> >
+> > ---
+> >
+> >  qga/vss-win32/requester.cpp | 12 ++++++++++++
+> >
+> >  1 file changed, 12 insertions(+)
+> >
+> >
+> >
+> > diff --git a/qga/vss-win32/requester.cpp b/qga/vss-win32/requester.cpp
+> >
+> > index 301762d..3d9c971 100644
+> >
+> > --- a/qga/vss-win32/requester.cpp
+> >
+> > +++ b/qga/vss-win32/requester.cpp
+> >
+> > @@ -419,6 +419,16 @@ void requester_freeze(int *num_vols, ErrorSet
+> *errset)
+> >
+> >              break;
+> >
+> >          }
+> >
+> >      }
+> >
+> > +
+> >
+> > +    if (wait_status =3D=3D WAIT_TIMEOUT) {
+> >
+> > +        err_set(errset, E_FAIL,
+> >
+> > +                "timeout when try to receive Frozen event from VSS
+> provider");
+> >
+> > +        /* If we are here, VSS had timeout.
+> >
+> > +         * Don't call AbortBackup, just return directly.
+> >
+> > +         */
+> >
+> > +        goto out1;
+> >
+> > +    }
+> >
+> > +
+> >
+> >      if (wait_status !=3D WAIT_OBJECT_0) {
+> >
+> >          err_set(errset, E_FAIL,
+> >
+> >                  "couldn't receive Frozen event from VSS provider");
+> >
+> > @@ -432,6 +442,8 @@ out:
+> >
+> >      if (vss_ctx.pVssbc) {
+> >
+> >          vss_ctx.pVssbc->AbortBackup();
+> >
+> >      }
+> >
+> > +
+> >
+> > +out1:
+> >
+> >      requester_cleanup();
+> >
+> >      CoUninitialize();
+> >
+> >  }
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
