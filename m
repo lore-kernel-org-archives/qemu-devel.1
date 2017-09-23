@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dvmw3-0005JV-1U
-	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 12:05:44 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1dvnNB-00030w-02
+	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 12:33:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dvmvz-0003MA-OE
-	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 12:05:42 -0400
-Received: from isrv.corpit.ru ([86.62.121.231]:45613)
+	(envelope-from <mjt@tls.msk.ru>) id 1dvnN6-0007gB-3N
+	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 12:33:44 -0400
+Received: from isrv.corpit.ru ([86.62.121.231]:51323)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dvmvz-0003HV-Gh
-	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 12:05:39 -0400
-References: <alpine.DEB.2.10.1706271456310.24648@sstabellini-ThinkPad-X260>
-	<1498601083-11799-1-git-send-email-sstabellini@kernel.org>
+	(envelope-from <mjt@tls.msk.ru>) id 1dvnN5-0007f2-RW
+	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 12:33:40 -0400
 From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <8717f8c6-69e4-558e-64d2-f4361cd98594@msgid.tls.msk.ru>
-Date: Sat, 23 Sep 2017 19:05:28 +0300
-MIME-Version: 1.0
-In-Reply-To: <1498601083-11799-1-git-send-email-sstabellini@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] xen/disk: don't leak stack data via response ring
+Date: Sat, 23 Sep 2017 19:33:34 +0300
+Message-Id: <20170923163334.9997-1-mjt@msgid.tls.msk.ru>
+Subject: [Qemu-devel] [PATCH] remove trailing whitespace from qemu-options.hx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +21,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>, stefanha@gmail.com
-Cc: stefanha@redhat.com, qemu-devel@nongnu.org, Jan Beulich <jbeulich@suse.com>, anthony.perard@citrix.com, xen-devel@lists.xenproject.org
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.orh, Michael Tokarev <mjt@tls.msk.ru>
 
-28.06.2017 01:04, Stefano Stabellini wrote:
-> Rather than constructing a local structure instance on the stack, fill
-> the fields directly on the shared ring, just like other (Linux)
-> backends do. Build on the fact that all response structure flavors are
-> actually identical (aside from alignment and padding at the end).
-> 
-> This is XSA-216.
-> 
-> Reported by: Anthony Perard <anthony.perard@citrix.com>
-> Signed-off-by: Jan Beulich <jbeulich@suse.com>
-> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
-> Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+Remove trailing whitespace in qemu-options documentation, as it causes
+reproducibility issues depending on the echo implementation used by
+the Makefile.
 
-Reportedly, after this patch, HVM DomUs running with qemu-system-i386
-(note i386, not x86_64), are leaking memory and host is running out of
-memory rather fast.  See for example https://bugs.debian.org/871702
+Reported-By: Vagrant Cascadian <vagrant@debian.org>
+Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
+---
+ qemu-options.hx | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-I've asked for details, let's see...
-
-For one, I've no idea how xen hvm works, and whenever -i386 version
-can be choosen in config or how.
-
-Thanks,
-
-/mjt
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 77859a248c..39225ae6c3 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -284,8 +284,8 @@ Set default value of @var{driver}'s property @var{prop} to @var{value}, e.g.:
+ qemu-system-i386 -global ide-hd.physical_block_size=4096 disk-image.img
+ @end example
+ 
+-In particular, you can use this to set driver properties for devices which are 
+-created automatically by the machine model. To create a device which is not 
++In particular, you can use this to set driver properties for devices which are
++created automatically by the machine model. To create a device which is not
+ created automatically and set properties on it, use -@option{device}.
+ 
+ -global @var{driver}.@var{prop}=@var{value} is shorthand for -global
+-- 
+2.11.0
