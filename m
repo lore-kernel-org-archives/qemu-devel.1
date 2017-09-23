@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dvloy-0003ur-3b
-	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 10:54:21 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1dvmw3-0005JV-1U
+	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 12:05:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dvlox-0008Kb-BX
-	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 10:54:20 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:51398)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dvlox-0008Jk-4O
-	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 10:54:19 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id z39so2629826wrb.8
-	for <qemu-devel@nongnu.org>; Sat, 23 Sep 2017 07:54:17 -0700 (PDT)
+	(envelope-from <mjt@tls.msk.ru>) id 1dvmvz-0003MA-OE
+	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 12:05:42 -0400
+Received: from isrv.corpit.ru ([86.62.121.231]:45613)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <mjt@tls.msk.ru>) id 1dvmvz-0003HV-Gh
+	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 12:05:39 -0400
+References: <alpine.DEB.2.10.1706271456310.24648@sstabellini-ThinkPad-X260>
+	<1498601083-11799-1-git-send-email-sstabellini@kernel.org>
+From: Michael Tokarev <mjt@tls.msk.ru>
+Message-ID: <8717f8c6-69e4-558e-64d2-f4361cd98594@msgid.tls.msk.ru>
+Date: Sat, 23 Sep 2017 19:05:28 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170922190853.1911-1-pbonzini@redhat.com>
-References: <20170922190853.1911-1-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 23 Sep 2017 15:53:56 +0100
-Message-ID: <CAFEAcA-dxO91e9E-P8EpO81ev+Fs=N-zMOYpx_faZ2SJ1DATmw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v3 00/32] Misc patches for 2017-09-22
+In-Reply-To: <1498601083-11799-1-git-send-email-sstabellini@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] xen/disk: don't leak stack data via response ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Stefano Stabellini <sstabellini@kernel.org>, stefanha@gmail.com
+Cc: stefanha@redhat.com, qemu-devel@nongnu.org, Jan Beulich <jbeulich@suse.com>, anthony.perard@citrix.com, xen-devel@lists.xenproject.org
 
-On 22 September 2017 at 20:08, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> The following changes since commit b62b7ed0fc9c58e373b8946c9bd2e193be98dae6:
->
->   Merge remote-tracking branch 'remotes/gkurz/tags/for-upstream' into staging (2017-09-20 20:33:48 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to bb86d05f4afab3ebfee2e897e295d61dbd8cc28e:
->
->   chardev: remove context in chr_update_read_handler (2017-09-22 21:07:27 +0200)
->
-> ----------------------------------------------------------------
-> * Speed up AddressSpaceDispatch creation (Alexey)
-> * Fix kvm.c assert (David)
-> * Memory fixes and further speedup (me)
-> * Persistent reservation manager infrastructure (me)
-> * virtio-serial: add enable_backend callback (Pavel)
-> * chardev GMainContext fixes (Peter)
->
+28.06.2017 01:04, Stefano Stabellini wrote:
+> Rather than constructing a local structure instance on the stack, fill
+> the fields directly on the shared ring, just like other (Linux)
+> backends do. Build on the fact that all response structure flavors are
+> actually identical (aside from alignment and padding at the end).
+> 
+> This is XSA-216.
+> 
+> Reported by: Anthony Perard <anthony.perard@citrix.com>
+> Signed-off-by: Jan Beulich <jbeulich@suse.com>
+> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+> Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 
-Applied, thanks.
+Reportedly, after this patch, HVM DomUs running with qemu-system-i386
+(note i386, not x86_64), are leaking memory and host is running out of
+memory rather fast.  See for example https://bugs.debian.org/871702
 
--- PMM
+I've asked for details, let's see...
+
+For one, I've no idea how xen hvm works, and whenever -i386 version
+can be choosen in config or how.
+
+Thanks,
+
+/mjt
