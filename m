@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dwBKp-0004Z3-7q
-	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 14:08:56 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dwBqL-00076r-HF
+	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 14:41:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dwBKn-00058e-Ep
-	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 14:08:55 -0400
-Received: from hera.aquilenet.fr ([141.255.128.1]:49421)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1dwBKn-00058A-7y
-	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 14:08:53 -0400
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Sun, 24 Sep 2017 20:08:48 +0200
-Message-Id: <20170924180848.19168-4-samuel.thibault@ens-lyon.org>
+	(envelope-from <no-reply@patchew.org>) id 1dwBqH-0002VP-2g
+	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 14:41:29 -0400
+Resent-Message-Id: <E1dwBqH-0002VP-2g@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21475)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dwBqG-0002SI-Rr
+	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 14:41:24 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150627750088.33.14395991167470436189@b58463cdfd5f>
 In-Reply-To: <20170924180848.19168-1-samuel.thibault@ens-lyon.org>
-References: <20170924180848.19168-1-samuel.thibault@ens-lyon.org>
-Subject: [Qemu-devel] [PULL 3/3] slirp: Add a special case for the NULL
- socket
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 24 Sep 2017 11:25:01 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 0/3] slirp updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Cernekee <cernekee@chromium.org>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: samuel.thibault@ens-lyon.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, jan.kiszka@siemens.com
 
-From: Kevin Cernekee <cernekee@chromium.org>
-
-NULL sockets are used for NDP, BOOTP, and other critical operations.
-If the topmost mbuf in a NULL session is blocked pending resolution,
-it may cause problems if it blocks other packets with a NULL socket.
-So do not add mbufs with a NULL socket field to the same session.
-
-Signed-off-by: Kevin Cernekee <cernekee@chromium.org>
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
----
- slirp/if.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
-
-diff --git a/slirp/if.c b/slirp/if.c
-index 6262d77495..590753c658 100644
---- a/slirp/if.c
-+++ b/slirp/if.c
-@@ -73,14 +73,16 @@ if_output(struct socket *so, struct mbuf *ifm)
- 	 * We mustn't put this packet back on the fastq (or we'll send it out of order)
- 	 * XXX add cache here?
- 	 */
--	for (ifq = (struct mbuf *) slirp->if_batchq.qh_rlink;
--	     (struct quehead *) ifq != &slirp->if_batchq;
--	     ifq = ifq->ifq_prev) {
--		if (so == ifq->ifq_so) {
--			/* A match! */
--			ifm->ifq_so = so;
--			ifs_insque(ifm, ifq->ifs_prev);
--			goto diddit;
-+	if (so) {
-+		for (ifq = (struct mbuf *) slirp->if_batchq.qh_rlink;
-+		     (struct quehead *) ifq != &slirp->if_batchq;
-+		     ifq = ifq->ifq_prev) {
-+			if (so == ifq->ifq_so) {
-+				/* A match! */
-+				ifm->ifq_so = so;
-+				ifs_insque(ifm, ifq->ifs_prev);
-+				goto diddit;
-+			}
- 		}
- 	}
- 
--- 
-2.14.1
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcwOTI0MTgwODQ4LjE5MTY4LTEtc2FtdWVsLnRoaWJhdWx0QGVucy1seW9u
+Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMC8zXSBzbGlycCB1cGRhdGVzCgo9PT0g
+VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQo
+Z2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
+IFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLiki
+CmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFs
+OiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRj
+IC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0
+aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpk
+b25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
+NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJh
+bmNoICd0ZXN0JwozYjg1NjBjZjcxIHNsaXJwOiBBZGQgYSBzcGVjaWFsIGNhc2UgZm9yIHRoZSBO
+VUxMIHNvY2tldAo5MWE1YzFjN2M0IHNsaXJwOiBGaXggaW50ZXJtaXR0ZW50IHNlbmQgcXVldWUg
+aGFuZ3Mgb24gYSBzb2NrZXQKMTZkNTQxNjIxNSBzbGlycDogQWRkIGV4cGxhbmF0aW9uIGZvciBo
+b3N0ZndkIHBhcnNpbmcgZmFpbHVyZQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFU
+Q0ggMS8zOiBzbGlycDogQWRkIGV4cGxhbmF0aW9uIGZvciBob3N0ZndkIHBhcnNpbmcgZmFpbHVy
+ZS4uLgpDaGVja2luZyBQQVRDSCAyLzM6IHNsaXJwOiBGaXggaW50ZXJtaXR0ZW50IHNlbmQgcXVl
+dWUgaGFuZ3Mgb24gYSBzb2NrZXQuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8zOiBzbGlycDogQWRkIGEg
+c3BlY2lhbCBjYXNlIGZvciB0aGUgTlVMTCBzb2NrZXQuLi4KRVJST1I6IGNvZGUgaW5kZW50IHNo
+b3VsZCBuZXZlciB1c2UgdGFicwojMzE6IEZJTEU6IHNsaXJwL2lmLmM6NzY6CiteSWlmIChzbykg
+eyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzMyOiBGSUxFOiBz
+bGlycC9pZi5jOjc3OgorXkleSWZvciAoaWZxID0gKHN0cnVjdCBtYnVmICopIHNsaXJwLT5pZl9i
+YXRjaHEucWhfcmxpbms7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
+cwojMzM6IEZJTEU6IHNsaXJwL2lmLmM6Nzg6CiteSV5JICAgICAoc3RydWN0IHF1ZWhlYWQgKikg
+aWZxICE9ICZzbGlycC0+aWZfYmF0Y2hxOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2
+ZXIgdXNlIHRhYnMKIzM0OiBGSUxFOiBzbGlycC9pZi5jOjc5OgorXkleSSAgICAgaWZxID0gaWZx
+LT5pZnFfcHJldikgeyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
+IzM1OiBGSUxFOiBzbGlycC9pZi5jOjgwOgorXkleSV5JaWYgKHNvID09IGlmcS0+aWZxX3NvKSB7
+JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzY6IEZJTEU6IHNs
+aXJwL2lmLmM6ODE6CiteSV5JXkleSS8qIEEgbWF0Y2ghICovJAoKRVJST1I6IGNvZGUgaW5kZW50
+IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzc6IEZJTEU6IHNsaXJwL2lmLmM6ODI6CiteSV5JXkle
+SWlmbS0+aWZxX3NvID0gc287JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2Ug
+dGFicwojMzg6IEZJTEU6IHNsaXJwL2lmLmM6ODM6CiteSV5JXkleSWlmc19pbnNxdWUoaWZtLCBp
+ZnEtPmlmc19wcmV2KTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJz
+CiMzOTogRklMRTogc2xpcnAvaWYuYzo4NDoKK15JXkleSV5JZ290byBkaWRkaXQ7JAoKRVJST1I6
+IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDA6IEZJTEU6IHNsaXJwL2lmLmM6
+ODU6CiteSV5JXkl9JAoKdG90YWw6IDEwIGVycm9ycywgMCB3YXJuaW5ncywgMjQgbGluZXMgY2hl
+Y2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBF
+TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5l
+cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxl
+YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
