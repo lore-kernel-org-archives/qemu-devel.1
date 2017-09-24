@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dw33H-0008Vy-5d
-	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 05:18:16 -0400
+	(envelope-from <ldoktor@redhat.com>) id 1dw4v3-0006gU-Dt
+	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 07:17:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dw33E-00031G-2G
-	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 05:18:15 -0400
-Received: from isrv.corpit.ru ([86.62.121.231]:36389)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dw33D-0002z4-PY
-	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 05:18:11 -0400
-From: Michael Tokarev <mjt@tls.msk.ru>
-References: <alpine.DEB.2.10.1706271456310.24648@sstabellini-ThinkPad-X260>
-	<1498601083-11799-1-git-send-email-sstabellini@kernel.org>
-	<8717f8c6-69e4-558e-64d2-f4361cd98594@msgid.tls.msk.ru>
-Message-ID: <ffc5e790-253f-e622-1f49-21adad653cc4@msgid.tls.msk.ru>
-Date: Sun, 24 Sep 2017 12:18:06 +0300
+	(envelope-from <ldoktor@redhat.com>) id 1dw4uz-0003J2-FW
+	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 07:17:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36784)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1dw4uz-0003II-5b
+	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 07:17:49 -0400
+References: <20170921162234.847-1-ehabkost@redhat.com>
+	<94b1569d-806a-98f3-7056-8f6a1b78e55c@redhat.com>
+	<20170922094007.GB12295@localhost.localdomain>
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+Message-ID: <4e531137-e22a-d47e-d4ea-5729704f5248@redhat.com>
+Date: Sun, 24 Sep 2017 13:17:40 +0200
 MIME-Version: 1.0
-In-Reply-To: <8717f8c6-69e4-558e-64d2-f4361cd98594@msgid.tls.msk.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] xen/disk: don't leak stack data via response ring
+In-Reply-To: <20170922094007.GB12295@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="oKPotiMrNsvDv05gH0eWm7aVjhJkPlSIv"
+Subject: Re: [Qemu-devel] [PATCH] qemu.py: Call logging.basicConfig()
+ automatically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +30,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>, stefanha@gmail.com
-Cc: anthony.perard@citrix.com, xen-devel@lists.xenproject.org, Jan Beulich <jbeulich@suse.com>, qemu-devel@nongnu.org, stefanha@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>, Amador Pahim <apahim@redhat.com>, Fam Zheng <famz@redhat.com>, stefanha@gmail.com, armbru@redhat.com, mreitz@redhat.com
 
-23.09.2017 19:05, Michael Tokarev wrote:
-> 28.06.2017 01:04, Stefano Stabellini wrote:
->> Rather than constructing a local structure instance on the stack, fill
->> the fields directly on the shared ring, just like other (Linux)
->> backends do. Build on the fact that all response structure flavors are
->> actually identical (aside from alignment and padding at the end).
->>
->> This is XSA-216.
->>
->> Reported by: Anthony Perard <anthony.perard@citrix.com>
->> Signed-off-by: Jan Beulich <jbeulich@suse.com>
->> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
->> Acked-by: Anthony PERARD <anthony.perard@citrix.com>
-> 
-> Reportedly, after this patch, HVM DomUs running with qemu-system-i386
-> (note i386, not x86_64), are leaking memory and host is running out of
-> memory rather fast.  See for example https://bugs.debian.org/871702
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oKPotiMrNsvDv05gH0eWm7aVjhJkPlSIv
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ Cleber Rosa <crosa@redhat.com>, Amador Pahim <apahim@redhat.com>,
+ Fam Zheng <famz@redhat.com>, stefanha@gmail.com, armbru@redhat.com,
+ mreitz@redhat.com
+Message-ID: <4e531137-e22a-d47e-d4ea-5729704f5248@redhat.com>
+Subject: Re: [PATCH] qemu.py: Call logging.basicConfig() automatically
+References: <20170921162234.847-1-ehabkost@redhat.com>
+ <94b1569d-806a-98f3-7056-8f6a1b78e55c@redhat.com>
+ <20170922094007.GB12295@localhost.localdomain>
+In-Reply-To: <20170922094007.GB12295@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Looks like this is a false alarm, the problem actually is with
-04bf2526ce87f21b32c9acba1c5518708c243ad0 (exec: use qemu_ram_ptr_length
-to access guest ram) without f5aa69bdc3418773f26747ca282c291519626ece
-(exec: Add lock parameter to qemu_ram_ptr_length).
+Dne 22.9.2017 v 11:40 Kevin Wolf napsal(a):
+> Am 22.09.2017 um 10:37 hat Luk=C3=A1=C5=A1 Doktor geschrieben:
+>> But we should focus on fixing all the entry points (either initialize
+>> from all of them, or force-create the root logger based on the
+>> entry-point requirements). Kevin, could you please share the exact
+>> reproducer? I used a custom file importing QEMUMachine() with a some
+>> added LOG calls.
+>=20
+> I was running qemu-iotests 030 on a development branch that had a bug
+> that made qemu segfault. This should result in a logged 'qemu received
+> signal 6' message, but only prints the logging error now. The same kind=
 
-I applied only 04bf2526ce87f to 2.8, without realizing that we also
-need f5aa69bdc3418).
+> of problem affects all Python-based tests in the tree, git grep didn't
+> find any that initialise the logger manually.
+>=20
+> In order to reproduce, you can fake such a crash by inserting an HMP
+> command like 'qemu-io ide0-hd0 abort' somewhere in a Python-based test.=
 
-Now when I try to backport f5aa69bdc3418 to 2.8 (on top of 04bf2526ce87f),
-I face an interesting logic without also applying 1ff7c5986a515d2d936eba0
-(xen/mapcache: store dma information in revmapcache entries for debugging),
-the arguments for xen_map_cache in qemu_ram_ptr_length() in these two patches
-are quite fun.. :)
+>=20
+OK, that's basically what I did. As a proper fix would require all tests =
+to initialize logging (even if as an extra call to `iotests.initialize_lo=
+gging` or `qemu.initialize_logging` I think Eduardo's patch actually fits=
+ the usage within qemu/scripts. Sorry for over-thinking this.
 
-Thanks,
+Luk=C3=A1=C5=A1
 
-/mjt
+> Kevin
+>=20
+
+
+
+--oKPotiMrNsvDv05gH0eWm7aVjhJkPlSIv
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEwBAEBCAAaBQJZx5RUExxsZG9rdG9yQHJlZGhhdC5jb20ACgkQJrNi5H/PIsFq
+EQf/dMmxGoQ7v915IsSxEVxKrpVJemSBCqiKqLE1lCQnkaWg1neTuhbm14xkQM+S
+uvVmC7KMDVaIywBJmrbkj6qiiLrg7Sfw19dmi5Nrxjzlz47jK44ID7ejkUesp6FQ
+Bl78TtR0/9j3axaZF8GbdenQKzh0+MJxcbdHRQT97CFOyxldy6Iq7jY60kzdxKJY
+pxPTxHr7KWkC80UTlTmZ11bpmTIh967jBers3pnL9Fl92BgomgL7ocCt6ycJD0PL
+W/5rQz0CCUYXK/KiZLRA2I5x5R5VbswSrEXIla3W95Zo8s1+/41TSfY+QmLW5Mbq
+TAf1JL2ptdMD6LRpSb1Fhe3CeA==
+=5D+o
+-----END PGP SIGNATURE-----
+
+--oKPotiMrNsvDv05gH0eWm7aVjhJkPlSIv--
