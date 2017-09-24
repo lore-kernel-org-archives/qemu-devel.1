@@ -1,18 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dwEf6-0003BQ-Um
+	(envelope-from <mjt@tls.msk.ru>) id 1dwEf7-0003BT-H3
 	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 17:42:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dwEf2-0004ls-Rn
-	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 17:42:04 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1dwEf3-0004md-ID
+	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 17:42:05 -0400
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Mon, 25 Sep 2017 00:22:43 +0300
-Message-Id: <7ac5511eea4f8ee511cd78e47a92436b0bdb3627.1506288070.git.mjt@msgid.tls.msk.ru>
+Date: Mon, 25 Sep 2017 00:22:29 +0300
+Message-Id: <6882507b6d2d524ab6d3e7ac2a83e987ac1e191a.1506288070.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1506288070.git.mjt@msgid.tls.msk.ru>
 References: <cover.1506288070.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1506288070.git.mjt@msgid.tls.msk.ru>
 References: <cover.1506288070.git.mjt@msgid.tls.msk.ru>
-Subject: [Qemu-devel] [PULL 25/31] osdep: Fix ROUND_UP(64-bit, 32-bit)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 11/31] MAINTAINERS: add missing entries for
+ throttling infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,60 +26,33 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, qemu-trivial@nongnu.org, qemu-stable@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
-From: Eric Blake <eblake@redhat.com>
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-When using bit-wise operations that exploit the power-of-two
-nature of the second argument of ROUND_UP(), we still need to
-ensure that the mask is as wide as the first argument (done
-by using a ternary to force proper arithmetic promotion).
-Unpatched, ROUND_UP(2ULL*1024*1024*1024*1024, 512U) produces 0,
-instead of the intended 2TiB, because negation of an unsigned
-32-bit quantity followed by widening to 64-bits does not
-sign-extend the mask.
-
-Broken since its introduction in commit 292c8e50 (v1.5.0).
-Callers that passed the same width type to both macro parameters,
-or that had other code to ensure the first parameter's maximum
-runtime value did not exceed the second parameter's width, are
-unaffected, but I did not audit to see which (if any) existing
-clients of the macro could trigger incorrect behavior (I found
-the bug while adding a new use of the macro).
-
-While preparing the patch, checkpatch complained about poor
-spacing, so I also fixed that here and in the nearby DIV_ROUND_UP.
-
-CC: qemu-trivial@nongnu.org
-CC: qemu-stable@nongnu.org
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
 ---
- include/qemu/osdep.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ MAINTAINERS | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 72b75bf044..9dd318a7dd 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -205,13 +205,13 @@ extern int daemon(int, int);
- 
- /* Round number up to multiple. Requires that d be a power of 2 (see
-  * QEMU_ALIGN_UP for a safer but slower version on arbitrary
-- * numbers) */
-+ * numbers); works even if d is a smaller type than n.  */
- #ifndef ROUND_UP
--#define ROUND_UP(n,d) (((n) + (d) - 1) & -(d))
-+#define ROUND_UP(n, d) (((n) + (d) - 1) & -(0 ? (n) : (d)))
- #endif
- 
- #ifndef DIV_ROUND_UP
--#define DIV_ROUND_UP(n,d) (((n) + (d) - 1) / (d))
-+#define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
- #endif
- 
- /*
--- 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 041605ce13..c40935f441 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1595,8 +1595,10 @@ M: Alberto Garcia <berto@igalia.com>
+ S: Supported
+ F: block/throttle-groups.c
+ F: include/block/throttle-groups.h
+-F: include/qemu/throttle.h
++F: include/qemu/throttle*.h
+ F: util/throttle.c
++F: docs/throttle.txt
++F: tests/test-throttle.c
+ L: qemu-block@nongnu.org
+=20
+ UUID
+--=20
 2.11.0
