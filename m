@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dwEFE-00078G-Ss
-	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 17:15:21 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1dwEMd-0008PQ-NG
+	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 17:23:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dwEFA-0001nU-Rn
-	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 17:15:20 -0400
-References: <1500538486-23453-1-git-send-email-sf@sfritsch.de>
+	(envelope-from <mjt@tls.msk.ru>) id 1dwEMZ-00048J-NA
+	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 17:22:59 -0400
 From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <68c8816f-69a7-8897-9dba-19c0309cd268@msgid.tls.msk.ru>
-Date: Mon, 25 Sep 2017 00:15:15 +0300
+Date: Mon, 25 Sep 2017 00:22:19 +0300
+Message-Id: <94219606725f67b0888061c39465abc74a394b00.1506288070.git.mjt@msgid.tls.msk.ru>
+In-Reply-To: <cover.1506288070.git.mjt@msgid.tls.msk.ru>
+References: <cover.1506288070.git.mjt@msgid.tls.msk.ru>
+In-Reply-To: <cover.1506288070.git.mjt@msgid.tls.msk.ru>
+References: <cover.1506288070.git.mjt@msgid.tls.msk.ru>
 MIME-Version: 1.0
-In-Reply-To: <1500538486-23453-1-git-send-email-sf@sfritsch.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] vmxcap: Fix output formatting
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 01/31] configure: Remove unused code (found by
+ shellcheck)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,34 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Fritsch <sf@sfritsch.de>, qemu-trivial@nongnu.org
-Cc: Stefan Fritsch <stefan_fritsch@genua.de>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Stefan Weil <sw@weilnetz.de>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
-Please excuse me for the long delay with this patch.
+From: Stefan Weil <sw@weilnetz.de>
 
-20.07.2017 11:14, Stefan Fritsch wrote:
-> From: Stefan Fritsch <stefan_fritsch@genua.de>
-> 
-> One string is longer than 40 chars. Set the field width to 50.
+smartcard_cflags is no longer needed since commit
+0b22ef0f57a8910d849602bef0940edcd0553d2c.
 
-The string is this one, I guess:
+Signed-off-by: Stefan Weil <sw@weilnetz.de>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
+---
+ configure | 1 -
+ 1 file changed, 1 deletion(-)
 
-Miscellaneous data
-  Hex: 0x100401e5
-  VMX-preemption timer scale (log2)        5
-  Store EFER.LMA into IA-32e mode guest control yes
-  HLT activity state                       yes
-  Shutdown activity state                  yes
-
-While technically after this change, it will be aligned
-in one column, I think it is better to reword this one
-entry instead: when widening the alignment column, the
-whole thing becomes less and less readable, it is more
-difficult this way to follow which value correspond to
-which entry.
-
-A better wording for this one entry is welcome :)
-
-Thanks,
-
-/mjt
+diff --git a/configure b/configure
+index 133a5757ef..12d4e4ebfa 100755
+--- a/configure
++++ b/configure
+@@ -4229,7 +4229,6 @@ EOF
+ fi
+=20
+ # check for smartcard support
+-smartcard_cflags=3D""
+ if test "$smartcard" !=3D "no"; then
+     if $pkg_config libcacard; then
+         libcacard_cflags=3D$($pkg_config --cflags libcacard)
+--=20
+2.11.0
