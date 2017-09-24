@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dwE9w-0004ND-P1
-	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 17:09:53 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1dwEFE-00078G-Ss
+	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 17:15:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dwE9s-0007i9-P8
-	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 17:09:52 -0400
-References: <1505293637-10450-1-git-send-email-thuth@redhat.com>
+	(envelope-from <mjt@tls.msk.ru>) id 1dwEFA-0001nU-Rn
+	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 17:15:20 -0400
+References: <1500538486-23453-1-git-send-email-sf@sfritsch.de>
 From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <bf1d186c-0489-caa8-7da0-f91c8c20b08b@msgid.tls.msk.ru>
-Date: Mon, 25 Sep 2017 00:09:47 +0300
+Message-ID: <68c8816f-69a7-8897-9dba-19c0309cd268@msgid.tls.msk.ru>
+Date: Mon, 25 Sep 2017 00:15:15 +0300
 MIME-Version: 1.0
-In-Reply-To: <1505293637-10450-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <1500538486-23453-1-git-send-email-sf@sfritsch.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/isa/pc87312: Mark the device with
- user_creatable = false
+Subject: Re: [Qemu-devel] [PATCH] vmxcap: Fix output formatting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,22 +23,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-ppc@nongnu.org
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Stefan Fritsch <sf@sfritsch.de>, qemu-trivial@nongnu.org
+Cc: Stefan Fritsch <stefan_fritsch@genua.de>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-13.09.2017 12:07, Thomas Huth wrote:
-> QEMU currently aborts if you try to use the device at the command
-> line:
-> 
-> $ ppc64-softmmu/qemu-system-ppc64 -S -machine prep -device pc87312
-> Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
-> qemu-system-ppc64: -device pc87312: Device 'parallel0' is in use
-> Aborted (core dumped)
-> 
-> It uses parallel_hds in its realize function, so I can not be
-> instantiated by the user again.
-> 
+Please excuse me for the long delay with this patch.
 
-Applied to -trivial, thanks!
+20.07.2017 11:14, Stefan Fritsch wrote:
+> From: Stefan Fritsch <stefan_fritsch@genua.de>
+> 
+> One string is longer than 40 chars. Set the field width to 50.
+
+The string is this one, I guess:
+
+Miscellaneous data
+  Hex: 0x100401e5
+  VMX-preemption timer scale (log2)        5
+  Store EFER.LMA into IA-32e mode guest control yes
+  HLT activity state                       yes
+  Shutdown activity state                  yes
+
+While technically after this change, it will be aligned
+in one column, I think it is better to reword this one
+entry instead: when widening the alignment column, the
+whole thing becomes less and less readable, it is more
+difficult this way to follow which value correspond to
+which entry.
+
+A better wording for this one entry is welcome :)
+
+Thanks,
 
 /mjt
