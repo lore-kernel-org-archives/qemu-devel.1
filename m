@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dwEyW-00005n-L5
+	(envelope-from <mjt@tls.msk.ru>) id 1dwEyW-00005o-UF
 	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 18:02:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dwEyS-0006Tv-VM
+	(envelope-from <mjt@tls.msk.ru>) id 1dwEyS-0006U3-Ve
 	for qemu-devel@nongnu.org; Sun, 24 Sep 2017 18:02:08 -0400
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Mon, 25 Sep 2017 00:22:33 +0300
-Message-Id: <85209bc943b0b429b0077cf49a60a001edc4613f.1506288070.git.mjt@msgid.tls.msk.ru>
+Date: Mon, 25 Sep 2017 00:22:23 +0300
+Message-Id: <806d1d39cb7d4d77a4ef62fae0f5d0be62d331ef.1506288070.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1506288070.git.mjt@msgid.tls.msk.ru>
 References: <cover.1506288070.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1506288070.git.mjt@msgid.tls.msk.ru>
@@ -15,7 +15,7 @@ References: <cover.1506288070.git.mjt@msgid.tls.msk.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 15/31] MAINTAINERS: update docs/devel/ entries
+Subject: [Qemu-devel] [PULL 05/31] MAINTAINERS: add missing entry for vhost
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +29,24 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@no
 
 From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-moved in commit ac06724a7158
-
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
 ---
- MAINTAINERS | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 1a5cd3c05c..f4444467e0 100644
+index 09e8e964ba..96ba0ffba6 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -1440,7 +1440,7 @@ F: tests/test-qapi-*.c
- F: tests/test-qmp-*.c
- F: tests/test-visitor-serialization.c
- F: scripts/qapi*
--F: docs/qapi*
-+F: docs/devel/qapi*
- T: git git://repo.or.cz/qemu/armbru.git qapi-next
-=20
- QAPI Schema
-@@ -1492,7 +1492,7 @@ M: Markus Armbruster <armbru@redhat.com>
+@@ -1034,6 +1034,7 @@ vhost
+ M: Michael S. Tsirkin <mst@redhat.com>
  S: Supported
- F: qmp.c
- F: monitor.c
--F: docs/*qmp-*
-+F: docs/devel/*qmp-*
- F: scripts/qmp/
- F: tests/qmp-test.c
- T: git git://repo.or.cz/qemu/armbru.git qapi-next
-@@ -1523,7 +1523,7 @@ S: Maintained
- F: trace/
- F: scripts/tracetool.py
- F: scripts/tracetool/
--F: docs/tracing.txt
-+F: docs/devel/tracing.txt
- T: git git://github.com/stefanha/qemu.git tracing
+ F: hw/*/*vhost*
++F: docs/interop/vhost-user.txt
 =20
- TPM
-@@ -1546,7 +1546,7 @@ F: include/migration/
- F: migration/
- F: scripts/vmstate-static-checker.py
- F: tests/vmstate-static-checker-data/
--F: docs/migration.txt
-+F: docs/devel/migration.txt
- F: qapi/migration.json
-=20
- Seccomp
-@@ -1945,5 +1945,5 @@ Documentation
- Build system architecture
- M: Daniel P. Berrange <berrange@redhat.com>
- S: Odd Fixes
--F: docs/build-system.txt
-+F: docs/devel/build-system.txt
-=20
+ virtio
+ M: Michael S. Tsirkin <mst@redhat.com>
 --=20
 2.11.0
