@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dvnNB-00030w-02
-	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 12:33:45 -0400
+	(envelope-from <famz@redhat.com>) id 1dvx4B-00060z-4Q
+	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 22:54:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dvnN6-0007gB-3N
-	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 12:33:44 -0400
-Received: from isrv.corpit.ru ([86.62.121.231]:51323)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dvnN5-0007f2-RW
-	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 12:33:40 -0400
-From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Sat, 23 Sep 2017 19:33:34 +0300
-Message-Id: <20170923163334.9997-1-mjt@msgid.tls.msk.ru>
-Subject: [Qemu-devel] [PATCH] remove trailing whitespace from qemu-options.hx
+	(envelope-from <famz@redhat.com>) id 1dvx47-0006i6-9D
+	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 22:54:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60930)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dvx47-0006fG-3F
+	for qemu-devel@nongnu.org; Sat, 23 Sep 2017 22:54:43 -0400
+Date: Sun, 24 Sep 2017 10:54:39 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170924025439.GA10444@lemon.lan>
+References: <1506080563-41084-1-git-send-email-pbonzini@redhat.com>
+	<20170922124720.GC32000@lemon>
+	<7a904eeb-f400-5311-e06b-65ced6d2298b@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7a904eeb-f400-5311-e06b-65ced6d2298b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] docker: add installation to build tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,33 +28,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.orh, Michael Tokarev <mjt@tls.msk.ru>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: alex.bennee@linaro.org, qemu-devel@nongnu.org
 
-Remove trailing whitespace in qemu-options documentation, as it causes
-reproducibility issues depending on the echo implementation used by
-the Makefile.
+On Fri, 09/22 17:52, Paolo Bonzini wrote:
+> On 22/09/2017 14:47, Fam Zheng wrote:
+> > On Fri, 09/22 13:42, Paolo Bonzini wrote:
+> >> Drop ccache on Fedora, because it fails on RHEL 7.4, it is not used
+> >> by any other distro and it is not particularly useful on throwaway
+> >> containers.
+> > 
+> > I wonder what exactly failed with ccache? Patchew relies on it to speed up
+> > compiling every series on the list. The ccache db is not throwaway with that in
+> > mind - git grep for CCACHE_DIR.
+> 
+> Got it.  For some reason the ccache dir in ~/.cache was owned by root.
+> I zapped it and now it works, so I've sent v2.
 
-Reported-By: Vagrant Cascadian <vagrant@debian.org>
-Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
----
- qemu-options.hx | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hmm, right, root in the container can mess with it if you have NOUSER=1, we
+should avoid that.
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 77859a248c..39225ae6c3 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -284,8 +284,8 @@ Set default value of @var{driver}'s property @var{prop} to @var{value}, e.g.:
- qemu-system-i386 -global ide-hd.physical_block_size=4096 disk-image.img
- @end example
- 
--In particular, you can use this to set driver properties for devices which are 
--created automatically by the machine model. To create a device which is not 
-+In particular, you can use this to set driver properties for devices which are
-+created automatically by the machine model. To create a device which is not
- created automatically and set properties on it, use -@option{device}.
- 
- -global @var{driver}.@var{prop}=@var{value} is shorthand for -global
--- 
-2.11.0
+Fam
