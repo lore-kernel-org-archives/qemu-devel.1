@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dwPzR-0000QR-C1
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:47:50 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dwQ6u-0002br-P4
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:55:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dwPzM-0004Ay-Eh
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:47:47 -0400
-Received: from 6.mo173.mail-out.ovh.net ([46.105.43.93]:53331)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dwPzM-0004A5-7o
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:47:44 -0400
-Received: from player687.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 1C1907798C
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 11:47:40 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Mon, 25 Sep 2017 11:47:33 +0200
-Message-ID: <150633285374.14880.11614678065344980502.stgit@bahia.lan>
+	(envelope-from <stefanha@gmail.com>) id 1dwQ6p-0007a3-64
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:55:32 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33832)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dwQ6o-0007Za-W2
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:55:27 -0400
+Received: by mail-wm0-x242.google.com with SMTP id i131so6701491wma.1
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 02:55:26 -0700 (PDT)
+Date: Mon, 25 Sep 2017 10:55:23 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170925095523.GF14140@stefanha-x1.localdomain>
+References: <1506321449-24013-1-git-send-email-peterx@redhat.com>
+	<1506321449-24013-2-git-send-email-peterx@redhat.com>
+	<4540074c-f523-41f4-3ce7-8b6514060fa4@suse.de>
+	<20170925081426.GE19505@pxdev.xzpeter.org>
+	<20170925083458.luy7kjv6x56lptvi@postretch>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] spapr: move registration of "host" CPU core
- type to machine code
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20170925083458.luy7kjv6x56lptvi@postretch>
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] qom: provide root container for
+ internal objs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,139 +34,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, Peter Xu <peterx@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Fam Zheng <famz@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-The CPU core abstraction belongs to the machine code. This also gets
-rid of some code duplication.
+On Mon, Sep 25, 2017 at 11:34:58AM +0300, Manos Pitsidianakis wrote:
+> On Mon, Sep 25, 2017 at 04:14:26PM +0800, Peter Xu wrote:
+> > On Mon, Sep 25, 2017 at 09:14:21AM +0200, Andreas Färber wrote:
+> > > Am 25.09.2017 um 08:37 schrieb Peter Xu:
+> > > > We have object_get_objects_root() to keep user created objects, however
+> > > > no place for objects that will be used internally.  Create such a
+> > > > container for internal objects.
+> > > >
+> > > > CC: Andreas Färber <afaerber@suse.de>
+> > > > CC: Markus Armbruster <armbru@redhat.com>
+> > > > CC: Paolo Bonzini <pbonzini@redhat.com>
+> > > > Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+> > > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > > ---
+> > > >  include/qom/object.h | 10 ++++++++++
+> > > >  qom/object.c         |  5 +++++
+> > > >  2 files changed, 15 insertions(+)
+> > > >
+> > > > diff --git a/include/qom/object.h b/include/qom/object.h
+> > > > index f3e5cff..f567052 100644
+> > > > --- a/include/qom/object.h
+> > > > +++ b/include/qom/object.h
+> > > > @@ -1214,6 +1214,16 @@ Object *object_get_root(void);
+> > > >  Object *object_get_objects_root(void);
+> > > >
+> > > >  /**
+> > > > + * object_get_internal_root:
+> > > > + *
+> > > > + * Get the container object that holds internally used object
+> > > > + * instances. This is the object at path "/internal-objects"
+> > > > + *
+> > > > + * Returns: the internal object container
+> > > > + */
+> > > > +Object *object_get_internal_root(void);
+> > > > +
+> > > > +/**
+> > > >   * object_get_canonical_path_component:
+> > > >   *
+> > > >   * Returns: The final component in the object's canonical path.  The canonical
+> > > > diff --git a/qom/object.c b/qom/object.c
+> > > > index 3e18537..857cee7 100644
+> > > > --- a/qom/object.c
+> > > > +++ b/qom/object.c
+> > > > @@ -1370,6 +1370,11 @@ Object *object_get_objects_root(void)
+> > > >      return container_get(object_get_root(), "/objects");
+> > > >  }
+> > > >
+> > > > +Object *object_get_internal_root(void)
+> > > > +{
+> > > > +    return container_get(object_get_root(), "/internal-objects");
+> > > 
+> > > Whatever you expose in the QOM tree is no longer internal. Other name?
+> > 
+> > Hi, Andreas,
+> > 
+> > If you mean "info qom-tree" here, can we still treat it as internal?
+> > Since after all it's not exposed in QMP (while IMHO QMP is the
+> > official protocol for QEMU clients).  And IIUC some HMP commands do
+> > dump some internal structs for debugging purpose (like: "info
+> > ramblock").
+> > 
+> > Or, do you have any suggestion?
+> > 
+> > (I did think about something like "hidden-objects", but I believe they
+> > are not hidden as well if we think they are not internal...)
+> > 
+> > Thanks,
+> > 
+> > > 
+> > > Regards,
+> > > Andreas
+> 
+> If there's no need for internal IOThreads to be together with user created
+> ones, a simple queue will be enough (include/qemu/queue.h).
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
+Two solutions:
 
-hw/ppc/spapr_cpu_core.h is also included elsewhere in target/ppc/kvm.c
-but this is already handled by the following cleanup patch:
+1. Manos' suggestion is Object->parent == NULL.  Simply don't add the
+   Object to a parent.
 
-https://patchwork.ozlabs.org/patch/817598/
----
- hw/ppc/spapr.c                  |    4 ++++
- hw/ppc/spapr_cpu_core.c         |   34 ++++++++++++++++++++++------------
- include/hw/ppc/spapr_cpu_core.h |    2 +-
- target/ppc/kvm.c                |   12 ------------
- 4 files changed, 27 insertions(+), 25 deletions(-)
+2. Create an internal root that isn't accessible via QMP.
+   Object *internal_root = object_new("container).
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 0ce3ec87ac59..e82c8532ffb0 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2349,6 +2349,10 @@ static void ppc_spapr_init(MachineState *machine)
-     }
- 
-     /* init CPUs */
-+    if (kvm_enabled()) {
-+        spapr_cpu_core_register_host_type();
-+    }
-+
-     if (machine->cpu_model == NULL) {
-         machine->cpu_model = kvm_enabled() ? "host" : smc->tcg_default_cpu;
-     }
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index c08ee7571a50..6e224ba029ec 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -317,7 +317,7 @@ static Property spapr_cpu_core_properties[] = {
-     DEFINE_PROP_END_OF_LIST()
- };
- 
--void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
-+static void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(oc);
-     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_CLASS(oc);
-@@ -337,6 +337,20 @@ static const TypeInfo spapr_cpu_core_type_info = {
-     .class_size = sizeof(sPAPRCPUCoreClass),
- };
- 
-+static void spapr_cpu_core_register_type(const char *model_name)
-+{
-+    TypeInfo type_info = {
-+        .parent = TYPE_SPAPR_CPU_CORE,
-+        .instance_size = sizeof(sPAPRCPUCore),
-+        .class_init = spapr_cpu_core_class_init,
-+        .class_data = (void *) model_name,
-+    };
-+
-+    type_info.name = g_strdup_printf("%s-"TYPE_SPAPR_CPU_CORE, model_name);
-+    type_register(&type_info);
-+    g_free((void *)type_info.name);
-+}
-+
- static void spapr_cpu_core_register_types(void)
- {
-     int i;
-@@ -344,18 +358,14 @@ static void spapr_cpu_core_register_types(void)
-     type_register_static(&spapr_cpu_core_type_info);
- 
-     for (i = 0; i < ARRAY_SIZE(spapr_core_models); i++) {
--        TypeInfo type_info = {
--            .parent = TYPE_SPAPR_CPU_CORE,
--            .instance_size = sizeof(sPAPRCPUCore),
--            .class_init = spapr_cpu_core_class_init,
--            .class_data = (void *) spapr_core_models[i],
--        };
--
--        type_info.name = g_strdup_printf("%s-" TYPE_SPAPR_CPU_CORE,
--                                         spapr_core_models[i]);
--        type_register(&type_info);
--        g_free((void *)type_info.name);
-+        spapr_cpu_core_register_type(spapr_core_models[i]);
-     }
-+
-+}
-+
-+void spapr_cpu_core_register_host_type(void)
-+{
-+    spapr_cpu_core_register_type("host");
- }
- 
- type_init(spapr_cpu_core_register_types)
-diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
-index 93051e9ecf56..e3e906343048 100644
---- a/include/hw/ppc/spapr_cpu_core.h
-+++ b/include/hw/ppc/spapr_cpu_core.h
-@@ -36,5 +36,5 @@ typedef struct sPAPRCPUCoreClass {
- } sPAPRCPUCoreClass;
- 
- char *spapr_get_cpu_core_type(const char *model);
--void spapr_cpu_core_class_init(ObjectClass *oc, void *data);
-+void spapr_cpu_core_register_host_type(void);
- #endif
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 5b281b2f1b6d..8dd80993ec9e 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -37,7 +37,6 @@
- #include "hw/sysbus.h"
- #include "hw/ppc/spapr.h"
- #include "hw/ppc/spapr_vio.h"
--#include "hw/ppc/spapr_cpu_core.h"
- #include "hw/ppc/ppc.h"
- #include "sysemu/watchdog.h"
- #include "trace.h"
-@@ -2502,17 +2501,6 @@ static int kvm_ppc_register_host_cpu_type(void)
-     oc = object_class_by_name(type_info.name);
-     g_assert(oc);
- 
--#if defined(TARGET_PPC64)
--    type_info.name = g_strdup_printf("%s-"TYPE_SPAPR_CPU_CORE, "host");
--    type_info.parent = TYPE_SPAPR_CPU_CORE,
--    type_info.instance_size = sizeof(sPAPRCPUCore);
--    type_info.instance_init = NULL;
--    type_info.class_init = spapr_cpu_core_class_init;
--    type_info.class_data = (void *) "host";
--    type_register(&type_info);
--    g_free((void *)type_info.name);
--#endif
--
-     /*
-      * Update generic CPU family class alias (e.g. on a POWER8NVL host,
-      * we want "POWER8" to be a "family" alias that points to the current
+Stefan
