@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dwTix-0001Ln-0o
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:47:10 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dwTm3-0002xe-Gp
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:50:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dwTiw-0002CO-1U
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:47:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35596)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dwTiv-0002C9-Oo
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:47:01 -0400
-Date: Mon, 25 Sep 2017 15:46:47 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170925154647.357047b9@nial.brq.redhat.com>
-In-Reply-To: <20170925133153.GZ3030@localhost.localdomain>
-References: <1506071794-4373-1-git-send-email-thuth@redhat.com>
-	<20170925135316.74fed6da.cohuck@redhat.com>
-	<20170925133153.GZ3030@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] qdev: Mark devices as non-hotpluggable
- by default
+	(envelope-from <programmingkidx@gmail.com>) id 1dwTlz-0003cz-1G
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:50:15 -0400
+Received: from mail-it0-x236.google.com ([2607:f8b0:4001:c0b::236]:52013)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dwTly-0003bK-SB
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:50:10 -0400
+Received: by mail-it0-x236.google.com with SMTP id o200so6844691itg.0
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 06:50:09 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <20170925085726.GD20236@redhat.com>
+Date: Mon, 25 Sep 2017 09:50:07 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <62B6542A-5946-4160-9E84-B355B4F9C513@gmail.com>
+References: <mailman.3351.1506066493.14747.qemu-devel@nongnu.org>
+	<726A2123-0371-407B-9270-6672DF66D511@gmail.com>
+	<20170922124405.GB32000@lemon> <20170922131819.GP12725@redhat.com>
+	<BA02424C-0C79-4FAE-B191-18A9D0CDBAC8@gmail.com>
+	<20170925085726.GD20236@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 28/36] tests: Add ubuntu.i386 image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +33,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Amit Shah <amit@kernel.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-On Mon, 25 Sep 2017 10:31:53 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-> On Mon, Sep 25, 2017 at 01:53:16PM +0200, Cornelia Huck wrote:
-> > On Fri, 22 Sep 2017 11:16:34 +0200
-> > Thomas Huth <thuth@redhat.com> wrote:
-> >   
-> > > Historically we've marked all devices as hotpluggable by default. However,
-> > > most devices are not hotpluggable, and you also need a HotplugHandler to
-> > > support these devices. So if the user tries to "device_add" or "device_del"
-> > > such a non-hotpluggable device during runtime, either nothing really usable
-> > > happens, or QEMU even crashes/aborts unexpectedly (see for example commit
-> > > 84ebd3e8c7d4fe955b - "Mark diag288 watchdog as non-hotpluggable").
-> > > So let's change this dangerous default behaviour and mark the devices as
-> > > non-hotpluggable by default. Certain parent devices classes which are known
-> > > as hotpluggable (e.g. PCI, USB, etc.) are marked with "hotpluggable = true",
-> > > so that devices that are derived from these classes continue to work as
-> > > expected.
-> > > 
-> > > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > > ---
-> > >  v2: Add missing devices and dropped "RFC" status. See Eduardo's reply on
-> > >  the previous version of this patch for the rationale which devices need
-> > >  to be hotpluggable:
-> > >  https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg06128.html
-> > > 
-> > >  hw/char/virtio-serial-bus.c   |  1 +
-> > >  hw/core/qdev.c                | 10 ++++------
-> > >  hw/mem/nvdimm.c               |  3 +++
-> > >  hw/mem/pc-dimm.c              |  1 +
-> > >  hw/pci/pci.c                  |  1 +
-> > >  hw/ppc/spapr_cpu_core.c       |  1 +
-> > >  hw/s390x/ccw-device.c         |  1 +
-> > >  hw/scsi/scsi-bus.c            |  1 +
-> > >  hw/usb/bus.c                  |  1 +
-> > >  hw/usb/dev-smartcard-reader.c |  1 +
-> > >  hw/xen/xen_backend.c          |  1 +
-> > >  target/i386/cpu.c             |  4 ++--
-> > >  target/s390x/cpu.c            |  1 +
-> > >  13 files changed, 19 insertions(+), 8 deletions(-)  
-> > 
-> > Hm, this seems to break hotplug of virtio devices:
-> > 
-> > (qemu) device_add virtio-net-pci,id=xxx
-> > Device 'virtio-net-device' does not support hotplugging
-> > 
-> > (qemu) device_add virtio-net-ccw,id=yyy
-> > Device 'virtio-net-device' does not support hotplugging
-> > 
-> > We probably need to enable hotplug for virtio devices as well?  
-> 
-> I've seen a similar case broken by "[PATCH] hw/core/qdev: Do not
-> allow hot-plugging without hotplug controller", because we're
-> blocking creation of devices created internally by other devices,
-> not just the ones created by device_add.  I need to find the
-> exact reproducer again.
-> 
-> It would probably simplify things if we move the check for
-> DeviceClass::hotpluggable to qmp_device_add(), instead of
-> device_set_realized().
-if we would have to do that, than we are probably doing
-something wrong and not using property right. Perhaps we
-should fix property instead of trying find a place to check
-it where it would hurt less.
+> On Sep 25, 2017, at 4:57 AM, Daniel P. Berrange <berrange@redhat.com> =
+wrote:
+>=20
+> On Fri, Sep 22, 2017 at 04:26:40PM -0400, Programmingkid wrote:
+>>=20
+>>> On Sep 22, 2017, at 9:18 AM, Daniel P. Berrange =
+<berrange@redhat.com> wrote:
+>>>=20
+>>> On Fri, Sep 22, 2017 at 08:44:05PM +0800, Fam Zheng wrote:
+>>>> On Fri, 09/22 08:10, Programmingkid wrote:
+>>>>> Could a Darwin test be added? Both x86 and PowerPC versions would =
+be great.
+>>>>=20
+>>>> It's nice to cover macOS in our test, but to be honest I don't know =
+how to do
+>>>> it. If there isn't any copyright problem, and if there are =
+instructions
+>>>> available in wiki.qemu.org descirbing how to create such a guest =
+step by step
+>>>> like [1], we can add one.
+>>>=20
+>>> AFAICT we can not just provide or host OS-X images and let =
+individual
+>>> devs run the without it being a license violation, so best avoided.
+>>=20
+>> Actually Darwin and Mac OS X are not the same. Darwin is this =
+minimalistic
+>> environment and Mac OS X is built on top of that environment. There =
+would
+>> be no license problems when using Darwin only.
+>=20
+> I looked for images of Darwin but haven't been able to find any modern
+> ones. Wikipedia claims that Apple stopped releasing installable images
+> of Darwin so you have to build it from source :-(
+
+I did find this project: http://www.puredarwin.org, but they haven't =
+released an image file yet.
+
+>=20
+>>> IMHO it easier to just rely on Travis' OS-X builders for testing =
+OS-X
+>>> platform builds, so that licensing compliance is their =
+responsibility.
+>>=20
+>> That might work for the x86 version of Mac OS X, but there doesn't =
+appear
+>> to be any support for the PowerPC version of Mac OS X.
+>=20
+> Yeah, no PPC support, but then that's essentially a dead platform, so =
+it
+> is questionable whether we need to care about OS-X PPC support for =
+QEMU.
+> The last PPC OS-X hardware shipped 2006.
+
+Good point.
