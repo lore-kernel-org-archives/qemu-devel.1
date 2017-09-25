@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dwY1K-00059y-7M
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 14:22:19 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1dwY2y-00067M-MU
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 14:24:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dwY1F-0002mN-L6
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 14:22:18 -0400
-Received: from mail-pf0-x22c.google.com ([2607:f8b0:400e:c00::22c]:54487)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dwY1F-0002lc-D6
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 14:22:13 -0400
-Received: by mail-pf0-x22c.google.com with SMTP id d187so4206536pfg.11
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 11:22:13 -0700 (PDT)
-References: <20170921110625.9500-1-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <824254ac-23a1-30d5-e64e-e4e3147db6c4@linaro.org>
-Date: Mon, 25 Sep 2017 11:22:09 -0700
+	(envelope-from <andrew.smirnov@gmail.com>) id 1dwY2x-0003Y6-W0
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 14:24:00 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170921110625.9500-1-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] accel/tcg/cputlb: avoid recursive BQL
- (fixes #1706296)
+In-Reply-To: <10a9c31a-5bd1-5915-4b82-1c3cf9cd8bbd@redhat.com>
+References: <20170918195100.17593-1-andrew.smirnov@gmail.com>
+	<20170918195100.17593-9-andrew.smirnov@gmail.com>
+	<10a9c31a-5bd1-5915-4b82-1c3cf9cd8bbd@redhat.com>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Mon, 25 Sep 2017 11:23:56 -0700
+Message-ID: <CAHQ1cqHdsmA4zRBh7=VHU8v5Xn1K+D2bsOWkQivs7iuOw7GRBA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 08/17] imx_fec: Add support for multiple Tx
+ DMA rings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +25,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Paolo Bonzini <bonzini@gnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Jones <rjones@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Jason Wang <jasowang@redhat.com>
+Cc: "open list:ARM" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On 09/21/2017 04:06 AM, Alex Bennée wrote:
-> The mmio path (see exec.c:prepare_mmio_access) already protects itself
-> against recursive locking and it makes sense to do the same for
-> io_readx/writex. Otherwise any helper running in the BQL context will
-> assert when it attempts to write to device memory as in the case of
-> the bug report.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> CC: Richard Jones <rjones@redhat.com>
-> CC: Paolo Bonzini <bonzini@gnu.org>
-> ---
->  accel/tcg/cputlb.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+On Fri, Sep 22, 2017 at 12:33 AM, Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2017=E5=B9=B409=E6=9C=8819=E6=97=A5 03:50, Andrey Smirnov wrote:
+>>
+>> More recent version of the IP block support more than one Tx DMA ring,
+>> so add the code implementing that feature.
+>>
+>> Cc: Peter Maydell<peter.maydell@linaro.org>
+>> Cc: Jason Wang<jasowang@redhat.com>
+>> Cc:qemu-devel@nongnu.org
+>> Cc:qemu-arm@nongnu.org
+>> Cc:yurovsky@gmail.com
+>> Signed-off-by: Andrey Smirnov<andrew.smirnov@gmail.com>
+>> ---
+>>   hw/net/imx_fec.c         | 97
+>> +++++++++++++++++++++++++++++++++++++++---------
+>>   include/hw/net/imx_fec.h | 23 +++++++++++-
+>>   2 files changed, 101 insertions(+), 19 deletions(-)
+>
+>
+> Is there a register for driver to know about the version? (Looks like I
+> didn't find it).
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I haven't seen anything of the sort in the datasheet and, since Linux
+driver relies on DT for that information, I am inclined to think
+there's none.
 
-I guess I'll queue this through tcg-next?
-
-
-r~
+Thanks,
+Andrey Smirnov
