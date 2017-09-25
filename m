@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dwXzr-0003Qh-9G
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 14:20:48 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dwY1K-00059y-7M
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 14:22:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dwXzm-0002H4-CM
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 14:20:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49928)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dwXzm-0002Gl-6K
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 14:20:42 -0400
-Date: Mon, 25 Sep 2017 15:20:31 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170925182031.GF3030@localhost.localdomain>
-References: <20170925135316.74fed6da.cohuck@redhat.com>
-	<20170925133153.GZ3030@localhost.localdomain>
-	<20170925154647.357047b9@nial.brq.redhat.com>
-	<20170925143439.GA3030@localhost.localdomain>
-	<f078939d-4ae0-0ae8-4030-3df0ed66299a@redhat.com>
-	<CAFEAcA-kmSkjhM0f+Ti7nY1_AuDm1pPcYHNGn50fes20YvOeBg@mail.gmail.com>
-	<59e890ab-45e4-fe8a-a8de-3c441de19080@redhat.com>
-	<CAFEAcA9b=XOhczb=vYRJLDFR5yYqHwYFF6YtO9veYFqsEDgYsw@mail.gmail.com>
-	<20170925175141.GC3030@localhost.localdomain>
-	<CAFEAcA8S0sAgpsKe0B7hjF9028rJdA6Ng6jFwvTFh+GupK7CRA@mail.gmail.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1dwY1F-0002mN-L6
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 14:22:18 -0400
+Received: from mail-pf0-x22c.google.com ([2607:f8b0:400e:c00::22c]:54487)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dwY1F-0002lc-D6
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 14:22:13 -0400
+Received: by mail-pf0-x22c.google.com with SMTP id d187so4206536pfg.11
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 11:22:13 -0700 (PDT)
+References: <20170921110625.9500-1-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <824254ac-23a1-30d5-e64e-e4e3147db6c4@linaro.org>
+Date: Mon, 25 Sep 2017 11:22:09 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8S0sAgpsKe0B7hjF9028rJdA6Ng6jFwvTFh+GupK7CRA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2] qdev: Mark devices as non-hotpluggable
- by default
+In-Reply-To: <20170921110625.9500-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] accel/tcg/cputlb: avoid recursive BQL
+ (fixes #1706296)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,28 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Amit Shah <amit@kernel.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Paolo Bonzini <bonzini@gnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Jones <rjones@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Mon, Sep 25, 2017 at 07:02:06PM +0100, Peter Maydell wrote:
-> On 25 September 2017 at 18:51, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > On Mon, Sep 25, 2017 at 06:45:15PM +0100, Peter Maydell wrote:
-> >> You should be able to on the command line for x86 do something
-> >> like -device virtio-pci,... -device virtio-foo-device,...
-> >> to manually create the pci transport and the backend.
-> >
-> > virtio-pci is abstract, so this is not possible.  (The same
-> > applies to virtio-ccw-device).
+On 09/21/2017 04:06 AM, Alex Bennée wrote:
+> The mmio path (see exec.c:prepare_mmio_access) already protects itself
+> against recursive locking and it makes sense to do the same for
+> io_readx/writex. Otherwise any helper running in the BQL context will
+> assert when it attempts to write to device memory as in the case of
+> the bug report.
 > 
-> Did I use the wrong device name? I meant the transport
-> layer device (which virtio-pci-blk creates along with
-> virtio-blk-device internally), not the abstract device
-> that's a base class for the pci devices.
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> CC: Richard Jones <rjones@redhat.com>
+> CC: Paolo Bonzini <bonzini@gnu.org>
+> ---
+>  accel/tcg/cputlb.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-AFAIK, virtio-pci/virtio-pci-blk itself is the transport layer
-device.  Internally, it creates two objects: a virtio-pci-bus
-(which is a 1-device bus, not creatable using -device), and a
-virtio-blk-device attached to that bus.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
--- 
-Eduardo
+I guess I'll queue this through tcg-next?
+
+
+r~
