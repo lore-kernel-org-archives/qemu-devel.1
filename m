@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43355)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dwQHl-0007Rj-L7
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 06:06:46 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dwQIv-0008Db-VX
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 06:07:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dwQHh-0004SV-BT
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 06:06:45 -0400
-Date: Mon, 25 Sep 2017 11:06:38 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170925100638.GJ14140@stefanha-x1.localdomain>
-References: <20170923111411.18626-1-el13635@mail.ntua.gr>
-	<20170923111411.18626-3-el13635@mail.ntua.gr>
+	(envelope-from <cohuck@redhat.com>) id 1dwQIr-0004tZ-M5
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 06:07:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59616)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dwQIr-0004tB-G1
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 06:07:53 -0400
+Date: Mon, 25 Sep 2017 12:07:45 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170925120745.7326637e.cohuck@redhat.com>
+In-Reply-To: <5cdfe359-2e78-7e2a-72c2-d3e69574288e@linux.vnet.ibm.com>
+References: <20170922083855.102341-1-borntraeger@de.ibm.com>
+	<20170922083855.102341-3-borntraeger@de.ibm.com>
+	<5e7ba7d5-82d4-f1e6-532a-37c2c445c227@linux.vnet.ibm.com>
+	<ccb6e3eb-320e-b5dd-f728-09d8cab440c4@de.ibm.com>
+	<eee7e600-a8b0-6e23-580b-803f3b4e9efa@linux.vnet.ibm.com>
+	<4a31c53b-98aa-747a-1402-1a93e74c565b@de.ibm.com>
+	<5cdfe359-2e78-7e2a-72c2-d3e69574288e@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170923111411.18626-3-el13635@mail.ntua.gr>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 2/3] block: rename
- bdrv_co_drain to bdrv_co_drain_begin
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH/RFC 2/3] s390x/ais: enable ais when
+ migration is available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,17 +33,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-On Sat, Sep 23, 2017 at 02:14:10PM +0300, Manos Pitsidianakis wrote:
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
-> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
-> ---
->  include/block/block_int.h | 4 ++--
->  block/io.c                | 4 ++--
->  block/qed.c               | 6 +++---
->  3 files changed, 7 insertions(+), 7 deletions(-)
+On Fri, 22 Sep 2017 16:27:00 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> One thing I would find very helpful is what do we expect to work and not
+> work for which version. Kind of a matrix. For instance should vfio pci
+> work for versions prior 2.11. I think in the not so distant past we
+> changed how SIC works (so it complains when we don't have ais).
+
+A matrix sounds like a good idea.
+
+I don't think we really ever had a setup that worked out of the box
+for a Linux guest prior to 2.10 anyway. For added fun, it also depends
+on the host kernel. And tcg won't work at all due to the pci
+instruction not yet being wired up.
+
+> Btw nimm/dimm is simm/nimm. And I would really like to hear something
+> form the original author(s) too.
+
+Seconded.
