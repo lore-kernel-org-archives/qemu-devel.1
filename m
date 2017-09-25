@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=434883a06=anthony.perard@citrix.com>)
-	id 1dwUaJ-0002Kj-Tb
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:42:13 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dwUnN-0005YP-SV
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:55:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=434883a06=anthony.perard@citrix.com>)
-	id 1dwUaF-0004FL-LZ
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:42:11 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:30576)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=434883a06=anthony.perard@citrix.com>)
-	id 1dwUaF-0004Ee-Do
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:42:07 -0400
-Date: Mon, 25 Sep 2017 15:41:34 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20170925144134.GF1859@perard.uk.xensource.com>
-References: <20170922120725.10910-1-jgross@suse.com>
-	<20170922120725.10910-3-jgross@suse.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20170922120725.10910-3-jgross@suse.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] xen: dont try setting max grants
- multiple times
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dwUnI-000313-NR
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:55:41 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:28024 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dwUnI-00030F-BL
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:55:36 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 25 Sep 2017 17:55:29 +0300
+Message-Id: <20170925145529.188686-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH] iotests: fix 181: enable postcopy-ram
+ capability on target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,85 +23,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juergen Gross <jgross@suse.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, kraxel@redhat.com, sstabellini@kernel.org
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com
+Cc: quintela@redhat.com, dgilbert@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-On Fri, Sep 22, 2017 at 02:07:25PM +0200, Juergen Gross wrote:
-> Trying to call xengnttab_set_max_grants() with the same file handle
-> might fail on some kernels, as this operation is allowed only once.
-> 
-> This is a problem for the qdisk backend as blk_connect() can be
-> called multiple times for a domain, e.g. in case grub-xen is being
-> used to boot it.
-> 
-> So instead of letting the generic backend code open the gnttab device
-> do it in blk_connect() and close it again in blk_disconnect.
-> 
-> Signed-off-by: Juergen Gross <jgross@suse.com>
+Migration capabilities should be enabled on both source and
+destination qemu processes.
 
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
 
-Thanks.
+Hi all.
 
-> ---
-> V2:
-> - always call blk_disconnect() from blk_free() in order to have the
->   gnttab device node closed (Anthony Perard)
-> ---
->  hw/block/xen_disk.c | 16 ++++++++++++----
->  1 file changed, 12 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
-> index 62506e3167..e431bd89e8 100644
-> --- a/hw/block/xen_disk.c
-> +++ b/hw/block/xen_disk.c
-> @@ -1220,6 +1220,12 @@ static int blk_connect(struct XenDevice *xendev)
->      /* Add on the number needed for the ring pages */
->      max_grants += blkdev->nr_ring_ref;
->  
-> +    blkdev->xendev.gnttabdev = xengnttab_open(NULL, 0);
-> +    if (blkdev->xendev.gnttabdev == NULL) {
-> +        xen_pv_printf(xendev, 0, "xengnttab_open failed: %s\n",
-> +                      strerror(errno));
-> +        return -1;
-> +    }
->      if (xengnttab_set_max_grants(blkdev->xendev.gnttabdev, max_grants)) {
->          xen_pv_printf(xendev, 0, "xengnttab_set_max_grants failed: %s\n",
->                        strerror(errno));
-> @@ -1327,6 +1333,11 @@ static void blk_disconnect(struct XenDevice *xendev)
->          }
->          blkdev->feature_persistent = false;
->      }
-> +
-> +    if (blkdev->xendev.gnttabdev) {
-> +        xengnttab_close(blkdev->xendev.gnttabdev);
-> +        blkdev->xendev.gnttabdev = NULL;
-> +    }
->  }
->  
->  static int blk_free(struct XenDevice *xendev)
-> @@ -1334,9 +1345,7 @@ static int blk_free(struct XenDevice *xendev)
->      struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
->      struct ioreq *ioreq;
->  
-> -    if (blkdev->blk || blkdev->sring) {
-> -        blk_disconnect(xendev);
-> -    }
-> +    blk_disconnect(xendev);
->  
->      while (!QLIST_EMPTY(&blkdev->freelist)) {
->          ioreq = QLIST_FIRST(&blkdev->freelist);
-> @@ -1363,7 +1372,6 @@ static void blk_event(struct XenDevice *xendev)
->  
->  struct XenDevOps xen_blkdev_ops = {
->      .size       = sizeof(struct XenBlkDev),
-> -    .flags      = DEVOPS_FLAG_NEED_GNTDEV,
->      .alloc      = blk_alloc,
->      .init       = blk_init,
->      .initialise    = blk_connect,
-> -- 
-> 2.12.3
-> 
+After my patch
 
+    commit 58110f0acb1a33e2bc60a2f1b26d2690a92e8a14
+    Author: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+    Date:   Mon Jul 10 19:30:16 2017 +0300
+
+        migration: split common postcopy out of ram postcopy
+
+test 181 becomes broken. Sorry for that.
+
+Actually, test 181 itself should be fixed, so, here is a fix.
+The problem was noted by Kevin, and it touches also some problems
+with image locking, which I don't see with my older kernel, so,
+please check is this patch fixes all problems.
+
+ tests/qemu-iotests/181     | 2 ++
+ tests/qemu-iotests/181.out | 1 -
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
+index 0333dda0e3..0c91e8f9de 100755
+--- a/tests/qemu-iotests/181
++++ b/tests/qemu-iotests/181
+@@ -93,7 +93,9 @@ echo
+ 
+ # Slow down migration so much that it definitely won't finish before we can
+ # switch to postcopy
++# Enable postcopy-ram capability both on source and destination
+ silent=yes
++_send_qemu_cmd $dest 'migrate_set_capability postcopy-ram on' "(qemu)"
+ _send_qemu_cmd $src 'migrate_set_speed 4k' "(qemu)"
+ _send_qemu_cmd $src 'migrate_set_capability postcopy-ram on' "(qemu)"
+ _send_qemu_cmd $src "migrate -d unix:${MIG_SOCKET}" "(qemu)"
+diff --git a/tests/qemu-iotests/181.out b/tests/qemu-iotests/181.out
+index 6534ba2a76..d58c6a9dab 100644
+--- a/tests/qemu-iotests/181.out
++++ b/tests/qemu-iotests/181.out
+@@ -20,7 +20,6 @@ read 65536/65536 bytes at offset 0
+ 
+ === Do some I/O on the destination ===
+ 
+-QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) qemu-io disk "read -P 0x55 0 64k"
+ read 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
 -- 
-Anthony PERARD
+2.11.1
