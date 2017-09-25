@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dwPGn-0002To-Sl
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:01:47 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dwPH5-0002uh-7d
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:02:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dwPGl-0004Y2-AW
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:01:41 -0400
-References: <20170925085825.20549-1-clg@kaod.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <362d1a83-4838-f5ae-a45d-2d9e646fb1df@redhat.com>
-Date: Mon, 25 Sep 2017 11:01:34 +0200
+	(envelope-from <stefanha@redhat.com>) id 1dwPGz-0004d2-Py
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:01:59 -0400
+Date: Mon, 25 Sep 2017 10:01:44 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170925090144.GB14140@stefanha-x1.localdomain>
+References: <20170922154014.29350-1-f4bug@amsat.org>
+	<20170922154014.29350-5-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20170925085825.20549-1-clg@kaod.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170922154014.29350-5-f4bug@amsat.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] ppc/pnv: check for OPAL firmware file
- presence
+Subject: Re: [Qemu-devel] [PATCH 04/34] misc: remove headers implicitly
+ included
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,48 +25,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Ben Warren <ben@skyportsystems.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On 25.09.2017 10:58, C=C3=A9dric Le Goater wrote:
-> and exit before uselessly trying to load it if the file does not
-> exists.
+On Fri, Sep 22, 2017 at 12:39:44PM -0300, Philippe Mathieu-Daud=E9 wrote:
+> applied using ./scripts/clean-includes
 >=20
-> Issue discovered by Coverity Scan.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 > ---
->=20
->  Changes since v1:
->=20
->  - fixed spelling
->  - improved OPAL naming by adding firmware=20
->=20
->  hw/ppc/pnv.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 47221158d415..d46d91c76f5c 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -570,10 +570,14 @@ static void ppc_powernv_init(MachineState *machin=
-e)
->      }
-> =20
->      fw_filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
-> +    if (!fw_filename) {
-> +        error_report("Could not find OPAL firmware '%s'", bios_name);
-> +        exit(1);
-> +    }
-> =20
->      fw_size =3D load_image_targphys(fw_filename, FW_LOAD_ADDR, FW_MAX_=
-SIZE);
->      if (fw_size < 0) {
-> -        error_report("Could not load OPAL '%s'", fw_filename);
-> +        error_report("Could not load OPAL firmware '%s'", fw_filename)=
-;
->          exit(1);
->      }
->      g_free(fw_filename);
->=20
+>  hw/audio/fmopl.h             | 1 -
+>  bsd-user/main.c              | 1 -
+>  chardev/wctablet.c           | 4 ----
+>  hw/scsi/vhost-user-scsi.c    | 1 -
+>  linux-user/main.c            | 1 -
+>  net/colo-compare.c           | 1 -
+>  tests/test-aio-multithread.c | 1 -
+>  tests/test-clone-visitor.c   | 1 -
+>  tests/vmgenid-test.c         | 3 ---
+>  9 files changed, 14 deletions(-)
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
