@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dwW5O-0003xJ-Ki
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 12:18:23 -0400
+	(envelope-from <prvs=434883a06=anthony.perard@citrix.com>)
+	id 1dwWFn-00070i-2T
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 12:29:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dwW5L-00077s-EV
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 12:18:22 -0400
-References: <40DEFE92-410B-4FED-B0A5-56C186627134@loffgren.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b99306b2-2e53-7b0f-933c-c549c54b07b7@redhat.com>
-Date: Mon, 25 Sep 2017 11:18:14 -0500
+	(envelope-from <prvs=434883a06=anthony.perard@citrix.com>)
+	id 1dwWFk-0003OI-00
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 12:29:07 -0400
+Received: from smtp.citrix.com ([66.165.176.89]:56656)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=434883a06=anthony.perard@citrix.com>)
+	id 1dwWFj-0003N7-Ov
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 12:29:03 -0400
+Date: Mon, 25 Sep 2017 17:28:59 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20170925162859.GE25986@perard.uk.xensource.com>
+References: <1505498999-17427-1-git-send-email-ian.jackson@eu.citrix.com>
+	<1505498999-17427-5-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <40DEFE92-410B-4FED-B0A5-56C186627134@loffgren.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wvWmL0C68swImAXnxxFUpqCnxUH6UENSk"
-Subject: Re: [Qemu-devel] [PATCH 1/2] fprintf-fn.h uses GCC_FMT,
- but doesn't include the definition of it
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1505498999-17427-5-git-send-email-ian.jackson@eu.citrix.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 4/6] xen: destroy_hvm_domain: Move
+ reason into a variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,70 +31,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Loffgren <daniel@loffgren.org>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
+To: Ian Jackson <ian.jackson@eu.citrix.com>
+Cc: qemu-devel@nongnu.org, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wvWmL0C68swImAXnxxFUpqCnxUH6UENSk
-From: Eric Blake <eblake@redhat.com>
-To: Daniel Loffgren <daniel@loffgren.org>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
-Message-ID: <b99306b2-2e53-7b0f-933c-c549c54b07b7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] fprintf-fn.h uses GCC_FMT, but doesn't
- include the definition of it
-References: <40DEFE92-410B-4FED-B0A5-56C186627134@loffgren.org>
-In-Reply-To: <40DEFE92-410B-4FED-B0A5-56C186627134@loffgren.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Sep 15, 2017 at 07:09:57PM +0100, Ian Jackson wrote:
+> We are going to want to reuse this.
+> 
+> No functional change.
+> 
+> Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-On 09/24/2017 08:02 PM, Daniel Loffgren wrote:
->=20
-> Signed-off-by: Daniel Loffgren <daniel@loffgren.org>
-
-Hmm - you've identified a file with no listed maintainer.  But
-qemu-trivial does seem like the right place to include it.
-
-Generally, we like patches to call out the topic that it is touching;
-also, the subject line should focus on the what, while the body focuses
-on the why.  So a better commit message might be:
-
-maint: Make fprintf-fn.h self-contained
-
-Include the necessary headers so that GCC_FMT_ATTR is defined regardless
-of what client files use fprintf-fn.h.
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 
 
-However, after saying that, I think your patch is not needed.  Per
-HACKING, _all_ .c files must include osdep.h first, and osdep.h already
-includes compiler.h, therefore, any .c file that uses fprintf-fn.h
-already has GCC_FMT_ATTR in scope by the time it gets to the
-fprintf_function typedef.  If you ran into a situation where you had a
-compile failure, please post more details of what failed for you, in
-case the problem was you forgetting to use osdep.h.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---wvWmL0C68swImAXnxxFUpqCnxUH6UENSk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnJLEYACgkQp6FrSiUn
-Q2q2+wf/S6KNmkFI8dcq9rRmQEOiZ6lR0/7korWHe57Rj4KjM+d8UruSNS+lQ16E
-pD0rik9zRZjlyInGUi8hHCH+nMBn/PgDJl+GZuudLG6N4hWXrm6NkAjwvlsj1C+S
-L0sD671k8CTZPdnXLT7MA3uTvSa+Dro00EsjcEhKTP+fJu9DvDO7PnXYKXWMDQC8
-D9jZfq5fGHVV6ex1wvaNmvhzHtvHkiiReGh/I3SXYywUCkURvDL44YjFVTEeHEfM
-H5rJq4CB9M2eLg+Udt0Bxhw37VxrRvKeEHSi1w735Z1wHmAWfKrrwxCC1TMwbOY4
-Mpv3FZHMD37/0C78mzExG4PdZGOswQ==
-=Q3dV
------END PGP SIGNATURE-----
-
---wvWmL0C68swImAXnxxFUpqCnxUH6UENSk--
+-- 
+Anthony PERARD
