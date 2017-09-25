@@ -1,24 +1,63 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dwR1j-0006gW-B9
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 06:54:16 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dwR56-00082j-Ub
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 06:57:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dwR1f-0000pL-16
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 06:54:15 -0400
-References: <20170915090643.6043-1-otubo@redhat.com>
-	<fbe31cc8-c628-32e6-90b0-0341ef1972d3@msgid.tls.msk.ru>
-	<0e84971b-592e-22f7-8815-2b3e193f6c1d@redhat.com>
-	<20170925092641.GD12137@vader>
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <52fe072e-8e53-0610-2195-3ef8e120b553@msgid.tls.msk.ru>
-Date: Mon, 25 Sep 2017 13:54:08 +0300
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dwR53-0002Rp-Sw
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 06:57:45 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37646)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dwR53-0002RJ-J1
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 06:57:41 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8PAraVx081641
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 06:57:37 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d6yp4axy3-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 06:57:35 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Mon, 25 Sep 2017 11:57:33 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+	[9.149.105.62])
+	by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id v8PAvVnd20906090
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 10:57:31 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 33C47AE051
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 11:52:16 +0100 (BST)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 07C5CAE045
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 11:52:16 +0100 (BST)
+Received: from oc3836556865.ibm.com (unknown [9.152.224.207])
+	by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 11:52:15 +0100 (BST)
+References: <8946b1ec-4d14-c953-deab-aaded7cd2c9d@linux.vnet.ibm.com>
+	<20170906162019.45eeec4a.cohuck@redhat.com>
+	<cc6eab96-969d-eb66-91b5-cdb965c1bcbb@linux.vnet.ibm.com>
+	<20170907085831.GF31680@bjsdjshi@linux.vnet.ibm.com>
+	<20170907122400.5b2e3faa.cohuck@redhat.com>
+	<27b2addf-0d1c-81d7-1e82-1a8cdac70231@linux.vnet.ibm.com>
+	<20170907134134.00f387e8.cohuck@redhat.com>
+	<20170908034100.GH31680@bjsdjshi@linux.vnet.ibm.com>
+	<381cb778-5679-634c-9d3d-7276f877da3a@linux.vnet.ibm.com>
+	<20170908115950.56996cc6.cohuck@redhat.com>
+	<20170925073159.GR11080@bjsdjshi@linux.vnet.ibm.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Mon, 25 Sep 2017 12:57:31 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170925092641.GD12137@vader>
+In-Reply-To: <20170925073159.GR11080@bjsdjshi@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] dma/i82374: avoid double creation of
- i82374 device
+Message-Id: <f7755ca8-78f3-759e-f879-fea2f4fdadfc@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 4/9] s390x: refactor error handling for
+ SSCH and RSCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,36 +66,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Otubo <otubo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, qemu-trivial@nongnu.org, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
 
-25.09.2017 12:26, Eduardo Otubo wrote:
-> On Mon, Sep 25, 2017 at 11:11:37AM +0200, Paolo Bonzini wrote:
->> On 24/09/2017 23:02, Michael Tokarev wrote:
->>> 15.09.2017 12:06, Eduardo Otubo wrote:
->>>> QEMU fails when used with the following command line:
->>>>
->>>>   ./ppc64-softmmu/qemu-system-ppc64 -S -machine 40p,accel=tcg -device i82374
->>>>   qemu-system-ppc64: hw/isa/isa-bus.c:110: isa_bus_dma: Assertion `!bus->dma[0] && !bus->dma[1]' failed.
->>>>   Aborted (core dumped)
->>>>
->>>> The 40p machine type already creates the device i82374. If specified in the
->>>> command line, it will try to create it again, hence generating the error. The
->>>> function isa_bus_dma() isn't supposed to be called twice for the same bus. One
->>>> way to avoid this problem is to set user_creatable=false.
->>>
->>> Applied to -trivial, thanks!
->>
->> Eduardo, weren't you going to send a version that propagates Error*
->> correctly instead?
+
+
+On 09/25/2017 09:31 AM, Dong Jia Shi wrote:
+> * Cornelia Huck <cohuck@redhat.com> [2017-09-08 11:59:50 +0200]:
 > 
-> Yes, that's correct. I can revert this patch with the error
-> propagation patch as well, if you guys don't mind.
+>> On Fri, 8 Sep 2017 11:21:57 +0200
+>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+>>
+>>> On 09/08/2017 05:41 AM, Dong Jia Shi wrote:
+>>>> Let' me summarize here, in case I misunderstand things. Now we have
+>>>> two ways to choose:
+>>>>
+>>>> A. Kernel: no change.
+>>>>    Qemu  : handle -EFAULT as option 2 by generating a program check.
+>>>>
+>>>> B. Kernel: return -EFAULT
+>>>>            +
+>>>>            update the IRB area in the I/O region for option 1 to present
+>>>>            a unit check SCSW (with proper sense byte ECW), and for option
+>>>>            2 to present a program check.
+>>>>    Qemu  : handle -EFAULT according to the information that the IRB area
+>>>>            provided.  
+>>>
+>>> This is not what I was trying to say. You got my message regarding A, but
+>>> B was supposed to be understood like this.
+>>>
+>>> Keep the current handling for option 1, that is return -EFAULT. For option
+>>> 2 do what the spec says, execute the program until the bad address and then
+>>> generate a program-check (SCSW) once the bad stuff has it's turn. Thus
+>>> the only change in QEMU would be handling -EFAULT with an unit check (because
+>>> now it's just option 1).
+> Let me adding some context information here by copying some words from the
+> previous mail in this thread:
+> The only option 2 case in the kernel is ccwchain_fetch_idal() finding a
+> bad idaw_iova.
+> 
+> What you propose to do for this case is (correct me if I get it wrong):
+> In ccwchain_fetch_idal(), we do not return -EFAULT, instead we return 0,
+> and issuing the incompletely translated channel program with the bad
+> address to the physical device. And QEMU will eventually get the SCSW
+> with the program-check from the physical device I/O result, and inject
+> it to guest for further handling.
+> 
 
-Hmm. After reading the original discussion I concluded this patch
-is okay.  I can remove it right now before the series has been
-applied, together with another tiny change.
+I guess that would be the cleanest. I would also be fine with not making
+the physical device program-check (issuing a shortened channel program,
+and doing the program check in software) but that's probably more
+complicated to implement.
 
-Thanks,
+> Is this understanding right? If so, I'm fine with that, and I can
+> provide the fix in the kernel.
+> 
 
-/mjt
+That would be nice.
+
+>>
+>> That makes sense to me.
+>>
+> 
