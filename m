@@ -1,35 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dwXOB-0002lW-Iz
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 13:41:52 -0400
+	(envelope-from <thuth@redhat.com>) id 1dwXOu-0003Mc-AR
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 13:42:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dwXO6-0001GB-MN
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 13:41:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44740)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dwXO6-0001Fk-EN
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 13:41:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dwXO3-0001tT-DM
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 17:41:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 21FBC2E8499
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 17:41:39 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1dwXOp-0001bJ-EU
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 13:42:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41108)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dwXOp-0001ax-8P
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 13:42:31 -0400
+References: <1506071794-4373-1-git-send-email-thuth@redhat.com>
+	<20170925135316.74fed6da.cohuck@redhat.com>
+	<20170925133153.GZ3030@localhost.localdomain>
+	<20170925154647.357047b9@nial.brq.redhat.com>
+	<20170925143439.GA3030@localhost.localdomain>
+	<f078939d-4ae0-0ae8-4030-3df0ed66299a@redhat.com>
+	<CAFEAcA-kmSkjhM0f+Ti7nY1_AuDm1pPcYHNGn50fes20YvOeBg@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <59e890ab-45e4-fe8a-a8de-3c441de19080@redhat.com>
+Date: Mon, 25 Sep 2017 19:42:13 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAFEAcA-kmSkjhM0f+Ti7nY1_AuDm1pPcYHNGn50fes20YvOeBg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 25 Sep 2017 17:33:42 -0000
-From: Thomas Huth <1681439@bugs.launchpad.net>
-Reply-To: Bug 1681439 <1681439@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170410132346.31250.84835.malonedeb@wampee.canonical.com>
-Message-Id: <150636082260.5891.1109315263523529911.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1681439] Re: qemu-system-x86_64:
- hw/ide/core.c:685: ide_cancel_dma_sync: Assertion `s->bus->dma->aiocb ==
- NULL' failed.
+Subject: Re: [Qemu-devel] [PATCH v2] qdev: Mark devices as non-hotpluggable
+ by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,65 +34,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Amit Shah <amit@kernel.org>
 
-Ok, I'm setting the state to "incomplete" so this will expire in 60
-days. If you hit the problem again, please change the state of the
-ticket back to "New".
+On 25.09.2017 17:26, Peter Maydell wrote:
+> On 25 September 2017 at 16:19, Thomas Huth <thuth@redhat.com> wrote:
+>> Not sure whether this works for the virtio-xxx-device devices,
+>> though, since they are marked as user_creatable =3D true currently...
+>=20
+> That's deliberate -- for the arm boards with virtio-mmio
+> the board creates a bunch of virtio-mmio transports and the
+> virtio-foo-device can be user created to plug into those.
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Yes, I know ... I'm just wondering whether the virtio-xxx-device devices
+should be non-user_creatable on the non-ARM targets, since they
+apparently can't be used with "-device" there...?
 
--- =
+> If overall trying to do the 'right thing' is tricky here
+> then perhaps we can start by flipping the default to
+> not-hotpluggable and marking some devices hotpluggable
+> that in theory shouldn't be with a comment about why.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1681439
+Yes, if Eduardo's idea to move the test to qmp_device_add() does not
+work out (I'll try that next), your suggestion is certainly the best
+thing we can do right now.
 
-Title:
-  qemu-system-x86_64: hw/ide/core.c:685: ide_cancel_dma_sync: Assertion
-  `s->bus->dma->aiocb =3D=3D NULL' failed.
+> Incidentally I think there's still some advantage in the
+> "created as part of some other device" devices having
+> to be explicitly marked hotpluggable, because those
+> devices do still need some specific code in them to
+> handle it (ie code to release the resources that are
+> created in the device's realize method).
 
-Status in QEMU:
-  Incomplete
+Ok ... by the way, does anybody know more devices like
+virtio-xxx-device, i.e. devices that are indirectly plugged when adding
+other devices?
 
-Bug description:
-  Since upgrading to QEMU 2.8.0, my Windows 7 64-bit virtual machines
-  started crashing due to the assertion quoted in the summary failing.
-  The assertion in question was added by commit 9972354856 ("block: add
-  BDS field to count in-flight requests").  My tests show that setting
-  discard=3Dunmap is needed to reproduce the issue.  Speaking of
-  reproduction, it is a bit flaky, because I have been unable to come up
-  with specific instructions that would allow the issue to be triggered
-  outside of my environment, but I do have a semi-sane way of testing that
-  appears to depend on a specific initial state of data on the underlying
-  storage volume, actions taken within the VM and waiting for about 20
-  minutes.
-
-  Here is the shortest QEMU command line that I managed to reproduce the
-  bug with:
-
-      qemu-system-x86_64 \
-          -machine pc-i440fx-2.7,accel=3Dkvm \
-          -m 3072 \
-          -drive file=3D/dev/lvm/qemu,format=3Draw,if=3Dide,discard=3Dunmap=
- \
-  	-netdev tap,id=3Dhostnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno,vhos=
-t=3Don \
-          -device virtio-net-pci,netdev=3Dhostnet0 \
-  	-vnc :0
-
-  The underlying storage (/dev/lvm/qemu) is a thin LVM snapshot.
-
-  QEMU was compiled using:
-
-      ./configure --python=3D/usr/bin/python2.7 --target-list=3Dx86_64-soft=
-mmu
-      make -j3
-
-  My virtualization environment is not really a critical one and
-  reproduction is not that much of a hassle, so if you need me to gather
-  further diagnostic information or test patches, I will be happy to help.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1681439/+subscriptions
+ Thomas
