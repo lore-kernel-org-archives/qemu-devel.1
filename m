@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <carenas@gmail.com>) id 1dwcf7-0007gs-5p
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 19:19:43 -0400
+	(envelope-from <carenas@gmail.com>) id 1dwcf8-0007ht-Tw
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 19:19:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <carenas@gmail.com>) id 1dwcf5-0001vN-FZ
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 19:19:41 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:34198)
+	(envelope-from <carenas@gmail.com>) id 1dwcf7-0001xw-2Z
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 19:19:42 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:35581)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <carenas@gmail.com>) id 1dwcf5-0001uh-7v
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 19:19:39 -0400
-Received: by mail-pg0-x242.google.com with SMTP id u18so5688030pgo.1
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 16:19:39 -0700 (PDT)
+	(Exim 4.71) (envelope-from <carenas@gmail.com>) id 1dwcf6-0001wm-Pg
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 19:19:40 -0400
+Received: by mail-pg0-x243.google.com with SMTP id j16so5683866pga.2
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 16:19:40 -0700 (PDT)
 From: =?UTF-8?q?Carlo=20Marcelo=20Arenas=20Bel=C3=B3n?= <carenas@gmail.com>
-Date: Mon, 25 Sep 2017 16:19:20 -0700
-Message-Id: <20170925231924.31303-3-carenas@gmail.com>
-In-Reply-To: <20170925231924.31303-2-carenas@gmail.com>
+Date: Mon, 25 Sep 2017 16:19:21 -0700
+Message-Id: <20170925231924.31303-4-carenas@gmail.com>
+In-Reply-To: <20170925231924.31303-3-carenas@gmail.com>
 References: <20170925231924.31303-1-carenas@gmail.com>
 	<20170925231924.31303-2-carenas@gmail.com>
+	<20170925231924.31303-3-carenas@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 2/6] linux-user: refactor socket.h for alpha
+Subject: [Qemu-devel] [PATCH v2 3/6] linux-user: refactor socket.h for mips
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,53 +33,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu, riku.voipio@iki.fi, =?UTF-8?q?Carlo=20Marcelo=20Arenas=20Bel=C3=B3n?= <carenas@gmail.com>
 
-based on fresh bits from linux 4.14 and therefore enabling SO_REUSEPORT
-as a side effect
+fresh bits from linux 4.14, redefine SO_STYLE and {SO,SCM}_TIMESTAMP to
+the right target values and enables SO_REUSEPORT
 
-to easy on maintenance SO_NONBLOCK updated to match the value from linux
-headers (in hexadecimal) as seen in arch/alpha/include/asm/socket.h
+to easy on maintenance SOCK_NONBLOCK has been updated to use the same
+value (in hexadecimal) as defined for O_NONBLOCK from the linux header
+arch/mips/linux/uapi/asm/fcntl.h
 
 Signed-off-by: Carlo Marcelo Arenas Belón <carenas@gmail.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/alpha/sockbits.h | 104 ++++++++++++++++++++++++++++++++++++++++++++
- linux-user/socket.h         | 104 +-------------------------------------------
- 2 files changed, 105 insertions(+), 103 deletions(-)
- create mode 100644 linux-user/alpha/sockbits.h
+ linux-user/mips/sockbits.h | 107 +++++++++++++++++++++++++++++++++++++++++++++
+ linux-user/socket.h        | 103 +------------------------------------------
+ 2 files changed, 108 insertions(+), 102 deletions(-)
+ create mode 100644 linux-user/mips/sockbits.h
 
-diff --git a/linux-user/alpha/sockbits.h b/linux-user/alpha/sockbits.h
+diff --git a/linux-user/mips/sockbits.h b/linux-user/mips/sockbits.h
 new file mode 100644
-index 0000000000..768579a1f7
+index 0000000000..6d8ea8aba2
 --- /dev/null
-+++ b/linux-user/alpha/sockbits.h
-@@ -0,0 +1,104 @@
-+#define TARGET_SOL_SOCKET                       0xffff
++++ b/linux-user/mips/sockbits.h
+@@ -0,0 +1,107 @@
++#define TARGET_SOL_SOCKET     0xffff
 +
-+#define TARGET_SO_DEBUG                         0x0001
-+#define TARGET_SO_REUSEADDR                     0x0004
-+#define TARGET_SO_KEEPALIVE                     0x0008
-+#define TARGET_SO_DONTROUTE                     0x0010
-+#define TARGET_SO_BROADCAST                     0x0020
-+#define TARGET_SO_LINGER                        0x0080
-+#define TARGET_SO_OOBINLINE                     0x0100
-+#define TARGET_SO_REUSEPORT                     0x0200
-+#define TARGET_SO_TYPE                          0x1008
-+#define TARGET_SO_ERROR                         0x1007
-+#define TARGET_SO_SNDBUF                        0x1001
-+#define TARGET_SO_RCVBUF                        0x1002
-+#define TARGET_SO_SNDBUFFORCE                   0x100a
-+#define TARGET_SO_RCVBUFFORCE                   0x100b
-+#define TARGET_SO_RCVLOWAT                      0x1010
-+#define TARGET_SO_SNDLOWAT                      0x1011
-+#define TARGET_SO_RCVTIMEO                      0x1012
-+#define TARGET_SO_SNDTIMEO                      0x1013
-+#define TARGET_SO_ACCEPTCONN                    0x1014
-+#define TARGET_SO_PROTOCOL                      0x1028
-+#define TARGET_SO_DOMAIN                        0x1029
++#define TARGET_SO_DEBUG       0x0001 /* Record debugging information.  */
++#define TARGET_SO_REUSEADDR   0x0004 /* Allow reuse of local addresses.  */
++#define TARGET_SO_KEEPALIVE   0x0008 /* Keep connections alive and send
++                                        SIGPIPE when they die. */
++#define TARGET_SO_DONTROUTE   0x0010 /* Don't do local routing. */
++#define TARGET_SO_BROADCAST   0x0020 /* Allow transmission of
++                                        broadcast messages. */
++#define TARGET_SO_LINGER      0x0080 /* Block on close of a reliable
++                                        socket to transmit pending data. */
++#define TARGET_SO_OOBINLINE   0x0100 /* Receive out-of-band data in-band. */
++#define TARGET_SO_REUSEPORT   0x0200 /* Allow local address and port reuse. */
++#define TARGET_SO_TYPE        0x1008 /* Compatible name for TARGET_SO_STYLE. */
++#define TARGET_SO_STYLE       TARGET_SO_TYPE /* Synonym */
++#define TARGET_SO_ERROR       0x1007         /* get error status and clear */
++#define TARGET_SO_SNDBUF      0x1001         /* Send buffer size. */
++#define TARGET_SO_RCVBUF      0x1002         /* Receive buffer. */
++#define TARGET_SO_SNDLOWAT    0x1003         /* send low-water mark */
++#define TARGET_SO_RCVLOWAT    0x1004         /* receive low-water mark */
++#define TARGET_SO_SNDTIMEO    0x1005         /* send timeout */
++#define TARGET_SO_RCVTIMEO    0x1006         /* receive timeout */
++#define TARGET_SO_ACCEPTCONN  0x1009
++#define TARGET_SO_PROTOCOL    0x1028         /* protocol type */
++#define TARGET_SO_DOMAIN      0x1029         /* domain/socket family */
 +#define TARGET_SO_NO_CHECK                      11
 +#define TARGET_SO_PRIORITY                      12
 +#define TARGET_SO_BSDCOMPAT                     14
 +#define TARGET_SO_PASSCRED                      17
 +#define TARGET_SO_PEERCRED                      18
++#define TARGET_SO_SECURITY_AUTHENTICATION       22
++#define TARGET_SO_SECURITY_ENCRYPTION_TRANSPORT 23
++#define TARGET_SO_SECURITY_ENCRYPTION_NETWORK   24
 +#define TARGET_SO_BINDTODEVICE                  25
 +#define TARGET_SO_ATTACH_FILTER                 26
 +#define TARGET_SO_DETACH_FILTER                 27
@@ -87,12 +95,11 @@ index 0000000000..768579a1f7
 +#define TARGET_SO_TIMESTAMP                     29
 +#define TARGET_SCM_TIMESTAMP                    TARGET_SO_TIMESTAMP
 +#define TARGET_SO_PEERSEC                       30
++#define TARGET_SO_SNDBUFFORCE                   31
++#define TARGET_SO_RCVBUFFORCE                   33
 +#define TARGET_SO_PASSSEC                       34
 +#define TARGET_SO_TIMESTAMPNS                   35
 +#define TARGET_SCM_TIMESTAMPNS                  TARGET_SO_TIMESTAMPNS
-+#define TARGET_SO_SECURITY_AUTHENTICATION       19
-+#define TARGET_SO_SECURITY_ENCRYPTION_TRANSPORT 20
-+#define TARGET_SO_SECURITY_ENCRYPTION_NETWORK   21
 +#define TARGET_SO_MARK                          36
 +#define TARGET_SO_TIMESTAMPING                  37
 +#define TARGET_SCM_TIMESTAMPING                 TARGET_SO_TIMESTAMPING
@@ -122,12 +129,12 @@ index 0000000000..768579a1f7
 +
 +/** sock_type - Socket types
 + *
-+ * Please notice that for binary compat reasons ALPHA has to
++ * Please notice that for binary compat reasons MIPS has to
 + * override the enum sock_type in include/linux/net.h, so
 + * we define ARCH_HAS_SOCKET_TYPES here.
 + *
-+ * @SOCK_STREAM - stream (connection) socket
 + * @SOCK_DGRAM - datagram (conn.less) socket
++ * @SOCK_STREAM - stream (connection) socket
 + * @SOCK_RAW - raw socket
 + * @SOCK_RDM - reliably-delivered message
 + * @SOCK_SEQPACKET - sequential packet socket
@@ -138,17 +145,16 @@ index 0000000000..768579a1f7
 + * @SOCK_CLOEXEC - sets the close-on-exec (FD_CLOEXEC) flag.
 + * @SOCK_NONBLOCK - sets the O_NONBLOCK file status flag.
 + */
-+
 +enum sock_type {
-+    TARGET_SOCK_STREAM      = 1,
-+    TARGET_SOCK_DGRAM       = 2,
++    TARGET_SOCK_DGRAM       = 1,
++    TARGET_SOCK_STREAM      = 2,
 +    TARGET_SOCK_RAW         = 3,
 +    TARGET_SOCK_RDM         = 4,
 +    TARGET_SOCK_SEQPACKET   = 5,
 +    TARGET_SOCK_DCCP        = 6,
 +    TARGET_SOCK_PACKET      = 10,
-+    TARGET_SOCK_CLOEXEC     = 010000000,
-+    TARGET_SOCK_NONBLOCK    = 0x40000000,
++    TARGET_SOCK_CLOEXEC     = 02000000,
++    TARGET_SOCK_NONBLOCK    = 0x0080,
 +};
 +
 +#define TARGET_SOCK_MAX (TARGET_SOCK_PACKET + 1)
@@ -156,84 +162,80 @@ index 0000000000..768579a1f7
 +
 +#define ARCH_HAS_SOCKET_TYPES 1
 diff --git a/linux-user/socket.h b/linux-user/socket.h
-index c7e6cb8ea1..115bdf2ddb 100644
+index 115bdf2ddb..036270a6e4 100644
 --- a/linux-user/socket.h
 +++ b/linux-user/socket.h
-@@ -102,109 +102,7 @@
-     #define TARGET_SOCK_TYPE_MASK    0xf  /* Covers up to TARGET_SOCK_MAX-1. */
- 
- #elif defined(TARGET_ALPHA)
+@@ -1,106 +1,5 @@
 -
--    /* For setsockopt(2) */
--    #define TARGET_SOL_SOCKET   0xffff
+ #if defined(TARGET_MIPS)
+-    /* MIPS special values for constants */
 -
--    #define TARGET_SO_DEBUG 0x0001
--    #define TARGET_SO_REUSEADDR 0x0004
--    #define TARGET_SO_KEEPALIVE 0x0008
--    #define TARGET_SO_DONTROUTE 0x0010
--    #define TARGET_SO_BROADCAST 0x0020
--    #define TARGET_SO_LINGER    0x0080
--    #define TARGET_SO_OOBINLINE 0x0100
--    /* To add :#define TARGET_SO_REUSEPORT 0x0200 */
+-    /*
+-     * For setsockopt(2)
+-     *
+-     * This defines are ABI conformant as far as Linux supports these ...
+-     */
+-    #define TARGET_SOL_SOCKET      0xffff
 -
--    #define TARGET_SO_TYPE      0x1008
--    #define TARGET_SO_ERROR 0x1007
--    #define TARGET_SO_SNDBUF    0x1001
--    #define TARGET_SO_RCVBUF    0x1002
--    #define TARGET_SO_SNDBUFFORCE   0x100a
--    #define TARGET_SO_RCVBUFFORCE   0x100b
--    #define TARGET_SO_RCVLOWAT  0x1010
--    #define TARGET_SO_SNDLOWAT  0x1011
--    #define TARGET_SO_RCVTIMEO  0x1012
--    #define TARGET_SO_SNDTIMEO  0x1013
--    #define TARGET_SO_ACCEPTCONN    0x1014
--    #define TARGET_SO_PROTOCOL  0x1028
--    #define TARGET_SO_DOMAIN    0x1029
+-    #define TARGET_SO_DEBUG        0x0001  /* Record debugging information. */
+-    #define TARGET_SO_REUSEADDR    0x0004  /* Allow reuse of local addresses. */
+-    #define TARGET_SO_KEEPALIVE    0x0008  /* Keep connections alive and send
+-                                              SIGPIPE when they die. */
+-    #define TARGET_SO_DONTROUTE    0x0010  /* Don't do local routing. */
+-    #define TARGET_SO_BROADCAST    0x0020  /* Allow transmission of
+-                                              broadcast messages. */
+-    #define TARGET_SO_LINGER       0x0080  /* Block on close of a reliable
+-                                            * socket to transmit pending data.
+-                                            */
+-    #define TARGET_SO_OOBINLINE 0x0100     /* Receive out-of-band data in-band.
+-                                            */
+-    #if 0
+-    /* To add: Allow local address and port reuse. */
+-    #define TARGET_SO_REUSEPORT 0x0200
+-    #endif
+-
+-    #define TARGET_SO_TYPE         0x1008  /* Compatible name for SO_STYLE. */
+-    #define TARGET_SO_STYLE        SO_TYPE /* Synonym */
+-    #define TARGET_SO_ERROR        0x1007  /* get error status and clear */
+-    #define TARGET_SO_SNDBUF       0x1001  /* Send buffer size. */
+-    #define TARGET_SO_RCVBUF       0x1002  /* Receive buffer. */
+-    #define TARGET_SO_SNDLOWAT     0x1003  /* send low-water mark */
+-    #define TARGET_SO_RCVLOWAT     0x1004  /* receive low-water mark */
+-    #define TARGET_SO_SNDTIMEO     0x1005  /* send timeout */
+-    #define TARGET_SO_RCVTIMEO     0x1006  /* receive timeout */
+-    #define TARGET_SO_ACCEPTCONN   0x1009
 -
 -    /* linux-specific, might as well be the same as on i386 */
--    #define TARGET_SO_NO_CHECK  11
--    #define TARGET_SO_PRIORITY  12
--    #define TARGET_SO_BSDCOMPAT 14
+-    #define TARGET_SO_NO_CHECK     11
+-    #define TARGET_SO_PRIORITY     12
+-    #define TARGET_SO_BSDCOMPAT    14
 -
--    #define TARGET_SO_PASSCRED  17
--    #define TARGET_SO_PEERCRED  18
--    #define TARGET_SO_BINDTODEVICE 25
+-    #define TARGET_SO_PASSCRED     17
+-    #define TARGET_SO_PEERCRED     18
+-
+-    /* Security levels - as per NRL IPv6 - don't actually do anything */
+-    #define TARGET_SO_SECURITY_AUTHENTICATION              22
+-    #define TARGET_SO_SECURITY_ENCRYPTION_TRANSPORT        23
+-    #define TARGET_SO_SECURITY_ENCRYPTION_NETWORK          24
+-
+-    #define TARGET_SO_BINDTODEVICE         25
 -
 -    /* Socket filtering */
 -    #define TARGET_SO_ATTACH_FILTER        26
 -    #define TARGET_SO_DETACH_FILTER        27
 -
--    #define TARGET_SO_PEERNAME      28
--    #define TARGET_SO_TIMESTAMP     29
--    #define TARGET_SCM_TIMESTAMP        TARGET_SO_TIMESTAMP
+-    #define TARGET_SO_PEERNAME             28
+-    #define TARGET_SO_TIMESTAMP            29
+-    #define SCM_TIMESTAMP          SO_TIMESTAMP
 -
--    #define TARGET_SO_PEERSEC       30
--    #define TARGET_SO_PASSSEC       34
--    #define TARGET_SO_TIMESTAMPNS       35
--    #define TARGET_SCM_TIMESTAMPNS      TARGET_SO_TIMESTAMPNS
--
--    /* Security levels - as per NRL IPv6 - don't actually do anything */
--    #define TARGET_SO_SECURITY_AUTHENTICATION       19
--    #define TARGET_SO_SECURITY_ENCRYPTION_TRANSPORT 20
--    #define TARGET_SO_SECURITY_ENCRYPTION_NETWORK       21
--
--    #define TARGET_SO_MARK          36
--
--    #define TARGET_SO_TIMESTAMPING      37
--    #define TARGET_SCM_TIMESTAMPING TARGET_SO_TIMESTAMPING
--
--    #define TARGET_SO_RXQ_OVFL             40
--
--    #define TARGET_SO_WIFI_STATUS       41
--    #define TARGET_SCM_WIFI_STATUS      TARGET_SO_WIFI_STATUS
--    #define TARGET_SO_PEEK_OFF      42
--
--    /* Instruct lower device to use last 4-bytes of skb data as FCS */
--    #define TARGET_SO_NOFCS     43
+-    #define TARGET_SO_PEERSEC              30
+-    #define TARGET_SO_SNDBUFFORCE          31
+-    #define TARGET_SO_RCVBUFFORCE          33
+-    #define TARGET_SO_PASSSEC              34
 -
 -    /** sock_type - Socket types
 -     *
--     * Please notice that for binary compat reasons ALPHA has to
+-     * Please notice that for binary compat reasons MIPS has to
 -     * override the enum sock_type in include/linux/net.h, so
 -     * we define ARCH_HAS_SOCKET_TYPES here.
 -     *
@@ -253,22 +255,23 @@ index c7e6cb8ea1..115bdf2ddb 100644
 -    #define ARCH_HAS_SOCKET_TYPES          1
 -
 -    enum sock_type {
--           TARGET_SOCK_STREAM      = 1,
--           TARGET_SOCK_DGRAM       = 2,
+-           TARGET_SOCK_DGRAM       = 1,
+-           TARGET_SOCK_STREAM      = 2,
 -           TARGET_SOCK_RAW         = 3,
 -           TARGET_SOCK_RDM         = 4,
 -           TARGET_SOCK_SEQPACKET   = 5,
 -           TARGET_SOCK_DCCP        = 6,
 -           TARGET_SOCK_PACKET      = 10,
--           TARGET_SOCK_CLOEXEC     = 010000000,
--           TARGET_SOCK_NONBLOCK    = 010000000000,
+-           TARGET_SOCK_CLOEXEC     = 02000000,
+-           TARGET_SOCK_NONBLOCK    = 0200,
 -    };
 -
 -    #define TARGET_SOCK_MAX (TARGET_SOCK_PACKET + 1)
 -    #define TARGET_SOCK_TYPE_MASK    0xf  /* Covers up to TARGET_SOCK_MAX-1. */
-+#include "alpha/sockbits.h"
+-
++#include "mips/sockbits.h"
+ #elif defined(TARGET_ALPHA)
+ #include "alpha/sockbits.h"
  #elif defined(TARGET_HPPA)
- #include "hppa/sockbits.h"
- #else
 -- 
 2.14.1
