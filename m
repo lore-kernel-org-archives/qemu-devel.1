@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dwSUw-0003k0-PU
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 08:28:33 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dwSUw-0003kM-Uv
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 08:28:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dwSUr-00067t-Un
+	(envelope-from <kwolf@redhat.com>) id 1dwSUt-00068b-9Z
 	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 08:28:30 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 25 Sep 2017 14:28:07 +0200
-Message-Id: <20170925122808.14561-5-kwolf@redhat.com>
+Date: Mon, 25 Sep 2017 14:28:08 +0200
+Message-Id: <20170925122808.14561-6-kwolf@redhat.com>
 In-Reply-To: <20170925122808.14561-1-kwolf@redhat.com>
 References: <20170925122808.14561-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/5] qemu-iotests: Test commit block job where
- top has two parents
+Subject: [Qemu-devel] [PATCH 5/5] commit: Remove overlay_bs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,1017 +22,245 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
+We don't need to make any assumptions about the graph layout above the
+top node of the commit operation any more. Remove the use of
+bdrv_find_overlay() and related variables from the commit job code.
+
+bdrv_drop_intermediate() doesn't use the 'active' parameter any more, so
+we can just drop it.
+
+The overlay node was previously added to the block job to get a
+BLK_PERM_GRAPH_MOD. We really need to respect those permissions in
+bdrv_drop_intermediate() now, but as long as we haven't figured out yet
+how BLK_PERM_GRAPH_MOD is actually supposed to work, just leave a TODO
+comment there.
+
+With this change, it is now possible to perform another block job on an
+overlay node without conflicts. qemu-iotests 030 is changed accordingly.
+
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/191     | 152 +++++++++
- tests/qemu-iotests/191.out | 827 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 980 insertions(+)
- create mode 100755 tests/qemu-iotests/191
- create mode 100644 tests/qemu-iotests/191.out
+ include/block/block.h  |  3 +--
+ block.c                |  6 +++--
+ block/commit.c         | 62 ++++++++++++--------------------------------------
+ tests/qemu-iotests/030 |  4 ----
+ 4 files changed, 20 insertions(+), 55 deletions(-)
 
-diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
-new file mode 100755
-index 0000000000..a4e0d691fa
---- /dev/null
-+++ b/tests/qemu-iotests/191
-@@ -0,0 +1,152 @@
-+#!/bin/bash
-+#
-+# Test commit block job where top has two parents
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+diff --git a/include/block/block.h b/include/block/block.h
+index 3c3af462e4..d5c2731a03 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -315,8 +315,7 @@ int bdrv_commit(BlockDriverState *bs);
+ int bdrv_change_backing_file(BlockDriverState *bs,
+     const char *backing_file, const char *backing_fmt);
+ void bdrv_register(BlockDriver *bdrv);
+-int bdrv_drop_intermediate(BlockDriverState *active, BlockDriverState *top,
+-                           BlockDriverState *base,
++int bdrv_drop_intermediate(BlockDriverState *top, BlockDriverState *base,
+                            const char *backing_file_str);
+ BlockDriverState *bdrv_find_overlay(BlockDriverState *active,
+                                     BlockDriverState *bs);
+diff --git a/block.c b/block.c
+index e57fab501d..5f2d7222a5 100644
+--- a/block.c
++++ b/block.c
+@@ -3491,8 +3491,8 @@ BlockDriverState *bdrv_find_base(BlockDriverState *bs)
+  *  if active == top, that is considered an error
+  *
+  */
+-int bdrv_drop_intermediate(BlockDriverState *active, BlockDriverState *top,
+-                           BlockDriverState *base, const char *backing_file_str)
++int bdrv_drop_intermediate(BlockDriverState *top, BlockDriverState *base,
++                           const char *backing_file_str)
+ {
+     BdrvChild *c, *next;
+     Error *local_err = NULL;
+@@ -3510,6 +3510,8 @@ int bdrv_drop_intermediate(BlockDriverState *active, BlockDriverState *top,
+     }
+ 
+     /* success - we can delete the intermediate states, and link top->base */
++    /* TODO Check graph modification op blockers (BLK_PERM_GRAPH_MOD) once
++     * we've figured out how they should work. */
+     backing_file_str = backing_file_str ? backing_file_str : base->filename;
+ 
+     QLIST_FOREACH_SAFE(c, &top->parents, next_parent, next) {
+diff --git a/block/commit.c b/block/commit.c
+index 610e1cd8f5..5036eec434 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -36,13 +36,11 @@ enum {
+ typedef struct CommitBlockJob {
+     BlockJob common;
+     RateLimit limit;
+-    BlockDriverState *active;
+     BlockDriverState *commit_top_bs;
+     BlockBackend *top;
+     BlockBackend *base;
+     BlockdevOnError on_error;
+     int base_flags;
+-    int orig_overlay_flags;
+     char *backing_file_str;
+ } CommitBlockJob;
+ 
+@@ -81,18 +79,15 @@ static void commit_complete(BlockJob *job, void *opaque)
+ {
+     CommitBlockJob *s = container_of(job, CommitBlockJob, common);
+     CommitCompleteData *data = opaque;
+-    BlockDriverState *active = s->active;
+     BlockDriverState *top = blk_bs(s->top);
+     BlockDriverState *base = blk_bs(s->base);
+-    BlockDriverState *overlay_bs = bdrv_find_overlay(active, s->commit_top_bs);
++    BlockDriverState *commit_top_bs = s->commit_top_bs;
+     int ret = data->ret;
+     bool remove_commit_top_bs = false;
+ 
+-    /* Make sure overlay_bs and top stay around until bdrv_set_backing_hd() */
++    /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
+     bdrv_ref(top);
+-    if (overlay_bs) {
+-        bdrv_ref(overlay_bs);
+-    }
++    bdrv_ref(commit_top_bs);
+ 
+     /* Remove base node parent that still uses BLK_PERM_WRITE/RESIZE before
+      * the normal backing chain can be restored. */
+@@ -100,9 +95,9 @@ static void commit_complete(BlockJob *job, void *opaque)
+ 
+     if (!block_job_is_cancelled(&s->common) && ret == 0) {
+         /* success */
+-        ret = bdrv_drop_intermediate(active, s->commit_top_bs, base,
++        ret = bdrv_drop_intermediate(s->commit_top_bs, base,
+                                      s->backing_file_str);
+-    } else if (overlay_bs) {
++    } else {
+         /* XXX Can (or should) we somehow keep 'consistent read' blocked even
+          * after the failed/cancelled commit job is gone? If we already wrote
+          * something to base, the intermediate images aren't valid any more. */
+@@ -115,9 +110,6 @@ static void commit_complete(BlockJob *job, void *opaque)
+     if (s->base_flags != bdrv_get_flags(base)) {
+         bdrv_reopen(base, s->base_flags, NULL);
+     }
+-    if (overlay_bs && s->orig_overlay_flags != bdrv_get_flags(overlay_bs)) {
+-        bdrv_reopen(overlay_bs, s->orig_overlay_flags, NULL);
+-    }
+     g_free(s->backing_file_str);
+     blk_unref(s->top);
+ 
+@@ -134,10 +126,13 @@ static void commit_complete(BlockJob *job, void *opaque)
+      * filter driver from the backing chain. Do this as the final step so that
+      * the 'consistent read' permission can be granted.  */
+     if (remove_commit_top_bs) {
+-        bdrv_set_backing_hd(overlay_bs, top, &error_abort);
++        bdrv_child_try_set_perm(commit_top_bs->backing, 0, BLK_PERM_ALL,
++                                &error_abort);
++        bdrv_replace_node(commit_top_bs, backing_bs(commit_top_bs),
++                          &error_abort);
+     }
+ 
+-    bdrv_unref(overlay_bs);
++    bdrv_unref(commit_top_bs);
+     bdrv_unref(top);
+ }
+ 
+@@ -283,10 +278,8 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+ {
+     CommitBlockJob *s;
+     BlockReopenQueue *reopen_queue = NULL;
+-    int orig_overlay_flags;
+     int orig_base_flags;
+     BlockDriverState *iter;
+-    BlockDriverState *overlay_bs;
+     BlockDriverState *commit_top_bs = NULL;
+     Error *local_err = NULL;
+     int ret;
+@@ -297,31 +290,19 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+         return;
+     }
+ 
+-    overlay_bs = bdrv_find_overlay(bs, top);
+-
+-    if (overlay_bs == NULL) {
+-        error_setg(errp, "Could not find overlay image for %s:", top->filename);
+-        return;
+-    }
+-
+     s = block_job_create(job_id, &commit_job_driver, bs, 0, BLK_PERM_ALL,
+                          speed, BLOCK_JOB_DEFAULT, NULL, NULL, errp);
+     if (!s) {
+         return;
+     }
+ 
+-    orig_base_flags    = bdrv_get_flags(base);
+-    orig_overlay_flags = bdrv_get_flags(overlay_bs);
+-
+-    /* convert base & overlay_bs to r/w, if necessary */
++    /* convert base to r/w, if necessary */
++    orig_base_flags = bdrv_get_flags(base);
+     if (!(orig_base_flags & BDRV_O_RDWR)) {
+         reopen_queue = bdrv_reopen_queue(reopen_queue, base, NULL,
+                                          orig_base_flags | BDRV_O_RDWR);
+     }
+-    if (!(orig_overlay_flags & BDRV_O_RDWR)) {
+-        reopen_queue = bdrv_reopen_queue(reopen_queue, overlay_bs, NULL,
+-                                         orig_overlay_flags | BDRV_O_RDWR);
+-    }
 +
-+# creator
-+owner=kwolf@redhat.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1 # failure is the default!
-+
-+MIG_SOCKET="${TEST_DIR}/migrate"
-+
-+_cleanup()
-+{
-+    rm -f "${TEST_IMG}.mid"
-+    rm -f "${TEST_IMG}.ovl2"
-+    rm -f "${TEST_IMG}.ovl3"
-+    _cleanup_test_img
-+    _cleanup_qemu
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.qemu
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+
-+size=64M
-+
-+echo
-+echo === Preparing and starting VM ===
-+echo
-+
-+TEST_IMG="${TEST_IMG}.base" _make_test_img $size
-+TEST_IMG="${TEST_IMG}.mid" _make_test_img -b "${TEST_IMG}.base"
-+_make_test_img -b "${TEST_IMG}.mid"
-+TEST_IMG="${TEST_IMG}.ovl2" _make_test_img -b "${TEST_IMG}.mid"
-+
-+$QEMU_IO -c 'write -P 0x55 1M 64k' "${TEST_IMG}.mid" | _filter_qemu_io
-+
-+qemu_comm_method="qmp"
-+qmp_pretty="y"
-+
-+_launch_qemu \
-+    -blockdev "driver=${IMGFMT},file.driver=file,file.filename=${TEST_IMG}.base,node-name=base" \
-+    -blockdev "driver=${IMGFMT},file.driver=file,file.filename=${TEST_IMG}.mid,node-name=mid,backing=base" \
-+    -blockdev "driver=${IMGFMT},file.driver=file,file.filename=${TEST_IMG},node-name=top,backing=mid" \
-+    -blockdev "driver=${IMGFMT},file.driver=file,file.filename=${TEST_IMG}.ovl2,node-name=top2,backing=mid"
-+h=$QEMU_HANDLE
-+_send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" '^}'
-+
-+echo
-+echo === Perform commit job ===
-+echo
-+
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'block-commit',
-+       'arguments': { 'job-id': 'commit0',
-+                      'device': 'top',
-+                      'base':'$TEST_IMG.base',
-+                      'top': '$TEST_IMG.mid' } }" \
-+    "BLOCK_JOB_COMPLETED"
-+_send_qemu_cmd $h "" "^}"
-+
-+echo
-+echo === Check that both top and top2 point to base now ===
-+echo
-+
-+_send_qemu_cmd $h "{ 'execute': 'query-named-block-nodes' }" "^}" |
-+    _filter_generated_node_ids
-+
-+_send_qemu_cmd $h "{ 'execute': 'quit' }" "^}"
-+wait=1 _cleanup_qemu
-+
-+_img_info
-+TEST_IMG="$TEST_IMG.ovl2" _img_info
-+
-+
-+echo
-+echo === Preparing and starting VM with -drive ===
-+echo
-+
-+TEST_IMG="${TEST_IMG}.base" _make_test_img $size
-+TEST_IMG="${TEST_IMG}.mid" _make_test_img -b "${TEST_IMG}.base"
-+_make_test_img -b "${TEST_IMG}.mid"
-+TEST_IMG="${TEST_IMG}.ovl2" _make_test_img -b "${TEST_IMG}.mid"
-+TEST_IMG="${TEST_IMG}.ovl3" _make_test_img -b "${TEST_IMG}.ovl2"
-+
-+$QEMU_IO -c 'write -P 0x55 1M 64k' "${TEST_IMG}.mid" | _filter_qemu_io
-+
-+qemu_comm_method="qmp"
-+qmp_pretty="y"
-+
-+_launch_qemu \
-+    -drive "driver=${IMGFMT},file=${TEST_IMG},node-name=top,backing.node-name=mid" \
-+    -drive "driver=${IMGFMT},file=${TEST_IMG}.ovl3,node-name=top2,backing.backing=mid"
-+h=$QEMU_HANDLE
-+_send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" '^}'
-+
-+echo
-+echo === Perform commit job ===
-+echo
-+
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'block-commit',
-+       'arguments': { 'job-id': 'commit0',
-+                      'device': 'top',
-+                      'base':'$TEST_IMG.base',
-+                      'top': '$TEST_IMG.mid' } }" \
-+    "BLOCK_JOB_COMPLETED"
-+_send_qemu_cmd $h "" "^}"
-+
-+echo
-+echo === Check that both top and top2 point to base now ===
-+echo
-+
-+_send_qemu_cmd $h "{ 'execute': 'query-named-block-nodes' }" "^}" |
-+    _filter_generated_node_ids
-+
-+_send_qemu_cmd $h "{ 'execute': 'quit' }" "^}"
-+wait=1 _cleanup_qemu
-+
-+_img_info
-+TEST_IMG="$TEST_IMG.ovl2" _img_info
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/191.out b/tests/qemu-iotests/191.out
-new file mode 100644
-index 0000000000..7bfcd2d5d8
---- /dev/null
-+++ b/tests/qemu-iotests/191.out
-@@ -0,0 +1,827 @@
-+QA output created by 191
-+
-+=== Preparing and starting VM ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=67108864
-+Formatting 'TEST_DIR/t.IMGFMT.mid', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.mid
-+Formatting 'TEST_DIR/t.IMGFMT.ovl2', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.mid
-+wrote 65536/65536 bytes at offset 1048576
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{
-+    "return": {
-+    }
-+}
-+
-+=== Perform commit job ===
-+
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "BLOCK_JOB_COMPLETED",
-+    "data": {
-+        "device": "commit0",
-+        "len": 67108864,
-+        "offset": 67108864,
-+        "speed": 0,
-+        "type": "commit"
-+    }
-+}
-+
-+=== Check that both top and top2 point to base now ===
-+
-+{
-+    "return": [
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "backing-image": {
-+                    "virtual-size": 67108864,
-+                    "filename": "TEST_DIR/t.qcow2.base",
-+                    "cluster-size": 65536,
-+                    "format": "qcow2",
-+                    "actual-size": 397312,
-+                    "format-specific": {
-+                        "type": "qcow2",
-+                        "data": {
-+                            "compat": "1.1",
-+                            "lazy-refcounts": false,
-+                            "refcount-bits": 16,
-+                            "corrupt": false
-+                        }
-+                    },
-+                    "dirty-flag": false
-+                },
-+                "backing-filename-format": "qcow2",
-+                "virtual-size": 67108864,
-+                "filename": "TEST_DIR/t.qcow2.ovl2",
-+                "cluster-size": 65536,
-+                "format": "qcow2",
-+                "actual-size": 200704,
-+                "format-specific": {
-+                    "type": "qcow2",
-+                    "data": {
-+                        "compat": "1.1",
-+                        "lazy-refcounts": false,
-+                        "refcount-bits": 16,
-+                        "corrupt": false
-+                    }
-+                },
-+                "full-backing-filename": "TEST_DIR/t.qcow2.base",
-+                "backing-filename": "TEST_DIR/t.qcow2.base",
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "top2",
-+            "backing_file_depth": 1,
-+            "drv": "qcow2",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "backing_file": "TEST_DIR/t.qcow2.base",
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.ovl2",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 197120,
-+                "filename": "TEST_DIR/t.qcow2.ovl2",
-+                "format": "file",
-+                "actual-size": 200704,
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "file",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.ovl2",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "backing-image": {
-+                    "virtual-size": 67108864,
-+                    "filename": "TEST_DIR/t.qcow2.base",
-+                    "cluster-size": 65536,
-+                    "format": "qcow2",
-+                    "actual-size": 397312,
-+                    "format-specific": {
-+                        "type": "qcow2",
-+                        "data": {
-+                            "compat": "1.1",
-+                            "lazy-refcounts": false,
-+                            "refcount-bits": 16,
-+                            "corrupt": false
-+                        }
-+                    },
-+                    "dirty-flag": false
-+                },
-+                "backing-filename-format": "qcow2",
-+                "virtual-size": 67108864,
-+                "filename": "TEST_DIR/t.qcow2",
-+                "cluster-size": 65536,
-+                "format": "qcow2",
-+                "actual-size": 200704,
-+                "format-specific": {
-+                    "type": "qcow2",
-+                    "data": {
-+                        "compat": "1.1",
-+                        "lazy-refcounts": false,
-+                        "refcount-bits": 16,
-+                        "corrupt": false
-+                    }
-+                },
-+                "full-backing-filename": "TEST_DIR/t.qcow2.base",
-+                "backing-filename": "TEST_DIR/t.qcow2.base",
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "top",
-+            "backing_file_depth": 1,
-+            "drv": "qcow2",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "backing_file": "TEST_DIR/t.qcow2.base",
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 197120,
-+                "filename": "TEST_DIR/t.qcow2",
-+                "format": "file",
-+                "actual-size": 200704,
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "file",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "backing-image": {
-+                    "virtual-size": 67108864,
-+                    "filename": "TEST_DIR/t.qcow2.base",
-+                    "cluster-size": 65536,
-+                    "format": "qcow2",
-+                    "actual-size": 397312,
-+                    "format-specific": {
-+                        "type": "qcow2",
-+                        "data": {
-+                            "compat": "1.1",
-+                            "lazy-refcounts": false,
-+                            "refcount-bits": 16,
-+                            "corrupt": false
-+                        }
-+                    },
-+                    "dirty-flag": false
-+                },
-+                "backing-filename-format": "qcow2",
-+                "virtual-size": 67108864,
-+                "filename": "TEST_DIR/t.qcow2.mid",
-+                "cluster-size": 65536,
-+                "format": "qcow2",
-+                "actual-size": 397312,
-+                "format-specific": {
-+                    "type": "qcow2",
-+                    "data": {
-+                        "compat": "1.1",
-+                        "lazy-refcounts": false,
-+                        "refcount-bits": 16,
-+                        "corrupt": false
-+                    }
-+                },
-+                "full-backing-filename": "TEST_DIR/t.qcow2.base",
-+                "backing-filename": "TEST_DIR/t.qcow2.base",
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "mid",
-+            "backing_file_depth": 1,
-+            "drv": "qcow2",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "backing_file": "TEST_DIR/t.qcow2.base",
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.mid",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 393216,
-+                "filename": "TEST_DIR/t.qcow2.mid",
-+                "format": "file",
-+                "actual-size": 397312,
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "file",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.mid",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 67108864,
-+                "filename": "TEST_DIR/t.qcow2.base",
-+                "cluster-size": 65536,
-+                "format": "qcow2",
-+                "actual-size": 397312,
-+                "format-specific": {
-+                    "type": "qcow2",
-+                    "data": {
-+                        "compat": "1.1",
-+                        "lazy-refcounts": false,
-+                        "refcount-bits": 16,
-+                        "corrupt": false
-+                    }
-+                },
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "base",
-+            "backing_file_depth": 0,
-+            "drv": "qcow2",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.base",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 393216,
-+                "filename": "TEST_DIR/t.qcow2.base",
-+                "format": "file",
-+                "actual-size": 397312,
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "file",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.base",
-+            "encryption_key_missing": false
-+        }
-+    ]
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "SHUTDOWN",
-+    "data": {
-+        "guest": false
-+    }
-+}
-+image: TEST_DIR/t.IMGFMT
-+file format: IMGFMT
-+virtual size: 64M (67108864 bytes)
-+cluster_size: 65536
-+backing file: TEST_DIR/t.IMGFMT.base
-+backing file format: IMGFMT
-+image: TEST_DIR/t.IMGFMT.ovl2
-+file format: IMGFMT
-+virtual size: 64M (67108864 bytes)
-+cluster_size: 65536
-+backing file: TEST_DIR/t.IMGFMT.base
-+backing file format: IMGFMT
-+
-+=== Preparing and starting VM with -drive ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=67108864
-+Formatting 'TEST_DIR/t.IMGFMT.mid', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.mid
-+Formatting 'TEST_DIR/t.IMGFMT.ovl2', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.mid
-+Formatting 'TEST_DIR/t.IMGFMT.ovl3', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.ovl2
-+wrote 65536/65536 bytes at offset 1048576
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{
-+    "return": {
-+    }
-+}
-+
-+=== Perform commit job ===
-+
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "BLOCK_JOB_COMPLETED",
-+    "data": {
-+        "device": "commit0",
-+        "len": 67108864,
-+        "offset": 67108864,
-+        "speed": 0,
-+        "type": "commit"
-+    }
-+}
-+
-+=== Check that both top and top2 point to base now ===
-+
-+{
-+    "return": [
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "backing-image": {
-+                    "virtual-size": 67108864,
-+                    "filename": "TEST_DIR/t.qcow2.base",
-+                    "cluster-size": 65536,
-+                    "format": "qcow2",
-+                    "actual-size": 397312,
-+                    "format-specific": {
-+                        "type": "qcow2",
-+                        "data": {
-+                            "compat": "1.1",
-+                            "lazy-refcounts": false,
-+                            "refcount-bits": 16,
-+                            "corrupt": false
-+                        }
-+                    },
-+                    "dirty-flag": false
-+                },
-+                "backing-filename-format": "qcow2",
-+                "virtual-size": 67108864,
-+                "filename": "TEST_DIR/t.qcow2.ovl2",
-+                "cluster-size": 65536,
-+                "format": "qcow2",
-+                "actual-size": 200704,
-+                "format-specific": {
-+                    "type": "qcow2",
-+                    "data": {
-+                        "compat": "1.1",
-+                        "lazy-refcounts": false,
-+                        "refcount-bits": 16,
-+                        "corrupt": false
-+                    }
-+                },
-+                "full-backing-filename": "TEST_DIR/t.qcow2.base",
-+                "backing-filename": "TEST_DIR/t.qcow2.base",
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": true,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 1,
-+            "drv": "qcow2",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "backing_file": "TEST_DIR/t.qcow2.base",
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.ovl2",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 197120,
-+                "filename": "TEST_DIR/t.qcow2.ovl2",
-+                "format": "file",
-+                "actual-size": 200704,
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": true,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "file",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.ovl2",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "backing-image": {
-+                    "backing-image": {
-+                        "virtual-size": 67108864,
-+                        "filename": "TEST_DIR/t.qcow2.base",
-+                        "cluster-size": 65536,
-+                        "format": "qcow2",
-+                        "actual-size": 397312,
-+                        "format-specific": {
-+                            "type": "qcow2",
-+                            "data": {
-+                                "compat": "1.1",
-+                                "lazy-refcounts": false,
-+                                "refcount-bits": 16,
-+                                "corrupt": false
-+                            }
-+                        },
-+                        "dirty-flag": false
-+                    },
-+                    "backing-filename-format": "qcow2",
-+                    "virtual-size": 67108864,
-+                    "filename": "TEST_DIR/t.qcow2.ovl2",
-+                    "cluster-size": 65536,
-+                    "format": "qcow2",
-+                    "actual-size": 200704,
-+                    "format-specific": {
-+                        "type": "qcow2",
-+                        "data": {
-+                            "compat": "1.1",
-+                            "lazy-refcounts": false,
-+                            "refcount-bits": 16,
-+                            "corrupt": false
-+                        }
-+                    },
-+                    "full-backing-filename": "TEST_DIR/t.qcow2.base",
-+                    "backing-filename": "TEST_DIR/t.qcow2.base",
-+                    "dirty-flag": false
-+                },
-+                "backing-filename-format": "qcow2",
-+                "virtual-size": 67108864,
-+                "filename": "TEST_DIR/t.qcow2.ovl3",
-+                "cluster-size": 65536,
-+                "format": "qcow2",
-+                "actual-size": 200704,
-+                "format-specific": {
-+                    "type": "qcow2",
-+                    "data": {
-+                        "compat": "1.1",
-+                        "lazy-refcounts": false,
-+                        "refcount-bits": 16,
-+                        "corrupt": false
-+                    }
-+                },
-+                "full-backing-filename": "TEST_DIR/t.qcow2.ovl2",
-+                "backing-filename": "TEST_DIR/t.qcow2.ovl2",
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "top2",
-+            "backing_file_depth": 2,
-+            "drv": "qcow2",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "backing_file": "TEST_DIR/t.qcow2.ovl2",
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.ovl3",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 197120,
-+                "filename": "TEST_DIR/t.qcow2.ovl3",
-+                "format": "file",
-+                "actual-size": 200704,
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "file",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.ovl3",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 67108864,
-+                "filename": "TEST_DIR/t.qcow2.base",
-+                "cluster-size": 65536,
-+                "format": "qcow2",
-+                "actual-size": 397312,
-+                "format-specific": {
-+                    "type": "qcow2",
-+                    "data": {
-+                        "compat": "1.1",
-+                        "lazy-refcounts": false,
-+                        "refcount-bits": 16,
-+                        "corrupt": false
-+                    }
-+                },
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": true,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "qcow2",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.base",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 393216,
-+                "filename": "TEST_DIR/t.qcow2.base",
-+                "format": "file",
-+                "actual-size": 397312,
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": true,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "file",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.base",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "backing-image": {
-+                    "virtual-size": 67108864,
-+                    "filename": "TEST_DIR/t.qcow2.base",
-+                    "cluster-size": 65536,
-+                    "format": "qcow2",
-+                    "actual-size": 397312,
-+                    "format-specific": {
-+                        "type": "qcow2",
-+                        "data": {
-+                            "compat": "1.1",
-+                            "lazy-refcounts": false,
-+                            "refcount-bits": 16,
-+                            "corrupt": false
-+                        }
-+                    },
-+                    "dirty-flag": false
-+                },
-+                "backing-filename-format": "qcow2",
-+                "virtual-size": 67108864,
-+                "filename": "TEST_DIR/t.qcow2",
-+                "cluster-size": 65536,
-+                "format": "qcow2",
-+                "actual-size": 200704,
-+                "format-specific": {
-+                    "type": "qcow2",
-+                    "data": {
-+                        "compat": "1.1",
-+                        "lazy-refcounts": false,
-+                        "refcount-bits": 16,
-+                        "corrupt": false
-+                    }
-+                },
-+                "full-backing-filename": "TEST_DIR/t.qcow2.base",
-+                "backing-filename": "TEST_DIR/t.qcow2.base",
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "top",
-+            "backing_file_depth": 1,
-+            "drv": "qcow2",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "backing_file": "TEST_DIR/t.qcow2.base",
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 197120,
-+                "filename": "TEST_DIR/t.qcow2",
-+                "format": "file",
-+                "actual-size": 200704,
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "file",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2",
-+            "encryption_key_missing": false
-+        }
-+    ]
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "SHUTDOWN",
-+    "data": {
-+        "guest": false
-+    }
-+}
-+image: TEST_DIR/t.IMGFMT
-+file format: IMGFMT
-+virtual size: 64M (67108864 bytes)
-+cluster_size: 65536
-+backing file: TEST_DIR/t.IMGFMT.base
-+backing file format: IMGFMT
-+image: TEST_DIR/t.IMGFMT.ovl2
-+file format: IMGFMT
-+virtual size: 64M (67108864 bytes)
-+cluster_size: 65536
-+backing file: TEST_DIR/t.IMGFMT.base
-+backing file format: IMGFMT
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 108339cd03..63d4ee052c 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -187,6 +187,7 @@
- 188 rw auto quick
- 189 rw auto
- 190 rw auto quick
-+191 rw auto
- 192 rw auto quick
- 194 rw auto migration quick
- 195 rw auto quick
+     if (reopen_queue) {
+         bdrv_reopen_multiple(bdrv_get_aio_context(bs), reopen_queue, &local_err);
+         if (local_err != NULL) {
+@@ -382,14 +363,6 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+         goto fail;
+     }
+ 
+-    /* overlay_bs must be blocked because it needs to be modified to
+-     * update the backing image string. */
+-    ret = block_job_add_bdrv(&s->common, "overlay of top", overlay_bs,
+-                             BLK_PERM_GRAPH_MOD, BLK_PERM_ALL, errp);
+-    if (ret < 0) {
+-        goto fail;
+-    }
+-
+     s->base = blk_new(BLK_PERM_CONSISTENT_READ
+                       | BLK_PERM_WRITE
+                       | BLK_PERM_RESIZE,
+@@ -408,13 +381,8 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+         goto fail;
+     }
+ 
+-    s->active = bs;
+-
+-    s->base_flags          = orig_base_flags;
+-    s->orig_overlay_flags  = orig_overlay_flags;
+-
++    s->base_flags = orig_base_flags;
+     s->backing_file_str = g_strdup(backing_file_str);
+-
+     s->on_error = on_error;
+ 
+     trace_commit_start(bs, base, top, s);
+@@ -429,7 +397,7 @@ fail:
+         blk_unref(s->top);
+     }
+     if (commit_top_bs) {
+-        bdrv_set_backing_hd(overlay_bs, top, &error_abort);
++        bdrv_replace_node(commit_top_bs, top, &error_abort);
+     }
+     block_job_early_fail(&s->common);
+ }
+diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+index d745cb4cde..18838948fa 100755
+--- a/tests/qemu-iotests/030
++++ b/tests/qemu-iotests/030
+@@ -287,10 +287,6 @@ class TestParallelOps(iotests.QMPTestCase):
+         result = self.vm.qmp('block-stream', device='node6', base=self.imgs[4], job_id='stream-node6-v2')
+         self.assert_qmp(result, 'error/class', 'GenericError')
+ 
+-        # This fails because block-commit needs to block node6, the overlay of the 'top' image
+-        result = self.vm.qmp('block-stream', device='node7', base=self.imgs[5], job_id='stream-node6-v3')
+-        self.assert_qmp(result, 'error/class', 'GenericError')
+-
+         # This fails because block-commit currently blocks the active layer even if it's not used
+         result = self.vm.qmp('block-stream', device='drive0', base=self.imgs[5], job_id='stream-drive0')
+         self.assert_qmp(result, 'error/class', 'GenericError')
 -- 
 2.13.5
