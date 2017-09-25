@@ -1,63 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dwR56-00082j-Ub
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 06:57:45 -0400
+	(envelope-from <groug@kaod.org>) id 1dwR7Y-0000Xy-60
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:00:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dwR53-0002Rp-Sw
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 06:57:45 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37646)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dwR53-0002RJ-J1
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 06:57:41 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8PAraVx081641
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 06:57:37 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d6yp4axy3-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 06:57:35 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 25 Sep 2017 11:57:33 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
-	[9.149.105.62])
-	by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id v8PAvVnd20906090
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 10:57:31 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 33C47AE051
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 11:52:16 +0100 (BST)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 07C5CAE045
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 11:52:16 +0100 (BST)
-Received: from oc3836556865.ibm.com (unknown [9.152.224.207])
-	by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 11:52:15 +0100 (BST)
-References: <8946b1ec-4d14-c953-deab-aaded7cd2c9d@linux.vnet.ibm.com>
-	<20170906162019.45eeec4a.cohuck@redhat.com>
-	<cc6eab96-969d-eb66-91b5-cdb965c1bcbb@linux.vnet.ibm.com>
-	<20170907085831.GF31680@bjsdjshi@linux.vnet.ibm.com>
-	<20170907122400.5b2e3faa.cohuck@redhat.com>
-	<27b2addf-0d1c-81d7-1e82-1a8cdac70231@linux.vnet.ibm.com>
-	<20170907134134.00f387e8.cohuck@redhat.com>
-	<20170908034100.GH31680@bjsdjshi@linux.vnet.ibm.com>
-	<381cb778-5679-634c-9d3d-7276f877da3a@linux.vnet.ibm.com>
-	<20170908115950.56996cc6.cohuck@redhat.com>
-	<20170925073159.GR11080@bjsdjshi@linux.vnet.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 25 Sep 2017 12:57:31 +0200
+	(envelope-from <groug@kaod.org>) id 1dwR7R-0004He-P9
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:00:16 -0400
+Received: from 5.mo173.mail-out.ovh.net ([46.105.40.148]:47939)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dwR7R-0004FM-F3
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:00:09 -0400
+Received: from player687.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id D283D7338F
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 13:00:07 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Mon, 25 Sep 2017 13:00:02 +0200
+Message-ID: <150633720242.17479.13000419788993728100.stgit@bahia>
 MIME-Version: 1.0
-In-Reply-To: <20170925073159.GR11080@bjsdjshi@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <f7755ca8-78f3-759e-f879-fea2f4fdadfc@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 4/9] s390x: refactor error handling for
- SSCH and RSCH
+Subject: [Qemu-devel] [PATCH v3] spapr: fix the value of SDR1 in
+ kvmppc_put_books_sregs()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -67,63 +29,267 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
+When running with KVM PR, if a new HPT is allocated we need to inform
+KVM about the HPT address and size. This is currently done by hacking
+the value of SDR1 and pushing it to KVM in several places.
 
+Also, migration breaks the guest since it is very unlikely the HPT has
+the same address in source and destination, but we push the incoming
+value of SDR1 to KVM anyway.
 
-On 09/25/2017 09:31 AM, Dong Jia Shi wrote:
-> * Cornelia Huck <cohuck@redhat.com> [2017-09-08 11:59:50 +0200]:
-> 
->> On Fri, 8 Sep 2017 11:21:57 +0200
->> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
->>
->>> On 09/08/2017 05:41 AM, Dong Jia Shi wrote:
->>>> Let' me summarize here, in case I misunderstand things. Now we have
->>>> two ways to choose:
->>>>
->>>> A. Kernel: no change.
->>>>    Qemu  : handle -EFAULT as option 2 by generating a program check.
->>>>
->>>> B. Kernel: return -EFAULT
->>>>            +
->>>>            update the IRB area in the I/O region for option 1 to present
->>>>            a unit check SCSW (with proper sense byte ECW), and for option
->>>>            2 to present a program check.
->>>>    Qemu  : handle -EFAULT according to the information that the IRB area
->>>>            provided.  
->>>
->>> This is not what I was trying to say. You got my message regarding A, but
->>> B was supposed to be understood like this.
->>>
->>> Keep the current handling for option 1, that is return -EFAULT. For option
->>> 2 do what the spec says, execute the program until the bad address and then
->>> generate a program-check (SCSW) once the bad stuff has it's turn. Thus
->>> the only change in QEMU would be handling -EFAULT with an unit check (because
->>> now it's just option 1).
-> Let me adding some context information here by copying some words from the
-> previous mail in this thread:
-> The only option 2 case in the kernel is ccwchain_fetch_idal() finding a
-> bad idaw_iova.
-> 
-> What you propose to do for this case is (correct me if I get it wrong):
-> In ccwchain_fetch_idal(), we do not return -EFAULT, instead we return 0,
-> and issuing the incompletely translated channel program with the bad
-> address to the physical device. And QEMU will eventually get the SCSW
-> with the program-check from the physical device I/O result, and inject
-> it to guest for further handling.
-> 
+This patch introduces a new virtual hypervisor hook so that the spapr
+code can provide the correct value of SDR1 to be pushed to KVM each
+time kvmppc_put_books_sregs() is called.
 
-I guess that would be the cleanest. I would also be fine with not making
-the physical device program-check (issuing a shortened channel program,
-and doing the program check in software) but that's probably more
-complicated to implement.
+It allows to get rid of all the hacking in the spapr/kvmppc code and
+it fixes migration of nested KVM PR.
 
-> Is this understanding right? If so, I'm fine with that, and I can
-> provide the fix in the kernel.
-> 
+Suggested-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+v3: - change encode_hpt_for_kvm_pr() to return the value instead of relying
+      on a pointer
+    - don't set env->spr[SPR_SDR1] if we have cpu->vhyp
 
-That would be nice.
+v2: - push sregs to KVM PR when HPT gets re-allocated during RESIZE_HPT_COMMIT
+      and CAS
+---
+ hw/ppc/spapr.c          |   14 ++++++++++++++
+ hw/ppc/spapr_cpu_core.c |   16 +---------------
+ hw/ppc/spapr_hcall.c    |   45 +++++++++++++++++++++++++++++++++------------
+ target/ppc/cpu.h        |    1 +
+ target/ppc/kvm.c        |   32 +++++++-------------------------
+ target/ppc/kvm_ppc.h    |    6 ------
+ 6 files changed, 56 insertions(+), 58 deletions(-)
 
->>
->> That makes sense to me.
->>
-> 
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index e82c8532ffb0..b0d528d0248a 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1240,6 +1240,19 @@ static hwaddr spapr_hpt_mask(PPCVirtualHypervisor *vhyp)
+     return HTAB_SIZE(spapr) / HASH_PTEG_SIZE_64 - 1;
+ }
+ 
++static target_ulong spapr_encode_hpt_for_kvm_pr(PPCVirtualHypervisor *vhyp)
++{
++    sPAPRMachineState *spapr = SPAPR_MACHINE(vhyp);
++
++    assert(kvm_enabled());
++
++    if (!spapr->htab) {
++        return 0;
++    }
++
++    return (target_ulong)(uintptr_t)spapr->htab | (spapr->htab_shift - 18);
++}
++
+ static const ppc_hash_pte64_t *spapr_map_hptes(PPCVirtualHypervisor *vhyp,
+                                                 hwaddr ptex, int n)
+ {
+@@ -3608,6 +3621,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+     vhc->unmap_hptes = spapr_unmap_hptes;
+     vhc->store_hpte = spapr_store_hpte;
+     vhc->get_patbe = spapr_get_patbe;
++    vhc->encode_hpt_for_kvm_pr = spapr_encode_hpt_for_kvm_pr;
+     xic->ics_get = spapr_ics_get;
+     xic->ics_resend = spapr_ics_resend;
+     xic->icp_get = spapr_icp_get;
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 6e224ba029ec..13d7333f2061 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -18,6 +18,7 @@
+ #include "hw/ppc/ppc.h"
+ #include "target/ppc/mmu-hash64.h"
+ #include "sysemu/numa.h"
++#include "sysemu/hw_accel.h"
+ #include "qemu/error-report.h"
+ 
+ void spapr_cpu_parse_features(sPAPRMachineState *spapr)
+@@ -73,7 +74,6 @@ void spapr_cpu_parse_features(sPAPRMachineState *spapr)
+ 
+ static void spapr_cpu_reset(void *opaque)
+ {
+-    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+     PowerPCCPU *cpu = opaque;
+     CPUState *cs = CPU(cpu);
+     CPUPPCState *env = &cpu->env;
+@@ -86,20 +86,6 @@ static void spapr_cpu_reset(void *opaque)
+     cs->halted = 1;
+ 
+     env->spr[SPR_HIOR] = 0;
+-
+-    /*
+-     * This is a hack for the benefit of KVM PR - it abuses the SDR1
+-     * slot in kvm_sregs to communicate the userspace address of the
+-     * HPT
+-     */
+-    if (kvm_enabled()) {
+-        env->spr[SPR_SDR1] = (target_ulong)(uintptr_t)spapr->htab
+-            | (spapr->htab_shift - 18);
+-        if (kvmppc_put_books_sregs(cpu) < 0) {
+-            error_report("Unable to update SDR1 in KVM");
+-            exit(1);
+-        }
+-    }
+ }
+ 
+ static void spapr_cpu_destroy(PowerPCCPU *cpu)
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 57bb411394ed..8d72bb7c1c34 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -686,6 +686,37 @@ static int rehash_hpt(PowerPCCPU *cpu,
+     return H_SUCCESS;
+ }
+ 
++static void do_push_sregs_to_kvm_pr(CPUState *cs, run_on_cpu_data data)
++{
++    int ret;
++
++    cpu_synchronize_state(cs);
++
++    ret = kvmppc_put_books_sregs(POWERPC_CPU(cs));
++    if (ret < 0) {
++        error_report("failed to push sregs to KVM: %s", strerror(-ret));
++        exit(1);
++    }
++}
++
++static void push_sregs_to_kvm_pr(sPAPRMachineState *spapr)
++{
++    CPUState *cs;
++
++    /*
++     * This is a hack for the benefit of KVM PR - it abuses the SDR1
++     * slot in kvm_sregs to communicate the userspace address of the
++     * HPT
++     */
++    if (!kvm_enabled() || !spapr->htab) {
++        return;
++    }
++
++    CPU_FOREACH(cs) {
++        run_on_cpu(cs, do_push_sregs_to_kvm_pr, RUN_ON_CPU_NULL);
++    }
++}
++
+ static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
+                                         sPAPRMachineState *spapr,
+                                         target_ulong opcode,
+@@ -733,12 +764,7 @@ static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
+         spapr->htab = pending->hpt;
+         spapr->htab_shift = pending->shift;
+ 
+-        if (kvm_enabled()) {
+-            /* For KVM PR, update the HPT pointer */
+-            target_ulong sdr1 = (target_ulong)(uintptr_t)spapr->htab
+-                | (spapr->htab_shift - 18);
+-            kvmppc_update_sdr1(sdr1);
+-        }
++        push_sregs_to_kvm_pr(spapr);
+ 
+         pending->hpt = NULL; /* so it's not free()d */
+     }
+@@ -1564,12 +1590,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+              * the point this is called, nothing should have been
+              * entered into the existing HPT */
+             spapr_reallocate_hpt(spapr, maxshift, &error_fatal);
+-            if (kvm_enabled()) {
+-                /* For KVM PR, update the HPT pointer */
+-                target_ulong sdr1 = (target_ulong)(uintptr_t)spapr->htab
+-                    | (spapr->htab_shift - 18);
+-                kvmppc_update_sdr1(sdr1);
+-            }
++            push_sregs_to_kvm_pr(spapr);
+         }
+     }
+ 
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index c9d3ffa89bcb..64aef17f6fb7 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1243,6 +1243,7 @@ struct PPCVirtualHypervisorClass {
+     void (*store_hpte)(PPCVirtualHypervisor *vhyp, hwaddr ptex,
+                        uint64_t pte0, uint64_t pte1);
+     uint64_t (*get_patbe)(PPCVirtualHypervisor *vhyp);
++    target_ulong (*encode_hpt_for_kvm_pr)(PPCVirtualHypervisor *vhyp);
+ };
+ 
+ #define TYPE_PPC_VIRTUAL_HYPERVISOR "ppc-virtual-hypervisor"
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 8dd80993ec9e..beed1d3db7ee 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -940,7 +940,13 @@ int kvmppc_put_books_sregs(PowerPCCPU *cpu)
+ 
+     sregs.pvr = env->spr[SPR_PVR];
+ 
+-    sregs.u.s.sdr1 = env->spr[SPR_SDR1];
++    if (cpu->vhyp) {
++        PPCVirtualHypervisorClass *vhc =
++            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
++        sregs.u.s.sdr1 = vhc->encode_hpt_for_kvm_pr(cpu->vhyp);
++    } else {
++        sregs.u.s.sdr1 = env->spr[SPR_SDR1];
++    }
+ 
+     /* Sync SLB */
+ #ifdef TARGET_PPC64
+@@ -2786,30 +2792,6 @@ int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift)
+     return kvm_vm_ioctl(cs->kvm_state, KVM_PPC_RESIZE_HPT_COMMIT, &rhpt);
+ }
+ 
+-static void kvmppc_pivot_hpt_cpu(CPUState *cs, run_on_cpu_data arg)
+-{
+-    target_ulong sdr1 = arg.target_ptr;
+-    PowerPCCPU *cpu = POWERPC_CPU(cs);
+-    CPUPPCState *env = &cpu->env;
+-
+-    /* This is just for the benefit of PR KVM */
+-    cpu_synchronize_state(cs);
+-    env->spr[SPR_SDR1] = sdr1;
+-    if (kvmppc_put_books_sregs(cpu) < 0) {
+-        error_report("Unable to update SDR1 in KVM");
+-        exit(1);
+-    }
+-}
+-
+-void kvmppc_update_sdr1(target_ulong sdr1)
+-{
+-    CPUState *cs;
+-
+-    CPU_FOREACH(cs) {
+-        run_on_cpu(cs, kvmppc_pivot_hpt_cpu, RUN_ON_CPU_TARGET_PTR(sdr1));
+-    }
+-}
+-
+ /*
+  * This is a helper function to detect a post migration scenario
+  * in which a guest, running as KVM-HV, freezes in cpu_post_load because
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 349f892631bf..d6be38ecafbd 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -67,7 +67,6 @@ PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
+ void kvmppc_check_papr_resize_hpt(Error **errp);
+ int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_ulong flags, int shift);
+ int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift);
+-void kvmppc_update_sdr1(target_ulong sdr1);
+ bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
+ 
+ bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
+@@ -325,11 +324,6 @@ static inline int kvmppc_resize_hpt_commit(PowerPCCPU *cpu,
+     return -ENOSYS;
+ }
+ 
+-static inline void kvmppc_update_sdr1(target_ulong sdr1)
+-{
+-    abort();
+-}
+-
+ #endif
+ 
+ #ifndef CONFIG_KVM
