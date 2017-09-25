@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dwZGZ-0005LP-3u
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 15:42:08 -0400
+	(envelope-from <eblake@redhat.com>) id 1dwZI1-00069H-0u
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 15:43:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dwZGW-0005km-0A
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 15:42:07 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:56309)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dwZGV-0005kY-QP
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 15:42:03 -0400
-Date: Mon, 25 Sep 2017 15:42:02 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170925194202.GA19618@flamenco>
-References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
-	<150529666493.10902.14830445134051381968.stgit@frigg.lan>
-	<CAFEAcA9p9B8AFaaSaSOOSsFsEhHW=XPLBFs5MrozWq=7p4_9Zg@mail.gmail.com>
-	<87poasgjyh.fsf@frigg.lan>
-	<CAFEAcA8XP+8Jz9Dn-mEQ3CCrVj00t3HA0praQ-OSggtQGAmQ5Q@mail.gmail.com>
-	<87d16o53xr.fsf@frigg.lan>
-	<CAFEAcA9FhXKVKe1E_pVDWX3u0W7WuKQmO54Z1Jgj-iL980yPew@mail.gmail.com>
-	<87o9pywt8k.fsf@frigg.lan>
+	(envelope-from <eblake@redhat.com>) id 1dwZI0-0006NC-A3
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 15:43:37 -0400
+References: <20170925122808.14561-1-kwolf@redhat.com>
+	<20170925122808.14561-4-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d990a587-0082-08e7-c507-0f60def33fb4@redhat.com>
+Date: Mon, 25 Sep 2017 14:43:28 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87o9pywt8k.fsf@frigg.lan>
-Subject: Re: [Qemu-devel] [PATCH v6 01/22] instrument: Add documentation
+In-Reply-To: <20170925122808.14561-4-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="EOgl7Vr9uLAQsoQU22LEUXSxoPSVL6wBQ"
+Subject: Re: [Qemu-devel] [PATCH 3/5] qemu-iotests: Allow QMP pretty
+ printing in common.qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,26 +25,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, qemu-devel@nongnu.org
 
-On Mon, Sep 25, 2017 at 21:03:39 +0300, Lluís Vilanova wrote:
-> I know it's not exactly the same we're discussing, but the plot in [1] compares
-> a few different ways to trace memory accesses on SPEC benchmarks:
-> 
-> * First bar is using a Intel's tool called PIN [2].
-> * Second is calling into an instrumentation function on every executed memory
->   access in QEMU.
-> * Third is embedding the hot path of writing the memory access info to an array
->   into the TCG opcode stream (more or less equivalent to supporting filtering;
->   when the array is full, a user's callback is called - cold path -)
-> * Fourth bar can be ignored.
-> 
-> This was working on a much older version of instrumentation for QEMU, but I can
-> implement something that does the first use-case point above and some filtering
-> example (second use-case point) to see what's the performance difference.
-> 
-> [1] https://filetea.me/n3wy9WwyCCZR72E9OWXHArHDw
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--EOgl7Vr9uLAQsoQU22LEUXSxoPSVL6wBQ
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, qemu-devel@nongnu.org
+Message-ID: <d990a587-0082-08e7-c507-0f60def33fb4@redhat.com>
+Subject: Re: [PATCH 3/5] qemu-iotests: Allow QMP pretty printing in
+ common.qemu
+References: <20170925122808.14561-1-kwolf@redhat.com>
+ <20170925122808.14561-4-kwolf@redhat.com>
+In-Reply-To: <20170925122808.14561-4-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Interesting! Unfortunately, this URL gives me a 404.
+On 09/25/2017 07:28 AM, Kevin Wolf wrote:
+> QMP responses to certain commands can become quite long, which doesn't
+> only make reading them hard, but also means that the maximum line lengt=
+h
+> in patch emails can be exceeded. Allow tests to switch to QMP pretty
+> printing, which results in more, but shorter lines.
+>=20
+> We also need to make sure to keep indentation in the response for this
+> to work as expected.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  tests/qemu-iotests/common.qemu | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
 
-		E.
+Nice!
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--EOgl7Vr9uLAQsoQU22LEUXSxoPSVL6wBQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnJXGAACgkQp6FrSiUn
+Q2oETwgAl8rVPqJ1gFRCanZtBJ9K8+4t3VNgJWHWDMbsbskfmAkiapbAtL02blnJ
+V6uYEzgiydOtX6pasJlgdS04Lj+nhkcHJR3ACQ6qKFQbbbmgrqCyi/DCbsr9Qwf9
+wtngKdycC1BA7MyQgY2naJEAz3DrEV6H+XTa98SlPyF6Kdt4hmpa5NCi/HqWENtN
+jUeWANltcIYoQ8AV1s983h5Od5bIf6e/IKqk6kGvWtvsiDrXSULm8N8CX8K8hve5
+a8x0t0BYqfIMKeIWik4jmp/I1ie6NX59g3vGWmY88M+Eqquws1rT0Npb/5jpqpjl
+huLs7aRsPbfs1d2kJNQvrdWjZjpeZg==
+=saym
+-----END PGP SIGNATURE-----
+
+--EOgl7Vr9uLAQsoQU22LEUXSxoPSVL6wBQ--
