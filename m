@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dwOER-0002uG-TI
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 03:55:12 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dwOT8-0007pb-5n
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:10:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dwOEN-0006FJ-Vf
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 03:55:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45056)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dwOEN-0006E4-QR
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 03:55:07 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Mon, 25 Sep 2017 15:54:58 +0800
-Message-Id: <20170925075458.18047-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH] docker: Don't mount ccache db if NOUSER=1
+	(envelope-from <cohuck@redhat.com>) id 1dwOT3-0007s7-3s
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:10:22 -0400
+Date: Mon, 25 Sep 2017 10:10:00 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170925101000.7e996270.cohuck@redhat.com>
+In-Reply-To: <20170922154014.29350-2-f4bug@amsat.org>
+References: <20170922154014.29350-1-f4bug@amsat.org>
+	<20170922154014.29350-2-f4bug@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 01/34] hw: use "qemu/osdep.h" as first
+ #include in source files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,35 +24,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-trivial@nongnu.org
 
-With NOUSER=1 the container runs code as root, which may create
-privileged files that will not be be accssible next time. Skip ccache
-dir mount in this case.
+On Fri, 22 Sep 2017 12:39:41 -0300
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- tests/docker/Makefile.include | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+> applied using ./scripts/clean-includes
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/acpi/ipmi-stub.c             | 1 +
+>  hw/audio/fmopl.c                | 1 -
+>  hw/cpu/core.c                   | 1 +
+>  hw/ppc/spapr_cpu_core.c         | 1 +
+>  hw/smbios/smbios_type_38-stub.c | 1 +
+>  hw/vfio/ccw.c                   | 2 +-
+>  hw/virtio/vhost-vsock.c         | 2 +-
+>  7 files changed, 6 insertions(+), 3 deletions(-)
+>=20
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 0e4f159619..6f9ea196a7 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -143,9 +143,11 @@ docker-run: docker-qemu-src
- 			-e EXTRA_CONFIGURE_OPTS="$(EXTRA_CONFIGURE_OPTS)" \
- 			-e V=$V -e J=$J -e DEBUG=$(DEBUG)		\
- 			-e SHOW_ENV=$(SHOW_ENV) 			\
--			-e CCACHE_DIR=/var/tmp/ccache 			\
-+			$(if $(NOUSER),,				\
-+				-e CCACHE_DIR=/var/tmp/ccache 		\
-+				-v $(DOCKER_CCACHE_DIR):/var/tmp/ccache:z \
-+			)						\
- 			-v $$(readlink -e $(DOCKER_SRC_COPY)):/var/tmp/qemu:z$(COMMA)ro \
--			-v $(DOCKER_CCACHE_DIR):/var/tmp/ccache:z 	\
- 			$(IMAGE) 					\
- 			/var/tmp/qemu/run 				\
- 			$(TEST), "  RUN $(TEST) in ${IMAGE}")
--- 
-2.13.5
+> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+> index a8baadf57a..4810fa0b50 100644
+> --- a/hw/vfio/ccw.c
+> +++ b/hw/vfio/ccw.c
+> @@ -11,11 +11,11 @@
+>   * directory.
+>   */
+> =20
+> +#include "qemu/osdep.h"
+>  #include <linux/vfio.h>
+>  #include <linux/vfio_ccw.h>
+>  #include <sys/ioctl.h>
+> =20
+> -#include "qemu/osdep.h"
+>  #include "qapi/error.h"
+>  #include "hw/sysbus.h"
+>  #include "hw/vfio/vfio.h"
+
+Acked-by: Cornelia Huck <cohuck@redhat.com>
