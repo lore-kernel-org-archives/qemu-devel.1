@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dwXE7-0008TG-Kl
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 13:31:28 -0400
+	(envelope-from <bounces@canonical.com>) id 1dwXOB-0002lW-Iz
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 13:41:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dwXE4-0006E4-HD
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 13:31:27 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41102)
+	(envelope-from <bounces@canonical.com>) id 1dwXO6-0001GB-MN
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 13:41:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44740)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dwXE4-0006Do-Bh
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 13:31:24 -0400
+	id 1dwXO6-0001Fk-EN
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 13:41:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dwXE1-0000Ji-L2
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 17:31:21 +0000
+	id 1dwXO3-0001tT-DM
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 17:41:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 241872E84A2
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 17:31:19 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 21FBC2E8499
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 17:41:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 25 Sep 2017 17:24:40 -0000
-From: John Snow <1681439@bugs.launchpad.net>
+Date: Mon, 25 Sep 2017 17:33:42 -0000
+From: Thomas Huth <1681439@bugs.launchpad.net>
 Reply-To: Bug 1681439 <1681439@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170410132346.31250.84835.malonedeb@wampee.canonical.com>
-Message-Id: <150636028056.29388.2076782782984420874.malone@gac.canonical.com>
+Message-Id: <150636082260.5891.1109315263523529911.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1681439] Re: qemu-system-x86_64:
  hw/ide/core.c:685: ide_cancel_dma_sync: Assertion `s->bus->dma->aiocb ==
@@ -40,8 +40,12 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Sorry that I wasn't able to narrow it down. Please report back if it
-occurs again.
+Ok, I'm setting the state to "incomplete" so this will expire in 60
+days. If you hit the problem again, please change the state of the
+ticket back to "New".
+
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
 -- =
 
@@ -54,7 +58,7 @@ Title:
   `s->bus->dma->aiocb =3D=3D NULL' failed.
 
 Status in QEMU:
-  New
+  Incomplete
 
 Bug description:
   Since upgrading to QEMU 2.8.0, my Windows 7 64-bit virtual machines
