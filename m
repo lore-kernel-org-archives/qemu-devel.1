@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dwVal-0006sk-La
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:46:45 -0400
+	(envelope-from <groug@kaod.org>) id 1dwVdK-0007kh-Ab
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:49:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dwVak-00007N-AG
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:46:43 -0400
-References: <20170925145526.32690-1-eblake@redhat.com>
-	<20170925145526.32690-6-eblake@redhat.com>
-	<f305e22b-963e-f1eb-710c-d74c6efc9628@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b10bd108-0387-34eb-9aa4-7c5e3f9f63a1@redhat.com>
-Date: Mon, 25 Sep 2017 10:46:05 -0500
+	(envelope-from <groug@kaod.org>) id 1dwVdF-0000qT-Ct
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:49:22 -0400
+Received: from 10.mo173.mail-out.ovh.net ([46.105.74.148]:38183)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dwVdF-0000q9-3P
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:49:17 -0400
+Received: from player687.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 22EEC67D9B
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 17:49:15 +0200 (CEST)
+Date: Mon, 25 Sep 2017 17:48:57 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170925174857.6021d0a0@bahia.lan>
+In-Reply-To: <20170925154134.7b4b8cde@nial.brq.redhat.com>
+References: <150633285374.14880.11614678065344980502.stgit@bahia.lan>
+	<20170925154134.7b4b8cde@nial.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <f305e22b-963e-f1eb-710c-d74c6efc9628@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wjvSxnD0glrK8Tb1pnl773RDSi1PlPs1m"
-Subject: Re: [Qemu-devel] [PATCH v10 05/20] dirty-bitmap: Avoid size query
- failure during truncate
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] spapr: move registration of "host" CPU
+ core type to machine code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,198 +31,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wjvSxnD0glrK8Tb1pnl773RDSi1PlPs1m
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
-Message-ID: <b10bd108-0387-34eb-9aa4-7c5e3f9f63a1@redhat.com>
-Subject: Re: [PATCH v10 05/20] dirty-bitmap: Avoid size query failure during
- truncate
-References: <20170925145526.32690-1-eblake@redhat.com>
- <20170925145526.32690-6-eblake@redhat.com>
- <f305e22b-963e-f1eb-710c-d74c6efc9628@virtuozzo.com>
-In-Reply-To: <f305e22b-963e-f1eb-710c-d74c6efc9628@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, 25 Sep 2017 15:41:34 +0200
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-On 09/25/2017 10:23 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 25.09.2017 17:55, Eric Blake wrote:
->> We've previously fixed several places where we failed to account
->> for possible errors from bdrv_nb_sectors().=C2=A0 Fix another one by
->> making bdrv_dirty_bitmap_truncate() take the new size from the
->> caller instead of querying itself; then adjust the sole caller
->> bdrv_truncate() to pass the size just determined by a successful
->> resize, or to skip the bitmap resize on failure, thus avoiding
->=20
-> nothing is skipped in this version
+> On Mon, 25 Sep 2017 11:47:33 +0200
+> Greg Kurz <groug@kaod.org> wrote:
+> 
+> > The CPU core abstraction belongs to the machine code. This also gets
+> > rid of some code duplication.
+> > 
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> > 
+> > hw/ppc/spapr_cpu_core.h is also included elsewhere in target/ppc/kvm.c
+> > but this is already handled by the following cleanup patch:
+> > 
+> > https://patchwork.ozlabs.org/patch/817598/
+> > ---
+> >  hw/ppc/spapr.c                  |    4 ++++
+> >  hw/ppc/spapr_cpu_core.c         |   34 ++++++++++++++++++++++------------
+> >  include/hw/ppc/spapr_cpu_core.h |    2 +-
+> >  target/ppc/kvm.c                |   12 ------------
+> >  4 files changed, 27 insertions(+), 25 deletions(-)
+> > 
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 0ce3ec87ac59..e82c8532ffb0 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -2349,6 +2349,10 @@ static void ppc_spapr_init(MachineState *machine)
+> >      }
+> >  
+> >      /* init CPUs */
+> > +    if (kvm_enabled()) {
+> > +        spapr_cpu_core_register_host_type();
+> > +    }  
+> why don't we create it statically in hw/ppc/spapr_cpu_core.c
+> like it's done in x86, i.e.
+> 
+>   static void x86_cpu_register_types(void)                                         
+>   {                                                                                
+>   ...                              
+>   #ifdef CONFIG_KVM                                                                
+>       type_register_static(&host_x86_cpu_type_info);                               
+>   #endif                                                                           
+>   } 
+>   type_init(x86_cpu_register_types)
+> 
+> and do the same for host CPU as well?
+> 
 
-So much for me squashing in a change.  If the maintainer is willing
-(Kevin, is this going through your tree?), we can reword that to:
+Hi Igor,
 
-"...pass the size just determined by a successful resize, or to reuse
-the size given to the original truncate operation when
-refresh_total_sectors() was not able to confirm the actual size (the two
-sizes can potentially differ according to rounding constraints), thus
-avoiding..."
+Not sure yet why we use dynamic types, but I'd be glad to dig a bit more.
+Maybe I'll do this in a followup patch though, since the present patch
+is mostly about not referencing sPAPRCPUCore from the KVM code anymore.
 
->=20
->> sizing the bitmaps to -1.=C2=A0 This also fixes a bug where not all
->> failure paths in bdrv_truncate() would set errp.
->>
->> Note that bdrv_truncate() is still a bit awkward.=C2=A0 We may want
->> to revisit it later and clean up things to better guarantee that
->> a resize attempt either fails cleanly up front, or cannot fail
->> after guest-visible changes have been made (if temporary changes
->> are made, then they need to be cleanly rolled back).=C2=A0 But that
->> is a task for another day; for now, the goal is the bare minimum
->> fix to ensure that just bdrv_dirty_bitmap_truncate() cannot fail.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->=20
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->=20
->=20
->=20
->>
->> ---
->> v10: always resize bitmap as before [John], enhance commit message to
->> point out errp bugfix [Vladimir]
->> v9: skip only bdrv_dirty_bitmap_truncate on error [Fam]
->> v8: retitle and rework to avoid possibility of secondary failure [John=
-]
->> v7: new patch [Kevin]
->> ---
->> =C2=A0 include/block/dirty-bitmap.h |=C2=A0 2 +-
->> =C2=A0 block.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 1=
-6 +++++++++++-----
->> =C2=A0 block/dirty-bitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 |=C2=A0 6 +++---
->> =C2=A0 3 files changed, 15 insertions(+), 9 deletions(-)
->>
->> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap=
-=2Eh
->> index 8fd842eac9..7a27590047 100644
->> --- a/include/block/dirty-bitmap.h
->> +++ b/include/block/dirty-bitmap.h
->> @@ -83,7 +83,7 @@ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter
->> *iter);
->> =C2=A0 void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t sect=
-or_num);
->> =C2=A0 int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
->> =C2=A0 int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
->> -void bdrv_dirty_bitmap_truncate(BlockDriverState *bs);
->> +void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes);=
+> my gripe with 'dynamic' types is that it creates problems
+> if one needs to access type information before type is created.
+> In my use-case it's before machine_init() is called but
+> after kvm is initialized, so I was sort of 'fine' with way
+> it's currently handled /i.e. still too much convoluted with
+> aliases redefinition and all but sort of 'manageable' /.
+> 
+> However I'd very much prefer static type info so it
+> could be used regardless of place/time it's accessed.
+> 
 
->> =C2=A0 bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);=
+I agree that it would be better.
 
->> =C2=A0 bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
->> =C2=A0 bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitm=
-ap);
->> diff --git a/block.c b/block.c
->> index 528cda7b2c..ef5af81f66 100644
->> --- a/block.c
->> +++ b/block.c
->> @@ -3545,12 +3545,18 @@ int bdrv_truncate(BdrvChild *child, int64_t
->> offset, PreallocMode prealloc,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(!(bs->open_flags & BDRV_O_INACTI=
-VE));
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D drv->bdrv_truncate(bs, offset, =
-prealloc, errp);
->> -=C2=A0=C2=A0=C2=A0 if (ret =3D=3D 0) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D refresh_total_sect=
-ors(bs, offset >> BDRV_SECTOR_BITS);
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmap_truncate=
-(bs);
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_parent_cb_resize(bs);=
+> I can add a couple patches to that effect into upcomming
+> cpu_model removal series, if that's ok for PPC folks.
+> 
 
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 atomic_inc(&bs->write_gen)=
-;
->> +=C2=A0=C2=A0=C2=A0 if (ret < 0) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> +=C2=A0=C2=A0=C2=A0 ret =3D refresh_total_sectors(bs, offset >> BDRV_S=
-ECTOR_BITS);
->> +=C2=A0=C2=A0=C2=A0 if (ret < 0) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg_errno(errp, -re=
-t, "Could not refresh total sector
->> count");
->> +=C2=A0=C2=A0=C2=A0 } else {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 offset =3D bs->total_secto=
-rs * BDRV_SECTOR_SIZE;
->> +=C2=A0=C2=A0=C2=A0 }
->> +=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmap_truncate(bs, offset);
->> +=C2=A0=C2=A0=C2=A0 bdrv_parent_cb_resize(bs);
->> +=C2=A0=C2=A0=C2=A0 atomic_inc(&bs->write_gen);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
->> =C2=A0 }
->>
->> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->> index 42a55e4a4b..ee164fb518 100644
->> --- a/block/dirty-bitmap.c
->> +++ b/block/dirty-bitmap.c
->> @@ -1,7 +1,7 @@
->> =C2=A0 /*
->> =C2=A0=C2=A0 * Block Dirty Bitmap
->> =C2=A0=C2=A0 *
->> - * Copyright (c) 2016 Red Hat. Inc
->> + * Copyright (c) 2016-2017 Red Hat. Inc
->> =C2=A0=C2=A0 *
->> =C2=A0=C2=A0 * Permission is hereby granted, free of charge, to any pe=
-rson
->> obtaining a copy
->> =C2=A0=C2=A0 * of this software and associated documentation files (th=
-e
->> "Software"), to deal
->> @@ -302,10 +302,10 @@ BdrvDirtyBitmap
->> *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
->> =C2=A0=C2=A0 * Truncates _all_ bitmaps attached to a BDS.
->> =C2=A0=C2=A0 * Called with BQL taken.
->> =C2=A0=C2=A0 */
->> -void bdrv_dirty_bitmap_truncate(BlockDriverState *bs)
->> +void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BdrvDirtyBitmap *bitmap;
->> -=C2=A0=C2=A0=C2=A0 uint64_t size =3D bdrv_nb_sectors(bs);
->> +=C2=A0=C2=A0=C2=A0 int64_t size =3D DIV_ROUND_UP(bytes, BDRV_SECTOR_S=
-IZE);
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmaps_lock(bs);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QLIST_FOREACH(bitmap, &bs->dirty_bitmap=
-s, list) {
->=20
->=20
+Oh, and can you share an url to see how it looks like ?
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Cheers,
+
+--
+Greg
+
+> 
+> > +
+> >      if (machine->cpu_model == NULL) {
+> >          machine->cpu_model = kvm_enabled() ? "host" : smc->tcg_default_cpu;
+> >      }
+> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> > index c08ee7571a50..6e224ba029ec 100644
+> > --- a/hw/ppc/spapr_cpu_core.c
+> > +++ b/hw/ppc/spapr_cpu_core.c
+> > @@ -317,7 +317,7 @@ static Property spapr_cpu_core_properties[] = {
+> >      DEFINE_PROP_END_OF_LIST()
+> >  };
+> >  
+> > -void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
+> > +static void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
+> >  {
+> >      DeviceClass *dc = DEVICE_CLASS(oc);
+> >      sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_CLASS(oc);
+> > @@ -337,6 +337,20 @@ static const TypeInfo spapr_cpu_core_type_info = {
+> >      .class_size = sizeof(sPAPRCPUCoreClass),
+> >  };
+> >  
+> > +static void spapr_cpu_core_register_type(const char *model_name)
+> > +{
+> > +    TypeInfo type_info = {
+> > +        .parent = TYPE_SPAPR_CPU_CORE,
+> > +        .instance_size = sizeof(sPAPRCPUCore),
+> > +        .class_init = spapr_cpu_core_class_init,
+> > +        .class_data = (void *) model_name,
+> > +    };
+> > +
+> > +    type_info.name = g_strdup_printf("%s-"TYPE_SPAPR_CPU_CORE, model_name);
+> > +    type_register(&type_info);
+> > +    g_free((void *)type_info.name);
+> > +}
+> > +
+> >  static void spapr_cpu_core_register_types(void)
+> >  {
+> >      int i;
+> > @@ -344,18 +358,14 @@ static void spapr_cpu_core_register_types(void)
+> >      type_register_static(&spapr_cpu_core_type_info);
+> >  
+> >      for (i = 0; i < ARRAY_SIZE(spapr_core_models); i++) {
+> > -        TypeInfo type_info = {
+> > -            .parent = TYPE_SPAPR_CPU_CORE,
+> > -            .instance_size = sizeof(sPAPRCPUCore),
+> > -            .class_init = spapr_cpu_core_class_init,
+> > -            .class_data = (void *) spapr_core_models[i],
+> > -        };
+> > -
+> > -        type_info.name = g_strdup_printf("%s-" TYPE_SPAPR_CPU_CORE,
+> > -                                         spapr_core_models[i]);
+> > -        type_register(&type_info);
+> > -        g_free((void *)type_info.name);
+> > +        spapr_cpu_core_register_type(spapr_core_models[i]);
+> >      }
+> > +
+> > +}
+> > +
+> > +void spapr_cpu_core_register_host_type(void)
+> > +{
+> > +    spapr_cpu_core_register_type("host");
+> >  }
+> >  
+> >  type_init(spapr_cpu_core_register_types)
+> > diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
+> > index 93051e9ecf56..e3e906343048 100644
+> > --- a/include/hw/ppc/spapr_cpu_core.h
+> > +++ b/include/hw/ppc/spapr_cpu_core.h
+> > @@ -36,5 +36,5 @@ typedef struct sPAPRCPUCoreClass {
+> >  } sPAPRCPUCoreClass;
+> >  
+> >  char *spapr_get_cpu_core_type(const char *model);
+> > -void spapr_cpu_core_class_init(ObjectClass *oc, void *data);
+> > +void spapr_cpu_core_register_host_type(void);
+> >  #endif
+> > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> > index 5b281b2f1b6d..8dd80993ec9e 100644
+> > --- a/target/ppc/kvm.c
+> > +++ b/target/ppc/kvm.c
+> > @@ -37,7 +37,6 @@
+> >  #include "hw/sysbus.h"
+> >  #include "hw/ppc/spapr.h"
+> >  #include "hw/ppc/spapr_vio.h"
+> > -#include "hw/ppc/spapr_cpu_core.h"
+> >  #include "hw/ppc/ppc.h"
+> >  #include "sysemu/watchdog.h"
+> >  #include "trace.h"
+> > @@ -2502,17 +2501,6 @@ static int kvm_ppc_register_host_cpu_type(void)
+> >      oc = object_class_by_name(type_info.name);
+> >      g_assert(oc);
+> >  
+> > -#if defined(TARGET_PPC64)
+> > -    type_info.name = g_strdup_printf("%s-"TYPE_SPAPR_CPU_CORE, "host");
+> > -    type_info.parent = TYPE_SPAPR_CPU_CORE,
+> > -    type_info.instance_size = sizeof(sPAPRCPUCore);
+> > -    type_info.instance_init = NULL;
+> > -    type_info.class_init = spapr_cpu_core_class_init;
+> > -    type_info.class_data = (void *) "host";
+> > -    type_register(&type_info);
+> > -    g_free((void *)type_info.name);
+> > -#endif
+> > -
+> >      /*
+> >       * Update generic CPU family class alias (e.g. on a POWER8NVL host,
+> >       * we want "POWER8" to be a "family" alias that points to the current
+> > 
+> >   
+> 
 
 
---wjvSxnD0glrK8Tb1pnl773RDSi1PlPs1m
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+-- 
+Gregory Kurz                                     kurzgreg@fr.ibm.com
+                                                 gkurz@linux.vnet.ibm.com
+Software Engineer @ IBM/LTC                      http://www.ibm.com
+Tel 33-5-6218-1607
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnJJL0ACgkQp6FrSiUn
-Q2o5Hgf/Rh/tJLaJHHsUQQL1HPdpweBTF4r4NkTAhoNY3gcT7Zt/MtJmK+VS818k
-6MP/D/VrnVoXdgWPnty2HjNZAPVC5Qulrbo3zA6OhztNJFb4CRlLcluzLjq8I9zy
-Mee26mwwRfHY3P8vox+tNUW56RkarsQkl++sdHrK3fcG6RhMeSJn3JtYsZbspgY/
-r8wA/JVuJ0mfEvODPn263n93DTVyUZgEJxofM1x8Z5klaIf4Jgw/AHxnSeMWBiyn
-GyyaneGIvFOz97jmvfzoJwkFfawKGXbpD+b/0wkDdLaokS4sGu5E7kixZtkjbwq5
-dOh5IheMDEZ093QS5xhzpfY6aq/4PA==
-=1EOP
------END PGP SIGNATURE-----
-
---wjvSxnD0glrK8Tb1pnl773RDSi1PlPs1m--
+"Anarchy is about taking complete responsibility for yourself."
+        Alan Moore.
