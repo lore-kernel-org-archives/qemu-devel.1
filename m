@@ -1,22 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dwaOi-0003Cl-3G
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 16:54:37 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dwaOu-0003J5-U1
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 16:54:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dwaOg-0003sm-W3
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 16:54:36 -0400
-References: <20170925145526.32690-1-eblake@redhat.com>
-	<20170925145526.32690-6-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <8da0f1ea-8650-550d-b804-b483563d94c3@redhat.com>
-Date: Mon, 25 Sep 2017 16:54:24 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dwaOq-0003z2-Ux
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 16:54:48 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43836)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1dwaOq-0003xw-Ml
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 16:54:44 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8PKsTpJ100417
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 16:54:40 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d733ccr8b-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 16:54:40 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Mon, 25 Sep 2017 14:54:39 -0600
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20170925145526.32690-6-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v10 05/20] dirty-bitmap: Avoid size query
- failure during truncate
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20170921110625.9500-1-alex.bennee@linaro.org>
+References: <20170921110625.9500-1-alex.bennee@linaro.org>
+Date: Mon, 25 Sep 2017 15:53:02 -0500
+Message-Id: <150637278211.26688.15280770501463365931@sif>
+Subject: Re: [Qemu-devel] [PATCH] accel/tcg/cputlb: avoid recursive BQL
+ (fixes #1706296)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,112 +41,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Paolo Bonzini <bonzini@gnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Jones <rjones@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
+Quoting Alex Benn=C3=A9e (2017-09-21 06:06:25)
+> The mmio path (see exec.c:prepare_mmio_access) already protects itself
+> against recursive locking and it makes sense to do the same for
+> io_readx/writex. Otherwise any helper running in the BQL context will
+> assert when it attempts to write to device memory as in the case of
+> the bug report.
+> =
 
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> CC: Richard Jones <rjones@redhat.com>
+> CC: Paolo Bonzini <bonzini@gnu.org>
 
-On 09/25/2017 10:55 AM, Eric Blake wrote:
-> We've previously fixed several places where we failed to account
-> for possible errors from bdrv_nb_sectors().  Fix another one by
-> making bdrv_dirty_bitmap_truncate() take the new size from the
-> caller instead of querying itself; then adjust the sole caller
-> bdrv_truncate() to pass the size just determined by a successful
-> resize, or to skip the bitmap resize on failure, thus avoiding
-> sizing the bitmaps to -1.  This also fixes a bug where not all
-> failure paths in bdrv_truncate() would set errp.
-> 
-> Note that bdrv_truncate() is still a bit awkward.  We may want
-> to revisit it later and clean up things to better guarantee that
-> a resize attempt either fails cleanly up front, or cannot fail
-> after guest-visible changes have been made (if temporary changes
-> are made, then they need to be cleanly rolled back).  But that
-> is a task for another day; for now, the goal is the bare minimum
-> fix to ensure that just bdrv_dirty_bitmap_truncate() cannot fail.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> 
+FYI: this patch has been tagged for stable 2.10.1, but is not yet
+upstream. Patch freeze for 2.10.1 is September 27th.
+
 > ---
-> v10: always resize bitmap as before [John], enhance commit message to
-> point out errp bugfix [Vladimir]
-> v9: skip only bdrv_dirty_bitmap_truncate on error [Fam]
-> v8: retitle and rework to avoid possibility of secondary failure [John]
-> v7: new patch [Kevin]
-> ---
->  include/block/dirty-bitmap.h |  2 +-
->  block.c                      | 16 +++++++++++-----
->  block/dirty-bitmap.c         |  6 +++---
->  3 files changed, 15 insertions(+), 9 deletions(-)
-> 
-> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-> index 8fd842eac9..7a27590047 100644
-> --- a/include/block/dirty-bitmap.h
-> +++ b/include/block/dirty-bitmap.h
-> @@ -83,7 +83,7 @@ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
->  void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t sector_num);
->  int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
->  int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
-> -void bdrv_dirty_bitmap_truncate(BlockDriverState *bs);
-> +void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes);
->  bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
->  bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
->  bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
-> diff --git a/block.c b/block.c
-> index 528cda7b2c..ef5af81f66 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -3545,12 +3545,18 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
->      assert(!(bs->open_flags & BDRV_O_INACTIVE));
-> 
->      ret = drv->bdrv_truncate(bs, offset, prealloc, errp);
-> -    if (ret == 0) {
-> -        ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
-> -        bdrv_dirty_bitmap_truncate(bs);
-> -        bdrv_parent_cb_resize(bs);
-> -        atomic_inc(&bs->write_gen);
-> +    if (ret < 0) {
-> +        return ret;
+>  accel/tcg/cputlb.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> =
+
+> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+> index e72415a882..bcbcc4db6c 100644
+> --- a/accel/tcg/cputlb.c
+> +++ b/accel/tcg/cputlb.c
+> @@ -765,7 +765,7 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBE=
+ntry *iotlbentry,
+> =
+
+>      cpu->mem_io_vaddr =3D addr;
+> =
+
+> -    if (mr->global_locking) {
+> +    if (mr->global_locking && !qemu_mutex_iothread_locked()) {
+>          qemu_mutex_lock_iothread();
+>          locked =3D true;
 >      }
-> +    ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
-> +    if (ret < 0) {
-> +        error_setg_errno(errp, -ret, "Could not refresh total sector count");
-> +    } else {
-> +        offset = bs->total_sectors * BDRV_SECTOR_SIZE;
-> +    }
-> +    bdrv_dirty_bitmap_truncate(bs, offset);
-> +    bdrv_parent_cb_resize(bs);
-> +    atomic_inc(&bs->write_gen);
->      return ret;
->  }
-> 
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index 42a55e4a4b..ee164fb518 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -1,7 +1,7 @@
->  /*
->   * Block Dirty Bitmap
->   *
-> - * Copyright (c) 2016 Red Hat. Inc
-> + * Copyright (c) 2016-2017 Red Hat. Inc
->   *
->   * Permission is hereby granted, free of charge, to any person obtaining a copy
->   * of this software and associated documentation files (the "Software"), to deal
-> @@ -302,10 +302,10 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
->   * Truncates _all_ bitmaps attached to a BDS.
->   * Called with BQL taken.
->   */
-> -void bdrv_dirty_bitmap_truncate(BlockDriverState *bs)
-> +void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes)
->  {
->      BdrvDirtyBitmap *bitmap;
-> -    uint64_t size = bdrv_nb_sectors(bs);
-> +    int64_t size = DIV_ROUND_UP(bytes, BDRV_SECTOR_SIZE);
-> 
->      bdrv_dirty_bitmaps_lock(bs);
->      QLIST_FOREACH(bitmap, &bs->dirty_bitmaps, list) {
-> 
+> @@ -800,7 +800,7 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntr=
+y *iotlbentry,
+>      cpu->mem_io_vaddr =3D addr;
+>      cpu->mem_io_pc =3D retaddr;
+> =
 
-I *THINK* this is the most correct we can do for now...
+> -    if (mr->global_locking) {
+> +    if (mr->global_locking && !qemu_mutex_iothread_locked()) {
+>          qemu_mutex_lock_iothread();
+>          locked =3D true;
+>      }
+> -- =
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+> 2.14.1
+> =
+
+>=20
