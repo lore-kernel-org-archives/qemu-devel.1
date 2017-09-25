@@ -1,30 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dwTm3-0002xe-Gp
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:50:16 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dwTtS-00068i-BT
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:57:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dwTlz-0003cz-1G
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:50:15 -0400
-Received: from mail-it0-x236.google.com ([2607:f8b0:4001:c0b::236]:52013)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1dwTly-0003bK-SB
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:50:10 -0400
-Received: by mail-it0-x236.google.com with SMTP id o200so6844691itg.0
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 06:50:09 -0700 (PDT)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <20170925085726.GD20236@redhat.com>
-Date: Mon, 25 Sep 2017 09:50:07 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <62B6542A-5946-4160-9E84-B355B4F9C513@gmail.com>
-References: <mailman.3351.1506066493.14747.qemu-devel@nongnu.org>
-	<726A2123-0371-407B-9270-6672DF66D511@gmail.com>
-	<20170922124405.GB32000@lemon> <20170922131819.GP12725@redhat.com>
-	<BA02424C-0C79-4FAE-B191-18A9D0CDBAC8@gmail.com>
-	<20170925085726.GD20236@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 28/36] tests: Add ubuntu.i386 image
+	(envelope-from <stefanha@redhat.com>) id 1dwTtO-0006y6-9l
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:57:54 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Mon, 25 Sep 2017 14:57:35 +0100
+Message-Id: <20170925135735.25076-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] throttle-groups: cancel timers on restart
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,62 +17,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Manos Pitsidianakis <el13635@mail.ntua.gr>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
+Throttling group members are restarted on config change and by
+bdrv_drained_begin().  Pending timers should be cancelled before
+restarting the queue, otherwise requests see that tg->any_timer_armed[]
+is already set and do not schedule a timer.
 
-> On Sep 25, 2017, at 4:57 AM, Daniel P. Berrange <berrange@redhat.com> =
-wrote:
->=20
-> On Fri, Sep 22, 2017 at 04:26:40PM -0400, Programmingkid wrote:
->>=20
->>> On Sep 22, 2017, at 9:18 AM, Daniel P. Berrange =
-<berrange@redhat.com> wrote:
->>>=20
->>> On Fri, Sep 22, 2017 at 08:44:05PM +0800, Fam Zheng wrote:
->>>> On Fri, 09/22 08:10, Programmingkid wrote:
->>>>> Could a Darwin test be added? Both x86 and PowerPC versions would =
-be great.
->>>>=20
->>>> It's nice to cover macOS in our test, but to be honest I don't know =
-how to do
->>>> it. If there isn't any copyright problem, and if there are =
-instructions
->>>> available in wiki.qemu.org descirbing how to create such a guest =
-step by step
->>>> like [1], we can add one.
->>>=20
->>> AFAICT we can not just provide or host OS-X images and let =
-individual
->>> devs run the without it being a license violation, so best avoided.
->>=20
->> Actually Darwin and Mac OS X are not the same. Darwin is this =
-minimalistic
->> environment and Mac OS X is built on top of that environment. There =
-would
->> be no license problems when using Darwin only.
->=20
-> I looked for images of Darwin but haven't been able to find any modern
-> ones. Wikipedia claims that Apple stopped releasing installable images
-> of Darwin so you have to build it from source :-(
+For example, a hang occurs at least since QEMU 2.10.0 with -drive
+iops=100 because no further timers will be scheduled:
 
-I did find this project: http://www.puredarwin.org, but they haven't =
-released an image file yet.
+  (guest)$ dd if=/dev/zero of=/dev/vdb oflag=direct count=1000
+  (qemu) stop
+  (qemu) cont
+  ...I/O is stuck...
 
->=20
->>> IMHO it easier to just rely on Travis' OS-X builders for testing =
-OS-X
->>> platform builds, so that licensing compliance is their =
-responsibility.
->>=20
->> That might work for the x86 version of Mac OS X, but there doesn't =
-appear
->> to be any support for the PowerPC version of Mac OS X.
->=20
-> Yeah, no PPC support, but then that's essentially a dead platform, so =
-it
-> is questionable whether we need to care about OS-X PPC support for =
-QEMU.
-> The last PPC OS-X hardware shipped 2006.
+This can be fixed by calling throttle_group_detach_aio_context() from a
+bdrv_drained_begin/end() region.  This way timers are quiesced properly,
+requests are drained, and other throttle group members are scheduled, if
+necessary.
 
-Good point.
+Reported-by: Yongxue Hong <yhong@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+v3:
+ * Different approach this time, based on Berto's insight that another
+   TGM may need to be scheduled now that our TGM's timers have been
+   detached.
+
+   I realized the problem isn't the detach operation, it's the restart
+   operation that runs before detach.  Timers shouldn't be left active
+   across restart.
+
+   After fixing restart no change is necessary in detach, but I decided
+   to add assertions to make it clear that this function must be called
+   in a quiesced environment.
+
+ block/block-backend.c   |  2 ++
+ block/throttle-groups.c | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 30 insertions(+)
+
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 45d9101be3..da2f6c0f8a 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -1748,8 +1748,10 @@ void blk_set_aio_context(BlockBackend *blk, AioContext *new_context)
+ 
+     if (bs) {
+         if (tgm->throttle_state) {
++            bdrv_drained_begin(bs);
+             throttle_group_detach_aio_context(tgm);
+             throttle_group_attach_aio_context(tgm, new_context);
++            bdrv_drained_end(bs);
+         }
+         bdrv_set_aio_context(bs, new_context);
+     }
+diff --git a/block/throttle-groups.c b/block/throttle-groups.c
+index 6ba992c8d7..c13530695a 100644
+--- a/block/throttle-groups.c
++++ b/block/throttle-groups.c
+@@ -420,6 +420,23 @@ static void throttle_group_restart_queue(ThrottleGroupMember *tgm, bool is_write
+ void throttle_group_restart_tgm(ThrottleGroupMember *tgm)
+ {
+     if (tgm->throttle_state) {
++        ThrottleState *ts = tgm->throttle_state;
++        ThrottleGroup *tg = container_of(ts, ThrottleGroup, ts);
++        ThrottleTimers *tt = &tgm->throttle_timers;
++
++        /* Cancel pending timers */
++        qemu_mutex_lock(&tg->lock);
++        if (timer_pending(tt->timers[0])) {
++            timer_del(tt->timers[0]);
++            tg->any_timer_armed[0] = false;
++        }
++        if (timer_pending(tt->timers[1])) {
++            timer_del(tt->timers[1]);
++            tg->any_timer_armed[1] = false;
++        }
++        qemu_mutex_unlock(&tg->lock);
++
++        /* This also schedules the next request in other TGMs, if necessary */
+         throttle_group_restart_queue(tgm, 0);
+         throttle_group_restart_queue(tgm, 1);
+     }
+@@ -592,6 +609,17 @@ void throttle_group_attach_aio_context(ThrottleGroupMember *tgm,
+ void throttle_group_detach_aio_context(ThrottleGroupMember *tgm)
+ {
+     ThrottleTimers *tt = &tgm->throttle_timers;
++
++    /* Requests must have been drained */
++    assert(tgm->pending_reqs[0] == 0);
++    assert(tgm->pending_reqs[1] == 0);
++    assert(qemu_co_queue_empty(&tgm->throttled_reqs[0]));
++    assert(qemu_co_queue_empty(&tgm->throttled_reqs[1]));
++
++    /* Timers must be disabled */
++    assert(!timer_pending(tt->timers[0]));
++    assert(!timer_pending(tt->timers[1]));
++
+     throttle_timers_detach_aio_context(tt);
+     tgm->aio_context = NULL;
+ }
+-- 
+2.13.5
