@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dwMUa-0006VB-DN
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 02:03:45 -0400
+	(envelope-from <peterx@redhat.com>) id 1dwN1Y-0004R6-MG
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 02:37:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dwMUX-00037Y-7S
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 02:03:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51030)
+	(envelope-from <peterx@redhat.com>) id 1dwN1V-0004vm-I8
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 02:37:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36826)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dwMUW-00037G-VH
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 02:03:41 -0400
-References: <20170922140338.6068-1-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ad63a57a-ecb7-b7db-a120-800c87164709@redhat.com>
-Date: Mon, 25 Sep 2017 08:03:34 +0200
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dwN1V-0004uW-Bz
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 02:37:45 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 97A62285B5
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 06:37:43 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Mon, 25 Sep 2017 14:37:25 +0800
+Message-Id: <1506321449-24013-1-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170922140338.6068-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] s390x/kvm: fix and cleanup storing CPU
- status
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 0/4] iothread: allow to create internal
+ iothreads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,116 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-On 22.09.2017 16:03, David Hildenbrand wrote:
-> env->psa is a 64bit value, while we copy 4 bytes into the save area,
-> resulting always in 0 getting stored.
-> 
-> Let's try to reduce such errors by using a proper structure. While at
-> it, use correct cpu->be conversion (and get_psw_mask()), as we will be
-> reusing this code for TCG soon.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
-> 
-> v1 -> v2:
->  - dropped QEMU_PACKED
->  - Moved QEMU_BUILD_BUG_ON()
->  - Retested if it works now
-> 
->  target/s390x/kvm.c | 62 ++++++++++++++++++++++++++++++++++++------------------
->  1 file changed, 42 insertions(+), 20 deletions(-)
-> 
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index ebb75cafaa..b63fcc5f1f 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -1553,22 +1553,37 @@ static int do_store_adtl_status(S390CPU *cpu, hwaddr addr, hwaddr len)
->      return 0;
->  }
->  
-> +struct sigp_save_area {
-> +    uint64_t    fprs[16];                       /* 0x0000 */
-> +    uint64_t    grs[16];                        /* 0x0080 */
-> +    PSW         psw;                            /* 0x0100 */
-> +    uint8_t     pad_0x0110[0x0118 - 0x0110];    /* 0x0110 */
-> +    uint32_t    prefix;                         /* 0x0118 */
-> +    uint32_t    fpc;                            /* 0x011c */
-> +    uint8_t     pad_0x0120[0x0124 - 0x0120];    /* 0x0120 */
-> +    uint32_t    todpr;                          /* 0x0124 */
-> +    uint64_t    cputm;                          /* 0x0128 */
-> +    uint64_t    ckc;                            /* 0x0130 */
-> +    uint8_t     pad_0x0138[0x0140 - 0x0138];    /* 0x0138 */
-> +    uint32_t    ars[16];                        /* 0x0140 */
-> +    uint64_t    crs[16];                        /* 0x0384 */
-> +};
-> +QEMU_BUILD_BUG_ON(sizeof(struct sigp_save_area) != 512);
-> +
->  #define KVM_S390_STORE_STATUS_DEF_ADDR offsetof(LowCore, floating_pt_save_area)
-> -#define SAVE_AREA_SIZE 512
->  static int kvm_s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch)
->  {
->      static const uint8_t ar_id = 1;
-> -    uint64_t ckc = cpu->env.ckc >> 8;
-> -    void *mem;
-> +    struct sigp_save_area *sa;
-> +    hwaddr len = sizeof(*sa);
->      int i;
-> -    hwaddr len = SAVE_AREA_SIZE;
->  
-> -    mem = cpu_physical_memory_map(addr, &len, 1);
-> -    if (!mem) {
-> +    sa = cpu_physical_memory_map(addr, &len, 1);
-> +    if (!sa) {
->          return -EFAULT;
->      }
-> -    if (len != SAVE_AREA_SIZE) {
-> -        cpu_physical_memory_unmap(mem, len, 1, 0);
-> +    if (len != sizeof(*sa)) {
-> +        cpu_physical_memory_unmap(sa, len, 1, 0);
->          return -EFAULT;
->      }
->  
-> @@ -1576,19 +1591,26 @@ static int kvm_s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch)
->          cpu_physical_memory_write(offsetof(LowCore, ar_access_id), &ar_id, 1);
->      }
->      for (i = 0; i < 16; ++i) {
-> -        *((uint64_t *)mem + i) = get_freg(&cpu->env, i)->ll;
-> -    }
-> -    memcpy(mem + 128, &cpu->env.regs, 128);
-> -    memcpy(mem + 256, &cpu->env.psw, 16);
-> -    memcpy(mem + 280, &cpu->env.psa, 4);
-> -    memcpy(mem + 284, &cpu->env.fpc, 4);
-> -    memcpy(mem + 292, &cpu->env.todpr, 4);
-> -    memcpy(mem + 296, &cpu->env.cputm, 8);
-> -    memcpy(mem + 304, &ckc, 8);
-> -    memcpy(mem + 320, &cpu->env.aregs, 64);
-> -    memcpy(mem + 384, &cpu->env.cregs, 128);
-> +        sa->fprs[i] = cpu_to_be64(get_freg(&cpu->env, i)->ll);
-> +    }
-> +    for (i = 0; i < 16; ++i) {
-> +        sa->grs[i] = cpu_to_be64(cpu->env.regs[i]);
-> +    }
-> +    sa->psw.addr = cpu_to_be64(cpu->env.psw.addr);
-> +    sa->psw.mask = cpu_to_be64(get_psw_mask(&cpu->env));
-> +    sa->prefix = cpu_to_be32(cpu->env.psa);
-> +    sa->fpc = cpu_to_be32(cpu->env.fpc);
-> +    sa->todpr = cpu_to_be32(cpu->env.todpr);
-> +    sa->cputm = cpu_to_be64(cpu->env.cputm);
-> +    sa->ckc = cpu_to_be64(cpu->env.ckc >> 8);
-> +    for (i = 0; i < 16; ++i) {
-> +        sa->ars[i] = cpu_to_be32(cpu->env.aregs[i]);
-> +    }
-> +    for (i = 0; i < 16; ++i) {
-> +        sa->ars[i] = cpu_to_be64(cpu->env.cregs[i]);
-> +    }
->  
-> -    cpu_physical_memory_unmap(mem, len, 1, len);
-> +    cpu_physical_memory_unmap(sa, len, 1, len);
->  
->      return 0;
->  }
+v2:
+- add one patch to provide object_get_internal_root() [Daniel]
+- patch 2: use the new object_get_internal_root()
+- patch 3: fix commit message, "reentrant" is wrongly used by me. it
+  should be "called multiple times"; move iothread->ctx check into
+  iothread_stop() [Fam]
+- patch 4: add one paragraph in commit message, mention about the glib
+  issue. [Fam]
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+When trying to support monitor OOB (out-of-band) commands, I found
+that the monitor IO thread I did looks just like iothread.  It would
+be best if I can use iothread directly.  However it seems that it was
+mostly used by "-object iothread" before but not friendly to internal
+usages.  This series tries to export essential functions to do it.
+
+Also, I think patch 2 also fixes a bug in iothread_stop().
+
+Please review. Thanks.
+
+Peter Xu (4):
+  qom: provide root container for internal objs
+  iothread: provide helpers for internal use
+  iothread: export iothread_stop()
+  iothread: delay the context release to finalize
+
+ include/qom/object.h      | 10 ++++++++++
+ include/sysemu/iothread.h |  9 +++++++++
+ iothread.c                | 46 ++++++++++++++++++++++++++++++++++++-----=
+-----
+ qom/object.c              |  5 +++++
+ 4 files changed, 60 insertions(+), 10 deletions(-)
+
+--=20
+2.7.4
