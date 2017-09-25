@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=434883a06=anthony.perard@citrix.com>)
-	id 1dwURZ-0005k6-EK
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:33:10 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dwUTF-0006cU-KT
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:34:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=434883a06=anthony.perard@citrix.com>)
-	id 1dwURT-0007Nv-NQ
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:33:09 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:39399)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=434883a06=anthony.perard@citrix.com>)
-	id 1dwURT-0007Ml-GJ
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:33:03 -0400
-Date: Mon, 25 Sep 2017 15:32:59 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20170925143259.GA25986@perard.uk.xensource.com>
-References: <20170823221445.15243-1-ehabkost@redhat.com>
-	<20170823221445.15243-5-ehabkost@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1dwUTC-0008NY-GK
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:34:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40946)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dwUTC-0008Mo-6K
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:34:50 -0400
+Date: Mon, 25 Sep 2017 11:34:39 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170925143439.GA3030@localhost.localdomain>
+References: <1506071794-4373-1-git-send-email-thuth@redhat.com>
+	<20170925135316.74fed6da.cohuck@redhat.com>
+	<20170925133153.GZ3030@localhost.localdomain>
+	<20170925154647.357047b9@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170823221445.15243-5-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/5] pci: Add INTERFACE_LEGACY_PCI_DEVICE
- to legacy PCI devices
+In-Reply-To: <20170925154647.357047b9@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] qdev: Mark devices as non-hotpluggable
+ by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,105 +30,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Laine Stump <laine@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Amit Shah <amit@kernel.org>
 
-On Wed, Aug 23, 2017 at 07:14:44PM -0300, Eduardo Habkost wrote:
-> Add INTERFACE_LEGACY_PCI_DEVICE to all direct subtypes of
-> TYPE_PCI_DEVICE, except:
+On Mon, Sep 25, 2017 at 03:46:47PM +0200, Igor Mammedov wrote:
+> On Mon, 25 Sep 2017 10:31:53 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
 > 
-> 1) The ones that already have INTERFACE_PCIE_DEVICE set:
-> 
-> * base-xhci
-> * e1000e
-> * nvme
-> * pvscsi
-> * vfio-pci
-> * virtio-pci
-> * vmxnet3
-> 
-> 2) base-pci-bridge
-> 
-> Not all PCI bridges are legacy PCI devices, so
-> INTERFACE_LEGACY_PCI_DEVICE is added only to the subtypes that
-> are actually legacy PCI devices:
-> 
-> * dec-21154-p2p-bridge
-> * i82801b11-bridge
-> * pbm-bridge
-> * pci-bridge
-> 
-> The direct subtypes of base-pci-bridge not touched by this patch
-> are:
-> 
-> * xilinx-pcie-root: Already marked as PCIe-only device.
-> * pcie-port: all non-abstract subtypes of pcie-port are already
->   marked as PCIe-only devices.
-> 
-> 3) megasas-base
-> 
-> Not all megasas devices are legacy PCI devices, so the interface
-> names are added to the subclasses registered by
-> megasas_register_types(), according to information in the
-> megasas_devices[] array.
-> 
-> "megasas-gen2" already implements INTERFACE_PCIE_DEVICE, so add
-> INTERFACE_LEGACY_PCI_DEVICE only to "megasas".
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  hw/i386/xen/xen_platform.c          |  4 ++++
->  hw/i386/xen/xen_pvdevice.c          |  4 ++++
->  hw/xen/xen_pt.c                     |  4 ++++
->  62 files changed, 288 insertions(+)
-> 
-> diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
-> index 9ba7474..2113bd0 100644
-> --- a/hw/i386/xen/xen_platform.c
-> +++ b/hw/i386/xen/xen_platform.c
-> @@ -517,6 +517,10 @@ static const TypeInfo xen_platform_info = {
->      .parent        = TYPE_PCI_DEVICE,
->      .instance_size = sizeof(PCIXenPlatformState),
->      .class_init    = xen_platform_class_init,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { INTERFACE_LEGACY_PCI_DEVICE },
-> +        { },
-> +    },
->  };
->  
->  static void xen_platform_register_types(void)
-> diff --git a/hw/i386/xen/xen_pvdevice.c b/hw/i386/xen/xen_pvdevice.c
-> index c093b34..e2ae81b 100644
-> --- a/hw/i386/xen/xen_pvdevice.c
-> +++ b/hw/i386/xen/xen_pvdevice.c
-> @@ -127,6 +127,10 @@ static const TypeInfo xen_pv_type_info = {
->      .parent        = TYPE_PCI_DEVICE,
->      .instance_size = sizeof(XenPVDevice),
->      .class_init    = xen_pv_class_init,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { INTERFACE_LEGACY_PCI_DEVICE },
-> +        { },
-> +    },
->  };
->  
->  static void xen_pv_register_types(void)
-> diff --git a/hw/xen/xen_pt.c b/hw/xen/xen_pt.c
-> index 375efa6..66664fc 100644
-> --- a/hw/xen/xen_pt.c
-> +++ b/hw/xen/xen_pt.c
-> @@ -964,6 +964,10 @@ static const TypeInfo xen_pci_passthrough_info = {
->      .instance_size = sizeof(XenPCIPassthroughState),
->      .instance_finalize = xen_pci_passthrough_finalize,
->      .class_init = xen_pci_passthrough_class_init,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { INTERFACE_LEGACY_PCI_DEVICE },
-> +        { },
-> +    },
->  };
->  
->  static void xen_pci_passthrough_register_types(void)
+> > On Mon, Sep 25, 2017 at 01:53:16PM +0200, Cornelia Huck wrote:
+> > > On Fri, 22 Sep 2017 11:16:34 +0200
+> > > Thomas Huth <thuth@redhat.com> wrote:
+> > >   
+> > > > Historically we've marked all devices as hotpluggable by default. However,
+> > > > most devices are not hotpluggable, and you also need a HotplugHandler to
+> > > > support these devices. So if the user tries to "device_add" or "device_del"
+> > > > such a non-hotpluggable device during runtime, either nothing really usable
+> > > > happens, or QEMU even crashes/aborts unexpectedly (see for example commit
+> > > > 84ebd3e8c7d4fe955b - "Mark diag288 watchdog as non-hotpluggable").
+> > > > So let's change this dangerous default behaviour and mark the devices as
+> > > > non-hotpluggable by default. Certain parent devices classes which are known
+> > > > as hotpluggable (e.g. PCI, USB, etc.) are marked with "hotpluggable = true",
+> > > > so that devices that are derived from these classes continue to work as
+> > > > expected.
+> > > > 
+> > > > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > > > ---
+> > > >  v2: Add missing devices and dropped "RFC" status. See Eduardo's reply on
+> > > >  the previous version of this patch for the rationale which devices need
+> > > >  to be hotpluggable:
+> > > >  https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg06128.html
+> > > > 
+> > > >  hw/char/virtio-serial-bus.c   |  1 +
+> > > >  hw/core/qdev.c                | 10 ++++------
+> > > >  hw/mem/nvdimm.c               |  3 +++
+> > > >  hw/mem/pc-dimm.c              |  1 +
+> > > >  hw/pci/pci.c                  |  1 +
+> > > >  hw/ppc/spapr_cpu_core.c       |  1 +
+> > > >  hw/s390x/ccw-device.c         |  1 +
+> > > >  hw/scsi/scsi-bus.c            |  1 +
+> > > >  hw/usb/bus.c                  |  1 +
+> > > >  hw/usb/dev-smartcard-reader.c |  1 +
+> > > >  hw/xen/xen_backend.c          |  1 +
+> > > >  target/i386/cpu.c             |  4 ++--
+> > > >  target/s390x/cpu.c            |  1 +
+> > > >  13 files changed, 19 insertions(+), 8 deletions(-)  
+> > > 
+> > > Hm, this seems to break hotplug of virtio devices:
+> > > 
+> > > (qemu) device_add virtio-net-pci,id=xxx
+> > > Device 'virtio-net-device' does not support hotplugging
+> > > 
+> > > (qemu) device_add virtio-net-ccw,id=yyy
+> > > Device 'virtio-net-device' does not support hotplugging
+> > > 
+> > > We probably need to enable hotplug for virtio devices as well?  
+> > 
+> > I've seen a similar case broken by "[PATCH] hw/core/qdev: Do not
+> > allow hot-plugging without hotplug controller", because we're
+> > blocking creation of devices created internally by other devices,
+> > not just the ones created by device_add.  I need to find the
+> > exact reproducer again.
+> > 
+> > It would probably simplify things if we move the check for
+> > DeviceClass::hotpluggable to qmp_device_add(), instead of
+> > device_set_realized().
+> if we would have to do that, than we are probably doing
+> something wrong and not using property right. Perhaps we
+> should fix property instead of trying find a place to check
+> it where it would hurt less.
 
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+I disagree.  It depends on the purpose and semantics we define
+for DeviceClass::hotpluggable.  My goal is to have a reliable way
+to tell the user if a device really supports device_add, and I
+think it wouldn't make sense to report hotpluggable=true on a
+device that is never instantiated directly by the user and only
+used internally.
 
 -- 
-Anthony PERARD
+Eduardo
