@@ -1,14 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dwXOu-0003Mc-AR
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 13:42:37 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dwXS5-0004t5-8K
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 13:45:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dwXOp-0001bJ-EU
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 13:42:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41108)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dwXOp-0001ax-8P
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 13:42:31 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dwXS4-0003H1-C8
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 13:45:53 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:49637)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dwXRp-0003Dw-7f
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 13:45:52 -0400
+Received: by mail-wm0-x232.google.com with SMTP id r74so22212221wme.4
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 10:45:37 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <59e890ab-45e4-fe8a-a8de-3c441de19080@redhat.com>
 References: <1506071794-4373-1-git-send-email-thuth@redhat.com>
 	<20170925135316.74fed6da.cohuck@redhat.com>
 	<20170925133153.GZ3030@localhost.localdomain>
@@ -16,14 +21,11 @@ References: <1506071794-4373-1-git-send-email-thuth@redhat.com>
 	<20170925143439.GA3030@localhost.localdomain>
 	<f078939d-4ae0-0ae8-4030-3df0ed66299a@redhat.com>
 	<CAFEAcA-kmSkjhM0f+Ti7nY1_AuDm1pPcYHNGn50fes20YvOeBg@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <59e890ab-45e4-fe8a-a8de-3c441de19080@redhat.com>
-Date: Mon, 25 Sep 2017 19:42:13 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-kmSkjhM0f+Ti7nY1_AuDm1pPcYHNGn50fes20YvOeBg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+	<59e890ab-45e4-fe8a-a8de-3c441de19080@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 25 Sep 2017 18:45:15 +0100
+Message-ID: <CAFEAcA9b=XOhczb=vYRJLDFR5yYqHwYFF6YtO9veYFqsEDgYsw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PATCH v2] qdev: Mark devices as non-hotpluggable
  by default
 List-Id: <qemu-devel.nongnu.org>
@@ -34,40 +36,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
+To: Thomas Huth <thuth@redhat.com>
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Amit Shah <amit@kernel.org>
 
-On 25.09.2017 17:26, Peter Maydell wrote:
-> On 25 September 2017 at 16:19, Thomas Huth <thuth@redhat.com> wrote:
->> Not sure whether this works for the virtio-xxx-device devices,
->> though, since they are marked as user_creatable =3D true currently...
->=20
-> That's deliberate -- for the arm boards with virtio-mmio
-> the board creates a bunch of virtio-mmio transports and the
-> virtio-foo-device can be user created to plug into those.
+On 25 September 2017 at 18:42, Thomas Huth <thuth@redhat.com> wrote:
+> On 25.09.2017 17:26, Peter Maydell wrote:
+>> On 25 September 2017 at 16:19, Thomas Huth <thuth@redhat.com> wrote:
+>>> Not sure whether this works for the virtio-xxx-device devices,
+>>> though, since they are marked as user_creatable = true currently...
+>>
+>> That's deliberate -- for the arm boards with virtio-mmio
+>> the board creates a bunch of virtio-mmio transports and the
+>> virtio-foo-device can be user created to plug into those.
+>
+> Yes, I know ... I'm just wondering whether the virtio-xxx-device devices
+> should be non-user_creatable on the non-ARM targets, since they
+> apparently can't be used with "-device" there...?
 
-Yes, I know ... I'm just wondering whether the virtio-xxx-device devices
-should be non-user_creatable on the non-ARM targets, since they
-apparently can't be used with "-device" there...?
+You should be able to on the command line for x86 do something
+like -device virtio-pci,... -device virtio-foo-device,...
+to manually create the pci transport and the backend.
 
-> If overall trying to do the 'right thing' is tricky here
-> then perhaps we can start by flipping the default to
-> not-hotpluggable and marking some devices hotpluggable
-> that in theory shouldn't be with a comment about why.
-
-Yes, if Eduardo's idea to move the test to qmp_device_add() does not
-work out (I'll try that next), your suggestion is certainly the best
-thing we can do right now.
-
-> Incidentally I think there's still some advantage in the
-> "created as part of some other device" devices having
-> to be explicitly marked hotpluggable, because those
-> devices do still need some specific code in them to
-> handle it (ie code to release the resources that are
-> created in the device's realize method).
-
-Ok ... by the way, does anybody know more devices like
-virtio-xxx-device, i.e. devices that are indirectly plugged when adding
-other devices?
-
- Thomas
+thanks
+-- PMM
