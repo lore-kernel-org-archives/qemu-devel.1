@@ -1,48 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dwRs2-0006nc-Qt
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:48:19 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dwRx9-0000Op-Ii
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:53:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dwRrz-00026L-I4
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:48:18 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39456)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dwRrs-000215-UG
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:48:15 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8PBhfnV047325
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 07:48:00 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d6wbpq28g-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 07:48:00 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 25 Sep 2017 12:47:56 +0100
-References: <20170922083855.102341-1-borntraeger@de.ibm.com>
-	<20170922083855.102341-3-borntraeger@de.ibm.com>
-	<5e7ba7d5-82d4-f1e6-532a-37c2c445c227@linux.vnet.ibm.com>
-	<ccb6e3eb-320e-b5dd-f728-09d8cab440c4@de.ibm.com>
-	<eee7e600-a8b0-6e23-580b-803f3b4e9efa@linux.vnet.ibm.com>
-	<4a31c53b-98aa-747a-1402-1a93e74c565b@de.ibm.com>
-	<5cdfe359-2e78-7e2a-72c2-d3e69574288e@linux.vnet.ibm.com>
-	<20170925120745.7326637e.cohuck@redhat.com>
-	<20da1950-3aa5-c29f-3d54-4f82289f34f1@de.ibm.com>
-	<20170925134532.08e9e273.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 25 Sep 2017 13:47:52 +0200
+	(envelope-from <cohuck@redhat.com>) id 1dwRx6-0004El-GI
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:53:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34194)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dwRx6-0004E6-7V
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:53:32 -0400
+Date: Mon, 25 Sep 2017 13:53:16 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170925135316.74fed6da.cohuck@redhat.com>
+In-Reply-To: <1506071794-4373-1-git-send-email-thuth@redhat.com>
+References: <1506071794-4373-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170925134532.08e9e273.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <4cbc3c5b-3050-2e4e-f4cd-0c92fdb8e11f@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH/RFC 2/3] s390x/ais: enable ais when
- migration is available
+Subject: Re: [Qemu-devel] [PATCH v2] qdev: Mark devices as non-hotpluggable
+ by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -51,47 +27,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>, Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Amit Shah <amit@kernel.org>
 
-On 09/25/2017 01:45 PM, Cornelia Huck wrote:
-> On Mon, 25 Sep 2017 12:12:49 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> On 09/25/2017 12:07 PM, Cornelia Huck wrote:
->>> On Fri, 22 Sep 2017 16:27:00 +0200
->>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
->>>   
->>>> One thing I would find very helpful is what do we expect to work and not
->>>> work for which version. Kind of a matrix. For instance should vfio pci
->>>> work for versions prior 2.11. I think in the not so distant past we
->>>> changed how SIC works (so it complains when we don't have ais).  
->>>
->>> A matrix sounds like a good idea.  
->>
->> I think we do not even need a matrix, a minimum level will suffice because...
->>>
->>> I don't think we really ever had a setup that worked out of the box  
->>
->> exactly: ...it never worked until 2.10 and we do not have libvirt support yet.
->> Now with the fix 2.10 will also not work, so I think its fair to say
->>
->> PCI passthrough via VFIO will be supported for 
->> - KVM: host kernel >= 4.13
->> - TCG: TBD
->> - QEMU >= 2.11
->> - libvirt TBD
-> 
-> Make that zpci-per-se, no?
-> 
-> with KVM: host kernel >= 4.13 && QEMU >= 2.11
-> with TCG: tbd, I don't think anybody has time to wire this up for 2.11
-> 
-> Apropos libvirt: How will it determine whether zpci should be
-> supported? There are some old QEMU + KVM combinations out there that
-> will have a phb (but not be usable by stock Linux guests as the feature
-> bits are missing). Version fence? Check for cpu feature support?
+On Fri, 22 Sep 2017 11:16:34 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-I think for multibus or something like that Boris wanted to check for a version
-anyway. So maybe 2.11 (now that 2.10 is broken regarding ais) as a minimum QEMU
-level would make sense.
+> Historically we've marked all devices as hotpluggable by default. However,
+> most devices are not hotpluggable, and you also need a HotplugHandler to
+> support these devices. So if the user tries to "device_add" or "device_del"
+> such a non-hotpluggable device during runtime, either nothing really usable
+> happens, or QEMU even crashes/aborts unexpectedly (see for example commit
+> 84ebd3e8c7d4fe955b - "Mark diag288 watchdog as non-hotpluggable").
+> So let's change this dangerous default behaviour and mark the devices as
+> non-hotpluggable by default. Certain parent devices classes which are known
+> as hotpluggable (e.g. PCI, USB, etc.) are marked with "hotpluggable = true",
+> so that devices that are derived from these classes continue to work as
+> expected.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  v2: Add missing devices and dropped "RFC" status. See Eduardo's reply on
+>  the previous version of this patch for the rationale which devices need
+>  to be hotpluggable:
+>  https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg06128.html
+> 
+>  hw/char/virtio-serial-bus.c   |  1 +
+>  hw/core/qdev.c                | 10 ++++------
+>  hw/mem/nvdimm.c               |  3 +++
+>  hw/mem/pc-dimm.c              |  1 +
+>  hw/pci/pci.c                  |  1 +
+>  hw/ppc/spapr_cpu_core.c       |  1 +
+>  hw/s390x/ccw-device.c         |  1 +
+>  hw/scsi/scsi-bus.c            |  1 +
+>  hw/usb/bus.c                  |  1 +
+>  hw/usb/dev-smartcard-reader.c |  1 +
+>  hw/xen/xen_backend.c          |  1 +
+>  target/i386/cpu.c             |  4 ++--
+>  target/s390x/cpu.c            |  1 +
+>  13 files changed, 19 insertions(+), 8 deletions(-)
+
+Hm, this seems to break hotplug of virtio devices:
+
+(qemu) device_add virtio-net-pci,id=xxx
+Device 'virtio-net-device' does not support hotplugging
+
+(qemu) device_add virtio-net-ccw,id=yyy
+Device 'virtio-net-device' does not support hotplugging
+
+We probably need to enable hotplug for virtio devices as well?
