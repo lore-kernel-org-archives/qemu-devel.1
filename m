@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dwTSI-0000rH-Jq
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:29:54 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dwTUh-0001s5-O0
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:32:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dwTSF-000535-Gs
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:29:50 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:38414)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dwTSF-00050x-Ac
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:29:47 -0400
-Received: by mail-pg0-x241.google.com with SMTP id m30so4869371pgn.5
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 06:29:47 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170925112917.21340-1-dgilbert@redhat.com>
-	<20170925112917.21340-2-dgilbert@redhat.com>
-	<d831a4f1-2598-66c2-6e84-a9ab93cf3bff@twiddle.net>
-	<20170925132514.GF2656@work-vm>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <efad6e1b-f80b-5ca6-6417-7497ddc052ef@twiddle.net>
-Date: Mon, 25 Sep 2017 06:29:43 -0700
+	(envelope-from <ehabkost@redhat.com>) id 1dwTUb-0000Dk-Td
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:32:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44038)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dwTUb-0000D4-Jc
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:32:13 -0400
+Date: Mon, 25 Sep 2017 10:31:53 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170925133153.GZ3030@localhost.localdomain>
+References: <1506071794-4373-1-git-send-email-thuth@redhat.com>
+	<20170925135316.74fed6da.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170925132514.GF2656@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] migration: pre_save return int
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170925135316.74fed6da.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] qdev: Mark devices as non-hotpluggable
+ by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,16 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, famz@redhat.com, peter.maydell@linaro.org, cohuck@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Amit Shah <amit@kernel.org>
 
-On 09/25/2017 06:25 AM, Dr. David Alan Gilbert wrote:
->> Why not a bool?
+On Mon, Sep 25, 2017 at 01:53:16PM +0200, Cornelia Huck wrote:
+> On Fri, 22 Sep 2017 11:16:34 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
 > 
-> Consistency with pre_load, post_load, put and get methods
-> that are already int.
+> > Historically we've marked all devices as hotpluggable by default. However,
+> > most devices are not hotpluggable, and you also need a HotplugHandler to
+> > support these devices. So if the user tries to "device_add" or "device_del"
+> > such a non-hotpluggable device during runtime, either nothing really usable
+> > happens, or QEMU even crashes/aborts unexpectedly (see for example commit
+> > 84ebd3e8c7d4fe955b - "Mark diag288 watchdog as non-hotpluggable").
+> > So let's change this dangerous default behaviour and mark the devices as
+> > non-hotpluggable by default. Certain parent devices classes which are known
+> > as hotpluggable (e.g. PCI, USB, etc.) are marked with "hotpluggable = true",
+> > so that devices that are derived from these classes continue to work as
+> > expected.
+> > 
+> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > ---
+> >  v2: Add missing devices and dropped "RFC" status. See Eduardo's reply on
+> >  the previous version of this patch for the rationale which devices need
+> >  to be hotpluggable:
+> >  https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg06128.html
+> > 
+> >  hw/char/virtio-serial-bus.c   |  1 +
+> >  hw/core/qdev.c                | 10 ++++------
+> >  hw/mem/nvdimm.c               |  3 +++
+> >  hw/mem/pc-dimm.c              |  1 +
+> >  hw/pci/pci.c                  |  1 +
+> >  hw/ppc/spapr_cpu_core.c       |  1 +
+> >  hw/s390x/ccw-device.c         |  1 +
+> >  hw/scsi/scsi-bus.c            |  1 +
+> >  hw/usb/bus.c                  |  1 +
+> >  hw/usb/dev-smartcard-reader.c |  1 +
+> >  hw/xen/xen_backend.c          |  1 +
+> >  target/i386/cpu.c             |  4 ++--
+> >  target/s390x/cpu.c            |  1 +
+> >  13 files changed, 19 insertions(+), 8 deletions(-)
+> 
+> Hm, this seems to break hotplug of virtio devices:
+> 
+> (qemu) device_add virtio-net-pci,id=xxx
+> Device 'virtio-net-device' does not support hotplugging
+> 
+> (qemu) device_add virtio-net-ccw,id=yyy
+> Device 'virtio-net-device' does not support hotplugging
+> 
+> We probably need to enable hotplug for virtio devices as well?
 
-Fair enough, thanks.
+I've seen a similar case broken by "[PATCH] hw/core/qdev: Do not
+allow hot-plugging without hotplug controller", because we're
+blocking creation of devices created internally by other devices,
+not just the ones created by device_add.  I need to find the
+exact reproducer again.
 
+It would probably simplify things if we move the check for
+DeviceClass::hotpluggable to qmp_device_add(), instead of
+device_set_realized().
 
-r~
+-- 
+Eduardo
