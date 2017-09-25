@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dwP8k-000684-1z
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:53:23 -0400
+	(envelope-from <berrange@redhat.com>) id 1dwPCu-0008LG-IM
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:57:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dwP8g-00005t-PA
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:53:22 -0400
-Received: from 4.mo173.mail-out.ovh.net ([46.105.34.219]:59905)
+	(envelope-from <berrange@redhat.com>) id 1dwPCr-0002Lo-Uq
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:57:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42326)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dwP8g-0008Vf-Ik
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:53:18 -0400
-Received: from player687.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 0F6D677911
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 10:53:10 +0200 (CEST)
-Date: Mon, 25 Sep 2017 10:52:56 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170925105256.6b8b57ff@bahia.lan>
-In-Reply-To: <30287e8a-e697-b33e-bcf0-94bf7fe291de@redhat.com>
-References: <20170925083348.17126-1-clg@kaod.org>
-	<30287e8a-e697-b33e-bcf0-94bf7fe291de@redhat.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dwPCr-0002LQ-Oj
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:57:37 -0400
+Date: Mon, 25 Sep 2017 09:57:26 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170925085726.GD20236@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <mailman.3351.1506066493.14747.qemu-devel@nongnu.org>
+	<726A2123-0371-407B-9270-6672DF66D511@gmail.com>
+	<20170922124405.GB32000@lemon> <20170922131819.GP12725@redhat.com>
+	<BA02424C-0C79-4FAE-B191-18A9D0CDBAC8@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] ppc/pnv: check for firmware
- file presence
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <BA02424C-0C79-4FAE-B191-18A9D0CDBAC8@gmail.com>
+Subject: Re: [Qemu-devel] [PULL 28/36] tests: Add ubuntu.i386 image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,67 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-On Mon, 25 Sep 2017 10:46:13 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+On Fri, Sep 22, 2017 at 04:26:40PM -0400, Programmingkid wrote:
+> 
+> > On Sep 22, 2017, at 9:18 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
+> > 
+> > On Fri, Sep 22, 2017 at 08:44:05PM +0800, Fam Zheng wrote:
+> >> On Fri, 09/22 08:10, Programmingkid wrote:
+> >>> Could a Darwin test be added? Both x86 and PowerPC versions would be great.
+> >> 
+> >> It's nice to cover macOS in our test, but to be honest I don't know how to do
+> >> it. If there isn't any copyright problem, and if there are instructions
+> >> available in wiki.qemu.org descirbing how to create such a guest step by step
+> >> like [1], we can add one.
+> > 
+> > AFAICT we can not just provide or host OS-X images and let individual
+> > devs run the without it being a license violation, so best avoided.
+> 
+> Actually Darwin and Mac OS X are not the same. Darwin is this minimalistic
+> environment and Mac OS X is built on top of that environment. There would
+> be no license problems when using Darwin only.
 
-> On 25.09.2017 10:33, C=C3=A9dric Le Goater wrote:
-> > and exit before uslessly trying to load it if the file does =20
->=20
-> s/uslessly/uselessly/
->=20
-> > not exists.
-> >=20
-> > Issue dicovered by Coverity Scan. =20
->=20
-> /dicovered/discovered/
->=20
+I looked for images of Darwin but haven't been able to find any modern
+ones. Wikipedia claims that Apple stopped releasing installable images
+of Darwin so you have to build it from source :-(
 
-Mentioning the Coverity Id (ie, CID 1381410) is also a usual practice.
+> > IMHO it easier to just rely on Travis' OS-X builders for testing OS-X
+> > platform builds, so that licensing compliance is their responsibility.
+> 
+> That might work for the x86 version of Mac OS X, but there doesn't appear
+> to be any support for the PowerPC version of Mac OS X.
 
-> > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> > ---
-> >  hw/ppc/pnv.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >=20
-> > diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> > index 47221158d415..7728eece2eec 100644
-> > --- a/hw/ppc/pnv.c
-> > +++ b/hw/ppc/pnv.c
-> > @@ -570,6 +570,10 @@ static void ppc_powernv_init(MachineState *machine)
-> >      }
-> > =20
-> >      fw_filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
-> > +    if (!fw_filename) {
-> > +        error_report("Could not find OPAL '%s'", bios_name); =20
->=20
-> I'd suggest to say "OPAL firmware" instead of just "OPAL". Not every
-> user knows what OPAL is.
->=20
+Yeah, no PPC support, but then that's essentially a dead platform, so it
+is questionable whether we need to care about OS-X PPC support for QEMU.
+The last PPC OS-X hardware shipped 2006.
 
-With all the suggested changes:
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
-> > +        exit(1);
-> > +    }
-> > =20
-> >      fw_size =3D load_image_targphys(fw_filename, FW_LOAD_ADDR, FW_MAX_=
-SIZE);
-> >      if (fw_size < 0) {
-> >  =20
->=20
->  Thomas
-
-
-
---=20
-Gregory Kurz                                     kurzgreg@fr.ibm.com
-                                                 gkurz@linux.vnet.ibm.com
-Software Engineer @ IBM/LTC                      http://www.ibm.com
-Tel 33-5-6218-1607
-
-"Anarchy is about taking complete responsibility for yourself."
-        Alan Moore.
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
