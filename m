@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dwXlN-0006FA-Sy
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 14:05:50 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dwXnS-0006uU-K0
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 14:07:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dwXlM-0003Kg-Rz
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 14:05:49 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:51195)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dwXlM-0003KK-6R
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 14:05:48 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id w12so9260006wrc.7
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 11:05:48 -0700 (PDT)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dwXnP-0004Be-Dx
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 14:07:58 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:50372)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dwXnP-0004An-26
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 14:07:55 -0400
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
+	<20170922224855.GA6905@flamenco>
+Date: Mon, 25 Sep 2017 21:07:45 +0300
+In-Reply-To: <20170922224855.GA6905@flamenco> (Emilio G. Cota's message of
+	"Fri, 22 Sep 2017 18:48:55 -0400")
+Message-ID: <87fubawt1q.fsf@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170925175944.GD3030@localhost.localdomain>
-References: <1506071794-4373-1-git-send-email-thuth@redhat.com>
-	<20170925135316.74fed6da.cohuck@redhat.com>
-	<20170925133153.GZ3030@localhost.localdomain>
-	<20170925154647.357047b9@nial.brq.redhat.com>
-	<20170925143439.GA3030@localhost.localdomain>
-	<f078939d-4ae0-0ae8-4030-3df0ed66299a@redhat.com>
-	<CAFEAcA-kmSkjhM0f+Ti7nY1_AuDm1pPcYHNGn50fes20YvOeBg@mail.gmail.com>
-	<59e890ab-45e4-fe8a-a8de-3c441de19080@redhat.com>
-	<20170925175944.GD3030@localhost.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 Sep 2017 19:05:26 +0100
-Message-ID: <CAFEAcA_3SpWNm0FCviD5fXOFmxF1jGAwYgD_cZgwUMMAMn4BOQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] qdev: Mark devices as non-hotpluggable
- by default
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 00/22] instrument: Add basic event
+ instrumentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,17 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Amit Shah <amit@kernel.org>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 25 September 2017 at 18:59, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> Finding the full list of devices that can be instantiated
-> internally at hotplug-time sounds tricky.
+Emilio G Cota writes:
 
-If we just diff "list of devices marked hotplug before this patch"
-against "list of devices marked hotplug after this patch" how
-big is the list? Can we just eyeball it to see what needs
-to be specialcased?
+> On Wed, Sep 13, 2017 at 12:53:43 +0300, Llu=C3=ADs Vilanova wrote:
+>> The instrumentation code is dynamically loaded as a library into QEMU ei=
+ther
+>> when it starts or later using its remote control interfaces. The loaded =
+code
+>> only has access to function explicitly exported through the QI_VPUBLIC m=
+acro.
+>>=20
+>> This series is branch 'devel-instrument' in
+>> https://code.gso.ac.upc.edu/git/qemu-dbi.
 
-thanks
--- PMM
+> Is this up to date? That tree doesn't build for me with --enable-instrume=
+nt; I
+> get the same error I got in v4:
+
+>   CC      x86_64-linux-user/instrument/state.o
+> /data/src/qemu2/instrument/trace.c:13:30: fatal error: qemu-instr/trace.h=
+: No such file or directory
+> compilation terminated.
+> /data/src/qemu2/rules.mak:66: recipe for target 'instrument/trace.o' fail=
+ed
+
+> Or maybe I'm doing something wrong?
+> I'm configuring with `configure --target-list=3Dx86_64-linux-user --enabl=
+e-instrument'.
+
+You're doing it right, and I've checked that the branch is properly pushed.=
+ Can
+you compile with V=3D1 to show me the failing cmdline?
+
+Thanks,
+  Lluis
