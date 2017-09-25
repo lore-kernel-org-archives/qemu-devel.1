@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dwd7i-00058s-6b
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 19:49:14 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dwd86-0005K0-E3
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 19:49:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dwd7f-0004wC-54
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 19:49:14 -0400
-Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:51842)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dwd7e-0004w0-Tv
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 19:49:11 -0400
-Received: by mail-pg0-x235.google.com with SMTP id k193so4914836pgc.8
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 16:49:10 -0700 (PDT)
-References: <20170918160012.4317-1-david@redhat.com>
-	<20170918160012.4317-17-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <a546be0b-48e8-5295-9c65-248e522efe39@linaro.org>
-Date: Mon, 25 Sep 2017 16:49:06 -0700
+	(envelope-from <dgibson@ozlabs.org>) id 1dwd83-00051j-Bp
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 19:49:38 -0400
+Date: Tue, 26 Sep 2017 09:49:25 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170925234925.GE12504@umbus>
+References: <1506264466-28252-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <20170918160012.4317-17-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 16/27] s390x/kvm: factor out SIGP code
- into sigp.c
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="6e7ZaeXHKrTJCxdu"
+Content-Disposition: inline
+In-Reply-To: <1506264466-28252-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH 0/7] mac_dbdma: tidy-up and QOMify
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +23,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-
-On 09/18/2017 09:00 AM, David Hildenbrand wrote:
-> We want to use the same code base for TCG, so let's cleanly factor it
-> out.
-> 
-> The sigp mutex is currently not really needed, as everything is
-> protected by the iothread mutex. But this could change later, so leave
-> it in place and initialize it properly from common code.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/s390x/s390-virtio-ccw.c |   3 +
->  target/s390x/Makefile.objs |   1 +
->  target/s390x/cpu.c         |   8 -
->  target/s390x/cpu.h         |   6 +-
->  target/s390x/internal.h    |   4 +
->  target/s390x/kvm-stub.c    |   5 -
->  target/s390x/kvm.c         | 349 +-----------------------------------------
->  target/s390x/kvm_s390x.h   |   1 -
->  target/s390x/sigp.c        | 366 +++++++++++++++++++++++++++++++++++++++++++++
->  target/s390x/trace-events  |   4 +-
->  10 files changed, 388 insertions(+), 359 deletions(-)
->  create mode 100644 target/s390x/sigp.c
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+--6e7ZaeXHKrTJCxdu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Sun, Sep 24, 2017 at 03:47:39PM +0100, Mark Cave-Ayland wrote:
+> Whilst looking at implementing another DBDMA device for the Mac machines
+> I noticed a couple of things: firstly there were some unused fields still
+> in DBDMAState, and secondly the existing code still used global functions
+> to register DMA channels and handle the relationship between macio IDE and
+> DBDMA.
+>=20
+> This patchset removes the now-unused fields from DBDMA state, QOMifys the
+> DBDMA device, uses a QOM object link to allow the macio IDE object to
+> reference the DBDMA device, and then finally removes the global DBDMA_*
+> functions substituting them instead for QOM methods.
+>=20
+> Note: this patchset does not apply to master but on top of David's
+> ppc-for-2.11 branch since there are merge conflicts with my previous
+> patchset. Hopefully the Based-On line below is enough to keep patchew
+> happy, even though it wasn't the final version applied to the ppc-for-2.11
+> branch.
+>=20
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Based-on: 1505668548-16616-1-git-send-email-mark.cave-ayland@ilande.co.uk=
+ (ppc: more Mac-related fixups)
 
-r~
+I've applied 1-5/7.  There are a couple of details I'm not 100%
+convinced on, but it's still better than what was there before.  6 & 7
+I'm still thinking about.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--6e7ZaeXHKrTJCxdu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnJlgAACgkQbDjKyiDZ
+s5IRlxAAwcnQi1bZBBfvdcvQGSb0zQUsp8wttZZnVDN6L7rBw53aK7y15enPvGFG
+SjhKu+Y8b8nfSlkL6yOzXaZyZiAKWBJiXX4XtgXkgY6ry5WzCck5AFZOqBDG6MOD
+/JfQU3sN9e44UUUCcfotn8w4WKKAPxjkU503q8+9b8slAK1W4/A6KytENIHz1awh
+bxVb2bPZBF/c1si0HuhOXi6CXPYtbOyaMy2kXhZw+tE06m5orlf5QsLcK4gp409n
+wv7nPCmOug971bRCqk66H6HsrsBTq/Sudmcc3UG56pEznXSLPnyTkWWzTKjZmd93
+0iZhiUeUpCcH4ixJESBtEyTYW//Jhtbh2HWlaK+2yJWM0du/NKMDi2Nt6JA5vHn/
+b8417SLja07eOXhJXV4MqzBGkoieni8ahQ7s8DzM7Ms98KMDnRN5M4MRPnSKgHb2
+N5yKzh6sfL0e5tYzN571s+pEwq549+kJ6Ems/wlspfBcthhYTXZ2mDu6nxh84RmE
++qWnOHXBGxklu3LAW/jHr80ZWLAtAim4UiK6rXoA3drdJGVo3TBGc3PQDbWWicbB
+/fJ7JetSj3dNo4NYt90oaTJUKI705iWwIu7J2uRqbf9I1pPq9lbJc38JYwJKaz8G
+hCIiuXuOPMSTMkc+PhnQW4+9H30AUdzDs3attXXl+Rwkga/NhiA=
+=X1Zn
+-----END PGP SIGNATURE-----
+
+--6e7ZaeXHKrTJCxdu--
