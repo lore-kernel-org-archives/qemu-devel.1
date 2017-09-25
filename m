@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dwTUh-0001s5-O0
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:32:20 -0400
+	(envelope-from <eblake@redhat.com>) id 1dwTdk-0005Db-Cr
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:41:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dwTUb-0000Dk-Td
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:32:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44038)
+	(envelope-from <eblake@redhat.com>) id 1dwTdf-0006BF-Gi
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:41:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49474)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dwTUb-0000D4-Jc
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:32:13 -0400
-Date: Mon, 25 Sep 2017 10:31:53 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170925133153.GZ3030@localhost.localdomain>
-References: <1506071794-4373-1-git-send-email-thuth@redhat.com>
-	<20170925135316.74fed6da.cohuck@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dwTdf-00069m-AK
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:41:35 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 59F167EA8D
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 13:41:33 +0000 (UTC)
+Received: from red.redhat.com (ovpn-124-97.rdu2.redhat.com [10.10.124.97])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E367D6F10A
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 13:41:32 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 25 Sep 2017 08:41:25 -0500
+Message-Id: <20170925134130.13262-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170925135316.74fed6da.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] qdev: Mark devices as non-hotpluggable
- by default
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/4] NBD patches for 2017-09-25
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,66 +33,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Amit Shah <amit@kernel.org>
+To: qemu-devel@nongnu.org
 
-On Mon, Sep 25, 2017 at 01:53:16PM +0200, Cornelia Huck wrote:
-> On Fri, 22 Sep 2017 11:16:34 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
-> 
-> > Historically we've marked all devices as hotpluggable by default. However,
-> > most devices are not hotpluggable, and you also need a HotplugHandler to
-> > support these devices. So if the user tries to "device_add" or "device_del"
-> > such a non-hotpluggable device during runtime, either nothing really usable
-> > happens, or QEMU even crashes/aborts unexpectedly (see for example commit
-> > 84ebd3e8c7d4fe955b - "Mark diag288 watchdog as non-hotpluggable").
-> > So let's change this dangerous default behaviour and mark the devices as
-> > non-hotpluggable by default. Certain parent devices classes which are known
-> > as hotpluggable (e.g. PCI, USB, etc.) are marked with "hotpluggable = true",
-> > so that devices that are derived from these classes continue to work as
-> > expected.
-> > 
-> > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > ---
-> >  v2: Add missing devices and dropped "RFC" status. See Eduardo's reply on
-> >  the previous version of this patch for the rationale which devices need
-> >  to be hotpluggable:
-> >  https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg06128.html
-> > 
-> >  hw/char/virtio-serial-bus.c   |  1 +
-> >  hw/core/qdev.c                | 10 ++++------
-> >  hw/mem/nvdimm.c               |  3 +++
-> >  hw/mem/pc-dimm.c              |  1 +
-> >  hw/pci/pci.c                  |  1 +
-> >  hw/ppc/spapr_cpu_core.c       |  1 +
-> >  hw/s390x/ccw-device.c         |  1 +
-> >  hw/scsi/scsi-bus.c            |  1 +
-> >  hw/usb/bus.c                  |  1 +
-> >  hw/usb/dev-smartcard-reader.c |  1 +
-> >  hw/xen/xen_backend.c          |  1 +
-> >  target/i386/cpu.c             |  4 ++--
-> >  target/s390x/cpu.c            |  1 +
-> >  13 files changed, 19 insertions(+), 8 deletions(-)
-> 
-> Hm, this seems to break hotplug of virtio devices:
-> 
-> (qemu) device_add virtio-net-pci,id=xxx
-> Device 'virtio-net-device' does not support hotplugging
-> 
-> (qemu) device_add virtio-net-ccw,id=yyy
-> Device 'virtio-net-device' does not support hotplugging
-> 
-> We probably need to enable hotplug for virtio devices as well?
+The following changes since commit 460b6c8e581aa06b86f59eebd9e52edfe7adf4=
+17:
 
-I've seen a similar case broken by "[PATCH] hw/core/qdev: Do not
-allow hot-plugging without hotplug controller", because we're
-blocking creation of devices created internally by other devices,
-not just the ones created by device_add.  I need to find the
-exact reproducer again.
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
+taging (2017-09-23 12:55:40 +0100)
 
-It would probably simplify things if we move the check for
-DeviceClass::hotpluggable to qmp_device_add(), instead of
-device_set_realized().
+are available in the git repository at:
 
--- 
-Eduardo
+  git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2017-09-25
+
+for you to fetch changes up to a693437037328a95d815ad5aec37ac2f8e130e58:
+
+  block/nbd-client: nbd_co_send_request: fix return code (2017-09-25 08:2=
+1:26 -0500)
+
+----------------------------------------------------------------
+nbd patches for 2017-09-25
+
+- Eric Blake: nbd-client: Use correct macro parenthesization
+- Vladimir Sementsov-Ogievskiy: 0/3 nbd client refactoring and fixing
+
+----------------------------------------------------------------
+Eric Blake (1):
+      nbd-client: Use correct macro parenthesization
+
+Vladimir Sementsov-Ogievskiy (3):
+      block/nbd-client: refactor nbd_co_receive_reply
+      block/nbd-client: simplify check in nbd_co_receive_reply
+      block/nbd-client: nbd_co_send_request: fix return code
+
+ block/nbd-client.c | 37 ++++++++++++++++++++-----------------
+ 1 file changed, 20 insertions(+), 17 deletions(-)
+
+--=20
+2.13.5
