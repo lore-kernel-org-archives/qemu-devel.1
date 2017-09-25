@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dwVSL-0004Lj-0b
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:38:01 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dwVTC-0004mV-IV
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:38:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dwVSK-0005SD-2f
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:38:01 -0400
-References: <20170925135735.25076-1-stefanha@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1d5203b2-dfb5-8eb0-4ff7-9ec2749e4317@redhat.com>
-Date: Mon, 25 Sep 2017 10:37:44 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dwVTB-0005aA-6z
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:38:54 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:17512 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dwVTA-0005ZQ-Qi
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:38:53 -0400
+References: <20170913181910.29688-1-mreitz@redhat.com>
+	<20170913181910.29688-12-mreitz@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <23eacf8d-8f80-f912-9b77-c955f8100a5f@virtuozzo.com>
+Date: Mon, 25 Sep 2017 18:38:44 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170925135735.25076-1-stefanha@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="WS5AcqoFoReLeHMjmskF9FdD7V09444BU"
-Subject: Re: [Qemu-devel] [PATCH v3] throttle-groups: cancel timers on
- restart
+In-Reply-To: <20170913181910.29688-12-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 11/18] hbitmap: Add @advance param to
+ hbitmap_iter_next()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +30,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Manos Pitsidianakis <el13635@mail.ntua.gr>, Max Reitz <mreitz@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WS5AcqoFoReLeHMjmskF9FdD7V09444BU
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- qemu-block@nongnu.org, Manos Pitsidianakis <el13635@mail.ntua.gr>,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <1d5203b2-dfb5-8eb0-4ff7-9ec2749e4317@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] throttle-groups: cancel timers on restart
-References: <20170925135735.25076-1-stefanha@redhat.com>
-In-Reply-To: <20170925135735.25076-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 09/25/2017 08:57 AM, Stefan Hajnoczi wrote:
-> Throttling group members are restarted on config change and by
-> bdrv_drained_begin().  Pending timers should be cancelled before
-> restarting the queue, otherwise requests see that tg->any_timer_armed[]=
-
-> is already set and do not schedule a timer.
->=20
-> For example, a hang occurs at least since QEMU 2.10.0 with -drive
-> iops=3D100 because no further timers will be scheduled:
->=20
->   (guest)$ dd if=3D/dev/zero of=3D/dev/vdb oflag=3Ddirect count=3D1000
->   (qemu) stop
->   (qemu) cont
->   ...I/O is stuck...
->=20
-> This can be fixed by calling throttle_group_detach_aio_context() from a=
-
-> bdrv_drained_begin/end() region.  This way timers are quiesced properly=
-,
-> requests are drained, and other throttle group members are scheduled, i=
-f
-> necessary.
->=20
-> Reported-by: Yongxue Hong <yhong@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+13.09.2017 21:19, Max Reitz wrote:
+> This new parameter allows the caller to just query the next dirty
+> position without moving the iterator.
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
+>   include/qemu/hbitmap.h |  4 +++-
+>   block/dirty-bitmap.c   |  2 +-
+>   tests/test-hbitmap.c   | 26 +++++++++++++-------------
+>   util/hbitmap.c         | 10 +++++++---
+>   4 files changed, 24 insertions(+), 18 deletions(-)
+>
+> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+> index d3a74a21fc..6a52575ad5 100644
+> --- a/include/qemu/hbitmap.h
+> +++ b/include/qemu/hbitmap.h
+> @@ -316,11 +316,13 @@ void hbitmap_free_meta(HBitmap *hb);
+>   /**
+>    * hbitmap_iter_next:
+>    * @hbi: HBitmapIter to operate on.
+> + * @advance: If true, advance the iterator.  Otherwise, the next call
+> + *           of this function will return the same result.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+it's not quit right, as hbitmap iterator allows concurrent resetting of 
+bits, and in
+this case next call may return some other result. (see f63ea4e92bad1db)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+>    *
+>    * Return the next bit that is set in @hbi's associated HBitmap,
+>    * or -1 if all remaining bits are zero.
+>    */
+> -int64_t hbitmap_iter_next(HBitmapIter *hbi);
+> +int64_t hbitmap_iter_next(HBitmapIter *hbi, bool advance);
+>   
+>   /**
+>    * hbitmap_iter_next_word:
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index 30462d4f9a..aee57cf8c8 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -547,7 +547,7 @@ void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter)
+>   
+>   int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
+>   {
+> -    return hbitmap_iter_next(&iter->hbi);
+> +    return hbitmap_iter_next(&iter->hbi, true);
+>   }
+>   
+>   /* Called within bdrv_dirty_bitmap_lock..unlock */
+> diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
+> index 1acb353889..e6d4d563cb 100644
+> --- a/tests/test-hbitmap.c
+> +++ b/tests/test-hbitmap.c
+> @@ -46,7 +46,7 @@ static void hbitmap_test_check(TestHBitmapData *data,
+>   
+>       i = first;
+>       for (;;) {
+> -        next = hbitmap_iter_next(&hbi);
+> +        next = hbitmap_iter_next(&hbi, true);
+>           if (next < 0) {
+>               next = data->size;
+>           }
+> @@ -435,25 +435,25 @@ static void test_hbitmap_iter_granularity(TestHBitmapData *data,
+>       /* Note that hbitmap_test_check has to be invoked manually in this test.  */
+>       hbitmap_test_init(data, 131072 << 7, 7);
+>       hbitmap_iter_init(&hbi, data->hb, 0);
+> -    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
+> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
+>   
+>       hbitmap_test_set(data, ((L2 + L1 + 1) << 7) + 8, 8);
+>       hbitmap_iter_init(&hbi, data->hb, 0);
+> -    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
+> -    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
+> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
+> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
+>   
+>       hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
+> -    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
+> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
+>   
+>       hbitmap_test_set(data, (131072 << 7) - 8, 8);
+>       hbitmap_iter_init(&hbi, data->hb, 0);
+> -    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
+> -    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, 131071 << 7);
+> -    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
+> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
+> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
+> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
+>   
+>       hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
+> -    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, 131071 << 7);
+> -    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
+> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
+> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
+>   }
+>   
+>   static void hbitmap_test_set_boundary_bits(TestHBitmapData *data, ssize_t diff)
+> @@ -893,7 +893,7 @@ static void test_hbitmap_serialize_zeroes(TestHBitmapData *data,
+>       for (i = 0; i < num_positions; i++) {
+>           hbitmap_deserialize_zeroes(data->hb, positions[i], min_l1, true);
+>           hbitmap_iter_init(&iter, data->hb, 0);
+> -        next = hbitmap_iter_next(&iter);
+> +        next = hbitmap_iter_next(&iter, true);
+>           if (i == num_positions - 1) {
+>               g_assert_cmpint(next, ==, -1);
+>           } else {
+> @@ -919,10 +919,10 @@ static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
+>   
+>       hbitmap_iter_init(&hbi, data->hb, BITS_PER_LONG - 1);
+>   
+> -    hbitmap_iter_next(&hbi);
+> +    hbitmap_iter_next(&hbi, true);
+>   
+>       hbitmap_reset_all(data->hb);
+> -    hbitmap_iter_next(&hbi);
+> +    hbitmap_iter_next(&hbi, true);
+>   }
+>   
+>   int main(int argc, char **argv)
+> diff --git a/util/hbitmap.c b/util/hbitmap.c
+> index 21535cc90b..96525983ce 100644
+> --- a/util/hbitmap.c
+> +++ b/util/hbitmap.c
+> @@ -141,7 +141,7 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi)
+>       return cur;
+>   }
+>   
+> -int64_t hbitmap_iter_next(HBitmapIter *hbi)
+> +int64_t hbitmap_iter_next(HBitmapIter *hbi, bool advance)
+>   {
+>       unsigned long cur = hbi->cur[HBITMAP_LEVELS - 1] &
+>               hbi->hb->levels[HBITMAP_LEVELS - 1][hbi->pos];
+> @@ -154,8 +154,12 @@ int64_t hbitmap_iter_next(HBitmapIter *hbi)
+>           }
+>       }
+>   
+> -    /* The next call will resume work from the next bit.  */
+> -    hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
+> +    if (advance) {
+> +        /* The next call will resume work from the next bit.  */
+> +        hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
+> +    } else {
+> +        hbi->cur[HBITMAP_LEVELS - 1] = cur;
+> +    }
+>       item = ((uint64_t)hbi->pos << BITS_PER_LEVEL) + ctzl(cur);
+>   
+>       return item << hbi->granularity;
 
 
---WS5AcqoFoReLeHMjmskF9FdD7V09444BU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnJIsoACgkQp6FrSiUn
-Q2qbpQgAgMM41xk+IBjMAFoB/rMAniWhk4jMF74yBZ+AB2znkf3a9s/p+/UovccQ
-J7ZTb3Xa2gKJldkUC+BUb7fFr0xJB6LlCRWHYwl3JmMqjo/AkDRcfuOzhqFDtKqy
-MLwW2wl9/HppgnpzbxyUm5foudTdWzQ3Mw1ygluC6hN0tg5Hsc4r18fZplPIs85K
-AkeFt89YnvLuBKgs5iaAZmfnEIVc5Os/vde70ypHc2GZlw5PHUl/6vfLWtugT6nW
-J+lhpB+dydgyds0s8jlwMypwNCzIftf12bOJHwwQ/uCYSGf0dFKfP6sJ1fGkFf+r
-eshENmt85rgliCkX6fptFq0UKC6TGQ==
-=KgI2
------END PGP SIGNATURE-----
-
---WS5AcqoFoReLeHMjmskF9FdD7V09444BU--
+-- 
+Best regards,
+Vladimir
