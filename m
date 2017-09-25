@@ -1,28 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dwOrI-0007Fk-Uk
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:35:21 -0400
+	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1dwOzJ-0000cu-ED
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:43:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dwOrE-0001i7-Pl
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:35:20 -0400
-Received: from smtp1.ntua.gr ([2001:648:2000:de::183]:36248)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dwOrE-0001cN-EW
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:35:16 -0400
-Date: Mon, 25 Sep 2017 11:34:58 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170925083458.luy7kjv6x56lptvi@postretch>
-References: <1506321449-24013-1-git-send-email-peterx@redhat.com>
-	<1506321449-24013-2-git-send-email-peterx@redhat.com>
-	<4540074c-f523-41f4-3ce7-8b6514060fa4@suse.de>
-	<20170925081426.GE19505@pxdev.xzpeter.org>
+	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1dwOzG-0004p5-4T
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:43:37 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58624)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <s1seetee@linux.vnet.ibm.com>)
+	id 1dwOzF-0004op-Ss
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:43:34 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8P8dMIf052564
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 04:43:29 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d6p5xya9h-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 04:43:29 -0400
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <s1seetee@linux.vnet.ibm.com>;
+	Mon, 25 Sep 2017 04:43:28 -0400
+References: <1504511031-26834-1-git-send-email-s1seetee@linux.vnet.ibm.com>
+	<5577a43c-0c60-a1c7-e5ab-7b940225ea85@amsat.org>
+From: seeteena <s1seetee@linux.vnet.ibm.com>
+Date: Mon, 25 Sep 2017 14:13:22 +0530
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="7ht2aswe3wnqpunq"
-Content-Disposition: inline
-In-Reply-To: <20170925081426.GE19505@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] qom: provide root container for
- internal objs
+In-Reply-To: <5577a43c-0c60-a1c7-e5ab-7b940225ea85@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <0476b7f3-e760-273a-7edf-07ff90157dc4@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5] vl: exit if maxcpus is negative
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,108 +42,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>, Fam Zheng <famz@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+
+Hi Philippe,
+
+I have not seen patch went upstream..
 
 
---7ht2aswe3wnqpunq
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Sep 25, 2017 at 04:14:26PM +0800, Peter Xu wrote:
->On Mon, Sep 25, 2017 at 09:14:21AM +0200, Andreas F=C3=A4rber wrote:
->> Am 25.09.2017 um 08:37 schrieb Peter Xu:
->> > We have object_get_objects_root() to keep user created objects, however
->> > no place for objects that will be used internally.  Create such a
->> > container for internal objects.
->> >
->> > CC: Andreas F=C3=A4rber <afaerber@suse.de>
->> > CC: Markus Armbruster <armbru@redhat.com>
->> > CC: Paolo Bonzini <pbonzini@redhat.com>
->> > Suggested-by: Daniel P. Berrange <berrange@redhat.com>
->> > Signed-off-by: Peter Xu <peterx@redhat.com>
->> > ---
->> >  include/qom/object.h | 10 ++++++++++
->> >  qom/object.c         |  5 +++++
->> >  2 files changed, 15 insertions(+)
->> >
->> > diff --git a/include/qom/object.h b/include/qom/object.h
->> > index f3e5cff..f567052 100644
->> > --- a/include/qom/object.h
->> > +++ b/include/qom/object.h
->> > @@ -1214,6 +1214,16 @@ Object *object_get_root(void);
->> >  Object *object_get_objects_root(void);
->> >
->> >  /**
->> > + * object_get_internal_root:
->> > + *
->> > + * Get the container object that holds internally used object
->> > + * instances. This is the object at path "/internal-objects"
->> > + *
->> > + * Returns: the internal object container
->> > + */
->> > +Object *object_get_internal_root(void);
->> > +
->> > +/**
->> >   * object_get_canonical_path_component:
->> >   *
->> >   * Returns: The final component in the object's canonical path.  The =
-canonical
->> > diff --git a/qom/object.c b/qom/object.c
->> > index 3e18537..857cee7 100644
->> > --- a/qom/object.c
->> > +++ b/qom/object.c
->> > @@ -1370,6 +1370,11 @@ Object *object_get_objects_root(void)
->> >      return container_get(object_get_root(), "/objects");
->> >  }
->> >
->> > +Object *object_get_internal_root(void)
->> > +{
->> > +    return container_get(object_get_root(), "/internal-objects");
+On 09/04/2017 09:12 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 09/04/2017 04:43 AM, Seeteena Thoufeek wrote:
+>> ---Steps to Reproduce---
 >>
->> Whatever you expose in the QOM tree is no longer internal. Other name?
->
->Hi, Andreas,
->
->If you mean "info qom-tree" here, can we still treat it as internal?
->Since after all it's not exposed in QMP (while IMHO QMP is the
->official protocol for QEMU clients).  And IIUC some HMP commands do
->dump some internal structs for debugging purpose (like: "info
->ramblock").
->
->Or, do you have any suggestion?
->
->(I did think about something like "hidden-objects", but I believe they
-> are not hidden as well if we think they are not internal...)
->
->Thanks,
->
+>> When passed a negative number to 'maxcpus' parameter, Qemu aborts
+>> with a core dump.
 >>
->> Regards,
->> Andreas
-
-If there's no need for internal IOThreads to be together with user=20
-created ones, a simple queue will be enough (include/qemu/queue.h).
-
---7ht2aswe3wnqpunq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlnIv7IACgkQc2J8L2kN
-9xAuBA//dcEVWTNCMMjRdIW7VCJZp6ZxGOduk0KAVU7OJWabMYQZTn9aMQxwV5cB
-GdwaQ7dl4aJPwcLo3nH78GPitRv11uLiz1LTCkpX2J2nY8jVIZx4a7+ymji5ypqE
-rDABK9RI8/IgfzfbtQZZfhxyRGYtxtH9hy+L1x1jtGTMlXrUCXMmokb9VcaEz/fO
-/nsl2Y2GJqPG+KJSjO9LByOLWQJ7g/mEUnUFZl86vMj4bvr8aY1ORUpeBpDNPkCX
-FY7UEXsryAcwqscxydfpUtMtA2MiMF6xWFmrqrgIWOyiKnkm+iYg14hDzvxyBjpR
-IcnPn1ZQSi5kuoflzF7EOVqWyYt/uQPzjNjmgR/HMOc7m0v0WedtN5WFZ8ggpR6V
-TqxkhiPUIuaCrxkIKLcp1Oxkd5QShDjlzOe2du5MdPo1pkzaM9cL/FiD9fOgH0JP
-1QfzTK3n0vtQ9Ji59RUPN5FayzRYbH+tjuYItOH0KV+76/c+UFpI0Yw6NWMLi0NP
-d4XyhwEA3ilKhwydSFrIJFH1xU/mjQRxrhbdtZxZN4GtT2WMTrVU3nnCIIwfb6/W
-wiMHusePD35lZx9bc7Kg03riUSCErvO3M3uV+jtc7MglnrI2JyyCREM5epnTDF3L
-9KUHuHm6UR2GaH4XIambSnYBO1gxn6V7I6a5BxAep/ZciLCdpvs=
-=b4Xh
------END PGP SIGNATURE-----
-
---7ht2aswe3wnqpunq--
+>> Run the following command with maxcpus argument as negative number
+>>
+>> ppc64-softmmu/qemu-system-ppc64 --nographic -vga none -machine
+>> pseries,accel=3Dkvm,kvm-type=3DHV -m size=3D200g -device virtio-blk-pc=
+i,
+>> drive=3Drootdisk -drive file=3D/home/images/pegas-1.0-ppc64le.qcow2,
+>> if=3Dnone,cache=3Dnone,id=3Drootdisk,format=3Dqcow2 -monitor telnet
+>> :127.0.0.1:1234,server,nowait -net nic,model=3Dvirtio -net
+>> user -redir tcp:2000::22 -device nec-usb-xhci -smp 8,cores=3D1,
+>> threads=3D1,maxcpus=3D-12
+>>
+>> (process:12149): GLib-ERROR **: gmem.c:130: failed to allocate
+>> =C2=A0 18446744073709550568 bytes
+>>
+>> Trace/breakpoint trap
+>>
+>> Reported-by: R.Nageswara Sastry <rnsastry@linux.vnet.ibm.com>
+>> Signed-off-by: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+>> ---
+>> v1 -> v2:
+>> =C2=A0=C2=A0 - Fix the error check in vl.c to make it generic.
+>> v2 -> v3:
+>> =C2=A0=C2=A0 - Fix coding style pointed out by patchew.
+>> =C2=A0=C2=A0 - Fix check for "<=3D 0" instead of just "< 0".
+>> v3 -> v4:
+>> =C2=A0=C2=A0 - Fix subject line.
+>> =C2=A0=C2=A0 - Removed space before ":" from vl.c:1248
+>> =C2=A0=C2=A0 - Removed Reviewed-by: flag
+>> v4-> v5:
+>> =C2=A0=C2=A0 - Code rework to declare max_cpus as unsigned int in syse=
+mu.h
+>> =C2=A0=C2=A0 - Remove the error check in vl.c referred in v2.
+>> =C2=A0=C2=A0 - declare max_cpus as unsigned int in vl.c
+>> ---
+>> =C2=A0 include/sysemu/sysemu.h | 2 +-
+>> =C2=A0 vl.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 6 +++---
+>> =C2=A0 2 files changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+>> index b213696..c083869 100644
+>> --- a/include/sysemu/sysemu.h
+>> +++ b/include/sysemu/sysemu.h
+>> @@ -113,7 +113,7 @@ extern int win2k_install_hack;
+>> =C2=A0 extern int alt_grab;
+>> =C2=A0 extern int ctrl_grab;
+>> =C2=A0 extern int smp_cpus;
+>> -extern int max_cpus;
+>> +extern unsigned int max_cpus;
+>> =C2=A0 extern int cursor_hide;
+>> =C2=A0 extern int graphic_rotate;
+>> =C2=A0 extern int no_quit;
+>> diff --git a/vl.c b/vl.c
+>> index 8e247cc..1470c21 100644
+>> --- a/vl.c
+>> +++ b/vl.c
+>> @@ -164,7 +164,7 @@ Chardev *sclp_hds[MAX_SCLP_CONSOLES];
+>> =C2=A0 int win2k_install_hack =3D 0;
+>> =C2=A0 int singlestep =3D 0;
+>> =C2=A0 int smp_cpus =3D 1;
+>> -int max_cpus =3D 1;
+>> +unsigned int max_cpus =3D 1;
+>> =C2=A0 int smp_cores =3D 1;
+>> =C2=A0 int smp_threads =3D 1;
+>> =C2=A0 int acpi_enabled =3D 1;
+>> @@ -4233,8 +4233,8 @@ int main(int argc, char **argv, char **envp)
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 machine_class->max_cpus =3D mach=
+ine_class->max_cpus ?: 1; /*=20
+>> Default to UP */
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_cpus > machine_class->max_cpus)=
+ {
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("Number of SM=
+P CPUs requested (%d) exceeds max=20
+>> CPUs "
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "supported by machine=
+ '%s' (%d)", max_cpus,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("Invalid SMP =
+CPUs %d. The max CPUs "
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "supported by machine=
+ '%s' is %d", max_cpus,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 machine_clas=
+s->name, machine_class->max_cpus);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exit(1);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>
+>
