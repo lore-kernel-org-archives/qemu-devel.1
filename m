@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52809)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dwSqw-0006Id-WF
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 08:51:15 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dwT7R-0002cu-02
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:08:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dwSqt-00089u-2v
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 08:51:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48938)
+	(envelope-from <cohuck@redhat.com>) id 1dwT7N-0006sB-OR
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:08:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:6012)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dwSqs-00089U-QL
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 08:51:11 -0400
-References: <20170918160012.4317-1-david@redhat.com>
-	<20170918160012.4317-19-david@redhat.com>
-	<1e5cbbe5-63ab-e628-a742-4f540a2d8c85@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <775a2477-6fce-4fbb-e873-56fc5acc3033@redhat.com>
-Date: Mon, 25 Sep 2017 14:51:05 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dwT7N-0006rz-Hw
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:08:13 -0400
+Date: Mon, 25 Sep 2017 15:08:05 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170925150805.3143397d.cohuck@redhat.com>
+In-Reply-To: <20170925102302.60587-3-borntraeger@de.ibm.com>
+References: <20170925102302.60587-1-borntraeger@de.ibm.com>
+	<20170925102302.60587-3-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1e5cbbe5-63ab-e628-a742-4f540a2d8c85@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 18/27] s390x/tcg: implement SIGP SENSE
- RUNNING STATUS
+Subject: Re: [Qemu-devel] [PATCH 2/2] s390/kvm: Support for get/set of
+ extended TOD-Clock for guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Matthew Rosato <mjrosato@linux.vnet.ibm.com>, cohuck@redhat.com, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, "Collin L. Walling" <walling@linux.vnet.ibm.com>
 
-On 25.09.2017 14:47, Thomas Huth wrote:
-> On 18.09.2017 18:00, David Hildenbrand wrote:
->> Preparation for TCG, for KVM is this is completely handled in the
->> kernel.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  target/s390x/cpu.h  |  2 ++
->>  target/s390x/sigp.c | 25 +++++++++++++++++++++++++
->>  2 files changed, 27 insertions(+)
->>
->> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
->> index 5d03802c7d..5aa755d7b5 100644
->> --- a/target/s390x/cpu.h
->> +++ b/target/s390x/cpu.h
->> @@ -594,6 +594,7 @@ struct sysib_322 {
->>  #define SIGP_SET_PREFIX        0x0d
->>  #define SIGP_STORE_STATUS_ADDR 0x0e
->>  #define SIGP_SET_ARCH          0x12
->> +#define SIGP_SENSE_RUNNING     0x15
->>  #define SIGP_STORE_ADTL_STATUS 0x17
->>  
->>  /* SIGP condition codes */
->> @@ -604,6 +605,7 @@ struct sysib_322 {
->>  
->>  /* SIGP status bits */
->>  #define SIGP_STAT_EQUIPMENT_CHECK   0x80000000UL
->> +#define SIGP_STAT_NOT_RUNNING       0x00000400UL
->>  #define SIGP_STAT_INCORRECT_STATE   0x00000200UL
->>  #define SIGP_STAT_INVALID_PARAMETER 0x00000100UL
->>  #define SIGP_STAT_EXT_CALL_PENDING  0x00000080UL
->> diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
->> index 9587c3d319..c57312b743 100644
->> --- a/target/s390x/sigp.c
->> +++ b/target/s390x/sigp.c
->> @@ -234,6 +234,28 @@ static void sigp_set_prefix(CPUState *cs, run_on_cpu_data arg)
->>      si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
->>  }
->>  
->> +static void sigp_sense_running(S390CPU *dst_cpu, SigpInfo *si)
->> +{
->> +    if (!tcg_enabled()) {
->> +        /* handled in KVM */
->> +        set_sigp_status(si, SIGP_STAT_INVALID_ORDER);
->> +        return;
->> +    }
+On Mon, 25 Sep 2017 12:23:02 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+
+> From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
 > 
-> If we're sure that this is always handled in the kernel, I think you
-> could simply do a "g_assert(tcg_enabled())" here instead?
+> Provides an interface for getting and setting the guest's extended
+> TOD-Clock via a single ioctl to kvm. If the ioctl fails because it
+> is not support by kvm, then we fall back to the old style of
+> retrieving the clock via two ioctls.
 > 
->  Thomas
+> If kvm fails to set a nonzero epoch index, then we ultimately fail
+> the migration altogether and the guest will resume normally on the
+> original host machine.
+
+I'd prefer to have that part split off, as it is a change in behaviour
+and I don't think we should mix it with adding support for an improved
+interface.
+
 > 
+> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+> Reviewed-by: Eric Farman <farman@linux.vnet.ibm.com>
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  hw/s390x/s390-virtio-ccw.c |  8 +++-----
+>  target/s390x/cpu.c         | 26 +++++++++++++++++++-------
+>  target/s390x/kvm-stub.c    | 10 ++++++++++
+>  target/s390x/kvm.c         | 35 +++++++++++++++++++++++++++++++++++
+>  target/s390x/kvm_s390x.h   |  2 ++
+>  5 files changed, 69 insertions(+), 12 deletions(-)
+> 
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index fafbc6d..bad09f5 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -213,13 +213,11 @@ static int gtod_load(QEMUFile *f, void *opaque, int version_id)
+>  
+>      r = s390_set_clock(&tod_high, &tod_low);
+>      if (r) {
+> -        warn_report("Unable to set guest clock for migration: %s",
+> -                    strerror(-r));
+> -        error_printf("Guest clock will not be restored "
+> -                     "which could cause the guest to hang.");
+> +        error_report("Unable to set guest clock value. "
+> +                     "s390_get_clock returned error %d.\n", r);
 
-This keeps existing behavior and does not crash the guest. Therefore I
-decided to not use a g_assert().
+Please keep to a single phrase in error_report(). Also, I find
+strerror() often more useful.
 
-Especially, kernels throw every SIGP order to user space that they don't
-understand. So e.g. a SIGP SENSE RUNNING could end up here for older
-kernels.
+>      }
+>  
+> -    return 0;
+> +    return r;
+>  }
+>  
+>  static SaveVMHandlers savevm_gtod = {
 
--- 
-
-Thanks,
-
-David
+Otherwise looks good.
