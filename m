@@ -1,46 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dwUxa-0007v6-Fy
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:06:15 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dwUzN-0000od-5D
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:08:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dwUxW-0008VH-9v
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:06:14 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38488
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dwUxW-0008Uy-3q
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:06:10 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8PF3dEL143813
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 11:06:07 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2d71c84ajm-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 11:06:06 -0400
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 25 Sep 2017 16:06:05 +0100
-References: <20170913132752.8484-1-pasic@linux.vnet.ibm.com>
-	<20170913132752.8484-2-pasic@linux.vnet.ibm.com>
-	<20170914162603.1cdabd09.cohuck@redhat.com>
-	<0b42ef59-4366-175f-8dc7-bc3ed02e2fb4@linux.vnet.ibm.com>
-	<20170915092758.16ea52fc.cohuck@redhat.com>
-	<20170915190118.03dc1b57.cohuck@redhat.com>
-	<1301a0dc-755f-1670-1062-b70ea86802e0@linux.vnet.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 25 Sep 2017 17:06:01 +0200
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dwUzM-0001mZ-0T
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:08:05 -0400
+References: <20170710163029.129912-1-vsementsov@virtuozzo.com>
+	<20170710163029.129912-4-vsementsov@virtuozzo.com>
+	<20170711130650.GD2223@work-vm>
+	<2394bb38-de82-8621-eeae-14ffea68869b@virtuozzo.com>
+	<b802048c-f5c0-efff-5550-6faed26023cd@redhat.com>
+	<1078f013-e554-1d75-d1e8-f24daace5965@virtuozzo.com>
+	<20170919190634.GK2107@work-vm> <87bmm5k2zs.fsf@secure.laptop>
+	<20170925132312.GA7999@localhost.localdomain>
+	<a1145c5e-4b70-a5ab-b828-ba51a9a3f9e3@virtuozzo.com>
+	<20170925145842.GB7999@localhost.localdomain>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <b3121fed-0d31-f3f3-446c-1241561003a9@virtuozzo.com>
+Date: Mon, 25 Sep 2017 18:07:47 +0300
 MIME-Version: 1.0
-In-Reply-To: <1301a0dc-755f-1670-1062-b70ea86802e0@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170925145842.GB7999@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Message-Id: <2ec0f5a8-b12e-1b4a-8d6f-ecddedeecc78@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/ccs: add ccw-tester emulated
- device
+Subject: Re: [Qemu-devel] ping Re: [PATCH v7 03/16] migration: split common
+ postcopy out of ram postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,64 +33,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, peter.maydell@linaro.org, famz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com, lirans@il.ibm.com, pbonzini@redhat.com, den@openvz.org, mreitz@redhat.com, John Snow <jsnow@redhat.com>
 
-
-
-On 09/19/2017 04:20 PM, Pierre Morel wrote:
-> On 15/09/2017 19:01, Cornelia Huck wrote:
->> On Fri, 15 Sep 2017 09:27:58 +0200
->> Cornelia Huck <cohuck@redhat.com> wrote:
->>
->>> On Thu, 14 Sep 2017 18:50:29 +0200
->>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+25.09.2017 17:58, Kevin Wolf wrote:
+> Am 25.09.2017 um 16:31 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>> 25.09.2017 16:23, Kevin Wolf wrote:
+>>> Am 20.09.2017 um 13:45 hat Juan Quintela geschrieben:
+>>>> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+>>>>> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+>>>>>> ping for 1-3
+>>>>>> Can we merge them?
+>>>>> I see all of them have R-b's; so lets try and put them in the next
+>>>>> migration merge.
+>>>>>
+>>>>> Quintela: Sound good?
+>>>> Yeap.
+>>> This patch broke qemu-iotests 181 ('Test postcopy live migration with
+>>> shared storage'):
 >>>
->>>> On 09/14/2017 04:26 PM, Cornelia Huck wrote:
->>
->>>>> There's quite some potential in this. We may want to make this a
->>>>> permanent addition.
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=20
->>>>
->>>> I'm happy to contribute! I'm not sure how shall we proceed though.
->>>> Maybe with making a todo list?
->>>
->>> I think the first step would be to figure out the ids so we don't ste=
-p
->>> on anyone's toes. Then maybe refactor a bit so that other testers can
->>> be added easily.
->>>
->>> For ideas about things to be tested, maybe put a list into the wiki?
->>
->> OK, I've created https://wiki.qemu.org/Testing/CCWTestDevice - let me
->> know if you need an account.
->>
->=20
-> Great!
-> I just saw your email, it was waiting in my inbox.
-> strange things happens some time. A good serie. strange things.
-> neverless...
->=20
-> Seriously.
-> Yes, I definitively need an account!
->=20
->=20
-> Pierre
->=20
+>>> --- /home/kwolf/source/qemu/tests/qemu-iotests/181.out  2017-06-16 19:19:53.000000000 +0200
+>>> +++ 181.out.bad 2017-09-25 15:20:40.787582000 +0200
+>>> @@ -21,18 +21,16 @@
+>>>    === Do some I/O on the destination ===
+>>>    QEMU X.Y.Z monitor - type 'help' for more information
+>>> -(qemu) qemu-io disk "read -P 0x55 0 64k"
+>>> +(qemu) QEMU_PROG: Expected vmdescription section, but got 0
+>>> +QEMU_PROG: Failed to get "write" lock
+>>> +Is another process using the image?
+>>> +qemu-io disk "read -P 0x55 0 64k"
+>>>    read 65536/65536 bytes at offset 0
+>>>    64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>>>    (qemu)
+>>>    (qemu) qemu-io disk "write -P 0x66 1M 64k"
+>>> -wrote 65536/65536 bytes at offset 1048576
+>>> -64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>>> -
+>>> -=== Shut down and check image ===
+>>> -
+>>> -(qemu) quit
+>>> -(qemu)
+>>> -(qemu) quit
+>>> -No errors were found on the image.
+>>> -*** done
+>>> +QEMU_PROG: block/io.c:1359: bdrv_aligned_pwritev: Assertion `child->perm & BLK_PERM_WRITE' failed.
+>>> +./common.config: Aborted                 (core dumped) ( if [ -n "${QEMU_NEED_PID}" ]; then
+>>> +echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid";
+>>> +fi; exec "$QEMU_PROG" $QEMU_OPTIONS "$@" )
+>>> +Timeout waiting for ops/sec on handle 1
+>> Not sure about locking (don't see this error on my old kernel without OFD
+>> locking), but it looks like that
+>> 181 test should be fixed to set postcopy-ram capability on target too (which
+>> was considered as correct way on list)
+> Whatever you think the preferred way to set up postcopy migration is: If
+> something worked before this patch and doesn't after it, that's a
+> regression and breaks backwards compatibility.
+>
+> If we were talking about a graceful failure, maybe we could discuss
+> whether carefully and deliberately breaking compatibility could be
+> justified in this specific case. But the breakage is neither mentioned
+> in the commit message nor is it graceful, so I can only call it a bug.
+>
+> Kevin
 
-@Connie
-I would also like to have an account. I would also like to do a
-v2 of this somewhere in the not too distant future. I intend
-to address the issues pointed out by you here (chpid_type,
-cu_type). Another question is whether this should go under
-hw/misc/ like the pci-testdev? ccw-testdev would also probably
-be a better file name (that ccw-tester) regardless of in which
-folder does this belong. One more thing I am considering for
-v2 is this make it extensible argument. I had something like
-mode on my mind from the very beginning (fib would be one mode).
-The idea was to provide a control ccw for setting/getting the mode
-(something like virtio) as well as a device property for setting
-the initial mode (so that guest does not have to know about it).
+It's of course my fault, I don't mean "it's wrong test, so it's not my 
+problem") And I've already sent a patch.
 
-Regards,
-Halil
+-- 
+Best regards,
+Vladimir
