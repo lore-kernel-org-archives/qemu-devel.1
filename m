@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dwT7R-0002cu-02
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:08:18 -0400
+	(envelope-from <david@redhat.com>) id 1dwTFa-0004df-4e
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:16:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dwT7N-0006sB-OR
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:08:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:6012)
+	(envelope-from <david@redhat.com>) id 1dwTFV-0001re-3k
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:16:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42432)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dwT7N-0006rz-Hw
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:08:13 -0400
-Date: Mon, 25 Sep 2017 15:08:05 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170925150805.3143397d.cohuck@redhat.com>
-In-Reply-To: <20170925102302.60587-3-borntraeger@de.ibm.com>
-References: <20170925102302.60587-1-borntraeger@de.ibm.com>
-	<20170925102302.60587-3-borntraeger@de.ibm.com>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dwTFU-0001rG-TE
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 09:16:37 -0400
+References: <20170918160012.4317-1-david@redhat.com>
+	<20170918160012.4317-7-david@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <1551a7b0-de0b-ab57-0ac7-1d0cb9eed6af@redhat.com>
+Date: Mon, 25 Sep 2017 15:16:31 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170918160012.4317-7-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] s390/kvm: Support for get/set of
- extended TOD-Clock for guest
+Subject: Re: [Qemu-devel] [PATCH v1 06/27] s390x/tcg: injection of emergency
+ signals and extarnal calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, "Collin L. Walling" <walling@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On Mon, 25 Sep 2017 12:23:02 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
-> 
-> Provides an interface for getting and setting the guest's extended
-> TOD-Clock via a single ioctl to kvm. If the ioctl fails because it
-> is not support by kvm, then we fall back to the old style of
-> retrieving the clock via two ioctls.
-> 
-> If kvm fails to set a nonzero epoch index, then we ultimately fail
-> the migration altogether and the guest will resume normally on the
-> original host machine.
+> @@ -248,6 +249,19 @@ static void do_ext_interrupt(CPUS390XState *env)
+>          lowcore->ext_int_code = cpu_to_be16(EXT_CPU_TIMER);
+>          lowcore->cpu_addr = 0;
+>          env->pending_int &= ~INTERRUPT_EXT_CPU_TIMER;
+> +    } else if (env->pending_int & INTERRUPT_EMERGENCY_SIGNAL) {
+> +        lowcore->ext_int_code = cpu_to_be16(EXT_EMERGENCY);
+> +        cpu_addr = find_first_bit(env->emergency_signals, S390_MAX_CPUS);
+> +        g_assert(cpu_addr < S390_MAX_CPUS);
+> +        lowcore->cpu_addr = cpu_to_be16(cpu_addr);
+> +        clear_bit(cpu_addr, env->emergency_signals);
+> +        if (bitmap_empty(env->emergency_signals, max_cpus)) {
+> +            env->pending_int &= ~INTERRUPT_EMERGENCY_SIGNAL;
+> +        }
+> +    } else if (env->pending_int & INTERRUPT_EXTERNAL_CALL) {
+> +        lowcore->ext_int_code = cpu_to_be16(EXT_EXTERNAL_CALL);
+> +        lowcore->cpu_addr = cpu_to_be16(env->external_call_addr);
+> +        env->pending_int &= ~INTERRUPT_EXTERNAL_CALL;
 
-I'd prefer to have that part split off, as it is a change in behaviour
-and I don't think we should mix it with adding support for an improved
-interface.
+The priority of the interrupts is still wrong and we don't check for the
+subclass-mask bits. Will fix this.
 
-> 
-> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
-> Reviewed-by: Eric Farman <farman@linux.vnet.ibm.com>
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  hw/s390x/s390-virtio-ccw.c |  8 +++-----
->  target/s390x/cpu.c         | 26 +++++++++++++++++++-------
->  target/s390x/kvm-stub.c    | 10 ++++++++++
->  target/s390x/kvm.c         | 35 +++++++++++++++++++++++++++++++++++
->  target/s390x/kvm_s390x.h   |  2 ++
->  5 files changed, 69 insertions(+), 12 deletions(-)
-> 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index fafbc6d..bad09f5 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -213,13 +213,11 @@ static int gtod_load(QEMUFile *f, void *opaque, int version_id)
->  
->      r = s390_set_clock(&tod_high, &tod_low);
->      if (r) {
-> -        warn_report("Unable to set guest clock for migration: %s",
-> -                    strerror(-r));
-> -        error_printf("Guest clock will not be restored "
-> -                     "which could cause the guest to hang.");
-> +        error_report("Unable to set guest clock value. "
-> +                     "s390_get_clock returned error %d.\n", r);
+-- 
 
-Please keep to a single phrase in error_report(). Also, I find
-strerror() often more useful.
+Thanks,
 
->      }
->  
-> -    return 0;
-> +    return r;
->  }
->  
->  static SaveVMHandlers savevm_gtod = {
-
-Otherwise looks good.
+David
