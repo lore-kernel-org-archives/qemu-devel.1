@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dwPfB-0001sk-Pb
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:26:54 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dwPlj-0003oK-U0
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:33:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dwPf8-0002c5-Co
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:26:53 -0400
-Date: Mon, 25 Sep 2017 11:26:41 +0200
-From: Eduardo Otubo <otubo@redhat.com>
-Message-ID: <20170925092641.GD12137@vader>
-References: <20170915090643.6043-1-otubo@redhat.com>
-	<fbe31cc8-c628-32e6-90b0-0341ef1972d3@msgid.tls.msk.ru>
-	<0e84971b-592e-22f7-8815-2b3e193f6c1d@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1dwPlg-0006kY-HN
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:33:39 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:37119)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dwPlg-0006id-Aq
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:33:36 -0400
+Received: by mail-wr0-x242.google.com with SMTP id u48so1597358wrf.4
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 02:33:34 -0700 (PDT)
+Date: Mon, 25 Sep 2017 10:33:32 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170925093332.GD14140@stefanha-x1.localdomain>
+References: <20170923163334.9997-1-mjt@msgid.tls.msk.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0e84971b-592e-22f7-8815-2b3e193f6c1d@redhat.com>
-Subject: Re: [Qemu-devel] [[PATCH] dma/i82374: avoid double creation of
- i82374 device
+In-Reply-To: <20170923163334.9997-1-mjt@msgid.tls.msk.ru>
+Subject: Re: [Qemu-devel] [PATCH] remove trailing whitespace from
+ qemu-options.hx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,27 +29,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org, ehabkost@redhat.com, qemu-trivial@nongnu.org, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>
+To: Michael Tokarev <mjt@tls.msk.ru>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.orh
 
-On Mon, Sep 25, 2017 at 11:11:37AM +0200, Paolo Bonzini wrote:
-> On 24/09/2017 23:02, Michael Tokarev wrote:
-> > 15.09.2017 12:06, Eduardo Otubo wrote:
-> >> QEMU fails when used with the following command line:
-> >>
-> >>   ./ppc64-softmmu/qemu-system-ppc64 -S -machine 40p,accel=tcg -device i82374
-> >>   qemu-system-ppc64: hw/isa/isa-bus.c:110: isa_bus_dma: Assertion `!bus->dma[0] && !bus->dma[1]' failed.
-> >>   Aborted (core dumped)
-> >>
-> >> The 40p machine type already creates the device i82374. If specified in the
-> >> command line, it will try to create it again, hence generating the error. The
-> >> function isa_bus_dma() isn't supposed to be called twice for the same bus. One
-> >> way to avoid this problem is to set user_creatable=false.
-> > 
-> > Applied to -trivial, thanks!
+On Sat, Sep 23, 2017 at 07:33:34PM +0300, Michael Tokarev wrote:
+> Remove trailing whitespace in qemu-options documentation, as it causes
+> reproducibility issues depending on the echo implementation used by
+> the Makefile.
 > 
-> Eduardo, weren't you going to send a version that propagates Error*
-> correctly instead?
+> Reported-By: Vagrant Cascadian <vagrant@debian.org>
+> Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
+> ---
+>  qemu-options.hx | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Yes, that's correct. I can revert this patch with the error
-propagation patch as well, if you guys don't mind.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
