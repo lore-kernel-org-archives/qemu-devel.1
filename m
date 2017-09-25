@@ -1,39 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1dwOzJ-0000cu-ED
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:43:38 -0400
+	(envelope-from <thuth@redhat.com>) id 1dwP1x-0001xt-Fp
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:46:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1dwOzG-0004p5-4T
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:43:37 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58624)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <s1seetee@linux.vnet.ibm.com>)
-	id 1dwOzF-0004op-Ss
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:43:34 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8P8dMIf052564
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 04:43:29 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d6p5xya9h-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 04:43:29 -0400
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <s1seetee@linux.vnet.ibm.com>;
-	Mon, 25 Sep 2017 04:43:28 -0400
-References: <1504511031-26834-1-git-send-email-s1seetee@linux.vnet.ibm.com>
-	<5577a43c-0c60-a1c7-e5ab-7b940225ea85@amsat.org>
-From: seeteena <s1seetee@linux.vnet.ibm.com>
-Date: Mon, 25 Sep 2017 14:13:22 +0530
+	(envelope-from <thuth@redhat.com>) id 1dwP1u-0005ky-6R
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:46:21 -0400
+References: <20170925083348.17126-1-clg@kaod.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <30287e8a-e697-b33e-bcf0-94bf7fe291de@redhat.com>
+Date: Mon, 25 Sep 2017 10:46:13 +0200
 MIME-Version: 1.0
-In-Reply-To: <5577a43c-0c60-a1c7-e5ab-7b940225ea85@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20170925083348.17126-1-clg@kaod.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Message-Id: <0476b7f3-e760-273a-7edf-07ff90157dc4@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5] vl: exit if maxcpus is negative
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] ppc/pnv: check for firmware
+ file presence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,109 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
 
-Hi Philippe,
+On 25.09.2017 10:33, C=C3=A9dric Le Goater wrote:
+> and exit before uslessly trying to load it if the file does
 
-I have not seen patch went upstream..
+s/uslessly/uselessly/
 
+> not exists.
+>=20
+> Issue dicovered by Coverity Scan.
 
-On 09/04/2017 09:12 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 09/04/2017 04:43 AM, Seeteena Thoufeek wrote:
->> ---Steps to Reproduce---
->>
->> When passed a negative number to 'maxcpus' parameter, Qemu aborts
->> with a core dump.
->>
->> Run the following command with maxcpus argument as negative number
->>
->> ppc64-softmmu/qemu-system-ppc64 --nographic -vga none -machine
->> pseries,accel=3Dkvm,kvm-type=3DHV -m size=3D200g -device virtio-blk-pc=
-i,
->> drive=3Drootdisk -drive file=3D/home/images/pegas-1.0-ppc64le.qcow2,
->> if=3Dnone,cache=3Dnone,id=3Drootdisk,format=3Dqcow2 -monitor telnet
->> :127.0.0.1:1234,server,nowait -net nic,model=3Dvirtio -net
->> user -redir tcp:2000::22 -device nec-usb-xhci -smp 8,cores=3D1,
->> threads=3D1,maxcpus=3D-12
->>
->> (process:12149): GLib-ERROR **: gmem.c:130: failed to allocate
->> =C2=A0 18446744073709550568 bytes
->>
->> Trace/breakpoint trap
->>
->> Reported-by: R.Nageswara Sastry <rnsastry@linux.vnet.ibm.com>
->> Signed-off-by: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
->> ---
->> v1 -> v2:
->> =C2=A0=C2=A0 - Fix the error check in vl.c to make it generic.
->> v2 -> v3:
->> =C2=A0=C2=A0 - Fix coding style pointed out by patchew.
->> =C2=A0=C2=A0 - Fix check for "<=3D 0" instead of just "< 0".
->> v3 -> v4:
->> =C2=A0=C2=A0 - Fix subject line.
->> =C2=A0=C2=A0 - Removed space before ":" from vl.c:1248
->> =C2=A0=C2=A0 - Removed Reviewed-by: flag
->> v4-> v5:
->> =C2=A0=C2=A0 - Code rework to declare max_cpus as unsigned int in syse=
-mu.h
->> =C2=A0=C2=A0 - Remove the error check in vl.c referred in v2.
->> =C2=A0=C2=A0 - declare max_cpus as unsigned int in vl.c
->> ---
->> =C2=A0 include/sysemu/sysemu.h | 2 +-
->> =C2=A0 vl.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 6 +++---
->> =C2=A0 2 files changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
->> index b213696..c083869 100644
->> --- a/include/sysemu/sysemu.h
->> +++ b/include/sysemu/sysemu.h
->> @@ -113,7 +113,7 @@ extern int win2k_install_hack;
->> =C2=A0 extern int alt_grab;
->> =C2=A0 extern int ctrl_grab;
->> =C2=A0 extern int smp_cpus;
->> -extern int max_cpus;
->> +extern unsigned int max_cpus;
->> =C2=A0 extern int cursor_hide;
->> =C2=A0 extern int graphic_rotate;
->> =C2=A0 extern int no_quit;
->> diff --git a/vl.c b/vl.c
->> index 8e247cc..1470c21 100644
->> --- a/vl.c
->> +++ b/vl.c
->> @@ -164,7 +164,7 @@ Chardev *sclp_hds[MAX_SCLP_CONSOLES];
->> =C2=A0 int win2k_install_hack =3D 0;
->> =C2=A0 int singlestep =3D 0;
->> =C2=A0 int smp_cpus =3D 1;
->> -int max_cpus =3D 1;
->> +unsigned int max_cpus =3D 1;
->> =C2=A0 int smp_cores =3D 1;
->> =C2=A0 int smp_threads =3D 1;
->> =C2=A0 int acpi_enabled =3D 1;
->> @@ -4233,8 +4233,8 @@ int main(int argc, char **argv, char **envp)
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 machine_class->max_cpus =3D mach=
-ine_class->max_cpus ?: 1; /*=20
->> Default to UP */
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_cpus > machine_class->max_cpus)=
- {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("Number of SM=
-P CPUs requested (%d) exceeds max=20
->> CPUs "
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "supported by machine=
- '%s' (%d)", max_cpus,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("Invalid SMP =
-CPUs %d. The max CPUs "
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "supported by machine=
- '%s' is %d", max_cpus,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 machine_clas=
-s->name, machine_class->max_cpus);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exit(1);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>
->
+/dicovered/discovered/
+
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>  hw/ppc/pnv.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 47221158d415..7728eece2eec 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -570,6 +570,10 @@ static void ppc_powernv_init(MachineState *machine=
+)
+>      }
+> =20
+>      fw_filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+> +    if (!fw_filename) {
+> +        error_report("Could not find OPAL '%s'", bios_name);
+
+I'd suggest to say "OPAL firmware" instead of just "OPAL". Not every
+user knows what OPAL is.
+
+> +        exit(1);
+> +    }
+> =20
+>      fw_size =3D load_image_targphys(fw_filename, FW_LOAD_ADDR, FW_MAX_=
+SIZE);
+>      if (fw_size < 0) {
+>=20
+
+ Thomas
