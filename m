@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dwPH5-0002uh-7d
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:02:04 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dwPPy-0006AB-PC
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:11:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dwPGz-0004d2-Py
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:01:59 -0400
-Date: Mon, 25 Sep 2017 10:01:44 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170925090144.GB14140@stefanha-x1.localdomain>
-References: <20170922154014.29350-1-f4bug@amsat.org>
-	<20170922154014.29350-5-f4bug@amsat.org>
+	(envelope-from <pbonzini@redhat.com>) id 1dwPPx-0001HY-QM
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:11:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38670)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dwPPx-0001Gx-Jd
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:11:09 -0400
+References: <1506095371-23160-1-git-send-email-pbonzini@redhat.com>
+	<20170925030912.GC22980@lemon.lan>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <caf7430e-6819-8c76-5a26-1fcbfc0a0b1a@redhat.com>
+Date: Mon, 25 Sep 2017 11:11:03 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170922154014.29350-5-f4bug@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 04/34] misc: remove headers implicitly
- included
+In-Reply-To: <20170925030912.GC22980@lemon.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] docker: add installation to build tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,23 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Ben Warren <ben@skyportsystems.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org
 
-On Fri, Sep 22, 2017 at 12:39:44PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> applied using ./scripts/clean-includes
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
->  hw/audio/fmopl.h             | 1 -
->  bsd-user/main.c              | 1 -
->  chardev/wctablet.c           | 4 ----
->  hw/scsi/vhost-user-scsi.c    | 1 -
->  linux-user/main.c            | 1 -
->  net/colo-compare.c           | 1 -
->  tests/test-aio-multithread.c | 1 -
->  tests/test-clone-visitor.c   | 1 -
->  tests/vmgenid-test.c         | 3 ---
->  9 files changed, 14 deletions(-)
+On 25/09/2017 05:09, Fam Zheng wrote:
+> On Fri, 09/22 17:49, Paolo Bonzini wrote:
+>> diff --git a/tests/docker/common.rc b/tests/docker/common.rc
+>> index 6865689..1522aab 100755
+>> --- a/tests/docker/common.rc
+>> +++ b/tests/docker/common.rc
+>> @@ -36,3 +36,11 @@ build_qemu()
+>>      $QEMU_SRC/configure $config_opts
+>>      make $MAKEFLAGS
+>>  }
+>> +
+>> +install_qemu()
+>> +{
+>> +    make install $MAKEFLAGS DESTDIR=$PWD/=destdir
+> 
+> Why provide DESTDIR? build_qemu already has "--prefix=$INSTALL_DIR", can a
+> simple "make install $MAKEFLAGS" work? Is there a permission problem?
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Just to test the $DESTDIR case.  I have plans to extend the test a bit
+further, such as:
+
+- checking that $INSTALL_DIR remains empty
+
+- comparing the destdir installation against the $INSTALL_DIR (to ensure
+that the destdir doesn't end up in the installed files; distro packaging
+conventions usually don't like that).
+
+- doing the DESTDIR install as a non-root user
+
+>> +    ret=$?
+>> +    rm -rf $PWD/=destdir
+> 
+> Why is this cleanup needed given the container will go away anyway?
+
+Again it's just for cleanliness.  Another possible test to add is that
+"make distclean" actually leaves the build tree in a pristine state, and
+this would fail if we leave the installation tree around.
+
+All these tests, by the way, are inspired by the "make distcheck"
+produced by Automake.
+
+Paolo
