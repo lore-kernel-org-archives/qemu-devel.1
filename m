@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1dwS5N-0004VC-W8
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 08:02:14 -0400
+	(envelope-from <ahzhanghaoyu@gmail.com>) id 1dwSDq-00075c-Te
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 08:10:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1dwS5H-0000Lp-HQ
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 08:02:06 -0400
-Received: from mga07.intel.com ([134.134.136.100]:59799)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
-	id 1dwS5H-0000In-4i
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 08:01:59 -0400
-From: "Valluri, Amarnath" <amarnath.valluri@intel.com>
-Date: Mon, 25 Sep 2017 12:01:51 +0000
-Message-ID: <1506340994.5843.84.camel@intel.com>
-References: <1506083624-20621-1-git-send-email-amarnath.valluri@intel.com>
-	<1506083624-20621-6-git-send-email-amarnath.valluri@intel.com>
-	<CAJ+F1CLD3gGHxtxSidEBvOz57rXvbpLNyEjnE7hfV89ok9LhKQ@mail.gmail.com>
-In-Reply-To: <CAJ+F1CLD3gGHxtxSidEBvOz57rXvbpLNyEjnE7hfV89ok9LhKQ@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <DB628B4DCEC42F4DACB87B3A160BE02A@intel.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <ahzhanghaoyu@gmail.com>) id 1dwSDi-0004sR-WA
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 08:10:46 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:37523)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ahzhanghaoyu@gmail.com>)
+	id 1dwSDi-0004s6-Lu
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 08:10:42 -0400
+Received: by mail-pg0-x241.google.com with SMTP id v5so4750301pgn.4
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 05:10:42 -0700 (PDT)
+References: <20160809191216.GF2025@work-vm>
+	<1470790447-83284-1-git-send-email-jiangshanlai@gmail.com>
+From: Zhang Haoyu <ahzhanghaoyu@gmail.com>
+Message-ID: <c4f5dbe8-fe33-d8b9-4c9a-3d2282332832@gmail.com>
+Date: Mon, 25 Sep 2017 20:13:22 +0800
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v7 5/8] tmp backend: Add new api to read
- backend TpmInfo
+In-Reply-To: <1470790447-83284-1-git-send-email-jiangshanlai@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH V2] add migration capability to bypass the
+ shared memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,185 +32,292 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>
-Cc: "stefanb@linux.vnet.ibm.com" <stefanb@linux.vnet.ibm.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Lai Jiangshan <jiangshanlai@gmail.com>, qemu-devel@nongnu.org
+Cc: Juan Quintela <quintela@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Amit Shah <amit.shah@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-T24gRnJpLCAyMDE3LTA5LTIyIGF0IDE3OjM1ICswMjAwLCBNYXJjLUFuZHLDqSBMdXJlYXUgd3Jv
-dGU6DQo+IEhpDQo+IA0KPiBPbiBGcmksIFNlcCAyMiwgMjAxNyBhdCAyOjMzIFBNLCBBbWFybmF0
-aCBWYWxsdXJpDQo+IDxhbWFybmF0aC52YWxsdXJpQGludGVsLmNvbT4gd3JvdGU6DQo+ID4gDQo+
-ID4gVFBNIGNvbmZpZ3VyYXRpb24gb3B0aW9ucyBhcmUgYmFja2VuZCBpbXBsZW1lbnRhdGlvbiBk
-ZXRhaWxzIGFuZA0KPiA+IHNoYWxsIG5vdCBiZQ0KPiA+IHBhcnQgb2YgYmFzZSBUUE1CYWNrZW5k
-IG9iamVjdCwgYW5kIHRoZXNlIHNoYWxsIG5vdCBiZSBhY2Nlc3NlZA0KPiA+IGRpcmVjdGx5IG91
-dHNpZGUNCj4gPiBvZiB0aGUgY2xhc3MsIGhlbmNlIGFkZGVkIGEgbmV3IGludGVyZmFjZSBtZXRo
-b2QsIGdldF90cG1fb3B0aW9ucygpDQo+ID4gdG8NCj4gPiBUUE1Ecml2ZXJPcHMuLCB3aGljaCBz
-aGFsbCBiZSBpbXBsZW1lbnRlZCBieSB0aGUgZGVyaXZlZCBjbGFzc2VzIHRvDQo+ID4gcmV0dXJu
-DQo+ID4gY29uZmlndXJlZCB0cG0gb3B0aW9ucy4NCj4gPiANCj4gPiBBIG5ldyB0cG0gYmFja2Vu
-ZCBhcGkgLSB0cG1fYmFja2VuZF9xdWVyeV90cG0oKSB3aGljaCB1c2VzDQo+ID4gX2dldF90cG1f
-b3B0aW9ucygpIHRvDQo+ID4gcHJlcGFyZSBUcG1JbmZvLg0KPiA+IA0KPiA+IFNpZ25lZC1vZmYt
-Ynk6IEFtYXJuYXRoIFZhbGx1cmkgPGFtYXJuYXRoLnZhbGx1cmlAaW50ZWwuY29tPg0KPiA+IFJl
-dmlld2VkLWJ5OiBTdGVmYW4gQmVyZ2VyIDxzdGVmYW5iQGxpbnV4LnZuZXQuaWJtLmNvbT4NCj4g
-PiAtLS0NCj4gPiDCoGJhY2tlbmRzL3RwbS5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-fCAyMiArKysrKysrKysrKysrLS0NCj4gPiDCoGhtcC5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgfMKgwqA3ICsrLS0tDQo+ID4gwqBody90cG0vdHBtX3Bh
-c3N0aHJvdWdoLmPCoMKgwqDCoMKgfCA2NCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-LQ0KPiA+IC0tLS0tLS0tLS0tLQ0KPiA+IMKgaW5jbHVkZS9zeXNlbXUvdHBtX2JhY2tlbmQuaCB8
-IDI1ICsrKysrKysrKysrKysrKy0tDQo+ID4gwqB0cG0uY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHwgMzIgKy0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiA+
-IMKgNSBmaWxlcyBjaGFuZ2VkLCA5MyBpbnNlcnRpb25zKCspLCA1NyBkZWxldGlvbnMoLSkNCj4g
-PiANCj4gPiBkaWZmIC0tZ2l0IGEvYmFja2VuZHMvdHBtLmMgYi9iYWNrZW5kcy90cG0uYw0KPiA+
-IGluZGV4IGM0MDlhNDYuLjZhZGU5ZTQgMTAwNjQ0DQo+ID4gLS0tIGEvYmFja2VuZHMvdHBtLmMN
-Cj4gPiArKysgYi9iYWNrZW5kcy90cG0uYw0KPiA+IEBAIC0xMzgsNiArMTM4LDI2IEBAIFRQTVZl
-cnNpb24NCj4gPiB0cG1fYmFja2VuZF9nZXRfdHBtX3ZlcnNpb24oVFBNQmFja2VuZCAqcykNCj4g
-PiDCoMKgwqDCoMKgcmV0dXJuIGstPm9wcy0+Z2V0X3RwbV92ZXJzaW9uKHMpOw0KPiA+IMKgfQ0K
-PiA+IA0KPiA+ICtUcG1UeXBlT3B0aW9ucyAqdHBtX2JhY2tlbmRfZ2V0X3RwbV9vcHRpb25zKFRQ
-TUJhY2tlbmQgKnMpDQo+ID4gK3sNCj4gPiArwqDCoMKgwqBUUE1CYWNrZW5kQ2xhc3MgKmsgPSBU
-UE1fQkFDS0VORF9HRVRfQ0xBU1Mocyk7DQo+ID4gKw0KPiA+ICvCoMKgwqDCoGFzc2VydChrLT5v
-cHMtPmdldF90cG1fb3B0aW9ucyk7DQo+ID4gKw0KPiA+ICvCoMKgwqDCoHJldHVybiBrLT5vcHMt
-PmdldF90cG1fb3B0aW9ucyhzKTsNCj4gPiArfQ0KPiA+ICsNCj4gV2h5IG1ha2UgdGhpcyBwdWJs
-aWMgQVBJPw0KWWVzLCBJIGFncmVlIG5vIG5lZWQgb2YgdGhpcyBBUEksIGkgd2lsbCByZW1vdmUg
-dGhpcw0KPiANCj4gPiANCj4gPiArVFBNSW5mbyAqdHBtX2JhY2tlbmRfcXVlcnlfdHBtKFRQTUJh
-Y2tlbmQgKnMpDQo+ID4gK3sNCj4gPiArwqDCoMKgwqBUUE1JbmZvICppbmZvID0gZ19uZXcwKFRQ
-TUluZm8sIDEpOw0KPiA+ICsNCj4gPiArwqDCoMKgwqBpbmZvLT5pZCA9IGdfc3RyZHVwKHMtPmlk
-KTsNCj4gPiArwqDCoMKgwqBpbmZvLT5tb2RlbCA9IHMtPmZlX21vZGVsOw0KPiA+ICvCoMKgwqDC
-oGluZm8tPm9wdGlvbnMgPSB0cG1fYmFja2VuZF9nZXRfdHBtX29wdGlvbnMocyk7DQo+IENhbGxi
-YWNrIGNvdWxkIGJlIGNhbGxlZCBkaXJlY3RseSBmcm9tIGhlcmUuDQo+IA0KPiA+IA0KPiA+ICsN
-Cj4gPiArwqDCoMKgwqByZXR1cm4gaW5mbzsNCj4gPiArfQ0KPiA+ICsNCj4gPiDCoHN0YXRpYyBi
-b29sIHRwbV9iYWNrZW5kX3Byb3BfZ2V0X29wZW5lZChPYmplY3QgKm9iaiwgRXJyb3IgKiplcnJw
-KQ0KPiA+IMKgew0KPiA+IMKgwqDCoMKgwqBUUE1CYWNrZW5kICpzID0gVFBNX0JBQ0tFTkQob2Jq
-KTsNCj4gPiBAQCAtMTkyLDggKzIxMiw2IEBAIHN0YXRpYyB2b2lkDQo+ID4gdHBtX2JhY2tlbmRf
-aW5zdGFuY2VfZmluYWxpemUoT2JqZWN0ICpvYmopDQo+ID4gwqDCoMKgwqDCoFRQTUJhY2tlbmQg
-KnMgPSBUUE1fQkFDS0VORChvYmopOw0KPiA+IA0KPiA+IMKgwqDCoMKgwqBnX2ZyZWUocy0+aWQp
-Ow0KPiA+IC3CoMKgwqDCoGdfZnJlZShzLT5wYXRoKTsNCj4gPiAtwqDCoMKgwqBnX2ZyZWUocy0+
-Y2FuY2VsX3BhdGgpOw0KPiA+IMKgwqDCoMKgwqB0cG1fYmFja2VuZF90aHJlYWRfZW5kKHMpOw0K
-PiA+IMKgfQ0KPiA+IA0KPiA+IGRpZmYgLS1naXQgYS9obXAuYyBiL2htcC5jDQo+ID4gaW5kZXgg
-MGZiMmJjNy4uY2Y2MmIyZSAxMDA2NDQNCj4gPiAtLS0gYS9obXAuYw0KPiA+ICsrKyBiL2htcC5j
-DQo+ID4gQEAgLTMxLDYgKzMxLDcgQEANCj4gPiDCoCNpbmNsdWRlICJxYXBpL3FtcC9xZXJyb3Iu
-aCINCj4gPiDCoCNpbmNsdWRlICJxYXBpL3N0cmluZy1pbnB1dC12aXNpdG9yLmgiDQo+ID4gwqAj
-aW5jbHVkZSAicWFwaS9zdHJpbmctb3V0cHV0LXZpc2l0b3IuaCINCj4gPiArI2luY2x1ZGUgInFh
-cGkvdXRpbC5oIg0KPiA+IMKgI2luY2x1ZGUgInFhcGktdmlzaXQuaCINCj4gPiDCoCNpbmNsdWRl
-ICJxb20vb2JqZWN0X2ludGVyZmFjZXMuaCINCj4gPiDCoCNpbmNsdWRlICJ1aS9jb25zb2xlLmgi
-DQo+ID4gQEAgLTEwMTIsMTAgKzEwMTMsMTAgQEAgdm9pZCBobXBfaW5mb190cG0oTW9uaXRvciAq
-bW9uLCBjb25zdCBRRGljdA0KPiA+ICpxZGljdCkNCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBjLCBUcG1Nb2RlbF9zdHIodGktPm1vZGVsKSk7DQo+
-ID4gDQo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgbW9uaXRvcl9wcmludGYobW9uLCAiwqDCoFxcICVz
-OiB0eXBlPSVzIiwNCj4gPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoHRpLT5pZCwgVHBtVHlwZU9wdGlvbnNLaW5kX3N0cih0aS0+b3B0aW9ucy0NCj4gPiA+
-dHlwZSkpOw0KPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgdGktPmlkLCBUcG1UeXBlX3N0cih0aS0+b3B0aW9ucy0+dHlwZSkpOw0KPiA+IA0KPiBXaHkg
-dGhpcyBjaGFuZ2U/IEl0IGlzIHN0aWxsIGEgVHBtVHlwZU9wdGlvbnNLaW5kIG5vPw0KVGhpcyBp
-cyB3YXMgaXNzdWUgd2l0aCBteSByZWJhc2UsIGkgd2lsbCBmaXguDQo+IA0KPiA+IA0KPiA+IMKg
-wqDCoMKgwqDCoMKgwqDCoHN3aXRjaCAodGktPm9wdGlvbnMtPnR5cGUpIHsNCj4gPiAtwqDCoMKg
-wqDCoMKgwqDCoGNhc2UgVFBNX1RZUEVfT1BUSU9OU19LSU5EX1BBU1NUSFJPVUdIOg0KPiA+ICvC
-oMKgwqDCoMKgwqDCoMKgY2FzZSBUUE1fVFlQRV9QQVNTVEhST1VHSDoNCj4gPiDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoHRwbyA9IHRpLT5vcHRpb25zLT51LnBhc3N0aHJvdWdoLmRhdGE7DQo+
-ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBtb25pdG9yX3ByaW50Zihtb24sICIlcyVzJXMl
-cyIsDQo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqB0cG8tPmhhc19wYXRoID8gIixwYXRoPSIgOiAiIiwNCj4gPiBAQCAtMTAyMyw3ICsx
-MDI0LDcgQEAgdm9pZCBobXBfaW5mb190cG0oTW9uaXRvciAqbW9uLCBjb25zdCBRRGljdA0KPiA+
-ICpxZGljdCkNCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoHRwby0+aGFzX2NhbmNlbF9wYXRoID8gIixjYW5jZWwtcGF0aD0iDQo+ID4g
-OiAiIiwNCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoHRwby0+aGFzX2NhbmNlbF9wYXRoID8gdHBvLT5jYW5jZWxfcGF0aCANCj4gPiA6
-ICIiKTsNCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGJyZWFrOw0KPiA+IC3CoMKgwqDC
-oMKgwqDCoMKgY2FzZSBUUE1fVFlQRV9PUFRJT05TX0tJTkRfX01BWDoNCj4gPiArwqDCoMKgwqDC
-oMKgwqDCoGNhc2UgVFBNX1RZUEVfX01BWDoNCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oGJyZWFrOw0KPiA+IMKgwqDCoMKgwqDCoMKgwqDCoH0NCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqBt
-b25pdG9yX3ByaW50Zihtb24sICJcbiIpOw0KPiA+IGRpZmYgLS1naXQgYS9ody90cG0vdHBtX3Bh
-c3N0aHJvdWdoLmMgYi9ody90cG0vdHBtX3Bhc3N0aHJvdWdoLmMNCj4gPiBpbmRleCBhMDQ1OWE2
-Li5mYjdkYWQ4IDEwMDY0NA0KPiA+IC0tLSBhL2h3L3RwbS90cG1fcGFzc3Rocm91Z2guYw0KPiA+
-ICsrKyBiL2h3L3RwbS90cG1fcGFzc3Rocm91Z2guYw0KPiA+IEBAIC00OSw3ICs0OSw4IEBADQo+
-ID4gwqBzdHJ1Y3QgVFBNUGFzc3RocnVTdGF0ZSB7DQo+ID4gwqDCoMKgwqDCoFRQTUJhY2tlbmQg
-cGFyZW50Ow0KPiA+IA0KPiA+IC3CoMKgwqDCoGNoYXIgKnRwbV9kZXY7DQo+ID4gK8KgwqDCoMKg
-VFBNUGFzc3Rocm91Z2hPcHRpb25zICpvcHRpb25zOw0KPiA+ICvCoMKgwqDCoGNvbnN0IGNoYXIg
-KnRwbV9kZXY7DQo+ID4gwqDCoMKgwqDCoGludCB0cG1fZmQ7DQo+ID4gwqDCoMKgwqDCoGJvb2wg
-dHBtX2V4ZWN1dGluZzsNCj4gPiDCoMKgwqDCoMKgYm9vbCB0cG1fb3BfY2FuY2VsZWQ7DQo+ID4g
-QEAgLTMwOCwxNSArMzA5LDE0IEBAIHN0YXRpYyBUUE1WZXJzaW9uDQo+ID4gdHBtX3Bhc3N0aHJv
-dWdoX2dldF90cG1fdmVyc2lvbihUUE1CYWNrZW5kICp0YikNCj4gPiDCoCAqIGluIERvY3VtZW50
-YXRpb24vQUJJL3N0YWJsZS9zeXNmcy1jbGFzcy10cG0uDQo+ID4gwqAgKiBGcm9tIC9kZXYvdHBt
-MCBjcmVhdGUgL3N5cy9jbGFzcy9taXNjL3RwbTAvZGV2aWNlL2NhbmNlbA0KPiA+IMKgICovDQo+
-ID4gLXN0YXRpYyBpbnQgdHBtX3Bhc3N0aHJvdWdoX29wZW5fc3lzZnNfY2FuY2VsKFRQTUJhY2tl
-bmQgKnRiKQ0KPiA+ICtzdGF0aWMgaW50IHRwbV9wYXNzdGhyb3VnaF9vcGVuX3N5c2ZzX2NhbmNl
-bChUUE1QYXNzdGhydVN0YXRlDQo+ID4gKnRwbV9wdCkNCj4gSSBzdXNwZWN0IHRoaXMgY2hhbmdl
-IGNvdWxkIGJlIGRvbmUgaW4gYW4gZWFybGllci9zZXBhcmF0ZSBwYXRjaA0KSSBmZWVsIHRoaXMg
-Y2hhbmdlIGlzIGJldHRlciBwYXJ0IG9mIHRoaXMgY29tbWl0IGFzIHRoaXMgaXMgc2lkZSBlZmZl
-Y3QNCm9mIHJlYXJyYWdlbmQgdHBtIG9wdGlvbnMsIG5vdyB0aGVzZSBhcmUgcGFydCBvZiBUUE1Q
-YXNzdHJodVN0YXRlIHNvDQpfb3Blbl9zeXNmc19jYW5jZWwoKSBuZWVkIG5vdCB3b3JrIG9uIFRQ
-TUJhY2tlbmQuDQo+IA0KPiA+IA0KPiA+IMKgew0KPiA+IC3CoMKgwqDCoFRQTVBhc3N0aHJ1U3Rh
-dGUgKnRwbV9wdCA9IFRQTV9QQVNTVEhST1VHSCh0Yik7DQo+ID4gwqDCoMKgwqDCoGludCBmZCA9
-IC0xOw0KPiA+IMKgwqDCoMKgwqBjaGFyICpkZXY7DQo+ID4gwqDCoMKgwqDCoGNoYXIgcGF0aFtQ
-QVRIX01BWF07DQo+ID4gDQo+ID4gLcKgwqDCoMKgaWYgKHRiLT5jYW5jZWxfcGF0aCkgew0KPiA+
-IC3CoMKgwqDCoMKgwqDCoMKgZmQgPSBxZW11X29wZW4odGItPmNhbmNlbF9wYXRoLCBPX1dST05M
-WSk7DQo+ID4gK8KgwqDCoMKgaWYgKHRwbV9wdC0+b3B0aW9ucy0+Y2FuY2VsX3BhdGgpIHsNCj4g
-PiArwqDCoMKgwqDCoMKgwqDCoGZkID0gcWVtdV9vcGVuKHRwbV9wdC0+b3B0aW9ucy0+Y2FuY2Vs
-X3BhdGgsIE9fV1JPTkxZKTsNCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqBpZiAoZmQgPCAwKSB7DQo+
-ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBlcnJvcl9yZXBvcnQoIkNvdWxkIG5vdCBvcGVu
-IFRQTSBjYW5jZWwgcGF0aCA6ICVzIiwNCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgc3RyZXJyb3IoZXJybm8pKTsNCj4gPiBAQCAtMzMxLDcg
-KzMzMSw3IEBAIHN0YXRpYyBpbnQNCj4gPiB0cG1fcGFzc3Rocm91Z2hfb3Blbl9zeXNmc19jYW5j
-ZWwoVFBNQmFja2VuZCAqdGIpDQo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqBkZXYpIDwgc2l6ZW9mKHBhdGgpKSB7DQo+ID4gwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqBmZCA9IHFlbXVfb3BlbihwYXRoLCBPX1dST05MWSk7DQo+ID4gwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqBpZiAoZmQgPj0gMCkgew0KPiA+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoHRiLT5jYW5jZWxfcGF0aCA9IGdfc3RyZHVwKHBhdGgpOw0KPiA+ICvCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHRwbV9wdC0+b3B0aW9ucy0+Y2FuY2VsX3BhdGggPSBn
-X3N0cmR1cChwYXRoKTsNCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoH0gZWxzZSB7DQo+
-ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGVycm9yX3JlcG9ydCgidHBtX3Bh
-c3N0aHJvdWdoOiBDb3VsZCBub3Qgb3BlbiBUUE0NCj4gPiBjYW5jZWwgIg0KPiA+IMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCJwYXRo
-ICVzIDogJXMiLCBwYXRoLA0KPiA+IHN0cmVycm9yKGVycm5vKSk7DQo+ID4gQEAgLTM1MSwxNyAr
-MzUxLDE4IEBAIHN0YXRpYyBpbnQNCj4gPiB0cG1fcGFzc3Rocm91Z2hfaGFuZGxlX2RldmljZV9v
-cHRzKFFlbXVPcHRzICpvcHRzLCBUUE1CYWNrZW5kICp0YikNCj4gPiDCoMKgwqDCoMKgY29uc3Qg
-Y2hhciAqdmFsdWU7DQo+ID4gDQo+ID4gwqDCoMKgwqDCoHZhbHVlID0gcWVtdV9vcHRfZ2V0KG9w
-dHMsICJjYW5jZWwtcGF0aCIpOw0KPiA+IC3CoMKgwqDCoHRiLT5jYW5jZWxfcGF0aCA9IGdfc3Ry
-ZHVwKHZhbHVlKTsNCj4gPiArwqDCoMKgwqBpZiAodmFsdWUpIHsNCj4gPiArwqDCoMKgwqDCoMKg
-wqDCoHRwbV9wdC0+b3B0aW9ucy0+Y2FuY2VsX3BhdGggPSBnX3N0cmR1cCh2YWx1ZSk7DQo+ID4g
-K8KgwqDCoMKgwqDCoMKgwqB0cG1fcHQtPm9wdGlvbnMtPmhhc19jYW5jZWxfcGF0aCA9IHRydWU7
-DQo+ID4gK8KgwqDCoMKgfQ0KPiA+IA0KPiA+IMKgwqDCoMKgwqB2YWx1ZSA9IHFlbXVfb3B0X2dl
-dChvcHRzLCAicGF0aCIpOw0KPiA+IC3CoMKgwqDCoGlmICghdmFsdWUpIHsNCj4gPiAtwqDCoMKg
-wqDCoMKgwqDCoHZhbHVlID0gVFBNX1BBU1NUSFJPVUdIX0RFRkFVTFRfREVWSUNFOw0KPiA+ICvC
-oMKgwqDCoGlmICh2YWx1ZSkgew0KPiA+ICvCoMKgwqDCoMKgwqDCoMKgdHBtX3B0LT5vcHRpb25z
-LT5oYXNfcGF0aCA9IHRydWU7DQo+ID4gK8KgwqDCoMKgwqDCoMKgwqB0cG1fcHQtPm9wdGlvbnMt
-PnBhdGggPSBnX3N0cmR1cCh2YWx1ZSk7DQo+ID4gwqDCoMKgwqDCoH0NCj4gPiANCj4gPiAtwqDC
-oMKgwqB0cG1fcHQtPnRwbV9kZXYgPSBnX3N0cmR1cCh2YWx1ZSk7DQo+ID4gLQ0KPiA+IC3CoMKg
-wqDCoHRiLT5wYXRoID0gZ19zdHJkdXAodHBtX3B0LT50cG1fZGV2KTsNCj4gPiAtDQo+ID4gK8Kg
-wqDCoMKgdHBtX3B0LT50cG1fZGV2ID0gdmFsdWUgPyB2YWx1ZSA6DQo+ID4gVFBNX1BBU1NUSFJP
-VUdIX0RFRkFVTFRfREVWSUNFOw0KPiBJc24ndCB0aGF0IGR1cGxpY2F0ZWQgd2l0aCB0cG1fcHQt
-Pm9wdGlvbnMtPnBhdGggPyBBbmQgZGlmZmVyZW50DQo+IHZhbHVlcy4uLg0KVGhpcyBpcyBpbnRl
-bnRpb25hbCwgb3B0aW9ucy0+cGF0aCBob2xkcyB0aGUgY29uZmlndXJhdGlvbiB2YWx1ZSwgd2hl
-cmUNCmFzIHRwbV9kZXYgcG9pbnRzIHRoZSByZWFsIGRldmljZSBwYXRoIHVzZWQuDQo+IA0KPiA+
-IA0KPiA+IMKgwqDCoMKgwqB0cG1fcHQtPnRwbV9mZCA9IHFlbXVfb3Blbih0cG1fcHQtPnRwbV9k
-ZXYsIE9fUkRXUik7DQo+ID4gwqDCoMKgwqDCoGlmICh0cG1fcHQtPnRwbV9mZCA8IDApIHsNCj4g
-PiDCoMKgwqDCoMKgwqDCoMKgwqBlcnJvcl9yZXBvcnQoIkNhbm5vdCBhY2Nlc3MgVFBNIGRldmlj
-ZSB1c2luZyAnJXMnOiAlcyIsDQo+ID4gQEAgLTM4MiwxMCArMzgzLDggQEAgc3RhdGljIGludA0K
-PiA+IHRwbV9wYXNzdGhyb3VnaF9oYW5kbGVfZGV2aWNlX29wdHMoUWVtdU9wdHMgKm9wdHMsIFRQ
-TUJhY2tlbmQgKnRiKQ0KPiA+IMKgwqDCoMKgwqB0cG1fcHQtPnRwbV9mZCA9IC0xOw0KPiA+IA0K
-PiA+IMKgIGVycl9mcmVlX3BhcmFtZXRlcnM6DQo+ID4gLcKgwqDCoMKgZ19mcmVlKHRiLT5wYXRo
-KTsNCj4gPiAtwqDCoMKgwqB0Yi0+cGF0aCA9IE5VTEw7DQo+ID4gLQ0KPiA+IC3CoMKgwqDCoGdf
-ZnJlZSh0cG1fcHQtPnRwbV9kZXYpOw0KPiA+ICvCoMKgwqDCoHFhcGlfZnJlZV9UUE1QYXNzdGhy
-b3VnaE9wdGlvbnModHBtX3B0LT5vcHRpb25zKTsNCj4gPiArwqDCoMKgwqB0cG1fcHQtPm9wdGlv
-bnMgPSBOVUxMOw0KPiA+IMKgwqDCoMKgwqB0cG1fcHQtPnRwbV9kZXYgPSBOVUxMOw0KPiA+IA0K
-PiA+IMKgwqDCoMKgwqByZXR1cm4gMTsNCj4gPiBAQCAtNDAzLDcgKzQwMiw3IEBAIHN0YXRpYyBU
-UE1CYWNrZW5kDQo+ID4gKnRwbV9wYXNzdGhyb3VnaF9jcmVhdGUoUWVtdU9wdHMgKm9wdHMsIGNv
-bnN0IGNoYXIgKmlkKQ0KPiA+IMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gZXJyX2V4aXQ7DQo+ID4g
-wqDCoMKgwqDCoH0NCj4gPiANCj4gPiAtwqDCoMKgwqB0cG1fcHQtPmNhbmNlbF9mZCA9IHRwbV9w
-YXNzdGhyb3VnaF9vcGVuX3N5c2ZzX2NhbmNlbCh0Yik7DQo+ID4gK8KgwqDCoMKgdHBtX3B0LT5j
-YW5jZWxfZmQgPSB0cG1fcGFzc3Rocm91Z2hfb3Blbl9zeXNmc19jYW5jZWwodHBtX3B0KTsNCj4g
-PiDCoMKgwqDCoMKgaWYgKHRwbV9wdC0+Y2FuY2VsX2ZkIDwgMCkgew0KPiA+IMKgwqDCoMKgwqDC
-oMKgwqDCoGdvdG8gZXJyX2V4aXQ7DQo+ID4gwqDCoMKgwqDCoH0NCj4gPiBAQCAtNDE2LDYgKzQx
-NSwzMSBAQCBlcnJfZXhpdDoNCj4gPiDCoMKgwqDCoMKgcmV0dXJuIE5VTEw7DQo+ID4gwqB9DQo+
-ID4gDQo+ID4gK3N0YXRpYyBUcG1UeXBlT3B0aW9ucyAqdHBtX3Bhc3N0aHJvdWdoX2dldF90cG1f
-b3B0aW9ucyhUUE1CYWNrZW5kDQo+ID4gKnRiKQ0KPiA+ICt7DQo+ID4gK8KgwqDCoMKgVFBNUGFz
-c3RocnVTdGF0ZSAqdHBtX3B0ID0gVFBNX1BBU1NUSFJPVUdIKHRiKTsNCj4gPiArwqDCoMKgwqBU
-cG1UeXBlT3B0aW9ucyAqb3B0aW9ucyA9IE5VTEw7DQo+ID4gK8KgwqDCoMKgVFBNUGFzc3Rocm91
-Z2hPcHRpb25zICpwb3B0aW9ucyA9IE5VTEw7DQo+ID4gKw0KPiA+ICvCoMKgwqDCoHBvcHRpb25z
-ID0gZ19uZXcwKFRQTVBhc3N0aHJvdWdoT3B0aW9ucywgMSk7DQo+ID4gKw0KPiA+ICvCoMKgwqDC
-oGlmICh0cG1fcHQtPm9wdGlvbnMtPmhhc19wYXRoKSB7DQo+ID4gK8KgwqDCoMKgwqDCoMKgwqBw
-b3B0aW9ucy0+aGFzX3BhdGggPSB0cnVlOw0KPiA+ICvCoMKgwqDCoMKgwqDCoMKgcG9wdGlvbnMt
-PnBhdGggPSBnX3N0cmR1cCh0cG1fcHQtPm9wdGlvbnMtPnBhdGgpOw0KPiA+ICvCoMKgwqDCoH0N
-Cj4gPiArDQo+ID4gK8KgwqDCoMKgaWYgKHRwbV9wdC0+b3B0aW9ucy0+aGFzX2NhbmNlbF9wYXRo
-KSB7DQo+ID4gK8KgwqDCoMKgwqDCoMKgwqBwb3B0aW9ucy0+aGFzX2NhbmNlbF9wYXRoID0gdHJ1
-ZTsNCj4gPiArwqDCoMKgwqDCoMKgwqDCoHBvcHRpb25zLT5jYW5jZWxfcGF0aCA9IGdfc3RyZHVw
-KHRwbV9wdC0+b3B0aW9ucy0NCj4gPiA+Y2FuY2VsX3BhdGgpOw0KPiA+ICvCoMKgwqDCoH0NCj4g
-PiArDQo+IFRoYXQgbG9va3MgbGlrZSBhIGpvYiBmb3IgUUFQSV9DTE9ORS4NCk9rLCBJIHdhcyBu
-b3Qga25vd2luZyB0aGlzLCBUaGFua3MgZm9yIHBvaW50aW5nIGl0LiBJIHdpbGwgZml4Lg0KDQoN
-Ci0gQW1hcm5hdGg=
+If hotplug memory during migration, the calculation of migration_dirty_pages
+maybe incorrect, should fixed as below,
+
+-void migration_bitmap_extend(ram_addr_t old, ram_addr_t new)
++void migration_bitmap_extend(RAMBlock *block, ram_addr_t old, ram_addr_t new)
+{
+    /* called in qemu main thread, so there is
+     * no writing race against this migration_bitmap
+     */
+-    if (migration_bitmap_rcu) {
++    if (migration_bitmap_rcu && (!migrate_bypass_shared_memory() || !qemu_ram_is_shared(block))) {
+        struct BitmapRcu *old_bitmap = migration_bitmap_rcu, *bitmap;
+        bitmap = g_new(struct BitmapRcu, 1);
+
+On 2016/8/10 8:54, Lai Jiangshan wrote:
+> When the migration capability 'bypass-shared-memory'
+> is set, the shared memory will be bypassed when migration.
+> 
+> It is the key feature to enable several excellent features for
+> the qemu, such as qemu-local-migration, qemu-live-update,
+> extremely-fast-save-restore, vm-template, vm-fast-live-clone,
+> yet-another-post-copy-migration, etc..
+> 
+> The philosophy behind this key feature and the advanced
+> key features is that a part of the memory management is
+> separated out from the qemu, and let the other toolkits
+> such as libvirt, runv(https://github.com/hyperhq/runv/)
+> or the next qemu-cmd directly access to it, manage it,
+> provide features to it.
+> 
+> The hyperhq(http://hyper.sh  http://hypercontainer.io/)
+> introduced the feature vm-template(vm-fast-live-clone)
+> to the hyper container for several months, it works perfect.
+> (see https://github.com/hyperhq/runv/pull/297)
+> 
+> The feature vm-template makes the containers(VMs) can
+> be started in 130ms and save 80M memory for every
+> container(VM). So that the hyper containers are fast
+> and high-density as normal containers.
+> 
+> In current qemu command line, shared memory has
+> to be configured via memory-object. Anyone can add a
+> -mem-path-share to the qemu command line for combining
+> with -mem-path for this feature. This patch doesn’t include
+> this change of -mem-path-share.
+> 
+> Advanced features:
+> 1) qemu-local-migration, qemu-live-update
+> Set the mem-path on the tmpfs and set share=on for it when
+> start the vm. example:
+> -object \
+> memory-backend-file,id=mem,size=128M,mem-path=/dev/shm/memory,share=on \
+> -numa node,nodeid=0,cpus=0-7,memdev=mem
+> 
+> when you want to migrate the vm locally (after fixed a security bug
+> of the qemu-binary, or other reason), you can start a new qemu with
+> the same command line and -incoming, then you can migrate the
+> vm from the old qemu to the new qemu with the migration capability
+> 'bypass-shared-memory' set. The migration will migrate the device-state
+> *ONLY*, the memory is the origin memory backed by tmpfs file.
+> 
+> 2) extremely-fast-save-restore
+> the same above, but the mem-path is on the persistent file system.
+> 
+> 3)  vm-template, vm-fast-live-clone
+> the template vm is started as 1), and paused when the guest reaches
+> the template point(example: the guest app is ready), then the template
+> vm is saved. (the qemu process of the template can be killed now, because
+> we need only the memory and the device state files (in tmpfs)).
+> 
+> Then we can launch one or multiple VMs base on the template vm states,
+> the new VMs are started without the “share=on”, all the new VMs share
+> the initial memory from the memory file, they save a lot of memory.
+> all the new VMs start from the template point, the guest app can go to
+> work quickly.
+> 
+> The new VM booted from template vm can’t become template again,
+> if you need this unusual chained-template feature, you can write
+> a cloneable-tmpfs kernel module for it.
+> 
+> The libvirt toolkit can’t manage vm-template currently, in the
+> hyperhq/runv, we use qemu wrapper script to do it. I hope someone add
+> “libvrit managed template” feature to libvirt.
+> 
+> 4) yet-another-post-copy-migration
+> It is a possible feature, no toolkit can do it well now.
+> Using nbd server/client on the memory file is reluctantly Ok but
+> inconvenient. A special feature for tmpfs might be needed to
+> fully complete this feature.
+> No one need yet another post copy migration method,
+> but it is possible when some crazy man need it.
+> 
+> Changed from v1:
+>    fix style
+> 
+> Signed-off-by: Lai Jiangshan <jiangshanlai@gmail.com>
+> ---
+>  exec.c                        |  5 +++++
+>  include/exec/cpu-common.h     |  1 +
+>  include/migration/migration.h |  1 +
+>  migration/migration.c         |  9 +++++++++
+>  migration/ram.c               | 37 ++++++++++++++++++++++++++++---------
+>  qapi-schema.json              |  6 +++++-
+>  qmp-commands.hx               |  3 +++
+>  7 files changed, 52 insertions(+), 10 deletions(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index 8ffde75..888919a 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1402,6 +1402,11 @@ static void qemu_ram_setup_dump(void *addr, ram_addr_t size)
+>      }
+>  }
+>  
+> +bool qemu_ram_is_shared(RAMBlock *rb)
+> +{
+> +    return rb->flags & RAM_SHARED;
+> +}
+> +
+>  const char *qemu_ram_get_idstr(RAMBlock *rb)
+>  {
+>      return rb->idstr;
+> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+> index 952bcfe..7c18db9 100644
+> --- a/include/exec/cpu-common.h
+> +++ b/include/exec/cpu-common.h
+> @@ -58,6 +58,7 @@ RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
+>  void qemu_ram_set_idstr(RAMBlock *block, const char *name, DeviceState *dev);
+>  void qemu_ram_unset_idstr(RAMBlock *block);
+>  const char *qemu_ram_get_idstr(RAMBlock *rb);
+> +bool qemu_ram_is_shared(RAMBlock *rb);
+>  
+>  void cpu_physical_memory_rw(hwaddr addr, uint8_t *buf,
+>                              int len, int is_write);
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index 3c96623..080b6b2 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -290,6 +290,7 @@ void migrate_add_blocker(Error *reason);
+>   */
+>  void migrate_del_blocker(Error *reason);
+>  
+> +bool migrate_bypass_shared_memory(void);
+>  bool migrate_postcopy_ram(void);
+>  bool migrate_zero_blocks(void);
+>  
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 955d5ee..c87d136 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1189,6 +1189,15 @@ void qmp_migrate_set_downtime(double value, Error **errp)
+>      max_downtime = (uint64_t)value;
+>  }
+>  
+> +bool migrate_bypass_shared_memory(void)
+> +{
+> +    MigrationState *s;
+> +
+> +    s = migrate_get_current();
+> +
+> +    return s->enabled_capabilities[MIGRATION_CAPABILITY_BYPASS_SHARED_MEMORY];
+> +}
+> +
+>  bool migrate_postcopy_ram(void)
+>  {
+>      MigrationState *s;
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 815bc0e..f7c4081 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -605,6 +605,28 @@ static void migration_bitmap_sync_init(void)
+>      num_dirty_pages_period = 0;
+>      xbzrle_cache_miss_prev = 0;
+>      iterations_prev = 0;
+> +    migration_dirty_pages = 0;
+
+This initialization is not necessary.
+
+> +}
+> +
+> +static void migration_bitmap_init(unsigned long *bitmap)
+> +{
+> +    RAMBlock *block;
+> +
+> +    bitmap_clear(bitmap, 0, last_ram_offset() >> TARGET_PAGE_BITS);
+> +    rcu_read_lock();
+> +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> +        if (!migrate_bypass_shared_memory() || !qemu_ram_is_shared(block)) {
+> +            bitmap_set(bitmap, block->offset >> TARGET_PAGE_BITS,
+> +                       block->used_length >> TARGET_PAGE_BITS);
+> +
+> +            /*
+> +             * Count the total number of pages used by ram blocks not including
+> +             * any gaps due to alignment or unplugs.
+> +             */
+> +            migration_dirty_pages += block->used_length >> TARGET_PAGE_BITS;
+> +        }
+> +    }
+> +    rcu_read_unlock();
+>  }
+>  
+>  static void migration_bitmap_sync(void)
+> @@ -631,7 +653,9 @@ static void migration_bitmap_sync(void)
+>      qemu_mutex_lock(&migration_bitmap_mutex);
+>      rcu_read_lock();
+>      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> -        migration_bitmap_sync_range(block->offset, block->used_length);
+> +        if (!migrate_bypass_shared_memory() || !qemu_ram_is_shared(block)) {
+> +            migration_bitmap_sync_range(block->offset, block->used_length);
+> +        }
+>      }
+>      rcu_read_unlock();
+>      qemu_mutex_unlock(&migration_bitmap_mutex);
+> @@ -1926,19 +1950,14 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
+>      ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
+>      migration_bitmap_rcu = g_new0(struct BitmapRcu, 1);
+>      migration_bitmap_rcu->bmap = bitmap_new(ram_bitmap_pages);
+> -    bitmap_set(migration_bitmap_rcu->bmap, 0, ram_bitmap_pages);
+> +    migration_bitmap_init(migration_bitmap_rcu->bmap);
+>  
+>      if (migrate_postcopy_ram()) {
+>          migration_bitmap_rcu->unsentmap = bitmap_new(ram_bitmap_pages);
+> -        bitmap_set(migration_bitmap_rcu->unsentmap, 0, ram_bitmap_pages);
+> +        bitmap_copy(migration_bitmap_rcu->unsentmap,
+> +                    migration_bitmap_rcu->bmap, ram_bitmap_pages);
+>      }
+>  
+> -    /*
+> -     * Count the total number of pages used by ram blocks not including any
+> -     * gaps due to alignment or unplugs.
+> -     */
+> -    migration_dirty_pages = ram_bytes_total() >> TARGET_PAGE_BITS;
+> -
+>      memory_global_dirty_log_start();
+>      migration_bitmap_sync();
+>      qemu_mutex_unlock_ramlist();
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 5658723..453e6d9 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -553,11 +553,15 @@
+>  #          been migrated, pulling the remaining pages along as needed. NOTE: If
+>  #          the migration fails during postcopy the VM will fail.  (since 2.6)
+>  #
+> +# @bypass-shared-memory: the shared memory region will be bypassed on migration.
+> +#          This feature allows the memory region to be reused by new qemu(s)
+> +#          or be migrated separately. (since 2.8)
+> +#
+>  # Since: 1.2
+>  ##
+>  { 'enum': 'MigrationCapability',
+>    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
+> -           'compress', 'events', 'postcopy-ram'] }
+> +           'compress', 'events', 'postcopy-ram', 'bypass-shared-memory'] }
+>  
+>  ##
+>  # @MigrationCapabilityStatus
+> diff --git a/qmp-commands.hx b/qmp-commands.hx
+> index c8d360a..c31152c 100644
+> --- a/qmp-commands.hx
+> +++ b/qmp-commands.hx
+> @@ -3723,6 +3723,7 @@ Enable/Disable migration capabilities
+>  - "compress": use multiple compression threads to accelerate live migration
+>  - "events": generate events for each migration state change
+>  - "postcopy-ram": postcopy mode for live migration
+> +- "bypass-shared-memory": bypass shared memory region
+>  
+>  Arguments:
+>  
+> @@ -3753,6 +3754,7 @@ Query current migration capabilities
+>           - "compress": Multiple compression threads state (json-bool)
+>           - "events": Migration state change event state (json-bool)
+>           - "postcopy-ram": postcopy ram state (json-bool)
+> +         - "bypass-shared-memory": bypass shared memory state (json-bool)
+>  
+>  Arguments:
+>  
+> @@ -3767,6 +3769,7 @@ Example:
+>       {"state": false, "capability": "compress"},
+>       {"state": true, "capability": "events"},
+>       {"state": false, "capability": "postcopy-ram"}
+> +     {"state": false, "capability": "bypass-shared-memory"}
+>     ]}
+>  
+>  EQMP
+> 
