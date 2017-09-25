@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dwRZp-0007wL-4T
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:29:30 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dwRZr-0007wW-2F
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:29:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dwRZl-0001z4-VM
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:29:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50134)
+	(envelope-from <dgilbert@redhat.com>) id 1dwRZq-000215-AJ
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:29:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50412)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dwRZl-0001yg-N4
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:29:25 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dwRZq-00020i-1g
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:29:30 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 25 Sep 2017 12:29:11 +0100
-Message-Id: <20170925112917.21340-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/6] migration: let pre_save fail
+Date: Mon, 25 Sep 2017 12:29:13 +0100
+Message-Id: <20170925112917.21340-3-dgilbert@redhat.com>
+In-Reply-To: <20170925112917.21340-1-dgilbert@redhat.com>
+References: <20170925112917.21340-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 2/6] migration: check pre_save return in
+ vmstate_save_state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,102 +29,79 @@ Cc: peter.maydell@linaro.org, cohuck@redhat.com, rth@twiddle.net
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-At the moment the pre-save method on VMStateDescription returns void
-which means there's no sane way of a pre_save routine failing.  There
-are quite a few pre_save's that abort or do other nasty things, and it
-would be better if they could fail cleanly.
-
-This patch series doesn't fix any of those pre_save's - it just changes
-pre_save to return an error value and routes that back up so the
-migration fails.  I'll leave that up to the individual device owners.
-
-There are a bunch of corner cases that I've not fixed yet;  these are
-mostly places that call vmstate_save_state which have been partially
-converted to modern migration code;  often the functions they're called
-from return void as well - they can get fixed later.
+Check the return value of pre_save state and fail vmstate_save_state
+if the pre_save failed.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ include/migration/vmstate.h |  4 ++--
+ migration/trace-events      |  1 +
+ migration/vmstate.c         | 12 ++++++++++--
+ 3 files changed, 13 insertions(+), 4 deletions(-)
 
-v2
-  test: Split assert/side effects [Fam]
-  new patch 3: Changed to also check the return of the ->put methods
-    that should have been checked previously. [Peter]
-
-Dr. David Alan Gilbert (6):
-  migration: pre_save return int
-  migration: check pre_save return in vmstate_save_state
-  migration: Check field save returns
-  migration: wire vmstate_save_state errors up to
-    vmstate_subsection_save
-  migration: Route errors up through vmstate_save
-  migration: Route more error paths
-
- docs/devel/migration.txt       |  2 +-
- hw/arm/pxa2xx.c                |  4 +++-
- hw/arm/strongarm.c             |  4 +++-
- hw/audio/wm8750.c              |  4 +++-
- hw/block/fdc.c                 |  4 +++-
- hw/block/m25p80.c              |  4 +++-
- hw/block/nand.c                |  4 +++-
- hw/block/onenand.c             |  4 +++-
- hw/char/serial.c               |  4 +++-
- hw/display/qxl.c               |  4 +++-
- hw/display/virtio-gpu.c        |  4 +---
- hw/i2c/core.c                  |  4 +++-
- hw/i386/kvm/clock.c            |  4 +++-
- hw/ide/core.c                  |  4 +++-
- hw/ide/pci.c                   |  4 +++-
- hw/input/ps2.c                 |  8 ++++++--
- hw/input/tsc210x.c             |  4 +++-
- hw/intc/apic_common.c          |  4 +++-
- hw/intc/arm_gic_common.c       |  4 +++-
- hw/intc/arm_gicv3_common.c     |  4 +++-
- hw/intc/arm_gicv3_its_common.c |  4 +++-
- hw/intc/i8259_common.c         |  4 +++-
- hw/intc/ioapic_common.c        |  4 +++-
- hw/intc/s390_flic_kvm.c        |  6 ++++--
- hw/intc/xics.c                 |  8 ++++++--
- hw/net/e1000.c                 |  4 +++-
- hw/net/e1000e.c                |  4 +++-
- hw/net/rtl8139.c               |  4 +++-
- hw/net/virtio-net.c            | 16 ++++++++++++----
- hw/net/vmxnet3.c               |  4 +++-
- hw/pci-host/piix.c             |  4 +++-
- hw/ppc/ppc.c                   |  4 +++-
- hw/ppc/spapr_iommu.c           |  4 +++-
- hw/ppc/spapr_pci.c             |  6 ++++--
- hw/s390x/css.c                 | 10 +++++++---
- hw/s390x/virtio-ccw.c          |  4 +++-
- hw/scsi/lsi53c895a.c           |  4 +++-
- hw/scsi/vmw_pvscsi.c           |  4 +++-
- hw/timer/cadence_ttc.c         |  4 +++-
- hw/timer/hpet.c                |  4 +++-
- hw/timer/i8254_common.c        |  4 +++-
- hw/timer/mc146818rtc.c         |  4 +++-
- hw/timer/pl031.c               |  4 +++-
- hw/timer/twl92230.c            |  4 +++-
- hw/usb/dev-smartcard-reader.c  |  4 +++-
- hw/usb/hcd-ehci.c              |  4 +++-
- hw/usb/redirect.c              |  4 +++-
- hw/virtio/vhost-vsock.c        |  4 +++-
- hw/virtio/virtio.c             | 13 +++++++------
- include/hw/virtio/virtio.h     |  2 +-
- include/migration/vmstate.h    |  6 +++---
- migration/colo-comm.c          |  4 +++-
- migration/global_state.c       |  4 +++-
- migration/savevm.c             | 23 ++++++++++++++++------
- migration/trace-events         |  1 +
- migration/vmstate-types.c      | 11 ++++++++---
- migration/vmstate.c            | 43 +++++++++++++++++++++++++++++++-----------
- replay/replay-snapshot.c       |  4 +++-
- slirp/slirp.c                  |  8 ++++++--
- target/arm/machine.c           |  4 +++-
- target/i386/machine.c          |  7 +++++--
- target/ppc/machine.c           |  4 +++-
- target/s390x/machine.c         |  4 +++-
- target/sparc/machine.c         |  4 +++-
- tests/test-vmstate.c           | 13 +++++++++----
- 65 files changed, 271 insertions(+), 104 deletions(-)
-
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index da46b1a36d..88b55df5ae 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -994,8 +994,8 @@ extern const VMStateInfo vmstate_info_qtailq;
+ 
+ int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
+                        void *opaque, int version_id);
+-void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
+-                        void *opaque, QJSON *vmdesc);
++int vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
++                       void *opaque, QJSON *vmdesc);
+ 
+ bool vmstate_save_needed(const VMStateDescription *vmsd, void *opaque);
+ 
+diff --git a/migration/trace-events b/migration/trace-events
+index d2910a6e7b..6f29fcc686 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -40,6 +40,7 @@ savevm_state_iterate(void) ""
+ savevm_state_cleanup(void) ""
+ savevm_state_complete_precopy(void) ""
+ vmstate_save(const char *idstr, const char *vmsd_name) "%s, %s"
++vmstate_save_state_pre_save_res(const char *name, int res) "%s/%d"
+ vmstate_save_state_loop(const char *name, const char *field, int n_elems) "%s/%s[%d]"
+ vmstate_save_state_top(const char *idstr) "%s"
+ vmstate_subsection_save_loop(const char *name, const char *sub) "%s/%s"
+diff --git a/migration/vmstate.c b/migration/vmstate.c
+index 3226e8eb45..ae8abd3c32 100644
+--- a/migration/vmstate.c
++++ b/migration/vmstate.c
+@@ -308,15 +308,21 @@ bool vmstate_save_needed(const VMStateDescription *vmsd, void *opaque)
+ }
+ 
+ 
+-void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
++int vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
+                         void *opaque, QJSON *vmdesc)
+ {
++    int ret = 0;
+     VMStateField *field = vmsd->fields;
+ 
+     trace_vmstate_save_state_top(vmsd->name);
+ 
+     if (vmsd->pre_save) {
+-        vmsd->pre_save(opaque);
++        ret = vmsd->pre_save(opaque);
++        trace_vmstate_save_state_pre_save_res(vmsd->name, ret);
++        if (ret) {
++            error_report("pre-save failed: %s", vmsd->name);
++            return ret;
++        }
+     }
+ 
+     if (vmdesc) {
+@@ -381,6 +387,8 @@ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
+     }
+ 
+     vmstate_subsection_save(f, vmsd, opaque, vmdesc);
++
++    return 0;
+ }
+ 
+ static const VMStateDescription *
 -- 
 2.13.5
