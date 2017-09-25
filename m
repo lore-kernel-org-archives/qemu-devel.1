@@ -1,20 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dwUnN-0005YP-SV
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:55:42 -0400
+	(envelope-from <eblake@redhat.com>) id 1dwUnb-0005gF-NI
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:55:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dwUnI-000313-NR
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:55:41 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:28024 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dwUnI-00030F-BL
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:55:36 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 25 Sep 2017 17:55:29 +0300
-Message-Id: <20170925145529.188686-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH] iotests: fix 181: enable postcopy-ram
- capability on target
+	(envelope-from <eblake@redhat.com>) id 1dwUna-00037V-Di
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:55:55 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 25 Sep 2017 09:55:06 -0500
+Message-Id: <20170925145526.32690-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v10 00/20] make dirty-bitmap byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,61 +17,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com
-Cc: quintela@redhat.com, dgilbert@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-Migration capabilities should be enabled on both source and
-destination qemu processes.
+There are patches floating around to add NBD_CMD_BLOCK_STATUS,
+but NBD wants to report status on byte granularity (even if the
+reporting will probably be naturally aligned to sectors or even
+much higher levels).  I've therefore started the task of
+converting our block status code to report at a byte granularity
+rather than sectors.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
+Now that 2.11 is open, I'm rebasing/reposting the remaining patches.
 
-Hi all.
+The overall conversion currently looks like:
+part 1: bdrv_is_allocated (merged in 2.10, commit 51b0a488)
+part 2: dirty-bitmap (this series, v9 was here [1])
+part 3: bdrv_get_block_status (v4 is posted [2] and is mostly reviewed)
+part 4: .bdrv_co_block_status (v3 is posted [3], but needs review)
 
-After my patch
+Available as a tag at:
+git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-dirty-v10
 
-    commit 58110f0acb1a33e2bc60a2f1b26d2690a92e8a14
-    Author: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-    Date:   Mon Jul 10 19:30:16 2017 +0300
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg05387.html
+[2] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03543.html
+[3] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03812.html
 
-        migration: split common postcopy out of ram postcopy
+Since v9:
+- another try at patch 5 [John]
+- add R-b where appropriate
 
-test 181 becomes broken. Sorry for that.
+001/20:[----] [--] 'block: Make bdrv_img_create() size selection easier to read'
+002/20:[----] [--] 'hbitmap: Rename serialization_granularity to serialization_align'
+003/20:[----] [--] 'qcow2: Ensure bitmap serialization is aligned'
+004/20:[----] [--] 'dirty-bitmap: Drop unused functions'
+005/20:[0003] [FC] 'dirty-bitmap: Avoid size query failure during truncate'
+006/20:[----] [--] 'dirty-bitmap: Change bdrv_dirty_bitmap_size() to report bytes'
+007/20:[----] [--] 'dirty-bitmap: Track bitmap size by bytes'
+008/20:[----] [--] 'dirty-bitmap: Change bdrv_dirty_bitmap_*serialize*() to take bytes'
+009/20:[----] [--] 'qcow2: Switch sectors_covered_by_bitmap_cluster() to byte-based'
+010/20:[----] [--] 'dirty-bitmap: Set iterator start by offset, not sector'
+011/20:[----] [--] 'dirty-bitmap: Change bdrv_dirty_iter_next() to report byte offset'
+012/20:[----] [--] 'dirty-bitmap: Change bdrv_get_dirty_count() to report bytes'
+013/20:[----] [--] 'dirty-bitmap: Change bdrv_get_dirty_locked() to take bytes'
+014/20:[----] [--] 'dirty-bitmap: Change bdrv_[re]set_dirty_bitmap() to use bytes'
+015/20:[----] [--] 'mirror: Switch mirror_dirty_init() to byte-based iteration'
+016/20:[----] [--] 'qcow2: Switch qcow2_measure() to byte-based iteration'
+017/20:[----] [--] 'qcow2: Switch load_bitmap_data() to byte-based iteration'
+018/20:[----] [--] 'qcow2: Switch store_bitmap_data() to byte-based iteration'
+019/20:[----] [--] 'dirty-bitmap: Switch bdrv_set_dirty() to bytes'
+020/20:[----] [--] 'dirty-bitmap: Convert internal hbitmap size/granularity'
 
-Actually, test 181 itself should be fixed, so, here is a fix.
-The problem was noted by Kevin, and it touches also some problems
-with image locking, which I don't see with my older kernel, so,
-please check is this patch fixes all problems.
+Eric Blake (20):
+  block: Make bdrv_img_create() size selection easier to read
+  hbitmap: Rename serialization_granularity to serialization_align
+  qcow2: Ensure bitmap serialization is aligned
+  dirty-bitmap: Drop unused functions
+  dirty-bitmap: Avoid size query failure during truncate
+  dirty-bitmap: Change bdrv_dirty_bitmap_size() to report bytes
+  dirty-bitmap: Track bitmap size by bytes
+  dirty-bitmap: Change bdrv_dirty_bitmap_*serialize*() to take bytes
+  qcow2: Switch sectors_covered_by_bitmap_cluster() to byte-based
+  dirty-bitmap: Set iterator start by offset, not sector
+  dirty-bitmap: Change bdrv_dirty_iter_next() to report byte offset
+  dirty-bitmap: Change bdrv_get_dirty_count() to report bytes
+  dirty-bitmap: Change bdrv_get_dirty_locked() to take bytes
+  dirty-bitmap: Change bdrv_[re]set_dirty_bitmap() to use bytes
+  mirror: Switch mirror_dirty_init() to byte-based iteration
+  qcow2: Switch qcow2_measure() to byte-based iteration
+  qcow2: Switch load_bitmap_data() to byte-based iteration
+  qcow2: Switch store_bitmap_data() to byte-based iteration
+  dirty-bitmap: Switch bdrv_set_dirty() to bytes
+  dirty-bitmap: Convert internal hbitmap size/granularity
 
- tests/qemu-iotests/181     | 2 ++
- tests/qemu-iotests/181.out | 1 -
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ include/block/block_int.h    |   2 +-
+ include/block/dirty-bitmap.h |  43 ++++++--------
+ include/qemu/hbitmap.h       |   8 +--
+ block/io.c                   |   6 +-
+ block.c                      |  18 ++++--
+ block/backup.c               |   7 +--
+ block/dirty-bitmap.c         | 134 ++++++++++++++-----------------------------
+ block/mirror.c               |  79 +++++++++++--------------
+ block/qcow2-bitmap.c         |  62 +++++++++++---------
+ block/qcow2.c                |  22 ++++---
+ migration/block.c            |  12 ++--
+ tests/test-hbitmap.c         |  10 ++--
+ util/hbitmap.c               |   8 +--
+ tests/qemu-iotests/165       |   2 +-
+ 14 files changed, 174 insertions(+), 239 deletions(-)
 
-diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
-index 0333dda0e3..0c91e8f9de 100755
---- a/tests/qemu-iotests/181
-+++ b/tests/qemu-iotests/181
-@@ -93,7 +93,9 @@ echo
- 
- # Slow down migration so much that it definitely won't finish before we can
- # switch to postcopy
-+# Enable postcopy-ram capability both on source and destination
- silent=yes
-+_send_qemu_cmd $dest 'migrate_set_capability postcopy-ram on' "(qemu)"
- _send_qemu_cmd $src 'migrate_set_speed 4k' "(qemu)"
- _send_qemu_cmd $src 'migrate_set_capability postcopy-ram on' "(qemu)"
- _send_qemu_cmd $src "migrate -d unix:${MIG_SOCKET}" "(qemu)"
-diff --git a/tests/qemu-iotests/181.out b/tests/qemu-iotests/181.out
-index 6534ba2a76..d58c6a9dab 100644
---- a/tests/qemu-iotests/181.out
-+++ b/tests/qemu-iotests/181.out
-@@ -20,7 +20,6 @@ read 65536/65536 bytes at offset 0
- 
- === Do some I/O on the destination ===
- 
--QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) qemu-io disk "read -P 0x55 0 64k"
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
 -- 
-2.11.1
+2.13.5
