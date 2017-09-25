@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dwLyE-0004ns-8l
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 01:30:19 -0400
+	(envelope-from <thuth@redhat.com>) id 1dwM2X-00061x-V5
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 01:34:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dwLy9-00022h-C0
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 01:30:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47848)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dwLy9-00021l-68
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 01:30:13 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E5BB385550
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 05:30:11 +0000 (UTC)
-Date: Mon, 25 Sep 2017 13:30:02 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170925053002.GA398@lemon.lan>
-References: <1506070572-7549-1-git-send-email-peterx@redhat.com>
-	<1506070572-7549-4-git-send-email-peterx@redhat.com>
-	<20170922130922.GF32000@lemon>
-	<20170925052330.GC19505@pxdev.xzpeter.org>
+	(envelope-from <thuth@redhat.com>) id 1dwM2T-00045c-0H
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 01:34:45 -0400
+References: <20170922154014.29350-1-f4bug@amsat.org>
+	<20170922160111.31885-7-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <5ed69cad-69b8-888d-39e6-e99004cbe053@redhat.com>
+Date: Mon, 25 Sep 2017 07:34:32 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170925052330.GC19505@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH 3/3] iothread: delay the context release to
- finalize
+In-Reply-To: <20170922160111.31885-7-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 29/34] hw/net/e1000e: use TYPE_PCI_E1000E
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,26 +24,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On Mon, 09/25 13:23, Peter Xu wrote:
-> On Fri, Sep 22, 2017 at 09:09:22PM +0800, Fam Zheng wrote:
-> > On Fri, 09/22 16:56, Peter Xu wrote:
-> > > When gcontext is used with iothread, the context will be destroyed
-> > > during iothread_stop().  That's not good since sometimes we would like
-> > > to keep the resources until iothread is destroyed, but we may want to
-> > > stop the thread before that point.
-> > 
-> > Would be nice if you can also mention the glib bug that "required" this in the
-> > commit message.
-> 
-> I can add it, but I am not sure it's very closely related (and I'm
-> afraid that may confuse more people).  Say, even without that bug, I
-> would still think it not a good idea to free the context in the loop,
-> especially considering that we have the finalize function there.  Thanks,
+On 22.09.2017 18:01, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  include/hw/net/pci.h | 1 +
+>  hw/net/e1000e.c      | 6 +++---
+>  2 files changed, 4 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/include/hw/net/pci.h b/include/hw/net/pci.h
+> index b24b5257a5..92111f86f3 100644
+> --- a/include/hw/net/pci.h
+> +++ b/include/hw/net/pci.h
+> @@ -14,6 +14,7 @@
+>  #include "hw/pci/pci_bus.h"
+> =20
+>  #define TYPE_PCI_E1000      "e1000"
+> +#define TYPE_PCI_E1000E     "e1000e"
+> =20
+>  PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,
+>                                 const char *default_model,
+> diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
+> index 6c42b4478c..494f8cced6 100644
+> --- a/hw/net/e1000e.c
+> +++ b/hw/net/e1000e.c
+> @@ -40,6 +40,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "hw/pci/msi.h"
+>  #include "hw/pci/msix.h"
+> +#include "hw/net/pci.h"
+> =20
+>  #include "hw/net/e1000_regs.h"
+> =20
+> @@ -49,8 +50,7 @@
+>  #include "trace.h"
+>  #include "qapi/error.h"
+> =20
+> -#define TYPE_E1000E "e1000e"
+> -#define E1000E(obj) OBJECT_CHECK(E1000EState, (obj), TYPE_E1000E)
+> +#define E1000E(obj) OBJECT_CHECK(E1000EState, (obj), TYPE_PCI_E1000E)
+> =20
+>  typedef struct E1000EState {
+>      PCIDevice parent_obj;
+> @@ -703,7 +703,7 @@ static void e1000e_instance_init(Object *obj)
+>  }
+> =20
+>  static const TypeInfo e1000e_info =3D {
+> -    .name =3D TYPE_E1000E,
+> +    .name =3D   TYPE_PCI_E1000E,
+>      .parent =3D TYPE_PCI_DEVICE,
+>      .instance_size =3D sizeof(E1000EState),
+>      .class_init =3D e1000e_class_init,
+>=20
 
-It's interesting to know if or not your future change will break without this
-patch, this is especially useful for backport.
+That seems unnecessary to me, since it's not used anywhere outside of
+e1000e.c. I'd suggest to drop this patch.
 
-Fam
+ Thomas
