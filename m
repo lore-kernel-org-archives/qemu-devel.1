@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dwUVS-00081y-F6
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:37:14 -0400
+	(envelope-from <prvs=434883a06=anthony.perard@citrix.com>)
+	id 1dwUaJ-0002Kj-Tb
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:42:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dwUVP-0001Sf-5o
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:37:10 -0400
-Resent-Message-Id: <E1dwUVP-0001Sf-5o@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21478)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dwUVO-0001Rn-TV
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:37:07 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150633656091.33.862531980128168681@b58463cdfd5f>
-In-Reply-To: <20170925102302.60587-1-borntraeger@de.ibm.com>
+	(envelope-from <prvs=434883a06=anthony.perard@citrix.com>)
+	id 1dwUaF-0004FL-LZ
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:42:11 -0400
+Received: from smtp02.citrix.com ([66.165.176.63]:30576)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=434883a06=anthony.perard@citrix.com>)
+	id 1dwUaF-0004Ee-Do
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:42:07 -0400
+Date: Mon, 25 Sep 2017 15:41:34 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20170925144134.GF1859@perard.uk.xensource.com>
+References: <20170922120725.10910-1-jgross@suse.com>
+	<20170922120725.10910-3-jgross@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 25 Sep 2017 03:49:21 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/2] s390/z14: extended TOD-clock support
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20170922120725.10910-3-jgross@suse.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] xen: dont try setting max grants
+ multiple times
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +31,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: borntraeger@de.ibm.com
-Cc: famz@redhat.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, qemu-devel@nongnu.org, agraf@suse.de, rth@twiddle.net
+To: Juergen Gross <jgross@suse.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, kraxel@redhat.com, sstabellini@kernel.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcwOTI1MTAyMzAyLjYwNTg3LTEtYm9ybnRyYWVnZXJAZGUuaWJtLmNvbQpT
-dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvMl0gczM5MC96MTQ6IGV4dGVuZGVkIFRPRC1j
-bG9jayBzdXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNF
-PWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWls
-ZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAt
-LXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tp
-bmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAg
-ICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gu
-cGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBm
-aQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9
-PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dp
-dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo5NmM2OTA2YzkzIHMzOTAva3ZtOiBTdXBwb3J0
-IGZvciBnZXQvc2V0IG9mIGV4dGVuZGVkIFRPRC1DbG9jayBmb3IgZ3Vlc3QKZjRlY2YxNDNmMCBs
-aW51eC1oZWFkZXJzOiBVcGRhdGUgbGludXggaGVhZGVycyBmb3IgZXh0ZW5kZWQgVE9ELUNsb2Nr
-Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI6IGxpbnV4LWhlYWRlcnM6
-IFVwZGF0ZSBsaW51eCBoZWFkZXJzIGZvciBleHRlbmRlZCBUT0QtQ2xvY2suLi4KQ2hlY2tpbmcg
-UEFUQ0ggMi8yOiBzMzkwL2t2bTogU3VwcG9ydCBmb3IgZ2V0L3NldCBvZiBleHRlbmRlZCBUT0Qt
-Q2xvY2sgZm9yIGd1ZXN0Li4uCkVSUk9SOiBFcnJvciBtZXNzYWdlcyBzaG91bGQgbm90IGNvbnRh
-aW4gbmV3bGluZXMKIzM0OiBGSUxFOiBody9zMzkweC9zMzkwLXZpcnRpby1jY3cuYzoyMTc6Cisg
-ICAgICAgICAgICAgICAgICAgICAiczM5MF9nZXRfY2xvY2sgcmV0dXJuZWQgZXJyb3IgJWQuXG4i
-LCByKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTM0IGxpbmVzIGNoZWNrZWQKCllv
-dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoK
-VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
-dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
-IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Fri, Sep 22, 2017 at 02:07:25PM +0200, Juergen Gross wrote:
+> Trying to call xengnttab_set_max_grants() with the same file handle
+> might fail on some kernels, as this operation is allowed only once.
+> 
+> This is a problem for the qdisk backend as blk_connect() can be
+> called multiple times for a domain, e.g. in case grub-xen is being
+> used to boot it.
+> 
+> So instead of letting the generic backend code open the gnttab device
+> do it in blk_connect() and close it again in blk_disconnect.
+> 
+> Signed-off-by: Juergen Gross <jgross@suse.com>
+
+Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+
+Thanks.
+
+> ---
+> V2:
+> - always call blk_disconnect() from blk_free() in order to have the
+>   gnttab device node closed (Anthony Perard)
+> ---
+>  hw/block/xen_disk.c | 16 ++++++++++++----
+>  1 file changed, 12 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
+> index 62506e3167..e431bd89e8 100644
+> --- a/hw/block/xen_disk.c
+> +++ b/hw/block/xen_disk.c
+> @@ -1220,6 +1220,12 @@ static int blk_connect(struct XenDevice *xendev)
+>      /* Add on the number needed for the ring pages */
+>      max_grants += blkdev->nr_ring_ref;
+>  
+> +    blkdev->xendev.gnttabdev = xengnttab_open(NULL, 0);
+> +    if (blkdev->xendev.gnttabdev == NULL) {
+> +        xen_pv_printf(xendev, 0, "xengnttab_open failed: %s\n",
+> +                      strerror(errno));
+> +        return -1;
+> +    }
+>      if (xengnttab_set_max_grants(blkdev->xendev.gnttabdev, max_grants)) {
+>          xen_pv_printf(xendev, 0, "xengnttab_set_max_grants failed: %s\n",
+>                        strerror(errno));
+> @@ -1327,6 +1333,11 @@ static void blk_disconnect(struct XenDevice *xendev)
+>          }
+>          blkdev->feature_persistent = false;
+>      }
+> +
+> +    if (blkdev->xendev.gnttabdev) {
+> +        xengnttab_close(blkdev->xendev.gnttabdev);
+> +        blkdev->xendev.gnttabdev = NULL;
+> +    }
+>  }
+>  
+>  static int blk_free(struct XenDevice *xendev)
+> @@ -1334,9 +1345,7 @@ static int blk_free(struct XenDevice *xendev)
+>      struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+>      struct ioreq *ioreq;
+>  
+> -    if (blkdev->blk || blkdev->sring) {
+> -        blk_disconnect(xendev);
+> -    }
+> +    blk_disconnect(xendev);
+>  
+>      while (!QLIST_EMPTY(&blkdev->freelist)) {
+>          ioreq = QLIST_FIRST(&blkdev->freelist);
+> @@ -1363,7 +1372,6 @@ static void blk_event(struct XenDevice *xendev)
+>  
+>  struct XenDevOps xen_blkdev_ops = {
+>      .size       = sizeof(struct XenBlkDev),
+> -    .flags      = DEVOPS_FLAG_NEED_GNTDEV,
+>      .alloc      = blk_alloc,
+>      .init       = blk_init,
+>      .initialise    = blk_connect,
+> -- 
+> 2.12.3
+> 
+
+-- 
+Anthony PERARD
