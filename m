@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dwPqR-0006Y8-VA
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:38:32 -0400
+	(envelope-from <groug@kaod.org>) id 1dwPzR-0000QR-C1
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:47:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dwPqR-0000Q7-1u
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:38:32 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:31637 helo=relay.sw.ru)
+	(envelope-from <groug@kaod.org>) id 1dwPzM-0004Ay-Eh
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:47:47 -0400
+Received: from 6.mo173.mail-out.ovh.net ([46.105.43.93]:53331)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dwPqQ-0000Pj-MH
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:38:30 -0400
-References: <20170913181910.29688-1-mreitz@redhat.com>
-	<20170913181910.29688-5-mreitz@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <8ac33a2c-1d1a-85fd-9e0e-bcf4054b2876@virtuozzo.com>
-Date: Mon, 25 Sep 2017 12:38:11 +0300
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dwPzM-0004A5-7o
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 05:47:44 -0400
+Received: from player687.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 1C1907798C
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 11:47:40 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Mon, 25 Sep 2017 11:47:33 +0200
+Message-ID: <150633285374.14880.11614678065344980502.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170913181910.29688-5-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 04/18] block/mirror: Pull out
- mirror_perform()
+Subject: [Qemu-devel] [PATCH] spapr: move registration of "host" CPU core
+ type to machine code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,117 +28,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-13.09.2017 21:18, Max Reitz wrote:
-> When converting mirror's I/O to coroutines, we are going to need a point
-> where these coroutines are created.  mirror_perform() is going to be
-> that point.
->
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+The CPU core abstraction belongs to the machine code. This also gets
+rid of some code duplication.
 
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+hw/ppc/spapr_cpu_core.h is also included elsewhere in target/ppc/kvm.c
+but this is already handled by the following cleanup patch:
 
-> ---
->   block/mirror.c | 53 ++++++++++++++++++++++++++++++-----------------------
->   1 file changed, 30 insertions(+), 23 deletions(-)
->
-> diff --git a/block/mirror.c b/block/mirror.c
-> index 6531652d73..4664b0516f 100644
-> --- a/block/mirror.c
-> +++ b/block/mirror.c
-> @@ -82,6 +82,12 @@ typedef struct MirrorOp {
->       uint64_t bytes;
->   } MirrorOp;
->   
-> +typedef enum MirrorMethod {
-> +    MIRROR_METHOD_COPY,
-> +    MIRROR_METHOD_ZERO,
-> +    MIRROR_METHOD_DISCARD,
-> +} MirrorMethod;
-> +
->   static BlockErrorAction mirror_error_action(MirrorBlockJob *s, bool read,
->                                               int error)
->   {
-> @@ -324,6 +330,22 @@ static void mirror_do_zero_or_discard(MirrorBlockJob *s,
->       }
->   }
->   
-> +static unsigned mirror_perform(MirrorBlockJob *s, int64_t offset,
-> +                               unsigned bytes, MirrorMethod mirror_method)
-> +{
-> +    switch (mirror_method) {
-> +    case MIRROR_METHOD_COPY:
-> +        return mirror_do_read(s, offset, bytes);
-> +    case MIRROR_METHOD_ZERO:
-> +    case MIRROR_METHOD_DISCARD:
-> +        mirror_do_zero_or_discard(s, offset, bytes,
-> +                                  mirror_method == MIRROR_METHOD_DISCARD);
-> +        return bytes;
-> +    default:
-> +        abort();
-> +    }
-> +}
-> +
->   static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
->   {
->       BlockDriverState *source = s->source;
-> @@ -395,11 +417,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
->           unsigned int io_bytes;
->           int64_t io_bytes_acct;
->           BlockDriverState *file;
-> -        enum MirrorMethod {
-> -            MIRROR_METHOD_COPY,
-> -            MIRROR_METHOD_ZERO,
-> -            MIRROR_METHOD_DISCARD
-> -        } mirror_method = MIRROR_METHOD_COPY;
-> +        MirrorMethod mirror_method = MIRROR_METHOD_COPY;
->   
->           assert(!(offset % s->granularity));
->           ret = bdrv_get_block_status_above(source, NULL,
-> @@ -439,22 +457,11 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
->           }
->   
->           io_bytes = mirror_clip_bytes(s, offset, io_bytes);
-> -        switch (mirror_method) {
-> -        case MIRROR_METHOD_COPY:
-> -            io_bytes = io_bytes_acct = mirror_do_read(s, offset, io_bytes);
-> -            break;
-> -        case MIRROR_METHOD_ZERO:
-> -        case MIRROR_METHOD_DISCARD:
-> -            mirror_do_zero_or_discard(s, offset, io_bytes,
-> -                                      mirror_method == MIRROR_METHOD_DISCARD);
-> -            if (write_zeroes_ok) {
-> -                io_bytes_acct = 0;
-> -            } else {
-> -                io_bytes_acct = io_bytes;
-> -            }
-> -            break;
-> -        default:
-> -            abort();
-> +        io_bytes = mirror_perform(s, offset, io_bytes, mirror_method);
-> +        if (mirror_method != MIRROR_METHOD_COPY && write_zeroes_ok) {
-> +            io_bytes_acct = 0;
-> +        } else {
-> +            io_bytes_acct = io_bytes;
->           }
->           assert(io_bytes);
->           offset += io_bytes;
-> @@ -650,8 +657,8 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
->                   continue;
->               }
->   
-> -            mirror_do_zero_or_discard(s, sector_num * BDRV_SECTOR_SIZE,
-> -                                      nb_sectors * BDRV_SECTOR_SIZE, false);
-> +            mirror_perform(s, sector_num * BDRV_SECTOR_SIZE,
-> +                           nb_sectors * BDRV_SECTOR_SIZE, MIRROR_METHOD_ZERO);
->               sector_num += nb_sectors;
->           }
->   
+https://patchwork.ozlabs.org/patch/817598/
+---
+ hw/ppc/spapr.c                  |    4 ++++
+ hw/ppc/spapr_cpu_core.c         |   34 ++++++++++++++++++++++------------
+ include/hw/ppc/spapr_cpu_core.h |    2 +-
+ target/ppc/kvm.c                |   12 ------------
+ 4 files changed, 27 insertions(+), 25 deletions(-)
 
-
--- 
-Best regards,
-Vladimir
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 0ce3ec87ac59..e82c8532ffb0 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2349,6 +2349,10 @@ static void ppc_spapr_init(MachineState *machine)
+     }
+ 
+     /* init CPUs */
++    if (kvm_enabled()) {
++        spapr_cpu_core_register_host_type();
++    }
++
+     if (machine->cpu_model == NULL) {
+         machine->cpu_model = kvm_enabled() ? "host" : smc->tcg_default_cpu;
+     }
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index c08ee7571a50..6e224ba029ec 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -317,7 +317,7 @@ static Property spapr_cpu_core_properties[] = {
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
+-void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
++static void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(oc);
+     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_CLASS(oc);
+@@ -337,6 +337,20 @@ static const TypeInfo spapr_cpu_core_type_info = {
+     .class_size = sizeof(sPAPRCPUCoreClass),
+ };
+ 
++static void spapr_cpu_core_register_type(const char *model_name)
++{
++    TypeInfo type_info = {
++        .parent = TYPE_SPAPR_CPU_CORE,
++        .instance_size = sizeof(sPAPRCPUCore),
++        .class_init = spapr_cpu_core_class_init,
++        .class_data = (void *) model_name,
++    };
++
++    type_info.name = g_strdup_printf("%s-"TYPE_SPAPR_CPU_CORE, model_name);
++    type_register(&type_info);
++    g_free((void *)type_info.name);
++}
++
+ static void spapr_cpu_core_register_types(void)
+ {
+     int i;
+@@ -344,18 +358,14 @@ static void spapr_cpu_core_register_types(void)
+     type_register_static(&spapr_cpu_core_type_info);
+ 
+     for (i = 0; i < ARRAY_SIZE(spapr_core_models); i++) {
+-        TypeInfo type_info = {
+-            .parent = TYPE_SPAPR_CPU_CORE,
+-            .instance_size = sizeof(sPAPRCPUCore),
+-            .class_init = spapr_cpu_core_class_init,
+-            .class_data = (void *) spapr_core_models[i],
+-        };
+-
+-        type_info.name = g_strdup_printf("%s-" TYPE_SPAPR_CPU_CORE,
+-                                         spapr_core_models[i]);
+-        type_register(&type_info);
+-        g_free((void *)type_info.name);
++        spapr_cpu_core_register_type(spapr_core_models[i]);
+     }
++
++}
++
++void spapr_cpu_core_register_host_type(void)
++{
++    spapr_cpu_core_register_type("host");
+ }
+ 
+ type_init(spapr_cpu_core_register_types)
+diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
+index 93051e9ecf56..e3e906343048 100644
+--- a/include/hw/ppc/spapr_cpu_core.h
++++ b/include/hw/ppc/spapr_cpu_core.h
+@@ -36,5 +36,5 @@ typedef struct sPAPRCPUCoreClass {
+ } sPAPRCPUCoreClass;
+ 
+ char *spapr_get_cpu_core_type(const char *model);
+-void spapr_cpu_core_class_init(ObjectClass *oc, void *data);
++void spapr_cpu_core_register_host_type(void);
+ #endif
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 5b281b2f1b6d..8dd80993ec9e 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -37,7 +37,6 @@
+ #include "hw/sysbus.h"
+ #include "hw/ppc/spapr.h"
+ #include "hw/ppc/spapr_vio.h"
+-#include "hw/ppc/spapr_cpu_core.h"
+ #include "hw/ppc/ppc.h"
+ #include "sysemu/watchdog.h"
+ #include "trace.h"
+@@ -2502,17 +2501,6 @@ static int kvm_ppc_register_host_cpu_type(void)
+     oc = object_class_by_name(type_info.name);
+     g_assert(oc);
+ 
+-#if defined(TARGET_PPC64)
+-    type_info.name = g_strdup_printf("%s-"TYPE_SPAPR_CPU_CORE, "host");
+-    type_info.parent = TYPE_SPAPR_CPU_CORE,
+-    type_info.instance_size = sizeof(sPAPRCPUCore);
+-    type_info.instance_init = NULL;
+-    type_info.class_init = spapr_cpu_core_class_init;
+-    type_info.class_data = (void *) "host";
+-    type_register(&type_info);
+-    g_free((void *)type_info.name);
+-#endif
+-
+     /*
+      * Update generic CPU family class alias (e.g. on a POWER8NVL host,
+      * we want "POWER8" to be a "family" alias that points to the current
