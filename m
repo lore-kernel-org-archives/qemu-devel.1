@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dwZ2N-0006js-QX
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 15:27:28 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dwZ4K-0007VV-99
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 15:29:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dwZ2M-0008Er-G8
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 15:27:27 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:43474)
+	(envelope-from <peter.maydell@linaro.org>) id 1dwZ4J-0000Zv-JC
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 15:29:28 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:46766)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dwZ2M-0008Ef-9h
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 15:27:26 -0400
-Received: by mail-wm0-x235.google.com with SMTP id m72so12357498wmc.0
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 12:27:26 -0700 (PDT)
+	id 1dwZ4J-0000Zj-DD
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 15:29:27 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id o42so9664009wrb.3
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 12:29:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170920061905.rbv3g2ubd4c5zvn4@pengutronix.de>
-References: <150555367996.36.15771330325496067998@69b6ddf88678>
-	<20170916103523.1482-1-m.olbrich@pengutronix.de>
-	<CAKmqyKP_5dC1td8DMCEM_4v74XBZy5-rWH2z4XA8VCw4165SAg@mail.gmail.com>
-	<20170919082358.43upqf3lawg2aqtg@pengutronix.de>
-	<CAKmqyKOeYQHRytnhzmC0Tr3rp4KU8NomgnFhhcrKE5KP75WMow@mail.gmail.com>
-	<20170920061905.rbv3g2ubd4c5zvn4@pengutronix.de>
+In-Reply-To: <af89f372-3fa7-a727-b49c-6418c3fab985@siemens.com>
+References: <af89f372-3fa7-a727-b49c-6418c3fab985@siemens.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 Sep 2017 20:27:04 +0100
-Message-ID: <CAFEAcA89F3RVOyu3SPHxZiPB-ws2sQhL71e21fAGP-_TCgOC3w@mail.gmail.com>
+Date: Mon, 25 Sep 2017 20:29:05 +0100
+Message-ID: <CAFEAcA-Am0f7-6B=6GevEf6o9+OyAs-BDk1wxJER4Y43oZaVQA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] hw/sd: fix out-of-bounds check for
- multi block reads
+Subject: Re: [Qemu-devel] [PATCH] usb: Fix usb-host build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,52 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Olbrich <m.olbrich@pengutronix.de>
-Cc: Alistair Francis <alistair23@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Jan Kiszka <jan.kiszka@siemens.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 20 September 2017 at 07:19, Michael Olbrich <m.olbrich@pengutronix.de> wrote:
-> On Tue, Sep 19, 2017 at 05:09:51PM -0700, Alistair Francis wrote:
->> On Tue, Sep 19, 2017 at 1:23 AM, Michael Olbrich
->> <m.olbrich@pengutronix.de> wrote:
->> > On Mon, Sep 18, 2017 at 02:28:26PM -0700, Alistair Francis wrote:
->> >> On Sat, Sep 16, 2017 at 3:35 AM, Michael Olbrich
->> >> <m.olbrich@pengutronix.de> wrote:
->> >> >  hw/sd/sd.c | 12 ++++++------
->> >> >  1 file changed, 6 insertions(+), 6 deletions(-)
->> >> >
->> >> > diff --git a/hw/sd/sd.c b/hw/sd/sd.c
->> >> > index ba47bff4db80..35347a5bbcde 100644
->> >> > --- a/hw/sd/sd.c
->> >> > +++ b/hw/sd/sd.c
->> >> > @@ -1797,8 +1797,13 @@ uint8_t sd_read_data(SDState *sd)
->> >> >          break;
->> >> >
->> >> >      case 18:   /* CMD18:  READ_MULTIPLE_BLOCK */
->> >> > -        if (sd->data_offset == 0)
->> >> > +        if (sd->data_offset == 0) {
->> >> > +            if (sd->data_start + io_len > sd->size) {
->> >> > +                sd->card_status |= ADDRESS_ERROR;
->> >> > +                return 0x00;
->> >> > +            }
->> >>
->> >> Why move it inside the if (sd->data_offset == 0) and not just below
->> >> the ret = sd->data[sd->data_offset ++] ?
->> >>
->> >> >              BLK_READ_BLOCK(sd->data_start, io_len);
->> >
->> > Mostly because of the line above. This copies the full block from the
->> > backend storage to sd->data, so we need to make sure that the data is
->> > actually available to fill sd->data, not if it's ok to access a certain
->> > byte within sd->data.
->>
->> Doesn't this mean that the check is only done for the first block
->> then? When data_offset is 0.
->
-> No, data_offset is reset at the end of the block.
-> [...]
-
-Alistair, were you planning to provide a reviewed-by: for this
-patch (or did you have more review comments on it)?
+Gerd, ping? If you provide a reviewed-by or acked-by
+I can apply this to master as a buildfix...
 
 thanks
 -- PMM
+
+On 22 September 2017 at 08:42, Jan Kiszka <jan.kiszka@siemens.com> wrote:
+> From: Jan Kiszka <jan.kiszka@siemens.com>
+>
+> This reverts the incorrect commit 2041649f0b04 (these are
+> machine-independent objects) and fixes the name of the config var.
+>
+> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+> ---
+>  hw/usb/Makefile.objs | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
+> index 757e365562..c7f0a52f44 100644
+> --- a/hw/usb/Makefile.objs
+> +++ b/hw/usb/Makefile.objs
+> @@ -38,7 +38,7 @@ endif
+>  common-obj-$(CONFIG_USB_REDIR) += redirect.o quirks.o
+>
+>  # usb pass-through
+> -ifeq ($(CONFIG_LIBUSB)$(CONFIG_USB),yy)
+> +ifeq ($(CONFIG_USB_LIBUSB),y)
+>  common-obj-y += host-libusb.o host-legacy.o
+>  else
+>  common-obj-y += host-stub.o
+> --
+> 2.12.3
