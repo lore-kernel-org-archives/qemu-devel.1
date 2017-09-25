@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ahzhanghaoyu@gmail.com>) id 1dwO2H-0000fA-Pc
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 03:42:39 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dwO8z-0001wz-3y
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 03:49:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ahzhanghaoyu@gmail.com>) id 1dwO2D-0006ui-Ml
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 03:42:37 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:37742)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ahzhanghaoyu@gmail.com>)
-	id 1dwO2D-0006t2-E0
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 03:42:33 -0400
-Received: by mail-pg0-x241.google.com with SMTP id v5so4448082pgn.4
-	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 00:42:31 -0700 (PDT)
-References: <20160809191216.GF2025@work-vm>
-	<1470790447-83284-1-git-send-email-jiangshanlai@gmail.com>
-From: Zhang Haoyu <ahzhanghaoyu@gmail.com>
-Message-ID: <ca739103-ac2c-e051-75b2-e55524b8b037@gmail.com>
-Date: Mon, 25 Sep 2017 15:42:55 +0800
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dwO8v-0002bs-3Q
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 03:49:33 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:24603)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dwO8u-0002ZC-Jy
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 03:49:29 -0400
+References: <1505385610-35529-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1505385610-35529-2-git-send-email-pradeep.jagadeesh@huawei.com>
+	<20170918162033.ee7fuarojpkwp5wr@postretch>
+	<209dd16d-8d97-090d-35e9-b355c53c3448@huawei.com>
+	<20170923103359.qzp5eyr54hjzzvie@postretch>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <b8a59332-7cb0-857b-fd74-8c6dad2470f5@huawei.com>
+Date: Mon, 25 Sep 2017 09:47:37 +0200
 MIME-Version: 1.0
-In-Reply-To: <1470790447-83284-1-git-send-email-jiangshanlai@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH V2] add migration capability to bypass the
- shared memory
+In-Reply-To: <20170923103359.qzp5eyr54hjzzvie@postretch>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v11 1/6] throttle: factor out duplicate code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,291 +30,313 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lai Jiangshan <jiangshanlai@gmail.com>, qemu-devel@nongnu.org
-Cc: Juan Quintela <quintela@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Markus Armbruster <armbru@redhat.com>, Amit Shah <amit.shah@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>, qemu-devel@nongnu.org, jani kokkonen <jani.kokkonen@huawei.com>, alberto garcia <berto@igalia.com>, Markus
+	Armbruster <armbru@redhat.com>
 
-If hotplug memory during migration, the calculation of migration_dirty_pages
-maybe not correct,
-void migration_bitmap_extend(ram_addr_t old, ram_addr_t new)
-{
-        ...
-        migration_dirty_pages += new - old;
-        call_rcu(old_bitmap, migration_bitmap_free, rcu);
-        ...
-}
+On 9/23/2017 12:33 PM, Manos Pitsidianakis wrote:
+> On Fri, Sep 22, 2017 at 01:31:58PM +0200, Pradeep Jagadeesh wrote:
+>> On 9/18/2017 6:20 PM, Manos Pitsidianakis wrote:
+>>> On Thu, Sep 14, 2017 at 06:40:05AM -0400, Pradeep Jagadeesh wrote:
+>>>> This patch factors out the duplicate throttle code that was still
+>>>> present in block and fsdev devices.
+>>>>
+>>>> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+>>>> Reviewed-by: Alberto Garcia <berto@igalia.com>
+>>>> Reviewed-by: Greg Kurz <groug@kaod.org>
+>>>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>>> ---
+>>>> blockdev.c                      | 44 +---------------------------------
+>>>> fsdev/qemu-fsdev-throttle.c     | 44 ++--------------------------------
+>>>> include/qemu/throttle-options.h |  3 +++
+>>>> include/qemu/throttle.h         |  4 ++--
+>>>> include/qemu/typedefs.h         |  1 +
+>>>> util/throttle.c                 | 52
+>>>> +++++++++++++++++++++++++++++++++++++++++
+>>>> 6 files changed, 61 insertions(+), 87 deletions(-)
+>>>>
+>>>> diff --git a/blockdev.c b/blockdev.c
+>>>> index 56a6b24..9d33c25 100644
+>>>> --- a/blockdev.c
+>>>> +++ b/blockdev.c
+>>>> @@ -387,49 +387,7 @@ static void
+>>>> extract_common_blockdev_options(QemuOpts *opts, int *bdrv_flags,
+>>>>    }
+>>>>
+>>>>    if (throttle_cfg) {
+>>>> -        throttle_config_init(throttle_cfg);
+>>>> -        throttle_cfg->buckets[THROTTLE_BPS_TOTAL].avg =
+>>>> -            qemu_opt_get_number(opts, "throttling.bps-total", 0);
+>>>> -        throttle_cfg->buckets[THROTTLE_BPS_READ].avg  =
+>>>> -            qemu_opt_get_number(opts, "throttling.bps-read", 0);
+>>>> -        throttle_cfg->buckets[THROTTLE_BPS_WRITE].avg =
+>>>> -            qemu_opt_get_number(opts, "throttling.bps-write", 0);
+>>>> -        throttle_cfg->buckets[THROTTLE_OPS_TOTAL].avg =
+>>>> -            qemu_opt_get_number(opts, "throttling.iops-total", 0);
+>>>> -        throttle_cfg->buckets[THROTTLE_OPS_READ].avg =
+>>>> -            qemu_opt_get_number(opts, "throttling.iops-read", 0);
+>>>> -        throttle_cfg->buckets[THROTTLE_OPS_WRITE].avg =
+>>>> -            qemu_opt_get_number(opts, "throttling.iops-write", 0);
+>>>> -
+>>>> -        throttle_cfg->buckets[THROTTLE_BPS_TOTAL].max =
+>>>> -            qemu_opt_get_number(opts, "throttling.bps-total-max", 0);
+>>>> -        throttle_cfg->buckets[THROTTLE_BPS_READ].max  =
+>>>> -            qemu_opt_get_number(opts, "throttling.bps-read-max", 0);
+>>>> -        throttle_cfg->buckets[THROTTLE_BPS_WRITE].max =
+>>>> -            qemu_opt_get_number(opts, "throttling.bps-write-max", 0);
+>>>> -        throttle_cfg->buckets[THROTTLE_OPS_TOTAL].max =
+>>>> -            qemu_opt_get_number(opts, "throttling.iops-total-max", 0);
+>>>> -        throttle_cfg->buckets[THROTTLE_OPS_READ].max =
+>>>> -            qemu_opt_get_number(opts, "throttling.iops-read-max", 0);
+>>>> -        throttle_cfg->buckets[THROTTLE_OPS_WRITE].max =
+>>>> -            qemu_opt_get_number(opts, "throttling.iops-write-max", 0);
+>>>> -
+>>>> -        throttle_cfg->buckets[THROTTLE_BPS_TOTAL].burst_length =
+>>>> -            qemu_opt_get_number(opts,
+>>>> "throttling.bps-total-max-length", 1);
+>>>> -        throttle_cfg->buckets[THROTTLE_BPS_READ].burst_length  =
+>>>> -            qemu_opt_get_number(opts,
+>>>> "throttling.bps-read-max-length", 1);
+>>>> -        throttle_cfg->buckets[THROTTLE_BPS_WRITE].burst_length =
+>>>> -            qemu_opt_get_number(opts,
+>>>> "throttling.bps-write-max-length", 1);
+>>>> -        throttle_cfg->buckets[THROTTLE_OPS_TOTAL].burst_length =
+>>>> -            qemu_opt_get_number(opts,
+>>>> "throttling.iops-total-max-length", 1);
+>>>> -        throttle_cfg->buckets[THROTTLE_OPS_READ].burst_length =
+>>>> -            qemu_opt_get_number(opts,
+>>>> "throttling.iops-read-max-length", 1);
+>>>> -        throttle_cfg->buckets[THROTTLE_OPS_WRITE].burst_length =
+>>>> -            qemu_opt_get_number(opts,
+>>>> "throttling.iops-write-max-length", 1);
+>>>> -
+>>>> -        throttle_cfg->op_size =
+>>>> -            qemu_opt_get_number(opts, "throttling.iops-size", 0);
+>>>> -
+>>>> +        throttle_parse_options(throttle_cfg, opts);
+>>>>        if (!throttle_is_valid(throttle_cfg, errp)) {
+>>>>            return;
+>>>>        }
+>>>> diff --git a/fsdev/qemu-fsdev-throttle.c b/fsdev/qemu-fsdev-throttle.c
+>>>> index 49eebb5..0e6fb86 100644
+>>>> --- a/fsdev/qemu-fsdev-throttle.c
+>>>> +++ b/fsdev/qemu-fsdev-throttle.c
+>>>> @@ -16,6 +16,7 @@
+>>>> #include "qemu/error-report.h"
+>>>> #include "qemu-fsdev-throttle.h"
+>>>> #include "qemu/iov.h"
+>>>> +#include "qemu/throttle-options.h"
+>>>>
+>>>> static void fsdev_throttle_read_timer_cb(void *opaque)
+>>>> {
+>>>> @@ -31,48 +32,7 @@ static void fsdev_throttle_write_timer_cb(void
+>>>> *opaque)
+>>>>
+>>>> void fsdev_throttle_parse_opts(QemuOpts *opts, FsThrottle *fst, Error
+>>>> **errp)
+>>>> {
+>>>> -    throttle_config_init(&fst->cfg);
+>>>> -    fst->cfg.buckets[THROTTLE_BPS_TOTAL].avg =
+>>>> -        qemu_opt_get_number(opts, "throttling.bps-total", 0);
+>>>> -    fst->cfg.buckets[THROTTLE_BPS_READ].avg  =
+>>>> -        qemu_opt_get_number(opts, "throttling.bps-read", 0);
+>>>> -    fst->cfg.buckets[THROTTLE_BPS_WRITE].avg =
+>>>> -        qemu_opt_get_number(opts, "throttling.bps-write", 0);
+>>>> -    fst->cfg.buckets[THROTTLE_OPS_TOTAL].avg =
+>>>> -        qemu_opt_get_number(opts, "throttling.iops-total", 0);
+>>>> -    fst->cfg.buckets[THROTTLE_OPS_READ].avg =
+>>>> -        qemu_opt_get_number(opts, "throttling.iops-read", 0);
+>>>> -    fst->cfg.buckets[THROTTLE_OPS_WRITE].avg =
+>>>> -        qemu_opt_get_number(opts, "throttling.iops-write", 0);
+>>>> -
+>>>> -    fst->cfg.buckets[THROTTLE_BPS_TOTAL].max =
+>>>> -        qemu_opt_get_number(opts, "throttling.bps-total-max", 0);
+>>>> -    fst->cfg.buckets[THROTTLE_BPS_READ].max  =
+>>>> -        qemu_opt_get_number(opts, "throttling.bps-read-max", 0);
+>>>> -    fst->cfg.buckets[THROTTLE_BPS_WRITE].max =
+>>>> -        qemu_opt_get_number(opts, "throttling.bps-write-max", 0);
+>>>> -    fst->cfg.buckets[THROTTLE_OPS_TOTAL].max =
+>>>> -        qemu_opt_get_number(opts, "throttling.iops-total-max", 0);
+>>>> -    fst->cfg.buckets[THROTTLE_OPS_READ].max =
+>>>> -        qemu_opt_get_number(opts, "throttling.iops-read-max", 0);
+>>>> -    fst->cfg.buckets[THROTTLE_OPS_WRITE].max =
+>>>> -        qemu_opt_get_number(opts, "throttling.iops-write-max", 0);
+>>>> -
+>>>> -    fst->cfg.buckets[THROTTLE_BPS_TOTAL].burst_length =
+>>>> -        qemu_opt_get_number(opts,
+>>>> "throttling.bps-total-max-length", 1);
+>>>> -    fst->cfg.buckets[THROTTLE_BPS_READ].burst_length  =
+>>>> -        qemu_opt_get_number(opts, "throttling.bps-read-max-length",
+>>>> 1);
+>>>> -    fst->cfg.buckets[THROTTLE_BPS_WRITE].burst_length =
+>>>> -        qemu_opt_get_number(opts,
+>>>> "throttling.bps-write-max-length", 1);
+>>>> -    fst->cfg.buckets[THROTTLE_OPS_TOTAL].burst_length =
+>>>> -        qemu_opt_get_number(opts, "throttling.iops-total-max-length",
+>>>> 1);
+>>>> -    fst->cfg.buckets[THROTTLE_OPS_READ].burst_length =
+>>>> -        qemu_opt_get_number(opts,
+>>>> "throttling.iops-read-max-length", 1);
+>>>> -    fst->cfg.buckets[THROTTLE_OPS_WRITE].burst_length =
+>>>> -        qemu_opt_get_number(opts, "throttling.iops-write-max-length",
+>>>> 1);
+>>>> -    fst->cfg.op_size =
+>>>> -        qemu_opt_get_number(opts, "throttling.iops-size", 0);
+>>>> -
+>>>> +    throttle_parse_options(&fst->cfg, opts);
+>>>>    throttle_is_valid(&fst->cfg, errp);
+>>>> }
+>>>>
+>>>> diff --git a/include/qemu/throttle-options.h
+>>>> b/include/qemu/throttle-options.h
+>>>> index 3528a8f..9709dcd 100644
+>>>> --- a/include/qemu/throttle-options.h
+>>>> +++ b/include/qemu/throttle-options.h
+>>>> @@ -9,6 +9,7 @@
+>>>> */
+>>>> #ifndef THROTTLE_OPTIONS_H
+>>>> #define THROTTLE_OPTIONS_H
+>>>> +#include "typedefs.h"
+>>>>
+>>>> #define QEMU_OPT_IOPS_TOTAL "iops-total"
+>>>> #define QEMU_OPT_IOPS_TOTAL_MAX "iops-total-max"
+>>>> @@ -111,4 +112,6 @@
+>>>>            .help = "when limiting by iops max size of an I/O in
+>>>> bytes",\
+>>>>        }
+>>>>
+>>>> +void throttle_parse_options(ThrottleConfig *, QemuOpts *);
+>>>> +
+>>>> #endif
+>>>> diff --git a/include/qemu/throttle.h b/include/qemu/throttle.h
+>>>> index 8c93237..b6ebc6d 100644
+>>>> --- a/include/qemu/throttle.h
+>>>> +++ b/include/qemu/throttle.h
+>>>> @@ -89,10 +89,10 @@ typedef struct LeakyBucket {
+>>>> * However it allows to keep the code clean and the bucket field is
+>>>> reset to
+>>>> * zero at the right time.
+>>>> */
+>>>> -typedef struct ThrottleConfig {
+>>>> +struct ThrottleConfig {
+>>>>    LeakyBucket buckets[BUCKETS_COUNT]; /* leaky buckets */
+>>>>    uint64_t op_size;         /* size of an operation in bytes */
+>>>> -} ThrottleConfig;
+>>>> +};
+>>>>
+>>>> typedef struct ThrottleState {
+>>>>    ThrottleConfig cfg;       /* configuration */
+>>>> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+>>>> index 39bc835..90fe0f9 100644
+>>>> --- a/include/qemu/typedefs.h
+>>>> +++ b/include/qemu/typedefs.h
+>>>> @@ -100,6 +100,7 @@ typedef struct uWireSlave uWireSlave;
+>>>> typedef struct VirtIODevice VirtIODevice;
+>>>> typedef struct Visitor Visitor;
+>>>> typedef struct node_info NodeInfo;
+>>>> +typedef struct ThrottleConfig ThrottleConfig;
+>>>
+>>> Is this really needed? Just include include/qemu/throttle.h wherever you
+>>> need.
+>>>
+>>>> typedef void SaveStateHandler(QEMUFile *f, void *opaque);
+>>>> typedef int LoadStateHandler(QEMUFile *f, void *opaque, int
+>>>> version_id);
+>>>>
+>>>> diff --git a/util/throttle.c b/util/throttle.c
+>>>> index 06bf916..9ef28c4 100644
+>>>> --- a/util/throttle.c
+>>>> +++ b/util/throttle.c
+>>>> @@ -27,6 +27,7 @@
+>>>> #include "qemu/throttle.h"
+>>>> #include "qemu/timer.h"
+>>>> #include "block/aio.h"
+>>>> +#include "qemu/throttle-options.h"
+>>>>
+>>>> /* This function make a bucket leak
+>>>> *
+>>>> @@ -635,3 +636,54 @@ void throttle_config_to_limits(ThrottleConfig
+>>>> *cfg, ThrottleLimits *var)
+>>>>    var->has_iops_write_max_length = true;
+>>>>    var->has_iops_size = true;
+>>>> }
+>>>> +
+>>>> +/* parse the throttle options
+>>>> + *
+>>>> + * @opts: qemu options
+>>>> + * @throttle_cfg: throttle configuration
+>>>> + */
+>>>> +void throttle_parse_options(ThrottleConfig *throttle_cfg, QemuOpts
+>>>> *opts)
+>>>> +{
+>>>> +    throttle_config_init(throttle_cfg);
+>>>> +    throttle_cfg->buckets[THROTTLE_BPS_TOTAL].avg =
+>>>> +        qemu_opt_get_number(opts, "throttling.bps-total", 0);
+>>>> +    throttle_cfg->buckets[THROTTLE_BPS_READ].avg  =
+>>>> +        qemu_opt_get_number(opts, "throttling.bps-read", 0);
+>>>> +    throttle_cfg->buckets[THROTTLE_BPS_WRITE].avg =
+>>>> +        qemu_opt_get_number(opts, "throttling.bps-write", 0);
+>>>> +    throttle_cfg->buckets[THROTTLE_OPS_TOTAL].avg =
+>>>> +        qemu_opt_get_number(opts, "throttling.iops-total", 0);
+>>>> +    throttle_cfg->buckets[THROTTLE_OPS_READ].avg =
+>>>> +        qemu_opt_get_number(opts, "throttling.iops-read", 0);
+>>>> +    throttle_cfg->buckets[THROTTLE_OPS_WRITE].avg =
+>>>> +        qemu_opt_get_number(opts, "throttling.iops-write", 0);
+>>>> +
+>>>> +    throttle_cfg->buckets[THROTTLE_BPS_TOTAL].max =
+>>>> +        qemu_opt_get_number(opts, "throttling.bps-total-max", 0);
+>>>> +    throttle_cfg->buckets[THROTTLE_BPS_READ].max  =
+>>>> +        qemu_opt_get_number(opts, "throttling.bps-read-max", 0);
+>>>> +    throttle_cfg->buckets[THROTTLE_BPS_WRITE].max =
+>>>> +        qemu_opt_get_number(opts, "throttling.bps-write-max", 0);
+>>>> +    throttle_cfg->buckets[THROTTLE_OPS_TOTAL].max =
+>>>> +        qemu_opt_get_number(opts, "throttling.iops-total-max", 0);
+>>>> +    throttle_cfg->buckets[THROTTLE_OPS_READ].max =
+>>>> +        qemu_opt_get_number(opts, "throttling.iops-read-max", 0);
+>>>> +    throttle_cfg->buckets[THROTTLE_OPS_WRITE].max =
+>>>> +        qemu_opt_get_number(opts, "throttling.iops-write-max", 0);
+>>>> +
+>>>> +    throttle_cfg->buckets[THROTTLE_BPS_TOTAL].burst_length =
+>>>> +        qemu_opt_get_number(opts,
+>>>> "throttling.bps-total-max-length", 1);
+>>>> +    throttle_cfg->buckets[THROTTLE_BPS_READ].burst_length  =
+>>>> +        qemu_opt_get_number(opts, "throttling.bps-read-max-length",
+>>>> 1);
+>>>> +    throttle_cfg->buckets[THROTTLE_BPS_WRITE].burst_length =
+>>>> +        qemu_opt_get_number(opts,
+>>>> "throttling.bps-write-max-length", 1);
+>>>> +    throttle_cfg->buckets[THROTTLE_OPS_TOTAL].burst_length =
+>>>> +        qemu_opt_get_number(opts, "throttling.iops-total-max-length",
+>>>> 1);
+>>>> +    throttle_cfg->buckets[THROTTLE_OPS_READ].burst_length =
+>>>> +        qemu_opt_get_number(opts,
+>>>> "throttling.iops-read-max-length", 1);
+>>>> +    throttle_cfg->buckets[THROTTLE_OPS_WRITE].burst_length =
+>>>> +        qemu_opt_get_number(opts, "throttling.iops-write-max-length",
+>>>> 1);
+>>>> +
+>>>> +    throttle_cfg->op_size =
+>>>> +        qemu_opt_get_number(opts, "throttling.iops-size", 0);
+>>>> +}
+>>>
+>>> You should reuse the #define's in include/qemu/throttle-options.h
+>>> See throttle_extract_options() in this patch:
+>>> http://patchwork.ozlabs.org/patch/803919/ Disregard the UINT_MAX checks,
+>>> unsigned ints in LeakyBucket were replaced by uint64_t.
+>>>
+>> I can not use the #define's because I use throttling.*.
+>> In my last patch also we wanted to have it like that to align with the
+>> block device throttle options.
+>> If you see in blockdev.c, still there exists throttling.*
+>>
+>
+> You can use them.
+>
+> qemu_opt_get_number(opts, "throttling.iops-size", 0) becomes:
+> qemu_opt_get_number(opts, THROTTLE_OPT_PREFIX QEMU_OPT_IOPS_SIZE, 0)
+> This is what I did in the patch I linked, except for redefining
+> THROTTLE_OPT_PREFIX to "limits.". I plan to send some patches for
+> blockdev.c code when the old legacy interface is replaced.
+OK, I can do sendout a patch for blockdev.c also.
 
-Thanks,
-Zhanghaoyu
-
-
-On 2016/8/10 8:54, Lai Jiangshan wrote:
-> When the migration capability 'bypass-shared-memory'
-> is set, the shared memory will be bypassed when migration.
-> 
-> It is the key feature to enable several excellent features for
-> the qemu, such as qemu-local-migration, qemu-live-update,
-> extremely-fast-save-restore, vm-template, vm-fast-live-clone,
-> yet-another-post-copy-migration, etc..
-> 
-> The philosophy behind this key feature and the advanced
-> key features is that a part of the memory management is
-> separated out from the qemu, and let the other toolkits
-> such as libvirt, runv(https://github.com/hyperhq/runv/)
-> or the next qemu-cmd directly access to it, manage it,
-> provide features to it.
-> 
-> The hyperhq(http://hyper.sh  http://hypercontainer.io/)
-> introduced the feature vm-template(vm-fast-live-clone)
-> to the hyper container for several months, it works perfect.
-> (see https://github.com/hyperhq/runv/pull/297)
-> 
-> The feature vm-template makes the containers(VMs) can
-> be started in 130ms and save 80M memory for every
-> container(VM). So that the hyper containers are fast
-> and high-density as normal containers.
-> 
-> In current qemu command line, shared memory has
-> to be configured via memory-object. Anyone can add a
-> -mem-path-share to the qemu command line for combining
-> with -mem-path for this feature. This patch doesn’t include
-> this change of -mem-path-share.
-> 
-> Advanced features:
-> 1) qemu-local-migration, qemu-live-update
-> Set the mem-path on the tmpfs and set share=on for it when
-> start the vm. example:
-> -object \
-> memory-backend-file,id=mem,size=128M,mem-path=/dev/shm/memory,share=on \
-> -numa node,nodeid=0,cpus=0-7,memdev=mem
-> 
-> when you want to migrate the vm locally (after fixed a security bug
-> of the qemu-binary, or other reason), you can start a new qemu with
-> the same command line and -incoming, then you can migrate the
-> vm from the old qemu to the new qemu with the migration capability
-> 'bypass-shared-memory' set. The migration will migrate the device-state
-> *ONLY*, the memory is the origin memory backed by tmpfs file.
-> 
-> 2) extremely-fast-save-restore
-> the same above, but the mem-path is on the persistent file system.
-> 
-> 3)  vm-template, vm-fast-live-clone
-> the template vm is started as 1), and paused when the guest reaches
-> the template point(example: the guest app is ready), then the template
-> vm is saved. (the qemu process of the template can be killed now, because
-> we need only the memory and the device state files (in tmpfs)).
-> 
-> Then we can launch one or multiple VMs base on the template vm states,
-> the new VMs are started without the “share=on”, all the new VMs share
-> the initial memory from the memory file, they save a lot of memory.
-> all the new VMs start from the template point, the guest app can go to
-> work quickly.
-> 
-> The new VM booted from template vm can’t become template again,
-> if you need this unusual chained-template feature, you can write
-> a cloneable-tmpfs kernel module for it.
-> 
-> The libvirt toolkit can’t manage vm-template currently, in the
-> hyperhq/runv, we use qemu wrapper script to do it. I hope someone add
-> “libvrit managed template” feature to libvirt.
-> 
-> 4) yet-another-post-copy-migration
-> It is a possible feature, no toolkit can do it well now.
-> Using nbd server/client on the memory file is reluctantly Ok but
-> inconvenient. A special feature for tmpfs might be needed to
-> fully complete this feature.
-> No one need yet another post copy migration method,
-> but it is possible when some crazy man need it.
-> 
-> Changed from v1:
->    fix style
-> 
-> Signed-off-by: Lai Jiangshan <jiangshanlai@gmail.com>
-> ---
->  exec.c                        |  5 +++++
->  include/exec/cpu-common.h     |  1 +
->  include/migration/migration.h |  1 +
->  migration/migration.c         |  9 +++++++++
->  migration/ram.c               | 37 ++++++++++++++++++++++++++++---------
->  qapi-schema.json              |  6 +++++-
->  qmp-commands.hx               |  3 +++
->  7 files changed, 52 insertions(+), 10 deletions(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index 8ffde75..888919a 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1402,6 +1402,11 @@ static void qemu_ram_setup_dump(void *addr, ram_addr_t size)
->      }
->  }
->  
-> +bool qemu_ram_is_shared(RAMBlock *rb)
-> +{
-> +    return rb->flags & RAM_SHARED;
-> +}
-> +
->  const char *qemu_ram_get_idstr(RAMBlock *rb)
->  {
->      return rb->idstr;
-> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-> index 952bcfe..7c18db9 100644
-> --- a/include/exec/cpu-common.h
-> +++ b/include/exec/cpu-common.h
-> @@ -58,6 +58,7 @@ RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
->  void qemu_ram_set_idstr(RAMBlock *block, const char *name, DeviceState *dev);
->  void qemu_ram_unset_idstr(RAMBlock *block);
->  const char *qemu_ram_get_idstr(RAMBlock *rb);
-> +bool qemu_ram_is_shared(RAMBlock *rb);
->  
->  void cpu_physical_memory_rw(hwaddr addr, uint8_t *buf,
->                              int len, int is_write);
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index 3c96623..080b6b2 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -290,6 +290,7 @@ void migrate_add_blocker(Error *reason);
->   */
->  void migrate_del_blocker(Error *reason);
->  
-> +bool migrate_bypass_shared_memory(void);
->  bool migrate_postcopy_ram(void);
->  bool migrate_zero_blocks(void);
->  
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 955d5ee..c87d136 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1189,6 +1189,15 @@ void qmp_migrate_set_downtime(double value, Error **errp)
->      max_downtime = (uint64_t)value;
->  }
->  
-> +bool migrate_bypass_shared_memory(void)
-> +{
-> +    MigrationState *s;
-> +
-> +    s = migrate_get_current();
-> +
-> +    return s->enabled_capabilities[MIGRATION_CAPABILITY_BYPASS_SHARED_MEMORY];
-> +}
-> +
->  bool migrate_postcopy_ram(void)
->  {
->      MigrationState *s;
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 815bc0e..f7c4081 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -605,6 +605,28 @@ static void migration_bitmap_sync_init(void)
->      num_dirty_pages_period = 0;
->      xbzrle_cache_miss_prev = 0;
->      iterations_prev = 0;
-> +    migration_dirty_pages = 0;
-This initialization is not necessary.
-
-> +}
-> +
-> +static void migration_bitmap_init(unsigned long *bitmap)
-> +{
-> +    RAMBlock *block;
-> +
-> +    bitmap_clear(bitmap, 0, last_ram_offset() >> TARGET_PAGE_BITS);
-> +    rcu_read_lock();
-> +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +        if (!migrate_bypass_shared_memory() || !qemu_ram_is_shared(block)) {
-> +            bitmap_set(bitmap, block->offset >> TARGET_PAGE_BITS,
-> +                       block->used_length >> TARGET_PAGE_BITS);
-> +
-> +            /*
-> +             * Count the total number of pages used by ram blocks not including
-> +             * any gaps due to alignment or unplugs.
-> +             */
-> +            migration_dirty_pages += block->used_length >> TARGET_PAGE_BITS;
-> +        }
-> +    }
-> +    rcu_read_unlock();
->  }
->  
->  static void migration_bitmap_sync(void)
-> @@ -631,7 +653,9 @@ static void migration_bitmap_sync(void)
->      qemu_mutex_lock(&migration_bitmap_mutex);
->      rcu_read_lock();
->      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> -        migration_bitmap_sync_range(block->offset, block->used_length);
-> +        if (!migrate_bypass_shared_memory() || !qemu_ram_is_shared(block)) {
-> +            migration_bitmap_sync_range(block->offset, block->used_length);
-> +        }
->      }
->      rcu_read_unlock();
->      qemu_mutex_unlock(&migration_bitmap_mutex);
-> @@ -1926,19 +1950,14 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
->      ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
->      migration_bitmap_rcu = g_new0(struct BitmapRcu, 1);
->      migration_bitmap_rcu->bmap = bitmap_new(ram_bitmap_pages);
-> -    bitmap_set(migration_bitmap_rcu->bmap, 0, ram_bitmap_pages);
-> +    migration_bitmap_init(migration_bitmap_rcu->bmap);
->  
->      if (migrate_postcopy_ram()) {
->          migration_bitmap_rcu->unsentmap = bitmap_new(ram_bitmap_pages);
-> -        bitmap_set(migration_bitmap_rcu->unsentmap, 0, ram_bitmap_pages);
-> +        bitmap_copy(migration_bitmap_rcu->unsentmap,
-> +                    migration_bitmap_rcu->bmap, ram_bitmap_pages);
->      }
->  
-> -    /*
-> -     * Count the total number of pages used by ram blocks not including any
-> -     * gaps due to alignment or unplugs.
-> -     */
-> -    migration_dirty_pages = ram_bytes_total() >> TARGET_PAGE_BITS;
-> -
->      memory_global_dirty_log_start();
->      migration_bitmap_sync();
->      qemu_mutex_unlock_ramlist();
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 5658723..453e6d9 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -553,11 +553,15 @@
->  #          been migrated, pulling the remaining pages along as needed. NOTE: If
->  #          the migration fails during postcopy the VM will fail.  (since 2.6)
->  #
-> +# @bypass-shared-memory: the shared memory region will be bypassed on migration.
-> +#          This feature allows the memory region to be reused by new qemu(s)
-> +#          or be migrated separately. (since 2.8)
-> +#
->  # Since: 1.2
->  ##
->  { 'enum': 'MigrationCapability',
->    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
-> -           'compress', 'events', 'postcopy-ram'] }
-> +           'compress', 'events', 'postcopy-ram', 'bypass-shared-memory'] }
->  
->  ##
->  # @MigrationCapabilityStatus
-> diff --git a/qmp-commands.hx b/qmp-commands.hx
-> index c8d360a..c31152c 100644
-> --- a/qmp-commands.hx
-> +++ b/qmp-commands.hx
-> @@ -3723,6 +3723,7 @@ Enable/Disable migration capabilities
->  - "compress": use multiple compression threads to accelerate live migration
->  - "events": generate events for each migration state change
->  - "postcopy-ram": postcopy mode for live migration
-> +- "bypass-shared-memory": bypass shared memory region
->  
->  Arguments:
->  
-> @@ -3753,6 +3754,7 @@ Query current migration capabilities
->           - "compress": Multiple compression threads state (json-bool)
->           - "events": Migration state change event state (json-bool)
->           - "postcopy-ram": postcopy ram state (json-bool)
-> +         - "bypass-shared-memory": bypass shared memory state (json-bool)
->  
->  Arguments:
->  
-> @@ -3767,6 +3769,7 @@ Example:
->       {"state": false, "capability": "compress"},
->       {"state": true, "capability": "events"},
->       {"state": false, "capability": "postcopy-ram"}
-> +     {"state": false, "capability": "bypass-shared-memory"}
->     ]}
->  
->  EQMP
-> 
+Regards,
+Pradeep
