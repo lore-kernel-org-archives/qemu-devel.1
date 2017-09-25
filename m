@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dwbhu-0007VZ-0u
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 18:18:34 -0400
+	(envelope-from <eblake@redhat.com>) id 1dwbif-00088K-N4
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 18:19:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dwbhs-0006qO-Nn
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 18:18:30 -0400
-References: <20170925145526.32690-1-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <0dd26890-560e-26a3-9997-1292be7aecdd@redhat.com>
-Date: Mon, 25 Sep 2017 18:18:15 -0400
+	(envelope-from <eblake@redhat.com>) id 1dwbie-00075J-Gr
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 18:19:17 -0400
+References: <20170925135801.144261-1-vsementsov@virtuozzo.com>
+	<20170925135801.144261-9-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b8b01f1a-6e7b-342f-02b6-b7386bff1500@redhat.com>
+Date: Mon, 25 Sep 2017 17:19:07 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170925145526.32690-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v10 00/20] make dirty-bitmap byte-based
+In-Reply-To: <20170925135801.144261-9-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="6lEvbFlCtbXBckPlw0CQ9lSjRsU4TEpkN"
+Subject: Re: [Qemu-devel] [PATCH 8/8] nbd: Minimal structured read for client
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,98 +24,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--6lEvbFlCtbXBckPlw0CQ9lSjRsU4TEpkN
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+Message-ID: <b8b01f1a-6e7b-342f-02b6-b7386bff1500@redhat.com>
+Subject: Re: [PATCH 8/8] nbd: Minimal structured read for client
+References: <20170925135801.144261-1-vsementsov@virtuozzo.com>
+ <20170925135801.144261-9-vsementsov@virtuozzo.com>
+In-Reply-To: <20170925135801.144261-9-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 09/25/2017 08:58 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Minimal implementation: drop most of additional error information.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/nbd-client.h  |   2 +
+>  include/block/nbd.h |  15 ++++-
+>  block/nbd-client.c  |  97 +++++++++++++++++++++++++-----
+>  nbd/client.c        | 169 ++++++++++++++++++++++++++++++++++++++++++++=
++++-----
+>  4 files changed, 249 insertions(+), 34 deletions(-)
+>=20
+
+> +++ b/include/block/nbd.h
+> @@ -57,11 +57,17 @@ struct NBDRequest {
+>  };
+>  typedef struct NBDRequest NBDRequest;
+> =20
+> -struct NBDReply {
+> +typedef struct NBDReply {
+> +    bool simple;
+>      uint64_t handle;
+>      uint32_t error;
+> -};
+> -typedef struct NBDReply NBDReply;
+> +
+> +    uint16_t flags;
+> +    uint16_t type;
+> +    uint32_t tail_length;
+> +    uint64_t offset;
+> +    uint32_t hole_size;
+> +} NBDReply;
+
+This feels like it should be a discriminated union, rather than a struct
+containing fields that are only sometimes valid...
+
+> =20
+>  #define NBD_SREP_TYPE_NONE          0
+>  #define NBD_SREP_TYPE_OFFSET_DATA   1
+> +#define NBD_SREP_TYPE_OFFSET_HOLE   2
+>  #define NBD_SREP_TYPE_ERROR         NBD_SREP_ERR(1)
+> +#define NBD_SREP_TYPE_ERROR_OFFSET  NBD_SREP_ERR(2)
+
+=2E..especially since there is more than one type of SREP packet layout.
+
+I also wonder why you are defining constants in a piecemeal fashion,
+rather than all at once (even if your minimal server implementation
+doesn't send a particular constant, there's no harm in defining them all
+up front).
+
+> +++ b/block/nbd-client.c
+> @@ -179,9 +179,10 @@ err:
+>      return rc;
+>  }
+> =20
+> -static int nbd_co_receive_reply(NBDClientSession *s,
+> -                                uint64_t handle,
+> -                                QEMUIOVector *qiov)
+> +static int nbd_co_receive_1_reply_or_chunk(NBDClientSession *s,
+
+Long name, and unusual to mix in "1" instead of "one".  Would it be
+better to name it nbd_co_receive_chunk, where we declare that a simple
+reply is (roughly) the same amount of effort as a chunk in a structured
+reply?
+
+> +                                           uint64_t handle,
+> +                                           bool *cont,
+> +                                           QEMUIOVector *qiov)
+>  {
+
+No documentation of the function?
+
+>      int ret;
+>      int i =3D HANDLE_TO_INDEX(s, handle);
+> @@ -191,29 +192,95 @@ static int nbd_co_receive_reply(NBDClientSession =
+*s,
+>      qemu_coroutine_yield();
+>      s->requests[i].receiving =3D false;
+>      if (!s->ioc || s->quit) {
+> -        ret =3D -EIO;
+> -    } else {
+> -        assert(s->reply.handle =3D=3D handle);
+> -        ret =3D -s->reply.error;
+> -        if (qiov && s->reply.error =3D=3D 0) {
+> +        *cont =3D false;
+> +        return -EIO;
+> +    }
+> +
+> +    assert(s->reply.handle =3D=3D handle);
+> +    *cont =3D !(s->reply.simple || (s->reply.flags & NBD_SREP_FLAG_DON=
+E));
+
+We need to validate that the server is not sending us SREP chunks unless
+we negotiated them.  I'm thinking it might be better to do it here
+(maybe you did it somewhere else, but I haven't seen it yet; I'm
+reviewing the patch in textual order rather than the order in which
+things are called).
+
+> +    ret =3D -s->reply.error;
+> +    if (ret < 0) {
+> +        goto out;
+> +    }
+> +
+> +    if (s->reply.simple) {
+> +        if (qiov) {
+>              if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
+> -                                      NULL) < 0) {
+> -                ret =3D -EIO;
+> -                s->quit =3D true;
+> +                                      NULL) < 0)
+> +            {
+> +                goto fatal;
+>              }
+>          }
+> +        goto out;
+> +    }
+> =20
+> -        /* Tell the read handler to read another header.  */
+> -        s->reply.handle =3D 0;
+> +    /* here we deal with successful structured reply */
+> +    switch (s->reply.type) {
+> +        QEMUIOVector sub_qiov;
+> +    case NBD_SREP_TYPE_OFFSET_DATA:
+
+This is putting a LOT of smarts directly into the receive routine.
+Here's where I was previously wondering (and I think Paolo as well)
+whether it might be better to split the efforts: the generic function
+reads off the chunk information and any payload, but a per-command
+callback function then parses the chunks.  Especially since the
+definition of the chunks differs on a per-command basis (yes, the NBD
+spec will try to not reuse an SREP chunk type across multiple commands
+unless the semantics are similar, but that's a bit more fragile).  This
+particularly matters given my statement above that you want a
+discriminated union, rather than a struct that contains unused fields,
+for handling different SREP chunk types.
+
+My review has to pause here for now...
 
 
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-On 09/25/2017 10:55 AM, Eric Blake wrote:
-> There are patches floating around to add NBD_CMD_BLOCK_STATUS,
-> but NBD wants to report status on byte granularity (even if the
-> reporting will probably be naturally aligned to sectors or even
-> much higher levels).  I've therefore started the task of
-> converting our block status code to report at a byte granularity
-> rather than sectors.
-> 
-> Now that 2.11 is open, I'm rebasing/reposting the remaining patches.
-> 
-> The overall conversion currently looks like:
-> part 1: bdrv_is_allocated (merged in 2.10, commit 51b0a488)
-> part 2: dirty-bitmap (this series, v9 was here [1])
-> part 3: bdrv_get_block_status (v4 is posted [2] and is mostly reviewed)
-> part 4: .bdrv_co_block_status (v3 is posted [3], but needs review)
-> 
-> Available as a tag at:
-> git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-dirty-v10
-> 
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg05387.html
-> [2] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03543.html
-> [3] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03812.html
-> 
-> Since v9:
-> - another try at patch 5 [John]
-> - add R-b where appropriate
-> 
-> 001/20:[----] [--] 'block: Make bdrv_img_create() size selection easier to read'
-> 002/20:[----] [--] 'hbitmap: Rename serialization_granularity to serialization_align'
-> 003/20:[----] [--] 'qcow2: Ensure bitmap serialization is aligned'
-> 004/20:[----] [--] 'dirty-bitmap: Drop unused functions'
-> 005/20:[0003] [FC] 'dirty-bitmap: Avoid size query failure during truncate'
-> 006/20:[----] [--] 'dirty-bitmap: Change bdrv_dirty_bitmap_size() to report bytes'
-> 007/20:[----] [--] 'dirty-bitmap: Track bitmap size by bytes'
-> 008/20:[----] [--] 'dirty-bitmap: Change bdrv_dirty_bitmap_*serialize*() to take bytes'
-> 009/20:[----] [--] 'qcow2: Switch sectors_covered_by_bitmap_cluster() to byte-based'
-> 010/20:[----] [--] 'dirty-bitmap: Set iterator start by offset, not sector'
-> 011/20:[----] [--] 'dirty-bitmap: Change bdrv_dirty_iter_next() to report byte offset'
-> 012/20:[----] [--] 'dirty-bitmap: Change bdrv_get_dirty_count() to report bytes'
-> 013/20:[----] [--] 'dirty-bitmap: Change bdrv_get_dirty_locked() to take bytes'
-> 014/20:[----] [--] 'dirty-bitmap: Change bdrv_[re]set_dirty_bitmap() to use bytes'
-> 015/20:[----] [--] 'mirror: Switch mirror_dirty_init() to byte-based iteration'
-> 016/20:[----] [--] 'qcow2: Switch qcow2_measure() to byte-based iteration'
-> 017/20:[----] [--] 'qcow2: Switch load_bitmap_data() to byte-based iteration'
-> 018/20:[----] [--] 'qcow2: Switch store_bitmap_data() to byte-based iteration'
-> 019/20:[----] [--] 'dirty-bitmap: Switch bdrv_set_dirty() to bytes'
-> 020/20:[----] [--] 'dirty-bitmap: Convert internal hbitmap size/granularity'
-> 
-> Eric Blake (20):
->   block: Make bdrv_img_create() size selection easier to read
->   hbitmap: Rename serialization_granularity to serialization_align
->   qcow2: Ensure bitmap serialization is aligned
->   dirty-bitmap: Drop unused functions
->   dirty-bitmap: Avoid size query failure during truncate
->   dirty-bitmap: Change bdrv_dirty_bitmap_size() to report bytes
->   dirty-bitmap: Track bitmap size by bytes
->   dirty-bitmap: Change bdrv_dirty_bitmap_*serialize*() to take bytes
->   qcow2: Switch sectors_covered_by_bitmap_cluster() to byte-based
->   dirty-bitmap: Set iterator start by offset, not sector
->   dirty-bitmap: Change bdrv_dirty_iter_next() to report byte offset
->   dirty-bitmap: Change bdrv_get_dirty_count() to report bytes
->   dirty-bitmap: Change bdrv_get_dirty_locked() to take bytes
->   dirty-bitmap: Change bdrv_[re]set_dirty_bitmap() to use bytes
->   mirror: Switch mirror_dirty_init() to byte-based iteration
->   qcow2: Switch qcow2_measure() to byte-based iteration
->   qcow2: Switch load_bitmap_data() to byte-based iteration
->   qcow2: Switch store_bitmap_data() to byte-based iteration
->   dirty-bitmap: Switch bdrv_set_dirty() to bytes
->   dirty-bitmap: Convert internal hbitmap size/granularity
-> 
->  include/block/block_int.h    |   2 +-
->  include/block/dirty-bitmap.h |  43 ++++++--------
->  include/qemu/hbitmap.h       |   8 +--
->  block/io.c                   |   6 +-
->  block.c                      |  18 ++++--
->  block/backup.c               |   7 +--
->  block/dirty-bitmap.c         | 134 ++++++++++++++-----------------------------
->  block/mirror.c               |  79 +++++++++++--------------
->  block/qcow2-bitmap.c         |  62 +++++++++++---------
->  block/qcow2.c                |  22 ++++---
->  migration/block.c            |  12 ++--
->  tests/test-hbitmap.c         |  10 ++--
->  util/hbitmap.c               |   8 +--
->  tests/qemu-iotests/165       |   2 +-
->  14 files changed, 174 insertions(+), 239 deletions(-)
-> 
 
-Tested-by: John Snow <jsnow@redhat.com>
+--6lEvbFlCtbXBckPlw0CQ9lSjRsU4TEpkN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-(Just in case I had to merge it, I ran tests.)
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnJgNsACgkQp6FrSiUn
+Q2pRqAf/ZJsEW/wDpRDXnRxY4nn3oEDkt+GobF/EpcRlkvv6dms/9Li4CrqoROBt
+W3xlu5Z8USWLOFEKNRiwd5uxrC+g7ecMChBOBL/aRnMTTI7kIs6Fr1X/LHt7vpa8
+kyhitRfgnkv4Div12+LVBLBG7x1t9R4lzyr0aaryZ1zfwukuCiLEghPacc2/1Snz
+a7i0mCLNz6IwmBPegFzkTAKRiSSvaO/U3ppVvLiech/c7Rq97fwc7Tz0BFbu2urA
+dsBkQbjDEBjGNtkcII71DJXN9byyMwZzXo59OuD38iuKy5JAdD7ZRAVkKSPKkVot
+/IiV8+MbvBoVvWvPRnCBwn1QsmoxSw==
+=zye7
+-----END PGP SIGNATURE-----
+
+--6lEvbFlCtbXBckPlw0CQ9lSjRsU4TEpkN--
