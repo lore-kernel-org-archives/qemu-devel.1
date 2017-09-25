@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dwOVS-00016G-My
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:12:47 -0400
+	(envelope-from <peterx@redhat.com>) id 1dwOXE-00026z-Nu
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:14:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dwOVR-0000sL-T3
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:12:46 -0400
-Date: Mon, 25 Sep 2017 10:12:32 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170925101232.4d5dd45c.cohuck@redhat.com>
-In-Reply-To: <20170922154014.29350-6-f4bug@amsat.org>
-References: <20170922154014.29350-1-f4bug@amsat.org>
-	<20170922154014.29350-6-f4bug@amsat.org>
+	(envelope-from <peterx@redhat.com>) id 1dwOXC-0001fb-1C
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:14:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43870)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dwOXB-0001fH-OO
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 04:14:33 -0400
+Date: Mon, 25 Sep 2017 16:14:26 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170925081426.GE19505@pxdev.xzpeter.org>
+References: <1506321449-24013-1-git-send-email-peterx@redhat.com>
+	<1506321449-24013-2-git-send-email-peterx@redhat.com>
+	<4540074c-f523-41f4-3ce7-8b6514060fa4@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <4540074c-f523-41f4-3ce7-8b6514060fa4@suse.de>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 05/34] misc: remove duplicated includes
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] qom: provide root container for
+ internal objs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,41 +30,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Stafford Horne <shorne@gmail.com>, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-trivial@nongnu.org
+To: Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Fri, 22 Sep 2017 12:39:45 -0300
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
-
-> exec: housekeeping (funny since 02d0e095031)
+On Mon, Sep 25, 2017 at 09:14:21AM +0200, Andreas F=C3=A4rber wrote:
+> Am 25.09.2017 um 08:37 schrieb Peter Xu:
+> > We have object_get_objects_root() to keep user created objects, howev=
+er
+> > no place for objects that will be used internally.  Create such a
+> > container for internal objects.
+> >=20
+> > CC: Andreas F=C3=A4rber <afaerber@suse.de>
+> > CC: Markus Armbruster <armbru@redhat.com>
+> > CC: Paolo Bonzini <pbonzini@redhat.com>
+> > Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  include/qom/object.h | 10 ++++++++++
+> >  qom/object.c         |  5 +++++
+> >  2 files changed, 15 insertions(+)
+> >=20
+> > diff --git a/include/qom/object.h b/include/qom/object.h
+> > index f3e5cff..f567052 100644
+> > --- a/include/qom/object.h
+> > +++ b/include/qom/object.h
+> > @@ -1214,6 +1214,16 @@ Object *object_get_root(void);
+> >  Object *object_get_objects_root(void);
+> > =20
+> >  /**
+> > + * object_get_internal_root:
+> > + *
+> > + * Get the container object that holds internally used object
+> > + * instances. This is the object at path "/internal-objects"
+> > + *
+> > + * Returns: the internal object container
+> > + */
+> > +Object *object_get_internal_root(void);
+> > +
+> > +/**
+> >   * object_get_canonical_path_component:
+> >   *
+> >   * Returns: The final component in the object's canonical path.  The=
+ canonical
+> > diff --git a/qom/object.c b/qom/object.c
+> > index 3e18537..857cee7 100644
+> > --- a/qom/object.c
+> > +++ b/qom/object.c
+> > @@ -1370,6 +1370,11 @@ Object *object_get_objects_root(void)
+> >      return container_get(object_get_root(), "/objects");
+> >  }
+> > =20
+> > +Object *object_get_internal_root(void)
+> > +{
+> > +    return container_get(object_get_root(), "/internal-objects");
 >=20
-> applied using ./scripts/clean-includes
+> Whatever you expose in the QOM tree is no longer internal. Other name?
+
+Hi, Andreas,
+
+If you mean "info qom-tree" here, can we still treat it as internal?
+Since after all it's not exposed in QMP (while IMHO QMP is the
+official protocol for QEMU clients).  And IIUC some HMP commands do
+dump some internal structs for debugging purpose (like: "info
+ramblock").
+
+Or, do you have any suggestion?
+
+(I did think about something like "hidden-objects", but I believe they
+ are not hidden as well if we think they are not internal...)
+
+Thanks,
+
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  accel/tcg/translate-all.c          | 1 -
->  exec.c                             | 3 ---
->  hw/arm/spitz.c                     | 1 -
->  hw/char/xen_console.c              | 1 -
->  hw/core/machine.c                  | 1 -
->  hw/s390x/css.c                     | 1 -
->  target/openrisc/exception_helper.c | 1 -
->  tests/vhost-user-test.c            | 1 -
->  util/qemu-sockets.c                | 1 -
->  vl.c                               | 1 -
->  10 files changed, 12 deletions(-)
+> Regards,
+> Andreas
+>=20
+> > +}
+> > +
+> >  static void object_get_child_property(Object *obj, Visitor *v,
+> >                                        const char *name, void *opaque=
+,
+> >                                        Error **errp)
+> >=20
+>=20
+>=20
+> --=20
+> SUSE Linux GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, Germany
+> GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
+> HRB 21284 (AG N=C3=BCrnberg)
 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 75d4f301fb..3938fa5909 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -13,7 +13,6 @@
->  #include "qapi/error.h"
->  #include "qapi/visitor.h"
->  #include "hw/qdev.h"
-> -#include "qemu/error-report.h"
->  #include "qemu/bitops.h"
->  #include "qemu/error-report.h"
->  #include "exec/address-spaces.h"
-
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+--=20
+Peter Xu
