@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dwVAX-0001Nx-J5
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:19:38 -0400
+	(envelope-from <bounces@canonical.com>) id 1dwVCE-0002iw-II
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:21:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dwVAU-0004Pl-BT
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:19:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:13569)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dwVAU-0004Nz-3a
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:19:34 -0400
-References: <1506071794-4373-1-git-send-email-thuth@redhat.com>
-	<20170925135316.74fed6da.cohuck@redhat.com>
-	<20170925133153.GZ3030@localhost.localdomain>
-	<20170925154647.357047b9@nial.brq.redhat.com>
-	<20170925143439.GA3030@localhost.localdomain>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f078939d-4ae0-0ae8-4030-3df0ed66299a@redhat.com>
-Date: Mon, 25 Sep 2017 17:19:17 +0200
+	(envelope-from <bounces@canonical.com>) id 1dwVC7-000676-VR
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:21:22 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48712)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dwVC7-00066X-M5
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:21:15 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1dwVC4-0004m2-J8
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 15:21:12 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 53D4A2E84A1
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 15:21:11 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170925143439.GA3030@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] qdev: Mark devices as non-hotpluggable
- by default
+Date: Mon, 25 Sep 2017 15:06:11 -0000
+From: Denys Zagorui <1719339@bugs.launchpad.net>
+Reply-To: Bug 1719339 <1719339@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <150635197143.30872.17188090859541401647.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1719339] [NEW] serial8250: too much work for irq3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,102 +35,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Amit Shah <amit@kernel.org>
+To: qemu-devel@nongnu.org
 
-On 25.09.2017 16:34, Eduardo Habkost wrote:
-> On Mon, Sep 25, 2017 at 03:46:47PM +0200, Igor Mammedov wrote:
->> On Mon, 25 Sep 2017 10:31:53 -0300
->> Eduardo Habkost <ehabkost@redhat.com> wrote:
->>
->>> On Mon, Sep 25, 2017 at 01:53:16PM +0200, Cornelia Huck wrote:
->>>> On Fri, 22 Sep 2017 11:16:34 +0200
->>>> Thomas Huth <thuth@redhat.com> wrote:
->>>>  =20
->>>>> Historically we've marked all devices as hotpluggable by default. H=
-owever,
->>>>> most devices are not hotpluggable, and you also need a HotplugHandl=
-er to
->>>>> support these devices. So if the user tries to "device_add" or "dev=
-ice_del"
->>>>> such a non-hotpluggable device during runtime, either nothing reall=
-y usable
->>>>> happens, or QEMU even crashes/aborts unexpectedly (see for example =
-commit
->>>>> 84ebd3e8c7d4fe955b - "Mark diag288 watchdog as non-hotpluggable").
->>>>> So let's change this dangerous default behaviour and mark the devic=
-es as
->>>>> non-hotpluggable by default. Certain parent devices classes which a=
-re known
->>>>> as hotpluggable (e.g. PCI, USB, etc.) are marked with "hotpluggable=
- =3D true",
->>>>> so that devices that are derived from these classes continue to wor=
-k as
->>>>> expected.
->>>>>
->>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>>> ---
->>>>>  v2: Add missing devices and dropped "RFC" status. See Eduardo's re=
-ply on
->>>>>  the previous version of this patch for the rationale which devices=
- need
->>>>>  to be hotpluggable:
->>>>>  https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg06128.htm=
-l
->>>>>
->>>>>  hw/char/virtio-serial-bus.c   |  1 +
->>>>>  hw/core/qdev.c                | 10 ++++------
->>>>>  hw/mem/nvdimm.c               |  3 +++
->>>>>  hw/mem/pc-dimm.c              |  1 +
->>>>>  hw/pci/pci.c                  |  1 +
->>>>>  hw/ppc/spapr_cpu_core.c       |  1 +
->>>>>  hw/s390x/ccw-device.c         |  1 +
->>>>>  hw/scsi/scsi-bus.c            |  1 +
->>>>>  hw/usb/bus.c                  |  1 +
->>>>>  hw/usb/dev-smartcard-reader.c |  1 +
->>>>>  hw/xen/xen_backend.c          |  1 +
->>>>>  target/i386/cpu.c             |  4 ++--
->>>>>  target/s390x/cpu.c            |  1 +
->>>>>  13 files changed, 19 insertions(+), 8 deletions(-) =20
->>>>
->>>> Hm, this seems to break hotplug of virtio devices:
->>>>
->>>> (qemu) device_add virtio-net-pci,id=3Dxxx
->>>> Device 'virtio-net-device' does not support hotplugging
->>>>
->>>> (qemu) device_add virtio-net-ccw,id=3Dyyy
->>>> Device 'virtio-net-device' does not support hotplugging
->>>>
->>>> We probably need to enable hotplug for virtio devices as well? =20
+Public bug reported:
 
-D'oh, I only checked "normal" PCI devices, not the ones like virtio
-devices that consist of two devices internally :-/
+It's know issue and sometimes mentioned since 2007. But it seems not
+fixed.
 
->>> I've seen a similar case broken by "[PATCH] hw/core/qdev: Do not
->>> allow hot-plugging without hotplug controller", because we're
->>> blocking creation of devices created internally by other devices,
->>> not just the ones created by device_add.  I need to find the
->>> exact reproducer again.
->>>
->>> It would probably simplify things if we move the check for
->>> DeviceClass::hotpluggable to qmp_device_add(), instead of
->>> device_set_realized().
->> if we would have to do that, than we are probably doing
->> something wrong and not using property right. Perhaps we
->> should fix property instead of trying find a place to check
->> it where it would hurt less.
->=20
-> I disagree.  It depends on the purpose and semantics we define
-> for DeviceClass::hotpluggable.  My goal is to have a reliable way
-> to tell the user if a device really supports device_add, and I
-> think it wouldn't make sense to report hotpluggable=3Dtrue on a
-> device that is never instantiated directly by the user and only
-> used internally.
+http://lists.gnu.org/archive/html/qemu-devel/2008-02/msg00140.html
+https://bugzilla.redhat.com/show_bug.cgi?id=3D986761
+http://old-list-archives.xenproject.org/archives/html/xen-devel/2009-02/msg=
+00696.html
 
-I think an alternative was would maybe be to check for "user_creatable"
-in device_set_realized() in addition to "hotpluggable": If
-user_creatable is false, we can be sure that it is an internal plugging
-only. Not sure whether this works for the virtio-xxx-device devices,
-though, since they are marked as user_creatable =3D true currently...
+I don't think fixes like increases PASS_LIMIT
+(/drivers/tty/serial/8250.c) or remove this annoying message
+(https://patchwork.kernel.org/patch/3920801/) is real fix. Some fix was
+proposed by H. Peter Anvin  https://lkml.org/lkml/2008/2/7/485.
 
- Thomas
+Can reproduce on Debian Strech host (Qemu 1:2.8+dfsg-6+deb9u2), Ubuntu
+16.04.2 LTS (Qemu 1:2.5+dfsg-5ubuntu10.15) also tried to use master
+branch (QEMU emulator version 2.10.50 (v2.10.0-766-ga43415ebfd-dirty))
+if we write a lot of message into console (dmesg or dd if=3D/dev/zero
+of=3D/dev/ttyS1).
+
+/usr/local/bin/qemu-system-x86_64 -name guest=3Dultra1,debug-threads=3Don -S
+-object
+secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-27-=
+ultra1
+/master-key.aes -machine pc-i440fx-2.8,accel=3Dkvm,usb=3Doff,dump-guest-
+core=3Doff -cpu Skylake-
+Client,ds=3Don,acpi=3Don,ss=3Don,ht=3Don,tm=3Don,pbe=3Don,dtes64=3Don,monit=
+or=3Don,ds_cpl=3Don,vmx=3Don,smx=3Don,est=3Don,tm2=3Don,xtpr=3Don,pdcm=3Don=
+,osxsave=3Don,tsc_adjust=3Don,clflushopt=3Don,pdpe1gb=3Don
+-m 4096 -realtime mlock=3Doff -smp 4,sockets=3D1,cores=3D4,threads=3D1 -uuid
+4537ca29-73b2-40c3-9b43-666de182ba5f -display none -no-user-config
+-nodefaults -chardev
+socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-27-ultra1/monit=
+or.sock,server,nowait
+-mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
+base=3Dutc,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddelay -no-hpet
+-no-shutdown -global PIIX4_PM.disable_s3=3D1 -global PIIX4_PM.disable_s4=3D1
+-boot strict=3Don -device ich9-usb-ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x8.0x7
+-drive file=3D/home/dzagorui/csr/csr_disk.qcow2,format=3Dqcow2,if=3Dnone,id
+=3Ddrive-ide0-0-0 -device ide-hd,bus=3Dide.0,unit=3D0,drive=3Ddrive-
+ide0-0-0,id=3Dide0-0-0,bootindex=3D1 -netdev tap,fd=3D26,id=3Dhostnet0 -dev=
+ice
+e1000,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:a9:4c:86,bus=3Dpci.0,addr=
+=3D0x3
+-chardev
+socket,id=3Dcharserial0,host=3D127.0.0.1,port=3D4000,telnet,server,nowait
+-device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
+socket,id=3Dcharserial1,host=3D127.0.0.1,port=3D4001,telnet,server,nowait
+-device isa-serial,chardev=3Dcharserial1,id=3Dserial1 -device virtio-
+balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x2 -msg timestamp=3Don
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1719339
+
+Title:
+  serial8250: too much work for irq3
+
+Status in QEMU:
+  New
+
+Bug description:
+  It's know issue and sometimes mentioned since 2007. But it seems not
+  fixed.
+
+  http://lists.gnu.org/archive/html/qemu-devel/2008-02/msg00140.html
+  https://bugzilla.redhat.com/show_bug.cgi?id=3D986761
+  http://old-list-archives.xenproject.org/archives/html/xen-devel/2009-02/m=
+sg00696.html
+
+  I don't think fixes like increases PASS_LIMIT
+  (/drivers/tty/serial/8250.c) or remove this annoying message
+  (https://patchwork.kernel.org/patch/3920801/) is real fix. Some fix
+  was proposed by H. Peter Anvin  https://lkml.org/lkml/2008/2/7/485.
+
+  Can reproduce on Debian Strech host (Qemu 1:2.8+dfsg-6+deb9u2), Ubuntu
+  16.04.2 LTS (Qemu 1:2.5+dfsg-5ubuntu10.15) also tried to use master
+  branch (QEMU emulator version 2.10.50 (v2.10.0-766-ga43415ebfd-dirty))
+  if we write a lot of message into console (dmesg or dd if=3D/dev/zero
+  of=3D/dev/ttyS1).
+
+  /usr/local/bin/qemu-system-x86_64 -name guest=3Dultra1,debug-threads=3Don
+  -S -object
+  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-2=
+7-ultra1
+  /master-key.aes -machine pc-i440fx-2.8,accel=3Dkvm,usb=3Doff,dump-guest-
+  core=3Doff -cpu Skylake-
+  Client,ds=3Don,acpi=3Don,ss=3Don,ht=3Don,tm=3Don,pbe=3Don,dtes64=3Don,mon=
+itor=3Don,ds_cpl=3Don,vmx=3Don,smx=3Don,est=3Don,tm2=3Don,xtpr=3Don,pdcm=3D=
+on,osxsave=3Don,tsc_adjust=3Don,clflushopt=3Don,pdpe1gb=3Don
+  -m 4096 -realtime mlock=3Doff -smp 4,sockets=3D1,cores=3D4,threads=3D1 -u=
+uid
+  4537ca29-73b2-40c3-9b43-666de182ba5f -display none -no-user-config
+  -nodefaults -chardev
+  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-27-ultra1/mon=
+itor.sock,server,nowait
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
+  base=3Dutc,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddelay -no-h=
+pet
+  -no-shutdown -global PIIX4_PM.disable_s3=3D1 -global
+  PIIX4_PM.disable_s4=3D1 -boot strict=3Don -device ich9-usb-
+  ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x8.0x7 -drive
+  file=3D/home/dzagorui/csr/csr_disk.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddr=
+ive-
+  ide0-0-0 -device ide-hd,bus=3Dide.0,unit=3D0,drive=3Ddrive-
+  ide0-0-0,id=3Dide0-0-0,bootindex=3D1 -netdev tap,fd=3D26,id=3Dhostnet0 -d=
+evice
+  e1000,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:a9:4c:86,bus=3Dpci.0,add=
+r=3D0x3
+  -chardev
+  socket,id=3Dcharserial0,host=3D127.0.0.1,port=3D4000,telnet,server,nowait
+  -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
+  socket,id=3Dcharserial1,host=3D127.0.0.1,port=3D4001,telnet,server,nowait
+  -device isa-serial,chardev=3Dcharserial1,id=3Dserial1 -device virtio-
+  balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x2 -msg timestamp=3Don
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1719339/+subscriptions
