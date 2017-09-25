@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dwUoG-0006Gz-Sw
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:56:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1dwUoQ-0006Ov-Qg
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:56:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dwUoF-0003RJ-OY
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:56:36 -0400
+	(envelope-from <eblake@redhat.com>) id 1dwUoP-0003XJ-P9
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:56:46 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 25 Sep 2017 09:55:16 -0500
-Message-Id: <20170925145526.32690-11-eblake@redhat.com>
+Date: Mon, 25 Sep 2017 09:55:17 -0500
+Message-Id: <20170925145526.32690-12-eblake@redhat.com>
 In-Reply-To: <20170925145526.32690-1-eblake@redhat.com>
 References: <20170925145526.32690-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v10 10/20] dirty-bitmap: Set iterator start by
- offset, not sector
+Subject: [Qemu-devel] [PATCH v10 11/20] dirty-bitmap: Change
+ bdrv_dirty_iter_next() to report byte offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,14 +23,18 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-All callers to bdrv_dirty_iter_new() passed 0 for their initial
-starting point, drop that parameter.
+Thanks to recent cleanups, most callers were scaling a return value
+of sectors into bytes (the exception, in qcow2-bitmap, will be
+converted to byte-based iteration later).  Update the interface to
+do the scaling internally instead.
 
-Most callers to bdrv_set_dirty_iter() were scaling a byte offset to
-a sector number; the exception qcow2-bitmap will be converted later
-to use byte rather than sector iteration.  Move the scaling to occur
-internally to dirty bitmap code instead, so that callers now pass
-in bytes.
+In qcow2-bitmap, the code was specifically checking for an error
+return of -1.  To avoid a regression, we either have to make sure
+we continue to return -1 (rather than a scaled -512) on error, or
+we have to fix the caller to treat all negative values as error
+rather than just one magic value.  It's easy enough to make both
+changes at the same time, even though either one in isolation
+would work.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
@@ -38,137 +42,89 @@ Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
 
 ---
-v5: no change
-v4: rebase to persistent bitmaps
+v8: tweak commit message, add R-b
+v7: return -1, not -512; and fix qcow2-bitmap to check all negatives [Kevin]
+v5-v6: no change
+v4: rebase to persistent bitmap
 v3: no change
 v2: no change
 ---
- include/block/dirty-bitmap.h | 5 ++---
- block/backup.c               | 5 ++---
- block/dirty-bitmap.c         | 9 ++++-----
- block/mirror.c               | 4 ++--
- block/qcow2-bitmap.c         | 4 ++--
- 5 files changed, 12 insertions(+), 15 deletions(-)
+ block/backup.c       | 2 +-
+ block/dirty-bitmap.c | 3 ++-
+ block/mirror.c       | 8 ++++----
+ block/qcow2-bitmap.c | 2 +-
+ 4 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 5f34a1a3c7..757fc4c5b8 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -44,8 +44,7 @@ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
- void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-                              int64_t cur_sector, int64_t nr_sectors);
- BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap);
--BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap,
--                                         uint64_t first_sector);
-+BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap);
- void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter);
-
- uint64_t bdrv_dirty_bitmap_serialization_size(const BdrvDirtyBitmap *bitmap,
-@@ -80,7 +79,7 @@ void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
- void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-                                     int64_t cur_sector, int64_t nr_sectors);
- int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
--void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t sector_num);
-+void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t offset);
- int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
- int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
- void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes);
 diff --git a/block/backup.c b/block/backup.c
-index 517c300a49..ac9c018717 100644
+index ac9c018717..06ddbfd03d 100644
 --- a/block/backup.c
 +++ b/block/backup.c
-@@ -372,7 +372,7 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
-
-     granularity = bdrv_dirty_bitmap_granularity(job->sync_bitmap);
-     clusters_per_iter = MAX((granularity / job->cluster_size), 1);
--    dbi = bdrv_dirty_iter_new(job->sync_bitmap, 0);
-+    dbi = bdrv_dirty_iter_new(job->sync_bitmap);
+@@ -375,7 +375,7 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+     dbi = bdrv_dirty_iter_new(job->sync_bitmap);
 
      /* Find the next dirty sector(s) */
-     while ((offset = bdrv_dirty_iter_next(dbi) * BDRV_SECTOR_SIZE) >= 0) {
-@@ -403,8 +403,7 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
-         /* If the bitmap granularity is smaller than the backup granularity,
-          * we need to advance the iterator pointer to the next cluster. */
-         if (granularity < job->cluster_size) {
--            bdrv_set_dirty_iter(dbi,
--                                cluster * job->cluster_size / BDRV_SECTOR_SIZE);
-+            bdrv_set_dirty_iter(dbi, cluster * job->cluster_size);
-         }
+-    while ((offset = bdrv_dirty_iter_next(dbi) * BDRV_SECTOR_SIZE) >= 0) {
++    while ((offset = bdrv_dirty_iter_next(dbi)) >= 0) {
+         cluster = offset / job->cluster_size;
 
-         last_cluster = cluster - 1;
+         /* Fake progress updates for any clusters we skipped */
 diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 555c736024..84509476ba 100644
+index 84509476ba..e451916187 100644
 --- a/block/dirty-bitmap.c
 +++ b/block/dirty-bitmap.c
-@@ -473,11 +473,10 @@ uint32_t bdrv_dirty_bitmap_granularity(const BdrvDirtyBitmap *bitmap)
-     return BDRV_SECTOR_SIZE << hbitmap_granularity(bitmap->bitmap);
+@@ -503,7 +503,8 @@ void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter)
+
+ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
+ {
+-    return hbitmap_iter_next(&iter->hbi);
++    int64_t ret = hbitmap_iter_next(&iter->hbi);
++    return ret < 0 ? -1 : ret * BDRV_SECTOR_SIZE;
  }
 
--BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap,
--                                         uint64_t first_sector)
-+BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap)
- {
-     BdrvDirtyBitmapIter *iter = g_new(BdrvDirtyBitmapIter, 1);
--    hbitmap_iter_init(&iter->hbi, bitmap->bitmap, first_sector);
-+    hbitmap_iter_init(&iter->hbi, bitmap->bitmap, 0);
-     iter->bitmap = bitmap;
-     bitmap->active_iterators++;
-     return iter;
-@@ -645,9 +644,9 @@ void bdrv_set_dirty(BlockDriverState *bs, int64_t cur_sector,
- /**
-  * Advance a BdrvDirtyBitmapIter to an arbitrary offset.
-  */
--void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *iter, int64_t sector_num)
-+void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *iter, int64_t offset)
- {
--    hbitmap_iter_init(&iter->hbi, iter->hbi.hb, sector_num);
-+    hbitmap_iter_init(&iter->hbi, iter->hbi.hb, offset >> BDRV_SECTOR_BITS);
- }
-
- int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap)
+ /* Called within bdrv_dirty_bitmap_lock..unlock */
 diff --git a/block/mirror.c b/block/mirror.c
-index 6f5cb9f26c..0c705e0b4f 100644
+index 0c705e0b4f..de0a02778c 100644
 --- a/block/mirror.c
 +++ b/block/mirror.c
-@@ -373,7 +373,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
-         next_dirty = bdrv_dirty_iter_next(s->dbi) * BDRV_SECTOR_SIZE;
-         if (next_dirty > next_offset || next_dirty < 0) {
-             /* The bitmap iterator's cache is stale, refresh it */
--            bdrv_set_dirty_iter(s->dbi, next_offset >> BDRV_SECTOR_BITS);
-+            bdrv_set_dirty_iter(s->dbi, next_offset);
-             next_dirty = bdrv_dirty_iter_next(s->dbi) * BDRV_SECTOR_SIZE;
-         }
-         assert(next_dirty == next_offset);
-@@ -796,7 +796,7 @@ static void coroutine_fn mirror_run(void *opaque)
-     }
+@@ -336,10 +336,10 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+     int max_io_bytes = MAX(s->buf_size / MAX_IN_FLIGHT, MAX_IO_BYTES);
 
-     assert(!s->dbi);
--    s->dbi = bdrv_dirty_iter_new(s->dirty_bitmap, 0);
-+    s->dbi = bdrv_dirty_iter_new(s->dirty_bitmap);
-     for (;;) {
-         uint64_t delay_ns = 0;
-         int64_t cnt, delta;
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 4475273d8c..44329fc74f 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1103,7 +1103,7 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
-         return NULL;
-     }
-
--    dbi = bdrv_dirty_iter_new(bitmap, 0);
-+    dbi = bdrv_dirty_iter_new(bitmap);
-     buf = g_malloc(s->cluster_size);
-     limit = bytes_covered_by_bitmap_cluster(s, bitmap);
-     sbc = limit >> BDRV_SECTOR_BITS;
-@@ -1153,7 +1153,7 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
+     bdrv_dirty_bitmap_lock(s->dirty_bitmap);
+-    offset = bdrv_dirty_iter_next(s->dbi) * BDRV_SECTOR_SIZE;
++    offset = bdrv_dirty_iter_next(s->dbi);
+     if (offset < 0) {
+         bdrv_set_dirty_iter(s->dbi, 0);
+-        offset = bdrv_dirty_iter_next(s->dbi) * BDRV_SECTOR_SIZE;
++        offset = bdrv_dirty_iter_next(s->dbi);
+         trace_mirror_restart_iter(s, bdrv_get_dirty_count(s->dirty_bitmap) *
+                                   BDRV_SECTOR_SIZE);
+         assert(offset >= 0);
+@@ -370,11 +370,11 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
              break;
          }
 
--        bdrv_set_dirty_iter(dbi, end);
-+        bdrv_set_dirty_iter(dbi, end * BDRV_SECTOR_SIZE);
-     }
+-        next_dirty = bdrv_dirty_iter_next(s->dbi) * BDRV_SECTOR_SIZE;
++        next_dirty = bdrv_dirty_iter_next(s->dbi);
+         if (next_dirty > next_offset || next_dirty < 0) {
+             /* The bitmap iterator's cache is stale, refresh it */
+             bdrv_set_dirty_iter(s->dbi, next_offset);
+-            next_dirty = bdrv_dirty_iter_next(s->dbi) * BDRV_SECTOR_SIZE;
++            next_dirty = bdrv_dirty_iter_next(s->dbi);
+         }
+         assert(next_dirty == next_offset);
+         nb_chunks++;
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index 44329fc74f..b09010b1d3 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -1109,7 +1109,7 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
+     sbc = limit >> BDRV_SECTOR_BITS;
+     assert(DIV_ROUND_UP(bm_size, limit) == tb_size);
 
-     *bitmap_table_size = tb_size;
+-    while ((sector = bdrv_dirty_iter_next(dbi)) != -1) {
++    while ((sector = bdrv_dirty_iter_next(dbi) >> BDRV_SECTOR_BITS) >= 0) {
+         uint64_t cluster = sector / sbc;
+         uint64_t end, write_size;
+         int64_t off;
 -- 
 2.13.5
