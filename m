@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dwRZu-0007xa-Sh
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:29:38 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dwRZy-000802-3C
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:29:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dwRZt-000231-TD
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:29:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54640)
+	(envelope-from <dgilbert@redhat.com>) id 1dwRZv-00023t-Iq
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:29:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52782)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dwRZt-00022X-L7
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:29:33 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dwRZv-00023R-DA
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:29:35 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 25 Sep 2017 12:29:15 +0100
-Message-Id: <20170925112917.21340-5-dgilbert@redhat.com>
+Date: Mon, 25 Sep 2017 12:29:16 +0100
+Message-Id: <20170925112917.21340-6-dgilbert@redhat.com>
 In-Reply-To: <20170925112917.21340-1-dgilbert@redhat.com>
 References: <20170925112917.21340-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/6] migration: wire vmstate_save_state
- errors up to vmstate_subsection_save
+Subject: [Qemu-devel] [PATCH v2 5/6] migration: Route errors up through
+ vmstate_save
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +29,70 @@ Cc: peter.maydell@linaro.org, cohuck@redhat.com, rth@twiddle.net
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Route the errors from vmstate_subsection_save up through
-vmstate_subsection_save (and back down, all rather recursive).
+Route the errors from vsmtate_save_state back up through
+vmstate_save and out to the normal device state path.
+That's the normal error path done.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/vmstate.c | 20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
+ migration/savevm.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/migration/vmstate.c b/migration/vmstate.c
-index 848e8448c6..0b3282c9df 100644
---- a/migration/vmstate.c
-+++ b/migration/vmstate.c
-@@ -21,8 +21,8 @@
- #include "trace.h"
- #include "qjson.h"
- 
--static void vmstate_subsection_save(QEMUFile *f, const VMStateDescription *vmsd,
--                                    void *opaque, QJSON *vmdesc);
-+static int vmstate_subsection_save(QEMUFile *f, const VMStateDescription *vmsd,
-+                                   void *opaque, QJSON *vmdesc);
- static int vmstate_subsection_load(QEMUFile *f, const VMStateDescription *vmsd,
-                                    void *opaque);
- 
-@@ -395,9 +395,7 @@ int vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
-         json_end_array(vmdesc);
+diff --git a/migration/savevm.c b/migration/savevm.c
+index e9feade46a..4a88228614 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -768,14 +768,14 @@ static void vmstate_save_old_style(QEMUFile *f, SaveStateEntry *se, QJSON *vmdes
      }
- 
--    vmstate_subsection_save(f, vmsd, opaque, vmdesc);
--
--    return 0;
-+    return vmstate_subsection_save(f, vmsd, opaque, vmdesc);
  }
  
- static const VMStateDescription *
-@@ -463,11 +461,12 @@ static int vmstate_subsection_load(QEMUFile *f, const VMStateDescription *vmsd,
-     return 0;
- }
- 
--static void vmstate_subsection_save(QEMUFile *f, const VMStateDescription *vmsd,
--                                    void *opaque, QJSON *vmdesc)
-+static int vmstate_subsection_save(QEMUFile *f, const VMStateDescription *vmsd,
-+                                   void *opaque, QJSON *vmdesc)
+-static void vmstate_save(QEMUFile *f, SaveStateEntry *se, QJSON *vmdesc)
++static int vmstate_save(QEMUFile *f, SaveStateEntry *se, QJSON *vmdesc)
  {
-     const VMStateDescription **sub = vmsd->subsections;
-     bool subsection_found = false;
-+    int ret = 0;
- 
-     trace_vmstate_subsection_save_top(vmsd->name);
-     while (sub && *sub && (*sub)->needed) {
-@@ -491,7 +490,10 @@ static void vmstate_subsection_save(QEMUFile *f, const VMStateDescription *vmsd,
-             qemu_put_byte(f, len);
-             qemu_put_buffer(f, (uint8_t *)vmsdsub->name, len);
-             qemu_put_be32(f, vmsdsub->version_id);
--            vmstate_save_state(f, vmsdsub, opaque, vmdesc);
-+            ret = vmstate_save_state(f, vmsdsub, opaque, vmdesc);
-+            if (ret) {
-+                return ret;
-+            }
- 
-             if (vmdesc) {
-                 json_end_object(vmdesc);
-@@ -503,4 +505,6 @@ static void vmstate_subsection_save(QEMUFile *f, const VMStateDescription *vmsd,
-     if (vmdesc && subsection_found) {
-         json_end_array(vmdesc);
+     trace_vmstate_save(se->idstr, se->vmsd ? se->vmsd->name : "(old)");
+     if (!se->vmsd) {
+         vmstate_save_old_style(f, se, vmdesc);
+-        return;
++        return 0;
      }
-+
-+    return ret;
+-    vmstate_save_state(f, se->vmsd, se->opaque, vmdesc);
++    return vmstate_save_state(f, se->vmsd, se->opaque, vmdesc);
  }
+ 
+ /*
+@@ -1171,7 +1171,11 @@ int qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only,
+         json_prop_int(vmdesc, "instance_id", se->instance_id);
+ 
+         save_section_header(f, se, QEMU_VM_SECTION_FULL);
+-        vmstate_save(f, se, vmdesc);
++        ret = vmstate_save(f, se, vmdesc);
++        if (ret) {
++            qemu_file_set_error(f, ret);
++            return ret;
++        }
+         trace_savevm_section_end(se->idstr, se->section_id, 0);
+         save_section_footer(f, se);
+ 
+@@ -1313,6 +1317,8 @@ static int qemu_save_device_state(QEMUFile *f)
+     cpu_synchronize_all_states();
+ 
+     QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
++        int ret;
++
+         if (se->is_ram) {
+             continue;
+         }
+@@ -1325,7 +1331,10 @@ static int qemu_save_device_state(QEMUFile *f)
+ 
+         save_section_header(f, se, QEMU_VM_SECTION_FULL);
+ 
+-        vmstate_save(f, se, NULL);
++        ret = vmstate_save(f, se, NULL);
++        if (ret) {
++            return ret;
++        }
+ 
+         save_section_footer(f, se);
+     }
 -- 
 2.13.5
