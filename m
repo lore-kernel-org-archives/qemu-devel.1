@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dwRWa-0006Ri-GV
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:26:09 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dwRZp-0007wL-4T
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:29:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dwRWX-0008WB-D6
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:26:08 -0400
-References: <20170915090643.6043-1-otubo@redhat.com>
-	<fbe31cc8-c628-32e6-90b0-0341ef1972d3@msgid.tls.msk.ru>
-	<0e84971b-592e-22f7-8815-2b3e193f6c1d@redhat.com>
-	<20170925092641.GD12137@vader>
-	<52fe072e-8e53-0610-2195-3ef8e120b553@msgid.tls.msk.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cd87c7b5-76e3-c5f1-3c2a-59c163f4bc35@redhat.com>
-Date: Mon, 25 Sep 2017 13:25:58 +0200
-MIME-Version: 1.0
-In-Reply-To: <52fe072e-8e53-0610-2195-3ef8e120b553@msgid.tls.msk.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] dma/i82374: avoid double creation of
- i82374 device
+	(envelope-from <dgilbert@redhat.com>) id 1dwRZl-0001z4-VM
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:29:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50134)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dwRZl-0001yg-N4
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 07:29:25 -0400
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Mon, 25 Sep 2017 12:29:11 +0100
+Message-Id: <20170925112917.21340-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/6] migration: let pre_save fail
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,16 +21,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>, Eduardo Otubo <otubo@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, qemu-trivial@nongnu.org, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, famz@redhat.com
+Cc: peter.maydell@linaro.org, cohuck@redhat.com, rth@twiddle.net
 
-On 25/09/2017 12:54, Michael Tokarev wrote:
->> Yes, that's correct. I can revert this patch with the error
->> propagation patch as well, if you guys don't mind.
-> Hmm. After reading the original discussion I concluded this patch
-> is okay.  I can remove it right now before the series has been
-> applied, together with another tiny change.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-No problem, it's okay for now as a trivial change.
+At the moment the pre-save method on VMStateDescription returns void
+which means there's no sane way of a pre_save routine failing.  There
+are quite a few pre_save's that abort or do other nasty things, and it
+would be better if they could fail cleanly.
 
-Paolo
+This patch series doesn't fix any of those pre_save's - it just changes
+pre_save to return an error value and routes that back up so the
+migration fails.  I'll leave that up to the individual device owners.
+
+There are a bunch of corner cases that I've not fixed yet;  these are
+mostly places that call vmstate_save_state which have been partially
+converted to modern migration code;  often the functions they're called
+from return void as well - they can get fixed later.
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+v2
+  test: Split assert/side effects [Fam]
+  new patch 3: Changed to also check the return of the ->put methods
+    that should have been checked previously. [Peter]
+
+Dr. David Alan Gilbert (6):
+  migration: pre_save return int
+  migration: check pre_save return in vmstate_save_state
+  migration: Check field save returns
+  migration: wire vmstate_save_state errors up to
+    vmstate_subsection_save
+  migration: Route errors up through vmstate_save
+  migration: Route more error paths
+
+ docs/devel/migration.txt       |  2 +-
+ hw/arm/pxa2xx.c                |  4 +++-
+ hw/arm/strongarm.c             |  4 +++-
+ hw/audio/wm8750.c              |  4 +++-
+ hw/block/fdc.c                 |  4 +++-
+ hw/block/m25p80.c              |  4 +++-
+ hw/block/nand.c                |  4 +++-
+ hw/block/onenand.c             |  4 +++-
+ hw/char/serial.c               |  4 +++-
+ hw/display/qxl.c               |  4 +++-
+ hw/display/virtio-gpu.c        |  4 +---
+ hw/i2c/core.c                  |  4 +++-
+ hw/i386/kvm/clock.c            |  4 +++-
+ hw/ide/core.c                  |  4 +++-
+ hw/ide/pci.c                   |  4 +++-
+ hw/input/ps2.c                 |  8 ++++++--
+ hw/input/tsc210x.c             |  4 +++-
+ hw/intc/apic_common.c          |  4 +++-
+ hw/intc/arm_gic_common.c       |  4 +++-
+ hw/intc/arm_gicv3_common.c     |  4 +++-
+ hw/intc/arm_gicv3_its_common.c |  4 +++-
+ hw/intc/i8259_common.c         |  4 +++-
+ hw/intc/ioapic_common.c        |  4 +++-
+ hw/intc/s390_flic_kvm.c        |  6 ++++--
+ hw/intc/xics.c                 |  8 ++++++--
+ hw/net/e1000.c                 |  4 +++-
+ hw/net/e1000e.c                |  4 +++-
+ hw/net/rtl8139.c               |  4 +++-
+ hw/net/virtio-net.c            | 16 ++++++++++++----
+ hw/net/vmxnet3.c               |  4 +++-
+ hw/pci-host/piix.c             |  4 +++-
+ hw/ppc/ppc.c                   |  4 +++-
+ hw/ppc/spapr_iommu.c           |  4 +++-
+ hw/ppc/spapr_pci.c             |  6 ++++--
+ hw/s390x/css.c                 | 10 +++++++---
+ hw/s390x/virtio-ccw.c          |  4 +++-
+ hw/scsi/lsi53c895a.c           |  4 +++-
+ hw/scsi/vmw_pvscsi.c           |  4 +++-
+ hw/timer/cadence_ttc.c         |  4 +++-
+ hw/timer/hpet.c                |  4 +++-
+ hw/timer/i8254_common.c        |  4 +++-
+ hw/timer/mc146818rtc.c         |  4 +++-
+ hw/timer/pl031.c               |  4 +++-
+ hw/timer/twl92230.c            |  4 +++-
+ hw/usb/dev-smartcard-reader.c  |  4 +++-
+ hw/usb/hcd-ehci.c              |  4 +++-
+ hw/usb/redirect.c              |  4 +++-
+ hw/virtio/vhost-vsock.c        |  4 +++-
+ hw/virtio/virtio.c             | 13 +++++++------
+ include/hw/virtio/virtio.h     |  2 +-
+ include/migration/vmstate.h    |  6 +++---
+ migration/colo-comm.c          |  4 +++-
+ migration/global_state.c       |  4 +++-
+ migration/savevm.c             | 23 ++++++++++++++++------
+ migration/trace-events         |  1 +
+ migration/vmstate-types.c      | 11 ++++++++---
+ migration/vmstate.c            | 43 +++++++++++++++++++++++++++++++-----------
+ replay/replay-snapshot.c       |  4 +++-
+ slirp/slirp.c                  |  8 ++++++--
+ target/arm/machine.c           |  4 +++-
+ target/i386/machine.c          |  7 +++++--
+ target/ppc/machine.c           |  4 +++-
+ target/s390x/machine.c         |  4 +++-
+ target/sparc/machine.c         |  4 +++-
+ tests/test-vmstate.c           | 13 +++++++++----
+ 65 files changed, 271 insertions(+), 104 deletions(-)
+
+-- 
+2.13.5
