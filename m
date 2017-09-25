@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dwZDi-0003Lr-Hp
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 15:39:12 -0400
+	(envelope-from <cota@braap.org>) id 1dwZGZ-0005LP-3u
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 15:42:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dwZDh-0004BD-0r
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 15:39:10 -0400
-References: <20170925122808.14561-1-kwolf@redhat.com>
-	<20170925122808.14561-3-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <59f25063-4338-dc44-be0b-bc682e72d4ee@redhat.com>
-Date: Mon, 25 Sep 2017 14:38:59 -0500
+	(envelope-from <cota@braap.org>) id 1dwZGW-0005km-0A
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 15:42:07 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:56309)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dwZGV-0005kY-QP
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 15:42:03 -0400
+Date: Mon, 25 Sep 2017 15:42:02 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170925194202.GA19618@flamenco>
+References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
+	<150529666493.10902.14830445134051381968.stgit@frigg.lan>
+	<CAFEAcA9p9B8AFaaSaSOOSsFsEhHW=XPLBFs5MrozWq=7p4_9Zg@mail.gmail.com>
+	<87poasgjyh.fsf@frigg.lan>
+	<CAFEAcA8XP+8Jz9Dn-mEQ3CCrVj00t3HA0praQ-OSggtQGAmQ5Q@mail.gmail.com>
+	<87d16o53xr.fsf@frigg.lan>
+	<CAFEAcA9FhXKVKe1E_pVDWX3u0W7WuKQmO54Z1Jgj-iL980yPew@mail.gmail.com>
+	<87o9pywt8k.fsf@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170925122808.14561-3-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="P6qgJCaLt8qLn8jae4Lt6AFWLMWdgGipc"
-Subject: Re: [Qemu-devel] [PATCH 2/5] commit: Support multiple roots above
- top node
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87o9pywt8k.fsf@frigg.lan>
+Subject: Re: [Qemu-devel] [PATCH v6 01/22] instrument: Add documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,120 +34,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---P6qgJCaLt8qLn8jae4Lt6AFWLMWdgGipc
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, qemu-devel@nongnu.org
-Message-ID: <59f25063-4338-dc44-be0b-bc682e72d4ee@redhat.com>
-Subject: Re: [PATCH 2/5] commit: Support multiple roots above top node
-References: <20170925122808.14561-1-kwolf@redhat.com>
- <20170925122808.14561-3-kwolf@redhat.com>
-In-Reply-To: <20170925122808.14561-3-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, Sep 25, 2017 at 21:03:39 +0300, Lluís Vilanova wrote:
+> I know it's not exactly the same we're discussing, but the plot in [1] compares
+> a few different ways to trace memory accesses on SPEC benchmarks:
+> 
+> * First bar is using a Intel's tool called PIN [2].
+> * Second is calling into an instrumentation function on every executed memory
+>   access in QEMU.
+> * Third is embedding the hot path of writing the memory access info to an array
+>   into the TCG opcode stream (more or less equivalent to supporting filtering;
+>   when the array is full, a user's callback is called - cold path -)
+> * Fourth bar can be ignored.
+> 
+> This was working on a much older version of instrumentation for QEMU, but I can
+> implement something that does the first use-case point above and some filtering
+> example (second use-case point) to see what's the performance difference.
+> 
+> [1] https://filetea.me/n3wy9WwyCCZR72E9OWXHArHDw
 
-On 09/25/2017 07:28 AM, Kevin Wolf wrote:
-> This changes the commit block job to support operation in a graph where=
+Interesting! Unfortunately, this URL gives me a 404.
 
-> there is more than a single active layer that references the top node.
->=20
-> This involves inserting the commit filter node not only on the path
-> between the given active node and the top node, but between the top nod=
-e
-> and all of its parents.
->=20
-> On completion, bdrv_drop_intermediate() must consider all parents for
-> updating the backing file link. These parents may be backing files
-> themselves and such read-only; reopen them temporarily if necessary.
-
-s/such/as such/
-
-> Previously this was achieved by the bdrv_reopen() calls in the commit
-> block job that made overlay_bs read-write for the whole duration of the=
-
-> block job, even though write access is only needed on completion.
-
-Do we know, at the start of the operation, enough to reject attempts
-that will eventually fail because we cannot obtain write access at
-completion, without having to wait for all the intermediate work before
-the completion phase is reached?  If not, that might be a bit of a
-regression (where a command used to fail up front, we now waste a lot of
-effort, and possibly modify the backing chain irreversably, before
-finding out we still fail because we lack write access).
-
->=20
-> Now that we consider all parents, overlay_bs is meaningless. It is left=
-
-> in place in this commit, but we'll remove it soon.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block.c        | 68 ++++++++++++++++++++++++++++++++++----------------=
---------
->  block/commit.c |  2 +-
->  2 files changed, 41 insertions(+), 29 deletions(-)
-> =20
->      /* success - we can delete the intermediate states, and link top->=
-base */
-> -    if (new_top_bs->backing->role->update_filename) {
-> -        backing_file_str =3D backing_file_str ? backing_file_str : bas=
-e->filename;
-> -        ret =3D new_top_bs->backing->role->update_filename(new_top_bs-=
->backing,
-> -                                                         base, backing=
-_file_str,
-> -                                                         &local_err);
-> -        if (ret < 0) {
-> -            bdrv_set_backing_hd(new_top_bs, top, &error_abort);
-> +    backing_file_str =3D backing_file_str ? backing_file_str : base->f=
-ilename;
-> +
-> +    QLIST_FOREACH_SAFE(c, &top->parents, next_parent, next) {
-> +        /* Check whether we are allowed to switch c from top to base *=
-/
-> +        GSList *ignore_children =3D g_slist_prepend(NULL, c);
-> +        bdrv_check_update_perm(base, NULL, c->perm, c->shared_perm,
-> +                               ignore_children, &local_err);
-> +        if (local_err) {
-> +            ret =3D -EPERM;
-> +            error_report_err(local_err);
->              goto exit;
->          }
-> -    }
-> +        g_slist_free(ignore_children);
-> =20
-
-And it looks like you DO check up front that permissions are sufficient
-for later on.
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---P6qgJCaLt8qLn8jae4Lt6AFWLMWdgGipc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnJW1MACgkQp6FrSiUn
-Q2oS8Af+JG8hz5A57s+30HBjlvhRIsluDkYmGbLlG345EiL6W+8eHDJQmDAezZaw
-AbttXdJDG3zDV/G+ugxoxVDDB1Ejxd5f0/m8b65pbsrO/xa4/7T+jv2nHVTC2Pmk
-vDP7RGgJjNFQAPJeY+JU+0wj1BQbDDneJMzRr+2Prt7R1k3p3sMY50BT49+K5xFV
-FLq6cjckneM8WlnS9PFibMZpkLESP3jAV4xr9x283bJdWf2uSW2HQ2R7Hnm2dzIZ
-07uG74SwEXMAuaQcCkiRrYgGsmb7+SibX3MOAM1xLe6QsI7GRBlLor+lw8fHR5Km
-b6ucygyRtih9D5FEvSyh1hjuoVErUw==
-=uovQ
------END PGP SIGNATURE-----
-
---P6qgJCaLt8qLn8jae4Lt6AFWLMWdgGipc--
+		E.
