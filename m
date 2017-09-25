@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dwUTF-0006cU-KT
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:34:54 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dwUVS-00081y-F6
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:37:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dwUTC-0008NY-GK
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:34:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40946)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dwUTC-0008Mo-6K
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:34:50 -0400
-Date: Mon, 25 Sep 2017 11:34:39 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170925143439.GA3030@localhost.localdomain>
-References: <1506071794-4373-1-git-send-email-thuth@redhat.com>
-	<20170925135316.74fed6da.cohuck@redhat.com>
-	<20170925133153.GZ3030@localhost.localdomain>
-	<20170925154647.357047b9@nial.brq.redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1dwUVP-0001Sf-5o
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:37:10 -0400
+Resent-Message-Id: <E1dwUVP-0001Sf-5o@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21478)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dwUVO-0001Rn-TV
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 10:37:07 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150633656091.33.862531980128168681@b58463cdfd5f>
+In-Reply-To: <20170925102302.60587-1-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170925154647.357047b9@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] qdev: Mark devices as non-hotpluggable
- by default
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 25 Sep 2017 03:49:21 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/2] s390/z14: extended TOD-clock support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,81 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Amit Shah <amit@kernel.org>
+To: borntraeger@de.ibm.com
+Cc: famz@redhat.com, cohuck@redhat.com, thuth@redhat.com, david@redhat.com, qemu-devel@nongnu.org, agraf@suse.de, rth@twiddle.net
 
-On Mon, Sep 25, 2017 at 03:46:47PM +0200, Igor Mammedov wrote:
-> On Mon, 25 Sep 2017 10:31:53 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
-> > On Mon, Sep 25, 2017 at 01:53:16PM +0200, Cornelia Huck wrote:
-> > > On Fri, 22 Sep 2017 11:16:34 +0200
-> > > Thomas Huth <thuth@redhat.com> wrote:
-> > >   
-> > > > Historically we've marked all devices as hotpluggable by default. However,
-> > > > most devices are not hotpluggable, and you also need a HotplugHandler to
-> > > > support these devices. So if the user tries to "device_add" or "device_del"
-> > > > such a non-hotpluggable device during runtime, either nothing really usable
-> > > > happens, or QEMU even crashes/aborts unexpectedly (see for example commit
-> > > > 84ebd3e8c7d4fe955b - "Mark diag288 watchdog as non-hotpluggable").
-> > > > So let's change this dangerous default behaviour and mark the devices as
-> > > > non-hotpluggable by default. Certain parent devices classes which are known
-> > > > as hotpluggable (e.g. PCI, USB, etc.) are marked with "hotpluggable = true",
-> > > > so that devices that are derived from these classes continue to work as
-> > > > expected.
-> > > > 
-> > > > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > > > ---
-> > > >  v2: Add missing devices and dropped "RFC" status. See Eduardo's reply on
-> > > >  the previous version of this patch for the rationale which devices need
-> > > >  to be hotpluggable:
-> > > >  https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg06128.html
-> > > > 
-> > > >  hw/char/virtio-serial-bus.c   |  1 +
-> > > >  hw/core/qdev.c                | 10 ++++------
-> > > >  hw/mem/nvdimm.c               |  3 +++
-> > > >  hw/mem/pc-dimm.c              |  1 +
-> > > >  hw/pci/pci.c                  |  1 +
-> > > >  hw/ppc/spapr_cpu_core.c       |  1 +
-> > > >  hw/s390x/ccw-device.c         |  1 +
-> > > >  hw/scsi/scsi-bus.c            |  1 +
-> > > >  hw/usb/bus.c                  |  1 +
-> > > >  hw/usb/dev-smartcard-reader.c |  1 +
-> > > >  hw/xen/xen_backend.c          |  1 +
-> > > >  target/i386/cpu.c             |  4 ++--
-> > > >  target/s390x/cpu.c            |  1 +
-> > > >  13 files changed, 19 insertions(+), 8 deletions(-)  
-> > > 
-> > > Hm, this seems to break hotplug of virtio devices:
-> > > 
-> > > (qemu) device_add virtio-net-pci,id=xxx
-> > > Device 'virtio-net-device' does not support hotplugging
-> > > 
-> > > (qemu) device_add virtio-net-ccw,id=yyy
-> > > Device 'virtio-net-device' does not support hotplugging
-> > > 
-> > > We probably need to enable hotplug for virtio devices as well?  
-> > 
-> > I've seen a similar case broken by "[PATCH] hw/core/qdev: Do not
-> > allow hot-plugging without hotplug controller", because we're
-> > blocking creation of devices created internally by other devices,
-> > not just the ones created by device_add.  I need to find the
-> > exact reproducer again.
-> > 
-> > It would probably simplify things if we move the check for
-> > DeviceClass::hotpluggable to qmp_device_add(), instead of
-> > device_set_realized().
-> if we would have to do that, than we are probably doing
-> something wrong and not using property right. Perhaps we
-> should fix property instead of trying find a place to check
-> it where it would hurt less.
-
-I disagree.  It depends on the purpose and semantics we define
-for DeviceClass::hotpluggable.  My goal is to have a reliable way
-to tell the user if a device really supports device_add, and I
-think it wouldn't make sense to report hotpluggable=true on a
-device that is never instantiated directly by the user and only
-used internally.
-
--- 
-Eduardo
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcwOTI1MTAyMzAyLjYwNTg3LTEtYm9ybnRyYWVnZXJAZGUuaWJtLmNvbQpT
+dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvMl0gczM5MC96MTQ6IGV4dGVuZGVkIFRPRC1j
+bG9jayBzdXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNF
+PWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWls
+ZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAt
+LXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tp
+bmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAg
+ICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gu
+cGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBm
+aQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9
+PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dp
+dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo5NmM2OTA2YzkzIHMzOTAva3ZtOiBTdXBwb3J0
+IGZvciBnZXQvc2V0IG9mIGV4dGVuZGVkIFRPRC1DbG9jayBmb3IgZ3Vlc3QKZjRlY2YxNDNmMCBs
+aW51eC1oZWFkZXJzOiBVcGRhdGUgbGludXggaGVhZGVycyBmb3IgZXh0ZW5kZWQgVE9ELUNsb2Nr
+Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI6IGxpbnV4LWhlYWRlcnM6
+IFVwZGF0ZSBsaW51eCBoZWFkZXJzIGZvciBleHRlbmRlZCBUT0QtQ2xvY2suLi4KQ2hlY2tpbmcg
+UEFUQ0ggMi8yOiBzMzkwL2t2bTogU3VwcG9ydCBmb3IgZ2V0L3NldCBvZiBleHRlbmRlZCBUT0Qt
+Q2xvY2sgZm9yIGd1ZXN0Li4uCkVSUk9SOiBFcnJvciBtZXNzYWdlcyBzaG91bGQgbm90IGNvbnRh
+aW4gbmV3bGluZXMKIzM0OiBGSUxFOiBody9zMzkweC9zMzkwLXZpcnRpby1jY3cuYzoyMTc6Cisg
+ICAgICAgICAgICAgICAgICAgICAiczM5MF9nZXRfY2xvY2sgcmV0dXJuZWQgZXJyb3IgJWQuXG4i
+LCByKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTM0IGxpbmVzIGNoZWNrZWQKCllv
+dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoK
+VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
+dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
+IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
