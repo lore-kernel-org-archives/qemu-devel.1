@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dwVTC-0004mV-IV
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:38:55 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dwVUI-0005OH-GS
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:40:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dwVTB-0005aA-6z
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:38:54 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:17512 helo=relay.sw.ru)
+	(envelope-from <cohuck@redhat.com>) id 1dwVUF-00060k-Er
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:40:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46765)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dwVTA-0005ZQ-Qi
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:38:53 -0400
-References: <20170913181910.29688-1-mreitz@redhat.com>
-	<20170913181910.29688-12-mreitz@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <23eacf8d-8f80-f912-9b77-c955f8100a5f@virtuozzo.com>
-Date: Mon, 25 Sep 2017 18:38:44 +0300
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dwVUF-00060R-8N
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 11:39:59 -0400
+Date: Mon, 25 Sep 2017 17:39:54 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170925173954.11fba063.cohuck@redhat.com>
+In-Reply-To: <2ec0f5a8-b12e-1b4a-8d6f-ecddedeecc78@linux.vnet.ibm.com>
+References: <20170913132752.8484-1-pasic@linux.vnet.ibm.com>
+	<20170913132752.8484-2-pasic@linux.vnet.ibm.com>
+	<20170914162603.1cdabd09.cohuck@redhat.com>
+	<0b42ef59-4366-175f-8dc7-bc3ed02e2fb4@linux.vnet.ibm.com>
+	<20170915092758.16ea52fc.cohuck@redhat.com>
+	<20170915190118.03dc1b57.cohuck@redhat.com>
+	<1301a0dc-755f-1670-1062-b70ea86802e0@linux.vnet.ibm.com>
+	<2ec0f5a8-b12e-1b4a-8d6f-ecddedeecc78@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170913181910.29688-12-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 11/18] hbitmap: Add @advance param to
- hbitmap_iter_next()
+Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/ccs: add ccw-tester emulated
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,158 +34,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
 
-13.09.2017 21:19, Max Reitz wrote:
-> This new parameter allows the caller to just query the next dirty
-> position without moving the iterator.
->
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->   include/qemu/hbitmap.h |  4 +++-
->   block/dirty-bitmap.c   |  2 +-
->   tests/test-hbitmap.c   | 26 +++++++++++++-------------
->   util/hbitmap.c         | 10 +++++++---
->   4 files changed, 24 insertions(+), 18 deletions(-)
->
-> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-> index d3a74a21fc..6a52575ad5 100644
-> --- a/include/qemu/hbitmap.h
-> +++ b/include/qemu/hbitmap.h
-> @@ -316,11 +316,13 @@ void hbitmap_free_meta(HBitmap *hb);
->   /**
->    * hbitmap_iter_next:
->    * @hbi: HBitmapIter to operate on.
-> + * @advance: If true, advance the iterator.  Otherwise, the next call
-> + *           of this function will return the same result.
+On Mon, 25 Sep 2017 17:06:01 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-it's not quit right, as hbitmap iterator allows concurrent resetting of 
-bits, and in
-this case next call may return some other result. (see f63ea4e92bad1db)
+> @Connie
+> I would also like to have an account. 
 
->    *
->    * Return the next bit that is set in @hbi's associated HBitmap,
->    * or -1 if all remaining bits are zero.
->    */
-> -int64_t hbitmap_iter_next(HBitmapIter *hbi);
-> +int64_t hbitmap_iter_next(HBitmapIter *hbi, bool advance);
->   
->   /**
->    * hbitmap_iter_next_word:
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index 30462d4f9a..aee57cf8c8 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -547,7 +547,7 @@ void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter)
->   
->   int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
->   {
-> -    return hbitmap_iter_next(&iter->hbi);
-> +    return hbitmap_iter_next(&iter->hbi, true);
->   }
->   
->   /* Called within bdrv_dirty_bitmap_lock..unlock */
-> diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
-> index 1acb353889..e6d4d563cb 100644
-> --- a/tests/test-hbitmap.c
-> +++ b/tests/test-hbitmap.c
-> @@ -46,7 +46,7 @@ static void hbitmap_test_check(TestHBitmapData *data,
->   
->       i = first;
->       for (;;) {
-> -        next = hbitmap_iter_next(&hbi);
-> +        next = hbitmap_iter_next(&hbi, true);
->           if (next < 0) {
->               next = data->size;
->           }
-> @@ -435,25 +435,25 @@ static void test_hbitmap_iter_granularity(TestHBitmapData *data,
->       /* Note that hbitmap_test_check has to be invoked manually in this test.  */
->       hbitmap_test_init(data, 131072 << 7, 7);
->       hbitmap_iter_init(&hbi, data->hb, 0);
-> -    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
-> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
->   
->       hbitmap_test_set(data, ((L2 + L1 + 1) << 7) + 8, 8);
->       hbitmap_iter_init(&hbi, data->hb, 0);
-> -    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
-> -    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
-> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
-> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
->   
->       hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
-> -    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
-> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
->   
->       hbitmap_test_set(data, (131072 << 7) - 8, 8);
->       hbitmap_iter_init(&hbi, data->hb, 0);
-> -    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
-> -    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, 131071 << 7);
-> -    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
-> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
-> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
-> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
->   
->       hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
-> -    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, 131071 << 7);
-> -    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
-> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
-> +    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
->   }
->   
->   static void hbitmap_test_set_boundary_bits(TestHBitmapData *data, ssize_t diff)
-> @@ -893,7 +893,7 @@ static void test_hbitmap_serialize_zeroes(TestHBitmapData *data,
->       for (i = 0; i < num_positions; i++) {
->           hbitmap_deserialize_zeroes(data->hb, positions[i], min_l1, true);
->           hbitmap_iter_init(&iter, data->hb, 0);
-> -        next = hbitmap_iter_next(&iter);
-> +        next = hbitmap_iter_next(&iter, true);
->           if (i == num_positions - 1) {
->               g_assert_cmpint(next, ==, -1);
->           } else {
-> @@ -919,10 +919,10 @@ static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
->   
->       hbitmap_iter_init(&hbi, data->hb, BITS_PER_LONG - 1);
->   
-> -    hbitmap_iter_next(&hbi);
-> +    hbitmap_iter_next(&hbi, true);
->   
->       hbitmap_reset_all(data->hb);
-> -    hbitmap_iter_next(&hbi);
-> +    hbitmap_iter_next(&hbi, true);
->   }
->   
->   int main(int argc, char **argv)
-> diff --git a/util/hbitmap.c b/util/hbitmap.c
-> index 21535cc90b..96525983ce 100644
-> --- a/util/hbitmap.c
-> +++ b/util/hbitmap.c
-> @@ -141,7 +141,7 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi)
->       return cur;
->   }
->   
-> -int64_t hbitmap_iter_next(HBitmapIter *hbi)
-> +int64_t hbitmap_iter_next(HBitmapIter *hbi, bool advance)
->   {
->       unsigned long cur = hbi->cur[HBITMAP_LEVELS - 1] &
->               hbi->hb->levels[HBITMAP_LEVELS - 1][hbi->pos];
-> @@ -154,8 +154,12 @@ int64_t hbitmap_iter_next(HBitmapIter *hbi)
->           }
->       }
->   
-> -    /* The next call will resume work from the next bit.  */
-> -    hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
-> +    if (advance) {
-> +        /* The next call will resume work from the next bit.  */
-> +        hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
-> +    } else {
-> +        hbi->cur[HBITMAP_LEVELS - 1] = cur;
-> +    }
->       item = ((uint64_t)hbi->pos << BITS_PER_LEVEL) + ctzl(cur);
->   
->       return item << hbi->granularity;
+Done (for both of you).
 
+> I would also like to do a
+> v2 of this somewhere in the not too distant future. I intend
+> to address the issues pointed out by you here (chpid_type,
+> cu_type). Another question is whether this should go under
+> hw/misc/ like the pci-testdev? ccw-testdev would also probably
+> be a better file name (that ccw-tester) regardless of in which
+> folder does this belong. 
 
--- 
-Best regards,
-Vladimir
+Probably not a bad idea to follow pci here.
+
+> One more thing I am considering for
+> v2 is this make it extensible argument. I had something like
+> mode on my mind from the very beginning (fib would be one mode).
+> The idea was to provide a control ccw for setting/getting the mode
+> (something like virtio) as well as a device property for setting
+> the initial mode (so that guest does not have to know about it).
+
+Yes, a control ccw sounds nice, we should just make sure that it
+doesn't collide with future tests (e.g. if we want to do some channel
+program fuzzing). Alternatively, this could be controled by a diagnose,
+which would be out of band (we can use a high function code for diag
+500 that is unlikely to collide with future extensions).
