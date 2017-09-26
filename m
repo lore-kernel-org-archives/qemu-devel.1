@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dwift-0007BM-GY
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 01:44:54 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dwinr-0000UF-E1
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 01:53:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dwifq-0005GD-D0
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 01:44:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46892)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dwifq-0005Fw-3u
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 01:44:50 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E54264A703
-	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 05:44:48 +0000 (UTC)
-Date: Tue, 26 Sep 2017 13:44:39 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170926054439.GB25267@pxdev.xzpeter.org>
+	(envelope-from <laurent@vivier.eu>) id 1dwinq-0001Mc-Oe
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 01:53:07 -0400
+References: <20170926041420.32673-1-carenas@gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <a0c73f93-14a7-1685-92bb-6f1a2c7f9dea@vivier.eu>
+Date: Tue, 26 Sep 2017 07:52:50 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170926041420.32673-1-carenas@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Subject: [Qemu-devel] A glib warning encountered with internal iothread
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: remove duplicate break in
+ syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +24,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Devel Mailing List <qemu-devel@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
+To: =?UTF-8?Q?Carlo_Marcelo_Arenas_Bel=c3=b3n?= <carenas@gmail.com>, qemu-devel@nongnu.org
+Cc: riku.voipio@iki.fi, qemu-trivial@nongnu.org
 
-Hi,
+Le 26/09/2017 à 06:14, Carlo Marcelo Arenas Belón a écrit :
+> likely introduced in 3532fa7402cda16f7b95261b0339c58630051f0b
+> 
+> Signed-off-by: Carlo Marcelo Arenas Belón <carenas@gmail.com>
+> ---
+>  linux-user/syscall.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 9b6364a266..3ef4d1c568 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -3131,7 +3131,6 @@ set_timeout:
+>          case TARGET_SO_RCVLOWAT:
+>  		optname = SO_RCVLOWAT;
+>  		break;
+> -            break;
+>          default:
+>              goto unimplemented;
+>          }
+> 
 
-Generally speaking this is a question about glib, but I would like to
-see how the list sees this before throwing this question to glib
-community in case I made severe mistake.
-
-I encountered one glib warning when start to use internal iothread:
-
-(qemu-system-x86_64:19925): GLib-CRITICAL **: g_source_remove_poll: assertion '!SOURCE_DESTROYED (source)' failed
-
-This will be triggered as long as we create one private iothread and
-enables gcontext of it (by calling iothread_get_g_main_context() at
-least once on the private iothread).
-
-The warning is generated when quitting QEMU in following path (please
-ignore unknown function names, they only appear in a private tree, but
-the logic is the same):
-
-#0  0x00007ff0c2bb4180 in g_source_remove_poll () at /lib64/libglib-2.0.so.0
-#1  0x00005634b0fe8bc9 in aio_set_fd_handler (ctx=0x5634b365ca90, fd=22, is_external=false, io_read=0x0, io_write=0x0, io_poll=0x0, opaque=0x5634b365cb3c) at /root/git/qemu/util/aio-posix.c:226
-#2  0x00005634b0fe8ebc in aio_set_event_notifier (ctx=0x5634b365ca90, notifier=0x5634b365cb3c, is_external=false, io_read=0x0, io_poll=0x0) at /root/git/qemu/util/aio-posix.c:299
-#3  0x00005634b0fe5174 in aio_ctx_finalize (source=0x5634b365ca90) at /root/git/qemu/util/async.c:296
-#4  0x00007ff0c2bb39a6 in g_source_unref_internal () at /lib64/libglib-2.0.so.0
-#5  0x00005634b0fe5757 in aio_context_unref (ctx=0x5634b365ca90) at /root/git/qemu/util/async.c:484
-#6  0x00005634b0c39642 in iothread_instance_finalize (obj=0x5634b36cfa40) at /root/git/qemu/iothread.c:127
-#7  0x00005634b0ede36e in object_deinit (obj=0x5634b36cfa40, type=0x5634b3543c60) at /root/git/qemu/qom/object.c:453
-#8  0x00005634b0ede3e0 in object_finalize (data=0x5634b36cfa40) at /root/git/qemu/qom/object.c:467
-#9  0x00005634b0edf361 in object_unref (obj=0x5634b36cfa40) at /root/git/qemu/qom/object.c:902
-#10 0x00005634b0ee0607 in object_finalize_child_property (obj=0x5634b369d3b0, name=0x5634b36eb900 "monitor_io_thr", opaque=0x5634b36cfa40) at /root/git/qemu/qom/object.c:1407
-#11 0x00005634b0ede25d in object_property_del_child (obj=0x5634b369d3b0, child=0x5634b36cfa40, errp=0x0) at /root/git/qemu/qom/object.c:427
-#12 0x00005634b0ede33d in object_unparent (obj=0x5634b36cfa40) at /root/git/qemu/qom/object.c:446
-#13 0x00005634b0c39f44 in iothread_destroy (iothread=0x5634b36cfa40) at /root/git/qemu/iothread.c:383
-#14 0x00005634b0ae920f in monitor_io_thread_destroy () at /root/git/qemu/monitor.c:4416
-#15 0x00005634b0ae9302 in monitor_cleanup () at /root/git/qemu/monitor.c:4439
-#16 0x00005634b0c496cb in main (argc=17, argv=0x7ffcc5b88918, envp=0x7ffcc5b889a8) at /root/git/qemu/vl.c:4889
-
-It's on the path during destruction of AioContext, where we called
-g_source_remove_poll() in the destructor.  When reach here, AioContext
-has been detached from the gcontext already, so the assertion is
-triggered.
-
-I'll copy some code for easier reference from glib:
-
-void
-g_source_remove_poll (GSource *source,
-		      GPollFD *fd)
-{
-  GMainContext *context;
-  
-  g_return_if_fail (source != NULL);
-  g_return_if_fail (fd != NULL);
-  g_return_if_fail (!SOURCE_DESTROYED (source)); <---- this assertion fails
-  
-  context = source->context;
-
-  if (context)
-    LOCK_CONTEXT (context);
-  
-  source->poll_fds = g_slist_remove (source->poll_fds, fd);
-
-  if (context)
-    {
-      if (!SOURCE_BLOCKED (source))
-	g_main_context_remove_poll_unlocked (context, fd);
-      UNLOCK_CONTEXT (context);
-    }
-}
-
-I'm translating this assertion failure into: "when removing one
-GSource from the polled GSource array, the GSource should still be
-attached to its GMainContext".  But does this really matter?  Why
-can't we remove one GSource from the poll array even if the source is
-detached already?  After all if we see following code in
-g_source_remove_poll() we have already taken special care when
-source->context == NULL happens.
-
-Any thoughts?  TIA.
-
--- 
-Peter Xu
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
