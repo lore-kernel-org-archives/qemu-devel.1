@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dwnae-0000qT-Ql
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:59:49 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dwnba-0001Ny-4j
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 07:00:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dwnaX-0005tg-Ky
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:59:44 -0400
-Date: Tue, 26 Sep 2017 11:59:31 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170926105930.GE2689@work-vm>
-References: <1506421996-12513-1-git-send-email-pl@kamp.de>
+	(envelope-from <stefanha@redhat.com>) id 1dwnbW-0006f1-Bb
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 07:00:46 -0400
+Date: Tue, 26 Sep 2017 12:00:24 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170926110024.GA13332@stefanha-x1.localdomain>
+References: <20170923111411.18626-1-el13635@mail.ntua.gr>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1506421996-12513-1-git-send-email-pl@kamp.de>
-Subject: Re: [Qemu-devel] [PATCH V3] migration: disable auto-converge during
- bulk block migration
+In-Reply-To: <20170923111411.18626-1-el13635@mail.ntua.gr>
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] add bdrv_co_drain_begin/end
+ BlockDriver callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,97 +23,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, famz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, qemu-stable@nongnu.org
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-* Peter Lieven (pl@kamp.de) wrote:
-> auto-converge and block migration currently do not play well together.
-> During block migration the auto-converge logic detects that ram
-> migration makes no progress and thus throttles down the vm until
-> it nearly stalls completely. Avoid this by disabling the throttling
-> logic during the bulk phase of the block migration.
+On Sat, Sep 23, 2017 at 02:14:08PM +0300, Manos Pitsidianakis wrote:
+> This patch series renames bdrv_co_drain to bdrv_co_drain_begin and adds a new 
+> bdrv_co_drain_end callback to match bdrv_drained_begin/end and 
+> drained_begin/end of BdrvChild. This is needed because the throttle driver 
+> (block/throttle.c) needs a way to mark the end of the drain in order to toggle 
+> io_limits_disabled correctly.
 > 
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Peter Lieven <pl@kamp.de>
+> Based-on: <20170918202529.28379-1-el13635@mail.ntua.gr>
+>     "block/throttle-groups.c: allocate RestartData on the heap"
+>     Which fixes a coroutine crash in block/throttle-groups.c
+> 
+> v3:
+>   fixed commit message typo in first patch [Fam]
+>   rephrased doc comment based on mailing discussion
+> v2: 
+>   add doc for callbacks and change order of request polling for completion 
+>   [Stefan]
+> 
+> Manos Pitsidianakis (3):
+>   block: add bdrv_co_drain_end callback
+>   block: rename bdrv_co_drain to bdrv_co_drain_begin
+>   block/throttle.c: add bdrv_co_drain_begin/end callbacks
+> 
+>  include/block/block_int.h | 13 ++++++++++---
+>  block/io.c                | 48 +++++++++++++++++++++++++++++++++--------------
+>  block/qed.c               |  6 +++---
+>  block/throttle.c          | 18 ++++++++++++++++++
+>  4 files changed, 65 insertions(+), 20 deletions(-)
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Oops, this seems to cause a qemu-iotests failure.  Please take a look:
 
-> ---
-> V1->V2: add comment why we disable auto-converge during bulk block migration [Stefan]
-> V2->V3: add missing patch for migration/block.h
-> 
->  migration/block.c | 5 +++++
->  migration/block.h | 7 +++++++
->  migration/ram.c   | 6 +++++-
->  3 files changed, 17 insertions(+), 1 deletion(-)
-> 
-> diff --git a/migration/block.c b/migration/block.c
-> index 9171f60..606ad4d 100644
-> --- a/migration/block.c
-> +++ b/migration/block.c
-> @@ -161,6 +161,11 @@ int blk_mig_active(void)
->      return !QSIMPLEQ_EMPTY(&block_mig_state.bmds_list);
->  }
->  
-> +int blk_mig_bulk_active(void)
-> +{
-> +    return blk_mig_active() && !block_mig_state.bulk_completed;
-> +}
-> +
->  uint64_t blk_mig_bytes_transferred(void)
->  {
->      BlkMigDevState *bmds;
-> diff --git a/migration/block.h b/migration/block.h
-> index 22ebe94..3178609 100644
-> --- a/migration/block.h
-> +++ b/migration/block.h
-> @@ -16,6 +16,7 @@
->  
->  #ifdef CONFIG_LIVE_BLOCK_MIGRATION
->  int blk_mig_active(void);
-> +int blk_mig_bulk_active(void);
->  uint64_t blk_mig_bytes_transferred(void);
->  uint64_t blk_mig_bytes_remaining(void);
->  uint64_t blk_mig_bytes_total(void);
-> @@ -25,6 +26,12 @@ static inline int blk_mig_active(void)
->  {
->      return false;
->  }
-> +
-> +static inline int blk_mig_bulk_active(void)
-> +{
-> +    return false;
-> +}
-> +
->  static inline uint64_t blk_mig_bytes_transferred(void)
->  {
->      return 0;
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 88ca69e..b83f897 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -46,6 +46,7 @@
->  #include "exec/ram_addr.h"
->  #include "qemu/rcu_queue.h"
->  #include "migration/colo.h"
-> +#include "migration/block.h"
->  
->  /***********************************************************/
->  /* ram save/restore */
-> @@ -825,7 +826,10 @@ static void migration_bitmap_sync(RAMState *rs)
->              / (end_time - rs->time_last_bitmap_sync);
->          bytes_xfer_now = ram_counters.transferred;
->  
-> -        if (migrate_auto_converge()) {
-> +        /* During block migration the auto-converge logic incorrectly detects
-> +         * that ram migration makes no progress. Avoid this by disabling the
-> +         * throttling logic during the bulk phase of block migration. */
-> +        if (migrate_auto_converge() && !blk_mig_bulk_active()) {
->              /* The following detection logic can be refined later. For now:
->                 Check to see if the dirtied bytes is 50% more than the approx.
->                 amount of bytes that just got transferred since the last time we
-> -- 
-> 1.9.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+$ ./check -qcow2 184
+184 0s ... - output mismatch (see 184.out.bad)
+--- /home/stefanha/qemu/tests/qemu-iotests/184.out	2017-09-19 14:51:46.673854437 +0100
++++ 184.out.bad	2017-09-26 11:13:06.946610239 +0100
+@@ -142,6 +142,9 @@
+         "guest": false
+     }
+ }
++./common.config: line 118:  9196 Segmentation fault      (core dumped) ( if [ -n "${QEMU_NEED_PID}" ]; then
++    echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid";
++fi; exec "$QEMU_PROG" $QEMU_OPTIONS "$@" )
