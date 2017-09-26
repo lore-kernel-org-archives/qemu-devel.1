@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dwg6e-0004c2-Lc
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 23:00:22 -0400
+	(envelope-from <peterx@redhat.com>) id 1dwgD4-00069K-Sg
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 23:07:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dwg6b-0008Mg-Fx
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 23:00:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51662)
+	(envelope-from <peterx@redhat.com>) id 1dwgD1-0002ba-Lo
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 23:06:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34532)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dwg6b-0008Kv-6g
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 23:00:17 -0400
-Date: Mon, 25 Sep 2017 23:59:56 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170926025956.GB4115@localhost.localdomain>
-References: <1506071794-4373-1-git-send-email-thuth@redhat.com>
-	<20170925135316.74fed6da.cohuck@redhat.com>
-	<20170925133153.GZ3030@localhost.localdomain>
-	<20170925154647.357047b9@nial.brq.redhat.com>
-	<20170925143439.GA3030@localhost.localdomain>
-	<f078939d-4ae0-0ae8-4030-3df0ed66299a@redhat.com>
-	<CAFEAcA-kmSkjhM0f+Ti7nY1_AuDm1pPcYHNGn50fes20YvOeBg@mail.gmail.com>
-	<59e890ab-45e4-fe8a-a8de-3c441de19080@redhat.com>
-	<20170925175944.GD3030@localhost.localdomain>
-	<CAFEAcA_3SpWNm0FCviD5fXOFmxF1jGAwYgD_cZgwUMMAMn4BOQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dwgD1-0002aJ-BR
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 23:06:55 -0400
+Date: Tue, 26 Sep 2017 11:06:47 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170926030647.GK19505@pxdev.xzpeter.org>
+References: <20170925112917.21340-1-dgilbert@redhat.com>
+	<20170925112917.21340-7-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA_3SpWNm0FCviD5fXOFmxF1jGAwYgD_cZgwUMMAMn4BOQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2] qdev: Mark devices as non-hotpluggable
- by default
+In-Reply-To: <20170925112917.21340-7-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] migration: Route more error paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,128 +27,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Amit Shah <amit@kernel.org>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, famz@redhat.com, peter.maydell@linaro.org, cohuck@redhat.com, rth@twiddle.net
 
-On Mon, Sep 25, 2017 at 07:05:26PM +0100, Peter Maydell wrote:
-> On 25 September 2017 at 18:59, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > Finding the full list of devices that can be instantiated
-> > internally at hotplug-time sounds tricky.
+On Mon, Sep 25, 2017 at 12:29:17PM +0100, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> If we just diff "list of devices marked hotplug before this patch"
-> against "list of devices marked hotplug after this patch" how
-> big is the list? Can we just eyeball it to see what needs
-> to be specialcased?
+> vmstate_save is called in a few places, and vmstate_save_state is
+> called in lots of places.
 
-So, the full list quite big, ~1800 device types are affected by
-this patch:
+vmstate_save() should have been processed with previous patch?
 
-https://gist.github.com/ehabkost/bd8e25c6811ac81d947ad8ad5b557f5c#file-dev-types-diff-json
+> 
+> Route error returns from the easier cases back up;  there are lots
+> of more complex cases where their own error paths need fixing.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-If we ignore the "-cpu" classes, there ~640 affected device
-types.
+The patch content wires quite a few vmstate_save_state() callers, so
+the patch itself makes sense to me.
 
-However, if we look only at the direct children of TYPE_DEVICE,
-we have:
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-$ grep '"parent": "device"' dev-types-diff.json 
--{"return": {"abstract": true, "name": "adb-device", "parent": "device", "user-creatable": true, "hotpluggable": true}}
--{"return": {"abstract": true, "name": "apic-common", "parent": "device", "user-creatable": false, "hotpluggable": true}}
--{"return": {"abstract": true, "name": "aspeed-soc", "parent": "device", "user-creatable": true, "hotpluggable": true}}
--{"return": {"abstract": true, "name": "aux-slave", "parent": "device", "user-creatable": true, "hotpluggable": true}}
-+{"return": {"abstract": true, "name": "adb-device", "parent": "device", "user-creatable": true, "hotpluggable": false}}
-+{"return": {"abstract": true, "name": "apic-common", "parent": "device", "user-creatable": false, "hotpluggable": false}}
-+{"return": {"abstract": true, "name": "aspeed-soc", "parent": "device", "user-creatable": true, "hotpluggable": false}}
-+{"return": {"abstract": true, "name": "aux-slave", "parent": "device", "user-creatable": true, "hotpluggable": false}}
- {"return": {"abstract": true, "name": "ccid-card", "parent": "device", "user-creatable": true, "hotpluggable": true}}
- {"return": {"abstract": true, "name": "ccw-device", "parent": "device", "user-creatable": true, "hotpluggable": true}}
--{"return": {"abstract": true, "name": "cpu-core", "parent": "device", "user-creatable": true, "hotpluggable": true}}
--{"return": {"abstract": true, "name": "cpu", "parent": "device", "user-creatable": false, "hotpluggable": true}}
-+{"return": {"abstract": true, "name": "cpu-core", "parent": "device", "user-creatable": true, "hotpluggable": false}}
-+{"return": {"abstract": true, "name": "cpu", "parent": "device", "user-creatable": false, "hotpluggable": false}}
--{"return": {"abstract": true, "name": "hda-codec", "parent": "device", "user-creatable": true, "hotpluggable": true}}
--{"return": {"abstract": true, "name": "i2c-slave", "parent": "device", "user-creatable": true, "hotpluggable": true}}
-+{"return": {"abstract": true, "name": "hda-codec", "parent": "device", "user-creatable": true, "hotpluggable": false}}
-+{"return": {"abstract": true, "name": "i2c-slave", "parent": "device", "user-creatable": true, "hotpluggable": false}}
--{"return": {"abstract": true, "name": "ics-base", "parent": "device", "user-creatable": true, "hotpluggable": true}}
--{"return": {"abstract": true, "name": "ide-device", "parent": "device", "user-creatable": true, "hotpluggable": true}}
-+{"return": {"abstract": true, "name": "ics-base", "parent": "device", "user-creatable": true, "hotpluggable": false}}
-+{"return": {"abstract": true, "name": "ide-device", "parent": "device", "user-creatable": true, "hotpluggable": false}}
--{"return": {"abstract": true, "name": "ipack-device", "parent": "device", "user-creatable": true, "hotpluggable": true}}
--{"return": {"abstract": true, "name": "ipmi-bmc", "parent": "device", "user-creatable": true, "hotpluggable": true}}
--{"return": {"abstract": true, "name": "isa-device", "parent": "device", "user-creatable": true, "hotpluggable": true}}
-+{"return": {"abstract": true, "name": "ipack-device", "parent": "device", "user-creatable": true, "hotpluggable": false}}
-+{"return": {"abstract": true, "name": "ipmi-bmc", "parent": "device", "user-creatable": true, "hotpluggable": false}}
-+{"return": {"abstract": true, "name": "isa-device", "parent": "device", "user-creatable": true, "hotpluggable": false}}
- {"return": {"abstract": true, "name": "pci-device", "parent": "device", "user-creatable": true, "hotpluggable": true}}
--{"return": {"abstract": true, "name": "pcmcia-card", "parent": "device", "user-creatable": true, "hotpluggable": true}}
-+{"return": {"abstract": true, "name": "pcmcia-card", "parent": "device", "user-creatable": true, "hotpluggable": false}}
--{"return": {"abstract": true, "name": "s390-sclp-event-type", "parent": "device", "user-creatable": true, "hotpluggable": true}}
-+{"return": {"abstract": true, "name": "s390-sclp-event-type", "parent": "device", "user-creatable": true, "hotpluggable": false}}
- {"return": {"abstract": true, "name": "s390-skeys", "parent": "device", "user-creatable": true, "hotpluggable": false}}
- {"return": {"abstract": true, "name": "s390-storage_attributes", "parent": "device", "user-creatable": true, "hotpluggable": false}}
- {"return": {"abstract": true, "name": "scsi-device", "parent": "device", "user-creatable": true, "hotpluggable": true}}
--{"return": {"abstract": true, "name": "spapr-dr-connector", "parent": "device", "user-creatable": false, "hotpluggable": true}}
--{"return": {"abstract": true, "name": "ssi-slave", "parent": "device", "user-creatable": true, "hotpluggable": true}}
--{"return": {"abstract": true, "name": "sys-bus-device", "parent": "device", "user-creatable": false, "hotpluggable": true}}
-+{"return": {"abstract": true, "name": "spapr-dr-connector", "parent": "device", "user-creatable": false, "hotpluggable": false}}
-+{"return": {"abstract": true, "name": "ssi-slave", "parent": "device", "user-creatable": true, "hotpluggable": false}}
-+{"return": {"abstract": true, "name": "sys-bus-device", "parent": "device", "user-creatable": false, "hotpluggable": false}}
- {"return": {"abstract": true, "name": "usb-device", "parent": "device", "user-creatable": true, "hotpluggable": true}}
--{"return": {"abstract": true, "name": "vio-spapr-device", "parent": "device", "user-creatable": true, "hotpluggable": true}}
-+{"return": {"abstract": true, "name": "vio-spapr-device", "parent": "device", "user-creatable": true, "hotpluggable": false}}
--{"return": {"abstract": true, "name": "virtio-device", "parent": "device", "user-creatable": true, "hotpluggable": true}}
-+{"return": {"abstract": true, "name": "virtio-device", "parent": "device", "user-creatable": true, "hotpluggable": false}}
- {"return": {"abstract": true, "name": "virtio-serial-port", "parent": "device", "user-creatable": true, "hotpluggable": true}}
--{"return": {"name": "allwinner-a10", "parent": "device", "user-creatable": false, "hotpluggable": true}}
-+{"return": {"name": "allwinner-a10", "parent": "device", "user-creatable": false, "hotpluggable": false}}
--{"return": {"name": "aux-to-i2c-bridge", "parent": "device", "user-creatable": true, "hotpluggable": true}}
-+{"return": {"name": "aux-to-i2c-bridge", "parent": "device", "user-creatable": true, "hotpluggable": false}}
- {"return": {"name": "diag288", "parent": "device", "user-creatable": true, "hotpluggable": false}}
--{"return": {"name": "digic", "parent": "device", "user-creatable": false, "hotpluggable": true}}
-+{"return": {"name": "digic", "parent": "device", "user-creatable": false, "hotpluggable": false}}
--{"return": {"name": "floppy", "parent": "device", "user-creatable": true, "hotpluggable": true}}
--{"return": {"name": "fsl,imx25", "parent": "device", "user-creatable": true, "hotpluggable": true}}
--{"return": {"name": "fsl,imx31", "parent": "device", "user-creatable": true, "hotpluggable": true}}
--{"return": {"name": "fsl,imx6", "parent": "device", "user-creatable": true, "hotpluggable": true}}
-+{"return": {"name": "floppy", "parent": "device", "user-creatable": true, "hotpluggable": false}}
-+{"return": {"name": "fsl,imx25", "parent": "device", "user-creatable": true, "hotpluggable": false}}
-+{"return": {"name": "fsl,imx31", "parent": "device", "user-creatable": true, "hotpluggable": false}}
-+{"return": {"name": "fsl,imx6", "parent": "device", "user-creatable": true, "hotpluggable": false}}
--{"return": {"name": "icp", "parent": "device", "user-creatable": true, "hotpluggable": true}}
-+{"return": {"name": "icp", "parent": "device", "user-creatable": true, "hotpluggable": false}}
--{"return": {"name": "loader", "parent": "device", "user-creatable": true, "hotpluggable": true}}
-+{"return": {"name": "loader", "parent": "device", "user-creatable": true, "hotpluggable": false}}
--{"return": {"name": "migration", "parent": "device", "user-creatable": false, "hotpluggable": true}}
--{"return": {"name": "mmio_interface", "parent": "device", "user-creatable": false, "hotpluggable": true}}
-+{"return": {"name": "migration", "parent": "device", "user-creatable": false, "hotpluggable": false}}
-+{"return": {"name": "mmio_interface", "parent": "device", "user-creatable": false, "hotpluggable": false}}
--{"return": {"name": "nand", "parent": "device", "user-creatable": true, "hotpluggable": true}}
-+{"return": {"name": "nand", "parent": "device", "user-creatable": true, "hotpluggable": false}}
--{"return": {"name": "or-irq", "parent": "device", "user-creatable": false, "hotpluggable": true}}
-+{"return": {"name": "or-irq", "parent": "device", "user-creatable": false, "hotpluggable": false}}
- {"return": {"name": "pc-dimm", "parent": "device", "user-creatable": true, "hotpluggable": true}}
--{"return": {"name": "pnv-lpc", "parent": "device", "user-creatable": true, "hotpluggable": true}}
--{"return": {"name": "pnv-occ", "parent": "device", "user-creatable": true, "hotpluggable": true}}
-+{"return": {"name": "pnv-lpc", "parent": "device", "user-creatable": true, "hotpluggable": false}}
-+{"return": {"name": "pnv-occ", "parent": "device", "user-creatable": true, "hotpluggable": false}}
--{"return": {"name": "qemu,register", "parent": "device", "user-creatable": false, "hotpluggable": true}}
-+{"return": {"name": "qemu,register", "parent": "device", "user-creatable": false, "hotpluggable": false}}
--{"return": {"name": "s390-ipl", "parent": "device", "user-creatable": false, "hotpluggable": true}}
-+{"return": {"name": "s390-ipl", "parent": "device", "user-creatable": false, "hotpluggable": false}}
- {"return": {"name": "sclp", "parent": "device", "user-creatable": true, "hotpluggable": false}}
--{"return": {"name": "sd-card", "parent": "device", "user-creatable": true, "hotpluggable": true}}
-+{"return": {"name": "sd-card", "parent": "device", "user-creatable": true, "hotpluggable": false}}
- {"return": {"name": "spapr-rng", "parent": "device", "user-creatable": true, "hotpluggable": false}}
--{"return": {"name": "spapr-rtc", "parent": "device", "user-creatable": false, "hotpluggable": true}}
--{"return": {"name": "spapr-tce-table", "parent": "device", "user-creatable": false, "hotpluggable": true}}
-+{"return": {"name": "spapr-rtc", "parent": "device", "user-creatable": false, "hotpluggable": false}}
-+{"return": {"name": "spapr-tce-table", "parent": "device", "user-creatable": false, "hotpluggable": false}}
- {"return": {"name": "vmgenid", "parent": "device", "user-creatable": true, "hotpluggable": false}}
--{"return": {"name": "xlnx,zynqmp", "parent": "device", "user-creatable": true, "hotpluggable": true}}
-+{"return": {"name": "xlnx,zynqmp", "parent": "device", "user-creatable": true, "hotpluggable": false}}
--{"return": {"name": "zpci", "parent": "device", "user-creatable": true, "hotpluggable": true}}
-+{"return": {"name": "zpci", "parent": "device", "user-creatable": true, "hotpluggable": false}}
+> ---
+>  hw/display/virtio-gpu.c    |  4 +---
+>  hw/virtio/virtio.c         | 13 +++++++------
+>  include/hw/virtio/virtio.h |  2 +-
+>  migration/vmstate-types.c  | 11 ++++++++---
+>  tests/test-vmstate.c       |  9 ++++++---
+>  5 files changed, 23 insertions(+), 16 deletions(-)
+> 
+> diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+> index 3a8f1e1a2d..2becbfda59 100644
+> --- a/hw/display/virtio-gpu.c
+> +++ b/hw/display/virtio-gpu.c
+> @@ -1050,9 +1050,7 @@ static int virtio_gpu_save(QEMUFile *f, void *opaque, size_t size,
+>      }
+>      qemu_put_be32(f, 0); /* end of list */
+>  
+> -    vmstate_save_state(f, &vmstate_virtio_gpu_scanouts, g, NULL);
+> -
+> -    return 0;
+> +    return vmstate_save_state(f, &vmstate_virtio_gpu_scanouts, g, NULL);
+>  }
+>  
+>  static int virtio_gpu_load(QEMUFile *f, void *opaque, size_t size,
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 3129d25c00..311929e9df 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -1897,7 +1897,7 @@ static const VMStateDescription vmstate_virtio = {
+>      }
+>  };
+>  
+> -void virtio_save(VirtIODevice *vdev, QEMUFile *f)
+> +int virtio_save(VirtIODevice *vdev, QEMUFile *f)
+>  {
+>      BusState *qbus = qdev_get_parent_bus(DEVICE(vdev));
+>      VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
+> @@ -1947,20 +1947,21 @@ void virtio_save(VirtIODevice *vdev, QEMUFile *f)
+>      }
+>  
+>      if (vdc->vmsd) {
+> -        vmstate_save_state(f, vdc->vmsd, vdev, NULL);
+> +        int ret = vmstate_save_state(f, vdc->vmsd, vdev, NULL);
+> +        if (ret) {
+> +            return ret;
+> +        }
+>      }
+>  
+>      /* Subsections */
+> -    vmstate_save_state(f, &vmstate_virtio, vdev, NULL);
+> +    return vmstate_save_state(f, &vmstate_virtio, vdev, NULL);
+>  }
+>  
+>  /* A wrapper for use as a VMState .put function */
+>  static int virtio_device_put(QEMUFile *f, void *opaque, size_t size,
+>                                VMStateField *field, QJSON *vmdesc)
+>  {
+> -    virtio_save(VIRTIO_DEVICE(opaque), f);
+> -
+> -    return 0;
+> +    return virtio_save(VIRTIO_DEVICE(opaque), f);
+>  }
+>  
+>  /* A wrapper for use as a VMState .get function */
+> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> index 80c45c321e..5abada6966 100644
+> --- a/include/hw/virtio/virtio.h
+> +++ b/include/hw/virtio/virtio.h
+> @@ -188,7 +188,7 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
+>  void virtio_notify_irqfd(VirtIODevice *vdev, VirtQueue *vq);
+>  void virtio_notify(VirtIODevice *vdev, VirtQueue *vq);
+>  
+> -void virtio_save(VirtIODevice *vdev, QEMUFile *f);
+> +int virtio_save(VirtIODevice *vdev, QEMUFile *f);
+>  
+>  extern const VMStateInfo virtio_vmstate_info;
+>  
+> diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
+> index c056c98bdb..48184c380d 100644
+> --- a/migration/vmstate-types.c
+> +++ b/migration/vmstate-types.c
+> @@ -550,13 +550,14 @@ static int put_tmp(QEMUFile *f, void *pv, size_t size, VMStateField *field,
+>  {
+>      const VMStateDescription *vmsd = field->vmsd;
+>      void *tmp = g_malloc(size);
+> +    int ret;
+>  
+>      /* Writes the parent field which is at the start of the tmp */
+>      *(void **)tmp = pv;
+> -    vmstate_save_state(f, vmsd, tmp, vmdesc);
+> +    ret = vmstate_save_state(f, vmsd, tmp, vmdesc);
+>      g_free(tmp);
+>  
+> -    return 0;
+> +    return ret;
+>  }
+>  
+>  const VMStateInfo vmstate_info_tmp = {
+> @@ -657,12 +658,16 @@ static int put_qtailq(QEMUFile *f, void *pv, size_t unused_size,
+>      /* offset of the QTAILQ entry in a QTAILQ element*/
+>      size_t entry_offset = field->start;
+>      void *elm;
+> +    int ret;
+>  
+>      trace_put_qtailq(vmsd->name, vmsd->version_id);
+>  
+>      QTAILQ_RAW_FOREACH(elm, pv, entry_offset) {
+>          qemu_put_byte(f, true);
+> -        vmstate_save_state(f, vmsd, elm, vmdesc);
+> +        ret = vmstate_save_state(f, vmsd, elm, vmdesc);
+> +        if (ret) {
+> +            return ret;
+> +        }
+>      }
+>      qemu_put_byte(f, false);
+>  
+> diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+> index e643ac662b..087844b6c8 100644
+> --- a/tests/test-vmstate.c
+> +++ b/tests/test-vmstate.c
+> @@ -70,7 +70,8 @@ static void save_vmstate(const VMStateDescription *desc, void *obj)
+>      QEMUFile *f = open_test_file(true);
+>  
+>      /* Save file with vmstate */
+> -    vmstate_save_state(f, desc, obj, NULL);
+> +    int ret = vmstate_save_state(f, desc, obj, NULL);
+> +    g_assert(!ret);
+>      qemu_put_byte(f, QEMU_VM_EOF);
+>      g_assert(!qemu_file_get_error(f));
+>      qemu_fclose(f);
+> @@ -381,7 +382,8 @@ static void test_save_noskip(void)
+>      QEMUFile *fsave = open_test_file(true);
+>      TestStruct obj = { .a = 1, .b = 2, .c = 3, .d = 4, .e = 5, .f = 6,
+>                         .skip_c_e = false };
+> -    vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL);
+> +    int ret = vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL);
+> +    g_assert(!ret);
+>      g_assert(!qemu_file_get_error(fsave));
+>  
+>      uint8_t expected[] = {
+> @@ -402,7 +404,8 @@ static void test_save_skip(void)
+>      QEMUFile *fsave = open_test_file(true);
+>      TestStruct obj = { .a = 1, .b = 2, .c = 3, .d = 4, .e = 5, .f = 6,
+>                         .skip_c_e = true };
+> -    vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL);
+> +    int ret = vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL);
+> +    g_assert(!ret);
+>      g_assert(!qemu_file_get_error(fsave));
+>  
+>      uint8_t expected[] = {
+> -- 
+> 2.13.5
+> 
 
 -- 
-Eduardo
+Peter Xu
