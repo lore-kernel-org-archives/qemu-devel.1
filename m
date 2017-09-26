@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dwqkf-0001g8-My
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:23 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dwqkh-0001iw-UK
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dwqkZ-0005WX-KD
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:21 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dwqkg-0005as-Bb
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:23 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 26 Sep 2017 16:21:26 +0200
-Message-Id: <20170926142133.2498-18-kwolf@redhat.com>
+Date: Tue, 26 Sep 2017 16:21:27 +0200
+Message-Id: <20170926142133.2498-19-kwolf@redhat.com>
 In-Reply-To: <20170926142133.2498-1-kwolf@redhat.com>
 References: <20170926142133.2498-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 17/24] block: Fix permissions after bdrv_reopen()
+Subject: [Qemu-devel] [PULL 18/24] qemu-iotests: Test change-backing-file
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,138 +23,209 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-If we switch between read-only and read-write, the permissions that
-image format drivers need on bs->file change, too. Make sure to update
-the permissions during bdrv_reopen().
+This involves a temporary read-write reopen if the backing file link in
+the middle of a backing file chain should be changed and is therefore a
+good test for the latest bdrv_reopen() vs. op blockers fixes.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- include/block/block.h |  1 +
- block.c               | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 65 insertions(+)
+ tests/qemu-iotests/195     | 92 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/195.out | 78 +++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 171 insertions(+)
+ create mode 100755 tests/qemu-iotests/195
+ create mode 100644 tests/qemu-iotests/195.out
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 082eb2cd9c..3c3af462e4 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -166,6 +166,7 @@ typedef QSIMPLEQ_HEAD(BlockReopenQueue, BlockReopenQueueEntry) BlockReopenQueue;
- typedef struct BDRVReopenState {
-     BlockDriverState *bs;
-     int flags;
-+    uint64_t perm, shared_perm;
-     QDict *options;
-     QDict *explicit_options;
-     void *opaque;
-diff --git a/block.c b/block.c
-index 204cbb46c7..5c65fac672 100644
---- a/block.c
-+++ b/block.c
-@@ -2781,6 +2781,10 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-     bs_entry->state.explicit_options = explicit_options;
-     bs_entry->state.flags = flags;
- 
-+    /* This needs to be overwritten in bdrv_reopen_prepare() */
-+    bs_entry->state.perm = UINT64_MAX;
-+    bs_entry->state.shared_perm = 0;
+diff --git a/tests/qemu-iotests/195 b/tests/qemu-iotests/195
+new file mode 100755
+index 0000000000..05a239cbf5
+--- /dev/null
++++ b/tests/qemu-iotests/195
+@@ -0,0 +1,92 @@
++#!/bin/bash
++#
++# Test change-backing-file command
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-     QLIST_FOREACH(child, &bs->children, next) {
-         QDict *new_child_options;
-         char *child_key_dot;
-@@ -2887,6 +2891,52 @@ int bdrv_reopen(BlockDriverState *bs, int bdrv_flags, Error **errp)
-     return ret;
- }
- 
-+static BlockReopenQueueEntry *find_parent_in_reopen_queue(BlockReopenQueue *q,
-+                                                          BdrvChild *c)
++# creator
++owner=kwolf@redhat.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1 # failure is the default!
++
++_cleanup()
 +{
-+    BlockReopenQueueEntry *entry;
++    _cleanup_test_img
++    rm -f "$TEST_IMG.mid"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
 +
-+    QSIMPLEQ_FOREACH(entry, q, entry) {
-+        BlockDriverState *bs = entry->state.bs;
-+        BdrvChild *child;
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
 +
-+        QLIST_FOREACH(child, &bs->children, next) {
-+            if (child == c) {
-+                return entry;
-+            }
-+        }
-+    }
++_supported_fmt qcow2
++_supported_proto file
++_supported_os Linux
 +
-+    return NULL;
++function do_run_qemu()
++{
++    echo Testing: "$@" | _filter_imgfmt
++    $QEMU -nographic -qmp-pretty stdio -serial none "$@"
++    echo
 +}
 +
-+static void bdrv_reopen_perm(BlockReopenQueue *q, BlockDriverState *bs,
-+                             uint64_t *perm, uint64_t *shared)
++function run_qemu()
 +{
-+    BdrvChild *c;
-+    BlockReopenQueueEntry *parent;
-+    uint64_t cumulative_perms = 0;
-+    uint64_t cumulative_shared_perms = BLK_PERM_ALL;
-+
-+    QLIST_FOREACH(c, &bs->parents, next_parent) {
-+        parent = find_parent_in_reopen_queue(q, c);
-+        if (!parent) {
-+            cumulative_perms |= c->perm;
-+            cumulative_shared_perms &= c->shared_perm;
-+        } else {
-+            uint64_t nperm, nshared;
-+
-+            bdrv_child_perm(parent->state.bs, bs, c, c->role, q,
-+                            parent->state.perm, parent->state.shared_perm,
-+                            &nperm, &nshared);
-+
-+            cumulative_perms |= nperm;
-+            cumulative_shared_perms &= nshared;
-+        }
-+    }
-+    *perm = cumulative_perms;
-+    *shared = cumulative_shared_perms;
++    do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_qemu | _filter_qmp \
++                          | _filter_qemu_io | _filter_generated_node_ids
 +}
- 
- /*
-  * Prepares a BlockDriverState for reopen. All changes are staged in the
-@@ -2952,6 +3002,9 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
-         goto error;
-     }
- 
-+    /* Calculate required permissions after reopening */
-+    bdrv_reopen_perm(queue, reopen_state->bs,
-+                     &reopen_state->perm, &reopen_state->shared_perm);
- 
-     ret = bdrv_flush(reopen_state->bs);
-     if (ret) {
-@@ -3007,6 +3060,12 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
-         } while ((entry = qdict_next(reopen_state->options, entry)));
-     }
- 
-+    ret = bdrv_check_perm(reopen_state->bs, queue, reopen_state->perm,
-+                          reopen_state->shared_perm, NULL, errp);
-+    if (ret < 0) {
-+        goto error;
++
++size=64M
++TEST_IMG="$TEST_IMG.base" _make_test_img $size
++TEST_IMG="$TEST_IMG.mid" _make_test_img -b "$TEST_IMG.base"
++_make_test_img -b "$TEST_IMG.mid"
++
++echo
++echo "Change backing file of mid (opened read-only)"
++echo
++
++run_qemu -drive if=none,file="$TEST_IMG",backing.node-name=mid <<EOF
++{"execute":"qmp_capabilities"}
++{"execute":"change-backing-file", "arguments":{"device":"none0","image-node-name":"mid","backing-file":"/dev/null"}}
++{"execute":"quit"}
++EOF
++
++TEST_IMG="$TEST_IMG.mid" _img_info
++
++echo
++echo "Change backing file of top (opened writable)"
++echo
++
++TEST_IMG="$TEST_IMG.mid" _make_test_img -b "$TEST_IMG.base"
++
++run_qemu -drive if=none,file="$TEST_IMG",node-name=top <<EOF
++{"execute":"qmp_capabilities"}
++{"execute":"change-backing-file", "arguments":{"device":"none0","image-node-name":"top","backing-file":"/dev/null"}}
++{"execute":"quit"}
++EOF
++
++_img_info
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/195.out b/tests/qemu-iotests/195.out
+new file mode 100644
+index 0000000000..7613575c64
+--- /dev/null
++++ b/tests/qemu-iotests/195.out
+@@ -0,0 +1,78 @@
++QA output created by 195
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=67108864
++Formatting 'TEST_DIR/t.IMGFMT.mid', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.mid
++
++Change backing file of mid (opened read-only)
++
++Testing: -drive if=none,file=TEST_DIR/t.IMGFMT,backing.node-name=mid
++{
++    QMP_VERSION
++}
++{
++    "return": {
 +    }
++}
++{
++    "return": {
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "timestamp": {
++        "seconds":  TIMESTAMP,
++        "microseconds":  TIMESTAMP
++    },
++    "event": "SHUTDOWN",
++    "data": {
++        "guest": false
++    }
++}
 +
-     ret = 0;
- 
- error:
-@@ -3047,6 +3106,9 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
- 
-     bdrv_refresh_limits(bs, NULL);
- 
-+    bdrv_set_perm(reopen_state->bs, reopen_state->perm,
-+                  reopen_state->shared_perm);
++image: TEST_DIR/t.IMGFMT.mid
++file format: IMGFMT
++virtual size: 64M (67108864 bytes)
++cluster_size: 65536
++backing file: /dev/null
++backing file format: IMGFMT
 +
-     new_can_write =
-         !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE);
-     if (!old_can_write && new_can_write && drv->bdrv_reopen_bitmaps_rw) {
-@@ -3080,6 +3142,8 @@ void bdrv_reopen_abort(BDRVReopenState *reopen_state)
-     }
- 
-     QDECREF(reopen_state->explicit_options);
++Change backing file of top (opened writable)
 +
-+    bdrv_abort_perm_update(reopen_state->bs);
- }
- 
- 
++Formatting 'TEST_DIR/t.IMGFMT.mid', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base
++Testing: -drive if=none,file=TEST_DIR/t.IMGFMT,node-name=top
++{
++    QMP_VERSION
++}
++{
++    "return": {
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "timestamp": {
++        "seconds":  TIMESTAMP,
++        "microseconds":  TIMESTAMP
++    },
++    "event": "SHUTDOWN",
++    "data": {
++        "guest": false
++    }
++}
++
++image: TEST_DIR/t.IMGFMT
++file format: IMGFMT
++virtual size: 64M (67108864 bytes)
++cluster_size: 65536
++backing file: /dev/null
++backing file format: IMGFMT
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 94e764865a..108339cd03 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -189,3 +189,4 @@
+ 190 rw auto quick
+ 192 rw auto quick
+ 194 rw auto migration quick
++195 rw auto quick
 -- 
 2.13.5
