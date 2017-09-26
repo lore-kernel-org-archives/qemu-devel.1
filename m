@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dwedE-0003j4-Uj
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 21:25:56 -0400
+	(envelope-from <famz@redhat.com>) id 1dwehh-0005D7-4R
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 21:30:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dwedB-0006d9-KA
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 21:25:50 -0400
-Date: Tue, 26 Sep 2017 09:25:38 +0800
+	(envelope-from <famz@redhat.com>) id 1dwehf-0002PN-VD
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 21:30:29 -0400
+Date: Tue, 26 Sep 2017 09:30:14 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170926012538.GA31924@lemon.lan>
+Message-ID: <20170926013014.GB31924@lemon.lan>
 References: <20170925145526.32690-1-eblake@redhat.com>
-	<20170925145526.32690-6-eblake@redhat.com>
+	<20170925145526.32690-19-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170925145526.32690-6-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v10 05/20] dirty-bitmap: Avoid size query
- failure during truncate
+In-Reply-To: <20170925145526.32690-19-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v10 18/20] qcow2: Switch
+ store_bitmap_data() to byte-based iteration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,106 +28,24 @@ To: Eric Blake <eblake@redhat.com>
 Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 On Mon, 09/25 09:55, Eric Blake wrote:
-> We've previously fixed several places where we failed to account
-> for possible errors from bdrv_nb_sectors().  Fix another one by
-> making bdrv_dirty_bitmap_truncate() take the new size from the
-> caller instead of querying itself; then adjust the sole caller
-> bdrv_truncate() to pass the size just determined by a successful
-> resize, or to skip the bitmap resize on failure, thus avoiding
-> sizing the bitmaps to -1.  This also fixes a bug where not all
-> failure paths in bdrv_truncate() would set errp.
+> Now that we have adjusted the majority of the calls this function
+> makes to be byte-based, it is easier to read the code if it makes
+> passes over the image using bytes rather than sectors.
 > 
-> Note that bdrv_truncate() is still a bit awkward.  We may want
-> to revisit it later and clean up things to better guarantee that
-> a resize attempt either fails cleanly up front, or cannot fail
-> after guest-visible changes have been made (if temporary changes
-> are made, then they need to be cleanly rolled back).  But that
-> is a task for another day; for now, the goal is the bare minimum
-> fix to ensure that just bdrv_dirty_bitmap_truncate() cannot fail.
+> iotests 165 was rather weak - on a default 64k-cluster image, where
+> bitmap granularity also defaults to 64k bytes, a single cluster of
+> the bitmap table thus covers (64*1024*8) bits which each cover 64k
+> bytes, or 32G of image space.  But the test only uses a 1G image,
+> so it cannot trigger any more than one loop of the code in
+> store_bitmap_data(); and it was writing to the first cluster.  In
+> order to test that we are properly aligning which portions of the
+> bitmap are being written to the file, we really want to test a case
+> where the first dirty bit returned by bdrv_dirty_iter_next() is not
+> aligned to the start of a cluster, which we can do by modifying the
+> test to write data that doesn't happen to fall in the first cluster
+> of the image.
 > 
 > Signed-off-by: Eric Blake <eblake@redhat.com>
-> 
-> ---
-> v10: always resize bitmap as before [John], enhance commit message to
-> point out errp bugfix [Vladimir]
-> v9: skip only bdrv_dirty_bitmap_truncate on error [Fam]
-> v8: retitle and rework to avoid possibility of secondary failure [John]
-> v7: new patch [Kevin]
-> ---
->  include/block/dirty-bitmap.h |  2 +-
->  block.c                      | 16 +++++++++++-----
->  block/dirty-bitmap.c         |  6 +++---
->  3 files changed, 15 insertions(+), 9 deletions(-)
-> 
-> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-> index 8fd842eac9..7a27590047 100644
-> --- a/include/block/dirty-bitmap.h
-> +++ b/include/block/dirty-bitmap.h
-> @@ -83,7 +83,7 @@ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
->  void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t sector_num);
->  int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
->  int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
-> -void bdrv_dirty_bitmap_truncate(BlockDriverState *bs);
-> +void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes);
->  bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
->  bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
->  bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
-> diff --git a/block.c b/block.c
-> index 528cda7b2c..ef5af81f66 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -3545,12 +3545,18 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
->      assert(!(bs->open_flags & BDRV_O_INACTIVE));
-> 
->      ret = drv->bdrv_truncate(bs, offset, prealloc, errp);
-> -    if (ret == 0) {
-> -        ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
-> -        bdrv_dirty_bitmap_truncate(bs);
-> -        bdrv_parent_cb_resize(bs);
-> -        atomic_inc(&bs->write_gen);
-> +    if (ret < 0) {
-> +        return ret;
->      }
-> +    ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
-> +    if (ret < 0) {
-> +        error_setg_errno(errp, -ret, "Could not refresh total sector count");
-> +    } else {
-> +        offset = bs->total_sectors * BDRV_SECTOR_SIZE;
-> +    }
-> +    bdrv_dirty_bitmap_truncate(bs, offset);
-> +    bdrv_parent_cb_resize(bs);
-> +    atomic_inc(&bs->write_gen);
->      return ret;
->  }
-> 
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index 42a55e4a4b..ee164fb518 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -1,7 +1,7 @@
->  /*
->   * Block Dirty Bitmap
->   *
-> - * Copyright (c) 2016 Red Hat. Inc
-> + * Copyright (c) 2016-2017 Red Hat. Inc
->   *
->   * Permission is hereby granted, free of charge, to any person obtaining a copy
->   * of this software and associated documentation files (the "Software"), to deal
-> @@ -302,10 +302,10 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
->   * Truncates _all_ bitmaps attached to a BDS.
->   * Called with BQL taken.
->   */
-> -void bdrv_dirty_bitmap_truncate(BlockDriverState *bs)
-> +void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes)
->  {
->      BdrvDirtyBitmap *bitmap;
-> -    uint64_t size = bdrv_nb_sectors(bs);
-> +    int64_t size = DIV_ROUND_UP(bytes, BDRV_SECTOR_SIZE);
-> 
->      bdrv_dirty_bitmaps_lock(bs);
->      QLIST_FOREACH(bitmap, &bs->dirty_bitmaps, list) {
-> -- 
-> 2.13.5
-> 
+> Reviewed-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
 
 Reviewed-by: Fam Zheng <famz@redhat.com>
