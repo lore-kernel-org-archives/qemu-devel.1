@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1dwnfd-0003Pr-4Z
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 07:05:01 -0400
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1dwnfq-0003f5-KL
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 07:05:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1dwnfZ-0000Cm-O0
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 07:04:57 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:51760)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1dwnfk-0000ON-R8
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 07:05:10 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:51804)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1dwnfZ-0000CS-Ey
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 07:04:53 -0400
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1dwnfk-0000OB-K6
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 07:05:04 -0400
 From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Tue, 26 Sep 2017 14:04:51 +0300
-Message-ID: <150642389121.3900.12320775067244184010.stgit@Misha-PC.lan02.inno>
+Date: Tue, 26 Sep 2017 14:05:02 +0300
+Message-ID: <150642390241.3900.9553276177858515734.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <150642384156.3900.3326424823772221077.stgit@Misha-PC.lan02.inno>
 References: <150642384156.3900.3326424823772221077.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 08/43] windbg: hook to wrmsr operation
+Subject: [Qemu-devel] [PATCH 10/43] windbg: structures for parsing data
+ stream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,98 +30,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
-Inserted hook to wrmsr operation. Windows Kernel put address on KPCR struct to fs/gs (x32/x64) register. Needs catch this moment and allow windbg server handle packets.
+Added structures for parsing data stream from windbg to packet.
 
 Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
 ---
- include/exec/windbgstub-utils.h |    3 +++
- include/exec/windbgstub.h       |    1 +
- target/i386/misc_helper.c       |    3 +++
- windbgstub-utils.c              |    8 ++++++++
- windbgstub.c                    |    8 ++++++++
- 5 files changed, 23 insertions(+)
+ include/exec/windbgstub-utils.h |   11 +++++++++++
+ windbgstub.c                    |   30 ++++++++++++++++++++++++++++++
+ 2 files changed, 41 insertions(+)
 
 diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-index 65f336e4bf..90fb766839 100755
+index f2402ebb34..63df5e339c 100755
 --- a/include/exec/windbgstub-utils.h
 +++ b/include/exec/windbgstub-utils.h
-@@ -62,4 +62,7 @@
-     _t;                                                       \
- })
+@@ -67,6 +67,17 @@ typedef struct InitedAddr {
+     bool is_init;
+ } InitedAddr;
  
-+bool windbg_on_load(void);
-+void windbg_on_exit(void);
++typedef struct PacketData {
++    union {
++        struct {
++            DBGKD_MANIPULATE_STATE64 m64;
++            uint8_t extra[PACKET_MAX_SIZE - sizeof(DBGKD_MANIPULATE_STATE64)];
++        };
++        uint8_t buf[PACKET_MAX_SIZE];
++    };
++    uint16_t extra_size;
++} PacketData;
 +
- #endif
-diff --git a/include/exec/windbgstub.h b/include/exec/windbgstub.h
-index 703fc26b8f..2dbf1b1f13 100755
---- a/include/exec/windbgstub.h
-+++ b/include/exec/windbgstub.h
-@@ -15,6 +15,7 @@
- #define WINDBG "windbg"
- #define WINDBG_DEBUG_ON false
+ bool windbg_on_load(void);
+ void windbg_on_exit(void);
  
-+void windbg_try_load(void);
- int windbg_server_start(const char *device);
- 
- #endif
-diff --git a/target/i386/misc_helper.c b/target/i386/misc_helper.c
-index 628f64aad5..ec1fcd2899 100644
---- a/target/i386/misc_helper.c
-+++ b/target/i386/misc_helper.c
-@@ -24,6 +24,7 @@
- #include "exec/exec-all.h"
- #include "exec/cpu_ldst.h"
- #include "exec/address-spaces.h"
-+#include "exec/windbgstub.h"
- 
- void helper_outb(CPUX86State *env, uint32_t port, uint32_t data)
- {
-@@ -385,6 +386,8 @@ void helper_wrmsr(CPUX86State *env)
-         /* XXX: exception? */
-         break;
-     }
-+
-+    windbg_try_load();
- }
- 
- void helper_rdmsr(CPUX86State *env)
-diff --git a/windbgstub-utils.c b/windbgstub-utils.c
-index dc5e505c63..b5fb6db3f2 100755
---- a/windbgstub-utils.c
-+++ b/windbgstub-utils.c
-@@ -10,3 +10,11 @@
-  */
- 
- #include "exec/windbgstub-utils.h"
-+
-+bool windbg_on_load(void)
-+{
-+    return false;
-+}
-+
-+void windbg_on_exit(void)
-+{}
 diff --git a/windbgstub.c b/windbgstub.c
-index 378d1b911f..99c3ef9b14 100755
+index 99c3ef9b14..32984d0f92 100755
 --- a/windbgstub.c
 +++ b/windbgstub.c
-@@ -39,8 +39,16 @@ static void windbg_chr_receive(void *opaque, const uint8_t *buf, int size)
-     }
- }
+@@ -16,6 +16,36 @@
+ #include "exec/windbgstub.h"
+ #include "exec/windbgstub-utils.h"
  
-+void windbg_try_load(void)
-+{
-+    if (windbg_state && !windbg_state->is_loaded) {
-+        windbg_state->is_loaded = windbg_on_load();
-+    }
-+}
++typedef enum ParsingState {
++    STATE_LEADER,
++    STATE_PACKET_TYPE,
++    STATE_PACKET_BYTE_COUNT,
++    STATE_PACKET_ID,
++    STATE_PACKET_CHECKSUM,
++    STATE_PACKET_DATA,
++    STATE_TRAILING_BYTE,
++} ParsingState;
 +
- static void windbg_exit(void)
- {
-+    windbg_on_exit();
-     g_free(windbg_state);
- }
++typedef enum ParsingResult {
++    RESULT_NONE,
++    RESULT_BREAKIN_BYTE,
++    RESULT_UNKNOWN_PACKET,
++    RESULT_CONTROL_PACKET,
++    RESULT_DATA_PACKET,
++    RESULT_ERROR,
++} ParsingResult;
++
++typedef struct ParsingContext {
++    /* index in the current buffer,
++       which depends on the current state */
++    int index;
++    ParsingState state;
++    ParsingResult result;
++    KD_PACKET packet;
++    PacketData data;
++    const char *name;
++} ParsingContext;
++
+ typedef struct WindbgState {
+     bool is_loaded;
  
