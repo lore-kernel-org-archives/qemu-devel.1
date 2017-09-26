@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dwrHz-00012n-3U
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:56:48 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dwrQx-0003s0-Hq
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 11:06:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dwrHy-0007Sv-CL
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:56:47 -0400
-References: <20170926142133.2498-1-kwolf@redhat.com>
-	<20170926142133.2498-9-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <88194ed0-b5ea-2eef-8294-6557739ae605@redhat.com>
-Date: Tue, 26 Sep 2017 09:56:32 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1dwrQr-0002ym-MY
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 11:06:03 -0400
+Received: from mail-pf0-x236.google.com ([2607:f8b0:400e:c00::236]:48298)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dwrQr-0002y7-F8
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 11:05:57 -0400
+Received: by mail-pf0-x236.google.com with SMTP id n24so5673468pfk.5
+	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 08:05:57 -0700 (PDT)
+References: <cover.1506384414.git.alistair.francis@xilinx.com>
+	<c52d7f4dac2d3d209968019d389baa64243d2966.1506384415.git.alistair.francis@xilinx.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <8095513c-6344-f456-2c79-5a9b97ab691a@linaro.org>
+Date: Tue, 26 Sep 2017 08:05:52 -0700
 MIME-Version: 1.0
-In-Reply-To: <20170926142133.2498-9-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="rsCnbqJmD3uxBt4wrAeDk4lmRMiVISeCv"
-Subject: Re: [Qemu-devel] [PULL 08/24] iotests: Print full path of bad
- output if mismatch
+In-Reply-To: <c52d7f4dac2d3d209968019d389baa64243d2966.1506384415.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 7/8] tcg: Replace fprintf(stderr,
+ "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,72 +32,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
+Cc: alistair23@gmail.com, armbru@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Stefan Weil <sw@weilnetz.de>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rsCnbqJmD3uxBt4wrAeDk4lmRMiVISeCv
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Message-ID: <88194ed0-b5ea-2eef-8294-6557739ae605@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 08/24] iotests: Print full path of bad output
- if mismatch
-References: <20170926142133.2498-1-kwolf@redhat.com>
- <20170926142133.2498-9-kwolf@redhat.com>
-In-Reply-To: <20170926142133.2498-9-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 09/26/2017 09:21 AM, Kevin Wolf wrote:
-> From: Fam Zheng <famz@redhat.com>
->=20
-> So it is easier to copy paste the path.
->=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+On 09/25/2017 05:09 PM, Alistair Francis wrote:
+> Replace a large number of the fprintf(stderr, "*\n" calls with
+> error_report(). The functions were renamed with these commands and then
+> compiler issues where manually fixed.
+> 
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> find ./* -type f -exec sed -i \
+>     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>     {} +
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Stefan Weil <sw@weilnetz.de>
 > ---
->  tests/qemu-iotests/check | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-> index d504b6e455..4583a0c269 100755
-> --- a/tests/qemu-iotests/check
-> +++ b/tests/qemu-iotests/check
-> @@ -353,7 +353,7 @@ do
->                  else
->                      echo " - output mismatch (see $seq.out.bad)"
->                      mv $tmp.out $seq.out.bad
-> -                    $diff -w "$reference" $seq.out.bad
-> +                    $diff -w "$reference" $(realpath $seq.out.bad)
+> 
+>  cpus.c                   |  8 ++++----
+>  exec.c                   | 14 +++++++-------
+>  tcg/optimize.c           |  8 ++++----
+>  tcg/tcg.c                |  2 +-
+>  tcg/tcg.h                |  3 ++-
+>  tcg/tci.c                |  2 +-
+>  tcg/tci/tcg-target.inc.c |  4 ++--
+>  vl.c                     |  2 +-
+>  8 files changed, 22 insertions(+), 21 deletions(-)
 
-This missed my review comments about being unsafe if $PWD contains spaces=
-:
-https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04241.html
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Acked-by: Richard Henderson <richard.henderson@linaro.org>
 
 
---rsCnbqJmD3uxBt4wrAeDk4lmRMiVISeCv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnKaqAACgkQp6FrSiUn
-Q2p+owf/Ut27EnBc75tojqkXo2NEoi+WMWZ93KnkTrTaD+VzKgPBfh/dW4c9KUQy
-d0An9O0XJ4byA8wcfEgzKCQK0QRzHEkbIyha1r2RMkIrmw1ojmkxj247AomMb7Hj
-kdT5CMOzbIPqe+byxILNOCAfGQxDTyJ1XiBsc+8nhd4BEt+RuHHZpmi7Q2W8sNYF
-WouQXS+hZt+1yyIi0AYLjN+CqMxLST4hhNuvj3LEEFZANXJrcyVbkebQFOA8Mfuh
-QmAsXIjInO9Y46pezkguxReQGWh2LjPMuURvAJNltTRjD8rXub1WQtIHB2aGX2Cn
-bd+U6XzCxp49aLyAUzi4C38iWRYHmw==
-=bTGz
------END PGP SIGNATURE-----
-
---rsCnbqJmD3uxBt4wrAeDk4lmRMiVISeCv--
+r~
