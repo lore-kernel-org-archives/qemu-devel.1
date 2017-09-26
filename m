@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dwywg-0007jU-Kl
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 19:07:21 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dwywn-0007nm-3I
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 19:07:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dwywf-0005KE-SF
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 19:07:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52880)
+	(envelope-from <ehabkost@redhat.com>) id 1dwywj-0005OB-SE
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 19:07:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34256)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dwywf-0005Ig-Lh
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 19:07:17 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dwywj-0005NP-Jy
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 19:07:21 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D4F46883AE
-	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 23:07:16 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B81C981DFC
+	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 23:07:20 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue, 26 Sep 2017 20:07:06 -0300
-Message-Id: <20170926230709.22958-4-ehabkost@redhat.com>
+Date: Tue, 26 Sep 2017 20:07:08 -0300
+Message-Id: <20170926230709.22958-6-ehabkost@redhat.com>
 In-Reply-To: <20170926230709.22958-1-ehabkost@redhat.com>
 References: <20170926230709.22958-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [RFC 3/6] device-crash-test: Allow checkOneCase() to
- report multiple results
+Subject: [Qemu-devel] [RFC 5/6] device-crash-test: Basic device_add support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,70 +32,122 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Thomas Huth <thuth@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-This will allow the test code to be improved to test multiple
-devices in a single run.
+Add a 'method' testcase argument that will test the device using
+device_add instead of -device.  A new device_add_error whitelist
+key is now supported, to catch device_add errors.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/device-crash-test | 29 ++++++++++++++---------------
- 1 file changed, 14 insertions(+), 15 deletions(-)
+ scripts/device-crash-test | 38 +++++++++++++++++++++++++++++++++-----
+ 1 file changed, 33 insertions(+), 5 deletions(-)
 
 diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-index 782d7fd6c2..0bd599d395 100755
+index 4c23ffa449..1245e214a0 100755
 --- a/scripts/device-crash-test
 +++ b/scripts/device-crash-test
-@@ -384,7 +384,8 @@ def getBinaryInfo(args, binary):
- def checkOneCase(args, testcase):
-     """Check one specific case
+@@ -35,7 +35,7 @@ import argparse
+ from itertools import chain
  
--    Returns a dictionary containing results of test case.
-+    Generates a list of dictionaries containing results of testing.  If
-+    multiple devices are being tested, multiple entries can be returned.
-     """
-     binary = testcase['binary']
-     accel = testcase['accel']
-@@ -413,7 +414,7 @@ def checkOneCase(args, testcase):
-     vm.shutdown()
-     r['exitcode'] = vm.exitcode()
-     r['log'] = vm.get_log()
--    return r
-+    yield r
+ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'scripts'))
+-from qemu import QEMUMachine
++from qemu import QEMUMachine, MonitorResponseError
  
- def binariesToTest(args, testcase):
-     if args.qemu:
-@@ -572,22 +573,20 @@ def main():
-         if args.dry_run:
-             continue
+ logger = logging.getLogger('device-crash-test')
+ dbg = logger.debug
+@@ -203,6 +203,11 @@ ERROR_WHITELIST = [
+     {'log':r"core 0 already populated"},
+     {'log':r"could not find stage1 bootloader"},
  
--        try:
--            f = checkOneCase(args, t)
--        except KeyboardInterrupt:
--            break
- 
--        i, wl = checkResultWhitelist(f)
--        dbg("testcase: %r, whitelist match: %r", t, wl)
--        wl_stats.setdefault(i, []).append(f)
--        level = wl.get('loglevel', logging.DEBUG)
--        logResult(f, level)
-+        for r in checkOneCase(args, t):
-+            i, wl = checkResultWhitelist(r)
-+            dbg("testcase: %r, whitelist match: %r", t, wl)
-+            wl_stats.setdefault(i, []).append(r)
-+            level = wl.get('loglevel', logging.DEBUG)
-+            logResult(r, level)
++    {'exitcode':None, 'device_add_error':r"^Bus '[\w.-]+' does not support hotplugging$"},
++    {'exitcode':None, 'device_add_error':r"^No '[\w-]+' bus found for device '[\w-]+'$"},
++    # There are too many ways device_add can fail, ignore all of them as long as QEMU doesn't crash:
++    {'exitcode':None, 'device_add_error':r".+"},
 +
-+            if wl.get('fatal') or (args.strict and level >= logging.WARN):
-+                fatal_failures.append(r)
+     # other exitcode=1 failures not listed above will just generate INFO messages:
+     {'exitcode':1, 'loglevel':logging.INFO},
  
--        if wl.get('fatal') or (args.strict and level >= logging.WARN):
--            fatal_failures.append(f)
-+            if expected_match and expected_match[0] != i:
-+                logger.warn("Didn't fail as expected: %s", formatTestCase(t))
+@@ -290,7 +295,10 @@ def whitelistResultMatch(wl, r):
+              r.get('exitcode') == wl.get('exitcode', 1)) and
+             ('log' not in wl or
+              ('log' in r and
+-              re.search(wl['log'], r['log'], re.MULTILINE))))
++              re.search(wl['log'], r['log'], re.MULTILINE))) and
++            ('device_add_error' not in wl or
++             ('device_add_error' in r and
++              re.search(wl['device_add_error'], r['device_add_error']))))
  
--        if expected_match and expected_match[0] != i:
--            logger.warn("Didn't fail as expected: %s", formatTestCase(t))
  
-     logger.info("Total: %d test cases", total)
-     if skipped:
+ def checkResultWhitelist(r):
+@@ -339,6 +347,7 @@ class QemuBinaryInfo(object):
+             self.alldevs = set(qomListTypeNames(vm, implements=devtype, abstract=False))
+             self.dev_info = dict((t, vm.command('query-device-type', typename=t)) for t in self.alldevs)
+             self.user_devs = set(d for d in self.alldevs if self.dev_info[d]['user-creatable'])
++            self.hotpluggable_devs = set(d for d in self.alldevs if self.dev_info[d]['hotpluggable'])
+             self.machines = list(m['name'] for m in vm.command('query-machines'))
+             self.kvm_available = vm.command('query-kvm')['enabled']
+         finally:
+@@ -391,11 +400,14 @@ def checkOneCase(args, testcase):
+     accel = testcase['accel']
+     machine = testcase['machine']
+     device = testcase['device']
++    method = testcase['method']
++    assert method in ['-device', 'device_add']
+ 
+     dbg("will test: %r", testcase)
+ 
+-    args = ['-S', '-machine', '%s,accel=%s' % (machine, accel),
+-            '-device', qemuOptsEscape(device)]
++    args = ['-S', '-machine', '%s,accel=%s' % (machine, accel)]
++    if method == '-device':
++        args.extend(['-device', qemuOptsEscape(device)])
+     cmdline = ' '.join([binary] + args)
+     dbg("will launch QEMU: %s", cmdline)
+     vm = QEMUMachine(binary=binary, args=args)
+@@ -405,6 +417,12 @@ def checkOneCase(args, testcase):
+ 
+     try:
+         vm.launch()
++        if method == 'device_add':
++            dbg('running device_add %s', device)
++            try:
++                vm.command('device_add', driver=device)
++            except MonitorResponseError, e:
++                r['device_add_error'] = e.reply['error']['desc']
+     except KeyboardInterrupt:
+         raise
+     except:
+@@ -434,14 +452,22 @@ def machinesToTest(args, testcase):
+     return getBinaryInfo(args, testcase['binary']).machines
+ 
+ 
++def plugMethods(args, testcase):
++    return ['-device', 'device_add']
++
++
+ def devicesToTest(args, testcase):
+-    return getBinaryInfo(args, testcase['binary']).user_devs
++    if testcase['method'] == 'device_add':
++        return getBinaryInfo(args, testcase['binary']).hotpluggable_devs
++    else:
++        return getBinaryInfo(args, testcase['binary']).user_devs
+ 
+ 
+ TESTCASE_VARIABLES = [
+     ('binary', binariesToTest),
+     ('accel', accelsToTest),
+     ('machine', machinesToTest),
++    ('method', plugMethods),
+     ('device', devicesToTest),
+ ]
+ 
+@@ -494,6 +520,8 @@ def logResult(f, level):
+     logger.log(level, "cmdline: %s", f['cmdline'])
+     for l in f.get('log', '').strip().split('\n'):
+         logger.log(level, "log: %s", l)
++    if 'device_add_error' in f:
++        logger.log(level, "device_add error: %s", f['device_add_error'])
+     logger.log(level, "exit code: %r", f.get('exitcode'))
+     if 'exc_traceback' in f:
+         logger.log(level, "exception:")
 -- 
 2.13.5
