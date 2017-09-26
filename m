@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dwt6Y-0005iN-Ky
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 12:53:07 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dwtHd-0008Pi-Kg
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 13:04:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dwt6V-0003PP-IG
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 12:53:06 -0400
-Received: from mail-pg0-x22d.google.com ([2607:f8b0:400e:c05::22d]:56313)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dwt6V-0003OH-Cg
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 12:53:03 -0400
-Received: by mail-pg0-x22d.google.com with SMTP id b11so6221018pgn.12
-	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 09:53:03 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <150505986682.19604.11937392314067517230.stgit@frigg.lan>
-	<150506083546.19604.543091497330269756.stgit@frigg.lan>
-	<169db8d7-fe49-05c4-aca7-ad818b12c9c5@linaro.org>
-	<87a81xpasb.fsf@frigg.lan>
-	<7e4260a8-89a3-9c52-4f09-afe9035ceac2@twiddle.net>
-	<87ingki0je.fsf@frigg.lan> <87poadto9u.fsf@frigg.lan>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <a6221cd2-6ce2-bad0-2e70-31961e23f448@twiddle.net>
-Date: Tue, 26 Sep 2017 09:52:58 -0700
+	(envelope-from <alistair23@gmail.com>) id 1dwtHX-0005gI-Mq
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 13:04:33 -0400
 MIME-Version: 1.0
-In-Reply-To: <87poadto9u.fsf@frigg.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/7] tcg: Add support for "inlining"
- regions of code
+Sender: alistair23@gmail.com
+In-Reply-To: <cbcf25a4-db9c-910f-fdbc-b7620d013b14@redhat.com>
+References: <1506441116-16627-1-git-send-email-thuth@redhat.com>
+	<CAKmqyKOCsyCHnaNzo_zrRQjZi30ENdPoSc+dFehHvevm-9nrZg@mail.gmail.com>
+	<cbcf25a4-db9c-910f-fdbc-b7620d013b14@redhat.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Tue, 26 Sep 2017 10:03:41 -0700
+Message-ID: <CAKmqyKO2jfVZ9d1epxVWKMy9FUfByCoVXMV4JQ-qGAV=vzKwnQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/xlnx-zynqmp: Mark the "xlnx,
+ zynqmp" device with user_creatable = false
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,87 +25,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, QEMU Trivial <qemu-trivial@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
 
-On 09/26/2017 09:31 AM, Lluís Vilanova wrote:
-> Lluís Vilanova writes:
-> 
->> Richard Henderson writes:
->>> On 09/14/2017 08:20 AM, Lluís Vilanova wrote:
->>>> Richard Henderson writes:
->>>>
->>>>> On 09/10/2017 09:27 AM, Lluís Vilanova wrote:
->>>>>> TCG BBLs and instructions have multiple exit points from where to raise
->>>>>> tracing events, but some of the necessary information in the generic
->>>>>> disassembly infrastructure is not available until after generating these
->>>>>> exit points.
->>>>>>
->>>>>> This patch adds support for "inline points" (where the tracing code will
->>>>>> be placed), and "inline regions" (which identify the TCG code that must
->>>>>> be inlined). The TCG compiler will basically copy each inline region to
->>>>>> any inline points that reference it.
->>>>
->>>>> I am not keen on this.
->>>>
->>>>> Is there a reason you can't just emit the tracing code at the appropriate place
->>>>> to begin with?  Perhaps I have to wait to see how this is used...
->>>>
->>>> As I tried to briefly explain on next patch, the main problem without inlining
->>>> is that we will see guest_tb_after_trans twice on the trace for each TB in
->>>> conditional instructions on the guest, since they have two exit points (which we
->>>> capture when emitting goto_tb in TCG).
-> 
->>> Without seeing the code, I suspect this is because you didn't examine the
->>> argument to tcg_gen_exit_tb.  You can tell when goto_tb must have been emitted
->>> and avoid logging twice.
-> 
->> The generated tracing code for 'guest_*_after' must be right before the
->> "goto_tb" opcode at the end of a TB (AFAIU generated by
->> tcg_gen_lookup_and_goto_ptr()), and we have two of those when decoding a guest
->> conditional jump.
-> 
->> If we couple this with the semantics of the trace_*_tcg functions (trace the
->> event at translation time, and generate TCG code to trace the event at execution
->> time), we get the case I described (we don't want to call trace_tb_after_tcg()
->> or trace_insn_after_tcg() twice for the same TB or instruction).
-> 
->> That is, unless I've missed something.
-> 
-> 
->> The only alternative I can think of is changing tracetool to offer an additional
->> API that provides separate functions for translation-time tracing and
->> execution-time generation. So from this:
-> 
->>   static inline void trace_event_tcg(CPUState *cpu, TCGv_env env, ...)
->>   {
->>       trace_event_trans(cpu, ...);
->>       if (trace_event_get_vcpu_state(cpu, EVENT_EXEC)) {
->>           gen_helper_trace_event_exec(env, ...);
->>       }
->>   }
-> 
->> We can extend it into this:
-> 
->>   static inline void gen_trace_event_exec(TCGv_env env, ...)
->>       if (trace_event_get_vcpu_state(cpu, EVENT_EXEC)) {
->>           gen_helper_trace_event_exec(env, ...);
->>       }
->>   }
->>   static inline void trace_event_tcg(CPUState *cpu, TCGv_env env, ...)
->>   {
->>       trace_event_trans(cpu, ...);
->>       gen_trace_event_exec(env, ...);
->>   }
-> 
-> Richard, do you prefer to keep the "TCG inline" feature or switch the internal
-> tracing API to this second approach?
+On Tue, Sep 26, 2017 at 9:52 AM, Thomas Huth <thuth@redhat.com> wrote:
+> On 26.09.2017 18:36, Alistair Francis wrote:
+>> On Tue, Sep 26, 2017 at 8:51 AM, Thomas Huth <thuth@redhat.com> wrote:
+>>> The device uses serial_hds in its realize function and thus can't be
+>>> used twice. Apart from that, the comma in its name makes it quite hard
+>>> to use for the user anyway, since a comma is normally used to separate
+>>> the device name from its properties when using the "-device" parameter
+>>> or the "device_add" HMP command.
+>>
+>> Is it worth changing the name now then as well?
+>
+> Not sure, was there a reason for this name? E.g. is it used in a device
+> tree somewhere somehow? Anyway, with user_creatable = false, I think it
+> is not so urgent anymore to change it.
 
-I don't think I fully understand what you're proposing.  The example
-transformation above is merely syntactic and has no functional change.
+I don't think there was a specific reason. Maybe it was copied from a
+device tree, but I'm not tied to keeping the comma. Maybe that's
+something we can investigate in the future.
 
-As previously stated, I'm not keen on the "tcg inline" approach.  I would
-prefer that you hook into tcg_gen_{exit_tb,goto_tb,goto_ptr} functions within
-tcg/tcg-op.c to log transitions between TBs.
+Thanks,
+Alistair
 
-
-r~
+>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>
+>> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+>
+> Thanks!
+>
+>  Thomas
+>
