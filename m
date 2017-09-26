@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46214)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1dwmxT-0005U9-0M
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:19:20 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46979)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <thuth@redhat.com>) id 1dwmz8-0006sC-4x
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:21:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1dwmxP-0002lR-MM
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:19:19 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:57848 helo=mx01.kamp.de)
+	(envelope-from <thuth@redhat.com>) id 1dwmz4-0003qc-PZ
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:21:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50952)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dwmxP-0002kg-Cf
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:19:15 -0400
-References: <1505997152-16980-1-git-send-email-pl@kamp.de>
-	<150637280903.26688.16951846700405077637@sif>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <a59ed0e5-dd3f-fed4-7561-eb91384fe700@kamp.de>
-Date: Tue, 26 Sep 2017 12:19:13 +0200
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dwmz4-0003qJ-Gg
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:20:58 -0400
+References: <1506071794-4373-1-git-send-email-thuth@redhat.com>
+	<20170926052650.GA10768@in.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <1321f06e-c5d9-4f14-2459-6e1bbd8e0cdf@redhat.com>
+Date: Tue, 26 Sep 2017 12:20:43 +0200
 MIME-Version: 1.0
-In-Reply-To: <150637280903.26688.16951846700405077637@sif>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20170926052650.GA10768@in.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH] migration: disable
- auto-converge during bulk block migration
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] qdev: Mark devices as non-hotpluggable
+ by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,24 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: quintela@redhat.com, qemu-stable@nongnu.org, dgilbert@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
+To: bharata@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Amit Shah <amit@kernel.org>
 
-Am 25.09.2017 um 22:53 schrieb Michael Roth:
-> Quoting Peter Lieven (2017-09-21 07:32:32)
->> auto-converge and block migration currently do not play well together.
->> During block migration the auto-converge logic detects that ram
->> migration makes no progress and thus throttles down the vm until
->> it nearly stalls completely. Avoid this by disabling the throttling
->> logic during the bulk phase of the block migration.
->>
->> Cc: qemu-stable@nongnu.org
->> Signed-off-by: Peter Lieven <pl@kamp.de>
-> FYI: this patch has been tagged for stable 2.10.1, but is not yet
-> upstream. Patch freeze for 2.10.1 is September 27th.
+On 26.09.2017 07:26, Bharata B Rao wrote:
+> On Fri, Sep 22, 2017 at 11:16:34AM +0200, Thomas Huth wrote:
+>> Historically we've marked all devices as hotpluggable by default. Howe=
+ver,
+>> most devices are not hotpluggable, and you also need a HotplugHandler =
+to
+>> support these devices. So if the user tries to "device_add" or "device=
+_del"
+>> such a non-hotpluggable device during runtime, either nothing really u=
+sable
+>> happens, or QEMU even crashes/aborts unexpectedly (see for example com=
+mit
+>> 84ebd3e8c7d4fe955b - "Mark diag288 watchdog as non-hotpluggable").
+>> So let's change this dangerous default behaviour and mark the devices =
+as
+>> non-hotpluggable by default. Certain parent devices classes which are =
+known
+>> as hotpluggable (e.g. PCI, USB, etc.) are marked with "hotpluggable =3D=
+ true",
+>> so that devices that are derived from these classes continue to work a=
+s
+>> expected.
+>=20
+> I see that the discussion has moved on, but want to note here that
+> CPU hotplug on pseries breaks with this patch.
+>=20
+> (qemu) device_add host-spapr-cpu-core,core-id=3D8,id=3Dcore8
+> Device 'host-powerpc64-cpu' does not support hotplugging
+>=20
+> (qemu) device_add POWER8E_v2.1-spapr-cpu-core,id=3Dcore8,core-id=3D8
+> Device 'POWER8E_v2.1-powerpc64-cpu' does not support hotplugging
 
-I just send a V2 of the patch adding a comment to the code
-why auto-converge is disabled during bulk block migration.
-Maybe someone can review it and pick it up.
+Sorry, my bad (again) - I missed that the spapr-cpu-core tries to
+internally create some more devices, i.e. the powerpc64-cpu device and a
+icp device. So they need to be marked as hotpluggable, too. I'll fix
+this in my next version of the patch...
+Anyway, thanks a lot for testing! (and memo ty myself: Do more testing
+on your own before sending patches like this...)
 
-Peter
+> Hope I am not missing anything.
+
+You just missed to add a proper qtest for "make check" for hot-pluggable
+CPUs (hint, hint!) ;-) Apart from that, this failure was completely my
+fault...
+
+ Cheers,
+  Thomas
