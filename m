@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=435739c2e=owen.smith@citrix.com>)
-	id 1dwrBH-0005u3-At
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:49:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1dwrHz-00012n-3U
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:56:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=435739c2e=owen.smith@citrix.com>)
-	id 1dwrBC-000413-Mj
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:49:51 -0400
-Received: from smtp.citrix.com ([66.165.176.89]:54430)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=435739c2e=owen.smith@citrix.com>)
-	id 1dwrBC-00040M-Ew
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:49:46 -0400
-From: Owen Smith <owen.smith@citrix.com>
-Date: Tue, 26 Sep 2017 14:43:37 +0000
-Message-ID: <1506437019-17946-2-git-send-email-owen.smith@citrix.com>
-In-Reply-To: <1506437019-17946-1-git-send-email-owen.smith@citrix.com>
-References: <1506437019-17946-1-git-send-email-owen.smith@citrix.com>
+	(envelope-from <eblake@redhat.com>) id 1dwrHy-0007Sv-CL
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:56:47 -0400
+References: <20170926142133.2498-1-kwolf@redhat.com>
+	<20170926142133.2498-9-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <88194ed0-b5ea-2eef-8294-6557739ae605@redhat.com>
+Date: Tue, 26 Sep 2017 09:56:32 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 1/3 v4] ui/input: add qemu_input_qcode_to_linux
+In-Reply-To: <20170926142133.2498-9-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="rsCnbqJmD3uxBt4wrAeDk4lmRMiVISeCv"
+Subject: Re: [Qemu-devel] [PULL 08/24] iotests: Print full path of bad
+ output if mismatch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +25,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sstabellini@kernel.org, anthony.perard@citrix.com, kraxel@redhat.com
-Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Owen Smith <owen.smith@citrix.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-Build a reverse mapping on first call that converts qcodes to
-linux KEY_* identifiers.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rsCnbqJmD3uxBt4wrAeDk4lmRMiVISeCv
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Message-ID: <88194ed0-b5ea-2eef-8294-6557739ae605@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 08/24] iotests: Print full path of bad output
+ if mismatch
+References: <20170926142133.2498-1-kwolf@redhat.com>
+ <20170926142133.2498-9-kwolf@redhat.com>
+In-Reply-To: <20170926142133.2498-9-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Owen Smith <owen.smith@citrix.com>
----
- include/ui/input.h |  1 +
- ui/input-keymap.c  | 16 ++++++++++++++++
- 2 files changed, 17 insertions(+)
+On 09/26/2017 09:21 AM, Kevin Wolf wrote:
+> From: Fam Zheng <famz@redhat.com>
+>=20
+> So it is easier to copy paste the path.
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  tests/qemu-iotests/check | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+> index d504b6e455..4583a0c269 100755
+> --- a/tests/qemu-iotests/check
+> +++ b/tests/qemu-iotests/check
+> @@ -353,7 +353,7 @@ do
+>                  else
+>                      echo " - output mismatch (see $seq.out.bad)"
+>                      mv $tmp.out $seq.out.bad
+> -                    $diff -w "$reference" $seq.out.bad
+> +                    $diff -w "$reference" $(realpath $seq.out.bad)
 
-diff --git a/include/ui/input.h b/include/ui/input.h
-index c488585..c3c1664 100644
---- a/include/ui/input.h
-+++ b/include/ui/input.h
-@@ -49,6 +49,7 @@ int qemu_input_key_value_to_qcode(const KeyValue *value);
- int qemu_input_key_value_to_scancode(const KeyValue *value, bool down,
-                                      int *codes);
- int qemu_input_linux_to_qcode(unsigned int lnx);
-+unsigned int qemu_input_qcode_to_linux(int qcode);
- 
- InputEvent *qemu_input_event_new_btn(InputButton btn, bool down);
- void qemu_input_queue_btn(QemuConsole *src, InputButton btn, bool down);
-diff --git a/ui/input-keymap.c b/ui/input-keymap.c
-index cf979c2..5f020fc 100644
---- a/ui/input-keymap.c
-+++ b/ui/input-keymap.c
-@@ -300,6 +300,7 @@ static const int qcode_to_number[] = {
- };
- 
- static int number_to_qcode[0x100];
-+static unsigned int qcode_to_linux[Q_KEY_CODE__MAX];
- 
- int qemu_input_linux_to_qcode(unsigned int lnx)
- {
-@@ -307,6 +308,21 @@ int qemu_input_linux_to_qcode(unsigned int lnx)
-     return linux_to_qcode[lnx];
- }
- 
-+unsigned int qemu_input_qcode_to_linux(int qcode)
-+{
-+    static int first = true;
-+
-+    if (first) {
-+        unsigned int lnx;
-+        first = false;
-+        for (lnx = 0; lnx < KEY_CNT; ++lnx) {
-+            qcode_to_linux[linux_to_qcode[lnx]] = lnx;
-+        }
-+    }
-+
-+    return qcode_to_linux[qcode];
-+}
-+
- int qemu_input_key_value_to_number(const KeyValue *value)
- {
-     if (value->type == KEY_VALUE_KIND_QCODE) {
--- 
-2.1.4
+This missed my review comments about being unsafe if $PWD contains spaces=
+:
+https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04241.html
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--rsCnbqJmD3uxBt4wrAeDk4lmRMiVISeCv
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnKaqAACgkQp6FrSiUn
+Q2p+owf/Ut27EnBc75tojqkXo2NEoi+WMWZ93KnkTrTaD+VzKgPBfh/dW4c9KUQy
+d0An9O0XJ4byA8wcfEgzKCQK0QRzHEkbIyha1r2RMkIrmw1ojmkxj247AomMb7Hj
+kdT5CMOzbIPqe+byxILNOCAfGQxDTyJ1XiBsc+8nhd4BEt+RuHHZpmi7Q2W8sNYF
+WouQXS+hZt+1yyIi0AYLjN+CqMxLST4hhNuvj3LEEFZANXJrcyVbkebQFOA8Mfuh
+QmAsXIjInO9Y46pezkguxReQGWh2LjPMuURvAJNltTRjD8rXub1WQtIHB2aGX2Cn
+bd+U6XzCxp49aLyAUzi4C38iWRYHmw==
+=bTGz
+-----END PGP SIGNATURE-----
+
+--rsCnbqJmD3uxBt4wrAeDk4lmRMiVISeCv--
