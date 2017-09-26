@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dwqki-0001ju-PR
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:30 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dwqkl-0001oO-PM
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dwqkc-0005Yj-Ow
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:24 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dwqkd-0005ZJ-Jn
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:27 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 26 Sep 2017 16:21:20 +0200
-Message-Id: <20170926142133.2498-12-kwolf@redhat.com>
+Date: Tue, 26 Sep 2017 16:21:23 +0200
+Message-Id: <20170926142133.2498-15-kwolf@redhat.com>
 In-Reply-To: <20170926142133.2498-1-kwolf@redhat.com>
 References: <20170926142133.2498-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 11/24] block: Clean up some bad code in the
- vvfat driver
+Subject: [Qemu-devel] [PULL 14/24] block: Add reopen queue to
+ bdrv_check_perm()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,69 +23,142 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Thomas Huth <thuth@redhat.com>
+In the context of bdrv_reopen(), we'll have to look at the state of the
+graph as it will be after the reopen. This interface addition is in
+preparation for the change.
 
-Remove the unnecessary home-grown redefinition of the assert() macro here,
-and remove the unusable debug code at the end of the checkpoint() function.
-The code there uses assert() with side-effects (assignment to the "mapping"
-variable), which should be avoided. Looking more closely, it seems as it is
-apparently also only usable for one certain directory layout (with a file
-named USB.H in it) and thus is of no use for the rest of the world.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/vvfat.c | 26 ++------------------------
- 1 file changed, 2 insertions(+), 24 deletions(-)
+ block.c | 34 +++++++++++++++++++---------------
+ 1 file changed, 19 insertions(+), 15 deletions(-)
 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index cbabb36f62..1d6e7087a8 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -57,15 +57,6 @@
- 
- static void checkpoint(void);
- 
--#ifdef __MINGW32__
--void nonono(const char* file, int line, const char* msg) {
--    fprintf(stderr, "Nonono! %s:%d %s\n", file, line, msg);
--    exit(-5);
--}
--#undef assert
--#define assert(a) do {if (!(a)) nonono(__FILE__, __LINE__, #a);}while(0)
--#endif
--
- #else
- 
- #define DLOG(a)
-@@ -3270,24 +3261,11 @@ static void bdrv_vvfat_init(void)
- block_init(bdrv_vvfat_init);
- 
- #ifdef DEBUG
--static void checkpoint(void) {
-+static void checkpoint(void)
-+{
-     assert(((mapping_t*)array_get(&(vvv->mapping), 0))->end == 2);
-     check1(vvv);
-     check2(vvv);
-     assert(!vvv->current_mapping || vvv->current_fd || (vvv->current_mapping->mode & MODE_DIRECTORY));
--#if 0
--    if (((direntry_t*)vvv->directory.pointer)[1].attributes != 0xf)
--        fprintf(stderr, "Nonono!\n");
--    mapping_t* mapping;
--    direntry_t* direntry;
--    assert(vvv->mapping.size >= vvv->mapping.item_size * vvv->mapping.next);
--    assert(vvv->directory.size >= vvv->directory.item_size * vvv->directory.next);
--    if (vvv->mapping.next<47)
--        return;
--    assert((mapping = array_get(&(vvv->mapping), 47)));
--    assert(mapping->dir_index < vvv->directory.next);
--    direntry = array_get(&(vvv->directory), mapping->dir_index);
--    assert(!memcmp(direntry->name, "USB     H  ", 11) || direntry->name[0]==0);
--#endif
+diff --git a/block.c b/block.c
+index c7724c85e3..0b499fda4c 100644
+--- a/block.c
++++ b/block.c
+@@ -1531,7 +1531,8 @@ static int bdrv_fill_options(QDict **options, const char *filename,
+     return 0;
  }
- #endif
+ 
+-static int bdrv_child_check_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
++static int bdrv_child_check_perm(BdrvChild *c, BlockReopenQueue *q,
++                                 uint64_t perm, uint64_t shared,
+                                  GSList *ignore_children, Error **errp);
+ static void bdrv_child_abort_perm_update(BdrvChild *c);
+ static void bdrv_child_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared);
+@@ -1562,7 +1563,8 @@ static void bdrv_child_perm(BlockDriverState *bs, BlockDriverState *child_bs,
+  * A call to this function must always be followed by a call to bdrv_set_perm()
+  * or bdrv_abort_perm_update().
+  */
+-static int bdrv_check_perm(BlockDriverState *bs, uint64_t cumulative_perms,
++static int bdrv_check_perm(BlockDriverState *bs, BlockReopenQueue *q,
++                           uint64_t cumulative_perms,
+                            uint64_t cumulative_shared_perms,
+                            GSList *ignore_children, Error **errp)
+ {
+@@ -1597,11 +1599,11 @@ static int bdrv_check_perm(BlockDriverState *bs, uint64_t cumulative_perms,
+     /* Check all children */
+     QLIST_FOREACH(c, &bs->children, next) {
+         uint64_t cur_perm, cur_shared;
+-        bdrv_child_perm(bs, c->bs, c, c->role, NULL,
++        bdrv_child_perm(bs, c->bs, c, c->role, q,
+                         cumulative_perms, cumulative_shared_perms,
+                         &cur_perm, &cur_shared);
+-        ret = bdrv_child_check_perm(c, cur_perm, cur_shared, ignore_children,
+-                                    errp);
++        ret = bdrv_child_check_perm(c, q, cur_perm, cur_shared,
++                                    ignore_children, errp);
+         if (ret < 0) {
+             return ret;
+         }
+@@ -1727,7 +1729,8 @@ char *bdrv_perm_names(uint64_t perm)
+  *
+  * Needs to be followed by a call to either bdrv_set_perm() or
+  * bdrv_abort_perm_update(). */
+-static int bdrv_check_update_perm(BlockDriverState *bs, uint64_t new_used_perm,
++static int bdrv_check_update_perm(BlockDriverState *bs, BlockReopenQueue *q,
++                                  uint64_t new_used_perm,
+                                   uint64_t new_shared_perm,
+                                   GSList *ignore_children, Error **errp)
+ {
+@@ -1769,19 +1772,20 @@ static int bdrv_check_update_perm(BlockDriverState *bs, uint64_t new_used_perm,
+         cumulative_shared_perms &= c->shared_perm;
+     }
+ 
+-    return bdrv_check_perm(bs, cumulative_perms, cumulative_shared_perms,
++    return bdrv_check_perm(bs, q, cumulative_perms, cumulative_shared_perms,
+                            ignore_children, errp);
+ }
+ 
+ /* Needs to be followed by a call to either bdrv_child_set_perm() or
+  * bdrv_child_abort_perm_update(). */
+-static int bdrv_child_check_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
++static int bdrv_child_check_perm(BdrvChild *c, BlockReopenQueue *q,
++                                 uint64_t perm, uint64_t shared,
+                                  GSList *ignore_children, Error **errp)
+ {
+     int ret;
+ 
+     ignore_children = g_slist_prepend(g_slist_copy(ignore_children), c);
+-    ret = bdrv_check_update_perm(c->bs, perm, shared, ignore_children, errp);
++    ret = bdrv_check_update_perm(c->bs, q, perm, shared, ignore_children, errp);
+     g_slist_free(ignore_children);
+ 
+     return ret;
+@@ -1809,7 +1813,7 @@ int bdrv_child_try_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
+ {
+     int ret;
+ 
+-    ret = bdrv_child_check_perm(c, perm, shared, NULL, errp);
++    ret = bdrv_child_check_perm(c, NULL, perm, shared, NULL, errp);
+     if (ret < 0) {
+         bdrv_child_abort_perm_update(c);
+         return ret;
+@@ -1950,7 +1954,7 @@ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs)
+          * because we're just taking a parent away, so we're loosening
+          * restrictions. */
+         bdrv_get_cumulative_perm(old_bs, &perm, &shared_perm);
+-        bdrv_check_perm(old_bs, perm, shared_perm, NULL, &error_abort);
++        bdrv_check_perm(old_bs, NULL, perm, shared_perm, NULL, &error_abort);
+         bdrv_set_perm(old_bs, perm, shared_perm);
+     }
+ 
+@@ -1969,7 +1973,7 @@ BdrvChild *bdrv_root_attach_child(BlockDriverState *child_bs,
+     BdrvChild *child;
+     int ret;
+ 
+-    ret = bdrv_check_update_perm(child_bs, perm, shared_perm, NULL, errp);
++    ret = bdrv_check_update_perm(child_bs, NULL, perm, shared_perm, NULL, errp);
+     if (ret < 0) {
+         bdrv_abort_perm_update(child_bs);
+         return NULL;
+@@ -3184,7 +3188,7 @@ void bdrv_replace_node(BlockDriverState *from, BlockDriverState *to,
+ 
+     /* Check whether the required permissions can be granted on @to, ignoring
+      * all BdrvChild in @list so that they can't block themselves. */
+-    ret = bdrv_check_update_perm(to, perm, shared, list, errp);
++    ret = bdrv_check_update_perm(to, NULL, perm, shared, list, errp);
+     if (ret < 0) {
+         bdrv_abort_perm_update(to);
+         goto out;
+@@ -4054,7 +4058,7 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
+ 
+     /* Update permissions, they may differ for inactive nodes */
+     bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
+-    ret = bdrv_check_perm(bs, perm, shared_perm, NULL, &local_err);
++    ret = bdrv_check_perm(bs, NULL, perm, shared_perm, NULL, &local_err);
+     if (ret < 0) {
+         bs->open_flags |= BDRV_O_INACTIVE;
+         error_propagate(errp, local_err);
+@@ -4121,7 +4125,7 @@ static int bdrv_inactivate_recurse(BlockDriverState *bs,
+ 
+         /* Update permissions, they may differ for inactive nodes */
+         bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
+-        bdrv_check_perm(bs, perm, shared_perm, NULL, &error_abort);
++        bdrv_check_perm(bs, NULL, perm, shared_perm, NULL, &error_abort);
+         bdrv_set_perm(bs, perm, shared_perm);
+     }
+ 
 -- 
 2.13.5
