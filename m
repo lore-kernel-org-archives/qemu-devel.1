@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dwqkn-0001od-LK
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:33 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dwqkj-0001lr-Qw
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dwqki-0005bo-0c
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:29 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dwqki-0005cV-VG
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:25 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 26 Sep 2017 16:21:25 +0200
-Message-Id: <20170926142133.2498-17-kwolf@redhat.com>
+Date: Tue, 26 Sep 2017 16:21:28 +0200
+Message-Id: <20170926142133.2498-20-kwolf@redhat.com>
 In-Reply-To: <20170926142133.2498-1-kwolf@redhat.com>
 References: <20170926142133.2498-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 16/24] block: reopen: Queue children after their
- parents
+Subject: [Qemu-devel] [PULL 19/24] iotests: fix 181: enable postcopy-ram
+ capability on target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,62 +23,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-We will calculate the required new permissions in the prepare stage of a
-reopen. Required permissions of children can be influenced by the
-changes made to their parents, but parents are independent from their
-children. This means that permissions need to be calculated top-down. In
-order to achieve this, queue parents before their children rather than
-queuing the children first.
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
+Migration capabilities should be enabled on both source and
+destination qemu processes.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ tests/qemu-iotests/181     | 2 ++
+ tests/qemu-iotests/181.out | 1 -
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/block.c b/block.c
-index ed8d51dd42..204cbb46c7 100644
---- a/block.c
-+++ b/block.c
-@@ -2768,6 +2768,19 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-         flags |= BDRV_O_ALLOW_RDWR;
-     }
+diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
+index 0333dda0e3..0c91e8f9de 100755
+--- a/tests/qemu-iotests/181
++++ b/tests/qemu-iotests/181
+@@ -93,7 +93,9 @@ echo
  
-+    if (!bs_entry) {
-+        bs_entry = g_new0(BlockReopenQueueEntry, 1);
-+        QSIMPLEQ_INSERT_TAIL(bs_queue, bs_entry, entry);
-+    } else {
-+        QDECREF(bs_entry->state.options);
-+        QDECREF(bs_entry->state.explicit_options);
-+    }
-+
-+    bs_entry->state.bs = bs;
-+    bs_entry->state.options = options;
-+    bs_entry->state.explicit_options = explicit_options;
-+    bs_entry->state.flags = flags;
-+
-     QLIST_FOREACH(child, &bs->children, next) {
-         QDict *new_child_options;
-         char *child_key_dot;
-@@ -2787,19 +2800,6 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-                                 child->role, options, flags);
-     }
+ # Slow down migration so much that it definitely won't finish before we can
+ # switch to postcopy
++# Enable postcopy-ram capability both on source and destination
+ silent=yes
++_send_qemu_cmd $dest 'migrate_set_capability postcopy-ram on' "(qemu)"
+ _send_qemu_cmd $src 'migrate_set_speed 4k' "(qemu)"
+ _send_qemu_cmd $src 'migrate_set_capability postcopy-ram on' "(qemu)"
+ _send_qemu_cmd $src "migrate -d unix:${MIG_SOCKET}" "(qemu)"
+diff --git a/tests/qemu-iotests/181.out b/tests/qemu-iotests/181.out
+index 6534ba2a76..d58c6a9dab 100644
+--- a/tests/qemu-iotests/181.out
++++ b/tests/qemu-iotests/181.out
+@@ -20,7 +20,6 @@ read 65536/65536 bytes at offset 0
  
--    if (!bs_entry) {
--        bs_entry = g_new0(BlockReopenQueueEntry, 1);
--        QSIMPLEQ_INSERT_TAIL(bs_queue, bs_entry, entry);
--    } else {
--        QDECREF(bs_entry->state.options);
--        QDECREF(bs_entry->state.explicit_options);
--    }
--
--    bs_entry->state.bs = bs;
--    bs_entry->state.options = options;
--    bs_entry->state.explicit_options = explicit_options;
--    bs_entry->state.flags = flags;
--
-     return bs_queue;
- }
+ === Do some I/O on the destination ===
  
+-QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) qemu-io disk "read -P 0x55 0 64k"
+ read 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
 -- 
 2.13.5
