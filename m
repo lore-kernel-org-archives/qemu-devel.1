@@ -1,29 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dwgOB-00015l-22
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 23:18:28 -0400
+	(envelope-from <thuth@redhat.com>) id 1dwgZB-00030E-1d
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 23:29:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dwgO7-0006R0-SM
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 23:18:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45500)
+	(envelope-from <thuth@redhat.com>) id 1dwgZ6-0004AO-Lu
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 23:29:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54268)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dwgO7-0006Qo-Kn
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 23:18:23 -0400
-Date: Tue, 26 Sep 2017 11:18:15 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170926031815.GL19505@pxdev.xzpeter.org>
-References: <1506321449-24013-1-git-send-email-peterx@redhat.com>
-	<1506321449-24013-2-git-send-email-peterx@redhat.com>
-	<4540074c-f523-41f4-3ce7-8b6514060fa4@suse.de>
-	<20170925081426.GE19505@pxdev.xzpeter.org>
-	<f8b295e1-e2c5-fdce-d4ea-2161490ca08b@suse.de>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dwgZ6-00049P-DT
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 23:29:44 -0400
+References: <1506071794-4373-1-git-send-email-thuth@redhat.com>
+	<20170925135316.74fed6da.cohuck@redhat.com>
+	<20170925133153.GZ3030@localhost.localdomain>
+	<20170925154647.357047b9@nial.brq.redhat.com>
+	<20170925143439.GA3030@localhost.localdomain>
+	<f078939d-4ae0-0ae8-4030-3df0ed66299a@redhat.com>
+	<CAFEAcA-kmSkjhM0f+Ti7nY1_AuDm1pPcYHNGn50fes20YvOeBg@mail.gmail.com>
+	<59e890ab-45e4-fe8a-a8de-3c441de19080@redhat.com>
+	<20170925175944.GD3030@localhost.localdomain>
+	<CAFEAcA_3SpWNm0FCviD5fXOFmxF1jGAwYgD_cZgwUMMAMn4BOQ@mail.gmail.com>
+	<20170926025956.GB4115@localhost.localdomain>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d5dcbb18-3ff8-f47d-8b15-8f7473165335@redhat.com>
+Date: Tue, 26 Sep 2017 05:29:12 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170926025956.GB4115@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f8b295e1-e2c5-fdce-d4ea-2161490ca08b@suse.de>
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] qom: provide root container for
- internal objs
+Subject: Re: [Qemu-devel] [PATCH v2] qdev: Mark devices as non-hotpluggable
+ by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,115 +38,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>
+To: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Igor Mammedov <imammedo@redhat.com>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Amit Shah <amit@kernel.org>
 
-On Mon, Sep 25, 2017 at 11:00:33AM +0200, Andreas F=C3=A4rber wrote:
-> Hi,
+On 26.09.2017 04:59, Eduardo Habkost wrote:
+> On Mon, Sep 25, 2017 at 07:05:26PM +0100, Peter Maydell wrote:
+>> On 25 September 2017 at 18:59, Eduardo Habkost <ehabkost@redhat.com> w=
+rote:
+>>> Finding the full list of devices that can be instantiated
+>>> internally at hotplug-time sounds tricky.
+>>
+>> If we just diff "list of devices marked hotplug before this patch"
+>> against "list of devices marked hotplug after this patch" how
+>> big is the list? Can we just eyeball it to see what needs
+>> to be specialcased?
 >=20
-> Am 25.09.2017 um 10:14 schrieb Peter Xu:
-> > On Mon, Sep 25, 2017 at 09:14:21AM +0200, Andreas F=C3=A4rber wrote:
-> >> Am 25.09.2017 um 08:37 schrieb Peter Xu:
-> >>> We have object_get_objects_root() to keep user created objects, how=
-ever
-> >>> no place for objects that will be used internally.  Create such a
-> >>> container for internal objects.
-> >>>
-> >>> CC: Andreas F=C3=A4rber <afaerber@suse.de>
-> >>> CC: Markus Armbruster <armbru@redhat.com>
-> >>> CC: Paolo Bonzini <pbonzini@redhat.com>
-> >>> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
-> >>> Signed-off-by: Peter Xu <peterx@redhat.com>
-> >>> ---
-> >>>  include/qom/object.h | 10 ++++++++++
-> >>>  qom/object.c         |  5 +++++
-> >>>  2 files changed, 15 insertions(+)
-> >>>
-> >>> diff --git a/include/qom/object.h b/include/qom/object.h
-> >>> index f3e5cff..f567052 100644
-> >>> --- a/include/qom/object.h
-> >>> +++ b/include/qom/object.h
-> >>> @@ -1214,6 +1214,16 @@ Object *object_get_root(void);
-> >>>  Object *object_get_objects_root(void);
-> >>> =20
-> >>>  /**
-> >>> + * object_get_internal_root:
-> >>> + *
-> >>> + * Get the container object that holds internally used object
-> >>> + * instances. This is the object at path "/internal-objects"
-> >>> + *
-> >>> + * Returns: the internal object container
-> >>> + */
-> >>> +Object *object_get_internal_root(void);
-> >>> +
-> >>> +/**
-> >>>   * object_get_canonical_path_component:
-> >>>   *
-> >>>   * Returns: The final component in the object's canonical path.  T=
-he canonical
-> >>> diff --git a/qom/object.c b/qom/object.c
-> >>> index 3e18537..857cee7 100644
-> >>> --- a/qom/object.c
-> >>> +++ b/qom/object.c
-> >>> @@ -1370,6 +1370,11 @@ Object *object_get_objects_root(void)
-> >>>      return container_get(object_get_root(), "/objects");
-> >>>  }
-> >>> =20
-> >>> +Object *object_get_internal_root(void)
-> >>> +{
-> >>> +    return container_get(object_get_root(), "/internal-objects");
-> >>
-> >> Whatever you expose in the QOM tree is no longer internal. Other nam=
-e?
-> >=20
-> > Hi, Andreas,
-> >=20
-> > If you mean "info qom-tree" here, can we still treat it as internal?
-> > Since after all it's not exposed in QMP (while IMHO QMP is the
-> > official protocol for QEMU clients).  And IIUC some HMP commands do
-> > dump some internal structs for debugging purpose (like: "info
-> > ramblock").
-> >=20
-> > Or, do you have any suggestion?
-> >=20
-> > (I did think about something like "hidden-objects", but I believe the=
-y
-> >  are not hidden as well if we think they are not internal...)
+> So, the full list quite big, ~1800 device types are affected by
+> this patch:
 >=20
-> I'm on travels and only seeing this 1/4 without context - according to
-> Manos apparently something about IOThreads.
+> https://gist.github.com/ehabkost/bd8e25c6811ac81d947ad8ad5b557f5c#file-=
+dev-types-diff-json
 >=20
-> The reason that certain container groups such as "/machine/peripheral"
-> exist was more of a legacy reason for migration from qdev, so yes I am
-> critical of "/hidden-objects" as well. If the objects are not related t=
-o
-> an existing device, you could just place them somewhere outside
-> "/machine", e.g. directly in the root node or in a container specific t=
-o
-> that use case (/io? /threads?), rather than a new generic bucket of
-> whatever name. Any objects not under /machine should be close to what
-> you consider internal.
+> If we ignore the "-cpu" classes, there ~640 affected device
+> types.
 >=20
-> Note that "info qom-tree" is not the only way to query the objects,
-> there's some Python QMP scripts as well.
+> However, if we look only at the direct children of TYPE_DEVICE,
+> we have:
 
-I see.  I'll take away Stefan's suggestion to create a standalone
-container for internal objects, so that it will be totally hidden.
+OK, thanks a lot for that list! But do you think that we can assume that
+the devices which are not direct children of TYPE_DEVICE can not be
+hotplugged internally during runtime? ... I currently don't think so
+(but at least they are good candidates which need to be examined more
+carefully).
 
-I didn't choose to allow parent =3D=3D NULL to avoid breaking or modifyin=
-g
-QOM interfaces.
+But anyway, how can we continue here? Set hotpluggable =3D true on all 64=
+0
+(or even all 1800) affected devices? That sounds very, very ugly to me.
+Maybe we should just do it for the virtio-*-device devices and the
+others that break during "make check" (btw. sorry for not noticing this
+... I normally run "make check" regularly, but this time I apparently
+missed to run it for aarch64), and if we later notice some more
+problems, we know that we lack a "make check" test for that case, too,
+and we should add such a test? That would at least eventually improve
+our test coverage a little bit, I guess...
 
-Preparing another post.  Thanks all!
-
->=20
-> Regards,
-> Andreas
->=20
-> --=20
-> SUSE Linux GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, Germany
-> GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
-> HRB 21284 (AG N=C3=BCrnberg)
-
---=20
-Peter Xu
+ Thomas
