@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dwz2H-0004Rb-Vk
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 19:13:07 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dx0Sj-0008WB-Az
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 20:44:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dwz2E-00009u-LQ
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 19:13:05 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:46335)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dwz2E-00009Y-Ah
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 19:13:02 -0400
-Received: by mail-wm0-x235.google.com with SMTP id m72so12614039wmc.1
-	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 16:13:02 -0700 (PDT)
-References: <20170916023417.14599-1-richard.henderson@linaro.org>
-	<20170916023417.14599-5-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170916023417.14599-5-richard.henderson@linaro.org>
-Date: Wed, 27 Sep 2017 00:12:59 +0100
-Message-ID: <87o9pxcav8.fsf@linaro.org>
+	(envelope-from <no-reply@patchew.org>) id 1dx0Sg-00078H-8A
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 20:44:29 -0400
+Resent-Message-Id: <E1dx0Sg-00078H-8A@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21433)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dx0Sg-00076U-1V
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 20:44:26 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150646669584.63.10090914967646614472@b58463cdfd5f>
+In-Reply-To: <20170916023417.14599-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 4/6] target/arm: Use vector
- infrastructure for aa64 add/sub/logic
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 26 Sep 2017 15:58:16 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] TCG vectorization and example
+ conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,306 +29,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, f4bug@amsat.org
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, alex.bennee@linaro.org, f4bug@amsat.org
 
-
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
-> ---
->  target/arm/translate-a64.c | 216 ++++++++++++++++++++++++++++++---------------
->  1 file changed, 143 insertions(+), 73 deletions(-)
->
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index a3984c9a0d..4759cc9829 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -21,6 +21,7 @@
->  #include "cpu.h"
->  #include "exec/exec-all.h"
->  #include "tcg-op.h"
-> +#include "tcg-op-gvec.h"
->  #include "qemu/log.h"
->  #include "arm_ldst.h"
->  #include "translate.h"
-> @@ -82,6 +83,7 @@ typedef void NeonGenTwoDoubleOPFn(TCGv_i64, TCGv_i64, TCGv_i64, TCGv_ptr);
->  typedef void NeonGenOneOpFn(TCGv_i64, TCGv_i64);
->  typedef void CryptoTwoOpEnvFn(TCGv_ptr, TCGv_i32, TCGv_i32);
->  typedef void CryptoThreeOpEnvFn(TCGv_ptr, TCGv_i32, TCGv_i32, TCGv_i32);
-> +typedef void GVecGenTwoFn(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t);
->
->  /* initialize TCG globals.  */
->  void a64_translate_init(void)
-> @@ -537,6 +539,21 @@ static inline int vec_reg_offset(DisasContext *s, int regno,
->      return offs;
->  }
->
-> +/* Return the offset info CPUARMState of the "whole" vector register Qn.  */
-> +static inline int vec_full_reg_offset(DisasContext *s, int regno)
-> +{
-> +    assert_fp_access_checked(s);
-> +    return offsetof(CPUARMState, vfp.regs[regno * 2]);
-> +}
-> +
-> +/* Return the byte size of the "whole" vector register, VL / 8.  */
-> +static inline int vec_full_reg_size(DisasContext *s)
-> +{
-> +    /* FIXME SVE: We should put the composite ZCR_EL* value into tb->flags.
-> +       In the meantime this is just the AdvSIMD length of 128.  */
-> +    return 128 / 8;
-> +}
-> +
->  /* Return the offset into CPUARMState of a slice (from
->   * the least significant end) of FP register Qn (ie
->   * Dn, Sn, Hn or Bn).
-> @@ -9036,85 +9053,125 @@ static void disas_simd_three_reg_diff(DisasContext *s, uint32_t insn)
->      }
->  }
->
-> +static void gen_bsl_i64(TCGv_i64 rd, TCGv_i64 rn, TCGv_i64 rm)
-> +{
-> +    tcg_gen_xor_i64(rn, rn, rm);
-> +    tcg_gen_and_i64(rn, rn, rd);
-> +    tcg_gen_xor_i64(rd, rm, rn);
-> +}
-> +
-> +static void gen_bit_i64(TCGv_i64 rd, TCGv_i64 rn, TCGv_i64 rm)
-> +{
-> +    tcg_gen_xor_i64(rn, rn, rd);
-> +    tcg_gen_and_i64(rn, rn, rm);
-> +    tcg_gen_xor_i64(rd, rd, rn);
-> +}
-> +
-> +static void gen_bif_i64(TCGv_i64 rd, TCGv_i64 rn, TCGv_i64 rm)
-> +{
-> +    tcg_gen_xor_i64(rn, rn, rd);
-> +    tcg_gen_andc_i64(rn, rn, rm);
-> +    tcg_gen_xor_i64(rd, rd, rn);
-> +}
-> +
-> +static void gen_bsl_vec(TCGv_vec rd, TCGv_vec rn, TCGv_vec rm)
-> +{
-> +    tcg_gen_xor_vec(rn, rn, rm);
-> +    tcg_gen_and_vec(rn, rn, rd);
-> +    tcg_gen_xor_vec(rd, rm, rn);
-> +}
-> +
-> +static void gen_bit_vec(TCGv_vec rd, TCGv_vec rn, TCGv_vec rm)
-> +{
-> +    tcg_gen_xor_vec(rn, rn, rd);
-> +    tcg_gen_and_vec(rn, rn, rm);
-> +    tcg_gen_xor_vec(rd, rd, rn);
-> +}
-> +
-> +static void gen_bif_vec(TCGv_vec rd, TCGv_vec rn, TCGv_vec rm)
-> +{
-> +    tcg_gen_xor_vec(rn, rn, rd);
-> +    tcg_gen_andc_vec(rn, rn, rm);
-> +    tcg_gen_xor_vec(rd, rd, rn);
-> +}
-> +
->  /* Logic op (opcode == 3) subgroup of C3.6.16. */
->  static void disas_simd_3same_logic(DisasContext *s, uint32_t insn)
->  {
-> +    static const GVecGen3 bsl_op = {
-> +        .fni8 = gen_bsl_i64,
-> +        .fniv = gen_bsl_vec,
-> +        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-> +        .load_dest = true
-> +    };
-> +    static const GVecGen3 bit_op = {
-> +        .fni8 = gen_bit_i64,
-> +        .fniv = gen_bit_vec,
-> +        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-> +        .load_dest = true
-> +    };
-> +    static const GVecGen3 bif_op = {
-> +        .fni8 = gen_bif_i64,
-> +        .fniv = gen_bif_vec,
-> +        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-> +        .load_dest = true
-> +    };
-> +
->      int rd = extract32(insn, 0, 5);
->      int rn = extract32(insn, 5, 5);
->      int rm = extract32(insn, 16, 5);
->      int size = extract32(insn, 22, 2);
->      bool is_u = extract32(insn, 29, 1);
->      bool is_q = extract32(insn, 30, 1);
-> -    TCGv_i64 tcg_op1, tcg_op2, tcg_res[2];
-> -    int pass;
-> +    GVecGenTwoFn *gvec_fn;
-> +    const GVecGen3 *gvec_op;
->
->      if (!fp_access_check(s)) {
->          return;
->      }
->
-> -    tcg_op1 = tcg_temp_new_i64();
-> -    tcg_op2 = tcg_temp_new_i64();
-> -    tcg_res[0] = tcg_temp_new_i64();
-> -    tcg_res[1] = tcg_temp_new_i64();
-> -
-> -    for (pass = 0; pass < (is_q ? 2 : 1); pass++) {
-> -        read_vec_element(s, tcg_op1, rn, pass, MO_64);
-> -        read_vec_element(s, tcg_op2, rm, pass, MO_64);
-> -
-> -        if (!is_u) {
-> -            switch (size) {
-> -            case 0: /* AND */
-> -                tcg_gen_and_i64(tcg_res[pass], tcg_op1, tcg_op2);
-> -                break;
-> -            case 1: /* BIC */
-> -                tcg_gen_andc_i64(tcg_res[pass], tcg_op1, tcg_op2);
-> -                break;
-> -            case 2: /* ORR */
-> -                tcg_gen_or_i64(tcg_res[pass], tcg_op1, tcg_op2);
-> -                break;
-> -            case 3: /* ORN */
-> -                tcg_gen_orc_i64(tcg_res[pass], tcg_op1, tcg_op2);
-> -                break;
-> -            }
-> -        } else {
-> -            if (size != 0) {
-> -                /* B* ops need res loaded to operate on */
-> -                read_vec_element(s, tcg_res[pass], rd, pass, MO_64);
-> -            }
-> -
-> -            switch (size) {
-> -            case 0: /* EOR */
-> -                tcg_gen_xor_i64(tcg_res[pass], tcg_op1, tcg_op2);
-> -                break;
-> -            case 1: /* BSL bitwise select */
-> -                tcg_gen_xor_i64(tcg_op1, tcg_op1, tcg_op2);
-> -                tcg_gen_and_i64(tcg_op1, tcg_op1, tcg_res[pass]);
-> -                tcg_gen_xor_i64(tcg_res[pass], tcg_op2, tcg_op1);
-> -                break;
-> -            case 2: /* BIT, bitwise insert if true */
-> -                tcg_gen_xor_i64(tcg_op1, tcg_op1, tcg_res[pass]);
-> -                tcg_gen_and_i64(tcg_op1, tcg_op1, tcg_op2);
-> -                tcg_gen_xor_i64(tcg_res[pass], tcg_res[pass], tcg_op1);
-> -                break;
-> -            case 3: /* BIF, bitwise insert if false */
-> -                tcg_gen_xor_i64(tcg_op1, tcg_op1, tcg_res[pass]);
-> -                tcg_gen_andc_i64(tcg_op1, tcg_op1, tcg_op2);
-> -                tcg_gen_xor_i64(tcg_res[pass], tcg_res[pass], tcg_op1);
-> -                break;
-> -            }
-> -        }
-> -    }
-> +    switch (size + 4 * is_u) {
-> +    case 0: /* AND */
-> +        gvec_fn = tcg_gen_gvec_and;
-> +        goto do_fn;
-> +    case 1: /* BIC */
-> +        gvec_fn = tcg_gen_gvec_andc;
-> +        goto do_fn;
-> +    case 2: /* ORR */
-> +        gvec_fn = tcg_gen_gvec_or;
-> +        goto do_fn;
-> +    case 3: /* ORN */
-> +        gvec_fn = tcg_gen_gvec_orc;
-> +        goto do_fn;
-> +    case 4: /* EOR */
-> +        gvec_fn = tcg_gen_gvec_xor;
-> +        goto do_fn;
-> +    do_fn:
-> +        gvec_fn(vec_full_reg_offset(s, rd),
-> +                vec_full_reg_offset(s, rn),
-> +                vec_full_reg_offset(s, rm),
-> +                is_q ? 16 : 8, vec_full_reg_size(s));
-> +        return;
-> +
-> +    case 5: /* BSL bitwise select */
-> +        gvec_op = &bsl_op;
-> +        goto do_op;
-> +    case 6: /* BIT, bitwise insert if true */
-> +        gvec_op = &bit_op;
-> +        goto do_op;
-> +    case 7: /* BIF, bitwise insert if false */
-> +        gvec_op = &bif_op;
-> +        goto do_op;
-> +    do_op:
-> +        tcg_gen_gvec_3(vec_full_reg_offset(s, rd),
-> +                       vec_full_reg_offset(s, rn),
-> +                       vec_full_reg_offset(s, rm),
-> +                       is_q ? 16 : 8, vec_full_reg_size(s), gvec_op);
-> +        return;
->
-> -    write_vec_element(s, tcg_res[0], rd, 0, MO_64);
-> -    if (!is_q) {
-> -        tcg_gen_movi_i64(tcg_res[1], 0);
-> +    default:
-> +        g_assert_not_reached();
->      }
-> -    write_vec_element(s, tcg_res[1], rd, 1, MO_64);
-> -
-> -    tcg_temp_free_i64(tcg_op1);
-> -    tcg_temp_free_i64(tcg_op2);
-> -    tcg_temp_free_i64(tcg_res[0]);
-> -    tcg_temp_free_i64(tcg_res[1]);
->  }
->
->  /* Helper functions for 32 bit comparisons */
-> @@ -9375,6 +9432,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
->      int rn = extract32(insn, 5, 5);
->      int rd = extract32(insn, 0, 5);
->      int pass;
-> +    GVecGenTwoFn *gvec_op;
->
->      switch (opcode) {
->      case 0x13: /* MUL, PMUL */
-> @@ -9414,6 +9472,28 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
->          return;
->      }
->
-> +    switch (opcode) {
-> +    case 0x10: /* ADD, SUB */
-> +        {
-> +            static GVecGenTwoFn * const fns[4][2] = {
-> +                { tcg_gen_gvec_add8, tcg_gen_gvec_sub8 },
-> +                { tcg_gen_gvec_add16, tcg_gen_gvec_sub16 },
-> +                { tcg_gen_gvec_add32, tcg_gen_gvec_sub32 },
-> +                { tcg_gen_gvec_add64, tcg_gen_gvec_sub64 },
-> +            };
-> +            gvec_op = fns[size][u];
-> +            goto do_gvec;
-> +        }
-> +        break;
-> +
-> +    do_gvec:
-> +        gvec_op(vec_full_reg_offset(s, rd),
-> +                vec_full_reg_offset(s, rn),
-> +                vec_full_reg_offset(s, rm),
-> +                is_q ? 16 : 8, vec_full_reg_size(s));
-> +        return;
-> +    }
-> +
->      if (size == 3) {
->          assert(is_q);
->          for (pass = 0; pass < 2; pass++) {
-> @@ -9586,16 +9666,6 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
->                  genfn = fns[size][u];
->                  break;
->              }
-> -            case 0x10: /* ADD, SUB */
-> -            {
-> -                static NeonGenTwoOpFn * const fns[3][2] = {
-> -                    { gen_helper_neon_add_u8, gen_helper_neon_sub_u8 },
-> -                    { gen_helper_neon_add_u16, gen_helper_neon_sub_u16 },
-> -                    { tcg_gen_add_i32, tcg_gen_sub_i32 },
-> -                };
-> -                genfn = fns[size][u];
-> -                break;
-> -            }
->              case 0x11: /* CMTST, CMEQ */
->              {
->                  static NeonGenTwoOpFn * const fns[3][2] = {
-
-
---
-Alex Bennée
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcwOTE2MDIzNDE3LjE0NTk5LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
+Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAvNl0gVENHIHZlY3Rvcml6YXRp
+b24gYW5kIGV4YW1wbGUgY29udmVyc2lvbgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4g
+fCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cg
+LS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAg
+IGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9
+JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0
+cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAg
+ICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNU
+IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
+ODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKN2Y4YmZmMzYzOSB0Y2cv
+YWFyY2g2NDogQWRkIHZlY3RvciBvcGVyYXRpb25zCjEwNzcwMGI5OTggdGNnL2kzODY6IEFkZCB2
+ZWN0b3Igb3BlcmF0aW9ucwo2M2M1ZDcyOWNkIHRhcmdldC9hcm06IFVzZSB2ZWN0b3IgaW5mcmFz
+dHJ1Y3R1cmUgZm9yIGFhNjQgYWRkL3N1Yi9sb2dpYwo2NmJkMWJhMTE3IHRhcmdldC9hcm06IEFs
+aWduIHZlY3RvciByZWdpc3RlcnMKYmNmODg2MzZjMCB0Y2c6IEFkZCB2ZWN0b3IgZXhwYW5kZXJz
+CjAwZTMyZWE1YjIgdGNnOiBBZGQgdHlwZXMgYW5kIG9wZXJhdGlvbnMgZm9yIGhvc3QgdmVjdG9y
+cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS82OiB0Y2c6IEFkZCB0eXBl
+cyBhbmQgb3BlcmF0aW9ucyBmb3IgaG9zdCB2ZWN0b3JzLi4uCkNoZWNraW5nIFBBVENIIDIvNjog
+dGNnOiBBZGQgdmVjdG9yIGV4cGFuZGVycy4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3Vu
+ZCB0aGF0ICcmJyAoY3R4Old4TykKIzI4NDogRklMRTogYWNjZWwvdGNnL3RjZy1ydW50aW1lLWd2
+ZWMuYzoyNDE6CisgICAgICAgICoodmVjNjQgKikoZCArIGkpID0gKih2ZWM2NCAqKShhICsgaSkg
+Jn4gKih2ZWM2NCAqKShiICsgaSk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCAnficgKGN0
+eDpPeFcpCiMyODQ6IEZJTEU6IGFjY2VsL3RjZy90Y2ctcnVudGltZS1ndmVjLmM6MjQxOgorICAg
+ICAgICAqKHZlYzY0ICopKGQgKyBpKSA9ICoodmVjNjQgKikoYSArIGkpICZ+ICoodmVjNjQgKiko
+YiArIGkpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBe
+CgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICd8JyAoY3R4Old4TykKIzI5NTog
+RklMRTogYWNjZWwvdGNnL3RjZy1ydW50aW1lLWd2ZWMuYzoyNTI6CisgICAgICAgICoodmVjNjQg
+KikoZCArIGkpID0gKih2ZWM2NCAqKShhICsgaSkgfH4gKih2ZWM2NCAqKShiICsgaSk7CiAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNl
+IHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCAnficgKGN0eDpPeFcpCiMyOTU6IEZJTEU6IGFjY2VsL3Rj
+Zy90Y2ctcnVudGltZS1ndmVjLmM6MjUyOgorICAgICAgICAqKHZlYzY0ICopKGQgKyBpKSA9ICoo
+dmVjNjQgKikoYSArIGkpIHx+ICoodmVjNjQgKikoYiArIGkpOwogICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogdHJhaWxpbmcgc3RhdGVtZW50
+cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiM1ODk6IEZJTEU6IHRjZy90Y2ctb3AtZ3ZlYy5jOjE5
+ODoKKyAgICB9IGlmIChUQ0dfVEFSR0VUX1JFR19CSVRTID09IDY0KSB7Cgp0b3RhbDogNSBlcnJv
+cnMsIDAgd2FybmluZ3MsIDEzNDIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy82OiB0YXJnZXQvYXJtOiBBbGlnbiB2
+ZWN0b3IgcmVnaXN0ZXJzLi4uCkNoZWNraW5nIFBBVENIIDQvNjogdGFyZ2V0L2FybTogVXNlIHZl
+Y3RvciBpbmZyYXN0cnVjdHVyZSBmb3IgYWE2NCBhZGQvc3ViL2xvZ2ljLi4uCkNoZWNraW5nIFBB
+VENIIDUvNjogdGNnL2kzODY6IEFkZCB2ZWN0b3Igb3BlcmF0aW9ucy4uLgpXQVJOSU5HOiBhcmNo
+aXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojNTA6IEZJTEU6IHRj
+Zy9pMzg2L3RjZy10YXJnZXQuaDo5MzoKKyNpZmRlZiBfX1NTRTJfXwoKV0FSTklORzogYXJjaGl0
+ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzU1OiBGSUxFOiB0Y2cv
+aTM4Ni90Y2ctdGFyZ2V0Lmg6OTg6CisjaWZkZWYgX19BVlgyX18KCnRvdGFsOiAwIGVycm9ycywg
+MiB3YXJuaW5ncywgNzIyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggNi82OiB0Y2cvYWFyY2g2NDogQWRkIHZlY3RvciBv
+cGVyYXRpb25zLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
+IGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
+aHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
+dy1kZXZlbEBmcmVlbGlzdHMub3Jn
