@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45805)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dwmwL-0004fi-2B
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:18:14 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46214)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1dwmxT-0005U9-0M
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:19:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dwmwH-000274-61
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:18:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33022)
+	(envelope-from <pl@kamp.de>) id 1dwmxP-0002lR-MM
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:19:19 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:57848 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dwmwG-00026n-W8
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:18:05 -0400
-Date: Tue, 26 Sep 2017 12:18:00 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170926121800.1e9e1ac1.cohuck@redhat.com>
-In-Reply-To: <20170921180841.24490-1-pasic@linux.vnet.ibm.com>
-References: <20170921180841.24490-1-pasic@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dwmxP-0002kg-Cf
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:19:15 -0400
+References: <1505997152-16980-1-git-send-email-pl@kamp.de>
+	<150637280903.26688.16951846700405077637@sif>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <a59ed0e5-dd3f-fed4-7561-eb91384fe700@kamp.de>
+Date: Tue, 26 Sep 2017 12:19:13 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <150637280903.26688.16951846700405077637@sif>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 0/5] add CCW indirect data access support
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH] migration: disable
+ auto-converge during bulk block migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,32 +29,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: quintela@redhat.com, qemu-stable@nongnu.org, dgilbert@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
 
-On Thu, 21 Sep 2017 20:08:36 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+Am 25.09.2017 um 22:53 schrieb Michael Roth:
+> Quoting Peter Lieven (2017-09-21 07:32:32)
+>> auto-converge and block migration currently do not play well together.
+>> During block migration the auto-converge logic detects that ram
+>> migration makes no progress and thus throttles down the vm until
+>> it nearly stalls completely. Avoid this by disabling the throttling
+>> logic during the bulk phase of the block migration.
+>>
+>> Cc: qemu-stable@nongnu.org
+>> Signed-off-by: Peter Lieven <pl@kamp.de>
+> FYI: this patch has been tagged for stable 2.10.1, but is not yet
+> upstream. Patch freeze for 2.10.1 is September 27th.
 
-> Abstract
-> --------
-> 
-> The objective of this series is introducing CCW IDA (indirect data
-> access) support to our virtual channel subsystem implementation. Briefly
-> CCW IDA can be thought of as a kind of a scatter gather support for a
-> single CCW. If certain flags are set, the cda is to be interpreted as an
-> address to a list which in turn holds further addresses designating the
-> actual data.  Thus the scheme which we are currently using for accessing
-> CCW payload does not work in general case. Currently there is no
-> immediate need for proper IDA handling (no use case), but since it IDA is
-> a non-optional part of the architecture, the only way towards AR
-> compliance is actually implementing IDA.
-> 
-> The focus of this patch set is introducing IDA support. There seems to be
-> a potential for further  improvements based on the introduced
-> infrastructure, but such improvements are intended to be discusses
-> separately and realized as patches on top of this series.
+I just send a V2 of the patch adding a comment to the code
+why auto-converge is disabled during bulk block migration.
+Maybe someone can review it and pick it up.
 
-Hm, do you have a list of what you want to do as follow-on patches?
-(Checking return codes, ...)
-
-It's easy to lose track of all this :)
+Peter
