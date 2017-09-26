@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51371)
 	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1dwnAD-000326-Bk
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:32:30 -0400
+	id 1dwnB6-0003a0-DA
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:33:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1dwnA7-00011L-Kl
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:32:29 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:45538 helo=mx01.kamp.de)
+	(envelope-from <pl@kamp.de>) id 1dwnB3-0001LN-A7
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:33:24 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:44625 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dwnA7-00010H-Aw
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:32:23 -0400
-References: <1506421015-4737-1-git-send-email-pl@kamp.de>
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dwnB2-0001Ki-Uv
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:33:21 -0400
 From: Peter Lieven <pl@kamp.de>
-Message-ID: <9b0ceb88-d68e-ca2a-e255-ec0a0951f0fe@kamp.de>
-Date: Tue, 26 Sep 2017 12:32:19 +0200
-MIME-Version: 1.0
-In-Reply-To: <1506421015-4737-1-git-send-email-pl@kamp.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH V2] migration: disable auto-converge during
+Date: Tue, 26 Sep 2017 12:33:16 +0200
+Message-Id: <1506421996-12513-1-git-send-email-pl@kamp.de>
+Subject: [Qemu-devel] [PATCH V3] migration: disable auto-converge during
  bulk block migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,24 +23,89 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: quintela@redhat.com, famz@redhat.com, stefanha@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, qemu-stable@nongnu.org
+Cc: quintela@redhat.com, famz@redhat.com, stefanha@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, Peter Lieven <pl@kamp.de>, qemu-stable@nongnu.org
 
-Am 26.09.2017 um 12:16 schrieb Peter Lieven:
-> auto-converge and block migration currently do not play well together.
-> During block migration the auto-converge logic detects that ram
-> migration makes no progress and thus throttles down the vm until
-> it nearly stalls completely. Avoid this by disabling the throttling
-> logic during the bulk phase of the block migration.
->
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Peter Lieven <pl@kamp.de>
-> ---
-> V1->V2: add comment why we disable auto-converge during bulk block migration [Stefan]
->
->   migration/block.c | 5 +++++
->   migration/ram.c   | 6 +++++-
->   2 files changed, 10 insertions(+), 1 deletion(-)
+auto-converge and block migration currently do not play well together.
+During block migration the auto-converge logic detects that ram
+migration makes no progress and thus throttles down the vm until
+it nearly stalls completely. Avoid this by disabling the throttling
+logic during the bulk phase of the block migration.
 
-Sorry, I missed to include the updated header files. Will send a V3.
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Peter Lieven <pl@kamp.de>
+---
+V1->V2: add comment why we disable auto-converge during bulk block migration [Stefan]
+V2->V3: add missing patch for migration/block.h
 
-Peter
+ migration/block.c | 5 +++++
+ migration/block.h | 7 +++++++
+ migration/ram.c   | 6 +++++-
+ 3 files changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/migration/block.c b/migration/block.c
+index 9171f60..606ad4d 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -161,6 +161,11 @@ int blk_mig_active(void)
+     return !QSIMPLEQ_EMPTY(&block_mig_state.bmds_list);
+ }
+ 
++int blk_mig_bulk_active(void)
++{
++    return blk_mig_active() && !block_mig_state.bulk_completed;
++}
++
+ uint64_t blk_mig_bytes_transferred(void)
+ {
+     BlkMigDevState *bmds;
+diff --git a/migration/block.h b/migration/block.h
+index 22ebe94..3178609 100644
+--- a/migration/block.h
++++ b/migration/block.h
+@@ -16,6 +16,7 @@
+ 
+ #ifdef CONFIG_LIVE_BLOCK_MIGRATION
+ int blk_mig_active(void);
++int blk_mig_bulk_active(void);
+ uint64_t blk_mig_bytes_transferred(void);
+ uint64_t blk_mig_bytes_remaining(void);
+ uint64_t blk_mig_bytes_total(void);
+@@ -25,6 +26,12 @@ static inline int blk_mig_active(void)
+ {
+     return false;
+ }
++
++static inline int blk_mig_bulk_active(void)
++{
++    return false;
++}
++
+ static inline uint64_t blk_mig_bytes_transferred(void)
+ {
+     return 0;
+diff --git a/migration/ram.c b/migration/ram.c
+index 88ca69e..b83f897 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -46,6 +46,7 @@
+ #include "exec/ram_addr.h"
+ #include "qemu/rcu_queue.h"
+ #include "migration/colo.h"
++#include "migration/block.h"
+ 
+ /***********************************************************/
+ /* ram save/restore */
+@@ -825,7 +826,10 @@ static void migration_bitmap_sync(RAMState *rs)
+             / (end_time - rs->time_last_bitmap_sync);
+         bytes_xfer_now = ram_counters.transferred;
+ 
+-        if (migrate_auto_converge()) {
++        /* During block migration the auto-converge logic incorrectly detects
++         * that ram migration makes no progress. Avoid this by disabling the
++         * throttling logic during the bulk phase of block migration. */
++        if (migrate_auto_converge() && !blk_mig_bulk_active()) {
+             /* The following detection logic can be refined later. For now:
+                Check to see if the dirtied bytes is 50% more than the approx.
+                amount of bytes that just got transferred since the last time we
+-- 
+1.9.1
