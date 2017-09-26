@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dwe9s-0007P8-1s
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 20:55:33 -0400
+	(envelope-from <famz@redhat.com>) id 1dwedE-0003j4-Uj
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 21:25:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dwe9r-0005P9-5g
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 20:55:32 -0400
-Date: Mon, 25 Sep 2017 20:55:20 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170926005520.GA7906@flamenco>
-References: <cover.1506384414.git.alistair.francis@xilinx.com>
-	<50c325943b1547813567efe6a11fb44644494d70.1506384414.git.alistair.francis@xilinx.com>
+	(envelope-from <famz@redhat.com>) id 1dwedB-0006d9-KA
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 21:25:50 -0400
+Date: Tue, 26 Sep 2017 09:25:38 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170926012538.GA31924@lemon.lan>
+References: <20170925145526.32690-1-eblake@redhat.com>
+	<20170925145526.32690-6-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <50c325943b1547813567efe6a11fb44644494d70.1506384414.git.alistair.francis@xilinx.com>
-Subject: Re: [Qemu-devel] [PATCH v1 2/8] tests: Replace fprintf(stderr,
- "*\n" with error_report()
+In-Reply-To: <20170925145526.32690-6-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v10 05/20] dirty-bitmap: Avoid size query
+ failure during truncate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +24,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, alistair23@gmail.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Mon, Sep 25, 2017 at 17:08:48 -0700, Alistair Francis wrote:
-> diff --git a/tests/atomic_add-bench.c b/tests/atomic_add-bench.c
-> index caa1e8e689..41ba1600c0 100644
-> --- a/tests/atomic_add-bench.c
-> +++ b/tests/atomic_add-bench.c
-> @@ -29,7 +29,7 @@ static const char commands_string[] =
->  static void usage_complete(char *argv[])
->  {
->      fprintf(stderr, "Usage: %s [options]\n", argv[0]);
-> -    fprintf(stderr, "options:\n%s\n", commands_string);
-> +    fprintf(stderr, "options:\n%s", commands_string);
->  }
-
-We do want that trailing \n, unless we move it to commands_string.
-
-Also, I think using error_report here would be confusing -- this is a standalone
-test program with as little QEMU-specific knowledge as possible (QemuThreads
-are used for portability); using error_report here is confusing (this is not
-an error).
-
-> diff --git a/tests/check-qlit b/tests/check-qlit
-> new file mode 100755
-> index 0000000000000000000000000000000000000000..950429524e3eb07e6daed1fe01caad0f5d554809
-> GIT binary patch
-> literal 272776
-> zcmeEvdwf*Ywf~vPB$){zGeCghJ;($So{10*LNEgfoIs*MKvBRDLV(l&F`3b5QKOS6
-
-? I don't know what this is, I don't seem to have this binary in my
-checked out tree.
-
-(snips thousands of lines)
-
-> diff --git a/tests/qht-bench.c b/tests/qht-bench.c
-> index 11c1cec766..2637d601a9 100644
-> --- a/tests/qht-bench.c
-> +++ b/tests/qht-bench.c
-> @@ -5,6 +5,7 @@
->   *   See the COPYING file in the top-level directory.
->   */
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
->  #include "qemu/processor.h"
->  #include "qemu/atomic.h"
->  #include "qemu/qht.h"
-> @@ -89,7 +90,7 @@ static const char commands_string[] =
->  static void usage_complete(int argc, char *argv[])
->  {
->      fprintf(stderr, "Usage: %s [options]\n", argv[0]);
-> -    fprintf(stderr, "options:\n%s\n", commands_string);
-> +    fprintf(stderr, "options:\n%s", commands_string);
-
-Same as above: this removes the necessary trailing \n.
-
->      exit(-1);
->  }
->  
-> @@ -328,7 +329,7 @@ static void htable_init(void)
->              retries++;
->          }
+On Mon, 09/25 09:55, Eric Blake wrote:
+> We've previously fixed several places where we failed to account
+> for possible errors from bdrv_nb_sectors().  Fix another one by
+> making bdrv_dirty_bitmap_truncate() take the new size from the
+> caller instead of querying itself; then adjust the sole caller
+> bdrv_truncate() to pass the size just determined by a successful
+> resize, or to skip the bitmap resize on failure, thus avoiding
+> sizing the bitmaps to -1.  This also fixes a bug where not all
+> failure paths in bdrv_truncate() would set errp.
+> 
+> Note that bdrv_truncate() is still a bit awkward.  We may want
+> to revisit it later and clean up things to better guarantee that
+> a resize attempt either fails cleanly up front, or cannot fail
+> after guest-visible changes have been made (if temporary changes
+> are made, then they need to be cleanly rolled back).  But that
+> is a task for another day; for now, the goal is the bare minimum
+> fix to ensure that just bdrv_dirty_bitmap_truncate() cannot fail.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
+> ---
+> v10: always resize bitmap as before [John], enhance commit message to
+> point out errp bugfix [Vladimir]
+> v9: skip only bdrv_dirty_bitmap_truncate on error [Fam]
+> v8: retitle and rework to avoid possibility of secondary failure [John]
+> v7: new patch [Kevin]
+> ---
+>  include/block/dirty-bitmap.h |  2 +-
+>  block.c                      | 16 +++++++++++-----
+>  block/dirty-bitmap.c         |  6 +++---
+>  3 files changed, 15 insertions(+), 9 deletions(-)
+> 
+> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+> index 8fd842eac9..7a27590047 100644
+> --- a/include/block/dirty-bitmap.h
+> +++ b/include/block/dirty-bitmap.h
+> @@ -83,7 +83,7 @@ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
+>  void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t sector_num);
+>  int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
+>  int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
+> -void bdrv_dirty_bitmap_truncate(BlockDriverState *bs);
+> +void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes);
+>  bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
+>  bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
+>  bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
+> diff --git a/block.c b/block.c
+> index 528cda7b2c..ef5af81f66 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -3545,12 +3545,18 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
+>      assert(!(bs->open_flags & BDRV_O_INACTIVE));
+> 
+>      ret = drv->bdrv_truncate(bs, offset, prealloc, errp);
+> -    if (ret == 0) {
+> -        ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
+> -        bdrv_dirty_bitmap_truncate(bs);
+> -        bdrv_parent_cb_resize(bs);
+> -        atomic_inc(&bs->write_gen);
+> +    if (ret < 0) {
+> +        return ret;
 >      }
-> -    fprintf(stderr, " populated after %zu retries\n", retries);
-> +    error_report(" populated after %zu retries", retries);
+> +    ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
+> +    if (ret < 0) {
+> +        error_setg_errno(errp, -ret, "Could not refresh total sector count");
+> +    } else {
+> +        offset = bs->total_sectors * BDRV_SECTOR_SIZE;
+> +    }
+> +    bdrv_dirty_bitmap_truncate(bs, offset);
+> +    bdrv_parent_cb_resize(bs);
+> +    atomic_inc(&bs->write_gen);
+>      return ret;
 >  }
+> 
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index 42a55e4a4b..ee164fb518 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -1,7 +1,7 @@
+>  /*
+>   * Block Dirty Bitmap
+>   *
+> - * Copyright (c) 2016 Red Hat. Inc
+> + * Copyright (c) 2016-2017 Red Hat. Inc
+>   *
+>   * Permission is hereby granted, free of charge, to any person obtaining a copy
+>   * of this software and associated documentation files (the "Software"), to deal
+> @@ -302,10 +302,10 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
+>   * Truncates _all_ bitmaps attached to a BDS.
+>   * Called with BQL taken.
+>   */
+> -void bdrv_dirty_bitmap_truncate(BlockDriverState *bs)
+> +void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes)
+>  {
+>      BdrvDirtyBitmap *bitmap;
+> -    uint64_t size = bdrv_nb_sectors(bs);
+> +    int64_t size = DIV_ROUND_UP(bytes, BDRV_SECTOR_SIZE);
+> 
+>      bdrv_dirty_bitmaps_lock(bs);
+>      QLIST_FOREACH(bitmap, &bs->dirty_bitmaps, list) {
+> -- 
+> 2.13.5
+> 
 
-ditto -- I'd rather keep fprintf(stderr) here, it's less confusing.
-
-Thanks,
-
-		Emilio
+Reviewed-by: Fam Zheng <famz@redhat.com>
