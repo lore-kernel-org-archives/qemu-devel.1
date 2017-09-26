@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dwq2u-00068n-Oi
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 09:37:12 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dwq32-0006EH-B7
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 09:37:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dwq2r-0007lf-Jk
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 09:37:08 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38506
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dwq2r-0007lA-Ch
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 09:37:05 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8QDaX2e121203
-	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 09:37:01 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d7mu9nrtg-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 09:37:00 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 26 Sep 2017 14:36:28 +0100
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 26 Sep 2017 15:36:22 +0200
-Message-Id: <20170926133624.155394-1-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 0/2] ais fixups for 2.11
+	(envelope-from <cohuck@redhat.com>) id 1dwq2z-0007q0-4o
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 09:37:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:26092)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dwq2y-0007pT-UB
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 09:37:13 -0400
+Date: Tue, 26 Sep 2017 15:36:56 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170926153656.4b715383.cohuck@redhat.com>
+In-Reply-To: <20170925112917.21340-6-dgilbert@redhat.com>
+References: <20170925112917.21340-1-dgilbert@redhat.com>
+	<20170925112917.21340-6-dgilbert@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 5/6] migration: Route errors up through
+ vmstate_save
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,25 +28,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, David Hildenbrand <david@redhat.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, famz@redhat.com, peter.maydell@linaro.org, rth@twiddle.net
 
-v1->v2:
-- get rid of fs->ais_supported
-- update copyright
+On Mon, 25 Sep 2017 12:29:16 +0100
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
 
-Christian Borntraeger (2):
-  s390x/ais: enable ais when migration is available
-  s390x/ais: disable ais for compat machines
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Route the errors from vsmtate_save_state back up through
+> vmstate_save and out to the normal device state path.
+> That's the normal error path done.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  migration/savevm.c | 19 ++++++++++++++-----
+>  1 file changed, 14 insertions(+), 5 deletions(-)
 
- hw/intc/s390_flic.c                |  8 ++------
- hw/intc/s390_flic_kvm.c            | 18 +++++++++++++-----
- hw/s390x/css.c                     |  4 ++--
- hw/s390x/s390-virtio-ccw.c         | 20 +++++++++++++++++---
- include/hw/s390x/s390-virtio-ccw.h |  3 +++
- include/hw/s390x/s390_flic.h       |  1 -
- target/s390x/kvm.c                 | 10 ++--------
- 7 files changed, 39 insertions(+), 25 deletions(-)
-
--- 
-2.9.4
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
