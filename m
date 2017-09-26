@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dwqkp-0001qp-Lh
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:37 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dwqks-0001uQ-Dw
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dwqko-0005ec-4e
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:31 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dwqko-0005eW-3M
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:34 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 26 Sep 2017 16:21:32 +0200
-Message-Id: <20170926142133.2498-24-kwolf@redhat.com>
+Date: Tue, 26 Sep 2017 16:21:29 +0200
+Message-Id: <20170926142133.2498-21-kwolf@redhat.com>
 In-Reply-To: <20170926142133.2498-1-kwolf@redhat.com>
 References: <20170926142133.2498-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 23/24] qemu-iotests: add shrinking image test
+Subject: [Qemu-devel] [PULL 20/24] qemu-img: add --shrink flag for resize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,217 +24,160 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: Pavel Butsykin <pbutsykin@virtuozzo.com>
 
+The flag is additional precaution against data loss. Perhaps in the future the
+operation shrink without this flag will be blocked for all formats, but for now
+we need to maintain compatibility with raw.
+
 Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20170918124230.8152-5-pbutsykin@virtuozzo.com
+Message-id: 20170918124230.8152-2-pbutsykin@virtuozzo.com
+[mreitz: Added a missing space to a warning]
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/163     | 170 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/163.out |   5 ++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 176 insertions(+)
- create mode 100644 tests/qemu-iotests/163
- create mode 100644 tests/qemu-iotests/163.out
+ qemu-img.c             | 23 +++++++++++++++++++++++
+ qemu-img-cmds.hx       |  4 ++--
+ qemu-img.texi          |  6 +++++-
+ tests/qemu-iotests/102 |  4 ++--
+ tests/qemu-iotests/106 |  2 +-
+ 5 files changed, 33 insertions(+), 6 deletions(-)
 
-diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
-new file mode 100644
-index 0000000000..403842354e
---- /dev/null
-+++ b/tests/qemu-iotests/163
-@@ -0,0 +1,170 @@
-+#!/usr/bin/env python
-+#
-+# Tests for shrinking images
-+#
-+# Copyright (c) 2016-2017 Parallels International GmbH
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+diff --git a/qemu-img.c b/qemu-img.c
+index df984b11b9..d6007b2a6d 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -64,6 +64,7 @@ enum {
+     OPTION_TARGET_IMAGE_OPTS = 263,
+     OPTION_SIZE = 264,
+     OPTION_PREALLOCATION = 265,
++    OPTION_SHRINK = 266,
+ };
+ 
+ typedef enum OutputFormat {
+@@ -3436,6 +3437,7 @@ static int img_resize(int argc, char **argv)
+         },
+     };
+     bool image_opts = false;
++    bool shrink = false;
+ 
+     /* Remove size from argv manually so that negative numbers are not treated
+      * as options by getopt. */
+@@ -3454,6 +3456,7 @@ static int img_resize(int argc, char **argv)
+             {"object", required_argument, 0, OPTION_OBJECT},
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+             {"preallocation", required_argument, 0, OPTION_PREALLOCATION},
++            {"shrink", no_argument, 0, OPTION_SHRINK},
+             {0, 0, 0, 0}
+         };
+         c = getopt_long(argc, argv, ":f:hq",
+@@ -3496,6 +3499,9 @@ static int img_resize(int argc, char **argv)
+                 return 1;
+             }
+             break;
++        case OPTION_SHRINK:
++            shrink = true;
++            break;
+         }
+     }
+     if (optind != argc - 1) {
+@@ -3569,6 +3575,23 @@ static int img_resize(int argc, char **argv)
+         goto out;
+     }
+ 
++    if (total_size < current_size && !shrink) {
++        warn_report("Shrinking an image will delete all data beyond the "
++                    "shrunken image's end. Before performing such an "
++                    "operation, make sure there is no important data there.");
 +
-+import os, random, iotests, struct, qcow2
-+from iotests import qemu_img, qemu_io, image_size
-+
-+test_img = os.path.join(iotests.test_dir, 'test.img')
-+check_img = os.path.join(iotests.test_dir, 'check.img')
-+
-+def size_to_int(str):
-+    suff = ['B', 'K', 'M', 'G', 'T']
-+    return int(str[:-1]) * 1024**suff.index(str[-1:])
-+
-+class ShrinkBaseClass(iotests.QMPTestCase):
-+    image_len = '128M'
-+    shrink_size = '10M'
-+    chunk_size = '16M'
-+    refcount_bits = '16'
-+
-+    def __qcow2_check(self, filename):
-+        entry_bits = 3
-+        entry_size = 1 << entry_bits
-+        l1_mask = 0x00fffffffffffe00
-+        div_roundup = lambda n, d: (n + d - 1) / d
-+
-+        def split_by_n(data, n):
-+            for x in xrange(0, len(data), n):
-+                yield struct.unpack('>Q', data[x:x + n])[0] & l1_mask
-+
-+        def check_l1_table(h, l1_data):
-+            l1_list = list(split_by_n(l1_data, entry_size))
-+            real_l1_size = div_roundup(h.size,
-+                                       1 << (h.cluster_bits*2 - entry_size))
-+            used, unused = l1_list[:real_l1_size], l1_list[real_l1_size:]
-+
-+            self.assertTrue(len(used) != 0, "Verifying l1 table content")
-+            self.assertFalse(any(unused), "Verifying l1 table content")
-+
-+        def check_reftable(fd, h, reftable):
-+            for offset in split_by_n(reftable, entry_size):
-+                if offset != 0:
-+                    fd.seek(offset)
-+                    cluster = fd.read(1 << h.cluster_bits)
-+                    self.assertTrue(any(cluster), "Verifying reftable content")
-+
-+        with open(filename, "rb") as fd:
-+            h = qcow2.QcowHeader(fd)
-+
-+            fd.seek(h.l1_table_offset)
-+            l1_table = fd.read(h.l1_size << entry_bits)
-+
-+            fd.seek(h.refcount_table_offset)
-+            reftable = fd.read(h.refcount_table_clusters << h.cluster_bits)
-+
-+            check_l1_table(h, l1_table)
-+            check_reftable(fd, h, reftable)
-+
-+    def __raw_check(self, filename):
-+        pass
-+
-+    image_check = {
-+        'qcow2' : __qcow2_check,
-+        'raw' : __raw_check
++        if (g_strcmp0(bdrv_get_format_name(blk_bs(blk)), "raw") != 0) {
++            error_report(
++              "Use the --shrink option to perform a shrink operation.");
++            ret = -1;
++            goto out;
++        } else {
++            warn_report("Using the --shrink option will suppress this message. "
++                        "Note that future versions of qemu-img may refuse to "
++                        "shrink images without this option.");
++        }
 +    }
 +
-+    def setUp(self):
-+        if iotests.imgfmt == 'raw':
-+            qemu_img('create', '-f', iotests.imgfmt, test_img, self.image_len)
-+            qemu_img('create', '-f', iotests.imgfmt, check_img,
-+                     self.shrink_size)
-+        else:
-+            qemu_img('create', '-f', iotests.imgfmt,
-+                     '-o', 'cluster_size=' + self.cluster_size +
-+                     ',refcount_bits=' + self.refcount_bits,
-+                     test_img, self.image_len)
-+            qemu_img('create', '-f', iotests.imgfmt,
-+                     '-o', 'cluster_size=%s'% self.cluster_size,
-+                     check_img, self.shrink_size)
-+        qemu_io('-c', 'write -P 0xff 0 ' + self.shrink_size, check_img)
+     ret = blk_truncate(blk, total_size, prealloc, &err);
+     if (!ret) {
+         qprintf(quiet, "Image resized.\n");
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index b47d409665..2fe31893cf 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -89,9 +89,9 @@ STEXI
+ ETEXI
+ 
+ DEF("resize", img_resize,
+-    "resize [--object objectdef] [--image-opts] [-q] filename [+ | -]size")
++    "resize [--object objectdef] [--image-opts] [-q] [--shrink] filename [+ | -]size")
+ STEXI
+-@item resize [--object @var{objectdef}] [--image-opts] [-q] @var{filename} [+ | -]@var{size}
++@item resize [--object @var{objectdef}] [--image-opts] [-q] [--shrink] @var{filename} [+ | -]@var{size}
+ ETEXI
+ 
+ STEXI
+diff --git a/qemu-img.texi b/qemu-img.texi
+index 90c7eab4a8..ee5c5940d3 100644
+--- a/qemu-img.texi
++++ b/qemu-img.texi
+@@ -545,7 +545,7 @@ qemu-img rebase -b base.img diff.qcow2
+ At this point, @code{modified.img} can be discarded, since
+ @code{base.img + diff.qcow2} contains the same information.
+ 
+-@item resize [--preallocation=@var{prealloc}] @var{filename} [+ | -]@var{size}
++@item resize [--shrink] [--preallocation=@var{prealloc}] @var{filename} [+ | -]@var{size}
+ 
+ Change the disk image as if it had been created with @var{size}.
+ 
+@@ -553,6 +553,10 @@ Before using this command to shrink a disk image, you MUST use file system and
+ partitioning tools inside the VM to reduce allocated file systems and partition
+ sizes accordingly.  Failure to do so will result in data loss!
+ 
++When shrinking images, the @code{--shrink} option must be given. This informs
++qemu-img that the user acknowledges all loss of data beyond the truncated
++image's end.
 +
-+    def tearDown(self):
-+        os.remove(test_img)
-+        os.remove(check_img)
-+
-+    def image_verify(self):
-+        self.assertEqual(image_size(test_img), image_size(check_img),
-+                         "Verifying image size")
-+        self.image_check[iotests.imgfmt](self, test_img)
-+
-+        if iotests.imgfmt == 'raw':
-+            return
-+        self.assertEqual(qemu_img('check', test_img), 0,
-+                         "Verifying image corruption")
-+
-+    def test_empty_image(self):
-+        qemu_img('resize',  '-f', iotests.imgfmt, '--shrink', test_img,
-+                 self.shrink_size)
-+
-+        self.assertEqual(
-+            qemu_io('-c', 'read -P 0x00 %s'%self.shrink_size, test_img),
-+            qemu_io('-c', 'read -P 0x00 %s'%self.shrink_size, check_img),
-+            "Verifying image content")
-+
-+        self.image_verify()
-+
-+    def test_sequential_write(self):
-+        for offs in range(0, size_to_int(self.image_len),
-+                          size_to_int(self.chunk_size)):
-+            qemu_io('-c', 'write -P 0xff %d %s' % (offs, self.chunk_size),
-+                    test_img)
-+
-+        qemu_img('resize',  '-f', iotests.imgfmt, '--shrink', test_img,
-+                 self.shrink_size)
-+
-+        self.assertEqual(qemu_img("compare", test_img, check_img), 0,
-+                         "Verifying image content")
-+
-+        self.image_verify()
-+
-+    def test_random_write(self):
-+        offs_list = range(0, size_to_int(self.image_len),
-+                          size_to_int(self.chunk_size))
-+        random.shuffle(offs_list)
-+        for offs in offs_list:
-+            qemu_io('-c', 'write -P 0xff %d %s' % (offs, self.chunk_size),
-+                    test_img)
-+
-+        qemu_img('resize',  '-f', iotests.imgfmt, '--shrink', test_img,
-+                 self.shrink_size)
-+
-+        self.assertEqual(qemu_img("compare", test_img, check_img), 0,
-+                         "Verifying image content")
-+
-+        self.image_verify()
-+
-+class TestShrink512(ShrinkBaseClass):
-+    image_len = '3M'
-+    shrink_size = '1M'
-+    chunk_size = '256K'
-+    cluster_size = '512'
-+    refcount_bits = '64'
-+
-+class TestShrink64K(ShrinkBaseClass):
-+    cluster_size = '64K'
-+
-+class TestShrink1M(ShrinkBaseClass):
-+    cluster_size = '1M'
-+    refcount_bits = '1'
-+
-+ShrinkBaseClass = None
-+
-+if __name__ == '__main__':
-+    iotests.main(supported_fmts=['raw', 'qcow2'])
-diff --git a/tests/qemu-iotests/163.out b/tests/qemu-iotests/163.out
-new file mode 100644
-index 0000000000..dae404e278
---- /dev/null
-+++ b/tests/qemu-iotests/163.out
-@@ -0,0 +1,5 @@
-+.........
-+----------------------------------------------------------------------
-+Ran 9 tests
-+
-+OK
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 108339cd03..cdccee319e 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -166,6 +166,7 @@
- 159 rw auto quick
- 160 rw auto quick
- 162 auto quick
-+163 rw auto quick
- 165 rw auto quick
- 170 rw auto quick
- 171 rw auto quick
+ After using this command to grow a disk image, you must use file system and
+ partitioning tools inside the VM to actually begin using the new space on the
+ device.
+diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
+index 87db1bb1bf..d7ad8d9840 100755
+--- a/tests/qemu-iotests/102
++++ b/tests/qemu-iotests/102
+@@ -54,7 +54,7 @@ _make_test_img $IMG_SIZE
+ $QEMU_IO -c 'write 0 64k' "$TEST_IMG" | _filter_qemu_io
+ # Remove data cluster from image (first cluster: image header, second: reftable,
+ # third: refblock, fourth: L1 table, fifth: L2 table)
+-$QEMU_IMG resize -f raw "$TEST_IMG" $((5 * 64 * 1024))
++$QEMU_IMG resize -f raw --shrink "$TEST_IMG" $((5 * 64 * 1024))
+ 
+ $QEMU_IO -c map "$TEST_IMG"
+ $QEMU_IMG map "$TEST_IMG"
+@@ -69,7 +69,7 @@ $QEMU_IO -c 'write 0 64k' "$TEST_IMG" | _filter_qemu_io
+ 
+ qemu_comm_method=monitor _launch_qemu -drive if=none,file="$TEST_IMG",id=drv0
+ 
+-$QEMU_IMG resize -f raw "$TEST_IMG" $((5 * 64 * 1024))
++$QEMU_IMG resize -f raw --shrink "$TEST_IMG" $((5 * 64 * 1024))
+ 
+ _send_qemu_cmd $QEMU_HANDLE 'qemu-io drv0 map' 'allocated' \
+     | sed -e 's/^(qemu).*qemu-io drv0 map...$/(qemu) qemu-io drv0 map/'
+diff --git a/tests/qemu-iotests/106 b/tests/qemu-iotests/106
+index 32649578fb..bfe71f4e60 100755
+--- a/tests/qemu-iotests/106
++++ b/tests/qemu-iotests/106
+@@ -83,7 +83,7 @@ echo '=== Testing image shrinking ==='
+ for growth_mode in falloc full off; do
+     echo
+     echo "--- growth_mode=$growth_mode ---"
+-    $QEMU_IMG resize -f "$IMGFMT" --preallocation=$growth_mode "$TEST_IMG" -${GROWTH_SIZE}K
++    $QEMU_IMG resize -f "$IMGFMT" --shrink --preallocation=$growth_mode "$TEST_IMG" -${GROWTH_SIZE}K
+ done
+ 
+ # success, all done
 -- 
 2.13.5
