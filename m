@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dwmhX-0006R2-P6
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:02:55 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dwmiD-0006hG-2V
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:03:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dwmhW-0001xx-R1
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:02:51 -0400
-Date: Tue, 26 Sep 2017 11:02:36 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170926100236.GG16834@stefanha-x1.localdomain>
-References: <20170923111411.18626-1-el13635@mail.ntua.gr>
+	(envelope-from <dgilbert@redhat.com>) id 1dwmi7-0002CK-14
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:03:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37492)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dwmi6-0002Ba-PE
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:03:26 -0400
+Date: Tue, 26 Sep 2017 11:03:16 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170926100315.GC2689@work-vm>
+References: <20170925112917.21340-1-dgilbert@redhat.com>
+	<20170925112917.21340-7-dgilbert@redhat.com>
+	<20170926030647.GK19505@pxdev.xzpeter.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170923111411.18626-1-el13635@mail.ntua.gr>
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] add bdrv_co_drain_begin/end
- BlockDriver callbacks
+In-Reply-To: <20170926030647.GK19505@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] migration: Route more error paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +28,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, famz@redhat.com, peter.maydell@linaro.org, cohuck@redhat.com, rth@twiddle.net
 
-On Sat, Sep 23, 2017 at 02:14:08PM +0300, Manos Pitsidianakis wrote:
-> This patch series renames bdrv_co_drain to bdrv_co_drain_begin and adds a new 
-> bdrv_co_drain_end callback to match bdrv_drained_begin/end and 
-> drained_begin/end of BdrvChild. This is needed because the throttle driver 
-> (block/throttle.c) needs a way to mark the end of the drain in order to toggle 
-> io_limits_disabled correctly.
+* Peter Xu (peterx@redhat.com) wrote:
+> On Mon, Sep 25, 2017 at 12:29:17PM +0100, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > vmstate_save is called in a few places, and vmstate_save_state is
+> > called in lots of places.
 > 
-> Based-on: <20170918202529.28379-1-el13635@mail.ntua.gr>
->     "block/throttle-groups.c: allocate RestartData on the heap"
->     Which fixes a coroutine crash in block/throttle-groups.c
+> vmstate_save() should have been processed with previous patch?
+
+Ah yes, it was just vmstate_save_state in the end fixed in this one.
+
+> > 
+> > Route error returns from the easier cases back up;  there are lots
+> > of more complex cases where their own error paths need fixing.
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > 
-> v3:
->   fixed commit message typo in first patch [Fam]
->   rephrased doc comment based on mailing discussion
-> v2: 
->   add doc for callbacks and change order of request polling for completion 
->   [Stefan]
+> The patch content wires quite a few vmstate_save_state() callers, so
+> the patch itself makes sense to me.
 > 
-> Manos Pitsidianakis (3):
->   block: add bdrv_co_drain_end callback
->   block: rename bdrv_co_drain to bdrv_co_drain_begin
->   block/throttle.c: add bdrv_co_drain_begin/end callbacks
-> 
->  include/block/block_int.h | 13 ++++++++++---
->  block/io.c                | 48 +++++++++++++++++++++++++++++++++--------------
->  block/qed.c               |  6 +++---
->  block/throttle.c          | 18 ++++++++++++++++++
->  4 files changed, 65 insertions(+), 20 deletions(-)
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+
+Thanks!
+
+Dave
+
+> > ---
+> >  hw/display/virtio-gpu.c    |  4 +---
+> >  hw/virtio/virtio.c         | 13 +++++++------
+> >  include/hw/virtio/virtio.h |  2 +-
+> >  migration/vmstate-types.c  | 11 ++++++++---
+> >  tests/test-vmstate.c       |  9 ++++++---
+> >  5 files changed, 23 insertions(+), 16 deletions(-)
+> > 
+> > diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+> > index 3a8f1e1a2d..2becbfda59 100644
+> > --- a/hw/display/virtio-gpu.c
+> > +++ b/hw/display/virtio-gpu.c
+> > @@ -1050,9 +1050,7 @@ static int virtio_gpu_save(QEMUFile *f, void *opaque, size_t size,
+> >      }
+> >      qemu_put_be32(f, 0); /* end of list */
+> >  
+> > -    vmstate_save_state(f, &vmstate_virtio_gpu_scanouts, g, NULL);
+> > -
+> > -    return 0;
+> > +    return vmstate_save_state(f, &vmstate_virtio_gpu_scanouts, g, NULL);
+> >  }
+> >  
+> >  static int virtio_gpu_load(QEMUFile *f, void *opaque, size_t size,
+> > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> > index 3129d25c00..311929e9df 100644
+> > --- a/hw/virtio/virtio.c
+> > +++ b/hw/virtio/virtio.c
+> > @@ -1897,7 +1897,7 @@ static const VMStateDescription vmstate_virtio = {
+> >      }
+> >  };
+> >  
+> > -void virtio_save(VirtIODevice *vdev, QEMUFile *f)
+> > +int virtio_save(VirtIODevice *vdev, QEMUFile *f)
+> >  {
+> >      BusState *qbus = qdev_get_parent_bus(DEVICE(vdev));
+> >      VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
+> > @@ -1947,20 +1947,21 @@ void virtio_save(VirtIODevice *vdev, QEMUFile *f)
+> >      }
+> >  
+> >      if (vdc->vmsd) {
+> > -        vmstate_save_state(f, vdc->vmsd, vdev, NULL);
+> > +        int ret = vmstate_save_state(f, vdc->vmsd, vdev, NULL);
+> > +        if (ret) {
+> > +            return ret;
+> > +        }
+> >      }
+> >  
+> >      /* Subsections */
+> > -    vmstate_save_state(f, &vmstate_virtio, vdev, NULL);
+> > +    return vmstate_save_state(f, &vmstate_virtio, vdev, NULL);
+> >  }
+> >  
+> >  /* A wrapper for use as a VMState .put function */
+> >  static int virtio_device_put(QEMUFile *f, void *opaque, size_t size,
+> >                                VMStateField *field, QJSON *vmdesc)
+> >  {
+> > -    virtio_save(VIRTIO_DEVICE(opaque), f);
+> > -
+> > -    return 0;
+> > +    return virtio_save(VIRTIO_DEVICE(opaque), f);
+> >  }
+> >  
+> >  /* A wrapper for use as a VMState .get function */
+> > diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> > index 80c45c321e..5abada6966 100644
+> > --- a/include/hw/virtio/virtio.h
+> > +++ b/include/hw/virtio/virtio.h
+> > @@ -188,7 +188,7 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
+> >  void virtio_notify_irqfd(VirtIODevice *vdev, VirtQueue *vq);
+> >  void virtio_notify(VirtIODevice *vdev, VirtQueue *vq);
+> >  
+> > -void virtio_save(VirtIODevice *vdev, QEMUFile *f);
+> > +int virtio_save(VirtIODevice *vdev, QEMUFile *f);
+> >  
+> >  extern const VMStateInfo virtio_vmstate_info;
+> >  
+> > diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
+> > index c056c98bdb..48184c380d 100644
+> > --- a/migration/vmstate-types.c
+> > +++ b/migration/vmstate-types.c
+> > @@ -550,13 +550,14 @@ static int put_tmp(QEMUFile *f, void *pv, size_t size, VMStateField *field,
+> >  {
+> >      const VMStateDescription *vmsd = field->vmsd;
+> >      void *tmp = g_malloc(size);
+> > +    int ret;
+> >  
+> >      /* Writes the parent field which is at the start of the tmp */
+> >      *(void **)tmp = pv;
+> > -    vmstate_save_state(f, vmsd, tmp, vmdesc);
+> > +    ret = vmstate_save_state(f, vmsd, tmp, vmdesc);
+> >      g_free(tmp);
+> >  
+> > -    return 0;
+> > +    return ret;
+> >  }
+> >  
+> >  const VMStateInfo vmstate_info_tmp = {
+> > @@ -657,12 +658,16 @@ static int put_qtailq(QEMUFile *f, void *pv, size_t unused_size,
+> >      /* offset of the QTAILQ entry in a QTAILQ element*/
+> >      size_t entry_offset = field->start;
+> >      void *elm;
+> > +    int ret;
+> >  
+> >      trace_put_qtailq(vmsd->name, vmsd->version_id);
+> >  
+> >      QTAILQ_RAW_FOREACH(elm, pv, entry_offset) {
+> >          qemu_put_byte(f, true);
+> > -        vmstate_save_state(f, vmsd, elm, vmdesc);
+> > +        ret = vmstate_save_state(f, vmsd, elm, vmdesc);
+> > +        if (ret) {
+> > +            return ret;
+> > +        }
+> >      }
+> >      qemu_put_byte(f, false);
+> >  
+> > diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+> > index e643ac662b..087844b6c8 100644
+> > --- a/tests/test-vmstate.c
+> > +++ b/tests/test-vmstate.c
+> > @@ -70,7 +70,8 @@ static void save_vmstate(const VMStateDescription *desc, void *obj)
+> >      QEMUFile *f = open_test_file(true);
+> >  
+> >      /* Save file with vmstate */
+> > -    vmstate_save_state(f, desc, obj, NULL);
+> > +    int ret = vmstate_save_state(f, desc, obj, NULL);
+> > +    g_assert(!ret);
+> >      qemu_put_byte(f, QEMU_VM_EOF);
+> >      g_assert(!qemu_file_get_error(f));
+> >      qemu_fclose(f);
+> > @@ -381,7 +382,8 @@ static void test_save_noskip(void)
+> >      QEMUFile *fsave = open_test_file(true);
+> >      TestStruct obj = { .a = 1, .b = 2, .c = 3, .d = 4, .e = 5, .f = 6,
+> >                         .skip_c_e = false };
+> > -    vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL);
+> > +    int ret = vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL);
+> > +    g_assert(!ret);
+> >      g_assert(!qemu_file_get_error(fsave));
+> >  
+> >      uint8_t expected[] = {
+> > @@ -402,7 +404,8 @@ static void test_save_skip(void)
+> >      QEMUFile *fsave = open_test_file(true);
+> >      TestStruct obj = { .a = 1, .b = 2, .c = 3, .d = 4, .e = 5, .f = 6,
+> >                         .skip_c_e = true };
+> > -    vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL);
+> > +    int ret = vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL);
+> > +    g_assert(!ret);
+> >      g_assert(!qemu_file_get_error(fsave));
+> >  
+> >      uint8_t expected[] = {
+> > -- 
+> > 2.13.5
+> > 
 > 
 > -- 
-> 2.11.0
-> 
-
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
-
-Stefan
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
