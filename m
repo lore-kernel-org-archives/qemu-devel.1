@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dwnhI-00054e-CM
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 07:06:45 -0400
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1dwnhQ-0005AS-4U
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 07:06:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dwnhC-0001Hj-DD
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 07:06:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35146)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dwnhC-0001HJ-6Y
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 07:06:34 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 24B3E81DE5
-	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 11:06:33 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 26 Sep 2017 13:06:27 +0200
-Message-Id: <20170926110628.2705-2-kraxel@redhat.com>
-In-Reply-To: <20170926110628.2705-1-kraxel@redhat.com>
-References: <20170926110628.2705-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 1/2] add qemu_add_data_dir()
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1dwnhN-0001LY-TI
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 07:06:48 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:52194)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1dwnhN-0001LJ-Mh
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 07:06:45 -0400
+From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+Date: Tue, 26 Sep 2017 14:06:43 +0300
+Message-ID: <150642400352.3900.13935192906711901682.stgit@Misha-PC.lan02.inno>
+In-Reply-To: <150642384156.3900.3326424823772221077.stgit@Misha-PC.lan02.inno>
+References: <150642384156.3900.3326424823772221077.stgit@Misha-PC.lan02.inno>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH 28/43] windbg: implemented windbg_read_ks_regs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +27,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
-Add helper function to add a directory to the qemu search path, so we
-don't duplicate the checks.  Add a check for duplicate entries, so we
-stop trying to open files twice.
-
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20170914114236.25343-2-kraxel@redhat.com
+Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
 ---
- vl.c | 34 +++++++++++++++++++++++-----------
- 1 file changed, 23 insertions(+), 11 deletions(-)
+ windbgstub-utils.c |   38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/vl.c b/vl.c
-index 4fd01fda91..19633423aa 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2348,6 +2348,24 @@ char *qemu_find_file(int type, const char *name)
-     return NULL;
+diff --git a/windbgstub-utils.c b/windbgstub-utils.c
+index 73ff98dfbc..537ba9e2aa 100755
+--- a/windbgstub-utils.c
++++ b/windbgstub-utils.c
+@@ -587,6 +587,44 @@ static int windbg_write_context(CPUState *cpu, uint8_t *buf, int len,
+ static int windbg_read_ks_regs(CPUState *cpu, uint8_t *buf, int len,
+                                int offset)
+ {
++    CPUArchState *env = cpu->env_ptr;
++    const bool new_mem = (len != sizeof(CPU_KSPECIAL_REGISTERS)
++                       || offset != 0);
++    CPU_KSPECIAL_REGISTERS *ckr;
++    if (new_mem) {
++        ckr = g_new(CPU_KSPECIAL_REGISTERS, 1);
++    } else {
++        ckr = (CPU_KSPECIAL_REGISTERS *) buf;
++    }
++
++    memset(ckr, 0, len);
++
++    ckr->Cr0 = ldl_p(&env->cr[0]);
++    ckr->Cr2 = ldl_p(&env->cr[2]);
++    ckr->Cr3 = ldl_p(&env->cr[3]);
++    ckr->Cr4 = ldl_p(&env->cr[4]);
++
++    ckr->KernelDr0 = ldtul_p(&env->dr[0]);
++    ckr->KernelDr1 = ldtul_p(&env->dr[1]);
++    ckr->KernelDr2 = ldtul_p(&env->dr[2]);
++    ckr->KernelDr3 = ldtul_p(&env->dr[3]);
++    ckr->KernelDr6 = ldtul_p(&env->dr[6]);
++    ckr->KernelDr7 = ldtul_p(&env->dr[7]);
++
++    ckr->Gdtr.Pad = lduw_p(&env->gdt.selector);
++    ckr->Idtr.Pad = lduw_p(&env->idt.selector);
++
++    ckr->Gdtr.Limit = lduw_p(&env->gdt.limit);
++    ckr->Gdtr.Base  = ldtul_p(&env->gdt.base);
++    ckr->Idtr.Limit = lduw_p(&env->idt.limit);
++    ckr->Idtr.Base  = ldtul_p(&env->idt.base);
++    ckr->Tr         = lduw_p(&env->tr.selector);
++    ckr->Ldtr       = lduw_p(&env->ldt.selector);
++
++    if (new_mem) {
++        memcpy(buf, (uint8_t *) ckr + offset, len);
++        g_free(ckr);
++    }
+     return 0;
  }
  
-+static void qemu_add_data_dir(const char *path)
-+{
-+    int i;
-+
-+    if (path == NULL) {
-+        return;
-+    }
-+    if (data_dir_idx == ARRAY_SIZE(data_dir)) {
-+        return;
-+    }
-+    for (i = 0; i < data_dir_idx; i++) {
-+        if (strcmp(data_dir[i], path) == 0) {
-+            return; /* duplicate */
-+        }
-+    }
-+    data_dir[data_dir_idx++] = path;
-+}
-+
- static inline bool nonempty_str(const char *str)
- {
-     return str && *str;
-@@ -3527,8 +3545,8 @@ int main(int argc, char **argv, char **envp)
-             case QEMU_OPTION_L:
-                 if (is_help_option(optarg)) {
-                     list_data_dirs = true;
--                } else if (data_dir_idx < ARRAY_SIZE(data_dir)) {
--                    data_dir[data_dir_idx++] = optarg;
-+                } else {
-+                    qemu_add_data_dir(optarg);
-                 }
-                 break;
-             case QEMU_OPTION_bios:
-@@ -4293,16 +4311,10 @@ int main(int argc, char **argv, char **envp)
- 
-     /* If no data_dir is specified then try to find it relative to the
-        executable path.  */
--    if (data_dir_idx < ARRAY_SIZE(data_dir)) {
--        data_dir[data_dir_idx] = os_find_datadir();
--        if (data_dir[data_dir_idx] != NULL) {
--            data_dir_idx++;
--        }
--    }
-+    qemu_add_data_dir(os_find_datadir());
-+
-     /* If all else fails use the install path specified when building. */
--    if (data_dir_idx < ARRAY_SIZE(data_dir)) {
--        data_dir[data_dir_idx++] = CONFIG_QEMU_DATADIR;
--    }
-+    qemu_add_data_dir(CONFIG_QEMU_DATADIR);
- 
-     /* -L help lists the data directories and exits. */
-     if (list_data_dirs) {
--- 
-2.9.3
