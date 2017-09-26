@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dwrgE-00074c-Lq
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 11:21:51 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dwrjo-00083i-FV
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 11:25:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dwrgD-0000FB-Kj
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 11:21:50 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <cover.1506384414.git.alistair.francis@xilinx.com>
-	<5ad72536402da2879d49b58753cc709a8ff22de9.1506384415.git.alistair.francis@xilinx.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <d591fe76-6305-e082-3dc3-b53178c0ee5d@twiddle.net>
-Date: Tue, 26 Sep 2017 08:21:24 -0700
+	(envelope-from <kwolf@redhat.com>) id 1dwrjk-0001Wn-HD
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 11:25:32 -0400
+Date: Tue, 26 Sep 2017 17:25:14 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170926152514.GB14717@localhost.localdomain>
+References: <20170926142133.2498-1-kwolf@redhat.com>
+	<20170926142133.2498-9-kwolf@redhat.com>
+	<88194ed0-b5ea-2eef-8294-6557739ae605@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5ad72536402da2879d49b58753cc709a8ff22de9.1506384415.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 8/8] target: Replace fprintf(stderr,
- "*\n" with error_report()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="UugvWAfsgieZRqgk"
+Content-Disposition: inline
+In-Reply-To: <88194ed0-b5ea-2eef-8294-6557739ae605@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 08/24] iotests: Print full path of bad
+ output if mismatch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,85 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
-Cc: alistair23@gmail.com, armbru@redhat.com, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Michael Walle <michael@walle.cc>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
-
-On 09/25/2017 05:09 PM, Alistair Francis wrote:
-> diff --git a/target/cris/translate.c b/target/cris/translate.c
-> index 38a999e6f1..8847005984 100644
-> --- a/target/cris/translate.c
-> +++ b/target/cris/translate.c
-> @@ -138,7 +138,7 @@ typedef struct DisasContext {
->  
->  static void gen_BUG(DisasContext *dc, const char *file, int line)
->  {
-> -    fprintf(stderr, "BUG: pc=%x %s %d\n", dc->pc, file, line);
-> +    error_report("BUG: pc=%x %s %d", dc->pc, file, line);
->      if (qemu_log_separate()) {
->          qemu_log("BUG: pc=%x %s %d\n", dc->pc, file, line);
->      }
-
-Eh, no, this should simply use qemu_log.
-
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index 606b605ba0..a3da22580e 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -3943,8 +3943,8 @@ static inline void gen_op_mfspr(DisasContext *ctx)
->               * allowing userland application to read the PVR
->               */
->              if (sprn != SPR_PVR) {
-> -                fprintf(stderr, "Trying to read privileged spr %d (0x%03x) at "
-> -                        TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
-> +                error_report("Trying to read privileged spr %d (0x%03x) at "
-> +                        TARGET_FMT_lx "", sprn, sprn, ctx->nip - 4);
->                  if (qemu_log_separate()) {
->                      qemu_log("Trying to read privileged spr %d (0x%03x) at "
->                               TARGET_FMT_lx "\n", sprn, sprn, ctx->nip - 4);
-
-Likewise.  And all the others.
-Perhaps we should kill qemu_log_separate as a bad idea?
-
-> diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-> index 10191073b2..9f95410e53 100644
-> --- a/target/sh4/translate.c
-> +++ b/target/sh4/translate.c
-> @@ -438,7 +438,7 @@ static void _decode_opc(DisasContext * ctx)
->  	}
->  
->  #if 0
-> -    fprintf(stderr, "Translating opcode 0x%04x\n", ctx->opcode);
-> +    error_report("Translating opcode 0x%04x", ctx->opcode);
->  #endif
-
-qemu_log.
-
->  
->      switch (ctx->opcode) {
-> @@ -1799,7 +1799,7 @@ static void _decode_opc(DisasContext * ctx)
->          break;
->      }
->  #if 0
-> -    fprintf(stderr, "unknown instruction 0x%04x at pc 0x%08x\n",
-> +    error_report("unknown instruction 0x%04x at pc 0x%08x",
->  	    ctx->opcode, ctx->pc);
->      fflush(stderr);
->  #endif
-
-qemu_log_mask(LOG_UNIMP, ...)
-
-> @@ -1940,7 +1940,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
->          disas_uc32_insn(env, dc);
->  
->          if (num_temps) {
-> -            fprintf(stderr, "Internal resource leak before %08x\n", dc->pc);
-> +            error_report("Internal resource leak before %08x", dc->pc);
->              num_temps = 0;
->          }
->  
-> 
-
-qemu_log.
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-block@nongnu.org, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 
-r~
+--UugvWAfsgieZRqgk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Am 26.09.2017 um 16:56 hat Eric Blake geschrieben:
+> On 09/26/2017 09:21 AM, Kevin Wolf wrote:
+> > From: Fam Zheng <famz@redhat.com>
+> >=20
+> > So it is easier to copy paste the path.
+> >=20
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >  tests/qemu-iotests/check | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+> > index d504b6e455..4583a0c269 100755
+> > --- a/tests/qemu-iotests/check
+> > +++ b/tests/qemu-iotests/check
+> > @@ -353,7 +353,7 @@ do
+> >                  else
+> >                      echo " - output mismatch (see $seq.out.bad)"
+> >                      mv $tmp.out $seq.out.bad
+> > -                    $diff -w "$reference" $seq.out.bad
+> > +                    $diff -w "$reference" $(realpath $seq.out.bad)
+>=20
+> This missed my review comments about being unsafe if $PWD contains spaces:
+> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04241.html
+
+Sorry for missing this. Please send a follow-up patch to fix it.
+
+Kevin
+
+--UugvWAfsgieZRqgk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJZynFaAAoJEH8JsnLIjy/WsPoP/0cWG9vRn/E0wtmN2CKz/EKk
+0gRgyqvTyyosrEaZ9Zj5+6MsV2XpZsveG+yuRtoZMi3uLLXPzr5kAGph13zk8u2T
+SYVwWXdj3jtHB72zPnSXg+v6yWWL7OyzEBOoObz6IY9wiE5NEUODiofxhvcpLQzz
+4jLKi3Nlh8dPpLgNt3reAxnZCWL7uRVn+hmrvOZ3hYJeOzjlc+gjT8aDSh+7wsji
+oViKGO03lztt3zpTjLHSXIqUjr+HuqmWhIGcMEkSH6yTkPvx1A+XbeE7Rv49wDJ9
+YUbe6MJ/uFy6PyrhJv9UUI0Vj3uCLpWWavGd5bVzD7eLPZyHVYneKgxguK8FXn7o
+KLQ64CHG0HaMFe/iX2ak3dMDZgLbfXvrg3uWXfCj751cMz8KrWko6bkV4ZeHOq+G
+VkSGnnq1ubgPZ5pkmToLI0liJ+EXyohg4iAA+7Nlu+iZChobxWBQ2YzZ2rBRO2VK
+XAiAXpDkP6+KP4iHCH/n11syGyDzXxlW+sE+9B5OcwLEee+xPrgMAKjyyTIvoEjm
+VvD6EM6UbcwHqmLTqXjdmwgdSGGN3NmlwopZsRde/gZPvFasOK3EDqcXZp29q/7n
+o5/B+RQd4+yhq+NK92es+0KHZDrd0SrC370O6hhucbv9kHm4qikQn84l77Jc1j7q
+ubMBt6Ciht9XAdLRKmd7
+=NlpH
+-----END PGP SIGNATURE-----
+
+--UugvWAfsgieZRqgk--
