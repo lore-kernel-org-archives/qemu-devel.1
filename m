@@ -1,47 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dwiOo-0004lU-QH
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 01:27:15 -0400
+	(envelope-from <peterx@redhat.com>) id 1dwift-0007BM-GY
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 01:44:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dwiOj-0007Kk-Sc
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 01:27:14 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36922)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1dwiOj-0007KO-Er
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 01:27:09 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8Q5P86o062294
-	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 01:27:04 -0400
-Received: from e23smtp03.au.ibm.com (e23smtp03.au.ibm.com [202.81.31.145])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d7btk8r45-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 01:27:04 -0400
-Received: from localhost
-	by e23smtp03.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Tue, 26 Sep 2017 15:27:02 +1000
-Received: from d23av04.au.ibm.com (d23av04.au.ibm.com [9.190.235.139])
-	by d23relay08.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v8Q5QxZH40370194
-	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 15:26:59 +1000
-Received: from d23av04.au.ibm.com (localhost [127.0.0.1])
-	by d23av04.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v8Q5R1KN029659
-	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 15:27:02 +1000
-Date: Tue, 26 Sep 2017 10:56:50 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reply-To: bharata@linux.vnet.ibm.com
-References: <1506071794-4373-1-git-send-email-thuth@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1dwifq-0005GD-D0
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 01:44:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46892)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dwifq-0005Fw-3u
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 01:44:50 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E54264A703
+	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 05:44:48 +0000 (UTC)
+Date: Tue, 26 Sep 2017 13:44:39 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170926054439.GB25267@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1506071794-4373-1-git-send-email-thuth@redhat.com>
-Message-Id: <20170926052650.GA10768@in.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2] qdev: Mark devices as non-hotpluggable
- by default
+Subject: [Qemu-devel] A glib warning encountered with internal iothread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -50,32 +30,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Amit Shah <amit@kernel.org>
+To: QEMU Devel Mailing List <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
 
-On Fri, Sep 22, 2017 at 11:16:34AM +0200, Thomas Huth wrote:
-> Historically we've marked all devices as hotpluggable by default. However,
-> most devices are not hotpluggable, and you also need a HotplugHandler to
-> support these devices. So if the user tries to "device_add" or "device_del"
-> such a non-hotpluggable device during runtime, either nothing really usable
-> happens, or QEMU even crashes/aborts unexpectedly (see for example commit
-> 84ebd3e8c7d4fe955b - "Mark diag288 watchdog as non-hotpluggable").
-> So let's change this dangerous default behaviour and mark the devices as
-> non-hotpluggable by default. Certain parent devices classes which are known
-> as hotpluggable (e.g. PCI, USB, etc.) are marked with "hotpluggable = true",
-> so that devices that are derived from these classes continue to work as
-> expected.
+Hi,
 
-I see that the discussion has moved on, but want to note here that
-CPU hotplug on pseries breaks with this patch.
+Generally speaking this is a question about glib, but I would like to
+see how the list sees this before throwing this question to glib
+community in case I made severe mistake.
 
-(qemu) device_add host-spapr-cpu-core,core-id=8,id=core8
-Device 'host-powerpc64-cpu' does not support hotplugging
+I encountered one glib warning when start to use internal iothread:
 
-(qemu) device_add POWER8E_v2.1-spapr-cpu-core,id=core8,core-id=8
-Device 'POWER8E_v2.1-powerpc64-cpu' does not support hotplugging
+(qemu-system-x86_64:19925): GLib-CRITICAL **: g_source_remove_poll: assertion '!SOURCE_DESTROYED (source)' failed
 
-Hope I am not missing anything.
+This will be triggered as long as we create one private iothread and
+enables gcontext of it (by calling iothread_get_g_main_context() at
+least once on the private iothread).
 
-Regards,
-Bharata.
+The warning is generated when quitting QEMU in following path (please
+ignore unknown function names, they only appear in a private tree, but
+the logic is the same):
+
+#0  0x00007ff0c2bb4180 in g_source_remove_poll () at /lib64/libglib-2.0.so.0
+#1  0x00005634b0fe8bc9 in aio_set_fd_handler (ctx=0x5634b365ca90, fd=22, is_external=false, io_read=0x0, io_write=0x0, io_poll=0x0, opaque=0x5634b365cb3c) at /root/git/qemu/util/aio-posix.c:226
+#2  0x00005634b0fe8ebc in aio_set_event_notifier (ctx=0x5634b365ca90, notifier=0x5634b365cb3c, is_external=false, io_read=0x0, io_poll=0x0) at /root/git/qemu/util/aio-posix.c:299
+#3  0x00005634b0fe5174 in aio_ctx_finalize (source=0x5634b365ca90) at /root/git/qemu/util/async.c:296
+#4  0x00007ff0c2bb39a6 in g_source_unref_internal () at /lib64/libglib-2.0.so.0
+#5  0x00005634b0fe5757 in aio_context_unref (ctx=0x5634b365ca90) at /root/git/qemu/util/async.c:484
+#6  0x00005634b0c39642 in iothread_instance_finalize (obj=0x5634b36cfa40) at /root/git/qemu/iothread.c:127
+#7  0x00005634b0ede36e in object_deinit (obj=0x5634b36cfa40, type=0x5634b3543c60) at /root/git/qemu/qom/object.c:453
+#8  0x00005634b0ede3e0 in object_finalize (data=0x5634b36cfa40) at /root/git/qemu/qom/object.c:467
+#9  0x00005634b0edf361 in object_unref (obj=0x5634b36cfa40) at /root/git/qemu/qom/object.c:902
+#10 0x00005634b0ee0607 in object_finalize_child_property (obj=0x5634b369d3b0, name=0x5634b36eb900 "monitor_io_thr", opaque=0x5634b36cfa40) at /root/git/qemu/qom/object.c:1407
+#11 0x00005634b0ede25d in object_property_del_child (obj=0x5634b369d3b0, child=0x5634b36cfa40, errp=0x0) at /root/git/qemu/qom/object.c:427
+#12 0x00005634b0ede33d in object_unparent (obj=0x5634b36cfa40) at /root/git/qemu/qom/object.c:446
+#13 0x00005634b0c39f44 in iothread_destroy (iothread=0x5634b36cfa40) at /root/git/qemu/iothread.c:383
+#14 0x00005634b0ae920f in monitor_io_thread_destroy () at /root/git/qemu/monitor.c:4416
+#15 0x00005634b0ae9302 in monitor_cleanup () at /root/git/qemu/monitor.c:4439
+#16 0x00005634b0c496cb in main (argc=17, argv=0x7ffcc5b88918, envp=0x7ffcc5b889a8) at /root/git/qemu/vl.c:4889
+
+It's on the path during destruction of AioContext, where we called
+g_source_remove_poll() in the destructor.  When reach here, AioContext
+has been detached from the gcontext already, so the assertion is
+triggered.
+
+I'll copy some code for easier reference from glib:
+
+void
+g_source_remove_poll (GSource *source,
+		      GPollFD *fd)
+{
+  GMainContext *context;
+  
+  g_return_if_fail (source != NULL);
+  g_return_if_fail (fd != NULL);
+  g_return_if_fail (!SOURCE_DESTROYED (source)); <---- this assertion fails
+  
+  context = source->context;
+
+  if (context)
+    LOCK_CONTEXT (context);
+  
+  source->poll_fds = g_slist_remove (source->poll_fds, fd);
+
+  if (context)
+    {
+      if (!SOURCE_BLOCKED (source))
+	g_main_context_remove_poll_unlocked (context, fd);
+      UNLOCK_CONTEXT (context);
+    }
+}
+
+I'm translating this assertion failure into: "when removing one
+GSource from the polled GSource array, the GSource should still be
+attached to its GMainContext".  But does this really matter?  Why
+can't we remove one GSource from the poll array even if the source is
+detached already?  After all if we see following code in
+g_source_remove_poll() we have already taken special care when
+source->context == NULL happens.
+
+Any thoughts?  TIA.
+
+-- 
+Peter Xu
