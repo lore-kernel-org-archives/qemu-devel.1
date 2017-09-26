@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dwuSv-0007XY-8p
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 14:20:18 -0400
+	(envelope-from <david@redhat.com>) id 1dwuZ5-0000oT-4L
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 14:26:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dwuSs-0007cK-0b
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 14:20:17 -0400
-Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:56487)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dwuSr-0007Zn-FB
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 14:20:13 -0400
-Received: by mail-pf0-x233.google.com with SMTP id g65so5923858pfe.13
-	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 11:20:11 -0700 (PDT)
-Received: from bigtime.twiddle.net ([70.35.39.2])
-	by smtp.gmail.com with ESMTPSA id
-	q67sm18901327pfg.160.2017.09.26.11.20.08 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 26 Sep 2017 11:20:09 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-References: <20170919150313.10833-1-richard.henderson@linaro.org>
-	<20170919150313.10833-5-richard.henderson@linaro.org>
-Message-ID: <a615f520-a3e1-83eb-da65-a03b0d118903@linaro.org>
-Date: Tue, 26 Sep 2017 11:20:07 -0700
+	(envelope-from <david@redhat.com>) id 1dwuZ1-0000si-Tz
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 14:26:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44674)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dwuZ1-0000sa-O7
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 14:26:35 -0400
+References: <20170926180522.68482-1-borntraeger@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <67c13b99-2d44-666b-9328-05917d0fc0dc@redhat.com>
+Date: Tue, 26 Sep 2017 20:26:31 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170919150313.10833-5-richard.henderson@linaro.org>
+In-Reply-To: <20170926180522.68482-1-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/8] disas: Support the Capstone
- disassembler library
+Subject: Re: [Qemu-devel] [PATCH] s390x/cpumodel: remove ais from z14
+ default model-> also for 2.10.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,25 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 09/19/2017 08:03 AM, Richard Henderson wrote:
-> +    while (1) {
-> +        /* We want to read memory for one insn, but generically we do not
-> +           know how much memory that is.  We have a small buffer which is
-> +           known to be sufficient for all supported targets.  Try to not
-> +           read beyond the page, Just In Case.  For even more simplicity,
-> +           ignore the actual target page size and use a 1k boundary.  If
-> +           that turns out to be insufficient, we'll come back around the
-> +           loop and read more.  */
-> +        uint64_t epc = QEMU_ALIGN_UP(pc + csize, 1024);
-> +        size_t tsize = MIN(sizeof(cap_buf) - csize, epc - pc);
-...
-> +        assert(tsize != 0);
+On 26.09.2017 20:05, Christian Borntraeger wrote:
+> We disabled ais for 2.10 lets also remove it from the z14 default model.
+> 
+> Fixes: 3f2d07b3b01e  s390x/ais: for 2.10 stable: disable ais facility
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  target/s390x/gen-features.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+> index c8dc104..68e6c31 100644
+> --- a/target/s390x/gen-features.c
+> +++ b/target/s390x/gen-features.c
+> @@ -527,7 +527,6 @@ static uint16_t default_GEN13_GA1[] = {
+>  #define default_GEN13_GA2 EmptyFeat
+>  
+>  static uint16_t default_GEN14_GA1[] = {
+> -    S390_FEAT_ADAPTER_INT_SUPPRESSION,
+>      S390_FEAT_INSTRUCTION_EXEC_PROT,
+>      S390_FEAT_GUARDED_STORAGE,
+>      S390_FEAT_VECTOR_PACKED_DECIMAL,
+> 
 
-By inspection, epc must be computed from pc + csize + 1.
-If csize = 0 and pc % 1024 == 0, epc == pc and tsize == 0,
-which will assert.
+Yes, this has to go into stable, otherwise the migration safe stable
+model would be changed.
 
+Apart from that, this looks just fine.
 
-r~
+-- 
+
+Thanks,
+
+David
