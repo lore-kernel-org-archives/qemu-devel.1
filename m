@@ -1,40 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dwpbE-0005lC-VW
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 09:08:36 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dwpu3-0001GR-N3
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 09:28:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dwpb9-0000V6-1z
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 09:08:32 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51674
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dwpb8-0000Uz-SL
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 09:08:26 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8QD8ENP116463
-	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 09:08:22 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d7mfkcyrf-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 09:08:21 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 26 Sep 2017 14:08:08 +0100
-References: <20170926122427.GC4115@localhost.localdomain>
-	<20170926130028.12471-1-ehabkost@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 26 Sep 2017 15:08:03 +0200
+	(envelope-from <cohuck@redhat.com>) id 1dwptz-0001Te-NN
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 09:27:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41502)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dwptz-0001SF-EZ
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 09:27:55 -0400
+Date: Tue, 26 Sep 2017 15:27:46 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170926152746.1bd31900.cohuck@redhat.com>
+In-Reply-To: <20170925112917.21340-2-dgilbert@redhat.com>
+References: <20170925112917.21340-1-dgilbert@redhat.com>
+	<20170925112917.21340-2-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170926130028.12471-1-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <62e340df-f56f-3f9c-de5c-9d5bf4df2da8@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] iothread: Make iothread_stop() idempotent
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] migration: pre_save return int
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,47 +27,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, famz@redhat.com, peter.maydell@linaro.org, rth@twiddle.net
 
+On Mon, 25 Sep 2017 12:29:12 +0100
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
 
-
-On 09/26/2017 03:00 PM, Eduardo Habkost wrote:
-> Currently, iothread_stop_all() makes all iothread objects unsafe
-> to be destroyed, because qemu_thread_join() ends up being called
-> twice.
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> To fix this, make iothread_stop() idempotent by checking
-> thread->stopped.
+> Modify the pre_save method on VMStateDescription to return an int
+> rather than void so that it potentially can fail.
 > 
-> Fixes the following crash:
+> Changed zillions of devices to make them return 0; the only
+> case I've made it return non-0 is hw/intc/s390_flic_kvm.c that already
+> had an error_report/return case.
 > 
->   qemu-system-x86_64 -object iothread,id=iothread0 -monitor stdio -display none
->   QEMU 2.10.50 monitor - type 'help' for more information
->   (qemu) quit
->   qemu: qemu_thread_join: No such process
->   Aborted (core dumped)
+> Note: If you add an error exit in your pre_save you must emit
+> an error_report to say why.
 > 
-> Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-
-Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > ---
->  iothread.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/iothread.c b/iothread.c
-> index 44c8944dc4..59d0850988 100644
-> --- a/iothread.c
-> +++ b/iothread.c
-> @@ -85,7 +85,7 @@ static int iothread_stop(Object *object, void *opaque)
->      IOThread *iothread;
-> 
->      iothread = (IOThread *)object_dynamic_cast(object, TYPE_IOTHREAD);
-> -    if (!iothread || !iothread->ctx) {
-> +    if (!iothread || !iothread->ctx || iothread->stopping) {
->          return 0;
->      }
->      iothread->stopping = true;
-> 
+>  docs/devel/migration.txt       |  2 +-
+>  hw/arm/pxa2xx.c                |  4 +++-
+>  hw/arm/strongarm.c             |  4 +++-
+>  hw/audio/wm8750.c              |  4 +++-
+>  hw/block/fdc.c                 |  4 +++-
+>  hw/block/m25p80.c              |  4 +++-
+>  hw/block/nand.c                |  4 +++-
+>  hw/block/onenand.c             |  4 +++-
+>  hw/char/serial.c               |  4 +++-
+>  hw/display/qxl.c               |  4 +++-
+>  hw/i2c/core.c                  |  4 +++-
+>  hw/i386/kvm/clock.c            |  4 +++-
+>  hw/ide/core.c                  |  4 +++-
+>  hw/ide/pci.c                   |  4 +++-
+>  hw/input/ps2.c                 |  8 ++++++--
+>  hw/input/tsc210x.c             |  4 +++-
+>  hw/intc/apic_common.c          |  4 +++-
+>  hw/intc/arm_gic_common.c       |  4 +++-
+>  hw/intc/arm_gicv3_common.c     |  4 +++-
+>  hw/intc/arm_gicv3_its_common.c |  4 +++-
+>  hw/intc/i8259_common.c         |  4 +++-
+>  hw/intc/ioapic_common.c        |  4 +++-
+>  hw/intc/s390_flic_kvm.c        |  6 ++++--
+>  hw/intc/xics.c                 |  8 ++++++--
+>  hw/net/e1000.c                 |  4 +++-
+>  hw/net/e1000e.c                |  4 +++-
+>  hw/net/rtl8139.c               |  4 +++-
+>  hw/net/virtio-net.c            | 16 ++++++++++++----
+>  hw/net/vmxnet3.c               |  4 +++-
+>  hw/pci-host/piix.c             |  4 +++-
+>  hw/ppc/ppc.c                   |  4 +++-
+>  hw/ppc/spapr_iommu.c           |  4 +++-
+>  hw/ppc/spapr_pci.c             |  6 ++++--
+>  hw/s390x/css.c                 | 10 +++++++---
+>  hw/s390x/virtio-ccw.c          |  4 +++-
+>  hw/scsi/lsi53c895a.c           |  4 +++-
+>  hw/scsi/vmw_pvscsi.c           |  4 +++-
+>  hw/timer/cadence_ttc.c         |  4 +++-
+>  hw/timer/hpet.c                |  4 +++-
+>  hw/timer/i8254_common.c        |  4 +++-
+>  hw/timer/mc146818rtc.c         |  4 +++-
+>  hw/timer/pl031.c               |  4 +++-
+>  hw/timer/twl92230.c            |  4 +++-
+>  hw/usb/dev-smartcard-reader.c  |  4 +++-
+>  hw/usb/hcd-ehci.c              |  4 +++-
+>  hw/usb/redirect.c              |  4 +++-
+>  hw/virtio/vhost-vsock.c        |  4 +++-
+>  include/migration/vmstate.h    |  2 +-
+>  migration/colo-comm.c          |  4 +++-
+>  migration/global_state.c       |  4 +++-
+>  migration/savevm.c             |  4 +++-
+>  replay/replay-snapshot.c       |  4 +++-
+>  slirp/slirp.c                  |  8 ++++++--
+>  target/arm/machine.c           |  4 +++-
+>  target/i386/machine.c          |  7 +++++--
+>  target/ppc/machine.c           |  4 +++-
+>  target/s390x/machine.c         |  4 +++-
+>  target/sparc/machine.c         |  4 +++-
+>  tests/test-vmstate.c           |  4 +++-
+>  59 files changed, 199 insertions(+), 70 deletions(-)
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
