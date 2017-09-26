@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dwd86-0005K0-E3
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 19:49:39 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dwdNC-00007D-P8
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 20:05:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dwd83-00051j-Bp
-	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 19:49:38 -0400
-Date: Tue, 26 Sep 2017 09:49:25 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170925234925.GE12504@umbus>
-References: <1506264466-28252-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	(envelope-from <alistair23@gmail.com>) id 1dwdNB-0002so-RU
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 20:05:14 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:33362)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1dwdNB-0002sU-EZ
+	for qemu-devel@nongnu.org; Mon, 25 Sep 2017 20:05:13 -0400
+Received: by mail-wr0-x244.google.com with SMTP id b9so982010wra.0
+	for <qemu-devel@nongnu.org>; Mon, 25 Sep 2017 17:05:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="6e7ZaeXHKrTJCxdu"
-Content-Disposition: inline
-In-Reply-To: <1506264466-28252-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 0/7] mac_dbdma: tidy-up and QOMify
+In-Reply-To: <20170925082913.22089-1-famz@redhat.com>
+References: <20170925082913.22089-1-famz@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 25 Sep 2017 17:04:41 -0700
+Message-ID: <CAKmqyKNZW=JBc4xTpg1wisqD2_eLEPJvqtVMMacCt9mrNgEY-Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] docker: Fix test-mingw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,65 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
+On Mon, Sep 25, 2017 at 1:29 AM, Fam Zheng <famz@redhat.com> wrote:
+> Feature "dtc" is explicitly required by test-mingw, but is not detected
+> by the run script since we switched to archive-source.sh in b7f404201e4.
+> Since it isn't available in the Fedora image which runs this test on
+> patchew, the way we get dtc is still from submodule.
+>
+> archive-source.sh takes care of bundling the submodule files already, so
+> what we need to do is just checking if files are there. Makefile is
+> chosen because it is one that is unlikely to get renamed in the future.
+>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 
---6e7ZaeXHKrTJCxdu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
-On Sun, Sep 24, 2017 at 03:47:39PM +0100, Mark Cave-Ayland wrote:
-> Whilst looking at implementing another DBDMA device for the Mac machines
-> I noticed a couple of things: firstly there were some unused fields still
-> in DBDMAState, and secondly the existing code still used global functions
-> to register DMA channels and handle the relationship between macio IDE and
-> DBDMA.
->=20
-> This patchset removes the now-unused fields from DBDMA state, QOMifys the
-> DBDMA device, uses a QOM object link to allow the macio IDE object to
-> reference the DBDMA device, and then finally removes the global DBDMA_*
-> functions substituting them instead for QOM methods.
->=20
-> Note: this patchset does not apply to master but on top of David's
-> ppc-for-2.11 branch since there are merge conflicts with my previous
-> patchset. Hopefully the Based-On line below is enough to keep patchew
-> happy, even though it wasn't the final version applied to the ppc-for-2.11
-> branch.
->=20
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Based-on: 1505668548-16616-1-git-send-email-mark.cave-ayland@ilande.co.uk=
- (ppc: more Mac-related fixups)
+Thanks,
+Alistair
 
-I've applied 1-5/7.  There are a couple of details I'm not 100%
-convinced on, but it's still better than what was there before.  6 & 7
-I'm still thinking about.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---6e7ZaeXHKrTJCxdu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnJlgAACgkQbDjKyiDZ
-s5IRlxAAwcnQi1bZBBfvdcvQGSb0zQUsp8wttZZnVDN6L7rBw53aK7y15enPvGFG
-SjhKu+Y8b8nfSlkL6yOzXaZyZiAKWBJiXX4XtgXkgY6ry5WzCck5AFZOqBDG6MOD
-/JfQU3sN9e44UUUCcfotn8w4WKKAPxjkU503q8+9b8slAK1W4/A6KytENIHz1awh
-bxVb2bPZBF/c1si0HuhOXi6CXPYtbOyaMy2kXhZw+tE06m5orlf5QsLcK4gp409n
-wv7nPCmOug971bRCqk66H6HsrsBTq/Sudmcc3UG56pEznXSLPnyTkWWzTKjZmd93
-0iZhiUeUpCcH4ixJESBtEyTYW//Jhtbh2HWlaK+2yJWM0du/NKMDi2Nt6JA5vHn/
-b8417SLja07eOXhJXV4MqzBGkoieni8ahQ7s8DzM7Ms98KMDnRN5M4MRPnSKgHb2
-N5yKzh6sfL0e5tYzN571s+pEwq549+kJ6Ems/wlspfBcthhYTXZ2mDu6nxh84RmE
-+qWnOHXBGxklu3LAW/jHr80ZWLAtAim4UiK6rXoA3drdJGVo3TBGc3PQDbWWicbB
-/fJ7JetSj3dNo4NYt90oaTJUKI705iWwIu7J2uRqbf9I1pPq9lbJc38JYwJKaz8G
-hCIiuXuOPMSTMkc+PhnQW4+9H30AUdzDs3attXXl+Rwkga/NhiA=
-=X1Zn
------END PGP SIGNATURE-----
-
---6e7ZaeXHKrTJCxdu--
+> ---
+>  tests/docker/run | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/tests/docker/run b/tests/docker/run
+> index c8f940de15..0fd2f358ce 100755
+> --- a/tests/docker/run
+> +++ b/tests/docker/run
+> @@ -31,6 +31,9 @@ mkdir -p $TEST_DIR/{src,build,install}
+>
+>  # Extract the source tarballs
+>  tar -C $TEST_DIR/src -xf $BASE/qemu.tar || prep_fail "Failed to untar source"
+> +if test -f $TEST_DIR/src/Makefile; then
+> +    export FEATURES="$FEATURES dtc"
+> +fi
+>
+>  if test -n "$SHOW_ENV"; then
+>      if test -f /packages.txt; then
+> --
+> 2.13.5
+>
+>
