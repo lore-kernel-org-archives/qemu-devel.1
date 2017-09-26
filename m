@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dwnba-0001Ny-4j
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 07:00:47 -0400
+	(envelope-from <famz@redhat.com>) id 1dwncZ-00025T-4t
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 07:01:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dwnbW-0006f1-Bb
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 07:00:46 -0400
-Date: Tue, 26 Sep 2017 12:00:24 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170926110024.GA13332@stefanha-x1.localdomain>
-References: <20170923111411.18626-1-el13635@mail.ntua.gr>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170923111411.18626-1-el13635@mail.ntua.gr>
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] add bdrv_co_drain_begin/end
- BlockDriver callbacks
+	(envelope-from <famz@redhat.com>) id 1dwncT-0007Dl-N6
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 07:01:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50536)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dwncT-0007DW-GB
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 07:01:41 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Tue, 26 Sep 2017 19:01:34 +0800
+Message-Id: <20170926110134.2786-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH] docker: test-block: Don't continue if build
+ fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,48 +22,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On Sat, Sep 23, 2017 at 02:14:08PM +0300, Manos Pitsidianakis wrote:
-> This patch series renames bdrv_co_drain to bdrv_co_drain_begin and adds a new 
-> bdrv_co_drain_end callback to match bdrv_drained_begin/end and 
-> drained_begin/end of BdrvChild. This is needed because the throttle driver 
-> (block/throttle.c) needs a way to mark the end of the drain in order to toggle 
-> io_limits_disabled correctly.
-> 
-> Based-on: <20170918202529.28379-1-el13635@mail.ntua.gr>
->     "block/throttle-groups.c: allocate RestartData on the heap"
->     Which fixes a coroutine crash in block/throttle-groups.c
-> 
-> v3:
->   fixed commit message typo in first patch [Fam]
->   rephrased doc comment based on mailing discussion
-> v2: 
->   add doc for callbacks and change order of request polling for completion 
->   [Stefan]
-> 
-> Manos Pitsidianakis (3):
->   block: add bdrv_co_drain_end callback
->   block: rename bdrv_co_drain to bdrv_co_drain_begin
->   block/throttle.c: add bdrv_co_drain_begin/end callbacks
-> 
->  include/block/block_int.h | 13 ++++++++++---
->  block/io.c                | 48 +++++++++++++++++++++++++++++++++--------------
->  block/qed.c               |  6 +++---
->  block/throttle.c          | 18 ++++++++++++++++++
->  4 files changed, 65 insertions(+), 20 deletions(-)
+Report error and exit upon compiling error, otherwise the iotests output
+will be pure noise.
 
-Oops, this seems to cause a qemu-iotests failure.  Please take a look:
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ tests/docker/test-block | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-$ ./check -qcow2 184
-184 0s ... - output mismatch (see 184.out.bad)
---- /home/stefanha/qemu/tests/qemu-iotests/184.out	2017-09-19 14:51:46.673854437 +0100
-+++ 184.out.bad	2017-09-26 11:13:06.946610239 +0100
-@@ -142,6 +142,9 @@
-         "guest": false
-     }
- }
-+./common.config: line 118:  9196 Segmentation fault      (core dumped) ( if [ -n "${QEMU_NEED_PID}" ]; then
-+    echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid";
-+fi; exec "$QEMU_PROG" $QEMU_OPTIONS "$@" )
+diff --git a/tests/docker/test-block b/tests/docker/test-block
+index 2ca1ce54f6..5624b81827 100755
+--- a/tests/docker/test-block
++++ b/tests/docker/test-block
+@@ -14,7 +14,7 @@
+ 
+ cd "$BUILD_DIR"
+ 
+-build_qemu --target-list=x86_64-softmmu
++build_qemu --target-list=x86_64-softmmu || test_fail "Build failed"
+ cd tests/qemu-iotests
+ for t in raw qcow2 nbd luks; do
+     ./check -g quick -$t || test_fail "Test failed: iotests $t"
+-- 
+2.13.5
