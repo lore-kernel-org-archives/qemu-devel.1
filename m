@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dwmai-0004d3-Bs
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 05:55:49 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dwmhX-0006R2-P6
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:02:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dwmaf-00072r-RN
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 05:55:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55348)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dwmaf-00072T-Kq
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 05:55:45 -0400
-Date: Tue, 26 Sep 2017 10:55:35 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170926095535.GB2689@work-vm>
-References: <20170925112917.21340-1-dgilbert@redhat.com>
-	<20170925112917.21340-5-dgilbert@redhat.com>
-	<20170926024548.GI19505@pxdev.xzpeter.org>
+	(envelope-from <stefanha@redhat.com>) id 1dwmhW-0001xx-R1
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:02:51 -0400
+Date: Tue, 26 Sep 2017 11:02:36 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170926100236.GG16834@stefanha-x1.localdomain>
+References: <20170923111411.18626-1-el13635@mail.ntua.gr>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170926024548.GI19505@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] migration: wire vmstate_save_state
- errors up to vmstate_subsection_save
+In-Reply-To: <20170923111411.18626-1-el13635@mail.ntua.gr>
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] add bdrv_co_drain_begin/end
+ BlockDriver callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +23,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, famz@redhat.com, peter.maydell@linaro.org, cohuck@redhat.com, rth@twiddle.net
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Mon, Sep 25, 2017 at 12:29:15PM +0100, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Route the errors from vmstate_subsection_save up through
-> > vmstate_subsection_save (and back down, all rather recursive).
+On Sat, Sep 23, 2017 at 02:14:08PM +0300, Manos Pitsidianakis wrote:
+> This patch series renames bdrv_co_drain to bdrv_co_drain_begin and adds a new 
+> bdrv_co_drain_end callback to match bdrv_drained_begin/end and 
+> drained_begin/end of BdrvChild. This is needed because the throttle driver 
+> (block/throttle.c) needs a way to mark the end of the drain in order to toggle 
+> io_limits_disabled correctly.
 > 
-> I guess here one of the "vmstate_subsection_save" should be replaced
-> by "vmstate_save_state"? :-)
-
-Ah yes, fixed.
-
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Based-on: <20170918202529.28379-1-el13635@mail.ntua.gr>
+>     "block/throttle-groups.c: allocate RestartData on the heap"
+>     Which fixes a coroutine crash in block/throttle-groups.c
 > 
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-
-Thanks.
-
-Dave
-
+> v3:
+>   fixed commit message typo in first patch [Fam]
+>   rephrased doc comment based on mailing discussion
+> v2: 
+>   add doc for callbacks and change order of request polling for completion 
+>   [Stefan]
+> 
+> Manos Pitsidianakis (3):
+>   block: add bdrv_co_drain_end callback
+>   block: rename bdrv_co_drain to bdrv_co_drain_begin
+>   block/throttle.c: add bdrv_co_drain_begin/end callbacks
+> 
+>  include/block/block_int.h | 13 ++++++++++---
+>  block/io.c                | 48 +++++++++++++++++++++++++++++++++--------------
+>  block/qed.c               |  6 +++---
+>  block/throttle.c          | 18 ++++++++++++++++++
+>  4 files changed, 65 insertions(+), 20 deletions(-)
 > 
 > -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 2.11.0
+> 
+
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
+
+Stefan
