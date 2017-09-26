@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dwtUw-0003g9-M2
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 13:18:19 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dwtXB-0004fp-DI
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 13:20:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dwtUv-0006xp-Lq
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 13:18:18 -0400
-Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:34251)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1dwtUv-0006xS-HV
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 13:18:17 -0400
-Received: by mail-it0-x243.google.com with SMTP id o200so5066172itg.1
-	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 10:18:17 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1dwtXA-0000aP-Ax
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 13:20:37 -0400
+Date: Tue, 26 Sep 2017 19:20:20 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170926172020.GC14717@localhost.localdomain>
+References: <1506442418-26026-1-git-send-email-jan.dakinevich@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <150642388004.3900.5767850617613782105.stgit@Misha-PC.lan02.inno>
-References: <150642384156.3900.3326424823772221077.stgit@Misha-PC.lan02.inno>
-	<150642388004.3900.5767850617613782105.stgit@Misha-PC.lan02.inno>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 26 Sep 2017 10:17:46 -0700
-Message-ID: <CAKmqyKNuoesi8NTPNfzM=dt+vciXEH1a9L+4iZuSkzpa0hHjRw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 06/43] windbg: added WindbgState
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1506442418-26026-1-git-send-email-jan.dakinevich@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio: introduce `info virtio' hmp command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +22,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Stefan Weil <sw@weilnetz.de>, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, Paolo Bonzini <pbonzini@redhat.com>, den@openvz.org
+To: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Amit Shah <amit@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>
 
-On Tue, Sep 26, 2017 at 4:04 AM, Mihail Abakumov
-<mikhail.abakumov@ispras.ru> wrote:
-> Added definition of the WindbgState struct and its initialization.
->
-> Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-> Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-> Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
+Am 26.09.2017 um 18:13 hat Jan Dakinevich geschrieben:
+> The command is intended for exposing device specific virtio feature bits
+> and their negotiation status. It is convenient and useful for debug
+> purpose.
+> 
+> Names of features are taken from a devices via get_feature_name() within
+> VirtioDeviceClass. If certain device doesn't implement it, the command
+> will print only hexadecimal value of feature mask.
+> 
+> Cc: Denis V. Lunev <den@virtuozzo.com>
+> Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
 > ---
->  windbgstub.c |   26 ++++++++++++++++++++++++++
->  1 file changed, 26 insertions(+)
->
-> diff --git a/windbgstub.c b/windbgstub.c
-> index 3830446988..60a380c213 100755
-> --- a/windbgstub.c
-> +++ b/windbgstub.c
-> @@ -10,10 +10,36 @@
->   */
->
->  #include "qemu/osdep.h"
-> +#include "chardev/char.h"
-> +#include "chardev/char-fe.h"
->  #include "exec/windbgstub.h"
->  #include "exec/windbgstub-utils.h"
->
-> +typedef struct WindbgState {
-> +    bool is_loaded;
-> +
-> +    uint32_t ctrl_packet_id;
-> +    uint32_t data_packet_id;
-> +} WindbgState;
-> +
-> +static WindbgState *windbg_state;
-> +
-> +static void windbg_exit(void)
-> +{
-> +    g_free(windbg_state);
-> +}
-> +
->  int windbg_server_start(const char *device)
->  {
-> +    if (windbg_state) {
-> +        WINDBG_ERROR("Multiple instances are not supported");
+> The patch suggests an another approach for this:
+> 
+> "virtio: show guest features in 'info qtree'"
+> http://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg01609.html
 
-Use error_report() to report errors.
+Actually, I think the original approach is much nicer because it uses
+generic infrastructure rather than introducing a one-off monitor command
+that is specific to a certain class of devices.
 
-Thanks,
-Alistair
+But at the same time I can see Cornelia's point that this would create a
+whole lot of properties and if we did the same thing consistently for
+all devices, the output of 'info qtree' would be completely cluttered
+up.
 
-> +        exit(1);
-> +    }
-> +
-> +    windbg_state = g_new0(WindbgState, 1);
-> +    windbg_state->ctrl_packet_id = RESET_PACKET_ID;
-> +    windbg_state->data_packet_id = INITIAL_PACKET_ID;
-> +
-> +    atexit(windbg_exit);
+Maybe it would make sense to have properties that can be queried with
+QOM, but that don't show up in 'info qtree'? If we then add some HMP
+'qom-get' command that allows dumping a whole device as a QOM object
+instead of having to query property by property, it should be quite
+convenient to use.
 
-I don't think you need this.
-
-Thanks,
-Alistair
-
->      return 0;
->  }
->
->
+Kevin
