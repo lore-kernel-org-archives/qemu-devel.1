@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dwslo-0004cB-Ua
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 12:31:41 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dwsrI-0007En-Mt
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 12:37:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dwslj-0004ND-7q
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 12:31:40 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:44104)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dwsli-0004ME-SP
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 12:31:35 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <150505986682.19604.11937392314067517230.stgit@frigg.lan>
-	<150506083546.19604.543091497330269756.stgit@frigg.lan>
-	<169db8d7-fe49-05c4-aca7-ad818b12c9c5@linaro.org>
-	<87a81xpasb.fsf@frigg.lan>
-	<7e4260a8-89a3-9c52-4f09-afe9035ceac2@twiddle.net>
-	<87ingki0je.fsf@frigg.lan>
-Date: Tue, 26 Sep 2017 19:31:25 +0300
-In-Reply-To: <87ingki0je.fsf@frigg.lan> (=?utf-8?Q?=22Llu=C3=ADs?=
-	Vilanova"'s message of "Fri, 15 Sep 2017 15:55:33 +0300")
-Message-ID: <87poadto9u.fsf@frigg.lan>
+	(envelope-from <alistair23@gmail.com>) id 1dwsrH-0008PM-V8
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 12:37:20 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/7] tcg: Add support for "inlining"
- regions of code
+Sender: alistair23@gmail.com
+In-Reply-To: <1506441116-16627-1-git-send-email-thuth@redhat.com>
+References: <1506441116-16627-1-git-send-email-thuth@redhat.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Tue, 26 Sep 2017 09:36:44 -0700
+Message-ID: <CAKmqyKOCsyCHnaNzo_zrRQjZi30ENdPoSc+dFehHvevm-9nrZg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/xlnx-zynqmp: Mark the "xlnx,
+ zynqmp" device with user_creatable = false
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,97 +23,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-Llu=C3=ADs Vilanova writes:
+On Tue, Sep 26, 2017 at 8:51 AM, Thomas Huth <thuth@redhat.com> wrote:
+> The device uses serial_hds in its realize function and thus can't be
+> used twice. Apart from that, the comma in its name makes it quite hard
+> to use for the user anyway, since a comma is normally used to separate
+> the device name from its properties when using the "-device" parameter
+> or the "device_add" HMP command.
 
-> Richard Henderson writes:
->> On 09/14/2017 08:20 AM, Llu=C3=ADs Vilanova wrote:
->>> Richard Henderson writes:
->>>=20
->>>> On 09/10/2017 09:27 AM, Llu=C3=ADs Vilanova wrote:
->>>>> TCG BBLs and instructions have multiple exit points from where to rai=
-se
->>>>> tracing events, but some of the necessary information in the generic
->>>>> disassembly infrastructure is not available until after generating th=
-ese
->>>>> exit points.
->>>>>=20
->>>>> This patch adds support for "inline points" (where the tracing code w=
-ill
->>>>> be placed), and "inline regions" (which identify the TCG code that mu=
-st
->>>>> be inlined). The TCG compiler will basically copy each inline region =
-to
->>>>> any inline points that reference it.
->>>=20
->>>> I am not keen on this.
->>>=20
->>>> Is there a reason you can't just emit the tracing code at the appropri=
-ate place
->>>> to begin with?  Perhaps I have to wait to see how this is used...
->>>=20
->>> As I tried to briefly explain on next patch, the main problem without i=
-nlining
->>> is that we will see guest_tb_after_trans twice on the trace for each TB=
- in
->>> conditional instructions on the guest, since they have two exit points =
-(which we
->>> capture when emitting goto_tb in TCG).
+Is it worth changing the name now then as well?
 
->> Without seeing the code, I suspect this is because you didn't examine the
->> argument to tcg_gen_exit_tb.  You can tell when goto_tb must have been e=
-mitted
->> and avoid logging twice.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-> The generated tracing code for 'guest_*_after' must be right before the
-> "goto_tb" opcode at the end of a TB (AFAIU generated by
-> tcg_gen_lookup_and_goto_ptr()), and we have two of those when decoding a =
-guest
-> conditional jump.
-
-> If we couple this with the semantics of the trace_*_tcg functions (trace =
-the
-> event at translation time, and generate TCG code to trace the event at ex=
-ecution
-> time), we get the case I described (we don't want to call trace_tb_after_=
-tcg()
-> or trace_insn_after_tcg() twice for the same TB or instruction).
-
-> That is, unless I've missed something.
-
-
-> The only alternative I can think of is changing tracetool to offer an add=
-itional
-> API that provides separate functions for translation-time tracing and
-> execution-time generation. So from this:
-
->   static inline void trace_event_tcg(CPUState *cpu, TCGv_env env, ...)
->   {
->       trace_event_trans(cpu, ...);
->       if (trace_event_get_vcpu_state(cpu, EVENT_EXEC)) {
->           gen_helper_trace_event_exec(env, ...);
->       }
->   }
-
-> We can extend it into this:
-
->   static inline void gen_trace_event_exec(TCGv_env env, ...)
->       if (trace_event_get_vcpu_state(cpu, EVENT_EXEC)) {
->           gen_helper_trace_event_exec(env, ...);
->       }
->   }
->   static inline void trace_event_tcg(CPUState *cpu, TCGv_env env, ...)
->   {
->       trace_event_trans(cpu, ...);
->       gen_trace_event_exec(env, ...);
->   }
-
-Richard, do you prefer to keep the "TCG inline" feature or switch the inter=
-nal
-tracing API to this second approach?
-
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
 Thanks,
-  Lluis
+Alistair
+
+> ---
+>  hw/arm/xlnx-zynqmp.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+> index 2b27daf..d4b6560 100644
+> --- a/hw/arm/xlnx-zynqmp.c
+> +++ b/hw/arm/xlnx-zynqmp.c
+> @@ -440,6 +440,8 @@ static void xlnx_zynqmp_class_init(ObjectClass *oc, void *data)
+>
+>      dc->props = xlnx_zynqmp_props;
+>      dc->realize = xlnx_zynqmp_realize;
+> +    /* Reason: Uses serial_hds in realize function, thus can't be used twice */
+> +    dc->user_creatable = false;
+>  }
+>
+>  static const TypeInfo xlnx_zynqmp_type_info = {
+> --
+> 1.8.3.1
+>
+>
