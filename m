@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dwqyL-0005ec-JF
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:36:31 -0400
+	(envelope-from <prvs=435882bd1=anthony.perard@citrix.com>)
+	id 1dwr0J-0007Er-OE
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:38:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dwqyI-0005IK-UK
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:36:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52780)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dwqyI-0005HU-LB
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:36:26 -0400
-Date: Tue, 26 Sep 2017 17:36:18 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170926170901-mutt-send-email-mst@kernel.org>
-References: <69fd8746-b2bd-31d0-4d70-792f40ef2d79@amd.com>
+	(envelope-from <prvs=435882bd1=anthony.perard@citrix.com>)
+	id 1dwr0F-0006bf-P5
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:38:31 -0400
+Date: Tue, 26 Sep 2017 15:37:51 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20170926143750.GA17168@perard.uk.xensource.com>
+References: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <69fd8746-b2bd-31d0-4d70-792f40ef2d79@amd.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] libvirt/QEMU/SEV interaction
+In-Reply-To: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 00/12] Patch Round-up for stable 2.10.1,
+ freeze on 2017-09-27
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,171 +25,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "Relph, Richard" <Richard.Relph@amd.com>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>
 
-On Fri, Sep 08, 2017 at 06:57:30AM -0500, Brijesh Singh wrote:
-> Hi All,
+On Tue, Sep 19, 2017 at 07:45:09PM -0500, Michael Roth wrote:
+> Hi everyone,
+> 
+> The following new patches are queued for QEMU stable v2.10.1:
+> 
+>   https://github.com/mdroth/qemu/commits/stable-2.10-staging
+> 
+> The release is planned for 2017-10-02:
+> 
+>   https://wiki.qemu.org/Planning/2.10
+> 
+> Please respond here or CC qemu-stable@nongnu.org on any patches you
+> think should be included in the release.
 
-Sorry if below comment doesn't make sense, I might be misunderstanding
-something basic about SEV. Also sorry about the delay, I've been on
-vacation.
+Hi,
 
+I'd like to add this patch:
 
-> (sorry for the long message)
->=20
-> CPUs from AMD EPYC family supports Secure Encrypted Virtualization (SEV=
-)
-> feature - the feature allows running encrypted VMs. To enable the featu=
-re,
-> I have been submitting patches to Linux kernel [1], Qemu [2] and OVMF [=
-3].
-> We have been making some good progress in getting patches accepted upst=
-ream
-> in Linux and OVMF trees. SEV builds upon SME (Secure Memory Encryption)
-> feature -- SME support just got pulled into 4.14 merge window. The base
-> SEV patches are accepted in OVMF tree -- now we have SEV aware guest BI=
-OS.
-> I am getting ready to take off "RFC" tag from remaining patches to get =
-them
-> reviewed and accepted.
->=20
-> The boot flow for launching an SEV guest is a bit different from a typi=
-cal
-> guest launch. In order to launch SEV guest from virt-manager or other
-> high-level VM management tools, we need to design and implement new
-> interface between libvirt and qemu, and probably add new APIs in libvir=
-t
-> to be used by VM management tools. I am new to the libvirt and need som=
-e
-> expert advice while designing this interface. A pictorial representatio=
-n
-> for a SEV guest launch flow is available in SEV Spec Appendix A [4].
->=20
-> A typical flow looks like this:
->=20
-> 1. Guest owner (GO) asks the cloud provider to launch SEV guest.
-> 2. VM tool asks libvirt to provide its Platform Diffie-Hellman (PDH) ke=
-y.
-> 3. libvirt opens /dev/sev device to get its PDH and return the blob to =
-the
-> =A0=A0 caller.
-> 4. VM tool gives its PDH to GO.
-> 5. GO provides its DH key, session-info and guest policy.
-> 6. VM tool somehow communicates the GO provided information to libvirt.
-> 7. libvirt adds "sev-guest" object in its xml file with all the informa=
-tion
-> =A0=A0 obtained from #5
->=20
-> =A0=A0 (currently my xml file looks like this)
->=20
-> =A0=A0 <qemu:arg value=3D'-object'>
-> =A0=A0 <qemu:arg
-> value=3D'sev-guest,id=3Dsev0,policy=3D<GO_policy>,dh-key-file=3D<filena=
-me>,session-file=3D<filename>/>
-> =A0=A0 <qemu:arg value=3D'-machine'/>
-> =A0=A0 <qemu:arg value=3D'memory-encryption=3Dsev0'/>
->=20
-> 8. libvirt launches the guest with "-S"
-> 9. While creating the SEV guest qemu does the following
-> =A0i) create encryption context using GO's DH, session-info and guest p=
-olicy
-> =A0=A0=A0 (LAUNCH_START)
-> =A0ii) encrypts the guest bios (LAUNCH_UPDATE_DATA)
-> =A0iii) calls LAUNCH_MEASUREMENT to get the encrypted bios measurement
-
-This part troubles me. This seems to mean that the guest being launched
-must know what the measurement of the bios is going to be.  This means
-that the cloud provider can not update the bios without breaking guests.
-Also, while in practice you typically can run an old bios image on a new
-qemu instance, this is not really tested so would be very hard to
-support properly in QEMU.
+a3fd781f653db4dc76635715207c9029208634bd
+"xen-disk: use g_new0 to fix build"
 
 
-And this looks like a fundamental problem with the hash based
-measurement that's in hardware. So below I suggest that we layer
-some software on top to rely on the hash as little as possible.
+And maybe these three patches to fix a regression compared to 2.8:
+
+f5855994fee2f8815dc86b8453e4a63e290aea05
+"hw/acpi: Limit hotplug to root bus on legacy mode"
+
+ab938ae43f8a3a71a3525566edf586081b7a7452
+"hw/acpi: Move acpi_set_pci_info to pcihp"
+
+2bed1ba77fae50bc8b5e68ede2d80b652b30c3b8
+"Revert "ACPI: don't call acpi_pcihp_device_plug_cb on xen""
 
 
+There is also two more patches that are not commited yet, so I don't
+known if they can be candidate for the stable release:
 
-> 10. By some interface we must propagate the measurement all the way to =
-GO
-> =A0 before libvirt starts the guest.
-> 11. GO verifies the measurement and if measurement matches then it may
-> =A0give a secret blob -- which must be injected into the guest before
-> =A0libvirt starts the VM. If verification failed, GO will request cloud
-> =A0provider to destroy the VM.
-> 12. After secret blob is injected into guest, we call LAUNCH_FINISH
-> =A0 to destory the encryption context.
-> 13. libvirt issues "continue" command to resume the guest boot.
->=20
-> Please note that the measurement value is protected with transport
-> encryption key (TIK) and it changes on each run. Similarly the secret b=
-lob
-> provided by GO does not need to be protected using libvirt/qemu APIs. T=
-he
-> secret is protected by TIK. From qemu and libvirt point of view these a=
-re
-> blobs and must be passed as-is to the SEV FW.
-
-So here's an alternative idea for starting guests:
-
-How about building a minimal shim firmware that
-runs on a single CPU and uses no hardware at all,
-it just contains the secret blob.
-
-That firmware just immediately stops and signals
-hypervisor that it is ready to be run in the cloud.
-
-Have user generate and start this shim firmware as a guest in a private
-setup, then export it out using SEND_* commands.
-
-Then instead of asking to launch guest, you ask provider
-to load it with RECEIVE_* commands.
-
-Unlike bios the shim firmware
-can hopefully be static so supporting it across qemu
-versions should be easy.
-
-The shim firmware then loads bios from qemu, verifies
-it in any way it sees fit (e.g. it could check a signature, version, etc:
-it is not limited to a hardware hash anymore).
-It then jumps to the bios.
+"xen: add a global indicator for grant copy being available"
+"xen: dont try setting max grants multiple times"
 
 
-While not exactly the same, there is some similarity
-here with how people solved the issues around secureboot -
-by using a shim.
+Thanks,
 
-Thanks!
-
-
-> Questions:
-> a) Do we need to add a new set of APIs in libvirt to return the PDH fro=
-m
-> libvirt and VM tool ? Or can we use some pre-existing APIs to pass the
-> opaque blobs ? (this is mainly for step 3 and 6)
-> b) do we need to define a new xml tag to for memory-encryption ? or jus=
-t
-> use the qemu:args tag ? (step 6)
-> c) what existing communicate interface can be used between libvirt and =
-qemu
-> to get the measurement ? can we add a new qemu monitor command
-> 'get_sev_measurement' to get the measurement ? (step 10)
-> d) how to pass the secret blob from libvirt to qemu ? should we conside=
-r
-> adding a new object (sev-guest-secret) -- libvirt can add the object th=
-rough
-> qemu monitor.
->=20
->=20
-> [1] https://marc.info/?l=3Dkvm&m=3D150092661105069&w=3D2
-> [2] https://marc.info/?l=3Dqemu-devel&m=3D148901186615642&w=3D2
-> [3] https://lists.01.org/pipermail/edk2-devel/2017-July/012220.html
-> [4] http://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pd=
-f
->=20
-> Thanks
->=20
-> Brijesh
->=20
+-- 
+Anthony PERARD
