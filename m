@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dwmEN-0005j6-VT
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 05:32:45 -0400
+	(envelope-from <peterx@redhat.com>) id 1dwmHH-0007fp-Fn
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 05:35:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dwmEK-0004Js-O9
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 05:32:43 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:44757)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dwmEK-0004JN-HC
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 05:32:40 -0400
-Received: by mail-wm0-x241.google.com with SMTP id m127so14742546wmm.1
-	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 02:32:40 -0700 (PDT)
-Date: Tue, 26 Sep 2017 10:32:37 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170926093237.GF16834@stefanha-x1.localdomain>
-References: <1504729728-23279-1-git-send-email-cota@braap.org>
-	<c9b8e5af-3ccb-5747-78b4-de8e11e5e081@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1dwmHE-00069u-5i
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 05:35:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47056)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dwmHD-00068j-Ty
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 05:35:40 -0400
+Date: Tue, 26 Sep 2017 17:35:32 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170926093532.GE3828@pxdev.xzpeter.org>
+References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
+	<1504081950-2528-10-git-send-email-peterx@redhat.com>
+	<20170921192144.GG3401@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <c9b8e5af-3ccb-5747-78b4-de8e11e5e081@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 0/6] initial plugin support
+In-Reply-To: <20170921192144.GG3401@work-vm>
+Subject: Re: [Qemu-devel] [RFC v2 09/33] migration: implement
+ "postcopy-pause" src logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +29,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, Stefan Hajnoczi <stefanha@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On Tue, Sep 26, 2017 at 06:22:31AM +0200, Thomas Huth wrote:
-> On 06.09.2017 22:28, Emilio G. Cota wrote:
-> > Related threads:
-> >   [PATCH 00/13] instrument: Add basic event instrumentation
-> >   Date: Mon, 24 Jul 2017 20:02:24 +0300
-> >   https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg07419.html
-> > and
-> >   [PATCH v4 00/20] instrument: Add basic event instrumentation
-> >   Date:	Wed, 6 Sep 2017 20:22:41 +0300
-> >   https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg07419.html
+On Thu, Sep 21, 2017 at 08:21:45PM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > Now when network down for postcopy, the source side will not fail the
+> > migration. Instead we convert the status into this new paused state, and
+> > we will try to wait for a rescue in the future.
 > > 
-> > This set does something similar to the instrumentation patches by Lluis,
-> > but with a different implementation (and for now less events).
+> > If a recovery is detected, migration_thread() will reset its local
+> > variables to prepare for that.
 > > 
-> > My focus has been on working on the skeleton of a (pseudo) stable API,
-> > as Stefan requested. Of course more events would have to be added, but
-> > before spending more time on this I'd like to get some feedback on the
-> > core of the design. Patch 2 has all the details.
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  migration/migration.c  | 98 +++++++++++++++++++++++++++++++++++++++++++++++---
+> >  migration/migration.h  |  3 ++
+> >  migration/trace-events |  1 +
+> >  3 files changed, 98 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index f6130db..8d26ea8 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -993,6 +993,8 @@ static void migrate_fd_cleanup(void *opaque)
+> >  
+> >      notifier_list_notify(&migration_state_notifiers, s);
+> >      block_cleanup_parameters(s);
+> > +
+> > +    qemu_sem_destroy(&s->postcopy_pause_sem);
+> >  }
+> >  
+> >  void migrate_fd_error(MigrationState *s, const Error *error)
+> > @@ -1136,6 +1138,7 @@ MigrationState *migrate_init(void)
+> >      s->migration_thread_running = false;
+> >      error_free(s->error);
+> >      s->error = NULL;
+> > +    qemu_sem_init(&s->postcopy_pause_sem, 0);
+> >  
+> >      migrate_set_state(&s->state, MIGRATION_STATUS_NONE, MIGRATION_STATUS_SETUP);
+> >  
+> > @@ -1938,6 +1941,80 @@ bool migrate_colo_enabled(void)
+> >      return s->enabled_capabilities[MIGRATION_CAPABILITY_X_COLO];
+> >  }
+> >  
+> > +typedef enum MigThrError {
+> > +    /* No error detected */
+> > +    MIG_THR_ERR_NONE = 0,
+> > +    /* Detected error, but resumed successfully */
+> > +    MIG_THR_ERR_RECOVERED = 1,
+> > +    /* Detected fatal error, need to exit */
+> > +    MIG_THR_ERR_FATAL = 2,
 > 
-> Sorry for my ignorance, but if you send a patch series like this, could
-> you please elaborate a little bit more on the topic what this all is
-> about? In this cover letter, you basically give only some pointers about
-> other patch series and point the reader to patch 2, but also patch 2
-> does not really have a proper *description* of what this is really all
-> about. Sure, it's about plugins, but what kind of plugins? Audio? Video?
-> CPU? Everything? If you send RFC, you should properly describe your
-> vision first, and maybe give some examples, before you jump into the
-> details.
+> I don't think it's necessary to assign the values there, but it's OK.
+> 
+> > +} MigThrError;
+> > +
+> > +/*
+> > + * We don't return until we are in a safe state to continue current
+> > + * postcopy migration.  Returns MIG_THR_ERR_RECOVERED if recovered, or
+> > + * MIG_THR_ERR_FATAL if unrecovery failure happened.
+> > + */
+> > +static MigThrError postcopy_pause(MigrationState *s)
+> > +{
+> > +    assert(s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
+> > +    migrate_set_state(&s->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
+> > +                      MIGRATION_STATUS_POSTCOPY_PAUSED);
+> > +
+> > +    /* Current channel is possibly broken. Release it. */
+> > +    assert(s->to_dst_file);
+> > +    qemu_file_shutdown(s->to_dst_file);
+> > +    qemu_fclose(s->to_dst_file);
+> > +    s->to_dst_file = NULL;
+> > +
+> > +    error_report("Detected IO failure for postcopy. "
+> > +                 "Migration paused.");
+> > +
+> > +    /*
+> > +     * We wait until things fixed up. Then someone will setup the
+> > +     * status back for us.
+> > +     */
+> > +    while (s->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
+> > +        qemu_sem_wait(&s->postcopy_pause_sem);
+> > +    }
+> > +
+> > +    trace_postcopy_pause_continued();
+> > +
+> > +    return MIG_THR_ERR_RECOVERED;
+> > +}
+> > +
+> > +static MigThrError migration_detect_error(MigrationState *s)
+> > +{
+> > +    int ret;
+> > +
+> > +    /* Try to detect any file errors */
+> > +    ret = qemu_file_get_error(s->to_dst_file);
+> > +
+> > +    if (!ret) {
+> > +        /* Everything is fine */
+> > +        return MIG_THR_ERR_NONE;
+> > +    }
+> > +
+> > +    if (s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE && ret == -EIO) {
+> 
+> We do need to make sure that whenever we hit a failure in migration
+> due to a device that we pass that up rather than calling
+> qemu_file_set_error - e.g. an EIO in a block device or network.
+> 
+> However,
+> 
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Good point.
+I'll take the R-b first. :)
 
-This series is about introducing a stable API/ABI and loadable
-instrumentation plugin interface.  The goal is to offer dynamic binary
-instrumentation frameworks like Intel's Pin and DynamoRIO offer.
+Regarding to above - aren't we currently detecting these kind of
+errors using -EIO?  And network down should be only one of such case?
 
-In other words, performance analysis tasks (especially for TCG) can be
-implemented in a shared library that is loaded by QEMU when running a
-benchmark.
+For now I still cannot distinguish network down out of something worse
+that cannot even be recovered.  No matter what, current code will go
+into PAUSED state as long as EIO is got.  I thought about it, and for
+now I don't think it is a problem, since even if it is a critical
+failure and unable to recover in any way, we still won't lose anything
+if we stop the VM at once (that's what paused state do - VM is just
+stopped).  For the critical failures, we will just find out that the
+recovery will fail again rather than success.
 
-Stefan
+-- 
+Peter Xu
