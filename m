@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45328)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1dwmvL-000480-0i
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:17:10 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45805)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <cohuck@redhat.com>) id 1dwmwL-0004fi-2B
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:18:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1dwmvH-0001cV-MG
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:17:07 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:40029 helo=mx01.kamp.de)
+	(envelope-from <cohuck@redhat.com>) id 1dwmwH-000274-61
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:18:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33022)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dwmvH-0001b9-D2
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:17:03 -0400
-From: Peter Lieven <pl@kamp.de>
-Date: Tue, 26 Sep 2017 12:16:55 +0200
-Message-Id: <1506421015-4737-1-git-send-email-pl@kamp.de>
-Subject: [Qemu-devel] [PATCH V2] migration: disable auto-converge during
- bulk block migration
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dwmwG-00026n-W8
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:18:05 -0400
+Date: Tue, 26 Sep 2017 12:18:00 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170926121800.1e9e1ac1.cohuck@redhat.com>
+In-Reply-To: <20170921180841.24490-1-pasic@linux.vnet.ibm.com>
+References: <20170921180841.24490-1-pasic@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 0/5] add CCW indirect data access support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,63 +26,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: quintela@redhat.com, famz@redhat.com, stefanha@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, Peter Lieven <pl@kamp.de>, qemu-stable@nongnu.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-auto-converge and block migration currently do not play well together.
-During block migration the auto-converge logic detects that ram
-migration makes no progress and thus throttles down the vm until
-it nearly stalls completely. Avoid this by disabling the throttling
-logic during the bulk phase of the block migration.
+On Thu, 21 Sep 2017 20:08:36 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Peter Lieven <pl@kamp.de>
----
-V1->V2: add comment why we disable auto-converge during bulk block migration [Stefan]
+> Abstract
+> --------
+> 
+> The objective of this series is introducing CCW IDA (indirect data
+> access) support to our virtual channel subsystem implementation. Briefly
+> CCW IDA can be thought of as a kind of a scatter gather support for a
+> single CCW. If certain flags are set, the cda is to be interpreted as an
+> address to a list which in turn holds further addresses designating the
+> actual data.  Thus the scheme which we are currently using for accessing
+> CCW payload does not work in general case. Currently there is no
+> immediate need for proper IDA handling (no use case), but since it IDA is
+> a non-optional part of the architecture, the only way towards AR
+> compliance is actually implementing IDA.
+> 
+> The focus of this patch set is introducing IDA support. There seems to be
+> a potential for further  improvements based on the introduced
+> infrastructure, but such improvements are intended to be discusses
+> separately and realized as patches on top of this series.
 
- migration/block.c | 5 +++++
- migration/ram.c   | 6 +++++-
- 2 files changed, 10 insertions(+), 1 deletion(-)
+Hm, do you have a list of what you want to do as follow-on patches?
+(Checking return codes, ...)
 
-diff --git a/migration/block.c b/migration/block.c
-index 9171f60..606ad4d 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -161,6 +161,11 @@ int blk_mig_active(void)
-     return !QSIMPLEQ_EMPTY(&block_mig_state.bmds_list);
- }
- 
-+int blk_mig_bulk_active(void)
-+{
-+    return blk_mig_active() && !block_mig_state.bulk_completed;
-+}
-+
- uint64_t blk_mig_bytes_transferred(void)
- {
-     BlkMigDevState *bmds;
-diff --git a/migration/ram.c b/migration/ram.c
-index 88ca69e..b83f897 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -46,6 +46,7 @@
- #include "exec/ram_addr.h"
- #include "qemu/rcu_queue.h"
- #include "migration/colo.h"
-+#include "migration/block.h"
- 
- /***********************************************************/
- /* ram save/restore */
-@@ -825,7 +826,10 @@ static void migration_bitmap_sync(RAMState *rs)
-             / (end_time - rs->time_last_bitmap_sync);
-         bytes_xfer_now = ram_counters.transferred;
- 
--        if (migrate_auto_converge()) {
-+        /* During block migration the auto-converge logic incorrectly detects
-+         * that ram migration makes no progress. Avoid this by disabling the
-+         * throttling logic during the bulk phase of block migration. */
-+        if (migrate_auto_converge() && !blk_mig_bulk_active()) {
-             /* The following detection logic can be refined later. For now:
-                Check to see if the dirtied bytes is 50% more than the approx.
-                amount of bytes that just got transferred since the last time we
--- 
-1.9.1
+It's easy to lose track of all this :)
