@@ -1,41 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44416)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dwmtI-0002oI-Gf
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:15:06 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45328)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1dwmvL-000480-0i
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:17:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dwmtF-0000SJ-5L
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:15:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43580)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dwmtE-0000R1-Sr
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:14:57 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8QAETIs086204
-	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 06:14:53 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d7jajacma-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 06:14:52 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 26 Sep 2017 11:14:50 +0100
-References: <20170921180841.24490-1-pasic@linux.vnet.ibm.com>
-	<20170921180841.24490-4-pasic@linux.vnet.ibm.com>
-	<7e694ed6-7b40-c895-9542-e445489cda18@linux.vnet.ibm.com>
-	<20170926121027.735e5126.cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue, 26 Sep 2017 12:14:47 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170926121027.735e5126.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <d38de14e-c126-131a-f6d5-a9b0122149a2@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v4 3/5] virtio-ccw: use ccw data stream
+	(envelope-from <pl@kamp.de>) id 1dwmvH-0001cV-MG
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:17:07 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:40029 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dwmvH-0001b9-D2
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 06:17:03 -0400
+From: Peter Lieven <pl@kamp.de>
+Date: Tue, 26 Sep 2017 12:16:55 +0200
+Message-Id: <1506421015-4737-1-git-send-email-pl@kamp.de>
+Subject: [Qemu-devel] [PATCH V2] migration: disable auto-converge during
+ bulk block migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,42 +22,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: quintela@redhat.com, famz@redhat.com, stefanha@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, Peter Lieven <pl@kamp.de>, qemu-stable@nongnu.org
 
+auto-converge and block migration currently do not play well together.
+During block migration the auto-converge logic detects that ram
+migration makes no progress and thus throttles down the vm until
+it nearly stalls completely. Avoid this by disabling the throttling
+logic during the bulk phase of the block migration.
 
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Peter Lieven <pl@kamp.de>
+---
+V1->V2: add comment why we disable auto-converge during bulk block migration [Stefan]
 
-On 09/26/2017 12:10 PM, Cornelia Huck wrote:
-> On Fri, 22 Sep 2017 17:39:35 +0200
-> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
-> 
->> On 21/09/2017 20:08, Halil Pasic wrote:
->>> Replace direct access which implicitly assumes no IDA
->>> or MIDA with the new ccw data stream interface which should
->>> cope with these transparently in the future.
->>>
->>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->>> Reviewed-by: Pierre Morel<pmorel@linux.vnet.ibm.com>
->>> Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
->>> ---
->>>   hw/s390x/virtio-ccw.c | 155 +++++++++++++++-----------------------------------
->>>   1 file changed, 46 insertions(+), 109 deletions(-)
-> 
->> LGTM.
->> Not testing the return value for ccw_dstream_read/write_buf() bother me 
->> but I can understand that you will modify this later.
->> May be a comment?
->> Not a strong opinion.
-> 
-> I can add "Note that checking the return code for ccw_dstream_* will be
-> done in a follow-on patch."
-> 
+ migration/block.c | 5 +++++
+ migration/ram.c   | 6 +++++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
-I'm fine with that.
-
->>
->> Reviewed-by: Pierre Morel<pmorel@linux.vnet.ibm.com>
->>
->>
-> 
-> 
+diff --git a/migration/block.c b/migration/block.c
+index 9171f60..606ad4d 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -161,6 +161,11 @@ int blk_mig_active(void)
+     return !QSIMPLEQ_EMPTY(&block_mig_state.bmds_list);
+ }
+ 
++int blk_mig_bulk_active(void)
++{
++    return blk_mig_active() && !block_mig_state.bulk_completed;
++}
++
+ uint64_t blk_mig_bytes_transferred(void)
+ {
+     BlkMigDevState *bmds;
+diff --git a/migration/ram.c b/migration/ram.c
+index 88ca69e..b83f897 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -46,6 +46,7 @@
+ #include "exec/ram_addr.h"
+ #include "qemu/rcu_queue.h"
+ #include "migration/colo.h"
++#include "migration/block.h"
+ 
+ /***********************************************************/
+ /* ram save/restore */
+@@ -825,7 +826,10 @@ static void migration_bitmap_sync(RAMState *rs)
+             / (end_time - rs->time_last_bitmap_sync);
+         bytes_xfer_now = ram_counters.transferred;
+ 
+-        if (migrate_auto_converge()) {
++        /* During block migration the auto-converge logic incorrectly detects
++         * that ram migration makes no progress. Avoid this by disabling the
++         * throttling logic during the bulk phase of block migration. */
++        if (migrate_auto_converge() && !blk_mig_bulk_active()) {
+             /* The following detection logic can be refined later. For now:
+                Check to see if the dirtied bytes is 50% more than the approx.
+                amount of bytes that just got transferred since the last time we
+-- 
+1.9.1
