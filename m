@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1dwwaL-00060W-0R
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 16:36:06 -0400
+	(envelope-from <eblake@redhat.com>) id 1dwwbh-0006tP-Gr
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 16:37:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1dwwaG-0007d8-W2
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 16:36:05 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:59000
-	helo=v2201612906741603.powersrv.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1dwwaG-0007bV-Q5
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 16:36:00 -0400
-References: <1506049617-25716-1-git-send-email-thuth@redhat.com>
-	<20170926222730-mutt-send-email-mst@kernel.org>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <4b4c8d9e-101b-ee27-b4d2-249890c14d21@weilnetz.de>
-Date: Tue, 26 Sep 2017 22:35:57 +0200
+	(envelope-from <eblake@redhat.com>) id 1dwwbd-0008Ep-Iw
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 16:37:29 -0400
+References: <20170926202512.37670-1-carenas@gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <581bdcc9-6826-3fd9-f531-c37041cf34d1@redhat.com>
+Date: Tue, 26 Sep 2017 15:37:20 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170926222730-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tests/boot-sector: Increase timeout to 600
- seconds
+In-Reply-To: <20170926202512.37670-1-carenas@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="VVhE9VFSVK81iDHQ6KdORkUFwjWqBJ6dN"
+Subject: Re: [Qemu-devel] [PATCH] gitignore: ignore check-qlit test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +23,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Victor Kaplansky <victork@redhat.com>
+To: =?UTF-8?Q?Carlo_Marcelo_Arenas_Bel=c3=b3n?= <carenas@gmail.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, marcandre.lureau@redhat.com
 
-Am 26.09.2017 um 21:30 schrieb Michael S. Tsirkin:
-> On Fri, Sep 22, 2017 at 05:06:57AM +0200, Thomas Huth wrote:
->> If QEMU has been compiled with the flags --enable-tcg-interpreter and
->> --enable-debug, the guest is running incredibly slow. The pxe boot tes=
-t
->> can take up to 400 seconds when testing the pseries ppc64 machine. Whi=
-le
->> we should still look for ways to speed up the test on the pseries mach=
-ine,
->> it's better to increase the timeout in this test to 600 seconds anyway=
- to
->> allow the test to pass successfully now with this unusal configuration
->> already.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VVhE9VFSVK81iDHQ6KdORkUFwjWqBJ6dN
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Carlo_Marcelo_Arenas_Bel=c3=b3n?= <carenas@gmail.com>,
+ qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, marcandre.lureau@redhat.com
+Message-ID: <581bdcc9-6826-3fd9-f531-c37041cf34d1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] gitignore: ignore check-qlit test
+References: <20170926202512.37670-1-carenas@gmail.com>
+In-Reply-To: <20170926202512.37670-1-carenas@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 09/26/2017 03:25 PM, Carlo Marcelo Arenas Bel=C3=B3n wrote:
+
+Worth mentioning in the commit message body that it was introduced in
+commit 382176b4.
+
+> Signed-off-by: Carlo Marcelo Arenas Bel=C3=B3n <carenas@gmail.com>
+> ---
+>  tests/.gitignore | 1 +
+>  1 file changed, 1 insertion(+)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
 >=20
-> Well I do break things sometimes and I won't be happy about
-> spending 10 minutes waiting for a test to fail.
+> diff --git a/tests/.gitignore b/tests/.gitignore
+> index cf6d99c91e..53cb2efaee 100644
+> --- a/tests/.gitignore
+> +++ b/tests/.gitignore
+> @@ -6,6 +6,7 @@ check-qdict
+>  check-qnum
+>  check-qjson
+>  check-qlist
+> +check-qlit
+>  check-qnull
+>  check-qstring
+>  check-qom-interface
 >=20
-> Can we break out of the test if all CPUs are halted with
-> interrupts disabled?
 
-Yes, that sounds like a scenario where no more progress
-can be expected.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Any fixed timeout is either too long (when you expect a failing
-test) or too short (when you need time for the test to pass).
 
-Would it be possible to get some speed factor (like Linux
-bogomips) at the beginning of all tests? Then that factor
-could be used later for all tests which currently use a
-hard timeout.
+--VVhE9VFSVK81iDHQ6KdORkUFwjWqBJ6dN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Regards
-Stefan
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnKuoAACgkQp6FrSiUn
+Q2rhggf9E0EZDseAZbl3AC/aP/AMMNvnotG/t7QNPpzCDzpCGOtGj68ZAOSx9NOM
+c7nSX0JctWZcIegKLjW2KNYSD4KUB+Z16ehLTFcl2j4G14nH6LiPtGimJtl6JVzb
+rBiWn5q7hAv9AzjPlcxHhb2FTpG4lKKq6W8BqXCTlE78d0iwWR/ZpIi6YINEUqhm
+zilbxWh1Oc5wDXP5XgPaSY4Y10opXY4pJBxC3oBPVH8VrQNYgMDencpfxPF7/cb9
+QBXIj3WO5EU4mMpzbxYLasa7iHkVs+LG1tEW6NAznwlA+XSLvmpYSWYd/gdFKbB1
+duJV5fmsDTQyNcWCNDkglCt4t+wY6w==
+=uFUY
+-----END PGP SIGNATURE-----
+
+--VVhE9VFSVK81iDHQ6KdORkUFwjWqBJ6dN--
