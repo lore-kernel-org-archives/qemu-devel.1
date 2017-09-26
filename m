@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dwyPq-0003Dj-JG
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 18:33:23 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dwywe-0007ih-8k
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 19:07:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dwyPl-0002uG-NQ
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 18:33:22 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:56328)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dwyPl-0002tb-GQ
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 18:33:17 -0400
-Received: by mail-wr0-x230.google.com with SMTP id r74so14360836wrb.13
-	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 15:33:17 -0700 (PDT)
-References: <20170916023417.14599-1-richard.henderson@linaro.org>
-	<20170916023417.14599-4-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170916023417.14599-4-richard.henderson@linaro.org>
-Date: Tue, 26 Sep 2017 23:33:15 +0100
-Message-ID: <87poadccpg.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/6] target/arm: Align vector registers
+	(envelope-from <ehabkost@redhat.com>) id 1dwywb-0005Df-32
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 19:07:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34010)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dwywa-0005Cc-T7
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 19:07:13 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3D63281DEA
+	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 23:07:11 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Tue, 26 Sep 2017 20:07:03 -0300
+Message-Id: <20170926230709.22958-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [RFC 0/6] device-crash-test: device_add test mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, f4bug@amsat.org
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
+This series implements device_add testing on device-crash-test.
+The new test mode will be enabled by default in addition to the
+old test cases, but if only device_add testing is wanted, it can
+be specified using the '-t' command-line option, e.g.:
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+  $ ./scripts/device-crash-test -t method=device_add
 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+In comparison to the "-device" test cases, a full test run runs
+reasonably quickly (17 seconds on my machine for testing all
+hotpluggable devices on all 72 machine-types in
+qemu-system-x86_64).  I believe it is a good candidate to be
+eventually included on "make check".
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+TODO:
+* Fix the QEMU crash found using '-t plug_all=1'
+  (see patch 5/5 for details)
+* Test non-x86 architectures
+* Compare results with Thomas' HMP unit test
+  ("tests: Add a device_add/del HMP test" patch").
 
-> ---
->  target/arm/cpu.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 98b9b26fd3..c346bd148f 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -486,7 +486,7 @@ typedef struct CPUARMState {
->           * the two execution states, and means we do not need to explicitly
->           * map these registers when changing states.
->           */
-> -        float64 regs[64];
-> +        float64 regs[64] QEMU_ALIGNED(16);
->
->          uint32_t xregs[16];
->          /* We store these fpcsr fields separately for convenience.  */
+Based-on: 20170926220319.12889-1-ehabkost@redhat.com
+(Subject: [PATCH 0/4] qmp: query-device-type command)
 
+Eduardo Habkost (6):
+  device-crash-test: Make whitelist code a bit more flexible
+  device-crash-test: Log detailed info on success too
+  device-crash-test: Allow checkOneCase() to report multiple results
+  device-crash-test: Exit immediately on fatal failures on quick mode
+  device-crash-test: Basic device_add support
+  device-crash-test: Multi-device device_add test
 
---
-Alex Bennée
+ scripts/device-crash-test | 132 +++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 94 insertions(+), 38 deletions(-)
+
+-- 
+2.13.5
