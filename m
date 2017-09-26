@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dwqkQ-0001Qg-Am
+	(envelope-from <kwolf@redhat.com>) id 1dwqkS-0001SC-An
 	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dwqkK-0005Kk-OX
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:06 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dwqkO-0005Mx-Ga
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:08 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 26 Sep 2017 16:21:12 +0200
-Message-Id: <20170926142133.2498-4-kwolf@redhat.com>
+Date: Tue, 26 Sep 2017 16:21:19 +0200
+Message-Id: <20170926142133.2498-11-kwolf@redhat.com>
 In-Reply-To: <20170926142133.2498-1-kwolf@redhat.com>
 References: <20170926142133.2498-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 03/24] file-posix: Clear out first sector in
- hdev_create
+Subject: [Qemu-devel] [PULL 10/24] block/throttle-groups.c: allocate
+ RestartData on the heap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +23,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Fam Zheng <famz@redhat.com>
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
 
-People get surprised when, after "qemu-img create -f raw /dev/sdX", they
-still see qcow2 with "qemu-img info", if previously the bdev had a qcow2
-header. While this is natural because raw doesn't need to write any
-magic bytes during creation, hdev_create is free to clear out the first
-sector to make sure the stale qcow2 header doesn't cause such confusion.
+RestartData is the opaque data of the throttle_group_restart_queue_entry
+coroutine. By being stack allocated, it isn't available anymore if
+aio_co_enter schedules the coroutine with a bottom half and runs after
+throttle_group_restart_queue returns.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/file-posix.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ block/throttle-groups.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index ab12a2b591..36ee89e940 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -2730,6 +2730,16 @@ static int hdev_create(const char *filename, QemuOpts *opts,
-         ret = -ENOSPC;
+diff --git a/block/throttle-groups.c b/block/throttle-groups.c
+index 6ba992c8d7..b291a88481 100644
+--- a/block/throttle-groups.c
++++ b/block/throttle-groups.c
+@@ -403,17 +403,19 @@ static void coroutine_fn throttle_group_restart_queue_entry(void *opaque)
+         schedule_next_request(tgm, is_write);
+         qemu_mutex_unlock(&tg->lock);
      }
- 
-+    if (!ret && total_size) {
-+        uint8_t buf[BDRV_SECTOR_SIZE] = { 0 };
-+        int64_t zero_size = MIN(BDRV_SECTOR_SIZE, total_size);
-+        if (lseek(fd, 0, SEEK_SET) == -1) {
-+            ret = -errno;
-+        } else {
-+            ret = qemu_write_full(fd, buf, zero_size);
-+            ret = ret == zero_size ? 0 : -errno;
-+        }
-+    }
-     qemu_close(fd);
-     return ret;
++
++    g_free(data);
  }
+ 
+ static void throttle_group_restart_queue(ThrottleGroupMember *tgm, bool is_write)
+ {
+     Coroutine *co;
+-    RestartData rd = {
+-        .tgm = tgm,
+-        .is_write = is_write
+-    };
++    RestartData *rd = g_new0(RestartData, 1);
++
++    rd->tgm = tgm;
++    rd->is_write = is_write;
+ 
+-    co = qemu_coroutine_create(throttle_group_restart_queue_entry, &rd);
++    co = qemu_coroutine_create(throttle_group_restart_queue_entry, rd);
+     aio_co_enter(tgm->aio_context, co);
+ }
+ 
 -- 
 2.13.5
