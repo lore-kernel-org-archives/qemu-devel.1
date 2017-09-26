@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dwufq-0004Uf-7c
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 14:33:38 -0400
+	(envelope-from <david@redhat.com>) id 1dwufs-0004Wm-BN
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 14:33:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dwufp-0003V0-Fv
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 14:33:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42424)
+	(envelope-from <david@redhat.com>) id 1dwufr-0003Vj-Je
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 14:33:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53750)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dwufp-0003Ul-AO
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 14:33:37 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dwufr-0003VH-E1
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 14:33:39 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Tue, 26 Sep 2017 20:33:17 +0200
-Message-Id: <20170926183318.12995-6-david@redhat.com>
+Date: Tue, 26 Sep 2017 20:33:18 +0200
+Message-Id: <20170926183318.12995-7-david@redhat.com>
 In-Reply-To: <20170926183318.12995-1-david@redhat.com>
 References: <20170926183318.12995-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 5/6] s390x/tcg: make testblock use the new
+Subject: [Qemu-devel] [PATCH v1 6/6] s390x/tcg: make idte/ipte use the new
  _real mmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,44 +27,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: thuth@redhat.com, cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-Low address protection checks will be moved into the mmu later.
+We don't wrap addresses in the mmu for the _real case, therefore the
+behavior should be unchanged.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/mem_helper.c | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
+ target/s390x/mem_helper.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 34ffc282bf..4cf4f29171 100644
+index 4cf4f29171..010f509ac5 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -1702,17 +1702,9 @@ uint32_t HELPER(testblock)(CPUS390XState *env, uint64_t real_addr)
+@@ -1889,11 +1889,11 @@ void HELPER(idte)(CPUS390XState *env, uint64_t r1, uint64_t r2, uint32_t m4)
+         for (i = 0; i < entries; i++) {
+             /* addresses are not wrapped in 24/31bit mode but table index is */
+             raddr = table + ((index + i) & 0x7ff) * sizeof(entry);
+-            entry = ldq_phys(cs->as, raddr);
++            entry = cpu_ldq_real_ra(env, raddr, ra);
+             if (!(entry & _REGION_ENTRY_INV)) {
+                 /* we are allowed to not store if already invalid */
+                 entry |= _REGION_ENTRY_INV;
+-                stq_phys(cs->as, raddr, entry);
++                cpu_stq_real_ra(env, raddr, entry, ra);
+             }
+         }
+     }
+@@ -1911,6 +1911,7 @@ void HELPER(ipte)(CPUS390XState *env, uint64_t pto, uint64_t vaddr,
+                   uint32_t m4)
  {
-     uintptr_t ra = GETPC();
      CPUState *cs = CPU(s390_env_get_cpu(env));
--    uint64_t abs_addr;
-     int i;
++    const uintptr_t ra = GETPC();
+     uint64_t page = vaddr & TARGET_PAGE_MASK;
+     uint64_t pte_addr, pte;
  
--    real_addr = wrap_address(env, real_addr);
--    abs_addr = mmu_real2abs(env, real_addr) & TARGET_PAGE_MASK;
--    if (!address_space_access_valid(&address_space_memory, abs_addr,
--                                    TARGET_PAGE_SIZE, true)) {
--        cpu_restore_state(cs, ra);
--        program_interrupt(env, PGM_ADDRESSING, 4);
--        return 1;
--    }
-+    real_addr = wrap_address(env, real_addr) & TARGET_PAGE_MASK;
+@@ -1919,9 +1920,9 @@ void HELPER(ipte)(CPUS390XState *env, uint64_t pto, uint64_t vaddr,
+     pte_addr += (vaddr & VADDR_PX) >> 9;
  
-     /* Check low-address protection */
-     if ((env->cregs[0] & CR0_LOWPROT) && real_addr < 0x2000) {
-@@ -1722,7 +1714,7 @@ uint32_t HELPER(testblock)(CPUS390XState *env, uint64_t real_addr)
-     }
+     /* Mark the page table entry as invalid */
+-    pte = ldq_phys(cs->as, pte_addr);
++    pte = cpu_ldq_real_ra(env, pte_addr, ra);
+     pte |= _PAGE_INVALID;
+-    stq_phys(cs->as, pte_addr, pte);
++    cpu_stq_real_ra(env, pte_addr, pte, ra);
  
-     for (i = 0; i < TARGET_PAGE_SIZE; i += 8) {
--        stq_phys(cs->as, abs_addr + i, 0);
-+        cpu_stq_real_ra(env, real_addr + i, 0, ra);
-     }
- 
-     return 0;
+     /* XXX we exploit the fact that Linux passes the exact virtual
+        address here - it's not obliged to! */
 -- 
 2.13.5
