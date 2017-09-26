@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dwlFR-0005zc-Gc
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 04:29:47 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dwlSy-0008MB-Lc
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 04:43:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dwlFN-0004k9-Eu
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 04:29:45 -0400
-Date: Tue, 26 Sep 2017 10:29:36 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170926102936.1a099080@nial.brq.redhat.com>
-In-Reply-To: <20170926091928.50e115ff@bahia.lan>
-References: <150633285374.14880.11614678065344980502.stgit@bahia.lan>
-	<20170926025739.GF12504@umbus> <20170926091928.50e115ff@bahia.lan>
+	(envelope-from <stefanha@gmail.com>) id 1dwlSv-0002Rh-9m
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 04:43:44 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:38648)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dwlSu-0002RF-VC
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 04:43:41 -0400
+Received: by mail-wm0-x242.google.com with SMTP id x17so8728806wmd.5
+	for <qemu-devel@nongnu.org>; Tue, 26 Sep 2017 01:43:40 -0700 (PDT)
+Date: Tue, 26 Sep 2017 09:43:37 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170926084337.GB16834@stefanha-x1.localdomain>
+References: <20170926054439.GB25267@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] spapr: move registration of "host" CPU
- core type to machine code
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170926054439.GB25267@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] A glib warning encountered with internal iothread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,181 +28,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tue, 26 Sep 2017 09:19:28 +0200
-Greg Kurz <groug@kaod.org> wrote:
-
-> On Tue, 26 Sep 2017 12:57:39 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
+On Tue, Sep 26, 2017 at 01:44:39PM +0800, Peter Xu wrote:
+> Hi,
 > 
-> > On Mon, Sep 25, 2017 at 11:47:33AM +0200, Greg Kurz wrote:  
-> > > The CPU core abstraction belongs to the machine code. This also gets
-> > > rid of some code duplication.
-> > > 
-> > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > ---
-> > > 
-> > > hw/ppc/spapr_cpu_core.h is also included elsewhere in target/ppc/kvm.c
-> > > but this is already handled by the following cleanup patch:    
-> > 
-> > I don't really see what the advantage of this is.  As others have
-> > pointed out it leads to the host type being registered very late,
-> > which could cause problems.
-> >   
+> Generally speaking this is a question about glib, but I would like to
+> see how the list sees this before throwing this question to glib
+> community in case I made severe mistake.
 > 
-> Well, the goal was to consolidate the code to register sPAPRCPUCore types in
-> the spapr code, instead of open-coding it in spapr_cpu_core.c and kvm.c... 
+> I encountered one glib warning when start to use internal iothread:
 > 
-> But now I realize that delaying the registration even more is a bad idea. And,
-> the other way round, registering a static type earlier as asked by Igor would
-> require all parent types to be already registered, which seems to be impossible
-> to guarantee with the current code.
-so I'll leave this code as is for now as as it's a bit of topic
-wrt my work on cpu_model removal (or I'll try not to touch it until I have to)
-
-> Maybe we could at least have kvm_ppc_register_host_cpu_type() to call a
-> function in spapr_cpu_core.c instead of duplicating the registration code ?
-Is it possible for other boards (non core based) to use host CPU?
-
-but for simplicity sake I'd lave it where it's now.
-
-BTW I have an additional question:
-what PPC boards are supposed to support KVM/host cpu?
-
-(especially taking in account that aliases get patched to it as well,
-which I very much dislike since user asked for one CPU but got another
-and when the same happens on another host migration probably would be
-screwed up)
-
-> > > 
-> > > https://patchwork.ozlabs.org/patch/817598/
-> > > ---
-> > >  hw/ppc/spapr.c                  |    4 ++++
-> > >  hw/ppc/spapr_cpu_core.c         |   34 ++++++++++++++++++++++------------
-> > >  include/hw/ppc/spapr_cpu_core.h |    2 +-
-> > >  target/ppc/kvm.c                |   12 ------------
-> > >  4 files changed, 27 insertions(+), 25 deletions(-)
-> > > 
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index 0ce3ec87ac59..e82c8532ffb0 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -2349,6 +2349,10 @@ static void ppc_spapr_init(MachineState *machine)
-> > >      }
-> > >  
-> > >      /* init CPUs */
-> > > +    if (kvm_enabled()) {
-> > > +        spapr_cpu_core_register_host_type();
-> > > +    }
-> > > +
-> > >      if (machine->cpu_model == NULL) {
-> > >          machine->cpu_model = kvm_enabled() ? "host" : smc->tcg_default_cpu;
-> > >      }
-> > > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> > > index c08ee7571a50..6e224ba029ec 100644
-> > > --- a/hw/ppc/spapr_cpu_core.c
-> > > +++ b/hw/ppc/spapr_cpu_core.c
-> > > @@ -317,7 +317,7 @@ static Property spapr_cpu_core_properties[] = {
-> > >      DEFINE_PROP_END_OF_LIST()
-> > >  };
-> > >  
-> > > -void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
-> > > +static void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
-> > >  {
-> > >      DeviceClass *dc = DEVICE_CLASS(oc);
-> > >      sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_CLASS(oc);
-> > > @@ -337,6 +337,20 @@ static const TypeInfo spapr_cpu_core_type_info = {
-> > >      .class_size = sizeof(sPAPRCPUCoreClass),
-> > >  };
-> > >  
-> > > +static void spapr_cpu_core_register_type(const char *model_name)
-> > > +{
-> > > +    TypeInfo type_info = {
-> > > +        .parent = TYPE_SPAPR_CPU_CORE,
-> > > +        .instance_size = sizeof(sPAPRCPUCore),
-> > > +        .class_init = spapr_cpu_core_class_init,
-> > > +        .class_data = (void *) model_name,
-> > > +    };
-> > > +
-> > > +    type_info.name = g_strdup_printf("%s-"TYPE_SPAPR_CPU_CORE, model_name);
-> > > +    type_register(&type_info);
-> > > +    g_free((void *)type_info.name);
-> > > +}
-> > > +
-> > >  static void spapr_cpu_core_register_types(void)
-> > >  {
-> > >      int i;
-> > > @@ -344,18 +358,14 @@ static void spapr_cpu_core_register_types(void)
-> > >      type_register_static(&spapr_cpu_core_type_info);
-> > >  
-> > >      for (i = 0; i < ARRAY_SIZE(spapr_core_models); i++) {
-> > > -        TypeInfo type_info = {
-> > > -            .parent = TYPE_SPAPR_CPU_CORE,
-> > > -            .instance_size = sizeof(sPAPRCPUCore),
-> > > -            .class_init = spapr_cpu_core_class_init,
-> > > -            .class_data = (void *) spapr_core_models[i],
-> > > -        };
-> > > -
-> > > -        type_info.name = g_strdup_printf("%s-" TYPE_SPAPR_CPU_CORE,
-> > > -                                         spapr_core_models[i]);
-> > > -        type_register(&type_info);
-> > > -        g_free((void *)type_info.name);
-> > > +        spapr_cpu_core_register_type(spapr_core_models[i]);
-> > >      }
-> > > +
-> > > +}
-> > > +
-> > > +void spapr_cpu_core_register_host_type(void)
-> > > +{
-> > > +    spapr_cpu_core_register_type("host");
-> > >  }
-> > >  
-> > >  type_init(spapr_cpu_core_register_types)
-> > > diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
-> > > index 93051e9ecf56..e3e906343048 100644
-> > > --- a/include/hw/ppc/spapr_cpu_core.h
-> > > +++ b/include/hw/ppc/spapr_cpu_core.h
-> > > @@ -36,5 +36,5 @@ typedef struct sPAPRCPUCoreClass {
-> > >  } sPAPRCPUCoreClass;
-> > >  
-> > >  char *spapr_get_cpu_core_type(const char *model);
-> > > -void spapr_cpu_core_class_init(ObjectClass *oc, void *data);
-> > > +void spapr_cpu_core_register_host_type(void);
-> > >  #endif
-> > > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> > > index 5b281b2f1b6d..8dd80993ec9e 100644
-> > > --- a/target/ppc/kvm.c
-> > > +++ b/target/ppc/kvm.c
-> > > @@ -37,7 +37,6 @@
-> > >  #include "hw/sysbus.h"
-> > >  #include "hw/ppc/spapr.h"
-> > >  #include "hw/ppc/spapr_vio.h"
-> > > -#include "hw/ppc/spapr_cpu_core.h"
-> > >  #include "hw/ppc/ppc.h"
-> > >  #include "sysemu/watchdog.h"
-> > >  #include "trace.h"
-> > > @@ -2502,17 +2501,6 @@ static int kvm_ppc_register_host_cpu_type(void)
-> > >      oc = object_class_by_name(type_info.name);
-> > >      g_assert(oc);
-> > >  
-> > > -#if defined(TARGET_PPC64)
-> > > -    type_info.name = g_strdup_printf("%s-"TYPE_SPAPR_CPU_CORE, "host");
-> > > -    type_info.parent = TYPE_SPAPR_CPU_CORE,
-> > > -    type_info.instance_size = sizeof(sPAPRCPUCore);
-> > > -    type_info.instance_init = NULL;
-> > > -    type_info.class_init = spapr_cpu_core_class_init;
-> > > -    type_info.class_data = (void *) "host";
-> > > -    type_register(&type_info);
-> > > -    g_free((void *)type_info.name);
-> > > -#endif
-> > > -
-> > >      /*
-> > >       * Update generic CPU family class alias (e.g. on a POWER8NVL host,
-> > >       * we want "POWER8" to be a "family" alias that points to the current
-> > >     
-> >   
+> (qemu-system-x86_64:19925): GLib-CRITICAL **: g_source_remove_poll: assertion '!SOURCE_DESTROYED (source)' failed
 > 
+> This will be triggered as long as we create one private iothread and
+> enables gcontext of it (by calling iothread_get_g_main_context() at
+> least once on the private iothread).
 > 
+> The warning is generated when quitting QEMU in following path (please
+> ignore unknown function names, they only appear in a private tree, but
+> the logic is the same):
 > 
+> #0  0x00007ff0c2bb4180 in g_source_remove_poll () at /lib64/libglib-2.0.so.0
+> #1  0x00005634b0fe8bc9 in aio_set_fd_handler (ctx=0x5634b365ca90, fd=22, is_external=false, io_read=0x0, io_write=0x0, io_poll=0x0, opaque=0x5634b365cb3c) at /root/git/qemu/util/aio-posix.c:226
+> #2  0x00005634b0fe8ebc in aio_set_event_notifier (ctx=0x5634b365ca90, notifier=0x5634b365cb3c, is_external=false, io_read=0x0, io_poll=0x0) at /root/git/qemu/util/aio-posix.c:299
+> #3  0x00005634b0fe5174 in aio_ctx_finalize (source=0x5634b365ca90) at /root/git/qemu/util/async.c:296
+> #4  0x00007ff0c2bb39a6 in g_source_unref_internal () at /lib64/libglib-2.0.so.0
+> #5  0x00005634b0fe5757 in aio_context_unref (ctx=0x5634b365ca90) at /root/git/qemu/util/async.c:484
+> #6  0x00005634b0c39642 in iothread_instance_finalize (obj=0x5634b36cfa40) at /root/git/qemu/iothread.c:127
+> #7  0x00005634b0ede36e in object_deinit (obj=0x5634b36cfa40, type=0x5634b3543c60) at /root/git/qemu/qom/object.c:453
+> #8  0x00005634b0ede3e0 in object_finalize (data=0x5634b36cfa40) at /root/git/qemu/qom/object.c:467
+> #9  0x00005634b0edf361 in object_unref (obj=0x5634b36cfa40) at /root/git/qemu/qom/object.c:902
+> #10 0x00005634b0ee0607 in object_finalize_child_property (obj=0x5634b369d3b0, name=0x5634b36eb900 "monitor_io_thr", opaque=0x5634b36cfa40) at /root/git/qemu/qom/object.c:1407
+> #11 0x00005634b0ede25d in object_property_del_child (obj=0x5634b369d3b0, child=0x5634b36cfa40, errp=0x0) at /root/git/qemu/qom/object.c:427
+> #12 0x00005634b0ede33d in object_unparent (obj=0x5634b36cfa40) at /root/git/qemu/qom/object.c:446
+> #13 0x00005634b0c39f44 in iothread_destroy (iothread=0x5634b36cfa40) at /root/git/qemu/iothread.c:383
+> #14 0x00005634b0ae920f in monitor_io_thread_destroy () at /root/git/qemu/monitor.c:4416
+> #15 0x00005634b0ae9302 in monitor_cleanup () at /root/git/qemu/monitor.c:4439
+> #16 0x00005634b0c496cb in main (argc=17, argv=0x7ffcc5b88918, envp=0x7ffcc5b889a8) at /root/git/qemu/vl.c:4889
+> 
+> It's on the path during destruction of AioContext, where we called
+> g_source_remove_poll() in the destructor.  When reach here, AioContext
+> has been detached from the gcontext already, so the assertion is
+> triggered.
+> 
+> I'll copy some code for easier reference from glib:
+> 
+> void
+> g_source_remove_poll (GSource *source,
+> 		      GPollFD *fd)
+> {
+>   GMainContext *context;
+>   
+>   g_return_if_fail (source != NULL);
+>   g_return_if_fail (fd != NULL);
+>   g_return_if_fail (!SOURCE_DESTROYED (source)); <---- this assertion fails
+>   
+>   context = source->context;
+> 
+>   if (context)
+>     LOCK_CONTEXT (context);
+>   
+>   source->poll_fds = g_slist_remove (source->poll_fds, fd);
+> 
+>   if (context)
+>     {
+>       if (!SOURCE_BLOCKED (source))
+> 	g_main_context_remove_poll_unlocked (context, fd);
+>       UNLOCK_CONTEXT (context);
+>     }
+> }
+> 
+> I'm translating this assertion failure into: "when removing one
+> GSource from the polled GSource array, the GSource should still be
+> attached to its GMainContext".  But does this really matter?  Why
+> can't we remove one GSource from the poll array even if the source is
+> detached already?  After all if we see following code in
+> g_source_remove_poll() we have already taken special care when
+> source->context == NULL happens.
+> 
+> Any thoughts?  TIA.
+
+It seems glib chose this cleanup order:
+GPollFD < GSource < GMainLoop < GMainContext
+
+Even if glib could be modified to allow what you want, QEMU needs to
+work with old glib versions.
+
+I suggest modifying iothread.c to implement glib's required cleanup
+order in the finalize function:
+
+aio_context_unref();  <-- the GSource
+g_main_loop_unref();
+g_main_context_unref();
+
+Stefan
