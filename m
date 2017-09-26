@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dwqkh-0001ic-Ir
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:29 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dwqki-0001ju-PR
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dwqkg-0005ae-62
-	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:23 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dwqkc-0005Yj-Ow
+	for qemu-devel@nongnu.org; Tue, 26 Sep 2017 10:22:24 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 26 Sep 2017 16:21:24 +0200
-Message-Id: <20170926142133.2498-16-kwolf@redhat.com>
+Date: Tue, 26 Sep 2017 16:21:20 +0200
+Message-Id: <20170926142133.2498-12-kwolf@redhat.com>
 In-Reply-To: <20170926142133.2498-1-kwolf@redhat.com>
 References: <20170926142133.2498-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 15/24] block: Base permissions on rw state after
- reopen
+Subject: [Qemu-devel] [PULL 11/24] block: Clean up some bad code in the
+ vvfat driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,128 +23,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-When new permissions are calculated during bdrv_reopen(), they need to
-be based on the state of the graph as it will be after the reopen has
-completed, not on the current state of the involved nodes.
+From: Thomas Huth <thuth@redhat.com>
 
-This patch makes bdrv_is_writable() optionally accept a BlockReopenQueue
-from which the new flags are taken. This is then used for determining
-the new bs->file permissions of format drivers as soon as we add the
-code to actually pass a non-NULL reopen queue to the .bdrv_child_perm
-callbacks.
+Remove the unnecessary home-grown redefinition of the assert() macro here,
+and remove the unusable debug code at the end of the checkpoint() function.
+The code there uses assert() with side-effects (assignment to the "mapping"
+variable), which should be avoided. Looking more closely, it seems as it is
+apparently also only usable for one certain directory layout (with a file
+named USB.H in it) and thus is of no use for the rest of the world.
 
-While moving bdrv_is_writable(), make it static. It isn't used outside
-block.c.
-
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/block.h |  1 -
- block.c               | 52 ++++++++++++++++++++++++++++++++++++---------------
- 2 files changed, 37 insertions(+), 16 deletions(-)
+ block/vvfat.c | 26 ++------------------------
+ 1 file changed, 2 insertions(+), 24 deletions(-)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 2ad18775af..082eb2cd9c 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -435,7 +435,6 @@ int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
-                             int64_t offset, int64_t bytes, int64_t *pnum);
+diff --git a/block/vvfat.c b/block/vvfat.c
+index cbabb36f62..1d6e7087a8 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -57,15 +57,6 @@
  
- bool bdrv_is_read_only(BlockDriverState *bs);
--bool bdrv_is_writable(BlockDriverState *bs);
- int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only,
-                            bool ignore_allow_rdw, Error **errp);
- int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
-diff --git a/block.c b/block.c
-index 0b499fda4c..ed8d51dd42 100644
---- a/block.c
-+++ b/block.c
-@@ -239,12 +239,6 @@ bool bdrv_is_read_only(BlockDriverState *bs)
-     return bs->read_only;
- }
+ static void checkpoint(void);
  
--/* Returns whether the image file can be written to right now */
--bool bdrv_is_writable(BlockDriverState *bs)
--{
--    return !bdrv_is_read_only(bs) && !(bs->open_flags & BDRV_O_INACTIVE);
+-#ifdef __MINGW32__
+-void nonono(const char* file, int line, const char* msg) {
+-    fprintf(stderr, "Nonono! %s:%d %s\n", file, line, msg);
+-    exit(-5);
 -}
+-#undef assert
+-#define assert(a) do {if (!(a)) nonono(__FILE__, __LINE__, #a);}while(0)
+-#endif
 -
- int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only,
-                            bool ignore_allow_rdw, Error **errp)
- {
-@@ -1537,6 +1531,41 @@ static int bdrv_child_check_perm(BdrvChild *c, BlockReopenQueue *q,
- static void bdrv_child_abort_perm_update(BdrvChild *c);
- static void bdrv_child_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared);
+ #else
  
-+typedef struct BlockReopenQueueEntry {
-+     bool prepared;
-+     BDRVReopenState state;
-+     QSIMPLEQ_ENTRY(BlockReopenQueueEntry) entry;
-+} BlockReopenQueueEntry;
-+
-+/*
-+ * Return the flags that @bs will have after the reopens in @q have
-+ * successfully completed. If @q is NULL (or @bs is not contained in @q),
-+ * return the current flags.
-+ */
-+static int bdrv_reopen_get_flags(BlockReopenQueue *q, BlockDriverState *bs)
+ #define DLOG(a)
+@@ -3270,24 +3261,11 @@ static void bdrv_vvfat_init(void)
+ block_init(bdrv_vvfat_init);
+ 
+ #ifdef DEBUG
+-static void checkpoint(void) {
++static void checkpoint(void)
 +{
-+    BlockReopenQueueEntry *entry;
-+
-+    if (q != NULL) {
-+        QSIMPLEQ_FOREACH(entry, q, entry) {
-+            if (entry->state.bs == bs) {
-+                return entry->state.flags;
-+            }
-+        }
-+    }
-+
-+    return bs->open_flags;
-+}
-+
-+/* Returns whether the image file can be written to after the reopen queue @q
-+ * has been successfully applied, or right now if @q is NULL. */
-+static bool bdrv_is_writable(BlockDriverState *bs, BlockReopenQueue *q)
-+{
-+    int flags = bdrv_reopen_get_flags(q, bs);
-+
-+    return (flags & (BDRV_O_RDWR | BDRV_O_INACTIVE)) == BDRV_O_RDWR;
-+}
-+
- static void bdrv_child_perm(BlockDriverState *bs, BlockDriverState *child_bs,
-                             BdrvChild *c, const BdrvChildRole *role,
-                             BlockReopenQueue *reopen_queue,
-@@ -1574,7 +1603,7 @@ static int bdrv_check_perm(BlockDriverState *bs, BlockReopenQueue *q,
- 
-     /* Write permissions never work with read-only images */
-     if ((cumulative_perms & (BLK_PERM_WRITE | BLK_PERM_WRITE_UNCHANGED)) &&
--        !bdrv_is_writable(bs))
-+        !bdrv_is_writable(bs, q))
-     {
-         error_setg(errp, "Block node is read-only");
-         return -EPERM;
-@@ -1864,8 +1893,7 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
-                                   &perm, &shared);
- 
-         /* Format drivers may touch metadata even if the guest doesn't write */
--        /* TODO Take flags from reopen_queue */
--        if (bdrv_is_writable(bs)) {
-+        if (bdrv_is_writable(bs, reopen_queue)) {
-             perm |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
-         }
- 
-@@ -2642,12 +2670,6 @@ BlockDriverState *bdrv_open(const char *filename, const char *reference,
-                              NULL, errp);
+     assert(((mapping_t*)array_get(&(vvv->mapping), 0))->end == 2);
+     check1(vvv);
+     check2(vvv);
+     assert(!vvv->current_mapping || vvv->current_fd || (vvv->current_mapping->mode & MODE_DIRECTORY));
+-#if 0
+-    if (((direntry_t*)vvv->directory.pointer)[1].attributes != 0xf)
+-        fprintf(stderr, "Nonono!\n");
+-    mapping_t* mapping;
+-    direntry_t* direntry;
+-    assert(vvv->mapping.size >= vvv->mapping.item_size * vvv->mapping.next);
+-    assert(vvv->directory.size >= vvv->directory.item_size * vvv->directory.next);
+-    if (vvv->mapping.next<47)
+-        return;
+-    assert((mapping = array_get(&(vvv->mapping), 47)));
+-    assert(mapping->dir_index < vvv->directory.next);
+-    direntry = array_get(&(vvv->directory), mapping->dir_index);
+-    assert(!memcmp(direntry->name, "USB     H  ", 11) || direntry->name[0]==0);
+-#endif
  }
- 
--typedef struct BlockReopenQueueEntry {
--     bool prepared;
--     BDRVReopenState state;
--     QSIMPLEQ_ENTRY(BlockReopenQueueEntry) entry;
--} BlockReopenQueueEntry;
--
- /*
-  * Adds a BlockDriverState to a simple queue for an atomic, transactional
-  * reopen of multiple devices.
+ #endif
 -- 
 2.13.5
