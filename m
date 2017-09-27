@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <intermediadc@hotmail.com>) id 1dxBLY-0002Ym-Fj
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:21:49 -0400
+	(envelope-from <david@redhat.com>) id 1dxBLf-0002eR-5I
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:21:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <intermediadc@hotmail.com>) id 1dxBLV-0003tt-8p
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:21:48 -0400
-From: luigi burdo <intermediadc@hotmail.com>
-Date: Wed, 27 Sep 2017 12:21:30 +0000
-Message-ID: <AM5P194MB013209976BC625983F3265D3C8780@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
-References: <AM5P194MB0132C46F9FCCF1DCF2FFC7D0C87A0@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>,
-	<1506512087.25036.10.camel@redhat.com>
-In-Reply-To: <1506512087.25036.10.camel@redhat.com>
-Content-Language: it-IT
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <david@redhat.com>) id 1dxBLZ-0003v6-8x
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:21:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41098)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dxBLZ-0003uj-2g
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:21:49 -0400
+References: <20170926162058.30772-1-cohuck@redhat.com>
+	<20170926162058.30772-2-cohuck@redhat.com>
+	<338c8565-691e-a8bc-d8a6-3637ce13701d@redhat.com>
+	<20170927114717.72bd69f8.cohuck@redhat.com>
+	<e8bef299-5501-a59d-aba3-5a338227966e@linux.vnet.ibm.com>
+	<20170927125606.65dc514d.cohuck@redhat.com>
+	<14df9ad6-f0e9-cd51-04dd-4fe994808433@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <4681e677-9e5a-4c1c-8e22-dc5c51b7286d@redhat.com>
+Date: Wed, 27 Sep 2017 14:21:45 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] ppce500 usb-ehci-pci issue on last uboot
+In-Reply-To: <14df9ad6-f0e9-cd51-04dd-4fe994808433@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/1] s390x: create a compat s390 phb for
+ <=2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +34,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, agraf@suse.de, pasic@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, dgilbert@redhat.com
 
-hi Gerd,
-yes the host is a big endian but i can test it on an little endian host too=
- and report.
-About xhci or ohci the uboot dont recognize it . ehci-pci are the only usb =
-pci board from where uboot on ppce500 vm  can make the load from device or =
-use directly the device attached on  it if cmd reset work for initislize th=
-e board.
+On 27.09.2017 12:59, Christian Borntraeger wrote:
+>=20
+>=20
+> On 09/27/2017 12:56 PM, Cornelia Huck wrote:
+>> On Wed, 27 Sep 2017 18:25:00 +0800
+>> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
+>>
+>>> =E5=9C=A8 2017/9/27 =E4=B8=8B=E5=8D=885:47, Cornelia Huck =E5=86=99=E9=
+=81=93:
+>>>> On Tue, 26 Sep 2017 20:40:25 +0200
+>>>> David Hildenbrand <david@redhat.com> wrote:
+>>
+>>>>> I'd really really really (did I mention really?) favor something li=
+ke a
+>>>>> dummy device, because we could easily handle the !CONFIG_PCI case t=
+hen.
+>>>>>
+>>>>> All these compat options and conditions will kill us someday... we'=
+re
+>>>>> already patching around that whole stuff way too much.
+>>>>>
+>>>>> If we ever unconditionally created a device, we should keep doing s=
+o. =20
+>>>> Yes, that whole thing is horrible, especially interaction with compa=
+t
+>>>> machines.
+>>>>
+>>>> Do you have an idea on how to create such a dummy device (without
+>>>> having to effectively copy a lot of configured-out code)?
+>>>>
+>>>> =20
+>>> How about in s390_pcihost_hot_plug() we check s390_has_feat(zpci)?
+>>> If no zpci feature, we avoid plugging any pci device.
+>>> Then we could always create phb.
+>>> I think pcibus's vmstate is only data to migrate.
+>>
+>> That's still problematic if CONFIG_PCI is off. I currently don't have =
+a
+>> better idea than either disallowing compat machines on builds without
+>> pci, or using a dummy device...
+>=20
+> For this particular case your initial patch might be less problematic t=
+han
+> a dummy device, because the code that does the migration is NOT contain=
+ed
+> in s390 specific code but in common PCI code instead. We would need to =
+keep
+> the dummy device always in a way that it will work with the common PCI
+> code.
+>=20
 
-regards
-luigi
+Interesting, so how is migration then handled for e.g. x86 or other
+architectures that can work without CONFIG_PCI? I assume their migration
+should also break?
 
-Inviato da iPad
+--=20
 
-> Il giorno 27 set 2017, alle ore 13:34, Gerd Hoffmann <kraxel@redhat.com> =
-ha scritto:
->=20
->  Hi,
->=20
->> "actually, I tried it yesterday and it seems to be a bug in qemu in
->> case you reset the EHCI controller, it doesn't come out of reset for
->> whatever reason ... so you probably want to talk to the qemu guys,
->> it's when U-Boot sets USBCMD RESET bit and then does handshake, the
->> controller is stuck with reset bit asserted"
->>=20
->>=20
->> i ask if possible to fix it?
->=20
-> Nothing obvious in the ehci reset code.  Needs someone debugging it ...
->=20
-> Is this on a bigendian host?  If so this could be endian bugs in the
-> ehci emulation.
->=20
-> You could also try xhci or ohci instead, these are known-working on
-> bigendian hosts (used by ppc64 pseries).
->=20
-> cheers,
->  Gerd
->=20
->=20
+Thanks,
+
+David
