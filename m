@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dxJv3-0005Fd-Tm
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 17:31:02 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dxJzI-0007W2-Sg
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 17:35:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dxJv3-0007aJ-1S
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 17:31:01 -0400
-References: <20170927211334.3988-1-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0d109afc-c083-7488-8979-21a112ea6031@redhat.com>
-Date: Wed, 27 Sep 2017 16:30:53 -0500
+	(envelope-from <jsnow@redhat.com>) id 1dxJzH-0001Wj-K8
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 17:35:24 -0400
+References: <20170913160333.23622-1-eblake@redhat.com>
+	<20170913160333.23622-17-eblake@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <37b21d60-acbd-c4ce-3d6f-3f852b8da2a3@redhat.com>
+Date: Wed, 27 Sep 2017 17:35:12 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170927211334.3988-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="FQNvofBVT2rDEl87evcSjgfmNnV5JHJv8"
-Subject: Re: [Qemu-devel] [PATCH] iotests: Fix 195 if IMGFMT is part of
- TEST_DIR
+In-Reply-To: <20170913160333.23622-17-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 16/23] qemu-img: Drop redundant error
+ message in compare
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,67 +25,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FQNvofBVT2rDEl87evcSjgfmNnV5JHJv8
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <0d109afc-c083-7488-8979-21a112ea6031@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] iotests: Fix 195 if IMGFMT is part of
- TEST_DIR
-References: <20170927211334.3988-1-mreitz@redhat.com>
-In-Reply-To: <20170927211334.3988-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 09/27/2017 04:13 PM, Max Reitz wrote:
-> do_run_qemu() in iotest 195 first applies _filter_imgfmt when printing
-> qemu's command line and _filter_testdir only afterwards.  Therefore, if=
 
-> the image format is part of the test directory path, _filter_testdir
-> will no longer apply and the actual output will differ from the
-> reference output even in case of success.
->=20
-> For example, TEST_DIR might be "/tmp/test-qcow2", in which case
-> _filter_imgfmt first transforms this to "/tmp/test-IMGFMT" which is no
-> longer recognized as the TEST_DIR by _filter_testdir.
->=20
-> Fix this by not applying _filter_imgfmt in do_run_qemu() but in
-> run_qemu() instead, and only after _filter_testdir.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+On 09/13/2017 12:03 PM, Eric Blake wrote:
+> If a read error is encountered during 'qemu-img compare', we
+> were printing the "Error while reading offset ..." message twice.
+> Update the testsuite for the improved output.
+> 
+> Further simplify the code by hoisting the error code conversion
+> into the helper function, rather than repeating it at the callers.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
 > ---
->  tests/qemu-iotests/195 | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+> v3: new patch
+> ---
+>  qemu-img.c                 | 19 +++++--------------
+>  tests/qemu-iotests/074.out |  2 --
+>  2 files changed, 5 insertions(+), 16 deletions(-)
+> 
+> diff --git a/qemu-img.c b/qemu-img.c
+> index dfccebe6bc..3e1e373e8f 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -1196,8 +1196,10 @@ static int64_t sectors_to_bytes(int64_t sectors)
+>  /*
+>   * Check if passed sectors are empty (not allocated or contain only 0 bytes)
+>   *
+> - * Returns 0 in case sectors are filled with 0, 1 if sectors contain non-zero
+> - * data and negative value on error.
+> + * Intended for use by 'qemu-img compare': Returns 0 in case sectors are
+> + * filled with 0, 1 if sectors contain non-zero data (this is a comparison
+> + * failure), and 4 on error (the exit status for read errors), after emitting
+> + * an error message.
+>   *
+>   * @param blk:  BlockBackend for the image
+>   * @param sect_num: Number of first sector to check
+> @@ -1218,7 +1220,7 @@ static int check_empty_sectors(BlockBackend *blk, int64_t sect_num,
+>      if (ret < 0) {
+>          error_report("Error while reading offset %" PRId64 " of %s: %s",
+>                       sectors_to_bytes(sect_num), filename, strerror(-ret));
+> -        return ret;
+> +        return 4;
+>      }
+>      idx = find_nonzero(buffer, sect_count * BDRV_SECTOR_SIZE);
+>      if (idx >= 0) {
+> @@ -1473,11 +1475,6 @@ static int img_compare(int argc, char **argv)
+>                                            filename2, buf1, quiet);
+>              }
+>              if (ret) {
+> -                if (ret < 0) {
+> -                    error_report("Error while reading offset %" PRId64 ": %s",
+> -                                 sectors_to_bytes(sector_num), strerror(-ret));
+> -                    ret = 4;
+> -                }
+>                  goto out;
+>              }
+>          }
+> @@ -1522,12 +1519,6 @@ static int img_compare(int argc, char **argv)
+>                  ret = check_empty_sectors(blk_over, sector_num, nb_sectors,
+>                                            filename_over, buf1, quiet);
+>                  if (ret) {
+> -                    if (ret < 0) {
+> -                        error_report("Error while reading offset %" PRId64
+> -                                     " of %s: %s", sectors_to_bytes(sector_num),
+> -                                     filename_over, strerror(-ret));
+> -                        ret = 4;
+> -                    }
+>                      goto out;
+>                  }
+>              }
+> diff --git a/tests/qemu-iotests/074.out b/tests/qemu-iotests/074.out
+> index 8fba5aea9c..ede66c3f81 100644
+> --- a/tests/qemu-iotests/074.out
+> +++ b/tests/qemu-iotests/074.out
+> @@ -4,7 +4,6 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+>  wrote 512/512 bytes at offset 512
+>  512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>  qemu-img: Error while reading offset 0 of blkdebug:TEST_DIR/blkdebug.conf:TEST_DIR/t.IMGFMT: Input/output error
+> -qemu-img: Error while reading offset 0: Input/output error
+>  4
+>  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+>  Formatting 'TEST_DIR/t.IMGFMT.2', fmt=IMGFMT size=0
+> @@ -12,7 +11,6 @@ Formatting 'TEST_DIR/t.IMGFMT.2', fmt=IMGFMT size=0
+>  wrote 512/512 bytes at offset 512
+>  512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>  qemu-img: Error while reading offset 0 of blkdebug:TEST_DIR/blkdebug.conf:TEST_DIR/t.IMGFMT: Input/output error
+> -qemu-img: Error while reading offset 0 of blkdebug:TEST_DIR/blkdebug.conf:TEST_DIR/t.IMGFMT: Input/output error
+>  Warning: Image size mismatch!
+>  4
+>  Cleanup
+> 
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Hm, naively I might assume it's best for the caller to report the error
+and to leave the function a nicely self-contained helper, but I won't
+insist on it.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---FQNvofBVT2rDEl87evcSjgfmNnV5JHJv8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnMGI0ACgkQp6FrSiUn
-Q2p2fQf/bsKIHmo6lBbLGTX/B1OG+7yi9GuI0Q7tsfC1mbSj2jaCW5vtcqnNvHHu
-eEQpISGd0poHFSBqsuyr0KV2qi2wBqyftDVkGF8YxEtH103lbkIxOGfvNguNZzSf
-WLXvDIHFderkePt91QLhDlRSClWGXPC27oBcI2ua/1zg31LYUriYGcUQYW71P3tG
-7POhYXcZzuMaf5fj3ji8a8pVdo7dyCCjJY0E5avvl3N6uARd4AqfsTpziqpQUHVT
-CgAajcpxhlxuMVukOKjvlqb6T3EYcwLVr5h3e9h+on/cFsbab53QmwuIpRrpdaIZ
-bPNxC2+GgfP9NYLTL5lTKpY7IPgCdg==
-=sMIE
------END PGP SIGNATURE-----
-
---FQNvofBVT2rDEl87evcSjgfmNnV5JHJv8--
+Reviewed-by: John Snow <jsnow@redhat.com>
