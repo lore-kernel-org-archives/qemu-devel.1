@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dxFVw-00047J-IN
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 12:48:53 -0400
+	(envelope-from <david@redhat.com>) id 1dxFhN-0006b3-2a
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 13:00:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dxFVr-00087m-FL
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 12:48:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55200)
+	(envelope-from <david@redhat.com>) id 1dxFhI-00060T-Fd
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 13:00:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42698)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dxFVr-00087X-9O
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 12:48:43 -0400
-References: <b5786d73-10f9-bba8-28c6-275cdf623004@redhat.com>
-	<CAKSfGUC5qvxreaP2cVusw6wAaHV9H8NQ91x9EtiSiz9Y-LkmTQ@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c0074bc4-ae13-6321-f830-27257334419b@redhat.com>
-Date: Wed, 27 Sep 2017 18:48:35 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAKSfGUC5qvxreaP2cVusw6wAaHV9H8NQ91x9EtiSiz9Y-LkmTQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Problem in pcie_pci_bridge_realize()
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dxFhI-0005zM-97
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 13:00:32 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Wed, 27 Sep 2017 19:00:24 +0200
+Message-Id: <20170927170027.8539-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC 0/3] s390x/tcg: LAP support using immediate
+ TLB invalidation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +22,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: thuth@redhat.com, cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <richard.henderson@linaro.org>
 
-On 27.09.2017 18:22, Aleksandr Bezzubikov wrote:
-> 2017-09-27 18:50 GMT+03:00 Thomas Huth <thuth@redhat.com>:
->>  Hi,
->>
->> QEMU currently aborts with an assertion when plugging of the
->> pcie-pci-bridge fails, e.g.:
->>
->> $ mips64el-softmmu/qemu-system-mips64el -M malta -nographic -S \
->>                 -device pcie-pci-bridge -bios pc-bios/bios.bin
->> qemu-system-mips64el: memory.c:1699: memory_region_finalize:
->>  Assertion `!mr->container' failed.
->> Aborted (core dumped)
-[...]
-> Hi Thomas,
-> This bug was already reported by Eduardo with ppc64, try this patch
-> that is intended to fix it
->=20
-> http://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg06696.html
+Details about Low-Address Protection can be found in description of
+patch 1 and 2. It is basically a subpage protection of the first two
+pages of every address space (for which it is enabled).
 
-Thanks, that fixed the issue indeed!
+We can achieve this by simply directly invalidating the TLB entry and
+therefore forcing every write accesses onto these two pages into the slow
+path.
 
- Thomas
+With this patch, I can boot Linux just fine (which uses LAP). This also
+makes all related kvm-unit-tests that we have pass.
+
+The checks are working that good, that I discovered a STFL bug. STFL
+stores into the low addresses but low-address protection does explicitly
+not apply. The Linux kernel calls STFL while LAP is active. So without
+patch nr 3, booting Linux will fail. (this change is also part of a patch
+of my SMP series).
+
+Based on: https://github.com/cohuck/qemu.git s390-next
+Available on: https://github.com/dhildenb/qemu.git s390x_lap
+
+
+David Hildenbrand (3):
+  accel/tcg: allow to invalidate a write TLB entry immediately
+  s390x/tcg: low-address protection support
+  s390x/tcg: make STFL store into the lowcore
+
+ accel/tcg/cputlb.c           |  5 ++-
+ accel/tcg/softmmu_template.h |  4 +-
+ include/exec/cpu-all.h       |  3 ++
+ target/s390x/excp_helper.c   |  3 +-
+ target/s390x/helper.h        |  2 +-
+ target/s390x/mem_helper.c    |  8 ----
+ target/s390x/misc_helper.c   |  7 +++-
+ target/s390x/mmu_helper.c    | 96 ++++++++++++++++++++++++++++----------------
+ 8 files changed, 78 insertions(+), 50 deletions(-)
+
+-- 
+2.13.5
