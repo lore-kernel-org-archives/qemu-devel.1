@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dxI34-0008NH-Tl
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 15:31:15 -0400
+	(envelope-from <lists@wiesinger.com>) id 1dxI4S-0000kj-9K
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 15:32:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dxI2t-0006K6-Fr
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 15:31:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54456)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dxI2t-0006J6-A3
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 15:30:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dxI2q-0001j2-Tp
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 19:30:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 984BB2E849D
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 19:30:56 +0000 (UTC)
+	(envelope-from <lists@wiesinger.com>) id 1dxI4N-0006s7-8y
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 15:32:36 -0400
+Received: from [2a02:25b0:aaaa:57a::affe:bade] (port=44298
+	helo=vps01.wiesinger.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lists@wiesinger.com>) id 1dxI4N-0006UC-2L
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 15:32:31 -0400
+References: <35eda6a9-086e-f899-e131-288f2346effe@wiesinger.com>
+	<ce477c53-25bc-e6dd-3e05-c74af1f33c2d@wiesinger.com>
+	<3e1f41a8-faff-1858-6f0d-154694dff02d@wiesinger.com>
+	<CABgObfYzngJPgS9agXMrRENVD_e+3Hm=y+KD5dp9na8jNwuumw@mail.gmail.com>
+	<CABgObfZFwJMpU_D8SMkuiEhb0qBokHL0jpwmuzdE73TReHMFkg@mail.gmail.com>
+	<0e69cbad-f658-03be-0191-1b6fe588147b@wiesinger.com>
+	<CABgObfaw_bMQ=Dpfs=vh_AweaidqCZSBy4bDtsddk5DSKpRP8A@mail.gmail.com>
+	<1b37b04c-349f-28f7-fb6c-fbbbe8415b33@wiesinger.com>
+	<7757e373-c892-2824-d710-27ca57d479c4@redhat.com>
+From: Gerhard Wiesinger <lists@wiesinger.com>
+Message-ID: <d5006c6b-c7d3-b002-b608-e4e05ee1f15c@wiesinger.com>
+Date: Wed, 27 Sep 2017 21:31:20 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 27 Sep 2017 19:21:07 -0000
-From: Todd Eisenberger <1719984@bugs.launchpad.net>
-Reply-To: Bug 1719984 <1719984@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <150654006758.30143.16289666541182400408.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1719984] [NEW] wrgsbase misemulated in
- x86_64-softmmu
+In-Reply-To: <7757e373-c892-2824-d710-27ca57d479c4@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] kvm_intel fails to load on Conroe CPUs running
+ Linux 4.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,44 +37,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>
 
-Public bug reported:
+On 15.09.2017 19:07, Paolo Bonzini wrote:
+> On 15/09/2017 16:43, Gerhard Wiesinger wrote:
+>> On 27.08.2017 20:55, Paolo Bonzini wrote:
+>>>
+>>> Il 27 ago 2017 4:48 PM, "Gerhard Wiesinger" <lists@wiesinger.com
+>>> <mailto:lists@wiesinger.com>> ha scritto:
+>>>
+>>>      On 27.08.2017 14 <tel:27.08.2017%2014>:03, Paolo Bonzini wrote:
+>>>
+>>>
+>>>          We will revert the patch, but 4.13.0 will not have the fix.
+>>>          Expect it in later stable kernels (because vacations).
+>>>
+>>>
+>>>      Thnx. Why will 4.13.0 NOT have the fix?
+>>>
+>>>
+>>> Because maintainers are on vacation! :-)
+>>>
+>>>
+>> Hello Paolo,
+>>
+>> Any update on this for 4.12 and 4.13 kernels?
+> A late fix is better than a wrong fix.  Hope to get to it next week!
 
-qemu revision: cfe4cade054c0e0d00d0185cdc433a9e3ce3e2e4
-command: ./qemu-system-x86_64 -m 2048 -nographic -net none -smp 4,threads=
-=3D2 -machine q35 -kernel zircon.bin -cpu Haswell,+smap,-check -initrd boot=
-data.bin -append 'TERM=3Dscreen kernel.halt-on-panic=3Dtrue '
+Hello Paolo,
 
-On this revision, the VM reports CPUID.07H.0H.EBX[0] =3D 1.  In this VM,
-with CR4[16] set to 1, wrgsbase triggers #UD, which mismatches the
-behavior described in Intel's instruction reference.
+Any update? Thnx.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1719984
-
-Title:
-  wrgsbase misemulated in x86_64-softmmu
-
-Status in QEMU:
-  New
-
-Bug description:
-  qemu revision: cfe4cade054c0e0d00d0185cdc433a9e3ce3e2e4
-  command: ./qemu-system-x86_64 -m 2048 -nographic -net none -smp 4,threads=
-=3D2 -machine q35 -kernel zircon.bin -cpu Haswell,+smap,-check -initrd boot=
-data.bin -append 'TERM=3Dscreen kernel.halt-on-panic=3Dtrue '
-
-  On this revision, the VM reports CPUID.07H.0H.EBX[0] =3D 1.  In this VM,
-  with CR4[16] set to 1, wrgsbase triggers #UD, which mismatches the
-  behavior described in Intel's instruction reference.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1719984/+subscriptions
+Ciao,
+Gerhard
