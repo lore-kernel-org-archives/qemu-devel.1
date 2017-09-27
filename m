@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70M-0001Pt-4t
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:39 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70P-0001Tx-G5
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70L-000431-31
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:38 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70O-000477-BF
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:41 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 27 Sep 2017 17:42:56 +1000
-Message-Id: <20170927074316.4454-7-david@gibson.dropbear.id.au>
+Date: Wed, 27 Sep 2017 17:43:04 +1000
+Message-Id: <20170927074316.4454-15-david@gibson.dropbear.id.au>
 In-Reply-To: <20170927074316.4454-1-david@gibson.dropbear.id.au>
 References: <20170927074316.4454-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 06/26] ppc4xx: Add more PLB registers
+Subject: [Qemu-devel] [PULL 14/26] spapr: introduce helpers to migrate HPT
+ chunks and the end marker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,50 +23,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, groug@kaod.org, mark.cave-ayland@ilande.co.uk, balaton@eik.bme.hu, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+From: Greg Kurz <groug@kaod.org>
 
-These registers are present in 440 SoCs (and maybe in others too) and
-U-Boot accesses them when printing register info. We don't emulate
-these but add them to avoid crashing when they are read or written.
+This consolidates some duplicated code in a dedicated helpers.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/ppc405_uc.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ hw/ppc/spapr.c | 38 +++++++++++++++++++++-----------------
+ 1 file changed, 21 insertions(+), 17 deletions(-)
 
-diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
-index e621d0aec5..8e58065f5f 100644
---- a/hw/ppc/ppc405_uc.c
-+++ b/hw/ppc/ppc405_uc.c
-@@ -105,9 +105,12 @@ ram_addr_t ppc405_set_bootinfo (CPUPPCState *env, ppc4xx_bd_info_t *bd,
- /*****************************************************************************/
- /* Peripheral local bus arbitrer */
- enum {
--    PLB0_BESR = 0x084,
--    PLB0_BEAR = 0x086,
--    PLB0_ACR  = 0x087,
-+    PLB3A0_ACR = 0x077,
-+    PLB4A0_ACR = 0x081,
-+    PLB0_BESR  = 0x084,
-+    PLB0_BEAR  = 0x086,
-+    PLB0_ACR   = 0x087,
-+    PLB4A1_ACR = 0x089,
- };
- 
- typedef struct ppc4xx_plb_t ppc4xx_plb_t;
-@@ -179,9 +182,12 @@ void ppc4xx_plb_init(CPUPPCState *env)
-     ppc4xx_plb_t *plb;
- 
-     plb = g_malloc0(sizeof(ppc4xx_plb_t));
-+    ppc_dcr_register(env, PLB3A0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
-+    ppc_dcr_register(env, PLB4A0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
-     ppc_dcr_register(env, PLB0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
-     ppc_dcr_register(env, PLB0_BEAR, plb, &dcr_read_plb, &dcr_write_plb);
-     ppc_dcr_register(env, PLB0_BESR, plb, &dcr_read_plb, &dcr_write_plb);
-+    ppc_dcr_register(env, PLB4A1_ACR, plb, &dcr_read_plb, &dcr_write_plb);
-     qemu_register_reset(ppc4xx_plb_reset, plb);
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 90a94952c3..0ce3ec87ac 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1709,6 +1709,23 @@ static int htab_save_setup(QEMUFile *f, void *opaque)
+     return 0;
  }
  
++static void htab_save_chunk(QEMUFile *f, sPAPRMachineState *spapr,
++                            int chunkstart, int n_valid, int n_invalid)
++{
++    qemu_put_be32(f, chunkstart);
++    qemu_put_be16(f, n_valid);
++    qemu_put_be16(f, n_invalid);
++    qemu_put_buffer(f, HPTE(spapr->htab, chunkstart),
++                    HASH_PTE_SIZE_64 * n_valid);
++}
++
++static void htab_save_end_marker(QEMUFile *f)
++{
++    qemu_put_be32(f, 0);
++    qemu_put_be16(f, 0);
++    qemu_put_be16(f, 0);
++}
++
+ static void htab_save_first_pass(QEMUFile *f, sPAPRMachineState *spapr,
+                                  int64_t max_ns)
+ {
+@@ -1740,11 +1757,7 @@ static void htab_save_first_pass(QEMUFile *f, sPAPRMachineState *spapr,
+         if (index > chunkstart) {
+             int n_valid = index - chunkstart;
+ 
+-            qemu_put_be32(f, chunkstart);
+-            qemu_put_be16(f, n_valid);
+-            qemu_put_be16(f, 0);
+-            qemu_put_buffer(f, HPTE(spapr->htab, chunkstart),
+-                            HASH_PTE_SIZE_64 * n_valid);
++            htab_save_chunk(f, spapr, chunkstart, n_valid, 0);
+ 
+             if (has_timeout &&
+                 (qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - starttime) > max_ns) {
+@@ -1806,11 +1819,7 @@ static int htab_save_later_pass(QEMUFile *f, sPAPRMachineState *spapr,
+             int n_valid = invalidstart - chunkstart;
+             int n_invalid = index - invalidstart;
+ 
+-            qemu_put_be32(f, chunkstart);
+-            qemu_put_be16(f, n_valid);
+-            qemu_put_be16(f, n_invalid);
+-            qemu_put_buffer(f, HPTE(spapr->htab, chunkstart),
+-                            HASH_PTE_SIZE_64 * n_valid);
++            htab_save_chunk(f, spapr, chunkstart, n_valid, n_invalid);
+             sent += index - chunkstart;
+ 
+             if (!final && (qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - starttime) > max_ns) {
+@@ -1873,10 +1882,7 @@ static int htab_save_iterate(QEMUFile *f, void *opaque)
+         rc = htab_save_later_pass(f, spapr, MAX_ITERATION_NS);
+     }
+ 
+-    /* End marker */
+-    qemu_put_be32(f, 0);
+-    qemu_put_be16(f, 0);
+-    qemu_put_be16(f, 0);
++    htab_save_end_marker(f);
+ 
+     return rc;
+ }
+@@ -1916,9 +1922,7 @@ static int htab_save_complete(QEMUFile *f, void *opaque)
+     }
+ 
+     /* End marker */
+-    qemu_put_be32(f, 0);
+-    qemu_put_be16(f, 0);
+-    qemu_put_be16(f, 0);
++    htab_save_end_marker(f);
+ 
+     return 0;
+ }
 -- 
 2.13.5
