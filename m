@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70U-0001a5-5R
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:48 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70U-0001b0-R9
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70Q-0004AC-Si
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70R-0004At-AC
 	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:46 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 27 Sep 2017 17:43:09 +1000
-Message-Id: <20170927074316.4454-20-david@gibson.dropbear.id.au>
+Date: Wed, 27 Sep 2017 17:43:11 +1000
+Message-Id: <20170927074316.4454-22-david@gibson.dropbear.id.au>
 In-Reply-To: <20170927074316.4454-1-david@gibson.dropbear.id.au>
 References: <20170927074316.4454-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 19/26] ppc: remove all unused CPU definitions
+Subject: [Qemu-devel] [PULL 21/26] spapr: fix the value of SDR1 in
+ kvmppc_put_books_sregs()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,358 +21,265 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, groug@kaod.org, mark.cave-ayland@ilande.co.uk, balaton@eik.bme.hu, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, groug@kaod.org, mark.cave-ayland@ilande.co.uk, balaton@eik.bme.hu, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: John Snow <jsnow@redhat.com>
+From: Greg Kurz <groug@kaod.org>
 
-Remove *all* unused CPU definitions as indicated by compile-time
-`#if 0` constructs.
+When running with KVM PR, if a new HPT is allocated we need to inform
+KVM about the HPT address and size. This is currently done by hacking
+the value of SDR1 and pushing it to KVM in several places.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
-[dwg: Removed some additional now-useless comments]
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Also, migration breaks the guest since it is very unlikely the HPT has
+the same address in source and destination, but we push the incoming
+value of SDR1 to KVM anyway.
+
+This patch introduces a new virtual hypervisor hook so that the spapr
+code can provide the correct value of SDR1 to be pushed to KVM each
+time kvmppc_put_books_sregs() is called.
+
+It allows to get rid of all the hacking in the spapr/kvmppc code and
+it fixes migration of nested KVM PR.
+
+Suggested-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/cpu-models.h | 225 ------------------------------------------------
- 1 file changed, 225 deletions(-)
+ hw/ppc/spapr.c          | 14 ++++++++++++++
+ hw/ppc/spapr_cpu_core.c | 16 +---------------
+ hw/ppc/spapr_hcall.c    | 45 +++++++++++++++++++++++++++++++++------------
+ target/ppc/cpu.h        |  1 +
+ target/ppc/kvm.c        | 32 +++++++-------------------------
+ target/ppc/kvm_ppc.h    |  6 ------
+ 6 files changed, 56 insertions(+), 58 deletions(-)
 
-diff --git a/target/ppc/cpu-models.h b/target/ppc/cpu-models.h
-index 152365425d..25ef372d4c 100644
---- a/target/ppc/cpu-models.h
-+++ b/target/ppc/cpu-models.h
-@@ -44,184 +44,55 @@ enum {
-     /* PowerPC 401 cores */
-     CPU_POWERPC_401A1              = 0x00210000,
-     CPU_POWERPC_401B2              = 0x00220000,
--#if 0
--    CPU_POWERPC_401B3              = xxx,
--#endif
-     CPU_POWERPC_401C2              = 0x00230000,
-     CPU_POWERPC_401D2              = 0x00240000,
-     CPU_POWERPC_401E2              = 0x00250000,
-     CPU_POWERPC_401F2              = 0x00260000,
-     CPU_POWERPC_401G2              = 0x00270000,
-     /* PowerPC 401 microcontrolers */
--#if 0
--    CPU_POWERPC_401GF              = xxx,
--#endif
- #define CPU_POWERPC_IOP480           CPU_POWERPC_401B2
-     /* IBM Processor for Network Resources */
-     CPU_POWERPC_COBRA              = 0x10100000, /* XXX: 405 ? */
--#if 0
--    CPU_POWERPC_XIPCHIP            = xxx,
--#endif
-     /* PowerPC 403 family */
-     /* PowerPC 403 microcontrollers */
-     CPU_POWERPC_403GA              = 0x00200011,
-     CPU_POWERPC_403GB              = 0x00200100,
-     CPU_POWERPC_403GC              = 0x00200200,
-     CPU_POWERPC_403GCX             = 0x00201400,
--#if 0
--    CPU_POWERPC_403GP              = xxx,
--#endif
-     /* PowerPC 405 family */
-     /* PowerPC 405 cores */
--#if 0
--    CPU_POWERPC_405A3              = xxx,
--#endif
--#if 0
--    CPU_POWERPC_405A4              = xxx,
--#endif
--#if 0
--    CPU_POWERPC_405B3              = xxx,
--#endif
--#if 0
--    CPU_POWERPC_405B4              = xxx,
--#endif
--#if 0
--    CPU_POWERPC_405C3              = xxx,
--#endif
--#if 0
--    CPU_POWERPC_405C4              = xxx,
--#endif
-     CPU_POWERPC_405D2              = 0x20010000,
--#if 0
--    CPU_POWERPC_405D3              = xxx,
--#endif
-     CPU_POWERPC_405D4              = 0x41810000,
--#if 0
--    CPU_POWERPC_405D5              = xxx,
--#endif
--#if 0
--    CPU_POWERPC_405E4              = xxx,
--#endif
--#if 0
--    CPU_POWERPC_405F4              = xxx,
--#endif
--#if 0
--    CPU_POWERPC_405F5              = xxx,
--#endif
--#if 0
--    CPU_POWERPC_405F6              = xxx,
--#endif
-     /* PowerPC 405 microcontrolers */
-     /* XXX: missing 0x200108a0 */
-     CPU_POWERPC_405CRa             = 0x40110041,
-     CPU_POWERPC_405CRb             = 0x401100C5,
-     CPU_POWERPC_405CRc             = 0x40110145,
-     CPU_POWERPC_405EP              = 0x51210950,
--#if 0
--    CPU_POWERPC_405EXr             = xxx,
--#endif
-     CPU_POWERPC_405EZ              = 0x41511460, /* 0x51210950 ? */
--#if 0
--    CPU_POWERPC_405FX              = xxx,
--#endif
-     CPU_POWERPC_405GPa             = 0x40110000,
-     CPU_POWERPC_405GPb             = 0x40110040,
-     CPU_POWERPC_405GPc             = 0x40110082,
-     CPU_POWERPC_405GPd             = 0x401100C4,
-     CPU_POWERPC_405GPR             = 0x50910951,
--#if 0
--    CPU_POWERPC_405H               = xxx,
--#endif
--#if 0
--    CPU_POWERPC_405L               = xxx,
--#endif
-     CPU_POWERPC_405LP              = 0x41F10000,
--#if 0
--    CPU_POWERPC_405PM              = xxx,
--#endif
--#if 0
--    CPU_POWERPC_405PS              = xxx,
--#endif
--#if 0
--    CPU_POWERPC_405S               = xxx,
--#endif
-     /* IBM network processors */
-     CPU_POWERPC_NPE405H            = 0x414100C0,
-     CPU_POWERPC_NPE405H2           = 0x41410140,
-     CPU_POWERPC_NPE405L            = 0x416100C0,
-     CPU_POWERPC_NPE4GS3            = 0x40B10000,
--#if 0
--    CPU_POWERPC_NPCxx1             = xxx,
--#endif
--#if 0
--    CPU_POWERPC_NPR161             = xxx,
--#endif
--#if 0
--    CPU_POWERPC_LC77700            = xxx,
--#endif
-     /* IBM STBxxx (PowerPC 401/403/405 core based microcontrollers) */
--#if 0
--    CPU_POWERPC_STB01000           = xxx,
--#endif
--#if 0
--    CPU_POWERPC_STB01010           = xxx,
--#endif
--#if 0
--    CPU_POWERPC_STB0210            = xxx, /* 401B3 */
--#endif
-     CPU_POWERPC_STB03              = 0x40310000, /* 0x40130000 ? */
--#if 0
--    CPU_POWERPC_STB043             = xxx,
--#endif
--#if 0
--    CPU_POWERPC_STB045             = xxx,
--#endif
-     CPU_POWERPC_STB04              = 0x41810000,
-     CPU_POWERPC_STB25              = 0x51510950,
--#if 0
--    CPU_POWERPC_STB130             = xxx,
--#endif
-     /* Xilinx cores */
-     CPU_POWERPC_X2VP4              = 0x20010820,
-     CPU_POWERPC_X2VP20             = 0x20010860,
--#if 0
--    CPU_POWERPC_ZL10310            = xxx,
--#endif
--#if 0
--    CPU_POWERPC_ZL10311            = xxx,
--#endif
--#if 0
--    CPU_POWERPC_ZL10320            = xxx,
--#endif
--#if 0
--    CPU_POWERPC_ZL10321            = xxx,
--#endif
-     /* PowerPC 440 family */
-     /* Generic PowerPC 440 */
- #define CPU_POWERPC_440              CPU_POWERPC_440GXf
-     /* PowerPC 440 cores */
--#if 0
--    CPU_POWERPC_440A4              = xxx,
--#endif
-     CPU_POWERPC_440_XILINX         = 0x7ff21910,
--#if 0
--    CPU_POWERPC_440A5              = xxx,
--#endif
--#if 0
--    CPU_POWERPC_440B4              = xxx,
--#endif
--#if 0
--    CPU_POWERPC_440F5              = xxx,
--#endif
--#if 0
--    CPU_POWERPC_440G5              = xxx,
--#endif
--#if 0
--    CPU_POWERPC_440H4              = xxx,
--#endif
--#if 0
--    CPU_POWERPC_440H6              = xxx,
--#endif
-     /* PowerPC 440 microcontrolers */
-     CPU_POWERPC_440EPa             = 0x42221850,
-     CPU_POWERPC_440EPb             = 0x422218D3,
-@@ -234,25 +105,10 @@ enum {
-     CPU_POWERPC_440GXb             = 0x51B21851,
-     CPU_POWERPC_440GXc             = 0x51B21892,
-     CPU_POWERPC_440GXf             = 0x51B21894,
--#if 0
--    CPU_POWERPC_440S               = xxx,
--#endif
-     CPU_POWERPC_440SP              = 0x53221850,
-     CPU_POWERPC_440SP2             = 0x53221891,
-     CPU_POWERPC_440SPE             = 0x53421890,
-     CPU_POWERPC_460EXb             = 0x130218A4, /* called 460 but 440 core */
--    /* PowerPC 460 family */
--#if 0
--    /* Generic PowerPC 464 */
--#define CPU_POWERPC_464              CPU_POWERPC_464H90
--#endif
--    /* PowerPC 464 microcontrolers */
--#if 0
--    CPU_POWERPC_464H90             = xxx,
--#endif
--#if 0
--    CPU_POWERPC_464H90FP           = xxx,
--#endif
-     /* Freescale embedded PowerPC cores */
-     /* PowerPC MPC 5xx cores (aka RCPU) */
-     CPU_POWERPC_MPC5xx             = 0x00020020,
-@@ -281,15 +137,6 @@ enum {
- #define CPU_POWERPC_MPC5200B_v21     CPU_POWERPC_G2LEgp1
-     /* e200 family */
-     /* e200 cores */
--#if 0
--    CPU_POWERPC_e200z0             = xxx,
--#endif
--#if 0
--    CPU_POWERPC_e200z1             = xxx,
--#endif
--#if 0 /* ? */
--    CPU_POWERPC_e200z3             = 0x81120000,
--#endif
-     CPU_POWERPC_e200z5             = 0x81000000,
-     CPU_POWERPC_e200z6             = 0x81120000,
-     /* e300 family */
-@@ -407,9 +254,6 @@ enum {
-     /* XXX: missing 0x000a0100 */
-     /* XXX: missing 0x00093102 */
-     CPU_POWERPC_604R               = 0x000a0101,
--#if 0
--    CPU_POWERPC_604EV              = xxx, /* XXX: same as 604R ? */
--#endif
-     /* PowerPC 740/750 cores (aka G3) */
-     /* XXX: missing 0x00084202 */
-     CPU_POWERPC_7x0_v10            = 0x00080100,
-@@ -464,9 +308,6 @@ enum {
-     CPU_POWERPC_7x5_v26            = 0x00083206,
-     CPU_POWERPC_7x5_v27            = 0x00083207,
-     CPU_POWERPC_7x5_v28            = 0x00083208,
--#if 0
--    CPU_POWERPC_7x5P               = xxx,
--#endif
-     /* PowerPC 74xx cores (aka G4) */
-     /* XXX: missing 0x000C1101 */
-     CPU_POWERPC_7400_v10           = 0x000C0100,
-@@ -554,12 +395,6 @@ enum {
-     /* XXX: should be POWER (RIOS), RSC3308, RSC4608,
-      * POWER2 (RIOS2) & RSC2 (P2SC) here
-      */
--#if 0
--    CPU_POWER                      = xxx, /* 0x20000 ? 0x30000 for RSC ? */
--#endif
--#if 0
--    CPU_POWER2                     = xxx, /* 0x40000 ? */
--#endif
-     /* PA Semi core */
-     CPU_POWERPC_PA6T               = 0x00900000,
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 0ce3ec87ac..ff87f155d5 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1240,6 +1240,19 @@ static hwaddr spapr_hpt_mask(PPCVirtualHypervisor *vhyp)
+     return HTAB_SIZE(spapr) / HASH_PTEG_SIZE_64 - 1;
+ }
+ 
++static target_ulong spapr_encode_hpt_for_kvm_pr(PPCVirtualHypervisor *vhyp)
++{
++    sPAPRMachineState *spapr = SPAPR_MACHINE(vhyp);
++
++    assert(kvm_enabled());
++
++    if (!spapr->htab) {
++        return 0;
++    }
++
++    return (target_ulong)(uintptr_t)spapr->htab | (spapr->htab_shift - 18);
++}
++
+ static const ppc_hash_pte64_t *spapr_map_hptes(PPCVirtualHypervisor *vhyp,
+                                                 hwaddr ptex, int n)
+ {
+@@ -3604,6 +3617,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+     vhc->unmap_hptes = spapr_unmap_hptes;
+     vhc->store_hpte = spapr_store_hpte;
+     vhc->get_patbe = spapr_get_patbe;
++    vhc->encode_hpt_for_kvm_pr = spapr_encode_hpt_for_kvm_pr;
+     xic->ics_get = spapr_ics_get;
+     xic->ics_resend = spapr_ics_resend;
+     xic->icp_get = spapr_icp_get;
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index c08ee7571a..3e20b1d886 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -18,6 +18,7 @@
+ #include "hw/ppc/ppc.h"
+ #include "target/ppc/mmu-hash64.h"
+ #include "sysemu/numa.h"
++#include "sysemu/hw_accel.h"
+ #include "qemu/error-report.h"
+ 
+ void spapr_cpu_parse_features(sPAPRMachineState *spapr)
+@@ -73,7 +74,6 @@ void spapr_cpu_parse_features(sPAPRMachineState *spapr)
+ 
+ static void spapr_cpu_reset(void *opaque)
+ {
+-    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+     PowerPCCPU *cpu = opaque;
+     CPUState *cs = CPU(cpu);
+     CPUPPCState *env = &cpu->env;
+@@ -86,20 +86,6 @@ static void spapr_cpu_reset(void *opaque)
+     cs->halted = 1;
+ 
+     env->spr[SPR_HIOR] = 0;
+-
+-    /*
+-     * This is a hack for the benefit of KVM PR - it abuses the SDR1
+-     * slot in kvm_sregs to communicate the userspace address of the
+-     * HPT
+-     */
+-    if (kvm_enabled()) {
+-        env->spr[SPR_SDR1] = (target_ulong)(uintptr_t)spapr->htab
+-            | (spapr->htab_shift - 18);
+-        if (kvmppc_put_books_sregs(cpu) < 0) {
+-            error_report("Unable to update SDR1 in KVM");
+-            exit(1);
+-        }
+-    }
+ }
+ 
+ static void spapr_cpu_destroy(PowerPCCPU *cpu)
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 57bb411394..8d72bb7c1c 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -686,6 +686,37 @@ static int rehash_hpt(PowerPCCPU *cpu,
+     return H_SUCCESS;
+ }
+ 
++static void do_push_sregs_to_kvm_pr(CPUState *cs, run_on_cpu_data data)
++{
++    int ret;
++
++    cpu_synchronize_state(cs);
++
++    ret = kvmppc_put_books_sregs(POWERPC_CPU(cs));
++    if (ret < 0) {
++        error_report("failed to push sregs to KVM: %s", strerror(-ret));
++        exit(1);
++    }
++}
++
++static void push_sregs_to_kvm_pr(sPAPRMachineState *spapr)
++{
++    CPUState *cs;
++
++    /*
++     * This is a hack for the benefit of KVM PR - it abuses the SDR1
++     * slot in kvm_sregs to communicate the userspace address of the
++     * HPT
++     */
++    if (!kvm_enabled() || !spapr->htab) {
++        return;
++    }
++
++    CPU_FOREACH(cs) {
++        run_on_cpu(cs, do_push_sregs_to_kvm_pr, RUN_ON_CPU_NULL);
++    }
++}
++
+ static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
+                                         sPAPRMachineState *spapr,
+                                         target_ulong opcode,
+@@ -733,12 +764,7 @@ static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
+         spapr->htab = pending->hpt;
+         spapr->htab_shift = pending->shift;
+ 
+-        if (kvm_enabled()) {
+-            /* For KVM PR, update the HPT pointer */
+-            target_ulong sdr1 = (target_ulong)(uintptr_t)spapr->htab
+-                | (spapr->htab_shift - 18);
+-            kvmppc_update_sdr1(sdr1);
+-        }
++        push_sregs_to_kvm_pr(spapr);
+ 
+         pending->hpt = NULL; /* so it's not free()d */
+     }
+@@ -1564,12 +1590,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+              * the point this is called, nothing should have been
+              * entered into the existing HPT */
+             spapr_reallocate_hpt(spapr, maxshift, &error_fatal);
+-            if (kvm_enabled()) {
+-                /* For KVM PR, update the HPT pointer */
+-                target_ulong sdr1 = (target_ulong)(uintptr_t)spapr->htab
+-                    | (spapr->htab_shift - 18);
+-                kvmppc_update_sdr1(sdr1);
+-            }
++            push_sregs_to_kvm_pr(spapr);
+         }
+     }
+ 
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index c9d3ffa89b..64aef17f6f 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1243,6 +1243,7 @@ struct PPCVirtualHypervisorClass {
+     void (*store_hpte)(PPCVirtualHypervisor *vhyp, hwaddr ptex,
+                        uint64_t pte0, uint64_t pte1);
+     uint64_t (*get_patbe)(PPCVirtualHypervisor *vhyp);
++    target_ulong (*encode_hpt_for_kvm_pr)(PPCVirtualHypervisor *vhyp);
  };
-@@ -583,60 +418,6 @@ enum {
-     POWERPC_SVR_5200B_v20          = 0x80110020,
-     POWERPC_SVR_5200B_v21          = 0x80110021,
- #define POWERPC_SVR_55xx             POWERPC_SVR_5567
--#if 0
--    POWERPC_SVR_5533               = xxx,
--#endif
--#if 0
--    POWERPC_SVR_5534               = xxx,
--#endif
--#if 0
--    POWERPC_SVR_5553               = xxx,
--#endif
--#if 0
--    POWERPC_SVR_5554               = xxx,
--#endif
--#if 0
--    POWERPC_SVR_5561               = xxx,
--#endif
--#if 0
--    POWERPC_SVR_5565               = xxx,
--#endif
--#if 0
--    POWERPC_SVR_5566               = xxx,
--#endif
--#if 0
--    POWERPC_SVR_5567               = xxx,
--#endif
--#if 0
--    POWERPC_SVR_8313               = xxx,
--#endif
--#if 0
--    POWERPC_SVR_8313E              = xxx,
--#endif
--#if 0
--    POWERPC_SVR_8314               = xxx,
--#endif
--#if 0
--    POWERPC_SVR_8314E              = xxx,
--#endif
--#if 0
--    POWERPC_SVR_8315               = xxx,
--#endif
--#if 0
--    POWERPC_SVR_8315E              = xxx,
--#endif
--#if 0
--    POWERPC_SVR_8321               = xxx,
--#endif
--#if 0
--    POWERPC_SVR_8321E              = xxx,
--#endif
--#if 0
--    POWERPC_SVR_8323               = xxx,
--#endif
--#if 0
--    POWERPC_SVR_8323E              = xxx,
--#endif
-     POWERPC_SVR_8343               = 0x80570010,
-     POWERPC_SVR_8343A              = 0x80570030,
-     POWERPC_SVR_8343E              = 0x80560010,
-@@ -653,12 +434,6 @@ enum {
-     POWERPC_SVR_8349A              = 0x80510030,
-     POWERPC_SVR_8349E              = 0x80500010,
-     POWERPC_SVR_8349EA             = 0x80500030,
--#if 0
--    POWERPC_SVR_8358E              = xxx,
--#endif
--#if 0
--    POWERPC_SVR_8360E              = xxx,
--#endif
- #define POWERPC_SVR_E500             0x40000000
-     POWERPC_SVR_8377               = 0x80C70010 | POWERPC_SVR_E500,
-     POWERPC_SVR_8377E              = 0x80C60010 | POWERPC_SVR_E500,
+ 
+ #define TYPE_PPC_VIRTUAL_HYPERVISOR "ppc-virtual-hypervisor"
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 5b281b2f1b..171d3d8040 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -941,7 +941,13 @@ int kvmppc_put_books_sregs(PowerPCCPU *cpu)
+ 
+     sregs.pvr = env->spr[SPR_PVR];
+ 
+-    sregs.u.s.sdr1 = env->spr[SPR_SDR1];
++    if (cpu->vhyp) {
++        PPCVirtualHypervisorClass *vhc =
++            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
++        sregs.u.s.sdr1 = vhc->encode_hpt_for_kvm_pr(cpu->vhyp);
++    } else {
++        sregs.u.s.sdr1 = env->spr[SPR_SDR1];
++    }
+ 
+     /* Sync SLB */
+ #ifdef TARGET_PPC64
+@@ -2798,30 +2804,6 @@ int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift)
+     return kvm_vm_ioctl(cs->kvm_state, KVM_PPC_RESIZE_HPT_COMMIT, &rhpt);
+ }
+ 
+-static void kvmppc_pivot_hpt_cpu(CPUState *cs, run_on_cpu_data arg)
+-{
+-    target_ulong sdr1 = arg.target_ptr;
+-    PowerPCCPU *cpu = POWERPC_CPU(cs);
+-    CPUPPCState *env = &cpu->env;
+-
+-    /* This is just for the benefit of PR KVM */
+-    cpu_synchronize_state(cs);
+-    env->spr[SPR_SDR1] = sdr1;
+-    if (kvmppc_put_books_sregs(cpu) < 0) {
+-        error_report("Unable to update SDR1 in KVM");
+-        exit(1);
+-    }
+-}
+-
+-void kvmppc_update_sdr1(target_ulong sdr1)
+-{
+-    CPUState *cs;
+-
+-    CPU_FOREACH(cs) {
+-        run_on_cpu(cs, kvmppc_pivot_hpt_cpu, RUN_ON_CPU_TARGET_PTR(sdr1));
+-    }
+-}
+-
+ /*
+  * This is a helper function to detect a post migration scenario
+  * in which a guest, running as KVM-HV, freezes in cpu_post_load because
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 349f892631..d6be38ecaf 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -67,7 +67,6 @@ PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
+ void kvmppc_check_papr_resize_hpt(Error **errp);
+ int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_ulong flags, int shift);
+ int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift);
+-void kvmppc_update_sdr1(target_ulong sdr1);
+ bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
+ 
+ bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
+@@ -325,11 +324,6 @@ static inline int kvmppc_resize_hpt_commit(PowerPCCPU *cpu,
+     return -ENOSYS;
+ }
+ 
+-static inline void kvmppc_update_sdr1(target_ulong sdr1)
+-{
+-    abort();
+-}
+-
+ #endif
+ 
+ #ifndef CONFIG_KVM
 -- 
 2.13.5
