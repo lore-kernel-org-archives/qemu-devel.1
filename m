@@ -1,37 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dx7Bs-0003mI-Sl
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:55:33 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dx7Jt-0001Og-1w
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 04:03:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dx7Bo-0000vS-3i
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:55:32 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40396)
+	(envelope-from <borntraeger@de.ibm.com>) id 1dx7Jn-0004uB-1t
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 04:03:49 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54898)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1dx7Bn-0000s0-Lt
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:55:27 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dx7Jm-0004tr-OO
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 04:03:42 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8R7tEtj017098
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 03:55:22 -0400
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d808ad5x7-1
+	v8R82hn3111965
+	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 04:03:39 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d87p11r6j-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 03:55:22 -0400
+	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 04:03:38 -0400
 Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Wed, 27 Sep 2017 01:55:21 -0600
-Date: Wed, 27 Sep 2017 15:55:17 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 27 Sep 2017 09:03:34 +0100
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+References: <20170926133624.155394-1-borntraeger@de.ibm.com>
+	<20170926133624.155394-3-borntraeger@de.ibm.com>
+	<e1b995a5-078a-f2a1-9f3b-6c1ab0ac697b@redhat.com>
+	<5770bcf6-3608-11e7-7f4e-a91f5046c8c1@de.ibm.com>
+Date: Wed, 27 Sep 2017 10:03:31 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f7755ca8-78f3-759e-f879-fea2f4fdadfc@linux.vnet.ibm.com>
-Message-Id: <20170927075517.GB5870@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 4/9] s390x: refactor error handling for
- SSCH and RSCH
+In-Reply-To: <5770bcf6-3608-11e7-7f4e-a91f5046c8c1@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <2f3eb94e-c07f-8752-059c-de5900859fff@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] s390x/ais: disable ais for compat
+ machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,69 +45,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-09-25 12:57:31 +0200]:
 
-[restored Cc:]
 
+On 09/27/2017 09:12 AM, Christian Borntraeger wrote:
 > 
 > 
-> On 09/25/2017 09:31 AM, Dong Jia Shi wrote:
-> > * Cornelia Huck <cohuck@redhat.com> [2017-09-08 11:59:50 +0200]:
-> > 
-> >> On Fri, 8 Sep 2017 11:21:57 +0200
-> >> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> >>
-> >>> On 09/08/2017 05:41 AM, Dong Jia Shi wrote:
-> >>>> Let' me summarize here, in case I misunderstand things. Now we have
-> >>>> two ways to choose:
-> >>>>
-> >>>> A. Kernel: no change.
-> >>>>    Qemu  : handle -EFAULT as option 2 by generating a program check.
-> >>>>
-> >>>> B. Kernel: return -EFAULT
-> >>>>            +
-> >>>>            update the IRB area in the I/O region for option 1 to present
-> >>>>            a unit check SCSW (with proper sense byte ECW), and for option
-> >>>>            2 to present a program check.
-> >>>>    Qemu  : handle -EFAULT according to the information that the IRB area
-> >>>>            provided.  
-> >>>
-> >>> This is not what I was trying to say. You got my message regarding A, but
-> >>> B was supposed to be understood like this.
-> >>>
-> >>> Keep the current handling for option 1, that is return -EFAULT. For option
-> >>> 2 do what the spec says, execute the program until the bad address and then
-> >>> generate a program-check (SCSW) once the bad stuff has it's turn. Thus
-> >>> the only change in QEMU would be handling -EFAULT with an unit check (because
-> >>> now it's just option 1).
-> > Let me adding some context information here by copying some words from the
-> > previous mail in this thread:
-> > The only option 2 case in the kernel is ccwchain_fetch_idal() finding a
-> > bad idaw_iova.
-> > 
-> > What you propose to do for this case is (correct me if I get it wrong):
-> > In ccwchain_fetch_idal(), we do not return -EFAULT, instead we return 0,
-> > and issuing the incompletely translated channel program with the bad
-> > address to the physical device. And QEMU will eventually get the SCSW
-> > with the program-check from the physical device I/O result, and inject
-> > it to guest for further handling.
-> > 
-> 
-> I guess that would be the cleanest. I would also be fine with not making
-> the physical device program-check (issuing a shortened channel program,
-> and doing the program check in software) but that's probably more
-> complicated to implement.
-That's far more complicated. I will try the simple approach.
+> On 09/26/2017 03:51 PM, David Hildenbrand wrote:
+>> On 26.09.2017 15:36, Christian Borntraeger wrote:
+>>> With newer kernels that do support the ais feature (4.13) a qemu 2.11
+>>> will not only enable the ais feature for the 2.11 machine, but also
+>>> for a <=2.10 compat machine. As this feature is not available in
+>>> QEMU <=2.9 (and QEMU 2.10.1), this guest will fail to migrate
+>>> back to an older qemu like 2.9 with:
+>>>
+>>> _snip_
+>>> error while loading state for instance 0x0 of device 's390-flic'
+>>> _snip_
+>>>
+>>> making the whole compat machine dis-functional. As a permanent fix, we
+>>> need to fence the ais feature for machines <= 2.10
+>>>
+>>> Due to ais being enabled on 2.10.0 (fixed in 2.10.1) this will prevent
+>>> migration of ais-enabled guests from 2.10.0 with
+>>>
+>>> _snip_
+>>> qemu-system-s390x: Failed to load s390-flic/ais:tmp
+>>> qemu-system-s390x: error while loading state for instance 0x0 of device 's390-flic'
+>>> qemu-system-s390x: load of migration failed: Function not implemented
+>>> _snip_
+>>>
+>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>>> Cc: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+>>> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>> ---
+>>>  hw/intc/s390_flic_kvm.c            |  4 +++-
+>>
+>>
+>> As discussed, I think we should use cpu_model_allowed() instead.
+> I think I still prefer the explicit check for ais-enabled to make managedsave
+> (on the same system) continue to work if the user does not specify a cpu model 
+> at all (which will then fallback to the host model). We already fence other
+> things (like guarded storage) and yes it will grow over time but the 
+> *_allowed things seem to be the smallest maintenance issue in this area.
 
-> > Is this understanding right? If so, I'm fine with that, and I can
-> > provide the fix in the kernel.
-> > 
-> 
-> That would be nice.
-Ok.
-
--- 
-Dong Jia Shi
+Hmm, on the other hand this fails only when we migrate to an older qemu during
+managedsave. So yes, maybe this is just an "will not work anyway"
