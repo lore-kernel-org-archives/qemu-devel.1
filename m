@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dxCap-0007os-2S
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:41:46 -0400
+	(envelope-from <bounces@canonical.com>) id 1dxCay-0007us-Bz
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:41:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dxCaj-0001de-9b
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:41:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57886)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dxCaj-0001dF-33
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:41:33 -0400
-Date: Wed, 27 Sep 2017 10:41:24 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170927134124.GG4115@localhost.localdomain>
-References: <20170927130339.21444-1-ehabkost@redhat.com>
-	<20170927130339.21444-5-ehabkost@redhat.com>
-	<20170927133321.GB8521@lemon.lan>
+	(envelope-from <bounces@canonical.com>) id 1dxCas-0001hW-45
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:41:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47784)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dxCar-0001gh-TE
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:41:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1dxCao-0004Hc-Eq
+	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 13:41:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1EC3E2E852C
+	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 13:41:27 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170927133321.GB8521@lemon.lan>
-Subject: Re: [Qemu-devel] [PATCH 4/5] scripts: Remove debug parameter from
- QEMUMonitorProtocol
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 27 Sep 2017 13:33:54 -0000
+From: Denys Zagorui <1719339@bugs.launchpad.net>
+Reply-To: Bug 1719339 <1719339@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150635197143.30872.17188090859541401647.malonedeb@wampee.canonical.com>
+Message-Id: <150651923473.5936.15995644373163842793.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1719339] Re: serial8250: too much work for irq3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +36,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Cleber Rosa <crosa@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
 
-On Wed, Sep 27, 2017 at 09:33:21PM +0800, Fam Zheng wrote:
-> On Wed, 09/27 10:03, Eduardo Habkost wrote:
-> > @@ -51,7 +54,6 @@ class QEMUMonitorProtocol(object):
-> >          """
-> >          self.__events = []
-> >          self.__address = address
-> > -        self._debug = debug
-> 
-> Should you also drop the debug parameter from the method?
+Use simpler setup for reproducing. =
 
-I will do.  Thanks for noticing!
+Was used only qemu-system-x86_64 (without using high-level wrappers and man=
+agers of virtual machines: libvirt, virsh, virt-install, virt-manager etc..=
+). My setup with two consoles:
 
-> 
-> >          self.__sock = self.__get_sock()
-> >          self.__sockfile = None
-> >          if server:
-> > @@ -83,8 +85,7 @@ class QEMUMonitorProtocol(object):
-> >                  return
-> >              resp = json.loads(data)
-> >              if 'event' in resp:
-> > -                if self._debug:
-> > -                    print >>sys.stderr, "QMP:<<< %s" % resp
-> > +                self.logger.debug("<<< %s", resp)
-> >                  self.__events.append(resp)
-> >                  if not only_event:
-> >                      continue
-> > @@ -164,8 +165,7 @@ class QEMUMonitorProtocol(object):
-> >          @return QMP response as a Python dict or None if the connection has
-> >                  been closed
-> >          """
-> > -        if self._debug:
-> > -            print >>sys.stderr, "QMP:>>> %s" % qmp_cmd
-> > +        self.logger.debug("<<< %s", qmp_cmd)
-> 
-> This should be ">>> %s".
+/usr/local/bin/qemu-system-x86_64 -cpu host -enable-kvm -m 256 -smp 4
+-kernel /home/dzagorui//bzImage -append 'root=3D/dev/ram0 loglevel=3D9 rw
+console=3DttyS0' -initrd /home/dzagorui/initrd.cpio -display none -chardev
+socket,id=3Dcharserial0,host=3D127.0.0.1,port=3D4002,telnet,server,nowait
+-device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
+socket,id=3Dcharserial1,host=3D127.0.0.1,port=3D4003,telnet,server,nowait
+-device isa-serial,chardev=3Dcharserial1,id=3Dserial1
 
-Good catch.  Thanks!
+I noticed one thing, that -smp parameter affects this issue. When -smp 1 i =
+can't reproduce this issue at all, when -smp 2 i can produce this issue onl=
+y in second console (ttyS1), when -smp 4 and higher the issue produces on b=
+oth consoles (ttyS1/ttyS0).
+My Host cpu i5-6200U has 2 cores and 4 threads.
 
-I will send a fixup in a moment.
+For reproducing was used this commands (no matter what console we use ttyS1=
+ or ttyS0):
+#dmesg > /dev/ttyS*
+#dd if=3D/dev/zero of=3D/dev/ttyS*
 
--- 
-Eduardo
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1719339
+
+Title:
+  serial8250: too much work for irq3
+
+Status in QEMU:
+  New
+
+Bug description:
+  It's know issue and sometimes mentioned since 2007. But it seems not
+  fixed.
+
+  http://lists.gnu.org/archive/html/qemu-devel/2008-02/msg00140.html
+  https://bugzilla.redhat.com/show_bug.cgi?id=3D986761
+  http://old-list-archives.xenproject.org/archives/html/xen-devel/2009-02/m=
+sg00696.html
+
+  I don't think fixes like increases PASS_LIMIT
+  (/drivers/tty/serial/8250.c) or remove this annoying message
+  (https://patchwork.kernel.org/patch/3920801/) is real fix. Some fix
+  was proposed by H. Peter Anvin  https://lkml.org/lkml/2008/2/7/485.
+
+  Can reproduce on Debian Strech host (Qemu 1:2.8+dfsg-6+deb9u2), Ubuntu
+  16.04.2 LTS (Qemu 1:2.5+dfsg-5ubuntu10.15) also tried to use master
+  branch (QEMU emulator version 2.10.50 (v2.10.0-766-ga43415ebfd-dirty))
+  if we write a lot of message into console (dmesg or dd if=3D/dev/zero
+  of=3D/dev/ttyS1).
+
+  /usr/local/bin/qemu-system-x86_64 -name guest=3Dultra1,debug-threads=3Don
+  -S -object
+  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-2=
+7-ultra1
+  /master-key.aes -machine pc-i440fx-2.8,accel=3Dkvm,usb=3Doff,dump-guest-
+  core=3Doff -cpu Skylake-
+  Client,ds=3Don,acpi=3Don,ss=3Don,ht=3Don,tm=3Don,pbe=3Don,dtes64=3Don,mon=
+itor=3Don,ds_cpl=3Don,vmx=3Don,smx=3Don,est=3Don,tm2=3Don,xtpr=3Don,pdcm=3D=
+on,osxsave=3Don,tsc_adjust=3Don,clflushopt=3Don,pdpe1gb=3Don
+  -m 4096 -realtime mlock=3Doff -smp 4,sockets=3D1,cores=3D4,threads=3D1 -u=
+uid
+  4537ca29-73b2-40c3-9b43-666de182ba5f -display none -no-user-config
+  -nodefaults -chardev
+  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-27-ultra1/mon=
+itor.sock,server,nowait
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
+  base=3Dutc,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddelay -no-h=
+pet
+  -no-shutdown -global PIIX4_PM.disable_s3=3D1 -global
+  PIIX4_PM.disable_s4=3D1 -boot strict=3Don -device ich9-usb-
+  ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x8.0x7 -drive
+  file=3D/home/dzagorui/csr/csr_disk.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddr=
+ive-
+  ide0-0-0 -device ide-hd,bus=3Dide.0,unit=3D0,drive=3Ddrive-
+  ide0-0-0,id=3Dide0-0-0,bootindex=3D1 -netdev tap,fd=3D26,id=3Dhostnet0 -d=
+evice
+  e1000,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:a9:4c:86,bus=3Dpci.0,add=
+r=3D0x3
+  -chardev
+  socket,id=3Dcharserial0,host=3D127.0.0.1,port=3D4000,telnet,server,nowait
+  -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
+  socket,id=3Dcharserial1,host=3D127.0.0.1,port=3D4001,telnet,server,nowait
+  -device isa-serial,chardev=3Dcharserial1,id=3Dserial1 -device virtio-
+  balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x2 -msg timestamp=3Don
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1719339/+subscriptions
