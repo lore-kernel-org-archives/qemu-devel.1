@@ -1,27 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dxBaC-0007fM-2h
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:36:56 -0400
+	(envelope-from <berrange@redhat.com>) id 1dxBqf-0004FM-Ah
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:53:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dxBaB-0001SA-7K
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:36:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42988)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dxBaB-0001S1-1H
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:36:55 -0400
-Date: Wed, 27 Sep 2017 20:36:46 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170927123646.GA8521@lemon.lan>
-References: <20170926054439.GB25267@pxdev.xzpeter.org>
-	<20170926084337.GB16834@stefanha-x1.localdomain>
-	<20170926091150.GC3828@pxdev.xzpeter.org>
-	<20170926111343.GE31924@lemon.lan>
-	<20170927121753.GB14579@stefanha-x1.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170927121753.GB14579@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] A glib warning encountered with internal iothread
+	(envelope-from <berrange@redhat.com>) id 1dxBqe-0001Qh-9E
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:53:57 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Wed, 27 Sep 2017 13:53:34 +0100
+Message-Id: <20170927125340.12360-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/6] Misc improvements to crypto block driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,23 +17,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Devel Mailing List <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Wed, 09/27 13:17, Stefan Hajnoczi wrote:
-> On Tue, Sep 26, 2017 at 07:13:43PM +0800, Fam Zheng wrote:
-> > On Tue, 09/26 17:11, Peter Xu wrote:
-> >  void aio_context_unref(AioContext *ctx)
-> >  {
-> > +    assert(ctx->refcnt > 0);
-> > +    if (--ctx->refcnt == 0) {
-> > +        aio_set_event_notifier(ctx, &ctx->notifier, false, NULL, NULL);
-> > +    }
-> 
-> This isn't a general solution because Linux AIO also has a file
-> descriptor that is removed in aio_ctx_finalize().
+This is a followup to
 
-Right. Another option is to move everything in aio_context_finalize() into the
-"if (--ctx->refcnt == 0) { ... }" block, before calling g_source_unref().
+  v1: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg00781.html
+  v2: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg06464.html
+  v3: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg02923.html
 
-Fam
+This collection of patches first improves the performance of the
+crypto block driver and then does various cleanups to improve ongoing
+maint work.
+
+Changed in v4:
+
+  - Drop intermediate patch that replaced '512' with a constant (Max)
+  - Use MIN() macro where needed (Max)
+  - Fix bounce buffer size at 1MB instead of varying per sector size (Max)
+  - Convert missing qcrypto_block_encrypt call to sectors in qcow.c (Max)
+
+Changed in v3:
+
+  - Support passthrough of BDRV_REQ_FUA (Eric)
+  - Fix potential truncation of payload offset values (Eric)
+  - Use encryption scheme sector size instead of BDRV_SECTOR_SIZE (Kevin)
+  - Use QEMU_IS_ALIGNED where appropriate (Eric)
+  - Remove unused 'sector_num' variable (Eric)
+  - Fix whitespace alignment (Eric)
+  - Fix math error in qcow conversion (Eric)
+
+Daniel P. Berrange (6):
+  block: use 1 MB bounce buffers for crypto instead of 16KB
+  crypto: expose encryption sector size in APIs
+  block: fix data type casting for crypto payload offset
+  block: convert crypto driver to bdrv_co_preadv|pwritev
+  block: convert qcrypto_block_encrypt|decrypt to take bytes offset
+  block: support passthrough of BDRV_REQ_FUA in crypto driver
+
+ block/crypto.c         | 130 ++++++++++++++++++++++++++-----------------------
+ block/qcow.c           |  11 +++--
+ block/qcow2-cluster.c  |   8 ++-
+ block/qcow2.c          |   4 +-
+ crypto/block-luks.c    |  18 ++++---
+ crypto/block-qcow.c    |  13 +++--
+ crypto/block.c         |  26 +++++++---
+ crypto/blockpriv.h     |   5 +-
+ include/crypto/block.h |  29 ++++++++---
+ 9 files changed, 148 insertions(+), 96 deletions(-)
+
+-- 
+2.13.5
