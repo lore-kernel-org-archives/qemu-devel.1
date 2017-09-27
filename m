@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70P-0001TO-2T
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:42 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70M-0001Pt-4t
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70N-00046I-Jc
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:41 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70L-000431-31
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:38 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 27 Sep 2017 17:43:02 +1000
-Message-Id: <20170927074316.4454-13-david@gibson.dropbear.id.au>
+Date: Wed, 27 Sep 2017 17:42:56 +1000
+Message-Id: <20170927074316.4454-7-david@gibson.dropbear.id.au>
 In-Reply-To: <20170927074316.4454-1-david@gibson.dropbear.id.au>
 References: <20170927074316.4454-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 12/26] ppc/kvm: change kvmppc_get_htab_fd() to
- return -errno on error
+Subject: [Qemu-devel] [PULL 06/26] ppc4xx: Add more PLB registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,73 +22,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, groug@kaod.org, mark.cave-ayland@ilande.co.uk, balaton@eik.bme.hu, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Greg Kurz <groug@kaod.org>
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-When kvmppc_get_htab_fd() fails, its return value is propagated up to
-qemu_savevm_state_iterate() or to qemu_savevm_state_complete_precopy().
-All savevm handlers expect to receive a negative errno on error.
+These registers are present in 440 SoCs (and maybe in others too) and
+U-Boot accesses them when printing register info. We don't emulate
+these but add them to avoid crashing when they are read or written.
 
-Let's patch kvmppc_get_htab_fd() accordingly.
-
-While here, let's change htab_load() in the spapr code to also
-propagate the error, since it doesn't make sense to abort() if
-we couldn't get the htab fd from KVM.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c   |  5 +++--
- target/ppc/kvm.c | 10 ++++++++--
- 2 files changed, 11 insertions(+), 4 deletions(-)
+ hw/ppc/ppc405_uc.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 17ea77618c..ec0ea7b5dd 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1218,7 +1218,7 @@ static int get_htab_fd(sPAPRMachineState *spapr)
-     spapr->htab_fd = kvmppc_get_htab_fd(false);
-     if (spapr->htab_fd < 0) {
-         error_report("Unable to open fd for reading hash table from KVM: %s",
--                     strerror(errno));
-+                     strerror(spapr->htab_fd));
-     }
+diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
+index e621d0aec5..8e58065f5f 100644
+--- a/hw/ppc/ppc405_uc.c
++++ b/hw/ppc/ppc405_uc.c
+@@ -105,9 +105,12 @@ ram_addr_t ppc405_set_bootinfo (CPUPPCState *env, ppc4xx_bd_info_t *bd,
+ /*****************************************************************************/
+ /* Peripheral local bus arbitrer */
+ enum {
+-    PLB0_BESR = 0x084,
+-    PLB0_BEAR = 0x086,
+-    PLB0_ACR  = 0x087,
++    PLB3A0_ACR = 0x077,
++    PLB4A0_ACR = 0x081,
++    PLB0_BESR  = 0x084,
++    PLB0_BEAR  = 0x086,
++    PLB0_ACR   = 0x087,
++    PLB4A1_ACR = 0x089,
+ };
  
-     return spapr->htab_fd;
-@@ -1958,7 +1958,8 @@ static int htab_load(QEMUFile *f, void *opaque, int version_id)
-         fd = kvmppc_get_htab_fd(true);
-         if (fd < 0) {
-             error_report("Unable to open fd to restore KVM hash table: %s",
--                         strerror(errno));
-+                         strerror(fd));
-+            return fd;
-         }
-     }
+ typedef struct ppc4xx_plb_t ppc4xx_plb_t;
+@@ -179,9 +182,12 @@ void ppc4xx_plb_init(CPUPPCState *env)
+     ppc4xx_plb_t *plb;
  
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index be27429b57..2780e692a7 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2556,13 +2556,19 @@ int kvmppc_get_htab_fd(bool write)
-         .flags = write ? KVM_GET_HTAB_WRITE : 0,
-         .start_index = 0,
-     };
-+    int ret;
- 
-     if (!cap_htab_fd) {
-         fprintf(stderr, "KVM version doesn't support saving the hash table\n");
--        return -1;
-+        return -ENOTSUP;
-+    }
-+
-+    ret = kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &s);
-+    if (ret < 0) {
-+        return -errno;
-     }
- 
--    return kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &s);
-+    return ret;
+     plb = g_malloc0(sizeof(ppc4xx_plb_t));
++    ppc_dcr_register(env, PLB3A0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
++    ppc_dcr_register(env, PLB4A0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
+     ppc_dcr_register(env, PLB0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
+     ppc_dcr_register(env, PLB0_BEAR, plb, &dcr_read_plb, &dcr_write_plb);
+     ppc_dcr_register(env, PLB0_BESR, plb, &dcr_read_plb, &dcr_write_plb);
++    ppc_dcr_register(env, PLB4A1_ACR, plb, &dcr_read_plb, &dcr_write_plb);
+     qemu_register_reset(ppc4xx_plb_reset, plb);
  }
  
- int kvmppc_save_htab(QEMUFile *f, int fd, size_t bufsize, int64_t max_ns)
 -- 
 2.13.5
