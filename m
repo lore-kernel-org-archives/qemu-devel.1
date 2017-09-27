@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dx8OJ-0003Pz-KJ
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:12:31 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dx8PE-0003yw-TS
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:13:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dx8OE-0004Vt-0W
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:12:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42816)
+	(envelope-from <cohuck@redhat.com>) id 1dx8P9-00054u-5o
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:13:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52946)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dx8OD-0004VW-QZ
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:12:21 -0400
-Date: Wed, 27 Sep 2017 11:12:14 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dx8P8-00054M-Tm
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:13:19 -0400
+Date: Wed, 27 Sep 2017 11:13:07 +0200
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170927111214.5aa7a7dc.cohuck@redhat.com>
-In-Reply-To: <20170927072030.35737-2-borntraeger@de.ibm.com>
-References: <20170927072030.35737-1-borntraeger@de.ibm.com>
-	<20170927072030.35737-2-borntraeger@de.ibm.com>
+Message-ID: <20170927111307.4812fe03.cohuck@redhat.com>
+In-Reply-To: <c43687d5-192c-6826-b206-f36e22e75721@de.ibm.com>
+References: <20170926180522.68482-1-borntraeger@de.ibm.com>
+	<67c13b99-2d44-666b-9328-05917d0fc0dc@redhat.com>
+	<20170927093959.3f61dd36.cohuck@redhat.com>
+	<b8704df5-9c1d-1aed-2adf-f783a66a5eeb@de.ibm.com>
+	<20170927105727.08c3b3af.cohuck@redhat.com>
+	<c43687d5-192c-6826-b206-f36e22e75721@de.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] s390x/cpumodel: remove ais from z14
+Subject: Re: [Qemu-devel] [PATCH] s390x/cpumodel: remove ais from z14
  default model-> also for 2.10.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,33 +33,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Michael Roth <mdroth@linux.vnet.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Wed, 27 Sep 2017 09:20:28 +0200
+On Wed, 27 Sep 2017 11:09:28 +0200
 Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> We disabled ais for 2.10 lets also remove it from the z14 default model.
+> On 09/27/2017 10:57 AM, Cornelia Huck wrote:
+> > On Wed, 27 Sep 2017 09:41:21 +0200
+> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> >   
+> >> On 09/27/2017 09:39 AM, Cornelia Huck wrote:  
+> >>> On Tue, 26 Sep 2017 20:26:31 +0200
+> >>> David Hildenbrand <david@redhat.com> wrote:
+> >>>     
+> >>>> On 26.09.2017 20:05, Christian Borntraeger wrote:    
+> >>>>> We disabled ais for 2.10 lets also remove it from the z14 default model.
+> >>>>>
+> >>>>> Fixes: 3f2d07b3b01e  s390x/ais: for 2.10 stable: disable ais facility
+> >>>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> >>>>> ---
+> >>>>>  target/s390x/gen-features.c | 1 -
+> >>>>>  1 file changed, 1 deletion(-)
+> >>>>>
+> >>>>> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+> >>>>> index c8dc104..68e6c31 100644
+> >>>>> --- a/target/s390x/gen-features.c
+> >>>>> +++ b/target/s390x/gen-features.c
+> >>>>> @@ -527,7 +527,6 @@ static uint16_t default_GEN13_GA1[] = {
+> >>>>>  #define default_GEN13_GA2 EmptyFeat
+> >>>>>  
+> >>>>>  static uint16_t default_GEN14_GA1[] = {
+> >>>>> -    S390_FEAT_ADAPTER_INT_SUPPRESSION,
+> >>>>>      S390_FEAT_INSTRUCTION_EXEC_PROT,
+> >>>>>      S390_FEAT_GUARDED_STORAGE,
+> >>>>>      S390_FEAT_VECTOR_PACKED_DECIMAL,
+> >>>>>       
+> >>>>
+> >>>> Yes, this has to go into stable, otherwise the migration safe stable
+> >>>> model would be changed.
+> >>>>
+> >>>> Apart from that, this looks just fine.    
+> >>>
+> >>> So, this should go into stable only, as the patches currently on the
+> >>> list will fix this properly for 2.11, right?    
+> >>
+> >> No this also has to go into 2.11 (otherwise the default model for z14 would differ)
+> >> so maybe change the subject when applying.
+> >>  
+> > 
+> > OK, so it looks like I should do the following:
+> > - Get this upstream as a single patch so that it does not miss the
+> >   2.10.1 train.  
+> 
+> Can you add the Cc stable? I forgot that.
 
-s/lets/, so let's/
+Huh, me too. Fixing up.
 
 > 
-> Fixes: 3f2d07b3b01e  s390x/ais: for 2.10 stable: disable ais facility
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  target/s390x/gen-features.c | 1 -
->  1 file changed, 1 deletion(-)
+> > - Send another pull with the ais(yours)/phb(mine)/whatever(I hope
+> >   that's it...) fixups once we're confident about those.  
 > 
-> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-> index c8dc104..68e6c31 100644
-> --- a/target/s390x/gen-features.c
-> +++ b/target/s390x/gen-features.c
-> @@ -527,7 +527,6 @@ static uint16_t default_GEN13_GA1[] = {
->  #define default_GEN13_GA2 EmptyFeat
->  
->  static uint16_t default_GEN14_GA1[] = {
-> -    S390_FEAT_ADAPTER_INT_SUPPRESSION,
->      S390_FEAT_INSTRUCTION_EXEC_PROT,
->      S390_FEAT_GUARDED_STORAGE,
->      S390_FEAT_VECTOR_PACKED_DECIMAL,
-
-Thanks, fixed description and applied to s390-fixes.
+> yes.
+> > 
+> > Agreed?
+> >   
+> 
