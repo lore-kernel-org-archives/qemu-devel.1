@@ -1,44 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dxA4D-0003Yb-Vq
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 06:59:51 -0400
+	(envelope-from <bharat.bhushan@nxp.com>) id 1dxA5c-0004KG-5t
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 07:01:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dxA4A-0003Cv-0m
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 06:59:50 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50076)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dxA49-0003Az-Nw
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 06:59:45 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8RAwtYP045361
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 06:59:40 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d83qrn1hm-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 06:59:40 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 27 Sep 2017 11:59:38 +0100
-References: <20170926162058.30772-1-cohuck@redhat.com>
-	<20170926162058.30772-2-cohuck@redhat.com>
-	<338c8565-691e-a8bc-d8a6-3637ce13701d@redhat.com>
-	<20170927114717.72bd69f8.cohuck@redhat.com>
-	<e8bef299-5501-a59d-aba3-5a338227966e@linux.vnet.ibm.com>
-	<20170927125606.65dc514d.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 27 Sep 2017 12:59:35 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170927125606.65dc514d.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <bharat.bhushan@nxp.com>) id 1dxA5S-0004QV-Kg
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 07:01:16 -0400
+From: Bharat Bhushan <bharat.bhushan@nxp.com>
+Date: Wed, 27 Sep 2017 11:00:52 +0000
+Message-ID: <AM5PR0401MB254589AAAAC0DAC45861D05C9A780@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+References: <1505807208-9063-1-git-send-email-eric.auger@redhat.com>
+	<1505807208-9063-11-git-send-email-eric.auger@redhat.com>
+	<4cecfa75-c97a-586b-aadf-9b0bfd168960@caviumnetworks.com>
+In-Reply-To: <4cecfa75-c97a-586b-aadf-9b0bfd168960@caviumnetworks.com>
 Content-Language: en-US
-Message-Id: <14df9ad6-f0e9-cd51-04dd-4fe994808433@de.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390x: create a compat s390 phb for
- <=2.10
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC v4 10/16] virtio-iommu: Implement probe
+ request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,51 +26,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, agraf@suse.de, pasic@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, dgilbert@redhat.com
+To: Tomasz Nowicki <tnowicki@caviumnetworks.com>, Eric Auger <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>
+Cc: "will.deacon@arm.com" <will.deacon@arm.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "drjones@redhat.com" <drjones@redhat.com>, "wei@redhat.com" <wei@redhat.com>, "peterx@redhat.com" <peterx@redhat.com>, "linuc.decode@gmail.com" <linuc.decode@gmail.com>
 
-
-
-On 09/27/2017 12:56 PM, Cornelia Huck wrote:
-> On Wed, 27 Sep 2017 18:25:00 +0800
-> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
->=20
->> =E5=9C=A8 2017/9/27 =E4=B8=8B=E5=8D=885:47, Cornelia Huck =E5=86=99=E9=
-=81=93:
->>> On Tue, 26 Sep 2017 20:40:25 +0200
->>> David Hildenbrand <david@redhat.com> wrote:
->=20
->>>> I'd really really really (did I mention really?) favor something lik=
-e a
->>>> dummy device, because we could easily handle the !CONFIG_PCI case th=
-en.
->>>>
->>>> All these compat options and conditions will kill us someday... we'r=
-e
->>>> already patching around that whole stuff way too much.
->>>>
->>>> If we ever unconditionally created a device, we should keep doing so=
-. =20
->>> Yes, that whole thing is horrible, especially interaction with compat
->>> machines.
->>>
->>> Do you have an idea on how to create such a dummy device (without
->>> having to effectively copy a lot of configured-out code)?
->>>
->>> =20
->> How about in s390_pcihost_hot_plug() we check s390_has_feat(zpci)?
->> If no zpci feature, we avoid plugging any pci device.
->> Then we could always create phb.
->> I think pcibus's vmstate is only data to migrate.
->=20
-> That's still problematic if CONFIG_PCI is off. I currently don't have a
-> better idea than either disallowing compat machines on builds without
-> pci, or using a dummy device...
-
-For this particular case your initial patch might be less problematic tha=
-n
-a dummy device, because the code that does the migration is NOT contained
-in s390 specific code but in common PCI code instead. We would need to ke=
-ep
-the dummy device always in a way that it will work with the common PCI
-code.
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogVG9tYXN6IE5vd2lja2kg
+W21haWx0bzp0bm93aWNraUBjYXZpdW1uZXR3b3Jrcy5jb21dDQo+IFNlbnQ6IFdlZG5lc2RheSwg
+U2VwdGVtYmVyIDI3LCAyMDE3IDQ6MjMgUE0NCj4gVG86IEVyaWMgQXVnZXIgPGVyaWMuYXVnZXJA
+cmVkaGF0LmNvbT47IGVyaWMuYXVnZXIucHJvQGdtYWlsLmNvbTsNCj4gcGV0ZXIubWF5ZGVsbEBs
+aW5hcm8ub3JnOyBhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbTsgbXN0QHJlZGhhdC5jb207DQo+
+IHFlbXUtYXJtQG5vbmdudS5vcmc7IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgamVhbi0NCj4gcGhp
+bGlwcGUuYnJ1Y2tlckBhcm0uY29tDQo+IENjOiB3aWxsLmRlYWNvbkBhcm0uY29tOyBrZXZpbi50
+aWFuQGludGVsLmNvbTsgbWFyYy56eW5naWVyQGFybS5jb207DQo+IGNocmlzdG9mZmVyLmRhbGxA
+bGluYXJvLm9yZzsgZHJqb25lc0ByZWRoYXQuY29tOyB3ZWlAcmVkaGF0LmNvbTsgQmhhcmF0DQo+
+IEJodXNoYW4gPGJoYXJhdC5iaHVzaGFuQG54cC5jb20+OyBwZXRlcnhAcmVkaGF0LmNvbTsNCj4g
+bGludWMuZGVjb2RlQGdtYWlsLmNvbQ0KPiBTdWJqZWN0OiBSZTogW1JGQyB2NCAxMC8xNl0gdmly
+dGlvLWlvbW11OiBJbXBsZW1lbnQgcHJvYmUgcmVxdWVzdA0KPiANCj4gSGkgRXJpYywNCj4gDQo+
+IE9uIDE5LjA5LjIwMTcgMDk6NDYsIEVyaWMgQXVnZXIgd3JvdGU6DQo+ID4gVGhpcyBwYXRjaCBp
+bXBsZW1lbnRzIHRoZSBQUk9CRSByZXF1ZXN0LiBBdCB0aGUgbW9tZW50LCBubyByZXNlcnZlZA0K
+PiA+IHJlZ2lvbnMgYXJlIHJldHVybmVkLg0KPiA+DQo+ID4gQXQgdGhlIG1vbWVudCByZXNlcnZl
+ZCByZWdpb25zIGFyZSBzdG9yZWQgcGVyIGRldmljZS4NCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6
+IEVyaWMgQXVnZXIgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4NCj4gPg0KPiA+IC0tLQ0KPiA+DQo+
+IA0KPiBbLi4uXQ0KPiANCj4gPiArDQo+ID4gK3N0YXRpYyBpbnQgdmlydGlvX2lvbW11X2ZpbGxf
+cHJvcGVydHkoaW50IGRldmlkLCBpbnQgdHlwZSwNCj4gPiArICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICB2aW9tbXVfcHJvcGVydHlfYnVmZmVyDQo+ID4gKypidWZzdGF0ZSkg
+ew0KPiA+ICsgICAgaW50IHJldCA9IC1FTk9TUEM7DQo+ID4gKw0KPiA+ICsgICAgaWYgKGJ1ZnN0
+YXRlLT5maWxsZWQgKyA0ID49IFZJT01NVV9QUk9CRV9TSVpFKSB7DQo+ID4gKyAgICAgICAgYnVm
+c3RhdGUtPmVycm9yID0gdHJ1ZTsNCj4gPiArICAgICAgICBnb3RvIG91dDsNCj4gPiArICAgIH0N
+Cj4gPiArDQo+ID4gKyAgICBzd2l0Y2ggKHR5cGUpIHsNCj4gPiArICAgIGNhc2UgVklSVElPX0lP
+TU1VX1BST0JFX1RfTk9ORToNCj4gPiArICAgICAgICByZXQgPSB2aXJ0aW9faW9tbXVfZmlsbF9u
+b25lX3Byb3AoYnVmc3RhdGUpOw0KPiA+ICsgICAgICAgIGJyZWFrOw0KPiA+ICsgICAgY2FzZSBW
+SVJUSU9fSU9NTVVfUFJPQkVfVF9SRVNWX01FTToNCj4gPiArICAgIHsNCj4gPiArICAgICAgICB2
+aW9tbXVfZGV2ICpkZXYgPSBidWZzdGF0ZS0+ZGV2Ow0KPiA+ICsNCj4gPiArICAgICAgICBnX3Ry
+ZWVfZm9yZWFjaChkZXYtPnJlc2VydmVkX3JlZ2lvbnMsDQo+ID4gKyAgICAgICAgICAgICAgICAg
+ICAgICAgdmlydGlvX2lvbW11X2ZpbGxfcmVzdl9tZW1fcHJvcCwNCj4gPiArICAgICAgICAgICAg
+ICAgICAgICAgICBidWZzdGF0ZSk7DQo+ID4gKyAgICAgICAgaWYgKCFidWZzdGF0ZS0+ZXJyb3Ip
+IHsNCj4gPiArICAgICAgICAgICAgcmV0ID0gMDsNCj4gPiArICAgICAgICB9DQo+ID4gKyAgICAg
+ICAgYnJlYWs7DQo+ID4gKyAgICB9DQo+ID4gKyAgICBkZWZhdWx0Og0KPiA+ICsgICAgICAgIHJl
+dCA9IC1FTk9FTlQ7DQo+ID4gKyAgICAgICAgYnJlYWs7DQo+ID4gKyAgICB9DQo+ID4gK291dDoN
+Cj4gPiArICAgIGlmIChyZXQpIHsNCj4gPiArICAgICAgICBlcnJvcl9yZXBvcnQoIiVzIHByb3Bl
+cnR5IG9mIHR5cGU9JWQgY291bGQgbm90IGJlIGZpbGxlZCAoJWQpLCINCj4gPiArICAgICAgICAg
+ICAgICAgICAgICAgIiByZW1haW5pbmcgc2l6ZSA9IDB4JWx4IiwNCj4gPiArICAgICAgICAgICAg
+ICAgICAgICAgX19mdW5jX18sIHR5cGUsIHJldCwgYnVmc3RhdGUtPmZpbGxlZCk7DQo+ID4gKyAg
+ICB9DQo+ID4gKyAgICByZXR1cm4gcmV0Ow0KPiA+ICt9DQo+ID4gKw0KPiA+ICtzdGF0aWMgaW50
+IHZpcnRpb19pb21tdV9wcm9iZShWaXJ0SU9JT01NVSAqcywNCj4gPiArICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgc3RydWN0IHZpcnRpb19pb21tdV9yZXFfcHJvYmUgKnJlcSwNCj4gPiAr
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDhfdCAqYnVmKSB7DQo+ID4gKyAgICB1
+aW50MzJfdCBkZXZpZCA9IGxlMzJfdG9fY3B1KHJlcS0+ZGV2aWNlKTsNCj4gPiArICAgIGludDE2
+X3QgcHJvcF90eXBlcyA9IFNVUFBPUlRFRF9QUk9CRV9QUk9QRVJUSUVTLCB0eXBlOw0KPiA+ICsg
+ICAgdmlvbW11X3Byb3BlcnR5X2J1ZmZlciBidWZzdGF0ZTsNCj4gPiArICAgIHZpb21tdV9kZXYg
+KmRldjsNCj4gPiArICAgIGludCByZXQ7DQo+ID4gKw0KPiA+ICsgICAgZGV2ID0gZ190cmVlX2xv
+b2t1cChzLT5kZXZpY2VzLCBHVUlOVF9UT19QT0lOVEVSKGRldmlkKSk7DQo+ID4gKyAgICBpZiAo
+IWRldikgew0KPiA+ICsgICAgICAgIHJldHVybiAtRUlOVkFMOw0KPiA+ICsgICAgfQ0KPiA+ICsN
+Cj4gPiArICAgIGJ1ZnN0YXRlLnN0YXJ0ID0gYnVmOw0KPiA+ICsgICAgYnVmc3RhdGUuZmlsbGVk
+ID0gMDsNCj4gPiArICAgIGJ1ZnN0YXRlLmRldiA9IGRldjsNCj4gDQo+IGJ1ZnN0YXRlLmVycm9y
+IGlzIG5vdCBpbml0aWFsaXplZCB3aGljaCBtYXkgY2F1c2UgZmFsc2UgYWxhcm0gaW4NCj4gdmly
+dGlvX2lvbW11X2ZpbGxfcHJvcGVydHkoKQ0KDQpJIG9ic2VydmVkIGJlbG93IHByaW50cyANCgkg
+InFlbXUtc3lzdGVtLWFhcmNoNjQ6IHZpcnRpb19pb21tdV9maWxsX3Byb3BlcnR5IHByb3BlcnR5
+IG9mIHR5cGU9MiBjb3VsZCBub3QgYmUgZmlsbGVkICgtMjgpLCByZW1haW5pbmcgc2l6ZSA9IDB4
+MCAiDQoNCldoZW4gSSBpbml0aWFsaXplZCB0aGUgYnVmc3RhdGUuZXJyb3IgPSAwLGl0IGdvZXMu
+DQoNClRoYW5rcw0KLUJoYXJhdA0KDQo+IA0KPiA+ICsNCj4gPiArICAgIHdoaWxlICgodHlwZSA9
+IGN0ejMyKHByb3BfdHlwZXMpKSAhPSAzMikgew0KPiA+ICsgICAgICAgIHJldCA9IHZpcnRpb19p
+b21tdV9maWxsX3Byb3BlcnR5KGRldmlkLCAxIDw8IHR5cGUsICZidWZzdGF0ZSk7DQo+ID4gKyAg
+ICAgICAgaWYgKHJldCkgew0KPiA+ICsgICAgICAgICAgICBicmVhazsNCj4gPiArICAgICAgICB9
+DQo+ID4gKyAgICAgICAgcHJvcF90eXBlcyAmPSB+KDEgPDwgdHlwZSk7DQo+ID4gKyAgICB9DQo+
+ID4gKyAgICB2aXJ0aW9faW9tbXVfZmlsbF9wcm9wZXJ0eShkZXZpZCwgVklSVElPX0lPTU1VX1BS
+T0JFX1RfTk9ORSwNCj4gPiArICZidWZzdGF0ZSk7DQo+ID4gKw0KPiA+ICsgICAgcmV0dXJuIFZJ
+UlRJT19JT01NVV9TX09LOw0KPiA+ICt9DQo+ID4gKw0KPiA+ICAgI2RlZmluZSBnZXRfcGF5bG9h
+ZF9zaXplKHJlcSkgKFwNCj4gPiAgIHNpemVvZigocmVxKSkgLSBzaXplb2Yoc3RydWN0IHZpcnRp
+b19pb21tdV9yZXFfdGFpbCkpDQo+ID4NCj4gPiBAQCAtNDMzLDYgKzU2NywyNCBAQCBzdGF0aWMg
+aW50DQo+IHZpcnRpb19pb21tdV9oYW5kbGVfdW5tYXAoVmlydElPSU9NTVUgKnMsDQo+ID4gICAg
+ICAgcmV0dXJuIHZpcnRpb19pb21tdV91bm1hcChzLCAmcmVxKTsNCj4gPiAgIH0NCj4gDQo+IFRo
+YW5rcywNCj4gVG9tYXN6DQo=
