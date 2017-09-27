@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dx9Eg-0007h0-A5
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 06:06:35 -0400
+	(envelope-from <peterx@redhat.com>) id 1dx9Jl-0000cc-Tc
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 06:11:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dx9Ec-0005Wq-B3
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 06:06:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40762)
+	(envelope-from <peterx@redhat.com>) id 1dx9Jk-0007st-Qh
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 06:11:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37150)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dx9Ec-0005Vc-2B
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 06:06:30 -0400
-References: <20170906142658.58298-1-marcel@redhat.com>
-	<20170906142658.58298-3-marcel@redhat.com>
-	<4ca77991-ad6a-a138-622b-b42f410fa1eb@redhat.com>
-	<a8d8ec43-bc27-b28a-dd7d-163a715acb5e@redhat.com>
-	<24ca79b9-9350-4339-960b-0dbdf9cd4c5b@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <13096938-e70f-7a3a-3cd0-4b9d475c2b18@redhat.com>
-Date: Wed, 27 Sep 2017 13:06:30 +0300
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dx9Jk-0007sa-HY
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 06:11:48 -0400
+Date: Wed, 27 Sep 2017 18:11:41 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170927101141.GB17044@pxdev.xzpeter.org>
+References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
+	<1504081950-2528-22-git-send-email-peterx@redhat.com>
+	<20170922110806.GE2620@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <24ca79b9-9350-4339-960b-0dbdf9cd4c5b@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] hw/pcie: disable IO port fwd by
- default for pcie-root-port
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170922110806.GE2620@work-vm>
+Subject: Re: [Qemu-devel] [RFC v2 21/33] migration: new cmd
+ MIG_CMD_POSTCOPY_RESUME
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,71 +29,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Alexander Bezzubikov <zuban32s@gmail.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-Hi Laszlo,
+On Fri, Sep 22, 2017 at 12:08:06PM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > Introducing this new command to be sent when the source VM is ready to
+> > resume the paused migration.  What the destination does here is
+> > basically release the fault thread to continue service page faults.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  migration/savevm.c     | 33 +++++++++++++++++++++++++++++++++
+> >  migration/savevm.h     |  1 +
+> >  migration/trace-events |  1 +
+> >  3 files changed, 35 insertions(+)
+> > 
+> > diff --git a/migration/savevm.c b/migration/savevm.c
+> > index 7f77a31..e914346 100644
+> > --- a/migration/savevm.c
+> > +++ b/migration/savevm.c
+> > @@ -77,6 +77,7 @@ enum qemu_vm_cmd {
+> >      MIG_CMD_POSTCOPY_RAM_DISCARD,  /* A list of pages to discard that
+> >                                        were previously sent during
+> >                                        precopy but are dirty. */
+> > +    MIG_CMD_POSTCOPY_RESUME,       /* resume postcopy on dest */
+> >      MIG_CMD_PACKAGED,          /* Send a wrapped stream within this stream */
+> >      MIG_CMD_RECV_BITMAP,       /* Request for recved bitmap on dst */
+> >      MIG_CMD_MAX
+> > @@ -95,6 +96,7 @@ static struct mig_cmd_args {
+> >      [MIG_CMD_POSTCOPY_RUN]     = { .len =  0, .name = "POSTCOPY_RUN" },
+> >      [MIG_CMD_POSTCOPY_RAM_DISCARD] = {
+> >                                     .len = -1, .name = "POSTCOPY_RAM_DISCARD" },
+> > +    [MIG_CMD_POSTCOPY_RESUME]  = { .len =  0, .name = "POSTCOPY_RESUME" },
+> >      [MIG_CMD_PACKAGED]         = { .len =  4, .name = "PACKAGED" },
+> >      [MIG_CMD_RECV_BITMAP]      = { .len = -1, .name = "RECV_BITMAP" },
+> >      [MIG_CMD_MAX]              = { .len = -1, .name = "MAX" },
+> > @@ -931,6 +933,12 @@ void qemu_savevm_send_postcopy_run(QEMUFile *f)
+> >      qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_RUN, 0, NULL);
+> >  }
+> >  
+> > +void qemu_savevm_send_postcopy_resume(QEMUFile *f)
+> > +{
+> > +    trace_savevm_send_postcopy_resume();
+> > +    qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_RESUME, 0, NULL);
+> > +}
+> > +
+> >  void qemu_savevm_send_recv_bitmap(QEMUFile *f, char *block_name)
+> >  {
+> >      size_t len;
+> > @@ -1682,6 +1690,28 @@ static int loadvm_postcopy_handle_run(MigrationIncomingState *mis)
+> >      return LOADVM_QUIT;
+> >  }
+> >  
+> > +static int loadvm_postcopy_handle_resume(MigrationIncomingState *mis)
+> > +{
+> > +    if (mis->state != MIGRATION_STATUS_POSTCOPY_RECOVER) {
+> > +        error_report("%s: illegal resume received", __func__);
+> > +        /* Don't fail the load, only for this. */
+> > +        return 0;
+> > +    }
+> > +
+> > +    /*
+> > +     * This means source VM is ready to resume the postcopy migration.
+> > +     * It's time to switch state and release the fault thread to
+> > +     * continue service page faults.
+> > +     */
+> > +    migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_RECOVER,
+> > +                      MIGRATION_STATUS_POSTCOPY_ACTIVE);
+> > +    qemu_sem_post(&mis->postcopy_pause_sem_fault);
+> > +
+> > +    /* TODO: Tell source that "we are ready" */
+> > +
+> 
+> You might want to add a trace in here; however,
 
-On 20/09/2017 14:01, Laszlo Ersek wrote:
->   We now have
-> 
->      if (mem_pref_32_reserve != (uint32_t)-1 &&
->          mem_pref_64_reserve != (uint64_t)-1) {
->          error_setg(errp,
-> 
-> but after introducing the zero value, this is going to be too strict.
-> Consider all the possible combinations:
-> 
-> * (-1; -1): default fw behavior, check is OK
-> 
-> * (-1;  0): fw sticks with the default for the first component, picks
->              "no reservation" for the second component, check is OK
-> 
-> * (-1; >0): fw can treat this identically to ( 0; >0) -- see below. This
->              is justified because, while the first component says "use
->              the default", the entire situation of having such a
->              capability is new, so the firmware can introduce new ways
->              for handling it. The check passes, which is good.
-> 
-> * ( 0;  0): check reports error, but the firmware can handle this case
->              fine (no reservation for either component)
-> 
-> * ( 0; >0): check reports error, but the fw can handle this (no
->              reservation for the first component, specific reservation
->              for the second)
-> 
-> * (>0; >0): conflict, check is OK
-> 
-> (I'm skipping the description of the inverted orderings, such as (0;-1),
-> they behave similarly.)
-> 
-> So we need to accept 0 as "valid" for either component:
-> 
->      if (mem_pref_32_reserve > 0 &&
->          mem_pref_32_reserve < (uint32_t)-1 &&
->          mem_pref_64_reserve > 0 &&
->          mem_pref_64_reserve < (uint64_t)-1) {
->          error_setg(errp,
-> 
+Added.
 
-SeaBIOS  will not allow (0,0) values for pref32 and pref64 fields.
-More than that, 0 values are not being taken in consideration.
+> 
+> 
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-We may say is a bug and fix it. But taking a step back, we need the
-hints to reserve *more* mem range, I am not sure 0 values are 
-interesting for mem reservation. Also is also only a hint,
-the firmware should decide.
+Thanks!
 
-Do we have a concrete scenario where would we want to use (0, non-zero)
-or (non-zero, 0) ? (ask for 32/64 prefetch)
-
-Our current semantic is: "we give a hint to the Guest Firmware,
-we don't decide. However, giving hints to both pref32 and pref64
-is wrong".
-
-
-Not related: Using 0 value to disable IO works just fine!
-No need for disable-IO-fwd property :)
-
-Thanks,
-Marcel
+-- 
+Peter Xu
