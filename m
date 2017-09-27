@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70O-0001SZ-5w
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:46 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70P-0001U3-I0
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70L-00044D-Pm
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:40 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70M-00044x-DD
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:41 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 27 Sep 2017 17:43:03 +1000
-Message-Id: <20170927074316.4454-14-david@gibson.dropbear.id.au>
+Date: Wed, 27 Sep 2017 17:42:59 +1000
+Message-Id: <20170927074316.4454-10-david@gibson.dropbear.id.au>
 In-Reply-To: <20170927074316.4454-1-david@gibson.dropbear.id.au>
 References: <20170927074316.4454-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 13/26] ppc/kvm: generalize the use of
- kvmppc_get_htab_fd()
+Subject: [Qemu-devel] [PULL 09/26] ppc/mac: More rework of the DBDMA
+ emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,191 +21,376 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, groug@kaod.org, mark.cave-ayland@ilande.co.uk, balaton@eik.bme.hu, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, groug@kaod.org, mark.cave-ayland@ilande.co.uk, balaton@eik.bme.hu, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Greg Kurz <groug@kaod.org>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-The use of KVM_PPC_GET_HTAB_FD is open-coded in kvmppc_read_hptes()
-and kvmppc_write_hpte().
+This completely reworks the handling of the control register
+according to my understanding of the HW and the spec.
 
-This patch modifies kvmppc_get_htab_fd() so that it can be used
-everywhere we need to access the in-kernel htab:
-- add an index argument
-  => only kvmppc_read_hptes() passes an actual index, all other users
-     pass 0
-- add an errp argument to propagate error messages to the caller.
-  => spapr migration code prints the error
-  => hpte helpers pass &error_abort to keep the current behavior
-     of hw_error()
+It should (hopefully ... still testing) fix a number of issues
+most notably cases of MacOS hanging.
 
-While here, this also fixes a bug in kvmppc_write_hpte() so that it
-opens the htab fd for writing instead of reading as it currently does.
-This never broke anything because we currently never call this code,
-as explained in the changelog of commit c1385933804bb:
+Also update dbdma_unassigned_rw() and dbdma_unassigned_flush() to
+have the expected behaviour now that flush is handled slightly
+differently.
 
-"This support updating htab managed by the hypervisor. Currently
- we don't have any user for this feature. This actually bring the
- store_hpte interface in-line with the load_hpte one. We may want
- to use this when we want to emulate henter hcall in qemu for HV
- kvm."
-
-The above is still true today.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c       | 15 +++++++--------
- target/ppc/kvm.c     | 27 +++++++++------------------
- target/ppc/kvm_ppc.h |  4 ++--
- 3 files changed, 18 insertions(+), 28 deletions(-)
+ hw/misc/macio/mac_dbdma.c | 191 +++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 139 insertions(+), 52 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index ec0ea7b5dd..90a94952c3 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1211,14 +1211,15 @@ static uint64_t spapr_get_patbe(PPCVirtualHypervisor *vhyp)
-  */
- static int get_htab_fd(sPAPRMachineState *spapr)
+diff --git a/hw/misc/macio/mac_dbdma.c b/hw/misc/macio/mac_dbdma.c
+index 15452b9a28..3fe507393f 100644
+--- a/hw/misc/macio/mac_dbdma.c
++++ b/hw/misc/macio/mac_dbdma.c
+@@ -96,9 +96,8 @@ static void dbdma_cmdptr_load(DBDMA_channel *ch)
+ 
+ static void dbdma_cmdptr_save(DBDMA_channel *ch)
  {
-+    Error *local_err = NULL;
-+
-     if (spapr->htab_fd >= 0) {
-         return spapr->htab_fd;
-     }
- 
--    spapr->htab_fd = kvmppc_get_htab_fd(false);
-+    spapr->htab_fd = kvmppc_get_htab_fd(false, 0, &local_err);
-     if (spapr->htab_fd < 0) {
--        error_report("Unable to open fd for reading hash table from KVM: %s",
--                     strerror(spapr->htab_fd));
-+        error_report_err(local_err);
-     }
- 
-     return spapr->htab_fd;
-@@ -1927,6 +1928,7 @@ static int htab_load(QEMUFile *f, void *opaque, int version_id)
-     sPAPRMachineState *spapr = opaque;
-     uint32_t section_hdr;
-     int fd = -1;
-+    Error *local_err = NULL;
- 
-     if (version_id < 1 || version_id > 1) {
-         error_report("htab_load() bad version");
-@@ -1941,8 +1943,6 @@ static int htab_load(QEMUFile *f, void *opaque, int version_id)
-     }
- 
-     if (section_hdr) {
--        Error *local_err = NULL;
+-    DBDMA_DPRINTFCH(ch, "dbdma_cmdptr_save 0x%08x\n",
+-                    ch->regs[DBDMA_CMDPTR_LO]);
+-    DBDMA_DPRINTFCH(ch, "xfer_status 0x%08x res_count 0x%04x\n",
++    DBDMA_DPRINTFCH(ch, "-> update 0x%08x stat=0x%08x, res=0x%04x\n",
++                    ch->regs[DBDMA_CMDPTR_LO],
+                     le16_to_cpu(ch->current.xfer_status),
+                     le16_to_cpu(ch->current.res_count));
+     dma_memory_write(&address_space_memory, ch->regs[DBDMA_CMDPTR_LO],
+@@ -166,15 +165,14 @@ static int conditional_wait(DBDMA_channel *ch)
+     uint16_t sel_mask, sel_value;
+     uint32_t status;
+     int cond;
 -
-         /* First section gives the htab size */
-         spapr_reallocate_hpt(spapr, section_hdr, &local_err);
-         if (local_err) {
-@@ -1955,10 +1955,9 @@ static int htab_load(QEMUFile *f, void *opaque, int version_id)
-     if (!spapr->htab) {
-         assert(kvm_enabled());
+-    DBDMA_DPRINTFCH(ch, "conditional_wait\n");
++    int res = 0;
  
--        fd = kvmppc_get_htab_fd(true);
-+        fd = kvmppc_get_htab_fd(true, 0, &local_err);
-         if (fd < 0) {
--            error_report("Unable to open fd to restore KVM hash table: %s",
--                         strerror(fd));
-+            error_report_err(local_err);
-             return fd;
-         }
-     }
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 2780e692a7..5b281b2f1b 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2550,21 +2550,25 @@ int kvmppc_define_rtas_kernel_token(uint32_t token, const char *function)
-     return kvm_vm_ioctl(kvm_state, KVM_PPC_RTAS_DEFINE_TOKEN, &args);
- }
- 
--int kvmppc_get_htab_fd(bool write)
-+int kvmppc_get_htab_fd(bool write, uint64_t index, Error **errp)
- {
-     struct kvm_get_htab_fd s = {
-         .flags = write ? KVM_GET_HTAB_WRITE : 0,
--        .start_index = 0,
-+        .start_index = index,
-     };
-     int ret;
- 
-     if (!cap_htab_fd) {
--        fprintf(stderr, "KVM version doesn't support saving the hash table\n");
-+        error_setg(errp, "KVM version doesn't support %s the HPT",
-+                   write ? "writing" : "reading");
-         return -ENOTSUP;
+     wait = le16_to_cpu(current->command) & WAIT_MASK;
+-
+     switch(wait) {
+     case WAIT_NEVER:  /* don't wait */
+         return 0;
+     case WAIT_ALWAYS: /* always wait */
++        DBDMA_DPRINTFCH(ch, "  [WAIT_ALWAYS]\n");
+         return 1;
      }
  
-     ret = kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &s);
-     if (ret < 0) {
-+        error_setg(errp, "Unable to open fd for %s HPT %s KVM: %s",
-+                   write ? "writing" : "reading", write ? "to" : "from",
-+                   strerror(errno));
-         return -errno;
+@@ -187,15 +185,19 @@ static int conditional_wait(DBDMA_channel *ch)
+ 
+     switch(wait) {
+     case WAIT_IFSET:  /* wait if condition bit is 1 */
+-        if (cond)
+-            return 1;
+-        return 0;
++        if (cond) {
++            res = 1;
++        }
++        DBDMA_DPRINTFCH(ch, "  [WAIT_IFSET=%d]\n", res);
++        break;
+     case WAIT_IFCLR:  /* wait if condition bit is 0 */
+-        if (!cond)
+-            return 1;
+-        return 0;
++        if (!cond) {
++            res = 1;
++        }
++        DBDMA_DPRINTFCH(ch, "  [WAIT_IFCLR=%d]\n", res);
++        break;
+     }
+-    return 0;
++    return res;
+ }
+ 
+ static void next(DBDMA_channel *ch)
+@@ -226,8 +228,6 @@ static void conditional_branch(DBDMA_channel *ch)
+     uint32_t status;
+     int cond;
+ 
+-    DBDMA_DPRINTFCH(ch, "conditional_branch\n");
+-
+     /* check if we must branch */
+ 
+     br = le16_to_cpu(current->command) & BR_MASK;
+@@ -237,6 +237,7 @@ static void conditional_branch(DBDMA_channel *ch)
+         next(ch);
+         return;
+     case BR_ALWAYS: /* always branch */
++        DBDMA_DPRINTFCH(ch, "  [BR_ALWAYS]\n");
+         branch(ch);
+         return;
+     }
+@@ -250,16 +251,22 @@ static void conditional_branch(DBDMA_channel *ch)
+ 
+     switch(br) {
+     case BR_IFSET:  /* branch if condition bit is 1 */
+-        if (cond)
++        if (cond) {
++            DBDMA_DPRINTFCH(ch, "  [BR_IFSET = 1]\n");
+             branch(ch);
+-        else
++        } else {
++            DBDMA_DPRINTFCH(ch, "  [BR_IFSET = 0]\n");
+             next(ch);
++        }
+         return;
+     case BR_IFCLR:  /* branch if condition bit is 0 */
+-        if (!cond)
++        if (!cond) {
++            DBDMA_DPRINTFCH(ch, "  [BR_IFCLR = 1]\n");
+             branch(ch);
+-        else
++        } else {
++            DBDMA_DPRINTFCH(ch, "  [BR_IFCLR = 0]\n");
+             next(ch);
++        }
+         return;
+     }
+ }
+@@ -428,7 +435,7 @@ wait:
+ 
+ static void stop(DBDMA_channel *ch)
+ {
+-    ch->regs[DBDMA_STATUS] &= ~(ACTIVE|DEAD|FLUSH);
++    ch->regs[DBDMA_STATUS] &= ~(ACTIVE);
+ 
+     /* the stop command does not increment command pointer */
+ }
+@@ -471,18 +478,22 @@ static void channel_run(DBDMA_channel *ch)
+ 
+     switch (cmd) {
+     case OUTPUT_MORE:
++        DBDMA_DPRINTFCH(ch, "* OUTPUT_MORE *\n");
+         start_output(ch, key, phy_addr, req_count, 0);
+         return;
+ 
+     case OUTPUT_LAST:
++        DBDMA_DPRINTFCH(ch, "* OUTPUT_LAST *\n");
+         start_output(ch, key, phy_addr, req_count, 1);
+         return;
+ 
+     case INPUT_MORE:
++        DBDMA_DPRINTFCH(ch, "* INPUT_MORE *\n");
+         start_input(ch, key, phy_addr, req_count, 0);
+         return;
+ 
+     case INPUT_LAST:
++        DBDMA_DPRINTFCH(ch, "* INPUT_LAST *\n");
+         start_input(ch, key, phy_addr, req_count, 1);
+         return;
+     }
+@@ -508,10 +519,12 @@ static void channel_run(DBDMA_channel *ch)
+ 
+     switch (cmd) {
+     case LOAD_WORD:
++        DBDMA_DPRINTFCH(ch, "* LOAD_WORD *\n");
+         load_word(ch, key, phy_addr, req_count);
+         return;
+ 
+     case STORE_WORD:
++        DBDMA_DPRINTFCH(ch, "* STORE_WORD *\n");
+         store_word(ch, key, phy_addr, req_count);
+         return;
+     }
+@@ -562,43 +575,117 @@ void DBDMA_register_channel(void *dbdma, int nchan, qemu_irq irq,
+     ch->io.opaque = opaque;
+ }
+ 
+-static void
+-dbdma_control_write(DBDMA_channel *ch)
++static void dbdma_control_write(DBDMA_channel *ch)
+ {
+     uint16_t mask, value;
+     uint32_t status;
++    bool do_flush = false;
+ 
+     mask = (ch->regs[DBDMA_CONTROL] >> 16) & 0xffff;
+     value = ch->regs[DBDMA_CONTROL] & 0xffff;
+ 
+-    value &= (RUN | PAUSE | FLUSH | WAKE | DEVSTAT);
+-
++    /* This is the status register which we'll update
++     * appropriately and store back
++     */
+     status = ch->regs[DBDMA_STATUS];
+ 
+-    status = (value & mask) | (status & ~mask);
++    /* RUN and PAUSE are bits under SW control only
++     * FLUSH and WAKE are set by SW and cleared by HW
++     * DEAD, ACTIVE and BT are only under HW control
++     *
++     * We handle ACTIVE separately at the end of the
++     * logic to ensure all cases are covered.
++     */
+ 
+-    if (status & WAKE)
+-        status |= ACTIVE;
+-    if (status & RUN) {
+-        status |= ACTIVE;
+-        status &= ~DEAD;
++    /* Setting RUN will tentatively activate the channel
++     */
++    if ((mask & RUN) && (value & RUN)) {
++        status |= RUN;
++        DBDMA_DPRINTFCH(ch, " Setting RUN !\n");
++    }
++
++    /* Clearing RUN 1->0 will stop the channel */
++    if ((mask & RUN) && !(value & RUN)) {
++        /* This has the side effect of clearing the DEAD bit */
++        status &= ~(DEAD | RUN);
++        DBDMA_DPRINTFCH(ch, " Clearing RUN !\n");
++    }
++
++    /* Setting WAKE wakes up an idle channel if it's running
++     *
++     * Note: The doc doesn't say so but assume that only works
++     * on a channel whose RUN bit is set.
++     *
++     * We set WAKE in status, it's not terribly useful as it will
++     * be cleared on the next command fetch but it seems to mimmic
++     * the HW behaviour and is useful for the way we handle
++     * ACTIVE further down.
++     */
++    if ((mask & WAKE) && (value & WAKE) && (status & RUN)) {
++        status |= WAKE;
++        DBDMA_DPRINTFCH(ch, " Setting WAKE !\n");
++    }
++
++    /* PAUSE being set will deactivate (or prevent activation)
++     * of the channel. We just copy it over for now, ACTIVE will
++     * be re-evaluated later.
++     */
++    if (mask & PAUSE) {
++        status = (status & ~PAUSE) | (value & PAUSE);
++        DBDMA_DPRINTFCH(ch, " %sing PAUSE !\n",
++                        (value & PAUSE) ? "sett" : "clear");
++    }
++
++    /* FLUSH is its own thing */
++    if ((mask & FLUSH) && (value & FLUSH))  {
++        DBDMA_DPRINTFCH(ch, " Setting FLUSH !\n");
++        /* We set flush directly in the status register, we do *NOT*
++         * set it in "status" so that it gets naturally cleared when
++         * we update the status register further down. That way it
++         * will be set only during the HW flush operation so it is
++         * visible to any completions happening during that time.
++         */
++        ch->regs[DBDMA_STATUS] |= FLUSH;
++        do_flush = true;
+     }
+-    if (status & PAUSE)
++
++    /* If either RUN or PAUSE is clear, so should ACTIVE be,
++     * otherwise, ACTIVE will be set if we modified RUN, PAUSE or
++     * set WAKE. That means that PAUSE was just cleared, RUN was
++     * just set or WAKE was just set.
++     */
++    if ((status & PAUSE) || !(status & RUN)) {
+         status &= ~ACTIVE;
+-    if ((ch->regs[DBDMA_STATUS] & RUN) && !(status & RUN)) {
+-        /* RUN is cleared */
+-        status &= ~(ACTIVE|DEAD);
++        DBDMA_DPRINTFCH(ch, "  -> ACTIVE down !\n");
++
++        /* We stopped processing, we want the underlying HW command
++         * to complete *before* we clear the ACTIVE bit. Otherwise
++         * we can get into a situation where the command status will
++         * have RUN or ACTIVE not set which is going to confuse the
++         * MacOS driver.
++         */
++        do_flush = true;
++    } else if (mask & (RUN | PAUSE)) {
++        status |= ACTIVE;
++        DBDMA_DPRINTFCH(ch, " -> ACTIVE up !\n");
++    } else if ((mask & WAKE) && (value & WAKE)) {
++        status |= ACTIVE;
++        DBDMA_DPRINTFCH(ch, " -> ACTIVE up !\n");
      }
  
-@@ -2648,17 +2652,10 @@ void kvm_arch_init_irq_routing(KVMState *s)
+-    if ((status & FLUSH) && ch->flush) {
++    DBDMA_DPRINTFCH(ch, " new status=0x%08x\n", status);
++
++    /* If we need to flush the underlying HW, do it now, this happens
++     * both on FLUSH commands and when stopping the channel for safety.
++     */
++    if (do_flush && ch->flush) {
+         ch->flush(&ch->io);
+-        status &= ~FLUSH;
+     }
  
- void kvmppc_read_hptes(ppc_hash_pte64_t *hptes, hwaddr ptex, int n)
- {
--    struct kvm_get_htab_fd ghf = {
--        .flags = 0,
--        .start_index = ptex,
--    };
-     int fd, rc;
-     int i;
+-    DBDMA_DPRINTFCH(ch, "    status 0x%08x\n", status);
+-
++    /* Finally update the status register image */
+     ch->regs[DBDMA_STATUS] = status;
  
--    fd = kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &ghf);
--    if (fd < 0) {
--        hw_error("kvmppc_read_hptes: Unable to open HPT fd");
--    }
-+    fd = kvmppc_get_htab_fd(false, ptex, &error_abort);
++    /* If active, make sure the BH gets to run */
+     if (status & ACTIVE) {
+         DBDMA_kick(dbdma_from_ch(ch));
+     }
+@@ -666,13 +753,9 @@ static uint64_t dbdma_read(void *opaque, hwaddr addr,
  
-     i = 0;
-     while (i < n) {
-@@ -2700,19 +2697,13 @@ void kvmppc_read_hptes(ppc_hash_pte64_t *hptes, hwaddr ptex, int n)
- void kvmppc_write_hpte(hwaddr ptex, uint64_t pte0, uint64_t pte1)
- {
-     int fd, rc;
--    struct kvm_get_htab_fd ghf;
-     struct {
-         struct kvm_get_htab_header hdr;
-         uint64_t pte0;
-         uint64_t pte1;
-     } buf;
+     value = ch->regs[reg];
  
--    ghf.flags = 0;
--    ghf.start_index = 0;     /* Ignored */
--    fd = kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &ghf);
--    if (fd < 0) {
--        hw_error("kvmppc_write_hpte: Unable to open HPT fd");
--    }
-+    fd = kvmppc_get_htab_fd(true, 0 /* Ignored */, &error_abort);
+-    DBDMA_DPRINTFCH(ch, "readl 0x" TARGET_FMT_plx " => 0x%08x\n", addr, value);
+-    DBDMA_DPRINTFCH(ch, "channel 0x%x reg 0x%x\n",
+-                    (uint32_t)addr >> DBDMA_CHANNEL_SHIFT, reg);
+-
+     switch(reg) {
+     case DBDMA_CONTROL:
+-        value = 0;
++        value = ch->regs[DBDMA_STATUS];
+         break;
+     case DBDMA_STATUS:
+     case DBDMA_CMDPTR_LO:
+@@ -698,6 +781,10 @@ static uint64_t dbdma_read(void *opaque, hwaddr addr,
+         break;
+     }
  
-     buf.hdr.n_valid = 1;
-     buf.hdr.n_invalid = 0;
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index 08aab46c5a..349f892631 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -51,7 +51,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift);
- #endif /* !CONFIG_USER_ONLY */
- bool kvmppc_has_cap_epr(void);
- int kvmppc_define_rtas_kernel_token(uint32_t token, const char *function);
--int kvmppc_get_htab_fd(bool write);
-+int kvmppc_get_htab_fd(bool write, uint64_t index, Error **errp);
- int kvmppc_save_htab(QEMUFile *f, int fd, size_t bufsize, int64_t max_ns);
- int kvmppc_load_htab_chunk(QEMUFile *f, int fd, uint32_t index,
-                            uint16_t n_valid, uint16_t n_invalid);
-@@ -245,7 +245,7 @@ static inline int kvmppc_define_rtas_kernel_token(uint32_t token,
-     return -1;
++    DBDMA_DPRINTFCH(ch, "readl 0x" TARGET_FMT_plx " => 0x%08x\n", addr, value);
++    DBDMA_DPRINTFCH(ch, "channel 0x%x reg 0x%x\n",
++                    (uint32_t)addr >> DBDMA_CHANNEL_SHIFT, reg);
++
+     return value;
  }
  
--static inline int kvmppc_get_htab_fd(bool write)
-+static inline int kvmppc_get_htab_fd(bool write, uint64_t index, Error **errp)
+@@ -776,28 +863,28 @@ static void dbdma_reset(void *opaque)
+ static void dbdma_unassigned_rw(DBDMA_io *io)
  {
-     return -1;
+     DBDMA_channel *ch = io->channel;
+-    qemu_log_mask(LOG_GUEST_ERROR, "%s: use of unassigned channel %d\n",
+-                  __func__, ch->channel);
+-    ch->io.processing = false;
+-}
+-
+-static void dbdma_unassigned_flush(DBDMA_io *io)
+-{
+-    DBDMA_channel *ch = io->channel;
+     dbdma_cmd *current = &ch->current;
+     uint16_t cmd;
+     qemu_log_mask(LOG_GUEST_ERROR, "%s: use of unassigned channel %d\n",
+                   __func__, ch->channel);
++    ch->io.processing = false;
+ 
+     cmd = le16_to_cpu(current->command) & COMMAND_MASK;
+     if (cmd == OUTPUT_MORE || cmd == OUTPUT_LAST ||
+         cmd == INPUT_MORE || cmd == INPUT_LAST) {
+-        current->xfer_status = cpu_to_le16(ch->regs[DBDMA_STATUS] | FLUSH);
++        current->xfer_status = cpu_to_le16(ch->regs[DBDMA_STATUS]);
+         current->res_count = cpu_to_le16(io->len);
+         dbdma_cmdptr_save(ch);
+     }
  }
+ 
++static void dbdma_unassigned_flush(DBDMA_io *io)
++{
++    DBDMA_channel *ch = io->channel;
++    qemu_log_mask(LOG_GUEST_ERROR, "%s: use of unassigned channel %d\n",
++                  __func__, ch->channel);
++}
++
+ void* DBDMA_init (MemoryRegion **dbdma_mem)
+ {
+     DBDMAState *s;
 -- 
 2.13.5
