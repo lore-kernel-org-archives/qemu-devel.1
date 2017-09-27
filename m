@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Bharat.Bhushan@nxp.com>) id 1dx5xl-0001Z3-DE
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 02:36:58 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dx602-0003Xs-F9
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 02:39:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Bharat.Bhushan@nxp.com>) id 1dx5xk-0008Pg-DI
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 02:36:53 -0400
-From: Bharat Bhushan <Bharat.Bhushan@nxp.com>
-Date: Wed, 27 Sep 2017 12:03:20 +0530
-Message-ID: <1506494000-31982-6-git-send-email-Bharat.Bhushan@nxp.com>
-In-Reply-To: <1506494000-31982-1-git-send-email-Bharat.Bhushan@nxp.com>
-References: <1506494000-31982-1-git-send-email-Bharat.Bhushan@nxp.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1dx601-0000Zk-JD
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 02:39:14 -0400
+Date: Wed, 27 Sep 2017 16:21:43 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170927062143.GN12504@umbus>
+References: <150633285374.14880.11614678065344980502.stgit@bahia.lan>
+	<20170926025739.GF12504@umbus> <20170926091928.50e115ff@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 5/5] virtio-iommu: add iommu notifier
- memory-region
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="nRwNdQxTdQ7rZk9A"
+Content-Disposition: inline
+In-Reply-To: <20170926091928.50e115ff@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH] spapr: move registration of "host" CPU
+ core type to machine code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,82 +25,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger@redhat.com, eric.auger.pro@gmail.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: wei@redhat.com, kevin.tian@intel.com, marc.zyngier@arm.com, tn@semihalf.com, will.deacon@arm.com, drjones@redhat.com, robin.murphy@arm.com, christoffer.dall@linaro.org, bharatb.yadav@gmail.com, Bharat Bhushan <Bharat.Bhushan@nxp.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Igor Mammedov <imammedo@redhat.com>
 
-Finally add notify_flag_changed() to for memory-region
-access flag iommu flag change notifier
 
-Finally add the memory notifier
+--nRwNdQxTdQ7rZk9A
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Bharat Bhushan <Bharat.Bhushan@nxp.com>
----
-v3->v4:
- - notify_flag_changed functionality moved in separate patch
- - No other changes
+On Tue, Sep 26, 2017 at 09:19:28AM +0200, Greg Kurz wrote:
+> On Tue, 26 Sep 2017 12:57:39 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > On Mon, Sep 25, 2017 at 11:47:33AM +0200, Greg Kurz wrote:
+> > > The CPU core abstraction belongs to the machine code. This also gets
+> > > rid of some code duplication.
+> > >=20
+> > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > ---
+> > >=20
+> > > hw/ppc/spapr_cpu_core.h is also included elsewhere in target/ppc/kvm.c
+> > > but this is already handled by the following cleanup patch: =20
+> >=20
+> > I don't really see what the advantage of this is.  As others have
+> > pointed out it leads to the host type being registered very late,
+> > which could cause problems.
+> >=20
+>=20
+> Well, the goal was to consolidate the code to register sPAPRCPUCore types=
+ in
+> the spapr code, instead of open-coding it in spapr_cpu_core.c and kvm.c..=
+=2E=20
+>=20
+> But now I realize that delaying the registration even more is a bad idea.=
+ And,
+> the other way round, registering a static type earlier as asked by Igor w=
+ould
+> require all parent types to be already registered, which seems to be impo=
+ssible
+> to guarantee with the current code.
+>=20
+> Maybe we could at least have kvm_ppc_register_host_cpu_type() to call a
+> function in spapr_cpu_core.c instead of duplicating the registration
+> code ?
 
- hw/virtio/trace-events   |  2 ++
- hw/virtio/virtio-iommu.c | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 33 insertions(+)
+I think that sounds like a better idea.  It's still a little bodgy
+with the abstraction boundaries, but I think that's unavoidable: this
+fundamentally depends on both KVM's presence and use of the PAPR
+machine type.  Whichever place we put it, you could argue it belongs
+better in the other one.
 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 840d54f..a9de0d4 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -52,3 +52,5 @@ virtio_iommu_set_page_size_mask(const char *iommu_mr, uint64_t mask) "mr=%s page
- virtio_iommu_notify_map(const char *name, hwaddr iova, hwaddr paddr, hwaddr map_size) "mr=%s iova=0x%"PRIx64" pa=0x%" PRIx64" size=0x%"PRIx64""
- virtio_iommu_notify_unmap(const char *name, hwaddr iova, hwaddr map_size) "mr=%s iova=0x%"PRIx64" size=0x%"PRIx64""
- virtio_iommu_remap(hwaddr iova, hwaddr pa, hwaddr size) "iova=0x%"PRIx64" pa=0x%" PRIx64" size=0x%"PRIx64""
-+virtio_iommu_notify_flag_add(const char *iommu) "Add virtio-iommu notifier node for memory region %s"
-+virtio_iommu_notify_flag_del(const char *iommu) "Del virtio-iommu notifier node for memory region %s"
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index d4d34cf..a9b0d72 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -764,6 +764,36 @@ push:
-     }
- }
- 
-+static void virtio_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu_mr,
-+                                             IOMMUNotifierFlag old,
-+                                             IOMMUNotifierFlag new)
-+{
-+    IOMMUDevice *sdev = container_of(iommu_mr, IOMMUDevice, iommu_mr);
-+    VirtIOIOMMU *s = sdev->viommu;
-+    VirtioIOMMUNotifierNode *node = NULL;
-+    VirtioIOMMUNotifierNode *next_node = NULL;
-+
-+    if (old == IOMMU_NOTIFIER_NONE) {
-+        trace_virtio_iommu_notify_flag_add(iommu_mr->parent_obj.name);
-+        node = g_malloc0(sizeof(*node));
-+        node->iommu_dev = sdev;
-+        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
-+        return;
-+    }
-+
-+    /* update notifier node with new flags */
-+    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
-+        if (node->iommu_dev == sdev) {
-+            if (new == IOMMU_NOTIFIER_NONE) {
-+                trace_virtio_iommu_notify_flag_del(iommu_mr->parent_obj.name);
-+                QLIST_REMOVE(node, next);
-+                g_free(node);
-+            }
-+            return;
-+        }
-+    }
-+}
-+
- static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr addr,
-                                             IOMMUAccessFlags flag)
- {
-@@ -1041,6 +1071,7 @@ static void virtio_iommu_memory_region_class_init(ObjectClass *klass,
-     imrc->translate = virtio_iommu_translate;
-     imrc->set_page_size_mask = virtio_iommu_set_page_size_mask;
-     imrc->replay = virtio_iommu_replay;
-+    imrc->notify_flag_changed = virtio_iommu_notify_flag_changed;
- }
- 
- static const TypeInfo virtio_iommu_info = {
--- 
-1.9.3
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--nRwNdQxTdQ7rZk9A
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnLQ3cACgkQbDjKyiDZ
+s5Iv5A/8CRAC11GmwPEYMi3yzjeigmBHzTUVA5bPqhPs8dc63G35iPbaANNzp7Zv
+BwMhRbVEY5eIm0LKiI9p6SkEYa3kVl2khkbsVbOIWTRRX+28rp0b2HjzvoQcUpqX
+YQuFqBCLg9q3g0zflvavGnywZ1xSMZwwjCbn0QrVQFaXxFjsZ/DVUEQdy/RoMqEp
+WNQuwUc21o9D4wLO9S60X/eCXzF+dJbIAQiHCzH0JFK8Qjk238vx0igJsgORjmrP
+P4HOIAyRAcECsAkT00rWYlYBylkdHhvpft3UWppp1G0yvzZQr4bH+9Eyy1CsuobP
+RJkp0SnZg766Tbh4higDhyXhuUJ1BZ5ff4+EQ9E3HqyH8kbgv7Kl3GOdldj9BM4R
+MmSvQ909R3Xb+tHjOvUvxFJN/8RnDe5hATepV3x8hIleFSW1GI9LwhjmHg+tFCx7
+qwvBTObZrjQ45TuCgHcA1VvhAICmDNfCJbpytDVFPoRoaixJGmbWztkYkTU96vEL
+uB5lHJzmHbA8B2JknZayAE5yccYrL/HI1a76Iqgf1+TK2Kay7VWzvUqBVN3FODQO
+JpRIneTO6272fFqgVEltMUlTRmzrpuyxdj1PaRUZsOA37t44qIakIOZ9ySRYMMPq
+X206+1QZ3gW41ZLdrnn0ugiKtLQMeRT+ptR7OPZz/Wt7v6UAY4w=
+=Wd1Q
+-----END PGP SIGNATURE-----
+
+--nRwNdQxTdQ7rZk9A--
