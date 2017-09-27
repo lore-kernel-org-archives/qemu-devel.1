@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dx66z-0006gN-EZ
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 02:46:26 -0400
+	(envelope-from <bharat.bhushan@nxp.com>) id 1dx674-0006jM-Of
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 02:46:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dx66u-0003QI-Iy
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 02:46:25 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:36003
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dx66u-0003P6-BB
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 02:46:20 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Wed, 27 Sep 2017 07:45:56 +0100
-Message-Id: <1506494757-7352-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH] sun4u: update PCI topology to include simba
- PCI bridges
+	(envelope-from <bharat.bhushan@nxp.com>) id 1dx673-0003S2-Ms
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 02:46:30 -0400
+From: Bharat Bhushan <bharat.bhushan@nxp.com>
+Date: Wed, 27 Sep 2017 06:46:18 +0000
+Message-ID: <AM5PR0401MB25458FFED2D7D405A71F954C9A780@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+References: <1506494000-31982-1-git-send-email-Bharat.Bhushan@nxp.com>
+In-Reply-To: <1506494000-31982-1-git-send-email-Bharat.Bhushan@nxp.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v4 0/5] virtio-iommu: VFIO integration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +23,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, atar4qemu@gmail.com
+To: Bharat Bhushan <bharat.bhushan@nxp.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "peterx@redhat.com" <peterx@redhat.com>
+Cc: "wei@redhat.com" <wei@redhat.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "bharatb.yadav@gmail.com" <bharatb.yadav@gmail.com>
 
-This patch implements what I've been working towards over the past few
-months in order to get a more realistic Ultra 5 model for the sun4u
-machine. The basic change is that devices are no longer plugged into the
-PCI root bus, but behind PCI busA for in-built devices and PCI busB for all
-other devices.
+Hi Peter,
 
-Note: this patch requires my previous fix for allowing 32-bit PCI IO
-accesses through the PCI bridge posted at
-https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg06371.html in
-order for devices plugged into PCI busB to function correctly.
+While vfio with virtio-iommu I observed one issue,  When virtio-iommu devic=
+e exists but guest kernel does not have virtio-iommu driver (not enabled in=
+ Config) then IOMMU faults are reported on host.
 
-The benefits of this patch are that guest OSs can map PCI BARs correctly
-without overlapping (Linux currently issues several warnings about this
-on boot) and interrupt routing is updated to match the official
-documentation.
+This is because no mapping is created in IOMMU, not even default guest-phys=
+ical to real-physical. While looking at vfio_listener_region_add(), it does=
+ not create initial mapping in IOMMU and relies on guest to create mapping.=
+ Is this something known or I am missing something?
 
-For users the main visible change is that it is no longer possible to
-plug PCI devices into the PCI root bus, but instead devices should be
-added to PCI busB. For example with this patchset if you try and plug
-a virtio-blk-pci device as before you now get this error:
+Thanks
+-Bharat
 
-$ ./qemu-system-sparc64 -device virtio-blk-pci,...
-qemu-system-sparc64: -device virtio-blk-pci: PCI: no slot/function available
-for virtio-blk-pci, all in use or reserved
-
-Instead the correct command line should be:
-
-$ ./qemu-system-sparc64 -device virtio-blk-pci,bus=pciB,...
-
-Since the patch changes the PCI IO space, PCI topology and interrupt
-routing I've included a custom-built openbios-sparc64 to maintain
-bisectability. Once this patch has been applied I will immediately send
-an updated MR to sync the OpenBIOS submodule and binaries once again.
-
-As it stands the patch is reasonably straightforward: the hardest part
-is related to the in-built sunhme network card since the combination
-of QEMU's -netdev syntax not supporting in-built NICs and
-pci_nic_init_nofail() asserting if not using the PCI root bus lead to
-some interesting code. I hope that I've managed to come up with a solution
-that implements reasonable behaviour in these cases.
-
-On a final note I should add that this passes all my OpenBIOS SPARC64
-image boot tests without introducing regressions, and whilst we introduce
-PCI topology changes there is no effect on migration because the sun4u
-machine is currently not migratable.
-
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-
-Mark Cave-Ayland (1):
-  sun4u: update PCI topology to include simba PCI bridges
-
- hw/pci-host/apb.c        |   47 +++++++++++++++++++++++++++---------
- hw/sparc64/sun4u.c       |   60 +++++++++++++++++++++++++++++++++-------------
- pc-bios/openbios-sparc64 |  Bin 1593408 -> 1593408 bytes
- 3 files changed, 79 insertions(+), 28 deletions(-)
-
--- 
-1.7.10.4
+> -----Original Message-----
+> From: Bharat Bhushan [mailto:Bharat.Bhushan@nxp.com]
+> Sent: Wednesday, September 27, 2017 12:03 PM
+> To: eric.auger@redhat.com; eric.auger.pro@gmail.com;
+> peter.maydell@linaro.org; alex.williamson@redhat.com; mst@redhat.com;
+> qemu-arm@nongnu.org; qemu-devel@nongnu.org
+> Cc: wei@redhat.com; kevin.tian@intel.com; marc.zyngier@arm.com;
+> tn@semihalf.com; will.deacon@arm.com; drjones@redhat.com;
+> robin.murphy@arm.com; christoffer.dall@linaro.org;
+> bharatb.yadav@gmail.com; Bharat Bhushan <bharat.bhushan@nxp.com>
+> Subject: [PATCH v4 0/5] virtio-iommu: VFIO integration
+>=20
+> This patch series integrates VFIO/VHOST with virtio-iommu.
+>=20
+> This version is mainly about rebasing on v4 version on virtio-iommu devic=
+e
+> framework from Eric Augur and addresing review comments.
+>=20
+> This patch series allows PCI pass-through using virtio-iommu.
+>=20
+> This series is based on:
+>  - virtio-iommu kernel driver by Jean-Philippe Brucker
+>     [1] [RFC] virtio-iommu version 0.4
+>     git://linux-arm.org/virtio-iommu.git branch viommu/v0.4
+>=20
+>  - virtio-iommu device emulation by Eric Augur.
+>    [RFC v4 00/16] VIRTIO-IOMMU device
+>    https://github.com/eauger/qemu/tree/v2.10.0-virtio-iommu-v4
+>=20
+> Changes are available at : https://github.com/bharaty/qemu.git virtio-
+> iommu-vfio-integration-v4
+>=20
+> v3->v4:
+>  - Rebase to v4 version from Eric
+>  - Fixes from Eric with DPDK in VM
+>  - Logical division in multiple patches
+>=20
+> v2->v3:
+>  - This series is based on "[RFC v3 0/8] VIRTIO-IOMMU device"
+>    Which is based on top of v2.10-rc0 that
+>  - Fixed issue with two PCI devices
+>  - Addressed review comments
+>=20
+> v1->v2:
+>   - Added trace events
+>   - removed vSMMU3 link in patch description
+>=20
+> Bharat Bhushan (5):
+>   target/arm/kvm: Translate the MSI doorbell in kvm_arch_fixup_msi_route
+>   virtio-iommu: Add iommu notifier for map/unmap
+>   virtio-iommu: Call iommu notifier for attach/detach
+>   virtio-iommu: add iommu replay
+>   virtio-iommu: add iommu notifier memory-region
+>=20
+>  hw/virtio/trace-events           |   5 ++
+>  hw/virtio/virtio-iommu.c         | 181
+> ++++++++++++++++++++++++++++++++++++++-
+>  include/hw/virtio/virtio-iommu.h |   6 ++
+>  target/arm/kvm.c                 |  27 ++++++
+>  target/arm/trace-events          |   3 +
+>  5 files changed, 219 insertions(+), 3 deletions(-)
+>=20
+> --
+> 1.9.3
