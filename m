@@ -1,43 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dx8Le-0001wI-O1
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:09:48 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dx8NE-0002js-UW
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:11:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dx8La-0002Vh-Nm
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:09:42 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54780)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dx8La-0002UC-EK
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:09:38 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8R9947h145644
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 05:09:34 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d83qrfx6f-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 05:09:33 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 27 Sep 2017 10:09:31 +0100
-References: <20170926180522.68482-1-borntraeger@de.ibm.com>
-	<67c13b99-2d44-666b-9328-05917d0fc0dc@redhat.com>
-	<20170927093959.3f61dd36.cohuck@redhat.com>
-	<b8704df5-9c1d-1aed-2adf-f783a66a5eeb@de.ibm.com>
-	<20170927105727.08c3b3af.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 27 Sep 2017 11:09:28 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170927105727.08c3b3af.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <c43687d5-192c-6826-b206-f36e22e75721@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] s390x/cpumodel: remove ais from z14
- default model-> also for 2.10.1
+	(envelope-from <kraxel@redhat.com>) id 1dx8N8-00041U-Tv
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:11:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34096)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dx8N8-00041B-OR
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:11:14 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CAFE781E07
+	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 09:11:13 +0000 (UTC)
+Message-ID: <1506503472.25036.3.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 27 Sep 2017 11:11:12 +0200
+In-Reply-To: <7f50b7bb-bbf7-7e0e-754a-234d4244fb72@redhat.com>
+References: <20170926111757.3628-1-kraxel@redhat.com>
+	<7f50b7bb-bbf7-7e0e-754a-234d4244fb72@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/1] qemu-firmware repo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,64 +33,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
+On Wed, 2017-09-27 at 09:19 +0200, Paolo Bonzini wrote:
+> On 26/09/2017 13:17, Gerd Hoffmann wrote:
+> >=20
+> > Ok, we want for varios reasons separate the firmware from the main
+> > qemu repo.=C2=A0=C2=A0Here is my attempt to create such a repo.=C2=A0=
+=C2=A0For starters
+> > only seabios has been added here.
+> >=20
+> > You can find the repo with currently three patches here:
+> > =C2=A0=C2=A0=C2=A0=C2=A0https://www.kraxel.org/cgit/qemu-firmware/
+> >=20
+> > This "series" is only patch #2 of the repo.=C2=A0=C2=A0Havn't found a=
+ way to
+> > convince git-format-patch to include the initial commit of a repo.
+> > But patch #1 (the initial commit) only adds the seabios submodule,
+> > patch #3 adds the binary blobs, so patch #2 actually is the most
+> > interesting one.
+>=20
+> Are you planning to include only submodules, or also "QEMU-native"
+> firmware such as linuxboot, kvmvapic, s390-ccw, spapr-rtas, etc.?
 
+The submodules are my priority.
 
-On 09/27/2017 10:57 AM, Cornelia Huck wrote:
-> On Wed, 27 Sep 2017 09:41:21 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> On 09/27/2017 09:39 AM, Cornelia Huck wrote:
->>> On Tue, 26 Sep 2017 20:26:31 +0200
->>> David Hildenbrand <david@redhat.com> wrote:
->>>   
->>>> On 26.09.2017 20:05, Christian Borntraeger wrote:  
->>>>> We disabled ais for 2.10 lets also remove it from the z14 default model.
->>>>>
->>>>> Fixes: 3f2d07b3b01e  s390x/ais: for 2.10 stable: disable ais facility
->>>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>>>> ---
->>>>>  target/s390x/gen-features.c | 1 -
->>>>>  1 file changed, 1 deletion(-)
->>>>>
->>>>> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
->>>>> index c8dc104..68e6c31 100644
->>>>> --- a/target/s390x/gen-features.c
->>>>> +++ b/target/s390x/gen-features.c
->>>>> @@ -527,7 +527,6 @@ static uint16_t default_GEN13_GA1[] = {
->>>>>  #define default_GEN13_GA2 EmptyFeat
->>>>>  
->>>>>  static uint16_t default_GEN14_GA1[] = {
->>>>> -    S390_FEAT_ADAPTER_INT_SUPPRESSION,
->>>>>      S390_FEAT_INSTRUCTION_EXEC_PROT,
->>>>>      S390_FEAT_GUARDED_STORAGE,
->>>>>      S390_FEAT_VECTOR_PACKED_DECIMAL,
->>>>>     
->>>>
->>>> Yes, this has to go into stable, otherwise the migration safe stable
->>>> model would be changed.
->>>>
->>>> Apart from that, this looks just fine.  
->>>
->>> So, this should go into stable only, as the patches currently on the
->>> list will fix this properly for 2.11, right?  
->>
->> No this also has to go into 2.11 (otherwise the default model for z14 would differ)
->> so maybe change the subject when applying.
->>
-> 
-> OK, so it looks like I should do the following:
-> - Get this upstream as a single patch so that it does not miss the
->   2.10.1 train.
+I think it makes sense for all firmware where we have pre-built
+binaries committed to the qemu repo, even if the source is in the qemu
+repo too.  But maybe it's easier to keep those in qemu.  They tend to
+be small and they are also not problematic license-wise.
 
-Can you add the Cc stable? I forgot that.
-
-> - Send another pull with the ais(yours)/phb(mine)/whatever(I hope
->   that's it...) fixups once we're confident about those.
-
-yes.
-> 
-> Agreed?
-> 
+cheers,
+  Gerd
