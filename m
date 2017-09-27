@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dxLSF-0001Qj-KS
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 19:09:26 -0400
+	(envelope-from <mst@redhat.com>) id 1dxLXc-0002Mf-Jm
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 19:14:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dxLSE-0004pU-Ht
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 19:09:23 -0400
+	(envelope-from <mst@redhat.com>) id 1dxLXX-0008Lb-IA
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 19:14:56 -0400
+Date: Thu, 28 Sep 2017 02:14:45 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170928020110-mutt-send-email-mst@kernel.org>
+References: <1506049617-25716-1-git-send-email-thuth@redhat.com>
+	<513bbb2d-280b-92f8-b45f-89963f7118e2@msgid.tls.msk.ru>
+	<20170926223046-mutt-send-email-mst@kernel.org>
+	<CAFEAcA-dWVfX2i7ZYdHVg3G_kSSM6Gos8TRk=dfYYML4Jrn9HQ@mail.gmail.com>
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20170926005520.GA7906@flamenco>
-References: <cover.1506384414.git.alistair.francis@xilinx.com>
-	<50c325943b1547813567efe6a11fb44644494d70.1506384414.git.alistair.francis@xilinx.com>
-	<20170926005520.GA7906@flamenco>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 27 Sep 2017 16:08:50 -0700
-Message-ID: <CAKmqyKP7b0OP35ctzOmkCwPH4sHQFZAKtyTRgPTYN0iSXkgsaw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 2/8] tests: Replace fprintf(stderr,
- "*\n" with error_report()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-dWVfX2i7ZYdHVg3G_kSSM6Gos8TRk=dfYYML4Jrn9HQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] tests/boot-sector: Increase timeout to 600
+ seconds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,88 +26,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Michael Tokarev <mjt@tls.msk.ru>, Thomas Huth <thuth@redhat.com>, Victor Kaplansky <victork@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Sep 25, 2017 at 5:55 PM, Emilio G. Cota <cota@braap.org> wrote:
-> On Mon, Sep 25, 2017 at 17:08:48 -0700, Alistair Francis wrote:
->> diff --git a/tests/atomic_add-bench.c b/tests/atomic_add-bench.c
->> index caa1e8e689..41ba1600c0 100644
->> --- a/tests/atomic_add-bench.c
->> +++ b/tests/atomic_add-bench.c
->> @@ -29,7 +29,7 @@ static const char commands_string[] =
->>  static void usage_complete(char *argv[])
->>  {
->>      fprintf(stderr, "Usage: %s [options]\n", argv[0]);
->> -    fprintf(stderr, "options:\n%s\n", commands_string);
->> +    fprintf(stderr, "options:\n%s", commands_string);
->>  }
->
-> We do want that trailing \n, unless we move it to commands_string.
+On Tue, Sep 26, 2017 at 08:35:59PM +0100, Peter Maydell wrote:
+> On 26 September 2017 at 20:31, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > On Mon, Sep 25, 2017 at 12:06:40AM +0300, Michael Tokarev wrote:
+> >> 22.09.2017 06:06, Thomas Huth wrote:
+> >> > If QEMU has been compiled with the flags --enable-tcg-interpreter and
+> >> > --enable-debug, the guest is running incredibly slow. The pxe boot test
+> >> > can take up to 400 seconds when testing the pseries ppc64 machine. While
+> >> > we should still look for ways to speed up the test on the pseries machine,
+> >> > it's better to increase the timeout in this test to 600 seconds anyway to
+> >> > allow the test to pass successfully now with this unusal configuration
+> >> > already.
+> >>
+> >> Applied to -trivial, thanks!
+> >>
+> >> /mjt
+> >
+> > Please do not apply this, trivial is not appropriate for functional
+> > changes like this.
+> 
+> It's not a functional change, it's just bumping a test timeout.
+> If you think we should be doing something else that's fine (as
+> with any other patch), but in principle I think this is totally
+> fine as a -trivial patch.
+> 
+> thanks
+> -- PMM
 
-Yeah, this was a mistake. It should have swapped to error_report().
+OK. I'd rather not see it applied as-is though.
 
->
-> Also, I think using error_report here would be confusing -- this is a standalone
-> test program with as little QEMU-specific knowledge as possible (QemuThreads
-> are used for portability); using error_report here is confusing (this is not
-> an error).
-
-Do you mean in all tests/ sub directory or just a few certain cases?
-
->
->> diff --git a/tests/check-qlit b/tests/check-qlit
->> new file mode 100755
->> index 0000000000000000000000000000000000000000..950429524e3eb07e6daed1fe01caad0f5d554809
->> GIT binary patch
->> literal 272776
->> zcmeEvdwf*Ywf~vPB$){zGeCghJ;($So{10*LNEgfoIs*MKvBRDLV(l&F`3b5QKOS6
->
-> ? I don't know what this is, I don't seem to have this binary in my
-> checked out tree.
-
-Yeah, this shouldn't be here.
-
-Thanks,
-Alistair
-
->
-> (snips thousands of lines)
->
->> diff --git a/tests/qht-bench.c b/tests/qht-bench.c
->> index 11c1cec766..2637d601a9 100644
->> --- a/tests/qht-bench.c
->> +++ b/tests/qht-bench.c
->> @@ -5,6 +5,7 @@
->>   *   See the COPYING file in the top-level directory.
->>   */
->>  #include "qemu/osdep.h"
->> +#include "qemu/error-report.h"
->>  #include "qemu/processor.h"
->>  #include "qemu/atomic.h"
->>  #include "qemu/qht.h"
->> @@ -89,7 +90,7 @@ static const char commands_string[] =
->>  static void usage_complete(int argc, char *argv[])
->>  {
->>      fprintf(stderr, "Usage: %s [options]\n", argv[0]);
->> -    fprintf(stderr, "options:\n%s\n", commands_string);
->> +    fprintf(stderr, "options:\n%s", commands_string);
->
-> Same as above: this removes the necessary trailing \n.
->
->>      exit(-1);
->>  }
->>
->> @@ -328,7 +329,7 @@ static void htable_init(void)
->>              retries++;
->>          }
->>      }
->> -    fprintf(stderr, " populated after %zu retries\n", retries);
->> +    error_report(" populated after %zu retries", retries);
->>  }
->
-> ditto -- I'd rather keep fprintf(stderr) here, it's less confusing.
->
-> Thanks,
->
->                 Emilio
+-- 
+MST
