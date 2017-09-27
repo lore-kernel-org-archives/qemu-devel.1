@@ -1,41 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dx9Wl-0003Ym-EZ
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 06:25:16 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dx9Ze-0004S7-Sv
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 06:28:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dx9Wi-0004RB-7M
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 06:25:15 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33108)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
-	id 1dx9Wh-0004Q5-V1
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 06:25:12 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8RAO1ZQ115919
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 06:25:07 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d87p18e6e-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 06:25:06 -0400
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
-	Wed, 27 Sep 2017 04:25:06 -0600
-References: <20170926162058.30772-1-cohuck@redhat.com>
-	<20170926162058.30772-2-cohuck@redhat.com>
-	<338c8565-691e-a8bc-d8a6-3637ce13701d@redhat.com>
-	<20170927114717.72bd69f8.cohuck@redhat.com>
-From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Date: Wed, 27 Sep 2017 18:25:00 +0800
+	(envelope-from <dgilbert@redhat.com>) id 1dx9Zb-0005hO-Mk
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 06:28:14 -0400
+Date: Wed, 27 Sep 2017 11:28:01 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170927102801.GA5453@work-vm>
+References: <1506421996-12513-1-git-send-email-pl@kamp.de>
 MIME-Version: 1.0
-In-Reply-To: <20170927114717.72bd69f8.cohuck@redhat.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Message-Id: <e8bef299-5501-a59d-aba3-5a338227966e@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390x: create a compat s390 phb for
- <=2.10
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1506421996-12513-1-git-send-email-pl@kamp.de>
+Subject: Re: [Qemu-devel] [PATCH V3] migration: disable auto-converge during
+ bulk block migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,110 +23,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, pasic@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, dgilbert@redhat.com
+To: Peter Lieven <pl@kamp.de>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, famz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, qemu-stable@nongnu.org
 
+* Peter Lieven (pl@kamp.de) wrote:
+> auto-converge and block migration currently do not play well together.
+> During block migration the auto-converge logic detects that ram
+> migration makes no progress and thus throttles down the vm until
+> it nearly stalls completely. Avoid this by disabling the throttling
+> logic during the bulk phase of the block migration.
 
+Queued for migration (which hopefully I'll send a pull later today)
 
-=D4=DA 2017/9/27 =CF=C2=CE=E75:47, Cornelia Huck =D0=B4=B5=C0:
-> On Tue, 26 Sep 2017 20:40:25 +0200
-> David Hildenbrand <david@redhat.com> wrote:
->
->> On 26.09.2017 18:20, Cornelia Huck wrote:
->>> d32bd032d8 ("s390x/ccw: create s390 phb conditionally") made
->>> creating the s390 phb dependant on the zpci facility. This broke
->>> migration from pre-cpu model machines which was fixed with
->>> 8ad9087c4a ("s390x/ccw: create s390 phb for compat reasons as well").
->>> However, that is not enough: Migration from 2.10 with -cpu z13
->>> breaks as well.
->>>
->>> Let's create a phb for all pre-2.11 compat machines to fix this.
->>> We leave the zpci facility off to avoid a guest-visible change
->>> with cpu models on.
->>>
->>> Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>> Fixes: d32bd032d8 ("s390x/ccw: create s390 phb conditionally")
->>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->>> ---
->>>   hw/s390x/s390-virtio-ccw.c         | 8 +++++++-
->>>   include/hw/s390x/s390-virtio-ccw.h | 1 +
->>>   2 files changed, 8 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->>> index 1bcb7000ab..981f1c4336 100644
->>> --- a/hw/s390x/s390-virtio-ccw.c
->>> +++ b/hw/s390x/s390-virtio-ccw.c
->>> @@ -247,6 +247,8 @@ static void s390_create_virtio_net(BusState *bus,=
- const char *name)
->>>       }
->>>   }
->>>  =20
->>> +static S390CcwMachineClass *get_machine_class(void);
->>> +
->>>   static void ccw_init(MachineState *machine)
->>>   {
->>>       int ret;
->>> @@ -266,7 +268,7 @@ static void ccw_init(MachineState *machine)
->>>                         machine->initrd_filename, "s390-ccw.img",
->>>                         "s390-netboot.img", true);
->>>  =20
->>> -    if (s390_has_feat(S390_FEAT_ZPCI)) {
->>> +    if (s390_has_feat(S390_FEAT_ZPCI) || get_machine_class()->phb_co=
-mpat) {
->>>           DeviceState *dev =3D qdev_create(NULL, TYPE_S390_PCI_HOST_B=
-RIDGE);
->>>           object_property_add_child(qdev_get_machine(),
->>>                                     TYPE_S390_PCI_HOST_BRIDGE,
->>> @@ -407,6 +409,7 @@ static void ccw_machine_class_init(ObjectClass *o=
-c, void *data)
->>>       s390mc->cpu_model_allowed =3D true;
->>>       s390mc->css_migration_enabled =3D true;
->>>       s390mc->gs_allowed =3D true;
->>> +    s390mc->phb_compat =3D false;
->>>       mc->init =3D ccw_init;
->>>       mc->reset =3D s390_machine_reset;
->>>       mc->hot_add_cpu =3D s390_hot_add_cpu;
->>> @@ -716,6 +719,9 @@ static void ccw_machine_2_10_instance_options(Mac=
-hineState *machine)
->>>  =20
->>>   static void ccw_machine_2_10_class_options(MachineClass *mc)
->>>   {
->>> +    S390CcwMachineClass *s390mc =3D S390_MACHINE_CLASS(mc);
->>> +
->>> +    s390mc->phb_compat =3D pci_available;
->>>       ccw_machine_2_11_class_options(mc);
->>>       SET_MACHINE_COMPAT(mc, CCW_COMPAT_2_10);
->>>   }
->>> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s3=
-90-virtio-ccw.h
->>> index a9a90c2022..fb717afe92 100644
->>> --- a/include/hw/s390x/s390-virtio-ccw.h
->>> +++ b/include/hw/s390x/s390-virtio-ccw.h
->>> @@ -41,6 +41,7 @@ typedef struct S390CcwMachineClass {
->>>       bool cpu_model_allowed;
->>>       bool css_migration_enabled;
->>>       bool gs_allowed;
->>> +    bool phb_compat;
->>>   } S390CcwMachineClass;
->>>  =20
->>>   /* runtime-instrumentation allowed by the machine */
->>>   =20
->> I'd really really really (did I mention really?) favor something like =
-a
->> dummy device, because we could easily handle the !CONFIG_PCI case then.
->>
->> All these compat options and conditions will kill us someday... we're
->> already patching around that whole stuff way too much.
->>
->> If we ever unconditionally created a device, we should keep doing so.
-> Yes, that whole thing is horrible, especially interaction with compat
-> machines.
->
-> Do you have an idea on how to create such a dummy device (without
-> having to effectively copy a lot of configured-out code)?
->
->
-How about in s390_pcihost_hot_plug() we check s390_has_feat(zpci)?
-If no zpci feature, we avoid plugging any pci device.
-Then we could always create phb.
-I think pcibus's vmstate is only data to migrate.
+Dave
+
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Peter Lieven <pl@kamp.de>
+> ---
+> V1->V2: add comment why we disable auto-converge during bulk block migration [Stefan]
+> V2->V3: add missing patch for migration/block.h
+> 
+>  migration/block.c | 5 +++++
+>  migration/block.h | 7 +++++++
+>  migration/ram.c   | 6 +++++-
+>  3 files changed, 17 insertions(+), 1 deletion(-)
+> 
+> diff --git a/migration/block.c b/migration/block.c
+> index 9171f60..606ad4d 100644
+> --- a/migration/block.c
+> +++ b/migration/block.c
+> @@ -161,6 +161,11 @@ int blk_mig_active(void)
+>      return !QSIMPLEQ_EMPTY(&block_mig_state.bmds_list);
+>  }
+>  
+> +int blk_mig_bulk_active(void)
+> +{
+> +    return blk_mig_active() && !block_mig_state.bulk_completed;
+> +}
+> +
+>  uint64_t blk_mig_bytes_transferred(void)
+>  {
+>      BlkMigDevState *bmds;
+> diff --git a/migration/block.h b/migration/block.h
+> index 22ebe94..3178609 100644
+> --- a/migration/block.h
+> +++ b/migration/block.h
+> @@ -16,6 +16,7 @@
+>  
+>  #ifdef CONFIG_LIVE_BLOCK_MIGRATION
+>  int blk_mig_active(void);
+> +int blk_mig_bulk_active(void);
+>  uint64_t blk_mig_bytes_transferred(void);
+>  uint64_t blk_mig_bytes_remaining(void);
+>  uint64_t blk_mig_bytes_total(void);
+> @@ -25,6 +26,12 @@ static inline int blk_mig_active(void)
+>  {
+>      return false;
+>  }
+> +
+> +static inline int blk_mig_bulk_active(void)
+> +{
+> +    return false;
+> +}
+> +
+>  static inline uint64_t blk_mig_bytes_transferred(void)
+>  {
+>      return 0;
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 88ca69e..b83f897 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -46,6 +46,7 @@
+>  #include "exec/ram_addr.h"
+>  #include "qemu/rcu_queue.h"
+>  #include "migration/colo.h"
+> +#include "migration/block.h"
+>  
+>  /***********************************************************/
+>  /* ram save/restore */
+> @@ -825,7 +826,10 @@ static void migration_bitmap_sync(RAMState *rs)
+>              / (end_time - rs->time_last_bitmap_sync);
+>          bytes_xfer_now = ram_counters.transferred;
+>  
+> -        if (migrate_auto_converge()) {
+> +        /* During block migration the auto-converge logic incorrectly detects
+> +         * that ram migration makes no progress. Avoid this by disabling the
+> +         * throttling logic during the bulk phase of block migration. */
+> +        if (migrate_auto_converge() && !blk_mig_bulk_active()) {
+>              /* The following detection logic can be refined later. For now:
+>                 Check to see if the dirtied bytes is 50% more than the approx.
+>                 amount of bytes that just got transferred since the last time we
+> -- 
+> 1.9.1
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
