@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52833)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dxC0n-00011r-BS
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:04:32 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dxCAz-0005N2-D4
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:15:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dxC0h-0006m3-Bm
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:04:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42388)
+	(envelope-from <pbonzini@redhat.com>) id 1dxCAv-00048c-GY
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:14:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46316)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dxC0h-0006lu-3Z
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:04:19 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2BCF47E454
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 13:04:18 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Wed, 27 Sep 2017 10:03:39 -0300
-Message-Id: <20170927130339.21444-6-ehabkost@redhat.com>
-In-Reply-To: <20170927130339.21444-1-ehabkost@redhat.com>
-References: <20170927130339.21444-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH 5/5] scripts: Remove debug parameter from
- QEMUMachine
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dxCAv-00048G-AX
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:14:53 -0400
+References: <20170926054439.GB25267@pxdev.xzpeter.org>
+	<20170926084337.GB16834@stefanha-x1.localdomain>
+	<20170926091150.GC3828@pxdev.xzpeter.org>
+	<20170926111343.GE31924@lemon.lan>
+	<20170927121753.GB14579@stefanha-x1.localdomain>
+	<20170927123646.GA8521@lemon.lan>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <49ed96f4-74e3-6e2b-72d1-0f6741ed2469@redhat.com>
+Date: Wed, 27 Sep 2017 15:14:40 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170927123646.GA8521@lemon.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] A glib warning encountered with internal iothread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,93 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Devel Mailing List <qemu-devel@nongnu.org>
 
-All scripts that use the QEMUMachine and QEMUQtestMachine classes
-(device-crash-test, tests/migration/*, iotests.py, basevm.py)
-already configure logging.
+On 27/09/2017 14:36, Fam Zheng wrote:
+> On Wed, 09/27 13:17, Stefan Hajnoczi wrote:
+>> On Tue, Sep 26, 2017 at 07:13:43PM +0800, Fam Zheng wrote:
+>>> On Tue, 09/26 17:11, Peter Xu wrote:
+>>>  void aio_context_unref(AioContext *ctx)
+>>>  {
+>>> +    assert(ctx->refcnt > 0);
+>>> +    if (--ctx->refcnt == 0) {
+>>> +        aio_set_event_notifier(ctx, &ctx->notifier, false, NULL, NULL);
+>>> +    }
+>>
+>> This isn't a general solution because Linux AIO also has a file
+>> descriptor that is removed in aio_ctx_finalize().
+> 
+> Right. Another option is to move everything in aio_context_finalize() into the
+> "if (--ctx->refcnt == 0) { ... }" block, before calling g_source_unref().
 
-The basicConfig() call inside QEMUMachine.__init__() is being
-kept just to make sure a script would still work if it didn't
-configure logging.
+I think I prefer Stefan's solution.  If the GSource has been ref'ed
+independent of the AioContext object, it may be a problem to free it early.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- scripts/qemu.py                     | 6 ++----
- tests/migration/guestperf/engine.py | 6 ++----
- tests/qemu-iotests/iotests.py       | 2 --
- 3 files changed, 4 insertions(+), 10 deletions(-)
-
-diff --git a/scripts/qemu.py b/scripts/qemu.py
-index f6d2e68627..9bfdf6d37d 100644
---- a/scripts/qemu.py
-+++ b/scripts/qemu.py
-@@ -54,7 +54,7 @@ class QEMUMachine(object):
- 
-     def __init__(self, binary, args=None, wrapper=None, name=None,
-                  test_dir="/var/tmp", monitor_address=None,
--                 socket_scm_helper=None, debug=False):
-+                 socket_scm_helper=None):
-         '''
-         Initialize a QEMUMachine
- 
-@@ -65,7 +65,6 @@ class QEMUMachine(object):
-         @param test_dir: where to create socket and log file
-         @param monitor_address: address for QMP monitor
-         @param socket_scm_helper: helper program, required for send_fd_scm()"
--        @param debug: enable debug mode
-         @note: Qemu process is not started until launch() is used.
-         '''
-         if args is None:
-@@ -85,12 +84,11 @@ class QEMUMachine(object):
-         self._events = []
-         self._iolog = None
-         self._socket_scm_helper = socket_scm_helper
--        self._debug = debug
-         self._qmp = None
-         self._qemu_full_args = None
- 
-         # just in case logging wasn't configured by the main script:
--        logging.basicConfig(level=(logging.DEBUG if debug else logging.WARN))
-+        logging.basicConfig()
- 
-     def __enter__(self):
-         return self
-diff --git a/tests/migration/guestperf/engine.py b/tests/migration/guestperf/engine.py
-index 0a13050bc6..e14d4320b2 100644
---- a/tests/migration/guestperf/engine.py
-+++ b/tests/migration/guestperf/engine.py
-@@ -388,15 +388,13 @@ class Engine(object):
-                                args=self._get_src_args(hardware),
-                                wrapper=self._get_src_wrapper(hardware),
-                                name="qemu-src-%d" % os.getpid(),
--                               monitor_address=srcmonaddr,
--                               debug=self._debug)
-+                               monitor_address=srcmonaddr)
- 
-         dst = qemu.QEMUMachine(self._binary,
-                                args=self._get_dst_args(hardware, uri),
-                                wrapper=self._get_dst_wrapper(hardware),
-                                name="qemu-dst-%d" % os.getpid(),
--                               monitor_address=dstmonaddr,
--                               debug=self._debug)
-+                               monitor_address=dstmonaddr)
- 
-         try:
-             src.launch()
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 36a7757aaf..6f057904a9 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -195,8 +195,6 @@ class VM(qtest.QEMUQtestMachine):
-         super(VM, self).__init__(qemu_prog, qemu_opts, name=name,
-                                  test_dir=test_dir,
-                                  socket_scm_helper=socket_scm_helper)
--        if debug:
--            self._debug = True
-         self._num_drives = 0
- 
-     def add_device(self, opts):
--- 
-2.13.5
+Paolo
