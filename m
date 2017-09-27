@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70M-0001Qc-LS
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70N-0001RS-51
 	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70L-00043R-Cx
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:38 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70L-000444-Nn
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:39 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 27 Sep 2017 17:42:55 +1000
-Message-Id: <20170927074316.4454-6-david@gibson.dropbear.id.au>
+Date: Wed, 27 Sep 2017 17:43:00 +1000
+Message-Id: <20170927074316.4454-11-david@gibson.dropbear.id.au>
 In-Reply-To: <20170927074316.4454-1-david@gibson.dropbear.id.au>
 References: <20170927074316.4454-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 05/26] ppc: Add 460EX embedded CPU
+Subject: [Qemu-devel] [PULL 10/26] ppc/ide/macio: Add missing registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,102 +20,138 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, groug@kaod.org, mark.cave-ayland@ilande.co.uk, balaton@eik.bme.hu, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, groug@kaod.org, mark.cave-ayland@ilande.co.uk, balaton@eik.bme.hu, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-Despite its name it is a 440 core CPU
+The timing register exists on all variants of MacIO IDE, we just
+store and return its value.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+The interrupts register only exists on KeyLargo but it doesn't
+hurt to have it. The lack of this register causes MacOS X to
+hangs under some circumstances.
+
+Both are 32-bit only. The HW might support smaller access sizes
+but no known OS uses them.
+
+Because the core IDE subsystem doesn't provide us with a way
+to query the main (level) interrupt state, nor do we have a way
+to know that DBDMA issued a (edge) interrupt, we reflect both
+through a private pair of qirq's in order to maintain the
+register state.
+
+Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/cpu-models.c     |  3 +++
- target/ppc/cpu-models.h     |  1 +
- target/ppc/translate_init.c | 38 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 42 insertions(+)
+ hw/ide/macio.c | 44 +++++++++++++++++++++++++++++++++++++++++---
+ hw/ppc/mac.h   |  6 +++++-
+ 2 files changed, 46 insertions(+), 4 deletions(-)
 
-diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
-index 9626d6b7c4..9d45702843 100644
---- a/target/ppc/cpu-models.c
-+++ b/target/ppc/cpu-models.c
-@@ -167,6 +167,8 @@
-                 "PowerPC 440 EPb")
-     POWERPC_DEF("440epx",        CPU_POWERPC_440EPX,                 440EP,
-                 "PowerPC 440 EPX")
-+    POWERPC_DEF("460exb",        CPU_POWERPC_460EXb,                 460EX,
-+                "PowerPC 460 EXb")
- #if defined(TODO_USER_ONLY)
-     POWERPC_DEF("440gpb",        CPU_POWERPC_440GPb,                 440GP,
-                 "PowerPC 440 GPb")
-@@ -786,6 +788,7 @@ PowerPCCPUAlias ppc_cpu_aliases[] = {
-     { "x2vp50", "x2vp20" },
- 
-     { "440ep", "440epb" },
-+    { "460ex", "460exb" },
- #if defined(TODO_USER_ONLY)
-     { "440gp", "440gpc" },
-     { "440gr", "440gra" },
-diff --git a/target/ppc/cpu-models.h b/target/ppc/cpu-models.h
-index df31d7f492..ed64005ff8 100644
---- a/target/ppc/cpu-models.h
-+++ b/target/ppc/cpu-models.h
-@@ -240,6 +240,7 @@ enum {
-     CPU_POWERPC_440SP              = 0x53221850,
-     CPU_POWERPC_440SP2             = 0x53221891,
-     CPU_POWERPC_440SPE             = 0x53421890,
-+    CPU_POWERPC_460EXb             = 0x130218A4, /* called 460 but 440 core */
-     /* PowerPC 460 family */
- #if 0
-     /* Generic PowerPC 464 */
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 466bf97347..c6399a3a0d 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -3833,6 +3833,44 @@ POWERPC_FAMILY(440EP)(ObjectClass *oc, void *data)
-                  POWERPC_FLAG_DE | POWERPC_FLAG_BUS_CLK;
+diff --git a/hw/ide/macio.c b/hw/ide/macio.c
+index 9742c005d1..db5db390e7 100644
+--- a/hw/ide/macio.c
++++ b/hw/ide/macio.c
+@@ -331,6 +331,12 @@ static void pmac_ide_writel (void *opaque,
+     val = bswap32(val);
+     if (addr == 0) {
+         ide_data_writel(&d->bus, 0, val);
++    } else if (addr == 0x20) {
++        d->timing_reg = val;
++    } else if (addr == 0x30) {
++        if (val & 0x80000000u) {
++            d->irq_reg &= 0x7fffffff;
++        }
+     }
  }
  
-+POWERPC_FAMILY(460EX)(ObjectClass *oc, void *data)
+@@ -342,6 +348,17 @@ static uint32_t pmac_ide_readl (void *opaque,hwaddr addr)
+     addr = (addr & 0xFFF) >> 4;
+     if (addr == 0) {
+         retval = ide_data_readl(&d->bus, 0);
++    } else if (addr == 0x20) {
++        retval = d->timing_reg;
++    } else if (addr == 0x30) {
++        /* This is an interrupt state register that only exists
++         * in the KeyLargo and later variants. Bit 0x8000_0000
++         * latches the DMA interrupt and has to be written to
++         * clear. Bit 0x4000_0000 is an image of the disk
++         * interrupt. MacOS X relies on this and will hang if
++         * we don't provide at least the disk interrupt
++         */
++        retval = d->irq_reg;
+     } else {
+         retval = 0xFFFFFFFF;
+     }
+@@ -426,13 +443,32 @@ static void macio_ide_realizefn(DeviceState *dev, Error **errp)
+ {
+     MACIOIDEState *s = MACIO_IDE(dev);
+ 
+-    ide_init2(&s->bus, s->irq);
++    ide_init2(&s->bus, s->ide_irq);
+ 
+     /* Register DMA callbacks */
+     s->dma.ops = &dbdma_ops;
+     s->bus.dma = &s->dma;
+ }
+ 
++static void pmac_ide_irq(void *opaque, int n, int level)
 +{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(oc);
++    MACIOIDEState *s = opaque;
++    uint32_t mask = 0x80000000u >> n;
 +
-+    dc->desc = "PowerPC 460 EX";
-+    pcc->init_proc = init_proc_440EP;
-+    pcc->check_pow = check_pow_nocheck;
-+    pcc->insns_flags = PPC_INSNS_BASE | PPC_STRING |
-+                       PPC_FLOAT | PPC_FLOAT_FRES | PPC_FLOAT_FSEL |
-+                       PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
-+                       PPC_FLOAT_STFIWX |
-+                       PPC_DCR | PPC_DCRX | PPC_WRTEE | PPC_RFMCI |
-+                       PPC_CACHE | PPC_CACHE_ICBI |
-+                       PPC_CACHE_DCBZ | PPC_CACHE_DCBA |
-+                       PPC_MEM_TLBSYNC | PPC_MFTB |
-+                       PPC_BOOKE | PPC_4xx_COMMON | PPC_405_MAC |
-+                       PPC_440_SPEC;
-+    pcc->msr_mask = (1ull << MSR_POW) |
-+                    (1ull << MSR_CE) |
-+                    (1ull << MSR_EE) |
-+                    (1ull << MSR_PR) |
-+                    (1ull << MSR_FP) |
-+                    (1ull << MSR_ME) |
-+                    (1ull << MSR_FE0) |
-+                    (1ull << MSR_DWE) |
-+                    (1ull << MSR_DE) |
-+                    (1ull << MSR_FE1) |
-+                    (1ull << MSR_IR) |
-+                    (1ull << MSR_DR);
-+    pcc->mmu_model = POWERPC_MMU_BOOKE;
-+    pcc->excp_model = POWERPC_EXCP_BOOKE;
-+    pcc->bus_model = PPC_FLAGS_INPUT_BookE;
-+    pcc->bfd_mach = bfd_mach_ppc_403;
-+    pcc->flags = POWERPC_FLAG_CE | POWERPC_FLAG_DWE |
-+                 POWERPC_FLAG_DE | POWERPC_FLAG_BUS_CLK;
++    /* We need to reflect the IRQ state in the irq register */
++    if (level) {
++        s->irq_reg |= mask;
++    } else {
++        s->irq_reg &= ~mask;
++    }
++
++    if (n) {
++        qemu_set_irq(s->real_ide_irq, level);
++    } else {
++        qemu_set_irq(s->real_dma_irq, level);
++    }
 +}
 +
- static void init_proc_440GP(CPUPPCState *env)
+ static void macio_ide_initfn(Object *obj)
  {
-     /* Time base */
+     SysBusDevice *d = SYS_BUS_DEVICE(obj);
+@@ -441,8 +477,10 @@ static void macio_ide_initfn(Object *obj)
+     ide_bus_new(&s->bus, sizeof(s->bus), DEVICE(obj), 0, 2);
+     memory_region_init_io(&s->mem, obj, &pmac_ide_ops, s, "pmac-ide", 0x1000);
+     sysbus_init_mmio(d, &s->mem);
+-    sysbus_init_irq(d, &s->irq);
+-    sysbus_init_irq(d, &s->dma_irq);
++    sysbus_init_irq(d, &s->real_ide_irq);
++    sysbus_init_irq(d, &s->real_dma_irq);
++    s->dma_irq = qemu_allocate_irq(pmac_ide_irq, s, 0);
++    s->ide_irq = qemu_allocate_irq(pmac_ide_irq, s, 1);
+ }
+ 
+ static void macio_ide_class_init(ObjectClass *oc, void *data)
+diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
+index 20cbddb4e4..300fc8ab68 100644
+--- a/hw/ppc/mac.h
++++ b/hw/ppc/mac.h
+@@ -132,7 +132,9 @@ typedef struct MACIOIDEState {
+     SysBusDevice parent_obj;
+     /*< public >*/
+ 
+-    qemu_irq irq;
++    qemu_irq real_ide_irq;
++    qemu_irq real_dma_irq;
++    qemu_irq ide_irq;
+     qemu_irq dma_irq;
+ 
+     MemoryRegion mem;
+@@ -140,6 +142,8 @@ typedef struct MACIOIDEState {
+     IDEDMA dma;
+     void *dbdma;
+     bool dma_active;
++    uint32_t timing_reg;
++    uint32_t irq_reg;
+ } MACIOIDEState;
+ 
+ void macio_ide_init_drives(MACIOIDEState *ide, DriveInfo **hd_table);
 -- 
 2.13.5
