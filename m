@@ -1,42 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dx7Jt-0001Og-1w
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 04:03:54 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dx7Sf-0006GI-5D
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 04:12:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dx7Jn-0004uB-1t
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 04:03:49 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54898)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dx7Jm-0004tr-OO
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 04:03:42 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8R82hn3111965
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 04:03:39 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d87p11r6j-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 04:03:38 -0400
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 27 Sep 2017 09:03:34 +0100
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-References: <20170926133624.155394-1-borntraeger@de.ibm.com>
-	<20170926133624.155394-3-borntraeger@de.ibm.com>
-	<e1b995a5-078a-f2a1-9f3b-6c1ab0ac697b@redhat.com>
-	<5770bcf6-3608-11e7-7f4e-a91f5046c8c1@de.ibm.com>
-Date: Wed, 27 Sep 2017 10:03:31 +0200
+	(envelope-from <dgibson@ozlabs.org>) id 1dx7SZ-0001ZL-DS
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 04:12:53 -0400
+Date: Wed, 27 Sep 2017 17:59:17 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170927075917.GQ12504@umbus>
+References: <20170926121750.9015-1-lvivier@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5770bcf6-3608-11e7-7f4e-a91f5046c8c1@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <2f3eb94e-c07f-8752-059c-de5900859fff@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] s390x/ais: disable ais for compat
- machines
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="JaBjgNvtdKe5H086"
+Content-Disposition: inline
+In-Reply-To: <20170926121750.9015-1-lvivier@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] spapr: select default vty
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,51 +23,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
+--JaBjgNvtdKe5H086
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 09/27/2017 09:12 AM, Christian Borntraeger wrote:
-> 
-> 
-> On 09/26/2017 03:51 PM, David Hildenbrand wrote:
->> On 26.09.2017 15:36, Christian Borntraeger wrote:
->>> With newer kernels that do support the ais feature (4.13) a qemu 2.11
->>> will not only enable the ais feature for the 2.11 machine, but also
->>> for a <=2.10 compat machine. As this feature is not available in
->>> QEMU <=2.9 (and QEMU 2.10.1), this guest will fail to migrate
->>> back to an older qemu like 2.9 with:
->>>
->>> _snip_
->>> error while loading state for instance 0x0 of device 's390-flic'
->>> _snip_
->>>
->>> making the whole compat machine dis-functional. As a permanent fix, we
->>> need to fence the ais feature for machines <= 2.10
->>>
->>> Due to ais being enabled on 2.10.0 (fixed in 2.10.1) this will prevent
->>> migration of ais-enabled guests from 2.10.0 with
->>>
->>> _snip_
->>> qemu-system-s390x: Failed to load s390-flic/ais:tmp
->>> qemu-system-s390x: error while loading state for instance 0x0 of device 's390-flic'
->>> qemu-system-s390x: load of migration failed: Function not implemented
->>> _snip_
->>>
->>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>> Cc: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
->>> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>> ---
->>>  hw/intc/s390_flic_kvm.c            |  4 +++-
->>
->>
->> As discussed, I think we should use cpu_model_allowed() instead.
-> I think I still prefer the explicit check for ais-enabled to make managedsave
-> (on the same system) continue to work if the user does not specify a cpu model 
-> at all (which will then fallback to the host model). We already fence other
-> things (like guarded storage) and yes it will grow over time but the 
-> *_allowed things seem to be the smallest maintenance issue in this area.
+On Tue, Sep 26, 2017 at 02:17:50PM +0200, Laurent Vivier wrote:
+> SLOF uses the "/chosen/linux,stdout-path" variable to
+> choose its console. This variable is provided by QEMU.
+> QEMU selects the spapr-vty using the "reg" property:
+> it takes the vty with the lowest reg number.
+> This patch allows the user to define "linux,stdout-path"
+> from the command line by adding a keyword 'default' to
+> the spapr-vty device.
+>=20
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 
-Hmm, on the other hand this fails only when we migrate to an older qemu during
-managedsave. So yes, maybe this is just an "will not work anyway"
+I'm a bit dubious about the worth of this.  With your SLOF fixes it
+should still be possible to redirect output correctly using -prom-env,
+yes?  Using a secondary vty is a pretty niche case, so I'm not
+convinced we need extra properties just to make it simpler.
+> ---
+>  hw/char/spapr_vty.c | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/char/spapr_vty.c b/hw/char/spapr_vty.c
+> index 0fa416ca6b..aa56a9a6cb 100644
+> --- a/hw/char/spapr_vty.c
+> +++ b/hw/char/spapr_vty.c
+> @@ -15,6 +15,7 @@ typedef struct VIOsPAPRVTYDevice {
+>      CharBackend chardev;
+>      uint32_t in, out;
+>      uint8_t buf[VTERM_BUFSIZE];
+> +    bool is_default;
+>  } VIOsPAPRVTYDevice;
+> =20
+>  #define TYPE_VIO_SPAPR_VTY_DEVICE "spapr-vty"
+> @@ -153,6 +154,7 @@ void spapr_vty_create(VIOsPAPRBus *bus, Chardev *char=
+dev)
+>  static Property spapr_vty_properties[] =3D {
+>      DEFINE_SPAPR_PROPERTIES(VIOsPAPRVTYDevice, sdev),
+>      DEFINE_PROP_CHR("chardev", VIOsPAPRVTYDevice, chardev),
+> +    DEFINE_PROP_BOOL("default", VIOsPAPRVTYDevice, is_default, false),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> =20
+> @@ -194,11 +196,13 @@ static const TypeInfo spapr_vty_info =3D {
+>  VIOsPAPRDevice *spapr_vty_get_default(VIOsPAPRBus *bus)
+>  {
+>      VIOsPAPRDevice *sdev, *selected;
+> +    VIOsPAPRVTYDevice *dev;
+>      BusChild *kid;
+> =20
+>      /*
+>       * To avoid the console bouncing around we want one VTY to be
+> -     * the "default". We haven't really got anything to go on, so
+> +     * the "default". If the user doesn't provide the information
+> +     * we haven't really got anything to go on, so
+>       * arbitrarily choose the one with the lowest reg value.
+>       */
+> =20
+> @@ -213,6 +217,13 @@ VIOsPAPRDevice *spapr_vty_get_default(VIOsPAPRBus *b=
+us)
+> =20
+>          sdev =3D VIO_SPAPR_DEVICE(iter);
+> =20
+> +        /* The user can provide the default console to use */
+> +
+> +        dev =3D VIO_SPAPR_VTY_DEVICE(sdev);
+> +        if (dev->is_default) {
+> +            return sdev;
+> +        }
+> +
+>          /* First VTY we've found, so it is selected for now */
+>          if (!selected) {
+>              selected =3D sdev;
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--JaBjgNvtdKe5H086
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnLWlQACgkQbDjKyiDZ
+s5KBTxAAtT6aB/9hB1MMwSbVR/IU/s3x62sa2FZKEU8hNjZcTc/4guvTBsWcs4NQ
+L4tkgN5JjOnums2fLETI8B6FZqrXrsIwR5WdZxrW6JcCcqrjuJHigZfjR/c1N92L
+coVSOLNb4qKCfytgi6+JAzeiniuT5C8f0gzuOxyMP6r0uutyFnIZIVFUaSEj0xhT
+iSSoQiXriNIMS+yNXCc0HQf86FeEtlZ6vku2gK28NeGTuZk7PDFdCjHHYlh0cWwE
+NRRkizGx1uL986tMU+ZEs4/XHXVsu5UKOVjFxMAV8UuoFYwseKQt0ZNw7pX9p2J2
+kq9CthE6+4fKcWR4oc6Xktcp8gtrVUVyDvXCZ76UNrA01nErVjIqdR9mdnTN9zHB
+LOSyKtQ8SWc7MW2E2v/h/mQXNm0qI6+EfiH47VgeSfWBGZMbASKydHCXT0EMpsRm
+FU9wBBcESlwgO0+uCDMbbTLjjTjdGtuaPvQafdLEe5MveZWoAlrz9ySLrBZxd9Dl
+yrrNxULJG/yE6BYjR6UHaYWR6b1MdXRSg3EDtVlru187U3hLDROCDtEDQSDRlnNj
+aE7bvLaPNdvHIjDRP5pRtYf0+Jzi1bHQGoCt4bOzBbHs8qMvmyNlXq2eLhi0X+KS
++IirbJd/PymLkRIlv0Jxjg0z/MLRD5DCjMN7NRXvL5BS+O3n0k0=
+=B/Wt
+-----END PGP SIGNATURE-----
+
+--JaBjgNvtdKe5H086--
