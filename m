@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70J-0001Ng-EM
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:37 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70J-0001NN-1A
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70I-0003zF-8r
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70H-0003yr-VC
 	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:35 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 27 Sep 2017 17:42:50 +1000
-Message-Id: <20170927074316.4454-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/26] ppc-for-2.11 queue 20170927
+Date: Wed, 27 Sep 2017 17:42:53 +1000
+Message-Id: <20170927074316.4454-4-david@gibson.dropbear.id.au>
+In-Reply-To: <20170927074316.4454-1-david@gibson.dropbear.id.au>
+References: <20170927074316.4454-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PULL 03/26] ohci: Allow sysbus version to be used as
+ a companion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,98 +23,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, groug@kaod.org, mark.cave-ayland@ilande.co.uk, balaton@eik.bme.hu, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-The following changes since commit 31bc1d8481af414cfa2857f905e40f7d8e6d5b=
-2e:
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-  Merge remote-tracking branch 'remotes/mjt/tags/trivial-patches-fetch' i=
-nto staging (2017-09-26 19:49:08 +0100)
+Some PPC SoCs have an EHCI with OHCI companion USB controller. To
+emulate this allow the sysbus version of OHCI to be used as a companion.
 
-are available in the git repository at:
-
-  git://github.com/dgibson/qemu.git tags/ppc-for-2.11-20170927
-
-for you to fetch changes up to e451b85f1bf3c8140be51e2b03eb71ab96c246a5:
-
-  macio: use object link between MACIO_IDE and MAC_DBDMA object (2017-09-=
-27 13:05:41 +1000)
-
-----------------------------------------------------------------
-ppc patch queue 2017-09-27
-
-Contains
- * a number of Mac machine type fixes
- * a number of embedded machine type fixes (preliminary to adding the
-   Sam460ex board)
- * a important fix for handling of migration with KVM PR
- * assorted other minor fixes and cleanups
-
-----------------------------------------------------------------
-BALATON Zoltan (4):
-      ohci: Allow sysbus version to be used as a companion
-      ehci: Add ppc4xx-ehci for the USB 2.0 controller in embedded PPC So=
-Cs
-      ppc: Add 460EX embedded CPU
-      ppc4xx: Add more PLB registers
-
-Benjamin Herrenschmidt (4):
-      ppc/mac: Advertise a high clock frequency for NewWorld Macs
-      ppc/mac: More rework of the DBDMA emulation
-      ppc/ide/macio: Add missing registers
-      ppc: Fix OpenPIC model
-
-C=C3=A9dric Le Goater (1):
-      ppc/pnv: check for OPAL firmware file presence
-
-Eric Blake (1):
-      ppc/pnv: Improve macro parenthesization
-
-Greg Kurz (7):
-      ppc/kvm: check some capabilities with kvm_vm_check_extension()
-      ppc/kvm: drop kvmppc_has_cap_htab_fd()
-      ppc/kvm: change kvmppc_get_htab_fd() to return -errno on error
-      ppc/kvm: generalize the use of kvmppc_get_htab_fd()
-      spapr: introduce helpers to migrate HPT chunks and the end marker
-      spapr_pci: make index property mandatory
-      spapr: fix the value of SDR1 in kvmppc_put_books_sregs()
-
-John Snow (2):
-      ppc: remove unused CPU definitions
-      ppc: remove all unused CPU definitions
-
-Mark Cave-Ayland (7):
-      ppc: QOMify g3beige machine
-      macio: convert pmac_ide_ops from old_mmio
-      mac_dbdma: remove unused IO fields from DBDMAState
-      mac_dbdma: QOMify
-      mac_dbdma: remove DBDMA_init() function
-      macio: pass channel into MACIOIDEState via qdev property
-      macio: use object link between MACIO_IDE and MAC_DBDMA object
-
- hw/ide/macio.c              | 206 +++++++++++++++++++----------------
- hw/intc/openpic.c           |  35 ++++++
- hw/misc/macio/mac_dbdma.c   | 242 +++++++++++++++++++++++++++++---------=
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/misc/macio/macio.c       |  21 +++-
- hw/ppc/mac.h                |  10 +-
- hw/ppc/mac_newworld.c       |   4 +-
- hw/ppc/mac_oldworld.c       |  17 ++-
- hw/ppc/pnv.c                |   6 +-
- hw/ppc/ppc405_uc.c          |  12 ++-
- hw/ppc/spapr.c              |  68 +++++++-----
- hw/ppc/spapr_cpu_core.c     |  16 +--
- hw/ppc/spapr_hcall.c        |  45 +++++---
- hw/ppc/spapr_pci.c          |  62 ++---------
- hw/usb/hcd-ehci-sysbus.c    |  25 +++++
- hw/usb/hcd-ehci.h           |   1 +
- hw/usb/hcd-ohci.c           |  15 ++-
- include/hw/ppc/mac_dbdma.h  |  11 +-
- include/hw/ppc/openpic.h    |   1 +
- include/hw/ppc/pnv_xscom.h  |   2 +-
- target/ppc/cpu-models.c     |   3 +
- target/ppc/cpu-models.h     | 258 +-------------------------------------=
-------
- target/ppc/cpu.h            |   1 +
- target/ppc/kvm.c            |  80 +++++---------
- target/ppc/kvm_ppc.h        |  16 +--
- target/ppc/translate_init.c |  38 +++++++
- 25 files changed, 579 insertions(+), 616 deletions(-)
+ hw/usb/hcd-ohci.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
+index 267982e160..17beeddb09 100644
+--- a/hw/usb/hcd-ohci.c
++++ b/hw/usb/hcd-ohci.c
+@@ -1999,7 +1999,9 @@ typedef struct {
+     /*< public >*/
+ 
+     OHCIState ohci;
++    char *masterbus;
+     uint32_t num_ports;
++    uint32_t firstport;
+     dma_addr_t dma_offset;
+ } OHCISysBusState;
+ 
+@@ -2007,10 +2009,15 @@ static void ohci_realize_pxa(DeviceState *dev, Error **errp)
+ {
+     OHCISysBusState *s = SYSBUS_OHCI(dev);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
++    Error *err = NULL;
+ 
+-    /* Cannot fail as we pass NULL for masterbus */
+-    usb_ohci_init(&s->ohci, dev, s->num_ports, s->dma_offset, NULL, 0,
+-                  &address_space_memory, &error_abort);
++    usb_ohci_init(&s->ohci, dev, s->num_ports, s->dma_offset,
++                  s->masterbus, s->firstport,
++                  &address_space_memory, &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+     sysbus_init_irq(sbd, &s->ohci.irq);
+     sysbus_init_mmio(sbd, &s->ohci.mem);
+ }
+@@ -2142,7 +2149,9 @@ static const TypeInfo ohci_pci_info = {
+ };
+ 
+ static Property ohci_sysbus_properties[] = {
++    DEFINE_PROP_STRING("masterbus", OHCISysBusState, masterbus),
+     DEFINE_PROP_UINT32("num-ports", OHCISysBusState, num_ports, 3),
++    DEFINE_PROP_UINT32("firstport", OHCISysBusState, firstport, 0),
+     DEFINE_PROP_DMAADDR("dma-offset", OHCISysBusState, dma_offset, 0),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+-- 
+2.13.5
