@@ -1,34 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dx3vJ-0005CV-Dj
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 00:26:14 -0400
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dx44v-0006g2-Fc
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 00:36:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dx3vG-0004uq-9K
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 00:26:13 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34258)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dx3vG-0004u8-38
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 00:26:10 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dx3vC-0006yJ-Dw
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 04:26:06 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8E5C02E8520
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 04:26:01 +0000 (UTC)
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dx44s-0001Wb-CY
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 00:36:09 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38278)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
+	id 1dx44s-0001W0-2H
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 00:36:06 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8R4XbwI101441
+	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 00:36:01 -0400
+Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d7vxe5p97-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 00:36:01 -0400
+Received: from localhost
+	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
+	Tue, 26 Sep 2017 22:36:00 -0600
+References: <20170926133624.155394-1-borntraeger@de.ibm.com>
+	<20170926133624.155394-2-borntraeger@de.ibm.com>
+	<6f4a490e-96bc-58b5-c561-4491f175e2e4@redhat.com>
+	<debb11b6-3eba-b2fe-961f-52df7b1c5926@de.ibm.com>
+From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+Date: Wed, 27 Sep 2017 12:35:53 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <debb11b6-3eba-b2fe-961f-52df7b1c5926@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <47df0694-49b2-7acf-fab1-af6119fa5aa2@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 27 Sep 2017 04:17:36 -0000
-From: Launchpad Bug Tracker <1706866@bugs.launchpad.net>
-Reply-To: Bug 1706866 <1706866@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150113818340.31767.9409806903366726521.malonedeb@gac.canonical.com>
-Message-Id: <150648585618.20621.6766970903072980557.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1706866] Re: migrate:  add tls option in virsh,
- migrate failed
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] s390x/ais: enable ais when
+ migration is available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,66 +44,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>
 
-[Expired for QEMU because there has been no activity for 60 days.]
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1706866
-
-Title:
-  migrate:  add tls option in virsh, migrate failed
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  version:
-      libvirt-3.4.0 + qemu-2.9.90(latest)
-
-  domain:
-      any
-
-  step:
-      1. generate tls certificate in /etc/pki/libvirt-migrate
-      2. start vm
-      3. migrate vm, cmdline:
-         virsh migrate rh7.1-3 --live --undefinesource --persistent --verbo=
-se --tls qemu+ssh://IP/system
-      4. then migrate failed and reported:
-   Migration: [ 64 %]error: internal error: qemu unexpectedly closed the mo=
-nitor: Domain pid=3D5288, libvirtd pid=3D49634
-   kvm: warning: CPU(s) not present in any NUMA nodes: 2 3 4 5 6 7 8 9 10 1=
-1 12 13 14 15 16 17 18 19 20 21 22 23
-   kvm: warning: All CPU(s) up to maxcpus should be described in NUMA config
-   kvm: error while loading state section id 2(ram)
-   kvm: load of migration failed: Input/output error
-
-  other:
-      Analysis qemu code and debug:
-  #0  ram_save_page (f=3D0x55ca8be370e0, pss=3D0x7fefdfc7b9a0, last_stage=
-=3Dfalse, bytes_transferred=3D0x55ca885ec1d8) =
-
-  #1  0x000055ca87b00b21 in ram_save_target_page (ms=3D0x55ca885b8d80, f=3D=
-0x55ca8be370e0, pss=3D0x7fefdfc7b9a0, last_stage=3Dfalse, bytes_transferred=
-=3D0x55ca885ec1d8, dirty_ram_abs=3D0)
-  #2  0x000055ca87b00bda in ram_save_host_page (ms=3D0x55ca885b8d80, f=3D0x=
-55ca8be370e0, pss=3D0x7fefdfc7b9a0, last_stage=3Dfalse, bytes_transferred=
-=3D0x55ca885ec1d8, dirty_ram_abs=3D0)
-  #3  0x000055ca87b00d39 in ram_find_and_save_block (f=3D0x55ca8be370e0, la=
-st_stage=3Dfalse, bytes_transferred=3D0x55ca885ec1d8)
-  #4  0x000055ca87b020b8 in ram_save_iterate (f=3D0x55ca8be370e0, opaque=3D=
-0x0)
-  #5  0x000055ca87b07a9a in qemu_savevm_state_iterate (f=3D0x55ca8be370e0, =
-postcopy=3Dfalse) =
-
-  #6  0x000055ca87e404e5 in migration_thread (opaque=3D0x55ca885b8d80)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1706866/+subscriptions
+=E5=9C=A8 2017/9/26 =E4=B8=8B=E5=8D=8810:06, Christian Borntraeger =E5=86=
+=99=E9=81=93:
+>
+> On 09/26/2017 03:43 PM, David Hildenbrand wrote:
+>>> +    /* try enable the AIS facility */
+>>> +    test_attr.group =3D KVM_DEV_FLIC_AISM_ALL;
+>>> +    if (!ioctl(flic_state->fd, KVM_HAS_DEVICE_ATTR, test_attr)) {
+>>> +            kvm_vm_enable_cap(kvm_state, KVM_CAP_S390_AIS, 0);
+>>> +    }
+>>> +
+>>>       return;
+>>>   fail:
+>>>       error_propagate(errp, errp_local);
+>>> @@ -578,7 +584,7 @@ static void kvm_s390_flic_reset(DeviceState *dev)
+>>>  =20
+>>>       flic_disable_wait_pfault(flic);
+>>>  =20
+>>> -    if (fs->ais_supported) {
+>>> +    if (s390_has_feat(S390_FEAT_ADAPTER_INT_SUPPRESSION)) {
+>> I don't remember if a reset is trigger on realization. Most probably
+>> not, but it could be.
+>>
+>> Would it hurt if the following code would not get called if the flic
+>> hasn't been used yet? (possible reset before cpu model has been
+>> initialized) - are kvm_s390_modify_ais_mode() calls required before ai=
+s
+>> can be used for the first time?
+> Hmm, simm/nimm should default to zero in the kernel I guess. So I think=
+ it would
+> not hurt. Yi Min, correct?
+Yes, the default mode is all interruption mode, IOW simm =3D 0 and nimm =3D=
+ 0.
+>
+>
+> Anyway it seems that reset is NOT called during realize, the first
+> call is
+>
+>                  #0  0x00000000010e5178 kvm_s390_flic_reset (qemu-syste=
+m-s390x)
+>                  #1  0x000000000124bbc4 device_reset (qemu-system-s390x=
+)
+>                  #2  0x0000000001248cd0 qdev_reset_one (qemu-system-s39=
+0x)
+>                  #3  0x0000000001249ea4 qdev_walk_children (qemu-system=
+-s390x)
+>                  #4  0x000000000124fd3a qbus_walk_children (qemu-system=
+-s390x)
+>                  #5  0x0000000001248e6c qbus_reset_all (qemu-system-s39=
+0x)
+>                  #6  0x0000000001248eae qbus_reset_all_fn (qemu-system-=
+s390x)
+>                  #7  0x0000000001250a60 qemu_devices_reset (qemu-system=
+-s390x)
+>                  #8  0x0000000001143c80 s390_machine_reset (qemu-system=
+-s390x)
+>                  #9  0x00000000011c5b72 qemu_system_reset (qemu-system-=
+s390x)
+>                  #10 0x00000000011ceb8e main (qemu-system-s390x)
+>                  #11 0x000003ff947a289a __libc_start_main (libc.so.6)
+>                  #12 0x0000000001017646 _start (qemu-system-s390x)
+>
+>
+>
