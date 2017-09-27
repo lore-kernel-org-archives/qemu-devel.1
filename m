@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dxAqD-0005Wa-8L
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 07:49:26 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dxArN-0006Mw-M1
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 07:50:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dxAqC-0008Df-2G
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 07:49:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37416)
+	(envelope-from <kraxel@redhat.com>) id 1dxArM-0000eU-6c
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 07:50:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34488)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dxAqB-0008DI-PH
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 07:49:23 -0400
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed, 27 Sep 2017 13:49:17 +0200
-Message-Id: <1506512957-196068-1-git-send-email-imammedo@redhat.com>
-In-Reply-To: <20170927062143.GN12504@umbus>
-References: <20170927062143.GN12504@umbus>
-Subject: [Qemu-devel] [RFC] ppc: define spapr core types statically
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dxArL-0000dv-Po
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 07:50:36 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BC24E81E00
+	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 11:50:34 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 27 Sep 2017 13:50:31 +0200
+Message-Id: <20170927115031.12063-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] egl: misc framebuffer helper improvements.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,249 +28,174 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: david@gibson.dropbear.id.au, groug@kaod.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
---
-patch does 3 things at the same time and should be split but
-it has 'host' consolidation is it as well to demonstrate idea
---
+Rename the functions to to say "setup" instead of "create" because they
+support being called multiple times on the same egl framebuffer.
 
-spapr core type definition doesn't have any fields that
-require it to be defined at runtime. So replace code
-that fills in TypeInfo at runtime with static TypeInfo
-array that does the same at complie time.
+Properly delete unused textures, update function interfaces to support
+this.
 
-And replace sPAPRCPUCoreClass::cpu_class with cpu
-type name since were used just to get that at points
-it were accessed.
-
-While at that, consolidate move 'host' core type
-registration into spapr_cpu_core.c, similar like
-it's done in x86 target.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/hw/ppc/spapr_cpu_core.h |  5 ++-
- hw/ppc/spapr.c                  |  6 +--
- hw/ppc/spapr_cpu_core.c         | 93 ++++++++++++++++-------------------------
- target/ppc/kvm.c                | 11 -----
- 4 files changed, 41 insertions(+), 74 deletions(-)
+ include/ui/egl-helpers.h |  5 +++--
+ ui/egl-headless.c        |  6 +++---
+ ui/egl-helpers.c         | 26 ++++++++++++++++++--------
+ ui/gtk-egl.c             |  4 ++--
+ ui/gtk-gl-area.c         |  4 ++--
+ ui/sdl2-gl.c             |  4 ++--
+ 6 files changed, 30 insertions(+), 19 deletions(-)
 
-diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
-index 93051e9..42765de 100644
---- a/include/hw/ppc/spapr_cpu_core.h
-+++ b/include/hw/ppc/spapr_cpu_core.h
-@@ -21,6 +21,8 @@
- #define SPAPR_CPU_CORE_GET_CLASS(obj) \
-      OBJECT_GET_CLASS(sPAPRCPUCoreClass, (obj), TYPE_SPAPR_CPU_CORE)
+diff --git a/include/ui/egl-helpers.h b/include/ui/egl-helpers.h
+index be8908737c..81cb255de0 100644
+--- a/include/ui/egl-helpers.h
++++ b/include/ui/egl-helpers.h
+@@ -18,8 +18,9 @@ typedef struct egl_fb {
  
-+#define SPAPR_CPU_CORE_TYPE_NAME(model) model "-" TYPE_SPAPR_CPU_CORE
-+
- typedef struct sPAPRCPUCore {
-     /*< private >*/
-     CPUCore parent_obj;
-@@ -32,9 +34,8 @@ typedef struct sPAPRCPUCore {
+ void egl_fb_destroy(egl_fb *fb);
+ void egl_fb_setup_default(egl_fb *fb, int width, int height);
+-void egl_fb_create_for_tex(egl_fb *fb, int width, int height, GLuint texture);
+-void egl_fb_create_new_tex(egl_fb *fb, int width, int height);
++void egl_fb_setup_for_tex(egl_fb *fb, int width, int height,
++                          GLuint texture, bool delete);
++void egl_fb_setup_new_tex(egl_fb *fb, int width, int height);
+ void egl_fb_blit(egl_fb *dst, egl_fb *src, bool flip);
+ void egl_fb_read(void *dst, egl_fb *src);
  
- typedef struct sPAPRCPUCoreClass {
-     DeviceClass parent_class;
--    ObjectClass *cpu_class;
-+    const char *cpu_type;
- } sPAPRCPUCoreClass;
+diff --git a/ui/egl-headless.c b/ui/egl-headless.c
+index 809bfde99c..12ad64e995 100644
+--- a/ui/egl-headless.c
++++ b/ui/egl-headless.c
+@@ -54,14 +54,14 @@ static void egl_scanout_texture(DisplayChangeListener *dcl,
+     edpy->y_0_top = backing_y_0_top;
  
- char *spapr_get_cpu_core_type(const char *model);
--void spapr_cpu_core_class_init(ObjectClass *oc, void *data);
- #endif
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 8c1a437..00cfe9a 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3125,8 +3125,7 @@ void spapr_core_release(DeviceState *dev)
-     if (smc->pre_2_10_has_unused_icps) {
-         sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
-         sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
--        const char *typename = object_class_get_name(scc->cpu_class);
--        size_t size = object_type_get_instance_size(typename);
-+        size_t size = object_type_get_instance_size(scc->cpu_type);
-         int i;
+     /* source framebuffer */
+-    egl_fb_create_for_tex(&edpy->guest_fb,
+-                          backing_width, backing_height, backing_id);
++    egl_fb_setup_for_tex(&edpy->guest_fb,
++                         backing_width, backing_height, backing_id, false);
  
-         for (i = 0; i < cc->nr_threads; i++) {
-@@ -3222,8 +3221,7 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
- 
-     if (smc->pre_2_10_has_unused_icps) {
-         sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
--        const char *typename = object_class_get_name(scc->cpu_class);
--        size_t size = object_type_get_instance_size(typename);
-+        size_t size = object_type_get_instance_size(scc->cpu_type);
-         int i;
- 
-         for (i = 0; i < cc->nr_threads; i++) {
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 5bea4c9..8a18eaf 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -104,8 +104,7 @@ static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
- {
-     sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
-     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
--    const char *typename = object_class_get_name(scc->cpu_class);
--    size_t size = object_type_get_instance_size(typename);
-+    size_t size = object_type_get_instance_size(scc->cpu_type);
-     CPUCore *cc = CPU_CORE(dev);
-     int i;
- 
-@@ -166,8 +165,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-     sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
-     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
-     CPUCore *cc = CPU_CORE(OBJECT(dev));
--    const char *typename = object_class_get_name(scc->cpu_class);
--    size_t size = object_type_get_instance_size(typename);
-+    size_t size = object_type_get_instance_size(scc->cpu_type);
-     Error *local_err = NULL;
-     void *obj;
-     int i, j;
-@@ -186,7 +184,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
- 
-         obj = sc->threads + i * size;
- 
--        object_initialize(obj, size, typename);
-+        object_initialize(obj, size, scc->cpu_type);
-         cs = CPU(obj);
-         cpu = POWERPC_CPU(cs);
-         cs->cpu_index = cc->core_id + i;
-@@ -231,42 +229,12 @@ err:
-     error_propagate(errp, local_err);
- }
- 
--static const char *spapr_core_models[] = {
--    /* 970 */
--    "970_v2.2",
--
--    /* 970MP variants */
--    "970mp_v1.0",
--    "970mp_v1.1",
--
--    /* POWER5+ */
--    "power5+_v2.1",
--
--    /* POWER7 */
--    "power7_v2.3",
--
--    /* POWER7+ */
--    "power7+_v2.1",
--
--    /* POWER8 */
--    "power8_v2.0",
--
--    /* POWER8E */
--    "power8e_v2.1",
--
--    /* POWER8NVL */
--    "power8nvl_v1.0",
--
--    /* POWER9 */
--    "power9_v1.0",
--};
--
- static Property spapr_cpu_core_properties[] = {
-     DEFINE_PROP_INT32("node-id", sPAPRCPUCore, node_id, CPU_UNSET_NUMA_NODE_ID),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
--void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
-+static void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(oc);
-     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_CLASS(oc);
-@@ -274,36 +242,47 @@ void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
-     dc->realize = spapr_cpu_core_realize;
-     dc->unrealize = spapr_cpu_core_unrealizefn;
-     dc->props = spapr_cpu_core_properties;
--    scc->cpu_class = cpu_class_by_name(TYPE_POWERPC_CPU, data);
--    g_assert(scc->cpu_class);
-+    scc->cpu_type = data;
- }
- 
--static const TypeInfo spapr_cpu_core_type_info = {
--    .name = TYPE_SPAPR_CPU_CORE,
--    .parent = TYPE_CPU_CORE,
--    .abstract = true,
--    .instance_size = sizeof(sPAPRCPUCore),
--    .class_size = sizeof(sPAPRCPUCoreClass),
-+#define DEFINE_SPAPR_CPU_CORE_TYPE(cpu_model) \
-+    {                                                   \
-+        .parent = TYPE_SPAPR_CPU_CORE,                  \
-+        .class_data = (void *) POWERPC_CPU_TYPE_NAME(cpu_model), \
-+        .class_init = spapr_cpu_core_class_init,        \
-+        .name = SPAPR_CPU_CORE_TYPE_NAME(cpu_model),    \
-+    }
-+
-+static const TypeInfo spapr_cpu_core_type_infos[] = {
-+    {
-+        .name = TYPE_SPAPR_CPU_CORE,
-+        .parent = TYPE_CPU_CORE,
-+        .abstract = true,
-+        .instance_size = sizeof(sPAPRCPUCore),
-+        .class_size = sizeof(sPAPRCPUCoreClass),
-+    },
-+    DEFINE_SPAPR_CPU_CORE_TYPE("970_v2.2"),
-+    DEFINE_SPAPR_CPU_CORE_TYPE("970mp_v1.0"),
-+    DEFINE_SPAPR_CPU_CORE_TYPE("970mp_v1.1"),
-+    DEFINE_SPAPR_CPU_CORE_TYPE("power5+_v2.1"),
-+    DEFINE_SPAPR_CPU_CORE_TYPE("power7_v2.3"),
-+    DEFINE_SPAPR_CPU_CORE_TYPE("power7+_v2.1"),
-+    DEFINE_SPAPR_CPU_CORE_TYPE("power8_v2.0"),
-+    DEFINE_SPAPR_CPU_CORE_TYPE("power8e_v2.1"),
-+    DEFINE_SPAPR_CPU_CORE_TYPE("power8nvl_v1.0"),
-+    DEFINE_SPAPR_CPU_CORE_TYPE("power9_v1.0"),
-+#ifdef CONFIG_KVM
-+    DEFINE_SPAPR_CPU_CORE_TYPE("host"),
-+#endif
- };
- 
- static void spapr_cpu_core_register_types(void)
- {
-     int i;
- 
--    type_register_static(&spapr_cpu_core_type_info);
--
--    for (i = 0; i < ARRAY_SIZE(spapr_core_models); i++) {
--        TypeInfo type_info = {
--            .parent = TYPE_SPAPR_CPU_CORE,
--            .instance_size = sizeof(sPAPRCPUCore),
--            .class_init = spapr_cpu_core_class_init,
--            .class_data = (void *) spapr_core_models[i],
--        };
- 
--        type_info.name = g_strdup_printf("%s-" TYPE_SPAPR_CPU_CORE,
--                                         spapr_core_models[i]);
--        type_register(&type_info);
--        g_free((void *)type_info.name);
-+    for (i = 0; i < ARRAY_SIZE(spapr_cpu_core_type_infos); i++) {
-+        type_register_static(&spapr_cpu_core_type_infos[i]);
+     /* dest framebuffer */
+     if (edpy->blit_fb.width  != backing_width ||
+         edpy->blit_fb.height != backing_height) {
+         egl_fb_destroy(&edpy->blit_fb);
+-        egl_fb_create_new_tex(&edpy->blit_fb, backing_width, backing_height);
++        egl_fb_setup_new_tex(&edpy->blit_fb, backing_width, backing_height);
      }
  }
  
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 1deaf10..7e5c041 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2507,17 +2507,6 @@ static int kvm_ppc_register_host_cpu_type(void)
-     oc = object_class_by_name(type_info.name);
-     g_assert(oc);
+diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
+index bb19a5eeca..cde9965dea 100644
+--- a/ui/egl-helpers.c
++++ b/ui/egl-helpers.c
+@@ -26,16 +26,23 @@ EGLConfig qemu_egl_config;
  
--#if defined(TARGET_PPC64)
--    type_info.name = g_strdup_printf("%s-"TYPE_SPAPR_CPU_CORE, "host");
--    type_info.parent = TYPE_SPAPR_CPU_CORE,
--    type_info.instance_size = sizeof(sPAPRCPUCore);
--    type_info.instance_init = NULL;
--    type_info.class_init = spapr_cpu_core_class_init;
--    type_info.class_data = (void *) "host";
--    type_register(&type_info);
--    g_free((void *)type_info.name);
--#endif
--
-     /*
-      * Update generic CPU family class alias (e.g. on a POWER8NVL host,
-      * we want "POWER8" to be a "family" alias that points to the current
+ /* ------------------------------------------------------------------ */
+ 
++static void egl_fb_delete_texture(egl_fb *fb)
++{
++    if (!fb->delete_texture) {
++        return;
++    }
++
++    glDeleteTextures(1, &fb->texture);
++    fb->delete_texture = false;
++}
++
+ void egl_fb_destroy(egl_fb *fb)
+ {
+     if (!fb->framebuffer) {
+         return;
+     }
+ 
+-    if (fb->delete_texture) {
+-        glDeleteTextures(1, &fb->texture);
+-        fb->delete_texture = false;
+-    }
++    egl_fb_delete_texture(fb);
+     glDeleteFramebuffers(1, &fb->framebuffer);
+ 
+     fb->width = 0;
+@@ -51,11 +58,15 @@ void egl_fb_setup_default(egl_fb *fb, int width, int height)
+     fb->framebuffer = 0; /* default framebuffer */
+ }
+ 
+-void egl_fb_create_for_tex(egl_fb *fb, int width, int height, GLuint texture)
++void egl_fb_setup_for_tex(egl_fb *fb, int width, int height,
++                          GLuint texture, bool delete)
+ {
++    egl_fb_delete_texture(fb);
++
+     fb->width = width;
+     fb->height = height;
+     fb->texture = texture;
++    fb->delete_texture = delete;
+     if (!fb->framebuffer) {
+         glGenFramebuffers(1, &fb->framebuffer);
+     }
+@@ -65,7 +76,7 @@ void egl_fb_create_for_tex(egl_fb *fb, int width, int height, GLuint texture)
+                               GL_TEXTURE_2D, fb->texture, 0);
+ }
+ 
+-void egl_fb_create_new_tex(egl_fb *fb, int width, int height)
++void egl_fb_setup_new_tex(egl_fb *fb, int width, int height)
+ {
+     GLuint texture;
+ 
+@@ -74,8 +85,7 @@ void egl_fb_create_new_tex(egl_fb *fb, int width, int height)
+     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height,
+                  0, GL_BGRA, GL_UNSIGNED_BYTE, 0);
+ 
+-    egl_fb_create_for_tex(fb, width, height, texture);
+-    fb->delete_texture = true;
++    egl_fb_setup_for_tex(fb, width, height, texture, true);
+ }
+ 
+ void egl_fb_blit(egl_fb *dst, egl_fb *src, bool flip)
+diff --git a/ui/gtk-egl.c b/ui/gtk-egl.c
+index 0d5cab2bc8..0f0d35e041 100644
+--- a/ui/gtk-egl.c
++++ b/ui/gtk-egl.c
+@@ -190,8 +190,8 @@ void gd_egl_scanout_texture(DisplayChangeListener *dcl,
+                    vc->gfx.esurface, vc->gfx.ectx);
+ 
+     gtk_egl_set_scanout_mode(vc, true);
+-    egl_fb_create_for_tex(&vc->gfx.guest_fb, backing_width, backing_height,
+-                          backing_id);
++    egl_fb_setup_for_tex(&vc->gfx.guest_fb, backing_width, backing_height,
++                         backing_id, false);
+ }
+ 
+ void gd_egl_scanout_flush(DisplayChangeListener *dcl,
+diff --git a/ui/gtk-gl-area.c b/ui/gtk-gl-area.c
+index 18b298fc21..01ebf2c7de 100644
+--- a/ui/gtk-gl-area.c
++++ b/ui/gtk-gl-area.c
+@@ -185,8 +185,8 @@ void gd_gl_area_scanout_texture(DisplayChangeListener *dcl,
+     }
+ 
+     gtk_gl_area_set_scanout_mode(vc, true);
+-    egl_fb_create_for_tex(&vc->gfx.guest_fb, backing_width, backing_height,
+-                          backing_id);
++    egl_fb_setup_for_tex(&vc->gfx.guest_fb, backing_width, backing_height,
++                         backing_id, false);
+ }
+ 
+ void gd_gl_area_scanout_flush(DisplayChangeListener *dcl,
+diff --git a/ui/sdl2-gl.c b/ui/sdl2-gl.c
+index dcad3d0d26..9110491ee5 100644
+--- a/ui/sdl2-gl.c
++++ b/ui/sdl2-gl.c
+@@ -207,8 +207,8 @@ void sdl2_gl_scanout_texture(DisplayChangeListener *dcl,
+     SDL_GL_MakeCurrent(scon->real_window, scon->winctx);
+ 
+     sdl2_set_scanout_mode(scon, true);
+-    egl_fb_create_for_tex(&scon->guest_fb, backing_width, backing_height,
+-                          backing_id);
++    egl_fb_setup_for_tex(&scon->guest_fb, backing_width, backing_height,
++                         backing_id, false);
+ }
+ 
+ void sdl2_gl_scanout_flush(DisplayChangeListener *dcl,
 -- 
-2.7.4
+2.9.3
