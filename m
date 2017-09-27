@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dxKmT-0001F5-Ce
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 18:26:14 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dxKo3-0001uq-5z
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 18:27:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dxKmS-0000gD-Dp
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 18:26:13 -0400
-References: <20170913160333.23622-1-eblake@redhat.com>
-	<20170913160333.23622-19-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <0dc1b91f-c996-9b50-731c-54663f077a6d@redhat.com>
-Date: Wed, 27 Sep 2017 18:25:59 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dxKo2-0001UL-6J
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 18:27:51 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:35195)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1dxKo1-0001U7-Vd
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 18:27:50 -0400
+Received: by mail-wr0-x243.google.com with SMTP id n64so6722635wrb.2
+	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 15:27:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170913160333.23622-19-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 18/23] qemu-img: Change
- compare_sectors() to be byte-based
+In-Reply-To: <20170927203225.30896-2-ehabkost@redhat.com>
+References: <20170927203225.30896-1-ehabkost@redhat.com>
+	<20170927203225.30896-2-ehabkost@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 27 Sep 2017 15:27:18 -0700
+Message-ID: <CAKmqyKMVLuiqsN0THX-r1DrCEF6BYD7BOOjNFqVZc7eS+v=TWA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 1/2] vl: Eliminate defconfig variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,80 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
+On Wed, Sep 27, 2017 at 1:32 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> Both -nodefconfig and -no-user-config options do the same thing
+> today, we only need one variable to keep track of them.
+>
+> Suggested-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
+Acked-by: Alistair Francis <alistair.francis@xilinx.com>
 
-On 09/13/2017 12:03 PM, Eric Blake wrote:
-> In the continuing quest to make more things byte-based, change
-> compare_sectors(), renaming it to compare_buffers() in the
-> process.  Note that one caller (qemu-img compare) only cares
-> about the first difference, while the other (qemu-img rebase)
-> cares about how many consecutive sectors have the same
-> equal/different status; however, this patch does not bother to
-> micro-optimize the compare case to avoid the comparisons of
-> sectors beyond the first mismatch.  Both callers are always
-> passing valid buffers in, so the initial check for buffer size
-> can be turned into an assertion.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> 
+Thanks,
+Alistair
+
 > ---
-> v3: new patch
-> ---
->  qemu-img.c | 55 +++++++++++++++++++++++++++----------------------------
->  1 file changed, 27 insertions(+), 28 deletions(-)
-> 
-> diff --git a/qemu-img.c b/qemu-img.c
-> index 2e05f92e85..034122eba5 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -1155,31 +1155,28 @@ static int is_allocated_sectors_min(const uint8_t *buf, int n, int *pnum,
->  }
-> 
->  /*
-> - * Compares two buffers sector by sector. Returns 0 if the first sector of both
-> - * buffers matches, non-zero otherwise.
-> + * Compares two buffers sector by sector. Returns 0 if the first
-> + * sector of each buffer matches, non-zero otherwise.
->   *
-> - * pnum is set to the number of sectors (including and immediately following
-> - * the first one) that are known to have the same comparison result
-> + * pnum is set to the sector-aligned size of the buffer prefix that
-> + * has the same matching status as the first sector.
->   */
-> -static int compare_sectors(const uint8_t *buf1, const uint8_t *buf2, int n,
-> -    int *pnum)
-> +static int compare_buffers(const uint8_t *buf1, const uint8_t *buf2,
-> +                           int64_t bytes, int64_t *pnum)
->  {
->      bool res;
-> -    int i;
-> +    int64_t i = MIN(bytes, BDRV_SECTOR_SIZE);
-> 
-> -    if (n <= 0) {
-> -        *pnum = 0;
-> -        return 0;
-> -    }
-> +    assert(bytes > 0);
-> 
-> -    res = !!memcmp(buf1, buf2, 512);
-> -    for(i = 1; i < n; i++) {
-> -        buf1 += 512;
-> -        buf2 += 512;
-> +    res = !!memcmp(buf1, buf2, i);
-
-It is temporarily confusing that 'i' is never again used for this
-particular parameter, because
-
-> +    while (i < bytes) {
-
-This gives the brief impression that we might be looping in a way that
-changes the comparison size passed to memcmp, which isn't true.
-
-Just me being cranky, though. It's probably still the best way, because
-of how you have to prime the loop. Doing it the literal-minded way
-requires an extra i += len, so:
-
-Reviewed-by: John Snow <jsnow@redhat.com>
+>  vl.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+>
+> diff --git a/vl.c b/vl.c
+> index 4fd01fda91..b347a97a5b 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3093,7 +3093,6 @@ int main(int argc, char **argv, char **envp)
+>      const char *qtest_log = NULL;
+>      const char *pid_file = NULL;
+>      const char *incoming = NULL;
+> -    bool defconfig = true;
+>      bool userconfig = true;
+>      bool nographic = false;
+>      DisplayType display_type = DT_DEFAULT;
+> @@ -3194,8 +3193,6 @@ int main(int argc, char **argv, char **envp)
+>              popt = lookup_opt(argc, argv, &optarg, &optind);
+>              switch (popt->index) {
+>              case QEMU_OPTION_nodefconfig:
+> -                defconfig = false;
+> -                break;
+>              case QEMU_OPTION_nouserconfig:
+>                  userconfig = false;
+>                  break;
+> @@ -3203,7 +3200,7 @@ int main(int argc, char **argv, char **envp)
+>          }
+>      }
+>
+> -    if (defconfig && userconfig) {
+> +    if (userconfig) {
+>          if (qemu_read_default_config_file() < 0) {
+>              exit(1);
+>          }
+> --
+> 2.13.5
+>
+>
