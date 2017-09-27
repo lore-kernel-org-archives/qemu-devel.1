@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dxBYK-0006qW-5i
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:35:04 -0400
+	(envelope-from <famz@redhat.com>) id 1dxBaC-0007fM-2h
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:36:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dxBYE-0000SB-6y
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:35:00 -0400
-Date: Wed, 27 Sep 2017 13:34:42 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170927123442.GF12223@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170912112855.24269-1-berrange@redhat.com>
-	<20170912112855.24269-6-berrange@redhat.com>
-	<bca76897-ec7d-035e-9473-b304b63f5d7b@redhat.com>
+	(envelope-from <famz@redhat.com>) id 1dxBaB-0001SA-7K
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:36:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42988)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dxBaB-0001S1-1H
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:36:55 -0400
+Date: Wed, 27 Sep 2017 20:36:46 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170927123646.GA8521@lemon.lan>
+References: <20170926054439.GB25267@pxdev.xzpeter.org>
+	<20170926084337.GB16834@stefanha-x1.localdomain>
+	<20170926091150.GC3828@pxdev.xzpeter.org>
+	<20170926111343.GE31924@lemon.lan>
+	<20170927121753.GB14579@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bca76897-ec7d-035e-9473-b304b63f5d7b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] block: convert crypto driver to
- bdrv_co_preadv|pwritev
+In-Reply-To: <20170927121753.GB14579@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] A glib warning encountered with internal iothread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,65 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Devel Mailing List <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Sat, Sep 16, 2017 at 06:54:58PM +0200, Max Reitz wrote:
-> On 2017-09-12 13:28, Daniel P. Berrange wrote:
-> > Make the crypto driver implement the bdrv_co_preadv|pwritev
-> > callbacks, and also use bdrv_co_preadv|pwritev for I/O
-> > with the protocol driver beneath.
-> > 
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> >  block/crypto.c | 104 +++++++++++++++++++++++++++++++--------------------------
-> >  1 file changed, 56 insertions(+), 48 deletions(-)
+On Wed, 09/27 13:17, Stefan Hajnoczi wrote:
+> On Tue, Sep 26, 2017 at 07:13:43PM +0800, Fam Zheng wrote:
+> > On Tue, 09/26 17:11, Peter Xu wrote:
+> >  void aio_context_unref(AioContext *ctx)
+> >  {
+> > +    assert(ctx->refcnt > 0);
+> > +    if (--ctx->refcnt == 0) {
+> > +        aio_set_event_notifier(ctx, &ctx->notifier, false, NULL, NULL);
+> > +    }
 > 
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> 
-> Some notes below.
-> 
-> > diff --git a/block/crypto.c b/block/crypto.c
-> > index 49d6d4c058..d004e9cef4 100644
-> > --- a/block/crypto.c
-> > +++ b/block/crypto.c
-> 
-> [...]
-> 
-> > @@ -410,37 +414,33 @@ block_crypto_co_readv(BlockDriverState *bs, int64_t sector_num,
-> >          goto cleanup;
-> >      }
-> >  
-> > -    while (remaining_sectors) {
-> > -        cur_nr_sectors = remaining_sectors;
-> > +    while (bytes) {
-> > +        cur_bytes = bytes;
-> >  
-> > -        if (cur_nr_sectors > BLOCK_CRYPTO_MAX_SECTORS) {
-> > -            cur_nr_sectors = BLOCK_CRYPTO_MAX_SECTORS;
-> > +        if (cur_bytes > (BLOCK_CRYPTO_MAX_SECTORS * sector_size)) {
-> > +            cur_bytes = BLOCK_CRYPTO_MAX_SECTORS * sector_size;
-> 
-> It's a bit weird that now the bounce buffer's size is now no longer
-> fixed at 1 MB but variable depending on the crypto driver's block size.
-> It also doesn't seem too intentional when looking at the first patch's
-> commit message...
-> 
-> In any case, that would be an issue in the previous patch, though.  In
-> general, I'm wondering whether maybe you should squash this patch into
-> the previous one...  Yes, that would make the for a larger patch, but it
-> wouldn't leave some not-quite-right state in between where sector_size
-> is generally assumed to be equal to BDRV_SECTOR_SIZE -- which it is in
-> practice, but not necessarily in theory.
+> This isn't a general solution because Linux AIO also has a file
+> descriptor that is removed in aio_ctx_finalize().
 
-In the end i'm going with this approach - just dropping the previous
-patch entirely, since 99% of what it does is then removed in this
-patch and the next one.
+Right. Another option is to move everything in aio_context_finalize() into the
+"if (--ctx->refcnt == 0) { ... }" block, before calling g_source_unref().
 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Fam
