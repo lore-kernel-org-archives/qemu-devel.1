@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dxBHx-0000Q2-82
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:18:11 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dxBJr-0001Tn-9B
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:20:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dxBHt-0001jR-8J
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:18:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57132)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dxBHs-0001il-UK
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:18:01 -0400
-Date: Wed, 27 Sep 2017 13:17:53 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170927121753.GB14579@stefanha-x1.localdomain>
-References: <20170926054439.GB25267@pxdev.xzpeter.org>
-	<20170926084337.GB16834@stefanha-x1.localdomain>
-	<20170926091150.GC3828@pxdev.xzpeter.org>
-	<20170926111343.GE31924@lemon.lan>
+	(envelope-from <imammedo@redhat.com>) id 1dxBJo-0002zb-2i
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:20:03 -0400
+Date: Wed, 27 Sep 2017 14:19:56 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170927141956.1bd6a3bd@nial.brq.redhat.com>
+In-Reply-To: <20170925234730.29b7b919@bahia.lan>
+References: <150633285374.14880.11614678065344980502.stgit@bahia.lan>
+	<20170925154134.7b4b8cde@nial.brq.redhat.com>
+	<20170925174857.6021d0a0@bahia.lan>
+	<20170925234730.29b7b919@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170926111343.GE31924@lemon.lan>
-Subject: Re: [Qemu-devel] A glib warning encountered with internal iothread
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] spapr: move registration of
+ "host" CPU core type to machine code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +26,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Devel Mailing List <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-On Tue, Sep 26, 2017 at 07:13:43PM +0800, Fam Zheng wrote:
-> On Tue, 09/26 17:11, Peter Xu wrote:
->  void aio_context_unref(AioContext *ctx)
->  {
-> +    assert(ctx->refcnt > 0);
-> +    if (--ctx->refcnt == 0) {
-> +        aio_set_event_notifier(ctx, &ctx->notifier, false, NULL, NULL);
-> +    }
+On Mon, 25 Sep 2017 23:47:30 +0200
+Greg Kurz <groug@kaod.org> wrote:
 
-This isn't a general solution because Linux AIO also has a file
-descriptor that is removed in aio_ctx_finalize().
-
-Here is a different approach.  Does it work for you?
-
-BTW I'm not a glib expert so maybe we're abusing the API and missing the
-obvious way to structure our code :).
-
-diff --git a/util/aio-posix.c b/util/aio-posix.c
-index 2d51239ec6..5946ac09f0 100644
---- a/util/aio-posix.c
-+++ b/util/aio-posix.c
-@@ -223,7 +223,14 @@ void aio_set_fd_handler(AioContext *ctx,
-             return;
-         }
-
--        g_source_remove_poll(&ctx->source, &node->pfd);
-+        /* If the GSource is in the process of being destroyed then
-+         * g_source_remove_poll() causes an assertion failure.  Skip
-+         * removal in that case, because glib cleans up its state during
-+         * destruction anyway.
-+         */
-+        if (!g_source_is_destroyed(&ctx->source)) {
-+            g_source_remove_poll(&ctx->source, &node->pfd);
-+        }
-
-         /* If the lock is held, just mark the node as deleted */
-         if (qemu_lockcnt_count(&ctx->list_lock)) {
+> On Mon, 25 Sep 2017 17:48:57 +0200
+> Greg Kurz <groug@kaod.org> wrote:
+>=20
+> > On Mon, 25 Sep 2017 15:41:34 +0200
+> > Igor Mammedov <imammedo@redhat.com> wrote:
+> >  =20
+> > > On Mon, 25 Sep 2017 11:47:33 +0200
+> > > Greg Kurz <groug@kaod.org> wrote:
+> > >    =20
+> > > > The CPU core abstraction belongs to the machine code. This also gets
+> > > > rid of some code duplication.
+> > > >=20
+> > > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > > ---
+> > > >=20
+> > > > hw/ppc/spapr_cpu_core.h is also included elsewhere in target/ppc/kv=
+m.c
+> > > > but this is already handled by the following cleanup patch:
+> > > >=20
+> > > > https://patchwork.ozlabs.org/patch/817598/
+> > > > ---
+> > > >  hw/ppc/spapr.c                  |    4 ++++
+> > > >  hw/ppc/spapr_cpu_core.c         |   34 ++++++++++++++++++++++-----=
+-------
+> > > >  include/hw/ppc/spapr_cpu_core.h |    2 +-
+> > > >  target/ppc/kvm.c                |   12 ------------
+> > > >  4 files changed, 27 insertions(+), 25 deletions(-)
+> > > >=20
+> > > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > > index 0ce3ec87ac59..e82c8532ffb0 100644
+> > > > --- a/hw/ppc/spapr.c
+> > > > +++ b/hw/ppc/spapr.c
+> > > > @@ -2349,6 +2349,10 @@ static void ppc_spapr_init(MachineState *mac=
+hine)
+> > > >      }
+> > > > =20
+> > > >      /* init CPUs */
+> > > > +    if (kvm_enabled()) {
+> > > > +        spapr_cpu_core_register_host_type();
+> > > > +    }     =20
+> > > why don't we create it statically in hw/ppc/spapr_cpu_core.c
+> > > like it's done in x86, i.e.
+> > >=20
+> > >   static void x86_cpu_register_types(void)                           =
+             =20
+> > >   {                                                                  =
+             =20
+> > >   ...                             =20
+> > >   #ifdef CONFIG_KVM                                                  =
+             =20
+> > >       type_register_static(&host_x86_cpu_type_info);                 =
+             =20
+> > >   #endif                                                             =
+             =20
+> > >   }=20
+> > >   type_init(x86_cpu_register_types)
+> > >=20
+> > > and do the same for host CPU as well?
+> > >    =20
+> >=20
+> > Hi Igor,
+> >=20
+> > Not sure yet why we use dynamic types, but I'd be glad to dig a bit mor=
+e. =20
+>=20
+> So the problem is that it was decided to make the host CPU class a
+> subclass of the host's CPU model, and this requires all the CPU model
+> classes to be registered beforehand.
+>=20
+> commit 5ba4576b858c0d6056f59abb7e17a2b63f7905f3
+> Author: Andreas F=C3=A4rber <afaerber@suse.de>
+> Date:   Sat Feb 23 11:22:12 2013 +0000
+>=20
+>     target-ppc: Make host CPU a subclass of the host's CPU model
+>    =20
+>     This avoids assigning individual class fields and contributors
+>     forgetting to add field assignments in KVM-only code.
+>    =20
+>     ppc_cpu_class_find_by_pvr() requires the CPU model classes to be
+>     registered, so defer host CPU type registration to kvm_arch_init().
+>    =20
+>     Only register the host CPU type if there is a class with matching PVR.
+>     This lets us drop error handling from instance_init.
+>    =20
+>     Signed-off-by: Andreas F=C3=A4rber <afaerber@suse.de>
+>     Signed-off-by: Alexander Graf <agraf@suse.de>
+>=20
+> I can't think of an alternate way to do this. Any suggestion ?
+I don't see from this commit a reason why it can't be done in cpu-models.c
+dependencies here are
+  mfpvr() - which probably should work without KVM
+  ppc_cpu_class_by_pvr() - should work fine if 'host' type is being
+                           registered as the last among the other CPU types
