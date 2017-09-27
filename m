@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dx8D8-0004vX-AC
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:00:55 -0400
+	(envelope-from <quintela@redhat.com>) id 1dx8FV-0006kw-F5
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:03:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dx8Cy-00050j-TS
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:00:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59918)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dx8Cy-000503-Ns
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:00:44 -0400
+	(envelope-from <quintela@redhat.com>) id 1dx8FR-0006af-IJ
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:03:21 -0400
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170925112917.21340-6-dgilbert@redhat.com> (David Alan
-	Gilbert's message of "Mon, 25 Sep 2017 12:29:16 +0100")
-References: <20170925112917.21340-1-dgilbert@redhat.com>
-	<20170925112917.21340-6-dgilbert@redhat.com>
+In-Reply-To: <1506421996-12513-1-git-send-email-pl@kamp.de> (Peter Lieven's
+	message of "Tue, 26 Sep 2017 12:33:16 +0200")
+References: <1506421996-12513-1-git-send-email-pl@kamp.de>
 Reply-To: quintela@redhat.com
-Date: Wed, 27 Sep 2017 11:00:46 +0200
-Message-ID: <87o9pwbjnl.fsf@secure.laptop>
+Date: Wed, 27 Sep 2017 11:03:13 +0200
+Message-ID: <87k20kbjji.fsf@secure.laptop>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 5/6] migration: Route errors up through
- vmstate_save
+Subject: Re: [Qemu-devel] [PATCH V3] migration: disable auto-converge during
+ bulk block migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,16 +24,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, peterx@redhat.com, famz@redhat.com, peter.maydell@linaro.org, cohuck@redhat.com, rth@twiddle.net
+To: Peter Lieven <pl@kamp.de>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, stefanha@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, qemu-stable@nongnu.org
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Peter Lieven <pl@kamp.de> wrote:
+> auto-converge and block migration currently do not play well together.
+> During block migration the auto-converge logic detects that ram
+> migration makes no progress and thus throttles down the vm until
+> it nearly stalls completely. Avoid this by disabling the throttling
+> logic during the bulk phase of the block migration.
 >
-> Route the errors from vsmtate_save_state back up through
-> vmstate_save and out to the normal device state path.
-> That's the normal error path done.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Peter Lieven <pl@kamp.de>
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
