@@ -1,22 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dxDye-0006Y9-Eb
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 11:10:28 -0400
+	(envelope-from <jan.dakinevich@virtuozzo.com>) id 1dxDyj-0006Zk-IN
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 11:10:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dxDyW-0000Dv-Mb
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 11:10:20 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:9428 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dxDyV-0000DB-W3
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 11:10:12 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 27 Sep 2017 18:10:08 +0300
-Message-Id: <20170927151008.53763-1-vsementsov@virtuozzo.com>
-In-Reply-To: <407cbf8e-3854-e657-deb7-03d5c808bd82@virtuozzo.com>
-References: <407cbf8e-3854-e657-deb7-03d5c808bd82@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v1.1 DRAFT] nbd: Minimal structured read for
- client
+	(envelope-from <jan.dakinevich@virtuozzo.com>) id 1dxDyc-0000Jt-6m
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 11:10:25 -0400
+From: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+Date: Wed, 27 Sep 2017 18:09:42 +0300
+Message-Id: <1506524982-4053-1-git-send-email-jan.dakinevich@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v2] virtio: introduce `info virtio' hmp command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,833 +17,495 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Amit Shah <amit@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, Jan Dakinevich <jan.dakinevich@virtuozzo.com>, "Denis V. Lunev" <den@virtuozzo.com>
 
-Minimal implementation: drop most of additional error information.
+The command is intended for exposing device specific virtio feature bits
+and their negotiation status. It is convenient and useful for debug
+purpose.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Names of features are taken from a devices via get_feature_name() within
+VirtioDeviceClass. If certain device doesn't implement it, the command
+will print only hexadecimal value of feature mask.
+
+Cc: Denis V. Lunev <den@virtuozzo.com>
+Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
 ---
+v2:
+* Moved hmp_info_virtio and stuff to hmp.c to avoid build error
+* Added printing of device status
+* Listed common virtio features
 
-Hi!
+v1: http://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg07247.html
+---
+ hmp-commands-info.hx        |  14 +++++
+ hmp.c                       | 148 ++++++++++++++++++++++++++++++++++++++++++++
+ hmp.h                       |   1 +
+ hw/block/virtio-blk.c       |  20 ++++++
+ hw/char/virtio-serial-bus.c |  15 +++++
+ hw/display/virtio-gpu.c     |  12 ++++
+ hw/net/virtio-net.c         |  34 ++++++++++
+ hw/scsi/virtio-scsi.c       |  15 +++++
+ hw/virtio/virtio-balloon.c  |  15 +++++
+ hw/virtio/virtio-bus.c      |   1 +
+ include/hw/virtio/virtio.h  |   2 +
+ monitor.c                   |   1 +
+ 12 files changed, 278 insertions(+)
 
-Here is a draft of how to refactor reply-payload receiving if you don't
-like my previous simple (but not flexible) try. Ofcourse, if we agree on this
-approach this patch should be splitted into several ones and many things
-(error handling) should be improved.
-
-The idea is:
-
-nbd_read_reply_entry reads only reply header through nbd/client.c code.
-
-Then, the payload is read through block/nbd-client-cmds.c:
-simple payload: generic per-command handler, however it should only exist
-  for CMD_READ
-structured NONE: no payload, handle in nbd_co_receive_one_chunk
-structured error: read by nbd_handle_structured_error_payload
-  defined in block/nbd-client-cmds.c
-structured success: read by per-[command X reply-type] handler
-  defined in block/nbd-client-cmds.c
-
-For now nbd-client-cmds.c looks more like nbd-payload.c, but, may be, we
-should move command sending special-casing (CMD_WRITE) to it too..
-
-Don't waste time on careful reviewing this patch, let's consider first
-the concept of nbd-client-cmds.c,
-
- block/nbd-client.h      |  10 +++
- include/block/nbd.h     |  82 ++++++++++++++++--
- nbd/nbd-internal.h      |  25 ------
- block/nbd-client-cmds.c | 220 ++++++++++++++++++++++++++++++++++++++++++++++++
- block/nbd-client.c      | 118 ++++++++++++++++++++------
- nbd/client.c            | 128 ++++++++++++++++------------
- block/Makefile.objs     |   2 +-
- 7 files changed, 475 insertions(+), 110 deletions(-)
- create mode 100644 block/nbd-client-cmds.c
-
-diff --git a/block/nbd-client.h b/block/nbd-client.h
-index b435754b82..abb88e4ea5 100644
---- a/block/nbd-client.h
-+++ b/block/nbd-client.h
-@@ -35,6 +35,8 @@ typedef struct NBDClientSession {
-     NBDClientRequest requests[MAX_NBD_REQUESTS];
-     NBDReply reply;
-     bool quit;
-+
-+    bool structured_reply;
- } NBDClientSession;
+diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+index 4f1ece9..2550027 100644
+--- a/hmp-commands-info.hx
++++ b/hmp-commands-info.hx
+@@ -868,6 +868,20 @@ ETEXI
+     },
  
- NBDClientSession *nbd_get_client_session(BlockDriverState *bs);
-@@ -60,4 +62,12 @@ void nbd_client_detach_aio_context(BlockDriverState *bs);
- void nbd_client_attach_aio_context(BlockDriverState *bs,
-                                    AioContext *new_context);
+ STEXI
++@item info virtio
++@findex virtio
++Display guest and host fetures for all virtio devices.
++ETEXI
++
++    {
++        .name       = "virtio",
++        .args_type  = "",
++        .params     = "",
++        .help       = "show virtio info",
++        .cmd        = hmp_info_virtio,
++    },
++
++STEXI
+ @end table
+ ETEXI
  
-+int nbd_handle_structured_payload(QIOChannel *ioc, int cmd,
-+                                  NBDStructuredReplyChunk *reply, void *opaque);
-+int nbd_handle_simple_payload(QIOChannel *ioc, int cmd, void *opaque);
-+
-+int nbd_handle_structured_error_payload(QIOChannel *ioc,
-+                                        NBDStructuredReplyChunk *reply,
-+                                        int *request_ret);
-+
- #endif /* NBD_CLIENT_H */
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 314f2f9bbc..b9a4e1dfa9 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -57,12 +57,6 @@ struct NBDRequest {
- };
- typedef struct NBDRequest NBDRequest;
+diff --git a/hmp.c b/hmp.c
+index ace729d..009d808 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -43,6 +43,7 @@
+ #include "hw/intc/intc.h"
+ #include "migration/snapshot.h"
+ #include "migration/misc.h"
++#include "hw/virtio/virtio.h"
  
--struct NBDReply {
--    uint64_t handle;
--    uint32_t error;
--};
--typedef struct NBDReply NBDReply;
--
- typedef struct NBDSimpleReply {
-     uint32_t magic;  /* NBD_SIMPLE_REPLY_MAGIC */
-     uint32_t error;
-@@ -77,6 +71,24 @@ typedef struct NBDStructuredReplyChunk {
-     uint32_t length; /* length of payload */
- } QEMU_PACKED NBDStructuredReplyChunk;
- 
-+typedef union NBDReply {
-+    NBDSimpleReply simple;
-+    NBDStructuredReplyChunk structured;
-+    struct {
-+        uint32_t magic;
-+        uint32_t _skip;
-+        uint64_t handle;
-+    } QEMU_PACKED;
-+} NBDReply;
-+
-+#define NBD_SIMPLE_REPLY_MAGIC      0x67446698
-+#define NBD_STRUCTURED_REPLY_MAGIC  0x668e33ef
-+
-+static inline bool nbd_reply_is_simple(NBDReply *reply)
-+{
-+    return reply->magic == NBD_SIMPLE_REPLY_MAGIC;
-+}
-+
- typedef struct NBDStructuredRead {
-     NBDStructuredReplyChunk h;
-     uint64_t offset;
-@@ -88,6 +100,11 @@ typedef struct NBDStructuredError {
-     uint16_t message_length;
- } QEMU_PACKED NBDStructuredError;
- 
-+typedef struct NBDPayloadOffsetHole {
-+    uint64_t offset;
-+    uint32_t hole_size;
-+} QEMU_PACKED NBDPayloadOffsetHole;
-+
- /* Transmission (export) flags: sent from server to client during handshake,
-    but describe what will happen during transmission */
- #define NBD_FLAG_HAS_FLAGS         (1 << 0) /* Flags are there */
-@@ -178,12 +195,54 @@ enum {
- 
- #define NBD_SREP_TYPE_NONE          0
- #define NBD_SREP_TYPE_OFFSET_DATA   1
-+#define NBD_SREP_TYPE_OFFSET_HOLE   2
- #define NBD_SREP_TYPE_ERROR         NBD_SREP_ERR(1)
-+#define NBD_SREP_TYPE_ERROR_OFFSET  NBD_SREP_ERR(2)
-+
-+static inline bool nbd_srep_type_is_error(int type)
-+{
-+    return type & (1 << 15);
-+}
-+
-+/* NBD errors are based on errno numbers, so there is a 1:1 mapping,
-+ * but only a limited set of errno values is specified in the protocol.
-+ * Everything else is squashed to EINVAL.
-+ */
-+#define NBD_SUCCESS    0
-+#define NBD_EPERM      1
-+#define NBD_EIO        5
-+#define NBD_ENOMEM     12
-+#define NBD_EINVAL     22
-+#define NBD_ENOSPC     28
-+#define NBD_ESHUTDOWN  108
-+
-+static inline int nbd_errno_to_system_errno(int err)
-+{
-+    switch (err) {
-+    case NBD_SUCCESS:
-+        return 0;
-+    case NBD_EPERM:
-+        return EPERM;
-+    case NBD_EIO:
-+        return EIO;
-+    case NBD_ENOMEM:
-+        return ENOMEM;
-+    case NBD_ENOSPC:
-+        return ENOSPC;
-+    case NBD_ESHUTDOWN:
-+        return ESHUTDOWN;
-+    case NBD_EINVAL:
-+        return EINVAL;
-+    }
-+
-+    return EINVAL;
-+}
- 
- /* Details collected by NBD_OPT_EXPORT_NAME and NBD_OPT_GO */
- struct NBDExportInfo {
-     /* Set by client before nbd_receive_negotiate() */
-     bool request_sizes;
-+    bool structured_reply;
-     /* Set by server results during nbd_receive_negotiate() */
-     uint64_t size;
-     uint16_t flags;
-@@ -233,4 +292,15 @@ void nbd_client_put(NBDClient *client);
- void nbd_server_start(SocketAddress *addr, const char *tls_creds,
-                       Error **errp);
- 
-+/* nbd_read
-+ * Reads @size bytes from @ioc. Returns 0 on success.
-+ */
-+static inline int nbd_read(QIOChannel *ioc, void *buffer, size_t size,
-+                           Error **errp)
-+{
-+    return qio_channel_read_all(ioc, buffer, size, errp) < 0 ? -EIO : 0;
-+}
-+
-+int nbd_drop(QIOChannel *ioc, size_t size, Error **errp);
-+
- #endif
-diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
-index 6b0d1183ba..9f7b6b68e8 100644
---- a/nbd/nbd-internal.h
-+++ b/nbd/nbd-internal.h
-@@ -47,8 +47,6 @@
- #define NBD_OLDSTYLE_NEGOTIATE_SIZE (8 + 8 + 8 + 4 + 124)
- 
- #define NBD_REQUEST_MAGIC           0x25609513
--#define NBD_SIMPLE_REPLY_MAGIC      0x67446698
--#define NBD_STRUCTURED_REPLY_MAGIC  0x668e33ef
- #define NBD_OPTS_MAGIC              0x49484156454F5054LL
- #define NBD_CLIENT_MAGIC            0x0000420281861253LL
- #define NBD_REP_MAGIC               0x0003e889045565a9LL
-@@ -65,18 +63,6 @@
- #define NBD_SET_TIMEOUT             _IO(0xab, 9)
- #define NBD_SET_FLAGS               _IO(0xab, 10)
- 
--/* NBD errors are based on errno numbers, so there is a 1:1 mapping,
-- * but only a limited set of errno values is specified in the protocol.
-- * Everything else is squashed to EINVAL.
-- */
--#define NBD_SUCCESS    0
--#define NBD_EPERM      1
--#define NBD_EIO        5
--#define NBD_ENOMEM     12
--#define NBD_EINVAL     22
--#define NBD_ENOSPC     28
--#define NBD_ESHUTDOWN  108
--
- /* nbd_read_eof
-  * Tries to read @size bytes from @ioc.
-  * Returns 1 on success
-@@ -96,15 +82,6 @@ static inline int nbd_read_eof(QIOChannel *ioc, void *buffer, size_t size,
-     return ret;
+ #ifdef CONFIG_SPICE
+ #include <spice/enums.h>
+@@ -2894,3 +2895,150 @@ void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict)
+     }
+     hmp_handle_error(mon, &err);
  }
++
++#define HMP_INFO_VIRTIO_INDENT 2
++#define HMP_INFO_VIRTIO_FIELD 32
++
++static void hmp_info_virtio_print_status(Monitor *mon, VirtIODevice *vdev)
++{
++    uint8_t status[] = {
++        VIRTIO_CONFIG_S_ACKNOWLEDGE,
++        VIRTIO_CONFIG_S_DRIVER,
++        VIRTIO_CONFIG_S_DRIVER_OK,
++        VIRTIO_CONFIG_S_FEATURES_OK,
++        VIRTIO_CONFIG_S_NEEDS_RESET,
++        VIRTIO_CONFIG_S_FAILED,
++    };
++    const char *names[] = {
++        "acknowledge",
++        "driver",
++        "driver_ok",
++        "features_ok",
++        "needs_reset"
++        "failed",
++    };
++    const char *comma = "";
++    int idx;
++
++    monitor_printf(mon, "%*sstatus:           0x%02"PRIx8" ",
++                   HMP_INFO_VIRTIO_INDENT, "", vdev->status);
++
++    for (idx = 0; idx < ARRAY_SIZE(status); idx++) {
++        if (!(vdev->status & status[idx])) {
++            continue;
++        }
++        monitor_printf(mon, "%s%s", comma, names[idx]);
++        if (names[idx]) {
++            comma = ",";
++        }
++    }
++    monitor_printf(mon, "\n");
++}
++
++static void hmp_info_virtio_print_common_features(Monitor *mon,
++                                                  VirtIODevice *vdev)
++{
++    uint64_t features[] = {
++        VIRTIO_RING_F_INDIRECT_DESC,
++        VIRTIO_RING_F_EVENT_IDX,
++        VIRTIO_F_NOTIFY_ON_EMPTY,
++        VIRTIO_F_ANY_LAYOUT,
++        VIRTIO_F_IOMMU_PLATFORM,
++        VIRTIO_F_VERSION_1,
++    };
++    const char *names[] = {
++        "indirect_desc",
++        "event_idx",
++        "notify_on_empty",
++        "any_layout",
++        "iommu_platform",
++        "version_1",
++    };
++    int idx;
++
++    monitor_printf(mon, "%*scommon features:\n", HMP_INFO_VIRTIO_INDENT, "");
++
++    for (idx = 0; idx < ARRAY_SIZE(features); idx++) {
++        const char *ack = vdev->guest_features & features[idx] ? "acked" : "";
++
++        if (!(vdev->host_features & features[idx])) {
++            continue;
++        }
++        monitor_printf(mon, "%*s%*s%*s\n", HMP_INFO_VIRTIO_INDENT, "",
++                       HMP_INFO_VIRTIO_FIELD, names[idx],
++                       HMP_INFO_VIRTIO_FIELD, ack);
++    }
++}
++
++static void hmp_info_virtio_print_specific_features(Monitor *mon,
++                                                    VirtIODevice *vdev)
++{
++    VirtioDeviceClass *vdc = VIRTIO_DEVICE_GET_CLASS(vdev);
++    int idx;
++
++    if (!vdc->get_feature_name) {
++        return;
++    }
++
++    monitor_printf(mon, "%*sspecific features:\n", HMP_INFO_VIRTIO_INDENT, "");
++
++    for (idx = 0; idx < 64; idx++) {
++        const char *name = vdc->get_feature_name(vdev, idx);
++        const char *ack = vdev->guest_features & (1 << idx) ? "acked" : "";
++
++        if (!name) {
++            continue;
++        }
++        if (!(vdev->host_features & (1 << idx))) {
++            continue;
++        }
++        monitor_printf(mon, "%*s%*s%*s\n", HMP_INFO_VIRTIO_INDENT, "",
++                       HMP_INFO_VIRTIO_FIELD, name, HMP_INFO_VIRTIO_FIELD, ack);
++    }
++}
++
++static void hmp_info_virtio_print(Monitor *mon, VirtIODevice *vdev)
++{
++    char *path = qdev_get_dev_path(DEVICE(vdev));
++
++    monitor_printf(mon, "%s at %s\n", object_get_typename(OBJECT(vdev)), path);
++    g_free(path);
++
++    hmp_info_virtio_print_status(mon, vdev);
++
++    monitor_printf(mon, "%*shost features:    0x%016"PRIx64"\n",
++                   HMP_INFO_VIRTIO_INDENT, "", vdev->host_features);
++    monitor_printf(mon, "%*sguest features:   0x%016"PRIx64"\n",
++                   HMP_INFO_VIRTIO_INDENT, "", vdev->guest_features);
++
++    hmp_info_virtio_print_common_features(mon, vdev);
++    hmp_info_virtio_print_specific_features(mon, vdev);
++}
++
++static void hmp_info_virtio_recursive(Monitor *mon, BusState *bus)
++{
++    BusChild *kid;
++
++    QTAILQ_FOREACH(kid, &bus->children, sibling) {
++        DeviceState *dev = kid->child;
++        BusState *child;
++
++        if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_DEVICE)) {
++            hmp_info_virtio_print(mon, VIRTIO_DEVICE(dev));
++        }
++        QLIST_FOREACH(child, &dev->child_bus, sibling) {
++            hmp_info_virtio_recursive(mon, child);
++        }
++    }
++}
++
++void hmp_info_virtio(Monitor *mon, const QDict *qdict)
++{
++    BusState *bus = sysbus_get_default();
++
++    if (!bus) {
++        return;
++    }
++
++    hmp_info_virtio_recursive(mon, bus);
++}
+diff --git a/hmp.h b/hmp.h
+index 3605003..3e8f30a 100644
+--- a/hmp.h
++++ b/hmp.h
+@@ -146,5 +146,6 @@ void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
+ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+ void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
++void hmp_info_virtio(Monitor *mon, const QDict *qdict);
  
--/* nbd_read
-- * Reads @size bytes from @ioc. Returns 0 on success.
-- */
--static inline int nbd_read(QIOChannel *ioc, void *buffer, size_t size,
--                           Error **errp)
--{
--    return qio_channel_read_all(ioc, buffer, size, errp) < 0 ? -EIO : 0;
--}
--
- /* nbd_write
-  * Writes @size bytes to @ioc. Returns 0 on success.
-  */
-@@ -137,6 +114,4 @@ const char *nbd_rep_lookup(uint32_t rep);
- const char *nbd_info_lookup(uint16_t info);
- const char *nbd_cmd_lookup(uint16_t info);
- 
--int nbd_drop(QIOChannel *ioc, size_t size, Error **errp);
--
  #endif
-diff --git a/block/nbd-client-cmds.c b/block/nbd-client-cmds.c
-new file mode 100644
-index 0000000000..488a3dc267
---- /dev/null
-+++ b/block/nbd-client-cmds.c
-@@ -0,0 +1,220 @@
-+/*
-+ * QEMU Block driver for NBD
-+ *
-+ * Copyright (c) 2017 Parallels International GmbH
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "nbd-client.h"
-+
-+
-+typedef int (*NBDCommandFn)(QIOChannel *ioc,
-+                            NBDStructuredReplyChunk *chunk,
-+                            void *opaque);
-+typedef struct NBDCommand {
-+    int (*read_simple_payload)(QIOChannel *ioc, void *opaque);
-+    NBDCommandFn read_offset_data;
-+    NBDCommandFn read_offset_hole;
-+} NBDCommand;
-+
-+static int nbd_cmd_read__siple_payload(QIOChannel *ioc, void *opaque)
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 05d1440..5856640 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -1017,6 +1017,25 @@ static Property virtio_blk_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
++static const char *virtio_blk_get_feature_name(VirtIODevice *vdev, int feature)
 +{
-+    QEMUIOVector *qiov = (QEMUIOVector *)opaque;
-+    return qio_channel_readv_all(ioc, qiov->iov, qiov->niov, NULL);
-+}
-+
-+static int nbd_cmd_read__offset_data(QIOChannel *ioc,
-+                                     NBDStructuredReplyChunk *chunk,
-+                                     void *opaque)
-+{
-+    QEMUIOVector *qiov = (QEMUIOVector *)opaque;
-+    QEMUIOVector sub_qiov;
-+    uint64_t offset;
-+    size_t data_size;
-+    int ret;
-+
-+    if (chunk->length < sizeof(offset)) {
-+        return -1;
-+    }
-+
-+    if (nbd_read(ioc, &offset, sizeof(offset), NULL) < 0) {
-+        return -1;
-+    }
-+    be64_to_cpus(&offset);
-+
-+    data_size = chunk->length - sizeof(offset);
-+    if (offset + data_size > qiov->size) {
-+        return -1;
-+    }
-+
-+    qemu_iovec_init(&sub_qiov, qiov->niov);
-+    qemu_iovec_concat(&sub_qiov, qiov, offset, data_size);
-+    ret = qio_channel_readv_all(ioc, sub_qiov.iov, sub_qiov.niov, NULL);
-+    qemu_iovec_destroy(&sub_qiov);
-+
-+    return ret;
-+}
-+
-+static int nbd_cmd_read__offset_hole(QIOChannel *ioc,
-+                                     NBDStructuredReplyChunk *chunk,
-+                                     void *opaque)
-+{
-+    QEMUIOVector *qiov = (QEMUIOVector *)opaque;
-+    NBDPayloadOffsetHole pl;
-+
-+    if (chunk->length != sizeof(pl)) {
-+        return -1;
-+    }
-+
-+    if (nbd_read(ioc, &pl, sizeof(pl), NULL) < 0) {
-+        return -1;
-+    }
-+
-+    be64_to_cpus(&pl.offset);
-+    be32_to_cpus(&pl.hole_size);
-+
-+    if (pl.offset + pl.hole_size > qiov->size) {
-+        return -1;
-+    }
-+
-+    qemu_iovec_memset(qiov, pl.offset, 0, pl.hole_size);
-+
-+    return 0;
-+}
-+
-+NBDCommand nbd_cmd_read = {
-+    .read_simple_payload = nbd_cmd_read__siple_payload,
-+    .read_offset_data = nbd_cmd_read__offset_data,
-+    .read_offset_hole = nbd_cmd_read__offset_hole,
-+};
-+
-+static NBDCommand *nbd_get_cmd(int cmd)
-+{
-+    switch (cmd) {
-+    case NBD_CMD_READ:
-+        return &nbd_cmd_read;
-+    }
-+
-+    return NULL;
-+}
-+
-+static NBDCommandFn nbd_cmd_get_handler(int cmd, int reply_type)
-+{
-+    NBDCommand *command = nbd_get_cmd(cmd);
-+
-+    if (command == NULL) {
++    static const char *names[] = {
++        [VIRTIO_BLK_F_BARRIER] = "barrier",
++        [VIRTIO_BLK_F_SIZE_MAX] = "size_max",
++        [VIRTIO_BLK_F_SEG_MAX] = "seg_max",
++        [VIRTIO_BLK_F_RO] = "ro",
++        [VIRTIO_BLK_F_BLK_SIZE] = "blk_size",
++        [VIRTIO_BLK_F_SCSI] = "scsi",
++        [VIRTIO_BLK_F_TOPOLOGY] = "topology",
++        [VIRTIO_BLK_F_FLUSH] = "flush",
++        [VIRTIO_BLK_F_MQ] = "mq",
++    };
++    if (feature >= ARRAY_SIZE(names)) {
 +        return NULL;
 +    }
-+
-+    switch (reply_type) {
-+    case NBD_SREP_TYPE_OFFSET_DATA:
-+        return command->read_offset_data;
-+    case NBD_SREP_TYPE_OFFSET_HOLE:
-+        return command->read_offset_hole;
-+    }
-+
-+    return NULL;
++    return names[feature];
 +}
 +
-+/* nbd_handle_structured_payload
-+ * Find corresponding handler and call it.
-+ * If not found return -1 (fail)
-+ */
-+int nbd_handle_structured_payload(QIOChannel *ioc, int cmd, NBDStructuredReplyChunk *chunk,
-+                                  void *opaque)
-+{
-+    NBDCommandFn fn = nbd_cmd_get_handler(cmd, chunk->type);
-+
-+    if (fn == NULL) {
-+        return -1;
-+    }
-+
-+    return fn(ioc, chunk, opaque);
-+}
-+
-+/* nbd_handle_simple_payload
-+ * Find corresponding handler and call it.
-+ * If not found return 0 (success)
-+ */
-+int nbd_handle_simple_payload(QIOChannel *ioc, int cmd, void *opaque)
-+{
-+    NBDCommand *command = nbd_get_cmd(cmd);
-+
-+    if (command == NULL || command->read_simple_payload == NULL) {
-+        return 0;
-+    }
-+
-+    return command->read_simple_payload(ioc, opaque);
-+}
-+
-+int nbd_handle_structured_error_payload(QIOChannel *ioc, NBDStructuredReplyChunk *chunk,
-+                                        int *request_ret)
-+{
-+    uint32_t error;
-+    uint16_t message_size;
-+    int ret;
-+    assert(chunk->type & (1 << 15));
-+
-+    switch (chunk->type) {
-+    case NBD_SREP_TYPE_ERROR:
-+    case NBD_SREP_TYPE_ERROR_OFFSET:
-+        ret = nbd_read(ioc, &error, sizeof(error), NULL);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+        be32_to_cpus(&error);
-+
-+        ret = nbd_read(ioc, &message_size, sizeof(message_size), NULL);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+        be16_to_cpus(&message_size);
-+
-+        if (message_size > 0) {
-+            /* TODO: provide error message to user */
-+            ret = nbd_drop(ioc, message_size, NULL);
-+            if (ret < 0) {
-+                return ret;
-+            }
-+        }
-+
-+        if (chunk->type == NBD_SREP_TYPE_ERROR_OFFSET) {
-+            /* drop 64bit offset */
-+            ret = nbd_drop(ioc, 8, NULL);
-+            if (ret < 0) {
-+                return ret;
-+            }
-+        }
-+        break;
-+    default:
-+        /* unknown error */
-+        ret = nbd_drop(ioc, chunk->length, NULL);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+
-+        error = NBD_EINVAL;
-+    }
-+
-+    *request_ret = nbd_errno_to_system_errno(error);
-+    return 0;
-+}
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index e4f0c789f4..cf80564a83 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -179,9 +179,9 @@ err:
-     return rc;
- }
- 
--static int nbd_co_receive_reply(NBDClientSession *s,
--                                uint64_t handle,
--                                QEMUIOVector *qiov)
-+static int nbd_co_receive_one_chunk(NBDClientSession *s, uint64_t handle,
-+                                    int request_cmd, void *request_opaque,
-+                                    bool *cont)
+ static void virtio_blk_class_init(ObjectClass *klass, void *data)
  {
-     int ret;
-     int i = HANDLE_TO_INDEX(s, handle);
-@@ -191,29 +191,93 @@ static int nbd_co_receive_reply(NBDClientSession *s,
-     qemu_coroutine_yield();
-     s->requests[i].receiving = false;
-     if (!s->ioc || s->quit) {
--        ret = -EIO;
--    } else {
--        assert(s->reply.handle == handle);
--        ret = -s->reply.error;
--        if (qiov && s->reply.error == 0) {
--            if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
--                                      NULL) < 0) {
--                ret = -EIO;
--                s->quit = true;
-+        *cont = false;
-+        return -EIO;
-+    }
-+
-+    assert(s->reply.handle == handle);
-+
-+    if (nbd_reply_is_simple(&s->reply)) {
-+        *cont = false;
-+        ret = -s->reply.simple.error;
-+        if (s->structured_reply && request_cmd == NBD_CMD_READ) {
-+            goto fatal;
-+        }
-+        if (ret == 0) {
-+            if (nbd_handle_simple_payload(s->ioc, request_cmd,
-+                                          request_opaque) < 0)
-+            {
-+                goto fatal;
-             }
-         }
-+        goto out;
-+    }
-+
-+    /* handle structured reply chunk */
-+
-+    *cont = !(s->reply.structured.flags & NBD_SREP_FLAG_DONE);
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -1030,6 +1049,7 @@ static void virtio_blk_class_init(ObjectClass *klass, void *data)
+     vdc->get_config = virtio_blk_update_config;
+     vdc->set_config = virtio_blk_set_config;
+     vdc->get_features = virtio_blk_get_features;
++    vdc->get_feature_name = virtio_blk_get_feature_name;
+     vdc->set_status = virtio_blk_set_status;
+     vdc->reset = virtio_blk_reset;
+     vdc->save = virtio_blk_save_device;
+diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
+index 9470bd7..a6ccb6a 100644
+--- a/hw/char/virtio-serial-bus.c
++++ b/hw/char/virtio-serial-bus.c
+@@ -1156,6 +1156,20 @@ static Property virtio_serial_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
--        /* Tell the read handler to read another header.  */
--        s->reply.handle = 0;
-+    if (s->reply.structured.type == NBD_SREP_TYPE_NONE) {
-+        goto out;
-     }
- 
--    s->requests[i].coroutine = NULL;
-+    if (nbd_srep_type_is_error(s->reply.structured.type)) {
-+        if (nbd_handle_structured_error_payload(s->ioc, &s->reply.structured,
-+                                                &ret) < 0)
-+        {
-+            goto fatal;
-+        }
-+        goto out;
++static const char *virtio_serial_get_feature_name(VirtIODevice *vdev,
++                                                  int feature)
++{
++    static const char *names[] = {
++        [VIRTIO_CONSOLE_F_SIZE] = "size",
++        [VIRTIO_CONSOLE_F_MULTIPORT] = "multiport",
++        [VIRTIO_CONSOLE_F_EMERG_WRITE] = "emerg_write",
++    };
++    if (feature >= ARRAY_SIZE(names)) {
++        return NULL;
 +    }
-+
-+    /* here we deal with successful not-NONE structured reply */
-+    if (nbd_handle_structured_payload(s->ioc, request_cmd,
-+                                      &s->reply.structured,
-+                                      request_opaque) < 0)
-+    {
-+        goto fatal;
-+    }
-+
-+out:
-+    /* For assert at loop start in nbd_read_reply_entry */
-+    s->reply.handle = 0;
- 
--    /* Kick the read_reply_co to get the next reply.  */
-     if (s->read_reply_co) {
-         aio_co_wake(s->read_reply_co);
-     }
- 
-+    return ret;
-+
-+fatal:
-+    /* protocol or ioc failure */
-+    *cont = false;
-+    s->quit = true;
-+    if (s->read_reply_co) {
-+        aio_co_wake(s->read_reply_co);
-+    }
-+
-+    return -EIO;
++    return names[feature];
 +}
 +
-+static int nbd_co_receive_reply(NBDClientSession *s,
-+                                uint64_t handle,
-+                                int request_cmd,
-+                                void *request_opaque)
-+{
-+    int ret = 0;
-+    int i = HANDLE_TO_INDEX(s, handle);
-+    bool cont = true;
-+
-+    while (cont) {
-+        int rc = nbd_co_receive_one_chunk(s, handle, request_cmd,
-+                                          request_opaque, &cont);
-+        if (rc < 0 && ret == 0) {
-+            ret = rc;
-+        }
-+    }
-+
-+    s->requests[i].coroutine = NULL;
-+
-     qemu_co_mutex_lock(&s->send_mutex);
-     s->in_flight--;
-     qemu_co_queue_next(&s->free_sema);
-@@ -224,22 +288,28 @@ static int nbd_co_receive_reply(NBDClientSession *s,
- 
- static int nbd_co_request(BlockDriverState *bs,
-                           NBDRequest *request,
--                          QEMUIOVector *qiov)
-+                          void *request_opaque)
+ static void virtio_serial_class_init(ObjectClass *klass, void *data)
  {
-     NBDClientSession *client = nbd_get_client_session(bs);
-     int ret;
-+    QEMUIOVector *send_qiov = NULL;
-+
-+    if (request->type == NBD_CMD_WRITE) {
-+        /* TODO: move request sending special casing to nbd-client-cmds.c like
-+         * receiving part. */
-+        send_qiov = request_opaque;
-+        request_opaque = NULL;
-+        assert(send_qiov &&
-+               request->len == iov_size(send_qiov->iov, send_qiov->niov));
-+    }
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -1170,6 +1184,7 @@ static void virtio_serial_class_init(ObjectClass *klass, void *data)
+     vdc->realize = virtio_serial_device_realize;
+     vdc->unrealize = virtio_serial_device_unrealize;
+     vdc->get_features = get_features;
++    vdc->get_feature_name = virtio_serial_get_feature_name;
+     vdc->get_config = get_config;
+     vdc->set_config = set_config;
+     vdc->set_status = set_status;
+diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+index 3a8f1e1..860d2b3 100644
+--- a/hw/display/virtio-gpu.c
++++ b/hw/display/virtio-gpu.c
+@@ -1307,6 +1307,17 @@ static Property virtio_gpu_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
--    assert(!qiov || request->type == NBD_CMD_WRITE ||
--           request->type == NBD_CMD_READ);
--    assert(!qiov || request->len == iov_size(qiov->iov, qiov->niov));
--    ret = nbd_co_send_request(bs, request,
--                              request->type == NBD_CMD_WRITE ? qiov : NULL);
-+    ret = nbd_co_send_request(bs, request, send_qiov);
-     if (ret < 0) {
-         return ret;
-     }
- 
--    return nbd_co_receive_reply(client, request->handle,
--                                request->type == NBD_CMD_READ ? qiov : NULL);
-+    return nbd_co_receive_reply(client, request->handle, request->type,
-+                                request_opaque);
- }
- 
- int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
-diff --git a/nbd/client.c b/nbd/client.c
-index 51ae492e92..d0e9b8f138 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -22,38 +22,6 @@
- #include "trace.h"
- #include "nbd-internal.h"
- 
--static int nbd_errno_to_system_errno(int err)
--{
--    int ret;
--    switch (err) {
--    case NBD_SUCCESS:
--        ret = 0;
--        break;
--    case NBD_EPERM:
--        ret = EPERM;
--        break;
--    case NBD_EIO:
--        ret = EIO;
--        break;
--    case NBD_ENOMEM:
--        ret = ENOMEM;
--        break;
--    case NBD_ENOSPC:
--        ret = ENOSPC;
--        break;
--    case NBD_ESHUTDOWN:
--        ret = ESHUTDOWN;
--        break;
--    default:
--        trace_nbd_unknown_error(err);
--        /* fallthrough */
--    case NBD_EINVAL:
--        ret = EINVAL;
--        break;
--    }
--    return ret;
--}
--
- /* Definitions for opaque data types */
- 
- static QTAILQ_HEAD(, NBDExport) exports = QTAILQ_HEAD_INITIALIZER(exports);
-@@ -719,6 +687,13 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-         if (fixedNewStyle) {
-             int result;
- 
-+            result = nbd_request_simple_option(ioc, NBD_OPT_STRUCTURED_REPLY,
-+                                               errp);
-+            if (result < 0) {
-+                goto fail;
-+            }
-+            info->structured_reply = result > 0;
-+
-             /* Try NBD_OPT_GO first - if it works, we are done (it
-              * also gives us a good message if the server requires
-              * TLS).  If it is not available, fall back to
-@@ -759,6 +734,12 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-             goto fail;
-         }
-         be16_to_cpus(&info->flags);
-+
-+        if (info->structured_reply && !(info->flags & NBD_CMD_FLAG_DF)) {
-+            error_setg(errp, "Structured reply is negotiated, "
-+                             "but DF flag is not.");
-+            goto fail;
-+        }
-     } else if (magic == NBD_CLIENT_MAGIC) {
-         uint32_t oldflags;
- 
-@@ -942,6 +923,46 @@ int nbd_send_request(QIOChannel *ioc, NBDRequest *request)
-     return nbd_write(ioc, buf, sizeof(buf), NULL);
- }
- 
-+/* nbd_receive_simple_reply
-+ * Read simple reply except magic field (which should be already read)
-+ */
-+static int nbd_receive_simple_reply(QIOChannel *ioc, NBDSimpleReply *reply,
-+                                   Error **errp)
++static const char *virtio_gpu_get_feature_name(VirtIODevice *vdev, int feature)
 +{
-+    int ret = nbd_read(ioc, (uint8_t *)reply + sizeof(reply->magic),
-+                       sizeof(*reply) - sizeof(reply->magic), errp);
-+    if (ret < 0) {
-+        return ret;
++    static const char *names[] = {
++        [VIRTIO_GPU_F_VIRGL] = "virgl",
++    };
++    if (feature >= ARRAY_SIZE(names)) {
++        return NULL;
 +    }
-+
-+    be32_to_cpus(&reply->error);
-+    be64_to_cpus(&reply->handle);
-+
-+    return 0;
++    return names[feature];
 +}
 +
-+/* nbd_receive_structured_reply_chunk
-+ * Read structured reply chunk except magic field (which should be already read)
-+ * Payload is not read.
-+ */
-+static int nbd_receive_structured_reply_chunk(QIOChannel *ioc,
-+                                              NBDStructuredReplyChunk *chunk,
-+                                              Error **errp)
-+{
-+    int ret = nbd_read(ioc, (uint8_t *)chunk + sizeof(chunk->magic),
-+                       sizeof(*chunk) - sizeof(chunk->magic), errp);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    be16_to_cpus(&chunk->flags);
-+    be16_to_cpus(&chunk->type);
-+    be64_to_cpus(&chunk->handle);
-+    be32_to_cpus(&chunk->length);
-+
-+    return 0;
-+}
-+
- /* nbd_receive_reply
-  * Returns 1 on success
-  *         0 on eof, when no data was read (errp is not set)
-@@ -949,39 +970,38 @@ int nbd_send_request(QIOChannel *ioc, NBDRequest *request)
-  */
- int nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
+ static void virtio_gpu_class_init(ObjectClass *klass, void *data)
  {
--    uint8_t buf[NBD_REPLY_SIZE];
--    uint32_t magic;
-     int ret;
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -1317,6 +1328,7 @@ static void virtio_gpu_class_init(ObjectClass *klass, void *data)
+     vdc->get_config = virtio_gpu_get_config;
+     vdc->set_config = virtio_gpu_set_config;
+     vdc->get_features = virtio_gpu_get_features;
++    vdc->get_feature_name = virtio_gpu_get_feature_name;
+     vdc->set_features = virtio_gpu_set_features;
  
--    ret = nbd_read_eof(ioc, buf, sizeof(buf), errp);
-+    ret = nbd_read_eof(ioc, &reply->magic, sizeof(reply->magic), errp);
-     if (ret <= 0) {
-         return ret;
-     }
+     vdc->reset = virtio_gpu_reset;
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 148071a..e1d5d5d 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -2154,6 +2154,39 @@ static Property virtio_net_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
--    /* Reply
--       [ 0 ..  3]    magic   (NBD_SIMPLE_REPLY_MAGIC)
--       [ 4 ..  7]    error   (0 == no error)
--       [ 7 .. 15]    handle
--     */
-+    be32_to_cpus(&reply->magic);
++static const char *virtio_net_get_feature_name(VirtIODevice *vdev, int feature)
++{
++    static const char *names[] = {
++        [VIRTIO_NET_F_CSUM] = "csum",
++        [VIRTIO_NET_F_GUEST_CSUM] = "guest_csum",
++        [VIRTIO_NET_F_CTRL_GUEST_OFFLOADS] = "ctrl_guest_offloads",
++        [VIRTIO_NET_F_MTU] = "mtu",
++        [VIRTIO_NET_F_MAC] = "mac",
++        [VIRTIO_NET_F_GSO] = "gso",
++        [VIRTIO_NET_F_GUEST_TSO4] = "guest_tso4",
++        [VIRTIO_NET_F_GUEST_TSO6] = "guest_tso6",
++        [VIRTIO_NET_F_GUEST_ECN] = "guest_ecn",
++        [VIRTIO_NET_F_GUEST_UFO] = "guest_ufo",
++        [VIRTIO_NET_F_HOST_TSO4] = "host_tso4",
++        [VIRTIO_NET_F_HOST_TSO6] = "host_tso6",
++        [VIRTIO_NET_F_HOST_ECN] = "host_ecn",
++        [VIRTIO_NET_F_HOST_UFO] = "host_ufo",
++        [VIRTIO_NET_F_MRG_RXBUF] = "mrg_rxbuf",
++        [VIRTIO_NET_F_STATUS] = "status",
++        [VIRTIO_NET_F_CTRL_VQ] = "ctrl_vq",
++        [VIRTIO_NET_F_CTRL_RX] = "ctrl_rx",
++        [VIRTIO_NET_F_CTRL_VLAN] = "ctrl_vlan",
++        [VIRTIO_NET_F_CTRL_RX_EXTRA] = "ctrl_rx_extra",
++        [VIRTIO_NET_F_GUEST_ANNOUNCE] = "guest_announce",
++        [VIRTIO_NET_F_MQ] = "mq",
++        [VIRTIO_NET_F_CTRL_MAC_ADDR] = "ctrl_mac_addr",
++    };
++    if (feature >= ARRAY_SIZE(names)) {
++        return NULL;
++    }
++    return names[feature];
++}
++
+ static void virtio_net_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -2169,6 +2202,7 @@ static void virtio_net_class_init(ObjectClass *klass, void *data)
+     vdc->get_features = virtio_net_get_features;
+     vdc->set_features = virtio_net_set_features;
+     vdc->bad_features = virtio_net_bad_features;
++    vdc->get_feature_name = virtio_net_get_feature_name;
+     vdc->reset = virtio_net_reset;
+     vdc->set_status = virtio_net_set_status;
+     vdc->guest_notifier_mask = virtio_net_guest_notifier_mask;
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index 3aa9971..4365c0a 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -942,6 +942,20 @@ static const VMStateDescription vmstate_virtio_scsi = {
+     },
+ };
  
--    magic = ldl_be_p(buf);
--    reply->error  = ldl_be_p(buf + 4);
--    reply->handle = ldq_be_p(buf + 8);
-+    switch (reply->magic) {
-+    case NBD_SIMPLE_REPLY_MAGIC:
-+        ret = nbd_receive_simple_reply(ioc, &reply->simple, errp);
-+        reply->simple.error = nbd_errno_to_system_errno(reply->simple.error);
++static const char *virtio_scsi_get_feature_name(VirtIODevice *vdev, int feature)
++{
++    static const char *names[] = {
++        [VIRTIO_SCSI_F_INOUT] = "inout",
++        [VIRTIO_SCSI_F_HOTPLUG] = "hotplug",
++        [VIRTIO_SCSI_F_CHANGE] = "change",
++        [VIRTIO_SCSI_F_T10_PI] = "t10_pi",
++    };
++    if (feature >= ARRAY_SIZE(names)) {
++        return NULL;
++    }
++    return names[feature];
++}
++
+ static void virtio_scsi_common_class_init(ObjectClass *klass, void *data)
+ {
+     VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
+@@ -964,6 +978,7 @@ static void virtio_scsi_class_init(ObjectClass *klass, void *data)
+     vdc->unrealize = virtio_scsi_device_unrealize;
+     vdc->set_config = virtio_scsi_set_config;
+     vdc->get_features = virtio_scsi_get_features;
++    vdc->get_feature_name = virtio_scsi_get_feature_name;
+     vdc->reset = virtio_scsi_reset;
+     vdc->start_ioeventfd = virtio_scsi_dataplane_start;
+     vdc->stop_ioeventfd = virtio_scsi_dataplane_stop;
+diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+index 37cde38..04f4e66 100644
+--- a/hw/virtio/virtio-balloon.c
++++ b/hw/virtio/virtio-balloon.c
+@@ -509,6 +509,20 @@ static Property virtio_balloon_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
--    reply->error = nbd_errno_to_system_errno(reply->error);
--
--    if (reply->error == ESHUTDOWN) {
--        /* This works even on mingw which lacks a native ESHUTDOWN */
--        error_setg(errp, "server shutting down");
-+        if (reply->simple.error == ESHUTDOWN) {
-+            /* This works even on mingw which lacks a native ESHUTDOWN */
-+            error_setg(errp, "server shutting down");
-+            return -EINVAL;
-+        }
-+        trace_nbd_receive_reply(reply->magic, reply->simple.error,
-+                                reply->simple.handle);
-+        break;
-+    case NBD_STRUCTURED_REPLY_MAGIC:
-+        ret = nbd_receive_structured_reply_chunk(ioc, &reply->structured, errp);
-+        break;
-+    default:
-+        error_setg(errp, "invalid magic (got 0x%" PRIx32 ")", reply->magic);
-         return -EINVAL;
-     }
--    trace_nbd_receive_reply(magic, reply->error, reply->handle);
--
--    if (magic != NBD_SIMPLE_REPLY_MAGIC) {
--        error_setg(errp, "invalid magic (got 0x%" PRIx32 ")", magic);
--        return -EINVAL;
-+    if (ret < 0) {
-+        return ret;
-     }
- 
-     return 1;
++static const char *virtio_balloon_get_feature_name(VirtIODevice *vdev,
++                                                   int feature)
++{
++    static const char *names[] = {
++        [VIRTIO_BALLOON_F_MUST_TELL_HOST] = "must_tell_host",
++        [VIRTIO_BALLOON_F_STATS_VQ] = "stats_vq",
++        [VIRTIO_BALLOON_F_DEFLATE_ON_OOM] = "deflate_on_oom",
++    };
++    if (feature >= ARRAY_SIZE(names)) {
++        return NULL;
++    }
++    return names[feature];
++}
++
+ static void virtio_balloon_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -523,6 +537,7 @@ static void virtio_balloon_class_init(ObjectClass *klass, void *data)
+     vdc->get_config = virtio_balloon_get_config;
+     vdc->set_config = virtio_balloon_set_config;
+     vdc->get_features = virtio_balloon_get_features;
++    vdc->get_feature_name = virtio_balloon_get_feature_name;
+     vdc->set_status = virtio_balloon_set_status;
+     vdc->vmsd = &vmstate_virtio_balloon_device;
  }
--
-diff --git a/block/Makefile.objs b/block/Makefile.objs
-index 6eaf78a046..c99420f42b 100644
---- a/block/Makefile.objs
-+++ b/block/Makefile.objs
-@@ -12,7 +12,7 @@ block-obj-$(CONFIG_LINUX_AIO) += linux-aio.o
- block-obj-y += null.o mirror.o commit.o io.o
- block-obj-y += throttle-groups.o
+diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
+index 3042232..e9ae54f 100644
+--- a/hw/virtio/virtio-bus.c
++++ b/hw/virtio/virtio-bus.c
+@@ -30,6 +30,7 @@
+ #include "hw/virtio/virtio-bus.h"
+ #include "hw/virtio/virtio.h"
+ #include "exec/address-spaces.h"
++#include "monitor/monitor.h"
  
--block-obj-y += nbd.o nbd-client.o sheepdog.o
-+block-obj-y += nbd.o nbd-client.o nbd-client-cmds.o sheepdog.o
- block-obj-$(CONFIG_LIBISCSI) += iscsi.o
- block-obj-$(if $(CONFIG_LIBISCSI),y,n) += iscsi-opts.o
- block-obj-$(CONFIG_LIBNFS) += nfs.o
+ /* #define DEBUG_VIRTIO_BUS */
+ 
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index 80c45c3..9b324f6 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -141,6 +141,8 @@ typedef struct VirtioDeviceClass {
+     void (*save)(VirtIODevice *vdev, QEMUFile *f);
+     int (*load)(VirtIODevice *vdev, QEMUFile *f, int version_id);
+     const VMStateDescription *vmsd;
++    /* Get the name of device specific feature */
++    const char *(*get_feature_name)(VirtIODevice *vdev, int feature);
+ } VirtioDeviceClass;
+ 
+ void virtio_instance_init_common(Object *proxy_obj, void *data,
+diff --git a/monitor.c b/monitor.c
+index f4856b9..779f168 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -78,6 +78,7 @@
+ #include "sysemu/cpus.h"
+ #include "qemu/cutils.h"
+ #include "qapi/qmp/dispatch.h"
++#include "hw/virtio/virtio-bus.h"
+ 
+ #if defined(TARGET_S390X)
+ #include "hw/s390x/storage-keys.h"
 -- 
-2.11.1
+2.1.4
