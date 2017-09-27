@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx7Sf-0006GI-5D
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 04:12:57 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dx7TE-0006js-0i
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 04:13:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx7SZ-0001ZL-DS
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 04:12:53 -0400
-Date: Wed, 27 Sep 2017 17:59:17 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170927075917.GQ12504@umbus>
-References: <20170926121750.9015-1-lvivier@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1dx7T9-0001pl-Mi
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 04:13:27 -0400
+Date: Wed, 27 Sep 2017 10:13:19 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170927101319.1e7cfd8a@nial.brq.redhat.com>
+In-Reply-To: <20170927062143.GN12504@umbus>
+References: <150633285374.14880.11614678065344980502.stgit@bahia.lan>
+	<20170926025739.GF12504@umbus> <20170926091928.50e115ff@bahia.lan>
+	<20170927062143.GN12504@umbus>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="JaBjgNvtdKe5H086"
-Content-Disposition: inline
-In-Reply-To: <20170926121750.9015-1-lvivier@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] spapr: select default vty
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] spapr: move registration of "host" CPU
+ core type to machine code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,110 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
+On Wed, 27 Sep 2017 16:21:43 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
---JaBjgNvtdKe5H086
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Tue, Sep 26, 2017 at 09:19:28AM +0200, Greg Kurz wrote:
+> > On Tue, 26 Sep 2017 12:57:39 +1000
+> > David Gibson <david@gibson.dropbear.id.au> wrote:
+> >   
+> > > On Mon, Sep 25, 2017 at 11:47:33AM +0200, Greg Kurz wrote:  
+> > > > The CPU core abstraction belongs to the machine code. This also gets
+> > > > rid of some code duplication.
+> > > > 
+> > > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > > ---
+> > > > 
+> > > > hw/ppc/spapr_cpu_core.h is also included elsewhere in target/ppc/kvm.c
+> > > > but this is already handled by the following cleanup patch:    
+> > > 
+> > > I don't really see what the advantage of this is.  As others have
+> > > pointed out it leads to the host type being registered very late,
+> > > which could cause problems.
+> > >   
+> > 
+> > Well, the goal was to consolidate the code to register sPAPRCPUCore types in
+> > the spapr code, instead of open-coding it in spapr_cpu_core.c and kvm.c... 
+> > 
+> > But now I realize that delaying the registration even more is a bad idea. And,
+> > the other way round, registering a static type earlier as asked by Igor would
+> > require all parent types to be already registered, which seems to be impossible
+> > to guarantee with the current code.
+> > 
+> > Maybe we could at least have kvm_ppc_register_host_cpu_type() to call a
+> > function in spapr_cpu_core.c instead of duplicating the registration
+> > code ?  
+> 
+> I think that sounds like a better idea.  It's still a little bodgy
+> with the abstraction boundaries, but I think that's unavoidable: this
+> fundamentally depends on both KVM's presence and use of the PAPR
+> machine type.  Whichever place we put it, you could argue it belongs
+> better in the other one.
+it looks like kvm_ppc_register_host_cpu_type() doesn't depend on
+anything that requires KVM being present/initialized, so I'd
+suggest to:
 
-On Tue, Sep 26, 2017 at 02:17:50PM +0200, Laurent Vivier wrote:
-> SLOF uses the "/chosen/linux,stdout-path" variable to
-> choose its console. This variable is provided by QEMU.
-> QEMU selects the spapr-vty using the "reg" property:
-> it takes the vty with the lowest reg number.
-> This patch allows the user to define "linux,stdout-path"
-> from the command line by adding a keyword 'default' to
-> the spapr-vty device.
->=20
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-
-I'm a bit dubious about the worth of this.  With your SLOF fixes it
-should still be possible to redirect output correctly using -prom-env,
-yes?  Using a secondary vty is a pretty niche case, so I'm not
-convinced we need extra properties just to make it simpler.
-> ---
->  hw/char/spapr_vty.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/char/spapr_vty.c b/hw/char/spapr_vty.c
-> index 0fa416ca6b..aa56a9a6cb 100644
-> --- a/hw/char/spapr_vty.c
-> +++ b/hw/char/spapr_vty.c
-> @@ -15,6 +15,7 @@ typedef struct VIOsPAPRVTYDevice {
->      CharBackend chardev;
->      uint32_t in, out;
->      uint8_t buf[VTERM_BUFSIZE];
-> +    bool is_default;
->  } VIOsPAPRVTYDevice;
-> =20
->  #define TYPE_VIO_SPAPR_VTY_DEVICE "spapr-vty"
-> @@ -153,6 +154,7 @@ void spapr_vty_create(VIOsPAPRBus *bus, Chardev *char=
-dev)
->  static Property spapr_vty_properties[] =3D {
->      DEFINE_SPAPR_PROPERTIES(VIOsPAPRVTYDevice, sdev),
->      DEFINE_PROP_CHR("chardev", VIOsPAPRVTYDevice, chardev),
-> +    DEFINE_PROP_BOOL("default", VIOsPAPRVTYDevice, is_default, false),
->      DEFINE_PROP_END_OF_LIST(),
->  };
-> =20
-> @@ -194,11 +196,13 @@ static const TypeInfo spapr_vty_info =3D {
->  VIOsPAPRDevice *spapr_vty_get_default(VIOsPAPRBus *bus)
->  {
->      VIOsPAPRDevice *sdev, *selected;
-> +    VIOsPAPRVTYDevice *dev;
->      BusChild *kid;
-> =20
->      /*
->       * To avoid the console bouncing around we want one VTY to be
-> -     * the "default". We haven't really got anything to go on, so
-> +     * the "default". If the user doesn't provide the information
-> +     * we haven't really got anything to go on, so
->       * arbitrarily choose the one with the lowest reg value.
->       */
-> =20
-> @@ -213,6 +217,13 @@ VIOsPAPRDevice *spapr_vty_get_default(VIOsPAPRBus *b=
-us)
-> =20
->          sdev =3D VIO_SPAPR_DEVICE(iter);
-> =20
-> +        /* The user can provide the default console to use */
-> +
-> +        dev =3D VIO_SPAPR_VTY_DEVICE(sdev);
-> +        if (dev->is_default) {
-> +            return sdev;
-> +        }
-> +
->          /* First VTY we've found, so it is selected for now */
->          if (!selected) {
->              selected =3D sdev;
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---JaBjgNvtdKe5H086
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnLWlQACgkQbDjKyiDZ
-s5KBTxAAtT6aB/9hB1MMwSbVR/IU/s3x62sa2FZKEU8hNjZcTc/4guvTBsWcs4NQ
-L4tkgN5JjOnums2fLETI8B6FZqrXrsIwR5WdZxrW6JcCcqrjuJHigZfjR/c1N92L
-coVSOLNb4qKCfytgi6+JAzeiniuT5C8f0gzuOxyMP6r0uutyFnIZIVFUaSEj0xhT
-iSSoQiXriNIMS+yNXCc0HQf86FeEtlZ6vku2gK28NeGTuZk7PDFdCjHHYlh0cWwE
-NRRkizGx1uL986tMU+ZEs4/XHXVsu5UKOVjFxMAV8UuoFYwseKQt0ZNw7pX9p2J2
-kq9CthE6+4fKcWR4oc6Xktcp8gtrVUVyDvXCZ76UNrA01nErVjIqdR9mdnTN9zHB
-LOSyKtQ8SWc7MW2E2v/h/mQXNm0qI6+EfiH47VgeSfWBGZMbASKydHCXT0EMpsRm
-FU9wBBcESlwgO0+uCDMbbTLjjTjdGtuaPvQafdLEe5MveZWoAlrz9ySLrBZxd9Dl
-yrrNxULJG/yE6BYjR6UHaYWR6b1MdXRSg3EDtVlru187U3hLDROCDtEDQSDRlnNj
-aE7bvLaPNdvHIjDRP5pRtYf0+Jzi1bHQGoCt4bOzBbHs8qMvmyNlXq2eLhi0X+KS
-+IirbJd/PymLkRIlv0Jxjg0z/MLRD5DCjMN7NRXvL5BS+O3n0k0=
-=B/Wt
------END PGP SIGNATURE-----
-
---JaBjgNvtdKe5H086--
+  - 1: revert commit 715d4b96 and do alias hiding another way
+  - 2: move host core type registration into spapr_cpu_core.c and make it static like x86
+  - 3: move host cpu type into target/ppc/translate_init.c where the rest
+       of cpu types is initialized and make it static like x86
