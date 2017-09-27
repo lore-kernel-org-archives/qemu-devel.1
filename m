@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dxJzI-0007W2-Sg
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 17:35:26 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dxK7h-0001fr-5k
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 17:44:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dxJzH-0001Wj-K8
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 17:35:24 -0400
-References: <20170913160333.23622-1-eblake@redhat.com>
-	<20170913160333.23622-17-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <37b21d60-acbd-c4ce-3d6f-3f852b8da2a3@redhat.com>
-Date: Wed, 27 Sep 2017 17:35:12 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dxK7g-0006dL-97
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 17:44:05 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:49496)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dxK7g-0006ca-12
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 17:44:04 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id r74so22780935wme.4
+	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 14:44:03 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170913160333.23622-17-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 16/23] qemu-img: Drop redundant error
- message in compare
+In-Reply-To: <20170927074316.4454-1-david@gibson.dropbear.id.au>
+References: <20170927074316.4454-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 27 Sep 2017 14:43:42 -0700
+Message-ID: <CAFEAcA-dmfDZja+WQuQmgcZMKMzgme8_J4cpE5-j6z8_4q6-LQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/26] ppc-for-2.11 queue 20170927
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,103 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, Greg Kurz <groug@kaod.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, BALATON Zoltan <balaton@eik.bme.hu>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
+On 27 September 2017 at 00:42, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit 31bc1d8481af414cfa2857f905e40f7d8e6d5b2e:
+>
+>   Merge remote-tracking branch 'remotes/mjt/tags/trivial-patches-fetch' into staging (2017-09-26 19:49:08 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-2.11-20170927
+>
+> for you to fetch changes up to e451b85f1bf3c8140be51e2b03eb71ab96c246a5:
+>
+>   macio: use object link between MACIO_IDE and MAC_DBDMA object (2017-09-27 13:05:41 +1000)
+>
+> ----------------------------------------------------------------
+> ppc patch queue 2017-09-27
+>
+> Contains
+>  * a number of Mac machine type fixes
+>  * a number of embedded machine type fixes (preliminary to adding the
+>    Sam460ex board)
+>  * a important fix for handling of migration with KVM PR
+>  * assorted other minor fixes and cleanups
+>
+> ----------------------------------------------------------------
 
+Applied, thanks.
 
-On 09/13/2017 12:03 PM, Eric Blake wrote:
-> If a read error is encountered during 'qemu-img compare', we
-> were printing the "Error while reading offset ..." message twice.
-> Update the testsuite for the improved output.
-> 
-> Further simplify the code by hoisting the error code conversion
-> into the helper function, rather than repeating it at the callers.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> 
-> ---
-> v3: new patch
-> ---
->  qemu-img.c                 | 19 +++++--------------
->  tests/qemu-iotests/074.out |  2 --
->  2 files changed, 5 insertions(+), 16 deletions(-)
-> 
-> diff --git a/qemu-img.c b/qemu-img.c
-> index dfccebe6bc..3e1e373e8f 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -1196,8 +1196,10 @@ static int64_t sectors_to_bytes(int64_t sectors)
->  /*
->   * Check if passed sectors are empty (not allocated or contain only 0 bytes)
->   *
-> - * Returns 0 in case sectors are filled with 0, 1 if sectors contain non-zero
-> - * data and negative value on error.
-> + * Intended for use by 'qemu-img compare': Returns 0 in case sectors are
-> + * filled with 0, 1 if sectors contain non-zero data (this is a comparison
-> + * failure), and 4 on error (the exit status for read errors), after emitting
-> + * an error message.
->   *
->   * @param blk:  BlockBackend for the image
->   * @param sect_num: Number of first sector to check
-> @@ -1218,7 +1220,7 @@ static int check_empty_sectors(BlockBackend *blk, int64_t sect_num,
->      if (ret < 0) {
->          error_report("Error while reading offset %" PRId64 " of %s: %s",
->                       sectors_to_bytes(sect_num), filename, strerror(-ret));
-> -        return ret;
-> +        return 4;
->      }
->      idx = find_nonzero(buffer, sect_count * BDRV_SECTOR_SIZE);
->      if (idx >= 0) {
-> @@ -1473,11 +1475,6 @@ static int img_compare(int argc, char **argv)
->                                            filename2, buf1, quiet);
->              }
->              if (ret) {
-> -                if (ret < 0) {
-> -                    error_report("Error while reading offset %" PRId64 ": %s",
-> -                                 sectors_to_bytes(sector_num), strerror(-ret));
-> -                    ret = 4;
-> -                }
->                  goto out;
->              }
->          }
-> @@ -1522,12 +1519,6 @@ static int img_compare(int argc, char **argv)
->                  ret = check_empty_sectors(blk_over, sector_num, nb_sectors,
->                                            filename_over, buf1, quiet);
->                  if (ret) {
-> -                    if (ret < 0) {
-> -                        error_report("Error while reading offset %" PRId64
-> -                                     " of %s: %s", sectors_to_bytes(sector_num),
-> -                                     filename_over, strerror(-ret));
-> -                        ret = 4;
-> -                    }
->                      goto out;
->                  }
->              }
-> diff --git a/tests/qemu-iotests/074.out b/tests/qemu-iotests/074.out
-> index 8fba5aea9c..ede66c3f81 100644
-> --- a/tests/qemu-iotests/074.out
-> +++ b/tests/qemu-iotests/074.out
-> @@ -4,7 +4,6 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
->  wrote 512/512 bytes at offset 512
->  512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  qemu-img: Error while reading offset 0 of blkdebug:TEST_DIR/blkdebug.conf:TEST_DIR/t.IMGFMT: Input/output error
-> -qemu-img: Error while reading offset 0: Input/output error
->  4
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
->  Formatting 'TEST_DIR/t.IMGFMT.2', fmt=IMGFMT size=0
-> @@ -12,7 +11,6 @@ Formatting 'TEST_DIR/t.IMGFMT.2', fmt=IMGFMT size=0
->  wrote 512/512 bytes at offset 512
->  512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  qemu-img: Error while reading offset 0 of blkdebug:TEST_DIR/blkdebug.conf:TEST_DIR/t.IMGFMT: Input/output error
-> -qemu-img: Error while reading offset 0 of blkdebug:TEST_DIR/blkdebug.conf:TEST_DIR/t.IMGFMT: Input/output error
->  Warning: Image size mismatch!
->  4
->  Cleanup
-> 
-
-Hm, naively I might assume it's best for the caller to report the error
-and to leave the function a nicely self-contained helper, but I won't
-insist on it.
-
-Reviewed-by: John Snow <jsnow@redhat.com>
+-- PMM
