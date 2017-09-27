@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dxBVw-0005oW-L3
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:32:34 -0400
+	(envelope-from <berrange@redhat.com>) id 1dxBYK-0006qW-5i
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:35:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dxBVt-00086r-Dm
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:32:32 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:16932 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dxBVs-00086B-TA
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:32:29 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20170925135801.144261-1-vsementsov@virtuozzo.com>
-	<20170925135801.144261-9-vsementsov@virtuozzo.com>
-	<b8b01f1a-6e7b-342f-02b6-b7386bff1500@redhat.com>
-	<a86f5324-231f-5072-f843-095c8b191fe1@virtuozzo.com>
-Message-ID: <407cbf8e-3854-e657-deb7-03d5c808bd82@virtuozzo.com>
-Date: Wed, 27 Sep 2017 15:32:18 +0300
+	(envelope-from <berrange@redhat.com>) id 1dxBYE-0000SB-6y
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 08:35:00 -0400
+Date: Wed, 27 Sep 2017 13:34:42 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170927123442.GF12223@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170912112855.24269-1-berrange@redhat.com>
+	<20170912112855.24269-6-berrange@redhat.com>
+	<bca76897-ec7d-035e-9473-b304b63f5d7b@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a86f5324-231f-5072-f843-095c8b191fe1@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH 8/8] nbd: Minimal structured read for client
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <bca76897-ec7d-035e-9473-b304b63f5d7b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 5/7] block: convert crypto driver to
+ bdrv_co_preadv|pwritev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,133 +26,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
 
-MjcuMDkuMjAxNyAxMzowNSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToN
-Cj4gMjYuMDkuMjAxNyAwMToxOSwgRXJpYyBCbGFrZSB3cm90ZToNCj4+IE9uIDA5LzI1LzIw
-MTcgMDg6NTggQU0sIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4g
-TWluaW1hbCBpbXBsZW1lbnRhdGlvbjogZHJvcCBtb3N0IG9mIGFkZGl0aW9uYWwgZXJyb3Ig
-aW5mb3JtYXRpb24uDQo+Pj4NCj4+PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRz
-b3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+Pj4gLS0tDQo+Pj4g
-wqAgYmxvY2svbmJkLWNsaWVudC5owqAgfMKgwqAgMiArDQo+Pj4gwqAgaW5jbHVkZS9ibG9j
-ay9uYmQuaCB8wqAgMTUgKysrKy0NCj4+PiDCoCBibG9jay9uYmQtY2xpZW50LmPCoCB8wqAg
-OTcgKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tDQo+Pj4gwqAgbmJkL2NsaWVudC5j
-wqDCoMKgwqDCoMKgwqAgfCAxNjkgDQo+Pj4gKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKystLS0tLQ0KPj4+IMKgIDQgZmlsZXMgY2hhbmdlZCwgMjQ5
-IGluc2VydGlvbnMoKyksIDM0IGRlbGV0aW9ucygtKQ0KPj4+DQo+Pj4gKysrIGIvaW5jbHVk
-ZS9ibG9jay9uYmQuaA0KPj4+IEBAIC01NywxMSArNTcsMTcgQEAgc3RydWN0IE5CRFJlcXVl
-c3Qgew0KPj4+IMKgIH07DQo+Pj4gwqAgdHlwZWRlZiBzdHJ1Y3QgTkJEUmVxdWVzdCBOQkRS
-ZXF1ZXN0Ow0KPj4+IMKgIC1zdHJ1Y3QgTkJEUmVwbHkgew0KPj4+ICt0eXBlZGVmIHN0cnVj
-dCBOQkRSZXBseSB7DQo+Pj4gK8KgwqDCoCBib29sIHNpbXBsZTsNCj4+PiDCoMKgwqDCoMKg
-IHVpbnQ2NF90IGhhbmRsZTsNCj4+PiDCoMKgwqDCoMKgIHVpbnQzMl90IGVycm9yOw0KPj4+
-IC19Ow0KPj4+IC10eXBlZGVmIHN0cnVjdCBOQkRSZXBseSBOQkRSZXBseTsNCj4+PiArDQo+
-Pj4gK8KgwqDCoCB1aW50MTZfdCBmbGFnczsNCj4+PiArwqDCoMKgIHVpbnQxNl90IHR5cGU7
-DQo+Pj4gK8KgwqDCoCB1aW50MzJfdCB0YWlsX2xlbmd0aDsNCj4+PiArwqDCoMKgIHVpbnQ2
-NF90IG9mZnNldDsNCj4+PiArwqDCoMKgIHVpbnQzMl90IGhvbGVfc2l6ZTsNCj4+PiArfSBO
-QkRSZXBseTsNCj4+IFRoaXMgZmVlbHMgbGlrZSBpdCBzaG91bGQgYmUgYSBkaXNjcmltaW5h
-dGVkIHVuaW9uLCByYXRoZXIgdGhhbiBhIHN0cnVjdA0KPj4gY29udGFpbmluZyBmaWVsZHMg
-dGhhdCBhcmUgb25seSBzb21ldGltZXMgdmFsaWQuLi4NCj4NCj4gTm86DQo+DQo+IHNpbXBs
-ZSwgaGFuZGxlIGFuZCBlcnJvciBhcmUgYWx3YXlzIHZhbGlkDQo+IGZsYWdzLCB0eXBlLCB0
-YWlsX2xlbmd0aCBhcmUgdmFsaWQgZm9yIGFsbCBzdHJ1Y3R1cmVkIHJlcGxpZXMNCj4gb2Zm
-c2V0IGFuZCBob2xlX3NpemUgYXJlIHZhbGlkIGZvciBzdHJ1Y3R1cmVkIGhvbGUgcmVwbHkN
-Cj4NCj4gc28sIHdlIGhhdmUgb25lIGNhc2Ugd2hlbiBhbGwgZmllbGRzIGFyZSB2YWxpZC4u
-IGhvdyBkbyB5b3Ugc2VlIGl0IA0KPiB3aXRoIHVuaW9uLCB3aGF0IGlzIHRoZSByZWFsIGRp
-ZmZlcmVuY2U/IEkgdGhpbmsgaXQgd291bGQgYmUganVzdCBhIA0KPiBjb21wbGljYXRpb24u
-DQo+DQo+Pg0KPj4+IMKgIMKgICNkZWZpbmUgTkJEX1NSRVBfVFlQRV9OT05FIDANCj4+PiDC
-oCAjZGVmaW5lIE5CRF9TUkVQX1RZUEVfT0ZGU0VUX0RBVEHCoMKgIDENCj4+PiArI2RlZmlu
-ZSBOQkRfU1JFUF9UWVBFX09GRlNFVF9IT0xFwqDCoCAyDQo+Pj4gwqAgI2RlZmluZSBOQkRf
-U1JFUF9UWVBFX0VSUk9SwqDCoMKgwqDCoMKgwqDCoCBOQkRfU1JFUF9FUlIoMSkNCj4+PiAr
-I2RlZmluZSBOQkRfU1JFUF9UWVBFX0VSUk9SX09GRlNFVMKgIE5CRF9TUkVQX0VSUigyKQ0K
-Pj4gLi4uZXNwZWNpYWxseSBzaW5jZSB0aGVyZSBpcyBtb3JlIHRoYW4gb25lIHR5cGUgb2Yg
-U1JFUCBwYWNrZXQgbGF5b3V0Lg0KPj4NCj4+IEkgYWxzbyB3b25kZXIgd2h5IHlvdSBhcmUg
-ZGVmaW5pbmcgY29uc3RhbnRzIGluIGEgcGllY2VtZWFsIGZhc2hpb24sDQo+PiByYXRoZXIg
-dGhhbiBhbGwgYXQgb25jZSAoZXZlbiBpZiB5b3VyIG1pbmltYWwgc2VydmVyIGltcGxlbWVu
-dGF0aW9uDQo+PiBkb2Vzbid0IHNlbmQgYSBwYXJ0aWN1bGFyIGNvbnN0YW50LCB0aGVyZSdz
-IG5vIGhhcm0gaW4gZGVmaW5pbmcgdGhlbSBhbGwNCj4+IHVwIGZyb250KS4NCj4NCj4gaG1t
-LiBqdXN0IHRvIG5vdCBkZWZpbmUgdW51c2VkIGNvbnN0YW50cy4gSXQgZG9lc24ndCBtYXR0
-ZXIsIEkgY2FuIA0KPiBkZWZpbmUgdGhlbSBhbGwgaWYgeW91IHByZWZlci4NCj4NCj4+DQo+
-Pj4gKysrIGIvYmxvY2svbmJkLWNsaWVudC5jDQo+Pj4gQEAgLTE3OSw5ICsxNzksMTAgQEAg
-ZXJyOg0KPj4+IMKgwqDCoMKgwqAgcmV0dXJuIHJjOw0KPj4+IMKgIH0NCj4+PiDCoCAtc3Rh
-dGljIGludCBuYmRfY29fcmVjZWl2ZV9yZXBseShOQkRDbGllbnRTZXNzaW9uICpzLA0KPj4+
-IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCB1aW50NjRfdCBoYW5kbGUsDQo+Pj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIFFFTVVJT1ZlY3Rv
-ciAqcWlvdikNCj4+PiArc3RhdGljIGludCBuYmRfY29fcmVjZWl2ZV8xX3JlcGx5X29yX2No
-dW5rKE5CRENsaWVudFNlc3Npb24gKnMsDQo+PiBMb25nIG5hbWUsIGFuZCB1bnVzdWFsIHRv
-IG1peCBpbiAiMSIgaW5zdGVhZCBvZiAib25lIi7CoCBXb3VsZCBpdCBiZQ0KPj4gYmV0dGVy
-IHRvIG5hbWUgaXQgbmJkX2NvX3JlY2VpdmVfY2h1bmssIHdoZXJlIHdlIGRlY2xhcmUgdGhh
-dCBhIHNpbXBsZQ0KPj4gcmVwbHkgaXMgKHJvdWdobHkpIHRoZSBzYW1lIGFtb3VudCBvZiBl
-ZmZvcnQgYXMgYSBjaHVuayBpbiBhIHN0cnVjdHVyZWQNCj4+IHJlcGx5Pw0KPj4NCj4+PiAr
-IHVpbnQ2NF90IGhhbmRsZSwNCj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IGJvb2wgKmNvbnQsDQo+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBRRU1V
-SU9WZWN0b3IgKnFpb3YpDQo+Pj4gwqAgew0KPj4gTm8gZG9jdW1lbnRhdGlvbiBvZiB0aGUg
-ZnVuY3Rpb24/DQo+Pg0KPj4+IMKgwqDCoMKgwqAgaW50IHJldDsNCj4+PiDCoMKgwqDCoMKg
-IGludCBpID0gSEFORExFX1RPX0lOREVYKHMsIGhhbmRsZSk7DQo+Pj4gQEAgLTE5MSwyOSAr
-MTkyLDk1IEBAIHN0YXRpYyBpbnQgDQo+Pj4gbmJkX2NvX3JlY2VpdmVfcmVwbHkoTkJEQ2xp
-ZW50U2Vzc2lvbiAqcywNCj4+PiDCoMKgwqDCoMKgIHFlbXVfY29yb3V0aW5lX3lpZWxkKCk7
-DQo+Pj4gwqDCoMKgwqDCoCBzLT5yZXF1ZXN0c1tpXS5yZWNlaXZpbmcgPSBmYWxzZTsNCj4+
-PiDCoMKgwqDCoMKgIGlmICghcy0+aW9jIHx8IHMtPnF1aXQpIHsNCj4+PiAtwqDCoMKgwqDC
-oMKgwqAgcmV0ID0gLUVJTzsNCj4+PiAtwqDCoMKgIH0gZWxzZSB7DQo+Pj4gLcKgwqDCoMKg
-wqDCoMKgIGFzc2VydChzLT5yZXBseS5oYW5kbGUgPT0gaGFuZGxlKTsNCj4+PiAtwqDCoMKg
-wqDCoMKgwqAgcmV0ID0gLXMtPnJlcGx5LmVycm9yOw0KPj4+IC3CoMKgwqDCoMKgwqDCoCBp
-ZiAocWlvdiAmJiBzLT5yZXBseS5lcnJvciA9PSAwKSB7DQo+Pj4gK8KgwqDCoMKgwqDCoMKg
-ICpjb250ID0gZmFsc2U7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIHJldHVybiAtRUlPOw0KPj4+
-ICvCoMKgwqAgfQ0KPj4+ICsNCj4+PiArwqDCoMKgIGFzc2VydChzLT5yZXBseS5oYW5kbGUg
-PT0gaGFuZGxlKTsNCj4+PiArwqDCoMKgICpjb250ID0gIShzLT5yZXBseS5zaW1wbGUgfHwg
-KHMtPnJlcGx5LmZsYWdzICYgDQo+Pj4gTkJEX1NSRVBfRkxBR19ET05FKSk7DQo+PiBXZSBu
-ZWVkIHRvIHZhbGlkYXRlIHRoYXQgdGhlIHNlcnZlciBpcyBub3Qgc2VuZGluZyB1cyBTUkVQ
-IGNodW5rcyB1bmxlc3MNCj4+IHdlIG5lZ290aWF0ZWQgdGhlbS7CoCBJJ20gdGhpbmtpbmcg
-aXQgbWlnaHQgYmUgYmV0dGVyIHRvIGRvIGl0IGhlcmUNCj4+IChtYXliZSB5b3UgZGlkIGl0
-IHNvbWV3aGVyZSBlbHNlLCBidXQgSSBoYXZlbid0IHNlZW4gaXQgeWV0OyBJJ20NCj4+IHJl
-dmlld2luZyB0aGUgcGF0Y2ggaW4gdGV4dHVhbCBvcmRlciByYXRoZXIgdGhhbiB0aGUgb3Jk
-ZXIgaW4gd2hpY2gNCj4+IHRoaW5ncyBhcmUgY2FsbGVkKS4NCj4NCj4gTm8sIEkgZGlkbid0
-LiBXaWxsIGFkZCAobWF5IGJlIGVhcmx5LCBpbiByZXBseV9lbnRyeSkuDQo+DQo+Pg0KPj4+
-ICvCoMKgwqAgcmV0ID0gLXMtPnJlcGx5LmVycm9yOw0KPj4+ICvCoMKgwqAgaWYgKHJldCA8
-IDApIHsNCj4+PiArwqDCoMKgwqDCoMKgwqAgZ290byBvdXQ7DQo+Pj4gK8KgwqDCoCB9DQo+
-Pj4gKw0KPj4+ICvCoMKgwqAgaWYgKHMtPnJlcGx5LnNpbXBsZSkgew0KPj4+ICvCoMKgwqDC
-oMKgwqDCoCBpZiAocWlvdikgew0KPj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlm
-IChxaW9fY2hhbm5lbF9yZWFkdl9hbGwocy0+aW9jLCBxaW92LT5pb3YsIHFpb3YtPm5pb3Ys
-DQo+Pj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIE5VTEwpIDwgMCkgew0KPj4+IC3CoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0ID0gLUVJTzsNCj4+PiAtwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgIHMtPnF1aXQgPSB0cnVlOw0KPj4+ICvCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCBOVUxMKSA8IDApDQo+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgew0KPj4+
-ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZ290byBmYXRhbDsNCj4+PiDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB9DQo+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgIH0NCj4+
-PiArwqDCoMKgwqDCoMKgwqAgZ290byBvdXQ7DQo+Pj4gK8KgwqDCoCB9DQo+Pj4gwqAgLcKg
-wqDCoMKgwqDCoMKgIC8qIFRlbGwgdGhlIHJlYWQgaGFuZGxlciB0byByZWFkIGFub3RoZXIg
-aGVhZGVyLiAqLw0KPj4+IC3CoMKgwqDCoMKgwqDCoCBzLT5yZXBseS5oYW5kbGUgPSAwOw0K
-Pj4+ICvCoMKgwqAgLyogaGVyZSB3ZSBkZWFsIHdpdGggc3VjY2Vzc2Z1bCBzdHJ1Y3R1cmVk
-IHJlcGx5ICovDQo+Pj4gK8KgwqDCoCBzd2l0Y2ggKHMtPnJlcGx5LnR5cGUpIHsNCj4+PiAr
-wqDCoMKgwqDCoMKgwqAgUUVNVUlPVmVjdG9yIHN1Yl9xaW92Ow0KPj4+ICvCoMKgwqAgY2Fz
-ZSBOQkRfU1JFUF9UWVBFX09GRlNFVF9EQVRBOg0KPj4gVGhpcyBpcyBwdXR0aW5nIGEgTE9U
-IG9mIHNtYXJ0cyBkaXJlY3RseSBpbnRvIHRoZSByZWNlaXZlIHJvdXRpbmUuDQo+PiBIZXJl
-J3Mgd2hlcmUgSSB3YXMgcHJldmlvdXNseSB3b25kZXJpbmcgKGFuZCBJIHRoaW5rIFBhb2xv
-IGFzIHdlbGwpDQo+PiB3aGV0aGVyIGl0IG1pZ2h0IGJlIGJldHRlciB0byBzcGxpdCB0aGUg
-ZWZmb3J0czogdGhlIGdlbmVyaWMgZnVuY3Rpb24NCj4+IHJlYWRzIG9mZiB0aGUgY2h1bmsg
-aW5mb3JtYXRpb24gYW5kIGFueSBwYXlsb2FkLCBidXQgYSBwZXItY29tbWFuZA0KPg0KPiBI
-bW0uIGl0IHdhcyBteSBpZGVhIHRvIG1vdmUgYWxsIHJlYWRpbmcgaW50byBvbmUgY29yb3V0
-aW5lIChpbiBteSANCj4gcmVmYWN0b3Jpbmcgc2VyaWVzLCBidXQgUGFvbG8gd2FzIGFnYWlu
-c3QpLg0KPg0KPiBPciB5b3UgbWVhbiB0byByZWFkIGEgcGF5bG9hZCBhcyByYXc/IEl0IHdv
-dWxkIGxlYWQgdG8gZG91YmxlIGNvcHlpbmcgDQo+IGl0IHRvIGRlc3RpbmF0aW9uIHFpb3Ys
-IHdoaWNoIEkgZGlzbGlrZS4uDQo+DQo+PiBjYWxsYmFjayBmdW5jdGlvbiB0aGVuIHBhcnNl
-cyB0aGUgY2h1bmtzLg0KPg0KPiBwZXItY29tbWFuZD8gVGhlbiBjYWxsYmFjayBmb3IgQ01E
-X1JFQUQgd291bGQgaGF2ZSBhbGwgb2YgdGhlc2UgDQo+ICJzbWFydHMiLCBzbyB0aGUgd2hv
-bGUgY29kZSB3b3VsZCBub3QgYmUgc2ltcGxlci4uIChIb3dldmVyIGl0IHdpbGwgDQo+IHNp
-bXBsaWZ5IGFkZGluZyBibG9jay1zdGF0dXMgbGF0ZXIpLg0KPg0KPj4gwqDCoCBFc3BlY2lh
-bGx5IHNpbmNlIHRoZQ0KPj4gZGVmaW5pdGlvbiBvZiB0aGUgY2h1bmtzIGRpZmZlcnMgb24g
-YSBwZXItY29tbWFuZCBiYXNpcyAoeWVzLCB0aGUgTkJEDQo+PiBzcGVjIHdpbGwgdHJ5IHRv
-IG5vdCByZXVzZSBhbiBTUkVQIGNodW5rIHR5cGUgYWNyb3NzIG11bHRpcGxlIGNvbW1hbmRz
-DQo+PiB1bmxlc3MgdGhlIHNlbWFudGljcyBhcmUgc2ltaWxhciwgYnV0IHRoYXQncyBhIGJp
-dCBtb3JlIGZyYWdpbGUpLsKgIFRoaXMNCj4+IHBhcnRpY3VsYXJseSBtYXR0ZXJzIGdpdmVu
-IG15IHN0YXRlbWVudCBhYm92ZSB0aGF0IHlvdSB3YW50IGENCj4+IGRpc2NyaW1pbmF0ZWQg
-dW5pb24sIHJhdGhlciB0aGFuIGEgc3RydWN0IHRoYXQgY29udGFpbnMgdW51c2VkIGZpZWxk
-cywNCj4+IGZvciBoYW5kbGluZyBkaWZmZXJlbnQgU1JFUCBjaHVuayB0eXBlcy4NCj4+DQo+
-PiBNeSByZXZpZXcgaGFzIHRvIHBhdXNlIGhlcmUgZm9yIG5vdy4uLg0KPj4NCj4+DQo+DQo+
-DQoNCkknbGwgcG9zdCBhIHByb3Bvc2FsIG9mIGV4dGVuZGFibGUgYXJjaGl0ZWN0dXJlIGZv
-ciB0aGlzIHRvZGF5IHRvIGhhdmUgYSANCm1vcmUgY29uY3JldGUgZGlzY3Vzc2lvbi4NCg0K
-DQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQoNCg==
+On Sat, Sep 16, 2017 at 06:54:58PM +0200, Max Reitz wrote:
+> On 2017-09-12 13:28, Daniel P. Berrange wrote:
+> > Make the crypto driver implement the bdrv_co_preadv|pwritev
+> > callbacks, and also use bdrv_co_preadv|pwritev for I/O
+> > with the protocol driver beneath.
+> > 
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > ---
+> >  block/crypto.c | 104 +++++++++++++++++++++++++++++++--------------------------
+> >  1 file changed, 56 insertions(+), 48 deletions(-)
+> 
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> 
+> Some notes below.
+> 
+> > diff --git a/block/crypto.c b/block/crypto.c
+> > index 49d6d4c058..d004e9cef4 100644
+> > --- a/block/crypto.c
+> > +++ b/block/crypto.c
+> 
+> [...]
+> 
+> > @@ -410,37 +414,33 @@ block_crypto_co_readv(BlockDriverState *bs, int64_t sector_num,
+> >          goto cleanup;
+> >      }
+> >  
+> > -    while (remaining_sectors) {
+> > -        cur_nr_sectors = remaining_sectors;
+> > +    while (bytes) {
+> > +        cur_bytes = bytes;
+> >  
+> > -        if (cur_nr_sectors > BLOCK_CRYPTO_MAX_SECTORS) {
+> > -            cur_nr_sectors = BLOCK_CRYPTO_MAX_SECTORS;
+> > +        if (cur_bytes > (BLOCK_CRYPTO_MAX_SECTORS * sector_size)) {
+> > +            cur_bytes = BLOCK_CRYPTO_MAX_SECTORS * sector_size;
+> 
+> It's a bit weird that now the bounce buffer's size is now no longer
+> fixed at 1 MB but variable depending on the crypto driver's block size.
+> It also doesn't seem too intentional when looking at the first patch's
+> commit message...
+> 
+> In any case, that would be an issue in the previous patch, though.  In
+> general, I'm wondering whether maybe you should squash this patch into
+> the previous one...  Yes, that would make the for a larger patch, but it
+> wouldn't leave some not-quite-right state in between where sector_size
+> is generally assumed to be equal to BDRV_SECTOR_SIZE -- which it is in
+> practice, but not necessarily in theory.
+
+In the end i'm going with this approach - just dropping the previous
+patch entirely, since 99% of what it does is then removed in this
+patch and the next one.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
