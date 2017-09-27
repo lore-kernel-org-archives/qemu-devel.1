@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dxElx-0006Fb-Br
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 12:01:23 -0400
+	(envelope-from <prvs=4366824e0=wei.liu2@citrix.com>)
+	id 1dxEuo-0001YW-Ef
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 12:10:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dxElr-0006e9-DD
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 12:01:17 -0400
-References: <20170922093926.9723-1-pbutsykin@virtuozzo.com>
-	<20170922093926.9723-3-pbutsykin@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <46949467-5bed-602b-5d64-badf92c059e1@redhat.com>
-Date: Wed, 27 Sep 2017 18:00:49 +0200
+	(envelope-from <prvs=4366824e0=wei.liu2@citrix.com>)
+	id 1dxEui-0003NE-Ee
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 12:10:26 -0400
+Received: from smtp02.citrix.com ([66.165.176.63]:10631)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=4366824e0=wei.liu2@citrix.com>)
+	id 1dxEuh-0003Id-SG
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 12:10:20 -0400
+From: Wei Liu <wei.liu2@citrix.com>
+Date: Wed, 27 Sep 2017 17:10:09 +0100
+Message-ID: <20170927161009.28091-1-wei.liu2@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <20170922093926.9723-3-pbutsykin@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="WhHVSbO4dv0devgFsHciVsA8do5lihTBE"
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] qcow2: truncate the tail of the
- image file after shrinking the image
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] xen-hvm: use errno in error message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,163 +26,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, eblake@redhat.com, jsnow@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: Xen-devel <xen-devel@lists.xenproject.org>, Wei Liu <wei.liu2@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony PERARD <anthony.perard@citrix.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WhHVSbO4dv0devgFsHciVsA8do5lihTBE
-From: Max Reitz <mreitz@redhat.com>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, eblake@redhat.com, jsnow@redhat.com, den@openvz.org
-Message-ID: <46949467-5bed-602b-5d64-badf92c059e1@redhat.com>
-Subject: Re: [PATCH v2 2/2] qcow2: truncate the tail of the image file after
- shrinking the image
-References: <20170922093926.9723-1-pbutsykin@virtuozzo.com>
- <20170922093926.9723-3-pbutsykin@virtuozzo.com>
-In-Reply-To: <20170922093926.9723-3-pbutsykin@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The error code is encoding in errno, not rc.
 
-On 2017-09-22 11:39, Pavel Butsykin wrote:
-> Now after shrinking the image, at the end of the image file, there migh=
-t be a
-> tail that probably will never be used. So we can find the last used clu=
-ster and
-> cut the tail.
->=20
-> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
-> ---
->  block/qcow2-refcount.c | 22 ++++++++++++++++++++++
->  block/qcow2.c          | 23 +++++++++++++++++++++++
->  block/qcow2.h          |  1 +
->  3 files changed, 46 insertions(+)
->=20
-> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-> index 88d5a3f1ad..aa3fd6cf17 100644
-> --- a/block/qcow2-refcount.c
-> +++ b/block/qcow2-refcount.c
-> @@ -3181,3 +3181,25 @@ out:
->      g_free(reftable_tmp);
->      return ret;
->  }
-> +
-> +int64_t qcow2_get_last_cluster(BlockDriverState *bs, int64_t size)
-> +{
-> +    BDRVQcow2State *s =3D bs->opaque;
-> +    int64_t i;
-> +
-> +    for (i =3D size_to_clusters(s, size) - 1; i >=3D 0; i--) {
-> +        uint64_t refcount;
-> +        int ret =3D qcow2_get_refcount(bs, i, &refcount);
-> +        if (ret < 0) {
-> +            fprintf(stderr, "Can't get refcount for cluster %" PRId64 =
-": %s\n",
-> +                    i, strerror(-ret));
-> +            return ret;
-> +        }
-> +        if (refcount > 0) {
-> +            return i;
-> +        }
-> +    }
-> +    qcow2_signal_corruption(bs, true, -1, -1,
-> +                            "There are no references in the refcount t=
-able.");
-> +    return -EIO;
-> +}
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 8a4311d338..8dfb5393a7 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -3106,6 +3106,7 @@ static int qcow2_truncate(BlockDriverState *bs, i=
-nt64_t offset,
->      new_l1_size =3D size_to_l1(s, offset);
-> =20
->      if (offset < old_length) {
-> +        int64_t last_cluster, old_file_size;
->          if (prealloc !=3D PREALLOC_MODE_OFF) {
->              error_setg(errp,
->                         "Preallocation can't be used for shrinking an i=
-mage");
-> @@ -3134,6 +3135,28 @@ static int qcow2_truncate(BlockDriverState *bs, =
-int64_t offset,
->                               "Failed to discard unused refblocks");
->              return ret;
->          }
-> +
-> +        old_file_size =3D bdrv_getlength(bs->file->bs);
-> +        if (old_file_size < 0) {
-> +            error_setg_errno(errp, -old_file_size,
-> +                             "Failed to inquire current file length");=
+Signed-off-by: Wei Liu <wei.liu2@citrix.com>
+---
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony PERARD <anthony.perard@citrix.com>
+---
+ hw/i386/xen/xen-hvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> +            return old_file_size;
-> +        }
-> +        last_cluster =3D qcow2_get_last_cluster(bs, old_file_size);
-> +        if (last_cluster < 0) {
-> +            error_setg_errno(errp, -last_cluster,
-> +                             "Failed to find the last cluster");
-> +            return last_cluster;
-> +        }
-
-My idea was rather that you just wouldn't truncate the image file if
-something fails here.  So in any of these new cases where you currently
-just report the whole truncate operation as having failed, you could
-just emit a warning and not do the truncation of bs->file.
-
-I can live with the current version, though, so:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-But I'll wait for a response from you before merging this series.
-
-Max
-
-> +        if ((last_cluster + 1) * s->cluster_size < old_file_size) {
-> +            ret =3D bdrv_truncate(bs->file, (last_cluster + 1) * s->cl=
-uster_size,
-> +                                PREALLOC_MODE_OFF, NULL);
-> +            if (ret < 0) {
-> +                error_setg_errno(errp, -ret,
-> +                                 "Failed to truncate the tail of the i=
-mage");
-> +                return ret;
-> +            }
-> +        }
->      } else {
->          ret =3D qcow2_grow_l1_table(bs, new_l1_size, true);
->          if (ret < 0) {
-> diff --git a/block/qcow2.h b/block/qcow2.h
-> index 5a289a81e2..782a206ecb 100644
-> --- a/block/qcow2.h
-> +++ b/block/qcow2.h
-> @@ -597,6 +597,7 @@ int qcow2_change_refcount_order(BlockDriverState *b=
-s, int refcount_order,
->                                  BlockDriverAmendStatusCB *status_cb,
->                                  void *cb_opaque, Error **errp);
->  int qcow2_shrink_reftable(BlockDriverState *bs);
-> +int64_t qcow2_get_last_cluster(BlockDriverState *bs, int64_t size);
-> =20
->  /* qcow2-cluster.c functions */
->  int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
->=20
-
-
-
---WhHVSbO4dv0devgFsHciVsA8do5lihTBE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlnLyzESHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AuWUH/1/cSjBNfgOEw4GHL0qFyBNHM2N3sSh0
-vSyJK6sxauPtZumgMBDtbQ+JEa1EvKMDy1R3H8CofnLl1D9OJ82SpBmy9dThJrGW
-cpTGDw50KF9j3o6IyHVEI6GCMP845uCZP8wWipK9l7qOEwp8gnGEjaelwOkHQi8S
-FnqVRBU9uhW4+rYkrBAGxKq8MnYvGew8xmxu4MFLdBzDmFvEJtxKha7IePCcp4hp
-fULsJPi9zyHRQaS8uN4kw26gxTmjJF/BNXWwtjPBMC+IeynHDMBVR0PJrNdvCVfF
-bAginiMMXKuLTuGRQ6b0IhREsZpiz1dx+NBWHrapCOVcUEaYrAgkJjk=
-=5NOI
------END PGP SIGNATURE-----
-
---WhHVSbO4dv0devgFsHciVsA8do5lihTBE--
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index d9ccd5d0d6..f79816a649 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -1446,7 +1446,7 @@ void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length)
+         if (rc) {
+             fprintf(stderr,
+                     "%s failed for "RAM_ADDR_FMT" ("RAM_ADDR_FMT"): %i, %s\n",
+-                    __func__, start, nb_pages, rc, strerror(-rc));
++                    __func__, start, nb_pages, rc, strerror(errno));
+         }
+     }
+ }
+-- 
+2.11.0
