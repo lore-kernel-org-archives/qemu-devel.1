@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dxCLG-0002qw-CT
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:25:35 -0400
+	(envelope-from <eblake@redhat.com>) id 1dxCNh-0003gn-HU
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:28:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dxCLD-0001PD-8E
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:25:34 -0400
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:48973)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dxCLC-0001Oh-W7
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:25:31 -0400
-Received: by mail-wm0-f54.google.com with SMTP id m127so18254120wmm.3
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 06:25:30 -0700 (PDT)
-References: <70a6ee09-f482-58f9-dded-2fa90bdab90e@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <de7c8fda-7e93-b3fb-c1bf-ef7768e808e8@redhat.com>
-Date: Wed, 27 Sep 2017 15:25:27 +0200
+	(envelope-from <eblake@redhat.com>) id 1dxCNg-000343-IP
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:28:05 -0400
+References: <20170927125340.12360-1-berrange@redhat.com>
+	<20170927125340.12360-2-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a4fbc91e-8d9e-bb6c-758f-672b0a943bcd@redhat.com>
+Date: Wed, 27 Sep 2017 08:27:56 -0500
 MIME-Version: 1.0
-In-Reply-To: <70a6ee09-f482-58f9-dded-2fa90bdab90e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Something wrong in usb_try_create_simple()
+In-Reply-To: <20170927125340.12360-2-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="EHjpgKl9grtNcdNgTTGlOd3iKG1oQjQLt"
+Subject: Re: [Qemu-devel] [PATCH v4 1/6] block: use 1 MB bounce buffers for
+ crypto instead of 16KB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +25,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
 
-On 27/09/2017 13:38, Thomas Huth wrote:
->  Hi Gerd,
-> 
-> today, I've run into this issue reported by valgrind:
-> 
-> $ valgrind x86_64-softmmu/qemu-system-x86_64 -device usb-ehci -nographic -S
-> ==2043== Memcheck, a memory error detector
-> ==2043== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.
-> ==2043== Using Valgrind-3.12.0 and LibVEX; rerun with -h for copyright info
-> ==2043== Command: x86_64-softmmu/qemu-system-x86_64 -device usb-ehci -nographic -S
-> ==2043== 
-> QEMU 2.10.50 monitor - type 'help' for more information
-> (qemu) device_add usb-tablet
-> (qemu) device_add usb-tablet
-> (qemu) device_add usb-tablet
-> (qemu) device_add usb-tablet
-> (qemu) device_add usb-tablet
-> (qemu) device_add usb-tablet
-> ==2043== Invalid read of size 8
-> ==2043==    at 0x60EF50: object_unparent (object.c:445)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--EHjpgKl9grtNcdNgTTGlOd3iKG1oQjQLt
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <a4fbc91e-8d9e-bb6c-758f-672b0a943bcd@redhat.com>
+Subject: Re: [PATCH v4 1/6] block: use 1 MB bounce buffers for crypto instead
+ of 16KB
+References: <20170927125340.12360-1-berrange@redhat.com>
+ <20170927125340.12360-2-berrange@redhat.com>
+In-Reply-To: <20170927125340.12360-2-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This object_unparent is not needed anymore.  See
+On 09/27/2017 07:53 AM, Daniel P. Berrange wrote:
+> Using 16KB bounce buffers creates a significant performance
+> penalty for I/O to encrypted volumes on storage which high
+> I/O latency (rotating rust & network drives), because it
+> triggers lots of fairly small I/O operations.
+>=20
+> On tests with rotating rust, and cache=3Dnone|directsync,
+> write speed increased from 2MiB/s to 32MiB/s, on a par
+> with that achieved by the in-kernel luks driver. With
+> other cache modes the in-kernel driver is still notably
+> faster because it is able to report completion of the
+> I/O request before any encryption is done, while the
+> in-QEMU driver must encrypt the data before completion.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  block/crypto.c | 28 +++++++++++++++-------------
+>  1 file changed, 15 insertions(+), 13 deletions(-)
 
-    commit 69382d8b3e8600b349c191394d761dcb480502cf
-    Author: Igor Mammedov <imammedo@redhat.com>
-    Date:   Mon Jul 25 11:59:22 2016 +0200
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-    qdev: Fix object reference leak in case device.realize() fails
 
-Paolo
+> @@ -464,12 +467,11 @@ block_crypto_co_writev(BlockDriverState *bs, int6=
+4_t sector_num,
+> =20
+>      qemu_iovec_init(&hd_qiov, qiov->niov);
+> =20
+> -    /* Bounce buffer so we have a linear mem region for
+> -     * entire sector. XXX optimize so we avoid bounce
+> -     * buffer in case that qiov->niov =3D=3D 1
+> +    /* Bounce buffer because we're not permitted to touch
+> +     * contents of qiov - it points to guest memory.
+>       */
+>      cipher_data =3D
+> -        qemu_try_blockalign(bs->file->bs, MIN(BLOCK_CRYPTO_MAX_SECTORS=
+ * 512,
+> +        qemu_try_blockalign(bs->file->bs, MIN(BLOCK_CRYPTO_MAX_IO_SIZE=
+,
+>                                                qiov->size));
 
-> ==2043==    by 0x580F0D: usb_try_create_simple (bus.c:346)
-> ==2043==    by 0x581BEB: usb_claim_port (bus.c:451)
-> ==2043==    by 0x582310: usb_qdev_realize (bus.c:257)
-> ==2043==    by 0x4CB399: device_set_realized (qdev.c:914)
-> ==2043==    by 0x60E26D: property_set_bool (object.c:1886)
-> ==2043==    by 0x61235E: object_property_set_qobject (qom-qobject.c:27)
-> ==2043==    by 0x61000F: object_property_set_bool (object.c:1162)
-> ==2043==    by 0x4567C3: qdev_device_add (qdev-monitor.c:630)
-> ==2043==    by 0x456D52: qmp_device_add (qdev-monitor.c:807)
-> ==2043==    by 0x470A99: hmp_device_add (hmp.c:1933)
-> ==2043==    by 0x3679C3: handle_hmp_command (monitor.c:3123)
-> ==2043==  Address 0x2100b430 is 32 bytes inside a block of size 6,448 free'd
-> ==2043==    at 0x4C2ACDD: free (vg_replace_malloc.c:530)
-> ==2043==    by 0xA04EBCD: g_free (in /usr/lib64/libglib-2.0.so.0.5000.3)
-> ==2043==    by 0x60F735: object_finalize (object.c:471)
-> ==2043==    by 0x60F735: object_unref (object.c:902)
-> ==2043==    by 0x60E746: object_property_del_child.isra.7 (object.c:427)
-> ==2043==    by 0x4CB2B2: device_set_realized (qdev.c:994)
-> ==2043==    by 0x60E26D: property_set_bool (object.c:1886)
-> ==2043==    by 0x61235E: object_property_set_qobject (qom-qobject.c:27)
-> ==2043==    by 0x61000F: object_property_set_bool (object.c:1162)
-> ==2043==    by 0x580EBB: usb_try_create_simple (bus.c:341)
-> ==2043==    by 0x581BEB: usb_claim_port (bus.c:451)
-> ==2043==    by 0x582310: usb_qdev_realize (bus.c:257)
-> ==2043==    by 0x4CB399: device_set_realized (qdev.c:914)
-> ==2043==  Block was alloc'd at
-> ==2043==    at 0x4C29BE3: malloc (vg_replace_malloc.c:299)
-> ==2043==    by 0xA04EABD: g_malloc (in /usr/lib64/libglib-2.0.so.0.5000.3)
-> ==2043==    by 0x60EE0C: object_new_with_type (object.c:482)
-> ==2043==    by 0x4CA080: qdev_try_create (qdev.c:152)
-> ==2043==    by 0x580E7A: usb_try_create_simple (bus.c:336)
-> ==2043==    by 0x581BEB: usb_claim_port (bus.c:451)
-> ==2043==    by 0x582310: usb_qdev_realize (bus.c:257)
-> ==2043==    by 0x4CB399: device_set_realized (qdev.c:914)
-> ==2043==    by 0x60E26D: property_set_bool (object.c:1886)
-> ==2043==    by 0x61235E: object_property_set_qobject (qom-qobject.c:27)
-> ==2043==    by 0x61000F: object_property_set_bool (object.c:1162)
-> ==2043==    by 0x4567C3: qdev_device_add (qdev-monitor.c:630)
-> 
-> Any idea what could be wrong here?
-> 
->  Thomas
-> 
-> 
+We allocate and free a bounce buffer for every write - is there anything
+we can do to reduce malloc() calls by reusing a bounce buffer associated
+with a coroutine (we have to be careful that parallel coroutines don't
+share bounce buffers, of course).  But that's independent of this patch.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--EHjpgKl9grtNcdNgTTGlOd3iKG1oQjQLt
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnLp10ACgkQp6FrSiUn
+Q2pgfggAjg7rk8zY0EpjItTw1JL7nf2b6Kalautx+cw8R49gPdQY58eNRteOZJG3
+k4gfHyrFFbxUFhAtDxVTF0qAEG6rzq/zEcFeNAE5uIURzPlXZNHmB+hJ3/9uoFmm
+zGCNN5D5UgHiU4DFj3ksvORk5RCRUOjKVqj3gC4EbM6/AawDL6Eqj+qWzxc5knbm
+GuxmsYAvJxXBnt4S+mZW7BKKENMZ6IK1Rte97dT/fKYf0aetIy5pDU43CYODbkCW
+6rQWq5WkltwM18AXBvU23CW90e0VcAw426lLYhH/ra8w1ed1NkiOcMBFAXqpEVrl
+u2jhDXfU4Z1sU7Diej/9mChzcECfPQ==
+=gj5S
+-----END PGP SIGNATURE-----
+
+--EHjpgKl9grtNcdNgTTGlOd3iKG1oQjQLt--
