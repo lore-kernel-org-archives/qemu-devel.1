@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70R-0001Wg-UF
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:46 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70U-0001a6-5k
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70Q-00049L-2G
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:43 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70R-0004BM-LM
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:46 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 27 Sep 2017 17:43:15 +1000
-Message-Id: <20170927074316.4454-26-david@gibson.dropbear.id.au>
+Date: Wed, 27 Sep 2017 17:43:13 +1000
+Message-Id: <20170927074316.4454-24-david@gibson.dropbear.id.au>
 In-Reply-To: <20170927074316.4454-1-david@gibson.dropbear.id.au>
 References: <20170927074316.4454-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 25/26] macio: pass channel into MACIOIDEState
- via qdev property
+Subject: [Qemu-devel] [PULL 23/26] mac_dbdma: QOMify
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,90 +24,131 @@ Cc: agraf@suse.de, groug@kaod.org, mark.cave-ayland@ilande.co.uk, balaton@eik.bm
 
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-One of the reasons macio_ide_register_dma() needs to exist is because the
-channel id isn't passed into the MACIO_IDE object. Pass in the channel id
-using a qdev property to remove this requirement.
-
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ide/macio.c        | 10 ++++++++--
- hw/misc/macio/macio.c |  4 +++-
- hw/ppc/mac.h          |  4 ++--
- 3 files changed, 13 insertions(+), 5 deletions(-)
+ hw/misc/macio/mac_dbdma.c  | 59 ++++++++++++++++++++++++++++++++++++++--------
+ include/hw/ppc/mac_dbdma.h |  6 +++++
+ 2 files changed, 55 insertions(+), 10 deletions(-)
 
-diff --git a/hw/ide/macio.c b/hw/ide/macio.c
-index 18ae952934..19d5f5a8b3 100644
---- a/hw/ide/macio.c
-+++ b/hw/ide/macio.c
-@@ -452,12 +452,18 @@ static void macio_ide_initfn(Object *obj)
-     s->ide_irq = qemu_allocate_irq(pmac_ide_irq, s, 1);
+diff --git a/hw/misc/macio/mac_dbdma.c b/hw/misc/macio/mac_dbdma.c
+index 979517263f..302f131c0e 100644
+--- a/hw/misc/macio/mac_dbdma.c
++++ b/hw/misc/macio/mac_dbdma.c
+@@ -851,13 +851,14 @@ static const VMStateDescription vmstate_dbdma = {
+     }
+ };
+ 
+-static void dbdma_reset(void *opaque)
++static void mac_dbdma_reset(DeviceState *d)
+ {
+-    DBDMAState *s = opaque;
++    DBDMAState *s = MAC_DBDMA(d);
+     int i;
+ 
+-    for (i = 0; i < DBDMA_CHANNELS; i++)
++    for (i = 0; i < DBDMA_CHANNELS; i++) {
+         memset(s->channels[i].regs, 0, DBDMA_SIZE);
++    }
  }
  
-+static Property macio_ide_properties[] = {
-+    DEFINE_PROP_UINT32("channel", MACIOIDEState, channel, 0),
-+    DEFINE_PROP_END_OF_LIST(),
+ static void dbdma_unassigned_rw(DBDMA_io *io)
+@@ -888,9 +889,22 @@ static void dbdma_unassigned_flush(DBDMA_io *io)
+ void* DBDMA_init (MemoryRegion **dbdma_mem)
+ {
+     DBDMAState *s;
+-    int i;
++    SysBusDevice *sbd;
++
++    s = MAC_DBDMA(object_new(TYPE_MAC_DBDMA));
++    object_property_set_bool(OBJECT(s), true, "realized", NULL);
++
++    sbd = SYS_BUS_DEVICE(s);
++    *dbdma_mem = sysbus_mmio_get_region(sbd, 0);
+ 
+-    s = g_malloc0(sizeof(DBDMAState));
++    return s;
++}
++
++static void mac_dbdma_init(Object *obj)
++{
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    DBDMAState *s = MAC_DBDMA(obj);
++    int i;
+ 
+     for (i = 0; i < DBDMA_CHANNELS; i++) {
+         DBDMA_channel *ch = &s->channels[i];
+@@ -901,12 +915,37 @@ void* DBDMA_init (MemoryRegion **dbdma_mem)
+         ch->io.channel = ch;
+     }
+ 
+-    memory_region_init_io(&s->mem, NULL, &dbdma_ops, s, "dbdma", 0x1000);
+-    *dbdma_mem = &s->mem;
+-    vmstate_register(NULL, -1, &vmstate_dbdma, s);
+-    qemu_register_reset(dbdma_reset, s);
++    memory_region_init_io(&s->mem, obj, &dbdma_ops, s, "dbdma", 0x1000);
++    sysbus_init_mmio(sbd, &s->mem);
++}
++
++static void mac_dbdma_realize(DeviceState *dev, Error **errp)
++{
++    DBDMAState *s = MAC_DBDMA(dev);
+ 
+     s->bh = qemu_bh_new(DBDMA_run_bh, s);
++}
+ 
+-    return s;
++static void mac_dbdma_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++
++    dc->realize = mac_dbdma_realize;
++    dc->reset = mac_dbdma_reset;
++    dc->vmsd = &vmstate_dbdma;
+ }
++
++static const TypeInfo mac_dbdma_type_info = {
++    .name = TYPE_MAC_DBDMA,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(DBDMAState),
++    .instance_init = mac_dbdma_init,
++    .class_init = mac_dbdma_class_init
 +};
 +
- static void macio_ide_class_init(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(oc);
- 
-     dc->realize = macio_ide_realizefn;
-     dc->reset = macio_ide_reset;
-+    dc->props = macio_ide_properties;
-     dc->vmsd = &vmstate_pmac;
-     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
- }
-@@ -487,10 +493,10 @@ void macio_ide_init_drives(MACIOIDEState *s, DriveInfo **hd_table)
-     }
- }
- 
--void macio_ide_register_dma(MACIOIDEState *s, void *dbdma, int channel)
-+void macio_ide_register_dma(MACIOIDEState *s, void *dbdma)
- {
-     s->dbdma = dbdma;
--    DBDMA_register_channel(dbdma, channel, s->dma_irq,
-+    DBDMA_register_channel(dbdma, s->channel, s->dma_irq,
-                            pmac_ide_transfer, pmac_ide_flush, s);
- }
- 
-diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-index f459f17f2f..41b377e7a0 100644
---- a/hw/misc/macio/macio.c
-+++ b/hw/misc/macio/macio.c
-@@ -159,7 +159,9 @@ static void macio_realize_ide(MacIOState *s, MACIOIDEState *ide,
-     sysbus_dev = SYS_BUS_DEVICE(ide);
-     sysbus_connect_irq(sysbus_dev, 0, irq0);
-     sysbus_connect_irq(sysbus_dev, 1, irq1);
--    macio_ide_register_dma(ide, s->dbdma, dmaid);
-+    qdev_prop_set_uint32(DEVICE(ide), "channel", dmaid);
-+    macio_ide_register_dma(ide, s->dbdma);
++static void mac_dbdma_register_types(void)
++{
++    type_register_static(&mac_dbdma_type_info);
++}
 +
-     object_property_set_bool(OBJECT(ide), true, "realized", errp);
- }
++type_init(mac_dbdma_register_types)
+diff --git a/include/hw/ppc/mac_dbdma.h b/include/hw/ppc/mac_dbdma.h
+index 21bd66f3c9..4bc6274656 100644
+--- a/include/hw/ppc/mac_dbdma.h
++++ b/include/hw/ppc/mac_dbdma.h
+@@ -26,6 +26,7 @@
+ #include "exec/memory.h"
+ #include "qemu/iov.h"
+ #include "sysemu/dma.h"
++#include "hw/sysbus.h"
  
-diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-index 300fc8ab68..b3a26c49c1 100644
---- a/hw/ppc/mac.h
-+++ b/hw/ppc/mac.h
-@@ -131,7 +131,7 @@ typedef struct MACIOIDEState {
-     /*< private >*/
-     SysBusDevice parent_obj;
-     /*< public >*/
--
-+    uint32_t channel;
-     qemu_irq real_ide_irq;
-     qemu_irq real_dma_irq;
-     qemu_irq ide_irq;
-@@ -147,7 +147,7 @@ typedef struct MACIOIDEState {
- } MACIOIDEState;
+ typedef struct DBDMA_io DBDMA_io;
  
- void macio_ide_init_drives(MACIOIDEState *ide, DriveInfo **hd_table);
--void macio_ide_register_dma(MACIOIDEState *ide, void *dbdma, int channel);
-+void macio_ide_register_dma(MACIOIDEState *ide, void *dbdma);
+@@ -160,6 +161,8 @@ typedef struct DBDMA_channel {
+ } DBDMA_channel;
  
- void macio_init(PCIDevice *dev,
-                 MemoryRegion *pic_mem,
+ typedef struct {
++    SysBusDevice parent_obj;
++
+     MemoryRegion mem;
+     DBDMA_channel channels[DBDMA_CHANNELS];
+     QEMUBH *bh;
+@@ -173,4 +176,7 @@ void DBDMA_register_channel(void *dbdma, int nchan, qemu_irq irq,
+ void DBDMA_kick(DBDMAState *dbdma);
+ void* DBDMA_init (MemoryRegion **dbdma_mem);
+ 
++#define TYPE_MAC_DBDMA "mac-dbdma"
++#define MAC_DBDMA(obj) OBJECT_CHECK(DBDMAState, (obj), TYPE_MAC_DBDMA)
++
+ #endif
 -- 
 2.13.5
