@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dxCVL-0005GK-GQ
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:36:00 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dxCYD-00065I-BQ
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:38:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dxCVH-0007dG-9W
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:35:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41520)
+	(envelope-from <ehabkost@redhat.com>) id 1dxCY7-0000Tc-L0
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:38:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44459)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dxCVH-0007cw-4J
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:35:55 -0400
-Date: Wed, 27 Sep 2017 21:35:44 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170927133544.GC8521@lemon.lan>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dxCY7-0000SN-Ed
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:38:51 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5177612987A
+	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 13:38:50 +0000 (UTC)
+Date: Wed, 27 Sep 2017 10:38:48 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170927133848.GE4115@localhost.localdomain>
 References: <20170927130339.21444-1-ehabkost@redhat.com>
-	<20170927130339.21444-4-ehabkost@redhat.com>
+	<20170927130339.21444-6-ehabkost@redhat.com>
+	<20170927132224.GK12223@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170927130339.21444-4-ehabkost@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/5] basevm: Call logging.basicConfig()
+In-Reply-To: <20170927132224.GK12223@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 5/5] scripts: Remove debug parameter from
+ QEMUMachine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +35,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Cleber Rosa <crosa@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-On Wed, 09/27 10:03, Eduardo Habkost wrote:
-> Just setting level=3DDEBUG when debug is enabled is not enough: we
-> need to set up a log handler if we want debug messages generated
-> using logging.getLogger(...).debug() to be printed.
->=20
-> This was not a problem before because logging.debug() calls
-> logging.basicConfig() implicitly, but it's safer to not rely on
-> that.
->=20
-> Cc: "Alex Benn=E9e" <alex.bennee@linaro.org>
-> Cc: Fam Zheng <famz@redhat.com>
-> Cc: "Philippe Mathieu-Daud=E9" <f4bug@amsat.org>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  tests/vm/basevm.py | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-> index 3c863bc237..686d88decf 100755
-> --- a/tests/vm/basevm.py
-> +++ b/tests/vm/basevm.py
-> @@ -227,8 +227,8 @@ def main(vmcls):
->          if not argv and not args.build_qemu and not args.build_image:
->              print "Nothing to do?"
->              return 1
-> -        if args.debug:
-> -            logging.getLogger().setLevel(logging.DEBUG)
-> +        logging.basicConfig(level=3D(logging.DEBUG if args.debug
-> +                                   else logging.WARN))
+On Wed, Sep 27, 2017 at 02:22:24PM +0100, Daniel P. Berrange wrote:
+> On Wed, Sep 27, 2017 at 10:03:39AM -0300, Eduardo Habkost wrote:
+> > All scripts that use the QEMUMachine and QEMUQtestMachine classes
+> > (device-crash-test, tests/migration/*, iotests.py, basevm.py)
+> > already configure logging.
+> > 
+> > The basicConfig() call inside QEMUMachine.__init__() is being
+> > kept just to make sure a script would still work if it didn't
+> > configure logging.
+> 
+> I don't find that compelling. IIUC, if we remove this basicConfig
+> they'll see a message that logging is not configured, which is a
+> suitable hint to fix the script to configure logging.
 
-I find the " ? : " expression in C more readable than this in Python. :)
+I don't see the benefit of requiring the caller to configure
+logging even if they just want the default behavior (WARN
+loglevel, logged to stderr).
 
->          vm =3D vmcls(debug=3Dargs.debug, vcpus=3Dargs.jobs)
->          if args.build_image:
->              if os.path.exists(args.image) and not args.force:
-> --=20
-> 2.13.5
->=20
+> >  
+> >          # just in case logging wasn't configured by the main script:
+> > -        logging.basicConfig(level=(logging.DEBUG if debug else logging.WARN))
+> > +        logging.basicConfig()
+> 
+> So I'd just remove this line entirely
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+I think it does no harm, and can save people from wasting time
+googling for "No handlers could be found for logger" just to find
+out they need to add a logging.basicConfig() call to their
+script.
+
+-- 
+Eduardo
