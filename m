@@ -1,15 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dxDnV-0001r2-Ee
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 10:58:55 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dxDsU-00051W-UG
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 11:04:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dxDnR-0002EQ-Mk
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 10:58:49 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 27 Sep 2017 16:58:33 +0200
-Message-Id: <1506524313-20037-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] disas: Always initialize
- read_memory_inner_func properly
+	(envelope-from <cohuck@redhat.com>) id 1dxDsQ-00056u-Oy
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 11:03:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37912)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dxDsQ-00056P-Fi
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 11:03:54 -0400
+Date: Wed, 27 Sep 2017 17:03:46 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170927170346.68ca0cd8.cohuck@redhat.com>
+In-Reply-To: <20170927144927.GC2108@work-vm>
+References: <20170926162058.30772-1-cohuck@redhat.com>
+	<20170926162058.30772-2-cohuck@redhat.com>
+	<338c8565-691e-a8bc-d8a6-3637ce13701d@redhat.com>
+	<20170927114717.72bd69f8.cohuck@redhat.com>
+	<e8bef299-5501-a59d-aba3-5a338227966e@linux.vnet.ibm.com>
+	<20170927125606.65dc514d.cohuck@redhat.com>
+	<14df9ad6-f0e9-cd51-04dd-4fe994808433@de.ibm.com>
+	<4681e677-9e5a-4c1c-8e22-dc5c51b7286d@redhat.com>
+	<20170927142837.GB2108@work-vm>
+	<20170927164644.42205e6f.cohuck@redhat.com>
+	<20170927144927.GC2108@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/1] s390x: create a compat s390 phb for
+ <=2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,62 +37,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Julian Brown <julian@codesourcery.com>, Richard Henderson <richard.henderson@linaro.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, qemu-devel@nongnu.org, agraf@suse.de, pasic@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com
 
-I've recently seen this with valgrind while running the HMP tester:
+On Wed, 27 Sep 2017 15:49:27 +0100
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
-==22373== Conditional jump or move depends on uninitialised value(s)
-==22373==    at 0x4A41FD: arm_disas_set_info (cpu.c:504)
-==22373==    by 0x3867A7: monitor_disas (disas.c:390)
-==22373==    by 0x38E80E: memory_dump (monitor.c:1339)
-==22373==    by 0x38FA43: handle_hmp_command (monitor.c:3123)
-==22373==    by 0x38FB9E: qmp_human_monitor_command (monitor.c:613)
-==22373==    by 0x4E3124: qmp_marshal_human_monitor_command (qmp-marshal.c:1736)
-==22373==    by 0x769678: do_qmp_dispatch (qmp-dispatch.c:104)
-==22373==    by 0x769678: qmp_dispatch (qmp-dispatch.c:131)
-==22373==    by 0x38B734: handle_qmp_command (monitor.c:3853)
-==22373==    by 0x76ED07: json_message_process_token (json-streamer.c:105)
-==22373==    by 0x78D40A: json_lexer_feed_char (json-lexer.c:323)
-==22373==    by 0x78D4CD: json_lexer_feed (json-lexer.c:373)
-==22373==    by 0x38A08D: monitor_qmp_read (monitor.c:3895)
+> * Cornelia Huck (cohuck@redhat.com) wrote:
+> > On Wed, 27 Sep 2017 15:28:38 +0100
+> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> >  =20
+> > > * David Hildenbrand (david@redhat.com) wrote: =20
+> > > > On 27.09.2017 12:59, Christian Borntraeger wrote:   =20
+> > > > >=20
+> > > > >=20
+> > > > > On 09/27/2017 12:56 PM, Cornelia Huck wrote:   =20
+> > > > >> On Wed, 27 Sep 2017 18:25:00 +0800
+> > > > >> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
+> > > > >>   =20
+> > > > >>> =E5=9C=A8 2017/9/27 =E4=B8=8B=E5=8D=885:47, Cornelia Huck =E5=
+=86=99=E9=81=93:   =20
+> > > > >>>> On Tue, 26 Sep 2017 20:40:25 +0200
+> > > > >>>> David Hildenbrand <david@redhat.com> wrote:   =20
+> > > > >>   =20
+> > > > >>>>> I'd really really really (did I mention really?) favor someth=
+ing like a
+> > > > >>>>> dummy device, because we could easily handle the !CONFIG_PCI =
+case then.
+> > > > >>>>>
+> > > > >>>>> All these compat options and conditions will kill us someday.=
+.. we're
+> > > > >>>>> already patching around that whole stuff way too much.
+> > > > >>>>>
+> > > > >>>>> If we ever unconditionally created a device, we should keep d=
+oing so.     =20
+> > > > >>>> Yes, that whole thing is horrible, especially interaction with=
+ compat
+> > > > >>>> machines.
+> > > > >>>>
+> > > > >>>> Do you have an idea on how to create such a dummy device (with=
+out
+> > > > >>>> having to effectively copy a lot of configured-out code)?
+> > > > >>>>
+> > > > >>>>     =20
+> > > > >>> How about in s390_pcihost_hot_plug() we check s390_has_feat(zpc=
+i)?
+> > > > >>> If no zpci feature, we avoid plugging any pci device.
+> > > > >>> Then we could always create phb.
+> > > > >>> I think pcibus's vmstate is only data to migrate.   =20
+> > > > >>
+> > > > >> That's still problematic if CONFIG_PCI is off. I currently don't=
+ have a
+> > > > >> better idea than either disallowing compat machines on builds wi=
+thout
+> > > > >> pci, or using a dummy device...   =20
+> > > > >=20
+> > > > > For this particular case your initial patch might be less problem=
+atic than
+> > > > > a dummy device, because the code that does the migration is NOT c=
+ontained
+> > > > > in s390 specific code but in common PCI code instead. We would ne=
+ed to keep
+> > > > > the dummy device always in a way that it will work with the commo=
+n PCI
+> > > > > code.
+> > > > >    =20
+> > > >=20
+> > > > Interesting, so how is migration then handled for e.g. x86 or other
+> > > > architectures that can work without CONFIG_PCI? I assume their migr=
+ation
+> > > > should also break?   =20
+> > >=20
+> > > It's tied to machine-type; the x86 i440fx and q35 machine types have
+> > > PCI; you can't disable PCI while still having those machine types.
+> > > (I don't know if you can disable PCI at all on x86) =20
+> >=20
+> > Ugh, that sounds like we need two machine types on s390x as well
+> > (s390x-ccw-virtio and s390x-ccw-virtio-nopci or so), built
+> > conditionally. That whole zpci detanglement is looking worse and
+> > worse :( =20
+>=20
+> Well fundamentally the migration expects to migrate something into
+> the same shaped hole on the destination;  if you've got a lump of PCI
+> config on the source there's got to be somewhere for it to fit on the
+> destination.
+> Now, if PCI is actually pretty rare; then you might be able to make
+> the host-pci bridge a normal device and not include it in any
+> machine type; that way those who want PCI can just instantiate
+> the host-pci bridge, and those who don't want it just stick with
+> the base machine type.
 
-And indeed, in monitor_disas, the read_memory_inner_func variable was
-not initialized, but arm_disas_set_info() expects this to be NULL
-or a valid pointer. Let's properly set this to NULL in the
-INIT_DISASSEMBLE_INFO to fix it in all functions that use the
-disassemble_info struct.
-
-Fixes: f7478a92dd9ee2276bfaa5b7317140d3f9d6a53b ("Fix Thumb-1 BE32 execution")
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- disas.c             | 1 -
- include/disas/bfd.h | 1 +
- 2 files changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/disas.c b/disas.c
-index d6a1eb9..54eea3f 100644
---- a/disas.c
-+++ b/disas.c
-@@ -190,7 +190,6 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
- 
-     s.cpu = cpu;
-     s.info.read_memory_func = target_read_memory;
--    s.info.read_memory_inner_func = NULL;
-     s.info.buffer_vma = code;
-     s.info.buffer_length = size;
-     s.info.print_address_func = generic_print_address;
-diff --git a/include/disas/bfd.h b/include/disas/bfd.h
-index b01e002..d99da68 100644
---- a/include/disas/bfd.h
-+++ b/include/disas/bfd.h
-@@ -479,6 +479,7 @@ int generic_symbol_at_address(bfd_vma, struct disassemble_info *);
-   (INFO).buffer_vma = 0, \
-   (INFO).buffer_length = 0, \
-   (INFO).read_memory_func = buffer_read_memory, \
-+  (INFO).read_memory_inner_func = NULL, \
-   (INFO).memory_error_func = perror_memory, \
-   (INFO).print_address_func = generic_print_address, \
-   (INFO).print_insn = NULL, \
--- 
-1.8.3.1
+I fear that ship has already sailed; the s390-ccw-virtio machine type
+has been instantiating a phb for quite some time, which means we have
+to drag this on in the compat machines...
