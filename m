@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70N-0001RS-51
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70M-0001Qg-OD
 	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70L-000444-Nn
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:39 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70I-0003zY-Be
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:38 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 27 Sep 2017 17:43:00 +1000
-Message-Id: <20170927074316.4454-11-david@gibson.dropbear.id.au>
+Date: Wed, 27 Sep 2017 17:42:51 +1000
+Message-Id: <20170927074316.4454-2-david@gibson.dropbear.id.au>
 In-Reply-To: <20170927074316.4454-1-david@gibson.dropbear.id.au>
 References: <20170927074316.4454-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 10/26] ppc/ide/macio: Add missing registers
+Subject: [Qemu-devel] [PULL 01/26] ppc/kvm: check some capabilities with
+ kvm_vm_check_extension()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,138 +21,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, groug@kaod.org, mark.cave-ayland@ilande.co.uk, balaton@eik.bme.hu, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, groug@kaod.org, mark.cave-ayland@ilande.co.uk, balaton@eik.bme.hu, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+From: Greg Kurz <groug@kaod.org>
 
-The timing register exists on all variants of MacIO IDE, we just
-store and return its value.
+The following capabilities are VM specific:
+- KVM_CAP_PPC_SMT_POSSIBLE
+- KVM_CAP_PPC_HTAB_FD
+- KVM_CAP_PPC_ALLOC_HTAB
 
-The interrupts register only exists on KeyLargo but it doesn't
-hurt to have it. The lack of this register causes MacOS X to
-hangs under some circumstances.
+If both KVM HV and KVM PR are present, checking them always return
+the HV value, even if we explicitely requested to use PR.
 
-Both are 32-bit only. The HW might support smaller access sizes
-but no known OS uses them.
+This has no visible effect for KVM_CAP_PPC_ALLOC_HTAB, because we also
+try the KVM_PPC_ALLOCATE_HTAB ioctl which is only suppored by HV. As
+a consequence, the spapr code doesn't even check KVM_CAP_PPC_HTAB_FD.
 
-Because the core IDE subsystem doesn't provide us with a way
-to query the main (level) interrupt state, nor do we have a way
-to know that DBDMA issued a (edge) interrupt, we reflect both
-through a private pair of qirq's in order to maintain the
-register state.
+However, this will cause kvmppc_hint_smt_possible(), introduced by
+commit fa98fbfcdfcb9, to report several VSMT modes (eg, Available
+VSMT modes: 8 4 2 1) whereas PR only support mode 1.
 
-Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+This patch fixes all three anyway to use kvm_vm_check_extension(). It
+is okay since the VM is already created at the time kvm_arch_init() or
+kvmppc_reset_htab() is called.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ide/macio.c | 44 +++++++++++++++++++++++++++++++++++++++++---
- hw/ppc/mac.h   |  6 +++++-
- 2 files changed, 46 insertions(+), 4 deletions(-)
+ target/ppc/kvm.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ide/macio.c b/hw/ide/macio.c
-index 9742c005d1..db5db390e7 100644
---- a/hw/ide/macio.c
-+++ b/hw/ide/macio.c
-@@ -331,6 +331,12 @@ static void pmac_ide_writel (void *opaque,
-     val = bswap32(val);
-     if (addr == 0) {
-         ide_data_writel(&d->bus, 0, val);
-+    } else if (addr == 0x20) {
-+        d->timing_reg = val;
-+    } else if (addr == 0x30) {
-+        if (val & 0x80000000u) {
-+            d->irq_reg &= 0x7fffffff;
-+        }
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 1deaf106d2..208c70e814 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -131,7 +131,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     cap_interrupt_level = kvm_check_extension(s, KVM_CAP_PPC_IRQ_LEVEL);
+     cap_segstate = kvm_check_extension(s, KVM_CAP_PPC_SEGSTATE);
+     cap_booke_sregs = kvm_check_extension(s, KVM_CAP_PPC_BOOKE_SREGS);
+-    cap_ppc_smt_possible = kvm_check_extension(s, KVM_CAP_PPC_SMT_POSSIBLE);
++    cap_ppc_smt_possible = kvm_vm_check_extension(s, KVM_CAP_PPC_SMT_POSSIBLE);
+     cap_ppc_rma = kvm_check_extension(s, KVM_CAP_PPC_RMA);
+     cap_spapr_tce = kvm_check_extension(s, KVM_CAP_SPAPR_TCE);
+     cap_spapr_tce_64 = kvm_check_extension(s, KVM_CAP_SPAPR_TCE_64);
+@@ -143,7 +143,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     cap_ppc_watchdog = kvm_check_extension(s, KVM_CAP_PPC_BOOKE_WATCHDOG);
+     /* Note: we don't set cap_papr here, because this capability is
+      * only activated after this by kvmppc_set_papr() */
+-    cap_htab_fd = kvm_check_extension(s, KVM_CAP_PPC_HTAB_FD);
++    cap_htab_fd = kvm_vm_check_extension(s, KVM_CAP_PPC_HTAB_FD);
+     cap_fixup_hcalls = kvm_check_extension(s, KVM_CAP_PPC_FIXUP_HCALL);
+     cap_ppc_smt = kvm_vm_check_extension(s, KVM_CAP_PPC_SMT);
+     cap_htm = kvm_vm_check_extension(s, KVM_CAP_PPC_HTM);
+@@ -2353,7 +2353,7 @@ int kvmppc_reset_htab(int shift_hint)
+         /* Full emulation, tell caller to allocate htab itself */
+         return 0;
      }
- }
- 
-@@ -342,6 +348,17 @@ static uint32_t pmac_ide_readl (void *opaque,hwaddr addr)
-     addr = (addr & 0xFFF) >> 4;
-     if (addr == 0) {
-         retval = ide_data_readl(&d->bus, 0);
-+    } else if (addr == 0x20) {
-+        retval = d->timing_reg;
-+    } else if (addr == 0x30) {
-+        /* This is an interrupt state register that only exists
-+         * in the KeyLargo and later variants. Bit 0x8000_0000
-+         * latches the DMA interrupt and has to be written to
-+         * clear. Bit 0x4000_0000 is an image of the disk
-+         * interrupt. MacOS X relies on this and will hang if
-+         * we don't provide at least the disk interrupt
-+         */
-+        retval = d->irq_reg;
-     } else {
-         retval = 0xFFFFFFFF;
-     }
-@@ -426,13 +443,32 @@ static void macio_ide_realizefn(DeviceState *dev, Error **errp)
- {
-     MACIOIDEState *s = MACIO_IDE(dev);
- 
--    ide_init2(&s->bus, s->irq);
-+    ide_init2(&s->bus, s->ide_irq);
- 
-     /* Register DMA callbacks */
-     s->dma.ops = &dbdma_ops;
-     s->bus.dma = &s->dma;
- }
- 
-+static void pmac_ide_irq(void *opaque, int n, int level)
-+{
-+    MACIOIDEState *s = opaque;
-+    uint32_t mask = 0x80000000u >> n;
-+
-+    /* We need to reflect the IRQ state in the irq register */
-+    if (level) {
-+        s->irq_reg |= mask;
-+    } else {
-+        s->irq_reg &= ~mask;
-+    }
-+
-+    if (n) {
-+        qemu_set_irq(s->real_ide_irq, level);
-+    } else {
-+        qemu_set_irq(s->real_dma_irq, level);
-+    }
-+}
-+
- static void macio_ide_initfn(Object *obj)
- {
-     SysBusDevice *d = SYS_BUS_DEVICE(obj);
-@@ -441,8 +477,10 @@ static void macio_ide_initfn(Object *obj)
-     ide_bus_new(&s->bus, sizeof(s->bus), DEVICE(obj), 0, 2);
-     memory_region_init_io(&s->mem, obj, &pmac_ide_ops, s, "pmac-ide", 0x1000);
-     sysbus_init_mmio(d, &s->mem);
--    sysbus_init_irq(d, &s->irq);
--    sysbus_init_irq(d, &s->dma_irq);
-+    sysbus_init_irq(d, &s->real_ide_irq);
-+    sysbus_init_irq(d, &s->real_dma_irq);
-+    s->dma_irq = qemu_allocate_irq(pmac_ide_irq, s, 0);
-+    s->ide_irq = qemu_allocate_irq(pmac_ide_irq, s, 1);
- }
- 
- static void macio_ide_class_init(ObjectClass *oc, void *data)
-diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-index 20cbddb4e4..300fc8ab68 100644
---- a/hw/ppc/mac.h
-+++ b/hw/ppc/mac.h
-@@ -132,7 +132,9 @@ typedef struct MACIOIDEState {
-     SysBusDevice parent_obj;
-     /*< public >*/
- 
--    qemu_irq irq;
-+    qemu_irq real_ide_irq;
-+    qemu_irq real_dma_irq;
-+    qemu_irq ide_irq;
-     qemu_irq dma_irq;
- 
-     MemoryRegion mem;
-@@ -140,6 +142,8 @@ typedef struct MACIOIDEState {
-     IDEDMA dma;
-     void *dbdma;
-     bool dma_active;
-+    uint32_t timing_reg;
-+    uint32_t irq_reg;
- } MACIOIDEState;
- 
- void macio_ide_init_drives(MACIOIDEState *ide, DriveInfo **hd_table);
+-    if (kvm_check_extension(kvm_state, KVM_CAP_PPC_ALLOC_HTAB)) {
++    if (kvm_vm_check_extension(kvm_state, KVM_CAP_PPC_ALLOC_HTAB)) {
+         int ret;
+         ret = kvm_vm_ioctl(kvm_state, KVM_PPC_ALLOCATE_HTAB, &shift);
+         if (ret == -ENOTTY) {
 -- 
 2.13.5
