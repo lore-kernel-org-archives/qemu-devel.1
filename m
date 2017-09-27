@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dxCay-0007us-Bz
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:41:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1dxCcU-0000lf-Ui
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:43:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dxCas-0001hW-45
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:41:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47784)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dxCar-0001gh-TE
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:41:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dxCao-0004Hc-Eq
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 13:41:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1EC3E2E852C
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 13:41:27 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1dxCcT-0002rY-VH
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:43:22 -0400
+References: <20170927125340.12360-1-berrange@redhat.com>
+	<20170927125340.12360-5-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5dec9dab-4e79-8194-42e8-2917dd4e0e8d@redhat.com>
+Date: Wed, 27 Sep 2017 08:43:11 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 27 Sep 2017 13:33:54 -0000
-From: Denys Zagorui <1719339@bugs.launchpad.net>
-Reply-To: Bug 1719339 <1719339@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150635197143.30872.17188090859541401647.malonedeb@wampee.canonical.com>
-Message-Id: <150651923473.5936.15995644373163842793.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1719339] Re: serial8250: too much work for irq3
+In-Reply-To: <20170927125340.12360-5-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="fbmrEwsgXsX3MR5QFP4w0u3M3AaUEFRCW"
+Subject: Re: [Qemu-devel] [PATCH v4 4/6] block: convert crypto driver to
+ bdrv_co_preadv|pwritev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,99 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
 
-Use simpler setup for reproducing. =
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--fbmrEwsgXsX3MR5QFP4w0u3M3AaUEFRCW
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <5dec9dab-4e79-8194-42e8-2917dd4e0e8d@redhat.com>
+Subject: Re: [PATCH v4 4/6] block: convert crypto driver to
+ bdrv_co_preadv|pwritev
+References: <20170927125340.12360-1-berrange@redhat.com>
+ <20170927125340.12360-5-berrange@redhat.com>
+In-Reply-To: <20170927125340.12360-5-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Was used only qemu-system-x86_64 (without using high-level wrappers and man=
-agers of virtual machines: libvirt, virsh, virt-install, virt-manager etc..=
-). My setup with two consoles:
+On 09/27/2017 07:53 AM, Daniel P. Berrange wrote:
+> Make the crypto driver implement the bdrv_co_preadv|pwritev
+> callbacks, and also use bdrv_co_preadv|pwritev for I/O
+> with the protocol driver beneath. This replaces sector based
+> I/O with byte based I/O, and allows us to stop assuming the
+> physical sector size matches the encryption sector size.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  block/crypto.c | 106 +++++++++++++++++++++++++++++--------------------=
+--------
+>  1 file changed, 54 insertions(+), 52 deletions(-)
+>=20
 
-/usr/local/bin/qemu-system-x86_64 -cpu host -enable-kvm -m 256 -smp 4
--kernel /home/dzagorui//bzImage -append 'root=3D/dev/ram0 loglevel=3D9 rw
-console=3DttyS0' -initrd /home/dzagorui/initrd.cpio -display none -chardev
-socket,id=3Dcharserial0,host=3D127.0.0.1,port=3D4002,telnet,server,nowait
--device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
-socket,id=3Dcharserial1,host=3D127.0.0.1,port=3D4003,telnet,server,nowait
--device isa-serial,chardev=3Dcharserial1,id=3Dserial1
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-I noticed one thing, that -smp parameter affects this issue. When -smp 1 i =
-can't reproduce this issue at all, when -smp 2 i can produce this issue onl=
-y in second console (ttyS1), when -smp 4 and higher the issue produces on b=
-oth consoles (ttyS1/ttyS0).
-My Host cpu i5-6200U has 2 cores and 4 threads.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-For reproducing was used this commands (no matter what console we use ttyS1=
- or ttyS0):
-#dmesg > /dev/ttyS*
-#dd if=3D/dev/zero of=3D/dev/ttyS*
 
--- =
+--fbmrEwsgXsX3MR5QFP4w0u3M3AaUEFRCW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1719339
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Title:
-  serial8250: too much work for irq3
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnLqu8ACgkQp6FrSiUn
+Q2qoCAf+OrucHxsg+uHfgl4LZgiUHd0lCEx3RGzt48iImpUihPFbX1zCJ8eUyCII
++v3U0zy23rU/vcNtV+wWioBOCOaBO+hbB33dQ5tFWflywduDL2T2XJiAGKGghp/G
+/BAa8Kn5LMDAyNrRCOxZ5DObChwRSntLTINhvxOYv/gk/U1nnz0mo7JRf7mDgo45
+/53oT2B4b5bYL7rfcsKshHYWWSH3wyBrEZxJYfDOYDdofKj8ePASrWGtvm/4/kUO
+iTGEEKaK/e1BjW9rnPZpCGGgpNDwgV6yCfOatS4UlbZvJF/a65a0lJWR2hzmDz/T
+DIY/12Au5XA/9VQ1CGr2W51kjuXgIw==
+=N0j+
+-----END PGP SIGNATURE-----
 
-Status in QEMU:
-  New
-
-Bug description:
-  It's know issue and sometimes mentioned since 2007. But it seems not
-  fixed.
-
-  http://lists.gnu.org/archive/html/qemu-devel/2008-02/msg00140.html
-  https://bugzilla.redhat.com/show_bug.cgi?id=3D986761
-  http://old-list-archives.xenproject.org/archives/html/xen-devel/2009-02/m=
-sg00696.html
-
-  I don't think fixes like increases PASS_LIMIT
-  (/drivers/tty/serial/8250.c) or remove this annoying message
-  (https://patchwork.kernel.org/patch/3920801/) is real fix. Some fix
-  was proposed by H. Peter Anvin  https://lkml.org/lkml/2008/2/7/485.
-
-  Can reproduce on Debian Strech host (Qemu 1:2.8+dfsg-6+deb9u2), Ubuntu
-  16.04.2 LTS (Qemu 1:2.5+dfsg-5ubuntu10.15) also tried to use master
-  branch (QEMU emulator version 2.10.50 (v2.10.0-766-ga43415ebfd-dirty))
-  if we write a lot of message into console (dmesg or dd if=3D/dev/zero
-  of=3D/dev/ttyS1).
-
-  /usr/local/bin/qemu-system-x86_64 -name guest=3Dultra1,debug-threads=3Don
-  -S -object
-  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-2=
-7-ultra1
-  /master-key.aes -machine pc-i440fx-2.8,accel=3Dkvm,usb=3Doff,dump-guest-
-  core=3Doff -cpu Skylake-
-  Client,ds=3Don,acpi=3Don,ss=3Don,ht=3Don,tm=3Don,pbe=3Don,dtes64=3Don,mon=
-itor=3Don,ds_cpl=3Don,vmx=3Don,smx=3Don,est=3Don,tm2=3Don,xtpr=3Don,pdcm=3D=
-on,osxsave=3Don,tsc_adjust=3Don,clflushopt=3Don,pdpe1gb=3Don
-  -m 4096 -realtime mlock=3Doff -smp 4,sockets=3D1,cores=3D4,threads=3D1 -u=
-uid
-  4537ca29-73b2-40c3-9b43-666de182ba5f -display none -no-user-config
-  -nodefaults -chardev
-  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-27-ultra1/mon=
-itor.sock,server,nowait
-  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
-  base=3Dutc,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddelay -no-h=
-pet
-  -no-shutdown -global PIIX4_PM.disable_s3=3D1 -global
-  PIIX4_PM.disable_s4=3D1 -boot strict=3Don -device ich9-usb-
-  ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x8.0x7 -drive
-  file=3D/home/dzagorui/csr/csr_disk.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddr=
-ive-
-  ide0-0-0 -device ide-hd,bus=3Dide.0,unit=3D0,drive=3Ddrive-
-  ide0-0-0,id=3Dide0-0-0,bootindex=3D1 -netdev tap,fd=3D26,id=3Dhostnet0 -d=
-evice
-  e1000,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:a9:4c:86,bus=3Dpci.0,add=
-r=3D0x3
-  -chardev
-  socket,id=3Dcharserial0,host=3D127.0.0.1,port=3D4000,telnet,server,nowait
-  -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
-  socket,id=3Dcharserial1,host=3D127.0.0.1,port=3D4001,telnet,server,nowait
-  -device isa-serial,chardev=3Dcharserial1,id=3Dserial1 -device virtio-
-  balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x2 -msg timestamp=3Don
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1719339/+subscriptions
+--fbmrEwsgXsX3MR5QFP4w0u3M3AaUEFRCW--
