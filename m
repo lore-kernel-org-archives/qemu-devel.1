@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dxEvm-00024O-Jz
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 12:11:27 -0400
+	(envelope-from <mst@redhat.com>) id 1dxEx6-0002ws-3Z
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 12:12:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dxEvh-0003qa-KU
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 12:11:26 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53682)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dxEvh-0003q1-Co
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 12:11:21 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dxEve-00061Q-Kg
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 16:11:18 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 928102E8490
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 16:11:18 +0000 (UTC)
+	(envelope-from <mst@redhat.com>) id 1dxEx1-0004g8-5T
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 12:12:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41784)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dxEx0-0004fN-SS
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 12:12:43 -0400
+Date: Wed, 27 Sep 2017 19:12:37 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170927190724-mutt-send-email-mst@kernel.org>
+References: <69fd8746-b2bd-31d0-4d70-792f40ef2d79@amd.com>
+	<20170926170901-mutt-send-email-mst@kernel.org>
+	<2fb6e86d-5afa-d7f0-6f62-8f81db5a5419@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 27 Sep 2017 16:03:46 -0000
-From: R Naveen Kumar <raju.naveenkumar.s@gmail.com>
-Reply-To: Bug 1719870 <1719870@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150651491208.6275.5437921155583182268.malonedeb@soybean.canonical.com>
-Message-Id: <150652822713.6013.15351949598650883048.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1719870] Re: Converting 100G VHDX fixed image to
- QCOW2 fails
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2fb6e86d-5afa-d7f0-6f62-8f81db5a5419@amd.com>
+Subject: Re: [Qemu-devel] libvirt/QEMU/SEV interaction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,66 +28,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Brijesh Singh <brijesh.singh@amd.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "Relph, Richard" <Richard.Relph@amd.com>
 
-PS > Get-VHD .\VM.vhdx
-ComputerName            : Server1
-Path                    : \VM.vhdx
-VhdFormat               : VHDX
-VhdType                 : Fixed
-FileSize                : 107378376704
-Size                    : 107374182400
-MinimumSize             : 107374182400
-LogicalSectorSize       : 4096
-PhysicalSectorSize      : 4096
-BlockSize               : 0
-ParentPath              :
-DiskIdentifier          : 53fd4aa7-562e-4bed-bc1c-2db71222e07e
-FragmentationPercentage : 0
-Alignment               : 1
-Attached                : False
-DiskNumber              :
-Key                     :
-IsDeleted               : False
-Number                  :
-PS > & 'C:\Program Files\qemu\qemu-img.exe' convert -O qcow2 .\VM.vhdx .\VM=
-.qcow2
-Assertion failed!
-Program: C:\Program Files\qemu\qemu-img.exe
-File: /home/stefan/src/qemu/repo.or.cz/qemu/ar7/block/io.c, Line 1034
-Expression: !qiov || bytes =3D=3D qiov->size
-PS > & 'C:\Program Files\qemu\qemu-img.exe' info .\VM.qcow2
-image: .\VM.qcow2
-file format: qcow2
-virtual size: 13G (13421772800 bytes)
-disk size: 1.4G
-cluster_size: 65536
-Format specific information:
-    compat: 1.1
-    lazy refcounts: false
-    refcount bits: 16
-    corrupt: false
+On Wed, Sep 27, 2017 at 08:39:24AM -0500, Brijesh Singh wrote:
+> Hi Michael,
+> 
+> 
+> On 09/26/2017 09:36 AM, Michael S. Tsirkin wrote:
+> 
+> ...
+> 
+> > > 8. libvirt launches the guest with "-S"
+> > > 9. While creating the SEV guest qemu does the following
+> > >   i) create encryption context using GO's DH, session-info and guest policy
+> > >      (LAUNCH_START)
+> > >   ii) encrypts the guest bios (LAUNCH_UPDATE_DATA)
+> > >   iii) calls LAUNCH_MEASUREMENT to get the encrypted bios measurement
+> > 
+> > This part troubles me. This seems to mean that the guest being launched
+> > must know what the measurement of the bios is going to be.  This means
+> > that the cloud provider can not update the bios without breaking guests.
+> > Also, while in practice you typically can run an old bios image on a new
+> > qemu instance, this is not really tested so would be very hard to
+> > support properly in QEMU.
+> > 
+> > 
+> 
+> 
+> The guest itself does not need to know the measurement of the bios --
+> the SEV launch flow empowers the GO to validate the bootstrap code (bios)
+> before GO can provide a confidential information to the guest. Please note
+> that the validating of the measurement flow is optional. GO can ask cloud
+> provider to ignore the measurement all together and boot the SEV guest.
 
--- =
+As the OS runs on top of the bios, it does not seem prudent to boot the
+SEV guest without a way to verify that the bios is safe to use.
+Linux generally trusts the firmware it runs on. Are you looking for
+examples of how a malicious firmware can leak info out of the guest?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1719870
+> The measurement flow can be useful when GO decides to provide a custom
+> bios and want to know that his bios is used for booting the guest. In this
+> case, since the guest owner knows the initial contents of the guest at boot,
+> he can request the measurement from the cloud provider and compare it with
+> what the guest owner expects.
 
-Title:
-  Converting 100G VHDX fixed image to QCOW2 fails
+I agree the measurement works for this, but If that's the only case, I'd
+say it's not all that interesting since most people will use a standard
+bios.
 
-Status in QEMU:
-  New
+I do think something needs to vaidate the bios though, and I do not
+think naively measuring the hash of the full bios is a way to do this
+that we can support well long term.
 
-Bug description:
-  Virtual Size recognized incorrectly for VHDX fixed disk and conversion
-  fails with error Expression: !qiov || bytes =3D=3D qiov->size
-
-
-  PS > & 'C:\Program Files\qemu\qemu-img.exe' --version
-  qemu-img version 2.10.0 (v2.10.0-11669-g579e69bd5b-dirty)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1719870/+subscriptions
+> 
+> 
+> > And this looks like a fundamental problem with the hash based
+> > measurement that's in hardware. So below I suggest that we layer
+> > some software on top to rely on the hash as little as possible.
+> > 
+> > 
+> > 
+> > > 10. By some interface we must propagate the measurement all the way to GO
+> > >    before libvirt starts the guest.
+> > > 11. GO verifies the measurement and if measurement matches then it may
+> > >   give a secret blob -- which must be injected into the guest before
+> > >   libvirt starts the VM. If verification failed, GO will request cloud
+> > >   provider to destroy the VM.
+> > > 12. After secret blob is injected into guest, we call LAUNCH_FINISH
+> > >    to destory the encryption context.
+> > > 13. libvirt issues "continue" command to resume the guest boot.
+> > > 
+> > > Please note that the measurement value is protected with transport
+> > > encryption key (TIK) and it changes on each run. Similarly the secret blob
+> > > provided by GO does not need to be protected using libvirt/qemu APIs. The
+> > > secret is protected by TIK. From qemu and libvirt point of view these are
+> > > blobs and must be passed as-is to the SEV FW.
+> > 
+> > So here's an alternative idea for starting guests:
+> > 
+> > How about building a minimal shim firmware that
+> > runs on a single CPU and uses no hardware at all,
+> > it just contains the secret blob.
+> > 
+> > That firmware just immediately stops and signals
+> > hypervisor that it is ready to be run in the cloud.
+> > 
+> > Have user generate and start this shim firmware as a guest in a private
+> > setup, then export it out using SEND_* commands.
+> > 
+> > Then instead of asking to launch guest, you ask provider
+> > to load it with RECEIVE_* commands.
+> > 
+> > Unlike bios the shim firmware
+> > can hopefully be static so supporting it across qemu
+> > versions should be easy.
+> > 
+> > The shim firmware then loads bios from qemu, verifies
+> > it in any way it sees fit (e.g. it could check a signature, version, etc:
+> > it is not limited to a hardware hash anymore).
+> > It then jumps to the bios.
+> > 
+> > 
+> > While not exactly the same, there is some similarity
+> > here with how people solved the issues around secureboot -
+> > by using a shim.
+> > 
