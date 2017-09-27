@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70U-0001a6-5k
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:47 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70R-0001Vi-0c
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70R-0004BM-LM
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:46 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70O-00047z-S4
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:43 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 27 Sep 2017 17:43:13 +1000
-Message-Id: <20170927074316.4454-24-david@gibson.dropbear.id.au>
+Date: Wed, 27 Sep 2017 17:43:06 +1000
+Message-Id: <20170927074316.4454-17-david@gibson.dropbear.id.au>
 In-Reply-To: <20170927074316.4454-1-david@gibson.dropbear.id.au>
 References: <20170927074316.4454-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 23/26] mac_dbdma: QOMify
+Subject: [Qemu-devel] [PULL 16/26] macio: convert pmac_ide_ops from old_mmio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,128 +27,219 @@ From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/misc/macio/mac_dbdma.c  | 59 ++++++++++++++++++++++++++++++++++++++--------
- include/hw/ppc/mac_dbdma.h |  6 +++++
- 2 files changed, 55 insertions(+), 10 deletions(-)
+ hw/ide/macio.c | 181 ++++++++++++++++++++++++---------------------------------
+ 1 file changed, 75 insertions(+), 106 deletions(-)
 
-diff --git a/hw/misc/macio/mac_dbdma.c b/hw/misc/macio/mac_dbdma.c
-index 979517263f..302f131c0e 100644
---- a/hw/misc/macio/mac_dbdma.c
-+++ b/hw/misc/macio/mac_dbdma.c
-@@ -851,13 +851,14 @@ static const VMStateDescription vmstate_dbdma = {
+diff --git a/hw/ide/macio.c b/hw/ide/macio.c
+index db5db390e7..18ae952934 100644
+--- a/hw/ide/macio.c
++++ b/hw/ide/macio.c
+@@ -255,131 +255,100 @@ static void pmac_ide_flush(DBDMA_io *io)
+ }
+ 
+ /* PowerMac IDE memory IO */
+-static void pmac_ide_writeb (void *opaque,
+-                             hwaddr addr, uint32_t val)
++static uint64_t pmac_ide_read(void *opaque, hwaddr addr, unsigned size)
+ {
+     MACIOIDEState *d = opaque;
+-
+-    addr = (addr & 0xFFF) >> 4;
+-    switch (addr) {
+-    case 1 ... 7:
+-        ide_ioport_write(&d->bus, addr, val);
+-        break;
+-    case 8:
+-    case 22:
+-        ide_cmd_write(&d->bus, 0, val);
++    uint64_t retval = 0xffffffff;
++    int reg = addr >> 4;
++
++    switch (reg) {
++    case 0x0:
++        if (size == 2) {
++            retval = ide_data_readw(&d->bus, 0);
++        } else if (size == 4) {
++            retval = ide_data_readl(&d->bus, 0);
++        }
+         break;
+-    default:
++    case 0x1 ... 0x7:
++        if (size == 1) {
++            retval = ide_ioport_read(&d->bus, reg);
++        }
+         break;
+-    }
+-}
+-
+-static uint32_t pmac_ide_readb (void *opaque,hwaddr addr)
+-{
+-    uint8_t retval;
+-    MACIOIDEState *d = opaque;
+-
+-    addr = (addr & 0xFFF) >> 4;
+-    switch (addr) {
+-    case 1 ... 7:
+-        retval = ide_ioport_read(&d->bus, addr);
++    case 0x8:
++    case 0x16:
++        if (size == 1) {
++            retval = ide_status_read(&d->bus, 0);
++        }
+         break;
+-    case 8:
+-    case 22:
+-        retval = ide_status_read(&d->bus, 0);
++    case 0x20:
++        if (size == 4) {
++            retval = d->timing_reg;
++        }
+         break;
+-    default:
+-        retval = 0xFF;
++    case 0x30:
++        /* This is an interrupt state register that only exists
++         * in the KeyLargo and later variants. Bit 0x8000_0000
++         * latches the DMA interrupt and has to be written to
++         * clear. Bit 0x4000_0000 is an image of the disk
++         * interrupt. MacOS X relies on this and will hang if
++         * we don't provide at least the disk interrupt
++         */
++        if (size == 4) {
++            retval = d->irq_reg;
++        }
+         break;
      }
+-    return retval;
+-}
+ 
+-static void pmac_ide_writew (void *opaque,
+-                             hwaddr addr, uint32_t val)
+-{
+-    MACIOIDEState *d = opaque;
+-
+-    addr = (addr & 0xFFF) >> 4;
+-    val = bswap16(val);
+-    if (addr == 0) {
+-        ide_data_writew(&d->bus, 0, val);
+-    }
+-}
+-
+-static uint32_t pmac_ide_readw (void *opaque,hwaddr addr)
+-{
+-    uint16_t retval;
+-    MACIOIDEState *d = opaque;
+-
+-    addr = (addr & 0xFFF) >> 4;
+-    if (addr == 0) {
+-        retval = ide_data_readw(&d->bus, 0);
+-    } else {
+-        retval = 0xFFFF;
+-    }
+-    retval = bswap16(retval);
+     return retval;
+ }
+ 
+-static void pmac_ide_writel (void *opaque,
+-                             hwaddr addr, uint32_t val)
+-{
+-    MACIOIDEState *d = opaque;
+ 
+-    addr = (addr & 0xFFF) >> 4;
+-    val = bswap32(val);
+-    if (addr == 0) {
+-        ide_data_writel(&d->bus, 0, val);
+-    } else if (addr == 0x20) {
+-        d->timing_reg = val;
+-    } else if (addr == 0x30) {
+-        if (val & 0x80000000u) {
+-            d->irq_reg &= 0x7fffffff;
+-        }
+-    }
+-}
+-
+-static uint32_t pmac_ide_readl (void *opaque,hwaddr addr)
++static void pmac_ide_write(void *opaque, hwaddr addr, uint64_t val,
++                           unsigned size)
+ {
+-    uint32_t retval;
+     MACIOIDEState *d = opaque;
+-
+-    addr = (addr & 0xFFF) >> 4;
+-    if (addr == 0) {
+-        retval = ide_data_readl(&d->bus, 0);
+-    } else if (addr == 0x20) {
+-        retval = d->timing_reg;
+-    } else if (addr == 0x30) {
+-        /* This is an interrupt state register that only exists
+-         * in the KeyLargo and later variants. Bit 0x8000_0000
+-         * latches the DMA interrupt and has to be written to
+-         * clear. Bit 0x4000_0000 is an image of the disk
+-         * interrupt. MacOS X relies on this and will hang if
+-         * we don't provide at least the disk interrupt
+-         */
+-        retval = d->irq_reg;
+-    } else {
+-        retval = 0xFFFFFFFF;
++    int reg = addr >> 4;
++
++    switch (reg) {
++    case 0x0:
++        if (size == 2) {
++            ide_data_writew(&d->bus, 0, val);
++        } else if (size == 4) {
++            ide_data_writel(&d->bus, 0, val);
++        }
++        break;
++    case 0x1 ... 0x7:
++        if (size == 1) {
++            ide_ioport_write(&d->bus, reg, val);
++        }
++        break;
++    case 0x8:
++    case 0x16:
++        if (size == 1) {
++            ide_cmd_write(&d->bus, 0, val);
++        }
++        break;
++    case 0x20:
++        if (size == 4) {
++            d->timing_reg = val;
++        }
++        break;
++    case 0x30:
++        if (size == 4) {
++            if (val & 0x80000000u) {
++                d->irq_reg &= 0x7fffffff;
++            }
++        }
++        break;
+     }
+-    retval = bswap32(retval);
+-    return retval;
+ }
+ 
+ static const MemoryRegionOps pmac_ide_ops = {
+-    .old_mmio = {
+-        .write = {
+-            pmac_ide_writeb,
+-            pmac_ide_writew,
+-            pmac_ide_writel,
+-        },
+-        .read = {
+-            pmac_ide_readb,
+-            pmac_ide_readw,
+-            pmac_ide_readl,
+-        },
+-    },
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .read = pmac_ide_read,
++    .write = pmac_ide_write,
++    .valid.min_access_size = 1,
++    .valid.max_access_size = 4,
++    .endianness = DEVICE_LITTLE_ENDIAN,
  };
  
--static void dbdma_reset(void *opaque)
-+static void mac_dbdma_reset(DeviceState *d)
- {
--    DBDMAState *s = opaque;
-+    DBDMAState *s = MAC_DBDMA(d);
-     int i;
- 
--    for (i = 0; i < DBDMA_CHANNELS; i++)
-+    for (i = 0; i < DBDMA_CHANNELS; i++) {
-         memset(s->channels[i].regs, 0, DBDMA_SIZE);
-+    }
- }
- 
- static void dbdma_unassigned_rw(DBDMA_io *io)
-@@ -888,9 +889,22 @@ static void dbdma_unassigned_flush(DBDMA_io *io)
- void* DBDMA_init (MemoryRegion **dbdma_mem)
- {
-     DBDMAState *s;
--    int i;
-+    SysBusDevice *sbd;
-+
-+    s = MAC_DBDMA(object_new(TYPE_MAC_DBDMA));
-+    object_property_set_bool(OBJECT(s), true, "realized", NULL);
-+
-+    sbd = SYS_BUS_DEVICE(s);
-+    *dbdma_mem = sysbus_mmio_get_region(sbd, 0);
- 
--    s = g_malloc0(sizeof(DBDMAState));
-+    return s;
-+}
-+
-+static void mac_dbdma_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    DBDMAState *s = MAC_DBDMA(obj);
-+    int i;
- 
-     for (i = 0; i < DBDMA_CHANNELS; i++) {
-         DBDMA_channel *ch = &s->channels[i];
-@@ -901,12 +915,37 @@ void* DBDMA_init (MemoryRegion **dbdma_mem)
-         ch->io.channel = ch;
-     }
- 
--    memory_region_init_io(&s->mem, NULL, &dbdma_ops, s, "dbdma", 0x1000);
--    *dbdma_mem = &s->mem;
--    vmstate_register(NULL, -1, &vmstate_dbdma, s);
--    qemu_register_reset(dbdma_reset, s);
-+    memory_region_init_io(&s->mem, obj, &dbdma_ops, s, "dbdma", 0x1000);
-+    sysbus_init_mmio(sbd, &s->mem);
-+}
-+
-+static void mac_dbdma_realize(DeviceState *dev, Error **errp)
-+{
-+    DBDMAState *s = MAC_DBDMA(dev);
- 
-     s->bh = qemu_bh_new(DBDMA_run_bh, s);
-+}
- 
--    return s;
-+static void mac_dbdma_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->realize = mac_dbdma_realize;
-+    dc->reset = mac_dbdma_reset;
-+    dc->vmsd = &vmstate_dbdma;
- }
-+
-+static const TypeInfo mac_dbdma_type_info = {
-+    .name = TYPE_MAC_DBDMA,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(DBDMAState),
-+    .instance_init = mac_dbdma_init,
-+    .class_init = mac_dbdma_class_init
-+};
-+
-+static void mac_dbdma_register_types(void)
-+{
-+    type_register_static(&mac_dbdma_type_info);
-+}
-+
-+type_init(mac_dbdma_register_types)
-diff --git a/include/hw/ppc/mac_dbdma.h b/include/hw/ppc/mac_dbdma.h
-index 21bd66f3c9..4bc6274656 100644
---- a/include/hw/ppc/mac_dbdma.h
-+++ b/include/hw/ppc/mac_dbdma.h
-@@ -26,6 +26,7 @@
- #include "exec/memory.h"
- #include "qemu/iov.h"
- #include "sysemu/dma.h"
-+#include "hw/sysbus.h"
- 
- typedef struct DBDMA_io DBDMA_io;
- 
-@@ -160,6 +161,8 @@ typedef struct DBDMA_channel {
- } DBDMA_channel;
- 
- typedef struct {
-+    SysBusDevice parent_obj;
-+
-     MemoryRegion mem;
-     DBDMA_channel channels[DBDMA_CHANNELS];
-     QEMUBH *bh;
-@@ -173,4 +176,7 @@ void DBDMA_register_channel(void *dbdma, int nchan, qemu_irq irq,
- void DBDMA_kick(DBDMAState *dbdma);
- void* DBDMA_init (MemoryRegion **dbdma_mem);
- 
-+#define TYPE_MAC_DBDMA "mac-dbdma"
-+#define MAC_DBDMA(obj) OBJECT_CHECK(DBDMAState, (obj), TYPE_MAC_DBDMA)
-+
- #endif
+ static const VMStateDescription vmstate_pmac = {
 -- 
 2.13.5
