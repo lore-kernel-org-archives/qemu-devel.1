@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dxFDV-0008Uy-Tx
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 12:29:46 -0400
+	(envelope-from <prvs=43635ca44=anthony.perard@citrix.com>)
+	id 1dxFGr-0000pK-ER
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 12:33:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dxFDV-000625-26
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 12:29:45 -0400
-References: <20170926175942.GE14717@localhost.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d53e621c-9c9a-3661-8b1c-3bdf4f651f79@redhat.com>
-Date: Wed, 27 Sep 2017 18:29:33 +0200
+	(envelope-from <prvs=43635ca44=anthony.perard@citrix.com>)
+	id 1dxFGn-00084m-Fc
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 12:33:13 -0400
+Received: from smtp.citrix.com ([66.165.176.89]:11727)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=43635ca44=anthony.perard@citrix.com>)
+	id 1dxFGn-000844-9y
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 12:33:09 -0400
+Date: Wed, 27 Sep 2017 17:33:06 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20170927163306.GI1859@perard.uk.xensource.com>
+References: <20170927161009.28091-1-wei.liu2@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <20170926175942.GE14717@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="HxlUI1j4tWXKA68Gn3xup8fUDf901WDVV"
-Subject: Re: [Qemu-devel] blockdev-commit design
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20170927161009.28091-1-wei.liu2@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH] xen-hvm: use errno in error message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,76 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, stefanha@redhat.com, jcody@redhat.com
+To: Wei Liu <wei.liu2@citrix.com>
+Cc: qemu-devel@nongnu.org, Xen-devel <xen-devel@lists.xenproject.org>, Stefano Stabellini <sstabellini@kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HxlUI1j4tWXKA68Gn3xup8fUDf901WDVV
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, stefanha@redhat.com,
- jcody@redhat.com
-Message-ID: <d53e621c-9c9a-3661-8b1c-3bdf4f651f79@redhat.com>
-Subject: Re: blockdev-commit design
-References: <20170926175942.GE14717@localhost.localdomain>
-In-Reply-To: <20170926175942.GE14717@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, Sep 27, 2017 at 05:10:09PM +0100, Wei Liu wrote:
+> The error code is encoding in errno, not rc.
 
-On 2017-09-26 19:59, Kevin Wolf wrote:
+                    ^ encoded
+I think.
 
-[...]
+Otherwise,
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 
->   * The old block-commit command decides between an "actual" commit job=
+Thanks,
 
->     and the mirror-based active commit based on whether top is the
->     active layer.
->=20
->     We don't get an option for the active layer any more now, so this
->     isn't how things can work for blockdev-commit. We could probably
->     check whether top has a BlockBackend parent, but that's not really
->     what we're interested in anyway. Maybe the best we could do to
->     decide this automatically is to check whether there is any parent o=
-f
->     top that requires write permissions. If there is, we need active
->     commit, otherwise the "normal" one is good enough.
->=20
->     However, who says that the intentions of the user stay as we deduce=
+> 
+> Signed-off-by: Wei Liu <wei.liu2@citrix.com>
+> ---
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony PERARD <anthony.perard@citrix.com>
+> ---
+>  hw/i386/xen/xen-hvm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+> index d9ccd5d0d6..f79816a649 100644
+> --- a/hw/i386/xen/xen-hvm.c
+> +++ b/hw/i386/xen/xen-hvm.c
+> @@ -1446,7 +1446,7 @@ void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length)
+>          if (rc) {
+>              fprintf(stderr,
+>                      "%s failed for "RAM_ADDR_FMT" ("RAM_ADDR_FMT"): %i, %s\n",
+> -                    __func__, start, nb_pages, rc, strerror(-rc));
+> +                    __func__, start, nb_pages, rc, strerror(errno));
+>          }
+>      }
+>  }
+> -- 
+> 2.11.0
+> 
 
->     them at the start of the block job? Who says that the user doesn't
->     want to add a writable disk as a user of the node while the block
->     job is running?
->=20
->     The optimal solution to this would be that the commit filter node
->     responds to permission requests and switches between active and
->     "normal" commit mode. I'm not sure how hard this would be to
->     implement.
->=20
->     As long as we don't have the automatic switch, do we have to allow
->     the user to specify explicitly which mode they want instead of
->     automatically choosing one?
-
-Probably a stupid question: What advantage does the commit job have over
-the mirror job? I.e. would it be possible to just always do a mirror?
-
-Max
-
-
---HxlUI1j4tWXKA68Gn3xup8fUDf901WDVV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlnL0e0SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A2hYH/17Suss87xN6J/8//NfJJyCKzLC/g66S
-AcmNNwhCi6CV/SRUi4J1sEvWHpFHfr8N3jCJOMIlTKqtQNYWwBZ6xpCirG06W3ic
-w8mHXvtdBcmoY4UUHbvtGAuB00dWNFTYN4oJCY34r8q+WR7PeT6Iiqw9DjRpCn0x
-/Cepsw0447xj1llLGwdFWp3ZfEJXlsj2xvV4VUO4JOh0KQckC132gi/pDMEKijdc
-wfL3LaFtMOXZFVBjmthSrzIs3wjRsH2jOhDUBkxzxY2Idc8nWTSSDudjXfTwvZi5
-6TfudZgW4cMzVHnhtbtSvPtDwzQOXNhpCQ8ryTcGKBCAjyE+XahGEx4=
-=v6rl
------END PGP SIGNATURE-----
-
---HxlUI1j4tWXKA68Gn3xup8fUDf901WDVV--
+-- 
+Anthony PERARD
