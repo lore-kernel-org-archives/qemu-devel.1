@@ -1,16 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Bharat.Bhushan@nxp.com>) id 1dx5xF-0000z8-Dn
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 02:36:22 -0400
+	(envelope-from <Bharat.Bhushan@nxp.com>) id 1dx5xO-00017A-40
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 02:36:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Bharat.Bhushan@nxp.com>) id 1dx5xE-00087n-Ag
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 02:36:21 -0400
+	(envelope-from <Bharat.Bhushan@nxp.com>) id 1dx5xJ-00089l-99
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 02:36:30 -0400
 From: Bharat Bhushan <Bharat.Bhushan@nxp.com>
-Date: Wed, 27 Sep 2017 12:03:15 +0530
-Message-ID: <1506494000-31982-1-git-send-email-Bharat.Bhushan@nxp.com>
+Date: Wed, 27 Sep 2017 12:03:16 +0530
+Message-ID: <1506494000-31982-2-git-send-email-Bharat.Bhushan@nxp.com>
+In-Reply-To: <1506494000-31982-1-git-send-email-Bharat.Bhushan@nxp.com>
+References: <1506494000-31982-1-git-send-email-Bharat.Bhushan@nxp.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 0/5] virtio-iommu: VFIO integration
+Subject: [Qemu-devel] [PATCH v4 1/5] target/arm/kvm: Translate the MSI
+ doorbell in kvm_arch_fixup_msi_route
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,53 +25,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger@redhat.com, eric.auger.pro@gmail.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: wei@redhat.com, kevin.tian@intel.com, marc.zyngier@arm.com, tn@semihalf.com, will.deacon@arm.com, drjones@redhat.com, robin.murphy@arm.com, christoffer.dall@linaro.org, bharatb.yadav@gmail.com, Bharat Bhushan <Bharat.Bhushan@nxp.com>
 
-This patch series integrates VFIO/VHOST with virtio-iommu.
+Translate msi address if device is behind virtio-iommu.
+This logic is similar to vSMMUv3/Intel iommu emulation.
 
-This version is mainly about rebasing on v4 version on
-virtio-iommu device framework from Eric Augur and
-addresing review comments.
+This RFC patch does not handle the case where both vsmmuv3 and
+virtio-iommu are available.
 
-This patch series allows PCI pass-through using virtio-iommu.
-  
-This series is based on:
- - virtio-iommu kernel driver by Jean-Philippe Brucker
-    [1] [RFC] virtio-iommu version 0.4
-    git://linux-arm.org/virtio-iommu.git branch viommu/v0.4
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Bharat Bhushan <Bharat.Bhushan@nxp.com>
+---
+v3->v4
+ - No changes
 
- - virtio-iommu device emulation by Eric Augur.
-   [RFC v4 00/16] VIRTIO-IOMMU device
-   https://github.com/eauger/qemu/tree/v2.10.0-virtio-iommu-v4
+ target/arm/kvm.c        | 27 +++++++++++++++++++++++++++
+ target/arm/trace-events |  3 +++
+ 2 files changed, 30 insertions(+)
 
-Changes are available at : https://github.com/bharaty/qemu.git virtio-iommu-vfio-integration-v4
-
-v3->v4:
- - Rebase to v4 version from Eric
- - Fixes from Eric with DPDK in VM
- - Logical division in multiple patches
-
-v2->v3:
- - This series is based on "[RFC v3 0/8] VIRTIO-IOMMU device"
-   Which is based on top of v2.10-rc0 that
- - Fixed issue with two PCI devices
- - Addressed review comments
-
-v1->v2:
-  - Added trace events
-  - removed vSMMU3 link in patch description
-
-Bharat Bhushan (5):
-  target/arm/kvm: Translate the MSI doorbell in kvm_arch_fixup_msi_route
-  virtio-iommu: Add iommu notifier for map/unmap
-  virtio-iommu: Call iommu notifier for attach/detach
-  virtio-iommu: add iommu replay
-  virtio-iommu: add iommu notifier memory-region
-
- hw/virtio/trace-events           |   5 ++
- hw/virtio/virtio-iommu.c         | 181 ++++++++++++++++++++++++++++++++++++++-
- include/hw/virtio/virtio-iommu.h |   6 ++
- target/arm/kvm.c                 |  27 ++++++
- target/arm/trace-events          |   3 +
- 5 files changed, 219 insertions(+), 3 deletions(-)
-
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 211a7bf..895a630 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -21,7 +21,11 @@
+ #include "kvm_arm.h"
+ #include "cpu.h"
+ #include "internals.h"
++#include "trace.h"
+ #include "hw/arm/arm.h"
++#include "hw/pci/pci.h"
++#include "hw/pci/msi.h"
++#include "hw/virtio/virtio-iommu.h"
+ #include "exec/memattrs.h"
+ #include "exec/address-spaces.h"
+ #include "hw/boards.h"
+@@ -666,6 +670,29 @@ int kvm_arm_vgic_probe(void)
+ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
+                              uint64_t address, uint32_t data, PCIDevice *dev)
+ {
++    AddressSpace *as = pci_device_iommu_address_space(dev);
++    IOMMUTLBEntry entry;
++    IOMMUDevice *sdev;
++    IOMMUMemoryRegionClass *imrc;
++
++    if (as == &address_space_memory) {
++        return 0;
++    }
++
++    /* MSI doorbell address is translated by an IOMMU */
++    sdev = container_of(as, IOMMUDevice, as);
++
++    imrc = memory_region_get_iommu_class_nocheck(&sdev->iommu_mr);
++
++    entry = imrc->translate(&sdev->iommu_mr, address, IOMMU_WO);
++
++    route->u.msi.address_lo = entry.translated_addr;
++    route->u.msi.address_hi = entry.translated_addr >> 32;
++
++    trace_kvm_arm_fixup_msi_route(address, sdev->devfn,
++                                  sdev->iommu_mr.parent_obj.name,
++                                  entry.translated_addr);
++
+     return 0;
+ }
+ 
+diff --git a/target/arm/trace-events b/target/arm/trace-events
+index 9e37131..8b3c220 100644
+--- a/target/arm/trace-events
++++ b/target/arm/trace-events
+@@ -8,3 +8,6 @@ arm_gt_tval_write(int timer, uint64_t value) "gt_tval_write: timer %d value 0x%"
+ arm_gt_ctl_write(int timer, uint64_t value) "gt_ctl_write: timer %d value 0x%" PRIx64
+ arm_gt_imask_toggle(int timer, int irqstate) "gt_ctl_write: timer %d IMASK toggle, new irqstate %d"
+ arm_gt_cntvoff_write(uint64_t value) "gt_cntvoff_write: value 0x%" PRIx64
++
++# target/arm/kvm.c
++kvm_arm_fixup_msi_route(uint64_t iova, uint32_t devid, const char *name, uint64_t gpa) "MSI addr = 0x%"PRIx64" is translated for devfn=%d through %s into 0x%"PRIx64
 -- 
 1.9.3
