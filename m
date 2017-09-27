@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dxKo3-0001uq-5z
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 18:27:52 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dxKoN-00024I-TL
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 18:28:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dxKo2-0001UL-6J
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 18:27:51 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:35195)
+	(envelope-from <alistair23@gmail.com>) id 1dxKoM-0001di-Tn
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 18:28:11 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:56212)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1dxKo1-0001U7-Vd
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 18:27:50 -0400
-Received: by mail-wr0-x243.google.com with SMTP id n64so6722635wrb.2
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 15:27:49 -0700 (PDT)
+	id 1dxKoM-0001dX-NM
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 18:28:10 -0400
+Received: by mail-wm0-x243.google.com with SMTP id u138so47217wmu.4
+	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 15:28:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170927203225.30896-2-ehabkost@redhat.com>
+In-Reply-To: <20170927203225.30896-3-ehabkost@redhat.com>
 References: <20170927203225.30896-1-ehabkost@redhat.com>
-	<20170927203225.30896-2-ehabkost@redhat.com>
+	<20170927203225.30896-3-ehabkost@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 27 Sep 2017 15:27:18 -0700
-Message-ID: <CAKmqyKMVLuiqsN0THX-r1DrCEF6BYD7BOOjNFqVZc7eS+v=TWA@mail.gmail.com>
+Date: Wed, 27 Sep 2017 15:27:39 -0700
+Message-ID: <CAKmqyKOT_QOpo7isuiV-x2Sis2BHCP36U55Kz0nnbx84tn2WEQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/2] vl: Eliminate defconfig variable
+Subject: Re: [Qemu-devel] [PATCH 2/2] qemu-options: Deprecate -nodefconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,10 +33,12 @@ To: Eduardo Habkost <ehabkost@redhat.com>
 Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
 On Wed, Sep 27, 2017 at 1:32 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> Both -nodefconfig and -no-user-config options do the same thing
-> today, we only need one variable to keep track of them.
+> Since 2012 (commit ba6212d8 "Eliminate cpus-x86_64.conf file") we
+> have no default config files that would be disabled using
+> -nodefconfig.  Update documentation and document -nodefconfig as
+> deprecated.
 >
-> Suggested-by: Markus Armbruster <armbru@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
 Acked-by: Alistair Francis <alistair.francis@xilinx.com>
@@ -45,39 +47,45 @@ Thanks,
 Alistair
 
 > ---
->  vl.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
+>  qemu-options.hx | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
 >
-> diff --git a/vl.c b/vl.c
-> index 4fd01fda91..b347a97a5b 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3093,7 +3093,6 @@ int main(int argc, char **argv, char **envp)
->      const char *qtest_log = NULL;
->      const char *pid_file = NULL;
->      const char *incoming = NULL;
-> -    bool defconfig = true;
->      bool userconfig = true;
->      bool nographic = false;
->      DisplayType display_type = DT_DEFAULT;
-> @@ -3194,8 +3193,6 @@ int main(int argc, char **argv, char **envp)
->              popt = lookup_opt(argc, argv, &optarg, &optind);
->              switch (popt->index) {
->              case QEMU_OPTION_nodefconfig:
-> -                defconfig = false;
-> -                break;
->              case QEMU_OPTION_nouserconfig:
->                  userconfig = false;
->                  break;
-> @@ -3203,7 +3200,7 @@ int main(int argc, char **argv, char **envp)
->          }
->      }
->
-> -    if (defconfig && userconfig) {
-> +    if (userconfig) {
->          if (qemu_read_default_config_file() < 0) {
->              exit(1);
->          }
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 39225ae6c3..bc52e79184 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -4069,24 +4069,25 @@ output to stdout. This can be later used as input file for @code{-readconfig} op
+>  ETEXI
+>  DEF("nodefconfig", 0, QEMU_OPTION_nodefconfig,
+>      "-nodefconfig\n"
+> -    "                do not load default config files at startup\n",
+> +    "                do not load default config files at startup (deprecated)\n",
+>      QEMU_ARCH_ALL)
+>  STEXI
+>  @item -nodefconfig
+>  @findex -nodefconfig
+> -Normally QEMU loads configuration files from @var{sysconfdir} and @var{datadir} at startup.
+> -The @code{-nodefconfig} option will prevent QEMU from loading any of those config files.
+> +This option was used to disable loading of config files from @var{sysconfdir}
+> +and @var{datadir}, but it is deprecated as QEMU doesn't load any config files
+> +from @var{datadir} anymore.  To disable loading of config files from
+> +@var{sysconfdir}, use @code{-no-user-config} instead.
+>  ETEXI
+>  DEF("no-user-config", 0, QEMU_OPTION_nouserconfig,
+>      "-no-user-config\n"
+> -    "                do not load user-provided config files at startup\n",
+> +    "                do not load default user-provided config files at startup\n",
+>      QEMU_ARCH_ALL)
+>  STEXI
+>  @item -no-user-config
+>  @findex -no-user-config
+>  The @code{-no-user-config} option makes QEMU not load any of the user-provided
+> -config files on @var{sysconfdir}, but won't make it skip the QEMU-provided config
+> -files from @var{datadir}.
+> +config files on @var{sysconfdir}.
+>  ETEXI
+>  DEF("trace", HAS_ARG, QEMU_OPTION_trace,
+>      "-trace [[enable=]<pattern>][,events=<file>][,file=<file>]\n"
 > --
 > 2.13.5
 >
