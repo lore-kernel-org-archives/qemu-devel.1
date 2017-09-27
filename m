@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dx8CB-0003vO-Eg
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 04:59:56 -0400
+	(envelope-from <quintela@redhat.com>) id 1dx8CP-0004AC-P5
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:00:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dx8CA-0003qC-IT
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 04:59:55 -0400
-References: <1506088275-31734-1-git-send-email-wei@redhat.com>
-	<20170926105422.vfaalzzmhufvrk34@kamzik.brq.redhat.com>
-	<CAFEAcA_Wk5U89QAUHx0tsJR57LLASgnKwtMQk9-PY7sBZAm+hg@mail.gmail.com>
-	<20170926153705.365mvhaf6rj65rvl@kamzik.brq.redhat.com>
-	<b860e3fd-64c3-f37d-4ae2-424936663697@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <b9bb5d96-14af-fde5-95a4-6d56a718f548@redhat.com>
-Date: Wed, 27 Sep 2017 10:59:44 +0200
+	(envelope-from <quintela@redhat.com>) id 1dx8CK-0003zU-Dy
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:00:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39748)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dx8CK-0003yx-9A
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 05:00:04 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170925112917.21340-5-dgilbert@redhat.com> (David Alan
+	Gilbert's message of "Mon, 25 Sep 2017 12:29:15 +0100")
+References: <20170925112917.21340-1-dgilbert@redhat.com>
+	<20170925112917.21340-5-dgilbert@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 27 Sep 2017 11:00:02 +0200
+Message-ID: <87shf8bjot.fsf@secure.laptop>
 MIME-Version: 1.0
-In-Reply-To: <b860e3fd-64c3-f37d-4ae2-424936663697@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] mach-virt: Set VM's SMBIOS system
- version to mc->name
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 4/6] migration: wire vmstate_save_state
+ errors up to vmstate_subsection_save
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +29,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wei@redhat.com>, Andrew Jones <drjones@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, peterx@redhat.com, famz@redhat.com, peter.maydell@linaro.org, cohuck@redhat.com, rth@twiddle.net
 
-Hi Wei,
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> Route the errors from vmstate_subsection_save up through
+> vmstate_subsection_save (and back down, all rather recursive).
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-On 26/09/2017 18:52, Wei Huang wrote:
-> 
-> 
-> On 09/26/2017 10:37 AM, Andrew Jones wrote:
->> On Tue, Sep 26, 2017 at 04:28:03PM +0100, Peter Maydell wrote:
->>> On 26 September 2017 at 11:54, Andrew Jones <drjones@redhat.com> wrote:
->>>> On Fri, Sep 22, 2017 at 08:51:15AM -0500, Wei Huang wrote:
->>>>> Instead of using "1.0" as the system version of SMBIOS, we should use
->>>>> mc->name for mach-virt machine type. This matches with x86 code and
->>>>> prevents the smbios_table.machine_type test of Avocado from failing.
->>>>>
->>>>> Signed-off-by: Wei Huang <wei@redhat.com>
->>>>> ---
->>>>>  hw/arm/virt.c | 3 ++-
->>>>>  1 file changed, 2 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->>>>> index 9e18b41..8d0c6a9 100644
->>>>> --- a/hw/arm/virt.c
->>>>> +++ b/hw/arm/virt.c
->>>>> @@ -1189,6 +1189,7 @@ static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
->>>>>
->>>>>  static void virt_build_smbios(VirtMachineState *vms)
->>>>>  {
->>>>> +    MachineClass *mc = MACHINE_GET_CLASS(vms);
->>>>>      uint8_t *smbios_tables, *smbios_anchor;
->>>>>      size_t smbios_tables_len, smbios_anchor_len;
->>>>>      const char *product = "QEMU Virtual Machine";
->>>>> @@ -1202,7 +1203,7 @@ static void virt_build_smbios(VirtMachineState *vms)
->>>>>      }
->>>>>
->>>>>      smbios_set_defaults("QEMU", product,
->>>>> -                        "1.0", false, true, SMBIOS_ENTRY_POINT_30);
->>>>> +                        mc->name, false, true, SMBIOS_ENTRY_POINT_30);
->>>>>
->>>>>      smbios_get_tables(NULL, 0, &smbios_tables, &smbios_tables_len,
->>>>>                        &smbios_anchor, &smbios_anchor_len);
->>>>> --
->>>>> 2.7.5
->>>>>
->>>>>
->>>>
->>>> Reviewed-by: Andrew Jones <drjones@redhat.com>
->>>
->>> Are we OK to change this without having to tie it to the machine
->>> version number?
->>
->> Let's tie it to be safe. Eric has a 2.11 machine version patch in his
->> virtio-iommu series, but, like for 2.10, he or Wei should probably just
->> post that independently to make sure it gets in.
->>
->> Wei, will you post the 2.11 version patch?
-> 
-> Will do
-
-yep, feel free to reuse my patch and remove the noiommu field.
-
-Thanks
-
-Eric
-> 
->>
->> Thanks,
->> drew
->>
-> 
+Reviewed-by: Juan Quintela <quintela@redhat.com>
