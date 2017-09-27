@@ -1,16 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dxC0e-0000x5-0C
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:04:22 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dxC0h-0000yS-Bv
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:04:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dxC0a-0006iK-P1
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:04:16 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dxC0d-0006kc-8b
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:04:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41508)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dxC0d-0006kK-2L
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:04:15 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Wed, 27 Sep 2017 10:03:36 -0300
-Message-Id: <20170927130339.21444-3-ehabkost@redhat.com>
+Date: Wed, 27 Sep 2017 10:03:37 -0300
+Message-Id: <20170927130339.21444-4-ehabkost@redhat.com>
 In-Reply-To: <20170927130339.21444-1-ehabkost@redhat.com>
 References: <20170927130339.21444-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/5] iotests: Set up Python logging
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 3/5] basevm: Call logging.basicConfig()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,39 +27,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>, Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Set up Python logging module instead of relying on
-QEMUMachine._debug to enable debugging messages.
+Just setting level=3DDEBUG when debug is enabled is not enough: we
+need to set up a log handler if we want debug messages generated
+using logging.getLogger(...).debug() to be printed.
 
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org
+This was not a problem before because logging.debug() calls
+logging.basicConfig() implicitly, but it's safer to not rely on
+that.
+
+Cc: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>
+Cc: Fam Zheng <famz@redhat.com>
+Cc: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 3 +++
- 1 file changed, 3 insertions(+)
+ tests/vm/basevm.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 1af117e37d..36a7757aaf 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -28,6 +28,7 @@ import qtest
- import struct
- import json
- import signal
-+import logging
- 
- 
- # This will not work if arguments contain spaces but is necessary if we
-@@ -467,6 +468,8 @@ def main(supported_fmts=[], supported_oses=['linux']):
-     else:
-         output = StringIO.StringIO()
- 
-+    logging.basicConfig(level=(logging.DEBUG if debug else logging.WARN))
-+
-     class MyTestRunner(unittest.TextTestRunner):
-         def __init__(self, stream=output, descriptions=True, verbosity=verbosity):
-             unittest.TextTestRunner.__init__(self, stream, descriptions, verbosity)
--- 
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index 3c863bc237..686d88decf 100755
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -227,8 +227,8 @@ def main(vmcls):
+         if not argv and not args.build_qemu and not args.build_image:
+             print "Nothing to do?"
+             return 1
+-        if args.debug:
+-            logging.getLogger().setLevel(logging.DEBUG)
++        logging.basicConfig(level=3D(logging.DEBUG if args.debug
++                                   else logging.WARN))
+         vm =3D vmcls(debug=3Dargs.debug, vcpus=3Dargs.jobs)
+         if args.build_image:
+             if os.path.exists(args.image) and not args.force:
+--=20
 2.13.5
