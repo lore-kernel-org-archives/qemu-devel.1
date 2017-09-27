@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dxGHv-0001cP-Ij
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 13:38:24 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dxGS1-0003Qy-Pt
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 13:48:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dxGHu-0005X4-Qq
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 13:38:23 -0400
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:52138)
+	(envelope-from <richard.henderson@linaro.org>) id 1dxGRw-0003v3-BB
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 13:48:49 -0400
+Received: from mail-pf0-x229.google.com ([2607:f8b0:400e:c00::229]:43607)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dxGHu-0005WP-Jj
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 13:38:22 -0400
-Received: by mail-wr0-x22f.google.com with SMTP id z39so17786497wrb.8
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 10:38:22 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dxGRw-0003uV-5F
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 13:48:44 -0400
+Received: by mail-pf0-x229.google.com with SMTP id y29so7618973pff.0
+	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 10:48:43 -0700 (PDT)
+References: <20170927170027.8539-1-david@redhat.com>
+	<20170927170027.8539-2-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <30b6f3a1-bfeb-6172-5233-2f7d444399fc@linaro.org>
+Date: Wed, 27 Sep 2017 10:48:39 -0700
 MIME-Version: 1.0
-In-Reply-To: <1504286483-23327-2-git-send-email-eric.auger@redhat.com>
-References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
-	<1504286483-23327-2-git-send-email-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 27 Sep 2017 10:38:00 -0700
-Message-ID: <CAFEAcA8k4nAjqJ_Mu5ZZ8ygMMJikX17BCB3M0ZkbQBsKVLt5TQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v7 01/20] hw/arm/smmu-common: smmu base
- device and datatypes
+In-Reply-To: <20170927170027.8539-2-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 1/3] accel/tcg: allow to invalidate a
+ write TLB entry immediately
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +32,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, Radha Mohan <mohun106@gmail.com>, Trey Cain <tcain@qti.qualcomm.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Will Deacon <will.deacon@arm.com>, jean-philippe.brucker@arm.com, robin.murphy@arm.com, Peter Xu <peterx@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, wtownsen@redhat.com
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>
 
-On 1 September 2017 at 10:21, Eric Auger <eric.auger@redhat.com> wrote:
-> The patch introduces the smmu base device and class for the ARM
-> smmu. Devices for specific versions will be derived from this
-> base device.
->
-> We also introduce some important datatypes.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
+On 09/27/2017 10:00 AM, David Hildenbrand wrote:
+> Background: s390x implements Low-Address Protection (LAP). If LAP is
+> enabled, writing to effective addresses (before any transaltion)
+> 0-511 and 4096-4607 triggers a protection exception.
+> 
+> So we have subpage protection on the first two pages of every address
+> space (where the lowcore - the CPU private data resides).
+> 
+> By immediately invalidating the write entry but allowing the caller to
+> continue, we force every write access onto these first two pages into
+> the slow path. we will get a tlb fault with the specific accessed
+> addresses and can then evaluate if protection applies or not.
+> 
+> We have to make sure to ignore the invalid bit if tlb_fill() succeeds.
 
-> +/*
-> + * Copyright (C) 2014-2016 Broadcom Corporation
-> + * Copyright (c) 2017 Red Hat, Inc.
-> + * Written by Prem Mallappa, Eric Auger
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
+This is similar to a scheme I proposed to PMM wrt handling ARM v8M translation.
+ Reusing TLB_INVALID_MASK would appear to work, but I wonder if it wouldn't be
+clearer to use another bit.  I believe I had proposed a TLB_FORCE_SLOW_MASK.
 
-Really GPL-2-only ?
+Thoughts, Peter?
 
-Unless there's a good reason, you should probably fix this (including
-getting an ack from Prem/Broadcom where it applies to code that came
-from him).
 
-thanks
--- PMM
+r~
