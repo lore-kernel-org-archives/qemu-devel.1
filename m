@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dxCdn-0001bH-Sh
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:44:44 -0400
+	(envelope-from <eblake@redhat.com>) id 1dxCfx-0003Gj-9R
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:47:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dxCdi-0003GE-3z
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:44:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57602)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dxCdh-0003Fn-Si
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:44:38 -0400
-Date: Wed, 27 Sep 2017 10:44:31 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170927134431.GN21016@localhost.localdomain>
-References: <20170927130339.21444-1-ehabkost@redhat.com>
-	<20170927130339.21444-5-ehabkost@redhat.com>
-	<20170927133321.GB8521@lemon.lan>
+	(envelope-from <eblake@redhat.com>) id 1dxCfr-0005KA-RI
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 09:46:57 -0400
+References: <20170927125340.12360-1-berrange@redhat.com>
+	<20170927125340.12360-6-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f2d2ea15-ffbd-a05c-225d-6a2345240227@redhat.com>
+Date: Wed, 27 Sep 2017 08:46:43 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170927133321.GB8521@lemon.lan>
-Subject: [Qemu-devel] [PATCH] fixup! scripts: Remove debug parameter from
- QEMUMonitorProtocol
+In-Reply-To: <20170927125340.12360-6-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Fh3UP5TR1J4wALfpnJWWlvocTBAIlosLt"
+Subject: Re: [Qemu-devel] [PATCH v4 5/6] block: convert
+ qcrypto_block_encrypt|decrypt to take bytes offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +25,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
 
-On Wed, Sep 27, 2017 at 09:33:21PM +0800, Fam Zheng wrote:
-> On Wed, 09/27 10:03, Eduardo Habkost wrote:
-> > @@ -51,7 +54,6 @@ class QEMUMonitorProtocol(object):
-> >          """
-> >          self.__events = []
-> >          self.__address = address
-> > -        self._debug = debug
-> 
-> Should you also drop the debug parameter from the method?
-> 
-> >          self.__sock = self.__get_sock()
-> >          self.__sockfile = None
-> >          if server:
-> > @@ -83,8 +85,7 @@ class QEMUMonitorProtocol(object):
-> >                  return
-> >              resp = json.loads(data)
-> >              if 'event' in resp:
-> > -                if self._debug:
-> > -                    print >>sys.stderr, "QMP:<<< %s" % resp
-> > +                self.logger.debug("<<< %s", resp)
-> >                  self.__events.append(resp)
-> >                  if not only_event:
-> >                      continue
-> > @@ -164,8 +165,7 @@ class QEMUMonitorProtocol(object):
-> >          @return QMP response as a Python dict or None if the connection has
-> >                  been closed
-> >          """
-> > -        if self._debug:
-> > -            print >>sys.stderr, "QMP:>>> %s" % qmp_cmd
-> > +        self.logger.debug("<<< %s", qmp_cmd)
-> 
-> This should be ">>> %s".
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Fh3UP5TR1J4wALfpnJWWlvocTBAIlosLt
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <f2d2ea15-ffbd-a05c-225d-6a2345240227@redhat.com>
+Subject: Re: [PATCH v4 5/6] block: convert qcrypto_block_encrypt|decrypt to
+ take bytes offset
+References: <20170927125340.12360-1-berrange@redhat.com>
+ <20170927125340.12360-6-berrange@redhat.com>
+In-Reply-To: <20170927125340.12360-6-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Fixed.
+On 09/27/2017 07:53 AM, Daniel P. Berrange wrote:
+> Instead of sector offset, take the bytes offset when encrypting
+> or decrypting data.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- scripts/qmp/qmp.py | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
-index be79d7aa80..369d9fef39 100644
---- a/scripts/qmp/qmp.py
-+++ b/scripts/qmp/qmp.py
-@@ -40,7 +40,7 @@ class QEMUMonitorProtocol(object):
-     #: Socket's timeout
-     timeout = socket.timeout
- 
--    def __init__(self, address, server=False, debug=False):
-+    def __init__(self, address, server=False):
-         """
-         Create a QEMUMonitorProtocol class.
- 
-@@ -165,7 +165,7 @@ class QEMUMonitorProtocol(object):
-         @return QMP response as a Python dict or None if the connection has
-                 been closed
-         """
--        self.logger.debug("<<< %s", qmp_cmd)
-+        self.logger.debug(">>> %s", qmp_cmd)
-         try:
-             self.__sock.sendall(json.dumps(qmp_cmd))
-         except socket.error as err:
--- 
-2.13.5
+
+--Fh3UP5TR1J4wALfpnJWWlvocTBAIlosLt
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnLq8MACgkQp6FrSiUn
+Q2qkeggAi94fr3tW8W0XgYG+EVe0Uk5EAkjKXM4+p58U1z6SAQZmbnac/Ge5kwsX
+oDW7Iqqc5GPGuNcFi1C9I/py2WilfyMN7oR6ZfeLDiwVtuevQJYZum6BCyl7TX9L
+iTj9rM5E5d9KPtFNDDVOyC3/IYvARpOXuDCCc8dmgWdZt3oVxYGuNTh3p+uyW4aW
+hCu1fCaGBv9z/rXFLvzfQ89yFfeX9a8LKCCI87qx393pH9qLZtXOz54NCyVBeiKy
+KANkDDuFBpCsD6I5upNOSL4ZVRwCGFj4UHWYHbCRt87DWe5Df1Cdqe00hPhvOSi0
+Ej/l9uiPZZor5RaeOh0sg1gCeQEk8A==
+=y5MT
+-----END PGP SIGNATURE-----
+
+--Fh3UP5TR1J4wALfpnJWWlvocTBAIlosLt--
