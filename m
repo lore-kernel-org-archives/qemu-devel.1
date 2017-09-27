@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47833)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linuc.decode@gmail.com>) id 1dx8BZ-0003NX-S3
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 04:59:19 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dx8CB-0003vO-Eg
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 04:59:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linuc.decode@gmail.com>) id 1dx8BW-0003WS-RX
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 04:59:16 -0400
-Date: Wed, 27 Sep 2017 14:28:38 +0530
-From: Linu Cherian <linuc.decode@gmail.com>
-Message-ID: <20170927085838.GA32011@virtx40>
-References: <1506494000-31982-1-git-send-email-Bharat.Bhushan@nxp.com>
-	<20170927074109.GA31587@virtx40>
-	<AM5PR0401MB25450ACC804B20D93C4F2D9D9A780@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	(envelope-from <eric.auger@redhat.com>) id 1dx8CA-0003qC-IT
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 04:59:55 -0400
+References: <1506088275-31734-1-git-send-email-wei@redhat.com>
+	<20170926105422.vfaalzzmhufvrk34@kamzik.brq.redhat.com>
+	<CAFEAcA_Wk5U89QAUHx0tsJR57LLASgnKwtMQk9-PY7sBZAm+hg@mail.gmail.com>
+	<20170926153705.365mvhaf6rj65rvl@kamzik.brq.redhat.com>
+	<b860e3fd-64c3-f37d-4ae2-424936663697@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <b9bb5d96-14af-fde5-95a4-6d56a718f548@redhat.com>
+Date: Wed, 27 Sep 2017 10:59:44 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AM5PR0401MB25450ACC804B20D93C4F2D9D9A780@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v4 0/5] virtio-iommu: VFIO
- integration
+In-Reply-To: <b860e3fd-64c3-f37d-4ae2-424936663697@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] mach-virt: Set VM's SMBIOS system
+ version to mc->name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,136 +27,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharat Bhushan <bharat.bhushan@nxp.com>
-Cc: "eric.auger@redhat.com" <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "bharatb.yadav@gmail.com" <bharatb.yadav@gmail.com>
+To: Wei Huang <wei@redhat.com>, Andrew Jones <drjones@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed Sep 27, 2017 at 08:30:51AM +0000, Bharat Bhushan wrote:
-> Hi,
+Hi Wei,
+
+On 26/09/2017 18:52, Wei Huang wrote:
 > 
-> > -----Original Message-----
-> > From: Linu Cherian [mailto:linuc.decode@gmail.com]
-> > Sent: Wednesday, September 27, 2017 1:11 PM
-> > To: Bharat Bhushan <bharat.bhushan@nxp.com>
-> > Cc: eric.auger@redhat.com; eric.auger.pro@gmail.com;
-> > peter.maydell@linaro.org; alex.williamson@redhat.com; mst@redhat.com;
-> > qemu-arm@nongnu.org; qemu-devel@nongnu.org; kevin.tian@intel.com;
-> > marc.zyngier@arm.com; tn@semihalf.com; will.deacon@arm.com;
-> > drjones@redhat.com; robin.murphy@arm.com; christoffer.dall@linaro.org;
-> > bharatb.yadav@gmail.com
-> > Subject: Re: [Qemu-arm] [PATCH v4 0/5] virtio-iommu: VFIO integration
-> > 
-> > Hi,
-> > 
-> > On Wed Sep 27, 2017 at 12:03:15PM +0530, Bharat Bhushan wrote:
-> > > This patch series integrates VFIO/VHOST with virtio-iommu.
-> > >
-> > > This version is mainly about rebasing on v4 version on virtio-iommu
-> > > device framework from Eric Augur and addresing review comments.
-> > >
-> > > This patch series allows PCI pass-through using virtio-iommu.
-> > >
-> > > This series is based on:
-> > >  - virtio-iommu kernel driver by Jean-Philippe Brucker
-> > >     [1] [RFC] virtio-iommu version 0.4
-> > >     git://linux-arm.org/virtio-iommu.git branch viommu/v0.4
-> > >
-> > >  - virtio-iommu device emulation by Eric Augur.
-> > >    [RFC v4 00/16] VIRTIO-IOMMU device
-> > >    https://github.com/eauger/qemu/tree/v2.10.0-virtio-iommu-v4
-> > >
-> > > Changes are available at : https://github.com/bharaty/qemu.git
-> > > virtio-iommu-vfio-integration-v4
-> > >
-> > 
-> > # With the above sources, was trying to test the vfio-pci device assigned to
-> >   guest using Qemu.
-> > # Both guest and host kernels are configured with 4k as page size.
-> > # releavant qemu command snippet,
-> >   -device virtio-iommu-device -device virtio-blk-device,drive=hd0 \
-> >   -net none -device vfio-pci,host=xxx
-> > 
-> > 
-> > On guest booting, observed mutliple messages as below,
-> > 
-> > qemu-system-aarch64: iommu has granularity incompatible with target AS
-> > 
-> > # On adding necessary prints, 0x5000 is len, 0x4fff is address mask
-> >   and the code expects the address mask to be 0xfff.
 > 
-> I have not seen these errors, I am also using 4K page-size on both host and guest. Can you share compete qemu command and log. 
-
-Qemu cmd:
-
-qemu-system-aarch64 -machine virt,gic_version=3 -cpu host -enable-kvm -nographic
- -smp 8 -m 1024 -kernel /boot/Image --append "console=ttyAMA0 root=/dev/vda rw" 
--drive if=none,file=/home/ubuntu/fs_images/ubu1604.img,id=hd0,format=raw 
--device virtio-iommu-device -device virtio-blk-device,drive=hd0 -net none -device vfio-pci,host=0002:01:00.3
-
-
-Qemu log:
-qemu-system-aarch64: iommu has granularity incompatible with target AS
-qemu-system-aarch64: iommu has granularity incompatible with target AS
-qemu-system-aarch64: iommu has granularity incompatible with target AS
-qemu-system-aarch64: iommu has granularity incompatible with target AS
-qemu-system-aarch64: iommu has granularity incompatible with target AS
-qemu-system-aarch64: iommu has granularity incompatible with target AS
-...
-
-
-
-
-
+> On 09/26/2017 10:37 AM, Andrew Jones wrote:
+>> On Tue, Sep 26, 2017 at 04:28:03PM +0100, Peter Maydell wrote:
+>>> On 26 September 2017 at 11:54, Andrew Jones <drjones@redhat.com> wrote:
+>>>> On Fri, Sep 22, 2017 at 08:51:15AM -0500, Wei Huang wrote:
+>>>>> Instead of using "1.0" as the system version of SMBIOS, we should use
+>>>>> mc->name for mach-virt machine type. This matches with x86 code and
+>>>>> prevents the smbios_table.machine_type test of Avocado from failing.
+>>>>>
+>>>>> Signed-off-by: Wei Huang <wei@redhat.com>
+>>>>> ---
+>>>>>  hw/arm/virt.c | 3 ++-
+>>>>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>>>>> index 9e18b41..8d0c6a9 100644
+>>>>> --- a/hw/arm/virt.c
+>>>>> +++ b/hw/arm/virt.c
+>>>>> @@ -1189,6 +1189,7 @@ static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
+>>>>>
+>>>>>  static void virt_build_smbios(VirtMachineState *vms)
+>>>>>  {
+>>>>> +    MachineClass *mc = MACHINE_GET_CLASS(vms);
+>>>>>      uint8_t *smbios_tables, *smbios_anchor;
+>>>>>      size_t smbios_tables_len, smbios_anchor_len;
+>>>>>      const char *product = "QEMU Virtual Machine";
+>>>>> @@ -1202,7 +1203,7 @@ static void virt_build_smbios(VirtMachineState *vms)
+>>>>>      }
+>>>>>
+>>>>>      smbios_set_defaults("QEMU", product,
+>>>>> -                        "1.0", false, true, SMBIOS_ENTRY_POINT_30);
+>>>>> +                        mc->name, false, true, SMBIOS_ENTRY_POINT_30);
+>>>>>
+>>>>>      smbios_get_tables(NULL, 0, &smbios_tables, &smbios_tables_len,
+>>>>>                        &smbios_anchor, &smbios_anchor_len);
+>>>>> --
+>>>>> 2.7.5
+>>>>>
+>>>>>
+>>>>
+>>>> Reviewed-by: Andrew Jones <drjones@redhat.com>
+>>>
+>>> Are we OK to change this without having to tie it to the machine
+>>> version number?
+>>
+>> Let's tie it to be safe. Eric has a 2.11 machine version patch in his
+>> virtio-iommu series, but, like for 2.10, he or Wei should probably just
+>> post that independently to make sure it gets in.
+>>
+>> Wei, will you post the 2.11 version patch?
 > 
-> Thanks
-> -Bharat
-> 
-> > 
-> > if (len & iotlb->addr_mask) {
-> >         error_report
-> > 
-> > # vfio_dma_map is failing due to this error.
-> > 
-> > Any pointers ?
-> > 
-> > 
-> > > v3->v4:
-> > >  - Rebase to v4 version from Eric
-> > >  - Fixes from Eric with DPDK in VM
-> > >  - Logical division in multiple patches
-> > >
-> > > v2->v3:
-> > >  - This series is based on "[RFC v3 0/8] VIRTIO-IOMMU device"
-> > >    Which is based on top of v2.10-rc0 that
-> > >  - Fixed issue with two PCI devices
-> > >  - Addressed review comments
-> > >
-> > > v1->v2:
-> > >   - Added trace events
-> > >   - removed vSMMU3 link in patch description
-> > >
-> > > Bharat Bhushan (5):
-> > >   target/arm/kvm: Translate the MSI doorbell in
-> > kvm_arch_fixup_msi_route
-> > >   virtio-iommu: Add iommu notifier for map/unmap
-> > >   virtio-iommu: Call iommu notifier for attach/detach
-> > >   virtio-iommu: add iommu replay
-> > >   virtio-iommu: add iommu notifier memory-region
-> > >
-> > >  hw/virtio/trace-events           |   5 ++
-> > >  hw/virtio/virtio-iommu.c         | 181
-> > ++++++++++++++++++++++++++++++++++++++-
-> > >  include/hw/virtio/virtio-iommu.h |   6 ++
-> > >  target/arm/kvm.c                 |  27 ++++++
-> > >  target/arm/trace-events          |   3 +
-> > >  5 files changed, 219 insertions(+), 3 deletions(-)
-> > >
-> > > --
-> > > 1.9.3
-> > >
-> > >
-> > 
-> > --
-> > Linu cherian
+> Will do
 
--- 
-Linu cherian
+yep, feel free to reuse my patch and remove the noiommu field.
+
+Thanks
+
+Eric
+> 
+>>
+>> Thanks,
+>> drew
+>>
+> 
