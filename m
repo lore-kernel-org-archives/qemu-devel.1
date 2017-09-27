@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70M-0001Qg-OD
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:40 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70P-0001TO-2T
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dx70I-0003zY-Be
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:38 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dx70N-00046I-Jc
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:43:41 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 27 Sep 2017 17:42:51 +1000
-Message-Id: <20170927074316.4454-2-david@gibson.dropbear.id.au>
+Date: Wed, 27 Sep 2017 17:43:02 +1000
+Message-Id: <20170927074316.4454-13-david@gibson.dropbear.id.au>
 In-Reply-To: <20170927074316.4454-1-david@gibson.dropbear.id.au>
 References: <20170927074316.4454-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 01/26] ppc/kvm: check some capabilities with
- kvm_vm_check_extension()
+Subject: [Qemu-devel] [PULL 12/26] ppc/kvm: change kvmppc_get_htab_fd() to
+ return -errno on error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +25,71 @@ Cc: agraf@suse.de, groug@kaod.org, mark.cave-ayland@ilande.co.uk, balaton@eik.bm
 
 From: Greg Kurz <groug@kaod.org>
 
-The following capabilities are VM specific:
-- KVM_CAP_PPC_SMT_POSSIBLE
-- KVM_CAP_PPC_HTAB_FD
-- KVM_CAP_PPC_ALLOC_HTAB
+When kvmppc_get_htab_fd() fails, its return value is propagated up to
+qemu_savevm_state_iterate() or to qemu_savevm_state_complete_precopy().
+All savevm handlers expect to receive a negative errno on error.
 
-If both KVM HV and KVM PR are present, checking them always return
-the HV value, even if we explicitely requested to use PR.
+Let's patch kvmppc_get_htab_fd() accordingly.
 
-This has no visible effect for KVM_CAP_PPC_ALLOC_HTAB, because we also
-try the KVM_PPC_ALLOCATE_HTAB ioctl which is only suppored by HV. As
-a consequence, the spapr code doesn't even check KVM_CAP_PPC_HTAB_FD.
-
-However, this will cause kvmppc_hint_smt_possible(), introduced by
-commit fa98fbfcdfcb9, to report several VSMT modes (eg, Available
-VSMT modes: 8 4 2 1) whereas PR only support mode 1.
-
-This patch fixes all three anyway to use kvm_vm_check_extension(). It
-is okay since the VM is already created at the time kvm_arch_init() or
-kvmppc_reset_htab() is called.
+While here, let's change htab_load() in the spapr code to also
+propagate the error, since it doesn't make sense to abort() if
+we couldn't get the htab fd from KVM.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/kvm.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ hw/ppc/spapr.c   |  5 +++--
+ target/ppc/kvm.c | 10 ++++++++--
+ 2 files changed, 11 insertions(+), 4 deletions(-)
 
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 17ea77618c..ec0ea7b5dd 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1218,7 +1218,7 @@ static int get_htab_fd(sPAPRMachineState *spapr)
+     spapr->htab_fd = kvmppc_get_htab_fd(false);
+     if (spapr->htab_fd < 0) {
+         error_report("Unable to open fd for reading hash table from KVM: %s",
+-                     strerror(errno));
++                     strerror(spapr->htab_fd));
+     }
+ 
+     return spapr->htab_fd;
+@@ -1958,7 +1958,8 @@ static int htab_load(QEMUFile *f, void *opaque, int version_id)
+         fd = kvmppc_get_htab_fd(true);
+         if (fd < 0) {
+             error_report("Unable to open fd to restore KVM hash table: %s",
+-                         strerror(errno));
++                         strerror(fd));
++            return fd;
+         }
+     }
+ 
 diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 1deaf106d2..208c70e814 100644
+index be27429b57..2780e692a7 100644
 --- a/target/ppc/kvm.c
 +++ b/target/ppc/kvm.c
-@@ -131,7 +131,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     cap_interrupt_level = kvm_check_extension(s, KVM_CAP_PPC_IRQ_LEVEL);
-     cap_segstate = kvm_check_extension(s, KVM_CAP_PPC_SEGSTATE);
-     cap_booke_sregs = kvm_check_extension(s, KVM_CAP_PPC_BOOKE_SREGS);
--    cap_ppc_smt_possible = kvm_check_extension(s, KVM_CAP_PPC_SMT_POSSIBLE);
-+    cap_ppc_smt_possible = kvm_vm_check_extension(s, KVM_CAP_PPC_SMT_POSSIBLE);
-     cap_ppc_rma = kvm_check_extension(s, KVM_CAP_PPC_RMA);
-     cap_spapr_tce = kvm_check_extension(s, KVM_CAP_SPAPR_TCE);
-     cap_spapr_tce_64 = kvm_check_extension(s, KVM_CAP_SPAPR_TCE_64);
-@@ -143,7 +143,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     cap_ppc_watchdog = kvm_check_extension(s, KVM_CAP_PPC_BOOKE_WATCHDOG);
-     /* Note: we don't set cap_papr here, because this capability is
-      * only activated after this by kvmppc_set_papr() */
--    cap_htab_fd = kvm_check_extension(s, KVM_CAP_PPC_HTAB_FD);
-+    cap_htab_fd = kvm_vm_check_extension(s, KVM_CAP_PPC_HTAB_FD);
-     cap_fixup_hcalls = kvm_check_extension(s, KVM_CAP_PPC_FIXUP_HCALL);
-     cap_ppc_smt = kvm_vm_check_extension(s, KVM_CAP_PPC_SMT);
-     cap_htm = kvm_vm_check_extension(s, KVM_CAP_PPC_HTM);
-@@ -2353,7 +2353,7 @@ int kvmppc_reset_htab(int shift_hint)
-         /* Full emulation, tell caller to allocate htab itself */
-         return 0;
+@@ -2556,13 +2556,19 @@ int kvmppc_get_htab_fd(bool write)
+         .flags = write ? KVM_GET_HTAB_WRITE : 0,
+         .start_index = 0,
+     };
++    int ret;
+ 
+     if (!cap_htab_fd) {
+         fprintf(stderr, "KVM version doesn't support saving the hash table\n");
+-        return -1;
++        return -ENOTSUP;
++    }
++
++    ret = kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &s);
++    if (ret < 0) {
++        return -errno;
      }
--    if (kvm_check_extension(kvm_state, KVM_CAP_PPC_ALLOC_HTAB)) {
-+    if (kvm_vm_check_extension(kvm_state, KVM_CAP_PPC_ALLOC_HTAB)) {
-         int ret;
-         ret = kvm_vm_ioctl(kvm_state, KVM_PPC_ALLOCATE_HTAB, &shift);
-         if (ret == -ENOTTY) {
+ 
+-    return kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &s);
++    return ret;
+ }
+ 
+ int kvmppc_save_htab(QEMUFile *f, int fd, size_t bufsize, int64_t max_ns)
 -- 
 2.13.5
