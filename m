@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dx6eG-0001I7-G1
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:20:49 -0400
+	(envelope-from <peterx@redhat.com>) id 1dx6ru-0005Nk-01
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:34:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dx6e9-0007cC-OE
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:20:48 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57478)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dx6e9-0007bj-En
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:20:41 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8R7JX0O064638
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 03:20:38 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d808abdjb-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 03:20:38 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 27 Sep 2017 08:20:35 +0100
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 27 Sep 2017 09:20:29 +0200
-In-Reply-To: <20170927072030.35737-1-borntraeger@de.ibm.com>
-References: <20170927072030.35737-1-borntraeger@de.ibm.com>
-Message-Id: <20170927072030.35737-3-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 2/3] s390x/ais: enable ais when migration is
- available
+	(envelope-from <peterx@redhat.com>) id 1dx6rq-0006JD-OU
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:34:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49944)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dx6rq-0006Ii-Ew
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 03:34:50 -0400
+Date: Wed, 27 Sep 2017 15:34:41 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170927073441.GD25011@pxdev.xzpeter.org>
+References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
+	<1504081950-2528-11-git-send-email-peterx@redhat.com>
+	<20170921192903.GH3401@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170921192903.GH3401@work-vm>
+Subject: Re: [Qemu-devel] [RFC v2 10/33] migration: allow dst vm pause on
+ postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,212 +29,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Michael Roth <mdroth@linux.vnet.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-Instead of unconditionally enabling the KVM AIS capability
-in the kvm arch init function, do this in the flic realize function
-when we know if migration is available. This requires to initialize
-flic before the CPUs (and cpu models).
+On Thu, Sep 21, 2017 at 08:29:03PM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > When there is IO error on the incoming channel (e.g., network down),
+> > instead of bailing out immediately, we allow the dst vm to switch to the
+> > new POSTCOPY_PAUSE state. Currently it is still simple - it waits the
+> > new semaphore, until someone poke it for another attempt.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  migration/migration.c  |  1 +
+> >  migration/migration.h  |  3 +++
+> >  migration/savevm.c     | 60 ++++++++++++++++++++++++++++++++++++++++++++++++--
+> >  migration/trace-events |  2 ++
+> >  4 files changed, 64 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 8d26ea8..80de212 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -146,6 +146,7 @@ MigrationIncomingState *migration_incoming_get_current(void)
+> >          memset(&mis_current, 0, sizeof(MigrationIncomingState));
+> >          qemu_mutex_init(&mis_current.rp_mutex);
+> >          qemu_event_init(&mis_current.main_thread_load_event, false);
+> > +        qemu_sem_init(&mis_current.postcopy_pause_sem_dst, 0);
+> >          once = true;
+> >      }
+> >      return &mis_current;
+> > diff --git a/migration/migration.h b/migration/migration.h
+> > index 0c957c9..c423682 100644
+> > --- a/migration/migration.h
+> > +++ b/migration/migration.h
+> > @@ -60,6 +60,9 @@ struct MigrationIncomingState {
+> >      /* The coroutine we should enter (back) after failover */
+> >      Coroutine *migration_incoming_co;
+> >      QemuSemaphore colo_incoming_sem;
+> > +
+> > +    /* notify PAUSED postcopy incoming migrations to try to continue */
+> > +    QemuSemaphore postcopy_pause_sem_dst;
+> >  };
+> >  
+> >  MigrationIncomingState *migration_incoming_get_current(void);
+> > diff --git a/migration/savevm.c b/migration/savevm.c
+> > index 7172f14..3777124 100644
+> > --- a/migration/savevm.c
+> > +++ b/migration/savevm.c
+> > @@ -1488,8 +1488,8 @@ static int loadvm_postcopy_ram_handle_discard(MigrationIncomingState *mis,
+> >   */
+> >  static void *postcopy_ram_listen_thread(void *opaque)
+> >  {
+> > -    QEMUFile *f = opaque;
+> >      MigrationIncomingState *mis = migration_incoming_get_current();
+> > +    QEMUFile *f = mis->from_src_file;
+> >      int load_res;
+> >  
+> >      migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+> > @@ -1503,6 +1503,14 @@ static void *postcopy_ram_listen_thread(void *opaque)
+> >       */
+> >      qemu_file_set_blocking(f, true);
+> >      load_res = qemu_loadvm_state_main(f, mis);
+> > +
+> > +    /*
+> > +     * This is tricky, but, mis->from_src_file can change after it
+> > +     * returns, when postcopy recovery happened. In the future, we may
+> > +     * want a wrapper for the QEMUFile handle.
+> > +     */
+> > +    f = mis->from_src_file;
+> > +
+> >      /* And non-blocking again so we don't block in any cleanup */
+> >      qemu_file_set_blocking(f, false);
+> >  
+> > @@ -1581,7 +1589,7 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
+> >      /* Start up the listening thread and wait for it to signal ready */
+> >      qemu_sem_init(&mis->listen_thread_sem, 0);
+> >      qemu_thread_create(&mis->listen_thread, "postcopy/listen",
+> > -                       postcopy_ram_listen_thread, mis->from_src_file,
+> > +                       postcopy_ram_listen_thread, NULL,
+> >                         QEMU_THREAD_DETACHED);
+> >      qemu_sem_wait(&mis->listen_thread_sem);
+> >      qemu_sem_destroy(&mis->listen_thread_sem);
+> > @@ -1966,11 +1974,44 @@ void qemu_loadvm_state_cleanup(void)
+> >      }
+> >  }
+> >  
+> > +/* Return true if we should continue the migration, or false. */
+> > +static bool postcopy_pause_incoming(MigrationIncomingState *mis)
+> > +{
+> > +    trace_postcopy_pause_incoming();
+> > +
+> > +    migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
+> > +                      MIGRATION_STATUS_POSTCOPY_PAUSED);
+> > +
+> > +    assert(mis->from_src_file);
+> > +    qemu_file_shutdown(mis->from_src_file);
+> > +    qemu_fclose(mis->from_src_file);
+> > +    mis->from_src_file = NULL;
+> > +
+> > +    assert(mis->to_src_file);
+> > +    qemu_mutex_lock(&mis->rp_mutex);
+> > +    qemu_file_shutdown(mis->to_src_file);
+> 
+> Should you not do the shutdown() before the lock?
+> For example if the other thread is stuck, with rp_mutex
+> held, trying to write to to_src_file, then you'll block
+> waiting for the mutex.  If you call shutdown and then take
+> the lock, the other thread will error and release the lock.
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
----
- hw/intc/s390_flic.c          |  8 ++------
- hw/intc/s390_flic_kvm.c      | 16 +++++++++++-----
- hw/s390x/css.c               |  4 ++--
- hw/s390x/s390-virtio-ccw.c   | 10 +++++++---
- include/hw/s390x/s390_flic.h |  1 -
- target/s390x/kvm.c           | 10 ++--------
- 6 files changed, 24 insertions(+), 25 deletions(-)
+The problem is that IMHO QEMUFile is not yet thread-safe itself.  So
+if we operate on it (even to shut it down) logically we need to have
+the lock, right?
 
-diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
-index 6eaf178..9858f0e 100644
---- a/hw/intc/s390_flic.c
-+++ b/hw/intc/s390_flic.c
-@@ -1,7 +1,7 @@
- /*
-  * QEMU S390x floating interrupt controller (flic)
-  *
-- * Copyright 2014 IBM Corp.
-+ * Copyright IBM Corp. 2014, 2017
-  * Author(s): Jens Freimann <jfrei@linux.vnet.ibm.com>
-  *            Cornelia Huck <cornelia.huck@de.ibm.com>
-  *
-@@ -136,9 +136,7 @@ static void qemu_s390_flic_reset(DeviceState *dev)
- 
- bool ais_needed(void *opaque)
- {
--    S390FLICState *s = opaque;
--
--    return s->ais_supported;
-+    return s390_has_feat(S390_FEAT_ADAPTER_INT_SUPPRESSION);
- }
- 
- static const VMStateDescription qemu_s390_flic_vmstate = {
-@@ -185,8 +183,6 @@ static void s390_flic_common_realize(DeviceState *dev, Error **errp)
-                    " (%d > %d)", max_batch, ADAPTER_ROUTES_MAX_GSI);
-         return;
-     }
--
--    fs->ais_supported = s390_has_feat(S390_FEAT_ADAPTER_INT_SUPPRESSION);
- }
- 
- static void s390_flic_class_init(ObjectClass *oc, void *data)
-diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
-index 7ead17a..0a370a9 100644
---- a/hw/intc/s390_flic_kvm.c
-+++ b/hw/intc/s390_flic_kvm.c
-@@ -1,7 +1,7 @@
- /*
-  * QEMU S390x KVM floating interrupt controller (flic)
-  *
-- * Copyright 2014 IBM Corp.
-+ * Copyright IBM Corp. 2014, 2017
-  * Author(s): Jens Freimann <jfrei@linux.vnet.ibm.com>
-  *            Cornelia Huck <cornelia.huck@de.ibm.com>
-  *
-@@ -164,7 +164,7 @@ static int kvm_s390_modify_ais_mode(S390FLICState *fs, uint8_t isc,
-         .addr = (uint64_t)&req,
-     };
- 
--    if (!fs->ais_supported) {
-+    if (!s390_has_feat(S390_FEAT_ADAPTER_INT_SUPPRESSION)) {
-         return -ENOSYS;
-     }
- 
-@@ -181,7 +181,7 @@ static int kvm_s390_inject_airq(S390FLICState *fs, uint8_t type,
-         .attr = id,
-     };
- 
--    if (!fs->ais_supported) {
-+    if (!s390_has_feat(S390_FEAT_ADAPTER_INT_SUPPRESSION)) {
-         return -ENOSYS;
-     }
- 
-@@ -459,7 +459,7 @@ static int kvm_flic_ais_post_load(void *opaque, int version_id)
-      * migration from a host that has AIS to a host that has no AIS.
-      * In that case the target system will reject the migration here.
-      */
--    if (!ais_needed(flic)) {
-+    if (!s390_has_feat(S390_FEAT_ADAPTER_INT_SUPPRESSION)) {
-         return -ENOSYS;
-     }
- 
-@@ -557,6 +557,12 @@ static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
-     test_attr.group = KVM_DEV_FLIC_CLEAR_IO_IRQ;
-     flic_state->clear_io_supported = !ioctl(flic_state->fd,
-                                             KVM_HAS_DEVICE_ATTR, test_attr);
-+    /* try enable the AIS facility */
-+    test_attr.group = KVM_DEV_FLIC_AISM_ALL;
-+    if (!ioctl(flic_state->fd, KVM_HAS_DEVICE_ATTR, test_attr)) {
-+        kvm_vm_enable_cap(kvm_state, KVM_CAP_S390_AIS, 0);
-+    }
-+
-     return;
- fail:
-     error_propagate(errp, errp_local);
-@@ -578,7 +584,7 @@ static void kvm_s390_flic_reset(DeviceState *dev)
- 
-     flic_disable_wait_pfault(flic);
- 
--    if (fs->ais_supported) {
-+    if (s390_has_feat(S390_FEAT_ADAPTER_INT_SUPPRESSION)) {
-         for (isc = 0; isc <= MAX_ISC; isc++) {
-             rc = kvm_s390_modify_ais_mode(fs, isc, SIC_IRQ_MODE_ALL);
-             if (rc) {
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 75d4f30..1d4bb73 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -1,7 +1,7 @@
- /*
-  * Channel subsystem base support.
-  *
-- * Copyright 2012 IBM Corp.
-+ * Copyright IBM Corp. 2012, 2017
-  * Author(s): Cornelia Huck <cornelia.huck@de.ibm.com>
-  *
-  * This work is licensed under the terms of the GNU GPL, version 2 or (at
-@@ -672,7 +672,7 @@ void css_adapter_interrupt(CssIoAdapterType type, uint8_t isc)
-     }
- 
-     trace_css_adapter_interrupt(isc);
--    if (fs->ais_supported) {
-+    if (s390_has_feat(S390_FEAT_ADAPTER_INT_SUPPRESSION)) {
-         if (fsc->inject_airq(fs, type, isc, adapter->flags)) {
-             error_report("Failed to inject airq with AIS supported");
-             exit(1);
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index fafbc6d..98c82c2 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -1,7 +1,7 @@
- /*
-  * virtio ccw machine
-  *
-- * Copyright 2012 IBM Corp.
-+ * Copyright IBM Corp. 2012, 2017
-  * Copyright (c) 2009 Alexander Graf <agraf@suse.de>
-  * Author(s): Cornelia Huck <cornelia.huck@de.ibm.com>
-  *
-@@ -279,11 +279,15 @@ static void ccw_init(MachineState *machine)
-     s390_sclp_init();
-     s390_memory_init(machine->ram_size);
- 
-+    /*
-+     * This might also enable some KVM features like AIS, so it must
-+     * be called before the CPU model
-+     */
-+    s390_flic_init();
-+
-     /* init CPUs (incl. CPU model) early so s390_has_feature() works */
-     s390_init_cpus(machine);
- 
--    s390_flic_init();
--
-     /* get a BUS */
-     css_bus = virtual_css_bus_init();
-     s390_init_ipl_dev(machine->kernel_filename, machine->kernel_cmdline,
-diff --git a/include/hw/s390x/s390_flic.h b/include/hw/s390x/s390_flic.h
-index 7aab6ef..75fd83c 100644
---- a/include/hw/s390x/s390_flic.h
-+++ b/include/hw/s390x/s390_flic.h
-@@ -44,7 +44,6 @@ typedef struct S390FLICState {
-     SysBusDevice parent_obj;
-     /* to limit AdapterRoutes.num_routes for compat */
-     uint32_t adapter_routes_max_batch;
--    bool ais_supported;
- } S390FLICState;
- 
- #define S390_FLIC_COMMON_CLASS(klass) \
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index ebb75ca..9ee2ada 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -2,7 +2,7 @@
-  * QEMU S390x KVM implementation
-  *
-  * Copyright (c) 2009 Alexander Graf <agraf@suse.de>
-- * Copyright IBM Corp. 2012
-+ * Copyright IBM Corp. 2012, 2017
-  *
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-@@ -311,13 +311,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-         }
-     }
- 
--    /*
--     * The migration interface for ais was introduced with kernel 4.13
--     * but the capability itself had been active since 4.12. As migration
--     * support is considered necessary let's disable ais in the 2.10
--     * machine.
--     */
--    /* kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0); */
-+    /* The AIS enablement happens in the flic realize */
- 
-     qemu_mutex_init(&qemu_sigp_mutex);
- 
+Then, IMHO the question would be: when will the send() be stuck in the
+other thread?
+
+Normally the only case I can think of is that source didn't recv()
+fast enough, and we even consumed all the write buffer in dst side (I
+don't really know how kernel manages the buffers though, and e.g. how
+the size of buffer is defined...).
+
+But when reach here, the channel (say, from_src_file and to_src_file,
+since both of them are using the same channel behind the QEMUFile
+interface) should already be broken in some way, then IIUC even there
+is a send() in the other thread, it should return at some point with a
+failure as well, just like how we reached here (possibly due to a
+read() failure).
+
+> 
+> I'm not quite sure what will happen if we end up calling this
+> before the main thread has been returned from postcopy and the
+> device loading is complete.
+
+IIUC you mean the time starts from when we got MIG_CMD_PACKAGED until
+main thread finishes handling that package?
+
+Normally I think that should not matter much since during handling the
+package it should hardly fail (we were reading from a buffer QIO
+channel, no real IOs there)...  But I agree about the reasoning.  How
+about one more patch to postpone the "active" to "postcopy-active"
+state change after the package is handled correctly?  Like:
+
+--------------
+diff --git a/migration/savevm.c b/migration/savevm.c                     
+index b5c3214034..8317b2a7e2 100644 
+--- a/migration/savevm.c            
++++ b/migration/savevm.c            
+@@ -1573,8 +1573,6 @@ static void *postcopy_ram_listen_thread(void *opaque)                                                                       
+     QEMUFile *f = mis->from_src_file;                                   
+     int load_res;                  
+                                    
+-    migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,             
+-                                   MIGRATION_STATUS_POSTCOPY_ACTIVE);   
+     qemu_sem_post(&mis->listen_thread_sem);                             
+     trace_postcopy_ram_listen_thread_start();                           
+                                    
+@@ -1817,6 +1815,9 @@ static int loadvm_handle_cmd_packaged(MigrationIncomingState *mis)                                                          
+     qemu_fclose(packf);            
+     object_unref(OBJECT(bioc));    
+                                    
++    migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,             
++                                   MIGRATION_STATUS_POSTCOPY_ACTIVE);   
++                                   
+     return ret;                    
+ }                                  
+--------------
+
+This function will only be called with "postcopy-active" state.
+
+> 
+> Also, at this point have we guaranteed no one else is about
+> to do an op on mis->to_src_file and will seg?
+
+I think no?  Since IMHO the main thread is playing with the buffer QIO
+channel, rather than the real one?
+
+(btw, could I ask what's "seg"? :)
+
 -- 
-2.9.4
+Peter Xu
