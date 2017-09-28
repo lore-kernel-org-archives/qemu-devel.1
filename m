@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1dxTyJ-0005Cy-Ly
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 04:15:04 -0400
+	(envelope-from <benh@kernel.crashing.org>) id 1dxU1k-00068E-0t
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 04:18:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1dxTyF-0006AU-Mo
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 04:15:03 -0400
-Message-ID: <1506586475.25626.12.camel@kernel.crashing.org>
+	(envelope-from <benh@kernel.crashing.org>) id 1dxU1g-0007un-0s
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 04:18:36 -0400
+Message-ID: <1506586686.25626.16.camel@kernel.crashing.org>
 From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date: Thu, 28 Sep 2017 10:14:35 +0200
-In-Reply-To: <d3a85114-ab64-5086-31b0-27124c4a5fbb@kaod.org>
+Date: Thu, 28 Sep 2017 10:18:06 +0200
+In-Reply-To: <13fdab3c-6af7-780a-ad1e-9ea64a5d660c@kaod.org>
 References: <20170911171235.29331-1-clg@kaod.org>
-	<20170911171235.29331-14-clg@kaod.org> <20170919075300.GQ27153@umbus>
-	<d3a85114-ab64-5086-31b0-27124c4a5fbb@kaod.org>
+	<20170911171235.29331-15-clg@kaod.org> <20170919075506.GR27153@umbus>
+	<13fdab3c-6af7-780a-ad1e-9ea64a5d660c@kaod.org>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 13/21] ppc/xive: handle interrupt
- acknowledgment by the O/S
+Subject: Re: [Qemu-devel] [RFC PATCH v2 14/21] ppc/xive: add support for the
+ SET_OS_PENDING command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,25 +28,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
 
-On Wed, 2017-09-20 at 11:40 +0200, C=C3=A9dric Le Goater wrote:
-> > Plus, this doesn't seem right.  Shouldn't this
-> > recheck the CPPR against the PIPR, in case a higher priority irq has
-> > been delivered since the one the cpu is acking.
+On Wed, 2017-09-20 at 11:47 +0200, C=C3=A9dric Le Goater wrote:
+> > > @@ -162,7 +162,14 @@ static bool spapr_xive_tm_is_readonly(uint8_t =
+index)
+> > >   static void spapr_xive_tm_write_special(ICPState *icp, hwaddr off=
+set,
+> > >                                     uint64_t value, unsigned size)
+> > >   {
+> > > -    /* TODO: support TM_SPC_SET_OS_PENDING */
+> > > +    if (offset =3D=3D TM_SPC_SET_OS_PENDING && size =3D=3D 1) {
+> > > +        icp->tima_os[TM_IPB] |=3D priority_to_ipb(value & 0xff);
+> > > +        icp->tima_os[TM_PIPR] =3D ipb_to_pipr(icp->tima_os[TM_IPB]=
+);
+> >=20
+> > This only lets the cpu raise bits in the IPB, never clear them.> Is t=
+hat right? =20
 >=20
-> If a higher priority is delivered, it means that the CPPR was more=20
-> privileged and that we have now two bits set in the IPB by the time=20
-> the interrupt is acked. The high priority PIPR will become the new=20
-> CPPR and the IBP will be modified keeping only the lower priority.=20
+> The clear is done when the OS acks the interrupt.
 >=20
-> if the CPPR is modified to the lower priority level, then the=20
-> first interrupt will be delivered again.=20
+> > I don't see how you'd implement the handling of multiple
+> > priorities without being able to clear bits here.
 >=20
-> I think this is fine.
+> I am not sure how this command should be used from the OS.=20
+> Currently, I only see KVM handling it in the XICS/XIVE glue.
+> I need to take a closer look.
 
-Also remember the HW PIPR behaviour, its a bit odd, it will be clamped
-by the CPPR. So if CPPR is 0 PIPR will be 0.
+It's a way to avoid the SW replay on EOI.
 
-If CPPR is 7, PIPR will be <=3D 7, etc...
+IE, assume you have 2 interrupts in the queue. You take the exception,
+ack the first one, process it etc...
+
+Then you EOI, the HW won't send a second notification. You need to look
+at the queue and continue consuming until it's empty.
+
+Today Linux checks the queue on EOI and use a SW mechanism to
+synthetize a new pseudo-external interrupt.
+
+This MMIO command would allow the OS to instead set back the
+corresponding priority bit to 1 in the IPB and cause the HW to re-emit
+the interrupt instead of SW.
+
+Linux doesn't use this today because DD1 didn't support it for the HV
+level, but other OSes might and we also might use it when we do groups,
+thus allowing redistribution.
 
 Cheers,
 Ben.
