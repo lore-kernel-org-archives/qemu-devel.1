@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dxdSJ-0002yB-H9
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:22:40 -0400
+	(envelope-from <eblake@redhat.com>) id 1dxdVX-0004iD-90
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:26:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dxdSG-0003Xa-DL
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:22:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34782)
+	(envelope-from <eblake@redhat.com>) id 1dxdVU-0005HC-3X
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:25:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41284)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dxdSG-0003X9-5L
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:22:36 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dxdVT-0005GS-Qm
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:25:56 -0400
 References: <20170928120621.30288-1-berrange@redhat.com>
-	<20170928120621.30288-4-berrange@redhat.com>
+	<20170928120621.30288-5-berrange@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <a7007b76-bcbf-eb19-ebbc-fe1422ef484d@redhat.com>
-Date: Thu, 28 Sep 2017 13:22:27 -0500
+Message-ID: <3d611c0b-7920-2e3a-39c7-a3dff1b2b586@redhat.com>
+Date: Thu, 28 Sep 2017 13:25:47 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170928120621.30288-4-berrange@redhat.com>
+In-Reply-To: <20170928120621.30288-5-berrange@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="AdkLvDOhkVhhfhqVH9kJegR0kQfiXfJhk"
-Subject: Re: [Qemu-devel] [PATCH v7 3/6] ui: add keycodemapdb repository as
- a GIT submodule
+	boundary="ceHx62Nn5PV4DXmA2PgVK995nRJWdCsW9"
+Subject: Re: [Qemu-devel] [PATCH v7 4/6] ui: convert common input code to
+ keycodemapdb
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -33,46 +33,71 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Gerd 
 List-ID: <qemu-devel.nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AdkLvDOhkVhhfhqVH9kJegR0kQfiXfJhk
+--ceHx62Nn5PV4DXmA2PgVK995nRJWdCsW9
 From: Eric Blake <eblake@redhat.com>
 To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>,
  Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a7007b76-bcbf-eb19-ebbc-fe1422ef484d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 3/6] ui: add keycodemapdb repository as a
- GIT submodule
+Message-ID: <3d611c0b-7920-2e3a-39c7-a3dff1b2b586@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 4/6] ui: convert common input code to
+ keycodemapdb
 References: <20170928120621.30288-1-berrange@redhat.com>
- <20170928120621.30288-4-berrange@redhat.com>
-In-Reply-To: <20170928120621.30288-4-berrange@redhat.com>
+ <20170928120621.30288-5-berrange@redhat.com>
+In-Reply-To: <20170928120621.30288-5-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 09/28/2017 07:06 AM, Daniel P. Berrange wrote:
-> The https://gitlab.com/keycodemap/keycodemapdb/ repo contains a
-> data file mapping between all the different scancode/keycode/keysym
-> sets that are known, and a tool to auto-generate lookup tables for
-> different combinations.
+> Replace the number_to_qcode, qcode_to_number and linux_to_qcode
+> tables with automatically generated tables.
 >=20
-> It is used by GTK-VNC, SPICE-GTK and libvirt for mapping keys.
-> Using it in QEMU will let us replace many hand written lookup
-> tables with auto-generated tables from a master data source,
-> reducing bugs. Adding new QKeyCodes will now only require the
-> master table to be updated, all ~20 other tables will be
-> automatically updated to follow.
+> Missing entries in linux_to_qcode now fixed:
 >=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
+>   KEY_LINEFEED -> Q_KEY_CODE_LF
+>   KEY_KPEQUAL -> Q_KEY_CODE_KP_EQUALS
+>   KEY_COMPOSE -> Q_KEY_CODE_COMPOSE
+>   KEY_AGAIN -> Q_KEY_CODE_AGAIN
+>   KEY_PROPS -> Q_KEY_CODE_PROPS
+>   KEY_UNDO -> Q_KEY_CODE_UNDO
+>   KEY_FRONT -> Q_KEY_CODE_FRONT
+>   KEY_COPY -> Q_KEY_CODE_COPY
+>   KEY_OPEN -> Q_KEY_CODE_OPEN
+>   KEY_PASTE -> Q_KEY_CODE_PASTE
+>   KEY_CUT -> Q_KEY_CODE_CUT
+>   KEY_HELP -> Q_KEY_CODE_HELP
+>   KEY_MEDIA -> Q_KEY_CODE_MEDIASELECT
+>=20
+> In additionsome fixes:
 
-> +++ b/configure
-> @@ -264,7 +264,13 @@ cc_i386=3Di386-pc-linux-gnu-gcc
->  libs_qga=3D""
->  debug_info=3D"yes"
->  stack_protector=3D""
-> -git_submodules=3D""
-> +
-> +if test -d "$source_path/.git"
+s/additionsome/addition, some/
 
-Again, .git does not have to be a directory; test -e is probably safer.
+>=20
+>  - KEY_PLAYPAUSE now maps to Q_KEY_CODE_AUDIOPLAY, instead of
+>    KEY_PLAYCD. KEY_PLAYPAUSE is defined across almost all scancodes
+>    sets, while KEY_PLAYCD only appears in AT set1, so the former is
+>    a more useful mapping.
+>=20
+> Missing entries in qcode_to_number now fixed:
+>=20
+>   Q_KEY_CODE_AGAIN -> 0x85
+>   Q_KEY_CODE_PROPS -> 0x86
+>   Q_KEY_CODE_UNDO -> 0x87
+>   Q_KEY_CODE_FRONT -> 0x8c
+>   Q_KEY_CODE_COPY -> 0xf8
+>   Q_KEY_CODE_OPEN -> 0x64
+>   Q_KEY_CODE_PASTE -> 0x65
+>   Q_KEY_CODE_CUT -> 0xbc
+>   Q_KEY_CODE_LF -> 0x5b
+>   Q_KEY_CODE_HELP -> 0xf5
+>   Q_KEY_CODE_COMPOSE -> 0xdd
+>   Q_KEY_CODE_KP_EQUALS -> 0x59
+>   Q_KEY_CODE_MEDIASELECT -> 0xed
+>=20
+> In addition some fixes:
+
+Hmm - inconsistent with my suggestion above with regards to comma usage;
+I think this is one scenario in English where you can get away without
+the comma, even though I would use it.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -80,7 +105,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---AdkLvDOhkVhhfhqVH9kJegR0kQfiXfJhk
+--ceHx62Nn5PV4DXmA2PgVK995nRJWdCsW9
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -89,14 +114,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnNPeQACgkQp6FrSiUn
-Q2qJggf/WhxstrepbBZzOjyOrFRLrkuvSmE7nSENY4Qi2yjbXPwlpm9l1eJwGeEn
-CY5A5RMP10R8IZzgHEhkc5NbFU0Y1PQ9EM5grH8YJ50gnE2pjoLAOIMbXGYNE7rq
-4Nn5Zmmk74IyD3hHQAqx/aqciyqfj+Z73+XmFTy6Gee8s5QlakI3vvYveDjpNv8M
-MpIvWZwIKSTiZZcAwxD9pmq4b7Cl9/JP+cvXyUpY/gAIQWdhqcyupkZ/h1/cztM1
-qo9IqQJOEuKakzAIfPkOVUeaIPqs6vMQQ4qRmSqgle41670feXzszw8Oa/nbEOK2
-4kMddL6yh3j71/SW8bKsOYOow0hNPA==
-=V5y6
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnNPqsACgkQp6FrSiUn
+Q2oNggf9HG0oixZUOOfOPQAK++vAUj0JGJttJ6e/QiJjdHhrBBgKXo3dfIlc+h+V
+143g09iP4BsveqUHjBLxc/XTte+0P1kJan4OmdUjhqK/8205RQWealgsA/7QkkF7
+xC3Qrec7B/4mCtfZK5MwngvoFBm9bQNibVaCt2C+lidDFLDeB5irHdUfjjUmGaH+
+m0Gp1C99/6nBFWq7ZDXDNmducatFVeZqS3Wygavom1vxX1D782f6dJ75SmTOEeaG
+M2tfRfQFCs2/X5IdxzhQtoEHnnh2tmHncsrI5zCeM03mENd30+H42L6Q9uVhQImN
+VOv2DQUbg+8rswS786HjvONoKSvhrQ==
+=/6fJ
 -----END PGP SIGNATURE-----
 
---AdkLvDOhkVhhfhqVH9kJegR0kQfiXfJhk--
+--ceHx62Nn5PV4DXmA2PgVK995nRJWdCsW9--
