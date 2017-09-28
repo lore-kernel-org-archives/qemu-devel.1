@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dxQMn-0006Be-DV
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 00:24:06 -0400
+	(envelope-from <thuth@redhat.com>) id 1dxQmg-0001Uo-Ag
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 00:50:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dxQMk-0000Ex-8g
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 00:24:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47470)
+	(envelope-from <thuth@redhat.com>) id 1dxQmc-0003Fa-DZ
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 00:50:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49464)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dxQMk-0000Em-1t
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 00:24:02 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dxQmc-0003FQ-7K
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 00:50:46 -0400
 References: <20170927170027.8539-1-david@redhat.com>
-	<20170927170027.8539-4-david@redhat.com>
-	<6d86db3a-33ef-e155-2f96-76cf15dd1220@linaro.org>
-	<9d535e6d-6e22-dc7f-2ce8-b2a542935f58@redhat.com>
+	<20170927170027.8539-3-david@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b2384985-75ed-564d-0063-1c50ad535385@redhat.com>
-Date: Thu, 28 Sep 2017 06:23:55 +0200
+Message-ID: <466fa6a0-ac91-66aa-aabb-a15a8ac62e0f@redhat.com>
+Date: Thu, 28 Sep 2017 06:50:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <9d535e6d-6e22-dc7f-2ce8-b2a542935f58@redhat.com>
+In-Reply-To: <20170927170027.8539-3-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 3/3] s390x/tcg: make STFL store into
- the lowcore
+Subject: Re: [Qemu-devel] [PATCH RFC 2/3] s390x/tcg: low-address protection
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <richard.henderson@linaro.org>
 
-On 27.09.2017 20:46, David Hildenbrand wrote:
-> On 27.09.2017 19:52, Richard Henderson wrote:
->> On 09/27/2017 10:00 AM, David Hildenbrand wrote:
->>> Using virtual memory access is wrong and will soon include low-address
->>> protection checks, which is to be bypassed for STFL.
->>>
->>> This was originally part of a bigger STFL(E) refactoring.
->>>
->>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>> ---
->>>  target/s390x/helper.h      | 2 +-
->>>  target/s390x/misc_helper.c | 7 ++++++-
->>>  2 files changed, 7 insertions(+), 2 deletions(-)
->>
->> Need to sort this patch first, so that the series is bisectable.
+On 27.09.2017 19:00, David Hildenbrand wrote:
+> This is a neat way to implement low address protection, whereby
+> only the first 512 bytes of the first two pages (each 4096 bytes) of
+> every address space are protected.
 > 
-> Right, this should become #2.
+> Store a tec of 0 for the access exception, this is what is defined by
+> Enhanced Suppression on Protection in case of a low address protection
+> (Bit 61 set to 0, rest undefined).
 > 
->>
->>>  DEF_HELPER_FLAGS_2(sfpc, TCG_CALL_NO_RWG, void, env, i64)
->>>  DEF_HELPER_FLAGS_2(sfas, TCG_CALL_NO_WG, void, env, i64)
->>>  DEF_HELPER_FLAGS_1(popcnt, TCG_CALL_NO_RWG_SE, i64, i64)
->>> -DEF_HELPER_FLAGS_1(stfl, TCG_CALL_NO_RWG, void, env)
->>>  DEF_HELPER_2(stfle, i32, env, i64)
->>>  DEF_HELPER_FLAGS_2(lpq, TCG_CALL_NO_WG, i64, env, i64)
->>>  DEF_HELPER_FLAGS_4(stpq, TCG_CALL_NO_WG, void, env, i64, i64, i64)
->>> @@ -153,6 +152,7 @@ DEF_HELPER_FLAGS_3(sturg, TCG_CALL_NO_WG, void, env, i64, i64)
->>>  DEF_HELPER_1(per_check_exception, void, env)
->>>  DEF_HELPER_FLAGS_3(per_branch, TCG_CALL_NO_RWG, void, env, i64, i64)
->>>  DEF_HELPER_FLAGS_2(per_ifetch, TCG_CALL_NO_RWG, void, env, i64)
->>> +DEF_HELPER_FLAGS_1(stfl, TCG_CALL_NO_RWG, void, env)
->>>  
->>
->> Why?  Otherwise,
+> We have to make sure to to pass the access address, not the masked page
+> address into mmu_translate*().
 > 
-> struct LowCore is only available for !CONFIG_USER_ONLY. Therefore I also
-> have to move the helper declaration into !CONFIG_USER_ONLY.
+> Drop the check from testblock. So we can properly test this via
+> kvm-unit-tests.
+> 
+> This will check every access going through one of the MMUs.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/excp_helper.c |  3 +-
+>  target/s390x/mem_helper.c  |  8 ----
+>  target/s390x/mmu_helper.c  | 96 +++++++++++++++++++++++++++++-----------------
+>  3 files changed, 62 insertions(+), 45 deletions(-)
+[...]
+> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+> index 9daa0fd8e2..44a15449d2 100644
+> --- a/target/s390x/mmu_helper.c
+> +++ b/target/s390x/mmu_helper.c
+> @@ -106,6 +106,37 @@ static void trigger_page_fault(CPUS390XState *env, target_ulong vaddr,
+>      trigger_access_exception(env, type, ilen, tec);
+>  }
+>  
+> +/* check whether the address would be proteted by Low-Address Protection */
+> +static bool is_low_address(uint64_t addr)
+> +{
+> +    return addr < 512 || (addr >= 4096 && addr < 4607);
+> +}
 
-You should mention that in the patch description, that it is a
-privileged instruction and thus you also mark it here accordingly.
+I like the check from the kernel sources better:
 
-With that update:
+static inline int is_low_address(unsigned long ga)
+{
+    /* Check for address ranges 0..511 and 4096..4607 */
+    return (ga & ~0x11fful) == 0;
+}
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+... that might result in slightly faster code (depending on the
+compiler, of course).
+
+ Thomas
