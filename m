@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dxhRt-0004TA-FQ
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 18:38:30 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dxhmx-0007Lt-Iz
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 19:00:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dxhRs-0005Pu-Jk
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 18:38:29 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dxhms-0002WO-PG
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 19:00:15 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:53371)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1dxhms-0002VV-Id
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 19:00:10 -0400
+Received: by mail-wm0-x243.google.com with SMTP id q132so189153wmd.2
+	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 16:00:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_G8Md3k6EAqoN1=GCcXoCq_8vAUZ_qjOZp5GbnnfmcrA@mail.gmail.com>
-References: <cover.1506384414.git.alistair.francis@xilinx.com>
-	<e9eb34b7a508fbe3b89bb8b8aa8141f018871081.1506384414.git.alistair.francis@xilinx.com>
-	<1788278d-9437-34a0-4a17-d7914d459f77@redhat.com>
-	<CAFEAcA_G8Md3k6EAqoN1=GCcXoCq_8vAUZ_qjOZp5GbnnfmcrA@mail.gmail.com>
+In-Reply-To: <20170928094453.GD26066@lemon.lan>
+References: <20170928084430.17059-1-berrange@redhat.com>
+	<20170928084430.17059-3-berrange@redhat.com>
+	<20170928094453.GD26066@lemon.lan>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 28 Sep 2017 15:37:55 -0700
-Message-ID: <CAKmqyKM9e2R2f3BorZJ9R1XMaAwNRxvCEPGrSm3Jh=O=PnJ-_A@mail.gmail.com>
+Date: Thu, 28 Sep 2017 15:59:38 -0700
+Message-ID: <CAKmqyKN+CWQyMWisSbwRDa698Kncd6VUq1qi_-LKyLdrXKJC+w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v1 1/8] Replace all occurances
- of __FUNCTION__ with __func__
+Subject: Re: [Qemu-devel] [PATCH v6 2/6] docker: don't rely on submodules
+ existing in the main checkout
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -24,40 +30,37 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eric Blake <eblake@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>, Fam Zheng <famz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, qemu-arm <qemu-arm@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Yongbok Kim <yongbok.kim@imgtec.com>, "open list:X86" <xen-devel@lists.xenproject.org>, John Snow <jsnow@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Fam Zheng <famz@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-On Wed, Sep 27, 2017 at 4:47 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 26 September 2017 at 06:32, Eric Blake <eblake@redhat.com> wrote:
->> On 09/25/2017 07:08 PM, Alistair Francis wrote:
->>> diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
->>> index 58005b6619..32687afced 100644
->>> --- a/hw/arm/nseries.c
->>> +++ b/hw/arm/nseries.c
->>> @@ -463,7 +463,7 @@ static uint32_t mipid_txrx(void *opaque, uint32_t cmd, int len)
->>>      uint8_t ret;
->>>
->>>      if (len > 9) {
->>> -        hw_error("%s: FIXME: bad SPI word width %i\n", __FUNCTION__, len);
->>> +        hw_error("%s: FIXME: bad SPI word width %i\n", __func__, len);
+On Thu, Sep 28, 2017 at 2:44 AM, Fam Zheng <famz@redhat.com> wrote:
+> On Thu, 09/28 09:44, Daniel P. Berrange wrote:
+>> When building the tarball to pass into the docker/vm test image,
+>> the code relies on the git submodules being checked out in the
+>> main checkout.
 >>
->> Not this patch's problem, but it would probably be simpler if hw_error()
->> were a macro that automatically prefixed __func__, rather than making
->> every caller have to supply it themselves.
+>> ie if the developer has not run 'git submodule update --init dtc'
+>> most (all?) of the docker tests will fail due to the missing dtc
+>> package in the test images.
 >
-> I'm not sure there's a great deal of benefit to that change, because
-> use of hw_error() in new code is rarely correct (it does an abort()
-> so it should never be used for guest-triggered conditions, which is
-> about the only time that you might be interested in a guest register
-> dump rather than just asserting). Most of its existing uses are in
-> crufty old device models.
+> Not all, fail only in envs/configs where libfdt devel doesn't exist. But I'm not
+> sure about this patch (*).
+>
+>> Patchew manually checks out the dtc
+>> submodule in the main git checkout, but this is a bad idea. The
+>> docker tests should never mess around with the developer's main
+>> GIT checkout.
+>
+> Or in general, scripts should not mess around with developer's GIT checkouts,
+> which is the reason ./configure doesn't do it?
+>
+> How about we clone/checkout dtc into a temporary dir from ./configure
+> automatically instead?
 
-Ok, another excuse to leave it out :)
+I like this! Submodules cause lots of issues for us. Other users
+building QEMU don't expect to have to clone submodules and we get
+complaints back to the QEMU. Especially DTC which is always required.
 
 Thanks,
 Alistair
-
->
-> thanks
-> -- PMM
