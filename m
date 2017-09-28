@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dxa1Q-000751-MF
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 10:42:41 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dxa6P-00087t-Bv
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 10:47:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dxa1L-0008P1-O0
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 10:42:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53816)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dxa1L-0008Od-II
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 10:42:35 -0400
-Date: Thu, 28 Sep 2017 16:42:26 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170928164226.5e3ca82c.cohuck@redhat.com>
-In-Reply-To: <20170927072030.35737-3-borntraeger@de.ibm.com>
-References: <20170927072030.35737-1-borntraeger@de.ibm.com>
-	<20170927072030.35737-3-borntraeger@de.ibm.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dxa6K-0002p9-OB
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 10:47:49 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:45635)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dxa6K-0002oE-Fw
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 10:47:44 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id m18so3143122wrm.2
+	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 07:47:42 -0700 (PDT)
+References: <20170925075458.18047-1-famz@redhat.com>
+	<CAAdtpL5j_9qh2bmzpmx3ULgCFr8TkMF4AgUZF=7Ka66=3diD3A@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAAdtpL5j_9qh2bmzpmx3ULgCFr8TkMF4AgUZF=7Ka66=3diD3A@mail.gmail.com>
+Date: Thu, 28 Sep 2017 15:47:39 +0100
+Message-ID: <87lgkydgms.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] s390x/ais: enable ais when
- migration is available
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] docker: Don't mount ccache db if NOUSER=1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Michael Roth <mdroth@linux.vnet.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, 27 Sep 2017 09:20:29 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> Instead of unconditionally enabling the KVM AIS capability
-> in the kvm arch init function, do this in the flic realize function
-> when we know if migration is available. This requires to initialize
-> flic before the CPUs (and cpu models).
-> 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/intc/s390_flic.c          |  8 ++------
->  hw/intc/s390_flic_kvm.c      | 16 +++++++++++-----
->  hw/s390x/css.c               |  4 ++--
->  hw/s390x/s390-virtio-ccw.c   | 10 +++++++---
->  include/hw/s390x/s390_flic.h |  1 -
->  target/s390x/kvm.c           | 10 ++--------
->  6 files changed, 24 insertions(+), 25 deletions(-)
+Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 
-Thanks, applied.
+> On Mon, Sep 25, 2017 at 4:54 AM, Fam Zheng <famz@redhat.com> wrote:
+>> With NOUSER=1 the container runs code as root, which may create
+>> privileged files that will not be be accssible next time. Skip ccache
+>> dir mount in this case.
+>>
+>> Signed-off-by: Fam Zheng <famz@redhat.com>
+>
+> Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+Makes sense:
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
+>
+>> ---
+>>  tests/docker/Makefile.include | 6 ++++--
+>>  1 file changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+>> index 0e4f159619..6f9ea196a7 100644
+>> --- a/tests/docker/Makefile.include
+>> +++ b/tests/docker/Makefile.include
+>> @@ -143,9 +143,11 @@ docker-run: docker-qemu-src
+>>                         -e EXTRA_CONFIGURE_OPTS="$(EXTRA_CONFIGURE_OPTS)" \
+>>                         -e V=$V -e J=$J -e DEBUG=$(DEBUG)               \
+>>                         -e SHOW_ENV=$(SHOW_ENV)                         \
+>> -                       -e CCACHE_DIR=/var/tmp/ccache                   \
+>> +                       $(if $(NOUSER),,                                \
+>> +                               -e CCACHE_DIR=/var/tmp/ccache           \
+>> +                               -v $(DOCKER_CCACHE_DIR):/var/tmp/ccache:z \
+>> +                       )                                               \
+>>                         -v $$(readlink -e $(DOCKER_SRC_COPY)):/var/tmp/qemu:z$(COMMA)ro \
+>> -                       -v $(DOCKER_CCACHE_DIR):/var/tmp/ccache:z       \
+>>                         $(IMAGE)                                        \
+>>                         /var/tmp/qemu/run                               \
+>>                         $(TEST), "  RUN $(TEST) in ${IMAGE}")
+>> --
+>> 2.13.5
+>>
+
+
+--
+Alex Bennée
