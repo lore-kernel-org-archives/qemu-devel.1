@@ -1,38 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dxY0n-00043m-4T
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 08:33:57 -0400
+	(envelope-from <bounces@canonical.com>) id 1dxY2b-0004mW-4j
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 08:35:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dxY0j-0001jf-8Q
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 08:33:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45250)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dxY0j-0001jH-2d
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 08:33:49 -0400
-References: <20170926162058.30772-1-cohuck@redhat.com>
-	<20170926162058.30772-2-cohuck@redhat.com>
-	<338c8565-691e-a8bc-d8a6-3637ce13701d@redhat.com>
-	<20170927114717.72bd69f8.cohuck@redhat.com>
-	<e8bef299-5501-a59d-aba3-5a338227966e@linux.vnet.ibm.com>
-	<20170927125606.65dc514d.cohuck@redhat.com>
-	<14df9ad6-f0e9-cd51-04dd-4fe994808433@de.ibm.com>
-	<4681e677-9e5a-4c1c-8e22-dc5c51b7286d@redhat.com>
-	<20170927142837.GB2108@work-vm>
-	<20170927164644.42205e6f.cohuck@redhat.com>
-	<20170927144927.GC2108@work-vm>
-	<20170927170346.68ca0cd8.cohuck@redhat.com>
-	<9c8c2596-c4cf-41ad-7228-0ed598cf65cd@de.ibm.com>
-	<dc15f576-8397-718d-0c75-0cba607c53b9@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <06985cad-8fc0-8eb5-8cd1-6baabd5a217b@redhat.com>
-Date: Thu, 28 Sep 2017 14:33:44 +0200
+	(envelope-from <bounces@canonical.com>) id 1dxY2X-00034y-8A
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 08:35:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46542)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dxY2X-00034h-1w
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 08:35:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1dxY2U-0008EG-MN
+	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 12:35:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6CC072E849C
+	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 12:35:38 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <dc15f576-8397-718d-0c75-0cba607c53b9@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390x: create a compat s390 phb for
- <=2.10
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 28 Sep 2017 12:20:34 -0000
+From: Daniel Berrange <1583784@bugs.launchpad.net>
+Reply-To: Bug 1583784 <1583784@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160519202600.8755.25116.malonedeb@gac.canonical.com>
+Message-Id: <150660123576.5593.10717541064815910295.launchpad@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1583784] Re: qio_task_free segfault websocket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,33 +36,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Yi Min Zhao <zyimin@linux.vnet.ibm.com>, qemu-devel@nongnu.org, agraf@suse.de, pasic@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
 
+*** This bug is a duplicate of bug 1589923 ***
+    https://bugs.launchpad.net/bugs/1589923
 
->> In the end that means that you should revert
->>
->> commit d32bd032d8fde41281aae34c16a4aa97e9acfeac
->> Author:     Cornelia Huck <cohuck@redhat.com>
->> AuthorDate: Thu Jul 6 17:21:52 2017 +0200
->> Commit:     Cornelia Huck <cohuck@redhat.com>
->> CommitDate: Wed Aug 30 18:23:25 2017 +0200
->>
->>     s390x/ccw: create s390 phb conditionally
->>
->> to keep s390-ccw-virtio clean proper.
->>
->> If you want to have PCI disabled, you can do you in a machine like 
-> too quick                                     ^that^					 
->> s390-rhelx.y.z or whatever. 
-> 
-> I think we really must revert this commit. 
-> 
+** This bug has been marked a duplicate of bug 1589923
+   https websockets not working in 2.5 or 2.6
 
-I tend to agree.
+-- =
 
--- 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1583784
 
-Thanks,
+Title:
+  qio_task_free segfault websocket
 
-David
+Status in QEMU:
+  New
+
+Bug description:
+  When connecting with websocket and tls to a vnc-ws port I get segfault
+
+  =3D=3D15252=3D=3D Process terminating with default action of signal 11 (S=
+IGSEGV): dumping core
+  =3D=3D15252=3D=3D  Access not within mapped region at address 0x0
+  =3D=3D15252=3D=3D    at 0x1: ???
+  =3D=3D15252=3D=3D    by 0x56E1E2: qio_task_free (task.c:58)
+  =3D=3D15252=3D=3D    by 0x56E42B: qio_task_complete (task.c:145)
+  =3D=3D15252=3D=3D    by 0x56DBB8: qio_channel_websock_handshake_send (cha=
+nnel-websock.c:289)
+  =3D=3D15252=3D=3D    by 0x7B3F689: g_main_dispatch (gmain.c:3154)
+  =3D=3D15252=3D=3D    by 0x7B3F689: g_main_context_dispatch (gmain.c:3769)
+  =3D=3D15252=3D=3D    by 0x50D42A: glib_pollfds_poll (main-loop.c:213)
+  =3D=3D15252=3D=3D    by 0x50D42A: os_host_main_loop_wait (main-loop.c:258)
+  =3D=3D15252=3D=3D    by 0x50D42A: main_loop_wait (main-loop.c:506)
+  =3D=3D15252=3D=3D    by 0x28A8D1: main_loop (vl.c:1934)
+  =3D=3D15252=3D=3D    by 0x28A8D1: main (vl.c:4656)
+
+  qemu 2.6.0
+  linux x64
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1583784/+subscriptions
