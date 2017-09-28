@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1dxUyC-0000nW-6s
+	(envelope-from <amarnath.valluri@intel.com>) id 1dxUyC-0000nX-8p
 	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:19:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1dxUy8-0000cf-V7
+	(envelope-from <amarnath.valluri@intel.com>) id 1dxUyB-0000eo-7h
 	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:19:00 -0400
 Received: from mga11.intel.com ([192.55.52.93]:13925)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
-	id 1dxUy8-0000bz-NK
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:18:56 -0400
+	id 1dxUyA-0000bz-Uh
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:18:59 -0400
 From: Amarnath Valluri <amarnath.valluri@intel.com>
-Date: Thu, 28 Sep 2017 12:20:01 +0300
-Message-Id: <1506590409-28857-1-git-send-email-amarnath.valluri@intel.com>
+Date: Thu, 28 Sep 2017 12:20:02 +0300
+Message-Id: <1506590409-28857-2-git-send-email-amarnath.valluri@intel.com>
+In-Reply-To: <1506590409-28857-1-git-send-email-amarnath.valluri@intel.com>
+References: <1506590409-28857-1-git-send-email-amarnath.valluri@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v9 0/8] Provide support for the software TPM
+Subject: [Qemu-devel] [PATCH v9 1/8] tpm-backend: Remove unneeded member
+ variable from backend class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +31,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Amarnath Valluri <amarnath.valluri@intel.com>
 
-Briefly, Theses set of patches introduces:
-- new TPM backend driver to support software TPM emulators(swtpm(1)).
-- and few supported fixes/enhancements/cleanup to existing tpm backend code.
+TPMDriverOps inside TPMBackend is not required, as it is supposed to be a class
+member. The only possible reason for keeping in TPMBackend was, to get the
+backend type in tpm.c where dedicated backend api, tpm_backend_get_type() is
+present.
 
-The similar idea was initiated earliar(2) by Stefan Berger(CCed) with slightly
-different approach, using CUSE. As swtpm has excellent support for unix domain
-sockets, hence this implementation uses unix domain sockets to communicate with
-swtpm.
+Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+---
+ hw/tpm/tpm_passthrough.c     | 4 ----
+ include/sysemu/tpm_backend.h | 1 -
+ tpm.c                        | 2 +-
+ 3 files changed, 1 insertion(+), 6 deletions(-)
 
-When Qemu is configured with 'emulator' tpm backend, it spawns 'swtpm' and
-communicates its via Unix domain sockets.
-
-1) https://github.com/stefanberger/swtpm
-2) https://lists.nongnu.org/archive/html/qemu-devel/2016-01/msg00089.html
-
-** Changes in V2:
-- Made spawnning swtpm optional
-- used QIOChannel instead of plain unix sockets
-- incorporated other fixes pointed in v1 review
-
-** Changes in v3:
-- Addressed review comments made by Stefan Berger and Deniel
-P Berrange
-
-** Changes in v4:
-- Moved realloc_buffer() to TIS model
-- Made TpmInfo related change backwards compatible.
-
-** Changes in v5:
-- updated Reviewed-By: tag to git commits
-- added migration blocker to TPM emulator backend
-
-** Changes in v6:
-- rebased agianst latest master
-- Address review comments maded by Stefan Berger
-
-** Changes in v7:
-- rebased agianst latest master
-- Rewritten emulater backend using chardev backend
-
-** Changes in v[89]:
-- Address review comments maded by Stefan Berger and Marc-Andre
-- Removed unneeded had_startup_error() method from TPMDriverOps
-
-Amarnath Valluri (8):
-  tpm-backend: Remove unneeded member variable from backend class
-  tpm-backend: Move thread handling inside TPMBackend
-  tpm-backend: Initialize and free data members in it's own methods
-  tpm-backend: Made few interface methods optional
-  tmp backend: Add new api to read backend TpmInfo
-  tpm-backend: Move realloc_buffer() implementation to tpm-tis model
-  tpm-passthrough: move reusable code to utils
-  tpm: Added support for TPM emulator
-
- backends/tpm.c                   | 115 +++++---
- configure                        |  13 +-
- hmp.c                            |   5 +
- hw/tpm/Makefile.objs             |   1 +
- hw/tpm/tpm_emulator.c            | 599 +++++++++++++++++++++++++++++++++++++++
- hw/tpm/tpm_ioctl.h               | 246 ++++++++++++++++
- hw/tpm/tpm_passthrough.c         | 242 ++++------------
- hw/tpm/tpm_tis.c                 |  14 +-
- hw/tpm/tpm_util.c                |  25 ++
- hw/tpm/tpm_util.h                |   4 +
- include/sysemu/tpm_backend.h     |  80 +++---
- include/sysemu/tpm_backend_int.h |  41 ---
- qapi/tpm.json                    |  21 +-
- qemu-options.hx                  |  22 +-
- tpm.c                            |  36 +--
- vl.c                             |   1 +
- 16 files changed, 1100 insertions(+), 365 deletions(-)
- create mode 100644 hw/tpm/tpm_emulator.c
- create mode 100644 hw/tpm/tpm_ioctl.h
- delete mode 100644 include/sysemu/tpm_backend_int.h
-
+diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+index 9234eb3..a0baf5f 100644
+--- a/hw/tpm/tpm_passthrough.c
++++ b/hw/tpm/tpm_passthrough.c
+@@ -46,8 +46,6 @@
+ #define TPM_PASSTHROUGH(obj) \
+     OBJECT_CHECK(TPMPassthruState, (obj), TYPE_TPM_PASSTHROUGH)
+ 
+-static const TPMDriverOps tpm_passthrough_driver;
+-
+ /* data structures */
+ typedef struct TPMPassthruThreadParams {
+     TPMState *tpm_state;
+@@ -462,8 +460,6 @@ static TPMBackend *tpm_passthrough_create(QemuOpts *opts, const char *id)
+     /* let frontend set the fe_model to proper value */
+     tb->fe_model = -1;
+ 
+-    tb->ops = &tpm_passthrough_driver;
+-
+     if (tpm_passthrough_handle_device_opts(opts, tb)) {
+         goto err_exit;
+     }
+diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
+index b0a9731..3708413 100644
+--- a/include/sysemu/tpm_backend.h
++++ b/include/sysemu/tpm_backend.h
+@@ -50,7 +50,6 @@ struct TPMBackend {
+     enum TpmModel fe_model;
+     char *path;
+     char *cancel_path;
+-    const TPMDriverOps *ops;
+ 
+     QLIST_ENTRY(TPMBackend) list;
+ };
+diff --git a/tpm.c b/tpm.c
+index 2d830d0..abedf3f 100644
+--- a/tpm.c
++++ b/tpm.c
+@@ -211,7 +211,7 @@ static TPMInfo *qmp_query_tpm_inst(TPMBackend *drv)
+     res->model = drv->fe_model;
+     res->options = g_new0(TpmTypeOptions, 1);
+ 
+-    switch (drv->ops->type) {
++    switch (tpm_backend_get_type(drv)) {
+     case TPM_TYPE_PASSTHROUGH:
+         res->options->type = TPM_TYPE_OPTIONS_KIND_PASSTHROUGH;
+         tpo = g_new0(TPMPassthroughOptions, 1);
 -- 
 2.7.4
