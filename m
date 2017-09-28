@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dxfa2-0004lP-1h
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 16:38:48 -0400
+	(envelope-from <david@redhat.com>) id 1dxfa4-0004nQ-5n
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 16:38:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dxfZy-0003Y9-4R
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 16:38:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55500)
+	(envelope-from <david@redhat.com>) id 1dxfa2-0003Zg-CY
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 16:38:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57708)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dxfZx-0003Xr-Rw
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 16:38:42 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dxfa2-0003ZR-6i
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 16:38:46 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Thu, 28 Sep 2017 22:36:56 +0200
-Message-Id: <20170928203708.9376-19-david@redhat.com>
+Date: Thu, 28 Sep 2017 22:36:58 +0200
+Message-Id: <20170928203708.9376-21-david@redhat.com>
 In-Reply-To: <20170928203708.9376-1-david@redhat.com>
 References: <20170928203708.9376-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 18/30] s390x/kvm: factor out actual handling
- of STOP interrupts
+Subject: [Qemu-devel] [PATCH v2 20/30] s390x/tcg: implement SIGP SENSE
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -27,79 +26,60 @@ To: qemu-devel@nongnu.org
 Cc: thuth@redhat.com, cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <richard.henderson@linaro.org>, David Hildenbrand <david@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-For KVM, the KVM module decides when a STOP can be performed (when the
-STOP interrupt can be processed). Factor it out so we can use it
-later for TCG.
+Add it as preparation for TCG. Sensing coul later be done completely
+lockless.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/internal.h |  1 +
- target/s390x/kvm.c      |  8 +-------
- target/s390x/sigp.c     | 15 ++++++++++++++-
- 3 files changed, 16 insertions(+), 8 deletions(-)
+ target/s390x/sigp.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-index d6ab45add4..2c3fc3fce0 100644
---- a/target/s390x/internal.h
-+++ b/target/s390x/internal.h
-@@ -418,5 +418,6 @@ void s390x_translate_init(void);
- 
- /* sigp.c */
- int handle_sigp(CPUS390XState *env, uint8_t order, uint64_t r1, uint64_t r3);
-+void do_stop_interrupt(CPUS390XState *env);
- 
- #endif /* S390X_INTERNAL_H */
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 1174e249ab..72008e436f 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -1597,13 +1597,7 @@ static int handle_intercept(S390CPU *cpu)
-             r = EXCP_HALTED;
-             break;
-         case ICPT_CPU_STOP:
--            if (s390_cpu_set_state(CPU_STATE_STOPPED, cpu) == 0) {
--                qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
--            }
--            if (cpu->env.sigp_order == SIGP_STOP_STORE_STATUS) {
--                s390_store_status(cpu, S390_STORE_STATUS_DEF_ADDR, true);
--            }
--            cpu->env.sigp_order = 0;
-+            do_stop_interrupt(&cpu->env);
-             r = EXCP_HALTED;
-             break;
-         case ICPT_OPEREXC:
 diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
-index 4813123aad..9587c3d319 100644
+index c57312b743..063a34ccc7 100644
 --- a/target/s390x/sigp.c
 +++ b/target/s390x/sigp.c
-@@ -81,7 +81,7 @@ static void sigp_stop_and_store_status(CPUState *cs, run_on_cpu_data arg)
-     case CPU_STATE_OPERATING:
-         cpu->env.sigp_order = SIGP_STOP_STORE_STATUS;
-         cpu_inject_stop(cpu);
--        /* store will be performed when handling the stop intercept */
-+        /* store will be performed in do_stop_interrup() */
-         break;
-     case CPU_STATE_STOPPED:
-         /* already stopped, just store the status */
-@@ -360,6 +360,19 @@ int s390_cpu_restart(S390CPU *cpu)
-     return 0;
+@@ -32,6 +32,32 @@ static void set_sigp_status(SigpInfo *si, uint64_t status)
+     si->cc = SIGP_CC_STATUS_STORED;
  }
  
-+void do_stop_interrupt(CPUS390XState *env)
++static void sigp_sense(S390CPU *dst_cpu, SigpInfo *si)
 +{
-+    S390CPU *cpu = s390_env_get_cpu(env);
++    uint8_t state = s390_cpu_get_state(dst_cpu);
++    bool ext_call = dst_cpu->env.pending_int & INTERRUPT_EXTERNAL_CALL;
++    uint64_t status = 0;
 +
-+    if (s390_cpu_set_state(CPU_STATE_STOPPED, cpu) == 0) {
-+        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
++    if (!tcg_enabled()) {
++        /* handled in KVM */
++        set_sigp_status(si, SIGP_STAT_INVALID_ORDER);
++        return;
 +    }
-+    if (cpu->env.sigp_order == SIGP_STOP_STORE_STATUS) {
-+        s390_store_status(cpu, S390_STORE_STATUS_DEF_ADDR, true);
++
++    /* sensing without locks is racy, but it's the same for real hw */
++    if (state != CPU_STATE_STOPPED && !ext_call) {
++        si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
++    } else {
++        if (ext_call) {
++            status |= SIGP_STAT_EXT_CALL_PENDING;
++        }
++        if (state == CPU_STATE_STOPPED) {
++            status |= SIGP_STAT_STOPPED;
++        }
++        set_sigp_status(si, status);
 +    }
-+    env->sigp_order = 0;
 +}
 +
- void s390_init_sigp(void)
+ static void sigp_start(CPUState *cs, run_on_cpu_data arg)
  {
-     qemu_mutex_init(&qemu_sigp_mutex);
+     S390CPU *cpu = S390_CPU(cs);
+@@ -277,6 +303,9 @@ static int handle_sigp_single_dst(S390CPU *dst_cpu, uint8_t order,
+     }
+ 
+     switch (order) {
++    case SIGP_SENSE:
++        sigp_sense(dst_cpu, &si);
++        break;
+     case SIGP_START:
+         run_on_cpu(CPU(dst_cpu), sigp_start, RUN_ON_CPU_HOST_PTR(&si));
+         break;
 -- 
 2.13.5
