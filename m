@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dxix7-0000He-6D
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 20:14:50 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dxix9-0000Kx-7k
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 20:14:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dxix6-00013x-11
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 20:14:49 -0400
-Date: Thu, 28 Sep 2017 23:20:02 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dxix6-00013w-1a
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 20:14:51 -0400
+Date: Thu, 28 Sep 2017 23:17:44 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170928132002.GG6445@umbus.fritz.box>
+Message-ID: <20170928131744.GF6445@umbus.fritz.box>
 References: <20170911171235.29331-1-clg@kaod.org>
-	<20170911171235.29331-8-clg@kaod.org>
-	<20170919025747.GM27153@umbus>
-	<771e897f-f304-3616-2e9c-e582f556b914@kaod.org>
-	<1506587342.25626.26.camel@kernel.crashing.org>
+	<20170919082020.GT27153@umbus> <20170919084618.GY27153@umbus>
+	<98b6f737-a554-1c83-79f9-2c8021e1cf69@kaod.org>
+	<1506587002.25626.20.camel@kernel.crashing.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="YH9Qf6Fh2G5kB/85"
+	protocol="application/pgp-signature"; boundary="4f28nU6agdXSinmL"
 Content-Disposition: inline
-In-Reply-To: <1506587342.25626.26.camel@kernel.crashing.org>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 07/21] ppc/xive: add MMIO handlers
- for the XIVE interrupt sources
+In-Reply-To: <1506587002.25626.20.camel@kernel.crashing.org>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 00/21] Guest exploitation of the
+ XIVE interrupt controller (POWER9)
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -32,64 +31,99 @@ Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qem
 List-ID: <qemu-devel.nongnu.org>
 
 
---YH9Qf6Fh2G5kB/85
+--4f28nU6agdXSinmL
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 28, 2017 at 10:29:02AM +0200, Benjamin Herrenschmidt wrote:
-> On Wed, 2017-09-20 at 15:05 +0200, C=E9dric Le Goater wrote:
-> > > > +/*
-> > > > + * XIVE Interrupt Source MMIOs
-> > > > + */
-> > > > +static uint64_t spapr_xive_esb_read(void *opaque, hwaddr addr, uns=
-igned size)
-> > > > +{
-> > > > +    sPAPRXive *xive =3D SPAPR_XIVE(opaque);
-> > > > +    uint32_t offset =3D addr & 0xF00;
-> > > > +    uint32_t srcno =3D addr >> xive->esb_shift;
-> > > > +    XiveIVE *ive;
-> > > > +    uint64_t ret =3D -1;
-> > > > +
-> > > > +    ive =3D spapr_xive_get_ive(xive, srcno);
-> > > > +    if (!ive || !(ive->w & IVE_VALID))  {
-> > > > +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid LISN %d\n", =
-srcno);
-> > > > +        goto out;
+On Thu, Sep 28, 2017 at 10:23:22AM +0200, Benjamin Herrenschmidt wrote:
+> On Wed, 2017-09-20 at 14:33 +0200, C=E9dric Le Goater wrote:
+> > > > I'm thinking maybe trying to support the CAS negotiation of interru=
+pt
+> > > > controller from day 1 is warping the design.  A better approach mig=
+ht
+> > > > be first to implement XIVE only when given a specific machine optio=
+n -
+> > > > guest gets one or the other and can't negotiate.
+> >=20
+> > ok.=20
+> >=20
+> > CAS is not the most complex problem, we mostly need to share=20
+> > the ICSIRQState array and the source offset. migration from older
+> > machine is a problem. We are doomed to keep the existing XICS
+> > framework available.
+>=20
+> I don't like sharing anything. I'd rather we had separate objects
+> alltogether. If needed we can implement CAS by doing a partition reboot
+> like pHyp does, at least initially, until we add ways to tear down and
+> rebuild objects.
+
+Right, I agree.  The difficulty isn't really CAS reboot or not, it's
+more that altering the virtual hardware at runtime is.. awkward.. in
+qemu.  And then there's the issue of migrating the state, which also
+gets a bit complex.
+
+As you've seen elsewhere, I think we need to get the XIVE model right
+on its own first, then worry about those issues.
+
+> The main issue is whether we can keep a consistent number space so the
+> DT doesn't have to be completely rebuilt. If it does, then reboot will
+> be the only practical option I'm afraid.
+
+I think it should be possible to make a consistent number space.  At
+present the irq allocation is kind of tied to xics, but I think that's
+fixable.
+
+> > > > That should allow a more natural XIVE design to emerge, *then* we c=
+an
+> > > > look at what's necessary to make boot-time negotiation possible.
 > > >=20
-> > > Since there's a whole (4k) page for each source, I wonder if we should
-> > > actually map each one as a separate MMIO region to allow us to tweak
-> > > the mappings more flexibly
+> > > Actually, it just occurred to me that we might be making life hard for
+> > > ourselves by trying to actually switch between full XICS and XIVE
+> > > models.  Coudln't we have new machine types always construct the XIVE
+> > > infrastructure,=20
 > >=20
-> > yes we could have a subregion for each source. In that case,=20
-> > we should also handle IVE_VALID properly. That will require=20
-> > a specific XIVE allocator which was difficult to do while
-> > keeping the compatibility with XICS for migration and CAS.
+> > yes.
+> >=20
+> > > but then implement the XICS RTAS and hcalls in terms of the XIVE virt=
+ual=20
+> > > hardware.
 >=20
-> That will be a serious bloat with lots of interrupts. We also cannot
-> possibly have a KVM mm region per interrupt or even a vma.
-
-Yeah.  I'd been thinking in terms of thousands of sources, which
-wouldn't be too unreasonable in terms of separate regions.  With all
-the IPIs sounds like it could be more in the hundres of thousands at
-which point that would get very nasty.
-
-So I agree, I think we want to keep it one region.
-
-AIUI, how we do that shouldn't affect the guest, though.
-
-> I'm thinking of some kind of /dev/xive (or some other KVM or irqfd
-> orignated fd) that allows you to mmap a single big region whose content
-> is demand-faulted and invalidated by the kernel to map the various
-> interrupts.
+> That's gross :-)
 >=20
-> So that it looks like a single VMA (and KVM memory block).
+> This is also exactly what KVM does with real XIVE HW and there's also
+> such an emulation in OPAL. I'd be weary of creating a 3rd one...
 >=20
-> Ben.
+> I'd much prefer if we managed to:
 >=20
+>  - Split the source numbering from the various state tracking objects
+> so we can have that common
+>=20
+>  - Either delay the creation to after CAS or tear down & re-create the
+> state tracking objects at CAS time.
+>=20
+> > ok but migration will not be supported.
+> >=20
+> > > Since something more or less equivalent
+> > > has already been done in both OPAL and the host kernel, I'm guessing
+> > > this shouldn't be too hard at this point.
+>=20
+> It would very much suck to have yet another one of these.
+
+Hm, ok.
+
+> Also we need to understand how that would work in a KVM context, the
+> kernel will provide a "XICS" state even on top of XIVE unless we switch
+> the kernel object to native, but then the kernel will expect full
+> exploitation.
+>=20
+> > Indeed that is how it is working currently on P9 kvm guests. hcalls are
+> > implemented on top of XIVE native.
+> >=20
+> > Thanks,
+> >=20
+> >=20
 > > C.
-> >=20
-> >=20
 >=20
 
 --=20
@@ -98,24 +132,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---YH9Qf6Fh2G5kB/85
+--4f28nU6agdXSinmL
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnM9wIACgkQbDjKyiDZ
-s5LqrhAA3MWbmhph6JsoGzDWrg951cYRZnFBPaCHpr8J6tzQZehRFnBz5rDpBYW5
-om1ac4cKoclCJApEWXkmal1W4ns+NBMHi4bUulw6tw+age2hdhlgLfdwBGnfgXq7
-F1DBR5x1yCBdNpSWcsaOIXtwf96Tc2RlLhHSLH40f0hKHm1kcGG2Tiv01gFcmqBg
-PSVmINKOrENtuGHOqrc4TEKeg4JMnnRLJdtxNzNTSuCHAgirgyW5QbAxF03Jj1Pl
-lrtqeLKaNq2sU8PS2L5zIpVVAvKHIQRAOt4ffrONZOs7hde9p8jey2rD718DY0fx
-9/HyqjpJWNS0NKNYvZDkhVjTs0+NGN1av96f362oq0nkRVU24Bk+I5x93KejXUUa
-dfUOaGu5BIGCjO2Annwdg/sY3VUTFUFVWH76aAcnD/PdEFTIqhFjS75y28zOr/qx
-NVwfI2XP5bqqf79iIlRqoTENieOGS32Isl2857CVHhWpOGZ6zGCsgosRLQr2tRN6
-yQ/fDd5/v7KQluxXlVYlku0ZitKqm946pTxsIlSnbiwS8lEFeR7tDZAS7XipSveD
-P0LQNia3ZLbA2l8tSbKpMj4wTWDZVA2vn20A9oOvwa0ITMaRJ8+LvNkrY2FYu/8F
-twxtBve38BN4RWqZHg1km5Yk/I/ikozEsKewS0qhbqinnxeUXwA=
-=XyMz
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnM9ngACgkQbDjKyiDZ
+s5JaWxAAtnFRTzzPBHuFZ7LDTSJ6Yr6S6BEfuHG77lndehDvG+3cL5+QBmJZyLDE
+H5RVP4rgNttz8J0AjH/HhN4Q5qRRrhe1vIpMgA+fj9lzmU/imv48K2kbaDXZMgwE
+af8fT/ODgbQfTuMCVRJe7ZBGdIKweYxbErniqwtR+Bw4LjAC8mxLwNAFEF1RbOeZ
+oWj//tMVE2IQaq6l24Q2msxBSoI6ypvuonCRPxH3+aTFphTfl4aL22YkAv7g93HJ
+lXbqcd5BinfV9d26/NMjZ0czwVIErELMKly/IM2iCLOsoNhWIQouo4jINz17VzLr
+XBYAEkhQRi8P0sqGlAPufY8++g1BBh6e1YB44V/Qo8zXJpumII7+/3IyGLKAcJ43
+kZnKIuRCL8xGEfA5lg28CxuFUPvXsMbmeDHbE2OI4t0cl4rU8Us13/8+lr1F63TK
+8fdcZs+yUW8ejvpEcliPzahDRBR0x6PuLJ6eCC/CMkqVil9q0B+v1b0mOJfFeXI0
+cTDstXo5HzL5kwomN57gT12IxNIeHj1m19Urtd6ciaTeCFzoKp1/sMO9HEDOueco
+UF/HZy4aZXCevucNCbPxtzrhbl+zmKGsEwyL+DzYdDesYsyrfeOkQ4LTzzjO+y0r
+UM1dMxKm8AIkniDGnPfCOt9bnzW8VgsRmAt9NOPfyDYxHRbZweY=
+=Nh1X
 -----END PGP SIGNATURE-----
 
---YH9Qf6Fh2G5kB/85--
+--4f28nU6agdXSinmL--
