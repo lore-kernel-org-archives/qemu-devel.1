@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dxYQi-0002Z3-Ng
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 09:00:44 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dxYW5-0003hM-0B
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 09:06:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dxYQe-0005L0-D8
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 09:00:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42748)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dxYQe-0005Kn-6Q
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 09:00:36 -0400
-References: <20170913132417.24384-1-david@redhat.com>
-	<20170913132417.24384-17-david@redhat.com>
-	<f07c7045-7809-c008-e521-bf7aa6189c72@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <c0eee695-2e53-a819-43ee-a0fb677b5486@redhat.com>
-Date: Thu, 28 Sep 2017 15:00:26 +0200
-MIME-Version: 1.0
-In-Reply-To: <f07c7045-7809-c008-e521-bf7aa6189c72@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 16/22] s390x: allow cpu hotplug via
- device_add
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dxYW1-0008Db-Q2
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 09:06:12 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 28 Sep 2017 16:06:05 +0300
+Message-Id: <20170928130605.79666-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20170912094622.GC29136@localhost.localdomain>
+References: <20170912094622.GC29136@localhost.localdomain>
+Subject: [Qemu-devel] [PATCH] iotests: test clearing unknown
+ autoclear_features by qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +20,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Matthew Rosato <mjrosato@linux.vnet.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, borntraeger@de.ibm.com, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: mreitz@redhat.com
+Cc: vsementsov@virtuozzo.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On 28.09.2017 08:01, Thomas Huth wrote:
-> On 13.09.2017 15:24, David Hildenbrand wrote:
->> E.g. the following now works:
->>     device_add host-s390-cpu,id=cpu1,core-id=1
-> 
->  Hi David,
-> 
-> FYI, this introduced a possibility to crash QEMU with the none machine:
-> 
-> $ s390x-softmmu/qemu-system-s390x -M none -nographic
-> QEMU 2.10.50 monitor - type 'help' for more information
-> (qemu) device_add qemu-s390-cpu
-> Segmentation fault (core dumped)
-> 
->  Thomas
-> 
+Test clearing unknown autoclear_features by qcow2 on incoming
+migration.
 
-Interesting, x86 shields hotplug for none completely.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
 
-t460s: ~/git/qemu s390x_lap $ sudo qemu-system-x86_64 -M none -smp
-1,maxcpus=4 -monitor stdio -Sqemu-system-x86_64: Number of SMP CPUs
-requested (4) exceeds max CPUs supported by machine 'none' (1)
+Here is a test, related to this problem, which fails with SIGABRT on master
+and is successful on 2.9
 
-Will send a patch.
+I've tried to fix it by some interchanges in bdrv_invalidate_cache but
+unsuccessfully...
 
+ tests/qemu-iotests/196     | 63 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/196.out |  5 ++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 69 insertions(+)
+ create mode 100755 tests/qemu-iotests/196
+ create mode 100644 tests/qemu-iotests/196.out
+
+diff --git a/tests/qemu-iotests/196 b/tests/qemu-iotests/196
+new file mode 100755
+index 0000000000..9ffbc723c2
+--- /dev/null
++++ b/tests/qemu-iotests/196
+@@ -0,0 +1,63 @@
++#!/usr/bin/env python
++#
++# Test clearing unknown autoclear_features flag by qcow2 after
++# migration. This test mimics migration to older qemu.
++#
++# Copyright (c) 2017 Parallels International GmbH
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++import os
++import iotests
++from iotests import qemu_img
++
++disk = os.path.join(iotests.test_dir, 'disk')
++migfile = os.path.join(iotests.test_dir, 'migfile')
++
++class TestInvalidateAutoclear(iotests.QMPTestCase):
++
++    def tearDown(self):
++        self.vm_a.shutdown()
++        self.vm_b.shutdown()
++        os.remove(disk)
++        os.remove(migfile)
++
++    def setUp(self):
++        qemu_img('create', '-f', iotests.imgfmt, disk, '1M')
++
++        self.vm_a = iotests.VM(path_suffix='a').add_drive(disk)
++        self.vm_a.launch()
++
++        self.vm_b = iotests.VM(path_suffix='b').add_drive(disk)
++        self.vm_b.add_incoming("exec: cat '" + migfile + "'")
++
++    def test_migration(self):
++        result = self.vm_a.qmp('migrate', uri='exec:cat>' + migfile)
++        self.assert_qmp(result, 'return', {});
++        self.assertNotEqual(self.vm_a.event_wait("STOP"), None)
++
++        with open(disk, 'r+b') as f:
++            f.seek(88) # first byte of autoclear_features field
++            f.write(b'\xff')
++
++        self.vm_b.launch()
++        self.assertNotEqual(self.vm_b.event_wait("RESUME"), None)
++
++        with open(disk, 'rb') as f:
++            f.seek(88)
++            self.assertEqual(f.read(1), b'\x00')
++
++if __name__ == '__main__':
++    iotests.main(supported_fmts=['qcow2'])
+diff --git a/tests/qemu-iotests/196.out b/tests/qemu-iotests/196.out
+new file mode 100644
+index 0000000000..ae1213e6f8
+--- /dev/null
++++ b/tests/qemu-iotests/196.out
+@@ -0,0 +1,5 @@
++.
++----------------------------------------------------------------------
++Ran 1 tests
++
++OK
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index cdccee319e..be219ca5fd 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -191,3 +191,4 @@
+ 192 rw auto quick
+ 194 rw auto migration quick
+ 195 rw auto quick
++196 rw auto quick
 -- 
-
-Thanks,
-
-David
+2.11.1
