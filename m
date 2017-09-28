@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1dxUyC-0000nX-8p
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:19:01 -0400
+	(envelope-from <amarnath.valluri@intel.com>) id 1dxUyG-0000oI-7U
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:19:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1dxUyB-0000eo-7h
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:19:00 -0400
+	(envelope-from <amarnath.valluri@intel.com>) id 1dxUyE-0000kO-UJ
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:19:04 -0400
 Received: from mga11.intel.com ([192.55.52.93]:13925)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
-	id 1dxUyA-0000bz-Uh
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:18:59 -0400
+	id 1dxUyE-0000bz-K1
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:19:02 -0400
 From: Amarnath Valluri <amarnath.valluri@intel.com>
-Date: Thu, 28 Sep 2017 12:20:02 +0300
-Message-Id: <1506590409-28857-2-git-send-email-amarnath.valluri@intel.com>
+Date: Thu, 28 Sep 2017 12:20:04 +0300
+Message-Id: <1506590409-28857-4-git-send-email-amarnath.valluri@intel.com>
 In-Reply-To: <1506590409-28857-1-git-send-email-amarnath.valluri@intel.com>
 References: <1506590409-28857-1-git-send-email-amarnath.valluri@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v9 1/8] tpm-backend: Remove unneeded member
- variable from backend class
+Subject: [Qemu-devel] [PATCH v9 3/8] tpm-backend: Initialize and free data
+ members in it's own methods
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,66 +31,176 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Amarnath Valluri <amarnath.valluri@intel.com>
 
-TPMDriverOps inside TPMBackend is not required, as it is supposed to be a class
-member. The only possible reason for keeping in TPMBackend was, to get the
-backend type in tpm.c where dedicated backend api, tpm_backend_get_type() is
-present.
+Initialize and free TPMBackend data members in it's own instance_init() and
+instance_finalize methods.
+
+Took the opportunity to remove unneeded destroy() method from TpmDriverOps
+interface as TPMBackend is a Qemu Object, we can use object_unref() inplace of
+tpm_backend_destroy() to free the backend object, hence removed destroy() from
+TPMDriverOps interface.
 
 Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
 Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 ---
- hw/tpm/tpm_passthrough.c     | 4 ----
- include/sysemu/tpm_backend.h | 1 -
- tpm.c                        | 2 +-
- 3 files changed, 1 insertion(+), 6 deletions(-)
+ backends/tpm.c               | 16 ++++++----------
+ hw/tpm/tpm_passthrough.c     | 31 ++++++++++++-------------------
+ include/sysemu/tpm_backend.h |  7 -------
+ tpm.c                        |  2 +-
+ 4 files changed, 19 insertions(+), 37 deletions(-)
 
+diff --git a/backends/tpm.c b/backends/tpm.c
+index ce56c3b..cf5abf1 100644
+--- a/backends/tpm.c
++++ b/backends/tpm.c
+@@ -51,15 +51,6 @@ const char *tpm_backend_get_desc(TPMBackend *s)
+     return k->ops->desc();
+ }
+ 
+-void tpm_backend_destroy(TPMBackend *s)
+-{
+-    TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
+-
+-    k->ops->destroy(s);
+-
+-    tpm_backend_thread_end(s);
+-}
+-
+ int tpm_backend_init(TPMBackend *s, TPMState *state,
+                      TPMRecvDataCB *datacb)
+ {
+@@ -182,17 +173,22 @@ static void tpm_backend_prop_set_opened(Object *obj, bool value, Error **errp)
+ 
+ static void tpm_backend_instance_init(Object *obj)
+ {
++    TPMBackend *s = TPM_BACKEND(obj);
++
+     object_property_add_bool(obj, "opened",
+                              tpm_backend_prop_get_opened,
+                              tpm_backend_prop_set_opened,
+                              NULL);
+-
++    s->fe_model = -1;
+ }
+ 
+ static void tpm_backend_instance_finalize(Object *obj)
+ {
+     TPMBackend *s = TPM_BACKEND(obj);
+ 
++    g_free(s->id);
++    g_free(s->path);
++    g_free(s->cancel_path);
+     tpm_backend_thread_end(s);
+ }
+ 
 diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-index 9234eb3..a0baf5f 100644
+index f50d9cf..815a72e 100644
 --- a/hw/tpm/tpm_passthrough.c
 +++ b/hw/tpm/tpm_passthrough.c
-@@ -46,8 +46,6 @@
- #define TPM_PASSTHROUGH(obj) \
-     OBJECT_CHECK(TPMPassthruState, (obj), TYPE_TPM_PASSTHROUGH)
+@@ -417,8 +417,6 @@ static TPMBackend *tpm_passthrough_create(QemuOpts *opts, const char *id)
+     TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
  
--static const TPMDriverOps tpm_passthrough_driver;
--
- /* data structures */
- typedef struct TPMPassthruThreadParams {
-     TPMState *tpm_state;
-@@ -462,8 +460,6 @@ static TPMBackend *tpm_passthrough_create(QemuOpts *opts, const char *id)
-     /* let frontend set the fe_model to proper value */
-     tb->fe_model = -1;
+     tb->id = g_strdup(id);
+-    /* let frontend set the fe_model to proper value */
+-    tb->fe_model = -1;
  
--    tb->ops = &tpm_passthrough_driver;
--
      if (tpm_passthrough_handle_device_opts(opts, tb)) {
          goto err_exit;
-     }
+@@ -432,26 +430,11 @@ static TPMBackend *tpm_passthrough_create(QemuOpts *opts, const char *id)
+     return tb;
+ 
+ err_exit:
+-    g_free(tb->id);
++    object_unref(obj);
+ 
+     return NULL;
+ }
+ 
+-static void tpm_passthrough_destroy(TPMBackend *tb)
+-{
+-    TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
+-
+-    tpm_passthrough_cancel_cmd(tb);
+-
+-    qemu_close(tpm_pt->tpm_fd);
+-    qemu_close(tpm_pt->cancel_fd);
+-
+-    g_free(tb->id);
+-    g_free(tb->path);
+-    g_free(tb->cancel_path);
+-    g_free(tpm_pt->tpm_dev);
+-}
+-
+ static const QemuOptDesc tpm_passthrough_cmdline_opts[] = {
+     TPM_STANDARD_CMDLINE_OPTS,
+     {
+@@ -472,7 +455,6 @@ static const TPMDriverOps tpm_passthrough_driver = {
+     .opts                     = tpm_passthrough_cmdline_opts,
+     .desc                     = tpm_passthrough_create_desc,
+     .create                   = tpm_passthrough_create,
+-    .destroy                  = tpm_passthrough_destroy,
+     .init                     = tpm_passthrough_init,
+     .startup_tpm              = tpm_passthrough_startup_tpm,
+     .realloc_buffer           = tpm_passthrough_realloc_buffer,
+@@ -486,10 +468,21 @@ static const TPMDriverOps tpm_passthrough_driver = {
+ 
+ static void tpm_passthrough_inst_init(Object *obj)
+ {
++    TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(obj);
++
++    tpm_pt->tpm_fd = -1;
++    tpm_pt->cancel_fd = -1;
+ }
+ 
+ static void tpm_passthrough_inst_finalize(Object *obj)
+ {
++    TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(obj);
++
++    tpm_passthrough_cancel_cmd(TPM_BACKEND(obj));
++
++    qemu_close(tpm_pt->tpm_fd);
++    qemu_close(tpm_pt->cancel_fd);
++    g_free(tpm_pt->tpm_dev);
+ }
+ 
+ static void tpm_passthrough_class_init(ObjectClass *klass, void *data)
 diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
-index b0a9731..3708413 100644
+index 58308b3..202ec8d 100644
 --- a/include/sysemu/tpm_backend.h
 +++ b/include/sysemu/tpm_backend.h
-@@ -50,7 +50,6 @@ struct TPMBackend {
-     enum TpmModel fe_model;
-     char *path;
-     char *cancel_path;
--    const TPMDriverOps *ops;
+@@ -78,7 +78,6 @@ struct TPMDriverOps {
+     const char *(*desc)(void);
  
-     QLIST_ENTRY(TPMBackend) list;
- };
+     TPMBackend *(*create)(QemuOpts *opts, const char *id);
+-    void (*destroy)(TPMBackend *t);
+ 
+     /* initialize the backend */
+     int (*init)(TPMBackend *t);
+@@ -118,12 +117,6 @@ enum TpmType tpm_backend_get_type(TPMBackend *s);
+ const char *tpm_backend_get_desc(TPMBackend *s);
+ 
+ /**
+- * tpm_backend_destroy:
+- * @s: the backend to destroy
+- */
+-void tpm_backend_destroy(TPMBackend *s);
+-
+-/**
+  * tpm_backend_init:
+  * @s: the backend to initialized
+  * @state: TPMState
 diff --git a/tpm.c b/tpm.c
-index 2d830d0..abedf3f 100644
+index abedf3f..b19b1a3 100644
 --- a/tpm.c
 +++ b/tpm.c
-@@ -211,7 +211,7 @@ static TPMInfo *qmp_query_tpm_inst(TPMBackend *drv)
-     res->model = drv->fe_model;
-     res->options = g_new0(TpmTypeOptions, 1);
+@@ -157,7 +157,7 @@ void tpm_cleanup(void)
  
--    switch (drv->ops->type) {
-+    switch (tpm_backend_get_type(drv)) {
-     case TPM_TYPE_PASSTHROUGH:
-         res->options->type = TPM_TYPE_OPTIONS_KIND_PASSTHROUGH;
-         tpo = g_new0(TPMPassthroughOptions, 1);
+     QLIST_FOREACH_SAFE(drv, &tpm_backends, list, next) {
+         QLIST_REMOVE(drv, list);
+-        tpm_backend_destroy(drv);
++        object_unref(OBJECT(drv));
+     }
+ }
+ 
 -- 
 2.7.4
