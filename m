@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dxV6U-0007eF-0h
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:27:35 -0400
+	(envelope-from <berrange@redhat.com>) id 1dxV6e-0007mN-Qo
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:27:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dxV6P-0006Xc-Ml
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:27:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39310)
+	(envelope-from <berrange@redhat.com>) id 1dxV6b-0006bX-2F
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:27:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39430)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dxV6P-0006XI-E7
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:27:29 -0400
-References: <20170927195635.16014-1-ehabkost@redhat.com>
-	<20170927195635.16014-3-ehabkost@redhat.com>
-	<20170928040809.GA12504@umbus>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <f41c462f-7f03-c6d2-bef5-cfd99a6c9adb@redhat.com>
-Date: Thu, 28 Sep 2017 12:27:16 +0300
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dxV6a-0006b3-S9
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:27:40 -0400
+Date: Thu, 28 Sep 2017 10:27:30 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170928092730.GE12919@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170928084430.17059-1-berrange@redhat.com>
+	<150658880436.78.1818358095772477476@b58463cdfd5f>
 MIME-Version: 1.0
-In-Reply-To: <20170928040809.GA12504@umbus>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] pci: Add interface names to hybrid
- PCI devices
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <150658880436.78.1818358095772477476@b58463cdfd5f>
+Subject: Re: [Qemu-devel] [PATCH v6 0/6] Initial support for keycodemapdb
+ GIT submodule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,144 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, David Gibson <dgibson@redhat.com>, Alistair Francis <alistair23@gmail.com>, Laine Stump <laine@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Dmitry Fleytman <dmitry@daynix.com>, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, peter.maydell@linaro.org, kraxel@redhat.com, pbonzini@redhat.com
 
-On 28/09/2017 7:08, David Gibson wrote:
-> On Wed, Sep 27, 2017 at 04:56:32PM -0300, Eduardo Habkost wrote:
->> The following devices support both PCI Express and Conventional
->> PCI, by including special code to handle the QEMU_PCI_CAP_EXPRESS
->> flag and/or conditional pcie_endpoint_cap_init() calls:
->>
->> * vfio-pci (is_express=1, but legacy PCI handled by
->>    vfio_populate_device())
+On Thu, Sep 28, 2017 at 01:53:25AM -0700, no-reply@patchew.org wrote:
+> Hi,
 > 
-> In the case of VFIO, won't this depend on the capabilities of the
-> device on the host?
+> This series failed build test on s390x host. Please find the details below.
 > 
+> Type: series
+> Subject: [Qemu-devel] [PATCH v6 0/6] Initial support for keycodemapdb GIT submodule
+> Message-id: 20170928084430.17059-1-berrange@redhat.com
 
-Most (almost all?) assigned devices are PCI Express,
-they will be exposed as PCI/PCI express depending on the
-slot they are plugged into.
+[snip]
 
-Anyway, the interface only states the device can be PCI or PCI Express,
-so I think is OK.
+>   GIT     ui/keycodemapdb
+>   GEN     config-host.h
+>   GEN     x86_64-linux-user/config-devices.mak
+>   GEN     qemu-options.def
+>   GEN     qmp-commands.h
+>   GEN     qapi-types.h
+>   GEN     qapi-visit.h
+>   GEN     qapi-event.h
+>   GEN     qmp-marshal.c
+>   GEN     qapi-types.c
+>   GEN     qapi-visit.c
+>   GEN     qapi-event.c
+>   GEN     qmp-introspect.h
+>   GEN     qmp-introspect.c
+>   GEN     trace/generated-tcg-tracers.h
+>   GEN     trace/generated-helpers-wrappers.h
+>   GEN     trace/generated-helpers.h
+>   GEN     trace/generated-helpers.c
+>   GEN     module_block.h
+> make: *** No rule to make target 'ui/input-keymap-linux-to-qcode.c', needed by 'Makefile'.  Stop.
+> make: *** Waiting for unfinished jobs....
 
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
-Thanks,
-Marcel
+What's happened here is that the 'GIT ui/keycodemapdb' checout has not
+completed by the time it tries to buil ui/input-keymap-linux-to-qcode.c
 
->> * vmxnet3 (is_express=0, but PCIe handled by vmxnet3_realize())
->> * pvscsi (is_express=0, but PCIe handled by pvscsi_realize())
->> * virtio-pci (is_express=0, but PCIe handled by
->>    virtio_pci_dc_realize(), and additional legacy PCI code at
->>    virtio_pci_realize())
->> * base-xhci (is_express=1, but pcie_endpoint_cap_init() call
->>    is conditional on pci_bus_is_express(dev->bus)
->>    * Note that xhci does not clear QEMU_PCI_CAP_EXPRESS like the
->>      other hybrid devices
->>
->> Cc: Dmitry Fleytman <dmitry@daynix.com>
->> Cc: Jason Wang <jasowang@redhat.com>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Gerd Hoffmann <kraxel@redhat.com>
->> Cc: Alex Williamson <alex.williamson@redhat.com>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> 
-> Except for the query above,
-> 
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> 
->> ---
->> Changes v1 -> v2:
->> * s/legacy/conventional/
->>    * Suggested-by: Alex Williamson <alex.williamson@redhat.com>
->> * Mark base-xhci as hybrid too
->> ---
->>   hw/net/vmxnet3.c       | 5 +++++
->>   hw/scsi/vmw_pvscsi.c   | 2 ++
->>   hw/usb/hcd-xhci.c      | 5 +++++
->>   hw/vfio/pci.c          | 5 +++++
->>   hw/virtio/virtio-pci.c | 5 +++++
->>   5 files changed, 22 insertions(+)
->>
->> diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
->> index a19a7a31dd..f99d9a69ec 100644
->> --- a/hw/net/vmxnet3.c
->> +++ b/hw/net/vmxnet3.c
->> @@ -2651,6 +2651,11 @@ static const TypeInfo vmxnet3_info = {
->>       .instance_size = sizeof(VMXNET3State),
->>       .class_init    = vmxnet3_class_init,
->>       .instance_init = vmxnet3_instance_init,
->> +    .interfaces = (InterfaceInfo[]) {
->> +        { INTERFACE_PCIE_DEVICE },
->> +        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
->> +        { }
->> +    },
->>   };
->>   
->>   static void vmxnet3_register_types(void)
->> diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
->> index 6d3f0bf11d..d6b315f8b2 100644
->> --- a/hw/scsi/vmw_pvscsi.c
->> +++ b/hw/scsi/vmw_pvscsi.c
->> @@ -1300,6 +1300,8 @@ static const TypeInfo pvscsi_info = {
->>       .class_init    = pvscsi_class_init,
->>       .interfaces = (InterfaceInfo[]) {
->>           { TYPE_HOTPLUG_HANDLER },
->> +        { INTERFACE_PCIE_DEVICE },
->> +        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
->>           { }
->>       }
->>   };
->> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
->> index d75c085d94..af3a9d88de 100644
->> --- a/hw/usb/hcd-xhci.c
->> +++ b/hw/usb/hcd-xhci.c
->> @@ -3670,6 +3670,11 @@ static const TypeInfo xhci_info = {
->>       .instance_size = sizeof(XHCIState),
->>       .class_init    = xhci_class_init,
->>       .abstract      = true,
->> +    .interfaces = (InterfaceInfo[]) {
->> +        { INTERFACE_PCIE_DEVICE },
->> +        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
->> +        { }
->> +    },
->>   };
->>   
->>   static void qemu_xhci_class_init(ObjectClass *klass, void *data)
->> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
->> index 31e1edf447..913433d6ba 100644
->> --- a/hw/vfio/pci.c
->> +++ b/hw/vfio/pci.c
->> @@ -3023,6 +3023,11 @@ static const TypeInfo vfio_pci_dev_info = {
->>       .class_init = vfio_pci_dev_class_init,
->>       .instance_init = vfio_instance_init,
->>       .instance_finalize = vfio_instance_finalize,
->> +    .interfaces = (InterfaceInfo[]) {
->> +        { INTERFACE_PCIE_DEVICE },
->> +        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
->> +        { }
->> +    },
->>   };
->>   
->>   static void register_vfio_pci_dev_type(void)
->> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
->> index 8b0d6b69cd..67c8ab63ad 100644
->> --- a/hw/virtio/virtio-pci.c
->> +++ b/hw/virtio/virtio-pci.c
->> @@ -1958,6 +1958,11 @@ static const TypeInfo virtio_pci_info = {
->>       .class_init    = virtio_pci_class_init,
->>       .class_size    = sizeof(VirtioPCIClass),
->>       .abstract      = true,
->> +    .interfaces = (InterfaceInfo[]) {
->> +        { INTERFACE_PCIE_DEVICE },
->> +        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
->> +        { }
->> +    },
->>   };
->>   
->>   /* virtio-blk-pci */
-> 
+Makefile depends on 'git-submodule-update', and Makefile also depends
+on $(GENERATED_FILES). IOW the checkout of the git submodules is not
+serialized wrt generation of files that use the submodule, and the
+patchew test had high enough parallelization to show this flaw, which
+my local & Travis tests did not see.
+
+So I need to tweak the deps a little...
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
