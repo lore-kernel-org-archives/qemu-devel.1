@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brogers@suse.com>) id 1dxhRI-00047i-4W
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 18:37:54 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dxhRt-0004TA-FQ
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 18:38:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brogers@suse.com>) id 1dxhRE-0004PL-63
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 18:37:52 -0400
-Message-Id: <59CD79B7020000480014A1DF@prv-mh.provo.novell.com>
-Date: Thu, 28 Sep 2017 16:37:43 -0600
-From: "Bruce Rogers" <brogers@suse.com>
-References: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
-	<150637291959.8417.14832530795506547523@sif>
-In-Reply-To: <150637291959.8417.14832530795506547523@sif>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH 00/12] Patch Round-up for
- stable 2.10.1, freeze on 2017-09-27
+	(envelope-from <alistair23@gmail.com>) id 1dxhRs-0005Pu-Jk
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 18:38:29 -0400
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_G8Md3k6EAqoN1=GCcXoCq_8vAUZ_qjOZp5GbnnfmcrA@mail.gmail.com>
+References: <cover.1506384414.git.alistair.francis@xilinx.com>
+	<e9eb34b7a508fbe3b89bb8b8aa8141f018871081.1506384414.git.alistair.francis@xilinx.com>
+	<1788278d-9437-34a0-4a17-d7914d459f77@redhat.com>
+	<CAFEAcA_G8Md3k6EAqoN1=GCcXoCq_8vAUZ_qjOZp5GbnnfmcrA@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 28 Sep 2017 15:37:55 -0700
+Message-ID: <CAKmqyKM9e2R2f3BorZJ9R1XMaAwNRxvCEPGrSm3Jh=O=PnJ-_A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v1 1/8] Replace all occurances
+ of __FUNCTION__ with __func__
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -24,131 +24,40 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eric Blake <eblake@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>, Fam Zheng <famz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, qemu-arm <qemu-arm@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Yongbok Kim <yongbok.kim@imgtec.com>, "open list:X86" <xen-devel@lists.xenproject.org>, John Snow <jsnow@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 List-ID: <qemu-devel.nongnu.org>
 
->>> On 9/25/2017 at 2:55 PM, <mdroth@linux.vnet.ibm.com> wrote:
-> Quoting Michael Roth (2017-09-19 19:45:09)
->> Hi everyone,
->>=20
->> The following new patches are queued for QEMU stable v2.10.1:
->>=20
->>   https://github.com/mdroth/qemu/commits/stable-2.10-staging=20
->>=20
->> The release is planned for 2017-10-02:
->>=20
->>   https://wiki.qemu.org/Planning/2.10=20
->=20
-> Thank you for the suggestions. The following additional patches are =
-now=20
-> queued:
->=20
->   s390x/ais: for 2.10 stable: disable ais facility (Christian Borntraeger=
-)
->   9pfs: check the size of transport buffer before marshaling (Jan=20
-> Dakinevich)
->   9pfs: fix name_to_path assertion in v9fs_complete_rename() (Jan=20
-> Dakinevich)
->   9pfs: fix readdir() for 9p2000.u (Jan Dakinevich)
->   console: fix dpy_gfx_replace_surface assert (Gerd Hoffmann)
->   ide: ahci: unparent children buses before freeing their memory =
-(Igor=20
-> Mammedov)
->   hw/ide/microdrive: Mark the dscm1xxxx device with user_creatable =3D =
-false=20
-> (Thomas Huth)
->   hw/arm/aspeed_soc: Mark devices as user_creatable =3D false (Thomas =
-Huth)
->   hw/arm/digic: Mark device with user_creatable =3D false (Thomas Huth)
->   s390x/ipl: The s390-ipl device is not hot-pluggable (Thomas Huth)
->   watchdog/wdt_diag288: Mark diag288 watchdog as non-hotpluggable =
-(Thomas=20
-> Huth)
->   multiboot: validate multiboot header address values (Prasad J Pandit)
->   vga: stop passing pointers to vga_draw_line* functions (Gerd Hoffmann)
->   vga: fix display update region calculation (split screen) (Gerd =
-Hoffmann)
->=20
-> The following patches are tagged for inclusion, but still awaiting pull
-> requests:
->=20
->   block/qcow2-bitmap: fix use of uninitialized pointer
->   migration: disable auto-converge during bulk block migration
->   accel/tcg/cputlb: avoid recursive BQL (fixes #1706296)
->   virtio/vhost: reset dev->log after syncing
->   block/throttle-groups.c: allocate RestartData on the heap
->   throttle-groups: update tg->any_timer_armed[] on detach
->=20
->>=20
->> Please respond here or CC qemu-stable@nongnu.org on any patches you
->> think should be included in the release.
->>=20
->> Testing/feedback is greatly appreciated.
->>=20
->> Thanks!
->>=20
->> ----------------------------------------------------------------
->> Alex Williamson (1):
->>       vhost: Release memory references on cleanup
->>=20
->> Farhan Ali (1):
->>       s390-ccw: Fix alignment for CCW1
->>=20
->> Greg Kurz (1):
->>       virtfs: error out gracefully when mandatory suboptions are =
-missing
->>=20
->> Hannes Reinecke (1):
->>       scsi-bus: correct responses for INQUIRY and REQUEST SENSE
->>=20
->> Marc-Andr=E9 Lureau (2):
->>       libvhost-user: support resuming vq->last_avail_idx based on =
-used_idx
->>       vhost-user-bridge: fix resume regression (since 2.9)
->>=20
->> Pavel Butsykin (1):
->>       qcow2: move qcow2_store_persistent_dirty_bitmaps() before =
-cache=20
-> flushing
->>=20
->> Peter Maydell (1):
->>       mps2-an511: Fix wiring of UART overflow interrupt lines
->>=20
->> Pranith Kumar (1):
->>       arm_gicv3_kvm: Fix compile warning
->>=20
->> Richard Henderson (1):
->>       target/arm: Fix aa64 ldp register writeback
->>=20
->> Samuel Thibault (1):
->>       slirp: fix clearing ifq_so from pending packets
->>=20
->> Thomas Huth (1):
->>       hw/arm/allwinner-a10: Mark the allwinner-a10 device with=20
-> user_creatable =3D false
->>=20
->>  block/qcow2.c                         | 16 +++++++-------
->>  contrib/libvhost-user/libvhost-user.c | 13 ++++++++++++
->>  contrib/libvhost-user/libvhost-user.h |  7 +++++++
->>  hw/arm/allwinner-a10.c                |  2 ++
->>  hw/arm/mps2.c                         |  4 ++--
->>  hw/intc/arm_gicv3_kvm.c               |  2 +-
->>  hw/scsi/scsi-bus.c                    | 29 ++++++++++++++++++++++----
->>  hw/virtio/vhost.c                     |  4 ++++
->>  pc-bios/s390-ccw/cio.h                |  2 +-
->>  scripts/device-crash-test             |  1 -
->>  slirp/socket.c                        | 39=20
-> +++++++++++++++++++++--------------
->>  targ
-et/arm/translate-a64.c            | 29 +++++++++++++++-----------
->>  tests/vhost-user-bridge.c             |  7 +++++++
->>  vl.c                                  | 16 ++++++++------
->>  14 files changed, 120 insertions(+), 51 deletions(-)
->>=20
->>=20
->>=20
+On Wed, Sep 27, 2017 at 4:47 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 26 September 2017 at 06:32, Eric Blake <eblake@redhat.com> wrote:
+>> On 09/25/2017 07:08 PM, Alistair Francis wrote:
+>>> diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
+>>> index 58005b6619..32687afced 100644
+>>> --- a/hw/arm/nseries.c
+>>> +++ b/hw/arm/nseries.c
+>>> @@ -463,7 +463,7 @@ static uint32_t mipid_txrx(void *opaque, uint32_t cmd, int len)
+>>>      uint8_t ret;
+>>>
+>>>      if (len > 9) {
+>>> -        hw_error("%s: FIXME: bad SPI word width %i\n", __FUNCTION__, len);
+>>> +        hw_error("%s: FIXME: bad SPI word width %i\n", __func__, len);
+>>
+>> Not this patch's problem, but it would probably be simpler if hw_error()
+>> were a macro that automatically prefixed __func__, rather than making
+>> every caller have to supply it themselves.
+>
+> I'm not sure there's a great deal of benefit to that change, because
+> use of hw_error() in new code is rarely correct (it does an abort()
+> so it should never be used for guest-triggered conditions, which is
+> about the only time that you might be interested in a guest register
+> dump rather than just asserting). Most of its existing uses are in
+> crufty old device models.
 
-Sounds like this one is also targeted for 2.10.1:
-s390x/cpumodel: remove ais from z14 default model-> also for 2.10.1
-Bruce
+Ok, another excuse to leave it out :)
+
+Thanks,
+Alistair
+
+>
+> thanks
+> -- PMM
