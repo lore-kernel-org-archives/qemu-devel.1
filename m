@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dxUyf-00017i-E8
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:19:35 -0400
+	(envelope-from <linuc.decode@gmail.com>) id 1dxV0s-0002vu-Vv
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:21:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dxUyb-00013m-72
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:19:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49786)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dxUya-00012e-UV
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:19:25 -0400
-References: <1506082711-16004-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<905d94b3-291b-0e55-e234-97fc2c85b6a6@redhat.com>
-	<4a9754d9-e73b-8e67-427e-9624d0486c91@ilande.co.uk>
-	<26f60ea0-199e-f9ec-5b1d-d7023d60bb03@redhat.com>
-	<20170925081140.GA2656@work-vm>
-	<c0055753-30ba-7cd0-cf64-94e1679678ef@ilande.co.uk>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <f1353944-8a03-ed58-f4d1-beda8465ed5b@redhat.com>
-Date: Thu, 28 Sep 2017 12:19:18 +0300
+	(envelope-from <linuc.decode@gmail.com>) id 1dxV0n-00035A-Sj
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:21:46 -0400
+Date: Thu, 28 Sep 2017 14:51:08 +0530
+From: Linu Cherian <linuc.decode@gmail.com>
+Message-ID: <20170928092107.GA1813@virtx40>
+References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
+	<20170928064312.GA1544@virtx40>
+	<20170928071359.GG17044@pxdev.xzpeter.org>
+	<42a551e1-ccc4-f162-51d8-c61ca5f86790@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <c0055753-30ba-7cd0-cf64-94e1679678ef@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pci: allow 32-bit PCI IO accesses to pass
- through the PCI bridge
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <42a551e1-ccc4-f162-51d8-c61ca5f86790@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v7 00/20] ARM SMMUv3 Emulation
+ Support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,87 +26,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, peter.maydell@linaro.org, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mohun106@gmail.com, jean-philippe.brucker@arm.com, tn@semihalf.com, bharat.bhushan@nxp.com, mst@redhat.com, will.deacon@arm.com, qemu-devel@nongnu.org, alex.williamson@redhat.com, qemu-arm@nongnu.org, christoffer.dall@linaro.org, wtownsen@redhat.com, robin.murphy@arm.com, prem.mallappa@gmail.com, eric.auger.pro@gmail.com, linu.cherian@cavium.com
 
-On 28/09/2017 10:31, Mark Cave-Ayland wrote:
-> On 25/09/17 09:11, Dr. David Alan Gilbert wrote:
+On Thu Sep 28, 2017 at 09:54:20AM +0200, Auger Eric wrote:
+> Hi Linu, Peter,
 > 
->> * Marcel Apfelbaum (marcel@redhat.com) wrote:
->>> On 23/09/2017 11:23, Mark Cave-Ayland wrote:
->>>> On 22/09/17 23:18, Laszlo Ersek wrote:
->>>>
->>>>> On 09/22/17 14:18, Mark Cave-Ayland wrote:
->>>>>> Whilst the underlying PCI bridge implementation supports 32-bit PCI IO
->>>>>> accesses, unfortunately they are truncated at the legacy 64K limit.
->>>>>>
->>>>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>>>>> ---
->>>>>>    hw/pci/pci_bridge.c |    3 ++-
->>>>>>    1 file changed, 2 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
->>>>>> index 17feae5..a47d257 100644
->>>>>> --- a/hw/pci/pci_bridge.c
->>>>>> +++ b/hw/pci/pci_bridge.c
->>>>>> @@ -379,7 +379,8 @@ void pci_bridge_initfn(PCIDevice *dev, const char *typename)
->>>>>>        sec_bus->address_space_mem = &br->address_space_mem;
->>>>>>        memory_region_init(&br->address_space_mem, OBJECT(br), "pci_bridge_pci", UINT64_MAX);
->>>>>>        sec_bus->address_space_io = &br->address_space_io;
->>>>>> -    memory_region_init(&br->address_space_io, OBJECT(br), "pci_bridge_io", 65536);
->>>>>> +    memory_region_init(&br->address_space_io, OBJECT(br), "pci_bridge_io",
->>>>>> +                       UINT32_MAX);
->>>>>>        br->windows = pci_bridge_region_init(br);
->>>>>>        QLIST_INIT(&sec_bus->child);
->>>>>>        QLIST_INSERT_HEAD(&parent->child, sec_bus, sibling);
->>>>>>
->>>>>
->>>
->>> Hi Mark,
->>>
->>>>> Based on the commit message, I assume this change is guest-visible. If
->>>>> so, should it be made dependent on a compat property, so that it doesn't
->>>>> cause problems with migration?
->>>>
->>>> In order to enable 32-bit IO accesses the PCI bridge needs to set bit 0
->>>> in the IO_LIMIT and IO_BASE registers - this bit is read-only to guests,
->>>> so unless a PCI bridge has this bit set then it's impossible for this
->>>> change to be guest visible.
->>>>
->>>> I did a grep for PCI_IO_RANGE_TYPE_32 and didn't see any existing users
->>>> (other than an upcoming patchset from me!), so this combined with the
->>>> fact that without this patch the feature is broken makes me think that I
->>>> am the first user and so existing guests won't have a problem.
->>>>
->>>
->>> (adding Dave for his expertise)
->>>
->>> Do you know how the migration code will behave if it will have
->>> a 65k address space on source and MAX UINT on destination?
->>> (and the other way around for rolling back)
->>
->> Hmm not sure; we don't migrate regions explicitly; just RAMBlocks
->> and devices that back them.  If the change is visible in the IO
->> addresses allocated to the PCI devices or in the config space then
->> it might fail.
+> On 28/09/2017 09:13, Peter Xu wrote:
+> > On Thu, Sep 28, 2017 at 12:13:12PM +0530, Linu Cherian wrote:
+> >> Hi Eric,
+> >>
+> >>
+> >> On Fri Sep 01, 2017 at 07:21:03PM +0200, Eric Auger wrote:
+> >>> This series implements the emulation code for ARM SMMUv3.
+> >>>
+> >>> Changes since v6:
+> >>> - DPDK testpmd now running on guest with 2 assigned VFs
+> >>> - Changed the instantiation method: add the following option to
+> >>>   the QEMU command line
+> >>>   -device smmuv3 # for virtio/vhost use cases
+> >>>   -device smmuv3,caching-mode # for vfio use cases (based on [1])
+> >>> - splitted the series into smaller patches to allow the review
+> >>> - the VFIO integration based on "tlbi-on-map" smmuv3 driver
+> >>>   is isolated from the rest: last 2 patches, not for upstream.
+> >>>   This is shipped for testing/bench until a better solution is found.
+> >>> - Reworked permission flag checks and event generation
+> >>> e testing:
+> >>> - in dt and ACPI modes
+> >>> - virtio-net-pci and vhost-net devices using dma ops with various
+> >>>   guest page sizes [2]
+> >>> - assigned VFs using dma ops [3]:
+> >>>   - AMD Overdrive and igbvf passthrough (using gsi direct mapping)
+> >>>   - Cavium ThunderX and ixgbevf passthrough (using KVM MSI routing)
+> >>> - DPDK testpmd on guest running with VFIO user space drivers (2 igbvf) [3]
+> >>>   with guest and host page size equal (4kB)
+> >>>
+> >>> Known limitations:
+> >>> - no VMSAv8-32 suport
+> >>> - no nested stage support (S1 + S2)
+> >>> - no support for HYP mappings
+> >>> - register fine emulation, commands, interrupts and errors were
+> >>>   not accurately tested. Handling is sufficient to run use cases
+> >>>   described above though.
+> >>> - interrupts and event generation not observed yet.
+> >>
+> >> While testing with vfio-pci, observed that the below two  Qemu command,
+> >> results in two different behaviour. Is this expected by design ?
+> >>
+> >> Case 1:
+> >> # -device vfio-pci,host=0002:01:00.3 -device smmuv3,caching-mode
+> >>  Here iommu is not attached to the pci bus in Qemu backend, since
+> >>  pci_setup_iommu is not called before vfio_realize.
+> >>
+> >> Case 2:
+> >> # -device smmuv3,caching-mode -device vfio-pci,host=0002:01:00.3
+> >> This works as expected, iommu is attached to the pci bus.
+> > 
+> > Not sure about SMMU, but VT-d should have similar issue - the vIOMMU
+> > device needs to be created before the rest of the devices.
 > 
-> For reference here is the link to the sun4u patch I posted yesterday
-> that requires this fix if anyone else would like to test:
-> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg07355.html.
+> Yes this is an expected limitation right now. I should have documented
+> it though. As you noticed, the pci_set_iommu() is called on virtio-iommu
+> realize and it relies on the fact the PCIe devices already are realized.
 > 
-> Other than that are there any further objections to this patch?
+> Maybe we could relax this constraint by calling the pci_set_iommu in a
+> machine init done notifier.
 > 
+> Thanks
+> 
+> Eric
 
-Since we don't support 32-bit IO accesses (yet) in x86
-and the address space is not visible to guest, it should be OK.
-I'll run a simple migration test to be sure, I'll let you
-know if something goes wrong.
-
-Thanks,
-Marcel
+Thanks for confirming. 
 
 > 
-> ATB,
 > 
-> Mark.
-> 
+> > 
+> > Now for VT-d the ordering of devices should be assured by Libvirt:
+> > 
+> > https://bugzilla.redhat.com/show_bug.cgi?id=1427005
+> > 
+> > For your reference only.  Thanks,
+> > 
+
+-- 
+Linu cherian
