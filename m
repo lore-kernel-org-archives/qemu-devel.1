@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dxdA8-0000Cr-WF
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:03:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1dxdSJ-0002yB-H9
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:22:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dxdA5-0002Ba-Rz
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:03:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35110)
+	(envelope-from <eblake@redhat.com>) id 1dxdSG-0003Xa-DL
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:22:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34782)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dxdA5-0002Aw-JM
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:03:49 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dxdSG-0003X9-5L
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:22:36 -0400
 References: <20170928120621.30288-1-berrange@redhat.com>
-	<20170928120621.30288-3-berrange@redhat.com>
+	<20170928120621.30288-4-berrange@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <723de7c1-e617-923c-6e69-561577f0fe1a@redhat.com>
-Date: Thu, 28 Sep 2017 13:03:41 -0500
+Message-ID: <a7007b76-bcbf-eb19-ebbc-fe1422ef484d@redhat.com>
+Date: Thu, 28 Sep 2017 13:22:27 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170928120621.30288-3-berrange@redhat.com>
+In-Reply-To: <20170928120621.30288-4-berrange@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="8goO7fkCSMeLuhraeSevIdfULUP6RN7mD"
-Subject: Re: [Qemu-devel] [PATCH v7 2/6] docker: don't rely on submodules
- existing in the main checkout
+	boundary="AdkLvDOhkVhhfhqVH9kJegR0kQfiXfJhk"
+Subject: Re: [Qemu-devel] [PATCH v7 3/6] ui: add keycodemapdb repository as
+ a GIT submodule
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -33,110 +33,46 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Gerd 
 List-ID: <qemu-devel.nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8goO7fkCSMeLuhraeSevIdfULUP6RN7mD
+--AdkLvDOhkVhhfhqVH9kJegR0kQfiXfJhk
 From: Eric Blake <eblake@redhat.com>
 To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>,
  Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <723de7c1-e617-923c-6e69-561577f0fe1a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 2/6] docker: don't rely on submodules
- existing in the main checkout
+Message-ID: <a7007b76-bcbf-eb19-ebbc-fe1422ef484d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 3/6] ui: add keycodemapdb repository as a
+ GIT submodule
 References: <20170928120621.30288-1-berrange@redhat.com>
- <20170928120621.30288-3-berrange@redhat.com>
-In-Reply-To: <20170928120621.30288-3-berrange@redhat.com>
+ <20170928120621.30288-4-berrange@redhat.com>
+In-Reply-To: <20170928120621.30288-4-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 09/28/2017 07:06 AM, Daniel P. Berrange wrote:
-> When building the tarball to pass into the docker/vm test image,
-> the code relies on the git submodules being checked out in the
-> main checkout.
+> The https://gitlab.com/keycodemap/keycodemapdb/ repo contains a
+> data file mapping between all the different scancode/keycode/keysym
+> sets that are known, and a tool to auto-generate lookup tables for
+> different combinations.
 >=20
-> ie if the developer has not run 'git submodule update --init dtc'
-> many of the docker tests will fail due to the libfdt package not
-
-'dtc' vs. 'libfdt' - is one of the acronyms wrong?
-
-> being present in the test images. Patchew manually checks out the
-> dtc submodule in the main git checkout, but this is a bad idea.
->=20
-> When running tests we want to have a predictable set of submodules
-> included in the source that's tested. The build environment is
-> completely independant of the developers host OS, so the submodules
-
-s/independant/independent/
-
-> the developer has checked out should not be considered relevant for
-> the tests.
->=20
-> This changes the archive-source.sh script so that it clones the
-> current git checkout into a temporary directory, checks out a
-> fixed set of submodules, builds the tarball and finally removes
-> the temporary git clone.
+> It is used by GTK-VNC, SPICE-GTK and libvirt for mapping keys.
+> Using it in QEMU will let us replace many hand written lookup
+> tables with auto-generated tables from a master data source,
+> reducing bugs. Adding new QKeyCodes will now only require the
+> master table to be updated, all ~20 other tables will be
+> automatically updated to follow.
 >=20
 > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
->  scripts/archive-source.sh | 30 +++++++++++++++++++++++++++---
->  1 file changed, 27 insertions(+), 3 deletions(-)
->=20
 
-> +++ b/scripts/archive-source.sh
-
-> +# We want a predictable list of submodules for builds, that is
-> +# independant of what the developer currently has initialized
-
-and again
-
-> +# in their checkout, because the build environment is completely
-> +# different to the host OS.
-> +submodules=3D"dtc"
-> =20
->  if test $? -ne 0; then
->      error "git submodule command failed"
-> @@ -28,6 +34,21 @@ fi
-> =20
->  trap "status=3D$?; rm -f \"$list_file\"; exit \$status" 0 1 2 3 15
-> =20
-> +if git diff-index --quiet HEAD -- &>/dev/null
-> +then
-> +    HEAD=3DHEAD
-> +else
-> +    HEAD=3D`git stash create`
-> +fi
-> +git clone --shared . "$vroot_dir"
-
-set -e is not in effect; do you need error checking here?
-
-> +here=3D`pwd`
-
-$PWD is cheaper than spawning a subprocess for `pwd`.
-
-> +cd "$vroot_dir"
-
-Definitely need error checking here.
-
-> +git checkout $HEAD
+> +++ b/configure
+> @@ -264,7 +264,13 @@ cc_i386=3Di386-pc-linux-gnu-gcc
+>  libs_qga=3D""
+>  debug_info=3D"yes"
+>  stack_protector=3D""
+> -git_submodules=3D""
 > +
-> +for sm in $submodules; do
-> +    git submodule update --init $sm
-> +done
-> +
->  if test -n "$submodules"; then
->      {
->          git ls-files || error "git ls-files failed"
-> @@ -48,4 +69,7 @@ fi
-> =20
->  tar -cf "$tar_file" -T "$list_file" || error "failed to create tar fil=
-e"
-> =20
-> +cd "$here"
+> +if test -d "$source_path/.git"
 
-and again here
-
-> +rm -rf "$vroot_dir"
-> +
->  exit 0
->=20
+Again, .git does not have to be a directory; test -e is probably safer.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -144,7 +80,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---8goO7fkCSMeLuhraeSevIdfULUP6RN7mD
+--AdkLvDOhkVhhfhqVH9kJegR0kQfiXfJhk
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -153,14 +89,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnNOX0ACgkQp6FrSiUn
-Q2qmhQf/YXaQ/deqxuqH6rw2SKK4ha80zQJor9sWPtG35zdUFZSi1SD9hmDFDp/X
-yMYlKwWd3Ko7b9oDW0ox2msG18c92SuuNa6x2wbF/rB8Af1gs2xbYLCJiVhpqCM9
-st4swY93iYXkxGEnEL6l3OR4Vk8tpx472Lp3vGhpxJPEgkXQaY7e9V2jMJ5aNp6G
-1rhC9f0Drkg2D1MQxiRam/A1lTFOhPL8j1MaXUCswVjdj+41kAAuc5KBE+x+XfBC
-0J7ebAUIeazpnBkhkX7RwZXV1l7WvtRl+Nobo1FnaEeBihgXs3X8w2DKjEvRRIq5
-3qPUVw9qDQv0WS9zVaRIcSe1P4xgmw==
-=xJuY
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnNPeQACgkQp6FrSiUn
+Q2qJggf/WhxstrepbBZzOjyOrFRLrkuvSmE7nSENY4Qi2yjbXPwlpm9l1eJwGeEn
+CY5A5RMP10R8IZzgHEhkc5NbFU0Y1PQ9EM5grH8YJ50gnE2pjoLAOIMbXGYNE7rq
+4Nn5Zmmk74IyD3hHQAqx/aqciyqfj+Z73+XmFTy6Gee8s5QlakI3vvYveDjpNv8M
+MpIvWZwIKSTiZZcAwxD9pmq4b7Cl9/JP+cvXyUpY/gAIQWdhqcyupkZ/h1/cztM1
+qo9IqQJOEuKakzAIfPkOVUeaIPqs6vMQQ4qRmSqgle41670feXzszw8Oa/nbEOK2
+4kMddL6yh3j71/SW8bKsOYOow0hNPA==
+=V5y6
 -----END PGP SIGNATURE-----
 
---8goO7fkCSMeLuhraeSevIdfULUP6RN7mD--
+--AdkLvDOhkVhhfhqVH9kJegR0kQfiXfJhk--
