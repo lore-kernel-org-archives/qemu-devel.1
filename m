@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dxfaY-0005G7-Vh
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 16:39:20 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dxfpH-000241-MQ
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 16:54:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dxfaU-0003os-Vg
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 16:39:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37984)
+	(envelope-from <ehabkost@redhat.com>) id 1dxfpG-0005ER-OW
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 16:54:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45604)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dxfaU-0003oT-Pg
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 16:39:14 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Thu, 28 Sep 2017 22:37:08 +0200
-Message-Id: <20170928203708.9376-31-david@redhat.com>
-In-Reply-To: <20170928203708.9376-1-david@redhat.com>
-References: <20170928203708.9376-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 30/30] target/s390x: special handling when
- starting a CPU with WAIT PSW
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dxfpG-0005Dw-Hf
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 16:54:30 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 819B583F43
+	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 20:54:29 +0000 (UTC)
+Date: Thu, 28 Sep 2017 17:52:48 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170928205248.GU4115@localhost.localdomain>
+References: <20170927204148.2311-1-ehabkost@redhat.com>
+	<20170927204148.2311-3-ehabkost@redhat.com>
+	<d06c7b8f-02aa-3e5f-1c76-0355a016bb09@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d06c7b8f-02aa-3e5f-1c76-0355a016bb09@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] vl: Print warning when a default
+ config file is loaded
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -23,66 +34,40 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <richard.henderson@linaro.org>, David Hildenbrand <david@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-When we try to start a CPU with a WAIT PSW, we have to take care that
-TCG will actually try to continue executing instructions.
+On Wed, Sep 27, 2017 at 03:47:18PM -0500, Eric Blake wrote:
+> On 09/27/2017 03:41 PM, Eduardo Habkost wrote:
+> > In case there were options set in the default config file, print
+> > a warning so users can update their scripts.
+> > 
+> > If somebody wants to keep the config file as-is, avoid the
+> > warning and use a command-line that will work in future QEMU
+> > versions, they can use:
+> > 
+> >  $QEMU -no-user-config -readconfig /etc/qemu/qemu.conf
+> > 
+> > I was going to add an additional message suggesting it as a
+> > solution, but I thought it could make it more confusing. The
+> > solution can be documented in the QEMU 2.11 ChangeLog.
+> > 
+> > Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> > Changes v2 -> v3:
+> > * Rebase (no code changes)
+> > * Commit message update: suggest -no-user-config
+> 
+> > +    if (ret > 0) {
+> > +        loc_set_none();
+> > +        error_report("Warning: Future QEMU versions won't load %s automatically",
+> > +                     CONFIG_QEMU_CONFDIR "/qemu.conf");
+> 
+> Shouldn't we now use warn_report() with no 'Warning:' prefix?
 
-We must therefore really only unhalt the CPU if we don't have a WAIT
-PSW. Also document the special order for restart interrupts, which
-load a new PSW and change the state to operating.
+Oops, yes.  I will fix it and send v4.
 
-To keep KVM working, simply don't have a look at the WAIT bit when
-loading the PSW. Otherwise the behavior of a restart interrupt when
-a CPU stopped would be changed.
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/cpu.c  | 11 +++++++++--
- target/s390x/sigp.c |  6 +++++-
- 2 files changed, 14 insertions(+), 3 deletions(-)
-
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index e27827afb3..981f5d4f39 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -335,8 +335,15 @@ unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu)
-         break;
-     case CPU_STATE_OPERATING:
-     case CPU_STATE_LOAD:
--        /* unhalt the cpu for common infrastructure */
--        s390_cpu_unhalt(cpu);
-+        /*
-+         * Starting a CPU with a PSW WAIT bit set:
-+         * KVM: handles this internally and triggers another WAIT exit.
-+         * TCG: will actually try to continue to run. Don't unhalt, will
-+         *      be done when the CPU actually has work (an interrupt).
-+         */
-+        if (!tcg_enabled() || !(cpu->env.psw.mask & PSW_MASK_WAIT)) {
-+            s390_cpu_unhalt(cpu);
-+        }
-         break;
-     default:
-         error_report("Requested CPU state is not a valid S390 CPU state: %u",
-diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
-index 964c75a736..ac3f8e7dc2 100644
---- a/target/s390x/sigp.c
-+++ b/target/s390x/sigp.c
-@@ -232,8 +232,12 @@ static void sigp_restart(CPUState *cs, run_on_cpu_data arg)
-     case CPU_STATE_STOPPED:
-         /* the restart irq has to be delivered prior to any other pending irq */
-         cpu_synchronize_state(cs);
--        do_restart_interrupt(&cpu->env);
-+        /*
-+         * Set OPERATING (and unhalting) before loading the restart PSW.
-+         * load_psw() will then properly halt the CPU again if necessary (TCG).
-+         */
-         s390_cpu_set_state(CPU_STATE_OPERATING, cpu);
-+        do_restart_interrupt(&cpu->env);
-         break;
-     case CPU_STATE_OPERATING:
-         cpu_inject_restart(cpu);
 -- 
-2.13.5
+Eduardo
