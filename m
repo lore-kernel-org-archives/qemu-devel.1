@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dxa6P-00087t-Bv
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 10:47:50 -0400
+	(envelope-from <eblake@redhat.com>) id 1dxaHB-0001pk-QI
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 10:59:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dxa6K-0002p9-OB
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 10:47:49 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:45635)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dxa6K-0002oE-Fw
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 10:47:44 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id m18so3143122wrm.2
-	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 07:47:42 -0700 (PDT)
-References: <20170925075458.18047-1-famz@redhat.com>
-	<CAAdtpL5j_9qh2bmzpmx3ULgCFr8TkMF4AgUZF=7Ka66=3diD3A@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAAdtpL5j_9qh2bmzpmx3ULgCFr8TkMF4AgUZF=7Ka66=3diD3A@mail.gmail.com>
-Date: Thu, 28 Sep 2017 15:47:39 +0100
-Message-ID: <87lgkydgms.fsf@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1dxaH7-0008KL-RF
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 10:58:57 -0400
+References: <20170913160333.23622-1-eblake@redhat.com>
+	<20170913160333.23622-3-eblake@redhat.com>
+	<b5fd50f3-7bd0-115c-bc67-0df49b05cb76@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d34a1afa-d4a4-e82f-a372-1f7e24d3bbcd@redhat.com>
+Date: Thu, 28 Sep 2017 09:58:37 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] docker: Don't mount ccache db if NOUSER=1
+In-Reply-To: <b5fd50f3-7bd0-115c-bc67-0df49b05cb76@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="D2olUSFlmPnm62DQB3awdaoX20SK8JujV"
+Subject: Re: [Qemu-devel] [PATCH v4 02/23] block: Add flag to avoid wasted
+ work in bdrv_is_allocated()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +26,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--D2olUSFlmPnm62DQB3awdaoX20SK8JujV
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <d34a1afa-d4a4-e82f-a372-1f7e24d3bbcd@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 02/23] block: Add flag to avoid wasted
+ work in bdrv_is_allocated()
+References: <20170913160333.23622-1-eblake@redhat.com>
+ <20170913160333.23622-3-eblake@redhat.com>
+ <b5fd50f3-7bd0-115c-bc67-0df49b05cb76@redhat.com>
+In-Reply-To: <b5fd50f3-7bd0-115c-bc67-0df49b05cb76@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
-
-> On Mon, Sep 25, 2017 at 4:54 AM, Fam Zheng <famz@redhat.com> wrote:
->> With NOUSER=1 the container runs code as root, which may create
->> privileged files that will not be be accssible next time. Skip ccache
->> dir mount in this case.
+On 09/26/2017 01:31 PM, John Snow wrote:
+>=20
+>=20
+> On 09/13/2017 12:03 PM, Eric Blake wrote:
+>> Not all callers care about which BDS owns the mapping for a given
+>> range of the file.  In particular, bdrv_is_allocated() cares more
+>> about finding the largest run of allocated data from the guest
+>> perspective, whether or not that data is consecutive from the
+>> host perspective.  Therefore, doing subsequent refinements such
+>> as checking how much of the format-layer allocation also satisfies
+>> BDRV_BLOCK_ZERO at the protocol layer is wasted work - in the best
+>> case, it just costs extra CPU cycles during a single
+>> bdrv_is_allocated(), but in the worst case, it results in a smaller
+>> *pnum, and forces callers to iterate through more status probes when
+>> visiting the entire file for even more extra CPU cycles.
 >>
->> Signed-off-by: Fam Zheng <famz@redhat.com>
->
-> Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-Makes sense:
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
->
->> ---
->>  tests/docker/Makefile.include | 6 ++++--
->>  1 file changed, 4 insertions(+), 2 deletions(-)
+>> This patch only optimizes the block layer.  But subsequent patches
+>> will tweak the driver callback to be byte-based, and in the process,
+>> can also pass this hint through to the driver.
 >>
->> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
->> index 0e4f159619..6f9ea196a7 100644
->> --- a/tests/docker/Makefile.include
->> +++ b/tests/docker/Makefile.include
->> @@ -143,9 +143,11 @@ docker-run: docker-qemu-src
->>                         -e EXTRA_CONFIGURE_OPTS="$(EXTRA_CONFIGURE_OPTS)" \
->>                         -e V=$V -e J=$J -e DEBUG=$(DEBUG)               \
->>                         -e SHOW_ENV=$(SHOW_ENV)                         \
->> -                       -e CCACHE_DIR=/var/tmp/ccache                   \
->> +                       $(if $(NOUSER),,                                \
->> +                               -e CCACHE_DIR=/var/tmp/ccache           \
->> +                               -v $(DOCKER_CCACHE_DIR):/var/tmp/ccache:z \
->> +                       )                                               \
->>                         -v $$(readlink -e $(DOCKER_SRC_COPY)):/var/tmp/qemu:z$(COMMA)ro \
->> -                       -v $(DOCKER_CCACHE_DIR):/var/tmp/ccache:z       \
->>                         $(IMAGE)                                        \
->>                         /var/tmp/qemu/run                               \
->>                         $(TEST), "  RUN $(TEST) in ${IMAGE}")
->> --
->> 2.13.5
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
 >>
 
+>>   *
+>> + * If 'mapping' is true, the caller is querying for mapping purposes,=
 
---
-Alex Bennée
+>> + * and the result should include BDRV_BLOCK_OFFSET_VALID where
+>> + * possible; otherwise, the result may omit that bit particularly if
+>> + * it allows for a larger value in 'pnum'.
+
+I decided one more tweak to the comment will help:
+
++ * If 'mapping' is true, the caller is querying for mapping purposes,
++ * and the result should include BDRV_BLOCK_OFFSET_VALID and
++ * BDRV_BLOCK_ZERO where possible; otherwise, the result may omit those
++ * bits particularly if it allows for a larger value in 'pnum'.
+
+
+>> @@ -1836,12 +1844,13 @@ static int64_t coroutine_fn bdrv_co_get_block_=
+status(BlockDriverState *bs,
+>>          }
+>>      }
+>>
+>> -    if (local_file && local_file !=3D bs &&
+>> +    if (mapping && local_file && local_file !=3D bs &&
+>=20
+> Tentatively this looks OK to me, but I have to admit I'm a little shaky=
+
+> on this portion because I've not really investigated this function too
+> much. I am at the very least convinced that when mapping is true that
+> the function is equivalent and that existing callers don't have their
+> behavior changed too much.
+>=20
+> Benefit of the doubt:
+>=20
+> Reviewed-by: John Snow <jsnow@redhat.com>
+
+Then I'll tentatively keep your R-b even with the comment tweak, unless
+you say otherwise :)
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--D2olUSFlmPnm62DQB3awdaoX20SK8JujV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnNDh0ACgkQp6FrSiUn
+Q2qCZAgAoF9hYQY93B/03QnEgib3eJaBE5WHki3yFHknNN+NIfnCIRXiMqTilpvW
+SEmT31FBEjMSLVJMzGDUuhYIc79upnnmeSOlMkQz3B1wtWmNCJfxbO28AtCDWPUx
+x9wA0RxxFlEM8aRWnL0p/w6R8X8dVtGiaGlmCACLqf9OYfr4g9EfeowDpU3psdHr
+eVrgcmbi2JRe6tQO856JUCjDMr9oFs3z7f+9RxM1N4w8GRnxJ5KLEZa3DQvmYuRY
+g+RMcgN8eyaa1VyOtGeyrnj+JKtSYB/dHP8iiIUT/y3jbsmBki5ewB5mopSXRO9h
+iHOUOV8x4YsniOzU22jXq0nMZobb2Q==
+=nXpw
+-----END PGP SIGNATURE-----
+
+--D2olUSFlmPnm62DQB3awdaoX20SK8JujV--
