@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dxd0u-0002TE-Hh
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 13:54:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1dxd59-0004o0-Ce
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 13:58:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dxd0r-0004Zs-Dk
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 13:54:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:5316)
+	(envelope-from <eblake@redhat.com>) id 1dxd56-00073F-9f
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 13:58:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45654)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dxd0r-0004ZZ-5P
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 13:54:17 -0400
-Date: Thu, 28 Sep 2017 18:54:11 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170928175410.GA10866@work-vm>
-References: <1506590409-28857-1-git-send-email-amarnath.valluri@intel.com>
-	<1506590409-28857-6-git-send-email-amarnath.valluri@intel.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dxd55-00072Z-Vt
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 13:58:40 -0400
+References: <20170928120621.30288-1-berrange@redhat.com>
+	<20170928120621.30288-2-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3b48e116-7d88-4df0-05c3-7e45754db347@redhat.com>
+Date: Thu, 28 Sep 2017 12:58:32 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1506590409-28857-6-git-send-email-amarnath.valluri@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v9 5/8] tmp backend: Add new api to read
- backend TpmInfo
+In-Reply-To: <20170928120621.30288-2-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="E0uKSOKD0RL8UK8tH9X6Hr5wcdj5BjSLq"
+Subject: Re: [Qemu-devel] [PATCH v7 1/6] build: automatically handle GIT
+ submodule checkout for dtc
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -27,302 +28,233 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Amarnath Valluri <amarnath.valluri@intel.com>
-Cc: qemu-devel@nongnu.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-* Amarnath Valluri (amarnath.valluri@intel.com) wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--E0uKSOKD0RL8UK8tH9X6Hr5wcdj5BjSLq
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3b48e116-7d88-4df0-05c3-7e45754db347@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 1/6] build: automatically handle GIT
+ submodule checkout for dtc
+References: <20170928120621.30288-1-berrange@redhat.com>
+ <20170928120621.30288-2-berrange@redhat.com>
+In-Reply-To: <20170928120621.30288-2-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Note this patch says 'tmp' in the subject rather than tpm!
+On 09/28/2017 07:06 AM, Daniel P. Berrange wrote:
+> Currently if DTC is required by configure and not available in the host=
 
-Dave
+> OS install, we exit with an error message telling the user to checkout =
+a
+> git submodule or install the library.
+>=20
+> This introduces automatic handling of the git submodule checkout proces=
+s
+> and enables it for dtc. This only runs if building from GIT, so users o=
+f
+> release tarballs still need the system library install. The current sta=
+te
+> of the git checkout is stashed in .git-submodule-status, and a helper
+> program is used to determine if this state matches the desired submodul=
+e
+> state. A dependency against 'Makefile' ensures that the submodule state=
 
-> TPM configuration options are backend implementation details and shall not be
-> part of base TPMBackend object, and these shall not be accessed directly outside
-> of the class, hence added a new interface method, get_tpm_options() to
-> TPMDriverOps., which shall be implemented by the derived classes to return
-> configured tpm options.
-> 
-> A new tpm backend api - tpm_backend_query_tpm() which uses _get_tpm_options() to
-> prepare TpmInfo.
-> 
-> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
-> Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> is refreshed at the start of the build process
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
->  backends/tpm.c               | 15 +++++++++++--
->  hw/tpm/tpm_passthrough.c     | 51 +++++++++++++++++++++++++++-----------------
->  include/sysemu/tpm_backend.h | 15 +++++++++++--
->  tpm.c                        | 32 +--------------------------
->  4 files changed, 59 insertions(+), 54 deletions(-)
-> 
-> diff --git a/backends/tpm.c b/backends/tpm.c
-> index 8911597..de313c9 100644
-> --- a/backends/tpm.c
-> +++ b/backends/tpm.c
-> @@ -142,6 +142,19 @@ TPMVersion tpm_backend_get_tpm_version(TPMBackend *s)
->      return k->ops->get_tpm_version(s);
->  }
->  
-> +TPMInfo *tpm_backend_query_tpm(TPMBackend *s)
-> +{
-> +    TPMInfo *info = g_new0(TPMInfo, 1);
-> +    TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
+>  .gitignore               |  1 +
+>  Makefile                 | 23 ++++++++++++++++++++++-
+>  configure                | 46 ++++++++++++++++++++++++++--------------=
+------
+>  scripts/git-submodule.sh | 31 +++++++++++++++++++++++++++++++
+>  4 files changed, 80 insertions(+), 21 deletions(-)
+>  create mode 100755 scripts/git-submodule.sh
+>=20
+
+> +++ b/Makefile
+> @@ -14,6 +14,27 @@ ifneq ($(wildcard config-host.mak),)
+>  all:
+>  include config-host.mak
+> =20
+> +git-submodule-update:
 > +
-> +    info->id = g_strdup(s->id);
-> +    info->model = s->fe_model;
-> +    info->options = k->ops->get_tpm_options ?
-> +                    k->ops->get_tpm_options(s) : NULL;
+> +.PHONY: git-submodule-update
 > +
-> +    return info;
-> +}
+> +ifeq (0,$(MAKELEVEL))
+> +  git_module_status :=3D $(shell \
+> +    cd '$(SRC_PATH)'; \
+
+Should this be && instead of ;, since I don't know if $(shell) implies
+'set -e' semantics?
+
+> +    ./scripts/git-submodule.sh status $(GIT_SUBMODULES); \
+> +    echo $$?; \
+> +  )
 > +
->  static bool tpm_backend_prop_get_opened(Object *obj, Error **errp)
->  {
->      TPMBackend *s = TPM_BACKEND(obj);
-> @@ -196,8 +209,6 @@ static void tpm_backend_instance_finalize(Object *obj)
->      TPMBackend *s = TPM_BACKEND(obj);
->  
->      g_free(s->id);
-> -    g_free(s->path);
-> -    g_free(s->cancel_path);
->      tpm_backend_thread_end(s);
->  }
->  
-> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-> index 4c21e52..84fc49a 100644
-> --- a/hw/tpm/tpm_passthrough.c
-> +++ b/hw/tpm/tpm_passthrough.c
-> @@ -30,6 +30,7 @@
->  #include "tpm_int.h"
->  #include "hw/hw.h"
->  #include "hw/i386/pc.h"
-> +#include "qapi/clone-visitor.h"
->  #include "tpm_tis.h"
->  #include "tpm_util.h"
->  
-> @@ -49,7 +50,8 @@
->  struct TPMPassthruState {
->      TPMBackend parent;
->  
-> -    char *tpm_dev;
-> +    TPMPassthroughOptions *options;
-> +    const char *tpm_dev;
->      int tpm_fd;
->      bool tpm_executing;
->      bool tpm_op_canceled;
-> @@ -296,15 +298,14 @@ static TPMVersion tpm_passthrough_get_tpm_version(TPMBackend *tb)
->   * in Documentation/ABI/stable/sysfs-class-tpm.
->   * From /dev/tpm0 create /sys/class/misc/tpm0/device/cancel
->   */
-> -static int tpm_passthrough_open_sysfs_cancel(TPMBackend *tb)
-> +static int tpm_passthrough_open_sysfs_cancel(TPMPassthruState *tpm_pt)
->  {
-> -    TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
->      int fd = -1;
->      char *dev;
->      char path[PATH_MAX];
->  
-> -    if (tb->cancel_path) {
-> -        fd = qemu_open(tb->cancel_path, O_WRONLY);
-> +    if (tpm_pt->options->cancel_path) {
-> +        fd = qemu_open(tpm_pt->options->cancel_path, O_WRONLY);
->          if (fd < 0) {
->              error_report("Could not open TPM cancel path : %s",
->                           strerror(errno));
-> @@ -319,7 +320,7 @@ static int tpm_passthrough_open_sysfs_cancel(TPMBackend *tb)
->                       dev) < sizeof(path)) {
->              fd = qemu_open(path, O_WRONLY);
->              if (fd >= 0) {
-> -                tb->cancel_path = g_strdup(path);
-> +                tpm_pt->options->cancel_path = g_strdup(path);
->              } else {
->                  error_report("tpm_passthrough: Could not open TPM cancel "
->                               "path %s : %s", path, strerror(errno));
-> @@ -339,17 +340,18 @@ static int tpm_passthrough_handle_device_opts(QemuOpts *opts, TPMBackend *tb)
->      const char *value;
->  
->      value = qemu_opt_get(opts, "cancel-path");
-> -    tb->cancel_path = g_strdup(value);
-> +    if (value) {
-> +        tpm_pt->options->cancel_path = g_strdup(value);
-> +        tpm_pt->options->has_cancel_path = true;
-> +    }
->  
->      value = qemu_opt_get(opts, "path");
-> -    if (!value) {
-> -        value = TPM_PASSTHROUGH_DEFAULT_DEVICE;
-> +    if (value) {
-> +        tpm_pt->options->has_path = true;
-> +        tpm_pt->options->path = g_strdup(value);
->      }
->  
-> -    tpm_pt->tpm_dev = g_strdup(value);
-> -
-> -    tb->path = g_strdup(tpm_pt->tpm_dev);
-> -
-> +    tpm_pt->tpm_dev = value ? value : TPM_PASSTHROUGH_DEFAULT_DEVICE;
->      tpm_pt->tpm_fd = qemu_open(tpm_pt->tpm_dev, O_RDWR);
->      if (tpm_pt->tpm_fd < 0) {
->          error_report("Cannot access TPM device using '%s': %s",
-> @@ -370,10 +372,8 @@ static int tpm_passthrough_handle_device_opts(QemuOpts *opts, TPMBackend *tb)
->      tpm_pt->tpm_fd = -1;
->  
->   err_free_parameters:
-> -    g_free(tb->path);
-> -    tb->path = NULL;
-> -
-> -    g_free(tpm_pt->tpm_dev);
-> +    qapi_free_TPMPassthroughOptions(tpm_pt->options);
-> +    tpm_pt->options = NULL;
->      tpm_pt->tpm_dev = NULL;
->  
->      return 1;
-> @@ -391,7 +391,7 @@ static TPMBackend *tpm_passthrough_create(QemuOpts *opts, const char *id)
->          goto err_exit;
->      }
->  
-> -    tpm_pt->cancel_fd = tpm_passthrough_open_sysfs_cancel(tb);
-> +    tpm_pt->cancel_fd = tpm_passthrough_open_sysfs_cancel(tpm_pt);
->      if (tpm_pt->cancel_fd < 0) {
->          goto err_exit;
->      }
-> @@ -404,6 +404,17 @@ err_exit:
->      return NULL;
->  }
->  
-> +static TpmTypeOptions *tpm_passthrough_get_tpm_options(TPMBackend *tb)
-> +{
-> +    TpmTypeOptions *options = g_new0(TpmTypeOptions, 1);
+> +ifeq (1,$(git_module_status))
+> +git-submodule-update:
+> +	$(call quiet-command, \
+> +          (cd $(SRC_PATH); ./scripts/git-submodule.sh update $(GIT_SUB=
+MODULES)), \
+
+and again
+
+> +          "GIT","$(GIT_SUBMODULES)")
+> +endif
+> +endif
 > +
-> +    options->type = TPM_TYPE_OPTIONS_KIND_PASSTHROUGH;
-> +    options->u.passthrough.data = QAPI_CLONE(TPMPassthroughOptions,
-> +                                             TPM_PASSTHROUGH(tb)->options);
+> +.git-submodule-status: git-submodule-update
 > +
-> +    return options;
-> +}
+
+> +++ b/configure
+> @@ -264,6 +264,7 @@ cc_i386=3Di386-pc-linux-gnu-gcc
+>  libs_qga=3D""
+>  debug_info=3D"yes"
+>  stack_protector=3D""
+> +git_submodules=3D""
+> =20
+>  # Don't accept a target_list environment variable.
+>  unset target_list
+> @@ -3580,27 +3581,30 @@ EOF
+>    if compile_prog "" "$fdt_libs" ; then
+>      # system DTC is good - use it
+>      fdt=3Dyes
+> -  elif test -d ${source_path}/dtc/libfdt ; then
+=2E..
+> -       symlink "$source_path/dtc/Makefile" "dtc/Makefile"
+
+Old code is inconsistent on whether it quotes the expansion of
+$source_path.  Given the unquoted usage, we don't support a $source_path
+that contains spaces; however...
+
+> +      # have GIT checkout, so activate dtc submodule
+> +      if test -d ${source_path}/.git ; then
+
+=2E..we might as well consistently use quotes in all new code, especially=
+,
+since it is already a red flag any time someone does unquoted test -d $fo=
+o.
+
+> +	  git_submodules=3D"${git_submodules} dtc"
+> +      fi
+> +      if test -d ${source_path}/dtc/libfdt || test -d ${source_path}/.=
+git ; then
+
+and again
+
+=2Egit is not always a directory; it can be a symlink or text file
+containing a directory name.  It is probably sufficient to just use test
+-e instead of test -d.
+
+> +	  fdt=3Dyes
+> +	  dtc_internal=3D"yes"
+> +	  mkdir -p dtc
+> +	  if [ "$pwd_is_source_path" !=3D "y" ] ; then
+> +	      symlink "$source_path/dtc/Makefile" "dtc/Makefile"
+> +	      symlink "$source_path/dtc/scripts" "dtc/scripts"
+> +	  fi
+> +	  fdt_cflags=3D"-I\$(SRC_PATH)/dtc/libfdt"
+> +	  fdt_libs=3D"-L\$(BUILD_DIR)/dtc/libfdt $fdt_libs"
+> +      elif test "$fdt" =3D "yes" ; then
+> +	  # have neither and want - prompt for system/submodule install
+> +	  error_exit "DTC (libfdt) version >=3D 1.4.2 not present." \
+> +		     "Please install the DTC (libfdt) devel package"
+
+Is the comment accurate, given that the error message doesn't mention a
+submodule?
+
+> +      else
+> +	  # don't have and don't want
+> +	  fdt_libs=3D
+> +	  fdt=3Dno
+> +      fi
+>    fi
+>  fi
+> =20
+
+> +++ b/scripts/git-submodule.sh
+> @@ -0,0 +1,31 @@
+> +#!/bin/bash
 > +
->  static const QemuOptDesc tpm_passthrough_cmdline_opts[] = {
->      TPM_STANDARD_CMDLINE_OPTS,
->      {
-> @@ -430,12 +441,14 @@ static const TPMDriverOps tpm_passthrough_driver = {
->      .get_tpm_established_flag = tpm_passthrough_get_tpm_established_flag,
->      .reset_tpm_established_flag = tpm_passthrough_reset_tpm_established_flag,
->      .get_tpm_version          = tpm_passthrough_get_tpm_version,
-> +    .get_tpm_options          = tpm_passthrough_get_tpm_options,
->  };
->  
->  static void tpm_passthrough_inst_init(Object *obj)
->  {
->      TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(obj);
->  
-> +    tpm_pt->options = g_new0(TPMPassthroughOptions, 1);
->      tpm_pt->tpm_fd = -1;
->      tpm_pt->cancel_fd = -1;
->  }
-> @@ -448,7 +461,7 @@ static void tpm_passthrough_inst_finalize(Object *obj)
->  
->      qemu_close(tpm_pt->tpm_fd);
->      qemu_close(tpm_pt->cancel_fd);
-> -    g_free(tpm_pt->tpm_dev);
-> +    qapi_free_TPMPassthroughOptions(tpm_pt->options);
->  }
->  
->  static void tpm_passthrough_class_init(ObjectClass *klass, void *data)
-> diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
-> index 9ea7072..e96c191 100644
-> --- a/include/sysemu/tpm_backend.h
-> +++ b/include/sysemu/tpm_backend.h
-> @@ -49,10 +49,9 @@ struct TPMBackend {
->      TPMRecvDataCB *recv_data_callback;
->      bool had_startup_error;
->  
-> +    /* <public> */
->      char *id;
->      enum TpmModel fe_model;
-> -    char *path;
-> -    char *cancel_path;
->  
->      QLIST_ENTRY(TPMBackend) list;
->  };
-> @@ -96,6 +95,8 @@ struct TPMDriverOps {
->      int (*reset_tpm_established_flag)(TPMBackend *t, uint8_t locty);
->  
->      TPMVersion (*get_tpm_version)(TPMBackend *t);
+> +set -e
+
+'set -e' is notoriously awkward to work with, especially if your shell
+script includes functions.  Do we really need it, or can we do proper
+error checking in place?
+
 > +
-> +    TpmTypeOptions *(*get_tpm_options)(TPMBackend *t);
->  };
->  
->  
-> @@ -214,6 +215,16 @@ void tpm_backend_open(TPMBackend *s, Error **errp);
->   */
->  TPMVersion tpm_backend_get_tpm_version(TPMBackend *s);
->  
-> +/**
-> + * tpm_backend_query_tpm:
-> + * @s: the backend
-> + *
-> + * Query backend tpm info
-> + *
-> + * Returns newly allocated TPMInfo
-> + */
-> +TPMInfo *tpm_backend_query_tpm(TPMBackend *s);
+> +command=3D$1
+> +shift
+> +modules=3D"$@"
 > +
->  TPMBackend *qemu_find_tpm(const char *id);
->  
->  const TPMDriverOps *tpm_get_backend_driver(const char *type);
-> diff --git a/tpm.c b/tpm.c
-> index db14849..3b8c7ed 100644
-> --- a/tpm.c
-> +++ b/tpm.c
-> @@ -202,36 +202,6 @@ static const TPMDriverOps *tpm_driver_find_by_type(enum TpmType type)
->      return be_drivers[type];
->  }
->  
-> -static TPMInfo *qmp_query_tpm_inst(TPMBackend *drv)
-> -{
-> -    TPMInfo *res = g_new0(TPMInfo, 1);
-> -    TPMPassthroughOptions *tpo;
-> -
-> -    res->id = g_strdup(drv->id);
-> -    res->model = drv->fe_model;
-> -    res->options = g_new0(TpmTypeOptions, 1);
-> -
-> -    switch (tpm_backend_get_type(drv)) {
-> -    case TPM_TYPE_PASSTHROUGH:
-> -        res->options->type = TPM_TYPE_OPTIONS_KIND_PASSTHROUGH;
-> -        tpo = g_new0(TPMPassthroughOptions, 1);
-> -        res->options->u.passthrough.data = tpo;
-> -        if (drv->path) {
-> -            tpo->path = g_strdup(drv->path);
-> -            tpo->has_path = true;
-> -        }
-> -        if (drv->cancel_path) {
-> -            tpo->cancel_path = g_strdup(drv->cancel_path);
-> -            tpo->has_cancel_path = true;
-> -        }
-> -        break;
-> -    case TPM_TYPE__MAX:
-> -        break;
-> -    }
-> -
-> -    return res;
-> -}
-> -
->  /*
->   * Walk the list of active TPM backends and collect information about them
->   * following the schema description in qapi-schema.json.
-> @@ -246,7 +216,7 @@ TPMInfoList *qmp_query_tpm(Error **errp)
->              continue;
->          }
->          info = g_new0(TPMInfoList, 1);
-> -        info->value = qmp_query_tpm_inst(drv);
-> +        info->value = tpm_backend_query_tpm(drv);
->  
->          if (!cur_item) {
->              head = cur_item = info;
-> -- 
-> 2.7.4
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> +test -z "$modules" && exit 0
+> +
+> +if ! test -d ".git"
+
+Again, .git doesn't necessarily have to be a directory; test -e may be
+better.
+
+> +then
+> +    echo "$0: unexpectedly called with submodules but no git checkout =
+exists"
+> +    exit 1
+> +fi
+> +
+> +substat=3D".git-submodule-status"
+> +
+> +case "$command" in
+> +status)
+> +    test -f "$substat" || exit 1
+> +    git submodule status $modules > "${substat}.tmp"
+
+This is one place where if 'set -e' is not in effect, you need to decide
+if failure to run the command should cause early exit.
+
+> +    trap "rm -f ${substat}.tmp" EXIT
+
+Don't you want the trap installed one line earlier, before you create
+the file?
+
+> +    diff "${substat}" "${substat}.tmp" >/dev/null
+> +    exit $?
+> +    ;;
+> +update)
+> +    git submodule update --init $modules 1>/dev/null 2>&1
+> +    git submodule status $modules > "${substat}"
+> +    ;;
+> +esac
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--E0uKSOKD0RL8UK8tH9X6Hr5wcdj5BjSLq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnNOEgACgkQp6FrSiUn
+Q2pLMggAozcA1ewboCo2Wd4Ybf0Yw6Nu6Vb3KN6StuUdGHE+f3mxo8Jd8tPepBdj
+QaqratiLYp6OxUp59B4mbc1qkcPS4dxbabF4wU8M0m7dPGY8CfCHWzHhiADQu6Rv
+lwW0gpEfSx+Bjo0Qp3i9gIRVOMRjkwBbz2VxluqT5l2/a1W6rJzFHWRG+4/5Keof
+wzLt+lv3qlQqLx24iOscmj4HbwYF6zsvdQzWZiIcsBKhjQstt9d7gMEme/I3Ycjn
+ole4jjF6xCI3+AWHOUmtVmVZNSdm33Kp4Vy6DrbkOe7JFkH87gDI1FA9hTBURXRQ
+K5dX1Wit1OVOLsoE6V3XIrkHjSym7g==
+=Zhl5
+-----END PGP SIGNATURE-----
+
+--E0uKSOKD0RL8UK8tH9X6Hr5wcdj5BjSLq--
