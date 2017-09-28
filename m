@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linuc.decode@gmail.com>) id 1dxV0s-0002vu-Vv
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:21:51 -0400
+	(envelope-from <ldoktor@redhat.com>) id 1dxV43-0005Sy-2M
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:25:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linuc.decode@gmail.com>) id 1dxV0n-00035A-Sj
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:21:46 -0400
-Date: Thu, 28 Sep 2017 14:51:08 +0530
-From: Linu Cherian <linuc.decode@gmail.com>
-Message-ID: <20170928092107.GA1813@virtx40>
-References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
-	<20170928064312.GA1544@virtx40>
-	<20170928071359.GG17044@pxdev.xzpeter.org>
-	<42a551e1-ccc4-f162-51d8-c61ca5f86790@redhat.com>
+	(envelope-from <ldoktor@redhat.com>) id 1dxV3x-00053I-0D
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:25:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48596)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1dxV3w-00052v-NM
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:24:56 -0400
+References: <20170927130339.21444-1-ehabkost@redhat.com>
+	<20170927130339.21444-4-ehabkost@redhat.com>
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+Message-ID: <57b8fe55-6534-e27e-041b-5c9a6c16f7c6@redhat.com>
+Date: Thu, 28 Sep 2017 11:24:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <42a551e1-ccc4-f162-51d8-c61ca5f86790@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v7 00/20] ARM SMMUv3 Emulation
- Support
+In-Reply-To: <20170927130339.21444-4-ehabkost@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="usrO79NXATIfvr5Ds71QLuhgQuVPb4dhs"
+Subject: Re: [Qemu-devel] [PATCH 3/5] basevm: Call logging.basicConfig()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,87 +28,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, peter.maydell@linaro.org, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mohun106@gmail.com, jean-philippe.brucker@arm.com, tn@semihalf.com, bharat.bhushan@nxp.com, mst@redhat.com, will.deacon@arm.com, qemu-devel@nongnu.org, alex.williamson@redhat.com, qemu-arm@nongnu.org, christoffer.dall@linaro.org, wtownsen@redhat.com, robin.murphy@arm.com, prem.mallappa@gmail.com, eric.auger.pro@gmail.com, linu.cherian@cavium.com
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On Thu Sep 28, 2017 at 09:54:20AM +0200, Auger Eric wrote:
-> Hi Linu, Peter,
-> 
-> On 28/09/2017 09:13, Peter Xu wrote:
-> > On Thu, Sep 28, 2017 at 12:13:12PM +0530, Linu Cherian wrote:
-> >> Hi Eric,
-> >>
-> >>
-> >> On Fri Sep 01, 2017 at 07:21:03PM +0200, Eric Auger wrote:
-> >>> This series implements the emulation code for ARM SMMUv3.
-> >>>
-> >>> Changes since v6:
-> >>> - DPDK testpmd now running on guest with 2 assigned VFs
-> >>> - Changed the instantiation method: add the following option to
-> >>>   the QEMU command line
-> >>>   -device smmuv3 # for virtio/vhost use cases
-> >>>   -device smmuv3,caching-mode # for vfio use cases (based on [1])
-> >>> - splitted the series into smaller patches to allow the review
-> >>> - the VFIO integration based on "tlbi-on-map" smmuv3 driver
-> >>>   is isolated from the rest: last 2 patches, not for upstream.
-> >>>   This is shipped for testing/bench until a better solution is found.
-> >>> - Reworked permission flag checks and event generation
-> >>> e testing:
-> >>> - in dt and ACPI modes
-> >>> - virtio-net-pci and vhost-net devices using dma ops with various
-> >>>   guest page sizes [2]
-> >>> - assigned VFs using dma ops [3]:
-> >>>   - AMD Overdrive and igbvf passthrough (using gsi direct mapping)
-> >>>   - Cavium ThunderX and ixgbevf passthrough (using KVM MSI routing)
-> >>> - DPDK testpmd on guest running with VFIO user space drivers (2 igbvf) [3]
-> >>>   with guest and host page size equal (4kB)
-> >>>
-> >>> Known limitations:
-> >>> - no VMSAv8-32 suport
-> >>> - no nested stage support (S1 + S2)
-> >>> - no support for HYP mappings
-> >>> - register fine emulation, commands, interrupts and errors were
-> >>>   not accurately tested. Handling is sufficient to run use cases
-> >>>   described above though.
-> >>> - interrupts and event generation not observed yet.
-> >>
-> >> While testing with vfio-pci, observed that the below two  Qemu command,
-> >> results in two different behaviour. Is this expected by design ?
-> >>
-> >> Case 1:
-> >> # -device vfio-pci,host=0002:01:00.3 -device smmuv3,caching-mode
-> >>  Here iommu is not attached to the pci bus in Qemu backend, since
-> >>  pci_setup_iommu is not called before vfio_realize.
-> >>
-> >> Case 2:
-> >> # -device smmuv3,caching-mode -device vfio-pci,host=0002:01:00.3
-> >> This works as expected, iommu is attached to the pci bus.
-> > 
-> > Not sure about SMMU, but VT-d should have similar issue - the vIOMMU
-> > device needs to be created before the rest of the devices.
-> 
-> Yes this is an expected limitation right now. I should have documented
-> it though. As you noticed, the pci_set_iommu() is called on virtio-iommu
-> realize and it relies on the fact the PCIe devices already are realized.
-> 
-> Maybe we could relax this constraint by calling the pci_set_iommu in a
-> machine init done notifier.
-> 
-> Thanks
-> 
-> Eric
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--usrO79NXATIfvr5Ds71QLuhgQuVPb4dhs
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <57b8fe55-6534-e27e-041b-5c9a6c16f7c6@redhat.com>
+Subject: Re: [PATCH 3/5] basevm: Call logging.basicConfig()
+References: <20170927130339.21444-1-ehabkost@redhat.com>
+ <20170927130339.21444-4-ehabkost@redhat.com>
+In-Reply-To: <20170927130339.21444-4-ehabkost@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for confirming. 
+Dne 27.9.2017 v 15:03 Eduardo Habkost napsal(a):
+> Just setting level=3DDEBUG when debug is enabled is not enough: we
+> need to set up a log handler if we want debug messages generated
+> using logging.getLogger(...).debug() to be printed.
+>=20
+> This was not a problem before because logging.debug() calls
+> logging.basicConfig() implicitly, but it's safer to not rely on
+> that.
+>=20
+> Cc: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>
+> Cc: Fam Zheng <famz@redhat.com>
+> Cc: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  tests/vm/basevm.py | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+> index 3c863bc237..686d88decf 100755
+> --- a/tests/vm/basevm.py
+> +++ b/tests/vm/basevm.py
+> @@ -227,8 +227,8 @@ def main(vmcls):
+>          if not argv and not args.build_qemu and not args.build_image:
+>              print "Nothing to do?"
+>              return 1
+> -        if args.debug:
+> -            logging.getLogger().setLevel(logging.DEBUG)
+> +        logging.basicConfig(level=3D(logging.DEBUG if args.debug
+> +                                   else logging.WARN))
+>          vm =3D vmcls(debug=3Dargs.debug, vcpus=3Dargs.jobs)
+>          if args.build_image:
+>              if os.path.exists(args.image) and not args.force:
+>=20
 
-> 
-> 
-> > 
-> > Now for VT-d the ordering of devices should be assured by Libvirt:
-> > 
-> > https://bugzilla.redhat.com/show_bug.cgi?id=1427005
-> > 
-> > For your reference only.  Thanks,
-> > 
+Reviewed-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
 
--- 
-Linu cherian
+
+--usrO79NXATIfvr5Ds71QLuhgQuVPb4dhs
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEwBAEBCAAaBQJZzL/hExxsZG9rdG9yQHJlZGhhdC5jb20ACgkQJrNi5H/PIsGb
+Kgf/XLQwnELuMUplNGubSSA0zU1F/+aLBfONaHDSZBCS7MERmP6le9hGF6Qn9Zwd
+V/qQCIEb8f59D3un0oR51jzu91SULdN9bXq0Gd3yvLv/I/wiDzc2JmxdJASj2B4t
+E5qkHuVw7ZCxGObxRWMsGF5z/VIIBZ3ZLrSg7QWruDwMRebq1LsOf4GCO1zcXIBM
+LHFNpmHxm1cE9lOgqOUd9vIIESoOF/u77R1jgBL5lW141bvbTsxPyPXFk3cF2i2W
+uE67jaHt+Wx6kXnnTt/NrWnJyRdLi1w3Q1TJQFLfQ0X0bgmJtcuGGhsxZHgaoRWH
+VhqiGCDW0JnpsJZ/QE9ICGpfbA==
+=8LF4
+-----END PGP SIGNATURE-----
+
+--usrO79NXATIfvr5Ds71QLuhgQuVPb4dhs--
