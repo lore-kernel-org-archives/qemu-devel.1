@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dxT1d-0007es-0A
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 03:14:25 -0400
+	(envelope-from <intermediadc@hotmail.com>) id 1dxTEF-0001Fr-7d
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 03:27:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dxT1b-0002xR-Tt
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 03:14:24 -0400
-Date: Thu, 28 Sep 2017 15:13:59 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170928071359.GG17044@pxdev.xzpeter.org>
-References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
-	<20170928064312.GA1544@virtx40>
+	(envelope-from <intermediadc@hotmail.com>) id 1dxTEB-0007XY-2R
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 03:27:27 -0400
+From: luigi burdo <intermediadc@hotmail.com>
+Date: Thu, 28 Sep 2017 07:27:15 +0000
+Message-ID: <AM5P194MB0132260A40AD097E2F67A4B2C8790@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
+References: <AM5P194MB0132C46F9FCCF1DCF2FFC7D0C87A0@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>,
+	<1506512087.25036.10.camel@redhat.com>,
+	<AM5P194MB013209976BC625983F3265D3C8780@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
+In-Reply-To: <AM5P194MB013209976BC625983F3265D3C8780@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
+Content-Language: it-IT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170928064312.GA1544@virtx40>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v7 00/20] ARM SMMUv3 Emulation
- Support
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] ppce500 usb-ehci-pci issue on last uboot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Linu Cherian <linuc.decode@gmail.com>
-Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, prem.mallappa@gmail.com, alex.williamson@redhat.com, mohun106@gmail.com, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mst@redhat.com, jean-philippe.brucker@arm.com, tn@semihalf.com, will.deacon@arm.com, robin.murphy@arm.com, bharat.bhushan@nxp.com, christoffer.dall@linaro.org, wtownsen@redhat.com
+To: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On Thu, Sep 28, 2017 at 12:13:12PM +0530, Linu Cherian wrote:
-> Hi Eric,
-> 
-> 
-> On Fri Sep 01, 2017 at 07:21:03PM +0200, Eric Auger wrote:
-> > This series implements the emulation code for ARM SMMUv3.
-> > 
-> > Changes since v6:
-> > - DPDK testpmd now running on guest with 2 assigned VFs
-> > - Changed the instantiation method: add the following option to
-> >   the QEMU command line
-> >   -device smmuv3 # for virtio/vhost use cases
-> >   -device smmuv3,caching-mode # for vfio use cases (based on [1])
-> > - splitted the series into smaller patches to allow the review
-> > - the VFIO integration based on "tlbi-on-map" smmuv3 driver
-> >   is isolated from the rest: last 2 patches, not for upstream.
-> >   This is shipped for testing/bench until a better solution is found.
-> > - Reworked permission flag checks and event generation
-> > e testing:
-> > - in dt and ACPI modes
-> > - virtio-net-pci and vhost-net devices using dma ops with various
-> >   guest page sizes [2]
-> > - assigned VFs using dma ops [3]:
-> >   - AMD Overdrive and igbvf passthrough (using gsi direct mapping)
-> >   - Cavium ThunderX and ixgbevf passthrough (using KVM MSI routing)
-> > - DPDK testpmd on guest running with VFIO user space drivers (2 igbvf) [3]
-> >   with guest and host page size equal (4kB)
-> > 
-> > Known limitations:
-> > - no VMSAv8-32 suport
-> > - no nested stage support (S1 + S2)
-> > - no support for HYP mappings
-> > - register fine emulation, commands, interrupts and errors were
-> >   not accurately tested. Handling is sufficient to run use cases
-> >   described above though.
-> > - interrupts and event generation not observed yet.
-> 
-> While testing with vfio-pci, observed that the below two  Qemu command,
-> results in two different behaviour. Is this expected by design ?
-> 
-> Case 1:
-> # -device vfio-pci,host=0002:01:00.3 -device smmuv3,caching-mode
->  Here iommu is not attached to the pci bus in Qemu backend, since
->  pci_setup_iommu is not called before vfio_realize.
-> 
-> Case 2:
-> # -device smmuv3,caching-mode -device vfio-pci,host=0002:01:00.3
-> This works as expected, iommu is attached to the pci bus.
 
-Not sure about SMMU, but VT-d should have similar issue - the vIOMMU
-device needs to be created before the rest of the devices.
+Hi Gerd,
+i had test it yesterday on Little Endian machine host (Apple  Osx Sierra)
+the issue is present there too.
 
-Now for VT-d the ordering of devices should be assured by Libvirt:
+Ciao
+Luigi
 
-https://bugzilla.redhat.com/show_bug.cgi?id=1427005
 
-For your reference only.  Thanks,
+________________________________
 
--- 
-Peter Xu
+hi Gerd,
+yes the host is a big endian but i can test it on an little endian host too=
+ and report.
+About xhci or ohci the uboot dont recognize it . ehci-pci are the only usb =
+pci board from where uboot on ppce500 vm  can make the load from device or =
+use directly the device attached on  it if cmd reset work for initislize th=
+e board.
+
+
+> Il giorno 27 set 2017, alle ore 13:34, Gerd Hoffmann <kraxel@redhat.com> =
+ha scritto:
+>
+>  Hi,
+>
+>> "actually, I tried it yesterday and it seems to be a bug in qemu in
+>> case you reset the EHCI controller, it doesn't come out of reset for
+>> whatever reason ... so you probably want to talk to the qemu guys,
+>> it's when U-Boot sets USBCMD RESET bit and then does handshake, the
+>> controller is stuck with reset bit asserted"
+>>
+>>
+>> i ask if possible to fix it?
+>
+> Nothing obvious in the ehci reset code.  Needs someone debugging it ...
+>
+> Is this on a bigendian host?  If so this could be endian bugs in the
+> ehci emulation.
+>
+> You could also try xhci or ohci instead, these are known-working on
+> bigendian hosts (used by ppc64 pseries).
+>
+> cheers,
+>  Gerd
+>
+>
