@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dxVAw-0002ky-6q
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:32:14 -0400
+	(envelope-from <ldoktor@redhat.com>) id 1dxVCm-0003vy-VC
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:34:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dxVAr-0000yR-Q6
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:32:10 -0400
-References: <20170927195635.16014-1-ehabkost@redhat.com>
-	<20170927195635.16014-4-ehabkost@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <9ad2077b-a161-1100-fb44-bd308e3e412f@redhat.com>
-Date: Thu, 28 Sep 2017 12:31:41 +0300
+	(envelope-from <ldoktor@redhat.com>) id 1dxVCm-0001Z0-21
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:34:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53792)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1dxVCl-0001Yk-OA
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 05:34:03 -0400
+References: <20170927130339.21444-1-ehabkost@redhat.com>
+	<20170927130339.21444-5-ehabkost@redhat.com>
+	<20170927133321.GB8521@lemon.lan>
+	<20170927134431.GN21016@localhost.localdomain>
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+Message-ID: <7b84fb9c-9969-c9d5-8ede-2d54c3825ea6@redhat.com>
+Date: Thu, 28 Sep 2017 11:33:57 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170927195635.16014-4-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] pci: Add INTERFACE_PCIE_DEVICE to
- all PCIe devices
+In-Reply-To: <20170927134431.GN21016@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="KDl3ccndaw73K8T2u4aSv5LareC2XcbTI"
+Subject: Re: [Qemu-devel] [PATCH] fixup! scripts: Remove debug parameter
+ from QEMUMonitorProtocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,177 +31,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: David Gibson <dgibson@redhat.com>, Alistair Francis <alistair23@gmail.com>, Laine Stump <laine@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Dmitry Fleytman <dmitry@daynix.com>, Jason Wang <jasowang@redhat.com>, Paul Burton <paul.burton@imgtec.com>, Paolo Bonzini <pbonzini@redhat.com>, Hannes Reinecke <hare@suse.com>, qemu-block@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
 
-On 27/09/2017 22:56, Eduardo Habkost wrote:
-> Change all devices that set is_express=1 to implement
-> INTERFACE_PCIE_DEVICE.
-> 
-> Cc: Keith Busch <keith.busch@intel.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: Dmitry Fleytman <dmitry@daynix.com>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Marcel Apfelbaum <marcel@redhat.com>
-> Cc: Paul Burton <paul.burton@imgtec.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Hannes Reinecke <hare@suse.com>
-> Cc: qemu-block@nongnu.org
-> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--KDl3ccndaw73K8T2u4aSv5LareC2XcbTI
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
+Message-ID: <7b84fb9c-9969-c9d5-8ede-2d54c3825ea6@redhat.com>
+Subject: Re: [PATCH] fixup! scripts: Remove debug parameter from
+ QEMUMonitorProtocol
+References: <20170927130339.21444-1-ehabkost@redhat.com>
+ <20170927130339.21444-5-ehabkost@redhat.com>
+ <20170927133321.GB8521@lemon.lan>
+ <20170927134431.GN21016@localhost.localdomain>
+In-Reply-To: <20170927134431.GN21016@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Dne 27.9.2017 v 15:44 Eduardo Habkost napsal(a):
+> On Wed, Sep 27, 2017 at 09:33:21PM +0800, Fam Zheng wrote:
+>> On Wed, 09/27 10:03, Eduardo Habkost wrote:
+>>> @@ -51,7 +54,6 @@ class QEMUMonitorProtocol(object):
+>>>          """
+>>>          self.__events =3D []
+>>>          self.__address =3D address
+>>> -        self._debug =3D debug
+>>
+>> Should you also drop the debug parameter from the method?
+>>
+>>>          self.__sock =3D self.__get_sock()
+>>>          self.__sockfile =3D None
+>>>          if server:
+>>> @@ -83,8 +85,7 @@ class QEMUMonitorProtocol(object):
+>>>                  return
+>>>              resp =3D json.loads(data)
+>>>              if 'event' in resp:
+>>> -                if self._debug:
+>>> -                    print >>sys.stderr, "QMP:<<< %s" % resp
+
+This is the only user of `sys` import, please remove it as well. Apart fr=
+om this it looks good, although you might consider using `__name__` inste=
+ad of hardcoded `QMP` in `logger =3D logging.getLogger(__name__)` for the=
+ sake of consistency (people might expect it to correlate with the module=
+ name).
+
+Luk=C3=A1=C5=A1
+
+>>> +                self.logger.debug("<<< %s", resp)
+>>>                  self.__events.append(resp)
+>>>                  if not only_event:
+>>>                      continue
+>>> @@ -164,8 +165,7 @@ class QEMUMonitorProtocol(object):
+>>>          @return QMP response as a Python dict or None if the connect=
+ion has
+>>>                  been closed
+>>>          """
+>>> -        if self._debug:
+>>> -            print >>sys.stderr, "QMP:>>> %s" % qmp_cmd
+>>> +        self.logger.debug("<<< %s", qmp_cmd)
+>>
+>> This should be ">>> %s".
+>>
+>=20
+> Fixed.
+>=20
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
-> Changes v1 -> v2:
-> * base-xhci is marked as hybrid, now (in another patch)
-> * Included pcie-pci-bridge
-> ---
->   hw/block/nvme.c                    | 4 ++++
->   hw/net/e1000e.c                    | 4 ++++
->   hw/pci-bridge/pcie_pci_bridge.c    | 1 +
->   hw/pci-bridge/pcie_root_port.c     | 4 ++++
->   hw/pci-bridge/xio3130_downstream.c | 4 ++++
->   hw/pci-bridge/xio3130_upstream.c   | 4 ++++
->   hw/pci-host/xilinx-pcie.c          | 4 ++++
->   hw/scsi/megasas.c                  | 6 ++++++
->   8 files changed, 31 insertions(+)
-> 
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 9aa32692a3..441e21ed1f 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -1110,6 +1110,10 @@ static const TypeInfo nvme_info = {
->       .instance_size = sizeof(NvmeCtrl),
->       .class_init    = nvme_class_init,
->       .instance_init = nvme_instance_init,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { INTERFACE_PCIE_DEVICE },
-> +        { }
-> +    },
->   };
->   
->   static void nvme_register_types(void)
-> diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
-> index 6c42b4478c..81f7934a59 100644
-> --- a/hw/net/e1000e.c
-> +++ b/hw/net/e1000e.c
-> @@ -708,6 +708,10 @@ static const TypeInfo e1000e_info = {
->       .instance_size = sizeof(E1000EState),
->       .class_init = e1000e_class_init,
->       .instance_init = e1000e_instance_init,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { INTERFACE_PCIE_DEVICE },
-> +        { }
-> +    },
->   };
->   
->   static void e1000e_register_types(void)
-> diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
-> index 9aa5cc3e45..88db143633 100644
-> --- a/hw/pci-bridge/pcie_pci_bridge.c
-> +++ b/hw/pci-bridge/pcie_pci_bridge.c
-> @@ -180,6 +180,7 @@ static const TypeInfo pcie_pci_bridge_info = {
->           .class_init = pcie_pci_bridge_class_init,
->           .interfaces = (InterfaceInfo[]) {
->               { TYPE_HOTPLUG_HANDLER },
-> +            { INTERFACE_PCIE_DEVICE },
->               { },
->           }
->   };
-> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
-> index 4d588cb22e..9b6e4ce512 100644
-> --- a/hw/pci-bridge/pcie_root_port.c
-> +++ b/hw/pci-bridge/pcie_root_port.c
-> @@ -161,6 +161,10 @@ static const TypeInfo rp_info = {
->       .class_init    = rp_class_init,
->       .abstract      = true,
->       .class_size = sizeof(PCIERootPortClass),
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { INTERFACE_PCIE_DEVICE },
-> +        { }
-> +    },
->   };
->   
->   static void rp_register_types(void)
-> diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
-> index e706f36cb7..7d2f7629c1 100644
-> --- a/hw/pci-bridge/xio3130_downstream.c
-> +++ b/hw/pci-bridge/xio3130_downstream.c
-> @@ -195,6 +195,10 @@ static const TypeInfo xio3130_downstream_info = {
->       .name          = "xio3130-downstream",
->       .parent        = TYPE_PCIE_SLOT,
->       .class_init    = xio3130_downstream_class_init,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { INTERFACE_PCIE_DEVICE },
-> +        { }
-> +    },
->   };
->   
->   static void xio3130_downstream_register_types(void)
-> diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_upstream.c
-> index a052224bbf..227997ce46 100644
-> --- a/hw/pci-bridge/xio3130_upstream.c
-> +++ b/hw/pci-bridge/xio3130_upstream.c
-> @@ -166,6 +166,10 @@ static const TypeInfo xio3130_upstream_info = {
->       .name          = "x3130-upstream",
->       .parent        = TYPE_PCIE_PORT,
->       .class_init    = xio3130_upstream_class_init,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { INTERFACE_PCIE_DEVICE },
-> +        { }
-> +    },
->   };
->   
->   static void xio3130_upstream_register_types(void)
-> diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
-> index 4613dda1d2..7659253090 100644
-> --- a/hw/pci-host/xilinx-pcie.c
-> +++ b/hw/pci-host/xilinx-pcie.c
-> @@ -317,6 +317,10 @@ static const TypeInfo xilinx_pcie_root_info = {
->       .parent = TYPE_PCI_BRIDGE,
->       .instance_size = sizeof(XilinxPCIERoot),
->       .class_init = xilinx_pcie_root_class_init,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { INTERFACE_PCIE_DEVICE },
-> +        { }
-> +    },
->   };
->   
->   static void xilinx_pcie_register(void)
-> diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
-> index 0db68aacee..535ee267c3 100644
-> --- a/hw/scsi/megasas.c
-> +++ b/hw/scsi/megasas.c
-> @@ -2451,6 +2451,7 @@ typedef struct MegasasInfo {
->       int osts;
->       const VMStateDescription *vmsd;
->       Property *props;
-> +    InterfaceInfo *interfaces;
->   } MegasasInfo;
->   
->   static struct MegasasInfo megasas_devices[] = {
-> @@ -2480,6 +2481,10 @@ static struct MegasasInfo megasas_devices[] = {
->           .is_express = true,
->           .vmsd = &vmstate_megasas_gen2,
->           .props = megasas_properties_gen2,
-> +        .interfaces = (InterfaceInfo[]) {
-> +            { INTERFACE_PCIE_DEVICE },
-> +            { }
-> +        },
->       }
->   };
->   
-> @@ -2531,6 +2536,7 @@ static void megasas_register_types(void)
->           type_info.parent = TYPE_MEGASAS_BASE;
->           type_info.class_data = (void *)info;
->           type_info.class_init = megasas_class_init;
-> +        type_info.interfaces = info->interfaces;
->   
->           type_register(&type_info);
->       }
-> 
+>  scripts/qmp/qmp.py | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
+> index be79d7aa80..369d9fef39 100644
+> --- a/scripts/qmp/qmp.py
+> +++ b/scripts/qmp/qmp.py
+> @@ -40,7 +40,7 @@ class QEMUMonitorProtocol(object):
+>      #: Socket's timeout
+>      timeout =3D socket.timeout
+> =20
+> -    def __init__(self, address, server=3DFalse, debug=3DFalse):
+> +    def __init__(self, address, server=3DFalse):
+>          """
+>          Create a QEMUMonitorProtocol class.
+> =20
+> @@ -165,7 +165,7 @@ class QEMUMonitorProtocol(object):
+>          @return QMP response as a Python dict or None if the connectio=
+n has
+>                  been closed
+>          """
+> -        self.logger.debug("<<< %s", qmp_cmd)
+> +        self.logger.debug(">>> %s", qmp_cmd)
+>          try:
+>              self.__sock.sendall(json.dumps(qmp_cmd))
+>          except socket.error as err:
+>=20
 
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
-Thanks,
-Marcel
+
+--KDl3ccndaw73K8T2u4aSv5LareC2XcbTI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEwBAEBCAAaBQJZzMIFExxsZG9rdG9yQHJlZGhhdC5jb20ACgkQJrNi5H/PIsGN
+RggAsGVC8jpLzmDtHSG//ahkrrsL1dfgTTdmg+8eaA2U1SgSf3XSolBkKyutQ8r4
+LdVrTsW3kIIaWR/YSJ5eYgCaW7t+ffI0e1ji1B9LWbpaRrGfeYRERf+o92K5dbVG
+RhWr9yNpooRj8C5q3Zq6dFgBa6G2bHSXn/6CX24tnJZfF08uanhWBglJ4cW76QgH
+i0TxpLtqeGQ32/s7l4fLthE6jIwCWAH5hsHnGtdRJIJdOVy5b9xEAay8eq2tqmR2
+dn0WEGocYd1woFj9KsuYDeOHqjePS/6bx98x80kVOLo6rVIH+jz+z5kGy265eILG
+wa9u78E9UlJIO+9CrGefN+MVhQ==
+=q209
+-----END PGP SIGNATURE-----
+
+--KDl3ccndaw73K8T2u4aSv5LareC2XcbTI--
