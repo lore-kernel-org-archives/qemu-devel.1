@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dxcPl-0006Tc-5e
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 13:15:58 -0400
+	(envelope-from <teisenbe@google.com>) id 1dxcR1-0007ER-Aj
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 13:17:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dxcPh-0004UE-1Z
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 13:15:57 -0400
-Received: from mail-pg0-x233.google.com ([2607:f8b0:400e:c05::233]:55459)
+	(envelope-from <teisenbe@google.com>) id 1dxcQv-00050u-QA
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 13:17:15 -0400
+Received: from mail-qt0-x22a.google.com ([2607:f8b0:400d:c0d::22a]:50948)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dxcPg-0004Tl-Rl
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 13:15:52 -0400
-Received: by mail-pg0-x233.google.com with SMTP id b11so1279809pgn.12
-	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 10:15:52 -0700 (PDT)
-References: <20170927083636.26648-1-kraxel@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <9f93e3fb-6979-137a-c86d-b7641563921f@linaro.org>
-Date: Thu, 28 Sep 2017 10:15:47 -0700
+	(Exim 4.71) (envelope-from <teisenbe@google.com>) id 1dxcQv-0004zp-Kt
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 13:17:09 -0400
+Received: by mail-qt0-x22a.google.com with SMTP id f15so2590866qtf.7
+	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 10:17:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170927083636.26648-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] console: purge curses bits from console.h
+From: Todd Eisenberger <teisenbe@google.com>
+Date: Thu, 28 Sep 2017 10:17:06 -0700
+Message-ID: <CAP26EVRNVb=Mq=O3s51w7fDhGVmf-e3XFFA73MRzc5b4qKBA4g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] [PATCH] x86: Correct translation of some rdgsbase and
+ wrgsbase encodings
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -29,21 +25,34 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
 List-ID: <qemu-devel.nongnu.org>
 
-On 09/27/2017 01:36 AM, Gerd Hoffmann wrote:
-> Handle the translation from vga chars to curses chars in curses_update()
-> instead of console_write_ch().  Purge any curses support bits from
-> ui/console.h include file.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  include/ui/console.h | 23 ++---------------------
->  ui/curses.c          | 25 ++++++++++++++++++++-----
->  2 files changed, 22 insertions(+), 26 deletions(-)
+It looks like there was a transcription error when writing this code
+initially.  The code previously only decoded src or dst of rax.  This
+resolves
+https://bugs.launchpad.net/qemu/+bug/1719984.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Todd Eisenberger <teisenbe@google.com>
+---
+ target/i386/translate.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index a8986f4c1a..7b920115f9 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -8155,9 +8155,9 @@ static target_ulong disas_insn(DisasContext *s,
+CPUState *cpu)
+             break;
 
-r~
+         case 0xc0 ... 0xc7: /* rdfsbase (f3 0f ae /0) */
+-        case 0xc8 ... 0xc8: /* rdgsbase (f3 0f ae /1) */
++        case 0xc8 ... 0xcf: /* rdgsbase (f3 0f ae /1) */
+         case 0xd0 ... 0xd7: /* wrfsbase (f3 0f ae /2) */
+-        case 0xd8 ... 0xd8: /* wrgsbase (f3 0f ae /3) */
++        case 0xd8 ... 0xdf: /* wrgsbase (f3 0f ae /3) */
+             if (CODE64(s)
+                 && (prefixes & PREFIX_REPZ)
+                 && !(prefixes & PREFIX_LOCK)
