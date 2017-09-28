@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dxd8d-0007rF-Fk
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:02:25 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dxd9O-0008B5-Jt
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:03:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dxd8a-0001Nr-Be
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:02:19 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46854)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dxd8a-0001NL-4q
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:02:16 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dxd8W-0000Da-Us
-	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 18:02:13 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2B6242E84C8
-	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 18:02:07 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 Sep 2017 17:46:45 -0000
+	(envelope-from <dgilbert@redhat.com>) id 1dxd9L-0001nB-Fh
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:03:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58128)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dxd9L-0001mP-0c
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:03:03 -0400
+Date: Thu, 28 Sep 2017 19:02:58 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1713825 <1713825@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150404140220.18876.2468100840644103776.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150662080585.5555.6433531334189699405.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1713825] Re: Booting Windows 2016 with qxl video
- crashes qemu
+Message-ID: <20170928180257.GG2130@work-vm>
+References: <1506085187-24259-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170922130004eucas1p2aadaabbca4a656f43cd30bcfef6f6537@eucas1p2.samsung.com>
+	<1506085187-24259-2-git-send-email-a.perevalov@samsung.com>
+	<20170927190526.GB2395@work-vm>
+	<f1e1f29c-26c0-3c5a-2f79-28ad4a694d45@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f1e1f29c-26c0-3c5a-2f79-28ad4a694d45@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] linux-headers: sync against v4.14-rc1
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -36,120 +29,277 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-Hi Maciej,
-  Can you clarify:
-     a) What version of the qxl drivers you have installed in windows
-     b) Does it crash immediately or only when you do something specific?
-     c) Can you give the qemu command line and/or libvirt xml
-     d) What resolution have you got the guest set at?
-     e) What version are your spice-server libraries at?
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> On 27/09/2017 21:05, Dr. David Alan Gilbert wrote:
+> > cc'ing in Paolo who I think knows more about checking this sync.
+> 
+> It looks good to me.
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Fancy turning that into a Reviewed-by and pulling it?
 
--- =
+Dave
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1713825
-
-Title:
-  Booting Windows 2016 with qxl video crashes qemu
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  launched from libvirt.
-
-  qemu version: 2.9.0
-  host: Linux <hostname> 4.9.34-gentoo #1 SMP Sat Jul 29 13:28:43 PDT 2017 =
-x86_64 Intel(R) Core(TM) i7-3930K CPU @ 3.20GHz GenuineIntel GNU/Linux
-  guest: Windows 2016 64 bit
-
-  Thread 28 (Thread 0x7f0e2edff700 (LWP 29860)):
-  #0  __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.=
-c:51
-          set =3D {__val =3D {18446744067266837079, 139698892694944, 139699=
-853745096, 139700858749789, 4222451712, 139694281220640, 139694281220741, 1=
-39694281220640, 139694281220640, 139694281220810, =
-
-              139694281220940, 139694281220640, 139694281220940, 0, 0, 0}}
-          pid =3D <optimized out>
-          tid =3D <optimized out>
-  #1  0x00007f0ea40b644a in __GI_abort () at abort.c:89
-          save_stage =3D 2
-          act =3D {__sigaction_handler =3D {sa_handler =3D 0x7f0e2edfe5c0, =
-sa_sigaction =3D 0x7f0e2edfe5c0}, sa_mask =3D {__val =3D {139694281219872, =
-139698106269697, 139698892695344, 4, 2676511744, 0, 139698892695144, 0, =
-
-                139698892694912, 1, 4737316546111099904, 139700859888720, 4=
-737316546111099904, 139700862161824, 139700911349760, 94211934977482}}, sa_=
-flags =3D 416, =
-
-            sa_restorer =3D 0x55af6ceb0500 <__PRETTY_FUNCTION__.36381>}
-          sigs =3D {__val =3D {32, 0 <repeats 15 times>}}
-  #2  0x00007f0ea40abab6 in __assert_fail_base (fmt=3D<optimized out>, asse=
-rtion=3Dassertion@entry=3D0x55af6ceafdca "offset < qxl->vga.vram_size", =
-
-      file=3Dfile@entry=3D0x55af6ceaeaa0 "/var/tmp/portage/app-emulation/qe=
-mu-2.9.0-r2/work/qemu-2.9.0/hw/display/qxl.c", line=3Dline@entry=3D416, =
-
-      function=3Dfunction@entry=3D0x55af6ceb0500 <__PRETTY_FUNCTION__.36381=
-> "qxl_ram_set_dirty") at assert.c:92
-          str =3D 0x7f0d1c026220 "\340r\002\034\r\177"
-          total =3D 4096
-  #3  0x00007f0ea40abb81 in __GI___assert_fail (assertion=3Dassertion@entry=
-=3D0x55af6ceafdca "offset < qxl->vga.vram_size", =
-
-      file=3Dfile@entry=3D0x55af6ceaeaa0 "/var/tmp/portage/app-emulation/qe=
-mu-2.9.0-r2/work/qemu-2.9.0/hw/display/qxl.c", line=3Dline@entry=3D416, =
-
-      function=3Dfunction@entry=3D0x55af6ceb0500 <__PRETTY_FUNCTION__.36381=
-> "qxl_ram_set_dirty") at assert.c:101
-  No locals.
-  #4  0x000055af6cc58805 in qxl_ram_set_dirty (qxl=3D<optimized out>, ptr=
-=3D<optimized out>) at /var/tmp/portage/app-emulation/qemu-2.9.0-r2/work/qe=
-mu-2.9.0/hw/display/qxl.c:416
-          base =3D <optimized out>
-          offset =3D <optimized out>
-          qxl =3D <optimized out>
-          ptr =3D <optimized out>
-          base =3D <optimized out>
-          offset =3D <optimized out>
-  #5  0x000055af6cc5b9e2 in interface_release_resource (sin=3D0x55af71a91ed=
-0, ext=3D...) at /var/tmp/portage/app-emulation/qemu-2.9.0-r2/work/qemu-2.9=
-.0/hw/display/qxl.c:767
-          qxl =3D 0x55af71a91450
-          ring =3D <optimized out>
-          item =3D <optimized out>
-          id =3D 18446690739814400920
-          __func__ =3D "interface_release_resource"
-  #6  0x00007f0ea510afa8 in red_drawable_unref (red_drawable=3D0x7f0d1c0261=
-20) at red-worker.c:101
-  No locals.
-  #7  0x00007f0ea510b609 in red_drawable_unref (red_drawable=3D<optimized o=
-ut>) at red-worker.c:104
-  No locals.
-  #8  0x00007f0ea510eae9 in drawable_unref (drawable=3Ddrawable@entry=3D0x7=
-f0e68285ac0) at display-channel.c:1438
-          display =3D 0x55af71dbd3c0
-          __FUNCTION__ =3D "drawable_unref"
-  #9  0x00007f0ea51109f7 in draw_until (display=3Ddisplay@entry=3D0x55af71d=
-bd3c0, surface=3Dsurface@entry=3D0x7f0e6828aae8, last=3D0x7f0e68285ac0) at =
-display-channel.c:1637
-          container =3D 0x0
-          now =3D 0x7f0e68285ac0
-  #10 0x00007f0ea510f93f in display_channel_draw (display=3D0x55af71dbd3c0,=
- area=3D0x7f0e2edfe8e0, surface_id=3D<optimized out>) at display-channel.c:=
-1729
-          surface =3D 0x7f0e6828aae8
-          last =3D <optimized out>
-          __FUNCTION__ =3D "display_channel_draw"
-          __func__ =3D "display_channel_draw"
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1713825/+subscriptions
+> Paolo
+> 
+> > Dave
+> > 
+> > * Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> >> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> >> ---
+> >>  include/standard-headers/asm-x86/hyperv.h    | 19 ++++++++++---
+> >>  include/standard-headers/linux/pci_regs.h    | 42 ++++++++++++++++------------
+> >>  include/standard-headers/linux/virtio_ring.h |  4 +--
+> >>  linux-headers/asm-s390/kvm.h                 |  6 ++++
+> >>  linux-headers/linux/kvm.h                    |  3 +-
+> >>  linux-headers/linux/userfaultfd.h            | 16 ++++++++++-
+> >>  6 files changed, 64 insertions(+), 26 deletions(-)
+> >>
+> >> diff --git a/include/standard-headers/asm-x86/hyperv.h b/include/standard-headers/asm-x86/hyperv.h
+> >> index fac7651..5f95d5e 100644
+> >> --- a/include/standard-headers/asm-x86/hyperv.h
+> >> +++ b/include/standard-headers/asm-x86/hyperv.h
+> >> @@ -149,12 +149,9 @@
+> >>   */
+> >>  #define HV_X64_DEPRECATING_AEOI_RECOMMENDED	(1 << 9)
+> >>  
+> >> -/*
+> >> - * HV_VP_SET available
+> >> - */
+> >> +/* Recommend using the newer ExProcessorMasks interface */
+> >>  #define HV_X64_EX_PROCESSOR_MASKS_RECOMMENDED	(1 << 11)
+> >>  
+> >> -
+> >>  /*
+> >>   * Crash notification flag.
+> >>   */
+> >> @@ -242,7 +239,11 @@
+> >>  		(~((1ull << HV_X64_MSR_HYPERCALL_PAGE_ADDRESS_SHIFT) - 1))
+> >>  
+> >>  /* Declare the various hypercall operations. */
+> >> +#define HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE	0x0002
+> >> +#define HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST	0x0003
+> >>  #define HVCALL_NOTIFY_LONG_SPIN_WAIT		0x0008
+> >> +#define HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX  0x0013
+> >> +#define HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX   0x0014
+> >>  #define HVCALL_POST_MESSAGE			0x005c
+> >>  #define HVCALL_SIGNAL_EVENT			0x005d
+> >>  
+> >> @@ -259,6 +260,16 @@
+> >>  #define HV_PROCESSOR_POWER_STATE_C2		2
+> >>  #define HV_PROCESSOR_POWER_STATE_C3		3
+> >>  
+> >> +#define HV_FLUSH_ALL_PROCESSORS			BIT(0)
+> >> +#define HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES	BIT(1)
+> >> +#define HV_FLUSH_NON_GLOBAL_MAPPINGS_ONLY	BIT(2)
+> >> +#define HV_FLUSH_USE_EXTENDED_RANGE_FORMAT	BIT(3)
+> >> +
+> >> +enum HV_GENERIC_SET_FORMAT {
+> >> +	HV_GENERIC_SET_SPARCE_4K,
+> >> +	HV_GENERIC_SET_ALL,
+> >> +};
+> >> +
+> >>  /* hypercall status code */
+> >>  #define HV_STATUS_SUCCESS			0
+> >>  #define HV_STATUS_INVALID_HYPERCALL_CODE	2
+> >> diff --git a/include/standard-headers/linux/pci_regs.h b/include/standard-headers/linux/pci_regs.h
+> >> index c22d3eb..f8d5804 100644
+> >> --- a/include/standard-headers/linux/pci_regs.h
+> >> +++ b/include/standard-headers/linux/pci_regs.h
+> >> @@ -513,6 +513,7 @@
+> >>  #define  PCI_EXP_DEVSTA_URD	0x0008	/* Unsupported Request Detected */
+> >>  #define  PCI_EXP_DEVSTA_AUXPD	0x0010	/* AUX Power Detected */
+> >>  #define  PCI_EXP_DEVSTA_TRPND	0x0020	/* Transactions Pending */
+> >> +#define PCI_CAP_EXP_RC_ENDPOINT_SIZEOF_V1	12	/* v1 endpoints without link end here */
+> >>  #define PCI_EXP_LNKCAP		12	/* Link Capabilities */
+> >>  #define  PCI_EXP_LNKCAP_SLS	0x0000000f /* Supported Link Speeds */
+> >>  #define  PCI_EXP_LNKCAP_SLS_2_5GB 0x00000001 /* LNKCAP2 SLS Vector bit 0 */
+> >> @@ -556,7 +557,7 @@
+> >>  #define  PCI_EXP_LNKSTA_DLLLA	0x2000	/* Data Link Layer Link Active */
+> >>  #define  PCI_EXP_LNKSTA_LBMS	0x4000	/* Link Bandwidth Management Status */
+> >>  #define  PCI_EXP_LNKSTA_LABS	0x8000	/* Link Autonomous Bandwidth Status */
+> >> -#define PCI_CAP_EXP_ENDPOINT_SIZEOF_V1	20	/* v1 endpoints end here */
+> >> +#define PCI_CAP_EXP_ENDPOINT_SIZEOF_V1	20	/* v1 endpoints with link end here */
+> >>  #define PCI_EXP_SLTCAP		20	/* Slot Capabilities */
+> >>  #define  PCI_EXP_SLTCAP_ABP	0x00000001 /* Attention Button Present */
+> >>  #define  PCI_EXP_SLTCAP_PCP	0x00000002 /* Power Controller Present */
+> >> @@ -639,7 +640,7 @@
+> >>  #define  PCI_EXP_DEVCTL2_OBFF_MSGB_EN	0x4000	/* Enable OBFF Message type B */
+> >>  #define  PCI_EXP_DEVCTL2_OBFF_WAKE_EN	0x6000	/* OBFF using WAKE# signaling */
+> >>  #define PCI_EXP_DEVSTA2		42	/* Device Status 2 */
+> >> -#define PCI_CAP_EXP_ENDPOINT_SIZEOF_V2	44	/* v2 endpoints end here */
+> >> +#define PCI_CAP_EXP_RC_ENDPOINT_SIZEOF_V2	44	/* v2 endpoints without link end here */
+> >>  #define PCI_EXP_LNKCAP2		44	/* Link Capabilities 2 */
+> >>  #define  PCI_EXP_LNKCAP2_SLS_2_5GB	0x00000002 /* Supported Speed 2.5GT/s */
+> >>  #define  PCI_EXP_LNKCAP2_SLS_5_0GB	0x00000004 /* Supported Speed 5.0GT/s */
+> >> @@ -647,6 +648,7 @@
+> >>  #define  PCI_EXP_LNKCAP2_CROSSLINK	0x00000100 /* Crosslink supported */
+> >>  #define PCI_EXP_LNKCTL2		48	/* Link Control 2 */
+> >>  #define PCI_EXP_LNKSTA2		50	/* Link Status 2 */
+> >> +#define PCI_CAP_EXP_ENDPOINT_SIZEOF_V2	52	/* v2 endpoints with link end here */
+> >>  #define PCI_EXP_SLTCAP2		52	/* Slot Capabilities 2 */
+> >>  #define PCI_EXP_SLTCTL2		56	/* Slot Control 2 */
+> >>  #define PCI_EXP_SLTSTA2		58	/* Slot Status 2 */
+> >> @@ -733,23 +735,17 @@
+> >>  #define  PCI_ERR_CAP_ECRC_CHKE	0x00000100	/* ECRC Check Enable */
+> >>  #define PCI_ERR_HEADER_LOG	28	/* Header Log Register (16 bytes) */
+> >>  #define PCI_ERR_ROOT_COMMAND	44	/* Root Error Command */
+> >> -/* Correctable Err Reporting Enable */
+> >> -#define PCI_ERR_ROOT_CMD_COR_EN		0x00000001
+> >> -/* Non-fatal Err Reporting Enable */
+> >> -#define PCI_ERR_ROOT_CMD_NONFATAL_EN	0x00000002
+> >> -/* Fatal Err Reporting Enable */
+> >> -#define PCI_ERR_ROOT_CMD_FATAL_EN	0x00000004
+> >> +#define PCI_ERR_ROOT_CMD_COR_EN		0x00000001 /* Correctable Err Reporting Enable */
+> >> +#define PCI_ERR_ROOT_CMD_NONFATAL_EN	0x00000002 /* Non-Fatal Err Reporting Enable */
+> >> +#define PCI_ERR_ROOT_CMD_FATAL_EN	0x00000004 /* Fatal Err Reporting Enable */
+> >>  #define PCI_ERR_ROOT_STATUS	48
+> >> -#define PCI_ERR_ROOT_COR_RCV		0x00000001	/* ERR_COR Received */
+> >> -/* Multi ERR_COR Received */
+> >> -#define PCI_ERR_ROOT_MULTI_COR_RCV	0x00000002
+> >> -/* ERR_FATAL/NONFATAL Received */
+> >> -#define PCI_ERR_ROOT_UNCOR_RCV		0x00000004
+> >> -/* Multi ERR_FATAL/NONFATAL Received */
+> >> -#define PCI_ERR_ROOT_MULTI_UNCOR_RCV	0x00000008
+> >> -#define PCI_ERR_ROOT_FIRST_FATAL	0x00000010	/* First Fatal */
+> >> -#define PCI_ERR_ROOT_NONFATAL_RCV	0x00000020	/* Non-Fatal Received */
+> >> -#define PCI_ERR_ROOT_FATAL_RCV		0x00000040	/* Fatal Received */
+> >> +#define PCI_ERR_ROOT_COR_RCV		0x00000001 /* ERR_COR Received */
+> >> +#define PCI_ERR_ROOT_MULTI_COR_RCV	0x00000002 /* Multiple ERR_COR */
+> >> +#define PCI_ERR_ROOT_UNCOR_RCV		0x00000004 /* ERR_FATAL/NONFATAL */
+> >> +#define PCI_ERR_ROOT_MULTI_UNCOR_RCV	0x00000008 /* Multiple FATAL/NONFATAL */
+> >> +#define PCI_ERR_ROOT_FIRST_FATAL	0x00000010 /* First UNC is Fatal */
+> >> +#define PCI_ERR_ROOT_NONFATAL_RCV	0x00000020 /* Non-Fatal Received */
+> >> +#define PCI_ERR_ROOT_FATAL_RCV		0x00000040 /* Fatal Received */
+> >>  #define PCI_ERR_ROOT_ERR_SRC	52	/* Error Source Identification */
+> >>  
+> >>  /* Virtual Channel */
+> >> @@ -967,6 +963,7 @@
+> >>  #define  PCI_EXP_DPC_CAP_RP_EXT		0x20	/* Root Port Extensions for DPC */
+> >>  #define  PCI_EXP_DPC_CAP_POISONED_TLP	0x40	/* Poisoned TLP Egress Blocking Supported */
+> >>  #define  PCI_EXP_DPC_CAP_SW_TRIGGER	0x80	/* Software Triggering Supported */
+> >> +#define  PCI_EXP_DPC_RP_PIO_LOG_SIZE	0xF00	/* RP PIO log size */
+> >>  #define  PCI_EXP_DPC_CAP_DL_ACTIVE	0x1000	/* ERR_COR signal on DL_Active supported */
+> >>  
+> >>  #define PCI_EXP_DPC_CTL			6	/* DPC control */
+> >> @@ -980,6 +977,15 @@
+> >>  
+> >>  #define PCI_EXP_DPC_SOURCE_ID		10	/* DPC Source Identifier */
+> >>  
+> >> +#define PCI_EXP_DPC_RP_PIO_STATUS	 0x0C	/* RP PIO Status */
+> >> +#define PCI_EXP_DPC_RP_PIO_MASK		 0x10	/* RP PIO MASK */
+> >> +#define PCI_EXP_DPC_RP_PIO_SEVERITY	 0x14	/* RP PIO Severity */
+> >> +#define PCI_EXP_DPC_RP_PIO_SYSERROR	 0x18	/* RP PIO SysError */
+> >> +#define PCI_EXP_DPC_RP_PIO_EXCEPTION	 0x1C	/* RP PIO Exception */
+> >> +#define PCI_EXP_DPC_RP_PIO_HEADER_LOG	 0x20	/* RP PIO Header Log */
+> >> +#define PCI_EXP_DPC_RP_PIO_IMPSPEC_LOG	 0x30	/* RP PIO ImpSpec Log */
+> >> +#define PCI_EXP_DPC_RP_PIO_TLPPREFIX_LOG 0x34	/* RP PIO TLP Prefix Log */
+> >> +
+> >>  /* Precision Time Measurement */
+> >>  #define PCI_PTM_CAP			0x04	    /* PTM Capability */
+> >>  #define  PCI_PTM_CAP_REQ		0x00000001  /* Requester capable */
+> >> diff --git a/include/standard-headers/linux/virtio_ring.h b/include/standard-headers/linux/virtio_ring.h
+> >> index 023c6db..f1dc05d 100644
+> >> --- a/include/standard-headers/linux/virtio_ring.h
+> >> +++ b/include/standard-headers/linux/virtio_ring.h
+> >> @@ -1,7 +1,7 @@
+> >>  #ifndef _LINUX_VIRTIO_RING_H
+> >>  #define _LINUX_VIRTIO_RING_H
+> >> -/* An interface for efficient virtio implementation, currently for use by KVM
+> >> - * and lguest, but hopefully others soon.  Do NOT change this since it will
+> >> +/* An interface for efficient virtio implementation, currently for use by KVM,
+> >> + * but hopefully others soon.  Do NOT change this since it will
+> >>   * break existing servers and clients.
+> >>   *
+> >>   * This header is BSD licensed so anyone can use the definitions to implement
+> >> diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
+> >> index 8387d71..7b750ef 100644
+> >> --- a/linux-headers/asm-s390/kvm.h
+> >> +++ b/linux-headers/asm-s390/kvm.h
+> >> @@ -88,6 +88,12 @@ struct kvm_s390_io_adapter_req {
+> >>  /* kvm attributes for KVM_S390_VM_TOD */
+> >>  #define KVM_S390_VM_TOD_LOW		0
+> >>  #define KVM_S390_VM_TOD_HIGH		1
+> >> +#define KVM_S390_VM_TOD_EXT		2
+> >> +
+> >> +struct kvm_s390_vm_tod_clock {
+> >> +	__u8  epoch_idx;
+> >> +	__u64 tod;
+> >> +};
+> >>  
+> >>  /* kvm attributes for KVM_S390_VM_CPU_MODEL */
+> >>  /* processor related attributes are r/w */
+> >> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+> >> index 7971a4f..dd8a918 100644
+> >> --- a/linux-headers/linux/kvm.h
+> >> +++ b/linux-headers/linux/kvm.h
+> >> @@ -711,7 +711,8 @@ struct kvm_ppc_one_seg_page_size {
+> >>  struct kvm_ppc_smmu_info {
+> >>  	__u64 flags;
+> >>  	__u32 slb_size;
+> >> -	__u32 pad;
+> >> +	__u16 data_keys;	/* # storage keys supported for data */
+> >> +	__u16 instr_keys;	/* # storage keys supported for instructions */
+> >>  	struct kvm_ppc_one_seg_page_size sps[KVM_PPC_PAGE_SIZES_MAX_SZ];
+> >>  };
+> >>  
+> >> diff --git a/linux-headers/linux/userfaultfd.h b/linux-headers/linux/userfaultfd.h
+> >> index 9701772..b43cf0d 100644
+> >> --- a/linux-headers/linux/userfaultfd.h
+> >> +++ b/linux-headers/linux/userfaultfd.h
+> >> @@ -23,7 +23,9 @@
+> >>  			   UFFD_FEATURE_EVENT_REMOVE |	\
+> >>  			   UFFD_FEATURE_EVENT_UNMAP |		\
+> >>  			   UFFD_FEATURE_MISSING_HUGETLBFS |	\
+> >> -			   UFFD_FEATURE_MISSING_SHMEM)
+> >> +			   UFFD_FEATURE_MISSING_SHMEM |		\
+> >> +			   UFFD_FEATURE_SIGBUS |		\
+> >> +			   UFFD_FEATURE_THREAD_ID)
+> >>  #define UFFD_API_IOCTLS				\
+> >>  	((__u64)1 << _UFFDIO_REGISTER |		\
+> >>  	 (__u64)1 << _UFFDIO_UNREGISTER |	\
+> >> @@ -78,6 +80,9 @@ struct uffd_msg {
+> >>  		struct {
+> >>  			__u64	flags;
+> >>  			__u64	address;
+> >> +			union {
+> >> +				__u32 ptid;
+> >> +			} feat;
+> >>  		} pagefault;
+> >>  
+> >>  		struct {
+> >> @@ -153,6 +158,13 @@ struct uffdio_api {
+> >>  	 * UFFD_FEATURE_MISSING_SHMEM works the same as
+> >>  	 * UFFD_FEATURE_MISSING_HUGETLBFS, but it applies to shmem
+> >>  	 * (i.e. tmpfs and other shmem based APIs).
+> >> +	 *
+> >> +	 * UFFD_FEATURE_SIGBUS feature means no page-fault
+> >> +	 * (UFFD_EVENT_PAGEFAULT) event will be delivered, instead
+> >> +	 * a SIGBUS signal will be sent to the faulting process.
+> >> +	 *
+> >> +	 * UFFD_FEATURE_THREAD_ID pid of the page faulted task_struct will
+> >> +	 * be returned, if feature is not requested 0 will be returned.
+> >>  	 */
+> >>  #define UFFD_FEATURE_PAGEFAULT_FLAG_WP		(1<<0)
+> >>  #define UFFD_FEATURE_EVENT_FORK			(1<<1)
+> >> @@ -161,6 +173,8 @@ struct uffdio_api {
+> >>  #define UFFD_FEATURE_MISSING_HUGETLBFS		(1<<4)
+> >>  #define UFFD_FEATURE_MISSING_SHMEM		(1<<5)
+> >>  #define UFFD_FEATURE_EVENT_UNMAP		(1<<6)
+> >> +#define UFFD_FEATURE_SIGBUS			(1<<7)
+> >> +#define UFFD_FEATURE_THREAD_ID			(1<<8)
+> >>  	__u64 features;
+> >>  
+> >>  	__u64 ioctls;
+> >> -- 
+> >> 1.9.1
+> >>
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
