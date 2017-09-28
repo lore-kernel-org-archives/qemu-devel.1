@@ -1,21 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dxXaa-0000MK-8s
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 08:06:59 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dxXb3-0000lQ-Jv
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 08:07:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dxXaT-0007nh-6l
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 08:06:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:2285)
+	(envelope-from <cohuck@redhat.com>) id 1dxXax-00080o-Br
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 08:07:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:63047)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dxXaS-0007nW-Uo
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 08:06:41 -0400
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu, 28 Sep 2017 13:06:19 +0100
-Message-Id: <20170928120621.30288-5-berrange@redhat.com>
-In-Reply-To: <20170928120621.30288-1-berrange@redhat.com>
-References: <20170928120621.30288-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 4/6] ui: convert common input code to
- keycodemapdb
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dxXax-00080K-44
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 08:07:11 -0400
+Date: Thu, 28 Sep 2017 14:07:04 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170928140704.0cc18986.cohuck@redhat.com>
+In-Reply-To: <dc15f576-8397-718d-0c75-0cba607c53b9@de.ibm.com>
+References: <20170926162058.30772-1-cohuck@redhat.com>
+	<20170926162058.30772-2-cohuck@redhat.com>
+	<338c8565-691e-a8bc-d8a6-3637ce13701d@redhat.com>
+	<20170927114717.72bd69f8.cohuck@redhat.com>
+	<e8bef299-5501-a59d-aba3-5a338227966e@linux.vnet.ibm.com>
+	<20170927125606.65dc514d.cohuck@redhat.com>
+	<14df9ad6-f0e9-cd51-04dd-4fe994808433@de.ibm.com>
+	<4681e677-9e5a-4c1c-8e22-dc5c51b7286d@redhat.com>
+	<20170927142837.GB2108@work-vm>
+	<20170927164644.42205e6f.cohuck@redhat.com>
+	<20170927144927.GC2108@work-vm>
+	<20170927170346.68ca0cd8.cohuck@redhat.com>
+	<9c8c2596-c4cf-41ad-7228-0ed598cf65cd@de.ibm.com>
+	<dc15f576-8397-718d-0c75-0cba607c53b9@de.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/1] s390x: create a compat s390 phb for
+ <=2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,462 +40,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, David Hildenbrand <david@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, qemu-devel@nongnu.org, agraf@suse.de, pasic@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com
 
-Replace the number_to_qcode, qcode_to_number and linux_to_qcode
-tables with automatically generated tables.
+On Thu, 28 Sep 2017 12:41:54 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Missing entries in linux_to_qcode now fixed:
+> On 09/28/2017 12:34 PM, Christian Borntraeger wrote:
+> >=20
+> >=20
+> > On 09/27/2017 05:03 PM, Cornelia Huck wrote: =20
+> >> On Wed, 27 Sep 2017 15:49:27 +0100
+> >> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> >> =20
+> >>> * Cornelia Huck (cohuck@redhat.com) wrote: =20
+> >>>> On Wed, 27 Sep 2017 15:28:38 +0100
+> >>>> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> >>>>    =20
+> >>>>> * David Hildenbrand (david@redhat.com) wrote:   =20
+> >>>>>> On 27.09.2017 12:59, Christian Borntraeger wrote:     =20
+> >>>>>>>
+> >>>>>>>
+> >>>>>>> On 09/27/2017 12:56 PM, Cornelia Huck wrote:     =20
+> >>>>>>>> On Wed, 27 Sep 2017 18:25:00 +0800
+> >>>>>>>> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
+> >>>>>>>>     =20
+> >>>>>>>>> =E5=9C=A8 2017/9/27 =E4=B8=8B=E5=8D=885:47, Cornelia Huck =E5=
+=86=99=E9=81=93:     =20
+> >>>>>>>>>> On Tue, 26 Sep 2017 20:40:25 +0200
+> >>>>>>>>>> David Hildenbrand <david@redhat.com> wrote:     =20
+> >>>>>>>>     =20
+> >>>>>>>>>>> I'd really really really (did I mention really?) favor someth=
+ing like a
+> >>>>>>>>>>> dummy device, because we could easily handle the !CONFIG_PCI =
+case then.
+> >>>>>>>>>>>
+> >>>>>>>>>>> All these compat options and conditions will kill us someday.=
+.. we're
+> >>>>>>>>>>> already patching around that whole stuff way too much.
+> >>>>>>>>>>>
+> >>>>>>>>>>> If we ever unconditionally created a device, we should keep d=
+oing so.       =20
+> >>>>>>>>>> Yes, that whole thing is horrible, especially interaction with=
+ compat
+> >>>>>>>>>> machines.
+> >>>>>>>>>>
+> >>>>>>>>>> Do you have an idea on how to create such a dummy device (with=
+out
+> >>>>>>>>>> having to effectively copy a lot of configured-out code)?
+> >>>>>>>>>>
+> >>>>>>>>>>       =20
+> >>>>>>>>> How about in s390_pcihost_hot_plug() we check s390_has_feat(zpc=
+i)?
+> >>>>>>>>> If no zpci feature, we avoid plugging any pci device.
+> >>>>>>>>> Then we could always create phb.
+> >>>>>>>>> I think pcibus's vmstate is only data to migrate.     =20
+> >>>>>>>>
+> >>>>>>>> That's still problematic if CONFIG_PCI is off. I currently don't=
+ have a
+> >>>>>>>> better idea than either disallowing compat machines on builds wi=
+thout
+> >>>>>>>> pci, or using a dummy device...     =20
+> >>>>>>>
+> >>>>>>> For this particular case your initial patch might be less problem=
+atic than
+> >>>>>>> a dummy device, because the code that does the migration is NOT c=
+ontained
+> >>>>>>> in s390 specific code but in common PCI code instead. We would ne=
+ed to keep
+> >>>>>>> the dummy device always in a way that it will work with the commo=
+n PCI
+> >>>>>>> code.
+> >>>>>>>      =20
+> >>>>>>
+> >>>>>> Interesting, so how is migration then handled for e.g. x86 or other
+> >>>>>> architectures that can work without CONFIG_PCI? I assume their mig=
+ration
+> >>>>>> should also break?     =20
+> >>>>>
+> >>>>> It's tied to machine-type; the x86 i440fx and q35 machine types have
+> >>>>> PCI; you can't disable PCI while still having those machine types.
+> >>>>> (I don't know if you can disable PCI at all on x86)   =20
+> >>>>
+> >>>> Ugh, that sounds like we need two machine types on s390x as well
+> >>>> (s390x-ccw-virtio and s390x-ccw-virtio-nopci or so), built
+> >>>> conditionally. That whole zpci detanglement is looking worse and
+> >>>> worse :(   =20
+> >>>
+> >>> Well fundamentally the migration expects to migrate something into
+> >>> the same shaped hole on the destination;  if you've got a lump of PCI
+> >>> config on the source there's got to be somewhere for it to fit on the
+> >>> destination.
+> >>> Now, if PCI is actually pretty rare; then you might be able to make
+> >>> the host-pci bridge a normal device and not include it in any
+> >>> machine type; that way those who want PCI can just instantiate
+> >>> the host-pci bridge, and those who don't want it just stick with
+> >>> the base machine type. =20
+> >>
+> >> I fear that ship has already sailed; the s390-ccw-virtio machine type
+> >> has been instantiating a phb for quite some time, which means we have
+> >> to drag this on in the compat machines... =20
+> >=20
+> > In the end that means that you should revert
+> >=20
+> > commit d32bd032d8fde41281aae34c16a4aa97e9acfeac
+> > Author:     Cornelia Huck <cohuck@redhat.com>
+> > AuthorDate: Thu Jul 6 17:21:52 2017 +0200
+> > Commit:     Cornelia Huck <cohuck@redhat.com>
+> > CommitDate: Wed Aug 30 18:23:25 2017 +0200
+> >=20
+> >     s390x/ccw: create s390 phb conditionally
+> >=20
+> > to keep s390-ccw-virtio clean proper.
+> >=20
+> > If you want to have PCI disabled, you can do you in a machine like  =20
+> too quick                                     ^that^					=20
+> > s390-rhelx.y.z or whatever.  =20
+>=20
+> I think we really must revert this commit.=20
+>=20
 
-  KEY_LINEFEED -> Q_KEY_CODE_LF
-  KEY_KPEQUAL -> Q_KEY_CODE_KP_EQUALS
-  KEY_COMPOSE -> Q_KEY_CODE_COMPOSE
-  KEY_AGAIN -> Q_KEY_CODE_AGAIN
-  KEY_PROPS -> Q_KEY_CODE_PROPS
-  KEY_UNDO -> Q_KEY_CODE_UNDO
-  KEY_FRONT -> Q_KEY_CODE_FRONT
-  KEY_COPY -> Q_KEY_CODE_COPY
-  KEY_OPEN -> Q_KEY_CODE_OPEN
-  KEY_PASTE -> Q_KEY_CODE_PASTE
-  KEY_CUT -> Q_KEY_CODE_CUT
-  KEY_HELP -> Q_KEY_CODE_HELP
-  KEY_MEDIA -> Q_KEY_CODE_MEDIASELECT
+A set of non-pci machines looks more attractive to me. I currently have
+the following (not yet tested):
 
-In additionsome fixes:
+=46rom 5dd282bd6e12dca0ca8252019a4c4c58e729b2c5 Mon Sep 17 00:00:00 2001
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Thu, 28 Sep 2017 14:00:48 +0200
+Subject: [PATCH] s390x: set of -nopci machines for non-pci builds
 
- - KEY_PLAYPAUSE now maps to Q_KEY_CODE_AUDIOPLAY, instead of
-   KEY_PLAYCD. KEY_PLAYPAUSE is defined across almost all scancodes
-   sets, while KEY_PLAYCD only appears in AT set1, so the former is
-   a more useful mapping.
-
-Missing entries in qcode_to_number now fixed:
-
-  Q_KEY_CODE_AGAIN -> 0x85
-  Q_KEY_CODE_PROPS -> 0x86
-  Q_KEY_CODE_UNDO -> 0x87
-  Q_KEY_CODE_FRONT -> 0x8c
-  Q_KEY_CODE_COPY -> 0xf8
-  Q_KEY_CODE_OPEN -> 0x64
-  Q_KEY_CODE_PASTE -> 0x65
-  Q_KEY_CODE_CUT -> 0xbc
-  Q_KEY_CODE_LF -> 0x5b
-  Q_KEY_CODE_HELP -> 0xf5
-  Q_KEY_CODE_COMPOSE -> 0xdd
-  Q_KEY_CODE_KP_EQUALS -> 0x59
-  Q_KEY_CODE_MEDIASELECT -> 0xed
-
-In addition some fixes:
-
- - Q_KEY_CODE_MENU was incorrectly mapped to the compose
-   scancode (0xdd) and is now mapped to 0x9e
- - Q_KEY_CODE_FIND was mapped to 0xe065 (Search) instead
-   of to 0xe041 (Find)
- - Q_KEY_CODE_HIRAGANA was mapped to 0x70 (Katakanahiragana)
-   instead of of 0x77 (Hirigana)
- - Q_KEY_CODE_PRINT was mapped to 0xb7 which is not a defined
-   scan code in AT set 1, it is now mapped to 0x54 (sysrq)
-
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- include/ui/input.h |  11 +-
- ui/Makefile.objs   |   3 +
- ui/input-keymap.c  | 326 +++--------------------------------------------------
- 3 files changed, 28 insertions(+), 312 deletions(-)
+ hw/s390x/s390-virtio-ccw.c | 22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
 
-diff --git a/include/ui/input.h b/include/ui/input.h
-index c488585def..479cc46cfc 100644
---- a/include/ui/input.h
-+++ b/include/ui/input.h
-@@ -43,7 +43,7 @@ void qemu_input_event_send_key(QemuConsole *src, KeyValue *key, bool down);
- void qemu_input_event_send_key_number(QemuConsole *src, int num, bool down);
- void qemu_input_event_send_key_qcode(QemuConsole *src, QKeyCode q, bool down);
- void qemu_input_event_send_key_delay(uint32_t delay_ms);
--int qemu_input_key_number_to_qcode(uint8_t nr);
-+int qemu_input_key_number_to_qcode(unsigned int nr);
- int qemu_input_key_value_to_number(const KeyValue *value);
- int qemu_input_key_value_to_qcode(const KeyValue *value);
- int qemu_input_key_value_to_scancode(const KeyValue *value, bool down,
-@@ -69,4 +69,13 @@ void qemu_input_check_mode_change(void);
- void qemu_add_mouse_mode_change_notifier(Notifier *notify);
- void qemu_remove_mouse_mode_change_notifier(Notifier *notify);
- 
-+extern const guint qemu_input_map_linux_to_qcode_len;
-+extern const guint16 qemu_input_map_linux_to_qcode[];
-+
-+extern const guint qemu_input_map_qcode_to_qnum_len;
-+extern const guint16 qemu_input_map_qcode_to_qnum[];
-+
-+extern const guint qemu_input_map_qnum_to_qcode_len;
-+extern const guint16 qemu_input_map_qnum_to_qcode[];
-+
- #endif /* INPUT_H */
-diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index a930afafe5..78d676738f 100644
---- a/ui/Makefile.objs
-+++ b/ui/Makefile.objs
-@@ -55,6 +55,9 @@ KEYCODEMAP_GEN = $(SRC_PATH)/ui/keycodemapdb/tools/keymap-gen
- KEYCODEMAP_CSV = $(SRC_PATH)/ui/keycodemapdb/data/keymaps.csv
- 
- KEYCODEMAP_FILES = \
-+		 ui/input-keymap-linux-to-qcode.c \
-+		 ui/input-keymap-qcode-to-qnum.c \
-+		 ui/input-keymap-qnum-to-qcode.c \
- 		 $(NULL)
- 
- GENERATED_FILES += $(KEYCODEMAP_FILES)
-diff --git a/ui/input-keymap.c b/ui/input-keymap.c
-index cf979c2ce9..3a19a169f5 100644
---- a/ui/input-keymap.c
-+++ b/ui/input-keymap.c
-@@ -5,333 +5,37 @@
- 
- #include "standard-headers/linux/input.h"
- 
--static int linux_to_qcode[KEY_CNT] = {
--    [KEY_ESC]            = Q_KEY_CODE_ESC,
--    [KEY_1]              = Q_KEY_CODE_1,
--    [KEY_2]              = Q_KEY_CODE_2,
--    [KEY_3]              = Q_KEY_CODE_3,
--    [KEY_4]              = Q_KEY_CODE_4,
--    [KEY_5]              = Q_KEY_CODE_5,
--    [KEY_6]              = Q_KEY_CODE_6,
--    [KEY_7]              = Q_KEY_CODE_7,
--    [KEY_8]              = Q_KEY_CODE_8,
--    [KEY_9]              = Q_KEY_CODE_9,
--    [KEY_0]              = Q_KEY_CODE_0,
--    [KEY_MINUS]          = Q_KEY_CODE_MINUS,
--    [KEY_EQUAL]          = Q_KEY_CODE_EQUAL,
--    [KEY_BACKSPACE]      = Q_KEY_CODE_BACKSPACE,
--    [KEY_TAB]            = Q_KEY_CODE_TAB,
--    [KEY_Q]              = Q_KEY_CODE_Q,
--    [KEY_W]              = Q_KEY_CODE_W,
--    [KEY_E]              = Q_KEY_CODE_E,
--    [KEY_R]              = Q_KEY_CODE_R,
--    [KEY_T]              = Q_KEY_CODE_T,
--    [KEY_Y]              = Q_KEY_CODE_Y,
--    [KEY_U]              = Q_KEY_CODE_U,
--    [KEY_I]              = Q_KEY_CODE_I,
--    [KEY_O]              = Q_KEY_CODE_O,
--    [KEY_P]              = Q_KEY_CODE_P,
--    [KEY_LEFTBRACE]      = Q_KEY_CODE_BRACKET_LEFT,
--    [KEY_RIGHTBRACE]     = Q_KEY_CODE_BRACKET_RIGHT,
--    [KEY_ENTER]          = Q_KEY_CODE_RET,
--    [KEY_LEFTCTRL]       = Q_KEY_CODE_CTRL,
--    [KEY_A]              = Q_KEY_CODE_A,
--    [KEY_S]              = Q_KEY_CODE_S,
--    [KEY_D]              = Q_KEY_CODE_D,
--    [KEY_F]              = Q_KEY_CODE_F,
--    [KEY_G]              = Q_KEY_CODE_G,
--    [KEY_H]              = Q_KEY_CODE_H,
--    [KEY_J]              = Q_KEY_CODE_J,
--    [KEY_K]              = Q_KEY_CODE_K,
--    [KEY_L]              = Q_KEY_CODE_L,
--    [KEY_SEMICOLON]      = Q_KEY_CODE_SEMICOLON,
--    [KEY_APOSTROPHE]     = Q_KEY_CODE_APOSTROPHE,
--    [KEY_GRAVE]          = Q_KEY_CODE_GRAVE_ACCENT,
--    [KEY_LEFTSHIFT]      = Q_KEY_CODE_SHIFT,
--    [KEY_BACKSLASH]      = Q_KEY_CODE_BACKSLASH,
--    [KEY_102ND]          = Q_KEY_CODE_LESS,
--    [KEY_Z]              = Q_KEY_CODE_Z,
--    [KEY_X]              = Q_KEY_CODE_X,
--    [KEY_C]              = Q_KEY_CODE_C,
--    [KEY_V]              = Q_KEY_CODE_V,
--    [KEY_B]              = Q_KEY_CODE_B,
--    [KEY_N]              = Q_KEY_CODE_N,
--    [KEY_M]              = Q_KEY_CODE_M,
--    [KEY_COMMA]          = Q_KEY_CODE_COMMA,
--    [KEY_DOT]            = Q_KEY_CODE_DOT,
--    [KEY_SLASH]          = Q_KEY_CODE_SLASH,
--    [KEY_RIGHTSHIFT]     = Q_KEY_CODE_SHIFT_R,
--    [KEY_LEFTALT]        = Q_KEY_CODE_ALT,
--    [KEY_SPACE]          = Q_KEY_CODE_SPC,
--    [KEY_CAPSLOCK]       = Q_KEY_CODE_CAPS_LOCK,
--    [KEY_F1]             = Q_KEY_CODE_F1,
--    [KEY_F2]             = Q_KEY_CODE_F2,
--    [KEY_F3]             = Q_KEY_CODE_F3,
--    [KEY_F4]             = Q_KEY_CODE_F4,
--    [KEY_F5]             = Q_KEY_CODE_F5,
--    [KEY_F6]             = Q_KEY_CODE_F6,
--    [KEY_F7]             = Q_KEY_CODE_F7,
--    [KEY_F8]             = Q_KEY_CODE_F8,
--    [KEY_F9]             = Q_KEY_CODE_F9,
--    [KEY_F10]            = Q_KEY_CODE_F10,
--    [KEY_NUMLOCK]        = Q_KEY_CODE_NUM_LOCK,
--    [KEY_SCROLLLOCK]     = Q_KEY_CODE_SCROLL_LOCK,
--    [KEY_KP0]            = Q_KEY_CODE_KP_0,
--    [KEY_KP1]            = Q_KEY_CODE_KP_1,
--    [KEY_KP2]            = Q_KEY_CODE_KP_2,
--    [KEY_KP3]            = Q_KEY_CODE_KP_3,
--    [KEY_KP4]            = Q_KEY_CODE_KP_4,
--    [KEY_KP5]            = Q_KEY_CODE_KP_5,
--    [KEY_KP6]            = Q_KEY_CODE_KP_6,
--    [KEY_KP7]            = Q_KEY_CODE_KP_7,
--    [KEY_KP8]            = Q_KEY_CODE_KP_8,
--    [KEY_KP9]            = Q_KEY_CODE_KP_9,
--    [KEY_KPMINUS]        = Q_KEY_CODE_KP_SUBTRACT,
--    [KEY_KPPLUS]         = Q_KEY_CODE_KP_ADD,
--    [KEY_KPDOT]          = Q_KEY_CODE_KP_DECIMAL,
--    [KEY_KPENTER]        = Q_KEY_CODE_KP_ENTER,
--    [KEY_KPSLASH]        = Q_KEY_CODE_KP_DIVIDE,
--    [KEY_KPASTERISK]     = Q_KEY_CODE_KP_MULTIPLY,
--    [KEY_F11]            = Q_KEY_CODE_F11,
--    [KEY_F12]            = Q_KEY_CODE_F12,
--    [KEY_RO]             = Q_KEY_CODE_RO,
--    [KEY_HIRAGANA]       = Q_KEY_CODE_HIRAGANA,
--    [KEY_HENKAN]         = Q_KEY_CODE_HENKAN,
--    [KEY_RIGHTCTRL]      = Q_KEY_CODE_CTRL_R,
--    [KEY_SYSRQ]          = Q_KEY_CODE_SYSRQ,
--    [KEY_RIGHTALT]       = Q_KEY_CODE_ALT_R,
--    [KEY_HOME]           = Q_KEY_CODE_HOME,
--    [KEY_UP]             = Q_KEY_CODE_UP,
--    [KEY_PAGEUP]         = Q_KEY_CODE_PGUP,
--    [KEY_LEFT]           = Q_KEY_CODE_LEFT,
--    [KEY_RIGHT]          = Q_KEY_CODE_RIGHT,
--    [KEY_END]            = Q_KEY_CODE_END,
--    [KEY_DOWN]           = Q_KEY_CODE_DOWN,
--    [KEY_PAGEDOWN]       = Q_KEY_CODE_PGDN,
--    [KEY_INSERT]         = Q_KEY_CODE_INSERT,
--    [KEY_DELETE]         = Q_KEY_CODE_DELETE,
--    [KEY_POWER]          = Q_KEY_CODE_POWER,
--    [KEY_KPCOMMA]        = Q_KEY_CODE_KP_COMMA,
--    [KEY_YEN]            = Q_KEY_CODE_YEN,
--    [KEY_LEFTMETA]       = Q_KEY_CODE_META_L,
--    [KEY_RIGHTMETA]      = Q_KEY_CODE_META_R,
--    [KEY_MENU]           = Q_KEY_CODE_MENU,
--    [KEY_PAUSE]          = Q_KEY_CODE_PAUSE,
--
--    [KEY_SLEEP]          = Q_KEY_CODE_SLEEP,
--    [KEY_WAKEUP]         = Q_KEY_CODE_WAKE,
--    [KEY_CALC]           = Q_KEY_CODE_CALCULATOR,
--    [KEY_MAIL]           = Q_KEY_CODE_MAIL,
--    [KEY_COMPUTER]       = Q_KEY_CODE_COMPUTER,
--
--    [KEY_STOP]           = Q_KEY_CODE_STOP,
--    [KEY_BOOKMARKS]      = Q_KEY_CODE_AC_BOOKMARKS,
--    [KEY_BACK]           = Q_KEY_CODE_AC_BACK,
--    [KEY_FORWARD]        = Q_KEY_CODE_AC_FORWARD,
--    [KEY_HOMEPAGE]       = Q_KEY_CODE_AC_HOME,
--    [KEY_REFRESH]        = Q_KEY_CODE_AC_REFRESH,
--    [KEY_FIND]           = Q_KEY_CODE_FIND,
--
--    [KEY_NEXTSONG]       = Q_KEY_CODE_AUDIONEXT,
--    [KEY_PREVIOUSSONG]   = Q_KEY_CODE_AUDIOPREV,
--    [KEY_STOPCD]         = Q_KEY_CODE_AUDIOSTOP,
--    [KEY_PLAYCD]         = Q_KEY_CODE_AUDIOPLAY,
--    [KEY_MUTE]           = Q_KEY_CODE_AUDIOMUTE,
--    [KEY_VOLUMEDOWN]     = Q_KEY_CODE_VOLUMEDOWN,
--    [KEY_VOLUMEUP]       = Q_KEY_CODE_VOLUMEUP,
--};
--
--static const int qcode_to_number[] = {
--    [Q_KEY_CODE_SHIFT] = 0x2a,
--    [Q_KEY_CODE_SHIFT_R] = 0x36,
--
--    [Q_KEY_CODE_ALT] = 0x38,
--    [Q_KEY_CODE_ALT_R] = 0xb8,
--    [Q_KEY_CODE_CTRL] = 0x1d,
--    [Q_KEY_CODE_CTRL_R] = 0x9d,
--
--    [Q_KEY_CODE_META_L] = 0xdb,
--    [Q_KEY_CODE_META_R] = 0xdc,
--    [Q_KEY_CODE_MENU] = 0xdd,
--
--    [Q_KEY_CODE_ESC] = 0x01,
--
--    [Q_KEY_CODE_1] = 0x02,
--    [Q_KEY_CODE_2] = 0x03,
--    [Q_KEY_CODE_3] = 0x04,
--    [Q_KEY_CODE_4] = 0x05,
--    [Q_KEY_CODE_5] = 0x06,
--    [Q_KEY_CODE_6] = 0x07,
--    [Q_KEY_CODE_7] = 0x08,
--    [Q_KEY_CODE_8] = 0x09,
--    [Q_KEY_CODE_9] = 0x0a,
--    [Q_KEY_CODE_0] = 0x0b,
--    [Q_KEY_CODE_MINUS] = 0x0c,
--    [Q_KEY_CODE_EQUAL] = 0x0d,
--    [Q_KEY_CODE_BACKSPACE] = 0x0e,
--
--    [Q_KEY_CODE_TAB] = 0x0f,
--    [Q_KEY_CODE_Q] = 0x10,
--    [Q_KEY_CODE_W] = 0x11,
--    [Q_KEY_CODE_E] = 0x12,
--    [Q_KEY_CODE_R] = 0x13,
--    [Q_KEY_CODE_T] = 0x14,
--    [Q_KEY_CODE_Y] = 0x15,
--    [Q_KEY_CODE_U] = 0x16,
--    [Q_KEY_CODE_I] = 0x17,
--    [Q_KEY_CODE_O] = 0x18,
--    [Q_KEY_CODE_P] = 0x19,
--    [Q_KEY_CODE_BRACKET_LEFT] = 0x1a,
--    [Q_KEY_CODE_BRACKET_RIGHT] = 0x1b,
--    [Q_KEY_CODE_RET] = 0x1c,
--
--    [Q_KEY_CODE_A] = 0x1e,
--    [Q_KEY_CODE_S] = 0x1f,
--    [Q_KEY_CODE_D] = 0x20,
--    [Q_KEY_CODE_F] = 0x21,
--    [Q_KEY_CODE_G] = 0x22,
--    [Q_KEY_CODE_H] = 0x23,
--    [Q_KEY_CODE_J] = 0x24,
--    [Q_KEY_CODE_K] = 0x25,
--    [Q_KEY_CODE_L] = 0x26,
--    [Q_KEY_CODE_SEMICOLON] = 0x27,
--    [Q_KEY_CODE_APOSTROPHE] = 0x28,
--    [Q_KEY_CODE_GRAVE_ACCENT] = 0x29,
--
--    [Q_KEY_CODE_BACKSLASH] = 0x2b,
--    [Q_KEY_CODE_Z] = 0x2c,
--    [Q_KEY_CODE_X] = 0x2d,
--    [Q_KEY_CODE_C] = 0x2e,
--    [Q_KEY_CODE_V] = 0x2f,
--    [Q_KEY_CODE_B] = 0x30,
--    [Q_KEY_CODE_N] = 0x31,
--    [Q_KEY_CODE_M] = 0x32,
--    [Q_KEY_CODE_COMMA] = 0x33,
--    [Q_KEY_CODE_DOT] = 0x34,
--    [Q_KEY_CODE_SLASH] = 0x35,
--
--    [Q_KEY_CODE_ASTERISK] = 0x37,
--
--    [Q_KEY_CODE_SPC] = 0x39,
--    [Q_KEY_CODE_CAPS_LOCK] = 0x3a,
--    [Q_KEY_CODE_F1] = 0x3b,
--    [Q_KEY_CODE_F2] = 0x3c,
--    [Q_KEY_CODE_F3] = 0x3d,
--    [Q_KEY_CODE_F4] = 0x3e,
--    [Q_KEY_CODE_F5] = 0x3f,
--    [Q_KEY_CODE_F6] = 0x40,
--    [Q_KEY_CODE_F7] = 0x41,
--    [Q_KEY_CODE_F8] = 0x42,
--    [Q_KEY_CODE_F9] = 0x43,
--    [Q_KEY_CODE_F10] = 0x44,
--    [Q_KEY_CODE_NUM_LOCK] = 0x45,
--    [Q_KEY_CODE_SCROLL_LOCK] = 0x46,
--
--    [Q_KEY_CODE_KP_DIVIDE] = 0xb5,
--    [Q_KEY_CODE_KP_MULTIPLY] = 0x37,
--    [Q_KEY_CODE_KP_SUBTRACT] = 0x4a,
--    [Q_KEY_CODE_KP_ADD] = 0x4e,
--    [Q_KEY_CODE_KP_ENTER] = 0x9c,
--    [Q_KEY_CODE_KP_DECIMAL] = 0x53,
--    [Q_KEY_CODE_SYSRQ] = 0x54,
--    [Q_KEY_CODE_PAUSE] = 0xc6,
--
--    [Q_KEY_CODE_KP_0] = 0x52,
--    [Q_KEY_CODE_KP_1] = 0x4f,
--    [Q_KEY_CODE_KP_2] = 0x50,
--    [Q_KEY_CODE_KP_3] = 0x51,
--    [Q_KEY_CODE_KP_4] = 0x4b,
--    [Q_KEY_CODE_KP_5] = 0x4c,
--    [Q_KEY_CODE_KP_6] = 0x4d,
--    [Q_KEY_CODE_KP_7] = 0x47,
--    [Q_KEY_CODE_KP_8] = 0x48,
--    [Q_KEY_CODE_KP_9] = 0x49,
--
--    [Q_KEY_CODE_LESS] = 0x56,
--
--    [Q_KEY_CODE_F11] = 0x57,
--    [Q_KEY_CODE_F12] = 0x58,
--
--    [Q_KEY_CODE_PRINT] = 0xb7,
--
--    [Q_KEY_CODE_HOME] = 0xc7,
--    [Q_KEY_CODE_PGUP] = 0xc9,
--    [Q_KEY_CODE_PGDN] = 0xd1,
--    [Q_KEY_CODE_END] = 0xcf,
--
--    [Q_KEY_CODE_LEFT] = 0xcb,
--    [Q_KEY_CODE_UP] = 0xc8,
--    [Q_KEY_CODE_DOWN] = 0xd0,
--    [Q_KEY_CODE_RIGHT] = 0xcd,
--
--    [Q_KEY_CODE_INSERT] = 0xd2,
--    [Q_KEY_CODE_DELETE] = 0xd3,
--
--    [Q_KEY_CODE_RO] = 0x73,
--    [Q_KEY_CODE_HIRAGANA] = 0x70,
--    [Q_KEY_CODE_HENKAN] = 0x79,
--    [Q_KEY_CODE_POWER] = 0xde,
--    [Q_KEY_CODE_YEN] = 0x7d,
--    [Q_KEY_CODE_KP_COMMA] = 0x7e,
--
--    [Q_KEY_CODE_SLEEP] = 0xdf,
--    [Q_KEY_CODE_WAKE] = 0xe3,
--    [Q_KEY_CODE_CALCULATOR] = 0xa1,
--    [Q_KEY_CODE_MAIL] = 0xec,
--    [Q_KEY_CODE_COMPUTER] = 0xeb,
--
--    [Q_KEY_CODE_STOP] = 0xe8,
--    [Q_KEY_CODE_AC_BOOKMARKS] = 0xe6,
--    [Q_KEY_CODE_AC_BACK] = 0xea,
--    [Q_KEY_CODE_AC_FORWARD] = 0xe9,
--    [Q_KEY_CODE_AC_HOME] = 0xb2,
--    [Q_KEY_CODE_AC_REFRESH] = 0xe7,
--    [Q_KEY_CODE_FIND] = 0xe5,
--
--    [Q_KEY_CODE_AUDIONEXT] = 0x99,
--    [Q_KEY_CODE_AUDIOPREV] = 0x90,
--    [Q_KEY_CODE_AUDIOSTOP] = 0xa4,
--    [Q_KEY_CODE_AUDIOPLAY] = 0xa2,
--    [Q_KEY_CODE_AUDIOMUTE] = 0xa0,
--    [Q_KEY_CODE_VOLUMEDOWN] = 0xae,
--    [Q_KEY_CODE_VOLUMEUP] = 0xb0,
--
--    [Q_KEY_CODE__MAX] = 0,
--};
--
--static int number_to_qcode[0x100];
-+#include "ui/input-keymap-linux-to-qcode.c"
-+#include "ui/input-keymap-qcode-to-qnum.c"
-+#include "ui/input-keymap-qnum-to-qcode.c"
- 
- int qemu_input_linux_to_qcode(unsigned int lnx)
- {
--    assert(lnx < KEY_CNT);
--    return linux_to_qcode[lnx];
-+    if (lnx >= qemu_input_map_linux_to_qcode_len) {
-+        return 0;
-+    }
-+    return qemu_input_map_linux_to_qcode[lnx];
- }
- 
- int qemu_input_key_value_to_number(const KeyValue *value)
- {
-     if (value->type == KEY_VALUE_KIND_QCODE) {
--        return qcode_to_number[value->u.qcode.data];
-+        if (value->u.qcode.data >= qemu_input_map_qcode_to_qnum_len) {
-+            return 0;
-+        }
-+        return qemu_input_map_qcode_to_qnum[value->u.qcode.data];
-     } else {
-         assert(value->type == KEY_VALUE_KIND_NUMBER);
-         return value->u.number.data;
-     }
- }
- 
--int qemu_input_key_number_to_qcode(uint8_t nr)
-+int qemu_input_key_number_to_qcode(unsigned int nr)
- {
--    static int first = true;
--
--    if (first) {
--        int qcode, number;
--        first = false;
--        for (qcode = 0; qcode < Q_KEY_CODE__MAX; qcode++) {
--            number = qcode_to_number[qcode];
--            assert(number < ARRAY_SIZE(number_to_qcode));
--            number_to_qcode[number] = qcode;
--        }
-+    if (nr >= qemu_input_map_qnum_to_qcode_len) {
-+        return 0;
-     }
--
--    return number_to_qcode[nr];
-+    return qemu_input_map_qnum_to_qcode[nr];
- }
- 
- int qemu_input_key_value_to_qcode(const KeyValue *value)
--- 
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 1bcb7000ab..e032857b6e 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -266,7 +266,7 @@ static void ccw_init(MachineState *machine)
+                       machine->initrd_filename, "s390-ccw.img",
+                       "s390-netboot.img", true);
+=20
+-    if (s390_has_feat(S390_FEAT_ZPCI)) {
++    if (pci_available) {
+         DeviceState *dev =3D qdev_create(NULL, TYPE_S390_PCI_HOST_BRIDGE);
+         object_property_add_child(qdev_get_machine(),
+                                   TYPE_S390_PCI_HOST_BRIDGE,
+@@ -596,9 +596,11 @@ bool css_migration_enabled(void)
+     {                                                                     =
+    \
+         MachineClass *mc =3D MACHINE_CLASS(oc);                           =
+      \
+         ccw_machine_##suffix##_class_options(mc);                         =
+    \
+-        mc->desc =3D "VirtIO-ccw based S390 machine v" verstr;            =
+      \
++        mc->desc =3D pci_available ? "VirtIO-ccw based S390 machine v" ver=
+str : \
++            "VirtIO-ccw based S390 machine (no PCI) v" verstr;            =
+    \
+         if (latest) {                                                     =
+    \
+-            mc->alias =3D "s390-ccw-virtio";                              =
+      \
++            mc->alias =3D pci_available ? "s390-ccw-virtio" :             =
+      \
++                "s390-ccw-virtio-nopci";                                  =
+    \
+             mc->is_default =3D 1;                                         =
+      \
+         }                                                                 =
+    \
+     }                                                                     =
+    \
+@@ -609,14 +611,24 @@ bool css_migration_enabled(void)
+         ccw_machine_##suffix##_instance_options(machine);                 =
+    \
+     }                                                                     =
+    \
+     static const TypeInfo ccw_machine_##suffix##_info =3D {               =
+      \
+-        .name =3D MACHINE_TYPE_NAME("s390-ccw-virtio-" verstr),           =
+      \
++        .name =3D MACHINE_TYPE_NAME("s390-virtio-ccw-" verstr),           =
+      \
++        .parent =3D TYPE_S390_CCW_MACHINE,                                =
+      \
++        .class_init =3D ccw_machine_##suffix##_class_init,                =
+      \
++        .instance_init =3D ccw_machine_##suffix##_instance_init,          =
+      \
++    };                                                                    =
+    \
++    static const TypeInfo ccw_machine_nopci_##suffix##_info =3D {         =
+      \
++        .name =3D MACHINE_TYPE_NAME("s390-virtio-ccw-nopci-" verstr),     =
+      \
+         .parent =3D TYPE_S390_CCW_MACHINE,                                =
+      \
+         .class_init =3D ccw_machine_##suffix##_class_init,                =
+      \
+         .instance_init =3D ccw_machine_##suffix##_instance_init,          =
+      \
+     };                                                                    =
+    \
+     static void ccw_machine_register_##suffix(void)                       =
+    \
+     {                                                                     =
+    \
+-        type_register_static(&ccw_machine_##suffix##_info);               =
+    \
++        if (pci_available) {                                              =
+    \
++            type_register_static(&ccw_machine_##suffix##_info);           =
+    \
++        } else {                                                          =
+    \
++            type_register_static(&ccw_machine_nopci_##suffix##_info);     =
+    \
++        }                                                                 =
+    \
+     }                                                                     =
+    \
+     type_init(ccw_machine_register_##suffix)
+=20
+--=20
 2.13.5
