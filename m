@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dxfYl-0003f1-7o
+	(envelope-from <david@redhat.com>) id 1dxfYl-0003f2-82
 	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 16:37:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dxfYh-00033O-8u
+	(envelope-from <david@redhat.com>) id 1dxfYj-000347-GZ
 	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 16:37:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34150)
+Received: from mx1.redhat.com ([209.132.183.28]:59818)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dxfYh-000330-0z
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 16:37:23 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dxfYj-00033t-7t
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 16:37:25 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Thu, 28 Sep 2017 22:36:42 +0200
-Message-Id: <20170928203708.9376-5-david@redhat.com>
+Date: Thu, 28 Sep 2017 22:36:43 +0200
+Message-Id: <20170928203708.9376-6-david@redhat.com>
 In-Reply-To: <20170928203708.9376-1-david@redhat.com>
 References: <20170928203708.9376-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 04/30] s390x/tcg: rework checking for
- deliverable interrupts
+Subject: [Qemu-devel] [PATCH v2 05/30] s390x/tcg: take care of external
+ interrupt subclasses
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -27,160 +27,154 @@ To: qemu-devel@nongnu.org
 Cc: thuth@redhat.com, cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <richard.henderson@linaro.org>, David Hildenbrand <david@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-Currently, enabling/disabling of interrupts is not really supported.
-
-Let's improve interrupt handling code by explicitly checking for
-deliverable interrupts only. This is the first step. Checking for
-external interrupt subclasses will be done next.
+We can now let go of INTERRUPT_EXT. When cr0 changes, we have to
+revalidate if we now have a pending external interrupt, just like
+when the PSW (or SYSTEM MASK only) changes.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/cpu.c         |  8 +++++---
- target/s390x/excp_helper.c | 21 +++++++--------------
- target/s390x/internal.h    |  4 ++++
- target/s390x/interrupt.c   | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 62 insertions(+), 17 deletions(-)
+ target/s390x/cpu.h         | 10 +++++-----
+ target/s390x/excp_helper.c | 15 ++++++++++-----
+ target/s390x/interrupt.c   | 32 +++++++++++++++++++++++++++++++-
+ target/s390x/translate.c   |  6 ++++--
+ 4 files changed, 50 insertions(+), 13 deletions(-)
 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index e240d99fe6..9c2a1e6ac8 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -56,10 +56,12 @@ static void s390_cpu_set_pc(CPUState *cs, vaddr value)
- static bool s390_cpu_has_work(CPUState *cs)
- {
-     S390CPU *cpu = S390_CPU(cs);
--    CPUS390XState *env = &cpu->env;
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index f0f5ff0359..6ae0c7dfc8 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -345,6 +345,11 @@ extern const struct VMStateDescription vmstate_s390_cpu;
+ #define CR0_LOWPROT             0x0000000010000000ULL
+ #define CR0_SECONDARY           0x0000000004000000ULL
+ #define CR0_EDAT                0x0000000000800000ULL
++#define CR0_EMERGENCY_SIGNAL_SC 0x0000000000004000ULL
++#define CR0_EXTERNAL_CALL_SC    0x0000000000002000ULL
++#define CR0_CKC_SC              0x0000000000000800ULL
++#define CR0_CPU_TIMER_SC        0x0000000000000400ULL
++#define CR0_SERVICE_SC          0x0000000000000200ULL
  
--    return (cs->interrupt_request & CPU_INTERRUPT_HARD) &&
--           (env->psw.mask & PSW_MASK_EXT);
-+    if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
-+        return false;
-+    }
-+
-+    return s390_cpu_has_int(cpu);
- }
+ /* MMU */
+ #define MMU_PRIMARY_IDX         0
+@@ -405,11 +410,6 @@ static inline void cpu_get_tb_cpu_state(CPUS390XState* env, target_ulong *pc,
+ #define INTERRUPT_EXT_CLOCK_COMPARATOR   (1 << 4)
+ #define INTERRUPT_EXTERNAL_CALL          (1 << 5)
+ #define INTERRUPT_EMERGENCY_SIGNAL       (1 << 6)
+-#define INTERRUPT_EXT                    (INTERRUPT_EXT_SERVICE | \
+-                                          INTERRUPT_EXT_CPU_TIMER | \
+-                                          INTERRUPT_EXT_CLOCK_COMPARATOR | \
+-                                          INTERRUPT_EXTERNAL_CALL | \
+-                                          INTERRUPT_EMERGENCY_SIGNAL)
  
- #if !defined(CONFIG_USER_ONLY)
+ /* Program Status Word.  */
+ #define S390_PSWM_REGNUM 0
 diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index bffcf7f39e..02849e41e6 100644
+index 02849e41e6..fe68de5a77 100644
 --- a/target/s390x/excp_helper.c
 +++ b/target/s390x/excp_helper.c
-@@ -434,24 +434,16 @@ void s390_cpu_do_interrupt(CPUState *cs)
+@@ -248,7 +248,8 @@ static void do_ext_interrupt(CPUS390XState *env)
  
-     s390_cpu_set_state(CPU_STATE_OPERATING, cpu);
-     /* handle machine checks */
--    if ((env->psw.mask & PSW_MASK_MCHECK) &&
--        (cs->exception_index == -1)) {
--        if (env->pending_int & INTERRUPT_MCHK) {
--            cs->exception_index = EXCP_MCHK;
--        }
-+    if (cs->exception_index == -1 && s390_cpu_has_mcck_int(cpu)) {
-+        cs->exception_index = EXCP_MCHK;
-     }
-     /* handle external interrupts */
--    if ((env->psw.mask & PSW_MASK_EXT) &&
--        cs->exception_index == -1 &&
--        (env->pending_int & INTERRUPT_EXT)) {
-+    if (cs->exception_index == -1 && s390_cpu_has_ext_int(cpu)) {
-         cs->exception_index = EXCP_EXT;
-     }
-     /* handle I/O interrupts */
--    if ((env->psw.mask & PSW_MASK_IO) &&
--        (cs->exception_index == -1)) {
--        if (env->pending_int & INTERRUPT_IO) {
--            cs->exception_index = EXCP_IO;
--        }
-+    if (cs->exception_index == -1 && s390_cpu_has_io_int(cpu)) {
-+        cs->exception_index = EXCP_IO;
-     }
+     lowcore = cpu_map_lowcore(env);
  
-     switch (cs->exception_index) {
-@@ -473,6 +465,7 @@ void s390_cpu_do_interrupt(CPUState *cs)
-     }
-     cs->exception_index = -1;
- 
-+    /* we might still have pending interrupts, but not deliverable */
-     if (!env->pending_int) {
-         cs->interrupt_request &= ~CPU_INTERRUPT_HARD;
-     }
-@@ -489,7 +482,7 @@ bool s390_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-                the parent EXECUTE insn.  */
-             return false;
+-    if (env->pending_int & INTERRUPT_EMERGENCY_SIGNAL) {
++    if ((env->pending_int & INTERRUPT_EMERGENCY_SIGNAL) &&
++        (env->cregs[0] & CR0_EMERGENCY_SIGNAL_SC)) {
+         lowcore->ext_int_code = cpu_to_be16(EXT_EMERGENCY);
+         cpu_addr = find_first_bit(env->emergency_signals, S390_MAX_CPUS);
+         g_assert(cpu_addr < S390_MAX_CPUS);
+@@ -257,19 +258,23 @@ static void do_ext_interrupt(CPUS390XState *env)
+         if (bitmap_empty(env->emergency_signals, max_cpus)) {
+             env->pending_int &= ~INTERRUPT_EMERGENCY_SIGNAL;
          }
--        if (env->psw.mask & PSW_MASK_EXT) {
-+        if (s390_cpu_has_int(cpu)) {
-             s390_cpu_do_interrupt(cs);
-             return true;
-         }
-diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-index f67c2a1785..e41fb2e38e 100644
---- a/target/s390x/internal.h
-+++ b/target/s390x/internal.h
-@@ -364,6 +364,10 @@ void cpu_inject_clock_comparator(S390CPU *cpu);
- void cpu_inject_cpu_timer(S390CPU *cpu);
- void cpu_inject_emergency_signal(S390CPU *cpu, uint16_t src_cpu_addr);
- int cpu_inject_external_call(S390CPU *cpu, uint16_t src_cpu_addr);
-+bool s390_cpu_has_io_int(S390CPU *cpu);
-+bool s390_cpu_has_ext_int(S390CPU *cpu);
-+bool s390_cpu_has_mcck_int(S390CPU *cpu);
-+bool s390_cpu_has_int(S390CPU *cpu);
- 
- 
- /* ioinst.c */
+-    } else if (env->pending_int & INTERRUPT_EXTERNAL_CALL) {
++    } else if ((env->pending_int & INTERRUPT_EXTERNAL_CALL) &&
++               (env->cregs[0] & CR0_EXTERNAL_CALL_SC)) {
+         lowcore->ext_int_code = cpu_to_be16(EXT_EXTERNAL_CALL);
+         lowcore->cpu_addr = cpu_to_be16(env->external_call_addr);
+         env->pending_int &= ~INTERRUPT_EXTERNAL_CALL;
+-    } else if (env->pending_int & INTERRUPT_EXT_CLOCK_COMPARATOR) {
++    } else if ((env->pending_int & INTERRUPT_EXT_CLOCK_COMPARATOR) &&
++               (env->cregs[0] & CR0_CKC_SC)) {
+         lowcore->ext_int_code = cpu_to_be16(EXT_CLOCK_COMP);
+         lowcore->cpu_addr = 0;
+         env->pending_int &= ~INTERRUPT_EXT_CLOCK_COMPARATOR;
+-    } else if (env->pending_int & INTERRUPT_EXT_CPU_TIMER) {
++    } else if ((env->pending_int & INTERRUPT_EXT_CPU_TIMER) &&
++               (env->cregs[0] & CR0_CPU_TIMER_SC)) {
+         lowcore->ext_int_code = cpu_to_be16(EXT_CPU_TIMER);
+         lowcore->cpu_addr = 0;
+         env->pending_int &= ~INTERRUPT_EXT_CPU_TIMER;
+-    } else if (env->pending_int & INTERRUPT_EXT_SERVICE) {
++    } else if ((env->pending_int & INTERRUPT_EXT_SERVICE) &&
++               (env->cregs[0] & CR0_SERVICE_SC)) {
+         /*
+          * FIXME: floating IRQs should be considered by all CPUs and
+          *        shuld not get cleared by CPU reset.
 diff --git a/target/s390x/interrupt.c b/target/s390x/interrupt.c
-index afd311c1e1..54eb400b0c 100644
+index 54eb400b0c..c1eaaea98b 100644
 --- a/target/s390x/interrupt.c
 +++ b/target/s390x/interrupt.c
-@@ -190,4 +190,50 @@ void s390_crw_mchk(void)
+@@ -209,7 +209,37 @@ bool s390_cpu_has_ext_int(S390CPU *cpu)
+         return false;
      }
+ 
+-    return env->pending_int & INTERRUPT_EXT;
++    if ((env->pending_int & INTERRUPT_EMERGENCY_SIGNAL) &&
++        (env->cregs[0] & CR0_EMERGENCY_SIGNAL_SC)) {
++        return true;
++    }
++
++    if ((env->pending_int & INTERRUPT_EXTERNAL_CALL) &&
++        (env->cregs[0] & CR0_EXTERNAL_CALL_SC)) {
++        return true;
++    }
++
++    if ((env->pending_int & INTERRUPT_EXTERNAL_CALL) &&
++        (env->cregs[0] & CR0_EXTERNAL_CALL_SC)) {
++        return true;
++    }
++
++    if ((env->pending_int & INTERRUPT_EXT_CLOCK_COMPARATOR) &&
++        (env->cregs[0] & CR0_CKC_SC)) {
++        return true;
++    }
++
++    if ((env->pending_int & INTERRUPT_EXT_CPU_TIMER) &&
++        (env->cregs[0] & CR0_CPU_TIMER_SC)) {
++        return true;
++    }
++
++    if ((env->pending_int & INTERRUPT_EXT_SERVICE) &&
++        (env->cregs[0] & CR0_SERVICE_SC)) {
++        return true;
++    }
++
++    return false;
  }
  
-+bool s390_cpu_has_mcck_int(S390CPU *cpu)
-+{
-+    CPUS390XState *env = &cpu->env;
-+
-+    if (!(env->psw.mask & PSW_MASK_MCHECK)) {
-+        return false;
-+    }
-+
-+    return env->pending_int & INTERRUPT_MCHK;
-+}
-+
-+bool s390_cpu_has_ext_int(S390CPU *cpu)
-+{
-+    CPUS390XState *env = &cpu->env;
-+
-+    if (!(env->psw.mask & PSW_MASK_EXT)) {
-+        return false;
-+    }
-+
-+    return env->pending_int & INTERRUPT_EXT;
-+}
-+
-+bool s390_cpu_has_io_int(S390CPU *cpu)
-+{
-+    CPUS390XState *env = &cpu->env;
-+
-+    if (!(env->psw.mask & PSW_MASK_IO)) {
-+        return false;
-+    }
-+
-+    return env->pending_int & INTERRUPT_IO;
-+}
- #endif
-+
-+bool s390_cpu_has_int(S390CPU *cpu)
-+{
-+#ifndef CONFIG_USER_ONLY
-+    if (!tcg_enabled()) {
-+        return false;
-+    }
-+    return s390_cpu_has_mcck_int(cpu) ||
-+           s390_cpu_has_ext_int(cpu) ||
-+           s390_cpu_has_io_int(cpu);
-+#else
-+    return false;
-+#endif
-+}
+ bool s390_cpu_has_io_int(S390CPU *cpu)
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 9ef95141f9..405d94b87d 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -2719,7 +2719,8 @@ static ExitStatus op_lctl(DisasContext *s, DisasOps *o)
+     gen_helper_lctl(cpu_env, r1, o->in2, r3);
+     tcg_temp_free_i32(r1);
+     tcg_temp_free_i32(r3);
+-    return NO_EXIT;
++    /* Exit to main loop to reevaluate s390_cpu_exec_interrupt.  */
++    return EXIT_PC_STALE_NOCHAIN;
+ }
+ 
+ static ExitStatus op_lctlg(DisasContext *s, DisasOps *o)
+@@ -2730,7 +2731,8 @@ static ExitStatus op_lctlg(DisasContext *s, DisasOps *o)
+     gen_helper_lctlg(cpu_env, r1, o->in2, r3);
+     tcg_temp_free_i32(r1);
+     tcg_temp_free_i32(r3);
+-    return NO_EXIT;
++    /* Exit to main loop to reevaluate s390_cpu_exec_interrupt.  */
++    return EXIT_PC_STALE_NOCHAIN;
+ }
+ 
+ static ExitStatus op_lra(DisasContext *s, DisasOps *o)
 -- 
 2.13.5
