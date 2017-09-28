@@ -1,40 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dxZJV-0002nn-IQ
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 09:57:23 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dxZO9-0003mH-6T
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 10:02:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dxZJQ-00075s-LQ
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 09:57:17 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59498)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dxZGy-0005XF-M3
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 09:57:12 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8SDnjLu036203
-	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 09:52:48 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d91ujtb3r-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 09:52:48 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 28 Sep 2017 14:52:43 +0100
-References: <20170928134609.16985-1-david@redhat.com>
-	<20170928134609.16985-2-david@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 28 Sep 2017 15:52:39 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1dxZO4-0001N0-CN
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 10:02:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44666)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dxZO4-0001L0-0x
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 10:02:00 -0400
+Date: Thu, 28 Sep 2017 11:01:50 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170928140150.GS4115@localhost.localdomain>
+References: <20170927130339.21444-1-ehabkost@redhat.com>
+	<20170927130339.21444-5-ehabkost@redhat.com>
+	<20170927133321.GB8521@lemon.lan>
+	<20170927134431.GN21016@localhost.localdomain>
+	<7b84fb9c-9969-c9d5-8ede-2d54c3825ea6@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170928134609.16985-2-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <f2d649ee-3553-7b1d-4432-e646fb409a65@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v1 1/5] MAINTAINERS: use KVM s390x
- maintainers for kvm-stubs.c and kvm_s390x.h
+Content-Disposition: inline
+In-Reply-To: <7b84fb9c-9969-c9d5-8ede-2d54c3825ea6@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] fixup! scripts: Remove debug parameter
+ from QEMUMonitorProtocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,33 +32,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, cohuck@redhat.com, Alexander Graf <agraf@suse.de>, Richard Henderson <richard.henderson@linaro.org>
+To: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
+
+On Thu, Sep 28, 2017 at 11:33:57AM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
+> Dne 27.9.2017 v 15:44 Eduardo Habkost napsal(a):
+> > On Wed, Sep 27, 2017 at 09:33:21PM +0800, Fam Zheng wrote:
+> >> On Wed, 09/27 10:03, Eduardo Habkost wrote:
+> >>> @@ -51,7 +54,6 @@ class QEMUMonitorProtocol(object):
+> >>>          """
+> >>>          self.__events =3D []
+> >>>          self.__address =3D address
+> >>> -        self._debug =3D debug
+> >>
+> >> Should you also drop the debug parameter from the method?
+> >>
+> >>>          self.__sock =3D self.__get_sock()
+> >>>          self.__sockfile =3D None
+> >>>          if server:
+> >>> @@ -83,8 +85,7 @@ class QEMUMonitorProtocol(object):
+> >>>                  return
+> >>>              resp =3D json.loads(data)
+> >>>              if 'event' in resp:
+> >>> -                if self._debug:
+> >>> -                    print >>sys.stderr, "QMP:<<< %s" % resp
+>=20
+> This is the only user of `sys` import, please remove it as
+> well. Apart from this it looks good, although you might
+> consider using `__name__` instead of hardcoded `QMP` in `logger
+> =3D logging.getLogger(__name__)` for the sake of consistency
+> (people might expect it to correlate with the module name).
+
+I will remove 'import sys' in v2, but I disagree about using the
+module name: prefixing them with "QMP" makes them more readable
+and familiar than using "qmp.qmp".
+
+Thanks!
+
+>=20
+> Luk=C3=A1=C5=A1
+>=20
+> >>> +                self.logger.debug("<<< %s", resp)
+> >>>                  self.__events.append(resp)
+> >>>                  if not only_event:
+> >>>                      continue
+> >>> @@ -164,8 +165,7 @@ class QEMUMonitorProtocol(object):
+> >>>          @return QMP response as a Python dict or None if the conne=
+ction has
+> >>>                  been closed
+> >>>          """
+> >>> -        if self._debug:
+> >>> -            print >>sys.stderr, "QMP:>>> %s" % qmp_cmd
+> >>> +        self.logger.debug("<<< %s", qmp_cmd)
+> >>
+> >> This should be ">>> %s".
+> >>
+> >=20
+> > Fixed.
+> >=20
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> >  scripts/qmp/qmp.py | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
+> > index be79d7aa80..369d9fef39 100644
+> > --- a/scripts/qmp/qmp.py
+> > +++ b/scripts/qmp/qmp.py
+> > @@ -40,7 +40,7 @@ class QEMUMonitorProtocol(object):
+> >      #: Socket's timeout
+> >      timeout =3D socket.timeout
+> > =20
+> > -    def __init__(self, address, server=3DFalse, debug=3DFalse):
+> > +    def __init__(self, address, server=3DFalse):
+> >          """
+> >          Create a QEMUMonitorProtocol class.
+> > =20
+> > @@ -165,7 +165,7 @@ class QEMUMonitorProtocol(object):
+> >          @return QMP response as a Python dict or None if the connect=
+ion has
+> >                  been closed
+> >          """
+> > -        self.logger.debug("<<< %s", qmp_cmd)
+> > +        self.logger.debug(">>> %s", qmp_cmd)
+> >          try:
+> >              self.__sock.sendall(json.dumps(qmp_cmd))
+> >          except socket.error as err:
+> >=20
+>=20
+>=20
 
 
 
-On 09/28/2017 03:46 PM, David Hildenbrand wrote:
-> Forgot it when factoring code out into these files. This is 100% s390x
-> KVM material.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  MAINTAINERS | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 932443df41..772ac209e1 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -299,6 +299,8 @@ M: Cornelia Huck <cohuck@redhat.com>
->  M: Alexander Graf <agraf@suse.de>
->  S: Maintained
->  F: target/s390x/kvm.c
-> +F: target/s390x/kvm_s390x.h
-> +F: target/s390x/kvm-stub.c
->  F: target/s390x/ioinst.[ch]
->  F: target/s390x/machine.c
->  F: hw/intc/s390_flic.c
-> 
+--=20
+Eduardo
