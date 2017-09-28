@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dxZ9V-0006zI-5D
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 09:47:01 -0400
+	(envelope-from <david@redhat.com>) id 1dxZAU-0007kh-3B
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 09:47:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dxZ9R-0002XV-5t
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 09:46:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52141)
+	(envelope-from <david@redhat.com>) id 1dxZAO-0002nb-GU
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 09:47:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49344)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dxZ9Q-0002XF-Mr
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 09:46:53 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dxZAO-0002nN-7C
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 09:47:52 -0400
+References: <20170928131831.81393-1-borntraeger@de.ibm.com>
 From: David Hildenbrand <david@redhat.com>
-Date: Thu, 28 Sep 2017 15:46:08 +0200
-Message-Id: <20170928134609.16985-5-david@redhat.com>
-In-Reply-To: <20170928134609.16985-1-david@redhat.com>
-References: <20170928134609.16985-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 4/5] target/s390x: get rid of next_core_id
+Message-ID: <3445a7f0-65cc-7420-c494-87f1c600b474@redhat.com>
+Date: Thu, 28 Sep 2017 15:47:47 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170928131831.81393-1-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Revert "s390x/ccw: create s390 phb
+ conditionally"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,122 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <richard.henderson@linaro.org>, David Hildenbrand <david@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-core_id is not needed by linux-user, as the core_id a.k.a. CPU address
-is only accessible from kernel space.
+On 28.09.2017 15:18, Christian Borntraeger wrote:
+> This reverts commit d32bd032d8fde41281aae34c16a4aa97e9acfeac.
+> 
+> Turns out that old QEMUs always created a pci host bridge
+> and for many CPU models the migration from old QEMUs to new
+> QEMUs will fail with
+> qemu-system-s390x: Unknown savevm section or instance 'PCIBUS' 0
+> qemu-system-s390x: load of migration failed: Invalid argument
+> 
+> As a quick fix we will revert the commit and always create the
+> pci host bridge.
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> [fixed revert to keep the comment fixup, added a comment in the code]
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/s390x/s390-virtio-ccw.c | 16 +++++++++-------
+>  1 file changed, 9 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index b6aa2da..a77336f 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -275,6 +275,7 @@ static void ccw_init(MachineState *machine)
+>  {
+>      int ret;
+>      VirtualCssBus *css_bus;
+> +    DeviceState *dev;
+>  
+>      s390_sclp_init();
+>      s390_memory_init(machine->ram_size);
+> @@ -290,13 +291,14 @@ static void ccw_init(MachineState *machine)
+>                        machine->initrd_filename, "s390-ccw.img",
+>                        "s390-netboot.img", true);
+>  
+> -    if (s390_has_feat(S390_FEAT_ZPCI)) {
+> -        DeviceState *dev = qdev_create(NULL, TYPE_S390_PCI_HOST_BRIDGE);
+> -        object_property_add_child(qdev_get_machine(),
+> -                                  TYPE_S390_PCI_HOST_BRIDGE,
+> -                                  OBJECT(dev), NULL);
+> -        qdev_init_nofail(dev);
+> -    }
+> +    /*
+> +     * We cannot easily make the pci host bridge conditional as older QEMUs
+> +     * always created it. Doing so would break migration across QEMU versions
+> +     */
+> +    dev = qdev_create(NULL, TYPE_S390_PCI_HOST_BRIDGE);
+> +    object_property_add_child(qdev_get_machine(), TYPE_S390_PCI_HOST_BRIDGE,
+> +                              OBJECT(dev), NULL);
+> +    qdev_init_nofail(dev);
+>  
+>      /* register hypercalls */
+>      virtio_ccw_register_hcalls();
+> 
 
-Therefore, drop next_core_id and make cpu_index get autoassigned again
-for linux-user.
+This zPCI stuff is just nasty.
 
-While at it, shield core_id and cpuid completely from linux-user. cpuid
-can also only be queried from kernel space.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/cpu-qom.h    |  2 --
- target/s390x/cpu.c        | 14 +++++++-------
- target/s390x/cpu.h        |  2 ++
- target/s390x/cpu_models.c |  2 ++
- 4 files changed, 11 insertions(+), 9 deletions(-)
-
-diff --git a/target/s390x/cpu-qom.h b/target/s390x/cpu-qom.h
-index 2e446fab51..0510c49e07 100644
---- a/target/s390x/cpu-qom.h
-+++ b/target/s390x/cpu-qom.h
-@@ -54,8 +54,6 @@ typedef struct S390CPUClass {
-     bool is_migration_safe;
-     const char *desc;
- 
--    uint32_t next_core_id;
--
-     DeviceRealize parent_realize;
-     void (*parent_reset)(CPUState *cpu);
-     void (*load_normal)(CPUState *cpu);
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 4920da3625..f42e28ea25 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -178,8 +178,9 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
- {
-     CPUState *cs = CPU(dev);
-     S390CPUClass *scc = S390_CPU_GET_CLASS(dev);
-+#if !defined(CONFIG_USER_ONLY)
-     S390CPU *cpu = S390_CPU(dev);
--    CPUS390XState *env = &cpu->env;
-+#endif
-     Error *err = NULL;
- 
-     /* the model has to be realized before qemu_init_vcpu() due to kvm */
-@@ -195,11 +196,6 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
-                    max_cpus - 1);
-         goto out;
-     }
--#else
--    /* implicitly set for linux-user only */
--    cpu->env.core_id = scc->next_core_id;
--    scc->next_core_id++;
--#endif
- 
-     if (cpu_exists(cpu->env.core_id)) {
-         error_setg(&err, "Unable to add CPU with core-id: %" PRIu32
-@@ -208,7 +204,9 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
-     }
- 
-     /* sync cs->cpu_index and env->core_id. The latter is needed for TCG. */
--    cs->cpu_index = env->core_id;
-+    cs->cpu_index = cpu->env.core_id;
-+#endif
-+
-     cpu_exec_realizefn(cs, &err);
-     if (err != NULL) {
-         goto out;
-@@ -440,7 +438,9 @@ static gchar *s390_gdb_arch_name(CPUState *cs)
- }
- 
- static Property s390x_cpu_properties[] = {
-+#if !defined(CONFIG_USER_ONLY)
-     DEFINE_PROP_UINT32("core-id", S390CPU, env.core_id, 0),
-+#endif
-     DEFINE_PROP_END_OF_LIST()
- };
- 
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index c57ef71f6d..ff3cc59c02 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -151,8 +151,10 @@ struct CPUS390XState {
- 
-     CPU_COMMON
- 
-+#if !defined(CONFIG_USER_ONLY)
-     uint32_t core_id; /* PoP "CPU address", same as cpu_index */
-     uint64_t cpuid;
-+#endif
- 
-     uint64_t tod_offset;
-     uint64_t tod_basetime;
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 48dd7beddd..07ef8a3b6e 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -945,11 +945,13 @@ void s390_realize_cpu_model(CPUState *cs, Error **errp)
- 
-     apply_cpu_model(cpu->model, errp);
- 
-+#if !defined(CONFIG_USER_ONLY)
-     cpu->env.cpuid = s390_cpuid_from_cpu_model(cpu->model);
-     if (tcg_enabled()) {
-         /* basic mode, write the cpu address into the first 4 bit of the ID */
-         cpu->env.cpuid = deposit64(cpu->env.cpuid, 54, 4, cpu->env.core_id);
-     }
-+#endif
- }
- 
- static void get_feature(Object *obj, Visitor *v, const char *name,
 -- 
-2.13.5
+
+Thanks,
+
+David
