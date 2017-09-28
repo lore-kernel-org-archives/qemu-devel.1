@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dxY2b-0004mW-4j
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 08:35:50 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dxYHS-00084f-Bf
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 08:51:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dxY2X-00034y-8A
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 08:35:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46542)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dxY2X-00034h-1w
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 08:35:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dxY2U-0008EG-MN
-	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 12:35:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6CC072E849C
-	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 12:35:38 +0000 (UTC)
+	(envelope-from <ehabkost@redhat.com>) id 1dxYHR-0008QU-5l
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 08:51:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47584)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dxYHQ-0008QK-Tk
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 08:51:05 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D032BE9E19
+	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 12:51:03 +0000 (UTC)
+Date: Thu, 28 Sep 2017 09:50:59 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170928125059.GN4115@localhost.localdomain>
+References: <20170927203225.30896-1-ehabkost@redhat.com>
+	<20170927203225.30896-2-ehabkost@redhat.com>
+	<20170928114202.GJ12919@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 Sep 2017 12:20:34 -0000
-From: Daniel Berrange <1583784@bugs.launchpad.net>
-Reply-To: Bug 1583784 <1583784@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160519202600.8755.25116.malonedeb@gac.canonical.com>
-Message-Id: <150660123576.5593.10717541064815910295.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1583784] Re: qio_task_free segfault websocket
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170928114202.GJ12919@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] vl: Eliminate defconfig variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,47 +34,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, libvir-list@redhat.com
 
-*** This bug is a duplicate of bug 1589923 ***
-    https://bugs.launchpad.net/bugs/1589923
+(CCing libvir-list)
 
-** This bug has been marked a duplicate of bug 1589923
-   https websockets not working in 2.5 or 2.6
+On Thu, Sep 28, 2017 at 12:42:02PM +0100, Daniel P. Berrange wrote:
+> On Wed, Sep 27, 2017 at 05:32:24PM -0300, Eduardo Habkost wrote:
+> > Both -nodefconfig and -no-user-config options do the same thing
+> > today, we only need one variable to keep track of them.
+> 
+> What reason for picking -nodefconfig instead of -no-user-config to
+> deprecate ?  -nodefconfig predates -no-user-config by a few years,
+> and is what libvirt has historically used. So from libvirt POV
+> we'd have a slight preference to deprecate -no-user-config instead
+> and keep -nodefconfig, simply to avoid need to add conditional
+> logic to libvirt to pick which to use.
 
--- =
+libvirt already prefers -no-user-config, which is the right thing
+for libvirt because it needs a mechanism to disable user-provided
+configuration only, not QEMU-provided data files (in case they
+exist).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1583784
+In other words, we have an important use case for the
+-no-user-config semantics in libvirt, and I am not aware of any
+existing user of the -nodefconfig semantics.
 
-Title:
-  qio_task_free segfault websocket
+(For the record, I think the existing documented -nodefconfig
+semantics is awful and useless, but that's the one we got.  Old
+discussions about this can be seen at:
+https://www.mail-archive.com/libvir-list@redhat.com/msg53083.html )
 
-Status in QEMU:
-  New
+> 
+> > 
+> > Suggested-by: Markus Armbruster <armbru@redhat.com>
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> >  vl.c | 5 +----
+> >  1 file changed, 1 insertion(+), 4 deletions(-)
+> > 
+> > diff --git a/vl.c b/vl.c
+> > index 4fd01fda91..b347a97a5b 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -3093,7 +3093,6 @@ int main(int argc, char **argv, char **envp)
+> >      const char *qtest_log = NULL;
+> >      const char *pid_file = NULL;
+> >      const char *incoming = NULL;
+> > -    bool defconfig = true;
+> >      bool userconfig = true;
+> >      bool nographic = false;
+> >      DisplayType display_type = DT_DEFAULT;
+> > @@ -3194,8 +3193,6 @@ int main(int argc, char **argv, char **envp)
+> >              popt = lookup_opt(argc, argv, &optarg, &optind);
+> >              switch (popt->index) {
+> >              case QEMU_OPTION_nodefconfig:
+> > -                defconfig = false;
+> > -                break;
+> >              case QEMU_OPTION_nouserconfig:
+> >                  userconfig = false;
+> >                  break;
+> > @@ -3203,7 +3200,7 @@ int main(int argc, char **argv, char **envp)
+> >          }
+> >      }
+> >  
+> > -    if (defconfig && userconfig) {
+> > +    if (userconfig) {
+> >          if (qemu_read_default_config_file() < 0) {
+> >              exit(1);
+> >          }
+> > -- 
+> > 2.13.5
+> > 
+> > 
+> 
+> Regards,
+> Daniel
+> -- 
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-Bug description:
-  When connecting with websocket and tls to a vnc-ws port I get segfault
-
-  =3D=3D15252=3D=3D Process terminating with default action of signal 11 (S=
-IGSEGV): dumping core
-  =3D=3D15252=3D=3D  Access not within mapped region at address 0x0
-  =3D=3D15252=3D=3D    at 0x1: ???
-  =3D=3D15252=3D=3D    by 0x56E1E2: qio_task_free (task.c:58)
-  =3D=3D15252=3D=3D    by 0x56E42B: qio_task_complete (task.c:145)
-  =3D=3D15252=3D=3D    by 0x56DBB8: qio_channel_websock_handshake_send (cha=
-nnel-websock.c:289)
-  =3D=3D15252=3D=3D    by 0x7B3F689: g_main_dispatch (gmain.c:3154)
-  =3D=3D15252=3D=3D    by 0x7B3F689: g_main_context_dispatch (gmain.c:3769)
-  =3D=3D15252=3D=3D    by 0x50D42A: glib_pollfds_poll (main-loop.c:213)
-  =3D=3D15252=3D=3D    by 0x50D42A: os_host_main_loop_wait (main-loop.c:258)
-  =3D=3D15252=3D=3D    by 0x50D42A: main_loop_wait (main-loop.c:506)
-  =3D=3D15252=3D=3D    by 0x28A8D1: main_loop (vl.c:1934)
-  =3D=3D15252=3D=3D    by 0x28A8D1: main (vl.c:4656)
-
-  qemu 2.6.0
-  linux x64
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1583784/+subscriptions
+-- 
+Eduardo
