@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dxd6k-0005VY-2a
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:00:27 -0400
+	(envelope-from <bounces@canonical.com>) id 1dxd8d-0007rF-Fk
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:02:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dxd6g-0008Jg-VU
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:00:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43120)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dxd6g-0008HI-Ew
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:00:18 -0400
-References: <20170928120621.30288-1-berrange@redhat.com>
-	<20170928120621.30288-2-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e4db5995-1e8e-b422-f401-3a295ccc7f64@redhat.com>
-Date: Thu, 28 Sep 2017 12:59:56 -0500
+	(envelope-from <bounces@canonical.com>) id 1dxd8a-0001Nr-Be
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:02:19 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46854)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dxd8a-0001NL-4q
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:02:16 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1dxd8W-0000Da-Us
+	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 18:02:13 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2B6242E84C8
+	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 18:02:07 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170928120621.30288-2-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="30oLGxGnEkwffTHw9sRJ8AU0BhNDGpQ5K"
-Subject: Re: [Qemu-devel] [PATCH v7 1/6] build: automatically handle GIT
- submodule checkout for dtc
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 28 Sep 2017 17:46:45 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1713825 <1713825@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150404140220.18876.2468100840644103776.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150662080585.5555.6433531334189699405.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1713825] Re: Booting Windows 2016 with qxl video
+ crashes qemu
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -28,78 +36,120 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---30oLGxGnEkwffTHw9sRJ8AU0BhNDGpQ5K
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e4db5995-1e8e-b422-f401-3a295ccc7f64@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 1/6] build: automatically handle GIT
- submodule checkout for dtc
-References: <20170928120621.30288-1-berrange@redhat.com>
- <20170928120621.30288-2-berrange@redhat.com>
-In-Reply-To: <20170928120621.30288-2-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Maciej,
+  Can you clarify:
+     a) What version of the qxl drivers you have installed in windows
+     b) Does it crash immediately or only when you do something specific?
+     c) Can you give the qemu command line and/or libvirt xml
+     d) What resolution have you got the guest set at?
+     e) What version are your spice-server libraries at?
 
-On 09/28/2017 07:06 AM, Daniel P. Berrange wrote:
-> Currently if DTC is required by configure and not available in the host=
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-> OS install, we exit with an error message telling the user to checkout =
-a
-> git submodule or install the library.
->=20
-> This introduces automatic handling of the git submodule checkout proces=
-s
-> and enables it for dtc. This only runs if building from GIT, so users o=
-f
-> release tarballs still need the system library install. The current sta=
-te
-> of the git checkout is stashed in .git-submodule-status, and a helper
-> program is used to determine if this state matches the desired submodul=
-e
-> state. A dependency against 'Makefile' ensures that the submodule state=
+-- =
 
-> is refreshed at the start of the build process
->=20
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1713825
 
-> +++ b/scripts/git-submodule.sh
-> @@ -0,0 +1,31 @@
-> +#!/bin/bash
-> +
-> +set -e
+Title:
+  Booting Windows 2016 with qxl video crashes qemu
 
-New file, but appears not to be covered by MAINTAINERS; that should be
-fixed.  Also, an explicit copyright/license might be needed.
+Status in QEMU:
+  Incomplete
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Bug description:
+  launched from libvirt.
 
+  qemu version: 2.9.0
+  host: Linux <hostname> 4.9.34-gentoo #1 SMP Sat Jul 29 13:28:43 PDT 2017 =
+x86_64 Intel(R) Core(TM) i7-3930K CPU @ 3.20GHz GenuineIntel GNU/Linux
+  guest: Windows 2016 64 bit
 
---30oLGxGnEkwffTHw9sRJ8AU0BhNDGpQ5K
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  Thread 28 (Thread 0x7f0e2edff700 (LWP 29860)):
+  #0  __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.=
+c:51
+          set =3D {__val =3D {18446744067266837079, 139698892694944, 139699=
+853745096, 139700858749789, 4222451712, 139694281220640, 139694281220741, 1=
+39694281220640, 139694281220640, 139694281220810, =
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+              139694281220940, 139694281220640, 139694281220940, 0, 0, 0}}
+          pid =3D <optimized out>
+          tid =3D <optimized out>
+  #1  0x00007f0ea40b644a in __GI_abort () at abort.c:89
+          save_stage =3D 2
+          act =3D {__sigaction_handler =3D {sa_handler =3D 0x7f0e2edfe5c0, =
+sa_sigaction =3D 0x7f0e2edfe5c0}, sa_mask =3D {__val =3D {139694281219872, =
+139698106269697, 139698892695344, 4, 2676511744, 0, 139698892695144, 0, =
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnNOJwACgkQp6FrSiUn
-Q2pCFAf/Wf+myp7maxK2uS+zsLqxROxj/wTValPxjyGS5pS91SGyXNIqouSlJaSv
-Bu5wWmS6Ef+BmYgLmveNFZjhi/3aBkzoPW6WaB1+EDLPxq9PeZKsb0XaD/mEmqKk
-i1vqbQIKyHXBXtxi3hLY80/w12/R6URTX5g71FDBBdYiR1OxZ1fnfS9DeOF0l2hg
-MerXnFSxquOfoYblgm/EOgcq+Gu2xCnO6opDIS2MvzIxwBtGqN7pwKxoDUh6a3/m
-rwe4E97aJFJmvCfEvhHoa9f/wc904JZ+b2wDTZZJFar00Aq5OPgtzr7TppH1bHg2
-yL2Pr9/eyHjoSroGSs5jT41N8/1BuQ==
-=iSVj
------END PGP SIGNATURE-----
+                139698892694912, 1, 4737316546111099904, 139700859888720, 4=
+737316546111099904, 139700862161824, 139700911349760, 94211934977482}}, sa_=
+flags =3D 416, =
 
---30oLGxGnEkwffTHw9sRJ8AU0BhNDGpQ5K--
+            sa_restorer =3D 0x55af6ceb0500 <__PRETTY_FUNCTION__.36381>}
+          sigs =3D {__val =3D {32, 0 <repeats 15 times>}}
+  #2  0x00007f0ea40abab6 in __assert_fail_base (fmt=3D<optimized out>, asse=
+rtion=3Dassertion@entry=3D0x55af6ceafdca "offset < qxl->vga.vram_size", =
+
+      file=3Dfile@entry=3D0x55af6ceaeaa0 "/var/tmp/portage/app-emulation/qe=
+mu-2.9.0-r2/work/qemu-2.9.0/hw/display/qxl.c", line=3Dline@entry=3D416, =
+
+      function=3Dfunction@entry=3D0x55af6ceb0500 <__PRETTY_FUNCTION__.36381=
+> "qxl_ram_set_dirty") at assert.c:92
+          str =3D 0x7f0d1c026220 "\340r\002\034\r\177"
+          total =3D 4096
+  #3  0x00007f0ea40abb81 in __GI___assert_fail (assertion=3Dassertion@entry=
+=3D0x55af6ceafdca "offset < qxl->vga.vram_size", =
+
+      file=3Dfile@entry=3D0x55af6ceaeaa0 "/var/tmp/portage/app-emulation/qe=
+mu-2.9.0-r2/work/qemu-2.9.0/hw/display/qxl.c", line=3Dline@entry=3D416, =
+
+      function=3Dfunction@entry=3D0x55af6ceb0500 <__PRETTY_FUNCTION__.36381=
+> "qxl_ram_set_dirty") at assert.c:101
+  No locals.
+  #4  0x000055af6cc58805 in qxl_ram_set_dirty (qxl=3D<optimized out>, ptr=
+=3D<optimized out>) at /var/tmp/portage/app-emulation/qemu-2.9.0-r2/work/qe=
+mu-2.9.0/hw/display/qxl.c:416
+          base =3D <optimized out>
+          offset =3D <optimized out>
+          qxl =3D <optimized out>
+          ptr =3D <optimized out>
+          base =3D <optimized out>
+          offset =3D <optimized out>
+  #5  0x000055af6cc5b9e2 in interface_release_resource (sin=3D0x55af71a91ed=
+0, ext=3D...) at /var/tmp/portage/app-emulation/qemu-2.9.0-r2/work/qemu-2.9=
+.0/hw/display/qxl.c:767
+          qxl =3D 0x55af71a91450
+          ring =3D <optimized out>
+          item =3D <optimized out>
+          id =3D 18446690739814400920
+          __func__ =3D "interface_release_resource"
+  #6  0x00007f0ea510afa8 in red_drawable_unref (red_drawable=3D0x7f0d1c0261=
+20) at red-worker.c:101
+  No locals.
+  #7  0x00007f0ea510b609 in red_drawable_unref (red_drawable=3D<optimized o=
+ut>) at red-worker.c:104
+  No locals.
+  #8  0x00007f0ea510eae9 in drawable_unref (drawable=3Ddrawable@entry=3D0x7=
+f0e68285ac0) at display-channel.c:1438
+          display =3D 0x55af71dbd3c0
+          __FUNCTION__ =3D "drawable_unref"
+  #9  0x00007f0ea51109f7 in draw_until (display=3Ddisplay@entry=3D0x55af71d=
+bd3c0, surface=3Dsurface@entry=3D0x7f0e6828aae8, last=3D0x7f0e68285ac0) at =
+display-channel.c:1637
+          container =3D 0x0
+          now =3D 0x7f0e68285ac0
+  #10 0x00007f0ea510f93f in display_channel_draw (display=3D0x55af71dbd3c0,=
+ area=3D0x7f0e2edfe8e0, surface_id=3D<optimized out>) at display-channel.c:=
+1729
+          surface =3D 0x7f0e6828aae8
+          last =3D <optimized out>
+          __FUNCTION__ =3D "display_channel_draw"
+          __func__ =3D "display_channel_draw"
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1713825/+subscriptions
