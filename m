@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dxdjD-0007rL-Cq
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:40:08 -0400
+	(envelope-from <david@redhat.com>) id 1dxeB9-0005WE-1K
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 15:09:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dxdj7-0005tA-JW
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:40:07 -0400
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:54171)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dxdj7-0005lw-CG
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 14:40:01 -0400
-Received: by mail-wm0-x22e.google.com with SMTP id q132so4026408wmd.2
-	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 11:39:59 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1dxeB5-00006H-QW
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 15:08:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38667)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dxeB5-0008WG-Kp
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 15:08:55 -0400
+References: <20170918160012.4317-1-david@redhat.com>
+	<20170918160012.4317-6-david@redhat.com>
+	<bcbe99e8-6b1a-6c50-794a-ab2601a9deda@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <a94e596f-d543-3260-117a-ee21ac5b9945@redhat.com>
+Date: Thu, 28 Sep 2017 21:08:49 +0200
 MIME-Version: 1.0
-In-Reply-To: <6f84eb7d-6c81-f543-155c-659fd0eb5a5c@redhat.com>
-References: <6f84eb7d-6c81-f543-155c-659fd0eb5a5c@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 28 Sep 2017 11:39:38 -0700
-Message-ID: <CAFEAcA9CoA+qw6kVTVLfz3pV4vfQOmPNBwofWANcYdEa4qnXuA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] List-Id change
+In-Reply-To: <bcbe99e8-6b1a-6c50-794a-ab2601a9deda@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 05/27] s390/tcg: turn INTERRUPT_EXT into
+ a mask
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -27,33 +29,33 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, Jeffrey Cody <jcody@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 List-ID: <qemu-devel.nongnu.org>
 
-On 28 September 2017 at 11:29, Laszlo Ersek <lersek@redhat.com> wrote:
-> Hi,
->
-> the List-Id field of recent messages reflected by qemu-devel is no longer
->
->   <qemu-devel.nongnu.org>
->               ^^^^^^
->
-> like it used to be, but
->
->   <qemu-devel.gnu.org>
->               ^^^
->
-> This broke my qemu-devel filter (albeit easy enough to fix).
->
-> Has this been an intentional change in the list software config?
+On 26.09.2017 01:18, Richard Henderson wrote:
+> On 09/18/2017 08:59 AM, David Hildenbrand wrote:
+>> +    } else if (env->pending_int | INTERRUPT_EXT_FLOATING) {
+> 
+> Surely & here.
+> 
 
-I haven't changed anything in the mailing list config. Our mailing lists
-are hosted by the gnu.org folks, and I'm pretty sure that nongnu.org
-and gnu.org are the same system under the hood. It's quite possible
-that a minor change there has resulted in the list-id header changing.
-(You can get at the qemu-devel archives via either hostname, for
-instance.)
+Yes, the code just worked because the next check is a
+g_assert_not_reached() :)
 
-thanks
--- PMM
+Thanks!
+
+> Otherwise,
+> 
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> 
+> 
+> r~
+> 
+
+
+-- 
+
+Thanks,
+
+David
