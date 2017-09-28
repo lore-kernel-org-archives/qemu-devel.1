@@ -1,34 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dxeR9-0000pK-I6
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 15:25:34 -0400
+	(envelope-from <david@redhat.com>) id 1dxfYb-0003XB-Qj
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 16:37:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dxeR6-00006u-DI
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 15:25:31 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43002)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dxeR6-00006P-7C
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 15:25:28 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dxeR3-0000Cq-AW
-	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 19:25:25 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 468982E8490
-	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 19:25:25 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 Sep 2017 19:05:45 -0000
-From: ChristianEhrhardt <1390520@bugs.launchpad.net>
-Reply-To: Bug 1390520 <1390520@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20141107160655.5759.49372.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150662554562.30723.12604467923318936801.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1390520] Re: virtual machine fails to start with
- connected audio cd
+	(envelope-from <david@redhat.com>) id 1dxfYX-0002yp-SY
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 16:37:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43778)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dxfYX-0002y0-Jd
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 16:37:13 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Thu, 28 Sep 2017 22:36:38 +0200
+Message-Id: <20170928203708.9376-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 00/30] s390x: SMP for TCG
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -37,67 +21,124 @@ List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: thuth@redhat.com, cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <richard.henderson@linaro.org>
 List-ID: <qemu-devel.nongnu.org>
 
-Since we are waiting on this as a wishlist feature on upstream I
-invalidate the tasks we have on the older releases for now.
+This series is based on a couple of other patches floating around on
+the mailing list (e.g. cleanups and LAP). The fist patches of v1 have
+been sent as a separate series.
 
-** Changed in: libvirt (Ubuntu)
-   Importance: Medium =3D> Wishlist
+As I am working on kvm-unit-tests for SIGP, I discovered some bugs that
+have been fixed in this series.
 
-** Changed in: libvirt (Ubuntu Trusty)
-       Status: Confirmed =3D> Won't Fix
+======================================
+I'll be on vacation until 15. October.
+======================================
 
--- =
+This series contains:
+- properly implement local external interrupts for TCG. Take care of
+  interrupt masks. Cleanup service interrupt handling.
+- factor out KVM SIGP handling code into common code
+- implement missing SIGP orders for TCG handled by the kernel for KVM
+  (including STOP and RESTART interrupts)
+- make TCG use the new SIGP code - experimental SMP support for s390x TCG
+- refactor STFL(E) implementation for TCG
+- bunch of cleanups
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1390520
+Basically all SIGP instructions are fully supported.
 
-Title:
-  virtual machine fails to start with connected audio cd
+Thanks to Aurelien Jarno for the initital prototype and showcasing that
+supporting experimental SMP code can be implemented quite easily.
 
-Status in QEMU:
-  New
-Status in libvirt package in Ubuntu:
-  Confirmed
-Status in libvirt source package in Trusty:
-  Won't Fix
+CPU hotplug does still not work correctly.
 
-Bug description:
-  when connecting a data cd with a virtual machine (IDE CDROM 1), the virtu=
-al machine starts up and the data cd is accessable (for example to install =
-software package or drivers),
-  but connecting an audio cd the following error appears:
+v1 -> v2:
+- "turn INTERRUPT_EXT into a mask"
+-- fix one check (& vs |)
+-- rename EXT_FLOATING to EXT_SERVICE
+-- drop duplicate storing of interrupt parameters for queded ext irqa
+- "s390x/tcg: cleanup service interrupt injectio"
+-- added, as we don't have virtio irq anymore (for legacy transport)
+- "s390x/tcg: rework checking for deliverable interrupts"
+-- added, we actually check if interrupts are deliverable
+- "s390x/tcg: take care of external interrupt subclasses"
+-- properly check for the subclasses we implement
+- "target/s390x: factor out handling of WAIT PSW into s390_handle_wait()"
+-- renamed handle_wait() -> s390_handle_wait()
+- "s390x/tcg: handle WAIT PSWs during interrupt injection"
+-- any feedback if this is the right way to do it? needed for stop interrupts
+- "target/s390x: interpret PSW_MASK_WAIT only for TCG"
+-- identified while testing SIGP
+- "s390x/kvm: pass ipb directly into handle_sigp()"
+-- order parameters alphabetically
+- "s390x/kvm: factor out storing of CPU status"
+-- the rework/conversion has been integrated as a fix (Connys queue)
+- "MAINTAINERS: use s390 KVM maintainers for target/s390x/sigp.c"
+-- added as requested by Christian
+- "s390x/tcg: implement STOP and RESET interrupts for TCG"
+-- some change due to the way interrupts are handled after the rework
+   for deliverable interrupts
+- "s390x/cpumodel: allow to enable SENSE RUNNING STATUS for qemu"
+-- added, because we implement SENSE RUNNING STATUS
+- "target/s390x: special handling when starting a CPU with WAIT PSW"
+-- identified while testing SIGP code
 
-  -------------------------------------------------------------------------=
-------------------------------------------------------
-  cannot read header '/dev/sr0': Input/output error
 
-  Traceback (most recent call last):
-    File "/usr/share/virt-manager/virtManager/details.py", line 2530, in _c=
-hange_config_helper
-      func(*args)
-    File "/usr/share/virt-manager/virtManager/domain.py", line 850, in hotp=
-lug_storage_media
-      self.attach_device(devobj)
-    File "/usr/share/virt-manager/virtManager/domain.py", line 798, in atta=
-ch_device
-      self._backend.attachDevice(devxml)
-    File "/usr/lib/python2.7/dist-packages/libvirt.py", line 493, in attach=
-Device
-      if ret =3D=3D -1: raise libvirtError ('virDomainAttachDevice() failed=
-', dom=3Dself)
-  libvirtError: cannot read header '/dev/sr0': Input/output error
-  -------------------------------------------------------------------------=
----------------------------------------------------
+Based on: https://github.com/cohuck/qemu.git s390-next
+Available on: https://github.com/davidhildenbrand/qemu.git s390x-queue
 
-  Description:    Ubuntu 14.04.1 LTS
-  Release:        14.04
+David Hildenbrand (30):
+  s390x/tcg: turn INTERRUPT_EXT into a mask
+  s390x/tcg: cleanup service interrupt injection
+  s390x/tcg: injection of emergency signals and external calls
+  s390x/tcg: rework checking for deliverable interrupts
+  s390x/tcg: take care of external interrupt subclasses
+  s390x/tcg: STOPPED cpus can never wake up
+  s390x/tcg: a CPU cannot switch state due to an interrupt
+  target/s390x: factor out handling of WAIT PSW into s390_handle_wait()
+  s390x/tcg: handle WAIT PSWs during interrupt injection
+  target/s390x: interpret PSW_MASK_WAIT only for TCG
+  s390x/kvm: pass ipb directly into handle_sigp()
+  s390x/kvm: generalize SIGP stop and restart interrupt injection
+  s390x/kvm: factor out storing of CPU status
+  s390x/kvm: factor out storing of adtl CPU status
+  s390x/kvm: drop two debug prints
+  s390x/kvm: factor out SIGP code into sigp.c
+  MAINTAINERS: use s390 KVM maintainers for target/s390x/sigp.c
+  s390x/kvm: factor out actual handling of STOP interrupts
+  s390x/tcg: implement SIGP SENSE RUNNING STATUS
+  s390x/tcg: implement SIGP SENSE
+  s390x/tcg: implement SIGP EXTERNAL CALL
+  s390x/tcg: implement SIGP EMERGENCY SIGNAL
+  s390x/tcg: implement SIGP CONDITIONAL EMERGENCY SIGNAL
+  s390x/tcg: implement STOP and RESET interrupts for TCG
+  s390x/tcg: flush the tlb on SIGP SET PREFIX
+  s390x/tcg: switch to new SIGP handling code
+  s390x/cpumodel: allow to enable SENSE RUNNING STATUS for qemu
+  s390x/tcg: unlock NMI
+  s390x/tcg: refactor stfl(e) to use s390_get_feat_block()
+  target/s390x: special handling when starting a CPU with WAIT PSW
 
-  qemu:
-    Installiert:           2.0.0+dfsg-2ubuntu1.6
-    Installationskandidat: 2.0.0+dfsg-2ubuntu1.6
+ MAINTAINERS                |   1 +
+ hw/s390x/s390-virtio-ccw.c |  11 +-
+ target/s390x/Makefile.objs |   1 +
+ target/s390x/cpu.c         |  35 ++--
+ target/s390x/cpu.h         |  42 ++--
+ target/s390x/cpu_models.c  |   1 +
+ target/s390x/excp_helper.c | 116 +++++++----
+ target/s390x/helper.c      | 132 ++++++++++--
+ target/s390x/helper.h      |   2 +-
+ target/s390x/internal.h    |  23 +-
+ target/s390x/interrupt.c   | 172 ++++++++++++++-
+ target/s390x/kvm-stub.c    |  13 +-
+ target/s390x/kvm.c         | 491 +++----------------------------------------
+ target/s390x/kvm_s390x.h   |   3 +-
+ target/s390x/misc_helper.c | 109 ++++------
+ target/s390x/sigp.c        | 508 +++++++++++++++++++++++++++++++++++++++++++++
+ target/s390x/trace-events  |   4 +-
+ target/s390x/translate.c   |  12 +-
+ 18 files changed, 1013 insertions(+), 663 deletions(-)
+ create mode 100644 target/s390x/sigp.c
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1390520/+subscriptions
+-- 
+2.13.5
