@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dxRtA-000250-IT
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 02:01:40 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dxSUz-000792-5L
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 02:40:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dxRt7-0006dy-Gy
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 02:01:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41496)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dxRt7-0006dj-AV
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 02:01:33 -0400
-References: <20170913132417.24384-1-david@redhat.com>
-	<20170913132417.24384-17-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f07c7045-7809-c008-e521-bf7aa6189c72@redhat.com>
-Date: Thu, 28 Sep 2017 08:01:25 +0200
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dxSUw-00072k-0v
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 02:40:41 -0400
+References: <1506264466-28252-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1506264466-28252-7-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170926034706.GG12504@umbus>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <aaa2b280-4028-b593-e92a-5125d96fcbb6@ilande.co.uk>
+Date: Thu, 28 Sep 2017 07:40:18 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170913132417.24384-17-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170926034706.GG12504@umbus>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 16/22] s390x: allow cpu hotplug via
- device_add
+Subject: Re: [Qemu-devel] [PATCH 6/7] mac_dbdma: change
+ DBDMA_register_channel to a MAC_DBDMA type method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,20 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: Matthew Rosato <mjrosato@linux.vnet.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, borntraeger@de.ibm.com, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 13.09.2017 15:24, David Hildenbrand wrote:
-> E.g. the following now works:
->     device_add host-s390-cpu,id=cpu1,core-id=1
+On 26/09/17 04:47, David Gibson wrote:
 
- Hi David,
+> On Sun, Sep 24, 2017 at 03:47:45PM +0100, Mark Cave-Ayland wrote:
+>> Using this we can change the MACIO_IDE instance to register the channel
+>> itself via a type method instead of requiring a separate
+>> DBDMA_register_channel() function.
+>>
+>> As a consequence of this it is now possible to remove the old external
+>> macio_ide_register_dma() function.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> 
+> Ok, two concerns about this.
+> 
+> First, you've added the function pointer to the instance, not to the
+> class, which is not how a QOM method would normally be done.
 
-FYI, this introduced a possibility to crash QEMU with the none machine:
+Yeah I did think about whether I needed to create a full class but was
+torn since as you say there is only one implementation.
 
-$ s390x-softmmu/qemu-system-s390x -M none -nographic
-QEMU 2.10.50 monitor - type 'help' for more information
-(qemu) device_add qemu-s390-cpu
-Segmentation fault (core dumped)
+> More generally, though, why is a method preferable to a plain
+> function?  AFAICT it's not plausible that there will ever be more than
+> one implementation of the method.
+> 
+> Same comments apply to patch 7/7.
 
- Thomas
+For me it's really for encapsulation. It seems a little odd requiring a
+global function to configure a QOM object to which I already have a
+reference.
+
+If I were to redo the last 2 patches using a proper class, would you
+accept them?
+
+
+ATB,
+
+Mark.
