@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dxTky-0000cj-0N
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 04:01:18 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dxTl2-0000do-6D
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 04:01:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dxTkt-0007nE-48
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 04:01:16 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:58043)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1dxTks-0007lg-Qt
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 04:01:11 -0400
-MIME-version: 1.0
-Content-type: text/plain; charset="utf-8"; format="flowed"
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Message-id: <00d3ead7-56e5-1093-bb8b-b6471192bf73@samsung.com>
-Date: Thu, 28 Sep 2017 11:01:01 +0300
-In-reply-to: <20170921115746.GB2717@work-vm>
-Content-language: en-GB
-References: <1505839684-10046-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170919164825eucas1p213639e95387bf054270d020f1d7dbfe9@eucas1p2.samsung.com>
-	<1505839684-10046-8-git-send-email-a.perevalov@samsung.com>
-	<20170921115746.GB2717@work-vm>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v10 07/10] migration: calculate vCPU
- blocktime on dst side
+	(envelope-from <dgibson@ozlabs.org>) id 1dxTkw-0007pm-6r
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 04:01:20 -0400
+Date: Thu, 28 Sep 2017 17:53:31 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170928075331.GC6445@umbus.fritz.box>
+References: <20170328021651.19350-1-david@gibson.dropbear.id.au>
+	<20170328021651.19350-3-david@gibson.dropbear.id.au>
+	<20170426182535-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="GZVR6ND4mMseVXL/"
+Content-Disposition: inline
+In-Reply-To: <20170426182535-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [RFC for-2.10 2/3] pci: Allow host bridges to
+ override PCI/PCIe hybrid device behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,360 +26,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com, eblake@redhat.com, quintela@redhat.com, heetae82.ahn@samsung.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: ehabkost@redhat.com, aik@ozlabs.ru, marcel@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lersek@redhat.com
 
-On 09/21/2017 02:57 PM, Dr. David Alan Gilbert wrote:
-> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
->> This patch provides blocktime calculation per vCPU,
->> as a summary and as a overlapped value for all vCPUs.
->>
->> This approach was suggested by Peter Xu, as an improvements of
->> previous approch where QEMU kept tree with faulted page address and cp=
-us bitmask
->> in it. Now QEMU is keeping array with faulted page address as value an=
-d vCPU
->> as index. It helps to find proper vCPU at UFFD_COPY time. Also it keep=
-s
->> list for blocktime per vCPU (could be traced with page_fault_addr)
->>
->> Blocktime will not calculated if postcopy_blocktime field of
->> MigrationIncomingState wasn't initialized.
->>
->> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
->> ---
->>   migration/postcopy-ram.c | 138 +++++++++++++++++++++++++++++++++++++=
-+++++++++-
->>   migration/trace-events   |   5 +-
->>   2 files changed, 140 insertions(+), 3 deletions(-)
->>
->> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
->> index cc78981..9a5133f 100644
->> --- a/migration/postcopy-ram.c
->> +++ b/migration/postcopy-ram.c
->> @@ -110,7 +110,6 @@ static struct PostcopyBlocktimeContext *blocktime_=
-context_new(void)
->>  =20
->>       ctx->exit_notifier.notify =3D migration_exit_cb;
->>       qemu_add_exit_notifier(&ctx->exit_notifier);
->> -    add_migration_state_change_notifier(&ctx->postcopy_notifier);
->>       return ctx;
->>   }
->>  =20
->> @@ -559,6 +558,136 @@ static int ram_block_enable_notify(const char *b=
-lock_name, void *host_addr,
->>       return 0;
->>   }
->>  =20
->> +static int get_mem_fault_cpu_index(uint32_t pid)
->> +{
->> +    CPUState *cpu_iter;
->> +
->> +    CPU_FOREACH(cpu_iter) {
->> +        if (cpu_iter->thread_id =3D=3D pid) {
->> +            trace_get_mem_fault_cpu_index(cpu_iter->cpu_index, pid);
->> +            return cpu_iter->cpu_index;
->> +        }
->> +    }
->> +    trace_get_mem_fault_cpu_index(-1, pid);
->> +    return -1;
->> +}
->> +
->> +/*
->> + * This function is being called when pagefault occurs. It
->> + * tracks down vCPU blocking time.
->> + *
->> + * @addr: faulted host virtual address
->> + * @ptid: faulted process thread id
->> + * @rb: ramblock appropriate to addr
->> + */
->> +static void mark_postcopy_blocktime_begin(uint64_t addr, uint32_t pti=
-d,
->> +                                          RAMBlock *rb)
->> +{
->> +    int cpu, already_received;
->> +    MigrationIncomingState *mis =3D migration_incoming_get_current();
->> +    PostcopyBlocktimeContext *dc =3D mis->blocktime_ctx;
->> +    int64_t now_ms;
->> +
->> +    if (!dc || ptid =3D=3D 0) {
->> +        return;
->> +    }
->> +    cpu =3D get_mem_fault_cpu_index(ptid);
->> +    if (cpu < 0) {
->> +        return;
->> +    }
->> +
->> +    now_ms =3D qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->> +    if (dc->vcpu_addr[cpu] =3D=3D 0) {
->> +        atomic_inc(&dc->smp_cpus_down);
->> +    }
->> +
->> +    atomic_xchg__nocheck(&dc->vcpu_addr[cpu], addr);
->> +    atomic_xchg__nocheck(&dc->last_begin, now_ms);
->> +    atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], now_ms);
->> +
->> +    already_received =3D ramblock_recv_bitmap_test(rb, (void *)addr);
->> +    if (already_received) {
->> +        atomic_xchg__nocheck(&dc->vcpu_addr[cpu], 0);
->> +        atomic_xchg__nocheck(&dc->page_fault_vcpu_time[cpu], 0);
->> +        atomic_sub(&dc->smp_cpus_down, 1);
->> +    }
->> +    trace_mark_postcopy_blocktime_begin(addr, dc, dc->page_fault_vcpu=
-_time[cpu],
->> +                                        cpu, already_received);
->> +}
->> +
->> +/*
->> + *  This function just provide calculated blocktime per cpu and trace=
- it.
->> + *  Total blocktime is calculated in mark_postcopy_blocktime_end.
->> + *
->> + *
->> + * Assume we have 3 CPU
->> + *
->> + *      S1        E1           S1               E1
->> + * -----***********------------xxx***************--------------------=
-----> CPU1
->> + *
->> + *             S2                E2
->> + * ------------****************xxx-----------------------------------=
-----> CPU2
->> + *
->> + *                         S3            E3
->> + * ------------------------****xxx********---------------------------=
-----> CPU3
->> + *
->> + * We have sequence S1,S2,E1,S3,S1,E2,E3,E1
->> + * S2,E1 - doesn't match condition due to sequence S1,S2,E1 doesn't i=
-nclude CPU3
->> + * S3,S1,E2 - sequence includes all CPUs, in this case overlap will b=
-e S1,E2 -
->> + *            it's a part of total blocktime.
->> + * S1 - here is last_begin
->> + * Legend of the picture is following:
->> + *              * - means blocktime per vCPU
->> + *              x - means overlapped blocktime (total blocktime)
->> + *
->> + * @addr: host virtual address
->> + */
->> +static void mark_postcopy_blocktime_end(uint64_t addr)
->> +{
->> +    MigrationIncomingState *mis =3D migration_incoming_get_current();
->> +    PostcopyBlocktimeContext *dc =3D mis->blocktime_ctx;
->> +    int i, affected_cpu =3D 0;
->> +    int64_t now_ms;
->> +    bool vcpu_total_blocktime =3D false;
->> +
->> +    if (!dc) {
->> +        return;
->> +    }
->> +
->> +    now_ms =3D qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->> +
->> +    /* lookup cpu, to clear it,
->> +     * that algorithm looks straighforward, but it's not
->> +     * optimal, more optimal algorithm is keeping tree or hash
->> +     * where key is address value is a list of  */
->> +    for (i =3D 0; i < smp_cpus; i++) {
->> +        uint64_t vcpu_blocktime =3D 0;
->> +        if (atomic_fetch_add(&dc->vcpu_addr[i], 0) !=3D addr) {
->> +            continue;
->> +        }
->> +        atomic_xchg__nocheck(&dc->vcpu_addr[i], 0);
->> +        vcpu_blocktime =3D now_ms -
->> +            atomic_fetch_add(&dc->page_fault_vcpu_time[i], 0);
->> +        affected_cpu +=3D 1;
->> +        /* we need to know is that mark_postcopy_end was due to
->> +         * faulted page, another possible case it's prefetched
->> +         * page and in that case we shouldn't be here */
->> +        if (!vcpu_total_blocktime &&
->> +            atomic_fetch_add(&dc->smp_cpus_down, 0) =3D=3D smp_cpus) =
-{
->> +            vcpu_total_blocktime =3D true;
->> +        }
->> +        /* continue cycle, due to one page could affect several vCPUs=
- */
->> +        dc->vcpu_blocktime[i] +=3D vcpu_blocktime;
->> +    }
-> Unfortunately this still isn't thread safe; consider the code in
-> mark_postcopy_blocktime_begin is:
->
->   1 check vcpu_addr
->   2 write vcpu_addr
->   3 write last_begin
->   4 write vcpu_time
->   5 smp_cpus_down++
->
->   6  already_received:
->   7     write addr =3D 0
->   8     write vcpu_time =3D 0
->   9     smp_cpus_down--
->
-> and this code is:
->   a check vcpu_addr
->   b write vcpu_addr
->   c read vcpu_time
->   d read smp_cpus_down
->
->   e dec smp_cpus_down
->
-> if (a) happens after (2) but before (3), (c) and (d) can also
-> happen before (3), and so you end up reading a bogus
-> vcpu_time.
->
-> This is tricky to get right; if you changed the source to do:
->   1 check vcpu_addr
->   3 write last_begin
->   4 write vcpu_time
->   5 smp_cpus_down++
->   2 write vcpu_addr
->
->   6  already_received:
->   7     write addr =3D 0
->   8     write vcpu_time =3D 0
->   9     smp_cpus_down--
->
-> I think it's safer;  if you read a good vcpu_addr you know
-> that the vcpu_time has already been written.
->
-> However, can this check (a) happen between  the new (2) and (7) ?
-> It's slim but I think possibly; on the receiving side we've
-> just set the bitmap flag to say received - if a fault comes
-> in at about the same time then we could end up with
->
-> 1,3,4,5,2 ab 6 7 8 9 cde
->
-> So again we end up reading a bogus vcpu_time and double decrement
-> smp_cpus_down.
->
-> So I think we have to have:
->
->    a'  read vcpu_addr
->    b'  read vcpu_time
->    c'  if vcpu_addr =3D=3D addr && vcpu_time !=3D 0 ...
->    d'    clear vcpu_addr
->    e'    read/dec smp_cpus_down
-I think even in this sequence it's possible to have
-lookup condition
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (atomic_fetch_add(&dc->vcp=
-u_addr[i], 0) !=3D addr ||
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 atomi=
-c_fetch_add(&dc->page_fault_vcpu_time[i], 0) =3D=3D 0) {
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conti=
-nue;
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-in you terms it's (not c)
-between
-atomic_xchg__nocheck(&dc->vcpu_addr[cpu], addr); - (2)
-and
-atomic_xchg__nocheck(&dc->vcpu_addr[cpu], 0); - (7)
-2c7
-Probability is lesser, but it still exists.
-Here comes up a second bitmap, but it will increase code complexity.
-BTW, remind me why we don't protect body of these functions by mutex?
 
->
-> You should comment to say where the order is important as well;
-> because we'll never remember this - it's hairy!
-> (Better suggestions welcome)
->
-> Dave
->
->> +    atomic_sub(&dc->smp_cpus_down, affected_cpu);
->> +    if (vcpu_total_blocktime) {
->> +        dc->total_blocktime +=3D now_ms - atomic_fetch_add(&dc->last_=
-begin, 0);
->> +    }
->> +    trace_mark_postcopy_blocktime_end(addr, dc, dc->total_blocktime,
->> +                                      affected_cpu);
->> +}
->> +
->>   /*
->>    * Handle faults detected by the USERFAULT markings
->>    */
->> @@ -636,8 +765,11 @@ static void *postcopy_ram_fault_thread(void *opaq=
-ue)
->>           rb_offset &=3D ~(qemu_ram_pagesize(rb) - 1);
->>           trace_postcopy_ram_fault_thread_request(msg.arg.pagefault.ad=
-dress,
->>                                                   qemu_ram_get_idstr(r=
-b),
->> -                                                rb_offset);
->> +                                                rb_offset,
->> +                                                msg.arg.pagefault.fea=
-t.ptid);
->>  =20
->> +        mark_postcopy_blocktime_begin((uintptr_t)(msg.arg.pagefault.a=
-ddress),
->> +                                      msg.arg.pagefault.feat.ptid, rb=
-);
->>           /*
->>            * Send the request to the source - we want to request one
->>            * of our host page sizes (which is >=3D TPS)
->> @@ -727,6 +859,8 @@ static int qemu_ufd_copy_ioctl(int userfault_fd, v=
-oid *host_addr,
->>       if (!ret) {
->>           ramblock_recv_bitmap_set_range(rb, host_addr,
->>                                          pagesize / qemu_target_page_s=
-ize());
->> +        mark_postcopy_blocktime_end((uint64_t)(uintptr_t)host_addr);
->> +
->>       }
->>       return ret;
->>   }
->> diff --git a/migration/trace-events b/migration/trace-events
->> index d2910a6..01f30fe 100644
->> --- a/migration/trace-events
->> +++ b/migration/trace-events
->> @@ -114,6 +114,8 @@ process_incoming_migration_co_end(int ret, int ps)=
- "ret=3D%d postcopy-state=3D%d"
->>   process_incoming_migration_co_postcopy_end_main(void) ""
->>   migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=3D=
-%p ioctype=3D%s"
->>   migration_set_outgoing_channel(void *ioc, const char *ioctype, const=
- char *hostname)  "ioc=3D%p ioctype=3D%s hostname=3D%s"
->> +mark_postcopy_blocktime_begin(uint64_t addr, void *dd, int64_t time, =
-int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %" PRId64 ", c=
-pu: %d, already_received: %d"
->> +mark_postcopy_blocktime_end(uint64_t addr, void *dd, int64_t time, in=
-t affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %" PRId64 ", affected=
-_cpu: %d"
->>  =20
->>   # migration/rdma.c
->>   qemu_rdma_accept_incoming_migration(void) ""
->> @@ -190,7 +192,7 @@ postcopy_ram_enable_notify(void) ""
->>   postcopy_ram_fault_thread_entry(void) ""
->>   postcopy_ram_fault_thread_exit(void) ""
->>   postcopy_ram_fault_thread_quit(void) ""
->> -postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramb=
-lock, size_t offset) "Request for HVA=3D0x%" PRIx64 " rb=3D%s offset=3D0x=
-%zx"
->> +postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramb=
-lock, size_t offset, uint32_t pid) "Request for HVA=3D0x%" PRIx64 " rb=3D=
-%s offset=3D0x%zx pid=3D%u"
->>   postcopy_ram_incoming_cleanup_closeuf(void) ""
->>   postcopy_ram_incoming_cleanup_entry(void) ""
->>   postcopy_ram_incoming_cleanup_exit(void) ""
->> @@ -199,6 +201,7 @@ save_xbzrle_page_skipping(void) ""
->>   save_xbzrle_page_overflow(void) ""
->>   ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big =
-wait: %" PRIu64 " milliseconds, %d iterations"
->>   ram_load_complete(int ret, uint64_t seq_iter) "exit_code %d seq iter=
-ation %" PRIu64
->> +get_mem_fault_cpu_index(int cpu, uint32_t pid) "cpu: %d, pid: %u"
->>  =20
->>   # migration/exec.c
->>   migration_exec_outgoing(const char *cmd) "cmd=3D%s"
->> --=20
->> 1.9.1
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
->
->
+--GZVR6ND4mMseVXL/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Apr 26, 2017 at 06:29:05PM +0300, Michael S. Tsirkin wrote:
+> On Tue, Mar 28, 2017 at 01:16:50PM +1100, David Gibson wrote:
+> > Currently PCI/PCIe hybrid devices - that is, devices which can appear as
+> > either plain PCI or PCIe depending on where they're attached - will only
+> > appear in PCIe mode if they're attached to a PCIe bus via a root port or
+> > downstream port.
+> >=20
+> > This is correct for "standard" PCIe setups, but there are some platforms
+> > which need different behaviour (notably "pseries" whose paravirtualized
+> > PCI host bridges have some idiosyncracies).
+> >=20
+> > This patch allows the host bridge to override the normal behaviour.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  hw/pci/pci.c              | 11 +++++++++--
+> >  include/hw/pci/pci_host.h |  1 +
+> >  2 files changed, 10 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> > index 779787b..ac68065 100644
+> > --- a/hw/pci/pci.c
+> > +++ b/hw/pci/pci.c
+> > @@ -392,9 +392,16 @@ bool pci_bus_is_root(PCIBus *bus)
+> > =20
+> >  bool pci_allow_hybrid_pcie(PCIDevice *pci_dev)
+> >  {
+> > -    PCIBus *bus =3D pci_dev->bus;
+> > +    PCIHostState *host_bridge =3D PCI_HOST_BRIDGE(pci_device_root_bus(=
+pci_dev)->qbus.parent);
+> > +    PCIHostBridgeClass *hc =3D PCI_HOST_BRIDGE_GET_CLASS(host_bridge);
+> > +
+> > +    if (hc->allow_hybrid_pcie) {
+> > +        return hc->allow_hybrid_pcie(host_bridge, pci_dev);
+> > +    } else {
+> > +        PCIBus *bus =3D pci_dev->bus;
+> > =20
+> > -    return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
+> > +        return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
+> > +    }
+> >  }
+> > =20
+> >  void pci_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *pa=
+rent,
+>=20
+> I think I'd prefer adding some flags in PCIBus. While we are at it,
+> is_root can become a flag too.
+
+Good idea!  Looking at it the is_root() method really is bogus, I have
+a draft patch which replaces it with a flag.  (In fact the other
+PCIBusClass methods look kind of bogus too, I'll see if I can find
+time to do something about that).
+
+>=20
+> > diff --git a/include/hw/pci/pci_host.h b/include/hw/pci/pci_host.h
+> > index ba31595..ad03cca 100644
+> > --- a/include/hw/pci/pci_host.h
+> > +++ b/include/hw/pci/pci_host.h
+> > @@ -54,6 +54,7 @@ typedef struct PCIHostBridgeClass {
+> >      SysBusDeviceClass parent_class;
+> > =20
+> >      const char *(*root_bus_path)(PCIHostState *, PCIBus *);
+> > +    bool (*allow_hybrid_pcie)(PCIHostState *, PCIDevice *);
+> >  } PCIHostBridgeClass;
+> > =20
+> >  /* common internal helpers for PCI/PCIe hosts, cut off overflows */
+>=20
 
 --=20
-Best regards,
-Alexey Perevalov
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--GZVR6ND4mMseVXL/
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnMqngACgkQbDjKyiDZ
+s5L8XQ/8CNg7Vxn/bk1wDeuzjiFOUIEDMGc30MQpJ+NES00q4Ggz+T4Ms1ofLRBr
+sG0Qz9nSXSnIJe19X6HM9MUg1quPP5RxjwFgRncUQRmlZ5ta2DbP8GeaKnJ/5kVY
+5Y7wexFoyZRwVlNVp0DCZDSL/a7S2eWu7wgXZnBYeQrKoDdBTDiiuGtJjhcJaSps
+VmwmSK0AzFZahkUvmAiU3sJJKzZn7GY7+CTu9qvCneZozCEyI541XWrGYrWlSiIH
+2MpFhQGA1uB5FkxLkxbrRJ8iqKyVWw6FOpgHZWfChqTwkxUiEFtdebitN8gVm10A
+mjKLeSMEd0M8wYfEVABfzjJRT+hNYrmo5b8DeuB1MuhkMqoztTxXpFOs34ZODXQw
+R/R1tGNV6YFXw4h50FIvhoVJGpcsDRm7zA2nfOX4QSvVZWKMO0PN1bkXHWad4FQx
+9eQDY5M56/KJcIDSKy/mo359b9qy3noUUagPH5rcNVY8JV0wawbAEgsBvZ6IvaT8
+4lgAMzFTaKWtFJ0zKp94LoMTH7D3/3MGPcUiOh0PBqfu4JY6t4lItE30x9WWgi/z
+ynu+cpjpqlx5eIZKe1h/O3c7sk8xCgcaLBBOIdpv97IwJleel7Lbj7b1YHculEQx
+eGbaPvIxLWyIcoyN0Ahxq7LwiVTwZWxVU1A8Z3kNypaEry2luaY=
+=nUZJ
+-----END PGP SIGNATURE-----
+
+--GZVR6ND4mMseVXL/--
