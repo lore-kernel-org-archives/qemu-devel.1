@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dxQCT-0000cS-He
+	(envelope-from <dgibson@ozlabs.org>) id 1dxQCT-0000cR-FX
 	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 00:13:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dxQCR-0003V6-SG
+	(envelope-from <dgibson@ozlabs.org>) id 1dxQCR-0003VL-Sw
 	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 00:13:25 -0400
-Date: Thu, 28 Sep 2017 13:58:15 +1000
+Date: Thu, 28 Sep 2017 14:01:47 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170928035815.GX12504@umbus>
-References: <150287457293.9760.17827532208744487789.stgit@aravinda>
-	<150287474187.9760.12052550430995757993.stgit@aravinda>
-	<20170817013934.GC5509@umbus.fritz.box>
-	<555e187e-38af-d897-85b7-f08364b264fd@linux.vnet.ibm.com>
-	<20170822020854.GY12356@umbus.fritz.box>
-	<98ef38a4-9c09-adec-6f0c-b280e5349d64@linux.vnet.ibm.com>
-	<20170927071508.GP12504@umbus>
-	<bcc42ba6-6c71-d8d0-a196-7588a4d4a0d2@linux.vnet.ibm.com>
+Message-ID: <20170928040147.GY12504@umbus>
+References: <150633285374.14880.11614678065344980502.stgit@bahia.lan>
+	<20170926025739.GF12504@umbus> <20170926091928.50e115ff@bahia.lan>
+	<20170926102936.1a099080@nial.brq.redhat.com>
+	<20170927063903.GO12504@umbus>
+	<20170927141144.151a468a@nial.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="9CzcV6dAFIr7O1Ie"
+	protocol="application/pgp-signature"; boundary="9Q79yvCDNTHf0qBd"
 Content-Disposition: inline
-In-Reply-To: <bcc42ba6-6c71-d8d0-a196-7588a4d4a0d2@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] ppc: spapr: Handle "ibm,
- nmi-register" and "ibm, nmi-interlock" RTAS calls
+In-Reply-To: <20170927141144.151a468a@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] spapr: move registration of "host" CPU
+ core type to machine code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,151 +28,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru, mahesh@linux.vnet.ibm.com, benh@au1.ibm.com, paulus@samba.org, sam.bobroff@au1.ibm.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 
 
---9CzcV6dAFIr7O1Ie
+--9Q79yvCDNTHf0qBd
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 27, 2017 at 05:23:51PM +0530, Aravinda Prasad wrote:
+On Wed, Sep 27, 2017 at 02:11:44PM +0200, Igor Mammedov wrote:
+> On Wed, 27 Sep 2017 16:39:03 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
 >=20
->=20
-> On Wednesday 27 September 2017 12:45 PM, David Gibson wrote:
-> > On Thu, Sep 21, 2017 at 02:39:06PM +0530, Aravinda Prasad wrote:
-> >>
-> >>
-> >> On Tuesday 22 August 2017 07:38 AM, David Gibson wrote:
-> >>
-> >> [ . . . ]
-> >>
-> >>>>>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> >>>>>> index 46012b3..eee8d33 100644
-> >>>>>> --- a/include/hw/ppc/spapr.h
-> >>>>>> +++ b/include/hw/ppc/spapr.h
-> >>>>>> @@ -123,6 +123,12 @@ struct sPAPRMachineState {
-> >>>>>>       * occurs during the unplug process. */
-> >>>>>>      QTAILQ_HEAD(, sPAPRDIMMState) pending_dimm_unplugs;
-> >>>>>> =20
-> >>>>>> +    /* State related to "ibm,nmi-register" and "ibm,nmi-interlock=
-" calls */
-> >>>>>> +    target_ulong guest_machine_check_addr;
-> >>>>>> +    bool mc_in_progress;
-> >>>>>> +    int mc_cpu;
-> >>>>>
-> >>>>> mc_cpu isn't actually used yet in this patch.  In any case it and
-> >>>>> mc_in_progress could probably be folded together, no?
-> >>>>
-> >>>> It is possible to fold mc_cpu and mc_in_progress together with the
-> >>>> convention that if it is set to -1 mc is not in progress otherwise i=
-t is
-> >>>> set to the CPU handling the mc.
-> >>>>
-> >>>>>
-> >>>>> These values will also need to be migrated, AFAICT.
-> >>>>
-> >>>> I am thinking of how to handle the migration when machine check hand=
-ling
-> >>>> is in progress. Probably wait for machine check handling to complete
-> >>>> before migrating as the error could be irrelevant once migrated to a=
- new
-> >>>> hardware. If that is the case we don't need to migrate these values.
-> >>>
-> >>> Ok.
-> >>
-> >> This is what I think about handling machine check during migration bas=
-ed
-> >> on my understanding of the VM migration code.
-> >>
-> >> There are two possibilities here. First, migration can be initiated
-> >> while the machine check handling is in progress. Second, A machine che=
-ck
-> >> error can happen when the migration is in progress.
-> >>
-> >> To handle the first case we can add migrate_add_blocker() call when we
-> >> start handling the machine check error and issue migrate_del_blocker()
-> >> when done. I think this should solve the issue.
-> >>
-> >> The second case is bit tricky. The migration has already started and
-> >> hence migrate_add_blocker() call will fail. We also cannot wait till t=
-he
-> >> completion of the migration to handle machine check error as the VM's
-> >> data could be corrupt.
-> >>
-> >> Machine check errors should not be an issue when the migration is in t=
-he
-> >> RAM copy phase as VM is still active with vCPUs running. The problem is
-> >> when we hit a machine check when the migration is about to complete. F=
-or
-> >> example,
-> >>
-> >> 1. vCPU2 hits a machine check error during migration.
-> >>
-> >> 2. KVM causes VM exit on vCPU2 and the NIP of vCPU2 is changed to the
-> >> guest registered machine check handler.
-> >>
-> >> 3. The migration_completion() issues vm_stop() and hence either vCPU2 =
-is
-> >> never scheduled again on the source hardware or vCPU2 is preempted whi=
-le
-> >> executing the machine check handler.
-> >>
-> >> 4. vCPU2 is resumed on the target hardware and either starts or
-> >> continues processing the machine check error. This could be a problem =
-as
-> >> these errors are specific to the source hardware. For instance, when t=
-he
-> >> the guest issues memory poisoning upon such error, a clean page on the
-> >> target hardware is poisoned while the corrupt page on source hardware =
-is
-> >> not poisoned.
-> >>
-> >> The second case of hitting machine check during the final phase of
-> >> migration is rare but wanted to check what others think about it.
+> > On Tue, Sep 26, 2017 at 10:29:36AM +0200, Igor Mammedov wrote:
+> > > On Tue, 26 Sep 2017 09:19:28 +0200
+> > > Greg Kurz <groug@kaod.org> wrote:
+> > >  =20
+> > > > On Tue, 26 Sep 2017 12:57:39 +1000
+> > > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> > > >  =20
+> > > > > On Mon, Sep 25, 2017 at 11:47:33AM +0200, Greg Kurz wrote:   =20
+> > > > > > The CPU core abstraction belongs to the machine code. This also=
+ gets
+> > > > > > rid of some code duplication.
+> > > > > >=20
+> > > > > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > > > > ---
+> > > > > >=20
+> > > > > > hw/ppc/spapr_cpu_core.h is also included elsewhere in target/pp=
+c/kvm.c
+> > > > > > but this is already handled by the following cleanup patch:    =
+ =20
+> > > > >=20
+> > > > > I don't really see what the advantage of this is.  As others have
+> > > > > pointed out it leads to the host type being registered very late,
+> > > > > which could cause problems.
+> > > > >    =20
+> > > >=20
+> > > > Well, the goal was to consolidate the code to register sPAPRCPUCore=
+ types in
+> > > > the spapr code, instead of open-coding it in spapr_cpu_core.c and k=
+vm.c...=20
+> > > >=20
+> > > > But now I realize that delaying the registration even more is a bad=
+ idea. And,
+> > > > the other way round, registering a static type earlier as asked by =
+Igor would
+> > > > require all parent types to be already registered, which seems to b=
+e impossible
+> > > > to guarantee with the current code. =20
+> > > so I'll leave this code as is for now as as it's a bit of topic
+> > > wrt my work on cpu_model removal (or I'll try not to touch it until I=
+ have to)
+> > >  =20
+> > > > Maybe we could at least have kvm_ppc_register_host_cpu_type() to ca=
+ll a
+> > > > function in spapr_cpu_core.c instead of duplicating the registratio=
+n code ? =20
+> > > Is it possible for other boards (non core based) to use host CPU?
+> > >=20
+> > > but for simplicity sake I'd lave it where it's now.
+> > >=20
+> > > BTW I have an additional question:
+> > > what PPC boards are supposed to support KVM/host cpu? =20
 > >=20
-> > So, I've had a bit of a think about this.  I don't recall if these
-> > fwnmi machine checks are expected on guest RAM, or guest IO addresses.
->=20
-> It is expected on guest RAM. I am not sure about guest IO address.
->=20
+> > In theory, any board, but your host has to have a cpu that's suitable
+> > for the board in question.  So, if your host is a POWER8, you can use
+> > -cpu host with a machine type which supports a POWER8 cpu; which is
+> > basically just "pseries".  You couldn't use -cpu host with one of the
+> > embedded board types, since they don't expect a POWER8 vCPU.
 > >=20
-> > 1) If RAM
+> > If you were on an e500 based host, you could use -cpu host with one of
+> > the various e500 based machine types.  You couldn't use it with
+> > "pseries", since that will only work with a POWER7/8/9 vCPU.
 > >=20
-> >   What exactly is the guest's notification for?  Even without
-> >   migration, the host's free to move guest memory around in host
-> >   memory, so it seems any hardware level poking should be done on the
-> >   host side.
->=20
-> If the error is a correctable error, then host takes care of it by
-> moving the page to a different location, the guest need not be and will
-> not be notified. Guest will be notified if host is not able to fully
-> recover. Hence we hit FWNMI in guest when RAM errors are not recovered
-> by the host.
+> > The issue is muddied by the fact that KVM HV (the fast KVM
+> > implementation), a) will only work with a PAPR guest (i.e. pseries
+> > machine type) and b) can't present a vCPU to the guest that differs
+> > from the host (this is a hardware limitation).  If these conditions
+> > aren't met, the host kernel should automatically fall back to KVM PR
+> > (or fail outright if it's not available).  Of course then it's further
+> > muddied by the fact that KVM PR has _some_ ability to present a
+> > different vCPU to the guest than is on the host, but it has some curly
+> > limitations that we might or might not be able to detect in advance.
+> >=20
+> > And, it's muddied even further by the fact that some of the CPU
+> > "variants" are in fact identical cores - the differences are just in
+> > peripherals, pin-level connections, cache etc. which the guest can't
+> > see and doesn't care about.  Unfortunately, there aren't separate ways
+> > for the CPU to advertise core version and other things, so even
+> > trivial variants like this will have a different PVR value as a rule.
+> >=20
+> > > (especially taking in account that aliases get patched to it as well,
+> > > which I very much dislike since user asked for one CPU but got
+> > > another =20
+> >=20
+> > Uh.. what?  You should never get something different than what you
+> > asked for.  The worst that can happen is if you request something
+> > fuzzy, like "POWER8" instead of "POWER8E_v2.0" then exactly which
+> > thing in that family you get depends on the host.
+> that's what bothers me since when alias is used /like POWER8/
+> user gets 'some' cpu and he/she has to be aware that it might be not
+> the exactly the same cpu on another host.
 
-Ok.
+Well, yeah.  We did this for the benefit of libvirt, which really
+wants to specify "POWER8" or "POWER9" or whatever instead of "host".
+KVM HV only works with the host CPU, so it doesn't work for it to
+specify some specific cpu model.
 
-> >   Is it just to notify the guest that we weren't able to fully recover
-> >   on the host side and that page may contain corrupted data?  If
-> >   that's so then it seems resuming the handling on the destination is
-> >   still right.  It may be new good RAM, but the contents we migrated
-> >   could still be corrupt from the machine check event on the source.
->=20
-> Yes. This is what I am doing in my v5 patch set which I am about to
-> post. Additionally I block migration when processing machine check errors.
->=20
+> > > and when the same happens on another host migration probably would be
+> > > screwed up) =20
 > >=20
-> > 2) If IO
-> >=20
-> >   AFAICT this could only happen with VFIO passthrough devices.. but it
-> >   shouldn't be possible to migrate if there are any of those.
-> >=20
->=20
-> I am not very sure about IO errors.
+> > So, we can migrate between different CPUs if they're similar enough
+> > (say, everything within the POWER8 family).  The guest is able to see
+> > the change in the PVR, but it will be fine in practice.
+> sounds rather fragile, is there plan to make it more strict and
+> less ambiguous?
 
-Ok.  It sounds like that's not the primary case you're interested, so
-I guess we can ignore it for now.
+Not really.
+
+> /like not allowing 'generic' cpu names and using
+> only concrete ones/
+
+I don't see how that would help.  Again we *cannot* present a
+different cpu to the guest than is present in the host, it's simply
+not possible in the hardware.
+
+> > This is really ugly, but unfortunately there's no away around it in
+> > the hardware, it's simply not possible to virtualize the PVR to
+> > present a different CPU variant to the guest (well, short of putting
+> > the entire guest into user mode, which is what KVM PR does).
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -183,24 +166,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---9CzcV6dAFIr7O1Ie
+--9Q79yvCDNTHf0qBd
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnMc1cACgkQbDjKyiDZ
-s5JuihAA5L93HFs9ndp3wW/M1nPAM8f6ek5VCrdqBiDLQwgV7tVjM3W8I819OOOO
-yDeAa8UeBDeA9K7Z5n505HbX8owjZxfWA7x0/Lnes4Dm4SklkR4p6yoot5RFAGcM
-0hZw17m4wMD20c20zU9nKfJ3YgCEpXD4JYFaSOQtxFGmdAoWqzhyPrl2s0fvbzhS
-OkTjv1+hdP5mK5VXOSXhkX+6rTOZLHXQUh5B3ansasguOD3bVIyd/bIsA+2vSNxn
-HXuQOIarimu5zy5XY2eOS2Lqa4VJNezrax+9x2DUwANW0j/kja90+SbR28iSi2Ui
-tpFqipsuPp160ukKfkNPiX4EjeK3kt47G2G3vsLg0Fkunfh+mLHeq3FlYru8ayBF
-fSIlXopGGUD4e/fUE+fPEWpgFaMX2mjY8fG9P4/pLaM5WYwcna9jCX5gG2u402Ph
-aYCGNQWHWodXY5BRrMNBPKm39VwS8kC8Cw6P3SRzkk8K4qsfuS/qqbBLU43gwwXX
-dOal0CE4vxf0ooMQMa4YLbofzeR9zSyATM0wCNgfWEMlCjSdSuAKoDRQSM2VlHAw
-U+X6pBixBmZiN6qIjsnvk+Apg7GcJmYVWuMpax6pen7GOVXXISZEX9elqum0SToQ
-+lL0woaDKbo9bzMXU24z6yQ2mONu+7tmIxe/X3Sj64rUw2qO92Y=
-=8yHT
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnMdCoACgkQbDjKyiDZ
+s5L4FxAAzpBtE2fQFqzfAk8WbdHLNsR4AZPLleJ0Uku+GkeEHSw68eCCpM8uArF8
+g3OqA4nXjYtBjYNYyE4ldqgpmm99dsqP9ZRb99Pb3Ml5kwhcdWMz78K48f6VRIpE
+lxBTgTEnuS0EQ6Z092QFJgTOpzYdIEbB80BgMJN/OM/kLrtRxmn95nnuZnjG/Qx9
+ygL9btvoTL3QjaIEjE4wL09+YkcfkoXbHDGzIQmJq71dgXHRyUhBznw7y8ExRM8y
+p9+d/ybMIr5u+NQtcDE+gyrI8ekDyfgbB2eY0cpJvmUVApyRvP8ZMOVPdSn5pILT
+NAN9FeVELVapMFQBOswKt7S6kP2JV7e/BbRs2FmXtXd159lNsQhQZaVSSIpH+q0U
+KHx1/XUVyrIpDFk20ZPG6hohOvUKzgJBprJqwuQaYEoHDDNDKg/1VZqAtyUA8miB
+fRgin8Ks/sK+uRV/Oh3L+HxnicSUybb6E05UrRv+vGt41na1M8D7DLMXx7q1xuLp
+8WGpJKuDUsSb0eq1zd7dT3yj6JkaFlVAwBnj0dq6WNNhLWBwm30k8NDMZXSG31mh
+Vas/PvdrxVNetsfgAx4SYSQ3F9P3A2O7tajLuac4QlDCKsOlDRf3EGDAVKnH+qzT
+gzDmN6VCQqs+d72DWZDbCMN0hRW1xNjkrP/lbnzwGBQGSBSgYD4=
+=81Na
 -----END PGP SIGNATURE-----
 
---9CzcV6dAFIr7O1Ie--
+--9Q79yvCDNTHf0qBd--
