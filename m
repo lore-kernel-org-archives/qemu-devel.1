@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <teisenbe@google.com>) id 1dxcR1-0007ER-Aj
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 13:17:16 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dxcT5-0008KV-KH
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 13:19:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <teisenbe@google.com>) id 1dxcQv-00050u-QA
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 13:17:15 -0400
-Received: from mail-qt0-x22a.google.com ([2607:f8b0:400d:c0d::22a]:50948)
+	(envelope-from <richard.henderson@linaro.org>) id 1dxcT3-0006DP-8q
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 13:19:23 -0400
+Received: from mail-pg0-x236.google.com ([2607:f8b0:400e:c05::236]:51169)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <teisenbe@google.com>) id 1dxcQv-0004zp-Kt
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 13:17:09 -0400
-Received: by mail-qt0-x22a.google.com with SMTP id f15so2590866qtf.7
-	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 10:17:08 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dxcT3-0006Ca-30
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 13:19:21 -0400
+Received: by mail-pg0-x236.google.com with SMTP id p5so1291901pgn.7
+	for <qemu-devel@nongnu.org>; Thu, 28 Sep 2017 10:19:21 -0700 (PDT)
+References: <1506524313-20037-1-git-send-email-thuth@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <66d1d3b0-5f46-a682-1f3f-8945168f3aac@linaro.org>
+Date: Thu, 28 Sep 2017 10:19:11 -0700
 MIME-Version: 1.0
-From: Todd Eisenberger <teisenbe@google.com>
-Date: Thu, 28 Sep 2017 10:17:06 -0700
-Message-ID: <CAP26EVRNVb=Mq=O3s51w7fDhGVmf-e3XFFA73MRzc5b4qKBA4g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] [PATCH] x86: Correct translation of some rdgsbase and
- wrgsbase encodings
+In-Reply-To: <1506524313-20037-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] disas: Always initialize
+ read_memory_inner_func properly
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -25,34 +30,43 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Julian Brown <julian@codesourcery.com>
 List-ID: <qemu-devel.nongnu.org>
 
-It looks like there was a transcription error when writing this code
-initially.  The code previously only decoded src or dst of rax.  This
-resolves
-https://bugs.launchpad.net/qemu/+bug/1719984.
+On 09/27/2017 07:58 AM, Thomas Huth wrote:
+> I've recently seen this with valgrind while running the HMP tester:
+> 
+> ==22373== Conditional jump or move depends on uninitialised value(s)
+> ==22373==    at 0x4A41FD: arm_disas_set_info (cpu.c:504)
+> ==22373==    by 0x3867A7: monitor_disas (disas.c:390)
+> ==22373==    by 0x38E80E: memory_dump (monitor.c:1339)
+> ==22373==    by 0x38FA43: handle_hmp_command (monitor.c:3123)
+> ==22373==    by 0x38FB9E: qmp_human_monitor_command (monitor.c:613)
+> ==22373==    by 0x4E3124: qmp_marshal_human_monitor_command (qmp-marshal.c:1736)
+> ==22373==    by 0x769678: do_qmp_dispatch (qmp-dispatch.c:104)
+> ==22373==    by 0x769678: qmp_dispatch (qmp-dispatch.c:131)
+> ==22373==    by 0x38B734: handle_qmp_command (monitor.c:3853)
+> ==22373==    by 0x76ED07: json_message_process_token (json-streamer.c:105)
+> ==22373==    by 0x78D40A: json_lexer_feed_char (json-lexer.c:323)
+> ==22373==    by 0x78D4CD: json_lexer_feed (json-lexer.c:373)
+> ==22373==    by 0x38A08D: monitor_qmp_read (monitor.c:3895)
+> 
+> And indeed, in monitor_disas, the read_memory_inner_func variable was
+> not initialized, but arm_disas_set_info() expects this to be NULL
+> or a valid pointer. Let's properly set this to NULL in the
+> INIT_DISASSEMBLE_INFO to fix it in all functions that use the
+> disassemble_info struct.
+> 
+> Fixes: f7478a92dd9ee2276bfaa5b7317140d3f9d6a53b ("Fix Thumb-1 BE32 execution")
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  disas.c             | 1 -
+>  include/disas/bfd.h | 1 +
+>  2 files changed, 1 insertion(+), 1 deletion(-)
 
-Signed-off-by: Todd Eisenberger <teisenbe@google.com>
----
- target/i386/translate.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index a8986f4c1a..7b920115f9 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -8155,9 +8155,9 @@ static target_ulong disas_insn(DisasContext *s,
-CPUState *cpu)
-             break;
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-         case 0xc0 ... 0xc7: /* rdfsbase (f3 0f ae /0) */
--        case 0xc8 ... 0xc8: /* rdgsbase (f3 0f ae /1) */
-+        case 0xc8 ... 0xcf: /* rdgsbase (f3 0f ae /1) */
-         case 0xd0 ... 0xd7: /* wrfsbase (f3 0f ae /2) */
--        case 0xd8 ... 0xd8: /* wrgsbase (f3 0f ae /3) */
-+        case 0xd8 ... 0xdf: /* wrgsbase (f3 0f ae /3) */
-             if (CODE64(s)
-                 && (prefixes & PREFIX_REPZ)
-                 && !(prefixes & PREFIX_LOCK)
+
+r~
