@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dxM3i-0000Zq-Bn
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 19:48:07 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dxOEn-0006tK-Kr
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 22:07:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dxM3g-00033g-Gw
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 19:48:05 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:43512)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dxOEm-0005hc-M0
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 22:07:41 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:53019)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dxM3g-000333-8Y
-	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 19:48:04 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id a43so19127695wrc.0
-	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 16:48:03 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dxOEm-0005hA-GF
+	for qemu-devel@nongnu.org; Wed, 27 Sep 2017 22:07:40 -0400
+Received: by mail-it0-x244.google.com with SMTP id c195so520303itb.1
+	for <qemu-devel@nongnu.org>; Wed, 27 Sep 2017 19:07:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1788278d-9437-34a0-4a17-d7914d459f77@redhat.com>
-References: <cover.1506384414.git.alistair.francis@xilinx.com>
-	<e9eb34b7a508fbe3b89bb8b8aa8141f018871081.1506384414.git.alistair.francis@xilinx.com>
-	<1788278d-9437-34a0-4a17-d7914d459f77@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 27 Sep 2017 16:47:42 -0700
-Message-ID: <CAFEAcA_G8Md3k6EAqoN1=GCcXoCq_8vAUZ_qjOZp5GbnnfmcrA@mail.gmail.com>
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <20170925075458.18047-1-famz@redhat.com>
+References: <20170925075458.18047-1-famz@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Wed, 27 Sep 2017 23:07:36 -0300
+Message-ID: <CAAdtpL5j_9qh2bmzpmx3ULgCFr8TkMF4AgUZF=7Ka66=3diD3A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v1 1/8] Replace all occurances
- of __FUNCTION__ with __func__
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] docker: Don't mount ccache db if NOUSER=1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +32,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>, Fam Zheng <famz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, qemu-arm <qemu-arm@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alistair Francis <alistair23@gmail.com>, Yongbok Kim <yongbok.kim@imgtec.com>, "open list:X86" <xen-devel@lists.xenproject.org>, John Snow <jsnow@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Fam Zheng <famz@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On 26 September 2017 at 06:32, Eric Blake <eblake@redhat.com> wrote:
-> On 09/25/2017 07:08 PM, Alistair Francis wrote:
->> diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
->> index 58005b6619..32687afced 100644
->> --- a/hw/arm/nseries.c
->> +++ b/hw/arm/nseries.c
->> @@ -463,7 +463,7 @@ static uint32_t mipid_txrx(void *opaque, uint32_t cmd, int len)
->>      uint8_t ret;
->>
->>      if (len > 9) {
->> -        hw_error("%s: FIXME: bad SPI word width %i\n", __FUNCTION__, len);
->> +        hw_error("%s: FIXME: bad SPI word width %i\n", __func__, len);
+On Mon, Sep 25, 2017 at 4:54 AM, Fam Zheng <famz@redhat.com> wrote:
+> With NOUSER=3D1 the container runs code as root, which may create
+> privileged files that will not be be accssible next time. Skip ccache
+> dir mount in this case.
 >
-> Not this patch's problem, but it would probably be simpler if hw_error()
-> were a macro that automatically prefixed __func__, rather than making
-> every caller have to supply it themselves.
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 
-I'm not sure there's a great deal of benefit to that change, because
-use of hw_error() in new code is rarely correct (it does an abort()
-so it should never be used for guest-triggered conditions, which is
-about the only time that you might be interested in a guest register
-dump rather than just asserting). Most of its existing uses are in
-crufty old device models.
+Acked-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-thanks
--- PMM
+> ---
+>  tests/docker/Makefile.include | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.includ=
+e
+> index 0e4f159619..6f9ea196a7 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -143,9 +143,11 @@ docker-run: docker-qemu-src
+>                         -e EXTRA_CONFIGURE_OPTS=3D"$(EXTRA_CONFIGURE_OPTS=
+)" \
+>                         -e V=3D$V -e J=3D$J -e DEBUG=3D$(DEBUG)          =
+     \
+>                         -e SHOW_ENV=3D$(SHOW_ENV)                        =
+ \
+> -                       -e CCACHE_DIR=3D/var/tmp/ccache                  =
+ \
+> +                       $(if $(NOUSER),,                                \
+> +                               -e CCACHE_DIR=3D/var/tmp/ccache          =
+ \
+> +                               -v $(DOCKER_CCACHE_DIR):/var/tmp/ccache:z=
+ \
+> +                       )                                               \
+>                         -v $$(readlink -e $(DOCKER_SRC_COPY)):/var/tmp/qe=
+mu:z$(COMMA)ro \
+> -                       -v $(DOCKER_CCACHE_DIR):/var/tmp/ccache:z       \
+>                         $(IMAGE)                                        \
+>                         /var/tmp/qemu/run                               \
+>                         $(TEST), "  RUN $(TEST) in ${IMAGE}")
+> --
+> 2.13.5
+>
