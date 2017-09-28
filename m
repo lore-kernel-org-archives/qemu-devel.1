@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dxTr8-0002eN-Ih
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 04:07:42 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dxTra-0002rZ-Uf
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 04:08:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dxTr4-0001lt-KJ
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 04:07:38 -0400
-Message-ID: <1506586050.6902.0.camel@redhat.com>
+	(envelope-from <kraxel@redhat.com>) id 1dxTra-0001yj-1B
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 04:08:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45330)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dxTrZ-0001yK-R6
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 04:08:05 -0400
+Message-ID: <1506586083.6902.1.camel@redhat.com>
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 28 Sep 2017 10:07:30 +0200
-In-Reply-To: <AM5P194MB0132260A40AD097E2F67A4B2C8790@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
-References: <AM5P194MB0132C46F9FCCF1DCF2FFC7D0C87A0@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
-	, <1506512087.25036.10.camel@redhat.com> ,
-	<AM5P194MB013209976BC625983F3265D3C8780@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
-	<AM5P194MB0132260A40AD097E2F67A4B2C8790@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
+Date: Thu, 28 Sep 2017 10:08:03 +0200
+In-Reply-To: <20170927135119.GA15789@morn.lan>
+References: <1506411189.32072.14.camel@redhat.com>
+	<20170927135119.GA15789@morn.lan>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] ppce500 usb-ehci-pci issue on last uboot
+Subject: Re: [Qemu-devel] [SeaBIOS] Time for a seabios 1.11 release?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,17 +27,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: luigi burdo <intermediadc@hotmail.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
+To: Kevin O'Connor <kevin@koconnor.net>
+Cc: seabios <seabios@seabios.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Thu, 2017-09-28 at 07:27 +0000, luigi burdo wrote:
+On Wed, 2017-09-27 at 09:51 -0400, Kevin O'Connor wrote:
+> On Tue, Sep 26, 2017 at 09:33:09AM +0200, Gerd Hoffmann wrote:
+> > =C2=A0=C2=A0=C2=A0Hi,
+> >=20
+> > Quite a few changes accumulated in master.=C2=A0=C2=A0Time to plan a =
+new
+> > release
+> > I think, so we can pick up the improvements in qemu 2.11.
+> >=20
+> > Comments?
 >=20
-> Hi Gerd,
-> i had test it yesterday=C2=A0on Little Endian machine host (Apple =C2=A0=
-Osx
-> Sierra)
-> the issue is present there too.
+> Makes sense.=C2=A0=C2=A0How about freezing SeaBIOS on October 13th and =
+target a
+> release on October 27th?
 
-How can this be reproduced?
+Looks good to me.
 
 cheers,
   Gerd
