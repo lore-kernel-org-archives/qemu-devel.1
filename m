@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dxSzL-0006Px-TW
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 03:12:13 -0400
+	(envelope-from <peterx@redhat.com>) id 1dxT1d-0007es-0A
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 03:14:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dxSzK-0002II-Tn
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 03:12:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50332)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dxSzK-0002I4-MF
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 03:12:02 -0400
-Date: Thu, 28 Sep 2017 15:11:54 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170928071154.GC26066@lemon.lan>
-References: <20170928025958.1420-1-peterx@redhat.com>
-	<20170928025958.1420-6-peterx@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1dxT1b-0002xR-Tt
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 03:14:24 -0400
+Date: Thu, 28 Sep 2017 15:13:59 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170928071359.GG17044@pxdev.xzpeter.org>
+References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
+	<20170928064312.GA1544@virtx40>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170928025958.1420-6-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 5/5] aio: fix assert when remove poll
- during destroy
+In-Reply-To: <20170928064312.GA1544@virtx40>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v7 00/20] ARM SMMUv3 Emulation
+ Support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +24,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Manos Pitsidianakis <el13635@mail.ntua.gr>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Linu Cherian <linuc.decode@gmail.com>
+Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, prem.mallappa@gmail.com, alex.williamson@redhat.com, mohun106@gmail.com, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mst@redhat.com, jean-philippe.brucker@arm.com, tn@semihalf.com, will.deacon@arm.com, robin.murphy@arm.com, bharat.bhushan@nxp.com, christoffer.dall@linaro.org, wtownsen@redhat.com
 
-On Thu, 09/28 10:59, Peter Xu wrote:
-> From: Stefan Hajnoczi <stefanha@redhat.com>
+On Thu, Sep 28, 2017 at 12:13:12PM +0530, Linu Cherian wrote:
+> Hi Eric,
 > 
-> After iothread is enabled internally inside QEMU with GMainContext, we
-> may encounter this warning when destroying the iothread:
 > 
-> (qemu-system-x86_64:19925): GLib-CRITICAL **: g_source_remove_poll:
->  assertion '!SOURCE_DESTROYED (source)' failed
+> On Fri Sep 01, 2017 at 07:21:03PM +0200, Eric Auger wrote:
+> > This series implements the emulation code for ARM SMMUv3.
+> > 
+> > Changes since v6:
+> > - DPDK testpmd now running on guest with 2 assigned VFs
+> > - Changed the instantiation method: add the following option to
+> >   the QEMU command line
+> >   -device smmuv3 # for virtio/vhost use cases
+> >   -device smmuv3,caching-mode # for vfio use cases (based on [1])
+> > - splitted the series into smaller patches to allow the review
+> > - the VFIO integration based on "tlbi-on-map" smmuv3 driver
+> >   is isolated from the rest: last 2 patches, not for upstream.
+> >   This is shipped for testing/bench until a better solution is found.
+> > - Reworked permission flag checks and event generation
+> > e testing:
+> > - in dt and ACPI modes
+> > - virtio-net-pci and vhost-net devices using dma ops with various
+> >   guest page sizes [2]
+> > - assigned VFs using dma ops [3]:
+> >   - AMD Overdrive and igbvf passthrough (using gsi direct mapping)
+> >   - Cavium ThunderX and ixgbevf passthrough (using KVM MSI routing)
+> > - DPDK testpmd on guest running with VFIO user space drivers (2 igbvf) [3]
+> >   with guest and host page size equal (4kB)
+> > 
+> > Known limitations:
+> > - no VMSAv8-32 suport
+> > - no nested stage support (S1 + S2)
+> > - no support for HYP mappings
+> > - register fine emulation, commands, interrupts and errors were
+> >   not accurately tested. Handling is sufficient to run use cases
+> >   described above though.
+> > - interrupts and event generation not observed yet.
 > 
-> The problem is that g_source_remove_poll() does not allow to remove one
-> source from array if the source is detached from its owner
-> context. (peterx: which IMHO does not make much sense)
+> While testing with vfio-pci, observed that the below two  Qemu command,
+> results in two different behaviour. Is this expected by design ?
 > 
-> Fix it on QEMU side by avoid calling g_source_remove_poll() if we know
-> the object is during destruction, and we won't leak anything after all
-> since the array will be gone soon cleanly even with that fd.
+> Case 1:
+> # -device vfio-pci,host=0002:01:00.3 -device smmuv3,caching-mode
+>  Here iommu is not attached to the pci bus in Qemu backend, since
+>  pci_setup_iommu is not called before vfio_realize.
 > 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> [peterx: write the commit message]
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  util/aio-posix.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/util/aio-posix.c b/util/aio-posix.c
-> index 2d51239ec6..5946ac09f0 100644
-> --- a/util/aio-posix.c
-> +++ b/util/aio-posix.c
-> @@ -223,7 +223,14 @@ void aio_set_fd_handler(AioContext *ctx,
->              return;
->          }
->  
-> -        g_source_remove_poll(&ctx->source, &node->pfd);
-> +        /* If the GSource is in the process of being destroyed then
-> +         * g_source_remove_poll() causes an assertion failure.  Skip
-> +         * removal in that case, because glib cleans up its state during
-> +         * destruction anyway.
-> +         */
-> +        if (!g_source_is_destroyed(&ctx->source)) {
-> +            g_source_remove_poll(&ctx->source, &node->pfd);
-> +        }
->  
->          /* If the lock is held, just mark the node as deleted */
->          if (qemu_lockcnt_count(&ctx->list_lock)) {
-> -- 
-> 2.13.5
-> 
+> Case 2:
+> # -device smmuv3,caching-mode -device vfio-pci,host=0002:01:00.3
+> This works as expected, iommu is attached to the pci bus.
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Not sure about SMMU, but VT-d should have similar issue - the vIOMMU
+device needs to be created before the rest of the devices.
+
+Now for VT-d the ordering of devices should be assured by Libvirt:
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1427005
+
+For your reference only.  Thanks,
+
+-- 
+Peter Xu
