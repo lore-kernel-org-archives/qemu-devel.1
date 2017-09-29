@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dxuEB-0008Ou-Mc
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:17:12 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dxuDQ-0007rf-5M
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:16:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dxuE7-0008Vz-Fn
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:17:11 -0400
-From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Date: Fri, 29 Sep 2017 15:16:13 +0300
-Message-Id: <20170929121613.25997-3-pbutsykin@virtuozzo.com>
-In-Reply-To: <20170929121613.25997-1-pbutsykin@virtuozzo.com>
-References: <20170929121613.25997-1-pbutsykin@virtuozzo.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dxuDP-0008I0-AC
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:16:24 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:38561)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dxuDP-0008Ho-3s
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:16:23 -0400
+Received: by mail-oi0-x241.google.com with SMTP id s145so588380oie.5
+	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 05:16:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 2/2] qcow2: truncate the tail of the image
- file after shrinking the image
+In-Reply-To: <1506683421-27004-10-git-send-email-amarnath.valluri@intel.com>
+References: <1506683421-27004-1-git-send-email-amarnath.valluri@intel.com>
+	<1506683421-27004-10-git-send-email-amarnath.valluri@intel.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 29 Sep 2017 14:16:21 +0200
+Message-ID: <CAJ+F1CLN+=W5DcB+P5XAqU7EfHv5ojP831LYPj4+BpasnGk3DQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v10 9/9] tpm: Move tpm_cleanup() to right
+ place
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -21,104 +30,55 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: pbutsykin@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, jsnow@redhat.com, den@openvz.org
+To: Amarnath Valluri <amarnath.valluri@intel.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-Now after shrinking the image, at the end of the image file, there might be a
-tail that probably will never be used. So we can find the last used cluster and
-cut the tail.
+On Fri, Sep 29, 2017 at 1:10 PM, Amarnath Valluri
+<amarnath.valluri@intel.com> wrote:
+> As Emulator TPM backend uses chardev, tpm cleanup should happen before ch=
+ardev
+> similar to other vhost-users.
+>
+> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
 
-Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
----
- block/qcow2-refcount.c | 22 ++++++++++++++++++++++
- block/qcow2.c          | 23 +++++++++++++++++++++++
- block/qcow2.h          |  1 +
- 3 files changed, 46 insertions(+)
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 88d5a3f1ad..aa3fd6cf17 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -3181,3 +3181,25 @@ out:
-     g_free(reftable_tmp);
-     return ret;
- }
-+
-+int64_t qcow2_get_last_cluster(BlockDriverState *bs, int64_t size)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    int64_t i;
-+
-+    for (i = size_to_clusters(s, size) - 1; i >= 0; i--) {
-+        uint64_t refcount;
-+        int ret = qcow2_get_refcount(bs, i, &refcount);
-+        if (ret < 0) {
-+            fprintf(stderr, "Can't get refcount for cluster %" PRId64 ": %s\n",
-+                    i, strerror(-ret));
-+            return ret;
-+        }
-+        if (refcount > 0) {
-+            return i;
-+        }
-+    }
-+    qcow2_signal_corruption(bs, true, -1, -1,
-+                            "There are no references in the refcount table.");
-+    return -EIO;
-+}
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 8a4311d338..d9e0a132f9 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3106,6 +3106,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-     new_l1_size = size_to_l1(s, offset);
- 
-     if (offset < old_length) {
-+        int64_t last_cluster, old_file_size;
-         if (prealloc != PREALLOC_MODE_OFF) {
-             error_setg(errp,
-                        "Preallocation can't be used for shrinking an image");
-@@ -3134,6 +3135,28 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-                              "Failed to discard unused refblocks");
-             return ret;
-         }
-+
-+        old_file_size = bdrv_getlength(bs->file->bs);
-+        if (old_file_size < 0) {
-+            error_setg_errno(errp, -old_file_size,
-+                             "Failed to inquire current file length");
-+            return old_file_size;
-+        }
-+        last_cluster = qcow2_get_last_cluster(bs, old_file_size);
-+        if (last_cluster < 0) {
-+            error_setg_errno(errp, -last_cluster,
-+                             "Failed to find the last cluster");
-+            return last_cluster;
-+        }
-+        if ((last_cluster + 1) * s->cluster_size < old_file_size) {
-+            ret = bdrv_truncate(bs->file, (last_cluster + 1) * s->cluster_size,
-+                                PREALLOC_MODE_OFF, NULL);
-+            if (ret < 0) {
-+                warn_report("Failed to truncate the tail of the image: %s",
-+                            strerror(-ret));
-+                ret = 0;
-+            }
-+        }
-     } else {
-         ret = qcow2_grow_l1_table(bs, new_l1_size, true);
-         if (ret < 0) {
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 5a289a81e2..782a206ecb 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -597,6 +597,7 @@ int qcow2_change_refcount_order(BlockDriverState *bs, int refcount_order,
-                                 BlockDriverAmendStatusCB *status_cb,
-                                 void *cb_opaque, Error **errp);
- int qcow2_shrink_reftable(BlockDriverState *bs);
-+int64_t qcow2_get_last_cluster(BlockDriverState *bs, int64_t size);
- 
- /* qcow2-cluster.c functions */
- int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
--- 
-2.14.1
+
+> ---
+>  tpm.c | 1 -
+>  vl.c  | 1 +
+>  2 files changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/tpm.c b/tpm.c
+> index 3b8c7ed..3122227 100644
+> --- a/tpm.c
+> +++ b/tpm.c
+> @@ -172,7 +172,6 @@ int tpm_init(void)
+>          return -1;
+>      }
+>
+> -    atexit(tpm_cleanup);
+>      return 0;
+>  }
+>
+> diff --git a/vl.c b/vl.c
+> index 9bb5058..ed86209 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4893,6 +4893,7 @@ int main(int argc, char **argv, char **envp)
+>      res_free();
+>
+>      /* vhost-user must be cleaned up before chardevs.  */
+> +    tpm_cleanup();
+>      net_cleanup();
+>      audio_cleanup();
+>      monitor_cleanup();
+> --
+> 2.7.4
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
