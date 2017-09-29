@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dxzZm-0007To-MH
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 13:59:51 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dxzia-0001Pf-IZ
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 14:08:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dxzZh-0003Yp-PC
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 13:59:50 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:43251)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dxzZh-0003Vk-HB
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 13:59:45 -0400
-Date: Fri, 29 Sep 2017 13:59:43 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170929175943.GA25038@flamenco>
-References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
-	<150529666493.10902.14830445134051381968.stgit@frigg.lan>
-	<CAFEAcA9p9B8AFaaSaSOOSsFsEhHW=XPLBFs5MrozWq=7p4_9Zg@mail.gmail.com>
-	<87poasgjyh.fsf@frigg.lan>
-	<CAFEAcA8XP+8Jz9Dn-mEQ3CCrVj00t3HA0praQ-OSggtQGAmQ5Q@mail.gmail.com>
-	<87d16o53xr.fsf@frigg.lan>
-	<CAFEAcA9FhXKVKe1E_pVDWX3u0W7WuKQmO54Z1Jgj-iL980yPew@mail.gmail.com>
-	<87o9pywt8k.fsf@frigg.lan> <87shf5zlty.fsf@frigg.lan>
+	(envelope-from <mreitz@redhat.com>) id 1dxziZ-0000bD-Q0
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 14:08:56 -0400
+References: <20170929170843.3711-1-mreitz@redhat.com>
+	<cf6e8f28-760c-57ae-184b-d9b07c28f0f2@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <c08cfd7e-c459-8ddf-a81c-fbe31ecfeac3@redhat.com>
+Date: Fri, 29 Sep 2017 20:08:43 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87shf5zlty.fsf@frigg.lan>
-Subject: Re: [Qemu-devel] [PATCH v6 01/22] instrument: Add documentation
+In-Reply-To: <cf6e8f28-760c-57ae-184b-d9b07c28f0f2@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="dWerVo1hkpRQxkH8dwbOW4Dt2kIwd8q3M"
+Subject: Re: [Qemu-devel] [PATCH v3] iotests: Add test for dataplane
+ mirroring
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -33,77 +24,74 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Jeff Cody <jcody@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-On Fri, Sep 29, 2017 at 16:16:41 +0300, Lluís Vilanova wrote:
-> Lluís Vilanova writes:
-> [...]
-> > This was working on a much older version of instrumentation for QEMU, but I can
-> > implement something that does the first use-case point above and some filtering
-> > example (second use-case point) to see what's the performance difference.
-> 
-> Ok, so here's some numbers for the discussion (booting Emilio's ARM full system
-> image that immediately shuts down):
-> 
-> * Without instrumentation
-> 
->   real	0m10,099s
->   user	0m9,876s
->   sys	0m0,128s
-> 
-> * Count number of memory access writes, by instrumenting only when they are
->   executed
-> 
->   real	0m15,896s
->   user	0m15,752s
->   sys	0m0,108s
-> 
-> * Counting same, but the filtering is done at translation time (i.e., not
->   generate an execute-time callback if it's not a write)
-> 
->   real	0m11,084s
->   user	0m10,880s
->   sys	0m0,112s
-> 
->   As Peter said, the filtering can be added into the API to take advantage of
->   this "speedup", without exposing translation vs execution time callbacks.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--dWerVo1hkpRQxkH8dwbOW4Dt2kIwd8q3M
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Jeff Cody <jcody@redhat.com>
+Message-ID: <c08cfd7e-c459-8ddf-a81c-fbe31ecfeac3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] iotests: Add test for dataplane mirroring
+References: <20170929170843.3711-1-mreitz@redhat.com>
+ <cf6e8f28-760c-57ae-184b-d9b07c28f0f2@redhat.com>
+In-Reply-To: <cf6e8f28-760c-57ae-184b-d9b07c28f0f2@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I'm not sure I understand this concept of filtering. Are you saying that in
-the first case, all memory accesses are instrumented, and then in the
-"access helper" we only call the user's callback if it's a memory write?
-And in the second case, we simply just generate a "write helper" instead
-of an "access helper". Am I understanding this correctly?
+On 2017-09-29 19:33, Eric Blake wrote:
+> On 09/29/2017 12:08 PM, Max Reitz wrote:
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>> v3: Make the test actually pass (the reference output from v2 only
+>>     worked with v1 of the test...)
+>> ---
+>>  tests/qemu-iotests/127     | 97 +++++++++++++++++++++++++++++++++++++=
++++++++++
+>>  tests/qemu-iotests/127.out | 14 +++++++
+>>  tests/qemu-iotests/group   |  1 +
+>>  3 files changed, 112 insertions(+)
+>>  create mode 100755 tests/qemu-iotests/127
+>>  create mode 100644 tests/qemu-iotests/127.out
+>>
+>=20
+>> +_cleanup()
+>> +{
+>> +    _cleanup_qemu
+>> +    _cleanup_test_img
+>> +    _rm_test_img "$TEST_IMG.overlay0"
+>> +    _rm_test_img "$TEST_IMG.overlay1"
+>> +}
+>> +trap "_cleanup; exit \$status" 0 1 2 3 15
+>=20
+> Semantic conflict with Jeff's patches for './check -s' to preserve
+> intermediate files.  Otherwise,
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> * Counting number of executed instructions, by instrumenting the beginning of
->   each one of them
-> 
->   real	0m24,583s
->   user	0m24,352s
->   sys	0m0,184s
-> 
-> * Counting same, but per-TB numbers are collected at translation-time, and we
->   only generate a per-TB execution time callback to add the corresponding number
->   of instructions for that TB
-> 
->   real	0m11,151s
->   user	0m10,952s
->   sys	0m0,092s
-> 
->   This really needs to expose translation vs execution time callbacks to take
->   advantage of this "speedup".
+True, but as long as v4 of his series is not around, I feel OK to put
+the burden of having to rebase on him. :-)
 
-Clearly instrumenting per-TB is a significant net gain. I think we should
-definitely allow instrumenters to use this option.
+Max
 
-FWIW my experiments so far show similar numbers for instrumenting each
-instruction (haven't done the per-tb yet). The difference is that I'm
-exposing to instrumenters a copy of the guest instructions (const void *data,
-size_t size). These copies are kept around until TB's are flushed.
-Luckily there seems to be very little overhead in keeping these around,
-apart from the memory overhead -- but in terms of performance, the
-necessary allocations do not induce significant overhead.
 
-Thanks,
+--dWerVo1hkpRQxkH8dwbOW4Dt2kIwd8q3M
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-		Emilio
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlnOjCsSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AYb0H/AqwaYsX1Zsb/ALPp4Lf/sZCxGgrQ4NT
+qQOrPwwuGYwuFmARVkSevJi5aSOr0p8s/vaDQTOclYQI0IorLnDZUvpMQAUpPpjD
+c4h5lMntHM3/o5FLO+sHSbx8GyA7wISYTjLWpCLTkcCB/sriojnKG9P5hifvoE1j
+odKvBeuJdGBkNO/cqNRZ8W02x/CVynl5leby29TPnZ4Fd+G5EbMQdcd+4RTwJZE8
+5ieFOTyY0UyC6kcmcP5W7+SK7LwblWYYgoecXIC6x9ai3nIDw853c5kBtV8EBJLI
+cp+E3lYIndbg9pfieadsbXO90hkn7Cy7MqaIz0c0GDpS/vDjNxLHDHs=
+=aREu
+-----END PGP SIGNATURE-----
+
+--dWerVo1hkpRQxkH8dwbOW4Dt2kIwd8q3M--
