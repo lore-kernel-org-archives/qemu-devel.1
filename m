@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dy1hy-0002cO-T4
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:16:27 -0400
+	(envelope-from <zhuoweizhang@yahoo.com>) id 1dxyUs-0007H7-Jr
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 12:50:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dy1hu-0005Bj-L4
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:16:26 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:38982)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dy1hu-00058q-EY
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:16:22 -0400
-From: James Hogan <james.hogan@imgtec.com>
-Date: Fri, 29 Sep 2017 21:15:56 +0100
-Message-ID: <0cadfe03c2cd47171767e374764c4641a00c841f.1506716058.git-series.james.hogan@imgtec.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] target/mips: Preserve read-only CP0_WatchHi
- bits
+	(envelope-from <zhuoweizhang@yahoo.com>) id 1dxyUo-000124-Ne
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 12:50:42 -0400
+Received: from sonic315-20.consmr.mail.ne1.yahoo.com ([66.163.190.146]:45862)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zhuoweizhang@yahoo.com>)
+	id 1dxyUo-00011E-HJ
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 12:50:38 -0400
+From: zhuoweizhang@yahoo.com
+Date: Fri, 29 Sep 2017 12:50:16 -0400
+Message-Id: <1506703816-7359-1-git-send-email-zhuoweizhang@yahoo.com>
+Subject: [Qemu-devel] [PATCH] syscall: fix special case of write(fd, NULL, 0)
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -23,38 +21,50 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: qemu-devel@nongnu.org, James Hogan <james.hogan@imgtec.com>
+To: qemu-devel@nongnu.org
+Cc: riku.voipio@iki.fi, laurent@vivier.eu, Zhuowei Zhang <zhuoweizhang@yahoo.com>
 List-ID: <qemu-devel.nongnu.org>
 
-Currently all read-only bits of the CP0_WatchHi registers are cleared by
-MTC0, including the M bit which indicates whether more watch registers
-exist, and the IRW bits which would be set when a watch is hit (if
-watchpoints were actually fully supported by QEMU) and are only cleared
-when 1 is written to them. Fix it so that the read-only bits are
-properly preserved.
+From: Zhuowei Zhang <zhuoweizhang@yahoo.com>
 
-Reported-by: Tam Robb <tam.robb@imgtec.com>
-Signed-off-by: James Hogan <james.hogan@imgtec.com>
-Cc: Aurelien Jarno <aurelien@aurel32.net>
-Cc: Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: qemu-devel@nongnu.org
+Linux returns success for the special case of calling write with a zero-length
+NULL buffer: compiling and running
+
+```
+
+int main() {
+   ssize_t ret = write(STDOUT_FILENO, NULL, 0);
+   fprintf(stderr, "write returned %ld\n", ret);
+   return 0;
+}
+```
+gives "write returned 0" when run directly, but "write returned -1" in QEMU.
+
+This commit checks for this situation and returns success if found.
+
+Signed-off-by: Zhuowei Zhang <zhuoweizhang@yahoo.com>
 ---
- target/mips/op_helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ linux-user/syscall.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 320f2b0dc473..f7d740118f8b 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -1662,7 +1662,7 @@ void helper_mtc0_watchlo(CPUMIPSState *env, target_ulong arg1, uint32_t sel)
- void helper_mtc0_watchhi(CPUMIPSState *env, target_ulong arg1, uint32_t sel)
- {
-     int mask = 0x40000FF8 | (env->CP0_EntryHi_ASID_mask << CP0WH_ASID);
--    env->CP0_WatchHi[sel] = arg1 & mask;
-+    env->CP0_WatchHi[sel] ^= (env->CP0_WatchHi[sel] ^ arg1) & mask;
-     env->CP0_WatchHi[sel] &= ~(env->CP0_WatchHi[sel] & arg1 & 0x7);
- }
- 
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 9b6364a..ecadf49 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -7783,6 +7783,11 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+         }
+         break;
+     case TARGET_NR_write:
++        if (arg2 == 0 && arg3 == 0) {
++            /* special case: write(fd, NULL, 0) returns success. */
++            ret = 0;
++            break;
++        }
+         if (!(p = lock_user(VERIFY_READ, arg2, arg3, 1)))
+             goto efault;
+         if (fd_trans_target_to_host_data(arg1)) {
 -- 
-git-series 0.8.10
+1.9.1
+
+
+.
