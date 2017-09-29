@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dxrwZ-00042R-Dv
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 05:50:52 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dxs3k-0005cV-8y
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 05:58:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dxrwO-0005dD-Eb
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 05:50:47 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:52096)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dxs3h-0001LA-6V
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 05:58:16 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:33611)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dxrwO-0005ci-6a
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 05:50:40 -0400
-Received: by mail-oi0-x243.google.com with SMTP id n82so1185127oib.8
-	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 02:50:38 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dxs3g-0001Jz-UE
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 05:58:13 -0400
+Received: by mail-pg0-x243.google.com with SMTP id u136so1116080pgc.0
+	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 02:58:11 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1506677707-2758-1-git-send-email-jiang.biao2@zte.com.cn>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <5e146f0b-3c7c-b0a7-cea2-1d20bfcfc2d2@amsat.org>
+Date: Fri, 29 Sep 2017 06:58:08 -0300
 MIME-Version: 1.0
-In-Reply-To: <1506674157.3700.3.camel@intel.com>
-References: <1506590409-28857-1-git-send-email-amarnath.valluri@intel.com>
-	<1506590409-28857-9-git-send-email-amarnath.valluri@intel.com>
-	<CAJ+F1C+u4ggH1feJTqzC5dZYfKG0=4H5ihBtDDgiX8UYowfbuA@mail.gmail.com>
-	<1506674157.3700.3.camel@intel.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 29 Sep 2017 11:50:37 +0200
-Message-ID: <CAJ+F1CLiGiWfvTkBhXyx0+esQPWCTHYoo4aFnZ74AsLYERpPUg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v9 8/8] tpm: Added support for TPM emulator
+In-Reply-To: <1506677707-2758-1-git-send-email-jiang.biao2@zte.com.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/mips: remove commented out codes in
+ translate.c
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -31,250 +34,283 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: "Valluri, Amarnath" <amarnath.valluri@intel.com>
-Cc: "stefanb@linux.vnet.ibm.com" <stefanb@linux.vnet.ibm.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: Jiang Biao <jiang.biao2@zte.com.cn>, aurelien@aurel32.net, yongbok.kim@imgtec.com
+Cc: zhong.weidong@zte.com.cn, qemu-devel@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-On Fri, Sep 29, 2017 at 10:35 AM, Valluri, Amarnath
-<amarnath.valluri@intel.com> wrote:
-> On Thu, 2017-09-28 at 13:53 +0200, Marc-Andr=C3=A9 Lureau wrote:
->> Hi
->>
->> On Thu, Sep 28, 2017 at 11:20 AM, Amarnath Valluri
->> <amarnath.valluri@intel.com> wrote:
->> >
->> > This change introduces a new TPM backend driver that can
->> > communicate with
->> > swtpm(software TPM emulator) using unix domain socket interface.
->> > QEMU talks to
->> > TPM emulator using QEMU's socket-based chardev backend device.
->> >
->> > Swtpm uses two Unix sockets for communications, one for plain TPM
->> > commands and
->> > responses, and one for out-of-band control messages. QEMU passes
->> > data socket to
->> > be used over the control channel.
->> >
->> > The swtpm and associated tools can be found here:
->> >     https://github.com/stefanberger/swtpm
->> >
->> > The swtpm's control channel protocol specification can be found
->> > here:
->> >     https://github.com/stefanberger/swtpm/wiki/Control-Channel-Spec
->> > ification
->> >
->> > Usage:
->> >     # setup TPM state directory
->> >     mkdir /tmp/mytpm
->> >     chown -R tss:root /tmp/mytpm
->> >     /usr/bin/swtpm_setup --tpm-state /tmp/mytpm --createek
->> >
->> >     # Ask qemu to use TPM emulator with given tpm state directory
->> >     qemu-system-x86_64 \
->> >         [...] \
->> >         -chardev socket,id=3Dchrtpm,path=3D/tmp/swtpm-sock \
->> >         -tpmdev emulator,id=3Dtpm0,chardev=3Dchrtpm \
->> >         -device tpm-tis,tpmdev=3Dtpm0 \
->> >         [...]
->> >
->> > Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
->> > ---
->> >  configure             |  13 +-
->> >  hmp.c                 |   5 +
->> >  hw/tpm/Makefile.objs  |   1 +
->> >  hw/tpm/tpm_emulator.c | 599
->> > ++++++++++++++++++++++++++++++++++++++++++++++++++
->> >  hw/tpm/tpm_ioctl.h    | 246 +++++++++++++++++++++
->> >  qapi/tpm.json         |  21 +-
->> >  qemu-options.hx       |  22 +-
->> >  vl.c                  |   1 +
->> >  8 files changed, 901 insertions(+), 7 deletions(-)
->> >  create mode 100644 hw/tpm/tpm_emulator.c
->> >  create mode 100644 hw/tpm/tpm_ioctl.h
->> >
->> > diff --git a/configure b/configure
->> > index cb0f7ed..a1b956e 100755
->> > --- a/configure
->> > +++ b/configure
->> > @@ -3467,6 +3467,12 @@ else
->> >    tpm_passthrough=3Dno
->> >  fi
->> >
->> > +# TPM emulator is for all posix systems
->> > +if test "$mingw32" !=3D "yes"; then
->> > +  tpm_emulator=3D$tpm
->> > +else
->> > +  tpm_emulator=3Dno
->> > +fi
->> >  ##########################################
->> >  # attr probe
->> >
->> > @@ -5359,6 +5365,7 @@ echo "gcov enabled      $gcov"
->> >  echo "TPM support       $tpm"
->> >  echo "libssh2 support   $libssh2"
->> >  echo "TPM passthrough   $tpm_passthrough"
->> > +echo "TPM emulator      $tpm_emulator"
->> >  echo "QOM debugging     $qom_cast_debug"
->> >  echo "Live block migration $live_block_migration"
->> >  echo "lzo support       $lzo"
->> > @@ -5937,12 +5944,16 @@ if test "$live_block_migration" =3D "yes" ;
->> > then
->> >    echo "CONFIG_LIVE_BLOCK_MIGRATION=3Dy" >> $config_host_mak
->> >  fi
->> >
->> > -# TPM passthrough support?
->> >  if test "$tpm" =3D "yes"; then
->> >    echo 'CONFIG_TPM=3D$(CONFIG_SOFTMMU)' >> $config_host_mak
->> > +  # TPM passthrough support?
->> >    if test "$tpm_passthrough" =3D "yes"; then
->> >      echo "CONFIG_TPM_PASSTHROUGH=3Dy" >> $config_host_mak
->> >    fi
->> > +  # TPM emulator support?
->> > +  if test "$tpm_emulator" =3D "yes"; then
->> > +    echo "CONFIG_TPM_EMULATOR=3Dy" >> $config_host_mak
->> > +  fi
->> >  fi
->> >
->> >  echo "TRACE_BACKENDS=3D$trace_backends" >> $config_host_mak
->> > diff --git a/hmp.c b/hmp.c
->> > index 0fb2bc7..9cd8179 100644
->> > --- a/hmp.c
->> > +++ b/hmp.c
->> > @@ -994,6 +994,7 @@ void hmp_info_tpm(Monitor *mon, const QDict
->> > *qdict)
->> >      Error *err =3D NULL;
->> >      unsigned int c =3D 0;
->> >      TPMPassthroughOptions *tpo;
->> > +    TPMEmulatorOptions *teo;
->> >
->> >      info_list =3D qmp_query_tpm(&err);
->> >      if (err) {
->> > @@ -1023,6 +1024,10 @@ void hmp_info_tpm(Monitor *mon, const QDict
->> > *qdict)
->> >                             tpo->has_cancel_path ? ",cancel-path=3D"
->> > : "",
->> >                             tpo->has_cancel_path ? tpo->cancel_path
->> > : "");
->> >              break;
->> > +        case TPM_TYPE_OPTIONS_KIND_EMULATOR:
->> > +            teo =3D ti->options->u.emulator.data;
->> > +            monitor_printf(mon, ",chardev=3D%s", teo->chardev);
->> > +            break;
->> >          case TPM_TYPE_OPTIONS_KIND__MAX:
->> >              break;
->> >          }
->> > diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
->> > index 64cecc3..41f0b7a 100644
->> > --- a/hw/tpm/Makefile.objs
->> > +++ b/hw/tpm/Makefile.objs
->> > @@ -1,2 +1,3 @@
->> >  common-obj-$(CONFIG_TPM_TIS) +=3D tpm_tis.o
->> >  common-obj-$(CONFIG_TPM_PASSTHROUGH) +=3D tpm_passthrough.o
->> > tpm_util.o
->> > +common-obj-$(CONFIG_TPM_EMULATOR) +=3D tpm_emulator.o tpm_util.o
->> > diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
->> > new file mode 100644
->> > index 0000000..0065b0a
->> > --- /dev/null
->> > +++ b/hw/tpm/tpm_emulator.c
->> > @@ -0,0 +1,599 @@
->> > +/*
->> > + *  Emulator TPM driver
->> > + *
->> > + *  Copyright (c) 2017 Intel Corporation
->> > + *  Author: Amarnath Valluri <amarnath.valluri@intel.com>
->> > + *
->> > + *  Copyright (c) 2010 - 2013 IBM Corporation
->> > + *  Authors:
->> > + *    Stefan Berger <stefanb@us.ibm.com>
->> > + *
->> > + *  Copyright (C) 2011 IAIK, Graz University of Technology
->> > + *    Author: Andreas Niederl
->> > + *
->> > + * This library is free software; you can redistribute it and/or
->> > + * modify it under the terms of the GNU Lesser General Public
->> > + * License as published by the Free Software Foundation; either
->> > + * version 2 of the License, or (at your option) any later
->> > version.
->> > + *
->> > + * This library is distributed in the hope that it will be useful,
->> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> > GNU
->> > + * Lesser General Public License for more details.
->> > + *
->> > + * You should have received a copy of the GNU Lesser General
->> > Public
->> > + * License along with this library; if not, see <http://www.gnu.or
->> > g/licenses/>
->> > + *
->> > + */
->> > +
->> > +#include "qemu/osdep.h"
->> > +#include "qemu/error-report.h"
->> > +#include "qemu/sockets.h"
->> > +#include "io/channel-socket.h"
->> > +#include "sysemu/tpm_backend.h"
->> > +#include "tpm_int.h"
->> > +#include "hw/hw.h"
->> > +#include "hw/i386/pc.h"
->> > +#include "tpm_util.h"
->> > +#include "tpm_ioctl.h"
->> > +#include "migration/blocker.h"
->> > +#include "qapi/error.h"
->> > +#include "qapi/clone-visitor.h"
->> > +#include "chardev/char-fe.h"
->> > +
->> > +#include <fcntl.h>
->> > +#include <sys/types.h>
->> > +#include <sys/stat.h>
->> > +#include <stdio.h>
->> > +
->> > +#define DEBUG_TPM 0
->> > +
->> > +#define DPRINTF(fmt, ...) do { \
->> > +    if (DEBUG_TPM) { \
->> > +        fprintf(stderr, "tpm-emulator:"fmt"\n", ## __VA_ARGS__); \
->> > +    } \
->> > +} while (0)
->> > +
->> > +#define TYPE_TPM_EMULATOR "tpm-emulator"
->> > +#define TPM_EMULATOR(obj) \
->> > +    OBJECT_CHECK(TPMEmulator, (obj), TYPE_TPM_EMULATOR)
->> > +
->> > +#define TPM_EMULATOR_IMPLEMENTS_ALL_CAPS(S, cap) (((S)->caps &
->> > (cap)) =3D=3D (cap))
->> > +
->> > +static const TPMDriverOps tpm_emulator_driver;
->> > +
->> > +/* data structures */
->> > +typedef struct TPMEmulator {
->> > +    TPMBackend parent;
->> > +
->> > +    TPMEmulatorOptions *options;
->> > +    CharBackend ctrl_chr;
->> > +    QIOChannel *data_ioc;
->> > +    TPMVersion tpm_version;
->> > +    ptm_cap caps; /* capabilities of the TPM */
->> > +    uint8_t cur_locty_number; /* last set locality */
->> > +    QemuMutex state_lock;
->> The mutex isnt doing much with this code, as there should be no
->> concurrent handle_request() (thread-pool has max-thread=3D1).
-> Yes I agree, I can remove this mutex in this case.
->>
->> (I wonder if we could replace the thread-pool with a coroutine/bh
->> doing IO instead to avoid potential thread races... or just do IO in
->> the current context, like the ctrlcmd)
-> Yes we should. Can we do it as a separate PR?. As it touches both the
-> backends.
->
+Hi Jiang,
 
-Absolutely, this is not directly related. We should try to get your
-series merged first. I have a pending series with various tpm
-cleanups, I may try to tackle that too.
+I'm not sure it is really helpful to remove those comment, they are here 
+as debt to the project, reminding what should be implemented.
 
-Thanks
+Are you proposing to accept this instructions will never get implemented?
 
+Regards,
 
---=20
-Marc-Andr=C3=A9 Lureau
+Phil.
+
+On 09/29/2017 06:35 AM, Jiang Biao wrote:
+> Signed-off-by: Jiang Biao <jiang.biao2@zte.com.cn>
+> ---
+>   target/mips/translate.c | 48 ------------------------------------------------
+>   1 file changed, 48 deletions(-)
+> 
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index 559f8fe..7c102a4 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -5133,7 +5133,6 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>               rn = "Context";
+>               break;
+>           case 1:
+> -//            gen_helper_mfc0_contextconfig(arg); /* SmartMIPS ASE */
+>               rn = "ContextConfig";
+>               goto cp0_unimplemented;
+>           case 2:
+> @@ -5455,19 +5454,15 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>               rn = "Debug";
+>               break;
+>           case 1:
+> -//            gen_helper_mfc0_tracecontrol(arg); /* PDtrace support */
+>               rn = "TraceControl";
+>               goto cp0_unimplemented;
+>           case 2:
+> -//            gen_helper_mfc0_tracecontrol2(arg); /* PDtrace support */
+>               rn = "TraceControl2";
+>               goto cp0_unimplemented;
+>           case 3:
+> -//            gen_helper_mfc0_usertracedata(arg); /* PDtrace support */
+>               rn = "UserTraceData";
+>               goto cp0_unimplemented;
+>           case 4:
+> -//            gen_helper_mfc0_tracebpc(arg); /* PDtrace support */
+>               rn = "TraceBPC";
+>               goto cp0_unimplemented;
+>           default:
+> @@ -5493,31 +5488,24 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>               rn = "Performance0";
+>               break;
+>           case 1:
+> -//            gen_helper_mfc0_performance1(arg);
+>               rn = "Performance1";
+>               goto cp0_unimplemented;
+>           case 2:
+> -//            gen_helper_mfc0_performance2(arg);
+>               rn = "Performance2";
+>               goto cp0_unimplemented;
+>           case 3:
+> -//            gen_helper_mfc0_performance3(arg);
+>               rn = "Performance3";
+>               goto cp0_unimplemented;
+>           case 4:
+> -//            gen_helper_mfc0_performance4(arg);
+>               rn = "Performance4";
+>               goto cp0_unimplemented;
+>           case 5:
+> -//            gen_helper_mfc0_performance5(arg);
+>               rn = "Performance5";
+>               goto cp0_unimplemented;
+>           case 6:
+> -//            gen_helper_mfc0_performance6(arg);
+>               rn = "Performance6";
+>               goto cp0_unimplemented;
+>           case 7:
+> -//            gen_helper_mfc0_performance7(arg);
+>               rn = "Performance7";
+>               goto cp0_unimplemented;
+>           default:
+> @@ -5785,7 +5773,6 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>               rn = "Context";
+>               break;
+>           case 1:
+> -//            gen_helper_mtc0_contextconfig(cpu_env, arg); /* SmartMIPS ASE */
+>               rn = "ContextConfig";
+>               goto cp0_unimplemented;
+>           case 2:
+> @@ -6110,13 +6097,11 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>               rn = "Debug";
+>               break;
+>           case 1:
+> -//            gen_helper_mtc0_tracecontrol(cpu_env, arg); /* PDtrace support */
+>               rn = "TraceControl";
+>               /* Stop translation as we may have switched the execution mode */
+>               ctx->bstate = BS_STOP;
+>               goto cp0_unimplemented;
+>           case 2:
+> -//            gen_helper_mtc0_tracecontrol2(cpu_env, arg); /* PDtrace support */
+>               rn = "TraceControl2";
+>               /* Stop translation as we may have switched the execution mode */
+>               ctx->bstate = BS_STOP;
+> @@ -6124,13 +6109,11 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>           case 3:
+>               /* Stop translation as we may have switched the execution mode */
+>               ctx->bstate = BS_STOP;
+> -//            gen_helper_mtc0_usertracedata(cpu_env, arg); /* PDtrace support */
+>               rn = "UserTraceData";
+>               /* Stop translation as we may have switched the execution mode */
+>               ctx->bstate = BS_STOP;
+>               goto cp0_unimplemented;
+>           case 4:
+> -//            gen_helper_mtc0_tracebpc(cpu_env, arg); /* PDtrace support */
+>               /* Stop translation as we may have switched the execution mode */
+>               ctx->bstate = BS_STOP;
+>               rn = "TraceBPC";
+> @@ -6157,31 +6140,24 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>               rn = "Performance0";
+>               break;
+>           case 1:
+> -//            gen_helper_mtc0_performance1(arg);
+>               rn = "Performance1";
+>               goto cp0_unimplemented;
+>           case 2:
+> -//            gen_helper_mtc0_performance2(arg);
+>               rn = "Performance2";
+>               goto cp0_unimplemented;
+>           case 3:
+> -//            gen_helper_mtc0_performance3(arg);
+>               rn = "Performance3";
+>               goto cp0_unimplemented;
+>           case 4:
+> -//            gen_helper_mtc0_performance4(arg);
+>               rn = "Performance4";
+>               goto cp0_unimplemented;
+>           case 5:
+> -//            gen_helper_mtc0_performance5(arg);
+>               rn = "Performance5";
+>               goto cp0_unimplemented;
+>           case 6:
+> -//            gen_helper_mtc0_performance6(arg);
+>               rn = "Performance6";
+>               goto cp0_unimplemented;
+>           case 7:
+> -//            gen_helper_mtc0_performance7(arg);
+>               rn = "Performance7";
+>               goto cp0_unimplemented;
+>           default:
+> @@ -6447,7 +6423,6 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>               rn = "Context";
+>               break;
+>           case 1:
+> -//            gen_helper_dmfc0_contextconfig(arg); /* SmartMIPS ASE */
+>               rn = "ContextConfig";
+>               goto cp0_unimplemented;
+>           case 2:
+> @@ -6762,19 +6737,15 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>               rn = "Debug";
+>               break;
+>           case 1:
+> -//            gen_helper_dmfc0_tracecontrol(arg, cpu_env); /* PDtrace support */
+>               rn = "TraceControl";
+>               goto cp0_unimplemented;
+>           case 2:
+> -//            gen_helper_dmfc0_tracecontrol2(arg, cpu_env); /* PDtrace support */
+>               rn = "TraceControl2";
+>               goto cp0_unimplemented;
+>           case 3:
+> -//            gen_helper_dmfc0_usertracedata(arg, cpu_env); /* PDtrace support */
+>               rn = "UserTraceData";
+>               goto cp0_unimplemented;
+>           case 4:
+> -//            gen_helper_dmfc0_tracebpc(arg, cpu_env); /* PDtrace support */
+>               rn = "TraceBPC";
+>               goto cp0_unimplemented;
+>           default:
+> @@ -6799,31 +6770,24 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>               rn = "Performance0";
+>               break;
+>           case 1:
+> -//            gen_helper_dmfc0_performance1(arg);
+>               rn = "Performance1";
+>               goto cp0_unimplemented;
+>           case 2:
+> -//            gen_helper_dmfc0_performance2(arg);
+>               rn = "Performance2";
+>               goto cp0_unimplemented;
+>           case 3:
+> -//            gen_helper_dmfc0_performance3(arg);
+>               rn = "Performance3";
+>               goto cp0_unimplemented;
+>           case 4:
+> -//            gen_helper_dmfc0_performance4(arg);
+>               rn = "Performance4";
+>               goto cp0_unimplemented;
+>           case 5:
+> -//            gen_helper_dmfc0_performance5(arg);
+>               rn = "Performance5";
+>               goto cp0_unimplemented;
+>           case 6:
+> -//            gen_helper_dmfc0_performance6(arg);
+>               rn = "Performance6";
+>               goto cp0_unimplemented;
+>           case 7:
+> -//            gen_helper_dmfc0_performance7(arg);
+>               rn = "Performance7";
+>               goto cp0_unimplemented;
+>           default:
+> @@ -7083,7 +7047,6 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>               rn = "Context";
+>               break;
+>           case 1:
+> -//           gen_helper_mtc0_contextconfig(cpu_env, arg); /* SmartMIPS ASE */
+>               rn = "ContextConfig";
+>               goto cp0_unimplemented;
+>           case 2:
+> @@ -7410,25 +7373,21 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>               rn = "Debug";
+>               break;
+>           case 1:
+> -//            gen_helper_mtc0_tracecontrol(cpu_env, arg); /* PDtrace support */
+>               /* Stop translation as we may have switched the execution mode */
+>               ctx->bstate = BS_STOP;
+>               rn = "TraceControl";
+>               goto cp0_unimplemented;
+>           case 2:
+> -//            gen_helper_mtc0_tracecontrol2(cpu_env, arg); /* PDtrace support */
+>               /* Stop translation as we may have switched the execution mode */
+>               ctx->bstate = BS_STOP;
+>               rn = "TraceControl2";
+>               goto cp0_unimplemented;
+>           case 3:
+> -//            gen_helper_mtc0_usertracedata(cpu_env, arg); /* PDtrace support */
+>               /* Stop translation as we may have switched the execution mode */
+>               ctx->bstate = BS_STOP;
+>               rn = "UserTraceData";
+>               goto cp0_unimplemented;
+>           case 4:
+> -//            gen_helper_mtc0_tracebpc(cpu_env, arg); /* PDtrace support */
+>               /* Stop translation as we may have switched the execution mode */
+>               ctx->bstate = BS_STOP;
+>               rn = "TraceBPC";
+> @@ -7455,31 +7414,24 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>               rn = "Performance0";
+>               break;
+>           case 1:
+> -//            gen_helper_mtc0_performance1(cpu_env, arg);
+>               rn = "Performance1";
+>               goto cp0_unimplemented;
+>           case 2:
+> -//            gen_helper_mtc0_performance2(cpu_env, arg);
+>               rn = "Performance2";
+>               goto cp0_unimplemented;
+>           case 3:
+> -//            gen_helper_mtc0_performance3(cpu_env, arg);
+>               rn = "Performance3";
+>               goto cp0_unimplemented;
+>           case 4:
+> -//            gen_helper_mtc0_performance4(cpu_env, arg);
+>               rn = "Performance4";
+>               goto cp0_unimplemented;
+>           case 5:
+> -//            gen_helper_mtc0_performance5(cpu_env, arg);
+>               rn = "Performance5";
+>               goto cp0_unimplemented;
+>           case 6:
+> -//            gen_helper_mtc0_performance6(cpu_env, arg);
+>               rn = "Performance6";
+>               goto cp0_unimplemented;
+>           case 7:
+> -//            gen_helper_mtc0_performance7(cpu_env, arg);
+>               rn = "Performance7";
+>               goto cp0_unimplemented;
+>           default:
+> 
