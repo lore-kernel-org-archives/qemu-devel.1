@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dxm9M-0005fb-CF
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 23:39:41 -0400
+	(envelope-from <peterx@redhat.com>) id 1dxm9Q-0005kI-U5
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 23:39:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dxm9H-0006U2-Cl
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 23:39:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46856)
+	(envelope-from <peterx@redhat.com>) id 1dxm9Q-0006f0-2Y
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 23:39:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36834)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dxm9H-0006Th-3W
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 23:39:35 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dxm9P-0006dn-QW
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 23:39:44 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Fri, 29 Sep 2017 11:38:29 +0800
-Message-Id: <20170929033844.26935-8-peterx@redhat.com>
+Date: Fri, 29 Sep 2017 11:38:31 +0800
+Message-Id: <20170929033844.26935-10-peterx@redhat.com>
 In-Reply-To: <20170929033844.26935-1-peterx@redhat.com>
 References: <20170929033844.26935-1-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC v2 07/22] monitor: move the cur_mon hack deeper
- for QMP
+Subject: [Qemu-devel] [RFC v2 09/22] monitor: create monitor dedicate
+ iothread
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -27,81 +27,101 @@ To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-In monitor_qmp_read(), we have the hack to temporarily replace the
-cur_mon pointer.  Now we move this hack deeper inside the QMP dispatcher
-routine since the Monitor pointer can be passed in to that using the new
-JSON Parser opaque field now.
+Create one IO thread for the monitors, prepared to handle all the
+input/output IOs using existing iothread framework.
 
-This does not make much sense as a single patch.  However, this will be
-a big step for the next patch, when the QMP dispatcher routine will be
-split from the QMP parser.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- monitor.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ monitor.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
 diff --git a/monitor.c b/monitor.c
-index ebeb54b0d3..f6cd9ba529 100644
+index 9a8482a962..b44e1f6c86 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -3826,7 +3826,7 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens,
- {
-     QObject *req, *rsp = NULL, *id = NULL;
-     QDict *qdict = NULL;
--    Monitor *mon = cur_mon;
-+    Monitor *mon = opaque, *old_mon;
-     Error *err = NULL;
+@@ -76,6 +76,7 @@
+ #include "qmp-introspect.h"
+ #include "sysemu/qtest.h"
+ #include "sysemu/cpus.h"
++#include "sysemu/iothread.h"
+ #include "qemu/cutils.h"
+ #include "qapi/qmp/dispatch.h"
  
-     req = json_parser_parse_err(tokens, NULL, &err);
-@@ -3851,8 +3851,13 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens,
-         QDECREF(req_json);
-     }
+@@ -208,6 +209,12 @@ struct Monitor {
+     QLIST_ENTRY(Monitor) entry;
+ };
  
-+    old_mon = cur_mon;
-+    cur_mon = mon;
++struct MonitorGlobal {
++    IOThread *mon_io_thread;
++};
 +
-     rsp = qmp_dispatch(cur_mon->qmp.commands, req);
- 
-+    cur_mon = old_mon;
++static struct MonitorGlobal mon_global;
 +
-     if (mon->qmp.commands == &qmp_cap_negotiation_commands) {
-         qdict = qdict_get_qdict(qobject_to_qdict(rsp), "error");
-         if (qdict
-@@ -3889,13 +3894,9 @@ err_out:
+ /* QMP checker flags */
+ #define QMP_ACCEPT_UNKNOWNS 1
  
- static void monitor_qmp_read(void *opaque, const uint8_t *buf, int size)
- {
--    Monitor *old_mon = cur_mon;
--
--    cur_mon = opaque;
--
--    json_message_parser_feed(&cur_mon->qmp.parser, (const char *) buf, size);
-+    Monitor *mon = opaque;
- 
--    cur_mon = old_mon;
-+    json_message_parser_feed(&mon->qmp.parser, (const char *) buf, size);
+@@ -4047,12 +4054,29 @@ static void sortcmdlist(void)
+     qsort((void *)info_cmds, array_num, elem_size, compare_mon_cmd);
  }
  
- static void monitor_read(void *opaque, const uint8_t *buf, int size)
-@@ -3969,7 +3970,7 @@ static void monitor_qmp_event(void *opaque, int event)
-         break;
-     case CHR_EVENT_CLOSED:
-         json_message_parser_destroy(&mon->qmp.parser);
--        json_message_parser_init(&mon->qmp.parser, handle_qmp_command, NULL);
-+        json_message_parser_init(&mon->qmp.parser, handle_qmp_command, mon);
-         mon_refcount--;
-         monitor_fdsets_cleanup();
-         break;
-@@ -4119,7 +4120,7 @@ void monitor_init(Chardev *chr, int flags)
-         qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_qmp_read,
-                                  monitor_qmp_event, NULL, mon, NULL, true);
-         qemu_chr_fe_set_echo(&mon->chr, true);
--        json_message_parser_init(&mon->qmp.parser, handle_qmp_command, NULL);
-+        json_message_parser_init(&mon->qmp.parser, handle_qmp_command, mon);
-     } else {
-         qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_read,
-                                  monitor_event, NULL, mon, NULL, true);
++static GMainContext *monitor_io_context_get(void)
++{
++    return iothread_get_g_main_context(mon_global.mon_io_thread);
++}
++
++static void monitor_io_thread_init(void)
++{
++    mon_global.mon_io_thread = iothread_create("monitor_io_thr",
++                                               &error_abort);
++    /*
++     * Gcontext in iothread is using lazy init - the first time we
++     * fetch the context we'll have that initialized.
++     */
++    monitor_io_context_get();
++}
++
+ void monitor_init_globals(void)
+ {
+     monitor_init_qmp_commands();
+     monitor_qapi_event_init();
+     sortcmdlist();
+     qemu_mutex_init(&monitor_lock);
++    monitor_io_thread_init();
+ }
+ 
+ /* These functions just adapt the readline interface in a typesafe way.  We
+@@ -4126,10 +4150,23 @@ void monitor_init(Chardev *chr, int flags)
+     qemu_mutex_unlock(&monitor_lock);
+ }
+ 
++static void monitor_io_thread_destroy(void)
++{
++    iothread_destroy(mon_global.mon_io_thread);
++    mon_global.mon_io_thread = NULL;
++}
++
+ void monitor_cleanup(void)
+ {
+     Monitor *mon, *next;
+ 
++    /*
++     * We need to explicitly stop the iothread (but not destroy it),
++     * cleanup the monitor resources, then destroy the iothread.  See
++     * again on the glib bug mentioned in 2b316774f6 for a reason.
++     */
++    iothread_stop(mon_global.mon_io_thread);
++
+     qemu_mutex_lock(&monitor_lock);
+     QLIST_FOREACH_SAFE(mon, &mon_list, entry, next) {
+         QLIST_REMOVE(mon, entry);
+@@ -4137,6 +4174,8 @@ void monitor_cleanup(void)
+         g_free(mon);
+     }
+     qemu_mutex_unlock(&monitor_lock);
++
++    monitor_io_thread_destroy();
+ }
+ 
+ QemuOptsList qemu_mon_opts = {
 -- 
 2.13.5
