@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gedwards@ddn.com>) id 1dy3Jl-0000NZ-1y
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 17:59:34 -0400
+	(envelope-from <lersek@redhat.com>) id 1dy3ZH-0002rI-Fh
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 18:15:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gedwards@ddn.com>) id 1dy3Jg-0006c7-50
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 17:59:33 -0400
-Received: from legacy.ddn.com ([64.47.133.206]:43532)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <gedwards@ddn.com>) id 1dy3Jf-0006bf-VM
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 17:59:28 -0400
-Date: Fri, 29 Sep 2017 15:59:23 -0600
-From: Greg Edwards <gedwards@ddn.com>
-Message-ID: <20170929215922.GC4541@psuche>
-References: <20170928205211.15641-1-gedwards@ddn.com>
-	<2e1d2e56-7969-cb58-b462-dc140c3ff91c@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1dy3ZD-0006QD-CO
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 18:15:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37240)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dy3ZD-0006Pu-39
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 18:15:31 -0400
+References: <69fd8746-b2bd-31d0-4d70-792f40ef2d79@amd.com>
+	<20170926170901-mutt-send-email-mst@kernel.org>
+	<2fb6e86d-5afa-d7f0-6f62-8f81db5a5419@amd.com>
+	<20170927190724-mutt-send-email-mst@kernel.org>
+	<927fedc3-a2c8-d37c-930e-11cecb7b0149@amd.com>
+	<20170929223152-mutt-send-email-mst@kernel.org>
+	<05b3c915-d7c1-2d73-1579-68d5f3bcc3d7@amd.com>
+	<20170930000900-mutt-send-email-mst@kernel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <a5dbaca2-511b-0da0-0395-92bf46fff2cd@redhat.com>
+Date: Sat, 30 Sep 2017 00:15:20 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <2e1d2e56-7969-cb58-b462-dc140c3ff91c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] char: report errors from qio_channel_{read,
- write}v_full
+In-Reply-To: <20170930000900-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] libvirt/QEMU/SEV interaction
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -27,31 +33,82 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Richard Relph <richard.relph@amd.com>
+Cc: libvir-list@redhat.com, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-On Fri, Sep 29, 2017 at 11:12:41AM +0200, Paolo Bonzini wrote:
-> On 28/09/2017 22:52, Greg Edwards wrote:
->> Two callers of qio_channel_{read,write}v_full were not passing in an
->> Error pointer, missing any error messages from the channel class
->> io_{read,write}v methods.
->
-> This is on purpose in order to avoid "spamming" the logs.  In
-> particular, for sockets it can be a normal thing for the other side to
-> disconnect.
+On 09/29/17 23:16, Michael S. Tsirkin wrote:
+> On Fri, Sep 29, 2017 at 02:48:45PM -0500, Richard Relph wrote:
+>> On 9/29/17 2:34 PM, Michael S. Tsirkin wrote:
+>>> On Wed, Sep 27, 2017 at 02:06:10PM -0500, Richard Relph wrote:
+>>>> Whether the "BIOS" is a "static shim" as Michael suggests, or a full BIOS,
+>>>> or even a BIOS+kernel+initrd is really not too significant. What is
+>>>> significant is that the GO has a basis for trusting all code that is
+>>>> imported in to their VM by the CP. And that NONE of the code provided by the
+>>>> CP is "unknown" and unauditable by the GO. If the CP has a way to inject
+>>>> code unknown to the GO in to the guest VM, the trust model is broken and
+>>>> both GO and CP suffer the consequences.
+>>>
+>>> Absolutely.
+>>>
+>>>> When the CP needs to update the BIOS image, they will have to inform the GO
+>>>> and allow the GO to establish trust in the CP's new BIOS image somehow.
+>>>
+>>> This GO update on every BIOS change is imho is not a workable model. You
+>>> want something like checking the BIOS signature instead. And since
+>>> hardware is all hash based, you need the shim to do it in software.
+>>
+>> A BIOS "signed" by the CP doesn't meet the security requirement. It is code
+>> that is "unknown" to the GO.
+> 
+> There is a misunderstanding here.
+> 
+> BIOS would not be signed by a CP. It would be signed by a trusted
+> software vendor e.g. by Red Hat.
+> 
+>> The (legitimate) CP does NOT want to be in that position of trust. If they
+>> are, then some government somewhere is going to insist that they sign a BIOS
+>> that allows the government to spy on the GO's VMs, and steal secrets from
+>> it. Or some hacker admin will do it "for fun".
+>>
+>> How often do large public CPs really change their BIOSes? My sense is that
+>> large public CPs prefer stability over "latest and greatest".
+> 
+> CPs just do dnf update. Software vendors change BIOSes.
+> 
+> And we do change them. Look at number of revisions for seabios in e.g.
+> Fedora. More importantly we might need to change them quickly e.g.
+> because of a security issue. Adding the need to coordinate with all GOs
+> is not going to work. Neither can QEMU support booting old BIOS
+> versions on new machine types indefinitely.
+> 
+>> And, perhaps more importantly, if a CP are able to sell a "more secure" VM,
+>> one that justifies a higher price per vCPU hour, wouldn't that warrant some
+>> changes in the "insecure" model being used today?
+>>
+>> Richard
+> 
+> Absolutely. CPs have no business signing images. But it is just not
+> really feasible for software vendors to distribute hashes.
 
-Thanks for the background, Paolo.
+Can this be helped by "reproducible builds"? Like,
 
-We had encountered a vhost-user-scsi initialization failure, and were
-looking for the errno from the recvmsg failure from
-VHOST_USER_GET_FEATURES:
+- guest firmware vendor publishes the source package,
+- GO asynchronously audits the source package (most likely
+incrementally, reviewing the new, broken-out patches in the source package),
+- GO builds the binary package,
+- GO verifies that it bit-wise matches the guest fw vendor's binary package,
+- GO adds the fw binary's hash to their own whitelist.
 
-qemu-system-x86_64: -device vhost-user-scsi-pci,chardev=vus0,bootindex=2: Failed to read msg header. Read -1 instead of 12. Original request 1.
-qemu-system-x86_64: -device vhost-user-scsi-pci,chardev=vus0,bootindex=2: vhost-user-scsi: vhost initialization failed: Operation not permitted
+By virtue of releasing the source package of the guest firmware (and by
+announcing it via another erratum), the guest fw vendor implicitly
+notifies all GOs. It is then up to the individual GOs to evaluate the
+changes on their own time, and to switch to the new fw binary.
 
-In this case, the strerror in vhost_user_scsi_realize is just reporting
-on the -1 returned from the vhost_user_read failure, not the errno of
-original offender.  That's what started me down this path.
+It would even be OK if the GO built their own fw binary from the source
+package, and submitted that to the CP, as part of the guest payload. The
+guest firmware vendor would still be able to support this build, since
+it would match the vendor's own binary 100%.
 
-Greg
+Thanks
+Laszlo
