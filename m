@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Richard.Relph@amd.com>) id 1dy1HL-0000bn-71
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:48:56 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dy1Hx-0000xf-4R
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:49:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Richard.Relph@amd.com>) id 1dy1HH-0006z5-8D
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:48:55 -0400
-Received: from mail-by2nam01on0044.outbound.protection.outlook.com
-	([104.47.34.44]:40909
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Richard.Relph@amd.com>)
-	id 1dy1HG-0006yb-U4
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:48:51 -0400
-References: <69fd8746-b2bd-31d0-4d70-792f40ef2d79@amd.com>
-	<20170926170901-mutt-send-email-mst@kernel.org>
-	<2fb6e86d-5afa-d7f0-6f62-8f81db5a5419@amd.com>
-	<20170927190724-mutt-send-email-mst@kernel.org>
-	<927fedc3-a2c8-d37c-930e-11cecb7b0149@amd.com>
-	<20170929223152-mutt-send-email-mst@kernel.org>
-From: Richard Relph <richard.relph@amd.com>
-Message-ID: <05b3c915-d7c1-2d73-1579-68d5f3bcc3d7@amd.com>
-Date: Fri, 29 Sep 2017 14:48:45 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1dy1Hw-0007Ah-6U
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:49:33 -0400
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:52716)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dy1Hv-0007AF-VE
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:49:32 -0400
+Received: by mail-wm0-x230.google.com with SMTP id m127so1377577wmm.1
+	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 12:49:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170929223152-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] libvirt/QEMU/SEV interaction
+In-Reply-To: <46ce7f3c-f0cb-bdfe-25fc-984276601f7d@vivier.eu>
+References: <1506703816-7359-1-git-send-email-zhuoweizhang@yahoo.com>
+	<46ce7f3c-f0cb-bdfe-25fc-984276601f7d@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 29 Sep 2017 12:49:08 -0700
+Message-ID: <CAFEAcA_wfyAweXnaz1eNZ6r0GvhFUoeRqk8vUUaV_wTEBNWu0g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] syscall: fix special case of write(fd, NULL,
+ 0)
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -34,42 +30,64 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: zhuoweizhang@yahoo.com, QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 List-ID: <qemu-devel.nongnu.org>
 
-On 9/29/17 2:34 PM, Michael S. Tsirkin wrote:
-> On Wed, Sep 27, 2017 at 02:06:10PM -0500, Richard Relph wrote:
->> Whether the "BIOS" is a "static shim" as Michael suggests, or a full BIOS,
->> or even a BIOS+kernel+initrd is really not too significant. What is
->> significant is that the GO has a basis for trusting all code that is
->> imported in to their VM by the CP. And that NONE of the code provided by the
->> CP is "unknown" and unauditable by the GO. If the CP has a way to inject
->> code unknown to the GO in to the guest VM, the trust model is broken and
->> both GO and CP suffer the consequences.
-> 
-> Absolutely.
-> 
->> When the CP needs to update the BIOS image, they will have to inform the GO
->> and allow the GO to establish trust in the CP's new BIOS image somehow.
-> 
-> This GO update on every BIOS change is imho is not a workable model. You
-> want something like checking the BIOS signature instead. And since
-> hardware is all hash based, you need the shim to do it in software.
+On 29 September 2017 at 12:14, Laurent Vivier <laurent@vivier.eu> wrote:
+> Le 29/09/2017 =C3=A0 18:50, zhuoweizhang@yahoo.com a =C3=A9crit :
+>> From: Zhuowei Zhang <zhuoweizhang@yahoo.com>
+>>
+>> Linux returns success for the special case of calling write with a zero-=
+length
+>> NULL buffer: compiling and running
+>>
+>> ```
+>>
+>> int main() {
+>>    ssize_t ret =3D write(STDOUT_FILENO, NULL, 0);
+>>    fprintf(stderr, "write returned %ld\n", ret);
+>>    return 0;
+>> }
+>> ```
+>> gives "write returned 0" when run directly, but "write returned -1" in Q=
+EMU.
+>>
+>> This commit checks for this situation and returns success if found.
+>>
+>> Signed-off-by: Zhuowei Zhang <zhuoweizhang@yahoo.com>
+>> ---
+>>  linux-user/syscall.c | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>
+>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>> index 9b6364a..ecadf49 100644
+>> --- a/linux-user/syscall.c
+>> +++ b/linux-user/syscall.c
+>> @@ -7783,6 +7783,11 @@ abi_long do_syscall(void *cpu_env, int num, abi_l=
+ong arg1,
+>>          }
+>>          break;
+>>      case TARGET_NR_write:
+>> +        if (arg2 =3D=3D 0 && arg3 =3D=3D 0) {
+>> +            /* special case: write(fd, NULL, 0) returns success. */
+>> +            ret =3D 0;
+>> +            break;
+>> +        }
+>>          if (!(p =3D lock_user(VERIFY_READ, arg2, arg3, 1)))
+>>              goto efault;
+>>          if (fd_trans_target_to_host_data(arg1)) {
+>>
+>
+> I think we should keep the call to the kernel write() as the behavior
+> depends on the driver behind the syscall. Moreover, calling write() with
+> (NULL, 0) can triggers "something" at kernel level.
 
-A BIOS "signed" by the CP doesn't meet the security requirement. It is 
-code that is "unknown" to the GO.
+I tend to agree. On the other hand our handling of NR_read
+with a zero count just returns 0 without calling the syscall;
+perhaps we should change that for consistency?
 
-The (legitimate) CP does NOT want to be in that position of trust. If 
-they are, then some government somewhere is going to insist that they 
-sign a BIOS that allows the government to spy on the GO's VMs, and steal 
-secrets from it. Or some hacker admin will do it "for fun".
+Do we also have the same issue with pread64/pwrite64 ?
 
-How often do large public CPs really change their BIOSes? My sense is 
-that large public CPs prefer stability over "latest and greatest".
-
-And, perhaps more importantly, if a CP are able to sell a "more secure" 
-VM, one that justifies a higher price per vCPU hour, wouldn't that 
-warrant some changes in the "insecure" model being used today?
-
-Richard
+thanks
+-- PMM
