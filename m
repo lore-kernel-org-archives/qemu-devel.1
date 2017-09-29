@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <teisenbe@google.com>) id 1dy1tY-000200-Ac
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:28:25 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dy27X-00059Z-A3
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:42:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <teisenbe@google.com>) id 1dy1tX-0007hp-4e
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:28:24 -0400
-Received: from mail-qt0-x236.google.com ([2607:f8b0:400d:c0d::236]:56764)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <teisenbe@google.com>) id 1dy1tW-0007h3-U9
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:28:23 -0400
-Received: by mail-qt0-x236.google.com with SMTP id l25so1034482qtf.13
-	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 13:28:21 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1dy27V-0007Lw-NU
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:42:51 -0400
+References: <20170913160333.23622-1-eblake@redhat.com>
+	<20170913160333.23622-21-eblake@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <35698d23-4991-5210-68d8-5ef9fb3fa04a@redhat.com>
+Date: Fri, 29 Sep 2017 16:42:36 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170929194329.GO21016@localhost.localdomain>
-References: <CAP26EVRNVb=Mq=O3s51w7fDhGVmf-e3XFFA73MRzc5b4qKBA4g@mail.gmail.com>
-	<20170929194329.GO21016@localhost.localdomain>
-From: Todd Eisenberger <teisenbe@google.com>
-Date: Fri, 29 Sep 2017 13:28:20 -0700
-Message-ID: <CAP26EVQoZPT5i-HJ=QhhNvkzQrMgAa+HM+u17g+J_y=Sr6mdig@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] x86: Correct translation of some rdgsbase
- and wrgsbase encodings
+In-Reply-To: <20170913160333.23622-21-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 20/23] qemu-img: Change img_compare() to
+ be byte-based
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -28,54 +24,280 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-Ah, sorry for that trouble.  I'll look into setting up git-send-email next
-time I need to send a patch out.
 
-On Fri, Sep 29, 2017 at 12:43 PM, Eduardo Habkost <ehabkost@redhat.com>
-wrote:
 
-> On Thu, Sep 28, 2017 at 10:17:06AM -0700, Todd Eisenberger via Qemu-devel
-> wrote:
-> > It looks like there was a transcription error when writing this code
-> > initially.  The code previously only decoded src or dst of rax.  This
-> > resolves
-> > https://bugs.launchpad.net/qemu/+bug/1719984.
-> >
-> > Signed-off-by: Todd Eisenberger <teisenbe@google.com>
-> > ---
-> >  target/i386/translate.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/target/i386/translate.c b/target/i386/translate.c
-> > index a8986f4c1a..7b920115f9 100644
-> > --- a/target/i386/translate.c
-> > +++ b/target/i386/translate.c
-> > @@ -8155,9 +8155,9 @@ static target_ulong disas_insn(DisasContext *s,
-> > CPUState *cpu)
->
-> The patch is corrupted due to line wrapping.  I recommend using
-> git-send-email to avoid that.
->
-> I'm queueing it on x86-next after fixing it manually.
->
->
-> >              break;
-> >
-> >          case 0xc0 ... 0xc7: /* rdfsbase (f3 0f ae /0) */
-> > -        case 0xc8 ... 0xc8: /* rdgsbase (f3 0f ae /1) */
-> > +        case 0xc8 ... 0xcf: /* rdgsbase (f3 0f ae /1) */
-> >          case 0xd0 ... 0xd7: /* wrfsbase (f3 0f ae /2) */
-> > -        case 0xd8 ... 0xd8: /* wrgsbase (f3 0f ae /3) */
-> > +        case 0xd8 ... 0xdf: /* wrgsbase (f3 0f ae /3) */
-> >              if (CODE64(s)
-> >                  && (prefixes & PREFIX_REPZ)
-> >                  && !(prefixes & PREFIX_LOCK)
-> >
->
-> --
-> Eduardo
->
+On 09/13/2017 12:03 PM, Eric Blake wrote:
+> In the continuing quest to make more things byte-based, change
+> the internal iteration of img_compare().  We can finally drop the
+> TODO assertion added earlier, now that the entire algorithm is
+> byte-based and no longer has to shift from bytes to sectors.
+> 
+> Most of the change is mechanical ('total_sectors' becomes
+> 'total_size', 'sector_num' becomes 'offset', 'nb_sectors' becomes
+> 'chunk', 'progress_base' goes from sectors to bytes); some of it
+> is also a cleanup (sectors_to_bytes() is now unused, loss of
+> variable 'count' added earlier in commit 51b0a488).
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
+> ---
+> v3: new patch
+> ---
+>  qemu-img.c | 119 ++++++++++++++++++++++++-------------------------------------
+>  1 file changed, 46 insertions(+), 73 deletions(-)
+> 
+> diff --git a/qemu-img.c b/qemu-img.c
+> index 028c34a2cc..ef7062649d 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -1185,11 +1185,6 @@ static int compare_buffers(const uint8_t *buf1, const uint8_t *buf2,
+> 
+>  #define IO_BUF_SIZE (2 * 1024 * 1024)
+> 
+> -static int64_t sectors_to_bytes(int64_t sectors)
+> -{
+> -    return sectors << BDRV_SECTOR_BITS;
+> -}
+> -
+>  /*
+>   * Check if passed sectors are empty (not allocated or contain only 0 bytes)
+>   *
+> @@ -1240,7 +1235,7 @@ static int img_compare(int argc, char **argv)
+>      const char *fmt1 = NULL, *fmt2 = NULL, *cache, *filename1, *filename2;
+>      BlockBackend *blk1, *blk2;
+>      BlockDriverState *bs1, *bs2;
+> -    int64_t total_sectors1, total_sectors2;
+> +    int64_t total_size1, total_size2;
+>      uint8_t *buf1 = NULL, *buf2 = NULL;
+>      int64_t pnum1, pnum2;
+>      int allocated1, allocated2;
+> @@ -1248,9 +1243,9 @@ static int img_compare(int argc, char **argv)
+>      bool progress = false, quiet = false, strict = false;
+>      int flags;
+>      bool writethrough;
+> -    int64_t total_sectors;
+> -    int64_t sector_num = 0;
+> -    int64_t nb_sectors;
+> +    int64_t total_size;
+> +    int64_t offset = 0;
+> +    int64_t chunk;
+>      int c;
+>      uint64_t progress_base;
+>      bool image_opts = false;
+> @@ -1364,39 +1359,36 @@ static int img_compare(int argc, char **argv)
+> 
+>      buf1 = blk_blockalign(blk1, IO_BUF_SIZE);
+>      buf2 = blk_blockalign(blk2, IO_BUF_SIZE);
+> -    total_sectors1 = blk_nb_sectors(blk1);
+> -    if (total_sectors1 < 0) {
+> +    total_size1 = blk_getlength(blk1);
+> +    if (total_size1 < 0) {
+>          error_report("Can't get size of %s: %s",
+> -                     filename1, strerror(-total_sectors1));
+> +                     filename1, strerror(-total_size1));
+>          ret = 4;
+>          goto out;
+>      }
+> -    total_sectors2 = blk_nb_sectors(blk2);
+> -    if (total_sectors2 < 0) {
+> +    total_size2 = blk_getlength(blk2);
+> +    if (total_size2 < 0) {
+>          error_report("Can't get size of %s: %s",
+> -                     filename2, strerror(-total_sectors2));
+> +                     filename2, strerror(-total_size2));
+>          ret = 4;
+>          goto out;
+>      }
+> -    total_sectors = MIN(total_sectors1, total_sectors2);
+> -    progress_base = MAX(total_sectors1, total_sectors2);
+> +    total_size = MIN(total_size1, total_size2);
+> +    progress_base = MAX(total_size1, total_size2);
+> 
+>      qemu_progress_print(0, 100);
+> 
+> -    if (strict && total_sectors1 != total_sectors2) {
+> +    if (strict && total_size1 != total_size2) {
+>          ret = 1;
+>          qprintf(quiet, "Strict mode: Image size mismatch!\n");
+>          goto out;
+>      }
+> 
+> -    while (sector_num < total_sectors) {
+> +    while (offset < total_size) {
+>          int64_t status1, status2;
+> 
+> -        status1 = bdrv_block_status_above(bs1, NULL,
+> -                                          sector_num * BDRV_SECTOR_SIZE,
+> -                                          (total_sectors1 - sector_num) *
+> -                                          BDRV_SECTOR_SIZE,
+> -                                          &pnum1, NULL);
+> +        status1 = bdrv_block_status_above(bs1, NULL, offset,
+> +                                          total_size1 - offset, &pnum1, NULL);
+>          if (status1 < 0) {
+>              ret = 3;
+>              error_report("Sector allocation test failed for %s", filename1);
+> @@ -1404,11 +1396,8 @@ static int img_compare(int argc, char **argv)
+>          }
+>          allocated1 = status1 & BDRV_BLOCK_ALLOCATED;
+> 
+> -        status2 = bdrv_block_status_above(bs2, NULL,
+> -                                          sector_num * BDRV_SECTOR_SIZE,
+> -                                          (total_sectors2 - sector_num) *
+> -                                          BDRV_SECTOR_SIZE,
+> -                                          &pnum2, NULL);
+> +        status2 = bdrv_block_status_above(bs2, NULL, offset,
+> +                                          total_size2 - offset, &pnum2, NULL);
+>          if (status2 < 0) {
+>              ret = 3;
+>              error_report("Sector allocation test failed for %s", filename2);
+> @@ -1417,15 +1406,14 @@ static int img_compare(int argc, char **argv)
+>          allocated2 = status2 & BDRV_BLOCK_ALLOCATED;
+> 
+>          assert(pnum1 && pnum2);
+> -        nb_sectors = DIV_ROUND_UP(MIN(pnum1, pnum2), BDRV_SECTOR_SIZE);
+> +        chunk = MIN(pnum1, pnum2);
+
+Ayup, there goes that line.
+
+> 
+>          if (strict) {
+>              if ((status1 & ~BDRV_BLOCK_OFFSET_MASK) !=
+>                  (status2 & ~BDRV_BLOCK_OFFSET_MASK)) {
+>                  ret = 1;
+>                  qprintf(quiet, "Strict mode: Offset %" PRId64
+> -                        " block status mismatch!\n",
+> -                        sectors_to_bytes(sector_num));
+> +                        " block status mismatch!\n", offset);
+>                  goto out;
+>              }
+>          }
+> @@ -1435,59 +1423,54 @@ static int img_compare(int argc, char **argv)
+>              if (allocated1) {
+>                  int64_t pnum;
+> 
+> -                nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
+> -                ret = blk_pread(blk1, sector_num << BDRV_SECTOR_BITS, buf1,
+> -                                nb_sectors << BDRV_SECTOR_BITS);
+> +                chunk = MIN(chunk, IO_BUF_SIZE);
+> +                ret = blk_pread(blk1, offset, buf1, chunk);
+>                  if (ret < 0) {
+> -                    error_report("Error while reading offset %" PRId64 " of %s:"
+> -                                 " %s", sectors_to_bytes(sector_num), filename1,
+> -                                 strerror(-ret));
+> +                    error_report("Error while reading offset %" PRId64
+> +                                 " of %s: %s",
+> +                                 offset, filename1, strerror(-ret));
+>                      ret = 4;
+>                      goto out;
+>                  }
+> -                ret = blk_pread(blk2, sector_num << BDRV_SECTOR_BITS, buf2,
+> -                                nb_sectors << BDRV_SECTOR_BITS);
+> +                ret = blk_pread(blk2, offset, buf2, chunk);
+>                  if (ret < 0) {
+>                      error_report("Error while reading offset %" PRId64
+> -                                 " of %s: %s", sectors_to_bytes(sector_num),
+> -                                 filename2, strerror(-ret));
+> +                                 " of %s: %s",
+> +                                 offset, filename2, strerror(-ret));
+>                      ret = 4;
+>                      goto out;
+>                  }
+> -                ret = compare_buffers(buf1, buf2,
+> -                                      nb_sectors * BDRV_SECTOR_SIZE, &pnum);
+> -                if (ret || pnum != nb_sectors * BDRV_SECTOR_SIZE) {
+> +                ret = compare_buffers(buf1, buf2, chunk, &pnum);
+> +                if (ret || pnum != chunk) {
+>                      qprintf(quiet, "Content mismatch at offset %" PRId64 "!\n",
+> -                            sectors_to_bytes(sector_num) + (ret ? 0 : pnum));
+> +                            offset + (ret ? 0 : pnum));
+>                      ret = 1;
+>                      goto out;
+>                  }
+>              }
+>          } else {
+> -            nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
+> +            chunk = MIN(chunk, IO_BUF_SIZE);
+>              if (allocated1) {
+> -                ret = check_empty_sectors(blk1, sector_num * BDRV_SECTOR_SIZE,
+> -                                          nb_sectors * BDRV_SECTOR_SIZE,
+> +                ret = check_empty_sectors(blk1, offset, chunk,
+>                                            filename1, buf1, quiet);
+>              } else {
+> -                ret = check_empty_sectors(blk2, sector_num * BDRV_SECTOR_SIZE,
+> -                                          nb_sectors * BDRV_SECTOR_SIZE,
+> +                ret = check_empty_sectors(blk2, offset, chunk,
+>                                            filename2, buf1, quiet);
+>              }
+>              if (ret) {
+>                  goto out;
+>              }
+>          }
+> -        sector_num += nb_sectors;
+> -        qemu_progress_print(((float) nb_sectors / progress_base)*100, 100);
+> +        offset += chunk;
+> +        qemu_progress_print(((float) chunk / progress_base) * 100, 100);
+>      }
+> 
+> -    if (total_sectors1 != total_sectors2) {
+> +    if (total_size1 != total_size2) {
+>          BlockBackend *blk_over;
+>          const char *filename_over;
+> 
+>          qprintf(quiet, "Warning: Image size mismatch!\n");
+> -        if (total_sectors1 > total_sectors2) {
+> +        if (total_size1 > total_size2) {
+>              blk_over = blk1;
+>              filename_over = filename1;
+>          } else {
+> @@ -1495,14 +1478,10 @@ static int img_compare(int argc, char **argv)
+>              filename_over = filename2;
+>          }
+> 
+> -        while (sector_num < progress_base) {
+> -            int64_t count;
+> -
+> -            ret = bdrv_block_status_above(blk_bs(blk_over), NULL,
+> -                                          sector_num * BDRV_SECTOR_SIZE,
+> -                                          (progress_base - sector_num) *
+> -                                          BDRV_SECTOR_SIZE,
+> -                                          &count, NULL);
+> +        while (offset < progress_base) {
+> +            ret = bdrv_block_status_above(blk_bs(blk_over), NULL, offset,
+> +                                          progress_base - offset, &chunk,
+> +                                          NULL);
+>              if (ret < 0) {
+>                  ret = 3;
+>                  error_report("Sector allocation test failed for %s",
+> @@ -1510,22 +1489,16 @@ static int img_compare(int argc, char **argv)
+>                  goto out;
+> 
+>              }
+> -            /* TODO relax this once bdrv_block_status_above does not enforce
+> -             * sector alignment */
+> -            assert(QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE));
+> -            nb_sectors = count >> BDRV_SECTOR_BITS;
+>              if (ret & BDRV_BLOCK_ALLOCATED && !(ret & BDRV_BLOCK_ZERO)) {
+> -                nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
+> -                ret = check_empty_sectors(blk_over,
+> -                                          sector_num * BDRV_SECTOR_SIZE,
+> -                                          nb_sectors * BDRV_SECTOR_SIZE,
+> +                chunk = MIN(chunk, IO_BUF_SIZE);
+> +                ret = check_empty_sectors(blk_over, offset, chunk,
+>                                            filename_over, buf1, quiet);
+>                  if (ret) {
+>                      goto out;
+>                  }
+>              }
+> -            sector_num += nb_sectors;
+> -            qemu_progress_print(((float) nb_sectors / progress_base)*100, 100);
+> +            offset += chunk;
+> +            qemu_progress_print(((float) chunk / progress_base) * 100, 100);
+>          }
+>      }
+> 
+
+Reviewed-by: John Snow <jsnow@redhat.com>
