@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dxyYR-0000l9-RX
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 12:54:25 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dxyYe-0000uf-3D
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 12:54:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dxyYQ-0002nM-Nc
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 12:54:23 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dxyYc-0002tR-OK
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 12:54:36 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri, 29 Sep 2017 18:53:27 +0200
-Message-Id: <20170929165347.29658-6-mreitz@redhat.com>
+Date: Fri, 29 Sep 2017 18:53:28 +0200
+Message-Id: <20170929165347.29658-7-mreitz@redhat.com>
 In-Reply-To: <20170929165347.29658-1-mreitz@redhat.com>
 References: <20170929165347.29658-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 05/25] block: Make path_combine() return the
- path
+Subject: [Qemu-devel] [PATCH v6 06/25] block:
+ bdrv_get_full_backing_filename_from_...'s ret. val.
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -23,179 +23,146 @@ To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-Besides being safe for arbitrary path lengths, after some follow-up
-patches all callers will want a freshly allocated buffer anyway.
-
-In the meantime, path_combine_deprecated() is added which has the same
-interface as path_combine() had before this patch. All callers to that
-function will be converted in follow-up patches.
+Make bdrv_get_full_backing_filename_from_filename() return an allocated
+string instead of placing the result in a caller-provided buffer.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block.h |  4 +--
- block.c               | 85 ++++++++++++++++++++++++++++-----------------------
- block/vmdk.c          |  3 +-
- 3 files changed, 49 insertions(+), 43 deletions(-)
+ include/block/block.h |  7 +++----
+ block.c               | 51 +++++++++++++++++++++++++++++++++++----------------
+ block/vmdk.c          |  9 ++++-----
+ 3 files changed, 42 insertions(+), 25 deletions(-)
 
 diff --git a/include/block/block.h b/include/block/block.h
-index 3c3af462e4..a6ab70fb5e 100644
+index a6ab70fb5e..3002236967 100644
 --- a/include/block/block.h
 +++ b/include/block/block.h
-@@ -491,9 +491,7 @@ void bdrv_get_full_backing_filename_from_filename(const char *backed,
+@@ -484,10 +484,9 @@ void bdrv_get_backing_filename(BlockDriverState *bs,
+                                char *filename, int filename_size);
+ void bdrv_get_full_backing_filename(BlockDriverState *bs,
+                                     char *dest, size_t sz, Error **errp);
+-void bdrv_get_full_backing_filename_from_filename(const char *backed,
+-                                                  const char *backing,
+-                                                  char *dest, size_t sz,
+-                                                  Error **errp);
++char *bdrv_get_full_backing_filename_from_filename(const char *backed,
++                                                   const char *backing,
++                                                   Error **errp);
  
  int path_has_protocol(const char *path);
  int path_is_absolute(const char *path);
--void path_combine(char *dest, int dest_size,
--                  const char *base_path,
--                  const char *filename);
-+char *path_combine(const char *base_path, const char *filename);
- 
- int bdrv_readv_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos);
- int bdrv_writev_vmstate(BlockDriverState *bs, QEMUIOVector *qiov, int64_t pos);
 diff --git a/block.c b/block.c
-index ba24845960..32e8437107 100644
+index 32e8437107..4ca56983bb 100644
 --- a/block.c
 +++ b/block.c
-@@ -147,53 +147,62 @@ int path_is_absolute(const char *path)
- #endif
+@@ -283,20 +283,28 @@ int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp)
+     return 0;
  }
  
--/* if filename is absolute, just copy it to dest. Otherwise, build a
-+/* if filename is absolute, just return its duplicate. Otherwise, build a
-    path to it by considering it is relative to base_path. URL are
-    supported. */
--void path_combine(char *dest, int dest_size,
--                  const char *base_path,
--                  const char *filename)
-+char *path_combine(const char *base_path, const char *filename)
+-void bdrv_get_full_backing_filename_from_filename(const char *backed,
+-                                                  const char *backing,
+-                                                  char *dest, size_t sz,
+-                                                  Error **errp)
++/* If @backing is empty, this function returns NULL without setting
++ * @errp.  In all other cases, NULL will only be returned with @errp
++ * set.
++ *
++ * Therefore, a return value of NULL without @errp set means that
++ * there is no backing file; if @errp is set, there is one but its
++ * absolute filename cannot be generated.
++ */
++char *bdrv_get_full_backing_filename_from_filename(const char *backed,
++                                                   const char *backing,
++                                                   Error **errp)
  {
-+    const char *protocol_stripped = NULL;
-     const char *p, *p1;
-+    char *result;
-     int len;
- 
--    if (dest_size <= 0)
--        return;
-     if (path_is_absolute(filename)) {
--        pstrcpy(dest, dest_size, filename);
--    } else {
--        const char *protocol_stripped = NULL;
-+        return g_strdup(filename);
-+    }
- 
--        if (path_has_protocol(base_path)) {
--            protocol_stripped = strchr(base_path, ':');
--            if (protocol_stripped) {
--                protocol_stripped++;
--            }
-+    if (path_has_protocol(base_path)) {
-+        protocol_stripped = strchr(base_path, ':');
-+        if (protocol_stripped) {
-+            protocol_stripped++;
-         }
--        p = protocol_stripped ?: base_path;
-+    }
-+    p = protocol_stripped ?: base_path;
- 
--        p1 = strrchr(base_path, '/');
-+    p1 = strrchr(base_path, '/');
- #ifdef _WIN32
--        {
--            const char *p2;
--            p2 = strrchr(base_path, '\\');
--            if (!p1 || p2 > p1)
--                p1 = p2;
-+    {
-+        const char *p2;
-+        p2 = strrchr(base_path, '\\');
-+        if (!p1 || p2 > p1) {
-+            p1 = p2;
-         }
-+    }
- #endif
--        if (p1)
--            p1++;
--        else
--            p1 = base_path;
--        if (p1 > p)
--            p = p1;
--        len = p - base_path;
--        if (len > dest_size - 1)
--            len = dest_size - 1;
--        memcpy(dest, base_path, len);
--        dest[len] = '\0';
--        pstrcat(dest, dest_size, filename);
-+    if (p1) {
-+        p1++;
-+    } else {
-+        p1 = base_path;
-+    }
-+    if (p1 > p) {
-+        p = p1;
-     }
-+    len = p - base_path;
-+
-+    result = g_malloc(len + strlen(filename) + 1);
-+    memcpy(result, base_path, len);
-+    strcpy(result + len, filename);
-+
-+    return result;
-+}
-+
-+static void path_combine_deprecated(char *dest, int dest_size,
-+                                    const char *base_path,
-+                                    const char *filename)
-+{
-+    char *combined = path_combine(base_path, filename);
-+    pstrcpy(dest, dest_size, combined);
-+    g_free(combined);
- }
- 
- /*
-@@ -287,7 +296,7 @@ void bdrv_get_full_backing_filename_from_filename(const char *backed,
+-    if (backing[0] == '\0' || path_has_protocol(backing) ||
+-        path_is_absolute(backing))
+-    {
+-        pstrcpy(dest, sz, backing);
++    if (backing[0] == '\0') {
++        return NULL;
++    } else if (path_has_protocol(backing) || path_is_absolute(backing)) {
++        return g_strdup(backing);
+     } else if (backed[0] == '\0' || strstart(backed, "json:", NULL)) {
          error_setg(errp, "Cannot use relative backing file names for '%s'",
                     backed);
++        return NULL;
      } else {
--        path_combine(dest, sz, backed, backing);
-+        path_combine_deprecated(dest, sz, backed, backing);
+-        path_combine_deprecated(dest, sz, backed, backing);
++        return path_combine(backed, backing);
      }
  }
  
-@@ -4070,8 +4079,8 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
-         } else {
-             /* If not an absolute filename path, make it relative to the current
-              * image's filename path */
--            path_combine(filename_tmp, PATH_MAX, curr_bs->filename,
--                         backing_file);
-+            path_combine_deprecated(filename_tmp, PATH_MAX, curr_bs->filename,
-+                                    backing_file);
+@@ -304,9 +312,20 @@ void bdrv_get_full_backing_filename(BlockDriverState *bs, char *dest, size_t sz,
+                                     Error **errp)
+ {
+     char *backed = bs->exact_filename[0] ? bs->exact_filename : bs->filename;
++    char *full_name;
++    Error *local_error = NULL;
  
-             /* We are going to compare absolute pathnames */
-             if (!realpath(filename_tmp, filename_full)) {
-@@ -4080,8 +4089,8 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
+-    bdrv_get_full_backing_filename_from_filename(backed, bs->backing_file,
+-                                                 dest, sz, errp);
++    full_name = bdrv_get_full_backing_filename_from_filename(backed,
++                                                             bs->backing_file,
++                                                             &local_error);
++    if (full_name) {
++        pstrcpy(dest, sz, full_name);
++        g_free(full_name);
++    } else if (local_error) {
++        error_propagate(errp, local_error);
++    } else if (sz > 0) {
++        *dest = '\0';
++    }
+ }
  
-             /* We need to make sure the backing filename we are comparing against
-              * is relative to the current image filename (or absolute) */
--            path_combine(filename_tmp, PATH_MAX, curr_bs->filename,
--                         curr_bs->backing_file);
-+            path_combine_deprecated(filename_tmp, PATH_MAX, curr_bs->filename,
-+                                    curr_bs->backing_file);
+ void bdrv_register(BlockDriver *bdrv)
+@@ -4509,17 +4528,17 @@ void bdrv_img_create(const char *filename, const char *fmt,
+     size = qemu_opt_get_size(opts, BLOCK_OPT_SIZE, 0);
+     if (backing_file && !(flags & BDRV_O_NO_BACKING)) {
+         BlockDriverState *bs;
+-        char *full_backing = g_new0(char, PATH_MAX);
++        char *full_backing;
+         int back_flags;
+         QDict *backing_options = NULL;
  
-             if (!realpath(filename_tmp, backing_file_full)) {
-                 continue;
+-        bdrv_get_full_backing_filename_from_filename(filename, backing_file,
+-                                                     full_backing, PATH_MAX,
+-                                                     &local_err);
++        full_backing =
++            bdrv_get_full_backing_filename_from_filename(filename, backing_file,
++                                                         &local_err);
+         if (local_err) {
+-            g_free(full_backing);
+             goto out;
+         }
++        assert(full_backing);
+ 
+         /* backing files always opened read-only */
+         back_flags = flags;
 diff --git a/block/vmdk.c b/block/vmdk.c
-index c665bcc977..5397a4345e 100644
+index 5397a4345e..c1dbcfe133 100644
 --- a/block/vmdk.c
 +++ b/block/vmdk.c
-@@ -857,8 +857,7 @@ static int vmdk_parse_extents(const char *desc, BlockDriverState *bs,
-             return -EINVAL;
+@@ -2001,16 +2001,15 @@ static int vmdk_create(const char *filename, QemuOpts *opts, Error **errp)
+     }
+     if (backing_file) {
+         BlockBackend *blk;
+-        char *full_backing = g_new0(char, PATH_MAX);
+-        bdrv_get_full_backing_filename_from_filename(filename, backing_file,
+-                                                     full_backing, PATH_MAX,
+-                                                     &local_err);
++        char *full_backing =
++            bdrv_get_full_backing_filename_from_filename(filename, backing_file,
++                                                         &local_err);
+         if (local_err) {
+-            g_free(full_backing);
+             error_propagate(errp, local_err);
+             ret = -ENOENT;
+             goto exit;
          }
++        assert(full_backing);
  
--        extent_path = g_malloc0(PATH_MAX);
--        path_combine(extent_path, PATH_MAX, desc_file_path, fname);
-+        extent_path = path_combine(desc_file_path, fname);
- 
-         ret = snprintf(extent_opt_prefix, 32, "extents.%d", s->num_extents);
-         assert(ret < 32);
+         blk = blk_new_open(full_backing, NULL, NULL,
+                            BDRV_O_NO_BACKING, errp);
 -- 
 2.13.6
