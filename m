@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dxscf-0005Ys-4b
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:34:22 -0400
+	(envelope-from <berrange@redhat.com>) id 1dxsj3-0007ox-0w
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:40:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dxscb-00051b-6M
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:34:21 -0400
-Date: Fri, 29 Sep 2017 18:34:11 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170929103411.GF26066@lemon.lan>
-References: <20170920085952.3872-1-famz@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1dxsiz-0000TF-6Z
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:40:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37576)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dxsiz-0000Sm-02
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:40:53 -0400
+Date: Fri, 29 Sep 2017 11:40:43 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170929104043.GB11930@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1506679874-22284-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170929101125eucas1p1ed4a290bfc6fcbf6f492fc45d4e9cc10@eucas1p1.samsung.com>
+	<1506679874-22284-2-git-send-email-a.perevalov@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170920085952.3872-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] usb: Use angle brackets for cacard include
- directive
+In-Reply-To: <1506679874-22284-2-git-send-email-a.perevalov@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH] configure: correctly define PTHREAD_LIB
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -22,39 +28,41 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-trivial@nongnu.org
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, heetae82.ahn@samsung.com, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 List-ID: <qemu-devel.nongnu.org>
 
-On Wed, 09/20 16:59, Fam Zheng wrote:
-> This is a library header, so angle brackets are more appropriate; also
-> move the line to before QEMU headers, as is recommended in HACKING.
+On Fri, Sep 29, 2017 at 01:11:14PM +0300, Alexey Perevalov wrote:
+> In case of -pthread already exists in QEMU_CFLAGS,
+> compilation of sample pthread program successed,
+> but -pthread is not putting into PTHREAD_LIBS in this case.
+> PTHREAD_LIB is using while compiling tests/migration/stress.
 > 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 > ---
->  hw/usb/ccid-card-passthru.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  configure | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
-> index 45d96b03c6..117711862e 100644
-> --- a/hw/usb/ccid-card-passthru.c
-> +++ b/hw/usb/ccid-card-passthru.c
-> @@ -9,11 +9,11 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include <cacard/vscard_common.h>
->  #include "chardev/char-fe.h"
->  #include "qemu/error-report.h"
->  #include "qemu/sockets.h"
->  #include "ccid.h"
-> -#include "cacard/vscard_common.h"
->  
->  #define DPRINTF(card, lvl, fmt, ...)                    \
->  do {                                                    \
-> -- 
-> 2.13.5
-> 
-> 
+> diff --git a/configure b/configure
+> index 6587e80..a2dd044 100755
+> --- a/configure
+> +++ b/configure
+> @@ -3359,6 +3359,7 @@ int main(void) {
+>  EOF
+>  if compile_prog "" "" ; then
+>    pthread=yes
+> +  PTHREAD_LIB="-pthread"
+>  else
+>    for pthread_lib in $PTHREADLIBS_LIST; do
+>      if compile_prog "" "$pthread_lib" ; then
 
-Cc: qemu-trivial@nongnu.org
+We shouldn't do this because it affects whole of QEMU. The stress program
+needs -lpthread because it is linking statically, so just add it to the
+Makefile rule for building stress.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
