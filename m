@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dxuiK-0000hT-Dn
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:48:21 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1dxumZ-0002Ok-Mx
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:52:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dxuiJ-0001yY-Jt
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:48:20 -0400
-References: <20170927211334.3988-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <6b78de48-1f51-8b12-62ee-d81f7194b6c6@redhat.com>
-Date: Fri, 29 Sep 2017 14:48:08 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170927211334.3988-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="jFWK3r3XrvOU4OBRwD70l2FcfUraQ8AMf"
-Subject: Re: [Qemu-devel] [PATCH] iotests: Fix 195 if IMGFMT is part of
- TEST_DIR
+	(envelope-from <a.perevalov@samsung.com>) id 1dxumW-0004KD-Ic
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:52:43 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:49603)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1dxumW-0004JQ-Bq
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:52:40 -0400
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <a7622d89-a067-648c-ae97-4943c7554343@samsung.com>
+Date: Fri, 29 Sep 2017 15:52:34 +0300
+MIME-version: 1.0
+In-reply-to: <20170929104043.GB11930@redhat.com>
+Content-type: text/plain; charset="utf-8"; format="flowed"
+Content-transfer-encoding: 7bit
+Content-language: en-GB
+References: <1506679874-22284-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170929101125eucas1p1ed4a290bfc6fcbf6f492fc45d4e9cc10@eucas1p1.samsung.com>
+	<1506679874-22284-2-git-send-email-a.perevalov@samsung.com>
+	<20170929104043.GB11930@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] configure: correctly define PTHREAD_LIB
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -23,62 +30,46 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, heetae82.ahn@samsung.com, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 List-ID: <qemu-devel.nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jFWK3r3XrvOU4OBRwD70l2FcfUraQ8AMf
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <6b78de48-1f51-8b12-62ee-d81f7194b6c6@redhat.com>
-Subject: Re: [PATCH] iotests: Fix 195 if IMGFMT is part of TEST_DIR
-References: <20170927211334.3988-1-mreitz@redhat.com>
-In-Reply-To: <20170927211334.3988-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 09/29/2017 01:40 PM, Daniel P. Berrange wrote:
+> On Fri, Sep 29, 2017 at 01:11:14PM +0300, Alexey Perevalov wrote:
+>> In case of -pthread already exists in QEMU_CFLAGS,
+>> compilation of sample pthread program successed,
+>> but -pthread is not putting into PTHREAD_LIBS in this case.
+>> PTHREAD_LIB is using while compiling tests/migration/stress.
+>>
+>> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+>> ---
+>>   configure | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/configure b/configure
+>> index 6587e80..a2dd044 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -3359,6 +3359,7 @@ int main(void) {
+>>   EOF
+>>   if compile_prog "" "" ; then
+>>     pthread=yes
+>> +  PTHREAD_LIB="-pthread"
+>>   else
+>>     for pthread_lib in $PTHREADLIBS_LIST; do
+>>       if compile_prog "" "$pthread_lib" ; then
+> We shouldn't do this because it affects whole of QEMU. The stress program
+> needs -lpthread because it is linking statically, so just add it to the
+> Makefile rule for building stress.
+ok, but I didn't find any explicit usage of PTHREAD_LIB,
+and avoiding it in Makefile I think will make PTHREAD_LIB
+redundant.
 
-On 2017-09-27 23:13, Max Reitz wrote:
-> do_run_qemu() in iotest 195 first applies _filter_imgfmt when printing
-> qemu's command line and _filter_testdir only afterwards.  Therefore, if=
-
-> the image format is part of the test directory path, _filter_testdir
-> will no longer apply and the actual output will differ from the
-> reference output even in case of success.
->=20
-> For example, TEST_DIR might be "/tmp/test-qcow2", in which case
-> _filter_imgfmt first transforms this to "/tmp/test-IMGFMT" which is no
-> longer recognized as the TEST_DIR by _filter_testdir.
->=20
-> Fix this by not applying _filter_imgfmt in do_run_qemu() but in
-> run_qemu() instead, and only after _filter_testdir.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/195 | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-
-Applied to my block branch.
-
-Max
+>
+> Regards,
+> Daniel
 
 
---jFWK3r3XrvOU4OBRwD70l2FcfUraQ8AMf
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlnOQQgSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AeGAH/1s+II4MiZODnaGLwbdv70hKugBbLua5
-nv+QaW1V5/rY5ZWIfkClyCZLsvNknVwYPntU+OY6Dsw9svvGvibQuo+Q3ZxGxCtN
-aTmNqDuGj9ig+dBUwKCEDBk3/eiR9V/VqAlE7DkQYHkVU0vVVFNNpJnvyMwj+SWL
-2uTZxkRRQeeMswTswVOA2lSyLTTSwi5x/Uh62g89QOltfP/rauFJlQ3lU0T9MBSt
-UpvE2zA9zce9IeCz+GYMb05DO/sEUOdTPFi+bDATBY2/13OJ2JaW1Pe8NJiz0LJ4
-cdVzF2BW/mJo/9snlsG+RxWNW87S4iUbmuQM6yOa6lydONaLg1hhVHI=
-=zE3F
------END PGP SIGNATURE-----
-
---jFWK3r3XrvOU4OBRwD70l2FcfUraQ8AMf--
+-- 
+Best regards,
+Alexey Perevalov
