@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dxudp-0007Vv-Mb
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:43:42 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dxuiK-0000hT-Dn
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:48:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dxudm-0007Kq-JB
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:43:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34548)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dxudm-0007KJ-Ca
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:43:38 -0400
-Date: Fri, 29 Sep 2017 14:43:17 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170929144317.04a0955e.cohuck@redhat.com>
-In-Reply-To: <20170927170027.8539-4-david@redhat.com>
-References: <20170927170027.8539-1-david@redhat.com>
-	<20170927170027.8539-4-david@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1dxuiJ-0001yY-Jt
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:48:20 -0400
+References: <20170927211334.3988-1-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <6b78de48-1f51-8b12-62ee-d81f7194b6c6@redhat.com>
+Date: Fri, 29 Sep 2017 14:48:08 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 3/3] s390x/tcg: make STFL store into
- the lowcore
+In-Reply-To: <20170927211334.3988-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="jFWK3r3XrvOU4OBRwD70l2FcfUraQ8AMf"
+Subject: Re: [Qemu-devel] [PATCH] iotests: Fix 195 if IMGFMT is part of
+ TEST_DIR
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -27,22 +23,62 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, thuth@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <richard.henderson@linaro.org>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-On Wed, 27 Sep 2017 19:00:27 +0200
-David Hildenbrand <david@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jFWK3r3XrvOU4OBRwD70l2FcfUraQ8AMf
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <6b78de48-1f51-8b12-62ee-d81f7194b6c6@redhat.com>
+Subject: Re: [PATCH] iotests: Fix 195 if IMGFMT is part of TEST_DIR
+References: <20170927211334.3988-1-mreitz@redhat.com>
+In-Reply-To: <20170927211334.3988-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Using virtual memory access is wrong and will soon include low-address
-> protection checks, which is to be bypassed for STFL.
-> 
-> This was originally part of a bigger STFL(E) refactoring.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+On 2017-09-27 23:13, Max Reitz wrote:
+> do_run_qemu() in iotest 195 first applies _filter_imgfmt when printing
+> qemu's command line and _filter_testdir only afterwards.  Therefore, if=
+
+> the image format is part of the test directory path, _filter_testdir
+> will no longer apply and the actual output will differ from the
+> reference output even in case of success.
+>=20
+> For example, TEST_DIR might be "/tmp/test-qcow2", in which case
+> _filter_imgfmt first transforms this to "/tmp/test-IMGFMT" which is no
+> longer recognized as the TEST_DIR by _filter_testdir.
+>=20
+> Fix this by not applying _filter_imgfmt in do_run_qemu() but in
+> run_qemu() instead, and only after _filter_testdir.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  target/s390x/helper.h      | 2 +-
->  target/s390x/misc_helper.c | 7 ++++++-
->  2 files changed, 7 insertions(+), 2 deletions(-)
+>  tests/qemu-iotests/195 | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 
-Thanks, applied (with updated patch description).
+Applied to my block branch.
+
+Max
+
+
+--jFWK3r3XrvOU4OBRwD70l2FcfUraQ8AMf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlnOQQgSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AeGAH/1s+II4MiZODnaGLwbdv70hKugBbLua5
+nv+QaW1V5/rY5ZWIfkClyCZLsvNknVwYPntU+OY6Dsw9svvGvibQuo+Q3ZxGxCtN
+aTmNqDuGj9ig+dBUwKCEDBk3/eiR9V/VqAlE7DkQYHkVU0vVVFNNpJnvyMwj+SWL
+2uTZxkRRQeeMswTswVOA2lSyLTTSwi5x/Uh62g89QOltfP/rauFJlQ3lU0T9MBSt
+UpvE2zA9zce9IeCz+GYMb05DO/sEUOdTPFi+bDATBY2/13OJ2JaW1Pe8NJiz0LJ4
+cdVzF2BW/mJo/9snlsG+RxWNW87S4iUbmuQM6yOa6lydONaLg1hhVHI=
+=zE3F
+-----END PGP SIGNATURE-----
+
+--jFWK3r3XrvOU4OBRwD70l2FcfUraQ8AMf--
