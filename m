@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dxm9f-0005wl-RG
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 23:40:00 -0400
+	(envelope-from <peterx@redhat.com>) id 1dxm9k-00063v-0f
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 23:40:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dxm9e-0006uw-UJ
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 23:39:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36590)
+	(envelope-from <peterx@redhat.com>) id 1dxm9j-0006xd-5z
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 23:40:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41208)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dxm9e-0006rM-GV
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 23:39:58 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dxm9j-0006xD-08
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 23:40:03 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Fri, 29 Sep 2017 11:38:33 +0800
-Message-Id: <20170929033844.26935-12-peterx@redhat.com>
+Date: Fri, 29 Sep 2017 11:38:34 +0800
+Message-Id: <20170929033844.26935-13-peterx@redhat.com>
 In-Reply-To: <20170929033844.26935-1-peterx@redhat.com>
 References: <20170929033844.26935-1-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC v2 11/22] monitor: introduce monitor_qmp_respond()
+Subject: [Qemu-devel] [RFC v2 12/22] monitor: let mon_list be tail queue
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -26,79 +26,55 @@ To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-A tiny refactoring, preparing to split the QMP dispatcher away.
+It was QLIST.  I want to use this list to do monitor priority job later,
+which need tail insertion ability.  So switching to a tail queue.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- monitor.c | 48 +++++++++++++++++++++++++++++++-----------------
- 1 file changed, 31 insertions(+), 17 deletions(-)
+ monitor.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/monitor.c b/monitor.c
-index 1d782afafb..0caf2019c1 100644
+index 0caf2019c1..7b76dff5ad 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -3831,6 +3831,36 @@ static int monitor_can_read(void *opaque)
-     return (mon->suspend_cnt == 0) ? 1 : 0;
- }
+@@ -207,7 +207,7 @@ struct Monitor {
+     void *password_opaque;
+     mon_cmd_t *cmd_table;
+     QLIST_HEAD(,mon_fd_t) fds;
+-    QLIST_ENTRY(Monitor) entry;
++    QTAILQ_ENTRY(Monitor) entry;
+ };
  
-+/*
-+ * When rsp/err/id is passed in, the function will be responsible for
-+ * the cleanup.
-+ */
-+static void monitor_qmp_respond(Monitor *mon, QObject *rsp,
-+                                Error *err, QObject *id)
-+{
-+    QDict *qdict = NULL;
-+
-+    if (err) {
-+        qdict = qdict_new();
-+        qdict_put_obj(qdict, "error", qmp_build_error_object(err));
-+        error_free(err);
-+        rsp = QOBJECT(qdict);
-+    }
-+
-+    if (rsp) {
-+        if (id) {
-+            /* This is for the qdict below. */
-+            qobject_incref(id);
-+            qdict_put_obj(qobject_to_qdict(rsp), "id", id);
-+        }
-+
-+        monitor_json_emitter(mon, rsp);
-+    }
-+
-+    qobject_decref(id);
-+    qobject_decref(rsp);
-+}
-+
- static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens,
-                                void *opaque)
- {
-@@ -3881,24 +3911,8 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens,
+ struct MonitorGlobal {
+@@ -222,7 +222,7 @@ static struct MonitorGlobal mon_global;
+ /* Protects mon_list, monitor_event_state.  */
+ static QemuMutex monitor_lock;
+ 
+-static QLIST_HEAD(mon_list, Monitor) mon_list;
++static QTAILQ_HEAD(mon_list, Monitor) mon_list;
+ static QLIST_HEAD(mon_fdsets, MonFdset) mon_fdsets;
+ static int mon_refcount;
+ 
+@@ -423,7 +423,7 @@ static void monitor_qapi_event_emit(QAPIEvent event, QDict *qdict)
+     Monitor *mon;
+ 
+     trace_monitor_protocol_event_emit(event, qdict);
+-    QLIST_FOREACH(mon, &mon_list, entry) {
++    QTAILQ_FOREACH(mon, &mon_list, entry) {
+         if (monitor_is_qmp(mon)
+             && mon->qmp.commands != &qmp_cap_negotiation_commands) {
+             monitor_json_emitter(mon, QOBJECT(qdict));
+@@ -4204,8 +4204,8 @@ void monitor_cleanup(void)
+     iothread_stop(mon_global.mon_io_thread);
+ 
+     qemu_mutex_lock(&monitor_lock);
+-    QLIST_FOREACH_SAFE(mon, &mon_list, entry, next) {
+-        QLIST_REMOVE(mon, entry);
++    QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
++        QTAILQ_REMOVE(&mon_list, mon, entry);
+         monitor_data_destroy(mon);
+         g_free(mon);
      }
- 
- err_out:
--    if (err) {
--        qdict = qdict_new();
--        qdict_put_obj(qdict, "error", qmp_build_error_object(err));
--        error_free(err);
--        rsp = QOBJECT(qdict);
--    }
-+    monitor_qmp_respond(mon, rsp, err, id);
- 
--    if (rsp) {
--        if (id) {
--            qdict_put_obj(qobject_to_qdict(rsp), "id", id);
--            id = NULL;
--        }
--
--        monitor_json_emitter(mon, rsp);
--    }
--
--    qobject_decref(id);
--    qobject_decref(rsp);
-     qobject_decref(req);
- }
- 
 -- 
 2.13.5
