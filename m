@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dxzT1-0004hB-BR
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 13:52:52 -0400
+	(envelope-from <cota@braap.org>) id 1dxzZm-0007To-MH
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 13:59:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dxzT0-0007gw-4w
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 13:52:51 -0400
-Date: Fri, 29 Sep 2017 19:52:35 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170929175235.GF3812@localhost.localdomain>
-References: <20170815074513.9055-1-el13635@mail.ntua.gr>
+	(envelope-from <cota@braap.org>) id 1dxzZh-0003Yp-PC
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 13:59:50 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:43251)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dxzZh-0003Vk-HB
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 13:59:45 -0400
+Date: Fri, 29 Sep 2017 13:59:43 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170929175943.GA25038@flamenco>
+References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
+	<150529666493.10902.14830445134051381968.stgit@frigg.lan>
+	<CAFEAcA9p9B8AFaaSaSOOSsFsEhHW=XPLBFs5MrozWq=7p4_9Zg@mail.gmail.com>
+	<87poasgjyh.fsf@frigg.lan>
+	<CAFEAcA8XP+8Jz9Dn-mEQ3CCrVj00t3HA0praQ-OSggtQGAmQ5Q@mail.gmail.com>
+	<87d16o53xr.fsf@frigg.lan>
+	<CAFEAcA9FhXKVKe1E_pVDWX3u0W7WuKQmO54Z1Jgj-iL980yPew@mail.gmail.com>
+	<87o9pywt8k.fsf@frigg.lan> <87shf5zlty.fsf@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20170815074513.9055-1-el13635@mail.ntua.gr>
-Subject: Re: [Qemu-devel] [PATCH RFC] block: add block-insert-node QMP
- command
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87shf5zlty.fsf@frigg.lan>
+Subject: Re: [Qemu-devel] [PATCH v6 01/22] instrument: Add documentation
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -22,193 +33,77 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-Am 15.08.2017 um 09:45 hat Manos Pitsidianakis geschrieben:
-> block-insert-node and its pair command block-remove-node provide runtime
-> insertion and removal of filter nodes.
+On Fri, Sep 29, 2017 at 16:16:41 +0300, Lluís Vilanova wrote:
+> Lluís Vilanova writes:
+> [...]
+> > This was working on a much older version of instrumentation for QEMU, but I can
+> > implement something that does the first use-case point above and some filtering
+> > example (second use-case point) to see what's the performance difference.
 > 
-> block-insert-node takes a (parent, child) and (node, child) pair of
-> edges and unrefs the (parent, child) BdrvChild relationship and creates
-> a new (parent, node) child with the same BdrvChildRole.
+> Ok, so here's some numbers for the discussion (booting Emilio's ARM full system
+> image that immediately shuts down):
 > 
-> This is a different approach than x-blockdev-change which uses the driver
-> methods bdrv_add_child() and bdrv_del_child(),
+> * Without instrumentation
 > 
-> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+>   real	0m10,099s
+>   user	0m9,876s
+>   sys	0m0,128s
+> 
+> * Count number of memory access writes, by instrumenting only when they are
+>   executed
+> 
+>   real	0m15,896s
+>   user	0m15,752s
+>   sys	0m0,108s
+> 
+> * Counting same, but the filtering is done at translation time (i.e., not
+>   generate an execute-time callback if it's not a write)
+> 
+>   real	0m11,084s
+>   user	0m10,880s
+>   sys	0m0,112s
+> 
+>   As Peter said, the filtering can be added into the API to take advantage of
+>   this "speedup", without exposing translation vs execution time callbacks.
 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 4d6ba1baef..16e19cb648 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -3947,3 +3947,63 @@
->    'data' : { 'parent': 'str',
->               '*child': 'str',
->               '*node': 'str' } }
-> +
-> +##
-> +# @block-insert-node:
-> +#
-> +# Insert a filter node between a specific edge in the block driver state graph.
-> +# @parent:  the name of the parent node or device
-> +# @node:    the name of the node to insert under parent
-> +# @child:   the name of the child of both node and parent
-> +#
-> +# Example:
-> +# Insert and remove a throttle filter on top of a device chain, between the
-> +# device 'ide0-hd0' and node 'node-A'
-> +#
-> +# -> {'execute': 'object-add',
-> +#     "arguments": {
-> +#       "qom-type": "throttle-group",
-> +#       "id": "group0",
-> +#       "props" : { "limits": { "iops-total": 300 } }
-> +#     }
-> +#    }
-> +# <- { 'return': {} }
-> +# -> {'execute': 'blockdev-add',
-> +#       'arguments': {
-> +#           'driver': 'throttle',
-> +#           'node-name': 'throttle0',
-> +#           'throttle-group': 'group0',
-> +#           'file': 'node-A'
-> +#       }
-> +#    }
-> +# <- { 'return': {} }
-> +# -> { 'execute': 'block-insert-node',
-> +#       'arguments': { 'parent': 'ide0-hd0', 'child': 'node-A', 'node': 'throttle0' }
-> +#    }
-> +# <- { 'return': {} }
-> +# -> { 'execute': 'block-remove-node',
-> +#       'arguments': { 'parent': 'ide0-hd0', 'child': 'node-A', 'node': 'throttle0' }
-> +#    }
-> +# <- { 'return': {} }
-> +# -> { 'execute': 'blockdev-del',
-> +#       'arguments': { 'node-name': 'throttle0' }
-> +#    }
-> +# <- { 'return': {} }
-> +#
-> +##
-> +{ 'command': 'block-insert-node',
-> +  'data': { 'parent': 'str',
-> +             'child': 'str',
-> +             'node': 'str'} }
+I'm not sure I understand this concept of filtering. Are you saying that in
+the first case, all memory accesses are instrumented, and then in the
+"access helper" we only call the user's callback if it's a memory write?
+And in the second case, we simply just generate a "write helper" instead
+of an "access helper". Am I understanding this correctly?
 
-I would suggest a change to the meaning of @child: Instead of using the
-node-name of the child BDS, I would use the name of the BdrvChild that
-represents the link.
+> * Counting number of executed instructions, by instrumenting the beginning of
+>   each one of them
+> 
+>   real	0m24,583s
+>   user	0m24,352s
+>   sys	0m0,184s
+> 
+> * Counting same, but per-TB numbers are collected at translation-time, and we
+>   only generate a per-TB execution time callback to add the corresponding number
+>   of instructions for that TB
+> 
+>   real	0m11,151s
+>   user	0m10,952s
+>   sys	0m0,092s
+> 
+>   This really needs to expose translation vs execution time callbacks to take
+>   advantage of this "speedup".
 
-The reason for this is that the node-name could be ambiguous, if you
-have two edges between the same two nodes.
+Clearly instrumenting per-TB is a significant net gain. I think we should
+definitely allow instrumenters to use this option.
 
-The only use of the node-name of the child that I can remember was for
-checking that the graph still looks like what the user expects. But I
-think we came to the conclusion that there are no race conditions to
-check for if we have manual block job deletion instead of automatic
-completion which can involve surprise changes to the graph. So probably
-we don't need the node-name even for this.
+FWIW my experiments so far show similar numbers for instrumenting each
+instruction (haven't done the per-tb yet). The difference is that I'm
+exposing to instrumenters a copy of the guest instructions (const void *data,
+size_t size). These copies are kept around until TB's are flushed.
+Luckily there seems to be very little overhead in keeping these around,
+apart from the memory overhead -- but in terms of performance, the
+necessary allocations do not induce significant overhead.
 
-> +##
-> +# @block-remove-node:
-> +#
-> +# Remove a filter node between two other nodes in the block driver state graph.
-> +# @parent:  the name of the parent node or device
-> +# @node:    the name of the node to remove from parent
-> +# @child:   the name of the child of node which will go under parent
-> +##
-> +{ 'command': 'block-remove-node',
-> +  'data': { 'parent': 'str',
-> +             'child': 'str',
-> +             'node': 'str'} }
+Thanks,
 
-Same thing here.
-
-> diff --git a/block.c b/block.c
-> index 81bd51b670..f874aabbfb 100644
-> --- a/block.c
-> +++ b/block.c
-> +    /* insert 'node' as child bs of 'parent' node */
-> +    if (check_node_edge(parent, child, errp)) {
-> +        return;
-> +    }
-> +    parent_bs = bdrv_find_node(parent);
-> +    c = bdrv_find_child(parent_bs, child);
-> +    role = c->role;
-> +    assert(role == &child_file || role == &child_backing);
-> +
-> +    bdrv_ref(node_bs);
-> +
-> +    bdrv_drained_begin(parent_bs);
-> +    bdrv_unref_child(parent_bs, c);
-> +    if (role == &child_file) {
-> +        parent_bs->file = bdrv_attach_child(parent_bs, node_bs, "file",
-> +                                            &child_file, errp);
-> +        if (!parent_bs->file) {
-> +            parent_bs->file = bdrv_attach_child(parent_bs, child_bs, "file",
-> +                                                &child_file, &error_abort);
-> +            goto out;
-> +        }
-> +    } else if (role == &child_backing) {
-> +        parent_bs->backing = bdrv_attach_child(parent_bs, node_bs, "backing",
-> +                                               &child_backing, errp);
-> +        if (!parent_bs->backing) {
-> +            parent_bs->backing = bdrv_attach_child(parent_bs, child_bs,
-> +                                                   "backing", &child_backing,
-> +                                                   &error_abort);
-> +            goto out;
-> +        }
-> +    }
-
-I would prefer if we could find a solution to avoid requiring a specific
-role. I'm not even sure that your assertion above is correct; can you
-explain why c couldn't have any other role?
-
-Instead of bdrv_unref_child/bdrv_attach_child, could we just change
-where the child points to using bdrv_replace_child()? Then
-parent_bs->file and parent_bs->backing (or whatever other variable
-contains the BdrvChild pointer) can stay unchanged and just keep
-working.
-
-> +    bdrv_refresh_filename(parent_bs);
-> +    bdrv_refresh_limits(parent_bs, NULL);
-> +
-> +out:
-> +    bdrv_drained_end(parent_bs);
-> +}
-
-> diff --git a/blockdev.c b/blockdev.c
-> index 8e2fc6e64c..5195ec1b61 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -4238,3 +4238,47 @@ QemuOptsList qemu_drive_opts = {
->          { /* end of list */ }
->      },
->  };
-> +
-> +void qmp_block_insert_node(const char *parent, const char *child,
-> +                           const char *node, Error **errp)
-> +{
-> +    BlockDriverState *bs = bdrv_find_node(node);
-> +    if (!bs) {
-> +        error_setg(errp, "Node '%s' not found", node);
-> +        return;
-> +    }
-> +    if (!bs->monitor_list.tqe_prev) {
-> +        error_setg(errp, "Node '%s' is not owned by the monitor",
-> +                   bs->node_name);
-> +        return;
-> +    }
-> +    if (!bs->drv->is_filter) {
-> +        error_setg(errp, "Block format '%s' used by node '%s' does not support"
-> +                   "insertion", bs->drv->format_name, bs->node_name);
-> +        return;
-> +    }
-> +
-> +    bdrv_insert_node(parent, child, node, errp);
-> +}
-
-Do we need to acquire an AioContext lock somewhere?
-
-Kevin
+		Emilio
