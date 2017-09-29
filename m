@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dy0ZN-0000Nb-8c
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:03:30 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dy0c4-0001D4-Tk
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dy0ZK-0006JG-6Q
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:03:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54052)
+	(envelope-from <dgilbert@redhat.com>) id 1dy0c1-0007xR-Nj
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:06:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55856)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dy0ZJ-0006Iv-Ta
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:03:26 -0400
-References: <20170929033844.26935-1-peterx@redhat.com>
-	<150665750396.84.2688523110192906870@b58463cdfd5f>
-	<20170929041433.GA29131@pxdev.xzpeter.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1ef3d76b-ddd8-7c6a-e934-1fb84de2b35f@redhat.com>
-Date: Fri, 29 Sep 2017 14:03:14 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dy0c1-0007wr-Ew
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:06:13 -0400
+Date: Fri, 29 Sep 2017 20:06:06 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170929190605.GB2129@work-vm>
+References: <9AA25E8890139848BAC96ED2495626F439A2EA23@DGGEML501-MBX.china.huawei.com>
+	<20170928170114.GF2130@work-vm>
+	<20170929093547.GC3812@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20170929041433.GA29131@pxdev.xzpeter.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="FMt8eUGP6FO4tlL8UHmkF7oMTTTFMfWL4"
-Subject: Re: [Qemu-devel] [RFC v2 00/22] QMP: out-of-band (OOB) execution
- support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170929093547.GC3812@localhost.localdomain>
+Subject: Re: [Qemu-devel] ping RE: question: I found a qemu crash about
+ migration
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -29,71 +28,148 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, famz@redhat.com, quintela@redhat.com, mdroth@linux.vnet.ibm.com, armbru@redhat.com, shajnocz@redhat.com, pbonzini@redhat.com, marcandre.lureau@gmail.com, dgilbert@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "wangjie (P)" <wangjie88@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, mreitz@redhat.com, quintela@redhat.com, "pbonzini@redhat.com" <pbonzini@redhat.com>, "fuweiwei (C)" <fuweiwei2@huawei.com>, "eblake@redhat.com" <eblake@redhat.com>, "berrange@redhat.com kchamart@redhat.com" <kchamart@redhat.com>, "famz@redhat.com" <famz@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FMt8eUGP6FO4tlL8UHmkF7oMTTTFMfWL4
-From: Eric Blake <eblake@redhat.com>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, famz@redhat.com, quintela@redhat.com,
- mdroth@linux.vnet.ibm.com, armbru@redhat.com, shajnocz@redhat.com,
- pbonzini@redhat.com, marcandre.lureau@gmail.com, dgilbert@redhat.com
-Message-ID: <1ef3d76b-ddd8-7c6a-e934-1fb84de2b35f@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 00/22] QMP: out-of-band (OOB) execution
- support
-References: <20170929033844.26935-1-peterx@redhat.com>
- <150665750396.84.2688523110192906870@b58463cdfd5f>
- <20170929041433.GA29131@pxdev.xzpeter.org>
-In-Reply-To: <20170929041433.GA29131@pxdev.xzpeter.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Kevin Wolf (kwolf@redhat.com) wrote:
+> Am 28.09.2017 um 19:01 hat Dr. David Alan Gilbert geschrieben:
+> > Hi,
+> >   This is a 'fun' bug;  I had a good chat to kwolf about it earlier.
+> > A proper fix really needs to be done together with libvirt so that we
+> > can sequence:
+> >    a) The stopping of the CPU on the source
+> >    b) The termination of the mirroring block job
+> >    c) The inactivation of the block devices on the source
+> >        (bdrv_inactivate_all)
+> >    d) The activation of the block devices on the destination
+> >        (bdrv_invalidate_cache_all)
+> >    e) The start of the CPU on the destination
+> > 
+> > It looks like you're hitting a race between b/c;  we've had races
+> > between c/d in the past and moved the bdrv_inactivate_all.
+> > 
+> > During the discussion we ended up with two proposed solutions;
+> > both of them require one extra command and one extra migration
+> > capability.
+> > 
+> > The block way
+> > -------------
+> >    1) Add a new migration capability pause-at-complete
+> >    2) Add a new migration state almost-complete
+> >    3) After saving devices, if pause-at-complete is set,
+> >       transition to almost-complete
+> >    4) Add a new command (migration-continue) that 
+> >       causes the migration to inactivate the devices (c)
+> >       and send the final EOF to the destination.
+> > 
+> > You set pause-at-complete, wait until migrate hits almost-complete;
+> > cleanup the mirror job, and then do migration-continue.  When it
+> > completes do 'cont' on the destination.
+> 
+> Especially since you're concerned about the exact position of the pause,
+> the following would be a little safer (using the opportunity to suggest
+> slightly different names,too):
+> 
+> 1) Add a new migration capability pause-at-complete
+> 2) Add a new migration state ready
+> 3) After migration has converged (i.e. the background phase of the
+>    migration has completed) and we are ready to actually switch to the
+>    destination, stop the VM, transition to 'ready' and emit a QMP event
+> 4) Continue processing QMP commands in the 'ready' phase. This is where
+>    libvirt is supposed to tear down any running non-VM activities like
+>    block jobs, NBD servers, etc.
+> 5) Add a new command (migration-complete) that does the final part of
+>    migration, including sending the remaining dirty memory, device state
+>    and the final EOF that signals the destination to resume the VM if -S
+>    isn't given.
 
-On 09/28/2017 11:14 PM, Peter Xu wrote:
-> On Thu, Sep 28, 2017 at 08:58:25PM -0700, no-reply@patchew.org wrote:
->> /var/tmp/patchew-tester-tmp-hw4oylij/src/monitor.c: In function =E2=80=
-=98monitor_io_thread_init=E2=80=99:
->> /var/tmp/patchew-tester-tmp-hw4oylij/src/monitor.c:4286:32: error: imp=
-licit declaration of function =E2=80=98iothread_create=E2=80=99 [-Werror=3D=
-implicit-function-declaration]
->>      mon_global.mon_io_thread =3D iothread_create("monitor_io_thr",
->>                                 ^~~~~~~~~~~~~~~
->> /var/tmp/patchew-tester-tmp-hw4oylij/src/monitor.c:4286:5: error: nest=
-ed extern declaration of =E2=80=98iothread_create=E2=80=99 [-Werror=3Dnes=
-ted-externs]
+What worries me here is whether some other subsection is going to say
+that this pause must happen after the device state save, e.g. if the
+device state save causes them to push out the last block/packet/etc -
+and I've got no real way to say whether that point is any better or
+worse than the point I was suggestion.
+And the position in the cycle when the pause happens is part of the API.
 
->=20
-> This is because the iothread series that this series used has not yet
-> been pushed to master.
+> The main reason why I advocate this "block way" is that it looks a lot
+> less hacky, but more future-proof to me. Instead of adding a one-off
+> hack for the problem at hand, it introduces a phase where libvirt can
+> cleanly tear down any activity it has still running on the source qemu.
 
-In which case, you can add a 'Based-on: <message-id>' tag in your cover
-letter of this series to tell patchew to not try this series unless it
-applies all Based-on series first.
+Yes, if we get that phase right.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> We got away without doing this because we never did a clean handover of
+> resources from the source to the destination. From the perspective of a
+> management tool, we had these distinct phases during migration:
+> 
+> a) 'migrate' command:
+>    Source VM is still running and in control of all resources (like disk
+>    images), migrating some state in the background
+> 
+> b) Migration converges:
+>    Both VMs are stopped (assuming -S is given on the destination,
+>    otherwise this phase is skipped), the destination is in control of
+>    the resources
+> 
+> c) 'cont' command:
+>    Destination VM is running and in control of the resources
+> 
+> There is an asymmetry here because there is no phase where the VMs are
+> stopped, but the source is in control of the resources (this is the
+> additional state that my proposal introduces).
+> 
+> As long as we didn't really manage control of the resources with locks,
+> we could abuse b) for things where the source still accessed the
+> resources if we knew that the destination wouldn't use them yet (it's
+> not an assumption that I'm willing to trust too much) and it would still
+> kind of work in the common cases. But it's not really the correct thing
+> to do, it has probably always caused bugs in corner cases, and the
+> locking mechanisms are pointing that out now.
+> 
+> We're now noticing this with block device because we're using locking,
+> but I wouldn't be surprised if we found sooner or later that there are
+> more resources that should really be handed over in a cleanly designed
+> way and that work only by accident as long as you don't do that. So I
+> don't think a local hack for mirroring (or even all block jobs) is
+> sufficient to be future-proof.
+
+Without the block-job we were actually pretty safe - up until the EOF
+we knew the destination wouldn't start, and similarly we wouldn't start
+using a device on the destination before the source had saved that
+device.
+
+My worry is where the edge of 'source is in control of the device is' -
+is that upto the point at which the end of the device save? Before that?
+After that? What?  It seems to be pretty arbitrary.  Unless we can
+understand why it's where it is, then I'm not sure if it's a 'clean
+migration phase model'.
 
 
---FMt8eUGP6FO4tlL8UHmkF7oMTTTFMfWL4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> > The migration way
+> > -----------------
+> >    1) Stop doing (d) when the destination is started with -S
+> >       since it happens anyway when 'cont' is issued
+> >    2) Add a new migration capability ext-manage-storage
+> >    3) When 'ext-manage-storage' is set, we don't bother doing (c)
+> >    4) Add a new command 'block-inactivate' on the source
+> > 
+> > You set ext-manage-storage, do the migrate and when it's finished
+> > clean up the block job, block-inactivate on the source, and
+> > then cont on the destination.
+> 
+> You would have to inactivate every single block node, which is not
+> a thing libvirt can currently do (they don't even really manage
+> individual nodes yet). Apart from that I believe it is much too
+> low-level and users shouldn't have to worry about what implications
+> migration has to block devices. A clean migration phase model should be
+> much easier to understand.
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Yep, I see that.
+(Having said that, this extra round-trip with management is adding extra
+downtime, and we'll have to work out things like what happens if you
+cancel or fail in that time).
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnOmPIACgkQp6FrSiUn
-Q2qylwf/apgw1U1Ed7koQSrUdvjYm2raEUKBkN/fWe3dHXAGWFOcNNd/LjXpbdLS
-sqg4EyJv1oBDnEOFHhqlKcBYtxCgBnEv8lCHAVh0/KvUuZFIsQ8JumdVuihWz2HB
-R19iYO16KwCCqqJW4djg9wpIIrGoEDXDGx5/EEjbC71b91VU1cpLbiBna4rKwB17
-G5bRPoJICaw1jHkj4od04wmEp4J1UfNH9eqAee2EVpiEZ9fkpStuJZLE+v44UD6n
-4k+eg3dpAVj738vnj9ZDww0eNhTg3ZIZx8BE3MnMmIOiJQclia5A7XaECfwdwbOL
-ppjIBXacriaYIguiCroibwwEhc2LaA==
-=xaGA
------END PGP SIGNATURE-----
-
---FMt8eUGP6FO4tlL8UHmkF7oMTTTFMfWL4--
+Dave
+> Kevin
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
