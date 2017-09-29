@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dxp2C-0005ej-Rp
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 02:44:30 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dxp9i-0007UN-I6
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 02:52:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dxp28-000209-Vh
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 02:44:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38530)
+	(envelope-from <wei.w.wang@intel.com>) id 1dxp9e-0006p8-IJ
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 02:52:14 -0400
+Received: from mga01.intel.com ([192.55.52.88]:49564)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dxp28-0001zn-MF
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 02:44:24 -0400
-Date: Fri, 29 Sep 2017 08:44:21 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170929084421.2417a519@nial.brq.redhat.com>
-In-Reply-To: <20170927181834.76c5d2ef@bahia.lan>
-References: <20170927062143.GN12504@umbus>
-	<1506512957-196068-1-git-send-email-imammedo@redhat.com>
-	<20170927181834.76c5d2ef@bahia.lan>
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dxp9e-0006oO-6x
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 02:52:10 -0400
+Message-ID: <59CDEE56.6070807@intel.com>
+Date: Fri, 29 Sep 2017 14:55:18 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <1503914913-28893-1-git-send-email-wei.w.wang@intel.com>
+	<1503914913-28893-4-git-send-email-wei.w.wang@intel.com>
+	<20170828204659-mutt-send-email-mst@kernel.org>
+	<59A4DADE.5050303@intel.com>
+	<20170908062748-mutt-send-email-mst@kernel.org>
+	<59B27A64.4040604@intel.com>
+	<20170929070049-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170929070049-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] ppc: define spapr core types statically
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v15 3/5] virtio-balloon:
+ VIRTIO_BALLOON_F_SG
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -27,181 +33,211 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 List-ID: <qemu-devel.nongnu.org>
 
-On Wed, 27 Sep 2017 18:18:34 +0200
-Greg Kurz <groug@kaod.org> wrote:
+On 09/29/2017 12:01 PM, Michael S. Tsirkin wrote:
+> On Fri, Sep 08, 2017 at 07:09:24PM +0800, Wei Wang wrote:
+>> On 09/08/2017 11:36 AM, Michael S. Tsirkin wrote:
+>>> On Tue, Aug 29, 2017 at 11:09:18AM +0800, Wei Wang wrote:
+>>>> On 08/29/2017 02:03 AM, Michael S. Tsirkin wrote:
+>>>>> On Mon, Aug 28, 2017 at 06:08:31PM +0800, Wei Wang wrote:
+>>>>>> Add a new feature, VIRTIO_BALLOON_F_SG, which enables the transfer
+>>>>>> of balloon (i.e. inflated/deflated) pages using scatter-gather lists
+>>>>>> to the host.
+>>>>>>
+>>>>>> The implementation of the previous virtio-balloon is not very
+>>>>>> efficient, because the balloon pages are transferred to the
+>>>>>> host one by one. Here is the breakdown of the time in percentage
+>>>>>> spent on each step of the balloon inflating process (inflating
+>>>>>> 7GB of an 8GB idle guest).
+>>>>>>
+>>>>>> 1) allocating pages (6.5%)
+>>>>>> 2) sending PFNs to host (68.3%)
+>>>>>> 3) address translation (6.1%)
+>>>>>> 4) madvise (19%)
+>>>>>>
+>>>>>> It takes about 4126ms for the inflating process to complete.
+>>>>>> The above profiling shows that the bottlenecks are stage 2)
+>>>>>> and stage 4).
+>>>>>>
+>>>>>> This patch optimizes step 2) by transferring pages to the host in
+>>>>>> sgs. An sg describes a chunk of guest physically continuous pages.
+>>>>>> With this mechanism, step 4) can also be optimized by doing address
+>>>>>> translation and madvise() in chunks rather than page by page.
+>>>>>>
+>>>>>> With this new feature, the above ballooning process takes ~597ms
+>>>>>> resulting in an improvement of ~86%.
+>>>>>>
+>>>>>> TODO: optimize stage 1) by allocating/freeing a chunk of pages
+>>>>>> instead of a single page each time.
+>>>>>>
+>>>>>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>>>>>> Signed-off-by: Liang Li <liang.z.li@intel.com>
+>>>>>> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+>>>>>> ---
+>>>>>>     drivers/virtio/virtio_balloon.c     | 171 ++++++++++++++++++++++++++++++++----
+>>>>>>     include/uapi/linux/virtio_balloon.h |   1 +
+>>>>>>     2 files changed, 155 insertions(+), 17 deletions(-)
+>>>>>>
+>>>>>> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
+>>>>>> index f0b3a0b..8ecc1d4 100644
+>>>>>> --- a/drivers/virtio/virtio_balloon.c
+>>>>>> +++ b/drivers/virtio/virtio_balloon.c
+>>>>>> @@ -32,6 +32,8 @@
+>>>>>>     #include <linux/mm.h>
+>>>>>>     #include <linux/mount.h>
+>>>>>>     #include <linux/magic.h>
+>>>>>> +#include <linux/xbitmap.h>
+>>>>>> +#include <asm/page.h>
+>>>>>>     /*
+>>>>>>      * Balloon device works in 4K page units.  So each page is pointed to by
+>>>>>> @@ -79,6 +81,9 @@ struct virtio_balloon {
+>>>>>>     	/* Synchronize access/update to this struct virtio_balloon elements */
+>>>>>>     	struct mutex balloon_lock;
+>>>>>> +	/* The xbitmap used to record balloon pages */
+>>>>>> +	struct xb page_xb;
+>>>>>> +
+>>>>>>     	/* The array of pfns we tell the Host about. */
+>>>>>>     	unsigned int num_pfns;
+>>>>>>     	__virtio32 pfns[VIRTIO_BALLOON_ARRAY_PFNS_MAX];
+>>>>>> @@ -141,13 +146,111 @@ static void set_page_pfns(struct virtio_balloon *vb,
+>>>>>>     					  page_to_balloon_pfn(page) + i);
+>>>>>>     }
+>>>>>> +static int add_one_sg(struct virtqueue *vq, void *addr, uint32_t size)
+>>>>>> +{
+>>>>>> +	struct scatterlist sg;
+>>>>>> +
+>>>>>> +	sg_init_one(&sg, addr, size);
+>>>>>> +	return virtqueue_add_inbuf(vq, &sg, 1, vq, GFP_KERNEL);
+>>>>>> +}
+>>>>>> +
+>>>>>> +static void send_balloon_page_sg(struct virtio_balloon *vb,
+>>>>>> +				 struct virtqueue *vq,
+>>>>>> +				 void *addr,
+>>>>>> +				 uint32_t size,
+>>>>>> +				 bool batch)
+>>>>>> +{
+>>>>>> +	unsigned int len;
+>>>>>> +	int err;
+>>>>>> +
+>>>>>> +	err = add_one_sg(vq, addr, size);
+>>>>>> +	/* Sanity check: this can't really happen */
+>>>>>> +	WARN_ON(err);
+>>>>> It might be cleaner to detect that add failed due to
+>>>>> ring full and kick then. Just an idea, up to you
+>>>>> whether to do it.
+>>>>>
+>>>>>> +
+>>>>>> +	/* If batching is in use, we batch the sgs till the vq is full. */
+>>>>>> +	if (!batch || !vq->num_free) {
+>>>>>> +		virtqueue_kick(vq);
+>>>>>> +		wait_event(vb->acked, virtqueue_get_buf(vq, &len));
+>>>>>> +		/* Release all the entries if there are */
+>>>>> Meaning
+>>>>> 	Account for all used entries if any
+>>>>> ?
+>>>>>
+>>>>>> +		while (virtqueue_get_buf(vq, &len))
+>>>>>> +			;
+>>>>> Above code is reused below. Add a function?
+>>>>>
+>>>>>> +	}
+>>>>>> +}
+>>>>>> +
+>>>>>> +/*
+>>>>>> + * Send balloon pages in sgs to host. The balloon pages are recorded in the
+>>>>>> + * page xbitmap. Each bit in the bitmap corresponds to a page of PAGE_SIZE.
+>>>>>> + * The page xbitmap is searched for continuous "1" bits, which correspond
+>>>>>> + * to continuous pages, to chunk into sgs.
+>>>>>> + *
+>>>>>> + * @page_xb_start and @page_xb_end form the range of bits in the xbitmap that
+>>>>>> + * need to be searched.
+>>>>>> + */
+>>>>>> +static void tell_host_sgs(struct virtio_balloon *vb,
+>>>>>> +			  struct virtqueue *vq,
+>>>>>> +			  unsigned long page_xb_start,
+>>>>>> +			  unsigned long page_xb_end)
+>>>>>> +{
+>>>>>> +	unsigned long sg_pfn_start, sg_pfn_end;
+>>>>>> +	void *sg_addr;
+>>>>>> +	uint32_t sg_len, sg_max_len = round_down(UINT_MAX, PAGE_SIZE);
+>>>>>> +
+>>>>>> +	sg_pfn_start = page_xb_start;
+>>>>>> +	while (sg_pfn_start < page_xb_end) {
+>>>>>> +		sg_pfn_start = xb_find_next_bit(&vb->page_xb, sg_pfn_start,
+>>>>>> +						page_xb_end, 1);
+>>>>>> +		if (sg_pfn_start == page_xb_end + 1)
+>>>>>> +			break;
+>>>>>> +		sg_pfn_end = xb_find_next_bit(&vb->page_xb, sg_pfn_start + 1,
+>>>>>> +					      page_xb_end, 0);
+>>>>>> +		sg_addr = (void *)pfn_to_kaddr(sg_pfn_start);
+>>>>>> +		sg_len = (sg_pfn_end - sg_pfn_start) << PAGE_SHIFT;
+>>>>>> +		while (sg_len > sg_max_len) {
+>>>>>> +			send_balloon_page_sg(vb, vq, sg_addr, sg_max_len, 1);
+>>>>> Last argument should be true, not 1.
+>>>>>
+>>>>>> +			sg_addr += sg_max_len;
+>>>>>> +			sg_len -= sg_max_len;
+>>>>>> +		}
+>>>>>> +		send_balloon_page_sg(vb, vq, sg_addr, sg_len, 1);
+>>>>>> +		xb_zero(&vb->page_xb, sg_pfn_start, sg_pfn_end);
+>>>>>> +		sg_pfn_start = sg_pfn_end + 1;
+>>>>>> +	}
+>>>>>> +
+>>>>>> +	/*
+>>>>>> +	 * The last few sgs may not reach the batch size, but need a kick to
+>>>>>> +	 * notify the device to handle them.
+>>>>>> +	 */
+>>>>>> +	if (vq->num_free != virtqueue_get_vring_size(vq)) {
+>>>>>> +		virtqueue_kick(vq);
+>>>>>> +		wait_event(vb->acked, virtqueue_get_buf(vq, &sg_len));
+>>>>>> +		while (virtqueue_get_buf(vq, &sg_len))
+>>>>>> +			;
+>>>>> Some entries can get used after a pause. Looks like they will leak then?
+>>>>> One fix would be to convert above if to a while loop.
+>>>>> I don't know whether to do it like this in send_balloon_page_sg too.
+>>>>>
+>>>> Thanks for the above comments. I've re-written this part of code.
+>>>> Please have a check below if there is anything more we could improve:
+>>>>
+>>>> static void kick_and_wait(struct virtqueue *vq, wait_queue_head_t wq_head)
+>>>> {
+>>>>           unsigned int len;
+>>>>
+>>>>           virtqueue_kick(vq);
+>>>>           wait_event(wq_head, virtqueue_get_buf(vq, &len));
+>>>>           /* Detach all the used buffers from the vq */
+>>>>           while (virtqueue_get_buf(vq, &len))
+>>>>                   ;
+>>> I would move this last part to before add_buf. Increases chances
+>>> it succeeds even in case of a bug.
+>>>> }
+>>>>
+>>>> static int add_one_sg(struct virtqueue *vq, void *addr, uint32_t size)
+>>>> {
+>>>>           struct scatterlist sg;
+>>>>           int ret;
+>>>>
+>>>>           sg_init_one(&sg, addr, size);
+>>>>           ret = virtqueue_add_inbuf(vq, &sg, 1, vq, GFP_KERNEL);
+>>>>           if (unlikely(ret == -ENOSPC))
+>>>>                   dev_warn(&vq->vdev->dev, "%s: failed due to ring full\n",
+>>>>                                    __func__);
+>>> So if this ever triggers then kick and wait might fail, right?
+>>> I think you should not special-case this one then.
+>> OK, I will remove the check above, and take other suggestions as well.
+>> Thanks.
+>>
+>> Best,
+>> Wei
+> Any updates here? It's been a while.
+>
 
-> On Wed, 27 Sep 2017 13:49:17 +0200
-> Igor Mammedov <imammedo@redhat.com> wrote:
-> 
-> > --
-> > patch does 3 things at the same time and should be split but
-> > it has 'host' consolidation is it as well to demonstrate idea
-> > --
-> > 
-> > spapr core type definition doesn't have any fields that
-> > require it to be defined at runtime. So replace code
-> > that fills in TypeInfo at runtime with static TypeInfo
-> > array that does the same at complie time.
-> > 
-> > And replace sPAPRCPUCoreClass::cpu_class with cpu
-> > type name since were used just to get that at points
-> > it were accessed.
-> > 
-> > While at that, consolidate move 'host' core type
-> > registration into spapr_cpu_core.c, similar like
-> > it's done in x86 target.
-> >   
-> 
-> This looks nice indeed (just one remark, see below).
-> 
-> Will you re-post as a patch series or do you prefer I do it ?
-I'll repost it as part of cpu_model removal series (ppc part)
+Yes. with some major optimization on xbitmap, we can improve the 
+ballooning time to ~492ms.
+I will send out the patches soon.
 
-> 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> >  include/hw/ppc/spapr_cpu_core.h |  5 ++-
-> >  hw/ppc/spapr.c                  |  6 +--
-> >  hw/ppc/spapr_cpu_core.c         | 93 ++++++++++++++++-------------------------
-> >  target/ppc/kvm.c                | 11 -----
-> >  4 files changed, 41 insertions(+), 74 deletions(-)
-> > 
-> > diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
-> > index 93051e9..42765de 100644
-> > --- a/include/hw/ppc/spapr_cpu_core.h
-> > +++ b/include/hw/ppc/spapr_cpu_core.h
-> > @@ -21,6 +21,8 @@
-> >  #define SPAPR_CPU_CORE_GET_CLASS(obj) \
-> >       OBJECT_GET_CLASS(sPAPRCPUCoreClass, (obj), TYPE_SPAPR_CPU_CORE)
-> >  
-> > +#define SPAPR_CPU_CORE_TYPE_NAME(model) model "-" TYPE_SPAPR_CPU_CORE
-> > +
-> >  typedef struct sPAPRCPUCore {
-> >      /*< private >*/
-> >      CPUCore parent_obj;
-> > @@ -32,9 +34,8 @@ typedef struct sPAPRCPUCore {
-> >  
-> >  typedef struct sPAPRCPUCoreClass {
-> >      DeviceClass parent_class;
-> > -    ObjectClass *cpu_class;
-> > +    const char *cpu_type;
-> >  } sPAPRCPUCoreClass;
-> >  
-> >  char *spapr_get_cpu_core_type(const char *model);
-> > -void spapr_cpu_core_class_init(ObjectClass *oc, void *data);
-> >  #endif
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 8c1a437..00cfe9a 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -3125,8 +3125,7 @@ void spapr_core_release(DeviceState *dev)
-> >      if (smc->pre_2_10_has_unused_icps) {
-> >          sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
-> >          sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
-> > -        const char *typename = object_class_get_name(scc->cpu_class);
-> > -        size_t size = object_type_get_instance_size(typename);
-> > +        size_t size = object_type_get_instance_size(scc->cpu_type);
-> >          int i;
-> >  
-> >          for (i = 0; i < cc->nr_threads; i++) {
-> > @@ -3222,8 +3221,7 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> >  
-> >      if (smc->pre_2_10_has_unused_icps) {
-> >          sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
-> > -        const char *typename = object_class_get_name(scc->cpu_class);
-> > -        size_t size = object_type_get_instance_size(typename);
-> > +        size_t size = object_type_get_instance_size(scc->cpu_type);
-> >          int i;
-> >  
-> >          for (i = 0; i < cc->nr_threads; i++) {
-> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> > index 5bea4c9..8a18eaf 100644
-> > --- a/hw/ppc/spapr_cpu_core.c
-> > +++ b/hw/ppc/spapr_cpu_core.c
-> > @@ -104,8 +104,7 @@ static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
-> >  {
-> >      sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
-> >      sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
-> > -    const char *typename = object_class_get_name(scc->cpu_class);
-> > -    size_t size = object_type_get_instance_size(typename);
-> > +    size_t size = object_type_get_instance_size(scc->cpu_type);
-> >      CPUCore *cc = CPU_CORE(dev);
-> >      int i;
-> >  
-> > @@ -166,8 +165,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-> >      sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
-> >      sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
-> >      CPUCore *cc = CPU_CORE(OBJECT(dev));
-> > -    const char *typename = object_class_get_name(scc->cpu_class);
-> > -    size_t size = object_type_get_instance_size(typename);
-> > +    size_t size = object_type_get_instance_size(scc->cpu_type);
-> >      Error *local_err = NULL;
-> >      void *obj;
-> >      int i, j;
-> > @@ -186,7 +184,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-> >  
-> >          obj = sc->threads + i * size;
-> >  
-> > -        object_initialize(obj, size, typename);
-> > +        object_initialize(obj, size, scc->cpu_type);
-> >          cs = CPU(obj);
-> >          cpu = POWERPC_CPU(cs);
-> >          cs->cpu_index = cc->core_id + i;
-> > @@ -231,42 +229,12 @@ err:
-> >      error_propagate(errp, local_err);
-> >  }
-> >  
-> > -static const char *spapr_core_models[] = {
-> > -    /* 970 */
-> > -    "970_v2.2",
-> > -
-> > -    /* 970MP variants */
-> > -    "970mp_v1.0",
-> > -    "970mp_v1.1",
-> > -
-> > -    /* POWER5+ */
-> > -    "power5+_v2.1",
-> > -
-> > -    /* POWER7 */
-> > -    "power7_v2.3",
-> > -
-> > -    /* POWER7+ */
-> > -    "power7+_v2.1",
-> > -
-> > -    /* POWER8 */
-> > -    "power8_v2.0",
-> > -
-> > -    /* POWER8E */
-> > -    "power8e_v2.1",
-> > -
-> > -    /* POWER8NVL */
-> > -    "power8nvl_v1.0",
-> > -
-> > -    /* POWER9 */
-> > -    "power9_v1.0",
-> > -};
-> > -
-> >  static Property spapr_cpu_core_properties[] = {
-> >      DEFINE_PROP_INT32("node-id", sPAPRCPUCore, node_id, CPU_UNSET_NUMA_NODE_ID),
-> >      DEFINE_PROP_END_OF_LIST()
-> >  };
-> >  
-> > -void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
-> > +static void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
-> >  {
-> >      DeviceClass *dc = DEVICE_CLASS(oc);
-> >      sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_CLASS(oc);
-> > @@ -274,36 +242,47 @@ void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
-> >      dc->realize = spapr_cpu_core_realize;
-> >      dc->unrealize = spapr_cpu_core_unrealizefn;
-> >      dc->props = spapr_cpu_core_properties;
-> > -    scc->cpu_class = cpu_class_by_name(TYPE_POWERPC_CPU, data);
-> > -    g_assert(scc->cpu_class);
-> > +    scc->cpu_type = data;  
-> 
-> Maybe assert data isn't NULL ?
-I'll fix it up on respin
+Best,
+Wei
