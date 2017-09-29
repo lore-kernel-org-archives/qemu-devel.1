@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wangjie88@huawei.com>) id 1dxlrk-0001Aq-LP
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 23:21:30 -0400
+	(envelope-from <peterx@redhat.com>) id 1dxm8g-00057h-4n
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 23:38:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wangjie88@huawei.com>) id 1dxlrf-0004Zu-Fm
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 23:21:27 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:4426)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <wangjie88@huawei.com>) id 1dxlre-0004XI-Cc
-	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 23:21:23 -0400
-From: "wangjie (P)" <wangjie88@huawei.com>
-Date: Fri, 29 Sep 2017 03:20:53 +0000
-Message-ID: <9AA25E8890139848BAC96ED2495626F439A2FFAA@DGGEML501-MBX.china.huawei.com>
-Content-Language: zh-CN
-Content-Type: multipart/mixed;
-	boundary="_002_9AA25E8890139848BAC96ED2495626F439A2FFAADGGEML501MBXchi_"
+	(envelope-from <peterx@redhat.com>) id 1dxm8c-000697-Tb
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 23:38:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40180)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dxm8c-00068h-KQ
+	for qemu-devel@nongnu.org; Thu, 28 Sep 2017 23:38:54 -0400
+From: Peter Xu <peterx@redhat.com>
+Date: Fri, 29 Sep 2017 11:38:22 +0800
+Message-Id: <20170929033844.26935-1-peterx@redhat.com>
 MIME-Version: 1.0
-Subject: [Qemu-devel] I have two issues about it to discuss with you RE:
- ping RE: question: I found a qemu crash about migration
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC v2 00/22] QMP: out-of-band (OOB) execution support
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -25,225 +23,206 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "fuweiwei (C)" <fuweiwei2@huawei.com>, "eblake@redhat.com" <eblake@redhat.com>, "berrange@redhat.com
-	kchamart@redhat.com" <kchamart@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "Wubin (H)" <wu.wubin@huawei.com>, "Fangyi (C)" <eric.fangyi@huawei.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
---_002_9AA25E8890139848BAC96ED2495626F439A2FFAADGGEML501MBXchi_
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+This is RFC version 2 of monitor OOB series.  It is based on following
+series:
 
-RXhjdXNlIG1lLCBJIGhhdmUgdHdvIGlzc3VlcyB0byBkaXNjdXNzIHdpdGggeW91IDo+DQoNCi8v
-UXVlc3Rpb24gMToNCg0KQ2FuIHdlIGZpeCBpdCBieSB0aGUgZGVtbyBwYXRjaCBhcyBhdHRhY2ht
-ZW50PyAodGhlIHBhdGNoIGlzIGJhc2Ugb24gcWVtdS0yLjguMSwganVzdCBhIGRlbW8gZm9yIGRp
-c2N1c3MpDQoNCkJlY2F1c2UgSSB0aGluayB3ZSBzaG91bGQgbm90IHNldCAgSU5BQ1RJVkUgbGFi
-ZWwgZm9yIGRyaXZlLW1pcnJvciBCbG9ja0RyaXZlclN0YXRlLCBtaXJyb3IgSU8gd2lsbCBub3Qg
-YWZmZWN0IHRoZSBtZW1vcnkgbWlncmF0aW9uLiBTbyB3ZSBjYW4gZmlsdGVyIHRoZSBkcml2ZS1t
-aXJyb3IgYnMgaW4gYmRydl9pbmFjdGl2YXRlX2FsbCwgYW5kIEkgdGVzdGVkLCBteSBkZW1vIHBh
-dGNoIGNhbiBmaXggaXQuDQoNCg0KDQovL1F1ZXN0aW9uIDI6DQoNCkkgdXNlZCBnaXQtYmlzZWN0
-IGFuZCBmb3VuZCB0aGUgcWVtdS0yLjYuMCBpcyBPSywgIGJlY2F1c2UgSSBjYW5uJ3QgdHJpZ2dl
-ciB0aGUgYnVnIG9uIHFlbXUtMi42LjAgZXZlbiB0aG91Z2ggSSB0cmllZCBtYW55IHRpbWVzLiAg
-ICAgQnV0IEkgY2FuIHRyaWdnZXIgdGhlIGJ1ZyBhbmQgcmVwcm9kdWNlIGl0IHZlcnkgZWFzeSAg
-c2luY2UgcWVtdS0yLjcuMC1yYzAuICAgc28gSSBnaXQtYmlzZXQgaXQgZ28gb24sIGFuZCBmb3Vu
-ZCB0aGUgYnVnIGJlZ2luIHRvIG9jY3VyIHNpbmNlIHRoZSBwYXRjaHMgY29tbWl0dGVkIGFzIGZv
-bGxvd2luZzoNCg0KY29tbWl0IGNiZDYxNDg3MGZjZTAwZjQ2MDg4YmU3MDU0YTdiZjVlYWRjYzc3
-YWMNCk1lcmdlOiA1MDBhY2M5IDBiYzdhNmYNCkF1dGhvcjogUGV0ZXIgTWF5ZGVsbCA8cGV0ZXIu
-bWF5ZGVsbEBsaW5hcm8ub3JnPg0KRGF0ZTogICBUaHUgSnVuIDIgMTM6NDI6NTIgMjAxNiArMDEw
-MA0KDQogICAgTWVyZ2UgcmVtb3RlLXRyYWNraW5nIGJyYW5jaCAncmVtb3Rlcy9mYW16L3RhZ3Mv
-cHVsbC1kb2NrZXItMjAxNjA2MDEnIGludG8gc3RhZ2luZw0KDQoNCi4uLi4uQnV0IEkgcmV2aWV3
-ZWQgdGhlIHBhdGNocyBhYm91dCB0aGUgY29tbWl0KGNiZDYxNDg3MGZjZTAwZjQ2MDg4YmU3MDU0
-YTdiZjVlYWRjYzc3YWMpIGFib3ZlLCBJIGRpZG4ndCBmaW5kIHNvbWV0aGluZyBjb250YWN0IHRv
-IHRoaXMgYnVnLCBkaWQgSSBuZWdsZWN0IHNvbWUgZGV0YWlscz8NCg0KDQoNCg0KDQotLS0tLU9y
-aWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogRHIuIERhdmlkIEFsYW4gR2lsYmVydCBbbWFpbHRv
-OmRnaWxiZXJ0QHJlZGhhdC5jb21dIA0KU2VudDogRnJpZGF5LCBTZXB0ZW1iZXIgMjksIDIwMTcg
-MTowMSBBTQ0KVG86IHdhbmdqaWUgKFApIDx3YW5namllODhAaHVhd2VpLmNvbT4NCkNjOiBxZW11
-LWRldmVsQG5vbmdudS5vcmc7IGt3b2xmQHJlZGhhdC5jb207IG1yZWl0ekByZWRoYXQuY29tOyBx
-dWludGVsYUByZWRoYXQuY29tOyBwYm9uemluaUByZWRoYXQuY29tOyBmdXdlaXdlaSAoQykgPGZ1
-d2Vpd2VpMkBodWF3ZWkuY29tPjsgZWJsYWtlQHJlZGhhdC5jb207IGJlcnJhbmdlQHJlZGhhdC5j
-b20ga2NoYW1hcnRAcmVkaGF0LmNvbSA8a2NoYW1hcnRAcmVkaGF0LmNvbT47IGZhbXpAcmVkaGF0
-LmNvbQ0KU3ViamVjdDogUmU6IHBpbmcgUkU6IHF1ZXN0aW9uOiBJIGZvdW5kIGEgcWVtdSBjcmFz
-aCBhYm91dCBtaWdyYXRpb24NCg0KKiB3YW5namllIChQKSAod2FuZ2ppZTg4QGh1YXdlaS5jb20p
-IHdyb3RlOg0KPiBQaW5n77yfDQo+IA0KPiBGcm9tOiB3YW5namllIChQKQ0KPiBTZW50OiBUdWVz
-ZGF5LCBTZXB0ZW1iZXIgMjYsIDIwMTcgOToxMCBQTQ0KPiBUbzogcWVtdS1kZXZlbEBub25nbnUu
-b3JnOyBrd29sZkByZWRoYXQuY29tOyBwYm9uemluaUByZWRoYXQuY29tDQo+IENjOiB3YW5namll
-IChQKSA8d2FuZ2ppZTg4QGh1YXdlaS5jb20+OyBmdXdlaXdlaSAoQykgDQo+IDxmdXdlaXdlaTJA
-aHVhd2VpLmNvbT47IGVibGFrZUByZWRoYXQuY29tOyBrY2hhbWFydEByZWRoYXQuY29tOyANCj4g
-ZGdpbGJlcnRAcmVkaGF0LmNvbTsgZmFtekByZWRoYXQuY29tOyBXdWJpbiAoSCkgPHd1Lnd1Ymlu
-QGh1YXdlaS5jb20+DQo+IFN1YmplY3Q6IHF1ZXN0aW9uOiBJIGZvdW5kIGEgcWVtdSBjcmFzaCBh
-Ym91dCBtaWdyYXRpb24NCj4gDQo+IEhpLA0KPiANCj4gV2hlbiBJIHVzZSBxZW11TWlncmF0aW9u
-UnVuIHRvIG1pZ3JhdGUgYm90aCBtZW1vcnkgYW5kIHN0b3JhZ2Ugd2l0aCANCj4gc29tZSBJTyBw
-cmVzcyBpbiBWTSwgYW5kIGNvbmZpZ3VyZWQgaW90aHJlYWRzLiBXZSB0cmlnZ2VyZWQgYSBlcnJv
-ciANCj4gcmVwb3J0czogIChJIHVzZSB0aGUgY3VycmVudCBxZW11IG1hc3RlciBicmFuY2gpICIg
-YmRydl9jb19kb19wd3JpdGV2OiANCj4gQXNzZXJ0aW9uIGAhKGJzLT5vcGVuX2ZsYWdzICYgMHgw
-ODAwKScgZmFpbGVkIiwNCj4gDQo+IEkgcmV2aWV3ZWQgdGhlIGNvZGUsIGFuZCBnZGIgdGhlIGNv
-cmVkdW1wIGZpbGUsIEkgdGhpbmsgb25lIGNhc2UgY2FuIA0KPiB0cmlnZ2VyIHRoZSBlcnJvciBy
-ZXBvcnRzDQo+IA0KPiBDYXNlOg0KPiANCj4gTWlncmF0aW9uX3RocmVhZCgpDQo+ICAgICAgIE1p
-Z3JhdGlvbl9jb21wbGV0aW9uKCkgLS0tLS0tLS0tLT4gbGFzdCBpdGVyYXRpb24gb2YgbWVtb3J5
-IG1pZ3JhdGlvbg0KPiAgICAgICAgICAgICBWbV9zdG9wX2ZvcmNlX3N0YXRlKCktLS0tLS0tLS0t
-LS0tLT4gU3RvcCB0aGUgVk0sIGFuZCBjYWxsIGJkcnZfZHJhaW5fYWxsLCBidXQgSSBnZGIgdGhl
-IGNvcmUgZmlsZSwgYW5kIGZvdW5kIHRoZSBjbnQgb2YgZGlydHkgYml0bWFwIG9mIGRyaXZlci1t
-aXJyb3IgaXMgbm90IDAsIGFuZCBpbl9mbGlnaHQgbWlycm9yIElPIGlzIDE2LA0KPiAgICAgICAg
-ICAgICAgICAgICBCZHJ2X2luYWN0aXZhdGVfYWxsKCktLS0tLS0tLS0tLS0tLS0tPiBpbmFjdGl2
-YXRlIGltYWdlcyBhbmQgc2V0IHRoZSBJTkFDVElWRSBsYWJlbC4NCj4gICAgICAgLT4gYmRydl9j
-b19kb19wd3JpdGV2KCktLS0tLS0tLS0tLS0tLT50aGVuIHRoZSBtaXJyb3IgSU8gaGFuZGxlZCAN
-Cj4gYWZ0ZXIgd2lsbCB0cmlnZ2VyIHRoZSBBc3NlcnRpb24gYCEoYnMtPm9wZW5fZmxhZ3MgJiAw
-eDA4MDApJyBhbmQgcWVtdSANCj4gY3Jhc2hlZA0KPiANCj4gDQo+IA0KPiANCj4gQXMgd2UgY2Fu
-IHNlZSBmcm9tIGFib3ZlLCAgTWlncmF0aW9uX2NvbXBsZXRpb24gY2FsbCANCj4gQmRydl9pbmFj
-dGl2YXRlX2FsbCB0byBpbmFjdGl2YXRlIGltYWdlcywgYnV0IHRoZSBtaXJyb3JfcnVuIGlzIG5v
-dCANCj4gZG9uZSAoc3RpbGwgaGFzIGRpcnR5IGNsdXN0ZXJzKSwgdGhlIG1pcnJvcl9ydW4gSU8g
-aXNzdWVkIGxhdGVyIHdpbGwgDQo+IHRyaWdnZXJlZCBlcnJvciByZXBvcnRzOiAiIGJkcnZfY29f
-ZG9fcHdyaXRldjogQXNzZXJ0aW9uIA0KPiBgIShicy0+b3Blbl9mbGFncyAmIDB4MDgwMCknIGZh
-aWxlZCIsDQo+IA0KPiBJdCBzZWVtcyB0aGF0IG1lbW9yeSBtaWdyYXRpb24gYW5kIHN0b3JhZ2Ug
-bWlycm9yIGlzIGRvbmUgaW5kZXBlbmRlbnRseSBhbmQgdGhlIHNlcXVlbmNlIG9mIHRoZSB0d28g
-cHJvZ3Jlc3NlcyBhcmUgcXVpdGUgcmFuZG9tLg0KPiANCj4gSG93IGNhbiBJIHNvbHZlIHRoaXMg
-cHJvYmxlbSwgc2hvdWxkIHdlIG5vdCBzZXQgIElOQUNUSVZFIGxhYmVsIGZvciBkcml2ZS1taXJy
-b3IgQmxvY2tEcml2ZXJTdGF0ZT8NCg0KSGksDQogIFRoaXMgaXMgYSAnZnVuJyBidWc7ICBJIGhh
-ZCBhIGdvb2QgY2hhdCB0byBrd29sZiBhYm91dCBpdCBlYXJsaWVyLg0KQSBwcm9wZXIgZml4IHJl
-YWxseSBuZWVkcyB0byBiZSBkb25lIHRvZ2V0aGVyIHdpdGggbGlidmlydCBzbyB0aGF0IHdlIGNh
-biBzZXF1ZW5jZToNCiAgIGEpIFRoZSBzdG9wcGluZyBvZiB0aGUgQ1BVIG9uIHRoZSBzb3VyY2UN
-CiAgIGIpIFRoZSB0ZXJtaW5hdGlvbiBvZiB0aGUgbWlycm9yaW5nIGJsb2NrIGpvYg0KICAgYykg
-VGhlIGluYWN0aXZhdGlvbiBvZiB0aGUgYmxvY2sgZGV2aWNlcyBvbiB0aGUgc291cmNlDQogICAg
-ICAgKGJkcnZfaW5hY3RpdmF0ZV9hbGwpDQogICBkKSBUaGUgYWN0aXZhdGlvbiBvZiB0aGUgYmxv
-Y2sgZGV2aWNlcyBvbiB0aGUgZGVzdGluYXRpb24NCiAgICAgICAoYmRydl9pbnZhbGlkYXRlX2Nh
-Y2hlX2FsbCkNCiAgIGUpIFRoZSBzdGFydCBvZiB0aGUgQ1BVIG9uIHRoZSBkZXN0aW5hdGlvbg0K
-DQpJdCBsb29rcyBsaWtlIHlvdSdyZSBoaXR0aW5nIGEgcmFjZSBiZXR3ZWVuIGIvYzsgIHdlJ3Zl
-IGhhZCByYWNlcyBiZXR3ZWVuIGMvZCBpbiB0aGUgcGFzdCBhbmQgbW92ZWQgdGhlIGJkcnZfaW5h
-Y3RpdmF0ZV9hbGwuDQoNCkR1cmluZyB0aGUgZGlzY3Vzc2lvbiB3ZSBlbmRlZCB1cCB3aXRoIHR3
-byBwcm9wb3NlZCBzb2x1dGlvbnM7IGJvdGggb2YgdGhlbSByZXF1aXJlIG9uZSBleHRyYSBjb21t
-YW5kIGFuZCBvbmUgZXh0cmEgbWlncmF0aW9uIGNhcGFiaWxpdHkuDQoNClRoZSBibG9jayB3YXkN
-Ci0tLS0tLS0tLS0tLS0NCiAgIDEpIEFkZCBhIG5ldyBtaWdyYXRpb24gY2FwYWJpbGl0eSBwYXVz
-ZS1hdC1jb21wbGV0ZQ0KICAgMikgQWRkIGEgbmV3IG1pZ3JhdGlvbiBzdGF0ZSBhbG1vc3QtY29t
-cGxldGUNCiAgIDMpIEFmdGVyIHNhdmluZyBkZXZpY2VzLCBpZiBwYXVzZS1hdC1jb21wbGV0ZSBp
-cyBzZXQsDQogICAgICB0cmFuc2l0aW9uIHRvIGFsbW9zdC1jb21wbGV0ZQ0KICAgNCkgQWRkIGEg
-bmV3IGNvbW1hbmQgKG1pZ3JhdGlvbi1jb250aW51ZSkgdGhhdCANCiAgICAgIGNhdXNlcyB0aGUg
-bWlncmF0aW9uIHRvIGluYWN0aXZhdGUgdGhlIGRldmljZXMgKGMpDQogICAgICBhbmQgc2VuZCB0
-aGUgZmluYWwgRU9GIHRvIHRoZSBkZXN0aW5hdGlvbi4NCg0KWW91IHNldCBwYXVzZS1hdC1jb21w
-bGV0ZSwgd2FpdCB1bnRpbCBtaWdyYXRlIGhpdHMgYWxtb3N0LWNvbXBsZXRlOyBjbGVhbnVwIHRo
-ZSBtaXJyb3Igam9iLCBhbmQgdGhlbiBkbyBtaWdyYXRpb24tY29udGludWUuICBXaGVuIGl0IGNv
-bXBsZXRlcyBkbyAnY29udCcgb24gdGhlIGRlc3RpbmF0aW9uLg0KDQpUaGUgbWlncmF0aW9uIHdh
-eQ0KLS0tLS0tLS0tLS0tLS0tLS0NCiAgIDEpIFN0b3AgZG9pbmcgKGQpIHdoZW4gdGhlIGRlc3Rp
-bmF0aW9uIGlzIHN0YXJ0ZWQgd2l0aCAtUw0KICAgICAgc2luY2UgaXQgaGFwcGVucyBhbnl3YXkg
-d2hlbiAnY29udCcgaXMgaXNzdWVkDQogICAyKSBBZGQgYSBuZXcgbWlncmF0aW9uIGNhcGFiaWxp
-dHkgZXh0LW1hbmFnZS1zdG9yYWdlDQogICAzKSBXaGVuICdleHQtbWFuYWdlLXN0b3JhZ2UnIGlz
-IHNldCwgd2UgZG9uJ3QgYm90aGVyIGRvaW5nIChjKQ0KICAgNCkgQWRkIGEgbmV3IGNvbW1hbmQg
-J2Jsb2NrLWluYWN0aXZhdGUnIG9uIHRoZSBzb3VyY2UNCg0KWW91IHNldCBleHQtbWFuYWdlLXN0
-b3JhZ2UsIGRvIHRoZSBtaWdyYXRlIGFuZCB3aGVuIGl0J3MgZmluaXNoZWQgY2xlYW4gdXAgdGhl
-IGJsb2NrIGpvYiwgYmxvY2staW5hY3RpdmF0ZSBvbiB0aGUgc291cmNlLCBhbmQgdGhlbiBjb250
-IG9uIHRoZSBkZXN0aW5hdGlvbi4NCiAgDQoNCk15IHdvcnJ5IGFib3V0IHRoZSAnYmxvY2sgd2F5
-JyBpcyB0aGF0IHRoZSBwb2ludCBhdCB3aGljaCB3ZSBkbyB0aGUgcGF1c2Ugc2VlbXMgcHJldHR5
-IGludGVyZXN0aW5nOyAgaXQgcHJvYmFibHkgaXMgYmVzdCBkb25lIGFmdGVyIHRoZSBmaW5hbCBk
-ZXZpY2Ugc2F2ZSBidXQgYmVmb3JlIHRoZSBpbmFjdGl2YXRlLCBidXQgY291bGQgYmUgZG9uZSBi
-ZWZvcmUgaXQuICBCdXQgaXQgcHJvYmFibHkgYmVjb21lcyBBUEkgYW5kIHNvbWV0aGluZyBtaWdo
-dCBiZWNvbWUgZGVwZW5kZW50IG9uIHdoZXJlIHdlIGRpZCBpdC4NCg0KSSB0aGluayBLZXZpbidz
-IHdvcnJ5IGFib3V0IHRoZSAnbWlncmF0aW9uIHdheScgaXMgdGhhdCBpdCdzIGEgYml0IG9mIGEg
-YmxvY2stc3BlY2lmaWMgZnVkZ2U7IHdoaWNoIGlzIHByb2JhYmx5IHJpZ2h0Lg0KDQoNCkkndmUg
-bm90IHJlYWxseSB0aG91Z2h0IHdoYXQgaGFwcGVucyB3aGVuIHlvdSBoYXZlIGEgbWl4IG9mIHNo
-YXJlZCBhbmQgbm9uLXNoYXJlZCBzdG9yYWdlLg0KDQpDb3VsZCB3ZSBkbyBhbnkgaGFjayB0aGF0
-IGlzbid0IGxpYnZpcnQtdmlzaWJsZSBmb3IgZXhpc3RpbmcgdmVyc2lvbnM/DQpJIGd1ZXNzIG1h
-eWJlIGhhY2sgZHJpdmUtbWlycm9yIHNvIGl0IGludGVybG9ja3Mgd2l0aCB0aGUgbWlncmF0aW9u
-IGNvZGUgc29tZWhvdyB0byBob2xkIG9mZiBvbiB0aGF0IGluYWN0aXZhdGU/DQoNClRoaXMgY29k
-ZSBpcyB2aXNpYmxlIHByb2JhbGJ5IGZyb20gMi45LmlzaCB3aXRoIHRoZSBuZXcgbG9ja2luZyBj
-b2RlOyBidXQgcmVhbGx5IHRoYXQgYi9jIHJhY2UgaGFzIGJlZW4gdGhlcmUgZm9yIGV2ZXIgLSB0
-aGVyZSdzIG1heWJlIGFsd2F5cyB0aGUgY2hhbmNlIHRoYXQgdGhlIGxhc3QgZmV3IGJsb2NrcyBv
-ZiBtaXJyb3JpbmcgbWlnaHQgaGF2ZSBoYXBwZW5lZCB0b28gbGF0ZSA/DQoNClRob3VnaHRzPw0K
-V2hhdCBhcmUgdGhlIGxpYnZpcnQgdmlldyBvbiB0aGUgcHJlZmVycmVkIHNvbHV0aW9uLg0KDQpE
-YXZlDQoNCg0KPiBRZW11IENyYXNoIGJ0Og0KPiAoZ2RiKSBidA0KPiAjMCAgMHgwMDAwN2Y2YjZl
-MmE3MWQ3IGluIHJhaXNlICgpIGZyb20gL3Vzci9saWI2NC9saWJjLnNvLjYNCj4gIzEgIDB4MDAw
-MDdmNmI2ZTJhODhjOCBpbiBhYm9ydCAoKSBmcm9tIC91c3IvbGliNjQvbGliYy5zby42DQo+ICMy
-ICAweDAwMDA3ZjZiNmUyYTAxNDYgaW4gX19hc3NlcnRfZmFpbF9iYXNlICgpIGZyb20gDQo+IC91
-c3IvbGliNjQvbGliYy5zby42DQo+ICMzICAweDAwMDA3ZjZiNmUyYTAxZjIgaW4gX19hc3NlcnRf
-ZmFpbCAoKSBmcm9tIC91c3IvbGliNjQvbGliYy5zby42DQo+ICM0ICAweDAwMDAwMDAwMDA3Yjky
-MTEgaW4gYmRydl9jb19wd3JpdGV2IChjaGlsZD08b3B0aW1pemVkIG91dD4sIG9mZnNldD1vZmZz
-ZXRAZW50cnk9NzAzNDg5NjM4NCwgYnl0ZXM9Ynl0ZXNAZW50cnk9NjU1MzYsDQo+ICAgICBxaW92
-PXFpb3ZAZW50cnk9MHg3ZjY5Y2MwOWIwNjgsIGZsYWdzPTApIGF0IGJsb2NrL2lvLmM6MTUzNg0K
-PiAjNSAgMHgwMDAwMDAwMDAwN2E2ZjAyIGluIGJsa19jb19wd3JpdGV2IChibGs9MHgyZjkyNzUw
-LCBvZmZzZXQ9NzAzNDg5NjM4NCwgYnl0ZXM9NjU1MzYsIHFpb3Y9MHg3ZjY5Y2MwOWIwNjgsDQo+
-ICAgICBmbGFncz08b3B0aW1pemVkIG91dD4pIGF0IGJsb2NrL2Jsb2NrX2JhY2tlbmQuYzo4NTEN
-Cj4gIzYgIDB4MDAwMDAwMDAwMDdhNmZjMSBpbiBibGtfYWlvX3dyaXRlX2VudHJ5IChvcGFxdWU9
-MHgzMDFkYWQwKSBhdCANCj4gYmxvY2svYmxvY2tfYmFja2VuZC5jOjEwNDMNCj4gIzcgIDB4MDAw
-MDAwMDAwMDgzNWUyYSBpbiBjb3JvdXRpbmVfdHJhbXBvbGluZSAoaTA9PG9wdGltaXplZCBvdXQ+
-LCANCj4gaTE9PG9wdGltaXplZCBvdXQ+KSBhdCB1dGlsL2Nvcm91dGluZV91Y29udGV4dC5jOjc5
-DQo+ICM4ICAweDAwMDA3ZjZiNmUyYjhjZjAgaW4gPz8gKCkgZnJvbSAvdXNyL2xpYjY0L2xpYmMu
-c28uNg0KPiAjOSAgMHgwMDAwN2Y2YTFiY2ZjNzgwIGluID8/ICgpDQo+ICMxMCAweDAwMDAwMDAw
-MDAwMDAwMDAgaW4gPz8gKCkNCj4gDQo+IEFuZCBJIHNlZSB0aGUgbWlycm9yX3J1biBpcyBub3Qg
-ZG9uZSwgIGdkYiBpbmZvIGFzIGZvbGxvd2luZzoNCj4gW2NpZDppbWFnZTAwMS5wbmdAMDFEMzM4
-NkYuREJDOUZGMTBdDQo+IA0KPiANCj4gU3JjIFZNIHFlbXUgbG9nOg0KPiANCj4gW2NpZDppbWFn
-ZTAwMi5wbmdAMDFEMzM4NkYuREJDOUZGMTBdDQo+IA0KPiANCj4gDQo+IA0KPiANCj4gDQo+IA0K
-PiANCj4gDQo+IA0KPiANCj4gDQo+IA0KPiANCg0KDQoNCi0tDQpEci4gRGF2aWQgQWxhbiBHaWxi
-ZXJ0IC8gZGdpbGJlcnRAcmVkaGF0LmNvbSAvIE1hbmNoZXN0ZXIsIFVLDQo=
+  [PATCH v4 0/5] iothread: allow to create internal iothreads
+  (queued in Stefan's tree, pre-requisite for iothread usage)
+  [PATCH v2 0/4] chardev: support non-default gcontext
+  (queued in Paolo's tree, fix chardev reconnect issue)
 
---_002_9AA25E8890139848BAC96ED2495626F439A2FFAADGGEML501MBXchi_
-Content-Type: application/octet-stream; name="demo.patch"
-Content-Description: demo.patch
-Content-Disposition: attachment; filename="demo.patch"; size=3600;
-	creation-date="Fri, 29 Sep 2017 02:33:17 GMT";
-	modification-date="Fri, 29 Sep 2017 03:05:45 GMT"
-Content-Transfer-Encoding: base64
+Big changes from version 1:
 
-ZGlmZiAtLWdpdCBhL2Jsb2NrLmMgYi9ibG9jay5jCmluZGV4IDI1NjI0MjQuLmMwNDE1YWUgMTAw
-NjQ0Ci0tLSBhL2Jsb2NrLmMKKysrIGIvYmxvY2suYwpAQCAtMzMyMyw2ICszMzIzLDExIEBAIHZv
-aWQgYmRydl9pbnZhbGlkYXRlX2NhY2hlKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBFcnJvciAqKmVy
-cnApCiAKIHN0YXRpYyBib29sIGlzX2luYWN0aXZhdGVkOwogCit2b2lkIGJkcnZfc2V0X21pcnJv
-cihCbG9ja0RyaXZlclN0YXRlICpicywgYm9vbCBpc19taXJyb3JfZHJpdmVyKQoreworICAgIGJz
-LT5pc19taXJyb3JfZHJpdmVyID0gaXNfbWlycm9yX2RyaXZlcjsKK30KKwogYm9vbCBiZHJ2X2lz
-X2luYWN0aXZhdGVkKHZvaWQpCiB7CiAgICAgcmV0dXJuIGlzX2luYWN0aXZhdGVkOwpAQCAtMzQw
-OSw2ICszNDE0LDQxIEBAIG91dDoKICAgICByZXR1cm4gcmV0OwogfQogCitpbnQgYmRydl9pbmFj
-dGl2YXRlX3dpdGhvdXRfbWlycm9yX2JzKHZvaWQpCit7CisgICAgQmxvY2tEcml2ZXJTdGF0ZSAq
-YnMgPSBOVUxMOworICAgIEJkcnZOZXh0SXRlcmF0b3IgaXQ7CisgICAgaW50IHJldCA9IDA7Cisg
-ICAgaW50IHBhc3M7CisKKyAgICBmb3IgKGJzID0gYmRydl9maXJzdCgmaXQpOyBiczsgYnMgPSBi
-ZHJ2X25leHQoJml0KSkgew0KKyAgICAgICAgIGlmICghYnMtPmlzX21pcnJvcl9kcml2ZXIpIHsN
-CisgICAgICAgICAgICAgYWlvX2NvbnRleHRfYWNxdWlyZShiZHJ2X2dldF9haW9fY29udGV4dChi
-cykpOw0KKyAgICAgICAgIH0KKyAgICB9CisKKyAgICAvKiBXZSBkbyB0d28gcGFzc2VzIG9mIGlu
-YWN0aXZhdGlvbi4gVGhlIGZpcnN0IHBhc3MgY2FsbHMgdG8gZHJpdmVycycKKyAgICAgKiAuYmRy
-dl9pbmFjdGl2YXRlIGNhbGxiYWNrcyByZWN1cnNpdmVseSBzbyBhbGwgY2FjaGUgaXMgZmx1c2hl
-ZCB0byBkaXNrOworICAgICAqIHRoZSBzZWNvbmQgcGFzcyBzZXRzIHRoZSBCRFJWX09fSU5BQ1RJ
-VkUgZmxhZyBzbyB0aGF0IG5vIGZ1cnRoZXIgd3JpdGUKKyAgICAgKiBpcyBhbGxvd2VkLiAqLwor
-ICAgIGZvciAocGFzcyA9IDA7IHBhc3MgPCAyOyBwYXNzKyspIHsKKyAgICAgICAgZm9yIChicyA9
-IGJkcnZfZmlyc3QoJml0KTsgYnM7IGJzID0gYmRydl9uZXh0KCZpdCkpIHsKKyAgICAgICAgICAg
-ICBpZiAoYnMtPmlzX21pcnJvcl9kcml2ZXIpIHsKKyAgICAgICAgICAgICAgICAgLyogZmlsdGVy
-IHRoZSBtaXJyb3IgYnMgKi8KKyAgICAgICAgICAgICAgICAgY29udGludWU7CisgICAgICAgICAg
-ICAgfQorCisgICAgICAgICAgICByZXQgPSBiZHJ2X2luYWN0aXZhdGVfcmVjdXJzZShicywgcGFz
-cyk7CisgICAgICAgICAgICBpZiAocmV0IDwgMCkgeworICAgICAgICAgICAgICAgIGdvdG8gb3V0
-OworICAgICAgICAgICAgfQorICAgICAgICB9CisgICAgfQorCitvdXQ6CisgICAgZm9yIChicyA9
-IGJkcnZfZmlyc3QoJml0KTsgYnM7IGJzID0gYmRydl9uZXh0KCZpdCkpIHsNCisgICAgICAgICBp
-ZiAoIWJzLT5pc19taXJyb3JfZHJpdmVyKSB7DQorICAgICAgICAgICAgIGFpb19jb250ZXh0X3Jl
-bGVhc2UoYmRydl9nZXRfYWlvX2NvbnRleHQoYnMpKTsNCisgICAgICAgICB9CisgICAgfQorCisg
-ICAgaWYgKCFyZXQpIHsKKyAgICAgICAgaXNfaW5hY3RpdmF0ZWQgPSB0cnVlOworICAgIH0KKyAg
-ICByZXR1cm4gcmV0OworfQorCiAvKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioq
-KioqKioqKioqKioqKioqKioqKioqKioqKiovCiAvKiByZW1vdmFibGUgZGV2aWNlIHN1cHBvcnQg
-Ki8KIApkaWZmIC0tZ2l0IGEvYmxvY2tkZXYuYyBiL2Jsb2NrZGV2LmMKaW5kZXggNTI4MDJhMC4u
-MjkwMDNmMSAxMDA2NDQKLS0tIGEvYmxvY2tkZXYuYworKysgYi9ibG9ja2Rldi5jCkBAIC0zNTk5
-LDYgKzM1OTksNyBAQCB2b2lkIHFtcF9kcml2ZV9taXJyb3IoRHJpdmVNaXJyb3IgKmFyZywgRXJy
-b3IgKiplcnJwKQogICAgIGlmICghdGFyZ2V0X2JzKSB7CiAgICAgICAgIGdvdG8gb3V0OwogICAg
-IH0KKyAgICBiZHJ2X3NldF9taXJyb3IodGFyZ2V0X2JzLCB0cnVlKTsKIAogICAgIGJkcnZfc2V0
-X2Fpb19jb250ZXh0KHRhcmdldF9icywgYWlvX2NvbnRleHQpOwogCmRpZmYgLS1naXQgYS9pbmNs
-dWRlL2Jsb2NrL2Jsb2NrLmggYi9pbmNsdWRlL2Jsb2NrL2Jsb2NrLmgKaW5kZXggNGUxODhjMS4u
-OGY5NWNiNCAxMDA2NDQKLS0tIGEvaW5jbHVkZS9ibG9jay9ibG9jay5oCisrKyBiL2luY2x1ZGUv
-YmxvY2svYmxvY2suaApAQCAtMzI3LDcgKzMyNyw5IEBAIGludCBiZHJ2X2NvX2lvY3RsKEJsb2Nr
-RHJpdmVyU3RhdGUgKmJzLCBpbnQgcmVxLCB2b2lkICpidWYpOwogdm9pZCBiZHJ2X2ludmFsaWRh
-dGVfY2FjaGUoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIEVycm9yICoqZXJycCk7CiB2b2lkIGJkcnZf
-aW52YWxpZGF0ZV9jYWNoZV9hbGwoRXJyb3IgKiplcnJwKTsKIGludCBiZHJ2X2luYWN0aXZhdGVf
-YWxsKHZvaWQpOworaW50IGJkcnZfaW5hY3RpdmF0ZV93aXRob3V0X21pcnJvcl9icyh2b2lkKTsK
-IGJvb2wgYmRydl9pc19pbmFjdGl2YXRlZCh2b2lkKTsKK3ZvaWQgYmRydl9zZXRfbWlycm9yKEJs
-b2NrRHJpdmVyU3RhdGUgKmJzLCBib29sIG1pcnJvcik7CiAKIC8qIEVuc3VyZSBjb250ZW50cyBh
-cmUgZmx1c2hlZCB0byBkaXNrLiAgKi8KIGludCBiZHJ2X2ZsdXNoKEJsb2NrRHJpdmVyU3RhdGUg
-KmJzKTsKZGlmZiAtLWdpdCBhL2luY2x1ZGUvYmxvY2svYmxvY2tfaW50LmggYi9pbmNsdWRlL2Js
-b2NrL2Jsb2NrX2ludC5oCmluZGV4IGU2ZGRiOTMuLjY4Y2I4MzQgMTAwNjQ0Ci0tLSBhL2luY2x1
-ZGUvYmxvY2svYmxvY2tfaW50LmgKKysrIGIvaW5jbHVkZS9ibG9jay9ibG9ja19pbnQuaApAQCAt
-NTM1LDYgKzUzNSw3IEBAIHN0cnVjdCBCbG9ja0RyaXZlclN0YXRlIHsKICAgICB1bnNpZ25lZCBp
-b19wbHVnZ2VkOwogCiAgICAgaW50IHF1aWVzY2VfY291bnRlcjsKKyAgICBib29sIGlzX21pcnJv
-cl9kcml2ZXI7CiB9OwogCiBzdHJ1Y3QgQmxvY2tCYWNrZW5kUm9vdFN0YXRlIHsKZGlmZiAtLWdp
-dCBhL21pZ3JhdGlvbi9taWdyYXRpb24uYyBiL21pZ3JhdGlvbi9taWdyYXRpb24uYwppbmRleCAy
-NzU3NWJlLi43ODQzNDZkIDEwMDY0NAotLS0gYS9taWdyYXRpb24vbWlncmF0aW9uLmMKKysrIGIv
-bWlncmF0aW9uL21pZ3JhdGlvbi5jCkBAIC0yMDY2LDcgKzIwNjYsNyBAQCBzdGF0aWMgdm9pZCBt
-aWdyYXRpb25fY29tcGxldGlvbihNaWdyYXRpb25TdGF0ZSAqcywgaW50IGN1cnJlbnRfYWN0aXZl
-X3N0YXRlLAogICAgICAgICAgICAgICogd2Ugd2lsbCBnbyBpbnRvIENPTE8gc3RhZ2UgbGF0ZXIu
-CiAgICAgICAgICAgICAgKi8KICAgICAgICAgICAgIGlmIChyZXQgPj0gMCAmJiAhbWlncmF0ZV9j
-b2xvX2VuYWJsZWQoKSkgewotICAgICAgICAgICAgICAgIHJldCA9IGJkcnZfaW5hY3RpdmF0ZV9h
-bGwoKTsKKyAgICAgICAgICAgICAgICByZXQgPSBiZHJ2X2luYWN0aXZhdGVfd2l0aG91dF9taXJy
-b3JfYnMoKTsKICAgICAgICAgICAgIH0KICAgICAgICAgICAgIGlmIChyZXQgPj0gMCkgewogICAg
-ICAgICAgICAgICAgIHFlbXVfZmlsZV9zZXRfcmF0ZV9saW1pdChzLT50b19kc3RfZmlsZSwgSU5U
-NjRfTUFYKTsK
+* Use IOThread for monitor IO thread.
 
---_002_9AA25E8890139848BAC96ED2495626F439A2FFAADGGEML501MBXchi_--
+* Request queue switched from global queue to per-monitor queue, with
+  basic flow control (currently 8 outstanding requests per monitor).
+
+* Moved all documents into a single patch.
+
+* Start to use "capabilities" field in QMP greeting message, to
+  declare OOB support on server side.
+
+* Added per-monitor response queue, so finally it looks like this:
+
+               queue/kick              queue/kick
+     JSON Parser =3D=3D=3D=3D=3D=3D> QMP Dispatcher =3D=3D=3D=3D=3D> Resp=
+onder
+         /|\ |     (3)       /|\  |      (4)      | /|\
+      (1) |  | (2)            |   |               |  |
+          |  |                |  \|/           (6)|  |(5)
+          |  |            main thread             |  |
+          |  |                                    |  |
+          |  +--------> monitor IO thread <-------+  |
+          +-----------/                   \----------+
+
+v2 changelog:
+- use 10-char hash for git commit ID [Eric]
+- instead of changing qstring_get_str(), add new
+  qstring_get_try_str(), and rename qobject_get_str() to
+  qobject_get_try_str() to follow the naming rule [Eric]
+- add one more patch to let object_property_get_str() leverage the new
+  qobject_get_try_str(). [Eric]
+- introduce JSONMessageEmitFunc in the JSON parser patch [Eric]
+- use per-monitor request queue, rather than a global queue
+- add queue flow control, when full (current queue depth: 8), send
+  event to notify client (two new patches added for this)
+- stop monitor thread first before destroying monitor objects [Dan]
+- document that client should drop responses with unknown IDs.
+- move all the documents into a single standalone patch.
+- use iothread for the monitor io thread.
+- respond in IO thread, rather than the dispatcher
+- new patch: in QMP greeting message, add 'oob' field in
+  'capabilities', so that client can explicitly know whether server
+  supports oob
+
+TODO:
+- qmp qtest for oob
+
+Please review.  Thanks,
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D below is original RFC cover letter =3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+This series was born from this one:
+
+  https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg04310.html
+
+The design comes from Markus, and also the whole-bunch-of discussions
+in previous thread.  My heartful thanks to Markus, Daniel, Dave,
+Stefan, etc. on discussing the topic (...again!), providing shiny
+ideas and suggestions.  Finally we got such a solution that seems to
+satisfy everyone.
+
+I re-started the versioning since this series is totally different
+from previous one.  Now it's version 1.
+
+In case new reviewers come along the way without reading previous
+discussions, I will try to do a summary on what this is all about.
+
+What is OOB execution?
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+It's the shortcut of Out-Of-Band execution, its name is given by
+Markus.  It's a way to quickly execute a QMP request.  Say, originally
+QMP is going throw these steps:
+
+      JSON Parser --> QMP Dispatcher --> Respond
+          /|\    (2)                (3)     |
+       (1) |                               \|/ (4)
+           +---------  main thread  --------+
+
+The requests are executed by the so-called QMP-dispatcher after the
+JSON is parsed.  If OOB is on, we run the command directly in the
+parser and quickly returns.
+
+Yeah I know in current code the parser calls dispatcher directly
+(please see handle_qmp_command()).  However it's not true again after
+this series (parser will has its own IO thread, and dispatcher will
+still be run in main thread).  So this OOB does brings something
+different.
+
+There are more details on why OOB and the difference/relationship
+between OOB, async QMP, block/general jobs, etc.. but IMHO that's
+slightly out of topic (and believe me, it's not easy for me to
+summarize that).  For more information, please refers to [1].
+
+Summary ends here.
+
+Some Implementation Details
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+
+Again, I mentioned that the old QMP workflow is this:
+
+      JSON Parser --> QMP Dispatcher --> Respond
+          /|\    (2)                (3)     |
+       (1) |                               \|/ (4)
+           +---------  main thread  --------+
+
+What this series does is, firstly:
+
+      JSON Parser     QMP Dispatcher --> Respond
+          /|\ |           /|\       (4)     |
+           |  | (2)        | (3)            |  (5)
+       (1) |  +----->      |               \|/
+           +---------  main thread  <-------+
+
+And further:
+
+               queue/kick
+     JSON Parser =3D=3D=3D=3D=3D=3D> QMP Dispatcher --> Respond
+         /|\ |     (3)       /|\        (4)    |
+      (1) |  | (2)            |                |  (5)
+          | \|/               |               \|/
+        IO thread         main thread  <-------+
+
+Then it introduced the "allow-oob" parameter in QAPI schema to define
+commands, and "run-oob" flag to let oob-allowed command to run in the
+parser.
+
+The last patch enables this for "migrate-incoming" command.
+
+Please review.  Thanks.
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg04310.html
+
+Peter Xu (22):
+  char-io: fix possible race on IOWatchPoll
+  qobject: introduce qstring_get_try_str()
+  qobject: introduce qobject_get_try_str()
+  qobject: let object_property_get_str() use new API
+  monitor: move skip_flush into monitor_data_init
+  qjson: add "opaque" field to JSONMessageParser
+  monitor: move the cur_mon hack deeper for QMP
+  monitor: unify global init
+  monitor: create monitor dedicate iothread
+  monitor: allow to use IO thread for parsing
+  monitor: introduce monitor_qmp_respond()
+  monitor: let mon_list be tail queue
+  monitor: separate QMP parser and dispatcher
+  qmp: add new event "request-dropped"
+  monitor: send event when request queue full
+  monitor: enable IO thread for (qmp & !mux) typed
+  qapi: introduce new cmd option "allow-oob"
+  qmp: support out-of-band (oob) execution
+  qmp: let migrate-incoming allow out-of-band
+  qmp: isolate responses into io thread
+  qmp: introduce QMPCapability
+  docs: update QMP documents for OOB commands
+
+ chardev/char-io.c                |  16 +-
+ docs/devel/qapi-code-gen.txt     |  51 ++++-
+ docs/interop/qmp-spec.txt        |  24 ++-
+ include/monitor/monitor.h        |   2 +-
+ include/qapi/qmp/dispatch.h      |   2 +
+ include/qapi/qmp/json-streamer.h |  10 +-
+ include/qapi/qmp/qstring.h       |   2 +
+ monitor.c                        | 441 ++++++++++++++++++++++++++++++++-=
+------
+ qapi-schema.json                 |  48 +++++
+ qapi/introspect.json             |   6 +-
+ qapi/migration.json              |   3 +-
+ qapi/qmp-dispatch.c              |  34 +++
+ qga/main.c                       |   5 +-
+ qobject/json-streamer.c          |   6 +-
+ qobject/qjson.c                  |   5 +-
+ qobject/qstring.c                |  21 ++
+ qom/object.c                     |   9 +-
+ scripts/qapi-commands.py         |  19 +-
+ scripts/qapi-introspect.py       |  10 +-
+ scripts/qapi.py                  |  15 +-
+ scripts/qapi2texi.py             |   2 +-
+ tests/libqtest.c                 |   5 +-
+ tests/qapi-schema/test-qapi.py   |   2 +-
+ tests/qmp-test.c                 |   2 +-
+ trace-events                     |   2 +
+ vl.c                             |   3 +-
+ 26 files changed, 630 insertions(+), 115 deletions(-)
+
+--=20
+2.13.5
