@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dxsQs-00073Z-So
+	(envelope-from <kraxel@redhat.com>) id 1dxsQw-00077w-8l
 	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:22:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dxsQp-0005hZ-VF
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:22:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39836)
+	(envelope-from <kraxel@redhat.com>) id 1dxsQu-0005ke-VY
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:22:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37530)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dxsQp-0005gq-I0
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:22:07 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dxsQu-0005kE-MV
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:22:12 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A488F267E0
-	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 10:22:06 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C84B34DD7C
+	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 10:22:11 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 29 Sep 2017 12:22:01 +0200
-Message-Id: <20170929102201.15408-6-kraxel@redhat.com>
+Date: Fri, 29 Sep 2017 12:21:59 +0200
+Message-Id: <20170929102201.15408-4-kraxel@redhat.com>
 In-Reply-To: <20170929102201.15408-1-kraxel@redhat.com>
 References: <20170929102201.15408-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 5/5] ui: add tracing of VNC authentication
- process
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 3/5] virtio-input: send rel-wheel events for
+ wheel buttons
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -30,654 +33,262 @@ List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
+qemu uses wheel-up/down button events for mouse wheel input, however
+linux applications typically want REL_WHEEL events.
 
-Trace anything related to authentication in the VNC protocol
-handshake
+This fixes wheel with linux guests. Tested with X11/wayland, and
+windows virtio-input driver.
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170921121528.23935-3-berrange@redhat.com
+Based on a patch from Marc.
+Added property to enable/disable wheel axis.
+
+Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 20170926113243.26081-1-kraxel@redhat.com
 ---
- ui/vnc-auth-sasl.c     | 113 ++++++++++++++++++++++---------------------------
- ui/vnc-auth-vencrypt.c |  21 ++++-----
- ui/vnc.c               |  36 ++++++++--------
- ui/trace-events        |  15 +++++++
- 4 files changed, 92 insertions(+), 93 deletions(-)
+ include/hw/compat.h              |  10 +++-
+ include/hw/virtio/virtio-input.h |   1 +
+ hw/input/virtio-input-hid.c      | 119 +++++++++++++++++++++++++++++++++=
+++++--
+ 3 files changed, 124 insertions(+), 6 deletions(-)
 
-diff --git a/ui/vnc-auth-sasl.c b/ui/vnc-auth-sasl.c
-index 3ade4a4918..23f28280e7 100644
---- a/ui/vnc-auth-sasl.c
-+++ b/ui/vnc-auth-sasl.c
-@@ -25,6 +25,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "vnc.h"
-+#include "trace.h"
- 
- /* Max amount of data we send/recv for SASL steps to prevent DOS */
- #define SASL_DATA_MAX_LEN (1024 * 1024)
-@@ -133,27 +134,26 @@ static int vnc_auth_sasl_check_access(VncState *vs)
- 
-     err = sasl_getprop(vs->sasl.conn, SASL_USERNAME, &val);
-     if (err != SASL_OK) {
--        VNC_DEBUG("cannot query SASL username on connection %d (%s), denying access\n",
--                  err, sasl_errstring(err, NULL, NULL));
-+        trace_vnc_auth_fail(vs, vs->auth, "Cannot fetch SASL username",
-+                            sasl_errstring(err, NULL, NULL));
-         return -1;
-     }
-     if (val == NULL) {
--        VNC_DEBUG("no client username was found, denying access\n");
-+        trace_vnc_auth_fail(vs, vs->auth, "No SASL username set", "");
-         return -1;
-     }
--    VNC_DEBUG("SASL client username %s\n", (const char *)val);
- 
-     vs->sasl.username = g_strdup((const char*)val);
-+    trace_vnc_auth_sasl_username(vs, vs->sasl.username);
- 
-     if (vs->vd->sasl.acl == NULL) {
--        VNC_DEBUG("no ACL activated, allowing access\n");
-+        trace_vnc_auth_sasl_acl(vs, 1);
-         return 0;
-     }
- 
-     allow = qemu_acl_party_is_allowed(vs->vd->sasl.acl, vs->sasl.username);
- 
--    VNC_DEBUG("SASL client %s %s by ACL\n", vs->sasl.username,
--              allow ? "allowed" : "denied");
-+    trace_vnc_auth_sasl_acl(vs, allow);
-     return allow ? 0 : -1;
+diff --git a/include/hw/compat.h b/include/hw/compat.h
+index 9cc14dd798..cf389b4e85 100644
+--- a/include/hw/compat.h
++++ b/include/hw/compat.h
+@@ -2,7 +2,15 @@
+ #define HW_COMPAT_H
+=20
+ #define HW_COMPAT_2_10 \
+-    /* empty */
++    {\
++        .driver   =3D "virtio-mouse-device",\
++        .property =3D "wheel-axis",\
++        .value    =3D "false",\
++    },{\
++        .driver   =3D "virtio-tablet-device",\
++        .property =3D "wheel-axis",\
++        .value    =3D "false",\
++    },
+=20
+ #define HW_COMPAT_2_9 \
+     {\
+diff --git a/include/hw/virtio/virtio-input.h b/include/hw/virtio/virtio-=
+input.h
+index 91df57eca4..054c38836f 100644
+--- a/include/hw/virtio/virtio-input.h
++++ b/include/hw/virtio/virtio-input.h
+@@ -89,6 +89,7 @@ struct VirtIOInputHID {
+     QemuInputHandler                  *handler;
+     QemuInputHandlerState             *hs;
+     int                               ledstate;
++    bool                              wheel_axis;
+ };
+=20
+ struct VirtIOInputHost {
+diff --git a/hw/input/virtio-input-hid.c b/hw/input/virtio-input-hid.c
+index 4d3afc1b14..e78faec0b1 100644
+--- a/hw/input/virtio-input-hid.c
++++ b/hw/input/virtio-input-hid.c
+@@ -190,6 +190,7 @@ static void virtio_input_key_config(VirtIOInput *vinp=
+ut,
+ static void virtio_input_handle_event(DeviceState *dev, QemuConsole *src=
+,
+                                       InputEvent *evt)
+ {
++    VirtIOInputHID *vhid =3D VIRTIO_INPUT_HID(dev);
+     VirtIOInput *vinput =3D VIRTIO_INPUT(dev);
+     virtio_input_event event;
+     int qcode;
+@@ -215,7 +216,14 @@ static void virtio_input_handle_event(DeviceState *d=
+ev, QemuConsole *src,
+         break;
+     case INPUT_EVENT_KIND_BTN:
+         btn =3D evt->u.btn.data;
+-        if (keymap_button[btn->button]) {
++        if (vhid->wheel_axis && (btn->button =3D=3D INPUT_BUTTON_WHEEL_U=
+P ||
++                                 btn->button =3D=3D INPUT_BUTTON_WHEEL_D=
+OWN)) {
++            event.type  =3D cpu_to_le16(EV_REL);
++            event.code  =3D cpu_to_le16(REL_WHEEL);
++            event.value =3D cpu_to_le32(btn->button =3D=3D INPUT_BUTTON_=
+WHEEL_UP
++                                      ? 1 : -1);
++            virtio_input_send(vinput, &event);
++        } else if (keymap_button[btn->button]) {
+             event.type  =3D cpu_to_le16(EV_KEY);
+             event.code  =3D cpu_to_le16(keymap_button[btn->button]);
+             event.value =3D cpu_to_le32(btn->down ? 1 : 0);
+@@ -407,7 +415,7 @@ static QemuInputHandler virtio_mouse_handler =3D {
+     .sync  =3D virtio_input_handle_sync,
+ };
+=20
+-static struct virtio_input_config virtio_mouse_config[] =3D {
++static struct virtio_input_config virtio_mouse_config_v1[] =3D {
+     {
+         .select    =3D VIRTIO_INPUT_CFG_ID_NAME,
+         .size      =3D sizeof(VIRTIO_ID_NAME_MOUSE),
+@@ -432,13 +440,53 @@ static struct virtio_input_config virtio_mouse_conf=
+ig[] =3D {
+     { /* end of list */ },
+ };
+=20
++static struct virtio_input_config virtio_mouse_config_v2[] =3D {
++    {
++        .select    =3D VIRTIO_INPUT_CFG_ID_NAME,
++        .size      =3D sizeof(VIRTIO_ID_NAME_MOUSE),
++        .u.string  =3D VIRTIO_ID_NAME_MOUSE,
++    },{
++        .select    =3D VIRTIO_INPUT_CFG_ID_DEVIDS,
++        .size      =3D sizeof(struct virtio_input_devids),
++        .u.ids     =3D {
++            .bustype =3D const_le16(BUS_VIRTUAL),
++            .vendor  =3D const_le16(0x0627), /* same we use for usb hid =
+devices */
++            .product =3D const_le16(0x0002),
++            .version =3D const_le16(0x0002),
++        },
++    },{
++        .select    =3D VIRTIO_INPUT_CFG_EV_BITS,
++        .subsel    =3D EV_REL,
++        .size      =3D 2,
++        .u.bitmap  =3D {
++            (1 << REL_X) | (1 << REL_Y),
++            (1 << (REL_WHEEL - 8))
++        },
++    },
++    { /* end of list */ },
++};
++
++static Property virtio_mouse_properties[] =3D {
++    DEFINE_PROP_BOOL("wheel-axis", VirtIOInputHID, wheel_axis, true),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void virtio_mouse_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->props  =3D virtio_mouse_properties;
++}
++
+ static void virtio_mouse_init(Object *obj)
+ {
+     VirtIOInputHID *vhid =3D VIRTIO_INPUT_HID(obj);
+     VirtIOInput *vinput =3D VIRTIO_INPUT(obj);
+=20
+     vhid->handler =3D &virtio_mouse_handler;
+-    virtio_input_init_config(vinput, virtio_mouse_config);
++    virtio_input_init_config(vinput, vhid->wheel_axis
++                             ? virtio_mouse_config_v2
++                             : virtio_mouse_config_v1);
+     virtio_input_key_config(vinput, keymap_button,
+                             ARRAY_SIZE(keymap_button));
  }
- 
-@@ -170,7 +170,9 @@ static int vnc_auth_sasl_check_ssf(VncState *vs)
-         return 0;
- 
-     ssf = *(const int *)val;
--    VNC_DEBUG("negotiated an SSF of %d\n", ssf);
+@@ -448,6 +496,7 @@ static const TypeInfo virtio_mouse_info =3D {
+     .parent        =3D TYPE_VIRTIO_INPUT_HID,
+     .instance_size =3D sizeof(VirtIOInputHID),
+     .instance_init =3D virtio_mouse_init,
++    .class_init    =3D virtio_mouse_class_init,
+ };
+=20
+ /* ----------------------------------------------------------------- */
+@@ -459,7 +508,7 @@ static QemuInputHandler virtio_tablet_handler =3D {
+     .sync  =3D virtio_input_handle_sync,
+ };
+=20
+-static struct virtio_input_config virtio_tablet_config[] =3D {
++static struct virtio_input_config virtio_tablet_config_v1[] =3D {
+     {
+         .select    =3D VIRTIO_INPUT_CFG_ID_NAME,
+         .size      =3D sizeof(VIRTIO_ID_NAME_TABLET),
+@@ -496,13 +545,72 @@ static struct virtio_input_config virtio_tablet_con=
+fig[] =3D {
+     { /* end of list */ },
+ };
+=20
++static struct virtio_input_config virtio_tablet_config_v2[] =3D {
++    {
++        .select    =3D VIRTIO_INPUT_CFG_ID_NAME,
++        .size      =3D sizeof(VIRTIO_ID_NAME_TABLET),
++        .u.string  =3D VIRTIO_ID_NAME_TABLET,
++    },{
++        .select    =3D VIRTIO_INPUT_CFG_ID_DEVIDS,
++        .size      =3D sizeof(struct virtio_input_devids),
++        .u.ids     =3D {
++            .bustype =3D const_le16(BUS_VIRTUAL),
++            .vendor  =3D const_le16(0x0627), /* same we use for usb hid =
+devices */
++            .product =3D const_le16(0x0003),
++            .version =3D const_le16(0x0002),
++        },
++    },{
++        .select    =3D VIRTIO_INPUT_CFG_EV_BITS,
++        .subsel    =3D EV_ABS,
++        .size      =3D 1,
++        .u.bitmap  =3D {
++            (1 << ABS_X) | (1 << ABS_Y),
++        },
++    },{
++        .select    =3D VIRTIO_INPUT_CFG_EV_BITS,
++        .subsel    =3D EV_REL,
++        .size      =3D 2,
++        .u.bitmap  =3D {
++            0,
++            (1 << (REL_WHEEL - 8))
++        },
++    },{
++        .select    =3D VIRTIO_INPUT_CFG_ABS_INFO,
++        .subsel    =3D ABS_X,
++        .size      =3D sizeof(virtio_input_absinfo),
++        .u.abs.min =3D const_le32(INPUT_EVENT_ABS_MIN),
++        .u.abs.max =3D const_le32(INPUT_EVENT_ABS_MAX),
++    },{
++        .select    =3D VIRTIO_INPUT_CFG_ABS_INFO,
++        .subsel    =3D ABS_Y,
++        .size      =3D sizeof(virtio_input_absinfo),
++        .u.abs.min =3D const_le32(INPUT_EVENT_ABS_MIN),
++        .u.abs.max =3D const_le32(INPUT_EVENT_ABS_MAX),
++    },
++    { /* end of list */ },
++};
 +
-+    trace_vnc_auth_sasl_ssf(vs, ssf);
++static Property virtio_tablet_properties[] =3D {
++    DEFINE_PROP_BOOL("wheel-axis", VirtIOInputHID, wheel_axis, true),
++    DEFINE_PROP_END_OF_LIST(),
++};
 +
-     if (ssf < 56)
-         return 0; /* 56 is good for Kerberos */
- 
-@@ -218,33 +220,28 @@ static int protocol_client_auth_sasl_step(VncState *vs, uint8_t *data, size_t le
-         datalen--; /* Don't count NULL byte when passing to _start() */
-     }
- 
--    VNC_DEBUG("Step using SASL Data %p (%d bytes)\n",
--              clientdata, datalen);
-     err = sasl_server_step(vs->sasl.conn,
-                            clientdata,
-                            datalen,
-                            &serverout,
-                            &serveroutlen);
-+    trace_vnc_auth_sasl_step(vs, data, len, serverout, serveroutlen, err);
-     if (err != SASL_OK &&
-         err != SASL_CONTINUE) {
--        VNC_DEBUG("sasl step failed %d (%s)\n",
--                  err, sasl_errdetail(vs->sasl.conn));
-+        trace_vnc_auth_fail(vs, vs->auth, "Cannot step SASL auth",
-+                            sasl_errdetail(vs->sasl.conn));
-         sasl_dispose(&vs->sasl.conn);
-         vs->sasl.conn = NULL;
-         goto authabort;
-     }
- 
-     if (serveroutlen > SASL_DATA_MAX_LEN) {
--        VNC_DEBUG("sasl step reply data too long %d\n",
--                  serveroutlen);
-+        trace_vnc_auth_fail(vs, vs->auth, "SASL data too long", "");
-         sasl_dispose(&vs->sasl.conn);
-         vs->sasl.conn = NULL;
-         goto authabort;
-     }
- 
--    VNC_DEBUG("SASL return data %d bytes, nil; %d\n",
--              serveroutlen, serverout ? 0 : 1);
--
-     if (serveroutlen) {
-         vnc_write_u32(vs, serveroutlen + 1);
-         vnc_write(vs, serverout, serveroutlen + 1);
-@@ -256,22 +253,20 @@ static int protocol_client_auth_sasl_step(VncState *vs, uint8_t *data, size_t le
-     vnc_write_u8(vs, err == SASL_CONTINUE ? 0 : 1);
- 
-     if (err == SASL_CONTINUE) {
--        VNC_DEBUG("%s", "Authentication must continue\n");
-         /* Wait for step length */
-         vnc_read_when(vs, protocol_client_auth_sasl_step_len, 4);
-     } else {
-         if (!vnc_auth_sasl_check_ssf(vs)) {
--            VNC_DEBUG("Authentication rejected for weak SSF %p\n", vs->ioc);
-+            trace_vnc_auth_fail(vs, vs->auth, "SASL SSF too weak", "");
-             goto authreject;
-         }
- 
-         /* Check username whitelist ACL */
-         if (vnc_auth_sasl_check_access(vs) < 0) {
--            VNC_DEBUG("Authentication rejected for ACL %p\n", vs->ioc);
-             goto authreject;
-         }
- 
--        VNC_DEBUG("Authentication successful %p\n", vs->ioc);
-+        trace_vnc_auth_pass(vs, vs->auth);
-         vnc_write_u32(vs, 0); /* Accept auth */
-         /*
-          * Delay writing in SSF encoded mode until pending output
-@@ -300,9 +295,9 @@ static int protocol_client_auth_sasl_step(VncState *vs, uint8_t *data, size_t le
- static int protocol_client_auth_sasl_step_len(VncState *vs, uint8_t *data, size_t len)
++static void virtio_tablet_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->props  =3D virtio_tablet_properties;
++}
++
+ static void virtio_tablet_init(Object *obj)
  {
-     uint32_t steplen = read_u32(data, 0);
--    VNC_DEBUG("Got client step len %d\n", steplen);
-+
-     if (steplen > SASL_DATA_MAX_LEN) {
--        VNC_DEBUG("Too much SASL data %d\n", steplen);
-+        trace_vnc_auth_fail(vs, vs->auth, "SASL step len too large", "");
-         vnc_client_error(vs);
-         return -1;
-     }
-@@ -346,33 +341,28 @@ static int protocol_client_auth_sasl_start(VncState *vs, uint8_t *data, size_t l
-         datalen--; /* Don't count NULL byte when passing to _start() */
-     }
- 
--    VNC_DEBUG("Start SASL auth with mechanism %s. Data %p (%d bytes)\n",
--              vs->sasl.mechlist, clientdata, datalen);
-     err = sasl_server_start(vs->sasl.conn,
-                             vs->sasl.mechlist,
-                             clientdata,
-                             datalen,
-                             &serverout,
-                             &serveroutlen);
-+    trace_vnc_auth_sasl_start(vs, data, len, serverout, serveroutlen, err);
-     if (err != SASL_OK &&
-         err != SASL_CONTINUE) {
--        VNC_DEBUG("sasl start failed %d (%s)\n",
--                  err, sasl_errdetail(vs->sasl.conn));
-+        trace_vnc_auth_fail(vs, vs->auth, "Cannot start SASL auth",
-+                            sasl_errdetail(vs->sasl.conn));
-         sasl_dispose(&vs->sasl.conn);
-         vs->sasl.conn = NULL;
-         goto authabort;
-     }
-     if (serveroutlen > SASL_DATA_MAX_LEN) {
--        VNC_DEBUG("sasl start reply data too long %d\n",
--                  serveroutlen);
-+        trace_vnc_auth_fail(vs, vs->auth, "SASL data too long", "");
-         sasl_dispose(&vs->sasl.conn);
-         vs->sasl.conn = NULL;
-         goto authabort;
-     }
- 
--    VNC_DEBUG("SASL return data %d bytes, nil; %d\n",
--              serveroutlen, serverout ? 0 : 1);
--
-     if (serveroutlen) {
-         vnc_write_u32(vs, serveroutlen + 1);
-         vnc_write(vs, serverout, serveroutlen + 1);
-@@ -384,22 +374,20 @@ static int protocol_client_auth_sasl_start(VncState *vs, uint8_t *data, size_t l
-     vnc_write_u8(vs, err == SASL_CONTINUE ? 0 : 1);
- 
-     if (err == SASL_CONTINUE) {
--        VNC_DEBUG("%s", "Authentication must continue\n");
-         /* Wait for step length */
-         vnc_read_when(vs, protocol_client_auth_sasl_step_len, 4);
-     } else {
-         if (!vnc_auth_sasl_check_ssf(vs)) {
--            VNC_DEBUG("Authentication rejected for weak SSF %p\n", vs->ioc);
-+            trace_vnc_auth_fail(vs, vs->auth, "SASL SSF too weak", "");
-             goto authreject;
-         }
- 
-         /* Check username whitelist ACL */
-         if (vnc_auth_sasl_check_access(vs) < 0) {
--            VNC_DEBUG("Authentication rejected for ACL %p\n", vs->ioc);
-             goto authreject;
-         }
- 
--        VNC_DEBUG("Authentication successful %p\n", vs->ioc);
-+        trace_vnc_auth_pass(vs, vs->auth);
-         vnc_write_u32(vs, 0); /* Accept auth */
-         start_client_init(vs);
-     }
-@@ -422,9 +410,9 @@ static int protocol_client_auth_sasl_start(VncState *vs, uint8_t *data, size_t l
- static int protocol_client_auth_sasl_start_len(VncState *vs, uint8_t *data, size_t len)
- {
-     uint32_t startlen = read_u32(data, 0);
--    VNC_DEBUG("Got client start len %d\n", startlen);
-+
-     if (startlen > SASL_DATA_MAX_LEN) {
--        VNC_DEBUG("Too much SASL data %d\n", startlen);
-+        trace_vnc_auth_fail(vs, vs->auth, "SASL start len too large", "");
-         vnc_client_error(vs);
-         return -1;
-     }
-@@ -439,22 +427,18 @@ static int protocol_client_auth_sasl_start_len(VncState *vs, uint8_t *data, size
- static int protocol_client_auth_sasl_mechname(VncState *vs, uint8_t *data, size_t len)
- {
-     char *mechname = g_strndup((const char *) data, len);
--    VNC_DEBUG("Got client mechname '%s' check against '%s'\n",
--              mechname, vs->sasl.mechlist);
-+    trace_vnc_auth_sasl_mech_choose(vs, mechname);
- 
-     if (strncmp(vs->sasl.mechlist, mechname, len) == 0) {
-         if (vs->sasl.mechlist[len] != '\0' &&
-             vs->sasl.mechlist[len] != ',') {
--            VNC_DEBUG("One %d", vs->sasl.mechlist[len]);
-             goto fail;
-         }
-     } else {
-         char *offset = strstr(vs->sasl.mechlist, mechname);
--        VNC_DEBUG("Two %p\n", offset);
-         if (!offset) {
-             goto fail;
-         }
--        VNC_DEBUG("Two '%s'\n", offset);
-         if (offset[-1] != ',' ||
-             (offset[len] != '\0'&&
-              offset[len] != ',')) {
-@@ -465,11 +449,11 @@ static int protocol_client_auth_sasl_mechname(VncState *vs, uint8_t *data, size_
-     g_free(vs->sasl.mechlist);
-     vs->sasl.mechlist = mechname;
- 
--    VNC_DEBUG("Validated mechname '%s'\n", mechname);
-     vnc_read_when(vs, protocol_client_auth_sasl_start_len, 4);
-     return 0;
- 
-  fail:
-+    trace_vnc_auth_fail(vs, vs->auth, "Unsupported mechname", mechname);
-     vnc_client_error(vs);
-     g_free(mechname);
-     return -1;
-@@ -478,14 +462,14 @@ static int protocol_client_auth_sasl_mechname(VncState *vs, uint8_t *data, size_
- static int protocol_client_auth_sasl_mechname_len(VncState *vs, uint8_t *data, size_t len)
- {
-     uint32_t mechlen = read_u32(data, 0);
--    VNC_DEBUG("Got client mechname len %d\n", mechlen);
-+
-     if (mechlen > 100) {
--        VNC_DEBUG("Too long SASL mechname data %d\n", mechlen);
-+        trace_vnc_auth_fail(vs, vs->auth, "SASL mechname too long", "");
-         vnc_client_error(vs);
-         return -1;
-     }
-     if (mechlen < 1) {
--        VNC_DEBUG("Too short SASL mechname %d\n", mechlen);
-+        trace_vnc_auth_fail(vs, vs->auth, "SASL mechname too short", "");
-         vnc_client_error(vs);
-         return -1;
-     }
-@@ -524,19 +508,22 @@ void start_auth_sasl(VncState *vs)
-     const char *mechlist = NULL;
-     sasl_security_properties_t secprops;
-     int err;
-+    Error *local_err = NULL;
-     char *localAddr, *remoteAddr;
-     int mechlistlen;
- 
--    VNC_DEBUG("Initialize SASL auth %p\n", vs->ioc);
--
-     /* Get local & remote client addresses in form  IPADDR;PORT */
--    localAddr = vnc_socket_ip_addr_string(vs->sioc, true, NULL);
-+    localAddr = vnc_socket_ip_addr_string(vs->sioc, true, &local_err);
-     if (!localAddr) {
-+        trace_vnc_auth_fail(vs, vs->auth, "Cannot format local IP",
-+                            error_get_pretty(local_err));
-         goto authabort;
-     }
- 
--    remoteAddr = vnc_socket_ip_addr_string(vs->sioc, false, NULL);
-+    remoteAddr = vnc_socket_ip_addr_string(vs->sioc, false, &local_err);
-     if (!remoteAddr) {
-+        trace_vnc_auth_fail(vs, vs->auth, "Cannot format remote IP",
-+                            error_get_pretty(local_err));
-         g_free(localAddr);
-         goto authabort;
-     }
-@@ -554,8 +541,8 @@ void start_auth_sasl(VncState *vs)
-     localAddr = remoteAddr = NULL;
- 
-     if (err != SASL_OK) {
--        VNC_DEBUG("sasl context setup failed %d (%s)",
--                  err, sasl_errstring(err, NULL, NULL));
-+        trace_vnc_auth_fail(vs, vs->auth,  "SASL context setup failed",
-+                            sasl_errstring(err, NULL, NULL));
-         vs->sasl.conn = NULL;
-         goto authabort;
-     }
-@@ -570,8 +557,8 @@ void start_auth_sasl(VncState *vs)
-         keysize = qcrypto_tls_session_get_key_size(vs->tls,
-                                                    &local_err);
-         if (keysize < 0) {
--            VNC_DEBUG("cannot TLS get cipher size: %s\n",
--                      error_get_pretty(local_err));
-+            trace_vnc_auth_fail(vs, vs->auth, "cannot TLS get cipher size",
-+                                error_get_pretty(local_err));
-             error_free(local_err);
-             sasl_dispose(&vs->sasl.conn);
-             vs->sasl.conn = NULL;
-@@ -581,8 +568,8 @@ void start_auth_sasl(VncState *vs)
- 
-         err = sasl_setprop(vs->sasl.conn, SASL_SSF_EXTERNAL, &ssf);
-         if (err != SASL_OK) {
--            VNC_DEBUG("cannot set SASL external SSF %d (%s)\n",
--                      err, sasl_errstring(err, NULL, NULL));
-+            trace_vnc_auth_fail(vs, vs->auth, "cannot set SASL external SSF",
-+                                sasl_errstring(err, NULL, NULL));
-             sasl_dispose(&vs->sasl.conn);
-             vs->sasl.conn = NULL;
-             goto authabort;
-@@ -617,8 +604,8 @@ void start_auth_sasl(VncState *vs)
- 
-     err = sasl_setprop(vs->sasl.conn, SASL_SEC_PROPS, &secprops);
-     if (err != SASL_OK) {
--        VNC_DEBUG("cannot set SASL security props %d (%s)\n",
--                  err, sasl_errstring(err, NULL, NULL));
-+        trace_vnc_auth_fail(vs, vs->auth, "cannot set SASL security props",
-+                            sasl_errstring(err, NULL, NULL));
-         sasl_dispose(&vs->sasl.conn);
-         vs->sasl.conn = NULL;
-         goto authabort;
-@@ -633,13 +620,13 @@ void start_auth_sasl(VncState *vs)
-                         NULL,
-                         NULL);
-     if (err != SASL_OK) {
--        VNC_DEBUG("cannot list SASL mechanisms %d (%s)\n",
--                  err, sasl_errdetail(vs->sasl.conn));
-+        trace_vnc_auth_fail(vs, vs->auth, "cannot list SASL mechanisms",
-+                            sasl_errdetail(vs->sasl.conn));
-         sasl_dispose(&vs->sasl.conn);
-         vs->sasl.conn = NULL;
-         goto authabort;
-     }
--    VNC_DEBUG("Available mechanisms for client: '%s'\n", mechlist);
-+    trace_vnc_auth_sasl_mech_list(vs, mechlist);
- 
-     vs->sasl.mechlist = g_strdup(mechlist);
-     mechlistlen = strlen(mechlist);
-@@ -647,12 +634,12 @@ void start_auth_sasl(VncState *vs)
-     vnc_write(vs, mechlist, mechlistlen);
-     vnc_flush(vs);
- 
--    VNC_DEBUG("Wait for client mechname length\n");
-     vnc_read_when(vs, protocol_client_auth_sasl_mechname_len, 4);
- 
-     return;
- 
-  authabort:
-+    error_free(local_err);
-     vnc_client_error(vs);
+     VirtIOInputHID *vhid =3D VIRTIO_INPUT_HID(obj);
+     VirtIOInput *vinput =3D VIRTIO_INPUT(obj);
+=20
+     vhid->handler =3D &virtio_tablet_handler;
+-    virtio_input_init_config(vinput, virtio_tablet_config);
++    virtio_input_init_config(vinput, vhid->wheel_axis
++                             ? virtio_tablet_config_v2
++                             : virtio_tablet_config_v1);
+     virtio_input_key_config(vinput, keymap_button,
+                             ARRAY_SIZE(keymap_button));
  }
- 
-diff --git a/ui/vnc-auth-vencrypt.c b/ui/vnc-auth-vencrypt.c
-index 8ab00ef784..f0bec204b3 100644
---- a/ui/vnc-auth-vencrypt.c
-+++ b/ui/vnc-auth-vencrypt.c
-@@ -35,27 +35,24 @@ static void start_auth_vencrypt_subauth(VncState *vs)
-     switch (vs->subauth) {
-     case VNC_AUTH_VENCRYPT_TLSNONE:
-     case VNC_AUTH_VENCRYPT_X509NONE:
--       VNC_DEBUG("Accept TLS auth none\n");
-        vnc_write_u32(vs, 0); /* Accept auth completion */
-        start_client_init(vs);
-        break;
- 
-     case VNC_AUTH_VENCRYPT_TLSVNC:
-     case VNC_AUTH_VENCRYPT_X509VNC:
--       VNC_DEBUG("Start TLS auth VNC\n");
-        start_auth_vnc(vs);
-        break;
- 
- #ifdef CONFIG_VNC_SASL
-     case VNC_AUTH_VENCRYPT_TLSSASL:
-     case VNC_AUTH_VENCRYPT_X509SASL:
--      VNC_DEBUG("Start TLS auth SASL\n");
-       start_auth_sasl(vs);
-       break;
- #endif /* CONFIG_VNC_SASL */
- 
-     default: /* Should not be possible, but just in case */
--       VNC_DEBUG("Reject subauth %d server bug\n", vs->auth);
-+       trace_vnc_auth_fail(vs, vs->auth, "Unhandled VeNCrypt subauth", "");
-        vnc_write_u8(vs, 1);
-        if (vs->minor >= 8) {
-            static const char err[] = "Unsupported authentication type";
-@@ -73,8 +70,8 @@ static void vnc_tls_handshake_done(QIOTask *task,
-     Error *err = NULL;
- 
-     if (qio_task_propagate_error(task, &err)) {
--        VNC_DEBUG("Handshake failed %s\n",
--                  error_get_pretty(err));
-+        trace_vnc_auth_fail(vs, vs->auth, "TLS handshake failed",
-+                            error_get_pretty(err));
-         vnc_client_error(vs);
-         error_free(err);
-     } else {
-@@ -89,15 +86,15 @@ static int protocol_client_vencrypt_auth(VncState *vs, uint8_t *data, size_t len
- {
-     int auth = read_u32(data, 0);
- 
-+    trace_vnc_auth_vencrypt_subauth(vs, auth);
-     if (auth != vs->subauth) {
--        VNC_DEBUG("Rejecting auth %d\n", auth);
-+        trace_vnc_auth_fail(vs, vs->auth, "Unsupported sub-auth version", "");
-         vnc_write_u8(vs, 0); /* Reject auth */
-         vnc_flush(vs);
-         vnc_client_error(vs);
-     } else {
-         Error *err = NULL;
-         QIOChannelTLS *tls;
--        VNC_DEBUG("Accepting auth %d, setting up TLS for handshake\n", auth);
-         vnc_write_u8(vs, 1); /* Accept auth */
-         vnc_flush(vs);
- 
-@@ -112,14 +109,14 @@ static int protocol_client_vencrypt_auth(VncState *vs, uint8_t *data, size_t len
-             vs->vd->tlsaclname,
-             &err);
-         if (!tls) {
--            VNC_DEBUG("Failed to setup TLS %s\n", error_get_pretty(err));
-+            trace_vnc_auth_fail(vs, vs->auth, "TLS setup failed",
-+                                error_get_pretty(err));
-             error_free(err);
-             vnc_client_error(vs);
-             return 0;
-         }
- 
-         qio_channel_set_name(QIO_CHANNEL(tls), "vnc-server-tls");
--        VNC_DEBUG("Start TLS VeNCrypt handshake process\n");
-         object_unref(OBJECT(vs->ioc));
-         vs->ioc = QIO_CHANNEL(tls);
-         trace_vnc_client_io_wrap(vs, vs->ioc, "tls");
-@@ -135,14 +132,14 @@ static int protocol_client_vencrypt_auth(VncState *vs, uint8_t *data, size_t len
- 
- static int protocol_client_vencrypt_init(VncState *vs, uint8_t *data, size_t len)
- {
-+    trace_vnc_auth_vencrypt_version(vs, (int)data[0], (int)data[1]);
-     if (data[0] != 0 ||
-         data[1] != 2) {
--        VNC_DEBUG("Unsupported VeNCrypt protocol %d.%d\n", (int)data[0], (int)data[1]);
-+        trace_vnc_auth_fail(vs, vs->auth, "Unsupported version", "");
-         vnc_write_u8(vs, 1); /* Reject version */
-         vnc_flush(vs);
-         vnc_client_error(vs);
-     } else {
--        VNC_DEBUG("Sending allowed auth %d\n", vs->subauth);
-         vnc_write_u8(vs, 0); /* Accept version */
-         vnc_write_u8(vs, 1); /* Number of sub-auths */
-         vnc_write_u32(vs, vs->subauth); /* The supported auth */
-diff --git a/ui/vnc.c b/ui/vnc.c
-index ed6d659722..af810f0547 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -2406,11 +2406,11 @@ static int protocol_client_auth_vnc(VncState *vs, uint8_t *data, size_t len)
-     Error *err = NULL;
- 
-     if (!vs->vd->password) {
--        VNC_DEBUG("No password configured on server");
-+        trace_vnc_auth_fail(vs, vs->auth, "password is not set", "");
-         goto reject;
-     }
-     if (vs->vd->expires < now) {
--        VNC_DEBUG("Password is expired");
-+        trace_vnc_auth_fail(vs, vs->auth, "password is expired", "");
-         goto reject;
-     }
- 
-@@ -2427,8 +2427,8 @@ static int protocol_client_auth_vnc(VncState *vs, uint8_t *data, size_t len)
-         key, G_N_ELEMENTS(key),
-         &err);
-     if (!cipher) {
--        VNC_DEBUG("Cannot initialize cipher %s",
--                  error_get_pretty(err));
-+        trace_vnc_auth_fail(vs, vs->auth, "cannot create cipher",
-+                            error_get_pretty(err));
-         error_free(err);
-         goto reject;
-     }
-@@ -2438,18 +2438,18 @@ static int protocol_client_auth_vnc(VncState *vs, uint8_t *data, size_t len)
-                                response,
-                                VNC_AUTH_CHALLENGE_SIZE,
-                                &err) < 0) {
--        VNC_DEBUG("Cannot encrypt challenge %s",
--                  error_get_pretty(err));
-+        trace_vnc_auth_fail(vs, vs->auth, "cannot encrypt challenge response",
-+                            error_get_pretty(err));
-         error_free(err);
-         goto reject;
-     }
- 
-     /* Compare expected vs actual challenge response */
-     if (memcmp(response, data, VNC_AUTH_CHALLENGE_SIZE) != 0) {
--        VNC_DEBUG("Client challenge response did not match\n");
-+        trace_vnc_auth_fail(vs, vs->auth, "mis-matched challenge response", "");
-         goto reject;
-     } else {
--        VNC_DEBUG("Accepting VNC challenge response\n");
-+        trace_vnc_auth_pass(vs, vs->auth);
-         vnc_write_u32(vs, 0); /* Accept auth */
-         vnc_flush(vs);
- 
-@@ -2488,7 +2488,7 @@ static int protocol_client_auth(VncState *vs, uint8_t *data, size_t len)
-     /* We only advertise 1 auth scheme at a time, so client
-      * must pick the one we sent. Verify this */
-     if (data[0] != vs->auth) { /* Reject auth */
--       VNC_DEBUG("Reject auth %d because it didn't match advertized\n", (int)data[0]);
-+       trace_vnc_auth_reject(vs, vs->auth, (int)data[0]);
-        vnc_write_u32(vs, 1);
-        if (vs->minor >= 8) {
-            static const char err[] = "Authentication failed";
-@@ -2497,36 +2497,33 @@ static int protocol_client_auth(VncState *vs, uint8_t *data, size_t len)
-        }
-        vnc_client_error(vs);
-     } else { /* Accept requested auth */
--       VNC_DEBUG("Client requested auth %d\n", (int)data[0]);
-+       trace_vnc_auth_start(vs, vs->auth);
-        switch (vs->auth) {
-        case VNC_AUTH_NONE:
--           VNC_DEBUG("Accept auth none\n");
-            if (vs->minor >= 8) {
-                vnc_write_u32(vs, 0); /* Accept auth completion */
-                vnc_flush(vs);
-            }
-+           trace_vnc_auth_pass(vs, vs->auth);
-            start_client_init(vs);
-            break;
- 
-        case VNC_AUTH_VNC:
--           VNC_DEBUG("Start VNC auth\n");
-            start_auth_vnc(vs);
-            break;
- 
-        case VNC_AUTH_VENCRYPT:
--           VNC_DEBUG("Accept VeNCrypt auth\n");
-            start_auth_vencrypt(vs);
-            break;
- 
- #ifdef CONFIG_VNC_SASL
-        case VNC_AUTH_SASL:
--           VNC_DEBUG("Accept SASL auth\n");
-            start_auth_sasl(vs);
-            break;
- #endif /* CONFIG_VNC_SASL */
- 
-        default: /* Should not be possible, but just in case */
--           VNC_DEBUG("Reject auth %d server code bug\n", vs->auth);
-+           trace_vnc_auth_fail(vs, vs->auth, "Unhandled auth method", "");
-            vnc_write_u8(vs, 1);
-            if (vs->minor >= 8) {
-                static const char err[] = "Authentication failed";
-@@ -2571,10 +2568,11 @@ static int protocol_version(VncState *vs, uint8_t *version, size_t len)
-         vs->minor = 3;
- 
-     if (vs->minor == 3) {
-+        trace_vnc_auth_start(vs, vs->auth);
-         if (vs->auth == VNC_AUTH_NONE) {
--            VNC_DEBUG("Tell client auth none\n");
-             vnc_write_u32(vs, vs->auth);
-             vnc_flush(vs);
-+            trace_vnc_auth_pass(vs, vs->auth);
-             start_client_init(vs);
-        } else if (vs->auth == VNC_AUTH_VNC) {
-             VNC_DEBUG("Tell client VNC auth\n");
-@@ -2582,13 +2580,13 @@ static int protocol_version(VncState *vs, uint8_t *version, size_t len)
-             vnc_flush(vs);
-             start_auth_vnc(vs);
-        } else {
--            VNC_DEBUG("Unsupported auth %d for protocol 3.3\n", vs->auth);
-+            trace_vnc_auth_fail(vs, vs->auth,
-+                                "Unsupported auth method for v3.3", "");
-             vnc_write_u32(vs, VNC_AUTH_INVALID);
-             vnc_flush(vs);
-             vnc_client_error(vs);
-        }
-     } else {
--        VNC_DEBUG("Telling client we support auth %d\n", vs->auth);
-         vnc_write_u8(vs, 1); /* num auth */
-         vnc_write_u8(vs, vs->auth);
-         vnc_read_when(vs, protocol_client_auth, 1);
-@@ -3942,12 +3940,14 @@ void vnc_display_open(const char *id, Error **errp)
-                                sasl, false, errp) < 0) {
-         goto fail;
-     }
-+    trace_vnc_auth_init(vd, 0, vd->auth, vd->subauth);
- 
-     if (vnc_display_setup_auth(&vd->ws_auth, &vd->ws_subauth,
-                                vd->tlscreds, password,
-                                sasl, true, errp) < 0) {
-         goto fail;
-     }
-+    trace_vnc_auth_init(vd, 1, vd->ws_auth, vd->ws_subauth);
- 
- #ifdef CONFIG_VNC_SASL
-     if ((saslErr = sasl_server_init(NULL, "qemu")) != SASL_OK) {
-diff --git a/ui/trace-events b/ui/trace-events
-index e4c02e47f5..1a9f126330 100644
---- a/ui/trace-events
-+++ b/ui/trace-events
-@@ -35,6 +35,21 @@ vnc_client_connect(void *state, void *ioc) "VNC client connect state=%p ioc=%p"
- vnc_client_disconnect_start(void *state, void *ioc) "VNC client disconnect start state=%p ioc=%p"
- vnc_client_disconnect_finish(void *state, void *ioc) "VNC client disconnect finish state=%p ioc=%p"
- vnc_client_io_wrap(void *state, void *ioc, const char *type) "VNC client I/O wrap state=%p ioc=%p type=%s"
-+vnc_auth_init(void *display, int websock, int auth, int subauth) "VNC auth init state=%p websock=%d auth=%d subauth=%d"
-+vnc_auth_start(void *state, int method) "VNC client auth start state=%p method=%d"
-+vnc_auth_pass(void *state, int method) "VNC client auth passed state=%p method=%d"
-+vnc_auth_fail(void *state, int method, const char *message, const char *reason) "VNC client auth failed state=%p method=%d message=%s reason=%s"
-+vnc_auth_reject(void *state, int expect, int got) "VNC client auth rejected state=%p method expected=%d got=%d"
-+vnc_auth_vencrypt_version(void *state, int major, int minor) "VNC client auth vencrypt version state=%p major=%d minor=%d"
-+vnc_auth_vencrypt_subauth(void *state, int auth) "VNC client auth vencrypt subauth state=%p auth=%d"
-+vnc_auth_sasl_mech_list(void *state, const char *mechs) "VNC client auth SASL state=%p mechlist=%s"
-+vnc_auth_sasl_mech_choose(void *state, const char *mech) "VNC client auth SASL state=%p mech=%s"
-+vnc_auth_sasl_start(void *state, const void *clientdata, size_t clientlen, const void *serverdata, size_t severlen, int ret) "VNC client auth SASL start state=%p clientdata=%p clientlen=%zu serverdata=%p serverlen=%zu ret=%d"
-+vnc_auth_sasl_step(void *state, const void *clientdata, size_t clientlen, const void *serverdata, size_t severlen, int ret) "VNC client auth SASL step state=%p clientdata=%p clientlen=%zu serverdata=%p serverlen=%zu ret=%d"
-+vnc_auth_sasl_ssf(void *state, int ssf) "VNC client auth SASL SSF state=%p size=%d"
-+vnc_auth_sasl_username(void *state, const char *name) "VNC client auth SASL user state=%p name=%s"
-+vnc_auth_sasl_acl(void *state, int allow) "VNC client auth SASL ACL state=%p allow=%d"
-+
- 
- # ui/input.c
- input_event_key_number(int conidx, int number, const char *qcode, bool down) "con %d, key number 0x%x [%s], down %d"
--- 
+@@ -512,6 +620,7 @@ static const TypeInfo virtio_tablet_info =3D {
+     .parent        =3D TYPE_VIRTIO_INPUT_HID,
+     .instance_size =3D sizeof(VirtIOInputHID),
+     .instance_init =3D virtio_tablet_init,
++    .class_init    =3D virtio_tablet_class_init,
+ };
+=20
+ /* ----------------------------------------------------------------- */
+--=20
 2.9.3
