@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <michael@fritscher.net>) id 1dxtFE-00064n-Ed
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:14:18 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dxtQR-0007YF-MJ
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:25:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <michael@fritscher.net>) id 1dxtF8-0007na-Mw
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:14:12 -0400
-Received: from mifritscher.de ([188.40.170.105]:32996
-	helo=mail.mifritscher.vserverkompetenz.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <michael@fritscher.net>)
-	id 1dxtF8-0007mb-Gp
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:14:06 -0400
-From: Michael Fritscher <michael@fritscher.net>
-Date: Fri, 29 Sep 2017 13:13:14 +0200
-Message-Id: <20170929111323.6308-10-michael@fritscher.net>
-In-Reply-To: <20170929111323.6308-1-michael@fritscher.net>
-References: <20170929111323.6308-1-michael@fritscher.net>
-Subject: [Qemu-devel] [PATCH 09/18] Dont initialize fields which aren't
- available on Windows.
+	(envelope-from <mreitz@redhat.com>) id 1dxtQQ-0005b3-Qg
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:25:47 -0400
+References: <20170928120300.58164-1-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <115951b8-99da-6a0b-efce-376b247d3f8a@redhat.com>
+Date: Fri, 29 Sep 2017 13:25:35 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170928120300.58164-1-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="DBpJdxvk1XJoTqtnCO772GAoqBkH85l6t"
+Subject: Re: [Qemu-devel] [PATCH] block/mirror: check backing in
+ bdrv_mirror_top_refresh_filename
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -25,29 +23,54 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: gkurz@linux.vnet.ibm.com, sw@weilnetz.de, aneesh.kumar@linux.vnet.ibm.com, mst@redhat.com, qemu-devel@nongnu.org
-Cc: Michael Fritscher <michael@fritscher.net>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, jcody@redhat.com, eblake@redhat.com, qemu-stable@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-Signed-off-by: Michael Fritscher <michael@fritscher.net>
----
- hw/9pfs/9p-synth.c | 2 ++
- 1 file changed, 2 insertions(+)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--DBpJdxvk1XJoTqtnCO772GAoqBkH85l6t
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, jcody@redhat.com, eblake@redhat.com,
+ qemu-stable@nongnu.org
+Message-ID: <115951b8-99da-6a0b-efce-376b247d3f8a@redhat.com>
+Subject: Re: [PATCH] block/mirror: check backing in
+ bdrv_mirror_top_refresh_filename
+References: <20170928120300.58164-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20170928120300.58164-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/hw/9pfs/9p-synth.c b/hw/9pfs/9p-synth.c
-index df0a8de08a..e1bf0438b8 100644
---- a/hw/9pfs/9p-synth.c
-+++ b/hw/9pfs/9p-synth.c
-@@ -150,8 +150,10 @@ static void synth_fill_statbuf(V9fsSynthNode *node, struct stat *stbuf)
-     stbuf->st_gid = 0;
-     stbuf->st_rdev = 0;
-     stbuf->st_size = 0;
-+#ifndef _WIN32
-     stbuf->st_blksize = 0;
-     stbuf->st_blocks = 0;
-+#endif
-     stbuf->st_atime = 0;
-     stbuf->st_mtime = 0;
-     stbuf->st_ctime = 0;
--- 
-2.13.2.windows.1
+On 2017-09-28 14:03, Vladimir Sementsov-Ogievskiy wrote:
+> Backing may be zero after failed bdrv_attach_child in
+> bdrv_set_backing_hd, which leads to SIGSEGV.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+
+Thanks, applied to my block branch:
+
+https://github.com/XanClic/qemu/commits/block
+
+Max
+
+
+--DBpJdxvk1XJoTqtnCO772GAoqBkH85l6t
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlnOLa8SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A8WEIAKgw2Uzge5zm57ZEY71z1IPwUUydeOgN
+raSNzv83viXPZ2k6XAr32hmVTUdrjFCke/lTgZXv6q+zD+RrtuNjqvYOLlzJbikG
+EH1CRSSc/pArz0jQWbp+1zx2QbvgERPP2AbsexadsXrrRnBfDCWwDyR2zEomLTyF
+3ASIZfwd+49MB+V9yxhMfGMt60ZtmFucGo2q3uRPBGG095YfhgEEQS+5NAxV+2GC
+IW7/3PzSHa1olmIf9rYoCPGck7w+TOC9w4rls2q37C8Llk++beh2pzvhewef1/1u
+b+iQ0aYSlR7OH2/vyhtAmg/2tDyFvzGT2SbecFkPiJIJm4ANiAIOgjo=
+=O4pI
+-----END PGP SIGNATURE-----
+
+--DBpJdxvk1XJoTqtnCO772GAoqBkH85l6t--
