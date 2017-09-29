@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1dxtBZ-0002xF-5E
+	(envelope-from <amarnath.valluri@intel.com>) id 1dxtBZ-0002xC-4Z
 	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:10:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1dxtBX-0006Ca-Nj
+	(envelope-from <amarnath.valluri@intel.com>) id 1dxtBV-00067s-Ts
 	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:10:25 -0400
 Received: from mga07.intel.com ([134.134.136.100]:42442)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
-	id 1dxtBX-0005tE-5w
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:10:23 -0400
+	id 1dxtBV-0005tE-G2
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:10:21 -0400
 From: Amarnath Valluri <amarnath.valluri@intel.com>
-Date: Fri, 29 Sep 2017 14:10:18 +0300
-Message-Id: <1506683421-27004-7-git-send-email-amarnath.valluri@intel.com>
+Date: Fri, 29 Sep 2017 14:10:17 +0300
+Message-Id: <1506683421-27004-6-git-send-email-amarnath.valluri@intel.com>
 In-Reply-To: <1506683421-27004-1-git-send-email-amarnath.valluri@intel.com>
 References: <1506683421-27004-1-git-send-email-amarnath.valluri@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v10 6/9] tpm-backend: Move realloc_buffer()
- implementation to tpm-tis model
+Subject: [Qemu-devel] [PATCH v10 5/9] tpm backend: Add new api to read
+ backend TpmInfo
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -31,131 +28,288 @@ To: qemu-devel@nongnu.org
 Cc: stefanb@linux.vnet.ibm.com, marcandre.lureau@gmail.com, Amarnath Valluri <amarnath.valluri@intel.com>
 List-ID: <qemu-devel.nongnu.org>
 
-buffer reallocation is very unlikely to be backend specific. Hence move inside
-the tis.
+TPM configuration options are backend implementation details and shall not be
+part of base TPMBackend object, and these shall not be accessed directly outside
+of the class, hence added a new interface method, get_tpm_options() to
+TPMDriverOps., which shall be implemented by the derived classes to return
+configured tpm options.
+
+A new tpm backend api - tpm_backend_query_tpm() which uses _get_tpm_options() to
+prepare TpmInfo.
 
 Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
 Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- backends/tpm.c               |  9 ---------
- hw/tpm/tpm_passthrough.c     | 12 ------------
- hw/tpm/tpm_tis.c             | 14 ++++++++++++--
- include/sysemu/tpm_backend.h | 12 ------------
- 4 files changed, 12 insertions(+), 35 deletions(-)
+ backends/tpm.c               | 15 +++++++++++--
+ hw/tpm/tpm_passthrough.c     | 51 +++++++++++++++++++++++++++-----------------
+ include/sysemu/tpm_backend.h | 15 +++++++++++--
+ tpm.c                        | 32 +--------------------------
+ 4 files changed, 59 insertions(+), 54 deletions(-)
 
 diff --git a/backends/tpm.c b/backends/tpm.c
-index de313c9..37c84b7 100644
+index 8911597..de313c9 100644
 --- a/backends/tpm.c
 +++ b/backends/tpm.c
-@@ -80,15 +80,6 @@ bool tpm_backend_had_startup_error(TPMBackend *s)
-     return s->had_startup_error;
+@@ -142,6 +142,19 @@ TPMVersion tpm_backend_get_tpm_version(TPMBackend *s)
+     return k->ops->get_tpm_version(s);
  }
  
--size_t tpm_backend_realloc_buffer(TPMBackend *s, TPMSizedBuffer *sb)
--{
--    TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
--
--    assert(k->ops->realloc_buffer);
--
--    return k->ops->realloc_buffer(sb);
--}
--
- void tpm_backend_deliver_request(TPMBackend *s)
- {
-     g_thread_pool_push(s->thread_pool, (gpointer)TPM_BACKEND_CMD_PROCESS_CMD,
-diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-index 84fc49a..22d3460 100644
---- a/hw/tpm/tpm_passthrough.c
-+++ b/hw/tpm/tpm_passthrough.c
-@@ -247,17 +247,6 @@ static int tpm_passthrough_reset_tpm_established_flag(TPMBackend *tb,
-     return 0;
- }
- 
--static size_t tpm_passthrough_realloc_buffer(TPMSizedBuffer *sb)
--{
--    size_t wanted_size = 4096; /* Linux tpm.c buffer size */
--
--    if (sb->size != wanted_size) {
--        sb->buffer = g_realloc(sb->buffer, wanted_size);
--        sb->size = wanted_size;
--    }
--    return sb->size;
--}
--
- static void tpm_passthrough_cancel_cmd(TPMBackend *tb)
- {
-     TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
-@@ -435,7 +424,6 @@ static const TPMDriverOps tpm_passthrough_driver = {
-     .opts                     = tpm_passthrough_cmdline_opts,
-     .desc                     = "Passthrough TPM backend driver",
-     .create                   = tpm_passthrough_create,
--    .realloc_buffer           = tpm_passthrough_realloc_buffer,
-     .reset                    = tpm_passthrough_reset,
-     .cancel_cmd               = tpm_passthrough_cancel_cmd,
-     .get_tpm_established_flag = tpm_passthrough_get_tpm_established_flag,
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index a6440fe..d5118e7 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -963,6 +963,16 @@ static int tpm_tis_do_startup_tpm(TPMState *s)
-     return tpm_backend_startup_tpm(s->be_driver);
- }
- 
-+static void tpm_tis_realloc_buffer(TPMSizedBuffer *sb)
++TPMInfo *tpm_backend_query_tpm(TPMBackend *s)
 +{
-+    size_t wanted_size = 4096; /* Linux tpm.c buffer size */
++    TPMInfo *info = g_new0(TPMInfo, 1);
++    TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
 +
-+    if (sb->size != wanted_size) {
-+        sb->buffer = g_realloc(sb->buffer, wanted_size);
-+        sb->size = wanted_size;
-+    }
++    info->id = g_strdup(s->id);
++    info->model = s->fe_model;
++    info->options = k->ops->get_tpm_options ?
++                    k->ops->get_tpm_options(s) : NULL;
++
++    return info;
 +}
 +
- /*
-  * Get the TPMVersion of the backend device being used
-  */
-@@ -1010,9 +1020,9 @@ static void tpm_tis_reset(DeviceState *dev)
-         tis->loc[c].state = TPM_TIS_STATE_IDLE;
+ static bool tpm_backend_prop_get_opened(Object *obj, Error **errp)
+ {
+     TPMBackend *s = TPM_BACKEND(obj);
+@@ -196,8 +209,6 @@ static void tpm_backend_instance_finalize(Object *obj)
+     TPMBackend *s = TPM_BACKEND(obj);
  
-         tis->loc[c].w_offset = 0;
--        tpm_backend_realloc_buffer(s->be_driver, &tis->loc[c].w_buffer);
-+        tpm_tis_realloc_buffer(&tis->loc[c].w_buffer);
-         tis->loc[c].r_offset = 0;
--        tpm_backend_realloc_buffer(s->be_driver, &tis->loc[c].r_buffer);
-+        tpm_tis_realloc_buffer(&tis->loc[c].r_buffer);
+     g_free(s->id);
+-    g_free(s->path);
+-    g_free(s->cancel_path);
+     tpm_backend_thread_end(s);
+ }
+ 
+diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+index 4c21e52..84fc49a 100644
+--- a/hw/tpm/tpm_passthrough.c
++++ b/hw/tpm/tpm_passthrough.c
+@@ -30,6 +30,7 @@
+ #include "tpm_int.h"
+ #include "hw/hw.h"
+ #include "hw/i386/pc.h"
++#include "qapi/clone-visitor.h"
+ #include "tpm_tis.h"
+ #include "tpm_util.h"
+ 
+@@ -49,7 +50,8 @@
+ struct TPMPassthruState {
+     TPMBackend parent;
+ 
+-    char *tpm_dev;
++    TPMPassthroughOptions *options;
++    const char *tpm_dev;
+     int tpm_fd;
+     bool tpm_executing;
+     bool tpm_op_canceled;
+@@ -296,15 +298,14 @@ static TPMVersion tpm_passthrough_get_tpm_version(TPMBackend *tb)
+  * in Documentation/ABI/stable/sysfs-class-tpm.
+  * From /dev/tpm0 create /sys/class/misc/tpm0/device/cancel
+  */
+-static int tpm_passthrough_open_sysfs_cancel(TPMBackend *tb)
++static int tpm_passthrough_open_sysfs_cancel(TPMPassthruState *tpm_pt)
+ {
+-    TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
+     int fd = -1;
+     char *dev;
+     char path[PATH_MAX];
+ 
+-    if (tb->cancel_path) {
+-        fd = qemu_open(tb->cancel_path, O_WRONLY);
++    if (tpm_pt->options->cancel_path) {
++        fd = qemu_open(tpm_pt->options->cancel_path, O_WRONLY);
+         if (fd < 0) {
+             error_report("Could not open TPM cancel path : %s",
+                          strerror(errno));
+@@ -319,7 +320,7 @@ static int tpm_passthrough_open_sysfs_cancel(TPMBackend *tb)
+                      dev) < sizeof(path)) {
+             fd = qemu_open(path, O_WRONLY);
+             if (fd >= 0) {
+-                tb->cancel_path = g_strdup(path);
++                tpm_pt->options->cancel_path = g_strdup(path);
+             } else {
+                 error_report("tpm_passthrough: Could not open TPM cancel "
+                              "path %s : %s", path, strerror(errno));
+@@ -339,17 +340,18 @@ static int tpm_passthrough_handle_device_opts(QemuOpts *opts, TPMBackend *tb)
+     const char *value;
+ 
+     value = qemu_opt_get(opts, "cancel-path");
+-    tb->cancel_path = g_strdup(value);
++    if (value) {
++        tpm_pt->options->cancel_path = g_strdup(value);
++        tpm_pt->options->has_cancel_path = true;
++    }
+ 
+     value = qemu_opt_get(opts, "path");
+-    if (!value) {
+-        value = TPM_PASSTHROUGH_DEFAULT_DEVICE;
++    if (value) {
++        tpm_pt->options->has_path = true;
++        tpm_pt->options->path = g_strdup(value);
      }
  
-     tpm_tis_do_startup_tpm(s);
+-    tpm_pt->tpm_dev = g_strdup(value);
+-
+-    tb->path = g_strdup(tpm_pt->tpm_dev);
+-
++    tpm_pt->tpm_dev = value ? value : TPM_PASSTHROUGH_DEFAULT_DEVICE;
+     tpm_pt->tpm_fd = qemu_open(tpm_pt->tpm_dev, O_RDWR);
+     if (tpm_pt->tpm_fd < 0) {
+         error_report("Cannot access TPM device using '%s': %s",
+@@ -370,10 +372,8 @@ static int tpm_passthrough_handle_device_opts(QemuOpts *opts, TPMBackend *tb)
+     tpm_pt->tpm_fd = -1;
+ 
+  err_free_parameters:
+-    g_free(tb->path);
+-    tb->path = NULL;
+-
+-    g_free(tpm_pt->tpm_dev);
++    qapi_free_TPMPassthroughOptions(tpm_pt->options);
++    tpm_pt->options = NULL;
+     tpm_pt->tpm_dev = NULL;
+ 
+     return 1;
+@@ -391,7 +391,7 @@ static TPMBackend *tpm_passthrough_create(QemuOpts *opts, const char *id)
+         goto err_exit;
+     }
+ 
+-    tpm_pt->cancel_fd = tpm_passthrough_open_sysfs_cancel(tb);
++    tpm_pt->cancel_fd = tpm_passthrough_open_sysfs_cancel(tpm_pt);
+     if (tpm_pt->cancel_fd < 0) {
+         goto err_exit;
+     }
+@@ -404,6 +404,17 @@ err_exit:
+     return NULL;
+ }
+ 
++static TpmTypeOptions *tpm_passthrough_get_tpm_options(TPMBackend *tb)
++{
++    TpmTypeOptions *options = g_new0(TpmTypeOptions, 1);
++
++    options->type = TPM_TYPE_OPTIONS_KIND_PASSTHROUGH;
++    options->u.passthrough.data = QAPI_CLONE(TPMPassthroughOptions,
++                                             TPM_PASSTHROUGH(tb)->options);
++
++    return options;
++}
++
+ static const QemuOptDesc tpm_passthrough_cmdline_opts[] = {
+     TPM_STANDARD_CMDLINE_OPTS,
+     {
+@@ -430,12 +441,14 @@ static const TPMDriverOps tpm_passthrough_driver = {
+     .get_tpm_established_flag = tpm_passthrough_get_tpm_established_flag,
+     .reset_tpm_established_flag = tpm_passthrough_reset_tpm_established_flag,
+     .get_tpm_version          = tpm_passthrough_get_tpm_version,
++    .get_tpm_options          = tpm_passthrough_get_tpm_options,
+ };
+ 
+ static void tpm_passthrough_inst_init(Object *obj)
+ {
+     TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(obj);
+ 
++    tpm_pt->options = g_new0(TPMPassthroughOptions, 1);
+     tpm_pt->tpm_fd = -1;
+     tpm_pt->cancel_fd = -1;
+ }
+@@ -448,7 +461,7 @@ static void tpm_passthrough_inst_finalize(Object *obj)
+ 
+     qemu_close(tpm_pt->tpm_fd);
+     qemu_close(tpm_pt->cancel_fd);
+-    g_free(tpm_pt->tpm_dev);
++    qapi_free_TPMPassthroughOptions(tpm_pt->options);
+ }
+ 
+ static void tpm_passthrough_class_init(ObjectClass *klass, void *data)
 diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
-index e96c191..2c798a1 100644
+index 9ea7072..e96c191 100644
 --- a/include/sysemu/tpm_backend.h
 +++ b/include/sysemu/tpm_backend.h
-@@ -84,8 +84,6 @@ struct TPMDriverOps {
-     /* start up the TPM on the backend */
-     int (*startup_tpm)(TPMBackend *t);
+@@ -49,10 +49,9 @@ struct TPMBackend {
+     TPMRecvDataCB *recv_data_callback;
+     bool had_startup_error;
  
--    size_t (*realloc_buffer)(TPMSizedBuffer *sb);
++    /* <public> */
+     char *id;
+     enum TpmModel fe_model;
+-    char *path;
+-    char *cancel_path;
+ 
+     QLIST_ENTRY(TPMBackend) list;
+ };
+@@ -96,6 +95,8 @@ struct TPMDriverOps {
+     int (*reset_tpm_established_flag)(TPMBackend *t, uint8_t locty);
+ 
+     TPMVersion (*get_tpm_version)(TPMBackend *t);
++
++    TpmTypeOptions *(*get_tpm_options)(TPMBackend *t);
+ };
+ 
+ 
+@@ -214,6 +215,16 @@ void tpm_backend_open(TPMBackend *s, Error **errp);
+  */
+ TPMVersion tpm_backend_get_tpm_version(TPMBackend *s);
+ 
++/**
++ * tpm_backend_query_tpm:
++ * @s: the backend
++ *
++ * Query backend tpm info
++ *
++ * Returns newly allocated TPMInfo
++ */
++TPMInfo *tpm_backend_query_tpm(TPMBackend *s);
++
+ TPMBackend *qemu_find_tpm(const char *id);
+ 
+ const TPMDriverOps *tpm_get_backend_driver(const char *type);
+diff --git a/tpm.c b/tpm.c
+index db14849..3b8c7ed 100644
+--- a/tpm.c
++++ b/tpm.c
+@@ -202,36 +202,6 @@ static const TPMDriverOps *tpm_driver_find_by_type(enum TpmType type)
+     return be_drivers[type];
+ }
+ 
+-static TPMInfo *qmp_query_tpm_inst(TPMBackend *drv)
+-{
+-    TPMInfo *res = g_new0(TPMInfo, 1);
+-    TPMPassthroughOptions *tpo;
 -
-     void (*reset)(TPMBackend *t);
- 
-     void (*cancel_cmd)(TPMBackend *t);
-@@ -140,16 +138,6 @@ int tpm_backend_startup_tpm(TPMBackend *s);
- bool tpm_backend_had_startup_error(TPMBackend *s);
- 
- /**
-- * tpm_backend_realloc_buffer:
-- * @s: the backend
-- * @sb: the TPMSizedBuffer to re-allocated to the size suitable for the
-- *      backend.
-- *
-- * This function returns the size of the allocated buffer
-- */
--size_t tpm_backend_realloc_buffer(TPMBackend *s, TPMSizedBuffer *sb);
+-    res->id = g_strdup(drv->id);
+-    res->model = drv->fe_model;
+-    res->options = g_new0(TpmTypeOptions, 1);
 -
--/**
-  * tpm_backend_deliver_request:
-  * @s: the backend to send the request to
-  *
+-    switch (tpm_backend_get_type(drv)) {
+-    case TPM_TYPE_PASSTHROUGH:
+-        res->options->type = TPM_TYPE_OPTIONS_KIND_PASSTHROUGH;
+-        tpo = g_new0(TPMPassthroughOptions, 1);
+-        res->options->u.passthrough.data = tpo;
+-        if (drv->path) {
+-            tpo->path = g_strdup(drv->path);
+-            tpo->has_path = true;
+-        }
+-        if (drv->cancel_path) {
+-            tpo->cancel_path = g_strdup(drv->cancel_path);
+-            tpo->has_cancel_path = true;
+-        }
+-        break;
+-    case TPM_TYPE__MAX:
+-        break;
+-    }
+-
+-    return res;
+-}
+-
+ /*
+  * Walk the list of active TPM backends and collect information about them
+  * following the schema description in qapi-schema.json.
+@@ -246,7 +216,7 @@ TPMInfoList *qmp_query_tpm(Error **errp)
+             continue;
+         }
+         info = g_new0(TPMInfoList, 1);
+-        info->value = qmp_query_tpm_inst(drv);
++        info->value = tpm_backend_query_tpm(drv);
+ 
+         if (!cur_item) {
+             head = cur_item = info;
 -- 
 2.7.4
