@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dxzqE-0005ag-FO
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 14:16:51 -0400
+	(envelope-from <bounces@canonical.com>) id 1dy0Rv-0007BL-24
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 14:55:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dxzqD-00056g-HB
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 14:16:50 -0400
-References: <20170929170843.3711-1-mreitz@redhat.com>
-	<cf6e8f28-760c-57ae-184b-d9b07c28f0f2@redhat.com>
-	<c08cfd7e-c459-8ddf-a81c-fbe31ecfeac3@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a91edbef-e315-0843-ae9d-947e2b67fc86@redhat.com>
-Date: Fri, 29 Sep 2017 13:16:40 -0500
+	(envelope-from <bounces@canonical.com>) id 1dy0Rq-0005LE-46
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 14:55:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54764)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dy0Rp-0005Ij-UX
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 14:55:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1dy0Ro-0007OG-9o
+	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 18:55:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0D9502E8086
+	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 18:55:40 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <c08cfd7e-c459-8ddf-a81c-fbe31ecfeac3@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="UHnvIVKUp7eeHK4RKXOi8OQNJMQctDe3R"
-Subject: Re: [Qemu-devel] [PATCH v3] iotests: Add test for dataplane
- mirroring
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 29 Sep 2017 18:47:03 -0000
+From: ChristianEhrhardt <1718719@bugs.launchpad.net>
+Reply-To: Bug 1718719 <1718719@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150601012428.28823.10384460665730601462.malonedeb@gac.canonical.com>
+Message-Id: <150671082394.24007.7605184612639387475.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1718719] Re: qemu can't capture keys properly
+ under wayland
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -25,66 +36,48 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Jeff Cody <jcody@redhat.com>
+To: qemu-devel@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---UHnvIVKUp7eeHK4RKXOi8OQNJMQctDe3R
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Jeff Cody <jcody@redhat.com>
-Message-ID: <a91edbef-e315-0843-ae9d-947e2b67fc86@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] iotests: Add test for dataplane mirroring
-References: <20170929170843.3711-1-mreitz@redhat.com>
- <cf6e8f28-760c-57ae-184b-d9b07c28f0f2@redhat.com>
- <c08cfd7e-c459-8ddf-a81c-fbe31ecfeac3@redhat.com>
-In-Reply-To: <c08cfd7e-c459-8ddf-a81c-fbe31ecfeac3@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+So it is likely a wayland <-> SDL thing.
+@Desktop Team could you take alook into this - the repro steps in c#2 are p=
+retty easy I'd think but none of us would know where in the UI stack to loo=
+k for.
 
-On 09/29/2017 01:08 PM, Max Reitz wrote:
-> On 2017-09-29 19:33, Eric Blake wrote:
->> On 09/29/2017 12:08 PM, Max Reitz wrote:
->>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>> ---
->>> v3: Make the test actually pass (the reference output from v2 only
->>>     worked with v1 of the test...)
+-- =
 
->>
->> Semantic conflict with Jeff's patches for './check -s' to preserve
->> intermediate files.  Otherwise,
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
-> True, but as long as v4 of his series is not around, I feel OK to put
-> the burden of having to rebase on him. :-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1718719
 
-Indeed - I was pointing it out to Jeff (hence the CC) ;)
+Title:
+  qemu can't capture keys properly under wayland
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  New
+Status in wayland package in Ubuntu:
+  New
 
+Bug description:
+  This appears to be different than the previous similar bugs; patches
+  do look to be applied to use libinput in the wayland case. Still:
 
---UHnvIVKUp7eeHK4RKXOi8OQNJMQctDe3R
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  unknown keycodes `(unnamed)', please report to qemu-devel@nongnu.org
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+  I am using qemu-system-x86                       1:2.10+dfsg-0ubuntu1
+  on artful.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnOjggACgkQp6FrSiUn
-Q2p7MAgAqwmKnd7VTzV83Cs2Q6Qp7INg6J0XZ5zVdxVPTyER60J5BWBil2L2E/Si
-3wyneS2hHWg12SacdX6aKxjFtIQdnwHwXIzuN6Uek+EdzOxn1Tghn3FGsKNXgkyp
-WLQsOq2M5uVhk3tgapRrVjXb+eTzfW9v81eyXZg3+YWJRd52zYTU3nRtetIgYJo2
-8OltIqYRdgKC/LAZZujyc/ikszyeXzHEJK0t38C+QTJsAYHcnQTK3hGWggUZDhsN
-Gjakx9GRPBzJs3x9KaNbm6RIMqF/3VM2TKtTJ5EZcoML7kxCpeB0wCmX5cLAjZG3
-GrGoNxRrLK4qxOnqZjy/9fkgDMMW/w==
-=QQiC
------END PGP SIGNATURE-----
+  Many key inputs work correctly, but at boot the system will not
+  properly catch the arrow keys, the above error shows up immediately
+  after hitting Esc (for instance) to get to the boot menu. Booting from
+  CD onto a daily Ubuntu desktop image, I can't navigate the splash
+  menu.
 
---UHnvIVKUp7eeHK4RKXOi8OQNJMQctDe3R--
+  The same works correctly through virt-manager (which uses spice
+  AFAICT, but wayland tends to crash when running virt-manager), and
+  things work if I switch my session to Xorg rather than wayland.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1718719/+subscriptions
