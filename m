@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dxw38-0005lI-Rn
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 10:13:55 -0400
+	(envelope-from <michael@fritscher.net>) id 1dxw3z-0006Px-DC
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 10:14:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dxw35-0004N4-KY
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 10:13:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40458)
+	(envelope-from <michael@fritscher.net>) id 1dxw3w-0004YR-8A
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 10:14:47 -0400
+Received: from mifritscher.de ([188.40.170.105]:35602
+	helo=mail.mifritscher.vserverkompetenz.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dxw35-0004Mr-EP
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 10:13:51 -0400
-References: <20170926122427.GC4115@localhost.localdomain>
-	<20170926130028.12471-1-ehabkost@redhat.com>
-	<890a01d9-d7a0-6afd-ffac-5c8f2425570f@de.ibm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b9f89dc4-35fc-7d27-6ec7-d131d4be5b06@redhat.com>
-Date: Fri, 29 Sep 2017 16:13:04 +0200
+	(Exim 4.71) (envelope-from <michael@fritscher.net>)
+	id 1dxw3w-0004XX-1Z
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 10:14:44 -0400
+Message-ID: <c507f03f377b2496da5e08af037a14ee.squirrel@mifritscher.de>
+In-Reply-To: <c6489dce-108d-e163-589d-11e6f2c227da@redhat.com>
+References: <20170929111323.6308-1-michael@fritscher.net>
+	<c6489dce-108d-e163-589d-11e6f2c227da@redhat.com>
+Date: Fri, 29 Sep 2017 16:14:41 +0200
+From: "Michael Fritscher" <michael@fritscher.net>
 MIME-Version: 1.0
-In-Reply-To: <890a01d9-d7a0-6afd-ffac-5c8f2425570f@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] iothread: Make iothread_stop() idempotent
+Content-Type: text/plain;charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Make 9pfs buildable for Windows
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -28,52 +28,40 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Michael Fritscher <michael@fritscher.net>, gkurz@linux.vnet.ibm.com, sw@weilnetz.de, aneesh.kumar@linux.vnet.ibm.com, mst@redhat.com, qemu-devel@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-On 29/09/2017 15:47, Christian Borntraeger wrote:
-> Is anybody going to pick this up? upstream qemu is still happily filling
-> up my disk with coredumps on exit.
+> On 29/09/2017 13:13, Michael Fritscher wrote:
+>> "
+>> The biggest issue seems to be the *at stuff. I'll
+>> try to workaround this via getting the directories' path from the file
+>> descriptor with the /proc (as it is already done in the 9pfs_utils) -
+>> luckily,the mingw environment emulates the /proc. If this doesn't work
+>> I've another idea (the file descriptors needs to be "registered" with
+>> the
+>> path (and saved in a sparse vector or map with the fd as key and the
+>> path
+>> as value). The "big" solution would be to write a 9p_local_windows.c
+>> from
+>> scratch, but I would like to avoid it.
+>> "
+>
+> Yes, that's pretty much the only way to do it; it's not the easiest
+> thing because you have to use NT kernel APIs (NtCreateFile) rather than
+> e.g. CreateFile.  Likewise for NtQueryAttributesFile,
+> NtQueryDirectoryObject, etc. NtOpenDirectoryObject. :(
+>
+> Paolo
+>
 
-I can, but I'll only send the pull request next Monday, probably.
+Hi,
 
-Paolo
+why do I need the NT* functions instead of the "normal" ones from
+kernel32? And it was working even with the posix functions some time ago
+(Which I'll port to current qemu atm)
 
-> On 09/26/2017 03:00 PM, Eduardo Habkost wrote:
->> Currently, iothread_stop_all() makes all iothread objects unsafe
->> to be destroyed, because qemu_thread_join() ends up being called
->> twice.
->>
->> To fix this, make iothread_stop() idempotent by checking
->> thread->stopped.
->>
->> Fixes the following crash:
->>
->>   qemu-system-x86_64 -object iothread,id=iothread0 -monitor stdio -display none
->>   QEMU 2.10.50 monitor - type 'help' for more information
->>   (qemu) quit
->>   qemu: qemu_thread_join: No such process
->>   Aborted (core dumped)
->>
->> Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->> ---
->>  iothread.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/iothread.c b/iothread.c
->> index 44c8944dc4..59d0850988 100644
->> --- a/iothread.c
->> +++ b/iothread.c
->> @@ -85,7 +85,7 @@ static int iothread_stop(Object *object, void *opaque)
->>      IOThread *iothread;
->>
->>      iothread = (IOThread *)object_dynamic_cast(object, TYPE_IOTHREAD);
->> -    if (!iothread || !iothread->ctx) {
->> +    if (!iothread || !iothread->ctx || iothread->stopping) {
->>          return 0;
->>      }
->>      iothread->stopping = true;
->>
-> 
+>From the "host side", 9pfs does nothing special I think.
+
+Best regards,
+Michael Fritscher
