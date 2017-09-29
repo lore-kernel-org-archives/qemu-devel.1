@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dy0kZ-0004I4-76
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:15:04 -0400
+	(envelope-from <mst@redhat.com>) id 1dy0yU-0000FO-6u
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:29:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dy0kW-0005De-2W
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:15:03 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:59553)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dy0kV-0005Cw-Ov
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:14:59 -0400
-References: <1506703816-7359-1-git-send-email-zhuoweizhang@yahoo.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <46ce7f3c-f0cb-bdfe-25fc-984276601f7d@vivier.eu>
-Date: Fri, 29 Sep 2017 21:14:46 +0200
+	(envelope-from <mst@redhat.com>) id 1dy0yR-0005iF-Pu
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:29:26 -0400
+Date: Fri, 29 Sep 2017 22:29:11 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170929222852-mutt-send-email-mst@kernel.org>
+References: <1506535289-14430-1-git-send-email-jan.dakinevich@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <1506703816-7359-1-git-send-email-zhuoweizhang@yahoo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] syscall: fix special case of write(fd, NULL,
- 0)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1506535289-14430-1-git-send-email-jan.dakinevich@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v3] virtio: introduce `info virtio' hmp
+ command
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -27,54 +22,506 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: zhuoweizhang@yahoo.com, qemu-devel@nongnu.org
-Cc: riku.voipio@iki.fi
+To: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Amit Shah <amit@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-Le 29/09/2017 à 18:50, zhuoweizhang@yahoo.com a écrit :
-> From: Zhuowei Zhang <zhuoweizhang@yahoo.com>
+On Wed, Sep 27, 2017 at 09:01:29PM +0300, Jan Dakinevich wrote:
+> The command is intended for exposing device specific virtio feature bits
+> and their negotiation status. It is convenient and useful for debug
+> purpose.
 > 
-> Linux returns success for the special case of calling write with a zero-length
-> NULL buffer: compiling and running
+> Names of features are taken from a devices via get_feature_name() within
+> VirtioDeviceClass. If certain device doesn't implement it, the command
+> will print only hexadecimal value of feature mask.
 > 
-> ```
-> 
-> int main() {
->    ssize_t ret = write(STDOUT_FILENO, NULL, 0);
->    fprintf(stderr, "write returned %ld\n", ret);
->    return 0;
-> }
-> ```
-> gives "write returned 0" when run directly, but "write returned -1" in QEMU.
-> 
-> This commit checks for this situation and returns success if found.
-> 
-> Signed-off-by: Zhuowei Zhang <zhuoweizhang@yahoo.com>
+> Cc: Denis V. Lunev <den@virtuozzo.com>
+> Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+
+Same question as before - why not a QMP counterpart as well?
+
 > ---
->  linux-user/syscall.c | 5 +++++
->  1 file changed, 5 insertions(+)
 > 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 9b6364a..ecadf49 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -7783,6 +7783,11 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->          }
->          break;
->      case TARGET_NR_write:
-> +        if (arg2 == 0 && arg3 == 0) {
-> +            /* special case: write(fd, NULL, 0) returns success. */
-> +            ret = 0;
-> +            break;
+> v3:
+> * Avoid signed int
+> * Use virtio_vdev_has_feature()/virtio_host_has_feature()
+> 
+> v2: http://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg07527.html
+> v1: http://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg07247.html
+> ---
+>  hmp-commands-info.hx        |  14 +++++
+>  hmp.c                       | 149 ++++++++++++++++++++++++++++++++++++++++++++
+>  hmp.h                       |   1 +
+>  hw/block/virtio-blk.c       |  21 +++++++
+>  hw/char/virtio-serial-bus.c |  15 +++++
+>  hw/display/virtio-gpu.c     |  13 ++++
+>  hw/net/virtio-net.c         |  35 +++++++++++
+>  hw/scsi/virtio-scsi.c       |  16 +++++
+>  hw/virtio/virtio-balloon.c  |  15 +++++
+>  hw/virtio/virtio-bus.c      |   1 +
+>  include/hw/virtio/virtio.h  |   2 +
+>  monitor.c                   |   1 +
+>  12 files changed, 283 insertions(+)
+> 
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index 4f1ece9..2550027 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -868,6 +868,20 @@ ETEXI
+>      },
+>  
+>  STEXI
+> +@item info virtio
+> +@findex virtio
+> +Display guest and host fetures for all virtio devices.
+> +ETEXI
+> +
+> +    {
+> +        .name       = "virtio",
+> +        .args_type  = "",
+> +        .params     = "",
+> +        .help       = "show virtio info",
+> +        .cmd        = hmp_info_virtio,
+> +    },
+> +
+> +STEXI
+>  @end table
+>  ETEXI
+>  
+> diff --git a/hmp.c b/hmp.c
+> index ace729d..f231395 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -43,6 +43,7 @@
+>  #include "hw/intc/intc.h"
+>  #include "migration/snapshot.h"
+>  #include "migration/misc.h"
+> +#include "hw/virtio/virtio.h"
+>  
+>  #ifdef CONFIG_SPICE
+>  #include <spice/enums.h>
+> @@ -2894,3 +2895,151 @@ void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict)
+>      }
+>      hmp_handle_error(mon, &err);
+>  }
+> +
+> +#define HMP_INFO_VIRTIO_INDENT 2
+> +#define HMP_INFO_VIRTIO_FIELD 32
+> +
+> +static void hmp_info_virtio_print_status(Monitor *mon, VirtIODevice *vdev)
+> +{
+> +    uint8_t status[] = {
+> +        VIRTIO_CONFIG_S_ACKNOWLEDGE,
+> +        VIRTIO_CONFIG_S_DRIVER,
+> +        VIRTIO_CONFIG_S_DRIVER_OK,
+> +        VIRTIO_CONFIG_S_FEATURES_OK,
+> +        VIRTIO_CONFIG_S_NEEDS_RESET,
+> +        VIRTIO_CONFIG_S_FAILED,
+> +    };
+> +    const char *names[] = {
+> +        "acknowledge",
+> +        "driver",
+> +        "driver_ok",
+> +        "features_ok",
+> +        "needs_reset"
+> +        "failed",
+> +    };
+> +    const char *comma = "";
+> +    unsigned idx;
+> +
+> +    monitor_printf(mon, "%*sstatus:           0x%02"PRIx8" ",
+> +                   HMP_INFO_VIRTIO_INDENT, "", vdev->status);
+> +
+> +    for (idx = 0; idx < ARRAY_SIZE(status); idx++) {
+> +        if (!(vdev->status & status[idx])) {
+> +            continue;
 > +        }
->          if (!(p = lock_user(VERIFY_READ, arg2, arg3, 1)))
->              goto efault;
->          if (fd_trans_target_to_host_data(arg1)) {
-> 
-
-I think we should keep the call to the kernel write() as the behavior
-depends on the driver behind the syscall. Moreover, calling write() with
-(NULL, 0) can triggers "something" at kernel level.
-
-Thanks,
-Laurent
+> +        monitor_printf(mon, "%s%s", comma, names[idx]);
+> +        if (names[idx]) {
+> +            comma = ",";
+> +        }
+> +    }
+> +    monitor_printf(mon, "\n");
+> +}
+> +
+> +static void hmp_info_virtio_print_common_features(Monitor *mon,
+> +                                                  VirtIODevice *vdev)
+> +{
+> +    uint64_t features[] = {
+> +        VIRTIO_RING_F_INDIRECT_DESC,
+> +        VIRTIO_RING_F_EVENT_IDX,
+> +        VIRTIO_F_NOTIFY_ON_EMPTY,
+> +        VIRTIO_F_ANY_LAYOUT,
+> +        VIRTIO_F_IOMMU_PLATFORM,
+> +        VIRTIO_F_VERSION_1,
+> +    };
+> +    const char *names[] = {
+> +        "indirect_desc",
+> +        "event_idx",
+> +        "notify_on_empty",
+> +        "any_layout",
+> +        "iommu_platform",
+> +        "version_1",
+> +    };
+> +    unsigned idx;
+> +
+> +    monitor_printf(mon, "%*scommon features:\n", HMP_INFO_VIRTIO_INDENT, "");
+> +
+> +    for (idx = 0; idx < ARRAY_SIZE(features); idx++) {
+> +        const char *ack = virtio_vdev_has_feature(vdev, features[idx])
+> +                ? "acked" : "";
+> +
+> +        if (!virtio_host_has_feature(vdev, features[idx])) {
+> +            continue;
+> +        }
+> +        monitor_printf(mon, "%*s%*s%*s\n", HMP_INFO_VIRTIO_INDENT, "",
+> +                       HMP_INFO_VIRTIO_FIELD, names[idx],
+> +                       HMP_INFO_VIRTIO_FIELD, ack);
+> +    }
+> +}
+> +
+> +static void hmp_info_virtio_print_specific_features(Monitor *mon,
+> +                                                    VirtIODevice *vdev)
+> +{
+> +    VirtioDeviceClass *vdc = VIRTIO_DEVICE_GET_CLASS(vdev);
+> +    unsigned idx;
+> +
+> +    if (!vdc->get_feature_name) {
+> +        return;
+> +    }
+> +
+> +    monitor_printf(mon, "%*sspecific features:\n", HMP_INFO_VIRTIO_INDENT, "");
+> +
+> +    for (idx = 0; idx < 64; idx++) {
+> +        const char *name = vdc->get_feature_name(vdev, idx);
+> +        const char *ack = virtio_vdev_has_feature(vdev, idx) ? "acked" : "";
+> +
+> +        if (!name) {
+> +            continue;
+> +        }
+> +        if (!virtio_host_has_feature(vdev, idx)) {
+> +            continue;
+> +        }
+> +        monitor_printf(mon, "%*s%*s%*s\n", HMP_INFO_VIRTIO_INDENT, "",
+> +                       HMP_INFO_VIRTIO_FIELD, name, HMP_INFO_VIRTIO_FIELD, ack);
+> +    }
+> +}
+> +
+> +static void hmp_info_virtio_print(Monitor *mon, VirtIODevice *vdev)
+> +{
+> +    char *path = qdev_get_dev_path(DEVICE(vdev));
+> +
+> +    monitor_printf(mon, "%s at %s\n", object_get_typename(OBJECT(vdev)), path);
+> +    g_free(path);
+> +
+> +    hmp_info_virtio_print_status(mon, vdev);
+> +
+> +    monitor_printf(mon, "%*shost features:    0x%016"PRIx64"\n",
+> +                   HMP_INFO_VIRTIO_INDENT, "", vdev->host_features);
+> +    monitor_printf(mon, "%*sguest features:   0x%016"PRIx64"\n",
+> +                   HMP_INFO_VIRTIO_INDENT, "", vdev->guest_features);
+> +
+> +    hmp_info_virtio_print_common_features(mon, vdev);
+> +    hmp_info_virtio_print_specific_features(mon, vdev);
+> +}
+> +
+> +static void hmp_info_virtio_recursive(Monitor *mon, BusState *bus)
+> +{
+> +    BusChild *kid;
+> +
+> +    QTAILQ_FOREACH(kid, &bus->children, sibling) {
+> +        DeviceState *dev = kid->child;
+> +        BusState *child;
+> +
+> +        if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_DEVICE)) {
+> +            hmp_info_virtio_print(mon, VIRTIO_DEVICE(dev));
+> +        }
+> +        QLIST_FOREACH(child, &dev->child_bus, sibling) {
+> +            hmp_info_virtio_recursive(mon, child);
+> +        }
+> +    }
+> +}
+> +
+> +void hmp_info_virtio(Monitor *mon, const QDict *qdict)
+> +{
+> +    BusState *bus = sysbus_get_default();
+> +
+> +    if (!bus) {
+> +        return;
+> +    }
+> +
+> +    hmp_info_virtio_recursive(mon, bus);
+> +}
+> diff --git a/hmp.h b/hmp.h
+> index 3605003..3e8f30a 100644
+> --- a/hmp.h
+> +++ b/hmp.h
+> @@ -146,5 +146,6 @@ void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
+>  void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+>  void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+>  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
+> +void hmp_info_virtio(Monitor *mon, const QDict *qdict);
+>  
+>  #endif
+> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> index 05d1440..c77f651 100644
+> --- a/hw/block/virtio-blk.c
+> +++ b/hw/block/virtio-blk.c
+> @@ -1017,6 +1017,26 @@ static Property virtio_blk_properties[] = {
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> +static const char *virtio_blk_get_feature_name(VirtIODevice *vdev,
+> +                                               unsigned feature)
+> +{
+> +    static const char *names[] = {
+> +        [VIRTIO_BLK_F_BARRIER] = "barrier",
+> +        [VIRTIO_BLK_F_SIZE_MAX] = "size_max",
+> +        [VIRTIO_BLK_F_SEG_MAX] = "seg_max",
+> +        [VIRTIO_BLK_F_RO] = "ro",
+> +        [VIRTIO_BLK_F_BLK_SIZE] = "blk_size",
+> +        [VIRTIO_BLK_F_SCSI] = "scsi",
+> +        [VIRTIO_BLK_F_TOPOLOGY] = "topology",
+> +        [VIRTIO_BLK_F_FLUSH] = "flush",
+> +        [VIRTIO_BLK_F_MQ] = "mq",
+> +    };
+> +    if (feature >= ARRAY_SIZE(names)) {
+> +        return NULL;
+> +    }
+> +    return names[feature];
+> +}
+> +
+>  static void virtio_blk_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> @@ -1030,6 +1050,7 @@ static void virtio_blk_class_init(ObjectClass *klass, void *data)
+>      vdc->get_config = virtio_blk_update_config;
+>      vdc->set_config = virtio_blk_set_config;
+>      vdc->get_features = virtio_blk_get_features;
+> +    vdc->get_feature_name = virtio_blk_get_feature_name;
+>      vdc->set_status = virtio_blk_set_status;
+>      vdc->reset = virtio_blk_reset;
+>      vdc->save = virtio_blk_save_device;
+> diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
+> index 9470bd7..41f4466 100644
+> --- a/hw/char/virtio-serial-bus.c
+> +++ b/hw/char/virtio-serial-bus.c
+> @@ -1156,6 +1156,20 @@ static Property virtio_serial_properties[] = {
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> +static const char *virtio_serial_get_feature_name(VirtIODevice *vdev,
+> +                                                  unsigned feature)
+> +{
+> +    static const char *names[] = {
+> +        [VIRTIO_CONSOLE_F_SIZE] = "size",
+> +        [VIRTIO_CONSOLE_F_MULTIPORT] = "multiport",
+> +        [VIRTIO_CONSOLE_F_EMERG_WRITE] = "emerg_write",
+> +    };
+> +    if (feature >= ARRAY_SIZE(names)) {
+> +        return NULL;
+> +    }
+> +    return names[feature];
+> +}
+> +
+>  static void virtio_serial_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> @@ -1170,6 +1184,7 @@ static void virtio_serial_class_init(ObjectClass *klass, void *data)
+>      vdc->realize = virtio_serial_device_realize;
+>      vdc->unrealize = virtio_serial_device_unrealize;
+>      vdc->get_features = get_features;
+> +    vdc->get_feature_name = virtio_serial_get_feature_name;
+>      vdc->get_config = get_config;
+>      vdc->set_config = set_config;
+>      vdc->set_status = set_status;
+> diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+> index 3a8f1e1..49aa214 100644
+> --- a/hw/display/virtio-gpu.c
+> +++ b/hw/display/virtio-gpu.c
+> @@ -1307,6 +1307,18 @@ static Property virtio_gpu_properties[] = {
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> +static const char *virtio_gpu_get_feature_name(VirtIODevice *vdev,
+> +                                               unsigned feature)
+> +{
+> +    static const char *names[] = {
+> +        [VIRTIO_GPU_F_VIRGL] = "virgl",
+> +    };
+> +    if (feature >= ARRAY_SIZE(names)) {
+> +        return NULL;
+> +    }
+> +    return names[feature];
+> +}
+> +
+>  static void virtio_gpu_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> @@ -1317,6 +1329,7 @@ static void virtio_gpu_class_init(ObjectClass *klass, void *data)
+>      vdc->get_config = virtio_gpu_get_config;
+>      vdc->set_config = virtio_gpu_set_config;
+>      vdc->get_features = virtio_gpu_get_features;
+> +    vdc->get_feature_name = virtio_gpu_get_feature_name;
+>      vdc->set_features = virtio_gpu_set_features;
+>  
+>      vdc->reset = virtio_gpu_reset;
+> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> index 148071a..f4d20a85 100644
+> --- a/hw/net/virtio-net.c
+> +++ b/hw/net/virtio-net.c
+> @@ -2154,6 +2154,40 @@ static Property virtio_net_properties[] = {
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> +static const char *virtio_net_get_feature_name(VirtIODevice *vdev,
+> +                                               unsigned feature)
+> +{
+> +    static const char *names[] = {
+> +        [VIRTIO_NET_F_CSUM] = "csum",
+> +        [VIRTIO_NET_F_GUEST_CSUM] = "guest_csum",
+> +        [VIRTIO_NET_F_CTRL_GUEST_OFFLOADS] = "ctrl_guest_offloads",
+> +        [VIRTIO_NET_F_MTU] = "mtu",
+> +        [VIRTIO_NET_F_MAC] = "mac",
+> +        [VIRTIO_NET_F_GSO] = "gso",
+> +        [VIRTIO_NET_F_GUEST_TSO4] = "guest_tso4",
+> +        [VIRTIO_NET_F_GUEST_TSO6] = "guest_tso6",
+> +        [VIRTIO_NET_F_GUEST_ECN] = "guest_ecn",
+> +        [VIRTIO_NET_F_GUEST_UFO] = "guest_ufo",
+> +        [VIRTIO_NET_F_HOST_TSO4] = "host_tso4",
+> +        [VIRTIO_NET_F_HOST_TSO6] = "host_tso6",
+> +        [VIRTIO_NET_F_HOST_ECN] = "host_ecn",
+> +        [VIRTIO_NET_F_HOST_UFO] = "host_ufo",
+> +        [VIRTIO_NET_F_MRG_RXBUF] = "mrg_rxbuf",
+> +        [VIRTIO_NET_F_STATUS] = "status",
+> +        [VIRTIO_NET_F_CTRL_VQ] = "ctrl_vq",
+> +        [VIRTIO_NET_F_CTRL_RX] = "ctrl_rx",
+> +        [VIRTIO_NET_F_CTRL_VLAN] = "ctrl_vlan",
+> +        [VIRTIO_NET_F_CTRL_RX_EXTRA] = "ctrl_rx_extra",
+> +        [VIRTIO_NET_F_GUEST_ANNOUNCE] = "guest_announce",
+> +        [VIRTIO_NET_F_MQ] = "mq",
+> +        [VIRTIO_NET_F_CTRL_MAC_ADDR] = "ctrl_mac_addr",
+> +    };
+> +    if (feature >= ARRAY_SIZE(names)) {
+> +        return NULL;
+> +    }
+> +    return names[feature];
+> +}
+> +
+>  static void virtio_net_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> @@ -2169,6 +2203,7 @@ static void virtio_net_class_init(ObjectClass *klass, void *data)
+>      vdc->get_features = virtio_net_get_features;
+>      vdc->set_features = virtio_net_set_features;
+>      vdc->bad_features = virtio_net_bad_features;
+> +    vdc->get_feature_name = virtio_net_get_feature_name;
+>      vdc->reset = virtio_net_reset;
+>      vdc->set_status = virtio_net_set_status;
+>      vdc->guest_notifier_mask = virtio_net_guest_notifier_mask;
+> diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+> index 3aa9971..b53cf8b 100644
+> --- a/hw/scsi/virtio-scsi.c
+> +++ b/hw/scsi/virtio-scsi.c
+> @@ -942,6 +942,21 @@ static const VMStateDescription vmstate_virtio_scsi = {
+>      },
+>  };
+>  
+> +static const char *virtio_scsi_get_feature_name(VirtIODevice *vdev,
+> +                                                unsigned feature)
+> +{
+> +    static const char *names[] = {
+> +        [VIRTIO_SCSI_F_INOUT] = "inout",
+> +        [VIRTIO_SCSI_F_HOTPLUG] = "hotplug",
+> +        [VIRTIO_SCSI_F_CHANGE] = "change",
+> +        [VIRTIO_SCSI_F_T10_PI] = "t10_pi",
+> +    };
+> +    if (feature >= ARRAY_SIZE(names)) {
+> +        return NULL;
+> +    }
+> +    return names[feature];
+> +}
+> +
+>  static void virtio_scsi_common_class_init(ObjectClass *klass, void *data)
+>  {
+>      VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
+> @@ -964,6 +979,7 @@ static void virtio_scsi_class_init(ObjectClass *klass, void *data)
+>      vdc->unrealize = virtio_scsi_device_unrealize;
+>      vdc->set_config = virtio_scsi_set_config;
+>      vdc->get_features = virtio_scsi_get_features;
+> +    vdc->get_feature_name = virtio_scsi_get_feature_name;
+>      vdc->reset = virtio_scsi_reset;
+>      vdc->start_ioeventfd = virtio_scsi_dataplane_start;
+>      vdc->stop_ioeventfd = virtio_scsi_dataplane_stop;
+> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> index 37cde38..b396eb1 100644
+> --- a/hw/virtio/virtio-balloon.c
+> +++ b/hw/virtio/virtio-balloon.c
+> @@ -509,6 +509,20 @@ static Property virtio_balloon_properties[] = {
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> +static const char *virtio_balloon_get_feature_name(VirtIODevice *vdev,
+> +                                                   unsigned feature)
+> +{
+> +    static const char *names[] = {
+> +        [VIRTIO_BALLOON_F_MUST_TELL_HOST] = "must_tell_host",
+> +        [VIRTIO_BALLOON_F_STATS_VQ] = "stats_vq",
+> +        [VIRTIO_BALLOON_F_DEFLATE_ON_OOM] = "deflate_on_oom",
+> +    };
+> +    if (feature >= ARRAY_SIZE(names)) {
+> +        return NULL;
+> +    }
+> +    return names[feature];
+> +}
+> +
+>  static void virtio_balloon_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> @@ -523,6 +537,7 @@ static void virtio_balloon_class_init(ObjectClass *klass, void *data)
+>      vdc->get_config = virtio_balloon_get_config;
+>      vdc->set_config = virtio_balloon_set_config;
+>      vdc->get_features = virtio_balloon_get_features;
+> +    vdc->get_feature_name = virtio_balloon_get_feature_name;
+>      vdc->set_status = virtio_balloon_set_status;
+>      vdc->vmsd = &vmstate_virtio_balloon_device;
+>  }
+> diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
+> index 3042232..e9ae54f 100644
+> --- a/hw/virtio/virtio-bus.c
+> +++ b/hw/virtio/virtio-bus.c
+> @@ -30,6 +30,7 @@
+>  #include "hw/virtio/virtio-bus.h"
+>  #include "hw/virtio/virtio.h"
+>  #include "exec/address-spaces.h"
+> +#include "monitor/monitor.h"
+>  
+>  /* #define DEBUG_VIRTIO_BUS */
+>  
+> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> index 80c45c3..3ea2cd0 100644
+> --- a/include/hw/virtio/virtio.h
+> +++ b/include/hw/virtio/virtio.h
+> @@ -141,6 +141,8 @@ typedef struct VirtioDeviceClass {
+>      void (*save)(VirtIODevice *vdev, QEMUFile *f);
+>      int (*load)(VirtIODevice *vdev, QEMUFile *f, int version_id);
+>      const VMStateDescription *vmsd;
+> +    /* Get the name of device specific feature */
+> +    const char *(*get_feature_name)(VirtIODevice *vdev, unsigned feature);
+>  } VirtioDeviceClass;
+>  
+>  void virtio_instance_init_common(Object *proxy_obj, void *data,
+> diff --git a/monitor.c b/monitor.c
+> index f4856b9..779f168 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -78,6 +78,7 @@
+>  #include "sysemu/cpus.h"
+>  #include "qemu/cutils.h"
+>  #include "qapi/qmp/dispatch.h"
+> +#include "hw/virtio/virtio-bus.h"
+>  
+>  #if defined(TARGET_S390X)
+>  #include "hw/s390x/storage-keys.h"
+> -- 
+> 2.1.4
