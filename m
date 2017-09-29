@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dy1VJ-00067o-Up
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:03:23 -0400
+	(envelope-from <Richard.Relph@amd.com>) id 1dy1Zf-000860-HN
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:07:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dy1VI-0005Bw-NU
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:03:21 -0400
-References: <20170913160333.23622-1-eblake@redhat.com>
-	<20170913160333.23622-4-eblake@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <86c281c3-7630-b6f3-27d7-ef778f75e798@redhat.com>
-Date: Fri, 29 Sep 2017 15:03:03 -0500
+	(envelope-from <Richard.Relph@amd.com>) id 1dy1Zc-00008X-A9
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:07:51 -0400
+Received: from mail-dm3nam03on0056.outbound.protection.outlook.com
+	([104.47.41.56]:51840
+	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Richard.Relph@amd.com>)
+	id 1dy1Zb-00006T-Rr
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:07:48 -0400
+From: Richard Relph <richard.relph@amd.com>
+References: <69fd8746-b2bd-31d0-4d70-792f40ef2d79@amd.com>
+	<20170926170901-mutt-send-email-mst@kernel.org>
+	<2fb6e86d-5afa-d7f0-6f62-8f81db5a5419@amd.com>
+	<20170927190724-mutt-send-email-mst@kernel.org>
+	<927fedc3-a2c8-d37c-930e-11cecb7b0149@amd.com>
+	<20170929223152-mutt-send-email-mst@kernel.org>
+	<05b3c915-d7c1-2d73-1579-68d5f3bcc3d7@amd.com>
+Message-ID: <151eedf4-6861-c4be-e6f8-6b33c226b298@amd.com>
+Date: Fri, 29 Sep 2017 15:07:40 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170913160333.23622-4-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="TMnlPxMSopGc41xveaoVUNKB2jPBFBLbv"
-Subject: Re: [Qemu-devel] [PATCH v4 03/23] block: Make
- bdrv_round_to_clusters() signature more useful
+In-Reply-To: <05b3c915-d7c1-2d73-1579-68d5f3bcc3d7@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] libvirt/QEMU/SEV interaction
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -24,95 +35,62 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
 List-ID: <qemu-devel.nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TMnlPxMSopGc41xveaoVUNKB2jPBFBLbv
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org,
- Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
-Message-ID: <86c281c3-7630-b6f3-27d7-ef778f75e798@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 03/23] block: Make
- bdrv_round_to_clusters() signature more useful
-References: <20170913160333.23622-1-eblake@redhat.com>
- <20170913160333.23622-4-eblake@redhat.com>
-In-Reply-To: <20170913160333.23622-4-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 9/29/17 2:48 PM, Richard Relph wrote:
+> On 9/29/17 2:34 PM, Michael S. Tsirkin wrote:
+>> On Wed, Sep 27, 2017 at 02:06:10PM -0500, Richard Relph wrote:
+>>> Whether the "BIOS" is a "static shim" as Michael suggests, or a full 
+>>> BIOS,
+>>> or even a BIOS+kernel+initrd is really not too significant. What is
+>>> significant is that the GO has a basis for trusting all code that is
+>>> imported in to their VM by the CP. And that NONE of the code provided 
+>>> by the
+>>> CP is "unknown" and unauditable by the GO. If the CP has a way to inject
+>>> code unknown to the GO in to the guest VM, the trust model is broken and
+>>> both GO and CP suffer the consequences.
+>>
+>> Absolutely.
+>>
+>>> When the CP needs to update the BIOS image, they will have to inform 
+>>> the GO
+>>> and allow the GO to establish trust in the CP's new BIOS image somehow.
+>>
+>> This GO update on every BIOS change is imho is not a workable model. You
+>> want something like checking the BIOS signature instead. And since
+>> hardware is all hash based, you need the shim to do it in software.
+> 
+> A BIOS "signed" by the CP doesn't meet the security requirement. It is 
+> code that is "unknown" to the GO.
+> 
+> The (legitimate) CP does NOT want to be in that position of trust. If 
+> they are, then some government somewhere is going to insist that they 
+> sign a BIOS that allows the government to spy on the GO's VMs, and steal 
+> secrets from it. Or some hacker admin will do it "for fun".
+> 
+> How often do large public CPs really change their BIOSes? My sense is 
+> that large public CPs prefer stability over "latest and greatest".
+> 
+> And, perhaps more importantly, if a CP are able to sell a "more secure" 
+> VM, one that justifies a higher price per vCPU hour, wouldn't that 
+> warrant some changes in the "insecure" model being used today?
 
-On 09/13/2017 11:03 AM, Eric Blake wrote:
-> In the process of converting sector-based interfaces to bytes,
-> I'm finding it easier to represent a byte count as a 64-bit
-> integer at the block layer (even if we are internally capped
-> by SIZE_MAX or even INT_MAX for individual transactions, it's
-> still nicer to not have to worry about truncation/overflow
-> issues on as many variables).  Update the signature of
-> bdrv_round_to_clusters() to uniformly use int64_t, matching
-> the signature already chosen for bdrv_is_allocated and the
-> fact that off_t is also a signed type, then adjust clients
-> according to the required fallout.
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
->=20
+Ultimately, I think both approaches are "doable". It will be a CP and GO 
+decision. If the GO trusts the CP, the shim+signed BIOS will work fine. 
+If GO requires a more secure VM and the CP wants to offer it, the CP 
+will figure out a way to satisfy the GO's "trust issue" that the BIOS 
+can't be used to circumvent SEV's protections. Depending on your level 
+of paranoia, that may require advance notice of BIOS changes, or even 
+allowing the GO to provide the BIOS themselves, written to a spec 
+supported by the CP's HV, and/or based on BIOS code provided by the CP.
 
-> @@ -946,7 +946,7 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(Bd=
-rvChild *child,
->      struct iovec iov;
->      QEMUIOVector bounce_qiov;
->      int64_t cluster_offset;
-> -    unsigned int cluster_bytes;
-> +    int64_t cluster_bytes;
->      size_t skip_bytes;
->      int ret;
+It's a business decision and I think SEV can support both. That said, 
+AMD currently has no plans to write a shim that can verify the signature 
+on a CP-provided BIOS image.
 
-Here, 'bytes' is still unsigned int, and I widened cluster_bytes,
+Richard
 
-> +++ b/block/trace-events
-> @@ -12,7 +12,7 @@ blk_co_pwritev(void *blk, void *bs, int64_t offset, u=
-nsigned int bytes, int flag
->  bdrv_co_preadv(void *bs, int64_t offset, int64_t nbytes, unsigned int =
-flags) "bs %p offset %"PRId64" nbytes %"PRId64" flags 0x%x"
->  bdrv_co_pwritev(void *bs, int64_t offset, int64_t nbytes, unsigned int=
- flags) "bs %p offset %"PRId64" nbytes %"PRId64" flags 0x%x"
->  bdrv_co_pwrite_zeroes(void *bs, int64_t offset, int count, int flags) =
-"bs %p offset %"PRId64" count %d flags 0x%x"
-> -bdrv_co_do_copy_on_readv(void *bs, int64_t offset, unsigned int bytes,=
- int64_t cluster_offset, unsigned int cluster_bytes) "bs %p offset %"PRId=
-64" bytes %u cluster_offset %"PRId64" cluster_bytes %u"
-> +bdrv_co_do_copy_on_readv(void *bs, int64_t offset, int64_t bytes, int6=
-4_t cluster_offset, unsigned int cluster_bytes) "bs %p offset %"PRId64" b=
-ytes %"PRId64" cluster_offset %"PRId64" cluster_bytes %u"
-
-but I botched which variable got widened in the trace.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---TMnlPxMSopGc41xveaoVUNKB2jPBFBLbv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnOpvgACgkQp6FrSiUn
-Q2pMuAgAnN0gefXPA5rQJ/dur49K+mnUlNRdTx4FuAKaeuUBiHUGM0mkRYsJMGXJ
-8sOOqYPlK1PH3YCp2JMlF31WhPTj4IVyTn6iVLhVlhTB57i5Ez5h7RSN6GZdWsDc
-RxgyC2uCF4gC1MOvikco/LP+k2aJ/Y95yLdJxAicBrJB9FhfjvHWj1kKI8T7aCSS
-j9+rX0xyQyY6twQAP8raiNIEOIUCexbODqW3ISankla6XEjI5oQG8AwlAUQb6WWY
-JEIZlWDokWxBjPN/2EiGCzPzh4ANFlJruRCAwXZH2MDUj03wQQcdFhyQA5ocgUgY
-wkeJoKos9LioPst8394+gY9EgqOOCA==
-=j/Hq
------END PGP SIGNATURE-----
-
---TMnlPxMSopGc41xveaoVUNKB2jPBFBLbv--
+> 
+> Richard
