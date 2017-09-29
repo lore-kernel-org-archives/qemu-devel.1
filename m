@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dxzmx-0003kg-G7
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 14:13:28 -0400
+	(envelope-from <eblake@redhat.com>) id 1dxzqE-0005ag-FO
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 14:16:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dxzmw-0003Qi-KS
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 14:13:27 -0400
+	(envelope-from <eblake@redhat.com>) id 1dxzqD-00056g-HB
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 14:16:50 -0400
+References: <20170929170843.3711-1-mreitz@redhat.com>
+	<cf6e8f28-760c-57ae-184b-d9b07c28f0f2@redhat.com>
+	<c08cfd7e-c459-8ddf-a81c-fbe31ecfeac3@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a91edbef-e315-0843-ae9d-947e2b67fc86@redhat.com>
+Date: Fri, 29 Sep 2017 13:16:40 -0500
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <adae1793-1a4a-7107-7676-f6dbaa26a9f4@redhat.com>
-References: <cover.1506384414.git.alistair.francis@xilinx.com>
-	<5ad72536402da2879d49b58753cc709a8ff22de9.1506384415.git.alistair.francis@xilinx.com>
-	<adae1793-1a4a-7107-7676-f6dbaa26a9f4@redhat.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 29 Sep 2017 11:12:54 -0700
-Message-ID: <CAKmqyKN-kB964To18yv-ScHX98R61iUN5JUCyyv0JO2fqKEwxg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 8/8] target: Replace fprintf(stderr,
- "*\n" with error_report()
+In-Reply-To: <c08cfd7e-c459-8ddf-a81c-fbe31ecfeac3@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="UHnvIVKUp7eeHK4RKXOi8OQNJMQctDe3R"
+Subject: Re: [Qemu-devel] [PATCH v3] iotests: Add test for dataplane
+ mirroring
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -24,54 +25,66 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Markus Armbruster <armbru@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Michael Walle <michael@walle.cc>, qemu-arm <qemu-arm@nongnu.org>, "open list:New World" <qemu-ppc@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Yongbok Kim <yongbok.kim@imgtec.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Jeff Cody <jcody@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-On Mon, Sep 25, 2017 at 9:08 PM, Thomas Huth <thuth@redhat.com> wrote:
-> On 26.09.2017 02:09, Alistair Francis wrote:
->> Replace a large number of the fprintf(stderr, "*\n" calls with
->> error_report(). The functions were renamed with these commands and then
->> compiler issues where manually fixed.
-> [...]
->> @@ -9281,18 +9281,19 @@ static void init_ppc_proc(PowerPCCPU *cpu)
->>          case POWERPC_FLAG_PMM:
->>              break;
->>          default:
->> -            fprintf(stderr, "PowerPC MSR definition inconsistency\n"
->> -                    "Should define POWERPC_FLAG_PX or POWERPC_FLAG_PMM\n");
->> +            error_report("PowerPC MSR definition inconsistency");
->> +            error_printf("Should define POWERPC_FLAG_PX or POWERPC_FLAG_PMM");
->>              exit(1);
->>          }
->>      } else if (env->flags & (POWERPC_FLAG_PX | POWERPC_FLAG_PMM)) {
->> -        fprintf(stderr, "PowerPC MSR definition inconsistency\n"
->> -                "Should not define POWERPC_FLAG_PX nor POWERPC_FLAG_PMM\n");
->> +        error_report("PowerPC MSR definition inconsistency");
->> +        error_printf("Should not define POWERPC_FLAG_PX nor POWERPC_FLAG_PMM");
->>          exit(1);
->>      }
->>      if ((env->flags & (POWERPC_FLAG_RTC_CLK | POWERPC_FLAG_BUS_CLK)) == 0) {
->> -        fprintf(stderr, "PowerPC flags inconsistency\n"
->> -                "Should define the time-base and decrementer clock source\n");
->> +        error_report("PowerPC MSR definition inconsistency");
->> +        error_printf("Should define the time-base and decrementer clock"
->> +                     " source");
->>          exit(1);
->>      }
->
-> Replacing fprintf with error_report+error_printf is kind of very ugly.
-> While error_report adds newline to the output, error_printf does not (as
-> far as I can see) ... did you check how such a message looks like when
-> it is generated during runtime?
-> Also, the strings belong together, so printing them with two function
-> calls sound wrong to me... maybe they should be joined without newline
-> in the middle instead?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UHnvIVKUp7eeHK4RKXOi8OQNJMQctDe3R
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Jeff Cody <jcody@redhat.com>
+Message-ID: <a91edbef-e315-0843-ae9d-947e2b67fc86@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] iotests: Add test for dataplane mirroring
+References: <20170929170843.3711-1-mreitz@redhat.com>
+ <cf6e8f28-760c-57ae-184b-d9b07c28f0f2@redhat.com>
+ <c08cfd7e-c459-8ddf-a81c-fbe31ecfeac3@redhat.com>
+In-Reply-To: <c08cfd7e-c459-8ddf-a81c-fbe31ecfeac3@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Ok, that works for me, I'll do that.
+On 09/29/2017 01:08 PM, Max Reitz wrote:
+> On 2017-09-29 19:33, Eric Blake wrote:
+>> On 09/29/2017 12:08 PM, Max Reitz wrote:
+>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>> ---
+>>> v3: Make the test actually pass (the reference output from v2 only
+>>>     worked with v1 of the test...)
 
-Thanks,
-Alistair
+>>
+>> Semantic conflict with Jeff's patches for './check -s' to preserve
+>> intermediate files.  Otherwise,
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
+> True, but as long as v4 of his series is not around, I feel OK to put
+> the burden of having to rebase on him. :-)
 
->
->  Thomas
+Indeed - I was pointing it out to Jeff (hence the CC) ;)
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--UHnvIVKUp7eeHK4RKXOi8OQNJMQctDe3R
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnOjggACgkQp6FrSiUn
+Q2p7MAgAqwmKnd7VTzV83Cs2Q6Qp7INg6J0XZ5zVdxVPTyER60J5BWBil2L2E/Si
+3wyneS2hHWg12SacdX6aKxjFtIQdnwHwXIzuN6Uek+EdzOxn1Tghn3FGsKNXgkyp
+WLQsOq2M5uVhk3tgapRrVjXb+eTzfW9v81eyXZg3+YWJRd52zYTU3nRtetIgYJo2
+8OltIqYRdgKC/LAZZujyc/ikszyeXzHEJK0t38C+QTJsAYHcnQTK3hGWggUZDhsN
+Gjakx9GRPBzJs3x9KaNbm6RIMqF/3VM2TKtTJ5EZcoML7kxCpeB0wCmX5cLAjZG3
+GrGoNxRrLK4qxOnqZjy/9fkgDMMW/w==
+=QQiC
+-----END PGP SIGNATURE-----
+
+--UHnvIVKUp7eeHK4RKXOi8OQNJMQctDe3R--
