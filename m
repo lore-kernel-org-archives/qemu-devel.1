@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39970)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dxsJU-0002bG-5t
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:14:33 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dxsQr-00073K-QG
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:22:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dxsJP-0000NU-5p
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:14:32 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:47388)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dxsJO-0000NK-W4
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:14:27 -0400
-References: <1506677707-2758-1-git-send-email-jiang.biao2@zte.com.cn>
-	<5e146f0b-3c7c-b0a7-cea2-1d20bfcfc2d2@amsat.org>
-From: Yongbok Kim <yongbok.kim@imgtec.com>
-Message-ID: <b70bb6ae-9cac-06e6-c65e-1fd11b8308db@imgtec.com>
-Date: Fri, 29 Sep 2017 11:14:25 +0100
-MIME-Version: 1.0
-In-Reply-To: <5e146f0b-3c7c-b0a7-cea2-1d20bfcfc2d2@amsat.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] target/mips: remove commented out codes in
- translate.c
+	(envelope-from <kraxel@redhat.com>) id 1dxsQo-0005gO-Ag
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:22:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43058)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dxsQo-0005ff-24
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:22:06 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 29 Sep 2017 12:21:57 +0200
+Message-Id: <20170929102201.15408-2-kraxel@redhat.com>
+In-Reply-To: <20170929102201.15408-1-kraxel@redhat.com>
+References: <20170929102201.15408-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 1/5] console: purge curses bits from console.h
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -28,35 +22,122 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Jiang Biao <jiang.biao2@zte.com.cn>, aurelien@aurel32.net
-Cc: zhong.weidong@zte.com.cn, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>
 List-ID: <qemu-devel.nongnu.org>
 
+Handle the translation from vga chars to curses chars in curses_update()
+instead of console_write_ch().  Purge any curses support bits from
+ui/console.h include file.
 
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 20170927103811.19249-1-kraxel@redhat.com
+---
+ include/ui/console.h      | 23 ++---------------------
+ target/unicore32/helper.c |  6 ++++++
+ ui/curses.c               | 25 ++++++++++++++++++++-----
+ 3 files changed, 28 insertions(+), 26 deletions(-)
 
-On 29/09/2017 10:58, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Jiang,
->=20
-> I'm not sure it is really helpful to remove those comment, they are her=
-e as
-> debt to the project, reminding what should be implemented.
->=20
-> Are you proposing to accept this instructions will never get implemente=
-d?
->=20
-> Regards,
->=20
-> Phil.
->=20
-
-Hi Phil,
-
-The commented codes are all trivial. When the time we implement those
-features it is merely copy & paste from the specification. I don't think
-there is much harm to remove the comments.
-Besides there is TODO file in the same directory but that has not been
-updated for a while, perhaps updating the file is much relevant with this
-patch.
-
-Regards,
-Yongbok
+diff --git a/include/ui/console.h b/include/ui/console.h
+index 8024878bae..6966e4bd9d 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -336,29 +336,10 @@ static inline pixman_format_code_t surface_format(DisplaySurface *s)
+     return s->format;
+ }
+ 
+-#ifdef CONFIG_CURSES
+-/* KEY_EVENT is defined in wincon.h and in curses.h. Avoid redefinition. */
+-#undef KEY_EVENT
+-#include <curses.h>
+-#undef KEY_EVENT
+-typedef chtype console_ch_t;
+-extern chtype vga_to_curses[];
+-#else
+-typedef unsigned long console_ch_t;
+-#endif
++typedef uint32_t console_ch_t;
++
+ static inline void console_write_ch(console_ch_t *dest, uint32_t ch)
+ {
+-    uint8_t c = ch;
+-#ifdef CONFIG_CURSES
+-    if (vga_to_curses[c]) {
+-        ch &= ~(console_ch_t)0xff;
+-        ch |= vga_to_curses[c];
+-    }
+-#else
+-    if (c == '\0') {
+-        ch |= ' ';
+-    }
+-#endif
+     *dest = ch;
+ }
+ 
+diff --git a/target/unicore32/helper.c b/target/unicore32/helper.c
+index 309dcd1ae1..3393d2c020 100644
+--- a/target/unicore32/helper.c
++++ b/target/unicore32/helper.c
+@@ -163,6 +163,12 @@ uint32_t helper_cp0_get(CPUUniCore32State *env, uint32_t creg, uint32_t cop)
+ }
+ 
+ #ifdef CONFIG_CURSES
++
++/* KEY_EVENT is defined in wincon.h and in curses.h. Avoid redefinition. */
++#undef KEY_EVENT
++#include <curses.h>
++#undef KEY_EVENT
++
+ /*
+  * FIXME:
+  *     1. curses windows will be blank when switching back
+diff --git a/ui/curses.c b/ui/curses.c
+index 03cefdf470..85503876c0 100644
+--- a/ui/curses.c
++++ b/ui/curses.c
+@@ -33,6 +33,11 @@
+ #include "ui/input.h"
+ #include "sysemu/sysemu.h"
+ 
++/* KEY_EVENT is defined in wincon.h and in curses.h. Avoid redefinition. */
++#undef KEY_EVENT
++#include <curses.h>
++#undef KEY_EVENT
++
+ #define FONT_HEIGHT 16
+ #define FONT_WIDTH 8
+ 
+@@ -42,16 +47,26 @@ static WINDOW *screenpad = NULL;
+ static int width, height, gwidth, gheight, invalidate;
+ static int px, py, sminx, sminy, smaxx, smaxy;
+ 
+-chtype vga_to_curses[256];
++static chtype vga_to_curses[256];
+ 
+ static void curses_update(DisplayChangeListener *dcl,
+                           int x, int y, int w, int h)
+ {
+-    chtype *line;
++    console_ch_t *line;
++    chtype curses_line[width];
+ 
+-    line = ((chtype *) screen) + y * width;
+-    for (h += y; y < h; y ++, line += width)
+-        mvwaddchnstr(screenpad, y, 0, line, width);
++    line = screen + y * width;
++    for (h += y; y < h; y ++, line += width) {
++        for (x = 0; x < width; x++) {
++            chtype ch = line[x] & 0xff;
++            chtype at = line[x] & ~0xff;
++            if (vga_to_curses[ch]) {
++                ch = vga_to_curses[ch];
++            }
++            curses_line[x] = ch | at;
++        }
++        mvwaddchnstr(screenpad, y, 0, curses_line, width);
++    }
+ 
+     pnoutrefresh(screenpad, py, px, sminy, sminx, smaxy - 1, smaxx - 1);
+     refresh();
+-- 
+2.9.3
