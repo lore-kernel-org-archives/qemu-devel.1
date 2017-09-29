@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dxyYz-0001H2-5A
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 12:54:58 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dxyZ3-0001Ks-9D
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 12:55:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dxyYy-0003Ij-8p
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 12:54:57 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dxyZ2-0003OV-E7
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 12:55:01 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri, 29 Sep 2017 18:53:31 +0200
-Message-Id: <20170929165347.29658-10-mreitz@redhat.com>
+Date: Fri, 29 Sep 2017 18:53:32 +0200
+Message-Id: <20170929165347.29658-11-mreitz@redhat.com>
 In-Reply-To: <20170929165347.29658-1-mreitz@redhat.com>
 References: <20170929165347.29658-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 09/25] block: Fix bdrv_find_backing_image()
+Subject: [Qemu-devel] [PATCH v6 10/25] block: Add bdrv_dirname()
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -22,89 +22,89 @@ To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-bdrv_find_backing_image() should use bdrv_get_full_backing_filename() or
-bdrv_make_absolute_filename() instead of trying to do what those
-functions do by itself.
+This function may be implemented by block drivers to derive a directory
+name from a BDS. Concatenating this g_free()-able string with a relative
+filename must result in a valid (not necessarily existing) filename, so
+this is a function that should generally be not implemented by format
+drivers, because this is protocol-specific.
 
-path_combine_deprecated() can now be dropped, so let's do that.
+If a BDS's driver does not implement this function, bdrv_dirname() will
+fall through to the BDS's file if it exists. If it does not, the
+exact_filename field will be used to generate a directory name.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block.c | 28 +++++++++++++---------------
- 1 file changed, 13 insertions(+), 15 deletions(-)
+ include/block/block.h     |  1 +
+ include/block/block_int.h |  7 +++++++
+ block.c                   | 26 ++++++++++++++++++++++++++
+ 3 files changed, 34 insertions(+)
 
+diff --git a/include/block/block.h b/include/block/block.h
+index 65b15ecd18..34422e87e7 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -486,6 +486,7 @@ char *bdrv_get_full_backing_filename(BlockDriverState *bs, Error **errp);
+ char *bdrv_get_full_backing_filename_from_filename(const char *backed,
+                                                    const char *backing,
+                                                    Error **errp);
++char *bdrv_dirname(BlockDriverState *bs, Error **errp);
+ 
+ int path_has_protocol(const char *path);
+ int path_is_absolute(const char *path);
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 2b816ec601..3a71be3734 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -135,6 +135,13 @@ struct BlockDriver {
+ 
+     void (*bdrv_refresh_filename)(BlockDriverState *bs, QDict *options);
+ 
++    /*
++     * Returns an allocated string which is the directory name of this BDS: It
++     * will be used to make relative filenames absolute by prepending this
++     * function's return value to them.
++     */
++    char *(*bdrv_dirname)(BlockDriverState *bs, Error **errp);
++
+     /* aio */
+     BlockAIOCB *(*bdrv_aio_readv)(BlockDriverState *bs,
+         int64_t sector_num, QEMUIOVector *qiov, int nb_sectors,
 diff --git a/block.c b/block.c
-index 2da242c1e9..17579125de 100644
+index 17579125de..d2ef7cbecb 100644
 --- a/block.c
 +++ b/block.c
-@@ -196,15 +196,6 @@ char *path_combine(const char *base_path, const char *filename)
-     return result;
+@@ -5018,6 +5018,32 @@ void bdrv_refresh_filename(BlockDriverState *bs)
+     }
  }
  
--static void path_combine_deprecated(char *dest, int dest_size,
--                                    const char *base_path,
--                                    const char *filename)
--{
--    char *combined = path_combine(base_path, filename);
--    pstrcpy(dest, dest_size, combined);
--    g_free(combined);
--}
--
++char *bdrv_dirname(BlockDriverState *bs, Error **errp)
++{
++    BlockDriver *drv = bs->drv;
++
++    if (!drv) {
++        error_setg(errp, "Node '%s' is ejected", bs->node_name);
++        return NULL;
++    }
++
++    if (drv->bdrv_dirname) {
++        return drv->bdrv_dirname(bs, errp);
++    }
++
++    if (bs->file) {
++        return bdrv_dirname(bs->file->bs, errp);
++    }
++
++    if (bs->exact_filename[0] != '\0') {
++        return path_combine(bs->exact_filename, "");
++    }
++
++    error_setg(errp, "Cannot generate a base directory for %s nodes",
++               drv->format_name);
++    return NULL;
++}
++
  /*
-  * Helper function for bdrv_parse_filename() implementations to remove optional
-  * protocol prefixes (especially "file:") from a filename and for putting the
-@@ -4067,7 +4058,6 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
- 
-     filename_full     = g_malloc(PATH_MAX);
-     backing_file_full = g_malloc(PATH_MAX);
--    filename_tmp      = g_malloc(PATH_MAX);
- 
-     is_protocol = path_has_protocol(backing_file);
- 
-@@ -4096,22 +4086,31 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
-         } else {
-             /* If not an absolute filename path, make it relative to the current
-              * image's filename path */
--            path_combine_deprecated(filename_tmp, PATH_MAX, curr_bs->filename,
--                                    backing_file);
-+            filename_tmp = bdrv_make_absolute_filename(curr_bs, backing_file,
-+                                                       NULL);
-+            if (!filename_tmp) {
-+                continue;
-+            }
- 
-             /* We are going to compare absolute pathnames */
-             if (!realpath(filename_tmp, filename_full)) {
-+                g_free(filename_tmp);
-                 continue;
-             }
-+            g_free(filename_tmp);
- 
-             /* We need to make sure the backing filename we are comparing against
-              * is relative to the current image filename (or absolute) */
--            path_combine_deprecated(filename_tmp, PATH_MAX, curr_bs->filename,
--                                    curr_bs->backing_file);
-+            filename_tmp = bdrv_get_full_backing_filename(curr_bs, NULL);
-+            if (!filename_tmp) {
-+                continue;
-+            }
- 
-             if (!realpath(filename_tmp, backing_file_full)) {
-+                g_free(filename_tmp);
-                 continue;
-             }
-+            g_free(filename_tmp);
- 
-             if (strcmp(backing_file_full, filename_full) == 0) {
-                 retval = curr_bs->backing->bs;
-@@ -4122,7 +4121,6 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
- 
-     g_free(filename_full);
-     g_free(backing_file_full);
--    g_free(filename_tmp);
-     return retval;
- }
- 
+  * Hot add/remove a BDS's child. So the user can take a child offline when
+  * it is broken and take a new child online
 -- 
 2.13.6
