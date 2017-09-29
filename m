@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dxzgy-00017J-7y
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 14:07:17 -0400
+	(envelope-from <teisenbe@google.com>) id 1dy1tY-000200-Ac
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:28:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dxzgt-0008Te-Ac
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 14:07:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41446)
+	(envelope-from <teisenbe@google.com>) id 1dy1tX-0007hp-4e
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:28:24 -0400
+Received: from mail-qt0-x236.google.com ([2607:f8b0:400d:c0d::236]:56764)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dxzgt-0008T7-4V
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 14:07:11 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dxzgq-0006Qm-T3
-	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 18:07:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D9C532E807B
-	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 18:07:08 +0000 (UTC)
+	(Exim 4.71) (envelope-from <teisenbe@google.com>) id 1dy1tW-0007h3-U9
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:28:23 -0400
+Received: by mail-qt0-x236.google.com with SMTP id l25so1034482qtf.13
+	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 13:28:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 29 Sep 2017 17:47:43 -0000
-From: Francis Ginther <francis.ginther@canonical.com>
-Reply-To: Bug 1006655 <1006655@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20120530234408.16043.24886.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150670726371.17422.6069611530548201500.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1006655] Re: Can't convert to vmdk with the
- streamOptimized subformat
+In-Reply-To: <20170929194329.GO21016@localhost.localdomain>
+References: <CAP26EVRNVb=Mq=O3s51w7fDhGVmf-e3XFFA73MRzc5b4qKBA4g@mail.gmail.com>
+	<20170929194329.GO21016@localhost.localdomain>
+From: Todd Eisenberger <teisenbe@google.com>
+Date: Fri, 29 Sep 2017 13:28:20 -0700
+Message-ID: <CAP26EVQoZPT5i-HJ=QhhNvkzQrMgAa+HM+u17g+J_y=Sr6mdig@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] x86: Correct translation of some rdgsbase
+ and wrgsbase encodings
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -36,40 +28,54 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 List-ID: <qemu-devel.nongnu.org>
 
-** Tags added: id-5880d8a1fc49f942b6e55443
+Ah, sorry for that trouble.  I'll look into setting up git-send-email next
+time I need to send a patch out.
 
--- =
+On Fri, Sep 29, 2017 at 12:43 PM, Eduardo Habkost <ehabkost@redhat.com>
+wrote:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1006655
-
-Title:
-  Can't convert to vmdk with the streamOptimized subformat
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu-kvm package in Ubuntu:
-  Invalid
-
-Bug description:
-  Hi all,
-  I'm trying to convert a qcow2 image file to the vmdk (on Ubuntu Server 12=
-.04):
-
-  # qemu-img convert -f qcow2 -O vmdk -o Stream spv-2912.qcow2 spv-2912-3.v=
-mdk -o subformat=3DstreamOptimized
-  VMDK: can't write to allocated cluster for streamOptimized
-  qemu-img: error while writing sector 65: Input/output error
-
-  Same result with any input format. Others subformats work but the
-  StreamOptimized is by far the most important one. The only workaround
-  I found is to migrate to raw and then to use VBoxManage (VirtualBox).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1006655/+subscriptions
+> On Thu, Sep 28, 2017 at 10:17:06AM -0700, Todd Eisenberger via Qemu-devel
+> wrote:
+> > It looks like there was a transcription error when writing this code
+> > initially.  The code previously only decoded src or dst of rax.  This
+> > resolves
+> > https://bugs.launchpad.net/qemu/+bug/1719984.
+> >
+> > Signed-off-by: Todd Eisenberger <teisenbe@google.com>
+> > ---
+> >  target/i386/translate.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/target/i386/translate.c b/target/i386/translate.c
+> > index a8986f4c1a..7b920115f9 100644
+> > --- a/target/i386/translate.c
+> > +++ b/target/i386/translate.c
+> > @@ -8155,9 +8155,9 @@ static target_ulong disas_insn(DisasContext *s,
+> > CPUState *cpu)
+>
+> The patch is corrupted due to line wrapping.  I recommend using
+> git-send-email to avoid that.
+>
+> I'm queueing it on x86-next after fixing it manually.
+>
+>
+> >              break;
+> >
+> >          case 0xc0 ... 0xc7: /* rdfsbase (f3 0f ae /0) */
+> > -        case 0xc8 ... 0xc8: /* rdgsbase (f3 0f ae /1) */
+> > +        case 0xc8 ... 0xcf: /* rdgsbase (f3 0f ae /1) */
+> >          case 0xd0 ... 0xd7: /* wrfsbase (f3 0f ae /2) */
+> > -        case 0xd8 ... 0xd8: /* wrgsbase (f3 0f ae /3) */
+> > +        case 0xd8 ... 0xdf: /* wrgsbase (f3 0f ae /3) */
+> >              if (CODE64(s)
+> >                  && (prefixes & PREFIX_REPZ)
+> >                  && !(prefixes & PREFIX_LOCK)
+> >
+>
+> --
+> Eduardo
+>
