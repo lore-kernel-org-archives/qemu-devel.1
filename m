@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1dxtBV-0002uT-TQ
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:10:25 -0400
+	(envelope-from <amarnath.valluri@intel.com>) id 1dxtBR-0002rw-Ui
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:10:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1dxtBU-00064V-5p
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:10:21 -0400
+	(envelope-from <amarnath.valluri@intel.com>) id 1dxtBP-00061K-Tw
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:10:17 -0400
 Received: from mga07.intel.com ([134.134.136.100]:42442)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
-	id 1dxtBT-0005tE-O4
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:10:20 -0400
+	id 1dxtBP-0005tE-FM
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:10:15 -0400
 From: Amarnath Valluri <amarnath.valluri@intel.com>
-Date: Fri, 29 Sep 2017 14:10:16 +0300
-Message-Id: <1506683421-27004-5-git-send-email-amarnath.valluri@intel.com>
+Date: Fri, 29 Sep 2017 14:10:14 +0300
+Message-Id: <1506683421-27004-3-git-send-email-amarnath.valluri@intel.com>
 In-Reply-To: <1506683421-27004-1-git-send-email-amarnath.valluri@intel.com>
 References: <1506683421-27004-1-git-send-email-amarnath.valluri@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v10 4/9] tpm-backend: Made few interface
- methods optional
+Subject: [Qemu-devel] [PATCH v10 2/9] tpm-backend: Move thread handling
+ inside TPMBackend
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -31,276 +31,409 @@ To: qemu-devel@nongnu.org
 Cc: stefanb@linux.vnet.ibm.com, marcandre.lureau@gmail.com, Amarnath Valluri <amarnath.valluri@intel.com>
 List-ID: <qemu-devel.nongnu.org>
 
-This allows backend implementations left optional interface methods.
-For mandatory methods assertion checks added.
+Move thread handling inside TPMBackend, this way backend implementations need
+not to maintain their own thread life cycle, instead they needs to implement
+'handle_request()' class method that always been called from a thread.
 
-Took the opportunity to remove unused methods:
- - tpm_backend_get_desc()
- - TPMDriverOps->handle_startup_error
+This change made tpm_backend_int.h kind of useless, hence removed it.
 
 Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
 Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Stefan Berger<stefanb@linux.vnet.ibm.com>
+Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 ---
- backends/tpm.c               | 39 ++++++++++++++++++++++++---------------
- hw/tpm/tpm_passthrough.c     | 36 +-----------------------------------
- include/sysemu/tpm_backend.h | 13 ++-----------
- tpm.c                        |  2 +-
- 4 files changed, 28 insertions(+), 62 deletions(-)
+ backends/tpm.c                   | 62 +++++++++++++++++++++++++---------------
+ hw/tpm/tpm_passthrough.c         | 58 ++++++-------------------------------
+ include/sysemu/tpm_backend.h     | 32 +++++++++++++--------
+ include/sysemu/tpm_backend_int.h | 41 --------------------------
+ 4 files changed, 67 insertions(+), 126 deletions(-)
+ delete mode 100644 include/sysemu/tpm_backend_int.h
 
 diff --git a/backends/tpm.c b/backends/tpm.c
-index cf5abf1..8911597 100644
+index 536f262..ce56c3b 100644
 --- a/backends/tpm.c
 +++ b/backends/tpm.c
-@@ -44,13 +44,6 @@ enum TpmType tpm_backend_get_type(TPMBackend *s)
-     return k->ops->type;
+@@ -18,7 +18,24 @@
+ #include "qapi/qmp/qerror.h"
+ #include "sysemu/tpm.h"
+ #include "qemu/thread.h"
+-#include "sysemu/tpm_backend_int.h"
++
++static void tpm_backend_worker_thread(gpointer data, gpointer user_data)
++{
++    TPMBackend *s = TPM_BACKEND(user_data);
++    TPMBackendClass *k  = TPM_BACKEND_GET_CLASS(s);
++
++    assert(k->handle_request != NULL);
++    k->handle_request(s, (TPMBackendCmd)data);
++}
++
++static void tpm_backend_thread_end(TPMBackend *s)
++{
++    if (s->thread_pool) {
++        g_thread_pool_push(s->thread_pool, (gpointer)TPM_BACKEND_CMD_END, NULL);
++        g_thread_pool_free(s->thread_pool, FALSE, TRUE);
++        s->thread_pool = NULL;
++    }
++}
+ 
+ enum TpmType tpm_backend_get_type(TPMBackend *s)
+ {
+@@ -39,6 +56,8 @@ void tpm_backend_destroy(TPMBackend *s)
+     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
+ 
+     k->ops->destroy(s);
++
++    tpm_backend_thread_end(s);
  }
  
--const char *tpm_backend_get_desc(TPMBackend *s)
--{
--    TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
--
--    return k->ops->desc();
--}
--
  int tpm_backend_init(TPMBackend *s, TPMState *state,
-                      TPMRecvDataCB *datacb)
+@@ -46,13 +65,23 @@ int tpm_backend_init(TPMBackend *s, TPMState *state,
  {
-@@ -58,12 +51,14 @@ int tpm_backend_init(TPMBackend *s, TPMState *state,
+     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
  
-     s->tpm_state = state;
-     s->recv_data_callback = datacb;
-+    s->had_startup_error = false;
- 
--    return k->ops->init(s);
-+    return k->ops->init ? k->ops->init(s) : 0;
+-    return k->ops->init(s, state, datacb);
++    s->tpm_state = state;
++    s->recv_data_callback = datacb;
++
++    return k->ops->init(s);
  }
  
  int tpm_backend_startup_tpm(TPMBackend *s)
  {
-+    int res = 0;
      TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
  
-     /* terminate a running TPM */
-@@ -73,20 +68,24 @@ int tpm_backend_startup_tpm(TPMBackend *s)
-                                        NULL);
-     g_thread_pool_push(s->thread_pool, (gpointer)TPM_BACKEND_CMD_INIT, NULL);
- 
--    return k->ops->startup_tpm(s);
-+    res = k->ops->startup_tpm ? k->ops->startup_tpm(s) : 0;
++    /* terminate a running TPM */
++    tpm_backend_thread_end(s);
 +
-+    s->had_startup_error = (res != 0);
++    s->thread_pool = g_thread_pool_new(tpm_backend_worker_thread, s, 1, TRUE,
++                                       NULL);
++    g_thread_pool_push(s->thread_pool, (gpointer)TPM_BACKEND_CMD_INIT, NULL);
 +
-+    return res;
+     return k->ops->startup_tpm(s);
  }
  
- bool tpm_backend_had_startup_error(TPMBackend *s)
+@@ -72,9 +101,8 @@ size_t tpm_backend_realloc_buffer(TPMBackend *s, TPMSizedBuffer *sb)
+ 
+ void tpm_backend_deliver_request(TPMBackend *s)
  {
 -    TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
 -
--    return k->ops->had_startup_error(s);
-+    return s->had_startup_error;
+-    k->ops->deliver_request(s);
++    g_thread_pool_push(s->thread_pool, (gpointer)TPM_BACKEND_CMD_PROCESS_CMD,
++                       NULL);
  }
  
- size_t tpm_backend_realloc_buffer(TPMBackend *s, TPMSizedBuffer *sb)
- {
+ void tpm_backend_reset(TPMBackend *s)
+@@ -82,6 +110,8 @@ void tpm_backend_reset(TPMBackend *s)
      TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
  
-+    assert(k->ops->realloc_buffer);
+     k->ops->reset(s);
 +
-     return k->ops->realloc_buffer(sb);
- }
- 
-@@ -100,15 +99,21 @@ void tpm_backend_reset(TPMBackend *s)
- {
-     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
- 
--    k->ops->reset(s);
-+    if (k->ops->reset) {
-+        k->ops->reset(s);
-+    }
- 
-     tpm_backend_thread_end(s);
-+
-+    s->had_startup_error = false;
++    tpm_backend_thread_end(s);
  }
  
  void tpm_backend_cancel_cmd(TPMBackend *s)
- {
-     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
+@@ -156,29 +186,14 @@ static void tpm_backend_instance_init(Object *obj)
+                              tpm_backend_prop_get_opened,
+                              tpm_backend_prop_set_opened,
+                              NULL);
+-}
  
-+    assert(k->ops->cancel_cmd);
-+
-     k->ops->cancel_cmd(s);
+-void tpm_backend_thread_deliver_request(TPMBackendThread *tbt)
+-{
+-   g_thread_pool_push(tbt->pool, (gpointer)TPM_BACKEND_CMD_PROCESS_CMD, NULL);
  }
  
-@@ -116,20 +121,24 @@ bool tpm_backend_get_tpm_established_flag(TPMBackend *s)
+-void tpm_backend_thread_create(TPMBackendThread *tbt,
+-                               GFunc func, gpointer user_data)
++static void tpm_backend_instance_finalize(Object *obj)
  {
-     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
+-    if (!tbt->pool) {
+-        tbt->pool = g_thread_pool_new(func, user_data, 1, TRUE, NULL);
+-        g_thread_pool_push(tbt->pool, (gpointer)TPM_BACKEND_CMD_INIT, NULL);
+-    }
+-}
++    TPMBackend *s = TPM_BACKEND(obj);
  
--    return k->ops->get_tpm_established_flag(s);
-+    return k->ops->get_tpm_established_flag ?
-+           k->ops->get_tpm_established_flag(s) : false;
+-void tpm_backend_thread_end(TPMBackendThread *tbt)
+-{
+-    if (tbt->pool) {
+-        g_thread_pool_push(tbt->pool, (gpointer)TPM_BACKEND_CMD_END, NULL);
+-        g_thread_pool_free(tbt->pool, FALSE, TRUE);
+-        tbt->pool = NULL;
+-    }
++    tpm_backend_thread_end(s);
  }
  
- int tpm_backend_reset_tpm_established_flag(TPMBackend *s, uint8_t locty)
- {
-     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
- 
--    return k->ops->reset_tpm_established_flag(s, locty);
-+    return k->ops->reset_tpm_established_flag ?
-+           k->ops->reset_tpm_established_flag(s, locty) : 0;
- }
- 
- TPMVersion tpm_backend_get_tpm_version(TPMBackend *s)
- {
-     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
- 
-+    assert(k->ops->get_tpm_version);
-+
-     return k->ops->get_tpm_version(s);
- }
- 
+ static const TypeInfo tpm_backend_info = {
+@@ -186,6 +201,7 @@ static const TypeInfo tpm_backend_info = {
+     .parent = TYPE_OBJECT,
+     .instance_size = sizeof(TPMBackend),
+     .instance_init = tpm_backend_instance_init,
++    .instance_finalize = tpm_backend_instance_finalize,
+     .class_size = sizeof(TPMBackendClass),
+     .abstract = true,
+ };
 diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-index 815a72e..4c21e52 100644
+index a0baf5f..f50d9cf 100644
 --- a/hw/tpm/tpm_passthrough.c
 +++ b/hw/tpm/tpm_passthrough.c
-@@ -54,7 +54,6 @@ struct TPMPassthruState {
-     bool tpm_executing;
-     bool tpm_op_canceled;
-     int cancel_fd;
--    bool had_startup_error;
+@@ -30,7 +30,6 @@
+ #include "tpm_int.h"
+ #include "hw/hw.h"
+ #include "hw/i386/pc.h"
+-#include "sysemu/tpm_backend_int.h"
+ #include "tpm_tis.h"
+ #include "tpm_util.h"
  
-     TPMVersion tpm_version;
- };
-@@ -227,29 +226,11 @@ static void tpm_passthrough_handle_request(TPMBackend *tb, TPMBackendCmd cmd)
-     }
+@@ -47,20 +46,9 @@
+     OBJECT_CHECK(TPMPassthruState, (obj), TYPE_TPM_PASSTHROUGH)
+ 
+ /* data structures */
+-typedef struct TPMPassthruThreadParams {
+-    TPMState *tpm_state;
+-
+-    TPMRecvDataCB *recv_data_callback;
+-    TPMBackend *tb;
+-} TPMPassthruThreadParams;
+-
+ struct TPMPassthruState {
+     TPMBackend parent;
+ 
+-    TPMBackendThread tbt;
+-
+-    TPMPassthruThreadParams tpm_thread_params;
+-
+     char *tpm_dev;
+     int tpm_fd;
+     bool tpm_executing;
+@@ -214,12 +202,9 @@ static int tpm_passthrough_unix_transfer(TPMPassthruState *tpm_pt,
+                                         selftest_done);
  }
  
--/*
-- * Start the TPM (thread). If it had been started before, then terminate
-- * and start it again.
-- */
--static int tpm_passthrough_startup_tpm(TPMBackend *tb)
--{
--    return 0;
--}
--
- static void tpm_passthrough_reset(TPMBackend *tb)
+-static void tpm_passthrough_worker_thread(gpointer data,
+-                                          gpointer user_data)
++static void tpm_passthrough_handle_request(TPMBackend *tb, TPMBackendCmd cmd)
+ {
+-    TPMPassthruThreadParams *thr_parms = user_data;
+-    TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(thr_parms->tb);
+-    TPMBackendCmd cmd = (TPMBackendCmd)data;
++    TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
+     bool selftest_done = false;
+ 
+     DPRINTF("tpm_passthrough: processing command type %d\n", cmd);
+@@ -227,12 +212,12 @@ static void tpm_passthrough_worker_thread(gpointer data,
+     switch (cmd) {
+     case TPM_BACKEND_CMD_PROCESS_CMD:
+         tpm_passthrough_unix_transfer(tpm_pt,
+-                                      thr_parms->tpm_state->locty_data,
++                                      tb->tpm_state->locty_data,
+                                       &selftest_done);
+ 
+-        thr_parms->recv_data_callback(thr_parms->tpm_state,
+-                                      thr_parms->tpm_state->locty_number,
+-                                      selftest_done);
++        tb->recv_data_callback(tb->tpm_state,
++                               tb->tpm_state->locty_number,
++                               selftest_done);
+         break;
+     case TPM_BACKEND_CMD_INIT:
+     case TPM_BACKEND_CMD_END:
+@@ -248,15 +233,6 @@ static void tpm_passthrough_worker_thread(gpointer data,
+  */
+ static int tpm_passthrough_startup_tpm(TPMBackend *tb)
  {
 -    TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
 -
-     DPRINTF("tpm_passthrough: CALL TO TPM_RESET!\n");
- 
-     tpm_passthrough_cancel_cmd(tb);
+-    /* terminate a running TPM */
+-    tpm_backend_thread_end(&tpm_pt->tbt);
 -
--    tpm_pt->had_startup_error = false;
--}
+-    tpm_backend_thread_create(&tpm_pt->tbt,
+-                              tpm_passthrough_worker_thread,
+-                              &tpm_pt->tpm_thread_params);
 -
--static int tpm_passthrough_init(TPMBackend *tb)
--{
--    return 0;
- }
- 
- static bool tpm_passthrough_get_tpm_established_flag(TPMBackend *tb)
-@@ -264,13 +245,6 @@ static int tpm_passthrough_reset_tpm_established_flag(TPMBackend *tb,
      return 0;
  }
  
--static bool tpm_passthrough_get_startup_error(TPMBackend *tb)
+@@ -268,20 +244,11 @@ static void tpm_passthrough_reset(TPMBackend *tb)
+ 
+     tpm_passthrough_cancel_cmd(tb);
+ 
+-    tpm_backend_thread_end(&tpm_pt->tbt);
+-
+     tpm_pt->had_startup_error = false;
+ }
+ 
+-static int tpm_passthrough_init(TPMBackend *tb, TPMState *s,
+-                                TPMRecvDataCB *recv_data_cb)
++static int tpm_passthrough_init(TPMBackend *tb)
+ {
+-    TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
+-
+-    tpm_pt->tpm_thread_params.tpm_state = s;
+-    tpm_pt->tpm_thread_params.recv_data_callback = recv_data_cb;
+-    tpm_pt->tpm_thread_params.tb = tb;
+-
+     return 0;
+ }
+ 
+@@ -315,13 +282,6 @@ static size_t tpm_passthrough_realloc_buffer(TPMSizedBuffer *sb)
+     return sb->size;
+ }
+ 
+-static void tpm_passthrough_deliver_request(TPMBackend *tb)
 -{
 -    TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
 -
--    return tpm_pt->had_startup_error;
+-    tpm_backend_thread_deliver_request(&tpm_pt->tbt);
 -}
 -
- static size_t tpm_passthrough_realloc_buffer(TPMSizedBuffer *sb)
- {
-     size_t wanted_size = 4096; /* Linux tpm.c buffer size */
-@@ -309,11 +283,6 @@ static void tpm_passthrough_cancel_cmd(TPMBackend *tb)
-     }
- }
- 
--static const char *tpm_passthrough_create_desc(void)
--{
--    return "Passthrough TPM backend driver";
--}
--
- static TPMVersion tpm_passthrough_get_tpm_version(TPMBackend *tb)
+ static void tpm_passthrough_cancel_cmd(TPMBackend *tb)
  {
      TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
-@@ -453,13 +422,10 @@ static const QemuOptDesc tpm_passthrough_cmdline_opts[] = {
- static const TPMDriverOps tpm_passthrough_driver = {
-     .type                     = TPM_TYPE_PASSTHROUGH,
-     .opts                     = tpm_passthrough_cmdline_opts,
--    .desc                     = tpm_passthrough_create_desc,
-+    .desc                     = "Passthrough TPM backend driver",
-     .create                   = tpm_passthrough_create,
--    .init                     = tpm_passthrough_init,
--    .startup_tpm              = tpm_passthrough_startup_tpm,
+@@ -483,8 +443,6 @@ static void tpm_passthrough_destroy(TPMBackend *tb)
+ 
+     tpm_passthrough_cancel_cmd(tb);
+ 
+-    tpm_backend_thread_end(&tpm_pt->tbt);
+-
+     qemu_close(tpm_pt->tpm_fd);
+     qemu_close(tpm_pt->cancel_fd);
+ 
+@@ -520,7 +478,6 @@ static const TPMDriverOps tpm_passthrough_driver = {
      .realloc_buffer           = tpm_passthrough_realloc_buffer,
      .reset                    = tpm_passthrough_reset,
--    .had_startup_error        = tpm_passthrough_get_startup_error,
+     .had_startup_error        = tpm_passthrough_get_startup_error,
+-    .deliver_request          = tpm_passthrough_deliver_request,
      .cancel_cmd               = tpm_passthrough_cancel_cmd,
      .get_tpm_established_flag = tpm_passthrough_get_tpm_established_flag,
      .reset_tpm_established_flag = tpm_passthrough_reset_tpm_established_flag,
+@@ -540,6 +497,7 @@ static void tpm_passthrough_class_init(ObjectClass *klass, void *data)
+     TPMBackendClass *tbc = TPM_BACKEND_CLASS(klass);
+ 
+     tbc->ops = &tpm_passthrough_driver;
++    tbc->handle_request = tpm_passthrough_handle_request;
+ }
+ 
+ static const TypeInfo tpm_passthrough_info = {
 diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
-index 202ec8d..9ea7072 100644
+index 3708413..58308b3 100644
 --- a/include/sysemu/tpm_backend.h
 +++ b/include/sysemu/tpm_backend.h
-@@ -47,6 +47,7 @@ struct TPMBackend {
-     TPMState *tpm_state;
-     GThreadPool *thread_pool;
-     TPMRecvDataCB *recv_data_callback;
-+    bool had_startup_error;
+@@ -29,22 +29,24 @@
+ 
+ typedef struct TPMBackendClass TPMBackendClass;
+ typedef struct TPMBackend TPMBackend;
+-
+ typedef struct TPMDriverOps TPMDriverOps;
++typedef void (TPMRecvDataCB)(TPMState *, uint8_t locty, bool selftest_done);
+ 
+-struct TPMBackendClass {
+-    ObjectClass parent_class;
+-
+-    const TPMDriverOps *ops;
+-
+-    void (*opened)(TPMBackend *s, Error **errp);
+-};
++typedef enum TPMBackendCmd {
++    TPM_BACKEND_CMD_INIT = 1,
++    TPM_BACKEND_CMD_PROCESS_CMD,
++    TPM_BACKEND_CMD_END,
++    TPM_BACKEND_CMD_TPM_RESET,
++} TPMBackendCmd;
+ 
+ struct TPMBackend {
+     Object parent;
+ 
+     /*< protected >*/
+     bool opened;
++    TPMState *tpm_state;
++    GThreadPool *thread_pool;
++    TPMRecvDataCB *recv_data_callback;
  
      char *id;
      enum TpmModel fe_model;
-@@ -75,7 +76,7 @@ struct TPMDriverOps {
-     enum TpmType type;
-     const QemuOptDesc *opts;
-     /* get a descriptive text of the backend to display to the user */
--    const char *(*desc)(void);
-+    const char *desc;
+@@ -54,7 +56,15 @@ struct TPMBackend {
+     QLIST_ENTRY(TPMBackend) list;
+ };
  
-     TPMBackend *(*create)(QemuOpts *opts, const char *id);
+-typedef void (TPMRecvDataCB)(TPMState *, uint8_t locty, bool selftest_done);
++struct TPMBackendClass {
++    ObjectClass parent_class;
++
++    const TPMDriverOps *ops;
++
++    void (*opened)(TPMBackend *s, Error **errp);
++
++    void (*handle_request)(TPMBackend *s, TPMBackendCmd cmd);
++};
  
-@@ -83,8 +84,6 @@ struct TPMDriverOps {
-     int (*init)(TPMBackend *t);
+ typedef struct TPMSizedBuffer {
+     uint32_t size;
+@@ -71,7 +81,7 @@ struct TPMDriverOps {
+     void (*destroy)(TPMBackend *t);
+ 
+     /* initialize the backend */
+-    int (*init)(TPMBackend *t, TPMState *s, TPMRecvDataCB *datacb);
++    int (*init)(TPMBackend *t);
      /* start up the TPM on the backend */
      int (*startup_tpm)(TPMBackend *t);
--    /* returns true if nothing will ever answer TPM requests */
--    bool (*had_startup_error)(TPMBackend *t);
+     /* returns true if nothing will ever answer TPM requests */
+@@ -79,8 +89,6 @@ struct TPMDriverOps {
  
      size_t (*realloc_buffer)(TPMSizedBuffer *sb);
  
-@@ -109,14 +108,6 @@ struct TPMDriverOps {
- enum TpmType tpm_backend_get_type(TPMBackend *s);
- 
- /**
-- * tpm_backend_get_desc:
-- * @s: the backend
-- *
-- * Returns a human readable description of the backend.
-- */
--const char *tpm_backend_get_desc(TPMBackend *s);
+-    void (*deliver_request)(TPMBackend *t);
 -
--/**
-  * tpm_backend_init:
-  * @s: the backend to initialized
-  * @state: TPMState
-diff --git a/tpm.c b/tpm.c
-index b19b1a3..db14849 100644
---- a/tpm.c
-+++ b/tpm.c
-@@ -62,7 +62,7 @@ static void tpm_display_backend_drivers(void)
-             continue;
-         }
-         fprintf(stderr, "%12s   %s\n",
--                TpmType_str(i), be_drivers[i]->desc());
-+                TpmType_str(i), be_drivers[i]->desc);
-     }
-     fprintf(stderr, "\n");
- }
+     void (*reset)(TPMBackend *t);
+ 
+     void (*cancel_cmd)(TPMBackend *t);
+diff --git a/include/sysemu/tpm_backend_int.h b/include/sysemu/tpm_backend_int.h
+deleted file mode 100644
+index 00639dd..0000000
+--- a/include/sysemu/tpm_backend_int.h
++++ /dev/null
+@@ -1,41 +0,0 @@
+-/*
+- *  common TPM backend driver functions
+- *
+- *  Copyright (c) 2012-2013 IBM Corporation
+- *  Authors:
+- *    Stefan Berger <stefanb@us.ibm.com>
+- *
+- * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Lesser General Public
+- * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
+- *
+- * This library is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Lesser General Public License for more details.
+- *
+- * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, see <http://www.gnu.org/licenses/>
+- */
+-
+-#ifndef TPM_BACKEND_INT_H
+-#define TPM_BACKEND_INT_H
+-
+-typedef struct TPMBackendThread {
+-    GThreadPool *pool;
+-} TPMBackendThread;
+-
+-void tpm_backend_thread_deliver_request(TPMBackendThread *tbt);
+-void tpm_backend_thread_create(TPMBackendThread *tbt,
+-                               GFunc func, gpointer user_data);
+-void tpm_backend_thread_end(TPMBackendThread *tbt);
+-
+-typedef enum TPMBackendCmd {
+-    TPM_BACKEND_CMD_INIT = 1,
+-    TPM_BACKEND_CMD_PROCESS_CMD,
+-    TPM_BACKEND_CMD_END,
+-    TPM_BACKEND_CMD_TPM_RESET,
+-} TPMBackendCmd;
+-
+-#endif /* TPM_BACKEND_INT_H */
 -- 
 2.7.4
