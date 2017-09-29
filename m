@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dy1Hx-0000xf-4R
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:49:34 -0400
+	(envelope-from <eblake@redhat.com>) id 1dy1VJ-00067o-Up
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:03:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dy1Hw-0007Ah-6U
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:49:33 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:52716)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dy1Hv-0007AF-VE
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:49:32 -0400
-Received: by mail-wm0-x230.google.com with SMTP id m127so1377577wmm.1
-	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 12:49:30 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1dy1VI-0005Bw-NU
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:03:21 -0400
+References: <20170913160333.23622-1-eblake@redhat.com>
+	<20170913160333.23622-4-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <86c281c3-7630-b6f3-27d7-ef778f75e798@redhat.com>
+Date: Fri, 29 Sep 2017 15:03:03 -0500
 MIME-Version: 1.0
-In-Reply-To: <46ce7f3c-f0cb-bdfe-25fc-984276601f7d@vivier.eu>
-References: <1506703816-7359-1-git-send-email-zhuoweizhang@yahoo.com>
-	<46ce7f3c-f0cb-bdfe-25fc-984276601f7d@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 29 Sep 2017 12:49:08 -0700
-Message-ID: <CAFEAcA_wfyAweXnaz1eNZ6r0GvhFUoeRqk8vUUaV_wTEBNWu0g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] syscall: fix special case of write(fd, NULL,
- 0)
+In-Reply-To: <20170913160333.23622-4-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="TMnlPxMSopGc41xveaoVUNKB2jPBFBLbv"
+Subject: Re: [Qemu-devel] [PATCH v4 03/23] block: Make
+ bdrv_round_to_clusters() signature more useful
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -30,64 +24,95 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: zhuoweizhang@yahoo.com, QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
 List-ID: <qemu-devel.nongnu.org>
 
-On 29 September 2017 at 12:14, Laurent Vivier <laurent@vivier.eu> wrote:
-> Le 29/09/2017 =C3=A0 18:50, zhuoweizhang@yahoo.com a =C3=A9crit :
->> From: Zhuowei Zhang <zhuoweizhang@yahoo.com>
->>
->> Linux returns success for the special case of calling write with a zero-=
-length
->> NULL buffer: compiling and running
->>
->> ```
->>
->> int main() {
->>    ssize_t ret =3D write(STDOUT_FILENO, NULL, 0);
->>    fprintf(stderr, "write returned %ld\n", ret);
->>    return 0;
->> }
->> ```
->> gives "write returned 0" when run directly, but "write returned -1" in Q=
-EMU.
->>
->> This commit checks for this situation and returns success if found.
->>
->> Signed-off-by: Zhuowei Zhang <zhuoweizhang@yahoo.com>
->> ---
->>  linux-user/syscall.c | 5 +++++
->>  1 file changed, 5 insertions(+)
->>
->> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->> index 9b6364a..ecadf49 100644
->> --- a/linux-user/syscall.c
->> +++ b/linux-user/syscall.c
->> @@ -7783,6 +7783,11 @@ abi_long do_syscall(void *cpu_env, int num, abi_l=
-ong arg1,
->>          }
->>          break;
->>      case TARGET_NR_write:
->> +        if (arg2 =3D=3D 0 && arg3 =3D=3D 0) {
->> +            /* special case: write(fd, NULL, 0) returns success. */
->> +            ret =3D 0;
->> +            break;
->> +        }
->>          if (!(p =3D lock_user(VERIFY_READ, arg2, arg3, 1)))
->>              goto efault;
->>          if (fd_trans_target_to_host_data(arg1)) {
->>
->
-> I think we should keep the call to the kernel write() as the behavior
-> depends on the driver behind the syscall. Moreover, calling write() with
-> (NULL, 0) can triggers "something" at kernel level.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--TMnlPxMSopGc41xveaoVUNKB2jPBFBLbv
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org,
+ Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
+Message-ID: <86c281c3-7630-b6f3-27d7-ef778f75e798@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 03/23] block: Make
+ bdrv_round_to_clusters() signature more useful
+References: <20170913160333.23622-1-eblake@redhat.com>
+ <20170913160333.23622-4-eblake@redhat.com>
+In-Reply-To: <20170913160333.23622-4-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I tend to agree. On the other hand our handling of NR_read
-with a zero count just returns 0 without calling the syscall;
-perhaps we should change that for consistency?
+On 09/13/2017 11:03 AM, Eric Blake wrote:
+> In the process of converting sector-based interfaces to bytes,
+> I'm finding it easier to represent a byte count as a 64-bit
+> integer at the block layer (even if we are internally capped
+> by SIZE_MAX or even INT_MAX for individual transactions, it's
+> still nicer to not have to worry about truncation/overflow
+> issues on as many variables).  Update the signature of
+> bdrv_round_to_clusters() to uniformly use int64_t, matching
+> the signature already chosen for bdrv_is_allocated and the
+> fact that off_t is also a signed type, then adjust clients
+> according to the required fallout.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
+>=20
 
-Do we also have the same issue with pread64/pwrite64 ?
+> @@ -946,7 +946,7 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(Bd=
+rvChild *child,
+>      struct iovec iov;
+>      QEMUIOVector bounce_qiov;
+>      int64_t cluster_offset;
+> -    unsigned int cluster_bytes;
+> +    int64_t cluster_bytes;
+>      size_t skip_bytes;
+>      int ret;
 
-thanks
--- PMM
+Here, 'bytes' is still unsigned int, and I widened cluster_bytes,
+
+> +++ b/block/trace-events
+> @@ -12,7 +12,7 @@ blk_co_pwritev(void *blk, void *bs, int64_t offset, u=
+nsigned int bytes, int flag
+>  bdrv_co_preadv(void *bs, int64_t offset, int64_t nbytes, unsigned int =
+flags) "bs %p offset %"PRId64" nbytes %"PRId64" flags 0x%x"
+>  bdrv_co_pwritev(void *bs, int64_t offset, int64_t nbytes, unsigned int=
+ flags) "bs %p offset %"PRId64" nbytes %"PRId64" flags 0x%x"
+>  bdrv_co_pwrite_zeroes(void *bs, int64_t offset, int count, int flags) =
+"bs %p offset %"PRId64" count %d flags 0x%x"
+> -bdrv_co_do_copy_on_readv(void *bs, int64_t offset, unsigned int bytes,=
+ int64_t cluster_offset, unsigned int cluster_bytes) "bs %p offset %"PRId=
+64" bytes %u cluster_offset %"PRId64" cluster_bytes %u"
+> +bdrv_co_do_copy_on_readv(void *bs, int64_t offset, int64_t bytes, int6=
+4_t cluster_offset, unsigned int cluster_bytes) "bs %p offset %"PRId64" b=
+ytes %"PRId64" cluster_offset %"PRId64" cluster_bytes %u"
+
+but I botched which variable got widened in the trace.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--TMnlPxMSopGc41xveaoVUNKB2jPBFBLbv
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnOpvgACgkQp6FrSiUn
+Q2pMuAgAnN0gefXPA5rQJ/dur49K+mnUlNRdTx4FuAKaeuUBiHUGM0mkRYsJMGXJ
+8sOOqYPlK1PH3YCp2JMlF31WhPTj4IVyTn6iVLhVlhTB57i5Ez5h7RSN6GZdWsDc
+RxgyC2uCF4gC1MOvikco/LP+k2aJ/Y95yLdJxAicBrJB9FhfjvHWj1kKI8T7aCSS
+j9+rX0xyQyY6twQAP8raiNIEOIUCexbODqW3ISankla6XEjI5oQG8AwlAUQb6WWY
+JEIZlWDokWxBjPN/2EiGCzPzh4ANFlJruRCAwXZH2MDUj03wQQcdFhyQA5ocgUgY
+wkeJoKos9LioPst8394+gY9EgqOOCA==
+=j/Hq
+-----END PGP SIGNATURE-----
+
+--TMnlPxMSopGc41xveaoVUNKB2jPBFBLbv--
