@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dxtSA-0000jT-CE
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:27:35 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dxtnh-0007n3-0W
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:49:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dxtS4-0006M3-FV
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:27:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39220)
+	(envelope-from <cohuck@redhat.com>) id 1dxtnd-0000Zc-4g
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:49:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46418)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dxtS4-0006KC-5v
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:27:28 -0400
-Date: Fri, 29 Sep 2017 13:27:17 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dxtnc-0000Yr-Ul
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:49:45 -0400
+Date: Fri, 29 Sep 2017 13:49:38 +0200
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170929132717.23ecf350.cohuck@redhat.com>
-In-Reply-To: <3d5ea6d8-b3bf-b1a5-b4a1-082ff49ae842@redhat.com>
+Message-ID: <20170929134938.18fae231.cohuck@redhat.com>
+In-Reply-To: <20170927170027.8539-1-david@redhat.com>
 References: <20170927170027.8539-1-david@redhat.com>
-	<20170927170027.8539-3-david@redhat.com>
-	<466fa6a0-ac91-66aa-aabb-a15a8ac62e0f@redhat.com>
-	<3d5ea6d8-b3bf-b1a5-b4a1-082ff49ae842@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 2/3] s390x/tcg: low-address protection
- support
+Subject: Re: [Qemu-devel] [PATCH RFC 0/3] s390x/tcg: LAP support using
+ immediate TLB invalidation
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -30,69 +27,52 @@ List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
 To: David Hildenbrand <david@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, thuth@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <richard.henderson@linaro.org>
 List-ID: <qemu-devel.nongnu.org>
 
-On Thu, 28 Sep 2017 15:08:11 +0200
+On Wed, 27 Sep 2017 19:00:24 +0200
 David Hildenbrand <david@redhat.com> wrote:
 
-> On 28.09.2017 06:50, Thomas Huth wrote:
-> > On 27.09.2017 19:00, David Hildenbrand wrote:  
-> >> This is a neat way to implement low address protection, whereby
-> >> only the first 512 bytes of the first two pages (each 4096 bytes) of
-> >> every address space are protected.
-> >>
-> >> Store a tec of 0 for the access exception, this is what is defined by
-> >> Enhanced Suppression on Protection in case of a low address protection
-> >> (Bit 61 set to 0, rest undefined).
-> >>
-> >> We have to make sure to to pass the access address, not the masked page
-> >> address into mmu_translate*().
-> >>
-> >> Drop the check from testblock. So we can properly test this via
-> >> kvm-unit-tests.
-> >>
-> >> This will check every access going through one of the MMUs.
-> >>
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> ---
-> >>  target/s390x/excp_helper.c |  3 +-
-> >>  target/s390x/mem_helper.c  |  8 ----
-> >>  target/s390x/mmu_helper.c  | 96 +++++++++++++++++++++++++++++-----------------
-> >>  3 files changed, 62 insertions(+), 45 deletions(-)  
-> > [...]  
-> >> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-> >> index 9daa0fd8e2..44a15449d2 100644
-> >> --- a/target/s390x/mmu_helper.c
-> >> +++ b/target/s390x/mmu_helper.c
-> >> @@ -106,6 +106,37 @@ static void trigger_page_fault(CPUS390XState *env, target_ulong vaddr,
-> >>      trigger_access_exception(env, type, ilen, tec);
-> >>  }
-> >>  
-> >> +/* check whether the address would be proteted by Low-Address Protection */
-> >> +static bool is_low_address(uint64_t addr)
-> >> +{
-> >> +    return addr < 512 || (addr >= 4096 && addr < 4607);
-> >> +}  
-> > 
-> > I like the check from the kernel sources better:
-> > 
-> > static inline int is_low_address(unsigned long ga)
-> > {
-> >     /* Check for address ranges 0..511 and 4096..4607 */
-> >     return (ga & ~0x11fful) == 0;
-> > }
-> > 
-> > ... that might result in slightly faster code (depending on the
-> > compiler, of course).  
+> Details about Low-Address Protection can be found in description of
+> patch 1 and 2. It is basically a subpage protection of the first two
+> pages of every address space (for which it is enabled).
 > 
-> I think that lim (readability) -> 0. Without that comment you're at
-> first sight really clueless what this is about.
+> We can achieve this by simply directly invalidating the TLB entry and
+> therefore forcing every write accesses onto these two pages into the slow
+> path.
 > 
-> My check exactly corresponds to the wording in the PoP (and smart
-> compilers should be able to optimize).
+> With this patch, I can boot Linux just fine (which uses LAP). This also
+> makes all related kvm-unit-tests that we have pass.
 > 
-> But I don't have a strong opinion on this micro optimization.
+> The checks are working that good, that I discovered a STFL bug. STFL
+> stores into the low addresses but low-address protection does explicitly
+> not apply. The Linux kernel calls STFL while LAP is active. So without
+> patch nr 3, booting Linux will fail. (this change is also part of a patch
+> of my SMP series).
 
-FWIW, I'd be happy with both, but has anyone actually looked at the
-generated code?
+I fear I have lost track a bit with all those patches floating around.
+IIUC, patch 3 fixes a real bug that is only exposed by your LAP
+changes. It used to be part of the stfl changes in v1 of your smp
+series but is no longer in v2. So, is this a patch that can be applied
+to current s390-next?
+
+> 
+> Based on: https://github.com/cohuck/qemu.git s390-next
+> Available on: https://github.com/dhildenb/qemu.git s390x_lap
+> 
+> 
+> David Hildenbrand (3):
+>   accel/tcg: allow to invalidate a write TLB entry immediately
+>   s390x/tcg: low-address protection support
+>   s390x/tcg: make STFL store into the lowcore
+> 
+>  accel/tcg/cputlb.c           |  5 ++-
+>  accel/tcg/softmmu_template.h |  4 +-
+>  include/exec/cpu-all.h       |  3 ++
+>  target/s390x/excp_helper.c   |  3 +-
+>  target/s390x/helper.h        |  2 +-
+>  target/s390x/mem_helper.c    |  8 ----
+>  target/s390x/misc_helper.c   |  7 +++-
+>  target/s390x/mmu_helper.c    | 96 ++++++++++++++++++++++++++++----------------
+>  8 files changed, 78 insertions(+), 50 deletions(-)
+> 
