@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dy1G3-0008MX-F6
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:47:36 -0400
+	(envelope-from <Richard.Relph@amd.com>) id 1dy1HL-0000bn-71
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:48:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dy1G2-0006VF-Qd
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:47:35 -0400
-Date: Fri, 29 Sep 2017 16:47:14 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170929194714.GP21016@localhost.localdomain>
-References: <20170917232842.14544-1-f4bug@amsat.org>
+	(envelope-from <Richard.Relph@amd.com>) id 1dy1HH-0006z5-8D
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:48:55 -0400
+Received: from mail-by2nam01on0044.outbound.protection.outlook.com
+	([104.47.34.44]:40909
+	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Richard.Relph@amd.com>)
+	id 1dy1HG-0006yb-U4
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 15:48:51 -0400
+References: <69fd8746-b2bd-31d0-4d70-792f40ef2d79@amd.com>
+	<20170926170901-mutt-send-email-mst@kernel.org>
+	<2fb6e86d-5afa-d7f0-6f62-8f81db5a5419@amd.com>
+	<20170927190724-mutt-send-email-mst@kernel.org>
+	<927fedc3-a2c8-d37c-930e-11cecb7b0149@amd.com>
+	<20170929223152-mutt-send-email-mst@kernel.org>
+From: Richard Relph <richard.relph@amd.com>
+Message-ID: <05b3c915-d7c1-2d73-1579-68d5f3bcc3d7@amd.com>
+Date: Fri, 29 Sep 2017 14:48:45 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170917232842.14544-1-f4bug@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qom/cpu: move cpu_model null check to
- cpu_class_by_name()
+In-Reply-To: <20170929223152-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] libvirt/QEMU/SEV interaction
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -23,17 +34,42 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Igor Mammedov <imammedo@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Anthony Green <green@moxielogic.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Chris Wulff <crwulff@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Laurent Vivier <laurent@vivier.eu>, Marek Vasut <marex@denx.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Max Filippov <jcmvbkbc@gmail.com>, Michael Walle <michael@walle.cc>, Peter Maydell <peter.maydell@linaro.org>, Stafford Horne <shorne@gmail.com>, Yongbok Kim <yongbok.kim@imgtec.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
 List-ID: <qemu-devel.nongnu.org>
 
-On Sun, Sep 17, 2017 at 08:28:42PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> and clean every implementation.
->=20
-> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+On 9/29/17 2:34 PM, Michael S. Tsirkin wrote:
+> On Wed, Sep 27, 2017 at 02:06:10PM -0500, Richard Relph wrote:
+>> Whether the "BIOS" is a "static shim" as Michael suggests, or a full BIOS,
+>> or even a BIOS+kernel+initrd is really not too significant. What is
+>> significant is that the GO has a basis for trusting all code that is
+>> imported in to their VM by the CP. And that NONE of the code provided by the
+>> CP is "unknown" and unauditable by the GO. If the CP has a way to inject
+>> code unknown to the GO in to the guest VM, the trust model is broken and
+>> both GO and CP suffer the consequences.
+> 
+> Absolutely.
+> 
+>> When the CP needs to update the BIOS image, they will have to inform the GO
+>> and allow the GO to establish trust in the CP's new BIOS image somehow.
+> 
+> This GO update on every BIOS change is imho is not a workable model. You
+> want something like checking the BIOS signature instead. And since
+> hardware is all hash based, you need the shim to do it in software.
 
-I'm queueing on machine-next.  Thanks!
+A BIOS "signed" by the CP doesn't meet the security requirement. It is 
+code that is "unknown" to the GO.
 
---=20
-Eduardo
+The (legitimate) CP does NOT want to be in that position of trust. If 
+they are, then some government somewhere is going to insist that they 
+sign a BIOS that allows the government to spy on the GO's VMs, and steal 
+secrets from it. Or some hacker admin will do it "for fun".
+
+How often do large public CPs really change their BIOSes? My sense is 
+that large public CPs prefer stability over "latest and greatest".
+
+And, perhaps more importantly, if a CP are able to sell a "more secure" 
+VM, one that justifies a higher price per vCPU hour, wouldn't that 
+warrant some changes in the "insecure" model being used today?
+
+Richard
