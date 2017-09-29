@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dxt5B-0000wW-IW
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:03:53 -0400
+	(envelope-from <amarnath.valluri@intel.com>) id 1dxtBP-0002rV-Vq
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:10:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dxt57-0002Ip-CJ
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:03:49 -0400
-References: <20170928092750.24938-1-pbutsykin@virtuozzo.com>
-	<20170928092750.24938-3-pbutsykin@virtuozzo.com>
-	<d796c4a7-1fcd-3750-39d1-21d0af4a364a@redhat.com>
-From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Message-ID: <3a729a9f-5836-bac1-b73d-8666aefa4447@virtuozzo.com>
-Date: Fri, 29 Sep 2017 14:03:18 +0300
+	(envelope-from <amarnath.valluri@intel.com>) id 1dxtBO-0005xc-29
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:10:15 -0400
+Received: from mga07.intel.com ([134.134.136.100]:42442)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
+	id 1dxtBN-0005tE-Ol
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 07:10:14 -0400
+From: Amarnath Valluri <amarnath.valluri@intel.com>
+Date: Fri, 29 Sep 2017 14:10:13 +0300
+Message-Id: <1506683421-27004-2-git-send-email-amarnath.valluri@intel.com>
+In-Reply-To: <1506683421-27004-1-git-send-email-amarnath.valluri@intel.com>
+References: <1506683421-27004-1-git-send-email-amarnath.valluri@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <d796c4a7-1fcd-3750-39d1-21d0af4a364a@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] qcow2: truncate the tail of the
- image file after shrinking the image
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v10 1/9] tpm-backend: Remove unneeded member
+ variable from backend class
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -25,114 +27,70 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, eblake@redhat.com, jsnow@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: stefanb@linux.vnet.ibm.com, marcandre.lureau@gmail.com, Amarnath Valluri <amarnath.valluri@intel.com>
 List-ID: <qemu-devel.nongnu.org>
 
-On 29.09.2017 13:55, Max Reitz wrote:
-> On 2017-09-28 11:27, Pavel Butsykin wrote:
->> Now after shrinking the image, at the end of the image file, there might be a
->> tail that probably will never be used. So we can find the last used cluster and
->> cut the tail.
->>
->> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
->> Reviewed-by: John Snow <jsnow@redhat.com>
->> ---
->>   block/qcow2-refcount.c | 22 ++++++++++++++++++++++
->>   block/qcow2.c          | 23 +++++++++++++++++++++++
->>   block/qcow2.h          |  1 +
->>   3 files changed, 46 insertions(+)
->>
->> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
->> index 88d5a3f1ad..aa3fd6cf17 100644
->> --- a/block/qcow2-refcount.c
->> +++ b/block/qcow2-refcount.c
->> @@ -3181,3 +3181,25 @@ out:
->>       g_free(reftable_tmp);
->>       return ret;
->>   }
->> +
->> +int64_t qcow2_get_last_cluster(BlockDriverState *bs, int64_t size)
->> +{
->> +    BDRVQcow2State *s = bs->opaque;
->> +    int64_t i;
->> +
->> +    for (i = size_to_clusters(s, size) - 1; i >= 0; i--) {
->> +        uint64_t refcount;
->> +        int ret = qcow2_get_refcount(bs, i, &refcount);
->> +        if (ret < 0) {
->> +            fprintf(stderr, "Can't get refcount for cluster %" PRId64 ": %s\n",
->> +                    i, strerror(-ret));
->> +            return ret;
->> +        }
->> +        if (refcount > 0) {
->> +            return i;
->> +        }
->> +    }
->> +    qcow2_signal_corruption(bs, true, -1, -1,
->> +                            "There are no references in the refcount table.");
->> +    return -EIO;
->> +}
->> diff --git a/block/qcow2.c b/block/qcow2.c
->> index 8a4311d338..f08c69ccd9 100644
->> --- a/block/qcow2.c
->> +++ b/block/qcow2.c
->> @@ -3106,6 +3106,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
->>       new_l1_size = size_to_l1(s, offset);
->>   
->>       if (offset < old_length) {
->> +        int64_t last_cluster, old_file_size;
->>           if (prealloc != PREALLOC_MODE_OFF) {
->>               error_setg(errp,
->>                          "Preallocation can't be used for shrinking an image");
->> @@ -3134,6 +3135,28 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
->>                                "Failed to discard unused refblocks");
->>               return ret;
->>           }
->> +
->> +        old_file_size = bdrv_getlength(bs->file->bs);
->> +        if (old_file_size < 0) {
->> +            error_setg_errno(errp, -old_file_size,
->> +                             "Failed to inquire current file length");
->> +            return old_file_size;
->> +        }
->> +        last_cluster = qcow2_get_last_cluster(bs, old_file_size);
->> +        if (last_cluster < 0) {
->> +            error_setg_errno(errp, -last_cluster,
->> +                             "Failed to find the last cluster");
->> +            return last_cluster;
->> +        }
->> +        if ((last_cluster + 1) * s->cluster_size < old_file_size) {
->> +            ret = bdrv_truncate(bs->file, (last_cluster + 1) * s->cluster_size,
->> +                                PREALLOC_MODE_OFF, NULL);
->> +            if (ret < 0) {
->> +                warn_report("Failed to truncate the tail of the image: "
->> +                            "ret = %d", ret);
-> 
-> How about using strerror(-ret) instead?
+TPMDriverOps inside TPMBackend is not required, as it is supposed to be a class
+member. The only possible reason for keeping in TPMBackend was, to get the
+backend type in tpm.c where dedicated backend api, tpm_backend_get_type() is
+present.
 
-yep, it would be better.
+Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+---
+ hw/tpm/tpm_passthrough.c     | 4 ----
+ include/sysemu/tpm_backend.h | 1 -
+ tpm.c                        | 2 +-
+ 3 files changed, 1 insertion(+), 6 deletions(-)
 
-> Max
-> 
->> +                ret = 0;
->> +            }
->> +        }
->>       } else {
->>           ret = qcow2_grow_l1_table(bs, new_l1_size, true);
->>           if (ret < 0) {
->> diff --git a/block/qcow2.h b/block/qcow2.h
->> index 5a289a81e2..782a206ecb 100644
->> --- a/block/qcow2.h
->> +++ b/block/qcow2.h
->> @@ -597,6 +597,7 @@ int qcow2_change_refcount_order(BlockDriverState *bs, int refcount_order,
->>                                   BlockDriverAmendStatusCB *status_cb,
->>                                   void *cb_opaque, Error **errp);
->>   int qcow2_shrink_reftable(BlockDriverState *bs);
->> +int64_t qcow2_get_last_cluster(BlockDriverState *bs, int64_t size);
->>   
->>   /* qcow2-cluster.c functions */
->>   int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
->>
-> 
-> 
+diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+index 9234eb3..a0baf5f 100644
+--- a/hw/tpm/tpm_passthrough.c
++++ b/hw/tpm/tpm_passthrough.c
+@@ -46,8 +46,6 @@
+ #define TPM_PASSTHROUGH(obj) \
+     OBJECT_CHECK(TPMPassthruState, (obj), TYPE_TPM_PASSTHROUGH)
+ 
+-static const TPMDriverOps tpm_passthrough_driver;
+-
+ /* data structures */
+ typedef struct TPMPassthruThreadParams {
+     TPMState *tpm_state;
+@@ -462,8 +460,6 @@ static TPMBackend *tpm_passthrough_create(QemuOpts *opts, const char *id)
+     /* let frontend set the fe_model to proper value */
+     tb->fe_model = -1;
+ 
+-    tb->ops = &tpm_passthrough_driver;
+-
+     if (tpm_passthrough_handle_device_opts(opts, tb)) {
+         goto err_exit;
+     }
+diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
+index b0a9731..3708413 100644
+--- a/include/sysemu/tpm_backend.h
++++ b/include/sysemu/tpm_backend.h
+@@ -50,7 +50,6 @@ struct TPMBackend {
+     enum TpmModel fe_model;
+     char *path;
+     char *cancel_path;
+-    const TPMDriverOps *ops;
+ 
+     QLIST_ENTRY(TPMBackend) list;
+ };
+diff --git a/tpm.c b/tpm.c
+index 2d830d0..abedf3f 100644
+--- a/tpm.c
++++ b/tpm.c
+@@ -211,7 +211,7 @@ static TPMInfo *qmp_query_tpm_inst(TPMBackend *drv)
+     res->model = drv->fe_model;
+     res->options = g_new0(TpmTypeOptions, 1);
+ 
+-    switch (drv->ops->type) {
++    switch (tpm_backend_get_type(drv)) {
+     case TPM_TYPE_PASSTHROUGH:
+         res->options->type = TPM_TYPE_OPTIONS_KIND_PASSTHROUGH;
+         tpo = g_new0(TPMPassthroughOptions, 1);
+-- 
+2.7.4
