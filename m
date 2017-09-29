@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dy27X-00059Z-A3
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:42:52 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dy28p-0005x7-Ic
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:44:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dy27V-0007Lw-NU
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:42:51 -0400
-References: <20170913160333.23622-1-eblake@redhat.com>
-	<20170913160333.23622-21-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <35698d23-4991-5210-68d8-5ef9fb3fa04a@redhat.com>
-Date: Fri, 29 Sep 2017 16:42:36 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dy28m-00082y-CV
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:44:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33823)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1dy28m-00082m-3T
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 16:44:08 -0400
+Date: Fri, 29 Sep 2017 22:44:00 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170929204400.GA13218@localhost.localdomain>
+References: <9AA25E8890139848BAC96ED2495626F439A2EA23@DGGEML501-MBX.china.huawei.com>
+	<20170928170114.GF2130@work-vm>
+	<20170929093547.GC3812@localhost.localdomain>
+	<20170929190605.GB2129@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20170913160333.23622-21-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 20/23] qemu-img: Change img_compare() to
- be byte-based
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170929190605.GB2129@work-vm>
+Subject: Re: [Qemu-devel] ping RE: question: I found a qemu crash about
+ migration
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -24,280 +29,194 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "wangjie (P)" <wangjie88@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, mreitz@redhat.com, quintela@redhat.com, "pbonzini@redhat.com" <pbonzini@redhat.com>, "fuweiwei (C)" <fuweiwei2@huawei.com>, "eblake@redhat.com" <eblake@redhat.com>, "berrange@redhat.com kchamart@redhat.com" <kchamart@redhat.com>, "famz@redhat.com" <famz@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
+Am 29.09.2017 um 21:06 hat Dr. David Alan Gilbert geschrieben:
+> * Kevin Wolf (kwolf@redhat.com) wrote:
+> > Am 28.09.2017 um 19:01 hat Dr. David Alan Gilbert geschrieben:
+> > > Hi,
+> > >   This is a 'fun' bug;  I had a good chat to kwolf about it earlier.
+> > > A proper fix really needs to be done together with libvirt so that we
+> > > can sequence:
+> > >    a) The stopping of the CPU on the source
+> > >    b) The termination of the mirroring block job
+> > >    c) The inactivation of the block devices on the source
+> > >        (bdrv_inactivate_all)
+> > >    d) The activation of the block devices on the destination
+> > >        (bdrv_invalidate_cache_all)
+> > >    e) The start of the CPU on the destination
+> > > 
+> > > It looks like you're hitting a race between b/c;  we've had races
+> > > between c/d in the past and moved the bdrv_inactivate_all.
+> > > 
+> > > During the discussion we ended up with two proposed solutions;
+> > > both of them require one extra command and one extra migration
+> > > capability.
+> > > 
+> > > The block way
+> > > -------------
+> > >    1) Add a new migration capability pause-at-complete
+> > >    2) Add a new migration state almost-complete
+> > >    3) After saving devices, if pause-at-complete is set,
+> > >       transition to almost-complete
+> > >    4) Add a new command (migration-continue) that 
+> > >       causes the migration to inactivate the devices (c)
+> > >       and send the final EOF to the destination.
+> > > 
+> > > You set pause-at-complete, wait until migrate hits almost-complete;
+> > > cleanup the mirror job, and then do migration-continue.  When it
+> > > completes do 'cont' on the destination.
+> > 
+> > Especially since you're concerned about the exact position of the pause,
+> > the following would be a little safer (using the opportunity to suggest
+> > slightly different names,too):
+> > 
+> > 1) Add a new migration capability pause-at-complete
+> > 2) Add a new migration state ready
+> > 3) After migration has converged (i.e. the background phase of the
+> >    migration has completed) and we are ready to actually switch to the
+> >    destination, stop the VM, transition to 'ready' and emit a QMP event
+> > 4) Continue processing QMP commands in the 'ready' phase. This is where
+> >    libvirt is supposed to tear down any running non-VM activities like
+> >    block jobs, NBD servers, etc.
+> > 5) Add a new command (migration-complete) that does the final part of
+> >    migration, including sending the remaining dirty memory, device state
+> >    and the final EOF that signals the destination to resume the VM if -S
+> >    isn't given.
+> 
+> What worries me here is whether some other subsection is going to say
+> that this pause must happen after the device state save, e.g. if the
+> device state save causes them to push out the last block/packet/etc -
+> and I've got no real way to say whether that point is any better or
+> worse than the point I was suggestion.
+> And the position in the cycle when the pause happens is part of the API.
 
+The important point here is that the VM is stopped. If device emulation
+is doing anything by itself while the VM is stopped, that is a bug.
+In other words, that last block/packet/etc. must already have been
+pushed out when we stopped the VM, so there is nothing left to push out
+when we save the state.
 
-On 09/13/2017 12:03 PM, Eric Blake wrote:
-> In the continuing quest to make more things byte-based, change
-> the internal iteration of img_compare().  We can finally drop the
-> TODO assertion added earlier, now that the entire algorithm is
-> byte-based and no longer has to shift from bytes to sectors.
-> 
-> Most of the change is mechanical ('total_sectors' becomes
-> 'total_size', 'sector_num' becomes 'offset', 'nb_sectors' becomes
-> 'chunk', 'progress_base' goes from sectors to bytes); some of it
-> is also a cleanup (sectors_to_bytes() is now unused, loss of
-> variable 'count' added earlier in commit 51b0a488).
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> 
-> ---
-> v3: new patch
-> ---
->  qemu-img.c | 119 ++++++++++++++++++++++++-------------------------------------
->  1 file changed, 46 insertions(+), 73 deletions(-)
-> 
-> diff --git a/qemu-img.c b/qemu-img.c
-> index 028c34a2cc..ef7062649d 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -1185,11 +1185,6 @@ static int compare_buffers(const uint8_t *buf1, const uint8_t *buf2,
-> 
->  #define IO_BUF_SIZE (2 * 1024 * 1024)
-> 
-> -static int64_t sectors_to_bytes(int64_t sectors)
-> -{
-> -    return sectors << BDRV_SECTOR_BITS;
-> -}
-> -
->  /*
->   * Check if passed sectors are empty (not allocated or contain only 0 bytes)
->   *
-> @@ -1240,7 +1235,7 @@ static int img_compare(int argc, char **argv)
->      const char *fmt1 = NULL, *fmt2 = NULL, *cache, *filename1, *filename2;
->      BlockBackend *blk1, *blk2;
->      BlockDriverState *bs1, *bs2;
-> -    int64_t total_sectors1, total_sectors2;
-> +    int64_t total_size1, total_size2;
->      uint8_t *buf1 = NULL, *buf2 = NULL;
->      int64_t pnum1, pnum2;
->      int allocated1, allocated2;
-> @@ -1248,9 +1243,9 @@ static int img_compare(int argc, char **argv)
->      bool progress = false, quiet = false, strict = false;
->      int flags;
->      bool writethrough;
-> -    int64_t total_sectors;
-> -    int64_t sector_num = 0;
-> -    int64_t nb_sectors;
-> +    int64_t total_size;
-> +    int64_t offset = 0;
-> +    int64_t chunk;
->      int c;
->      uint64_t progress_base;
->      bool image_opts = false;
-> @@ -1364,39 +1359,36 @@ static int img_compare(int argc, char **argv)
-> 
->      buf1 = blk_blockalign(blk1, IO_BUF_SIZE);
->      buf2 = blk_blockalign(blk2, IO_BUF_SIZE);
-> -    total_sectors1 = blk_nb_sectors(blk1);
-> -    if (total_sectors1 < 0) {
-> +    total_size1 = blk_getlength(blk1);
-> +    if (total_size1 < 0) {
->          error_report("Can't get size of %s: %s",
-> -                     filename1, strerror(-total_sectors1));
-> +                     filename1, strerror(-total_size1));
->          ret = 4;
->          goto out;
->      }
-> -    total_sectors2 = blk_nb_sectors(blk2);
-> -    if (total_sectors2 < 0) {
-> +    total_size2 = blk_getlength(blk2);
-> +    if (total_size2 < 0) {
->          error_report("Can't get size of %s: %s",
-> -                     filename2, strerror(-total_sectors2));
-> +                     filename2, strerror(-total_size2));
->          ret = 4;
->          goto out;
->      }
-> -    total_sectors = MIN(total_sectors1, total_sectors2);
-> -    progress_base = MAX(total_sectors1, total_sectors2);
-> +    total_size = MIN(total_size1, total_size2);
-> +    progress_base = MAX(total_size1, total_size2);
-> 
->      qemu_progress_print(0, 100);
-> 
-> -    if (strict && total_sectors1 != total_sectors2) {
-> +    if (strict && total_size1 != total_size2) {
->          ret = 1;
->          qprintf(quiet, "Strict mode: Image size mismatch!\n");
->          goto out;
->      }
-> 
-> -    while (sector_num < total_sectors) {
-> +    while (offset < total_size) {
->          int64_t status1, status2;
-> 
-> -        status1 = bdrv_block_status_above(bs1, NULL,
-> -                                          sector_num * BDRV_SECTOR_SIZE,
-> -                                          (total_sectors1 - sector_num) *
-> -                                          BDRV_SECTOR_SIZE,
-> -                                          &pnum1, NULL);
-> +        status1 = bdrv_block_status_above(bs1, NULL, offset,
-> +                                          total_size1 - offset, &pnum1, NULL);
->          if (status1 < 0) {
->              ret = 3;
->              error_report("Sector allocation test failed for %s", filename1);
-> @@ -1404,11 +1396,8 @@ static int img_compare(int argc, char **argv)
->          }
->          allocated1 = status1 & BDRV_BLOCK_ALLOCATED;
-> 
-> -        status2 = bdrv_block_status_above(bs2, NULL,
-> -                                          sector_num * BDRV_SECTOR_SIZE,
-> -                                          (total_sectors2 - sector_num) *
-> -                                          BDRV_SECTOR_SIZE,
-> -                                          &pnum2, NULL);
-> +        status2 = bdrv_block_status_above(bs2, NULL, offset,
-> +                                          total_size2 - offset, &pnum2, NULL);
->          if (status2 < 0) {
->              ret = 3;
->              error_report("Sector allocation test failed for %s", filename2);
-> @@ -1417,15 +1406,14 @@ static int img_compare(int argc, char **argv)
->          allocated2 = status2 & BDRV_BLOCK_ALLOCATED;
-> 
->          assert(pnum1 && pnum2);
-> -        nb_sectors = DIV_ROUND_UP(MIN(pnum1, pnum2), BDRV_SECTOR_SIZE);
-> +        chunk = MIN(pnum1, pnum2);
+With correctly written device code, there is no difference whether we
+save the device state first or last, without external influence it will
+be the same.
 
-Ayup, there goes that line.
+The obvious external thing that I can see is monitor commands, e.g. the
+monitor allows to access I/O ports, which can change the device state.
+However, monitor commands are completely under the control of the user,
+so they can always choose the order that they need.
 
-> 
->          if (strict) {
->              if ((status1 & ~BDRV_BLOCK_OFFSET_MASK) !=
->                  (status2 & ~BDRV_BLOCK_OFFSET_MASK)) {
->                  ret = 1;
->                  qprintf(quiet, "Strict mode: Offset %" PRId64
-> -                        " block status mismatch!\n",
-> -                        sectors_to_bytes(sector_num));
-> +                        " block status mismatch!\n", offset);
->                  goto out;
->              }
->          }
-> @@ -1435,59 +1423,54 @@ static int img_compare(int argc, char **argv)
->              if (allocated1) {
->                  int64_t pnum;
-> 
-> -                nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
-> -                ret = blk_pread(blk1, sector_num << BDRV_SECTOR_BITS, buf1,
-> -                                nb_sectors << BDRV_SECTOR_BITS);
-> +                chunk = MIN(chunk, IO_BUF_SIZE);
-> +                ret = blk_pread(blk1, offset, buf1, chunk);
->                  if (ret < 0) {
-> -                    error_report("Error while reading offset %" PRId64 " of %s:"
-> -                                 " %s", sectors_to_bytes(sector_num), filename1,
-> -                                 strerror(-ret));
-> +                    error_report("Error while reading offset %" PRId64
-> +                                 " of %s: %s",
-> +                                 offset, filename1, strerror(-ret));
->                      ret = 4;
->                      goto out;
->                  }
-> -                ret = blk_pread(blk2, sector_num << BDRV_SECTOR_BITS, buf2,
-> -                                nb_sectors << BDRV_SECTOR_BITS);
-> +                ret = blk_pread(blk2, offset, buf2, chunk);
->                  if (ret < 0) {
->                      error_report("Error while reading offset %" PRId64
-> -                                 " of %s: %s", sectors_to_bytes(sector_num),
-> -                                 filename2, strerror(-ret));
-> +                                 " of %s: %s",
-> +                                 offset, filename2, strerror(-ret));
->                      ret = 4;
->                      goto out;
->                  }
-> -                ret = compare_buffers(buf1, buf2,
-> -                                      nb_sectors * BDRV_SECTOR_SIZE, &pnum);
-> -                if (ret || pnum != nb_sectors * BDRV_SECTOR_SIZE) {
-> +                ret = compare_buffers(buf1, buf2, chunk, &pnum);
-> +                if (ret || pnum != chunk) {
->                      qprintf(quiet, "Content mismatch at offset %" PRId64 "!\n",
-> -                            sectors_to_bytes(sector_num) + (ret ? 0 : pnum));
-> +                            offset + (ret ? 0 : pnum));
->                      ret = 1;
->                      goto out;
->                  }
->              }
->          } else {
-> -            nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
-> +            chunk = MIN(chunk, IO_BUF_SIZE);
->              if (allocated1) {
-> -                ret = check_empty_sectors(blk1, sector_num * BDRV_SECTOR_SIZE,
-> -                                          nb_sectors * BDRV_SECTOR_SIZE,
-> +                ret = check_empty_sectors(blk1, offset, chunk,
->                                            filename1, buf1, quiet);
->              } else {
-> -                ret = check_empty_sectors(blk2, sector_num * BDRV_SECTOR_SIZE,
-> -                                          nb_sectors * BDRV_SECTOR_SIZE,
-> +                ret = check_empty_sectors(blk2, offset, chunk,
->                                            filename2, buf1, quiet);
->              }
->              if (ret) {
->                  goto out;
->              }
->          }
-> -        sector_num += nb_sectors;
-> -        qemu_progress_print(((float) nb_sectors / progress_base)*100, 100);
-> +        offset += chunk;
-> +        qemu_progress_print(((float) chunk / progress_base) * 100, 100);
->      }
-> 
-> -    if (total_sectors1 != total_sectors2) {
-> +    if (total_size1 != total_size2) {
->          BlockBackend *blk_over;
->          const char *filename_over;
-> 
->          qprintf(quiet, "Warning: Image size mismatch!\n");
-> -        if (total_sectors1 > total_sectors2) {
-> +        if (total_size1 > total_size2) {
->              blk_over = blk1;
->              filename_over = filename1;
->          } else {
-> @@ -1495,14 +1478,10 @@ static int img_compare(int argc, char **argv)
->              filename_over = filename2;
->          }
-> 
-> -        while (sector_num < progress_base) {
-> -            int64_t count;
-> -
-> -            ret = bdrv_block_status_above(blk_bs(blk_over), NULL,
-> -                                          sector_num * BDRV_SECTOR_SIZE,
-> -                                          (progress_base - sector_num) *
-> -                                          BDRV_SECTOR_SIZE,
-> -                                          &count, NULL);
-> +        while (offset < progress_base) {
-> +            ret = bdrv_block_status_above(blk_bs(blk_over), NULL, offset,
-> +                                          progress_base - offset, &chunk,
-> +                                          NULL);
->              if (ret < 0) {
->                  ret = 3;
->                  error_report("Sector allocation test failed for %s",
-> @@ -1510,22 +1489,16 @@ static int img_compare(int argc, char **argv)
->                  goto out;
-> 
->              }
-> -            /* TODO relax this once bdrv_block_status_above does not enforce
-> -             * sector alignment */
-> -            assert(QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE));
-> -            nb_sectors = count >> BDRV_SECTOR_BITS;
->              if (ret & BDRV_BLOCK_ALLOCATED && !(ret & BDRV_BLOCK_ZERO)) {
-> -                nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
-> -                ret = check_empty_sectors(blk_over,
-> -                                          sector_num * BDRV_SECTOR_SIZE,
-> -                                          nb_sectors * BDRV_SECTOR_SIZE,
-> +                chunk = MIN(chunk, IO_BUF_SIZE);
-> +                ret = check_empty_sectors(blk_over, offset, chunk,
->                                            filename_over, buf1, quiet);
->                  if (ret) {
->                      goto out;
->                  }
->              }
-> -            sector_num += nb_sectors;
-> -            qemu_progress_print(((float) nb_sectors / progress_base)*100, 100);
-> +            offset += chunk;
-> +            qemu_progress_print(((float) chunk / progress_base) * 100, 100);
->          }
->      }
-> 
+In any case, saving the device state only immediately before doing the
+switch makes sure that we consider any changes that have still been
+made.
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+> > The main reason why I advocate this "block way" is that it looks a lot
+> > less hacky, but more future-proof to me. Instead of adding a one-off
+> > hack for the problem at hand, it introduces a phase where libvirt can
+> > cleanly tear down any activity it has still running on the source qemu.
+> 
+> Yes, if we get that phase right.
+> 
+> > We got away without doing this because we never did a clean handover of
+> > resources from the source to the destination. From the perspective of a
+> > management tool, we had these distinct phases during migration:
+> > 
+> > a) 'migrate' command:
+> >    Source VM is still running and in control of all resources (like disk
+> >    images), migrating some state in the background
+> > 
+> > b) Migration converges:
+> >    Both VMs are stopped (assuming -S is given on the destination,
+> >    otherwise this phase is skipped), the destination is in control of
+> >    the resources
+> > 
+> > c) 'cont' command:
+> >    Destination VM is running and in control of the resources
+> > 
+> > There is an asymmetry here because there is no phase where the VMs are
+> > stopped, but the source is in control of the resources (this is the
+> > additional state that my proposal introduces).
+> > 
+> > As long as we didn't really manage control of the resources with locks,
+> > we could abuse b) for things where the source still accessed the
+> > resources if we knew that the destination wouldn't use them yet (it's
+> > not an assumption that I'm willing to trust too much) and it would still
+> > kind of work in the common cases. But it's not really the correct thing
+> > to do, it has probably always caused bugs in corner cases, and the
+> > locking mechanisms are pointing that out now.
+> > 
+> > We're now noticing this with block device because we're using locking,
+> > but I wouldn't be surprised if we found sooner or later that there are
+> > more resources that should really be handed over in a cleanly designed
+> > way and that work only by accident as long as you don't do that. So I
+> > don't think a local hack for mirroring (or even all block jobs) is
+> > sufficient to be future-proof.
+> 
+> Without the block-job we were actually pretty safe - up until the EOF
+> we knew the destination wouldn't start, and similarly we wouldn't start
+> using a device on the destination before the source had saved that
+> device.
+
+s/Without the block-job/With only the guest device/
+
+As long as only a guest device is using a resource, we're pretty safe,
+yes. This is because the VM is stopped when we actually migrate, so the
+user is already shut down without management tool interaction and the
+resource isn't actually in use at this point.
+
+Anything that keeps using a resource while the VM is stopped is a
+potential problem. Apart from block jobs, this includes at least the
+built-in NBD server, which also needs to be shut down before we can
+complete migration. And probably other things I'm forgetting right now.
+
+> My worry is where the edge of 'source is in control of the device is' -
+> is that upto the point at which the end of the device save? Before that?
+> After that? What?  It seems to be pretty arbitrary.  Unless we can
+> understand why it's where it is, then I'm not sure if it's a 'clean
+> migration phase model'.
+
+I can tell you where in the phase model it is: The source gives up
+control of the image during 'migration-complete', i.e. at the transition
+between the 'ready' and the 'completed' phase on the source.
+
+Within this transition, it's less clear where it has to be, but that's
+the same with its current place. I expect all of this code to stay
+mostly unchanged, but just called a bit later, so the place where we
+inactivate images today sounds like a good candidate. It's important
+that it's done before sending the EOF packet that triggers the
+destination to try and take control of the images.
+
+> > > The migration way
+> > > -----------------
+> > >    1) Stop doing (d) when the destination is started with -S
+> > >       since it happens anyway when 'cont' is issued
+> > >    2) Add a new migration capability ext-manage-storage
+> > >    3) When 'ext-manage-storage' is set, we don't bother doing (c)
+> > >    4) Add a new command 'block-inactivate' on the source
+> > > 
+> > > You set ext-manage-storage, do the migrate and when it's finished
+> > > clean up the block job, block-inactivate on the source, and
+> > > then cont on the destination.
+> > 
+> > You would have to inactivate every single block node, which is not
+> > a thing libvirt can currently do (they don't even really manage
+> > individual nodes yet). Apart from that I believe it is much too
+> > low-level and users shouldn't have to worry about what implications
+> > migration has to block devices. A clean migration phase model should be
+> > much easier to understand.
+> 
+> Yep, I see that.
+> (Having said that, this extra round-trip with management is adding extra
+> downtime, and we'll have to work out things like what happens if you
+> cancel or fail in that time).
+
+libvirt can opt in to the additional phase only when it actually needs
+it.
+
+I'm not sure if the requirement can change while migration is already
+running. I don't think so currently, but if yes, we might need a way for
+management tools to change the capability setting after the fact.
+
+Kevin
