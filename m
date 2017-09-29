@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dxuDQ-0007rf-5M
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:16:25 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dxuE9-0008Mp-83
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:17:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dxuDP-0008I0-AC
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:16:24 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:38561)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dxuDP-0008Ho-3s
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:16:23 -0400
-Received: by mail-oi0-x241.google.com with SMTP id s145so588380oie.5
-	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 05:16:23 -0700 (PDT)
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dxuE5-0008VJ-8J
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 08:17:09 -0400
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Date: Fri, 29 Sep 2017 15:16:11 +0300
+Message-Id: <20170929121613.25997-1-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <1506683421-27004-10-git-send-email-amarnath.valluri@intel.com>
-References: <1506683421-27004-1-git-send-email-amarnath.valluri@intel.com>
-	<1506683421-27004-10-git-send-email-amarnath.valluri@intel.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 29 Sep 2017 14:16:21 +0200
-Message-ID: <CAJ+F1CLN+=W5DcB+P5XAqU7EfHv5ojP831LYPj4+BpasnGk3DQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v10 9/9] tpm: Move tpm_cleanup() to right
- place
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v4 0/2] Truncate the tail of the image file in
+ qcow2 shrinking
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -30,55 +19,32 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Amarnath Valluri <amarnath.valluri@intel.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: pbutsykin@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, jsnow@redhat.com, den@openvz.org
 List-ID: <qemu-devel.nongnu.org>
 
-On Fri, Sep 29, 2017 at 1:10 PM, Amarnath Valluri
-<amarnath.valluri@intel.com> wrote:
-> As Emulator TPM backend uses chardev, tpm cleanup should happen before ch=
-ardev
-> similar to other vhost-users.
->
-> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+Now after shrinking the qcow2 image, at the end of the image file, there might
+be a tail that probably will never be used. Although it will not bring any
+tangible benefit, we can cut the tail if it is. Yes, it will not free up disk
+space, but if the blocks were be allocated sequentially and the image is not
+heavily fragmented then the virtual size of the image file will be commensurate
+with the real size. It also doesn't look like a great plus.. Well, at least we
+can discuss it.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Changes from v1:
+- rewrite qcow2_get_last_cluster() function according to Max's comments. (2)
 
+Changes from v2:
+- report a warning if truncation of the tail of the image file failed. (2)
 
-> ---
->  tpm.c | 1 -
->  vl.c  | 1 +
->  2 files changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tpm.c b/tpm.c
-> index 3b8c7ed..3122227 100644
-> --- a/tpm.c
-> +++ b/tpm.c
-> @@ -172,7 +172,6 @@ int tpm_init(void)
->          return -1;
->      }
->
-> -    atexit(tpm_cleanup);
->      return 0;
->  }
->
-> diff --git a/vl.c b/vl.c
-> index 9bb5058..ed86209 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -4893,6 +4893,7 @@ int main(int argc, char **argv, char **envp)
->      res_free();
->
->      /* vhost-user must be cleaned up before chardevs.  */
-> +    tpm_cleanup();
->      net_cleanup();
->      audio_cleanup();
->      monitor_cleanup();
-> --
-> 2.7.4
->
+Pavel Butsykin (2):
+  qcow2: fix return error code in qcow2_truncate()
+  qcow2: truncate the tail of the image file after shrinking the image
 
+ block/qcow2-refcount.c | 22 ++++++++++++++++++++++
+ block/qcow2.c          | 27 +++++++++++++++++++++++++--
+ block/qcow2.h          |  1 +
+ 3 files changed, 48 insertions(+), 2 deletions(-)
 
-
---=20
-Marc-Andr=C3=A9 Lureau
+-- 
+2.14.1
