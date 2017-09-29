@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dy37T-0004ib-GP
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 17:46:52 -0400
+	(envelope-from <lersek@redhat.com>) id 1dy3Iu-0008FB-Mg
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 17:58:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dy37Q-0008SY-An
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 17:46:51 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:54242)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dy37P-0008QN-V0
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 17:46:48 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
-	<150529666493.10902.14830445134051381968.stgit@frigg.lan>
-	<CAFEAcA9p9B8AFaaSaSOOSsFsEhHW=XPLBFs5MrozWq=7p4_9Zg@mail.gmail.com>
-	<87poasgjyh.fsf@frigg.lan>
-	<CAFEAcA8XP+8Jz9Dn-mEQ3CCrVj00t3HA0praQ-OSggtQGAmQ5Q@mail.gmail.com>
-	<87d16o53xr.fsf@frigg.lan>
-	<CAFEAcA9FhXKVKe1E_pVDWX3u0W7WuKQmO54Z1Jgj-iL980yPew@mail.gmail.com>
-	<87o9pywt8k.fsf@frigg.lan> <87shf5zlty.fsf@frigg.lan>
-	<20170929175943.GA25038@flamenco>
-Date: Sat, 30 Sep 2017 00:46:33 +0300
-In-Reply-To: <20170929175943.GA25038@flamenco> (Emilio G. Cota's message of
-	"Fri, 29 Sep 2017 13:59:43 -0400")
-Message-ID: <87vak1w53a.fsf@frigg.lan>
+	(envelope-from <lersek@redhat.com>) id 1dy3Iq-0006MF-BY
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 17:58:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49256)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dy3Iq-0006Lg-29
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 17:58:36 -0400
+References: <69fd8746-b2bd-31d0-4d70-792f40ef2d79@amd.com>
+	<20170926170901-mutt-send-email-mst@kernel.org>
+	<2fb6e86d-5afa-d7f0-6f62-8f81db5a5419@amd.com>
+	<20170927190724-mutt-send-email-mst@kernel.org>
+	<927fedc3-a2c8-d37c-930e-11cecb7b0149@amd.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <11d514ce-5752-d1a9-852c-9f091d2791e2@redhat.com>
+Date: Fri, 29 Sep 2017 23:58:23 +0200
 MIME-Version: 1.0
+In-Reply-To: <927fedc3-a2c8-d37c-930e-11cecb7b0149@amd.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 01/22] instrument: Add documentation
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] libvirt/QEMU/SEV interaction
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -34,115 +30,60 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Richard Relph <richard.relph@amd.com>, Brijesh Singh <brijesh.singh@amd.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, qemu-devel@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-Emilio G Cota writes:
+Side topic; sorry if it has been mentioned elsewhere:
 
-> On Fri, Sep 29, 2017 at 16:16:41 +0300, Llu=C3=ADs Vilanova wrote:
->> Llu=C3=ADs Vilanova writes:
->> [...]
->> > This was working on a much older version of instrumentation for QEMU, =
-but I can
->> > implement something that does the first use-case point above and some =
-filtering
->> > example (second use-case point) to see what's the performance differen=
-ce.
->>=20
->> Ok, so here's some numbers for the discussion (booting Emilio's ARM full=
- system
->> image that immediately shuts down):
->>=20
->> * Without instrumentation
->>=20
->> real	0m10,099s
->> user	0m9,876s
->> sys	0m0,128s
->>=20
->> * Count number of memory access writes, by instrumenting only when they =
-are
->> executed
->>=20
->> real	0m15,896s
->> user	0m15,752s
->> sys	0m0,108s
->>=20
->> * Counting same, but the filtering is done at translation time (i.e., not
->> generate an execute-time callback if it's not a write)
->>=20
->> real	0m11,084s
->> user	0m10,880s
->> sys	0m0,112s
->>=20
->> As Peter said, the filtering can be added into the API to take advantage=
- of
->> this "speedup", without exposing translation vs execution time callbacks.
+On 09/27/17 21:06, Richard Relph wrote:
 
-> I'm not sure I understand this concept of filtering. Are you saying that =
-in
-> the first case, all memory accesses are instrumented, and then in the
-> "access helper" we only call the user's callback if it's a memory write?
-> And in the second case, we simply just generate a "write helper" instead
-> of an "access helper". Am I understanding this correctly?
+> Whether the "BIOS" is a "static shim" as Michael suggests, or a full
+> BIOS, or even a BIOS+kernel+initrd is really not too significant. What
+> is significant is that the GO has a basis for trusting all code that is
+> imported in to their VM by the CP. And that NONE of the code provided by
+> the CP is "unknown" and unauditable by the GO. If the CP has a way to
+> inject code unknown to the GO in to the guest VM, the trust model is
+> broken and both GO and CP suffer the consequences.
 
-In the previous case (no filtering), the user callback is always called whe=
-n a
-memory access is *executed*, and the user then checks if the access mode is=
- a
-write to decide whether to increment a counter.
+The expansion ROMs (containing UEFI drivers) of emulated PCI devices,
+and the same of assigned physical PCI devices, constitute another
+channel through which code enters the guest from the outside (i.e., from
+the Cloud Provider). The ROM BARs from which the guest firmware reads
+the UEFI binaries are not guest RAM, they are MMIO. (For execution, the
+drivers are copied into encrypted guest RAM.)
 
-In this case (with filtering), a user callback is called when a memory acce=
-ss is
-*translated*, and if the access mode is a write, the user generates a call =
-to a
-second callback that is executed every time a memory access is executed (on=
-ly
-that it is only generated for memory writes, the ones we care about).
+If the guest has Secure Boot enabled, then the oproms are verified[*]
+(and not launched if verification fails), but this is slightly different
+from what I understand under audit-by-GO. It means the GO wouldn't get a
+measurement of the oproms for one-by-one clearing, when about to
+green-light a guest startup. Instead the GO would ensure that Secure
+Boot be enabled with the right certificates (and/or executable hashes)
+enrolled off the bat, and then implicitly trust all oprom drivers
+accepted by those certs / hashes. It's another layer of indirection.
 
-Is this clearer?
+This is likely nothing new qualitatively, but "the devil is in the
+details", so I thought it was worth raising.
 
+[*] For edk2 / OvmfPkg specifics, I'll mention
 
->> * Counting number of executed instructions, by instrumenting the beginni=
-ng of
->> each one of them
->>=20
->> real	0m24,583s
->> user	0m24,352s
->> sys	0m0,184s
->>=20
->> * Counting same, but per-TB numbers are collected at translation-time, a=
-nd we
->> only generate a per-TB execution time callback to add the corresponding =
-number
->> of instructions for that TB
->>=20
->> real	0m11,151s
->> user	0m10,952s
->> sys	0m0,092s
->>=20
->> This really needs to expose translation vs execution time callbacks to t=
-ake
->> advantage of this "speedup".
+  gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy
 
-> Clearly instrumenting per-TB is a significant net gain. I think we should
-> definitely allow instrumenters to use this option.
+The SecurityPkg default is 0x04 ("Deny execution when there is security
+violation"). However, OVMF sets it to 0x00 ("Always trust the image").
+Please see the following commit for the reasons:
 
-> FWIW my experiments so far show similar numbers for instrumenting each
-> instruction (haven't done the per-tb yet). The difference is that I'm
-> exposing to instrumenters a copy of the guest instructions (const void *d=
-ata,
-> size_t size). These copies are kept around until TB's are flushed.
-> Luckily there seems to be very little overhead in keeping these around,
-> apart from the memory overhead -- but in terms of performance, the
-> necessary allocations do not induce significant overhead.
+  https://github.com/tianocore/edk2/commit/1fea9ddb4e3fd
 
-To keep this use-case simpler, I added the memory access API I posted in th=
-is
-series, where instrumenters can read guest memory (more general than passin=
-g a
-copy of the current instruction).
+Brijesh, for SEV guests, we likely want to flip this PCD to 0x04, in the
+AmdSevInitialize() function, in "OvmfPkg/PlatformPei/AmdSev.c". For that
+we'll also have to change the PCD from fixed-at-build to dynamic, but
+that in turn will require a change to "SecurityPkg.dec" itself
+(currently it only allows fixed-at-build or patchable, not dynamic). Do
+you want me to file a BZ in the TianoCore tracker for this, and assign
+it to you? If you don't have time for writing the patch, I'm glad to do
+it too, but then the review could be slower; both other OvmfPkg
+co-maintainers are busy with other things.)
 
-
-Cheers,
-  Lluis
+Thanks!
+Laszlo
