@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dy3st-0006OE-Ad
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 18:35:52 -0400
+	(envelope-from <carenas@gmail.com>) id 1dy4mY-0006cJ-FG
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 19:33:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dy3sq-00017l-3P
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 18:35:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38428)
+	(envelope-from <carenas@gmail.com>) id 1dy4mX-0004O7-LN
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 19:33:22 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:45656)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dy3sp-00017U-Qf
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 18:35:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dy3sm-0006Tf-RU
-	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 22:35:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 420EF2E80E5
-	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 22:35:43 +0000 (UTC)
+	(Exim 4.71) (envelope-from <carenas@gmail.com>) id 1dy4mX-0004Me-FO
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 19:33:21 -0400
+Received: by mail-wm0-x235.google.com with SMTP id q124so2011236wmb.0
+	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 16:33:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 29 Sep 2017 22:27:55 -0000
-From: Bug Watch Updater <1718719@bugs.launchpad.net>
-Reply-To: Bug 1718719 <1718719@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150601012428.28823.10384460665730601462.malonedeb@gac.canonical.com>
-Message-Id: <150672407604.1553.9207448063464499250.launchpad@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1718719] Re: qemu can't capture keys properly
- under wayland
+In-Reply-To: <46ce7f3c-f0cb-bdfe-25fc-984276601f7d@vivier.eu>
+References: <1506703816-7359-1-git-send-email-zhuoweizhang@yahoo.com>
+	<46ce7f3c-f0cb-bdfe-25fc-984276601f7d@vivier.eu>
+From: Carlo Arenas <carenas@gmail.com>
+Date: Fri, 29 Sep 2017 16:33:17 -0700
+Message-ID: <CAPUEspiEoZk2ems4L_f9J7y9r+65EKu85COJzkBoH_YYuu+q8A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] syscall: fix special case of write(fd, NULL,
+ 0)
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -36,51 +28,17 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: zhuoweizhang@yahoo.com, qemu-devel@nongnu.org, riku.voipio@iki.fi
 List-ID: <qemu-devel.nongnu.org>
 
-** Changed in: xserver
-       Status: Unknown =3D> Incomplete
+a return of 0 is a valid response for write per POSIX and just indicates 0
+bytes were written.
 
-** Changed in: xserver
-   Importance: Unknown =3D> Medium
+the use of NULL for the buffer is not a trigger for that behaviour, but the
+fact that the third parameter asks for 0 bytes to be copied.
 
--- =
+therefore there is no need to get logic in this handler to check for NULL
+IMHO
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1718719
-
-Title:
-  qemu can't capture keys properly under wayland
-
-Status in QEMU:
-  New
-Status in XServer:
-  Incomplete
-Status in qemu package in Ubuntu:
-  New
-Status in wayland package in Ubuntu:
-  New
-
-Bug description:
-  This appears to be different than the previous similar bugs; patches
-  do look to be applied to use libinput in the wayland case. Still:
-
-  unknown keycodes `(unnamed)', please report to qemu-devel@nongnu.org
-
-  I am using qemu-system-x86                       1:2.10+dfsg-0ubuntu1
-  on artful.
-
-  Many key inputs work correctly, but at boot the system will not
-  properly catch the arrow keys, the above error shows up immediately
-  after hitting Esc (for instance) to get to the boot menu. Booting from
-  CD onto a daily Ubuntu desktop image, I can't navigate the splash
-  menu.
-
-  The same works correctly through virt-manager (which uses spice
-  AFAICT, but wayland tends to crash when running virt-manager), and
-  things work if I switch my session to Xorg rather than wayland.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1718719/+subscriptions
+Carlo
