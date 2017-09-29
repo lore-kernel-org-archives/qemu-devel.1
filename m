@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dy3ZH-0002rI-Fh
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 18:15:36 -0400
+	(envelope-from <bounces@canonical.com>) id 1dy3st-0006OE-Ad
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 18:35:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dy3ZD-0006QD-CO
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 18:15:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37240)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dy3ZD-0006Pu-39
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 18:15:31 -0400
-References: <69fd8746-b2bd-31d0-4d70-792f40ef2d79@amd.com>
-	<20170926170901-mutt-send-email-mst@kernel.org>
-	<2fb6e86d-5afa-d7f0-6f62-8f81db5a5419@amd.com>
-	<20170927190724-mutt-send-email-mst@kernel.org>
-	<927fedc3-a2c8-d37c-930e-11cecb7b0149@amd.com>
-	<20170929223152-mutt-send-email-mst@kernel.org>
-	<05b3c915-d7c1-2d73-1579-68d5f3bcc3d7@amd.com>
-	<20170930000900-mutt-send-email-mst@kernel.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <a5dbaca2-511b-0da0-0395-92bf46fff2cd@redhat.com>
-Date: Sat, 30 Sep 2017 00:15:20 +0200
+	(envelope-from <bounces@canonical.com>) id 1dy3sq-00017l-3P
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 18:35:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38428)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dy3sp-00017U-Qf
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 18:35:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1dy3sm-0006Tf-RU
+	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 22:35:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 420EF2E80E5
+	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 22:35:43 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170930000900-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] libvirt/QEMU/SEV interaction
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 29 Sep 2017 22:27:55 -0000
+From: Bug Watch Updater <1718719@bugs.launchpad.net>
+Reply-To: Bug 1718719 <1718719@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150601012428.28823.10384460665730601462.malonedeb@gac.canonical.com>
+Message-Id: <150672407604.1553.9207448063464499250.launchpad@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1718719] Re: qemu can't capture keys properly
+ under wayland
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -33,82 +36,51 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Richard Relph <richard.relph@amd.com>
-Cc: libvir-list@redhat.com, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-On 09/29/17 23:16, Michael S. Tsirkin wrote:
-> On Fri, Sep 29, 2017 at 02:48:45PM -0500, Richard Relph wrote:
->> On 9/29/17 2:34 PM, Michael S. Tsirkin wrote:
->>> On Wed, Sep 27, 2017 at 02:06:10PM -0500, Richard Relph wrote:
->>>> Whether the "BIOS" is a "static shim" as Michael suggests, or a full BIOS,
->>>> or even a BIOS+kernel+initrd is really not too significant. What is
->>>> significant is that the GO has a basis for trusting all code that is
->>>> imported in to their VM by the CP. And that NONE of the code provided by the
->>>> CP is "unknown" and unauditable by the GO. If the CP has a way to inject
->>>> code unknown to the GO in to the guest VM, the trust model is broken and
->>>> both GO and CP suffer the consequences.
->>>
->>> Absolutely.
->>>
->>>> When the CP needs to update the BIOS image, they will have to inform the GO
->>>> and allow the GO to establish trust in the CP's new BIOS image somehow.
->>>
->>> This GO update on every BIOS change is imho is not a workable model. You
->>> want something like checking the BIOS signature instead. And since
->>> hardware is all hash based, you need the shim to do it in software.
->>
->> A BIOS "signed" by the CP doesn't meet the security requirement. It is code
->> that is "unknown" to the GO.
-> 
-> There is a misunderstanding here.
-> 
-> BIOS would not be signed by a CP. It would be signed by a trusted
-> software vendor e.g. by Red Hat.
-> 
->> The (legitimate) CP does NOT want to be in that position of trust. If they
->> are, then some government somewhere is going to insist that they sign a BIOS
->> that allows the government to spy on the GO's VMs, and steal secrets from
->> it. Or some hacker admin will do it "for fun".
->>
->> How often do large public CPs really change their BIOSes? My sense is that
->> large public CPs prefer stability over "latest and greatest".
-> 
-> CPs just do dnf update. Software vendors change BIOSes.
-> 
-> And we do change them. Look at number of revisions for seabios in e.g.
-> Fedora. More importantly we might need to change them quickly e.g.
-> because of a security issue. Adding the need to coordinate with all GOs
-> is not going to work. Neither can QEMU support booting old BIOS
-> versions on new machine types indefinitely.
-> 
->> And, perhaps more importantly, if a CP are able to sell a "more secure" VM,
->> one that justifies a higher price per vCPU hour, wouldn't that warrant some
->> changes in the "insecure" model being used today?
->>
->> Richard
-> 
-> Absolutely. CPs have no business signing images. But it is just not
-> really feasible for software vendors to distribute hashes.
+** Changed in: xserver
+       Status: Unknown =3D> Incomplete
 
-Can this be helped by "reproducible builds"? Like,
+** Changed in: xserver
+   Importance: Unknown =3D> Medium
 
-- guest firmware vendor publishes the source package,
-- GO asynchronously audits the source package (most likely
-incrementally, reviewing the new, broken-out patches in the source package),
-- GO builds the binary package,
-- GO verifies that it bit-wise matches the guest fw vendor's binary package,
-- GO adds the fw binary's hash to their own whitelist.
+-- =
 
-By virtue of releasing the source package of the guest firmware (and by
-announcing it via another erratum), the guest fw vendor implicitly
-notifies all GOs. It is then up to the individual GOs to evaluate the
-changes on their own time, and to switch to the new fw binary.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1718719
 
-It would even be OK if the GO built their own fw binary from the source
-package, and submitted that to the CP, as part of the guest payload. The
-guest firmware vendor would still be able to support this build, since
-it would match the vendor's own binary 100%.
+Title:
+  qemu can't capture keys properly under wayland
 
-Thanks
-Laszlo
+Status in QEMU:
+  New
+Status in XServer:
+  Incomplete
+Status in qemu package in Ubuntu:
+  New
+Status in wayland package in Ubuntu:
+  New
+
+Bug description:
+  This appears to be different than the previous similar bugs; patches
+  do look to be applied to use libinput in the wayland case. Still:
+
+  unknown keycodes `(unnamed)', please report to qemu-devel@nongnu.org
+
+  I am using qemu-system-x86                       1:2.10+dfsg-0ubuntu1
+  on artful.
+
+  Many key inputs work correctly, but at boot the system will not
+  properly catch the arrow keys, the above error shows up immediately
+  after hitting Esc (for instance) to get to the boot menu. Booting from
+  CD onto a daily Ubuntu desktop image, I can't navigate the splash
+  menu.
+
+  The same works correctly through virt-manager (which uses spice
+  AFAICT, but wayland tends to crash when running virt-manager), and
+  things work if I switch my session to Xorg rather than wayland.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1718719/+subscriptions
