@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dxsVW-00026n-Oo
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:26:59 -0400
+	(envelope-from <bounces@canonical.com>) id 1dxsZZ-0004OA-QG
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:31:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dxsVS-0000fu-R0
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:26:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56488)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dxsVS-0000fK-Kn
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:26:54 -0400
-Message-ID: <1506680812.6902.22.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 29 Sep 2017 12:26:52 +0200
-In-Reply-To: <1506437019-17946-1-git-send-email-owen.smith@citrix.com>
-References: <1506437019-17946-1-git-send-email-owen.smith@citrix.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/3 v4] xenfb: Enablement for Windows PV
- HID frontend
+	(envelope-from <bounces@canonical.com>) id 1dxsZV-0003ZZ-G2
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:31:09 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42442)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dxsZV-0003Z4-AW
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 06:31:05 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1dxsZR-0008DH-MS
+	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 10:31:01 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 994032E8088
+	for <qemu-devel@nongnu.org>; Fri, 29 Sep 2017 10:31:01 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 29 Sep 2017 10:18:51 -0000
+From: Nick <nick@nine.ch>
+Reply-To: Bug 1701449 <1701449@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149880297386.6544.11962739093038956076.malonedeb@gac.canonical.com>
+Message-Id: <150668033199.20378.465574999272726478.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1701449] Re: high memory usage when using rbd
+ with client caching
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -26,27 +36,99 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Owen Smith <owen.smith@citrix.com>, sstabellini@kernel.org, anthony.perard@citrix.com
-Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-On Tue, 2017-09-26 at 14:43 +0000, Owen Smith wrote:
-> Improve the input device model in xenfb, by updating the
-> Qemu input handlers and adding a feature to allow for
-> raw (unscaled) absolute coordinates to be represented.
-> 
-> By using a reverse mapping call, the Linux input.h #defines
-> are not pulled into xenfb, and so should remove the compiler
-> warnings reported.
+Is there any progress on solving this or does anyone has an idea how to
+further debug this? I think we are kinda stuck in the ceph bug tracker
+issue as well [1].
 
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+[1] http://tracker.ceph.com/issues/20054
 
-What is the plan with this?  Merge through xen queue?  I can merge it
-via ui queue too, but in that case I'd like to get an review from the
-xen guys.
+-- =
 
-Note: conflicts with keycodemapdb patch series, might need a rebase
-depending on merge order.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1701449
 
-cheers,
-  Gerd
+Title:
+  high memory usage when using rbd with client caching
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+  we are experiencing a quite high memory usage of a single qemu (used with=
+ KVM) process when using RBD with client caching as a disk backend. We are =
+testing with 3GB memory qemu virtual machines and 128MB RBD client cache. W=
+hen running 'fio' in the virtual machine you can see that after some time t=
+he machine uses a lot more memory (RSS) on the hypervisor than she should. =
+We have seen values (in real production machines, no artificially fio tests=
+) of 250% memory overhead. I reproduced this with qemu version 2.9 as well.
+
+  Here the contents of our ceph.conf on the hypervisor:
+  """
+  [client]
+  rbd cache writethrough until flush =3D False
+  rbd cache max dirty =3D 100663296
+  rbd cache size =3D 134217728
+  rbd cache target dirty =3D 50331648
+  """
+
+  How to reproduce:
+  * create a virtual machine with a RBD backed disk (100GB or so)
+  * install a linux distribution on it (we are using Ubuntu)
+  * install fio (apt-get install fio)
+  * run fio multiple times with (e.g.) the following test file:
+  """
+  # This job file tries to mimic the Intel IOMeter File Server Access Patte=
+rn
+  [global]
+  description=3DEmulation of Intel IOmeter File Server Access Pattern
+  randrepeat=3D0
+  filename=3D/root/test.dat
+  # IOMeter defines the server loads as the following:
+  # iodepth=3D1     Linear
+  # iodepth=3D4     Very Light
+  # iodepth=3D8     Light
+  # iodepth=3D64    Moderate
+  # iodepth=3D256   Heavy
+  iodepth=3D8
+  size=3D80g
+  direct=3D0
+  ioengine=3Dlibaio
+
+  [iometer]
+  stonewall
+  bs=3D4M
+  rw=3Drandrw
+
+  [iometer_just_write]
+  stonewall
+  bs=3D4M
+  rw=3Dwrite
+
+  [iometer_just_read]
+  stonewall
+  bs=3D4M
+  rw=3Dread
+  """
+
+  You can measure the virtual machine RSS usage on the hypervisor with:
+    virsh dommemstat <machine name> | grep rss
+  or if you are not using libvirt:
+    grep RSS /proc/<PID of qemu process>/status
+
+  When switching off the RBD client cache, all is ok again, as the
+  process does not use so much memory anymore.
+
+  There is already a ticket on the ceph bug tracker for this ([1]).
+  However I can reproduce that memory behaviour only when using qemu
+  (maybe it is using librbd in a special way?). Running directly 'fio'
+  with the rbd engine does not result in that high memory usage.
+
+  [1] http://tracker.ceph.com/issues/20054
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1701449/+subscriptions
