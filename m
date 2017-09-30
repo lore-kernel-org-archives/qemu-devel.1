@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5Vg-0004LT-D3
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:03 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dy5Vk-0004Mo-2l
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5Vd-0005Ol-8d
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:00 -0400
-Received: from mail-by2nam03on0079.outbound.protection.outlook.com
-	([104.47.42.79]:6855
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	(envelope-from <alistai@xilinx.com>) id 1dy5Vg-0005Wf-T8
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:04 -0400
+Received: from mail-bl2nam02on0049.outbound.protection.outlook.com
+	([104.47.38.49]:35872
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dy5Vc-0005Kc-UH
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:57 -0400
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dy5Vg-0005VA-Lg
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:00 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 29 Sep 2017 17:15:57 -0700
-Message-ID: <5ff4b0fa8802bc338be8bb87274444d69f4eb2ba.1506730372.git.alistair.francis@xilinx.com>
+Date: Fri, 29 Sep 2017 17:16:00 -0700
+Message-ID: <a795d9122a419eece0e003a95f35e44347a1be84.1506730372.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1506730372.git.alistair.francis@xilinx.com>
 References: <cover.1506730372.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 19/47] hw/ipmi: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v2 20/47] hw/isa: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
@@ -36,37 +36,48 @@ error_report(). The functions were renamed with these commands and then
 compiler issues where manually fixed.
 
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr,
+"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr,
+"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr,
+"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N;N; {s|fprintf(stderr,
+"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N;N; {s|fprintf(stderr,
+"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N;N; {s|fprintf(stderr,
+"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N;N; {s|fprintf(stderr,
+"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N;N; {s|fprintf(stderr,
+"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N;N; {s|fprintf(stderr,
+"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N;N; {s|fprintf(stderr,
+"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 find ./* -type f -exec sed -i \
-    'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    'N; {s|fprintf(stderr,
+"\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 
 Some lines where then manually tweaked to pass checkpatch.
@@ -76,44 +87,39 @@ Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 V2:
  - Split hw patch into individual directories
 
- hw/ipmi/ipmi.c            | 1 +
- hw/ipmi/ipmi_bmc_extern.c | 5 +++--
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ hw/isa/isa-bus.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ipmi/ipmi.c b/hw/ipmi/ipmi.c
-index b27babd504..81c62920de 100644
---- a/hw/ipmi/ipmi.c
-+++ b/hw/ipmi/ipmi.c
-@@ -23,6 +23,7 @@
+diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
+index 348e0eab9d..0f2e426d02 100644
+--- a/hw/isa/isa-bus.c
++++ b/hw/isa/isa-bus.c
+@@ -17,6 +17,7 @@
+  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
   */
- 
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "hw/hw.h"
- #include "hw/ipmi/ipmi.h"
- #include "sysemu/sysemu.h"
-diff --git a/hw/ipmi/ipmi_bmc_extern.c b/hw/ipmi/ipmi_bmc_extern.c
-index abab3bba4f..8c0535d3dd 100644
---- a/hw/ipmi/ipmi_bmc_extern.c
-+++ b/hw/ipmi/ipmi_bmc_extern.c
-@@ -28,6 +28,7 @@
-  */
- 
  #include "qemu/osdep.h"
 +#include "qemu/error-report.h"
  #include "qapi/error.h"
- #include "qemu/timer.h"
- #include "chardev/char-fe.h"
-@@ -194,8 +195,8 @@ static void ipmi_bmc_extern_handle_command(IPMIBmc *b,
- 
-     if (ibe->outlen) {
-         /* We already have a command queued.  Shouldn't ever happen. */
--        fprintf(stderr, "IPMI KCS: Got command when not finished with the"
--                " previous command\n");
-+        error_report("IPMI KCS: Got command when not finished with the"
-+                     " previous command");
-         abort();
-     }
- 
+ #include "hw/hw.h"
+ #include "monitor/monitor.h"
+@@ -186,15 +187,15 @@ ISADevice *isa_vga_init(ISABus *bus)
+     case VGA_CIRRUS:
+         return isa_create_simple(bus, "isa-cirrus-vga");
+     case VGA_QXL:
+-        fprintf(stderr, "%s: qxl: no PCI bus\n", __func__);
++        error_report("%s: qxl: no PCI bus", __func__);
+         return NULL;
+     case VGA_STD:
+         return isa_create_simple(bus, "isa-vga");
+     case VGA_VMWARE:
+-        fprintf(stderr, "%s: vmware_vga: no PCI bus\n", __func__);
++        error_report("%s: vmware_vga: no PCI bus", __func__);
+         return NULL;
+     case VGA_VIRTIO:
+-        fprintf(stderr, "%s: virtio-vga: no PCI bus\n", __func__);
++        error_report("%s: virtio-vga: no PCI bus", __func__);
+         return NULL;
+     case VGA_NONE:
+     default:
 -- 
 2.11.0
