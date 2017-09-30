@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5V2-0003mj-IX
+	(envelope-from <alistai@xilinx.com>) id 1dy5V4-0003nQ-0s
 	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5Uy-0004HL-Vy
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:20 -0400
-Received: from mail-sn1nam01on0046.outbound.protection.outlook.com
-	([104.47.32.46]:26432
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	(envelope-from <alistai@xilinx.com>) id 1dy5V0-0004IH-Ov
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:22 -0400
+Received: from mail-bl2nam02on0089.outbound.protection.outlook.com
+	([104.47.38.89]:12330
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dy5Uy-0004Gu-KO
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:16 -0400
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dy5V0-0004Hk-Fo
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:18 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 29 Sep 2017 17:15:08 -0700
-Message-ID: <c861ba99329355f1f3096b833660d0be68b737c2.1506730372.git.alistair.francis@xilinx.com>
+Date: Fri, 29 Sep 2017 17:15:21 -0700
+Message-ID: <3400959d36218ad30e914439ab5d893ed9c87aae.1506730372.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1506730372.git.alistair.francis@xilinx.com>
 References: <cover.1506730372.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 03/47] audio: Replace AUDIO_FUNC with
- __func__
+Subject: [Qemu-devel] [PATCH v2 07/47] hw/bt: Replace fprintf(stderr,
+ "*\n" with error_report()
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -28,763 +28,497 @@ List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com
 List-ID: <qemu-devel.nongnu.org>
 
-Apparently we don't use __MSC_VER as a compiler anymore and we always
-require a C99 compiler (which means we always have __func__) so we don't
-need a special AUDIO_FUNC macro. We can just repleace AUDIO_FUNC with
-__func__ instead.
+Replace a large number of the fprintf(stderr, "*\n" calls with
+error_report(). The functions were renamed with these commands and then
+compiler issues where manually fixed.
 
-Checkpatch failures where manually fixed.
+find ./* -type f -exec sed -i \
+    'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    {} +
+find ./* -type f -exec sed -i \
+    'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+    {} +
+
+Some lines where then manually tweaked to pass checkpatch.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
 ---
+V2:
+ - Split hw patch into individual directories
 
- audio/alsaaudio.c      |  4 ++--
- audio/audio.c          | 40 ++++++++++++++++++------------------
- audio/audio_int.h      |  6 ------
- audio/audio_pt_int.c   | 28 ++++++++++++-------------
- audio/audio_template.h | 26 +++++++++++------------
- audio/dsoundaudio.c    |  2 +-
- audio/mixeng.c         |  2 +-
- audio/ossaudio.c       | 10 ++++-----
- audio/paaudio.c        | 56 +++++++++++++++++++++++++-------------------------
- audio/sdlaudio.c       |  2 +-
- audio/wavaudio.c       |  2 +-
- 11 files changed, 85 insertions(+), 93 deletions(-)
+ hw/bt/core.c    | 15 ++++++++-------
+ hw/bt/hci-csr.c | 17 +++++++++--------
+ hw/bt/hci.c     | 30 +++++++++++++++---------------
+ hw/bt/hid.c     |  2 +-
+ hw/bt/l2cap.c   | 47 ++++++++++++++++++++++++-----------------------
+ hw/bt/sdp.c     |  7 ++++---
+ 6 files changed, 61 insertions(+), 57 deletions(-)
 
-diff --git a/audio/alsaaudio.c b/audio/alsaaudio.c
-index 3652a7b5fa..92a96f8b2b 100644
---- a/audio/alsaaudio.c
-+++ b/audio/alsaaudio.c
-@@ -823,7 +823,7 @@ static int alsa_init_out(HWVoiceOut *hw, struct audsettings *as,
-     audio_pcm_init_info (&hw->info, &obt_as);
-     hw->samples = obt.samples;
- 
--    alsa->pcm_buf = audio_calloc (AUDIO_FUNC, obt.samples, 1 << hw->info.shift);
-+    alsa->pcm_buf = audio_calloc(__func__, obt.samples, 1 << hw->info.shift);
-     if (!alsa->pcm_buf) {
-         dolog ("Could not allocate DAC buffer (%d samples, each %d bytes)\n",
-                hw->samples, 1 << hw->info.shift);
-@@ -934,7 +934,7 @@ static int alsa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-     audio_pcm_init_info (&hw->info, &obt_as);
-     hw->samples = obt.samples;
- 
--    alsa->pcm_buf = audio_calloc (AUDIO_FUNC, hw->samples, 1 << hw->info.shift);
-+    alsa->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
-     if (!alsa->pcm_buf) {
-         dolog ("Could not allocate ADC buffer (%d samples, each %d bytes)\n",
-                hw->samples, 1 << hw->info.shift);
-diff --git a/audio/audio.c b/audio/audio.c
-index beafed209b..7658d2af66 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -424,12 +424,12 @@ static void audio_process_options (const char *prefix,
-     const char qemu_prefix[] = "QEMU_";
-     size_t preflen, optlen;
- 
--    if (audio_bug (AUDIO_FUNC, !prefix)) {
-+    if (audio_bug(__func__, !prefix)) {
-         dolog ("prefix = NULL\n");
-         return;
-     }
- 
--    if (audio_bug (AUDIO_FUNC, !opt)) {
-+    if (audio_bug(__func__, !opt)) {
-         dolog ("opt = NULL\n");
-         return;
-     }
-@@ -792,7 +792,7 @@ static int audio_attach_capture (HWVoiceOut *hw)
-         SWVoiceOut *sw;
-         HWVoiceOut *hw_cap = &cap->hw;
- 
--        sc = audio_calloc (AUDIO_FUNC, 1, sizeof (*sc));
-+        sc = audio_calloc(__func__, 1, sizeof(*sc));
-         if (!sc) {
-             dolog ("Could not allocate soft capture voice (%zu bytes)\n",
-                    sizeof (*sc));
-@@ -848,7 +848,7 @@ static int audio_pcm_hw_find_min_in (HWVoiceIn *hw)
- int audio_pcm_hw_get_live_in (HWVoiceIn *hw)
- {
-     int live = hw->total_samples_captured - audio_pcm_hw_find_min_in (hw);
--    if (audio_bug (AUDIO_FUNC, live < 0 || live > hw->samples)) {
-+    if (audio_bug(__func__, live < 0 || live > hw->samples)) {
-         dolog ("live=%d hw->samples=%d\n", live, hw->samples);
-         return 0;
-     }
-@@ -886,7 +886,7 @@ static int audio_pcm_sw_get_rpos_in (SWVoiceIn *sw)
-     int live = hw->total_samples_captured - sw->total_hw_samples_acquired;
-     int rpos;
- 
--    if (audio_bug (AUDIO_FUNC, live < 0 || live > hw->samples)) {
-+    if (audio_bug(__func__, live < 0 || live > hw->samples)) {
-         dolog ("live=%d hw->samples=%d\n", live, hw->samples);
-         return 0;
-     }
-@@ -909,7 +909,7 @@ int audio_pcm_sw_read (SWVoiceIn *sw, void *buf, int size)
-     rpos = audio_pcm_sw_get_rpos_in (sw) % hw->samples;
- 
-     live = hw->total_samples_captured - sw->total_hw_samples_acquired;
--    if (audio_bug (AUDIO_FUNC, live < 0 || live > hw->samples)) {
-+    if (audio_bug(__func__, live < 0 || live > hw->samples)) {
-         dolog ("live_in=%d hw->samples=%d\n", live, hw->samples);
-         return 0;
-     }
-@@ -935,7 +935,7 @@ int audio_pcm_sw_read (SWVoiceIn *sw, void *buf, int size)
-         }
-         osamp = swlim;
- 
--        if (audio_bug (AUDIO_FUNC, osamp < 0)) {
-+        if (audio_bug(__func__, osamp < 0)) {
-             dolog ("osamp=%d\n", osamp);
-             return 0;
-         }
-@@ -990,7 +990,7 @@ static int audio_pcm_hw_get_live_out (HWVoiceOut *hw, int *nb_live)
-     if (nb_live1) {
-         int live = smin;
- 
--        if (audio_bug (AUDIO_FUNC, live < 0 || live > hw->samples)) {
-+        if (audio_bug(__func__, live < 0 || live > hw->samples)) {
-             dolog ("live=%d hw->samples=%d\n", live, hw->samples);
-             return 0;
-         }
-@@ -1014,7 +1014,7 @@ int audio_pcm_sw_write (SWVoiceOut *sw, void *buf, int size)
-     hwsamples = sw->hw->samples;
- 
-     live = sw->total_hw_samples_mixed;
--    if (audio_bug (AUDIO_FUNC, live < 0 || live > hwsamples)){
-+    if (audio_bug(__func__, live < 0 || live > hwsamples)) {
-         dolog ("live=%d hw->samples=%d\n", live, hwsamples);
-         return 0;
-     }
-@@ -1263,7 +1263,7 @@ static int audio_get_avail (SWVoiceIn *sw)
-     }
- 
-     live = sw->hw->total_samples_captured - sw->total_hw_samples_acquired;
--    if (audio_bug (AUDIO_FUNC, live < 0 || live > sw->hw->samples)) {
-+    if (audio_bug(__func__, live < 0 || live > sw->hw->samples)) {
-         dolog ("live=%d sw->hw->samples=%d\n", live, sw->hw->samples);
-         return 0;
-     }
-@@ -1287,7 +1287,7 @@ static int audio_get_free (SWVoiceOut *sw)
- 
-     live = sw->total_hw_samples_mixed;
- 
--    if (audio_bug (AUDIO_FUNC, live < 0 || live > sw->hw->samples)) {
-+    if (audio_bug(__func__, live < 0 || live > sw->hw->samples)) {
-         dolog ("live=%d sw->hw->samples=%d\n", live, sw->hw->samples);
-         return 0;
-     }
-@@ -1354,7 +1354,7 @@ static void audio_run_out (AudioState *s)
-             live = 0;
-         }
- 
--        if (audio_bug (AUDIO_FUNC, live < 0 || live > hw->samples)) {
-+        if (audio_bug(__func__, live < 0 || live > hw->samples)) {
-             dolog ("live=%d hw->samples=%d\n", live, hw->samples);
-             continue;
-         }
-@@ -1389,7 +1389,7 @@ static void audio_run_out (AudioState *s)
-         prev_rpos = hw->rpos;
-         played = hw->pcm_ops->run_out (hw, live);
-         replay_audio_out(&played);
--        if (audio_bug (AUDIO_FUNC, hw->rpos >= hw->samples)) {
-+        if (audio_bug(__func__, hw->rpos >= hw->samples)) {
-             dolog ("hw->rpos=%d hw->samples=%d played=%d\n",
-                    hw->rpos, hw->samples, played);
-             hw->rpos = 0;
-@@ -1410,7 +1410,7 @@ static void audio_run_out (AudioState *s)
-                 continue;
-             }
- 
--            if (audio_bug (AUDIO_FUNC, played > sw->total_hw_samples_mixed)) {
-+            if (audio_bug(__func__, played > sw->total_hw_samples_mixed)) {
-                 dolog ("played=%d sw->total_hw_samples_mixed=%d\n",
-                        played, sw->total_hw_samples_mixed);
-                 played = sw->total_hw_samples_mixed;
-@@ -1513,7 +1513,7 @@ static void audio_run_capture (AudioState *s)
-                 continue;
-             }
- 
--            if (audio_bug (AUDIO_FUNC, captured > sw->total_hw_samples_mixed)) {
-+            if (audio_bug(__func__, captured > sw->total_hw_samples_mixed)) {
-                 dolog ("captured=%d sw->total_hw_samples_mixed=%d\n",
-                        captured, sw->total_hw_samples_mixed);
-                 captured = sw->total_hw_samples_mixed;
-@@ -1924,7 +1924,7 @@ CaptureVoiceOut *AUD_add_capture (
-         goto err0;
-     }
- 
--    cb = audio_calloc (AUDIO_FUNC, 1, sizeof (*cb));
-+    cb = audio_calloc(__func__, 1, sizeof(*cb));
-     if (!cb) {
-         dolog ("Could not allocate capture callback information, size %zu\n",
-                sizeof (*cb));
-@@ -1942,7 +1942,7 @@ CaptureVoiceOut *AUD_add_capture (
-         HWVoiceOut *hw;
-         CaptureVoiceOut *cap;
- 
--        cap = audio_calloc (AUDIO_FUNC, 1, sizeof (*cap));
-+        cap = audio_calloc(__func__, 1, sizeof(*cap));
-         if (!cap) {
-             dolog ("Could not allocate capture voice, size %zu\n",
-                    sizeof (*cap));
-@@ -1955,8 +1955,8 @@ CaptureVoiceOut *AUD_add_capture (
- 
-         /* XXX find a more elegant way */
-         hw->samples = 4096 * 4;
--        hw->mix_buf = audio_calloc (AUDIO_FUNC, hw->samples,
--                                    sizeof (struct st_sample));
-+        hw->mix_buf = audio_calloc(__func__, hw->samples,
-+                                   sizeof(struct st_sample));
-         if (!hw->mix_buf) {
-             dolog ("Could not allocate capture mix buffer (%d samples)\n",
-                    hw->samples);
-@@ -1965,7 +1965,7 @@ CaptureVoiceOut *AUD_add_capture (
- 
-         audio_pcm_init_info (&hw->info, as);
- 
--        cap->buf = audio_calloc (AUDIO_FUNC, hw->samples, 1 << hw->info.shift);
-+        cap->buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
-         if (!cap->buf) {
-             dolog ("Could not allocate capture buffer "
-                    "(%d samples, each %d bytes)\n",
-diff --git a/audio/audio_int.h b/audio/audio_int.h
-index 543b1bd8d5..5b25da0a37 100644
---- a/audio/audio_int.h
-+++ b/audio/audio_int.h
-@@ -252,10 +252,4 @@ static inline int audio_ring_dist (int dst, int src, int len)
- #define AUDIO_STRINGIFY_(n) #n
- #define AUDIO_STRINGIFY(n) AUDIO_STRINGIFY_(n)
- 
--#if defined _MSC_VER || defined __GNUC__
--#define AUDIO_FUNC __func__
--#else
--#define AUDIO_FUNC __FILE__ ":" AUDIO_STRINGIFY (__LINE__)
--#endif
--
- #endif /* QEMU_AUDIO_INT_H */
-diff --git a/audio/audio_pt_int.c b/audio/audio_pt_int.c
-index 21ff9c5803..3fe56d8514 100644
---- a/audio/audio_pt_int.c
-+++ b/audio/audio_pt_int.c
-@@ -31,7 +31,7 @@ int audio_pt_init (struct audio_pt *p, void *(*func) (void *),
- 
-     err = sigfillset (&set);
-     if (err) {
--        logerr (p, errno, "%s(%s): sigfillset failed", cap, AUDIO_FUNC);
-+        logerr(p, errno, "%s(%s): sigfillset failed", cap, __func__);
-         return -1;
-     }
- 
-@@ -57,8 +57,8 @@ int audio_pt_init (struct audio_pt *p, void *(*func) (void *),
- 
-     err2 = pthread_sigmask (SIG_SETMASK, &old_set, NULL);
-     if (err2) {
--        logerr (p, err2, "%s(%s): pthread_sigmask (restore) failed",
--                cap, AUDIO_FUNC);
-+        logerr(p, err2, "%s(%s): pthread_sigmask (restore) failed",
-+               cap, __func__);
-         /* We have failed to restore original signal mask, all bets are off,
-            so terminate the process */
-         exit (EXIT_FAILURE);
-@@ -74,17 +74,17 @@ int audio_pt_init (struct audio_pt *p, void *(*func) (void *),
-  err2:
-     err2 = pthread_cond_destroy (&p->cond);
-     if (err2) {
--        logerr (p, err2, "%s(%s): pthread_cond_destroy failed", cap, AUDIO_FUNC);
-+        logerr(p, err2, "%s(%s): pthread_cond_destroy failed", cap, __func__);
-     }
- 
-  err1:
-     err2 = pthread_mutex_destroy (&p->mutex);
-     if (err2) {
--        logerr (p, err2, "%s(%s): pthread_mutex_destroy failed", cap, AUDIO_FUNC);
-+        logerr(p, err2, "%s(%s): pthread_mutex_destroy failed", cap, __func__);
-     }
- 
-  err0:
--    logerr (p, err, "%s(%s): %s failed", cap, AUDIO_FUNC, efunc);
-+    logerr(p, err, "%s(%s): %s failed", cap, __func__, efunc);
-     return -1;
- }
- 
-@@ -94,13 +94,13 @@ int audio_pt_fini (struct audio_pt *p, const char *cap)
- 
-     err = pthread_cond_destroy (&p->cond);
-     if (err) {
--        logerr (p, err, "%s(%s): pthread_cond_destroy failed", cap, AUDIO_FUNC);
-+        logerr(p, err, "%s(%s): pthread_cond_destroy failed", cap, __func__);
-         ret = -1;
-     }
- 
-     err = pthread_mutex_destroy (&p->mutex);
-     if (err) {
--        logerr (p, err, "%s(%s): pthread_mutex_destroy failed", cap, AUDIO_FUNC);
-+        logerr(p, err, "%s(%s): pthread_mutex_destroy failed", cap, __func__);
-         ret = -1;
-     }
-     return ret;
-@@ -112,7 +112,7 @@ int audio_pt_lock (struct audio_pt *p, const char *cap)
- 
-     err = pthread_mutex_lock (&p->mutex);
-     if (err) {
--        logerr (p, err, "%s(%s): pthread_mutex_lock failed", cap, AUDIO_FUNC);
-+        logerr(p, err, "%s(%s): pthread_mutex_lock failed", cap, __func__);
-         return -1;
-     }
-     return 0;
-@@ -124,7 +124,7 @@ int audio_pt_unlock (struct audio_pt *p, const char *cap)
- 
-     err = pthread_mutex_unlock (&p->mutex);
-     if (err) {
--        logerr (p, err, "%s(%s): pthread_mutex_unlock failed", cap, AUDIO_FUNC);
-+        logerr(p, err, "%s(%s): pthread_mutex_unlock failed", cap, __func__);
-         return -1;
-     }
-     return 0;
-@@ -136,7 +136,7 @@ int audio_pt_wait (struct audio_pt *p, const char *cap)
- 
-     err = pthread_cond_wait (&p->cond, &p->mutex);
-     if (err) {
--        logerr (p, err, "%s(%s): pthread_cond_wait failed", cap, AUDIO_FUNC);
-+        logerr(p, err, "%s(%s): pthread_cond_wait failed", cap, __func__);
-         return -1;
-     }
-     return 0;
-@@ -148,12 +148,12 @@ int audio_pt_unlock_and_signal (struct audio_pt *p, const char *cap)
- 
-     err = pthread_mutex_unlock (&p->mutex);
-     if (err) {
--        logerr (p, err, "%s(%s): pthread_mutex_unlock failed", cap, AUDIO_FUNC);
-+        logerr(p, err, "%s(%s): pthread_mutex_unlock failed", cap, __func__);
-         return -1;
-     }
-     err = pthread_cond_signal (&p->cond);
-     if (err) {
--        logerr (p, err, "%s(%s): pthread_cond_signal failed", cap, AUDIO_FUNC);
-+        logerr(p, err, "%s(%s): pthread_cond_signal failed", cap, __func__);
-         return -1;
-     }
-     return 0;
-@@ -166,7 +166,7 @@ int audio_pt_join (struct audio_pt *p, void **arg, const char *cap)
- 
-     err = pthread_join (p->thread, &ret);
-     if (err) {
--        logerr (p, err, "%s(%s): pthread_join failed", cap, AUDIO_FUNC);
-+        logerr(p, err, "%s(%s): pthread_join failed", cap, __func__);
-         return -1;
-     }
-     *arg = ret;
-diff --git a/audio/audio_template.h b/audio/audio_template.h
-index 99b27b285e..7de227d2d1 100644
---- a/audio/audio_template.h
-+++ b/audio/audio_template.h
-@@ -57,13 +57,13 @@ static void glue (audio_init_nb_voices_, TYPE) (struct audio_driver *drv)
-         glue (s->nb_hw_voices_, TYPE) = max_voices;
-     }
- 
--    if (audio_bug (AUDIO_FUNC, !voice_size && max_voices)) {
-+    if (audio_bug(__func__, !voice_size && max_voices)) {
-         dolog ("drv=`%s' voice_size=0 max_voices=%d\n",
-                drv->name, max_voices);
-         glue (s->nb_hw_voices_, TYPE) = 0;
-     }
- 
--    if (audio_bug (AUDIO_FUNC, voice_size && !max_voices)) {
-+    if (audio_bug(__func__, voice_size && !max_voices)) {
-         dolog ("drv=`%s' voice_size=%d max_voices=0\n",
-                drv->name, voice_size);
-     }
-@@ -77,7 +77,7 @@ static void glue (audio_pcm_hw_free_resources_, TYPE) (HW *hw)
- 
- static int glue (audio_pcm_hw_alloc_resources_, TYPE) (HW *hw)
- {
--    HWBUF = audio_calloc (AUDIO_FUNC, hw->samples, sizeof (struct st_sample));
-+    HWBUF = audio_calloc(__func__, hw->samples, sizeof(struct st_sample));
-     if (!HWBUF) {
-         dolog ("Could not allocate " NAME " buffer (%d samples)\n",
-                hw->samples);
-@@ -105,7 +105,7 @@ static int glue (audio_pcm_sw_alloc_resources_, TYPE) (SW *sw)
- 
-     samples = ((int64_t) sw->hw->samples << 32) / sw->ratio;
- 
--    sw->buf = audio_calloc (AUDIO_FUNC, samples, sizeof (struct st_sample));
-+    sw->buf = audio_calloc(__func__, samples, sizeof(struct st_sample));
-     if (!sw->buf) {
-         dolog ("Could not allocate buffer for `%s' (%d samples)\n",
-                SW_NAME (sw), samples);
-@@ -238,17 +238,17 @@ static HW *glue (audio_pcm_hw_add_new_, TYPE) (struct audsettings *as)
-         return NULL;
-     }
- 
--    if (audio_bug (AUDIO_FUNC, !drv)) {
-+    if (audio_bug(__func__, !drv)) {
-         dolog ("No host audio driver\n");
-         return NULL;
-     }
- 
--    if (audio_bug (AUDIO_FUNC, !drv->pcm_ops)) {
-+    if (audio_bug(__func__, !drv->pcm_ops)) {
-         dolog ("Host audio driver without pcm_ops\n");
-         return NULL;
-     }
- 
--    hw = audio_calloc (AUDIO_FUNC, 1, glue (drv->voice_size_, TYPE));
-+    hw = audio_calloc(__func__, 1, glue(drv->voice_size_, TYPE));
-     if (!hw) {
-         dolog ("Can not allocate voice `%s' size %d\n",
-                drv->name, glue (drv->voice_size_, TYPE));
-@@ -266,7 +266,7 @@ static HW *glue (audio_pcm_hw_add_new_, TYPE) (struct audsettings *as)
-         goto err0;
-     }
- 
--    if (audio_bug (AUDIO_FUNC, hw->samples <= 0)) {
-+    if (audio_bug(__func__, hw->samples <= 0)) {
-         dolog ("hw->samples=%d\n", hw->samples);
-         goto err1;
-     }
-@@ -339,7 +339,7 @@ static SW *glue (audio_pcm_create_voice_pair_, TYPE) (
-         hw_as = *as;
-     }
- 
--    sw = audio_calloc (AUDIO_FUNC, 1, sizeof (*sw));
-+    sw = audio_calloc(__func__, 1, sizeof(*sw));
-     if (!sw) {
-         dolog ("Could not allocate soft voice `%s' (%zu bytes)\n",
-                sw_name ? sw_name : "unknown", sizeof (*sw));
-@@ -379,7 +379,7 @@ static void glue (audio_close_, TYPE) (SW *sw)
- void glue (AUD_close_, TYPE) (QEMUSoundCard *card, SW *sw)
- {
-     if (sw) {
--        if (audio_bug (AUDIO_FUNC, !card)) {
-+        if (audio_bug(__func__, !card)) {
-             dolog ("card=%p\n", card);
-             return;
-         }
-@@ -399,7 +399,7 @@ SW *glue (AUD_open_, TYPE) (
- {
-     AudioState *s = &glob_audio_state;
- 
--    if (audio_bug (AUDIO_FUNC, !card || !name || !callback_fn || !as)) {
-+    if (audio_bug(__func__, !card || !name || !callback_fn || !as)) {
-         dolog ("card=%p name=%p callback_fn=%p as=%p\n",
-                card, name, callback_fn, as);
-         goto fail;
-@@ -408,12 +408,12 @@ SW *glue (AUD_open_, TYPE) (
-     ldebug ("open %s, freq %d, nchannels %d, fmt %d\n",
-             name, as->freq, as->nchannels, as->fmt);
- 
--    if (audio_bug (AUDIO_FUNC, audio_validate_settings (as))) {
-+    if (audio_bug(__func__, audio_validate_settings(as))) {
-         audio_print_settings (as);
-         goto fail;
-     }
- 
--    if (audio_bug (AUDIO_FUNC, !s->drv)) {
-+    if (audio_bug(__func__, !s->drv)) {
-         dolog ("Can not open `%s' (no host audio driver)\n", name);
-         goto fail;
-     }
-diff --git a/audio/dsoundaudio.c b/audio/dsoundaudio.c
-index 516846eb80..bc39cb9b4d 100644
---- a/audio/dsoundaudio.c
-+++ b/audio/dsoundaudio.c
-@@ -543,7 +543,7 @@ static int dsound_run_out (HWVoiceOut *hw, int live)
-         }
-     }
- 
--    if (audio_bug (AUDIO_FUNC, len < 0 || len > bufsize)) {
-+    if (audio_bug(__func__, len < 0 || len > bufsize)) {
-         dolog ("len=%d bufsize=%d old_pos=%ld ppos=%ld\n",
-                len, bufsize, old_pos, ppos);
-         return 0;
-diff --git a/audio/mixeng.c b/audio/mixeng.c
-index 0bf9b5360f..2ab22df2aa 100644
---- a/audio/mixeng.c
-+++ b/audio/mixeng.c
-@@ -344,7 +344,7 @@ struct rate {
+diff --git a/hw/bt/core.c b/hw/bt/core.c
+index c1806b71a3..a6e9bf2a3e 100644
+--- a/hw/bt/core.c
++++ b/hw/bt/core.c
+@@ -18,6 +18,7 @@
   */
- void *st_rate_start (int inrate, int outrate)
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu-common.h"
+ #include "sysemu/bt.h"
+ #include "hw/bt.h"
+@@ -31,24 +32,24 @@ static void bt_dummy_lmp_mode_change(struct bt_link_s *link)
+ static void bt_dummy_lmp_connection_complete(struct bt_link_s *link)
  {
--    struct rate *rate = audio_calloc (AUDIO_FUNC, 1, sizeof (*rate));
-+    struct rate *rate = audio_calloc(__func__, 1, sizeof(*rate));
- 
-     if (!rate) {
-         dolog ("Could not allocate resampler (%zu bytes)\n", sizeof (*rate));
-diff --git a/audio/ossaudio.c b/audio/ossaudio.c
-index 0edd7ea5fe..a0428881c2 100644
---- a/audio/ossaudio.c
-+++ b/audio/ossaudio.c
-@@ -582,11 +582,9 @@ static int oss_init_out(HWVoiceOut *hw, struct audsettings *as,
-     }
- 
-     if (!oss->mmapped) {
--        oss->pcm_buf = audio_calloc (
--            AUDIO_FUNC,
--            hw->samples,
--            1 << hw->info.shift
--            );
-+        oss->pcm_buf = audio_calloc(__func__,
-+                                    hw->samples,
-+                                    1 << hw->info.shift);
-         if (!oss->pcm_buf) {
-             dolog (
-                 "Could not allocate DAC buffer (%d samples, each %d bytes)\n",
-@@ -705,7 +703,7 @@ static int oss_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-     }
- 
-     hw->samples = (obt.nfrags * obt.fragsize) >> hw->info.shift;
--    oss->pcm_buf = audio_calloc (AUDIO_FUNC, hw->samples, 1 << hw->info.shift);
-+    oss->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
-     if (!oss->pcm_buf) {
-         dolog ("Could not allocate ADC buffer (%d samples, each %d bytes)\n",
-                hw->samples, 1 << hw->info.shift);
-diff --git a/audio/paaudio.c b/audio/paaudio.c
-index 65beb6f010..8cf19c51d0 100644
---- a/audio/paaudio.c
-+++ b/audio/paaudio.c
-@@ -206,7 +206,7 @@ static void *qpa_thread_out (void *arg)
-     PAVoiceOut *pa = arg;
-     HWVoiceOut *hw = &pa->hw;
- 
--    if (audio_pt_lock (&pa->pt, AUDIO_FUNC)) {
-+    if (audio_pt_lock(&pa->pt, __func__)) {
-         return NULL;
-     }
- 
-@@ -222,7 +222,7 @@ static void *qpa_thread_out (void *arg)
-                 break;
-             }
- 
--            if (audio_pt_wait (&pa->pt, AUDIO_FUNC)) {
-+            if (audio_pt_wait(&pa->pt, __func__)) {
-                 goto exit;
-             }
-         }
-@@ -230,7 +230,7 @@ static void *qpa_thread_out (void *arg)
-         decr = to_mix = audio_MIN (pa->live, pa->g->conf.samples >> 2);
-         rpos = pa->rpos;
- 
--        if (audio_pt_unlock (&pa->pt, AUDIO_FUNC)) {
-+        if (audio_pt_unlock(&pa->pt, __func__)) {
-             return NULL;
-         }
- 
-@@ -251,7 +251,7 @@ static void *qpa_thread_out (void *arg)
-             to_mix -= chunk;
-         }
- 
--        if (audio_pt_lock (&pa->pt, AUDIO_FUNC)) {
-+        if (audio_pt_lock(&pa->pt, __func__)) {
-             return NULL;
-         }
- 
-@@ -261,7 +261,7 @@ static void *qpa_thread_out (void *arg)
-     }
- 
-  exit:
--    audio_pt_unlock (&pa->pt, AUDIO_FUNC);
-+    audio_pt_unlock(&pa->pt, __func__);
-     return NULL;
+     if (link->slave->reject_reason)
+-        fprintf(stderr, "%s: stray LMP_not_accepted received, fixme\n",
+-                        __func__);
++        error_report("%s: stray LMP_not_accepted received, fixme",
++                     __func__);
+     else
+-        fprintf(stderr, "%s: stray LMP_accepted received, fixme\n",
+-                        __func__);
++        error_report("%s: stray LMP_accepted received, fixme",
++                     __func__);
+     exit(-1);
  }
  
-@@ -270,7 +270,7 @@ static int qpa_run_out (HWVoiceOut *hw, int live)
-     int decr;
-     PAVoiceOut *pa = (PAVoiceOut *) hw;
- 
--    if (audio_pt_lock (&pa->pt, AUDIO_FUNC)) {
-+    if (audio_pt_lock(&pa->pt, __func__)) {
-         return 0;
-     }
- 
-@@ -279,10 +279,10 @@ static int qpa_run_out (HWVoiceOut *hw, int live)
-     pa->live = live - decr;
-     hw->rpos = pa->rpos;
-     if (pa->live > 0) {
--        audio_pt_unlock_and_signal (&pa->pt, AUDIO_FUNC);
-+        audio_pt_unlock_and_signal(&pa->pt, __func__);
-     }
-     else {
--        audio_pt_unlock (&pa->pt, AUDIO_FUNC);
-+        audio_pt_unlock(&pa->pt, __func__);
-     }
-     return decr;
+ static void bt_dummy_lmp_disconnect_master(struct bt_link_s *link)
+ {
+-    fprintf(stderr, "%s: stray LMP_detach received, fixme\n", __func__);
++    fprintf(stderr, "%s: stray LMP_detach received, fixme", __func__);
+     exit(-1);
  }
-@@ -298,7 +298,7 @@ static void *qpa_thread_in (void *arg)
-     PAVoiceIn *pa = arg;
-     HWVoiceIn *hw = &pa->hw;
  
--    if (audio_pt_lock (&pa->pt, AUDIO_FUNC)) {
-+    if (audio_pt_lock(&pa->pt, __func__)) {
-         return NULL;
+ static void bt_dummy_lmp_acl_resp(struct bt_link_s *link,
+                 const uint8_t *data, int start, int len)
+ {
+-    fprintf(stderr, "%s: stray ACL response PDU, fixme\n", __func__);
++    error_report("%s: stray ACL response PDU, fixme", __func__);
+     exit(-1);
+ }
+ 
+@@ -113,7 +114,7 @@ void bt_device_done(struct bt_device_s *dev)
+     while (*p && *p != dev)
+         p = &(*p)->next;
+     if (*p != dev) {
+-        fprintf(stderr, "%s: bad bt device \"%s\"\n", __func__,
++        error_report("%s: bad bt device \"%s\"", __func__,
+                         dev->lmp_name ?: "(null)");
+         exit(-1);
      }
+diff --git a/hw/bt/hci-csr.c b/hw/bt/hci-csr.c
+index ac067b81f6..6a171a54b7 100644
+--- a/hw/bt/hci-csr.c
++++ b/hw/bt/hci-csr.c
+@@ -19,6 +19,7 @@
+  */
  
-@@ -314,7 +314,7 @@ static void *qpa_thread_in (void *arg)
-                 break;
-             }
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu-common.h"
+ #include "chardev/char-serial.h"
+ #include "qemu/timer.h"
+@@ -111,14 +112,14 @@ static uint8_t *csrhci_out_packet(struct csrhci_s *s, int len)
  
--            if (audio_pt_wait (&pa->pt, AUDIO_FUNC)) {
-+            if (audio_pt_wait(&pa->pt, __func__)) {
-                 goto exit;
-             }
+     if (off < FIFO_LEN) {
+         if (off + len > FIFO_LEN && (s->out_size = off + len) > FIFO_LEN * 2) {
+-            fprintf(stderr, "%s: can't alloc %i bytes\n", __func__, len);
++            error_report("%s: can't alloc %i bytes", __func__, len);
+             exit(-1);
          }
-@@ -322,7 +322,7 @@ static void *qpa_thread_in (void *arg)
-         incr = to_grab = audio_MIN (pa->dead, pa->g->conf.samples >> 2);
-         wpos = pa->wpos;
+         return s->outfifo + off;
+     }
  
--        if (audio_pt_unlock (&pa->pt, AUDIO_FUNC)) {
-+        if (audio_pt_unlock(&pa->pt, __func__)) {
-             return NULL;
+     if (s->out_len > s->out_size) {
+-        fprintf(stderr, "%s: can't alloc %i bytes\n", __func__, len);
++        error_report("%s: can't alloc %i bytes", __func__, len);
+         exit(-1);
+     }
+ 
+@@ -168,8 +169,8 @@ static void csrhci_in_packet_vendor(struct csrhci_s *s, int ocf,
+             s->bd_addr.b[5] = data[offset + 2];
+ 
+             s->hci->bdaddr_set(s->hci, s->bd_addr.b);
+-            fprintf(stderr, "%s: bd_address loaded from firmware: "
+-                            "%02x:%02x:%02x:%02x:%02x:%02x\n", __func__,
++            error_report("%s: bd_address loaded from firmware: "
++                            "%02x:%02x:%02x:%02x:%02x:%02x", __func__,
+                             s->bd_addr.b[0], s->bd_addr.b[1], s->bd_addr.b[2],
+                             s->bd_addr.b[3], s->bd_addr.b[4], s->bd_addr.b[5]);
          }
+@@ -181,7 +182,7 @@ static void csrhci_in_packet_vendor(struct csrhci_s *s, int ocf,
+         break;
  
-@@ -342,7 +342,7 @@ static void *qpa_thread_in (void *arg)
-             to_grab -= chunk;
+     default:
+-        fprintf(stderr, "%s: got a bad CMD packet\n", __func__);
++        error_report("%s: got a bad CMD packet", __func__);
+         return;
+     }
+ 
+@@ -226,7 +227,7 @@ static void csrhci_in_packet(struct csrhci_s *s, uint8_t *pkt)
+     case H4_NEG_PKT:
+         if (s->in_hdr != sizeof(csrhci_neg_packet) ||
+                         memcmp(pkt - 1, csrhci_neg_packet, s->in_hdr)) {
+-            fprintf(stderr, "%s: got a bad NEG packet\n", __func__);
++            error_report("%s: got a bad NEG packet", __func__);
+             return;
          }
+         pkt += 2;
+@@ -241,7 +242,7 @@ static void csrhci_in_packet(struct csrhci_s *s, uint8_t *pkt)
  
--        if (audio_pt_lock (&pa->pt, AUDIO_FUNC)) {
-+        if (audio_pt_lock(&pa->pt, __func__)) {
-             return NULL;
-         }
- 
-@@ -352,7 +352,7 @@ static void *qpa_thread_in (void *arg)
-     }
- 
-  exit:
--    audio_pt_unlock (&pa->pt, AUDIO_FUNC);
-+    audio_pt_unlock(&pa->pt, __func__);
-     return NULL;
- }
- 
-@@ -361,7 +361,7 @@ static int qpa_run_in (HWVoiceIn *hw)
-     int live, incr, dead;
-     PAVoiceIn *pa = (PAVoiceIn *) hw;
- 
--    if (audio_pt_lock (&pa->pt, AUDIO_FUNC)) {
-+    if (audio_pt_lock(&pa->pt, __func__)) {
-         return 0;
-     }
- 
-@@ -372,10 +372,10 @@ static int qpa_run_in (HWVoiceIn *hw)
-     pa->dead = dead - incr;
-     hw->wpos = pa->wpos;
-     if (pa->dead > 0) {
--        audio_pt_unlock_and_signal (&pa->pt, AUDIO_FUNC);
-+        audio_pt_unlock_and_signal(&pa->pt, __func__);
-     }
-     else {
--        audio_pt_unlock (&pa->pt, AUDIO_FUNC);
-+        audio_pt_unlock(&pa->pt, __func__);
-     }
-     return incr;
- }
-@@ -579,7 +579,7 @@ static int qpa_init_out(HWVoiceOut *hw, struct audsettings *as,
- 
-     audio_pcm_init_info (&hw->info, &obt_as);
-     hw->samples = g->conf.samples;
--    pa->pcm_buf = audio_calloc (AUDIO_FUNC, hw->samples, 1 << hw->info.shift);
-+    pa->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
-     pa->rpos = hw->rpos;
-     if (!pa->pcm_buf) {
-         dolog ("Could not allocate buffer (%d bytes)\n",
-@@ -587,7 +587,7 @@ static int qpa_init_out(HWVoiceOut *hw, struct audsettings *as,
-         goto fail2;
-     }
- 
--    if (audio_pt_init (&pa->pt, qpa_thread_out, hw, AUDIO_CAP, AUDIO_FUNC)) {
-+    if (audio_pt_init(&pa->pt, qpa_thread_out, hw, AUDIO_CAP, __func__)) {
-         goto fail3;
-     }
- 
-@@ -636,7 +636,7 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
- 
-     audio_pcm_init_info (&hw->info, &obt_as);
-     hw->samples = g->conf.samples;
--    pa->pcm_buf = audio_calloc (AUDIO_FUNC, hw->samples, 1 << hw->info.shift);
-+    pa->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
-     pa->wpos = hw->wpos;
-     if (!pa->pcm_buf) {
-         dolog ("Could not allocate buffer (%d bytes)\n",
-@@ -644,7 +644,7 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-         goto fail2;
-     }
- 
--    if (audio_pt_init (&pa->pt, qpa_thread_in, hw, AUDIO_CAP, AUDIO_FUNC)) {
-+    if (audio_pt_init(&pa->pt, qpa_thread_in, hw, AUDIO_CAP, __func__)) {
-         goto fail3;
-     }
- 
-@@ -667,17 +667,17 @@ static void qpa_fini_out (HWVoiceOut *hw)
-     void *ret;
-     PAVoiceOut *pa = (PAVoiceOut *) hw;
- 
--    audio_pt_lock (&pa->pt, AUDIO_FUNC);
-+    audio_pt_lock(&pa->pt, __func__);
-     pa->done = 1;
--    audio_pt_unlock_and_signal (&pa->pt, AUDIO_FUNC);
--    audio_pt_join (&pa->pt, &ret, AUDIO_FUNC);
-+    audio_pt_unlock_and_signal(&pa->pt, __func__);
-+    audio_pt_join(&pa->pt, &ret, __func__);
- 
-     if (pa->stream) {
-         pa_stream_unref (pa->stream);
-         pa->stream = NULL;
-     }
- 
--    audio_pt_fini (&pa->pt, AUDIO_FUNC);
-+    audio_pt_fini(&pa->pt, __func__);
-     g_free (pa->pcm_buf);
-     pa->pcm_buf = NULL;
- }
-@@ -687,17 +687,17 @@ static void qpa_fini_in (HWVoiceIn *hw)
-     void *ret;
-     PAVoiceIn *pa = (PAVoiceIn *) hw;
- 
--    audio_pt_lock (&pa->pt, AUDIO_FUNC);
-+    audio_pt_lock(&pa->pt, __func__);
-     pa->done = 1;
--    audio_pt_unlock_and_signal (&pa->pt, AUDIO_FUNC);
--    audio_pt_join (&pa->pt, &ret, AUDIO_FUNC);
-+    audio_pt_unlock_and_signal(&pa->pt, __func__);
-+    audio_pt_join(&pa->pt, &ret, __func__);
- 
-     if (pa->stream) {
-         pa_stream_unref (pa->stream);
-         pa->stream = NULL;
-     }
- 
--    audio_pt_fini (&pa->pt, AUDIO_FUNC);
-+    audio_pt_fini(&pa->pt, __func__);
-     g_free (pa->pcm_buf);
-     pa->pcm_buf = NULL;
- }
-diff --git a/audio/sdlaudio.c b/audio/sdlaudio.c
-index e8d91d22af..e92135bd2f 100644
---- a/audio/sdlaudio.c
-+++ b/audio/sdlaudio.c
-@@ -277,7 +277,7 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
+     case H4_ALIVE_PKT:
+         if (s->in_hdr != 4 || pkt[1] != 0x55 || pkt[2] != 0x00) {
+-            fprintf(stderr, "%s: got a bad ALIVE packet\n", __func__);
++            error_report("%s: got a bad ALIVE packet", __func__);
              return;
          }
  
--        if (audio_bug (AUDIO_FUNC, sdl->live < 0 || sdl->live > hw->samples)) {
-+        if (audio_bug(__func__, sdl->live < 0 || sdl->live > hw->samples)) {
-             dolog ("sdl->live=%d hw->samples=%d\n",
-                    sdl->live, hw->samples);
-             return;
-diff --git a/audio/wavaudio.c b/audio/wavaudio.c
-index 341eec3121..068a595732 100644
---- a/audio/wavaudio.c
-+++ b/audio/wavaudio.c
-@@ -139,7 +139,7 @@ static int wav_init_out(HWVoiceOut *hw, struct audsettings *as,
-     audio_pcm_init_info (&hw->info, &wav_as);
+@@ -254,7 +255,7 @@ static void csrhci_in_packet(struct csrhci_s *s, uint8_t *pkt)
+     default:
+     bad_pkt:
+         /* TODO: error out */
+-        fprintf(stderr, "%s: got a bad packet\n", __func__);
++        error_report("%s: got a bad packet", __func__);
+         break;
+     }
  
-     hw->samples = 1024;
--    wav->pcm_buf = audio_calloc (AUDIO_FUNC, hw->samples, 1 << hw->info.shift);
-+    wav->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
-     if (!wav->pcm_buf) {
-         dolog ("Could not allocate buffer (%d bytes)\n",
-                hw->samples << hw->info.shift);
+diff --git a/hw/bt/hci.c b/hw/bt/hci.c
+index df05f07887..ac9394daf0 100644
+--- a/hw/bt/hci.c
++++ b/hw/bt/hci.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "qemu/timer.h"
+@@ -457,7 +458,7 @@ static inline uint8_t *bt_hci_event_start(struct bt_hci_s *hci,
+     int mask_byte;
+ 
+     if (len > 255) {
+-        fprintf(stderr, "%s: HCI event params too long (%ib)\n",
++        error_report("%s: HCI event params too long (%ib)",
+                         __func__, len);
+         exit(-1);
+     }
+@@ -589,7 +590,7 @@ static void bt_hci_inquiry_result(struct bt_hci_s *hci,
+         bt_hci_inquiry_result_with_rssi(hci, slave);
+         return;
+     default:
+-        fprintf(stderr, "%s: bad inquiry mode %02x\n", __func__,
++        error_report("%s: bad inquiry mode %02x", __func__,
+                         hci->lm.inquiry_mode);
+         exit(-1);
+     }
+@@ -1971,7 +1972,7 @@ static void bt_submit_hci(struct HCIInfo *info,
+         break;
+ 
+     short_hci:
+-        fprintf(stderr, "%s: HCI packet too short (%iB)\n",
++        error_report("%s: HCI packet too short (%iB)",
+                         __func__, length);
+         bt_hci_event_status(hci, HCI_INVALID_PARAMETERS);
+         break;
+@@ -1991,7 +1992,7 @@ static inline void bt_hci_lmp_acl_data(struct bt_hci_s *hci, uint16_t handle,
+     /* TODO: avoid memcpy'ing */
+ 
+     if (len + HCI_ACL_HDR_SIZE > sizeof(hci->acl_buf)) {
+-        fprintf(stderr, "%s: can't take ACL packets %i bytes long\n",
++        error_report("%s: can't take ACL packets %i bytes long",
+                         __func__, len);
+         return;
+     }
+@@ -2029,7 +2030,7 @@ static void bt_submit_acl(struct HCIInfo *info,
+     struct bt_link_s *link;
+ 
+     if (length < HCI_ACL_HDR_SIZE) {
+-        fprintf(stderr, "%s: ACL packet too short (%iB)\n",
++        error_report("%s: ACL packet too short (%iB)",
+                         __func__, length);
+         return;
+     }
+@@ -2041,15 +2042,15 @@ static void bt_submit_acl(struct HCIInfo *info,
+     length -= HCI_ACL_HDR_SIZE;
+ 
+     if (bt_hci_handle_bad(hci, handle)) {
+-        fprintf(stderr, "%s: invalid ACL handle %03x\n",
+-                        __func__, handle);
++        error_report("%s: invalid ACL handle %03x",
++                     __func__, handle);
+         /* TODO: signal an error */
+         return;
+     }
+     handle &= ~HCI_HANDLE_OFFSET;
+ 
+     if (datalen > length) {
+-        fprintf(stderr, "%s: ACL packet too short (%iB < %iB)\n",
++        fprintf(stderr, "%s: ACL packet too short (%iB < %iB)",
+                         __func__, length, datalen);
+         return;
+     }
+@@ -2060,7 +2061,7 @@ static void bt_submit_acl(struct HCIInfo *info,
+         if (!hci->asb_handle)
+             hci->asb_handle = handle;
+         else if (handle != hci->asb_handle) {
+-            fprintf(stderr, "%s: Bad handle %03x in Active Slave Broadcast\n",
++            error_report("%s: Bad handle %03x in Active Slave Broadcast",
+                             __func__, handle);
+             /* TODO: signal an error */
+             return;
+@@ -2073,7 +2074,7 @@ static void bt_submit_acl(struct HCIInfo *info,
+         if (!hci->psb_handle)
+             hci->psb_handle = handle;
+         else if (handle != hci->psb_handle) {
+-            fprintf(stderr, "%s: Bad handle %03x in Parked Slave Broadcast\n",
++            error_report("%s: Bad handle %03x in Parked Slave Broadcast",
+                             __func__, handle);
+             /* TODO: signal an error */
+             return;
+@@ -2105,14 +2106,13 @@ static void bt_submit_sco(struct HCIInfo *info,
+     length -= 3;
+ 
+     if (bt_hci_handle_bad(hci, handle)) {
+-        fprintf(stderr, "%s: invalid SCO handle %03x\n",
+-                        __func__, handle);
++        error_report("%s: invalid SCO handle %03x", __func__, handle);
+         return;
+     }
+ 
+     if (datalen > length) {
+-        fprintf(stderr, "%s: SCO packet too short (%iB < %iB)\n",
+-                        __func__, length, datalen);
++        error_report("%s: SCO packet too short (%iB < %iB)",
++                     __func__, length, datalen);
+         return;
+     }
+ 
+@@ -2223,7 +2223,7 @@ struct HCIInfo *hci_init(const char *str)
+            return bt_new_hci(vlan);
+     }
+ 
+-    fprintf(stderr, "qemu: Unknown bluetooth HCI `%s'.\n", str);
++    error_report("qemu: Unknown bluetooth HCI `%s'.", str);
+ 
+     return 0;
+ }
+diff --git a/hw/bt/hid.c b/hw/bt/hid.c
+index 09d17322e4..056291f9b5 100644
+--- a/hw/bt/hid.c
++++ b/hw/bt/hid.c
+@@ -419,7 +419,7 @@ static void bt_hid_interrupt_sdu(void *opaque, const uint8_t *data, int len)
+ 
+     return;
+ bad:
+-    fprintf(stderr, "%s: bad transaction on Interrupt channel.\n",
++    error_report("%s: bad transaction on Interrupt channel.",
+                     __func__);
+ }
+ 
+diff --git a/hw/bt/l2cap.c b/hw/bt/l2cap.c
+index 3e53dd082d..9cf27f0df6 100644
+--- a/hw/bt/l2cap.c
++++ b/hw/bt/l2cap.c
+@@ -18,6 +18,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu-common.h"
+ #include "qemu/timer.h"
+ #include "qemu/bswap.h"
+@@ -467,8 +468,8 @@ static void l2cap_channel_close(struct l2cap_instance_s *l2cap,
+ 
+     if (likely(ch)) {
+         if (ch->remote_cid != source_cid) {
+-            fprintf(stderr, "%s: Ignoring a Disconnection Request with the "
+-                            "invalid SCID %04x.\n", __func__, source_cid);
++            error_report("%s: Ignoring a Disconnection Request with the "
++                            "invalid SCID %04x.", __func__, source_cid);
+             return;
+         }
+ 
+@@ -790,7 +791,7 @@ static void l2cap_command(struct l2cap_instance_s *l2cap, int code, int id,
+ #if 0
+     /* TODO: do the IDs really have to be in sequence?  */
+     if (!id || (id != l2cap->last_id && id != l2cap->next_id)) {
+-        fprintf(stderr, "%s: out of sequence command packet ignored.\n",
++        error_report("%s: out of sequence command packet ignored.",
+                         __func__);
+         return;
+     }
+@@ -813,9 +814,9 @@ static void l2cap_command(struct l2cap_instance_s *l2cap, int code, int id,
+         }
+ 
+         /* We never issue commands other than Command Reject currently.  */
+-        fprintf(stderr, "%s: stray Command Reject (%02x, %04x) "
+-                        "packet, ignoring.\n", __func__, id,
+-                        le16_to_cpu(((l2cap_cmd_rej *) params)->reason));
++        error_report("%s: stray Command Reject (%02x, %04x) "
++                     "packet, ignoring.", __func__, id,
++                     le16_to_cpu(((l2cap_cmd_rej *) params)->reason));
+         break;
+ 
+     case L2CAP_CONN_REQ:
+@@ -836,8 +837,8 @@ static void l2cap_command(struct l2cap_instance_s *l2cap, int code, int id,
+         }
+ 
+         /* We never issue Connection Requests currently. TODO  */
+-        fprintf(stderr, "%s: unexpected Connection Response (%02x) "
+-                        "packet, ignoring.\n", __func__, id);
++        error_report("%s: unexpected Connection Response (%02x) "
++                     "packet, ignoring.", __func__, id);
+         break;
+ 
+     case L2CAP_CONF_REQ:
+@@ -865,8 +866,8 @@ static void l2cap_command(struct l2cap_instance_s *l2cap, int code, int id,
+                         le16_to_cpu(((l2cap_conf_rsp *) params)->scid),
+                         ((l2cap_conf_rsp *) params)->data,
+                         len - L2CAP_CONF_RSP_SIZE(0)))
+-            fprintf(stderr, "%s: unexpected Configure Response (%02x) "
+-                            "packet, ignoring.\n", __func__, id);
++            error_report("%s: unexpected Configure Response (%02x) "
++                         "packet, ignoring.", __func__, id);
+         break;
+ 
+     case L2CAP_DISCONN_REQ:
+@@ -887,8 +888,8 @@ static void l2cap_command(struct l2cap_instance_s *l2cap, int code, int id,
+         }
+ 
+         /* We never issue Disconnection Requests currently. TODO  */
+-        fprintf(stderr, "%s: unexpected Disconnection Response (%02x) "
+-                        "packet, ignoring.\n", __func__, id);
++        error_report("%s: unexpected Disconnection Response (%02x) "
++                     "packet, ignoring.", __func__, id);
+         break;
+ 
+     case L2CAP_ECHO_REQ:
+@@ -897,8 +898,8 @@ static void l2cap_command(struct l2cap_instance_s *l2cap, int code, int id,
+ 
+     case L2CAP_ECHO_RSP:
+         /* We never issue Echo Requests currently. TODO  */
+-        fprintf(stderr, "%s: unexpected Echo Response (%02x) "
+-                        "packet, ignoring.\n", __func__, id);
++        error_report("%s: unexpected Echo Response (%02x) "
++                     "packet, ignoring.", __func__, id);
+         break;
+ 
+     case L2CAP_INFO_REQ:
+@@ -917,8 +918,8 @@ static void l2cap_command(struct l2cap_instance_s *l2cap, int code, int id,
+         }
+ 
+         /* We never issue Information Requests currently. TODO  */
+-        fprintf(stderr, "%s: unexpected Information Response (%02x) "
+-                        "packet, ignoring.\n", __func__, id);
++        error_report("%s: unexpected Information Response (%02x) "
++                     "packet, ignoring.", __func__, id);
+         break;
+ 
+     default:
+@@ -1066,8 +1067,8 @@ static void l2cap_frame_in(struct l2cap_instance_s *l2cap,
+     uint16_t len = le16_to_cpu(frame->len);
+ 
+     if (unlikely(cid >= L2CAP_CID_MAX || !l2cap->cid[cid])) {
+-        fprintf(stderr, "%s: frame addressed to a non-existent L2CAP "
+-                        "channel %04x received.\n", __func__, cid);
++        error_report("%s: frame addressed to a non-existent L2CAP "
++                     "channel %04x received.", __func__, cid);
+         return;
+     }
+ 
+@@ -1128,9 +1129,9 @@ static uint8_t *l2cap_bframe_out(struct bt_l2cap_conn_params_s *parm, int len)
+     struct l2cap_chan_s *chan = (struct l2cap_chan_s *) parm;
+ 
+     if (len > chan->params.remote_mtu) {
+-        fprintf(stderr, "%s: B-Frame for CID %04x longer than %i octets.\n",
+-                        __func__,
+-                        chan->remote_cid, chan->params.remote_mtu);
++        error_report("%s: B-Frame for CID %04x longer than %i octets.",
++                     __func__,
++                     chan->remote_cid, chan->params.remote_mtu);
+         exit(-1);
+     }
+ 
+@@ -1353,8 +1354,8 @@ void bt_l2cap_psm_register(struct bt_l2cap_device_s *dev, int psm, int min_mtu,
+     struct bt_l2cap_psm_s *new_psm = l2cap_psm(dev, psm);
+ 
+     if (new_psm) {
+-        fprintf(stderr, "%s: PSM %04x already registered for device `%s'.\n",
+-                        __func__, psm, dev->device.lmp_name);
++        error_report("%s: PSM %04x already registered for device `%s'.",
++                     __func__, psm, dev->device.lmp_name);
+         exit(-1);
+     }
+ 
+diff --git a/hw/bt/sdp.c b/hw/bt/sdp.c
+index 7c0d38b504..f4aba9d74f 100644
+--- a/hw/bt/sdp.c
++++ b/hw/bt/sdp.c
+@@ -18,6 +18,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu-common.h"
+ #include "qemu/host-utils.h"
+ #include "hw/bt.h"
+@@ -506,7 +507,7 @@ static void bt_l2cap_sdp_sdu_in(void *opaque, const uint8_t *data, int len)
+     int rsp_len = 0;
+ 
+     if (len < 5) {
+-        fprintf(stderr, "%s: short SDP PDU (%iB).\n", __func__, len);
++        error_report("%s: short SDP PDU (%iB).", __func__, len);
+         return;
+     }
+ 
+@@ -517,7 +518,7 @@ static void bt_l2cap_sdp_sdu_in(void *opaque, const uint8_t *data, int len)
+     len -= 5;
+ 
+     if (len != plen) {
+-        fprintf(stderr, "%s: wrong SDP PDU length (%iB != %iB).\n",
++        error_report("%s: wrong SDP PDU length (%iB != %iB).",
+                         __func__, plen, len);
+         err = SDP_INVALID_PDU_SIZE;
+         goto respond;
+@@ -544,7 +545,7 @@ static void bt_l2cap_sdp_sdu_in(void *opaque, const uint8_t *data, int len)
+     case SDP_SVC_SEARCH_RSP:
+     case SDP_SVC_SEARCH_ATTR_RSP:
+     default:
+-        fprintf(stderr, "%s: unexpected SDP PDU ID %02x.\n",
++        error_report("%s: unexpected SDP PDU ID %02x.",
+                         __func__, pdu_id);
+         err = SDP_INVALID_SYNTAX;
+         break;
 -- 
 2.11.0
