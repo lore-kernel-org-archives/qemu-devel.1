@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1dy7Df-0002WV-PI
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 22:09:32 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1dy7De-0005G2-V1
+	(envelope-from <alindsay@codeaurora.org>) id 1dy7Dd-0002Tf-Oz
 	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 22:09:31 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <alindsay@codeaurora.org>) id 1dy7Dc-0005CM-Rl
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 22:09:29 -0400
 From: Aaron Lindsay <alindsay@codeaurora.org>
-Date: Fri, 29 Sep 2017 22:08:25 -0400
-Message-Id: <1506737310-21880-9-git-send-email-alindsay@codeaurora.org>
+Date: Fri, 29 Sep 2017 22:08:22 -0400
+Message-Id: <1506737310-21880-6-git-send-email-alindsay@codeaurora.org>
 In-Reply-To: <1506737310-21880-1-git-send-email-alindsay@codeaurora.org>
 References: <1506737310-21880-1-git-send-email-alindsay@codeaurora.org>
-Subject: [Qemu-devel] [PATCH 08/13] target/arm: Split arm_ccnt_enabled into
- generic pmu_counter_enabled
+Subject: [Qemu-devel] [PATCH 05/13] target/arm: Allow AArch32 access for
+ PMCCFILTR
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -23,40 +23,56 @@ To: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Fran
 Cc: qemu-devel@nongnu.org, Michael Spradling <mspradli@codeaurora.org>, Aaron Lindsay <alindsay@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 List-ID: <qemu-devel.nongnu.org>
 
+Also fix the existing bitmask for writes.
+
 Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
 ---
- target/arm/helper.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ target/arm/helper.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 3932ac0..c0ef367 100644
+index 54070a3..fcc2fcf 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -975,17 +975,22 @@ static CPAccessResult pmreg_access_ccntr(CPUARMState *env,
-     return pmreg_access(env, ri, isread);
- }
- 
--static inline bool arm_ccnt_enabled(CPUARMState *env)
-+static inline bool pmu_counter_enabled(CPUARMState *env, uint8_t counter)
+@@ -1059,10 +1059,25 @@ static void pmccfiltr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                             uint64_t value)
  {
-     /* Does not check PMCCFILTR_EL0, which is handled by pmu_counter_filtered */
--
--    if (!(env->cp15.c9_pmcr & PMCRE) || !(env->cp15.c9_pmcnten & (1 << 31))) {
-+    if (!(env->cp15.c9_pmcr & PMCRE) ||
-+            !(env->cp15.c9_pmcnten & (1 << counter))) {
-         return false;
-     }
- 
-     return true;
+     pmccntr_sync(env);
+-    env->cp15.pmccfiltr_el0 = value & 0x7E000000;
++    env->cp15.pmccfiltr_el0 = value & 0xfc000000;
+     pmccntr_sync(env);
  }
  
-+static inline bool arm_ccnt_enabled(CPUARMState *env)
++static void pmccfiltr_write_a32(CPUARMState *env, const ARMCPRegInfo *ri,
++                            uint64_t value)
 +{
-+    return pmu_counter_enabled(env, 31);
++    pmccntr_sync(env);
++    env->cp15.pmccfiltr_el0 = (env->cp15.pmccfiltr_el0 & 0x04000000) |
++        (value & 0xf8000000); /* M is not visible in AArch32 */
++    pmccntr_sync(env);
 +}
 +
- /* Returns true if the counter corresponding to the passed-in pmevtyper or
-  * pmccfiltr value is filtered using the current state */
- static inline bool pmu_counter_filtered(CPUARMState *env, uint64_t pmxevtyper)
++static uint64_t pmccfiltr_read_a32(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    /* M is not visible in AArch32 */
++    return env->cp15.pmccfiltr_el0 & 0xf8000000;
++}
++
+ static void pmcntenset_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                             uint64_t value)
+ {
+@@ -1280,6 +1295,12 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+       .type = ARM_CP_IO,
+       .readfn = pmccntr_read, .writefn = pmccntr_write, },
+ #endif
++    { .name = "PMCCFILTR", .cp = 15, .opc1 = 0, .crn = 14, .crm = 15, .opc2 = 7,
++      .writefn = pmccfiltr_write_a32, .readfn = pmccfiltr_read_a32,
++      .access = PL0_RW, .accessfn = pmreg_access,
++      .type = ARM_CP_ALIAS,
++      .fieldoffset = offsetoflow32(CPUARMState, cp15.pmccfiltr_el0),
++      .resetvalue = 0, },
+     { .name = "PMCCFILTR_EL0", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 15, .opc2 = 7,
+       .writefn = pmccfiltr_write,
 -- 
 Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.\nQualcomm Technologies, Inc. is a member of the\nCode Aurora Forum, a Linux Foundation Collaborative Project.
