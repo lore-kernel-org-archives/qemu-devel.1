@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5VP-00042e-E6
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:45 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dy5VZ-0004Er-La
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5VM-0004gI-4t
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:43 -0400
-Received: from mail-dm3nam03on0087.outbound.protection.outlook.com
-	([104.47.41.87]:4192
-	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
+	(envelope-from <alistai@xilinx.com>) id 1dy5VW-00057R-Dj
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:53 -0400
+Received: from mail-sn1nam02on0063.outbound.protection.outlook.com
+	([104.47.36.63]:23734
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dy5VL-0004ds-QZ
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:40 -0400
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dy5VW-00053q-3g
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:50 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 29 Sep 2017 17:15:37 -0700
-Message-ID: <85d53cce03d155ea59564a2743e8eb4637b422f0.1506730372.git.alistair.francis@xilinx.com>
+Date: Fri, 29 Sep 2017 17:15:52 -0700
+Message-ID: <4cfb4103300d333ec3e262dfb1b5873db1b6352e.1506730372.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1506730372.git.alistair.francis@xilinx.com>
 References: <cover.1506730372.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 12/47] hw/dma: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v2 17/47] hw/input: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
@@ -28,7 +28,7 @@ List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
 Replace a large number of the fprintf(stderr, "*\n" calls with
@@ -72,168 +72,402 @@ find ./* -type f -exec sed -i \
 Some lines where then manually tweaked to pass checkpatch.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 ---
 V2:
  - Split hw patch into individual directories
 
- hw/dma/omap_dma.c | 26 ++++++++++++++------------
- hw/dma/soc_dma.c  | 37 +++++++++++++++++++------------------
- 2 files changed, 33 insertions(+), 30 deletions(-)
+ hw/input/lm832x.c           |  6 ++--
+ hw/input/pckbd.c            |  3 +-
+ hw/input/pxa2xx_keypad.c    |  2 +-
+ hw/input/tsc2005.c          | 17 +++++------
+ hw/input/tsc210x.c          | 72 ++++++++++++++++++++++-----------------------
+ hw/input/virtio-input-hid.c | 14 ++++-----
+ hw/input/virtio-input.c     |  5 ++--
+ 7 files changed, 60 insertions(+), 59 deletions(-)
 
-diff --git a/hw/dma/omap_dma.c b/hw/dma/omap_dma.c
-index abd18c67ea..5d7fe06d98 100644
---- a/hw/dma/omap_dma.c
-+++ b/hw/dma/omap_dma.c
-@@ -18,6 +18,7 @@
-  * with this program; if not, see <http://www.gnu.org/licenses/>.
+diff --git a/hw/input/lm832x.c b/hw/input/lm832x.c
+index d39953126b..caeeda47f2 100644
+--- a/hw/input/lm832x.c
++++ b/hw/input/lm832x.c
+@@ -239,7 +239,7 @@ static uint8_t lm_kbd_read(LM823KbdState *s, int reg, int byte)
+ 
+     default:
+         lm_kbd_error(s, ERR_CMDUNK);
+-        fprintf(stderr, "%s: unknown command %02x\n", __func__, reg);
++        error_report("%s: unknown command %02x", __func__, reg);
+         return 0x00;
+     }
+ 
+@@ -330,7 +330,7 @@ static void lm_kbd_write(LM823KbdState *s, int reg, int byte, uint8_t value)
+         s->reg = LM832x_GENERAL_ERROR;
+         if ((value & 3) && (value & 3) != 3) {
+             lm_kbd_error(s, ERR_BADPAR);
+-            fprintf(stderr, "%s: invalid clock setting in RCPWM\n",
++            error_report("%s: invalid clock setting in RCPWM",
+                             __func__);
+         }
+         /* TODO: Validate that the command is only issued once */
+@@ -378,7 +378,7 @@ static void lm_kbd_write(LM823KbdState *s, int reg, int byte, uint8_t value)
+         break;
+     default:
+         lm_kbd_error(s, ERR_CMDUNK);
+-        fprintf(stderr, "%s: unknown command %02x\n", __func__, reg);
++        error_report("%s: unknown command %02x", __func__, reg);
+         break;
+     }
+ }
+diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
+index c479f827b6..ff4f03e4c3 100644
+--- a/hw/input/pckbd.c
++++ b/hw/input/pckbd.c
+@@ -22,6 +22,7 @@
+  * THE SOFTWARE.
   */
  #include "qemu/osdep.h"
 +#include "qemu/error-report.h"
- #include "qemu-common.h"
- #include "qemu/timer.h"
- #include "hw/arm/omap.h"
-@@ -1898,13 +1899,13 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
-             omap_dma_reset(s->dma);
-         s->ocp = value & 0x3321;
-         if (((s->ocp >> 12) & 3) == 3)				/* MIDLEMODE */
--            fprintf(stderr, "%s: invalid DMA power mode\n", __func__);
-+            error_report("%s: invalid DMA power mode", __func__);
-         return;
+ #include "hw/hw.h"
+ #include "hw/isa/isa.h"
+ #include "hw/i386/pc.h"
+@@ -307,7 +308,7 @@ static void kbd_write_command(void *opaque, hwaddr addr,
+         /* ignore that */
+         break;
+     default:
+-        fprintf(stderr, "qemu: unsupported keyboard cmd=0x%02x\n", (int)val);
++        error_report("qemu: unsupported keyboard cmd=0x%02x", (int)val);
+         break;
+     }
+ }
+diff --git a/hw/input/pxa2xx_keypad.c b/hw/input/pxa2xx_keypad.c
+index 93db9ed25b..0a594c30fc 100644
+--- a/hw/input/pxa2xx_keypad.c
++++ b/hw/input/pxa2xx_keypad.c
+@@ -326,7 +326,7 @@ void pxa27x_register_keypad(PXA2xxKeyPadState *kp,
+                             const struct keymap *map, int size)
+ {
+     if(!map || size < 0x80) {
+-        fprintf(stderr, "%s - No PXA keypad map defined\n", __func__);
++        error_report("%s - No PXA keypad map defined", __func__);
+         exit(-1);
+     }
  
-     case 0x78:	/* DMA4_GCR */
-         s->gcr = value & 0x00ff00ff;
- 	if ((value & 0xff) == 0x00)		/* MAX_CHANNEL_FIFO_DEPTH */
--            fprintf(stderr, "%s: wrong FIFO depth in GCR\n", __func__);
-+            error_report("%s: wrong FIFO depth in GCR", __func__);
-         return;
- 
-     case 0x80 ... 0xfff:
-@@ -1934,8 +1935,8 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
-         ch->buf_disable = (value >> 25) & 1;
-         ch->src_sync = (value >> 24) & 1;	/* XXX For CamDMA must be 1 */
-         if (ch->buf_disable && !ch->src_sync)
--            fprintf(stderr, "%s: Buffering disable is not allowed in "
--                            "destination synchronised mode\n", __func__);
-+            error_report("%s: Buffering disable is not allowed in "
-+                         "destination synchronised mode", __func__);
-         ch->prefetch = (value >> 23) & 1;
-         ch->bs = (value >> 18) & 1;
-         ch->transparent_copy = (value >> 17) & 1;
-@@ -1946,8 +1947,8 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
-         ch->priority = (value & 0x0040) >> 6;
-         ch->fs = (value & 0x0020) >> 5;
-         if (ch->fs && ch->bs && ch->mode[0] && ch->mode[1])
--            fprintf(stderr, "%s: For a packet transfer at least one port "
--                            "must be constant-addressed\n", __func__);
-+            error_report("%s: For a packet transfer at least one port "
-+                         "must be constant-addressed", __func__);
-         ch->sync = (value & 0x001f) | ((value >> 14) & 0x0060);
-         /* XXX must be 0x01 for CamDMA */
- 
-@@ -1977,8 +1978,8 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
-         ch->endian[1] =(value >> 19) & 1;
-         ch->endian_lock[1] =(value >> 18) & 1;
-         if (ch->endian[0] != ch->endian[1])
--            fprintf(stderr, "%s: DMA endianness conversion enable attempt\n",
+diff --git a/hw/input/tsc2005.c b/hw/input/tsc2005.c
+index 7990954b6c..f5057e8eeb 100644
+--- a/hw/input/tsc2005.c
++++ b/hw/input/tsc2005.c
+@@ -200,17 +200,17 @@ static void tsc2005_write(TSC2005State *s, int reg, uint16_t data)
+         s->host_mode = (data >> 15) != 0;
+         if (s->enabled != !(data & 0x4000)) {
+             s->enabled = !(data & 0x4000);
+-            fprintf(stderr, "%s: touchscreen sense %sabled\n",
+-                            __func__, s->enabled ? "en" : "dis");
++            error_report("%s: touchscreen sense %sabled",
++                         __func__, s->enabled ? "en" : "dis");
+             if (s->busy && !s->enabled)
+                 timer_del(s->timer);
+             s->busy = s->busy && s->enabled;
+         }
+         s->nextprecision = (data >> 13) & 1;
+         s->timing[0] = data & 0x1fff;
+-        if ((s->timing[0] >> 11) == 3)
+-            fprintf(stderr, "%s: illegal conversion clock setting\n",
 -                            __func__);
-+            error_report("%s: DMA endianness conversion enable attempt",
-+                          __func__);
-         ch->write_mode = (value >> 16) & 3;
-         ch->burst[1] = (value & 0xc000) >> 14;
-         ch->pack[1] = (value & 0x2000) >> 13;
-@@ -1986,12 +1987,13 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
-         ch->burst[0] = (value & 0x0180) >> 7;
-         ch->pack[0] = (value & 0x0040) >> 6;
-         ch->translate[0] = (value & 0x003c) >> 2;
--        if (ch->translate[0] | ch->translate[1])
--            fprintf(stderr, "%s: bad MReqAddressTranslate sideband signal\n",
--                            __func__);
-+        if (ch->translate[0] | ch->translate[1]) {
-+            error_report("%s: bad MReqAddressTranslate sideband signal",
-+                         __func__);
++        if ((s->timing[0] >> 11) == 3) {
++            error_report("%s: illegal conversion clock setting", __func__);
 +        }
-         ch->data_type = 1 << (value & 3);
-         if ((value & 3) == 3) {
--            printf("%s: bad data_type for DMA channel\n", __func__);
-+            error_report("%s: bad data_type for DMA channel", __func__);
-             ch->data_type >>= 1;
+         break;
+     case 0xd:	/* CFR1 */
+         s->timing[1] = data & 0xf07;
+@@ -221,8 +221,7 @@ static void tsc2005_write(TSC2005State *s, int reg, uint16_t data)
+         break;
+ 
+     default:
+-        fprintf(stderr, "%s: write into read-only register %x\n",
+-                        __func__, reg);
++        error_report("%s: write into read-only register %x", __func__, reg);
+     }
+ }
+ 
+@@ -337,8 +336,8 @@ static uint8_t tsc2005_txrx_word(void *opaque, uint8_t value)
+                 s->nextprecision = (value >> 2) & 1;
+                 if (s->enabled != !(value & 1)) {
+                     s->enabled = !(value & 1);
+-                    fprintf(stderr, "%s: touchscreen sense %sabled\n",
+-                                    __func__, s->enabled ? "en" : "dis");
++                    error_report("%s: touchscreen sense %sabled",
++                                 __func__, s->enabled ? "en" : "dis");
+                     if (s->busy && !s->enabled)
+                         timer_del(s->timer);
+                     s->busy = s->busy && s->enabled;
+diff --git a/hw/input/tsc210x.c b/hw/input/tsc210x.c
+index 1cad57f644..65c7569723 100644
+--- a/hw/input/tsc210x.c
++++ b/hw/input/tsc210x.c
+@@ -396,8 +396,8 @@ static uint16_t tsc2102_data_register_read(TSC210xState *s, int reg)
+ 
+     default:
+ #ifdef TSC_VERBOSE
+-        fprintf(stderr, "tsc2102_data_register_read: "
+-                        "no such register: 0x%02x\n", reg);
++        error_report("tsc2102_data_register_read: "
++                     "no such register: 0x%02x", reg);
+ #endif
+         return 0xffff;
+     }
+@@ -447,8 +447,8 @@ static uint16_t tsc2102_control_register_read(
+     default:
+     bad_reg:
+ #ifdef TSC_VERBOSE
+-        fprintf(stderr, "tsc2102_control_register_read: "
+-                        "no such register: 0x%02x\n", reg);
++        error_report("tsc2102_control_register_read: "
++                     "no such register: 0x%02x", reg);
+ #endif
+         return 0xffff;
+     }
+@@ -528,8 +528,8 @@ static uint16_t tsc2102_audio_register_read(TSC210xState *s, int reg)
+ 
+     default:
+ #ifdef TSC_VERBOSE
+-        fprintf(stderr, "tsc2102_audio_register_read: "
+-                        "no such register: 0x%02x\n", reg);
++        error_report("tsc2102_audio_register_read: "
++                     "no such register: 0x%02x", reg);
+ #endif
+         return 0xffff;
+     }
+@@ -553,8 +553,8 @@ static void tsc2102_data_register_write(
+ 
+     default:
+ #ifdef TSC_VERBOSE
+-        fprintf(stderr, "tsc2102_data_register_write: "
+-                        "no such register: 0x%02x\n", reg);
++        error_report("tsc2102_data_register_write: "
++                     "no such register: 0x%02x", reg);
+ #endif
+     }
+ }
+@@ -606,8 +606,8 @@ static void tsc2102_control_register_write(
+             tsc210x_reset(s);
+ #ifdef TSC_VERBOSE
+         } else {
+-            fprintf(stderr, "tsc2102_control_register_write: "
+-                            "wrong value written into RESET\n");
++            error_report("tsc2102_control_register_write: "
++                         "wrong value written into RESET");
+ #endif
+         }
+         return;
+@@ -616,8 +616,8 @@ static void tsc2102_control_register_write(
+         s->timing = value & 0x3f;
+ #ifdef TSC_VERBOSE
+         if (value & ~0x3f)
+-            fprintf(stderr, "tsc2102_control_register_write: "
+-                            "wrong value written into CONFIG\n");
++            error_report("tsc2102_control_register_write: "
++                         "wrong value written into CONFIG");
+ #endif
+         return;
+ 
+@@ -637,8 +637,8 @@ static void tsc2102_control_register_write(
+     default:
+     bad_reg:
+ #ifdef TSC_VERBOSE
+-        fprintf(stderr, "tsc2102_control_register_write: "
+-                        "no such register: 0x%02x\n", reg);
++        error_report("tsc2102_control_register_write: "
++                     "no such register: 0x%02x", reg);
+ #endif
+     }
+ }
+@@ -651,8 +651,8 @@ static void tsc2102_audio_register_write(
+         s->audio_ctrl1 = value & 0x0f3f;
+ #ifdef TSC_VERBOSE
+         if ((value & ~0x0f3f) || ((value & 7) != ((value >> 3) & 7)))
+-            fprintf(stderr, "tsc2102_audio_register_write: "
+-                            "wrong value written into Audio 1\n");
++            error_report("tsc2102_audio_register_write: "
++                         "wrong value written into Audio 1");
+ #endif
+         tsc2102_audio_rate_update(s);
+         tsc2102_audio_output_update(s);
+@@ -661,8 +661,8 @@ static void tsc2102_audio_register_write(
+     case 0x01:
+ #ifdef TSC_VERBOSE
+         if (value != 0xff00)
+-            fprintf(stderr, "tsc2102_audio_register_write: "
+-                            "wrong value written into reg 0x01\n");
++            error_report("tsc2102_audio_register_write: "
++                         "wrong value written into reg 0x01");
+ #endif
+         return;
+ 
+@@ -674,8 +674,8 @@ static void tsc2102_audio_register_write(
+     case 0x03:
+ #ifdef TSC_VERBOSE
+         if (value != 0x8b00)
+-            fprintf(stderr, "tsc2102_audio_register_write: "
+-                            "wrong value written into reg 0x03\n");
++            error_report("tsc2102_audio_register_write: "
++                         "wrong value written into reg 0x03");
+ #endif
+         return;
+ 
+@@ -683,8 +683,8 @@ static void tsc2102_audio_register_write(
+         s->audio_ctrl2 = value & 0xf7f2;
+ #ifdef TSC_VERBOSE
+         if (value & ~0xf7fd)
+-            fprintf(stderr, "tsc2102_audio_register_write: "
+-                            "wrong value written into Audio 2\n");
++            error_report("tsc2102_audio_register_write: "
++                         "wrong value written into Audio 2");
+ #endif
+         return;
+ 
+@@ -695,8 +695,8 @@ static void tsc2102_audio_register_write(
+         s->dac_power = value & 0x9543;
+ #ifdef TSC_VERBOSE
+         if ((value & ~0x9543) != 0x2aa0)
+-            fprintf(stderr, "tsc2102_audio_register_write: "
+-                            "wrong value written into Power\n");
++            error_report("tsc2102_audio_register_write: "
++                         "wrong value written into Power");
+ #endif
+         tsc2102_audio_rate_update(s);
+         tsc2102_audio_output_update(s);
+@@ -707,8 +707,8 @@ static void tsc2102_audio_register_write(
+         s->audio_ctrl3 |= value & 0xf800;
+ #ifdef TSC_VERBOSE
+         if (value & ~0xf8c7)
+-            fprintf(stderr, "tsc2102_audio_register_write: "
+-                            "wrong value written into Audio 3\n");
++            error_report("tsc2102_audio_register_write: "
++                         "wrong value written into Audio 3");
+ #endif
+         tsc2102_audio_output_update(s);
+         return;
+@@ -740,8 +740,8 @@ static void tsc2102_audio_register_write(
+         s->pll[0] = value & 0xfffc;
+ #ifdef TSC_VERBOSE
+         if (value & ~0xfffc)
+-            fprintf(stderr, "tsc2102_audio_register_write: "
+-                            "wrong value written into PLL 1\n");
++            error_report("tsc2102_audio_register_write: "
++                         "wrong value written into PLL 1");
+ #endif
+         return;
+ 
+@@ -749,8 +749,8 @@ static void tsc2102_audio_register_write(
+         s->pll[1] = value & 0xfffc;
+ #ifdef TSC_VERBOSE
+         if (value & ~0xfffc)
+-            fprintf(stderr, "tsc2102_audio_register_write: "
+-                            "wrong value written into PLL 2\n");
++            error_report("tsc2102_audio_register_write: "
++                         "wrong value written into PLL 2");
+ #endif
+         return;
+ 
+@@ -758,15 +758,15 @@ static void tsc2102_audio_register_write(
+         s->softstep = !(value & 0x4000);
+ #ifdef TSC_VERBOSE
+         if (value & ~0x4000)
+-            fprintf(stderr, "tsc2102_audio_register_write: "
+-                            "wrong value written into Audio 4\n");
++            error_report("tsc2102_audio_register_write: "
++                         "wrong value written into Audio 4");
+ #endif
+         return;
+ 
+     default:
+ #ifdef TSC_VERBOSE
+-        fprintf(stderr, "tsc2102_audio_register_write: "
+-                        "no such register: 0x%02x\n", reg);
++        error_report("tsc2102_audio_register_write: "
++                     "no such register: 0x%02x", reg);
+ #endif
+     }
+ }
+@@ -847,7 +847,7 @@ static uint16_t tsc210x_read(TSC210xState *s)
+     uint16_t ret = 0x0000;
+ 
+     if (!s->command)
+-        fprintf(stderr, "tsc210x_read: SPI underrun!\n");
++        error_report("tsc210x_read: SPI underrun!");
+ 
+     switch (s->page) {
+     case TSC_DATA_REGISTERS_PAGE:
+@@ -886,7 +886,7 @@ static void tsc210x_write(TSC210xState *s, uint16_t value)
+         s->state = true;
+     } else {
+         if (s->command)
+-            fprintf(stderr, "tsc210x_write: SPI overrun!\n");
++            error_report("tsc210x_write: SPI overrun!");
+         else
+             switch (s->page) {
+             case TSC_DATA_REGISTERS_PAGE:
+diff --git a/hw/input/virtio-input-hid.c b/hw/input/virtio-input-hid.c
+index 4d3afc1b14..bf1ed7b18e 100644
+--- a/hw/input/virtio-input-hid.c
++++ b/hw/input/virtio-input-hid.c
+@@ -208,8 +208,8 @@ static void virtio_input_handle_event(DeviceState *dev, QemuConsole *src,
+             virtio_input_send(vinput, &event);
+         } else {
+             if (key->down) {
+-                fprintf(stderr, "%s: unmapped key: %d [%s]\n", __func__,
+-                        qcode, QKeyCode_str(qcode));
++                error_report("%s: unmapped key: %d [%s]", __func__,
++                             qcode, QKeyCode_str(qcode));
+             }
          }
          break;
-diff --git a/hw/dma/soc_dma.c b/hw/dma/soc_dma.c
-index 9bb499bf9c..7339a3ec95 100644
---- a/hw/dma/soc_dma.c
-+++ b/hw/dma/soc_dma.c
-@@ -18,6 +18,7 @@
-  * with this program; if not, see <http://www.gnu.org/licenses/>.
+@@ -222,9 +222,9 @@ static void virtio_input_handle_event(DeviceState *dev, QemuConsole *src,
+             virtio_input_send(vinput, &event);
+         } else {
+             if (btn->down) {
+-                fprintf(stderr, "%s: unmapped button: %d [%s]\n", __func__,
+-                        btn->button,
+-                        InputButton_str(btn->button));
++                error_report("%s: unmapped button: %d [%s]", __func__,
++                             btn->button,
++                             InputButton_str(btn->button));
+             }
+         }
+         break;
+@@ -310,8 +310,8 @@ static void virtio_input_hid_handle_status(VirtIOInput *vinput,
+         kbd_put_ledstate(vhid->ledstate);
+         break;
+     default:
+-        fprintf(stderr, "%s: unknown type %d\n", __func__,
+-                le16_to_cpu(event->type));
++        error_report("%s: unknown type %d", __func__,
++                     le16_to_cpu(event->type));
+         break;
+     }
+ }
+diff --git a/hw/input/virtio-input.c b/hw/input/virtio-input.c
+index 0e42f0d02c..fb5fa0a280 100644
+--- a/hw/input/virtio-input.c
++++ b/hw/input/virtio-input.c
+@@ -5,6 +5,7 @@
   */
+ 
  #include "qemu/osdep.h"
 +#include "qemu/error-report.h"
- #include "qemu-common.h"
- #include "qemu/timer.h"
- #include "hw/arm/soc_dma.h"
-@@ -270,11 +271,11 @@ void soc_dma_port_add_fifo(struct soc_dma_s *soc, hwaddr virt_base,
-         if (entry->type == soc_dma_port_mem) {
-             if (entry->addr <= virt_base &&
-                             entry->addr + entry->u.mem.size > virt_base) {
--                fprintf(stderr, "%s: FIFO at %"PRIx64
--                                " collides with RAM region at %"PRIx64
--                                "-%"PRIx64 "\n", __func__,
--                                virt_base, entry->addr,
--                                (entry->addr + entry->u.mem.size));
-+                error_report("%s: FIFO at %"PRIx64
-+                             " collides with RAM region at %"PRIx64
-+                             "-%"PRIx64 "", __func__,
-+                             virt_base, entry->addr,
-+                             (entry->addr + entry->u.mem.size));
-                 exit(-1);
-             }
+ #include "qapi/error.h"
+ #include "qemu/iov.h"
+ #include "trace.h"
+@@ -121,8 +122,8 @@ void virtio_input_add_config(VirtIOInput *vinput,
  
-@@ -284,9 +285,9 @@ void soc_dma_port_add_fifo(struct soc_dma_s *soc, hwaddr virt_base,
-             while (entry < dma->memmap + dma->memmap_size &&
-                             entry->addr <= virt_base) {
-                 if (entry->addr == virt_base && entry->u.fifo.out == out) {
--                    fprintf(stderr, "%s: FIFO at %"PRIx64
--                                    " collides FIFO at %"PRIx64 "\n",
--                                    __func__, virt_base, entry->addr);
-+                    error_report("%s: FIFO at %"PRIx64
-+                                 " collides FIFO at %"PRIx64 "",
-+                                 __func__, virt_base, entry->addr);
-                     exit(-1);
-                 }
- 
-@@ -321,11 +322,11 @@ void soc_dma_port_add_mem(struct soc_dma_s *soc, uint8_t *phys_base,
-             if ((entry->addr >= virt_base && entry->addr < virt_base + size) ||
-                             (entry->addr <= virt_base &&
-                              entry->addr + entry->u.mem.size > virt_base)) {
--                fprintf(stderr, "%s: RAM at %"PRIx64 "-%"PRIx64
--                                " collides with RAM region at %"PRIx64
--                                "-%"PRIx64 "\n", __func__,
--                                virt_base, virt_base + size,
--                                entry->addr, entry->addr + entry->u.mem.size);
-+                error_report("%s: RAM at %"PRIx64 "-%"PRIx64
-+                             " collides with RAM region at %"PRIx64
-+                             "-%"PRIx64 "", __func__,
-+                             virt_base, virt_base + size,
-+                             entry->addr, entry->addr + entry->u.mem.size);
-                 exit(-1);
-             }
- 
-@@ -334,11 +335,11 @@ void soc_dma_port_add_mem(struct soc_dma_s *soc, uint8_t *phys_base,
-         } else {
-             if (entry->addr >= virt_base &&
-                             entry->addr < virt_base + size) {
--                fprintf(stderr, "%s: RAM at %"PRIx64 "-%"PRIx64
--                                " collides with FIFO at %"PRIx64
--                                "\n", __func__,
--                                virt_base, virt_base + size,
--                                entry->addr);
-+                error_report("%s: RAM at %"PRIx64 "-%"PRIx64
-+                             " collides with FIFO at %"PRIx64
-+                             "", __func__,
-+                             virt_base, virt_base + size,
-+                             entry->addr);
-                 exit(-1);
-             }
+     if (virtio_input_find_config(vinput, config->select, config->subsel)) {
+         /* should not happen */
+-        fprintf(stderr, "%s: duplicate config: %d/%d\n",
+-                __func__, config->select, config->subsel);
++        error_report("%s: duplicate config: %d/%d",
++                     __func__, config->select, config->subsel);
+         abort();
+     }
  
 -- 
 2.11.0
