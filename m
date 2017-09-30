@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5Wv-0005UE-Oc
+	(envelope-from <alistai@xilinx.com>) id 1dy5Wv-0005UD-MO
 	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:21:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5Ws-0006mp-HP
+	(envelope-from <alistai@xilinx.com>) id 1dy5Ws-0006mZ-CN
 	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:21:17 -0400
-Received: from mail-co1nam03on0040.outbound.protection.outlook.com
-	([104.47.40.40]:44064
+Received: from mail-co1nam03on0081.outbound.protection.outlook.com
+	([104.47.40.81]:20288
 	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dy5Ws-0006lw-50
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dy5Wr-0006lV-Vi
 	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:21:14 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 29 Sep 2017 17:17:20 -0700
-Message-ID: <fa83daf2be4b8fb5b5cb666e04ae4c82df243a06.1506730372.git.alistair.francis@xilinx.com>
+Date: Fri, 29 Sep 2017 17:17:12 -0700
+Message-ID: <73617234cd9894007428b8aaaa46b0744b997e0c.1506730372.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1506730372.git.alistair.francis@xilinx.com>
 References: <cover.1506730372.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 45/47] tcg: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v2 42/47] hw/xen*: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
@@ -28,7 +28,7 @@ List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Stefan Weil <sw@weilnetz.de>
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
 List-ID: <qemu-devel.nongnu.org>
 
 Replace a large number of the fprintf(stderr, "*\n" calls with
@@ -69,224 +69,221 @@ find ./* -type f -exec sed -i \
     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 
+Some lines where then manually tweaked to pass checkpatch.
+
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Stefan Weil <sw@weilnetz.de>
-Acked-by: Richard Henderson <richard.henderson@linaro.org>
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
 ---
+V2:
+ - Split hw patch into individual directories
 
- cpus.c                   |  8 ++++----
- exec.c                   | 14 +++++++-------
- tcg/optimize.c           |  8 ++++----
- tcg/tcg.c                |  2 +-
- tcg/tcg.h                |  3 ++-
- tcg/tci.c                |  2 +-
- tcg/tci/tcg-target.inc.c |  4 ++--
- vl.c                     |  2 +-
- 8 files changed, 22 insertions(+), 21 deletions(-)
+ hw/xen/xen-common.c        | 11 ++++++-----
+ hw/xen/xen_pt.c            |  4 ++--
+ hw/xenpv/xen_domainbuild.c | 24 ++++++++++++------------
+ hw/xenpv/xen_machine_pv.c  |  9 +++++----
+ 4 files changed, 25 insertions(+), 23 deletions(-)
 
-diff --git a/cpus.c b/cpus.c
-index c9a624003a..784cee4848 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -258,7 +258,7 @@ int64_t cpu_get_icount_raw(void)
+diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
+index 632a938dcc..42ada2ac05 100644
+--- a/hw/xen/xen-common.c
++++ b/hw/xen/xen-common.c
+@@ -9,6 +9,7 @@
+  */
  
-     if (cpu && cpu->running) {
-         if (!cpu->can_do_io) {
--            fprintf(stderr, "Bad icount read\n");
-+            error_report("Bad icount read");
-             exit(1);
-         }
-         /* Take into account what has run */
-@@ -1113,7 +1113,7 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
- 
-     r = kvm_init_vcpu(cpu);
-     if (r < 0) {
--        fprintf(stderr, "kvm_init_vcpu failed: %s\n", strerror(-r));
-+        error_report("kvm_init_vcpu failed: %s", strerror(-r));
-         exit(1);
-     }
- 
-@@ -1143,7 +1143,7 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
- static void *qemu_dummy_cpu_thread_fn(void *arg)
- {
- #ifdef _WIN32
--    fprintf(stderr, "qtest is not supported under Windows\n");
-+    error_report("qtest is not supported under Windows");
-     exit(1);
- #else
-     CPUState *cpu = arg;
-@@ -1525,7 +1525,7 @@ static void qemu_cpu_kick_thread(CPUState *cpu)
- #else /* _WIN32 */
-     if (!qemu_cpu_is_self(cpu)) {
-         if (!QueueUserAPC(dummy_apc_func, cpu->hThread, 0)) {
--            fprintf(stderr, "%s: QueueUserAPC failed with error %lu\n",
-+            error_report("%s: QueueUserAPC failed with error %lu",
-                     __func__, GetLastError());
-             exit(1);
-         }
-diff --git a/exec.c b/exec.c
-index 7a80460725..f71b714b10 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1045,7 +1045,7 @@ static RAMBlock *qemu_get_ram_block(ram_addr_t addr)
-         }
-     }
- 
--    fprintf(stderr, "Bad ram offset %" PRIx64 "\n", (uint64_t)addr);
-+    error_report("Bad ram offset %" PRIx64 "", (uint64_t)addr);
-     abort();
- 
- found:
-@@ -1658,7 +1658,7 @@ static ram_addr_t find_ram_offset(ram_addr_t size)
-     }
- 
-     if (offset == RAM_ADDR_MAX) {
--        fprintf(stderr, "Failed to find gap of requested size: %" PRIu64 "\n",
-+        error_report("Failed to find gap of requested size: %" PRIu64 "",
-                 (uint64_t)size);
-         abort();
-     }
-@@ -1688,8 +1688,8 @@ static void qemu_ram_setup_dump(void *addr, ram_addr_t size)
-         ret = qemu_madvise(addr, size, QEMU_MADV_DONTDUMP);
-         if (ret) {
-             perror("qemu_madvise");
--            fprintf(stderr, "madvise doesn't support MADV_DONTDUMP, "
--                            "but dump_guest_core=off specified\n");
-+            error_report("madvise doesn't support MADV_DONTDUMP, "
-+                            "but dump_guest_core=off specified");
-         }
-     }
- }
-@@ -1725,7 +1725,7 @@ void qemu_ram_set_idstr(RAMBlock *new_block, const char *name, DeviceState *dev)
-     RAMBLOCK_FOREACH(block) {
-         if (block != new_block &&
-             !strcmp(block->idstr, new_block->idstr)) {
--            fprintf(stderr, "RAMBlock \"%s\" already registered, abort!\n",
-+            error_report("RAMBlock \"%s\" already registered, abort!",
-                     new_block->idstr);
-             abort();
-         }
-@@ -2153,8 +2153,8 @@ void qemu_ram_remap(ram_addr_t addr, ram_addr_t length)
-                                 flags, -1, 0);
-                 }
-                 if (area != vaddr) {
--                    fprintf(stderr, "Could not remap addr: "
--                            RAM_ADDR_FMT "@" RAM_ADDR_FMT "\n",
-+                    error_report("Could not remap addr: "
-+                            RAM_ADDR_FMT "@" RAM_ADDR_FMT "",
-                             length, addr);
-                     exit(1);
-                 }
-diff --git a/tcg/optimize.c b/tcg/optimize.c
-index adfc56ce62..31b15b508d 100644
---- a/tcg/optimize.c
-+++ b/tcg/optimize.c
-@@ -96,8 +96,8 @@ static TCGOpcode op_to_mov(TCGOpcode op)
-     case 64:
-         return INDEX_op_mov_i64;
-     default:
--        fprintf(stderr, "op_to_mov: unexpected return value of "
--                "function op_bits.\n");
-+        error_report("op_to_mov: unexpected return value of "
-+                "function op_bits.");
-         tcg_abort();
-     }
- }
-@@ -110,8 +110,8 @@ static TCGOpcode op_to_movi(TCGOpcode op)
-     case 64:
-         return INDEX_op_movi_i64;
-     default:
--        fprintf(stderr, "op_to_movi: unexpected return value of "
--                "function op_bits.\n");
-+        error_report("op_to_movi: unexpected return value of "
-+                "function op_bits.");
-         tcg_abort();
-     }
- }
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index dff9999bc6..2bbd20fc28 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -673,7 +673,7 @@ static void tcg_temp_free_internal(int idx)
- #if defined(CONFIG_DEBUG_TCG)
-     s->temps_in_use--;
-     if (s->temps_in_use < 0) {
--        fprintf(stderr, "More temporaries freed than allocated!\n");
-+        error_report("More temporaries freed than allocated!");
-     }
- #endif
- 
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 25662c36d4..1ac0f817bc 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -29,6 +29,7 @@
- #include "cpu.h"
- #include "exec/tb-context.h"
- #include "qemu/bitops.h"
+ #include "qemu/osdep.h"
 +#include "qemu/error-report.h"
- #include "tcg-mo.h"
- #include "tcg-target.h"
+ #include "hw/xen/xen_backend.h"
+ #include "qmp-commands.h"
+ #include "chardev/char.h"
+@@ -47,19 +48,19 @@ static int store_dev_info(int domid, Chardev *cs, const char *string)
+     /* We now have everything we need to set the xenstore entry. */
+     xs = xs_open(0);
+     if (xs == NULL) {
+-        fprintf(stderr, "Could not contact XenStore\n");
++        error_report("Could not contact XenStore");
+         goto out;
+     }
  
-@@ -897,7 +898,7 @@ typedef struct TCGTargetOpDef {
+     path = xs_get_domain_path(xs, domid);
+     if (path == NULL) {
+-        fprintf(stderr, "xs_get_domain_path() error\n");
++        error_report("xs_get_domain_path() error");
+         goto out;
+     }
+     newpath = realloc(path, (strlen(path) + strlen(string) +
+                 strlen("/tty") + 1));
+     if (newpath == NULL) {
+-        fprintf(stderr, "realloc error\n");
++        error_report("realloc error");
+         goto out;
+     }
+     path = newpath;
+@@ -96,13 +97,13 @@ static void xenstore_record_dm_state(struct xs_handle *xs, const char *state)
+     char path[50];
  
- #define tcg_abort() \
- do {\
--    fprintf(stderr, "%s:%d: tcg fatal error\n", __FILE__, __LINE__);\
-+    error_report("%s:%d: tcg fatal error", __FILE__, __LINE__);\
-     abort();\
- } while (0)
- 
-diff --git a/tcg/tci.c b/tcg/tci.c
-index f39bfb95c0..10b88f7308 100644
---- a/tcg/tci.c
-+++ b/tcg/tci.c
-@@ -35,7 +35,7 @@
- /* Marker for missing code. */
- #define TODO() \
-     do { \
--        fprintf(stderr, "TODO %s:%u: %s()\n", \
-+        error_report("TODO %s:%u: %s()", \
-                 __FILE__, __LINE__, __func__); \
-         tcg_abort(); \
-     } while (0)
-diff --git a/tcg/tci/tcg-target.inc.c b/tcg/tci/tcg-target.inc.c
-index 913c3802a3..2f4b56d3ba 100644
---- a/tcg/tci/tcg-target.inc.c
-+++ b/tcg/tci/tcg-target.inc.c
-@@ -29,7 +29,7 @@
- /* Marker for missing code. */
- #define TODO() \
-     do { \
--        fprintf(stderr, "TODO %s:%u: %s()\n", \
-+        error_report("TODO %s:%u: %s()", \
-                 __FILE__, __LINE__, __func__); \
-         tcg_abort(); \
-     } while (0)
-@@ -403,7 +403,7 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
- void tci_disas(uint8_t opc)
- {
-     const TCGOpDef *def = &tcg_op_defs[opc];
--    fprintf(stderr, "TCG %s %u, %u, %u\n",
-+    error_report("TCG %s %u, %u, %u",
-             def->name, def->nb_oargs, def->nb_iargs, def->nb_cargs);
- }
- #endif
-diff --git a/vl.c b/vl.c
-index 3fed457921..e4e8694fcc 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2232,7 +2232,7 @@ static DisplayType select_display(const char *p)
-         display_opengl = 1;
-         display = DT_EGL;
- #else
--        fprintf(stderr, "egl support is disabled\n");
-+        error_report("egl support is disabled");
+     if (xs == NULL) {
+-        fprintf(stderr, "xenstore connection not initialized\n");
++        error_report("xenstore connection not initialized");
          exit(1);
+     }
+ 
+     snprintf(path, sizeof (path), "device-model/%u/state", xen_domid);
+     if (!xs_write(xs, XBT_NULL, path, state, strlen(state))) {
+-        fprintf(stderr, "error recording dm state\n");
++        error_report("error recording dm state");
+         exit(1);
+     }
+ }
+diff --git a/hw/xen/xen_pt.c b/hw/xen/xen_pt.c
+index 375efa68f6..e86d380d02 100644
+--- a/hw/xen/xen_pt.c
++++ b/hw/xen/xen_pt.c
+@@ -73,7 +73,7 @@ void xen_pt_log(const PCIDevice *d, const char *f, ...)
+ 
+     va_start(ap, f);
+     if (d) {
+-        fprintf(stderr, "[%02x:%02x.%d] ", pci_bus_num(d->bus),
++        error_report("[%02x:%02x.%d] ", pci_bus_num(d->bus),
+                 PCI_SLOT(d->devfn), PCI_FUNC(d->devfn));
+     }
+     vfprintf(stderr, f, ap);
+@@ -87,7 +87,7 @@ static int xen_pt_pci_config_access_check(PCIDevice *d, uint32_t addr, int len)
+     /* check offset range */
+     if (addr > 0xFF) {
+         XEN_PT_ERR(d, "Failed to access register with offset exceeding 0xFF. "
+-                   "(addr: 0x%02x, len: %d)\n", addr, len);
++                   "(addr: 0x%02x, len: %d)", addr, len);
+         return -1;
+     }
+ 
+diff --git a/hw/xenpv/xen_domainbuild.c b/hw/xenpv/xen_domainbuild.c
+index 027f76fad1..f5514ffec2 100644
+--- a/hw/xenpv/xen_domainbuild.c
++++ b/hw/xenpv/xen_domainbuild.c
+@@ -25,22 +25,22 @@ static int xenstore_domain_mkdir(char *path)
+     int i;
+ 
+     if (!xs_mkdir(xenstore, 0, path)) {
+-        fprintf(stderr, "%s: xs_mkdir %s: failed\n", __func__, path);
+-	return -1;
++        error_report("%s: xs_mkdir %s: failed", __func__, path);
++        return -1;
+     }
+     if (!xs_set_permissions(xenstore, 0, path, perms_ro, 2)) {
+-        fprintf(stderr, "%s: xs_set_permissions failed\n", __func__);
+-	return -1;
++        error_report("%s: xs_set_permissions failed", __func__);
++        return -1;
+     }
+ 
+     for (i = 0; writable[i]; i++) {
+         snprintf(subpath, sizeof(subpath), "%s/%s", path, writable[i]);
+         if (!xs_mkdir(xenstore, 0, subpath)) {
+-            fprintf(stderr, "%s: xs_mkdir %s: failed\n", __func__, subpath);
++            error_report("%s: xs_mkdir %s: failed", __func__, subpath);
+             return -1;
+         }
+         if (!xs_set_permissions(xenstore, 0, subpath, perms_rw, 2)) {
+-            fprintf(stderr, "%s: xs_set_permissions failed\n", __func__);
++            error_report("%s: xs_set_permissions failed", __func__);
+             return -1;
+         }
+     }
+@@ -235,7 +235,7 @@ int xen_domain_build_pv(const char *kernel, const char *ramdisk,
+     memcpy(uuid, &qemu_uuid, sizeof(uuid));
+     rc = xen_domain_create(xen_xc, ssidref, uuid, flags, &xen_domid);
+     if (rc < 0) {
+-        fprintf(stderr, "xen: xc_domain_create() failed\n");
++        error_report("xen: xc_domain_create() failed");
+         goto err;
+     }
+     qemu_log("xen: created domain %d\n", xen_domid);
+@@ -248,21 +248,21 @@ int xen_domain_build_pv(const char *kernel, const char *ramdisk,
+ 
+     rc = xc_domain_max_vcpus(xen_xc, xen_domid, smp_cpus);
+     if (rc < 0) {
+-        fprintf(stderr, "xen: xc_domain_max_vcpus() failed\n");
++        error_report("xen: xc_domain_max_vcpus() failed");
+         goto err;
+     }
+ 
+ #if 0
+     rc = xc_domain_setcpuweight(xen_xc, xen_domid, 256);
+     if (rc < 0) {
+-        fprintf(stderr, "xen: xc_domain_setcpuweight() failed\n");
++        error_report("xen: xc_domain_setcpuweight() failed");
+         goto err;
+     }
  #endif
-     } else if (strstart(p, "curses", &opts)) {
+ 
+     rc = xc_domain_setmaxmem(xen_xc, xen_domid, ram_size >> 10);
+     if (rc < 0) {
+-        fprintf(stderr, "xen: xc_domain_setmaxmem() failed\n");
++        error_report("xen: xc_domain_setmaxmem() failed");
+         goto err;
+     }
+ 
+@@ -275,7 +275,7 @@ int xen_domain_build_pv(const char *kernel, const char *ramdisk,
+                         xenstore_port, &xenstore_mfn,
+                         console_port, &console_mfn);
+     if (rc < 0) {
+-        fprintf(stderr, "xen: xc_linux_build() failed\n");
++        error_report("xen: xc_linux_build() failed");
+         goto err;
+     }
+ 
+@@ -285,7 +285,7 @@ int xen_domain_build_pv(const char *kernel, const char *ramdisk,
+     qemu_log("xen: unpausing domain %d\n", xen_domid);
+     rc = xc_domain_unpause(xen_xc, xen_domid);
+     if (rc < 0) {
+-        fprintf(stderr, "xen: xc_domain_unpause() failed\n");
++        error_report("xen: xc_domain_unpause() failed");
+         goto err;
+     }
+ 
+diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
+index 69a52a9f93..44d67b87c4 100644
+--- a/hw/xenpv/xen_machine_pv.c
++++ b/hw/xenpv/xen_machine_pv.c
+@@ -23,6 +23,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "hw/hw.h"
+ #include "hw/boards.h"
+ #include "hw/xen/xen_backend.h"
+@@ -36,7 +37,7 @@ static void xen_init_pv(MachineState *machine)
+ 
+     /* Initialize backend core & drivers */
+     if (xen_be_init() != 0) {
+-        fprintf(stderr, "%s: xen backend core setup failed\n", __func__);
++        error_report("%s: xen backend core setup failed", __func__);
+         exit(1);
+     }
+ 
+@@ -51,18 +52,18 @@ static void xen_init_pv(MachineState *machine)
+         const char *initrd_filename = machine->initrd_filename;
+         if (xen_domain_build_pv(kernel_filename, initrd_filename,
+                                 kernel_cmdline) < 0) {
+-            fprintf(stderr, "xen pv domain creation failed\n");
++            error_report("xen pv domain creation failed");
+             exit(1);
+         }
+         break;
+     }
+ #endif
+     case XEN_EMULATE:
+-        fprintf(stderr, "xen emulation not implemented (yet)\n");
++        error_report("xen emulation not implemented (yet)");
+         exit(1);
+         break;
+     default:
+-        fprintf(stderr, "unhandled xen_mode %d\n", xen_mode);
++        error_report("unhandled xen_mode %d", xen_mode);
+         exit(1);
+         break;
+     }
 -- 
 2.11.0
