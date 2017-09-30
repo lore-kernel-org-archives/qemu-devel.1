@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5WK-0004w8-28
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:41 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dy5WM-0004xK-95
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5WG-0006Ng-ST
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:40 -0400
-Received: from mail-bl2nam02on0063.outbound.protection.outlook.com
-	([104.47.38.63]:2946
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	(envelope-from <alistai@xilinx.com>) id 1dy5WI-0006Og-R3
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:42 -0400
+Received: from mail-co1nam03on0068.outbound.protection.outlook.com
+	([104.47.40.68]:5088
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dy5WG-0006N6-KQ
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:36 -0400
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dy5WI-0006O7-Gc
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:38 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 29 Sep 2017 17:16:33 -0700
-Message-ID: <6c7e6a1bed5381cf59c9e7bfb20d241dd3e29f39.1506730372.git.alistair.francis@xilinx.com>
+Date: Fri, 29 Sep 2017 17:16:30 -0700
+Message-ID: <9056bbcdb0d8fe7f0dbb1a050cacacb0ed508204.1506730372.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1506730372.git.alistair.francis@xilinx.com>
 References: <cover.1506730372.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 31/47] hw/pci*: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v2 30/47] hw/openrisc: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
@@ -28,7 +28,7 @@ List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Jia Liu <proljc@gmail.com>, Stafford Horne <shorne@gmail.com>
 List-ID: <qemu-devel.nongnu.org>
 
 Replace a large number of the fprintf(stderr, "*\n" calls with
@@ -72,81 +72,35 @@ find ./* -type f -exec sed -i \
 Some lines where then manually tweaked to pass checkpatch.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Jia Liu <proljc@gmail.com>
+Cc: Stafford Horne <shorne@gmail.com>
 ---
 V2:
  - Split hw patch into individual directories
 
- hw/pci-host/bonito.c |  6 +++---
- hw/pci/pci.c         | 10 +++++-----
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ hw/openrisc/openrisc_sim.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
-index 1767d2af61..48fef86c05 100644
---- a/hw/pci-host/bonito.c
-+++ b/hw/pci-host/bonito.c
-@@ -38,7 +38,7 @@
+diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
+index 86bf2849c4..44a6d115dd 100644
+--- a/hw/openrisc/openrisc_sim.c
++++ b/hw/openrisc/openrisc_sim.c
+@@ -19,6 +19,7 @@
   */
  
  #include "qemu/osdep.h"
--
 +#include "qemu/error-report.h"
- #include "hw/hw.h"
- #include "hw/pci/pci.h"
- #include "hw/i386/pc.h"
-@@ -449,8 +449,8 @@ static uint32_t bonito_sbridge_pciaddr(void *opaque, hwaddr addr)
-     regno = (cfgaddr & BONITO_PCICONF_REG_MASK) >> BONITO_PCICONF_REG_OFFSET;
- 
-     if (idsel == 0) {
--        fprintf(stderr, "error in bonito pci config address " TARGET_FMT_plx
--            ",pcimap_cfg=%x\n", addr, s->regs[BONITO_PCIMAP_CFG]);
-+        error_report("error in bonito pci config address " TARGET_FMT_plx
-+            ",pcimap_cfg=%x", addr, s->regs[BONITO_PCIMAP_CFG]);
-         exit(1);
-     }
-     pciaddr = PCI_ADDR(pci_bus_num(phb->bus), devno, funno, regno);
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 1e6fb88eba..1c8395d319 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -515,7 +515,7 @@ static int get_pci_irq_state(QEMUFile *f, void *pv, size_t size,
-     for (i = 0; i < PCI_NUM_PINS; ++i) {
-         irq_state[i] = qemu_get_be32(f);
-         if (irq_state[i] != 0x1 && irq_state[i] != 0) {
--            fprintf(stderr, "irq state %d: must be 0 or 1.\n",
-+            error_report("irq state %d: must be 0 or 1.",
-                     irq_state[i]);
-             return -EINVAL;
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
+@@ -87,7 +88,7 @@ static void cpu_openrisc_load_kernel(ram_addr_t ram_size,
          }
-@@ -678,7 +678,7 @@ static PCIBus *pci_get_bus_devfn(int *devfnp, PCIBus *root,
-     unsigned slot;
  
-     if (!root) {
--        fprintf(stderr, "No primary PCI bus\n");
-+        error_report("No primary PCI bus");
-         return NULL;
-     }
- 
-@@ -694,7 +694,7 @@ static PCIBus *pci_get_bus_devfn(int *devfnp, PCIBus *root,
-     }
- 
-     if (dom != 0) {
--        fprintf(stderr, "No support for non-zero PCI domains\n");
-+        error_report("No support for non-zero PCI domains");
-         return NULL;
-     }
- 
-@@ -1118,8 +1118,8 @@ void pci_register_bar(PCIDevice *pci_dev, int region_num,
-     assert(region_num >= 0);
-     assert(region_num < PCI_NUM_REGIONS);
-     if (size & (size-1)) {
--        fprintf(stderr, "ERROR: PCI region size must be pow2 "
--                    "type=0x%x, size=0x%"FMT_PCIBUS"\n", type, size);
-+        error_report("ERROR: PCI region size must be pow2 "
-+                    "type=0x%x, size=0x%"FMT_PCIBUS"", type, size);
-         exit(1);
-     }
- 
+         if (kernel_size < 0) {
+-            fprintf(stderr, "QEMU: couldn't load the kernel '%s'\n",
++            error_report("QEMU: couldn't load the kernel '%s'",
+                     kernel_filename);
+             exit(1);
+         }
 -- 
 2.11.0
