@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1dyN4o-0000eW-1W
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 15:05:27 -0400
+	(envelope-from <eblake@redhat.com>) id 1dyNpl-00075d-9q
+	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 15:53:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1dyN4j-0004l4-It
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 15:05:25 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:35730)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1dyN4j-0004jr-AC
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 15:05:21 -0400
-Received: by mail-pf0-x244.google.com with SMTP id i23so1845661pfi.2
-	for <qemu-devel@nongnu.org>; Sat, 30 Sep 2017 12:05:20 -0700 (PDT)
-Date: Sun, 1 Oct 2017 04:05:15 +0900
-From: Stafford Horne <shorne@gmail.com>
-Message-ID: <20170930190515.GD2609@lianli.shorne-pla.net>
-References: <cover.1506730372.git.alistair.francis@xilinx.com>
-	<9056bbcdb0d8fe7f0dbb1a050cacacb0ed508204.1506730372.git.alistair.francis@xilinx.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9056bbcdb0d8fe7f0dbb1a050cacacb0ed508204.1506730372.git.alistair.francis@xilinx.com>
-Subject: Re: [Qemu-devel] [PATCH v2 30/47] hw/openrisc: Replace
- fprintf(stderr, "*\n" with error_report()
+	(envelope-from <eblake@redhat.com>) id 1dyNpk-00073Z-Bx
+	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 15:53:57 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Sat, 30 Sep 2017 14:53:42 -0500
+Message-Id: <20170930195345.23338-2-eblake@redhat.com>
+In-Reply-To: <20170930195345.23338-1-eblake@redhat.com>
+References: <20170930195345.23338-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/4] qemu-io: Add -C for opening with
+ copy-on-read
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -29,83 +19,92 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, alistair23@gmail.com, armbru@redhat.com, Jia Liu <proljc@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, kwolf@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-Hi Alistair,
+Make it easier to enable copy-on-read during iotests, by
+exposing a new bool option to main and open.
 
-On Fri, Sep 29, 2017 at 05:16:30PM -0700, Alistair Francis wrote:
-> Replace a large number of the fprintf(stderr, "*\n" calls with
-> error_report(). The functions were renamed with these commands and then
-> compiler issues where manually fixed.
-> 
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> 
-> Some lines where then manually tweaked to pass checkpatch.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Cc: Jia Liu <proljc@gmail.com>
-> Cc: Stafford Horne <shorne@gmail.com>
-> ---
-> V2:
->  - Split hw patch into individual directories
-> 
->  hw/openrisc/openrisc_sim.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
-> index 86bf2849c4..44a6d115dd 100644
-> --- a/hw/openrisc/openrisc_sim.c
-> +++ b/hw/openrisc/openrisc_sim.c
-> @@ -19,6 +19,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
->  #include "qapi/error.h"
->  #include "qemu-common.h"
->  #include "cpu.h"
-> @@ -87,7 +88,7 @@ static void cpu_openrisc_load_kernel(ram_addr_t ram_size,
->          }
->  
->          if (kernel_size < 0) {
-> -            fprintf(stderr, "QEMU: couldn't load the kernel '%s'\n",
-> +            error_report("QEMU: couldn't load the kernel '%s'",
->                      kernel_filename);
->              exit(1);
->          }
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ qemu-io.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-Acked-by: Stafford Horne <shorne@gmail.com>
+diff --git a/qemu-io.c b/qemu-io.c
+index 265445ad89..c70bde3eb1 100644
+--- a/qemu-io.c
++++ b/qemu-io.c
+@@ -102,6 +102,7 @@ static void open_help(void)
+ " Opens a file for subsequent use by all of the other qemu-io commands.\n"
+ " -r, -- open file read-only\n"
+ " -s, -- use snapshot file\n"
++" -C, -- use copy-on-read\n"
+ " -n, -- disable host cache, short for -t none\n"
+ " -U, -- force shared permissions\n"
+ " -k, -- use kernel AIO implementation (on Linux only)\n"
+@@ -120,7 +121,7 @@ static const cmdinfo_t open_cmd = {
+     .argmin     = 1,
+     .argmax     = -1,
+     .flags      = CMD_NOFILE_OK,
+-    .args       = "[-rsnkU] [-t cache] [-d discard] [-o options] [path]",
++    .args       = "[-rsCnkU] [-t cache] [-d discard] [-o options] [path]",
+     .oneline    = "open the file specified by path",
+     .help       = open_help,
+ };
+@@ -145,7 +146,7 @@ static int open_f(BlockBackend *blk, int argc, char **argv)
+     QDict *opts;
+     bool force_share = false;
+
+-    while ((c = getopt(argc, argv, "snro:kt:d:U")) != -1) {
++    while ((c = getopt(argc, argv, "snCro:kt:d:U")) != -1) {
+         switch (c) {
+         case 's':
+             flags |= BDRV_O_SNAPSHOT;
+@@ -154,6 +155,9 @@ static int open_f(BlockBackend *blk, int argc, char **argv)
+             flags |= BDRV_O_NOCACHE;
+             writethrough = false;
+             break;
++        case 'C':
++            flags |= BDRV_O_COPY_ON_READ;
++            break;
+         case 'r':
+             readonly = 1;
+             break;
+@@ -251,6 +255,7 @@ static void usage(const char *name)
+ "  -r, --read-only      export read-only\n"
+ "  -s, --snapshot       use snapshot file\n"
+ "  -n, --nocache        disable host cache, short for -t none\n"
++"  -C, --copy-on-read   enable copy-on-read\n"
+ "  -m, --misalign       misalign allocations for O_DIRECT\n"
+ "  -k, --native-aio     use kernel AIO implementation (on Linux only)\n"
+ "  -t, --cache=MODE     use the given cache mode for the image\n"
+@@ -439,7 +444,7 @@ static QemuOptsList file_opts = {
+ int main(int argc, char **argv)
+ {
+     int readonly = 0;
+-    const char *sopt = "hVc:d:f:rsnmkt:T:U";
++    const char *sopt = "hVc:d:f:rsnCmkt:T:U";
+     const struct option lopt[] = {
+         { "help", no_argument, NULL, 'h' },
+         { "version", no_argument, NULL, 'V' },
+@@ -448,6 +453,7 @@ int main(int argc, char **argv)
+         { "read-only", no_argument, NULL, 'r' },
+         { "snapshot", no_argument, NULL, 's' },
+         { "nocache", no_argument, NULL, 'n' },
++        { "copy-on-read", no_argument, NULL, 'C' },
+         { "misalign", no_argument, NULL, 'm' },
+         { "native-aio", no_argument, NULL, 'k' },
+         { "discard", required_argument, NULL, 'd' },
+@@ -492,6 +498,9 @@ int main(int argc, char **argv)
+             flags |= BDRV_O_NOCACHE;
+             writethrough = false;
+             break;
++        case 'C':
++            flags |= BDRV_O_COPY_ON_READ;
++            break;
+         case 'd':
+             if (bdrv_parse_discard_flags(optarg, &flags) < 0) {
+                 error_report("Invalid discard option: %s", optarg);
+-- 
+2.13.6
