@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5WO-00050N-UN
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:48 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dy5WN-0004yZ-HK
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5WL-0006QS-Os
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:44 -0400
-Received: from mail-bl2nam02on0081.outbound.protection.outlook.com
-	([104.47.38.81]:34543
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dy5WL-0006QE-Ip
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:41 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dy5WL-0006QA-9h
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:43 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 29 Sep 2017 17:16:46 -0700
-Message-ID: <e953982c31117859f7892dff8f391ca20d176742.1506730372.git.alistair.francis@xilinx.com>
+Date: Fri, 29 Sep 2017 17:16:36 -0700
+Message-ID: <c3849730c544362ab5e7965f1c5c85ed987b57a7.1506730372.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1506730372.git.alistair.francis@xilinx.com>
 References: <cover.1506730372.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 35/47] hw/sd: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v2 32/47] hw/ppc: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
@@ -28,7 +22,7 @@ List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, qemu-ppc@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
 Replace a large number of the fprintf(stderr, "*\n" calls with
@@ -72,96 +66,344 @@ find ./* -type f -exec sed -i \
 Some lines where then manually tweaked to pass checkpatch.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-ppc@nongnu.org
 ---
 V2:
  - Split hw patch into individual directories
 
- hw/sd/pl181.c |  5 +++--
- hw/sd/sd.c    | 14 +++++++-------
- 2 files changed, 10 insertions(+), 9 deletions(-)
+ hw/ppc/e500.c          | 20 ++++++++++----------
+ hw/ppc/mac_newworld.c  |  2 +-
+ hw/ppc/mac_oldworld.c  |  2 +-
+ hw/ppc/mpc8544_guts.c  |  5 +++--
+ hw/ppc/ppc405_boards.c |  8 ++++----
+ hw/ppc/ppc440_bamboo.c | 19 ++++++++++---------
+ hw/ppc/ppc4xx_pci.c    |  3 ++-
+ hw/ppc/prep.c          |  4 ++--
+ hw/ppc/virtex_ml507.c  |  4 ++--
+ 9 files changed, 35 insertions(+), 32 deletions(-)
 
-diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
-index 55c8098ecd..2b878a0c5e 100644
---- a/hw/sd/pl181.c
-+++ b/hw/sd/pl181.c
-@@ -8,6 +8,7 @@
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index db0e49ab8f..8a5350161f 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -333,13 +333,13 @@ static int ppce500_load_device_tree(MachineState *machine,
+         ret = qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-start",
+                                     initrd_base);
+         if (ret < 0) {
+-            fprintf(stderr, "couldn't set /chosen/linux,initrd-start\n");
++            error_report("couldn't set /chosen/linux,initrd-start");
+         }
+ 
+         ret = qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-end",
+                                     (initrd_base + initrd_size));
+         if (ret < 0) {
+-            fprintf(stderr, "couldn't set /chosen/linux,initrd-end\n");
++            error_report("couldn't set /chosen/linux,initrd-end");
+         }
+ 
+     }
+@@ -353,7 +353,7 @@ static int ppce500_load_device_tree(MachineState *machine,
+     ret = qemu_fdt_setprop_string(fdt, "/chosen", "bootargs",
+                                       machine->kernel_cmdline);
+     if (ret < 0)
+-        fprintf(stderr, "couldn't set /chosen/bootargs\n");
++        error_report("couldn't set /chosen/bootargs");
+ 
+     if (kvm_enabled()) {
+         /* Read out host's frequencies */
+@@ -720,7 +720,7 @@ static DeviceState *ppce500_init_mpic_kvm(PPCE500Params *params,
+ 
+     CPU_FOREACH(cs) {
+         if (kvm_openpic_connect_vcpu(dev, cs)) {
+-            fprintf(stderr, "%s: failed to connect vcpu to irqchip\n",
++            error_report("%s: failed to connect vcpu to irqchip",
+                     __func__);
+             abort();
+         }
+@@ -821,7 +821,7 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+         cs = CPU(cpu);
+ 
+         if (env->mmu_model != POWERPC_MMU_BOOKE206) {
+-            fprintf(stderr, "MMU model %i not supported by this machine.\n",
++            error_report("MMU model %i not supported by this machine.",
+                 env->mmu_model);
+             exit(1);
+         }
+@@ -967,7 +967,7 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+                                           cur_base,
+                                           ram_size - cur_base);
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
++            error_report("qemu: could not load kernel '%s'",
+                     machine->kernel_filename);
+             exit(1);
+         }
+@@ -982,8 +982,8 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+                                           ram_size - initrd_base);
+ 
+         if (initrd_size < 0) {
+-            fprintf(stderr, "qemu: could not load initial ram disk '%s'\n",
+-                    machine->initrd_filename);
++            error_report("qemu: could not load initial ram disk '%s'",
++                         machine->initrd_filename);
+             exit(1);
+         }
+ 
+@@ -1024,7 +1024,7 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+         kernel_size = load_uimage(filename, &bios_entry, &loadaddr, NULL,
+                                   NULL, NULL);
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load firmware '%s'\n", filename);
++            error_report("qemu: could not load firmware '%s'", filename);
+             exit(1);
+         }
+     }
+@@ -1037,7 +1037,7 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+                                        initrd_base, initrd_size,
+                                        kernel_base, kernel_size);
+     if (dt_size < 0) {
+-        fprintf(stderr, "couldn't load device tree\n");
++        error_report("couldn't load device tree");
+         exit(1);
+     }
+     assert(dt_size < DTB_MAX_SIZE);
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index 6d0ace20ca..fa54056bc3 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -278,7 +278,7 @@ static void ppc_core99_init(MachineState *machine)
+             }
+         }
+         if (ppc_boot_device == '\0') {
+-            fprintf(stderr, "No valid boot device for Mac99 machine\n");
++            error_report("No valid boot device for Mac99 machine");
+             exit(1);
+         }
+     }
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index bc7c8b7bd7..4d75113533 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -221,7 +221,7 @@ static void ppc_heathrow_init(MachineState *machine)
+ #endif
+         }
+         if (ppc_boot_device == '\0') {
+-            fprintf(stderr, "No valid boot device for G3 Beige machine\n");
++            error_report("No valid boot device for G3 Beige machine");
+             exit(1);
+         }
+     }
+diff --git a/hw/ppc/mpc8544_guts.c b/hw/ppc/mpc8544_guts.c
+index ce1254b5d4..3a2c49e3fd 100644
+--- a/hw/ppc/mpc8544_guts.c
++++ b/hw/ppc/mpc8544_guts.c
+@@ -18,6 +18,7 @@
   */
  
  #include "qemu/osdep.h"
 +#include "qemu/error-report.h"
- #include "sysemu/block-backend.h"
- #include "sysemu/blockdev.h"
- #include "hw/sysbus.h"
-@@ -146,7 +147,7 @@ static void pl181_fifo_push(PL181State *s, uint32_t value)
-     int n;
+ #include "qemu-common.h"
+ #include "cpu.h"
+ #include "hw/hw.h"
+@@ -83,7 +84,7 @@ static uint64_t mpc8544_guts_read(void *opaque, hwaddr addr,
+         value = env->spr[SPR_E500_SVR];
+         break;
+     default:
+-        fprintf(stderr, "guts: Unknown register read: %x\n", (int)addr);
++        error_report("guts: Unknown register read: %x", (int)addr);
+         break;
+     }
  
-     if (s->fifo_len == PL181_FIFO_LEN) {
--        fprintf(stderr, "pl181: FIFO overflow\n");
-+        error_report("pl181: FIFO overflow");
+@@ -102,7 +103,7 @@ static void mpc8544_guts_write(void *opaque, hwaddr addr,
+         }
+         break;
+     default:
+-        fprintf(stderr, "guts: Unknown register write: %x = %x\n",
++        error_report("guts: Unknown register write: %x = %x",
+                 (int)addr, (unsigned)value);
+         break;
+     }
+diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+index e92db2c66a..0a31a1c116 100644
+--- a/hw/ppc/ppc405_boards.c
++++ b/hw/ppc/ppc405_boards.c
+@@ -324,7 +324,7 @@ static void ref405ep_init(MachineState *machine)
+         kernel_size = load_image_targphys(kernel_filename, kernel_base,
+                                           ram_size - kernel_base);
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
++            error_report("qemu: could not load kernel '%s'",
+                     kernel_filename);
+             exit(1);
+         }
+@@ -336,8 +336,8 @@ static void ref405ep_init(MachineState *machine)
+             initrd_size = load_image_targphys(initrd_filename, initrd_base,
+                                               ram_size - initrd_base);
+             if (initrd_size < 0) {
+-                fprintf(stderr, "qemu: could not load initial ram disk '%s'\n",
+-                        initrd_filename);
++                error_report("qemu: could not load initial ram disk '%s'",
++                             initrd_filename);
+                 exit(1);
+             }
+         } else {
+@@ -607,7 +607,7 @@ static void taihu_405ep_init(MachineState *machine)
+         kernel_size = load_image_targphys(kernel_filename, kernel_base,
+                                           ram_size - kernel_base);
+         if (kernel_size < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
++            error_report("qemu: could not load kernel '%s'",
+                     kernel_filename);
+             exit(1);
+         }
+diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+index f92d47f28d..77b74dfe9e 100644
+--- a/hw/ppc/ppc440_bamboo.c
++++ b/hw/ppc/ppc440_bamboo.c
+@@ -12,6 +12,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu-common.h"
+ #include "net/net.h"
+ #include "hw/hw.h"
+@@ -80,22 +81,22 @@ static int bamboo_load_device_tree(hwaddr addr,
+     ret = qemu_fdt_setprop(fdt, "/memory", "reg", mem_reg_property,
+                            sizeof(mem_reg_property));
+     if (ret < 0)
+-        fprintf(stderr, "couldn't set /memory/reg\n");
++        error_report("couldn't set /memory/reg");
+ 
+     ret = qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-start",
+                                 initrd_base);
+     if (ret < 0)
+-        fprintf(stderr, "couldn't set /chosen/linux,initrd-start\n");
++        error_report("couldn't set /chosen/linux,initrd-start");
+ 
+     ret = qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-end",
+                                 (initrd_base + initrd_size));
+     if (ret < 0)
+-        fprintf(stderr, "couldn't set /chosen/linux,initrd-end\n");
++        error_report("couldn't set /chosen/linux,initrd-end");
+ 
+     ret = qemu_fdt_setprop_string(fdt, "/chosen", "bootargs",
+                                   kernel_cmdline);
+     if (ret < 0)
+-        fprintf(stderr, "couldn't set /chosen/bootargs\n");
++        error_report("couldn't set /chosen/bootargs");
+ 
+     /* Copy data from the host device tree into the guest. Since the guest can
+      * directly access the timebase without host involvement, we must expose
+@@ -190,7 +191,7 @@ static void bamboo_init(MachineState *machine)
+     env = &cpu->env;
+ 
+     if (env->mmu_model != POWERPC_MMU_BOOKE) {
+-        fprintf(stderr, "MMU model %i not supported by this machine.\n",
++        error_report("MMU model %i not supported by this machine.",
+             env->mmu_model);
+         exit(1);
+     }
+@@ -224,7 +225,7 @@ static void bamboo_init(MachineState *machine)
+                                 NULL);
+     pcibus = (PCIBus *)qdev_get_child_bus(dev, "pci.0");
+     if (!pcibus) {
+-        fprintf(stderr, "couldn't create PCI controller!\n");
++        error_report("couldn't create PCI controller!");
+         exit(1);
+     }
+ 
+@@ -265,7 +266,7 @@ static void bamboo_init(MachineState *machine)
+         }
+         /* XXX try again as binary */
+         if (success < 0) {
+-            fprintf(stderr, "qemu: could not load kernel '%s'\n",
++            error_report("qemu: could not load kernel '%s'",
+                     kernel_filename);
+             exit(1);
+         }
+@@ -277,7 +278,7 @@ static void bamboo_init(MachineState *machine)
+                                           ram_size - RAMDISK_ADDR);
+ 
+         if (initrd_size < 0) {
+-            fprintf(stderr, "qemu: could not load ram disk '%s' at %x\n",
++            error_report("qemu: could not load ram disk '%s' at %x",
+                     initrd_filename, RAMDISK_ADDR);
+             exit(1);
+         }
+@@ -287,7 +288,7 @@ static void bamboo_init(MachineState *machine)
+     if (kernel_filename) {
+         if (bamboo_load_device_tree(FDT_ADDR, ram_size, RAMDISK_ADDR,
+                                     initrd_size, kernel_cmdline) < 0) {
+-            fprintf(stderr, "couldn't load device tree\n");
++            error_report("couldn't load device tree");
+             exit(1);
+         }
+     }
+diff --git a/hw/ppc/ppc4xx_pci.c b/hw/ppc/ppc4xx_pci.c
+index 6953f8b9ac..0b91d22253 100644
+--- a/hw/ppc/ppc4xx_pci.c
++++ b/hw/ppc/ppc4xx_pci.c
+@@ -20,6 +20,7 @@
+  * 4xx SoCs, such as the 440EP. */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "hw/hw.h"
+ #include "hw/ppc/ppc.h"
+ #include "hw/ppc/ppc4xx.h"
+@@ -254,7 +255,7 @@ static void ppc4xx_pci_set_irq(void *opaque, int irq_num, int level)
+ 
+     trace_ppc4xx_pci_set_irq(irq_num);
+     if (irq_num < 0) {
+-        fprintf(stderr, "%s: PCI irq %d\n", __func__, irq_num);
++        error_report("%s: PCI irq %d", __func__, irq_num);
          return;
      }
-     n = (s->fifo_pos + s->fifo_len) & (PL181_FIFO_LEN - 1);
-@@ -160,7 +161,7 @@ static uint32_t pl181_fifo_pop(PL181State *s)
-     uint32_t value;
- 
-     if (s->fifo_len == 0) {
--        fprintf(stderr, "pl181: FIFO underflow\n");
-+        error_report("pl181: FIFO underflow");
-         return 0;
+     qemu_set_irq(pci_irqs[irq_num], level);
+diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+index 94138a4e8c..7551d53fa5 100644
+--- a/hw/ppc/prep.c
++++ b/hw/ppc/prep.c
+@@ -576,7 +576,7 @@ static void ppc_prep_init(MachineState *machine)
+             }
+         }
+         if (ppc_boot_device == '\0') {
+-            fprintf(stderr, "No valid boot device for Mac99 machine\n");
++            error_report("No valid boot device for Mac99 machine");
+             exit(1);
+         }
      }
-     value = s->fifo[s->fifo_pos];
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index ba47bff4db..e467d74fc8 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -700,7 +700,7 @@ static void sd_lock_command(SDState *sd)
-         sd->card_status &= ~CARD_IS_LOCKED;
-         sd->pwd_len = 0;
-         /* Erasing the entire card here! */
--        fprintf(stderr, "SD: Card force-erased by CMD42\n");
-+        error_report("SD: Card force-erased by CMD42");
-         return;
+@@ -597,7 +597,7 @@ static void ppc_prep_init(MachineState *machine)
+     qdev_init_nofail(dev);
+     pci_bus = (PCIBus *)qdev_get_child_bus(dev, "pci.0");
+     if (pci_bus == NULL) {
+-        fprintf(stderr, "Couldn't create PCI host controller.\n");
++        error_report("Couldn't create PCI host controller.");
+         exit(1);
      }
+     sysctrl->contiguous_map_irq = qdev_get_gpio_in(dev, 0);
+diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+index ed9b406fd3..7641737f81 100644
+--- a/hw/ppc/virtex_ml507.c
++++ b/hw/ppc/virtex_ml507.c
+@@ -187,7 +187,7 @@ static int xilinx_load_device_tree(hwaddr addr,
  
-@@ -1282,7 +1282,7 @@ static sd_rsp_type_t sd_normal_command(SDState *sd,
-         return sd_r1;
- 
-     case 56:	/* CMD56:  GEN_CMD */
--        fprintf(stderr, "SD: GEN_CMD 0x%08x\n", req.arg);
-+        error_report("SD: GEN_CMD 0x%08x", req.arg);
- 
-         switch (sd->state) {
-         case sd_transfer_state:
-@@ -1565,10 +1565,10 @@ send_response:
-         int i;
-         DPRINTF("Response:");
-         for (i = 0; i < rsplen; i++)
--            fprintf(stderr, " %02x", response[i]);
--        fprintf(stderr, " state %d\n", sd->state);
-+            error_report(" %02x", response[i]);
-+        error_report(" state %d", sd->state);
-     } else {
--        DPRINTF("No response %d\n", sd->state);
-+        DPRINTF("No response %d", sd->state);
-     }
- #endif
- 
-@@ -1580,14 +1580,14 @@ static void sd_blk_read(SDState *sd, uint64_t addr, uint32_t len)
-     DPRINTF("sd_blk_read: addr = 0x%08llx, len = %d\n",
-             (unsigned long long) addr, len);
-     if (!sd->blk || blk_pread(sd->blk, addr, sd->data, len) < 0) {
--        fprintf(stderr, "sd_blk_read: read error on host side\n");
-+        error_report("sd_blk_read: read error on host side");
-     }
+     r = qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", kernel_cmdline);
+     if (r < 0)
+-        fprintf(stderr, "couldn't set /chosen/bootargs\n");
++        error_report("couldn't set /chosen/bootargs");
+     cpu_physical_memory_write(addr, fdt, fdt_size);
+     return fdt_size;
  }
+@@ -219,7 +219,7 @@ static void virtex_init(MachineState *machine)
+     env = &cpu->env;
  
- static void sd_blk_write(SDState *sd, uint64_t addr, uint32_t len)
- {
-     if (!sd->blk || blk_pwrite(sd->blk, addr, sd->data, len, 0) < 0) {
--        fprintf(stderr, "sd_blk_write: write error on host side\n");
-+        error_report("sd_blk_write: write error on host side");
+     if (env->mmu_model != POWERPC_MMU_BOOKE) {
+-        fprintf(stderr, "MMU model %i not supported by this machine.\n",
++        error_report("MMU model %i not supported by this machine.",
+             env->mmu_model);
+         exit(1);
      }
- }
- 
 -- 
 2.11.0
