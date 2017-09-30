@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5Wj-0005Jc-Mn
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:21:08 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dy5Wv-0005UG-Rl
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:21:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5Wg-0006fH-Sx
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:21:05 -0400
-Received: from mail-bl2nam02on0048.outbound.protection.outlook.com
-	([104.47.38.48]:33416
+	(envelope-from <alistai@xilinx.com>) id 1dy5Ws-0006n0-JP
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:21:17 -0400
+Received: from mail-bl2nam02on0073.outbound.protection.outlook.com
+	([104.47.38.73]:58400
 	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dy5Wg-0006eP-KM
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:21:02 -0400
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dy5Ws-0006m7-Ax
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:21:14 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 29 Sep 2017 17:17:03 -0700
-Message-ID: <06e443b5be5198646e9f76b80df198e954543daf.1506730372.git.alistair.francis@xilinx.com>
+Date: Fri, 29 Sep 2017 17:17:18 -0700
+Message-ID: <5f18f1b155fe21928ce9fe68d1212e654032f82f.1506730372.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1506730372.git.alistair.francis@xilinx.com>
 References: <cover.1506730372.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 40/47] hw/usb: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v2 44/47] ui: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
@@ -28,7 +28,7 @@ List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
 Replace a large number of the fprintf(stderr, "*\n" calls with
@@ -69,536 +69,479 @@ find ./* -type f -exec sed -i \
     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
     {} +
 
-Some lines where then manually tweaked to pass checkpatch.
-
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 ---
-V2:
- - Split hw patch into individual directories
 
- hw/usb/core.c          | 15 ++++++++-------
- hw/usb/desc.c          |  4 ++--
- hw/usb/dev-audio.c     | 29 +++++++++++++++--------------
- hw/usb/dev-bluetooth.c |  4 ++--
- hw/usb/dev-mtp.c       |  9 +++++----
- hw/usb/dev-network.c   | 20 ++++++++++----------
- hw/usb/hcd-ehci.c      | 32 ++++++++++++++++----------------
- hw/usb/hcd-musb.c      |  4 ++--
- hw/usb/hcd-xhci.c      |  3 ++-
- hw/usb/host-legacy.c   |  2 +-
- 10 files changed, 63 insertions(+), 59 deletions(-)
+ ui/cocoa.m         |  6 +++---
+ ui/console.c       |  2 +-
+ ui/curses.c        |  2 +-
+ ui/cursor.c        | 10 +++++-----
+ ui/gtk.c           | 10 +++++-----
+ ui/input-linux.c   |  3 ++-
+ ui/keymaps.c       |  4 ++--
+ ui/sdl.c           | 14 +++++++-------
+ ui/sdl2.c          |  8 ++++----
+ ui/sdl_zoom.c      |  3 ++-
+ ui/shader.c        |  9 +++++----
+ ui/spice-display.c | 10 +++++-----
+ ui/vnc-enc-tight.c |  4 ++--
+ ui/vnc-enc-zlib.c  |  4 ++--
+ ui/vnc-enc-zrle.c  |  4 ++--
+ ui/vnc.c           |  2 +-
+ 16 files changed, 49 insertions(+), 46 deletions(-)
 
-diff --git a/hw/usb/core.c b/hw/usb/core.c
-index 241ae66b15..9ffdef055c 100644
---- a/hw/usb/core.c
-+++ b/hw/usb/core.c
-@@ -24,6 +24,7 @@
-  * THE SOFTWARE.
-  */
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qemu-common.h"
- #include "hw/usb.h"
- #include "qemu/iov.h"
-@@ -599,7 +600,7 @@ void usb_packet_copy(USBPacket *p, void *ptr, size_t bytes)
-         iov_from_buf(iov->iov, iov->niov, p->actual_length, ptr, bytes);
-         break;
-     default:
--        fprintf(stderr, "%s: invalid pid: %x\n", __func__, p->pid);
-+        error_report("%s: invalid pid: %x", __func__, p->pid);
-         abort();
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index 93e56d0518..62c021c5d3 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -235,7 +235,7 @@ const int mac_to_qkeycode_map[] = {
+ static int cocoa_keycode_to_qemu(int keycode)
+ {
+     if (ARRAY_SIZE(mac_to_qkeycode_map) <= keycode) {
+-        fprintf(stderr, "(cocoa) warning unknown keycode 0x%x\n", keycode);
++        error_report("(cocoa) warning unknown keycode 0x%x", keycode);
+         return 0;
      }
-     p->actual_length += bytes;
-@@ -681,7 +682,7 @@ void usb_ep_dump(USBDevice *dev)
-     };
-     int ifnum, ep, first;
+     return mac_to_qkeycode_map[keycode];
+@@ -908,7 +908,7 @@ QemuCocoaView *cocoaView;
+         // create a view and add it to the window
+         cocoaView = [[QemuCocoaView alloc] initWithFrame:NSMakeRect(0.0, 0.0, 640.0, 480.0)];
+         if(!cocoaView) {
+-            fprintf(stderr, "(cocoa) can't create a view\n");
++            error_report("(cocoa) can't create a view");
+             exit(1);
+         }
  
--    fprintf(stderr, "Device \"%s\", config %d\n",
-+    error_report("Device \"%s\", config %d",
-             dev->product_desc, dev->configuration);
-     for (ifnum = 0; ifnum < 16; ifnum++) {
-         first = 1;
-@@ -690,10 +691,10 @@ void usb_ep_dump(USBDevice *dev)
-                 dev->ep_in[ep].ifnum == ifnum) {
-                 if (first) {
-                     first = 0;
--                    fprintf(stderr, "  Interface %d, alternative %d\n",
-+                    error_report("  Interface %d, alternative %d",
-                             ifnum, dev->altsetting[ifnum]);
-                 }
--                fprintf(stderr, "    Endpoint %d, IN, %s, %d max\n", ep,
-+                error_report("    Endpoint %d, IN, %s, %d max", ep,
-                         tname[dev->ep_in[ep].type],
-                         dev->ep_in[ep].max_packet_size);
-             }
-@@ -701,16 +702,16 @@ void usb_ep_dump(USBDevice *dev)
-                 dev->ep_out[ep].ifnum == ifnum) {
-                 if (first) {
-                     first = 0;
--                    fprintf(stderr, "  Interface %d, alternative %d\n",
-+                    error_report("  Interface %d, alternative %d",
-                             ifnum, dev->altsetting[ifnum]);
-                 }
--                fprintf(stderr, "    Endpoint %d, OUT, %s, %d max\n", ep,
-+                error_report("    Endpoint %d, OUT, %s, %d max", ep,
-                         tname[dev->ep_out[ep].type],
-                         dev->ep_out[ep].max_packet_size);
+@@ -917,7 +917,7 @@ QemuCocoaView *cocoaView;
+             styleMask:NSWindowStyleMaskTitled|NSWindowStyleMaskMiniaturizable|NSWindowStyleMaskClosable
+             backing:NSBackingStoreBuffered defer:NO];
+         if(!normalWindow) {
+-            fprintf(stderr, "(cocoa) can't create window\n");
++            error_report("(cocoa) can't create window");
+             exit(1);
+         }
+         [normalWindow setAcceptsMouseMovedEvents:YES];
+diff --git a/ui/console.c b/ui/console.c
+index b82c27960a..56d0ebcb50 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -1417,7 +1417,7 @@ void register_displaychangelistener(DisplayChangeListener *dcl)
+         /* display has opengl support */
+         assert(dcl->con);
+         if (dcl->con->gl) {
+-            fprintf(stderr, "can't register two opengl displays (%s, %s)\n",
++            error_report("can't register two opengl displays (%s, %s)",
+                     dcl->ops->dpy_name, dcl->con->gl->ops->dpy_name);
+             exit(1);
+         }
+diff --git a/ui/curses.c b/ui/curses.c
+index 03cefdf470..06784ec7f0 100644
+--- a/ui/curses.c
++++ b/ui/curses.c
+@@ -423,7 +423,7 @@ void curses_display_init(DisplayState *ds, int full_screen)
+ {
+ #ifndef _WIN32
+     if (!isatty(1)) {
+-        fprintf(stderr, "We need a terminal output\n");
++        error_report("We need a terminal output");
+         exit(1);
+     }
+ #endif
+diff --git a/ui/cursor.c b/ui/cursor.c
+index f3da0cee79..9d847031ec 100644
+--- a/ui/cursor.c
++++ b/ui/cursor.c
+@@ -18,12 +18,12 @@ static QEMUCursor *cursor_parse_xpm(const char *xpm[])
+     /* parse header line: width, height, #colors, #chars */
+     if (sscanf(xpm[line], "%u %u %u %u",
+                &width, &height, &colors, &chars) != 4) {
+-        fprintf(stderr, "%s: header parse error: \"%s\"\n",
+-                __func__, xpm[line]);
++        error_report("%s: header parse error: \"%s\"",
++                     __func__, xpm[line]);
+         return NULL;
+     }
+     if (chars != 1) {
+-        fprintf(stderr, "%s: chars != 1 not supported\n", __func__);
++        error_report("%s: chars != 1 not supported", __func__);
+         return NULL;
+     }
+     line++;
+@@ -40,7 +40,7 @@ static QEMUCursor *cursor_parse_xpm(const char *xpm[])
+                 continue;
              }
          }
+-        fprintf(stderr, "%s: color parse error: \"%s\"\n",
++        error_report("%s: color parse error: \"%s\"",
+                 __func__, xpm[line]);
+         return NULL;
      }
--    fprintf(stderr, "--\n");
-+    error_report("--");
+@@ -75,7 +75,7 @@ void cursor_print_ascii_art(QEMUCursor *c, const char *prefix)
+                 fprintf(stderr, "o"); /* other */
+             }
+         }
+-        fprintf(stderr, "|\n");
++        error_report("|");
+     }
  }
  
- struct USBEndpoint *usb_ep_get(USBDevice *dev, int pid, int ep)
-diff --git a/hw/usb/desc.c b/hw/usb/desc.c
-index 85c15addc5..afae910f8e 100644
---- a/hw/usb/desc.c
-+++ b/hw/usb/desc.c
-@@ -1,5 +1,5 @@
- #include "qemu/osdep.h"
--
-+#include "qemu/error-report.h"
- #include "hw/usb.h"
- #include "hw/usb/desc.h"
- #include "trace.h"
-@@ -688,7 +688,7 @@ int usb_desc_get_descriptor(USBDevice *dev, USBPacket *p,
-         break;
+diff --git a/ui/gtk.c b/ui/gtk.c
+index 5bd87c265a..99477ea6e6 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -1254,7 +1254,7 @@ static gboolean gd_win_grab(void *opaque)
+ {
+     VirtualConsole *vc = opaque;
  
-     default:
--        fprintf(stderr, "%s: %d unknown type %d (len %zd)\n", __func__,
-+        error_report("%s: %d unknown type %d (len %zd)", __func__,
-                 dev->addr, type, len);
-         break;
-     }
-diff --git a/hw/usb/dev-audio.c b/hw/usb/dev-audio.c
-index 343345235c..43fc20469a 100644
---- a/hw/usb/dev-audio.c
-+++ b/hw/usb/dev-audio.c
-@@ -30,6 +30,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qemu-common.h"
- #include "hw/usb.h"
- #include "hw/usb/desc.h"
-@@ -398,7 +399,7 @@ static int usb_audio_set_output_altset(USBAudioState *s, int altset)
-     }
- 
-     if (s->debug) {
--        fprintf(stderr, "usb-audio: set interface %d\n", altset);
-+        error_report("usb-audio: set interface %d", altset);
-     }
-     s->out.altset = altset;
-     return 0;
-@@ -478,7 +479,7 @@ static int usb_audio_set_control(USBAudioState *s, uint8_t attrib,
-             uint16_t vol = data[0] + (data[1] << 8);
- 
-             if (s->debug) {
--                fprintf(stderr, "usb-audio: vol %04x\n", (uint16_t)vol);
-+                error_report("usb-audio: vol %04x", (uint16_t)vol);
-             }
- 
-             vol -= 0x8000;
-@@ -496,7 +497,7 @@ static int usb_audio_set_control(USBAudioState *s, uint8_t attrib,
- 
-     if (set_vol) {
-         if (s->debug) {
--            fprintf(stderr, "usb-audio: mute %d, lvol %3d, rvol %3d\n",
-+            error_report("usb-audio: mute %d, lvol %3d, rvol %3d",
-                     s->out.mute, s->out.vol[0], s->out.vol[1]);
-         }
-         AUD_set_volume_out(s->out.voice, s->out.mute,
-@@ -514,8 +515,8 @@ static void usb_audio_handle_control(USBDevice *dev, USBPacket *p,
-     int ret = 0;
- 
-     if (s->debug) {
--        fprintf(stderr, "usb-audio: control transaction: "
--                "request 0x%04x value 0x%04x index 0x%04x length 0x%04x\n",
-+        error_report("usb-audio: control transaction: "
-+                "request 0x%04x value 0x%04x index 0x%04x length 0x%04x",
-                 request, value, index, length);
-     }
- 
-@@ -533,7 +534,7 @@ static void usb_audio_handle_control(USBDevice *dev, USBPacket *p,
-                                     length, data);
-         if (ret < 0) {
-             if (s->debug) {
--                fprintf(stderr, "usb-audio: fail: get control\n");
-+                error_report("usb-audio: fail: get control");
-             }
-             goto fail;
-         }
-@@ -548,7 +549,7 @@ static void usb_audio_handle_control(USBDevice *dev, USBPacket *p,
-                                     length, data);
-         if (ret < 0) {
-             if (s->debug) {
--                fprintf(stderr, "usb-audio: fail: set control\n");
-+                error_report("usb-audio: fail: set control");
-             }
-             goto fail;
-         }
-@@ -557,8 +558,8 @@ static void usb_audio_handle_control(USBDevice *dev, USBPacket *p,
-     default:
- fail:
-         if (s->debug) {
--            fprintf(stderr, "usb-audio: failed control transaction: "
--                    "request 0x%04x value 0x%04x index 0x%04x length 0x%04x\n",
-+            error_report("usb-audio: failed control transaction: "
-+                    "request 0x%04x value 0x%04x index 0x%04x length 0x%04x",
-                     request, value, index, length);
-         }
-         p->status = USB_RET_STALL;
-@@ -581,7 +582,7 @@ static void usb_audio_handle_reset(USBDevice *dev)
-     USBAudioState *s = USB_AUDIO(dev);
- 
-     if (s->debug) {
--        fprintf(stderr, "usb-audio: reset\n");
-+        error_report("usb-audio: reset");
-     }
-     usb_audio_set_output_altset(s, ALTSET_OFF);
- }
-@@ -595,7 +596,7 @@ static void usb_audio_handle_dataout(USBAudioState *s, USBPacket *p)
- 
-     streambuf_put(&s->out.buf, p);
-     if (p->actual_length < p->iov.size && s->debug > 1) {
--        fprintf(stderr, "usb-audio: output overrun (%zd bytes)\n",
-+        error_report("usb-audio: output overrun (%zd bytes)",
-                 p->iov.size - p->actual_length);
-     }
- }
-@@ -611,8 +612,8 @@ static void usb_audio_handle_data(USBDevice *dev, USBPacket *p)
- 
-     p->status = USB_RET_STALL;
-     if (s->debug) {
--        fprintf(stderr, "usb-audio: failed data transaction: "
--                        "pid 0x%x ep 0x%x len 0x%zx\n",
-+        error_report("usb-audio: failed data transaction: "
-+                        "pid 0x%x ep 0x%x len 0x%zx",
-                         p->pid, p->ep->nr, p->iov.size);
-     }
- }
-@@ -622,7 +623,7 @@ static void usb_audio_unrealize(USBDevice *dev, Error **errp)
-     USBAudioState *s = USB_AUDIO(dev);
- 
-     if (s->debug) {
--        fprintf(stderr, "usb-audio: destroy\n");
-+        error_report("usb-audio: destroy");
-     }
- 
-     usb_audio_set_output_altset(s, ALTSET_OFF);
-diff --git a/hw/usb/dev-bluetooth.c b/hw/usb/dev-bluetooth.c
-index 0bbceaea0b..dfef258dca 100644
---- a/hw/usb/dev-bluetooth.c
-+++ b/hw/usb/dev-bluetooth.c
-@@ -274,13 +274,13 @@ static void usb_bt_fifo_enqueue(struct usb_hci_in_fifo_s *fifo,
-     if (off <= DFIFO_LEN_MASK) {
-         if (off + len > DFIFO_LEN_MASK + 1 &&
-                         (fifo->dsize = off + len) > (DFIFO_LEN_MASK + 1) * 2) {
--            fprintf(stderr, "%s: can't alloc %i bytes\n", __func__, len);
-+            error_report("%s: can't alloc %i bytes", __func__, len);
-             exit(-1);
-         }
-         buf = fifo->data + off;
+-    fprintf(stderr, "%s: %s\n", __func__, vc->label);
++    error_report("%s: %s", __func__, vc->label);
+     if (vc->s->ptr_owner) {
+         gd_ungrab_pointer(vc->s);
      } else {
-         if (fifo->dlen > fifo->dsize) {
--            fprintf(stderr, "%s: can't alloc %i bytes\n", __func__, len);
-+            error_report("%s: can't alloc %i bytes", __func__, len);
-             exit(-1);
+@@ -2210,12 +2210,12 @@ static void gd_set_keycode_type(GtkDisplayState *s)
+             keycodes = XGetAtomName(x11_display, desc->names->keycodes);
          }
-         buf = fifo->data + off - fifo->dsize;
-diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index 94c2e94f10..7e1782b8fc 100644
---- a/hw/usb/dev-mtp.c
-+++ b/hw/usb/dev-mtp.c
-@@ -10,6 +10,7 @@
+         if (keycodes == NULL) {
+-            fprintf(stderr, "could not lookup keycode name\n");
++            error_report("could not lookup keycode name");
+         } else if (strstart(keycodes, "evdev", NULL)) {
+             s->has_evdev = true;
+         } else if (!strstart(keycodes, "xfree86", NULL)) {
+-            fprintf(stderr, "unknown keycodes `%s', please report to "
+-                    "qemu-devel@nongnu.org\n", keycodes);
++            error_report("unknown keycodes `%s', please report to "
++                    "qemu-devel@nongnu.org", keycodes);
+         }
+ 
+         if (desc) {
+@@ -2239,7 +2239,7 @@ void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_hover)
+     GdkDisplay *window_display;
+ 
+     if (!gtkinit) {
+-        fprintf(stderr, "gtk initialization failed\n");
++        error_report("gtk initialization failed");
+         exit(1);
+     }
+ 
+diff --git a/ui/input-linux.c b/ui/input-linux.c
+index 9720333b2c..edc5273476 100644
+--- a/ui/input-linux.c
++++ b/ui/input-linux.c
+@@ -5,6 +5,7 @@
   */
  
  #include "qemu/osdep.h"
 +#include "qemu/error-report.h"
  #include "qapi/error.h"
- #include <wchar.h>
- #include <dirent.h>
-@@ -546,7 +547,7 @@ static void inotify_watchfn(void *arg)
-                 break;
+ #include "qemu-common.h"
+ #include "qemu/config-file.h"
+@@ -241,7 +242,7 @@ static void input_linux_event(void *opaque)
+         rc = read(il->fd, &p[il->read_offset], read_size);
+         if (rc != read_size) {
+             if (rc < 0 && errno != EAGAIN) {
+-                fprintf(stderr, "%s: read: %s\n", __func__, strerror(errno));
++                error_report("%s: read: %s", __func__, strerror(errno));
+                 qemu_set_fd_handler(il->fd, NULL, NULL, NULL);
+                 close(il->fd);
+             } else if (rc > 0) {
+diff --git a/ui/keymaps.c b/ui/keymaps.c
+index f9762d1497..41c5e42553 100644
+--- a/ui/keymaps.c
++++ b/ui/keymaps.c
+@@ -105,7 +105,7 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+     f = filename ? fopen(filename, "r") : NULL;
+     g_free(filename);
+     if (!f) {
+-        fprintf(stderr, "Could not read keymap file: '%s'\n", language);
++        error_report("Could not read keymap file: '%s'", language);
+         return NULL;
+     }
  
-             default:
--                fprintf(stderr, "usb-mtp: failed to parse inotify event\n");
-+                error_report("usb-mtp: failed to parse inotify event");
-                 continue;
+@@ -150,7 +150,7 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+                     if (strstr(rest, "numlock")) {
+                         add_to_key_range(&k->keypad_range, keycode);
+                         add_to_key_range(&k->numlock_range, keysym);
+-                        /* fprintf(stderr, "keypad keysym %04x keycode %d\n",
++                        /* error_report("keypad keysym %04x keycode %d",
+                                    keysym, keycode); */
+                     }
+ 
+diff --git a/ui/sdl.c b/ui/sdl.c
+index 7b71a9ac58..29db4c68ad 100644
+--- a/ui/sdl.c
++++ b/ui/sdl.c
+@@ -91,7 +91,7 @@ static void sdl_update(DisplayChangeListener *dcl,
+             SDL_BlitSurface(guest_screen, &rec, real_screen, &rec);
+         } else {
+             if (sdl_zoom_blit(guest_screen, real_screen, SMOOTHING_ON, &rec) < 0) {
+-                fprintf(stderr, "Zoom blit failed\n");
++                error_report("Zoom blit failed");
+                 exit(1);
              }
- 
-@@ -617,7 +618,7 @@ static void usb_mtp_object_readdir(MTPState *s, MTPObject *o)
- #ifdef CONFIG_INOTIFY1
-     int watchfd = usb_mtp_add_watch(s->inotifyfd, o->path);
-     if (watchfd == -1) {
--        fprintf(stderr, "usb-mtp: failed to add watch for %s\n", o->path);
-+        error_report("usb-mtp: failed to add watch for %s", o->path);
-     } else {
-         trace_usb_mtp_inotify_event(s->dev.addr, o->path,
-                                     0, "Watch Added");
-@@ -1144,7 +1145,7 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
-         usb_mtp_object_alloc(s, s->next_handle++, NULL, s->root);
- #ifdef CONFIG_INOTIFY1
-         if (usb_mtp_inotify_init(s)) {
--            fprintf(stderr, "usb-mtp: file monitoring init failed\n");
-+            error_report("usb-mtp: file monitoring init failed");
          }
- #endif
-         break;
-@@ -1348,7 +1349,7 @@ static void usb_mtp_handle_control(USBDevice *dev, USBPacket *p,
- static void usb_mtp_cancel_packet(USBDevice *dev, USBPacket *p)
- {
-     /* we don't use async packets, so this should never be called */
--    fprintf(stderr, "%s\n", __func__);
-+    error_report("%s", __func__);
- }
- 
- static void usb_mtp_handle_data(USBDevice *dev, USBPacket *p)
-diff --git a/hw/usb/dev-network.c b/hw/usb/dev-network.c
-index 85fc81bf43..9dd4af5e34 100644
---- a/hw/usb/dev-network.c
-+++ b/hw/usb/dev-network.c
-@@ -815,7 +815,7 @@ static int ndis_query(USBNetState *s, uint32_t oid,
-         return sizeof(le32);
- 
-     default:
--        fprintf(stderr, "usbnet: unknown OID 0x%08x\n", oid);
-+        error_report("usbnet: unknown OID 0x%08x", oid);
-         return 0;
-     }
-     return -1;
-@@ -1084,9 +1084,9 @@ static void usb_net_handle_control(USBDevice *dev, USBPacket *p,
-             for (i = 0; i < length; i++) {
-                 if (!(i & 15))
-                     fprintf(stderr, "\n%04x:", i);
--                fprintf(stderr, " %02x", data[i]);
-+                error_report(" %02x", data[i]);
-             }
--            fprintf(stderr, "\n\n");
-+            fprintf(stderr, "\n");
+@@ -120,7 +120,7 @@ static void do_sdl_resize(int width, int height, int bpp)
+     tmp_screen = SDL_SetVideoMode(width, height, bpp, flags);
+     if (!real_screen) {
+         if (!tmp_screen) {
+-            fprintf(stderr, "Could not open SDL display (%dx%dx%d): %s\n",
++            error_report("Could not open SDL display (%dx%dx%d): %s",
+                     width, height, bpp, SDL_GetError());
+             exit(1);
          }
- #endif
-         ret = rndis_parse(s, data, length);
-@@ -1111,17 +1111,17 @@ static void usb_net_handle_control(USBDevice *dev, USBPacket *p,
-             for (i = 0; i < p->actual_length; i++) {
-                 if (!(i & 15))
-                     fprintf(stderr, "\n%04x:", i);
--                fprintf(stderr, " %02x", data[i]);
-+                error_report(" %02x", data[i]);
-             }
--            fprintf(stderr, "\n\n");
-+            fprintf(stderr, "\n");
+@@ -130,7 +130,7 @@ static void do_sdl_resize(int width, int height, int bpp)
+          * resolution failed.
+          */
+         if (!tmp_screen) {
+-            fprintf(stderr, "Failed to set SDL display (%dx%dx%d): %s\n",
++            error_report("Failed to set SDL display (%dx%dx%d): %s",
+                     width, height, bpp, SDL_GetError());
+             return;
          }
- #endif
-         break;
- 
-     default:
-     fail:
--        fprintf(stderr, "usbnet: failed control transaction: "
--                        "request 0x%x value 0x%x index 0x%x length 0x%x\n",
-+        error_report("usbnet: failed control transaction: "
-+                        "request 0x%x value 0x%x index 0x%x length 0x%x",
-                         request, value, index, length);
-         p->status = USB_RET_STALL;
-         break;
-@@ -1190,7 +1190,7 @@ static void usb_net_handle_dataout(USBNetState *s, USBPacket *p)
-     uint32_t len;
- 
- #ifdef TRAFFIC_DEBUG
--    fprintf(stderr, "usbnet: data out len %zu\n", p->iov.size);
-+    error_report("usbnet: data out len %zu", p->iov.size);
-     iov_hexdump(p->iov.iov, p->iov.niov, stderr, "usbnet", p->iov.size);
- #endif
- 
-@@ -1260,8 +1260,8 @@ static void usb_net_handle_data(USBDevice *dev, USBPacket *p)
+@@ -241,12 +241,12 @@ static int check_for_evdev(void)
+                      XkbKeycodesNameMask, desc) == Success)) {
+         keycodes = XGetAtomName(info.info.x11.display, desc->names->keycodes);
+         if (keycodes == NULL) {
+-            fprintf(stderr, "could not lookup keycode name\n");
++            error_report("could not lookup keycode name");
+         } else if (strstart(keycodes, "evdev", NULL)) {
+             has_evdev = 1;
+         } else if (!strstart(keycodes, "xfree86", NULL)) {
+-            fprintf(stderr, "unknown keycodes `%s', please report to "
+-                    "qemu-devel@nongnu.org\n", keycodes);
++            error_report("unknown keycodes `%s', please report to "
++                    "qemu-devel@nongnu.org", keycodes);
+         }
      }
  
-     if (p->status == USB_RET_STALL) {
--        fprintf(stderr, "usbnet: failed data transaction: "
--                        "pid 0x%x ep 0x%x len 0x%zx\n",
-+        error_report("usbnet: failed data transaction: "
-+                        "pid 0x%x ep 0x%x len 0x%zx",
-                         p->pid, p->ep->nr, p->iov.size);
-     }
- }
-diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
-index 0134232627..e405b882fb 100644
---- a/hw/usb/hcd-ehci.c
-+++ b/hw/usb/hcd-ehci.c
-@@ -419,7 +419,7 @@ static int ehci_get_pid(EHCIqtd *qtd)
-     case 2:
-         return USB_TOKEN_SETUP;
-     default:
--        fprintf(stderr, "bad token\n");
-+        error_report("bad token");
-         return 0;
-     }
- }
-@@ -1033,7 +1033,7 @@ static void ehci_opreg_write(void *ptr, hwaddr addr,
+@@ -988,7 +988,7 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
  
-         /* not supporting dynamic frame list size at the moment */
-         if ((val & USBCMD_FLS) && !(s->usbcmd & USBCMD_FLS)) {
--            fprintf(stderr, "attempt to set frame list size -- value %d\n",
-+            error_report("attempt to set frame list size -- value %d",
-                     (int)val & USBCMD_FLS);
-             val &= ~USBCMD_FLS;
-         }
-@@ -1190,7 +1190,7 @@ static int ehci_init_transfer(EHCIPacket *p)
- 
-     while (bytes > 0) {
-         if (cpage > 4) {
--            fprintf(stderr, "cpage out of range (%d)\n", cpage);
-+            error_report("cpage out of range (%d)", cpage);
-             qemu_sglist_destroy(&p->sgl);
-             return -1;
-         }
-@@ -1296,7 +1296,7 @@ static void ehci_execute_complete(EHCIQueue *q)
-         break;
-     default:
-         /* should not be triggerable */
--        fprintf(stderr, "USB invalid response %d\n", p->packet.status);
-+        error_report("USB invalid response %d", p->packet.status);
-         g_assert_not_reached();
-         break;
+     flags = SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE;
+     if (SDL_Init (flags)) {
+-        fprintf(stderr, "Could not initialize SDL(%s) - exiting\n",
++        error_report("Could not initialize SDL(%s) - exiting",
+                 SDL_GetError());
+         exit(1);
      }
-@@ -1345,7 +1345,7 @@ static int ehci_execute(EHCIPacket *p, const char *action)
-            p->async == EHCI_ASYNC_INITIALIZED);
+diff --git a/ui/sdl2.c b/ui/sdl2.c
+index 53dd447fd2..f6700e70f5 100644
+--- a/ui/sdl2.c
++++ b/ui/sdl2.c
+@@ -400,7 +400,7 @@ static void handle_keydown(SDL_Event *ev)
+                             160);
+                 height = (surface_height(scon->surface) * width) /
+                     surface_width(scon->surface);
+-                fprintf(stderr, "%s: scale to %dx%d\n",
++                error_report("%s: scale to %dx%d",
+                         __func__, width, height);
+                 sdl_scale(scon, width, height);
+                 sdl2_redraw(scon);
+@@ -686,13 +686,13 @@ static void sdl_mouse_define(DisplayChangeListener *dcl,
+                                  0xff0000, 0x00ff00, 0xff, 0xff000000);
  
-     if (!(p->qtd.token & QTD_TOKEN_ACTIVE)) {
--        fprintf(stderr, "Attempting to execute inactive qtd\n");
-+        error_report("Attempting to execute inactive qtd");
+     if (!guest_sprite_surface) {
+-        fprintf(stderr, "Failed to make rgb surface from %p\n", c);
++        error_report("Failed to make rgb surface from %p", c);
+         return;
+     }
+     guest_sprite = SDL_CreateColorCursor(guest_sprite_surface,
+                                          c->hot_x, c->hot_y);
+     if (!guest_sprite) {
+-        fprintf(stderr, "Failed to make color cursor from %p\n", c);
++        error_report("Failed to make color cursor from %p", c);
+         return;
+     }
+     if (guest_cursor &&
+@@ -783,7 +783,7 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
+ 
+     flags = SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE;
+     if (SDL_Init(flags)) {
+-        fprintf(stderr, "Could not initialize SDL(%s) - exiting\n",
++        error_report("Could not initialize SDL(%s) - exiting",
+                 SDL_GetError());
+         exit(1);
+     }
+diff --git a/ui/sdl_zoom.c b/ui/sdl_zoom.c
+index b96196bac5..bf73d1f1f9 100644
+--- a/ui/sdl_zoom.c
++++ b/ui/sdl_zoom.c
+@@ -12,6 +12,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "sdl_zoom.h"
+ 
+ static void sdl_zoom_rgb16(SDL_Surface *src, SDL_Surface *dst, int smooth,
+@@ -81,7 +82,7 @@ int sdl_zoom_blit(SDL_Surface *src_sfc, SDL_Surface *dst_sfc, int smooth,
+     else if (src_sfc->format->BitsPerPixel == 16)
+         sdl_zoom_rgb16(src_sfc, dst_sfc, smooth, &zoom);
+     else {
+-        fprintf(stderr, "pixel format not supported\n");
++        error_report("pixel format not supported");
          return -1;
      }
  
-@@ -1383,7 +1383,7 @@ static int ehci_execute(EHCIPacket *p, const char *action)
-             p->packet.actual_length);
- 
-     if (p->packet.actual_length > BUFF_SIZE) {
--        fprintf(stderr, "ret from usb_handle_packet > BUFF_SIZE\n");
-+        error_report("ret from usb_handle_packet > BUFF_SIZE");
-         return -1;
-     }
- 
-@@ -1461,7 +1461,7 @@ static int ehci_process_itd(EHCIState *ehci,
-             case USB_RET_SUCCESS:
-                 break;
-             default:
--                fprintf(stderr, "Unexpected iso usb result: %d\n",
-+                error_report("Unexpected iso usb result: %d",
-                         ehci->ipacket.status);
-                 /* Fall through */
-             case USB_RET_IOERROR:
-@@ -1564,7 +1564,7 @@ static int ehci_state_fetchentry(EHCIState *ehci, int async)
- 
-     /* section 4.8, only QH in async schedule */
-     if (async && (NLPTR_TYPE_GET(entry) != NLPTR_TYPE_QH)) {
--        fprintf(stderr, "non queue head request in async schedule\n");
-+        error_report("non queue head request in async schedule");
-         return -1;
-     }
- 
-@@ -1586,8 +1586,8 @@ static int ehci_state_fetchentry(EHCIState *ehci, int async)
- 
-     default:
-         /* TODO: handle FSTN type */
--        fprintf(stderr, "FETCHENTRY: entry at %X is of type %d "
--                "which is not supported yet\n", entry, NLPTR_TYPE_GET(entry));
-+        error_report("FETCHENTRY: entry at %X is of type %d "
-+                "which is not supported yet", entry, NLPTR_TYPE_GET(entry));
-         return -1;
-     }
- 
-@@ -2086,7 +2086,7 @@ static void ehci_advance_state(EHCIState *ehci, int async)
-             break;
- 
-         default:
--            fprintf(stderr, "Bad state!\n");
-+            error_report("Bad state!");
-             again = -1;
-             g_assert_not_reached();
-             break;
-@@ -2094,7 +2094,7 @@ static void ehci_advance_state(EHCIState *ehci, int async)
- 
-         if (again < 0 || itd_count > 16) {
-             /* TODO: notify guest (raise HSE irq?) */
--            fprintf(stderr, "processing error - resetting ehci HC\n");
-+            error_report("processing error - resetting ehci HC");
-             ehci_reset(ehci);
-             again = 0;
-         }
-@@ -2151,8 +2151,8 @@ static void ehci_advance_async_state(EHCIState *ehci)
- 
-     default:
-         /* this should only be due to a developer mistake */
--        fprintf(stderr, "ehci: Bad asynchronous state %d. "
--                "Resetting to active\n", ehci->astate);
-+        error_report("ehci: Bad asynchronous state %d. "
-+                "Resetting to active", ehci->astate);
-         g_assert_not_reached();
-     }
- }
-@@ -2201,8 +2201,8 @@ static void ehci_advance_periodic_state(EHCIState *ehci)
- 
-     default:
-         /* this should only be due to a developer mistake */
--        fprintf(stderr, "ehci: Bad periodic state %d. "
--                "Resetting to active\n", ehci->pstate);
-+        error_report("ehci: Bad periodic state %d. "
-+                "Resetting to active", ehci->pstate);
-         g_assert_not_reached();
-     }
- }
-diff --git a/hw/usb/hcd-musb.c b/hw/usb/hcd-musb.c
-index d70a91a58c..4729926124 100644
---- a/hw/usb/hcd-musb.c
-+++ b/hw/usb/hcd-musb.c
-@@ -253,8 +253,8 @@
- /* #define MUSB_DEBUG */
- 
- #ifdef MUSB_DEBUG
--#define TRACE(fmt, ...) fprintf(stderr, "%s@%d: " fmt "\n", __func__, \
--                                __LINE__, ##__VA_ARGS__)
-+#define TRACE(fmt, ...) error_report("%s@%d: " fmt "", __func__, \
-+                                     __LINE__, ##__VA_ARGS__)
- #else
- #define TRACE(...)
- #endif
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index d75c085d94..6cc1be09a2 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -19,6 +19,7 @@
-  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+diff --git a/ui/shader.c b/ui/shader.c
+index 1ffddbef3b..cecaa4876f 100644
+--- a/ui/shader.c
++++ b/ui/shader.c
+@@ -25,6 +25,7 @@
+  * THE SOFTWARE.
   */
  #include "qemu/osdep.h"
 +#include "qemu/error-report.h"
- #include "hw/hw.h"
- #include "qemu/timer.h"
- #include "qemu/queue.h"
-@@ -39,7 +40,7 @@
- #else
- #define DPRINTF(...) do {} while (0)
- #endif
--#define FIXME(_msg) do { fprintf(stderr, "FIXME %s:%d %s\n", \
-+#define FIXME(_msg) do { error_report("FIXME %s:%d %s", \
-                                  __func__, __LINE__, _msg); abort(); } while (0)
+ #include "qemu-common.h"
+ #include "ui/shader.h"
  
- #define TRB_LINK_LIMIT  32
-diff --git a/hw/usb/host-legacy.c b/hw/usb/host-legacy.c
-index 3b57e21b52..f0c81e5309 100644
---- a/hw/usb/host-legacy.c
-+++ b/hw/usb/host-legacy.c
-@@ -86,7 +86,7 @@ static int parse_filter(const char *spec, struct USBAutoFilter *f)
+@@ -85,9 +86,9 @@ GLuint qemu_gl_create_compile_shader(GLenum type, const GLchar *src)
+         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
+         errmsg = g_malloc(length);
+         glGetShaderInfoLog(shader, length, &length, errmsg);
+-        fprintf(stderr, "%s: compile %s error\n%s\n", __func__,
+-                (type == GL_VERTEX_SHADER) ? "vertex" : "fragment",
+-                errmsg);
++        error_report("%s: compile %s error: %s", __func__,
++                     (type == GL_VERTEX_SHADER) ? "vertex" : "fragment",
++                     errmsg);
+         g_free(errmsg);
+         return 0;
      }
+@@ -110,7 +111,7 @@ GLuint qemu_gl_create_link_program(GLuint vert, GLuint frag)
+         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+         errmsg = g_malloc(length);
+         glGetProgramInfoLog(program, length, &length, errmsg);
+-        fprintf(stderr, "%s: link program: %s\n", __func__, errmsg);
++        error_report("%s: link program: %s", __func__, errmsg);
+         g_free(errmsg);
+         return 0;
+     }
+diff --git a/ui/spice-display.c b/ui/spice-display.c
+index 346fff44f4..8cf126e7b0 100644
+--- a/ui/spice-display.c
++++ b/ui/spice-display.c
+@@ -630,13 +630,13 @@ static int interface_req_cursor_notification(QXLInstance *sin)
  
-     if (i < DEV) {
--        fprintf(stderr, "husb: invalid auto filter spec %s\n", spec);
-+        error_report("husb: invalid auto filter spec %s", spec);
+ static void interface_notify_update(QXLInstance *sin, uint32_t update_id)
+ {
+-    fprintf(stderr, "%s: abort()\n", __func__);
++    error_report("%s: abort()", __func__);
+     abort();
+ }
+ 
+ static int interface_flush_resources(QXLInstance *sin)
+ {
+-    fprintf(stderr, "%s: abort()\n", __func__);
++    error_report("%s: abort()", __func__);
+     abort();
+     return 0;
+ }
+@@ -646,7 +646,7 @@ static void interface_update_area_complete(QXLInstance *sin,
+         QXLRect *dirty, uint32_t num_updated_rects)
+ {
+     /* should never be called, used in qxl native mode only */
+-    fprintf(stderr, "%s: abort()\n", __func__);
++    error_report("%s: abort()", __func__);
+     abort();
+ }
+ 
+@@ -671,7 +671,7 @@ static void interface_async_complete(QXLInstance *sin, uint64_t cookie_token)
+ #endif
+     default:
+         /* should never be called, used in qxl native mode only */
+-        fprintf(stderr, "%s: abort()\n", __func__);
++        error_report("%s: abort()", __func__);
+         abort();
+     }
+     g_free(cookie);
+@@ -955,7 +955,7 @@ static void qemu_spice_gl_scanout_texture(DisplayChangeListener *dcl,
+     assert(tex_id);
+     fd = egl_get_fd_for_texture(tex_id, &stride, &fourcc);
+     if (fd < 0) {
+-        fprintf(stderr, "%s: failed to get fd for texture\n", __func__);
++        error_report("%s: failed to get fd for texture", __func__);
+         return;
+     }
+     dprint(1, "%s: %dx%d (stride %d, fourcc 0x%x)\n", __func__,
+diff --git a/ui/vnc-enc-tight.c b/ui/vnc-enc-tight.c
+index f38aceb4da..7ac957057d 100644
+--- a/ui/vnc-enc-tight.c
++++ b/ui/vnc-enc-tight.c
+@@ -800,7 +800,7 @@ static int tight_init_stream(VncState *vs, int stream_id,
+                            MAX_MEM_LEVEL, strategy);
+ 
+         if (err != Z_OK) {
+-            fprintf(stderr, "VNC: error initializing zlib\n");
++            error_report("VNC: error initializing zlib");
+             return -1;
+         }
+ 
+@@ -865,7 +865,7 @@ static int tight_compress_data(VncState *vs, int stream_id, size_t bytes,
+ 
+     /* start encoding */
+     if (deflate(zstream, Z_SYNC_FLUSH) != Z_OK) {
+-        fprintf(stderr, "VNC: error during tight compression\n");
++        error_report("VNC: error during tight compression");
          return -1;
      }
+ 
+diff --git a/ui/vnc-enc-zlib.c b/ui/vnc-enc-zlib.c
+index 33e9df2f6a..437cfb1307 100644
+--- a/ui/vnc-enc-zlib.c
++++ b/ui/vnc-enc-zlib.c
+@@ -80,7 +80,7 @@ static int vnc_zlib_stop(VncState *vs)
+                            MAX_MEM_LEVEL, Z_DEFAULT_STRATEGY);
+ 
+         if (err != Z_OK) {
+-            fprintf(stderr, "VNC: error initializing zlib\n");
++            error_report("VNC: error initializing zlib");
+             return -1;
+         }
+ 
+@@ -109,7 +109,7 @@ static int vnc_zlib_stop(VncState *vs)
+ 
+     // start encoding
+     if (deflate(zstream, Z_SYNC_FLUSH) != Z_OK) {
+-        fprintf(stderr, "VNC: error during zlib compression\n");
++        error_report("VNC: error during zlib compression");
+         return -1;
+     }
+ 
+diff --git a/ui/vnc-enc-zrle.c b/ui/vnc-enc-zrle.c
+index fd63d4f688..a3af8a1c5d 100644
+--- a/ui/vnc-enc-zrle.c
++++ b/ui/vnc-enc-zrle.c
+@@ -85,7 +85,7 @@ static int zrle_compress_data(VncState *vs, int level)
+                            MAX_MEM_LEVEL, Z_DEFAULT_STRATEGY);
+ 
+         if (err != Z_OK) {
+-            fprintf(stderr, "VNC: error initializing zlib\n");
++            error_report("VNC: error initializing zlib");
+             return -1;
+         }
+ 
+@@ -104,7 +104,7 @@ static int zrle_compress_data(VncState *vs, int level)
+ 
+     /* start encoding */
+     if (deflate(zstream, Z_SYNC_FLUSH) != Z_OK) {
+-        fprintf(stderr, "VNC: error during zrle compression\n");
++        error_report("VNC: error during zrle compression");
+         return -1;
+     }
+ 
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 0b5dbc62e4..2bad9ab971 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -71,7 +71,7 @@ static void vnc_set_share_mode(VncState *vs, VncShareMode mode)
+         [VNC_SHARE_MODE_EXCLUSIVE]    = "exclusive",
+         [VNC_SHARE_MODE_DISCONNECTED] = "disconnected",
+     };
+-    fprintf(stderr, "%s/%p: %s -> %s\n", __func__,
++    error_report("%s/%p: %s -> %s", __func__,
+             vs->ioc, mn[vs->share_mode], mn[mode]);
+ #endif
  
 -- 
 2.11.0
