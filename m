@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5VQ-00043R-4q
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:45 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dy5VR-00045C-5A
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5VN-0004ij-0C
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:44 -0400
-Received: from mail-by2nam01on0052.outbound.protection.outlook.com
-	([104.47.34.52]:52210
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
+	(envelope-from <alistai@xilinx.com>) id 1dy5VN-0004mR-Nh
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:45 -0400
+Received: from mail-by2nam03on0065.outbound.protection.outlook.com
+	([104.47.42.65]:58080
+	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dy5VM-0004ew-J4
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:40 -0400
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dy5VN-0004hD-DF
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:41 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 29 Sep 2017 17:15:40 -0700
-Message-ID: <9e3a014f577abba1ff5ce2484b40a2c4364e1db1.1506730372.git.alistair.francis@xilinx.com>
+Date: Fri, 29 Sep 2017 17:15:43 -0700
+Message-ID: <97f16c1f24f227db9f6a3dfac79aeccae9529caa.1506730372.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1506730372.git.alistair.francis@xilinx.com>
 References: <cover.1506730372.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 13/47] hw/gpio: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v2 14/47] hw/i2c: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
@@ -76,21 +76,39 @@ Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 V2:
  - Split hw patch into individual directories
 
- hw/gpio/omap_gpio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/i2c/omap_i2c.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/hw/gpio/omap_gpio.c b/hw/gpio/omap_gpio.c
-index 08472193b5..57aa2e54f5 100644
---- a/hw/gpio/omap_gpio.c
-+++ b/hw/gpio/omap_gpio.c
-@@ -399,7 +399,7 @@ static void omap2_gpio_module_write(void *opaque, hwaddr addr,
+diff --git a/hw/i2c/omap_i2c.c b/hw/i2c/omap_i2c.c
+index 26e3e5ebf6..c89664f342 100644
+--- a/hw/i2c/omap_i2c.c
++++ b/hw/i2c/omap_i2c.c
+@@ -340,13 +340,13 @@ static void omap_i2c_write(void *opaque, hwaddr addr,
+             break;
+         }
+         if ((value & (1 << 15)) && !(value & (1 << 10))) {	/* MST */
+-            fprintf(stderr, "%s: I^2C slave mode not supported\n",
+-                            __func__);
++            error_report("%s: I^2C slave mode not supported",
++                         __func__);
+             break;
+         }
+         if ((value & (1 << 15)) && value & (1 << 8)) {		/* XA */
+-            fprintf(stderr, "%s: 10-bit addressing mode not supported\n",
+-                            __func__);
++            error_report("%s: 10-bit addressing mode not supported",
++                         __func__);
+             break;
+         }
+         if ((value & (1 << 15)) && value & (1 << 0)) {		/* STT */
+@@ -393,7 +393,7 @@ static void omap_i2c_write(void *opaque, hwaddr addr,
+                 omap_i2c_interrupts_update(s);
+             }
+         if (value & (1 << 15))					/* ST_EN */
+-            fprintf(stderr, "%s: System Test not supported\n", __func__);
++            error_report("%s: System Test not supported", __func__);
+         break;
  
-     case 0x10:	/* GPIO_SYSCONFIG */
-         if (((value >> 3) & 3) == 3)
--            fprintf(stderr, "%s: bad IDLEMODE value\n", __func__);
-+            error_report("%s: bad IDLEMODE value", __func__);
-         if (value & 2)
-             omap2_gpio_module_reset(s);
-         s->config[0] = value & 0x1d;
+     default:
 -- 
 2.11.0
