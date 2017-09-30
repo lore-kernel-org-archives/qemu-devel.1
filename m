@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dyMCx-0006Ps-LX
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 14:09:48 -0400
+	(envelope-from <bounces@canonical.com>) id 1dyMSO-0000GD-R0
+	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 14:25:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dyMCu-0004vY-Pb
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 14:09:47 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:52727)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dyMCu-0004u3-KA
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 14:09:44 -0400
-Date: Sat, 30 Sep 2017 14:09:41 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170930180941.GA22048@flamenco>
-References: <150529666493.10902.14830445134051381968.stgit@frigg.lan>
-	<CAFEAcA9p9B8AFaaSaSOOSsFsEhHW=XPLBFs5MrozWq=7p4_9Zg@mail.gmail.com>
-	<87poasgjyh.fsf@frigg.lan>
-	<CAFEAcA8XP+8Jz9Dn-mEQ3CCrVj00t3HA0praQ-OSggtQGAmQ5Q@mail.gmail.com>
-	<87d16o53xr.fsf@frigg.lan>
-	<CAFEAcA9FhXKVKe1E_pVDWX3u0W7WuKQmO54Z1Jgj-iL980yPew@mail.gmail.com>
-	<87o9pywt8k.fsf@frigg.lan> <87shf5zlty.fsf@frigg.lan>
-	<20170929175943.GA25038@flamenco> <87vak1w53a.fsf@frigg.lan>
+	(envelope-from <bounces@canonical.com>) id 1dyMSK-0002PH-Iq
+	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 14:25:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57294)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dyMSK-0002Oo-CO
+	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 14:25:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1dyMSH-0008CB-CK
+	for <qemu-devel@nongnu.org>; Sat, 30 Sep 2017 18:25:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4EDDD2E8071
+	for <qemu-devel@nongnu.org>; Sat, 30 Sep 2017 18:25:37 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87vak1w53a.fsf@frigg.lan>
-Subject: Re: [Qemu-devel] [PATCH v6 01/22] instrument: Add documentation
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 30 Sep 2017 18:16:56 -0000
+From: Maciej Piechotka <uzytkownik2@gmail.com>
+Reply-To: Bug 1713825 <1713825@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150404140220.18876.2468100840644103776.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150679541675.16674.597586424111858908.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1713825] Re: Booting Windows 2016 with qxl video
+ crashes qemu
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -33,67 +36,122 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-On Sat, Sep 30, 2017 at 00:46:33 +0300, Lluís Vilanova wrote:
-> Emilio G Cota writes:
-> > I'm not sure I understand this concept of filtering. Are you saying that in
-> > the first case, all memory accesses are instrumented, and then in the
-> > "access helper" we only call the user's callback if it's a memory write?
-> > And in the second case, we simply just generate a "write helper" instead
-> > of an "access helper". Am I understanding this correctly?
-> 
-> In the previous case (no filtering), the user callback is always called when a
-> memory access is *executed*, and the user then checks if the access mode is a
-> write to decide whether to increment a counter.
-> 
-> In this case (with filtering), a user callback is called when a memory access is
-> *translated*, and if the access mode is a write, the user generates a call to a
-> second callback that is executed every time a memory access is executed (only
-> that it is only generated for memory writes, the ones we care about).
-> 
-> Is this clearer?
+Sorry - email with reply got misdirected in inbox:
 
-I get it now, thanks!
+a) qxldod.sys 02/20/2017,10.0.0.16000
+b) Immediately during boot. I assume during loading the driver
+c) Attached working configuration. For repro I change cirrus to qxl and del=
+ete arguments to have defaults set by libvirt.
+d) 1920x1080 I think. I cannot double check as it, well, crashes
+e) 0.13.90
 
-> > FWIW my experiments so far show similar numbers for instrumenting each
-> > instruction (haven't done the per-tb yet). The difference is that I'm
-> > exposing to instrumenters a copy of the guest instructions (const void *data,
-> > size_t size). These copies are kept around until TB's are flushed.
-> > Luckily there seems to be very little overhead in keeping these around,
-> > apart from the memory overhead -- but in terms of performance, the
-> > necessary allocations do not induce significant overhead.
-> 
-> To keep this use-case simpler, I added the memory access API I posted in this
-> series, where instrumenters can read guest memory (more general than passing a
-> copy of the current instruction).
+** Attachment added: "libvirt config"
+   https://bugs.launchpad.net/qemu/+bug/1713825/+attachment/4959423/+files/=
+windows.xml
 
-I see some potential problems with this:
-1. Instrumenters' accesses could generate exceptions. I presume we'd want to avoid
-   this, or leave it as a debug-only kind of option.
-2. Instrumenters won't know where the end of an instruction (for variable-length
-  ISAs) or of a TB is (TB != basic block). For instructions one could have a loop
-  where we read byte-by-byte and pass it to the decoder, something similar to
-  what we have in the capstone code recently posted to the list (v4). For TBs,
-  we really should have a way to delimit the length of the TB. This is further
-  complicated if we want instrumentation to be inserted *before* a TB is
-  translated.
+-- =
 
-Some thoughts on the latter problem: if we want a tb_trans_pre callback, like
-Pin/DynamoRIO provide, instead of doing two passes (one to delimit the TB and
-call the tb_trans_pre callback, to then generate the translated TB), we could:
-  - have a tb_trans_pre callback. This callback inserts an exec-time callback
-    with a user-defined pointer (let's call it **tb_info). The callback has
-    no arguments, perhaps just the pc.
-  - have a tb_trans_post callback. This one passes a copy of the guest
-    instructions. The instrumenter then can allocate whatever data structure
-    to represent the TB (*tb_info), and copies this pointer to **tb_info, so
-    that at execution time, we can obtain tb_info _before_ the TB is executed.
-    After the callback returns, the copy of the guest instructions can be freed.
-  This has two disadvantages:
-  - We have an extra dereference to find tb_info
-  - If it turns out that the TB should not be instrumented, we have generated
-    a callback for nothing.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1713825
 
-		Emilio
+Title:
+  Booting Windows 2016 with qxl video crashes qemu
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  launched from libvirt.
+
+  qemu version: 2.9.0
+  host: Linux <hostname> 4.9.34-gentoo #1 SMP Sat Jul 29 13:28:43 PDT 2017 =
+x86_64 Intel(R) Core(TM) i7-3930K CPU @ 3.20GHz GenuineIntel GNU/Linux
+  guest: Windows 2016 64 bit
+
+  Thread 28 (Thread 0x7f0e2edff700 (LWP 29860)):
+  #0  __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.=
+c:51
+          set =3D {__val =3D {18446744067266837079, 139698892694944, 139699=
+853745096, 139700858749789, 4222451712, 139694281220640, 139694281220741, 1=
+39694281220640, 139694281220640, 139694281220810, =
+
+              139694281220940, 139694281220640, 139694281220940, 0, 0, 0}}
+          pid =3D <optimized out>
+          tid =3D <optimized out>
+  #1  0x00007f0ea40b644a in __GI_abort () at abort.c:89
+          save_stage =3D 2
+          act =3D {__sigaction_handler =3D {sa_handler =3D 0x7f0e2edfe5c0, =
+sa_sigaction =3D 0x7f0e2edfe5c0}, sa_mask =3D {__val =3D {139694281219872, =
+139698106269697, 139698892695344, 4, 2676511744, 0, 139698892695144, 0, =
+
+                139698892694912, 1, 4737316546111099904, 139700859888720, 4=
+737316546111099904, 139700862161824, 139700911349760, 94211934977482}}, sa_=
+flags =3D 416, =
+
+            sa_restorer =3D 0x55af6ceb0500 <__PRETTY_FUNCTION__.36381>}
+          sigs =3D {__val =3D {32, 0 <repeats 15 times>}}
+  #2  0x00007f0ea40abab6 in __assert_fail_base (fmt=3D<optimized out>, asse=
+rtion=3Dassertion@entry=3D0x55af6ceafdca "offset < qxl->vga.vram_size", =
+
+      file=3Dfile@entry=3D0x55af6ceaeaa0 "/var/tmp/portage/app-emulation/qe=
+mu-2.9.0-r2/work/qemu-2.9.0/hw/display/qxl.c", line=3Dline@entry=3D416, =
+
+      function=3Dfunction@entry=3D0x55af6ceb0500 <__PRETTY_FUNCTION__.36381=
+> "qxl_ram_set_dirty") at assert.c:92
+          str =3D 0x7f0d1c026220 "\340r\002\034\r\177"
+          total =3D 4096
+  #3  0x00007f0ea40abb81 in __GI___assert_fail (assertion=3Dassertion@entry=
+=3D0x55af6ceafdca "offset < qxl->vga.vram_size", =
+
+      file=3Dfile@entry=3D0x55af6ceaeaa0 "/var/tmp/portage/app-emulation/qe=
+mu-2.9.0-r2/work/qemu-2.9.0/hw/display/qxl.c", line=3Dline@entry=3D416, =
+
+      function=3Dfunction@entry=3D0x55af6ceb0500 <__PRETTY_FUNCTION__.36381=
+> "qxl_ram_set_dirty") at assert.c:101
+  No locals.
+  #4  0x000055af6cc58805 in qxl_ram_set_dirty (qxl=3D<optimized out>, ptr=
+=3D<optimized out>) at /var/tmp/portage/app-emulation/qemu-2.9.0-r2/work/qe=
+mu-2.9.0/hw/display/qxl.c:416
+          base =3D <optimized out>
+          offset =3D <optimized out>
+          qxl =3D <optimized out>
+          ptr =3D <optimized out>
+          base =3D <optimized out>
+          offset =3D <optimized out>
+  #5  0x000055af6cc5b9e2 in interface_release_resource (sin=3D0x55af71a91ed=
+0, ext=3D...) at /var/tmp/portage/app-emulation/qemu-2.9.0-r2/work/qemu-2.9=
+.0/hw/display/qxl.c:767
+          qxl =3D 0x55af71a91450
+          ring =3D <optimized out>
+          item =3D <optimized out>
+          id =3D 18446690739814400920
+          __func__ =3D "interface_release_resource"
+  #6  0x00007f0ea510afa8 in red_drawable_unref (red_drawable=3D0x7f0d1c0261=
+20) at red-worker.c:101
+  No locals.
+  #7  0x00007f0ea510b609 in red_drawable_unref (red_drawable=3D<optimized o=
+ut>) at red-worker.c:104
+  No locals.
+  #8  0x00007f0ea510eae9 in drawable_unref (drawable=3Ddrawable@entry=3D0x7=
+f0e68285ac0) at display-channel.c:1438
+          display =3D 0x55af71dbd3c0
+          __FUNCTION__ =3D "drawable_unref"
+  #9  0x00007f0ea51109f7 in draw_until (display=3Ddisplay@entry=3D0x55af71d=
+bd3c0, surface=3Dsurface@entry=3D0x7f0e6828aae8, last=3D0x7f0e68285ac0) at =
+display-channel.c:1637
+          container =3D 0x0
+          now =3D 0x7f0e68285ac0
+  #10 0x00007f0ea510f93f in display_channel_draw (display=3D0x55af71dbd3c0,=
+ area=3D0x7f0e2edfe8e0, surface_id=3D<optimized out>) at display-channel.c:=
+1729
+          surface =3D 0x7f0e6828aae8
+          last =3D <optimized out>
+          __FUNCTION__ =3D "display_channel_draw"
+          __func__ =3D "display_channel_draw"
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1713825/+subscriptions
