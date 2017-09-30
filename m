@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhuoweizhang@yahoo.com>) id 1dyK0u-0004KW-27
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 11:49:12 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dyKxl-0004QO-V4
+	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 12:50:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhuoweizhang@yahoo.com>) id 1dyK0p-0000Fk-7c
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 11:49:12 -0400
-Received: from sonic301-31.consmr.mail.ne1.yahoo.com ([66.163.184.200]:42012)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhuoweizhang@yahoo.com>)
-	id 1dyK0p-0000EZ-1J
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 11:49:07 -0400
-Date: Sat, 30 Sep 2017 15:49:01 +0000 (UTC)
-From: Zhuowei zhang <zhuoweizhang@yahoo.com>
-Reply-To: Zhuowei zhang <zhuoweizhang@yahoo.com>
-Message-ID: <2080649258.295593.1506786541765@mail.yahoo.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-References: <2080649258.295593.1506786541765.ref@mail.yahoo.com>
-Subject: Re: [Qemu-devel] [PATCH v2] syscall: fix special case of write(fd,
- NULL, 0)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dyKxh-00041c-WD
+	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 12:50:02 -0400
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Sat, 30 Sep 2017 17:49:35 +0100
+Message-Id: <1506790175-581-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH] macio: add missing registers to
+ VMStateDescription
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -27,17 +17,39 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: zhuoweizhang@yahoo.com, qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>
-Cc: riku.voipio@iki.fi
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 List-ID: <qemu-devel.nongnu.org>
 
+Commit 4f7265f "ppc/ide/macio: Add missing registers" added two extra macio
+registers but forgot to add them to the corresponding VMStateDescription.
 
---------------------------------------------
-On Sat, 9/30/17, Laurent Vivier <laurent@vivier.eu> wrote:
- 
- > Could you change the NR_read too, for consistency?
- 
-The NR_read case for length 0 doesn't check if the buffer is NULL, unlike this patch, and I'm not sure if switching that to make a real read() syscall with a NULL buffer even if the original buffer is non-null would break anything.
+The version number is bumped accordingly, although this will have little
+effect given that the Mac machines are practically unmigratable.
 
-Thanks
-Zhuowei
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/ide/macio.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/hw/ide/macio.c b/hw/ide/macio.c
+index ce194c6..2e043ef 100644
+--- a/hw/ide/macio.c
++++ b/hw/ide/macio.c
+@@ -353,12 +353,14 @@ static const MemoryRegionOps pmac_ide_ops = {
+ 
+ static const VMStateDescription vmstate_pmac = {
+     .name = "ide",
+-    .version_id = 4,
++    .version_id = 5,
+     .minimum_version_id = 0,
+     .fields = (VMStateField[]) {
+         VMSTATE_IDE_BUS(bus, MACIOIDEState),
+         VMSTATE_IDE_DRIVES(bus.ifs, MACIOIDEState),
+         VMSTATE_BOOL(dma_active, MACIOIDEState),
++        VMSTATE_UINT32(timing_reg, MACIOIDEState),
++        VMSTATE_UINT32(irq_reg, MACIOIDEState),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+-- 
+1.7.10.4
