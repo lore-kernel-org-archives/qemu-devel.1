@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prem.mallappa@gmail.com>) id 1dyD8d-00074B-IA
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 04:28:44 -0400
+	(envelope-from <sandipan@linux.vnet.ibm.com>) id 1dyG4N-0004q7-2W
+	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 07:36:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prem.mallappa@gmail.com>) id 1dyD8c-0003rI-HM
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 04:28:43 -0400
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8k4nAjqJ_Mu5ZZ8ygMMJikX17BCB3M0ZkbQBsKVLt5TQ@mail.gmail.com>
-References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
-	<1504286483-23327-2-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA8k4nAjqJ_Mu5ZZ8ygMMJikX17BCB3M0ZkbQBsKVLt5TQ@mail.gmail.com>
-From: Prem Mallappa <prem.mallappa@gmail.com>
-Date: Sat, 30 Sep 2017 13:58:17 +0530
-Message-ID: <CADD6c-iohAZO7DLsYfh+sRz0SWyxWW0ja_tdFhdemgWJafHJjg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v7 01/20] hw/arm/smmu-common: smmu base
- device and datatypes
+	(envelope-from <sandipan@linux.vnet.ibm.com>) id 1dyG4J-0006Wz-VO
+	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 07:36:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39494)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sandipan@linux.vnet.ibm.com>)
+	id 1dyG4J-0006Vy-MV
+	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 07:36:27 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8UBYPoj043708
+	for <qemu-devel@nongnu.org>; Sat, 30 Sep 2017 07:36:22 -0400
+Received: from e23smtp02.au.ibm.com (e23smtp02.au.ibm.com [202.81.31.144])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2da7eae5p9-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Sat, 30 Sep 2017 07:36:22 -0400
+Received: from localhost
+	by e23smtp02.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <sandipan@linux.vnet.ibm.com>;
+	Sat, 30 Sep 2017 21:36:20 +1000
+From: Sandipan Das <sandipan@linux.vnet.ibm.com>
+Date: Sat, 30 Sep 2017 17:06:10 +0530
+Message-Id: <20170930113610.28608-1-sandipan@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH] target/ppc: Fix carry flag setting for shift
+ algebraic instructions
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -23,52 +35,133 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, Radha Mohan <mohun106@gmail.com>, Trey Cain <tcain@qti.qualcomm.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Will Deacon <will.deacon@arm.com>, jean-philippe.brucker@arm.com, robin.murphy@arm.com, Peter Xu <peterx@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, wtownsen@redhat.com
+To: david@gibson.dropbear.id.au, agraf@suse.de
+Cc: nikunj@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-All,
+For POWER ISA v3.0, the XER bit CA32 needs to be set by the shift
+right algebraic instructions whenever the CA bit is to be set. This
+change affects the following instructions:
+  * Shift Right Algebraic Word (sraw[.])
+  * Shift Right Algebraic Word Immediate (srawi[.])
+  * Shift Right Algebraic Doubleword (srad[.])
+  * Shift Right Algebraic Doubleword Immediate (sradi[.])
 
-I am no longer associated with Broadcom, so can't help much here I guess.
+Signed-off-by: Sandipan Das <sandipan@linux.vnet.ibm.com>
+---
+ target/ppc/helper.h     |  4 ++--
+ target/ppc/int_helper.c | 10 ++++++++--
+ target/ppc/translate.c  | 16 ++++++++++++++--
+ 3 files changed, 24 insertions(+), 6 deletions(-)
 
-If there is anything else I can do; please let me know.
-
-Cheers,
-/Prem
-
-
-
---
-Prem
-
-On Wed, Sep 27, 2017 at 11:08 PM, Peter Maydell <peter.maydell@linaro.org>
-wrote:
-
-> On 1 September 2017 at 10:21, Eric Auger <eric.auger@redhat.com> wrote:
-> > The patch introduces the smmu base device and class for the ARM
-> > smmu. Devices for specific versions will be derived from this
-> > base device.
-> >
-> > We also introduce some important datatypes.
-> >
-> > Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> > Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
->
-> > +/*
-> > + * Copyright (C) 2014-2016 Broadcom Corporation
-> > + * Copyright (c) 2017 Red Hat, Inc.
-> > + * Written by Prem Mallappa, Eric Auger
-> > + *
-> > + * This program is free software; you can redistribute it and/or modify
-> > + * it under the terms of the GNU General Public License version 2 as
-> > + * published by the Free Software Foundation.
->
-> Really GPL-2-only ?
->
-> Unless there's a good reason, you should probably fix this (including
-> getting an ack from Prem/Broadcom where it applies to code that came
-> from him).
->
-> thanks
-> -- PMM
->
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index bb6a94a8b3..069d65ad7b 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -40,12 +40,12 @@ DEF_HELPER_4(divwe, tl, env, tl, tl, i32)
+ 
+ DEF_HELPER_FLAGS_1(popcntb, TCG_CALL_NO_RWG_SE, tl, tl)
+ DEF_HELPER_FLAGS_2(cmpb, TCG_CALL_NO_RWG_SE, tl, tl, tl)
+-DEF_HELPER_3(sraw, tl, env, tl, tl)
++DEF_HELPER_4(sraw, tl, env, tl, tl, tl)
+ #if defined(TARGET_PPC64)
+ DEF_HELPER_FLAGS_2(cmpeqb, TCG_CALL_NO_RWG_SE, i32, tl, tl)
+ DEF_HELPER_FLAGS_1(popcntw, TCG_CALL_NO_RWG_SE, tl, tl)
+ DEF_HELPER_FLAGS_2(bpermd, TCG_CALL_NO_RWG_SE, i64, i64, i64)
+-DEF_HELPER_3(srad, tl, env, tl, tl)
++DEF_HELPER_4(srad, tl, env, tl, tl, tl)
+ DEF_HELPER_0(darn32, tl)
+ DEF_HELPER_0(darn64, tl)
+ #endif
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index da4e1a62c9..4f270eb49d 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -210,7 +210,7 @@ target_ulong helper_cmpb(target_ulong rs, target_ulong rb)
+ 
+ /* shift right arithmetic helper */
+ target_ulong helper_sraw(CPUPPCState *env, target_ulong value,
+-                         target_ulong shift)
++                         target_ulong shift, target_ulong is_isa300)
+ {
+     int32_t ret;
+ 
+@@ -231,12 +231,15 @@ target_ulong helper_sraw(CPUPPCState *env, target_ulong value,
+         ret = (int32_t)value >> 31;
+         env->ca = (ret != 0);
+     }
++    if (is_isa300) {
++        env->ca32 = env->ca;
++    }
+     return (target_long)ret;
+ }
+ 
+ #if defined(TARGET_PPC64)
+ target_ulong helper_srad(CPUPPCState *env, target_ulong value,
+-                         target_ulong shift)
++                         target_ulong shift, target_ulong is_isa300)
+ {
+     int64_t ret;
+ 
+@@ -257,6 +260,9 @@ target_ulong helper_srad(CPUPPCState *env, target_ulong value,
+         ret = (int64_t)value >> 63;
+         env->ca = (ret != 0);
+     }
++    if (is_isa300) {
++        env->ca32 = env->ca;
++    }
+     return ret;
+ }
+ #endif
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 606b605ba0..9b39f51447 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -2166,8 +2166,11 @@ static void gen_slw(DisasContext *ctx)
+ /* sraw & sraw. */
+ static void gen_sraw(DisasContext *ctx)
+ {
++    TCGv t0;
++
++    t0 = tcg_const_tl(is_isa300(ctx));
+     gen_helper_sraw(cpu_gpr[rA(ctx->opcode)], cpu_env,
+-                    cpu_gpr[rS(ctx->opcode)], cpu_gpr[rB(ctx->opcode)]);
++                    cpu_gpr[rS(ctx->opcode)], cpu_gpr[rB(ctx->opcode)], t0);
+     if (unlikely(Rc(ctx->opcode) != 0))
+         gen_set_Rc0(ctx, cpu_gpr[rA(ctx->opcode)]);
+ }
+@@ -2192,6 +2195,9 @@ static void gen_srawi(DisasContext *ctx)
+         tcg_gen_setcondi_tl(TCG_COND_NE, cpu_ca, cpu_ca, 0);
+         tcg_gen_sari_tl(dst, dst, sh);
+     }
++    if (is_isa300(ctx)) {
++        tcg_gen_mov_tl(cpu_ca32, cpu_ca);
++    }
+     if (unlikely(Rc(ctx->opcode) != 0)) {
+         gen_set_Rc0(ctx, dst);
+     }
+@@ -2245,8 +2251,11 @@ static void gen_sld(DisasContext *ctx)
+ /* srad & srad. */
+ static void gen_srad(DisasContext *ctx)
+ {
++    TCGv t0;
++
++    t0 = tcg_const_tl(is_isa300(ctx));
+     gen_helper_srad(cpu_gpr[rA(ctx->opcode)], cpu_env,
+-                    cpu_gpr[rS(ctx->opcode)], cpu_gpr[rB(ctx->opcode)]);
++                    cpu_gpr[rS(ctx->opcode)], cpu_gpr[rB(ctx->opcode)], t0);
+     if (unlikely(Rc(ctx->opcode) != 0))
+         gen_set_Rc0(ctx, cpu_gpr[rA(ctx->opcode)]);
+ }
+@@ -2269,6 +2278,9 @@ static inline void gen_sradi(DisasContext *ctx, int n)
+         tcg_gen_setcondi_tl(TCG_COND_NE, cpu_ca, cpu_ca, 0);
+         tcg_gen_sari_tl(dst, src, sh);
+     }
++    if (is_isa300(ctx)) {
++        tcg_gen_mov_tl(cpu_ca32, cpu_ca);
++    }
+     if (unlikely(Rc(ctx->opcode) != 0)) {
+         gen_set_Rc0(ctx, dst);
+     }
+-- 
+2.13.5
