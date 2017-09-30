@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5W5-0004jc-Bi
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:28 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dy5WK-0004w8-28
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5W2-00066Q-41
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:25 -0400
-Received: from mail-by2nam03on0047.outbound.protection.outlook.com
-	([104.47.42.47]:42982
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	(envelope-from <alistai@xilinx.com>) id 1dy5WG-0006Ng-ST
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:40 -0400
+Received: from mail-bl2nam02on0063.outbound.protection.outlook.com
+	([104.47.38.63]:2946
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dy5W1-00064A-Fp
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:21 -0400
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dy5WG-0006N6-KQ
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:20:36 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 29 Sep 2017 17:16:21 -0700
-Message-ID: <1ff71065271df7d2b92af3008c7592ba20e2ed0c.1506730372.git.alistair.francis@xilinx.com>
+Date: Fri, 29 Sep 2017 17:16:33 -0700
+Message-ID: <6c7e6a1bed5381cf59c9e7bfb20d241dd3e29f39.1506730372.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1506730372.git.alistair.francis@xilinx.com>
 References: <cover.1506730372.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 27/47] hw/net: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v2 31/47] hw/pci*: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
@@ -28,7 +28,7 @@ List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, Alexander Graf <agraf@suse.de>, Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
 Replace a large number of the fprintf(stderr, "*\n" calls with
@@ -72,130 +72,81 @@ find ./* -type f -exec sed -i \
 Some lines where then manually tweaked to pass checkpatch.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Alexander Graf <agraf@suse.de>
-Cc: Jason Wang <jasowang@redhat.com>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>
 ---
 V2:
  - Split hw patch into individual directories
 
- hw/net/fsl_etsec/etsec.c |  2 +-
- hw/net/pcnet.c           |  2 +-
- hw/net/smc91c111.c       |  5 +++--
- hw/net/vhost_net.c       | 16 ++++++++--------
- 4 files changed, 13 insertions(+), 12 deletions(-)
+ hw/pci-host/bonito.c |  6 +++---
+ hw/pci/pci.c         | 10 +++++-----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/hw/net/fsl_etsec/etsec.c b/hw/net/fsl_etsec/etsec.c
-index 9da1932970..965effa314 100644
---- a/hw/net/fsl_etsec/etsec.c
-+++ b/hw/net/fsl_etsec/etsec.c
-@@ -347,7 +347,7 @@ static ssize_t etsec_receive(NetClientState *nc,
-     eTSEC *etsec = qemu_get_nic_opaque(nc);
- 
- #if defined(HEX_DUMP)
--    fprintf(stderr, "%s receive size:%zd\n", nc->name, size);
-+    error_report("%s receive size:%zd", nc->name, size);
-     qemu_hexdump((void *)buf, stderr, "", size);
- #endif
-     /* Flush is unnecessary as are already in receiving path */
-diff --git a/hw/net/pcnet.c b/hw/net/pcnet.c
-index 654455355f..5f2b5fe046 100644
---- a/hw/net/pcnet.c
-+++ b/hw/net/pcnet.c
-@@ -1070,7 +1070,7 @@ ssize_t pcnet_receive(NetClientState *nc, const uint8_t *buf, size_t size_)
-             if (!s->looptest) {
-                 if (size > 4092) {
- #ifdef PCNET_DEBUG_RMD
--                    fprintf(stderr, "pcnet: truncates rx packet.\n");
-+                    error_report("pcnet: truncates rx packet.");
- #endif
-                     size = 4092;
-                 }
-diff --git a/hw/net/smc91c111.c b/hw/net/smc91c111.c
-index 3b16dcf5a1..ae40fd6e6e 100644
---- a/hw/net/smc91c111.c
-+++ b/hw/net/smc91c111.c
-@@ -8,6 +8,7 @@
+diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
+index 1767d2af61..48fef86c05 100644
+--- a/hw/pci-host/bonito.c
++++ b/hw/pci-host/bonito.c
+@@ -38,7 +38,7 @@
   */
  
  #include "qemu/osdep.h"
+-
 +#include "qemu/error-report.h"
- #include "hw/sysbus.h"
- #include "net/net.h"
- #include "hw/devices.h"
-@@ -362,9 +363,9 @@ static void smc91c111_writeb(void *opaque, hwaddr offset,
-             return;
-         case 12: /* Control */
-             if (value & 1)
--                fprintf(stderr, "smc91c111:EEPROM store not implemented\n");
-+                error_report("smc91c111:EEPROM store not implemented");
-             if (value & 2)
--                fprintf(stderr, "smc91c111:EEPROM reload not implemented\n");
-+                error_report("smc91c111:EEPROM reload not implemented");
-             value &= ~3;
-             SET_LOW(ctr, value);
-             return;
-diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-index e037db63a3..37d0cce560 100644
---- a/hw/net/vhost_net.c
-+++ b/hw/net/vhost_net.c
-@@ -135,7 +135,7 @@ static int vhost_net_get_fd(NetClientState *backend)
-     case NET_CLIENT_DRIVER_TAP:
-         return tap_get_fd(backend);
-     default:
--        fprintf(stderr, "vhost-net requires tap backend\n");
-+        error_report("vhost-net requires tap backend");
-         return -EBADFD;
-     }
- }
-@@ -148,7 +148,7 @@ struct vhost_net *vhost_net_init(VhostNetOptions *options)
-     uint64_t features = 0;
+ #include "hw/hw.h"
+ #include "hw/pci/pci.h"
+ #include "hw/i386/pc.h"
+@@ -449,8 +449,8 @@ static uint32_t bonito_sbridge_pciaddr(void *opaque, hwaddr addr)
+     regno = (cfgaddr & BONITO_PCICONF_REG_MASK) >> BONITO_PCICONF_REG_OFFSET;
  
-     if (!options->net_backend) {
--        fprintf(stderr, "vhost-net requires net backend to be setup\n");
-+        error_report("vhost-net requires net backend to be setup");
-         goto fail;
+     if (idsel == 0) {
+-        fprintf(stderr, "error in bonito pci config address " TARGET_FMT_plx
+-            ",pcimap_cfg=%x\n", addr, s->regs[BONITO_PCIMAP_CFG]);
++        error_report("error in bonito pci config address " TARGET_FMT_plx
++            ",pcimap_cfg=%x", addr, s->regs[BONITO_PCIMAP_CFG]);
+         exit(1);
      }
-     net->nc = options->net_backend;
-@@ -186,8 +186,8 @@ struct vhost_net *vhost_net_init(VhostNetOptions *options)
-             net->dev.features &= ~(1ULL << VIRTIO_NET_F_MRG_RXBUF);
+     pciaddr = PCI_ADDR(pci_bus_num(phb->bus), devno, funno, regno);
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 1e6fb88eba..1c8395d319 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -515,7 +515,7 @@ static int get_pci_irq_state(QEMUFile *f, void *pv, size_t size,
+     for (i = 0; i < PCI_NUM_PINS; ++i) {
+         irq_state[i] = qemu_get_be32(f);
+         if (irq_state[i] != 0x1 && irq_state[i] != 0) {
+-            fprintf(stderr, "irq state %d: must be 0 or 1.\n",
++            error_report("irq state %d: must be 0 or 1.",
+                     irq_state[i]);
+             return -EINVAL;
          }
-         if (~net->dev.features & net->dev.backend_features) {
--            fprintf(stderr, "vhost lacks feature mask %" PRIu64
--                   " for backend\n",
-+            error_report("vhost lacks feature mask %" PRIu64
-+                   " for backend",
-                    (uint64_t)(~net->dev.features & net->dev.backend_features));
-             goto fail;
-         }
-@@ -197,8 +197,8 @@ struct vhost_net *vhost_net_init(VhostNetOptions *options)
-     if (net->nc->info->type == NET_CLIENT_DRIVER_VHOST_USER) {
-         features = vhost_user_get_acked_features(net->nc);
-         if (~net->dev.features & features) {
--            fprintf(stderr, "vhost lacks feature mask %" PRIu64
--                    " for backend\n",
-+            error_report("vhost lacks feature mask %" PRIu64
-+                    " for backend",
-                     (uint64_t)(~net->dev.features & features));
-             goto fail;
-         }
-@@ -349,7 +349,7 @@ err_start:
-     }
-     e = k->set_guest_notifiers(qbus->parent, total_queues * 2, false);
-     if (e < 0) {
--        fprintf(stderr, "vhost guest notifier cleanup failed: %d\n", e);
-+        error_report("vhost guest notifier cleanup failed: %d", e);
-         fflush(stderr);
-     }
- err:
-@@ -370,7 +370,7 @@ void vhost_net_stop(VirtIODevice *dev, NetClientState *ncs,
+@@ -678,7 +678,7 @@ static PCIBus *pci_get_bus_devfn(int *devfnp, PCIBus *root,
+     unsigned slot;
  
-     r = k->set_guest_notifiers(qbus->parent, total_queues * 2, false);
-     if (r < 0) {
--        fprintf(stderr, "vhost guest notifier cleanup failed: %d\n", r);
-+        error_report("vhost guest notifier cleanup failed: %d", r);
-         fflush(stderr);
+     if (!root) {
+-        fprintf(stderr, "No primary PCI bus\n");
++        error_report("No primary PCI bus");
+         return NULL;
      }
-     assert(r >= 0);
+ 
+@@ -694,7 +694,7 @@ static PCIBus *pci_get_bus_devfn(int *devfnp, PCIBus *root,
+     }
+ 
+     if (dom != 0) {
+-        fprintf(stderr, "No support for non-zero PCI domains\n");
++        error_report("No support for non-zero PCI domains");
+         return NULL;
+     }
+ 
+@@ -1118,8 +1118,8 @@ void pci_register_bar(PCIDevice *pci_dev, int region_num,
+     assert(region_num >= 0);
+     assert(region_num < PCI_NUM_REGIONS);
+     if (size & (size-1)) {
+-        fprintf(stderr, "ERROR: PCI region size must be pow2 "
+-                    "type=0x%x, size=0x%"FMT_PCIBUS"\n", type, size);
++        error_report("ERROR: PCI region size must be pow2 "
++                    "type=0x%x, size=0x%"FMT_PCIBUS"", type, size);
+         exit(1);
+     }
+ 
 -- 
 2.11.0
