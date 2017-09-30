@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5VR-00045C-5A
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:46 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dy5VN-0004mR-Nh
+	(envelope-from <alistai@xilinx.com>) id 1dy5VP-00042e-E6
 	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:45 -0400
-Received: from mail-by2nam03on0065.outbound.protection.outlook.com
-	([104.47.42.65]:58080
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <alistai@xilinx.com>) id 1dy5VM-0004gI-4t
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:43 -0400
+Received: from mail-dm3nam03on0087.outbound.protection.outlook.com
+	([104.47.41.87]:4192
+	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dy5VN-0004hD-DF
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:41 -0400
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dy5VL-0004ds-QZ
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 20:19:40 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 29 Sep 2017 17:15:43 -0700
-Message-ID: <97f16c1f24f227db9f6a3dfac79aeccae9529caa.1506730372.git.alistair.francis@xilinx.com>
+Date: Fri, 29 Sep 2017 17:15:37 -0700
+Message-ID: <85d53cce03d155ea59564a2743e8eb4637b422f0.1506730372.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1506730372.git.alistair.francis@xilinx.com>
 References: <cover.1506730372.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 14/47] hw/i2c: Replace fprintf(stderr,
+Subject: [Qemu-devel] [PATCH v2 12/47] hw/dma: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
@@ -76,39 +76,164 @@ Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 V2:
  - Split hw patch into individual directories
 
- hw/i2c/omap_i2c.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ hw/dma/omap_dma.c | 26 ++++++++++++++------------
+ hw/dma/soc_dma.c  | 37 +++++++++++++++++++------------------
+ 2 files changed, 33 insertions(+), 30 deletions(-)
 
-diff --git a/hw/i2c/omap_i2c.c b/hw/i2c/omap_i2c.c
-index 26e3e5ebf6..c89664f342 100644
---- a/hw/i2c/omap_i2c.c
-+++ b/hw/i2c/omap_i2c.c
-@@ -340,13 +340,13 @@ static void omap_i2c_write(void *opaque, hwaddr addr,
-             break;
-         }
-         if ((value & (1 << 15)) && !(value & (1 << 10))) {	/* MST */
--            fprintf(stderr, "%s: I^2C slave mode not supported\n",
--                            __func__);
-+            error_report("%s: I^2C slave mode not supported",
-+                         __func__);
-             break;
-         }
-         if ((value & (1 << 15)) && value & (1 << 8)) {		/* XA */
--            fprintf(stderr, "%s: 10-bit addressing mode not supported\n",
--                            __func__);
-+            error_report("%s: 10-bit addressing mode not supported",
-+                         __func__);
-             break;
-         }
-         if ((value & (1 << 15)) && value & (1 << 0)) {		/* STT */
-@@ -393,7 +393,7 @@ static void omap_i2c_write(void *opaque, hwaddr addr,
-                 omap_i2c_interrupts_update(s);
-             }
-         if (value & (1 << 15))					/* ST_EN */
--            fprintf(stderr, "%s: System Test not supported\n", __func__);
-+            error_report("%s: System Test not supported", __func__);
-         break;
+diff --git a/hw/dma/omap_dma.c b/hw/dma/omap_dma.c
+index abd18c67ea..5d7fe06d98 100644
+--- a/hw/dma/omap_dma.c
++++ b/hw/dma/omap_dma.c
+@@ -18,6 +18,7 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu-common.h"
+ #include "qemu/timer.h"
+ #include "hw/arm/omap.h"
+@@ -1898,13 +1899,13 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
+             omap_dma_reset(s->dma);
+         s->ocp = value & 0x3321;
+         if (((s->ocp >> 12) & 3) == 3)				/* MIDLEMODE */
+-            fprintf(stderr, "%s: invalid DMA power mode\n", __func__);
++            error_report("%s: invalid DMA power mode", __func__);
+         return;
  
-     default:
+     case 0x78:	/* DMA4_GCR */
+         s->gcr = value & 0x00ff00ff;
+ 	if ((value & 0xff) == 0x00)		/* MAX_CHANNEL_FIFO_DEPTH */
+-            fprintf(stderr, "%s: wrong FIFO depth in GCR\n", __func__);
++            error_report("%s: wrong FIFO depth in GCR", __func__);
+         return;
+ 
+     case 0x80 ... 0xfff:
+@@ -1934,8 +1935,8 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
+         ch->buf_disable = (value >> 25) & 1;
+         ch->src_sync = (value >> 24) & 1;	/* XXX For CamDMA must be 1 */
+         if (ch->buf_disable && !ch->src_sync)
+-            fprintf(stderr, "%s: Buffering disable is not allowed in "
+-                            "destination synchronised mode\n", __func__);
++            error_report("%s: Buffering disable is not allowed in "
++                         "destination synchronised mode", __func__);
+         ch->prefetch = (value >> 23) & 1;
+         ch->bs = (value >> 18) & 1;
+         ch->transparent_copy = (value >> 17) & 1;
+@@ -1946,8 +1947,8 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
+         ch->priority = (value & 0x0040) >> 6;
+         ch->fs = (value & 0x0020) >> 5;
+         if (ch->fs && ch->bs && ch->mode[0] && ch->mode[1])
+-            fprintf(stderr, "%s: For a packet transfer at least one port "
+-                            "must be constant-addressed\n", __func__);
++            error_report("%s: For a packet transfer at least one port "
++                         "must be constant-addressed", __func__);
+         ch->sync = (value & 0x001f) | ((value >> 14) & 0x0060);
+         /* XXX must be 0x01 for CamDMA */
+ 
+@@ -1977,8 +1978,8 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
+         ch->endian[1] =(value >> 19) & 1;
+         ch->endian_lock[1] =(value >> 18) & 1;
+         if (ch->endian[0] != ch->endian[1])
+-            fprintf(stderr, "%s: DMA endianness conversion enable attempt\n",
+-                            __func__);
++            error_report("%s: DMA endianness conversion enable attempt",
++                          __func__);
+         ch->write_mode = (value >> 16) & 3;
+         ch->burst[1] = (value & 0xc000) >> 14;
+         ch->pack[1] = (value & 0x2000) >> 13;
+@@ -1986,12 +1987,13 @@ static void omap_dma4_write(void *opaque, hwaddr addr,
+         ch->burst[0] = (value & 0x0180) >> 7;
+         ch->pack[0] = (value & 0x0040) >> 6;
+         ch->translate[0] = (value & 0x003c) >> 2;
+-        if (ch->translate[0] | ch->translate[1])
+-            fprintf(stderr, "%s: bad MReqAddressTranslate sideband signal\n",
+-                            __func__);
++        if (ch->translate[0] | ch->translate[1]) {
++            error_report("%s: bad MReqAddressTranslate sideband signal",
++                         __func__);
++        }
+         ch->data_type = 1 << (value & 3);
+         if ((value & 3) == 3) {
+-            printf("%s: bad data_type for DMA channel\n", __func__);
++            error_report("%s: bad data_type for DMA channel", __func__);
+             ch->data_type >>= 1;
+         }
+         break;
+diff --git a/hw/dma/soc_dma.c b/hw/dma/soc_dma.c
+index 9bb499bf9c..7339a3ec95 100644
+--- a/hw/dma/soc_dma.c
++++ b/hw/dma/soc_dma.c
+@@ -18,6 +18,7 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu-common.h"
+ #include "qemu/timer.h"
+ #include "hw/arm/soc_dma.h"
+@@ -270,11 +271,11 @@ void soc_dma_port_add_fifo(struct soc_dma_s *soc, hwaddr virt_base,
+         if (entry->type == soc_dma_port_mem) {
+             if (entry->addr <= virt_base &&
+                             entry->addr + entry->u.mem.size > virt_base) {
+-                fprintf(stderr, "%s: FIFO at %"PRIx64
+-                                " collides with RAM region at %"PRIx64
+-                                "-%"PRIx64 "\n", __func__,
+-                                virt_base, entry->addr,
+-                                (entry->addr + entry->u.mem.size));
++                error_report("%s: FIFO at %"PRIx64
++                             " collides with RAM region at %"PRIx64
++                             "-%"PRIx64 "", __func__,
++                             virt_base, entry->addr,
++                             (entry->addr + entry->u.mem.size));
+                 exit(-1);
+             }
+ 
+@@ -284,9 +285,9 @@ void soc_dma_port_add_fifo(struct soc_dma_s *soc, hwaddr virt_base,
+             while (entry < dma->memmap + dma->memmap_size &&
+                             entry->addr <= virt_base) {
+                 if (entry->addr == virt_base && entry->u.fifo.out == out) {
+-                    fprintf(stderr, "%s: FIFO at %"PRIx64
+-                                    " collides FIFO at %"PRIx64 "\n",
+-                                    __func__, virt_base, entry->addr);
++                    error_report("%s: FIFO at %"PRIx64
++                                 " collides FIFO at %"PRIx64 "",
++                                 __func__, virt_base, entry->addr);
+                     exit(-1);
+                 }
+ 
+@@ -321,11 +322,11 @@ void soc_dma_port_add_mem(struct soc_dma_s *soc, uint8_t *phys_base,
+             if ((entry->addr >= virt_base && entry->addr < virt_base + size) ||
+                             (entry->addr <= virt_base &&
+                              entry->addr + entry->u.mem.size > virt_base)) {
+-                fprintf(stderr, "%s: RAM at %"PRIx64 "-%"PRIx64
+-                                " collides with RAM region at %"PRIx64
+-                                "-%"PRIx64 "\n", __func__,
+-                                virt_base, virt_base + size,
+-                                entry->addr, entry->addr + entry->u.mem.size);
++                error_report("%s: RAM at %"PRIx64 "-%"PRIx64
++                             " collides with RAM region at %"PRIx64
++                             "-%"PRIx64 "", __func__,
++                             virt_base, virt_base + size,
++                             entry->addr, entry->addr + entry->u.mem.size);
+                 exit(-1);
+             }
+ 
+@@ -334,11 +335,11 @@ void soc_dma_port_add_mem(struct soc_dma_s *soc, uint8_t *phys_base,
+         } else {
+             if (entry->addr >= virt_base &&
+                             entry->addr < virt_base + size) {
+-                fprintf(stderr, "%s: RAM at %"PRIx64 "-%"PRIx64
+-                                " collides with FIFO at %"PRIx64
+-                                "\n", __func__,
+-                                virt_base, virt_base + size,
+-                                entry->addr);
++                error_report("%s: RAM at %"PRIx64 "-%"PRIx64
++                             " collides with FIFO at %"PRIx64
++                             "", __func__,
++                             virt_base, virt_base + size,
++                             entry->addr);
+                 exit(-1);
+             }
+ 
 -- 
 2.11.0
