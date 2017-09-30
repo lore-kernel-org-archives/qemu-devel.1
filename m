@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lma@suse.com>) id 1dy9FH-0000GT-7g
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 00:19:20 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dy9FM-0000J9-Ie
+	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 00:19:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lma@suse.com>) id 1dy9FD-0001sg-TW
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 00:19:19 -0400
-Received: from prv3-mh.provo.novell.com ([137.65.250.26]:34179)
+	(envelope-from <wei.w.wang@intel.com>) id 1dy9FJ-0001vV-C6
+	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 00:19:24 -0400
+Received: from mga05.intel.com ([192.55.52.43]:47204)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lma@suse.com>) id 1dy9FD-0001rE-OA
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 00:19:15 -0400
-From: Lin Ma <lma@suse.com>
-Date: Sat, 30 Sep 2017 12:18:55 +0800
-Message-Id: <20170930041855.10997-1-lma@suse.com>
-Subject: [Qemu-devel] [PATCH] maint: Add scsi/qemu-pr-helper to .gitignore
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dy9FJ-0001ux-14
+	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 00:19:21 -0400
+From: Wei Wang <wei.w.wang@intel.com>
+Date: Sat, 30 Sep 2017 12:05:49 +0800
+Message-Id: <1506744354-20979-1-git-send-email-wei.w.wang@intel.com>
+Subject: [Qemu-devel] [PATCH v16 0/5] Virtio-balloon Enhancement
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -20,22 +21,146 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com
+Cc: david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, wei.w.wang@intel.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 List-ID: <qemu-devel.nongnu.org>
 
-Signed-off-by: Lin Ma <lma@suse.com>
----
- .gitignore | 1 +
- 1 file changed, 1 insertion(+)
+This patch series enhances the existing virtio-balloon with the following
+new features:
+1) fast ballooning: transfer ballooned pages between the guest and host in
+chunks using sgs, instead of one array each time; and
+2) free page block reporting: a new virtqueue to report guest free pages
+to the host.
 
-diff --git a/.gitignore b/.gitignore
-index 40acfcb9e2..30474bc1df 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -135,3 +135,4 @@ trace-dtrace-root.h
- trace-dtrace-root.dtrace
- trace-ust-all.h
- trace-ust-all.c
-+scsi/qemu-pr-helper
+The second feature can be used to accelerate live migration of VMs. Here
+are some details:
+
+Live migration needs to transfer the VM's memory from the source machine
+to the destination round by round. For the 1st round, all the VM's memory
+is transferred. From the 2nd round, only the pieces of memory that were
+written by the guest (after the 1st round) are transferred. One method
+that is popularly used by the hypervisor to track which part of memory is
+written is to write-protect all the guest memory.
+
+The second feature enables the optimization of the 1st round memory
+transfer - the hypervisor can skip the transfer of guest free pages in the
+1st round. It is not concerned that the memory pages are used after they
+are given to the hypervisor as a hint of the free pages, because they will
+be tracked by the hypervisor and transferred in the next round if they are
+used and written.
+
+Change Log:
+v15->v16:
+1) mm: stop reporting the free pfn range if the callback returns false;
+2) mm: move some implementaion of walk_free_mem_block into a function to
+make the code layout looks better;
+3) xbitmap: added some optimizations suggested by Matthew, please refer to
+the ChangLog in the xbitmap patch for details.
+4) xbitmap: added a test suite
+5) virtio-balloon: bail out with a warning when virtqueue_add_inbuf returns
+an error
+6) virtio-balloon: some small code re-arrangement, e.g. detachinf used buf
+from the vq before adding a new buf
+
+v14->v15:
+1) mm: make the report callback return a bool value - returning 1 to stop
+walking through the free page list.
+2) virtio-balloon: batching sgs of balloon pages till the vq is full
+3) virtio-balloon: create a new workqueue, rather than using the default
+system_wq, to queue the free page reporting work item.
+4) virtio-balloon: add a ctrl_vq to be a central control plane which will
+handle all the future control related commands between the host and guest.
+Add free page report as the first feature controlled under ctrl_vq, and
+the free_page_vq is a data plane vq dedicated to the transmission of free
+page blocks.
+
+v13->v14:
+1) xbitmap: move the code from lib/radix-tree.c to lib/xbitmap.c.
+2) xbitmap: consolidate the implementation of xb_bit_set/clear/test into
+one xb_bit_ops.
+3) xbitmap: add documents for the exported APIs.
+4) mm: rewrite the function to walk through free page blocks.
+5) virtio-balloon: when reporting a free page blcok to the device, if the
+vq is full (less likey to happen in practice), just skip reporting this
+block, instead of busywaiting till an entry gets released.
+6) virtio-balloon: fail the probe function if adding the signal buf in
+init_vqs fails.
+
+v12->v13:
+1) mm: use a callback function to handle the the free page blocks from the
+report function. This avoids exposing the zone internal to a kernel
+module.
+2) virtio-balloon: send balloon pages or a free page block using a single
+sg each time. This has the benefits of simpler implementation with no new
+APIs.
+3) virtio-balloon: the free_page_vq is used to report free pages only (no
+multiple usages interleaving)
+4) virtio-balloon: Balloon pages and free page blocks are sent via input
+sgs, and the completion signal to the host is sent via an output sg.
+
+v11->v12:
+1) xbitmap: use the xbitmap from Matthew Wilcox to record ballooned pages.
+2) virtio-ring: enable the driver to build up a desc chain using vring
+desc.
+3) virtio-ring: Add locking to the existing START_USE() and END_USE()
+macro to lock/unlock the vq when a vq operation starts/ends.
+4) virtio-ring: add virtqueue_kick_sync() and virtqueue_kick_async()
+5) virtio-balloon: describe chunks of ballooned pages and free pages
+blocks directly using one or more chains of desc from the vq.
+
+v10->v11:
+1) virtio_balloon: use vring_desc to describe a chunk;
+2) virtio_ring: support to add an indirect desc table to virtqueue;
+3)  virtio_balloon: use cmdq to report guest memory statistics.
+
+v9->v10:
+1) mm: put report_unused_page_block() under CONFIG_VIRTIO_BALLOON;
+2) virtio-balloon: add virtballoon_validate();
+3) virtio-balloon: msg format change;
+4) virtio-balloon: move miscq handling to a task on system_freezable_wq;
+5) virtio-balloon: code cleanup.
+
+v8->v9:
+1) Split the two new features, VIRTIO_BALLOON_F_BALLOON_CHUNKS and
+VIRTIO_BALLOON_F_MISC_VQ, which were mixed together in the previous
+implementation;
+2) Simpler function to get the free page block.
+
+v7->v8:
+1) Use only one chunk format, instead of two.
+2) re-write the virtio-balloon implementation patch.
+3) commit changes
+4) patch re-org
+
+Matthew Wilcox (2):
+  lib/xbitmap: Introduce xbitmap
+  radix tree test suite: add tests for xbitmap
+
+Wei Wang (3):
+  virtio-balloon: VIRTIO_BALLOON_F_SG
+  mm: support reporting free page blocks
+  virtio-balloon: VIRTIO_BALLOON_F_CTRL_VQ
+
+ drivers/virtio/virtio_balloon.c         | 437 +++++++++++++++++++++++++++++---
+ include/linux/mm.h                      |   6 +
+ include/linux/radix-tree.h              |   2 +
+ include/linux/xbitmap.h                 |  66 +++++
+ include/uapi/linux/virtio_balloon.h     |  16 ++
+ lib/Makefile                            |   2 +-
+ lib/radix-tree.c                        |  42 ++-
+ lib/xbitmap.c                           | 264 +++++++++++++++++++
+ mm/page_alloc.c                         |  91 +++++++
+ tools/include/linux/bitmap.h            |  34 +++
+ tools/include/linux/kernel.h            |   2 +
+ tools/testing/radix-tree/Makefile       |   7 +-
+ tools/testing/radix-tree/linux/kernel.h |   2 -
+ tools/testing/radix-tree/main.c         |   5 +
+ tools/testing/radix-tree/test.h         |   1 +
+ tools/testing/radix-tree/xbitmap.c      | 269 ++++++++++++++++++++
+ 16 files changed, 1203 insertions(+), 43 deletions(-)
+ create mode 100644 include/linux/xbitmap.h
+ create mode 100644 lib/xbitmap.c
+ create mode 100644 tools/testing/radix-tree/xbitmap.c
+
 -- 
-2.14.0
+2.7.4
