@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1dy7DV-0002Nv-7j
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 22:09:22 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1dy7DX-0002PF-NE
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 22:09:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1dy7DU-0004uf-5D
-	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 22:09:21 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1dy7DW-00050S-R9
+	for qemu-devel@nongnu.org; Fri, 29 Sep 2017 22:09:23 -0400
 From: Aaron Lindsay <alindsay@codeaurora.org>
-Date: Fri, 29 Sep 2017 22:08:17 -0400
-Message-Id: <1506737310-21880-1-git-send-email-alindsay@codeaurora.org>
-Subject: [Qemu-devel] [PATCH v2 00/13] More fully implement ARM PMUv3
+Date: Fri, 29 Sep 2017 22:08:18 -0400
+Message-Id: <1506737310-21880-2-git-send-email-alindsay@codeaurora.org>
+In-Reply-To: <1506737310-21880-1-git-send-email-alindsay@codeaurora.org>
+References: <1506737310-21880-1-git-send-email-alindsay@codeaurora.org>
+Subject: [Qemu-devel] [PATCH 01/13] target/arm: A53: Initialize PMCEID[0]
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -20,58 +22,39 @@ To: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Fran
 Cc: qemu-devel@nongnu.org, Michael Spradling <mspradli@codeaurora.org>, Aaron Lindsay <alindsay@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 List-ID: <qemu-devel.nongnu.org>
 
-The ARM PMU implementation currently contains a basic cycle counter, but it is
-often useful to gather counts of other events and filter them based on
-execution mode. These patches flesh out the implementations of various PMU
-registers including PM[X]EVCNTR and PM[X]EVTYPER, add a struct definition to
-represent arbitrary counter types, implement mode filtering, and add
-instruction, cycle, and software increment events.
+A53 advertises ARM_FEATURE_PMU, but wasn't initializing pmceid[01]
 
-I am particularly interested in feedback on the following two patches because I
-think I'm likely Doing It Wrong:
- [1] target/arm: Filter cycle counter based on PMCCFILTR_EL0
- [2] target/arm: PMU: Add instruction and cycle events
+Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+---
+ target/arm/cpu.c   | 2 +-
+ target/arm/cpu64.c | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-In order to implement mode filtering in an event-driven way, [1] adds a pair of
-calls to pmu_sync() surrounding every update to a register/variable which may
-affect whether any counter is currently filtered. These pmu_sync() calls
-ultimately call cpu_get_icount_raw() for enabled instruction and cycle counters
-when using icount. Unfortunately, cpu->can_do_io may otherwise be zero for
-these calls so the current implementation in [2] temporarily sets can_do_io to
-1. I haven't see any ill side effects from this in my testing, but it doesn't
-seem like the right way to handle this.
-
-I would like to eventually add sending interrupts on counter overflow.
-Suggestions for the best direction to handle this are most welcome.  
-
-Thanks for any feedback,
-Aaron
-
-Aaron Lindsay (13):
-  target/arm: A53: Initialize PMCEID[0]
-  target/arm: Check PMCNTEN for whether PMCCNTR is enabled
-  target/arm: Reorganize PMCCNTR read, write, sync
-  target/arm: Mask PMU register writes based on PMCR_EL0.N
-  target/arm: Allow AArch32 access for PMCCFILTR
-  target/arm: Filter cycle counter based on PMCCFILTR_EL0
-  target/arm: Implement PMOVSSET
-  target/arm: Split arm_ccnt_enabled into generic pmu_counter_enabled
-  target/arm: Add array for supported PMU events, generate PMCEID[01]
-  target/arm: Finish implementation of PM[X]EVCNTR and PM[X]EVTYPER
-  target/arm: PMU: Add instruction and cycle events
-  target/arm: PMU: Set PMCR.N to 4
-  target/arm: Implement PMSWINC
-
- target/arm/cpu.c       |  10 +-
- target/arm/cpu.h       |  34 +++-
- target/arm/cpu64.c     |   2 +
- target/arm/helper.c    | 535 +++++++++++++++++++++++++++++++++++++++++--------
- target/arm/kvm64.c     |   2 +
- target/arm/machine.c   |   2 +
- target/arm/op_helper.c |   4 +
- 7 files changed, 500 insertions(+), 89 deletions(-)
-
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 4300de6..a6c29cf 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1402,7 +1402,7 @@ static void cortex_a15_initfn(Object *obj)
+     cpu->id_pfr0 = 0x00001131;
+     cpu->id_pfr1 = 0x00011011;
+     cpu->id_dfr0 = 0x02010555;
+-    cpu->pmceid0 = 0x0000000;
++    cpu->pmceid0 = 0x00000000;
+     cpu->pmceid1 = 0x00000000;
+     cpu->id_afr0 = 0x00000000;
+     cpu->id_mmfr0 = 0x10201105;
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 670c07a..7b1642e 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -198,6 +198,8 @@ static void aarch64_a53_initfn(Object *obj)
+     cpu->id_isar5 = 0x00011121;
+     cpu->id_aa64pfr0 = 0x00002222;
+     cpu->id_aa64dfr0 = 0x10305106;
++    cpu->pmceid0 = 0x00000000;
++    cpu->pmceid1 = 0x00000000;
+     cpu->id_aa64isar0 = 0x00011120;
+     cpu->id_aa64mmfr0 = 0x00001122; /* 40 bit physical addr */
+     cpu->dbgdidr = 0x3516d000;
 -- 
-Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the
-Code Aurora Forum, a Linux Foundation Collaborative Project.
+Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.\nQualcomm Technologies, Inc. is a member of the\nCode Aurora Forum, a Linux Foundation Collaborative Project.
