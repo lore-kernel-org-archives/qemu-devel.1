@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dyFoI-0002Yq-IE
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 07:19:56 -0400
+	(envelope-from <prem.mallappa@gmail.com>) id 1dyD8d-00074B-IA
+	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 04:28:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dyFoF-0001FQ-Mu
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 07:19:54 -0400
-Resent-Message-Id: <E1dyFoF-0001FQ-Mu@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21439)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dyFoF-0001CQ-9o
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 07:19:51 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150676401986.93.8156901515684423207@b58463cdfd5f>
-In-Reply-To: <20170930090240.23729-1-carenas@gmail.com>
+	(envelope-from <prem.mallappa@gmail.com>) id 1dyD8c-0003rI-HM
+	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 04:28:43 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 30 Sep 2017 02:33:40 -0700 (PDT)
-Subject: Re: [Qemu-devel] [RFC PATCH] tests/tcg: add write tests for nbyte =
- 0
+In-Reply-To: <CAFEAcA8k4nAjqJ_Mu5ZZ8ygMMJikX17BCB3M0ZkbQBsKVLt5TQ@mail.gmail.com>
+References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
+	<1504286483-23327-2-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA8k4nAjqJ_Mu5ZZ8ygMMJikX17BCB3M0ZkbQBsKVLt5TQ@mail.gmail.com>
+From: Prem Mallappa <prem.mallappa@gmail.com>
+Date: Sat, 30 Sep 2017 13:58:17 +0530
+Message-ID: <CADD6c-iohAZO7DLsYfh+sRz0SWyxWW0ja_tdFhdemgWJafHJjg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v7 01/20] hw/arm/smmu-common: smmu base
+ device and datatypes
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -28,39 +23,52 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: carenas@gmail.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.com, zhuoweizhang@yahoo.com, laurent@vivier.eu
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, Radha Mohan <mohun106@gmail.com>, Trey Cain <tcain@qti.qualcomm.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Will Deacon <will.deacon@arm.com>, jean-philippe.brucker@arm.com, robin.murphy@arm.com, Peter Xu <peterx@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, wtownsen@redhat.com
 List-ID: <qemu-devel.nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcwOTMwMDkwMjQwLjIzNzI5LTEtY2FyZW5hc0BnbWFpbC5jb20KU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtSRkMgUEFUQ0hdIHRlc3RzL3RjZzogYWRkIHdyaXRlIHRlc3RzIGZv
-ciBuYnl0ZSA9IDAKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9
-YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxl
-ZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
-cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
-ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
-IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
-CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmUxYTQ1YjJhOGYgdGVzdHMvdGNnOiBhZGQgd3Jp
-dGUgdGVzdHMgZm9yIG5ieXRlID0gMAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFU
-Q0ggMS8xOiB0ZXN0cy90Y2c6IGFkZCB3cml0ZSB0ZXN0cyBmb3IgbmJ5dGUgPSAwLi4uCkVSUk9S
-OiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQK
-IzEwMzogRklMRTogdGVzdHMvdGNnL2xpbnV4LXRlc3QuYzoxMTI6CisgICAgaWYgKGxlbiAhPSAw
-KQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0
-aGlzIHN0YXRlbWVudAojMTA2OiBGSUxFOiB0ZXN0cy90Y2cvbGludXgtdGVzdC5jOjExNToKKyAg
-ICBpZiAobGVuICE9IDApClsuLi5dCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
-ZSB0YWJzCiMxMDc6IEZJTEU6IHRlc3RzL3RjZy9saW51eC10ZXN0LmM6MTE2OgorXkllcnJvcigi
-d3JpdGUgTlVMTCBidWYiKTskCgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzEx
-NjogRklMRTogdGVzdHMvdGNnL2xpbnV4LXRlc3QuYzo1NDM6CisgICAgLy90ZXN0X3NpZ25hbCgp
-OwoKdG90YWw6IDQgZXJyb3JzLCAwIHdhcm5pbmdzLCA3MiBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
-dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3Qg
-Y29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
-aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
-IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+All,
+
+I am no longer associated with Broadcom, so can't help much here I guess.
+
+If there is anything else I can do; please let me know.
+
+Cheers,
+/Prem
+
+
+
+--
+Prem
+
+On Wed, Sep 27, 2017 at 11:08 PM, Peter Maydell <peter.maydell@linaro.org>
+wrote:
+
+> On 1 September 2017 at 10:21, Eric Auger <eric.auger@redhat.com> wrote:
+> > The patch introduces the smmu base device and class for the ARM
+> > smmu. Devices for specific versions will be derived from this
+> > base device.
+> >
+> > We also introduce some important datatypes.
+> >
+> > Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> > Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
+>
+> > +/*
+> > + * Copyright (C) 2014-2016 Broadcom Corporation
+> > + * Copyright (c) 2017 Red Hat, Inc.
+> > + * Written by Prem Mallappa, Eric Auger
+> > + *
+> > + * This program is free software; you can redistribute it and/or modify
+> > + * it under the terms of the GNU General Public License version 2 as
+> > + * published by the Free Software Foundation.
+>
+> Really GPL-2-only ?
+>
+> Unless there's a good reason, you should probably fix this (including
+> getting an ack from Prem/Broadcom where it applies to code that came
+> from him).
+>
+> thanks
+> -- PMM
+>
