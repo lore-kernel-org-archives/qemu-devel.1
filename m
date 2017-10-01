@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60984)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dyS06-0004m2-Ck
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 20:20:55 -0400
+	(envelope-from <marcel@redhat.com>) id 1dyZLD-0005Zd-0K
+	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 04:11:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dyS03-0005I5-I2
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 20:20:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40122)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dyS03-0005Cv-9W
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 20:20:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dyRzz-0003up-Mr
-	for <qemu-devel@nongnu.org>; Sun, 01 Oct 2017 00:20:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9BBE92E8074
-	for <qemu-devel@nongnu.org>; Sun,  1 Oct 2017 00:20:47 +0000 (UTC)
+	(envelope-from <marcel@redhat.com>) id 1dyZLA-000891-7b
+	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 04:11:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dyZL9-00086k-VQ
+	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 04:11:08 -0400
+References: <cover.1506730372.git.alistair.francis@xilinx.com>
+	<6c7e6a1bed5381cf59c9e7bfb20d241dd3e29f39.1506730372.git.alistair.francis@xilinx.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <7a215eb2-246d-cc2f-9741-3010b1e1e0cd@redhat.com>
+Date: Sun, 1 Oct 2017 11:11:10 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 01 Oct 2017 00:13:43 -0000
-From: Sebastien Bacher <seb128@ubuntu.com>
-Reply-To: Bug 1718719 <1718719@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150601012428.28823.10384460665730601462.malonedeb@gac.canonical.com>
-Message-Id: <150681682344.20523.608292126006960010.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1718719] Re: qemu can't capture keys properly
- under wayland
+In-Reply-To: <6c7e6a1bed5381cf59c9e7bfb20d241dd3e29f39.1506730372.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 31/47] hw/pci*: Replace fprintf(stderr,
+ "*\n" with error_report()
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -36,48 +28,155 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
+Cc: alistair23@gmail.com, armbru@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-is the patch providing any user visible improvement? if not it would
-probably make sense to delay including it to next cycle
+Hi,
 
--- =
+On 30/09/2017 3:16, Alistair Francis wrote:
+> Replace a large number of the fprintf(stderr, "*\n" calls with
+> error_report(). The functions were renamed with these commands and then
+> compiler issues where manually fixed.
+> 
+> find ./* -type f -exec sed -i \
+>      'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>      {} +
+> find ./* -type f -exec sed -i \
+>      'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>      {} +
+> find ./* -type f -exec sed -i \
+>      'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>      {} +
+> find ./* -type f -exec sed -i \
+>      'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>      {} +
+> find ./* -type f -exec sed -i \
+>      'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>      {} +
+> find ./* -type f -exec sed -i \
+>      'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>      {} +
+> find ./* -type f -exec sed -i \
+>      'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>      {} +
+> find ./* -type f -exec sed -i \
+>      'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>      {} +
+> find ./* -type f -exec sed -i \
+>      'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>      {} +
+> find ./* -type f -exec sed -i \
+>      'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>      {} +
+> find ./* -type f -exec sed -i \
+>      'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
+>      {} +
+> 
+> Some lines where then manually tweaked to pass checkpatch.
+> 
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1718719
+We are using coccinelle with great results until now and
+we save the scripts in scripts/coccinelle so we can run
+them later/improve them.
+For your task it should be a really easy script, but
+since your work is already done maybe is not worth it.
+Anyway, here is the equivalent coccinelle script:
 
-Title:
-  qemu can't capture keys properly under wayland
+@
+expression list ARGS;
+@@
+- fprintf(stderr, ARGS);
++ error_report(ARGS);
 
-Status in QEMU:
-  New
-Status in XServer:
-  Incomplete
-Status in qemu package in Ubuntu:
-  New
-Status in xorg-server package in Ubuntu:
-  Triaged
+To run:
+Install coccinelle: dnf install coccinelle
+Save the above as:  <qemu_dir>/scripts/coccinelle/remove_fprintf.cocci
+Run it to see the diff:
+     spatch --sp-file <qemu_dir>scripts/coccinelle/remove_fprintf.cocci 
+--dir <qemu_dir> --include-headers
 
-Bug description:
-  This appears to be different than the previous similar bugs; patches
-  do look to be applied to use libinput in the wayland case. Still:
 
-  unknown keycodes `(unnamed)', please report to qemu-devel@nongnu.org
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
-  I am using qemu-system-x86                       1:2.10+dfsg-0ubuntu1
-  on artful.
+Thanks,
+Marcel
 
-  Many key inputs work correctly, but at boot the system will not
-  properly catch the arrow keys, the above error shows up immediately
-  after hitting Esc (for instance) to get to the boot menu. Booting from
-  CD onto a daily Ubuntu desktop image, I can't navigate the splash
-  menu.
-
-  The same works correctly through virt-manager (which uses spice
-  AFAICT, but wayland tends to crash when running virt-manager), and
-  things work if I switch my session to Xorg rather than wayland.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1718719/+subscriptions
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel@redhat.com>
+> ---
+> V2:
+>   - Split hw patch into individual directories
+> 
+>   hw/pci-host/bonito.c |  6 +++---
+>   hw/pci/pci.c         | 10 +++++-----
+>   2 files changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
+> index 1767d2af61..48fef86c05 100644
+> --- a/hw/pci-host/bonito.c
+> +++ b/hw/pci-host/bonito.c
+> @@ -38,7 +38,7 @@
+>    */
+>   
+>   #include "qemu/osdep.h"
+> -
+> +#include "qemu/error-report.h"
+>   #include "hw/hw.h"
+>   #include "hw/pci/pci.h"
+>   #include "hw/i386/pc.h"
+> @@ -449,8 +449,8 @@ static uint32_t bonito_sbridge_pciaddr(void *opaque, hwaddr addr)
+>       regno = (cfgaddr & BONITO_PCICONF_REG_MASK) >> BONITO_PCICONF_REG_OFFSET;
+>   
+>       if (idsel == 0) {
+> -        fprintf(stderr, "error in bonito pci config address " TARGET_FMT_plx
+> -            ",pcimap_cfg=%x\n", addr, s->regs[BONITO_PCIMAP_CFG]);
+> +        error_report("error in bonito pci config address " TARGET_FMT_plx
+> +            ",pcimap_cfg=%x", addr, s->regs[BONITO_PCIMAP_CFG]);
+>           exit(1);
+>       }
+>       pciaddr = PCI_ADDR(pci_bus_num(phb->bus), devno, funno, regno);
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 1e6fb88eba..1c8395d319 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -515,7 +515,7 @@ static int get_pci_irq_state(QEMUFile *f, void *pv, size_t size,
+>       for (i = 0; i < PCI_NUM_PINS; ++i) {
+>           irq_state[i] = qemu_get_be32(f);
+>           if (irq_state[i] != 0x1 && irq_state[i] != 0) {
+> -            fprintf(stderr, "irq state %d: must be 0 or 1.\n",
+> +            error_report("irq state %d: must be 0 or 1.",
+>                       irq_state[i]);
+>               return -EINVAL;
+>           }
+> @@ -678,7 +678,7 @@ static PCIBus *pci_get_bus_devfn(int *devfnp, PCIBus *root,
+>       unsigned slot;
+>   
+>       if (!root) {
+> -        fprintf(stderr, "No primary PCI bus\n");
+> +        error_report("No primary PCI bus");
+>           return NULL;
+>       }
+>   
+> @@ -694,7 +694,7 @@ static PCIBus *pci_get_bus_devfn(int *devfnp, PCIBus *root,
+>       }
+>   
+>       if (dom != 0) {
+> -        fprintf(stderr, "No support for non-zero PCI domains\n");
+> +        error_report("No support for non-zero PCI domains");
+>           return NULL;
+>       }
+>   
+> @@ -1118,8 +1118,8 @@ void pci_register_bar(PCIDevice *pci_dev, int region_num,
+>       assert(region_num >= 0);
+>       assert(region_num < PCI_NUM_REGIONS);
+>       if (size & (size-1)) {
+> -        fprintf(stderr, "ERROR: PCI region size must be pow2 "
+> -                    "type=0x%x, size=0x%"FMT_PCIBUS"\n", type, size);
+> +        error_report("ERROR: PCI region size must be pow2 "
+> +                    "type=0x%x, size=0x%"FMT_PCIBUS"", type, size);
+>           exit(1);
+>       }
+>   
+> 
