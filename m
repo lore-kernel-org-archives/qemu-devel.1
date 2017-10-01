@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33857)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dyTCd-0004s7-Ki
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 21:37:59 -0400
+	id 1dyTDL-0005PQ-L9
+	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 21:38:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dyTCc-00036r-Bf
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 21:37:55 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:33713)
+	id 1dyTDI-0003oU-3P
+	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 21:38:39 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:34457)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dyTCc-00036S-3e
-	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 21:37:54 -0400
-Received: by mail-qk0-x242.google.com with SMTP id b82so1590237qkc.0
-	for <qemu-devel@nongnu.org>; Sat, 30 Sep 2017 18:37:54 -0700 (PDT)
+	id 1dyTDH-0003nv-Tv
+	for qemu-devel@nongnu.org; Sat, 30 Sep 2017 21:38:36 -0400
+Received: by mail-qk0-x243.google.com with SMTP id a128so296374qkc.1
+	for <qemu-devel@nongnu.org>; Sat, 30 Sep 2017 18:38:35 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <cover.1506730372.git.alistair.francis@xilinx.com>
-	<cbe0b62f8115005867933cf841367f0e71893f79.1506730372.git.alistair.francis@xilinx.com>
+	<81f75ef14938cf64c69be23757a52eb1b585d406.1506730372.git.alistair.francis@xilinx.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <10220bf8-44a0-0942-14fb-617abc63054e@amsat.org>
-Date: Sat, 30 Sep 2017 22:37:50 -0300
+Message-ID: <4ff06509-bb63-f86a-66bb-31a2920df3c0@amsat.org>
+Date: Sat, 30 Sep 2017 22:38:31 -0300
 MIME-Version: 1.0
-In-Reply-To: <cbe0b62f8115005867933cf841367f0e71893f79.1506730372.git.alistair.francis@xilinx.com>
+In-Reply-To: <81f75ef14938cf64c69be23757a52eb1b585d406.1506730372.git.alistair.francis@xilinx.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 39/47] hw/timer: Replace fprintf(stderr,
+Subject: Re: [Qemu-devel] [PATCH v2 38/47] hw/ssi: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
@@ -39,7 +39,7 @@ To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
 Cc: alistair23@gmail.com, armbru@redhat.com
 List-ID: <qemu-devel.nongnu.org>
 
-On 09/29/2017 09:17 PM, Alistair Francis wrote:
+On 09/29/2017 09:16 PM, Alistair Francis wrote:
 > Replace a large number of the fprintf(stderr, "*\n" calls with
 > error_report(). The functions were renamed with these commands and then
 > compiler issues where manually fixed.
@@ -88,99 +88,31 @@ Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > V2:
 >   - Split hw patch into individual directories
 > 
->   hw/timer/omap_gptimer.c | 11 ++++++-----
->   hw/timer/twl92230.c     |  2 +-
->   hw/timer/xilinx_timer.c |  8 ++++----
->   3 files changed, 11 insertions(+), 10 deletions(-)
+>   hw/ssi/omap_spi.c | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
 > 
-> diff --git a/hw/timer/omap_gptimer.c b/hw/timer/omap_gptimer.c
-> index ae2dc99832..0f064241d3 100644
-> --- a/hw/timer/omap_gptimer.c
-> +++ b/hw/timer/omap_gptimer.c
-> @@ -18,6 +18,7 @@
->    * with this program; if not, see <http://www.gnu.org/licenses/>.
+> diff --git a/hw/ssi/omap_spi.c b/hw/ssi/omap_spi.c
+> index 34163e5646..98242d1e8b 100644
+> --- a/hw/ssi/omap_spi.c
+> +++ b/hw/ssi/omap_spi.c
+> @@ -20,6 +20,7 @@
+>    * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 >    */
 >   #include "qemu/osdep.h"
 > +#include "qemu/error-report.h"
 >   #include "hw/hw.h"
->   #include "qemu/timer.h"
 >   #include "hw/arm/omap.h"
-> @@ -356,7 +357,7 @@ static void omap_gp_timer_write(void *opaque, hwaddr addr,
->       case 0x10:	/* TIOCP_CFG */
->           s->config = value & 0x33d;
->           if (((value >> 3) & 3) == 3)				/* IDLEMODE */
-> -            fprintf(stderr, "%s: illegal IDLEMODE value in TIOCP_CFG\n",
-> +            error_report("%s: illegal IDLEMODE value in TIOCP_CFG",
->                               __func__);
->           if (value & 2)						/* SOFTRESET */
->               omap_gp_timer_reset(s);
-> @@ -394,11 +395,11 @@ static void omap_gp_timer_write(void *opaque, hwaddr addr,
->           s->ar = (value >> 1) & 1;
->           s->st = (value >> 0) & 1;
->           if (s->inout && s->trigger != gpt_trigger_none)
-> -            fprintf(stderr, "%s: GP timer pin must be an output "
-> -                            "for this trigger mode\n", __func__);
-> +            error_report("%s: GP timer pin must be an output "
-> +                         "for this trigger mode", __func__);
->           if (!s->inout && s->capture != gpt_capture_none)
-> -            fprintf(stderr, "%s: GP timer pin must be an input "
-> -                            "for this capture mode\n", __func__);
-> +            error_report("%s: GP timer pin must be an input "
-> +                         "for this capture mode", __func__);
->           if (s->trigger == gpt_trigger_none)
->               omap_gp_timer_out(s, s->scpwm);
->           /* TODO: make sure this doesn't overflow 32-bits */
-> diff --git a/hw/timer/twl92230.c b/hw/timer/twl92230.c
-> index ef116c636c..18880884c6 100644
-> --- a/hw/timer/twl92230.c
-> +++ b/hw/timer/twl92230.c
-> @@ -614,7 +614,7 @@ static void menelaus_write(void *opaque, uint8_t addr, uint8_t value)
->               break;
->           rtc_badness:
->           default:
-> -            fprintf(stderr, "%s: bad RTC_UPDATE value %02x\n",
-> +            error_report("%s: bad RTC_UPDATE value %02x",
->                               __func__, value);
->               s->status |= 1 << 10;				/* RTCERR */
->               menelaus_update(s);
-> diff --git a/hw/timer/xilinx_timer.c b/hw/timer/xilinx_timer.c
-> index 59439c05be..a80bba846b 100644
-> --- a/hw/timer/xilinx_timer.c
-> +++ b/hw/timer/xilinx_timer.c
-> @@ -127,7 +127,7 @@ timer_read(void *opaque, hwaddr addr, unsigned int size)
->               break;
 >   
->       }
-> -    D(fprintf(stderr, "%s timer=%d %x=%x\n", __func__, timer, addr * 4, r));
-> +    D(error_report("%s timer=%d %x=%x", __func__, timer, addr * 4, r));
->       return r;
->   }
->   
-> @@ -135,7 +135,7 @@ static void timer_enable(struct xlx_timer *xt)
->   {
->       uint64_t count;
->   
-> -    D(fprintf(stderr, "%s timer=%d down=%d\n", __func__,
-> +    D(error_report("%s timer=%d down=%d", __func__,
->                 xt->nr, xt->regs[R_TCSR] & TCSR_UDT));
->   
->       ptimer_stop(xt->ptimer);
-> @@ -160,7 +160,7 @@ timer_write(void *opaque, hwaddr addr,
->       addr >>= 2;
->       timer = timer_from_addr(addr);
->       xt = &t->timers[timer];
-> -    D(fprintf(stderr, "%s addr=%x val=%x (timer=%d off=%d)\n",
-> +    D(error_report("%s addr=%x val=%x (timer=%d off=%d)",
->                __func__, addr * 4, value, timer, addr & 3));
->       /* Further decoding to address a specific timers reg.  */
->       addr &= 3;
-> @@ -197,7 +197,7 @@ static void timer_hit(void *opaque)
->   {
->       struct xlx_timer *xt = opaque;
->       struct timerblock *t = xt->parent;
-> -    D(fprintf(stderr, "%s %d\n", __func__, xt->nr));
-> +    D(error_report("%s %d", __func__, xt->nr));
->       xt->regs[R_TCSR] |= TCSR_TINT;
->   
->       if (xt->regs[R_TCSR] & TCSR_ARHT)
+> @@ -295,9 +296,9 @@ static void omap_mcspi_write(void *opaque, hwaddr addr,
+>           if ((value ^ s->ch[ch].config) & (3 << 14))	/* DMAR | DMAW */
+>               omap_mcspi_dmarequest_update(s->ch + ch);
+>           if (((value >> 12) & 3) == 3)			/* TRM */
+> -            fprintf(stderr, "%s: invalid TRM value (3)\n", __func__);
+> +            error_report("%s: invalid TRM value (3)", __func__);
+>           if (((value >> 7) & 0x1f) < 3)			/* WL */
+> -            fprintf(stderr, "%s: invalid WL value (%" PRIx64 ")\n",
+> +            error_report("%s: invalid WL value (%" PRIx64 ")",
+>                               __func__, (value >> 7) & 0x1f);
+>           s->ch[ch].config = value & 0x7fffff;
+>           break;
 > 
