@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dyf3G-0002QH-V3
-	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 10:17:04 -0400
+	(envelope-from <michael@fritscher.net>) id 1dygw6-00031m-9S
+	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 12:17:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dyf3E-0000X4-63
-	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 10:17:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33368)
+	(envelope-from <michael@fritscher.net>) id 1dygw3-0001oz-0J
+	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 12:17:46 -0400
+Received: from mifritscher.de ([188.40.170.105]:42980
+	helo=mail.mifritscher.vserverkompetenz.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dyf3D-0000WW-Tt
-	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 10:17:00 -0400
-References: <cover.1506730372.git.alistair.francis@xilinx.com>
-	<06e443b5be5198646e9f76b80df198e954543daf.1506730372.git.alistair.francis@xilinx.com>
-	<9008446b-d889-d9ce-4cc8-545e17ecbbbe@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <536e24e5-5fd5-3cb7-1193-4cf57a12fcd1@redhat.com>
-Date: Sun, 1 Oct 2017 16:16:52 +0200
+	(Exim 4.71) (envelope-from <michael@fritscher.net>)
+	id 1dygw2-0001nr-MR
+	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 12:17:42 -0400
+Message-ID: <115676c417f5f845c436129e6b2be43f.squirrel@mifritscher.de>
+In-Reply-To: <497f0cbe-3441-ae6b-ad25-0ebc092318cc@redhat.com>
+References: <20170929111323.6308-1-michael@fritscher.net>
+	<c6489dce-108d-e163-589d-11e6f2c227da@redhat.com>
+	<c507f03f377b2496da5e08af037a14ee.squirrel@mifritscher.de>
+	<497f0cbe-3441-ae6b-ad25-0ebc092318cc@redhat.com>
+Date: Sun, 1 Oct 2017 18:17:38 +0200
+From: "Michael Fritscher" <michael@fritscher.net>
 MIME-Version: 1.0
-In-Reply-To: <9008446b-d889-d9ce-4cc8-545e17ecbbbe@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain;charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 40/47] hw/usb: Replace fprintf(stderr,
- "*\n" with error_report()
+Subject: Re: [Qemu-devel] Make 9pfs buildable for Windows
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -29,243 +30,132 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
-Cc: alistair23@gmail.com, Gerd Hoffmann <kraxel@redhat.com>, armbru@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Michael Fritscher <michael@fritscher.net>, gkurz@linux.vnet.ibm.com, sw@weilnetz.de, aneesh.kumar@linux.vnet.ibm.com, mst@redhat.com, qemu-devel@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-On 01.10.2017 03:36, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 09/29/2017 09:17 PM, Alistair Francis wrote:
->> Replace a large number of the fprintf(stderr, "*\n" calls with
->> error_report(). The functions were renamed with these commands and the=
-n
->> compiler issues where manually fixed.
-[...]
->> diff --git a/hw/usb/desc.c b/hw/usb/desc.c
->> index 85c15addc5..afae910f8e 100644
->> --- a/hw/usb/desc.c
->> +++ b/hw/usb/desc.c
->> @@ -1,5 +1,5 @@
->> =C2=A0 #include "qemu/osdep.h"
->> -
->> +#include "qemu/error-report.h"
->> =C2=A0 #include "hw/usb.h"
->> =C2=A0 #include "hw/usb/desc.h"
->> =C2=A0 #include "trace.h"
->> @@ -688,7 +688,7 @@ int usb_desc_get_descriptor(USBDevice *dev,
->> USBPacket *p,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 default:
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fprintf(stderr, "%s: %d un=
-known type %d (len %zd)\n", __func__,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("%s: %d unkno=
-wn type %d (len %zd)", __func__,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dev->addr, type, len);
+Hi,
 
-Bad indentation.
+I've no fear to NT API :-D
 
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> diff --git a/hw/usb/dev-audio.c b/hw/usb/dev-audio.c
->> index 343345235c..43fc20469a 100644
->> --- a/hw/usb/dev-audio.c
->> +++ b/hw/usb/dev-audio.c
->> @@ -30,6 +30,7 @@
->> =C2=A0=C2=A0 */
->> =C2=A0 =C2=A0 #include "qemu/osdep.h"
->> +#include "qemu/error-report.h"
->> =C2=A0 #include "qemu-common.h"
->> =C2=A0 #include "hw/usb.h"
->> =C2=A0 #include "hw/usb/desc.h"
->> @@ -398,7 +399,7 @@ static int
->> usb_audio_set_output_altset(USBAudioState *s, int altset)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s->debug) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fprintf(stderr, "usb-audio=
-: set interface %d\n", altset);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("usb-audio: s=
-et interface %d", altset);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->out.altset =3D altset;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
->> @@ -478,7 +479,7 @@ static int usb_audio_set_control(USBAudioState *s,
->> uint8_t attrib,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 uint16_t vol =3D data[0] + (data[1] << 8);
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 if (s->debug) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 fprintf(stderr, "usb-audio: vol %04x\n", (uint16_t)=
-vol);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 error_report("usb-audio: vol %04x", (uint16_t)vol);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 }
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 vol -=3D 0x8000;
->> @@ -496,7 +497,7 @@ static int usb_audio_set_control(USBAudioState *s,
->> uint8_t attrib,
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (set_vol) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s->debug) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fp=
-rintf(stderr, "usb-audio: mute %d, lvol %3d, rvol %3d\n",
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 er=
-ror_report("usb-audio: mute %d, lvol %3d, rvol %3d",
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->out.mute, s->ou=
-t.vol[0], s->out.vol[1]);
+surprisingly I'm the first guy which try to import things from ntdll it
+seems.
 
-Bad indentation.
+I've a working PoC, which can open a directory successfully - see below.
+Will code like this ever by acceptable for merging? Else: other ideas? :-=
+)
+And should I follow this way or try to emulate the relative path thing
+myself? Your choose :-)
 
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 AUD_set_volume_=
-out(s->out.voice, s->out.mute,
->> @@ -514,8 +515,8 @@ static void usb_audio_handle_control(USBDevice
->> *dev, USBPacket *p,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret =3D 0;
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s->debug) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fprintf(stderr, "usb-audio=
-: control transaction: "
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 "request 0x%04x value 0x%04x index 0x%04x length
->> 0x%04x\n",
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("usb-audio: c=
-ontrol transaction: "
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 "request 0x%04x value 0x%04x index 0x%04x length
->> 0x%04x",
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 request, value, index, length);
+Best regards,
+Michael Fritscher
 
-Bad indentation.
+-----------------------
 
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0 @@ -533,7 +534,7 @@ static void usb_audio_handle_control(USBDev=
-ice
->> *dev, USBPacket *p,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- length, data);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 if (s->debug) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 fprintf(stderr, "usb-audio: fail: get control\n");
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 error_report("usb-audio: fail: get control");
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 goto fail;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> @@ -548,7 +549,7 @@ static void usb_audio_handle_control(USBDevice
->> *dev, USBPacket *p,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- length, data);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 if (s->debug) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 fprintf(stderr, "usb-audio: fail: set control\n");
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 error_report("usb-audio: fail: set control");
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 goto fail;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> @@ -557,8 +558,8 @@ static void usb_audio_handle_control(USBDevice
->> *dev, USBPacket *p,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 default:
->> =C2=A0 fail:
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s->debug) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fp=
-rintf(stderr, "usb-audio: failed control transaction: "
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "request 0x%04x value 0x%04=
-x index 0x%04x length
->> 0x%04x\n",
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 er=
-ror_report("usb-audio: failed control transaction: "
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "request 0x%04x value 0x%04=
-x index 0x%04x length
->> 0x%04x",
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 request, value, in=
-dex, length);
+    //Main info sources:
+http://resources.infosecinstitute.com/calling-ntdll-functions-directly/
+&
+https://googleprojectzero.blogspot.de/2016/02/the-definitive-guide-on-win=
+32-to-nt.html
+    error_printf("Try to open %s\n", ctx->fs_root);
 
-Bad indentation.
+    typedef NTSTATUS  (__stdcall *NT_OPEN_FILE)(_Out_ PHANDLE FileHandle,
+_In_ ACCESS_MASK DesiredAccess, IN POBJECT_ATTRIBUTES
+ObjectAttributes, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ ULONG
+ShareAccess, _In_ ULONG OpenOptions);
+    NT_OPEN_FILE NtOpenFileStruct;
 
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p->status =3D U=
-SB_RET_STALL;
->> @@ -581,7 +582,7 @@ static void usb_audio_handle_reset(USBDevice *dev)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 USBAudioState *s =3D USB_AUDIO(dev);
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s->debug) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fprintf(stderr, "usb-audio=
-: reset\n");
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("usb-audio: r=
-eset");
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 usb_audio_set_output_altset(s, ALTSET_O=
-FF);
->> =C2=A0 }
->> @@ -595,7 +596,7 @@ static void usb_audio_handle_dataout(USBAudioState
->> *s, USBPacket *p)
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 streambuf_put(&s->out.buf, p);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (p->actual_length < p->iov.size && s=
-->debug > 1) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fprintf(stderr, "usb-audio=
-: output overrun (%zd bytes)\n",
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("usb-audio: o=
-utput overrun (%zd bytes)",
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p->iov.size - p->actual_length);
+    typedef NTSTATUS (__stdcall
+*RTL_ANSI_STRING_TO_UNICODE_STRING)(_Inout_ PUNICODE_STRING
+DestinationString, _In_ PCANSI_STRING SourceString, _In_ BOOLEAN
+AllocateDestinationString);
+    RTL_ANSI_STRING_TO_UNICODE_STRING RtlAnsiStringToUnicodeStringStruct;
 
-Bad indentation.
+    // typedef BOOLEAN (__stdcall
+*RTL_DOS_PATH_NAME_TO_RELATIVE_NT_PATH_NAME_U)(_In_ PCWSTR
+DosFileName, _Out_ PUNICODE_STRING NtFileName, _Out_opt_  PWSTR*
+FilePath, _Out_opt_ PRTL_RELATIVE_NAME RelativeName);
+    // RTL_DOS_PATH_NAME_TO_RELATIVE_NT_PATH_NAME_U
+RtlDosPathNameToRelativeNtPathName_U;
 
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0 }
->> @@ -611,8 +612,8 @@ static void usb_audio_handle_data(USBDevice *dev,
->> USBPacket *p)
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p->status =3D USB_RET_STALL;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s->debug) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fprintf(stderr, "usb-audio=
-: failed data transaction: "
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "pi=
-d 0x%x ep 0x%x len 0x%zx\n",
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("usb-audio: f=
-ailed data transaction: "
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "pi=
-d 0x%x ep 0x%x len 0x%zx",
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 p->pid, p->ep->nr, p->iov.size);
+    //TODO: PRTL_RELATIVE_NAME_U
+    typedef BOOLEAN (__stdcall
+*RTL_DOS_PATH_NAME_TO_NT_PATH_NAME_U)(_In_opt_z_ PCWSTR DosPathName,
+_Out_ PUNICODE_STRING NtPathName, _Out_opt_ PCWSTR * NtFileNamePart,
+_Out_opt_ PVOID DirectoryInfo);
+    RTL_DOS_PATH_NAME_TO_NT_PATH_NAME_U RtlDosPathNameToNtPathName_UStruc=
+t;
 
-Bad indentation.
+    typedef VOID (__stdcall *RTL_FREE_UNICODE_STRING)(_Inout_
+PUNICODE_STRING UnicodeString);
+    RTL_FREE_UNICODE_STRING RtlFreeUnicodeStringStruct;
 
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0 }
-[...]
->> @@ -1348,7 +1349,7 @@ static void usb_mtp_handle_control(USBDevice
->> *dev, USBPacket *p,
->> =C2=A0 static void usb_mtp_cancel_packet(USBDevice *dev, USBPacket *p)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* we don't use async packets, so this =
-should never be called */
->> -=C2=A0=C2=A0=C2=A0 fprintf(stderr, "%s\n", __func__);
->> +=C2=A0=C2=A0=C2=A0 error_report("%s", __func__);
->=20
-> what about using tracepoint instead? this report is probably confusing
-> instead of being useful for the user imho.
+    /* load the ntdll.dll */
+    HMODULE hModule =3D LoadLibrary("ntdll.dll");
 
-A comment like "should never be called" rather sounds like we should be
-using g_assert_not_reached() here instead.
+    NtOpenFileStruct =3D (NT_OPEN_FILE)GetProcAddress(hModule, "NtOpenFil=
+e");
+    if(NtOpenFileStruct =3D=3D NULL) {
+        error_printf("Error: could not find the function NtOpenFile in
+library ntdll.dll.");
+        exit(-1);
+    }
+    error_printf("NtOpenFile is located at 0x%p in ntdll.dll.\n",
+NtOpenFileStruct);
 
- Thomas
+    RtlAnsiStringToUnicodeStringStruct =3D
+(RTL_ANSI_STRING_TO_UNICODE_STRING)GetProcAddress(hModule,
+"RtlAnsiStringToUnicodeString");
+    if(RtlAnsiStringToUnicodeStringStruct =3D=3D NULL) {
+        error_printf("Error: could not find the function
+RtlAnsiStringToUnicodeString in library ntdll.dll.");
+        exit(-1);
+    }
+
+    RtlDosPathNameToNtPathName_UStruct =3D
+(RTL_DOS_PATH_NAME_TO_NT_PATH_NAME_U)GetProcAddress(hModule,
+"RtlDosPathNameToNtPathName_U");
+    if(RtlDosPathNameToNtPathName_UStruct =3D=3D NULL) {
+        error_printf("Error: could not find the function
+RtlAnsiStringToUnicodeString in library ntdll.dll.");
+        exit(-1);
+    }
+
+    RtlFreeUnicodeStringStruct =3D
+(RTL_FREE_UNICODE_STRING)GetProcAddress(hModule,
+"RtlFreeUnicodeString");
+    if(RtlFreeUnicodeStringStruct =3D=3D NULL) {
+        error_printf("Error: could not find the function RtlInitAnsiStrin=
+g
+in library ntdll.dll.");
+        exit(-1);
+    }
+
+    /* create the string in the right format */
+    UNICODE_STRING filename_UNICODE;
+
+    wchar_t filename_WIDECHAR[4096];
+
+    MultiByteToWideChar(CP_ACP, 0, ctx->fs_root, -1, filename_WIDECHAR,
+sizeof(filename_WIDECHAR));
+    RtlDosPathNameToNtPathName_UStruct(filename_WIDECHAR,
+&filename_UNICODE, NULL, NULL);
+
+    /* initialize OBJECT_ATTRIBUTES */
+    OBJECT_ATTRIBUTES obja;
+    InitializeObjectAttributes(&obja, &filename_UNICODE,
+OBJ_CASE_INSENSITIVE, NULL, NULL);
+
+    /* call NtOpenFile */
+    HANDLE file =3D NULL;
+    ULONG shareAccess =3D 0;
+    ULONG openOptions =3D FILE_DIRECTORY_FILE;
+    IO_STATUS_BLOCK statusBlock;
+    NTSTATUS stat =3D NtOpenFileStruct(&file, GENERIC_READ |
+FILE_READ_ATTRIBUTES, &obja, &statusBlock, shareAccess, openOptions);
+    if(NT_SUCCESS(stat)) {
+        error_printf("File successfully opened.\n");
+    }
+    else {
+        error_printf("File could not be opened: %lx.\n", stat);
+    }
