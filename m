@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <michael@fritscher.net>) id 1dygw6-00031m-9S
-	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 12:17:47 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dym2S-0007bk-VA
+	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 17:44:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <michael@fritscher.net>) id 1dygw3-0001oz-0J
-	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 12:17:46 -0400
-Received: from mifritscher.de ([188.40.170.105]:42980
-	helo=mail.mifritscher.vserverkompetenz.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <michael@fritscher.net>)
-	id 1dygw2-0001nr-MR
-	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 12:17:42 -0400
-Message-ID: <115676c417f5f845c436129e6b2be43f.squirrel@mifritscher.de>
-In-Reply-To: <497f0cbe-3441-ae6b-ad25-0ebc092318cc@redhat.com>
-References: <20170929111323.6308-1-michael@fritscher.net>
-	<c6489dce-108d-e163-589d-11e6f2c227da@redhat.com>
-	<c507f03f377b2496da5e08af037a14ee.squirrel@mifritscher.de>
-	<497f0cbe-3441-ae6b-ad25-0ebc092318cc@redhat.com>
-Date: Sun, 1 Oct 2017 18:17:38 +0200
-From: "Michael Fritscher" <michael@fritscher.net>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dym2P-0003d6-To
+	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 17:44:41 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:38586
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1dym2P-0003VV-Mg
+	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 17:44:37 -0400
+References: <1506082711-16004-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<905d94b3-291b-0e55-e234-97fc2c85b6a6@redhat.com>
+	<4a9754d9-e73b-8e67-427e-9624d0486c91@ilande.co.uk>
+	<26f60ea0-199e-f9ec-5b1d-d7023d60bb03@redhat.com>
+	<20170925081140.GA2656@work-vm>
+	<c0055753-30ba-7cd0-cf64-94e1679678ef@ilande.co.uk>
+	<ca4d8002-b0b4-873d-2a99-aabbdaaf7060@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <f6e34569-af2c-900c-75fc-683467b99a72@ilande.co.uk>
+Date: Sun, 1 Oct 2017 22:44:14 +0100
 MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Make 9pfs buildable for Windows
+In-Reply-To: <ca4d8002-b0b4-873d-2a99-aabbdaaf7060@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pci: allow 32-bit PCI IO accesses to pass
+ through the PCI bridge
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -30,132 +35,85 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Michael Fritscher <michael@fritscher.net>, gkurz@linux.vnet.ibm.com, sw@weilnetz.de, aneesh.kumar@linux.vnet.ibm.com, mst@redhat.com, qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com
 List-ID: <qemu-devel.nongnu.org>
 
-Hi,
+On 28/09/17 08:56, Laszlo Ersek wrote:
 
-I've no fear to NT API :-D
+> On 09/28/17 09:31, Mark Cave-Ayland wrote:
+>> On 25/09/17 09:11, Dr. David Alan Gilbert wrote:
+>>
+>>> * Marcel Apfelbaum (marcel@redhat.com) wrote:
+>>>> On 23/09/2017 11:23, Mark Cave-Ayland wrote:
+>>>>> On 22/09/17 23:18, Laszlo Ersek wrote:
+>>>>>
+>>>>>> On 09/22/17 14:18, Mark Cave-Ayland wrote:
+>>>>>>> Whilst the underlying PCI bridge implementation supports 32-bit PCI IO
+>>>>>>> accesses, unfortunately they are truncated at the legacy 64K limit.
+>>>>>>>
+>>>>>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>>>>>> ---
+>>>>>>>   hw/pci/pci_bridge.c |    3 ++-
+>>>>>>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>>>>>>
+>>>>>>> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+>>>>>>> index 17feae5..a47d257 100644
+>>>>>>> --- a/hw/pci/pci_bridge.c
+>>>>>>> +++ b/hw/pci/pci_bridge.c
+>>>>>>> @@ -379,7 +379,8 @@ void pci_bridge_initfn(PCIDevice *dev, const char *typename)
+>>>>>>>       sec_bus->address_space_mem = &br->address_space_mem;
+>>>>>>>       memory_region_init(&br->address_space_mem, OBJECT(br), "pci_bridge_pci", UINT64_MAX);
+>>>>>>>       sec_bus->address_space_io = &br->address_space_io;
+>>>>>>> -    memory_region_init(&br->address_space_io, OBJECT(br), "pci_bridge_io", 65536);
+>>>>>>> +    memory_region_init(&br->address_space_io, OBJECT(br), "pci_bridge_io",
+>>>>>>> +                       UINT32_MAX);
+>>>>>>>       br->windows = pci_bridge_region_init(br);
+>>>>>>>       QLIST_INIT(&sec_bus->child);
+>>>>>>>       QLIST_INSERT_HEAD(&parent->child, sec_bus, sibling);
+>>>>>>>
+>>>>>>
+>>>>
+>>>> Hi Mark,
+>>>>
+>>>>>> Based on the commit message, I assume this change is guest-visible. If
+>>>>>> so, should it be made dependent on a compat property, so that it doesn't
+>>>>>> cause problems with migration?
+>>>>>
+>>>>> In order to enable 32-bit IO accesses the PCI bridge needs to set bit 0
+>>>>> in the IO_LIMIT and IO_BASE registers - this bit is read-only to guests,
+>>>>> so unless a PCI bridge has this bit set then it's impossible for this
+>>>>> change to be guest visible.
+>>>>>
+>>>>> I did a grep for PCI_IO_RANGE_TYPE_32 and didn't see any existing users
+>>>>> (other than an upcoming patchset from me!), so this combined with the
+>>>>> fact that without this patch the feature is broken makes me think that I
+>>>>> am the first user and so existing guests won't have a problem.
+>>>>>
+>>>>
+>>>> (adding Dave for his expertise)
+>>>>
+>>>> Do you know how the migration code will behave if it will have
+>>>> a 65k address space on source and MAX UINT on destination?
+>>>> (and the other way around for rolling back)
+>>>
+>>> Hmm not sure; we don't migrate regions explicitly; just RAMBlocks
+>>> and devices that back them.  If the change is visible in the IO
+>>> addresses allocated to the PCI devices or in the config space then
+>>> it might fail.
+>>
+>> For reference here is the link to the sun4u patch I posted yesterday
+>> that requires this fix if anyone else would like to test:
+>> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg07355.html.
+>>
+>> Other than that are there any further objections to this patch?
+> 
+> None from my side. (I didn't "object" to begin with :) , I was just
+> curious about any possible migration impact.)
 
-surprisingly I'm the first guy which try to import things from ntdll it
-seems.
+Okay great! I guess I mis-read your query as being a NACK for the patch.
 
-I've a working PoC, which can open a directory successfully - see below.
-Will code like this ever by acceptable for merging? Else: other ideas? :-=
-)
-And should I follow this way or try to emulate the relative path thing
-myself? Your choose :-)
 
-Best regards,
-Michael Fritscher
+ATB,
 
------------------------
-
-    //Main info sources:
-http://resources.infosecinstitute.com/calling-ntdll-functions-directly/
-&
-https://googleprojectzero.blogspot.de/2016/02/the-definitive-guide-on-win=
-32-to-nt.html
-    error_printf("Try to open %s\n", ctx->fs_root);
-
-    typedef NTSTATUS  (__stdcall *NT_OPEN_FILE)(_Out_ PHANDLE FileHandle,
-_In_ ACCESS_MASK DesiredAccess, IN POBJECT_ATTRIBUTES
-ObjectAttributes, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ ULONG
-ShareAccess, _In_ ULONG OpenOptions);
-    NT_OPEN_FILE NtOpenFileStruct;
-
-    typedef NTSTATUS (__stdcall
-*RTL_ANSI_STRING_TO_UNICODE_STRING)(_Inout_ PUNICODE_STRING
-DestinationString, _In_ PCANSI_STRING SourceString, _In_ BOOLEAN
-AllocateDestinationString);
-    RTL_ANSI_STRING_TO_UNICODE_STRING RtlAnsiStringToUnicodeStringStruct;
-
-    // typedef BOOLEAN (__stdcall
-*RTL_DOS_PATH_NAME_TO_RELATIVE_NT_PATH_NAME_U)(_In_ PCWSTR
-DosFileName, _Out_ PUNICODE_STRING NtFileName, _Out_opt_  PWSTR*
-FilePath, _Out_opt_ PRTL_RELATIVE_NAME RelativeName);
-    // RTL_DOS_PATH_NAME_TO_RELATIVE_NT_PATH_NAME_U
-RtlDosPathNameToRelativeNtPathName_U;
-
-    //TODO: PRTL_RELATIVE_NAME_U
-    typedef BOOLEAN (__stdcall
-*RTL_DOS_PATH_NAME_TO_NT_PATH_NAME_U)(_In_opt_z_ PCWSTR DosPathName,
-_Out_ PUNICODE_STRING NtPathName, _Out_opt_ PCWSTR * NtFileNamePart,
-_Out_opt_ PVOID DirectoryInfo);
-    RTL_DOS_PATH_NAME_TO_NT_PATH_NAME_U RtlDosPathNameToNtPathName_UStruc=
-t;
-
-    typedef VOID (__stdcall *RTL_FREE_UNICODE_STRING)(_Inout_
-PUNICODE_STRING UnicodeString);
-    RTL_FREE_UNICODE_STRING RtlFreeUnicodeStringStruct;
-
-    /* load the ntdll.dll */
-    HMODULE hModule =3D LoadLibrary("ntdll.dll");
-
-    NtOpenFileStruct =3D (NT_OPEN_FILE)GetProcAddress(hModule, "NtOpenFil=
-e");
-    if(NtOpenFileStruct =3D=3D NULL) {
-        error_printf("Error: could not find the function NtOpenFile in
-library ntdll.dll.");
-        exit(-1);
-    }
-    error_printf("NtOpenFile is located at 0x%p in ntdll.dll.\n",
-NtOpenFileStruct);
-
-    RtlAnsiStringToUnicodeStringStruct =3D
-(RTL_ANSI_STRING_TO_UNICODE_STRING)GetProcAddress(hModule,
-"RtlAnsiStringToUnicodeString");
-    if(RtlAnsiStringToUnicodeStringStruct =3D=3D NULL) {
-        error_printf("Error: could not find the function
-RtlAnsiStringToUnicodeString in library ntdll.dll.");
-        exit(-1);
-    }
-
-    RtlDosPathNameToNtPathName_UStruct =3D
-(RTL_DOS_PATH_NAME_TO_NT_PATH_NAME_U)GetProcAddress(hModule,
-"RtlDosPathNameToNtPathName_U");
-    if(RtlDosPathNameToNtPathName_UStruct =3D=3D NULL) {
-        error_printf("Error: could not find the function
-RtlAnsiStringToUnicodeString in library ntdll.dll.");
-        exit(-1);
-    }
-
-    RtlFreeUnicodeStringStruct =3D
-(RTL_FREE_UNICODE_STRING)GetProcAddress(hModule,
-"RtlFreeUnicodeString");
-    if(RtlFreeUnicodeStringStruct =3D=3D NULL) {
-        error_printf("Error: could not find the function RtlInitAnsiStrin=
-g
-in library ntdll.dll.");
-        exit(-1);
-    }
-
-    /* create the string in the right format */
-    UNICODE_STRING filename_UNICODE;
-
-    wchar_t filename_WIDECHAR[4096];
-
-    MultiByteToWideChar(CP_ACP, 0, ctx->fs_root, -1, filename_WIDECHAR,
-sizeof(filename_WIDECHAR));
-    RtlDosPathNameToNtPathName_UStruct(filename_WIDECHAR,
-&filename_UNICODE, NULL, NULL);
-
-    /* initialize OBJECT_ATTRIBUTES */
-    OBJECT_ATTRIBUTES obja;
-    InitializeObjectAttributes(&obja, &filename_UNICODE,
-OBJ_CASE_INSENSITIVE, NULL, NULL);
-
-    /* call NtOpenFile */
-    HANDLE file =3D NULL;
-    ULONG shareAccess =3D 0;
-    ULONG openOptions =3D FILE_DIRECTORY_FILE;
-    IO_STATUS_BLOCK statusBlock;
-    NTSTATUS stat =3D NtOpenFileStruct(&file, GENERIC_READ |
-FILE_READ_ATTRIBUTES, &obja, &statusBlock, shareAccess, openOptions);
-    if(NT_SUCCESS(stat)) {
-        error_printf("File successfully opened.\n");
-    }
-    else {
-        error_printf("File could not be opened: %lx.\n", stat);
-    }
+Mark.
