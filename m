@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <damian.tometzki@icloud.com>) id 1dyeFl-0006mI-OL
-	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 09:26:02 -0400
+	(envelope-from <bounces@canonical.com>) id 1dyYP9-0007wb-0Y
+	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 03:11:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <damian.tometzki@icloud.com>) id 1dyeFa-0006FD-Hk
-	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 09:25:53 -0400
-Received: from st11p00im-asmtp002.me.com ([17.172.80.96]:51187)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <damian.tometzki@icloud.com>)
-	id 1dyeFa-0006Ea-BM
-	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 09:25:42 -0400
-Received: from process-dkim-sign-daemon.st11p00im-asmtp002.me.com by
-	st11p00im-asmtp002.me.com
-	(Oracle Communications Messaging Server 8.0.1.2.20170607 64bit (built
-	Jun 7 2017)) id <0OX500H00AMBQC00@st11p00im-asmtp002.me.com> for
-	qemu-devel@nongnu.org; Sun, 01 Oct 2017 13:25:38 +0000 (GMT)
-Date: Sun, 01 Oct 2017 15:25:27 +0200
-From: Damian Tometzki <damian.tometzki@icloud.com>
-In-reply-to: <1506744354-20979-1-git-send-email-wei.w.wang@intel.com>
-Message-id: <1506864327.1916.3.camel@icloud.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
-Content-transfer-encoding: QUOTED-PRINTABLE
-References: <1506744354-20979-1-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v16 0/5] Virtio-balloon Enhancement
+	(envelope-from <bounces@canonical.com>) id 1dyYP5-0000jf-L3
+	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 03:11:10 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59920)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dyYP5-0000io-Ef
+	for qemu-devel@nongnu.org; Sun, 01 Oct 2017 03:11:07 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1dyYP3-0001cf-Aw
+	for <qemu-devel@nongnu.org>; Sun, 01 Oct 2017 07:11:05 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4BB102E8076
+	for <qemu-devel@nongnu.org>; Sun,  1 Oct 2017 07:11:05 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 01 Oct 2017 07:05:40 -0000
+From: Timo Aaltonen <tjaalton@ubuntu.com>
+Reply-To: Bug 1718719 <1718719@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150601012428.28823.10384460665730601462.malonedeb@gac.canonical.com>
+Message-Id: <150684154017.27741.13427131973194039947.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1718719] Re: qemu can't capture keys properly
+ under wayland
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -31,229 +36,50 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>, virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com
-Cc: david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: qemu-devel@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-Hello,
+Actually, this bug would affect current 1.19-branch too since the
+patches are backported there as well. You can test
+ppa:canonical-x/x-staging to verify, which has xorg-server from current
+stable branch.
 
-where i can found the patch in git.kernel.org ?
+-- =
 
-Best regards
-Damian
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1718719
 
+Title:
+  qemu can't capture keys properly under wayland
 
-Am Samstag, den 30.09.2017, 12:05 +0800 schrieb Wei Wang:
-> This patch series enhances the existing virtio-balloon with the
-> following
-> new features:
-> 1) fast ballooning: transfer ballooned pages between the guest and
-> host in
-> chunks using sgs, instead of one array each time; and
-> 2) free page block reporting: a new virtqueue to report guest free
-> pages
-> to the host.
->=20
-> The second feature can be used to accelerate live migration of VMs.
-> Here
-> are some details:
->=20
-> Live migration needs to transfer the VM's memory from the source
-> machine
-> to the destination round by round. For the 1st round, all the VM's
-> memory
-> is transferred. From the 2nd round, only the pieces of memory that
-> were
-> written by the guest (after the 1st round) are transferred. One
-> method
-> that is popularly used by the hypervisor to track which part of
-> memory is
-> written is to write-protect all the guest memory.
->=20
-> The second feature enables the optimization of the 1st round memory
-> transfer - the hypervisor can skip the transfer of guest free pages
-> in the
-> 1st round. It is not concerned that the memory pages are used after
-> they
-> are given to the hypervisor as a hint of the free pages, because th=
-ey
-> will
-> be tracked by the hypervisor and transferred in the next round if
-> they are
-> used and written.
->=20
-> Change Log:
-> v15->v16:
-> 1) mm: stop reporting the free pfn range if the callback returns
-> false;
-> 2) mm: move some implementaion of walk_free_mem_block into a functi=
-on
-> to
-> make the code layout looks better;
-> 3) xbitmap: added some optimizations suggested by Matthew, please
-> refer to
-> the ChangLog in the xbitmap patch for details.
-> 4) xbitmap: added a test suite
-> 5) virtio-balloon: bail out with a warning when virtqueue_add_inbuf
-> returns
-> an error
-> 6) virtio-balloon: some small code re-arrangement, e.g. detachinf
-> used buf
-> from the vq before adding a new buf
->=20
-> v14->v15:
-> 1) mm: make the report callback return a bool value - returning 1 t=
-o
-> stop
-> walking through the free page list.
-> 2) virtio-balloon: batching sgs of balloon pages till the vq is ful=
-l
-> 3) virtio-balloon: create a new workqueue, rather than using the
-> default
-> system_wq, to queue the free page reporting work item.
-> 4) virtio-balloon: add a ctrl_vq to be a central control plane whic=
-h
-> will
-> handle all the future control related commands between the host and
-> guest.
-> Add free page report as the first feature controlled under ctrl_vq,
-> and
-> the free_page_vq is a data plane vq dedicated to the transmission o=
-f
-> free
-> page blocks.
->=20
-> v13->v14:
-> 1) xbitmap: move the code from lib/radix-tree.c to lib/xbitmap.c.
-> 2) xbitmap: consolidate the implementation of xb_bit_set/clear/test
-> into
-> one xb_bit_ops.
-> 3) xbitmap: add documents for the exported APIs.
-> 4) mm: rewrite the function to walk through free page blocks.
-> 5) virtio-balloon: when reporting a free page blcok to the device, =
-if
-> the
-> vq is full (less likey to happen in practice), just skip reporting
-> this
-> block, instead of busywaiting till an entry gets released.
-> 6) virtio-balloon: fail the probe function if adding the signal buf
-> in
-> init_vqs fails.
->=20
-> v12->v13:
-> 1) mm: use a callback function to handle the the free page blocks
-> from the
-> report function. This avoids exposing the zone internal to a kernel
-> module.
-> 2) virtio-balloon: send balloon pages or a free page block using a
-> single
-> sg each time. This has the benefits of simpler implementation with =
-no
-> new
-> APIs.
-> 3) virtio-balloon: the free_page_vq is used to report free pages on=
-ly
-> (no
-> multiple usages interleaving)
-> 4) virtio-balloon: Balloon pages and free page blocks are sent via
-> input
-> sgs, and the completion signal to the host is sent via an output sg=
-.
->=20
-> v11->v12:
-> 1) xbitmap: use the xbitmap from Matthew Wilcox to record ballooned
-> pages.
-> 2) virtio-ring: enable the driver to build up a desc chain using
-> vring
-> desc.
-> 3) virtio-ring: Add locking to the existing START_USE() and END_USE=
-()
-> macro to lock/unlock the vq when a vq operation starts/ends.
-> 4) virtio-ring: add virtqueue_kick_sync() and virtqueue_kick_async(=
-)
-> 5) virtio-balloon: describe chunks of ballooned pages and free page=
-s
-> blocks directly using one or more chains of desc from the vq.
->=20
-> v10->v11:
-> 1) virtio_balloon: use vring_desc to describe a chunk;
-> 2) virtio_ring: support to add an indirect desc table to virtqueue;
-> 3)=C2=A0=C2=A0virtio_balloon: use cmdq to report guest memory stati=
-stics.
->=20
-> v9->v10:
-> 1) mm: put report_unused_page_block() under CONFIG_VIRTIO_BALLOON;
-> 2) virtio-balloon: add virtballoon_validate();
-> 3) virtio-balloon: msg format change;
-> 4) virtio-balloon: move miscq handling to a task on
-> system_freezable_wq;
-> 5) virtio-balloon: code cleanup.
->=20
-> v8->v9:
-> 1) Split the two new features, VIRTIO_BALLOON_F_BALLOON_CHUNKS and
-> VIRTIO_BALLOON_F_MISC_VQ, which were mixed together in the previous
-> implementation;
-> 2) Simpler function to get the free page block.
->=20
-> v7->v8:
-> 1) Use only one chunk format, instead of two.
-> 2) re-write the virtio-balloon implementation patch.
-> 3) commit changes
-> 4) patch re-org
->=20
-> Matthew Wilcox (2):
-> =C2=A0 lib/xbitmap: Introduce xbitmap
-> =C2=A0 radix tree test suite: add tests for xbitmap
->=20
-> Wei Wang (3):
-> =C2=A0 virtio-balloon: VIRTIO_BALLOON_F_SG
-> =C2=A0 mm: support reporting free page blocks
-> =C2=A0 virtio-balloon: VIRTIO_BALLOON_F_CTRL_VQ
->=20
-> =C2=A0drivers/virtio/virtio_balloon.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0| 437
-> +++++++++++++++++++++++++++++---
-> =C2=A0include/linux/mm.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0|=C2=A0=C2=A0=C2=A06 +
-> =C2=A0include/linux/radix-tree.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|=C2=A0=C2=A0=C2=
-=A02 +
-> =C2=A0include/linux/xbitmap.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|=
-=C2=A0=C2=A066 +++++
-> =C2=A0include/uapi/linux/virtio_balloon.h=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0|=C2=A0=C2=A016 ++
-> =C2=A0lib/Makefile=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|=C2=A0=C2=
-=A0=C2=A02 +-
-> =C2=A0lib/radix-tree.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|=C2=A0=C2=A042 ++-
-> =C2=A0lib/xbitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0| 264 ++++++++++++=
-+++++++
-> =C2=A0mm/page_alloc.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|=C2=A0=C2=A091 +++++++
-> =C2=A0tools/include/linux/bitmap.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|=C2=A0=C2=A034 +++
-> =C2=A0tools/include/linux/kernel.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|=C2=A0=C2=A0=C2=A02 +
-> =C2=A0tools/testing/radix-tree/Makefile=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0|=C2=A0=C2=A0=C2=A07 +-
-> =C2=A0tools/testing/radix-tree/linux/kernel.h |=C2=A0=C2=A0=C2=A02 =
--
-> =C2=A0tools/testing/radix-tree/main.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0|=C2=A0=C2=A0=C2=A05 +
-> =C2=A0tools/testing/radix-tree/test.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0|=C2=A0=C2=A0=C2=A01 +
-> =C2=A0tools/testing/radix-tree/xbitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0| 269 ++++++++++++++++++++
-> =C2=A016 files changed, 1203 insertions(+), 43 deletions(-)
-> =C2=A0create mode 100644 include/linux/xbitmap.h
-> =C2=A0create mode 100644 lib/xbitmap.c
-> =C2=A0create mode 100644 tools/testing/radix-tree/xbitmap.c
->=20
+Status in QEMU:
+  New
+Status in XServer:
+  Incomplete
+Status in qemu package in Ubuntu:
+  New
+Status in xorg-server package in Ubuntu:
+  Triaged
+
+Bug description:
+  This appears to be different than the previous similar bugs; patches
+  do look to be applied to use libinput in the wayland case. Still:
+
+  unknown keycodes `(unnamed)', please report to qemu-devel@nongnu.org
+
+  I am using qemu-system-x86                       1:2.10+dfsg-0ubuntu1
+  on artful.
+
+  Many key inputs work correctly, but at boot the system will not
+  properly catch the arrow keys, the above error shows up immediately
+  after hitting Esc (for instance) to get to the boot menu. Booting from
+  CD onto a daily Ubuntu desktop image, I can't navigate the splash
+  menu.
+
+  The same works correctly through virt-manager (which uses spice
+  AFAICT, but wayland tends to crash when running virt-manager), and
+  things work if I switch my session to Xorg rather than wayland.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1718719/+subscriptions
