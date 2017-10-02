@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dz0uZ-0000Tj-3q
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:37:37 -0400
+	(envelope-from <mst@redhat.com>) id 1dz120-0003lF-Ev
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:45:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dz0uV-0005vt-15
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:37:31 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:46541)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dz0uU-0005vf-TO
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:37:26 -0400
-Received: by mail-qt0-x244.google.com with SMTP id s18so7234662qta.3
-	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 06:37:26 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170928165414.7339-1-richard.henderson@linaro.org>
-	<20170928165414.7339-7-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <122815c9-5a54-7d6f-58be-ff5e3918a0f6@amsat.org>
-Date: Mon, 2 Oct 2017 10:37:23 -0300
+	(envelope-from <mst@redhat.com>) id 1dz11w-0001t4-E5
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:45:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50368)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dz11w-0001qQ-3t
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:45:08 -0400
+Date: Mon, 2 Oct 2017 16:44:52 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171002160757-mutt-send-email-mst@kernel.org>
+References: <1506744354-20979-1-git-send-email-wei.w.wang@intel.com>
+	<1506744354-20979-4-git-send-email-wei.w.wang@intel.com>
+	<20171002072106-mutt-send-email-mst@kernel.org>
+	<286AC319A985734F985F78AFA26841F73931FDB5@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170928165414.7339-7-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 6/9] arm: Support Capstone in
- disas_set_info
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <286AC319A985734F985F78AFA26841F73931FDB5@shsmsx102.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v16 3/5] virtio-balloon: VIRTIO_BALLOON_F_SG
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -35,84 +28,64 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "mhocko@kernel.org" <mhocko@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "willy@infradead.org" <willy@infradead.org>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>
 List-ID: <qemu-devel.nongnu.org>
 
-On 09/28/2017 01:54 PM, Richard Henderson wrote:
-> Tested-by: Alex Bennée <alex.bennee@linaro.org>
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
-aarch32 (not thumb), aarch64 (without switching to aarch32):
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->   disas.c          |  3 +++
->   target/arm/cpu.c | 21 ++++++++++++++++++---
->   2 files changed, 21 insertions(+), 3 deletions(-)
+On Mon, Oct 02, 2017 at 12:39:30PM +0000, Wang, Wei W wrote:
+> On Monday, October 2, 2017 12:30 PM, Michael S. Tsirkin wrote:
+> > On Sat, Sep 30, 2017 at 12:05:52PM +0800, Wei Wang wrote:
+> > > +static int send_balloon_page_sg(struct virtio_balloon *vb,
+> > > +				 struct virtqueue *vq,
+> > > +				 void *addr,
+> > > +				 uint32_t size,
+> > > +				 bool batch)
+> > > +{
+> > > +	int err;
+> > > +
+> > > +	err = add_one_sg(vq, addr, size);
+> > > +
+> > > +	/* If batchng is requested, we batch till the vq is full */
+> > 
+> > typo
+> > 
+> > > +	if (!batch || !vq->num_free)
+> > > +		kick_and_wait(vq, vb->acked);
+> > > +
+> > > +	return err;
+> > > +}
+> > 
+> > If add_one_sg fails, kick_and_wait will hang forever.
+> > 
+> > The reason this might work in because
+> > 1. with 1 sg there are no memory allocations 2. if adding fails on vq full, then
+> > something
+> >    is in queue and will wake up kick_and_wait.
+> > 
+> > So in short this is expected to never fail.
+> > How about a BUG_ON here then?
+> > And make it void, and add a comment with above explanation.
+> > 
 > 
-> diff --git a/disas.c b/disas.c
-> index 1c44514254..23c4742f8d 100644
-> --- a/disas.c
-> +++ b/disas.c
-> @@ -451,6 +451,7 @@ void disas(FILE *out, void *code, unsigned long size)
->       print_insn = print_insn_ppc;
->   #elif defined(__aarch64__) && defined(CONFIG_ARM_A64_DIS)
->       print_insn = print_insn_arm_a64;
-> +    s.info.cap_arch = CS_ARCH_ARM64;
->   #elif defined(__alpha__)
->       print_insn = print_insn_alpha;
->   #elif defined(__sparc__)
-> @@ -458,6 +459,8 @@ void disas(FILE *out, void *code, unsigned long size)
->       s.info.mach = bfd_mach_sparc_v9b;
->   #elif defined(__arm__)
->       print_insn = print_insn_arm;
-> +    s.info.cap_arch = CS_ARCH_ARM;
-> +    /* TCG only generates code for arm mode.  */
->   #elif defined(__MIPSEB__)
->       print_insn = print_insn_big_mips;
->   #elif defined(__MIPSEL__)
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 4300de66e2..e5f84066b4 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -33,6 +33,7 @@
->   #include "sysemu/sysemu.h"
->   #include "sysemu/hw_accel.h"
->   #include "kvm_arm.h"
-> +#include "disas/capstone.h"
->   
->   static void arm_cpu_set_pc(CPUState *cs, vaddr value)
->   {
-> @@ -489,10 +490,24 @@ static void arm_disas_set_info(CPUState *cpu, disassemble_info *info)
->   #if defined(CONFIG_ARM_A64_DIS)
->           info->print_insn = print_insn_arm_a64;
->   #endif
-> -    } else if (env->thumb) {
-> -        info->print_insn = print_insn_thumb1;
-> +        info->cap_arch = CS_ARCH_ARM64;
->       } else {
-> -        info->print_insn = print_insn_arm;
-> +        int cap_mode;
-> +        if (env->thumb) {
-> +            info->print_insn = print_insn_thumb1;
-> +            cap_mode = CS_MODE_THUMB;
-> +        } else {
-> +            info->print_insn = print_insn_arm;
-> +            cap_mode = CS_MODE_ARM;
-> +        }
-> +        if (arm_feature(env, ARM_FEATURE_V8)) {
-> +            cap_mode |= CS_MODE_V8;
-> +        }
-> +        if (arm_feature(env, ARM_FEATURE_M)) {
-> +            cap_mode |= CS_MODE_MCLASS;
-> +        }
-> +        info->cap_arch = CS_ARCH_ARM;
-> +        info->cap_mode = cap_mode;
->       }
->       if (bswap_code(arm_sctlr_b(env))) {
->   #ifdef TARGET_WORDS_BIGENDIAN
 > 
+> Yes, agree that this wouldn't fail - the worker thread performing the ballooning operations has been put into sleep when the vq is full, so I think there shouldn't be anyone else to put more sgs onto the vq then.
+> Btw, not sure if we need to mention memory allocation in the comment, I found virtqueue_add() doesn't return any error when allocation (for indirect desc-s) fails - it simply avoids the use of indirect desc.
+> 
+> What do you think of the following? 
+> 
+> err = add_one_sg(vq, addr, size);
+> /* 
+>   * This is expected to never fail: there is always at least 1 entry available on the vq,
+>   * because when the vq is full the worker thread that adds the sg will be put into
+>   * sleep until at least 1 entry is available to use.
+>   */
+> BUG_ON(err);
+> 
+> Best,
+> Wei
+> 
+> 
+> 
+>  
+
+Sounds good.
