@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dz2be-0007zn-T4
+	(envelope-from <armbru@redhat.com>) id 1dz2bj-00084N-3P
 	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:26:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dz2bb-0007xp-TZ
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:26:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38700)
+	(envelope-from <armbru@redhat.com>) id 1dz2bf-000819-7Q
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:26:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38824)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dz2bb-0007wU-GY
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:26:03 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dz2be-000805-UY
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:26:07 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  2 Oct 2017 17:25:41 +0200
-Message-Id: <20171002152552.27999-22-armbru@redhat.com>
+Date: Mon,  2 Oct 2017 17:25:43 +0200
+Message-Id: <20171002152552.27999-24-armbru@redhat.com>
 In-Reply-To: <20171002152552.27999-1-armbru@redhat.com>
 References: <20171002152552.27999-1-armbru@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 21/32] qapi: Define QAPIOptionKind and
- QAPIOption automatically
+Subject: [Qemu-devel] [RFC PATCH 23/32] qapi-options: Command line option
+ backend
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -27,237 +27,402 @@ To: qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com, eblake@redhat.com
 List-ID: <qemu-devel.nongnu.org>
 
-Enumeration type QAPIOptionKind enumerates the command line options.
+New qapi generator qapi-options.py generates code for parsing command
+line options into an array of QAPIOption.
 
-Flat union QAPIOption captures a single command line option.  Its tag
-is QAPIOptionKind, and the variants are the option argument types.
-
-FIXME implement missing clash checking in QAPISchemaObjectType.check_clash()
-FIXME potential clash in QAPISchema._def_autos()
-FIXME made up info in QAPISchema._def_autos()
-TODO can we avoid the wrappers around non-object option argument types?
+TODO negative tests
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi-commands.py               |  2 +-
- scripts/qapi-event.py                  |  2 +-
- scripts/qapi-introspect.py             |  2 +-
- scripts/qapi-types.py                  |  2 +-
- scripts/qapi-visit.py                  |  2 +-
- scripts/qapi.py                        | 42 ++++++++++++++++++++++++++++++++--
- scripts/qapi2texi.py                   |  2 +-
- tests/qapi-schema/qapi-schema-test.out | 14 ++++++++++++
- tests/qapi-schema/test-qapi.py         |  2 +-
- 9 files changed, 61 insertions(+), 9 deletions(-)
+ Makefile                  |  11 ++-
+ Makefile.objs             |   1 +
+ scripts/qapi-options.py   | 199 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/Makefile.include    |  16 +++-
+ tests/test-qapi-options.c |  74 +++++++++++++++++
+ 5 files changed, 297 insertions(+), 4 deletions(-)
+ create mode 100644 scripts/qapi-options.py
+ create mode 100644 tests/test-qapi-options.c
 
-diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
-index 76cc9cc8a4..fdd3492f87 100644
---- a/scripts/qapi-commands.py
-+++ b/scripts/qapi-commands.py
-@@ -315,7 +315,7 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
-                   prefix=args.prefix,
-                   c_prefix=c_name(args.prefix, protect=False)))
+diff --git a/Makefile b/Makefile
+index 421e65d833..5e858f7295 100644
+--- a/Makefile
++++ b/Makefile
+@@ -56,8 +56,8 @@ GENERATED_FILES += builtin-qapi-types.h builtin-qapi-types.c
+ GENERATED_FILES += builtin-qapi-visit.h builtin-qapi-visit.c
+ GENERATED_FILES += qmp-commands.h qapi-types.h qapi-visit.h qapi-event.h
+ GENERATED_FILES += qmp-marshal.c qapi-types.c qapi-visit.c qapi-event.c
+-GENERATED_FILES += qmp-introspect.h
+-GENERATED_FILES += qmp-introspect.c
++GENERATED_FILES += qapi-options.h qmp-introspect.h
++GENERATED_FILES += qapi-options.c qmp-introspect.c
  
--schema = QAPISchema(args.schema)
-+schema = QAPISchema(args.schema, args.prefix)
- gen = QAPISchemaGenCommandVisitor()
- schema.visit(gen)
- fdef.write(gen.defn)
-diff --git a/scripts/qapi-event.py b/scripts/qapi-event.py
-index 1c61751bc0..64a4a02757 100644
---- a/scripts/qapi-event.py
-+++ b/scripts/qapi-event.py
-@@ -226,7 +226,7 @@ fdecl.write(mcgen('''
+ GENERATED_FILES += trace/generated-tcg-tracers.h
  
- event_enum_name = c_name(args.prefix + 'QAPIEvent', protect=False)
+@@ -470,6 +470,13 @@ qapi-commands-gen: $(qapi-modules) $(SRC_PATH)/scripts/qapi-commands.py $(qapi-p
+ 		$<, \
+ 		"GEN","$@")
  
--schema = QAPISchema(args.schema)
-+schema = QAPISchema(args.schema, args.prefix)
- gen = QAPISchemaGenEventVisitor()
- schema.visit(gen)
- fdef.write(gen.defn)
-diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
-index cc4ff01cd4..89365449b0 100644
---- a/scripts/qapi-introspect.py
-+++ b/scripts/qapi-introspect.py
-@@ -206,7 +206,7 @@ fdef.write(mcgen('''
- ''',
-                  prefix=args.prefix))
- 
--schema = QAPISchema(args.schema)
-+schema = QAPISchema(args.schema, args.prefix)
- gen = QAPISchemaGenIntrospectVisitor(args.unmask_non_abi_names)
- schema.visit(gen, builtins=True)
- fdef.write(gen.defn)
-diff --git a/scripts/qapi-types.py b/scripts/qapi-types.py
-index c058540e4d..5c53c56e45 100644
---- a/scripts/qapi-types.py
-+++ b/scripts/qapi-types.py
-@@ -276,7 +276,7 @@ else:
- #include "qapi/util.h"
- '''))
- 
--schema = QAPISchema(args.schema)
-+schema = QAPISchema(args.schema, args.prefix)
- gen = QAPISchemaGenTypeVisitor()
- schema.visit(gen, builtins=not args.schema)
- fdef.write(gen.defn)
-diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
-index e756ef98ee..3182b860af 100644
---- a/scripts/qapi-visit.py
-+++ b/scripts/qapi-visit.py
-@@ -359,7 +359,7 @@ else:
- 
- '''))
- 
--schema = QAPISchema(args.schema)
-+schema = QAPISchema(args.schema, args.prefix)
- gen = QAPISchemaGenVisitVisitor()
- schema.visit(gen, builtins=not args.schema)
- fdef.write(gen.defn)
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 1e03b62943..efc128eee0 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -1235,7 +1235,12 @@ class QAPISchemaObjectType(QAPISchemaType):
-     # and update seen to track the members seen so far. Report any errors
-     # on behalf of info, which is not necessarily self.info
-     def check_clash(self, info, seen):
--        assert not self.variants       # not implemented
-+        # check_union() ensures the following assertion holds, but
-+        # QAPIUnion violates it.  Disable it for now, so we can play
-+        # with QAPIUnion without having to implement the missing clash
-+        # checking first.
-+        # FIXME implement missing clash checking
-+        # assert not self.variants       # not implemented
-         for m in self.members:
-             m.check_clash(info, seen)
- 
-@@ -1535,8 +1540,9 @@ class QAPISchemaOption(QAPISchemaEntity):
- 
- 
- class QAPISchema(object):
--    def __init__(self, file):
-+    def __init__(self, file, prefix):
-         try:
-+            self.prefix = prefix
-             if file:
-                 parser = QAPISchemaParser(file)
-                 self.exprs = check_exprs(parser.exprs)
-@@ -1545,10 +1551,14 @@ class QAPISchema(object):
-                 self.exprs = []
-                 self.docs = []
-             self._entity_dict = {}
-+            self._option_arg = {}
-             self._predefining = True
-             self._def_predefineds()
-             self._predefining = False
-             self._def_exprs()
-+            self._predefining = True
-+            self._def_autos()
-+            self._predefining = False
-             self.check()
-         except QAPIError as err:
-             print >>sys.stderr, err
-@@ -1751,6 +1761,7 @@ class QAPISchema(object):
-                 name[2:], info, doc, 'optarg', self._make_members(data, info))
-         self._def_entity(QAPISchemaOption(name, info, doc, data,
-                                           short, implied_key, boxed, help_))
-+        self._option_arg[name[2:]] = data
- 
-     def _def_exprs(self):
-         for expr_elem in self.exprs:
-@@ -1774,6 +1785,33 @@ class QAPISchema(object):
-             else:
-                 assert False
- 
-+    def _def_autos(self):
-+        info = {'file': None, 'line': 0, 'parent': None}  # FIXME
-+        if self._option_arg:
-+            name = self.prefix + 'QAPIOption'
-+            self._make_implicit_enum_type(name, info,
-+                                          sorted(self._option_arg.keys()))
-+            # FIXME what if these members clash with variant members?
-+            members = [
-+                QAPISchemaObjectTypeMember('type', name + 'Kind', False),
-+                QAPISchemaObjectTypeMember('idx', 'int32', False),
-+                QAPISchemaObjectTypeMember('cnt', 'int32', False)]
-+            variants = []
-+            for (key, value) in sorted(self._option_arg.items()):
-+                if not value:
-+                    continue
-+                typ = self.lookup_type(value)
-+                if isinstance(typ, QAPISchemaObjectType):
-+                    v = self._make_variant(key, value)
-+                else:
-+                    # TODO can we avoid the wrapper?
-+                    v = self._make_simple_variant(key, value, typ.info)
-+                variants.append(v)
-+            self._def_entity(QAPISchemaObjectType(
-+                name, info, None, None, members,
-+                QAPISchemaObjectTypeVariants('type', None, variants)
-+                if variants else None))
++.INTERMEDIATE: qapi-options-gen
++qapi-options.h qapi-options.c: qapi-options-gen
++qapi-options-gen: $(qapi-modules) $(SRC_PATH)/scripts/qapi-options.py $(qapi-py)
++	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-options.py \
++		$<, \
++		"GEN","$@")
 +
-     def check(self):
-         for ent in self._entity_dict.values():
-             ent.check(self)
-diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index 071abc9d5d..0e099ebaa2 100755
---- a/scripts/qapi2texi.py
-+++ b/scripts/qapi2texi.py
-@@ -286,7 +286,7 @@ def main(argv):
-                         help='QAPI schema source file')
-     args = parser.parse_args()
+ .INTERMEDIATE: qapi-introspect-gen
+ qmp-introspect.h qmp-introspect.c: qapi-introspect-gen
+ qapi-introspect-gen: $(qapi-modules) $(SRC_PATH)/scripts/qapi-introspect.py $(qapi-py)
+diff --git a/Makefile.objs b/Makefile.objs
+index c2c62cb462..908ec053fe 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -80,6 +80,7 @@ common-obj-$(CONFIG_FDT) += device_tree.o
+ # qapi
  
--    schema = qapi.QAPISchema(args.schema)
-+    schema = qapi.QAPISchema(args.schema, '')
-     if not qapi.doc_required:
-         print >>sys.stderr, ("%s: need pragma 'doc-required' "
-                              "to generate documentation" % argv[0])
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qapi-schema-test.out
-index 9ee06539ac..16dc30dd99 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -79,6 +79,18 @@ object NestedEnumsOne
-     member enum2: EnumOne optional=True
-     member enum3: EnumOne optional=False
-     member enum4: EnumOne optional=True
-+object QAPIOption
-+    member type: QAPIOptionKind optional=False
-+    member idx: int32 optional=False
-+    member cnt: int32 optional=False
-+    tag type
-+    case opt-any: q_obj_any-wrapper
-+    case opt-boxed: UserDefZero
-+    case opt-enum: q_obj_EnumOne-wrapper
-+    case opt-int: q_obj_int-wrapper
-+    case opt-str: q_obj_str-wrapper
-+    case opt-struct: q_obj_opt-struct-optarg
-+enum QAPIOptionKind ['help', 'opt-any', 'opt-boxed', 'opt-enum', 'opt-int', 'opt-str', 'opt-struct']
- enum QEnumTwo ['value1', 'value2']
-     prefix QENUM_TWO
- object TestStruct
-@@ -207,6 +219,8 @@ object q_obj_EVENT_D-arg
-     member b: str optional=False
-     member c: str optional=True
-     member enum3: EnumOne optional=True
-+object q_obj_EnumOne-wrapper
-+    member data: EnumOne optional=False
- object q_obj_UserDefA-wrapper
-     member data: UserDefA optional=False
- object q_obj_UserDefB-wrapper
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.py
-index 2e5e7bfeb1..7de7d6dc53 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -67,7 +67,7 @@ parser.add_argument('schema', type=argparse.FileType('r'), nargs='?',
-                     help='QAPI schema source file')
- args = parser.parse_args()
+ common-obj-y += qmp-marshal.o
++common-obj-y += qapi-options.o
+ common-obj-y += qmp-introspect.o
+ common-obj-y += qmp.o hmp.o
+ endif
+diff --git a/scripts/qapi-options.py b/scripts/qapi-options.py
+new file mode 100644
+index 0000000000..240c9021c7
+--- /dev/null
++++ b/scripts/qapi-options.py
+@@ -0,0 +1,199 @@
++#
++# QAPI option generator
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# Authors:
++#  Markus Armbruster <armbru@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2.
++# See the COPYING file in the top-level directory.
++
++from qapi import *
++
++
++class QAPISchemaGenOptionVisitor(QAPISchemaVisitor):
++    def __init__(self):
++        self.decl = None
++        self.defn = None
++        self._shortopts = None
++        self._longopts = None
++        self._cases = None
++
++    def visit_begin(self, schema):
++        self.decl = ''
++        self.defn = ''
++        self._shortopts = ''
++        self._longopts = ''
++        self._cases = ''
++
++    def visit_end(self):
++        if self._cases:
++            c_max = c_enum_const(args.prefix + 'QAPIOptionKind', '_MAX')
++            self.decl += mcgen('''
++%(c_prefix)sQAPIOption *%(c_prefix)sqapi_options_parse(int argc, char *argv[]);
++''',
++                               c_prefix=c_name(args.prefix, protect=False))
++            self.defn += mcgen('''
++%(c_prefix)sQAPIOption *%(c_prefix)sqapi_options_parse(int argc, char *argv[])
++{
++    static const struct option longopts[] = {
++%(longopts)s        {0}
++    };
++    %(c_prefix)sQAPIOption *opt = g_new(%(c_prefix)sQAPIOption, argc);
++    int nopt, longidx, ret;
++    Visitor *v;
++
++    optind = 0;
++
++    for (nopt = 0, opt[nopt].idx = 1;
++         (ret = getopt_long_only(argc, argv, %(c_shortopts)s,
++                                 longopts, &longidx)) >= 0;
++         opt[++nopt].idx = optind) {
++        if (ret > 255) {
++            opt[nopt].type = longopts[longidx].val - 256;
++        }
++        opt[nopt].cnt = optind - opt[nopt].idx;
++        loc_set_cmdline(argv, opt[nopt].idx, opt[nopt].cnt);
++
++        switch(ret) {
++%(cases)s
++        case '?':
++            exit(1);
++        default:
++            abort();
++        }
++    }
++
++    opt[nopt].type = %(c_max)s;
++    opt[nopt].cnt = 0;
++
++    return g_renew(%(c_prefix)sQAPIOption, opt, nopt + 1);
++}
++''',
++                               c_prefix=c_name(args.prefix, protect=False),
++                               c_shortopts=c_string(self._shortopts),
++                               longopts=self._longopts,
++                               cases=self._cases,
++                               c_max=c_max)
++        self._shortopts = None
++        self._longopts = None
++        self._cases = None
++
++    def visit_option(self, name, info, arg_type, short, implied_key,
++                     boxed, help_):
++        name = name[2:]
++        enum_val = c_enum_const(args.prefix + 'QAPIOptionKind', name)
++
++        push_indent(8)
++
++        self._longopts += mcgen('''
++{
++    .name = "%(name)s",
++    .has_arg = %(has_arg)s,
++    .val = %(val)s
++},
++''',
++                                name=name,
++                                has_arg='required_argument'
++                                if arg_type else 'no_argument',
++                                val='256 + ' + enum_val)
++        if short:
++            self._shortopts += short
++            if arg_type:
++                self._shortopts += ':'
++            self._cases += mcgen('''
++case '%(char)s':
++    opt[nopt].type = %(case)s;
++    /* fall through */
++''',
++                                 char=short, case=enum_val)
++
++        self._cases += mcgen('''
++case 256 + %(case)s:
++''',
++                             case=enum_val)
++        if arg_type is None:
++            pass
++        elif isinstance(arg_type, QAPISchemaObjectType):
++            self._cases += mcgen('''
++    v = qobject_input_visitor_new_str(optarg, %(c_implied_key)s, &error_fatal);
++    visit_start_struct(v, NULL, NULL, 0, &error_fatal);
++    visit_type_%(c_type)s_members(v, &opt[nopt].u.%(c_name)s, &error_fatal);
++    visit_check_struct(v, &error_fatal);
++    visit_end_struct(v, NULL);
++    visit_free(v);
++''',
++                                 c_name=c_name(name), c_type=arg_type.c_name(),
++                                 c_implied_key=c_string(implied_key))
++        else:
++            assert isinstance(arg_type,
++                              (QAPISchemaBuiltinType, QAPISchemaEnumType))
++            self._cases += mcgen('''
++    v = qobject_input_visitor_new_keyval(QOBJECT(qstring_from_str(optarg)));
++    visit_type_%(c_type)s(v, NULL, &opt[nopt].u.%(c_name)s.data, &error_fatal);
++    visit_free(v);
++''',
++                                 c_name=c_name(name), c_type=arg_type.c_name())
++        self._cases += mcgen('''
++    break;
++''')
++
++        pop_indent(8)
++
++
++args = common_argument_parser().parse_args()
++
++c_comment = '''
++/*
++ * QAPI command line options
++ *
++ * Copyright (C) 2017 Red Hat, Inc.
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ *
++ */
++'''
++h_comment = '''
++/*
++ * QAPI command line options
++ *
++ * Copyright (C) 2017 Red Hat, Inc.
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ *
++ */
++'''
++
++(fdef, fdecl) = open_output(args.output_dir, args.prefix,
++                            'qapi-options.c', 'qapi-options.h',
++                            c_comment, h_comment)
++
++fdef.write(mcgen('''
++#include "qemu/osdep.h"
++#include <getopt.h>
++#include "%(prefix)sqapi-options.h"
++#include "%(prefix)sqapi-visit.h"
++#include "qapi/error.h"
++#include "qapi/qmp/qstring.h"
++#include "qapi/qobject-input-visitor.h"
++#include "qemu/error-report.h"
++
++''',
++                 prefix=args.prefix))
++
++fdecl.write(mcgen('''
++#include "%(prefix)sqapi-types.h"
++
++''',
++                  prefix=args.prefix))
++
++schema = QAPISchema(args.schema, args.prefix)
++gen = QAPISchemaGenOptionVisitor()
++schema.visit(gen)
++fdef.write(gen.defn)
++fdecl.write(gen.decl)
++
++close_output(fdef, fdecl)
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 2ef5dc51f1..442de4e0aa 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -59,6 +59,7 @@ check-unit-y += tests/test-string-output-visitor$(EXESUF)
+ gcov-files-test-string-output-visitor-y = qapi/string-output-visitor.c
+ check-unit-y += tests/test-qmp-event$(EXESUF)
+ gcov-files-test-qmp-event-y += qapi/qmp-event.c
++check-unit-y += tests/test-qapi-options(EXESUF)
+ check-unit-y += tests/test-opts-visitor$(EXESUF)
+ gcov-files-test-opts-visitor-y = qapi/opts-visitor.c
+ check-unit-y += tests/test-coroutine$(EXESUF)
+@@ -542,7 +543,7 @@ check-qapi-schema-y := $(addprefix tests/qapi-schema/, $(qapi-schema))
  
--schema = QAPISchema(args.schema)
-+schema = QAPISchema(args.schema, '')
- schema.visit(QAPISchemaTestVisitor(), builtins=not args.schema)
+ GENERATED_FILES += tests/test-qapi-types.h tests/test-qapi-visit.h \
+ 	tests/test-qmp-commands.h tests/test-qapi-event.h \
+-	tests/test-qmp-introspect.h
++	tests/test-qapi-options.h tests/test-qmp-introspect.h
  
- for doc in schema.docs:
+ test-obj-y = tests/check-qnum.o tests/check-qstring.o tests/check-qdict.o \
+ 	tests/check-qlist.o tests/check-qnull.o \
+@@ -567,7 +568,8 @@ QEMU_CFLAGS += -I$(SRC_PATH)/tests
+ test-util-obj-y = libqemuutil.a
+ test-qom-obj-y = $(qom-obj-y) $(test-util-obj-y)
+ test-qapi-obj-y = tests/test-qapi-visit.o tests/test-qapi-types.o \
+-	tests/test-qapi-event.o tests/test-qmp-introspect.o \
++	tests/test-qapi-event.o tests/test-qapi-options.o \
++	tests/test-qmp-introspect.o \
+ 	$(test-qom-obj-y)
+ benchmark-crypto-obj-y = $(crypto-obj-y) $(test-qom-obj-y)
+ test-crypto-obj-y = $(crypto-obj-y) $(test-qom-obj-y)
+@@ -651,6 +653,15 @@ $(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(SRC_PATH)/scripts/qapi-com
+ 		-o tests -p "test-" $<, \
+ 		"GEN","$@")
+ 
++.INTERMEDIATE: tests/test-qapi-options-gen
++tests/test-qapi-options.c tests/test-qapi-options.h: tests/test-qapi-options-gen
++tests/test-qapi-options-gen: \
++$(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(SRC_PATH)/scripts/qapi-options.py $(qapi-py)
++	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-options.py \
++		-o tests -p "test-" $<, \
++		"GEN","$@")
++tests/test-qmp-introspect.c tests/test-qmp-introspect.h :\
++
+ .INTERMEDIATE: tests/test-qapi-event-gen
+ tests/test-qapi-event.c tests/test-qapi-event.h: tests/test-qapi-event-gen ;
+ tests/test-qapi-event-gen: \
+@@ -673,6 +684,7 @@ tests/qapi-schema/doc-good.test.texi: $(SRC_PATH)/tests/qapi-schema/doc-good.jso
+ tests/test-string-output-visitor$(EXESUF): tests/test-string-output-visitor.o $(test-qapi-obj-y)
+ tests/test-string-input-visitor$(EXESUF): tests/test-string-input-visitor.o $(test-qapi-obj-y)
+ tests/test-qmp-event$(EXESUF): tests/test-qmp-event.o $(test-qapi-obj-y)
++tests/test-qapi-options(EXESUF): tests/test-qapi-options.o $(test-qapi-obj-y)
+ tests/test-qobject-output-visitor$(EXESUF): tests/test-qobject-output-visitor.o $(test-qapi-obj-y)
+ tests/test-clone-visitor$(EXESUF): tests/test-clone-visitor.o $(test-qapi-obj-y)
+ tests/test-qobject-input-visitor$(EXESUF): tests/test-qobject-input-visitor.o $(test-qapi-obj-y) qmp-introspect.o
+diff --git a/tests/test-qapi-options.c b/tests/test-qapi-options.c
+new file mode 100644
+index 0000000000..aa4394abdb
+--- /dev/null
++++ b/tests/test-qapi-options.c
+@@ -0,0 +1,74 @@
++#include "qemu/osdep.h"
++#include "qapi/qmp/qlit.h"
++#include "test-qapi-options.h"
++
++static void test_qapi_options_parse(void)
++{
++    static const char *argv[] = {
++        "progname",
++        "--help",
++        "-h",
++        "--opt-str", "hello",
++        "--opt-int", "123",
++        "--opt-enum", "value1",
++        "--opt-any", "hello",
++        "--opt-any", "123",
++        "--opt-struct", "sval,i=1",
++        "--opt-boxed", "integer=42",
++        NULL
++    };
++    static QLitObject qlit_hello = QLIT_QSTR("hello");
++    static QLitObject qlit_123 = QLIT_QSTR("123");
++    test_QAPIOption *opt;
++
++    opt = test_qapi_options_parse(ARRAY_SIZE(argv) - 1, (char **)argv);
++    g_assert_cmpint(opt[0].type, ==, TEST_QAPI_OPTION_KIND_HELP);
++    g_assert_cmpint(opt[0].idx, ==, 1);
++    g_assert_cmpint(opt[0].cnt, ==, 1);
++    g_assert_cmpint(opt[1].type, ==, TEST_QAPI_OPTION_KIND_HELP);
++    g_assert_cmpint(opt[1].idx, ==, 2);
++    g_assert_cmpint(opt[1].cnt, ==, 1);
++    g_assert_cmpint(opt[2].type, ==, TEST_QAPI_OPTION_KIND_OPT_STR);
++    g_assert_cmpint(opt[2].idx, ==, 3);
++    g_assert_cmpint(opt[2].cnt, ==, 2);
++    g_assert_cmpstr(opt[2].u.opt_str.data, ==, "hello");
++    g_assert_cmpint(opt[3].type, ==, TEST_QAPI_OPTION_KIND_OPT_INT);
++    g_assert_cmpint(opt[3].idx, ==, 5);
++    g_assert_cmpint(opt[3].cnt, ==, 2);
++    g_assert_cmpint(opt[3].u.opt_int.data, ==, 123);
++    g_assert_cmpint(opt[4].type, ==, TEST_QAPI_OPTION_KIND_OPT_ENUM);
++    g_assert_cmpint(opt[4].idx, ==, 7);
++    g_assert_cmpint(opt[4].cnt, ==, 2);
++    g_assert_cmpint(opt[4].u.opt_enum.data, ==, ENUM_ONE_VALUE1);
++    g_assert_cmpint(opt[5].type, ==, TEST_QAPI_OPTION_KIND_OPT_ANY);
++    g_assert_cmpint(opt[5].idx, ==, 9);
++    g_assert_cmpint(opt[5].cnt, ==, 2);
++    g_assert(qlit_equal_qobject(&qlit_hello, opt[5].u.opt_any.data));
++    g_assert_cmpint(opt[6].type, ==, TEST_QAPI_OPTION_KIND_OPT_ANY);
++    g_assert_cmpint(opt[6].idx, ==, 11);
++    g_assert_cmpint(opt[6].cnt, ==, 2);
++    g_assert(qlit_equal_qobject(&qlit_123, opt[6].u.opt_any.data));
++    g_assert_cmpint(opt[7].type, ==, TEST_QAPI_OPTION_KIND_OPT_STRUCT);
++    g_assert_cmpint(opt[7].idx, ==, 13);
++    g_assert_cmpint(opt[7].cnt, ==, 2);
++    g_assert_cmpstr(opt[7].u.opt_struct.s, ==, "sval");
++    g_assert_cmpint(opt[8].type, ==, TEST_QAPI_OPTION_KIND_OPT_BOXED);
++    g_assert_cmpint(opt[8].idx, ==, 15);
++    g_assert_cmpint(opt[8].cnt, ==, 2);
++    g_assert_cmpint(opt[8].u.opt_boxed.integer, ==, 42);
++    g_assert_cmpint(opt[9].type, ==, TEST_QAPI_OPTION_KIND__MAX);
++    g_assert_cmpint(opt[9].idx, ==, 17);
++    g_assert_cmpint(opt[9].cnt, ==, 0);
++    g_free(opt);
++}
++
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++
++    g_test_add_func("/qapi/options-parse", test_qapi_options_parse);
++
++    g_test_run();
++
++    return 0;
++}
 -- 
 2.13.6
