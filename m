@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dywiu-0002aX-08
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:09:17 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dywiv-0002cX-VF
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:09:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dywis-0006Lw-U8
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:09:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47266)
+	(envelope-from <imammedo@redhat.com>) id 1dywiq-0006Kh-32
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:09:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43328)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dywis-0006Ld-On
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:09:10 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dywip-0006KP-Sv
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:09:08 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon,  2 Oct 2017 11:08:19 +0200
-Message-Id: <1506935300-132598-38-git-send-email-imammedo@redhat.com>
+Date: Mon,  2 Oct 2017 11:08:17 +0200
+Message-Id: <1506935300-132598-36-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
 References: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 37/38] mips: mipssim: replace cpu_model with
+Subject: [Qemu-devel] [PATCH 35/38] mips: fulong2e: replace cpu_model with
  cpu_type
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
@@ -32,48 +32,40 @@ Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 CC: yongbok.kim@imgtec.com
 CC: aurelien@aurel32.net
 ---
- hw/mips/mips_mipssim.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+ hw/mips/mips_fulong2e.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-index a092072..e5d3654 100644
---- a/hw/mips/mips_mipssim.c
-+++ b/hw/mips/mips_mipssim.c
-@@ -141,7 +141,6 @@ static void
- mips_mipssim_init(MachineState *machine)
+diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+index 7531868..146cf0f 100644
+--- a/hw/mips/mips_fulong2e.c
++++ b/hw/mips/mips_fulong2e.c
+@@ -258,7 +258,6 @@ static void network_init (PCIBus *pci_bus)
+ static void mips_fulong2e_init(MachineState *machine)
  {
      ram_addr_t ram_size = machine->ram_size;
 -    const char *cpu_model = machine->cpu_model;
      const char *kernel_filename = machine->kernel_filename;
      const char *kernel_cmdline = machine->kernel_cmdline;
      const char *initrd_filename = machine->initrd_filename;
-@@ -156,14 +155,7 @@ mips_mipssim_init(MachineState *machine)
-     int bios_size;
+@@ -277,10 +276,7 @@ static void mips_fulong2e_init(MachineState *machine)
+     CPUMIPSState *env;
  
-     /* Init CPUs. */
+     /* init CPUs */
 -    if (cpu_model == NULL) {
--#ifdef TARGET_MIPS64
--        cpu_model = "5Kf";
--#else
--        cpu_model = "24Kf";
--#endif
+-        cpu_model = "Loongson-2E";
 -    }
 -    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
 +    cpu = MIPS_CPU(cpu_create(machine->cpu_type));
      env = &cpu->env;
  
-     reset_info = g_malloc0(sizeof(ResetData));
-@@ -235,6 +227,11 @@ static void mips_mipssim_machine_init(MachineClass *mc)
- {
-     mc->desc = "MIPS MIPSsim platform";
-     mc->init = mips_mipssim_init;
-+#ifdef TARGET_MIPS64
-+    mc->default_cpu_type = MIPS_CPU_TYPE_NAME("5Kf");
-+#else
-+    mc->default_cpu_type = MIPS_CPU_TYPE_NAME("24Kf");
-+#endif
+     qemu_register_reset(main_cpu_reset, cpu);
+@@ -385,6 +381,7 @@ static void mips_fulong2e_machine_init(MachineClass *mc)
+     mc->desc = "Fulong 2e mini pc";
+     mc->init = mips_fulong2e_init;
+     mc->block_default_type = IF_IDE;
++    mc->default_cpu_type = MIPS_CPU_TYPE_NAME("Loongson-2E");
  }
  
- DEFINE_MACHINE("mipssim", mips_mipssim_machine_init)
+ DEFINE_MACHINE("fulong2e", mips_fulong2e_machine_init)
 -- 
 2.7.4
