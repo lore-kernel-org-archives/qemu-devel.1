@@ -1,75 +1,100 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dz8aP-0000c8-Gl
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 17:49:14 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dz9JE-0004U3-MW
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 18:35:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dz8aL-0002YS-Ki
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 17:49:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37466)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dz8aL-0002X2-F0
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 17:49:09 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 02C2B81E00
-	for <qemu-devel@nongnu.org>; Mon,  2 Oct 2017 21:49:07 +0000 (UTC)
-References: <20171002103135.33440-1-marcel@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <07f7595e-f721-96d9-0d4c-4e2024b09e32@redhat.com>
-Date: Mon, 2 Oct 2017 23:49:01 +0200
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dz9JD-0006Ma-PR
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 18:35:32 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:50719)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dz9JD-0006Jf-JS
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 18:35:31 -0400
+Received: by mail-oi0-x243.google.com with SMTP id y64so11508277oia.7
+	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 15:35:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20171002103135.33440-1-marcel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/gen_pcie_root_port: properly set
-List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
-	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
-List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
-List-Post: <mailto:qemu-devel@gnu.org>
-List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
-List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
-	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com
-List-ID: <qemu-devel.nongnu.org>
+In-Reply-To: <20171002191521.15748-2-dgilbert@redhat.com>
+References: <20171002191521.15748-1-dgilbert@redhat.com>
+	<20171002191521.15748-2-dgilbert@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 3 Oct 2017 00:35:26 +0200
+Message-ID: <CAJ+F1CKxCeqAcHne9tJ3bwFzoS8kWX7Juffh1-2uStZ7kfLruQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/4] libvhost-user: vu_queue_started
+List-Id: <qemu-devel.nongnu.org>
+List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
+	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
+List-Archive: <http://lists.nongnu.org/archive/html/qemu-devel/>
+List-Post: <mailto:qemu-devel@nongnu.org>
+List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
+List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
+	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-On 10/02/17 12:31, Marcel Apfelbaum wrote:
-> IO_LIMIT and IO_BASE registers should not be writable if
-> gen_pcie_root_port's io-reserve property is set to 0.
-> The COMMAND register should have the IO flag read only.
-> 
-> 
-> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+On Mon, Oct 2, 2017 at 9:15 PM, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> Add a vu_queue_started method to complement vu_queue_enabled.
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
 > ---
->  hw/pci-bridge/gen_pcie_root_port.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
-> index ed03ffc764..ad4e6aa7ff 100644
-> --- a/hw/pci-bridge/gen_pcie_root_port.c
-> +++ b/hw/pci-bridge/gen_pcie_root_port.c
-> @@ -85,6 +85,13 @@ static void gen_rp_realize(DeviceState *dev, Error **errp)
->          rpc->parent_class.exit(d);
->          return;
->      }
-> +
-> +    if (!grp->io_reserve) {
-> +        pci_word_test_and_clear_mask(d->wmask + PCI_COMMAND,
-> +                                     PCI_COMMAND_IO);
-> +        d->wmask[PCI_IO_BASE] = 0;
-> +        d->wmask[PCI_IO_LIMIT] = 0;
-> +    }
+>  contrib/libvhost-user/libvhost-user.c | 6 ++++++
+>  contrib/libvhost-user/libvhost-user.h | 9 +++++++++
+>  2 files changed, 15 insertions(+)
+>
+> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
+r/libvhost-user.c
+> index d27d6303db..5ee8483a32 100644
+> --- a/contrib/libvhost-user/libvhost-user.c
+> +++ b/contrib/libvhost-user/libvhost-user.c
+> @@ -943,6 +943,12 @@ vu_queue_enabled(VuDev *dev, VuVirtq *vq)
+>      return vq->enable;
 >  }
->  
->  static const VMStateDescription vmstate_rp_dev = {
-> 
+>
+> +bool
+> +vu_queue_started(const VuDev *dev, const VuVirtq *vq)
+> +{
+> +    return vq->started;
+> +}
+> +
+>  static inline uint16_t
+>  vring_avail_flags(VuVirtq *vq)
+>  {
+> diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
+r/libvhost-user.h
+> index 4021f1124e..94d7cc8fbd 100644
+> --- a/contrib/libvhost-user/libvhost-user.h
+> +++ b/contrib/libvhost-user/libvhost-user.h
+> @@ -335,6 +335,15 @@ void vu_queue_set_notification(VuDev *dev, VuVirtq *=
+vq, int enable);
+>  bool vu_queue_enabled(VuDev *dev, VuVirtq *vq);
+>
+>  /**
+> + * vu_queue_started:
+> + * @dev: a VuDev context
+> + * @vq: a VuVirtq queue
+> + *
+> + * Returns: whether the queue is started.
+> + */
+> +bool vu_queue_started(const VuDev *dev, const VuVirtq *vq);
+> +
+> +/**
+>   * vu_queue_empty:
+>   * @dev: a VuDev context
+>   * @vq: a VuVirtq queue
+> --
+> 2.13.6
+>
+>
 
-The patch looks good to me (which doesn't mean much, honestly :) ), but
-I think the subject line is truncated. You left off what exactly should
-be set properly. (IO base, IO limit, and command registers, presumably.)
 
-Thanks!
-Laszlo
+
+--=20
+Marc-Andr=C3=A9 Lureau
