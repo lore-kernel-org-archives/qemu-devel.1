@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dz2bZ-0007x1-EW
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:26:03 -0400
+	(envelope-from <armbru@redhat.com>) id 1dz2ba-0007xm-Ot
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:26:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dz2bV-0007rM-Te
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:26:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58192)
+	(envelope-from <armbru@redhat.com>) id 1dz2bZ-0007uP-Ha
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:26:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56044)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dz2bV-0007qh-LH
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:25:57 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dz2bZ-0007td-C8
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:26:01 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  2 Oct 2017 17:25:24 +0200
-Message-Id: <20171002152552.27999-5-armbru@redhat.com>
+Date: Mon,  2 Oct 2017 17:25:29 +0200
+Message-Id: <20171002152552.27999-10-armbru@redhat.com>
 In-Reply-To: <20171002152552.27999-1-armbru@redhat.com>
 References: <20171002152552.27999-1-armbru@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 04/32] qapi2texi: Fix for '@' not followed
- by \w character
+Subject: [Qemu-devel] [RFC PATCH 09/32] qapi: check_type() parameter
+ allow_optional is now unused, drop
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -29,90 +29,60 @@ List-ID: <qemu-devel.nongnu.org>
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi2texi.py            | 22 ++++++++++++----------
- tests/qapi-schema/doc-good.json |  2 +-
- tests/qapi-schema/doc-good.out  |  2 +-
- tests/qapi-schema/doc-good.texi |  2 +-
- 4 files changed, 15 insertions(+), 13 deletions(-)
+ scripts/qapi.py | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
 
-diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index 1500afc553..cfcd8a19f0 100755
---- a/scripts/qapi2texi.py
-+++ b/scripts/qapi2texi.py
-@@ -41,14 +41,17 @@ def subst_emph(doc):
-     return re.sub(r'\b_([^_\n]+)_\b', r'@emph{\1}', doc)
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index 208010c241..8f9c5666bd 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -629,8 +629,7 @@ def add_name(name, info, meta, implicit=False):
+     all_names[name] = meta
  
  
--def subst_vars(doc):
--    """Replaces @var by @code{var}"""
--    return re.sub(r'@([\w-]+)', r'@code{\1}', doc)
--
--
--def subst_braces(doc):
--    """Replaces {} with @{ @}"""
--    return doc.replace('{', '@{').replace('}', '@}')
-+def subst_special(doc):
-+    ret = ''
-+    for m in re.finditer(r'([^@{}]*)(@([-\w]*)|[{}])?', doc):
-+        ret += m.group(1)
-+        if m.group(3):
-+            # format @NAME as @code{NAME}
-+            ret += '@code{' + m.group(3) + '}'
-+        elif m.group(2):
-+            # escape Texinfo's special characters
-+            ret += '@' + m.group(2)
-+    return ret
+-def check_type(info, source, value, allow_array=False,
+-               allow_dict=False, allow_optional=False,
++def check_type(info, source, value, allow_array=False, allow_dict=False,
+                allow_metas=[]):
+     global all_names
+ 
+@@ -686,7 +685,7 @@ def check_command(expr, info):
+     if boxed:
+         args_meta += ['union', 'alternate']
+     check_type(info, "'data' for command '%s'" % name,
+-               expr.get('data'), allow_dict=not boxed, allow_optional=True,
++               expr.get('data'), allow_dict=not boxed,
+                allow_metas=args_meta)
+     returns_meta = ['union', 'struct']
+     if name in returns_whitelist:
+@@ -704,8 +703,7 @@ def check_event(expr, info):
+     if boxed:
+         meta += ['union', 'alternate']
+     check_type(info, "'data' for event '%s'" % name,
+-               expr.get('data'), allow_dict=not boxed, allow_optional=True,
+-               allow_metas=meta)
++               expr.get('data'), allow_dict=not boxed, allow_metas=meta)
  
  
- def texi_example(doc):
-@@ -71,8 +74,7 @@ def texi_format(doc):
-     - */-: generates an @itemize list
-     """
-     ret = ''
--    doc = subst_braces(doc)
--    doc = subst_vars(doc)
-+    doc = subst_special(doc)
-     doc = subst_emph(doc)
-     doc = subst_strong(doc)
-     inlist = ''
-diff --git a/tests/qapi-schema/doc-good.json b/tests/qapi-schema/doc-good.json
-index 54a0012d5f..274004a8b6 100644
---- a/tests/qapi-schema/doc-good.json
-+++ b/tests/qapi-schema/doc-good.json
-@@ -10,7 +10,7 @@
- #
- # *strong* _with emphasis_
- # @var {in braces}
--# lone @ BUG: gets passed to Texinfo unescaped
-+# lone @
- # * List item one
- # - Two, multiple
- #   lines
-diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.out
-index a62d2d879c..46261d5010 100644
---- a/tests/qapi-schema/doc-good.out
-+++ b/tests/qapi-schema/doc-good.out
-@@ -38,7 +38,7 @@ doc freeform
+ def check_union(expr, info):
+@@ -728,8 +726,7 @@ def check_union(expr, info):
+     else:
+         # The object must have a string or dictionary 'base'.
+         check_type(info, "'base' for union '%s'" % name,
+-                   base, allow_dict=True, allow_optional=True,
+-                   allow_metas=['struct'])
++                   base, allow_dict=True, allow_metas=['struct'])
+         if not base:
+             raise QAPISemError(info, "Flat union '%s' must have a base"
+                                % name)
+@@ -843,7 +840,7 @@ def check_struct(expr, info):
+     members = expr['data']
  
- *strong* _with emphasis_
- @var {in braces}
--lone @ BUG: gets passed to Texinfo unescaped
-+lone @
- * List item one
- - Two, multiple
- lines
-diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good.texi
-index 3b77f2f675..8777cbb7fb 100644
---- a/tests/qapi-schema/doc-good.texi
-+++ b/tests/qapi-schema/doc-good.texi
-@@ -4,7 +4,7 @@
+     check_type(info, "'data' for struct '%s'" % name, members,
+-               allow_dict=True, allow_optional=True)
++               allow_dict=True)
+     check_type(info, "'base' for struct '%s'" % name, expr.get('base'),
+                allow_metas=['struct'])
  
- @strong{strong} @emph{with emphasis}
- @code{var} @{in braces@}
--lone @ BUG: gets passed to Texinfo unescaped
-+lone @@
- @itemize @bullet
- @item
- List item one
 -- 
 2.13.6
