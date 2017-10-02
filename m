@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dyuwl-00051F-R6
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 03:15:24 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dyvOJ-0008F0-5p
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 03:43:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dyuwe-0003ig-50
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 03:15:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35068)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dyuwd-0003hQ-VL
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 03:15:16 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170804012551.2714-1-eblake@redhat.com>
-	<20170804012551.2714-6-eblake@redhat.com>
-	<6f449d3a-bff7-f3bd-23e2-7b56258ee8c9@redhat.com>
-Date: Mon, 02 Oct 2017 09:15:00 +0200
-In-Reply-To: <6f449d3a-bff7-f3bd-23e2-7b56258ee8c9@redhat.com> (Eric Blake's
-	message of "Mon, 11 Sep 2017 16:52:06 -0500")
-Message-ID: <87o9pqqavf.fsf@dusky.pond.sub.org>
+	(envelope-from <eric.auger@redhat.com>) id 1dyvOF-0001Wa-BL
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 03:43:50 -0400
+References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
+	<1504286483-23327-2-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA8k4nAjqJ_Mu5ZZ8ygMMJikX17BCB3M0ZkbQBsKVLt5TQ@mail.gmail.com>
+	<CADD6c-iohAZO7DLsYfh+sRz0SWyxWW0ja_tdFhdemgWJafHJjg@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <6af2c711-5f6b-d8e1-d0e3-21bfb3e5c98c@redhat.com>
+Date: Mon, 2 Oct 2017 09:43:20 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 05/22] qobject: Simplify
- qobject_from_jsonv()
+In-Reply-To: <CADD6c-iohAZO7DLsYfh+sRz0SWyxWW0ja_tdFhdemgWJafHJjg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 01/20] hw/arm/smmu-common: smmu base
+ device and datatypes
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -28,34 +25,64 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Prem Mallappa <prem.mallappa@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, Radha Mohan <mohun106@gmail.com>, Trey Cain <tcain@qti.qualcomm.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Will Deacon <will.deacon@arm.com>, jean-philippe.brucker@arm.com, robin.murphy@arm.com, Peter Xu <peterx@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, wtownsen@redhat.com
 List-ID: <qemu-devel.nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+Hi Prem,
 
-> On 08/03/2017 08:25 PM, Eric Blake wrote:
->> qobject_from_jsonv() was unusual in that it took a va_list*, instead
->> of the more typical va_list; this was so that callers could pass
->> NULL to avoid % interpolation.  While this works under the hood, it
->> is awkward for callers, so move the magic into qjson.c rather than
->> in the public interface, and finally improve the documentation of
->> qobject_from_jsonf().
->> 
->
->> +/*
->> + * va_list form of qobject_from_jsonf().
->> + *
->> + * IMPORTANT: This function aborts on error, thus it must not
->> + * be used with untrusted arguments.
->> + */
->> +QObject *qobject_from_jsonv(const char *string, va_list ap)
->> +{
->
-> Given your comments on vararg naming elsewhere in the series, I'm also
-> thinking this is a good chance to fix this to be named
-> qobject_from_vjsonf() (making it obvious it is the va_list form of
-> formatted json, and similar to printf/vprintf or my
-> qtest_startf/qtest_vstartf in my v7 preliminary cleanup series).
+On 30/09/2017 10:28, Prem Mallappa wrote:
+> All,
+> 
+> I am no longer associated with Broadcom, so can't help much here I guess.
+> 
+> If there is anything else I can do; please let me know.
 
-Yes, please.
+Thank you very much for your reply. We are going to ask Broadcom's
+representatives.
+
+Thanks
+
+Eric
+> 
+> Cheers,
+> /Prem
+> 
+> 
+> 
+> --
+> Prem
+> 
+> On Wed, Sep 27, 2017 at 11:08 PM, Peter Maydell
+> <peter.maydell@linaro.org <mailto:peter.maydell@linaro.org>> wrote:
+> 
+>     On 1 September 2017 at 10:21, Eric Auger <eric.auger@redhat.com
+>     <mailto:eric.auger@redhat.com>> wrote:
+>     > The patch introduces the smmu base device and class for the ARM
+>     > smmu. Devices for specific versions will be derived from this
+>     > base device.
+>     >
+>     > We also introduce some important datatypes.
+>     >
+>     > Signed-off-by: Eric Auger <eric.auger@redhat.com <mailto:eric.auger@redhat.com>>
+>     > Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com <mailto:prem.mallappa@broadcom.com>>
+> 
+>     > +/*
+>     > + * Copyright (C) 2014-2016 Broadcom Corporation
+>     > + * Copyright (c) 2017 Red Hat, Inc.
+>     > + * Written by Prem Mallappa, Eric Auger
+>     > + *
+>     > + * This program is free software; you can redistribute it and/or modify
+>     > + * it under the terms of the GNU General Public License version 2 as
+>     > + * published by the Free Software Foundation.
+> 
+>     Really GPL-2-only ?
+> 
+>     Unless there's a good reason, you should probably fix this (including
+>     getting an ack from Prem/Broadcom where it applies to code that came
+>     from him).
+> 
+>     thanks
+>     -- PMM
+> 
+> 
