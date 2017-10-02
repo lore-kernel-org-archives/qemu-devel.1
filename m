@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dyzzU-0008SJ-Sq
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:38:37 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dz00f-0000XO-UK
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:39:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dyzzQ-0005s7-HW
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:38:32 -0400
-References: <150600964184.30533.472565821627831467.stgit@bahia.lan>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e37fe041-e70a-e9b3-34cf-d0b92b6b863f@redhat.com>
-Date: Mon, 2 Oct 2017 14:38:24 +0200
-MIME-Version: 1.0
-In-Reply-To: <150600964184.30533.472565821627831467.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <wei.w.wang@intel.com>) id 1dz00a-0006Up-UM
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:39:45 -0400
+Received: from mga04.intel.com ([192.55.52.120]:51538)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dz00a-0006Tu-L0
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:39:40 -0400
+From: "Wang, Wei W" <wei.w.wang@intel.com>
+Date: Mon, 2 Oct 2017 12:39:30 +0000
+Message-ID: <286AC319A985734F985F78AFA26841F73931FDB5@shsmsx102.ccr.corp.intel.com>
+References: <1506744354-20979-1-git-send-email-wei.w.wang@intel.com>
+	<1506744354-20979-4-git-send-email-wei.w.wang@intel.com>
+	<20171002072106-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20171002072106-mutt-send-email-mst@kernel.org>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] kvm: use kvm_vm_check_extension()
- with VM capabilities
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v16 3/5] virtio-balloon: VIRTIO_BALLOON_F_SG
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -23,46 +29,68 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: "'Michael S. Tsirkin'" <mst@redhat.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "mhocko@kernel.org" <mhocko@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "willy@infradead.org" <willy@infradead.org>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>
 List-ID: <qemu-devel.nongnu.org>
 
-On 21/09/2017 18:00, Greg Kurz wrote:
-> Some VM capabilities are currently checked with kvm_check_extension(). This
-> doesn't have any impact for most host architectures because they don't depend
-> on the KVM type. However, this is a problem for server-class ppc hosts that
-> can support the PR and HV KVM types. Both implementations can co-exist in the
-> kernel at the same time and we decide which one will be used with the "type"
-> argument of the KVM_CREATE_VM ioctl.
-> 
-> Each KVM type has a different set of capabilities, and checking them with
-> kvm_check_extension() will always cause KVM to assume we're in HV mode,
-> even if they are VM specific and we have explicitely requested to run in
-> PR mode. This may produce unexpected results.
-> 
-> Similar issues were recently fixed in the ppc code:
-> 
-> https://github.com/qemu/qemu/commit/70a0c19e83aa4c71c879d51e426e89e4b3d4e014
-> https://github.com/dgibson/qemu/commit/b152d74ebaed61f89fa1ab2c9b1526d9e9dabae5
-> 
-> This series focuses on capabilities that are checked by the common code.
+On Monday, October 2, 2017 12:30 PM, Michael S. Tsirkin wrote:
+> On Sat, Sep 30, 2017 at 12:05:52PM +0800, Wei Wang wrote:
+> > +static int send_balloon_page_sg(struct virtio_balloon *vb,
+> > +				 struct virtqueue *vq,
+> > +				 void *addr,
+> > +				 uint32_t size,
+> > +				 bool batch)
+> > +{
+> > +	int err;
+> > +
+> > +	err =3D add_one_sg(vq, addr, size);
+> > +
+> > +	/* If batchng is requested, we batch till the vq is full */
+>=20
+> typo
+>=20
+> > +	if (!batch || !vq->num_free)
+> > +		kick_and_wait(vq, vb->acked);
+> > +
+> > +	return err;
+> > +}
+>=20
+> If add_one_sg fails, kick_and_wait will hang forever.
+>=20
+> The reason this might work in because
+> 1. with 1 sg there are no memory allocations 2. if adding fails on vq ful=
+l, then
+> something
+>    is in queue and will wake up kick_and_wait.
+>=20
+> So in short this is expected to never fail.
+> How about a BUG_ON here then?
+> And make it void, and add a comment with above explanation.
+>=20
 
-Queued, thanks.
 
-Paolo
+Yes, agree that this wouldn't fail - the worker thread performing the ballo=
+oning operations has been put into sleep when the vq is full, so I think th=
+ere shouldn't be anyone else to put more sgs onto the vq then.
+Btw, not sure if we need to mention memory allocation in the comment, I fou=
+nd virtqueue_add() doesn't return any error when allocation (for indirect d=
+esc-s) fails - it simply avoids the use of indirect desc.
 
-> --
-> Greg
-> 
-> ---
-> 
-> Greg Kurz (2):
->       kvm: check KVM_CAP_SYNC_MMU with kvm_vm_check_extension()
->       kvm: check KVM_CAP_NR_VCPUS with kvm_vm_check_extension()
-> 
-> 
->  accel/kvm/kvm-all.c    |   51 +++++++++++++++++++++++++-----------------------
->  accel/stubs/kvm-stub.c |    4 ++--
->  include/sysemu/kvm.h   |    2 +-
->  3 files changed, 30 insertions(+), 27 deletions(-)
-> 
+What do you think of the following?=20
+
+err =3D add_one_sg(vq, addr, size);
+/*=20
+  * This is expected to never fail: there is always at least 1 entry availa=
+ble on the vq,
+  * because when the vq is full the worker thread that adds the sg will be =
+put into
+  * sleep until at least 1 entry is available to use.
+  */
+BUG_ON(err);
+
+Best,
+Wei
+
+
+
+=20
