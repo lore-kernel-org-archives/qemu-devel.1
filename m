@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dz1wT-0005At-1i
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:43:38 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dz1zL-0007C1-90
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:46:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dz1wQ-00055A-42
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:43:33 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:45221)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dz1zG-00086y-Kk
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:46:31 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:35157)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dz1wP-00054j-TO
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:43:30 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id q124so11088050wmb.0
-	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 07:43:29 -0700 (PDT)
-References: <20170928165414.7339-1-richard.henderson@linaro.org>
-	<20170928165414.7339-10-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170928165414.7339-10-richard.henderson@linaro.org>
-Date: Mon, 02 Oct 2017 15:43:27 +0100
-Message-ID: <87y3otzk34.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dz1zG-00086e-EM
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:46:26 -0400
+Received: by mail-qk0-x243.google.com with SMTP id w63so2430811qkd.2
+	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 07:46:26 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
+	<1506935300-132598-3-git-send-email-imammedo@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <578ced11-b54e-8de6-64f1-d346141f0ec4@amsat.org>
+Date: Mon, 2 Oct 2017 11:46:22 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1506935300-132598-3-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 9/9] disas: Add capstone as submodule
+Subject: Re: [Qemu-devel] [PATCH 02/38] alpha: cleanup cpu type name
+ composition
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -29,104 +35,227 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
+To: Igor Mammedov <imammedo@redhat.com>, rth@twiddle.net
 Cc: qemu-devel@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
+On 10/02/2017 06:07 AM, Igor Mammedov wrote:
+> Introduce ALPHA_CPU_TYPE_NAME macro to replace rather ununique
+> TYPE macro that alpha uses. With new macro it will follow
+> the same naming convention as other targets.
+> 
+> While at it put scattered TypeInfo into one array which places
+> type desriptions at one place and reduces code a bit.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> Do not require the submodule, but use it if present (in preference
-> even to a system copy).  This will allow us to easily use capstone
-> in older systems for which a package is not available, and also
-> easily track bug fixes from upstream.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  Makefile    | 13 +++++++++++++
->  .gitmodules |  3 +++
->  capstone    |  1 +
->  configure   | 12 +++++++++++-
->  4 files changed, 28 insertions(+), 1 deletion(-)
->  create mode 160000 capstone
->
-> diff --git a/Makefile b/Makefile
-> index cee6e28659..7ff366f6ca 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -336,6 +336,19 @@ subdir-dtc:dtc/libfdt dtc/tests
->  dtc/%:
->  	mkdir -p $@
->
-> +# Overriding CFLAGS causes us to lose defines added in the sub-makefile.
-> +# Not overriding CFLAGS leads to mis-matches between compilation modes.
-> +# Therefore we replicate some of the logic in the sub-makefile.
-> +CAP_CFLAGS = $(subst -Werror,,$(CFLAGS) $(QEMU_CFLAGS))
-> +CAP_CFLAGS += -DCAPSTONE_USE_SYS_DYN_MEM
-> +CAP_CFLAGS += -DCAPSTONE_HAS_ARM
-> +CAP_CFLAGS += -DCAPSTONE_HAS_ARM64
-> +CAP_CFLAGS += -DCAPSTONE_HAS_POWERPC
-> +CAP_CFLAGS += -DCAPSTONE_HAS_X86
+> CC: rth@twiddle.net
+> ---
+>   target/alpha/cpu.h |   3 ++
+>   target/alpha/cpu.c | 107 +++++++++++++++++------------------------------------
+>   2 files changed, 37 insertions(+), 73 deletions(-)
+> 
+> diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
+> index 6ae2409..0a9ad35 100644
+> --- a/target/alpha/cpu.h
+> +++ b/target/alpha/cpu.h
+> @@ -470,6 +470,9 @@ void alpha_translate_init(void);
+>   
+>   #define cpu_init(cpu_model) cpu_generic_init(TYPE_ALPHA_CPU, cpu_model)
+>   
+> +#define ALPHA_CPU_TYPE_SUFFIX "-" TYPE_ALPHA_CPU
+> +#define ALPHA_CPU_TYPE_NAME(model) model ALPHA_CPU_TYPE_SUFFIX
 > +
-> +subdir-capstone:
-> +	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=no BUILDDIR="$(BUILD_DIR)/capstone" CC="$(CC)" AR="$(AR)" LD="$(LD)" CFLAGS="$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(BUILD_DIR)/capstone/libcapstone.a)
+>   void alpha_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+>   /* you can call this signal handler from your SIGBUS and SIGSEGV
+>      signal handlers to inform the virtual CPU of exceptions. non zero
+> diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
+> index b8a21f4..81a39c4 100644
+> --- a/target/alpha/cpu.c
+> +++ b/target/alpha/cpu.c
+> @@ -108,21 +108,18 @@ void alpha_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+>   }
+>   
+>   /* Models */
+> -
+> -#define TYPE(model) model "-" TYPE_ALPHA_CPU
+> -
+>   typedef struct AlphaCPUAlias {
+>       const char *alias;
+>       const char *typename;
+>   } AlphaCPUAlias;
+>   
+>   static const AlphaCPUAlias alpha_cpu_aliases[] = {
+> -    { "21064",   TYPE("ev4") },
+> -    { "21164",   TYPE("ev5") },
+> -    { "21164a",  TYPE("ev56") },
+> -    { "21164pc", TYPE("pca56") },
+> -    { "21264",   TYPE("ev6") },
+> -    { "21264a",  TYPE("ev67") },
+> +    { "21064",   ALPHA_CPU_TYPE_NAME("ev4") },
+> +    { "21164",   ALPHA_CPU_TYPE_NAME("ev5") },
+> +    { "21164a",  ALPHA_CPU_TYPE_NAME("ev56") },
+> +    { "21164pc", ALPHA_CPU_TYPE_NAME("pca56") },
+> +    { "21264",   ALPHA_CPU_TYPE_NAME("ev6") },
+> +    { "21264a",  ALPHA_CPU_TYPE_NAME("ev67") },
+>   };
+>   
+>   static ObjectClass *alpha_cpu_class_by_name(const char *cpu_model)
+> @@ -145,7 +142,7 @@ static ObjectClass *alpha_cpu_class_by_name(const char *cpu_model)
+>           }
+>       }
+>   
+> -    typename = g_strdup_printf("%s-" TYPE_ALPHA_CPU, cpu_model);
+> +    typename = g_strdup_printf(ALPHA_CPU_TYPE_NAME("%s"), cpu_model);
+>       oc = object_class_by_name(typename);
+>       g_free(typename);
+>       if (oc != NULL && object_class_is_abstract(oc)) {
+> @@ -155,7 +152,7 @@ static ObjectClass *alpha_cpu_class_by_name(const char *cpu_model)
+>       /* TODO: remove match everything nonsense */
+>       /* Default to ev67; no reason not to emulate insns by default. */
+>       if (!oc) {
+> -        oc = object_class_by_name(TYPE("ev67"));
+> +        oc = object_class_by_name(ALPHA_CPU_TYPE_NAME("ev67"));
+>       }
+>   
+>       return oc;
+> @@ -169,12 +166,6 @@ static void ev4_cpu_initfn(Object *obj)
+>       env->implver = IMPLVER_2106x;
+>   }
+>   
+> -static const TypeInfo ev4_cpu_type_info = {
+> -    .name = TYPE("ev4"),
+> -    .parent = TYPE_ALPHA_CPU,
+> -    .instance_init = ev4_cpu_initfn,
+> -};
+> -
+>   static void ev5_cpu_initfn(Object *obj)
+>   {
+>       AlphaCPU *cpu = ALPHA_CPU(obj);
+> @@ -183,12 +174,6 @@ static void ev5_cpu_initfn(Object *obj)
+>       env->implver = IMPLVER_21164;
+>   }
+>   
+> -static const TypeInfo ev5_cpu_type_info = {
+> -    .name = TYPE("ev5"),
+> -    .parent = TYPE_ALPHA_CPU,
+> -    .instance_init = ev5_cpu_initfn,
+> -};
+> -
+>   static void ev56_cpu_initfn(Object *obj)
+>   {
+>       AlphaCPU *cpu = ALPHA_CPU(obj);
+> @@ -197,12 +182,6 @@ static void ev56_cpu_initfn(Object *obj)
+>       env->amask |= AMASK_BWX;
+>   }
+>   
+> -static const TypeInfo ev56_cpu_type_info = {
+> -    .name = TYPE("ev56"),
+> -    .parent = TYPE("ev5"),
+> -    .instance_init = ev56_cpu_initfn,
+> -};
+> -
+>   static void pca56_cpu_initfn(Object *obj)
+>   {
+>       AlphaCPU *cpu = ALPHA_CPU(obj);
+> @@ -211,12 +190,6 @@ static void pca56_cpu_initfn(Object *obj)
+>       env->amask |= AMASK_MVI;
+>   }
+>   
+> -static const TypeInfo pca56_cpu_type_info = {
+> -    .name = TYPE("pca56"),
+> -    .parent = TYPE("ev56"),
+> -    .instance_init = pca56_cpu_initfn,
+> -};
+> -
+>   static void ev6_cpu_initfn(Object *obj)
+>   {
+>       AlphaCPU *cpu = ALPHA_CPU(obj);
+> @@ -226,12 +199,6 @@ static void ev6_cpu_initfn(Object *obj)
+>       env->amask = AMASK_BWX | AMASK_FIX | AMASK_MVI | AMASK_TRAP;
+>   }
+>   
+> -static const TypeInfo ev6_cpu_type_info = {
+> -    .name = TYPE("ev6"),
+> -    .parent = TYPE_ALPHA_CPU,
+> -    .instance_init = ev6_cpu_initfn,
+> -};
+> -
+>   static void ev67_cpu_initfn(Object *obj)
+>   {
+>       AlphaCPU *cpu = ALPHA_CPU(obj);
+> @@ -240,17 +207,6 @@ static void ev67_cpu_initfn(Object *obj)
+>       env->amask |= AMASK_CIX | AMASK_PREFETCH;
+>   }
+>   
+> -static const TypeInfo ev67_cpu_type_info = {
+> -    .name = TYPE("ev67"),
+> -    .parent = TYPE("ev6"),
+> -    .instance_init = ev67_cpu_initfn,
+> -};
+> -
+> -static const TypeInfo ev68_cpu_type_info = {
+> -    .name = TYPE("ev68"),
+> -    .parent = TYPE("ev67"),
+> -};
+> -
+>   static void alpha_cpu_initfn(Object *obj)
+>   {
+>       CPUState *cs = CPU(obj);
+> @@ -303,26 +259,31 @@ static void alpha_cpu_class_init(ObjectClass *oc, void *data)
+>       cc->gdb_num_core_regs = 67;
+>   }
+>   
+> -static const TypeInfo alpha_cpu_type_info = {
+> -    .name = TYPE_ALPHA_CPU,
+> -    .parent = TYPE_CPU,
+> -    .instance_size = sizeof(AlphaCPU),
+> -    .instance_init = alpha_cpu_initfn,
+> -    .abstract = true,
+> -    .class_size = sizeof(AlphaCPUClass),
+> -    .class_init = alpha_cpu_class_init,
+> +#define DEFINE_ALPHA_CPU_TYPE(base_type, cpu_model, initfn) \
+> +     {                                                      \
+> +         .parent = base_type,                               \
+> +         .instance_init = initfn,                           \
+> +         .name = ALPHA_CPU_TYPE_NAME(cpu_model),            \
+> +     }
 > +
->  $(SUBDIR_RULES): libqemuutil.a $(common-obj-y) $(chardev-obj-y) \
->  	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
->
-> diff --git a/.gitmodules b/.gitmodules
-> index 84c54cdc49..bcb80d701a 100644
-> --- a/.gitmodules
-> +++ b/.gitmodules
-> @@ -34,3 +34,6 @@
->  [submodule "roms/QemuMacDrivers"]
->  	path = roms/QemuMacDrivers
->  	url = git://git.qemu.org/QemuMacDrivers.git
-> +[submodule "capstone"]
-> +	path = capstone
-> +	url = https://github.com/aquynh/capstone.git
-> diff --git a/capstone b/capstone
-> new file mode 160000
-> index 0000000000..a279481dbf
-> --- /dev/null
-> +++ b/capstone
-> @@ -0,0 +1 @@
-> +Subproject commit a279481dbfd54bb1e2336d771e89978cc6d43176
-> diff --git a/configure b/configure
-> index 3777db91b6..a6cf0a5a15 100755
-> --- a/configure
-> +++ b/configure
-> @@ -4380,7 +4380,14 @@ fi
->  # capstone
->
->  if test "$capstone" != no; then
-> -  if $pkg_config capstone; then
-> +  if test -f ${source_path}/capstone/Makefile ; then
-> +    # have submodule capstone - use it
-> +    capstone=yes
-> +    capstone_internal=yes
-> +    mkdir -p capstone
-
-Having a mkdir -p here seems a little out of place. Shouldn't the build
-directory creation be handled by the make recipe?
-
-> +    QEMU_CFLAGS="$QEMU_CFLAGS -I\$(SRC_PATH)/capstone/include"
-> +    LIBS="\$(BUILD_DIR)/capstone/libcapstone.a $LIBS"
-> +  elif $pkg_config capstone; then
->      capstone=yes
->      QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags capstone)"
->      LIBS="$($pkg_config --libs capstone) $LIBS"
-> @@ -6596,6 +6603,9 @@ done # for target in $targets
->  if [ "$dtc_internal" = "yes" ]; then
->    echo "config-host.h: subdir-dtc" >> $config_host_mak
->  fi
-> +if [ "$capstone_internal" = "yes" ]; then
-> +  echo "config-host.h: subdir-capstone" >> $config_host_mak
-> +fi
->
->  if test "$numa" = "yes"; then
->    echo "CONFIG_NUMA=y" >> $config_host_mak
-
-
---
-Alex Bennée
+> +static const TypeInfo alpha_cpu_type_infos[] = {
+> +    {
+> +        .name = TYPE_ALPHA_CPU,
+> +        .parent = TYPE_CPU,
+> +        .instance_size = sizeof(AlphaCPU),
+> +        .instance_init = alpha_cpu_initfn,
+> +        .abstract = true,
+> +        .class_size = sizeof(AlphaCPUClass),
+> +        .class_init = alpha_cpu_class_init,
+> +    },
+> +    DEFINE_ALPHA_CPU_TYPE(TYPE_ALPHA_CPU, "ev4", ev4_cpu_initfn),
+> +    DEFINE_ALPHA_CPU_TYPE(TYPE_ALPHA_CPU, "ev5", ev5_cpu_initfn),
+> +    DEFINE_ALPHA_CPU_TYPE(ALPHA_CPU_TYPE_NAME("ev5"), "ev56", ev56_cpu_initfn),
+> +    DEFINE_ALPHA_CPU_TYPE(ALPHA_CPU_TYPE_NAME("ev56"), "pca56",
+> +                          pca56_cpu_initfn),
+> +    DEFINE_ALPHA_CPU_TYPE(TYPE_ALPHA_CPU, "ev6", ev6_cpu_initfn),
+> +    DEFINE_ALPHA_CPU_TYPE(ALPHA_CPU_TYPE_NAME("ev6"), "ev67", ev67_cpu_initfn),
+> +    DEFINE_ALPHA_CPU_TYPE(ALPHA_CPU_TYPE_NAME("ev67"), "ev68", NULL),
+>   };
+>   
+> -static void alpha_cpu_register_types(void)
+> -{
+> -    type_register_static(&alpha_cpu_type_info);
+> -    type_register_static(&ev4_cpu_type_info);
+> -    type_register_static(&ev5_cpu_type_info);
+> -    type_register_static(&ev56_cpu_type_info);
+> -    type_register_static(&pca56_cpu_type_info);
+> -    type_register_static(&ev6_cpu_type_info);
+> -    type_register_static(&ev67_cpu_type_info);
+> -    type_register_static(&ev68_cpu_type_info);
+> -}
+> -
+> -type_init(alpha_cpu_register_types)
+> +type_init_from_array(alpha_cpu_type_infos)
+> 
