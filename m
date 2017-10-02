@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dz0pa-0006AW-UD
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:32:27 -0400
+	(envelope-from <armbru@redhat.com>) id 1dz0rq-0007LJ-5I
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:34:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dz0pZ-0002U0-HQ
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:32:22 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:26577 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dz0pZ-0002S5-0R
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:32:21 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20170913181910.29688-1-mreitz@redhat.com>
-	<20170913181910.29688-13-mreitz@redhat.com>
-	<042b7c75-96a8-a695-5702-289eb68b5f54@virtuozzo.com>
-Message-ID: <b426238f-30d4-8617-6c86-3c312e4f6fd2@virtuozzo.com>
-Date: Mon, 2 Oct 2017 16:32:00 +0300
+	(envelope-from <armbru@redhat.com>) id 1dz0rn-0003do-H4
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:34:42 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170916185123.29255-1-mreitz@redhat.com>
+	<20170916185123.29255-7-mreitz@redhat.com>
+Date: Mon, 02 Oct 2017 15:34:19 +0200
+In-Reply-To: <20170916185123.29255-7-mreitz@redhat.com> (Max Reitz's message
+	of "Sat, 16 Sep 2017 20:51:23 +0200")
+Message-ID: <87h8vhk71g.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <042b7c75-96a8-a695-5702-289eb68b5f54@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH 12/18] block/dirty-bitmap: Add
- bdrv_dirty_iter_next_area
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 6/6] tests: Add check-qobject for
+ equality tests
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -30,91 +23,404 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-MjUuMDkuMjAxNyAxODo0OSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToN
-Cj4gSSBoYXZlIGEgcGF0Y2ggb24gbGlzdCwgd2hpY2ggYWRkcyBoYml0bWFwX25leHRfemVy
-byBmdW5jdGlvbiwgaXQgbWF5IA0KPiBoZWxwDQo+IGh0dHBzOi8vbGlzdHMubm9uZ251Lm9y
-Zy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE3LTAyL21zZzAwODA5Lmh0bWwNCg0KdGhl
-cmUgaXMgYSBtaXN0YWtlIGluIHRoaXMgaGJpdG1hcF9uZXh0X3plcm8sIEknbGwgc2VuZCB0
-b2RheSBjb3JyZWN0ZWQgDQp2ZXJzaW9uIGFzIHBhcnQgb2Ygc21hbGwgYmFja3VwLXJlbGF0
-ZWQgc2VyaWVzLg0KDQoNCj4NCj4gMTMuMDkuMjAxNyAyMToxOSwgTWF4IFJlaXR6IHdyb3Rl
-Og0KPj4gVGhpcyBuZXcgZnVuY3Rpb24gYWxsb3dzIHRvIGxvb2sgZm9yIGEgY29uc2VjdXRp
-dmVseSBkaXJ0eSBhcmVhIGluIGENCj4+IGRpcnR5IGJpdG1hcC4NCj4+DQo+PiBTaWduZWQt
-b2ZmLWJ5OiBNYXggUmVpdHogPG1yZWl0ekByZWRoYXQuY29tPg0KPj4gLS0tDQo+PiDCoCBp
-bmNsdWRlL2Jsb2NrL2RpcnR5LWJpdG1hcC5oIHzCoCAyICsrDQo+PiDCoCBibG9jay9kaXJ0
-eS1iaXRtYXAuY8KgwqDCoMKgwqDCoMKgwqAgfCA1MiANCj4+ICsrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+PiDCoCAyIGZpbGVzIGNoYW5nZWQsIDU0
-IGluc2VydGlvbnMoKykNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9ibG9jay9kaXJ0
-eS1iaXRtYXAuaCBiL2luY2x1ZGUvYmxvY2svZGlydHktYml0bWFwLmgNCj4+IGluZGV4IGE3
-OWE1OGQyYzMuLjc2NTQ3NDg3MDAgMTAwNjQ0DQo+PiAtLS0gYS9pbmNsdWRlL2Jsb2NrL2Rp
-cnR5LWJpdG1hcC5oDQo+PiArKysgYi9pbmNsdWRlL2Jsb2NrL2RpcnR5LWJpdG1hcC5oDQo+
-PiBAQCAtOTAsNiArOTAsOCBAQCB2b2lkIGJkcnZfc2V0X2RpcnR5X2JpdG1hcF9sb2NrZWQo
-QmRydkRpcnR5Qml0bWFwIA0KPj4gKmJpdG1hcCwNCj4+IMKgIHZvaWQgYmRydl9yZXNldF9k
-aXJ0eV9iaXRtYXBfbG9ja2VkKEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwLA0KPj4gwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgaW50NjRfdCBjdXJfc2VjdG9yLCBpbnQ2NF90IA0KPj4gbnJfc2Vj
-dG9ycyk7DQo+PiDCoCBpbnQ2NF90IGJkcnZfZGlydHlfaXRlcl9uZXh0KEJkcnZEaXJ0eUJp
-dG1hcEl0ZXIgKml0ZXIpOw0KPj4gK2Jvb2wgYmRydl9kaXJ0eV9pdGVyX25leHRfYXJlYShC
-ZHJ2RGlydHlCaXRtYXBJdGVyICppdGVyLCB1aW50NjRfdCANCj4+IG1heF9vZmZzZXQsDQo+
-PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgIHVpbnQ2NF90ICpvZmZzZXQsIGludCAqYnl0ZXMpOw0KPj4gwqAgdm9pZCBi
-ZHJ2X3NldF9kaXJ0eV9pdGVyKEJkcnZEaXJ0eUJpdG1hcEl0ZXIgKmhiaSwgaW50NjRfdCAN
-Cj4+IHNlY3Rvcl9udW0pOw0KPj4gwqAgaW50NjRfdCBiZHJ2X2dldF9kaXJ0eV9jb3VudChC
-ZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCk7DQo+PiDCoCBpbnQ2NF90IGJkcnZfZ2V0X21ldGFf
-ZGlydHlfY291bnQoQmRydkRpcnR5Qml0bWFwICpiaXRtYXApOw0KPj4gZGlmZiAtLWdpdCBh
-L2Jsb2NrL2RpcnR5LWJpdG1hcC5jIGIvYmxvY2svZGlydHktYml0bWFwLmMNCj4+IGluZGV4
-IGFlZTU3Y2Y4YzguLjgxYjJmNzgwMTYgMTAwNjQ0DQo+PiAtLS0gYS9ibG9jay9kaXJ0eS1i
-aXRtYXAuYw0KPj4gKysrIGIvYmxvY2svZGlydHktYml0bWFwLmMNCj4+IEBAIC01NTAsNiAr
-NTUwLDU4IEBAIGludDY0X3QgYmRydl9kaXJ0eV9pdGVyX25leHQoQmRydkRpcnR5Qml0bWFw
-SXRlciANCj4+ICppdGVyKQ0KPj4gwqDCoMKgwqDCoCByZXR1cm4gaGJpdG1hcF9pdGVyX25l
-eHQoJml0ZXItPmhiaSwgdHJ1ZSk7DQo+PiDCoCB9DQo+PiDCoCArLyoqDQo+PiArICogUmV0
-dXJuIHRoZSBuZXh0IGNvbnNlY3V0aXZlbHkgZGlydHkgYXJlYSBpbiB0aGUgZGlydHkgYml0
-bWFwDQo+PiArICogYmVsb25naW5nIHRvIHRoZSBnaXZlbiBpdGVyYXRvciBAaXRlci4NCj4+
-ICsgKg0KPj4gKyAqIEBtYXhfb2Zmc2V0OiBNYXhpbXVtIHZhbHVlIHRoYXQgbWF5IGJlIHJl
-dHVybmVkIGZvcg0KPj4gKyAqwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKm9mZnNldCAr
-ICpieXRlcw0KPj4gKyAqIEBvZmZzZXQ6wqDCoMKgwqAgV2lsbCBjb250YWluIHRoZSBzdGFy
-dCBvZmZzZXQgb2YgdGhlIG5leHQgZGlydHkgYXJlYQ0KPj4gKyAqIEBieXRlczrCoMKgwqDC
-oMKgIFdpbGwgY29udGFpbiB0aGUgbGVuZ3RoIG9mIHRoZSBuZXh0IGRpcnR5IGFyZWENCj4+
-ICsgKg0KPj4gKyAqIFJldHVybnM6IFRydWUgaWYgYSBkaXJ0eSBhcmVhIGNvdWxkIGJlIGZv
-dW5kIGJlZm9yZSBtYXhfb2Zmc2V0DQo+PiArICrCoMKgwqDCoMKgwqDCoMKgwqAgKHdoaWNo
-IG1lYW5zIHRoYXQgKm9mZnNldCBhbmQgKmJ5dGVzIHRoZW4gY29udGFpbiB2YWxpZA0KPj4g
-KyAqwqDCoMKgwqDCoMKgwqDCoMKgIHZhbHVlcyksIGZhbHNlIG90aGVyd2lzZS4NCj4+ICsg
-Ki8NCj4+ICtib29sIGJkcnZfZGlydHlfaXRlcl9uZXh0X2FyZWEoQmRydkRpcnR5Qml0bWFw
-SXRlciAqaXRlciwgdWludDY0X3QgDQo+PiBtYXhfb2Zmc2V0LA0KPj4gK8KgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB1aW50
-NjRfdCAqb2Zmc2V0LCBpbnQgKmJ5dGVzKQ0KPj4gK3sNCj4+ICvCoMKgwqAgdWludDMyX3Qg
-Z3JhbnVsYXJpdHkgPSBiZHJ2X2RpcnR5X2JpdG1hcF9ncmFudWxhcml0eShpdGVyLT5iaXRt
-YXApOw0KPj4gK8KgwqDCoCB1aW50NjRfdCBncmFuX21heF9vZmZzZXQ7DQo+PiArwqDCoMKg
-IGludCBzZWN0b3JfZ3JhbiA9IGdyYW51bGFyaXR5ID4+IEJEUlZfU0VDVE9SX0JJVFM7DQo+
-PiArwqDCoMKgIGludDY0X3QgcmV0Ow0KPj4gK8KgwqDCoCBpbnQgc2l6ZTsNCj4+ICsNCj4+
-ICvCoMKgwqAgaWYgKERJVl9ST1VORF9VUChtYXhfb2Zmc2V0LCBCRFJWX1NFQ1RPUl9TSVpF
-KSA9PSANCj4+IGl0ZXItPmJpdG1hcC0+c2l6ZSkgew0KPj4gK8KgwqDCoMKgwqDCoMKgIC8q
-IElmIG1heF9vZmZzZXQgcG9pbnRzIHRvIHRoZSBpbWFnZSBlbmQsIHJvdW5kIGl0IHVwIGJ5
-IHRoZQ0KPj4gK8KgwqDCoMKgwqDCoMKgwqAgKiBiaXRtYXAgZ3JhbnVsYXJpdHkgKi8NCj4+
-ICvCoMKgwqDCoMKgwqDCoCBncmFuX21heF9vZmZzZXQgPSBST1VORF9VUChtYXhfb2Zmc2V0
-LCBncmFudWxhcml0eSk7DQo+PiArwqDCoMKgIH0gZWxzZSB7DQo+PiArwqDCoMKgwqDCoMKg
-wqAgZ3Jhbl9tYXhfb2Zmc2V0ID0gbWF4X29mZnNldDsNCj4+ICvCoMKgwqAgfQ0KPj4gKw0K
-Pj4gK8KgwqDCoCByZXQgPSBoYml0bWFwX2l0ZXJfbmV4dCgmaXRlci0+aGJpLCBmYWxzZSk7
-DQo+PiArwqDCoMKgIGlmIChyZXQgPCAwIHx8IChyZXQgPDwgQkRSVl9TRUNUT1JfQklUUykg
-KyBncmFudWxhcml0eSA+IA0KPj4gZ3Jhbl9tYXhfb2Zmc2V0KSB7DQo+PiArwqDCoMKgwqDC
-oMKgwqAgcmV0dXJuIGZhbHNlOw0KPj4gK8KgwqDCoCB9DQo+PiArDQo+PiArwqDCoMKgICpv
-ZmZzZXQgPSByZXQgPDwgQkRSVl9TRUNUT1JfQklUUzsNCj4+ICvCoMKgwqAgc2l6ZSA9IDA7
-DQo+PiArDQo+PiArwqDCoMKgIGFzc2VydChncmFudWxhcml0eSA8PSBJTlRfTUFYKTsNCj4+
-ICsNCj4+ICvCoMKgwqAgZG8gew0KPj4gK8KgwqDCoMKgwqDCoMKgIC8qIEFkdmFuY2UgaXRl
-cmF0b3IgKi8NCj4+ICvCoMKgwqDCoMKgwqDCoCByZXQgPSBoYml0bWFwX2l0ZXJfbmV4dCgm
-aXRlci0+aGJpLCB0cnVlKTsNCj4+ICvCoMKgwqDCoMKgwqDCoCBzaXplICs9IGdyYW51bGFy
-aXR5Ow0KPj4gK8KgwqDCoCB9IHdoaWxlICgocmV0IDw8IEJEUlZfU0VDVE9SX0JJVFMpICsg
-Z3JhbnVsYXJpdHkgPD0gDQo+PiBncmFuX21heF9vZmZzZXQgJiYNCj4+ICvCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgaGJpdG1hcF9pdGVyX25leHQoJml0ZXItPmhiaSwgZmFsc2UpID09
-IHJldCArIA0KPj4gc2VjdG9yX2dyYW4gJiYNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgc2l6ZSA8PSBJTlRfTUFYIC0gZ3JhbnVsYXJpdHkpOw0KPj4gKw0KPj4gK8KgwqDCoCAq
-Ynl0ZXMgPSBNSU4oc2l6ZSwgbWF4X29mZnNldCAtICpvZmZzZXQpOw0KPj4gK8KgwqDCoCBy
-ZXR1cm4gdHJ1ZTsNCj4+ICt9DQo+PiArDQo+PiDCoCAvKiBDYWxsZWQgd2l0aGluIGJkcnZf
-ZGlydHlfYml0bWFwX2xvY2suLnVubG9jayAqLw0KPj4gwqAgdm9pZCBiZHJ2X3NldF9kaXJ0
-eV9iaXRtYXBfbG9ja2VkKEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwLA0KPj4gwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCBpbnQ2NF90IGN1cl9zZWN0b3IsIGludDY0X3QgDQo+PiBucl9zZWN0b3JzKQ0K
-Pg0KPg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg0K
+Max Reitz <mreitz@redhat.com> writes:
+
+> Add a new test file (check-qobject.c) for unit tests that concern
+> QObjects as a whole.
+>
+> Its only purpose for now is to test the qobject_is_equal() function.
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/Makefile.include |   4 +-
+>  tests/check-qobject.c  | 315 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 318 insertions(+), 1 deletion(-)
+>  create mode 100644 tests/check-qobject.c
+>
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index fae5715e9c..40b8b4e98f 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -41,6 +41,7 @@ check-unit-y += tests/check-qlist$(EXESUF)
+>  gcov-files-check-qlist-y = qobject/qlist.c
+>  check-unit-y += tests/check-qnull$(EXESUF)
+>  gcov-files-check-qnull-y = qobject/qnull.c
+> +check-unit-y += tests/check-qobject$(EXESUF)
+>  check-unit-y += tests/check-qjson$(EXESUF)
+>  gcov-files-check-qjson-y = qobject/qjson.c
+>  check-unit-y += tests/check-qlit$(EXESUF)
+> @@ -542,7 +543,7 @@ GENERATED_FILES += tests/test-qapi-types.h tests/test-qapi-visit.h \
+>  	tests/test-qmp-introspect.h
+>  
+>  test-obj-y = tests/check-qnum.o tests/check-qstring.o tests/check-qdict.o \
+> -	tests/check-qlist.o tests/check-qnull.o \
+> +	tests/check-qlist.o tests/check-qnull.o tests/check-qobject.o \
+>  	tests/check-qjson.o tests/check-qlit.o \
+>  	tests/test-coroutine.o tests/test-string-output-visitor.o \
+>  	tests/test-string-input-visitor.o tests/test-qobject-output-visitor.o \
+> @@ -576,6 +577,7 @@ tests/check-qstring$(EXESUF): tests/check-qstring.o $(test-util-obj-y)
+>  tests/check-qdict$(EXESUF): tests/check-qdict.o $(test-util-obj-y)
+>  tests/check-qlist$(EXESUF): tests/check-qlist.o $(test-util-obj-y)
+>  tests/check-qnull$(EXESUF): tests/check-qnull.o $(test-util-obj-y)
+> +tests/check-qobject$(EXESUF): tests/check-qobject.o $(test-util-obj-y)
+>  tests/check-qjson$(EXESUF): tests/check-qjson.o $(test-util-obj-y)
+>  tests/check-qlit$(EXESUF): tests/check-qlit.o $(test-util-obj-y)
+>  tests/check-qom-interface$(EXESUF): tests/check-qom-interface.o $(test-qom-obj-y)
+> diff --git a/tests/check-qobject.c b/tests/check-qobject.c
+> new file mode 100644
+> index 0000000000..8f1b5550c2
+> --- /dev/null
+> +++ b/tests/check-qobject.c
+> @@ -0,0 +1,315 @@
+> +/*
+> + * Generic QObject unit-tests.
+> + *
+> + * Copyright (C) 2017 Red Hat Inc.
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
+> + * See the COPYING.LIB file in the top-level directory.
+> + */
+> +#include "qemu/osdep.h"
+> +
+> +#include "qapi/qmp/types.h"
+> +#include "qemu-common.h"
+> +
+> +#include <math.h>
+> +
+> +/* Marks the end of the test_equality() argument list.
+> + * We cannot use NULL there because that is a valid argument. */
+> +static QObject _test_equality_end_of_arguments;
+
+Reserved identifier.  Please scratch the leading underscore.
+
+Also: ugh!  I would've tried arrays just to avoid this ugliness.  But
+since you've written it, and it works...
+
+> +
+> +/**
+> + * Test whether all variadic QObject *arguments are equal (@expected
+> + * is true) or whether they are all not equal (@expected is false).
+> + * Every QObject is tested to be equal to itself (to test
+> + * reflexivity), all tests are done both ways (to test symmetry), and
+> + * transitivity is not assumed but checked (each object is compared to
+> + * every other one).
+> + *
+> + * Note that qobject_is_equal() is not really an equivalence relation,
+> + * so this function may not be used for all objects (reflexivity is
+> + * not guaranteed, e.g. in the case of a QNum containing NaN).
+> + */
+> +static void do_test_equality(bool expected, ...)
+> +{
+> +    va_list ap_count, ap_extract;
+> +    QObject **args;
+> +    int arg_count = 0;
+> +    int i, j;
+> +
+> +    va_start(ap_count, expected);
+> +    va_copy(ap_extract, ap_count);
+> +    while (va_arg(ap_count, QObject *) != &_test_equality_end_of_arguments) {
+> +        arg_count++;
+> +    }
+> +    va_end(ap_count);
+> +
+> +    args = g_new(QObject *, arg_count);
+> +    for (i = 0; i < arg_count; i++) {
+> +        args[i] = va_arg(ap_extract, QObject *);
+> +    }
+> +    va_end(ap_extract);
+> +
+> +    for (i = 0; i < arg_count; i++) {
+> +        g_assert(qobject_is_equal(args[i], args[i]) == true);
+> +
+> +        for (j = i + 1; j < arg_count; j++) {
+> +            g_assert(qobject_is_equal(args[i], args[j]) == expected);
+> +        }
+> +    }
+> +}
+> +
+> +#define test_equality(expected, ...) \
+> +    do_test_equality(expected, __VA_ARGS__, &_test_equality_end_of_arguments)
+> +
+> +static void do_free_all(int _, ...)
+> +{
+> +    va_list ap;
+> +    QObject *obj;
+> +
+> +    va_start(ap, _);
+> +    while ((obj = va_arg(ap, QObject *)) != NULL) {
+> +        qobject_decref(obj);
+> +    }
+> +    va_end(ap);
+> +}
+> +
+> +#define free_all(...) \
+> +    do_free_all(0, __VA_ARGS__, NULL)
+> +
+> +static void qobject_is_equal_null_test(void)
+> +{
+> +    test_equality(false, qnull(), NULL);
+> +}
+> +
+> +static void qobject_is_equal_num_test(void)
+> +{
+> +    QNum *u0, *i0, *d0, *dnan, *um42, *im42, *dm42;
+> +    QString *s0, *s_empty;
+> +    QBool *bfalse;
+> +
+> +    u0 = qnum_from_uint(0u);
+> +    i0 = qnum_from_int(0);
+> +    d0 = qnum_from_double(0.0);
+> +    dnan = qnum_from_double(NAN);
+> +    um42 = qnum_from_uint((uint64_t)-42);
+> +    im42 = qnum_from_int(-42);
+> +    dm42 = qnum_from_double(-42.0);
+> +
+> +    s0 = qstring_from_str("0");
+> +    s_empty = qstring_new();
+> +    bfalse = qbool_from_bool(false);
+> +
+> +    /* Integers representing a mathematically equal number should
+> +     * compare equal */
+> +    test_equality(true, u0, i0);
+> +    /* Doubles, however, are always unequal to integers */
+> +    test_equality(false, u0, d0);
+> +    test_equality(false, i0, d0);
+
+Would the following be more legible?
+
+       /* Integers representing a mathematically equal number should
+        * compare equal */
+       check_equal(u0, i0);
+       /* Doubles, however, are always unequal to integers */
+       check_unequal(u0, d0);
+       check_unequal(i0, d0);
+
+(with the obvious macros check_equal() and check_unequal())
+
+> +    /* No automatic type conversion */
+> +    test_equality(false, u0, s0, s_empty, bfalse, qnull(), NULL);
+> +    test_equality(false, i0, s0, s_empty, bfalse, qnull(), NULL);
+> +    test_equality(false, d0, s0, s_empty, bfalse, qnull(), NULL);
+
+No "num" in this part.  No big deal, but perhaps you'd like to put it
+into a qobject_is_equal_mixed_test().
+
+> +
+> +    /* Do not assume any object is equal to itself -- note however
+> +     * that NaN cannot occur in a JSON object anyway. */
+> +    g_assert(qobject_is_equal(QOBJECT(dnan), QOBJECT(dnan)) == false);
+> +
+> +    /* No unsigned overflow */
+> +    test_equality(false, um42, im42);
+> +    test_equality(false, um42, dm42);
+> +    g_assert(qobject_is_equal(QOBJECT(im42), QOBJECT(dm42)) == false);
+> +    test_equality(false, im42, dm42);
+> +
+> +
+
+Scratch one blank line.
+
+> +    free_all(u0, i0, d0, dnan, um42, im42, dm42, s0, s_empty, bfalse);
+> +}
+> +
+> +static void qobject_is_equal_bool_test(void)
+> +{
+> +    QBool *btrue_0, *btrue_1, *bfalse_0, *bfalse_1;
+> +
+> +    /* Automatic type conversion is tested in the QNum test */
+> +
+> +    btrue_0 = qbool_from_bool(true);
+> +    btrue_1 = qbool_from_bool(true);
+> +    bfalse_0 = qbool_from_bool(false);
+> +    bfalse_1 = qbool_from_bool(false);
+> +
+> +    test_equality(true, btrue_0, btrue_1);
+> +    test_equality(true, bfalse_0, bfalse_1);
+> +    test_equality(false, btrue_0, bfalse_0);
+> +    test_equality(false, btrue_1, bfalse_1);
+
+The last one is kind of redundant.  Your choice.
+
+> +
+> +    free_all(btrue_0, btrue_1, bfalse_0, bfalse_1);
+> +}
+> +
+> +static void qobject_is_equal_string_test(void)
+> +{
+> +    QString *str_base, *str_whitespace_0, *str_whitespace_1, *str_whitespace_2;
+> +    QString *str_whitespace_3, *str_case, *str_built;
+> +
+> +    str_base = qstring_from_str("foo");
+> +    str_whitespace_0 = qstring_from_str(" foo");
+> +    str_whitespace_1 = qstring_from_str("foo ");
+> +    str_whitespace_2 = qstring_from_str("foo\b");
+> +    str_whitespace_3 = qstring_from_str("fooo\b");
+> +    str_case = qstring_from_str("Foo");
+> +
+> +    /* Should yield "foo" */
+> +    str_built = qstring_from_substr("form", 0, 1);
+> +    qstring_append_chr(str_built, 'o');
+> +
+> +    test_equality(false, str_base, str_whitespace_0, str_whitespace_1,
+> +                         str_whitespace_2, str_whitespace_3, str_case);
+> +
+> +    test_equality(true, str_base, str_built);
+> +
+> +    free_all(str_base, str_whitespace_0, str_whitespace_1, str_whitespace_2,
+> +             str_whitespace_3, str_case, str_built);
+> +}
+> +
+> +static void qobject_is_equal_list_test(void)
+> +{
+> +    QList *list_0, *list_1, *list_cloned;
+> +    QList *list_reordered, *list_longer, *list_shorter;
+> +
+> +    list_0 = qlist_new();
+> +    list_1 = qlist_new();
+> +    list_reordered = qlist_new();
+> +    list_longer = qlist_new();
+> +    list_shorter = qlist_new();
+> +
+> +    qlist_append_int(list_0, 1);
+> +    qlist_append_int(list_0, 2);
+> +    qlist_append_int(list_0, 3);
+> +
+> +    qlist_append_int(list_1, 1);
+> +    qlist_append_int(list_1, 2);
+> +    qlist_append_int(list_1, 3);
+> +
+> +    qlist_append_int(list_reordered, 1);
+> +    qlist_append_int(list_reordered, 3);
+> +    qlist_append_int(list_reordered, 2);
+> +
+> +    qlist_append_int(list_longer, 1);
+> +    qlist_append_int(list_longer, 2);
+> +    qlist_append_int(list_longer, 3);
+> +    qlist_append_null(list_longer);
+> +
+> +    qlist_append_int(list_shorter, 1);
+> +    qlist_append_int(list_shorter, 2);
+> +
+> +    list_cloned = qlist_copy(list_0);
+> +
+> +    test_equality(true, list_0, list_1, list_cloned);
+> +    test_equality(false, list_0, list_reordered, list_longer, list_shorter);
+> +
+> +    /* With a NaN in it, the list should no longer compare equal to
+> +     * itself */
+> +    qlist_append(list_0, qnum_from_double(NAN));
+> +    g_assert(qobject_is_equal(QOBJECT(list_0), QOBJECT(list_0)) == false);
+> +
+> +    free_all(list_0, list_1, list_cloned, list_reordered, list_longer, list_shorter);
+> +}
+> +
+> +static void qobject_is_equal_dict_test(void)
+> +{
+> +    Error *local_err = NULL;
+> +    QDict *dict_0, *dict_1, *dict_cloned;
+> +    QDict *dict_different_key, *dict_different_value, *dict_different_null_key;
+> +    QDict *dict_longer, *dict_shorter, *dict_nested;
+> +    QDict *dict_crumpled;
+> +
+> +    dict_0 = qdict_new();
+> +    dict_1 = qdict_new();
+> +    dict_different_key = qdict_new();
+> +    dict_different_value = qdict_new();
+> +    dict_different_null_key = qdict_new();
+> +    dict_longer = qdict_new();
+> +    dict_shorter = qdict_new();
+> +    dict_nested = qdict_new();
+> +
+> +    qdict_put_int(dict_0, "f.o", 1);
+> +    qdict_put_int(dict_0, "bar", 2);
+> +    qdict_put_int(dict_0, "baz", 3);
+> +    qdict_put_null(dict_0, "null");
+> +
+> +    qdict_put_int(dict_1, "f.o", 1);
+> +    qdict_put_int(dict_1, "bar", 2);
+> +    qdict_put_int(dict_1, "baz", 3);
+> +    qdict_put_null(dict_1, "null");
+> +
+> +    qdict_put_int(dict_different_key, "F.o", 1);
+> +    qdict_put_int(dict_different_key, "bar", 2);
+> +    qdict_put_int(dict_different_key, "baz", 3);
+> +    qdict_put_null(dict_different_key, "null");
+> +
+> +    qdict_put_int(dict_different_value, "f.o", 42);
+> +    qdict_put_int(dict_different_value, "bar", 2);
+> +    qdict_put_int(dict_different_value, "baz", 3);
+> +    qdict_put_null(dict_different_value, "null");
+> +
+> +    qdict_put_int(dict_different_null_key, "f.o", 1);
+> +    qdict_put_int(dict_different_null_key, "bar", 2);
+> +    qdict_put_int(dict_different_null_key, "baz", 3);
+> +    qdict_put_null(dict_different_null_key, "none");
+> +
+> +    qdict_put_int(dict_longer, "f.o", 1);
+> +    qdict_put_int(dict_longer, "bar", 2);
+> +    qdict_put_int(dict_longer, "baz", 3);
+> +    qdict_put_int(dict_longer, "xyz", 4);
+> +    qdict_put_null(dict_longer, "null");
+> +
+> +    qdict_put_int(dict_shorter, "f.o", 1);
+> +    qdict_put_int(dict_shorter, "bar", 2);
+> +    qdict_put_int(dict_shorter, "baz", 3);
+> +
+> +    qdict_put(dict_nested, "f", qdict_new());
+> +    qdict_put_int(qdict_get_qdict(dict_nested, "f"), "o", 1);
+> +    qdict_put_int(dict_nested, "bar", 2);
+> +    qdict_put_int(dict_nested, "baz", 3);
+> +    qdict_put_null(dict_nested, "null");
+> +
+> +    dict_cloned = qdict_clone_shallow(dict_0);
+> +
+> +    test_equality(true, dict_0, dict_1, dict_cloned);
+> +    test_equality(false, dict_0, dict_different_key, dict_different_value,
+> +                         dict_different_null_key, dict_longer, dict_shorter,
+> +                         dict_nested);
+> +
+> +    dict_crumpled = qobject_to_qdict(qdict_crumple(dict_1, &local_err));
+> +    g_assert(!local_err);
+> +    test_equality(true, dict_crumpled, dict_nested);
+> +
+> +    qdict_flatten(dict_nested);
+> +    test_equality(true, dict_0, dict_nested);
+> +
+> +    /* Containing an NaN value will make this dict compare unequal to
+> +     * itself */
+> +    qdict_put(dict_0, "NaN", qnum_from_double(NAN));
+> +    g_assert(qobject_is_equal(QOBJECT(dict_0), QOBJECT(dict_0)) == false);
+> +
+> +    free_all(dict_0, dict_1, dict_cloned, dict_different_key,
+> +             dict_different_value, dict_different_null_key, dict_longer,
+> +             dict_shorter, dict_nested, dict_crumpled);
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +    g_test_init(&argc, &argv, NULL);
+> +
+> +    g_test_add_func("/public/qobject_is_equal_null",
+> +                    qobject_is_equal_null_test);
+> +    g_test_add_func("/public/qobject_is_equal_num", qobject_is_equal_num_test);
+> +    g_test_add_func("/public/qobject_is_equal_bool",
+> +                    qobject_is_equal_bool_test);
+> +    g_test_add_func("/public/qobject_is_equal_string",
+> +                    qobject_is_equal_string_test);
+> +    g_test_add_func("/public/qobject_is_equal_list",
+> +                    qobject_is_equal_list_test);
+> +    g_test_add_func("/public/qobject_is_equal_dict",
+> +                    qobject_is_equal_dict_test);
+> +
+> +    return g_test_run();
+> +}
+
+Quite thorough :)
+
+With at least the reserved identifier renamed and the extra blank line
+scratched:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
