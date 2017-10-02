@@ -1,19 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dz2EF-0000gv-0L
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:02:00 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dz2Ev-00011o-Ew
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:02:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dz2EB-0000xN-8Z
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:01:55 -0400
-Date: Mon, 2 Oct 2017 17:01:27 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20171002150127.gbodv4jwdlin7s53@eukaryote>
-References: <20170926175942.GE14717@localhost.localdomain>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dz2Es-0001H5-BQ
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:02:37 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:52341)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dz2Es-0001Gv-5h
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:02:34 -0400
+Received: by mail-qt0-x242.google.com with SMTP id o52so7587698qtc.9
+	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 08:02:34 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
+	<1506935300-132598-32-git-send-email-imammedo@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <65b90e6c-2c58-46b1-b872-fe5a538b3959@amsat.org>
+Date: Mon, 2 Oct 2017 12:02:25 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170926175942.GE14717@localhost.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] blockdev-commit design
+In-Reply-To: <1506935300-132598-32-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 31/38] sparc: sparc: use generic cpu_model
+ parsing
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -21,56 +35,215 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>, mark.cave-ayland@ilande.co.uk
+Cc: qemu-devel@nongnu.org, atar4qemu@gmail.com
 List-ID: <qemu-devel.nongnu.org>
 
-On Tue, Sep 26, 2017 at 07:59:42PM +0200, Kevin Wolf wrote:
+On 10/02/2017 06:08 AM, Igor Mammedov wrote:
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-[...]
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> In comparison with the old command, the important changes are:
+> ---
+> CC: mark.cave-ayland@ilande.co.uk
+> CC: atar4qemu@gmail.com
+> ---
+>   hw/sparc/sun4m.c | 29 ++++++++++++-----------------
+>   1 file changed, 12 insertions(+), 17 deletions(-)
 > 
->   * top/base are node names instead of file names.
+> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+> index e1bdd48..68b2378 100644
+> --- a/hw/sparc/sun4m.c
+> +++ b/hw/sparc/sun4m.c
+> @@ -94,7 +94,6 @@ struct sun4m_hwdef {
+>       } vsimm[MAX_VSIMMS];
+>       hwaddr ecc_base;
+>       uint64_t max_mem;
+> -    const char * const default_cpu_model;
+>       uint32_t ecc_version;
+>       uint32_t iommu_version;
+>       uint16_t machine_id;
+> @@ -790,14 +789,14 @@ static const TypeInfo ram_info = {
+>       .class_init    = ram_class_init,
+>   };
+>   
+> -static void cpu_devinit(const char *cpu_model, unsigned int id,
+> +static void cpu_devinit(const char *cpu_type, unsigned int id,
+>                           uint64_t prom_addr, qemu_irq **cpu_irqs)
+>   {
+>       CPUState *cs;
+>       SPARCCPU *cpu;
+>       CPUSPARCState *env;
+>   
+> -    cpu = SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+> +    cpu = SPARC_CPU(cpu_create(cpu_type));
+>       env = &cpu->env;
+>   
+>       cpu_sparc_set_id(env, id);
+> @@ -820,7 +819,6 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+>                             MachineState *machine)
+>   {
+>       DeviceState *slavio_intctl;
+> -    const char *cpu_model = machine->cpu_model;
+>       unsigned int i;
+>       void *iommu, *espdma, *ledma, *nvram;
+>       qemu_irq *cpu_irqs[MAX_CPUS], slavio_irq[32], slavio_cpu_irq[MAX_CPUS],
+> @@ -833,11 +831,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+>       unsigned int num_vsimms;
+>   
+>       /* init CPUs */
+> -    if (!cpu_model)
+> -        cpu_model = hwdef->default_cpu_model;
+> -
+>       for(i = 0; i < smp_cpus; i++) {
+> -        cpu_devinit(cpu_model, i, hwdef->slavio_base, &cpu_irqs[i]);
+> +        cpu_devinit(machine->cpu_type, i, hwdef->slavio_base, &cpu_irqs[i]);
+>       }
+>   
+>       for (i = smp_cpus; i < MAX_CPUS; i++)
+> @@ -1074,7 +1069,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
+>           .machine_id = ss5_id,
+>           .iommu_version = 0x05000000,
+>           .max_mem = 0x10000000,
+> -        .default_cpu_model = "Fujitsu MB86904",
+>       },
+>       /* SS-10 */
+>       {
+> @@ -1100,7 +1094,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
+>           .machine_id = ss10_id,
+>           .iommu_version = 0x03000000,
+>           .max_mem = 0xf00000000ULL,
+> -        .default_cpu_model = "TI SuperSparc II",
+>       },
+>       /* SS-600MP */
+>       {
+> @@ -1124,7 +1117,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
+>           .machine_id = ss600mp_id,
+>           .iommu_version = 0x01000000,
+>           .max_mem = 0xf00000000ULL,
+> -        .default_cpu_model = "TI SuperSparc II",
+>       },
+>       /* SS-20 */
+>       {
+> @@ -1166,7 +1158,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
+>           .machine_id = ss20_id,
+>           .iommu_version = 0x13000000,
+>           .max_mem = 0xf00000000ULL,
+> -        .default_cpu_model = "TI SuperSparc II",
+>       },
+>       /* Voyager */
+>       {
+> @@ -1190,7 +1181,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
+>           .machine_id = vger_id,
+>           .iommu_version = 0x05000000,
+>           .max_mem = 0x10000000,
+> -        .default_cpu_model = "Fujitsu MB86904",
+>       },
+>       /* LX */
+>       {
+> @@ -1215,7 +1205,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
+>           .machine_id = lx_id,
+>           .iommu_version = 0x04000000,
+>           .max_mem = 0x10000000,
+> -        .default_cpu_model = "TI MicroSparc I",
+>       },
+>       /* SS-4 */
+>       {
+> @@ -1240,7 +1229,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
+>           .machine_id = ss4_id,
+>           .iommu_version = 0x05000000,
+>           .max_mem = 0x10000000,
+> -        .default_cpu_model = "Fujitsu MB86904",
+>       },
+>       /* SPARCClassic */
+>       {
+> @@ -1264,7 +1252,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
+>           .machine_id = scls_id,
+>           .iommu_version = 0x05000000,
+>           .max_mem = 0x10000000,
+> -        .default_cpu_model = "TI MicroSparc I",
+>       },
+>       /* SPARCbook */
+>       {
+> @@ -1288,7 +1275,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
+>           .machine_id = sbook_id,
+>           .iommu_version = 0x05000000,
+>           .max_mem = 0x10000000,
+> -        .default_cpu_model = "TI MicroSparc I",
+>       },
+>   };
+>   
+> @@ -1355,6 +1341,7 @@ static void ss5_class_init(ObjectClass *oc, void *data)
+>       mc->block_default_type = IF_SCSI;
+>       mc->is_default = 1;
+>       mc->default_boot_order = "c";
+> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
+>   }
+>   
+>   static const TypeInfo ss5_type = {
+> @@ -1372,6 +1359,7 @@ static void ss10_class_init(ObjectClass *oc, void *data)
+>       mc->block_default_type = IF_SCSI;
+>       mc->max_cpus = 4;
+>       mc->default_boot_order = "c";
+> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
+>   }
+>   
+>   static const TypeInfo ss10_type = {
+> @@ -1389,6 +1377,7 @@ static void ss600mp_class_init(ObjectClass *oc, void *data)
+>       mc->block_default_type = IF_SCSI;
+>       mc->max_cpus = 4;
+>       mc->default_boot_order = "c";
+> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
+>   }
+>   
+>   static const TypeInfo ss600mp_type = {
+> @@ -1406,6 +1395,7 @@ static void ss20_class_init(ObjectClass *oc, void *data)
+>       mc->block_default_type = IF_SCSI;
+>       mc->max_cpus = 4;
+>       mc->default_boot_order = "c";
+> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
+>   }
+>   
+>   static const TypeInfo ss20_type = {
+> @@ -1422,6 +1412,7 @@ static void voyager_class_init(ObjectClass *oc, void *data)
+>       mc->init = vger_init;
+>       mc->block_default_type = IF_SCSI;
+>       mc->default_boot_order = "c";
+> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
+>   }
+>   
+>   static const TypeInfo voyager_type = {
+> @@ -1438,6 +1429,7 @@ static void ss_lx_class_init(ObjectClass *oc, void *data)
+>       mc->init = ss_lx_init;
+>       mc->block_default_type = IF_SCSI;
+>       mc->default_boot_order = "c";
+> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
+>   }
+>   
+>   static const TypeInfo ss_lx_type = {
+> @@ -1454,6 +1446,7 @@ static void ss4_class_init(ObjectClass *oc, void *data)
+>       mc->init = ss4_init;
+>       mc->block_default_type = IF_SCSI;
+>       mc->default_boot_order = "c";
+> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
+>   }
+>   
+>   static const TypeInfo ss4_type = {
+> @@ -1470,6 +1463,7 @@ static void scls_class_init(ObjectClass *oc, void *data)
+>       mc->init = scls_init;
+>       mc->block_default_type = IF_SCSI;
+>       mc->default_boot_order = "c";
+> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
+>   }
+>   
+>   static const TypeInfo scls_type = {
+> @@ -1486,6 +1480,7 @@ static void sbook_class_init(ObjectClass *oc, void *data)
+>       mc->init = sbook_init;
+>       mc->block_default_type = IF_SCSI;
+>       mc->default_boot_order = "c";
+> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
+>   }
+>   
+>   static const TypeInfo sbook_type = {
 > 
->   * You don't need to specify the active layer any more (not the least
->     because there could very well be more than one of them), but top
->     becomes mandatory instead.
-
-As a user of 'block-commit', I'm a bit confused on your above point.
-Two questions:
-
-(1) During active block commit, isn't "active layer" == "top"? 
-
-    With the existing QMP `block-commit`, given: 
-    
-        A <- B <- C <- D (active)
-    
-    To merge B, C, and D (the active layer) into A, I _have_ to specify
-    the active layer, which is "D", as a 'top' parameter:
-
-        {
-            "execute": "block-commit",
-            "arguments": {
-                "device": "node-D",
-                "job-id": "job0",
-                "top": "d.qcow2",
-                "base": "a.qcow2"
-            }
-        }
-
-    So when merging the top-most layer (D), there's at least one
-    scenario where we _are_ specifying the "active layer".  And 'top'
-    _is_ mandatory as seen above.  
-    
-    So I wonder if I'm misinterpreting your wording.
-
-(2) Also, just for my own education, can you mind expanding a bit more
-    about the "there can be more than one active layer" scenario?
-
-Thanks.
-
-[...]
-
--- 
-/kashyap
