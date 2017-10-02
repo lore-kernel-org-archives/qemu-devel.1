@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dyztm-0007Y3-OS
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:32:42 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dyzzU-0008SJ-Sq
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:38:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dyztg-0001rI-Tc
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:32:38 -0400
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:45742)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dyztg-0001qM-Ms
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:32:32 -0400
-Received: by mail-wm0-f54.google.com with SMTP id q124so10292073wmb.0
-	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 05:32:31 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1dyzzQ-0005s7-HW
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:38:32 -0400
+References: <150600964184.30533.472565821627831467.stgit@bahia.lan>
 From: Paolo Bonzini <pbonzini@redhat.com>
-References: <20170912144459.11359-1-pbonzini@redhat.com>
-Message-ID: <8315593b-4ae8-b034-01d6-d6f66925b6bb@redhat.com>
-Date: Mon, 2 Oct 2017 14:32:26 +0200
+Message-ID: <e37fe041-e70a-e9b3-34cf-d0b92b6b863f@redhat.com>
+Date: Mon, 2 Oct 2017 14:38:24 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170912144459.11359-1-pbonzini@redhat.com>
+In-Reply-To: <150600964184.30533.472565821627831467.stgit@bahia.lan>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 00/10] cleanup qemu-iotests
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] kvm: use kvm_vm_check_extension()
+ with VM capabilities
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -28,55 +23,46 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 List-ID: <qemu-devel.nongnu.org>
 
-On 12/09/2017 16:44, Paolo Bonzini wrote:
-> The purpose of this series is to separate the "check" sources from
-> the tests.  After these patches, common.config is reduced to simple
-> shell initialization, and common.rc is only included by the tests.
+On 21/09/2017 18:00, Greg Kurz wrote:
+> Some VM capabilities are currently checked with kvm_check_extension(). This
+> doesn't have any impact for most host architectures because they don't depend
+> on the KVM type. However, this is a problem for server-class ppc hosts that
+> can support the PR and HV KVM types. Both implementations can co-exist in the
+> kernel at the same time and we decide which one will be used with the "type"
+> argument of the KVM_CREATE_VM ioctl.
 > 
-> Along the way, a lot of dead code is removed too.
+> Each KVM type has a different set of capabilities, and checking them with
+> kvm_check_extension() will always cause KVM to assume we're in HV mode,
+> even if they are VM specific and we have explicitely requested to run in
+> PR mode. This may produce unexpected results.
 > 
-> In v2, the following patches:
+> Similar issues were recently fixed in the ppc code:
 > 
->   qemu-iotests: do not do useless search for QEMU_*_PROG
->   qemu-iotests: do not search for binaries in the current directory
->   qemu-iotests: include common.env and common.config early
+> https://github.com/qemu/qemu/commit/70a0c19e83aa4c71c879d51e426e89e4b3d4e014
+> https://github.com/dgibson/qemu/commit/b152d74ebaed61f89fa1ab2c9b1526d9e9dabae5
 > 
-> have been replaced by "qemu-iotests: cleanup and fix search for programs",
-> which also preserves the behavior of searching for programs as symlinks
-> in the current directory.
-> 
-> Paolo
+> This series focuses on capabilities that are checked by the common code.
 
-Kevin,
-
-ping?
+Queued, thanks.
 
 Paolo
 
-> Paolo Bonzini (10):
->   qemu-iotests: remove dead code
->   qemu-iotests: get rid of AWK_PROG
->   qemu-iotests: move "check" code out of common.rc
->   qemu-iotests: cleanup and fix search for programs
->   qemu-iotests: limit non-_PROG-suffixed variables to common.rc
->   qemu-iotests: do not include common.rc in "check"
->   qemu-iotests: disintegrate more parts of common.config
->   qemu-iotests: fix uninitialized variable
->   qemu-iotests: get rid of $iam
->   qemu-iotests: merge "check" and "common"
+> --
+> Greg
 > 
->  tests/qemu-iotests/039.out       |  10 +-
->  tests/qemu-iotests/061.out       |   4 +-
->  tests/qemu-iotests/137.out       |   2 +-
->  tests/qemu-iotests/check         | 575 ++++++++++++++++++++++++++++++++++-----
->  tests/qemu-iotests/common        | 459 -------------------------------
->  tests/qemu-iotests/common.config | 206 +-------------
->  tests/qemu-iotests/common.qemu   |   1 +
->  tests/qemu-iotests/common.rc     | 205 +++++++-------
->  8 files changed, 621 insertions(+), 841 deletions(-)
->  delete mode 100644 tests/qemu-iotests/common
+> ---
+> 
+> Greg Kurz (2):
+>       kvm: check KVM_CAP_SYNC_MMU with kvm_vm_check_extension()
+>       kvm: check KVM_CAP_NR_VCPUS with kvm_vm_check_extension()
+> 
+> 
+>  accel/kvm/kvm-all.c    |   51 +++++++++++++++++++++++++-----------------------
+>  accel/stubs/kvm-stub.c |    4 ++--
+>  include/sysemu/kvm.h   |    2 +-
+>  3 files changed, 30 insertions(+), 27 deletions(-)
 > 
