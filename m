@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dz17b-0007bD-8l
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:51:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1dz1ja-0003Dy-SC
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:30:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dz17X-0005ex-Lm
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:50:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33806)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dz17X-0005eS-Bp
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:50:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dz17U-0002pf-L2
-	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 13:50:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D645B2E80E0
-	for <qemu-devel@nongnu.org>; Mon,  2 Oct 2017 13:50:50 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1dz1jU-0005Vg-PX
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:30:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36206)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dz1jU-0005T2-Ft
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:30:08 -0400
+References: <20170804012551.2714-1-eblake@redhat.com>
+	<20170804012551.2714-6-eblake@redhat.com>
+	<87k22dw4r2.fsf@dusky.pond.sub.org>
+	<c9564021-896a-2c29-8f74-0921e94d292a@redhat.com>
+	<87lgkurtiw.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7893edd1-4f6c-7954-f682-e27824b8c984@redhat.com>
+Date: Mon, 2 Oct 2017 09:30:04 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 02 Oct 2017 13:41:39 -0000
-From: Sean Feole <sean.feole@canonical.com>
-Reply-To: Bug 1719196 <1719196@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150626680089.6094.17724106932405637799.malonedeb@soybean.canonical.com>
-Message-Id: <150695169922.20909.10928091282566961148.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1719196] Re: [arm64 ocata] newly created
- instances are unable to raise network interfaces
+In-Reply-To: <87lgkurtiw.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="B9PFWaNn6ch8mpBpGULCtJxmeRbqPQoaf"
+Subject: Re: [Qemu-devel] [PATCH v4 05/22] qobject: Simplify
+ qobject_from_jsonv()
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -36,313 +31,159 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 List-ID: <qemu-devel.nongnu.org>
 
-I was also able to reproduce this again on Cavium ThunderX hardware,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--B9PFWaNn6ch8mpBpGULCtJxmeRbqPQoaf
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Message-ID: <7893edd1-4f6c-7954-f682-e27824b8c984@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 05/22] qobject: Simplify
+ qobject_from_jsonv()
+References: <20170804012551.2714-1-eblake@redhat.com>
+ <20170804012551.2714-6-eblake@redhat.com> <87k22dw4r2.fsf@dusky.pond.sub.org>
+ <c9564021-896a-2c29-8f74-0921e94d292a@redhat.com>
+ <87lgkurtiw.fsf@dusky.pond.sub.org>
+In-Reply-To: <87lgkurtiw.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 10/02/2017 12:46 AM, Markus Armbruster wrote:
+
+>>>> +    /*
+>>>> +     * This seemingly unnecessary copy is required in case va_list
+>>>> +     * is an array type.
+>>>> +     */
+>>>
+>>> --verbose?
+>>>
+>>>> +    va_copy(ap_copy, ap);
+>>>> +    obj =3D qobject_from_json_internal(string, &ap_copy, &error_abo=
+rt);
+>>>> +    va_end(ap_copy);
+>>
+>> Code motion. But if the comment needs to be more verbose in the
+>> destination than it was on the source, the rationale is that C99/POSIX=
+
+>> allows 'typedef something va_list[]' (that is, where va_list is an arr=
+ay
+>> of some other type), although I don't know of any modern OS that
+>> actually defines it like that.  Based on C pointer-decay rules, '&ap'
+>> has a different type based on whether va_list was a struct/pointer or =
+an
+>> array type, when 'va_list ap' was passed as a parameter; so we can't
+>> portably use qobject_from_json_internal(string, &ap, &error_abort).  T=
+he
+>> va_copy() is what lets us guarantee that &ap_list is a pointer to a
+>> va_list regardless of the type of va_list (because va_copy was declare=
+d
+>> locally, rather than in a parameter list, and is therefore not subject=
+
+>> to pointer decay), and NOT an accidental pointer to first element of t=
+he
+>> va_list array on platforms where va_list is an array.
+>=20
+> I'm dense this Monday morning --- I still can't see where exactly
+> passing &ap directly goes wrong.
+>=20
+> Two cases:
+>=20
+> 1. va_list is a typedef name for a non-array type T.
+>=20
+> 2. va_list is a typedef name for an array type E[].
+>=20
+> What are the types of actual argument &ap and formal parameter va_list
+> *ap in either case?
+>=20
+> How exactly does case 2 break?
+
+An example program is probably the best to visualize the problem:
+
+$ cat typefun.c
+#include <stdio.h>
+
+typedef struct T {
+    int i[5];
+} T;
+typedef struct E {
+    int i;
+} E;
+
+typedef T list1;
+typedef E list2[5];
+
+void bar(const char *prefix, list1 *l1, list2 *l2) {
+    printf ("%s: %zu %zu\n", prefix, sizeof(&l1), sizeof(&l2));
+}
+
+void foo(list1 l1, list2 l2) {
+    printf ("parameter sizes: %zu %zu\n", sizeof(l1), sizeof(l2));
+    bar("called with address of parameter", &l1, &l2);
+}
+
+int main(void) {
+    list1 l1;
+    list2 l2;
+    printf ("local variable sizes: %zu %zu\n", sizeof(l1), sizeof(l2));
+    bar("called with address of local variable", &l1, &l2);
+    foo(l1, l2);
+    return 0;
+}
+
+$ gcc -o typefun -Wall typefun.c
+typefun.c: In function =E2=80=98foo=E2=80=99:
+typefun.c:18:61: warning: =E2=80=98sizeof=E2=80=99 on array function para=
+meter =E2=80=98l2=E2=80=99 will
+return size of =E2=80=98E * {aka struct E *}=E2=80=99 [-Wsizeof-array-arg=
+ument]
+     printf ("parameter sizes: %zu %zu\n", sizeof(l1), sizeof(l2));
+                                                             ^
+typefun.c:17:26: note: declared here
+ void foo(list1 l1, list2 l2) {
+                          ^~
+typefun.c:19:50: warning: passing argument 3 of =E2=80=98bar=E2=80=99 fro=
+m incompatible
+pointer type [-Wincompatible-pointer-types]
+     bar("called with address of parameter", &l1, &l2);
+                                                  ^
+typefun.c:13:6: note: expected =E2=80=98E (*)[5] {aka struct E (*)[5]}=E2=
+=80=99 but
+argument is of type =E2=80=98E ** {aka struct E **}=E2=80=99
+ void bar(const char *prefix, list1 *l1, list2 *l2) {
+      ^~~
+
+$ ./typefun
+local variable sizes: 20 20
+called with address of local variable: 8 8
+parameter sizes: 20 8
+called with address of parameter: 8 8
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-ii  ipxe-qemu                            1.0.0+git-20150424.a25a16d-1ubuntu=
-1        all          PXE boot firmware - ROM images for qemu
-ii  qemu-block-extra:arm64               1:2.8+dfsg-3ubuntu2.3~cloud0      =
-         arm64        extra block backend modules for qemu-system and qemu-=
-utils
-ii  qemu-efi                             0~20160408.ffea0a2c-2             =
-         all          UEFI firmware for virtual machines
-ii  qemu-kvm                             1:2.8+dfsg-3ubuntu2.3~cloud0      =
-         arm64        QEMU Full virtualization
-ii  qemu-system-arm                      1:2.8+dfsg-3ubuntu2.3~cloud0      =
-         arm64        QEMU full system emulation binaries (arm)
-ii  qemu-system-common                   1:2.8+dfsg-3ubuntu2.3~cloud0      =
-         arm64        QEMU full system emulation binaries (common files)
-ii  qemu-utils                           1:2.8+dfsg-3ubuntu2.3~cloud0      =
-         arm64        QEMU utilities
+--B9PFWaNn6ch8mpBpGULCtJxmeRbqPQoaf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
--------------------
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnSTWwACgkQp6FrSiUn
+Q2o9QQgArR8pzuJTAKnYiPKolhH5TAjQHAVhFap2FOm/jyp8USa82zEdKhs6cmme
+kyb0ix1yhvvJ7grmMI6bYa1eBGogTE3a+1NqWJf/0n3iTPiSVbgIE2lf/RRGpRgh
+vnZseoQ1vERpN4viLvS2qQUmdnPA7aJTo77Bk6d6OXouPfbDoTnuv9epL8YRYNeo
+kUXdhIev6dyWB9ZKI458kxSnSyMrcbv9bCTclkYhOJPyGVNqxFxJrAl+hwG8eAfW
+ExVNDJOlVTKVN4cpgzxOfiO5BE0EWhFkXK/SJ7To19lUdsSnXSZteqJ2IFTVSLWO
+mi5/5I5H2g8NjtG8qxtb8ReudUb8fQ==
+=lMk4
+-----END PGP SIGNATURE-----
 
-ii  libvirt-bin                          2.5.0-3ubuntu5.4~cloud0           =
-         arm64        programs for the libvirt library
-ii  libvirt-clients                      2.5.0-3ubuntu5.4~cloud0           =
-         arm64        Programs for the libvirt library
-ii  libvirt-daemon                       2.5.0-3ubuntu5.4~cloud0           =
-         arm64        Virtualization daemon
-ii  libvirt-daemon-system                2.5.0-3ubuntu5.4~cloud0           =
-         arm64        Libvirt daemon configuration files
-ii  libvirt0:arm64                       2.5.0-3ubuntu5.4~cloud0           =
-         arm64        library for interfacing with different virtualization=
- systems
-ii  nova-compute-libvirt                 2:15.0.6-0ubuntu1~cloud0          =
-         all          OpenStack Compute - compute node libvirt support
-ii  python-libvirt                       3.0.0-2~cloud0                    =
-         arm64        libvirt Python bindings
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1719196
-
-Title:
-  [arm64 ocata] newly created instances are unable to raise network
-  interfaces
-
-Status in libvirt:
-  New
-Status in QEMU:
-  New
-
-Bug description:
-  arm64 Ocata ,
-
-  I'm testing to see I can get Ocata running on arm64 and using the
-  openstack-base bundle to deploy it.  I have added the bundle to the
-  log file attached to this bug.
-
-  When I create a new instance via nova, the VM comes up and runs,
-  however fails to raise its eth0 interface. This occurs on both
-  internal and external networks.
-
-  ubuntu@openstackaw:~$ nova list
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  | ID                                   | Name    | Status | Task State | =
-Power State | Networks           |
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  | dcaf6d51-f81e-4cbd-ac77-0c5d21bde57c | sfeole1 | ACTIVE | -          | =
-Running     | internal=3D10.5.5.3  |
-  | aa0b8aee-5650-41f4-8fa0-aeccdc763425 | sfeole2 | ACTIVE | -          | =
-Running     | internal=3D10.5.5.13 |
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  ubuntu@openstackaw:~$ nova show aa0b8aee-5650-41f4-8fa0-aeccdc763425
-  +--------------------------------------+---------------------------------=
--------------------------+
-  | Property                             | Value                           =
-                         |
-  +--------------------------------------+---------------------------------=
--------------------------+
-  | OS-DCF:diskConfig                    | MANUAL                          =
-                         |
-  | OS-EXT-AZ:availability_zone          | nova                            =
-                         |
-  | OS-EXT-SRV-ATTR:host                 | awrep3                          =
-                         |
-  | OS-EXT-SRV-ATTR:hypervisor_hostname  | awrep3.maas                     =
-                         |
-  | OS-EXT-SRV-ATTR:instance_name        | instance-00000003               =
-                         |
-  | OS-EXT-STS:power_state               | 1                               =
-                         |
-  | OS-EXT-STS:task_state                | -                               =
-                         |
-  | OS-EXT-STS:vm_state                  | active                          =
-                         |
-  | OS-SRV-USG:launched_at               | 2017-09-24T14:23:08.000000      =
-                         |
-  | OS-SRV-USG:terminated_at             | -                               =
-                         |
-  | accessIPv4                           |                                 =
-                         |
-  | accessIPv6                           |                                 =
-                         |
-  | config_drive                         |                                 =
-                         |
-  | created                              | 2017-09-24T14:22:41Z            =
-                         |
-  | flavor                               | m1.small (717660ae-0440-4b19-a76=
-2-ffeb32a0575c)          |
-  | hostId                               | 5612a00671c47255d2ebd6737a64ec9b=
-d3a5866d1233ecf3e988b025 |
-  | id                                   | aa0b8aee-5650-41f4-8fa0-aeccdc76=
-3425                     |
-  | image                                | zestynosplash (e88fd1bd-f040-44d=
-8-9e7c-c462ccf4b945)     |
-  | internal network                     | 10.5.5.13                       =
-                         |
-  | key_name                             | mykey                           =
-                         |
-  | metadata                             | {}                              =
-                         |
-  | name                                 | sfeole2                         =
-                         |
-  | os-extended-volumes:volumes_attached | []                              =
-                         |
-  | progress                             | 0                               =
-                         |
-  | security_groups                      | default                         =
-                         |
-  | status                               | ACTIVE                          =
-                         |
-  | tenant_id                            | 9f7a21c1ad264fec81abc09f3960ad1d=
-                         |
-  | updated                              | 2017-09-24T14:23:09Z            =
-                         |
-  | user_id                              | e6bb6f5178a248c1b5ae66ed388f9040=
-                         |
-  +--------------------------------------+---------------------------------=
--------------------------+
-
-
-  As seen above the instances boot an run.  Full Console output is
-  attached to this bug.
-
-  =
-
-  [  OK  ] Started Initial cloud-init job (pre-networking).
-  [  OK  ] Reached target Network (Pre).
-  [  OK  ] Started AppArmor initialization.
-           Starting Raise network interfaces...
-  [FAILED] Failed to start Raise network interfaces.
-  See 'systemctl status networking.service' for details.
-           Starting Initial cloud-init job (metadata service crawler)...
-  [  OK  ] Reached target Network.
-  [  315.051902] cloud-init[881]: Cloud-init v. 0.7.9 running 'init' at Fri=
-, 22 Sep 2017 18:29:15 +0000. Up 314.70 seconds.
-  [  315.057291] cloud-init[881]: ci-info: +++++++++++++++++++++++++++Net d=
-evice info+++++++++++++++++++++++++++
-  [  315.060338] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.063308] cloud-init[881]: ci-info: | Device |  Up  |  Address  |   =
- Mask   | Scope |     Hw-Address    |
-  [  315.066304] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.069303] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
-  .     |   .   | fa:16:3e:39:4c:48 |
-  [  315.072308] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
-  .     |   d   | fa:16:3e:39:4c:48 |
-  [  315.075260] cloud-init[881]: ci-info: |  lo:   | True | 127.0.0.1 | 25=
-5.0.0.0 |   .   |         .         |
-  [  315.078258] cloud-init[881]: ci-info: |  lo:   | True |     .     |   =
-  .     |   d   |         .         |
-  [  315.081249] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.084240] cloud-init[881]: 2017-09-22 18:29:15,393 - url_helper.py[W=
-ARNING]: Calling 'http://169.254.169.254/2009-04-04/meta-data/instance-id' =
-failed [0/120s]: request error [HTTPConnectionPool(host=3D'169.254.169.254'=
-, port=3D80): Max retries exceeded with url: /2009-04-04/meta-data/instance=
--id (Caused by NewConnectionError('<requests.packages.urllib3.connection.HT=
-TPConnection object at 0xffffb10794e0>: Failed to establish a new connectio=
-n: [Errno 101] Network is unreachable',))]
-
-
-  =
-
-  ----------------
-
-
-  I have checked all services in neutron and made sure that they are
-  running and restarted in neutron-gateway
-
-  =
-
-   [ + ]  neutron-dhcp-agent
-   [ + ]  neutron-l3-agent
-   [ + ]  neutron-lbaasv2-agent
-   [ + ]  neutron-metadata-agent
-   [ + ]  neutron-metering-agent
-   [ + ]  neutron-openvswitch-agent
-   [ + ]  neutron-ovs-cleanup
-
-  and have also restarted and checked the nova-compute logs for their
-  neutron counterparts.
-
-  =
-
-   [ + ]  neutron-openvswitch-agent
-   [ + ]  neutron-ovs-cleanup
-
-
-   There are some warnings/errors in the neutron-gateway logs which I
-  have attached the full tarball in a separate attachment to this bug:
-
-  2017-09-24 14:39:33.152 10322 INFO ryu.base.app_manager [-] instantiating=
- app ryu.controller.ofp_handler of OFPHandler
-  2017-09-24 14:39:33.153 10322 INFO ryu.base.app_manager [-] instantiating=
- app ryu.app.ofctl.service of OfctlService
-  2017-09-24 14:39:39.577 10322 ERROR neutron.agent.ovsdb.impl_vsctl [req-2=
-f084ae8-13dc-47dc-b351-24c8f3c57067 - - - - -] Unable to execute ['ovs-vsct=
-l', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manage=
-r', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'Op=
-en_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1; =
-Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Transa=
-ction causes multiple rows in \"Manager\" table to have identical values (\=
-"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with UU=
-ID e02a5f7f-bfd2-4a1d-ae3c-0321db4bd3fb, existed in the database before thi=
-s transaction and was not modified by the transaction.  Second row, with UU=
-ID 6e9aba3a-471a-4976-bffd-b7131bbe5377, was inserted by this transaction."=
-,"error":"constraint violation"}
-
-
-  These warnings/errors also occur on the nova-compute hosts in
-  /var/log/neutron/
-
-
-  =
-
-  2017-09-22 18:54:52.130 387556 INFO ryu.base.app_manager [-] instantiatin=
-g app ryu.app.ofctl.service of OfctlService
-  2017-09-22 18:54:56.124 387556 ERROR neutron.agent.ovsdb.impl_vsctl [req-=
-e291c2f9-a123-422c-be7c-fadaeb5decfa - - - - -] Unable to execute ['ovs-vsc=
-tl', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manag=
-er', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'O=
-pen_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1;=
- Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Trans=
-action causes multiple rows in \"Manager\" table to have identical values (=
-\"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with U=
-UID 9f27ddee-9881-4cbc-9777-2f42fee735e9, was inserted by this transaction.=
-  Second row, with UUID ccf0e097-09d5-449c-b353-6b69781dc3f7, existed in th=
-e database before this transaction and was not modified by the transaction.=
-","error":"constraint violation"}
-
-
-  I'm not sure if the above error could be pertaining to the failure, I
-  have also attached those logs to this bug as well...
-
-  =
-
-  .
-  (neutron) agent-list
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-  | id                                   | agent_type           | host   | =
-availability_zone | alive | admin_state_up | binary                    |
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-  | 0cca03fb-abb2-4704-8b0b-e7d3e117d882 | DHCP agent           | awrep1 | =
-nova              | :-)   | True           | neutron-dhcp-agent        |
-  | 14a5fd52-fbc3-450c-96d5-4e9a65776dad | L3 agent             | awrep1 | =
-nova              | :-)   | True           | neutron-l3-agent          |
-  | 2ebc7238-5e61-41f8-bc60-df14ec6b226b | Loadbalancerv2 agent | awrep1 | =
-                  | :-)   | True           | neutron-lbaasv2-agent     |
-  | 4f6275be-fc8b-4994-bdac-13a4b76f6a83 | Metering agent       | awrep1 | =
-                  | :-)   | True           | neutron-metering-agent    |
-  | 86ecc6b0-c100-4298-b861-40c17516cc08 | Open vSwitch agent   | awrep1 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | 947ad3ab-650b-4b96-a520-00441ecb33e7 | Open vSwitch agent   | awrep4 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | 996b0692-7d19-4641-bec3-e057f4a856f6 | Open vSwitch agent   | awrep3 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | ab6b1065-0b98-4cf3-9f46-6bddba0c5e75 | Metadata agent       | awrep1 | =
-                  | :-)   | True           | neutron-metadata-agent    |
-  | fe24f622-b77c-4eed-ae22-18e4195cf763 | Open vSwitch agent   | awrep2 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-
-  =
-
-  Should neutron-openvswitch be assigned to the 'nova' availability zone? =
-
-
-  I have also attached the ovs-vsctl show from a nova-compute host and
-  the neutron-gateway host to ensure that the open v switch routes are
-  correct.
-
-  =
-
-  I can supply more logs if required.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/libvirt/+bug/1719196/+subscriptions
+--B9PFWaNn6ch8mpBpGULCtJxmeRbqPQoaf--
