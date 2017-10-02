@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dz1R0-0004Bf-4B
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:11:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1dz17b-0007bD-8l
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:51:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dz1Qv-000246-5C
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:11:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39304)
+	(envelope-from <bounces@canonical.com>) id 1dz17X-0005ex-Lm
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:50:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33806)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dz1Qu-0001zx-P5
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:10:57 -0400
+	id 1dz17X-0005eS-Bp
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:50:55 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dz1Qt-0006V3-G0
-	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 14:10:55 +0000
+	id 1dz17U-0002pf-L2
+	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 13:50:52 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 77A732E8056
-	for <qemu-devel@nongnu.org>; Mon,  2 Oct 2017 14:10:55 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id D645B2E80E0
+	for <qemu-devel@nongnu.org>; Mon,  2 Oct 2017 13:50:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 02 Oct 2017 13:56:39 -0000
+Date: Mon, 02 Oct 2017 13:41:39 -0000
 From: Sean Feole <sean.feole@canonical.com>
 Reply-To: Bug 1719196 <1719196@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150626680089.6094.17724106932405637799.malonedeb@soybean.canonical.com>
-Message-Id: <150695259998.1572.86066719545791577.malone@chaenomeles.canonical.com>
+Message-Id: <150695169922.20909.10928091282566961148.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1719196] Re: [arm64 ocata] newly created
  instances are unable to raise network interfaces
@@ -39,42 +39,43 @@ List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-Just to further add to comment #6, That this is not a neutron issue,
-Here is the tcpdump output of the guests tap device shows the dhcp
-request leaving and the reply coming back. For anyways that may be
-curious.
+I was also able to reproduce this again on Cavium ThunderX hardware,
 
 
-Guest MAC:  =
+ii  ipxe-qemu                            1.0.0+git-20150424.a25a16d-1ubuntu=
+1        all          PXE boot firmware - ROM images for qemu
+ii  qemu-block-extra:arm64               1:2.8+dfsg-3ubuntu2.3~cloud0      =
+         arm64        extra block backend modules for qemu-system and qemu-=
+utils
+ii  qemu-efi                             0~20160408.ffea0a2c-2             =
+         all          UEFI firmware for virtual machines
+ii  qemu-kvm                             1:2.8+dfsg-3ubuntu2.3~cloud0      =
+         arm64        QEMU Full virtualization
+ii  qemu-system-arm                      1:2.8+dfsg-3ubuntu2.3~cloud0      =
+         arm64        QEMU full system emulation binaries (arm)
+ii  qemu-system-common                   1:2.8+dfsg-3ubuntu2.3~cloud0      =
+         arm64        QEMU full system emulation binaries (common files)
+ii  qemu-utils                           1:2.8+dfsg-3ubuntu2.3~cloud0      =
+         arm64        QEMU utilities
 
 
-    <interface type=3D'bridge'>
-      <mac address=3D'fa:16:3e:1d:a8:82'/>
-      <source bridge=3D'qbrc8faaf66-7f'/>
-      <target dev=3D'tapc8faaf66-7f'/>
-      <model type=3D'virtio'/>
-      <address type=3D'virtio-mmio'/>
-    </interface>
+-------------------
 
-
-$ sudo ip netns exec qdhcp-a9958ab4-8a7e-4ded-b9a0-860bc42f79d9 tcpdump -A =
--l -i ns-c751afb3-2b
-tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
-listening on ns-c751afb3-2b, link-type EN10MB (Ethernet), capture size 2621=
-44 bytes
-13:51:11.458941 IP6 :: > ff02::16: HBH ICMP6, multicast listener report v2,=
- 1 group record(s), length 28
-`....$..................................:...................................
-13:51:11.462966 IP 0.0.0.0.bootpc > 255.255.255.255.bootps: BOOTP/DHCP, Req=
-uest from fa:16:3e:1d:a8:82 (oui Unknown), length 300
-E..H......9..........D.C.4q.....5QN{......................>................=
-...........................................................................=
-...........................................................................=
-.......................................c.Sc5....ubuntu7.......w.,/.y*......=
-............................
-13:51:11.463331 IP 10.5.5.2.bootps > 10.5.5.9.bootpc: BOOTP/DHCP, Reply, le=
-ngth 328
-E..dY'..@...
+ii  libvirt-bin                          2.5.0-3ubuntu5.4~cloud0           =
+         arm64        programs for the libvirt library
+ii  libvirt-clients                      2.5.0-3ubuntu5.4~cloud0           =
+         arm64        Programs for the libvirt library
+ii  libvirt-daemon                       2.5.0-3ubuntu5.4~cloud0           =
+         arm64        Virtualization daemon
+ii  libvirt-daemon-system                2.5.0-3ubuntu5.4~cloud0           =
+         arm64        Libvirt daemon configuration files
+ii  libvirt0:arm64                       2.5.0-3ubuntu5.4~cloud0           =
+         arm64        library for interfacing with different virtualization=
+ systems
+ii  nova-compute-libvirt                 2:15.0.6-0ubuntu1~cloud0          =
+         all          OpenStack Compute - compute node libvirt support
+ii  python-libvirt                       3.0.0-2~cloud0                    =
+         arm64        libvirt Python bindings
 
 -- =
 
