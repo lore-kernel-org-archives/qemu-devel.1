@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dz4In-0004DZ-2K
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 13:14:45 -0400
+	(envelope-from <armbru@redhat.com>) id 1dz4LB-0005Z7-N5
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 13:17:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dz4Ij-0003bR-TH
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 13:14:45 -0400
-References: <1506790175-581-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <adcb36e5-70bc-1ef8-651d-c4c5871c4f33@redhat.com>
-Date: Mon, 2 Oct 2017 13:14:37 -0400
+	(envelope-from <armbru@redhat.com>) id 1dz4L8-0005mH-IU
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 13:17:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37660)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dz4L8-0005ly-CW
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 13:17:10 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7DD4B3DE40
+	for <qemu-devel@nongnu.org>; Mon,  2 Oct 2017 17:17:09 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <150694455954.126.4260615671927745603@b58463cdfd5f>
+	<37ea08c6-ec95-2ab6-13dd-db9d270bfe5a@redhat.com>
+Date: Mon, 02 Oct 2017 19:17:05 +0200
+In-Reply-To: <37ea08c6-ec95-2ab6-13dd-db9d270bfe5a@redhat.com> (Eric Blake's
+	message of "Mon, 2 Oct 2017 09:36:03 -0500")
+Message-ID: <87lgkt1nce.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1506790175-581-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] macio: add missing registers to
- VMStateDescription
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PULL 0/3] QAPI patches for 2017-10-02
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -23,42 +32,27 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com
 List-ID: <qemu-devel.nongnu.org>
 
+Eric Blake <eblake@redhat.com> writes:
 
+> On 10/02/2017 06:42 AM, no-reply@patchew.org wrote:
+>> Hi,
+>> 
+>> This series seems to have some coding style problems. See output below for
+>> more information:
+>> 
+>
+>> Checking PATCH 2/3: watchdog.h: Drop local redefinition of actions enum...
+>> ERROR: braces {} are necessary for all arms of this statement
+>> #57: FILE: hw/watchdog/watchdog.c:86:
+>> +    if (action < 0)
+>> [...]
+>
+> Pre-existing problem, but would indeed be easy to fix up as part of this
+> series.  I don't know if that means Markus should respin the pull request?
 
-On 09/30/2017 12:49 PM, Mark Cave-Ayland wrote:
-> Commit 4f7265f "ppc/ide/macio: Add missing registers" added two extra macio
-> registers but forgot to add them to the corresponding VMStateDescription.
-> 
-> The version number is bumped accordingly, although this will have little
-> effect given that the Mac machines are practically unmigratable.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->  hw/ide/macio.c |    4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/ide/macio.c b/hw/ide/macio.c
-> index ce194c6..2e043ef 100644
-> --- a/hw/ide/macio.c
-> +++ b/hw/ide/macio.c
-> @@ -353,12 +353,14 @@ static const MemoryRegionOps pmac_ide_ops = {
->  
->  static const VMStateDescription vmstate_pmac = {
->      .name = "ide",
-> -    .version_id = 4,
-> +    .version_id = 5,
->      .minimum_version_id = 0,
->      .fields = (VMStateField[]) {
->          VMSTATE_IDE_BUS(bus, MACIOIDEState),
->          VMSTATE_IDE_DRIVES(bus.ifs, MACIOIDEState),
->          VMSTATE_BOOL(dma_active, MACIOIDEState),
-> +        VMSTATE_UINT32(timing_reg, MACIOIDEState),
-> +        VMSTATE_UINT32(irq_reg, MACIOIDEState),
->          VMSTATE_END_OF_LIST()
->      }
->  };
-> 
-Acked-by: John Snow <jsnow@redhat.com>
+I would've touched it up in my tree had I seen it in time, but I doubt
+it's worth the bother now.
