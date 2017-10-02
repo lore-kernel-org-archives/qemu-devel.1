@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dywRO-0007NG-1j
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 04:51:06 -0400
+	(envelope-from <bounces@canonical.com>) id 1dywfb-00015J-CT
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:05:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dywRL-0003gb-2j
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 04:51:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53602)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dywRK-0003ez-SS
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 04:51:02 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DAAD185550
-	for <qemu-devel@nongnu.org>; Mon,  2 Oct 2017 08:51:01 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170927204148.2311-1-ehabkost@redhat.com>
-	<20170927204148.2311-2-ehabkost@redhat.com>
-Date: Mon, 02 Oct 2017 10:51:00 +0200
-In-Reply-To: <20170927204148.2311-2-ehabkost@redhat.com> (Eduardo Habkost's
-	message of "Wed, 27 Sep 2017 17:41:47 -0300")
-Message-ID: <87tvzioruz.fsf@dusky.pond.sub.org>
+	(envelope-from <bounces@canonical.com>) id 1dywfX-0004i5-An
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:05:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33286)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dywfX-0004hk-4X
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:05:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1dywfV-0006L2-35
+	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 09:05:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EB1852E80CD
+	for <qemu-devel@nongnu.org>; Mon,  2 Oct 2017 09:05:40 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] config: qemu_config_parse() return
- number of config groups
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 02 Oct 2017 08:56:08 -0000
+From: Thomas Huth <1720747@bugs.launchpad.net>
+Reply-To: Bug 1720747 <1720747@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150693176480.12531.16110985684288309886.malonedeb@wampee.canonical.com>
+Message-Id: <150693456948.13102.1590162324308470967.launchpad@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1720747] Re: cannot extract release tarball on
+ case-insensitive filesystems
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -33,21 +36,38 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+*** This bug is a duplicate of bug 1714750 ***
+    https://bugs.launchpad.net/bugs/1714750
 
-> Change qemu_config_parse() to return the number of config groups
-> in success and -EINVAL on error. This will allow callers of
-> qemu_config_parse() to check if something was really loaded from
-> the config file.
->
-> All existing callers of qemu_config_parse() and
-> qemu_read_config_file() only check if the return value was
-> negative, so the change shouldn't affect them.
->
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+** This bug has been marked a duplicate of bug 1714750
+   2.10.0 cannot be installed on case-insensitive file system
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1720747
+
+Title:
+  cannot extract release tarball on case-insensitive filesystems
+
+Status in QEMU:
+  New
+
+Bug description:
+  Extracting the release tarball for qemu-2.10.0 results in an error on
+  case-insensitive filesystems (e.g: macOS) because one is a directory
+  (qemu-2.10.0/roms/u-boot/scripts/Kconfig) and the other one is a file
+  (qemu-2.10.0/roms/u-boot/scripts/kconfig).
+
+  All other files are extracted correctly, and the resulting source can
+  be built correctly.
+
+  But tar returns with an error, which creates difficulties when trying
+  to automate the build process (e.g: homebrew).
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1720747/+subscriptions
