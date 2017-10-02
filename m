@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dz22N-0000nT-Dy
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:49:40 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dz23U-0001oM-7k
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:50:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dz22K-00011w-39
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:49:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60930)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dz22J-00011l-Q3
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:49:36 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CB2BE5F2963
-	for <qemu-devel@nongnu.org>; Mon,  2 Oct 2017 14:49:34 +0000 (UTC)
-References: <20171002134538.23332-1-armbru@redhat.com>
-	<20171002134538.23332-4-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <40c06810-0b7c-6fc0-ed89-1ff53bc837e8@redhat.com>
-Date: Mon, 2 Oct 2017 09:49:32 -0500
+	(envelope-from <kwolf@redhat.com>) id 1dz23O-0002Xd-A1
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:50:48 -0400
+Date: Mon, 2 Oct 2017 16:50:30 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171002145030.GC4362@localhost.localdomain>
+References: <150680635276.96.4363000165685666262@b58463cdfd5f>
+	<4cac1113-5d6a-3dd1-1ef0-6fde5482a125@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171002134538.23332-4-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="pNVwgHJU65pk6244BVp1jFca4HvMCVxwB"
-Subject: Re: [Qemu-devel] [PATCH 3/3] hmp-commands-info: Change "@findex
- FOO" to "@findex info FOO"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="a8Wt8u1KmwUX3Y2C"
+Content-Disposition: inline
+In-Reply-To: <4cac1113-5d6a-3dd1-1ef0-6fde5482a125@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/4] block: Avoid copy-on-read assertions
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -34,61 +23,101 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pNVwgHJU65pk6244BVp1jFca4HvMCVxwB
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com
-Message-ID: <40c06810-0b7c-6fc0-ed89-1ff53bc837e8@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] hmp-commands-info: Change "@findex FOO"
- to "@findex info FOO"
-References: <20171002134538.23332-1-armbru@redhat.com>
- <20171002134538.23332-4-armbru@redhat.com>
-In-Reply-To: <20171002134538.23332-4-armbru@redhat.com>
+
+--a8Wt8u1KmwUX3Y2C
 Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 10/02/2017 08:45 AM, Markus Armbruster wrote:
-> qemu-doc has the monitor commands in the "Function Index".  The "info
-> FOO" are listed as "FOO" there.  List them as "info FOO" instead.
+Am 01.10.2017 um 00:05 hat Eric Blake geschrieben:
+> On 09/30/2017 04:19 PM, no-reply@patchew.org wrote:
+> > Hi,
+> >=20
+> > This series failed build test on s390x host. Please find the details be=
+low.
+> >=20
 >=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  hmp-commands-info.hx | 118 +++++++++++++++++++++++++------------------=
---------
->  1 file changed, 59 insertions(+), 59 deletions(-)
+> > /var/tmp/patchew-tester-tmp-a2p2tpcc/src/block/io.c: In function =E2=80=
+=98bdrv_aligned_preadv=E2=80=99:
+> > /var/tmp/patchew-tester-tmp-a2p2tpcc/src/block/io.c:955:9: error: =E2=
+=80=98ret=E2=80=99 may be used uninitialized in this function [-Werror=3Dma=
+ybe-uninitialized]
+> >      int ret;
+> >          ^~~
+>=20
+> Blah - I compiled with -g instead of -O2, which masks this warning in my
+> setup.
+>=20
+> The warning is a false negative (the error message is actually pointing
+> to a line in bdrv_co_do_copy_on_readv - but the compiler must have
+> inlined it into bdrv_aligned_preadv) - the function is only ever called
+> with non-zero bytes, and therefore the 'while (cluster_bytes)' loop will
+> execute at least once, and ret always gets assigned.  But the compiler
+> can't see that, so I'll squash this in:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Well, you could help the compiler with this:
 
-We have a lot of info subcommands ;)
+    assert(cluster_bytes > 0);
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Then it compiles. Unfortunately, the compiler was right and you weren't:
 
+    $ ./qemu-io -C -c 'read 0 0' /tmp/test.qcow2
+    qemu-io: block/io.c:988: bdrv_co_do_copy_on_readv: Assertion `cluster_b=
+ytes > 0' failed.
+    Abgebrochen (Speicherabzug geschrieben)
 
---pNVwgHJU65pk6244BVp1jFca4HvMCVxwB
+Maybe a case to add to the test?
+
+> commit a201636c3133827bd632d5fdd9eb1f5df81d0e0e
+> Author: Eric Blake <eblake@redhat.com>
+> Date:   Sat Sep 30 14:27:51 2017 -0500
+>=20
+>     fixup! block: Perform copy-on-read in loop
+>=20
+>     Signed-off-by: Eric Blake <eblake@redhat.com>
+>=20
+> diff --git a/block/io.c b/block/io.c
+> index 5ef5adc7a7..e7519464bb 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -952,7 +952,7 @@ static int coroutine_fn
+> bdrv_co_do_copy_on_readv(BdrvChild *child,
+>      int64_t cluster_offset;
+>      unsigned int cluster_bytes;
+>      size_t skip_bytes;
+> -    int ret;
+> +    int ret =3D 0;
+>      int max_transfer =3D MIN_NON_ZERO(bs->bl.max_transfer,
+>                                      BDRV_REQUEST_MAX_BYTES);
+>      unsigned int progress =3D 0;
+
+I would prefer a ret =3D 0 immediately before err: so that we'll still get
+warning if we forget assigning ret in any future error path.
+
+Kevin
+
+--a8Wt8u1KmwUX3Y2C
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnSUfwACgkQp6FrSiUn
-Q2rXpQf/YU6uuBTwiFjztJIb1Rf24nW+9KSB2HWRwqZ/Fe+UPMYaloq2u1bi2etQ
-jtEjJ345l8C9VXPR8vfQj4TWFDFqemDJzbijipIVapOvIDnM4n6K3V5MQpppcagF
-zq+7D/kAvnhZy0KylsWZMvrVr34Lgu5y211cHgybFEN8maH4YhR3XRQddGN+8wKS
-Vp2xJxPa5O19QJum8NlmMzjoM26wXmE5m9o/mc7wDZVEajnp7y+5AuFgILFWGTSQ
-7mear6NPVzBYOwdxSDVG7belONdPZsK+ZL3WUiI9jbObDHe4kKYXOfkB4m5HygGv
-Y4gN0chuJ5eGRdzH6DGjKJn4INiqfA==
-=Yb3Z
+iQIcBAEBAgAGBQJZ0lI2AAoJEH8JsnLIjy/Wk4cP/2n6BYMotCihTemRfDEWpZJ4
+7iYeLkHDcW31nkY1KHn6VX5HB9jVtEWmbC1uX5jyR59mW39SrasXFia0nwxjgDUJ
+hMM8SB0Pfgxdj7GJlElgTj+5hHDz4Pa1f5+f8QBMYlBeJ/onzuHrmrYxRnxRNdFM
+qP/UAB6KlqshAkZhyPHYfoqNmeYdX2ON/1KrCMszY8gHQ9bEaXvuOw4nH6vAzHWe
+w5Ug6gD+9wBfJJiy/r8g9uIFiJ40j8EklPryaPOR7qaAeZ9RFPqLJMyLX/cwIkrh
+urA//Nj0jsW6OMh5cqKLVnsQhAuB3kxthw8afXHLDMbUAs8V/NDme62BArsvaErK
+FsnamIVCUiBticubJsvSri49Fd3ghaMvfyb60iKoxul33jOZsOfVGikkA8uNzqqb
+GEjXCYz/yWI11d4/KDzGxEetEjoto5Y/45OwqDvBNNB3PPaZQeYjrbAj8ejR627p
+eubJ7SkifG3EI6s6Y3K8CR6jm8ox0V5JWskMZLIucd212ZB7VO0QNyU5CAeZKvKC
+mgCKQ+PgNTyh7svJsp9wDjaPb0/UEecKcdISPLX396FVFCWlD+dAhrxgZg/47Oaq
+lihDvBBFqQ09/5cPStYOD0bP4g30Ekn1rbQsknKE/4nowyvvg4L2WtHWfIByfHne
+zxcPDJlFzxYCNM4NP8UK
+=b3cq
 -----END PGP SIGNATURE-----
 
---pNVwgHJU65pk6244BVp1jFca4HvMCVxwB--
+--a8Wt8u1KmwUX3Y2C--
