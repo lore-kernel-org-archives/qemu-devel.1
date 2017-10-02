@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dytZA-0006m5-QD
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 01:46:57 -0400
+	(envelope-from <armbru@redhat.com>) id 1dyu2Z-0002Kn-Cp
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 02:17:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dytZ5-0006vA-V6
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 01:46:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40270)
+	(envelope-from <armbru@redhat.com>) id 1dyu2W-0007Y0-5W
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 02:17:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41814)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dytZ5-0006uN-NM
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 01:46:51 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dyu2V-0007XX-VD
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 02:17:16 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <20170804012551.2714-1-eblake@redhat.com>
-	<20170804012551.2714-6-eblake@redhat.com>
-	<87k22dw4r2.fsf@dusky.pond.sub.org>
-	<c9564021-896a-2c29-8f74-0921e94d292a@redhat.com>
-Date: Mon, 02 Oct 2017 07:46:47 +0200
-In-Reply-To: <c9564021-896a-2c29-8f74-0921e94d292a@redhat.com> (Eric Blake's
-	message of "Wed, 9 Aug 2017 08:14:09 -0500")
-Message-ID: <87lgkurtiw.fsf@dusky.pond.sub.org>
+References: <87r2w6eq5n.fsf@gmail.com>
+	<20170918153644.GA12759@stefanha-x1.localdomain>
+Date: Mon, 02 Oct 2017 08:17:12 +0200
+In-Reply-To: <20170918153644.GA12759@stefanha-x1.localdomain> (Stefan
+	Hajnoczi's message of "Mon, 18 Sep 2017 16:36:44 +0100")
+Message-ID: <87h8virs47.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 05/22] qobject: Simplify
- qobject_from_jsonv()
+Subject: Re: [Qemu-devel] [PATCH] scripts: Support building with Python 3
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -29,75 +26,56 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: David Michael <fedora.dm0@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+Stefan Hajnoczi <stefanha@gmail.com> writes:
 
-> On 08/09/2017 02:59 AM, Markus Armbruster wrote:
->> Eric Blake <eblake@redhat.com> writes:
+> On Sat, Aug 19, 2017 at 10:58:44PM -0700, David Michael wrote:
+>> This allows building with "./configure --python=python3", where
+>> the python3 program is at least version 3.6.  It preserves
+>> compatibility with Python 2.  The changes include:
 >> 
->>> qobject_from_jsonv() was unusual in that it took a va_list*, instead
->>> of the more typical va_list; this was so that callers could pass
->>> NULL to avoid % interpolation.  While this works under the hood, it
->>> is awkward for callers, so move the magic into qjson.c rather than
->>> in the public interface, and finally improve the documentation of
->>> qobject_from_jsonf().
->>>
+>>   - Avoiding "print" usage
+>>   - Using bytes with files opened in binary mode
+>>   - Switching .iteritems() to .items()
+>>   - Adding fallback imports for functions moved to other modules
+>> 
+>> Signed-off-by: David Michael <fedora.dm0@gmail.com>
+>> ---
+>> 
+>> Hi,
+>> 
+>> I've been applying these changes when building on Fedora 26, which does
+>> not include any Python 2 packages by default.  It was tested with Python
+>> 2.7 and 3.6.
+>> 
+>> I just saw the list of scripts that need updating on the mailing list,
+>> and this doesn't cover all of them, but it is enough to build a binary
+>> for running virtual machines with KVM.  Maybe it is still useful as a
+>> starting point.
+>> 
+>> Thanks.
 >
->>> -    /* Going through qobject ensures we escape strings properly.
->>> -     * This seemingly unnecessary copy is required in case va_list
->>> -     * is an array type.
->>> -     */
->>> -    va_copy(ap_copy, ap);
->>> -    qobj = qobject_from_jsonv(fmt, &ap_copy, &error_abort);
->>> -    va_end(ap_copy);
->>> +    /* Going through qobject ensures we escape strings properly. */
->>> +    qobj = qobject_from_jsonv(fmt, ap);
->>>      qstr = qobject_to_json(qobj);
->>>
->>>      /*
->> 
->> Wait!  Oh, the va_copy() moves iinto qobject_from_jsonv().  Okay, I
->> guess.
-[...]
->>> +
->>> +    /*
->>> +     * This seemingly unnecessary copy is required in case va_list
->>> +     * is an array type.
->>> +     */
->> 
->> --verbose?
->>
->>> +    va_copy(ap_copy, ap);
->>> +    obj = qobject_from_json_internal(string, &ap_copy, &error_abort);
->>> +    va_end(ap_copy);
 >
-> Code motion. But if the comment needs to be more verbose in the
-> destination than it was on the source, the rationale is that C99/POSIX
-> allows 'typedef something va_list[]' (that is, where va_list is an array
-> of some other type), although I don't know of any modern OS that
-> actually defines it like that.  Based on C pointer-decay rules, '&ap'
-> has a different type based on whether va_list was a struct/pointer or an
-> array type, when 'va_list ap' was passed as a parameter; so we can't
-> portably use qobject_from_json_internal(string, &ap, &error_abort).  The
-> va_copy() is what lets us guarantee that &ap_list is a pointer to a
-> va_list regardless of the type of va_list (because va_copy was declared
-> locally, rather than in a parameter list, and is therefore not subject
-> to pointer decay), and NOT an accidental pointer to first element of the
-> va_list array on platforms where va_list is an array.
+> Markus,
+> You wanted to discuss the general direction of Python version support
+> before applying this.
 
-I'm dense this Monday morning --- I still can't see where exactly
-passing &ap directly goes wrong.
+Dan has since posted competing patches.
 
-Two cases:
+> Has consensus been reached?
 
-1. va_list is a typedef name for a non-array type T.
+I need to decide how much I hate supporting both Python 2 and Python 3,
+and that involves looking at both patch sets in more detail.
 
-2. va_list is a typedef name for an array type E[].
+QAPI is a rather busy subsystem, and right now my review queue is in a
+state where I have to decide whom to annoy and disappoint with overly
+long delays.
 
-What are the types of actual argument &ap and formal parameter va_list
-*ap in either case?
-
-How exactly does case 2 break?
+Given the choice between addressing a problem that doesn't really exist,
+yet (Python 2 going away) and addressing problems that are hurting us
+*now* (such as QAPI's inability to express compile-time conditionals), I
+have to prioritize the latter.  I wish I wouldn't have to make such
+choices, and I apologize for the inconvenience.
