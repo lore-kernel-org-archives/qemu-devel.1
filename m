@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dz2ba-0007xv-U7
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:26:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1dz2bZ-0007x9-MB
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:26:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dz2bZ-0007ug-KP
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:26:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34010)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dz2bZ-0007te-Ci
+	(envelope-from <armbru@redhat.com>) id 1dz2bY-0007tV-Js
 	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:26:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49033)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dz2bY-0007sr-Bc
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:26:00 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  2 Oct 2017 17:25:33 +0200
-Message-Id: <20171002152552.27999-14-armbru@redhat.com>
+Date: Mon,  2 Oct 2017 17:25:26 +0200
+Message-Id: <20171002152552.27999-7-armbru@redhat.com>
 In-Reply-To: <20171002152552.27999-1-armbru@redhat.com>
 References: <20171002152552.27999-1-armbru@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 13/32] qapi: Use argparse to open schema
- file
+Subject: [Qemu-devel] [RFC PATCH 06/32] qapi2texi: Drop | example markup
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -27,81 +26,166 @@ To: qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com, eblake@redhat.com
 List-ID: <qemu-devel.nongnu.org>
 
-QAPISchema.__init__() opens the schema file.  Since it doesn't bother
-to catch exceptions, an invalid schema argument is reported like this:
+Doc comment lines starting with '|' are examples.  qapi2texi.py puts
+each line in its own @example environment, which is wrong.
+Fortunately, this kind of example markup is used in just one place
+outside tests.  Replace it by Texinfo markup, and drop the '|'
+feature.
 
-    Traceback (most recent call last):
-      File "../scripts/qapi-commands.py", line 318, in <module>
-	schema = QAPISchema(args.schema)
-      File "/work/armbru/qemu/scripts/qapi.py", line 1464, in __init__
-	parser = QAPISchemaParser(open(fname, 'r'))
-    IOError: [Errno 2] No such file or directory: 'nonexistent'
-
-Leave it to argparse, which handles the exception like this:
-
-    usage: qapi-commands.py [-h] [-o OUTPUT_DIR] [-p PREFIX] schema
-    qapi-commands.py: error: argument schema: can't open 'nonexistent': [Errno 2] No such file or directory: 'nonexistent'
-
-Too verbose for my taste, but let's not second-guess the standard
-library.
+tests/qapi-schema/doc-good.texi changes, because unlike the '|'
+markup, !texinfo terminates lists.  See the FIXME in texi_format().
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi.py                | 6 +++---
- scripts/qapi2texi.py           | 2 +-
- tests/qapi-schema/test-qapi.py | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ docs/devel/qapi-code-gen.txt    | 10 ----------
+ qapi-schema.json                |  8 ++++++--
+ scripts/qapi2texi.py            |  9 +--------
+ tests/qapi-schema/doc-good.json |  8 ++++++--
+ tests/qapi-schema/doc-good.out  |  8 ++++++--
+ tests/qapi-schema/doc-good.texi | 10 +++-------
+ 6 files changed, 22 insertions(+), 31 deletions(-)
 
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 25f6c81b08..a33203e82d 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -1450,9 +1450,9 @@ class QAPISchemaEvent(QAPISchemaEntity):
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index 0334ef37ef..579807f6a5 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -65,11 +65,6 @@ Double the '=' for a subsection title:
  
+     # == Subection title
  
- class QAPISchema(object):
--    def __init__(self, fname):
-+    def __init__(self, file):
-         try:
--            parser = QAPISchemaParser(open(fname, 'r'))
-+            parser = QAPISchemaParser(file)
-             self.exprs = check_exprs(parser.exprs)
-             self.docs = parser.docs
-             self._entity_dict = {}
-@@ -1934,7 +1934,7 @@ def common_argument_parser(builtins=False):
-                         help='output directory')
-     parser.add_argument('-p', '--prefix', default='', type=prefix,
-                         help='prefix to add to output files')
--    parser.add_argument('schema',
-+    parser.add_argument('schema', type=argparse.FileType('r'),
-                         help='QAPI schema source file')
-     return parser
+-'|' denotes examples:
+-
+-    # | Text of the example, may span
+-    # | multiple lines
+-
+ '*' starts an itemized list:
  
+     # * First item, may span
+@@ -110,11 +105,6 @@ Example:
+ # 1. with a list
+ # 2. like that
+ #
+-# And some code:
+-# | $ echo foo
+-# | -> do this
+-# | <- get that
+-#
+ # Texinfo markup:
+ # !texinfo
+ # @table @samp
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 3490a5edaf..a6ef550fd5 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -20,8 +20,12 @@
+ #
+ # Example:
+ #
+-# | -> data issued by the Client
+-# | <- Server data response
++# !texinfo
++# @verbatim
++# -> data issued by the Client
++# <- Server data response
++# @end verbatim
++# !end texinfo
+ #
+ # Please, refer to the QMP specification (docs/interop/qmp-spec.txt) for
+ # detailed information on the Server command and response formats.
 diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index fd90d8953e..d95d7541a3 100755
+index e356f911bb..bfd1c676e1 100755
 --- a/scripts/qapi2texi.py
 +++ b/scripts/qapi2texi.py
-@@ -282,7 +282,7 @@ def texi_schema(schema):
- def main(argv):
-     """Takes schema argument, prints result to stdout"""
-     parser = argparse.ArgumentParser()
--    parser.add_argument('schema',
-+    parser.add_argument('schema', type=argparse.FileType('r'),
-                         help='QAPI schema source file')
-     args = parser.parse_args()
+@@ -25,11 +25,6 @@ TYPE_FMT = """
  
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.py
-index a7e21d016f..225417d861 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -53,7 +53,7 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-                 print '    case %s: %s' % (v.name, v.type.name)
+ """.format
  
- parser = argparse.ArgumentParser()
--parser.add_argument('schema',
-+parser.add_argument('schema', type=argparse.FileType('r'),
-                     help='QAPI schema source file')
- args = parser.parse_args()
+-EXAMPLE_FMT = """@example
+-{code}
+-@end example
+-""".format
+-
  
+ def subst_strong(doc):
+     """Replaces *foo* by @strong{foo}"""
+@@ -103,9 +98,7 @@ def texi_format(doc):
+         #
+         # Make sure to update section "Documentation markup" in
+         # docs/devel/qapi-code-gen.txt when fixing this.
+-        if line.startswith('| '):
+-            line = EXAMPLE_FMT(code=line[2:])
+-        elif line.startswith('= '):
++        if line.startswith('= '):
+             line = '@section ' + line[2:]
+         elif line.startswith('== '):
+             line = '@subsection ' + line[3:]
+diff --git a/tests/qapi-schema/doc-good.json b/tests/qapi-schema/doc-good.json
+index 5fcca8dc85..d3ddf828ef 100644
+--- a/tests/qapi-schema/doc-good.json
++++ b/tests/qapi-schema/doc-good.json
+@@ -28,8 +28,12 @@
+ #
+ # - another item
+ #
+-# | example
+-# | multiple lines
++# !texinfo
++# @verbatim
++# example
++# multiple lines
++# @end verbatim
++# !end texinfo
+ #
+ # !texinfo
+ # @table @samp
+diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.out
+index 7c4aecbaa2..f0ba51db4b 100644
+--- a/tests/qapi-schema/doc-good.out
++++ b/tests/qapi-schema/doc-good.out
+@@ -56,8 +56,12 @@ is numbered
+ 
+ - another item
+ 
+-| example
+-| multiple lines
++!texinfo
++@verbatim
++example
++multiple lines
++@end verbatim
++!end texinfo
+ 
+ !texinfo
+ @table @samp
+diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good.texi
+index b7171ff6d1..4a9162c2a2 100644
+--- a/tests/qapi-schema/doc-good.texi
++++ b/tests/qapi-schema/doc-good.texi
+@@ -35,13 +35,11 @@ is numbered
+ @item
+ another item
+ 
+-@example
++@verbatim
+ example
+-@end example
+-
+-@example
+ multiple lines
+-@end example
++@end verbatim
++@end enumerate
+ 
+ 
+ @table @samp
+@@ -52,8 +50,6 @@ This is the text for
+ @item bar
+ Text for @samp{bar}.
+ @end table
+-@end enumerate
+-
+ 
+ Returns: the King
+ Since: the first age
 -- 
 2.13.6
