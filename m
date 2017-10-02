@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dyzgq-0003UP-NE
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:19:17 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dyztm-0007Y3-OS
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:32:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dyzgp-0001MN-K0
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:19:16 -0400
-Received: from mail-yw0-x22b.google.com ([2607:f8b0:4002:c05::22b]:52121)
+	(envelope-from <pbonzini@redhat.com>) id 1dyztg-0001rI-Tc
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:32:38 -0400
+Received: from mail-wm0-f54.google.com ([74.125.82.54]:45742)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dyzgp-0001Ld-FI
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:19:15 -0400
-Received: by mail-yw0-x22b.google.com with SMTP id p10so3497939ywh.8
-	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 05:19:14 -0700 (PDT)
-References: <20170930113610.28608-1-sandipan@linux.vnet.ibm.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <db510034-c358-eda5-63df-19ff1341792d@linaro.org>
-Date: Mon, 2 Oct 2017 08:19:10 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dyztg-0001qM-Ms
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:32:32 -0400
+Received: by mail-wm0-f54.google.com with SMTP id q124so10292073wmb.0
+	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 05:32:31 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+References: <20170912144459.11359-1-pbonzini@redhat.com>
+Message-ID: <8315593b-4ae8-b034-01d6-d6f66925b6bb@redhat.com>
+Date: Mon, 2 Oct 2017 14:32:26 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170930113610.28608-1-sandipan@linux.vnet.ibm.com>
+In-Reply-To: <20170912144459.11359-1-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: Fix carry flag setting for
- shift algebraic instructions
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 00/10] cleanup qemu-iotests
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -30,70 +28,55 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Sandipan Das <sandipan@linux.vnet.ibm.com>, david@gibson.dropbear.id.au, agraf@suse.de
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, nikunj@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-On 09/30/2017 07:36 AM, Sandipan Das wrote:
-> For POWER ISA v3.0, the XER bit CA32 needs to be set by the shift
-> right algebraic instructions whenever the CA bit is to be set. This
-> change affects the following instructions:
->   * Shift Right Algebraic Word (sraw[.])
->   * Shift Right Algebraic Word Immediate (srawi[.])
->   * Shift Right Algebraic Doubleword (srad[.])
->   * Shift Right Algebraic Doubleword Immediate (sradi[.])
+On 12/09/2017 16:44, Paolo Bonzini wrote:
+> The purpose of this series is to separate the "check" sources from
+> the tests.  After these patches, common.config is reduced to simple
+> shell initialization, and common.rc is only included by the tests.
 > 
-> Signed-off-by: Sandipan Das <sandipan@linux.vnet.ibm.com>
-> ---
->  target/ppc/helper.h     |  4 ++--
->  target/ppc/int_helper.c | 10 ++++++++--
->  target/ppc/translate.c  | 16 ++++++++++++++--
->  3 files changed, 24 insertions(+), 6 deletions(-)
+> Along the way, a lot of dead code is removed too.
 > 
-> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-> index bb6a94a8b3..069d65ad7b 100644
-> --- a/target/ppc/helper.h
-> +++ b/target/ppc/helper.h
-> @@ -40,12 +40,12 @@ DEF_HELPER_4(divwe, tl, env, tl, tl, i32)
->  
->  DEF_HELPER_FLAGS_1(popcntb, TCG_CALL_NO_RWG_SE, tl, tl)
->  DEF_HELPER_FLAGS_2(cmpb, TCG_CALL_NO_RWG_SE, tl, tl, tl)
-> -DEF_HELPER_3(sraw, tl, env, tl, tl)
-> +DEF_HELPER_4(sraw, tl, env, tl, tl, tl)
->  #if defined(TARGET_PPC64)
->  DEF_HELPER_FLAGS_2(cmpeqb, TCG_CALL_NO_RWG_SE, i32, tl, tl)
->  DEF_HELPER_FLAGS_1(popcntw, TCG_CALL_NO_RWG_SE, tl, tl)
->  DEF_HELPER_FLAGS_2(bpermd, TCG_CALL_NO_RWG_SE, i64, i64, i64)
-> -DEF_HELPER_3(srad, tl, env, tl, tl)
-> +DEF_HELPER_4(srad, tl, env, tl, tl, tl)
->  DEF_HELPER_0(darn32, tl)
->  DEF_HELPER_0(darn64, tl)
->  #endif
-> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-> index da4e1a62c9..4f270eb49d 100644
-> --- a/target/ppc/int_helper.c
-> +++ b/target/ppc/int_helper.c
-> @@ -210,7 +210,7 @@ target_ulong helper_cmpb(target_ulong rs, target_ulong rb)
->  
->  /* shift right arithmetic helper */
->  target_ulong helper_sraw(CPUPPCState *env, target_ulong value,
-> -                         target_ulong shift)
-> +                         target_ulong shift, target_ulong is_isa300)
->  {
->      int32_t ret;
->  
-> @@ -231,12 +231,15 @@ target_ulong helper_sraw(CPUPPCState *env, target_ulong value,
->          ret = (int32_t)value >> 31;
->          env->ca = (ret != 0);
->      }
-> +    if (is_isa300) {
-> +        env->ca32 = env->ca;
-> +    }
+> In v2, the following patches:
+> 
+>   qemu-iotests: do not do useless search for QEMU_*_PROG
+>   qemu-iotests: do not search for binaries in the current directory
+>   qemu-iotests: include common.env and common.config early
+> 
+> have been replaced by "qemu-iotests: cleanup and fix search for programs",
+> which also preserves the behavior of searching for programs as symlinks
+> in the current directory.
+> 
+> Paolo
 
-You do not need to pass a new parameter, because ca32 does not exist prior to
-ISA 3.00, and thus any code running ISA 2.x does not care about its value.
+Kevin,
 
-You only need set ca32 when ca is set.  Move those assignments adjacent.
+ping?
 
+Paolo
 
-r~
+> Paolo Bonzini (10):
+>   qemu-iotests: remove dead code
+>   qemu-iotests: get rid of AWK_PROG
+>   qemu-iotests: move "check" code out of common.rc
+>   qemu-iotests: cleanup and fix search for programs
+>   qemu-iotests: limit non-_PROG-suffixed variables to common.rc
+>   qemu-iotests: do not include common.rc in "check"
+>   qemu-iotests: disintegrate more parts of common.config
+>   qemu-iotests: fix uninitialized variable
+>   qemu-iotests: get rid of $iam
+>   qemu-iotests: merge "check" and "common"
+> 
+>  tests/qemu-iotests/039.out       |  10 +-
+>  tests/qemu-iotests/061.out       |   4 +-
+>  tests/qemu-iotests/137.out       |   2 +-
+>  tests/qemu-iotests/check         | 575 ++++++++++++++++++++++++++++++++++-----
+>  tests/qemu-iotests/common        | 459 -------------------------------
+>  tests/qemu-iotests/common.config | 206 +-------------
+>  tests/qemu-iotests/common.qemu   |   1 +
+>  tests/qemu-iotests/common.rc     | 205 +++++++-------
+>  8 files changed, 621 insertions(+), 841 deletions(-)
+>  delete mode 100644 tests/qemu-iotests/common
+> 
