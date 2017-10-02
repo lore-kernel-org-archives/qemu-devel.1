@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dz1Tq-00077t-2L
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:13:59 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dz1Vm-0000a2-Cx
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:16:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dz1Tj-0003eU-L0
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:13:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52134)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dz1Tj-0003e2-CO
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:13:51 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 822BF356DB
-	for <qemu-devel@nongnu.org>; Mon,  2 Oct 2017 14:13:50 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  2 Oct 2017 16:13:39 +0200
-Message-Id: <20171002141341.24616-10-armbru@redhat.com>
-In-Reply-To: <20171002141341.24616-1-armbru@redhat.com>
-References: <20171002141341.24616-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 09/11] qapi2texi: Simplify representation of
- section text
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dz1Vj-0005Ck-MP
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:15:58 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:53578)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dz1Vj-0005CA-He
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:15:55 -0400
+Received: by mail-qt0-x243.google.com with SMTP id 47so7371217qts.10
+	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 07:15:55 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
+	<1506935300-132598-2-git-send-email-imammedo@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <39052520-05bf-5e6f-fcc6-46026bd8a6f2@amsat.org>
+Date: Mon, 2 Oct 2017 11:15:51 -0300
+MIME-Version: 1.0
+In-Reply-To: <1506935300-132598-2-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 01/38] qom: add helper
+ type_init_from_array()
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -29,197 +35,47 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com
 List-ID: <qemu-devel.nongnu.org>
 
-Use a string instead of a list of strings.  While there, generate
-fewer superfluous blank lines.
+On 10/02/2017 06:07 AM, Igor Mammedov wrote:
+> it will help to remove code duplication in places
+> that currently open code registration of several
+> types.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- scripts/qapi2texi.py            | 33 ++++++++++++++++-----------------
- tests/qapi-schema/doc-good.texi | 10 ----------
- 2 files changed, 16 insertions(+), 27 deletions(-)
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index 379d27643d..58add26c11 100755
---- a/scripts/qapi2texi.py
-+++ b/scripts/qapi2texi.py
-@@ -13,7 +13,6 @@ MSG_FMT = """
- @deftypefn {type} {{}} {name}
- 
- {body}
--
- @end deftypefn
- 
- """.format
-@@ -22,7 +21,6 @@ TYPE_FMT = """
- @deftp {{{type}}} {name}
- 
- {body}
--
- @end deftp
- 
- """.format
-@@ -74,7 +72,7 @@ def texi_format(doc):
-     - 1. or 1): generates an @enumerate @item
-     - */-: generates an @itemize list
-     """
--    lines = []
-+    ret = ''
-     doc = subst_braces(doc)
-     doc = subst_vars(doc)
-     doc = subst_emph(doc)
-@@ -100,32 +98,32 @@ def texi_format(doc):
-             line = '@subsection ' + line[3:]
-         elif re.match(r'^([0-9]*\.) ', line):
-             if not inlist:
--                lines.append('@enumerate')
-+                ret += '@enumerate\n'
-                 inlist = 'enumerate'
-+            ret += '@item\n'
-             line = line[line.find(' ')+1:]
--            lines.append('@item')
-         elif re.match(r'^[*-] ', line):
-             if not inlist:
--                lines.append('@itemize %s' % {'*': '@bullet',
--                                              '-': '@minus'}[line[0]])
-+                ret += '@itemize %s\n' % {'*': '@bullet',
-+                                          '-': '@minus'}[line[0]]
-                 inlist = 'itemize'
--            lines.append('@item')
-+            ret += '@item\n'
-             line = line[2:]
-         elif lastempty and inlist:
--            lines.append('@end %s\n' % inlist)
-+            ret += '@end %s\n\n' % inlist
-             inlist = ''
- 
-         lastempty = empty
--        lines.append(line)
-+        ret += line + '\n'
- 
-     if inlist:
--        lines.append('@end %s\n' % inlist)
--    return '\n'.join(lines)
-+        ret += '@end %s\n\n' % inlist
-+    return ret
- 
- 
- def texi_body(doc):
-     """Format the main documentation body"""
--    return texi_format(doc.body.text) + '\n'
-+    return texi_format(doc.body.text)
- 
- 
- def texi_enum_value(value):
-@@ -154,10 +152,11 @@ def texi_members(doc, what, base, variants, member_func):
-         elif (variants and variants.tag_member == section.member
-               and not section.member.type.doc_type()):
-             values = section.member.type.member_names()
--            desc = 'One of ' + ', '.join(['@t{"%s"}' % v for v in values])
-+            members_text = ', '.join(['@t{"%s"}' % v for v in values])
-+            desc = 'One of ' + members_text + '\n'
-         else:
--            desc = 'Not documented'
--        items += member_func(section.member) + desc + '\n'
-+            desc = 'Not documented\n'
-+        items += member_func(section.member) + desc
-     if base:
-         items += '@item The members of @code{%s}\n' % base.doc_type()
-     if variants:
-@@ -182,7 +181,7 @@ def texi_sections(doc):
-     for section in doc.sections:
-         if section.name:
-             # prefer @b over @strong, so txt doesn't translate it to *Foo:*
--            body += '\n\n@b{%s:}\n' % section.name
-+            body += '\n@b{%s:}\n' % section.name
-         if section.name and section.name.startswith('Example'):
-             body += texi_example(section.text)
-         else:
-diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good.texi
-index c032f23fc1..1778312581 100644
---- a/tests/qapi-schema/doc-good.texi
-+++ b/tests/qapi-schema/doc-good.texi
-@@ -101,7 +101,6 @@ Not documented
- the first member
- @end table
- 
--
- @end deftp
- 
- 
-@@ -118,7 +117,6 @@ Another paragraph (but no @code{var}: line)
- Not documented
- @end table
- 
--
- @end deftp
- 
- 
-@@ -127,7 +125,6 @@ Not documented
- 
- 
- 
--
- @end deftp
- 
- 
-@@ -143,7 +140,6 @@ Not documented
- @item The members of @code{Variant2} when @code{base1} is @t{"two"}
- @end table
- 
--
- @end deftp
- 
- 
-@@ -160,7 +156,6 @@ One of @t{"one"}, @t{"two"}
- @item @code{data: Variant2} when @code{type} is @t{"two"}
- @end table
- 
--
- @end deftp
- 
- 
-@@ -182,7 +177,6 @@ argument
- Not documented
- @end table
- 
--
- @b{Note:}
- @code{arg3} is undocumented
- 
-@@ -209,14 +203,12 @@ Duis aute irure dolor
- <- out
- @end example
- 
--
- @b{Examples:}
- @example
- - *verbatim*
- - @{braces@}
- @end example
- 
--
- @b{Since:}
- 2.10
- 
-@@ -230,7 +222,6 @@ If you're bored enough to read this, go see a video of boxed cats
- 
- @b{Arguments:} the members of @code{Object}
- 
--
- @b{Example:}
- @example
- -> in
-@@ -238,7 +229,6 @@ If you're bored enough to read this, go see a video of boxed cats
- <- out
- @end example
- 
--
- @end deftypefn
- 
- 
--- 
-2.13.6
+> ---
+> I'm going to use it for CPU types in followup patches
+> 
+> CC: ehabkost@redhat.com
+> ---
+>   include/qemu/module.h | 10 ++++++++++
+>   1 file changed, 10 insertions(+)
+> 
+> diff --git a/include/qemu/module.h b/include/qemu/module.h
+> index 56dd218..29f9089 100644
+> --- a/include/qemu/module.h
+> +++ b/include/qemu/module.h
+> @@ -52,6 +52,16 @@ typedef enum {
+>   #define type_init(function) module_init(function, MODULE_INIT_QOM)
+>   #define trace_init(function) module_init(function, MODULE_INIT_TRACE)
+>   
+> +#define type_init_from_array(array)                                        \
+> +static void do_qemu_init_ ## array(void)                                   \
+> +{                                                                          \
+> +    int i;                                                                 \
+> +    for (i = 0; i < ARRAY_SIZE(array); i++) {                              \
+> +        type_register_static(&array[i]);                                   \
+> +    }                                                                      \
+> +}                                                                          \
+> +module_init(do_qemu_init_ ## array, MODULE_INIT_QOM)
+> +
+>   #define block_module_load_one(lib) module_load_one("block-", lib)
+>   
+>   void register_module_init(void (*fn)(void), module_init_type type);
+> 
