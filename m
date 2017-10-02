@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dyvSP-0001J7-Nz
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 03:48:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1dyw2x-0000KZ-JI
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 04:25:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dyvSM-0003d2-Mi
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 03:48:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52710)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dyvSM-0003cU-Gp
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 03:48:02 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170913132417.24384-1-david@redhat.com>
-	<20170913185827.1f7790f2.cohuck@redhat.com>
-Date: Mon, 02 Oct 2017 09:47:58 +0200
-In-Reply-To: <20170913185827.1f7790f2.cohuck@redhat.com> (Cornelia Huck's
-	message of "Wed, 13 Sep 2017 18:58:27 +0200")
-Message-ID: <87fub2q9ch.fsf@dusky.pond.sub.org>
+	(envelope-from <bounces@canonical.com>) id 1dyw2t-00071b-K3
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 04:25:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53858)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dyw2t-00071L-E4
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 04:25:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1dyw2s-0000G4-Ei
+	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 08:25:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 641B22E80C9
+	for <qemu-devel@nongnu.org>; Mon,  2 Oct 2017 08:25:46 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v5 00/22] s390x cleanups and CPU hotplug
- via device_add
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 02 Oct 2017 08:09:24 -0000
+From: degaart <1720747@bugs.launchpad.net>
+Reply-To: Bug 1720747 <1720747@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <150693176480.12531.16110985684288309886.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1720747] [NEW] cannot extract release tarball on
+ case-insensitive filesystems
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -27,29 +35,83 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 List-ID: <qemu-devel.nongnu.org>
 
-Cornelia Huck <cohuck@redhat.com> writes:
+Public bug reported:
 
-> On Wed, 13 Sep 2017 15:23:55 +0200
-> David Hildenbrand <david@redhat.com> wrote:
->
->> The first patches are a bunch of cleanups. I decided to go the
->> extra mile and implement CPU hotplug via "device_add", as well as
->> "query-hotpluggable-cpus".
->> 
->> On s390x, only complete cores can be plugged. CPU hot unplug is currently
->> not supported by the architecture.
->> 
->> Support for hotplugging CPUs in random core-id order (last two patches)
->> is added. We once hat a KVM bug preventing this, but the stable patch
->> should now be included in relevant places - 152e9f65d66f ("KVM: s390: fix
->> wrong lookup of VCPUs by array index"). Current tooling will plug them in
->> sequential order anyway, so it should not hurt.
->
-> Thanks, applied.
+Extracting the release tarball for qemu-2.10.0 results in an error on
+case-insensitive filesystems (e.g: macOS) because one is a directory
+(qemu-2.10.0/roms/u-boot/scripts/Kconfig) and the other one is a file
+(qemu-2.10.0/roms/u-boot/scripts/kconfig).
 
-Please squash in the one-liner fix I asked for in my (late!) review of
-PATCH 18.
+All other files are extracted correctly, and the resulting source can be
+built correctly.
+
+But tar returns with an error, which creates difficulties when trying to
+automate the build process (e.g: homebrew).
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Description changed:
+
+  Extracting the release tarball for qemu-2.10.0 results in an error on
+- case-insensitive filesystems because of the files
+- qemu-2.10.0/roms/u-boot/scripts/Kconfig and
+- qemu-2.10.0/roms/u-boot/scripts/kconfig.
++ case-insensitive filesystems because one is a directory
++ (qemu-2.10.0/roms/u-boot/scripts/Kconfig) and the other one is a file
++ (qemu-2.10.0/roms/u-boot/scripts/kconfig).
+  =
+
+  All other files are extracted correctly, and the resulting source can be
+  built correctly.
+  =
+
+  But tar returns with an error, which creates difficulties when trying to
+  automate the build process (e.g: homebrew).
+
+** Description changed:
+
+  Extracting the release tarball for qemu-2.10.0 results in an error on
+- case-insensitive filesystems because one is a directory
++ case-insensitive filesystems (e.g: macOS) because one is a directory
+  (qemu-2.10.0/roms/u-boot/scripts/Kconfig) and the other one is a file
+  (qemu-2.10.0/roms/u-boot/scripts/kconfig).
+  =
+
+  All other files are extracted correctly, and the resulting source can be
+  built correctly.
+  =
+
+  But tar returns with an error, which creates difficulties when trying to
+  automate the build process (e.g: homebrew).
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1720747
+
+Title:
+  cannot extract release tarball on case-insensitive filesystems
+
+Status in QEMU:
+  New
+
+Bug description:
+  Extracting the release tarball for qemu-2.10.0 results in an error on
+  case-insensitive filesystems (e.g: macOS) because one is a directory
+  (qemu-2.10.0/roms/u-boot/scripts/Kconfig) and the other one is a file
+  (qemu-2.10.0/roms/u-boot/scripts/kconfig).
+
+  All other files are extracted correctly, and the resulting source can
+  be built correctly.
+
+  But tar returns with an error, which creates difficulties when trying
+  to automate the build process (e.g: homebrew).
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1720747/+subscriptions
