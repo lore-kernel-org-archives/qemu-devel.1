@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dz2ba-0007xm-Ot
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:26:05 -0400
+	(envelope-from <armbru@redhat.com>) id 1dz2ba-0007xv-U7
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:26:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dz2bZ-0007uP-Ha
+	(envelope-from <armbru@redhat.com>) id 1dz2bZ-0007ug-KP
 	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:26:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56044)
+Received: from mx1.redhat.com ([209.132.183.28]:34010)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dz2bZ-0007td-C8
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dz2bZ-0007te-Ci
 	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:26:01 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  2 Oct 2017 17:25:29 +0200
-Message-Id: <20171002152552.27999-10-armbru@redhat.com>
+Date: Mon,  2 Oct 2017 17:25:33 +0200
+Message-Id: <20171002152552.27999-14-armbru@redhat.com>
 In-Reply-To: <20171002152552.27999-1-armbru@redhat.com>
 References: <20171002152552.27999-1-armbru@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 09/32] qapi: check_type() parameter
- allow_optional is now unused, drop
+Subject: [Qemu-devel] [RFC PATCH 13/32] qapi: Use argparse to open schema
+ file
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -27,62 +27,81 @@ To: qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com, eblake@redhat.com
 List-ID: <qemu-devel.nongnu.org>
 
+QAPISchema.__init__() opens the schema file.  Since it doesn't bother
+to catch exceptions, an invalid schema argument is reported like this:
+
+    Traceback (most recent call last):
+      File "../scripts/qapi-commands.py", line 318, in <module>
+	schema = QAPISchema(args.schema)
+      File "/work/armbru/qemu/scripts/qapi.py", line 1464, in __init__
+	parser = QAPISchemaParser(open(fname, 'r'))
+    IOError: [Errno 2] No such file or directory: 'nonexistent'
+
+Leave it to argparse, which handles the exception like this:
+
+    usage: qapi-commands.py [-h] [-o OUTPUT_DIR] [-p PREFIX] schema
+    qapi-commands.py: error: argument schema: can't open 'nonexistent': [Errno 2] No such file or directory: 'nonexistent'
+
+Too verbose for my taste, but let's not second-guess the standard
+library.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi.py | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+ scripts/qapi.py                | 6 +++---
+ scripts/qapi2texi.py           | 2 +-
+ tests/qapi-schema/test-qapi.py | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 208010c241..8f9c5666bd 100644
+index 25f6c81b08..a33203e82d 100644
 --- a/scripts/qapi.py
 +++ b/scripts/qapi.py
-@@ -629,8 +629,7 @@ def add_name(name, info, meta, implicit=False):
-     all_names[name] = meta
+@@ -1450,9 +1450,9 @@ class QAPISchemaEvent(QAPISchemaEntity):
  
  
--def check_type(info, source, value, allow_array=False,
--               allow_dict=False, allow_optional=False,
-+def check_type(info, source, value, allow_array=False, allow_dict=False,
-                allow_metas=[]):
-     global all_names
+ class QAPISchema(object):
+-    def __init__(self, fname):
++    def __init__(self, file):
+         try:
+-            parser = QAPISchemaParser(open(fname, 'r'))
++            parser = QAPISchemaParser(file)
+             self.exprs = check_exprs(parser.exprs)
+             self.docs = parser.docs
+             self._entity_dict = {}
+@@ -1934,7 +1934,7 @@ def common_argument_parser(builtins=False):
+                         help='output directory')
+     parser.add_argument('-p', '--prefix', default='', type=prefix,
+                         help='prefix to add to output files')
+-    parser.add_argument('schema',
++    parser.add_argument('schema', type=argparse.FileType('r'),
+                         help='QAPI schema source file')
+     return parser
  
-@@ -686,7 +685,7 @@ def check_command(expr, info):
-     if boxed:
-         args_meta += ['union', 'alternate']
-     check_type(info, "'data' for command '%s'" % name,
--               expr.get('data'), allow_dict=not boxed, allow_optional=True,
-+               expr.get('data'), allow_dict=not boxed,
-                allow_metas=args_meta)
-     returns_meta = ['union', 'struct']
-     if name in returns_whitelist:
-@@ -704,8 +703,7 @@ def check_event(expr, info):
-     if boxed:
-         meta += ['union', 'alternate']
-     check_type(info, "'data' for event '%s'" % name,
--               expr.get('data'), allow_dict=not boxed, allow_optional=True,
--               allow_metas=meta)
-+               expr.get('data'), allow_dict=not boxed, allow_metas=meta)
+diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
+index fd90d8953e..d95d7541a3 100755
+--- a/scripts/qapi2texi.py
++++ b/scripts/qapi2texi.py
+@@ -282,7 +282,7 @@ def texi_schema(schema):
+ def main(argv):
+     """Takes schema argument, prints result to stdout"""
+     parser = argparse.ArgumentParser()
+-    parser.add_argument('schema',
++    parser.add_argument('schema', type=argparse.FileType('r'),
+                         help='QAPI schema source file')
+     args = parser.parse_args()
  
+diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.py
+index a7e21d016f..225417d861 100644
+--- a/tests/qapi-schema/test-qapi.py
++++ b/tests/qapi-schema/test-qapi.py
+@@ -53,7 +53,7 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+                 print '    case %s: %s' % (v.name, v.type.name)
  
- def check_union(expr, info):
-@@ -728,8 +726,7 @@ def check_union(expr, info):
-     else:
-         # The object must have a string or dictionary 'base'.
-         check_type(info, "'base' for union '%s'" % name,
--                   base, allow_dict=True, allow_optional=True,
--                   allow_metas=['struct'])
-+                   base, allow_dict=True, allow_metas=['struct'])
-         if not base:
-             raise QAPISemError(info, "Flat union '%s' must have a base"
-                                % name)
-@@ -843,7 +840,7 @@ def check_struct(expr, info):
-     members = expr['data']
- 
-     check_type(info, "'data' for struct '%s'" % name, members,
--               allow_dict=True, allow_optional=True)
-+               allow_dict=True)
-     check_type(info, "'base' for struct '%s'" % name, expr.get('base'),
-                allow_metas=['struct'])
+ parser = argparse.ArgumentParser()
+-parser.add_argument('schema',
++parser.add_argument('schema', type=argparse.FileType('r'),
+                     help='QAPI schema source file')
+ args = parser.parse_args()
  
 -- 
 2.13.6
