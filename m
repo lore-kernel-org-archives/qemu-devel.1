@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dysNF-0004md-La
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 00:30:35 -0400
+	(envelope-from <armbru@redhat.com>) id 1dytZA-0006m5-QD
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 01:46:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dysNB-0001fO-LT
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 00:30:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41770)
+	(envelope-from <armbru@redhat.com>) id 1dytZ5-0006vA-V6
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 01:46:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40270)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dysNB-0001e9-Bz
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 00:30:29 -0400
-Date: Mon, 2 Oct 2017 07:30:17 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171002072106-mutt-send-email-mst@kernel.org>
-References: <1506744354-20979-1-git-send-email-wei.w.wang@intel.com>
-	<1506744354-20979-4-git-send-email-wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dytZ5-0006uN-NM
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 01:46:51 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170804012551.2714-1-eblake@redhat.com>
+	<20170804012551.2714-6-eblake@redhat.com>
+	<87k22dw4r2.fsf@dusky.pond.sub.org>
+	<c9564021-896a-2c29-8f74-0921e94d292a@redhat.com>
+Date: Mon, 02 Oct 2017 07:46:47 +0200
+In-Reply-To: <c9564021-896a-2c29-8f74-0921e94d292a@redhat.com> (Eric Blake's
+	message of "Wed, 9 Aug 2017 08:14:09 -0500")
+Message-ID: <87lgkurtiw.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1506744354-20979-4-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v16 3/5] virtio-balloon: VIRTIO_BALLOON_F_SG
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 05/22] qobject: Simplify
+ qobject_from_jsonv()
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -26,311 +29,75 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 List-ID: <qemu-devel.nongnu.org>
 
-Looks good to me. minor comments below.
+Eric Blake <eblake@redhat.com> writes:
 
-On Sat, Sep 30, 2017 at 12:05:52PM +0800, Wei Wang wrote:
-> @@ -141,13 +146,128 @@ static void set_page_pfns(struct virtio_balloon *vb,
->  					  page_to_balloon_pfn(page) + i);
->  }
->  
-> +
-> +static void kick_and_wait(struct virtqueue *vq, wait_queue_head_t wq_head)
-> +{
-> +	unsigned int len;
-> +
-> +	virtqueue_kick(vq);
-> +	wait_event(wq_head, virtqueue_get_buf(vq, &len));
-> +}
-> +
-> +static int add_one_sg(struct virtqueue *vq, void *addr, uint32_t size)
-> +{
-> +	struct scatterlist sg;
-> +	unsigned int len;
-> +
-> +	sg_init_one(&sg, addr, size);
-> +
-> +	/* Detach all the used buffers from the vq */
-> +	while (virtqueue_get_buf(vq, &len))
-> +		;
-> +
-> +	return virtqueue_add_inbuf(vq, &sg, 1, vq, GFP_KERNEL);
-> +}
-> +
-> +static int send_balloon_page_sg(struct virtio_balloon *vb,
-> +				 struct virtqueue *vq,
-> +				 void *addr,
-> +				 uint32_t size,
-> +				 bool batch)
-> +{
-> +	int err;
-> +
-> +	err = add_one_sg(vq, addr, size);
-> +
-> +	/* If batchng is requested, we batch till the vq is full */
+> On 08/09/2017 02:59 AM, Markus Armbruster wrote:
+>> Eric Blake <eblake@redhat.com> writes:
+>> 
+>>> qobject_from_jsonv() was unusual in that it took a va_list*, instead
+>>> of the more typical va_list; this was so that callers could pass
+>>> NULL to avoid % interpolation.  While this works under the hood, it
+>>> is awkward for callers, so move the magic into qjson.c rather than
+>>> in the public interface, and finally improve the documentation of
+>>> qobject_from_jsonf().
+>>>
+>
+>>> -    /* Going through qobject ensures we escape strings properly.
+>>> -     * This seemingly unnecessary copy is required in case va_list
+>>> -     * is an array type.
+>>> -     */
+>>> -    va_copy(ap_copy, ap);
+>>> -    qobj = qobject_from_jsonv(fmt, &ap_copy, &error_abort);
+>>> -    va_end(ap_copy);
+>>> +    /* Going through qobject ensures we escape strings properly. */
+>>> +    qobj = qobject_from_jsonv(fmt, ap);
+>>>      qstr = qobject_to_json(qobj);
+>>>
+>>>      /*
+>> 
+>> Wait!  Oh, the va_copy() moves iinto qobject_from_jsonv().  Okay, I
+>> guess.
+[...]
+>>> +
+>>> +    /*
+>>> +     * This seemingly unnecessary copy is required in case va_list
+>>> +     * is an array type.
+>>> +     */
+>> 
+>> --verbose?
+>>
+>>> +    va_copy(ap_copy, ap);
+>>> +    obj = qobject_from_json_internal(string, &ap_copy, &error_abort);
+>>> +    va_end(ap_copy);
+>
+> Code motion. But if the comment needs to be more verbose in the
+> destination than it was on the source, the rationale is that C99/POSIX
+> allows 'typedef something va_list[]' (that is, where va_list is an array
+> of some other type), although I don't know of any modern OS that
+> actually defines it like that.  Based on C pointer-decay rules, '&ap'
+> has a different type based on whether va_list was a struct/pointer or an
+> array type, when 'va_list ap' was passed as a parameter; so we can't
+> portably use qobject_from_json_internal(string, &ap, &error_abort).  The
+> va_copy() is what lets us guarantee that &ap_list is a pointer to a
+> va_list regardless of the type of va_list (because va_copy was declared
+> locally, rather than in a parameter list, and is therefore not subject
+> to pointer decay), and NOT an accidental pointer to first element of the
+> va_list array on platforms where va_list is an array.
 
-typo
+I'm dense this Monday morning --- I still can't see where exactly
+passing &ap directly goes wrong.
 
-> +	if (!batch || !vq->num_free)
-> +		kick_and_wait(vq, vb->acked);
-> +
-> +	return err;
-> +}
+Two cases:
 
-If add_one_sg fails, kick_and_wait will hang forever.
+1. va_list is a typedef name for a non-array type T.
 
-The reason this might work in because
-1. with 1 sg there are no memory allocations
-2. if adding fails on vq full, then something
-   is in queue and will wake up kick_and_wait.
+2. va_list is a typedef name for an array type E[].
 
-So in short this is expected to never fail.
-How about a BUG_ON here then?
-And make it void, and add a comment with above explanation.
+What are the types of actual argument &ap and formal parameter va_list
+*ap in either case?
 
-> +
-> +/*
-> + * Send balloon pages in sgs to host. The balloon pages are recorded in the
-> + * page xbitmap. Each bit in the bitmap corresponds to a page of PAGE_SIZE.
-> + * The page xbitmap is searched for continuous "1" bits, which correspond
-> + * to continuous pages, to chunk into sgs.
-> + *
-> + * @page_xb_start and @page_xb_end form the range of bits in the xbitmap that
-> + * need to be searched.
-> + */
-> +static void tell_host_sgs(struct virtio_balloon *vb,
-> +			  struct virtqueue *vq,
-> +			  unsigned long page_xb_start,
-> +			  unsigned long page_xb_end)
-> +{
-> +	unsigned long sg_pfn_start, sg_pfn_end;
-> +	void *sg_addr;
-> +	uint32_t sg_len, sg_max_len = round_down(UINT_MAX, PAGE_SIZE);
-> +	int err = 0;
-> +
-> +	sg_pfn_start = page_xb_start;
-> +	while (sg_pfn_start < page_xb_end) {
-> +		sg_pfn_start = xb_find_next_set_bit(&vb->page_xb, sg_pfn_start,
-> +						    page_xb_end);
-> +		if (sg_pfn_start == page_xb_end + 1)
-> +			break;
-> +		sg_pfn_end = xb_find_next_zero_bit(&vb->page_xb,
-> +						   sg_pfn_start + 1,
-> +						   page_xb_end);
-> +		sg_addr = (void *)pfn_to_kaddr(sg_pfn_start);
-> +		sg_len = (sg_pfn_end - sg_pfn_start) << PAGE_SHIFT;
-> +		while (sg_len > sg_max_len) {
-> +			err = send_balloon_page_sg(vb, vq, sg_addr, sg_max_len,
-> +						   true);
-> +			if (unlikely(err < 0))
-> +				goto err_out;
-> +			sg_addr += sg_max_len;
-> +			sg_len -= sg_max_len;
-> +		}
-> +		err = send_balloon_page_sg(vb, vq, sg_addr, sg_len, true);
-> +		if (unlikely(err < 0))
-> +			goto err_out;
-> +		sg_pfn_start = sg_pfn_end + 1;
-> +	}
-> +
-> +	/*
-> +	 * The last few sgs may not reach the batch size, but need a kick to
-> +	 * notify the device to handle them.
-> +	 */
-> +	if (vq->num_free != virtqueue_get_vring_size(vq))
-> +		kick_and_wait(vq, vb->acked);
-> +
-> +	xb_clear_bit_range(&vb->page_xb, page_xb_start, page_xb_end);
-> +	return;
-> +
-> +err_out:
-> +	dev_warn(&vb->vdev->dev, "%s failure: %d\n", __func__, err);
-
-so fundamentally just make send_balloon_page_sg void then.
-
-> +}
-> +
-> +static inline void xb_set_page(struct virtio_balloon *vb,
-> +			       struct page *page,
-> +			       unsigned long *pfn_min,
-> +			       unsigned long *pfn_max)
-> +{
-> +	unsigned long pfn = page_to_pfn(page);
-> +
-> +	*pfn_min = min(pfn, *pfn_min);
-> +	*pfn_max = max(pfn, *pfn_max);
-> +	xb_preload(GFP_KERNEL);
-> +	xb_set_bit(&vb->page_xb, pfn);
-> +	xb_preload_end();
-> +}
-> +
->  static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
->  {
->  	struct balloon_dev_info *vb_dev_info = &vb->vb_dev_info;
->  	unsigned num_allocated_pages;
-> +	bool use_sg = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_SG);
-> +	unsigned long pfn_max = 0, pfn_min = ULONG_MAX;
->  
->  	/* We can only do one array worth at a time. */
-> -	num = min(num, ARRAY_SIZE(vb->pfns));
-> +	if (!use_sg)
-> +		num = min(num, ARRAY_SIZE(vb->pfns));
->  
->  	mutex_lock(&vb->balloon_lock);
->  	for (vb->num_pfns = 0; vb->num_pfns < num;
-> @@ -162,7 +282,12 @@ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
->  			msleep(200);
->  			break;
->  		}
-> -		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
-> +
-> +		if (use_sg)
-> +			xb_set_page(vb, page, &pfn_min, &pfn_max);
-> +		else
-> +			set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
-> +
->  		vb->num_pages += VIRTIO_BALLOON_PAGES_PER_PAGE;
->  		if (!virtio_has_feature(vb->vdev,
->  					VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
-> @@ -171,8 +296,12 @@ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
->  
->  	num_allocated_pages = vb->num_pfns;
->  	/* Did we get any? */
-> -	if (vb->num_pfns != 0)
-> -		tell_host(vb, vb->inflate_vq);
-> +	if (vb->num_pfns) {
-> +		if (use_sg)
-> +			tell_host_sgs(vb, vb->inflate_vq, pfn_min, pfn_max);
-> +		else
-> +			tell_host(vb, vb->inflate_vq);
-> +	}
->  	mutex_unlock(&vb->balloon_lock);
->  
->  	return num_allocated_pages;
-> @@ -198,9 +327,12 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
->  	struct page *page;
->  	struct balloon_dev_info *vb_dev_info = &vb->vb_dev_info;
->  	LIST_HEAD(pages);
-> +	bool use_sg = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_SG);
-> +	unsigned long pfn_max = 0, pfn_min = ULONG_MAX;
->  
-> -	/* We can only do one array worth at a time. */
-> -	num = min(num, ARRAY_SIZE(vb->pfns));
-> +	/* Traditionally, we can only do one array worth at a time. */
-> +	if (!use_sg)
-> +		num = min(num, ARRAY_SIZE(vb->pfns));
->  
->  	mutex_lock(&vb->balloon_lock);
->  	/* We can't release more pages than taken */
-> @@ -210,7 +342,11 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
->  		page = balloon_page_dequeue(vb_dev_info);
->  		if (!page)
->  			break;
-> -		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
-> +		if (use_sg)
-> +			xb_set_page(vb, page, &pfn_min, &pfn_max);
-> +		else
-> +			set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
-> +
->  		list_add(&page->lru, &pages);
->  		vb->num_pages -= VIRTIO_BALLOON_PAGES_PER_PAGE;
->  	}
-> @@ -221,8 +357,12 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
->  	 * virtio_has_feature(vdev, VIRTIO_BALLOON_F_MUST_TELL_HOST);
->  	 * is true, we *have* to do it in this order
->  	 */
-> -	if (vb->num_pfns != 0)
-> -		tell_host(vb, vb->deflate_vq);
-> +	if (vb->num_pfns) {
-> +		if (use_sg)
-> +			tell_host_sgs(vb, vb->deflate_vq, pfn_min, pfn_max);
-> +		else
-> +			tell_host(vb, vb->deflate_vq);
-> +	}
->  	release_pages_balloon(vb, &pages);
->  	mutex_unlock(&vb->balloon_lock);
->  	return num_freed_pages;
-> @@ -441,6 +581,7 @@ static int init_vqs(struct virtio_balloon *vb)
->  }
->  
->  #ifdef CONFIG_BALLOON_COMPACTION
-> +
->  /*
->   * virtballoon_migratepage - perform the balloon page migration on behalf of
->   *			     a compation thread.     (called under page lock)
-> @@ -464,6 +605,7 @@ static int virtballoon_migratepage(struct balloon_dev_info *vb_dev_info,
->  {
->  	struct virtio_balloon *vb = container_of(vb_dev_info,
->  			struct virtio_balloon, vb_dev_info);
-> +	bool use_sg = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_SG);
->  	unsigned long flags;
->  
->  	/*
-> @@ -485,16 +627,24 @@ static int virtballoon_migratepage(struct balloon_dev_info *vb_dev_info,
->  	vb_dev_info->isolated_pages--;
->  	__count_vm_event(BALLOON_MIGRATE);
->  	spin_unlock_irqrestore(&vb_dev_info->pages_lock, flags);
-> -	vb->num_pfns = VIRTIO_BALLOON_PAGES_PER_PAGE;
-> -	set_page_pfns(vb, vb->pfns, newpage);
-> -	tell_host(vb, vb->inflate_vq);
-> -
-> +	if (use_sg) {
-> +		send_balloon_page_sg(vb, vb->inflate_vq, page_address(newpage),
-> +				     PAGE_SIZE, false);
-> +	} else {
-> +		vb->num_pfns = VIRTIO_BALLOON_PAGES_PER_PAGE;
-> +		set_page_pfns(vb, vb->pfns, newpage);
-> +		tell_host(vb, vb->inflate_vq);
-> +	}
->  	/* balloon's page migration 2nd step -- deflate "page" */
->  	balloon_page_delete(page);
-> -	vb->num_pfns = VIRTIO_BALLOON_PAGES_PER_PAGE;
-> -	set_page_pfns(vb, vb->pfns, page);
-> -	tell_host(vb, vb->deflate_vq);
-> -
-> +	if (use_sg) {
-> +		send_balloon_page_sg(vb, vb->deflate_vq, page_address(page),
-> +				     PAGE_SIZE, false);
-> +	} else {
-> +		vb->num_pfns = VIRTIO_BALLOON_PAGES_PER_PAGE;
-> +		set_page_pfns(vb, vb->pfns, page);
-> +		tell_host(vb, vb->deflate_vq);
-> +	}
->  	mutex_unlock(&vb->balloon_lock);
->  
->  	put_page(page); /* balloon reference */
-> @@ -553,6 +703,9 @@ static int virtballoon_probe(struct virtio_device *vdev)
->  	if (err)
->  		goto out_free_vb;
->  
-> +	if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_SG))
-> +		xb_init(&vb->page_xb);
-> +
->  	vb->nb.notifier_call = virtballoon_oom_notify;
->  	vb->nb.priority = VIRTBALLOON_OOM_NOTIFY_PRIORITY;
->  	err = register_oom_notifier(&vb->nb);
-> @@ -669,6 +822,7 @@ static unsigned int features[] = {
->  	VIRTIO_BALLOON_F_MUST_TELL_HOST,
->  	VIRTIO_BALLOON_F_STATS_VQ,
->  	VIRTIO_BALLOON_F_DEFLATE_ON_OOM,
-> +	VIRTIO_BALLOON_F_SG,
->  };
->  
->  static struct virtio_driver virtio_balloon_driver = {
-> diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
-> index 343d7dd..37780a7 100644
-> --- a/include/uapi/linux/virtio_balloon.h
-> +++ b/include/uapi/linux/virtio_balloon.h
-> @@ -34,6 +34,7 @@
->  #define VIRTIO_BALLOON_F_MUST_TELL_HOST	0 /* Tell before reclaiming pages */
->  #define VIRTIO_BALLOON_F_STATS_VQ	1 /* Memory Stats virtqueue */
->  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
-> +#define VIRTIO_BALLOON_F_SG		3 /* Use sg instead of PFN lists */
->  
->  /* Size of a PFN in the balloon interface. */
->  #define VIRTIO_BALLOON_PFN_SHIFT 12
-> -- 
-> 2.7.4
+How exactly does case 2 break?
