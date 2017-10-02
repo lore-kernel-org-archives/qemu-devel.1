@@ -1,17 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dz1JY-0005iF-7H
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:03:26 -0400
+	(envelope-from <armbru@redhat.com>) id 1dz1JV-0005gf-QH
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:03:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dz1JO-0004iu-Kg
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:03:20 -0400
+	(envelope-from <armbru@redhat.com>) id 1dz1JR-0004ke-Rv
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:03:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33600)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dz1JR-0004kM-Lj
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:03:13 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id ADB79806A6
+	for <qemu-devel@nongnu.org>; Mon,  2 Oct 2017 14:03:12 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  2 Oct 2017 16:03:00 +0200
-Message-Id: <20171002140307.5292-2-armbru@redhat.com>
+Date: Mon,  2 Oct 2017 16:03:06 +0200
+Message-Id: <20171002140307.5292-8-armbru@redhat.com>
 In-Reply-To: <20171002140307.5292-1-armbru@redhat.com>
 References: <20171002140307.5292-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/8] qemu-options: Remove stray colons from
- output of --help
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 7/8] qemu-options: Polish section "Character
+ device options"
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -20,175 +33,69 @@ List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-Commit 43f187a broke --help: it put colons into blank lines.  It
-removed the colon from DEFHEADING(TITLE:) and added it back in the
-macro expansion of DEFHEADING(TITLE), so hxtool can emit "@subsection
-TITLE" more easily.  Trouble is it's added back even for the blank
-lines made with DEFHEADING().
-
-Put the colons back where they were before commit 43f187a, and strip
-them in hxtool instead.
-
 Cc: Paolo Bonzini <pbonzini@redhat.com>
-CC: qemu-stable@nongnu.org
+CC: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- qemu-options-wrapper.h |  2 +-
- qemu-options.hx        | 27 ++++++++++++++-------------
- scripts/hxtool         |  3 ++-
- 3 files changed, 17 insertions(+), 15 deletions(-)
+ qemu-options.hx | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/qemu-options-wrapper.h b/qemu-options-wrapper.h
-index 4d7aeb1352..13bfea0294 100644
---- a/qemu-options-wrapper.h
-+++ b/qemu-options-wrapper.h
-@@ -14,7 +14,7 @@
- 
- #define ARCHHEADING(text, arch_mask) \
-     if ((arch_mask) & arch_type)    \
--        puts(stringify(text) ":");
-+        puts(stringify(text));
- 
- #define DEFHEADING(text) ARCHHEADING(text, QEMU_ARCH_ALL)
- 
 diff --git a/qemu-options.hx b/qemu-options.hx
-index 39225ae6c3..0fed2fc009 100644
+index 615cb230ab..b792c65149 100644
 --- a/qemu-options.hx
 +++ b/qemu-options.hx
-@@ -6,7 +6,7 @@ HXCOMM construct option structures, enums and help message for specified
- HXCOMM architectures.
- HXCOMM HXCOMM can be used for comments, discarded from both texi and C
- 
--DEFHEADING(Standard options)
-+DEFHEADING(Standard options:)
- STEXI
- @table @option
- ETEXI
-@@ -578,7 +578,7 @@ STEXI
- ETEXI
+@@ -2492,11 +2492,6 @@ ETEXI
  DEFHEADING()
- 
--DEFHEADING(Block device options)
-+DEFHEADING(Block device options:)
+=20
+ DEFHEADING(Character device options:)
+-STEXI
+-
+-The general form of a character device option is:
+-@table @option
+-ETEXI
+=20
+ DEF("chardev", HAS_ARG, QEMU_OPTION_chardev,
+     "-chardev help\n"
+@@ -2542,6 +2537,9 @@ DEF("chardev", HAS_ARG, QEMU_OPTION_chardev,
+ )
+=20
  STEXI
- @table @option
- ETEXI
-@@ -1177,7 +1177,7 @@ STEXI
- ETEXI
- DEFHEADING()
- 
--DEFHEADING(USB options)
-+DEFHEADING(USB options:)
- STEXI
- @table @option
- ETEXI
-@@ -1242,7 +1242,7 @@ STEXI
- ETEXI
- DEFHEADING()
- 
--DEFHEADING(Display options)
-+DEFHEADING(Display options:)
- STEXI
- @table @option
- ETEXI
-@@ -1779,7 +1779,7 @@ STEXI
- ETEXI
- ARCHHEADING(, QEMU_ARCH_I386)
- 
--ARCHHEADING(i386 target only, QEMU_ARCH_I386)
-+ARCHHEADING(i386 target only:, QEMU_ARCH_I386)
- STEXI
- @table @option
- ETEXI
-@@ -1895,7 +1895,7 @@ STEXI
- ETEXI
- DEFHEADING()
- 
--DEFHEADING(Network options)
-+DEFHEADING(Network options:)
- STEXI
- @table @option
- ETEXI
-@@ -2476,7 +2476,7 @@ STEXI
- ETEXI
- DEFHEADING()
- 
--DEFHEADING(Character device options)
-+DEFHEADING(Character device options:)
- STEXI
- 
- The general form of a character device option is:
-@@ -2809,7 +2809,7 @@ STEXI
- ETEXI
- DEFHEADING()
- 
--DEFHEADING(Device URL Syntax)
-+DEFHEADING(Device URL Syntax:)
- STEXI
- 
- In addition to using normal file images for the emulated storage devices,
-@@ -3039,7 +3039,7 @@ STEXI
- @end table
- ETEXI
- 
--DEFHEADING(Bluetooth(R) options)
-+DEFHEADING(Bluetooth(R) options:)
- STEXI
- @table @option
- ETEXI
-@@ -3115,7 +3115,7 @@ ETEXI
- DEFHEADING()
- 
- #ifdef CONFIG_TPM
--DEFHEADING(TPM device options)
-+DEFHEADING(TPM device options:)
- 
- DEF("tpmdev", HAS_ARG, QEMU_OPTION_tpmdev, \
-     "-tpmdev passthrough,id=id[,path=path][,cancel-path=path]\n"
-@@ -3189,7 +3189,7 @@ DEFHEADING()
- 
- #endif
- 
--DEFHEADING(Linux/Multiboot boot specific)
-+DEFHEADING(Linux/Multiboot boot specific:)
- STEXI
- 
- When using these options, you can use a given Linux or Multiboot
-@@ -3245,7 +3245,7 @@ STEXI
- ETEXI
- DEFHEADING()
- 
--DEFHEADING(Debug/Expert options)
-+DEFHEADING(Debug/Expert options:)
- STEXI
- @table @option
- ETEXI
-@@ -4160,7 +4160,8 @@ STEXI
- @end table
- ETEXI
- DEFHEADING()
--DEFHEADING(Generic object creation)
 +
-+DEFHEADING(Generic object creation:)
- STEXI
- @table @option
- ETEXI
-diff --git a/scripts/hxtool b/scripts/hxtool
-index 1e2c97c5e6..7d7c4289e3 100644
---- a/scripts/hxtool
-+++ b/scripts/hxtool
-@@ -19,7 +19,8 @@ hxtoh()
- print_texi_heading()
- {
-     if test "$*" != ""; then
--        printf "@subsection %s\n" "$*"
-+        title="$*"
-+        printf "@subsection %s\n" "${title%:}"
-     fi
- }
- 
--- 
++The general form of a character device option is:
++@table @option
+ @item -chardev @var{backend} ,id=3D@var{id} [,mux=3Don|off] [,@var{optio=
+ns}]
+ @findex -chardev
+ Backend is one of:
+@@ -2565,7 +2563,7 @@ Backend is one of:
+ @option{spiceport}.
+ The specific backend will determine the applicable options.
+=20
+-Use "-chardev help" to print all available chardev backend types.
++Use @code{-chardev help} to print all available chardev backend types.
+=20
+ All devices must have an id, which can be any string up to 127 character=
+s long.
+ It is used to uniquely identify this device in other command line direct=
+ives.
+@@ -2620,8 +2618,11 @@ to a file to record all data transmitted via the b=
+ackend. The @option{logappend}
+ option controls whether the log file will be truncated or appended to wh=
+en
+ opened.
+=20
+-Further options to each backend are described below.
++@end table
+=20
++The available backends are:
++
++@table @option
+ @item -chardev null ,id=3D@var{id}
+ A void device. This device will not emit any data, and will drop any dat=
+a it
+ receives. The null backend does not take any options.
+--=20
 2.13.6
