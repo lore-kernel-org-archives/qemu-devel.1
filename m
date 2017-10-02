@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dz2kd-0007Sp-JK
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:35:24 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dz2lo-0008OO-Sq
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:36:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dz2kZ-0005O1-IN
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:35:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:63155)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dz2kZ-0005N9-3V
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:35:19 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2369585550
-	for <qemu-devel@nongnu.org>; Mon,  2 Oct 2017 15:35:18 +0000 (UTC)
-References: <20171002140307.5292-1-armbru@redhat.com>
-	<20171002140307.5292-9-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <56dbe987-f56b-51b9-844d-45c674bd92b4@redhat.com>
-Date: Mon, 2 Oct 2017 10:35:16 -0500
+	(envelope-from <rth7680@gmail.com>) id 1dz2ln-0006ly-Gj
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:36:36 -0400
+Received: from mail-yw0-x22f.google.com ([2607:f8b0:4002:c05::22f]:49628)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dz2ln-0006kI-C5
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:36:35 -0400
+Received: by mail-yw0-x22f.google.com with SMTP id x64so3750131ywe.6
+	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 08:36:35 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <a53dca17-d9c2-d721-d71d-6cacb8481223@gmx.de>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <9326d662-0b0f-69bd-10f4-307661718525@twiddle.net>
+Date: Mon, 2 Oct 2017 11:36:31 -0400
 MIME-Version: 1.0
-In-Reply-To: <20171002140307.5292-9-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="PxxqqkGHn8FwEBwameJSV28w9P0397p4c"
-Subject: Re: [Qemu-devel] [PATCH 8/8] qemu-options: Belatedly document
- --watchdog-action inject-nmi
+In-Reply-To: <a53dca17-d9c2-d721-d71d-6cacb8481223@gmx.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] qemu-system-hppa first steps
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -34,81 +29,46 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Helge Deller <deller@gmx.de>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 List-ID: <qemu-devel.nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PxxqqkGHn8FwEBwameJSV28w9P0397p4c
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <56dbe987-f56b-51b9-844d-45c674bd92b4@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 8/8] qemu-options: Belatedly document
- --watchdog-action inject-nmi
-References: <20171002140307.5292-1-armbru@redhat.com>
- <20171002140307.5292-9-armbru@redhat.com>
-In-Reply-To: <20171002140307.5292-9-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 10/01/2017 04:27 PM, Helge Deller wrote:
+> What I'm absolutely missing knowledge in is the emulation code in
+> qemu to really be able to emulate the missing hppa assembler instructions.
+> For example, the space registers, some other PSW bits, and so on.
 
-On 10/02/2017 09:03 AM, Markus Armbruster wrote:
-> Missed in commit 795dc6e46d, v2.4.0.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  qemu-options.hx | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+[CC-ing the list for posterity]
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+For emulating system, I believe that we will require TARGET_LONG_BITS == 64
+(even for pa1.1), and make our space registers 32 bits wide (even for pa2.0).
+Thus we will always have a 64-bit virtual address space and never (as is
+architecturally allowable) a 96-bit virtual address space.
 
->=20
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index b792c65149..32afc11296 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -3596,7 +3596,7 @@ A virtual watchdog for s390x backed by the diagno=
-se 288 hypercall
->  ETEXI
-> =20
->  DEF("watchdog-action", HAS_ARG, QEMU_OPTION_watchdog_action, \
-> -    "-watchdog-action reset|shutdown|poweroff|pause|debug|none\n" \
-> +    "-watchdog-action reset|shutdown|poweroff|inject-nmi|pause|debug|n=
-one\n" \
->      "                action when watchdog fires [default=3Dreset]\n",
->      QEMU_ARCH_ALL)
->  STEXI
-> @@ -3610,6 +3610,7 @@ The default is
->  Other possible actions are:
->  @code{shutdown} (attempt to gracefully shutdown the guest),
->  @code{poweroff} (forcefully poweroff the guest),
-> +@code{inject-nmi} (inject a NMI into the guest),
->  @code{pause} (pause the guest),
->  @code{debug} (print a debug message and continue), or
->  @code{none} (do nothing).
->=20
+There may be clever things we can do with mmu_idx to speed things up for
+running Linux, which makes very little use of space registers.  However to
+begin let us open-code exactly what the hardware does and afterward see what
+needs to be optimized:
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+  pa1.1 or pa2.0 with psw.w=0:
+	gva = space{0:31} : offset{0:31}
+            = (space << 32) | (offset & 0x0000_0000_ffff_ffff)
+
+  pa2.0 with psw.w=1:
+	gva = space{0:1} : (space{2:31} | offset{2:31}) : offset{32:63}
+            = (space << 32) | (offset & 0x3fff_ffff_ffff_ffff)
+
+We may want to store the space registers in env pre-shifted as a uint64_t to
+minimize the operations required to compute the GVA at runtime.
+
+You'll want helper functions to compute this both directly in C and with TCG
+operations for the translator.  They'd be no-ops for -linux-user.
+
+Implementing the space registers themselves should be straight-forward.  There
+are comments in many (most?) of the places that should be modified.  Take care
+to leave -linux-user unmodified.
+
+Let's take the rest case-by-case as it comes up?
 
 
---PxxqqkGHn8FwEBwameJSV28w9P0397p4c
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnSXLUACgkQp6FrSiUn
-Q2piWAf9Gri2VyglHAlwHi+LoN0XAIoWfqOHA9fEZC2D9bm9q3V7DO47mk3EeFsj
-FlLkjTzeWDsmy7zAHhrtr9ITBuihb8Yi4kfBj7XgqJYnCdyHrGwypeAmswSAAP/G
-jjXE6UH9zFt+MUzLyI4v60WHOi6smPEKSFmZSpJzx9KAcvzWOrIkSCGu9MPkG8mr
-asHHR/C0cF05Xg23pd0zoZBaBF00Clhe1D4nwrAmHrfSVGRUPRTnNnpOJgYma/WA
-7Ehw6otLp7J6XDDMSokDW4VOwdwf1ABwju8EVS6MIChvL72OUmQGn71A4cIHBQJf
-CikO332HaDnJ2Ly3RvWgtplREFzc8A==
-=pYPU
------END PGP SIGNATURE-----
-
---PxxqqkGHn8FwEBwameJSV28w9P0397p4c--
+r~
