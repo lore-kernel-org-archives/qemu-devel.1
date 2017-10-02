@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dywiM-00023a-9x
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:39 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dywiO-00026L-Su
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dywiJ-00064L-I0
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42022)
+	(envelope-from <imammedo@redhat.com>) id 1dywiO-00067F-3r
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40660)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dywiJ-00063n-D1
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:35 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dywiN-00066o-Tw
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:40 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon,  2 Oct 2017 11:07:52 +0200
-Message-Id: <1506935300-132598-11-git-send-email-imammedo@redhat.com>
+Date: Mon,  2 Oct 2017 11:07:56 +0200
+Message-Id: <1506935300-132598-15-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
 References: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 10/38] m68k: an5206: use generic cpu_model
- parsing
+Subject: [Qemu-devel] [PATCH 14/38] moxie: use generic cpu_model parsing
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -24,48 +23,47 @@ List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, huth@tuxfamily.org, laurent@vivier.eu
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, green@moxielogic.com
 List-ID: <qemu-devel.nongnu.org>
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-CC: huth@tuxfamily.org
-CC: laurent@vivier.eu
+CC: green@moxielogic.com
 ---
- hw/m68k/an5206.c | 7 ++-----
+ hw/moxie/moxiesim.c | 7 ++-----
  1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/hw/m68k/an5206.c b/hw/m68k/an5206.c
-index 9002c46..0cedc54 100644
---- a/hw/m68k/an5206.c
-+++ b/hw/m68k/an5206.c
-@@ -28,7 +28,6 @@
- static void an5206_init(MachineState *machine)
+diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
+index 01b9f34..3ba5848 100644
+--- a/hw/moxie/moxiesim.c
++++ b/hw/moxie/moxiesim.c
+@@ -103,7 +103,6 @@ static void moxiesim_init(MachineState *machine)
  {
+     MoxieCPU *cpu = NULL;
      ram_addr_t ram_size = machine->ram_size;
 -    const char *cpu_model = machine->cpu_model;
      const char *kernel_filename = machine->kernel_filename;
-     M68kCPU *cpu;
-     CPUM68KState *env;
-@@ -39,10 +38,7 @@ static void an5206_init(MachineState *machine)
-     MemoryRegion *ram = g_new(MemoryRegion, 1);
-     MemoryRegion *sram = g_new(MemoryRegion, 1);
+     const char *kernel_cmdline = machine->kernel_cmdline;
+     const char *initrd_filename = machine->initrd_filename;
+@@ -115,10 +114,7 @@ static void moxiesim_init(MachineState *machine)
+     LoaderParams loader_params;
  
--    if (!cpu_model) {
--        cpu_model = "m5206";
+     /* Init CPUs. */
+-    if (cpu_model == NULL) {
+-        cpu_model = "MoxieLite";
 -    }
--    cpu = M68K_CPU(cpu_generic_init(TYPE_M68K_CPU, cpu_model));
-+    cpu = M68K_CPU(cpu_create(machine->cpu_type));
+-    cpu = MOXIE_CPU(cpu_generic_init(TYPE_MOXIE_CPU, cpu_model));
++    cpu = MOXIE_CPU(cpu_create(machine->cpu_type));
      env = &cpu->env;
  
-     /* Initialize CPU registers.  */
-@@ -94,6 +90,7 @@ static void an5206_machine_init(MachineClass *mc)
- {
-     mc->desc = "Arnewsh 5206";
-     mc->init = an5206_init;
-+    mc->default_cpu_type = M68K_CPU_TYPE_NAME("m5206");
+     qemu_register_reset(main_cpu_reset, cpu);
+@@ -150,6 +146,7 @@ static void moxiesim_machine_init(MachineClass *mc)
+     mc->desc = "Moxie simulator platform";
+     mc->init = moxiesim_init;
+     mc->is_default = 1;
++    mc->default_cpu_type = MOXIE_CPU_TYPE_NAME("MoxieLite");
  }
  
- DEFINE_MACHINE("an5206", an5206_machine_init)
+ DEFINE_MACHINE("moxiesim", moxiesim_machine_init)
 -- 
 2.7.4
