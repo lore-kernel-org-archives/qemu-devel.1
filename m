@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dz3Eq-0001Y6-5R
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 12:06:37 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dz3Or-00074X-Ae
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 12:17:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dz3Ep-0007Mw-Cw
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 12:06:36 -0400
-Date: Mon, 2 Oct 2017 18:06:15 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171002160615.GG4362@localhost.localdomain>
-References: <20170925145526.32690-1-eblake@redhat.com>
-	<20170925145526.32690-6-eblake@redhat.com>
-	<f305e22b-963e-f1eb-710c-d74c6efc9628@virtuozzo.com>
-	<b10bd108-0387-34eb-9aa4-7c5e3f9f63a1@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dz3Oq-0000uA-B3
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 12:16:57 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:42330 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dz3Op-0000t2-Tm
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 12:16:56 -0400
+References: <20171002143919.207741-1-vsementsov@virtuozzo.com>
+	<20171002143919.207741-2-vsementsov@virtuozzo.com>
+	<7afabb38-abb6-a261-20a0-48aa6526c315@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <e51eb2e1-a272-6261-c662-dc76d7fca69e@virtuozzo.com>
+Date: Mon, 2 Oct 2017 19:16:37 +0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="v9Ux+11Zm5mwPlX6"
-Content-Disposition: inline
-In-Reply-To: <b10bd108-0387-34eb-9aa4-7c5e3f9f63a1@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v10 05/20] dirty-bitmap: Avoid size query
- failure during truncate
+In-Reply-To: <7afabb38-abb6-a261-20a0-48aa6526c315@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 1/5] hbitmap: add next_zero function
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -26,61 +29,48 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
 List-ID: <qemu-devel.nongnu.org>
 
+02.10.2017 18:43, Eric Blake wrote:
+> On 10/02/2017 09:39 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> The function searches for next zero bit.
+>> Also add interface for BdrvDirtyBitmap.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   include/block/dirty-bitmap.h |  1 +
+>>   include/qemu/hbitmap.h       |  8 ++++++++
+>>   block/dirty-bitmap.c         |  5 +++++
+>>   util/hbitmap.c               | 29 +++++++++++++++++++++++++++++
+>>   4 files changed, 43 insertions(+)
+>>
+>> +++ b/block/dirty-bitmap.c
+>> @@ -715,3 +715,8 @@ char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp)
+>>   {
+>>       return hbitmap_sha256(bitmap->bitmap, errp);
+>>   }
+>> +
+>> +int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset)
+>> +{
+>> +    return hbitmap_next_zero(bitmap->bitmap, offset);
+>> +}
+> Returns an answer in the same scale as the underlying hbitmap; if this
+> is applied before my byte-based dirty bitmap series, that means offset
+> is a sector count and the result is likewise a sector number (awkward);
+> if this is applied after my series, you pass in a byte offset start and
+> get a byte result (nice).
 
---v9Ux+11Zm5mwPlX6
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Oh, I forget to say it: it's based on your series)
 
-Am 25.09.2017 um 17:46 hat Eric Blake geschrieben:
-> On 09/25/2017 10:23 AM, Vladimir Sementsov-Ogievskiy wrote:
-> > 25.09.2017 17:55, Eric Blake wrote:
-> >> We've previously fixed several places where we failed to account
-> >> for possible errors from bdrv_nb_sectors().=A0 Fix another one by
-> >> making bdrv_dirty_bitmap_truncate() take the new size from the
-> >> caller instead of querying itself; then adjust the sole caller
-> >> bdrv_truncate() to pass the size just determined by a successful
-> >> resize, or to skip the bitmap resize on failure, thus avoiding
-> >=20
-> > nothing is skipped in this version
->=20
-> So much for me squashing in a change.  If the maintainer is willing
-> (Kevin, is this going through your tree?), we can reword that to:
->=20
-> "...pass the size just determined by a successful resize, or to reuse
-> the size given to the original truncate operation when
-> refresh_total_sectors() was not able to confirm the actual size (the two
-> sizes can potentially differ according to rounding constraints), thus
-> avoiding..."
+>
+> I don't see any obvious errors in the implementation, but DO think that
+> you should include a testsuite enhancement in tests/test-hbitmap.c to
+> cover the new functionality before we accept this.
+>
 
-I always thought sentences that long were only allowed in German.
 
-Anyway, I'm squashing it in.
-
-Kevin
-
---v9Ux+11Zm5mwPlX6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJZ0mP3AAoJEH8JsnLIjy/W41EQAKNUNWXJ0ABVk0xnPlJYibKs
-VhUVHCCIWApw8IXMs4vWQ2cP//m4+Pa0MnyjkxqNaYHnwDiQdDmjrsrrBeBezNq+
-ehlG61NdPLEPzWa177i+H2+LfjtH4jj3pgZCt2qU4TefuI0t0FympUneE0kn1LTi
-xh13518++HznXuezjJY1GRROJlcWOypvG38odx5VE9nTSs34ZpBqNfOomHCjpcUI
-+onXYOgtBWRgTJZWBrIjFBB5SRion5816xkBs/4hN4CehgF3vJI+QHAlzyiX5rfZ
-EqNjO0bX3TO+Ly7PtfDrxYOxSkEoPHoBbpQp1AbwK8dUigW6RD8woNjbKg5TaN1w
-5PAe5yyCmEcgk88ER50aNVwsEGj4Jfkbe7rXabhS8mmSjAvCOIxduhfrvIUUKyFf
-8wFHWwVooiAO9okrCe9uCCC9rBq+vMb8ajFC5GUx3x7NgcQ6wtYKCrmPiBH9X0im
-cKpu9uHt0J4UOpPJvzAwEY6W95xLUITf7sNEGn6F3fA6xxbD2s9GiHeTDd914LHF
-PXLUDxHiJc0jeBn0nld3f2m9Jzx5MKLe8T1psi/Gd0MoRbRPNmVAOmr/zr8um0fv
-AZHLRjYQzt9NGhjtMTuouoLFzqcjSswPTgehH7XLmyg1XyD0aNutJD9gX6PwqpEM
-+eZxtbjvUZUxubOHIl7h
-=P7SO
------END PGP SIGNATURE-----
-
---v9Ux+11Zm5mwPlX6--
+-- 
+Best regards,
+Vladimir
