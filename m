@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49970)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dz6Bi-0001fp-L1
+	(envelope-from <dgilbert@redhat.com>) id 1dz6Bi-0001fr-LT
 	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 15:15:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dz6Bh-0000Pi-E8
+	(envelope-from <dgilbert@redhat.com>) id 1dz6Bf-0000Nt-FF
 	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 15:15:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46356)
+Received: from mx1.redhat.com ([209.132.183.28]:41334)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dz6Bh-0000P6-7r
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 15:15:33 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dz6Bf-0000Mg-8T
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 15:15:31 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5CA9D7E43D
-	for <qemu-devel@nongnu.org>; Mon,  2 Oct 2017 19:15:32 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BD1B0128B
+	for <qemu-devel@nongnu.org>; Mon,  2 Oct 2017 19:15:29 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon,  2 Oct 2017 20:15:19 +0100
-Message-Id: <20171002191521.15748-3-dgilbert@redhat.com>
-In-Reply-To: <20171002191521.15748-1-dgilbert@redhat.com>
-References: <20171002191521.15748-1-dgilbert@redhat.com>
+Date: Mon,  2 Oct 2017 20:15:17 +0100
+Message-Id: <20171002191521.15748-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 2/4] vhost-user-bridge: Only process received
- packets on started queues
+Subject: [Qemu-devel] [PATCH 0/4] Small vhost-user fixes and tweaks
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -37,26 +34,24 @@ List-ID: <qemu-devel.nongnu.org>
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Only process received packets if the queue has been started.
+Hi,
+  This set has a small set of fixes for vhost-user and also
+  enables the SET_SLAVE_REQ_FD feature in libvhost-user.
+  (Where it just stashes the fd).
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- tests/vhost-user-bridge.c | 1 +
- 1 file changed, 1 insertion(+)
+Dave
 
-diff --git a/tests/vhost-user-bridge.c b/tests/vhost-user-bridge.c
-index f922cc75ae..d820033a72 100644
---- a/tests/vhost-user-bridge.c
-+++ b/tests/vhost-user-bridge.c
-@@ -277,6 +277,7 @@ vubr_backend_recv_cb(int sock, void *ctx)
-     DPRINT("    hdrlen =3D %d\n", hdrlen);
-=20
-     if (!vu_queue_enabled(dev, vq) ||
-+        !vu_queue_started(dev, vq) ||
-         !vu_queue_avail_bytes(dev, vq, hdrlen, 0)) {
-         DPRINT("Got UDP packet, but no available descriptors on RX virtq=
-.\n");
-         return;
+Dr. David Alan Gilbert (4):
+  libvhost-user: vu_queue_started
+  vhost-user-bridge: Only process received packets on started queues
+  libvhost-user: Update and fix feature and request lists
+  libvhost-user: Support VHOST_USER_SET_SLAVE_REQ_FD
+
+ contrib/libvhost-user/libvhost-user.c | 43 +++++++++++++++++++++++++++++=
++-----
+ contrib/libvhost-user/libvhost-user.h | 19 +++++++++++++++-
+ tests/vhost-user-bridge.c             |  1 +
+ 3 files changed, 56 insertions(+), 7 deletions(-)
+
 --=20
 2.13.6
