@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dyy0t-0007GE-FU
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 06:31:52 -0400
+	(envelope-from <berrange@redhat.com>) id 1dyyO8-0001z5-Cr
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 06:55:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dyy0o-00023x-0h
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 06:31:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47380)
+	(envelope-from <berrange@redhat.com>) id 1dyyO5-0008L4-1I
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 06:55:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54964)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dyy0n-00022o-Qy
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 06:31:45 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 952C7356C9
-	for <qemu-devel@nongnu.org>; Mon,  2 Oct 2017 10:31:43 +0000 (UTC)
-From: Marcel Apfelbaum <marcel@redhat.com>
-Date: Mon,  2 Oct 2017 13:31:35 +0300
-Message-Id: <20171002103135.33440-1-marcel@redhat.com>
-Subject: [Qemu-devel]  [PATCH] hw/gen_pcie_root_port: properly set
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dyyO4-0008Kc-Pv
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 06:55:48 -0400
+Date: Mon, 2 Oct 2017 11:55:37 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171002105537.GA9597@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <mailman.4848.1506679941.14747.qemu-devel@gnu.org>
+	<49B4FB8A-C439-4912-BD30-D4FECF709BB8@gmail.com>
+	<20171002091838.GC27086@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171002091838.GC27086@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 0/6] Initial support for keycodemapdb
+ GIT submodule
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -26,37 +29,44 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: marcel@redhat.com, mst@redhat.com
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-IO_LIMIT and IO_BASE registers should not be writable if
-gen_pcie_root_port's io-reserve property is set to 0.
-The COMMAND register should have the IO flag read only.
+On Mon, Oct 02, 2017 at 10:18:38AM +0100, Daniel P. Berrange wrote:
+> On Fri, Sep 29, 2017 at 05:29:53PM -0400, Programmingkid wrote:
+> > 
+> > > On Sep 29, 2017, at 6:12 AM, qemu-devel-request@gnu.org wrote:
+> > > 
+> > > Message: 15
+> > > Date: Fri, 29 Sep 2017 11:11:55 +0100
+> > > From: "Daniel P. Berrange" <berrange@redhat.com <mailto:berrange@redhat.com>>
+> > > To: qemu-devel@nongnu.org <mailto:qemu-devel@nongnu.org>
+> > > Cc: Fam Zheng <famz@redhat.com <mailto:famz@redhat.com>>, Gerd Hoffmann <kraxel@redhat.com <mailto:kraxel@redhat.com>>,
+> > > 	Peter Maydell <peter.maydell@linaro.org <mailto:peter.maydell@linaro.org>>,	Paolo Bonzini
+> > > 	<pbonzini@redhat.com <mailto:pbonzini@redhat.com>>,	"Daniel P. Berrange" <berrange@redhat.com <mailto:berrange@redhat.com>>
+> > > Subject: [Qemu-devel] [PATCH v8 0/6] Initial support for keycodemapdb
+> > > 	GIT submodule
+> > > Message-ID: <20170929101201.21039-1-berrange@redhat.com <mailto:20170929101201.21039-1-berrange@redhat.com>>
+> > > 
+> > > This patch series is an update to:
+> > > 
+> > <snip>
+> > 
+> > For some reason this patch series isn't showing up in your patchworks page:
+> > https://patchwork.ozlabs.org/project/qemu-devel/list/?submitter=2694
+> 
+> I dunno who maintains that service, but it is not showing *any* qemu-devel
+> mail that has been sent since the list-id header changed from nongnu.org
+> to gnu.org
 
+Managed to track down an admin for patchwork and they fixed its list-id
+filter, so it should start getting emails again. Unfortunately I think
+any mails betwen Sept 28th and today will be lost from patchwork forever.
 
-Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
----
- hw/pci-bridge/gen_pcie_root_port.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
-index ed03ffc764..ad4e6aa7ff 100644
---- a/hw/pci-bridge/gen_pcie_root_port.c
-+++ b/hw/pci-bridge/gen_pcie_root_port.c
-@@ -85,6 +85,13 @@ static void gen_rp_realize(DeviceState *dev, Error **errp)
-         rpc->parent_class.exit(d);
-         return;
-     }
-+
-+    if (!grp->io_reserve) {
-+        pci_word_test_and_clear_mask(d->wmask + PCI_COMMAND,
-+                                     PCI_COMMAND_IO);
-+        d->wmask[PCI_IO_BASE] = 0;
-+        d->wmask[PCI_IO_LIMIT] = 0;
-+    }
- }
- 
- static const VMStateDescription vmstate_rp_dev = {
+Regards,
+Daniel
 -- 
-2.13.5
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
