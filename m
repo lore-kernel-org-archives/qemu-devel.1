@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1dz1nT-0005eR-Dz
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:34:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1dz1pQ-0007MW-1z
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:36:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1dz1nN-0007v6-0m
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:34:15 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:37885)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pradeepkiruvale@gmail.com>)
-	id 1dz1nM-0007ul-NI
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:34:08 -0400
-Received: by mail-wr0-x243.google.com with SMTP id v38so946633wrc.4
-	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 07:34:08 -0700 (PDT)
-From: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
-Date: Mon,  2 Oct 2017 10:33:31 -0400
-Message-Id: <1506954812-6552-6-git-send-email-pradeep.jagadeesh@huawei.com>
-In-Reply-To: <1506954812-6552-1-git-send-email-pradeep.jagadeesh@huawei.com>
-References: <1506954812-6552-1-git-send-email-pradeep.jagadeesh@huawei.com>
-Subject: [Qemu-devel] [PATCH v13 5/6] fsdev: QMP interface for throttling
+	(envelope-from <eblake@redhat.com>) id 1dz1pK-0000k2-Hm
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:36:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35842)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dz1pK-0000io-AH
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:36:10 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1E5C013204
+	for <qemu-devel@nongnu.org>; Mon,  2 Oct 2017 14:36:09 +0000 (UTC)
+References: <150694455954.126.4260615671927745603@b58463cdfd5f>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <37ea08c6-ec95-2ab6-13dd-db9d270bfe5a@redhat.com>
+Date: Mon, 2 Oct 2017 09:36:03 -0500
+MIME-Version: 1.0
+In-Reply-To: <150694455954.126.4260615671927745603@b58463cdfd5f>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="AMWveMJ5VfLjAVrjVGEd3vG6DTs1nx4oj"
+Subject: Re: [Qemu-devel] [PULL 0/3] QAPI patches for 2017-10-02
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -25,433 +32,64 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Markus Armbruster <armbru@redhat.com>, alberto garcia <berto@igalia.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, armbru@redhat.com
+Cc: famz@redhat.com
 List-ID: <qemu-devel.nongnu.org>
 
-This patch introduces qmp interfaces for the fsdev
-devices. This provides two interfaces one
-for querying info of all the fsdev devices. The second one
-to set the IO limits for the required fsdev device.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--AMWveMJ5VfLjAVrjVGEd3vG6DTs1nx4oj
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org, armbru@redhat.com
+Cc: famz@redhat.com
+Message-ID: <37ea08c6-ec95-2ab6-13dd-db9d270bfe5a@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 0/3] QAPI patches for 2017-10-02
+References: <150694455954.126.4260615671927745603@b58463cdfd5f>
+In-Reply-To: <150694455954.126.4260615671927745603@b58463cdfd5f>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- Makefile                    |   3 +-
- fsdev/qemu-fsdev-dummy.c    |  11 +++++
- fsdev/qemu-fsdev-throttle.c | 100 +++++++++++++++++++++++++++++++++++++++++---
- fsdev/qemu-fsdev-throttle.h |   9 +++-
- fsdev/qemu-fsdev.c          |  30 +++++++++++++
- monitor.c                   |   5 +++
- qapi-schema.json            |   4 ++
- qapi/fsdev.json             |  94 +++++++++++++++++++++++++++++++++++++++++
- qmp.c                       |  14 +++++++
- 9 files changed, 261 insertions(+), 9 deletions(-)
- create mode 100644 qapi/fsdev.json
+On 10/02/2017 06:42 AM, no-reply@patchew.org wrote:
+> Hi,
+>=20
+> This series seems to have some coding style problems. See output below =
+for
+> more information:
+>=20
 
-diff --git a/Makefile b/Makefile
-index cee6e28..018cae1 100644
---- a/Makefile
-+++ b/Makefile
-@@ -417,7 +417,8 @@ qapi-modules = $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.json \
-                $(SRC_PATH)/qapi/tpm.json \
-                $(SRC_PATH)/qapi/trace.json \
-                $(SRC_PATH)/qapi/transaction.json \
--               $(SRC_PATH)/qapi/ui.json
-+               $(SRC_PATH)/qapi/ui.json \
-+	             $(SRC_PATH)/qapi/fsdev.json
- 
- qapi-types.c qapi-types.h :\
- $(qapi-modules) $(SRC_PATH)/scripts/qapi-types.py $(qapi-py)
-diff --git a/fsdev/qemu-fsdev-dummy.c b/fsdev/qemu-fsdev-dummy.c
-index 6dc0fbc..b775e66 100644
---- a/fsdev/qemu-fsdev-dummy.c
-+++ b/fsdev/qemu-fsdev-dummy.c
-@@ -14,8 +14,19 @@
- #include "qemu-fsdev.h"
- #include "qemu/config-file.h"
- #include "qemu/module.h"
-+#include "qmp-commands.h"
- 
- int qemu_fsdev_add(QemuOpts *opts)
- {
-     return 0;
- }
-+
-+void qmp_fsdev_set_io_throttle(FsdevIOThrottle *arg, Error **errp)
-+{
-+    return;
-+}
-+
-+FsdevIOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
-+{
-+    return NULL;
-+}
-diff --git a/fsdev/qemu-fsdev-throttle.c b/fsdev/qemu-fsdev-throttle.c
-index 0e6fb86..7825be8 100644
---- a/fsdev/qemu-fsdev-throttle.c
-+++ b/fsdev/qemu-fsdev-throttle.c
-@@ -16,6 +16,7 @@
- #include "qemu/error-report.h"
- #include "qemu-fsdev-throttle.h"
- #include "qemu/iov.h"
-+#include "qemu/main-loop.h"
- #include "qemu/throttle-options.h"
- 
- static void fsdev_throttle_read_timer_cb(void *opaque)
-@@ -30,6 +31,96 @@ static void fsdev_throttle_write_timer_cb(void *opaque)
-     qemu_co_enter_next(&fst->throttled_reqs[true]);
- }
- 
-+typedef struct {
-+    FsThrottle *fst;
-+    bool is_write;
-+} RestartData;
-+
-+static bool coroutine_fn throttle_co_restart_queue(FsThrottle *fst,
-+                                                   bool is_write)
-+{
-+    return qemu_co_queue_next(&fst->throttled_reqs[is_write]);
-+}
-+
-+static void schedule_next_request(FsThrottle *fst, bool is_write)
-+{
-+    bool must_wait = throttle_schedule_timer(&fst->ts, &fst->tt, is_write);
-+    if (!must_wait) {
-+        if (qemu_in_coroutine() &&
-+            throttle_co_restart_queue(fst, is_write)) {
-+            return;
-+        } else {
-+            int64_t now = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-+            timer_mod(fst->tt.timers[is_write], now);
-+        }
-+    }
-+}
-+
-+static void coroutine_fn throttle_restart_queue_entry(void *opaque)
-+{
-+    RestartData *data = opaque;
-+    bool is_write = data->is_write;
-+    bool empty_queue = !throttle_co_restart_queue(data->fst, is_write);
-+    if (empty_queue) {
-+        schedule_next_request(data->fst, is_write);
-+    }
-+}
-+
-+static void throttle_restart_queues(FsThrottle *fst)
-+{
-+    Coroutine *co;
-+    RestartData rd = {
-+        .fst = fst,
-+        .is_write = true
-+    };
-+
-+    co = qemu_coroutine_create(throttle_restart_queue_entry, &rd);
-+    aio_co_enter(fst->ctx, co);
-+
-+    rd.is_write = false;
-+
-+    co = qemu_coroutine_create(throttle_restart_queue_entry, &rd);
-+    aio_co_enter(fst->ctx, co);
-+}
-+
-+static void coroutine_fn fsdev_throttle_config(FsThrottle *fst)
-+{
-+    if (throttle_enabled(&fst->cfg)) {
-+        throttle_config(&fst->ts, QEMU_CLOCK_REALTIME, &fst->cfg);
-+    } else {
-+        throttle_restart_queues(fst);
-+    }
-+}
-+
-+void fsdev_set_io_throttle(FsdevIOThrottle *arg, FsThrottle *fst, Error **errp)
-+{
-+    ThrottleConfig cfg;
-+    ThrottleLimits *tlimits;
-+
-+    throttle_get_config(&fst->ts, &cfg);
-+    tlimits = qapi_FsdevIOThrottle_base(arg);
-+    throttle_limits_to_config(tlimits, &cfg, errp);
-+
-+    if (throttle_is_valid(&cfg, errp)) {
-+        fst->cfg = cfg;
-+        fsdev_throttle_config(fst);
-+    }
-+}
-+
-+void fsdev_get_io_throttle(FsThrottle *fst, FsdevIOThrottle **fs9pcfg,
-+                           char *fsdevice)
-+{
-+    ThrottleConfig cfg = fst->cfg;
-+    ThrottleLimits *tlimits;
-+    FsdevIOThrottle *fscfg = g_malloc(sizeof(*fscfg));
-+    tlimits = qapi_FsdevIOThrottle_base(fscfg);
-+
-+    fscfg->has_id = true;
-+    fscfg->id = g_strdup(fsdevice);
-+    throttle_config_to_limits(&cfg, tlimits);
-+    *fs9pcfg = fscfg;
-+}
-+
- void fsdev_throttle_parse_opts(QemuOpts *opts, FsThrottle *fst, Error **errp)
- {
-     throttle_parse_options(&fst->cfg, opts);
-@@ -40,8 +131,9 @@ void fsdev_throttle_init(FsThrottle *fst)
- {
-     if (throttle_enabled(&fst->cfg)) {
-         throttle_init(&fst->ts);
-+        fst->ctx = qemu_get_aio_context();
-         throttle_timers_init(&fst->tt,
--                             qemu_get_aio_context(),
-+                             fst->ctx,
-                              QEMU_CLOCK_REALTIME,
-                              fsdev_throttle_read_timer_cb,
-                              fsdev_throttle_write_timer_cb,
-@@ -62,11 +154,7 @@ void coroutine_fn fsdev_co_throttle_request(FsThrottle *fst, bool is_write,
-         }
- 
-         throttle_account(&fst->ts, is_write, iov_size(iov, iovcnt));
--
--        if (!qemu_co_queue_empty(&fst->throttled_reqs[is_write]) &&
--            !throttle_schedule_timer(&fst->ts, &fst->tt, is_write)) {
--            qemu_co_queue_next(&fst->throttled_reqs[is_write]);
--        }
-+        schedule_next_request(fst, is_write);
-     }
- }
- 
-diff --git a/fsdev/qemu-fsdev-throttle.h b/fsdev/qemu-fsdev-throttle.h
-index e418643..5331c23 100644
---- a/fsdev/qemu-fsdev-throttle.h
-+++ b/fsdev/qemu-fsdev-throttle.h
-@@ -15,8 +15,6 @@
- #ifndef _FSDEV_THROTTLE_H
- #define _FSDEV_THROTTLE_H
- 
--#include "block/aio.h"
--#include "qemu/main-loop.h"
- #include "qemu/coroutine.h"
- #include "qapi/error.h"
- #include "qemu/throttle.h"
-@@ -25,6 +23,7 @@ typedef struct FsThrottle {
-     ThrottleState ts;
-     ThrottleTimers tt;
-     ThrottleConfig cfg;
-+    AioContext *ctx;
-     CoQueue      throttled_reqs[2];
- } FsThrottle;
- 
-@@ -36,4 +35,10 @@ void coroutine_fn fsdev_co_throttle_request(FsThrottle *, bool ,
-                                             struct iovec *, int);
- 
- void fsdev_throttle_cleanup(FsThrottle *);
-+
-+void fsdev_set_io_throttle(FsdevIOThrottle *, FsThrottle *, Error **errp);
-+
-+void fsdev_get_io_throttle(FsThrottle *, FsdevIOThrottle **iothp,
-+                           char *);
-+
- #endif /* _FSDEV_THROTTLE_H */
-diff --git a/fsdev/qemu-fsdev.c b/fsdev/qemu-fsdev.c
-index 266e442..4bfd233 100644
---- a/fsdev/qemu-fsdev.c
-+++ b/fsdev/qemu-fsdev.c
-@@ -16,6 +16,7 @@
- #include "qemu-common.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
-+#include "qmp-commands.h"
- 
- static QTAILQ_HEAD(FsDriverEntry_head, FsDriverListEntry) fsdriver_entries =
-     QTAILQ_HEAD_INITIALIZER(fsdriver_entries);
-@@ -98,3 +99,32 @@ FsDriverEntry *get_fsdev_fsentry(char *id)
-     }
-     return NULL;
- }
-+
-+void qmp_fsdev_set_io_throttle(FsdevIOThrottle *arg, Error **errp)
-+{
-+
-+    FsDriverEntry *fse;
-+
-+    fse = get_fsdev_fsentry(arg->has_id ? arg->id : NULL);
-+    if (!fse) {
-+        error_setg(errp, "Not a valid fsdev device");
-+        return;
-+    }
-+
-+    fsdev_set_io_throttle(arg, &fse->fst, errp);
-+}
-+
-+FsdevIOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
-+{
-+    FsdevIOThrottleList *head = NULL, *p_next;
-+    struct FsDriverListEntry *fsle;
-+
-+    QTAILQ_FOREACH(fsle, &fsdriver_entries, next) {
-+        p_next = g_new0(FsdevIOThrottleList, 1);
-+        fsdev_get_io_throttle(&fsle->fse.fst, &p_next->value,
-+                              fsle->fse.fsdev_id);
-+        p_next->next = head;
-+        head = p_next;
-+    }
-+    return head;
-+}
-diff --git a/monitor.c b/monitor.c
-index f4856b9..0a8f0ed 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -998,6 +998,11 @@ static void qmp_unregister_commands_hack(void)
-     && !defined(TARGET_S390X)
-     qmp_unregister_command(&qmp_commands, "query-cpu-definitions");
- #endif
-+#ifndef CONFIG_VIRTFS
-+    qmp_unregister_command(&qmp_commands, "fsdev-set-io-throttle");
-+    qmp_unregister_command(&qmp_commands, "query-fsdev-io-throttle");
-+#endif
-+
- }
- 
- void monitor_init_qmp_commands(void)
-diff --git a/qapi-schema.json b/qapi-schema.json
-index a3ba1c9..d9036f7 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -93,6 +93,10 @@
- { 'include': 'qapi/trace.json' }
- { 'include': 'qapi/introspect.json' }
- 
-+# QAPI fsdev definitions
-+{ 'include': 'qapi/fsdev.json' }
-+
-+
- ##
- # = Miscellanea
- ##
-diff --git a/qapi/fsdev.json b/qapi/fsdev.json
-new file mode 100644
-index 0000000..3beccab
---- /dev/null
-+++ b/qapi/fsdev.json
-@@ -0,0 +1,94 @@
-+# -*- Mode: Python -*-
-+
-+##
-+# == QAPI fsdev definitions
-+##
-+
-+##
-+# @FsdevIOThrottle:
-+#
-+# A set of parameters describing block throttling.
-+#
-+# @id: device id
-+#
-+# Since: 2.11
-+##
-+{ 'struct': 'FsdevIOThrottle',
-+  'base': 'ThrottleLimits',
-+  'data': { '*id': 'str' } }
-+
-+##
-+# @fsdev-set-io-throttle:
-+#
-+# Change I/O limits for a 9p/fsdev device.
-+#
-+# I/O limits can be enabled by setting throttle value to non-zero number.
-+#
-+# I/O limits can be disabled by setting all throttle values to 0.
-+#
-+# Returns: Nothing on success
-+#          If @device is not a valid fsdev device, GenericError
-+#
-+# Since: 2.11
-+#
-+# Example:
-+#
-+# -> { "execute": "fsdev-set-io-throttle",
-+#      "arguments": { "id": "id0-1-0",
-+#                     "bps": 1000000,
-+#                     "bps_rd": 0,
-+#                     "bps_wr": 0,
-+#                     "iops": 0,
-+#                     "iops_rd": 0,
-+#                     "iops_wr": 0,
-+#                     "bps_max": 8000000,
-+#                     "bps_rd_max": 0,
-+#                     "bps_wr_max": 0,
-+#                     "iops_max": 0,
-+#                     "iops_rd_max": 0,
-+#                     "iops_wr_max": 0,
-+#                     "bps_max_length": 60,
-+#                     "iops_size": 0 } }
-+# <- { "returns": {} }
-+##
-+{ 'command': 'fsdev-set-io-throttle', 'boxed': true,
-+  'data': 'FsdevIOThrottle' }
-+##
-+# @query-fsdev-io-throttle:
-+#
-+# Returns: a list of @IOThrottle describing I/O throttle
-+#          values of each fsdev device
-+#
-+# Since: 2.11
-+#
-+# Example:
-+#
-+# -> { "Execute": "query-fsdev-io-throttle" }
-+# <- { "returns" : [
-+#          {
-+#              "id": "id0-hd0",
-+#              "bps":1000000,
-+#              "bps_rd":0,
-+#              "bps_wr":0,
-+#              "iops":1000000,
-+#              "iops_rd":0,
-+#              "iops_wr":0,
-+#              "bps_max": 8000000,
-+#              "bps_rd_max": 0,
-+#              "bps_wr_max": 0,
-+#              "iops_max": 0,
-+#              "iops_rd_max": 0,
-+#              "iops_wr_max": 0,
-+#              "bps_max_length": 0,
-+#              "bps_rd_max_length": 0,
-+#              "bps_wr_max_length": 0,
-+#              "iops_max_length": 0,
-+#              "iops_rd_max_length": 0,
-+#              "iops_wr_max_length": 0,
-+#              "iops_size": 0
-+#            }
-+#          ]
-+#      }
-+#
-+##
-+{ 'command': 'query-fsdev-io-throttle', 'returns': [ 'FsdevIOThrottle' ] }
-diff --git a/qmp.c b/qmp.c
-index e8c3031..e90a401 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -130,6 +130,20 @@ void qmp_cpu_add(int64_t id, Error **errp)
-     }
- }
- 
-+#if defined(_WIN64) || defined(_WIN32) || defined(__FreeBSD__)
-+
-+void qmp_fsdev_set_io_throttle(FsdevIOThrottle *arg, Error **errp)
-+{
-+    return;
-+}
-+
-+FsdevIOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
-+{
-+    return NULL;
-+}
-+
-+#endif
-+
- #ifndef CONFIG_VNC
- /* If VNC support is enabled, the "true" query-vnc command is
-    defined in the VNC subsystem */
--- 
-1.8.3.1
+> Checking PATCH 2/3: watchdog.h: Drop local redefinition of actions enum=
+=2E..
+> ERROR: braces {} are necessary for all arms of this statement
+> #57: FILE: hw/watchdog/watchdog.c:86:
+> +    if (action < 0)
+> [...]
+
+Pre-existing problem, but would indeed be easy to fix up as part of this
+series.  I don't know if that means Markus should respin the pull request=
+?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--AMWveMJ5VfLjAVrjVGEd3vG6DTs1nx4oj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnSTtMACgkQp6FrSiUn
+Q2omPAf+NDDO5JlVQgl7DyW4+W13czOAFZzrWo5f+s1dXXTlGEiHyEj7H/AIS6id
+b78RLLqZxxKUmlu9Gs+gpuocwMWk4/Vwj2MmKDcENQqsP/bMBD4Ch/jAvRMPdY62
+WT+NAR87duCGucdTZNbFEp9mp0M323IZ94wU5IQ373fac4DLRpVYRAMkvRc0Zsmj
+1WxgcvxYkVWRV4sN7TbZhOaVsrykom8TVWauMVf2hNjQjX++vxkUJIjhUuD6Pa2q
+XGKwtogxsPxOJPp78zr9au80nGRtuICv96U/Q6EGLkeJR6fRgaiceYghAXqIpsGW
+bIumZru7aTvCbRsW/mLHt0F0AO1kEA==
+=PSq8
+-----END PGP SIGNATURE-----
+
+--AMWveMJ5VfLjAVrjVGEd3vG6DTs1nx4oj--
