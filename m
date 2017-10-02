@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dywiO-00026L-Su
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:41 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dywiR-00029H-PT
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dywiO-00067F-3r
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40660)
+	(envelope-from <imammedo@redhat.com>) id 1dywiL-00065a-SW
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57692)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dywiN-00066o-Tw
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:40 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dywiL-00065A-Ms
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:37 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon,  2 Oct 2017 11:07:56 +0200
-Message-Id: <1506935300-132598-15-git-send-email-imammedo@redhat.com>
+Date: Mon,  2 Oct 2017 11:07:54 +0200
+Message-Id: <1506935300-132598-13-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
 References: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 14/38] moxie: use generic cpu_model parsing
+Subject: [Qemu-devel] [PATCH 12/38] moxie: fix qemu-system-moxie failing to
+ start with CLI "-cpu MoxieLite"
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -26,44 +27,57 @@ To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, green@moxielogic.com
 List-ID: <qemu-devel.nongnu.org>
 
+It 'works' with default CPU only because of bug in
+moxie_cpu_class_by_name() where it treats cpu_model
+as type name and default cpu_model also happens to be
+type name. But specifying explicitly cpu on CLI,
+ex: '-cpu MoxieLite', makes QEMU fail since
+moxie_cpu_class_by_name() doesn't traslate cpu_model
+to cpu type and fails to find corresponding object class.
+
+Fix moxie_cpu_class_by_name() to do proper
+   cpu_model -> cpu type
+translation and fix default cpu_model to be cpu_model
+instead of being typename.
+
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
 CC: green@moxielogic.com
 ---
- hw/moxie/moxiesim.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ hw/moxie/moxiesim.c | 2 +-
+ target/moxie/cpu.c  | 7 ++++++-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
-index 01b9f34..3ba5848 100644
+index 5ea8dd3..01b9f34 100644
 --- a/hw/moxie/moxiesim.c
 +++ b/hw/moxie/moxiesim.c
-@@ -103,7 +103,6 @@ static void moxiesim_init(MachineState *machine)
- {
-     MoxieCPU *cpu = NULL;
-     ram_addr_t ram_size = machine->ram_size;
--    const char *cpu_model = machine->cpu_model;
-     const char *kernel_filename = machine->kernel_filename;
-     const char *kernel_cmdline = machine->kernel_cmdline;
-     const char *initrd_filename = machine->initrd_filename;
-@@ -115,10 +114,7 @@ static void moxiesim_init(MachineState *machine)
-     LoaderParams loader_params;
+@@ -116,7 +116,7 @@ static void moxiesim_init(MachineState *machine)
  
      /* Init CPUs. */
--    if (cpu_model == NULL) {
--        cpu_model = "MoxieLite";
--    }
--    cpu = MOXIE_CPU(cpu_generic_init(TYPE_MOXIE_CPU, cpu_model));
-+    cpu = MOXIE_CPU(cpu_create(machine->cpu_type));
+     if (cpu_model == NULL) {
+-        cpu_model = "MoxieLite-moxie-cpu";
++        cpu_model = "MoxieLite";
+     }
+     cpu = MOXIE_CPU(cpu_generic_init(TYPE_MOXIE_CPU, cpu_model));
      env = &cpu->env;
+diff --git a/target/moxie/cpu.c b/target/moxie/cpu.c
+index 30bd44f..d4626a1 100644
+--- a/target/moxie/cpu.c
++++ b/target/moxie/cpu.c
+@@ -89,7 +89,12 @@ static void moxie_cpu_initfn(Object *obj)
  
-     qemu_register_reset(main_cpu_reset, cpu);
-@@ -150,6 +146,7 @@ static void moxiesim_machine_init(MachineClass *mc)
-     mc->desc = "Moxie simulator platform";
-     mc->init = moxiesim_init;
-     mc->is_default = 1;
-+    mc->default_cpu_type = MOXIE_CPU_TYPE_NAME("MoxieLite");
- }
- 
- DEFINE_MACHINE("moxiesim", moxiesim_machine_init)
+ static ObjectClass *moxie_cpu_class_by_name(const char *cpu_model)
+ {
+-    ObjectClass *oc = object_class_by_name(cpu_model);
++    ObjectClass *oc;
++    char *typename;
++
++    typename = g_strdup_printf("%s-" TYPE_MOXIE_CPU, cpu_model);
++    oc = object_class_by_name(typename);
++    g_free(typename);
+     if (oc != NULL && (!object_class_dynamic_cast(oc, TYPE_MOXIE_CPU) ||
+                        object_class_is_abstract(oc))) {
+         return NULL;
 -- 
 2.7.4
