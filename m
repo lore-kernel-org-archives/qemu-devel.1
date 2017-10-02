@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dz1pQ-0007MW-1z
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:36:20 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dz1sW-0001Xj-UP
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:39:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dz1pK-0000k2-Hm
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:36:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35842)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dz1sU-00031D-BP
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:39:28 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:3879 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dz1pK-0000io-AH
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:36:10 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1E5C013204
-	for <qemu-devel@nongnu.org>; Mon,  2 Oct 2017 14:36:09 +0000 (UTC)
-References: <150694455954.126.4260615671927745603@b58463cdfd5f>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <37ea08c6-ec95-2ab6-13dd-db9d270bfe5a@redhat.com>
-Date: Mon, 2 Oct 2017 09:36:03 -0500
-MIME-Version: 1.0
-In-Reply-To: <150694455954.126.4260615671927745603@b58463cdfd5f>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="AMWveMJ5VfLjAVrjVGEd3vG6DTs1nx4oj"
-Subject: Re: [Qemu-devel] [PULL 0/3] QAPI patches for 2017-10-02
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dz1sT-0002yr-7H
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:39:26 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon,  2 Oct 2017 17:39:19 +0300
+Message-Id: <20171002143919.207741-6-vsementsov@virtuozzo.com>
+In-Reply-To: <20171002143919.207741-1-vsementsov@virtuozzo.com>
+References: <20171002143919.207741-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 5/5] backup: use copy_bitmap in incremental
+ backup
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -32,64 +24,90 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, armbru@redhat.com
-Cc: famz@redhat.com
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, stefanha@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 List-ID: <qemu-devel.nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AMWveMJ5VfLjAVrjVGEd3vG6DTs1nx4oj
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org, armbru@redhat.com
-Cc: famz@redhat.com
-Message-ID: <37ea08c6-ec95-2ab6-13dd-db9d270bfe5a@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 0/3] QAPI patches for 2017-10-02
-References: <150694455954.126.4260615671927745603@b58463cdfd5f>
-In-Reply-To: <150694455954.126.4260615671927745603@b58463cdfd5f>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+We can use copy_bitmap instead of sync_bitmap. copy_bitmap is
+initialized from sync_bitmap and it is more informative: we will not try
+to process data, that is already in progress (by write notifier).
 
-On 10/02/2017 06:42 AM, no-reply@patchew.org wrote:
-> Hi,
->=20
-> This series seems to have some coding style problems. See output below =
-for
-> more information:
->=20
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/backup.c | 55 +++++++++++++++++--------------------------------------
+ 1 file changed, 17 insertions(+), 38 deletions(-)
 
-> Checking PATCH 2/3: watchdog.h: Drop local redefinition of actions enum=
-=2E..
-> ERROR: braces {} are necessary for all arms of this statement
-> #57: FILE: hw/watchdog/watchdog.c:86:
-> +    if (action < 0)
-> [...]
-
-Pre-existing problem, but would indeed be easy to fix up as part of this
-series.  I don't know if that means Markus should respin the pull request=
-?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---AMWveMJ5VfLjAVrjVGEd3vG6DTs1nx4oj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnSTtMACgkQp6FrSiUn
-Q2omPAf+NDDO5JlVQgl7DyW4+W13czOAFZzrWo5f+s1dXXTlGEiHyEj7H/AIS6id
-b78RLLqZxxKUmlu9Gs+gpuocwMWk4/Vwj2MmKDcENQqsP/bMBD4Ch/jAvRMPdY62
-WT+NAR87duCGucdTZNbFEp9mp0M323IZ94wU5IQ373fac4DLRpVYRAMkvRc0Zsmj
-1WxgcvxYkVWRV4sN7TbZhOaVsrykom8TVWauMVf2hNjQjX++vxkUJIjhUuD6Pa2q
-XGKwtogxsPxOJPp78zr9au80nGRtuICv96U/Q6EGLkeJR6fRgaiceYghAXqIpsGW
-bIumZru7aTvCbRsW/mLHt0F0AO1kEA==
-=PSq8
------END PGP SIGNATURE-----
-
---AMWveMJ5VfLjAVrjVGEd3vG6DTs1nx4oj--
+diff --git a/block/backup.c b/block/backup.c
+index 52df7bb19e..c933cfafc3 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -362,49 +362,28 @@ static bool coroutine_fn yield_and_check(BackupBlockJob *job)
+ 
+ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+ {
++    int ret;
+     bool error_is_read;
+-    int ret = 0;
+-    int clusters_per_iter;
+-    uint32_t granularity;
+-    int64_t offset;
+     int64_t cluster;
+-    int64_t end;
+-    BdrvDirtyBitmapIter *dbi;
+-
+-    granularity = bdrv_dirty_bitmap_granularity(job->sync_bitmap);
+-    clusters_per_iter = MAX((granularity / job->cluster_size), 1);
+-    dbi = bdrv_dirty_iter_new(job->sync_bitmap);
+-
+-    /* Find the next dirty sector(s) */
+-    while ((offset = bdrv_dirty_iter_next(dbi)) >= 0) {
+-        cluster = offset / job->cluster_size;
+-
+-        for (end = cluster + clusters_per_iter; cluster < end; cluster++) {
+-            do {
+-                if (yield_and_check(job)) {
+-                    goto out;
+-                }
+-                ret = backup_do_cow(job, cluster * job->cluster_size,
+-                                    job->cluster_size, &error_is_read,
+-                                    false);
+-                if ((ret < 0) &&
+-                    backup_error_action(job, error_is_read, -ret) ==
+-                    BLOCK_ERROR_ACTION_REPORT) {
+-                    goto out;
+-                }
+-            } while (ret < 0);
+-        }
++    HBitmapIter hbi;
+ 
+-        /* If the bitmap granularity is smaller than the backup granularity,
+-         * we need to advance the iterator pointer to the next cluster. */
+-        if (granularity < job->cluster_size) {
+-            bdrv_set_dirty_iter(dbi, cluster * job->cluster_size);
+-        }
++    hbitmap_iter_init(&hbi, job->copy_bitmap, 0);
++    while ((cluster = hbitmap_iter_next(&hbi)) != -1) {
++        do {
++            if (yield_and_check(job)) {
++                return 0;
++            }
++            ret = backup_do_cow(job, cluster * job->cluster_size,
++                                job->cluster_size, &error_is_read, false);
++            if (ret < 0 && backup_error_action(job, error_is_read, -ret) ==
++                           BLOCK_ERROR_ACTION_REPORT)
++            {
++                return ret;
++            }
++        } while (ret < 0);
+     }
+ 
+-out:
+-    bdrv_dirty_iter_free(dbi);
+-    return ret;
++    return 0;
+ }
+ 
+ /* init copy_bitmap from sync_bitmap */
+-- 
+2.11.1
