@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dywii-0002PL-2y
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:09:07 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dywik-0002SF-C3
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:09:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dywic-0006DF-86
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:09:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49052)
+	(envelope-from <imammedo@redhat.com>) id 1dywij-0006HT-3S
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:09:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58538)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dywib-0006Ch-VU
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:54 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dywii-0006HB-R1
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:09:01 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon,  2 Oct 2017 11:08:07 +0200
-Message-Id: <1506935300-132598-26-git-send-email-imammedo@redhat.com>
+Date: Mon,  2 Oct 2017 11:08:12 +0200
+Message-Id: <1506935300-132598-31-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
 References: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 25/38] unicore32: cleanup cpu type name
- composition
+Subject: [Qemu-devel] [PATCH 30/38] sparc: sun4u/sun4v/niagara: use generic
+ cpu_model parsing
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -24,129 +24,131 @@ List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, gxt@mprc.pku.edu.cn
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, mark.cave-ayland@ilande.co.uk, atar4qemu@gmail.com
 List-ID: <qemu-devel.nongnu.org>
-
-use new UNICORE32_CPU_TYPE_NAME to compose CPU type
-name and get rid of intermediate
-   UniCore32CPUInfo/uc32_cpu_register_types()
-which is replaced by static TypeInfo array and
-type_init_from_array()
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-CC: gxt@mprc.pku.edu.cn
+CC: mark.cave-ayland@ilande.co.uk
+CC: atar4qemu@gmail.com
 ---
- target/unicore32/cpu.h |  3 +++
- target/unicore32/cpu.c | 61 +++++++++++++++++---------------------------------
- 2 files changed, 23 insertions(+), 41 deletions(-)
+ include/hw/sparc/sparc64.h | 3 +--
+ hw/sparc64/niagara.c       | 4 ++--
+ hw/sparc64/sparc64.c       | 8 ++------
+ hw/sparc64/sun4u.c         | 8 +++-----
+ 4 files changed, 8 insertions(+), 15 deletions(-)
 
-diff --git a/target/unicore32/cpu.h b/target/unicore32/cpu.h
-index 7724108..3dc6fbc 100644
---- a/target/unicore32/cpu.h
-+++ b/target/unicore32/cpu.h
-@@ -167,6 +167,9 @@ static inline int cpu_mmu_index(CPUUniCore32State *env, bool ifetch)
+diff --git a/include/hw/sparc/sparc64.h b/include/hw/sparc/sparc64.h
+index 7748939..ca3bb4b 100644
+--- a/include/hw/sparc/sparc64.h
++++ b/include/hw/sparc/sparc64.h
+@@ -1,5 +1,4 @@
  
- #define cpu_init(cpu_model) cpu_generic_init(TYPE_UNICORE32_CPU, cpu_model)
+-SPARCCPU *sparc64_cpu_devinit(const char *cpu_model,
+-                              const char *dflt_cpu_model, uint64_t prom_addr);
++SPARCCPU *sparc64_cpu_devinit(const char *cpu_type, uint64_t prom_addr);
  
-+#define UNICORE32_CPU_TYPE_SUFFIX "-" TYPE_UNICORE32_CPU
-+#define UNICORE32_CPU_TYPE_NAME(model) model UNICORE32_CPU_TYPE_SUFFIX
-+
- static inline void cpu_get_tb_cpu_state(CPUUniCore32State *env, target_ulong *pc,
-                                         target_ulong *cs_base, uint32_t *flags)
- {
-diff --git a/target/unicore32/cpu.c b/target/unicore32/cpu.c
-index 138acc9..3345cfd 100644
---- a/target/unicore32/cpu.c
-+++ b/target/unicore32/cpu.c
-@@ -44,7 +44,7 @@ static ObjectClass *uc32_cpu_class_by_name(const char *cpu_model)
-     ObjectClass *oc;
-     char *typename;
+ void sparc64_cpu_set_ivec_irq(void *opaque, int irq, int level);
+diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
+index 9a8d610..7a72332 100644
+--- a/hw/sparc64/niagara.c
++++ b/hw/sparc64/niagara.c
+@@ -106,8 +106,7 @@ static void niagara_init(MachineState *machine)
+     MemoryRegion *sysmem = get_system_memory();
  
--    typename = g_strdup_printf("%s-" TYPE_UNICORE32_CPU, cpu_model);
-+    typename = g_strdup_printf(UNICORE32_CPU_TYPE_NAME("%s"), cpu_model);
-     oc = object_class_by_name(typename);
-     g_free(typename);
-     if (oc != NULL && (!object_class_dynamic_cast(oc, TYPE_UNICORE32_CPU) ||
-@@ -54,11 +54,6 @@ static ObjectClass *uc32_cpu_class_by_name(const char *cpu_model)
-     return oc;
+     /* init CPUs */
+-    sparc64_cpu_devinit(machine->cpu_model, "Sun UltraSparc T1",
+-                        NIAGARA_PROM_BASE);
++    sparc64_cpu_devinit(machine->cpu_type, NIAGARA_PROM_BASE);
+     /* set up devices */
+     memory_region_allocate_system_memory(&s->hv_ram, NULL, "sun4v-hv.ram",
+                                          NIAGARA_HV_RAM_SIZE);
+@@ -174,6 +173,7 @@ static void niagara_class_init(ObjectClass *oc, void *data)
+     mc->init = niagara_init;
+     mc->max_cpus = 1; /* XXX for now */
+     mc->default_boot_order = "c";
++    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("Sun-UltraSparc-T1");
  }
  
--typedef struct UniCore32CPUInfo {
--    const char *name;
--    void (*instance_init)(Object *obj);
--} UniCore32CPUInfo;
--
- static void unicore_ii_cpu_initfn(Object *obj)
- {
-     UniCore32CPU *cpu = UNICORE32_CPU(obj);
-@@ -90,11 +85,6 @@ static void uc32_any_cpu_initfn(Object *obj)
-     set_snan_bit_is_one(1, &env->ucf64.fp_status);
+ static const TypeInfo niagara_type = {
+diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
+index 097d529..9453e2c 100644
+--- a/hw/sparc64/sparc64.c
++++ b/hw/sparc64/sparc64.c
+@@ -339,8 +339,7 @@ void cpu_tick_set_limit(CPUTimer *timer, uint64_t limit)
+     }
  }
  
--static const UniCore32CPUInfo uc32_cpus[] = {
--    { .name = "UniCore-II", .instance_init = unicore_ii_cpu_initfn },
--    { .name = "any",        .instance_init = uc32_any_cpu_initfn },
--};
--
- static void uc32_cpu_realizefn(DeviceState *dev, Error **errp)
+-SPARCCPU *sparc64_cpu_devinit(const char *cpu_model,
+-                              const char *default_cpu_model, uint64_t prom_addr)
++SPARCCPU *sparc64_cpu_devinit(const char *cpu_type, uint64_t prom_addr)
  {
-     CPUState *cs = CPU(dev);
-@@ -165,36 +155,25 @@ static void uc32_cpu_class_init(ObjectClass *oc, void *data)
-     dc->vmsd = &vmstate_uc32_cpu;
- }
+     SPARCCPU *cpu;
+     CPUSPARCState *env;
+@@ -350,10 +349,7 @@ SPARCCPU *sparc64_cpu_devinit(const char *cpu_model,
+     uint32_t  stick_frequency = 100 * 1000000;
+     uint32_t hstick_frequency = 100 * 1000000;
  
--static void uc32_register_cpu_type(const UniCore32CPUInfo *info)
--{
--    TypeInfo type_info = {
--        .parent = TYPE_UNICORE32_CPU,
--        .instance_init = info->instance_init,
--    };
--
--    type_info.name = g_strdup_printf("%s-" TYPE_UNICORE32_CPU, info->name);
--    type_register(&type_info);
--    g_free((void *)type_info.name);
--}
-+#define DEFINE_UNICORE32_CPU_TYPE(cpu_model, initfn) \
-+    {                                                \
-+        .parent = TYPE_UNICORE32_CPU,                \
-+        .instance_init = initfn,                     \
-+        .name = UNICORE32_CPU_TYPE_NAME(cpu_model),  \
-+    }
- 
--static const TypeInfo uc32_cpu_type_info = {
--    .name = TYPE_UNICORE32_CPU,
--    .parent = TYPE_CPU,
--    .instance_size = sizeof(UniCore32CPU),
--    .instance_init = uc32_cpu_initfn,
--    .abstract = true,
--    .class_size = sizeof(UniCore32CPUClass),
--    .class_init = uc32_cpu_class_init,
-+static const TypeInfo uc32_cpu_type_infos[] = {
-+    {
-+        .name = TYPE_UNICORE32_CPU,
-+        .parent = TYPE_CPU,
-+        .instance_size = sizeof(UniCore32CPU),
-+        .instance_init = uc32_cpu_initfn,
-+        .abstract = true,
-+        .class_size = sizeof(UniCore32CPUClass),
-+        .class_init = uc32_cpu_class_init,
-+    },
-+    DEFINE_UNICORE32_CPU_TYPE("UniCore-II", unicore_ii_cpu_initfn),
-+    DEFINE_UNICORE32_CPU_TYPE("any", uc32_any_cpu_initfn),
- };
- 
--static void uc32_cpu_register_types(void)
--{
--    int i;
--
--    type_register_static(&uc32_cpu_type_info);
--    for (i = 0; i < ARRAY_SIZE(uc32_cpus); i++) {
--        uc32_register_cpu_type(&uc32_cpus[i]);
+-    if (cpu_model == NULL) {
+-        cpu_model = default_cpu_model;
 -    }
--}
--
--type_init(uc32_cpu_register_types)
-+type_init_from_array(uc32_cpu_type_infos)
+-    cpu = SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
++    cpu = SPARC_CPU(cpu_create(cpu_type));
+     env = &cpu->env;
+ 
+     env->tick = cpu_timer_create("tick", cpu, tick_irq,
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index c3280aa..d53fad8 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -73,7 +73,6 @@
+ #define IVEC_MAX             0x40
+ 
+ struct hwdef {
+-    const char * const default_cpu_model;
+     uint16_t machine_id;
+     uint64_t prom_addr;
+     uint64_t console_serial_base;
+@@ -439,8 +438,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     int onboard_nic_idx;
+ 
+     /* init CPUs */
+-    cpu = sparc64_cpu_devinit(machine->cpu_model, hwdef->default_cpu_model,
+-                              hwdef->prom_addr);
++    cpu = sparc64_cpu_devinit(machine->cpu_type, hwdef->prom_addr);
+ 
+     /* set up devices */
+     ram_init(0, machine->ram_size);
+@@ -569,14 +567,12 @@ enum {
+ static const struct hwdef hwdefs[] = {
+     /* Sun4u generic PC-like machine */
+     {
+-        .default_cpu_model = "TI UltraSparc IIi",
+         .machine_id = sun4u_id,
+         .prom_addr = 0x1fff0000000ULL,
+         .console_serial_base = 0,
+     },
+     /* Sun4v generic PC-like machine */
+     {
+-        .default_cpu_model = "Sun UltraSparc T1",
+         .machine_id = sun4v_id,
+         .prom_addr = 0x1fff0000000ULL,
+         .console_serial_base = 0,
+@@ -605,6 +601,7 @@ static void sun4u_class_init(ObjectClass *oc, void *data)
+     mc->max_cpus = 1; /* XXX for now */
+     mc->is_default = 1;
+     mc->default_boot_order = "c";
++    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-UltraSparc-IIi");
+ }
+ 
+ static const TypeInfo sun4u_type = {
+@@ -622,6 +619,7 @@ static void sun4v_class_init(ObjectClass *oc, void *data)
+     mc->block_default_type = IF_IDE;
+     mc->max_cpus = 1; /* XXX for now */
+     mc->default_boot_order = "c";
++    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("Sun-UltraSparc-T1");
+ }
+ 
+ static const TypeInfo sun4v_type = {
 -- 
 2.7.4
