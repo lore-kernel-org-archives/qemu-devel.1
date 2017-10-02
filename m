@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anthoine.bourgeois@gmail.com>) id 1dyxdw-0001qK-7E
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 06:08:14 -0400
+	(envelope-from <anthoine.bourgeois@gmail.com>) id 1dyvmz-0005Y0-Md
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 04:09:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anthoine.bourgeois@gmail.com>) id 1dyxds-0004Nc-CJ
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 06:08:08 -0400
+	(envelope-from <anthoine.bourgeois@gmail.com>) id 1dyvmu-0005jp-MV
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 04:09:21 -0400
 From: Anthoine Bourgeois <anthoine.bourgeois@gmail.com>
-Date: Mon,  2 Oct 2017 12:07:46 +0200
-Message-Id: <20171002100746.9408-1-anthoine.bourgeois@blade-group.com>
+Date: Mon,  2 Oct 2017 10:09:06 +0200
+Message-Id: <20171002080906.4682-1-anthoine.bourgeois@gmail.com>
 Subject: [Qemu-devel] [PATCH] gtk: fix wrong id between texture and
  framebuffer
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
@@ -18,8 +18,10 @@ List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
 To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Anthoine Bourgeois <anthoine.bourgeois@blade-group.com>
+Cc: qemu-trivial@nongnu.org, Anthoine Bourgeois <anthoine.bourgeois@gmail.com>, Anthoine Bourgeois <anthoine.bourgeois@blade-group.com>
 List-ID: <qemu-devel.nongnu.org>
+
+From: Anthoine Bourgeois <anthoine.bourgeois@blade-group.com>
 
 The gd_gl_area_scanout_texture must destroy framebuffer if there is
 no texture id instead of no framebuffer id.
