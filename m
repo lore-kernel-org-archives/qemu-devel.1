@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anthoine.bourgeois@gmail.com>) id 1dyvmz-0005Y0-Md
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 04:09:23 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dz0pa-0006AW-UD
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:32:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anthoine.bourgeois@gmail.com>) id 1dyvmu-0005jp-MV
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 04:09:21 -0400
-From: Anthoine Bourgeois <anthoine.bourgeois@gmail.com>
-Date: Mon,  2 Oct 2017 10:09:06 +0200
-Message-Id: <20171002080906.4682-1-anthoine.bourgeois@gmail.com>
-Subject: [Qemu-devel] [PATCH] gtk: fix wrong id between texture and
- framebuffer
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dz0pZ-0002U0-HQ
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:32:22 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:26577 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dz0pZ-0002S5-0R
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 09:32:21 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20170913181910.29688-1-mreitz@redhat.com>
+	<20170913181910.29688-13-mreitz@redhat.com>
+	<042b7c75-96a8-a695-5702-289eb68b5f54@virtuozzo.com>
+Message-ID: <b426238f-30d4-8617-6c86-3c312e4f6fd2@virtuozzo.com>
+Date: Mon, 2 Oct 2017 16:32:00 +0300
+MIME-Version: 1.0
+In-Reply-To: <042b7c75-96a8-a695-5702-289eb68b5f54@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [PATCH 12/18] block/dirty-bitmap: Add
+ bdrv_dirty_iter_next_area
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -17,36 +30,91 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Anthoine Bourgeois <anthoine.bourgeois@gmail.com>, Anthoine Bourgeois <anthoine.bourgeois@blade-group.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-From: Anthoine Bourgeois <anthoine.bourgeois@blade-group.com>
-
-The gd_gl_area_scanout_texture must destroy framebuffer if there is
-no texture id instead of no framebuffer id.
-The effect was a black screen with "-vga virtio -display gtk,gl=on"
-options.
-The bug was introduce by a4f113fd "gtk: use framebuffer helper functions."
-
-Signed-off-by: Anthoine Bourgeois <anthoine.bourgeois@blade-group.com>
----
- ui/gtk-gl-area.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/ui/gtk-gl-area.c b/ui/gtk-gl-area.c
-index 18b298f..026b7d7 100644
---- a/ui/gtk-gl-area.c
-+++ b/ui/gtk-gl-area.c
-@@ -178,8 +178,7 @@ void gd_gl_area_scanout_texture(DisplayChangeListener *dcl,
- 
-     gtk_gl_area_make_current(GTK_GL_AREA(vc->gfx.drawing_area));
- 
--    if (vc->gfx.guest_fb.framebuffer  == 0 ||
--        vc->gfx.w == 0 || vc->gfx.h == 0) {
-+    if (backing_id == 0 || vc->gfx.w == 0 || vc->gfx.h == 0) {
-         gtk_gl_area_set_scanout_mode(vc, false);
-         return;
-     }
--- 
-2.9.3
+MjUuMDkuMjAxNyAxODo0OSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToN
+Cj4gSSBoYXZlIGEgcGF0Y2ggb24gbGlzdCwgd2hpY2ggYWRkcyBoYml0bWFwX25leHRfemVy
+byBmdW5jdGlvbiwgaXQgbWF5IA0KPiBoZWxwDQo+IGh0dHBzOi8vbGlzdHMubm9uZ251Lm9y
+Zy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE3LTAyL21zZzAwODA5Lmh0bWwNCg0KdGhl
+cmUgaXMgYSBtaXN0YWtlIGluIHRoaXMgaGJpdG1hcF9uZXh0X3plcm8sIEknbGwgc2VuZCB0
+b2RheSBjb3JyZWN0ZWQgDQp2ZXJzaW9uIGFzIHBhcnQgb2Ygc21hbGwgYmFja3VwLXJlbGF0
+ZWQgc2VyaWVzLg0KDQoNCj4NCj4gMTMuMDkuMjAxNyAyMToxOSwgTWF4IFJlaXR6IHdyb3Rl
+Og0KPj4gVGhpcyBuZXcgZnVuY3Rpb24gYWxsb3dzIHRvIGxvb2sgZm9yIGEgY29uc2VjdXRp
+dmVseSBkaXJ0eSBhcmVhIGluIGENCj4+IGRpcnR5IGJpdG1hcC4NCj4+DQo+PiBTaWduZWQt
+b2ZmLWJ5OiBNYXggUmVpdHogPG1yZWl0ekByZWRoYXQuY29tPg0KPj4gLS0tDQo+PiDCoCBp
+bmNsdWRlL2Jsb2NrL2RpcnR5LWJpdG1hcC5oIHzCoCAyICsrDQo+PiDCoCBibG9jay9kaXJ0
+eS1iaXRtYXAuY8KgwqDCoMKgwqDCoMKgwqAgfCA1MiANCj4+ICsrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+PiDCoCAyIGZpbGVzIGNoYW5nZWQsIDU0
+IGluc2VydGlvbnMoKykNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9ibG9jay9kaXJ0
+eS1iaXRtYXAuaCBiL2luY2x1ZGUvYmxvY2svZGlydHktYml0bWFwLmgNCj4+IGluZGV4IGE3
+OWE1OGQyYzMuLjc2NTQ3NDg3MDAgMTAwNjQ0DQo+PiAtLS0gYS9pbmNsdWRlL2Jsb2NrL2Rp
+cnR5LWJpdG1hcC5oDQo+PiArKysgYi9pbmNsdWRlL2Jsb2NrL2RpcnR5LWJpdG1hcC5oDQo+
+PiBAQCAtOTAsNiArOTAsOCBAQCB2b2lkIGJkcnZfc2V0X2RpcnR5X2JpdG1hcF9sb2NrZWQo
+QmRydkRpcnR5Qml0bWFwIA0KPj4gKmJpdG1hcCwNCj4+IMKgIHZvaWQgYmRydl9yZXNldF9k
+aXJ0eV9iaXRtYXBfbG9ja2VkKEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwLA0KPj4gwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqAgaW50NjRfdCBjdXJfc2VjdG9yLCBpbnQ2NF90IA0KPj4gbnJfc2Vj
+dG9ycyk7DQo+PiDCoCBpbnQ2NF90IGJkcnZfZGlydHlfaXRlcl9uZXh0KEJkcnZEaXJ0eUJp
+dG1hcEl0ZXIgKml0ZXIpOw0KPj4gK2Jvb2wgYmRydl9kaXJ0eV9pdGVyX25leHRfYXJlYShC
+ZHJ2RGlydHlCaXRtYXBJdGVyICppdGVyLCB1aW50NjRfdCANCj4+IG1heF9vZmZzZXQsDQo+
+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgIHVpbnQ2NF90ICpvZmZzZXQsIGludCAqYnl0ZXMpOw0KPj4gwqAgdm9pZCBi
+ZHJ2X3NldF9kaXJ0eV9pdGVyKEJkcnZEaXJ0eUJpdG1hcEl0ZXIgKmhiaSwgaW50NjRfdCAN
+Cj4+IHNlY3Rvcl9udW0pOw0KPj4gwqAgaW50NjRfdCBiZHJ2X2dldF9kaXJ0eV9jb3VudChC
+ZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCk7DQo+PiDCoCBpbnQ2NF90IGJkcnZfZ2V0X21ldGFf
+ZGlydHlfY291bnQoQmRydkRpcnR5Qml0bWFwICpiaXRtYXApOw0KPj4gZGlmZiAtLWdpdCBh
+L2Jsb2NrL2RpcnR5LWJpdG1hcC5jIGIvYmxvY2svZGlydHktYml0bWFwLmMNCj4+IGluZGV4
+IGFlZTU3Y2Y4YzguLjgxYjJmNzgwMTYgMTAwNjQ0DQo+PiAtLS0gYS9ibG9jay9kaXJ0eS1i
+aXRtYXAuYw0KPj4gKysrIGIvYmxvY2svZGlydHktYml0bWFwLmMNCj4+IEBAIC01NTAsNiAr
+NTUwLDU4IEBAIGludDY0X3QgYmRydl9kaXJ0eV9pdGVyX25leHQoQmRydkRpcnR5Qml0bWFw
+SXRlciANCj4+ICppdGVyKQ0KPj4gwqDCoMKgwqDCoCByZXR1cm4gaGJpdG1hcF9pdGVyX25l
+eHQoJml0ZXItPmhiaSwgdHJ1ZSk7DQo+PiDCoCB9DQo+PiDCoCArLyoqDQo+PiArICogUmV0
+dXJuIHRoZSBuZXh0IGNvbnNlY3V0aXZlbHkgZGlydHkgYXJlYSBpbiB0aGUgZGlydHkgYml0
+bWFwDQo+PiArICogYmVsb25naW5nIHRvIHRoZSBnaXZlbiBpdGVyYXRvciBAaXRlci4NCj4+
+ICsgKg0KPj4gKyAqIEBtYXhfb2Zmc2V0OiBNYXhpbXVtIHZhbHVlIHRoYXQgbWF5IGJlIHJl
+dHVybmVkIGZvcg0KPj4gKyAqwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKm9mZnNldCAr
+ICpieXRlcw0KPj4gKyAqIEBvZmZzZXQ6wqDCoMKgwqAgV2lsbCBjb250YWluIHRoZSBzdGFy
+dCBvZmZzZXQgb2YgdGhlIG5leHQgZGlydHkgYXJlYQ0KPj4gKyAqIEBieXRlczrCoMKgwqDC
+oMKgIFdpbGwgY29udGFpbiB0aGUgbGVuZ3RoIG9mIHRoZSBuZXh0IGRpcnR5IGFyZWENCj4+
+ICsgKg0KPj4gKyAqIFJldHVybnM6IFRydWUgaWYgYSBkaXJ0eSBhcmVhIGNvdWxkIGJlIGZv
+dW5kIGJlZm9yZSBtYXhfb2Zmc2V0DQo+PiArICrCoMKgwqDCoMKgwqDCoMKgwqAgKHdoaWNo
+IG1lYW5zIHRoYXQgKm9mZnNldCBhbmQgKmJ5dGVzIHRoZW4gY29udGFpbiB2YWxpZA0KPj4g
+KyAqwqDCoMKgwqDCoMKgwqDCoMKgIHZhbHVlcyksIGZhbHNlIG90aGVyd2lzZS4NCj4+ICsg
+Ki8NCj4+ICtib29sIGJkcnZfZGlydHlfaXRlcl9uZXh0X2FyZWEoQmRydkRpcnR5Qml0bWFw
+SXRlciAqaXRlciwgdWludDY0X3QgDQo+PiBtYXhfb2Zmc2V0LA0KPj4gK8KgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB1aW50
+NjRfdCAqb2Zmc2V0LCBpbnQgKmJ5dGVzKQ0KPj4gK3sNCj4+ICvCoMKgwqAgdWludDMyX3Qg
+Z3JhbnVsYXJpdHkgPSBiZHJ2X2RpcnR5X2JpdG1hcF9ncmFudWxhcml0eShpdGVyLT5iaXRt
+YXApOw0KPj4gK8KgwqDCoCB1aW50NjRfdCBncmFuX21heF9vZmZzZXQ7DQo+PiArwqDCoMKg
+IGludCBzZWN0b3JfZ3JhbiA9IGdyYW51bGFyaXR5ID4+IEJEUlZfU0VDVE9SX0JJVFM7DQo+
+PiArwqDCoMKgIGludDY0X3QgcmV0Ow0KPj4gK8KgwqDCoCBpbnQgc2l6ZTsNCj4+ICsNCj4+
+ICvCoMKgwqAgaWYgKERJVl9ST1VORF9VUChtYXhfb2Zmc2V0LCBCRFJWX1NFQ1RPUl9TSVpF
+KSA9PSANCj4+IGl0ZXItPmJpdG1hcC0+c2l6ZSkgew0KPj4gK8KgwqDCoMKgwqDCoMKgIC8q
+IElmIG1heF9vZmZzZXQgcG9pbnRzIHRvIHRoZSBpbWFnZSBlbmQsIHJvdW5kIGl0IHVwIGJ5
+IHRoZQ0KPj4gK8KgwqDCoMKgwqDCoMKgwqAgKiBiaXRtYXAgZ3JhbnVsYXJpdHkgKi8NCj4+
+ICvCoMKgwqDCoMKgwqDCoCBncmFuX21heF9vZmZzZXQgPSBST1VORF9VUChtYXhfb2Zmc2V0
+LCBncmFudWxhcml0eSk7DQo+PiArwqDCoMKgIH0gZWxzZSB7DQo+PiArwqDCoMKgwqDCoMKg
+wqAgZ3Jhbl9tYXhfb2Zmc2V0ID0gbWF4X29mZnNldDsNCj4+ICvCoMKgwqAgfQ0KPj4gKw0K
+Pj4gK8KgwqDCoCByZXQgPSBoYml0bWFwX2l0ZXJfbmV4dCgmaXRlci0+aGJpLCBmYWxzZSk7
+DQo+PiArwqDCoMKgIGlmIChyZXQgPCAwIHx8IChyZXQgPDwgQkRSVl9TRUNUT1JfQklUUykg
+KyBncmFudWxhcml0eSA+IA0KPj4gZ3Jhbl9tYXhfb2Zmc2V0KSB7DQo+PiArwqDCoMKgwqDC
+oMKgwqAgcmV0dXJuIGZhbHNlOw0KPj4gK8KgwqDCoCB9DQo+PiArDQo+PiArwqDCoMKgICpv
+ZmZzZXQgPSByZXQgPDwgQkRSVl9TRUNUT1JfQklUUzsNCj4+ICvCoMKgwqAgc2l6ZSA9IDA7
+DQo+PiArDQo+PiArwqDCoMKgIGFzc2VydChncmFudWxhcml0eSA8PSBJTlRfTUFYKTsNCj4+
+ICsNCj4+ICvCoMKgwqAgZG8gew0KPj4gK8KgwqDCoMKgwqDCoMKgIC8qIEFkdmFuY2UgaXRl
+cmF0b3IgKi8NCj4+ICvCoMKgwqDCoMKgwqDCoCByZXQgPSBoYml0bWFwX2l0ZXJfbmV4dCgm
+aXRlci0+aGJpLCB0cnVlKTsNCj4+ICvCoMKgwqDCoMKgwqDCoCBzaXplICs9IGdyYW51bGFy
+aXR5Ow0KPj4gK8KgwqDCoCB9IHdoaWxlICgocmV0IDw8IEJEUlZfU0VDVE9SX0JJVFMpICsg
+Z3JhbnVsYXJpdHkgPD0gDQo+PiBncmFuX21heF9vZmZzZXQgJiYNCj4+ICvCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqAgaGJpdG1hcF9pdGVyX25leHQoJml0ZXItPmhiaSwgZmFsc2UpID09
+IHJldCArIA0KPj4gc2VjdG9yX2dyYW4gJiYNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgc2l6ZSA8PSBJTlRfTUFYIC0gZ3JhbnVsYXJpdHkpOw0KPj4gKw0KPj4gK8KgwqDCoCAq
+Ynl0ZXMgPSBNSU4oc2l6ZSwgbWF4X29mZnNldCAtICpvZmZzZXQpOw0KPj4gK8KgwqDCoCBy
+ZXR1cm4gdHJ1ZTsNCj4+ICt9DQo+PiArDQo+PiDCoCAvKiBDYWxsZWQgd2l0aGluIGJkcnZf
+ZGlydHlfYml0bWFwX2xvY2suLnVubG9jayAqLw0KPj4gwqAgdm9pZCBiZHJ2X3NldF9kaXJ0
+eV9iaXRtYXBfbG9ja2VkKEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwLA0KPj4gwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCBpbnQ2NF90IGN1cl9zZWN0b3IsIGludDY0X3QgDQo+PiBucl9zZWN0b3JzKQ0K
+Pg0KPg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg0K
