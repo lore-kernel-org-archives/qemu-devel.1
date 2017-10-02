@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dz1ar-0004n3-W9
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:21:14 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dz1b9-000509-2v
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:21:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dz1an-0000Kw-G3
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:21:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57144)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dz1an-0000KQ-9E
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:21:09 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 33A99267F5
-	for <qemu-devel@nongnu.org>; Mon,  2 Oct 2017 14:21:08 +0000 (UTC)
-Date: Mon, 2 Oct 2017 15:21:04 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171002142104.GC2218@work-vm>
-References: <20171002134538.23332-1-armbru@redhat.com>
-	<20171002134538.23332-2-armbru@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1dz1b4-0000SM-J2
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:21:31 -0400
+Received: from mail-wm0-f44.google.com ([74.125.82.44]:53513)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dz1b4-0000Rv-CC
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:21:26 -0400
+Received: by mail-wm0-f44.google.com with SMTP id q132so10951720wmd.2
+	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 07:21:26 -0700 (PDT)
+References: <20170922074659.30097-1-famz@redhat.com>
+	<20170922074659.30097-7-famz@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4c054496-5c79-e56f-cd23-4f27694b2934@redhat.com>
+Date: Mon, 2 Oct 2017 16:21:22 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171002134538.23332-2-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] hmp-commands-info: Fix "info
- rocker-FOO" misspellings
+In-Reply-To: <20170922074659.30097-7-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 06/36] docker: Enable features explicitly in
+ test-full
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -33,47 +30,122 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 List-ID: <qemu-devel.nongnu.org>
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> Screwed up in commit da76ee7.
+On 22/09/2017 09:46, Fam Zheng wrote:
+> Also avoid "set -e".
 > 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> Message-Id: <20170907141245.31946-3-famz@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+This broke docker-test-full with at least Fedora and CentOS 6 images.  I
+wouldn't be surprised if some required packages do not even exist on
+CentOS 6.  Should it be reverted?
+
+Paolo
 
 > ---
->  hmp-commands-info.hx | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  tests/docker/test-full | 82 ++++++++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 76 insertions(+), 6 deletions(-)
 > 
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index 4f1ece93e5..574db7d24e 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -730,8 +730,8 @@ ETEXI
->      },
+> diff --git a/tests/docker/test-full b/tests/docker/test-full
+> index 05f0d491d1..d71bf9d275 100755
+> --- a/tests/docker/test-full
+> +++ b/tests/docker/test-full
+> @@ -1,8 +1,8 @@
+> -#!/bin/bash -e
+> +#!/bin/bash
+>  #
+> -# Compile all the targets.
+> +# Compile all the targets with as many features enabled as possible
+>  #
+> -# Copyright (c) 2016 Red Hat Inc.
+> +# Copyright 2016, 2017 Red Hat Inc.
+>  #
+>  # Authors:
+>  #  Fam Zheng <famz@redhat.com>
+> @@ -13,7 +13,77 @@
 >  
->  STEXI
-> -@item info rocker_ports @var{name}-ports
-> -@findex ocker-ports
-> +@item info rocker-ports @var{name}-ports
-> +@findex rocker-ports
->  Show rocker ports.
->  ETEXI
+>  . common.rc
 >  
-> @@ -744,7 +744,7 @@ ETEXI
->      },
+> -cd "$BUILD_DIR"
+> +cd "$BUILD_DIR" || exit 1
 >  
->  STEXI
-> -@item info rocker_of_dpa_flows @var{name} [@var{tbl_id}]
-> +@item info rocker-of-dpa-flows @var{name} [@var{tbl_id}]
->  @findex rocker-of-dpa-flows
->  Show rocker OF-DPA flow tables.
->  ETEXI
-> -- 
-> 2.13.6
+> -build_qemu
+> -make check $MAKEFLAGS
+> +build_qemu \
+> +    --enable-attr \
+> +    --enable-bluez \
+> +    --enable-brlapi \
+> +    --enable-bsd-user \
+> +    --enable-bzip2 \
+> +    --enable-cap-ng \
+> +    --enable-coroutine-pool \
+> +    --enable-crypto-afalg \
+> +    --enable-curl \
+> +    --enable-curses \
+> +    --enable-debug \
+> +    --enable-debug-info \
+> +    --enable-debug-tcg \
+> +    --enable-docs \
+> +    --enable-fdt \
+> +    --enable-gcrypt \
+> +    --enable-glusterfs \
+> +    --enable-gnutls \
+> +    --enable-gprof \
+> +    --enable-gtk \
+> +    --enable-guest-agent \
+> +    --enable-jemalloc \
+> +    --enable-kvm \
+> +    --enable-libiscsi \
+> +    --enable-libnfs \
+> +    --enable-libssh2 \
+> +    --enable-libusb \
+> +    --enable-linux-aio \
+> +    --enable-linux-user \
+> +    --enable-live-block-migration \
+> +    --enable-lzo \
+> +    --enable-modules \
+> +    --enable-numa \
+> +    --enable-opengl \
+> +    --enable-pie \
+> +    --enable-profiler \
+> +    --enable-qom-cast-debug \
+> +    --enable-rbd \
+> +    --enable-rdma \
+> +    --enable-replication \
+> +    --enable-sdl \
+> +    --enable-seccomp \
+> +    --enable-smartcard \
+> +    --enable-snappy \
+> +    --enable-spice \
+> +    --enable-stack-protector \
+> +    --enable-system \
+> +    --enable-tcg \
+> +    --enable-tcg-interpreter \
+> +    --enable-tools \
+> +    --enable-tpm \
+> +    --enable-trace-backend=ftrace \
+> +    --enable-usb-redir \
+> +    --enable-user \
+> +    --enable-vde \
+> +    --enable-vhost-net \
+> +    --enable-vhost-scsi \
+> +    --enable-vhost-user \
+> +    --enable-vhost-vsock \
+> +    --enable-virtfs \
+> +    --enable-vnc \
+> +    --enable-vnc-jpeg \
+> +    --enable-vnc-png \
+> +    --enable-vnc-sasl \
+> +    --enable-vte \
+> +    --enable-werror \
+> +    --enable-xen \
+> +    --enable-xen-pci-passthrough \
+> +    --enable-xen-pv-domain-build \
+> +    --enable-xfsctl \
+> +&& make check $MAKEFLAGS
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
