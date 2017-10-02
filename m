@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dz23U-0001oM-7k
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:50:53 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dz24T-0002QT-8l
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:51:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dz23O-0002Xd-A1
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:50:48 -0400
-Date: Mon, 2 Oct 2017 16:50:30 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171002145030.GC4362@localhost.localdomain>
-References: <150680635276.96.4363000165685666262@b58463cdfd5f>
-	<4cac1113-5d6a-3dd1-1ef0-6fde5482a125@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dz24Q-000332-7R
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:51:49 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:49777)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dz24Q-00032o-2O
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:51:46 -0400
+Received: by mail-qt0-x242.google.com with SMTP id o3so7573982qte.6
+	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 07:51:45 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
+	<1506935300-132598-5-git-send-email-imammedo@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a8b954a0-255b-0790-fdf0-7d173a5ed3ac@amsat.org>
+Date: Mon, 2 Oct 2017 11:51:42 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="a8Wt8u1KmwUX3Y2C"
-Content-Disposition: inline
-In-Reply-To: <4cac1113-5d6a-3dd1-1ef0-6fde5482a125@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/4] block: Avoid copy-on-read assertions
+In-Reply-To: <1506935300-132598-5-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 04/38] cris: cleanup cpu type name
+ composition
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -23,101 +35,171 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, edgar.iglesias@gmail.com
 List-ID: <qemu-devel.nongnu.org>
 
+Hi Igor,
 
---a8Wt8u1KmwUX3Y2C
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 10/02/2017 06:07 AM, Igor Mammedov wrote:
+> replace ambiguous TYPE macro with a new CRIS_CPU_TYPE_NAME
+> and use it consistently in the code.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> CC: edgar.iglesias@gmail.com
+> ---
+>   target/cris/cpu.h |  3 ++
+>   target/cris/cpu.c | 93 +++++++++++++++++++++++--------------------------------
+>   2 files changed, 42 insertions(+), 54 deletions(-)
+> 
+> diff --git a/target/cris/cpu.h b/target/cris/cpu.h
+> index 5d822de..b64fa35 100644
+> --- a/target/cris/cpu.h
+> +++ b/target/cris/cpu.h
+> @@ -269,6 +269,9 @@ enum {
+>   
+>   #define cpu_init(cpu_model) cpu_generic_init(TYPE_CRIS_CPU, cpu_model)
+>   
+> +#define CRIS_CPU_TYPE_SUFFIX "-" TYPE_CRIS_CPU
+> +#define CRIS_CPU_TYPE_NAME(name) (name CRIS_CPU_TYPE_SUFFIX)
+> +
+>   #define cpu_signal_handler cpu_cris_signal_handler
+>   
+>   /* MMU modes definitions */
+> diff --git a/target/cris/cpu.c b/target/cris/cpu.c
+> index 88d93f2..8681c84 100644
+> --- a/target/cris/cpu.c
+> +++ b/target/cris/cpu.c
+> @@ -71,11 +71,11 @@ static ObjectClass *cris_cpu_class_by_name(const char *cpu_model)
+>   
+>   #if defined(CONFIG_USER_ONLY)
+>       if (strcasecmp(cpu_model, "any") == 0) {
+> -        return object_class_by_name("crisv32-" TYPE_CRIS_CPU);
+> +        return object_class_by_name(CRIS_CPU_TYPE_NAME("crisv32"));
+>       }
+>   #endif
+>   
+> -    typename = g_strdup_printf("%s-" TYPE_CRIS_CPU, cpu_model);
+> +    typename = g_strdup_printf(CRIS_CPU_TYPE_NAME("%s"), cpu_model);
+>       oc = object_class_by_name(typename);
+>       g_free(typename);
+>       if (oc != NULL && (!object_class_dynamic_cast(oc, TYPE_CRIS_CPU) ||
+> @@ -108,7 +108,7 @@ static void cris_cpu_list_entry(gpointer data, gpointer user_data)
+>       const char *typename = object_class_get_name(oc);
+>       char *name;
+>   
+> -    name = g_strndup(typename, strlen(typename) - strlen("-" TYPE_CRIS_CPU));
+> +    name = g_strndup(typename, strlen(typename) - strlen(CRIS_CPU_TYPE_SUFFIX));
+>       (*s->cpu_fprintf)(s->file, "  %s\n", name);
+>       g_free(name);
+>   }
+> @@ -259,38 +259,6 @@ static void crisv32_cpu_class_init(ObjectClass *oc, void *data)
+>       ccc->vr = 32;
+>   }
+>   
+> -#define TYPE(model) model "-" TYPE_CRIS_CPU
+> -
+> -static const TypeInfo cris_cpu_model_type_infos[] = {
+> -    {
+> -        .name = TYPE("crisv8"),
+> -        .parent = TYPE_CRIS_CPU,
+> -        .class_init = crisv8_cpu_class_init,
+> -    }, {
+> -        .name = TYPE("crisv9"),
+> -        .parent = TYPE_CRIS_CPU,
+> -        .class_init = crisv9_cpu_class_init,
+> -    }, {
+> -        .name = TYPE("crisv10"),
+> -        .parent = TYPE_CRIS_CPU,
+> -        .class_init = crisv10_cpu_class_init,
+> -    }, {
+> -        .name = TYPE("crisv11"),
+> -        .parent = TYPE_CRIS_CPU,
+> -        .class_init = crisv11_cpu_class_init,
+> -    }, {
+> -        .name = TYPE("crisv17"),
+> -        .parent = TYPE_CRIS_CPU,
+> -        .class_init = crisv17_cpu_class_init,
+> -    }, {
+> -        .name = TYPE("crisv32"),
+> -        .parent = TYPE_CRIS_CPU,
+> -        .class_init = crisv32_cpu_class_init,
+> -    }
+> -};
+> -
+> -#undef TYPE
+> -
+>   static void cris_cpu_class_init(ObjectClass *oc, void *data)
+>   {
+>       DeviceClass *dc = DEVICE_CLASS(oc);
+> @@ -324,24 +292,41 @@ static void cris_cpu_class_init(ObjectClass *oc, void *data)
+>       cc->disas_set_info = cris_disas_set_info;
+>   }
+>   
+> -static const TypeInfo cris_cpu_type_info = {
+> -    .name = TYPE_CRIS_CPU,
+> -    .parent = TYPE_CPU,
+> -    .instance_size = sizeof(CRISCPU),
+> -    .instance_init = cris_cpu_initfn,
+> -    .abstract = true,
+> -    .class_size = sizeof(CRISCPUClass),
+> -    .class_init = cris_cpu_class_init,
+> -};
+> -
+> -static void cris_cpu_register_types(void)
+> -{
+> -    int i;
+> -
+> -    type_register_static(&cris_cpu_type_info);
+> -    for (i = 0; i < ARRAY_SIZE(cris_cpu_model_type_infos); i++) {
+> -        type_register_static(&cris_cpu_model_type_infos[i]);
+> +static const TypeInfo cris_cpu_model_type_infos[] = {
+> +    {
+> +        .name = TYPE_CRIS_CPU,
+> +        .parent = TYPE_CPU,
+> +        .instance_size = sizeof(CRISCPU),
+> +        .instance_init = cris_cpu_initfn,
+> +        .abstract = true,
+> +        .class_size = sizeof(CRISCPUClass),
+> +        .class_init = cris_cpu_class_init,
+> +    },
+> +    {
+> +        .name = CRIS_CPU_TYPE_NAME("crisv8"),
+> +        .parent = TYPE_CRIS_CPU,
+> +        .class_init = crisv8_cpu_class_init,
 
-Am 01.10.2017 um 00:05 hat Eric Blake geschrieben:
-> On 09/30/2017 04:19 PM, no-reply@patchew.org wrote:
-> > Hi,
-> >=20
-> > This series failed build test on s390x host. Please find the details be=
-low.
-> >=20
->=20
-> > /var/tmp/patchew-tester-tmp-a2p2tpcc/src/block/io.c: In function =E2=80=
-=98bdrv_aligned_preadv=E2=80=99:
-> > /var/tmp/patchew-tester-tmp-a2p2tpcc/src/block/io.c:955:9: error: =E2=
-=80=98ret=E2=80=99 may be used uninitialized in this function [-Werror=3Dma=
-ybe-uninitialized]
-> >      int ret;
-> >          ^~~
->=20
-> Blah - I compiled with -g instead of -O2, which masks this warning in my
-> setup.
->=20
-> The warning is a false negative (the error message is actually pointing
-> to a line in bdrv_co_do_copy_on_readv - but the compiler must have
-> inlined it into bdrv_aligned_preadv) - the function is only ever called
-> with non-zero bytes, and therefore the 'while (cluster_bytes)' loop will
-> execute at least once, and ret always gets assigned.  But the compiler
-> can't see that, so I'll squash this in:
+what about using your scattering macro like in the Alpha port? i.e.:
 
-Well, you could help the compiler with this:
+      DEFINE_CRIS_CPU_TYPE("crisv8", crisv8_cpu_class_init),
 
-    assert(cluster_bytes > 0);
+> +    }, {
+> +        .name = CRIS_CPU_TYPE_NAME("crisv9"),
+> +        .parent = TYPE_CRIS_CPU,
+> +        .class_init = crisv9_cpu_class_init,
 
-Then it compiles. Unfortunately, the compiler was right and you weren't:
+      ...
 
-    $ ./qemu-io -C -c 'read 0 0' /tmp/test.qcow2
-    qemu-io: block/io.c:988: bdrv_co_do_copy_on_readv: Assertion `cluster_b=
-ytes > 0' failed.
-    Abgebrochen (Speicherabzug geschrieben)
-
-Maybe a case to add to the test?
-
-> commit a201636c3133827bd632d5fdd9eb1f5df81d0e0e
-> Author: Eric Blake <eblake@redhat.com>
-> Date:   Sat Sep 30 14:27:51 2017 -0500
->=20
->     fixup! block: Perform copy-on-read in loop
->=20
->     Signed-off-by: Eric Blake <eblake@redhat.com>
->=20
-> diff --git a/block/io.c b/block/io.c
-> index 5ef5adc7a7..e7519464bb 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -952,7 +952,7 @@ static int coroutine_fn
-> bdrv_co_do_copy_on_readv(BdrvChild *child,
->      int64_t cluster_offset;
->      unsigned int cluster_bytes;
->      size_t skip_bytes;
-> -    int ret;
-> +    int ret =3D 0;
->      int max_transfer =3D MIN_NON_ZERO(bs->bl.max_transfer,
->                                      BDRV_REQUEST_MAX_BYTES);
->      unsigned int progress =3D 0;
-
-I would prefer a ret =3D 0 immediately before err: so that we'll still get
-warning if we forget assigning ret in any future error path.
-
-Kevin
-
---a8Wt8u1KmwUX3Y2C
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJZ0lI2AAoJEH8JsnLIjy/Wk4cP/2n6BYMotCihTemRfDEWpZJ4
-7iYeLkHDcW31nkY1KHn6VX5HB9jVtEWmbC1uX5jyR59mW39SrasXFia0nwxjgDUJ
-hMM8SB0Pfgxdj7GJlElgTj+5hHDz4Pa1f5+f8QBMYlBeJ/onzuHrmrYxRnxRNdFM
-qP/UAB6KlqshAkZhyPHYfoqNmeYdX2ON/1KrCMszY8gHQ9bEaXvuOw4nH6vAzHWe
-w5Ug6gD+9wBfJJiy/r8g9uIFiJ40j8EklPryaPOR7qaAeZ9RFPqLJMyLX/cwIkrh
-urA//Nj0jsW6OMh5cqKLVnsQhAuB3kxthw8afXHLDMbUAs8V/NDme62BArsvaErK
-FsnamIVCUiBticubJsvSri49Fd3ghaMvfyb60iKoxul33jOZsOfVGikkA8uNzqqb
-GEjXCYz/yWI11d4/KDzGxEetEjoto5Y/45OwqDvBNNB3PPaZQeYjrbAj8ejR627p
-eubJ7SkifG3EI6s6Y3K8CR6jm8ox0V5JWskMZLIucd212ZB7VO0QNyU5CAeZKvKC
-mgCKQ+PgNTyh7svJsp9wDjaPb0/UEecKcdISPLX396FVFCWlD+dAhrxgZg/47Oaq
-lihDvBBFqQ09/5cPStYOD0bP4g30Ekn1rbQsknKE/4nowyvvg4L2WtHWfIByfHne
-zxcPDJlFzxYCNM4NP8UK
-=b3cq
------END PGP SIGNATURE-----
-
---a8Wt8u1KmwUX3Y2C--
+> +    }, {
+> +        .name = CRIS_CPU_TYPE_NAME("crisv10"),
+> +        .parent = TYPE_CRIS_CPU,
+> +        .class_init = crisv10_cpu_class_init,
+> +    }, {
+> +        .name = CRIS_CPU_TYPE_NAME("crisv11"),
+> +        .parent = TYPE_CRIS_CPU,
+> +        .class_init = crisv11_cpu_class_init,
+> +    }, {
+> +        .name = CRIS_CPU_TYPE_NAME("crisv17"),
+> +        .parent = TYPE_CRIS_CPU,
+> +        .class_init = crisv17_cpu_class_init,
+> +    }, {
+> +        .name = CRIS_CPU_TYPE_NAME("crisv32"),
+> +        .parent = TYPE_CRIS_CPU,
+> +        .class_init = crisv32_cpu_class_init,
+>       }
+> -}
+> +};
+>   
+> -type_init(cris_cpu_register_types)
+> +type_init_from_array(cris_cpu_model_type_infos)
+> 
