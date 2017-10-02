@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dywib-0002GI-17
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:57 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dywih-0002Nq-7O
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:09:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dywiY-0006Bi-S7
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57920)
+	(envelope-from <imammedo@redhat.com>) id 1dywig-0006GK-Bx
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36514)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dywiY-0006BT-M1
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:50 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dywig-0006Fy-5l
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:58 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon,  2 Oct 2017 11:08:05 +0200
-Message-Id: <1506935300-132598-24-git-send-email-imammedo@redhat.com>
+Date: Mon,  2 Oct 2017 11:08:10 +0200
+Message-Id: <1506935300-132598-29-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
 References: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 23/38] xtensa: sim: use generic cpu_model
- parsing
+Subject: [Qemu-devel] [PATCH 28/38] tricore: use generic cpu_model parsing
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -24,45 +23,39 @@ List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, jcmvbkbc@gmail.com
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 List-ID: <qemu-devel.nongnu.org>
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-CC: jcmvbkbc@gmail.com
+CC: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 ---
- hw/xtensa/sim.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ hw/tricore/tricore_testboard.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
-index b3580b1..2bb883b 100644
---- a/hw/xtensa/sim.c
-+++ b/hw/xtensa/sim.c
-@@ -75,16 +75,11 @@ static void xtensa_sim_init(MachineState *machine)
-     XtensaCPU *cpu = NULL;
-     CPUXtensaState *env = NULL;
-     ram_addr_t ram_size = machine->ram_size;
--    const char *cpu_model = machine->cpu_model;
-     const char *kernel_filename = machine->kernel_filename;
-     int n;
+diff --git a/hw/tricore/tricore_testboard.c b/hw/tricore/tricore_testboard.c
+index 0486f8a..ac75eb2 100644
+--- a/hw/tricore/tricore_testboard.c
++++ b/hw/tricore/tricore_testboard.c
+@@ -71,10 +71,7 @@ static void tricore_testboard_init(MachineState *machine, int board_id)
+     MemoryRegion *pcp_data = g_new(MemoryRegion, 1);
+     MemoryRegion *pcp_text = g_new(MemoryRegion, 1);
  
--    if (!cpu_model) {
--        cpu_model = XTENSA_DEFAULT_CPU_MODEL;
+-    if (!machine->cpu_model) {
+-        machine->cpu_model = "tc1796";
 -    }
--
-     for (n = 0; n < smp_cpus; n++) {
--        cpu = XTENSA_CPU(cpu_generic_init(TYPE_XTENSA_CPU, cpu_model));
-+        cpu = XTENSA_CPU(cpu_create(machine->cpu_type));
-         env = &cpu->env;
- 
-         env->sregs[PRID] = n;
-@@ -133,6 +128,7 @@ static void xtensa_sim_machine_init(MachineClass *mc)
-     mc->init = xtensa_sim_init;
-     mc->max_cpus = 4;
-     mc->no_serial = 1;
-+    mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
+-    cpu = TRICORE_CPU(cpu_generic_init(TYPE_TRICORE_CPU, machine->cpu_model));
++    cpu = TRICORE_CPU(cpu_create(machine->cpu_type));
+     env = &cpu->env;
+     memory_region_init_ram(ext_cram, NULL, "powerlink_ext_c.ram",
+                            2 * 1024 * 1024, &error_fatal);
+@@ -114,6 +111,7 @@ static void ttb_machine_init(MachineClass *mc)
+     mc->desc = "a minimal TriCore board";
+     mc->init = tricoreboard_init;
+     mc->is_default = 0;
++    mc->default_cpu_type = TRICORE_CPU_TYPE_NAME("tc1796");
  }
  
- DEFINE_MACHINE("sim", xtensa_sim_machine_init)
+ DEFINE_MACHINE("tricore_testboard", ttb_machine_init)
 -- 
 2.7.4
