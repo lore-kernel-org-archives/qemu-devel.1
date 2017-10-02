@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dz6YW-0008U8-8r
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 15:39:09 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dz6af-0001DY-0o
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 15:41:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dz6YS-0006lb-7z
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 15:39:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36818)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1dz6YR-0006ky-UX
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 15:39:04 -0400
-Date: Mon, 2 Oct 2017 13:39:01 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20171002133901.4f886cec@t450s.home>
-In-Reply-To: <0D4B427206E615459C4FEB71FC00EF8CFE74E5@dggemi509-mbx.china.huawei.com>
-References: <0D4B427206E615459C4FEB71FC00EF8CFE74E5@dggemi509-mbx.china.huawei.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dz6aa-0000bM-Ma
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 15:41:21 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33060)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dz6aa-0000aa-GK
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 15:41:16 -0400
+Received: by mail-qk0-x244.google.com with SMTP id z12so1380573qkb.0
+	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 12:41:16 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <cover.1506037164.git.alistair.francis@xilinx.com>
+	<CAKmqyKOo_TJ=9GbYMdCAuEW6kKh8_5bjz9_8f3Ggc85OwWpd+A@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1aef9623-b4ee-867b-e495-4a3ebdd4064a@amsat.org>
+Date: Mon, 2 Oct 2017 16:41:11 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAKmqyKOo_TJ=9GbYMdCAuEW6kKh8_5bjz9_8f3Ggc85OwWpd+A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] vfio/pci: don't reset bar address when pci
- device no_soft_reset bit is set to "1"
+Subject: Re: [Qemu-devel] [RFC v2 0/2] Add a valid_cpu_types property
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -27,92 +34,71 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: "Lifei (Louis)" <louis.lifei@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Ido Yariv <ido@wizery.com>
+To: Alistair Francis <alistair23@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-On Tue, 12 Sep 2017 02:49:33 +0000
-"Lifei (Louis)" <louis.lifei@huawei.com> wrote:
+Hi Alistair,
 
-> Hi all
+On 10/02/2017 03:42 PM, Alistair Francis wrote:
+> On Thu, Sep 21, 2017 at 4:41 PM, Alistair Francis
+> <alistair.francis@xilinx.com> wrote:
+>> There are numorous QEMU machines that only have a single or a handful of
+>> valid CPU options. To simplyfy the management of specificying which CPU
+>> is/isn't valid let's create a property that can be set in the machine
+>> init. We can then check to see if the user supplied CPU is in that list
+>> or not.
+>>
+>> Here is what specifying the CPUs looks like now:
+>>
+>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m3" -S
+>> QEMU 2.10.50 monitor - type 'help' for more information
+>> (qemu) info cpus
+>> * CPU #0: thread_id=24175
+>> (qemu) q
+>>
+>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m4" -S
+>> QEMU 2.10.50 monitor - type 'help' for more information
+>> (qemu) q
+>>
+>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-m5" -S
+>> qemu-system-aarch64: unable to find CPU model 'cortex-m5'
+>>
+>> $ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -nographic -cpu "cortex-a9" -S
+>> qemu-system-aarch64: Invalid CPU: cortex-a9-arm-cpu
+>> The valid options are: cortex-m3-arm-cpu, cortex-m4-arm-cpu
+>>
 > 
-> In commit a52a4c471703e995ceb06f6157d70747823e8a0d said:
+> Any comments on this?
+
+No negative comment, so far so good!
+
 > 
-> The VFIO configuration space stays untouched, so the guest OS may choose
->     to skip restoring the BAR addresses as they would seem intact. The PCI
->     device may be left non-operational.
+> Otherwise I'll prepare a patch series and start adding support for
+> more machines.
+
+Yes please, I'm waiting your work get merged to continue some SoC 
+cleanups/improvements.
+
 > 
-> While the guest OS choose to restore the BAR addresses only when pci device no_soft_reset
-> is not set. So we may not reset the BAR address when no_soft_reset is set.
-
-Please see:
-
-https://git.qemu.org/?p=qemu.git;a=blob;f=README#l68
-https://wiki.qemu.org/Contribute/SubmitAPatch#Do_not_send_as_an_attachment
-
-(manually copied from attachment)
-> From 845914cf5bcd48872224df7f08e53ca2a19a577e Mon Sep 17 00:00:00 2001
-> From: Louis Lifei <louis.lifei@huawei.com>
-> Date: Tue, 12 Sep 2017 10:17:59 +0800
-> Subject: [PATCH] vfio/pci: don't reset bar address when no_soft_rst set
-
-The description above belongs here.  The proper way to reference the commit is:
-
-a52a4c471703 ("vfio/pci: fix out-of-sync BAR information on reset")
-
-> Signed-off-by: Louis Lifei <louis.lifei@huawei.com>
-> ---
->  hw/vfio/pci.c | 21 +++++++++++++--------
->  1 file changed, 13 insertions(+), 8 deletions(-)
->
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 31e1edf..6766f6b 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -2029,14 +2029,19 @@ static void vfio_pci_post_reset(VFIOPCIDevice *vdev)
->          error_reportf_err(err, ERR_PREFIX, vdev->vbasedev.name);
->      }
+> Thanks,
+> Alistair
 > 
-> -    for (nr = 0; nr < PCI_NUM_REGIONS - 1; ++nr) {
-> -        off_t addr = vdev->config_offset + PCI_BASE_ADDRESS_0 + (4 * nr);
-> -        uint32_t val = 0;
-> -        uint32_t len = sizeof(val);
-> -
-> -        if (pwrite(vdev->vbasedev.fd, &val, len, addr) != len) {
-> -            error_report("%s(%s) reset bar %d failed: %m", __func__,
-> -                         vdev->vbasedev.name, nr);
-> +    /* When No_Soft_Reset bit is set to "1", no additional operating
-> +     * system intervention is required beyond writing the PowerState bits.
-> +     */
-
-Follow the existing comment style please, multi-line comments:
-
-/*
- * First line
- * Nth line
- */
-
-> +    if (vdev->has_pm_reset) {
-> +        for (nr = 0; nr < PCI_NUM_REGIONS - 1; ++nr) {
-> +            off_t addr = vdev->config_offset + PCI_BASE_ADDRESS_0 + (4 * nr);
-> +            uint32_t val = 0;
-> +            uint32_t len = sizeof(val);
-> +
-> +            if (pwrite(vdev->vbasedev.fd, &val, len, addr) != len) {
-> +                error_report("%s(%s) reset bar %d failed: %m", __func__,
-> +                             vdev->vbasedev.name, nr);
-> +            }
->          }
->      }
->  }
-
-I don't understand the premise of the patch, if a device reports
-no_soft_reset, then vfio will not use a PM reset to reset the device.
-Conversely, simply because a device sets has_pm_reset, does not mean
-that every reset is a PM reset.  The device might also support FLR or
-we might have performed a secondary bus reset.  Therefore whether a
-device supports has_pm_reset at this point seems fairly irrelevant.
-Can you clarify exactly what path is getting to this point, having only
-done a PM reset on a device which advertises no_soft_reset?  Thanks,
-
-Alex
+>> RFC v2:
+>>   - Rebase on Igor's work
+>>   - Use more QEMUisms inside the code
+>>   - List the supported machines in a NULL terminated array
+>>
+>> Alistair Francis (2):
+>>    machine: Add a valid_cpu_types property
+>>    netduino2: Specify the valid CPUs
+>>
+>>   hw/arm/netduino2.c  | 10 +++++++++-
+>>   hw/core/machine.c   | 35 +++++++++++++++++++++++++++++++++++
+>>   include/hw/boards.h |  1 +
+>>   3 files changed, 45 insertions(+), 1 deletion(-)
+>>
+>> --
+>> 2.11.0
+>>
+> 
