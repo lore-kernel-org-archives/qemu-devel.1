@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dz2Ev-00011o-Ew
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:02:47 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dz2Fc-0001UG-TN
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:03:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dz2Es-0001H5-BQ
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:02:37 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:52341)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dz2Es-0001Gv-5h
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:02:34 -0400
-Received: by mail-qt0-x242.google.com with SMTP id o52so7587698qtc.9
-	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 08:02:34 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
+	(envelope-from <imammedo@redhat.com>) id 1dz2FW-0001Yx-NG
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:03:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58406)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dz2FW-0001YO-EB
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 11:03:14 -0400
+Date: Mon, 2 Oct 2017 17:03:11 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171002170311.70b0dc73@nial.brq.redhat.com>
+In-Reply-To: <a8b954a0-255b-0790-fdf0-7d173a5ed3ac@amsat.org>
 References: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
-	<1506935300-132598-32-git-send-email-imammedo@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <65b90e6c-2c58-46b1-b872-fe5a538b3959@amsat.org>
-Date: Mon, 2 Oct 2017 12:02:25 -0300
+	<1506935300-132598-5-git-send-email-imammedo@redhat.com>
+	<a8b954a0-255b-0790-fdf0-7d173a5ed3ac@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <1506935300-132598-32-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 31/38] sparc: sparc: use generic cpu_model
- parsing
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 04/38] cris: cleanup cpu type name
+ composition
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -35,215 +28,185 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, mark.cave-ayland@ilande.co.uk
-Cc: qemu-devel@nongnu.org, atar4qemu@gmail.com
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, edgar.iglesias@gmail.com
 List-ID: <qemu-devel.nongnu.org>
 
-On 10/02/2017 06:08 AM, Igor Mammedov wrote:
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+On Mon, 2 Oct 2017 11:51:42 -0300
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Hi Igor,
+>=20
+> On 10/02/2017 06:07 AM, Igor Mammedov wrote:
+> > replace ambiguous TYPE macro with a new CRIS_CPU_TYPE_NAME
+> > and use it consistently in the code.
+> >=20
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> > CC: edgar.iglesias@gmail.com
+> > ---
+> >   target/cris/cpu.h |  3 ++
+> >   target/cris/cpu.c | 93 +++++++++++++++++++++++-----------------------=
+---------
+> >   2 files changed, 42 insertions(+), 54 deletions(-)
+> >=20
+> > diff --git a/target/cris/cpu.h b/target/cris/cpu.h
+> > index 5d822de..b64fa35 100644
+> > --- a/target/cris/cpu.h
+> > +++ b/target/cris/cpu.h
+> > @@ -269,6 +269,9 @@ enum {
+> >  =20
+> >   #define cpu_init(cpu_model) cpu_generic_init(TYPE_CRIS_CPU, cpu_model)
+> >  =20
+> > +#define CRIS_CPU_TYPE_SUFFIX "-" TYPE_CRIS_CPU
+> > +#define CRIS_CPU_TYPE_NAME(name) (name CRIS_CPU_TYPE_SUFFIX)
+> > +
+> >   #define cpu_signal_handler cpu_cris_signal_handler
+> >  =20
+> >   /* MMU modes definitions */
+> > diff --git a/target/cris/cpu.c b/target/cris/cpu.c
+> > index 88d93f2..8681c84 100644
+> > --- a/target/cris/cpu.c
+> > +++ b/target/cris/cpu.c
+> > @@ -71,11 +71,11 @@ static ObjectClass *cris_cpu_class_by_name(const ch=
+ar *cpu_model)
+> >  =20
+> >   #if defined(CONFIG_USER_ONLY)
+> >       if (strcasecmp(cpu_model, "any") =3D=3D 0) {
+> > -        return object_class_by_name("crisv32-" TYPE_CRIS_CPU);
+> > +        return object_class_by_name(CRIS_CPU_TYPE_NAME("crisv32"));
+> >       }
+> >   #endif
+> >  =20
+> > -    typename =3D g_strdup_printf("%s-" TYPE_CRIS_CPU, cpu_model);
+> > +    typename =3D g_strdup_printf(CRIS_CPU_TYPE_NAME("%s"), cpu_model);
+> >       oc =3D object_class_by_name(typename);
+> >       g_free(typename);
+> >       if (oc !=3D NULL && (!object_class_dynamic_cast(oc, TYPE_CRIS_CPU=
+) ||
+> > @@ -108,7 +108,7 @@ static void cris_cpu_list_entry(gpointer data, gpoi=
+nter user_data)
+> >       const char *typename =3D object_class_get_name(oc);
+> >       char *name;
+> >  =20
+> > -    name =3D g_strndup(typename, strlen(typename) - strlen("-" TYPE_CR=
+IS_CPU));
+> > +    name =3D g_strndup(typename, strlen(typename) - strlen(CRIS_CPU_TY=
+PE_SUFFIX));
+> >       (*s->cpu_fprintf)(s->file, "  %s\n", name);
+> >       g_free(name);
+> >   }
+> > @@ -259,38 +259,6 @@ static void crisv32_cpu_class_init(ObjectClass *oc=
+, void *data)
+> >       ccc->vr =3D 32;
+> >   }
+> >  =20
+> > -#define TYPE(model) model "-" TYPE_CRIS_CPU
+> > -
+> > -static const TypeInfo cris_cpu_model_type_infos[] =3D {
+> > -    {
+> > -        .name =3D TYPE("crisv8"),
+> > -        .parent =3D TYPE_CRIS_CPU,
+> > -        .class_init =3D crisv8_cpu_class_init,
+> > -    }, {
+> > -        .name =3D TYPE("crisv9"),
+> > -        .parent =3D TYPE_CRIS_CPU,
+> > -        .class_init =3D crisv9_cpu_class_init,
+> > -    }, {
+> > -        .name =3D TYPE("crisv10"),
+> > -        .parent =3D TYPE_CRIS_CPU,
+> > -        .class_init =3D crisv10_cpu_class_init,
+> > -    }, {
+> > -        .name =3D TYPE("crisv11"),
+> > -        .parent =3D TYPE_CRIS_CPU,
+> > -        .class_init =3D crisv11_cpu_class_init,
+> > -    }, {
+> > -        .name =3D TYPE("crisv17"),
+> > -        .parent =3D TYPE_CRIS_CPU,
+> > -        .class_init =3D crisv17_cpu_class_init,
+> > -    }, {
+> > -        .name =3D TYPE("crisv32"),
+> > -        .parent =3D TYPE_CRIS_CPU,
+> > -        .class_init =3D crisv32_cpu_class_init,
+> > -    }
+> > -};
+> > -
+> > -#undef TYPE
+> > -
+> >   static void cris_cpu_class_init(ObjectClass *oc, void *data)
+> >   {
+> >       DeviceClass *dc =3D DEVICE_CLASS(oc);
+> > @@ -324,24 +292,41 @@ static void cris_cpu_class_init(ObjectClass *oc, =
+void *data)
+> >       cc->disas_set_info =3D cris_disas_set_info;
+> >   }
+> >  =20
+> > -static const TypeInfo cris_cpu_type_info =3D {
+> > -    .name =3D TYPE_CRIS_CPU,
+> > -    .parent =3D TYPE_CPU,
+> > -    .instance_size =3D sizeof(CRISCPU),
+> > -    .instance_init =3D cris_cpu_initfn,
+> > -    .abstract =3D true,
+> > -    .class_size =3D sizeof(CRISCPUClass),
+> > -    .class_init =3D cris_cpu_class_init,
+> > -};
+> > -
+> > -static void cris_cpu_register_types(void)
+> > -{
+> > -    int i;
+> > -
+> > -    type_register_static(&cris_cpu_type_info);
+> > -    for (i =3D 0; i < ARRAY_SIZE(cris_cpu_model_type_infos); i++) {
+> > -        type_register_static(&cris_cpu_model_type_infos[i]);
+> > +static const TypeInfo cris_cpu_model_type_infos[] =3D {
+> > +    {
+> > +        .name =3D TYPE_CRIS_CPU,
+> > +        .parent =3D TYPE_CPU,
+> > +        .instance_size =3D sizeof(CRISCPU),
+> > +        .instance_init =3D cris_cpu_initfn,
+> > +        .abstract =3D true,
+> > +        .class_size =3D sizeof(CRISCPUClass),
+> > +        .class_init =3D cris_cpu_class_init,
+> > +    },
+> > +    {
+> > +        .name =3D CRIS_CPU_TYPE_NAME("crisv8"),
+> > +        .parent =3D TYPE_CRIS_CPU,
+> > +        .class_init =3D crisv8_cpu_class_init, =20
+>=20
+> what about using your scattering macro like in the Alpha port? i.e.:
+I've thought that I did it but it seems that it got lost along the way,
+I'll post here v2 that will do it
 
-> ---
-> CC: mark.cave-ayland@ilande.co.uk
-> CC: atar4qemu@gmail.com
-> ---
->   hw/sparc/sun4m.c | 29 ++++++++++++-----------------
->   1 file changed, 12 insertions(+), 17 deletions(-)
-> 
-> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-> index e1bdd48..68b2378 100644
-> --- a/hw/sparc/sun4m.c
-> +++ b/hw/sparc/sun4m.c
-> @@ -94,7 +94,6 @@ struct sun4m_hwdef {
->       } vsimm[MAX_VSIMMS];
->       hwaddr ecc_base;
->       uint64_t max_mem;
-> -    const char * const default_cpu_model;
->       uint32_t ecc_version;
->       uint32_t iommu_version;
->       uint16_t machine_id;
-> @@ -790,14 +789,14 @@ static const TypeInfo ram_info = {
->       .class_init    = ram_class_init,
->   };
->   
-> -static void cpu_devinit(const char *cpu_model, unsigned int id,
-> +static void cpu_devinit(const char *cpu_type, unsigned int id,
->                           uint64_t prom_addr, qemu_irq **cpu_irqs)
->   {
->       CPUState *cs;
->       SPARCCPU *cpu;
->       CPUSPARCState *env;
->   
-> -    cpu = SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
-> +    cpu = SPARC_CPU(cpu_create(cpu_type));
->       env = &cpu->env;
->   
->       cpu_sparc_set_id(env, id);
-> @@ -820,7 +819,6 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
->                             MachineState *machine)
->   {
->       DeviceState *slavio_intctl;
-> -    const char *cpu_model = machine->cpu_model;
->       unsigned int i;
->       void *iommu, *espdma, *ledma, *nvram;
->       qemu_irq *cpu_irqs[MAX_CPUS], slavio_irq[32], slavio_cpu_irq[MAX_CPUS],
-> @@ -833,11 +831,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
->       unsigned int num_vsimms;
->   
->       /* init CPUs */
-> -    if (!cpu_model)
-> -        cpu_model = hwdef->default_cpu_model;
-> -
->       for(i = 0; i < smp_cpus; i++) {
-> -        cpu_devinit(cpu_model, i, hwdef->slavio_base, &cpu_irqs[i]);
-> +        cpu_devinit(machine->cpu_type, i, hwdef->slavio_base, &cpu_irqs[i]);
->       }
->   
->       for (i = smp_cpus; i < MAX_CPUS; i++)
-> @@ -1074,7 +1069,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
->           .machine_id = ss5_id,
->           .iommu_version = 0x05000000,
->           .max_mem = 0x10000000,
-> -        .default_cpu_model = "Fujitsu MB86904",
->       },
->       /* SS-10 */
->       {
-> @@ -1100,7 +1094,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
->           .machine_id = ss10_id,
->           .iommu_version = 0x03000000,
->           .max_mem = 0xf00000000ULL,
-> -        .default_cpu_model = "TI SuperSparc II",
->       },
->       /* SS-600MP */
->       {
-> @@ -1124,7 +1117,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
->           .machine_id = ss600mp_id,
->           .iommu_version = 0x01000000,
->           .max_mem = 0xf00000000ULL,
-> -        .default_cpu_model = "TI SuperSparc II",
->       },
->       /* SS-20 */
->       {
-> @@ -1166,7 +1158,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
->           .machine_id = ss20_id,
->           .iommu_version = 0x13000000,
->           .max_mem = 0xf00000000ULL,
-> -        .default_cpu_model = "TI SuperSparc II",
->       },
->       /* Voyager */
->       {
-> @@ -1190,7 +1181,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
->           .machine_id = vger_id,
->           .iommu_version = 0x05000000,
->           .max_mem = 0x10000000,
-> -        .default_cpu_model = "Fujitsu MB86904",
->       },
->       /* LX */
->       {
-> @@ -1215,7 +1205,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
->           .machine_id = lx_id,
->           .iommu_version = 0x04000000,
->           .max_mem = 0x10000000,
-> -        .default_cpu_model = "TI MicroSparc I",
->       },
->       /* SS-4 */
->       {
-> @@ -1240,7 +1229,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
->           .machine_id = ss4_id,
->           .iommu_version = 0x05000000,
->           .max_mem = 0x10000000,
-> -        .default_cpu_model = "Fujitsu MB86904",
->       },
->       /* SPARCClassic */
->       {
-> @@ -1264,7 +1252,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
->           .machine_id = scls_id,
->           .iommu_version = 0x05000000,
->           .max_mem = 0x10000000,
-> -        .default_cpu_model = "TI MicroSparc I",
->       },
->       /* SPARCbook */
->       {
-> @@ -1288,7 +1275,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
->           .machine_id = sbook_id,
->           .iommu_version = 0x05000000,
->           .max_mem = 0x10000000,
-> -        .default_cpu_model = "TI MicroSparc I",
->       },
->   };
->   
-> @@ -1355,6 +1341,7 @@ static void ss5_class_init(ObjectClass *oc, void *data)
->       mc->block_default_type = IF_SCSI;
->       mc->is_default = 1;
->       mc->default_boot_order = "c";
-> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
->   }
->   
->   static const TypeInfo ss5_type = {
-> @@ -1372,6 +1359,7 @@ static void ss10_class_init(ObjectClass *oc, void *data)
->       mc->block_default_type = IF_SCSI;
->       mc->max_cpus = 4;
->       mc->default_boot_order = "c";
-> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
->   }
->   
->   static const TypeInfo ss10_type = {
-> @@ -1389,6 +1377,7 @@ static void ss600mp_class_init(ObjectClass *oc, void *data)
->       mc->block_default_type = IF_SCSI;
->       mc->max_cpus = 4;
->       mc->default_boot_order = "c";
-> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
->   }
->   
->   static const TypeInfo ss600mp_type = {
-> @@ -1406,6 +1395,7 @@ static void ss20_class_init(ObjectClass *oc, void *data)
->       mc->block_default_type = IF_SCSI;
->       mc->max_cpus = 4;
->       mc->default_boot_order = "c";
-> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
->   }
->   
->   static const TypeInfo ss20_type = {
-> @@ -1422,6 +1412,7 @@ static void voyager_class_init(ObjectClass *oc, void *data)
->       mc->init = vger_init;
->       mc->block_default_type = IF_SCSI;
->       mc->default_boot_order = "c";
-> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
->   }
->   
->   static const TypeInfo voyager_type = {
-> @@ -1438,6 +1429,7 @@ static void ss_lx_class_init(ObjectClass *oc, void *data)
->       mc->init = ss_lx_init;
->       mc->block_default_type = IF_SCSI;
->       mc->default_boot_order = "c";
-> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
->   }
->   
->   static const TypeInfo ss_lx_type = {
-> @@ -1454,6 +1446,7 @@ static void ss4_class_init(ObjectClass *oc, void *data)
->       mc->init = ss4_init;
->       mc->block_default_type = IF_SCSI;
->       mc->default_boot_order = "c";
-> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
->   }
->   
->   static const TypeInfo ss4_type = {
-> @@ -1470,6 +1463,7 @@ static void scls_class_init(ObjectClass *oc, void *data)
->       mc->init = scls_init;
->       mc->block_default_type = IF_SCSI;
->       mc->default_boot_order = "c";
-> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
->   }
->   
->   static const TypeInfo scls_type = {
-> @@ -1486,6 +1480,7 @@ static void sbook_class_init(ObjectClass *oc, void *data)
->       mc->init = sbook_init;
->       mc->block_default_type = IF_SCSI;
->       mc->default_boot_order = "c";
-> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
->   }
->   
->   static const TypeInfo sbook_type = {
-> 
+>=20
+>       DEFINE_CRIS_CPU_TYPE("crisv8", crisv8_cpu_class_init),
+>=20
+> > +    }, {
+> > +        .name =3D CRIS_CPU_TYPE_NAME("crisv9"),
+> > +        .parent =3D TYPE_CRIS_CPU,
+> > +        .class_init =3D crisv9_cpu_class_init, =20
+>=20
+>       ...
+>=20
+> > +    }, {
+> > +        .name =3D CRIS_CPU_TYPE_NAME("crisv10"),
+> > +        .parent =3D TYPE_CRIS_CPU,
+> > +        .class_init =3D crisv10_cpu_class_init,
+> > +    }, {
+> > +        .name =3D CRIS_CPU_TYPE_NAME("crisv11"),
+> > +        .parent =3D TYPE_CRIS_CPU,
+> > +        .class_init =3D crisv11_cpu_class_init,
+> > +    }, {
+> > +        .name =3D CRIS_CPU_TYPE_NAME("crisv17"),
+> > +        .parent =3D TYPE_CRIS_CPU,
+> > +        .class_init =3D crisv17_cpu_class_init,
+> > +    }, {
+> > +        .name =3D CRIS_CPU_TYPE_NAME("crisv32"),
+> > +        .parent =3D TYPE_CRIS_CPU,
+> > +        .class_init =3D crisv32_cpu_class_init,
+> >       }
+> > -}
+> > +};
+> >  =20
+> > -type_init(cris_cpu_register_types)
+> > +type_init_from_array(cris_cpu_model_type_infos)
+> >  =20
