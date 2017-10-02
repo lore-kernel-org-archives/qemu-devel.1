@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dyvOJ-0008F0-5p
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 03:43:55 -0400
+	(envelope-from <armbru@redhat.com>) id 1dyvRB-0000gi-Va
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 03:46:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dyvOF-0001Wa-BL
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 03:43:50 -0400
-References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
-	<1504286483-23327-2-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA8k4nAjqJ_Mu5ZZ8ygMMJikX17BCB3M0ZkbQBsKVLt5TQ@mail.gmail.com>
-	<CADD6c-iohAZO7DLsYfh+sRz0SWyxWW0ja_tdFhdemgWJafHJjg@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <6af2c711-5f6b-d8e1-d0e3-21bfb3e5c98c@redhat.com>
-Date: Mon, 2 Oct 2017 09:43:20 +0200
+	(envelope-from <armbru@redhat.com>) id 1dyvR8-0002pF-Tc
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 03:46:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58226)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dyvR8-0002ob-Mw
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 03:46:46 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170913132417.24384-1-david@redhat.com>
+	<20170913132417.24384-19-david@redhat.com>
+Date: Mon, 02 Oct 2017 09:46:41 +0200
+In-Reply-To: <20170913132417.24384-19-david@redhat.com> (David Hildenbrand's
+	message of "Wed, 13 Sep 2017 15:24:13 +0200")
+Message-ID: <87k20eq9em.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CADD6c-iohAZO7DLsYfh+sRz0SWyxWW0ja_tdFhdemgWJafHJjg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 01/20] hw/arm/smmu-common: smmu base
- device and datatypes
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 18/22] s390x: implement
+ query-hotpluggable-cpus
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -25,64 +27,48 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Prem Mallappa <prem.mallappa@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, Radha Mohan <mohun106@gmail.com>, Trey Cain <tcain@qti.qualcomm.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Will Deacon <will.deacon@arm.com>, jean-philippe.brucker@arm.com, robin.murphy@arm.com, Peter Xu <peterx@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, wtownsen@redhat.com
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-Hi Prem,
+David Hildenbrand <david@redhat.com> writes:
 
-On 30/09/2017 10:28, Prem Mallappa wrote:
-> All,
-> 
-> I am no longer associated with Broadcom, so can't help much here I guess.
-> 
-> If there is anything else I can do; please let me know.
+> CPU hotplug is only possible on a per core basis on s390x. So let's
+> add possible_cpus and properly wire everything up.
+>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+[...]
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index f3af2cb851..79e9f85404 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -3121,6 +3121,22 @@
+>  #      }
+>  #    ]}
+>  #
+> +# For s390x-virtio-ccw machine type started with -smp 1,maxcpus=2 -cpu qemu
+> +# (Since: 2.11):
+> +#
+> +# -> { "execute": "query-hotpluggable-cpus" }
+> +# <- {"return": [
+> +#      {
+> +#         "type": "qemu-s390-cpu", "vcpus-count": 1,
+> +#         "props": { "core-id": 1 }
+> +#      },
+> +#      {
+> +#         "qom-path": "/machine/unattached/device[0]",
+> +#         "type": "qemu-s390-cpu", "vcpus-count": 1,
+> +#         "props": { "core-id": 0 }
+> +#      }
+> +#    ]}
+> +#
+>  ##
+>  { 'command': 'query-hotpluggable-cpus', 'returns': ['HotpluggableCPU'] }
 
-Thank you very much for your reply. We are going to ask Broadcom's
-representatives.
+Please stick in '# Example:' like we do in query-hotpluggable-cpus's doc
+comment.  I expect the generated documentation to be illegible[*]
+without it.
 
-Thanks
 
-Eric
-> 
-> Cheers,
-> /Prem
-> 
-> 
-> 
-> --
-> Prem
-> 
-> On Wed, Sep 27, 2017 at 11:08 PM, Peter Maydell
-> <peter.maydell@linaro.org <mailto:peter.maydell@linaro.org>> wrote:
-> 
->     On 1 September 2017 at 10:21, Eric Auger <eric.auger@redhat.com
->     <mailto:eric.auger@redhat.com>> wrote:
->     > The patch introduces the smmu base device and class for the ARM
->     > smmu. Devices for specific versions will be derived from this
->     > base device.
->     >
->     > We also introduce some important datatypes.
->     >
->     > Signed-off-by: Eric Auger <eric.auger@redhat.com <mailto:eric.auger@redhat.com>>
->     > Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com <mailto:prem.mallappa@broadcom.com>>
-> 
->     > +/*
->     > + * Copyright (C) 2014-2016 Broadcom Corporation
->     > + * Copyright (c) 2017 Red Hat, Inc.
->     > + * Written by Prem Mallappa, Eric Auger
->     > + *
->     > + * This program is free software; you can redistribute it and/or modify
->     > + * it under the terms of the GNU General Public License version 2 as
->     > + * published by the Free Software Foundation.
-> 
->     Really GPL-2-only ?
-> 
->     Unless there's a good reason, you should probably fix this (including
->     getting an ack from Prem/Broadcom where it applies to code that came
->     from him).
-> 
->     thanks
->     -- PMM
-> 
-> 
+[*] If you want to perform a quick eye-over, try running "make
+tests/qapi-schema/doc-good.test.txt" and examine the result.
