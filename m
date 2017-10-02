@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dz1Ku-0006tT-Oe
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:04:50 -0400
+	(envelope-from <eblake@redhat.com>) id 1dz1OJ-0001ef-T9
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:08:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dz1Km-0005Mj-TG
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:04:44 -0400
-Date: Mon, 2 Oct 2017 10:04:22 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20171002140422.GB4501@localhost.localdomain>
-References: <20170930195345.23338-1-eblake@redhat.com>
-	<20170930201121.24157-1-eblake@redhat.com>
-	<20171001030357.GF4313@localhost.localdomain>
-	<834de435-020b-9400-b640-af82968433dd@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dz1OH-0008Ir-6M
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:08:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51240)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dz1OG-0008IS-Sw
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 10:08:13 -0400
+References: <cover.1506730372.git.alistair.francis@xilinx.com>
+	<c861ba99329355f1f3096b833660d0be68b737c2.1506730372.git.alistair.francis@xilinx.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d0306786-e8b9-c297-e0af-7861cf76ecb4@redhat.com>
+Date: Mon, 2 Oct 2017 09:08:07 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <834de435-020b-9400-b640-af82968433dd@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 4/4] iotests: Add test 197 for
- covering copy-on-read
+In-Reply-To: <c861ba99329355f1f3096b833660d0be68b737c2.1506730372.git.alistair.francis@xilinx.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="T5as6tCDw1gNLFkpoTWr3WPt6tfP95OAK"
+Subject: Re: [Qemu-devel] [PATCH v2 03/47] audio: Replace AUDIO_FUNC with
+ __func__
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -25,67 +28,76 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
+Cc: alistair23@gmail.com, Gerd Hoffmann <kraxel@redhat.com>, armbru@redhat.com
 List-ID: <qemu-devel.nongnu.org>
 
-On Mon, Oct 02, 2017 at 08:55:50AM -0500, Eric Blake wrote:
-> On 09/30/2017 10:03 PM, Jeff Cody wrote:
-> > On Sat, Sep 30, 2017 at 03:11:21PM -0500, Eric Blake wrote:
-> >> Add a test for qcow2 copy-on-read behavior, including exposure
-> >> for the just-fixed bugs.
-> >>
-> >> The copy-on-read behavior is always to a qcow2 image, but the
-> >> test is careful to allow running with most image protocol/format
-> >> combos as the backing file being copied from (luks being the
-> >> exception, as it is harder to pass the right secret to all the
-> >> right places).  In fact, for './check nbd', this appears to be
-> >> the first time we've had a qcow2 image wrapping NBD, requiring
-> >> an additional line in _filter_img_create to match the similar
-> >> line in _filter_img_info.
-> >>
-> >> Signed-off-by: Eric Blake <eblake@redhat.com>
-> >>
-> 
-> >> +_cleanup()
-> >> +{
-> >> +    _cleanup_test_img
-> >> +    rm -f "$BLKDBG_CONF"
-> >> +}
-> >> +trap "_cleanup; exit \$status" 0 1 2 3 15
-> > 
-> > 
-> > Note to myself to add this to my iotests series.
-> 
-> Yep, and I even thought about that, since I've been pointing it out on
-> other patches, but forgot to mention it when composing the email ;)
-> 
-> 
-> >> +$QEMU_IO -c "open -C \
-> >> + -o driver=blkdebug,config=$BLKDBG_CONF,image.driver=qcow2 $TEST_WRAP" \
-> > 
-> > Hmm, this will lead to issues if $TEST_WRAP has spaces, right?
-> 
-> Probably :(  Although I didn't actually test that setup
-> 
-> But I don't know what other options we have to work around it. As long
-> as we are executing in the correct directory, I guess we can open both
-> BLKDBG_CONF and TEST_WRAP relative to ./ rather than as an absolute
-> path, and that should be sufficient to avoid spaces.  But I don't know
-> how easy that is to achieve, or if _filter_qemu_io will handle it correctly.
-> 
-> Maybe I take the wimpy way out and skip the test if $PWD contains spaces
-> or other problematic characters?
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--T5as6tCDw1gNLFkpoTWr3WPt6tfP95OAK
+From: Eric Blake <eblake@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
+Cc: alistair23@gmail.com, Gerd Hoffmann <kraxel@redhat.com>, armbru@redhat.com
+Message-ID: <d0306786-e8b9-c297-e0af-7861cf76ecb4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 03/47] audio: Replace AUDIO_FUNC with
+ __func__
+References: <cover.1506730372.git.alistair.francis@xilinx.com>
+ <c861ba99329355f1f3096b833660d0be68b737c2.1506730372.git.alistair.francis@xilinx.com>
+In-Reply-To: <c861ba99329355f1f3096b833660d0be68b737c2.1506730372.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-My thought is if the operation is destructive (writes, creates, deletes) a
-file, we want to make sure we do not ruin someone's day by destroying a file
-(e.g. "/home/jcody/qemu work", and having /home/jcody/qemu overwritten).
+On 09/29/2017 07:15 PM, Alistair Francis wrote:
+> Apparently we don't use __MSC_VER as a compiler anymore and we always
+> require a C99 compiler (which means we always have __func__) so we don'=
+t
+> need a special AUDIO_FUNC macro. We can just repleace AUDIO_FUNC with
+> __func__ instead.
+>=20
+> Checkpatch failures where manually fixed.
+>=20
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> ---
 
-Spaces in pathnames for iotests don't work currently, however.  So maybe the
-proper thing to do, is for me to add to my iotests series a check for spaces
-in TEST_DIR, and just refuse to run any tests at all (with an informative
-reason why).  And if it is ever fixed so that tests run (and run safely)
-with spaces, we can remove that restriction.
+Module the typo fixes spotted by Thomas,
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Jeff
+> +++ b/audio/audio.c
+> @@ -424,12 +424,12 @@ static void audio_process_options (const char *pr=
+efix,
+>      const char qemu_prefix[] =3D "QEMU_";
+>      size_t preflen, optlen;
+> =20
+> -    if (audio_bug (AUDIO_FUNC, !prefix)) {
+> +    if (audio_bug(__func__, !prefix)) {
+
+I wonder if it would be nicer to have audio_bug() as a macro that
+supplies __func__ automatically; but it's not enough of a concern to
+prevent this patch from going in as-is.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--T5as6tCDw1gNLFkpoTWr3WPt6tfP95OAK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnSSEcACgkQp6FrSiUn
+Q2oxPAf/bjhX1caPyAvDP5izsuKU8LQYZ/jeAD6/Rx3YxuXNQRXz2hu2EjxPKxTo
+P0iI4Dldrn9AD00VmnlsF0Fi/+OPvBl9D3+sw1UfTpXsQDD693fcoNQ/5tbtTRRO
+FChuVD6DFwXLnuvGLYpO4NgD3RzqlyOV04vHMwbwGQYq+YvrIRsnprcqdgHZXLmb
+7JGb5/zSQy69VNJCT4cLuWB2iagsgCSwtlQk2l25ReWfDM1FAPE8/MbBCaUF/Q52
+NhD8nrcNDik3D4ZjUYtmnjbjTqpzG0d9IWbb4XbelAtCc7brG2pzC6tS86KLdfE/
++HIYF25xNINz9WKfeWeGoYGS6tvWbw==
+=2Hlg
+-----END PGP SIGNATURE-----
+
+--T5as6tCDw1gNLFkpoTWr3WPt6tfP95OAK--
