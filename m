@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dywiE-0001ww-9B
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:35 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dywiM-00023Z-9n
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dywiD-00060K-Az
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57536)
+	(envelope-from <imammedo@redhat.com>) id 1dywiK-00064w-MW
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44332)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dywiD-0005zl-4u
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:29 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dywiK-00064U-Gi
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:08:36 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon,  2 Oct 2017 11:07:47 +0200
-Message-Id: <1506935300-132598-6-git-send-email-imammedo@redhat.com>
+Date: Mon,  2 Oct 2017 11:07:53 +0200
+Message-Id: <1506935300-132598-12-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
 References: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 05/38] cris: use generic cpu_model parsing
+Subject: [Qemu-devel] [PATCH 11/38] m68k: mcf5208: use generic cpu_model
+ parsing
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -23,47 +24,48 @@ List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, edgar.iglesias@gmail.com
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, laurent@vivier.eu, huth@tuxfamily.org
 List-ID: <qemu-devel.nongnu.org>
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-CC: edgar.iglesias@gmail.com
+CC: laurent@vivier.eu
+CC: huth@tuxfamily.org
 ---
- hw/cris/axis_dev88.c | 7 ++-----
+ hw/m68k/mcf5208.c | 7 ++-----
  1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/hw/cris/axis_dev88.c b/hw/cris/axis_dev88.c
-index 5eb552b..9ccc435 100644
---- a/hw/cris/axis_dev88.c
-+++ b/hw/cris/axis_dev88.c
-@@ -251,7 +251,6 @@ static
- void axisdev88_init(MachineState *machine)
+diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
+index b9dde75..cfac845 100644
+--- a/hw/m68k/mcf5208.c
++++ b/hw/m68k/mcf5208.c
+@@ -217,7 +217,6 @@ static void mcf_fec_init(MemoryRegion *sysmem, NICInfo *nd, hwaddr base,
+ static void mcf5208evb_init(MachineState *machine)
  {
      ram_addr_t ram_size = machine->ram_size;
 -    const char *cpu_model = machine->cpu_model;
      const char *kernel_filename = machine->kernel_filename;
-     const char *kernel_cmdline = machine->kernel_cmdline;
-     CRISCPU *cpu;
-@@ -268,10 +267,7 @@ void axisdev88_init(MachineState *machine)
-     MemoryRegion *phys_intmem = g_new(MemoryRegion, 1);
+     M68kCPU *cpu;
+     CPUM68KState *env;
+@@ -229,10 +228,7 @@ static void mcf5208evb_init(MachineState *machine)
+     MemoryRegion *ram = g_new(MemoryRegion, 1);
+     MemoryRegion *sram = g_new(MemoryRegion, 1);
  
-     /* init CPUs */
--    if (cpu_model == NULL) {
--        cpu_model = "crisv32";
+-    if (!cpu_model) {
+-        cpu_model = "m5208";
 -    }
--    cpu = CRIS_CPU(cpu_generic_init(TYPE_CRIS_CPU, cpu_model));
-+    cpu = CRIS_CPU(cpu_create(machine->cpu_type));
+-    cpu = M68K_CPU(cpu_generic_init(TYPE_M68K_CPU, cpu_model));
++    cpu = M68K_CPU(cpu_create(machine->cpu_type));
      env = &cpu->env;
  
-     /* allocate RAM */
-@@ -359,6 +355,7 @@ static void axisdev88_machine_init(MachineClass *mc)
-     mc->desc = "AXIS devboard 88";
-     mc->init = axisdev88_init;
+     /* Initialize CPU registers.  */
+@@ -321,6 +317,7 @@ static void mcf5208evb_machine_init(MachineClass *mc)
+     mc->desc = "MCF5206EVB";
+     mc->init = mcf5208evb_init;
      mc->is_default = 1;
-+    mc->default_cpu_type = CRIS_CPU_TYPE_NAME("crisv32");
++    mc->default_cpu_type = M68K_CPU_TYPE_NAME("m5208");
  }
  
- DEFINE_MACHINE("axis-dev88", axisdev88_machine_init)
+ DEFINE_MACHINE("mcf5208evb", mcf5208evb_machine_init)
 -- 
 2.7.4
