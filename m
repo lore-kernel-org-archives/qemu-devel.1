@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dz0DC-0004nh-E3
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:52:43 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dz0DP-0004vI-Co
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:53:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dz0D6-0006zJ-DP
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:52:42 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:46109)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dz0D6-0006z1-64
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:52:36 -0400
-Received: by mail-wm0-x229.google.com with SMTP id m72so10400661wmc.1
-	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 05:52:35 -0700 (PDT)
-References: <20170929101201.21039-1-berrange@redhat.com>
-	<20170929101201.21039-3-berrange@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170929101201.21039-3-berrange@redhat.com>
-Date: Mon, 02 Oct 2017 13:52:33 +0100
-Message-ID: <8737711zla.fsf@linaro.org>
+	(envelope-from <kwolf@redhat.com>) id 1dz0DL-00074u-CA
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 08:52:55 -0400
+Date: Mon, 2 Oct 2017 14:52:30 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171002125230.GB4362@localhost.localdomain>
+References: <20170815081854.14568-1-el13635@mail.ntua.gr>
+	<20170815081854.14568-3-el13635@mail.ntua.gr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v8 2/6] docker: don't rely on submodules
- existing in the main checkout
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170815081854.14568-3-el13635@mail.ntua.gr>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] block: add filter driver to
+ block/write-threshold.c
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -30,93 +23,222 @@ List-Post: <mailto:qemu-devel@gnu.org>
 List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-
-Daniel P. Berrange <berrange@redhat.com> writes:
-
-> When building the tarball to pass into the docker/vm test image,
-> the code relies on the git submodules being checked out in the
-> main checkout.
->
-> ie if the developer has not run 'git submodule update --init dtc'
-> many of the docker tests will fail due to the libfdt package not
-> being present in the test images. Patchew manually checks out the
-> dtc submodule in the main git checkout, but this is a bad idea.
->
-> When running tests we want to have a predictable set of submodules
-> included in the source that's tested. The build environment is
-> completely independent of the developers host OS, so the submodules
-> the developer has checked out should not be considered relevant for
-> the tests.
->
-> This changes the archive-source.sh script so that it clones the
-> current git checkout into a temporary directory, checks out a
-> fixed set of submodules, builds the tarball and finally removes
-> the temporary git clone.
-
-I feel like we've just gone around in one big circle here. The whole
-point of passing the tarball into the docker build in the first place
-was to avoid messing around with checkouts and the like. Is it not
-possible to get what we want direct from git?
-
->
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Am 15.08.2017 um 10:18 hat Manos Pitsidianakis geschrieben:
+> With runtime insertion and removal of filters, write-threshold.c can
+> provide more flexible deliveries of BLOCK_WRITE_THRESHOLD events. After
+> the event trigger, the filter nodes are no longer useful and must be
+> removed.
+> The existing write-threshold cannot be easily converted to using the
+> filter driver, so it is not affected.
+> 
+> This is part of deprecating before write notifiers, which are hard coded
+> into the block layer. Block filter drivers are inserted into the graph
+> only when a feature is needed. This makes the block layer more modular
+> and reuses the block driver abstraction that is already present.
+> 
+> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 > ---
->  scripts/archive-source.sh | 34 ++++++++++++++++++++++++++++------
->  1 file changed, 28 insertions(+), 6 deletions(-)
->
-> diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
-> index c4e7d98f4d..4029de7b20 100755
-> --- a/scripts/archive-source.sh
-> +++ b/scripts/archive-source.sh
-> @@ -18,15 +18,37 @@ if test $# -lt 1; then
->      error "Usage: $0 <output tarball>"
->  fi
->
-> -tar_file="$1"
-> -list_file="$1.list"
-> -submodules=$(git submodule foreach --recursive --quiet 'echo $name')
-> +tar_file=`realpath "$1"`
-> +list_file="${tar_file}.list"
-> +vroot_dir="${tar_file}.vroot"
->
-> -if test $? -ne 0; then
-> -    error "git submodule command failed"
-> +# We want a predictable list of submodules for builds, that is
-> +# independent of what the developer currently has initialized
-> +# in their checkout, because the build environment is completely
-> +# different to the host OS.
-> +submodules="dtc"
+>  block/qapi.c                    |   2 +-
+>  block/write-threshold.c         | 264 +++++++++++++++++++++++++++++++++++-----
+>  include/block/write-threshold.h |  22 ++--
+>  qapi/block-core.json            |  19 ++-
+>  tests/test-write-threshold.c    |  40 +++---
+>  5 files changed, 281 insertions(+), 66 deletions(-)
+> 
+> diff --git a/block/qapi.c b/block/qapi.c
+> index 2be44a6758..fe6cf2eae5 100644
+> --- a/block/qapi.c
+> +++ b/block/qapi.c
+> @@ -122,7 +122,7 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
+>          info->group = g_strdup(throttle_group_get_name(tgm));
+>      }
+>  
+> -    info->write_threshold = bdrv_write_threshold_get(bs);
+> +    info->write_threshold = bdrv_write_threshold_get_legacy(bs);
+>  
+>      bs0 = bs;
+>      p_image_info = &info->image;
+> diff --git a/block/write-threshold.c b/block/write-threshold.c
+> index 0bd1a01c86..4a67188ea3 100644
+> --- a/block/write-threshold.c
+> +++ b/block/write-threshold.c
+> @@ -2,9 +2,11 @@
+>   * QEMU System Emulator block write threshold notification
+>   *
+>   * Copyright Red Hat, Inc. 2014
+> + * Copyright 2017 Manos Pitsidianakis
+>   *
+>   * Authors:
+>   *  Francesco Romani <fromani@redhat.com>
+> + *  Manos Pitsidianakis <el13635@mail.ntua.gr>
+>   *
+>   * This work is licensed under the terms of the GNU LGPL, version 2 or later.
+>   * See the COPYING.LIB file in the top-level directory.
+> @@ -19,46 +21,35 @@
+>  #include "qmp-commands.h"
+>  
+>  
+> -uint64_t bdrv_write_threshold_get(const BlockDriverState *bs)
+> +uint64_t bdrv_write_threshold_get_legacy(const BlockDriverState *bs)
+>  {
+>      return bs->write_threshold_offset;
+>  }
+>  
+> -bool bdrv_write_threshold_is_set(const BlockDriverState *bs)
+> +bool bdrv_write_threshold_is_set_legacy(const BlockDriverState *bs)
+>  {
+>      return bs->write_threshold_offset > 0;
+>  }
+>  
+> -static void write_threshold_disable(BlockDriverState *bs)
+> +static void write_threshold_disable_legacy(BlockDriverState *bs)
+>  {
+> -    if (bdrv_write_threshold_is_set(bs)) {
+> +    if (bdrv_write_threshold_is_set_legacy(bs)) {
+>          notifier_with_return_remove(&bs->write_threshold_notifier);
+>          bs->write_threshold_offset = 0;
+>      }
+>  }
+>  
+> -uint64_t bdrv_write_threshold_exceeded(const BlockDriverState *bs,
+> -                                       const BdrvTrackedRequest *req)
+> -{
+> -    if (bdrv_write_threshold_is_set(bs)) {
+> -        if (req->offset > bs->write_threshold_offset) {
+> -            return (req->offset - bs->write_threshold_offset) + req->bytes;
+> -        }
+> -        if ((req->offset + req->bytes) > bs->write_threshold_offset) {
+> -            return (req->offset + req->bytes) - bs->write_threshold_offset;
+> -        }
+> -    }
+> -    return 0;
+> -}
+> -
+>  static int coroutine_fn before_write_notify(NotifierWithReturn *notifier,
+>                                              void *opaque)
+>  {
+>      BdrvTrackedRequest *req = opaque;
+>      BlockDriverState *bs = req->bs;
+>      uint64_t amount = 0;
+> +    uint64_t threshold = bdrv_write_threshold_get_legacy(bs);
+> +    uint64_t offset = req->offset;
+> +    uint64_t bytes = req->bytes;
+>  
+> -    amount = bdrv_write_threshold_exceeded(bs, req);
+> +    amount = bdrv_write_threshold_exceeded(threshold, offset, bytes);
+>      if (amount > 0) {
+>          qapi_event_send_block_write_threshold(
+>              bs->node_name,
+> @@ -67,7 +58,7 @@ static int coroutine_fn before_write_notify(NotifierWithReturn *notifier,
+>              &error_abort);
+>  
+>          /* autodisable to avoid flooding the monitor */
+> -        write_threshold_disable(bs);
+> +        write_threshold_disable_legacy(bs);
+>      }
+>  
+>      return 0; /* should always let other notifiers run */
+> @@ -79,25 +70,26 @@ static void write_threshold_register_notifier(BlockDriverState *bs)
+>      bdrv_add_before_write_notifier(bs, &bs->write_threshold_notifier);
+>  }
+>  
+> -static void write_threshold_update(BlockDriverState *bs,
+> -                                   int64_t threshold_bytes)
+> +static void write_threshold_update_legacy(BlockDriverState *bs,
+> +                                          int64_t threshold_bytes)
+>  {
+>      bs->write_threshold_offset = threshold_bytes;
+>  }
+>  
+> -void bdrv_write_threshold_set(BlockDriverState *bs, uint64_t threshold_bytes)
+> +void bdrv_write_threshold_set_legacy(BlockDriverState *bs,
+> +                                     uint64_t threshold_bytes)
+>  {
+> -    if (bdrv_write_threshold_is_set(bs)) {
+> +    if (bdrv_write_threshold_is_set_legacy(bs)) {
+>          if (threshold_bytes > 0) {
+> -            write_threshold_update(bs, threshold_bytes);
+> +            write_threshold_update_legacy(bs, threshold_bytes);
+>          } else {
+> -            write_threshold_disable(bs);
+> +            write_threshold_disable_legacy(bs);
+>          }
+>      } else {
+>          if (threshold_bytes > 0) {
+>              /* avoid multiple registration */
+>              write_threshold_register_notifier(bs);
+> -            write_threshold_update(bs, threshold_bytes);
+> +            write_threshold_update_legacy(bs, threshold_bytes);
+>          }
+>          /* discard bogus disable request */
+>      }
+> @@ -119,7 +111,223 @@ void qmp_block_set_write_threshold(const char *node_name,
+>      aio_context = bdrv_get_aio_context(bs);
+>      aio_context_acquire(aio_context);
+>  
+> -    bdrv_write_threshold_set(bs, threshold_bytes);
+> +    bdrv_write_threshold_set_legacy(bs, threshold_bytes);
+>  
+>      aio_context_release(aio_context);
+>  }
 > +
-> +trap "status=$?; rm -rf \"$list_file\" \"$vroot_dir\"; exit \$status" 0 1 2 3 15
 > +
-> +if git diff-index --quiet HEAD -- &>/dev/null
-> +then
-> +    HEAD=HEAD
-> +else
-> +    HEAD=`git stash create`
->  fi
-> +git clone --shared . "$vroot_dir"
-> +test $? -ne 0 && error "failed to clone into '$vroot_dir'"
+> +/* The write-threshold filter drivers delivers a one-time BLOCK_WRITE_THRESHOLD
+> + * event when a passing write request exceeds the configured write threshold
+> + * offset of the filter.
+> + *
+> + * This is useful to transparently resize thin-provisioned drives without
+> + * the guest OS noticing.
+> + */
 > +
-> +cd "$vroot_dir"
-> +test $? -ne 0 && error "failed to change into '$vroot_dir'"
-> +
-> +git checkout $HEAD
-> +test $? -ne 0 && error "failed to checkout $HEAD revision"
->
-> -trap "status=$?; rm -f \"$list_file\"; exit \$status" 0 1 2 3 15
-> +for sm in $submodules; do
-> +    git submodule update --init $sm
-> +    test $? -ne 0 && error "failed to init submodule $sm"
-> +done
->
->  if test -n "$submodules"; then
->      {
+> +#define QEMU_OPT_WRITE_THRESHOLD "write-threshold"
+> +static BlockDriver write_threshold;
 
+This forward declaration is unnecessary, the variable is never used
+before the actual definition.
 
---
-Alex Bennée
+> +static QemuOptsList write_threshold_opts = {
+> +    .name = "write-threshold",
+> +    .head = QTAILQ_HEAD_INITIALIZER(write_threshold_opts.head),
+> +    .desc = {
+> +        {
+> +            .name = QEMU_OPT_WRITE_THRESHOLD,
+> +            .type = QEMU_OPT_NUMBER,
+> +            .help = "configured threshold for the block device, bytes. Use 0"
+> +                    "to disable the threshold",
+> +        },
+> +        { /* end of list */ }
+> +    },
+> +};
+> +
+> +static bool bdrv_write_threshold_is_set(const BlockDriverState *bs)
+> +{
+> +    uint64_t threshold = *(uint64_t *)bs->opaque;
+
+I think I would prefer using a struct for bs->opaque, even if it only
+contains a single uint64_t for now.
+
+> +    return threshold > 0;
+> +}
+
+> +static int64_t coroutine_fn write_threshold_co_get_block_status(
+> +                                                       BlockDriverState *bs,
+> +                                                       int64_t sector_num,
+> +                                                       int nb_sectors,
+> +                                                       int *pnum,
+> +                                                       BlockDriverState **file)
+> +{
+> +    assert(child_bs(bs));
+> +    *pnum = nb_sectors;
+> +    *file = child_bs(bs);
+> +    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
+> +           (sector_num << BDRV_SECTOR_BITS);
+> +}
+
+This is bdrv_co_get_block_status_from_file() again.
+
+Kevin
