@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dyxSs-0007YO-Da
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:56:43 -0400
+	(envelope-from <bounces@canonical.com>) id 1dyxgv-0002Tx-MJ
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 06:11:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dyxSo-0007Uq-TD
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:56:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50674)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dyxSo-0007UR-K4
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 05:56:38 -0400
-Date: Mon, 2 Oct 2017 10:56:27 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171002095627.GD27086@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170929101201.21039-1-berrange@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1dyxgp-0007Ic-Ey
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 06:11:13 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42598)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dyxgp-0007I6-8p
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 06:11:07 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1dyxgo-0005Dz-4G
+	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 10:11:06 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 116E32E80CD
+	for <qemu-devel@nongnu.org>; Mon,  2 Oct 2017 10:11:06 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170929101201.21039-1-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v8 0/6] Initial support for keycodemapdb
- GIT submodule
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 02 Oct 2017 10:00:29 -0000
+From: Daniel Berrange <1718964@bugs.launchpad.net>
+Reply-To: Bug 1718964 <1718964@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150609439728.30760.16378952760062218203.malonedeb@wampee.canonical.com>
+Message-Id: <150693842953.29253.11845148330864099651.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1718964] Re: Memory leak when using websocket
+ over a low speed network
 List-Unsubscribe: <https://lists.gnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=unsubscribe>
 List-Archive: <http://lists.gnu.org/archive/html/qemu-devel/>
@@ -28,122 +37,135 @@ List-Help: <mailto:qemu-devel-request@gnu.org?subject=help>
 List-Subscribe: <https://lists.gnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@gnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 List-ID: <qemu-devel.nongnu.org>
 
-FYI, in case people were wondering, patchew successfully passed all
-tests. So it looks like 8th time lucky for getting submodules working
-correctly unless someone can break it again.....
+Thanks for your report. I've not tried reproducing yet, but from the
+looking at the code I think I can see why this happens. Code in
+vnc_update_client discards incoming frame updates from the guest if the
+output buffer has data pending in it, but it only checks the main VNC
+server output buffer usage. It fails to check the websockets output
+buffer usage.
 
-  http://patchew.org/QEMU/20170929101201.21039-1-berrange@redhat.com/
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Daniel Berrange (berrange)
 
-On Fri, Sep 29, 2017 at 11:11:55AM +0100, Daniel P. Berrange wrote:
-> This patch series is an update to:
-> 
->   v1: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02047.html
->   v2: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02471.html
->   v3: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02517.html
->   v4: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02708.html
->   v5: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg02950.html
->   v6: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg07673.html
->   v7: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg07740.html
-> 
-> The keycodemap project[1] provides a database mapping between many different
-> keysym/keycode/scancode sets, along with a tool to generate mapping/lookup
-> tables in various programming languages. It is already used by GTK-VNC,
-> SPICE-GTK and libvirt.
-> 
-> In this v6 posting I have dropped most of the conversion to keycodemapdb
-> across the devices / UI frontends. This only converts the core input
-> APIs, and wires up the git submodule build system mechanics. The remaining
-> patches from the v5 posting will be submitted separately, once this initial
-> conversion is mergable.
-> 
-> Changed in v8:
-> 
->  - Fix error checking in archive-source.sh changes (Eric)
->  - Use -e instead of -d to check for .git (Eric)
->  - Misc typos (Eric)
->  - Use && instead of ; in make shell rules (Eric)
->  - Fully quote $source_path usage (Eric)
->  - Fix position of trap statement for cleanup (Eric)
->  - Added missing dependnacy for Makefile (Patchew)
->  - Moved build rules from ui/Makefile.objs into Makefile because
->    we must not have those rules defined in the target specific
->    Makefiles
-> 
-> Changed in v7:
-> 
->  - subdir-dtc and ui/input-keymap-* make rules must depend on
->    the submodule status file to ensure build ordering (patchew)
->  - Use 'git stash' to ensure archive-source.sh keeps non-committed
->    changes for docker/vm testing (Fam)
-> 
-> Changed in v6:
-> 
->  - Switched back to using a git submodule
->  - Wire up Makefile rules so that git submodule is automatically
->    refreshed when needed prior to build.
->  - Fix source tarball creation for docker/vm tests wrt submodules
-> 
-> Changed in v5:
-> 
->  - Don't try to initialize git submodule at all
->  - Store generate keymap files in GIT
-> 
-> Changed in v4:
-> 
->  - Run submodule update in source_dir for vpath builds (patchew)
->  - Force submodule update in docker rules in case they
->    are run without configure (patchew)
-> 
-> Changed in v3:
-> 
->  - Ensure docker builds pull in keycodemapdb submodule (patchew)
->  - Add compat with py26 for RHEL-6 in keycodemapdb tools (patchew)
->  - Initialize submodule in configure script (patchew)
-> 
-> Changed in v2:
-> 
->  - Change filename pattern to 'ui/input-keymap-$SRC-to-$DST.c'
->    and map names 'qemu_input_map_$SRC_to_$DST'  (Eric)
->  - Fix typos (Eric)
->  - Drop changes to InputKeyEvent struct (Eric)
->  - Fix VPATH build (patchew)
->  - Fix code style errors (patchew)
-> 
-> [1] https://gitlab.com/keycodemap/keycodemapdb/
-> 
-> Daniel P. Berrange (6):
->   build: automatically handle GIT submodule checkout for dtc
->   docker: don't rely on submodules existing in the main checkout
->   ui: add keycodemapdb repository as a GIT submodule
->   ui: convert common input code to keycodemapdb
->   ui: convert key events to QKeyCodes immediately
->   ui: don't export qemu_input_event_new_key
-> 
->  .gitignore                |   2 +
->  .gitmodules               |   3 +
->  MAINTAINERS               |   6 +
->  Makefile                  |  46 ++++++-
->  configure                 |  52 +++++---
->  include/ui/input.h        |  12 +-
->  scripts/archive-source.sh |  34 ++++-
->  scripts/git-submodule.sh  |  38 ++++++
->  ui/input-keymap.c         | 326 +++-------------------------------------------
->  ui/input.c                |  26 ++--
->  ui/keycodemapdb           |   1 +
->  11 files changed, 198 insertions(+), 348 deletions(-)
->  create mode 100755 scripts/git-submodule.sh
->  create mode 160000 ui/keycodemapdb
-> 
-> -- 
-> 2.13.5
-> 
+-- =
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1718964
+
+Title:
+  Memory leak when using websocket over a low speed network
+
+Status in QEMU:
+  New
+
+Bug description:
+  Description of problem
+  -------------------------
+
+  When VNC is connected to QEMU via websocket over a low speed network
+  (e.g. 300KB/S Wide Area Network), and there is a lot of frame buffer
+  update, the VNC Client will get stuck, the cursor is almost impossible
+  to move, which may result in accumulation of a large number of data in
+  the QEMU process (memory consumption will keep increasing).
+
+  =
+
+  Environment
+  -------------------------
+  All of the following versions have been tested:
+
+  QEMU: 2.5.1 / 2.6.0 / 2.8.1.1 / 2.9.0 / 2.10.0
+  Host OS: Ubuntu 16.04 Server LTS / CentOS 7 x86_64_1611
+  Guest OS: Windows 7 64bit / Ubuntu 16.04 Desktop LTS
+  Client OS: Windows 7 64bit / Windows 10 64bit
+  Client Browser: IE 11.0.9600 / Chrome 60.0.3112 / Firefox 55.0.2
+  VNC Client: TigerVNC Viewer 1.8 / UltraVNC Viewer 1.2.1.5 / TightVNC View=
+er 2.8.8 =
+
+  VNC Web Client: noVNC 0.5.1 / noVNC 0.61 / noVNC 0.62
+  VNC Server: TigerVNC 1.8 / x11vnc 0.9.13 / TightVNC 2.8.8
+  VNC Client: TigerVNC Viewer 1.8 / UltraVNC Viewer 1.2.1.5 / TightVNC View=
+er 2.8.8
+
+  =
+
+  Steps to reproduce:
+  -------------------------
+  100% reproducible.
+
+  1. Launch a QEMU instance with websocket option:
+  qemu-system-x86_64 -enable-kvm -m 6G ./win_x64.qcow2 -vnc :1,websocket=3D=
+5701
+
+  2. Open VNC Web Client (noVNC/vnc.html) in browser and connect to QEMU
+  VM via websocket
+
+  3. Play a video (e.g. Watch YouTube) on VM (To produce a lot of frame
+  buffer update)
+
+  4. Limit (e.g. Use NetLimiter) the client inbound bandwidth to 300KB/S
+  (To simulate a low speed WAN)
+
+  5. Then client's output gets stuck(less than 1 fps), the cursor is
+  almost impossible to move
+
+  6. Observe QEMU process on the host, more and more data are
+  accumulated in the process, the consumption of memory continues to
+  keep increasing
+
+  =
+
+  Current result:
+  -------------------------
+  [Top - Initial status]
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMA=
+ND         =
+
+   2725 root      20   0 7229144 5.910g  23024 S  16.3 18.9   0:12.84 qemu-=
+system-x86_64
+
+  [Top - After an hour's playing w/o limit (6-8MB/S)]
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMA=
+ND         =
+
+   2725 root      20   0 7370284 6.046g  23132 S  28.0 19.3  35:58.15 qemu-=
+system-x86_64
+
+  [Top - Limit the bandwidth and continue to playing for another an hour (3=
+00KB/S)]
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMA=
+ND         =
+
+   2725 root      20   0 11.029g 8.853g  23132 S  20.0 28.2  72:14.17 qemu-=
+system-x86_64
+
+  Also test several other combinations in the same environment:
+
+  1. Client(VNC Viewer) - Server(QEMU)
+  2. Client(VNC Viewer) - Server(tigervnc/x11vnc/tightvnc)
+  3. Client(noVNC)      - Server(tigervnc/x11vnc/tightvnc)
+
+  Likewise, the client's inbound bandwidth is limited to 300KB/S, =
+
+  although a lot of frame are lost, all of they still works (at least the m=
+ouse is movable).
+
+  It's found that when connect to QEMU via websocket, it never drop any fra=
+mes.
+  QEMU still sends a lot of data to its websocket even when the network is =
+congested, =
+
+  the process is continually consuming more memory, then it gets stack.
+
+  =
+
+  Expected results:
+  -------------------------
+  When the network is poor (non-LAN), QEMU would reduce the VNC data send t=
+o its websocket correspondingly, and the memory usage remains stable.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1718964/+subscriptions
