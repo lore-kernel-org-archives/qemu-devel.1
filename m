@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dzNky-0003Qw-Ln
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 10:01:09 -0400
+	(envelope-from <eblake@redhat.com>) id 1dzNmg-00047v-L1
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 10:03:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dzNkp-0005uR-8h
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 10:01:08 -0400
-Received: from mail-vk0-f41.google.com ([209.85.213.41]:52220)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dzNkp-0005to-4K
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 10:00:59 -0400
-Received: by mail-vk0-f41.google.com with SMTP id 137so2094862vkk.8
-	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 07:00:58 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1dzNmc-0008NN-Fc
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 10:02:54 -0400
+References: <1507034861-4661-1-git-send-email-jan.dakinevich@virtuozzo.com>
+	<1507034861-4661-2-git-send-email-jan.dakinevich@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e77d7b78-a2ff-51a3-360e-c7d5d4e7006b@redhat.com>
+Date: Tue, 3 Oct 2017 09:02:27 -0500
 MIME-Version: 1.0
-In-Reply-To: <150642408350.3900.16985989168069353852.stgit@Misha-PC.lan02.inno>
-References: <150642384156.3900.3326424823772221077.stgit@Misha-PC.lan02.inno>
-	<150642408350.3900.16985989168069353852.stgit@Misha-PC.lan02.inno>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Tue, 3 Oct 2017 16:00:56 +0200
-Message-ID: <CABdb737SO1x-1B_mAXTgm4ND3QCd2vQw+568Y1WNryO38Uq4oQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 42/43] windbg: implemented
- kd_api_fill_memory
+In-Reply-To: <1507034861-4661-2-git-send-email-jan.dakinevich@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="mCHSRBdFCAxCFVwLn40AcXk5X1bFwV9Vb"
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] virtio: introduce `query-virtio'
+ QMP command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +25,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Cc: qemu-devel <qemu-devel@nongnu.org>, sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+To: Jan Dakinevich <jan.dakinevich@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Amit Shah <amit@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org
 
-On Tue, Sep 26, 2017 at 1:08 PM, Mihail Abakumov
-<mikhail.abakumov@ispras.ru> wrote:
-> Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-> Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-> Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mCHSRBdFCAxCFVwLn40AcXk5X1bFwV9Vb
+From: Eric Blake <eblake@redhat.com>
+To: Jan Dakinevich <jan.dakinevich@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Amit Shah <amit@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-block@nongnu.org
+Message-ID: <e77d7b78-a2ff-51a3-360e-c7d5d4e7006b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] virtio: introduce `query-virtio' QMP
+ command
+References: <1507034861-4661-1-git-send-email-jan.dakinevich@virtuozzo.com>
+ <1507034861-4661-2-git-send-email-jan.dakinevich@virtuozzo.com>
+In-Reply-To: <1507034861-4661-2-git-send-email-jan.dakinevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 10/03/2017 07:47 AM, Jan Dakinevich wrote:
+> The command is intended for gathering virtio information such as status=
+,
+> feature bits, negotiation status. It is convenient and useful for debug=
+
+> purpose.
+>=20
+> The commands returns generic virtio information for virtio such as
+> common feature names and status bits names and information for all
+> attached to current machine devices.
+>=20
+> To retrieve names of device-specific features `get_feature_name'
+> callback in VirtioDeviceClass also was introduced.
+>=20
+> Cc: Denis V. Lunev <den@virtuozzo.com>
+> Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
 > ---
->  include/exec/windbgstub-utils.h |    1 +
->  windbgstub-utils.c              |   36 ++++++++++++++++++++++++++++++++++++
->  windbgstub.c                    |    4 ++++
->  3 files changed, 41 insertions(+)
->
-> diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-> index ba001ddb42..d1a10c862e 100755
-> --- a/include/exec/windbgstub-utils.h
-> +++ b/include/exec/windbgstub-utils.h
-> @@ -119,6 +119,7 @@ void kd_api_get_version(CPUState *cpu, PacketData *pd);
->  void kd_api_read_msr(CPUState *cpu, PacketData *pd);
->  void kd_api_write_msr(CPUState *cpu, PacketData *pd);
->  void kd_api_search_memory(CPUState *cpu, PacketData *pd);
-> +void kd_api_fill_memory(CPUState *cpu, PacketData *pd);
->  void kd_api_unsupported(CPUState *cpu, PacketData *pd);
->
->  SizedBuf kd_gen_exception_sc(CPUState *cpu);
-> diff --git a/windbgstub-utils.c b/windbgstub-utils.c
-> index 2d3fbcc41c..3832e0b116 100755
-> --- a/windbgstub-utils.c
-> +++ b/windbgstub-utils.c
-> @@ -1570,6 +1570,42 @@ void kd_api_search_memory(CPUState *cpu, PacketData *pd)
->      pd->extra_size = 0;
->  }
->
-> +void kd_api_fill_memory(CPUState *cpu, PacketData *pd)
+>  hw/block/virtio-blk.c       |  21 +++++++++
+>  hw/char/virtio-serial-bus.c |  15 +++++++
+>  hw/display/virtio-gpu.c     |  13 ++++++
+>  hw/net/virtio-net.c         |  35 +++++++++++++++
+>  hw/scsi/virtio-scsi.c       |  16 +++++++
+>  hw/virtio/Makefile.objs     |   2 +
+>  hw/virtio/virtio-balloon.c  |  15 +++++++
+>  hw/virtio/virtio-stub.c     |   9 ++++
+>  hw/virtio/virtio.c          | 101 ++++++++++++++++++++++++++++++++++++=
+++++++++
+>  include/hw/virtio/virtio.h  |   2 +
+>  qapi-schema.json            |   1 +
+>  qapi/virtio.json            |  94 ++++++++++++++++++++++++++++++++++++=
++++++
+>  12 files changed, 324 insertions(+)
+>  create mode 100644 hw/virtio/virtio-stub.c
+>  create mode 100644 qapi/virtio.json
+
+This creates a new .json file, but does not touch MAINTAINERS.  Our idea
+in splitting the .json files was to make it easier for each sub-file
+that needs a specific maintainer in addition to the overall *.json line
+for QAPI maintainers, so this may deserve a MAINTAINERS entry.
+
+
+> +++ b/qapi/virtio.json
+> @@ -0,0 +1,94 @@
+> +# -*- Mode: Python -*-
+> +#
+> +
+> +##
+> +# =3D Virtio devices
+> +##
+> +
+> +{ 'include': 'common.json' }
+> +
+> +##
+> +# @VirtioInfoBit:
+> +#
+> +# Named virtio bit
+> +#
+> +# @bit: bit number
+> +#
+> +# @name: bit name
+> +#
+> +# Since: 2.11.0
+> +#
+> +##
 > +{
-> +    DBGKD_FILL_MEMORY *m64c = &pd->m64.u.FillMemory;
-> +
-> +    uint32_t len = ldl_p(&m64c->Length);
-> +    target_ulong addr = ldq_p(&m64c->Address);
-> +    uint16_t pattern = ldl_p(&m64c->PatternLength);
-> +    uint16_t flags = ldl_p(&m64c->Flags);
-> +
-> +    uint8_t mem[len];
+> +    'struct': 'VirtioInfoBit',
+> +    'data': {
+> +        'bit': 'uint64',
 
-Same as patch 41, break len into, say, page-sized regions and call
-cpu_memory_rw_debug in a loop.
+Why is this a 64-bit value? Are the values 0-63, or are they 1, 2, 4, 8,
+=2E..?  The documentation on 'bit number' is rather sparse.
 
-> +    int i, err;
-> +    for (i = 0; i < len; ++i) {
-> +        mem[i] = pd->extra[i % pattern];
+> +        'name': 'str'
+
+Wouldn't an enum type be better than an open-ended string?
+
 > +    }
-> +
-> +    switch (flags) {
-> +    case DBGKD_FILL_MEMORY_VIRTUAL:
-> +        err = cpu_memory_rw_debug(cpu, addr, mem, len, 1);
-> +        if (err) {
-> +            pd->m64.ReturnStatus = STATUS_UNSUCCESSFUL;
-> +            WINDBG_DEBUG("fill_memory: No physical page mapped: " FMT_ADDR,
-> +                        addr);
-> +        }
-> +        break;
-> +
-> +    case DBGKD_FILL_MEMORY_PHYSICAL:
-> +        cpu_physical_memory_rw(addr, mem, len, 1);
-> +        break;
-> +
-> +    default:
-> +        break;
-> +    }
-> +
-> +    pd->extra_size = 0;
 > +}
 > +
->  void kd_api_unsupported(CPUState *cpu, PacketData *pd)
->  {
->      WINDBG_ERROR("Catched unimplemented api %s",
-> diff --git a/windbgstub.c b/windbgstub.c
-> index 7cff6bc514..b01ddcf009 100755
-> --- a/windbgstub.c
-> +++ b/windbgstub.c
-> @@ -209,6 +209,10 @@ static void windbg_process_manipulate_packet(ParsingContext *ctx)
->          kd_api_search_memory(cpu, &ctx->data);
->          break;
->
-> +    case DbgKdFillMemoryApi:
-> +        kd_api_fill_memory(cpu, &ctx->data);
-> +        break;
+> +##
+> +# @VirtioInfoDevice:
+> +#
+> +# Information about specific virtio device
+> +#
+> +# @qom_path: QOM path of the device
+
+Please make this 'qom-path' - new interfaces should prefer '-' over '_'.
+
+> +#
+> +# @feature-names: names of device-specific features
+> +#
+> +# @host-features: bitmask of features, provided by devices
+> +#
+> +# @guest-features: bitmask of features, acknowledged by guest
+> +#
+> +# @status: virtio device status bitmask
+> +#
+> +# Since: 2.11.0
+> +#
+> +##
+> +{
+> +    'struct': 'VirtioInfoDevice',
+> +    'data': {
+> +        'qom_path': 'str',
+> +        'feature-names': ['VirtioInfoBit'],
+> +        'host-features': 'uint64',
+> +        'guest-features': 'uint64',
+> +        'status': 'uint64'
+
+I'm wondering if this is the best representation (where the caller has
+to parse the integer and then lookup in feature-names what each bit of
+the integer represents).  But I'm not sure I have anything better off
+the top of my head.
+
+> +    }
+> +}
 > +
->      default:
->          kd_api_unsupported(cpu, &ctx->data);
->          break;
->
+> +##
+> +# @VirtioInfo:
+> +#
+> +# Information about virtio devices
+> +#
+> +# @feature-names: names of common virtio features
+> +#
+> +# @status-names: names of bits which represents virtio device status
+> +#
+> +# @devices: list of per-device virtio information
+> +#
+> +# Since: 2.11.0
+> +#
+> +##
+> +{
+> +    'struct': 'VirtioInfo',
+> +    'data': {
+> +        'feature-names': ['VirtioInfoBit'],
+
+Why is feature-names listed at two different nestings of the return value=
+?
+
+> +        'status-names': ['VirtioInfoBit'],
+> +        'devices': ['VirtioInfoDevice']
+> +    }
+> +}
+> +
+> +
+> +##
+> +# @query-virtio:
+> +#
+> +# Returns generic and per-device virtio information
+> +#
+> +# Since: 2.11.0
+> +#
+> +##
+> +{
+> +    'command': 'query-virtio',
+> +    'returns': 'VirtioInfo'
+> +}
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--mCHSRBdFCAxCFVwLn40AcXk5X1bFwV9Vb
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnTmHMACgkQp6FrSiUn
+Q2orswf+KPHL9GhKfaFK6IQjLoupIhxR8okRTI3DL8NMBlHIZTkApKLdT/2afNJm
+10wOpcqzIyYfO5AxYX3xqd1/vbH0a6HOC+3QqW2jTSRAMYrbivNY8ErFe6WfXd+B
+jNNPPjhO1mIOD4iQWgTI0E1QD1zys0JkQYI6DwdoR+tokaj8Gzah2/tWP98DaJaT
+nHIuT4qMacnA1rrmq+dfJObceew8UV/4cck89XIRjgwwaOhdiDsDbGkpqRT3Jv4p
+C94yH+wxZTFEgHO9cLTswnCzi9CNIK6jUCe73kQULi/vpFBAB3dCIkDNMljec+do
+A9c8oBwntxJjuajXyA6UJqQqVm7Rhg==
+=IwSr
+-----END PGP SIGNATURE-----
+
+--mCHSRBdFCAxCFVwLn40AcXk5X1bFwV9Vb--
