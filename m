@@ -1,37 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dzNWP-0001sz-CW
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:46:09 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dzNWX-0001vA-Jm
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:46:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dzNWK-0003hs-DN
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:46:05 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:43842)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dzNWT-0003rw-9Q
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:46:13 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:50133)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dzNWK-0003hG-9G
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:46:00 -0400
-Received: by mail-qt0-x243.google.com with SMTP id a43so7092137qta.0
-	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 06:46:00 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170928165414.7339-1-richard.henderson@linaro.org>
-	<20170928165414.7339-5-richard.henderson@linaro.org>
-	<17f88913-12dc-b462-d6fd-9b1c6cfbd6a9@amsat.org>
-	<1085a4f8-d12b-f87c-caa7-a9927247d7e8@linaro.org>
-	<1be5c928-43d0-e8d1-7c6b-0c37f40c7a54@amsat.org>
-	<e4110def-0b26-f16f-593c-07e1b5eb67c6@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f1e00f85-8949-0f92-bd4b-b1cbfc92a503@amsat.org>
-Date: Tue, 3 Oct 2017 10:45:56 -0300
-MIME-Version: 1.0
-In-Reply-To: <e4110def-0b26-f16f-593c-07e1b5eb67c6@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 4/9] disas: Support the Capstone
- disassembler library
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1dzNWT-0003qO-2o
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:46:09 -0400
+Received: by mail-wm0-x235.google.com with SMTP id b189so12949284wmd.4
+	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 06:46:08 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue,  3 Oct 2017 15:45:30 +0200
+Message-Id: <20171003134540.21625-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [RFH PATCH 00/10] i386: hvf: miscellaneous cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,39 +25,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: alex@alex.org.uk, agraf@suse.de, sergio.g.delreal@gmail.com
 
-On 10/02/2017 10:51 PM, Richard Henderson wrote:
-> On 10/02/2017 02:45 PM, Philippe Mathieu-Daudé wrote:
->> On 10/02/2017 03:34 PM, Richard Henderson wrote:
->>> On 10/02/2017 09:36 AM, Philippe Mathieu-Daudé wrote:
->>>> Maybe some defines like:
->>>>
->>>> #define LARGEST_TARGET_INSTR_SIZE 32
->>>>
->>>> #define MINIMUM_TARGET_PAGE_SIZE 1024
->>>
->>> Eh.  If I weren't simply pulling numbers out of my hat, perhaps.
->>> Does it really make things clearer beyond sizeof or a great big comment?
->>
->> big comment is great!
-> 
-> Like the one that's already there?
+This is an initial set of (untested!) cleanups for the HVF code.
+If anyone could pick them up, I think they represent the bare minimum
+that has to be done before we can commit HVF support to master.
+It's by no means the end, but the existing MMU code in target/i386 could
+definitely stand a rewrite, and HVF could then use it as well.
 
-Yes, sorry for being that unclear, I wanted to say "_this_ big comment
-_is_ great!". I suppose I think about using #defines because my English
-isn't that conveying than yours :)
+They are available at git://github.com/bonzini/qemu.git, branch hvf.
 
-> 
-> +        /* We want to read memory for one insn, but generically we do not
-> +           know how much memory that is.  We have a small buffer which is
-> +           known to be sufficient for all supported targets.  Try to not
-> +           read beyond the page, Just In Case.  For even more simplicity,
-> +           ignore the actual target page size and use a 1k boundary.  If
-> +           that turns out to be insufficient, we'll come back around the
-> +           loop and read more.  */
-> 
-> 
-> r~
-> 
+Alex (both of them), Sergio, anyone else who can help?
+
+Paolo
+
+Paolo Bonzini (10):
+  i386: hvf: move all hvf files in the same directory
+  i386: hvf: header cleanup
+  i386: hvf: unify register enums between HVF and the rest
+  i386: hvf: remove more dead emulator code
+  i386: hvf: remove ZERO_INIT macro
+  i386: hvf: abort on decoding error
+  i386: hvf: simplify flag handling
+  i386: hvf: remove addr_t
+  i386: hvf: simplify and fix in/out handling
+  i386: hvf: cleanup x86_gen.h
+
+ target/i386/Makefile.objs                    |   2 +-
+ target/i386/cpu.h                            |  62 ++++---
+ target/i386/hvf-utils/panic.h                |  45 +++++
+ target/i386/hvf-utils/x86_flags.h            | 243 ---------------------------
+ target/i386/{hvf-utils => hvf}/Makefile.objs |   1 +
+ target/i386/{hvf-utils => hvf}/README.md     |   0
+ target/i386/{ => hvf}/hvf-i386.h             |   2 +-
+ target/i386/{hvf-all.c => hvf/hvf.c}         |  36 ++--
+ target/i386/{hvf-utils => hvf}/vmcs.h        |   0
+ target/i386/{hvf-utils => hvf}/vmx.h         |  10 +-
+ target/i386/{hvf-utils => hvf}/x86.c         |  23 +--
+ target/i386/{hvf-utils => hvf}/x86.h         | 167 ++++++------------
+ target/i386/{hvf-utils => hvf}/x86_cpuid.c   |   0
+ target/i386/{hvf-utils => hvf}/x86_cpuid.h   |   0
+ target/i386/{hvf-utils => hvf}/x86_decode.c  | 144 ++++++++--------
+ target/i386/{hvf-utils => hvf}/x86_decode.h  |  23 ++-
+ target/i386/{hvf-utils => hvf}/x86_descr.c   |  26 +--
+ target/i386/{hvf-utils => hvf}/x86_descr.h   |  21 ++-
+ target/i386/{hvf-utils => hvf}/x86_emu.c     | 238 ++++++++++----------------
+ target/i386/{hvf-utils => hvf}/x86_emu.h     |  14 +-
+ target/i386/{hvf-utils => hvf}/x86_flags.c   | 237 ++++++++++++--------------
+ target/i386/hvf/x86_flags.h                  |  77 +++++++++
+ target/i386/{hvf-utils => hvf}/x86_gen.h     |   4 -
+ target/i386/{hvf-utils => hvf}/x86_mmu.c     |  36 ++--
+ target/i386/{hvf-utils => hvf}/x86_mmu.h     |   8 +-
+ target/i386/{hvf-utils => hvf}/x86_task.c    |  65 +++----
+ target/i386/{hvf-utils => hvf}/x86_task.h    |   0
+ target/i386/{hvf-utils => hvf}/x86hvf.c      |  32 ++--
+ target/i386/{hvf-utils => hvf}/x86hvf.h      |   0
+ 29 files changed, 624 insertions(+), 892 deletions(-)
+ create mode 100644 target/i386/hvf-utils/panic.h
+ delete mode 100644 target/i386/hvf-utils/x86_flags.h
+ rename target/i386/{hvf-utils => hvf}/Makefile.objs (87%)
+ rename target/i386/{hvf-utils => hvf}/README.md (100%)
+ rename target/i386/{ => hvf}/hvf-i386.h (97%)
+ rename target/i386/{hvf-all.c => hvf/hvf.c} (97%)
+ rename target/i386/{hvf-utils => hvf}/vmcs.h (100%)
+ rename target/i386/{hvf-utils => hvf}/vmx.h (97%)
+ rename target/i386/{hvf-utils => hvf}/x86.c (88%)
+ rename target/i386/{hvf-utils => hvf}/x86.h (71%)
+ rename target/i386/{hvf-utils => hvf}/x86_cpuid.c (100%)
+ rename target/i386/{hvf-utils => hvf}/x86_cpuid.h (100%)
+ rename target/i386/{hvf-utils => hvf}/x86_decode.c (96%)
+ rename target/i386/{hvf-utils => hvf}/x86_decode.h (94%)
+ rename target/i386/{hvf-utils => hvf}/x86_descr.c (82%)
+ rename target/i386/{hvf-utils => hvf}/x86_descr.h (75%)
+ rename target/i386/{hvf-utils => hvf}/x86_emu.c (84%)
+ rename target/i386/{hvf-utils => hvf}/x86_emu.h (75%)
+ rename target/i386/{hvf-utils => hvf}/x86_flags.c (57%)
+ create mode 100644 target/i386/hvf/x86_flags.h
+ rename target/i386/{hvf-utils => hvf}/x86_gen.h (93%)
+ rename target/i386/{hvf-utils => hvf}/x86_mmu.c (85%)
+ rename target/i386/{hvf-utils => hvf}/x86_mmu.h (84%)
+ rename target/i386/{hvf-utils => hvf}/x86_task.c (81%)
+ rename target/i386/{hvf-utils => hvf}/x86_task.h (100%)
+ rename target/i386/{hvf-utils => hvf}/x86hvf.c (93%)
+ rename target/i386/{hvf-utils => hvf}/x86hvf.h (100%)
+
+-- 
+2.13.6
