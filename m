@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dzM7x-0003hu-Gi
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:16:46 -0400
+	(envelope-from <lprosek@redhat.com>) id 1dzMBt-0005jE-Uz
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:20:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dzM7t-0001Ho-5t
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:16:45 -0400
-Received: from mail-vk0-f43.google.com ([209.85.213.43]:55125)
+	(envelope-from <lprosek@redhat.com>) id 1dzMBp-0000cj-V2
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:20:49 -0400
+Received: from mail-ua0-f179.google.com ([209.85.217.179]:52391)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dzM7t-0001Gu-23
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:16:41 -0400
-Received: by mail-vk0-f43.google.com with SMTP id c19so4423873vke.11
-	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 05:16:41 -0700 (PDT)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dzMBp-0000c0-QF
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:20:45 -0400
+Received: by mail-ua0-f179.google.com with SMTP id i35so2408774uah.9
+	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 05:20:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <150642393032.3900.4598141276692628379.stgit@Misha-PC.lan02.inno>
+In-Reply-To: <150642395256.3900.7797961982959292389.stgit@Misha-PC.lan02.inno>
 References: <150642384156.3900.3326424823772221077.stgit@Misha-PC.lan02.inno>
-	<150642393032.3900.4598141276692628379.stgit@Misha-PC.lan02.inno>
+	<150642395256.3900.7797961982959292389.stgit@Misha-PC.lan02.inno>
 From: Ladi Prosek <lprosek@redhat.com>
-Date: Tue, 3 Oct 2017 14:16:39 +0200
-Message-ID: <CABdb734ijMQ_2-k669-rGErYnq3zJGN=MyyuR_=jwAwnoGC-Kg@mail.gmail.com>
+Date: Tue, 3 Oct 2017 14:20:44 +0200
+Message-ID: <CABdb73622pU09nem99V8_DihiCEPRH0NH7OKJzsVpdiFOEJiWA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 15/43] windbg: sized data buffer
+Subject: Re: [Qemu-devel] [PATCH 19/43] windbg: implemented
+ windbg_process_control_packet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,41 +34,51 @@ Cc: qemu-devel <qemu-devel@nongnu.org>, sw@weilnetz.de, Pavel Dovgalyuk <dovgalu
 
 On Tue, Sep 26, 2017 at 1:05 PM, Mihail Abakumov
 <mikhail.abakumov@ispras.ru> wrote:
-> Defined useful sized data buffer. It contains pointer to data and size of this data. Also, defined some macroses for init and free.
-
-"macros" instead of "macroses", same in patch 31.
-
 > Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
 > Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 > Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
 > ---
->  include/exec/windbgstub-utils.h |   15 +++++++++++++++
->  1 file changed, 15 insertions(+)
+>  windbgstub.c |   26 +++++++++++++++++++++++++-
+>  1 file changed, 25 insertions(+), 1 deletion(-)
 >
-> diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-> index cf2996d8cb..791721d472 100755
-> --- a/include/exec/windbgstub-utils.h
-> +++ b/include/exec/windbgstub-utils.h
-> @@ -86,6 +86,21 @@ typedef struct PacketData {
->      uint16_t extra_size;
->  } PacketData;
+> diff --git a/windbgstub.c b/windbgstub.c
+> index 3a13d22349..b8053102dd 100755
+> --- a/windbgstub.c
+> +++ b/windbgstub.c
+> @@ -126,7 +126,31 @@ static void windbg_process_data_packet(ParsingContext *ctx)
+>  {}
 >
-> +typedef struct SizedBuf {
-> +    uint8_t *data;
-> +    size_t size;
-> +} SizedBuf;
+>  static void windbg_process_control_packet(ParsingContext *ctx)
+> -{}
+> +{
+> +    switch (ctx->packet.PacketType) {
+> +    case PACKET_TYPE_KD_ACKNOWLEDGE:
+> +        break;
 > +
-> +#define SBUF_INIT(buf, mem_ptr, len) do { \
-> +    buf.data = mem_ptr;                   \
-> +    buf.size = len;                       \
-> +} while (false)
-> +#define SBUF_MALLOC(buf, size) SBUF_INIT(buf, g_malloc0(size), size)
-> +#define SBUF_FREE(buf) do { \
-> +    g_free(buf.data);       \
-> +    buf.data = NULL;        \
-> +    buf.size = 0;           \
-> +} while (false)
->  bool windbg_on_load(void);
->  void windbg_on_exit(void);
+> +    case PACKET_TYPE_KD_RESET:
+> +    {
+> +        SizedBuf buf = kd_gen_load_symbols_sc(qemu_get_cpu(0));
+> +
+> +        windbg_send_data_packet(buf.data, buf.size,
+> +                                PACKET_TYPE_KD_STATE_CHANGE64);
+> +        windbg_send_control_packet(ctx->packet.PacketType);
+> +        windbg_state->ctrl_packet_id = INITIAL_PACKET_ID;
+> +        SBUF_FREE(buf);
+> +        break;
+> +    }
+> +    default:
+> +        WINDBG_ERROR("Catched unsupported control packet 0x%x",
+
+"caught" instead of "catched", same in patches 20 and 21.
+
+> +                     ctx->packet.PacketType);
+> +
+> +        windbg_state->ctrl_packet_id = 0;
+> +        windbg_send_control_packet(PACKET_TYPE_KD_RESEND);
+> +        break;
+> +    }
+> +}
 >
+>  static void windbg_ctx_handler(ParsingContext *ctx)
+>  {
 >
