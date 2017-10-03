@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dzOra-0007Qc-Cw
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 11:12:03 -0400
+	(envelope-from <y_hebbal@esi.dz>) id 1dzJPJ-0001VY-0S
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 05:22:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dzOrU-0002F3-AM
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 11:12:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59622)
+	(envelope-from <y_hebbal@esi.dz>) id 1dzJPI-0007za-3y
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 05:22:29 -0400
+Received: from mail-io0-x234.google.com ([2607:f8b0:4001:c06::234]:47210)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dzOrU-0002ET-4I
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 11:11:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dzOrR-0002mt-88
-	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 15:11:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 301AC2E80C8
-	for <qemu-devel@nongnu.org>; Tue,  3 Oct 2017 15:11:53 +0000 (UTC)
+	(Exim 4.71) (envelope-from <y_hebbal@esi.dz>) id 1dzJPH-0007sa-Ur
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 05:22:28 -0400
+Received: by mail-io0-x234.google.com with SMTP id m201so1730887iom.4
+	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 02:22:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 03 Oct 2017 14:52:18 -0000
-From: Thomas Huth <1320360@bugs.launchpad.net>
-Reply-To: Bug 1320360 <1320360@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140516193455.16097.46510.malonedeb@gac.canonical.com>
-Message-Id: <150704233876.2579.2299518051611967620.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1320360] Re: usb passthrough not working anymore
+From: HEBBAL Yacine <y_hebbal@esi.dz>
+Date: Tue, 3 Oct 2017 11:22:24 +0200
+Message-ID: <CACEoar4cvTTY+m+J00aNPx6XjOxXmWMi1fXYsNmkB4SU4Dm3+w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] [Question] Where Qemu kvm_run structure is
+ synchronized with the one of KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,44 +28,14 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Thanks for checking again!
+Hi All,
+I added a field to "kvm_run" data structure in both Qemu and KVM to create
+a communication interface for a VM security monitoring application in order
+to avoid heavy modifications in the hypervisor.
+The problem I'm facing is that when this field is updated in KVM after a VM
+exit, I don't see the written value in "kvm_run" at Qemu function
+"kvm_arch_handle_exit".
+My question is how "kvm_run" is synchronized between Qemu and KVM ?
+Thank you in advance for your answers
 
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1320360
-
-Title:
-  usb passthrough not working anymore
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  Hi,
-
-  I'm using qemu 2.0.0 with opensuse 13.1 x84_64 bit as host and window7
-  as guest. Til qemu version 1.6.2 USB passthrough works perfectly, but
-  starting with qemu 2.0.0 passthrough stop working. I can still add the
-  usb device but when I start the guest following message appears:
-
-  "unable to execute QEMU command 'device_add': 'usb-host' is not a
-  valid device model name"
-
-  Then the guest will not start.
-
-  I try it with different usb devices (iphone, stick, hdd), always the
-  same error.
-
-  Are there any news / hints about this ?
-
-  Regards
-
-  Martin
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1320360/+subscriptions
+Yacine
