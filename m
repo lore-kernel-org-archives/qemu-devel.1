@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dzK5f-0004zD-UL
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 06:06:17 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dzK7U-0005tW-Mo
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 06:08:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dzK5b-00052Y-Sg
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 06:06:15 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47464)
+	(envelope-from <pbonzini@redhat.com>) id 1dzK7P-0006Z8-0K
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 06:08:08 -0400
+Received: from mail-wm0-f52.google.com ([74.125.82.52]:50766)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dzK5b-00051s-Ld
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 06:06:11 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dzK5a-0006SI-1I
-	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 10:06:10 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 07D9F2E80D0
-	for <qemu-devel@nongnu.org>; Tue,  3 Oct 2017 10:06:10 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dzK7O-0006Yn-PC
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 06:08:02 -0400
+Received: by mail-wm0-f52.google.com with SMTP id u138so15502041wmu.5
+	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 03:08:02 -0700 (PDT)
+References: <20170925135801.144261-1-vsementsov@virtuozzo.com>
+	<20170925135801.144261-9-vsementsov@virtuozzo.com>
+	<b8b01f1a-6e7b-342f-02b6-b7386bff1500@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a4fb096f-7995-ad85-64b7-68a124410e86@redhat.com>
+Date: Tue, 3 Oct 2017 12:07:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 03 Oct 2017 09:54:52 -0000
-From: Thomas Huth <1660035@bugs.launchpad.net>
-Reply-To: Bug 1660035 <1660035@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170128131607.26951.44105.malonedeb@wampee.canonical.com>
-Message-Id: <150702449222.21028.14118892942425383580.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1660035] Re: hw/timer/altera_timer.c:207: bad
- size in memset ?
+In-Reply-To: <b8b01f1a-6e7b-342f-02b6-b7386bff1500@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 8/8] nbd: Minimal structured
+ read for client
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,39 +32,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
 
-This problem should have been fixed with QEMU v2.10.0:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dcc16ee9d4ecec35ea04e
+On 26/09/2017 00:19, Eric Blake wrote:
+>> +    /* here we deal with successful structured reply */
+>> +    switch (s->reply.type) {
+>> +        QEMUIOVector sub_qiov;
+>> +    case NBD_SREP_TYPE_OFFSET_DATA:
+> This is putting a LOT of smarts directly into the receive routine.
+> Here's where I was previously wondering (and I think Paolo as well)
+> whether it might be better to split the efforts: the generic function
+> reads off the chunk information and any payload, but a per-command
+> callback function then parses the chunks.  Especially since the
+> definition of the chunks differs on a per-command basis (yes, the NBD
+> spec will try to not reuse an SREP chunk type across multiple commands
+> unless the semantics are similar, but that's a bit more fragile).  This
+> particularly matters given my statement above that you want a
+> discriminated union, rather than a struct that contains unused fields,
+> for handling different SREP chunk types.
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+I think there should be two kinds of replies: 1) read directly into a
+QEMUIOVector, using structured replies only as an encapsulation of the
+payload; 2) read a chunk at a time into malloc-ed memory, yielding back
+to the calling coroutine after receiving one complete chunk.
 
--- =
+In the end this probably means that you have a read_chunk_header
+function and a read_chunk function.  READ has a loop that calls
+read_chunk_header followed by direct reading into the QEMUIOVector,
+while everyone else calls read_chunk.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1660035
+Maybe qio_channel_readv/writev_full could have "offset" and "bytes"
+arguments.  Most code in iov_send_recv could be cut-and-pasted.  (When
+sheepdog is converted to QIOChannel, iov_send_recv can go away).
 
-Title:
-  hw/timer/altera_timer.c:207: bad size in memset ?
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  hw/timer/altera_timer.c:207:5: warning: =E2=80=98memset=E2=80=99 used wit=
-h length
-  equal to number of elements without multiplication by element size
-  [-Wmemset-elt-size]
-
-  Source code is
-
-       memset(t->regs, 0, ARRAY_SIZE(t->regs));
-
-  Maybe better code
-
-       memset(t->regs, 0, R_MAX * sizeof( uint32_t));
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1660035/+subscriptions
+Paolo
