@@ -1,39 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dzVZt-0003Z9-JC
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:22:14 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dzX5t-0000ZC-Fh
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 19:59:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dzVZq-0008LO-D3
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:22:13 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47034
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dzVZq-0008LC-6w
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:22:10 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v93MJSuv014826
-	for <qemu-devel@nongnu.org>; Tue, 3 Oct 2017 18:22:06 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dcgvmy1fc-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 18:22:06 -0400
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 3 Oct 2017 18:22:05 -0400
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <dgibson@ozlabs.org>) id 1dzX5s-0000wI-Ie
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 19:59:21 -0400
+Date: Wed, 4 Oct 2017 10:34:53 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171003233453.GN3260@umbus.fritz.box>
+References: <150703999112.6139.714822137654210421.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
-References: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Date: Tue, 03 Oct 2017 17:21:57 -0500
-Message-Id: <150706931752.3830.12126799989731308076@sif>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 0/3] qdev/vfio: defer DEVICE_DEL
- to avoid races with libvirt
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="tpyx7gKuSYt+mjHM"
+Content-Disposition: inline
+In-Reply-To: <150703999112.6139.714822137654210421.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/ppc: use 0 instead of
+ fdt_path_offset(fdt, "/")
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,94 +24,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, groug@kaod.org, armbru@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>
 
-Quoting Michael Roth (2017-07-26 20:30:52)
-> This series was motivated by the discussion in this thread:
-> =
 
->   https://www.redhat.com/archives/libvir-list/2017-June/msg01370.html
-> =
+--tpyx7gKuSYt+mjHM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> The issue this series addresses is that when libvirt unplugs a VFIO PCI d=
-evice,
-> it may attempt to bind the host device back to the host driver when QEMU =
-emits
-> the DEVICE_DELETED event for the corresponding vfio-pci device. However, =
-the
-> VFIO group FD is not actually cleaned up until vfio-pci device is *finali=
-zed*
-> by QEMU, whereas the event is emitted earlier during device_unparent.
-> Depending on the host device and how long certain operations like resetti=
-ng the
-> device might take, this can in result in libvirt trying to rebind the dev=
-ice
-> back to the host while it is still in use by VFIO, leading to host crashe=
-s or
-> other unexpected behavior.
-> =
-
-> In particular, Mellanox CX4 adapters on PowerNV hosts might not be fully
-> quiesced by vfio-pci's finalize() routine until up to 6s after the
-> DEVICE_DELETED was emitted, leading to detach-device on the libvirt side =
-pretty
-> much always crashing the host.
-> =
-
-> Implementing this change requires 2 prereqs to ensure the same informatio=
-n is
-> available when the DEVICE_DELETED is finally emitted:
-> =
-
-> 1) Storing the path in the composition patch, which is addressed by PATCH=
- 1,
->    which was plucked from another pending series from Greg Kurz:
-> =
-
->    https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg07922.html
-> =
-
->    since we are now "disconnected" at the time the event is emitted, and
-> =
-
-> 2) Deferring qemu_opts_del of the DeviceState->QemuOpts till finalize, si=
-nce
->    that is where DeviceState->id is stored. This was actually how it was
->    done in the past, so PATCH 2 simply reverts the change which moved it =
-to
->    device_unparent.
-> =
-
-> From there it's just a mechanical move of the event from device_unparent =
-to
-> device_finalize.
-
-Ping.
-
-The situation has changed somewhat since original posting as Alex now
-has a fix on the kernel side for the VFIO issue noted above:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit=
-/?id=3D6586b561a91cd80a91c8f107ed0d144feb3eadc2
-
-However, I think this series would still be useful for addressing the
-issue for hosts using older kernels, and there seems to be general
-interest from the libvirt side in aligning "DEVICE_DELETED" events
-with the notion that QEMU is completely finished with a device.
-
-Patch 1/3 is also needed for another series that Greg is working on
-and I don't want to hold that up for this series, so if it's
-preferred that we just post that patch separately in the meantime
-please let me know.
-
-Thanks!
-
-> =
-
->  hw/core/qdev.c         | 30 +++++++++++++++++++-----------
->  include/hw/qdev-core.h |  1 +
->  2 files changed, 20 insertions(+), 11 deletions(-)
-> =
-
+On Tue, Oct 03, 2017 at 04:13:11PM +0200, Greg Kurz wrote:
+> The offset of the root node is guaranteed to be 0.
 >=20
+> This doesn't fix anything, it's just trivial cleanup of the two
+> remaining places where this was done under hw/ppc.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+
+Applied to ppc-for-2.11.
+
+> ---
+>  hw/ppc/pnv.c   |    3 +--
+>  hw/ppc/spapr.c |    3 +--
+>  2 files changed, 2 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index d46d91c76f5c..84b2389ea60b 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -92,8 +92,7 @@ static int get_cpus_node(void *fdt)
+>      int cpus_offset =3D fdt_path_offset(fdt, "/cpus");
+> =20
+>      if (cpus_offset < 0) {
+> -        cpus_offset =3D fdt_add_subnode(fdt, fdt_path_offset(fdt, "/"),
+> -                                      "cpus");
+> +        cpus_offset =3D fdt_add_subnode(fdt, 0, "cpus");
+>          if (cpus_offset) {
+>              _FDT((fdt_setprop_cell(fdt, cpus_offset, "#address-cells", 0=
+x1)));
+>              _FDT((fdt_setprop_cell(fdt, cpus_offset, "#size-cells", 0x0)=
+));
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index ff87f155d55e..352ff3d614e8 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -353,8 +353,7 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachine=
+State *spapr)
+> =20
+>          cpus_offset =3D fdt_path_offset(fdt, "/cpus");
+>          if (cpus_offset < 0) {
+> -            cpus_offset =3D fdt_add_subnode(fdt, fdt_path_offset(fdt, "/=
+"),
+> -                                          "cpus");
+> +            cpus_offset =3D fdt_add_subnode(fdt, 0, "cpus");
+>              if (cpus_offset < 0) {
+>                  return cpus_offset;
+>              }
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--tpyx7gKuSYt+mjHM
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnUHpsACgkQbDjKyiDZ
+s5JyDhAAt+y4WmXRqBeBCz4h3UXGL4MR1gCiC2uX05QCDPlmewpwq6kJPzzbjzxa
+eqWMqFkaxg5pKGLkyAKRve1SvMlZv5zPZ882+y7qm4PlFkg+cUlMS4Id2V8VItTO
+p8xuRZslvToPSsoyMKTpa/D5PIXY6GyU4hw6DdFbbzPjgGCmBT1Vlk+IJ023w433
+9sEIlN0lZMpcugVh+XITFqdl03Di8EsXCje6BQynJLH95JpQaCz0vNViLdpcE5RB
+VA26jo2tMxbQQXTQWpB77XuZcgqM8K2NbVAypfnzyl+gfZQHcVhIObg3zWV3GPdw
+Fi52iLgIJNRImTAZwDKNF2l5QhKZBJ6yyAS9WyXXk8u/sOImwJDMugtmUBRb1IWK
+CyiK2TbjRhwl7OHXmIjRzoRAhVjgLR0m3Bl7Q6t6lAoId4syRVnnjiyBYybSS7t7
+TG4KzX29XwG4RZdMbjfdh6+ewhThMDOfmwyhJCfEjS9pJTRQHaWKLQ1pGIhRPfD+
+1vDz9pYgVkUNihxVg5MnClylZikG6FCAjfSix6HgZhWDkh37C/Wo+DkHKQ2FWXtf
+cm7OsTBLPqtoegCrUwdYADpF/9z+vKqFzSHjLDpOmQ/6vFj76Ux9Zf+sy6Xb1DLv
+HPxMOFsa+OOdQAivezV4+k4UnVBIvyDwnEnmKoXskwtU+C3Cr50=
+=UBQU
+-----END PGP SIGNATURE-----
+
+--tpyx7gKuSYt+mjHM--
