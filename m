@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dzMNf-0001wr-RE
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:33:00 -0400
+	(envelope-from <lprosek@redhat.com>) id 1dzMRU-0003IL-FQ
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:37:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dzMNb-0008Pg-Ow
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:32:59 -0400
-Received: from mail-ua0-f169.google.com ([209.85.217.169]:51506)
+	(envelope-from <lprosek@redhat.com>) id 1dzMRR-0002zD-8Y
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:36:56 -0400
+Received: from mail-ua0-f171.google.com ([209.85.217.171]:57016)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dzMNb-0008PV-Jl
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:32:55 -0400
-Received: by mail-ua0-f169.google.com with SMTP id 47so4752226uas.8
-	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 05:32:55 -0700 (PDT)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dzMRR-0002z3-43
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:36:53 -0400
+Received: by mail-ua0-f171.google.com with SMTP id n22so3689777uaj.13
+	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 05:36:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <150642399172.3900.299369975046339119.stgit@Misha-PC.lan02.inno>
+In-Reply-To: <150642400352.3900.13935192906711901682.stgit@Misha-PC.lan02.inno>
 References: <150642384156.3900.3326424823772221077.stgit@Misha-PC.lan02.inno>
-	<150642399172.3900.299369975046339119.stgit@Misha-PC.lan02.inno>
+	<150642400352.3900.13935192906711901682.stgit@Misha-PC.lan02.inno>
 From: Ladi Prosek <lprosek@redhat.com>
-Date: Tue, 3 Oct 2017 14:32:54 +0200
-Message-ID: <CABdb7349FFuZo41gk3r_Ow8RNz=pVjgSf+Gf47Fnu04pDyPs_g@mail.gmail.com>
+Date: Tue, 3 Oct 2017 14:36:51 +0200
+Message-ID: <CABdb734KoO5Myps-hA9qkhUDP=XvBtZsVgyB_G=W1+9p5e5j5A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 26/43] windbg: implemented
- windbg_read_context
+Subject: Re: [Qemu-devel] [PATCH 28/43] windbg: implemented
+ windbg_read_ks_regs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,111 +38,58 @@ On Tue, Sep 26, 2017 at 1:06 PM, Mihail Abakumov
 > Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 > Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
 > ---
->  windbgstub-utils.c |   90 +++++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 89 insertions(+), 1 deletion(-)
+>  windbgstub-utils.c |   38 ++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 38 insertions(+)
 >
 > diff --git a/windbgstub-utils.c b/windbgstub-utils.c
-> index c3ae2ddf5b..23bf4be9f0 100755
+> index 73ff98dfbc..537ba9e2aa 100755
 > --- a/windbgstub-utils.c
 > +++ b/windbgstub-utils.c
-> @@ -280,7 +280,95 @@ static KDData *kd;
->  static int windbg_read_context(CPUState *cpu, uint8_t *buf, int len,
+> @@ -587,6 +587,44 @@ static int windbg_write_context(CPUState *cpu, uint8_t *buf, int len,
+>  static int windbg_read_ks_regs(CPUState *cpu, uint8_t *buf, int len,
 >                                 int offset)
 >  {
-> -    return 0;
-> +    const bool new_mem = (len != sizeof(CPU_CONTEXT) || offset != 0);
 > +    CPUArchState *env = cpu->env_ptr;
-> +    CPU_CONTEXT *cc;
-> +    int err = 0;
-> +
+> +    const bool new_mem = (len != sizeof(CPU_KSPECIAL_REGISTERS)
+> +                       || offset != 0);
+> +    CPU_KSPECIAL_REGISTERS *ckr;
 > +    if (new_mem) {
-> +        cc = g_new(CPU_CONTEXT, 1);
+> +        ckr = g_new(CPU_KSPECIAL_REGISTERS, 1);
 > +    } else {
-> +        cc = (CPU_CONTEXT *) buf;
+> +        ckr = (CPU_KSPECIAL_REGISTERS *) buf;
 > +    }
 > +
-> +    memset(cc, 0, len);
+> +    memset(ckr, 0, len);
 
-This overruns the buffer if len > sizeof(CPU_CONTEXT).
+Buffer overrun on len > sizeof(CPU_KSPECIAL_REGISTERS).
 
+> +    ckr->Cr0 = ldl_p(&env->cr[0]);
+> +    ckr->Cr2 = ldl_p(&env->cr[2]);
+> +    ckr->Cr3 = ldl_p(&env->cr[3]);
+> +    ckr->Cr4 = ldl_p(&env->cr[4]);
 > +
-> +    cc->ContextFlags = CPU_CONTEXT_ALL;
+> +    ckr->KernelDr0 = ldtul_p(&env->dr[0]);
+> +    ckr->KernelDr1 = ldtul_p(&env->dr[1]);
+> +    ckr->KernelDr2 = ldtul_p(&env->dr[2]);
+> +    ckr->KernelDr3 = ldtul_p(&env->dr[3]);
+> +    ckr->KernelDr6 = ldtul_p(&env->dr[6]);
+> +    ckr->KernelDr7 = ldtul_p(&env->dr[7]);
 > +
-> +    if (cc->ContextFlags & CPU_CONTEXT_SEGMENTS) {
-> +        cc->SegCs = lduw_p(&env->segs[R_CS].selector);
-> +        cc->SegDs = lduw_p(&env->segs[R_DS].selector);
-> +        cc->SegEs = lduw_p(&env->segs[R_ES].selector);
-> +        cc->SegFs = lduw_p(&env->segs[R_FS].selector);
-> +        cc->SegGs = lduw_p(&env->segs[R_GS].selector);
-> +        cc->SegSs = lduw_p(&env->segs[R_SS].selector);
-> +    }
+> +    ckr->Gdtr.Pad = lduw_p(&env->gdt.selector);
+> +    ckr->Idtr.Pad = lduw_p(&env->idt.selector);
 > +
-> +    if (cc->ContextFlags & CPU_CONTEXT_DEBUG_REGISTERS) {
-> +        cc->Dr0 = ldtul_p(&env->dr[0]);
-> +        cc->Dr1 = ldtul_p(&env->dr[1]);
-> +        cc->Dr2 = ldtul_p(&env->dr[2]);
-> +        cc->Dr3 = ldtul_p(&env->dr[3]);
-> +        cc->Dr6 = ldtul_p(&env->dr[6]);
-> +        cc->Dr7 = ldtul_p(&env->dr[7]);
-> +    }
-> +
-> +    if (cc->ContextFlags & CPU_CONTEXT_INTEGER) {
-> +        cc->Edi    = ldl_p(&env->regs[R_EDI]);
-> +        cc->Esi    = ldl_p(&env->regs[R_ESI]);
-> +        cc->Ebx    = ldl_p(&env->regs[R_EBX]);
-> +        cc->Edx    = ldl_p(&env->regs[R_EDX]);
-> +        cc->Ecx    = ldl_p(&env->regs[R_ECX]);
-> +        cc->Eax    = ldl_p(&env->regs[R_EAX]);
-> +        cc->Ebp    = ldl_p(&env->regs[R_EBP]);
-> +        cc->Esp    = ldl_p(&env->regs[R_ESP]);
-> +
-> +        cc->Eip    = ldl_p(&env->eip);
-> +        cc->EFlags = ldl_p(&env->eflags);
-> +    }
-> +
-> +    if (cc->ContextFlags & CPU_CONTEXT_FLOATING_POINT) {
-> +        uint32_t swd = 0, twd = 0;
-> +        swd = env->fpus & ~(7 << 11);
-> +        swd |= (env->fpstt & 7) << 11;
-> +        int i;
-> +        for (i = 0; i < 8; ++i) {
-> +            twd |= (!env->fptags[i]) << i;
-> +        }
-> +
-> +        cc->FloatSave.ControlWord    = ldl_p(&env->fpuc);
-> +        cc->FloatSave.StatusWord     = ldl_p(&swd);
-> +        cc->FloatSave.TagWord        = ldl_p(&twd);
-> +        cc->FloatSave.ErrorOffset    = ldl_p(PTR(env->fpip));
-> +        cc->FloatSave.ErrorSelector  = ldl_p(PTR(env->fpip) + 32);
-> +        cc->FloatSave.DataOffset     = ldl_p(PTR(env->fpdp));
-> +        cc->FloatSave.DataSelector   = ldl_p(PTR(env->fpdp) + 32);
-> +        cc->FloatSave.Cr0NpxState    = ldl_p(&env->xcr0);
-> +
-> +        for (i = 0; i < 8; ++i) {
-> +            memcpy(PTR(cc->FloatSave.RegisterArea[i * 10]),
-> +                   PTR(env->fpregs[i]), 10);
-> +        }
-> +    }
-> +
-> +    if (cc->ContextFlags & CPU_CONTEXT_EXTENDED_REGISTERS) {
-> +        uint8_t *ptr = cc->ExtendedRegisters + 160;
-> +        int i;
-> +        for (i = 0; i < 8; ++i, ptr += 16) {
-> +            stq_p(ptr,     env->xmm_regs[i].ZMM_Q(0));
-> +            stq_p(ptr + 8, env->xmm_regs[i].ZMM_Q(1));
-> +        }
-> +
-> +        stl_p(cc->ExtendedRegisters + 24, env->mxcsr);
-> +    }
-> +
-> +    cc->ContextFlags = ldl_p(&cc->ContextFlags);
+> +    ckr->Gdtr.Limit = lduw_p(&env->gdt.limit);
+> +    ckr->Gdtr.Base  = ldtul_p(&env->gdt.base);
+> +    ckr->Idtr.Limit = lduw_p(&env->idt.limit);
+> +    ckr->Idtr.Base  = ldtul_p(&env->idt.base);
+> +    ckr->Tr         = lduw_p(&env->tr.selector);
+> +    ckr->Ldtr       = lduw_p(&env->ldt.selector);
 > +
 > +    if (new_mem) {
-> +        memcpy(buf, (uint8_t *) cc + offset, len);
-> +        g_free(cc);
+> +        memcpy(buf, (uint8_t *) ckr + offset, len);
+> +        g_free(ckr);
 > +    }
-> +    return err;
+>      return 0;
 >  }
 >
->  static int windbg_write_context(CPUState *cpu, uint8_t *buf, int len,
 >
