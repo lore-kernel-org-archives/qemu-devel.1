@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dzVQg-0007Sc-Ky
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:12:43 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1dzVQu-0007Z6-4z
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:12:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dzVQd-0002if-Ea
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:12:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49372)
+	(envelope-from <alex.williamson@redhat.com>) id 1dzVQq-0002t2-V6
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:12:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52168)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1dzVQd-0002iG-7y
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:12:39 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	id 1dzVQq-0002sJ-OF
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:12:52 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4F52781227
-	for <qemu-devel@nongnu.org>; Tue,  3 Oct 2017 22:12:38 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E5CAC61467
+	for <qemu-devel@nongnu.org>; Tue,  3 Oct 2017 22:12:51 +0000 (UTC)
 From: Alex Williamson <alex.williamson@redhat.com>
-Date: Tue, 03 Oct 2017 16:12:36 -0600
-Message-ID: <20171003221230.17156.56507.stgit@gimli.home>
+Date: Tue, 03 Oct 2017 16:12:49 -0600
+Message-ID: <20171003221243.17156.78713.stgit@gimli.home>
 In-Reply-To: <20171003221012.17156.23559.stgit@gimli.home>
 References: <20171003221012.17156.23559.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PULL 1/3] vfio/pci: Do not unwind on error
+Subject: [Qemu-devel] [PULL 2/3] vfio/pci: Add virtual capabilities quirk
+ infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,35 +36,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-If vfio_add_std_cap() errors then going to out prepends irrelevant
-errors for capabilities we haven't attempted to add as we unwind our
-recursive stack.  Just return error.
+If the hypervisor needs to add purely virtual capabilties, give us a
+hook through quirks to do that.  Note that we determine the maximum
+size for a capability based on the physical device, if we insert a
+virtual capability, that can change.  Therefore if maximum size is
+smaller after added virt capabilities, use that.
 
-Fixes: 7ef165b9a8d9 ("vfio/pci: Pass an error object to vfio_add_capabilities")
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/vfio/pci.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/vfio/pci-quirks.c |    4 ++++
+ hw/vfio/pci.c        |    8 ++++++++
+ hw/vfio/pci.h        |    1 +
+ 3 files changed, 13 insertions(+)
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 31e1edf44745..916d365dfab3 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -1826,7 +1826,7 @@ static int vfio_add_std_cap(VFIOPCIDevice *vdev, uint8_t pos, Error **errp)
-     if (next) {
-         ret = vfio_add_std_cap(vdev, next, errp);
-         if (ret) {
--            goto out;
-+            return ret;
-         }
-     } else {
-         /* Begin the rebuild, use QEMU emulated list bits */
-@@ -1862,7 +1862,7 @@ static int vfio_add_std_cap(VFIOPCIDevice *vdev, uint8_t pos, Error **errp)
-         ret = pci_add_capability(pdev, cap_id, pos, size, errp);
+diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+index 349085ea12bc..40aaae76feb9 100644
+--- a/hw/vfio/pci-quirks.c
++++ b/hw/vfio/pci-quirks.c
+@@ -1850,3 +1850,7 @@ void vfio_setup_resetfn_quirk(VFIOPCIDevice *vdev)
          break;
      }
--out:
+ }
++int vfio_add_virt_caps(VFIOPCIDevice *vdev, Error **errp)
++{
++    return 0;
++}
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 916d365dfab3..bfeaaef22d00 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -1833,8 +1833,16 @@ static int vfio_add_std_cap(VFIOPCIDevice *vdev, uint8_t pos, Error **errp)
+         pdev->config[PCI_CAPABILITY_LIST] = 0;
+         vdev->emulated_config_bits[PCI_CAPABILITY_LIST] = 0xff;
+         vdev->emulated_config_bits[PCI_STATUS] |= PCI_STATUS_CAP_LIST;
 +
-     if (ret < 0) {
-         error_prepend(errp,
-                       "failed to add PCI capability 0x%x[0x%x]@0x%x: ",
++        ret = vfio_add_virt_caps(vdev, errp);
++        if (ret) {
++            return ret;
++        }
+     }
+ 
++    /* Scale down size, esp in case virt caps were added above */
++    size = MIN(size, vfio_std_cap_max_size(pdev, pos));
++
+     /* Use emulated next pointer to allow dropping caps */
+     pci_set_byte(vdev->emulated_config_bits + pos + PCI_CAP_LIST_NEXT, 0xff);
+ 
+diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+index a8366bb2a74a..958cee058b3b 100644
+--- a/hw/vfio/pci.h
++++ b/hw/vfio/pci.h
+@@ -160,6 +160,7 @@ void vfio_bar_quirk_setup(VFIOPCIDevice *vdev, int nr);
+ void vfio_bar_quirk_exit(VFIOPCIDevice *vdev, int nr);
+ void vfio_bar_quirk_finalize(VFIOPCIDevice *vdev, int nr);
+ void vfio_setup_resetfn_quirk(VFIOPCIDevice *vdev);
++int vfio_add_virt_caps(VFIOPCIDevice *vdev, Error **errp);
+ 
+ int vfio_populate_vga(VFIOPCIDevice *vdev, Error **errp);
+ 
