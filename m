@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=442e384dd=anthony.perard@citrix.com>)
-	id 1dzLfz-0003n8-UC
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 07:47:52 -0400
+	(envelope-from <lprosek@redhat.com>) id 1dzLhY-0004RW-Ju
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 07:49:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=442e384dd=anthony.perard@citrix.com>)
-	id 1dzLfw-0007x8-Ph
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 07:47:51 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:56749)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=442e384dd=anthony.perard@citrix.com>)
-	id 1dzLfw-0007uk-JO
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 07:47:48 -0400
-Date: Tue, 3 Oct 2017 12:47:43 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20171003114742.GC2116@perard.uk.xensource.com>
-References: <20171002163058.15651-1-anthony.perard@citrix.com>
-	<20171003113337.nkde7v236fww3npt@MacBook-Pro-de-Roger.local>
+	(envelope-from <lprosek@redhat.com>) id 1dzLhV-0000oL-Du
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 07:49:28 -0400
+Received: from mail-ua0-f175.google.com ([209.85.217.175]:55045)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dzLhV-0000nn-9R
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 07:49:25 -0400
+Received: by mail-ua0-f175.google.com with SMTP id l94so5010944ual.11
+	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 04:49:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20171003113337.nkde7v236fww3npt@MacBook-Pro-de-Roger.local>
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH] migration,
- xen: Fix block image lock issue on live migration
+In-Reply-To: <150642388560.3900.1889412060549174598.stgit@Misha-PC.lan02.inno>
+References: <150642384156.3900.3326424823772221077.stgit@Misha-PC.lan02.inno>
+	<150642388560.3900.1889412060549174598.stgit@Misha-PC.lan02.inno>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Tue, 3 Oct 2017 13:49:24 +0200
+Message-ID: <CABdb736D975ai2N_o9Df5UCn5de6ohrxtajTmtT-B8smbDDvKw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 07/43] windbg: added chardev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,29 +28,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
-Cc: qemu-devel@nongnu.org, Wei Liu <wei.liu2@citrix.com>, Juan Quintela <quintela@redhat.com>, Ian Jackson <ian.jackson@eu.citrix.com>, "Dr. David
-	Alan Gilbert" <dgilbert@redhat.com>, xen-devel@lists.xenproject.org
+To: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+Cc: qemu-devel <qemu-devel@nongnu.org>, sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-On Tue, Oct 03, 2017 at 12:33:37PM +0100, Roger Pau Monné wrote:
-> On Mon, Oct 02, 2017 at 04:30:58PM +0000, Anthony PERARD wrote:
-> > When doing a live migration of a Xen guest with libxl, the images for
-> > block devices are locked by the original QEMU process, and this prevent
-> > the QEMU at the destination to take the lock and the migration fail.
-> > 
-> > From QEMU point of view, once the RAM of a domain is migrated, there is
-> > two QMP commands, "stop" then "xen-save-devices-state", at which point a
-> > new QEMU is spawned at the destination.
-> > 
-> > Release locks in "xen-save-devices-state" so the destination can takes
-> > them.
-> 
-> What happens if the migration fails on the destination? Will QEMU pick
-> the lock again when resuming on the source in this case?
+On Tue, Sep 26, 2017 at 1:04 PM, Mihail Abakumov
+<mikhail.abakumov@ispras.ru> wrote:
+> Added chardev for listening to windbg. Target device is a parameter in the '-windbg' option.
+>
+> Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+> Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+> Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
+> ---
+>  windbgstub.c |   26 ++++++++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+>
+> diff --git a/windbgstub.c b/windbgstub.c
+> index 60a380c213..378d1b911f 100755
+> --- a/windbgstub.c
+> +++ b/windbgstub.c
+> @@ -10,6 +10,7 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> +#include "qapi/error.h"
+>  #include "chardev/char.h"
+>  #include "chardev/char-fe.h"
+>  #include "exec/windbgstub.h"
+> @@ -18,12 +19,26 @@
+>  typedef struct WindbgState {
+>      bool is_loaded;
+>
+> +    CharBackend chr;
+> +
+>      uint32_t ctrl_packet_id;
+>      uint32_t data_packet_id;
+>  } WindbgState;
+>
+>  static WindbgState *windbg_state;
+>
+> +static int windbg_chr_can_receive(void *opaque)
+> +{
+> +    return PACKET_MAX_SIZE;
+> +}
+> +
+> +static void windbg_chr_receive(void *opaque, const uint8_t *buf, int size)
+> +{
+> +    if (windbg_state->is_loaded) {
+> +        /* T0D0: parse data */
+> +    }
+> +}
+> +
+>  static void windbg_exit(void)
+>  {
+>      g_free(windbg_state);
+> @@ -31,6 +46,8 @@ static void windbg_exit(void)
+>
+>  int windbg_server_start(const char *device)
+>  {
+> +    Chardev *chr = NULL;
+> +
+>      if (windbg_state) {
+>          WINDBG_ERROR("Multiple instances are not supported");
+>          exit(1);
+> @@ -40,6 +57,15 @@ int windbg_server_start(const char *device)
+>      windbg_state->ctrl_packet_id = RESET_PACKET_ID;
+>      windbg_state->data_packet_id = INITIAL_PACKET_ID;
+>
+> +    chr = qemu_chr_new_noreplay(WINDBG, device);
+> +    if (!chr) {
 
-Yes, calling the QMP command "cont" to resume the activity makes QEMU
-take the lock again, and libxl would call "cont". (I don't think you can
-pick this kind of lock ;-). )
+This should generate error output. Passing "-windbg bogus" makes QEMU
+exit silently.
+-gdb seems to have the same problem.
 
--- 
-Anthony PERARD
+> +        return -1;
+> +    }
+> +
+> +    qemu_chr_fe_init(&windbg_state->chr, chr, &error_abort);
+> +    qemu_chr_fe_set_handlers(&windbg_state->chr, windbg_chr_can_receive,
+> +                             windbg_chr_receive, NULL, NULL, NULL, NULL, true);
+> +
+>      atexit(windbg_exit);
+>      return 0;
+>  }
+>
