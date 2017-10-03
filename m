@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dzKaR-0007oS-MF
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 06:38:06 -0400
+	(envelope-from <bounces@canonical.com>) id 1dzKn3-0001mK-TT
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 06:51:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dzKaN-00022M-6Z
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 06:38:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45186)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dzKaM-00021Z-U2
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 06:37:59 -0400
-Date: Tue, 3 Oct 2017 12:37:54 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171003123754.0f2dd9fe@nial.brq.redhat.com>
-In-Reply-To: <71226704-7e3b-25e7-3155-4a84ceba5c51@amsat.org>
-References: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
-	<1506935300-132598-23-git-send-email-imammedo@redhat.com>
-	<71226704-7e3b-25e7-3155-4a84ceba5c51@amsat.org>
+	(envelope-from <bounces@canonical.com>) id 1dzKmy-0003Pp-8C
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 06:51:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43066)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dzKmy-0003Ow-2C
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 06:51:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1dzKmx-0001vD-2Y
+	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 10:50:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 11FB02E80C9
+	for <qemu-devel@nongnu.org>; Tue,  3 Oct 2017 10:50:59 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 22/38] xtensa: cleanup cpu type name
- composition
+Date: Tue, 03 Oct 2017 10:34:28 -0000
+From: Thomas Huth <700276@bugs.launchpad.net>
+Reply-To: Bug 700276 <700276@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20110108115227.15680.52990.malonedeb@soybean.canonical.com>
+Message-Id: <150702686848.12168.12710602818763578055.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 700276] Re: QEMU crashed when GDB request a big
+ size variable information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,92 +37,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, jcmvbkbc@gmail.com
+To: qemu-devel@nongnu.org
 
-On Mon, 2 Oct 2017 17:35:39 -0300
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+Triaging old bug tickets... can you still reproduce this issue with the
+latest version of QEMU? Or could we close this ticket nowadays?
 
-> On 10/02/2017 06:08 AM, Igor Mammedov wrote:
-> > use new XTENSA_CPU_TYPE_NAME to compose CPU type name
-> > to bring xtensa in line with all other targets that
-> > will similar macro.
-> >=20
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> > CC: jcmvbkbc@gmail.com
-> > ---
-> >   target/xtensa/cpu.h    | 4 ++++
-> >   target/xtensa/cpu.c    | 2 +-
-> >   target/xtensa/helper.c | 2 +-
-> >   3 files changed, 6 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
-> > index 4803331..b17d7d9 100644
-> > --- a/target/xtensa/cpu.h
-> > +++ b/target/xtensa/cpu.h
-> > @@ -469,11 +469,15 @@ void xtensa_cpu_do_unaligned_access(CPUState *cpu=
-, vaddr addr,
-> >   #define cpu_signal_handler cpu_xtensa_signal_handler
-> >   #define cpu_list xtensa_cpu_list
-> >  =20
-> > +#define XTENSA_CPU_TYPE_SUFFIX "-" TYPE_XTENSA_CPU
-> > +#define XTENSA_CPU_TYPE_NAME(model) model XTENSA_CPU_TYPE_SUFFIX
-> > +
-> >   #ifdef TARGET_WORDS_BIGENDIAN
-> >   #define XTENSA_DEFAULT_CPU_MODEL "fsf"
-> >   #else
-> >   #define XTENSA_DEFAULT_CPU_MODEL "dc232b"
-> >   #endif
-> > +#define XTENSA_DEFAULT_CPU_TYPE XTENSA_CPU_TYPE_NAME(XTENSA_DEFAULT_CP=
-U_MODEL) =20
->=20
-> I see XTENSA_DEFAULT_CPU_MODEL is used in mc->desc, any idea to be able=20
-> to use this instead?
-mc-desc is the reason why I've left XTENSA_DEFAULT_CPU_MODEL as is, and
-having that there were no point in adding yet another ifdef for type,
-XTENSA_DEFAULT_CPU_MODEL works just fine here.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
->=20
-> #ifdef TARGET_WORDS_BIGENDIAN
-> # define XTENSA_DEFAULT_CPU_TYPE XTENSA_CPU_TYPE_NAME("fsf")
-> #else
-> # define XTENSA_DEFAULT_CPU_TYPE XTENSA_CPU_TYPE_NAME("dc232b")
-> #endif
->=20
-> >  =20
-> >   #define cpu_init(cpu_model) cpu_generic_init(TYPE_XTENSA_CPU, cpu_mod=
-el)
-> >  =20
-> > diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
-> > index dcdc765..b5f7079 100644
-> > --- a/target/xtensa/cpu.c
-> > +++ b/target/xtensa/cpu.c
-> > @@ -83,7 +83,7 @@ static ObjectClass *xtensa_cpu_class_by_name(const ch=
-ar *cpu_model)
-> >       ObjectClass *oc;
-> >       char *typename;
-> >  =20
-> > -    typename =3D g_strdup_printf("%s-" TYPE_XTENSA_CPU, cpu_model);
-> > +    typename =3D g_strdup_printf(XTENSA_CPU_TYPE_NAME("%s"), cpu_model=
-);
-> >       oc =3D object_class_by_name(typename);
-> >       g_free(typename);
-> >       if (oc =3D=3D NULL || !object_class_dynamic_cast(oc, TYPE_XTENSA_=
-CPU) ||
-> > diff --git a/target/xtensa/helper.c b/target/xtensa/helper.c
-> > index e8fba20..216f198 100644
-> > --- a/target/xtensa/helper.c
-> > +++ b/target/xtensa/helper.c
-> > @@ -76,7 +76,7 @@ void xtensa_register_core(XtensaConfigList *node)
-> >  =20
-> >       node->next =3D xtensa_cores;
-> >       xtensa_cores =3D node;
-> > -    type.name =3D g_strdup_printf("%s-" TYPE_XTENSA_CPU, node->config-=
->name);
-> > +    type.name =3D g_strdup_printf(XTENSA_CPU_TYPE_NAME("%s"), node->co=
-nfig->name);
-> >       type_register(&type);
-> >       g_free((gpointer)type.name);
-> >   }
-> >  =20
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/700276
+
+Title:
+  QEMU crashed when GDB request a big size variable information
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Hello,
+  My host is Fedora 13. My QEMU version is 0.13.0, I use QEMU with GDB to d=
+ebug Linux kernel(Version 2.6.36.2).
+
+  I use QEMU like this:"qemu -s -S -kernel build/arch/i386/boot/bzImage -hd=
+a /dev/zero"
+  When GDB connected with QEMU, and use gdb command print to look big size =
+variable, the qemu is crash down. for example, when I look a task_struct va=
+riable 'init_task'(print init_task ), the qemu produce the below message an=
+d exit.
+
+  *** stack smashing detected ***: qemu terminated
+  =3D=3D=3D=3D=3D=3D=3D Backtrace: =3D=3D=3D=3D=3D=3D=3D=3D=3D
+  /lib/libc.so.6(__fortify_fail+0x4d)[0x78a31d]
+  /lib/libc.so.6[0x78a2ca]
+  qemu[0x8059e21]
+  qemu[0x805a0cf]
+  qemu[0x80d12a1]
+  qemu[0x8189cb8]
+  qemu[0x818c3b0]
+  /lib/libc.so.6(__libc_start_main+0xe6)[0x6a8cc6]
+  ...............
+  adbf7000-adbf8000 rw-p 00000000 00:00 0 =
+
+  adbf8000-ae3f8000 rw-p 00000000 00:00 0 =
+
+  ae3f8000-ae742000 rw-p 00000000 00:00 0 =
+
+  ae742000-ae762000 rw-p 00000000 00:00 0 =
+
+  ae762000-ae764000 rw-p 00000000 00:00 0 =
+
+  ae764000-ae784000 rw-p 00000000 00:00 0 =
+
+  ae784000-ae786000 rw-p 00000000 00:00 0 =
+
+  ae786000-b6786000 rw-p 00000000 00:00 0 =
+
+  b6786000-b7894000 rw-p 00000000 00:00 0 =
+
+  b78aa000-b78ab000 rw-p 00000000 00:00 0 =
+
+  bfe95000-bfeaa000 rw-p 00000000 00:00 0          [stack]
+  =E5=B7=B2=E6=94=BE=E5=BC=83 (core dumped)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/700276/+subscriptions
