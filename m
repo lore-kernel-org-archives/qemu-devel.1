@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dzGPF-0007xb-Kd
+	(envelope-from <dgibson@ozlabs.org>) id 1dzGPD-0007vd-Bj
 	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 02:10:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dzGPC-0003rq-8y
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 02:10:13 -0400
-Date: Tue, 3 Oct 2017 17:09:55 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1dzGPC-0003rO-0C
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 02:10:11 -0400
+Date: Tue, 3 Oct 2017 17:07:57 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171003060955.GG3260@umbus.fritz.box>
+Message-ID: <20171003060757.GF3260@umbus.fritz.box>
 References: <150659494872.25889.2069124544245723984.stgit@aravinda>
-	<150659506894.25889.3558250496380782854.stgit@aravinda>
-	<20170929064929.GF7712@umbus.fritz.box>
-	<911fd6ef-8931-aa40-8dbf-1d2dbb9ab800@linux.vnet.ibm.com>
+	<150659505839.25889.2018054058894535368.stgit@aravinda>
+	<20170929061735.GD7712@umbus.fritz.box>
+	<87y3oxen7t.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<95142cc0-518a-b7b7-4e56-cfc2adca36ba@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="j2AXaZ4YhVcLc+PQ"
+	protocol="application/pgp-signature"; boundary="DO5DiztRLs659m5i"
 Content-Disposition: inline
-In-Reply-To: <911fd6ef-8931-aa40-8dbf-1d2dbb9ab800@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v5 2/6] ppc: spapr: Handle "ibm,
- nmi-register" and "ibm, nmi-interlock" RTAS calls
+In-Reply-To: <95142cc0-518a-b7b7-4e56-cfc2adca36ba@ozlabs.ru>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v5 1/6] ppc: spapr: Register and
+ handle HCALL to receive updated RTAS region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,215 +28,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru, mahesh@linux.vnet.ibm.com, benh@au1.ibm.com, paulus@samba.org, sam.bobroff@au1.ibm.com
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Aravinda Prasad <aravinda@linux.vnet.ibm.com>, benh@au1.ibm.com, mahesh@linux.vnet.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, paulus@samba.org, sam.bobroff@au1.ibm.com
 
 
---j2AXaZ4YhVcLc+PQ
+--DO5DiztRLs659m5i
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 03, 2017 at 11:21:27AM +0530, Aravinda Prasad wrote:
->=20
->=20
-> On Friday 29 September 2017 12:19 PM, David Gibson wrote:
-> > I don't suppose there's a way to stop your mailer from inserting
-> > spaces after the commas in the subject line,
->=20
-> Not sure how to stop the mailer from doing this as I don't have any
-> spaces in the subject line of my actual patch.
->=20
+On Mon, Oct 02, 2017 at 02:02:19PM +1100, Alexey Kardashevskiy wrote:
+> On 29/09/17 21:52, Nikunj A Dadhania wrote:
+> > David Gibson <david@gibson.dropbear.id.au> writes:
 > >=20
-> >=20
-> > On Thu, Sep 28, 2017 at 04:07:48PM +0530, Aravinda Prasad wrote:
-> >> This patch adds support in QEMU to handle "ibm,nmi-register"
-> >> and "ibm,nmi-interlock" RTAS calls.
+> >> On Thu, Sep 28, 2017 at 04:07:38PM +0530, Aravinda Prasad wrote:
+> >>> Receive updates from SLOF about the updated rtas-base.
+> >>> A separate patch for SLOF [1] (commit f9a60de3) adds
+> >>> functionality to invoke a private HCALL whenever OS
+> >>> issues instantiate-rtas with a new rtas-base.
+> >>>
+> >>> This is required as QEMU needs to know the updated rtas-base
+> >>> as it allocates error reporting structure in RTAS space upon
+> >>> a machine check exception.
+> >>>
+> >>> [1] https://lists.ozlabs.org/pipermail/linuxppc-dev/2014-August/12038=
+6.html
+> >>>
+> >>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+> >>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 > >>
-> >> The machine check notification address is saved when the
-> >> OS issues "ibm,nmi-register" RTAS call.
+> >> Ao I acked this earlier, but I've now realized there might be some
+> >> connection between this and discussions taking place elsewhere about
+> >> qemu not knowing what SLOF does with the device tree.
 > >>
-> >> This patch also handles the case when multiple processors
-> >> experience machine check at or about the same time by
-> >> handling "ibm,nmi-interlock" call. In such cases, as per
-> >> PAPR, subsequent processors serialize waiting for the first
-> >> processor to issue the "ibm,nmi-interlock" call. The second
-> >> processor waits till the first processor, which also
-> >> received a machine check error, is done reading the error
-> >> log. The first processor issues "ibm,nmi-interlock" call
-> >> when the error log is consumed. This patch implements the
-> >> releasing part of the error-log while subsequent patch
-> >> (which builds error log) handles the locking part.
-> >>
-> >> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-> >> ---
-> >>  hw/ppc/spapr.c         |    8 ++++++++
-> >>  hw/ppc/spapr_rtas.c    |   35 +++++++++++++++++++++++++++++++++++
-> >>  include/hw/ppc/spapr.h |   11 ++++++++++-
-> >>  3 files changed, 53 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >> index 5deae30..d568ea6 100644
-> >> --- a/hw/ppc/spapr.c
-> >> +++ b/hw/ppc/spapr.c
-> >> @@ -1477,6 +1477,11 @@ static void ppc_spapr_reset(void)
-> >>      first_ppc_cpu->env.nip =3D SPAPR_ENTRY_POINT;
-> >> =20
-> >>      spapr->cas_reboot =3D false;
-> >> +
-> >> +    spapr->mc_status =3D -1;
-> >> +    spapr->guest_machine_check_addr =3D 0;
+> >> At what point will SLOF call the UPDATE_RTAS hcall?  I'm guessing at
+> >> the time of instantiate-rtas, is that right?
 > >=20
-> > You should probably use -1 as the default for this - strictly speaking
-> > the guest could legitimately choose to have it's machine check
-> > processing code at 0, though it would be a strange choice.
->=20
-> Sure.
->=20
+> > The call happens from
+> > arch/powerpc/kernel/prom_init.c:prom_instantiate_rtas() and after that
+> > linux kernel makes two entries in the DT
 > >=20
-> >> +    qemu_cond_destroy(&spapr->mc_delivery_cond);
-> >> +    qemu_cond_init(&spapr->mc_delivery_cond);
+> > ....
+> >        if (call_prom_ret("call-method", 3, 2, &entry,
+> >                           ADDR("instantiate-rtas"),
+> >                           rtas_inst, base) !=3D 0
+> >             || entry =3D=3D 0) {
+> >                 prom_printf(" failed\n");
+> >                 return;
+> >         }
+> >         prom_printf(" done\n");
 > >=20
-> > What will this do if one of the vcpus is waiting on the condition
-> > variable right now?  I suspect you're going to need to first wake up
-> > the queue, and marshal any blocked vcpus back into dead mode instead
-> > of this.
+> >         reserve_mem(base, size);
+> >=20
+> >         val =3D cpu_to_be32(base);
+> >         prom_setprop(rtas_node, "/rtas", "linux,rtas-base",
+> >                      &val, sizeof(val));
+> >         val =3D cpu_to_be32(entry);
+> >         prom_setprop(rtas_node, "/rtas", "linux,rtas-entry",
+> >                      &val, sizeof(val));
+> > ....
+> >=20
+> > Quiesce is called after this.=20
+> >=20
+> >> Does SLOF put the RTAS blob address in its internal device tree, or
+> >> does it only pass it to the guest via the return parameters from
+> >> instantiate-rtas?
+> >=20
+> > Entry was made to the DT by linux kernel prom_init code, will this be
+> > visible to QEMU?
 >=20
-> Do we need to wake-up the queue as the system, anyway, is being
-> reset?
+> With my recent SLOF FDT patch - yes:
+>=20
+> aik@fstn1-p1:~$ grep rtas dbg.dts
+> 	rtas {
+> 		linux,rtas-entry =3D <0x2fff0000>;
+> 		linux,rtas-base =3D <0x2fff0000>;
+> [...]
 
-The _virtual_ system is being reset.  These wait queues are in the
-qemu process and exist outside the virtual system.  They won't be
-reset with the virtual system unless we write the code to make them be
-reset.
+Ah.. except.. isn't that relying on the kernel putting the RTAS
+address into the device tree before it calls quiesce and kills SLOF?
 
+The SLOF image is bundled in with qemu, so it's ok for us to rely on
+its behaviour up to a point.  It's not really ok for us to rely on the
+kernel's behaviour here, unless that behaviour is mandated by PAPR,
+which this isn't.
 
->=20
-> >=20
-> >>  }
-> >> =20
-> >>  static void spapr_create_nvram(sPAPRMachineState *spapr)
-> >> @@ -2598,6 +2603,9 @@ static void ppc_spapr_init(MachineState *machine)
-> >> =20
-> >>          kvmppc_spapr_enable_inkernel_multitce();
-> >>      }
-> >> +
-> >> +    spapr->mc_status =3D -1;
-> >> +    qemu_cond_init(&spapr->mc_delivery_cond);
-> >>  }
-> >> =20
-> >>  static int spapr_kvm_type(const char *vm_type)
-> >> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> >> index cdf0b60..08e9a5e 100644
-> >> --- a/hw/ppc/spapr_rtas.c
-> >> +++ b/hw/ppc/spapr_rtas.c
-> >> @@ -348,6 +348,37 @@ static void rtas_get_power_level(PowerPCCPU *cpu,=
- sPAPRMachineState *spapr,
-> >>      rtas_st(rets, 1, 100);
-> >>  }
-> >> =20
-> >> +static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
-> >> +                                  sPAPRMachineState *spapr,
-> >> +                                  uint32_t token, uint32_t nargs,
-> >> +                                  target_ulong args,
-> >> +                                  uint32_t nret, target_ulong rets)
-> >> +{
-> >> +    spapr->guest_machine_check_addr =3D rtas_ld(args, 1);
-> >> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-> >> +}
-> >> +
-> >> +static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
-> >> +                                   sPAPRMachineState *spapr,
-> >> +                                   uint32_t token, uint32_t nargs,
-> >> +                                   target_ulong args,
-> >> +                                   uint32_t nret, target_ulong rets)
-> >> +{
-> >> +    if (!spapr->guest_machine_check_addr) {
-> >> +        /* NMI register not called */
-> >> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-> >> +    } else {
-> >> +        /*
-> >> +         * VCPU issuing "ibm,nmi-interlock" is done with NMI handling,
-> >> +         * hence unset mc_status.
-> >> +         */
-> >> +        spapr->mc_status =3D -1;
-> >> +        qemu_cond_signal(&spapr->mc_delivery_cond);
-> >> +        rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-> >> +    }
-> >> +}
-> >> +
-> >> +
-> >>  static struct rtas_call {
-> >>      const char *name;
-> >>      spapr_rtas_fn fn;
-> >> @@ -489,6 +520,10 @@ static void core_rtas_register_types(void)
-> >>                          rtas_set_power_level);
-> >>      spapr_rtas_register(RTAS_GET_POWER_LEVEL, "get-power-level",
-> >>                          rtas_get_power_level);
-> >> +    spapr_rtas_register(RTAS_IBM_NMI_REGISTER, "ibm,nmi-register",
-> >> +                        rtas_ibm_nmi_register);
-> >> +    spapr_rtas_register(RTAS_IBM_NMI_INTERLOCK, "ibm,nmi-interlock",
-> >> +                        rtas_ibm_nmi_interlock);
-> >>  }
-> >> =20
-> >>  type_init(core_rtas_register_types)
-> >> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> >> index b395aa7..28b6e2e 100644
-> >> --- a/include/hw/ppc/spapr.h
-> >> +++ b/include/hw/ppc/spapr.h
-> >> @@ -124,6 +124,13 @@ struct sPAPRMachineState {
-> >>       * occurs during the unplug process. */
-> >>      QTAILQ_HEAD(, sPAPRDIMMState) pending_dimm_unplugs;
-> >> =20
-> >> +    /* State related to "ibm,nmi-register" and "ibm,nmi-interlock" ca=
-lls */
-> >> +    target_ulong guest_machine_check_addr;
-> >=20
-> > You need to migrate this.  This is separate and simpler from the
-> > problems of migrating during machine check handling - at the moment if
-> > the guest calls nmi-register, then you migrate, then a machine check
-> > is triggered you will have lost the information on how to handle it
-> > properly.
->=20
-> I missed it. Will include.
->=20
-> Regards,
-> Aravinda
->=20
-> >=20
-> >=20
-> >> +    /* mc_status is set to -1 if mc is not in progress, else is set t=
-o the CPU
-> >> +     * handling the mc. */
-> >> +    int mc_status;
-> >> +    QemuCond mc_delivery_cond;
-> >> +
-> >>      /*< public >*/
-> >>      char *kvm_type;
-> >>      MemoryHotplugState hotplug_memory;
-> >> @@ -520,8 +527,10 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, tar=
-get_ulong opcode,
-> >>  #define RTAS_IBM_CREATE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x=
-27)
-> >>  #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x=
-28)
-> >>  #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x=
-29)
-> >> +#define RTAS_IBM_NMI_REGISTER                   (RTAS_TOKEN_BASE + 0x=
-2A)
-> >> +#define RTAS_IBM_NMI_INTERLOCK                  (RTAS_TOKEN_BASE + 0x=
-2B)
-> >> =20
-> >> -#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x=
-2A)
-> >> +#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x=
-2C)
-> >> =20
-> >>  /* RTAS ibm,get-system-parameter token values */
-> >>  #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
-> >>
-> >=20
->=20
+So, I think we either need to have *SLOF* update the device tree with
+that address at instantiate-rtas time, or we'll need to resurrect
+Aravinda's original UPDATE_RTAS hcall.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -243,24 +123,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---j2AXaZ4YhVcLc+PQ
+--DO5DiztRLs659m5i
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnTKbMACgkQbDjKyiDZ
-s5KOOxAAnqQU1ol/5snmkWfRKxMpqPxfWYGkF3Rqd0nrBTPzoaE/K8DN467Acn3o
-DDR/TJDGcfGcvKA5bq4azCVoHjD39lefMsmSo0JbHIDzxLY5VWKws1B8YiDJ7518
-BbXELPFR51NGixEHyVlp8pnW1W3aenC1iBn+y26mo0cAaNE1nKKqG+HwNCyOcZa+
-U1RR2StyF55nZJH/FRwv9Lyvf1Yy2jOR6tFnR4CDnrdnvh+JueTROLUlKxSxiOd7
-3nuy/b/OYDBnSYTsZHHUek5s5K8NVTJ/pJZVLkyItrlKN6IChmsJ7UBd/O7MJnbV
-wileV4XSdJkYglDALublmcYFRN6NvhTACy9izuCzyVlJu/+LQH7h1QIjbEmqPpBd
-Jjg4/1Ih2UuO+Eq/y26TiBZX/ZR90o2POmXLrxFGexI1fI7r2mYa9MNGeaCScAr+
-r9zpRVmrpxaFuBxV60DzTDjACVsdxn86vY8hHyFydrRmiJcJ/TKsxNzoC6NDncl0
-pN5AW7jGWPNV0jlw4UYPXgGX/8meNiND9U1fYo192k/xt4vSMwmXdl7MTP4ZevJu
-V78by2cst+l6DPhBaq/eUdQImOpSjSb9L42KcOUI9D7nR1vEK4OsnpvBAq68FqgG
-q9oX5ZNBobsldCgMcw7ZFZg5JDI+woZRB28RYLpcOOF9u1nqka4=
-=DZBD
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnTKTsACgkQbDjKyiDZ
+s5Kgvg//ePlHAHuIJe943fIksEmXg27C2jW4k/KnaIeMWJlKxjWu5LMyi7O1Q1mq
+wgLy7pQJrKXvnJi1edEW+86y+6t2zlzsdYkcFXfFhB873E926rMU7VTDxO2yMlrl
+QquJ7JV0JOb3zPatM0s18TohUpcSVLf0ob74HYOP7PUdq6a429qYWeiTD+N07sdU
+c4F2m+clYM4bbpU50JxNVjOXAePXoVfKLrjRkHU1HkzRp4tHxAffx48F8pAVdtxf
+FPb6FABhQeiSTbEzK+GdgmekgD7dN8hD4/BIdG6Y9V3N3nibm6CYz4gCBhe4MKoq
+hZAmUJBa12Pxb1ZnTslE1GiRpFrloucquiGy2/Jl+jBGrcJX8GnOr8MfbIvxBhXg
+WwDTy16Lj7HbvV3NTqjEav6nCyvj6hMKfsahGOScUBMiYzBsEsG9ifVPEegp7qEd
+NjYxNC1DKqywp6p1CwO3lSewdTBYTf97Zw/vEzvcYA6jZaNk3vhGCWj2l96LGxcV
+kmYywN64sIhdNgzTObOnUmeJAzi7gm4OpC8qPma7fAsSVDbjo1zaRhqGMbQ0Azr1
+Py9dalMdLbRSGhUDmT/FAACqyuwI+GAkn9/7f0Ozf8dRju/Wd2P4bAG2ftjM5/rr
+rQwqYJeAx/6OXZpI22L54FmgBh5HU7hoLckz+LLqW3YedEjKJ/w=
+=SpIj
 -----END PGP SIGNATURE-----
 
---j2AXaZ4YhVcLc+PQ--
+--DO5DiztRLs659m5i--
