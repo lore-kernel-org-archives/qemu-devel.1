@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dzMKA-0000lU-KG
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:29:23 -0400
+	(envelope-from <lprosek@redhat.com>) id 1dzMNf-0001wr-RE
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:33:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dzMK7-00030s-Co
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:29:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57300)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dzMK7-0002zL-73
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:29:19 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 99FC2641C1
-	for <qemu-devel@nongnu.org>; Tue,  3 Oct 2017 12:29:17 +0000 (UTC)
-References: <20171002103135.33440-1-marcel@redhat.com>
-	<07f7595e-f721-96d9-0d4c-4e2024b09e32@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <c871ced9-b872-c91f-9205-ae197f1ba7b2@redhat.com>
-Date: Tue, 3 Oct 2017 15:29:11 +0300
+	(envelope-from <lprosek@redhat.com>) id 1dzMNb-0008Pg-Ow
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:32:59 -0400
+Received: from mail-ua0-f169.google.com ([209.85.217.169]:51506)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dzMNb-0008PV-Jl
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:32:55 -0400
+Received: by mail-ua0-f169.google.com with SMTP id 47so4752226uas.8
+	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 05:32:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <07f7595e-f721-96d9-0d4c-4e2024b09e32@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/gen_pcie_root_port: properly set
+In-Reply-To: <150642399172.3900.299369975046339119.stgit@Misha-PC.lan02.inno>
+References: <150642384156.3900.3326424823772221077.stgit@Misha-PC.lan02.inno>
+	<150642399172.3900.299369975046339119.stgit@Misha-PC.lan02.inno>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Tue, 3 Oct 2017 14:32:54 +0200
+Message-ID: <CABdb7349FFuZo41gk3r_Ow8RNz=pVjgSf+Gf47Fnu04pDyPs_g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 26/43] windbg: implemented
+ windbg_read_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,52 +29,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com
+To: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+Cc: qemu-devel <qemu-devel@nongnu.org>, sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-On 03/10/2017 0:49, Laszlo Ersek wrote:
-> On 10/02/17 12:31, Marcel Apfelbaum wrote:
->> IO_LIMIT and IO_BASE registers should not be writable if
->> gen_pcie_root_port's io-reserve property is set to 0.
->> The COMMAND register should have the IO flag read only.
->>
->>
->> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
->> ---
->>   hw/pci-bridge/gen_pcie_root_port.c | 7 +++++++
->>   1 file changed, 7 insertions(+)
->>
->> diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
->> index ed03ffc764..ad4e6aa7ff 100644
->> --- a/hw/pci-bridge/gen_pcie_root_port.c
->> +++ b/hw/pci-bridge/gen_pcie_root_port.c
->> @@ -85,6 +85,13 @@ static void gen_rp_realize(DeviceState *dev, Error **errp)
->>           rpc->parent_class.exit(d);
->>           return;
->>       }
->> +
->> +    if (!grp->io_reserve) {
->> +        pci_word_test_and_clear_mask(d->wmask + PCI_COMMAND,
->> +                                     PCI_COMMAND_IO);
->> +        d->wmask[PCI_IO_BASE] = 0;
->> +        d->wmask[PCI_IO_LIMIT] = 0;
->> +    }
->>   }
->>   
->>   static const VMStateDescription vmstate_rp_dev = {
->>
-> 
-> The patch looks good to me (which doesn't mean much, honestly :) ), but
-> I think the subject line is truncated. You left off what exactly should
-> be set properly. (IO base, IO limit, and command registers, presumably.)
-> 
+On Tue, Sep 26, 2017 at 1:06 PM, Mihail Abakumov
+<mikhail.abakumov@ispras.ru> wrote:
+> Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+> Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+> Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
+> ---
+>  windbgstub-utils.c |   90 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 89 insertions(+), 1 deletion(-)
+>
+> diff --git a/windbgstub-utils.c b/windbgstub-utils.c
+> index c3ae2ddf5b..23bf4be9f0 100755
+> --- a/windbgstub-utils.c
+> +++ b/windbgstub-utils.c
+> @@ -280,7 +280,95 @@ static KDData *kd;
+>  static int windbg_read_context(CPUState *cpu, uint8_t *buf, int len,
+>                                 int offset)
+>  {
+> -    return 0;
+> +    const bool new_mem = (len != sizeof(CPU_CONTEXT) || offset != 0);
+> +    CPUArchState *env = cpu->env_ptr;
+> +    CPU_CONTEXT *cc;
+> +    int err = 0;
+> +
+> +    if (new_mem) {
+> +        cc = g_new(CPU_CONTEXT, 1);
+> +    } else {
+> +        cc = (CPU_CONTEXT *) buf;
+> +    }
+> +
+> +    memset(cc, 0, len);
 
-Strange, thanks for pointing it out.
-I'll send a V2.
+This overruns the buffer if len > sizeof(CPU_CONTEXT).
 
-Thanks,
-Marcel
-
-> Thanks!
-> Laszlo
-> 
+> +
+> +    cc->ContextFlags = CPU_CONTEXT_ALL;
+> +
+> +    if (cc->ContextFlags & CPU_CONTEXT_SEGMENTS) {
+> +        cc->SegCs = lduw_p(&env->segs[R_CS].selector);
+> +        cc->SegDs = lduw_p(&env->segs[R_DS].selector);
+> +        cc->SegEs = lduw_p(&env->segs[R_ES].selector);
+> +        cc->SegFs = lduw_p(&env->segs[R_FS].selector);
+> +        cc->SegGs = lduw_p(&env->segs[R_GS].selector);
+> +        cc->SegSs = lduw_p(&env->segs[R_SS].selector);
+> +    }
+> +
+> +    if (cc->ContextFlags & CPU_CONTEXT_DEBUG_REGISTERS) {
+> +        cc->Dr0 = ldtul_p(&env->dr[0]);
+> +        cc->Dr1 = ldtul_p(&env->dr[1]);
+> +        cc->Dr2 = ldtul_p(&env->dr[2]);
+> +        cc->Dr3 = ldtul_p(&env->dr[3]);
+> +        cc->Dr6 = ldtul_p(&env->dr[6]);
+> +        cc->Dr7 = ldtul_p(&env->dr[7]);
+> +    }
+> +
+> +    if (cc->ContextFlags & CPU_CONTEXT_INTEGER) {
+> +        cc->Edi    = ldl_p(&env->regs[R_EDI]);
+> +        cc->Esi    = ldl_p(&env->regs[R_ESI]);
+> +        cc->Ebx    = ldl_p(&env->regs[R_EBX]);
+> +        cc->Edx    = ldl_p(&env->regs[R_EDX]);
+> +        cc->Ecx    = ldl_p(&env->regs[R_ECX]);
+> +        cc->Eax    = ldl_p(&env->regs[R_EAX]);
+> +        cc->Ebp    = ldl_p(&env->regs[R_EBP]);
+> +        cc->Esp    = ldl_p(&env->regs[R_ESP]);
+> +
+> +        cc->Eip    = ldl_p(&env->eip);
+> +        cc->EFlags = ldl_p(&env->eflags);
+> +    }
+> +
+> +    if (cc->ContextFlags & CPU_CONTEXT_FLOATING_POINT) {
+> +        uint32_t swd = 0, twd = 0;
+> +        swd = env->fpus & ~(7 << 11);
+> +        swd |= (env->fpstt & 7) << 11;
+> +        int i;
+> +        for (i = 0; i < 8; ++i) {
+> +            twd |= (!env->fptags[i]) << i;
+> +        }
+> +
+> +        cc->FloatSave.ControlWord    = ldl_p(&env->fpuc);
+> +        cc->FloatSave.StatusWord     = ldl_p(&swd);
+> +        cc->FloatSave.TagWord        = ldl_p(&twd);
+> +        cc->FloatSave.ErrorOffset    = ldl_p(PTR(env->fpip));
+> +        cc->FloatSave.ErrorSelector  = ldl_p(PTR(env->fpip) + 32);
+> +        cc->FloatSave.DataOffset     = ldl_p(PTR(env->fpdp));
+> +        cc->FloatSave.DataSelector   = ldl_p(PTR(env->fpdp) + 32);
+> +        cc->FloatSave.Cr0NpxState    = ldl_p(&env->xcr0);
+> +
+> +        for (i = 0; i < 8; ++i) {
+> +            memcpy(PTR(cc->FloatSave.RegisterArea[i * 10]),
+> +                   PTR(env->fpregs[i]), 10);
+> +        }
+> +    }
+> +
+> +    if (cc->ContextFlags & CPU_CONTEXT_EXTENDED_REGISTERS) {
+> +        uint8_t *ptr = cc->ExtendedRegisters + 160;
+> +        int i;
+> +        for (i = 0; i < 8; ++i, ptr += 16) {
+> +            stq_p(ptr,     env->xmm_regs[i].ZMM_Q(0));
+> +            stq_p(ptr + 8, env->xmm_regs[i].ZMM_Q(1));
+> +        }
+> +
+> +        stl_p(cc->ExtendedRegisters + 24, env->mxcsr);
+> +    }
+> +
+> +    cc->ContextFlags = ldl_p(&cc->ContextFlags);
+> +
+> +    if (new_mem) {
+> +        memcpy(buf, (uint8_t *) cc + offset, len);
+> +        g_free(cc);
+> +    }
+> +    return err;
+>  }
+>
+>  static int windbg_write_context(CPUState *cpu, uint8_t *buf, int len,
+>
