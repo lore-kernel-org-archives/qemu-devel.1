@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dzM4p-0001G2-UR
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:13:33 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dzM4u-0001IM-D1
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:13:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dzM4l-0002ib-SV
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:13:31 -0400
-Received: from mail-vk0-f43.google.com ([209.85.213.43]:55638)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dzM4l-0002hH-Mw
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:13:27 -0400
-Received: by mail-vk0-f43.google.com with SMTP id i1so4419235vke.12
-	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 05:13:27 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1dzM4q-0002s9-AE
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:13:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33968)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dzM4q-0002qG-0u
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:13:32 -0400
+Date: Tue, 3 Oct 2017 14:13:28 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171003141328.4c07ae4c@nial.brq.redhat.com>
+In-Reply-To: <20171002192404.GC17385@localhost.localdomain>
+References: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
+	<1506935300-132598-2-git-send-email-imammedo@redhat.com>
+	<20171002192404.GC17385@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <150642389679.3900.2803313967054050497.stgit@Misha-PC.lan02.inno>
-References: <150642384156.3900.3326424823772221077.stgit@Misha-PC.lan02.inno>
-	<150642389679.3900.2803313967054050497.stgit@Misha-PC.lan02.inno>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Tue, 3 Oct 2017 14:13:26 +0200
-Message-ID: <CABdb7360CdGWMzKNyG2WAGEQLeZpKh9_fLaoeoDFsm82X7mAxQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 09/43] windbg: handler of fs/gs register
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/38] qom: add helper
+ type_init_from_array()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,114 +29,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Cc: qemu-devel <qemu-devel@nongnu.org>, sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
 
-On Tue, Sep 26, 2017 at 1:04 PM, Mihail Abakumov
-<mikhail.abakumov@ispras.ru> wrote:
-> Added handler of fs/gs register. It tries to find and check KPCR and version address.
->
-> Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-> Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-> Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
-> ---
->  include/exec/windbgstub-utils.h |    5 +++
->  windbgstub-utils.c              |   63 ++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 66 insertions(+), 2 deletions(-)
->
-> diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-> index 90fb766839..f2402ebb34 100755
-> --- a/include/exec/windbgstub-utils.h
-> +++ b/include/exec/windbgstub-utils.h
-> @@ -62,6 +62,11 @@
->      _t;                                                       \
->  })
->
-> +typedef struct InitedAddr {
-> +    target_ulong addr;
-> +    bool is_init;
-> +} InitedAddr;
-> +
->  bool windbg_on_load(void);
->  void windbg_on_exit(void);
->
-> diff --git a/windbgstub-utils.c b/windbgstub-utils.c
-> index b5fb6db3f2..662096647e 100755
-> --- a/windbgstub-utils.c
-> +++ b/windbgstub-utils.c
-> @@ -11,10 +11,69 @@
->
->  #include "exec/windbgstub-utils.h"
->
-> +#ifdef TARGET_X86_64
-> +# define OFFSET_SELF_PCR         0x18
-> +# define OFFSET_VERS             0x108
-> +#else
-> +# define OFFSET_SELF_PCR         0x1C
-> +# define OFFSET_VERS             0x34
-> +#endif
-> +
-> +typedef struct KDData {
-> +    InitedAddr KPCR;
-> +    InitedAddr version;
-> +} KDData;
-> +
-> +static KDData *kd;
-> +
->  bool windbg_on_load(void)
->  {
-> -    return false;
-> +    CPUState *cpu = qemu_get_cpu(0);
-> +    CPUArchState *env = cpu->env_ptr;
-> +
-> +    if (!kd) {
-> +        kd = g_new0(KDData, 1);
-> +    }
-> +
-> +    if (!kd->KPCR.is_init) {
-> +
-> + #ifdef TARGET_X86_64
-> +        kd->KPCR.addr = env->segs[R_GS].base;
-> + #else
-> +        kd->KPCR.addr = env->segs[R_FS].base;
-> + #endif
+On Mon, 2 Oct 2017 16:24:04 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-What if Windows is rebooted and FS/GS changes? Do you need to flip
-KPCR.is_init back to false on system reset?
+> On Mon, Oct 02, 2017 at 11:07:43AM +0200, Igor Mammedov wrote:
+> > it will help to remove code duplication in places
+> > that currently open code registration of several
+> > types.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> > I'm going to use it for CPU types in followup patches
+> > 
+> > CC: ehabkost@redhat.com
+> > ---
+> >  include/qemu/module.h | 10 ++++++++++
+> >  1 file changed, 10 insertions(+)
+> > 
+> > diff --git a/include/qemu/module.h b/include/qemu/module.h
+> > index 56dd218..29f9089 100644
+> > --- a/include/qemu/module.h
+> > +++ b/include/qemu/module.h
+> > @@ -52,6 +52,16 @@ typedef enum {
+> >  #define type_init(function) module_init(function, MODULE_INIT_QOM)
+> >  #define trace_init(function) module_init(function, MODULE_INIT_TRACE)
+> >  
+> > +#define type_init_from_array(array)                                        \  
+> 
+> So we're moving from a imperative way to register types to a
+> declarative way.  Sounds nice.
+> 
+> You are also adding a way to register a TypeInfo array easily.
+> That's nice, too.
+> 
+> But, why do we need to address both at the same time?  I think
+> this adds some confusing gaps to the module/QOM APIs:
+> 
+> * If you want to register a type at runtime, there are only
+>   functions to register a single type (type_register(),
+>   type_register_static().  What if I want to register a TypeInfo
+>   array from an existing type_init() function?
+> * If you want to declare types to be registered automatically at
+>   module_call_init(MODULE_INIT_QOM), you are adding a helper that
+>   avoids manual type_register*() calls, but only for arrays.
+>   What if I want to register a single type?  (There are 440+
+>   functions containing a single type_register*() call in the
+>   tree)
+just array is sufficient for code touched in this series.
+I'll add helper for single type as well, but I'd leave for someone
+else to use it (i.e. do cleanup).
 
-> +        static target_ulong prev_KPCR;
-> +        if (!kd->KPCR.addr || prev_KPCR == kd->KPCR.addr) {
-> +            return false;
-> +        }
-> +        prev_KPCR = kd->KPCR.addr;
-> +
-> +        if (kd->KPCR.addr != READ_VMEM(cpu, kd->KPCR.addr + OFFSET_SELF_PCR,
-> +                                       target_ulong)) {
-> +            return false;
-> +        }
-> +
-> +        kd->KPCR.is_init = true;
-> +    }
-> +
-> +    if (!kd->version.is_init && kd->KPCR.is_init) {
-> +        kd->version.addr = READ_VMEM(cpu, kd->KPCR.addr + OFFSET_VERS,
-> +                                     target_ulong);
-> +        if (!kd->version.addr) {
-> +            return false;
-> +        }
-> +        kd->version.is_init = true;
-> +    }
-> +
-> +    WINDBG_DEBUG("windbg_on_load: KPCR " FMT_ADDR, kd->KPCR.addr);
-> +    WINDBG_DEBUG("windbg_on_load: version " FMT_ADDR, kd->version.addr);
-> +
-> +    return true;
->  }
->
->  void windbg_on_exit(void)
-> -{}
-> +{
-> +    g_free(kd);
-> +    kd = NULL;
-> +}
->
+> I have two suggestions:
+> 
+> * Adding a type_register_static_array() helper first, call it
+>   from a type_init() function, and think about a module.h-based
+>   helper for arrays later.
+> 
+> * (For later) adding a module_init() helper that works for
+>   registering a single type too. So, this very common pattern:
+> 
+>       static const TypeInfo FOO_type = {
+>           /* ... */
+>       };
+>       
+>       static void register_FOO_type(void)
+>       {
+>           type_register_static(&FOO_type);
+>       }
+>       
+>       QOM_TYPE(register_FOO_type);
+> 
+>   could be written as:
+> 
+>       static const TypeInfo FOO_type = {
+>           /* ... */
+>       };
+>       
+>       QOM_TYPE(FOO_type);
+> 
+> (I'm suggesting QOM_TYPE as the macro name, but I'm not sure
+> about it.  But I think type_init_*() is confusing because it
+> doesn't work like the other *_init() helpers in module.h)
+> 
+> QOM_TYPE(T) could be just a shortcut to:
+> QOM_TYPES_PTR(&T, 1).
+QOM here seems redundant, how about
+REGISTER_STATIC_TYPE/REGISTER_STATIC_TYPES
+
+> 
+> Your type_init_from_array(A) helper could be just a shortcut to:
+> QOM_TYPES_PTR(A, ARRAY_SIZE(A)).
+> 
+> > +static void do_qemu_init_ ## array(void)                                   \
+> > +{                                                                          \
+> > +    int i;                                                                 \
+> > +    for (i = 0; i < ARRAY_SIZE(array); i++) {                              \
+> > +        type_register_static(&array[i]);                                   \  
+> 
+> type_register_static() is in qom/object.[ch], and module.[ch] has
+> no dependency on QOM at all.  I believe this belongs in
+> qom/object.h, not module.h.
+ok
+
+> 
+> > +    }                                                                      \
+> > +}                                                                          \
+> > +module_init(do_qemu_init_ ## array, MODULE_INIT_QOM)  
+> 
+> Why not use type_init(do_qemu_init_ ## array)?
+I'll will use it in v2
+
+> 
+> > +  
+> 
+> Also for later: this is not the first time we generate function
+> bodies on the fly for module_init().  Maybe module_init could
+> support a void* data argument?
+> 
+> >  #define block_module_load_one(lib) module_load_one("block-", lib)
+> >  
+> >  void register_module_init(void (*fn)(void), module_init_type type);
+> > -- 
+> > 2.7.4
+> >   
+> 
