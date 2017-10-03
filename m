@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dzHI4-0007WQ-Gv
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 03:06:57 -0400
+	(envelope-from <kchamart@redhat.com>) id 1dzI8N-00053T-U7
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 04:01:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dzHI1-000165-9E
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 03:06:52 -0400
-Received: from 18.mo1.mail-out.ovh.net ([46.105.35.72]:58084)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dzHI0-00014U-VO
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 03:06:49 -0400
-Received: from player756.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 286439C179
-	for <qemu-devel@nongnu.org>; Tue,  3 Oct 2017 09:06:44 +0200 (CEST)
-Date: Tue, 3 Oct 2017 09:06:34 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171003090634.494ed326@bahia.lan>
-In-Reply-To: <20171003051701.17721-1-aik@ozlabs.ru>
-References: <20171003051701.17721-1-aik@ozlabs.ru>
+	(envelope-from <kchamart@redhat.com>) id 1dzI8I-00048k-1p
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 04:00:56 -0400
+Date: Tue, 3 Oct 2017 10:00:26 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20171003080026.6nmw6pdpcuo2sqoe@eukaryote>
+References: <20170926175942.GE14717@localhost.localdomain>
+	<20171002150127.gbodv4jwdlin7s53@eukaryote>
+	<20171002153252.GF4362@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH qemu v2] ppc/spapr: Receive
- and store device tree blob from SLOF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171002153252.GF4362@localhost.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] blockdev-commit design
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,154 +24,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, Aravinda Prasad <aravinda@linux.vnet.ibm.com>, Balbir Singh <bsingharora@gmail.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
 
-On Tue,  3 Oct 2017 16:17:01 +1100
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+On Mon, Oct 02, 2017 at 05:32:52PM +0200, Kevin Wolf wrote:
+> Am 02.10.2017 um 17:01 hat Kashyap Chamarthy geschrieben:
+> > On Tue, Sep 26, 2017 at 07:59:42PM +0200, Kevin Wolf wrote:
 
-> SLOF receives a device tree and updates it with various properties
-> before switching to the guest kernel and QEMU is not aware of any changes
-> made by SLOF. Since there is no real RTAS and QEMU implements it,
-> it makes sense to pass the SLOF device tree to QEMU so the latter could
-> implement RTAS related tasks better.
-> 
-> Specifially, now QEMU can find out the actual XICS phandle (for PHB
-> hotplug) and the RTAS linux,rtas-entry/base properties (for firmware
-> assisted NMI - FWNMI).
-> 
-> This stores the initial DT blob in the sPAPR machine and replaces it
-> in the KVMPPC_H_UPDATE_DT (new private hypercall) handler.
-> 
+[...]
 
-Hmm, this doesn't look right: the initial DT blob isn't state but the one
-you get from KVMPPC_H_UPDATE_DT is, or am I missing something ?
-
-> This implements a very basic validity check of the new blob - magic and
-> size are checked; the new blob size should not increase more than twice.
+> >         {
+> >             "execute": "block-commit",
+> >             "arguments": {
+> >                 "device": "node-D",
+> >                 "job-id": "job0",
+> >                 "top": "d.qcow2",
+> >                 "base": "a.qcow2"
+> >             }
+> >         }
+> > 
+> >     So when merging the top-most layer (D), there's at least one
+> >     scenario where we _are_ specifying the "active layer".  And 'top'
+> >     _is_ mandatory as seen above.  
+> >     
+> >     So I wonder if I'm misinterpreting your wording.
 > 
-> This requires SLOF update: "fdt: Pass the resulting device tree to QEMU".
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
-> 
-> I could store just a size of the QEMU's blob, or a tree, not sure
-> which one makes more sense here.
-> 
+> The point is that you specify both "device" and "top". There is no real
+> use in specifying "device", because "top" already identifies the node.
+> (Of course, file names aren't a good way to identify nodes, so the
+> assumption is that they are replaced by node names.)
 
-You need to store the DT blob and its size, and migrate both of them.
+Ah, thanks.  Now I recall that the existing `block-commit` is the only
+command (among mirror, backup, stream, and commit) that doesn't yet
+support 'node-name' / 'snapshot-node-name'.  Hence your proposal, to
+bring it more in-line w/ blockdev-{mirror,backup}, and `block-stream`[*]
+(which accepts 'base-node', and its "device" parameter takes a named
+node).
 
-> This allows up to 2 times blob increase. Not 1.5 just to avoid
-> float/double, just looks a bit ugly imho.
-> ---
->  include/hw/ppc/spapr.h |  4 +++-
->  hw/ppc/spapr.c         |  4 +++-
->  hw/ppc/spapr_hcall.c   | 33 +++++++++++++++++++++++++++++++++
->  hw/ppc/trace-events    |  2 ++
->  4 files changed, 41 insertions(+), 2 deletions(-)
+[*] https://lists.gnu.org/archive/html/qemu-block/2017-05/msg01230.html
+
+> In the active commit case, it is just duplicated information, but in the
+> case of an intermediate commit, it is additional information that needs
+> to be provided without good reason.
+
+It's clearer now, thank you.
+
+> > (2) Also, just for my own education, can you mind expanding a bit more
+> >     about the "there can be more than one active layer" scenario?
 > 
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index a805b817a5..09f3a54dc2 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -92,6 +92,7 @@ struct sPAPRMachineState {
->      int vrma_adjust;
->      ssize_t rtas_size;
->      void *rtas_blob;
-> +    void *fdt_blob;
->      long kernel_size;
->      bool kernel_le;
->      uint32_t initrd_base;
-> @@ -400,7 +401,8 @@ struct sPAPRMachineState {
->  #define KVMPPC_H_LOGICAL_MEMOP  (KVMPPC_HCALL_BASE + 0x1)
->  /* Client Architecture support */
->  #define KVMPPC_H_CAS            (KVMPPC_HCALL_BASE + 0x2)
-> -#define KVMPPC_HCALL_MAX        KVMPPC_H_CAS
-> +#define KVMPPC_H_UPDATE_DT      (KVMPPC_HCALL_BASE + 0x3)
-> +#define KVMPPC_HCALL_MAX        KVMPPC_H_UPDATE_DT
->  
->  typedef struct sPAPRDeviceTreeUpdateHeader {
->      uint32_t version_id;
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 17ea77618c..b471f7e1ff 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1453,7 +1453,9 @@ static void ppc_spapr_reset(void)
->      /* Load the fdt */
->      qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
->      cpu_physical_memory_write(fdt_addr, fdt, fdt_totalsize(fdt));
-> -    g_free(fdt);
-> +    g_free(spapr->fdt_blob);
-> +    spapr->fdt_blob = fdt;
-> +    spapr->fdt_size = fdt_totalsize(fdt);
->  
->      /* Set up the entry state */
->      first_ppc_cpu = POWERPC_CPU(first_cpu);
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 57bb411394..a11831d3b2 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1635,6 +1635,37 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
->      return H_SUCCESS;
->  }
->  
-> +static target_ulong h_update_dt(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-> +                                target_ulong opcode, target_ulong *args)
-> +{
-> +    target_ulong dt = ppc64_phys_to_real(args[0]);
-> +    struct fdt_header hdr = { 0 };
-> +    unsigned cb, magic, old_cb = fdt_totalsize(spapr->fdt_blob);
-> +
-> +    cpu_physical_memory_read(dt, &hdr, sizeof(hdr));
-> +    cb = fdt32_to_cpu(hdr.totalsize);
-> +    magic = fdt32_to_cpu(hdr.magic);
-> +    if (magic != FDT_MAGIC || cb / old_cb > 2) {
+> Something like this, C is the backing file of both D and E:
+> 
+> 
+>                     +--- D
+>                     |
+>     A <- B <- C <---+
+>                     |
+>                     +--- E
+> 
+> I want to commit C into B. But do I specify D or E as the active layer?
+> They are both active layers above C.
 
-Maybe you could use fdt_check_header() which also checks the
-versions ?
+Ah-ha, yes, it's the "thin provisoning" case.
 
-> +        trace_spapr_update_dt_failed(old_cb, cb, magic);
-> +        return H_PARAMETER;
-> +    }
-> +
-> +    g_free(spapr->fdt_blob);
-> +    spapr->fdt_blob = g_malloc0(cb);
-> +    cpu_physical_memory_read(dt, spapr->fdt_blob, cb);
-> +
-> +#ifdef DEBUG
-> +    {
-> +        FILE *f = fopen("dbg.dtb", "wb");
-> +        fwrite(spapr->fdt_blob, cb, 1, f);
-> +        fclose(f);
-> +    }
-> +#endif
-> +    trace_spapr_update_dt(cb);
-> +
-> +    return H_SUCCESS;
-> +}
-> +
->  static spapr_hcall_fn papr_hypercall_table[(MAX_HCALL_OPCODE / 4) + 1];
->  static spapr_hcall_fn kvmppc_hypercall_table[KVMPPC_HCALL_MAX - KVMPPC_HCALL_BASE + 1];
->  
-> @@ -1732,6 +1763,8 @@ static void hypercall_register_types(void)
->  
->      /* ibm,client-architecture-support support */
->      spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support);
-> +
-> +    spapr_register_hypercall(KVMPPC_H_UPDATE_DT, h_update_dt);
->  }
->  
->  type_init(hypercall_register_types)
-> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-> index 4a6a6490fa..60ee4e3a4b 100644
-> --- a/hw/ppc/trace-events
-> +++ b/hw/ppc/trace-events
-> @@ -18,6 +18,8 @@ spapr_cas_pvr_try(uint32_t pvr) "0x%x"
->  spapr_cas_pvr(uint32_t cur_pvr, bool explicit_match, uint32_t new_pvr) "current=0x%x, explicit_match=%u, new=0x%x"
->  spapr_h_resize_hpt_prepare(uint64_t flags, uint64_t shift) "flags=0x%"PRIx64", shift=%"PRIu64
->  spapr_h_resize_hpt_commit(uint64_t flags, uint64_t shift) "flags=0x%"PRIx64", shift=%"PRIu64
-> +spapr_update_dt(unsigned cb) "New blob %u bytes"
-> +spapr_update_dt_failed(unsigned cbold, unsigned cbnew, unsigned magic) "Old blob %u bytes, new blob %u bytes, magic 0x%x"
->  
->  # hw/ppc/spapr_iommu.c
->  spapr_iommu_put(uint64_t liobn, uint64_t ioba, uint64_t tce, uint64_t ret) "liobn=0x%"PRIx64" ioba=0x%"PRIx64" tce=0x%"PRIx64" ret=%"PRId64
+Thanks for the explanation.
+
+-- 
+/kashyap
