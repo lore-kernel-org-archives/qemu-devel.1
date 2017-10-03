@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dzNXv-0003Gh-RC
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:47:41 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dzNaN-0005Wx-F8
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:50:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dzNXq-00055B-TV
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:47:39 -0400
-Received: from mail-wr0-f171.google.com ([209.85.128.171]:49035)
+	(envelope-from <peter.maydell@linaro.org>) id 1dzNaH-0006ad-W7
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:50:11 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:44785)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dzNXb-0004r2-9N
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:47:34 -0400
-Received: by mail-wr0-f171.google.com with SMTP id u5so6181237wrc.5
-	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 06:47:18 -0700 (PDT)
-References: <20170913090522.4022-1-Sergio.G.DelReal@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <be749b52-b0f9-64ef-bf9d-606df0609a30@redhat.com>
-Date: Tue, 3 Oct 2017 15:47:06 +0200
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dzNaH-0006aE-Og
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:50:05 -0400
+Received: by mail-wr0-x236.google.com with SMTP id l24so3448665wre.1
+	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 06:50:05 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170913090522.4022-1-Sergio.G.DelReal@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 00/14] add support for
- Hypervisor.framework in QEMU
+In-Reply-To: <1506441116-16627-1-git-send-email-thuth@redhat.com>
+References: <1506441116-16627-1-git-send-email-thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 3 Oct 2017 14:49:16 +0100
+Message-ID: <CAFEAcA-V5QRwBCCEvekUvTcVtt58y=1McU41LY0z3XP-JyQsXA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/xlnx-zynqmp: Mark the "xlnx,
+ zynqmp" device with user_creatable = false
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,158 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>, qemu-devel@nongnu.org
-Cc: stefanha@gmail.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>
 
-On 13/09/2017 11:05, Sergio Andres Gomez Del Real wrote:
-> ================
-> Changes in v4:
->  (1) Use g_new0 instead of g_malloc.
->  (2) hvf TODO's in cpu.c explained: in-kernel irqchip.
->  (3) Introduce ins_len field in patch where actually used.
->  (4) Remove outdated comment "/* Definition of hvf_state is here */"
->  (5) Treat vcpu_dirty as boolean throughout.
->  (6) checkpatch.pl patch only does styling changes.
->  (8) Add comment documenting meaning of -1 returned by
->      apic_get_highest_priority_irr.
->  (9) Add TODO to move hvf's synchronization functions inside
->      cpu_synchronize_*, along with kvm's and hax's.
-> ================
+On 26 September 2017 at 16:51, Thomas Huth <thuth@redhat.com> wrote:
+> The device uses serial_hds in its realize function and thus can't be
+> used twice. Apart from that, the comma in its name makes it quite hard
+> to use for the user anyway, since a comma is normally used to separate
+> the device name from its properties when using the "-device" parameter
+> or the "device_add" HMP command.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/arm/xlnx-zynqmp.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+> index 2b27daf..d4b6560 100644
+> --- a/hw/arm/xlnx-zynqmp.c
+> +++ b/hw/arm/xlnx-zynqmp.c
+> @@ -440,6 +440,8 @@ static void xlnx_zynqmp_class_init(ObjectClass *oc, void *data)
+>
+>      dc->props = xlnx_zynqmp_props;
+>      dc->realize = xlnx_zynqmp_realize;
+> +    /* Reason: Uses serial_hds in realize function, thus can't be used twice */
+> +    dc->user_creatable = false;
+>  }
+>
+>  static const TypeInfo xlnx_zynqmp_type_info = {
 
-Thanks Sergio, this is a good start.  I have done a few more cleanup and
-sent my patches which, however, I could not test.  In any case, it seems
-feasible to get this done for 2.11!
 
-Regards,
 
-Paolo
+Applied to target-arm.next, thanks.
 
-> ================
-> Changes in v3:
->  (1) Fixed licensing issues in patch 3.
->  (2) Revert to late adding of compilation rules in Makefile.objs (patch 8/14);
->      files aren't ready to compile earlier.
->  (3) Make a single patch just for fixing style (patch 4/14).
->  (4) Fix data type for hvf_fd field.
->  (5) Add comment that return value of -1 in apic function added in 7/14 means
->      "no interrupt".
-> ================
-> 
-> ================
-> Changes in v2:
->  (1) Removed legacy option "-enable-hvf" in favor of "-M accel=hvf"
->  (2) Added missing copyright headers; replace fprintfs for error_report;
->      improved commit description.
->  (3) Moved patch that adds compilation rules in Makefile.objs right after
->      the patch that adds the new files from Google's repo.
->  (4) Removed conditional macros from cpus.c and cpu.c
->  (5) Moved patch that fixes coding style to patch # 3
->  (6) Fix commit message in apic patch
->  (7) Squash some commits to avoid code churn
-> ================
-> 
-> The following patchset adds to QEMU the supporting for macOS's native
-> hypervisor, Hypervisor.framework (hvf). The code base is taken from
-> Google's Android emulator at
-> https://android.googlesource.com/platform/external/qemu/+/emu-master-dev.
-> Notably missing is support for live migration.
-> 
-> Apart from general code refactoring, some additional features were implemented:
-> retrieve the set of features supported by host cpu and hvf (cpuid);
-> dirty page tracking for VGA memory area; reimplementation of the event
-> injection mechanism to allow injection of exceptions during vmexits, which is
-> exemplified by the injection of a GP fault when the guest vmexits due to
-> execution of the vmcall instruction; changing the emulator's use of CPUState
-> structure in favor of CPUX86State, so as to in the future remove data structures
-> that are uselessly specific to hvf and unified some of the state between kvm/tcg
-> and hvf.
-> Some features initially planned to implement that didn't make it include:
-> page fault handling in the emulator and implementing the dummy_signal to handle
-> the SIG_IPI signal without race conditions. Hopefully these can be implemented
-> in the near future.
-> Event injection was tested through the eventinj kvm test. The latest Debian and
-> Damn Small Linux images were executed, although by now ways it was an
-> exhaustive testing.
-> 
-> Sergio Andres Gomez Del Real (14):
->   hvf: add support for Hypervisor.framework in the configure script
->   hvf: add code base from Google's QEMU repository
->   hvf: fix licensing issues; isolate task handling code (GPL v2-only)
->   hvf: run hvf code through checkpatch.pl and fix style issues
->   hvf: add code to cpus.c and do refactoring in preparation for
->     compiling
->   hvf: handle fields from CPUState and CPUX86State
->   apic: add function to apic that will be used by hvf
->   hvf: add compilation rules to Makefile.objs
->   hvf: use new helper functions for put/get xsave
->   hvf: implement hvf_get_supported_cpuid
->   hvf: refactor cpuid code
->   hvf: implement vga dirty page tracking
->   hvf: refactor event injection code for hvf
->   hvf: inject General Protection Fault when vmexit through vmcall
-> 
->  configure                           |   38 +
->  cpus.c                              |   89 ++
->  hw/intc/apic.c                      |   12 +
->  include/hw/i386/apic.h              |    1 +
->  include/qom/cpu.h                   |    2 +
->  include/sysemu/hvf.h                |  181 +++
->  qemu-options.hx                     |   10 +-
->  target/i386/Makefile.objs           |    1 +
->  target/i386/cpu-qom.h               |    4 +-
->  target/i386/cpu.c                   |   80 +-
->  target/i386/cpu.h                   |   34 +-
->  target/i386/hvf-all.c               |  963 +++++++++++++++
->  target/i386/hvf-i386.h              |   50 +
->  target/i386/hvf-utils/Makefile.objs |    1 +
->  target/i386/hvf-utils/README.md     |    7 +
->  target/i386/hvf-utils/vmcs.h        |  371 ++++++
->  target/i386/hvf-utils/vmx.h         |  222 ++++
->  target/i386/hvf-utils/x86.c         |  184 +++
->  target/i386/hvf-utils/x86.h         |  394 +++++++
->  target/i386/hvf-utils/x86_cpuid.c   |  417 +++++++
->  target/i386/hvf-utils/x86_cpuid.h   |   52 +
->  target/i386/hvf-utils/x86_decode.c  | 2186 +++++++++++++++++++++++++++++++++++
->  target/i386/hvf-utils/x86_decode.h  |  325 ++++++
->  target/i386/hvf-utils/x86_descr.c   |  124 ++
->  target/i386/hvf-utils/x86_descr.h   |   55 +
->  target/i386/hvf-utils/x86_emu.c     | 1536 ++++++++++++++++++++++++
->  target/i386/hvf-utils/x86_emu.h     |   49 +
->  target/i386/hvf-utils/x86_flags.c   |  333 ++++++
->  target/i386/hvf-utils/x86_flags.h   |  243 ++++
->  target/i386/hvf-utils/x86_gen.h     |   53 +
->  target/i386/hvf-utils/x86_mmu.c     |  273 +++++
->  target/i386/hvf-utils/x86_mmu.h     |   45 +
->  target/i386/hvf-utils/x86_task.c    |  201 ++++
->  target/i386/hvf-utils/x86_task.h    |   18 +
->  target/i386/hvf-utils/x86hvf.c      |  463 ++++++++
->  target/i386/hvf-utils/x86hvf.h      |   39 +
->  target/i386/kvm.c                   |    2 -
->  37 files changed, 9025 insertions(+), 33 deletions(-)
->  create mode 100644 include/sysemu/hvf.h
->  create mode 100644 target/i386/hvf-all.c
->  create mode 100644 target/i386/hvf-i386.h
->  create mode 100644 target/i386/hvf-utils/Makefile.objs
->  create mode 100644 target/i386/hvf-utils/README.md
->  create mode 100644 target/i386/hvf-utils/vmcs.h
->  create mode 100644 target/i386/hvf-utils/vmx.h
->  create mode 100644 target/i386/hvf-utils/x86.c
->  create mode 100644 target/i386/hvf-utils/x86.h
->  create mode 100644 target/i386/hvf-utils/x86_cpuid.c
->  create mode 100644 target/i386/hvf-utils/x86_cpuid.h
->  create mode 100644 target/i386/hvf-utils/x86_decode.c
->  create mode 100644 target/i386/hvf-utils/x86_decode.h
->  create mode 100644 target/i386/hvf-utils/x86_descr.c
->  create mode 100644 target/i386/hvf-utils/x86_descr.h
->  create mode 100644 target/i386/hvf-utils/x86_emu.c
->  create mode 100644 target/i386/hvf-utils/x86_emu.h
->  create mode 100644 target/i386/hvf-utils/x86_flags.c
->  create mode 100644 target/i386/hvf-utils/x86_flags.h
->  create mode 100644 target/i386/hvf-utils/x86_gen.h
->  create mode 100644 target/i386/hvf-utils/x86_mmu.c
->  create mode 100644 target/i386/hvf-utils/x86_mmu.h
->  create mode 100644 target/i386/hvf-utils/x86_task.c
->  create mode 100644 target/i386/hvf-utils/x86_task.h
->  create mode 100644 target/i386/hvf-utils/x86hvf.c
->  create mode 100644 target/i386/hvf-utils/x86hvf.h
-> 
+-- PMM
