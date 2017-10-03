@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dzVLM-0005MF-Tx
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:07:14 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dzVLo-0005az-Mp
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:07:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dzVLJ-0005Zg-Kg
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:07:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43376)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1dzVLJ-0005Y9-Ba
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:07:09 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8611325785
-	for <qemu-devel@nongnu.org>; Tue,  3 Oct 2017 22:07:07 +0000 (UTC)
-Date: Tue, 3 Oct 2017 16:07:06 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20171003160706.2671a6ea@t450s.home>
-In-Reply-To: <1505824179-21541-45-git-send-email-pbonzini@redhat.com>
-References: <1505824179-21541-1-git-send-email-pbonzini@redhat.com>
-	<1505824179-21541-45-git-send-email-pbonzini@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dzVLl-000637-9c
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:07:40 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:36568)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dzVLl-00062f-4M
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:07:37 -0400
+Received: by mail-qk0-x242.google.com with SMTP id z14so6825265qkg.3
+	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 15:07:37 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <cover.1507059418.git.alistair.francis@xilinx.com>
+	<ea095f0e516828d978bf2e7344100c20d89788f7.1507059418.git.alistair.francis@xilinx.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <011f8d04-3a5f-f3f9-ec78-85bc07bc7e2d@amsat.org>
+Date: Tue, 3 Oct 2017 19:07:31 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 44/50] scripts: let checkpatch.pl process an
- entire GIT branch
+In-Reply-To: <ea095f0e516828d978bf2e7344100c20d89788f7.1507059418.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 4/5] xilinx_zynq: : Specify the valid
+ CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,290 +36,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, imammedo@redhat.com, marcel@redhat.com, alistair23@gmail.com
 
-On Tue, 19 Sep 2017 14:29:33 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+On 10/03/2017 05:05 PM, Alistair Francis wrote:
+> List all possible valid CPU options.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 
-> From: "Daniel P. Berrange" <berrange@redhat.com>
-> 
-> Currently before submitting a series, devs should run checkpatch.pl
-> across each patch to be submitted. This can be automated using a
-> command such as:
-> 
->   git rebase -i master -x 'git show | ./scripts/checkpatch.pl -'
-> 
-> This is rather long winded to type, so this patch introduces a way
-> to tell checkpatch.pl to validate a series of GIT revisions.
-> 
-> There are now three modes it can operate in 1) check a patch 2) check a source
-> file, or 3) check a git branch.
-> 
-> If no flags are given, the mode is determined by checking the args passed to
-> the command. If the args contain a literal ".." it is treated as a GIT revision
-> list. If the args end in ".patch" or equal "-" it is treated as a patch file.
-> Otherwise it is treated as a source file.
-> 
-> This automatic guessing can be overridden using --[no-]patch --[no-]file or
-> --[no-]branch
-> 
-> For example to check a GIT revision list:
-> 
->     $ ./scripts/checkpatch.pl master..
->     total: 0 errors, 0 warnings, 297 lines checked
-> 
->     b886d352a2bf58f0996471fb3991a138373a2957 has no obvious style problems and is ready for submission.
->     total: 0 errors, 0 warnings, 182 lines checked
-> 
->     2a731f9a9ce145e0e0df6d42dd2a3ce4dfc543fa has no obvious style problems and is ready for submission.
->     total: 0 errors, 0 warnings, 102 lines checked
-> 
->     11844169bcc0c8ed4449eb3744a69877ed329dd7 has no obvious style problems and is ready for submission.
-> 
-> If a genuine patch filename contains the characters '..' it is
-> possible to force interpretation of the arg as a patch
-> 
->   $ ./scripts/checkpatch.pl --patch master..
-> 
-> will force it to load a patch file called "master..", or equivalently
-> 
->   $ ./scripts/checkpatch.pl --no-branch master..
-> 
-> will simply turn off guessing of GIT revision lists.
-> 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> Message-Id: <20170913091000.9005-1-berrange@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
->  scripts/checkpatch.pl | 138 ++++++++++++++++++++++++++++++++++++++++----------
->  1 file changed, 111 insertions(+), 27 deletions(-)
-
-
-This introduces the following regression for me:
-
-$ ./scripts/checkpatch.pl patches-next/vfio-pci-add-virtual
-ERROR: trailing whitespace
-#44: FILE: vfio-pci-add-virtual:44:
-+ $
-
-ERROR: trailing whitespace
-#50: FILE: vfio-pci-add-virtual:50:
-+ $
-
-ERROR: trailing whitespace
-#60: FILE: vfio-pci-add-virtual:60:
-+ $
-
-ERROR: trailing whitespace
-#62: FILE: vfio-pci-add-virtual:62:
-+ $
-
-total: 4 errors, 0 warnings, 62 lines checked
-
-patches-next/vfio-pci-add-virtual has style problems, please review.  If any of these errors
-are false positives report them to the maintainer, see
-CHECKPATCH in MAINTAINERS.
-
-This is reported for the following patch, which contains no trailing
-whitespace errors:
-
-https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg05828.html
-
-$ perl -v
-
-This is perl, v5.10.1 (*) built for x86_64-linux-thread-multi
-
-Thanks,
-Alex
-
- 
-> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-> index fa47807..28d71b3 100755
-> --- a/scripts/checkpatch.pl
-> +++ b/scripts/checkpatch.pl
-> @@ -18,11 +18,12 @@ use Getopt::Long qw(:config no_auto_abbrev);
->  my $quiet = 0;
->  my $tree = 1;
->  my $chk_signoff = 1;
-> -my $chk_patch = 1;
-> +my $chk_patch = undef;
-> +my $chk_branch = undef;
->  my $tst_only;
->  my $emacs = 0;
->  my $terse = 0;
-> -my $file = 0;
-> +my $file = undef;
->  my $no_warnings = 0;
->  my $summary = 1;
->  my $mailback = 0;
-> @@ -35,14 +36,19 @@ sub help {
->  	my ($exitcode) = @_;
->  
->  	print << "EOM";
-> -Usage: $P [OPTION]... [FILE]...
-> +Usage:
-> +
-> +    $P [OPTION]... [FILE]...
-> +    $P [OPTION]... [GIT-REV-LIST]
-> +
->  Version: $V
->  
->  Options:
->    -q, --quiet                quiet
->    --no-tree                  run without a kernel tree
->    --no-signoff               do not check for 'Signed-off-by' line
-> -  --patch                    treat FILE as patchfile (default)
-> +  --patch                    treat FILE as patchfile
-> +  --branch                   treat args as GIT revision list
->    --emacs                    emacs compile window format
->    --terse                    one line per report
->    -f, --file                 treat FILE as regular source file
-> @@ -69,6 +75,7 @@ GetOptions(
->  	'tree!'		=> \$tree,
->  	'signoff!'	=> \$chk_signoff,
->  	'patch!'	=> \$chk_patch,
-> +	'branch!'	=> \$chk_branch,
->  	'emacs!'	=> \$emacs,
->  	'terse!'	=> \$terse,
->  	'f|file!'	=> \$file,
-> @@ -93,6 +100,49 @@ if ($#ARGV < 0) {
->  	exit(1);
+> 
+>  hw/arm/xilinx_zynq.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
+> index 1836a4ed45..de1e0bbce1 100644
+> --- a/hw/arm/xilinx_zynq.c
+> +++ b/hw/arm/xilinx_zynq.c
+> @@ -313,6 +313,10 @@ static void zynq_init(MachineState *machine)
+>      arm_load_kernel(ARM_CPU(first_cpu), &zynq_binfo);
 >  }
 >  
-> +if (!defined $chk_branch && !defined $chk_patch && !defined $file) {
-> +	$chk_branch = $ARGV[0] =~ /\.\./ ? 1 : 0;
-> +	$chk_patch = $chk_branch ? 0 :
-> +		$ARGV[0] =~ /\.patch$/ || $ARGV[0] eq "-" ? 1 : 0;
-> +	$file = $chk_branch || $chk_patch ? 0 : 1;
-> +} elsif (!defined $chk_branch && !defined $chk_patch) {
-> +	if ($file) {
-> +		$chk_branch = $chk_patch = 0;
-> +	} else {
-> +		$chk_branch = $ARGV[0] =~ /\.\./ ? 1 : 0;
-> +		$chk_patch = $chk_branch ? 0 : 1;
-> +	}
-> +} elsif (!defined $chk_branch && !defined $file) {
-> +	if ($chk_patch) {
-> +		$chk_branch = $file = 0;
-> +	} else {
-> +		$chk_branch = $ARGV[0] =~ /\.\./ ? 1 : 0;
-> +		$file = $chk_branch ? 0 : 1;
-> +	}
-> +} elsif (!defined $chk_patch && !defined $file) {
-> +	if ($chk_branch) {
-> +		$chk_patch = $file = 0;
-> +	} else {
-> +		$chk_patch = $ARGV[0] =~ /\.patch$/ || $ARGV[0] eq "-" ? 1 : 0;
-> +		$file = $chk_patch ? 0 : 1;
-> +	}
-> +} elsif (!defined $chk_branch) {
-> +	$chk_branch = $chk_patch || $file ? 0 : 1;
-> +} elsif (!defined $chk_patch) {
-> +	$chk_patch = $chk_branch || $file ? 0 : 1;
-> +} elsif (!defined $file) {
-> +	$file = $chk_patch || $chk_branch ? 0 : 1;
-> +}
+> +const char *xlnx_zynq_7000_valid_cpus[] = { ARM_CPU_TYPE_NAME("cortex-a9"),
+> +                                            NULL
+> +                                          };
 > +
-> +if (($chk_patch && $chk_branch) ||
-> +    ($chk_patch && $file) ||
-> +    ($chk_branch && $file)) {
-> +	die "Only one of --file, --branch, --patch is permitted\n";
-> +}
-> +if (!$chk_patch && !$chk_branch && !$file) {
-> +	die "One of --file, --branch, --patch is required\n";
-> +}
-> +
->  my $dbg_values = 0;
->  my $dbg_possible = 0;
->  my $dbg_type = 0;
-> @@ -251,32 +301,66 @@ $chk_signoff = 0 if ($file);
->  my @rawlines = ();
->  my @lines = ();
->  my $vname;
-> -for my $filename (@ARGV) {
-> -	my $FILE;
-> -	if ($file) {
-> -		open($FILE, '-|', "diff -u /dev/null $filename") ||
-> -			die "$P: $filename: diff failed - $!\n";
-> -	} elsif ($filename eq '-') {
-> -		open($FILE, '<&STDIN');
-> -	} else {
-> -		open($FILE, '<', "$filename") ||
-> -			die "$P: $filename: open failed - $!\n";
-> -	}
-> -	if ($filename eq '-') {
-> -		$vname = 'Your patch';
-> -	} else {
-> -		$vname = $filename;
-> -	}
-> -	while (<$FILE>) {
-> +if ($chk_branch) {
-> +	my @patches;
-> +	my $HASH;
-> +	open($HASH, "-|", "git", "log", "--format=%H", $ARGV[0]) ||
-> +		die "$P: git log --format=%H $ARGV[0] failed - $!\n";
-> +
-> +	while (<$HASH>) {
->  		chomp;
-> -		push(@rawlines, $_);
-> +		push @patches, $_;
-> +	}
-> +
-> +	close $HASH;
-> +
-> +	die "$P: no revisions returned for revlist '$chk_branch'\n"
-> +	    unless @patches;
-> +
-> +	for my $hash (@patches) {
-> +		my $FILE;
-> +		open($FILE, '-|', "git", "show", $hash) ||
-> +			die "$P: git show $hash - $!\n";
-> +		$vname = $hash;
-> +		while (<$FILE>) {
-> +			chomp;
-> +			push(@rawlines, $_);
-> +		}
-> +		close($FILE);
-> +		if (!process($hash)) {
-> +			$exit = 1;
-> +		}
-> +		@rawlines = ();
-> +		@lines = ();
->  	}
-> -	close($FILE);
-> -	if (!process($filename)) {
-> -		$exit = 1;
-> +} else {
-> +	for my $filename (@ARGV) {
-> +		my $FILE;
-> +		if ($file) {
-> +			open($FILE, '-|', "diff -u /dev/null $filename") ||
-> +				die "$P: $filename: diff failed - $!\n";
-> +		} elsif ($filename eq '-') {
-> +			open($FILE, '<&STDIN');
-> +		} else {
-> +			open($FILE, '<', "$filename") ||
-> +				die "$P: $filename: open failed - $!\n";
-> +		}
-> +		if ($filename eq '-') {
-> +			$vname = 'Your patch';
-> +		} else {
-> +			$vname = $filename;
-> +		}
-> +		while (<$FILE>) {
-> +			chomp;
-> +			push(@rawlines, $_);
-> +		}
-> +		close($FILE);
-> +		if (!process($filename)) {
-> +			$exit = 1;
-> +		}
-> +		@rawlines = ();
-> +		@lines = ();
->  	}
-> -	@rawlines = ();
-> -	@lines = ();
+>  static void zynq_machine_init(MachineClass *mc)
+>  {
+>      mc->desc = "Xilinx Zynq Platform Baseboard for Cortex-A9";
+> @@ -321,6 +325,7 @@ static void zynq_machine_init(MachineClass *mc)
+>      mc->no_sdcard = 1;
+>      mc->ignore_memory_transaction_failures = true;
+>      mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a9");
+> +    mc->valid_cpu_types = xlnx_zynq_7000_valid_cpus;
 >  }
 >  
->  exit($exit);
+>  DEFINE_MACHINE("xilinx-zynq-a9", zynq_machine_init)
+> 
