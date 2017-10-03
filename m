@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dzMHJ-0007VQ-TU
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:26:31 -0400
+	(envelope-from <eblake@redhat.com>) id 1dzMJi-0000X0-Df
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:28:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dzMHD-0008Ln-UK
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:26:25 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:7522 helo=relay.sw.ru)
+	(envelope-from <eblake@redhat.com>) id 1dzMJf-0002dW-5L
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:28:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50806)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dzMHD-0008KL-IY
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:26:19 -0400
-References: <20170925135801.144261-1-vsementsov@virtuozzo.com>
-	<20170925135801.144261-9-vsementsov@virtuozzo.com>
-	<b8b01f1a-6e7b-342f-02b6-b7386bff1500@redhat.com>
-	<a4fb096f-7995-ad85-64b7-68a124410e86@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <3b2e222e-87ea-e134-64a8-f6394e502a14@virtuozzo.com>
-Date: Tue, 3 Oct 2017 15:26:10 +0300
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dzMJe-0002cb-Rw
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:28:51 -0400
+References: <20140607203050.27669.10321.malonedeb@gac.canonical.com>
+	<150702766740.1698.17693165473735413839.malone@chaenomeles.canonical.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f4f6b65f-9fa9-3cdd-3e9c-182be5ed6436@redhat.com>
+Date: Tue, 3 Oct 2017 07:28:48 -0500
 MIME-Version: 1.0
-In-Reply-To: <a4fb096f-7995-ad85-64b7-68a124410e86@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 8/8] nbd: Minimal structured
- read for client
+In-Reply-To: <150702766740.1698.17693165473735413839.malone@chaenomeles.canonical.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2BORbhLv663Cp8iIwkahpM4qen7TRMfx6"
+Subject: Re: [Qemu-devel] [Bug 1327608] Re: monitor socked path is cut a 105
+ characters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
+To: Bug 1327608 <1327608@bugs.launchpad.net>, qemu-devel@nongnu.org
 
-03.10.2017 13:07, Paolo Bonzini wrote:
-> On 26/09/2017 00:19, Eric Blake wrote:
->>> +    /* here we deal with successful structured reply */
->>> +    switch (s->reply.type) {
->>> +        QEMUIOVector sub_qiov;
->>> +    case NBD_SREP_TYPE_OFFSET_DATA:
->> This is putting a LOT of smarts directly into the receive routine.
->> Here's where I was previously wondering (and I think Paolo as well)
->> whether it might be better to split the efforts: the generic function
->> reads off the chunk information and any payload, but a per-command
->> callback function then parses the chunks.  Especially since the
->> definition of the chunks differs on a per-command basis (yes, the NBD
->> spec will try to not reuse an SREP chunk type across multiple commands
->> unless the semantics are similar, but that's a bit more fragile).  This
->> particularly matters given my statement above that you want a
->> discriminated union, rather than a struct that contains unused fields,
->> for handling different SREP chunk types.
-> I think there should be two kinds of replies: 1) read directly into a
-> QEMUIOVector, using structured replies only as an encapsulation of the
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2BORbhLv663Cp8iIwkahpM4qen7TRMfx6
+From: Eric Blake <eblake@redhat.com>
+To: Bug 1327608 <1327608@bugs.launchpad.net>, qemu-devel@nongnu.org
+Message-ID: <f4f6b65f-9fa9-3cdd-3e9c-182be5ed6436@redhat.com>
+Subject: Re: [Qemu-devel] [Bug 1327608] Re: monitor socked path is cut a 105
+ characters
+References: <20140607203050.27669.10321.malonedeb@gac.canonical.com>
+ <150702766740.1698.17693165473735413839.malone@chaenomeles.canonical.com>
+In-Reply-To: <150702766740.1698.17693165473735413839.malone@chaenomeles.canonical.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-who should read to qiov? reply_entry, or calling coroutine?.. 
-reply_entry should anyway
-parse reply, to understand should it read it all or read it to qiov (or 
-yield back, and then
-calling coroutine will read to qiov)..
+On 10/03/2017 05:47 AM, Thomas Huth wrote:
+> Triaging old bug tickets... can you still reproduce this issue with the=
 
-> payload; 2) read a chunk at a time into malloc-ed memory, yielding back
-> to the calling coroutine after receiving one complete chunk.
->
-> In the end this probably means that you have a read_chunk_header
-> function and a read_chunk function.  READ has a loop that calls
-> read_chunk_header followed by direct reading into the QEMUIOVector,
-> while everyone else calls read_chunk.
->
-> Maybe qio_channel_readv/writev_full could have "offset" and "bytes"
-> arguments.  Most code in iov_send_recv could be cut-and-pasted.  (When
-> sheepdog is converted to QIOChannel, iov_send_recv can go away).
->
-> Paolo
+> latest version of QEMU? Or could we close this ticket nowadays?
+
+This may be fixed by:
+
+commit ad9579aaa16d5b385922d49edac2c96c79bcfb62
+Author: Daniel P. Berrange <berrange@redhat.com>
+Date:   Thu May 25 16:53:00 2017 +0100
+
+    sockets: improve error reporting if UNIX socket path is too long
+
+    The 'struct sockaddr_un' only allows 108 bytes for the socket
+    path.
+
+    If the user supplies a path, QEMU uses snprintf() to silently
+    truncate it when too long. This is undesirable because the user
+    will then be unable to connect to the path they asked for.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
--- 
-Best regards,
-Vladimir
+--2BORbhLv663Cp8iIwkahpM4qen7TRMfx6
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnTgoAACgkQp6FrSiUn
+Q2rnhAf/f+WxlTkIt2XJEoUEB35Ze1rDpoWe9EqXKOuhBzOU/+ye7BHAaHo7WvJ6
+8EhvXwVsYpGDN+KPglnzYrExbEOnL66pM4y8yR3wcKBNQO5pVhae834SBTt1ITLq
+YrCub3nLF7IxWFtRO9emYNI+KaSzQa8GKZBYBrNHuoyHylQxJOb8OfWfnb/wizdr
+77TnjQtU/0j9MUdiKdK33kKeYSgXJR9WscnshjqcqAoDOujamm+ystKI+NyI9Di2
+wzB0TY7cBb5z981pEjivAKAQM1VnMuqO1xGmUfGU5YgLdKzDpZtKBUXLp57w4cxL
+7k4xZKlx0zHFlhIQM9/H/xIp2LHy0g==
+=U7GZ
+-----END PGP SIGNATURE-----
+
+--2BORbhLv663Cp8iIwkahpM4qen7TRMfx6--
