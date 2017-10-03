@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dzK7U-0005tW-Mo
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 06:08:09 -0400
+	(envelope-from <thuth@redhat.com>) id 1dzKDN-0007Ja-8o
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 06:14:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dzK7P-0006Z8-0K
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 06:08:08 -0400
-Received: from mail-wm0-f52.google.com ([74.125.82.52]:50766)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dzK7O-0006Yn-PC
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 06:08:02 -0400
-Received: by mail-wm0-f52.google.com with SMTP id u138so15502041wmu.5
-	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 03:08:02 -0700 (PDT)
-References: <20170925135801.144261-1-vsementsov@virtuozzo.com>
-	<20170925135801.144261-9-vsementsov@virtuozzo.com>
-	<b8b01f1a-6e7b-342f-02b6-b7386bff1500@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a4fb096f-7995-ad85-64b7-68a124410e86@redhat.com>
-Date: Tue, 3 Oct 2017 12:07:59 +0200
-MIME-Version: 1.0
-In-Reply-To: <b8b01f1a-6e7b-342f-02b6-b7386bff1500@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 8/8] nbd: Minimal structured
- read for client
+	(envelope-from <thuth@redhat.com>) id 1dzKDI-0003Nm-QY
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 06:14:13 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue,  3 Oct 2017 12:14:04 +0200
+Message-Id: <1507025644-5972-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] target/ppc: Remove unused PPC 460 and 460F
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +18,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
+To: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
 
-On 26/09/2017 00:19, Eric Blake wrote:
->> +    /* here we deal with successful structured reply */
->> +    switch (s->reply.type) {
->> +        QEMUIOVector sub_qiov;
->> +    case NBD_SREP_TYPE_OFFSET_DATA:
-> This is putting a LOT of smarts directly into the receive routine.
-> Here's where I was previously wondering (and I think Paolo as well)
-> whether it might be better to split the efforts: the generic function
-> reads off the chunk information and any payload, but a per-command
-> callback function then parses the chunks.  Especially since the
-> definition of the chunks differs on a per-command basis (yes, the NBD
-> spec will try to not reuse an SREP chunk type across multiple commands
-> unless the semantics are similar, but that's a bit more fragile).  This
-> particularly matters given my statement above that you want a
-> discriminated union, rather than a struct that contains unused fields,
-> for handling different SREP chunk types.
+We don't have any 460 or 460F CPUs in QEMU, so the init functions
+are just dead code. Let's simply remove them (translate_init.c
+is already big enough without them).
 
-I think there should be two kinds of replies: 1) read directly into a
-QEMUIOVector, using structured replies only as an encapsulation of the
-payload; 2) read a chunk at a time into malloc-ed memory, yielding back
-to the calling coroutine after receiving one complete chunk.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ target/ppc/translate_init.c | 217 --------------------------------------------
+ 1 file changed, 217 deletions(-)
 
-In the end this probably means that you have a read_chunk_header
-function and a read_chunk function.  READ has a loop that calls
-read_chunk_header followed by direct reading into the QEMUIOVector,
-while everyone else calls read_chunk.
-
-Maybe qio_channel_readv/writev_full could have "offset" and "bytes"
-arguments.  Most code in iov_send_recv could be cut-and-pasted.  (When
-sheepdog is converted to QIOChannel, iov_send_recv can go away).
-
-Paolo
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index c6399a3..0d6379f 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -4176,223 +4176,6 @@ POWERPC_FAMILY(440x5wDFPU)(ObjectClass *oc, void *data)
+                  POWERPC_FLAG_DE | POWERPC_FLAG_BUS_CLK;
+ }
+ 
+-static void init_proc_460 (CPUPPCState *env)
+-{
+-    /* Time base */
+-    gen_tbl(env);
+-    gen_spr_BookE(env, 0x000000000000FFFFULL);
+-    gen_spr_440(env);
+-    gen_spr_usprgh(env);
+-    /* Processor identification */
+-    spr_register(env, SPR_BOOKE_PIR, "PIR",
+-                 SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_pir,
+-                 0x00000000);
+-    /* XXX : not implemented */
+-    spr_register(env, SPR_BOOKE_IAC3, "IAC3",
+-                 SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_generic,
+-                 0x00000000);
+-    /* XXX : not implemented */
+-    spr_register(env, SPR_BOOKE_IAC4, "IAC4",
+-                 SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_generic,
+-                 0x00000000);
+-    /* XXX : not implemented */
+-    spr_register(env, SPR_BOOKE_DVC1, "DVC1",
+-                 SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_generic,
+-                 0x00000000);
+-    /* XXX : not implemented */
+-    spr_register(env, SPR_BOOKE_DVC2, "DVC2",
+-                 SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_generic,
+-                 0x00000000);
+-    /* XXX : not implemented */
+-    spr_register(env, SPR_BOOKE_MCSR, "MCSR",
+-                 SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_generic,
+-                 0x00000000);
+-    spr_register(env, SPR_BOOKE_MCSRR0, "MCSRR0",
+-                 SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_generic,
+-                 0x00000000);
+-    spr_register(env, SPR_BOOKE_MCSRR1, "MCSRR1",
+-                 SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_generic,
+-                 0x00000000);
+-    /* XXX : not implemented */
+-    spr_register(env, SPR_440_CCR1, "CCR1",
+-                 SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_generic,
+-                 0x00000000);
+-    /* XXX : not implemented */
+-    spr_register(env, SPR_DCRIPR, "SPR_DCRIPR",
+-                 &spr_read_generic, &spr_write_generic,
+-                 &spr_read_generic, &spr_write_generic,
+-                 0x00000000);
+-    /* Memory management */
+-#if !defined(CONFIG_USER_ONLY)
+-    env->nb_tlb = 64;
+-    env->nb_ways = 1;
+-    env->id_tlbs = 0;
+-    env->tlb_type = TLB_EMB;
+-#endif
+-    init_excp_BookE(env);
+-    env->dcache_line_size = 32;
+-    env->icache_line_size = 32;
+-    /* XXX: TODO: allocate internal IRQ controller */
+-
+-    SET_FIT_PERIOD(12, 16, 20, 24);
+-    SET_WDT_PERIOD(20, 24, 28, 32);
+-}
+-
+-POWERPC_FAMILY(460)(ObjectClass *oc, void *data)
+-{
+-    DeviceClass *dc = DEVICE_CLASS(oc);
+-    PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(oc);
+-
+-    dc->desc = "PowerPC 460 (guessed)";
+-    pcc->init_proc = init_proc_460;
+-    pcc->check_pow = check_pow_nocheck;
+-    pcc->insns_flags = PPC_INSNS_BASE | PPC_STRING |
+-                       PPC_DCR | PPC_DCRX  | PPC_DCRUX |
+-                       PPC_WRTEE | PPC_MFAPIDI | PPC_MFTB |
+-                       PPC_CACHE | PPC_CACHE_ICBI |
+-                       PPC_CACHE_DCBZ | PPC_CACHE_DCBA |
+-                       PPC_MEM_TLBSYNC | PPC_TLBIVA |
+-                       PPC_BOOKE | PPC_4xx_COMMON | PPC_405_MAC |
+-                       PPC_440_SPEC;
+-    pcc->msr_mask = (1ull << MSR_POW) |
+-                    (1ull << MSR_CE) |
+-                    (1ull << MSR_EE) |
+-                    (1ull << MSR_PR) |
+-                    (1ull << MSR_FP) |
+-                    (1ull << MSR_ME) |
+-                    (1ull << MSR_FE0) |
+-                    (1ull << MSR_DWE) |
+-                    (1ull << MSR_DE) |
+-                    (1ull << MSR_FE1) |
+-                    (1ull << MSR_IR) |
+-                    (1ull << MSR_DR);
+-    pcc->mmu_model = POWERPC_MMU_BOOKE;
+-    pcc->excp_model = POWERPC_EXCP_BOOKE;
+-    pcc->bus_model = PPC_FLAGS_INPUT_BookE;
+-    pcc->bfd_mach = bfd_mach_ppc_403;
+-    pcc->flags = POWERPC_FLAG_CE | POWERPC_FLAG_DWE |
+-                 POWERPC_FLAG_DE | POWERPC_FLAG_BUS_CLK;
+-}
+-
+-static void init_proc_460F(CPUPPCState *env)
+-{
+-    /* Time base */
+-    gen_tbl(env);
+-    gen_spr_BookE(env, 0x000000000000FFFFULL);
+-    gen_spr_440(env);
+-    gen_spr_usprgh(env);
+-    /* Processor identification */
+-    spr_register(env, SPR_BOOKE_PIR, "PIR",
+-                 SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_pir,
+-                 0x00000000);
+-    /* XXX : not implemented */
+-    spr_register(env, SPR_BOOKE_IAC3, "IAC3",
+-                 SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_generic,
+-                 0x00000000);
+-    /* XXX : not implemented */
+-    spr_register(env, SPR_BOOKE_IAC4, "IAC4",
+-                 SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_generic,
+-                 0x00000000);
+-    /* XXX : not implemented */
+-    spr_register(env, SPR_BOOKE_DVC1, "DVC1",
+-                 SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_generic,
+-                 0x00000000);
+-    /* XXX : not implemented */
+-    spr_register(env, SPR_BOOKE_DVC2, "DVC2",
+-                 SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_generic,
+-                 0x00000000);
+-    /* XXX : not implemented */
+-    spr_register(env, SPR_BOOKE_MCSR, "MCSR",
+-                 SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_generic,
+-                 0x00000000);
+-    spr_register(env, SPR_BOOKE_MCSRR0, "MCSRR0",
+-                 SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_generic,
+-                 0x00000000);
+-    spr_register(env, SPR_BOOKE_MCSRR1, "MCSRR1",
+-                 SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_generic,
+-                 0x00000000);
+-    /* XXX : not implemented */
+-    spr_register(env, SPR_440_CCR1, "CCR1",
+-                 SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_generic,
+-                 0x00000000);
+-    /* XXX : not implemented */
+-    spr_register(env, SPR_DCRIPR, "SPR_DCRIPR",
+-                 &spr_read_generic, &spr_write_generic,
+-                 &spr_read_generic, &spr_write_generic,
+-                 0x00000000);
+-    /* Memory management */
+-#if !defined(CONFIG_USER_ONLY)
+-    env->nb_tlb = 64;
+-    env->nb_ways = 1;
+-    env->id_tlbs = 0;
+-    env->tlb_type = TLB_EMB;
+-#endif
+-    init_excp_BookE(env);
+-    env->dcache_line_size = 32;
+-    env->icache_line_size = 32;
+-    /* XXX: TODO: allocate internal IRQ controller */
+-
+-    SET_FIT_PERIOD(12, 16, 20, 24);
+-    SET_WDT_PERIOD(20, 24, 28, 32);
+-}
+-
+-POWERPC_FAMILY(460F)(ObjectClass *oc, void *data)
+-{
+-    DeviceClass *dc = DEVICE_CLASS(oc);
+-    PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(oc);
+-
+-    dc->desc = "PowerPC 460F (guessed)";
+-    pcc->init_proc = init_proc_460F;
+-    pcc->check_pow = check_pow_nocheck;
+-    pcc->insns_flags = PPC_INSNS_BASE | PPC_STRING |
+-                       PPC_FLOAT | PPC_FLOAT_FRES | PPC_FLOAT_FSEL |
+-                       PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
+-                       PPC_FLOAT_STFIWX | PPC_MFTB |
+-                       PPC_DCR | PPC_DCRX | PPC_DCRUX |
+-                       PPC_WRTEE | PPC_MFAPIDI |
+-                       PPC_CACHE | PPC_CACHE_ICBI |
+-                       PPC_CACHE_DCBZ | PPC_CACHE_DCBA |
+-                       PPC_MEM_TLBSYNC | PPC_TLBIVA |
+-                       PPC_BOOKE | PPC_4xx_COMMON | PPC_405_MAC |
+-                       PPC_440_SPEC;
+-    pcc->msr_mask = (1ull << MSR_POW) |
+-                    (1ull << MSR_CE) |
+-                    (1ull << MSR_EE) |
+-                    (1ull << MSR_PR) |
+-                    (1ull << MSR_FP) |
+-                    (1ull << MSR_ME) |
+-                    (1ull << MSR_FE0) |
+-                    (1ull << MSR_DWE) |
+-                    (1ull << MSR_DE) |
+-                    (1ull << MSR_FE1) |
+-                    (1ull << MSR_IR) |
+-                    (1ull << MSR_DR);
+-    pcc->mmu_model = POWERPC_MMU_BOOKE;
+-    pcc->excp_model = POWERPC_EXCP_BOOKE;
+-    pcc->bus_model = PPC_FLAGS_INPUT_BookE;
+-    pcc->bfd_mach = bfd_mach_ppc_403;
+-    pcc->flags = POWERPC_FLAG_CE | POWERPC_FLAG_DWE |
+-                 POWERPC_FLAG_DE | POWERPC_FLAG_BUS_CLK;
+-}
+-
+ static void init_proc_MPC5xx(CPUPPCState *env)
+ {
+     /* Time base */
+-- 
+1.8.3.1
