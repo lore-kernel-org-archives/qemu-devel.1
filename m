@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dzNBB-0000LZ-Pc
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:24:13 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dzNDx-0001Fg-3E
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:27:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dzNB8-0008J2-Js
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:24:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40272)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dzNB8-0008I3-Dq
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:24:06 -0400
-Date: Tue, 3 Oct 2017 14:23:51 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171003132351.GA2935@work-vm>
-References: <20170628190047.26159-1-dgilbert@redhat.com>
-	<20170628190047.26159-25-dgilbert@redhat.com>
-	<2f4c1067-14a4-d943-0dff-790d705778f1@redhat.com>
-	<20170707115353.GD2451@work-vm>
+	(envelope-from <peter.maydell@linaro.org>) id 1dzNDw-0002Ry-6I
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:27:01 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:56060)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dzNDv-0002R2-Tu
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:27:00 -0400
+Received: by mail-wr0-x229.google.com with SMTP id l39so6309686wrl.12
+	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 06:26:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170707115353.GD2451@work-vm>
-Subject: Re: [Qemu-devel] [RFC 24/29] vhost+postcopy: Lock around
- set_mem_table
+In-Reply-To: <20170929102201.15408-1-kraxel@redhat.com>
+References: <20170929102201.15408-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 3 Oct 2017 14:26:37 +0100
+Message-ID: <CAFEAcA-7FCEYkovK4nZoJfn5-aRY15qFnu_LZxA2iNFUnGoM5w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/5] Ui 20170929 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-* Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
-> * Maxime Coquelin (maxime.coquelin@redhat.com) wrote:
-> > 
-> > 
-> > On 06/28/2017 09:00 PM, Dr. David Alan Gilbert (git) wrote:
-> > > From: "Dr. David Alan Gilbert"<dgilbert@redhat.com>
-> > > 
-> > > **HACK - better solution needed **
-> > > We have the situation where:
-> > > 
-> > >       qemu                      bridge
-> > > 
-> > >       send set_mem_table
-> > >                                map memory
-> > >    a)                          mark area with UFD
-> > >                                send reply with map addresses
-> > >    b)                          start using
-> > >    c) receive reply
-> > > 
-> > >    As soon as (a) happens qemu might start seeing faults
-> > > from memory accesses (but doesn't until b); but it can't
-> > > process those faults until (c) when it's received the
-> > > mmap addresses.
-> > > 
-> > > Make the fault handler spin until it gets the reply in (c).
-> > > 
-> > > At the very least this needs some proper locks, but preferably
-> > > we need to split the message.
-> > 
-> > Yes, maybe the slave channel could be used to send the ufds with
-> > a dedicated request? The backend would set the reply-ack flag, so that
-> > it starts accessing the guest memory only when Qemu is ready to handle
-> > faults.
-> 
-> Yes, that would make life a lot easier.
-> 
-> > Note that the slave channel support has not been implemented in Qemu's
-> > libvhost-user yet, but this is something I can do if we feel the need.
-> 
-> Can you tell me a bit about how the slave channel works?
+On 29 September 2017 at 11:21, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit ab161529261928ae7f3556e3220829c34b2686ec:
+>
+>   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-20170927a' into staging (2017-09-27 22:44:51 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/ui-20170929-pull-request
+>
+> for you to fetch changes up to 7364dbdabb7824d5bde1e341bb6d928282f01c83:
+>
+>   ui: add tracing of VNC authentication process (2017-09-29 10:36:34 +0200)
+>
+> ----------------------------------------------------------------
+> ui and input patches.
+>
+> ----------------------------------------------------------------
+>
+> Daniel P. Berrange (2):
+>   ui: add tracing of VNC operations related to QIOChannel
+>   ui: add tracing of VNC authentication process
+>
+> Gerd Hoffmann (3):
+>   console: purge curses bits from console.h
+>   egl: misc framebuffer helper improvements.
+>   virtio-input: send rel-wheel events for wheel buttons
 
-I've looked at the slave-channel; and I'm worried that it's not suitable
-for this case.
-The problem is that 'slave_read' is wired to a fd_handler that I think
-is serviced by the main thread, and while postcopy is running I don't
-want to rely on the operation of the main thread (since it could be
-blocked by a page fault).
-I could still use an explicit ack at that point though over the main
-channel I think (or use the slave synchronously?).
+Applied, thanks.
 
-Dave
-
-> Dave
-> 
-> > Maxime
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- PMM
