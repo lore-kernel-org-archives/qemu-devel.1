@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dzDgj-0006yo-RV
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 23:16:06 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dzDgk-0006yw-04
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 23:16:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dzDgi-0005pp-W4
+	(envelope-from <jsnow@redhat.com>) id 1dzDgj-0005q2-23
 	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 23:16:05 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Mon,  2 Oct 2017 23:15:53 -0400
-Message-Id: <20171003031556.15173-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/3] blockjobs: add explicit job culling
+Date: Mon,  2 Oct 2017 23:15:55 -0400
+Message-Id: <20171003031556.15173-3-jsnow@redhat.com>
+In-Reply-To: <20171003031556.15173-1-jsnow@redhat.com>
+References: <20171003031556.15173-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/3] qmp: add block-job-cull command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,33 +22,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-For jobs that complete when a monitor isn't looking, there's no way to
-tell what the job's final return code was. We need to allow jobs to
-remain in the list until queried for reliable management.
+For jobs that have finished (either completed or canceled), allow the
+user to dismiss the job's status reports via block-job-cull.
 
-This is an RFC; tests are on the way.
-(Tested only manually via qmp-shell for now.)
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ block/trace-events   |  1 +
+ blockdev.c           | 14 ++++++++++++++
+ qapi/block-core.json | 21 +++++++++++++++++++++
+ 3 files changed, 36 insertions(+)
 
-John Snow (3):
-  blockjob: add manual-cull property
-  qmp: add block-job-cull command
-  blockjob: expose manual-cull property
-
- block/backup.c               | 20 +++++++++---------
- block/commit.c               |  2 +-
- block/mirror.c               |  2 +-
- block/replication.c          |  5 +++--
- block/stream.c               |  2 +-
- block/trace-events           |  1 +
- blockdev.c                   | 28 +++++++++++++++++++++----
- blockjob.c                   | 46 +++++++++++++++++++++++++++++++++++++++--
- include/block/block_int.h    |  8 +++++---
- include/block/blockjob.h     | 21 +++++++++++++++++++
- include/block/blockjob_int.h |  2 +-
- qapi/block-core.json         | 49 ++++++++++++++++++++++++++++++++++++--------
- tests/test-blockjob-txn.c    |  2 +-
- tests/test-blockjob.c        |  2 +-
- 14 files changed, 155 insertions(+), 35 deletions(-)
-
+diff --git a/block/trace-events b/block/trace-events
+index 25dd5a3..cb64e91 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -46,6 +46,7 @@ qmp_block_job_cancel(void *job) "job %p"
+ qmp_block_job_pause(void *job) "job %p"
+ qmp_block_job_resume(void *job) "job %p"
+ qmp_block_job_complete(void *job) "job %p"
++qmp_block_job_cull(void *job) "job %p"
+ qmp_block_stream(void *bs, void *job) "bs %p job %p"
+ 
+ # block/file-win32.c
+diff --git a/blockdev.c b/blockdev.c
+index eeb4986..ee07bca 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3766,6 +3766,20 @@ void qmp_block_job_complete(const char *device, Error **errp)
+     aio_context_release(aio_context);
+ }
+ 
++void qmp_block_job_cull(const char *device, Error **errp)
++{
++    AioContext *aio_context;
++    BlockJob *job = find_block_job(device, &aio_context, errp);
++
++    if (!job) {
++        return;
++    }
++
++    trace_qmp_block_job_cull(job);
++    block_job_cull(&job, errp);
++    aio_context_release(aio_context);
++}
++
+ void qmp_change_backing_file(const char *device,
+                              const char *image_node_name,
+                              const char *backing_file,
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index a4f5e10..de322d1 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2161,6 +2161,27 @@
+ { 'command': 'block-job-complete', 'data': { 'device': 'str' } }
+ 
+ ##
++# @block-job-cull:
++#
++# For jobs that have already completed, remove them from the block-job-query
++# list. This command only needs to be run for jobs which were started with the
++# manual-cull=true option.
++#
++# This command will refuse to operate on any job that has not yet reached
++# its terminal state. "cancel" or "complete" will still need to be used as
++# appropriate.
++#
++# @device: The job identifier. This used to be a device name (hence
++#          the name of the parameter), but since QEMU 2.7 it can have
++#          other values.
++#
++# Returns: Nothing on success
++#
++# Since: 2.11
++##
++{ 'command': 'block-job-cull', 'data': { 'device': 'str' } }
++
++##
+ # @BlockdevDiscardOptions:
+ #
+ # Determines how to handle discard requests.
 -- 
 2.9.5
