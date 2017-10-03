@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dzO8G-0006U5-Se
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 10:25:17 -0400
+	(envelope-from <jan.dakinevich@virtuozzo.com>) id 1dzOG3-0008Jy-Ul
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 10:33:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dzO8B-0002iQ-1G
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 10:25:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46320)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dzO8A-0002i0-Og
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 10:25:06 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A7D9381E1E
-	for <qemu-devel@nongnu.org>; Tue,  3 Oct 2017 14:25:05 +0000 (UTC)
-Date: Tue, 3 Oct 2017 11:25:01 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171003142501.GI17385@localhost.localdomain>
-References: <20171002192404.GC17385@localhost.localdomain>
-	<1507032886-199950-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <jan.dakinevich@virtuozzo.com>) id 1dzOG0-0001Uh-Q8
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 10:33:15 -0400
+References: <1507034861-4661-1-git-send-email-jan.dakinevich@virtuozzo.com>
+	<1507034861-4661-2-git-send-email-jan.dakinevich@virtuozzo.com>
+	<e77d7b78-a2ff-51a3-360e-c7d5d4e7006b@redhat.com>
+From: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+Message-ID: <7735fee8-dcc0-edc1-2fd3-f2aee7fe2df1@virtuozzo.com>
+Date: Tue, 3 Oct 2017 17:32:49 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1507032886-199950-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qom: add helpers REGISTER_STATIC_TYPE[S]()
+In-Reply-To: <e77d7b78-a2ff-51a3-360e-c7d5d4e7006b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] virtio: introduce `query-virtio'
+ QMP command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,125 +26,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Amit Shah <amit@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org
 
-On Tue, Oct 03, 2017 at 02:14:46PM +0200, Igor Mammedov wrote:
-> it will help to remove code duplication in places
-> that currently open code registration of static
-> type[s] and remove necessity to declare function
-> for type_init() to call, when only static types
-> need to be registered.
+
+
+On 10/03/2017 05:02 PM, Eric Blake wrote:
+> On 10/03/2017 07:47 AM, Jan Dakinevich wrote:
+>> The command is intended for gathering virtio information such as status,
+>> feature bits, negotiation status. It is convenient and useful for debug
+>> purpose.
+>>
+>> The commands returns generic virtio information for virtio such as
+>> common feature names and status bits names and information for all
+>> attached to current machine devices.
+>>
+>> To retrieve names of device-specific features `get_feature_name'
+>> callback in VirtioDeviceClass also was introduced.
+>>
+>> Cc: Denis V. Lunev <den@virtuozzo.com>
+>> Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+>> ---
+>>  hw/block/virtio-blk.c       |  21 +++++++++
+>>  hw/char/virtio-serial-bus.c |  15 +++++++
+>>  hw/display/virtio-gpu.c     |  13 ++++++
+>>  hw/net/virtio-net.c         |  35 +++++++++++++++
+>>  hw/scsi/virtio-scsi.c       |  16 +++++++
+>>  hw/virtio/Makefile.objs     |   2 +
+>>  hw/virtio/virtio-balloon.c  |  15 +++++++
+>>  hw/virtio/virtio-stub.c     |   9 ++++
+>>  hw/virtio/virtio.c          | 101 ++++++++++++++++++++++++++++++++++++++++++++
+>>  include/hw/virtio/virtio.h  |   2 +
+>>  qapi-schema.json            |   1 +
+>>  qapi/virtio.json            |  94 +++++++++++++++++++++++++++++++++++++++++
+>>  12 files changed, 324 insertions(+)
+>>  create mode 100644 hw/virtio/virtio-stub.c
+>>  create mode 100644 qapi/virtio.json
 > 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> I'm going to use it for CPU types in followup patches
+> This creates a new .json file, but does not touch MAINTAINERS.  Our idea
+> in splitting the .json files was to make it easier for each sub-file
+> that needs a specific maintainer in addition to the overall *.json line
+> for QAPI maintainers, so this may deserve a MAINTAINERS entry.
 > 
-> CC: ehabkost@redhat.com
-> ---
->  include/qemu/module.h | 10 ++++++++++
->  include/qom/object.h  | 10 ++++++++++
->  qom/object.c          |  9 +++++++++
->  3 files changed, 29 insertions(+)
+
+Ok.
+
+>> +++ b/qapi/virtio.json
+>> @@ -0,0 +1,94 @@
+>> +# -*- Mode: Python -*-
+>> +#
+>> +
+>> +##
+>> +# = Virtio devices
+>> +##
+>> +
+>> +{ 'include': 'common.json' }
+>> +
+>> +##
+>> +# @VirtioInfoBit:
+>> +#
+>> +# Named virtio bit
+>> +#
+>> +# @bit: bit number
+>> +#
+>> +# @name: bit name
+>> +#
+>> +# Since: 2.11.0
+>> +#
+>> +##
+>> +{
+>> +    'struct': 'VirtioInfoBit',
+>> +    'data': {
+>> +        'bit': 'uint64',
 > 
-> diff --git a/include/qemu/module.h b/include/qemu/module.h
-> index 56dd218..60dd632 100644
-> --- a/include/qemu/module.h
-> +++ b/include/qemu/module.h
-> @@ -52,6 +52,16 @@ typedef enum {
->  #define type_init(function) module_init(function, MODULE_INIT_QOM)
->  #define trace_init(function) module_init(function, MODULE_INIT_TRACE)
->  
-> +#define REGISTER_STATIC_TYPES(t, nr)                                        \
+> Why is this a 64-bit value? Are the values 0-63, or are they 1, 2, 4, 8,
+> ...?  The documentation on 'bit number' is rather sparse.
 
-I'm unsure about the name.  We already have a declarative way to
-register machine types (DEFINE_MACHINE), maybe use "DEFINE_*" for
-consistency?
+I would prefer `uint' here, but I don't see generic unsigned type (may
+be, I am mistaken). I could use uint8 here, though.
 
-Also, this function won't work if t isn't a static variable, will
-it?  The "STATIC" part looks redundant.
+> 
+>> +        'name': 'str'
+> 
+> Wouldn't an enum type be better than an open-ended string?
+> 
 
-In other words, how about "DEFINE_TYPE" and "DEFINE_TYPES"?
+Bit names are not known here, they are obtained from virtio device
+implementations.
 
+>> +    }
+>> +}
+>> +
+>> +##
+>> +# @VirtioInfoDevice:
+>> +#
+>> +# Information about specific virtio device
+>> +#
+>> +# @qom_path: QOM path of the device
+> 
+> Please make this 'qom-path' - new interfaces should prefer '-' over '_'.
 
-> +static void do_qemu_init_ ## t(void)                                        \
-> +{                                                                           \
-> +    type_register_static_array(t, nr);                                      \
+Ok.
 
-qemu/module.h doesn't include qom/object.h.  I think this should
-go to either qom/object.h or a new header file.
+>> +#
+>> +# @feature-names: names of device-specific features
+>> +#
+>> +# @host-features: bitmask of features, provided by devices
+>> +#
+>> +# @guest-features: bitmask of features, acknowledged by guest
+>> +#
+>> +# @status: virtio device status bitmask
+>> +#
+>> +# Since: 2.11.0
+>> +#
+>> +##
+>> +{
+>> +    'struct': 'VirtioInfoDevice',
+>> +    'data': {
+>> +        'qom_path': 'str',
+>> +        'feature-names': ['VirtioInfoBit'],
+>> +        'host-features': 'uint64',
+>> +        'guest-features': 'uint64',
+>> +        'status': 'uint64'
+> 
+> I'm wondering if this is the best representation (where the caller has
+> to parse the integer and then lookup in feature-names what each bit of
+> the integer represents).  But I'm not sure I have anything better off
+> the top of my head.
+> 
 
-> +}                                                                           \
-> +type_init(do_qemu_init_ ## t)
-> +
-> +#define REGISTER_STATIC_TYPE(t)                                             \
-> +    REGISTER_STATIC_TYPES(t, 1)
-> +
->  #define block_module_load_one(lib) module_load_one("block-", lib)
->  
->  void register_module_init(void (*fn)(void), module_init_type type);
-> diff --git a/include/qom/object.h b/include/qom/object.h
-> index f3e5cff..17fcadd 100644
-> --- a/include/qom/object.h
-> +++ b/include/qom/object.h
-> @@ -789,6 +789,16 @@ Type type_register_static(const TypeInfo *info);
->  Type type_register(const TypeInfo *info);
->  
->  /**
-> + * type_register_static_array:
-> + * @infos: The array of the new type #TypeInfo structures.
-> + * @nr_infos: number of entries in @infos
-> + *
-> + * @infos and all of the strings it points to should exist for the life time
-> + * that the type is registered.
-> + */
-> +void type_register_static_array(const TypeInfo *infos, int nr_infos);
+Consider it as way to tell caller about names of supported features.
 
-This new function is probably less controversial than the new
-module.h-based code.  Maybe worth moving to a separate patch so
-it can be merged earlier?
+>> +    }
+>> +}
+>> +
+>> +##
+>> +# @VirtioInfo:
+>> +#
+>> +# Information about virtio devices
+>> +#
+>> +# @feature-names: names of common virtio features
+>> +#
+>> +# @status-names: names of bits which represents virtio device status
+>> +#
+>> +# @devices: list of per-device virtio information
+>> +#
+>> +# Since: 2.11.0
+>> +#
+>> +##
+>> +{
+>> +    'struct': 'VirtioInfo',
+>> +    'data': {
+>> +        'feature-names': ['VirtioInfoBit'],
+> 
+> Why is feature-names listed at two different nestings of the return value?
+> 
 
-(If I were you, I would just use type_register_static_array()
-inside the existing *_cpu_register_types() functions by now, so
-this won't block the whole series, and worry about
-REGISTER_STATIC_TYPE*/DEFINE_TYPE* later.)
+These are different feature names. First names are common and predefined
+for all devices. Second names are device-specific.
 
-
-> +
-> +/**
->   * object_class_dynamic_cast_assert:
->   * @klass: The #ObjectClass to attempt to cast.
->   * @typename: The QOM typename of the class to cast to.
-> diff --git a/qom/object.c b/qom/object.c
-> index 3e18537..40b1729 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -151,6 +151,15 @@ TypeImpl *type_register_static(const TypeInfo *info)
->      return type_register(info);
->  }
->  
-> +void type_register_static_array(const TypeInfo *infos, int nr_infos)
-> +{
-> +    int i;
-> +
-> +    for (i = 0; i < nr_infos; i++) {
-> +        assert(type_register_static(&infos[i]));
-
-Why the assert()?  type_register_static() is already guaranteed
-to never return NULL.
-
-This will break if compiled with -DNDEBUG: assert() won't even
-evaluate the expression if NDEBUG is defined.
-
-> +    }
-> +}
-> +
->  static TypeImpl *type_get_by_name(const char *name)
->  {
->      if (name == NULL) {
-> -- 
-> 2.7.4
+>> +        'status-names': ['VirtioInfoBit'],
+>> +        'devices': ['VirtioInfoDevice']
+>> +    }
+>> +}
+>> +
+>> +
+>> +##
+>> +# @query-virtio:
+>> +#
+>> +# Returns generic and per-device virtio information
+>> +#
+>> +# Since: 2.11.0
+>> +#
+>> +##
+>> +{
+>> +    'command': 'query-virtio',
+>> +    'returns': 'VirtioInfo'
+>> +}
+>>
 > 
 
 -- 
-Eduardo
+Best regards
+Jan Dakinevich
