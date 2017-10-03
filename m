@@ -1,23 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dzUb3-0001uB-OS
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 17:19:25 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dzUdF-0003Zm-AJ
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 17:21:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dzUb1-0000Ll-NS
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 17:19:21 -0400
-References: <20170916185123.29255-1-mreitz@redhat.com>
-	<20170916185123.29255-7-mreitz@redhat.com>
-	<87h8vhk71g.fsf@dusky.pond.sub.org>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <b9fa6dec-df95-8b98-d295-0bd2315a7494@redhat.com>
-Date: Tue, 3 Oct 2017 23:19:06 +0200
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dzUdB-0002Ug-C0
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 17:21:37 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50954)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1dzUdA-0002SW-U0
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 17:21:33 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v93LKTLr020027
+	for <qemu-devel@nongnu.org>; Tue, 3 Oct 2017 17:21:28 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dcgt8vukw-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 17:21:27 -0400
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Tue, 3 Oct 2017 15:21:26 -0600
+References: <1506683421-27004-1-git-send-email-amarnath.valluri@intel.com>
+	<1506683421-27004-9-git-send-email-amarnath.valluri@intel.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Tue, 3 Oct 2017 17:21:12 -0400
 MIME-Version: 1.0
-In-Reply-To: <87h8vhk71g.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="PNJWalsH85IPBMVd1jid7ruHIgtjqs7dP"
-Subject: Re: [Qemu-devel] [PATCH v5 6/6] tests: Add check-qobject for
- equality tests
+In-Reply-To: <1506683421-27004-9-git-send-email-amarnath.valluri@intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <306334f5-358e-a7df-b663-b1b77e78c934@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v10 8/9] tpm: Added support for TPM emulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,489 +41,1087 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, marcandre.lureau@gmail.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PNJWalsH85IPBMVd1jid7ruHIgtjqs7dP
-From: Max Reitz <mreitz@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- qemu-devel@nongnu.org
-Message-ID: <b9fa6dec-df95-8b98-d295-0bd2315a7494@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 6/6] tests: Add check-qobject for equality
- tests
-References: <20170916185123.29255-1-mreitz@redhat.com>
- <20170916185123.29255-7-mreitz@redhat.com>
- <87h8vhk71g.fsf@dusky.pond.sub.org>
-In-Reply-To: <87h8vhk71g.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 09/29/2017 07:10 AM, Amarnath Valluri wrote:
+> This change introduces a new TPM backend driver that can communicate with
+> swtpm(software TPM emulator) using unix domain socket interface. QEMU talks to
+> TPM emulator using QEMU's socket-based chardev backend device.
+>
+> Swtpm uses two Unix sockets for communications, one for plain TPM commands and
+> responses, and one for out-of-band control messages. QEMU passes data socket to
+> be used over the control channel.
+>
+> The swtpm and associated tools can be found here:
+>      https://github.com/stefanberger/swtpm
+>
+> The swtpm's control channel protocol specification can be found here:
+>      https://github.com/stefanberger/swtpm/wiki/Control-Channel-Specification
+>
+> Usage:
+>      # setup TPM state directory
+>      mkdir /tmp/mytpm
+>      chown -R tss:root /tmp/mytpm
+>      /usr/bin/swtpm_setup --tpm-state /tmp/mytpm --createek
 
-On 2017-10-02 15:34, Markus Armbruster wrote:
-> Max Reitz <mreitz@redhat.com> writes:
->=20
->> Add a new test file (check-qobject.c) for unit tests that concern
->> QObjects as a whole.
->>
->> Its only purpose for now is to test the qobject_is_equal() function.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  tests/Makefile.include |   4 +-
->>  tests/check-qobject.c  | 315 ++++++++++++++++++++++++++++++++++++++++=
-+++++++++
->>  2 files changed, 318 insertions(+), 1 deletion(-)
->>  create mode 100644 tests/check-qobject.c
->>
->> diff --git a/tests/Makefile.include b/tests/Makefile.include
->> index fae5715e9c..40b8b4e98f 100644
->> --- a/tests/Makefile.include
->> +++ b/tests/Makefile.include
->> @@ -41,6 +41,7 @@ check-unit-y +=3D tests/check-qlist$(EXESUF)
->>  gcov-files-check-qlist-y =3D qobject/qlist.c
->>  check-unit-y +=3D tests/check-qnull$(EXESUF)
->>  gcov-files-check-qnull-y =3D qobject/qnull.c
->> +check-unit-y +=3D tests/check-qobject$(EXESUF)
->>  check-unit-y +=3D tests/check-qjson$(EXESUF)
->>  gcov-files-check-qjson-y =3D qobject/qjson.c
->>  check-unit-y +=3D tests/check-qlit$(EXESUF)
->> @@ -542,7 +543,7 @@ GENERATED_FILES +=3D tests/test-qapi-types.h tests=
-/test-qapi-visit.h \
->>  	tests/test-qmp-introspect.h
->> =20
->>  test-obj-y =3D tests/check-qnum.o tests/check-qstring.o tests/check-q=
-dict.o \
->> -	tests/check-qlist.o tests/check-qnull.o \
->> +	tests/check-qlist.o tests/check-qnull.o tests/check-qobject.o \
->>  	tests/check-qjson.o tests/check-qlit.o \
->>  	tests/test-coroutine.o tests/test-string-output-visitor.o \
->>  	tests/test-string-input-visitor.o tests/test-qobject-output-visitor.=
-o \
->> @@ -576,6 +577,7 @@ tests/check-qstring$(EXESUF): tests/check-qstring.=
-o $(test-util-obj-y)
->>  tests/check-qdict$(EXESUF): tests/check-qdict.o $(test-util-obj-y)
->>  tests/check-qlist$(EXESUF): tests/check-qlist.o $(test-util-obj-y)
->>  tests/check-qnull$(EXESUF): tests/check-qnull.o $(test-util-obj-y)
->> +tests/check-qobject$(EXESUF): tests/check-qobject.o $(test-util-obj-y=
-)
->>  tests/check-qjson$(EXESUF): tests/check-qjson.o $(test-util-obj-y)
->>  tests/check-qlit$(EXESUF): tests/check-qlit.o $(test-util-obj-y)
->>  tests/check-qom-interface$(EXESUF): tests/check-qom-interface.o $(tes=
-t-qom-obj-y)
->> diff --git a/tests/check-qobject.c b/tests/check-qobject.c
->> new file mode 100644
->> index 0000000000..8f1b5550c2
->> --- /dev/null
->> +++ b/tests/check-qobject.c
->> @@ -0,0 +1,315 @@
->> +/*
->> + * Generic QObject unit-tests.
->> + *
->> + * Copyright (C) 2017 Red Hat Inc.
->> + *
->> + * This work is licensed under the terms of the GNU LGPL, version 2.1=
- or later.
->> + * See the COPYING.LIB file in the top-level directory.
->> + */
->> +#include "qemu/osdep.h"
->> +
->> +#include "qapi/qmp/types.h"
->> +#include "qemu-common.h"
->> +
->> +#include <math.h>
->> +
->> +/* Marks the end of the test_equality() argument list.
->> + * We cannot use NULL there because that is a valid argument. */
->> +static QObject _test_equality_end_of_arguments;
->=20
-> Reserved identifier.  Please scratch the leading underscore.
+To run this, one needs the latest version of swtpm that supports the 
+file descriptor passing.
+Then one can start the swtpm like this:
 
-OK.
+swtpm socket --tpmstate dir=/tmp/mytpm --ctrl 
+type=unixio,path=/tmp/swtpm-sock --log level=20
 
-> Also: ugh!  I would've tried arrays just to avoid this ugliness.  But
-> since you've written it, and it works...
+I tested the SeaBIOS menu items so far and that works fine, also for 
+TPM2 (--tpm2).
 
-*cough*
-
->> +
->> +/**
->> + * Test whether all variadic QObject *arguments are equal (@expected
->> + * is true) or whether they are all not equal (@expected is false).
->> + * Every QObject is tested to be equal to itself (to test
->> + * reflexivity), all tests are done both ways (to test symmetry), and=
-
->> + * transitivity is not assumed but checked (each object is compared t=
-o
->> + * every other one).
->> + *
->> + * Note that qobject_is_equal() is not really an equivalence relation=
-,
->> + * so this function may not be used for all objects (reflexivity is
->> + * not guaranteed, e.g. in the case of a QNum containing NaN).
->> + */
->> +static void do_test_equality(bool expected, ...)
->> +{
->> +    va_list ap_count, ap_extract;
->> +    QObject **args;
->> +    int arg_count =3D 0;
->> +    int i, j;
->> +
->> +    va_start(ap_count, expected);
->> +    va_copy(ap_extract, ap_count);
->> +    while (va_arg(ap_count, QObject *) !=3D &_test_equality_end_of_ar=
-guments) {
->> +        arg_count++;
->> +    }
->> +    va_end(ap_count);
->> +
->> +    args =3D g_new(QObject *, arg_count);
->> +    for (i =3D 0; i < arg_count; i++) {
->> +        args[i] =3D va_arg(ap_extract, QObject *);
->> +    }
->> +    va_end(ap_extract);
->> +
->> +    for (i =3D 0; i < arg_count; i++) {
->> +        g_assert(qobject_is_equal(args[i], args[i]) =3D=3D true);
->> +
->> +        for (j =3D i + 1; j < arg_count; j++) {
->> +            g_assert(qobject_is_equal(args[i], args[j]) =3D=3D expect=
-ed);
->> +        }
->> +    }
->> +}
->> +
->> +#define test_equality(expected, ...) \
->> +    do_test_equality(expected, __VA_ARGS__, &_test_equality_end_of_ar=
-guments)
->> +
->> +static void do_free_all(int _, ...)
->> +{
->> +    va_list ap;
->> +    QObject *obj;
->> +
->> +    va_start(ap, _);
->> +    while ((obj =3D va_arg(ap, QObject *)) !=3D NULL) {
->> +        qobject_decref(obj);
->> +    }
->> +    va_end(ap);
->> +}
->> +
->> +#define free_all(...) \
->> +    do_free_all(0, __VA_ARGS__, NULL)
->> +
->> +static void qobject_is_equal_null_test(void)
->> +{
->> +    test_equality(false, qnull(), NULL);
->> +}
->> +
->> +static void qobject_is_equal_num_test(void)
->> +{
->> +    QNum *u0, *i0, *d0, *dnan, *um42, *im42, *dm42;
->> +    QString *s0, *s_empty;
->> +    QBool *bfalse;
->> +
->> +    u0 =3D qnum_from_uint(0u);
->> +    i0 =3D qnum_from_int(0);
->> +    d0 =3D qnum_from_double(0.0);
->> +    dnan =3D qnum_from_double(NAN);
->> +    um42 =3D qnum_from_uint((uint64_t)-42);
->> +    im42 =3D qnum_from_int(-42);
->> +    dm42 =3D qnum_from_double(-42.0);
->> +
->> +    s0 =3D qstring_from_str("0");
->> +    s_empty =3D qstring_new();
->> +    bfalse =3D qbool_from_bool(false);
->> +
->> +    /* Integers representing a mathematically equal number should
->> +     * compare equal */
->> +    test_equality(true, u0, i0);
->> +    /* Doubles, however, are always unequal to integers */
->> +    test_equality(false, u0, d0);
->> +    test_equality(false, i0, d0);
->=20
-> Would the following be more legible?
->=20
->        /* Integers representing a mathematically equal number should
->         * compare equal */
->        check_equal(u0, i0);
->        /* Doubles, however, are always unequal to integers */
->        check_unequal(u0, d0);
->        check_unequal(i0, d0);
->=20
-> (with the obvious macros check_equal() and check_unequal())
-
-Sounds good, yes.
-
->> +    /* No automatic type conversion */
->> +    test_equality(false, u0, s0, s_empty, bfalse, qnull(), NULL);
->> +    test_equality(false, i0, s0, s_empty, bfalse, qnull(), NULL);
->> +    test_equality(false, d0, s0, s_empty, bfalse, qnull(), NULL);
->=20
-> No "num" in this part.  No big deal, but perhaps you'd like to put it
-> into a qobject_is_equal_mixed_test().
-
-Hm? u0, i0, and d0 are QNums.  Adding a mixed test for type conversion
-still sounds like a good idea, though.
-
->> +
->> +    /* Do not assume any object is equal to itself -- note however
->> +     * that NaN cannot occur in a JSON object anyway. */
->> +    g_assert(qobject_is_equal(QOBJECT(dnan), QOBJECT(dnan)) =3D=3D fa=
-lse);
->> +
->> +    /* No unsigned overflow */
->> +    test_equality(false, um42, im42);
->> +    test_equality(false, um42, dm42);
->> +    g_assert(qobject_is_equal(QOBJECT(im42), QOBJECT(dm42)) =3D=3D fa=
-lse);
->> +    test_equality(false, im42, dm42);
->> +
->> +
->=20
-> Scratch one blank line.
-
-Will do.
-
->> +    free_all(u0, i0, d0, dnan, um42, im42, dm42, s0, s_empty, bfalse)=
-;
->> +}
->> +
->> +static void qobject_is_equal_bool_test(void)
->> +{
->> +    QBool *btrue_0, *btrue_1, *bfalse_0, *bfalse_1;
->> +
->> +    /* Automatic type conversion is tested in the QNum test */
->> +
->> +    btrue_0 =3D qbool_from_bool(true);
->> +    btrue_1 =3D qbool_from_bool(true);
->> +    bfalse_0 =3D qbool_from_bool(false);
->> +    bfalse_1 =3D qbool_from_bool(false);
->> +
->> +    test_equality(true, btrue_0, btrue_1);
->> +    test_equality(true, bfalse_0, bfalse_1);
->> +    test_equality(false, btrue_0, bfalse_0);
->> +    test_equality(false, btrue_1, bfalse_1);
->=20
-> The last one is kind of redundant.  Your choice.
-
-Hmmm, yes. :-)
-
->> +
->> +    free_all(btrue_0, btrue_1, bfalse_0, bfalse_1);
->> +}
->> +
->> +static void qobject_is_equal_string_test(void)
->> +{
->> +    QString *str_base, *str_whitespace_0, *str_whitespace_1, *str_whi=
-tespace_2;
->> +    QString *str_whitespace_3, *str_case, *str_built;
->> +
->> +    str_base =3D qstring_from_str("foo");
->> +    str_whitespace_0 =3D qstring_from_str(" foo");
->> +    str_whitespace_1 =3D qstring_from_str("foo ");
->> +    str_whitespace_2 =3D qstring_from_str("foo\b");
->> +    str_whitespace_3 =3D qstring_from_str("fooo\b");
->> +    str_case =3D qstring_from_str("Foo");
->> +
->> +    /* Should yield "foo" */
->> +    str_built =3D qstring_from_substr("form", 0, 1);
->> +    qstring_append_chr(str_built, 'o');
->> +
->> +    test_equality(false, str_base, str_whitespace_0, str_whitespace_1=
-,
->> +                         str_whitespace_2, str_whitespace_3, str_case=
-);
->> +
->> +    test_equality(true, str_base, str_built);
->> +
->> +    free_all(str_base, str_whitespace_0, str_whitespace_1, str_whites=
-pace_2,
->> +             str_whitespace_3, str_case, str_built);
->> +}
->> +
->> +static void qobject_is_equal_list_test(void)
->> +{
->> +    QList *list_0, *list_1, *list_cloned;
->> +    QList *list_reordered, *list_longer, *list_shorter;
->> +
->> +    list_0 =3D qlist_new();
->> +    list_1 =3D qlist_new();
->> +    list_reordered =3D qlist_new();
->> +    list_longer =3D qlist_new();
->> +    list_shorter =3D qlist_new();
->> +
->> +    qlist_append_int(list_0, 1);
->> +    qlist_append_int(list_0, 2);
->> +    qlist_append_int(list_0, 3);
->> +
->> +    qlist_append_int(list_1, 1);
->> +    qlist_append_int(list_1, 2);
->> +    qlist_append_int(list_1, 3);
->> +
->> +    qlist_append_int(list_reordered, 1);
->> +    qlist_append_int(list_reordered, 3);
->> +    qlist_append_int(list_reordered, 2);
->> +
->> +    qlist_append_int(list_longer, 1);
->> +    qlist_append_int(list_longer, 2);
->> +    qlist_append_int(list_longer, 3);
->> +    qlist_append_null(list_longer);
->> +
->> +    qlist_append_int(list_shorter, 1);
->> +    qlist_append_int(list_shorter, 2);
->> +
->> +    list_cloned =3D qlist_copy(list_0);
->> +
->> +    test_equality(true, list_0, list_1, list_cloned);
->> +    test_equality(false, list_0, list_reordered, list_longer, list_sh=
-orter);
->> +
->> +    /* With a NaN in it, the list should no longer compare equal to
->> +     * itself */
->> +    qlist_append(list_0, qnum_from_double(NAN));
->> +    g_assert(qobject_is_equal(QOBJECT(list_0), QOBJECT(list_0)) =3D=3D=
- false);
->> +
->> +    free_all(list_0, list_1, list_cloned, list_reordered, list_longer=
-, list_shorter);
->> +}
->> +
->> +static void qobject_is_equal_dict_test(void)
->> +{
->> +    Error *local_err =3D NULL;
->> +    QDict *dict_0, *dict_1, *dict_cloned;
->> +    QDict *dict_different_key, *dict_different_value, *dict_different=
-_null_key;
->> +    QDict *dict_longer, *dict_shorter, *dict_nested;
->> +    QDict *dict_crumpled;
->> +
->> +    dict_0 =3D qdict_new();
->> +    dict_1 =3D qdict_new();
->> +    dict_different_key =3D qdict_new();
->> +    dict_different_value =3D qdict_new();
->> +    dict_different_null_key =3D qdict_new();
->> +    dict_longer =3D qdict_new();
->> +    dict_shorter =3D qdict_new();
->> +    dict_nested =3D qdict_new();
->> +
->> +    qdict_put_int(dict_0, "f.o", 1);
->> +    qdict_put_int(dict_0, "bar", 2);
->> +    qdict_put_int(dict_0, "baz", 3);
->> +    qdict_put_null(dict_0, "null");
->> +
->> +    qdict_put_int(dict_1, "f.o", 1);
->> +    qdict_put_int(dict_1, "bar", 2);
->> +    qdict_put_int(dict_1, "baz", 3);
->> +    qdict_put_null(dict_1, "null");
->> +
->> +    qdict_put_int(dict_different_key, "F.o", 1);
->> +    qdict_put_int(dict_different_key, "bar", 2);
->> +    qdict_put_int(dict_different_key, "baz", 3);
->> +    qdict_put_null(dict_different_key, "null");
->> +
->> +    qdict_put_int(dict_different_value, "f.o", 42);
->> +    qdict_put_int(dict_different_value, "bar", 2);
->> +    qdict_put_int(dict_different_value, "baz", 3);
->> +    qdict_put_null(dict_different_value, "null");
->> +
->> +    qdict_put_int(dict_different_null_key, "f.o", 1);
->> +    qdict_put_int(dict_different_null_key, "bar", 2);
->> +    qdict_put_int(dict_different_null_key, "baz", 3);
->> +    qdict_put_null(dict_different_null_key, "none");
->> +
->> +    qdict_put_int(dict_longer, "f.o", 1);
->> +    qdict_put_int(dict_longer, "bar", 2);
->> +    qdict_put_int(dict_longer, "baz", 3);
->> +    qdict_put_int(dict_longer, "xyz", 4);
->> +    qdict_put_null(dict_longer, "null");
->> +
->> +    qdict_put_int(dict_shorter, "f.o", 1);
->> +    qdict_put_int(dict_shorter, "bar", 2);
->> +    qdict_put_int(dict_shorter, "baz", 3);
->> +
->> +    qdict_put(dict_nested, "f", qdict_new());
->> +    qdict_put_int(qdict_get_qdict(dict_nested, "f"), "o", 1);
->> +    qdict_put_int(dict_nested, "bar", 2);
->> +    qdict_put_int(dict_nested, "baz", 3);
->> +    qdict_put_null(dict_nested, "null");
->> +
->> +    dict_cloned =3D qdict_clone_shallow(dict_0);
->> +
->> +    test_equality(true, dict_0, dict_1, dict_cloned);
->> +    test_equality(false, dict_0, dict_different_key, dict_different_v=
-alue,
->> +                         dict_different_null_key, dict_longer, dict_s=
-horter,
->> +                         dict_nested);
->> +
->> +    dict_crumpled =3D qobject_to_qdict(qdict_crumple(dict_1, &local_e=
-rr));
->> +    g_assert(!local_err);
->> +    test_equality(true, dict_crumpled, dict_nested);
->> +
->> +    qdict_flatten(dict_nested);
->> +    test_equality(true, dict_0, dict_nested);
->> +
->> +    /* Containing an NaN value will make this dict compare unequal to=
-
->> +     * itself */
->> +    qdict_put(dict_0, "NaN", qnum_from_double(NAN));
->> +    g_assert(qobject_is_equal(QOBJECT(dict_0), QOBJECT(dict_0)) =3D=3D=
- false);
->> +
->> +    free_all(dict_0, dict_1, dict_cloned, dict_different_key,
->> +             dict_different_value, dict_different_null_key, dict_long=
-er,
->> +             dict_shorter, dict_nested, dict_crumpled);
->> +}
->> +
->> +int main(int argc, char **argv)
->> +{
->> +    g_test_init(&argc, &argv, NULL);
->> +
->> +    g_test_add_func("/public/qobject_is_equal_null",
->> +                    qobject_is_equal_null_test);
->> +    g_test_add_func("/public/qobject_is_equal_num", qobject_is_equal_=
-num_test);
->> +    g_test_add_func("/public/qobject_is_equal_bool",
->> +                    qobject_is_equal_bool_test);
->> +    g_test_add_func("/public/qobject_is_equal_string",
->> +                    qobject_is_equal_string_test);
->> +    g_test_add_func("/public/qobject_is_equal_list",
->> +                    qobject_is_equal_list_test);
->> +    g_test_add_func("/public/qobject_is_equal_dict",
->> +                    qobject_is_equal_dict_test);
->> +
->> +    return g_test_run();
->> +}
->=20
-> Quite thorough :)
->=20
-> With at least the reserved identifier renamed and the extra blank line
-> scratched:
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-
-Thanks for your reviews!
-
-Max
+Cheers!
+      Stefan
 
 
---PNJWalsH85IPBMVd1jid7ruHIgtjqs7dP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlnT/soSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A6ygH/0lsvbIMUKvgA0tLGS8F/JAmm1TeOuyg
-UMg7kqOmMbt/ywM6xBAuP0iKOubhneh8RG6FwGeeBOqeD93posuDnTTaarx/GzAv
-ghtP6B+qQFzgwXN9yOZLOxGjcZmlXuddhiew/ebiUOZsVmL1fqPZDZvIf5SmOCIZ
-YtEWR4MvfF2YqRHi1d3xH/Z8Kjc+L8STKmzHRrmfCMWW6o3QH5a1R9GK6Ujiz19f
-OQ7B80wjbQM3B0F38NXl0hEyi1fP9m138bj0toNLj5YcPF/E5TyA4r5K1AYdTuVM
-eSczznKKKF7o0cF3MMETlLwO6fPj9GjRXUT4O8JVDXFhk6I4yhrob+g=
-=4Ps6
------END PGP SIGNATURE-----
-
---PNJWalsH85IPBMVd1jid7ruHIgtjqs7dP--
+>
+>      # Ask qemu to use TPM emulator with given tpm state directory
+>      qemu-system-x86_64 \
+>          [...] \
+>          -chardev socket,id=chrtpm,path=/tmp/swtpm-sock \
+>          -tpmdev emulator,id=tpm0,chardev=chrtpm \
+>          -device tpm-tis,tpmdev=tpm0 \
+>          [...]
+>
+> Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+> ---
+>   configure             |  13 +-
+>   hmp.c                 |   5 +
+>   hw/tpm/Makefile.objs  |   1 +
+>   hw/tpm/tpm_emulator.c | 587 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>   hw/tpm/tpm_ioctl.h    | 246 +++++++++++++++++++++
+>   qapi/tpm.json         |  21 +-
+>   qemu-options.hx       |  22 +-
+>   7 files changed, 888 insertions(+), 7 deletions(-)
+>   create mode 100644 hw/tpm/tpm_emulator.c
+>   create mode 100644 hw/tpm/tpm_ioctl.h
+>
+> diff --git a/configure b/configure
+> index cb0f7ed..a1b956e 100755
+> --- a/configure
+> +++ b/configure
+> @@ -3467,6 +3467,12 @@ else
+>     tpm_passthrough=no
+>   fi
+>
+> +# TPM emulator is for all posix systems
+> +if test "$mingw32" != "yes"; then
+> +  tpm_emulator=$tpm
+> +else
+> +  tpm_emulator=no
+> +fi
+>   ##########################################
+>   # attr probe
+>
+> @@ -5359,6 +5365,7 @@ echo "gcov enabled      $gcov"
+>   echo "TPM support       $tpm"
+>   echo "libssh2 support   $libssh2"
+>   echo "TPM passthrough   $tpm_passthrough"
+> +echo "TPM emulator      $tpm_emulator"
+>   echo "QOM debugging     $qom_cast_debug"
+>   echo "Live block migration $live_block_migration"
+>   echo "lzo support       $lzo"
+> @@ -5937,12 +5944,16 @@ if test "$live_block_migration" = "yes" ; then
+>     echo "CONFIG_LIVE_BLOCK_MIGRATION=y" >> $config_host_mak
+>   fi
+>
+> -# TPM passthrough support?
+>   if test "$tpm" = "yes"; then
+>     echo 'CONFIG_TPM=$(CONFIG_SOFTMMU)' >> $config_host_mak
+> +  # TPM passthrough support?
+>     if test "$tpm_passthrough" = "yes"; then
+>       echo "CONFIG_TPM_PASSTHROUGH=y" >> $config_host_mak
+>     fi
+> +  # TPM emulator support?
+> +  if test "$tpm_emulator" = "yes"; then
+> +    echo "CONFIG_TPM_EMULATOR=y" >> $config_host_mak
+> +  fi
+>   fi
+>
+>   echo "TRACE_BACKENDS=$trace_backends" >> $config_host_mak
+> diff --git a/hmp.c b/hmp.c
+> index 0fb2bc7..9cd8179 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -994,6 +994,7 @@ void hmp_info_tpm(Monitor *mon, const QDict *qdict)
+>       Error *err = NULL;
+>       unsigned int c = 0;
+>       TPMPassthroughOptions *tpo;
+> +    TPMEmulatorOptions *teo;
+>
+>       info_list = qmp_query_tpm(&err);
+>       if (err) {
+> @@ -1023,6 +1024,10 @@ void hmp_info_tpm(Monitor *mon, const QDict *qdict)
+>                              tpo->has_cancel_path ? ",cancel-path=" : "",
+>                              tpo->has_cancel_path ? tpo->cancel_path : "");
+>               break;
+> +        case TPM_TYPE_OPTIONS_KIND_EMULATOR:
+> +            teo = ti->options->u.emulator.data;
+> +            monitor_printf(mon, ",chardev=%s", teo->chardev);
+> +            break;
+>           case TPM_TYPE_OPTIONS_KIND__MAX:
+>               break;
+>           }
+> diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
+> index 64cecc3..41f0b7a 100644
+> --- a/hw/tpm/Makefile.objs
+> +++ b/hw/tpm/Makefile.objs
+> @@ -1,2 +1,3 @@
+>   common-obj-$(CONFIG_TPM_TIS) += tpm_tis.o
+>   common-obj-$(CONFIG_TPM_PASSTHROUGH) += tpm_passthrough.o tpm_util.o
+> +common-obj-$(CONFIG_TPM_EMULATOR) += tpm_emulator.o tpm_util.o
+> diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
+> new file mode 100644
+> index 0000000..5ddd723
+> --- /dev/null
+> +++ b/hw/tpm/tpm_emulator.c
+> @@ -0,0 +1,587 @@
+> +/*
+> + *  Emulator TPM driver
+> + *
+> + *  Copyright (c) 2017 Intel Corporation
+> + *  Author: Amarnath Valluri <amarnath.valluri@intel.com>
+> + *
+> + *  Copyright (c) 2010 - 2013 IBM Corporation
+> + *  Authors:
+> + *    Stefan Berger <stefanb@us.ibm.com>
+> + *
+> + *  Copyright (C) 2011 IAIK, Graz University of Technology
+> + *    Author: Andreas Niederl
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/licenses/>
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+> +#include "qemu/sockets.h"
+> +#include "io/channel-socket.h"
+> +#include "sysemu/tpm_backend.h"
+> +#include "tpm_int.h"
+> +#include "hw/hw.h"
+> +#include "hw/i386/pc.h"
+> +#include "tpm_util.h"
+> +#include "tpm_ioctl.h"
+> +#include "migration/blocker.h"
+> +#include "qapi/error.h"
+> +#include "qapi/clone-visitor.h"
+> +#include "chardev/char-fe.h"
+> +
+> +#include <fcntl.h>
+> +#include <sys/types.h>
+> +#include <sys/stat.h>
+> +#include <stdio.h>
+> +
+> +#define DEBUG_TPM 0
+> +
+> +#define DPRINTF(fmt, ...) do { \
+> +    if (DEBUG_TPM) { \
+> +        fprintf(stderr, "tpm-emulator:"fmt"\n", ## __VA_ARGS__); \
+> +    } \
+> +} while (0)
+> +
+> +#define TYPE_TPM_EMULATOR "tpm-emulator"
+> +#define TPM_EMULATOR(obj) \
+> +    OBJECT_CHECK(TPMEmulator, (obj), TYPE_TPM_EMULATOR)
+> +
+> +#define TPM_EMULATOR_IMPLEMENTS_ALL_CAPS(S, cap) (((S)->caps & (cap)) == (cap))
+> +
+> +static const TPMDriverOps tpm_emulator_driver;
+> +
+> +/* data structures */
+> +typedef struct TPMEmulator {
+> +    TPMBackend parent;
+> +
+> +    TPMEmulatorOptions *options;
+> +    CharBackend ctrl_chr;
+> +    QIOChannel *data_ioc;
+> +    TPMVersion tpm_version;
+> +    ptm_cap caps; /* capabilities of the TPM */
+> +    uint8_t cur_locty_number; /* last set locality */
+> +    Error *migration_blocker;
+> +} TPMEmulator;
+> +
+> +
+> +static int tpm_emulator_ctrlcmd(CharBackend *dev, unsigned long cmd, void *msg,
+> +                                size_t msg_len_in, size_t msg_len_out)
+> +{
+> +    uint32_t cmd_no = cpu_to_be32(cmd);
+> +    ssize_t n = sizeof(uint32_t) + msg_len_in;
+> +    uint8_t *buf = NULL;
+> +
+> +    buf = g_alloca(n);
+> +    memcpy(buf, &cmd_no, sizeof(cmd_no));
+> +    memcpy(buf + sizeof(cmd_no), msg, msg_len_in);
+> +
+> +    n = qemu_chr_fe_write_all(dev, buf, n);
+> +    if (n <= 0) {
+> +        return -1;
+> +    }
+> +
+> +    if (msg_len_out != 0) {
+> +        n = qemu_chr_fe_read_all(dev, msg, msg_len_out);
+> +        if (n <= 0) {
+> +            return -1;
+> +        }
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static int tpm_emulator_unix_tx_bufs(TPMEmulator *tpm_emu,
+> +                                     const uint8_t *in, uint32_t in_len,
+> +                                     uint8_t *out, uint32_t out_len,
+> +                                     bool *selftest_done,
+> +                                     Error **err)
+> +{
+> +    ssize_t ret;
+> +    bool is_selftest = false;
+> +    const struct tpm_resp_hdr *hdr = NULL;
+> +
+> +    if (selftest_done) {
+> +        *selftest_done = false;
+> +        is_selftest = tpm_util_is_selftest(in, in_len);
+> +    }
+> +
+> +    ret = qio_channel_write_all(tpm_emu->data_ioc, (char *)in, in_len, err);
+> +    if (ret != 0) {
+> +        return -1;
+> +    }
+> +
+> +    ret = qio_channel_read_all(tpm_emu->data_ioc, (char *)out, sizeof(*hdr),
+> +                               err);
+> +    if (ret != 0) {
+> +        return -1;
+> +    }
+> +
+> +    hdr = (struct tpm_resp_hdr *)out;
+> +    out += sizeof(*hdr);
+> +    ret = qio_channel_read_all(tpm_emu->data_ioc, (char *)out,
+> +                               be32_to_cpu(hdr->len) - sizeof(*hdr) , err);
+> +    if (ret != 0) {
+> +        return -1;
+> +    }
+> +
+> +    if (is_selftest) {
+> +        *selftest_done = (be32_to_cpu(hdr->errcode) == 0);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static int tpm_emulator_set_locality(TPMEmulator *tpm_emu, uint8_t locty_number)
+> +{
+> +    ptm_loc loc;
+> +
+> +    DPRINTF("%s : locality: 0x%x", __func__, locty_number);
+> +
+> +    if (tpm_emu->cur_locty_number == locty_number) {
+> +        return 0;
+> +    }
+> +
+> +    DPRINTF("setting locality : 0x%x", locty_number);
+> +    loc.u.req.loc = locty_number;
+> +    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_SET_LOCALITY, &loc,
+> +                             sizeof(loc), sizeof(loc)) < 0) {
+> +        error_report("tpm-emulator: could not set locality : %s",
+> +                     strerror(errno));
+> +        return -1;
+> +    }
+> +
+> +    loc.u.resp.tpm_result = be32_to_cpu(loc.u.resp.tpm_result);
+> +    if (loc.u.resp.tpm_result != 0) {
+> +        error_report("tpm-emulator: TPM result for set locality : 0x%x",
+> +                     loc.u.resp.tpm_result);
+> +        return -1;
+> +    }
+> +
+> +    tpm_emu->cur_locty_number = locty_number;
+> +
+> +    return 0;
+> +}
+> +
+> +static void tpm_emulator_handle_request(TPMBackend *tb, TPMBackendCmd cmd)
+> +{
+> +    TPMEmulator *tpm_emu = TPM_EMULATOR(tb);
+> +    TPMLocality *locty = NULL;
+> +    bool selftest_done = false;
+> +    Error *err = NULL;
+> +
+> +    DPRINTF("processing command type %d", cmd);
+> +
+> +    switch (cmd) {
+> +    case TPM_BACKEND_CMD_PROCESS_CMD:
+> +        locty = tb->tpm_state->locty_data;
+> +        if (tpm_emulator_set_locality(tpm_emu,
+> +                                      tb->tpm_state->locty_number) < 0 ||
+> +            tpm_emulator_unix_tx_bufs(tpm_emu, locty->w_buffer.buffer,
+> +                                      locty->w_offset, locty->r_buffer.buffer,
+> +                                      locty->r_buffer.size, &selftest_done,
+> +                                      &err) < 0) {
+> +            tpm_util_write_fatal_error_response(locty->r_buffer.buffer,
+> +                                                locty->r_buffer.size);
+> +            error_report_err(err);
+> +        }
+> +
+> +        tb->recv_data_callback(tb->tpm_state, tb->tpm_state->locty_number,
+> +                               selftest_done);
+> +
+> +        break;
+> +    case TPM_BACKEND_CMD_INIT:
+> +    case TPM_BACKEND_CMD_END:
+> +    case TPM_BACKEND_CMD_TPM_RESET:
+> +        /* nothing to do */
+> +        break;
+> +    }
+> +}
+> +
+> +static int tpm_emulator_probe_caps(TPMEmulator *tpm_emu)
+> +{
+> +    DPRINTF("%s", __func__);
+> +    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_GET_CAPABILITY,
+> +                         &tpm_emu->caps, 0, sizeof(tpm_emu->caps)) < 0) {
+> +        error_report("tpm-emulator: probing failed : %s", strerror(errno));
+> +        return -1;
+> +    }
+> +
+> +    tpm_emu->caps = be64_to_cpu(tpm_emu->caps);
+> +
+> +    DPRINTF("capbilities : 0x%lx", tpm_emu->caps);
+> +
+> +    return 0;
+> +}
+> +
+> +static int tpm_emulator_check_caps(TPMEmulator *tpm_emu)
+> +{
+> +    ptm_cap caps = 0;
+> +    const char *tpm = NULL;
+> +
+> +    /* check for min. required capabilities */
+> +    switch (tpm_emu->tpm_version) {
+> +    case TPM_VERSION_1_2:
+> +        caps = PTM_CAP_INIT | PTM_CAP_SHUTDOWN | PTM_CAP_GET_TPMESTABLISHED |
+> +               PTM_CAP_SET_LOCALITY | PTM_CAP_SET_DATAFD;
+> +        tpm = "1.2";
+> +        break;
+> +    case TPM_VERSION_2_0:
+> +        caps = PTM_CAP_INIT | PTM_CAP_SHUTDOWN | PTM_CAP_GET_TPMESTABLISHED |
+> +               PTM_CAP_SET_LOCALITY | PTM_CAP_RESET_TPMESTABLISHED |
+> +               PTM_CAP_SET_DATAFD;
+> +        tpm = "2";
+> +        break;
+> +    case TPM_VERSION_UNSPEC:
+> +        error_report("tpm-emulator: TPM version has not been set");
+> +        return -1;
+> +    }
+> +
+> +    if (!TPM_EMULATOR_IMPLEMENTS_ALL_CAPS(tpm_emu, caps)) {
+> +        error_report("tpm-emulator: TPM does not implement minimum set of "
+> +                     "required capabilities for TPM %s (0x%x)", tpm, (int)caps);
+> +        return -1;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static int tpm_emulator_startup_tpm(TPMBackend *tb)
+> +{
+> +    TPMEmulator *tpm_emu = TPM_EMULATOR(tb);
+> +    ptm_init init;
+> +    ptm_res res;
+> +
+> +    DPRINTF("%s", __func__);
+> +    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_INIT, &init, sizeof(init),
+> +                         sizeof(init)) < 0) {
+> +        error_report("tpm-emulator: could not send INIT: %s",
+> +                     strerror(errno));
+> +        goto err_exit;
+> +    }
+> +
+> +    res = be32_to_cpu(init.u.resp.tpm_result);
+> +    if (res) {
+> +        error_report("tpm-emulator: TPM result for CMD_INIT: 0x%x", res);
+> +        goto err_exit;
+> +    }
+> +    return 0;
+> +
+> +err_exit:
+> +    return -1;
+> +}
+> +
+> +static bool tpm_emulator_get_tpm_established_flag(TPMBackend *tb)
+> +{
+> +    TPMEmulator *tpm_emu = TPM_EMULATOR(tb);
+> +    ptm_est est;
+> +
+> +    DPRINTF("%s", __func__);
+> +    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_GET_TPMESTABLISHED, &est,
+> +                             0, sizeof(est)) < 0) {
+> +        error_report("tpm-emulator: Could not get the TPM established flag: %s",
+> +                     strerror(errno));
+> +        return false;
+> +    }
+> +    DPRINTF("established flag: %0x", est.u.resp.bit);
+> +
+> +    return (est.u.resp.bit != 0);
+> +}
+> +
+> +static int tpm_emulator_reset_tpm_established_flag(TPMBackend *tb,
+> +                                                   uint8_t locty)
+> +{
+> +    TPMEmulator *tpm_emu = TPM_EMULATOR(tb);
+> +    ptm_reset_est reset_est;
+> +    ptm_res res;
+> +
+> +    /* only a TPM 2.0 will support this */
+> +    if (tpm_emu->tpm_version != TPM_VERSION_2_0) {
+> +        return 0;
+> +    }
+> +
+> +    reset_est.u.req.loc = tpm_emu->cur_locty_number;
+> +    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_RESET_TPMESTABLISHED,
+> +                             &reset_est, sizeof(reset_est),
+> +                             sizeof(reset_est)) < 0) {
+> +        error_report("tpm-emulator: Could not reset the establishment bit: %s",
+> +                     strerror(errno));
+> +        return -1;
+> +    }
+> +
+> +    res = be32_to_cpu(reset_est.u.resp.tpm_result);
+> +    if (res) {
+> +        error_report("tpm-emulator: TPM result for rest establixhed flag: 0x%x",
+> +                     res);
+> +        return -1;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static void tpm_emulator_cancel_cmd(TPMBackend *tb)
+> +{
+> +    TPMEmulator *tpm_emu = TPM_EMULATOR(tb);
+> +    ptm_res res;
+> +
+> +    if (!TPM_EMULATOR_IMPLEMENTS_ALL_CAPS(tpm_emu, PTM_CAP_CANCEL_TPM_CMD)) {
+> +        DPRINTF("Backend does not support CANCEL_TPM_CMD");
+> +        return;
+> +    }
+> +
+> +    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_CANCEL_TPM_CMD, &res, 0,
+> +                             sizeof(res)) < 0) {
+> +        error_report("tpm-emulator: Could not cancel command: %s",
+> +                     strerror(errno));
+> +    } else if (res != 0) {
+> +        error_report("tpm-emulator: Failed to cancel TPM: 0x%x",
+> +                     be32_to_cpu(res));
+> +    }
+> +}
+> +
+> +static TPMVersion tpm_emulator_get_tpm_version(TPMBackend *tb)
+> +{
+> +    TPMEmulator *tpm_emu = TPM_EMULATOR(tb);
+> +
+> +    return tpm_emu->tpm_version;
+> +}
+> +
+> +static int tpm_emulator_block_migration(TPMEmulator *tpm_emu)
+> +{
+> +    Error *err = NULL;
+> +
+> +    error_setg(&tpm_emu->migration_blocker,
+> +               "Migration disabled: TPM emulator not yet migratable");
+> +    migrate_add_blocker(tpm_emu->migration_blocker, &err);
+> +    if (err) {
+> +        error_report_err(err);
+> +        error_free(tpm_emu->migration_blocker);
+> +        tpm_emu->migration_blocker = NULL;
+> +
+> +        return -1;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static int tpm_emulator_prepare_data_fd(TPMEmulator *tpm_emu)
+> +{
+> +    ptm_res res;
+> +    Error *err = NULL;
+> +    int fds[2] = { -1, -1 };
+> +
+> +    if (socketpair(AF_UNIX, SOCK_STREAM, 0, fds) < 0) {
+> +        error_report("tpm-emulator: Failed to create socketpair");
+> +        return -1;
+> +    }
+> +
+> +    qemu_chr_fe_set_msgfds(&tpm_emu->ctrl_chr, fds + 1, 1);
+> +
+> +    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_SET_DATAFD, &res, 0,
+> +                    sizeof(res)) || res != 0) {
+> +        error_report("tpm-emulator: Failed to send CMD_SET_DATAFD: %s",
+> +                     strerror(errno));
+> +        goto err_exit;
+> +    }
+> +
+> +    tpm_emu->data_ioc = QIO_CHANNEL(qio_channel_socket_new_fd(fds[0], &err));
+> +    if (err) {
+> +        error_prepend(&err, "tpm-emulator: Failed to create io channel: ");
+> +        error_report_err(err);
+> +        goto err_exit;
+> +    }
+> +
+> +    closesocket(fds[1]);
+> +
+> +    return 0;
+> +
+> +err_exit:
+> +    closesocket(fds[0]);
+> +    closesocket(fds[1]);
+> +    return -1;
+> +}
+> +
+> +static int tpm_emulator_handle_device_opts(TPMEmulator *tpm_emu, QemuOpts *opts)
+> +{
+> +    const char *value;
+> +
+> +    value = qemu_opt_get(opts, "chardev");
+> +    if (value) {
+> +        Error *err = NULL;
+> +        Chardev *dev = qemu_chr_find(value);
+> +
+> +        if (!dev) {
+> +            error_report("tpm-emulator: tpm chardev '%s' not found.", value);
+> +            goto err;
+> +        }
+> +
+> +        if (!qemu_chr_fe_init(&tpm_emu->ctrl_chr, dev, &err)) {
+> +            error_prepend(&err, "tpm-emulator: No valid chardev found at '%s':",
+> +                          value);
+> +            error_report_err(err);
+> +            goto err;
+> +        }
+> +
+> +        tpm_emu->options->chardev = g_strdup(value);
+> +    }
+> +
+> +    if (tpm_emulator_prepare_data_fd(tpm_emu) < 0) {
+> +        goto err;
+> +    }
+> +
+> +    /* FIXME: tpm_util_test_tpmdev() accepts only on socket fd, as it also used
+> +     * by passthrough driver, which not yet using GIOChannel.
+> +     */
+> +    if (tpm_util_test_tpmdev(QIO_CHANNEL_SOCKET(tpm_emu->data_ioc)->fd,
+> +                             &tpm_emu->tpm_version)) {
+> +        error_report("'%s' is not emulating TPM device. Error: %s",
+> +                      tpm_emu->options->chardev, strerror(errno));
+> +        goto err;
+> +    }
+> +
+> +    DPRINTF("TPM Version %s", tpm_emu->tpm_version == TPM_VERSION_1_2 ? "1.2" :
+> +            (tpm_emu->tpm_version == TPM_VERSION_2_0 ?  "2.0" : "Unspecified"));
+> +
+> +    if (tpm_emulator_probe_caps(tpm_emu) ||
+> +        tpm_emulator_check_caps(tpm_emu)) {
+> +        goto err;
+> +    }
+> +
+> +    return tpm_emulator_block_migration(tpm_emu);
+> +
+> +err:
+> +    DPRINTF("Startup error");
+> +    return -1;
+> +}
+> +
+> +static TPMBackend *tpm_emulator_create(QemuOpts *opts, const char *id)
+> +{
+> +    TPMBackend *tb = TPM_BACKEND(object_new(TYPE_TPM_EMULATOR));
+> +
+> +    tb->id = g_strdup(id);
+> +
+> +    if (tpm_emulator_handle_device_opts(TPM_EMULATOR(tb), opts)) {
+> +        goto err_exit;
+> +    }
+> +
+> +    return tb;
+> +
+> +err_exit:
+> +    object_unref(OBJECT(tb));
+> +
+> +    return NULL;
+> +}
+> +
+> +static TpmTypeOptions *tpm_emulator_get_tpm_options(TPMBackend *tb)
+> +{
+> +    TPMEmulator *tpm_emu = TPM_EMULATOR(tb);
+> +    TpmTypeOptions *options = g_new0(TpmTypeOptions, 1);
+> +
+> +    options->type = TPM_TYPE_OPTIONS_KIND_EMULATOR;
+> +    options->u.emulator.data = QAPI_CLONE(TPMEmulatorOptions, tpm_emu->options);
+> +
+> +    return options;
+> +}
+> +
+> +static const QemuOptDesc tpm_emulator_cmdline_opts[] = {
+> +    TPM_STANDARD_CMDLINE_OPTS,
+> +    {
+> +        .name = "chardev",
+> +        .type = QEMU_OPT_STRING,
+> +        .help = "Character device to use for out-of-band control messages",
+> +    },
+> +    { /* end of list */ },
+> +};
+> +
+> +static const TPMDriverOps tpm_emulator_driver = {
+> +    .type                     = TPM_TYPE_EMULATOR,
+> +    .opts                     = tpm_emulator_cmdline_opts,
+> +    .desc                     = "TPM emulator backend driver",
+> +
+> +    .create                   = tpm_emulator_create,
+> +    .startup_tpm              = tpm_emulator_startup_tpm,
+> +    .cancel_cmd               = tpm_emulator_cancel_cmd,
+> +    .get_tpm_established_flag = tpm_emulator_get_tpm_established_flag,
+> +    .reset_tpm_established_flag = tpm_emulator_reset_tpm_established_flag,
+> +    .get_tpm_version          = tpm_emulator_get_tpm_version,
+> +    .get_tpm_options          = tpm_emulator_get_tpm_options,
+> +};
+> +
+> +static void tpm_emulator_inst_init(Object *obj)
+> +{
+> +    TPMEmulator *tpm_emu = TPM_EMULATOR(obj);
+> +
+> +    DPRINTF("%s", __func__);
+> +    tpm_emu->options = g_new0(TPMEmulatorOptions, 1);
+> +    tpm_emu->cur_locty_number = ~0;
+> +}
+> +
+> +/*
+> + * Gracefully shut down the external TPM
+> + */
+> +static void tpm_emulator_shutdown(TPMEmulator *tpm_emu)
+> +{
+> +    ptm_res res;
+> +
+> +    if (tpm_emulator_ctrlcmd(&tpm_emu->ctrl_chr, CMD_SHUTDOWN, &res, 0,
+> +                             sizeof(res)) < 0) {
+> +        error_report("tpm-emulator: Could not cleanly shutdown the TPM: %s",
+> +                     strerror(errno));
+> +    } else if (res != 0) {
+> +        error_report("tpm-emulator: TPM result for sutdown: 0x%x",
+> +                     be32_to_cpu(res));
+> +    }
+> +}
+> +
+> +static void tpm_emulator_inst_finalize(Object *obj)
+> +{
+> +    TPMEmulator *tpm_emu = TPM_EMULATOR(obj);
+> +
+> +    tpm_emulator_shutdown(tpm_emu);
+> +
+> +    object_unref(OBJECT(tpm_emu->data_ioc));
+> +
+> +    qemu_chr_fe_deinit(&tpm_emu->ctrl_chr, false);
+> +
+> +    qapi_free_TPMEmulatorOptions(tpm_emu->options);
+> +
+> +    if (tpm_emu->migration_blocker) {
+> +        migrate_del_blocker(tpm_emu->migration_blocker);
+> +        error_free(tpm_emu->migration_blocker);
+> +    }
+> +}
+> +
+> +static void tpm_emulator_class_init(ObjectClass *klass, void *data)
+> +{
+> +    TPMBackendClass *tbc = TPM_BACKEND_CLASS(klass);
+> +    tbc->ops = &tpm_emulator_driver;
+> +    tbc->handle_request = tpm_emulator_handle_request;
+> +}
+> +
+> +static const TypeInfo tpm_emulator_info = {
+> +    .name = TYPE_TPM_EMULATOR,
+> +    .parent = TYPE_TPM_BACKEND,
+> +    .instance_size = sizeof(TPMEmulator),
+> +    .class_init = tpm_emulator_class_init,
+> +    .instance_init = tpm_emulator_inst_init,
+> +    .instance_finalize = tpm_emulator_inst_finalize,
+> +};
+> +
+> +static void tpm_emulator_register(void)
+> +{
+> +    type_register_static(&tpm_emulator_info);
+> +    tpm_register_driver(&tpm_emulator_driver);
+> +}
+> +
+> +type_init(tpm_emulator_register)
+> diff --git a/hw/tpm/tpm_ioctl.h b/hw/tpm/tpm_ioctl.h
+> new file mode 100644
+> index 0000000..33564b1
+> --- /dev/null
+> +++ b/hw/tpm/tpm_ioctl.h
+> @@ -0,0 +1,246 @@
+> +/*
+> + * tpm_ioctl.h
+> + *
+> + * (c) Copyright IBM Corporation 2014, 2015.
+> + *
+> + * This file is licensed under the terms of the 3-clause BSD license
+> + */
+> +#ifndef _TPM_IOCTL_H_
+> +#define _TPM_IOCTL_H_
+> +
+> +#include <stdint.h>
+> +#include <sys/uio.h>
+> +#include <sys/types.h>
+> +#include <sys/ioctl.h>
+> +
+> +/*
+> + * Every response from a command involving a TPM command execution must hold
+> + * the ptm_res as the first element.
+> + * ptm_res corresponds to the error code of a command executed by the TPM.
+> + */
+> +
+> +typedef uint32_t ptm_res;
+> +
+> +/* PTM_GET_TPMESTABLISHED: get the establishment bit */
+> +struct ptm_est {
+> +    union {
+> +        struct {
+> +            ptm_res tpm_result;
+> +            unsigned char bit; /* TPM established bit */
+> +        } resp; /* response */
+> +    } u;
+> +};
+> +
+> +/* PTM_RESET_TPMESTABLISHED: reset establishment bit */
+> +struct ptm_reset_est {
+> +    union {
+> +        struct {
+> +            uint8_t loc; /* locality to use */
+> +        } req; /* request */
+> +        struct {
+> +            ptm_res tpm_result;
+> +        } resp; /* response */
+> +    } u;
+> +};
+> +
+> +/* PTM_INIT */
+> +struct ptm_init {
+> +    union {
+> +        struct {
+> +            uint32_t init_flags; /* see definitions below */
+> +        } req; /* request */
+> +        struct {
+> +            ptm_res tpm_result;
+> +        } resp; /* response */
+> +    } u;
+> +};
+> +
+> +/* above init_flags */
+> +#define PTM_INIT_FLAG_DELETE_VOLATILE (1 << 0)
+> +    /* delete volatile state file after reading it */
+> +
+> +/* PTM_SET_LOCALITY */
+> +struct ptm_loc {
+> +    union {
+> +        struct {
+> +            uint8_t loc; /* locality to set */
+> +        } req; /* request */
+> +        struct {
+> +            ptm_res tpm_result;
+> +        } resp; /* response */
+> +    } u;
+> +};
+> +
+> +/* PTM_HASH_DATA: hash given data */
+> +struct ptm_hdata {
+> +    union {
+> +        struct {
+> +            uint32_t length;
+> +            uint8_t data[4096];
+> +        } req; /* request */
+> +        struct {
+> +            ptm_res tpm_result;
+> +        } resp; /* response */
+> +    } u;
+> +};
+> +
+> +/*
+> + * size of the TPM state blob to transfer; x86_64 can handle 8k,
+> + * ppc64le only ~7k; keep the response below a 4k page size
+> + */
+> +#define PTM_STATE_BLOB_SIZE (3 * 1024)
+> +
+> +/*
+> + * The following is the data structure to get state blobs from the TPM.
+> + * If the size of the state blob exceeds the PTM_STATE_BLOB_SIZE, multiple reads
+> + * with this ioctl and with adjusted offset are necessary. All bytes
+> + * must be transferred and the transfer is done once the last byte has been
+> + * returned.
+> + * It is possible to use the read() interface for reading the data; however, the
+> + * first bytes of the state blob will be part of the response to the ioctl(); a
+> + * subsequent read() is only necessary if the total length (totlength) exceeds
+> + * the number of received bytes. seek() is not supported.
+> + */
+> +struct ptm_getstate {
+> +    union {
+> +        struct {
+> +            uint32_t state_flags; /* may be: PTM_STATE_FLAG_DECRYPTED */
+> +            uint32_t type;        /* which blob to pull */
+> +            uint32_t offset;      /* offset from where to read */
+> +        } req; /* request */
+> +        struct {
+> +            ptm_res tpm_result;
+> +            uint32_t state_flags; /* may be: PTM_STATE_FLAG_ENCRYPTED */
+> +            uint32_t totlength;   /* total length that will be transferred */
+> +            uint32_t length;      /* number of bytes in following buffer */
+> +            uint8_t  data[PTM_STATE_BLOB_SIZE];
+> +        } resp; /* response */
+> +    } u;
+> +};
+> +
+> +/* TPM state blob types */
+> +#define PTM_BLOB_TYPE_PERMANENT  1
+> +#define PTM_BLOB_TYPE_VOLATILE   2
+> +#define PTM_BLOB_TYPE_SAVESTATE  3
+> +
+> +/* state_flags above : */
+> +#define PTM_STATE_FLAG_DECRYPTED     1 /* on input:  get decrypted state */
+> +#define PTM_STATE_FLAG_ENCRYPTED     2 /* on output: state is encrypted */
+> +
+> +/*
+> + * The following is the data structure to set state blobs in the TPM.
+> + * If the size of the state blob exceeds the PTM_STATE_BLOB_SIZE, multiple
+> + * 'writes' using this ioctl are necessary. The last packet is indicated
+> + * by the length being smaller than the PTM_STATE_BLOB_SIZE.
+> + * The very first packet may have a length indicator of '0' enabling
+> + * a write() with all the bytes from a buffer. If the write() interface
+> + * is used, a final ioctl with a non-full buffer must be made to indicate
+> + * that all data were transferred (a write with 0 bytes would not work).
+> + */
+> +struct ptm_setstate {
+> +    union {
+> +        struct {
+> +            uint32_t state_flags; /* may be PTM_STATE_FLAG_ENCRYPTED */
+> +            uint32_t type;        /* which blob to set */
+> +            uint32_t length;      /* length of the data;
+> +                                     use 0 on the first packet to
+> +                                     transfer using write() */
+> +            uint8_t data[PTM_STATE_BLOB_SIZE];
+> +        } req; /* request */
+> +        struct {
+> +            ptm_res tpm_result;
+> +        } resp; /* response */
+> +    } u;
+> +};
+> +
+> +/*
+> + * PTM_GET_CONFIG: Data structure to get runtime configuration information
+> + * such as which keys are applied.
+> + */
+> +struct ptm_getconfig {
+> +    union {
+> +        struct {
+> +            ptm_res tpm_result;
+> +            uint32_t flags;
+> +        } resp; /* response */
+> +    } u;
+> +};
+> +
+> +#define PTM_CONFIG_FLAG_FILE_KEY        0x1
+> +#define PTM_CONFIG_FLAG_MIGRATION_KEY   0x2
+> +
+> +
+> +typedef uint64_t ptm_cap;
+> +typedef struct ptm_est ptm_est;
+> +typedef struct ptm_reset_est ptm_reset_est;
+> +typedef struct ptm_loc ptm_loc;
+> +typedef struct ptm_hdata ptm_hdata;
+> +typedef struct ptm_init ptm_init;
+> +typedef struct ptm_getstate ptm_getstate;
+> +typedef struct ptm_setstate ptm_setstate;
+> +typedef struct ptm_getconfig ptm_getconfig;
+> +
+> +/* capability flags returned by PTM_GET_CAPABILITY */
+> +#define PTM_CAP_INIT               (1)
+> +#define PTM_CAP_SHUTDOWN           (1 << 1)
+> +#define PTM_CAP_GET_TPMESTABLISHED (1 << 2)
+> +#define PTM_CAP_SET_LOCALITY       (1 << 3)
+> +#define PTM_CAP_HASHING            (1 << 4)
+> +#define PTM_CAP_CANCEL_TPM_CMD     (1 << 5)
+> +#define PTM_CAP_STORE_VOLATILE     (1 << 6)
+> +#define PTM_CAP_RESET_TPMESTABLISHED (1 << 7)
+> +#define PTM_CAP_GET_STATEBLOB      (1 << 8)
+> +#define PTM_CAP_SET_STATEBLOB      (1 << 9)
+> +#define PTM_CAP_STOP               (1 << 10)
+> +#define PTM_CAP_GET_CONFIG         (1 << 11)
+> +#define PTM_CAP_SET_DATAFD         (1 << 12)
+> +
+> +enum {
+> +    PTM_GET_CAPABILITY     = _IOR('P', 0, ptm_cap),
+> +    PTM_INIT               = _IOWR('P', 1, ptm_init),
+> +    PTM_SHUTDOWN           = _IOR('P', 2, ptm_res),
+> +    PTM_GET_TPMESTABLISHED = _IOR('P', 3, ptm_est),
+> +    PTM_SET_LOCALITY       = _IOWR('P', 4, ptm_loc),
+> +    PTM_HASH_START         = _IOR('P', 5, ptm_res),
+> +    PTM_HASH_DATA          = _IOWR('P', 6, ptm_hdata),
+> +    PTM_HASH_END           = _IOR('P', 7, ptm_res),
+> +    PTM_CANCEL_TPM_CMD     = _IOR('P', 8, ptm_res),
+> +    PTM_STORE_VOLATILE     = _IOR('P', 9, ptm_res),
+> +    PTM_RESET_TPMESTABLISHED = _IOWR('P', 10, ptm_reset_est),
+> +    PTM_GET_STATEBLOB      = _IOWR('P', 11, ptm_getstate),
+> +    PTM_SET_STATEBLOB      = _IOWR('P', 12, ptm_setstate),
+> +    PTM_STOP               = _IOR('P', 13, ptm_res),
+> +    PTM_GET_CONFIG         = _IOR('P', 14, ptm_getconfig),
+> +    PTM_SET_DATAFD         = _IOR('P', 15, ptm_res),
+> +};
+> +
+> +/*
+> + * Commands used by the non-CUSE TPMs
+> + *
+> + * All messages container big-endian data.
+> + *
+> + * The return messages only contain the 'resp' part of the unions
+> + * in the data structures above. Besides that the limits in the
+> + * buffers above (ptm_hdata:u.req.data and ptm_get_state:u.resp.data
+> + * and ptm_set_state:u.req.data) are 0xffffffff.
+> + */
+> +enum {
+> +    CMD_GET_CAPABILITY = 1,
+> +    CMD_INIT,
+> +    CMD_SHUTDOWN,
+> +    CMD_GET_TPMESTABLISHED,
+> +    CMD_SET_LOCALITY,
+> +    CMD_HASH_START,
+> +    CMD_HASH_DATA,
+> +    CMD_HASH_END,
+> +    CMD_CANCEL_TPM_CMD,
+> +    CMD_STORE_VOLATILE,
+> +    CMD_RESET_TPMESTABLISHED,
+> +    CMD_GET_STATEBLOB,
+> +    CMD_SET_STATEBLOB,
+> +    CMD_STOP,
+> +    CMD_GET_CONFIG,
+> +    CMD_SET_DATAFD
+> +};
+> +
+> +#endif /* _TPM_IOCTL_H */
+> diff --git a/qapi/tpm.json b/qapi/tpm.json
+> index e8b2d8d..7093f26 100644
+> --- a/qapi/tpm.json
+> +++ b/qapi/tpm.json
+> @@ -39,10 +39,12 @@
+>   # An enumeration of TPM types
+>   #
+>   # @passthrough: TPM passthrough type
+> +# @emulator: Software Emulator TPM type
+> +#            Since: 2.11
+>   #
+>   # Since: 1.5
+>   ##
+> -{ 'enum': 'TpmType', 'data': [ 'passthrough' ] }
+> +{ 'enum': 'TpmType', 'data': [ 'passthrough', 'emulator' ] }
+>
+>   ##
+>   # @query-tpm-types:
+> @@ -56,7 +58,7 @@
+>   # Example:
+>   #
+>   # -> { "execute": "query-tpm-types" }
+> -# <- { "return": [ "passthrough" ] }
+> +# <- { "return": [ "passthrough", "emulator" ] }
+>   #
+>   ##
+>   { 'command': 'query-tpm-types', 'returns': ['TpmType'] }
+> @@ -77,16 +79,29 @@
+>                                                '*cancel-path' : 'str'} }
+>
+>   ##
+> +# @TPMEmulatorOptions:
+> +#
+> +# Information about the TPM emulator type
+> +#
+> +# @chardev: Name of a unix socket chardev
+> +#
+> +# Since: 2.11
+> +##
+> +{ 'struct': 'TPMEmulatorOptions', 'data': { 'chardev' : 'str' } }
+> +
+> +##
+>   # @TpmTypeOptions:
+>   #
+>   # A union referencing different TPM backend types' configuration options
+>   #
+>   # @type: 'passthrough' The configuration options for the TPM passthrough type
+> +#        'emulator' The configuration options for TPM emulator backend type
+>   #
+>   # Since: 1.5
+>   ##
+>   { 'union': 'TpmTypeOptions',
+> -   'data': { 'passthrough' : 'TPMPassthroughOptions' } }
+> +   'data': { 'passthrough' : 'TPMPassthroughOptions',
+> +             'emulator': 'TPMEmulatorOptions' } }
+>
+>   ##
+>   # @TPMInfo:
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 77859a2..846b3fc 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -3121,7 +3121,9 @@ DEF("tpmdev", HAS_ARG, QEMU_OPTION_tpmdev, \
+>       "-tpmdev passthrough,id=id[,path=path][,cancel-path=path]\n"
+>       "                use path to provide path to a character device; default is /dev/tpm0\n"
+>       "                use cancel-path to provide path to TPM's cancel sysfs entry; if\n"
+> -    "                not provided it will be searched for in /sys/class/misc/tpm?/device\n",
+> +    "                not provided it will be searched for in /sys/class/misc/tpm?/device\n"
+> +    "-tpmdev emulator,id=id,chardev=dev\n"
+> +    "                configure the TPM device using chardev backend\n",
+>       QEMU_ARCH_ALL)
+>   STEXI
+>
+> @@ -3130,8 +3132,8 @@ The general form of a TPM device option is:
+>
+>   @item -tpmdev @var{backend} ,id=@var{id} [,@var{options}]
+>   @findex -tpmdev
+> -Backend type must be:
+> -@option{passthrough}.
+> +Backend type must be either one of the following:
+> +@option{passthrough}, @option{emulator}.
+>
+>   The specific backend type will determine the applicable options.
+>   The @code{-tpmdev} option creates the TPM backend and requires a
+> @@ -3181,6 +3183,20 @@ To create a passthrough TPM use the following two options:
+>   Note that the @code{-tpmdev} id is @code{tpm0} and is referenced by
+>   @code{tpmdev=tpm0} in the device option.
+>
+> +@item -tpmdev emulator, id=@var{id}, chardev=@var{dev}
+> +
+> +(Linux-host only) Enable access to a TPM emulator using Unix domain socket based
+> +chardev backend.
+> +
+> +@option{chardev} specifies the unique ID of a character device backend that provides connection to the software TPM server.
+> +
+> +To create a TPM emulator backend device with chardev socket backend:
+> +@example
+> +
+> +-chardev socket,id=chrtpm,path=/tmp/swtpm-sock -tpmdev emulator,id=tpm0,chardev=chrtpm -device tpm-tis,tpmdev=tpm0
+> +
+> +@end example
+> +
+>   @end table
+>
+>   ETEXI
