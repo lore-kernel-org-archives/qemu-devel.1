@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dzCMf-0002sG-Hs
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 21:51:18 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dzCfE-0006Nr-25
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 22:10:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dzCMe-0007QF-LV
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 21:51:17 -0400
-Received: from mail-qt0-x235.google.com ([2607:f8b0:400d:c0d::235]:45883)
+	(envelope-from <aik@ozlabs.ru>) id 1dzCfA-000053-0n
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 22:10:27 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:32954)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dzCMe-0007Q0-GI
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 21:51:16 -0400
-Received: by mail-qt0-x235.google.com with SMTP id b21so4553088qte.2
-	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 18:51:16 -0700 (PDT)
-References: <20170928165414.7339-1-richard.henderson@linaro.org>
-	<20170928165414.7339-5-richard.henderson@linaro.org>
-	<17f88913-12dc-b462-d6fd-9b1c6cfbd6a9@amsat.org>
-	<1085a4f8-d12b-f87c-caa7-a9927247d7e8@linaro.org>
-	<1be5c928-43d0-e8d1-7c6b-0c37f40c7a54@amsat.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e4110def-0b26-f16f-593c-07e1b5eb67c6@linaro.org>
-Date: Mon, 2 Oct 2017 21:51:12 -0400
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1dzCf9-0008TD-Fs
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 22:10:23 -0400
+Received: by mail-pf0-x241.google.com with SMTP id m28so7312904pfi.0
+	for <qemu-devel@nongnu.org>; Mon, 02 Oct 2017 19:10:22 -0700 (PDT)
+References: <20170915063552.33868-1-aik@ozlabs.ru>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <2e1b8655-5d47-965c-3d54-1ac1a531afe8@ozlabs.ru>
+Date: Tue, 3 Oct 2017 13:10:17 +1100
 MIME-Version: 1.0
-In-Reply-To: <1be5c928-43d0-e8d1-7c6b-0c37f40c7a54@amsat.org>
+In-Reply-To: <20170915063552.33868-1-aik@ozlabs.ru>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: en-AU
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 4/9] disas: Support the Capstone
- disassembler library
+Subject: Re: [Qemu-devel] [PATCH qemu v2] pci: Initialize pci_dev->name
+ before use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,32 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 10/02/2017 02:45 PM, Philippe Mathieu-Daudé wrote:
-> On 10/02/2017 03:34 PM, Richard Henderson wrote:
->> On 10/02/2017 09:36 AM, Philippe Mathieu-Daudé wrote:
->>> Maybe some defines like:
->>>
->>> #define LARGEST_TARGET_INSTR_SIZE 32
->>>
->>> #define MINIMUM_TARGET_PAGE_SIZE 1024
->>
->> Eh.  If I weren't simply pulling numbers out of my hat, perhaps.
->> Does it really make things clearer beyond sizeof or a great big comment?
+On 15/09/17 16:35, Alexey Kardashevskiy wrote:
+> This moves pci_dev->name initialization earlier so
+> pci_dev->bus_master_as could get a name instead of an empty string.
 > 
-> big comment is great!
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Like the one that's already there?
-
-+        /* We want to read memory for one insn, but generically we do not
-+           know how much memory that is.  We have a small buffer which is
-+           known to be sufficient for all supported targets.  Try to not
-+           read beyond the page, Just In Case.  For even more simplicity,
-+           ignore the actual target page size and use a 1k boundary.  If
-+           that turns out to be insufficient, we'll come back around the
-+           loop and read more.  */
+Ping?
 
 
-r~
+> ---
+> Changes:
+> v2:
+> * fixed mistype in the commit log
+> * added "rb"
+> ---
+>  hw/pci/pci.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 21e203b056..353195d154 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -1020,6 +1020,7 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
+>  
+>      pci_dev->devfn = devfn;
+>      pci_dev->requester_id_cache = pci_req_id_cache_get(pci_dev);
+> +    pstrcpy(pci_dev->name, sizeof(pci_dev->name), name);
+>  
+>      memory_region_init(&pci_dev->bus_master_container_region, OBJECT(pci_dev),
+>                         "bus master container", UINT64_MAX);
+> @@ -1029,7 +1030,6 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
+>      if (qdev_hotplug) {
+>          pci_init_bus_master(pci_dev);
+>      }
+> -    pstrcpy(pci_dev->name, sizeof(pci_dev->name), name);
+>      pci_dev->irq_state = 0;
+>      pci_config_alloc(pci_dev);
+>  
+> 
+
+
+-- 
+Alexey
