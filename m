@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35407)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dzNGM-00026L-R5
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:29:31 -0400
+	id 1dzNIG-000392-Fa
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:31:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dzNGJ-0004Ui-Jq
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:29:30 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:34521)
+	id 1dzNID-0007iI-8u
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:31:28 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:55437)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dzNGJ-0004Tt-Et
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:29:27 -0400
-Received: by mail-qk0-x243.google.com with SMTP id b124so3272870qke.1
-	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 06:29:27 -0700 (PDT)
+	id 1dzNID-0007hn-3e
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:31:25 -0400
+Received: by mail-qt0-x242.google.com with SMTP id x54so12906650qth.12
+	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 06:31:25 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20171002192404.GC17385@localhost.localdomain>
-	<1507032886-199950-1-git-send-email-imammedo@redhat.com>
+References: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
+	<1506935300-132598-10-git-send-email-imammedo@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1b559ae7-4fe5-6ba2-5bb1-98d9e7c68c6f@amsat.org>
-Date: Tue, 3 Oct 2017 10:29:22 -0300
+Message-ID: <5ea5e63d-8287-84de-b9cd-fd544c22f578@amsat.org>
+Date: Tue, 3 Oct 2017 10:31:20 -0300
 MIME-Version: 1.0
-In-Reply-To: <1507032886-199950-1-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1506935300-132598-10-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] qom: add helpers REGISTER_STATIC_TYPE[S]()
+Subject: Re: [Qemu-devel] [PATCH 09/38] m68k: cleanup cpu type name
+ composition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,101 +36,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, ehabkost@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>, laurent@vivier.eu
 Cc: qemu-devel@nongnu.org
 
-Hi Igor,
-
-On 10/03/2017 09:14 AM, Igor Mammedov wrote:
-> it will help to remove code duplication in places
-> that currently open code registration of static
-> type[s] and remove necessity to declare function
-> for type_init() to call, when only static types
-> need to be registered.
+On 10/02/2017 06:07 AM, Igor Mammedov wrote:
+> use new M68K_CPU_TYPE_NAME to compose CPU type names
+> and get rid of intermediate M68kCPUInfo/register_cpu_type()
+> which is replaced by static TypeInfo array.
 > 
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> I'm going to use it for CPU types in followup patches
-> 
-> CC: ehabkost@redhat.com
-> ---
->  include/qemu/module.h | 10 ++++++++++
->  include/qom/object.h  | 10 ++++++++++
->  qom/object.c          |  9 +++++++++
->  3 files changed, 29 insertions(+)
-> 
-> diff --git a/include/qemu/module.h b/include/qemu/module.h
-> index 56dd218..60dd632 100644
-> --- a/include/qemu/module.h
-> +++ b/include/qemu/module.h
-> @@ -52,6 +52,16 @@ typedef enum {
->  #define type_init(function) module_init(function, MODULE_INIT_QOM)
->  #define trace_init(function) module_init(function, MODULE_INIT_TRACE)
->  
-> +#define REGISTER_STATIC_TYPES(t, nr)                                        \
-
-ok
-
-> +static void do_qemu_init_ ## t(void)                                        \
-> +{                                                                           \
-> +    type_register_static_array(t, nr);                                      \
-> +}                                                                           \
-> +type_init(do_qemu_init_ ## t)
-> +
-> +#define REGISTER_STATIC_TYPE(t)                                             \
-
-eh why not...
-
-What's your plan for your "generalize parsing of cpu_model (2)" series?
-re-post the whole? If you just change this macro you can keep my R-b for it.
-
-> +    REGISTER_STATIC_TYPES(t, 1)
-> +
->  #define block_module_load_one(lib) module_load_one("block-", lib)
->  
->  void register_module_init(void (*fn)(void), module_init_type type);
-> diff --git a/include/qom/object.h b/include/qom/object.h
-> index f3e5cff..17fcadd 100644
-> --- a/include/qom/object.h
-> +++ b/include/qom/object.h
-> @@ -789,6 +789,16 @@ Type type_register_static(const TypeInfo *info);
->  Type type_register(const TypeInfo *info);
->  
->  /**
-> + * type_register_static_array:
-> + * @infos: The array of the new type #TypeInfo structures.
-> + * @nr_infos: number of entries in @infos
-> + *
-> + * @infos and all of the strings it points to should exist for the life time
-> + * that the type is registered.
-> + */
-> +void type_register_static_array(const TypeInfo *infos, int nr_infos);
-> +
-> +/**
->   * object_class_dynamic_cast_assert:
->   * @klass: The #ObjectClass to attempt to cast.
->   * @typename: The QOM typename of the class to cast to.
-> diff --git a/qom/object.c b/qom/object.c
-> index 3e18537..40b1729 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -151,6 +151,15 @@ TypeImpl *type_register_static(const TypeInfo *info)
->      return type_register(info);
->  }
->  
-> +void type_register_static_array(const TypeInfo *infos, int nr_infos)
-> +{
-> +    int i;
-> +
-> +    for (i = 0; i < nr_infos; i++) {
-> +        assert(type_register_static(&infos[i]));
-> +    }
-> +}
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
+> ---
+> CC: laurent@vivier.eu
+> ---
+>  target/m68k/cpu.h |  3 +++
+>  target/m68k/cpu.c | 75 ++++++++++++++++++++-----------------------------------
+>  2 files changed, 30 insertions(+), 48 deletions(-)
+> 
+> diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+> index d936547..afae5f6 100644
+> --- a/target/m68k/cpu.h
+> +++ b/target/m68k/cpu.h
+> @@ -323,6 +323,9 @@ void register_m68k_insns (CPUM68KState *env);
+>  
+>  #define cpu_init(cpu_model) cpu_generic_init(TYPE_M68K_CPU, cpu_model)
+>  
+> +#define M68K_CPU_TYPE_SUFFIX "-" TYPE_M68K_CPU
+> +#define M68K_CPU_TYPE_NAME(model) model M68K_CPU_TYPE_SUFFIX
 > +
->  static TypeImpl *type_get_by_name(const char *name)
+>  #define cpu_signal_handler cpu_m68k_signal_handler
+>  #define cpu_list m68k_cpu_list
+>  
+> diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+> index 8c70e08..f0f90e9 100644
+> --- a/target/m68k/cpu.c
+> +++ b/target/m68k/cpu.c
+> @@ -87,7 +87,7 @@ static ObjectClass *m68k_cpu_class_by_name(const char *cpu_model)
+>      ObjectClass *oc;
+>      char *typename;
+>  
+> -    typename = g_strdup_printf("%s-" TYPE_M68K_CPU, cpu_model);
+> +    typename = g_strdup_printf(M68K_CPU_TYPE_NAME("%s"), cpu_model);
+>      oc = object_class_by_name(typename);
+>      g_free(typename);
+>      if (oc != NULL && (object_class_dynamic_cast(oc, TYPE_M68K_CPU) == NULL ||
+> @@ -202,23 +202,6 @@ static void any_cpu_initfn(Object *obj)
+>      m68k_set_feature(env, M68K_FEATURE_WORD_INDEX);
+>  }
+>  
+> -typedef struct M68kCPUInfo {
+> -    const char *name;
+> -    void (*instance_init)(Object *obj);
+> -} M68kCPUInfo;
+> -
+> -static const M68kCPUInfo m68k_cpus[] = {
+> -    { .name = "m68000", .instance_init = m68000_cpu_initfn },
+> -    { .name = "m68020", .instance_init = m68020_cpu_initfn },
+> -    { .name = "m68030", .instance_init = m68030_cpu_initfn },
+> -    { .name = "m68040", .instance_init = m68040_cpu_initfn },
+> -    { .name = "m68060", .instance_init = m68060_cpu_initfn },
+> -    { .name = "m5206", .instance_init = m5206_cpu_initfn },
+> -    { .name = "m5208", .instance_init = m5208_cpu_initfn },
+> -    { .name = "cfv4e", .instance_init = cfv4e_cpu_initfn },
+> -    { .name = "any",   .instance_init = any_cpu_initfn },
+> -};
+> -
+>  static void m68k_cpu_realizefn(DeviceState *dev, Error **errp)
 >  {
->      if (name == NULL) {
+>      CPUState *cs = CPU(dev);
+> @@ -295,36 +278,32 @@ static void m68k_cpu_class_init(ObjectClass *c, void *data)
+>      dc->vmsd = &vmstate_m68k_cpu;
+>  }
+>  
+> -static void register_cpu_type(const M68kCPUInfo *info)
+> -{
+> -    TypeInfo type_info = {
+> -        .parent = TYPE_M68K_CPU,
+> -        .instance_init = info->instance_init,
+> -    };
+> -
+> -    type_info.name = g_strdup_printf("%s-" TYPE_M68K_CPU, info->name);
+> -    type_register(&type_info);
+> -    g_free((void *)type_info.name);
+> -}
+> +#define DEFINE_M68K_CPU_TYPE(cpu_model, initfn) \
+> +    {                                           \
+> +        .name = M68K_CPU_TYPE_NAME(cpu_model),  \
+> +        .instance_init = initfn,                \
+> +        .parent = TYPE_M68K_CPU,                \
+> +    }
+>  
+> -static const TypeInfo m68k_cpu_type_info = {
+> -    .name = TYPE_M68K_CPU,
+> -    .parent = TYPE_CPU,
+> -    .instance_size = sizeof(M68kCPU),
+> -    .instance_init = m68k_cpu_initfn,
+> -    .abstract = true,
+> -    .class_size = sizeof(M68kCPUClass),
+> -    .class_init = m68k_cpu_class_init,
+> +static const TypeInfo m68k_cpus_type_infos[] = {
+> +    { /* base class should be registered first */
+> +        .name = TYPE_M68K_CPU,
+> +        .parent = TYPE_CPU,
+> +        .instance_size = sizeof(M68kCPU),
+> +        .instance_init = m68k_cpu_initfn,
+> +        .abstract = true,
+> +        .class_size = sizeof(M68kCPUClass),
+> +        .class_init = m68k_cpu_class_init,
+> +    },
+> +    DEFINE_M68K_CPU_TYPE("m68000", m68000_cpu_initfn),
+> +    DEFINE_M68K_CPU_TYPE("m68020", m68020_cpu_initfn),
+> +    DEFINE_M68K_CPU_TYPE("m68030", m68030_cpu_initfn),
+> +    DEFINE_M68K_CPU_TYPE("m68040", m68040_cpu_initfn),
+> +    DEFINE_M68K_CPU_TYPE("m68060", m68060_cpu_initfn),
+> +    DEFINE_M68K_CPU_TYPE("m5206", m5206_cpu_initfn),
+> +    DEFINE_M68K_CPU_TYPE("m5208", m5208_cpu_initfn),
+> +    DEFINE_M68K_CPU_TYPE("cfv4e", cfv4e_cpu_initfn),
+> +    DEFINE_M68K_CPU_TYPE("any", any_cpu_initfn),
+>  };
+>  
+> -static void m68k_cpu_register_types(void)
+> -{
+> -    int i;
+> -
+> -    type_register_static(&m68k_cpu_type_info);
+> -    for (i = 0; i < ARRAY_SIZE(m68k_cpus); i++) {
+> -        register_cpu_type(&m68k_cpus[i]);
+> -    }
+> -}
+> -
+> -type_init(m68k_cpu_register_types)
+> +type_init_from_array(m68k_cpus_type_infos)
 > 
