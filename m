@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dzVLo-0005az-Mp
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:07:41 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1dzVQT-0007MK-Is
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:12:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dzVLl-000637-9c
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:07:40 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:36568)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dzVLl-00062f-4M
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:07:37 -0400
-Received: by mail-qk0-x242.google.com with SMTP id z14so6825265qkg.3
-	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 15:07:37 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1507059418.git.alistair.francis@xilinx.com>
-	<ea095f0e516828d978bf2e7344100c20d89788f7.1507059418.git.alistair.francis@xilinx.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <011f8d04-3a5f-f3f9-ec78-85bc07bc7e2d@amsat.org>
-Date: Tue, 3 Oct 2017 19:07:31 -0300
+	(envelope-from <alex.williamson@redhat.com>) id 1dzVQQ-0002bD-6m
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:12:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38636)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1dzVQQ-0002aZ-11
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 18:12:26 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DFB3C19D4D1
+	for <qemu-devel@nongnu.org>; Tue,  3 Oct 2017 22:12:24 +0000 (UTC)
+From: Alex Williamson <alex.williamson@redhat.com>
+Date: Tue, 03 Oct 2017 16:12:21 -0600
+Message-ID: <20171003221012.17156.23559.stgit@gimli.home>
 MIME-Version: 1.0
-In-Reply-To: <ea095f0e516828d978bf2e7344100c20d89788f7.1507059418.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 4/5] xilinx_zynq: : Specify the valid
- CPUs
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PULL 0/3] VFIO updates 2017-10-03
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,42 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, imammedo@redhat.com, marcel@redhat.com, alistair23@gmail.com
+To: qemu-devel@nongnu.org
 
-On 10/03/2017 05:05 PM, Alistair Francis wrote:
-> List all possible valid CPU options.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+The following changes since commit d147f7e815f97cb477e223586bcb80c316ae10ea:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-10-03 16:27:24 +0100)
 
-> ---
-> 
->  hw/arm/xilinx_zynq.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-> index 1836a4ed45..de1e0bbce1 100644
-> --- a/hw/arm/xilinx_zynq.c
-> +++ b/hw/arm/xilinx_zynq.c
-> @@ -313,6 +313,10 @@ static void zynq_init(MachineState *machine)
->      arm_load_kernel(ARM_CPU(first_cpu), &zynq_binfo);
->  }
->  
-> +const char *xlnx_zynq_7000_valid_cpus[] = { ARM_CPU_TYPE_NAME("cortex-a9"),
-> +                                            NULL
-> +                                          };
-> +
->  static void zynq_machine_init(MachineClass *mc)
->  {
->      mc->desc = "Xilinx Zynq Platform Baseboard for Cortex-A9";
-> @@ -321,6 +325,7 @@ static void zynq_machine_init(MachineClass *mc)
->      mc->no_sdcard = 1;
->      mc->ignore_memory_transaction_failures = true;
->      mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a9");
-> +    mc->valid_cpu_types = xlnx_zynq_7000_valid_cpus;
->  }
->  
->  DEFINE_MACHINE("xilinx-zynq-a9", zynq_machine_init)
-> 
+are available in the git repository at:
+
+
+  git://github.com/awilliam/qemu-vfio.git tags/vfio-updates-20171003.0
+
+for you to fetch changes up to dfbee78db8fdf7bc8c151c3d29504bb47438480b:
+
+  vfio/pci: Add NVIDIA GPUDirect Cliques support (2017-10-03 12:57:36 -0600)
+
+----------------------------------------------------------------
+VFIO updates 2017-10-03
+
+ - NVIDIA GPUDirect Cliques experimental support (Alex Williamson)
+
+----------------------------------------------------------------
+Alex Williamson (3):
+      vfio/pci: Do not unwind on error
+      vfio/pci: Add virtual capabilities quirk infrastructure
+      vfio/pci: Add NVIDIA GPUDirect Cliques support
+
+ hw/vfio/pci-quirks.c | 114 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/vfio/pci.c        |  17 +++++++-
+ hw/vfio/pci.h        |   4 ++
+ 3 files changed, 133 insertions(+), 2 deletions(-)
