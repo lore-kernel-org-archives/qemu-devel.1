@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dzMdd-0006GO-8Z
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:49:34 -0400
+	(envelope-from <lprosek@redhat.com>) id 1dzMm9-0000k2-4L
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:58:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dzMdc-0002VP-Kb
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:49:29 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:52118)
+	(envelope-from <lprosek@redhat.com>) id 1dzMm4-0001Bv-9r
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:58:17 -0400
+Received: from mail-vk0-f52.google.com ([209.85.213.52]:52412)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dzMdc-0002U5-D8
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:49:28 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id f4so8581320wme.0
-	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 05:49:27 -0700 (PDT)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dzMm4-0001B3-5a
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:58:12 -0400
+Received: by mail-vk0-f52.google.com with SMTP id 126so4490527vkj.9
+	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 05:58:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170929031831.10179-1-famz@redhat.com>
-References: <20170929031831.10179-1-famz@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 3 Oct 2017 13:49:06 +0100
-Message-ID: <CAFEAcA-6bT_eYdzB2aFt7J+-8ZytXycmrDO6geLAdyMYE_qMJg@mail.gmail.com>
+In-Reply-To: <150642403148.3900.7920017116044093005.stgit@Misha-PC.lan02.inno>
+References: <150642384156.3900.3326424823772221077.stgit@Misha-PC.lan02.inno>
+	<150642403148.3900.7920017116044093005.stgit@Misha-PC.lan02.inno>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Tue, 3 Oct 2017 14:58:10 +0200
+Message-ID: <CABdb734VfemLf6BuASDYEBbHuErEubmcFZ_pN5NCuG76xwjOmQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/5] Docker testing patches
+Subject: Re: [Qemu-devel] [PATCH 33/43] windbg: implemented
+ windbg_hw_breakpoint_insert and windbg_hw_breakpoint_remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +29,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+Cc: qemu-devel <qemu-devel@nongnu.org>, sw@weilnetz.de, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Roman Kagan <rkagan@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-On 29 September 2017 at 04:18, Fam Zheng <famz@redhat.com> wrote:
-> The following changes since commit ab161529261928ae7f3556e3220829c34b2686=
-ec:
+On Tue, Sep 26, 2017 at 1:07 PM, Mihail Abakumov
+<mikhail.abakumov@ispras.ru> wrote:
+> Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+> Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+> Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
+> ---
+>  windbgstub-utils.c |   60 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 60 insertions(+)
 >
->   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-2017=
-0927a' into staging (2017-09-27 22:44:51 +0100)
+> diff --git a/windbgstub-utils.c b/windbgstub-utils.c
+> index e33789725e..05caf98c0c 100755
+> --- a/windbgstub-utils.c
+> +++ b/windbgstub-utils.c
+> @@ -294,11 +294,71 @@ static KDData *kd;
 >
-> are available in the git repository at:
->
->   git://github.com/famz/qemu.git tags/docker-testing-pull-request
->
-> for you to fetch changes up to 36ac78e65a0695f0e397865cceaf4ab5c4e52c64:
->
->   docker: Don't mount ccache db if NOUSER=3D1 (2017-09-29 11:14:15 +0800)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
->
-> Alex Benn=C3=A9e (1):
->   tests/docker/run: don't source /etc/profile
->
-> Fam Zheng (3):
->   docker: Fix test-mingw
->   docker: test-block: Don't continue if build fails
->   docker: Don't mount ccache db if NOUSER=3D1
->
-> Paolo Bonzini (1):
->   docker: add installation to build tests
->
+>  static int windbg_hw_breakpoint_insert(CPUState *cpu, int index)
+>  {
+> +    CPUArchState *env = cpu->env_ptr;
+> +
+> +    if (!IS_BP_ENABLED(env->dr[7], index)) {
 
-Applied, thanks.
+nit: This is already checked by both callers.
 
--- PMM
+> +        return 0;
+> +    }
+> +
+> +    target_ulong addr = env->dr[index];
+> +    int type = BP_TYPE(env->dr[7], index);
+> +    int len = BP_LEN(env->dr[7], index);
+> +    int err = 0;
+> +
+> +    switch (type) {
+> +    case DR7_TYPE_DATA_WR:
+> +        err = cpu_watchpoint_insert(cpu, addr, len, BP_MEM_WRITE | BP_GDB,
+> +                                    &env->cpu_watchpoint[index]);
+> +        break;
+> +    case DR7_TYPE_DATA_RW:
+> +        err = cpu_watchpoint_insert(cpu, addr, len, BP_MEM_ACCESS | BP_GDB,
+> +                                    &env->cpu_watchpoint[index]);
+> +        break;
+> +    case DR7_TYPE_BP_INST:
+> +        err = cpu_breakpoint_insert(cpu, addr, BP_GDB,
+> +                                    &env->cpu_breakpoint[index]);
+> +        break;
+> +    case DR7_TYPE_IO_RW:
+> +        return HF_IOBPT_MASK;
+> +    default:
+> +        return 0;
+> +    }
+> +
+> +    if (!err) {
+> +        WINDBG_DEBUG("hw_breakpoint_insert: index(%d), " FMT_ADDR,
+> +                     index, addr);
+> +    } else {
+> +        env->cpu_breakpoint[index] = NULL;
+> +        WINDBG_ERROR("hw_breakpoint_insert: index(%d), " FMT_ADDR ", " FMT_ERR,
+> +                     index, addr, err);
+> +    }
+>      return 0;
+>  }
+>
+>  static int windbg_hw_breakpoint_remove(CPUState *cpu, int index)
+>  {
+> +    CPUArchState *env = cpu->env_ptr;
+> +    int type = BP_TYPE(env->dr[7], index);
+> +
+> +    switch (type) {
+> +    case DR7_TYPE_BP_INST:
+> +        if (env->cpu_breakpoint[index]) {
+> +            cpu_breakpoint_remove_by_ref(cpu, env->cpu_breakpoint[index]);
+> +        }
+> +        break;
+> +    case DR7_TYPE_DATA_WR:
+> +    case DR7_TYPE_DATA_RW:
+> +        if (env->cpu_watchpoint[index]) {
+> +            cpu_watchpoint_remove_by_ref(cpu, env->cpu_watchpoint[index]);
+> +        }
+> +        break;
+> +    default:
+> +        return 0;
+> +    }
+> +
+> +    env->cpu_breakpoint[index] = NULL;
+> +    WINDBG_DEBUG("hw_breakpoint_remove: index(%d), " FMT_ADDR,
+> +                 index, env->dr[index]);
+>      return 0;
+>  }
+>
+>
