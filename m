@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1dzJJD-0004yu-Qi
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 05:16:12 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dzJNc-00006S-1Q
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 05:20:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1dzJJ4-0001Ot-6U
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 05:16:11 -0400
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:35700)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1dzJJ4-0001Iy-0V
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 05:16:02 -0400
-Received: by mail-wr0-f194.google.com with SMTP id y44so417209wry.2
-	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 02:16:01 -0700 (PDT)
-References: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
-	<1506935300-132598-11-git-send-email-imammedo@redhat.com>
-From: Thomas Huth <huth@tuxfamily.org>
-Message-ID: <3c74a15e-d7a7-6553-c1e3-b9afa306260f@tuxfamily.org>
-Date: Tue, 3 Oct 2017 11:13:50 +0200
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dzJNX-00017u-8O
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 05:20:43 -0400
+References: <20171003031556.15173-1-jsnow@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <f66d037c-67a3-30eb-05eb-fc105093ec80@virtuozzo.com>
+Date: Tue, 3 Oct 2017 12:20:25 +0300
 MIME-Version: 1.0
-In-Reply-To: <1506935300-132598-11-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20171003031556.15173-1-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/38] m68k: an5206: use generic cpu_model
- parsing
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 0/3] blockjobs: add explicit job culling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +23,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, laurent@vivier.eu
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
 
-On 02.10.2017 11:07, Igor Mammedov wrote:
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> CC: huth@tuxfamily.org
-> CC: laurent@vivier.eu
-> ---
->  hw/m68k/an5206.c | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/m68k/an5206.c b/hw/m68k/an5206.c
-> index 9002c46..0cedc54 100644
-> --- a/hw/m68k/an5206.c
-> +++ b/hw/m68k/an5206.c
-> @@ -28,7 +28,6 @@
->  static void an5206_init(MachineState *machine)
->  {
->      ram_addr_t ram_size = machine->ram_size;
-> -    const char *cpu_model = machine->cpu_model;
->      const char *kernel_filename = machine->kernel_filename;
->      M68kCPU *cpu;
->      CPUM68KState *env;
-> @@ -39,10 +38,7 @@ static void an5206_init(MachineState *machine)
->      MemoryRegion *ram = g_new(MemoryRegion, 1);
->      MemoryRegion *sram = g_new(MemoryRegion, 1);
->  
-> -    if (!cpu_model) {
-> -        cpu_model = "m5206";
-> -    }
-> -    cpu = M68K_CPU(cpu_generic_init(TYPE_M68K_CPU, cpu_model));
-> +    cpu = M68K_CPU(cpu_create(machine->cpu_type));
->      env = &cpu->env;
->  
->      /* Initialize CPU registers.  */
-> @@ -94,6 +90,7 @@ static void an5206_machine_init(MachineClass *mc)
->  {
->      mc->desc = "Arnewsh 5206";
->      mc->init = an5206_init;
-> +    mc->default_cpu_type = M68K_CPU_TYPE_NAME("m5206");
->  }
->  
->  DEFINE_MACHINE("an5206", an5206_machine_init)
-> 
+03.10.2017 06:15, John Snow wrote:
+> For jobs that complete when a monitor isn't looking, there's no way to
+> tell what the job's final return code was. We need to allow jobs to
+> remain in the list until queried for reliable management.
+>
+> This is an RFC; tests are on the way.
+> (Tested only manually via qmp-shell for now.)
 
-Acked-by: Thomas Huth <huth@tuxfamily.org>
+That's a cool feature!
+What about transactions support?
+
+>
+> John Snow (3):
+>    blockjob: add manual-cull property
+>    qmp: add block-job-cull command
+>    blockjob: expose manual-cull property
+>
+>   block/backup.c               | 20 +++++++++---------
+>   block/commit.c               |  2 +-
+>   block/mirror.c               |  2 +-
+>   block/replication.c          |  5 +++--
+>   block/stream.c               |  2 +-
+>   block/trace-events           |  1 +
+>   blockdev.c                   | 28 +++++++++++++++++++++----
+>   blockjob.c                   | 46 +++++++++++++++++++++++++++++++++++++++--
+>   include/block/block_int.h    |  8 +++++---
+>   include/block/blockjob.h     | 21 +++++++++++++++++++
+>   include/block/blockjob_int.h |  2 +-
+>   qapi/block-core.json         | 49 ++++++++++++++++++++++++++++++++++++--------
+>   tests/test-blockjob-txn.c    |  2 +-
+>   tests/test-blockjob.c        |  2 +-
+>   14 files changed, 155 insertions(+), 35 deletions(-)
+>
+
+
+-- 
+Best regards,
+Vladimir
