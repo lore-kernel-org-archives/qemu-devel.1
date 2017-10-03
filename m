@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dzNLx-0005C5-Pp
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:35:22 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dzNNj-0006Wa-KR
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:37:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dzNLs-0000dU-49
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:35:17 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:11433 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dzNLr-0000Pm-OC
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:35:12 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20170925135801.144261-1-vsementsov@virtuozzo.com>
-	<20170925135801.144261-9-vsementsov@virtuozzo.com>
-	<b8b01f1a-6e7b-342f-02b6-b7386bff1500@redhat.com>
-	<a4fb096f-7995-ad85-64b7-68a124410e86@redhat.com>
-	<cdec3d7e-04c9-a5e3-d0e7-293e2c7633c8@virtuozzo.com>
-Message-ID: <ca5a605d-e548-5860-1e40-abcac6017683@virtuozzo.com>
-Date: Tue, 3 Oct 2017 16:35:03 +0300
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dzNNg-0003N7-EY
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:37:07 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:34829)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dzNNg-0003Ms-9e
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:37:04 -0400
+Received: by mail-qk0-x243.google.com with SMTP id w63so4317746qkd.2
+	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 06:37:04 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
+	<1506935300-132598-13-git-send-email-imammedo@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <676d82ff-6917-036b-cc42-42ca670fbb8a@amsat.org>
+Date: Tue, 3 Oct 2017 10:37:00 -0300
 MIME-Version: 1.0
-In-Reply-To: <cdec3d7e-04c9-a5e3-d0e7-293e2c7633c8@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1506935300-132598-13-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 8/8] nbd: Minimal structured
- read for client
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 12/38] moxie: fix qemu-system-moxie failing
+ to start with CLI "-cpu MoxieLite"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,62 +36,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>, green@moxielogic.com
+Cc: qemu-devel@nongnu.org
 
-03.10.2017 15:58, Vladimir Sementsov-Ogievskiy wrote:
-> 03.10.2017 13:07, Paolo Bonzini wrote:
->> On 26/09/2017 00:19, Eric Blake wrote:
->>>> +=C2=A0=C2=A0=C2=A0 /* here we deal with successful structured reply=
- */
->>>> +=C2=A0=C2=A0=C2=A0 switch (s->reply.type) {
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QEMUIOVector sub_qiov;
->>>> +=C2=A0=C2=A0=C2=A0 case NBD_SREP_TYPE_OFFSET_DATA:
->>> This is putting a LOT of smarts directly into the receive routine.
->>> Here's where I was previously wondering (and I think Paolo as well)
->>> whether it might be better to split the efforts: the generic function
->>> reads off the chunk information and any payload, but a per-command
->>> callback function then parses the chunks.=C2=A0 Especially since the
->>> definition of the chunks differs on a per-command basis (yes, the NBD
->>> spec will try to not reuse an SREP chunk type across multiple command=
-s
->>> unless the semantics are similar, but that's a bit more fragile).=C2=A0=
- This
->>> particularly matters given my statement above that you want a
->>> discriminated union, rather than a struct that contains unused fields=
-,
->>> for handling different SREP chunk types.
->> I think there should be two kinds of replies: 1) read directly into a
->> QEMUIOVector, using structured replies only as an encapsulation of the
->> payload; 2) read a chunk at a time into malloc-ed memory, yielding bac=
-k
->> to the calling coroutine after receiving one complete chunk.
->>
->> In the end this probably means that you have a read_chunk_header
->> function and a read_chunk function.=C2=A0 READ has a loop that calls
->> read_chunk_header followed by direct reading into the QEMUIOVector,
->> while everyone else calls read_chunk.
->
-> accordingly to spec, we can receive several error reply chunks to any=20
-> request,
-> so loop, receiving them should be common for all requests I think
+On 10/02/2017 06:07 AM, Igor Mammedov wrote:
+> It 'works' with default CPU only because of bug in
+> moxie_cpu_class_by_name() where it treats cpu_model
+> as type name and default cpu_model also happens to be
+> type name. But specifying explicitly cpu on CLI,
+> ex: '-cpu MoxieLite', makes QEMU fail since
+> moxie_cpu_class_by_name() doesn't traslate cpu_model
+> to cpu type and fails to find corresponding object class.
+> 
+> Fix moxie_cpu_class_by_name() to do proper
+>    cpu_model -> cpu type
+> translation and fix default cpu_model to be cpu_model
+> instead of being typename.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-as well as handling error chunks should be common.. What do you think=20
-about my DRAFT proposal?
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-
->
->>
->> Maybe qio_channel_readv/writev_full could have "offset" and "bytes"
->> arguments.=C2=A0 Most code in iov_send_recv could be cut-and-pasted. (=
-When
->> sheepdog is converted to QIOChannel, iov_send_recv can go away).
->>
->> Paolo
->
->
-
-
---=20
-Best regards,
-Vladimir
+> ---
+> CC: green@moxielogic.com
+> ---
+>  hw/moxie/moxiesim.c | 2 +-
+>  target/moxie/cpu.c  | 7 ++++++-
+>  2 files changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
+> index 5ea8dd3..01b9f34 100644
+> --- a/hw/moxie/moxiesim.c
+> +++ b/hw/moxie/moxiesim.c
+> @@ -116,7 +116,7 @@ static void moxiesim_init(MachineState *machine)
+>  
+>      /* Init CPUs. */
+>      if (cpu_model == NULL) {
+> -        cpu_model = "MoxieLite-moxie-cpu";
+> +        cpu_model = "MoxieLite";
+>      }
+>      cpu = MOXIE_CPU(cpu_generic_init(TYPE_MOXIE_CPU, cpu_model));
+>      env = &cpu->env;
+> diff --git a/target/moxie/cpu.c b/target/moxie/cpu.c
+> index 30bd44f..d4626a1 100644
+> --- a/target/moxie/cpu.c
+> +++ b/target/moxie/cpu.c
+> @@ -89,7 +89,12 @@ static void moxie_cpu_initfn(Object *obj)
+>  
+>  static ObjectClass *moxie_cpu_class_by_name(const char *cpu_model)
+>  {
+> -    ObjectClass *oc = object_class_by_name(cpu_model);
+> +    ObjectClass *oc;
+> +    char *typename;
+> +
+> +    typename = g_strdup_printf("%s-" TYPE_MOXIE_CPU, cpu_model);
+> +    oc = object_class_by_name(typename);
+> +    g_free(typename);
+>      if (oc != NULL && (!object_class_dynamic_cast(oc, TYPE_MOXIE_CPU) ||
+>                         object_class_is_abstract(oc))) {
+>          return NULL;
+> 
