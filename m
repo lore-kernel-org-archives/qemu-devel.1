@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dzM7w-0003hV-Vp
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:16:45 -0400
+	(envelope-from <lprosek@redhat.com>) id 1dzM7x-0003hu-Gi
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:16:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dzM7s-0001HA-Se
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:16:44 -0400
-Received: from mail-vk0-f42.google.com ([209.85.213.42]:51763)
+	(envelope-from <lprosek@redhat.com>) id 1dzM7t-0001Ho-5t
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:16:45 -0400
+Received: from mail-vk0-f43.google.com ([209.85.213.43]:55125)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dzM7s-0001G2-Ni
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:16:40 -0400
-Received: by mail-vk0-f42.google.com with SMTP id 137so1911569vkk.8
-	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 05:16:40 -0700 (PDT)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dzM7t-0001Gu-23
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 08:16:41 -0400
+Received: by mail-vk0-f43.google.com with SMTP id c19so4423873vke.11
+	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 05:16:41 -0700 (PDT)
 MIME-Version: 1.0
 In-Reply-To: <150642393032.3900.4598141276692628379.stgit@Misha-PC.lan02.inno>
 References: <150642384156.3900.3326424823772221077.stgit@Misha-PC.lan02.inno>
 	<150642393032.3900.4598141276692628379.stgit@Misha-PC.lan02.inno>
 From: Ladi Prosek <lprosek@redhat.com>
 Date: Tue, 3 Oct 2017 14:16:39 +0200
-Message-ID: <CABdb737VRHzGxakpveJE7aQawyWFcDOg1aqR_36T9t80pO15WQ@mail.gmail.com>
+Message-ID: <CABdb734ijMQ_2-k669-rGErYnq3zJGN=MyyuR_=jwAwnoGC-Kg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PATCH 15/43] windbg: sized data buffer
 List-Id: <qemu-devel.nongnu.org>
