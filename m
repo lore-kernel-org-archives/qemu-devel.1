@@ -1,24 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dzQk4-0006Qq-PG
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 13:12:25 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dzQt7-0000SU-Op
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 13:21:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dzQk3-0006Gy-LL
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 13:12:24 -0400
-Date: Tue, 3 Oct 2017 10:12:11 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <20171003001257.GA7087@localhost.localdomain>
-Message-ID: <alpine.DEB.2.10.1710031003331.17914@sstabellini-ThinkPad-X260>
-References: <20170927195635.16014-1-ehabkost@redhat.com>
-	<20170927195635.16014-5-ehabkost@redhat.com>
-	<59CCD0150200007800180507@prv-mh.provo.novell.com>
-	<20170928131234.GP4115@localhost.localdomain>
-	<20171003001257.GA7087@localhost.localdomain>
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dzQt2-0005DF-QI
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 13:21:45 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55990)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1dzQt2-0005Cm-Hq
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 13:21:40 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v93HKMCk112633
+	for <qemu-devel@nongnu.org>; Tue, 3 Oct 2017 13:21:34 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dccgm8rh1-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 13:21:34 -0400
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Tue, 3 Oct 2017 11:21:33 -0600
+References: <150703999112.6139.714822137654210421.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Tue, 3 Oct 2017 14:21:27 -0300
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] xen-pci-passthrough PCI Express support? (Re:
- [Xen-devel] [PATCH v2 4/5] pci: Add INTERFACE_CONVENTIONAL_PCI_DEVICE to
- Conventional PCI devices)
+In-Reply-To: <150703999112.6139.714822137654210421.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <8498924e-39ce-7bcc-fe07-60ca4eda8c90@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] hw/ppc: use 0 instead of
+ fdt_path_offset(fdt, "/")
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +42,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Jan Beulich <JBeulich@suse.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, David Gibson <dgibson@redhat.com>, Jiri Slaby <jslaby@suse.cz>, Hannes Reinecke <hare@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Alexander Graf <agraf@suse.de>, =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Marcel Apfelbaum <marcel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org, Laine Stump <laine@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Yongbok Kim <yongbok.kim@imgtec.com>, Alistair Francis <alistair23@gmail.com>, John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-On Mon, 2 Oct 2017, Eduardo Habkost wrote:
-> On Thu, Sep 28, 2017 at 10:12:34AM -0300, Eduardo Habkost wrote:
-> > On Thu, Sep 28, 2017 at 02:33:57AM -0600, Jan Beulich wrote:
-> > > >>> On 27.09.17 at 21:56, <ehabkost@redhat.com> wrote:
-> > > > --- a/hw/xen/xen_pt.c
-> > > > +++ b/hw/xen/xen_pt.c
-> > > > @@ -964,6 +964,10 @@ static const TypeInfo xen_pci_passthrough_info = {
-> > > >      .instance_size = sizeof(XenPCIPassthroughState),
-> > > >      .instance_finalize = xen_pci_passthrough_finalize,
-> > > >      .class_init = xen_pci_passthrough_class_init,
-> > > > +    .interfaces = (InterfaceInfo[]) {
-> > > > +        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-> > > > +        { },
-> > > > +    },
-> > > >  };
-> > > 
-> > > Passed through devices can be both PCI and PCIe, so following
-> > > the description of the patch I don't think these can be statically
-> > > given either property. Granted quite a bit of PCIe specific
-> > > functionality may be missing in the Xen code ...
-> > 
-> > This is just static data about what the device type supports, not
-> > about what a given device instance really is.  Deciding if the
-> > device is PCIe or Conventional at runtime is out of the scope of
-> > this series.
-> > 
-> > That said, if passed through PCI Express devices are really
-> > supported, it looks like this should be marked as hybrid.
-> 
-> Can anybody confirm if PCI Express devices are really supported
-> by xen-pci-passthrough?
-> 
-> I suggest we add only INTERFACE_CONVENTIONAL_PCI_DEVICE to the
-> class info until we confirm that.
-> 
-> (In other words, apply this patch as-is, and add
-> INTERFACE_PCIE_DEVICE later as a follow-up patch if appropriate.)
 
-Yes, xen-pci-passthrough can expose PCI Express devices to the guest.  I
-don't think the old xen-pci-passthrough code does anything special to
-mark it as such internally in QEMU, but it can deal with the PCI Express
-Capabilities and expose/emulate them for the guest's benefit.
+
+On 10/03/2017 11:13 AM, Greg Kurz wrote:
+> The offset of the root node is guaranteed to be 0.
+>
+> This doesn't fix anything, it's just trivial cleanup of the two
+> remaining places where this was done under hw/ppc.
+>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+
+> ---
+>   hw/ppc/pnv.c   |    3 +--
+>   hw/ppc/spapr.c |    3 +--
+>   2 files changed, 2 insertions(+), 4 deletions(-)
+>
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index d46d91c76f5c..84b2389ea60b 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -92,8 +92,7 @@ static int get_cpus_node(void *fdt)
+>       int cpus_offset = fdt_path_offset(fdt, "/cpus");
+>
+>       if (cpus_offset < 0) {
+> -        cpus_offset = fdt_add_subnode(fdt, fdt_path_offset(fdt, "/"),
+> -                                      "cpus");
+> +        cpus_offset = fdt_add_subnode(fdt, 0, "cpus");
+>           if (cpus_offset) {
+>               _FDT((fdt_setprop_cell(fdt, cpus_offset, "#address-cells", 0x1)));
+>               _FDT((fdt_setprop_cell(fdt, cpus_offset, "#size-cells", 0x0)));
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index ff87f155d55e..352ff3d614e8 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -353,8 +353,7 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
+>
+>           cpus_offset = fdt_path_offset(fdt, "/cpus");
+>           if (cpus_offset < 0) {
+> -            cpus_offset = fdt_add_subnode(fdt, fdt_path_offset(fdt, "/"),
+> -                                          "cpus");
+> +            cpus_offset = fdt_add_subnode(fdt, 0, "cpus");
+>               if (cpus_offset < 0) {
+>                   return cpus_offset;
+>               }
+>
+>
