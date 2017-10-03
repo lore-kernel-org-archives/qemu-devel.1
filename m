@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dzAZs-0001r5-D7
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 19:56:49 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dzApz-0005Wh-6W
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 20:13:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dzAZr-0000wW-7i
-	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 19:56:48 -0400
-References: <20170913160333.23622-1-eblake@redhat.com>
-	<20170913160333.23622-24-eblake@redhat.com>
-	<ae5bcf8e-57de-68c2-8a1a-6599f0e5c9ea@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <47998e8d-69fa-9fa9-7647-efca89c3b98d@redhat.com>
-Date: Mon, 2 Oct 2017 18:56:33 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1dzApy-0001Py-45
+	for qemu-devel@nongnu.org; Mon, 02 Oct 2017 20:13:27 -0400
+Date: Mon, 2 Oct 2017 21:12:57 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171003001257.GA7087@localhost.localdomain>
+References: <20170927195635.16014-1-ehabkost@redhat.com>
+	<20170927195635.16014-5-ehabkost@redhat.com>
+	<59CCD0150200007800180507@prv-mh.provo.novell.com>
+	<20170928131234.GP4115@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <ae5bcf8e-57de-68c2-8a1a-6599f0e5c9ea@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="8tgkd8l0Q9su90gVp1LhjG6ka6vCuLeTE"
-Subject: Re: [Qemu-devel] [PATCH v4 23/23] qemu-io: Relax 'alloc' now that
- block-status doesn't assert
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170928131234.GP4115@localhost.localdomain>
+Subject: [Qemu-devel] xen-pci-passthrough PCI Express support? (Re:
+ [Xen-devel] [PATCH v2 4/5] pci: Add INTERFACE_CONVENTIONAL_PCI_DEVICE to
+ Conventional PCI devices)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,93 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Jan Beulich <JBeulich@suse.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, David Gibson <dgibson@redhat.com>, Jiri Slaby <jslaby@suse.cz>, Hannes Reinecke <hare@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Alexander Graf <agraf@suse.de>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Marcel Apfelbaum <marcel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org, Laine Stump <laine@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Yongbok Kim <yongbok.kim@imgtec.com>, Alistair Francis <alistair23@gmail.com>, John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8tgkd8l0Q9su90gVp1LhjG6ka6vCuLeTE
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <47998e8d-69fa-9fa9-7647-efca89c3b98d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 23/23] qemu-io: Relax 'alloc' now that
- block-status doesn't assert
-References: <20170913160333.23622-1-eblake@redhat.com>
- <20170913160333.23622-24-eblake@redhat.com>
- <ae5bcf8e-57de-68c2-8a1a-6599f0e5c9ea@redhat.com>
-In-Reply-To: <ae5bcf8e-57de-68c2-8a1a-6599f0e5c9ea@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Sep 28, 2017 at 10:12:34AM -0300, Eduardo Habkost wrote:
+> On Thu, Sep 28, 2017 at 02:33:57AM -0600, Jan Beulich wrote:
+> > >>> On 27.09.17 at 21:56, <ehabkost@redhat.com> wrote:
+> > > --- a/hw/xen/xen_pt.c
+> > > +++ b/hw/xen/xen_pt.c
+> > > @@ -964,6 +964,10 @@ static const TypeInfo xen_pci_passthrough_info = {
+> > >      .instance_size = sizeof(XenPCIPassthroughState),
+> > >      .instance_finalize = xen_pci_passthrough_finalize,
+> > >      .class_init = xen_pci_passthrough_class_init,
+> > > +    .interfaces = (InterfaceInfo[]) {
+> > > +        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+> > > +        { },
+> > > +    },
+> > >  };
+> > 
+> > Passed through devices can be both PCI and PCIe, so following
+> > the description of the patch I don't think these can be statically
+> > given either property. Granted quite a bit of PCIe specific
+> > functionality may be missing in the Xen code ...
+> 
+> This is just static data about what the device type supports, not
+> about what a given device instance really is.  Deciding if the
+> device is PCIe or Conventional at runtime is out of the scope of
+> this series.
+> 
+> That said, if passed through PCI Express devices are really
+> supported, it looks like this should be marked as hybrid.
 
-On 10/02/2017 04:27 PM, John Snow wrote:
->=20
->=20
-> On 09/13/2017 12:03 PM, Eric Blake wrote:
->> Previously, the alloc command required that input parameters be
->> sector-aligned and clamped to 32 bits, because the underlying
->> bdrv_is_allocated used a 32-bit parameter and asserted aligned
->> inputs.  But now that we have fixed block status to report a
->> 64-bit bytes value, and to properly round requests on behalf of
->> guests, we can pass any values, and can use qemu-io to add
->> coverage that our rounding is correct regardless of the guest
->> alignment constraints.
->>
->> Update iotest 177 to intentionally probe block status at
->> unaligned boundaries as well as with a bytes value that does not
->> map to 32-bit sectors, which also required tweaking the image
->> prep to leave an unallocated portion to the image under test.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->>
+Can anybody confirm if PCI Express devices are really supported
+by xen-pci-passthrough?
 
->>  echo
->> +echo "=3D=3D block status smaller than alignment =3D=3D"
->> +limits=3Dalign=3D4k
->> +$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
->> +	 -c "alloc 1 1" -c "alloc 0x6dffff0 1000" -c "alloc 127m 5P" \
->> +	 -c map | _filter_qemu_io
->> +
+I suggest we add only INTERFACE_CONVENTIONAL_PCI_DEVICE to the
+class info until we confirm that.
 
->=20
-> aaand I'll hold off on this one until the respin so I don't have to
-> review the test twice.
+(In other words, apply this patch as-is, and add
+INTERFACE_PCIE_DEVICE later as a follow-up patch if appropriate.)
 
-Fair enough; thanks for the reviews.
-
-By the way, it's operations like the above additions where you can step
-through bdrv_co_block_status in gdb to see all the rounding/alignment
-steps in action, so I do feel pretty confident that my changes in 21/23
-were fairly well covered.
-
->=20
-> I'll say I'm done for v4 for now :)
-
-I'll try to get v5 posted in the next day or two.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---8tgkd8l0Q9su90gVp1LhjG6ka6vCuLeTE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnS0jEACgkQp6FrSiUn
-Q2oZGQf/RN69IRUv/aP7tJykCZnp6oW7QsEm9WZo/Etvm1z1OGQKNFFJAWTp7jvO
-aZNeadI5BeTQ4jY6ZN/RHwSDD9OzrsJfG6c91ssTET6qRAexYBGN/M7fCW5hQgzn
-4PfINsfxVmE/ueI87/KlECW30NgVFXDFBUGNfoVeLrPJIHt57ACKrOsURkfQVPiq
-8AZyDwHlWkYEl7j6Z3EuBFAEPa8CfiVGaBV59698lUfKEqjV2Kpt4L/w+sKMoNTk
-6Cwg8VhPlPHpzowLQhcbOA1iHOriJxWmgrckymhsOG+lWvdUPwjBiLaeRT5GHxAj
-9D1VEUmN43zNfc5/jY0c017q6zrjIQ==
-=gPB+
------END PGP SIGNATURE-----
-
---8tgkd8l0Q9su90gVp1LhjG6ka6vCuLeTE--
+-- 
+Eduardo
