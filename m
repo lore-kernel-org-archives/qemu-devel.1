@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dzJHf-0003Zm-BP
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 05:14:37 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dzJHe-0003ZB-Ec
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 05:14:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dzJHa-0004i5-C4
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 05:14:35 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:50491)
+	(envelope-from <dgibson@ozlabs.org>) id 1dzJHd-0004pc-34
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 05:14:34 -0400
+Received: from ozlabs.org ([103.22.144.67]:45607)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1dzJHZ-0004YA-Pc
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 05:14:30 -0400
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1dzJHc-0004ie-DQ
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 05:14:33 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue,  3 Oct 2017 20:14:20 +1100
-Message-Id: <20171003091423.28704-3-david@gibson.dropbear.id.au>
+Date: Tue,  3 Oct 2017 20:14:22 +1100
+Message-Id: <20171003091423.28704-5-david@gibson.dropbear.id.au>
 In-Reply-To: <20171003091423.28704-1-david@gibson.dropbear.id.au>
 References: <20171003091423.28704-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [RFC 2/5] pci: Move bridge data structures from
- pci_bus.h to pci_bridge.h
+Subject: [Qemu-devel] [RFC 4/5] pci: Simplify pci_bus_is_root()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,157 +26,134 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mst@redhat.com, ehabkost@redhat.com, marcel@redhat.com
 Cc: qemu-devel@nongnu.org, alex.williamson@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-include/hw/pci/pci_bus.h contains several data structures related to PCI
-bridges that aren't needed by most users of pci_bus.h.  We already have
-a pci_bridge.h, so move them there.
+pci_bus_is_root() currently relies on a method in the PCIBusClass.
+But it's always known if a PCI bus is a root bus when we create it, so
+using a dynamic method is overkill.
+
+This replaces it with an IS_ROOT bit in a new flags field, which is set on
+root buses and otherwise clear.  As a bonus this removes the special
+is_root logic from pci_expander_bridge, since it already creates its bus
+as a root bus.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- include/hw/pci-host/xilinx-pcie.h |  2 +-
- include/hw/pci/pci_bridge.h       | 48 ++++++++++++++++++++++++++++++++++++
- include/hw/pci/pci_bus.h          | 51 ++-------------------------------------
- 3 files changed, 51 insertions(+), 50 deletions(-)
 
-diff --git a/include/hw/pci-host/xilinx-pcie.h b/include/hw/pci-host/xilinx-pcie.h
-index bec66b27c5..74c04dc9bb 100644
---- a/include/hw/pci-host/xilinx-pcie.h
-+++ b/include/hw/pci-host/xilinx-pcie.h
-@@ -23,7 +23,7 @@
- #include "hw/hw.h"
- #include "hw/sysbus.h"
- #include "hw/pci/pci.h"
--#include "hw/pci/pci_bus.h"
-+#include "hw/pci/pci_bridge.h"
- #include "hw/pci/pcie_host.h"
+# Conflicts:
+#	include/hw/pci/pci_bus.h
+---
+ hw/pci-bridge/pci_expander_bridge.c |  6 ------
+ hw/pci/pci.c                        | 14 ++------------
+ include/hw/pci/pci.h                | 12 +++++++++++-
+ 3 files changed, 13 insertions(+), 19 deletions(-)
+
+diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expander_bridge.c
+index 5652cf06e9..11dfa9258e 100644
+--- a/hw/pci-bridge/pci_expander_bridge.c
++++ b/hw/pci-bridge/pci_expander_bridge.c
+@@ -65,11 +65,6 @@ static int pxb_bus_num(PCIBus *bus)
+     return pxb->bus_nr;
+ }
  
- #define TYPE_XILINX_PCIE_HOST "xilinx-pcie-host"
-diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
-index 1acadc2c15..9b44ffd22a 100644
---- a/include/hw/pci/pci_bridge.h
-+++ b/include/hw/pci/pci_bridge.h
-@@ -27,6 +27,54 @@
- #define QEMU_PCI_BRIDGE_H
+-static bool pxb_is_root(PCIBus *bus)
+-{
+-    return true; /* by definition */
+-}
+-
+ static uint16_t pxb_bus_numa_node(PCIBus *bus)
+ {
+     PXBDev *pxb = convert_to_pxb(bus->parent_dev);
+@@ -82,7 +77,6 @@ static void pxb_bus_class_init(ObjectClass *class, void *data)
+     PCIBusClass *pbc = PCI_BUS_CLASS(class);
  
- #include "hw/pci/pci.h"
-+#include "hw/pci/pci_bus.h"
-+
-+typedef struct PCIBridgeWindows PCIBridgeWindows;
-+
-+/*
-+ * Aliases for each of the address space windows that the bridge
-+ * can forward. Mapped into the bridge's parent's address space,
-+ * as subregions.
-+ */
-+struct PCIBridgeWindows {
-+    MemoryRegion alias_pref_mem;
-+    MemoryRegion alias_mem;
-+    MemoryRegion alias_io;
-+    /*
-+     * When bridge control VGA forwarding is enabled, bridges will
-+     * provide positive decode on the PCI VGA defined I/O port and
-+     * MMIO ranges.  When enabled forwarding is only qualified on the
-+     * I/O and memory enable bits in the bridge command register.
-+     */
-+    MemoryRegion alias_vga[QEMU_PCI_VGA_NUM_REGIONS];
+     pbc->bus_num = pxb_bus_num;
+-    pbc->is_root = pxb_is_root;
+     pbc->numa_node = pxb_bus_numa_node;
+ }
+ 
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index ffaa449ec1..4baf591562 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -126,14 +126,9 @@ static void pci_bus_unrealize(BusState *qbus, Error **errp)
+     vmstate_unregister(NULL, &vmstate_pcibus, bus);
+ }
+ 
+-static bool pcibus_is_root(PCIBus *bus)
+-{
+-    return !bus->parent_dev;
+-}
+-
+ static int pcibus_num(PCIBus *bus)
+ {
+-    if (pcibus_is_root(bus)) {
++    if (pci_bus_is_root(bus)) {
+         return 0; /* pci host bridge */
+     }
+     return bus->parent_dev->config[PCI_SECONDARY_BUS];
+@@ -156,7 +151,6 @@ static void pci_bus_class_init(ObjectClass *klass, void *data)
+     k->unrealize = pci_bus_unrealize;
+     k->reset = pcibus_reset;
+ 
+-    pbc->is_root = pcibus_is_root;
+     pbc->bus_num = pcibus_num;
+     pbc->numa_node = pcibus_numa_node;
+ }
+@@ -385,6 +379,7 @@ static void pci_root_bus_init(PCIBus *bus, DeviceState *parent,
+     bus->slot_reserved_mask = 0x0;
+     bus->address_space_mem = address_space_mem;
+     bus->address_space_io = address_space_io;
++    bus->flags |= PCI_BUS_IS_ROOT;
+ 
+     /* host bridge */
+     QLIST_INIT(&bus->child);
+@@ -397,11 +392,6 @@ bool pci_bus_is_express(PCIBus *bus)
+     return object_dynamic_cast(OBJECT(bus), TYPE_PCIE_BUS);
+ }
+ 
+-bool pci_bus_is_root(PCIBus *bus)
+-{
+-    return PCI_BUS_GET_CLASS(bus)->is_root(bus);
+-}
+-
+ void pci_root_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *parent,
+                               const char *name,
+                               MemoryRegion *address_space_mem,
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index 77d92a3dc4..cbb3386207 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -404,6 +404,11 @@ typedef AddressSpace *(*PCIIOMMUFunc)(PCIBus *, void *, int);
+ #define PCI_BUS_GET_CLASS(obj) OBJECT_GET_CLASS(PCIBusClass, (obj), TYPE_PCI_BUS)
+ #define TYPE_PCIE_BUS "PCIE"
+ 
++enum PCIBusFlags {
++    /* This bus is the root of a PCI domain */
++    PCI_BUS_IS_ROOT                                         = 0x0001,
 +};
 +
-+#define TYPE_PCI_BRIDGE "base-pci-bridge"
-+#define PCI_BRIDGE(obj) OBJECT_CHECK(PCIBridge, (obj), TYPE_PCI_BRIDGE)
-+
-+struct PCIBridge {
-+    /*< private >*/
-+    PCIDevice parent_obj;
-+    /*< public >*/
-+
-+    /* private member */
-+    PCIBus sec_bus;
-+    /*
-+     * Memory regions for the bridge's address spaces.  These regions are not
-+     * directly added to system_memory/system_io or its descendants.
-+     * Bridge's secondary bus points to these, so that devices
-+     * under the bridge see these regions as its address spaces.
-+     * The regions are as large as the entire address space -
-+     * they don't take into account any windows.
-+     */
-+    MemoryRegion address_space_mem;
-+    MemoryRegion address_space_io;
-+
-+    PCIBridgeWindows *windows;
-+
-+    pci_map_irq_fn map_irq;
-+    const char *bus_name;
-+};
- 
- #define PCI_BRIDGE_DEV_PROP_CHASSIS_NR "chassis_nr"
- #define PCI_BRIDGE_DEV_PROP_MSI        "msi"
-diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
-index bc34fd0017..b7da8f555b 100644
---- a/include/hw/pci/pci_bus.h
-+++ b/include/hw/pci/pci_bus.h
-@@ -2,10 +2,10 @@
- #define QEMU_PCI_BUS_H
- 
- /*
-- * PCI Bus and Bridge datastructures.
-+ * PCI Bus datastructures.
-  *
-  * Do not access the following members directly;
-- * use accessor functions in pci.h, pci_bridge.h
-+ * use accessor functions in pci.h
-  */
- 
  typedef struct PCIBusClass {
-@@ -44,51 +44,4 @@ struct PCIBus {
+     /*< private >*/
+     BusClass parent_class;
+@@ -416,6 +421,7 @@ typedef struct PCIBusClass {
+ 
+ struct PCIBus {
+     BusState qbus;
++    enum PCIBusFlags flags;
+     PCIIOMMUFunc iommu_fn;
+     void *iommu_opaque;
+     uint8_t devfn_min;
+@@ -440,8 +446,12 @@ struct PCIBus {
      Notifier machine_done;
  };
  
--typedef struct PCIBridgeWindows PCIBridgeWindows;
--
--/*
-- * Aliases for each of the address space windows that the bridge
-- * can forward. Mapped into the bridge's parent's address space,
-- * as subregions.
-- */
--struct PCIBridgeWindows {
--    MemoryRegion alias_pref_mem;
--    MemoryRegion alias_mem;
--    MemoryRegion alias_io;
--    /*
--     * When bridge control VGA forwarding is enabled, bridges will
--     * provide positive decode on the PCI VGA defined I/O port and
--     * MMIO ranges.  When enabled forwarding is only qualified on the
--     * I/O and memory enable bits in the bridge command register.
--     */
--    MemoryRegion alias_vga[QEMU_PCI_VGA_NUM_REGIONS];
--};
--
--#define TYPE_PCI_BRIDGE "base-pci-bridge"
--#define PCI_BRIDGE(obj) OBJECT_CHECK(PCIBridge, (obj), TYPE_PCI_BRIDGE)
--
--struct PCIBridge {
--    /*< private >*/
--    PCIDevice parent_obj;
--    /*< public >*/
--
--    /* private member */
--    PCIBus sec_bus;
--    /*
--     * Memory regions for the bridge's address spaces.  These regions are not
--     * directly added to system_memory/system_io or its descendants.
--     * Bridge's secondary bus points to these, so that devices
--     * under the bridge see these regions as its address spaces.
--     * The regions are as large as the entire address space -
--     * they don't take into account any windows.
--     */
--    MemoryRegion address_space_mem;
--    MemoryRegion address_space_io;
--
--    PCIBridgeWindows *windows;
--
--    pci_map_irq_fn map_irq;
--    const char *bus_name;
--};
--
- #endif /* QEMU_PCI_BUS_H */
++static inline bool pci_bus_is_root(PCIBus *bus)
++{
++    return !!(bus->flags & PCI_BUS_IS_ROOT);
++}
++
+ bool pci_bus_is_express(PCIBus *bus);
+-bool pci_bus_is_root(PCIBus *bus);
+ void pci_root_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *parent,
+                               const char *name,
+                               MemoryRegion *address_space_mem,
 -- 
 2.13.6
