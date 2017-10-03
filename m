@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dzNLm-0004zw-1Z
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:35:11 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dzNLx-0005C5-Pp
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:35:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dzNLi-0008S3-0m
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:35:06 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:57134)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dzNLh-0008Qw-Tg
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:35:01 -0400
-Received: by mail-qt0-x244.google.com with SMTP id e19so9088914qta.13
-	for <qemu-devel@nongnu.org>; Tue, 03 Oct 2017 06:35:01 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1506935300-132598-1-git-send-email-imammedo@redhat.com>
-	<1506935300-132598-25-git-send-email-imammedo@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ab192839-6793-d408-124c-a14822f28fbc@amsat.org>
-Date: Tue, 3 Oct 2017 10:34:58 -0300
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dzNLs-0000dU-49
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:35:17 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:11433 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dzNLr-0000Pm-OC
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 09:35:12 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20170925135801.144261-1-vsementsov@virtuozzo.com>
+	<20170925135801.144261-9-vsementsov@virtuozzo.com>
+	<b8b01f1a-6e7b-342f-02b6-b7386bff1500@redhat.com>
+	<a4fb096f-7995-ad85-64b7-68a124410e86@redhat.com>
+	<cdec3d7e-04c9-a5e3-d0e7-293e2c7633c8@virtuozzo.com>
+Message-ID: <ca5a605d-e548-5860-1e40-abcac6017683@virtuozzo.com>
+Date: Tue, 3 Oct 2017 16:35:03 +0300
 MIME-Version: 1.0
-In-Reply-To: <1506935300-132598-25-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <cdec3d7e-04c9-a5e3-d0e7-293e2c7633c8@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 24/38] xtensa: lx60/lx200/ml605/kc705: use
- generic cpu_model parsing
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 8/8] nbd: Minimal structured
+ read for client
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,75 +33,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: jcmvbkbc@gmail.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
 
-On 10/02/2017 06:08 AM, Igor Mammedov wrote:
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+03.10.2017 15:58, Vladimir Sementsov-Ogievskiy wrote:
+> 03.10.2017 13:07, Paolo Bonzini wrote:
+>> On 26/09/2017 00:19, Eric Blake wrote:
+>>>> +=C2=A0=C2=A0=C2=A0 /* here we deal with successful structured reply=
+ */
+>>>> +=C2=A0=C2=A0=C2=A0 switch (s->reply.type) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QEMUIOVector sub_qiov;
+>>>> +=C2=A0=C2=A0=C2=A0 case NBD_SREP_TYPE_OFFSET_DATA:
+>>> This is putting a LOT of smarts directly into the receive routine.
+>>> Here's where I was previously wondering (and I think Paolo as well)
+>>> whether it might be better to split the efforts: the generic function
+>>> reads off the chunk information and any payload, but a per-command
+>>> callback function then parses the chunks.=C2=A0 Especially since the
+>>> definition of the chunks differs on a per-command basis (yes, the NBD
+>>> spec will try to not reuse an SREP chunk type across multiple command=
+s
+>>> unless the semantics are similar, but that's a bit more fragile).=C2=A0=
+ This
+>>> particularly matters given my statement above that you want a
+>>> discriminated union, rather than a struct that contains unused fields=
+,
+>>> for handling different SREP chunk types.
+>> I think there should be two kinds of replies: 1) read directly into a
+>> QEMUIOVector, using structured replies only as an encapsulation of the
+>> payload; 2) read a chunk at a time into malloc-ed memory, yielding bac=
+k
+>> to the calling coroutine after receiving one complete chunk.
+>>
+>> In the end this probably means that you have a read_chunk_header
+>> function and a read_chunk function.=C2=A0 READ has a loop that calls
+>> read_chunk_header followed by direct reading into the QEMUIOVector,
+>> while everyone else calls read_chunk.
+>
+> accordingly to spec, we can receive several error reply chunks to any=20
+> request,
+> so loop, receiving them should be common for all requests I think
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+as well as handling error chunks should be common.. What do you think=20
+about my DRAFT proposal?
 
-> ---
-> CC: jcmvbkbc@gmail.com
-> ---
->  hw/xtensa/xtfpga.c | 11 +++++------
->  1 file changed, 5 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-> index a19cceb..1971ecf 100644
-> --- a/hw/xtensa/xtfpga.c
-> +++ b/hw/xtensa/xtfpga.c
-> @@ -220,19 +220,14 @@ static void lx_init(const LxBoardDesc *board, MachineState *machine)
->      DriveInfo *dinfo;
->      pflash_t *flash = NULL;
->      QemuOpts *machine_opts = qemu_get_machine_opts();
-> -    const char *cpu_model = machine->cpu_model;
->      const char *kernel_filename = qemu_opt_get(machine_opts, "kernel");
->      const char *kernel_cmdline = qemu_opt_get(machine_opts, "append");
->      const char *dtb_filename = qemu_opt_get(machine_opts, "dtb");
->      const char *initrd_filename = qemu_opt_get(machine_opts, "initrd");
->      int n;
->  
-> -    if (!cpu_model) {
-> -        cpu_model = XTENSA_DEFAULT_CPU_MODEL;
-> -    }
-> -
->      for (n = 0; n < smp_cpus; n++) {
-> -        cpu = XTENSA_CPU(cpu_generic_init(TYPE_XTENSA_CPU, cpu_model));
-> +        cpu = XTENSA_CPU(cpu_create(machine->cpu_type));
->          env = &cpu->env;
->  
->          env->sregs[PRID] = n;
-> @@ -454,6 +449,7 @@ static void xtensa_lx60_class_init(ObjectClass *oc, void *data)
->      mc->desc = "lx60 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
->      mc->init = xtensa_lx60_init;
->      mc->max_cpus = 4;
-> +    mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
->  }
->  
->  static const TypeInfo xtensa_lx60_type = {
-> @@ -469,6 +465,7 @@ static void xtensa_lx200_class_init(ObjectClass *oc, void *data)
->      mc->desc = "lx200 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
->      mc->init = xtensa_lx200_init;
->      mc->max_cpus = 4;
-> +    mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
->  }
->  
->  static const TypeInfo xtensa_lx200_type = {
-> @@ -484,6 +481,7 @@ static void xtensa_ml605_class_init(ObjectClass *oc, void *data)
->      mc->desc = "ml605 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
->      mc->init = xtensa_ml605_init;
->      mc->max_cpus = 4;
-> +    mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
->  }
->  
->  static const TypeInfo xtensa_ml605_type = {
-> @@ -499,6 +497,7 @@ static void xtensa_kc705_class_init(ObjectClass *oc, void *data)
->      mc->desc = "kc705 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
->      mc->init = xtensa_kc705_init;
->      mc->max_cpus = 4;
-> +    mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
->  }
->  
->  static const TypeInfo xtensa_kc705_type = {
-> 
+
+>
+>>
+>> Maybe qio_channel_readv/writev_full could have "offset" and "bytes"
+>> arguments.=C2=A0 Most code in iov_send_recv could be cut-and-pasted. (=
+When
+>> sheepdog is converted to QIOChannel, iov_send_recv can go away).
+>>
+>> Paolo
+>
+>
+
+
+--=20
+Best regards,
+Vladimir
