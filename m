@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dzZ0T-0001Fx-Lo
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:01:54 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dzZ0S-0006IV-Mz
+	(envelope-from <eblake@redhat.com>) id 1dzZ0S-0001E9-B9
 	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:01:53 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <eblake@redhat.com>) id 1dzZ0R-0006Hb-HG
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:01:52 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Tue,  3 Oct 2017 21:00:36 -0500
-Message-Id: <20171004020048.26379-12-eblake@redhat.com>
+Date: Tue,  3 Oct 2017 21:00:34 -0500
+Message-Id: <20171004020048.26379-10-eblake@redhat.com>
 In-Reply-To: <20171004020048.26379-1-eblake@redhat.com>
 References: <20171004020048.26379-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 11/23] block: Switch
- bdrv_co_get_block_status_above() to byte-based
+Subject: [Qemu-devel] [PATCH v5 09/23] block: Switch
+ BdrvCoGetBlockStatusData to byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,117 +33,88 @@ Reviewed-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 
 ---
-v5: no change other than rebase to context
-v4: no change
-v3: rebase to allocation/mapping sense change, simple enough to keep R-b
+v4-v5: no change
+v3: rebase to context conflicts, simple enough to keep R-b
 v2: rebase to earlier changes
 ---
- block/io.c | 48 ++++++++++++++++++------------------------------
- 1 file changed, 18 insertions(+), 30 deletions(-)
+ block/io.c | 31 ++++++++++++++++++-------------
+ 1 file changed, 18 insertions(+), 13 deletions(-)
 
 diff --git a/block/io.c b/block/io.c
-index 4826751c27..ac7399ad41 100644
+index b879e26154..1857191187 100644
 --- a/block/io.c
 +++ b/block/io.c
-@@ -1935,12 +1935,12 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-     return ret;
+@@ -1744,17 +1744,17 @@ int bdrv_flush_all(void)
  }
 
--static int64_t coroutine_fn bdrv_co_get_block_status_above(BlockDriverState *bs,
-+static int64_t coroutine_fn bdrv_co_block_status_above(BlockDriverState *bs,
-         BlockDriverState *base,
-         bool mapping,
--        int64_t sector_num,
--        int nb_sectors,
--        int *pnum,
-+        int64_t offset,
-+        int64_t bytes,
-+        int64_t *pnum,
-         BlockDriverState **file)
- {
-     BlockDriverState *p;
-@@ -1949,17 +1949,10 @@ static int64_t coroutine_fn bdrv_co_get_block_status_above(BlockDriverState *bs,
 
-     assert(bs != base);
-     for (p = bs; p != base; p = backing_bs(p)) {
--        int64_t count;
--
--        ret = bdrv_co_block_status(p, mapping,
--                                   sector_num * BDRV_SECTOR_SIZE,
--                                   nb_sectors * BDRV_SECTOR_SIZE, &count,
--                                   file);
-+        ret = bdrv_co_block_status(p, mapping, offset, bytes, pnum, file);
-         if (ret < 0) {
-             break;
-         }
--        assert(QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE));
--        *pnum = count >> BDRV_SECTOR_BITS;
-         if (ret & BDRV_BLOCK_ZERO && ret & BDRV_BLOCK_EOF && !first) {
-             /*
-              * Reading beyond the end of the file continues to read
-@@ -1967,39 +1960,35 @@ static int64_t coroutine_fn bdrv_co_get_block_status_above(BlockDriverState *bs,
-              * unallocated length we learned from an earlier
-              * iteration.
-              */
--            *pnum = nb_sectors;
-+            *pnum = bytes;
-         }
-         if (ret & (BDRV_BLOCK_ZERO | BDRV_BLOCK_DATA)) {
-             break;
-         }
--        /* [sector_num, pnum] unallocated on this layer, which could be only
--         * the first part of [sector_num, nb_sectors].  */
--        nb_sectors = MIN(nb_sectors, *pnum);
-+        /* [offset, pnum] unallocated on this layer, which could be only
-+         * the first part of [offset, bytes].  */
-+        bytes = MIN(bytes, *pnum);
-         first = false;
-     }
-     return ret;
- }
+-typedef struct BdrvCoGetBlockStatusData {
++typedef struct BdrvCoBlockStatusData {
+     BlockDriverState *bs;
+     BlockDriverState *base;
+     BlockDriverState **file;
+-    int64_t sector_num;
+-    int nb_sectors;
+-    int *pnum;
++    int64_t offset;
++    int64_t bytes;
++    int64_t *pnum;
+     int64_t ret;
+     bool mapping;
+     bool done;
+-} BdrvCoGetBlockStatusData;
++} BdrvCoBlockStatusData;
 
+ int64_t coroutine_fn bdrv_co_get_block_status_from_file(BlockDriverState *bs,
+                                                         int64_t sector_num,
+@@ -1983,14 +1983,16 @@ static int64_t coroutine_fn bdrv_co_get_block_status_above(BlockDriverState *bs,
  /* Coroutine wrapper for bdrv_get_block_status_above() */
--static void coroutine_fn bdrv_get_block_status_above_co_entry(void *opaque)
-+static void coroutine_fn bdrv_block_status_above_co_entry(void *opaque)
+ static void coroutine_fn bdrv_get_block_status_above_co_entry(void *opaque)
  {
-     BdrvCoBlockStatusData *data = opaque;
--    int n;
+-    BdrvCoGetBlockStatusData *data = opaque;
++    BdrvCoBlockStatusData *data = opaque;
++    int n;
 
--    data->ret = bdrv_co_get_block_status_above(data->bs, data->base,
--                                               data->mapping,
--                                               data->offset >> BDRV_SECTOR_BITS,
--                                               data->bytes >> BDRV_SECTOR_BITS,
--                                               &n,
--                                               data->file);
--    *data->pnum = n * BDRV_SECTOR_SIZE;
-+    data->ret = bdrv_co_block_status_above(data->bs, data->base,
-+                                           data->mapping,
-+                                           data->offset, data->bytes,
-+                                           data->pnum, data->file);
+     data->ret = bdrv_co_get_block_status_above(data->bs, data->base,
+                                                data->mapping,
+-                                               data->sector_num,
+-                                               data->nb_sectors,
+-                                               data->pnum,
++                                               data->offset >> BDRV_SECTOR_BITS,
++                                               data->bytes >> BDRV_SECTOR_BITS,
++                                               &n,
+                                                data->file);
++    *data->pnum = n * BDRV_SECTOR_SIZE;
      data->done = true;
  }
 
- /*
-- * Synchronous wrapper around bdrv_co_get_block_status_above().
-+ * Synchronous wrapper around bdrv_co_block_status_above().
-  *
-- * See bdrv_co_get_block_status_above() for details.
-+ * See bdrv_co_block_status_above() for details.
-  */
- static int64_t bdrv_common_block_status_above(BlockDriverState *bs,
-                                               BlockDriverState *base,
-@@ -2022,10 +2011,9 @@ static int64_t bdrv_common_block_status_above(BlockDriverState *bs,
-
-     if (qemu_in_coroutine()) {
-         /* Fast-path if already in coroutine context */
--        bdrv_get_block_status_above_co_entry(&data);
-+        bdrv_block_status_above_co_entry(&data);
-     } else {
--        co = qemu_coroutine_create(bdrv_get_block_status_above_co_entry,
--                                   &data);
-+        co = qemu_coroutine_create(bdrv_block_status_above_co_entry, &data);
+@@ -2007,13 +2009,14 @@ static int64_t bdrv_common_block_status_above(BlockDriverState *bs,
+                                               BlockDriverState **file)
+ {
+     Coroutine *co;
+-    BdrvCoGetBlockStatusData data = {
++    int64_t n;
++    BdrvCoBlockStatusData data = {
+         .bs = bs,
+         .base = base,
+         .file = file,
+-        .sector_num = sector_num,
+-        .nb_sectors = nb_sectors,
+-        .pnum = pnum,
++        .offset = sector_num * BDRV_SECTOR_SIZE,
++        .bytes = nb_sectors * BDRV_SECTOR_SIZE,
++        .pnum = &n,
+         .mapping = mapping,
+         .done = false,
+     };
+@@ -2027,6 +2030,8 @@ static int64_t bdrv_common_block_status_above(BlockDriverState *bs,
          bdrv_coroutine_enter(bs, co);
          BDRV_POLL_WHILE(bs, !data.done);
      }
++    assert(data.ret < 0 || QEMU_IS_ALIGNED(n, BDRV_SECTOR_SIZE));
++    *pnum = n >> BDRV_SECTOR_BITS;
+     return data.ret;
+ }
+
 -- 
 2.13.6
