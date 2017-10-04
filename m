@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dzfCn-0006Nk-9K
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 04:39:02 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dzfH3-0008MV-1d
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 04:43:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dzfCj-0000KM-68
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 04:39:01 -0400
-Received: from outpost1.zedat.fu-berlin.de ([130.133.4.66]:45222)
+	(envelope-from <kraxel@redhat.com>) id 1dzfGz-0004sp-U5
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 04:43:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39012)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <glaubitz@physik.fu-berlin.de>)
-	id 1dzfCi-0000JW-Ug
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 04:38:57 -0400
-References: <20170915065821.16600-1-jrtc27@jrtc27.com>
-	<20170915193313.86362-1-jrtc27@jrtc27.com>
-From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Message-ID: <f22e881a-466a-945b-2979-8c0851790854@physik.fu-berlin.de>
-Date: Wed, 4 Oct 2017 10:38:50 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170915193313.86362-1-jrtc27@jrtc27.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dzfGz-0004r2-NV
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 04:43:21 -0400
+Message-ID: <1507106598.27227.2.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 04 Oct 2017 10:43:18 +0200
+In-Reply-To: <CAFEAcA-8gaOhkuNX9hBt0Ofg-CKkJ-v8puHJ4K3QOq0ZGMgB5w@mail.gmail.com>
+References: <20170929110052.6111-1-kraxel@redhat.com>
+	<CAFEAcA-8gaOhkuNX9hBt0Ofg-CKkJ-v8puHJ4K3QOq0ZGMgB5w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] linux-user/syscall.c: Handle SH4's
- exceptional alignment for p{read, write}64
+Subject: Re: [Qemu-devel] [PULL 0/3] Usb 20170929 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,144 +27,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: James Clarke <jrtc27@jrtc27.com>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi!
+  Hi,
 
-Any chance that this patch gets merged soon?
-
-Looks like it has been reviewed by at least Richard and Philippe.
-
-Adrian
-
-On 09/15/2017 09:33 PM, James Clarke wrote:
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1716767
-> Signed-off-by: James Clarke <jrtc27@jrtc27.com>
-> ---
+> This fails to build from clean (x86-64 Linux host):
 > 
-> Changes since v2:
->   * Fixed opening curly brace formatting, both for my new SH4-specific
->     regpairs_aligned function, as well as the Arm one I touched, to appease
->     checkpatch.pl
+> make[1]: *** No rule to make target '../hw/usb/host-stub.o', needed
+> by
+> 'qemu-system-microblaze'. Stop.
 > 
-> Changes since v1:
->   * Removed all changes in v1 :)
->   * Added syscall num argument to regpairs_aligned
->   * Added SH4-specific implementation of regpairs_aligned to return 1 for
->     p{read,write}64
-> 
->   linux-user/syscall.c | 36 +++++++++++++++++++++++++-----------
->   1 file changed, 25 insertions(+), 11 deletions(-)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 9b6364a266..0c1bd80bed 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -667,18 +667,32 @@ static inline int next_free_host_timer(void)
->   
->   /* ARM EABI and MIPS expect 64bit types aligned even on pairs or registers */
->   #ifdef TARGET_ARM
-> -static inline int regpairs_aligned(void *cpu_env) {
-> +static inline int regpairs_aligned(void *cpu_env, int num)
-> +{
->       return ((((CPUARMState *)cpu_env)->eabi) == 1) ;
->   }
->   #elif defined(TARGET_MIPS) && (TARGET_ABI_BITS == 32)
-> -static inline int regpairs_aligned(void *cpu_env) { return 1; }
-> +static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
->   #elif defined(TARGET_PPC) && !defined(TARGET_PPC64)
->   /* SysV AVI for PPC32 expects 64bit parameters to be passed on odd/even pairs
->    * of registers which translates to the same as ARM/MIPS, because we start with
->    * r3 as arg1 */
-> -static inline int regpairs_aligned(void *cpu_env) { return 1; }
-> +static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
-> +#elif defined(TARGET_SH4)
-> +/* SH4 doesn't align register pairs, except for p{read,write}64 */
-> +static inline int regpairs_aligned(void *cpu_env, int num)
-> +{
-> +    switch (num) {
-> +    case TARGET_NR_pread64:
-> +    case TARGET_NR_pwrite64:
-> +        return 1;
-> +
-> +    default:
-> +        return 0;
-> +    }
-> +}
->   #else
-> -static inline int regpairs_aligned(void *cpu_env) { return 0; }
-> +static inline int regpairs_aligned(void *cpu_env, int num) { return 0; }
->   #endif
->   
->   #define ERRNO_TABLE_SIZE 1200
-> @@ -6857,7 +6871,7 @@ static inline abi_long target_truncate64(void *cpu_env, const char *arg1,
->                                            abi_long arg3,
->                                            abi_long arg4)
->   {
-> -    if (regpairs_aligned(cpu_env)) {
-> +    if (regpairs_aligned(cpu_env, TARGET_NR_truncate64)) {
->           arg2 = arg3;
->           arg3 = arg4;
->       }
-> @@ -6871,7 +6885,7 @@ static inline abi_long target_ftruncate64(void *cpu_env, abi_long arg1,
->                                             abi_long arg3,
->                                             abi_long arg4)
->   {
-> -    if (regpairs_aligned(cpu_env)) {
-> +    if (regpairs_aligned(cpu_env, TARGET_NR_ftruncate64)) {
->           arg2 = arg3;
->           arg3 = arg4;
->       }
-> @@ -10495,7 +10509,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->   #endif
->   #ifdef TARGET_NR_pread64
->       case TARGET_NR_pread64:
-> -        if (regpairs_aligned(cpu_env)) {
-> +        if (regpairs_aligned(cpu_env, num)) {
->               arg4 = arg5;
->               arg5 = arg6;
->           }
-> @@ -10505,7 +10519,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->           unlock_user(p, arg2, ret);
->           break;
->       case TARGET_NR_pwrite64:
-> -        if (regpairs_aligned(cpu_env)) {
-> +        if (regpairs_aligned(cpu_env, num)) {
->               arg4 = arg5;
->               arg5 = arg6;
->           }
-> @@ -11275,7 +11289,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->           arg6 = ret;
->   #else
->           /* 6 args: fd, offset (high, low), len (high, low), advice */
-> -        if (regpairs_aligned(cpu_env)) {
-> +        if (regpairs_aligned(cpu_env, num)) {
->               /* offset is in (3,4), len in (5,6) and advice in 7 */
->               arg2 = arg3;
->               arg3 = arg4;
-> @@ -11294,7 +11308,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->   #ifdef TARGET_NR_fadvise64
->       case TARGET_NR_fadvise64:
->           /* 5 args: fd, offset (high, low), len, advice */
-> -        if (regpairs_aligned(cpu_env)) {
-> +        if (regpairs_aligned(cpu_env, num)) {
->               /* offset is in (3,4), len in 5 and advice in 6 */
->               arg2 = arg3;
->               arg3 = arg4;
-> @@ -11407,7 +11421,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->   #ifdef TARGET_NR_readahead
->       case TARGET_NR_readahead:
->   #if TARGET_ABI_BITS == 32
-> -        if (regpairs_aligned(cpu_env)) {
-> +        if (regpairs_aligned(cpu_env, num)) {
->               arg2 = arg3;
->               arg3 = arg4;
->               arg4 = arg5;
-> 
+> (and similar for other targets).
 
--- 
-  .''`.  John Paul Adrian Glaubitz
-: :' :  Debian Developer - glaubitz@debian.org
-`. `'   Freie Universitaet Berlin - glaubitz@physik.fu-berlin.de
-   `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
+/me looks puzzled.
+
+There is a "hw/usb/host-stub.c" file in the repo, so I fail so see why
+make thinks it can't build the object file ...
+
+Also it works fine in my testing, including a full build of all targets
+(some with and some without usb support).
+
+cheers,
+  Gerd
