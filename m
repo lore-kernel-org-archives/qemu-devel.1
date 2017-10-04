@@ -1,18 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1dzhz7-00074k-MQ
+	(envelope-from <imammedo@redhat.com>) id 1dzhz7-00074l-MV
 	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 07:37:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1dzhz4-0002Ji-IN
+	(envelope-from <imammedo@redhat.com>) id 1dzhz6-0002KN-4W
 	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 07:37:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58258)
+Received: from mx1.redhat.com ([209.132.183.28]:56418)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1dzhz4-0002Gv-Ax
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 07:37:02 -0400
-From: P J P <ppandit@redhat.com>
-Date: Wed,  4 Oct 2017 17:06:52 +0530
-Message-Id: <20171004113652.29620-1-ppandit@redhat.com>
-Subject: [Qemu-devel] [PATCH] 9pfs: use g_malloc0 to allocate space for xattr
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dzhz5-0002Jq-RB
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 07:37:04 -0400
+Date: Wed, 4 Oct 2017 13:36:59 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171004133659.1f656303@nial.brq.redhat.com>
+In-Reply-To: <1507049162-27026-1-git-send-email-thuth@redhat.com>
+References: <1507049162-27026-1-git-send-email-thuth@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qdev: Check for the availability of a
+ hotplug controller before adding a device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,44 +27,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu Developers <qemu-devel@nongnu.org>
-Cc: Greg Kurz <groug@kaod.org>, Tuomas Tynkkynen <tuomas.tynkkynen@iki.fi>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr.
+	David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+On Tue,  3 Oct 2017 18:46:02 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-9p back-end first queries the size of an extended attribute,
-allocates space for it via g_malloc() and then retrieves its
-value into allocated buffer. Race between querying attribute
-size and retrieving its could lead to memory bytes disclosure.
-Use g_malloc0() to avoid it.
+> The qdev_unplug() function contains a g_assert(hotplug_ctrl) statement,
+> so QEMU crashes when the user tries to device_add + device_del a device
+> that does not have a corresponding hotplug controller. This could be
+> provoked for a couple of devices in the past (see commit 4c93950659487c7ad
+> or 84ebd3e8c7d4fe955 for example). So devices clearly need a hotplug
+> controller when they are suitable for device_add.
+> The code in qdev_device_add() already checks whether the bus has a proper
+> hotplug controller, but for devices that do not have a corresponding bus,
+> there is no appropriate check available. In that case we should check
+> whether the machine itself provides a suitable hotplug controller and
+> refuse to plug the device if none is available.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  This is the follow-up patch from my earlier try "hw/core/qdev: Do not
+>  allow hot-plugging without hotplug controller" ... AFAICS the function
+>  qdev_device_add() is now the right spot to do the check.
+> 
+>  hw/core/qdev.c         | 28 ++++++++++++++++++++--------
+>  include/hw/qdev-core.h |  1 +
+>  qdev-monitor.c         |  9 +++++++++
+>  3 files changed, 30 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 606ab53..a953ec9 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -253,19 +253,31 @@ void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
+>      dev->alias_required_for_version = required_for_version;
+>  }
+>  
+> +HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev)
+> +{
+> +    MachineState *machine;
+> +    MachineClass *mc;
+> +    Object *m_obj = qdev_get_machine();
+> +
+> +    if (object_dynamic_cast(m_obj, TYPE_MACHINE)) {
+> +        machine = MACHINE(m_obj);
+> +        mc = MACHINE_GET_CLASS(machine);
+> +        if (mc->get_hotplug_handler) {
+> +            return mc->get_hotplug_handler(machine, dev);
+> +        }
+> +    }
+> +
+> +    return NULL;
+> +}
+> +
+>  HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev)
+>  {
+> -    HotplugHandler *hotplug_ctrl = NULL;
+> +    HotplugHandler *hotplug_ctrl;
+>  
+>      if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
+>          hotplug_ctrl = dev->parent_bus->hotplug_handler;
+> -    } else if (object_dynamic_cast(qdev_get_machine(), TYPE_MACHINE)) {
+> -        MachineState *machine = MACHINE(qdev_get_machine());
+> -        MachineClass *mc = MACHINE_GET_CLASS(machine);
+> -
+> -        if (mc->get_hotplug_handler) {
+> -            hotplug_ctrl = mc->get_hotplug_handler(machine, dev);
+> -        }
+> +    } else {
+> +        hotplug_ctrl = qdev_get_machine_hotplug_handler(dev);
+>      }
+>      return hotplug_ctrl;
+>  }
+> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> index 0891461..5aa536d 100644
+> --- a/include/hw/qdev-core.h
+> +++ b/include/hw/qdev-core.h
+> @@ -285,6 +285,7 @@ DeviceState *qdev_try_create(BusState *bus, const char *name);
+>  void qdev_init_nofail(DeviceState *dev);
+>  void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
+>                                   int required_for_version);
+> +HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev);
+>  HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev);
+>  void qdev_unplug(DeviceState *dev, Error **errp);
+>  void qdev_simple_device_unplug_cb(HotplugHandler *hotplug_dev,
+> diff --git a/qdev-monitor.c b/qdev-monitor.c
+> index 8fd6df9..2891dde 100644
+> --- a/qdev-monitor.c
+> +++ b/qdev-monitor.c
+> @@ -626,6 +626,15 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+>          return NULL;
+>      }
+>  
+> +    /* In case we don't have a bus, there must be a machine hotplug handler */
+> +    if (qdev_hotplug && !bus && !qdev_get_machine_hotplug_handler(dev)) {
+current machine hotplug handler serves both cold and hot-plug so in reality it's
+just  'plug' handler.
 
-Reported-by: Tuomas Tynkkynen <tuomas.tynkkynen@iki.fi>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- hw/9pfs/9p.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Is there a point -device/device_add devices on board that doesn't have 'hotplug'
+handler that would wire device up properly?
 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 23ac7bb532..f8bbac251d 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -3234,7 +3234,7 @@ static void coroutine_fn v9fs_xattrwalk(void *opaque)
-         xattr_fidp->fid_type = P9_FID_XATTR;
-         xattr_fidp->fs.xattr.xattrwalk_fid = true;
-         if (size) {
--            xattr_fidp->fs.xattr.value = g_malloc(size);
-+            xattr_fidp->fs.xattr.value = g_malloc0(size);
-             err = v9fs_co_llistxattr(pdu, &xattr_fidp->path,
-                                      xattr_fidp->fs.xattr.value,
-                                      xattr_fidp->fs.xattr.len);
-@@ -3267,7 +3267,7 @@ static void coroutine_fn v9fs_xattrwalk(void *opaque)
-         xattr_fidp->fid_type = P9_FID_XATTR;
-         xattr_fidp->fs.xattr.xattrwalk_fid = true;
-         if (size) {
--            xattr_fidp->fs.xattr.value = g_malloc(size);
-+            xattr_fidp->fs.xattr.value = g_malloc0(size);
-             err = v9fs_co_lgetxattr(pdu, &xattr_fidp->path,
-                                     &name, xattr_fidp->fs.xattr.value,
-                                     xattr_fidp->fs.xattr.len);
--- 
-2.13.6
+Do we have such devices?
+
+
+
+> +        error_setg(errp, "Device '%s' can not be hotplugged on this machine",
+> +                   driver);
+> +        object_unparent(OBJECT(dev));
+> +        object_unref(OBJECT(dev));
+> +        return NULL;
+> +    }
+> +
+>      dev->opts = opts;
+>      object_property_set_bool(OBJECT(dev), true, "realized", &err);
+>      if (err != NULL) {
