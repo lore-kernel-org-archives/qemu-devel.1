@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dzeJ8-0004i6-7N
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 03:41:31 -0400
+	(envelope-from <amarnath.valluri@intel.com>) id 1dzeMf-00061t-IO
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 03:45:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dzeJ7-0006BZ-4K
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 03:41:30 -0400
-Date: Wed, 4 Oct 2017 09:41:16 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171004094116.7537e74e.cohuck@redhat.com>
-In-Reply-To: <d64ca97ec0058b24002c387264654b4b322ad7a1.1506730372.git.alistair.francis@xilinx.com>
-References: <cover.1506730372.git.alistair.francis@xilinx.com>
-	<d64ca97ec0058b24002c387264654b4b322ad7a1.1506730372.git.alistair.francis@xilinx.com>
+	(envelope-from <amarnath.valluri@intel.com>) id 1dzeMc-0008T5-GC
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 03:45:09 -0400
+Received: from mga02.intel.com ([134.134.136.20]:11565)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
+	id 1dzeMc-0008SB-7T
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 03:45:06 -0400
+From: "Valluri, Amarnath" <amarnath.valluri@intel.com>
+Date: Wed, 4 Oct 2017 07:45:01 +0000
+Message-ID: <1507103131.2282.5.camel@intel.com>
+References: <1506683421-27004-1-git-send-email-amarnath.valluri@intel.com>
+	<1506683421-27004-9-git-send-email-amarnath.valluri@intel.com>
+	<306334f5-358e-a7df-b663-b1b77e78c934@linux.vnet.ibm.com>
+In-Reply-To: <306334f5-358e-a7df-b663-b1b77e78c934@linux.vnet.ibm.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <2A3115B23C647444A99D2D7705384D5A@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 47/47] target: Replace fprintf(stderr,
- "*\n" with error_report()
+Subject: Re: [Qemu-devel] [PATCH v10 8/9] tpm: Added support for TPM emulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,112 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, alistair23@gmail.com, armbru@redhat.com, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Michael Walle <michael@walle.cc>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: "stefanb@linux.vnet.ibm.com" <stefanb@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "dgilbert@redhat.com" <dgilbert@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>
 
-On Fri, 29 Sep 2017 17:17:26 -0700
-Alistair Francis <alistair.francis@xilinx.com> wrote:
-
-> Replace a large number of the fprintf(stderr, "*\n" calls with
-> error_report(). The functions were renamed with these commands and then
-> compiler issues where manually fixed.
-
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index ebb75cafaa..6f7ebd1c98 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -967,13 +967,13 @@ static void inject_vcpu_irq_legacy(CPUState *cs, struct kvm_s390_irq *irq)
->  
->      r = s390_kvm_irq_to_interrupt(irq, &kvmint);
->      if (r < 0) {
-> -        fprintf(stderr, "%s called with bogus interrupt\n", __func__);
-> +        error_report("%s called with bogus interrupt", __func__);
->          exit(1);
->      }
->  
->      r = kvm_vcpu_ioctl(cs, KVM_S390_INTERRUPT, &kvmint);
->      if (r < 0) {
-> -        fprintf(stderr, "KVM failed to inject interrupt\n");
-> +        error_report("KVM failed to inject interrupt");
->          exit(1);
->      }
->  }
-> @@ -1002,13 +1002,13 @@ static void __kvm_s390_floating_interrupt(struct kvm_s390_irq *irq)
->  
->      r = s390_kvm_irq_to_interrupt(irq, &kvmint);
->      if (r < 0) {
-> -        fprintf(stderr, "%s called with bogus interrupt\n", __func__);
-> +        error_report("%s called with bogus interrupt", __func__);
->          exit(1);
->      }
->  
->      r = kvm_vm_ioctl(kvm_state, KVM_S390_INTERRUPT, &kvmint);
->      if (r < 0) {
-> -        fprintf(stderr, "KVM failed to inject interrupt\n");
-> +        error_report("KVM failed to inject interrupt");
->          exit(1);
->      }
->  }
-> @@ -1116,14 +1116,14 @@ static int handle_b2(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
->          break;
->      case PRIV_B2_TSCH:
->          /* We should only get tsch via KVM_EXIT_S390_TSCH. */
-> -        fprintf(stderr, "Spurious tsch intercept\n");
-> +        error_report("Spurious tsch intercept");
->          break;
->      case PRIV_B2_CHSC:
->          ioinst_handle_chsc(cpu, run->s390_sieic.ipb);
->          break;
->      case PRIV_B2_TPI:
->          /* This should have been handled by kvm already. */
-> -        fprintf(stderr, "Spurious tpi intercept\n");
-> +        error_report("Spurious tpi intercept");
->          break;
->      case PRIV_B2_SCHM:
->          ioinst_handle_schm(cpu, env->regs[1], env->regs[2],
-> @@ -2050,15 +2050,15 @@ static int handle_intercept(S390CPU *cpu)
->              }
->              break;
->          case ICPT_SOFT_INTERCEPT:
-> -            fprintf(stderr, "KVM unimplemented icpt SOFT\n");
-> +            error_report("KVM unimplemented icpt SOFT");
->              exit(1);
->              break;
->          case ICPT_IO:
-> -            fprintf(stderr, "KVM unimplemented icpt IO\n");
-> +            error_report("KVM unimplemented icpt IO");
->              exit(1);
->              break;
->          default:
-> -            fprintf(stderr, "Unknown intercept code: %d\n", icpt_code);
-> +            error_report("Unknown intercept code: %d", icpt_code);
->              exit(1);
->              break;
->      }
-> @@ -2215,7 +2215,7 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
->              ret = kvm_arch_handle_debug_exit(cpu);
->              break;
->          default:
-> -            fprintf(stderr, "Unknown KVM exit: %d\n", run->exit_reason);
-> +            error_report("Unknown KVM exit: %d", run->exit_reason);
->              break;
->      }
->      qemu_mutex_unlock_iothread();
-> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-> index 293fc8428a..395872af45 100644
-> --- a/target/s390x/misc_helper.c
-> +++ b/target/s390x/misc_helper.c
-> @@ -354,7 +354,7 @@ uint32_t HELPER(sigp)(CPUS390XState *env, uint64_t order_code, uint32_t r1,
->  #endif
->      default:
->          /* unknown sigp */
-> -        fprintf(stderr, "XXX unknown sigp: 0x%" PRIx64 "\n", order_code);
-> +        error_report("XXX unknown sigp: 0x%" PRIx64 "", order_code);
->          cc = SIGP_CC_NOT_OPERATIONAL;
->      }
->  
-
-There might be some clashes with David's patches (haven't checked), but
-that depends on what goes in first anyway. So, for the s390x parts:
-
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+T24gVHVlLCAyMDE3LTEwLTAzIGF0IDE3OjIxIC0wNDAwLCBTdGVmYW4gQmVyZ2VyIHdyb3RlOg0K
+PiBPbiAwOS8yOS8yMDE3IDA3OjEwIEFNLCBBbWFybmF0aCBWYWxsdXJpIHdyb3RlOg0KPiA+IA0K
+PiA+IFRoaXMgY2hhbmdlIGludHJvZHVjZXMgYSBuZXcgVFBNIGJhY2tlbmQgZHJpdmVyIHRoYXQg
+Y2FuDQo+ID4gY29tbXVuaWNhdGUgd2l0aA0KPiA+IHN3dHBtKHNvZnR3YXJlIFRQTSBlbXVsYXRv
+cikgdXNpbmcgdW5peCBkb21haW4gc29ja2V0IGludGVyZmFjZS4NCj4gPiBRRU1VIHRhbGtzIHRv
+DQo+ID4gVFBNIGVtdWxhdG9yIHVzaW5nIFFFTVUncyBzb2NrZXQtYmFzZWQgY2hhcmRldiBiYWNr
+ZW5kIGRldmljZS4NCj4gPiANCj4gPiBTd3RwbSB1c2VzIHR3byBVbml4IHNvY2tldHMgZm9yIGNv
+bW11bmljYXRpb25zLCBvbmUgZm9yIHBsYWluIFRQTQ0KPiA+IGNvbW1hbmRzIGFuZA0KPiA+IHJl
+c3BvbnNlcywgYW5kIG9uZSBmb3Igb3V0LW9mLWJhbmQgY29udHJvbCBtZXNzYWdlcy4gUUVNVSBw
+YXNzZXMNCj4gPiBkYXRhIHNvY2tldCB0bw0KPiA+IGJlIHVzZWQgb3ZlciB0aGUgY29udHJvbCBj
+aGFubmVsLg0KPiA+IA0KPiA+IFRoZSBzd3RwbSBhbmQgYXNzb2NpYXRlZCB0b29scyBjYW4gYmUg
+Zm91bmQgaGVyZToNCj4gPiDCoMKgwqDCoMKgaHR0cHM6Ly9naXRodWIuY29tL3N0ZWZhbmJlcmdl
+ci9zd3RwbQ0KPiA+IA0KPiA+IFRoZSBzd3RwbSdzIGNvbnRyb2wgY2hhbm5lbCBwcm90b2NvbCBz
+cGVjaWZpY2F0aW9uIGNhbiBiZSBmb3VuZA0KPiA+IGhlcmU6DQo+ID4gwqDCoMKgwqDCoGh0dHBz
+Oi8vZ2l0aHViLmNvbS9zdGVmYW5iZXJnZXIvc3d0cG0vd2lraS9Db250cm9sLUNoYW5uZWwtU3Bl
+DQo+ID4gY2lmaWNhdGlvbg0KPiA+IA0KPiA+IFVzYWdlOg0KPiA+IMKgwqDCoMKgwqAjIHNldHVw
+IFRQTSBzdGF0ZSBkaXJlY3RvcnkNCj4gPiDCoMKgwqDCoMKgbWtkaXIgL3RtcC9teXRwbQ0KPiA+
+IMKgwqDCoMKgwqBjaG93biAtUiB0c3M6cm9vdCAvdG1wL215dHBtDQo+ID4gwqDCoMKgwqDCoC91
+c3IvYmluL3N3dHBtX3NldHVwIC0tdHBtLXN0YXRlIC90bXAvbXl0cG0gLS1jcmVhdGVlaw0KPiBU
+byBydW4gdGhpcywgb25lIG5lZWRzIHRoZSBsYXRlc3QgdmVyc2lvbiBvZiBzd3RwbSB0aGF0IHN1
+cHBvcnRzIHRoZcKgDQo+IGZpbGUgZGVzY3JpcHRvciBwYXNzaW5nLg0KPiBUaGVuIG9uZSBjYW4g
+c3RhcnQgdGhlIHN3dHBtIGxpa2UgdGhpczoNCj4gDQo+IHN3dHBtIHNvY2tldCAtLXRwbXN0YXRl
+IGRpcj0vdG1wL215dHBtIC0tY3RybMKgDQo+IHR5cGU9dW5peGlvLHBhdGg9L3RtcC9zd3RwbS1z
+b2NrIC0tbG9nIGxldmVsPTIwDQo+IA0KPiBJIHRlc3RlZCB0aGUgU2VhQklPUyBtZW51IGl0ZW1z
+IHNvIGZhciBhbmQgdGhhdCB3b3JrcyBmaW5lLCBhbHNvIGZvcsKgDQo+IFRQTTIgKC0tdHBtMiku
+DQoNCkdyZWF0ZSwgVGhhbmtzIGZvciB5b3UgZmVlZGJhY2suDQoNCi0gQW1hcm5hdGg=
