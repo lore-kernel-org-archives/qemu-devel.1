@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dzoOf-0004v6-Vh
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 14:27:55 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dzoXq-00070C-If
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 14:37:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dzoOe-0006vB-Vz
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 14:27:53 -0400
-Date: Wed, 4 Oct 2017 20:27:32 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171004182732.GE9801@localhost.localdomain>
-References: <20171004015205.20724-1-jsnow@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1dzoXm-0005nP-LB
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 14:37:22 -0400
+Resent-Message-Id: <E1dzoXm-0005nP-LB@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21482)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dzoXm-0005m1-Dp
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 14:37:18 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150714217015.153.939212709472417601@b58463cdfd5f>
+In-Reply-To: <1507132392-25051-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171004015205.20724-1-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] blockjobs: add explicit job reaping
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 4 Oct 2017 11:36:10 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] xen: xen-domid-restrict improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,66 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org
+To: ian.jackson@eu.citrix.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, anthony.perard@citrix.com, ross.lagerwall@citrix.com, sstabellini@kernel.org, jgross@suse.com, xen-devel@nongnu.org
 
-Am 04.10.2017 um 03:52 hat John Snow geschrieben:
-> For jobs that complete when a monitor isn't looking, there's no way to
-> tell what the job's final return code was. We need to allow jobs to
-> remain in the list until queried for reliable management.
-
-Just a short summary of what I discussed with John on IRC:
-
-Another important reason why we want to have an explicit end of block
-jobs is that job completion often makes changes to the graph. For a
-management tool that manages the block graph on a node level, it is a
-big problem if graph changes can happen at any point that can lead to
-bad race conditions. Giving the management tool control over the end of
-the block job makes it aware that graph changes happen.
-
-This means that compared to this RFC series, we need to move the waiting
-earlier in the process:
-
-1. Block job is done and calls block_job_completed()
-2. Wait for other block jobs in the same job transaction to complete
-3. Send a (new) QMP event to the management tool to notify it that the
-   job is ready to be reaped
-4. On block-job-reap, call the .commit/.abort callbacks of the jobs in
-   the transaction. They will do most of the work that is currently done
-   in the completion callbacks, in particular any graph changes. If we
-   need to allow error cases, we can add a .prepare_completion callback
-   that can still let the whole transaction fail.
-5. Send the final QMP completion event for each job in the transaction
-   with the final error code. This is the existing BLOCK_JOB_COMPLETED
-   or BLOCK_JOB_CANCELLED event.
-
-The current RFC still executes .commit/.abort before block-job-reap, so
-the graph changes happen too early to be under control of the management
-tool.
-
-> RFC:
-> The next version will add tests for transactions.
-> Kevin, can you please take a look at bdrv_is_root_node and how it is
-> used with respect to do_drive_backup? I suspect that in this case that
-> "is root" should actually be "true", but a node in use by a job has
-> two roles; child_root and child_job, so it starts returning false here.
-> 
-> That's fine because we prevent a collision that way, but it makes the
-> error messages pretty bad and misleading. Do you have a quick suggestion?
-> (Should I just amend the loop to allow non-root nodes as long as they
-> happen to be jobs so that the job creation code can check permissions?)
-
-We kind of sidestepped this problem by deciding that there is no real
-reason for the backup job to require the source to be a root node.
-
-I'm not completely sure how we could easily get a better message while
-still requiring a root node (and I suppose there are other places that
-rightfully still require a root node). Ignoring children with child_job
-feels ugly, but might be the best option.
-
-Note that this will not make the conflicting command work suddenly,
-because every node that has a child_job parent also has op blockers for
-everything, but the error message should be less confusing than "is not
-a root node".
-
-Kevin
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MDcxMzIzOTItMjUwNTEtMS1naXQtc2VuZC1lbWFpbC1pYW4uamFja3NvbkBl
+dS5jaXRyaXguY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC83XSB4ZW46IHhl
+bi1kb21pZC1yZXN0cmljdCBpbXByb3ZlbWVudHMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
+IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
+RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
+dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQg
+bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
+CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
+bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
+cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
+ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
+VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
+NDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjhmYzdlMDg2OWQg
+UkZDIGNvbmZpZ3VyZTogZG9fY29tcGlsZXI6IER1bXAgc29tZSBleHRyYSBpbmZvIHVuZGVyIGJh
+c2gKNTQ5YTRhMmMzNyBvcy1wb3NpeDogUHJvdmlkZSBuZXcgLXJ1bmFzaWQgb3B0aW9uCmJjODc3
+YWYzZDMgeGVuOiBkZXN0cm95X2h2bV9kb21haW46IFRyeSB4ZW5kZXZpY2Vtb2RlbF9zaHV0ZG93
+bgpiODkyYWQ1ZmJlIHhlbjogbW92ZSB4Y19pbnRlcmZhY2UgY29tcGF0aWJpbGl0eSBmYWxsYmFj
+ayBmdXJ0aGVyIHVwIHRoZSBmaWxlCjJkOTcwOTFkNjMgeGVuOiBkZXN0cm95X2h2bV9kb21haW46
+IE1vdmUgcmVhc29uIGludG8gYSB2YXJpYWJsZQplMGNmMzYyYTkzIHhlbjogZGVmZXIgY2FsbCB0
+byB4ZW5fcmVzdHJpY3QgdW50aWwgYWZ0ZXIgb3Nfc2V0dXBfcG9zdAo0MzM5ODk0YjFkIHhlbjog
+cmVzdHJpY3Q6IHVzZSB4ZW50b29sY29yZV9yZXN0cmljdF9hbGwKNzdjNzhmMjQ0ZiB4ZW46IGxp
+bmsgYWdhaW5zdCB4ZW50b29sY29yZQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFU
+Q0ggMS84OiB4ZW46IGxpbmsgYWdhaW5zdCB4ZW50b29sY29yZS4uLgpDaGVja2luZyBQQVRDSCAy
+Lzg6IHhlbjogcmVzdHJpY3Q6IHVzZSB4ZW50b29sY29yZV9yZXN0cmljdF9hbGwuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMy84OiB4ZW46IGRlZmVyIGNhbGwgdG8geGVuX3Jlc3RyaWN0IHVudGlsIGFmdGVy
+IG9zX3NldHVwX3Bvc3QuLi4KQ2hlY2tpbmcgUEFUQ0ggNC84OiB4ZW46IGRlc3Ryb3lfaHZtX2Rv
+bWFpbjogTW92ZSByZWFzb24gaW50byBhIHZhcmlhYmxlLi4uCkNoZWNraW5nIFBBVENIIDUvODog
+eGVuOiBtb3ZlIHhjX2ludGVyZmFjZSBjb21wYXRpYmlsaXR5IGZhbGxiYWNrIGZ1cnRoZXIgdXAg
+dGhlIGZpbGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNi84OiB4ZW46IGRlc3Ryb3lfaHZtX2RvbWFpbjog
+VHJ5IHhlbmRldmljZW1vZGVsX3NodXRkb3duLi4uCkNoZWNraW5nIFBBVENIIDcvODogb3MtcG9z
+aXg6IFByb3ZpZGUgbmV3IC1ydW5hc2lkIG9wdGlvbi4uLgpFUlJPUjogY29uc2lkZXIgdXNpbmcg
+cWVtdV9zdHJ0b3VsIGluIHByZWZlcmVuY2UgdG8gc3RydG91bAojNDI6IEZJTEU6IG9zLXBvc2l4
+LmM6MTYwOgorICAgICAgICBsdiA9IHN0cnRvdWwob3B0YXJnLCAmZXAsIDApOyAvKiBjYW4ndCBx
+ZW11X3N0cnRvdWwsIHdhbnQgKmVwPT0nLicgKi8KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
+cywgODAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+LgoKQ2hlY2tpbmcgUEFUQ0ggOC84OiBSRkMgY29uZmlndXJlOiBkb19jb21waWxlcjogRHVtcCBz
+b21lIGV4dHJhIGluZm8gdW5kZXIgYmFzaC4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
+bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
+bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
+ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
