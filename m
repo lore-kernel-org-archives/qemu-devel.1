@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dzhgv-0001LH-6h
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 07:18:18 -0400
+	(envelope-from <bounces@canonical.com>) id 1dzhjp-0002Am-GG
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 07:21:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dzhgt-0004u7-VS
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 07:18:17 -0400
-Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:53796)
+	(envelope-from <bounces@canonical.com>) id 1dzhjl-0007We-HG
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 07:21:17 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43960)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dzhgt-0004tT-Qw
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 07:18:15 -0400
-Received: by mail-oi0-x230.google.com with SMTP id j126so18971395oia.10
-	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 04:18:15 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dzhjl-0007Vw-Aj
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 07:21:13 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1dzhjk-0005qm-79
+	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 11:21:12 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 341002E80CD
+	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 11:21:12 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171002152552.27999-14-armbru@redhat.com>
-References: <20171002152552.27999-1-armbru@redhat.com>
-	<20171002152552.27999-14-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 4 Oct 2017 13:18:13 +0200
-Message-ID: <CAJ+F1CLiQd-zk4=QZZzamEFZO19rrZbrTnMngRaSLDN6se=FAA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 13/32] qapi: Use argparse to open
- schema file
+Date: Wed, 04 Oct 2017 11:08:38 -0000
+From: Thomas Huth <1721220@bugs.launchpad.net>
+Reply-To: Bug 1721220 <1721220@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150711170680.1346.17864224825794910388.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150711531851.2038.270222042115319432.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1721220] Re: qemu crashes with assertion error
+ `!mr->container' failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,102 +37,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
 
-On Mon, Oct 2, 2017 at 5:25 PM, Markus Armbruster <armbru@redhat.com> wrote=
-:
-> QAPISchema.__init__() opens the schema file.  Since it doesn't bother
-> to catch exceptions, an invalid schema argument is reported like this:
->
->     Traceback (most recent call last):
->       File "../scripts/qapi-commands.py", line 318, in <module>
->         schema =3D QAPISchema(args.schema)
->       File "/work/armbru/qemu/scripts/qapi.py", line 1464, in __init__
->         parser =3D QAPISchemaParser(open(fname, 'r'))
->     IOError: [Errno 2] No such file or directory: 'nonexistent'
->
-> Leave it to argparse, which handles the exception like this:
->
->     usage: qapi-commands.py [-h] [-o OUTPUT_DIR] [-p PREFIX] schema
->     qapi-commands.py: error: argument schema: can't open 'nonexistent': [=
-Errno 2] No such file or directory: 'nonexistent'
->
-> Too verbose for my taste, but let's not second-guess the standard
-> library.
+I think this should be fixed by this patch here:
+https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg06696.html
+("hw/pci-bridge/pcie_pci_bridge: properly handle MSI unavailability case")
 
-indeed :)
+-- =
 
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1721220
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Title:
+  qemu crashes with assertion error `!mr->container' failed
 
+Status in QEMU:
+  New
 
-> ---
->  scripts/qapi.py                | 6 +++---
->  scripts/qapi2texi.py           | 2 +-
->  tests/qapi-schema/test-qapi.py | 2 +-
->  3 files changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/scripts/qapi.py b/scripts/qapi.py
-> index 25f6c81b08..a33203e82d 100644
-> --- a/scripts/qapi.py
-> +++ b/scripts/qapi.py
-> @@ -1450,9 +1450,9 @@ class QAPISchemaEvent(QAPISchemaEntity):
->
->
->  class QAPISchema(object):
-> -    def __init__(self, fname):
-> +    def __init__(self, file):
->          try:
-> -            parser =3D QAPISchemaParser(open(fname, 'r'))
-> +            parser =3D QAPISchemaParser(file)
->              self.exprs =3D check_exprs(parser.exprs)
->              self.docs =3D parser.docs
->              self._entity_dict =3D {}
-> @@ -1934,7 +1934,7 @@ def common_argument_parser(builtins=3DFalse):
->                          help=3D'output directory')
->      parser.add_argument('-p', '--prefix', default=3D'', type=3Dprefix,
->                          help=3D'prefix to add to output files')
-> -    parser.add_argument('schema',
-> +    parser.add_argument('schema', type=3Dargparse.FileType('r'),
->                          help=3D'QAPI schema source file')
->      return parser
->
-> diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-> index fd90d8953e..d95d7541a3 100755
-> --- a/scripts/qapi2texi.py
-> +++ b/scripts/qapi2texi.py
-> @@ -282,7 +282,7 @@ def texi_schema(schema):
->  def main(argv):
->      """Takes schema argument, prints result to stdout"""
->      parser =3D argparse.ArgumentParser()
-> -    parser.add_argument('schema',
-> +    parser.add_argument('schema', type=3Dargparse.FileType('r'),
->                          help=3D'QAPI schema source file')
->      args =3D parser.parse_args()
->
-> diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
-.py
-> index a7e21d016f..225417d861 100644
-> --- a/tests/qapi-schema/test-qapi.py
-> +++ b/tests/qapi-schema/test-qapi.py
-> @@ -53,7 +53,7 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
->                  print '    case %s: %s' % (v.name, v.type.name)
->
->  parser =3D argparse.ArgumentParser()
-> -parser.add_argument('schema',
-> +parser.add_argument('schema', type=3Dargparse.FileType('r'),
->                      help=3D'QAPI schema source file')
->  args =3D parser.parse_args()
->
-> --
-> 2.13.6
->
->
+Bug description:
+  Re-production steps:
+  git clone today's qemu git tree (4th Oct 2017)
+  ./configure --target-list=3Dppc64-softmmu && make -j 8
 
+  Run the device-crash-test from scripts folder, seeing the following
+  error
 
+  INFO: running test case: machine=3Dbamboo binary=3Dppc64-softmmu/qemu-sys=
+tem-ppc64 device=3Dpcie-pci-bridge accel=3Dkvm
+  WARNING: qemu received signal -6: ppc64-softmmu/qemu-system-ppc64 -charde=
+v socket,id=3Dmon,path=3D/var/tmp/qemu-30972-monitor.sock -mon chardev=3Dmo=
+n,mode=3Dcontrol -display none -vga none -S -machine bamboo,accel=3Dkvm -de=
+vice pcie-pci-bridge
+  CRITICAL: failed: machine=3Dbamboo binary=3Dppc64-softmmu/qemu-system-ppc=
+64 device=3Dpcie-pci-bridge accel=3Dkvm
+  CRITICAL: cmdline: ppc64-softmmu/qemu-system-ppc64 -S -machine bamboo,acc=
+el=3Dkvm -device pcie-pci-bridge
+  CRITICAL: log: qemu-system-ppc64: /home/nasastry/qemu/memory.c:1699: memo=
+ry_region_finalize: Assertion `!mr->container' failed.
+  CRITICAL: log: warning: KVM does not support watchdog
+  CRITICAL: exit code: -6
 
---=20
-Marc-Andr=C3=A9 Lureau
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1721220/+subscriptions
