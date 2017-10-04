@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dzjOq-0001FW-Po
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:07:47 -0400
+	(envelope-from <thuth@redhat.com>) id 1dzjOy-0001HT-CN
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:07:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dzjOl-00061V-10
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:07:44 -0400
-Date: Wed, 4 Oct 2017 10:06:55 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171004130655.GK4760@localhost.localdomain>
-References: <20170927195635.16014-1-ehabkost@redhat.com>
-	<20170927195635.16014-5-ehabkost@redhat.com>
-	<59CCD0150200007800180507@prv-mh.provo.novell.com>
-	<20170928131234.GP4115@localhost.localdomain>
-	<20171003001257.GA7087@localhost.localdomain>
-	<59D4C11F0200007800181F48@prv-mh.provo.novell.com>
+	(envelope-from <thuth@redhat.com>) id 1dzjOx-0006FV-Fm
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:07:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44720)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dzjOx-0006Ej-9B
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:07:51 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6D103780D6
+	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 13:07:50 +0000 (UTC)
+References: <20171004103933.7898-1-quintela@redhat.com>
+	<20171004103933.7898-2-quintela@redhat.com>
+	<18ba5f7e-0d7e-fc5e-6cff-36ede10233f0@redhat.com>
+	<87infvgjx1.fsf@secure.laptop>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <2031be1e-62d1-1605-1f11-24868fbbc635@redhat.com>
+Date: Wed, 4 Oct 2017 15:07:45 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <59D4C11F0200007800181F48@prv-mh.provo.novell.com>
-Subject: Re: [Qemu-devel] xen-pci-passthrough PCI Express support? (Re:
- [Xen-devel] [PATCH v2 4/5] pci: Add INTERFACE_CONVENTIONAL_PCI_DEVICE to
- Conventional PCI devices)
+In-Reply-To: <87infvgjx1.fsf@secure.laptop>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/6] tests: Add basic migration precopy test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +36,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Beulich <JBeulich@suse.com>
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Anthony Perard <anthony.perard@citrix.com>, David Gibson <david@gibson.dropbear.id.au>, Alistair Francis <alistair23@gmail.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Alberto Garcia <berto@igalia.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Yongbok Kim <yongbok.kim@imgtec.com>, Stefano Stabellini <sstabellini@kernel.org>, Peter Maydell <peter.maydell@linaro.org>, xen-devel@lists.xenproject.org, qemu-arm@nongnu.org, qemu-block@nongnu.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Alex Williamson <alex.williamson@redhat.com>, David Gibson <dgibson@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Jason Wang <jasowang@redhat.com>, John Snow <jsnow@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Laine Stump <laine@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Hannes Reinecke <hare@suse.com>, Jiri Slaby <jslaby@suse.cz>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: quintela@redhat.com
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com
 
-On Wed, Oct 04, 2017 at 03:08:15AM -0600, Jan Beulich wrote:
-> >>> On 03.10.17 at 02:12, <ehabkost@redhat.com> wrote:
-> > On Thu, Sep 28, 2017 at 10:12:34AM -0300, Eduardo Habkost wrote:
-> >> On Thu, Sep 28, 2017 at 02:33:57AM -0600, Jan Beulich wrote:
-> >> > >>> On 27.09.17 at 21:56, <ehabkost@redhat.com> wrote:
-> >> > > --- a/hw/xen/xen_pt.c
-> >> > > +++ b/hw/xen/xen_pt.c
-> >> > > @@ -964,6 +964,10 @@ static const TypeInfo xen_pci_passthrough_info = {
-> >> > >      .instance_size = sizeof(XenPCIPassthroughState),
-> >> > >      .instance_finalize = xen_pci_passthrough_finalize,
-> >> > >      .class_init = xen_pci_passthrough_class_init,
-> >> > > +    .interfaces = (InterfaceInfo[]) {
-> >> > > +        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-> >> > > +        { },
-> >> > > +    },
-> >> > >  };
-> >> > 
-> >> > Passed through devices can be both PCI and PCIe, so following
-> >> > the description of the patch I don't think these can be statically
-> >> > given either property. Granted quite a bit of PCIe specific
-> >> > functionality may be missing in the Xen code ...
-> >> 
-> >> This is just static data about what the device type supports, not
-> >> about what a given device instance really is.  Deciding if the
-> >> device is PCIe or Conventional at runtime is out of the scope of
-> >> this series.
-> >> 
-> >> That said, if passed through PCI Express devices are really
-> >> supported, it looks like this should be marked as hybrid.
-> > 
-> > Can anybody confirm if PCI Express devices are really supported
-> > by xen-pci-passthrough?
+On 04.10.2017 14:46, Juan Quintela wrote:
+> Thomas Huth <thuth@redhat.com> wrote:
+>> On 04.10.2017 12:39, Juan Quintela wrote:
+>>> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > 
-> I think I've clearly said they're supported, with some limitations.
+>>
+>> Looks like a lot of this code is the same or very similar to the code in
+>> postcopy-test.c ... would it make sense to factor-out that code there
+>> into a separate file that could be used by both tests, so that we do not
+>> have to maintain the code twice?
+> 
+> 
+> I think I put that on the cover letter,  my idea is to add the postcopy
+> test here.
+OK, then I think you should remove the duplicated functions from
+postcopy-test.c in the same patch here, so that it is more obvious that
+this is a code movement.
 
-Sorry, thanks.  I thought the possible missing PCIe functionality
-could mean the device couldn't appear as PCI Express to the
-guest.
+ Thomas
 
-I will submit a follow-up patch adding INTERFACE_PCIE_DEVICE to
-xen-pci-passthrough.
-
--- 
-Eduardo
+PS: Please also add an entry to MAINTAINERS for the new files if feasible.
