@@ -1,17 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dzlZP-00058b-KC
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 11:26:49 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dzlo8-00026b-W0
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 11:42:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dzlZN-0001qP-Hu
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 11:26:47 -0400
-From: Max Reitz <mreitz@redhat.com>
-Date: Wed,  4 Oct 2017 17:25:53 +0200
-Message-Id: <20171004152553.30263-7-mreitz@redhat.com>
-In-Reply-To: <20171004152553.30263-1-mreitz@redhat.com>
-References: <20171004152553.30263-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 6/6] tests: Add check-qobject for equality
- tests
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dzlo5-0003IU-PK
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 11:42:01 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45904)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dzlo5-0003HU-Gk
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 11:41:57 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v94FdOun032541
+	for <qemu-devel@nongnu.org>; Wed, 4 Oct 2017 11:41:53 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dcyft4c5u-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 11:41:52 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Wed, 4 Oct 2017 16:41:50 +0100
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Wed,  4 Oct 2017 17:41:36 +0200
+Message-Id: <20171004154144.88995-1-pasic@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 0/8] improve error handling for IO instr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,393 +35,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-Add a new test file (check-qobject.c) for unit tests that concern
-QObjects as a whole.
+This is the v2 of my infamous nameless series (archive link:
+https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg06076.html).
 
-Its only purpose for now is to test the qobject_is_equal() function.
+Abstract
+=======
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/Makefile.include |   4 +-
- tests/check-qobject.c  | 325 +++++++++++++++++++++++++++++++++++++++++++++++++
- tests/.gitignore       |   1 +
- 3 files changed, 329 insertions(+), 1 deletion(-)
- create mode 100644 tests/check-qobject.c
+The basic idea is: tell how to handle an unusual condition where it's
+identified, instead of mapping it to an errno (more or less arbitrarily),
+then possibly mapping these errnos around, to finally (mentally) map the
+errno back to the condition and take appropriate action.
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index abc6707ef2..20622139f8 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -41,6 +41,7 @@ check-unit-y += tests/check-qlist$(EXESUF)
- gcov-files-check-qlist-y = qobject/qlist.c
- check-unit-y += tests/check-qnull$(EXESUF)
- gcov-files-check-qnull-y = qobject/qnull.c
-+check-unit-y += tests/check-qobject$(EXESUF)
- check-unit-y += tests/check-qjson$(EXESUF)
- gcov-files-check-qjson-y = qobject/qjson.c
- check-unit-y += tests/check-qlit$(EXESUF)
-@@ -543,7 +544,7 @@ GENERATED_FILES += tests/test-qapi-types.h tests/test-qapi-visit.h \
- 	tests/test-qmp-introspect.h
- 
- test-obj-y = tests/check-qnum.o tests/check-qstring.o tests/check-qdict.o \
--	tests/check-qlist.o tests/check-qnull.o \
-+	tests/check-qlist.o tests/check-qnull.o tests/check-qobject.o \
- 	tests/check-qjson.o tests/check-qlit.o \
- 	tests/test-coroutine.o tests/test-string-output-visitor.o \
- 	tests/test-string-input-visitor.o tests/test-qobject-output-visitor.o \
-@@ -577,6 +578,7 @@ tests/check-qstring$(EXESUF): tests/check-qstring.o $(test-util-obj-y)
- tests/check-qdict$(EXESUF): tests/check-qdict.o $(test-util-obj-y)
- tests/check-qlist$(EXESUF): tests/check-qlist.o $(test-util-obj-y)
- tests/check-qnull$(EXESUF): tests/check-qnull.o $(test-util-obj-y)
-+tests/check-qobject$(EXESUF): tests/check-qobject.o $(test-util-obj-y)
- tests/check-qjson$(EXESUF): tests/check-qjson.o $(test-util-obj-y)
- tests/check-qlit$(EXESUF): tests/check-qlit.o $(test-util-obj-y)
- tests/check-qom-interface$(EXESUF): tests/check-qom-interface.o $(test-qom-obj-y)
-diff --git a/tests/check-qobject.c b/tests/check-qobject.c
-new file mode 100644
-index 0000000000..e6b1556c2b
---- /dev/null
-+++ b/tests/check-qobject.c
-@@ -0,0 +1,325 @@
-+/*
-+ * Generic QObject unit-tests.
-+ *
-+ * Copyright (C) 2017 Red Hat Inc.
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
-+ * See the COPYING.LIB file in the top-level directory.
-+ */
-+#include "qemu/osdep.h"
-+
-+#include "qapi/qmp/types.h"
-+#include "qemu-common.h"
-+
-+#include <math.h>
-+
-+/* Marks the end of the test_equality() argument list.
-+ * We cannot use NULL there because that is a valid argument. */
-+static QObject test_equality_end_of_arguments;
-+
-+/**
-+ * Test whether all variadic QObject *arguments are equal (@expected
-+ * is true) or whether they are all not equal (@expected is false).
-+ * Every QObject is tested to be equal to itself (to test
-+ * reflexivity), all tests are done both ways (to test symmetry), and
-+ * transitivity is not assumed but checked (each object is compared to
-+ * every other one).
-+ *
-+ * Note that qobject_is_equal() is not really an equivalence relation,
-+ * so this function may not be used for all objects (reflexivity is
-+ * not guaranteed, e.g. in the case of a QNum containing NaN).
-+ */
-+static void do_test_equality(bool expected, ...)
-+{
-+    va_list ap_count, ap_extract;
-+    QObject **args;
-+    int arg_count = 0;
-+    int i, j;
-+
-+    va_start(ap_count, expected);
-+    va_copy(ap_extract, ap_count);
-+    while (va_arg(ap_count, QObject *) != &test_equality_end_of_arguments) {
-+        arg_count++;
-+    }
-+    va_end(ap_count);
-+
-+    args = g_new(QObject *, arg_count);
-+    for (i = 0; i < arg_count; i++) {
-+        args[i] = va_arg(ap_extract, QObject *);
-+    }
-+    va_end(ap_extract);
-+
-+    for (i = 0; i < arg_count; i++) {
-+        g_assert(qobject_is_equal(args[i], args[i]) == true);
-+
-+        for (j = i + 1; j < arg_count; j++) {
-+            g_assert(qobject_is_equal(args[i], args[j]) == expected);
-+        }
-+    }
-+}
-+
-+#define check_equal(...) \
-+    do_test_equality(true, __VA_ARGS__, &test_equality_end_of_arguments)
-+#define check_unequal(...) \
-+    do_test_equality(false, __VA_ARGS__, &test_equality_end_of_arguments)
-+
-+static void do_free_all(int _, ...)
-+{
-+    va_list ap;
-+    QObject *obj;
-+
-+    va_start(ap, _);
-+    while ((obj = va_arg(ap, QObject *)) != NULL) {
-+        qobject_decref(obj);
-+    }
-+    va_end(ap);
-+}
-+
-+#define free_all(...) \
-+    do_free_all(0, __VA_ARGS__, NULL)
-+
-+static void qobject_is_equal_null_test(void)
-+{
-+    check_unequal(qnull(), NULL);
-+}
-+
-+static void qobject_is_equal_num_test(void)
-+{
-+    QNum *u0, *i0, *d0, *dnan, *um42, *im42, *dm42;
-+
-+    u0 = qnum_from_uint(0u);
-+    i0 = qnum_from_int(0);
-+    d0 = qnum_from_double(0.0);
-+    dnan = qnum_from_double(NAN);
-+    um42 = qnum_from_uint((uint64_t)-42);
-+    im42 = qnum_from_int(-42);
-+    dm42 = qnum_from_double(-42.0);
-+
-+    /* Integers representing a mathematically equal number should
-+     * compare equal */
-+    check_equal(u0, i0);
-+    /* Doubles, however, are always unequal to integers */
-+    check_unequal(u0, d0);
-+    check_unequal(i0, d0);
-+
-+    /* Do not assume any object is equal to itself -- note however
-+     * that NaN cannot occur in a JSON object anyway. */
-+    g_assert(qobject_is_equal(QOBJECT(dnan), QOBJECT(dnan)) == false);
-+
-+    /* No unsigned overflow */
-+    check_unequal(um42, im42);
-+    check_unequal(um42, dm42);
-+    check_unequal(im42, dm42);
-+
-+    free_all(u0, i0, d0, dnan, um42, im42, dm42);
-+}
-+
-+static void qobject_is_equal_bool_test(void)
-+{
-+    QBool *btrue_0, *btrue_1, *bfalse_0, *bfalse_1;
-+
-+    btrue_0 = qbool_from_bool(true);
-+    btrue_1 = qbool_from_bool(true);
-+    bfalse_0 = qbool_from_bool(false);
-+    bfalse_1 = qbool_from_bool(false);
-+
-+    check_equal(btrue_0, btrue_1);
-+    check_equal(bfalse_0, bfalse_1);
-+    check_unequal(btrue_0, bfalse_0);
-+
-+    free_all(btrue_0, btrue_1, bfalse_0, bfalse_1);
-+}
-+
-+static void qobject_is_equal_string_test(void)
-+{
-+    QString *str_base, *str_whitespace_0, *str_whitespace_1, *str_whitespace_2;
-+    QString *str_whitespace_3, *str_case, *str_built;
-+
-+    str_base = qstring_from_str("foo");
-+    str_whitespace_0 = qstring_from_str(" foo");
-+    str_whitespace_1 = qstring_from_str("foo ");
-+    str_whitespace_2 = qstring_from_str("foo\b");
-+    str_whitespace_3 = qstring_from_str("fooo\b");
-+    str_case = qstring_from_str("Foo");
-+
-+    /* Should yield "foo" */
-+    str_built = qstring_from_substr("form", 0, 1);
-+    qstring_append_chr(str_built, 'o');
-+
-+    check_unequal(str_base, str_whitespace_0, str_whitespace_1,
-+                  str_whitespace_2, str_whitespace_3, str_case);
-+
-+    check_equal(str_base, str_built);
-+
-+    free_all(str_base, str_whitespace_0, str_whitespace_1, str_whitespace_2,
-+             str_whitespace_3, str_case, str_built);
-+}
-+
-+static void qobject_is_equal_list_test(void)
-+{
-+    QList *list_0, *list_1, *list_cloned;
-+    QList *list_reordered, *list_longer, *list_shorter;
-+
-+    list_0 = qlist_new();
-+    list_1 = qlist_new();
-+    list_reordered = qlist_new();
-+    list_longer = qlist_new();
-+    list_shorter = qlist_new();
-+
-+    qlist_append_int(list_0, 1);
-+    qlist_append_int(list_0, 2);
-+    qlist_append_int(list_0, 3);
-+
-+    qlist_append_int(list_1, 1);
-+    qlist_append_int(list_1, 2);
-+    qlist_append_int(list_1, 3);
-+
-+    qlist_append_int(list_reordered, 1);
-+    qlist_append_int(list_reordered, 3);
-+    qlist_append_int(list_reordered, 2);
-+
-+    qlist_append_int(list_longer, 1);
-+    qlist_append_int(list_longer, 2);
-+    qlist_append_int(list_longer, 3);
-+    qlist_append_null(list_longer);
-+
-+    qlist_append_int(list_shorter, 1);
-+    qlist_append_int(list_shorter, 2);
-+
-+    list_cloned = qlist_copy(list_0);
-+
-+    check_equal(list_0, list_1, list_cloned);
-+    check_unequal(list_0, list_reordered, list_longer, list_shorter);
-+
-+    /* With a NaN in it, the list should no longer compare equal to
-+     * itself */
-+    qlist_append(list_0, qnum_from_double(NAN));
-+    g_assert(qobject_is_equal(QOBJECT(list_0), QOBJECT(list_0)) == false);
-+
-+    free_all(list_0, list_1, list_cloned, list_reordered, list_longer,
-+             list_shorter);
-+}
-+
-+static void qobject_is_equal_dict_test(void)
-+{
-+    Error *local_err = NULL;
-+    QDict *dict_0, *dict_1, *dict_cloned;
-+    QDict *dict_different_key, *dict_different_value, *dict_different_null_key;
-+    QDict *dict_longer, *dict_shorter, *dict_nested;
-+    QDict *dict_crumpled;
-+
-+    dict_0 = qdict_new();
-+    dict_1 = qdict_new();
-+    dict_different_key = qdict_new();
-+    dict_different_value = qdict_new();
-+    dict_different_null_key = qdict_new();
-+    dict_longer = qdict_new();
-+    dict_shorter = qdict_new();
-+    dict_nested = qdict_new();
-+
-+    qdict_put_int(dict_0, "f.o", 1);
-+    qdict_put_int(dict_0, "bar", 2);
-+    qdict_put_int(dict_0, "baz", 3);
-+    qdict_put_null(dict_0, "null");
-+
-+    qdict_put_int(dict_1, "f.o", 1);
-+    qdict_put_int(dict_1, "bar", 2);
-+    qdict_put_int(dict_1, "baz", 3);
-+    qdict_put_null(dict_1, "null");
-+
-+    qdict_put_int(dict_different_key, "F.o", 1);
-+    qdict_put_int(dict_different_key, "bar", 2);
-+    qdict_put_int(dict_different_key, "baz", 3);
-+    qdict_put_null(dict_different_key, "null");
-+
-+    qdict_put_int(dict_different_value, "f.o", 42);
-+    qdict_put_int(dict_different_value, "bar", 2);
-+    qdict_put_int(dict_different_value, "baz", 3);
-+    qdict_put_null(dict_different_value, "null");
-+
-+    qdict_put_int(dict_different_null_key, "f.o", 1);
-+    qdict_put_int(dict_different_null_key, "bar", 2);
-+    qdict_put_int(dict_different_null_key, "baz", 3);
-+    qdict_put_null(dict_different_null_key, "none");
-+
-+    qdict_put_int(dict_longer, "f.o", 1);
-+    qdict_put_int(dict_longer, "bar", 2);
-+    qdict_put_int(dict_longer, "baz", 3);
-+    qdict_put_int(dict_longer, "xyz", 4);
-+    qdict_put_null(dict_longer, "null");
-+
-+    qdict_put_int(dict_shorter, "f.o", 1);
-+    qdict_put_int(dict_shorter, "bar", 2);
-+    qdict_put_int(dict_shorter, "baz", 3);
-+
-+    qdict_put(dict_nested, "f", qdict_new());
-+    qdict_put_int(qdict_get_qdict(dict_nested, "f"), "o", 1);
-+    qdict_put_int(dict_nested, "bar", 2);
-+    qdict_put_int(dict_nested, "baz", 3);
-+    qdict_put_null(dict_nested, "null");
-+
-+    dict_cloned = qdict_clone_shallow(dict_0);
-+
-+    check_equal(dict_0, dict_1, dict_cloned);
-+    check_unequal(dict_0, dict_different_key, dict_different_value,
-+                  dict_different_null_key, dict_longer, dict_shorter,
-+                  dict_nested);
-+
-+    dict_crumpled = qobject_to_qdict(qdict_crumple(dict_1, &local_err));
-+    g_assert(!local_err);
-+    check_equal(dict_crumpled, dict_nested);
-+
-+    qdict_flatten(dict_nested);
-+    check_equal(dict_0, dict_nested);
-+
-+    /* Containing an NaN value will make this dict compare unequal to
-+     * itself */
-+    qdict_put(dict_0, "NaN", qnum_from_double(NAN));
-+    g_assert(qobject_is_equal(QOBJECT(dict_0), QOBJECT(dict_0)) == false);
-+
-+    free_all(dict_0, dict_1, dict_cloned, dict_different_key,
-+             dict_different_value, dict_different_null_key, dict_longer,
-+             dict_shorter, dict_nested, dict_crumpled);
-+}
-+
-+static void qobject_is_equal_conversion_test(void)
-+{
-+    QNum *u0, *i0, *d0;
-+    QString *s0, *s_empty;
-+    QBool *bfalse;
-+
-+    u0 = qnum_from_uint(0u);
-+    i0 = qnum_from_int(0);
-+    d0 = qnum_from_double(0.0);
-+    s0 = qstring_from_str("0");
-+    s_empty = qstring_new();
-+    bfalse = qbool_from_bool(false);
-+
-+    /* No automatic type conversion */
-+    check_unequal(u0, s0, s_empty, bfalse, qnull(), NULL);
-+    check_unequal(i0, s0, s_empty, bfalse, qnull(), NULL);
-+    check_unequal(d0, s0, s_empty, bfalse, qnull(), NULL);
-+
-+    free_all(u0, i0, d0, s0, s_empty, bfalse);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    g_test_init(&argc, &argv, NULL);
-+
-+    g_test_add_func("/public/qobject_is_equal_null",
-+                    qobject_is_equal_null_test);
-+    g_test_add_func("/public/qobject_is_equal_num", qobject_is_equal_num_test);
-+    g_test_add_func("/public/qobject_is_equal_bool",
-+                    qobject_is_equal_bool_test);
-+    g_test_add_func("/public/qobject_is_equal_string",
-+                    qobject_is_equal_string_test);
-+    g_test_add_func("/public/qobject_is_equal_list",
-+                    qobject_is_equal_list_test);
-+    g_test_add_func("/public/qobject_is_equal_dict",
-+                    qobject_is_equal_dict_test);
-+    g_test_add_func("/public/qobject_is_equal_conversion",
-+                    qobject_is_equal_conversion_test);
-+
-+    return g_test_run();
-+}
-diff --git a/tests/.gitignore b/tests/.gitignore
-index cf6d99c91e..36fc912243 100644
---- a/tests/.gitignore
-+++ b/tests/.gitignore
-@@ -7,6 +7,7 @@ check-qnum
- check-qjson
- check-qlist
- check-qnull
-+check-qobject
- check-qstring
- check-qom-interface
- check-qom-proplist
+According to Dong Jia the patch-set also has a functional value: for ccw
+pass-through, he is planing to pass-through the instruction completion
+information (cc or interruption condition) from the kernel, and this
+patch set can pretty much be seen as a preparation for that.
+
+Changelog
+=========
+
+There was a fair amount of discussion regarding during the review of v1.
+For certain issues we have decided to address them differently (e.g. use
+unit-exception for VFIO if extra constraints are not respected, get rid
+of the addressing check, assert if do_subchannel_work called without
+improperly) and for some we decided to not address them for now (e.g.
+use if callbacks are null).
+
+Although this was not part of the v1 discussion, I have also decided to
+go back to return values (opposed to adding new state to SubchDev). There
+are multiple reasons for doing so: 
+* Most of, but not all IO instructions
+operate on a subchannel, thus having the instruction ending control in
+SubchDev is a bit weird. 
+* Get both the compiler and the good habits on ours side (e.g. non-void
+control reaches end of non-void function warning (-Wreturn-type), no
+overwrites possible, instead of having to check a certain member of a
+certain struct after a function call just don't ignore return values).
+
+v1 -> v2:
+* use assert if do_subchannel_work without any functions being
+  accepted 
+* generate unit-exception if ccw-vfio can't handle an otherwise
+  good channel program (due to extra limitations) 
+* keep using return values opposed to recording into SubchDev
+* split out 'add infrastructure' from 'refactor first handler'
+* reworded some commit messanges and comments
+* rebased on top of current master
+* dropped r-b's and acks because of the magnitude of the
+  changes
+
+Testing
+=======
+
+Regarding vfio-ccw Dong Jia did some quick testing with an equivalent
+version. Regarding virtual ccw I did only some rudimentary testing.
+Should the series be deemed promising more testing would make
+sense.
+
+Halil Pasic (8):
+  s390x/css: be more consistent if broken beyond repair
+  s390x/css: IO instr handler ending control
+  s390x: improve error handling for SSCH and RSCH
+  s390x: refactor error handling for XSCH handler
+  s390x: refactor error handling for CSCH handler
+  s390x: refactor error handling for HSCH handler
+  s390x: refactor error handling for MSCH handler
+  s390x: factor out common ioinst handler logic
+
+ hw/s390x/css.c              | 162 ++++++++++++------------------------------
+ hw/s390x/s390-ccw.c         |  11 ++-
+ hw/vfio/ccw.c               |  30 ++++++--
+ include/hw/s390x/css.h      |  44 +++++++++---
+ include/hw/s390x/s390-ccw.h |   2 +-
+ target/s390x/ioinst.c       | 169 +++++++-------------------------------------
+ 6 files changed, 131 insertions(+), 287 deletions(-)
+
 -- 
-2.13.6
+2.13.5
