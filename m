@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dzhCR-0004pz-Q2
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:46:48 -0400
+	(envelope-from <quintela@redhat.com>) id 1dzhCT-0004r0-En
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:46:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dzhCQ-0002oF-NQ
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:46:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53404)
+	(envelope-from <quintela@redhat.com>) id 1dzhCS-0002oy-FH
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:46:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40638)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dzhCQ-0002ng-El
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:46:46 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dzhCS-0002oW-77
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:46:48 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 748C45D5EB
-	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 10:46:45 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 362D7780CB
+	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 10:46:47 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed,  4 Oct 2017 12:46:26 +0200
-Message-Id: <20171004104636.7963-3-quintela@redhat.com>
+Date: Wed,  4 Oct 2017 12:46:27 +0200
+Message-Id: <20171004104636.7963-4-quintela@redhat.com>
 In-Reply-To: <20171004104636.7963-1-quintela@redhat.com>
 References: <20171004104636.7963-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v9 02/12] migration: Improve migration thread
- error handling
+Subject: [Qemu-devel] [PATCH v9 03/12] migration: Make migrate_fd_error()
+ the owner of the Error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,109 +33,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-We now report errors also when we finish migration, not only on info
-migrate.  We plan to use this error from several places, and we want
-the first error to happen to win, so we add an mutex to order it.
+So far, we had to free the error after each caller, so just do it
+here.  Once there, tls.c was leaking the error.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/migration.c | 19 ++++++++++++++++---
- migration/migration.h |  7 ++++++-
- migration/tls.c       |  1 -
- 3 files changed, 22 insertions(+), 5 deletions(-)
+ migration/channel.c   |  1 -
+ migration/migration.c | 10 ++++------
+ migration/migration.h |  4 ++--
+ migration/socket.c    |  1 -
+ 4 files changed, 6 insertions(+), 10 deletions(-)
 
+diff --git a/migration/channel.c b/migration/channel.c
+index 70ec7ea3b7..1dd2ae1530 100644
+--- a/migration/channel.c
++++ b/migration/channel.c
+@@ -71,7 +71,6 @@ void migration_channel_connect(MigrationState *s,
+         migration_tls_channel_connect(s, ioc, hostname, &local_err);
+         if (local_err) {
+             migrate_fd_error(s, local_err);
+-            error_free(local_err);
+         }
+     } else {
+         QEMUFile *f = qemu_fopen_channel_output(ioc);
 diff --git a/migration/migration.c b/migration/migration.c
-index 98429dc843..468f51cfa7 100644
+index 468f51cfa7..61b7e7105a 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -1071,19 +1071,30 @@ static void migrate_fd_cleanup(void *opaque)
-                           MIGRATION_STATUS_CANCELLED);
-     }
- 
-+    if (s->error) {
-+        /* It is used on info migrate.  We can't free it */
-+        error_report_err(error_copy(s->error));
-+    }
-     notifier_list_notify(&migration_state_notifiers, s);
+@@ -1079,16 +1079,14 @@ static void migrate_fd_cleanup(void *opaque)
      block_cleanup_parameters(s);
  }
  
-+void migrate_set_error(MigrationState *s, const Error *error)
-+{
-+    qemu_mutex_lock(&s->error_mutex);
-+    if (!s->error) {
-+        s->error = error_copy(error);
-+    }
-+    qemu_mutex_unlock(&s->error_mutex);
-+}
-+
- void migrate_fd_error(MigrationState *s, const Error *error)
+-void migrate_set_error(MigrationState *s, const Error *error)
++void migrate_set_error(MigrationState *s, Error *error)
  {
-     trace_migrate_fd_error(error_get_pretty(error));
-     assert(s->to_dst_file == NULL);
-     migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-                       MIGRATION_STATUS_FAILED);
+     qemu_mutex_lock(&s->error_mutex);
 -    if (!s->error) {
 -        s->error = error_copy(error);
 -    }
-+    migrate_set_error(s, error);
-     notifier_list_notify(&migration_state_notifiers, s);
-     block_cleanup_parameters(s);
++    error_propagate(&s->error, error);
+     qemu_mutex_unlock(&s->error_mutex);
  }
-@@ -2355,6 +2366,7 @@ static void migration_instance_finalize(Object *obj)
-     MigrationState *ms = MIGRATION_OBJ(obj);
-     MigrationParameters *params = &ms->parameters;
  
-+    qemu_mutex_destroy(&ms->error_mutex);
-     g_free(params->tls_hostname);
-     g_free(params->tls_creds);
- }
-@@ -2367,6 +2379,7 @@ static void migration_instance_init(Object *obj)
-     ms->state = MIGRATION_STATUS_NONE;
-     ms->xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE;
-     ms->mbps = -1;
-+    qemu_mutex_init(&ms->error_mutex);
+-void migrate_fd_error(MigrationState *s, const Error *error)
++void migrate_fd_error(MigrationState *s, Error *error)
+ {
+     trace_migrate_fd_error(error_get_pretty(error));
+     assert(s->to_dst_file == NULL);
+@@ -1362,7 +1360,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+     }
  
-     params->tls_hostname = g_strdup("");
-     params->tls_creds = g_strdup("");
+     if (local_err) {
+-        migrate_fd_error(s, local_err);
++        migrate_fd_error(s, error_copy(local_err));
+         error_propagate(errp, local_err);
+         return;
+     }
 diff --git a/migration/migration.h b/migration/migration.h
-index b83cceadc4..51c0ac2e71 100644
+index 51c0ac2e71..cc196cc87f 100644
 --- a/migration/migration.h
 +++ b/migration/migration.h
-@@ -129,8 +129,12 @@ struct MigrationState
-     int64_t colo_checkpoint_time;
-     QEMUTimer *colo_delay_timer;
- 
--    /* The last error that occurred */
-+    /* The first error that has occurred.
-+       We used the mutex to be able to return the 1st error message */
-     Error *error;
-+    /* mutex to protect errp */
-+    QemuMutex error_mutex;
-+
-     /* Do we have to clean up -b/-i from old migrate parameters */
-     /* This feature is deprecated and will be removed */
-     bool must_remove_block_options;
-@@ -159,6 +163,7 @@ bool  migration_has_all_channels(void);
+@@ -163,8 +163,8 @@ bool  migration_has_all_channels(void);
  
  uint64_t migrate_max_downtime(void);
  
-+void migrate_set_error(MigrationState *s, const Error *error);
- void migrate_fd_error(MigrationState *s, const Error *error);
+-void migrate_set_error(MigrationState *s, const Error *error);
+-void migrate_fd_error(MigrationState *s, const Error *error);
++void migrate_set_error(MigrationState *s, Error *error);
++void migrate_fd_error(MigrationState *s, Error *error);
  
  void migrate_fd_connect(MigrationState *s);
-diff --git a/migration/tls.c b/migration/tls.c
-index 596e8790bd..026a008667 100644
---- a/migration/tls.c
-+++ b/migration/tls.c
-@@ -119,7 +119,6 @@ static void migration_tls_outgoing_handshake(QIOTask *task,
+ 
+diff --git a/migration/socket.c b/migration/socket.c
+index dee869044a..2d70747a1a 100644
+--- a/migration/socket.c
++++ b/migration/socket.c
+@@ -80,7 +80,6 @@ static void socket_outgoing_migration(QIOTask *task,
      if (qio_task_propagate_error(task, &err)) {
-         trace_migration_tls_outgoing_handshake_error(error_get_pretty(err));
-         migrate_fd_error(s, err);
+         trace_migration_socket_outgoing_error(error_get_pretty(err));
+         migrate_fd_error(data->s, err);
 -        error_free(err);
      } else {
-         trace_migration_tls_outgoing_handshake_complete();
-         migration_channel_connect(s, ioc, NULL);
+         trace_migration_socket_outgoing_connected(data->hostname);
+         migration_channel_connect(data->s, sioc, data->hostname);
 -- 
 2.13.5
