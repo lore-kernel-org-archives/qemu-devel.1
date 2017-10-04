@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dzZ0S-0001E9-B9
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:01:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1dzZ0U-0001Gi-60
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:01:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dzZ0R-0006Hb-HG
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:01:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1dzZ0T-0006Iq-6P
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:01:54 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Tue,  3 Oct 2017 21:00:34 -0500
-Message-Id: <20171004020048.26379-10-eblake@redhat.com>
+Date: Tue,  3 Oct 2017 21:00:38 -0500
+Message-Id: <20171004020048.26379-14-eblake@redhat.com>
 In-Reply-To: <20171004020048.26379-1-eblake@redhat.com>
 References: <20171004020048.26379-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 09/23] block: Switch
- BdrvCoGetBlockStatusData to byte-based
+Subject: [Qemu-devel] [PATCH v5 13/23] qemu-img: Simplify logic in
+ img_compare()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,100 +21,140 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-We are gradually converting to byte-based interfaces, as they are
-easier to reason about than sector-based.  Convert another internal
-type (no semantic change), and rename it to match the corresponding
-public function rename.
+As long as we are querying the status for a chunk smaller than
+the known image size, we are guaranteed that a successful return
+will have set pnum to a non-zero size (pnum is zero only for
+queries beyond the end of the file).  Use that to slightly
+simplify the calculation of the current chunk size being compared.
+Likewise, we don't have to shrink the amount of data operated on
+until we know we have to read the file, and therefore have to fit
+in the bounds of our buffer.  Also, note that 'total_sectors_over'
+is equivalent to 'progress_base'.
+
+With these changes in place, sectors_to_process() is now dead code,
+and can be removed.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 
 ---
-v4-v5: no change
-v3: rebase to context conflicts, simple enough to keep R-b
-v2: rebase to earlier changes
+v5: rebase to alignment assertion [John]
+v4: no change
+v3: new patch
 ---
- block/io.c | 31 ++++++++++++++++++-------------
- 1 file changed, 18 insertions(+), 13 deletions(-)
+ qemu-img.c | 38 +++++++++++---------------------------
+ 1 file changed, 11 insertions(+), 27 deletions(-)
 
-diff --git a/block/io.c b/block/io.c
-index b879e26154..1857191187 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1744,17 +1744,17 @@ int bdrv_flush_all(void)
+diff --git a/qemu-img.c b/qemu-img.c
+index a351af09ac..abd289c0b5 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1172,11 +1172,6 @@ static int64_t sectors_to_bytes(int64_t sectors)
+     return sectors << BDRV_SECTOR_BITS;
  }
 
-
--typedef struct BdrvCoGetBlockStatusData {
-+typedef struct BdrvCoBlockStatusData {
-     BlockDriverState *bs;
-     BlockDriverState *base;
-     BlockDriverState **file;
--    int64_t sector_num;
--    int nb_sectors;
--    int *pnum;
-+    int64_t offset;
-+    int64_t bytes;
-+    int64_t *pnum;
-     int64_t ret;
-     bool mapping;
-     bool done;
--} BdrvCoGetBlockStatusData;
-+} BdrvCoBlockStatusData;
-
- int64_t coroutine_fn bdrv_co_get_block_status_from_file(BlockDriverState *bs,
-                                                         int64_t sector_num,
-@@ -1983,14 +1983,16 @@ static int64_t coroutine_fn bdrv_co_get_block_status_above(BlockDriverState *bs,
- /* Coroutine wrapper for bdrv_get_block_status_above() */
- static void coroutine_fn bdrv_get_block_status_above_co_entry(void *opaque)
- {
--    BdrvCoGetBlockStatusData *data = opaque;
-+    BdrvCoBlockStatusData *data = opaque;
-+    int n;
-
-     data->ret = bdrv_co_get_block_status_above(data->bs, data->base,
-                                                data->mapping,
--                                               data->sector_num,
--                                               data->nb_sectors,
--                                               data->pnum,
-+                                               data->offset >> BDRV_SECTOR_BITS,
-+                                               data->bytes >> BDRV_SECTOR_BITS,
-+                                               &n,
-                                                data->file);
-+    *data->pnum = n * BDRV_SECTOR_SIZE;
-     data->done = true;
- }
-
-@@ -2007,13 +2009,14 @@ static int64_t bdrv_common_block_status_above(BlockDriverState *bs,
-                                               BlockDriverState **file)
- {
-     Coroutine *co;
--    BdrvCoGetBlockStatusData data = {
-+    int64_t n;
-+    BdrvCoBlockStatusData data = {
-         .bs = bs,
-         .base = base,
-         .file = file,
--        .sector_num = sector_num,
--        .nb_sectors = nb_sectors,
--        .pnum = pnum,
-+        .offset = sector_num * BDRV_SECTOR_SIZE,
-+        .bytes = nb_sectors * BDRV_SECTOR_SIZE,
-+        .pnum = &n,
-         .mapping = mapping,
-         .done = false,
-     };
-@@ -2027,6 +2030,8 @@ static int64_t bdrv_common_block_status_above(BlockDriverState *bs,
-         bdrv_coroutine_enter(bs, co);
-         BDRV_POLL_WHILE(bs, !data.done);
+-static int64_t sectors_to_process(int64_t total, int64_t from)
+-{
+-    return MIN(total - from, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
+-}
+-
+ /*
+  * Check if passed sectors are empty (not allocated or contain only 0 bytes)
+  *
+@@ -1373,13 +1368,9 @@ static int img_compare(int argc, char **argv)
+         goto out;
      }
-+    assert(data.ret < 0 || QEMU_IS_ALIGNED(n, BDRV_SECTOR_SIZE));
-+    *pnum = n >> BDRV_SECTOR_BITS;
-     return data.ret;
- }
 
+-    for (;;) {
++    while (sector_num < total_sectors) {
+         int64_t status1, status2;
+
+-        nb_sectors = sectors_to_process(total_sectors, sector_num);
+-        if (nb_sectors <= 0) {
+-            break;
+-        }
+         status1 = bdrv_block_status_above(bs1, NULL,
+                                           sector_num * BDRV_SECTOR_SIZE,
+                                           (total_sectors1 - sector_num) *
+@@ -1406,12 +1397,9 @@ static int img_compare(int argc, char **argv)
+         /* TODO: Relax this once comparison is byte-based, and we no longer
+          * have to worry about sector alignment */
+         assert(QEMU_IS_ALIGNED(pnum1 | pnum2, BDRV_SECTOR_SIZE));
+-        if (pnum1) {
+-            nb_sectors = MIN(nb_sectors, pnum1 >> BDRV_SECTOR_BITS);
+-        }
+-        if (pnum2) {
+-            nb_sectors = MIN(nb_sectors, pnum2 >> BDRV_SECTOR_BITS);
+-        }
++
++        assert(pnum1 && pnum2);
++        nb_sectors = MIN(pnum1, pnum2) >> BDRV_SECTOR_BITS;
+
+         if (strict) {
+             if ((status1 & ~BDRV_BLOCK_OFFSET_MASK) !=
+@@ -1424,9 +1412,10 @@ static int img_compare(int argc, char **argv)
+             }
+         }
+         if ((status1 & BDRV_BLOCK_ZERO) && (status2 & BDRV_BLOCK_ZERO)) {
+-            nb_sectors = DIV_ROUND_UP(MIN(pnum1, pnum2), BDRV_SECTOR_SIZE);
++            /* nothing to do */
+         } else if (allocated1 == allocated2) {
+             if (allocated1) {
++                nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
+                 ret = blk_pread(blk1, sector_num << BDRV_SECTOR_BITS, buf1,
+                                 nb_sectors << BDRV_SECTOR_BITS);
+                 if (ret < 0) {
+@@ -1455,7 +1444,7 @@ static int img_compare(int argc, char **argv)
+                 }
+             }
+         } else {
+-
++            nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
+             if (allocated1) {
+                 ret = check_empty_sectors(blk1, sector_num, nb_sectors,
+                                           filename1, buf1, quiet);
+@@ -1478,30 +1467,24 @@ static int img_compare(int argc, char **argv)
+
+     if (total_sectors1 != total_sectors2) {
+         BlockBackend *blk_over;
+-        int64_t total_sectors_over;
+         const char *filename_over;
+
+         qprintf(quiet, "Warning: Image size mismatch!\n");
+         if (total_sectors1 > total_sectors2) {
+-            total_sectors_over = total_sectors1;
+             blk_over = blk1;
+             filename_over = filename1;
+         } else {
+-            total_sectors_over = total_sectors2;
+             blk_over = blk2;
+             filename_over = filename2;
+         }
+
+-        for (;;) {
++        while (sector_num < progress_base) {
+             int64_t count;
+
+-            nb_sectors = sectors_to_process(total_sectors_over, sector_num);
+-            if (nb_sectors <= 0) {
+-                break;
+-            }
+             ret = bdrv_is_allocated_above(blk_bs(blk_over), NULL,
+                                           sector_num * BDRV_SECTOR_SIZE,
+-                                          nb_sectors * BDRV_SECTOR_SIZE,
++                                          (progress_base - sector_num) *
++                                          BDRV_SECTOR_SIZE,
+                                           &count);
+             if (ret < 0) {
+                 ret = 3;
+@@ -1515,6 +1498,7 @@ static int img_compare(int argc, char **argv)
+             assert(QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE));
+             nb_sectors = count >> BDRV_SECTOR_BITS;
+             if (ret) {
++                nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
+                 ret = check_empty_sectors(blk_over, sector_num, nb_sectors,
+                                           filename_over, buf1, quiet);
+                 if (ret) {
 -- 
 2.13.6
