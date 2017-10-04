@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dzgrB-0004zw-Aj
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:24:50 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgrO-0005B7-GI
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:25:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dzgrA-0004N2-H6
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:24:49 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <1488286469-9381-29-git-send-email-kwolf@redhat.com>
-References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
-	<1488286469-9381-29-git-send-email-kwolf@redhat.com>
-Date: Wed, 04 Oct 2017 12:24:05 +0200
-Message-ID: <w51y3or9poa.fsf@maestria.local.igalia.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgrN-0004fj-Mr
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:25:02 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:38809)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dzgrN-0004eW-JA
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:25:01 -0400
+Received: by mail-oi0-x242.google.com with SMTP id s145so6797036oie.5
+	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 03:25:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 28/44] block: Fix pending
- requests check in bdrv_append()
+In-Reply-To: <20171002141341.24616-7-armbru@redhat.com>
+References: <20171002141341.24616-1-armbru@redhat.com>
+	<20171002141341.24616-7-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 4 Oct 2017 12:24:59 +0200
+Message-ID: <CAJ+F1CKsqdHKuHNJqVhc1qdRWSrxp37WbY_DOxwk6F8ne=SgMQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 06/11] qapi2texi: Clean up texi_sections()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, qemu-stable@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-On Tue 28 Feb 2017 01:54:13 PM CET, Kevin Wolf wrote:
-> bdrv_append() cares about isolation of the node that it modifies, but
-> not about activity in some subtree below it. Instead of using the
-> recursive bdrv_requests_pending(), directly check bs->in_flight, which
-> considers only the node in question.
+On Mon, Oct 2, 2017 at 4:13 PM, Markus Armbruster <armbru@redhat.com> wrote=
+:
+> Repurposing the function parameter doc for stepping through
+> doc.sections.__str__() is not nice.  Use new variable @text instead.
 >
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> While there, eliminate variables name and func.
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
 > ---
->  block.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  scripts/qapi2texi.py | 16 +++++++---------
+>  1 file changed, 7 insertions(+), 9 deletions(-)
 >
-> diff --git a/block.c b/block.c
-> index 9e538a5..5189c7c 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -2897,8 +2897,8 @@ static void change_parent_backing_link(BlockDriverState *from,
->   */
->  void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top)
->  {
-> -    assert(!bdrv_requests_pending(bs_top));
-> -    assert(!bdrv_requests_pending(bs_new));
-> +    assert(!atomic_read(&bs_top->in_flight));
-> +    assert(!atomic_read(&bs_new->in_flight));
->  
->      bdrv_ref(bs_top);
+> diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
+> index a317526e51..f876d9a174 100755
+> --- a/scripts/qapi2texi.py
+> +++ b/scripts/qapi2texi.py
+> @@ -180,16 +180,14 @@ def texi_sections(doc):
+>      """Format additional sections following arguments"""
+>      body =3D ''
+>      for section in doc.sections:
+> -        name, doc =3D (section.name, str(section))
+> -        func =3D texi_format
+> -        if name.startswith('Example'):
+> -            func =3D texi_example
+> -
+> -        if name:
+> +        if section.name:
+>              # prefer @b over @strong, so txt doesn't translate it to *Fo=
+o:*
+> -            body +=3D '\n\n@b{%s:}\n' % name
+> -
+> -        body +=3D func(doc)
+> +            body +=3D '\n\n@b{%s:}\n' % section.name
+> +        text =3D str(section)
+> +        if section.name.startswith('Example'):
+> +            body +=3D texi_example(text)
+> +        else:
+> +            body +=3D texi_format(text)
+>      return body
+>
+>
+> --
+> 2.13.6
+>
+>
 
-I don't know if there's still any maintenance on the v2.8.x branch, but
-I can make v2.8.1.1 crash easily because of this failing assertion.
-Applying this patch fixes the issue.
 
-I can provide more details if needed.
 
-Regards,
-
-Berto
+--=20
+Marc-Andr=C3=A9 Lureau
