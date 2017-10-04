@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36724)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dzckQ-0002Qw-Va
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 02:01:36 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dzckO-0002Qv-Vw
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 02:01:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dzckN-0003qo-SE
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 02:01:35 -0400
-Date: Wed, 4 Oct 2017 16:55:25 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1dzckN-0003qj-SJ
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 02:01:33 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:54557)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1dzckN-0003q9-4j
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 02:01:31 -0400
+Date: Wed, 4 Oct 2017 17:01:02 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171004055525.GT3260@umbus.fritz.box>
-References: <150659494872.25889.2069124544245723984.stgit@aravinda>
-	<150659505839.25889.2018054058894535368.stgit@aravinda>
-	<20170929061735.GD7712@umbus.fritz.box>
-	<87y3oxen7t.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<95142cc0-518a-b7b7-4e56-cfc2adca36ba@ozlabs.ru>
-	<20171003060757.GF3260@umbus.fritz.box>
-	<4d649456-1242-febe-06bd-35bb01e3982b@ozlabs.ru>
-	<8fa746ca-302f-b2bf-ee05-a4b0b4f2fcbb@ozlabs.ru>
+Message-ID: <20171004060102.GU3260@umbus.fritz.box>
+References: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
+	<150706931752.3830.12126799989731308076@sif>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="tRcR9GoWqjXrt11v"
+	protocol="application/pgp-signature"; boundary="dg6Tyglv1qyvGx3q"
 Content-Disposition: inline
-In-Reply-To: <8fa746ca-302f-b2bf-ee05-a4b0b4f2fcbb@ozlabs.ru>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v5 1/6] ppc: spapr: Register and
- handle HCALL to receive updated RTAS region
+In-Reply-To: <150706931752.3830.12126799989731308076@sif>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/3] qdev/vfio: defer DEVICE_DEL
+ to avoid races with libvirt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,134 +29,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Aravinda Prasad <aravinda@linux.vnet.ibm.com>, benh@au1.ibm.com, mahesh@linux.vnet.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, paulus@samba.org, sam.bobroff@au1.ibm.com
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, groug@kaod.org, armbru@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com
 
 
---tRcR9GoWqjXrt11v
+--dg6Tyglv1qyvGx3q
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 04, 2017 at 02:32:11PM +1100, Alexey Kardashevskiy wrote:
-> On 03/10/17 20:12, Alexey Kardashevskiy wrote:
-> > On 03/10/17 17:07, David Gibson wrote:
-> >> On Mon, Oct 02, 2017 at 02:02:19PM +1100, Alexey Kardashevskiy wrote:
-> >>> On 29/09/17 21:52, Nikunj A Dadhania wrote:
-> >>>> David Gibson <david@gibson.dropbear.id.au> writes:
-> >>>>
-> >>>>> On Thu, Sep 28, 2017 at 04:07:38PM +0530, Aravinda Prasad wrote:
-> >>>>>> Receive updates from SLOF about the updated rtas-base.
-> >>>>>> A separate patch for SLOF [1] (commit f9a60de3) adds
-> >>>>>> functionality to invoke a private HCALL whenever OS
-> >>>>>> issues instantiate-rtas with a new rtas-base.
-> >>>>>>
-> >>>>>> This is required as QEMU needs to know the updated rtas-base
-> >>>>>> as it allocates error reporting structure in RTAS space upon
-> >>>>>> a machine check exception.
-> >>>>>>
-> >>>>>> [1] https://lists.ozlabs.org/pipermail/linuxppc-dev/2014-August/12=
-0386.html
-> >>>>>>
-> >>>>>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-> >>>>>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> >>>>>
-> >>>>> Ao I acked this earlier, but I've now realized there might be some
-> >>>>> connection between this and discussions taking place elsewhere about
-> >>>>> qemu not knowing what SLOF does with the device tree.
-> >>>>>
-> >>>>> At what point will SLOF call the UPDATE_RTAS hcall?  I'm guessing at
-> >>>>> the time of instantiate-rtas, is that right?
-> >>>>
-> >>>> The call happens from
-> >>>> arch/powerpc/kernel/prom_init.c:prom_instantiate_rtas() and after th=
-at
-> >>>> linux kernel makes two entries in the DT
-> >>>>
-> >>>> ....
-> >>>>        if (call_prom_ret("call-method", 3, 2, &entry,
-> >>>>                           ADDR("instantiate-rtas"),
-> >>>>                           rtas_inst, base) !=3D 0
-> >>>>             || entry =3D=3D 0) {
-> >>>>                 prom_printf(" failed\n");
-> >>>>                 return;
-> >>>>         }
-> >>>>         prom_printf(" done\n");
-> >>>>
-> >>>>         reserve_mem(base, size);
-> >>>>
-> >>>>         val =3D cpu_to_be32(base);
-> >>>>         prom_setprop(rtas_node, "/rtas", "linux,rtas-base",
-> >>>>                      &val, sizeof(val));
-> >>>>         val =3D cpu_to_be32(entry);
-> >>>>         prom_setprop(rtas_node, "/rtas", "linux,rtas-entry",
-> >>>>                      &val, sizeof(val));
-> >>>> ....
-> >>>>
-> >>>> Quiesce is called after this.=20
-> >>>>
-> >>>>> Does SLOF put the RTAS blob address in its internal device tree, or
-> >>>>> does it only pass it to the guest via the return parameters from
-> >>>>> instantiate-rtas?
-> >>>>
-> >>>> Entry was made to the DT by linux kernel prom_init code, will this be
-> >>>> visible to QEMU?
-> >>>
-> >>> With my recent SLOF FDT patch - yes:
-> >>>
-> >>> aik@fstn1-p1:~$ grep rtas dbg.dts
-> >>> 	rtas {
-> >>> 		linux,rtas-entry =3D <0x2fff0000>;
-> >>> 		linux,rtas-base =3D <0x2fff0000>;
-> >>> [...]
-> >>
-> >> Ah.. except.. isn't that relying on the kernel putting the RTAS
-> >> address into the device tree before it calls quiesce and kills SLOF?
-> >>
-> >> The SLOF image is bundled in with qemu, so it's ok for us to rely on
-> >> its behaviour up to a point.  It's not really ok for us to rely on the
-> >> kernel's behaviour here, unless that behaviour is mandated by PAPR,
-> >> which this isn't.
+On Tue, Oct 03, 2017 at 05:21:57PM -0500, Michael Roth wrote:
+> Quoting Michael Roth (2017-07-26 20:30:52)
+> > This series was motivated by the discussion in this thread:
 > >=20
-> > Fair point.
+> >   https://www.redhat.com/archives/libvir-list/2017-June/msg01370.html
 > >=20
-> >> So, I think we either need to have *SLOF* update the device tree with
-> >> that address at instantiate-rtas time,
+> > The issue this series addresses is that when libvirt unplugs a VFIO PCI=
+ device,
+> > it may attempt to bind the host device back to the host driver when QEM=
+U emits
+> > the DEVICE_DELETED event for the corresponding vfio-pci device. However=
+, the
+> > VFIO group FD is not actually cleaned up until vfio-pci device is *fina=
+lized*
+> > by QEMU, whereas the event is emitted earlier during device_unparent.
+> > Depending on the host device and how long certain operations like reset=
+ting the
+> > device might take, this can in result in libvirt trying to rebind the d=
+evice
+> > back to the host while it is still in use by VFIO, leading to host cras=
+hes or
+> > other unexpected behavior.
 > >=20
-> > I can do that, in a separate patch.
->=20
->=20
-> One comment though - if I create the properties in SLOF, I have to name
-> them different, like rtas-entry/rtas-base or slof,rtas-entry/slof,rtas-ba=
-se
-> to avoid colliding with the ones create by the guest kernel.
-
-That's fine.  I don't know if the kernel will error if the properties
-are already there or just overwrite them, but using new names might be
-safer.
-
-> So what do I name them? And do we need 2 copies of the same thing,
-
-Need, no, but if having 2 copies is the simpler approach that's fine.
-
-> do we
-> ever expect rtas-entry!=3Drtas-base? The guest can potentially get them
-> different (under powervm) but not with SLOF.
-
-More to the point, qemu doesn't actually need to know the entry point
-for the fwnmi stuff, only the base address.
-
->=20
->=20
+> > In particular, Mellanox CX4 adapters on PowerNV hosts might not be fully
+> > quiesced by vfio-pci's finalize() routine until up to 6s after the
+> > DEVICE_DELETED was emitted, leading to detach-device on the libvirt sid=
+e pretty
+> > much always crashing the host.
 > >=20
-> >> or we'll need to resurrect
-> >> Aravinda's original UPDATE_RTAS hcall.
+> > Implementing this change requires 2 prereqs to ensure the same informat=
+ion is
+> > available when the DEVICE_DELETED is finally emitted:
+> >=20
+> > 1) Storing the path in the composition patch, which is addressed by PAT=
+CH 1,
+> >    which was plucked from another pending series from Greg Kurz:
+> >=20
+> >    https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg07922.html
+> >=20
+> >    since we are now "disconnected" at the time the event is emitted, and
+> >=20
+> > 2) Deferring qemu_opts_del of the DeviceState->QemuOpts till finalize, =
+since
+> >    that is where DeviceState->id is stored. This was actually how it was
+> >    done in the past, so PATCH 2 simply reverts the change which moved i=
+t to
+> >    device_unparent.
+> >=20
+> > From there it's just a mechanical move of the event from device_unparen=
+t to
+> > device_finalize.
 >=20
+> Ping.
 >=20
+> The situation has changed somewhat since original posting as Alex now
+> has a fix on the kernel side for the VFIO issue noted above:
 >=20
+>   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
+it/?id=3D6586b561a91cd80a91c8f107ed0d144feb3eadc2
+>=20
+> However, I think this series would still be useful for addressing the
+> issue for hosts using older kernels, and there seems to be general
+> interest from the libvirt side in aligning "DEVICE_DELETED" events
+> with the notion that QEMU is completely finished with a device.
+>=20
+> Patch 1/3 is also needed for another series that Greg is working on
+> and I don't want to hold that up for this series, so if it's
+> preferred that we just post that patch separately in the meantime
+> please let me know.
 
-
-
+Yeah, I'd been meaning to ask you about this.  I think it just got
+lost in the rush of things for qemu-2.10.  I think it would be worth
+rebasing and reposting.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -166,24 +118,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---tRcR9GoWqjXrt11v
+--dg6Tyglv1qyvGx3q
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnUd8sACgkQbDjKyiDZ
-s5JJEQ/+MoKAnNPh6D45OCXafA22YoIfRJBoyEeaRcnbBE4SBqo82c5U0Dze1V6d
-aheeMPxXCWBgp9VKv/A/UckxsaDPkJHhdgng+RrOlqnzKE66WYcFxrLYTLDNpRs0
-kuHRB/nFl/L9jkwlyBxVm9AKXbUqMygdw1qdj0P9GrsZstn4Mlr6522VrFeYShoH
-tYxpUCAp5I408RrfLhB45+nnh1zyEkCruv5bWS9zd1eWUrWzYgnqCtKFkT0FqjJh
-baIrX6/lm+Etma3UoQUa+b6POJ1BSCBE26jaLbeH2YkT4IQaFdAzi6MyqOFcHpG8
-p4Wahd5wTH7PHzTNW7rMGVod0p5YDyaraD0G6RVWS9VWXQ+LCXM2ROqiHBQJOQ24
-fQZ8c/3keM260HqSMES1An2y6hAkaMwQMjn12POmeRLcxvvahkC/JS2MU1c7BN1/
-ds8jAhI/JDwEQBZrsBWaehs5hnvfKC5Iki68a/STUKPaxDsErrGqhmcbberj37VO
-ObUTb14bSM3NkD0dq60uXqF7HcNCW3TsC4EtDxb90W+uzJr92ZLdmQXdhzRXVIy/
-xAx7xX1tPzX7MeEfmVONucFWmtLsPXfy42QQANSu7i5LdL0DoXUA7NVpNtiVbIny
-U58YNU5VPb25HKO+HfVDOoyk6AiLuH1UIYAGJBZx8tMFg05A9RE=
-=Mnxn
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnUeR4ACgkQbDjKyiDZ
+s5KapRAAuGAWbkBLYJHmQt2JDTI2crjpq04BTCMfO29gjDI98iQCxS9K8a0X/sOB
+tmUQGPy89buLpzy7BZJZRcuodCHlOhQcp7Q4FsdoS0KwHBEjt9eMgrbUd1Y7FAZ6
+BdPXH387h6PbDlgYeQl3pEezNBcMkhj/OSTbPdQRWwExlZBEwYjhhiZi1DiPyQqv
+t4zE/nqTnUI8zx0EQPgSQwcHr6fyOAUmVH837tk1GAVotcge6jcg1ImhXNgB0Kiy
+Yb9pDlls3x9p5rZzjhLIIpdBPC7zNodRMk9blQLgbAIrQXXoroMoLvoBGf29tSrE
+OXjFhLs90lnKRR3M/hqgNUgGuJfiy3vl+iWcHyV1JMEN0Z90pDGZu3bCHuMytnYj
+HG7lCMl3ycywR3lJgC2Ke9ENQm6sLgLSra7tmaDCdqP+RC6AGM1r0Ucri6rEqQa4
+p4rMUD1OQG0qkm7EOAc4Y+jI5e/EXh7Nzvkf0h0yCJW/TJbnawcjvGwr7Ms2jgAZ
+kjyMPQZIo5WqmcSl0OC6Ov7lUtoUs9TjrKMvj9d9Xsb+N4uzTy3mYefFIe/9pb/y
+DNbgNecl/r6YAq2artyP4/Dq/L7bwnRRBaCCMMhDiLaiFMmM3BKjKfaMhBmHcD7W
+QuBesG650S5MRSBjlPPBS3B0QHZRQ3PhmIhgOK/rmAJDC9BFD/I=
+=piJH
 -----END PGP SIGNATURE-----
 
---tRcR9GoWqjXrt11v--
+--dg6Tyglv1qyvGx3q--
