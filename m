@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dzmyj-0002Gz-5y
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 12:57:02 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dzn6s-0004aO-HW
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 13:05:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dzmyg-0006VM-3q
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 12:57:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52378)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dzmyf-0006UY-Qm
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 12:56:58 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9534BC0587DF
-	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 16:56:56 +0000 (UTC)
-Date: Wed, 4 Oct 2017 17:56:48 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171004165648.GP17517@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171004114008.14849-1-berrange@redhat.com>
-	<20171004114008.14849-2-berrange@redhat.com>
-	<20171004164943.GB2195@work-vm>
+	(envelope-from <el13635@mail.ntua.gr>) id 1dzn6o-0005vP-NH
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 13:05:26 -0400
+Date: Wed, 4 Oct 2017 20:05:01 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20171004170501.ttj7tayiqx2vvsjn@postretch>
+References: <20170815074513.9055-1-el13635@mail.ntua.gr>
+	<a646d860-5f33-19cb-e56a-893b57613533@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="kz7btylpp3qbzmv5"
 Content-Disposition: inline
-In-Reply-To: <20171004164943.GB2195@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v1 1/2] scsi-disk: support reporting of
- rotation rate
+In-Reply-To: <a646d860-5f33-19cb-e56a-893b57613533@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC] block: add
+ block-insert-node QMP command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,103 +25,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
 
-On Wed, Oct 04, 2017 at 05:49:44PM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > The Linux kernel will query the SCSI "Block device characteristics"
-> > VPD to determine the rotations per minute of the disk. If this has
-> > the value 1, it is taken to be an SSD and so Linux sets the
-> > 'rotational' flag to 0 for the I/O queue and will stop using that
-> > disk as a source of random entropy. Other operating systems may
-> > also take into account rotation rate when setting up default
-> > behaviour.
-> > 
-> > Mgmt apps should be able to set the rotation rate for virtualized
-> > block devices, based on characteristics of the host storage in use,
-> > so that the guest OS gets sensible behaviour out of the box. This
-> > patch thus adds a 'rotation-rate' parameter for 'scsi-hd' and
-> > 'scsi-block' device types. For the latter, this parameter will be
-> > ignored unless the host device has TYPE_DISK.
-> > 
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> >  hw/scsi/scsi-disk.c | 20 ++++++++++++++++++++
-> >  1 file changed, 20 insertions(+)
-> > 
-> > diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-> > index 6e841fb5ff..a518080e7d 100644
-> > --- a/hw/scsi/scsi-disk.c
-> > +++ b/hw/scsi/scsi-disk.c
-> > @@ -104,6 +104,14 @@ typedef struct SCSIDiskState
-> >      char *product;
-> >      bool tray_open;
-> >      bool tray_locked;
-> > +    /*
-> > +     * 0x0000        - rotation rate not reported
-> > +     * 0x0001        - non-rotating medium (SSD)
-> > +     * 0x0002-0x0400 - reserved
-> > +     * 0x0401-0xffe  - rotations per minute
-> > +     * 0xffff        - reserved
-> > +     */
-> > +    uint16_t rotation_rate;
-> >  } SCSIDiskState;
-> >  
-> >  static bool scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed);
-> > @@ -605,6 +613,7 @@ static int scsi_disk_emulate_inquiry(SCSIRequest *req, uint8_t *outbuf)
-> >              outbuf[buflen++] = 0x83; // device identification
-> >              if (s->qdev.type == TYPE_DISK) {
-> >                  outbuf[buflen++] = 0xb0; // block limits
-> > +                outbuf[buflen++] = 0xb1; /* block device characteristics */
-> >                  outbuf[buflen++] = 0xb2; // thin provisioning
-> >              }
-> >              break;
-> > @@ -747,6 +756,15 @@ static int scsi_disk_emulate_inquiry(SCSIRequest *req, uint8_t *outbuf)
-> >              outbuf[43] = max_io_sectors & 0xff;
-> >              break;
-> >          }
-> > +        case 0xb1: /* block device characteristics */
-> > +        {
-> > +            buflen = 8;
-> > +            outbuf[4] = (s->rotation_rate >> 8) & 0xff;
-> > +            outbuf[5] = s->rotation_rate & 0xff;
-> > +            outbuf[6] = 0;
-> > +            outbuf[7] = 0;
-> > +            break;
-> > +        }
-> >          case 0xb2: /* thin provisioning */
-> >          {
-> >              buflen = 8;
-> > @@ -2911,6 +2929,7 @@ static Property scsi_hd_properties[] = {
-> >                         DEFAULT_MAX_UNMAP_SIZE),
-> >      DEFINE_PROP_UINT64("max_io_size", SCSIDiskState, max_io_size,
-> >                         DEFAULT_MAX_IO_SIZE),
-> > +    DEFINE_PROP_UINT16("rotation_rate", SCSIDiskState, rotation_rate, 0),
-> >      DEFINE_BLOCK_CHS_PROPERTIES(SCSIDiskState, qdev.conf),
-> >      DEFINE_PROP_END_OF_LIST(),
-> >  };
-> > @@ -2982,6 +3001,7 @@ static const TypeInfo scsi_cd_info = {
-> >  static Property scsi_block_properties[] = {
-> >      DEFINE_BLOCK_ERROR_PROPERTIES(SCSIDiskState, qdev.conf),         \
-> >      DEFINE_PROP_DRIVE("drive", SCSIDiskState, qdev.conf.blk),
-> > +    DEFINE_PROP_UINT16("rotation_rate", SCSIDiskState, rotation_rate, 0),
-> >      DEFINE_PROP_END_OF_LIST(),
-> >  };
-> 
-> Are you sure you want this as a property of SCSIDiskState etc rather
-> than a property on the underlying drive?
-> Then if virtio devices etc wanted to pick this up later they could
-> without needing extra parameters.
 
-That would make 'rotation_rate' available for everything, regardless
-of whether its used/supported by the frontend device. I was trying to
-restrict this to only the places where its appropriate, so only disks,
-not cdroms for example.
+--kz7btylpp3qbzmv5
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+On Wed, Oct 04, 2017 at 02:49:27PM +0200, Max Reitz wrote:
+>On 2017-08-15 09:45, Manos Pitsidianakis wrote:
+>> block-insert-node and its pair command block-remove-node provide runtime
+>> insertion and removal of filter nodes.
+>>
+>> block-insert-node takes a (parent, child) and (node, child) pair of
+>> edges and unrefs the (parent, child) BdrvChild relationship and=20
+>> creates
+>> a new (parent, node) child with the same BdrvChildRole.
+>>
+>> This is a different approach than x-blockdev-change which uses the driver
+>> methods bdrv_add_child() and bdrv_del_child(),
+>
+>Why? :-)
+>
+>Can't we reuse x-blockdev-change? As far as I'm concerned, this was one
+>of its roles, and at least I don't want to have both x-blockdev-change
+>and these new commands.
+>
+>I think it would be a good idea just to change bdrv_add_child() and
+>bdrv_del_child(): If the driver has a bdrv_{add,del}_child() callback,
+>invoke that.  If it doesn't, then just attach the child.
+>
+>Of course, it may turn out that x-blockdev-change is lacking something
+>(e.g. a way to specify as what kind of child a new node is to be
+>attached).  Then we should either extend it so that it covers what it's
+>lacking, or replace it completely by these new commands.  In the latter
+>case, however, they would need to cover the existing use case which is
+>reconfiguring the quorum driver.  (And that would mean it would have to
+>invoke bdrv_add_child()/bdrv_del_child() when the driver has them.)
+>
+>Max
+>
+
+I think the two use cases are this:
+
+a) Adding/removing a replication child to an existing quorum node
+b) Insert a filter between two existing nodes.
+
+These are not directly compatible semantically, but as you said=20
+x-blockdev-change can perform b) if bdrv_add_child()/bdrv_del_child()=20
+are not implemented. Wouldn't that be unnecessary overloading?
+
+--kz7btylpp3qbzmv5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlnVFL0ACgkQc2J8L2kN
+9xCXpw/+I6uzdp7sIOdW01raGly9A6u25JZ9jkSE8N076y7ZvJiyhzSjmweXlJDp
+E7YYVm+kojdM+ymmnnsWEebu/C4f+T9qd4D4EK12pz7fH7KDyu3ohjT8jkMexmvR
+8OFg0dmrxG7m2l/3YbSrA/DD/0RbBprksCsoBPc7zquUD6x65aJAZmxHdwtCMhmk
+MWvv5DW4adZ0PpLWeHyqNBcUPyEdV0tmgaie+xJiIOXrdisqfQmeNViherEy2Uj4
+S+GJqcf6HPSO7skkzLLl66q7QqS6Qq1GqN/bbAHyIA9Ks5X/vBaDkcMTDtlgKyJ9
+0XWEyD/EUkBvT7MLbYoqb3xoJI8TmgXJNVSIzELUuAHQuUrKTae+5XqslqhZmlHj
+YwgWfqF0NnLzQMcv1SDHTB1cufkekaSbIv2UxiLkE6K40gCPevq5r4s3VCJfQJw2
+STYtH76kVl8Cst0jX2QXONHXeTGR6j72IXmaxJFdiPblRGOQ20ijoRps536zv1hG
+uq4XgAiuvPsd0Wa8V7TMRE+qusxssBsb+pIH4W+SkIHL0YQHBkHUINrdXLiIiB3J
+LxUK7UW7vEbXuBTEbD6GDLdkTJNMyiNfW1r0C7ZgdOcH9wWhgOOMGoFxCIZWaSQE
+9mXAUsM6HK1GDJRGdW7ZLoV8KgRCVIccXxn89crYvx+G9PiBIg0=
+=Zkxf
+-----END PGP SIGNATURE-----
+
+--kz7btylpp3qbzmv5--
