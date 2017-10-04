@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dzjgp-0007OL-OT
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:26:20 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dzjjc-00005r-0i
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:29:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dzjgm-0003nG-JH
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:26:19 -0400
-Resent-Message-Id: <E1dzjgm-0003nG-JH@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21472)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dzjgm-0003jn-DA
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:26:16 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150712355280.153.2674182748973930068@b58463cdfd5f>
-In-Reply-To: <20171004103933.7898-1-quintela@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1dzjjX-0006HP-2v
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:29:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44328)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dzjjW-0006GZ-SA
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:29:07 -0400
+Date: Wed, 4 Oct 2017 15:29:01 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171004152901.0e60cf93.cohuck@redhat.com>
+In-Reply-To: <0a170e87-54d5-8239-31f3-198b99d3924a@de.ibm.com>
+References: <20171004105751.24655-1-borntraeger@de.ibm.com>
+	<20171004105751.24655-2-borntraeger@de.ibm.com>
+	<512050f4-d7f5-7aac-f617-01ac5ef9513f@redhat.com>
+	<0a170e87-54d5-8239-31f3-198b99d3924a@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 4 Oct 2017 06:25:53 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/6] Add make check tests for Migration
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] s390/kvm: Support for get/set of
+ extended TOD-Clock for guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +30,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, "Collin L. Walling" <walling@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcxMDA0MTAzOTMzLjc4OTgtMS1xdWludGVsYUByZWRoYXQuY29tClN1Ympl
-Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC82XSBBZGQgbWFrZSBjaGVjayB0ZXN0cyBmb3IgTWln
-cmF0aW9uCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
-bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
-c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
-Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
-IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
-YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
-bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
-ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQg
-dG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo0YWViNjExMWI0IHRlc3RzOiBNb3ZlIHBvc3Rjb3B5IG1p
-Z3JhdGlvbiB0ZXN0IHRvIG1pZ3JhdGUtc2V0LXBhcmFtZXRlcnMKMWM5YjJiZGI5MiB0ZXN0czog
-QWRkIG1pZ3JhdGlvbiBjb21wcmVzcyB0aHJlYWRzIHRlc3RzCjU2Yzk5YzQ4MTQgdGVzdHM6IEFk
-ZCBtaWdyYXRpb24geGJ6cmxlIHRlc3QKNTc2ZjM4MDA0YiB0ZXN0czogQWRkIHByZWNvcHkgdGVz
-dCB1c2luZyBkZXByZWNhdGVkIGNvbW1hbmRzCmFmNDk5YjgxZTkgdGVzdHM6IEFkZCBiYXNpYyBt
-aWdyYXRpb24gcHJlY29weSB0Y3AgdGVzdAo1NDIxN2Q0NDgwIHRlc3RzOiBBZGQgYmFzaWMgbWln
-cmF0aW9uIHByZWNvcHkgdGVzdAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0gg
-MS82OiB0ZXN0czogQWRkIGJhc2ljIG1pZ3JhdGlvbiBwcmVjb3B5IHRlc3QuLi4KV0FSTklORzog
-YXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzcyOiBGSUxF
-OiB0ZXN0cy9taWdyYXRpb24tdGVzdC5jOjMwOgorI2lmIGRlZmluZWQoX19saW51eF9fKQoKdG90
-YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1MTggbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAyLzY6IHRlc3RzOiBBZGQg
-YmFzaWMgbWlncmF0aW9uIHByZWNvcHkgdGNwIHRlc3QuLi4KQ2hlY2tpbmcgUEFUQ0ggMy82OiB0
-ZXN0czogQWRkIHByZWNvcHkgdGVzdCB1c2luZyBkZXByZWNhdGVkIGNvbW1hbmRzLi4uCkNoZWNr
-aW5nIFBBVENIIDQvNjogdGVzdHM6IEFkZCBtaWdyYXRpb24geGJ6cmxlIHRlc3QuLi4KQ2hlY2tp
-bmcgUEFUQ0ggNS82OiB0ZXN0czogQWRkIG1pZ3JhdGlvbiBjb21wcmVzcyB0aHJlYWRzIHRlc3Rz
-Li4uCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMzNjogRklMRTogdGVzdHMvbWlncmF0aW9u
-LXRlc3QuYzo2NDA6CisgICAgbWlncmF0ZV9zZXRfcGFyYW1ldGVyKGZyb20sICJkZWNvbXByZXNz
-LXRocmVhZHMiLCAiMyIpOyAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDYzIGxpbmVz
-IGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5n
-IFBBVENIIDYvNjogdGVzdHM6IE1vdmUgcG9zdGNvcHkgbWlncmF0aW9uIHRlc3QgdG8gbWlncmF0
-ZS1zZXQtcGFyYW1ldGVycy4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
-ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
-dGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
-IHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On Wed, 4 Oct 2017 13:44:31 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+
+> On 10/04/2017 01:42 PM, Thomas Huth wrote:
+> > On 04.10.2017 12:57, Christian Borntraeger wrote:  
+> >> From: "Collin L. Walling" <walling@linux.vnet.ibm.com>
+> >>
+> >> Provides an interface for getting and setting the guest's extended
+> >> TOD-Clock via a single ioctl to kvm. If the ioctl fails because it
+> >> is not support by kvm, then we fall back to the old style of
+> >> retrieving the clock via two ioctls.
+> >>
+> >> Signed-off-by: Collin L. Walling <walling@linux.vnet.ibm.com>
+> >> Reviewed-by: Eric Farman <farman@linux.vnet.ibm.com>
+> >> Reviewed-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+> >> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> >> [split failure change from epoch index change]
+> >> ---
+> >>  target/s390x/cpu.c       | 26 +++++++++++++++++++-------
+> >>  target/s390x/kvm-stub.c  | 10 ++++++++++
+> >>  target/s390x/kvm.c       | 35 ++++++++++++++++++++++++++++++++++-
+> >>  target/s390x/kvm_s390x.h |  2 ++
+> >>  4 files changed, 65 insertions(+), 8 deletions(-)
+
+> >> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> >> index ebb75ca..4c944a5 100644
+> >> --- a/target/s390x/kvm.c
+> >> +++ b/target/s390x/kvm.c
+> >> @@ -643,10 +643,27 @@ int kvm_s390_get_clock(uint8_t *tod_high, uint64_t *tod_low)
+> >>      return kvm_vm_ioctl(kvm_state, KVM_GET_DEVICE_ATTR, &attr);
+> >>  }
+> >>  
+> >> +int kvm_s390_get_clock_ext(uint8_t *tod_high, uint64_t *tod_low)
+> >> +{
+> >> +    int r;
+> >> +    struct kvm_s390_vm_tod_clock gtod;
+> >> +  
+> > 
+> > So you've got a blank line here...  
+> 
+> Yes, seems that I have forgotten this one. 
+> I will let Conny decide if I should resend or if she can fixup.
+
+No worries, I can make this consistent on applying.
