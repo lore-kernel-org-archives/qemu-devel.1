@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dzjKN-0006aF-Ki
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:03:11 -0400
+	(envelope-from <armbru@redhat.com>) id 1dzjKy-0006sy-Mh
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:03:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dzjKI-00014F-3D
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:03:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1dzjKs-0001xI-Vm
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:03:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40366)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dzjKs-0001wQ-QD
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:03:38 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <20171002140307.5292-1-armbru@redhat.com>
-	<20171002140307.5292-6-armbru@redhat.com>
-	<CAJ+F1CLNTLXrqBWVCwvfHuGpC6fzpHB1QvnxSP3-D0j+oY+bJw@mail.gmail.com>
-Date: Wed, 04 Oct 2017 15:02:53 +0200
-In-Reply-To: <CAJ+F1CLNTLXrqBWVCwvfHuGpC6fzpHB1QvnxSP3-D0j+oY+bJw@mail.gmail.com>
+References: <20171002141341.24616-1-armbru@redhat.com>
+	<20171002141341.24616-2-armbru@redhat.com>
+	<CAJ+F1CL0Nfy-bjsz0XW1HhfqphUB5BdyyroiRweWfFsXDJVmOA@mail.gmail.com>
+Date: Wed, 04 Oct 2017 15:03:35 +0200
+In-Reply-To: <CAJ+F1CL0Nfy-bjsz0XW1HhfqphUB5BdyyroiRweWfFsXDJVmOA@mail.gmail.com>
 	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 4 Oct 2017
-	12:12:45 +0200")
-Message-ID: <87bmlnm5fm.fsf@dusky.pond.sub.org>
+	12:12:20 +0200")
+Message-ID: <877ewbm5eg.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/8] qemu-options: Add missing -iscsi
- Texinfo documentation
+Subject: Re: [Qemu-devel] [PATCH 01/11] qapi-schema: Fix
+ query-vm-generation-id's doc comment markup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +32,20 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, QEMU <qemu-devel@nongnu.org>, "open list:Block layer core" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
 Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-> On Mon, Oct 2, 2017 at 4:03 PM, Markus Armbruster <armbru@redhat.com> wro=
+> On Mon, Oct 2, 2017 at 4:13 PM, Markus Armbruster <armbru@redhat.com> wro=
 te:
->> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
->> Cc: Kevin Wolf <kwolf@redhat.com>
->> Cc: Max Reitz <mreitz@redhat.com>
->> Cc: qemu-block@nongnu.org
+>> Reported-by: Daniel P. Berrange <berrange@redhat.com>
 >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >
 > Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> (that's very short doc)
 
-No argument.  It's what I could do while cleaning up a mess that's
-blocking my path to what I really want to do.  Patches welcome :)
+Thanks!
 
->> ---
->>  qemu-options.hx | 6 ++++++
->>  1 file changed, 6 insertions(+)
->>
->> diff --git a/qemu-options.hx b/qemu-options.hx
->> index c647fdde62..8568ee388c 100644
->> --- a/qemu-options.hx
->> +++ b/qemu-options.hx
->> @@ -1180,6 +1180,12 @@ DEF("iscsi", HAS_ARG, QEMU_OPTION_iscsi,
->>      "                iSCSI session parameters\n", QEMU_ARCH_ALL)
->>
->>  STEXI
->> +@item -iscsi
->> +@findex -iscsi
->> +Configure iSCSI session parameters.
->> +ETEXI
->> +
->> +STEXI
->>  @end table
->>  ETEXI
->>  DEFHEADING()
->> --
->> 2.13.6
->>
->>
+> (reviweing this patch makes me realize that the last
+> expression/command in qapi-schema isn't in the generated doc..)
+
+Oh.  We better fix that.
