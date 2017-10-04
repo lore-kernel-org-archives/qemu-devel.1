@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dzjRC-0002yj-0l
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:10:15 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1dzjYX-0005JZ-1z
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:17:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dzjR7-0008Vg-TQ
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:10:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36028)
+	(envelope-from <alex.williamson@redhat.com>) id 1dzjYQ-0008DR-TY
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:17:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59624)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dzjR7-0008Up-KM
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:10:05 -0400
-Date: Wed, 4 Oct 2017 15:09:56 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171004150956.0901d6c1.cohuck@redhat.com>
-In-Reply-To: <87k20bm6cw.fsf@dusky.pond.sub.org>
-References: <20170913132417.24384-1-david@redhat.com>
-	<20170913132417.24384-19-david@redhat.com>
-	<87k20eq9em.fsf@dusky.pond.sub.org>
-	<20171004100415.0f0ded10.cohuck@redhat.com>
-	<87k20bm6cw.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1dzjYQ-0008C9-L1
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:17:38 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6FA3C883DD
+	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 13:17:37 +0000 (UTC)
+Date: Wed, 4 Oct 2017 07:17:35 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20171004071735.66f20b86@t450s.home>
+In-Reply-To: <20171004083329.GB17517@redhat.com>
+References: <1505824179-21541-1-git-send-email-pbonzini@redhat.com>
+	<1505824179-21541-45-git-send-email-pbonzini@redhat.com>
+	<20171003160706.2671a6ea@t450s.home>
+	<20171004083329.GB17517@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 18/22] s390x: implement
- query-hotpluggable-cpus
+Subject: Re: [Qemu-devel] [PULL 44/50] scripts: let checkpatch.pl process an
+ entire GIT branch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +37,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Matthew Rosato <mjrosato@linux.vnet.ibm.com>, thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, 04 Oct 2017 14:42:55 +0200
-Markus Armbruster <armbru@redhat.com> wrote:
+On Wed, 4 Oct 2017 09:33:29 +0100
+"Daniel P. Berrange" <berrange@redhat.com> wrote:
 
-> Cornelia Huck <cohuck@redhat.com> writes:
+> On Tue, Oct 03, 2017 at 04:07:06PM -0600, Alex Williamson wrote:
+> > On Tue, 19 Sep 2017 14:29:33 +0200
+> > Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >   
+> > > From: "Daniel P. Berrange" <berrange@redhat.com>
+> > > 
+> > > Currently before submitting a series, devs should run checkpatch.pl
+> > > across each patch to be submitted. This can be automated using a
+> > > command such as:
+> > > 
+> > >   git rebase -i master -x 'git show | ./scripts/checkpatch.pl -'
+> > > 
+> > > This is rather long winded to type, so this patch introduces a way
+> > > to tell checkpatch.pl to validate a series of GIT revisions.
+> > > 
+> > > There are now three modes it can operate in 1) check a patch 2) check a source
+> > > file, or 3) check a git branch.
+> > > 
+> > > If no flags are given, the mode is determined by checking the args passed to
+> > > the command. If the args contain a literal ".." it is treated as a GIT revision
+> > > list. If the args end in ".patch" or equal "-" it is treated as a patch file.
+> > > Otherwise it is treated as a source file.
+> > > 
+> > > This automatic guessing can be overridden using --[no-]patch --[no-]file or
+> > > --[no-]branch
+> > > 
+> > > For example to check a GIT revision list:
+> > > 
+> > >     $ ./scripts/checkpatch.pl master..
+> > >     total: 0 errors, 0 warnings, 297 lines checked
+> > > 
+> > >     b886d352a2bf58f0996471fb3991a138373a2957 has no obvious style problems and is ready for submission.
+> > >     total: 0 errors, 0 warnings, 182 lines checked
+> > > 
+> > >     2a731f9a9ce145e0e0df6d42dd2a3ce4dfc543fa has no obvious style problems and is ready for submission.
+> > >     total: 0 errors, 0 warnings, 102 lines checked
+> > > 
+> > >     11844169bcc0c8ed4449eb3744a69877ed329dd7 has no obvious style problems and is ready for submission.
+> > > 
+> > > If a genuine patch filename contains the characters '..' it is
+> > > possible to force interpretation of the arg as a patch
+> > > 
+> > >   $ ./scripts/checkpatch.pl --patch master..
+> > > 
+> > > will force it to load a patch file called "master..", or equivalently
+> > > 
+> > >   $ ./scripts/checkpatch.pl --no-branch master..
+> > > 
+> > > will simply turn off guessing of GIT revision lists.
+> > > 
+> > > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > > Message-Id: <20170913091000.9005-1-berrange@redhat.com>
+> > > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > ---
+> > >  scripts/checkpatch.pl | 138 ++++++++++++++++++++++++++++++++++++++++----------
+> > >  1 file changed, 111 insertions(+), 27 deletions(-)  
+> > 
+> > 
+> > This introduces the following regression for me:
+> > 
+> > $ ./scripts/checkpatch.pl patches-next/vfio-pci-add-virtual
+> > ERROR: trailing whitespace
+> > #44: FILE: vfio-pci-add-virtual:44:  
 > 
-> > On Mon, 02 Oct 2017 09:46:41 +0200
-> > Markus Armbruster <armbru@redhat.com> wrote:
-> >  
-> >> David Hildenbrand <david@redhat.com> writes:
-> >>   
-> >> > CPU hotplug is only possible on a per core basis on s390x. So let's
-> >> > add possible_cpus and properly wire everything up.
-> >> >
-> >> > Signed-off-by: David Hildenbrand <david@redhat.com>    
-> >> [...]  
-> >> > diff --git a/qapi-schema.json b/qapi-schema.json
-> >> > index f3af2cb851..79e9f85404 100644
-> >> > --- a/qapi-schema.json
-> >> > +++ b/qapi-schema.json
-> >> > @@ -3121,6 +3121,22 @@
-> >> >  #      }
-> >> >  #    ]}
-> >> >  #
-> >> > +# For s390x-virtio-ccw machine type started with -smp 1,maxcpus=2 -cpu qemu
-> >> > +# (Since: 2.11):
-> >> > +#
-> >> > +# -> { "execute": "query-hotpluggable-cpus" }
-> >> > +# <- {"return": [
-> >> > +#      {
-> >> > +#         "type": "qemu-s390-cpu", "vcpus-count": 1,
-> >> > +#         "props": { "core-id": 1 }
-> >> > +#      },
-> >> > +#      {
-> >> > +#         "qom-path": "/machine/unattached/device[0]",
-> >> > +#         "type": "qemu-s390-cpu", "vcpus-count": 1,
-> >> > +#         "props": { "core-id": 0 }
-> >> > +#      }
-> >> > +#    ]}
-> >> > +#
-> >> >  ##
-> >> >  { 'command': 'query-hotpluggable-cpus', 'returns': ['HotpluggableCPU'] }    
-> >> 
-> >> Please stick in '# Example:' like we do in query-hotpluggable-cpus's doc
-> >> comment.  I expect the generated documentation to be illegible[*]
-> >> without it.  
-> >
-> > Should '# Example:' go before each of the examples (instead of the
-> > beginning of the example block), then?  
+> IIUC, it is treating 'patches-next/vfio-pci-add-virtual' as a plain
+> source file, rather than a patch file because its filename doesn't
+> include .patch at the end.
 > 
-> Whatever makes the generated documentation look better.
+> I the heuristic based on the idea that there's always be a .patch
+> at the end of patch files. git format-patch at least will do this
+> by default - is there a particular reason you've not got any file
+> extension ?
+> 
+> BTW, assuming this diagnosis is correct, if you use --patch
+> it should work. eg try
+> 
+> ./scripts/checkpatch.pl --patch patches-next/vfio-pci-add-virtual
 
-The pdf indeed looks ugly, but that's a preexisting problem, and adding
-more '# Example:' lines does not really help.
+Yes, it works with the new --patch option.  I use stgit which does
+not add a filename extension to the patch name on export, nor have I
+ever known patch files to have any accepted standard file extension.
+checkpatch.pl has always assumed it's operating on a patch file, as
+implied by the name of the script, with an option to check regular
+files.  I'd suggest maintaining behavior consistent with the script name
+using more comprehensive heuristics than a non-standard file extension.
+Thanks,
 
-The basic issue is that the code expects just one example and no
-additional text for the '# Example:' tag -- the explaining text for the
-various statements ends up looking like the qmp examples. That should
-be improved before doing a patch on top for this command (and I don't
-really have the skills or time to improve the output, sorry.)
+Alex
