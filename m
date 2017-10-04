@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgkw-0000J1-EI
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:18:23 -0400
+	(envelope-from <bounces@canonical.com>) id 1dzgnK-0002FH-2E
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:20:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgkv-0006oo-DK
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:18:22 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:54852)
+	(envelope-from <bounces@canonical.com>) id 1dzgnH-0000i5-0K
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:20:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56132)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dzgkv-0006oU-7c
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:18:21 -0400
-Received: by mail-qt0-x242.google.com with SMTP id i13so18136132qtc.11
-	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 03:18:21 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dzgnG-0000hm-QK
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:20:46 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1dzgnF-0004h4-P6
+	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 10:20:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B17EE2E80C9
+	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 10:20:45 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171002141341.24616-5-armbru@redhat.com>
-References: <20171002141341.24616-1-armbru@redhat.com>
-	<20171002141341.24616-5-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 4 Oct 2017 12:18:20 +0200
-Message-ID: <CAJ+F1CJzEMXezgTiey3V=cThkmC1Wz5Dzic6PNb6xAE8fRQBFQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 04/11] qapi: Make cur_doc local to
- QAPISchemaParser.__init__()
+Date: Wed, 04 Oct 2017 10:08:26 -0000
+From: "R.Nageswara Sastry" <nasastry@in.ibm.com>
+Reply-To: Bug 1721220 <1721220@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <150711170680.1346.17864224825794910388.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1721220] [NEW] qemu crashes with assertion error
+ `!mr->container' failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,108 +36,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Mon, Oct 2, 2017 at 4:13 PM, Markus Armbruster <armbru@redhat.com> wrote=
-:
-> QAPISchemaParser.cur_doc is used only by .__init__() and its helper
-> .reject_expr_doc().  Make it local to __init__() and pass it to
-> .reject_expr_doc() explicitly.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Public bug reported:
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Re-production steps:
+git clone today's qemu git tree (4th Oct 2017)
+./configure --target-list=3Dppc64-softmmu && make -j 8
 
+Run the device-crash-test from scripts folder, seeing the following
+error
 
-> ---
->  scripts/qapi.py | 34 +++++++++++++++++-----------------
->  1 file changed, 17 insertions(+), 17 deletions(-)
->
-> diff --git a/scripts/qapi.py b/scripts/qapi.py
-> index 6c8001e96d..2f2738f562 100644
-> --- a/scripts/qapi.py
-> +++ b/scripts/qapi.py
-> @@ -272,21 +272,21 @@ class QAPISchemaParser(object):
->          self.line_pos =3D 0
->          self.exprs =3D []
->          self.docs =3D []
-> -        self.cur_doc =3D None
->          self.accept()
-> +        cur_doc =3D None
->
->          while self.tok is not None:
->              info =3D {'file': self.fname, 'line': self.line,
->                      'parent': self.incl_info}
->              if self.tok =3D=3D '#':
-> -                self.reject_expr_doc()
-> -                self.cur_doc =3D self.get_doc(info)
-> -                self.docs.append(self.cur_doc)
-> +                self.reject_expr_doc(cur_doc)
-> +                cur_doc =3D self.get_doc(info)
-> +                self.docs.append(cur_doc)
->                  continue
->
->              expr =3D self.get_expr(False)
->              if 'include' in expr:
-> -                self.reject_expr_doc()
-> +                self.reject_expr_doc(cur_doc)
->                  if len(expr) !=3D 1:
->                      raise QAPISemError(info, "Invalid 'include' directiv=
-e")
->                  include =3D expr['include']
-> @@ -296,7 +296,7 @@ class QAPISchemaParser(object):
->                  self._include(include, info, os.path.dirname(abs_fname),
->                                previously_included)
->              elif "pragma" in expr:
-> -                self.reject_expr_doc()
-> +                self.reject_expr_doc(cur_doc)
->                  if len(expr) !=3D 1:
->                      raise QAPISemError(info, "Invalid 'pragma' directive=
-")
->                  pragma =3D expr['pragma']
-> @@ -308,22 +308,22 @@ class QAPISchemaParser(object):
->              else:
->                  expr_elem =3D {'expr': expr,
->                               'info': info}
-> -                if self.cur_doc:
-> -                    if not self.cur_doc.symbol:
-> +                if cur_doc:
-> +                    if not cur_doc.symbol:
->                          raise QAPISemError(
-> -                            self.cur_doc.info,
-> -                            "Expression documentation required")
-> -                    expr_elem['doc'] =3D self.cur_doc
-> +                            cur_doc.info, "Expression documentation requ=
-ired")
-> +                    expr_elem['doc'] =3D cur_doc
->                  self.exprs.append(expr_elem)
-> -            self.cur_doc =3D None
-> -        self.reject_expr_doc()
-> +            cur_doc =3D None
-> +        self.reject_expr_doc(cur_doc)
->
-> -    def reject_expr_doc(self):
-> -        if self.cur_doc and self.cur_doc.symbol:
-> +    @staticmethod
-> +    def reject_expr_doc(doc):
-> +        if doc and doc.symbol:
->              raise QAPISemError(
-> -                self.cur_doc.info,
-> +                doc.info,
->                  "Documentation for '%s' is not followed by the definitio=
-n"
-> -                % self.cur_doc.symbol)
-> +                % doc.symbol)
->
->      def _include(self, include, info, base_dir, previously_included):
->          incl_abs_fname =3D os.path.join(base_dir, include)
-> --
-> 2.13.6
->
->
+INFO: running test case: machine=3Dbamboo binary=3Dppc64-softmmu/qemu-syste=
+m-ppc64 device=3Dpcie-pci-bridge accel=3Dkvm
+WARNING: qemu received signal -6: ppc64-softmmu/qemu-system-ppc64 -chardev =
+socket,id=3Dmon,path=3D/var/tmp/qemu-30972-monitor.sock -mon chardev=3Dmon,=
+mode=3Dcontrol -display none -vga none -S -machine bamboo,accel=3Dkvm -devi=
+ce pcie-pci-bridge
+CRITICAL: failed: machine=3Dbamboo binary=3Dppc64-softmmu/qemu-system-ppc64=
+ device=3Dpcie-pci-bridge accel=3Dkvm
+CRITICAL: cmdline: ppc64-softmmu/qemu-system-ppc64 -S -machine bamboo,accel=
+=3Dkvm -device pcie-pci-bridge
+CRITICAL: log: qemu-system-ppc64: /home/nasastry/qemu/memory.c:1699: memory=
+_region_finalize: Assertion `!mr->container' failed.
+CRITICAL: log: warning: KVM does not support watchdog
+CRITICAL: exit code: -6
 
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
+-- =
 
---=20
-Marc-Andr=C3=A9 Lureau
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1721220
+
+Title:
+  qemu crashes with assertion error `!mr->container' failed
+
+Status in QEMU:
+  New
+
+Bug description:
+  Re-production steps:
+  git clone today's qemu git tree (4th Oct 2017)
+  ./configure --target-list=3Dppc64-softmmu && make -j 8
+
+  Run the device-crash-test from scripts folder, seeing the following
+  error
+
+  INFO: running test case: machine=3Dbamboo binary=3Dppc64-softmmu/qemu-sys=
+tem-ppc64 device=3Dpcie-pci-bridge accel=3Dkvm
+  WARNING: qemu received signal -6: ppc64-softmmu/qemu-system-ppc64 -charde=
+v socket,id=3Dmon,path=3D/var/tmp/qemu-30972-monitor.sock -mon chardev=3Dmo=
+n,mode=3Dcontrol -display none -vga none -S -machine bamboo,accel=3Dkvm -de=
+vice pcie-pci-bridge
+  CRITICAL: failed: machine=3Dbamboo binary=3Dppc64-softmmu/qemu-system-ppc=
+64 device=3Dpcie-pci-bridge accel=3Dkvm
+  CRITICAL: cmdline: ppc64-softmmu/qemu-system-ppc64 -S -machine bamboo,acc=
+el=3Dkvm -device pcie-pci-bridge
+  CRITICAL: log: qemu-system-ppc64: /home/nasastry/qemu/memory.c:1699: memo=
+ry_region_finalize: Assertion `!mr->container' failed.
+  CRITICAL: log: warning: KVM does not support watchdog
+  CRITICAL: exit code: -6
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1721220/+subscriptions
