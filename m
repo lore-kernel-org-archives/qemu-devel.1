@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dzj0z-00079H-GX
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:43:06 -0400
+	(envelope-from <quintela@redhat.com>) id 1dzj4b-0008HY-Ag
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:46:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dzj0v-0005sf-Jo
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:43:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40834)
+	(envelope-from <quintela@redhat.com>) id 1dzj4X-00022u-D2
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:46:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58892)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dzj0v-0005rf-AL
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:43:01 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170913132417.24384-1-david@redhat.com>
-	<20170913132417.24384-19-david@redhat.com>
-	<87k20eq9em.fsf@dusky.pond.sub.org>
-	<20171004100415.0f0ded10.cohuck@redhat.com>
-Date: Wed, 04 Oct 2017 14:42:55 +0200
-In-Reply-To: <20171004100415.0f0ded10.cohuck@redhat.com> (Cornelia Huck's
-	message of "Wed, 4 Oct 2017 10:04:15 +0200")
-Message-ID: <87k20bm6cw.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dzj4X-00020d-6g
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:46:45 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F29E94E33E
+	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 12:46:43 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <18ba5f7e-0d7e-fc5e-6cff-36ede10233f0@redhat.com> (Thomas Huth's
+	message of "Wed, 4 Oct 2017 14:33:55 +0200")
+References: <20171004103933.7898-1-quintela@redhat.com>
+	<20171004103933.7898-2-quintela@redhat.com>
+	<18ba5f7e-0d7e-fc5e-6cff-36ede10233f0@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 04 Oct 2017 14:46:34 +0200
+Message-ID: <87infvgjx1.fsf@secure.laptop>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v5 18/22] s390x: implement
- query-hotpluggable-cpus
+Subject: Re: [Qemu-devel] [PATCH 1/6] tests: Add basic migration precopy test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +35,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Matthew Rosato <mjrosato@linux.vnet.ibm.com>, thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-Cornelia Huck <cohuck@redhat.com> writes:
+Thomas Huth <thuth@redhat.com> wrote:
+> On 04.10.2017 12:39, Juan Quintela wrote:
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-> On Mon, 02 Oct 2017 09:46:41 +0200
-> Markus Armbruster <armbru@redhat.com> wrote:
 >
->> David Hildenbrand <david@redhat.com> writes:
->> 
->> > CPU hotplug is only possible on a per core basis on s390x. So let's
->> > add possible_cpus and properly wire everything up.
->> >
->> > Signed-off-by: David Hildenbrand <david@redhat.com>  
->> [...]
->> > diff --git a/qapi-schema.json b/qapi-schema.json
->> > index f3af2cb851..79e9f85404 100644
->> > --- a/qapi-schema.json
->> > +++ b/qapi-schema.json
->> > @@ -3121,6 +3121,22 @@
->> >  #      }
->> >  #    ]}
->> >  #
->> > +# For s390x-virtio-ccw machine type started with -smp 1,maxcpus=2 -cpu qemu
->> > +# (Since: 2.11):
->> > +#
->> > +# -> { "execute": "query-hotpluggable-cpus" }
->> > +# <- {"return": [
->> > +#      {
->> > +#         "type": "qemu-s390-cpu", "vcpus-count": 1,
->> > +#         "props": { "core-id": 1 }
->> > +#      },
->> > +#      {
->> > +#         "qom-path": "/machine/unattached/device[0]",
->> > +#         "type": "qemu-s390-cpu", "vcpus-count": 1,
->> > +#         "props": { "core-id": 0 }
->> > +#      }
->> > +#    ]}
->> > +#
->> >  ##
->> >  { 'command': 'query-hotpluggable-cpus', 'returns': ['HotpluggableCPU'] }  
->> 
->> Please stick in '# Example:' like we do in query-hotpluggable-cpus's doc
->> comment.  I expect the generated documentation to be illegible[*]
->> without it.
->
-> Should '# Example:' go before each of the examples (instead of the
-> beginning of the example block), then?
+> Looks like a lot of this code is the same or very similar to the code in
+> postcopy-test.c ... would it make sense to factor-out that code there
+> into a separate file that could be used by both tests, so that we do not
+> have to maintain the code twice?
 
-Whatever makes the generated documentation look better.
 
->> [*] If you want to perform a quick eye-over, try running "make
->> tests/qapi-schema/doc-good.test.txt" and examine the result.
->
-> Hmm... I might be missing something in my setup:
->
-> [cohuck@gondolin build]$ make tests/qapi-schema/doc-good.test.txt
->   GEN     tests/qapi-schema/doc-good.test.txt
-> tests/qapi-schema/doc-good.test.texi:79: @subsection seen before @end deftp
-> tests/qapi-schema/doc-good.test.texi:90: unmatched `@end deftp'
-> make: *** [Makefile:695: tests/qapi-schema/doc-good.test.txt] Error 1
+I think I put that on the cover letter,  my idea is to add the postcopy
+test here.  This is a streamlined version of the postcopy-test, just a
+barebones, and insntead of doing things by hand, I added helpers like:
 
-Pasto, sorry!  Try "make docs/interop/qemu-qmp-ref.txt".  .pdf and .html
-also work.
+migrate_set_parameter(...);
+
+You can see that on the following patches I added support for:
+- tcp
+- precopy with deprecated commands
+- xbzrle
+- compression threads (not working at the momment, have to investigate
+  why).
+
+Idea is if people like the approach to add on top of that:
+- exec: migration (needs changes because command line option on source
+  and destination are different)
+- fd: Dunno how difficult is, I have really never passed fd's around.
+- postocpy: It needs additional commandsn to be added.
+
+- Probably move to use events, instead of "waiting" for 1st stage to
+  finish.
+
+Right now, the three tests on my laptop require around 14 seconds (not
+running in parallel).  I want to "optimize" the tests to take a bit less
+time.
+
+Later, Juan.
