@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dzh5f-0007c0-P7
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:39:48 -0400
+	(envelope-from <quintela@redhat.com>) id 1dzh5h-0007eo-M2
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:39:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dzh5e-00048D-Lj
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:39:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56706)
+	(envelope-from <quintela@redhat.com>) id 1dzh5g-0004B4-Nz
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:39:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38848)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dzh5e-00047B-D1
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:39:46 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dzh5g-00049m-7j
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:39:48 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 72016C059B76
-	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 10:39:45 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3E623800A8
+	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 10:39:47 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed,  4 Oct 2017 12:39:31 +0200
-Message-Id: <20171004103933.7898-5-quintela@redhat.com>
+Date: Wed,  4 Oct 2017 12:39:32 +0200
+Message-Id: <20171004103933.7898-6-quintela@redhat.com>
 In-Reply-To: <20171004103933.7898-1-quintela@redhat.com>
 References: <20171004103933.7898-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/6] tests: Add migration xbzrle test
+Subject: [Qemu-devel] [PATCH 5/6] tests: Add migration compress threads tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,64 +32,23 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
+For some reason, compression is not working at the moment, test is
+disabled until I found why.
+
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- tests/migration-test.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 80 insertions(+)
+ tests/migration-test.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
 diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 8549e4c2c6..f0734e4ba0 100644
+index f0734e4ba0..a8abc3d007 100644
 --- a/tests/migration-test.c
 +++ b/tests/migration-test.c
-@@ -422,6 +422,23 @@ static void migrate_set_parameter(QTestState *who, const char *parameter,
-     QDECREF(rsp);
+@@ -621,6 +621,54 @@ static void test_xbzrle_unix(void)
+     g_free(uri);
  }
  
-+static void migrate_set_capability(QTestState *who, const char *capability,
-+                                   const char *value)
-+{
-+    QDict *rsp;
-+    gchar *cmd;
-+
-+    cmd = g_strdup_printf("{ 'execute': 'migrate-set-capabilities',"
-+                          "'arguments': { "
-+                            "'capabilities': [ { "
-+                              "'capability': '%s', 'state': %s } ] } }",
-+                          capability, value);
-+    rsp = qtest_qmp(who, cmd);
-+    g_free(cmd);
-+    g_assert(qdict_haskey(rsp, "return"));
-+    QDECREF(rsp);
-+}
-+
- static void migrate_set_downtime(QTestState *who, const char *value)
- {
-     QDict *rsp;
-@@ -448,6 +465,19 @@ static void migrate_set_speed(QTestState *who, const char *value)
-     QDECREF(rsp);
- }
- 
-+static void migrate_set_cache_size(QTestState *who, const char *value)
-+{
-+    QDict *rsp;
-+    gchar *cmd;
-+
-+    cmd = g_strdup_printf("{ 'execute': 'migrate-set-cache-size',"
-+                          "'arguments': { 'value': %s } }", value);
-+    rsp = qtest_qmp(who, cmd);
-+    g_free(cmd);
-+    g_assert(qdict_haskey(rsp, "return"));
-+    QDECREF(rsp);
-+}
-+
- static void test_precopy_deprecated(const char *uri)
- {
-     QTestState *from, *to;
-@@ -543,6 +573,55 @@ static void test_precopy_tcp(void)
-     test_precopy(uri);
- }
- 
-+static void test_xbzrle(const char *uri)
++static void test_compress(const char *uri)
 +{
 +    QTestState *from, *to;
 +
@@ -104,10 +63,11 @@ index 8549e4c2c6..f0734e4ba0 100644
 +    /* 1MB/s slow*/
 +    migrate_set_parameter(from, "max-bandwidth", "100000000");
 +
-+    migrate_set_cache_size(from, "50000000");
++    migrate_set_parameter(from, "compress-threads", "4");
++    migrate_set_parameter(from, "decompress-threads", "3"); 
 +
-+    migrate_set_capability(from, "xbzrle", "true");
-+    migrate_set_capability(to, "xbzrle", "true");
++    migrate_set_capability(from, "compress", "true");
++    migrate_set_capability(to, "compress", "true");
 +    /* Wait for the first serial output from the source */
 +    wait_for_serial("src_serial");
 +
@@ -129,23 +89,23 @@ index 8549e4c2c6..f0734e4ba0 100644
 +    test_migrate_end(from, to);
 +}
 +
-+static void test_xbzrle_unix(void)
++static void test_compress_unix(void)
 +{
 +    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
 +
-+    test_xbzrle(uri);
++    test_compress(uri);
 +    g_free(uri);
 +}
-+
-+
+ 
  int main(int argc, char **argv)
  {
-     char template[] = "/tmp/migration-test-XXXXXX";
-@@ -561,6 +640,7 @@ int main(int argc, char **argv)
-     qtest_add_func("/migration/precopy/unix", test_precopy_unix);
+@@ -641,6 +689,9 @@ int main(int argc, char **argv)
      qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
      qtest_add_func("/migration/deprecated/unix", test_deprecated_unix);
-+    qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
+     qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
++    if (0) {
++        qtest_add_func("/migration/compress/unix", test_compress_unix);
++    }
  
      ret = g_test_run();
  
