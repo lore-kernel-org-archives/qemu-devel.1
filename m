@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dzm3h-0008At-QU
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 11:58:06 -0400
+	(envelope-from <eblake@redhat.com>) id 1dzm6G-0002BI-Jr
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 12:00:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dzm3d-0003DE-Jr
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 11:58:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60644)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1dzm3d-0003BU-A6
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 11:58:01 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 16D847E427
-	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 15:58:00 +0000 (UTC)
-References: <20171004114008.14849-1-berrange@redhat.com>
-	<20171004114008.14849-3-berrange@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <8ac64a27-8e89-d131-b388-8ac557ab5ce6@redhat.com>
-Date: Wed, 4 Oct 2017 11:57:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1dzm6F-0006DF-MB
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 12:00:44 -0400
+References: <1507034861-4661-1-git-send-email-jan.dakinevich@virtuozzo.com>
+	<1507034861-4661-2-git-send-email-jan.dakinevich@virtuozzo.com>
+	<e77d7b78-a2ff-51a3-360e-c7d5d4e7006b@redhat.com>
+	<7735fee8-dcc0-edc1-2fd3-f2aee7fe2df1@virtuozzo.com>
+	<20171003162921.GB2335@work-vm>
+	<418e65f7-faae-2e78-2170-2721bd6b2305@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2a1df411-c809-cc3e-6471-fd6cc1653bd0@redhat.com>
+Date: Wed, 4 Oct 2017 11:00:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171004114008.14849-3-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] ide: support reporting of rotation
- rate
+In-Reply-To: <418e65f7-faae-2e78-2170-2721bd6b2305@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ikH9V3tdX8uKpHe0U1CUp6aA3upaXDKgt"
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] virtio: introduce `query-virtio'
+ QMP command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,84 +29,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: Jan Dakinevich <jan.dakinevich@virtuozzo.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Amit Shah <amit@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ikH9V3tdX8uKpHe0U1CUp6aA3upaXDKgt
+From: Eric Blake <eblake@redhat.com>
+To: Jan Dakinevich <jan.dakinevich@virtuozzo.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Amit Shah <amit@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org
+Message-ID: <2a1df411-c809-cc3e-6471-fd6cc1653bd0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] virtio: introduce `query-virtio' QMP
+ command
+References: <1507034861-4661-1-git-send-email-jan.dakinevich@virtuozzo.com>
+ <1507034861-4661-2-git-send-email-jan.dakinevich@virtuozzo.com>
+ <e77d7b78-a2ff-51a3-360e-c7d5d4e7006b@redhat.com>
+ <7735fee8-dcc0-edc1-2fd3-f2aee7fe2df1@virtuozzo.com>
+ <20171003162921.GB2335@work-vm>
+ <418e65f7-faae-2e78-2170-2721bd6b2305@virtuozzo.com>
+In-Reply-To: <418e65f7-faae-2e78-2170-2721bd6b2305@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 10/04/2017 09:26 AM, Jan Dakinevich wrote:
+
+>>>>> +{
+>>>>> +    'struct': 'VirtioInfo',
+>>>>> +    'data': {
+>>>>> +        'feature-names': ['VirtioInfoBit'],
+>>>>
+>>>> Why is feature-names listed at two different nestings of the return =
+value?
+>>>>
+>>>
+>>> These are different feature names. First names are common and predefi=
+ned
+>>> for all devices. Second names are device-specific.
+>>
+>> If you can turn these into enums (union'd enums?) then you might
+>> be able to get rid of a lot of your array filling/naming conversion
+>> boilerplate. (Not sure if it's worth it, but it's worth looking).
+>>
+>=20
+> I would be happy to drop this boilerplate, but how enum could help here=
+?
+> To respond my requirement it should be something like set, not enum.
+> Even so, having set, I would have been needed to declare mapping betwee=
+n
+> names in set type and bit numbers within feature bitmask.
+
+Instead of returning a bitmask ("mask":123) as well as an array naming
+those bits
+([{"bit":1,"name":"bit1"},{"bit":2","name":"bit2"},{"bit":4,"name":"bit4}=
+,...]),
+you could omit the bit numbers and just return an array of named bits
+(["bit1", "bit2", "bit4"]).  An enum lets you declare up front what
+named bits are supported (and code can introspect when new named bits
+are supported in newer qemu).
+
+Perhaps it's easier to first take a step back, and show what the desired
+output might be like, and then we can figure out how to represent that
+output in QAPI.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
+--ikH9V3tdX8uKpHe0U1CUp6aA3upaXDKgt
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 10/04/2017 07:40 AM, Daniel P. Berrange wrote:
-> The Linux kernel will query the ATA IDENTITY DEVICE data, word 217
-> to determine the rotations per minute of the disk. If this has
-> the value 1, it is taken to be an SSD and so Linux sets the
-> 'rotational' flag to 0 for the I/O queue and will stop using that
-> disk as a source of random entropy. Other operating systems may
-> also take into account rotation rate when setting up default
-> behaviour.
-> 
-> Mgmt apps should be able to set the rotation rate for virtualized
-> block devices, based on characteristics of the host storage in use,
-> so that the guest OS gets sensible behaviour out of the box. This
-> patch thus adds a 'rotation-rate' parameter for 'ide-hd' device
-> types.
-> 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  hw/ide/core.c             | 1 +
->  hw/ide/qdev.c             | 1 +
->  include/hw/ide/internal.h | 8 ++++++++
->  3 files changed, 10 insertions(+)
-> 
-> diff --git a/hw/ide/core.c b/hw/ide/core.c
-> index 5f1cd3b91f..a04766aee7 100644
-> --- a/hw/ide/core.c
-> +++ b/hw/ide/core.c
-> @@ -208,6 +208,7 @@ static void ide_identify(IDEState *s)
->      if (dev && dev->conf.discard_granularity) {
->          put_le16(p + 169, 1); /* TRIM support */
->      }
-> +    put_le16(p + 217, dev->rotation_rate); /* Nominal media rotation rate */
->  
->      ide_identify_size(s);
->      s->identify_set = 1;
-> diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-> index d60ac25be0..a5181b4448 100644
-> --- a/hw/ide/qdev.c
-> +++ b/hw/ide/qdev.c
-> @@ -299,6 +299,7 @@ static Property ide_hd_properties[] = {
->      DEFINE_BLOCK_CHS_PROPERTIES(IDEDrive, dev.conf),
->      DEFINE_PROP_BIOS_CHS_TRANS("bios-chs-trans",
->                  IDEDrive, dev.chs_trans, BIOS_ATA_TRANSLATION_AUTO),
-> +    DEFINE_PROP_UINT16("rotation_rate", IDEDrive, dev.rotation_rate, 0),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
-> index e641012b48..31851b44d1 100644
-> --- a/include/hw/ide/internal.h
-> +++ b/include/hw/ide/internal.h
-> @@ -508,6 +508,14 @@ struct IDEDevice {
->      char *serial;
->      char *model;
->      uint64_t wwn;
-> +    /*
-> +     * 0x0000        - rotation rate not reported
-> +     * 0x0001        - non-rotating medium (SSD)
-> +     * 0x0002-0x0400 - reserved
-> +     * 0x0401-0xffe  - rotations per minute
-> +     * 0xffff        - reserved
-> +     */
-> +    uint16_t rotation_rate;
->  };
->  
->  /* These are used for the error_status field of IDEBus */
-> 
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-With Eric's comment addressed:
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnVBYkACgkQp6FrSiUn
+Q2pxlgf/RknM2Udm+1vj1HG7MKawNEF66M2I98Z3gtKoQLUg2yO60rue9tmUmdMz
+rVVmnegz2wM4kKMytIgY2k2T+6VvvAv7LF18WIy1IMUODowPLMGsIcG5/TWkn9hl
+mqNdDQ09kTDUKBxfqCkXAMNqFYxFR6tMFlRsxLFwrauefrfRD/orGq8zfZ6IJbaZ
+741d7HlK4NUbj1t1zSyY13PZGeSWza7GYgFbmXG6WK7sd0nBru7kkMeYvxTv0RkR
+ebi40VROnZRmXfYh31Pqf1Sk0EbnWVCDXNtskFZPAuE2zHUPb3XopdRL+K7Al2gA
+C7k/K+LuaaePEA0nyRfzS/hSMjjPmA==
+=UxdR
+-----END PGP SIGNATURE-----
 
-Reviewed-by: John Snow <jsnow@redhat.com>
-
-It'd be nice if we could have a magic autodetect value, but this is a
-strict improvement anyway.
-
-(Actually, probably most of the identify data needs to be audited, but
-the perceived cost:benefit ratio doesn't look too favorable.)
+--ikH9V3tdX8uKpHe0U1CUp6aA3upaXDKgt--
