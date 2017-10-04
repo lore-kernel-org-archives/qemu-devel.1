@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1dzeMf-00061t-IO
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 03:45:15 -0400
+	(envelope-from <jfreimann@redhat.com>) id 1dzeQC-0006r7-Re
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 03:48:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1dzeMc-0008T5-GC
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 03:45:09 -0400
-Received: from mga02.intel.com ([134.134.136.20]:11565)
+	(envelope-from <jfreimann@redhat.com>) id 1dzeQ9-0002oR-PU
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 03:48:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49766)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
-	id 1dzeMc-0008SB-7T
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 03:45:06 -0400
-From: "Valluri, Amarnath" <amarnath.valluri@intel.com>
-Date: Wed, 4 Oct 2017 07:45:01 +0000
-Message-ID: <1507103131.2282.5.camel@intel.com>
-References: <1506683421-27004-1-git-send-email-amarnath.valluri@intel.com>
-	<1506683421-27004-9-git-send-email-amarnath.valluri@intel.com>
-	<306334f5-358e-a7df-b663-b1b77e78c934@linux.vnet.ibm.com>
-In-Reply-To: <306334f5-358e-a7df-b663-b1b77e78c934@linux.vnet.ibm.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2A3115B23C647444A99D2D7705384D5A@intel.com>
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <jfreimann@redhat.com>)
+	id 1dzeQ9-0002nw-JI
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 03:48:45 -0400
+Date: Wed, 4 Oct 2017 09:48:39 +0200
+From: Jens Freimann <jfreimann@redhat.com>
+Message-ID: <20171004074839.5be4pq347yray2b3@localhost.localdomain>
+References: <20170927152118.13328-1-jfreimann@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v10 8/9] tpm: Added support for TPM emulator
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20170927152118.13328-1-jfreimann@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] net: fix check for number of parameters
+ to -netdev socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "stefanb@linux.vnet.ibm.com" <stefanb@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "dgilbert@redhat.com" <dgilbert@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: jasowang@redhat.com, maozy.fnst@cn.fujitsu.com
 
-T24gVHVlLCAyMDE3LTEwLTAzIGF0IDE3OjIxIC0wNDAwLCBTdGVmYW4gQmVyZ2VyIHdyb3RlOg0K
-PiBPbiAwOS8yOS8yMDE3IDA3OjEwIEFNLCBBbWFybmF0aCBWYWxsdXJpIHdyb3RlOg0KPiA+IA0K
-PiA+IFRoaXMgY2hhbmdlIGludHJvZHVjZXMgYSBuZXcgVFBNIGJhY2tlbmQgZHJpdmVyIHRoYXQg
-Y2FuDQo+ID4gY29tbXVuaWNhdGUgd2l0aA0KPiA+IHN3dHBtKHNvZnR3YXJlIFRQTSBlbXVsYXRv
-cikgdXNpbmcgdW5peCBkb21haW4gc29ja2V0IGludGVyZmFjZS4NCj4gPiBRRU1VIHRhbGtzIHRv
-DQo+ID4gVFBNIGVtdWxhdG9yIHVzaW5nIFFFTVUncyBzb2NrZXQtYmFzZWQgY2hhcmRldiBiYWNr
-ZW5kIGRldmljZS4NCj4gPiANCj4gPiBTd3RwbSB1c2VzIHR3byBVbml4IHNvY2tldHMgZm9yIGNv
-bW11bmljYXRpb25zLCBvbmUgZm9yIHBsYWluIFRQTQ0KPiA+IGNvbW1hbmRzIGFuZA0KPiA+IHJl
-c3BvbnNlcywgYW5kIG9uZSBmb3Igb3V0LW9mLWJhbmQgY29udHJvbCBtZXNzYWdlcy4gUUVNVSBw
-YXNzZXMNCj4gPiBkYXRhIHNvY2tldCB0bw0KPiA+IGJlIHVzZWQgb3ZlciB0aGUgY29udHJvbCBj
-aGFubmVsLg0KPiA+IA0KPiA+IFRoZSBzd3RwbSBhbmQgYXNzb2NpYXRlZCB0b29scyBjYW4gYmUg
-Zm91bmQgaGVyZToNCj4gPiDCoMKgwqDCoMKgaHR0cHM6Ly9naXRodWIuY29tL3N0ZWZhbmJlcmdl
-ci9zd3RwbQ0KPiA+IA0KPiA+IFRoZSBzd3RwbSdzIGNvbnRyb2wgY2hhbm5lbCBwcm90b2NvbCBz
-cGVjaWZpY2F0aW9uIGNhbiBiZSBmb3VuZA0KPiA+IGhlcmU6DQo+ID4gwqDCoMKgwqDCoGh0dHBz
-Oi8vZ2l0aHViLmNvbS9zdGVmYW5iZXJnZXIvc3d0cG0vd2lraS9Db250cm9sLUNoYW5uZWwtU3Bl
-DQo+ID4gY2lmaWNhdGlvbg0KPiA+IA0KPiA+IFVzYWdlOg0KPiA+IMKgwqDCoMKgwqAjIHNldHVw
-IFRQTSBzdGF0ZSBkaXJlY3RvcnkNCj4gPiDCoMKgwqDCoMKgbWtkaXIgL3RtcC9teXRwbQ0KPiA+
-IMKgwqDCoMKgwqBjaG93biAtUiB0c3M6cm9vdCAvdG1wL215dHBtDQo+ID4gwqDCoMKgwqDCoC91
-c3IvYmluL3N3dHBtX3NldHVwIC0tdHBtLXN0YXRlIC90bXAvbXl0cG0gLS1jcmVhdGVlaw0KPiBU
-byBydW4gdGhpcywgb25lIG5lZWRzIHRoZSBsYXRlc3QgdmVyc2lvbiBvZiBzd3RwbSB0aGF0IHN1
-cHBvcnRzIHRoZcKgDQo+IGZpbGUgZGVzY3JpcHRvciBwYXNzaW5nLg0KPiBUaGVuIG9uZSBjYW4g
-c3RhcnQgdGhlIHN3dHBtIGxpa2UgdGhpczoNCj4gDQo+IHN3dHBtIHNvY2tldCAtLXRwbXN0YXRl
-IGRpcj0vdG1wL215dHBtIC0tY3RybMKgDQo+IHR5cGU9dW5peGlvLHBhdGg9L3RtcC9zd3RwbS1z
-b2NrIC0tbG9nIGxldmVsPTIwDQo+IA0KPiBJIHRlc3RlZCB0aGUgU2VhQklPUyBtZW51IGl0ZW1z
-IHNvIGZhciBhbmQgdGhhdCB3b3JrcyBmaW5lLCBhbHNvIGZvcsKgDQo+IFRQTTIgKC0tdHBtMiku
-DQoNCkdyZWF0ZSwgVGhhbmtzIGZvciB5b3UgZmVlZGJhY2suDQoNCi0gQW1hcm5hdGg=
+ping
+
+On Wed, Sep 27, 2017 at 03:21:18PM +0000, Jens Freimann wrote:
+>Since commit 0f8c289ad "net: fix -netdev socket,fd= for UDP sockets"
+>we allow more than one parameter for -netdev socket. But now
+>we run into an assert when no parameter at all is specified
+>
+>> qemu-system-x86_64 -netdev socket
+>socket.c:729: net_init_socket: Assertion `sock->has_udp' failed.
+>
+>Fix this by reverting the change of the if condition done in 0f8c289ad.
+>
+>Cc: Jason Wang <jasowang@redhat.com>
+>Fixes: 0f8c289ad539feb5135c545bea947b310a893f4b
+>Reported-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+>
+>---
+>v2->v3:
+>- go back to the original check != 1. No need for more than one
+>  argument, putting sock->has_fd back into the calculation is enough
+>
+>v1->v2:
+>- add check to prevent listen= and connect= being used at the same time
+>
+> net/socket.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
+>
+>diff --git a/net/socket.c b/net/socket.c
+>index e6b471c63d..83a2a31025 100644
+>--- a/net/socket.c
+>+++ b/net/socket.c
+>@@ -695,8 +695,8 @@ int net_init_socket(const Netdev *netdev, const char *name,
+>     assert(netdev->type == NET_CLIENT_DRIVER_SOCKET);
+>     sock = &netdev->u.socket;
+>
+>-    if (sock->has_listen + sock->has_connect + sock->has_mcast +
+>-        sock->has_udp > 1) {
+>+    if (sock->has_fd + sock->has_listen + sock->has_connect + sock->has_mcast +
+>+        sock->has_udp != 1) {
+>         error_setg(errp, "exactly one of listen=, connect=, mcast= or udp="
+>                    " is required");
+>         return -1;
+>-- 
+>2.13.5
+>
+>
