@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dzoXq-00070C-If
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 14:37:23 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dzodo-00088k-Dy
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 14:43:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dzoXm-0005nP-LB
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 14:37:22 -0400
-Resent-Message-Id: <E1dzoXm-0005nP-LB@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21482)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dzoXm-0005m1-Dp
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 14:37:18 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150714217015.153.939212709472417601@b58463cdfd5f>
-In-Reply-To: <1507132392-25051-1-git-send-email-ian.jackson@eu.citrix.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 4 Oct 2017 11:36:10 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] xen: xen-domid-restrict improvements
+	(envelope-from <richard.henderson@linaro.org>) id 1dzodn-0002Xq-HC
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 14:43:32 -0400
+Received: from mail-qt0-x231.google.com ([2607:f8b0:400d:c0d::231]:48926)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dzodn-0002XV-AY
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 14:43:31 -0400
+Received: by mail-qt0-x231.google.com with SMTP id d13so20371295qta.5
+	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 11:43:30 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Wed,  4 Oct 2017 14:43:13 -0400
+Message-Id: <20171004184325.24157-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v1 00/12] ARM v8.1 simd + v8.3 complex insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ian.jackson@eu.citrix.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, anthony.perard@citrix.com, ross.lagerwall@citrix.com, sstabellini@kernel.org, jgross@suse.com, xen-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MDcxMzIzOTItMjUwNTEtMS1naXQtc2VuZC1lbWFpbC1pYW4uamFja3NvbkBl
-dS5jaXRyaXguY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC83XSB4ZW46IHhl
-bi1kb21pZC1yZXN0cmljdCBpbXByb3ZlbWVudHMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
-IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
-RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQg
-bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
-CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
-bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
-cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
-ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
-NDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjhmYzdlMDg2OWQg
-UkZDIGNvbmZpZ3VyZTogZG9fY29tcGlsZXI6IER1bXAgc29tZSBleHRyYSBpbmZvIHVuZGVyIGJh
-c2gKNTQ5YTRhMmMzNyBvcy1wb3NpeDogUHJvdmlkZSBuZXcgLXJ1bmFzaWQgb3B0aW9uCmJjODc3
-YWYzZDMgeGVuOiBkZXN0cm95X2h2bV9kb21haW46IFRyeSB4ZW5kZXZpY2Vtb2RlbF9zaHV0ZG93
-bgpiODkyYWQ1ZmJlIHhlbjogbW92ZSB4Y19pbnRlcmZhY2UgY29tcGF0aWJpbGl0eSBmYWxsYmFj
-ayBmdXJ0aGVyIHVwIHRoZSBmaWxlCjJkOTcwOTFkNjMgeGVuOiBkZXN0cm95X2h2bV9kb21haW46
-IE1vdmUgcmVhc29uIGludG8gYSB2YXJpYWJsZQplMGNmMzYyYTkzIHhlbjogZGVmZXIgY2FsbCB0
-byB4ZW5fcmVzdHJpY3QgdW50aWwgYWZ0ZXIgb3Nfc2V0dXBfcG9zdAo0MzM5ODk0YjFkIHhlbjog
-cmVzdHJpY3Q6IHVzZSB4ZW50b29sY29yZV9yZXN0cmljdF9hbGwKNzdjNzhmMjQ0ZiB4ZW46IGxp
-bmsgYWdhaW5zdCB4ZW50b29sY29yZQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFU
-Q0ggMS84OiB4ZW46IGxpbmsgYWdhaW5zdCB4ZW50b29sY29yZS4uLgpDaGVja2luZyBQQVRDSCAy
-Lzg6IHhlbjogcmVzdHJpY3Q6IHVzZSB4ZW50b29sY29yZV9yZXN0cmljdF9hbGwuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMy84OiB4ZW46IGRlZmVyIGNhbGwgdG8geGVuX3Jlc3RyaWN0IHVudGlsIGFmdGVy
-IG9zX3NldHVwX3Bvc3QuLi4KQ2hlY2tpbmcgUEFUQ0ggNC84OiB4ZW46IGRlc3Ryb3lfaHZtX2Rv
-bWFpbjogTW92ZSByZWFzb24gaW50byBhIHZhcmlhYmxlLi4uCkNoZWNraW5nIFBBVENIIDUvODog
-eGVuOiBtb3ZlIHhjX2ludGVyZmFjZSBjb21wYXRpYmlsaXR5IGZhbGxiYWNrIGZ1cnRoZXIgdXAg
-dGhlIGZpbGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNi84OiB4ZW46IGRlc3Ryb3lfaHZtX2RvbWFpbjog
-VHJ5IHhlbmRldmljZW1vZGVsX3NodXRkb3duLi4uCkNoZWNraW5nIFBBVENIIDcvODogb3MtcG9z
-aXg6IFByb3ZpZGUgbmV3IC1ydW5hc2lkIG9wdGlvbi4uLgpFUlJPUjogY29uc2lkZXIgdXNpbmcg
-cWVtdV9zdHJ0b3VsIGluIHByZWZlcmVuY2UgdG8gc3RydG91bAojNDI6IEZJTEU6IG9zLXBvc2l4
-LmM6MTYwOgorICAgICAgICBsdiA9IHN0cnRvdWwob3B0YXJnLCAmZXAsIDApOyAvKiBjYW4ndCBx
-ZW11X3N0cnRvdWwsIHdhbnQgKmVwPT0nLicgKi8KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
-cywgODAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoKQ2hlY2tpbmcgUEFUQ0ggOC84OiBSRkMgY29uZmlndXJlOiBkb19jb21waWxlcjogRHVtcCBz
-b21lIGV4dHJhIGluZm8gdW5kZXIgYmFzaC4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
-bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
-ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+This patch set depends on v3 of native-vector-registers;
+for ease of review the whole tree is at
+
+  git://github.com/rth7680/qemu.git tgt-arm-cplx
+
+I have successfully tested all insns for AArch64 via RISU.
+I have successfully tested everything but VCMLA for AArch32.
+
+The insn that doesn't match up is
+
+  fef3c848  vcmla.f32  q14, <illegal reg q1.5>, d8[0], #270
+
+for which FoundationModel is *not* signalling illegal insn.
+I'm not really sure what it is doing -- perhaps treating the
+insn as a coprocessor 8 nop?  I'll have to investigate further.
+
+In the meantime, it's surely time for a round 1 review.
+
+
+r~
+
+
+Richard Henderson (12):
+  HACK: use objdump disas
+  target/arm: Add ARM_FEATURE_V8_1_SIMD
+  target/arm: Decode aa64 armv8.1 scalar three same extra
+  target/arm: Decode aa64 armv8.1 three same extra
+  target/arm: Decode aa64 armv8.1 scalar/vector x indexed element
+  target/arm: Decode aa32 armv8.1 three same
+  target/arm: Decode aa32 armv8.1 two reg and a scalar
+  target/arm: Add ARM_FEATURE_V8_FCMA
+  target/arm: Decode aa64 armv8.3 fcadd
+  target/arm: Decode aa64 armv8.3 fcmla
+  target/arm: Decode aa32 armv8.3 3-same
+  target/arm: Decode aa32 armv8.3 2-reg-index
+
+ target/arm/cpu.h            |   2 +
+ target/arm/helper.h         |  26 ++++
+ disas.c                     |   2 +-
+ linux-user/elfload.c        |  10 ++
+ target/arm/advsimd_helper.c | 331 +++++++++++++++++++++++++++++++++++++++++
+ target/arm/cpu.c            |   2 +
+ target/arm/cpu64.c          |   2 +
+ target/arm/translate-a64.c  | 350 +++++++++++++++++++++++++++++++++++++++-----
+ target/arm/translate.c      | 241 +++++++++++++++++++++++++++---
+ target/arm/Makefile.objs    |   2 +-
+ 10 files changed, 912 insertions(+), 56 deletions(-)
+ create mode 100644 target/arm/advsimd_helper.c
+
+-- 
+2.13.6
