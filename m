@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dzlym-0003mC-8T
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 11:53:01 -0400
+	(envelope-from <prvs=4438c69fc=Ian.Jackson@citrix.com>)
+	id 1dzlzB-00047O-E8
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 11:53:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dzlyh-0006YQ-NM
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 11:53:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51760)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dzlyh-0006XK-Dp
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 11:52:55 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5CD3C61469
-	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 15:52:54 +0000 (UTC)
-References: <20171004103933.7898-1-quintela@redhat.com>
-	<20171004103933.7898-2-quintela@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7b27cb2f-6830-6698-4629-a1dd8dc8a08b@redhat.com>
-Date: Wed, 4 Oct 2017 10:52:50 -0500
+	(envelope-from <prvs=4438c69fc=Ian.Jackson@citrix.com>)
+	id 1dzlzA-0006ww-Ho
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 11:53:25 -0400
+Received: from smtp.citrix.com ([66.165.176.89]:37067)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=4438c69fc=Ian.Jackson@citrix.com>)
+	id 1dzlzA-0006rl-At
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 11:53:24 -0400
+From: Ian Jackson <ian.jackson@eu.citrix.com>
+Date: Wed, 4 Oct 2017 16:53:10 +0100
+Message-ID: <1507132392-25051-7-git-send-email-ian.jackson@eu.citrix.com>
+In-Reply-To: <1507132392-25051-1-git-send-email-ian.jackson@eu.citrix.com>
+References: <1507132392-25051-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <20171004103933.7898-2-quintela@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="0q0aJkO8dCvCcDkbOUTTXFMW9WfDF3ePV"
-Subject: Re: [Qemu-devel] [PATCH 1/6] tests: Add basic migration precopy test
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 6/8] xen: destroy_hvm_domain: Try
+ xendevicemodel_shutdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,59 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, =Anthony PERARD <anthony.perard@citrix.com>, xen-devel@nongnu.org, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0q0aJkO8dCvCcDkbOUTTXFMW9WfDF3ePV
-From: Eric Blake <eblake@redhat.com>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
-Message-ID: <7b27cb2f-6830-6698-4629-a1dd8dc8a08b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/6] tests: Add basic migration precopy test
-References: <20171004103933.7898-1-quintela@redhat.com>
- <20171004103933.7898-2-quintela@redhat.com>
-In-Reply-To: <20171004103933.7898-2-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+xc_interface_open etc. is not going to work if we have dropped
+privilege, but xendevicemodel_shutdown will if everything is new
+enough.
 
-On 10/04/2017 05:39 AM, Juan Quintela wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  tests/Makefile.include |   3 +
->  tests/migration-test.c | 497 +++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  2 files changed, 500 insertions(+)
->  create mode 100644 tests/migration-test.c
+xendevicemodel_shutdown is only availabe in Xen 4.10 and later, so
+provide a stub for earlier versions.
 
-New file; should it be mentioned in MAINTAINERS?
+Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
+---
+v2: Add compatibility stub for Xen < 4.10.
+    Fix coding style.
 
-At least you picked a name that matches .gitignore's existing '*.test'
-exclusion when the binary is built in-tree.
+Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
+---
+ hw/i386/xen/xen-hvm.c       | 10 ++++++++++
+ include/hw/xen/xen_common.h |  7 +++++++
+ 2 files changed, 17 insertions(+)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---0q0aJkO8dCvCcDkbOUTTXFMW9WfDF3ePV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnVA9IACgkQp6FrSiUn
-Q2ppgggAlywPSHCZDcpLHnhJr1N0zp4NbFDw4ojn9h1xGB9b2g310clfJLjpOj0S
-lX7epjx0czcnuLcg23oBJ2hzxf3ixA1IgDOKdQqkiLHZYGaIi4nosQ6axcVbZOWm
-afQy0ECJI6uiazCXEUY20YxIlJn+QPBH+8T7srtX659uuCd23Zyxwwe2aKZ8CyHf
-/Cch9+TjNI4Ud5i+hHgJiNYzx+fHeB5zl4VkYBCL3J9CQkQaWLhe5xJVPJ2BKWAR
-xbYL2Gj2zseDH/YSNha4U8gxHVYGIPPQwjp9ZUd2Xa+JvOimkp6LlZLHaY1tv7zz
-Tple6mDPiwlNr4119vyUrgtw9dViTw==
-=xr2T
------END PGP SIGNATURE-----
-
---0q0aJkO8dCvCcDkbOUTTXFMW9WfDF3ePV--
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index 83420cd..25b8b14 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -1386,9 +1386,19 @@ void destroy_hvm_domain(bool reboot)
+ {
+     xc_interface *xc_handle;
+     int sts;
++    int rc;
+ 
+     unsigned int reason = reboot ? SHUTDOWN_reboot : SHUTDOWN_poweroff;
+ 
++    if (xen_dmod) {
++        rc = xendevicemodel_shutdown(xen_dmod, xen_domid, reason);
++        if (!rc) {
++            return;
++        }
++        perror("xendevicemodel_shutdown failed");
++        /* well, try the old thing then */
++    }
++
+     xc_handle = xc_interface_open(0, 0, 0);
+     if (xc_handle == NULL) {
+         fprintf(stderr, "Cannot acquire xenctrl handle\n");
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index 8efdb8a..1d6fb57 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -108,6 +108,13 @@ static inline int xentoolcore_restrict_all(domid_t domid)
+     return -1;
+ }
+ 
++static inline int xendevicemodel_shutdown(xendevicemodel_handle *dmod,
++                                          domid_t domid, unsigned int reason)
++{
++    errno = ENOTTY;
++    return -1;
++}
++
+ #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 41000 */
+ 
+ #include <xentoolcore.h>
+-- 
+2.1.4
