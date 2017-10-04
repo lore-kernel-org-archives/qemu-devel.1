@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dzZ08-0000nn-1Y
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:01:33 -0400
+	(envelope-from <eblake@redhat.com>) id 1dzZ08-0000oZ-QC
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:01:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dzZ06-00060A-Fm
+	(envelope-from <eblake@redhat.com>) id 1dzZ07-00060o-Fa
 	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:01:32 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Tue,  3 Oct 2017 21:00:25 -0500
-Message-Id: <20171004020048.26379-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 00/23] make bdrv_get_block_status byte-based
+Date: Tue,  3 Oct 2017 21:00:27 -0500
+Message-Id: <20171004020048.26379-3-eblake@redhat.com>
+In-Reply-To: <20171004020048.26379-1-eblake@redhat.com>
+References: <20171004020048.26379-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 02/23] block: Add flag to avoid wasted work
+ in bdrv_is_allocated()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,106 +21,193 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-There are patches floating around to add NBD_CMD_BLOCK_STATUS,
-but NBD wants to report status on byte granularity (even if the
-reporting will probably be naturally aligned to sectors or even
-much higher levels).  I've therefore started the task of
-converting our block status code to report at a byte granularity
-rather than sectors.
+Not all callers care about which BDS owns the mapping for a given
+range of the file.  In particular, bdrv_is_allocated() cares more
+about finding the largest run of allocated data from the guest
+perspective, whether or not that data is consecutive from the
+host perspective, and whether or not the data reads as zero.
+Therefore, doing subsequent refinements such as checking how much
+of the format-layer allocation also satisfies BDRV_BLOCK_ZERO at
+the protocol layer is wasted work - in the best case, it just
+costs extra CPU cycles during a single bdrv_is_allocated(), but
+in the worst case, it results in a smaller *pnum, and forces
+callers to iterate through more status probes when visiting the
+entire file for even more extra CPU cycles.
 
-Now that 2.11 is open, I'm rebasing/reposting the remaining patches.
+This patch only optimizes the block layer (no behavior change when
+mapping is true, but skip unnecessary effort when it is false).
+Then when subsequent patches tweak the driver callback to be
+byte-based, we can also pass this hint through to the driver.
 
-The overall conversion currently looks like:
-part 1: bdrv_is_allocated (merged, commit 51b0a488)
-part 2: dirty-bitmap (v10 is queued [1])
-part 3: bdrv_get_block_status (this series, v4 at [2])
-part 4: .bdrv_co_block_status (v3 is posted [4], mostly reviewed)
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 
-Available as a tag at:
-git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-status-v4
+---
+v5: tweak commit message and one comment, rebase to previous changes,
+minor enough to still add R-b
+v4: only context changes
+v3: s/allocation/mapping/ and flip sense of bool
+v2: new patch
+---
+ block/io.c | 52 ++++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 38 insertions(+), 14 deletions(-)
 
-Based-on: <20170925145526.32690-1-eblake@redhat.com>
-([PATCH v10 00/20] make dirty-bitmap byte-based)
-Based-on: <20171004014347.25099-1-eblake@redhat.com>
-([PATCH v2 0/5] block: Avoid copy-on-read assertions)
+diff --git a/block/io.c b/block/io.c
+index e5a6f63eea..0d8cdab583 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1754,6 +1754,7 @@ typedef struct BdrvCoGetBlockStatusData {
+     int nb_sectors;
+     int *pnum;
+     int64_t ret;
++    bool mapping;
+     bool done;
+ } BdrvCoGetBlockStatusData;
 
-[1] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg06848.html
-[2] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03543.html
-[3] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03812.html
-[4] https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg00524.html
+@@ -1788,6 +1789,11 @@ int64_t coroutine_fn bdrv_co_get_block_status_from_backing(BlockDriverState *bs,
+  * Drivers not implementing the functionality are assumed to not support
+  * backing files, hence all their sectors are reported as allocated.
+  *
++ * If 'mapping' is true, the caller is querying for mapping purposes,
++ * and the result should include BDRV_BLOCK_OFFSET_VALID and
++ * BDRV_BLOCK_ZERO where possible; otherwise, the result may omit those
++ * bits particularly if it allows for a larger value in 'pnum'.
++ *
+  * If 'sector_num' is beyond the end of the disk image the return value is
+  * BDRV_BLOCK_EOF and 'pnum' is set to 0.
+  *
+@@ -1804,6 +1810,7 @@ int64_t coroutine_fn bdrv_co_get_block_status_from_backing(BlockDriverState *bs,
+  * is allocated in.
+  */
+ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
++                                                     bool mapping,
+                                                      int64_t sector_num,
+                                                      int nb_sectors, int *pnum,
+                                                      BlockDriverState **file)
+@@ -1854,14 +1861,15 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
 
-Since v4:
-- rebase to fixes for copy-on-read
-- tweak bdrv_co_block_status goto/label usage for easier reading [John]
-- more added comments and improved commit messages
-- fix a couple of bugs, such as wrong trace-events usage
-- add R-b where things didn't change drastically
+     if (ret & BDRV_BLOCK_RAW) {
+         assert(ret & BDRV_BLOCK_OFFSET_VALID && local_file);
+-        ret = bdrv_co_get_block_status(local_file, ret >> BDRV_SECTOR_BITS,
++        ret = bdrv_co_get_block_status(local_file, mapping,
++                                       ret >> BDRV_SECTOR_BITS,
+                                        local_pnum, &local_pnum, &local_file);
+         goto out;
+     }
 
-001/23:[0042] [FC] 'block: Allow NULL file for bdrv_get_block_status()'
-002/23:[0006] [FC] 'block: Add flag to avoid wasted work in bdrv_is_allocated()'
-003/23:[0003] [FC] 'block: Make bdrv_round_to_clusters() signature more useful'
-004/23:[----] [--] 'qcow2: Switch is_zero_sectors() to byte-based'
-005/23:[----] [--] 'block: Switch bdrv_make_zero() to byte-based'
-006/23:[----] [--] 'qemu-img: Switch get_block_status() to byte-based'
-007/23:[0010] [FC] 'block: Convert bdrv_get_block_status() to bytes'
-008/23:[0042] [FC] 'block: Switch bdrv_co_get_block_status() to byte-based'
-009/23:[----] [--] 'block: Switch BdrvCoGetBlockStatusData to byte-based'
-010/23:[----] [--] 'block: Switch bdrv_common_block_status_above() to byte-based'
-011/23:[----] [-C] 'block: Switch bdrv_co_get_block_status_above() to byte-based'
-012/23:[0019] [FC] 'block: Convert bdrv_get_block_status_above() to bytes'
-013/23:[0008] [FC] 'qemu-img: Simplify logic in img_compare()'
-014/23:[----] [--] 'qemu-img: Speed up compare on pre-allocated larger file'
-015/23:[----] [--] 'qemu-img: Add find_nonzero()'
-016/23:[----] [--] 'qemu-img: Drop redundant error message in compare'
-017/23:[----] [--] 'qemu-img: Change check_empty_sectors() to byte-based'
-018/23:[----] [--] 'qemu-img: Change compare_sectors() to be byte-based'
-019/23:[----] [--] 'qemu-img: Change img_rebase() to be byte-based'
-020/23:[0005] [FC] 'qemu-img: Change img_compare() to be byte-based'
-021/23:[0061] [FC] 'block: Align block status requests'
-022/23:[----] [--] 'block: Relax bdrv_aligned_preadv() assertion'
-023/23:[----] [--] 'qemu-io: Relax 'alloc' now that block-status doesn't assert'
+     if (ret & (BDRV_BLOCK_DATA | BDRV_BLOCK_ZERO)) {
+         ret |= BDRV_BLOCK_ALLOCATED;
+-    } else {
++    } else if (mapping) {
+         if (bdrv_unallocated_blocks_are_zero(bs)) {
+             ret |= BDRV_BLOCK_ZERO;
+         } else if (bs->backing) {
+@@ -1873,12 +1881,13 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
+         }
+     }
 
-Eric Blake (23):
-  block: Allow NULL file for bdrv_get_block_status()
-  block: Add flag to avoid wasted work in bdrv_is_allocated()
-  block: Make bdrv_round_to_clusters() signature more useful
-  qcow2: Switch is_zero_sectors() to byte-based
-  block: Switch bdrv_make_zero() to byte-based
-  qemu-img: Switch get_block_status() to byte-based
-  block: Convert bdrv_get_block_status() to bytes
-  block: Switch bdrv_co_get_block_status() to byte-based
-  block: Switch BdrvCoGetBlockStatusData to byte-based
-  block: Switch bdrv_common_block_status_above() to byte-based
-  block: Switch bdrv_co_get_block_status_above() to byte-based
-  block: Convert bdrv_get_block_status_above() to bytes
-  qemu-img: Simplify logic in img_compare()
-  qemu-img: Speed up compare on pre-allocated larger file
-  qemu-img: Add find_nonzero()
-  qemu-img: Drop redundant error message in compare
-  qemu-img: Change check_empty_sectors() to byte-based
-  qemu-img: Change compare_sectors() to be byte-based
-  qemu-img: Change img_rebase() to be byte-based
-  qemu-img: Change img_compare() to be byte-based
-  block: Align block status requests
-  block: Relax bdrv_aligned_preadv() assertion
-  qemu-io: Relax 'alloc' now that block-status doesn't assert
+-    if (local_file && local_file != bs &&
++    if (mapping && local_file && local_file != bs &&
+         (ret & BDRV_BLOCK_DATA) && !(ret & BDRV_BLOCK_ZERO) &&
+         (ret & BDRV_BLOCK_OFFSET_VALID)) {
+         int file_pnum;
 
- include/block/block.h      |  26 ++--
- include/block/block_int.h  |  11 +-
- block/io.c                 | 303 +++++++++++++++++++++----------------
- block/blkdebug.c           |  13 +-
- block/mirror.c             |  24 +--
- block/qcow2-cluster.c      |   2 +-
- block/qcow2.c              |  53 +++----
- qemu-img.c                 | 365 ++++++++++++++++++++-------------------------
- qemu-io-cmds.c             |  13 --
- block/trace-events         |   2 +-
- tests/qemu-iotests/074.out |   2 -
- tests/qemu-iotests/177     |  12 +-
- tests/qemu-iotests/177.out |  19 ++-
- 13 files changed, 431 insertions(+), 414 deletions(-)
+-        ret2 = bdrv_co_get_block_status(local_file, ret >> BDRV_SECTOR_BITS,
++        ret2 = bdrv_co_get_block_status(local_file, mapping,
++                                        ret >> BDRV_SECTOR_BITS,
+                                         local_pnum, &file_pnum, NULL);
+         if (ret2 >= 0) {
+             /* Ignore errors.  This is just providing extra information, it
+@@ -1915,6 +1924,7 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
 
+ static int64_t coroutine_fn bdrv_co_get_block_status_above(BlockDriverState *bs,
+         BlockDriverState *base,
++        bool mapping,
+         int64_t sector_num,
+         int nb_sectors,
+         int *pnum,
+@@ -1926,7 +1936,8 @@ static int64_t coroutine_fn bdrv_co_get_block_status_above(BlockDriverState *bs,
+
+     assert(bs != base);
+     for (p = bs; p != base; p = backing_bs(p)) {
+-        ret = bdrv_co_get_block_status(p, sector_num, nb_sectors, pnum, file);
++        ret = bdrv_co_get_block_status(p, mapping, sector_num, nb_sectors,
++                                       pnum, file);
+         if (ret < 0) {
+             break;
+         }
+@@ -1956,6 +1967,7 @@ static void coroutine_fn bdrv_get_block_status_above_co_entry(void *opaque)
+     BdrvCoGetBlockStatusData *data = opaque;
+
+     data->ret = bdrv_co_get_block_status_above(data->bs, data->base,
++                                               data->mapping,
+                                                data->sector_num,
+                                                data->nb_sectors,
+                                                data->pnum,
+@@ -1968,11 +1980,12 @@ static void coroutine_fn bdrv_get_block_status_above_co_entry(void *opaque)
+  *
+  * See bdrv_co_get_block_status_above() for details.
+  */
+-int64_t bdrv_get_block_status_above(BlockDriverState *bs,
+-                                    BlockDriverState *base,
+-                                    int64_t sector_num,
+-                                    int nb_sectors, int *pnum,
+-                                    BlockDriverState **file)
++static int64_t bdrv_common_block_status_above(BlockDriverState *bs,
++                                              BlockDriverState *base,
++                                              bool mapping,
++                                              int64_t sector_num,
++                                              int nb_sectors, int *pnum,
++                                              BlockDriverState **file)
+ {
+     Coroutine *co;
+     BdrvCoGetBlockStatusData data = {
+@@ -1982,6 +1995,7 @@ int64_t bdrv_get_block_status_above(BlockDriverState *bs,
+         .sector_num = sector_num,
+         .nb_sectors = nb_sectors,
+         .pnum = pnum,
++        .mapping = mapping,
+         .done = false,
+     };
+
+@@ -1997,6 +2011,16 @@ int64_t bdrv_get_block_status_above(BlockDriverState *bs,
+     return data.ret;
+ }
+
++int64_t bdrv_get_block_status_above(BlockDriverState *bs,
++                                    BlockDriverState *base,
++                                    int64_t sector_num,
++                                    int nb_sectors, int *pnum,
++                                    BlockDriverState **file)
++{
++    return bdrv_common_block_status_above(bs, base, true, sector_num,
++                                          nb_sectors, pnum, file);
++}
++
+ int64_t bdrv_get_block_status(BlockDriverState *bs,
+                               int64_t sector_num,
+                               int nb_sectors, int *pnum,
+@@ -2009,15 +2033,15 @@ int64_t bdrv_get_block_status(BlockDriverState *bs,
+ int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
+                                    int64_t bytes, int64_t *pnum)
+ {
+-    int64_t sector_num = offset >> BDRV_SECTOR_BITS;
+-    int nb_sectors = bytes >> BDRV_SECTOR_BITS;
+     int64_t ret;
+     int psectors;
+
+     assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
+     assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE) && bytes < INT_MAX);
+-    ret = bdrv_get_block_status(bs, sector_num, nb_sectors, &psectors,
+-                                NULL);
++    ret = bdrv_common_block_status_above(bs, backing_bs(bs), false,
++                                         offset >> BDRV_SECTOR_BITS,
++                                         bytes >> BDRV_SECTOR_BITS, &psectors,
++                                         NULL);
+     if (ret < 0) {
+         return ret;
+     }
 -- 
 2.13.6
