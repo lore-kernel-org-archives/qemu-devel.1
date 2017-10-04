@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dzZ0b-0001Me-Qu
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:02:03 -0400
+	(envelope-from <eblake@redhat.com>) id 1dzZ0e-0001Sw-Uc
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:02:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dzZ0W-0006Mm-Vt
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:02:01 -0400
+	(envelope-from <eblake@redhat.com>) id 1dzZ0d-0006Sr-Vo
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:02:05 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Tue,  3 Oct 2017 21:00:41 -0500
-Message-Id: <20171004020048.26379-17-eblake@redhat.com>
+Date: Tue,  3 Oct 2017 21:00:43 -0500
+Message-Id: <20171004020048.26379-19-eblake@redhat.com>
 In-Reply-To: <20171004020048.26379-1-eblake@redhat.com>
 References: <20171004020048.26379-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 16/23] qemu-img: Drop redundant error
- message in compare
+Subject: [Qemu-devel] [PATCH v5 18/23] qemu-img: Change compare_sectors() to
+ be byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,100 +23,133 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-If a read error is encountered during 'qemu-img compare', we
-were printing the "Error while reading offset ..." message twice;
-this was because our helper function was awkward, printing output
-on some but not all paths.  Fix it to consistently report errors
-on all paths, so that the callers do not risk a redundant message,
-and update the testsuite for the improved output.
-
-Further simplify the code by hoisting the conversion from an error
-message to an exit code into the helper function, rather than
-repeating that logic at all callers (yes, the helper function is
-now less generic, but it's a net win in lines of code).
+In the continuing quest to make more things byte-based, change
+compare_sectors(), renaming it to compare_buffers() in the
+process.  Note that one caller (qemu-img compare) only cares
+about the first difference, while the other (qemu-img rebase)
+cares about how many consecutive sectors have the same
+equal/different status; however, this patch does not bother to
+micro-optimize the compare case to avoid the comparisons of
+sectors beyond the first mismatch.  Both callers are always
+passing valid buffers in, so the initial check for buffer size
+can be turned into an assertion.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 
 ---
-v5: tweak commit message, but no code change
-v4: no change
+v4-v5: no change
 v3: new patch
 ---
- qemu-img.c                 | 19 +++++--------------
- tests/qemu-iotests/074.out |  2 --
- 2 files changed, 5 insertions(+), 16 deletions(-)
+ qemu-img.c | 55 +++++++++++++++++++++++++++----------------------------
+ 1 file changed, 27 insertions(+), 28 deletions(-)
 
 diff --git a/qemu-img.c b/qemu-img.c
-index 12881f008e..a8ed5d990d 100644
+index 016d0cc23a..b988c718aa 100644
 --- a/qemu-img.c
 +++ b/qemu-img.c
-@@ -1197,8 +1197,10 @@ static int64_t sectors_to_bytes(int64_t sectors)
+@@ -1156,31 +1156,28 @@ static int is_allocated_sectors_min(const uint8_t *buf, int n, int *pnum,
+ }
+
  /*
-  * Check if passed sectors are empty (not allocated or contain only 0 bytes)
+- * Compares two buffers sector by sector. Returns 0 if the first sector of both
+- * buffers matches, non-zero otherwise.
++ * Compares two buffers sector by sector. Returns 0 if the first
++ * sector of each buffer matches, non-zero otherwise.
   *
-- * Returns 0 in case sectors are filled with 0, 1 if sectors contain non-zero
-- * data and negative value on error.
-+ * Intended for use by 'qemu-img compare': Returns 0 in case sectors are
-+ * filled with 0, 1 if sectors contain non-zero data (this is a comparison
-+ * failure), and 4 on error (the exit status for read errors), after emitting
-+ * an error message.
-  *
-  * @param blk:  BlockBackend for the image
-  * @param sect_num: Number of first sector to check
-@@ -1219,7 +1221,7 @@ static int check_empty_sectors(BlockBackend *blk, int64_t sect_num,
-     if (ret < 0) {
-         error_report("Error while reading offset %" PRId64 " of %s: %s",
-                      sectors_to_bytes(sect_num), filename, strerror(-ret));
--        return ret;
-+        return 4;
-     }
-     idx = find_nonzero(buffer, sect_count * BDRV_SECTOR_SIZE);
-     if (idx >= 0) {
-@@ -1477,11 +1479,6 @@ static int img_compare(int argc, char **argv)
-                                           filename2, buf1, quiet);
-             }
-             if (ret) {
--                if (ret < 0) {
--                    error_report("Error while reading offset %" PRId64 ": %s",
--                                 sectors_to_bytes(sector_num), strerror(-ret));
--                    ret = 4;
--                }
-                 goto out;
-             }
+- * pnum is set to the number of sectors (including and immediately following
+- * the first one) that are known to have the same comparison result
++ * pnum is set to the sector-aligned size of the buffer prefix that
++ * has the same matching status as the first sector.
+  */
+-static int compare_sectors(const uint8_t *buf1, const uint8_t *buf2, int n,
+-    int *pnum)
++static int compare_buffers(const uint8_t *buf1, const uint8_t *buf2,
++                           int64_t bytes, int64_t *pnum)
+ {
+     bool res;
+-    int i;
++    int64_t i = MIN(bytes, BDRV_SECTOR_SIZE);
+
+-    if (n <= 0) {
+-        *pnum = 0;
+-        return 0;
+-    }
++    assert(bytes > 0);
+
+-    res = !!memcmp(buf1, buf2, 512);
+-    for(i = 1; i < n; i++) {
+-        buf1 += 512;
+-        buf2 += 512;
++    res = !!memcmp(buf1, buf2, i);
++    while (i < bytes) {
++        int64_t len = MIN(bytes - i, BDRV_SECTOR_SIZE);
+
+-        if (!!memcmp(buf1, buf2, 512) != res) {
++        if (!!memcmp(buf1 + i, buf2 + i, len) != res) {
+             break;
          }
-@@ -1526,12 +1523,6 @@ static int img_compare(int argc, char **argv)
-                 ret = check_empty_sectors(blk_over, sector_num, nb_sectors,
-                                           filename_over, buf1, quiet);
-                 if (ret) {
--                    if (ret < 0) {
--                        error_report("Error while reading offset %" PRId64
--                                     " of %s: %s", sectors_to_bytes(sector_num),
--                                     filename_over, strerror(-ret));
--                        ret = 4;
--                    }
++        i += len;
+     }
+
+     *pnum = i;
+@@ -1255,7 +1252,7 @@ static int img_compare(int argc, char **argv)
+     int64_t total_sectors;
+     int64_t sector_num = 0;
+     int64_t nb_sectors;
+-    int c, pnum;
++    int c;
+     uint64_t progress_base;
+     bool image_opts = false;
+     bool force_share = false;
+@@ -1440,6 +1437,8 @@ static int img_compare(int argc, char **argv)
+             /* nothing to do */
+         } else if (allocated1 == allocated2) {
+             if (allocated1) {
++                int64_t pnum;
++
+                 nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
+                 ret = blk_pread(blk1, sector_num << BDRV_SECTOR_BITS, buf1,
+                                 nb_sectors << BDRV_SECTOR_BITS);
+@@ -1459,11 +1458,11 @@ static int img_compare(int argc, char **argv)
+                     ret = 4;
                      goto out;
                  }
-             }
-diff --git a/tests/qemu-iotests/074.out b/tests/qemu-iotests/074.out
-index 8fba5aea9c..ede66c3f81 100644
---- a/tests/qemu-iotests/074.out
-+++ b/tests/qemu-iotests/074.out
-@@ -4,7 +4,6 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
- wrote 512/512 bytes at offset 512
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- qemu-img: Error while reading offset 0 of blkdebug:TEST_DIR/blkdebug.conf:TEST_DIR/t.IMGFMT: Input/output error
--qemu-img: Error while reading offset 0: Input/output error
- 4
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
- Formatting 'TEST_DIR/t.IMGFMT.2', fmt=IMGFMT size=0
-@@ -12,7 +11,6 @@ Formatting 'TEST_DIR/t.IMGFMT.2', fmt=IMGFMT size=0
- wrote 512/512 bytes at offset 512
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- qemu-img: Error while reading offset 0 of blkdebug:TEST_DIR/blkdebug.conf:TEST_DIR/t.IMGFMT: Input/output error
--qemu-img: Error while reading offset 0 of blkdebug:TEST_DIR/blkdebug.conf:TEST_DIR/t.IMGFMT: Input/output error
- Warning: Image size mismatch!
- 4
- Cleanup
+-                ret = compare_sectors(buf1, buf2, nb_sectors, &pnum);
+-                if (ret || pnum != nb_sectors) {
++                ret = compare_buffers(buf1, buf2,
++                                      nb_sectors * BDRV_SECTOR_SIZE, &pnum);
++                if (ret || pnum != nb_sectors * BDRV_SECTOR_SIZE) {
+                     qprintf(quiet, "Content mismatch at offset %" PRId64 "!\n",
+-                            sectors_to_bytes(
+-                                ret ? sector_num : sector_num + pnum));
++                            sectors_to_bytes(sector_num) + (ret ? 0 : pnum));
+                     ret = 1;
+                     goto out;
+                 }
+@@ -3354,16 +3353,16 @@ static int img_rebase(int argc, char **argv)
+             /* If they differ, we need to write to the COW file */
+             uint64_t written = 0;
+
+-            while (written < n) {
+-                int pnum;
++            while (written < n * BDRV_SECTOR_SIZE) {
++                int64_t pnum;
+
+-                if (compare_sectors(buf_old + written * 512,
+-                    buf_new + written * 512, n - written, &pnum))
++                if (compare_buffers(buf_old + written,
++                                    buf_new + written,
++                                    n * BDRV_SECTOR_SIZE - written, &pnum))
+                 {
+                     ret = blk_pwrite(blk,
+-                                     (sector + written) << BDRV_SECTOR_BITS,
+-                                     buf_old + written * 512,
+-                                     pnum << BDRV_SECTOR_BITS, 0);
++                                     (sector << BDRV_SECTOR_BITS) + written,
++                                     buf_old + written, pnum, 0);
+                     if (ret < 0) {
+                         error_report("Error while writing to COW image: %s",
+                             strerror(-ret));
 -- 
 2.13.6
