@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dzgPt-00037Y-MM
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 05:56:41 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dzgS3-0004qS-Lk
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 05:58:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dzgPp-0004Io-Nn
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 05:56:37 -0400
-Date: Wed, 4 Oct 2017 20:44:25 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171004094425.GY3260@umbus.fritz.box>
-References: <150710775137.16096.2606042109300213433.stgit@bahia.lan>
+	(envelope-from <pbonzini@redhat.com>) id 1dzgRy-0006zd-VV
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 05:58:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53096)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dzgRy-0006xX-P3
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 05:58:46 -0400
+References: <20170929110052.6111-1-kraxel@redhat.com>
+	<CAFEAcA-8gaOhkuNX9hBt0Ofg-CKkJ-v8puHJ4K3QOq0ZGMgB5w@mail.gmail.com>
+	<1507106598.27227.2.camel@redhat.com>
+	<9d566b88-7991-b9f4-8b73-737a99d3ac6d@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <84018e17-ecf2-71ff-b70e-0f53c3464e68@redhat.com>
+Date: Wed, 4 Oct 2017 11:58:40 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="g3IWFuR7/O9KKcN6"
-Content-Disposition: inline
-In-Reply-To: <150710775137.16096.2606042109300213433.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH] spapr: sanity check size of the CAS buffer
+In-Reply-To: <9d566b88-7991-b9f4-8b73-737a99d3ac6d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/3] Usb 20170929 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,84 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-
---g3IWFuR7/O9KKcN6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Oct 04, 2017 at 11:02:31AM +0200, Greg Kurz wrote:
-> The CAS buffer is provided by SLOF. A broken SLOF could pass a silly
-> size: either smaller than the diff header, in which case the current
-> code will try to allocate 16 Exabytes of memory and g_malloc0() will
-> abort, or bigger than the maximum memory provisioned for SLOF (ie,
-> 40 Megabytes), which doesn't make sense. Both cases indicate that
-> SLOF has a bug.
-
-Actually, it's much worse than that: SLOF is what's *expected* to call
-H_CAS, but nothing actually prevents anything in the guest from
-calling it and blowing up qemu.  Or, worse, allocating a large amount
-of memory outside the guest's address space.
-
-> Let's print out an explicit error message and exit since rebooting as
-> we do with other errors would only result in a reset loop.
+On 04/10/2017 11:37, Thomas Huth wrote:
+> Ah, deja vu. I think you've now run into the problem that I had with my
+> patch, too - see:
 >=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-
-Applied.
-
-> ---
->  hw/ppc/spapr.c |    7 +++++++
->  1 file changed, 7 insertions(+)
+>  https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01875.html
+>  https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg02082.html
 >=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index b284e0b9d43e..1a2ca8a22b6d 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -819,6 +819,13 @@ int spapr_h_cas_compose_response(sPAPRMachineState *=
-spapr,
->          return 1;
->      }
-> =20
-> +    if (size < sizeof(hdr) || size > FW_MAX_SIZE) {
-> +        error_report("SLOF provided an unexpected CAS buffer size "
-> +                     TARGET_FMT_lu " (min: %lu, max: %u)",
-> +                     size, sizeof(hdr), FW_MAX_SIZE);
-> +        exit(EXIT_FAILURE);
-> +    }
-> +
->      size -=3D sizeof(hdr);
-> =20
->      /* Create skeleton */
+> I think this is a race condition when building with "make -j" in
+> parallel. Just add a line like this and you should be fine:
 >=20
+> common-obj-$(CONFIG_ALL) +=3D host-stub.o
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+That's correct!  Maybe it should be documented in build-system.txt.
 
---g3IWFuR7/O9KKcN6
-Content-Type: application/pgp-signature; name="signature.asc"
+It's basically an optimization, CONFIG_ALL is used when some stubs are
+not used in all subtargets but you still want to build them once-only.
 
------BEGIN PGP SIGNATURE-----
+Then the toplevel Makefile will typically see the configuration symbol
+as defined (because it operates on the union of all targets'
+configuration symbols), and will skip builting the "stubs" file.  Using
+CONFIG_ALL for the stubs file ensures that the object file is available
+before recursing.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnUrXkACgkQbDjKyiDZ
-s5LbshAA3lTG+OBZySIueV5EZfsbaxMbX/8+HofSDoSOLktL8JeAVz74dMtAEMAf
-DVS44y4zgMI1uacEWtlIlLrD5byXW9Oiji0pNX+UxI+PYAUTQxi8//1Uw2+6vBeY
-Jvb022dh7G9XjZ1iakb7/lu/htQyXaIAwbhlKQnH0rreYv8/u4u+Jq/wVPbA+qVN
-aondngrtBRU6eUC5f27P9vxq3WtHsXcw//olGpnlMroUAKX/7AOJF2hfBlLrLkKi
-Bw8wMCr+iDstwpNZnm6CrFf9NRn2WzAQ5ZBgAQBiafNEDV6gjrI6sZ3nIyWiuZuY
-Wm2ca/F8Z0xrZMmA0H+wZQQinvwto6CPtpN5l8gbFvwxMT/WmS3TQUEab/ht+GKJ
-k/F5aZSaFIGrARz9nH331hOWsbnYAEDTFkGNAJrqWjBF6tpUF/2FeP1thOPcSdp2
-XDwSejJjAFnJh7HVhniPkeUbOQvv6dmuZ5muSoTPZm3fs1rPlnoJZUkvSkYCnT+r
-7/SmP819bZ667l/zHmeXefCKkHzyIDlN6AdiKi/50Fckf012rlOLLd97w6SYnX2/
-x8z/8VuYNGA8VNU8n550vtlZt6iEaPbXttrsAi3A7zSehs+NXpw91vXKGWE6+lbT
-As6Y4FkUbP5VjiTnxNQY4P9tys0qSDaZzikDnynlhPKocSZmgbg=
-=1sHD
------END PGP SIGNATURE-----
-
---g3IWFuR7/O9KKcN6--
+Paolo
