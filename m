@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dziVc-0006gt-6k
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:10:46 -0400
+	(envelope-from <berrange@redhat.com>) id 1dzieq-0000gJ-FY
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:20:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dziVb-0007bB-9Z
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:10:40 -0400
+	(envelope-from <berrange@redhat.com>) id 1dzieg-0007la-A6
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:20:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59238)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dzieg-0007hi-3i
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:20:02 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B132B935A3
+	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 12:20:00 +0000 (UTC)
+Date: Wed, 4 Oct 2017 13:19:54 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171004121954.GI17517@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171004114008.14849-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171002152552.27999-28-armbru@redhat.com>
-References: <20171002152552.27999-1-armbru@redhat.com>
-	<20171002152552.27999-28-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 4 Oct 2017 14:10:36 +0200
-Message-ID: <CAJ+F1CLManx1hv5vEuHC+J6R-GLJiUC2XWOti0nwakBDDAoEhw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 27/32] os-posix: Drop misleading comment
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171004114008.14849-1-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 0/2] Reporting of rotation rate for disks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,45 +33,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu trival <qemu-trivial@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 
-CC qemu-trivial
+On Wed, Oct 04, 2017 at 12:40:06PM +0100, Daniel P. Berrange wrote:
+> While looking at libvirt tagged questions on serverfault I saw
+> someone ask how to indicate that a virtual disk is an SSD rather
+> than rotating rust.
+> 
+> https://serverfault.com/questions/876467/how-to-add-virtual-storage-as-ssd-in-kvm
+> 
+> IIUC, IDE / SCSI don't really have an explicit concept of a
+> disk being SSD vs HDD, but they do have a means of reporting
+> the disk rotation rate and both specify that SSDs should
+> report RPM==1.
+> 
+> Linux uses this to determine whether to set the 'rotational'
+> property to 0 for the I/O queue, and also whether to allow
+> the disk to contribute random entropy (only HDDs contribute).
+> 
+> This felt like something QEMU ought to allow the mgmt application
+> to set based on the storage it is using to back the virtual block
+> devices. So this series adds a 'rotation_rate' property to the
+> SCSI and IDE disks, taking an RPM value per their respective
+> specifications.
 
-On Mon, Oct 2, 2017 at 5:25 PM, Markus Armbruster <armbru@redhat.com> wrote=
-:
-> Comments explaining why we include a header tend to go bad.  This
-> one's almost comical: not only doesn't qemu-options.hx use
-> MAP_POPULATE anymore (since commit ef36fa1, v2.0.0, 2013), even the
-> include it applies to got moved away in commit 02d0e09 (v2.7.0).
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+BTW, to verify these patches there's two ways:
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+  # smartctl -a /dev/sda | grep Rotation
+  Rotation Rate:        15000 rpm
 
+  # smartctl -a /dev/sdb | grep Rotation
+  Rotation Rate:        Solid State Device
 
-> ---
->  os-posix.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/os-posix.c b/os-posix.c
-> index 92e9d85215..b9c2343b1e 100644
-> --- a/os-posix.c
-> +++ b/os-posix.c
-> @@ -25,7 +25,6 @@
->
->  #include "qemu/osdep.h"
->  #include <sys/wait.h>
-> -/*needed for MAP_POPULATE before including qemu-options.h */
->  #include <pwd.h>
->  #include <grp.h>
->  #include <libgen.h>
-> --
-> 2.13.6
->
->
+Before these patches, 'Rotation rate' is not reported by smartctl
+at all. With these patches the default value of '0' means nothing
+will be reported too. Only if set to a non-zero value will it
+be reported.
+
+Or look at kernel queue:
+
+  # cat /sys/block/sda/queue/rotational 
+  1
+
+  # cat /sys/block/sdb/queue/rotational 
+  0
 
 
 
---=20
-Marc-Andr=C3=A9 Lureau
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
