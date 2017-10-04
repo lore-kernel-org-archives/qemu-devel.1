@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dzmGU-0001fh-OH
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 12:11:24 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1dzmLM-0003KA-6H
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 12:16:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dzmGQ-0008DM-KT
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 12:11:18 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56584)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dzmGQ-0008C2-Eo
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 12:11:14 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dzmGO-0008UY-IW
-	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 16:11:12 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8B5BA2E8047
-	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 16:11:12 +0000 (UTC)
+	(envelope-from <alex.williamson@redhat.com>) id 1dzmLG-00033e-B3
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 12:16:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51716)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1dzmLG-00032B-1r
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 12:16:14 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E9749859FA
+	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 16:16:12 +0000 (UTC)
+Date: Wed, 4 Oct 2017 10:16:11 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20171004101611.7c06009c@t450s.home>
+In-Reply-To: <4141ed57-05be-b60e-d66f-dd5fe08a2ac2@redhat.com>
+References: <1505824179-21541-1-git-send-email-pbonzini@redhat.com>
+	<1505824179-21541-45-git-send-email-pbonzini@redhat.com>
+	<20171003160706.2671a6ea@t450s.home>
+	<20171004083329.GB17517@redhat.com>
+	<20171004071735.66f20b86@t450s.home>
+	<4141ed57-05be-b60e-d66f-dd5fe08a2ac2@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Oct 2017 15:57:17 -0000
-From: Joe Clifford <joeclifford@gmail.com>
-Reply-To: Bug 1721221 <1721221@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150711207545.12908.17996297593812507930.malonedeb@wampee.canonical.com>
-Message-Id: <150713263724.2207.6229676379221966035.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1721221] Re: PCI-E passthrough of Nvidia GTX GFX
- card to Win 10 guest fails with "kvm_set_phys_mem: error registering slot:
- Invalid argument"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 44/50] scripts: let checkpatch.pl process an
+ entire GIT branch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,116 +39,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 
-Apologies, the title of this bug might be very misleading. I've made a
-huge assumption that PCI-E GFX card pass-through was triggering the bug,
-purely because a Debian Stretch guest VM on the same host, using the
-same build of QEMU, which uses virtio-vga for graphics and the same
-version of OVMF firmware, boots up fine.
+On Wed, 4 Oct 2017 16:11:07 +0200
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
--- =
+> On 04/10/2017 15:17, Alex Williamson wrote:
+> > Yes, it works with the new --patch option.  I use stgit which does
+> > not add a filename extension to the patch name on export, nor have I
+> > ever known patch files to have any accepted standard file extension.
+> > checkpatch.pl has always assumed it's operating on a patch file, as
+> > implied by the name of the script, with an option to check regular
+> > files.  I'd suggest maintaining behavior consistent with the script name
+> > using more comprehensive heuristics than a non-standard file extension.
+> > Thanks,  
+> 
+> We are already limiting source files to only a handful of extensions, 
+> perhaps we can reuse that in the DWIM mode selection code.  While at it,
+> do not match "../foo" as a branch name:
+> 
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index 3c0a28e644..9eca0f8458 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -11,6 +11,8 @@ use warnings;
+>  my $P = $0;
+>  $P =~ s@.*/@@g;
+>  
+> +our $SrcFile    = qr{\.(?:h|c|cpp|s|S|pl|py|sh)$};
+> +
+>  my $V = '0.31';
+>  
+>  use Getopt::Long qw(:config no_auto_abbrev);
+> @@ -101,30 +103,29 @@ if ($#ARGV < 0) {
+>  }
+>  
+>  if (!defined $chk_branch && !defined $chk_patch && !defined $file) {
+> -	$chk_branch = $ARGV[0] =~ /\.\./ ? 1 : 0;
+> -	$chk_patch = $chk_branch ? 0 :
+> -		$ARGV[0] =~ /\.patch$/ || $ARGV[0] eq "-" ? 1 : 0;
+> -	$file = $chk_branch || $chk_patch ? 0 : 1;
+> +	$chk_branch = $ARGV[0] =~ /.\.\./ ? 1 : 0;
+> +	$file = $ARGV[0] =~ /$SrcFile/ ? 1 : 0;
+> +	$chk_patch = $chk_branch || $file ? 0 : 1;
+>  } elsif (!defined $chk_branch && !defined $chk_patch) {
+>  	if ($file) {
+>  		$chk_branch = $chk_patch = 0;
+>  	} else {
+> -		$chk_branch = $ARGV[0] =~ /\.\./ ? 1 : 0;
+> +		$chk_branch = $ARGV[0] =~ /.\.\./ ? 1 : 0;
+>  		$chk_patch = $chk_branch ? 0 : 1;
+>  	}
+>  } elsif (!defined $chk_branch && !defined $file) {
+>  	if ($chk_patch) {
+>  		$chk_branch = $file = 0;
+>  	} else {
+> -		$chk_branch = $ARGV[0] =~ /\.\./ ? 1 : 0;
+> +		$chk_branch = $ARGV[0] =~ /.\.\./ ? 1 : 0;
+>  		$file = $chk_branch ? 0 : 1;
+>  	}
+>  } elsif (!defined $chk_patch && !defined $file) {
+>  	if ($chk_branch) {
+>  		$chk_patch = $file = 0;
+>  	} else {
+> -		$chk_patch = $ARGV[0] =~ /\.patch$/ || $ARGV[0] eq "-" ? 1 : 0;
+> -		$file = $chk_patch ? 0 : 1;
+> +		$file = $ARGV[0] =~ /$SrcFile/ ? 1 : 0;
+> +		$chk_patch = $file ? 0 : 1;
+>  	}
+>  } elsif (!defined $chk_branch) {
+>  	$chk_branch = $chk_patch || $file ? 0 : 1;
+> @@ -1442,7 +1443,7 @@ sub process {
+>  		}
+>  
+>  # check we are in a valid source file if not then ignore this hunk
+> -		next if ($realfile !~ /\.(h|c|cpp|s|S|pl|py|sh)$/);
+> +		next if ($realfile !~ /$SrcFile/);
+>  
+>  #90 column limit
+>  		if ($line =~ /^\+/ &&
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1721221
+Thanks Paolo
 
-Title:
-  PCI-E passthrough of Nvidia GTX GFX card to Win 10 guest fails with
-  "kvm_set_phys_mem: error registering slot: Invalid argument"
-
-Status in QEMU:
-  New
-
-Bug description:
-  Problem: =
-
-  Passthrough of a PCI-E Nvidia GTX 970 GFX card to a Windows 10 guest from=
- a Debian Stretch host fails after recent changes to kvm in QEMU master/tru=
-nk. Before this recent commit, everything worked as expected.
-
-  QEMU Version:
-  Master/trunk pulled from github 4/10/17 ( git reflog: d147f7e815 HEAD@{0}=
- )
-
-  Host:
-  Debian Stretch kernel SMP Debian 4.9.30-2+deb9u5 (2017-09-19) x86_64 GNU/=
-Linux
-
-  Guest:
-  Windows 10 Professional
-
-  Issue is with this commit:
-  https://github.com/qemu/qemu/commit/f357f564be0bd45245b3ccfbbe20ace08fe83=
-ca8
-
-  Subsequent commit does not help:
-  https://github.com/qemu/qemu/commit/3110cdbd8a4845c5b5fb861b0a664c56d993d=
-d3c#diff-7b7a17f6e8ba4195198dd685073f43cb
-
-  Error output from qemu: =
-
-  (qemu) kvm_set_phys_mem: error registering slot: Invalid argument
-
-  QEMU commandline used:
-
-  ./sources/qemu/x86_64-softmmu/qemu-system-x86_64 -machine q35,accel=3Dkvm=
- -serial none -parallel none -name Windows \
-  -enable-kvm -cpu host,kvm=3Doff,hv_vendor_id=3Dsugoidesu,-hypervisor -smp=
- 6,sockets=3D1,cores=3D3,threads=3D2 \
-  -m 8G -mem-path /dev/hugepages -mem-prealloc -balloon none \
-  -drive if=3Dpflash,format=3Draw,readonly,file=3Dvms/ovmf-x64/ovmf-x64/OVM=
-F_CODE-pure-efi.fd \
-  -drive if=3Dpflash,format=3Draw,file=3Dvms/ovmf-x64/ovmf-x64/OVMF_VARS-pu=
-re-efi.fd \
-  -rtc clock=3Dhost,base=3Dlocaltime \
-  -readconfig ./vms/q35-virtio-graphical.cfg \
-  -object iothread,id=3Diothread0 -object iothread,id=3Diothread1 -object i=
-othread,id=3Diothread2 -object iothread,id=3Diothread3 \
-  -device virtio-scsi-pci,iothread=3Diothread0,id=3Dscsi0 -device virtio-sc=
-si-pci,iothread=3Diothread1,id=3Dscsi1 -device virtio-scsi-pci,iothread=3Di=
-othread2,id=3Dscsi2 -device virtio-scsi-pci,iothread=3Diothread3,id=3Dscsi3=
- \
-  -device scsi-hd,bus=3Dscsi0.0,drive=3Ddrive0,bootindex=3D1 -device scsi-h=
-d,bus=3Dscsi1.0,drive=3Ddrive1 -device scsi-hd,bus=3Dscsi2.0,drive=3Ddrive2=
- -device scsi-hd,bus=3Dscsi3.0,drive=3Ddrive3 -device scsi-hd,bus=3Dscsi1.0=
-,drive=3Ddrive4 -device scsi-hd,bus=3Dscsi2.0,drive=3Ddrive5 -device scsi-h=
-d,bus=3Dscsi3.0,drive=3Ddrive6 -device scsi-hd,bus=3Dscsi1.0,drive=3Ddrive7=
- -device scsi-hd,bus=3Dscsi2.0,drive=3Ddrive8 -device scsi-hd,bus=3Dscsi3.0=
-,drive=3Ddrive9 \
-  -drive if=3Dnone,id=3Ddrive0,file=3Dvms/w10p64.qcow2,format=3Dqcow2,cache=
-=3Dnone,discard=3Dunmap \
-  -drive if=3Dnone,id=3Ddrive1,file=3Dvms/w10p64-2.qcow2,format=3Dqcow2,cac=
-he=3Dnone,discard=3Dunmap \
-  -drive if=3Dnone,id=3Ddrive2,file=3D/dev/mapper/w10p64-3,format=3Draw,cac=
-he=3Dnone \
-  -drive if=3Dnone,id=3Ddrive3,file=3Dvms/w10p64-4.qcow2,format=3Dqcow2,cac=
-he=3Dnone \
-  -drive if=3Dnone,id=3Ddrive4,file=3Dvms/w10p64-5.qcow2,format=3Dqcow2,cac=
-he=3Dnone \
-  -drive if=3Dnone,id=3Ddrive5,file=3Dvms/w10p64-6.qcow2,format=3Dqcow2,cac=
-he=3Dnone,discard=3Dunmap \
-  -drive if=3Dnone,id=3Ddrive6,file=3D/dev/mapper/w10p64-7,format=3Draw,cac=
-he=3Dnone \
-  -drive if=3Dnone,id=3Ddrive7,file=3Dvms/w10p64-8.qcow2,format=3Dqcow2,cac=
-he=3Dnone,discard=3Dunmap \
-  -device vfio-pci,host=3D01:00.0,multifunction=3Don,x-vga=3Don \
-  -device vfio-pci,host=3D01:00.1,multifunction=3Don \
-  -netdev type=3Dtap,id=3Dnet1,ifname=3Dtap1,script=3Dno,downscript=3Dno,vh=
-ost=3Don \
-  -device virtio-net-pci,netdev=3Dnet1,mac=3D52:54:00:18:32:c9,bus=3Dpcie.2=
-,addr=3D00.0,ioeventfd=3Don \
-  -device usb-host,bus=3Dusb.0,hostbus=3D3,hostport=3D2.1 \
-  -device usb-host,hostbus=3D3,hostport=3D2.2 \
-  -device usb-host,bus=3Dich9-ehci-1.0,hostbus=3D3,hostport=3D2.4 \
-  -object input-linux,id=3Dkbd1,evdev=3D/dev/input/event0,grab_all=3Dyes,re=
-peat=3Don \
-  -drive if=3Dnone,id=3Ddrive8,file=3Dvms/w10p64.qcow2-9,format=3Dqcow2,dis=
-card=3Dunmap \
-  -drive if=3Dnone,id=3Ddrive9,file=3Dvms/w10p64-10.qcow2,format=3Dqcow2,ca=
-che=3Dnone,discard=3Dunmap \
-  -device usb-host,bus=3Dusb.0,hostbus=3D3,hostport=3D9 \
-  -monitor stdio
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1721221/+subscriptions
+Tested-by: Alex Williamson <alex.williamson@redhat.com>
