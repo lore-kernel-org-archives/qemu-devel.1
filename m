@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dzgI5-0008KN-2M
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 05:48:34 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgJr-0000d9-RU
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 05:50:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dzgI1-0003RU-V8
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 05:48:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35666)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dzgI1-0003QK-Pv
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 05:48:29 -0400
-References: <1507109497-5365-1-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f7a56c6d-c66b-7ee5-48f1-e33c140c7bce@redhat.com>
-Date: Wed, 4 Oct 2017 11:48:24 +0200
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgJq-0006Hs-Ad
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 05:50:23 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:32989)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dzgJq-0006H6-1S
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 05:50:22 -0400
+Received: by mail-oi0-x241.google.com with SMTP id n129so6766384oia.0
+	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 02:50:21 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1507109497-5365-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-web PATCH] Add a blog post about the release
- of version 2.10.1
+In-Reply-To: <20171002134538.23332-3-armbru@redhat.com>
+References: <20171002134538.23332-1-armbru@redhat.com>
+	<20171002134538.23332-3-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 4 Oct 2017 11:50:19 +0200
+Message-ID: <CAJ+F1CKf2yXZ=+bfv+c0+tBpTGgyLmMi_jg+L+f6J=m1keoJgQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/3] hmp-commands-info: Move Texinfo
+ stanzas to conventional place
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +31,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On 04/10/2017 11:31, Thomas Huth wrote:
-> Content is based on Michael Roth's announce e-mail for this release.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On Mon, Oct 2, 2017 at 3:45 PM, Markus Armbruster <armbru@redhat.com> wrote=
+:
+> A command's STEXI..ETEXI stanza follows the command's initializer.
+> Two commands got them backwards.  Correct that.
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+
 > ---
->  _posts/2017-10-04-qemu-2-10-1.md | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
->  create mode 100644 _posts/2017-10-04-qemu-2-10-1.md
-> 
-> diff --git a/_posts/2017-10-04-qemu-2-10-1.md b/_posts/2017-10-04-qemu-2-10-1.md
-> new file mode 100644
-> index 0000000..6fa00fa
-> --- /dev/null
-> +++ b/_posts/2017-10-04-qemu-2-10-1.md
-> @@ -0,0 +1,21 @@
-> +---
-> +layout: post
-> +title:  "QEMU stable version 2.10.1 released"
-> +date:   2017-10-04 11:00:00 +0200
-> +categories: [releases, 'qemu 2.10']
-> +---
-> +We are pleased to announce that the QEMU v2.10.1 stable release
-> +is now available! You can grab the tarball from our
-> +[download page](https://www.qemu.org/download/#source).
+>  hmp-commands-info.hx | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
+>
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index 574db7d24e..d27d3b1227 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -837,12 +837,6 @@ STEXI
+>  Show information about hotpluggable CPUs
+>  ETEXI
+>
+> -STEXI
+> -@item info vm-generation-id
+> -@findex vm-generation-id
+> -Show Virtual Machine Generation ID
+> -ETEXI
+> -
+>      {
+>          .name       =3D "vm-generation-id",
+>          .args_type  =3D "",
+> @@ -852,10 +846,9 @@ ETEXI
+>      },
+>
+>  STEXI
+> -@item info memory_size_summary
+> -@findex memory_size_summary
+> -Display the amount of initially allocated and present hotpluggable (if
+> -enabled) memory in bytes.
+> +@item info vm-generation-id
+> +@findex vm-generation-id
+> +Show Virtual Machine Generation ID
+>  ETEXI
+>
+>      {
+> @@ -868,6 +861,13 @@ ETEXI
+>      },
+>
+>  STEXI
+> +@item info memory_size_summary
+> +@findex memory_size_summary
+> +Display the amount of initially allocated and present hotpluggable (if
+> +enabled) memory in bytes.
+> +ETEXI
 > +
-> +Version 2.10.1 is now tagged in the official
-> +[qemu.git repository](https://git.qemu.org/?p=qemu.git;a=shortlog;h=v2.10.1)
-> +(where you can also find the changelog with details), and the
-> +[stable-2.10 branch](https://git.qemu.org/?p=qemu.git;a=shortlog;h=refs/heads/stable-2.10)
-> +has been updated accordingly.
-> +
-> +Apart from the normal range of general fixes, this update contains security
-> +fixes addressing guest-induced crashing of host QEMU process (CVE-2017-13672,
-> +CVE-2017-13673) and possible code injection into host QEMU process via a
-> +crafted multiboot ELF kernel when specified directly via QEMU command-line
-> +option (CVE-2017-14167). Please update accordingly.
-> 
+> +STEXI
+>  @end table
+>  ETEXI
+>
+> --
+> 2.13.6
+>
+>
 
-Looks good, thanks!
 
-Paolo
+
+--=20
+Marc-Andr=C3=A9 Lureau
