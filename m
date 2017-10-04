@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dzjgU-0007EC-59
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:25:59 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dzjgp-0007OL-OT
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:26:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dzjgR-0003Cv-12
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:25:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38954)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dzjgQ-00039f-Q2
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:25:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dzjgN-0005Lh-Fs
-	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 13:25:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5F5D82E80D7
-	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 13:25:51 +0000 (UTC)
+	(envelope-from <no-reply@patchew.org>) id 1dzjgm-0003nG-JH
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:26:19 -0400
+Resent-Message-Id: <E1dzjgm-0003nG-JH@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21472)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dzjgm-0003jn-DA
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:26:16 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150712355280.153.2674182748973930068@b58463cdfd5f>
+In-Reply-To: <20171004103933.7898-1-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Oct 2017 13:15:50 -0000
-From: "R.Nageswara Sastry" <nasastry@in.ibm.com>
-Reply-To: Bug 1721220 <1721220@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150711170680.1346.17864224825794910388.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150712295095.27974.2866639656982988415.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1721220] Re: qemu crashes with assertion error
- `!mr->container' failed
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 4 Oct 2017 06:25:53 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/6] Add make check tests for Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,51 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: quintela@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-With the mentioned patch not seeing the Abort.
-
-# ppc64-softmmu/qemu-system-ppc64 -S -machine bamboo,accel=3Dkvm -device pc=
-ie-pci-bridge
-gtk initialization failed
-warning: KVM does not support watchdog
-
-Thanks!!
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1721220
-
-Title:
-  qemu crashes with assertion error `!mr->container' failed
-
-Status in QEMU:
-  New
-
-Bug description:
-  Re-production steps:
-  git clone today's qemu git tree (4th Oct 2017)
-  ./configure --target-list=3Dppc64-softmmu && make -j 8
-
-  Run the device-crash-test from scripts folder, seeing the following
-  error
-
-  INFO: running test case: machine=3Dbamboo binary=3Dppc64-softmmu/qemu-sys=
-tem-ppc64 device=3Dpcie-pci-bridge accel=3Dkvm
-  WARNING: qemu received signal -6: ppc64-softmmu/qemu-system-ppc64 -charde=
-v socket,id=3Dmon,path=3D/var/tmp/qemu-30972-monitor.sock -mon chardev=3Dmo=
-n,mode=3Dcontrol -display none -vga none -S -machine bamboo,accel=3Dkvm -de=
-vice pcie-pci-bridge
-  CRITICAL: failed: machine=3Dbamboo binary=3Dppc64-softmmu/qemu-system-ppc=
-64 device=3Dpcie-pci-bridge accel=3Dkvm
-  CRITICAL: cmdline: ppc64-softmmu/qemu-system-ppc64 -S -machine bamboo,acc=
-el=3Dkvm -device pcie-pci-bridge
-  CRITICAL: log: qemu-system-ppc64: /home/nasastry/qemu/memory.c:1699: memo=
-ry_region_finalize: Assertion `!mr->container' failed.
-  CRITICAL: log: warning: KVM does not support watchdog
-  CRITICAL: exit code: -6
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1721220/+subscriptions
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcxMDA0MTAzOTMzLjc4OTgtMS1xdWludGVsYUByZWRoYXQuY29tClN1Ympl
+Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC82XSBBZGQgbWFrZSBjaGVjayB0ZXN0cyBmb3IgTWln
+cmF0aW9uCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
+bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
+c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
+Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
+IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
+YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
+bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
+ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQg
+dG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo0YWViNjExMWI0IHRlc3RzOiBNb3ZlIHBvc3Rjb3B5IG1p
+Z3JhdGlvbiB0ZXN0IHRvIG1pZ3JhdGUtc2V0LXBhcmFtZXRlcnMKMWM5YjJiZGI5MiB0ZXN0czog
+QWRkIG1pZ3JhdGlvbiBjb21wcmVzcyB0aHJlYWRzIHRlc3RzCjU2Yzk5YzQ4MTQgdGVzdHM6IEFk
+ZCBtaWdyYXRpb24geGJ6cmxlIHRlc3QKNTc2ZjM4MDA0YiB0ZXN0czogQWRkIHByZWNvcHkgdGVz
+dCB1c2luZyBkZXByZWNhdGVkIGNvbW1hbmRzCmFmNDk5YjgxZTkgdGVzdHM6IEFkZCBiYXNpYyBt
+aWdyYXRpb24gcHJlY29weSB0Y3AgdGVzdAo1NDIxN2Q0NDgwIHRlc3RzOiBBZGQgYmFzaWMgbWln
+cmF0aW9uIHByZWNvcHkgdGVzdAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0gg
+MS82OiB0ZXN0czogQWRkIGJhc2ljIG1pZ3JhdGlvbiBwcmVjb3B5IHRlc3QuLi4KV0FSTklORzog
+YXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzcyOiBGSUxF
+OiB0ZXN0cy9taWdyYXRpb24tdGVzdC5jOjMwOgorI2lmIGRlZmluZWQoX19saW51eF9fKQoKdG90
+YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1MTggbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAyLzY6IHRlc3RzOiBBZGQg
+YmFzaWMgbWlncmF0aW9uIHByZWNvcHkgdGNwIHRlc3QuLi4KQ2hlY2tpbmcgUEFUQ0ggMy82OiB0
+ZXN0czogQWRkIHByZWNvcHkgdGVzdCB1c2luZyBkZXByZWNhdGVkIGNvbW1hbmRzLi4uCkNoZWNr
+aW5nIFBBVENIIDQvNjogdGVzdHM6IEFkZCBtaWdyYXRpb24geGJ6cmxlIHRlc3QuLi4KQ2hlY2tp
+bmcgUEFUQ0ggNS82OiB0ZXN0czogQWRkIG1pZ3JhdGlvbiBjb21wcmVzcyB0aHJlYWRzIHRlc3Rz
+Li4uCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMzNjogRklMRTogdGVzdHMvbWlncmF0aW9u
+LXRlc3QuYzo2NDA6CisgICAgbWlncmF0ZV9zZXRfcGFyYW1ldGVyKGZyb20sICJkZWNvbXByZXNz
+LXRocmVhZHMiLCAiMyIpOyAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDYzIGxpbmVz
+IGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5n
+IFBBVENIIDYvNjogdGVzdHM6IE1vdmUgcG9zdGNvcHkgbWlncmF0aW9uIHRlc3QgdG8gbWlncmF0
+ZS1zZXQtcGFyYW1ldGVycy4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
+ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
+dGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
