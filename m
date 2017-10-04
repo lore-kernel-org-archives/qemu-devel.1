@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dzaQu-0002tA-8H
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 23:33:17 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dzaeJ-0004fa-8Q
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 23:47:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dzaQr-0006v3-4e
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 23:33:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52266)
+	(envelope-from <ehabkost@redhat.com>) id 1dzaeF-0002h9-Vu
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 23:47:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39412)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dzaQq-0006up-Uc
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 23:33:13 -0400
-Date: Wed, 4 Oct 2017 00:33:07 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dzaeF-0002es-Mq
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 23:47:03 -0400
+Date: Wed, 4 Oct 2017 00:46:57 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171004033307.GG4760@localhost.localdomain>
+Message-ID: <20171004034657.GH4760@localhost.localdomain>
 References: <cover.1507059418.git.alistair.francis@xilinx.com>
-	<2a93b997d0acd369f35d68981a23ba491443daf6.1507059418.git.alistair.francis@xilinx.com>
-	<20171003203654.GD4760@localhost.localdomain>
-	<CAKmqyKN+QnBAS6c4mAb2EiTVQv3Km6EdmGXCFC3hVogL96QK1Q@mail.gmail.com>
+	<a418ab36b8beecb9df9886b283c6bbedaf94bb68.1507059418.git.alistair.francis@xilinx.com>
+	<20171003203956.GE4760@localhost.localdomain>
+	<CAKmqyKN-ABwyryZvHpWHpS9Kuaqy2ZSvdDoXSku2eBskLc8EBA@mail.gmail.com>
+	<a5ffa7ef-af03-7d63-5428-f78ad8a9339b@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CAKmqyKN+QnBAS6c4mAb2EiTVQv3Km6EdmGXCFC3hVogL96QK1Q@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v1 3/5] xlnx-zcu102: Specify the valid CPUs
+In-Reply-To: <a5ffa7ef-af03-7d63-5428-f78ad8a9339b@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 5/5] raspi: : Specify the valid CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +31,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Tue, Oct 03, 2017 at 02:41:17PM -0700, Alistair Francis wrote:
-> On Tue, Oct 3, 2017 at 1:36 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > On Tue, Oct 03, 2017 at 01:05:13PM -0700, Alistair Francis wrote:
-> >> List all possible valid CPU options.
+On Tue, Oct 03, 2017 at 07:18:44PM -0300, Philippe Mathieu-Daud=E9 wrote:
+> On 10/03/2017 06:36 PM, Alistair Francis wrote:
+> > On Tue, Oct 3, 2017 at 1:39 PM, Eduardo Habkost <ehabkost@redhat.com>=
+ wrote:
+> >> On Tue, Oct 03, 2017 at 01:05:18PM -0700, Alistair Francis wrote:
+> >>> List all possible valid CPU options.
+> >>>
+> >>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> >>> ---
+> >>>
+> >>>  hw/arm/raspi.c | 6 ++++++
+> >>>  1 file changed, 6 insertions(+)
+> >>>
+> >>> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+> >>> index 5941c9f751..555db0f258 100644
+> >>> --- a/hw/arm/raspi.c
+> >>> +++ b/hw/arm/raspi.c
+> >>> @@ -158,6 +158,10 @@ static void raspi2_init(MachineState *machine)
+> >>>      setup_boot(machine, 2, machine->ram_size - vcram_size);
+> >>>  }
+> >>>
+> >>> +const char *raspi2_valid_cpus[] =3D { ARM_CPU_TYPE_NAME("cortex-a7=
+"),
+> >>> +                                    NULL
+> >>> +                                  };
+> >>> +
+> >>>  static void raspi2_machine_init(MachineClass *mc)
+> >>>  {
+> >>>      mc->desc =3D "Raspberry Pi 2";
+> >>> @@ -169,5 +173,7 @@ static void raspi2_machine_init(MachineClass *m=
+c)
+> >>>      mc->max_cpus =3D BCM2836_NCPUS;
+> >>>      mc->default_ram_size =3D 1024 * 1024 * 1024;
+> >>>      mc->ignore_memory_transaction_failures =3D true;
+> >>> +    mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a7");
+> >>> +    mc->valid_cpu_types =3D raspi2_valid_cpus;
 > >>
-> >> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> >> ---
-> >>
-> >>  hw/arm/xlnx-zcu102.c         | 10 ++++++++++
-> >>  hw/arm/xlnx-zynqmp.c         | 16 +++++++++-------
-> >>  include/hw/arm/xlnx-zynqmp.h |  1 +
-> >>  3 files changed, 20 insertions(+), 7 deletions(-)
-> >>
-> >> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-> >> index 519a16ed98..039649e522 100644
-> >> --- a/hw/arm/xlnx-zcu102.c
-> >> +++ b/hw/arm/xlnx-zcu102.c
-> >> @@ -98,6 +98,8 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s, MachineState *machine)
-> >>      object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
-> >>                                &error_abort);
-> >>
-> >> +    object_property_set_str(OBJECT(&s->soc), machine->cpu_type, "cpu-type",
-> >> +                            &error_fatal);
-> >
-> > Do you have plans to support other CPU types to xlnx_zynqmp in
-> > the future?  If not, I wouldn't bother adding the cpu-type
-> > property and the extra boilerplate code if it's always going to
-> > be set to cortex-a53.
-> 
-> No, it'll always be A53.
-> 
-> I did think of that, but I also wanted to use the new option! I also
-> think there is an advantage in sanely handling users '-cpu' option,
-> before now we just ignored it, so I think it still does give a
-> benefit. That'll be especially important on the Xilinx tree (sometimes
-> people use our machines with a different CPU to 'benchmark' or test
-> other CPUs with our CoSimulation setup). So I think it does make sense
-> to keep in.
+> >> I'm confused: bcm2836_init() is hardcoded to cortex-a15, not
+> >> cortex-a7.
+> >=20
+> > Odd. I just looked up the Raspberry Pi 2 and it says a Cortex-A7:
+> > https://www.raspberrypi.org/products/raspberry-pi-2-model-b/
+>=20
+> The BCM2836 SoC definitively is Cortex-A7.
+>=20
+> git history says the A7 was added after (dcf578ed8cec) the raspi2 board
+> (bad5623690b1).
 
-I see.
+Shouldn't we update TYPE_BCM2836 to use cpu_type instead of
+cortex-a15 before applying this patch, then?
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+>=20
+> >=20
+> > Thanks,
+> > Alistair
+> >=20
+> >>
+> >>>  };
+> >>>  DEFINE_MACHINE("raspi2", raspi2_machine_init)
+> >>> --
+> >>> 2.11.0
+> >>>
+> >>
+> >> --
+> >> Eduardo
 
--- 
+--=20
 Eduardo
