@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dzhKI-0003AZ-RS
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dzhKI-0003Ae-TA
 	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:54:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dzhKH-0001nv-P2
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dzhKH-0001nt-ON
 	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:54:54 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:50500)
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:44517)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dzhKH-0001nS-Ib
+	id 1dzhKH-0001nT-If
 	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:54:53 -0400
-Received: by mail-oi0-x243.google.com with SMTP id q4so1312565oic.7
+Received: by mail-oi0-x242.google.com with SMTP id s145so13113410oie.1
 	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 03:54:53 -0700 (PDT)
 MIME-Version: 1.0
 In-Reply-To: <20171002152552.27999-9-armbru@redhat.com>
 References: <20171002152552.27999-1-armbru@redhat.com>
 	<20171002152552.27999-9-armbru@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 4 Oct 2017 12:54:50 +0200
-Message-ID: <CAJ+F1CKsYfk=SEj_VP-SPuLCu8R9gba-WD7xDbmp+68+VWUYVA@mail.gmail.com>
+Date: Wed, 4 Oct 2017 12:54:47 +0200
+Message-ID: <CAJ+F1C+nFMp5mTq=q_y4o95gb30zvHE-5xRLPMe0FUWAT1VhwQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [RFC PATCH 08/32] qapi: Simplify check_name()
