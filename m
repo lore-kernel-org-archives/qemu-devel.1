@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dzaeJ-0004fa-8Q
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 23:47:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1dzbLQ-0001Zp-Ho
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 00:31:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dzaeF-0002h9-Vu
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 23:47:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39412)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dzaeF-0002es-Mq
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 23:47:03 -0400
-Date: Wed, 4 Oct 2017 00:46:57 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171004034657.GH4760@localhost.localdomain>
-References: <cover.1507059418.git.alistair.francis@xilinx.com>
-	<a418ab36b8beecb9df9886b283c6bbedaf94bb68.1507059418.git.alistair.francis@xilinx.com>
-	<20171003203956.GE4760@localhost.localdomain>
-	<CAKmqyKN-ABwyryZvHpWHpS9Kuaqy2ZSvdDoXSku2eBskLc8EBA@mail.gmail.com>
-	<a5ffa7ef-af03-7d63-5428-f78ad8a9339b@amsat.org>
+	(envelope-from <bounces@canonical.com>) id 1dzbLN-0006Pu-FH
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 00:31:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47308)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dzbLN-0006Pl-8v
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 00:31:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1dzbLJ-0007Ib-V0
+	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 04:31:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E93292E80C9
+	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 04:31:33 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <a5ffa7ef-af03-7d63-5428-f78ad8a9339b@amsat.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 5/5] raspi: : Specify the valid CPUs
+Date: Wed, 04 Oct 2017 04:17:35 -0000
+From: Launchpad Bug Tracker <1352179@bugs.launchpad.net>
+Reply-To: Bug 1352179 <1352179@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140804064846.7551.44470.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150709065571.23798.7533373498136357211.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1352179] Re: could not open disk image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,76 +36,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Tue, Oct 03, 2017 at 07:18:44PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> On 10/03/2017 06:36 PM, Alistair Francis wrote:
-> > On Tue, Oct 3, 2017 at 1:39 PM, Eduardo Habkost <ehabkost@redhat.com>=
- wrote:
-> >> On Tue, Oct 03, 2017 at 01:05:18PM -0700, Alistair Francis wrote:
-> >>> List all possible valid CPU options.
-> >>>
-> >>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> >>> ---
-> >>>
-> >>>  hw/arm/raspi.c | 6 ++++++
-> >>>  1 file changed, 6 insertions(+)
-> >>>
-> >>> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-> >>> index 5941c9f751..555db0f258 100644
-> >>> --- a/hw/arm/raspi.c
-> >>> +++ b/hw/arm/raspi.c
-> >>> @@ -158,6 +158,10 @@ static void raspi2_init(MachineState *machine)
-> >>>      setup_boot(machine, 2, machine->ram_size - vcram_size);
-> >>>  }
-> >>>
-> >>> +const char *raspi2_valid_cpus[] =3D { ARM_CPU_TYPE_NAME("cortex-a7=
-"),
-> >>> +                                    NULL
-> >>> +                                  };
-> >>> +
-> >>>  static void raspi2_machine_init(MachineClass *mc)
-> >>>  {
-> >>>      mc->desc =3D "Raspberry Pi 2";
-> >>> @@ -169,5 +173,7 @@ static void raspi2_machine_init(MachineClass *m=
-c)
-> >>>      mc->max_cpus =3D BCM2836_NCPUS;
-> >>>      mc->default_ram_size =3D 1024 * 1024 * 1024;
-> >>>      mc->ignore_memory_transaction_failures =3D true;
-> >>> +    mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a7");
-> >>> +    mc->valid_cpu_types =3D raspi2_valid_cpus;
-> >>
-> >> I'm confused: bcm2836_init() is hardcoded to cortex-a15, not
-> >> cortex-a7.
-> >=20
-> > Odd. I just looked up the Raspberry Pi 2 and it says a Cortex-A7:
-> > https://www.raspberrypi.org/products/raspberry-pi-2-model-b/
->=20
-> The BCM2836 SoC definitively is Cortex-A7.
->=20
-> git history says the A7 was added after (dcf578ed8cec) the raspi2 board
-> (bad5623690b1).
+[Expired for QEMU because there has been no activity for 60 days.]
 
-Shouldn't we update TYPE_BCM2836 to use cpu_type instead of
-cortex-a15 before applying this patch, then?
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
->=20
-> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
->=20
-> >=20
-> > Thanks,
-> > Alistair
-> >=20
-> >>
-> >>>  };
-> >>>  DEFINE_MACHINE("raspi2", raspi2_machine_init)
-> >>> --
-> >>> 2.11.0
-> >>>
-> >>
-> >> --
-> >> Eduardo
+-- =
 
---=20
-Eduardo
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1352179
+
+Title:
+  could not open disk image
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  After restart the server it's show this error:
+
+  Error starting domain: internal error process exited while connecting to =
+monitor: char device redirected to /dev/pts/1
+  qemu-kvm: -drive file=3D/var/lib/nova/instances/b4535ce9-54b5-4581-a906-1=
+6b83bf1ba2f/disk,if=3Dnone,id=3Ddrive-virtio-disk0,format=3Dqcow2,cache=3Dn=
+one: could not open disk image /var/lib/nova/instances/b4535ce9-54b5-4581-a=
+906-16b83bf1ba2f/disk: No such file or directory
+
+  the disk info show
+  =C2=A0qemu-img info disk
+  image: disk
+  file format: qcow2
+  virtual size: 100G (107374182400 bytes)
+  disk size: 22G
+  cluster_size: 65536
+  backing file: /var/lib/nova/instances/_base/b4535ce9-54b5-4581-a906-16b83=
+bf1ba2f
+
+  but this file (backing file : /var/lib/nova/instances/_base/b4535ce9-54b5=
+-4581-a906-16b83bf1ba2f) is empty.
+  And all the instances can't find the disk image
+
+  We use CentOS release 6.5 (64bit)
+  kernel version : 2.6.32-431.11.2.el6.x86_64
+  qemu-kvm-0.12.1.2-2.415.el6_5.10.x86_64
+
+  virsh version
+  Compiled against library: libvirt 0.10.2
+  Using library: libvirt 0.10.2
+  Using API: QEMU 0.10.2
+  Running hypervisor: QEMU 0.12.1
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1352179/+subscriptions
