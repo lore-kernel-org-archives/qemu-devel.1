@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dzZ0U-0001Gi-60
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:01:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1dzZ0W-0001JS-Cl
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:01:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dzZ0T-0006Iq-6P
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:01:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1dzZ0V-0006LT-IY
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:01:56 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Tue,  3 Oct 2017 21:00:38 -0500
-Message-Id: <20171004020048.26379-14-eblake@redhat.com>
+Date: Tue,  3 Oct 2017 21:00:40 -0500
+Message-Id: <20171004020048.26379-16-eblake@redhat.com>
 In-Reply-To: <20171004020048.26379-1-eblake@redhat.com>
 References: <20171004020048.26379-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 13/23] qemu-img: Simplify logic in
- img_compare()
+Subject: [Qemu-devel] [PATCH v5 15/23] qemu-img: Add find_nonzero()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,138 +22,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-As long as we are querying the status for a chunk smaller than
-the known image size, we are guaranteed that a successful return
-will have set pnum to a non-zero size (pnum is zero only for
-queries beyond the end of the file).  Use that to slightly
-simplify the calculation of the current chunk size being compared.
-Likewise, we don't have to shrink the amount of data operated on
-until we know we have to read the file, and therefore have to fit
-in the bounds of our buffer.  Also, note that 'total_sectors_over'
-is equivalent to 'progress_base'.
+During 'qemu-img compare', when we are checking that an allocated
+portion of one file is all zeros, we don't need to waste time
+computing how many additional sectors after the first non-zero
+byte are also non-zero.  Create a new helper find_nonzero() to do
+the check for a first non-zero sector, and rebase
+check_empty_sectors() to use it.
 
-With these changes in place, sectors_to_process() is now dead code,
-and can be removed.
+The new interface intentionally uses bytes in its interface, even
+though it still crawls the buffer a sector at a time; it is robust
+to a partial sector at the end of the buffer.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 
 ---
-v5: rebase to alignment assertion [John]
-v4: no change
+v4-v5: no change
 v3: new patch
 ---
- qemu-img.c | 38 +++++++++++---------------------------
- 1 file changed, 11 insertions(+), 27 deletions(-)
+ qemu-img.c | 32 ++++++++++++++++++++++++++++----
+ 1 file changed, 28 insertions(+), 4 deletions(-)
 
 diff --git a/qemu-img.c b/qemu-img.c
-index a351af09ac..abd289c0b5 100644
+index 43e3038894..12881f008e 100644
 --- a/qemu-img.c
 +++ b/qemu-img.c
-@@ -1172,11 +1172,6 @@ static int64_t sectors_to_bytes(int64_t sectors)
-     return sectors << BDRV_SECTOR_BITS;
+@@ -1065,6 +1065,28 @@ done:
  }
 
--static int64_t sectors_to_process(int64_t total, int64_t from)
--{
--    return MIN(total - from, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
--}
--
  /*
-  * Check if passed sectors are empty (not allocated or contain only 0 bytes)
++ * Returns -1 if 'buf' contains only zeroes, otherwise the byte index
++ * of the first sector boundary within buf where the sector contains a
++ * non-zero byte.  This function is robust to a buffer that is not
++ * sector-aligned.
++ */
++static int64_t find_nonzero(const uint8_t *buf, int64_t n)
++{
++    int64_t i;
++    int64_t end = QEMU_ALIGN_DOWN(n, BDRV_SECTOR_SIZE);
++
++    for (i = 0; i < end; i += BDRV_SECTOR_SIZE) {
++        if (!buffer_is_zero(buf + i, BDRV_SECTOR_SIZE)) {
++            return i;
++        }
++    }
++    if (i < n && !buffer_is_zero(buf + i, n - end)) {
++        return i;
++    }
++    return -1;
++}
++
++/*
+  * Returns true iff the first sector pointed to by 'buf' contains at least
+  * a non-NUL byte.
   *
-@@ -1373,13 +1368,9 @@ static int img_compare(int argc, char **argv)
-         goto out;
+@@ -1189,7 +1211,9 @@ static int check_empty_sectors(BlockBackend *blk, int64_t sect_num,
+                                int sect_count, const char *filename,
+                                uint8_t *buffer, bool quiet)
+ {
+-    int pnum, ret = 0;
++    int ret = 0;
++    int64_t idx;
++
+     ret = blk_pread(blk, sect_num << BDRV_SECTOR_BITS, buffer,
+                     sect_count << BDRV_SECTOR_BITS);
+     if (ret < 0) {
+@@ -1197,10 +1221,10 @@ static int check_empty_sectors(BlockBackend *blk, int64_t sect_num,
+                      sectors_to_bytes(sect_num), filename, strerror(-ret));
+         return ret;
+     }
+-    ret = is_allocated_sectors(buffer, sect_count, &pnum);
+-    if (ret || pnum != sect_count) {
++    idx = find_nonzero(buffer, sect_count * BDRV_SECTOR_SIZE);
++    if (idx >= 0) {
+         qprintf(quiet, "Content mismatch at offset %" PRId64 "!\n",
+-                sectors_to_bytes(ret ? sect_num : sect_num + pnum));
++                sectors_to_bytes(sect_num) + idx);
+         return 1;
      }
 
--    for (;;) {
-+    while (sector_num < total_sectors) {
-         int64_t status1, status2;
-
--        nb_sectors = sectors_to_process(total_sectors, sector_num);
--        if (nb_sectors <= 0) {
--            break;
--        }
-         status1 = bdrv_block_status_above(bs1, NULL,
-                                           sector_num * BDRV_SECTOR_SIZE,
-                                           (total_sectors1 - sector_num) *
-@@ -1406,12 +1397,9 @@ static int img_compare(int argc, char **argv)
-         /* TODO: Relax this once comparison is byte-based, and we no longer
-          * have to worry about sector alignment */
-         assert(QEMU_IS_ALIGNED(pnum1 | pnum2, BDRV_SECTOR_SIZE));
--        if (pnum1) {
--            nb_sectors = MIN(nb_sectors, pnum1 >> BDRV_SECTOR_BITS);
--        }
--        if (pnum2) {
--            nb_sectors = MIN(nb_sectors, pnum2 >> BDRV_SECTOR_BITS);
--        }
-+
-+        assert(pnum1 && pnum2);
-+        nb_sectors = MIN(pnum1, pnum2) >> BDRV_SECTOR_BITS;
-
-         if (strict) {
-             if ((status1 & ~BDRV_BLOCK_OFFSET_MASK) !=
-@@ -1424,9 +1412,10 @@ static int img_compare(int argc, char **argv)
-             }
-         }
-         if ((status1 & BDRV_BLOCK_ZERO) && (status2 & BDRV_BLOCK_ZERO)) {
--            nb_sectors = DIV_ROUND_UP(MIN(pnum1, pnum2), BDRV_SECTOR_SIZE);
-+            /* nothing to do */
-         } else if (allocated1 == allocated2) {
-             if (allocated1) {
-+                nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
-                 ret = blk_pread(blk1, sector_num << BDRV_SECTOR_BITS, buf1,
-                                 nb_sectors << BDRV_SECTOR_BITS);
-                 if (ret < 0) {
-@@ -1455,7 +1444,7 @@ static int img_compare(int argc, char **argv)
-                 }
-             }
-         } else {
--
-+            nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
-             if (allocated1) {
-                 ret = check_empty_sectors(blk1, sector_num, nb_sectors,
-                                           filename1, buf1, quiet);
-@@ -1478,30 +1467,24 @@ static int img_compare(int argc, char **argv)
-
-     if (total_sectors1 != total_sectors2) {
-         BlockBackend *blk_over;
--        int64_t total_sectors_over;
-         const char *filename_over;
-
-         qprintf(quiet, "Warning: Image size mismatch!\n");
-         if (total_sectors1 > total_sectors2) {
--            total_sectors_over = total_sectors1;
-             blk_over = blk1;
-             filename_over = filename1;
-         } else {
--            total_sectors_over = total_sectors2;
-             blk_over = blk2;
-             filename_over = filename2;
-         }
-
--        for (;;) {
-+        while (sector_num < progress_base) {
-             int64_t count;
-
--            nb_sectors = sectors_to_process(total_sectors_over, sector_num);
--            if (nb_sectors <= 0) {
--                break;
--            }
-             ret = bdrv_is_allocated_above(blk_bs(blk_over), NULL,
-                                           sector_num * BDRV_SECTOR_SIZE,
--                                          nb_sectors * BDRV_SECTOR_SIZE,
-+                                          (progress_base - sector_num) *
-+                                          BDRV_SECTOR_SIZE,
-                                           &count);
-             if (ret < 0) {
-                 ret = 3;
-@@ -1515,6 +1498,7 @@ static int img_compare(int argc, char **argv)
-             assert(QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE));
-             nb_sectors = count >> BDRV_SECTOR_BITS;
-             if (ret) {
-+                nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
-                 ret = check_empty_sectors(blk_over, sector_num, nb_sectors,
-                                           filename_over, buf1, quiet);
-                 if (ret) {
 -- 
 2.13.6
