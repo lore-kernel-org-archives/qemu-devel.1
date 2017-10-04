@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46581)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgpR-00042Q-WD
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:23:03 -0400
+	(envelope-from <berto@igalia.com>) id 1dzgrB-0004zw-Aj
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:24:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgpQ-0002iT-Sb
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:23:02 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:38775)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dzgpQ-0002hu-Lz
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:23:00 -0400
-Received: by mail-oi0-x241.google.com with SMTP id s145so6794449oie.5
-	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 03:23:00 -0700 (PDT)
+	(envelope-from <berto@igalia.com>) id 1dzgrA-0004N2-H6
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:24:49 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <1488286469-9381-29-git-send-email-kwolf@redhat.com>
+References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
+	<1488286469-9381-29-git-send-email-kwolf@redhat.com>
+Date: Wed, 04 Oct 2017 12:24:05 +0200
+Message-ID: <w51y3or9poa.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20171002141341.24616-6-armbru@redhat.com>
-References: <20171002141341.24616-1-armbru@redhat.com>
-	<20171002141341.24616-6-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 4 Oct 2017 12:22:58 +0200
-Message-ID: <CAJ+F1CLBHFpVj0j99LYKDjq4GZd5TM+mHfqY4B9uFG5=u1EUhA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 05/11] tests/qapi-schema/doc-bad-section:
- New, factored out of doc-good
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 28/44] block: Fix pending
+ requests check in bdrv_append()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,157 +23,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, qemu-stable@nongnu.org
 
-On Mon, Oct 2, 2017 at 4:13 PM, Markus Armbruster <armbru@redhat.com> wrote=
-:
-> A negative test case crept into doc-good.json: invalid use of section
-> markup we currently fail to reject.  Move this into its own
-> doc-bad-section.json.
+On Tue 28 Feb 2017 01:54:13 PM CET, Kevin Wolf wrote:
+> bdrv_append() cares about isolation of the node that it modifies, but
+> not about activity in some subtree below it. Instead of using the
+> recursive bdrv_requests_pending(), directly check bs->in_flight, which
+> considers only the node in question.
 >
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
 > ---
->  tests/Makefile.include                 |  3 ++-
->  tests/qapi-schema/doc-bad-section.err  |  0
->  tests/qapi-schema/doc-bad-section.exit |  1 +
->  tests/qapi-schema/doc-bad-section.json | 11 +++++++++++
->  tests/qapi-schema/doc-bad-section.out  | 13 +++++++++++++
->  tests/qapi-schema/doc-good.json        |  1 -
->  tests/qapi-schema/doc-good.out         |  2 +-
->  tests/qapi-schema/doc-good.texi        |  2 +-
->  8 files changed, 29 insertions(+), 4 deletions(-)
->  create mode 100644 tests/qapi-schema/doc-bad-section.err
->  create mode 100644 tests/qapi-schema/doc-bad-section.exit
->  create mode 100644 tests/qapi-schema/doc-bad-section.json
->  create mode 100644 tests/qapi-schema/doc-bad-section.out
+>  block.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index abc6707ef2..de4a713c25 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -412,6 +412,7 @@ qapi-schema +=3D command-int.json
->  qapi-schema +=3D comments.json
->  qapi-schema +=3D doc-bad-alternate-member.json
->  qapi-schema +=3D doc-bad-command-arg.json
-> +qapi-schema +=3D doc-bad-section.json
->  qapi-schema +=3D doc-bad-symbol.json
->  qapi-schema +=3D doc-bad-union-member.json
->  qapi-schema +=3D doc-before-include.json
-> @@ -429,10 +430,10 @@ qapi-schema +=3D doc-invalid-end2.json
->  qapi-schema +=3D doc-invalid-return.json
->  qapi-schema +=3D doc-invalid-section.json
->  qapi-schema +=3D doc-invalid-start.json
-> -qapi-schema +=3D doc-missing.json
->  qapi-schema +=3D doc-missing-colon.json
->  qapi-schema +=3D doc-missing-expr.json
->  qapi-schema +=3D doc-missing-space.json
-> +qapi-schema +=3D doc-missing.json
->  qapi-schema +=3D doc-no-symbol.json
->  qapi-schema +=3D double-data.json
->  qapi-schema +=3D double-type.json
-> diff --git a/tests/qapi-schema/doc-bad-section.err b/tests/qapi-schema/do=
-c-bad-section.err
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/tests/qapi-schema/doc-bad-section.exit b/tests/qapi-schema/d=
-oc-bad-section.exit
-> new file mode 100644
-> index 0000000000..573541ac97
-> --- /dev/null
-> +++ b/tests/qapi-schema/doc-bad-section.exit
-> @@ -0,0 +1 @@
-> +0
-> diff --git a/tests/qapi-schema/doc-bad-section.json b/tests/qapi-schema/d=
-oc-bad-section.json
-> new file mode 100644
-> index 0000000000..560df4b087
-> --- /dev/null
-> +++ b/tests/qapi-schema/doc-bad-section.json
-> @@ -0,0 +1,11 @@
-> +# =3D section within an expression comment
-> +# BUG: not rejected
-> +
-> +##
-> +# @Enum:
-> +# =3D=3D Produces *invalid* texinfo
-> +# @one: The _one_ {and only}
-> +#
-> +# @two is undocumented
-> +##
-> +{ 'enum': 'Enum', 'data': [ 'one', 'two' ] }
-> diff --git a/tests/qapi-schema/doc-bad-section.out b/tests/qapi-schema/do=
-c-bad-section.out
-> new file mode 100644
-> index 0000000000..6fce84dd34
-> --- /dev/null
-> +++ b/tests/qapi-schema/doc-bad-section.out
-> @@ -0,0 +1,13 @@
-> +enum Enum ['one', 'two']
-> +enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool=
-']
-> +    prefix QTYPE
-> +object q_empty
-> +doc symbol=3DEnum
-> +    body=3D
-> +=3D=3D Produces *invalid* texinfo
-> +    arg=3Done
-> +The _one_ {and only}
-> +    arg=3Dtwo
-> +
-> +    section=3D
-> +@two is undocumented
-> diff --git a/tests/qapi-schema/doc-good.json b/tests/qapi-schema/doc-good=
-.json
-> index cfdc0a8a81..97ab4625ff 100644
-> --- a/tests/qapi-schema/doc-good.json
-> +++ b/tests/qapi-schema/doc-good.json
-> @@ -51,7 +51,6 @@
->
->  ##
->  # @Enum:
-> -# =3D=3D Produces *invalid* texinfo
->  # @one: The _one_ {and only}
->  #
->  # @two is undocumented
-> diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.=
-out
-> index 63ca25a8b9..c55e394e8a 100644
-> --- a/tests/qapi-schema/doc-good.out
-> +++ b/tests/qapi-schema/doc-good.out
-> @@ -77,7 +77,7 @@ Examples:
->  - {braces}
->  doc symbol=3DEnum
->      body=3D
-> -=3D=3D Produces *invalid* texinfo
-> +
->      arg=3Done
->  The _one_ {and only}
->      arg=3Dtwo
-> diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good=
-.texi
-> index c410626e4a..a331349756 100644
-> --- a/tests/qapi-schema/doc-good.texi
-> +++ b/tests/qapi-schema/doc-good.texi
-> @@ -76,7 +76,7 @@ Examples:
->
->  @deftp {Enum} Enum
->
-> -@subsection Produces @strong{invalid} texinfo
-> +
->
->  @b{Values:}
->  @table @asis
-> --
-> 2.13.6
->
->
+> diff --git a/block.c b/block.c
+> index 9e538a5..5189c7c 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -2897,8 +2897,8 @@ static void change_parent_backing_link(BlockDriverState *from,
+>   */
+>  void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top)
+>  {
+> -    assert(!bdrv_requests_pending(bs_top));
+> -    assert(!bdrv_requests_pending(bs_new));
+> +    assert(!atomic_read(&bs_top->in_flight));
+> +    assert(!atomic_read(&bs_new->in_flight));
+>  
+>      bdrv_ref(bs_top);
 
+I don't know if there's still any maintenance on the v2.8.x branch, but
+I can make v2.8.1.1 crash easily because of this failing assertion.
+Applying this patch fixes the issue.
 
+I can provide more details if needed.
 
---=20
-Marc-Andr=C3=A9 Lureau
+Regards,
+
+Berto
