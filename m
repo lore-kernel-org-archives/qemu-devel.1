@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dzgxQ-0001EN-Ie
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:31:22 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgxe-0001Ob-7A
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:31:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dzgxP-0000t4-Fs
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:31:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34222)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgxd-00018h-1U
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:31:30 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:55949)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dzgxP-0000sE-9d
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:31:15 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dzgxN-0006dj-Th
-	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 10:31:14 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DE7A42E80D0
-	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 10:31:13 +0000 (UTC)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dzgxc-00017n-Qs
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:31:28 -0400
+Received: by mail-oi0-x241.google.com with SMTP id g125so1308399oib.12
+	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 03:31:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20171002141341.24616-11-armbru@redhat.com>
+References: <20171002141341.24616-1-armbru@redhat.com>
+	<20171002141341.24616-11-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 4 Oct 2017 12:31:27 +0200
+Message-ID: <CAJ+F1C+N-mnLLDmvqgtSH7Q5Spar8kA1Gei5iZq67p-9kPcSzg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Oct 2017 10:14:52 -0000
-From: "R.Nageswara Sastry" <nasastry@in.ibm.com>
-Reply-To: Bug 1721220 <1721220@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150711170680.1346.17864224825794910388.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150711209288.28090.7375283416525119185.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1721220] Re: qemu crashes with signal 6 with
- assertion error `!mr->container' failed
+Subject: Re: [Qemu-devel] [PATCH 10/11] qapi: Rename QAPIDoc.parser,
+ .section to ._parser, ._section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,53 +31,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-** Summary changed:
+On Mon, Oct 2, 2017 at 4:13 PM, Markus Armbruster <armbru@redhat.com> wrote=
+:
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-- qemu crashes with signal 6 when tried with -machine bamboo,accel=3Dkvm -d=
-evice pcie-pci-bridge
-+ qemu crashes with signal 6 with assertion error `!mr->container' failed
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-** Summary changed:
 
-- qemu crashes with signal 6 with assertion error `!mr->container' failed
-+ qemu crashes with assertion error `!mr->container' failed
+> ---
+>  scripts/qapi.py | 52 ++++++++++++++++++++++++++-------------------------=
+-
+>  1 file changed, 26 insertions(+), 26 deletions(-)
+>
+> diff --git a/scripts/qapi.py b/scripts/qapi.py
+> index e338868a52..43a54bf40f 100644
+> --- a/scripts/qapi.py
+> +++ b/scripts/qapi.py
+> @@ -120,11 +120,11 @@ class QAPIDoc(object):
+>              self.member =3D member
+>
+>      def __init__(self, parser, info):
+> -        # self.parser is used to report errors with QAPIParseError.  The
+> +        # self._parser is used to report errors with QAPIParseError.  Th=
+e
+>          # resulting error position depends on the state of the parser.
+>          # It happens to be the beginning of the comment.  More or less
+>          # servicable, but action at a distance.
+> -        self.parser =3D parser
+> +        self._parser =3D parser
+>          self.info =3D info
+>          self.symbol =3D None
+>          self.body =3D QAPIDoc.Section()
+> @@ -133,7 +133,7 @@ class QAPIDoc(object):
+>          # a list of Section
+>          self.sections =3D []
+>          # the current section
+> -        self.section =3D self.body
+> +        self._section =3D self.body
+>
+>      def has_section(self, name):
+>          """Return True if we have a section with this name."""
+> @@ -150,7 +150,7 @@ class QAPIDoc(object):
+>              return
+>
+>          if line[0] !=3D ' ':
+> -            raise QAPIParseError(self.parser, "Missing space after #")
+> +            raise QAPIParseError(self._parser, "Missing space after #")
+>          line =3D line[1:]
+>
+>          # FIXME not nice: things like '#  @foo:' and '# @foo: ' aren't
+> @@ -159,11 +159,11 @@ class QAPIDoc(object):
+>              self._append_symbol_line(line)
+>          elif not self.body.text and line.startswith('@'):
+>              if not line.endswith(':'):
+> -                raise QAPIParseError(self.parser, "Line should end with =
+:")
+> +                raise QAPIParseError(self._parser, "Line should end with=
+ :")
+>              self.symbol =3D line[1:-1]
+>              # FIXME invalid names other than the empty string aren't fla=
+gged
+>              if not self.symbol:
+> -                raise QAPIParseError(self.parser, "Invalid name")
+> +                raise QAPIParseError(self._parser, "Invalid name")
+>          else:
+>              self._append_freeform(line)
+>
+> @@ -189,48 +189,48 @@ class QAPIDoc(object):
+>      def _start_args_section(self, name):
+>          # FIXME invalid names other than the empty string aren't flagged
+>          if not name:
+> -            raise QAPIParseError(self.parser, "Invalid parameter name")
+> +            raise QAPIParseError(self._parser, "Invalid parameter name")
+>          if name in self.args:
+> -            raise QAPIParseError(self.parser,
+> +            raise QAPIParseError(self._parser,
+>                                   "'%s' parameter name duplicated" % name=
+)
+>          if self.sections:
+> -            raise QAPIParseError(self.parser,
+> +            raise QAPIParseError(self._parser,
+>                                   "'@%s:' can't follow '%s' section"
+>                                   % (name, self.sections[0].name))
+>          self._end_section()
+> -        self.section =3D QAPIDoc.ArgSection(name)
+> -        self.args[name] =3D self.section
+> +        self._section =3D QAPIDoc.ArgSection(name)
+> +        self.args[name] =3D self._section
+>
+>      def _start_section(self, name=3DNone):
+>          if name in ('Returns', 'Since') and self.has_section(name):
+> -            raise QAPIParseError(self.parser,
+> +            raise QAPIParseError(self._parser,
+>                                   "Duplicated '%s' section" % name)
+>          self._end_section()
+> -        self.section =3D QAPIDoc.Section(name)
+> -        self.sections.append(self.section)
+> +        self._section =3D QAPIDoc.Section(name)
+> +        self.sections.append(self._section)
+>
+>      def _end_section(self):
+> -        if self.section:
+> -            text =3D self.section.text =3D self.section.text.strip()
+> -            if self.section.name and (not text or text.isspace()):
+> -                raise QAPIParseError(self.parser, "Empty doc section '%s=
+'"
+> -                                     % self.section.name)
+> -            self.section =3D None
+> +        if self._section:
+> +            text =3D self._section.text =3D self._section.text.strip()
+> +            if self._section.name and (not text or text.isspace()):
+> +                raise QAPIParseError(self._parser, "Empty doc section '%=
+s'"
+> +                                     % self._section.name)
+> +            self._section =3D None
+>
+>      def _append_freeform(self, line):
+> -        in_arg =3D isinstance(self.section, QAPIDoc.ArgSection)
+> -        if (in_arg and self.section.text.endswith('\n\n')
+> +        in_arg =3D isinstance(self._section, QAPIDoc.ArgSection)
+> +        if (in_arg and self._section.text.endswith('\n\n')
+>                  and line and not line[0].isspace()):
+>              self._start_section()
+> -        if (in_arg or not self.section.name
+> -                or not self.section.name.startswith('Example')):
+> +        if (in_arg or not self._section.name
+> +                or not self._section.name.startswith('Example')):
+>              line =3D line.strip()
+>          match =3D re.match(r'(@\S+:)', line)
+>          if match:
+> -            raise QAPIParseError(self.parser,
+> +            raise QAPIParseError(self._parser,
+>                                   "'%s' not allowed in free-form document=
+ation"
+>                                   % match.group(1))
+> -        self.section.append(line)
+> +        self._section.append(line)
+>
+>      def connect_member(self, member):
+>          if member.name not in self.args:
+> --
+> 2.13.6
+>
+>
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1721220
 
-Title:
-  qemu crashes with assertion error `!mr->container' failed
-
-Status in QEMU:
-  New
-
-Bug description:
-  Re-production steps:
-  git clone today's qemu git tree (4th Oct 2017)
-  ./configure --target-list=3Dppc64-softmmu && make -j 8
-
-  Run the device-crash-test from scripts folder, seeing the following
-  error
-
-  INFO: running test case: machine=3Dbamboo binary=3Dppc64-softmmu/qemu-sys=
-tem-ppc64 device=3Dpcie-pci-bridge accel=3Dkvm
-  WARNING: qemu received signal -6: ppc64-softmmu/qemu-system-ppc64 -charde=
-v socket,id=3Dmon,path=3D/var/tmp/qemu-30972-monitor.sock -mon chardev=3Dmo=
-n,mode=3Dcontrol -display none -vga none -S -machine bamboo,accel=3Dkvm -de=
-vice pcie-pci-bridge
-  CRITICAL: failed: machine=3Dbamboo binary=3Dppc64-softmmu/qemu-system-ppc=
-64 device=3Dpcie-pci-bridge accel=3Dkvm
-  CRITICAL: cmdline: ppc64-softmmu/qemu-system-ppc64 -S -machine bamboo,acc=
-el=3Dkvm -device pcie-pci-bridge
-  CRITICAL: log: qemu-system-ppc64: /home/nasastry/qemu/memory.c:1699: memo=
-ry_region_finalize: Assertion `!mr->container' failed.
-  CRITICAL: log: warning: KVM does not support watchdog
-  CRITICAL: exit code: -6
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1721220/+subscriptions
+--=20
+Marc-Andr=C3=A9 Lureau
