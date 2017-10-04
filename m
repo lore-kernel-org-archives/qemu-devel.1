@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgxe-0001Ob-7A
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:31:31 -0400
+	(envelope-from <ronniesahlberg@gmail.com>) id 1dzgxo-0001WV-Jq
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:31:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgxd-00018h-1U
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:31:30 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:55949)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dzgxc-00017n-Qs
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:31:28 -0400
-Received: by mail-oi0-x241.google.com with SMTP id g125so1308399oib.12
-	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 03:31:28 -0700 (PDT)
+	(envelope-from <ronniesahlberg@gmail.com>) id 1dzgxn-0001Sv-TQ
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:31:40 -0400
 MIME-Version: 1.0
-In-Reply-To: <20171002141341.24616-11-armbru@redhat.com>
-References: <20171002141341.24616-1-armbru@redhat.com>
-	<20171002141341.24616-11-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 4 Oct 2017 12:31:27 +0200
-Message-ID: <CAJ+F1C+N-mnLLDmvqgtSH7Q5Spar8kA1Gei5iZq67p-9kPcSzg@mail.gmail.com>
+In-Reply-To: <20171002140307.5292-6-armbru@redhat.com>
+References: <20171002140307.5292-1-armbru@redhat.com>
+	<20171002140307.5292-6-armbru@redhat.com>
+From: ronnie sahlberg <ronniesahlberg@gmail.com>
+Date: Wed, 4 Oct 2017 20:31:38 +1000
+Message-ID: <CAN05THQE4gCa7=iiK9P23Smck_itS2fmrAJkLSvmy_OqwfbYqw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 10/11] qapi: Rename QAPIDoc.parser,
- .section to ._parser, ._section
+Subject: Re: [Qemu-devel] [PATCH 5/8] qemu-options: Add missing -iscsi
+ Texinfo documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,153 +24,37 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-On Mon, Oct 2, 2017 at 4:13 PM, Markus Armbruster <armbru@redhat.com> wrote=
-:
+Reviewed-by: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+
+On Tue, Oct 3, 2017 at 12:03 AM, Markus Armbruster <armbru@redhat.com> wrote:
+> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> Cc: qemu-block@nongnu.org
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
 > ---
->  scripts/qapi.py | 52 ++++++++++++++++++++++++++-------------------------=
--
->  1 file changed, 26 insertions(+), 26 deletions(-)
+>  qemu-options.hx | 6 ++++++
+>  1 file changed, 6 insertions(+)
 >
-> diff --git a/scripts/qapi.py b/scripts/qapi.py
-> index e338868a52..43a54bf40f 100644
-> --- a/scripts/qapi.py
-> +++ b/scripts/qapi.py
-> @@ -120,11 +120,11 @@ class QAPIDoc(object):
->              self.member =3D member
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index c647fdde62..8568ee388c 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -1180,6 +1180,12 @@ DEF("iscsi", HAS_ARG, QEMU_OPTION_iscsi,
+>      "                iSCSI session parameters\n", QEMU_ARCH_ALL)
 >
->      def __init__(self, parser, info):
-> -        # self.parser is used to report errors with QAPIParseError.  The
-> +        # self._parser is used to report errors with QAPIParseError.  Th=
-e
->          # resulting error position depends on the state of the parser.
->          # It happens to be the beginning of the comment.  More or less
->          # servicable, but action at a distance.
-> -        self.parser =3D parser
-> +        self._parser =3D parser
->          self.info =3D info
->          self.symbol =3D None
->          self.body =3D QAPIDoc.Section()
-> @@ -133,7 +133,7 @@ class QAPIDoc(object):
->          # a list of Section
->          self.sections =3D []
->          # the current section
-> -        self.section =3D self.body
-> +        self._section =3D self.body
->
->      def has_section(self, name):
->          """Return True if we have a section with this name."""
-> @@ -150,7 +150,7 @@ class QAPIDoc(object):
->              return
->
->          if line[0] !=3D ' ':
-> -            raise QAPIParseError(self.parser, "Missing space after #")
-> +            raise QAPIParseError(self._parser, "Missing space after #")
->          line =3D line[1:]
->
->          # FIXME not nice: things like '#  @foo:' and '# @foo: ' aren't
-> @@ -159,11 +159,11 @@ class QAPIDoc(object):
->              self._append_symbol_line(line)
->          elif not self.body.text and line.startswith('@'):
->              if not line.endswith(':'):
-> -                raise QAPIParseError(self.parser, "Line should end with =
-:")
-> +                raise QAPIParseError(self._parser, "Line should end with=
- :")
->              self.symbol =3D line[1:-1]
->              # FIXME invalid names other than the empty string aren't fla=
-gged
->              if not self.symbol:
-> -                raise QAPIParseError(self.parser, "Invalid name")
-> +                raise QAPIParseError(self._parser, "Invalid name")
->          else:
->              self._append_freeform(line)
->
-> @@ -189,48 +189,48 @@ class QAPIDoc(object):
->      def _start_args_section(self, name):
->          # FIXME invalid names other than the empty string aren't flagged
->          if not name:
-> -            raise QAPIParseError(self.parser, "Invalid parameter name")
-> +            raise QAPIParseError(self._parser, "Invalid parameter name")
->          if name in self.args:
-> -            raise QAPIParseError(self.parser,
-> +            raise QAPIParseError(self._parser,
->                                   "'%s' parameter name duplicated" % name=
-)
->          if self.sections:
-> -            raise QAPIParseError(self.parser,
-> +            raise QAPIParseError(self._parser,
->                                   "'@%s:' can't follow '%s' section"
->                                   % (name, self.sections[0].name))
->          self._end_section()
-> -        self.section =3D QAPIDoc.ArgSection(name)
-> -        self.args[name] =3D self.section
-> +        self._section =3D QAPIDoc.ArgSection(name)
-> +        self.args[name] =3D self._section
->
->      def _start_section(self, name=3DNone):
->          if name in ('Returns', 'Since') and self.has_section(name):
-> -            raise QAPIParseError(self.parser,
-> +            raise QAPIParseError(self._parser,
->                                   "Duplicated '%s' section" % name)
->          self._end_section()
-> -        self.section =3D QAPIDoc.Section(name)
-> -        self.sections.append(self.section)
-> +        self._section =3D QAPIDoc.Section(name)
-> +        self.sections.append(self._section)
->
->      def _end_section(self):
-> -        if self.section:
-> -            text =3D self.section.text =3D self.section.text.strip()
-> -            if self.section.name and (not text or text.isspace()):
-> -                raise QAPIParseError(self.parser, "Empty doc section '%s=
-'"
-> -                                     % self.section.name)
-> -            self.section =3D None
-> +        if self._section:
-> +            text =3D self._section.text =3D self._section.text.strip()
-> +            if self._section.name and (not text or text.isspace()):
-> +                raise QAPIParseError(self._parser, "Empty doc section '%=
-s'"
-> +                                     % self._section.name)
-> +            self._section =3D None
->
->      def _append_freeform(self, line):
-> -        in_arg =3D isinstance(self.section, QAPIDoc.ArgSection)
-> -        if (in_arg and self.section.text.endswith('\n\n')
-> +        in_arg =3D isinstance(self._section, QAPIDoc.ArgSection)
-> +        if (in_arg and self._section.text.endswith('\n\n')
->                  and line and not line[0].isspace()):
->              self._start_section()
-> -        if (in_arg or not self.section.name
-> -                or not self.section.name.startswith('Example')):
-> +        if (in_arg or not self._section.name
-> +                or not self._section.name.startswith('Example')):
->              line =3D line.strip()
->          match =3D re.match(r'(@\S+:)', line)
->          if match:
-> -            raise QAPIParseError(self.parser,
-> +            raise QAPIParseError(self._parser,
->                                   "'%s' not allowed in free-form document=
-ation"
->                                   % match.group(1))
-> -        self.section.append(line)
-> +        self._section.append(line)
->
->      def connect_member(self, member):
->          if member.name not in self.args:
+>  STEXI
+> +@item -iscsi
+> +@findex -iscsi
+> +Configure iSCSI session parameters.
+> +ETEXI
+> +
+> +STEXI
+>  @end table
+>  ETEXI
+>  DEFHEADING()
 > --
 > 2.13.6
 >
->
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
