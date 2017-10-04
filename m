@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dzZKb-00087R-D3
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:22:42 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dzZlq-0002nH-Gk
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:50:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dzZKa-0005pY-Jr
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:22:41 -0400
-References: <150708336622.147.16727017734840064391@b58463cdfd5f>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7d6f852d-5186-e488-2f32-861ce5f69c79@redhat.com>
-Date: Tue, 3 Oct 2017 21:22:26 -0500
-MIME-Version: 1.0
-In-Reply-To: <150708336622.147.16727017734840064391@b58463cdfd5f>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Kt2ndBrAbAs5HRxBr7ccDnPEKq0eKOC21"
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] block: Avoid copy-on-read assertions
+	(envelope-from <ehabkost@redhat.com>) id 1dzZln-0005d2-B4
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:50:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60876)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dzZln-0005ba-55
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:50:47 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C77D96E762
+	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 02:50:45 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Tue,  3 Oct 2017 23:50:41 -0300
+Message-Id: <20171004025043.3788-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/2] vl: Deprecate auto-loading of qemu.conf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +28,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
+Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Kt2ndBrAbAs5HRxBr7ccDnPEKq0eKOC21
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com,
- qemu-block@nongnu.org, stefanha@redhat.com
-Message-ID: <7d6f852d-5186-e488-2f32-861ce5f69c79@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] block: Avoid copy-on-read assertions
-References: <150708336622.147.16727017734840064391@b58463cdfd5f>
-In-Reply-To: <150708336622.147.16727017734840064391@b58463cdfd5f>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This missed v2.9 and v2.10.  Let's try again: we can include this
+on v2.11, and remove the default config file in QEMU 2.13 or
+2.14.
 
-On 10/03/2017 09:16 PM, no-reply@patchew.org wrote:
-> Hi,
->=20
-> This series failed automatic build test. Please find the testing comman=
-ds and
-> their output below. If you have docker installed, you can probably repr=
-oduce it
-> locally.
->=20
+Changes v3 -> v4:
+* Use warn_report() instead of error_report("warning: ...")
+  (Eric Blake)
+* Document as a deprecated feature in qemu-doc.texi
+* Updated Subject line
+  (was "vl: Print warning if a non-empty default config file is found")
 
-> 195         [not run] not suitable for this image format: raw
-> 197         - output mismatch (see 197.out.bad)
-> --- /tmp/qemu-test/src/tests/qemu-iotests/197.out	2017-10-04 01:52:59.0=
-00000000 +0000
-> +++ /tmp/qemu-test/build/tests/qemu-iotests/197.out.bad	2017-10-04 02:1=
-5:52.212004491 +0000
-> @@ -12,13 +12,18 @@
->  128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  read 0/0 bytes at offset 0
->  0 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> -read 2147483136/2147483136 bytes at offset 1024
-> -2 GiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +(process:16284): GLib-ERROR **: gmem.c:100: failed to allocate 2147483=
-136 bytes
+Changes v2 -> v3:
+* Rebase to latest qemu.git master
 
-Okay, a test that requires a nearly-2G read in one operation is fringe,
-and I can see it choking 32-bit platforms rather easily.  How do we
-modify the test to not be so mean to memory-starved systems?  And why
-didn't patchew complain about this on v1, which had the same ~2G read?
+Changes v1 -> v2:
+* Remove unnecessary translation of qemu_config_parse()
+  erros to -EINVAL at block/blkdebug.c:read_config()
+  * Suggsted-by: Markus Armbruster <armbru@redhat.com>
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+We plan to remove support for /etc/qemu/qemu.conf in the near
+future. Make QEMU print a warning in case there a non-empty
+/etc/qemu/qemu.conf is loaded, so users have time to adapt.
 
+Eduardo Habkost (2):
+  config: qemu_config_parse() return number of config groups
+  vl: Deprecate auto-loading of qemu.conf
 
---Kt2ndBrAbAs5HRxBr7ccDnPEKq0eKOC21
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+ block/blkdebug.c   |  1 -
+ util/qemu-config.c | 15 +++++++--------
+ vl.c               |  6 ++++++
+ qemu-doc.texi      |  8 ++++++++
+ 4 files changed, 21 insertions(+), 9 deletions(-)
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnUReIACgkQp6FrSiUn
-Q2p9iQf/Z2IiUz/kqgKePiudO5ScY5K/7H0HJBAV9U/4/NBmnNA+1zYCylzATggm
-2R0sk7OCYyc0MHDaJasOslguOHhb54JMEVQlDnx//VRktZU/ADxx32KGchU5Rxwz
-sHhb5JcnqRCrTlXFHmK866jax9QO57/JF9xlS1Jv061XcWqAaKIeo+O3nnyb9ClQ
-Fmv1lPI3jAD5HRRNa+R91Zl9Yj5AkdWUZ14wLrHPHxRD6pLOGiv+B+hRgaqi0FxA
-06vtVzlXLTH1FbZjXySjLenznhxS5Y66wfHZYjS/fTHOXv21fDk+H+LWU19r9vFN
-5dVN6mxfPrgLxLXnPfc4pblE13glxQ==
-=9E0F
------END PGP SIGNATURE-----
-
---Kt2ndBrAbAs5HRxBr7ccDnPEKq0eKOC21--
+-- 
+2.13.5
