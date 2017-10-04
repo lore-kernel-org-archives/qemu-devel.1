@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgw7-0000Bp-L1
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:29:57 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgx1-0000vv-8u
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:30:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgw6-0007vT-Dx
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:29:55 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:47737)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgwz-0000TF-Tv
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:30:51 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:34640)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dzgw6-0007vA-7d
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:29:54 -0400
-Received: by mail-oi0-x241.google.com with SMTP id p187so18824893oif.4
-	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 03:29:54 -0700 (PDT)
+	id 1dzgwz-0000Su-Mv
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:30:49 -0400
+Received: by mail-oi0-x243.google.com with SMTP id h200so553815oib.1
+	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 03:30:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20171002141341.24616-10-armbru@redhat.com>
+In-Reply-To: <20171002141341.24616-9-armbru@redhat.com>
 References: <20171002141341.24616-1-armbru@redhat.com>
-	<20171002141341.24616-10-armbru@redhat.com>
+	<20171002141341.24616-9-armbru@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 4 Oct 2017 12:29:52 +0200
-Message-ID: <CAJ+F1CLKQ6zfM=xNspB4E7ZrY=WSnbiF0e9g3CNJSX7pKR6fVQ@mail.gmail.com>
+Date: Wed, 4 Oct 2017 12:30:47 +0200
+Message-ID: <CAJ+F1CLafk_YcYH=XgrENctQbELXETfWMxZHeTZnvtznkj==hQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 09/11] qapi2texi: Simplify representation
- of section text
+Subject: Re: [Qemu-devel] [PATCH 08/11] qapi: Simplify representation of
+ QAPIDoc section text
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,8 +36,10 @@ Cc: QEMU <qemu-devel@nongnu.org>
 
 On Mon, Oct 2, 2017 at 4:13 PM, Markus Armbruster <armbru@redhat.com> wrote=
 :
-> Use a string instead of a list of strings.  While there, generate
-> fewer superfluous blank lines.
+> Use a string instead of a list of strings.
+>
+> This makes qapi2texi.py generate additional blank lines.  They're
+> harmless, and the next commit will get rid of them again.
 >
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
@@ -45,195 +47,147 @@ Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
 > ---
->  scripts/qapi2texi.py            | 33 ++++++++++++++++-----------------
->  tests/qapi-schema/doc-good.texi | 10 ----------
->  2 files changed, 16 insertions(+), 27 deletions(-)
+>  scripts/qapi.py                 | 16 ++++++----------
+>  scripts/qapi2texi.py            | 14 +++++++-------
+>  tests/qapi-schema/doc-good.texi |  1 +
+>  tests/qapi-schema/test-qapi.py  |  6 +++---
+>  4 files changed, 17 insertions(+), 20 deletions(-)
 >
+> diff --git a/scripts/qapi.py b/scripts/qapi.py
+> index 2137067b48..e338868a52 100644
+> --- a/scripts/qapi.py
+> +++ b/scripts/qapi.py
+> @@ -106,13 +106,10 @@ class QAPIDoc(object):
+>              # optional section name (argument/member or section name)
+>              self.name =3D name
+>              # the list of lines for this section
+> -            self.content =3D []
+> +            self.text =3D ''
+>
+>          def append(self, line):
+> -            self.content.append(line)
+> -
+> -        def __repr__(self):
+> -            return '\n'.join(self.content).strip()
+> +            self.text +=3D line.rstrip() + '\n'
+>
+>      class ArgSection(Section):
+>          def __init__(self, name):
+> @@ -160,7 +157,7 @@ class QAPIDoc(object):
+>          # recognized, and get silently treated as ordinary text
+>          if self.symbol:
+>              self._append_symbol_line(line)
+> -        elif not self.body.content and line.startswith('@'):
+> +        elif not self.body.text and line.startswith('@'):
+>              if not line.endswith(':'):
+>                  raise QAPIParseError(self.parser, "Line should end with =
+:")
+>              self.symbol =3D line[1:-1]
+> @@ -214,16 +211,15 @@ class QAPIDoc(object):
+>
+>      def _end_section(self):
+>          if self.section:
+> -            contents =3D str(self.section)
+> -            if self.section.name and (not contents or contents.isspace()=
+):
+> +            text =3D self.section.text =3D self.section.text.strip()
+> +            if self.section.name and (not text or text.isspace()):
+>                  raise QAPIParseError(self.parser, "Empty doc section '%s=
+'"
+>                                       % self.section.name)
+>              self.section =3D None
+>
+>      def _append_freeform(self, line):
+>          in_arg =3D isinstance(self.section, QAPIDoc.ArgSection)
+> -        if (in_arg and self.section.content
+> -                and not self.section.content[-1]
+> +        if (in_arg and self.section.text.endswith('\n\n')
+>                  and line and not line[0].isspace()):
+>              self._start_section()
+>          if (in_arg or not self.section.name
 > diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-> index 379d27643d..58add26c11 100755
+> index f16fa1ba53..379d27643d 100755
 > --- a/scripts/qapi2texi.py
 > +++ b/scripts/qapi2texi.py
-> @@ -13,7 +13,6 @@ MSG_FMT =3D """
->  @deftypefn {type} {{}} {name}
->
->  {body}
-> -
->  @end deftypefn
->
->  """.format
-> @@ -22,7 +21,6 @@ TYPE_FMT =3D """
->  @deftp {{{type}}} {name}
->
->  {body}
-> -
->  @end deftp
->
->  """.format
-> @@ -74,7 +72,7 @@ def texi_format(doc):
->      - 1. or 1): generates an @enumerate @item
->      - */-: generates an @itemize list
->      """
-> -    lines =3D []
-> +    ret =3D ''
->      doc =3D subst_braces(doc)
->      doc =3D subst_vars(doc)
->      doc =3D subst_emph(doc)
-> @@ -100,32 +98,32 @@ def texi_format(doc):
->              line =3D '@subsection ' + line[3:]
->          elif re.match(r'^([0-9]*\.) ', line):
->              if not inlist:
-> -                lines.append('@enumerate')
-> +                ret +=3D '@enumerate\n'
->                  inlist =3D 'enumerate'
-> +            ret +=3D '@item\n'
->              line =3D line[line.find(' ')+1:]
-> -            lines.append('@item')
->          elif re.match(r'^[*-] ', line):
->              if not inlist:
-> -                lines.append('@itemize %s' % {'*': '@bullet',
-> -                                              '-': '@minus'}[line[0]])
-> +                ret +=3D '@itemize %s\n' % {'*': '@bullet',
-> +                                          '-': '@minus'}[line[0]]
->                  inlist =3D 'itemize'
-> -            lines.append('@item')
-> +            ret +=3D '@item\n'
->              line =3D line[2:]
->          elif lastempty and inlist:
-> -            lines.append('@end %s\n' % inlist)
-> +            ret +=3D '@end %s\n\n' % inlist
->              inlist =3D ''
->
->          lastempty =3D empty
-> -        lines.append(line)
-> +        ret +=3D line + '\n'
->
->      if inlist:
-> -        lines.append('@end %s\n' % inlist)
-> -    return '\n'.join(lines)
-> +        ret +=3D '@end %s\n\n' % inlist
-> +    return ret
->
+> @@ -125,7 +125,7 @@ def texi_format(doc):
 >
 >  def texi_body(doc):
 >      """Format the main documentation body"""
-> -    return texi_format(doc.body.text) + '\n'
-> +    return texi_format(doc.body.text)
+> -    return texi_format(str(doc.body)) + '\n'
+> +    return texi_format(doc.body.text) + '\n'
 >
 >
 >  def texi_enum_value(value):
-> @@ -154,10 +152,11 @@ def texi_members(doc, what, base, variants, member_=
-func):
+> @@ -149,8 +149,8 @@ def texi_members(doc, what, base, variants, member_fu=
+nc):
+>      items =3D ''
+>      for section in doc.args.itervalues():
+>          # TODO Drop fallbacks when undocumented members are outlawed
+> -        if section.content:
+> -            desc =3D texi_format(str(section))
+> +        if section.text:
+> +            desc =3D texi_format(section.text)
 >          elif (variants and variants.tag_member =3D=3D section.member
 >                and not section.member.type.doc_type()):
 >              values =3D section.member.type.member_names()
-> -            desc =3D 'One of ' + ', '.join(['@t{"%s"}' % v for v in valu=
-es])
-> +            members_text =3D ', '.join(['@t{"%s"}' % v for v in values])
-> +            desc =3D 'One of ' + members_text + '\n'
->          else:
-> -            desc =3D 'Not documented'
-> -        items +=3D member_func(section.member) + desc + '\n'
-> +            desc =3D 'Not documented\n'
-> +        items +=3D member_func(section.member) + desc
->      if base:
->          items +=3D '@item The members of @code{%s}\n' % base.doc_type()
->      if variants:
-> @@ -182,7 +181,7 @@ def texi_sections(doc):
->      for section in doc.sections:
+> @@ -183,11 +183,10 @@ def texi_sections(doc):
 >          if section.name:
 >              # prefer @b over @strong, so txt doesn't translate it to *Fo=
 o:*
-> -            body +=3D '\n\n@b{%s:}\n' % section.name
-> +            body +=3D '\n@b{%s:}\n' % section.name
+>              body +=3D '\n\n@b{%s:}\n' % section.name
+> -        text =3D str(section)
 >          if section.name and section.name.startswith('Example'):
->              body +=3D texi_example(section.text)
+> -            body +=3D texi_example(text)
+> +            body +=3D texi_example(section.text)
 >          else:
+> -            body +=3D texi_format(text)
+> +            body +=3D texi_format(section.text)
+>      return body
+>
+>
+> @@ -240,7 +239,8 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor)=
+:
+>              self.out +=3D '\n'
+>          if boxed:
+>              body =3D texi_body(doc)
+> -            body +=3D '\n@b{Arguments:} the members of @code{%s}' % arg_=
+type.name
+> +            body +=3D ('\n@b{Arguments:} the members of @code{%s}\n'
+> +                     % arg_type.name)
+>              body +=3D texi_sections(doc)
+>          else:
+>              body =3D texi_entity(doc, 'Arguments')
 > diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good=
 .texi
-> index c032f23fc1..1778312581 100644
+> index a331349756..c032f23fc1 100644
 > --- a/tests/qapi-schema/doc-good.texi
 > +++ b/tests/qapi-schema/doc-good.texi
-> @@ -101,7 +101,6 @@ Not documented
->  the first member
->  @end table
->
-> -
->  @end deftp
->
->
-> @@ -118,7 +117,6 @@ Another paragraph (but no @code{var}: line)
->  Not documented
->  @end table
->
-> -
->  @end deftp
->
->
-> @@ -127,7 +125,6 @@ Not documented
->
->
->
-> -
->  @end deftp
->
->
-> @@ -143,7 +140,6 @@ Not documented
->  @item The members of @code{Variant2} when @code{base1} is @t{"two"}
->  @end table
->
-> -
->  @end deftp
->
->
-> @@ -160,7 +156,6 @@ One of @t{"one"}, @t{"two"}
->  @item @code{data: Variant2} when @code{type} is @t{"two"}
->  @end table
->
-> -
->  @end deftp
->
->
-> @@ -182,7 +177,6 @@ argument
->  Not documented
->  @end table
->
-> -
->  @b{Note:}
->  @code{arg3} is undocumented
->
-> @@ -209,14 +203,12 @@ Duis aute irure dolor
->  <- out
->  @end example
->
-> -
->  @b{Examples:}
->  @example
->  - *verbatim*
->  - @{braces@}
->  @end example
->
-> -
->  @b{Since:}
->  2.10
->
-> @@ -230,7 +222,6 @@ If you're bored enough to read this, go see a video o=
+> @@ -230,6 +230,7 @@ If you're bored enough to read this, go see a video o=
 f boxed cats
 >
 >  @b{Arguments:} the members of @code{Object}
 >
-> -
+> +
 >  @b{Example:}
 >  @example
 >  -> in
-> @@ -238,7 +229,6 @@ If you're bored enough to read this, go see a video o=
-f boxed cats
->  <- out
->  @end example
->
-> -
->  @end deftypefn
->
->
+> diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
+.py
+> index c7724d3437..fe0ca08d78 100644
+> --- a/tests/qapi-schema/test-qapi.py
+> +++ b/tests/qapi-schema/test-qapi.py
+> @@ -61,8 +61,8 @@ for doc in schema.docs:
+>          print 'doc symbol=3D%s' % doc.symbol
+>      else:
+>          print 'doc freeform'
+> -    print '    body=3D\n%s' % doc.body
+> +    print '    body=3D\n%s' % doc.body.text
+>      for arg, section in doc.args.iteritems():
+> -        print '    arg=3D%s\n%s' % (arg, section)
+> +        print '    arg=3D%s\n%s' % (arg, section.text)
+>      for section in doc.sections:
+> -        print '    section=3D%s\n%s' % (section.name, section)
+> +        print '    section=3D%s\n%s' % (section.name, section.text)
 > --
 > 2.13.6
 >
