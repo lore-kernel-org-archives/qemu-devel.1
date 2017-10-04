@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dzY3e-0000Wk-8G
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 21:01:07 -0400
+	(envelope-from <bounces@canonical.com>) id 1dzY3e-0000Wl-8T
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 21:01:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dzY3b-0001De-GO
+	(envelope-from <bounces@canonical.com>) id 1dzY3a-0001DO-EM
 	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 21:01:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56770)
+Received: from indium.canonical.com ([91.189.90.7]:56726)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dzY3b-0001DS-6m
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 21:01:03 -0400
+	id 1dzY3a-0001Bz-4b
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 21:01:02 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1dzY3a-0002JZ-7W
-	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 01:01:02 +0000
+	id 1dzY3Z-0002Ji-46
+	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 01:01:01 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3697E2E80C3
-	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 01:01:02 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 1C3DA2E80C3
+	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 01:01:01 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Oct 2017 00:54:20 -0000
+Date: Wed, 04 Oct 2017 00:52:58 -0000
 From: Sean Feole <sean.feole@canonical.com>
 Reply-To: Bug 1719196 <1719196@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150626680089.6094.17724106932405637799.malonedeb@soybean.canonical.com>
-Message-Id: <150707846078.1760.2822744426953368536.malone@chaenomeles.canonical.com>
+Message-Id: <150707837818.13102.9187416002947798021.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1719196] Re: [arm64 ocata] newly created
  instances are unable to raise network interfaces
@@ -39,16 +39,16 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Taken from the upgraded hypervisor
+Taken from the upgraded hypervisor:
 
-ubuntu@aw3:/var/lib/nova/instances/2cec409e-de92-4d29-ad68-3f1d1f8be7fc$ su=
-do qemu-system-aarch64 --version
+ubuntu@awrep3:/var/lib/nova/instances/2cec409e-de92-4d29-ad68-3f1d1f8be7fc$=
+ sudo qemu-system-aarch64 --version
 QEMU emulator version 2.8.0(Debian 1:2.8+dfsg-3ubuntu2.3~cloud0)
 Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
 
 
-ubuntu@aw3:/var/lib/nova/instances/2cec409e-de92-4d29-ad68-3f1d1f8be7fc$ su=
-do libvirtd --version
+ubuntu@awrep3:/var/lib/nova/instances/2cec409e-de92-4d29-ad68-3f1d1f8be7fc$=
+ sudo libvirtd --version
 libvirtd (libvirt) 2.5.0
 
 -- =
