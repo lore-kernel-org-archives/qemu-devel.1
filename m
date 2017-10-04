@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgfl-0004B7-Au
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:13:04 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgfs-0004HW-NN
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:13:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgfi-0000oH-CW
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:13:01 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgfn-0000rz-4f
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:13:08 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:38547)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dzgfn-0000rr-0S
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 06:13:03 -0400
+Received: by mail-qk0-x244.google.com with SMTP id 17so732750qkq.5
+	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 03:13:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20171002140307.5292-4-armbru@redhat.com>
+In-Reply-To: <20171002140307.5292-3-armbru@redhat.com>
 References: <20171002140307.5292-1-armbru@redhat.com>
-	<20171002140307.5292-4-armbru@redhat.com>
+	<20171002140307.5292-3-armbru@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 4 Oct 2017 12:12:56 +0200
-Message-ID: <CAJ+F1CLtUD_Uh4_GFwPC8FVd-5ywWj3s_nttqbaf5x+YQpKayA@mail.gmail.com>
+Date: Wed, 4 Oct 2017 12:13:02 +0200
+Message-ID: <CAJ+F1CLPXMra-B5yM2AT-W5irDxKpKqh2_qRzyCiOqkbMQxQuA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/8] qemu-options qemu-doc: Move "Device
- URL Syntax" to qemu-doc
+Subject: Re: [Qemu-devel] [PATCH 2/8] qemu-options: Fix markup of -netdev
+ l2tpv3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,613 +32,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Max Reitz <mreitz@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
 
 On Mon, Oct 2, 2017 at 4:03 PM, Markus Armbruster <armbru@redhat.com> wrote=
 :
-> Commit 0f5314a (v1.0) added section "Device URL Syntax" to
-> qemu-options.hx.  It's enclosed in STEXI..ETEXI, thus affects only
-> qemu-options.texi, not --help.  It appears as a subsection under
-> section "Invocation".  Similarly, qemu.1 has it as a subsection under
-> "OPTIONS".
+> The table of option parameters lacks @table and @end table.  The
+> parameters become items in the enclosing table of options.  Screwed up
+> when l2tpv3 was added in commit 3fb69aa.  Fix the obvious way.
 >
-> Commit f9dadc9 (v1.1.0) dropped new option -iscsi into the middle of
-> this section.  No effect on qemu-options.texi.  It appears in --help
-> run together with the "Bluetooth(R) options:" header.
->
-> Commit c70a01e (v1.5.0) gives it is own heading in --help by moving
-> commit 0f5314a's DEFHEADING(Device URL Syntax:) outside STEXI..ETEXI.
-> Trouble is the heading makes no sense for -iscsi.
->
-> Move all of the "Device URL Syntax" Texinfo to qemu-doc.texi.  Mark it
-> for inclusion in qemu.1 with '@c man begin NOTES'.  This turns it into
-> a separate section outside the list of options both in qemu-doc and in
-> qemu.1.
->
-> There's substantial overlap with the existing qemu-doc section "Disk
-> Images".  Mark with a TODO comment.
->
-> Output of --help will be fixed next.
->
-> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: qemu-block@nongnu.org
+> Cc: Jason Wang <jasowang@redhat.com>
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
 > ---
->  qemu-doc.texi   | 217 ++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++
->  qemu-options.hx | 222 --------------------------------------------------=
-------
->  2 files changed, 217 insertions(+), 222 deletions(-)
->
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index ecd186a159..848e49966a 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -245,6 +245,223 @@ targets do not need a disk image.
->
->  @c man end
->
-> +@node device_url
-> +@subsection Device URL Syntax
-> +@c TODO merge this with section Disk Images
-> +
-> +@c man begin NOTES
-> +
-> +In addition to using normal file images for the emulated storage devices=
-,
-> +QEMU can also use networked resources such as iSCSI devices. These are
-> +specified using a special URL syntax.
-> +
-> +@table @option
-> +@item iSCSI
-> +iSCSI support allows QEMU to access iSCSI resources directly and use as
-> +images for the guest storage. Both disk and cdrom images are supported.
-> +
-> +Syntax for specifying iSCSI LUNs is
-> +``iscsi://<target-ip>[:<port>]/<target-iqn>/<lun>''
-> +
-> +By default qemu will use the iSCSI initiator-name
-> +'iqn.2008-11.org.linux-kvm[:<name>]' but this can also be set from the c=
-ommand
-> +line or a configuration file.
-> +
-> +Since version Qemu 2.4 it is possible to specify a iSCSI request timeout=
- to detect
-> +stalled requests and force a reestablishment of the session. The timeout
-> +is specified in seconds. The default is 0 which means no timeout. Libisc=
-si
-> +1.15.0 or greater is required for this feature.
-> +
-> +Example (without authentication):
-> +@example
-> +qemu-system-i386 -iscsi initiator-name=3Diqn.2001-04.com.example:my-init=
-iator \
-> +                 -cdrom iscsi://192.0.2.1/iqn.2001-04.com.example/2 \
-> +                 -drive file=3Discsi://192.0.2.1/iqn.2001-04.com.example=
-/1
-> +@end example
-> +
-> +Example (CHAP username/password via URL):
-> +@example
-> +qemu-system-i386 -drive file=3Discsi://user%password@@192.0.2.1/iqn.2001=
--04.com.example/1
-> +@end example
-> +
-> +Example (CHAP username/password via environment variables):
-> +@example
-> +LIBISCSI_CHAP_USERNAME=3D"user" \
-> +LIBISCSI_CHAP_PASSWORD=3D"password" \
-> +qemu-system-i386 -drive file=3Discsi://192.0.2.1/iqn.2001-04.com.example=
-/1
-> +@end example
-> +
-> +@item NBD
-> +QEMU supports NBD (Network Block Devices) both using TCP protocol as wel=
-l
-> +as Unix Domain Sockets.
-> +
-> +Syntax for specifying a NBD device using TCP
-> +``nbd:<server-ip>:<port>[:exportname=3D<export>]''
-> +
-> +Syntax for specifying a NBD device using Unix Domain Sockets
-> +``nbd:unix:<domain-socket>[:exportname=3D<export>]''
-> +
-> +Example for TCP
-> +@example
-> +qemu-system-i386 --drive file=3Dnbd:192.0.2.1:30000
-> +@end example
-> +
-> +Example for Unix Domain Sockets
-> +@example
-> +qemu-system-i386 --drive file=3Dnbd:unix:/tmp/nbd-socket
-> +@end example
-> +
-> +@item SSH
-> +QEMU supports SSH (Secure Shell) access to remote disks.
-> +
-> +Examples:
-> +@example
-> +qemu-system-i386 -drive file=3Dssh://user@@host/path/to/disk.img
-> +qemu-system-i386 -drive file.driver=3Dssh,file.user=3Duser,file.host=3Dh=
-ost,file.port=3D22,file.path=3D/path/to/disk.img
-> +@end example
-> +
-> +Currently authentication must be done using ssh-agent.  Other
-> +authentication methods may be supported in future.
-> +
-> +@item Sheepdog
-> +Sheepdog is a distributed storage system for QEMU.
-> +QEMU supports using either local sheepdog devices or remote networked
-> +devices.
-> +
-> +Syntax for specifying a sheepdog device
-> +@example
-> +sheepdog[+tcp|+unix]://[host:port]/vdiname[?socket=3Dpath][#snapid|#tag]
-> +@end example
-> +
-> +Example
-> +@example
-> +qemu-system-i386 --drive file=3Dsheepdog://192.0.2.1:30000/MyVirtualMach=
-ine
-> +@end example
-> +
-> +See also @url{https://sheepdog.github.io/sheepdog/}.
-> +
-> +@item GlusterFS
-> +GlusterFS is a user space distributed file system.
-> +QEMU supports the use of GlusterFS volumes for hosting VM disk images us=
-ing
-> +TCP, Unix Domain Sockets and RDMA transport protocols.
-> +
-> +Syntax for specifying a VM disk image on GlusterFS volume is
-> +@example
-> +
-> +URI:
-> +gluster[+type]://[host[:port]]/volume/path[?socket=3D...][,debug=3DN][,l=
-ogfile=3D...]
-> +
-> +JSON:
-> +'json:@{"driver":"qcow2","file":@{"driver":"gluster","volume":"testvol",=
-"path":"a.img","debug":N,"logfile":"...",
-> +@                                 "server":[@{"type":"tcp","host":"...",=
-"port":"..."@},
-> +@                                           @{"type":"unix","socket":"..=
-."@}]@}@}'
-> +@end example
-> +
-> +
-> +Example
-> +@example
-> +URI:
-> +qemu-system-x86_64 --drive file=3Dgluster://192.0.2.1/testvol/a.img,
-> +@                               file.debug=3D9,file.logfile=3D/var/log/q=
-emu-gluster.log
-> +
-> +JSON:
-> +qemu-system-x86_64 'json:@{"driver":"qcow2",
-> +@                          "file":@{"driver":"gluster",
-> +@                                   "volume":"testvol","path":"a.img",
-> +@                                   "debug":9,"logfile":"/var/log/qemu-g=
-luster.log",
-> +@                                   "server":[@{"type":"tcp","host":"1.2=
-.3.4","port":24007@},
-> +@                                             @{"type":"unix","socket":"=
-/var/run/glusterd.socket"@}]@}@}'
-> +qemu-system-x86_64 -drive driver=3Dqcow2,file.driver=3Dgluster,file.volu=
-me=3Dtestvol,file.path=3D/path/a.img,
-> +@                                      file.debug=3D9,file.logfile=3D/va=
-r/log/qemu-gluster.log,
-> +@                                      file.server.0.type=3Dtcp,file.ser=
-ver.0.host=3D1.2.3.4,file.server.0.port=3D24007,
-> +@                                      file.server.1.type=3Dunix,file.se=
-rver.1.socket=3D/var/run/glusterd.socket
-> +@end example
-> +
-> +See also @url{http://www.gluster.org}.
-> +
-> +@item HTTP/HTTPS/FTP/FTPS
-> +QEMU supports read-only access to files accessed over http(s) and ftp(s)=
-.
-> +
-> +Syntax using a single filename:
-> +@example
-> +<protocol>://[<username>[:<password>]@@]<host>/<path>
-> +@end example
-> +
-> +where:
-> +@table @option
-> +@item protocol
-> +'http', 'https', 'ftp', or 'ftps'.
-> +
-> +@item username
-> +Optional username for authentication to the remote server.
-> +
-> +@item password
-> +Optional password for authentication to the remote server.
-> +
-> +@item host
-> +Address of the remote server.
-> +
-> +@item path
-> +Path on the remote server, including any query string.
-> +@end table
-> +
-> +The following options are also supported:
-> +@table @option
-> +@item url
-> +The full URL when passing options to the driver explicitly.
-> +
-> +@item readahead
-> +The amount of data to read ahead with each range request to the remote s=
-erver.
-> +This value may optionally have the suffix 'T', 'G', 'M', 'K', 'k' or 'b'=
-. If it
-> +does not have a suffix, it will be assumed to be in bytes. The value mus=
-t be a
-> +multiple of 512 bytes. It defaults to 256k.
-> +
-> +@item sslverify
-> +Whether to verify the remote server's certificate when connecting over S=
-SL. It
-> +can have the value 'on' or 'off'. It defaults to 'on'.
-> +
-> +@item cookie
-> +Send this cookie (it can also be a list of cookies separated by ';') wit=
-h
-> +each outgoing request.  Only supported when using protocols such as HTTP
-> +which support cookies, otherwise ignored.
-> +
-> +@item timeout
-> +Set the timeout in seconds of the CURL connection. This timeout is the t=
-ime
-> +that CURL waits for a response from the remote server to get the size of=
- the
-> +image to be downloaded. If not set, the default timeout of 5 seconds is =
-used.
-> +@end table
-> +
-> +Note that when passing options to qemu explicitly, @option{driver} is th=
-e value
-> +of <protocol>.
-> +
-> +Example: boot from a remote Fedora 20 live ISO image
-> +@example
-> +qemu-system-x86_64 --drive media=3Dcdrom,file=3Dhttp://dl.fedoraproject.=
-org/pub/fedora/linux/releases/20/Live/x86_64/Fedora-Live-Desktop-x86_64-20-=
-1.iso,readonly
-> +
-> +qemu-system-x86_64 --drive media=3Dcdrom,file.driver=3Dhttp,file.url=3Dh=
-ttp://dl.fedoraproject.org/pub/fedora/linux/releases/20/Live/x86_64/Fedora-=
-Live-Desktop-x86_64-20-1.iso,readonly
-> +@end example
-> +
-> +Example: boot from a remote Fedora 20 cloud image using a local overlay =
-for
-> +writes, copy-on-read, and a readahead of 64k
-> +@example
-> +qemu-img create -f qcow2 -o backing_file=3D'json:@{"file.driver":"http",=
-, "file.url":"https://dl.fedoraproject.org/pub/fedora/linux/releases/20/Ima=
-ges/x86_64/Fedora-x86_64-20-20131211.1-sda.qcow2",, "file.readahead":"64k"@=
-}' /tmp/Fedora-x86_64-20-20131211.1-sda.qcow2
-> +
-> +qemu-system-x86_64 -drive file=3D/tmp/Fedora-x86_64-20-20131211.1-sda.qc=
-ow2,copy-on-read=3Don
-> +@end example
-> +
-> +Example: boot from an image stored on a VMware vSphere server with a sel=
-f-signed
-> +certificate using a local overlay for writes, a readahead of 64k and a t=
-imeout
-> +of 10 seconds.
-> +@example
-> +qemu-img create -f qcow2 -o backing_file=3D'json:@{"file.driver":"https"=
-,, "file.url":"https://user:password@@vsphere.example.com/folder/test/test-=
-flat.vmdk?dcPath=3DDatacenter&dsName=3Ddatastore1",, "file.sslverify":"off"=
-,, "file.readahead":"64k",, "file.timeout":10@}' /tmp/test.qcow2
-> +
-> +qemu-system-x86_64 -drive file=3D/tmp/test.qcow2
-> +@end example
-> +
-> +@end table
-> +
-> +@c man end
-> +
->  @node pcsys_keys
->  @section Keys in the graphical frontends
+>  qemu-options.hx | 2 ++
+>  1 file changed, 2 insertions(+)
 >
 > diff --git a/qemu-options.hx b/qemu-options.hx
-> index 39f0e1b990..f112281d37 100644
+> index 0fed2fc009..39f0e1b990 100644
 > --- a/qemu-options.hx
 > +++ b/qemu-options.hx
-> @@ -2812,234 +2812,12 @@ ETEXI
->  DEFHEADING()
+> @@ -2367,6 +2367,7 @@ two systems. It is present in routers, firewalls an=
+d the Linux kernel
 >
->  DEFHEADING(Device URL Syntax:)
-> -STEXI
-> -
-> -In addition to using normal file images for the emulated storage devices=
-,
-> -QEMU can also use networked resources such as iSCSI devices. These are
-> -specified using a special URL syntax.
-> -
-> -@table @option
-> -@item iSCSI
-> -iSCSI support allows QEMU to access iSCSI resources directly and use as
-> -images for the guest storage. Both disk and cdrom images are supported.
-> -
-> -Syntax for specifying iSCSI LUNs is
-> -``iscsi://<target-ip>[:<port>]/<target-iqn>/<lun>''
-> -
-> -By default qemu will use the iSCSI initiator-name
-> -'iqn.2008-11.org.linux-kvm[:<name>]' but this can also be set from the c=
-ommand
-> -line or a configuration file.
-> -
-> -Since version Qemu 2.4 it is possible to specify a iSCSI request timeout=
- to detect
-> -stalled requests and force a reestablishment of the session. The timeout
-> -is specified in seconds. The default is 0 which means no timeout. Libisc=
-si
-> -1.15.0 or greater is required for this feature.
-> -
-> -Example (without authentication):
-> -@example
-> -qemu-system-i386 -iscsi initiator-name=3Diqn.2001-04.com.example:my-init=
-iator \
-> -                 -cdrom iscsi://192.0.2.1/iqn.2001-04.com.example/2 \
-> -                 -drive file=3Discsi://192.0.2.1/iqn.2001-04.com.example=
-/1
-> -@end example
-> -
-> -Example (CHAP username/password via URL):
-> -@example
-> -qemu-system-i386 -drive file=3Discsi://user%password@@192.0.2.1/iqn.2001=
--04.com.example/1
-> -@end example
-> -
-> -Example (CHAP username/password via environment variables):
-> -@example
-> -LIBISCSI_CHAP_USERNAME=3D"user" \
-> -LIBISCSI_CHAP_PASSWORD=3D"password" \
-> -qemu-system-i386 -drive file=3Discsi://192.0.2.1/iqn.2001-04.com.example=
-/1
-> -@end example
-> -
-> -iSCSI support is an optional feature of QEMU and only available when
-> -compiled and linked against libiscsi.
-> -ETEXI
->  DEF("iscsi", HAS_ARG, QEMU_OPTION_iscsi,
->      "-iscsi [user=3Duser][,password=3Dpassword]\n"
->      "       [,header-digest=3DCRC32C|CR32C-NONE|NONE-CRC32C|NONE\n"
->      "       [,initiator-name=3Dinitiator-iqn][,id=3Dtarget-iqn]\n"
->      "       [,timeout=3Dtimeout]\n"
->      "                iSCSI session parameters\n", QEMU_ARCH_ALL)
-> -STEXI
-> -
-> -iSCSI parameters such as username and password can also be specified via
-> -a configuration file. See qemu-doc for more information and examples.
-> -
-> -@item NBD
-> -QEMU supports NBD (Network Block Devices) both using TCP protocol as wel=
-l
-> -as Unix Domain Sockets.
-> -
-> -Syntax for specifying a NBD device using TCP
-> -``nbd:<server-ip>:<port>[:exportname=3D<export>]''
-> -
-> -Syntax for specifying a NBD device using Unix Domain Sockets
-> -``nbd:unix:<domain-socket>[:exportname=3D<export>]''
-> -
-> -
-> -Example for TCP
-> -@example
-> -qemu-system-i386 --drive file=3Dnbd:192.0.2.1:30000
-> -@end example
-> -
-> -Example for Unix Domain Sockets
-> -@example
-> -qemu-system-i386 --drive file=3Dnbd:unix:/tmp/nbd-socket
-> -@end example
-> -
-> -@item SSH
-> -QEMU supports SSH (Secure Shell) access to remote disks.
-> -
-> -Examples:
-> -@example
-> -qemu-system-i386 -drive file=3Dssh://user@@host/path/to/disk.img
-> -qemu-system-i386 -drive file.driver=3Dssh,file.user=3Duser,file.host=3Dh=
-ost,file.port=3D22,file.path=3D/path/to/disk.img
-> -@end example
-> -
-> -Currently authentication must be done using ssh-agent.  Other
-> -authentication methods may be supported in future.
-> -
-> -@item Sheepdog
-> -Sheepdog is a distributed storage system for QEMU.
-> -QEMU supports using either local sheepdog devices or remote networked
-> -devices.
-> -
-> -Syntax for specifying a sheepdog device
-> -@example
-> -sheepdog[+tcp|+unix]://[host:port]/vdiname[?socket=3Dpath][#snapid|#tag]
-> -@end example
-> -
-> -Example
-> -@example
-> -qemu-system-i386 --drive file=3Dsheepdog://192.0.2.1:30000/MyVirtualMach=
-ine
-> -@end example
-> -
-> -See also @url{https://sheepdog.github.io/sheepdog/}.
-> -
-> -@item GlusterFS
-> -GlusterFS is a user space distributed file system.
-> -QEMU supports the use of GlusterFS volumes for hosting VM disk images us=
-ing
-> -TCP, Unix Domain Sockets and RDMA transport protocols.
-> -
-> -Syntax for specifying a VM disk image on GlusterFS volume is
-> -@example
-> -
-> -URI:
-> -gluster[+type]://[host[:port]]/volume/path[?socket=3D...][,debug=3DN][,l=
-ogfile=3D...]
-> -
-> -JSON:
-> -'json:@{"driver":"qcow2","file":@{"driver":"gluster","volume":"testvol",=
-"path":"a.img","debug":N,"logfile":"...",
-> -@                                 "server":[@{"type":"tcp","host":"...",=
-"port":"..."@},
-> -@                                           @{"type":"unix","socket":"..=
-."@}]@}@}'
-> -@end example
-> -
-> -
-> -Example
-> -@example
-> -URI:
-> -qemu-system-x86_64 --drive file=3Dgluster://192.0.2.1/testvol/a.img,
-> -@                               file.debug=3D9,file.logfile=3D/var/log/q=
-emu-gluster.log
-> -
-> -JSON:
-> -qemu-system-x86_64 'json:@{"driver":"qcow2",
-> -@                          "file":@{"driver":"gluster",
-> -@                                   "volume":"testvol","path":"a.img",
-> -@                                   "debug":9,"logfile":"/var/log/qemu-g=
-luster.log",
-> -@                                   "server":[@{"type":"tcp","host":"1.2=
-.3.4","port":24007@},
-> -@                                             @{"type":"unix","socket":"=
-/var/run/glusterd.socket"@}]@}@}'
-> -qemu-system-x86_64 -drive driver=3Dqcow2,file.driver=3Dgluster,file.volu=
-me=3Dtestvol,file.path=3D/path/a.img,
-> -@                                      file.debug=3D9,file.logfile=3D/va=
-r/log/qemu-gluster.log,
-> -@                                      file.server.0.type=3Dtcp,file.ser=
-ver.0.host=3D1.2.3.4,file.server.0.port=3D24007,
-> -@                                      file.server.1.type=3Dunix,file.se=
-rver.1.socket=3D/var/run/glusterd.socket
-> -@end example
-> -
-> -See also @url{http://www.gluster.org}.
-> -
-> -@item HTTP/HTTPS/FTP/FTPS
-> -QEMU supports read-only access to files accessed over http(s) and ftp(s)=
-.
-> -
-> -Syntax using a single filename:
-> -@example
-> -<protocol>://[<username>[:<password>]@@]<host>/<path>
-> -@end example
-> -
-> -where:
-> -@table @option
-> -@item protocol
-> -'http', 'https', 'ftp', or 'ftps'.
-> -
-> -@item username
-> -Optional username for authentication to the remote server.
-> -
-> -@item password
-> -Optional password for authentication to the remote server.
-> -
-> -@item host
-> -Address of the remote server.
-> -
-> -@item path
-> -Path on the remote server, including any query string.
-> -@end table
-> -
-> -The following options are also supported:
-> -@table @option
-> -@item url
-> -The full URL when passing options to the driver explicitly.
-> -
-> -@item readahead
-> -The amount of data to read ahead with each range request to the remote s=
-erver.
-> -This value may optionally have the suffix 'T', 'G', 'M', 'K', 'k' or 'b'=
-. If it
-> -does not have a suffix, it will be assumed to be in bytes. The value mus=
-t be a
-> -multiple of 512 bytes. It defaults to 256k.
-> -
-> -@item sslverify
-> -Whether to verify the remote server's certificate when connecting over S=
-SL. It
-> -can have the value 'on' or 'off'. It defaults to 'on'.
-> -
-> -@item cookie
-> -Send this cookie (it can also be a list of cookies separated by ';') wit=
-h
-> -each outgoing request.  Only supported when using protocols such as HTTP
-> -which support cookies, otherwise ignored.
-> -
-> -@item timeout
-> -Set the timeout in seconds of the CURL connection. This timeout is the t=
-ime
-> -that CURL waits for a response from the remote server to get the size of=
- the
-> -image to be downloaded. If not set, the default timeout of 5 seconds is =
-used.
-> -@end table
-> -
-> -Note that when passing options to qemu explicitly, @option{driver} is th=
-e value
-> -of <protocol>.
-> -
-> -Example: boot from a remote Fedora 20 live ISO image
-> -@example
-> -qemu-system-x86_64 --drive media=3Dcdrom,file=3Dhttp://dl.fedoraproject.=
-org/pub/fedora/linux/releases/20/Live/x86_64/Fedora-Live-Desktop-x86_64-20-=
-1.iso,readonly
-> -
-> -qemu-system-x86_64 --drive media=3Dcdrom,file.driver=3Dhttp,file.url=3Dh=
-ttp://dl.fedoraproject.org/pub/fedora/linux/releases/20/Live/x86_64/Fedora-=
-Live-Desktop-x86_64-20-1.iso,readonly
-> -@end example
-> -
-> -Example: boot from a remote Fedora 20 cloud image using a local overlay =
-for
-> -writes, copy-on-read, and a readahead of 64k
-> -@example
-> -qemu-img create -f qcow2 -o backing_file=3D'json:@{"file.driver":"http",=
-, "file.url":"https://dl.fedoraproject.org/pub/fedora/linux/releases/20/Ima=
-ges/x86_64/Fedora-x86_64-20-20131211.1-sda.qcow2",, "file.readahead":"64k"@=
-}' /tmp/Fedora-x86_64-20-20131211.1-sda.qcow2
-> -
-> -qemu-system-x86_64 -drive file=3D/tmp/Fedora-x86_64-20-20131211.1-sda.qc=
-ow2,copy-on-read=3Don
-> -@end example
-> -
-> -Example: boot from an image stored on a VMware vSphere server with a sel=
-f-signed
-> -certificate using a local overlay for writes, a readahead of 64k and a t=
-imeout
-> -of 10 seconds.
-> -@example
-> -qemu-img create -f qcow2 -o backing_file=3D'json:@{"file.driver":"https"=
-,, "file.url":"https://user:password@@vsphere.example.com/folder/test/test-=
-flat.vmdk?dcPath=3DDatacenter&dsName=3Ddatastore1",, "file.sslverify":"off"=
-,, "file.readahead":"64k",, "file.timeout":10@}' /tmp/test.qcow2
-> -
-> -qemu-system-x86_64 -drive file=3D/tmp/test.qcow2
-> -@end example
-> -ETEXI
-> -
-> -STEXI
-> -@end table
-> -ETEXI
+>  This transport allows a VM to communicate to another VM, router or firew=
+all directly.
 >
->  DEFHEADING(Bluetooth(R) options:)
->  STEXI
+> +@table @option
+>  @item src=3D@var{srcaddr}
+>      source address (mandatory)
+>  @item dst=3D@var{dstaddr}
+> @@ -2394,6 +2395,7 @@ draft-mkonstan-l2tpext-keyed-ipv6-tunnel-00
+>  networks which have packet reorder.
+>  @item offset=3D@var{offset}
+>      Add an extra offset between header and data
+> +@end table
+>
+>  For example, to attach a VM running on host 4.3.2.1 via L2TPv3 to the br=
+idge br-lan
+>  on the remote Linux host 1.2.3.4:
 > --
 > 2.13.6
 >
