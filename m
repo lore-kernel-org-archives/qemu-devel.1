@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dzik1-0002p4-24
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:25:34 -0400
+	(envelope-from <berrange@redhat.com>) id 1dzik1-0002p5-2D
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:25:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dzijx-0005T7-NZ
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:25:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43396)
+	(envelope-from <berrange@redhat.com>) id 1dzijz-0005VS-3f
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:25:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44500)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dzijx-0005S0-6R
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:25:29 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dzijy-0005U1-QW
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:25:31 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Wed,  4 Oct 2017 13:25:10 +0100
-Message-Id: <20171004122515.20627-7-berrange@redhat.com>
+Date: Wed,  4 Oct 2017 13:25:11 +0100
+Message-Id: <20171004122515.20627-8-berrange@redhat.com>
 In-Reply-To: <20171004122515.20627-1-berrange@redhat.com>
 References: <20171004122515.20627-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v1 06/11] io: Add support for fragmented
- websocket binary frames
+Subject: [Qemu-devel] [PULL v1 07/11] io: Allow empty websocket payload
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +28,93 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Brandon Carpenter <brandon.carpent
 
 From: Brandon Carpenter <brandon.carpenter@cypherpath.com>
 
-Allows fragmented binary frames by saving the previous opcode. Handles
-the case where an intermediary (i.e., web proxy) fragments frames
-originally sent unfragmented by the client.
+Some browsers send pings/pongs with no payload, so allow empty payloads
+instead of closing the connection.
 
 Signed-off-by: Brandon Carpenter <brandon.carpenter@cypherpath.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- include/io/channel-websock.h |  1 +
- io/channel-websock.c         | 26 ++++++++++++++++++--------
- 2 files changed, 19 insertions(+), 8 deletions(-)
+ io/channel-websock.c | 62 +++++++++++++++++++++++++---------------------------
+ 1 file changed, 30 insertions(+), 32 deletions(-)
 
-diff --git a/include/io/channel-websock.h b/include/io/channel-websock.h
-index 3c9ff84727..7c896557c5 100644
---- a/include/io/channel-websock.h
-+++ b/include/io/channel-websock.h
-@@ -65,6 +65,7 @@ struct QIOChannelWebsock {
-     guint io_tag;
-     Error *io_err;
-     gboolean io_eof;
-+    uint8_t opcode;
- };
- 
- /**
 diff --git a/io/channel-websock.c b/io/channel-websock.c
-index 4e5afb2e95..909d6367f0 100644
+index 909d6367f0..b19b5d96da 100644
 --- a/io/channel-websock.c
 +++ b/io/channel-websock.c
-@@ -636,28 +636,38 @@ static int qio_channel_websock_decode_header(QIOChannelWebsock *ioc,
-     has_mask = header->b1 & QIO_CHANNEL_WEBSOCK_HEADER_FIELD_HAS_MASK;
-     payload_len = header->b1 & QIO_CHANNEL_WEBSOCK_HEADER_FIELD_PAYLOAD_LEN;
+@@ -697,44 +697,42 @@ static int qio_channel_websock_decode_payload(QIOChannelWebsock *ioc,
+                                               Error **errp)
+ {
+     size_t i;
+-    size_t payload_len;
++    size_t payload_len = 0;
+     uint32_t *payload32;
  
-+    /* Save or restore opcode. */
-+    if (opcode) {
-+        ioc->opcode = opcode;
-+    } else {
-+        opcode = ioc->opcode;
-+    }
-+
-     if (opcode == QIO_CHANNEL_WEBSOCK_OPCODE_CLOSE) {
-         /* disconnect */
-         return 0;
-     }
- 
-     /* Websocket frame sanity check:
--     * * Websocket fragmentation is not supported.
--     * * All  websockets frames sent by a client have to be masked.
-+     * * Fragmentation is only supported for binary frames.
-+     * * All frames sent by a client MUST be masked.
-      * * Only binary encoding is supported.
-      */
-     if (!fin) {
--        error_setg(errp, "websocket fragmentation is not supported");
--        return -1;
-+        if (opcode != QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME) {
-+            error_setg(errp, "only binary websocket frames may be fragmented");
-+            return -1;
-+        }
-+    } else {
-+        if (opcode != QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME) {
-+            error_setg(errp, "only binary websocket frames are supported");
-+            return -1;
-+        }
-     }
-     if (!has_mask) {
-         error_setg(errp, "client websocket frames must be masked");
-         return -1;
-     }
--    if (opcode != QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME) {
--        error_setg(errp, "only binary websocket frames are supported");
+-    if (!ioc->payload_remain) {
+-        error_setg(errp,
+-                   "Decoding payload but no bytes of payload remain");
 -        return -1;
 -    }
+-
+-    /* If we aren't at the end of the payload, then drop
+-     * off the last bytes, so we're always multiple of 4
+-     * for purpose of unmasking, except at end of payload
+-     */
+-    if (ioc->encinput.offset < ioc->payload_remain) {
+-        payload_len = ioc->encinput.offset - (ioc->encinput.offset % 4);
+-    } else {
+-        payload_len = ioc->payload_remain;
+-    }
+-    if (payload_len == 0) {
+-        return QIO_CHANNEL_ERR_BLOCK;
+-    }
++    if (ioc->payload_remain) {
++        /* If we aren't at the end of the payload, then drop
++         * off the last bytes, so we're always multiple of 4
++         * for purpose of unmasking, except at end of payload
++         */
++        if (ioc->encinput.offset < ioc->payload_remain) {
++            payload_len = ioc->encinput.offset - (ioc->encinput.offset % 4);
++        } else {
++            payload_len = ioc->payload_remain;
++        }
++        if (payload_len == 0) {
++            return QIO_CHANNEL_ERR_BLOCK;
++        }
  
-     if (payload_len < QIO_CHANNEL_WEBSOCK_PAYLOAD_LEN_MAGIC_16_BIT) {
-         ioc->payload_remain = payload_len;
+-    ioc->payload_remain -= payload_len;
++        ioc->payload_remain -= payload_len;
+ 
+-    /* unmask frame */
+-    /* process 1 frame (32 bit op) */
+-    payload32 = (uint32_t *)ioc->encinput.buffer;
+-    for (i = 0; i < payload_len / 4; i++) {
+-        payload32[i] ^= ioc->mask.u;
+-    }
+-    /* process the remaining bytes (if any) */
+-    for (i *= 4; i < payload_len; i++) {
+-        ioc->encinput.buffer[i] ^= ioc->mask.c[i % 4];
++        /* unmask frame */
++        /* process 1 frame (32 bit op) */
++        payload32 = (uint32_t *)ioc->encinput.buffer;
++        for (i = 0; i < payload_len / 4; i++) {
++            payload32[i] ^= ioc->mask.u;
++        }
++        /* process the remaining bytes (if any) */
++        for (i *= 4; i < payload_len; i++) {
++            ioc->encinput.buffer[i] ^= ioc->mask.c[i % 4];
++        }
+     }
+ 
+-    buffer_reserve(&ioc->rawinput, payload_len);
+-    buffer_append(&ioc->rawinput, ioc->encinput.buffer, payload_len);
+-    buffer_advance(&ioc->encinput, payload_len);
++    if (payload_len) {
++        buffer_reserve(&ioc->rawinput, payload_len);
++        buffer_append(&ioc->rawinput, ioc->encinput.buffer, payload_len);
++        buffer_advance(&ioc->encinput, payload_len);
++    }
+     return 0;
+ }
+ 
 -- 
 2.13.5
