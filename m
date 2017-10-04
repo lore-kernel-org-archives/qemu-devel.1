@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dzn6s-0004aO-HW
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 13:05:27 -0400
+	(envelope-from <thuth@redhat.com>) id 1dzn8S-0005Tz-A2
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 13:07:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dzn6o-0005vP-NH
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 13:05:26 -0400
-Date: Wed, 4 Oct 2017 20:05:01 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20171004170501.ttj7tayiqx2vvsjn@postretch>
-References: <20170815074513.9055-1-el13635@mail.ntua.gr>
-	<a646d860-5f33-19cb-e56a-893b57613533@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1dzn8P-0007lK-4t
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 13:07:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45130)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dzn8O-0007kc-UL
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 13:07:01 -0400
+References: <1507125199-22562-1-git-send-email-thuth@redhat.com>
+	<b3bebf28-76e6-5a4c-3a4c-34b940f85fb9@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <7b42b017-e216-854f-a4a1-4393811cb69f@redhat.com>
+Date: Wed, 4 Oct 2017 19:06:57 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="kz7btylpp3qbzmv5"
-Content-Disposition: inline
-In-Reply-To: <a646d860-5f33-19cb-e56a-893b57613533@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC] block: add
- block-insert-node QMP command
+In-Reply-To: <b3bebf28-76e6-5a4c-3a4c-34b940f85fb9@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/s390x/sclp: Mark the sclp device with
+ user_creatable = false
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
+To: Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-
---kz7btylpp3qbzmv5
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Oct 04, 2017 at 02:49:27PM +0200, Max Reitz wrote:
->On 2017-08-15 09:45, Manos Pitsidianakis wrote:
->> block-insert-node and its pair command block-remove-node provide runtime
->> insertion and removal of filter nodes.
+On 04.10.2017 17:18, Pierre Morel wrote:
+> On 04/10/2017 15:53, Thomas Huth wrote:
+>> The "sclp" device is just an internal device that can not be instantia=
+ted
+>> by the users. If they try to use it, they only get a simple error
+>> message:
 >>
->> block-insert-node takes a (parent, child) and (node, child) pair of
->> edges and unrefs the (parent, child) BdrvChild relationship and=20
->> creates
->> a new (parent, node) child with the same BdrvChildRole.
+>> $ qemu-system-s390x -nographic -device sclp
+>> qemu-system-s390x: Option '-device s390-sclp-event-facility' cannot be
+>> handled by this machine
 >>
->> This is a different approach than x-blockdev-change which uses the driver
->> methods bdrv_add_child() and bdrv_del_child(),
->
->Why? :-)
->
->Can't we reuse x-blockdev-change? As far as I'm concerned, this was one
->of its roles, and at least I don't want to have both x-blockdev-change
->and these new commands.
->
->I think it would be a good idea just to change bdrv_add_child() and
->bdrv_del_child(): If the driver has a bdrv_{add,del}_child() callback,
->invoke that.  If it doesn't, then just attach the child.
->
->Of course, it may turn out that x-blockdev-change is lacking something
->(e.g. a way to specify as what kind of child a new node is to be
->attached).  Then we should either extend it so that it covers what it's
->lacking, or replace it completely by these new commands.  In the latter
->case, however, they would need to cover the existing use case which is
->reconfiguring the quorum driver.  (And that would mean it would have to
->invoke bdrv_add_child()/bdrv_del_child() when the driver has them.)
->
->Max
->
+>> Since sclp_init() tries to create a TYPE_SCLP_EVENT_FACILITY which is
+>> a non-pluggable sysbus device, there is really no way that the "sclp"
+>> device can be used by the user, so let's set the user_creatable =3D fa=
+lse
+>> accordingly.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>> =C2=A0 hw/s390x/sclp.c | 5 +++++
+>> =C2=A0 1 file changed, 5 insertions(+)
+>>
+>> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+>> index 30aefbf..9be0cb8 100644
+>> --- a/hw/s390x/sclp.c
+>> +++ b/hw/s390x/sclp.c
+>> @@ -606,6 +606,11 @@ static void sclp_class_init(ObjectClass *oc, void
+>> *data)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dc->realize =3D sclp_realize;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dc->hotpluggable =3D false;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 set_bit(DEVICE_CATEGORY_MISC, dc->categ=
+ories);
+>> +=C2=A0=C2=A0=C2=A0 /*
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 * Reason: Creates TYPE_SCLP_EVENT_FACILITY i=
+n sclp_init
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 * which is a non-pluggable sysbus device
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 */
+>> +=C2=A0=C2=A0=C2=A0 dc->user_creatable =3D false;
+>>
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sc->read_SCP_info =3D read_SCP_info;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sc->read_storage_element0_info =3D read=
+_storage_element0_info;
+>>
+>=20
+> I must miss something.
+> Why is the sclp device not a SYS_BUS_DEVICE ?
+> The problem seems to come from the heterogeneity of the sclp and sclp
+> generated devices.
 
-I think the two use cases are this:
+I wonder whether it should rather be the other way round: Why is
+TYPE_SCLP_EVENT_FACILITY a sysbus device? Sysbus is an abstraction for
+simple on-board devices, while TYPE_SCLP_EVENT_FACILITY seems rather to
+be a pseudo-device... so it should rather simply be of TYPE_DEVICE
+instead? Or do I miss something?
 
-a) Adding/removing a replication child to an existing quorum node
-b) Insert a filter between two existing nodes.
-
-These are not directly compatible semantically, but as you said=20
-x-blockdev-change can perform b) if bdrv_add_child()/bdrv_del_child()=20
-are not implemented. Wouldn't that be unnecessary overloading?
-
---kz7btylpp3qbzmv5
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlnVFL0ACgkQc2J8L2kN
-9xCXpw/+I6uzdp7sIOdW01raGly9A6u25JZ9jkSE8N076y7ZvJiyhzSjmweXlJDp
-E7YYVm+kojdM+ymmnnsWEebu/C4f+T9qd4D4EK12pz7fH7KDyu3ohjT8jkMexmvR
-8OFg0dmrxG7m2l/3YbSrA/DD/0RbBprksCsoBPc7zquUD6x65aJAZmxHdwtCMhmk
-MWvv5DW4adZ0PpLWeHyqNBcUPyEdV0tmgaie+xJiIOXrdisqfQmeNViherEy2Uj4
-S+GJqcf6HPSO7skkzLLl66q7QqS6Qq1GqN/bbAHyIA9Ks5X/vBaDkcMTDtlgKyJ9
-0XWEyD/EUkBvT7MLbYoqb3xoJI8TmgXJNVSIzELUuAHQuUrKTae+5XqslqhZmlHj
-YwgWfqF0NnLzQMcv1SDHTB1cufkekaSbIv2UxiLkE6K40gCPevq5r4s3VCJfQJw2
-STYtH76kVl8Cst0jX2QXONHXeTGR6j72IXmaxJFdiPblRGOQ20ijoRps536zv1hG
-uq4XgAiuvPsd0Wa8V7TMRE+qusxssBsb+pIH4W+SkIHL0YQHBkHUINrdXLiIiB3J
-LxUK7UW7vEbXuBTEbD6GDLdkTJNMyiNfW1r0C7ZgdOcH9wWhgOOMGoFxCIZWaSQE
-9mXAUsM6HK1GDJRGdW7ZLoV8KgRCVIccXxn89crYvx+G9PiBIg0=
-=Zkxf
------END PGP SIGNATURE-----
-
---kz7btylpp3qbzmv5--
+ Thomas
