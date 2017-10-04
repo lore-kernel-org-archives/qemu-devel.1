@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dzoe3-0008LS-Lv
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 14:43:48 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dzot5-0001qC-Or
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 14:59:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dzoe2-0002uZ-UT
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 14:43:47 -0400
-Received: from mail-qt0-x22a.google.com ([2607:f8b0:400d:c0d::22a]:48046)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dzoe2-0002ts-QP
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 14:43:46 -0400
-Received: by mail-qt0-x22a.google.com with SMTP id z50so16036423qtj.4
-	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 11:43:46 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  4 Oct 2017 14:43:25 -0400
-Message-Id: <20171004184325.24157-13-richard.henderson@linaro.org>
+	(envelope-from <no-reply@patchew.org>) id 1dzot4-00070q-Lj
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 14:59:19 -0400
+Resent-Message-Id: <E1dzot4-00070q-Lj@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21478)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dzot4-000704-Ee
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 14:59:18 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150714353690.153.9472664192067296350@b58463cdfd5f>
 In-Reply-To: <20171004184325.24157-1-richard.henderson@linaro.org>
-References: <20171004184325.24157-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v1 12/12] target/arm: Decode aa32 armv8.3
- 2-reg-index
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 4 Oct 2017 11:58:57 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v1 00/12] ARM v8.1 simd + v8.3 complex insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/translate.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
-
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 48f30e2621..50ef2f1f21 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -7693,6 +7693,53 @@ static int disas_neon_insn_cp8_3same(DisasContext *s, uint32_t insn)
-     return 0;
- }
- 
-+/* ARMv8.3 reclaims a portion of the CDP2 coprocessor 8 space.  */
-+
-+static int disas_neon_insn_cp8_index(DisasContext *s, uint32_t insn)
-+{
-+    int rd, rn, rm, rot, size, opr_sz;
-+    TCGv_ptr fpst;
-+    bool q;
-+
-+    /* FIXME: this access check should not take precedence over UNDEF
-+     * for invalid encodings; we will generate incorrect syndrome information
-+     * for attempts to execute invalid vfp/neon encodings with FP disabled.
-+     */
-+    if (s->fp_excp_el) {
-+        gen_exception_insn(s, 4, EXCP_UDEF,
-+                           syn_fp_access_trap(1, 0xe, false), s->fp_excp_el);
-+        return 0;
-+    }
-+    if (!s->vfp_enabled || !arm_dc_feature(s, ARM_FEATURE_V8_FCMA)) {
-+        return 1;
-+    }
-+
-+    q = extract32(insn, 6, 1);
-+    size = extract32(insn, 23, 1);
-+
-+    if (size == 0) { /* FIXME: fp16 support */
-+        return 1;
-+    }
-+
-+    VFP_DREG_D(rd, insn);
-+    VFP_DREG_N(rn, insn);
-+    VFP_DREG_M(rm, insn);
-+    if ((rd | rn) & q) {
-+        return 1;
-+    }
-+
-+    /* This entire space is VCMLA (indexed).  */
-+    rot = extract32(insn, 20, 2);
-+    opr_sz = (1 + q) * 8;
-+    fpst = get_fpstatus_ptr(1);
-+    tcg_gen_gvec_3_ptr(vfp_reg_offset(1, rd),
-+                       vfp_reg_offset(1, rn),
-+                       vfp_reg_offset(1, rm), fpst,
-+                       opr_sz, opr_sz, rot, gen_helper_gvec_fcmlas_idx);
-+    tcg_temp_free_ptr(fpst);
-+    return 0;
-+}
-+
- static int disas_coproc_insn(DisasContext *s, uint32_t insn)
- {
-     int cpnum, is64, crn, crm, opc1, opc2, isread, rt, rt2;
-@@ -8414,6 +8461,12 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                 goto illegal_op;
-             }
-             return;
-+        } else if ((insn & 0x0f000f10) == 0x0e000800) {
-+            /* ARMv8.3 neon cdp2 coprocessor 8 extension.  */
-+            if (disas_neon_insn_cp8_index(s, insn)) {
-+                goto illegal_op;
-+            }
-+            return;
-         } else if ((insn & 0x0fe00000) == 0x0c400000) {
-             /* Coprocessor double register transfer.  */
-             ARCH(5TE);
--- 
-2.13.6
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcxMDA0MTg0MzI1LjI0MTU3LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
+Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYxIDAwLzEyXSBBUk0gdjguMSBzaW1k
+ICsgdjguMyBjb21wbGV4IGluc25zCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
+YXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdj
+IC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
+Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZv
+cm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNo
+byAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAk
+YykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2No
+ZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBl
+Y2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NS
+SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
+MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkMmMxOWVjOTk3IHRhcmdldC9h
+cm06IERlY29kZSBhYTMyIGFybXY4LjMgMi1yZWctaW5kZXgKYTM0NzAyNTQyNCB0YXJnZXQvYXJt
+OiBEZWNvZGUgYWEzMiBhcm12OC4zIDMtc2FtZQoyY2QzNmNmOTcxIHRhcmdldC9hcm06IERlY29k
+ZSBhYTY0IGFybXY4LjMgZmNtbGEKOWNmYjAzZjRjZSB0YXJnZXQvYXJtOiBEZWNvZGUgYWE2NCBh
+cm12OC4zIGZjYWRkCjI4ZDFiZTJlY2QgdGFyZ2V0L2FybTogQWRkIEFSTV9GRUFUVVJFX1Y4X0ZD
+TUEKYzcwMWNhZDhiZSB0YXJnZXQvYXJtOiBEZWNvZGUgYWEzMiBhcm12OC4xIHR3byByZWcgYW5k
+IGEgc2NhbGFyCmE0NjFmYWI5MDcgdGFyZ2V0L2FybTogRGVjb2RlIGFhMzIgYXJtdjguMSB0aHJl
+ZSBzYW1lCmM2ZTNmNjBlYjcgdGFyZ2V0L2FybTogRGVjb2RlIGFhNjQgYXJtdjguMSBzY2FsYXIv
+dmVjdG9yIHggaW5kZXhlZCBlbGVtZW50CjYyYWFlNTMwMDMgdGFyZ2V0L2FybTogRGVjb2RlIGFh
+NjQgYXJtdjguMSB0aHJlZSBzYW1lIGV4dHJhCjBjZWQ4MmExODMgdGFyZ2V0L2FybTogRGVjb2Rl
+IGFhNjQgYXJtdjguMSBzY2FsYXIgdGhyZWUgc2FtZSBleHRyYQplMWExZDg2ZDUwIHRhcmdldC9h
+cm06IEFkZCBBUk1fRkVBVFVSRV9WOF8xX1NJTUQKNTA2Yjg5NTcwNSBIQUNLOiB1c2Ugb2JqZHVt
+cCBkaXNhcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMjogSEFDSzog
+dXNlIG9iamR1bXAgZGlzYXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMjogdGFyZ2V0L2FybTogQWRk
+IEFSTV9GRUFUVVJFX1Y4XzFfU0lNRC4uLgpDaGVja2luZyBQQVRDSCAzLzEyOiB0YXJnZXQvYXJt
+OiBEZWNvZGUgYWE2NCBhcm12OC4xIHNjYWxhciB0aHJlZSBzYW1lIGV4dHJhLi4uCkVSUk9SOiBN
+YWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVz
+aXMKIzU0OiBGSUxFOiB0YXJnZXQvYXJtL2FkdnNpbWRfaGVscGVyLmM6Mjc6CisjZGVmaW5lIFNF
+VF9RQygpIGVudi0+dmZwLnhyZWdzW0FSTV9WRlBfRlBTQ1JdIHw9IENQU1JfUQoKdG90YWw6IDEg
+ZXJyb3JzLCAwIHdhcm5pbmdzLCAyMjcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNC8xMjogdGFyZ2V0L2FybTogRGVj
+b2RlIGFhNjQgYXJtdjguMSB0aHJlZSBzYW1lIGV4dHJhLi4uCkNoZWNraW5nIFBBVENIIDUvMTI6
+IHRhcmdldC9hcm06IERlY29kZSBhYTY0IGFybXY4LjEgc2NhbGFyL3ZlY3RvciB4IGluZGV4ZWQg
+ZWxlbWVudC4uLgpDaGVja2luZyBQQVRDSCA2LzEyOiB0YXJnZXQvYXJtOiBEZWNvZGUgYWEzMiBh
+cm12OC4xIHRocmVlIHNhbWUuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xMjogdGFyZ2V0L2FybTogRGVj
+b2RlIGFhMzIgYXJtdjguMSB0d28gcmVnIGFuZCBhIHNjYWxhci4uLgpDaGVja2luZyBQQVRDSCA4
+LzEyOiB0YXJnZXQvYXJtOiBBZGQgQVJNX0ZFQVRVUkVfVjhfRkNNQS4uLgpDaGVja2luZyBQQVRD
+SCA5LzEyOiB0YXJnZXQvYXJtOiBEZWNvZGUgYWE2NCBhcm12OC4zIGZjYWRkLi4uCkNoZWNraW5n
+IFBBVENIIDEwLzEyOiB0YXJnZXQvYXJtOiBEZWNvZGUgYWE2NCBhcm12OC4zIGZjbWxhLi4uCkNo
+ZWNraW5nIFBBVENIIDExLzEyOiB0YXJnZXQvYXJtOiBEZWNvZGUgYWEzMiBhcm12OC4zIDMtc2Ft
+ZS4uLgpDaGVja2luZyBQQVRDSCAxMi8xMjogdGFyZ2V0L2FybTogRGVjb2RlIGFhMzIgYXJtdjgu
+MyAyLXJlZy1pbmRleC4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
+d2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
+ZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
+dGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
