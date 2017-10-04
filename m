@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgJr-0000d9-RU
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 05:50:24 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dzgKD-0000nH-F8
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 05:50:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dzgJq-0006Hs-Ad
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 05:50:23 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:32989)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dzgJq-0006H6-1S
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 05:50:22 -0400
-Received: by mail-oi0-x241.google.com with SMTP id n129so6766384oia.0
-	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 02:50:21 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20171002134538.23332-3-armbru@redhat.com>
-References: <20171002134538.23332-1-armbru@redhat.com>
-	<20171002134538.23332-3-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 4 Oct 2017 11:50:19 +0200
-Message-ID: <CAJ+F1CKf2yXZ=+bfv+c0+tBpTGgyLmMi_jg+L+f6J=m1keoJgQ@mail.gmail.com>
+	(envelope-from <kraxel@redhat.com>) id 1dzgKA-0006lu-CD
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 05:50:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46224)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dzgKA-0006kx-5u
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 05:50:42 -0400
+Message-ID: <1507110639.27227.4.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 04 Oct 2017 11:50:39 +0200
+In-Reply-To: <9d566b88-7991-b9f4-8b73-737a99d3ac6d@redhat.com>
+References: <20170929110052.6111-1-kraxel@redhat.com>
+	<CAFEAcA-8gaOhkuNX9hBt0Ofg-CKkJ-v8puHJ4K3QOq0ZGMgB5w@mail.gmail.com>
+	<1507106598.27227.2.camel@redhat.com>
+	<9d566b88-7991-b9f4-8b73-737a99d3ac6d@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] hmp-commands-info: Move Texinfo
- stanzas to conventional place
+Subject: Re: [Qemu-devel] [PULL 0/3] Usb 20170929 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, Oct 2, 2017 at 3:45 PM, Markus Armbruster <armbru@redhat.com> wrote=
-:
-> A command's STEXI..ETEXI stanza follows the command's initializer.
-> Two commands got them backwards.  Correct that.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+  Hi,
+>=20
+> Ah, deja vu. I think you've now run into the problem that I had with
+> my
+> patch, too - see:
+>=20
+> =C2=A0https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01875.ht=
+ml
+> =C2=A0https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg02082.ht=
+ml
+>=20
+> I think this is a race condition when building with "make -j" in
+> parallel. Just add a line like this and you should be fine:
+>=20
+> common-obj-$(CONFIG_ALL) +=3D host-stub.o
 
-> ---
->  hmp-commands-info.hx | 20 ++++++++++----------
->  1 file changed, 10 insertions(+), 10 deletions(-)
->
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index 574db7d24e..d27d3b1227 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -837,12 +837,6 @@ STEXI
->  Show information about hotpluggable CPUs
->  ETEXI
->
-> -STEXI
-> -@item info vm-generation-id
-> -@findex vm-generation-id
-> -Show Virtual Machine Generation ID
-> -ETEXI
-> -
->      {
->          .name       =3D "vm-generation-id",
->          .args_type  =3D "",
-> @@ -852,10 +846,9 @@ ETEXI
->      },
->
->  STEXI
-> -@item info memory_size_summary
-> -@findex memory_size_summary
-> -Display the amount of initially allocated and present hotpluggable (if
-> -enabled) memory in bytes.
-> +@item info vm-generation-id
-> +@findex vm-generation-id
-> +Show Virtual Machine Generation ID
->  ETEXI
->
->      {
-> @@ -868,6 +861,13 @@ ETEXI
->      },
->
->  STEXI
-> +@item info memory_size_summary
-> +@findex memory_size_summary
-> +Display the amount of initially allocated and present hotpluggable (if
-> +enabled) memory in bytes.
-> +ETEXI
-> +
-> +STEXI
->  @end table
->  ETEXI
->
-> --
-> 2.13.6
->
->
+I'd guess when compiling this unconditionally we better move it over to
+stubs.
 
+cheers,
+  Gerd
 
-
---=20
-Marc-Andr=C3=A9 Lureau
+diff --git a/hw/usb/host-stub.c b/stubs/usb-host.c
+similarity index 100%
+rename from hw/usb/host-stub.c
+rename to stubs/usb-host.c
+diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
+index 0e6d54b21f..c2f46ac540 100644
+--- a/hw/usb/Makefile.objs
++++ b/hw/usb/Makefile.objs
+@@ -44,8 +44,6 @@ redirect.o-libs =3D $(USB_REDIR_LIBS)
+=C2=A0# usb pass-through
+=C2=A0ifeq ($(CONFIG_USB_LIBUSB)$(CONFIG_USB),yy)
+=C2=A0common-obj-y +=3D host-libusb.o host-legacy.o
+-else
+-common-obj-y +=3D host-stub.o
+=C2=A0endif
+=C2=A0
+=C2=A0host-libusb.o-cflags :=3D $(LIBUSB_CFLAGS)
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index c7594796c3..edccdc5f1e 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -41,3 +41,4 @@ stub-obj-y +=3D vmgenid.o
+=C2=A0stub-obj-y +=3D xen-common.o
+=C2=A0stub-obj-y +=3D xen-hvm.o
+=C2=A0stub-obj-y +=3D pci-host-piix.o
++stub-obj-y +=3D usb-host.o
