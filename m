@@ -1,50 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1dzlS8-0003CC-5y
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 11:19:21 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dzlYn-0004dv-VT
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 11:26:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1dzlRy-00038U-Aq
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 11:19:16 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41194)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1dzlRx-000359-NA
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 11:19:06 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v94FIGQ9049764
-	for <qemu-devel@nongnu.org>; Wed, 4 Oct 2017 11:19:01 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dd1rchnkw-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 11:19:01 -0400
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Wed, 4 Oct 2017 16:18:58 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
-	[9.149.105.232])
-	by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id v94FIvgd8388714
-	for <qemu-devel@nongnu.org>; Wed, 4 Oct 2017 15:18:57 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5730052041
-	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 15:13:36 +0100 (BST)
-Received: from [9.145.179.43] (unknown [9.145.179.43])
-	by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 3BDBF5203F
-	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 15:13:36 +0100 (BST)
-References: <1507125199-22562-1-git-send-email-thuth@redhat.com>
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Wed, 4 Oct 2017 17:18:57 +0200
-MIME-Version: 1.0
-In-Reply-To: <1507125199-22562-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <b3bebf28-76e6-5a4c-3a4c-34b940f85fb9@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/s390x/sclp: Mark the sclp device with
- user_creatable = false
+	(envelope-from <mreitz@redhat.com>) id 1dzlYm-0000xX-W0
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 11:26:09 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Wed,  4 Oct 2017 17:25:48 +0200
+Message-Id: <20171004152553.30263-2-mreitz@redhat.com>
+In-Reply-To: <20171004152553.30263-1-mreitz@redhat.com>
+References: <20171004152553.30263-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 1/6] qapi/qnull: Add own header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -53,53 +19,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On 04/10/2017 15:53, Thomas Huth wrote:
-> The "sclp" device is just an internal device that can not be instantiat=
-ed
-> by the users. If they try to use it, they only get a simple error messa=
-ge:
->=20
-> $ qemu-system-s390x -nographic -device sclp
-> qemu-system-s390x: Option '-device s390-sclp-event-facility' cannot be
-> handled by this machine
->=20
-> Since sclp_init() tries to create a TYPE_SCLP_EVENT_FACILITY which is
-> a non-pluggable sysbus device, there is really no way that the "sclp"
-> device can be used by the user, so let's set the user_creatable =3D fal=
-se
-> accordingly.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->   hw/s390x/sclp.c | 5 +++++
->   1 file changed, 5 insertions(+)
->=20
-> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-> index 30aefbf..9be0cb8 100644
-> --- a/hw/s390x/sclp.c
-> +++ b/hw/s390x/sclp.c
-> @@ -606,6 +606,11 @@ static void sclp_class_init(ObjectClass *oc, void =
-*data)
->       dc->realize =3D sclp_realize;
->       dc->hotpluggable =3D false;
->       set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-> +    /*
-> +     * Reason: Creates TYPE_SCLP_EVENT_FACILITY in sclp_init
-> +     * which is a non-pluggable sysbus device
-> +     */
-> +    dc->user_creatable =3D false;
->=20
->       sc->read_SCP_info =3D read_SCP_info;
->       sc->read_storage_element0_info =3D read_storage_element0_info;
->=20
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+---
+ include/qapi/qmp/qdict.h    |  1 +
+ include/qapi/qmp/qnull.h    | 30 ++++++++++++++++++++++++++++++
+ include/qapi/qmp/qobject.h  | 12 ------------
+ include/qapi/qmp/types.h    |  1 +
+ qapi/qapi-clone-visitor.c   |  1 +
+ qapi/string-input-visitor.c |  1 +
+ qobject/qnull.c             |  2 +-
+ tests/check-qnull.c         |  2 +-
+ 8 files changed, 36 insertions(+), 14 deletions(-)
+ create mode 100644 include/qapi/qmp/qnull.h
 
-I must miss something.
-Why is the sclp device not a SYS_BUS_DEVICE ?
-The problem seems to come from the heterogeneity of the sclp and sclp=20
-generated devices.
-
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
+index 6588c7f0c8..7ea5120c4a 100644
+--- a/include/qapi/qmp/qdict.h
++++ b/include/qapi/qmp/qdict.h
+@@ -15,6 +15,7 @@
+ 
+ #include "qapi/qmp/qobject.h"
+ #include "qapi/qmp/qlist.h"
++#include "qapi/qmp/qnull.h"
+ #include "qapi/qmp/qnum.h"
+ #include "qemu/queue.h"
+ 
+diff --git a/include/qapi/qmp/qnull.h b/include/qapi/qmp/qnull.h
+new file mode 100644
+index 0000000000..d075549283
+--- /dev/null
++++ b/include/qapi/qmp/qnull.h
+@@ -0,0 +1,30 @@
++/*
++ * QNull
++ *
++ * Copyright (C) 2015 Red Hat, Inc.
++ *
++ * Authors:
++ *  Markus Armbruster <armbru@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1
++ * or later.  See the COPYING.LIB file in the top-level directory.
++ */
++
++#ifndef QNULL_H
++#define QNULL_H
++
++#include "qapi/qmp/qobject.h"
++
++struct QNull {
++    QObject base;
++};
++
++extern QNull qnull_;
++
++static inline QNull *qnull(void)
++{
++    QINCREF(&qnull_);
++    return &qnull_;
++}
++
++#endif /* QNULL_H */
+diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
+index eab29edd12..ef1d1a9237 100644
+--- a/include/qapi/qmp/qobject.h
++++ b/include/qapi/qmp/qobject.h
+@@ -93,16 +93,4 @@ static inline QType qobject_type(const QObject *obj)
+     return obj->type;
+ }
+ 
+-struct QNull {
+-    QObject base;
+-};
+-
+-extern QNull qnull_;
+-
+-static inline QNull *qnull(void)
+-{
+-    QINCREF(&qnull_);
+-    return &qnull_;
+-}
+-
+ #endif /* QOBJECT_H */
+diff --git a/include/qapi/qmp/types.h b/include/qapi/qmp/types.h
+index a4bc662bfb..749ac44dcb 100644
+--- a/include/qapi/qmp/types.h
++++ b/include/qapi/qmp/types.h
+@@ -19,5 +19,6 @@
+ #include "qapi/qmp/qstring.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qlist.h"
++#include "qapi/qmp/qnull.h"
+ 
+ #endif /* QAPI_QMP_TYPES_H */
+diff --git a/qapi/qapi-clone-visitor.c b/qapi/qapi-clone-visitor.c
+index d8b62792bc..daab6819b4 100644
+--- a/qapi/qapi-clone-visitor.c
++++ b/qapi/qapi-clone-visitor.c
+@@ -12,6 +12,7 @@
+ #include "qapi/clone-visitor.h"
+ #include "qapi/visitor-impl.h"
+ #include "qapi/error.h"
++#include "qapi/qmp/qnull.h"
+ 
+ struct QapiCloneVisitor {
+     Visitor visitor;
+diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
+index 67a0a4a58b..b3fdd0827d 100644
+--- a/qapi/string-input-visitor.c
++++ b/qapi/string-input-visitor.c
+@@ -16,6 +16,7 @@
+ #include "qapi/string-input-visitor.h"
+ #include "qapi/visitor-impl.h"
+ #include "qapi/qmp/qerror.h"
++#include "qapi/qmp/qnull.h"
+ #include "qemu/option.h"
+ #include "qemu/queue.h"
+ #include "qemu/range.h"
+diff --git a/qobject/qnull.c b/qobject/qnull.c
+index 69a21d1059..bc9fd31626 100644
+--- a/qobject/qnull.c
++++ b/qobject/qnull.c
+@@ -12,7 +12,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+-#include "qapi/qmp/qobject.h"
++#include "qapi/qmp/qnull.h"
+ 
+ QNull qnull_ = {
+     .base = {
+diff --git a/tests/check-qnull.c b/tests/check-qnull.c
+index 5c6eb0adc8..afa4400da1 100644
+--- a/tests/check-qnull.c
++++ b/tests/check-qnull.c
+@@ -8,7 +8,7 @@
+  */
+ #include "qemu/osdep.h"
+ 
+-#include "qapi/qmp/qobject.h"
++#include "qapi/qmp/qnull.h"
+ #include "qemu-common.h"
+ #include "qapi/qobject-input-visitor.h"
+ #include "qapi/qobject-output-visitor.h"
+-- 
+2.13.6
