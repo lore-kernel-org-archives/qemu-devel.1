@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dzhU0-00039k-9C
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 07:04:58 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dzhWo-0005kH-GP
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 07:07:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dzhTy-000207-EM
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 07:04:56 -0400
-Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:53692)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dzhWm-0004v1-TI
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 07:07:50 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:51844)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dzhTy-0001zu-7z
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 07:04:54 -0400
-Received: by mail-oi0-x233.google.com with SMTP id j126so18924398oia.10
-	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 04:04:54 -0700 (PDT)
+	id 1dzhWm-0004uR-N2
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 07:07:48 -0400
+Received: by mail-oi0-x243.google.com with SMTP id n82so18926361oib.8
+	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 04:07:48 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20171002152552.27999-11-armbru@redhat.com>
+In-Reply-To: <20171002152552.27999-12-armbru@redhat.com>
 References: <20171002152552.27999-1-armbru@redhat.com>
-	<20171002152552.27999-11-armbru@redhat.com>
+	<20171002152552.27999-12-armbru@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 4 Oct 2017 13:04:51 +0200
-Message-ID: <CAJ+F1C+=qrk4H-aNHw8Q_G1On3WxU3SN=bYGYK9BShLeo=9wMw@mail.gmail.com>
+Date: Wed, 4 Oct 2017 13:07:46 +0200
+Message-ID: <CAJ+F1CJ+La6tJHyzc4f1A4UqO_q_TYBKY1Ski=mq7YW164mD7w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 10/32] qapi: Don't run generators twice
+Subject: Re: [Qemu-devel] [RFC PATCH 11/32] qapi: Drop the options to
+ generate only .c or .h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,271 +36,200 @@ Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
 On Mon, Oct 2, 2017 at 5:25 PM, Markus Armbruster <armbru@redhat.com> wrote=
 :
-> The generators always generate both .c and .h, but they can route one
-> of them to the bit bucket.  We run them twice, once to generate .c,
-> and once to generate .h.  Probably because the naive make rule
->
->     FOO.c FOO.h: qapi-schema.json
->         RECIPE
->
-> runs RECIPE twice, once to generate FOO.c and once to generate FOO.h.
->
-> Employ the usual make trick to generate multiple files in one rule:
->
->     .INTERMEDIATE: FOO-gen
->     FOO.c FOO.h: FOO-gen ;
->     FOO-gen: qapi-schema.json
->         RECIPE
->
-> When make needs FOO.c or FOO.h, it runs RECIPE once to generate
-> intermediate target FOO-gen, then considers both FOO.c and FOO.h
-> updated.
->
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-As explained in the following stackoverflow answer:
-https://stackoverflow.com/a/10609434/1277510
-
-Nice
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
 > ---
->  Makefile               | 58 +++++++++++++++++++++++++++++++++-----------=
-------
->  Makefile.objs          |  2 +-
->  tests/Makefile.include | 36 +++++++++++++++++++++----------
->  3 files changed, 64 insertions(+), 32 deletions(-)
+>  scripts/qapi-commands.py   |  4 ++--
+>  scripts/qapi-event.py      |  4 ++--
+>  scripts/qapi-introspect.py |  4 ++--
+>  scripts/qapi-types.py      |  4 ++--
+>  scripts/qapi-visit.py      |  4 ++--
+>  scripts/qapi.py            | 25 ++++---------------------
+>  6 files changed, 14 insertions(+), 31 deletions(-)
 >
-> diff --git a/Makefile b/Makefile
-> index cee6e28659..784b601247 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -384,24 +384,33 @@ qemu-img-cmds.h: $(SRC_PATH)/qemu-img-cmds.hx $(SRC=
-_PATH)/scripts/hxtool
->  qemu-ga$(EXESUF): LIBS =3D $(LIBS_QGA)
->  qemu-ga$(EXESUF): QEMU_CFLAGS +=3D -I qga/qapi-generated
+> diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
+> index 974d0a4a80..56a1009564 100644
+> --- a/scripts/qapi-commands.py
+> +++ b/scripts/qapi-commands.py
+> @@ -253,7 +253,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
+>          self._regy +=3D gen_register_command(name, success_response)
 >
-> -gen-out-type =3D $(subst .,-,$(suffix $@))
+>
+> -(input_file, output_dir, do_c, do_h, prefix, opts) =3D parse_command_lin=
+e()
+> +(input_file, output_dir, prefix, opts) =3D parse_command_line()
+>
+>  c_comment =3D '''
+>  /*
+> @@ -284,7 +284,7 @@ h_comment =3D '''
+>   */
+>  '''
+>
+> -(fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
+> +(fdef, fdecl) =3D open_output(output_dir, prefix,
+>                              'qmp-marshal.c', 'qmp-commands.h',
+>                              c_comment, h_comment)
+>
+> diff --git a/scripts/qapi-event.py b/scripts/qapi-event.py
+> index 07b4b70199..0a308e6b69 100644
+> --- a/scripts/qapi-event.py
+> +++ b/scripts/qapi-event.py
+> @@ -169,7 +169,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
+>          self._event_names.append(name)
+>
+>
+> -(input_file, output_dir, do_c, do_h, prefix, dummy) =3D parse_command_li=
+ne()
+> +(input_file, output_dir, prefix, dummy) =3D parse_command_line()
+>
+>  c_comment =3D '''
+>  /*
+> @@ -200,7 +200,7 @@ h_comment =3D '''
+>   */
+>  '''
+>
+> -(fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
+> +(fdef, fdecl) =3D open_output(output_dir, prefix,
+>                              'qapi-event.c', 'qapi-event.h',
+>                              c_comment, h_comment)
+>
+> diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
+> index 032bcea491..c2e46182c8 100644
+> --- a/scripts/qapi-introspect.py
+> +++ b/scripts/qapi-introspect.py
+> @@ -169,7 +169,7 @@ const char %(c_name)s[] =3D %(c_string)s;
+>  # We normally mask them, because they're not QMP wire ABI
+>  opt_unmask =3D False
+>
+> -(input_file, output_dir, do_c, do_h, prefix, opts) =3D \
+> +(input_file, output_dir, prefix, opts) =3D \
+>      parse_command_line('u', ['unmask-non-abi-names'])
+>
+>  for o, a in opts:
+> @@ -199,7 +199,7 @@ h_comment =3D '''
+>   */
+>  '''
+>
+> -(fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
+> +(fdef, fdecl) =3D open_output(output_dir, prefix,
+>                              'qmp-introspect.c', 'qmp-introspect.h',
+>                              c_comment, h_comment)
+>
+> diff --git a/scripts/qapi-types.py b/scripts/qapi-types.py
+> index 7e3051dbb9..dc7dd08512 100644
+> --- a/scripts/qapi-types.py
+> +++ b/scripts/qapi-types.py
+> @@ -243,7 +243,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
+>  # QAPISchemaGenTypeVisitor.visit_end().
+>  do_builtins =3D False
+>
+> -(input_file, output_dir, do_c, do_h, prefix, opts) =3D \
+> +(input_file, output_dir, prefix, opts) =3D \
+>      parse_command_line('b', ['builtins'])
+>
+>  for o, a in opts:
+> @@ -280,7 +280,7 @@ h_comment =3D '''
+>   */
+>  '''
+>
+> -(fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
+> +(fdef, fdecl) =3D open_output(output_dir, prefix,
+>                              'qapi-types.c', 'qapi-types.h',
+>                              c_comment, h_comment)
+>
+> diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
+> index 7e1cfc13f0..9757911d2d 100644
+> --- a/scripts/qapi-visit.py
+> +++ b/scripts/qapi-visit.py
+> @@ -327,7 +327,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
+>  # QAPISchemaGenVisitVisitor.visit_end().
+>  do_builtins =3D False
+>
+> -(input_file, output_dir, do_c, do_h, prefix, opts) =3D \
+> +(input_file, output_dir, prefix, opts) =3D \
+>      parse_command_line('b', ['builtins'])
+>
+>  for o, a in opts:
+> @@ -363,7 +363,7 @@ h_comment =3D '''
+>   */
+>  '''
+>
+> -(fdef, fdecl) =3D open_output(output_dir, do_c, do_h, prefix,
+> +(fdef, fdecl) =3D open_output(output_dir, prefix,
+>                              'qapi-visit.c', 'qapi-visit.h',
+>                              c_comment, h_comment)
+>
+> diff --git a/scripts/qapi.py b/scripts/qapi.py
+> index 8f9c5666bd..5434987108 100644
+> --- a/scripts/qapi.py
+> +++ b/scripts/qapi.py
+> @@ -1931,8 +1931,6 @@ def parse_command_line(extra_options=3D'', extra_lo=
+ng_options=3D[]):
+>
+>      output_dir =3D ''
+>      prefix =3D ''
+> -    do_c =3D False
+> -    do_h =3D False
+>      extra_opts =3D []
+>
+>      for oa in opts:
+> @@ -1947,30 +1945,22 @@ def parse_command_line(extra_options=3D'', extra_=
+long_options=3D[]):
+>              prefix =3D a
+>          elif o in ('-o', '--output-dir'):
+>              output_dir =3D a + '/'
+> -        elif o in ('-c', '--source'):
+> -            do_c =3D True
+> -        elif o in ('-h', '--header'):
+> -            do_h =3D True
+>          else:
+>              extra_opts.append(oa)
+>
+> -    if not do_c and not do_h:
+> -        do_c =3D True
+> -        do_h =3D True
 > -
->  qapi-py =3D $(SRC_PATH)/scripts/qapi.py $(SRC_PATH)/scripts/ordereddict.=
-py
+>      if len(args) !=3D 1:
+>          print >>sys.stderr, "%s: need exactly one argument" % sys.argv[0=
+]
+>          sys.exit(1)
+>      fname =3D args[0]
 >
-> +.INTERMEDIATE: qga/qapi-generated/qga-qapi-types-gen
->  qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.h =
-:\
-> +qga/qapi-generated/qga-qapi-types-gen ;
-> +qga/qapi-generated/qga-qapi-types-gen: \
->  $(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-types.py $(qap=
-i-py)
->         $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-types.py =
-\
-> -               $(gen-out-type) -o qga/qapi-generated -p "qga-" $<, \
-> +               -o $(dir $@) -p "qga-" $<, \
->                 "GEN","$@")
-> +
-> +.INTERMEDIATE: qga/qapi-generated/qga-qapi-visit-gen
->  qga/qapi-generated/qga-qapi-visit.c qga/qapi-generated/qga-qapi-visit.h =
-:\
-> +qga/qapi-generated/qga-qapi-visit-gen ;
-> +qga/qapi-generated/qga-qapi-visit-gen: \
->  $(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-visit.py $(qap=
-i-py)
->         $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-visit.py =
-\
-> -               $(gen-out-type) -o qga/qapi-generated -p "qga-" $<, \
-> +               -o $(dir $@) -p "qga-" $<, \
->                 "GEN","$@")
-> +
-> +.INTERMEDIATE: qga/qapi-generated/qga-qapi-commands-gen
->  qga/qapi-generated/qga-qmp-commands.h qga/qapi-generated/qga-qmp-marshal=
-.c :\
-> +qga/qapi-generated/qga-qapi-commands-gen ;
-> +qga/qapi-generated/qga-qapi-commands-gen: \
->  $(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-commands.py $(=
-qapi-py)
->         $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-commands.=
-py \
-> -               $(gen-out-type) -o qga/qapi-generated -p "qga-" $<, \
-> +               -o $(dir $@) -p "qga-" $<, \
->                 "GEN","$@")
+> -    return (fname, output_dir, do_c, do_h, prefix, extra_opts)
+> +    return (fname, output_dir, prefix, extra_opts)
 >
->  qapi-modules =3D $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.js=
-on \
-> @@ -419,30 +428,39 @@ qapi-modules =3D $(SRC_PATH)/qapi-schema.json $(SRC=
-_PATH)/qapi/common.json \
->                 $(SRC_PATH)/qapi/transaction.json \
->                 $(SRC_PATH)/qapi/ui.json
+>  #
+>  # Generate output files with boilerplate
+>  #
 >
-> -qapi-types.c qapi-types.h :\
-> -$(qapi-modules) $(SRC_PATH)/scripts/qapi-types.py $(qapi-py)
-> +.INTERMEDIATE: qapi-types-gen
-> +qapi-types.c qapi-types.h: qapi-types-gen ;
-> +qapi-types-gen: $(qapi-modules) $(SRC_PATH)/scripts/qapi-types.py $(qapi=
--py)
->         $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-types.py =
-\
-> -               $(gen-out-type) -o "." -b $<, \
-> +               -b $<, \
->                 "GEN","$@")
-> -qapi-visit.c qapi-visit.h :\
-> -$(qapi-modules) $(SRC_PATH)/scripts/qapi-visit.py $(qapi-py)
-> +
-> +.INTERMEDIATE: qapi-visit-gen
-> +qapi-visit.c qapi-visit.h: qapi-visit-gen ;
-> +qapi-visit-gen: $(qapi-modules) $(SRC_PATH)/scripts/qapi-visit.py $(qapi=
--py)
->         $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-visit.py =
-\
-> -               $(gen-out-type) -o "." -b $<, \
-> +               -b $<, \
->                 "GEN","$@")
-> -qapi-event.c qapi-event.h :\
-> -$(qapi-modules) $(SRC_PATH)/scripts/qapi-event.py $(qapi-py)
-> +
-> +.INTERMEDIATE: qapi-event-gen
-> +qapi-event.c qapi-event.h: qapi-event-gen
-> +qapi-event-gen: $(qapi-modules) $(SRC_PATH)/scripts/qapi-event.py $(qapi=
--py)
->         $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-event.py =
-\
-> -               $(gen-out-type) -o "." $<, \
-> +               $<, \
->                 "GEN","$@")
-> -qmp-commands.h qmp-marshal.c :\
-> -$(qapi-modules) $(SRC_PATH)/scripts/qapi-commands.py $(qapi-py)
-> +
-> +.INTERMEDIATE: qapi-commands-gen
-> +qmp-commands.h qmp-marshal.c: qapi-commands-gen
-> +qapi-commands-gen: $(qapi-modules) $(SRC_PATH)/scripts/qapi-commands.py =
-$(qapi-py)
->         $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-commands.=
-py \
-> -               $(gen-out-type) -o "." $<, \
-> +               $<, \
->                 "GEN","$@")
-> -qmp-introspect.h qmp-introspect.c :\
-> -$(qapi-modules) $(SRC_PATH)/scripts/qapi-introspect.py $(qapi-py)
-> +
-> +.INTERMEDIATE: qapi-introspect-gen
-> +qmp-introspect.h qmp-introspect.c: qapi-introspect-gen
-> +qapi-introspect-gen: $(qapi-modules) $(SRC_PATH)/scripts/qapi-introspect=
-.py $(qapi-py)
->         $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-introspec=
-t.py \
-> -               $(gen-out-type) -o "." $<, \
-> +               $<, \
->                 "GEN","$@")
 >
->  QGALIB_GEN=3D$(addprefix qga/qapi-generated/, qga-qapi-types.h qga-qapi-=
-visit.h qga-qmp-commands.h)
-> diff --git a/Makefile.objs b/Makefile.objs
-> index bdfa3b6177..cc4f94d77a 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -2,7 +2,7 @@
->  # Common libraries for tools and emulators
->  stub-obj-y =3D stubs/ crypto/
->  util-obj-y =3D util/ qobject/ qapi/
-> -util-obj-y +=3D qmp-introspect.o qapi-types.o qapi-visit.o qapi-event.o
-> +util-obj-y +=3D qapi-types.o qapi-visit.o qapi-event.o
+> -def open_output(output_dir, do_c, do_h, prefix, c_file, h_file,
+> +def open_output(output_dir, prefix, c_file, h_file,
+>                  c_comment, h_comment):
+>      guard =3D guardname(prefix + h_file)
+>      c_file =3D output_dir + prefix + c_file
+> @@ -1983,15 +1973,8 @@ def open_output(output_dir, do_c, do_h, prefix, c_=
+file, h_file,
+>              if e.errno !=3D errno.EEXIST:
+>                  raise
 >
->  chardev-obj-y =3D chardev/
+> -    def maybe_open(really, name, opt):
+> -        if really:
+> -            return open(name, opt)
+> -        else:
+> -            import StringIO
+> -            return StringIO.StringIO()
+> -
+> -    fdef =3D maybe_open(do_c, c_file, 'w')
+> -    fdecl =3D maybe_open(do_h, h_file, 'w')
+> +    fdef =3D open(c_file, 'w')
+> +    fdecl =3D open(h_file, 'w')
 >
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index de4a713c25..5d53c58506 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -626,30 +626,44 @@ tests/test-logging$(EXESUF): tests/test-logging.o $=
-(test-util-obj-y)
->  tests/test-replication$(EXESUF): tests/test-replication.o $(test-util-ob=
-j-y) \
->         $(test-block-obj-y)
->
-> -tests/test-qapi-types.c tests/test-qapi-types.h :\
-> +.INTERMEDIATE: tests/test-qapi-types-gen
-> +tests/test-qapi-types.c tests/test-qapi-types.h: tests/test-qapi-types-g=
-en ;
-> +tests/test-qapi-types-gen: \
->  $(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(SRC_PATH)/scripts/=
-qapi-types.py $(qapi-py)
->         $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-types.py =
-\
-> -               $(gen-out-type) -o tests -p "test-" $<, \
-> +               -o tests -p "test-" $<, \
->                 "GEN","$@")
-> -tests/test-qapi-visit.c tests/test-qapi-visit.h :\
-> +
-> +.INTERMEDIATE: tests/test-qapi-visit-gen
-> +tests/test-qapi-visit.c tests/test-qapi-visit.h: tests/test-qapi-visit-g=
-en ;
-> +tests/test-qapi-visit-gen: \
->  $(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(SRC_PATH)/scripts/=
-qapi-visit.py $(qapi-py)
->         $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-visit.py =
-\
-> -               $(gen-out-type) -o tests -p "test-" $<, \
-> +               -o tests -p "test-" $<, \
->                 "GEN","$@")
-> -tests/test-qmp-commands.h tests/test-qmp-marshal.c :\
-> +
-> +.INTERMEDIATE: tests/test-qapi-commands-gen
-> +tests/test-qmp-commands.h tests/test-qmp-marshal.c: tests/test-qapi-comm=
-ands-gen ;
-> +tests/test-qapi-commands-gen: \
->  $(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(SRC_PATH)/scripts/=
-qapi-commands.py $(qapi-py)
->         $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-commands.=
-py \
-> -               $(gen-out-type) -o tests -p "test-" $<, \
-> +               -o tests -p "test-" $<, \
->                 "GEN","$@")
-> -tests/test-qapi-event.c tests/test-qapi-event.h :\
-> +
-> +.INTERMEDIATE: tests/test-qapi-event-gen
-> +tests/test-qapi-event.c tests/test-qapi-event.h: tests/test-qapi-event-g=
-en ;
-> +tests/test-qapi-event-gen: \
->  $(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(SRC_PATH)/scripts/=
-qapi-event.py $(qapi-py)
->         $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-event.py =
-\
-> -               $(gen-out-type) -o tests -p "test-" $<, \
-> +               -o tests -p "test-" $<, \
->                 "GEN","$@")
-> -tests/test-qmp-introspect.c tests/test-qmp-introspect.h :\
-> +
-> +.INTERMEDIATE: tests/test-qapi-introspect-gen
-> +tests/test-qmp-introspect.c tests/test-qmp-introspect.h: tests/test-qapi=
--introspect-gen ;
-> +tests/test-qapi-introspect-gen: \
->  $(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(SRC_PATH)/scripts/=
-qapi-introspect.py $(qapi-py)
->         $(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-introspec=
-t.py \
-> -               $(gen-out-type) -o tests -p "test-" $<, \
-> +               -o tests -p "test-" $<, \
->                 "GEN","$@")
->
->  tests/qapi-schema/doc-good.test.texi: $(SRC_PATH)/tests/qapi-schema/doc-=
-good.json $(SRC_PATH)/scripts/qapi2texi.py $(qapi-py)
-> @@ -660,7 +674,7 @@ tests/test-string-input-visitor$(EXESUF): tests/test-=
-string-input-visitor.o $(te
->  tests/test-qmp-event$(EXESUF): tests/test-qmp-event.o $(test-qapi-obj-y)
->  tests/test-qobject-output-visitor$(EXESUF): tests/test-qobject-output-vi=
-sitor.o $(test-qapi-obj-y)
->  tests/test-clone-visitor$(EXESUF): tests/test-clone-visitor.o $(test-qap=
-i-obj-y)
-> -tests/test-qobject-input-visitor$(EXESUF): tests/test-qobject-input-visi=
-tor.o $(test-qapi-obj-y)
-> +tests/test-qobject-input-visitor$(EXESUF): tests/test-qobject-input-visi=
-tor.o $(test-qapi-obj-y) qmp-introspect.o
->  tests/test-qmp-commands$(EXESUF): tests/test-qmp-commands.o tests/test-q=
-mp-marshal.o $(test-qapi-obj-y)
->  tests/test-visitor-serialization$(EXESUF): tests/test-visitor-serializat=
-ion.o $(test-qapi-obj-y)
->  tests/test-opts-visitor$(EXESUF): tests/test-opts-visitor.o $(test-qapi-=
-obj-y)
+>      fdef.write(mcgen('''
+>  /* AUTOMATICALLY GENERATED, DO NOT MODIFY */
 > --
 > 2.13.6
 >
