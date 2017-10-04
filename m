@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dzYrF-0005mY-06
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 21:52:24 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dzYrI-0005py-GK
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 21:52:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dzYrD-0000KC-2j
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 21:52:21 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dzYrF-0000Q4-CU
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 21:52:24 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Tue,  3 Oct 2017 21:52:02 -0400
-Message-Id: <20171004015205.20724-2-jsnow@redhat.com>
+Date: Tue,  3 Oct 2017 21:52:05 -0400
+Message-Id: <20171004015205.20724-5-jsnow@redhat.com>
 In-Reply-To: <20171004015205.20724-1-jsnow@redhat.com>
 References: <20171004015205.20724-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/4] blockjob: add persistent property
+Subject: [Qemu-devel] [PATCH v2 4/4] iotests: test manual job reaping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,384 +22,271 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-Add a persistent (manually reap) property to block jobs that forces
-them to linger in the block job list (visible to QMP queries) until
-the user explicitly dismisses them via QMP.
-
-The reap command itself is implemented in the next commit, and the
-feature is exposed to drive-backup and blockdev-backup in the subsequent
-commit.
+RFC: The error returned by a job creation command when that device
+already has a job attached has become misleading; "Someone should
+do something about that!"
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/backup.c               | 20 +++++++++----------
- block/commit.c               |  2 +-
- block/mirror.c               |  2 +-
- block/replication.c          |  5 +++--
- block/stream.c               |  2 +-
- blockdev.c                   |  8 ++++----
- blockjob.c                   | 46 ++++++++++++++++++++++++++++++++++++++++++--
- include/block/block_int.h    |  8 +++++---
- include/block/blockjob.h     | 21 ++++++++++++++++++++
- include/block/blockjob_int.h |  2 +-
- qapi/block-core.json         |  7 ++++---
- tests/test-blockjob-txn.c    |  2 +-
- tests/test-blockjob.c        |  2 +-
- 13 files changed, 97 insertions(+), 30 deletions(-)
+ tests/qemu-iotests/056     | 227 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/056.out |   4 +-
+ 2 files changed, 229 insertions(+), 2 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index 517c300..93ac194 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -532,15 +532,15 @@ static const BlockJobDriver backup_job_driver = {
-     .drain                  = backup_drain,
- };
+diff --git a/tests/qemu-iotests/056 b/tests/qemu-iotests/056
+index 04f2c3c..d6bed20 100755
+--- a/tests/qemu-iotests/056
++++ b/tests/qemu-iotests/056
+@@ -29,6 +29,26 @@ backing_img = os.path.join(iotests.test_dir, 'backing.img')
+ test_img = os.path.join(iotests.test_dir, 'test.img')
+ target_img = os.path.join(iotests.test_dir, 'target.img')
  
--BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
--                  BlockDriverState *target, int64_t speed,
--                  MirrorSyncMode sync_mode, BdrvDirtyBitmap *sync_bitmap,
--                  bool compress,
--                  BlockdevOnError on_source_error,
--                  BlockdevOnError on_target_error,
--                  int creation_flags,
--                  BlockCompletionFunc *cb, void *opaque,
--                  BlockJobTxn *txn, Error **errp)
-+BlockJob *backup_job_create(const char *job_id, bool persistent,
-+                            BlockDriverState *bs, BlockDriverState *target,
-+                            int64_t speed, MirrorSyncMode sync_mode,
-+                            BdrvDirtyBitmap *sync_bitmap, bool compress,
-+                            BlockdevOnError on_source_error,
-+                            BlockdevOnError on_target_error,
-+                            int creation_flags,
-+                            BlockCompletionFunc *cb, void *opaque,
-+                            BlockJobTxn *txn, Error **errp)
- {
-     int64_t len;
-     BlockDriverInfo bdi;
-@@ -608,7 +608,7 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-     }
- 
-     /* job->common.len is fixed, so we can't allow resize */
--    job = block_job_create(job_id, &backup_job_driver, bs,
-+    job = block_job_create(job_id, &backup_job_driver, persistent, bs,
-                            BLK_PERM_CONSISTENT_READ,
-                            BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE |
-                            BLK_PERM_WRITE_UNCHANGED | BLK_PERM_GRAPH_MOD,
-diff --git a/block/commit.c b/block/commit.c
-index 8f0e835..308a5fd 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -304,7 +304,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-         return;
-     }
- 
--    s = block_job_create(job_id, &commit_job_driver, bs, 0, BLK_PERM_ALL,
-+    s = block_job_create(job_id, &commit_job_driver, false, bs, 0, BLK_PERM_ALL,
-                          speed, BLOCK_JOB_DEFAULT, NULL, NULL, errp);
-     if (!s) {
-         return;
-diff --git a/block/mirror.c b/block/mirror.c
-index 6f5cb9f..013e73a 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1180,7 +1180,7 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-     }
- 
-     /* Make sure that the source is not resized while the job is running */
--    s = block_job_create(job_id, driver, mirror_top_bs,
-+    s = block_job_create(job_id, driver, false, mirror_top_bs,
-                          BLK_PERM_CONSISTENT_READ,
-                          BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
-                          BLK_PERM_WRITE | BLK_PERM_GRAPH_MOD, speed,
-diff --git a/block/replication.c b/block/replication.c
-index 3a4e682..6c59f00 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -539,8 +539,9 @@ static void replication_start(ReplicationState *rs, ReplicationMode mode,
-         bdrv_op_block_all(top_bs, s->blocker);
-         bdrv_op_unblock(top_bs, BLOCK_OP_TYPE_DATAPLANE, s->blocker);
- 
--        job = backup_job_create(NULL, s->secondary_disk->bs, s->hidden_disk->bs,
--                                0, MIRROR_SYNC_MODE_NONE, NULL, false,
-+        job = backup_job_create(NULL, false, s->secondary_disk->bs,
-+                                s->hidden_disk->bs, 0, MIRROR_SYNC_MODE_NONE,
-+                                NULL, false,
-                                 BLOCKDEV_ON_ERROR_REPORT,
-                                 BLOCKDEV_ON_ERROR_REPORT, BLOCK_JOB_INTERNAL,
-                                 backup_job_completed, bs, NULL, &local_err);
-diff --git a/block/stream.c b/block/stream.c
-index e6f7234..c644f34 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -244,7 +244,7 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-     /* Prevent concurrent jobs trying to modify the graph structure here, we
-      * already have our own plans. Also don't allow resize as the image size is
-      * queried only at the job start and then cached. */
--    s = block_job_create(job_id, &stream_job_driver, bs,
-+    s = block_job_create(job_id, &stream_job_driver, false, bs,
-                          BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
-                          BLK_PERM_GRAPH_MOD,
-                          BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
-diff --git a/blockdev.c b/blockdev.c
-index 56a6b24..eeb4986 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3290,8 +3290,8 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
-         }
-     }
- 
--    job = backup_job_create(backup->job_id, bs, target_bs, backup->speed,
--                            backup->sync, bmap, backup->compress,
-+    job = backup_job_create(backup->job_id, false, bs, target_bs,
-+                            backup->speed, backup->sync, bmap, backup->compress,
-                             backup->on_source_error, backup->on_target_error,
-                             BLOCK_JOB_DEFAULT, NULL, NULL, txn, &local_err);
-     bdrv_unref(target_bs);
-@@ -3369,8 +3369,8 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, BlockJobTxn *txn,
-             goto out;
-         }
-     }
--    job = backup_job_create(backup->job_id, bs, target_bs, backup->speed,
--                            backup->sync, NULL, backup->compress,
-+    job = backup_job_create(backup->job_id, false, bs, target_bs,
-+                            backup->speed, backup->sync, NULL, backup->compress,
-                             backup->on_source_error, backup->on_target_error,
-                             BLOCK_JOB_DEFAULT, NULL, NULL, txn, &local_err);
-     if (local_err != NULL) {
-diff --git a/blockjob.c b/blockjob.c
-index 3a0c491..1efac45 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -336,6 +336,8 @@ static void block_job_completed_single(BlockJob *job)
-         QLIST_REMOVE(job, txn_list);
-         block_job_txn_unref(job->txn);
-     }
++def img_create(img, fmt=iotests.imgfmt, size='64M', **kwargs):
++    fullname = os.path.join(iotests.test_dir, '%s.%s' % (img, fmt))
++    optargs = []
++    for k,v in kwargs.iteritems():
++        optargs = optargs + ['-o', '%s=%s' % (k,v)]
++    args = ['create', '-f', fmt] + optargs + [fullname, size]
++    iotests.qemu_img(*args)
++    return fullname
 +
-+    job->finished = true;
-     block_job_unref(job);
- }
- 
-@@ -352,6 +354,13 @@ static void block_job_cancel_async(BlockJob *job)
-     job->cancelled = true;
- }
- 
-+static void block_job_do_reap(BlockJob *job)
-+{
-+    assert(job && job->persistent == true);
-+    job->persistent = false;
-+    block_job_unref(job);
-+}
++def try_remove(img):
++    try:
++        os.remove(img)
++    except OSError:
++        pass
 +
- static int block_job_finish_sync(BlockJob *job,
-                                  void (*finish)(BlockJob *, Error **errp),
-                                  Error **errp)
-@@ -381,6 +390,9 @@ static int block_job_finish_sync(BlockJob *job,
-         aio_poll(qemu_get_aio_context(), true);
-     }
-     ret = (job->cancelled && job->ret == 0) ? -ECANCELED : job->ret;
-+    if (job->persistent) {
-+        block_job_do_reap(job);
-+    }
-     block_job_unref(job);
-     return ret;
- }
-@@ -483,6 +495,26 @@ void block_job_complete(BlockJob *job, Error **errp)
-     job->driver->complete(job, errp);
- }
- 
-+void block_job_reap(BlockJob **jobptr, Error **errp)
-+{
-+    BlockJob *job = *jobptr;
-+    /* similarly to _complete, this is QMP-interface only. */
-+    assert(job->id);
-+    if (!job->persistent) {
-+        error_setg(errp, "The active block job '%s' was not started with "
-+                   "\'manual-reap\': true, and so cannot be reaped as it will "
-+                   "clean up after itself automatically", job->id);
-+        return;
-+    } else if (!job->finished) {
-+        error_setg(errp, "The active block job '%s' has not yet terminated, "
-+                   "and cannot be reaped yet", job->id);
-+        return;
-+    }
++def io_write_patterns(img, patterns):
++    for pattern in patterns:
++        iotests.qemu_io('-c', 'write -P%s %s %s' % pattern, img)
 +
-+    block_job_do_reap(job);
-+    *jobptr = NULL;
-+}
 +
- void block_job_user_pause(BlockJob *job)
- {
-     job->user_paused = true;
-@@ -505,7 +537,9 @@ void block_job_user_resume(BlockJob *job)
+ class TestSyncModesNoneAndTop(iotests.QMPTestCase):
+     image_len = 64 * 1024 * 1024 # MB
  
- void block_job_cancel(BlockJob *job)
- {
--    if (block_job_started(job)) {
-+    if (job->finished) {
-+        return;
-+    } else if (block_job_started(job)) {
-         block_job_cancel_async(job);
-         block_job_enter(job);
-     } else {
-@@ -562,6 +596,7 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
-     info->speed     = job->speed;
-     info->io_status = job->iostatus;
-     info->ready     = job->ready;
-+    info->finished  = job->finished;
-     return info;
- }
+@@ -108,5 +128,212 @@ class TestBeforeWriteNotifier(iotests.QMPTestCase):
+         event = self.cancel_and_wait()
+         self.assert_qmp(event, 'data/type', 'backup')
  
-@@ -609,7 +644,7 @@ static void block_job_event_completed(BlockJob *job, const char *msg)
-  */
- 
- void *block_job_create(const char *job_id, const BlockJobDriver *driver,
--                       BlockDriverState *bs, uint64_t perm,
-+                       bool persistent, BlockDriverState *bs, uint64_t perm,
-                        uint64_t shared_perm, int64_t speed, int flags,
-                        BlockCompletionFunc *cb, void *opaque, Error **errp)
- {
-@@ -664,6 +699,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-     job->paused        = true;
-     job->pause_count   = 1;
-     job->refcnt        = 1;
-+    job->persistent   = persistent;
- 
-     error_setg(&job->blocker, "block device is in use by block job: %s",
-                BlockJobType_str(driver->job_type));
-@@ -689,6 +725,12 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-             return NULL;
-         }
-     }
++class BackupTest(iotests.QMPTestCase):
++    def setUp(self):
++        self.vm = iotests.VM()
++        self.test_img = img_create('test')
++        self.dest_img = img_create('dest')
++        self.vm.add_drive(self.test_img)
++        self.vm.launch()
 +
-+    /* Hang on to an extra reference on behalf of the QMP monitor */
-+    if (job->persistent) {
-+        block_job_ref(job);
-+    }
++    def tearDown(self):
++        self.vm.shutdown()
++        try_remove(self.test_img)
++        try_remove(self.dest_img)
 +
-     return job;
- }
- 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 99abe2c..a576357 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -944,6 +944,8 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
-  * backup_job_create:
-  * @job_id: The id of the newly-created job, or %NULL to use the
-  * device name of @bs.
-+ * @persistent: Whether or not this job, when completed, will need to be
-+ *               manually reaped via block-job-reap or not.
-  * @bs: Block device to operate on.
-  * @target: Block device to write to.
-  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
-@@ -960,9 +962,9 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
-  * Create a backup operation on @bs.  Clusters in @bs are written to @target
-  * until the job is cancelled or manually completed.
-  */
--BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
--                            BlockDriverState *target, int64_t speed,
--                            MirrorSyncMode sync_mode,
-+BlockJob *backup_job_create(const char *job_id, bool persistent,
-+                            BlockDriverState *bs, BlockDriverState *target,
-+                            int64_t speed, MirrorSyncMode sync_mode,
-                             BdrvDirtyBitmap *sync_bitmap,
-                             bool compress,
-                             BlockdevOnError on_source_error,
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 67c0968..cd1b41b 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -135,6 +135,15 @@ typedef struct BlockJob {
-      */
-     int ret;
- 
-+    /* True if this job must remain present post-completion until
-+     * it can be queried and removed via block-job-reap. */
-+    bool persistent;
++    def hmp_io_writes(self, drive, patterns):
++        for pattern in patterns:
++            self.vm.hmp_qemu_io(drive, 'write -P%s %s %s' % pattern)
++        self.vm.hmp_qemu_io(drive, 'flush')
 +
-+    /* True if and only if persistent is true and the job has finished
-+     * calling either abort or commit (if applicable) and can be reaped
-+     * via interactive user command. */
-+    bool finished;
++    def qmp_backup_and_wait(self, cmd='drive-backup', serror=None,
++                            aerror=None, **kwargs):
++        return (self.qmp_backup(cmd, serror, **kwargs) and
++                self.qmp_backup_wait(kwargs['device'], aerror))
 +
-     /** Non-NULL if this job is part of a transaction */
-     BlockJobTxn *txn;
-     QLIST_ENTRY(BlockJob) txn_list;
-@@ -227,6 +236,18 @@ void block_job_cancel(BlockJob *job);
- void block_job_complete(BlockJob *job, Error **errp);
- 
- /**
-+ * block_job_reap:
-+ * @job: The job to be reaped.
-+ * @errp: Error object.
-+ *
-+ * For completed or canceled jobs, remove the job object
-+ * from the block_job_query list and perform final cleanup.
-+ *
-+ * Note that at this stage, the job cannot be rolled back.
-+ */
-+void block_job_reap(BlockJob **job, Error **errp);
++    def qmp_backup(self, cmd='drive-backup',
++                   error=None, **kwargs):
++        self.assertTrue('device' in kwargs)
++        res = self.vm.qmp(cmd, **kwargs)
++        if error:
++            self.assert_qmp(res, 'error/desc', error)
++            return False
++        self.assert_qmp(res, 'return', {})
++        return True
 +
-+/**
-  * block_job_query:
-  * @job: The job to get information about.
-  *
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index f13ad05..c19275c 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -132,7 +132,7 @@ struct BlockJobDriver {
-  * called from a wrapper that is specific to the job type.
-  */
- void *block_job_create(const char *job_id, const BlockJobDriver *driver,
--                       BlockDriverState *bs, uint64_t perm,
-+                       bool persistent, BlockDriverState *bs, uint64_t perm,
-                        uint64_t shared_perm, int64_t speed, int flags,
-                        BlockCompletionFunc *cb, void *opaque, Error **errp);
++    def qmp_backup_wait(self, device, error=None):
++        event = self.vm.event_wait(name="BLOCK_JOB_COMPLETED",
++                                   match={'data': {'device': device}})
++        self.assertNotEqual(event, None)
++        try:
++            failure = self.dictpath(event, 'data/error')
++        except AssertionError:
++            # Backup succeeded.
++            self.assert_qmp(event, 'data/offset', event['data']['len'])
++            return True
++        else:
++            # Failure.
++            self.assert_qmp(event, 'data/error', qerror)
++            return False
++
++    def test_reap_false(self):
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++        self.qmp_backup_and_wait(device='drive0', format=iotests.imgfmt,
++                                 sync='full', target=self.dest_img, persistent=False)
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++
++    def test_reap_true(self):
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++        self.qmp_backup_and_wait(device='drive0', format=iotests.imgfmt,
++                                 sync='full', target=self.dest_img, persistent=True)
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return[0]/finished', True)
++        res = self.vm.qmp('block-job-reap', device='drive0')
++        self.assert_qmp(res, 'return', {})
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++
++    def test_reap_bad_id(self):
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++        res = self.vm.qmp('block-job-reap', device='foobar')
++        self.assert_qmp(res, 'error/class', 'DeviceNotActive')
++
++    def test_reap_collision(self):
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++        self.qmp_backup_and_wait(device='drive0', format=iotests.imgfmt,
++                                 sync='full', target=self.dest_img, persistent=True)
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return[0]/finished', True)
++        # Leave zombie job un-reaped, observe a failure:
++        res = self.qmp_backup_and_wait(serror='Need a root block node',
++                                       device='drive0', format=iotests.imgfmt,
++                                       sync='full', target=self.dest_img,
++                                       persistent=True)
++        self.assertEqual(res, False)
++        # OK, reap the zombie.
++        res = self.vm.qmp('block-job-reap', device='drive0')
++        self.assert_qmp(res, 'return', {})
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++        # Ensure it's really gone.
++        self.qmp_backup_and_wait(device='drive0', format=iotests.imgfmt,
++                                 sync='full', target=self.dest_img, persistent=True)
++
++    def test_reap_premature(self):
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++        # Give blkdebug something to chew on
++        self.hmp_io_writes('drive0',
++                           (('0x9a', 0, 512),
++                           ('0x55', '8M', '352k'),
++                           ('0x78', '15872k', '1M')))
++        # Add destination node via blkdebug
++        res = self.vm.qmp('blockdev-add',
++                          node_name='target0',
++                          driver=iotests.imgfmt,
++                          file={
++                              'driver': 'blkdebug',
++                              'image': {
++                                  'driver': 'file',
++                                  'filename': self.dest_img
++                              },
++                              'inject-error': [{
++                                  'event': 'write_aio',
++                                  'errno': 5,
++                                  'immediately': False,
++                                  'once': True
++                              }],
++                          })
++        self.assert_qmp(res, 'return', {})
++
++        res = self.qmp_backup(cmd='blockdev-backup',
++                              device='drive0', target='target0',
++                              on_target_error='stop',
++                              sync='full',
++                              persistent=True)
++        self.assertTrue(res)
++        event = self.vm.event_wait(name="BLOCK_JOB_ERROR",
++                                   match={'data': {'device': 'drive0'}})
++        self.assertNotEqual(event, None)
++        # OK, job should be wedged
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return[0]/finished', False)
++        res = self.vm.qmp('block-job-reap', device='drive0')
++        self.assert_qmp(res, 'error/desc',
++                        "The active block job 'drive0' has not yet terminated, and cannot be reaped yet")
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return[0]/finished', False)
++        # OK, unstick job and move forward.
++        res = self.vm.qmp('block-job-resume', device='drive0')
++        self.assert_qmp(res, 'return', {})
++        res = self.qmp_backup_wait(device='drive0')
++        self.assertTrue(res)
++        # Job should now be languishing:
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return[0]/finished', True)
++        res = self.vm.qmp('block-job-reap', device='drive0')
++        self.assert_qmp(res, 'return', {})
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++
++    def test_reap_erroneous(self):
++        '''Same as above test, but manual-reap is set to False.'''
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++        # Give blkdebug something to chew on
++        self.hmp_io_writes('drive0',
++                           (('0x9a', 0, 512),
++                           ('0x55', '8M', '352k'),
++                           ('0x78', '15872k', '1M')))
++        # Add destination node via blkdebug
++        res = self.vm.qmp('blockdev-add',
++                          node_name='target0',
++                          driver=iotests.imgfmt,
++                          file={
++                              'driver': 'blkdebug',
++                              'image': {
++                                  'driver': 'file',
++                                  'filename': self.dest_img
++                              },
++                              'inject-error': [{
++                                  'event': 'write_aio',
++                                  'errno': 5,
++                                  'immediately': False,
++                                  'once': True
++                              }],
++                          })
++        self.assert_qmp(res, 'return', {})
++
++        res = self.qmp_backup(cmd='blockdev-backup',
++                              device='drive0', target='target0',
++                              on_target_error='stop',
++                              sync='full',
++                              persistent=False)
++        self.assertTrue(res)
++        event = self.vm.event_wait(name="BLOCK_JOB_ERROR",
++                                   match={'data': {'device': 'drive0'}})
++        self.assertNotEqual(event, None)
++        # OK, job should be wedged
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return[0]/finished', False)
++        res = self.vm.qmp('block-job-reap', device='drive0')
++        self.assert_qmp(res, 'error/desc',
++                        "The active block job 'drive0' was not started with 'manual-reap': true, and so cannot be reaped as it will clean up after itself automatically")
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return[0]/finished', False)
++        # OK, unstick job and move forward.
++        res = self.vm.qmp('block-job-resume', device='drive0')
++        self.assert_qmp(res, 'return', {})
++        res = self.qmp_backup_wait(device='drive0')
++        self.assertTrue(res)
++        # Job should now be gone:
++        res = self.vm.qmp('query-block-jobs')
++        self.assert_qmp(res, 'return', [])
++
+ if __name__ == '__main__':
+     iotests.main(supported_fmts=['qcow2', 'qed'])
+diff --git a/tests/qemu-iotests/056.out b/tests/qemu-iotests/056.out
+index 8d7e996..dae404e 100644
+--- a/tests/qemu-iotests/056.out
++++ b/tests/qemu-iotests/056.out
+@@ -1,5 +1,5 @@
+-...
++.........
+ ----------------------------------------------------------------------
+-Ran 3 tests
++Ran 9 tests
  
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 750bb0c..a4f5e10 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -984,9 +984,10 @@
- # Since: 1.1
- ##
- { 'struct': 'BlockJobInfo',
--  'data': {'type': 'str', 'device': 'str', 'len': 'int',
--           'offset': 'int', 'busy': 'bool', 'paused': 'bool', 'speed': 'int',
--           'io-status': 'BlockDeviceIoStatus', 'ready': 'bool'} }
-+  'data': {'type': 'str', 'device': 'str', 'len': 'int', 'offset': 'int',
-+           'busy': 'bool', 'paused': 'bool', 'speed': 'int',
-+           'io-status': 'BlockDeviceIoStatus', 'ready': 'bool',
-+           'finished': 'bool'} }
- 
- ##
- # @query-block-jobs:
-diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
-index c77343f..5ab0e22 100644
---- a/tests/test-blockjob-txn.c
-+++ b/tests/test-blockjob-txn.c
-@@ -101,7 +101,7 @@ static BlockJob *test_block_job_start(unsigned int iterations,
-     g_assert_nonnull(bs);
- 
-     snprintf(job_id, sizeof(job_id), "job%u", counter++);
--    s = block_job_create(job_id, &test_block_job_driver, bs,
-+    s = block_job_create(job_id, &test_block_job_driver, false, bs,
-                          0, BLK_PERM_ALL, 0, BLOCK_JOB_DEFAULT,
-                          test_block_job_cb, data, &error_abort);
-     s->iterations = iterations;
-diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index 23bdf1a..9fc2785 100644
---- a/tests/test-blockjob.c
-+++ b/tests/test-blockjob.c
-@@ -30,7 +30,7 @@ static BlockJob *do_test_id(BlockBackend *blk, const char *id,
-     BlockJob *job;
-     Error *errp = NULL;
- 
--    job = block_job_create(id, &test_block_job_driver, blk_bs(blk),
-+    job = block_job_create(id, &test_block_job_driver, false, blk_bs(blk),
-                            0, BLK_PERM_ALL, 0, BLOCK_JOB_DEFAULT, block_job_cb,
-                            NULL, &errp);
-     if (should_succeed) {
+ OK
 -- 
 2.9.5
