@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dzjK8-0006V0-If
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:03:00 -0400
+	(envelope-from <armbru@redhat.com>) id 1dzjKN-0006aF-Ki
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:03:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dzjK5-0000ox-Gg
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:02:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40940)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dzjK5-0000nd-9y
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:02:49 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 84DA1780C3
-	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 13:02:47 +0000 (UTC)
-References: <20171004125210.7817-1-kraxel@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6f745058-69e1-33a6-f585-8bcd97bef248@redhat.com>
-Date: Wed, 4 Oct 2017 15:02:43 +0200
+	(envelope-from <armbru@redhat.com>) id 1dzjKI-00014F-3D
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 09:03:07 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20171002140307.5292-1-armbru@redhat.com>
+	<20171002140307.5292-6-armbru@redhat.com>
+	<CAJ+F1CLNTLXrqBWVCwvfHuGpC6fzpHB1QvnxSP3-D0j+oY+bJw@mail.gmail.com>
+Date: Wed, 04 Oct 2017 15:02:53 +0200
+In-Reply-To: <CAJ+F1CLNTLXrqBWVCwvfHuGpC6fzpHB1QvnxSP3-D0j+oY+bJw@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 4 Oct 2017
+	12:12:45 +0200")
+Message-ID: <87bmlnm5fm.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20171004125210.7817-1-kraxel@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] usb: fix host-stub.c build race
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 5/8] qemu-options: Add missing -iscsi
+ Texinfo documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,27 +27,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, QEMU <qemu-devel@nongnu.org>, "open list:Block layer core" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-On 04.10.2017 14:52, Gerd Hoffmann wrote:
-> Suggested-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/usb/Makefile.objs | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
-> index 0e6d54b21f..bdfead6701 100644
-> --- a/hw/usb/Makefile.objs
-> +++ b/hw/usb/Makefile.objs
-> @@ -47,6 +47,7 @@ common-obj-y += host-libusb.o host-legacy.o
->  else
->  common-obj-y += host-stub.o
->  endif
-> +common-obj-$(CONFIG_ALL) += host-stub.o
->  
->  host-libusb.o-cflags := $(LIBUSB_CFLAGS)
->  host-libusb.o-libs := $(LIBUSB_LIBS)
-> 
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+> On Mon, Oct 2, 2017 at 4:03 PM, Markus Armbruster <armbru@redhat.com> wro=
+te:
+>> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+>> Cc: Kevin Wolf <kwolf@redhat.com>
+>> Cc: Max Reitz <mreitz@redhat.com>
+>> Cc: qemu-block@nongnu.org
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> (that's very short doc)
+
+No argument.  It's what I could do while cleaning up a mess that's
+blocking my path to what I really want to do.  Patches welcome :)
+
+>> ---
+>>  qemu-options.hx | 6 ++++++
+>>  1 file changed, 6 insertions(+)
+>>
+>> diff --git a/qemu-options.hx b/qemu-options.hx
+>> index c647fdde62..8568ee388c 100644
+>> --- a/qemu-options.hx
+>> +++ b/qemu-options.hx
+>> @@ -1180,6 +1180,12 @@ DEF("iscsi", HAS_ARG, QEMU_OPTION_iscsi,
+>>      "                iSCSI session parameters\n", QEMU_ARCH_ALL)
+>>
+>>  STEXI
+>> +@item -iscsi
+>> +@findex -iscsi
+>> +Configure iSCSI session parameters.
+>> +ETEXI
+>> +
+>> +STEXI
+>>  @end table
+>>  ETEXI
+>>  DEFHEADING()
+>> --
+>> 2.13.6
+>>
+>>
