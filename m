@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dziiu-00026C-EY
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:24:25 -0400
+	(envelope-from <berrange@redhat.com>) id 1dzijs-0002iN-EK
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:25:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dziis-00045g-SM
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:24:24 -0400
-Date: Wed, 4 Oct 2017 15:23:33 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20171004122333.5r3uf3ynzqikxobs@postretch>
-References: <20170815074513.9055-1-el13635@mail.ntua.gr>
-	<20170929175235.GF3812@localhost.localdomain>
+	(envelope-from <berrange@redhat.com>) id 1dzijr-0005IW-Ho
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:25:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41935)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dzijr-0005Gk-9C
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:25:23 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Wed,  4 Oct 2017 13:25:06 +0100
+Message-Id: <20171004122515.20627-3-berrange@redhat.com>
+In-Reply-To: <20171004122515.20627-1-berrange@redhat.com>
+References: <20171004122515.20627-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="mnu7ktjwloc3qav5"
-Content-Disposition: inline
-In-Reply-To: <20170929175235.GF3812@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH RFC] block: add block-insert-node QMP
- command
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v1 02/11] io: include full error message in
+ websocket handshake trace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,243 +27,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
+When the websocket handshake fails it is useful to log the real
+error message via the trace points for debugging purposes.
 
---mnu7ktjwloc3qav5
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Fixes bug: #1715186
 
-On Fri, Sep 29, 2017 at 07:52:35PM +0200, Kevin Wolf wrote:
->Am 15.08.2017 um 09:45 hat Manos Pitsidianakis geschrieben:
->> block-insert-node and its pair command block-remove-node provide runtime
->> insertion and removal of filter nodes.
->>
->> block-insert-node takes a (parent, child) and (node, child) pair of
->> edges and unrefs the (parent, child) BdrvChild relationship and creates
->> a new (parent, node) child with the same BdrvChildRole.
->>
->> This is a different approach than x-blockdev-change which uses the driver
->> methods bdrv_add_child() and bdrv_del_child(),
->>
->> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
->
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index 4d6ba1baef..16e19cb648 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
->> @@ -3947,3 +3947,63 @@
->>    'data' : { 'parent': 'str',
->>               '*child': 'str',
->>               '*node': 'str' } }
->> +
->> +##
->> +# @block-insert-node:
->> +#
->> +# Insert a filter node between a specific edge in the block driver stat=
-e graph.
->> +# @parent:  the name of the parent node or device
->> +# @node:    the name of the node to insert under parent
->> +# @child:   the name of the child of both node and parent
->> +#
->> +# Example:
->> +# Insert and remove a throttle filter on top of a device chain, between=
- the
->> +# device 'ide0-hd0' and node 'node-A'
->> +#
->> +# -> {'execute': 'object-add',
->> +#     "arguments": {
->> +#       "qom-type": "throttle-group",
->> +#       "id": "group0",
->> +#       "props" : { "limits": { "iops-total": 300 } }
->> +#     }
->> +#    }
->> +# <- { 'return': {} }
->> +# -> {'execute': 'blockdev-add',
->> +#       'arguments': {
->> +#           'driver': 'throttle',
->> +#           'node-name': 'throttle0',
->> +#           'throttle-group': 'group0',
->> +#           'file': 'node-A'
->> +#       }
->> +#    }
->> +# <- { 'return': {} }
->> +# -> { 'execute': 'block-insert-node',
->> +#       'arguments': { 'parent': 'ide0-hd0', 'child': 'node-A', 'node':=
- 'throttle0' }
->> +#    }
->> +# <- { 'return': {} }
->> +# -> { 'execute': 'block-remove-node',
->> +#       'arguments': { 'parent': 'ide0-hd0', 'child': 'node-A', 'node':=
- 'throttle0' }
->> +#    }
->> +# <- { 'return': {} }
->> +# -> { 'execute': 'blockdev-del',
->> +#       'arguments': { 'node-name': 'throttle0' }
->> +#    }
->> +# <- { 'return': {} }
->> +#
->> +##
->> +{ 'command': 'block-insert-node',
->> +  'data': { 'parent': 'str',
->> +             'child': 'str',
->> +             'node': 'str'} }
->
->I would suggest a change to the meaning of @child: Instead of using the
->node-name of the child BDS, I would use the name of the BdrvChild that
->represents the link.
->
->The reason for this is that the node-name could be ambiguous, if you
->have two edges between the same two nodes.
->
->The only use of the node-name of the child that I can remember was for
->checking that the graph still looks like what the user expects. But I
->think we came to the conclusion that there are no race conditions to
->check for if we have manual block job deletion instead of automatic
->completion which can involve surprise changes to the graph. So probably
->we don't need the node-name even for this.
->
->> +##
->> +# @block-remove-node:
->> +#
->> +# Remove a filter node between two other nodes in the block driver stat=
-e graph.
->> +# @parent:  the name of the parent node or device
->> +# @node:    the name of the node to remove from parent
->> +# @child:   the name of the child of node which will go under parent
->> +##
->> +{ 'command': 'block-remove-node',
->> +  'data': { 'parent': 'str',
->> +             'child': 'str',
->> +             'node': 'str'} }
->
->Same thing here.
->
->> diff --git a/block.c b/block.c
->> index 81bd51b670..f874aabbfb 100644
->> --- a/block.c
->> +++ b/block.c
->> +    /* insert 'node' as child bs of 'parent' node */
->> +    if (check_node_edge(parent, child, errp)) {
->> +        return;
->> +    }
->> +    parent_bs =3D bdrv_find_node(parent);
->> +    c =3D bdrv_find_child(parent_bs, child);
->> +    role =3D c->role;
->> +    assert(role =3D=3D &child_file || role =3D=3D &child_backing);
->> +
->> +    bdrv_ref(node_bs);
->> +
->> +    bdrv_drained_begin(parent_bs);
->> +    bdrv_unref_child(parent_bs, c);
->> +    if (role =3D=3D &child_file) {
->> +        parent_bs->file =3D bdrv_attach_child(parent_bs, node_bs, "file=
-",
->> +                                            &child_file, errp);
->> +        if (!parent_bs->file) {
->> +            parent_bs->file =3D bdrv_attach_child(parent_bs, child_bs, =
-"file",
->> +                                                &child_file, &error_abo=
-rt);
->> +            goto out;
->> +        }
->> +    } else if (role =3D=3D &child_backing) {
->> +        parent_bs->backing =3D bdrv_attach_child(parent_bs, node_bs, "b=
-acking",
->> +                                               &child_backing, errp);
->> +        if (!parent_bs->backing) {
->> +            parent_bs->backing =3D bdrv_attach_child(parent_bs, child_b=
-s,
->> +                                                   "backing", &child_ba=
-cking,
->> +                                                   &error_abort);
->> +            goto out;
->> +        }
->> +    }
->
->I would prefer if we could find a solution to avoid requiring a specific
->role. I'm not even sure that your assertion above is correct; can you
->explain why c couldn't have any other role?
->
->Instead of bdrv_unref_child/bdrv_attach_child, could we just change
->where the child points to using bdrv_replace_child()? Then
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ io/channel-websock.c | 7 ++++---
+ io/trace-events      | 2 +-
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-bdrv_replace_child() uses bdrv_set_perm() and co. When I tried it at=20
-first I got errors like "Conflicts with use by ****** as 'backing',=20
-which does not allow 'write' on disk". Presumably the permissions do not=20
-need to change but can we do bdrv_set_perm without bdrv_check_perm?
-
->parent_bs->file and parent_bs->backing (or whatever other variable
->contains the BdrvChild pointer) can stay unchanged and just keep
->working.
->
->> +    bdrv_refresh_filename(parent_bs);
->> +    bdrv_refresh_limits(parent_bs, NULL);
->> +
->> +out:
->> +    bdrv_drained_end(parent_bs);
->> +}
->
->> diff --git a/blockdev.c b/blockdev.c
->> index 8e2fc6e64c..5195ec1b61 100644
->> --- a/blockdev.c
->> +++ b/blockdev.c
->> @@ -4238,3 +4238,47 @@ QemuOptsList qemu_drive_opts =3D {
->>          { /* end of list */ }
->>      },
->>  };
->> +
->> +void qmp_block_insert_node(const char *parent, const char *child,
->> +                           const char *node, Error **errp)
->> +{
->> +    BlockDriverState *bs =3D bdrv_find_node(node);
->> +    if (!bs) {
->> +        error_setg(errp, "Node '%s' not found", node);
->> +        return;
->> +    }
->> +    if (!bs->monitor_list.tqe_prev) {
->> +        error_setg(errp, "Node '%s' is not owned by the monitor",
->> +                   bs->node_name);
->> +        return;
->> +    }
->> +    if (!bs->drv->is_filter) {
->> +        error_setg(errp, "Block format '%s' used by node '%s' does not =
-support"
->> +                   "insertion", bs->drv->format_name, bs->node_name);
->> +        return;
->> +    }
->> +
->> +    bdrv_insert_node(parent, child, node, errp);
->> +}
->
->Do we need to acquire an AioContext lock somewhere?
->
->Kevin
->
-
-the *_child() functions call drained_begin/end which I think might cover=20
-this case?
-
---mnu7ktjwloc3qav5
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlnU0sUACgkQc2J8L2kN
-9xBUbQ//VngihJlUhFlp++Qo45+xwvKRJHUBTtRD9fhpDd0rlZny+Ww6H6eBm2w4
-MlCgcGzFEGLG0rfFbvX8DIsdIGNIyjXMeZ+13d4gDSy8y+KzT3mirQBV+jkmnBEw
-BREZfVB/xMDV3l7uCIV8wVOjzfJ0tlpFUA+hktTIZ4hUe0wyP0QkRznvsv3LQvIQ
-vZVOkuhpLJ33VOSx1C2/FQrQajul9dJ0/pKSZvKTn2MHu7QnYGx3LT3h4WpmDNbR
-DUaggomNVZNxwO3Hf5rKQ41CsvWJTJWdoA4V7d1MM++ajiZbj5JjEh2etB/DEWTN
-H/i/k2zdD0T0K8xqU7rHTVkrFafPfPirfDTvn9VS/UFd5Z6JQjJhgkTuwLLvINs7
-fsdCEmHp5mJ3ClzryUCJ6GusIi2yWo9+SKl2NFYWPUuYvxHaCBlujSEu6LWiWu7j
-L8p/pYxWvyJ9KYWIJ+irHQxKb1JlSGNMCzHDyYNu5h+njEhgcqRAadtkxFfCanFU
-66WcNjyp64bvcF22Bl63QLqksU5+EaSIsYQ0iAFDlQTYA+3tosdpqj/Cox3zDzdy
-HwqWrxIr7wAfMeckwU6b8t13S/EBqxnXzTh/nqMznzj199O2VwcC1KOnEQEwmJYk
-c/DmiHzcPMUJnc71Aps6Z8tPRF+XoF1q6b7jOi5MLlYRq6f+jy8=
-=H0nX
------END PGP SIGNATURE-----
-
---mnu7ktjwloc3qav5--
+diff --git a/io/channel-websock.c b/io/channel-websock.c
+index f5fac5b422..6ddcec1549 100644
+--- a/io/channel-websock.c
++++ b/io/channel-websock.c
+@@ -507,7 +507,7 @@ static gboolean qio_channel_websock_handshake_send(QI=
+OChannel *ioc,
+                             &err);
+=20
+     if (ret < 0) {
+-        trace_qio_channel_websock_handshake_fail(ioc);
++        trace_qio_channel_websock_handshake_fail(ioc, error_get_pretty(e=
+rr));
+         qio_task_set_error(task, err);
+         qio_task_complete(task);
+         return FALSE;
+@@ -516,7 +516,8 @@ static gboolean qio_channel_websock_handshake_send(QI=
+OChannel *ioc,
+     buffer_advance(&wioc->encoutput, ret);
+     if (wioc->encoutput.offset =3D=3D 0) {
+         if (wioc->io_err) {
+-            trace_qio_channel_websock_handshake_fail(ioc);
++            trace_qio_channel_websock_handshake_fail(
++                ioc, error_get_pretty(wioc->io_err));
+             qio_task_set_error(task, wioc->io_err);
+             wioc->io_err =3D NULL;
+             qio_task_complete(task);
+@@ -547,7 +548,7 @@ static gboolean qio_channel_websock_handshake_io(QIOC=
+hannel *ioc,
+          * client connection, as most of the time we have an
+          * HTTP 4xx err response to send instead
+          */
+-        trace_qio_channel_websock_handshake_fail(ioc);
++        trace_qio_channel_websock_handshake_fail(ioc, error_get_pretty(e=
+rr));
+         qio_task_set_error(task, err);
+         qio_task_complete(task);
+         return FALSE;
+diff --git a/io/trace-events b/io/trace-events
+index 3d233698d0..6459f71f5b 100644
+--- a/io/trace-events
++++ b/io/trace-events
+@@ -46,7 +46,7 @@ qio_channel_websock_new_server(void *ioc, void *master)=
+ "Websock new client ioc=3D
+ qio_channel_websock_handshake_start(void *ioc) "Websock handshake start =
+ioc=3D%p"
+ qio_channel_websock_handshake_pending(void *ioc, int status) "Websock ha=
+ndshake pending ioc=3D%p status=3D%d"
+ qio_channel_websock_handshake_reply(void *ioc) "Websock handshake reply =
+ioc=3D%p"
+-qio_channel_websock_handshake_fail(void *ioc) "Websock handshake fail io=
+c=3D%p"
++qio_channel_websock_handshake_fail(void *ioc, const char *msg) "Websock =
+handshake fail ioc=3D%p err=3D%s"
+ qio_channel_websock_handshake_complete(void *ioc) "Websock handshake com=
+plete ioc=3D%p"
+=20
+ # io/channel-command.c
+--=20
+2.13.5
