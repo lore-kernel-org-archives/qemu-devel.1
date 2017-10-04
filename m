@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dzYrI-0005py-GK
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 21:52:26 -0400
+	(envelope-from <eblake@redhat.com>) id 1dzZ08-0000nn-1Y
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:01:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dzYrF-0000Q4-CU
-	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 21:52:24 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Tue,  3 Oct 2017 21:52:05 -0400
-Message-Id: <20171004015205.20724-5-jsnow@redhat.com>
-In-Reply-To: <20171004015205.20724-1-jsnow@redhat.com>
-References: <20171004015205.20724-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/4] iotests: test manual job reaping
+	(envelope-from <eblake@redhat.com>) id 1dzZ06-00060A-Fm
+	for qemu-devel@nongnu.org; Tue, 03 Oct 2017 22:01:32 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Tue,  3 Oct 2017 21:00:25 -0500
+Message-Id: <20171004020048.26379-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 00/23] make bdrv_get_block_status byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,274 +17,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org
 
-RFC: The error returned by a job creation command when that device
-already has a job attached has become misleading; "Someone should
-do something about that!"
+There are patches floating around to add NBD_CMD_BLOCK_STATUS,
+but NBD wants to report status on byte granularity (even if the
+reporting will probably be naturally aligned to sectors or even
+much higher levels).  I've therefore started the task of
+converting our block status code to report at a byte granularity
+rather than sectors.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- tests/qemu-iotests/056     | 227 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/056.out |   4 +-
- 2 files changed, 229 insertions(+), 2 deletions(-)
+Now that 2.11 is open, I'm rebasing/reposting the remaining patches.
 
-diff --git a/tests/qemu-iotests/056 b/tests/qemu-iotests/056
-index 04f2c3c..d6bed20 100755
---- a/tests/qemu-iotests/056
-+++ b/tests/qemu-iotests/056
-@@ -29,6 +29,26 @@ backing_img = os.path.join(iotests.test_dir, 'backing.img')
- test_img = os.path.join(iotests.test_dir, 'test.img')
- target_img = os.path.join(iotests.test_dir, 'target.img')
- 
-+def img_create(img, fmt=iotests.imgfmt, size='64M', **kwargs):
-+    fullname = os.path.join(iotests.test_dir, '%s.%s' % (img, fmt))
-+    optargs = []
-+    for k,v in kwargs.iteritems():
-+        optargs = optargs + ['-o', '%s=%s' % (k,v)]
-+    args = ['create', '-f', fmt] + optargs + [fullname, size]
-+    iotests.qemu_img(*args)
-+    return fullname
-+
-+def try_remove(img):
-+    try:
-+        os.remove(img)
-+    except OSError:
-+        pass
-+
-+def io_write_patterns(img, patterns):
-+    for pattern in patterns:
-+        iotests.qemu_io('-c', 'write -P%s %s %s' % pattern, img)
-+
-+
- class TestSyncModesNoneAndTop(iotests.QMPTestCase):
-     image_len = 64 * 1024 * 1024 # MB
- 
-@@ -108,5 +128,212 @@ class TestBeforeWriteNotifier(iotests.QMPTestCase):
-         event = self.cancel_and_wait()
-         self.assert_qmp(event, 'data/type', 'backup')
- 
-+class BackupTest(iotests.QMPTestCase):
-+    def setUp(self):
-+        self.vm = iotests.VM()
-+        self.test_img = img_create('test')
-+        self.dest_img = img_create('dest')
-+        self.vm.add_drive(self.test_img)
-+        self.vm.launch()
-+
-+    def tearDown(self):
-+        self.vm.shutdown()
-+        try_remove(self.test_img)
-+        try_remove(self.dest_img)
-+
-+    def hmp_io_writes(self, drive, patterns):
-+        for pattern in patterns:
-+            self.vm.hmp_qemu_io(drive, 'write -P%s %s %s' % pattern)
-+        self.vm.hmp_qemu_io(drive, 'flush')
-+
-+    def qmp_backup_and_wait(self, cmd='drive-backup', serror=None,
-+                            aerror=None, **kwargs):
-+        return (self.qmp_backup(cmd, serror, **kwargs) and
-+                self.qmp_backup_wait(kwargs['device'], aerror))
-+
-+    def qmp_backup(self, cmd='drive-backup',
-+                   error=None, **kwargs):
-+        self.assertTrue('device' in kwargs)
-+        res = self.vm.qmp(cmd, **kwargs)
-+        if error:
-+            self.assert_qmp(res, 'error/desc', error)
-+            return False
-+        self.assert_qmp(res, 'return', {})
-+        return True
-+
-+    def qmp_backup_wait(self, device, error=None):
-+        event = self.vm.event_wait(name="BLOCK_JOB_COMPLETED",
-+                                   match={'data': {'device': device}})
-+        self.assertNotEqual(event, None)
-+        try:
-+            failure = self.dictpath(event, 'data/error')
-+        except AssertionError:
-+            # Backup succeeded.
-+            self.assert_qmp(event, 'data/offset', event['data']['len'])
-+            return True
-+        else:
-+            # Failure.
-+            self.assert_qmp(event, 'data/error', qerror)
-+            return False
-+
-+    def test_reap_false(self):
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return', [])
-+        self.qmp_backup_and_wait(device='drive0', format=iotests.imgfmt,
-+                                 sync='full', target=self.dest_img, persistent=False)
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return', [])
-+
-+    def test_reap_true(self):
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return', [])
-+        self.qmp_backup_and_wait(device='drive0', format=iotests.imgfmt,
-+                                 sync='full', target=self.dest_img, persistent=True)
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return[0]/finished', True)
-+        res = self.vm.qmp('block-job-reap', device='drive0')
-+        self.assert_qmp(res, 'return', {})
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return', [])
-+
-+    def test_reap_bad_id(self):
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return', [])
-+        res = self.vm.qmp('block-job-reap', device='foobar')
-+        self.assert_qmp(res, 'error/class', 'DeviceNotActive')
-+
-+    def test_reap_collision(self):
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return', [])
-+        self.qmp_backup_and_wait(device='drive0', format=iotests.imgfmt,
-+                                 sync='full', target=self.dest_img, persistent=True)
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return[0]/finished', True)
-+        # Leave zombie job un-reaped, observe a failure:
-+        res = self.qmp_backup_and_wait(serror='Need a root block node',
-+                                       device='drive0', format=iotests.imgfmt,
-+                                       sync='full', target=self.dest_img,
-+                                       persistent=True)
-+        self.assertEqual(res, False)
-+        # OK, reap the zombie.
-+        res = self.vm.qmp('block-job-reap', device='drive0')
-+        self.assert_qmp(res, 'return', {})
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return', [])
-+        # Ensure it's really gone.
-+        self.qmp_backup_and_wait(device='drive0', format=iotests.imgfmt,
-+                                 sync='full', target=self.dest_img, persistent=True)
-+
-+    def test_reap_premature(self):
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return', [])
-+        # Give blkdebug something to chew on
-+        self.hmp_io_writes('drive0',
-+                           (('0x9a', 0, 512),
-+                           ('0x55', '8M', '352k'),
-+                           ('0x78', '15872k', '1M')))
-+        # Add destination node via blkdebug
-+        res = self.vm.qmp('blockdev-add',
-+                          node_name='target0',
-+                          driver=iotests.imgfmt,
-+                          file={
-+                              'driver': 'blkdebug',
-+                              'image': {
-+                                  'driver': 'file',
-+                                  'filename': self.dest_img
-+                              },
-+                              'inject-error': [{
-+                                  'event': 'write_aio',
-+                                  'errno': 5,
-+                                  'immediately': False,
-+                                  'once': True
-+                              }],
-+                          })
-+        self.assert_qmp(res, 'return', {})
-+
-+        res = self.qmp_backup(cmd='blockdev-backup',
-+                              device='drive0', target='target0',
-+                              on_target_error='stop',
-+                              sync='full',
-+                              persistent=True)
-+        self.assertTrue(res)
-+        event = self.vm.event_wait(name="BLOCK_JOB_ERROR",
-+                                   match={'data': {'device': 'drive0'}})
-+        self.assertNotEqual(event, None)
-+        # OK, job should be wedged
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return[0]/finished', False)
-+        res = self.vm.qmp('block-job-reap', device='drive0')
-+        self.assert_qmp(res, 'error/desc',
-+                        "The active block job 'drive0' has not yet terminated, and cannot be reaped yet")
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return[0]/finished', False)
-+        # OK, unstick job and move forward.
-+        res = self.vm.qmp('block-job-resume', device='drive0')
-+        self.assert_qmp(res, 'return', {})
-+        res = self.qmp_backup_wait(device='drive0')
-+        self.assertTrue(res)
-+        # Job should now be languishing:
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return[0]/finished', True)
-+        res = self.vm.qmp('block-job-reap', device='drive0')
-+        self.assert_qmp(res, 'return', {})
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return', [])
-+
-+    def test_reap_erroneous(self):
-+        '''Same as above test, but manual-reap is set to False.'''
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return', [])
-+        # Give blkdebug something to chew on
-+        self.hmp_io_writes('drive0',
-+                           (('0x9a', 0, 512),
-+                           ('0x55', '8M', '352k'),
-+                           ('0x78', '15872k', '1M')))
-+        # Add destination node via blkdebug
-+        res = self.vm.qmp('blockdev-add',
-+                          node_name='target0',
-+                          driver=iotests.imgfmt,
-+                          file={
-+                              'driver': 'blkdebug',
-+                              'image': {
-+                                  'driver': 'file',
-+                                  'filename': self.dest_img
-+                              },
-+                              'inject-error': [{
-+                                  'event': 'write_aio',
-+                                  'errno': 5,
-+                                  'immediately': False,
-+                                  'once': True
-+                              }],
-+                          })
-+        self.assert_qmp(res, 'return', {})
-+
-+        res = self.qmp_backup(cmd='blockdev-backup',
-+                              device='drive0', target='target0',
-+                              on_target_error='stop',
-+                              sync='full',
-+                              persistent=False)
-+        self.assertTrue(res)
-+        event = self.vm.event_wait(name="BLOCK_JOB_ERROR",
-+                                   match={'data': {'device': 'drive0'}})
-+        self.assertNotEqual(event, None)
-+        # OK, job should be wedged
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return[0]/finished', False)
-+        res = self.vm.qmp('block-job-reap', device='drive0')
-+        self.assert_qmp(res, 'error/desc',
-+                        "The active block job 'drive0' was not started with 'manual-reap': true, and so cannot be reaped as it will clean up after itself automatically")
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return[0]/finished', False)
-+        # OK, unstick job and move forward.
-+        res = self.vm.qmp('block-job-resume', device='drive0')
-+        self.assert_qmp(res, 'return', {})
-+        res = self.qmp_backup_wait(device='drive0')
-+        self.assertTrue(res)
-+        # Job should now be gone:
-+        res = self.vm.qmp('query-block-jobs')
-+        self.assert_qmp(res, 'return', [])
-+
- if __name__ == '__main__':
-     iotests.main(supported_fmts=['qcow2', 'qed'])
-diff --git a/tests/qemu-iotests/056.out b/tests/qemu-iotests/056.out
-index 8d7e996..dae404e 100644
---- a/tests/qemu-iotests/056.out
-+++ b/tests/qemu-iotests/056.out
-@@ -1,5 +1,5 @@
--...
-+.........
- ----------------------------------------------------------------------
--Ran 3 tests
-+Ran 9 tests
- 
- OK
+The overall conversion currently looks like:
+part 1: bdrv_is_allocated (merged, commit 51b0a488)
+part 2: dirty-bitmap (v10 is queued [1])
+part 3: bdrv_get_block_status (this series, v4 at [2])
+part 4: .bdrv_co_block_status (v3 is posted [4], mostly reviewed)
+
+Available as a tag at:
+git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-status-v4
+
+Based-on: <20170925145526.32690-1-eblake@redhat.com>
+([PATCH v10 00/20] make dirty-bitmap byte-based)
+Based-on: <20171004014347.25099-1-eblake@redhat.com>
+([PATCH v2 0/5] block: Avoid copy-on-read assertions)
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg06848.html
+[2] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03543.html
+[3] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03812.html
+[4] https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg00524.html
+
+Since v4:
+- rebase to fixes for copy-on-read
+- tweak bdrv_co_block_status goto/label usage for easier reading [John]
+- more added comments and improved commit messages
+- fix a couple of bugs, such as wrong trace-events usage
+- add R-b where things didn't change drastically
+
+001/23:[0042] [FC] 'block: Allow NULL file for bdrv_get_block_status()'
+002/23:[0006] [FC] 'block: Add flag to avoid wasted work in bdrv_is_allocated()'
+003/23:[0003] [FC] 'block: Make bdrv_round_to_clusters() signature more useful'
+004/23:[----] [--] 'qcow2: Switch is_zero_sectors() to byte-based'
+005/23:[----] [--] 'block: Switch bdrv_make_zero() to byte-based'
+006/23:[----] [--] 'qemu-img: Switch get_block_status() to byte-based'
+007/23:[0010] [FC] 'block: Convert bdrv_get_block_status() to bytes'
+008/23:[0042] [FC] 'block: Switch bdrv_co_get_block_status() to byte-based'
+009/23:[----] [--] 'block: Switch BdrvCoGetBlockStatusData to byte-based'
+010/23:[----] [--] 'block: Switch bdrv_common_block_status_above() to byte-based'
+011/23:[----] [-C] 'block: Switch bdrv_co_get_block_status_above() to byte-based'
+012/23:[0019] [FC] 'block: Convert bdrv_get_block_status_above() to bytes'
+013/23:[0008] [FC] 'qemu-img: Simplify logic in img_compare()'
+014/23:[----] [--] 'qemu-img: Speed up compare on pre-allocated larger file'
+015/23:[----] [--] 'qemu-img: Add find_nonzero()'
+016/23:[----] [--] 'qemu-img: Drop redundant error message in compare'
+017/23:[----] [--] 'qemu-img: Change check_empty_sectors() to byte-based'
+018/23:[----] [--] 'qemu-img: Change compare_sectors() to be byte-based'
+019/23:[----] [--] 'qemu-img: Change img_rebase() to be byte-based'
+020/23:[0005] [FC] 'qemu-img: Change img_compare() to be byte-based'
+021/23:[0061] [FC] 'block: Align block status requests'
+022/23:[----] [--] 'block: Relax bdrv_aligned_preadv() assertion'
+023/23:[----] [--] 'qemu-io: Relax 'alloc' now that block-status doesn't assert'
+
+Eric Blake (23):
+  block: Allow NULL file for bdrv_get_block_status()
+  block: Add flag to avoid wasted work in bdrv_is_allocated()
+  block: Make bdrv_round_to_clusters() signature more useful
+  qcow2: Switch is_zero_sectors() to byte-based
+  block: Switch bdrv_make_zero() to byte-based
+  qemu-img: Switch get_block_status() to byte-based
+  block: Convert bdrv_get_block_status() to bytes
+  block: Switch bdrv_co_get_block_status() to byte-based
+  block: Switch BdrvCoGetBlockStatusData to byte-based
+  block: Switch bdrv_common_block_status_above() to byte-based
+  block: Switch bdrv_co_get_block_status_above() to byte-based
+  block: Convert bdrv_get_block_status_above() to bytes
+  qemu-img: Simplify logic in img_compare()
+  qemu-img: Speed up compare on pre-allocated larger file
+  qemu-img: Add find_nonzero()
+  qemu-img: Drop redundant error message in compare
+  qemu-img: Change check_empty_sectors() to byte-based
+  qemu-img: Change compare_sectors() to be byte-based
+  qemu-img: Change img_rebase() to be byte-based
+  qemu-img: Change img_compare() to be byte-based
+  block: Align block status requests
+  block: Relax bdrv_aligned_preadv() assertion
+  qemu-io: Relax 'alloc' now that block-status doesn't assert
+
+ include/block/block.h      |  26 ++--
+ include/block/block_int.h  |  11 +-
+ block/io.c                 | 303 +++++++++++++++++++++----------------
+ block/blkdebug.c           |  13 +-
+ block/mirror.c             |  24 +--
+ block/qcow2-cluster.c      |   2 +-
+ block/qcow2.c              |  53 +++----
+ qemu-img.c                 | 365 ++++++++++++++++++++-------------------------
+ qemu-io-cmds.c             |  13 --
+ block/trace-events         |   2 +-
+ tests/qemu-iotests/074.out |   2 -
+ tests/qemu-iotests/177     |  12 +-
+ tests/qemu-iotests/177.out |  19 ++-
+ 13 files changed, 431 insertions(+), 414 deletions(-)
+
 -- 
-2.9.5
+2.13.6
