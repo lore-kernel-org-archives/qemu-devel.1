@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dzijs-0002iN-EK
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:25:25 -0400
+	(envelope-from <berrange@redhat.com>) id 1dziju-0002jL-BI
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:25:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dzijr-0005IW-Ho
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:25:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41935)
+	(envelope-from <berrange@redhat.com>) id 1dzijt-0005M4-EK
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:25:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56016)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dzijr-0005Gk-9C
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:25:23 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dzijt-0005KI-2R
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:25:25 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Wed,  4 Oct 2017 13:25:06 +0100
-Message-Id: <20171004122515.20627-3-berrange@redhat.com>
+Date: Wed,  4 Oct 2017 13:25:07 +0100
+Message-Id: <20171004122515.20627-4-berrange@redhat.com>
 In-Reply-To: <20171004122515.20627-1-berrange@redhat.com>
 References: <20171004122515.20627-1-berrange@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v1 02/11] io: include full error message in
- websocket handshake trace
+Subject: [Qemu-devel] [PULL v1 03/11] io: use case insensitive check for
+ Connection & Upgrade websock headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +27,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-When the websocket handshake fails it is useful to log the real
-error message via the trace points for debugging purposes.
+When checking the value of the Connection and Upgrade HTTP headers
+the websock RFC (6455) requires the comparison to be case insensitive.
+The Connection value should be an exact match not a substring.
 
-Fixes bug: #1715186
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- io/channel-websock.c | 7 ++++---
- io/trace-events      | 2 +-
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ io/channel-websock.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/io/channel-websock.c b/io/channel-websock.c
-index f5fac5b422..6ddcec1549 100644
+index 6ddcec1549..2258557a21 100644
 --- a/io/channel-websock.c
 +++ b/io/channel-websock.c
-@@ -507,7 +507,7 @@ static gboolean qio_channel_websock_handshake_send(QI=
-OChannel *ioc,
-                             &err);
-=20
-     if (ret < 0) {
--        trace_qio_channel_websock_handshake_fail(ioc);
-+        trace_qio_channel_websock_handshake_fail(ioc, error_get_pretty(e=
-rr));
-         qio_task_set_error(task, err);
-         qio_task_complete(task);
-         return FALSE;
-@@ -516,7 +516,8 @@ static gboolean qio_channel_websock_handshake_send(QI=
-OChannel *ioc,
-     buffer_advance(&wioc->encoutput, ret);
-     if (wioc->encoutput.offset =3D=3D 0) {
-         if (wioc->io_err) {
--            trace_qio_channel_websock_handshake_fail(ioc);
-+            trace_qio_channel_websock_handshake_fail(
-+                ioc, error_get_pretty(wioc->io_err));
-             qio_task_set_error(task, wioc->io_err);
-             wioc->io_err =3D NULL;
-             qio_task_complete(task);
-@@ -547,7 +548,7 @@ static gboolean qio_channel_websock_handshake_io(QIOC=
-hannel *ioc,
-          * client connection, as most of the time we have an
-          * HTTP 4xx err response to send instead
-          */
--        trace_qio_channel_websock_handshake_fail(ioc);
-+        trace_qio_channel_websock_handshake_fail(ioc, error_get_pretty(e=
-rr));
-         qio_task_set_error(task, err);
-         qio_task_complete(task);
-         return FALSE;
-diff --git a/io/trace-events b/io/trace-events
-index 3d233698d0..6459f71f5b 100644
---- a/io/trace-events
-+++ b/io/trace-events
-@@ -46,7 +46,7 @@ qio_channel_websock_new_server(void *ioc, void *master)=
- "Websock new client ioc=3D
- qio_channel_websock_handshake_start(void *ioc) "Websock handshake start =
-ioc=3D%p"
- qio_channel_websock_handshake_pending(void *ioc, int status) "Websock ha=
-ndshake pending ioc=3D%p status=3D%d"
- qio_channel_websock_handshake_reply(void *ioc) "Websock handshake reply =
-ioc=3D%p"
--qio_channel_websock_handshake_fail(void *ioc) "Websock handshake fail io=
-c=3D%p"
-+qio_channel_websock_handshake_fail(void *ioc, const char *msg) "Websock =
-handshake fail ioc=3D%p err=3D%s"
- qio_channel_websock_handshake_complete(void *ioc) "Websock handshake com=
-plete ioc=3D%p"
-=20
- # io/channel-command.c
---=20
+@@ -431,12 +431,12 @@ static void qio_channel_websock_handshake_process(QIOChannelWebsock *ioc,
+         goto bad_request;
+     }
+ 
+-    if (!g_strrstr(connection, QIO_CHANNEL_WEBSOCK_CONNECTION_UPGRADE)) {
++    if (strcasecmp(connection, QIO_CHANNEL_WEBSOCK_CONNECTION_UPGRADE) != 0) {
+         error_setg(errp, "No connection upgrade requested '%s'", connection);
+         goto bad_request;
+     }
+ 
+-    if (!g_str_equal(upgrade, QIO_CHANNEL_WEBSOCK_UPGRADE_WEBSOCKET)) {
++    if (strcasecmp(upgrade, QIO_CHANNEL_WEBSOCK_UPGRADE_WEBSOCKET) != 0) {
+         error_setg(errp, "Incorrect upgrade method '%s'", upgrade);
+         goto bad_request;
+     }
+-- 
 2.13.5
