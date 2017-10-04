@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dzj4b-0008HY-Ag
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:46:50 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dzj7N-0001e0-Fv
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:49:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dzj4X-00022u-D2
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:46:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58892)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dzj4X-00020d-6g
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:46:45 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F29E94E33E
-	for <qemu-devel@nongnu.org>; Wed,  4 Oct 2017 12:46:43 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <18ba5f7e-0d7e-fc5e-6cff-36ede10233f0@redhat.com> (Thomas Huth's
-	message of "Wed, 4 Oct 2017 14:33:55 +0200")
-References: <20171004103933.7898-1-quintela@redhat.com>
-	<20171004103933.7898-2-quintela@redhat.com>
-	<18ba5f7e-0d7e-fc5e-6cff-36ede10233f0@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 04 Oct 2017 14:46:34 +0200
-Message-ID: <87infvgjx1.fsf@secure.laptop>
+	(envelope-from <mreitz@redhat.com>) id 1dzj7M-0004oB-Lo
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 08:49:41 -0400
+References: <20170815074513.9055-1-el13635@mail.ntua.gr>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <a646d860-5f33-19cb-e56a-893b57613533@redhat.com>
+Date: Wed, 4 Oct 2017 14:49:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/6] tests: Add basic migration precopy test
+In-Reply-To: <20170815074513.9055-1-el13635@mail.ntua.gr>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="q5ABp7xF2jnXDSE31CWl3Mjsvq0uOVceL"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH RFC] block: add
+ block-insert-node QMP command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +24,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
 
-Thomas Huth <thuth@redhat.com> wrote:
-> On 04.10.2017 12:39, Juan Quintela wrote:
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--q5ABp7xF2jnXDSE31CWl3Mjsvq0uOVceL
+From: Max Reitz <mreitz@redhat.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>,
+ qemu-devel <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ qemu-block <qemu-block@nongnu.org>
+Message-ID: <a646d860-5f33-19cb-e56a-893b57613533@redhat.com>
+Subject: Re: [Qemu-block] [PATCH RFC] block: add block-insert-node QMP command
+References: <20170815074513.9055-1-el13635@mail.ntua.gr>
+In-Reply-To: <20170815074513.9055-1-el13635@mail.ntua.gr>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
->
-> Looks like a lot of this code is the same or very similar to the code in
-> postcopy-test.c ... would it make sense to factor-out that code there
-> into a separate file that could be used by both tests, so that we do not
-> have to maintain the code twice?
+On 2017-08-15 09:45, Manos Pitsidianakis wrote:
+> block-insert-node and its pair command block-remove-node provide runtim=
+e
+> insertion and removal of filter nodes.
+>=20
+> block-insert-node takes a (parent, child) and (node, child) pair of
+> edges and unrefs the (parent, child) BdrvChild relationship and creates=
+
+> a new (parent, node) child with the same BdrvChildRole.
+>=20
+> This is a different approach than x-blockdev-change which uses the driv=
+er
+> methods bdrv_add_child() and bdrv_del_child(),
+
+Why? :-)
+
+Can't we reuse x-blockdev-change? As far as I'm concerned, this was one
+of its roles, and at least I don't want to have both x-blockdev-change
+and these new commands.
+
+I think it would be a good idea just to change bdrv_add_child() and
+bdrv_del_child(): If the driver has a bdrv_{add,del}_child() callback,
+invoke that.  If it doesn't, then just attach the child.
+
+Of course, it may turn out that x-blockdev-change is lacking something
+(e.g. a way to specify as what kind of child a new node is to be
+attached).  Then we should either extend it so that it covers what it's
+lacking, or replace it completely by these new commands.  In the latter
+case, however, they would need to cover the existing use case which is
+reconfiguring the quorum driver.  (And that would mean it would have to
+invoke bdrv_add_child()/bdrv_del_child() when the driver has them.)
+
+Max
 
 
-I think I put that on the cover letter,  my idea is to add the postcopy
-test here.  This is a streamlined version of the postcopy-test, just a
-barebones, and insntead of doing things by hand, I added helpers like:
+--q5ABp7xF2jnXDSE31CWl3Mjsvq0uOVceL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-migrate_set_parameter(...);
+-----BEGIN PGP SIGNATURE-----
 
-You can see that on the following patches I added support for:
-- tcp
-- precopy with deprecated commands
-- xbzrle
-- compression threads (not working at the momment, have to investigate
-  why).
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlnU2NcSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A+x4H/1r+q/w/j5zdkLJjDOmliWnLBWLOYPB+
+G8o4S2CGrmgqBIQAduOuEqIEbUuC//uvFriy/EOhlL/U2sQ+OClJA04lylM10gOK
+Wp+VPOYwLP0QOVk4noob8xR1KVMPMMrEtyKLd4KzKhU/tgjSVDOjtRYtnoOAnNLp
+naXmqKnstmBhzmpQyZw3yvJse8ZaMCr1PLg27TaTOydi9X18sTx6MitO6UzN2AQd
+GwhxTsCKDA1D6ZYfrRb2ZxLRcs2ljJasx4mhaTJN2kyKNFiK+9gE/qW9IXoctd4r
+yRn1fFugpt77FFROKvwF+d+tm1Idpx1qXNiJaiiPl7ntRPqDBXcXGwQ=
+=dQf0
+-----END PGP SIGNATURE-----
 
-Idea is if people like the approach to add on top of that:
-- exec: migration (needs changes because command line option on source
-  and destination are different)
-- fd: Dunno how difficult is, I have really never passed fd's around.
-- postocpy: It needs additional commandsn to be added.
-
-- Probably move to use events, instead of "waiting" for 1st stage to
-  finish.
-
-Right now, the three tests on my laptop require around 14 seconds (not
-running in parallel).  I want to "optimize" the tests to take a bit less
-time.
-
-Later, Juan.
+--q5ABp7xF2jnXDSE31CWl3Mjsvq0uOVceL--
