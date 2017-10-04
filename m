@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dzr6X-0000hS-Ta
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 17:21:23 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dzrOU-0003dt-Hr
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 17:39:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dzr6W-0002qX-Js
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 17:21:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45174)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dzr6W-0002pA-Br
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 17:21:20 -0400
-Date: Wed, 4 Oct 2017 18:21:16 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171004212116.GD4015@localhost.localdomain>
-References: <1507049162-27026-1-git-send-email-thuth@redhat.com>
-	<20171004133659.1f656303@nial.brq.redhat.com>
-	<591132a9-c4e5-47cd-bab9-f017a116c2ae@redhat.com>
+	(envelope-from <alistair23@gmail.com>) id 1dzrOT-0002l9-59
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 17:39:54 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:52486)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1dzrOS-0002k2-Rp
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 17:39:53 -0400
+Received: by mail-wr0-x235.google.com with SMTP id k62so9557637wrc.9
+	for <qemu-devel@nongnu.org>; Wed, 04 Oct 2017 14:39:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <591132a9-c4e5-47cd-bab9-f017a116c2ae@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qdev: Check for the availability of a
- hotplug controller before adding a device
+Sender: alistair23@gmail.com
+In-Reply-To: <20171004163434.GN4760@localhost.localdomain>
+References: <cover.1507059418.git.alistair.francis@xilinx.com>
+	<2a93b997d0acd369f35d68981a23ba491443daf6.1507059418.git.alistair.francis@xilinx.com>
+	<20171003203654.GD4760@localhost.localdomain>
+	<CAKmqyKN+QnBAS6c4mAb2EiTVQv3Km6EdmGXCFC3hVogL96QK1Q@mail.gmail.com>
+	<20171004131232.32f5caae@nial.brq.redhat.com>
+	<20171004122851.GJ4760@localhost.localdomain>
+	<20171004150816.41ffc161@nial.brq.redhat.com>
+	<20171004163434.GN4760@localhost.localdomain>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Wed, 4 Oct 2017 14:39:20 -0700
+Message-ID: <CAKmqyKP6yqWfGbzDnWeeROO=_27TiVSBZvdw1PA5JbRH_m3tcA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 3/5] xlnx-zcu102: Specify the valid CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,120 +36,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>
 
-On Wed, Oct 04, 2017 at 09:29:54PM +0200, Thomas Huth wrote:
-> On 04.10.2017 13:36, Igor Mammedov wrote:
-> > On Tue,  3 Oct 2017 18:46:02 +0200
-> > Thomas Huth <thuth@redhat.com> wrote:
-> > 
-> >> The qdev_unplug() function contains a g_assert(hotplug_ctrl) statement,
-> >> so QEMU crashes when the user tries to device_add + device_del a device
-> >> that does not have a corresponding hotplug controller. This could be
-> >> provoked for a couple of devices in the past (see commit 4c93950659487c7ad
-> >> or 84ebd3e8c7d4fe955 for example). So devices clearly need a hotplug
-> >> controller when they are suitable for device_add.
-> >> The code in qdev_device_add() already checks whether the bus has a proper
-> >> hotplug controller, but for devices that do not have a corresponding bus,
-> >> there is no appropriate check available. In that case we should check
-> >> whether the machine itself provides a suitable hotplug controller and
-> >> refuse to plug the device if none is available.
-> >>
-> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> >> ---
-> >>  This is the follow-up patch from my earlier try "hw/core/qdev: Do not
-> >>  allow hot-plugging without hotplug controller" ... AFAICS the function
-> >>  qdev_device_add() is now the right spot to do the check.
-> >>
-> >>  hw/core/qdev.c         | 28 ++++++++++++++++++++--------
-> >>  include/hw/qdev-core.h |  1 +
-> >>  qdev-monitor.c         |  9 +++++++++
-> >>  3 files changed, 30 insertions(+), 8 deletions(-)
-> >>
-> >> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> >> index 606ab53..a953ec9 100644
-> >> --- a/hw/core/qdev.c
-> >> +++ b/hw/core/qdev.c
-> >> @@ -253,19 +253,31 @@ void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
-> >>      dev->alias_required_for_version = required_for_version;
-> >>  }
-> >>  
-> >> +HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev)
-> >> +{
-> >> +    MachineState *machine;
-> >> +    MachineClass *mc;
-> >> +    Object *m_obj = qdev_get_machine();
-> >> +
-> >> +    if (object_dynamic_cast(m_obj, TYPE_MACHINE)) {
-> >> +        machine = MACHINE(m_obj);
-> >> +        mc = MACHINE_GET_CLASS(machine);
-> >> +        if (mc->get_hotplug_handler) {
-> >> +            return mc->get_hotplug_handler(machine, dev);
-> >> +        }
-> >> +    }
-> >> +
-> >> +    return NULL;
-> >> +}
-> >> +
-> >>  HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev)
-> >>  {
-> >> -    HotplugHandler *hotplug_ctrl = NULL;
-> >> +    HotplugHandler *hotplug_ctrl;
-> >>  
-> >>      if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-> >>          hotplug_ctrl = dev->parent_bus->hotplug_handler;
-> >> -    } else if (object_dynamic_cast(qdev_get_machine(), TYPE_MACHINE)) {
-> >> -        MachineState *machine = MACHINE(qdev_get_machine());
-> >> -        MachineClass *mc = MACHINE_GET_CLASS(machine);
-> >> -
-> >> -        if (mc->get_hotplug_handler) {
-> >> -            hotplug_ctrl = mc->get_hotplug_handler(machine, dev);
-> >> -        }
-> >> +    } else {
-> >> +        hotplug_ctrl = qdev_get_machine_hotplug_handler(dev);
-> >>      }
-> >>      return hotplug_ctrl;
-> >>  }
-> >> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> >> index 0891461..5aa536d 100644
-> >> --- a/include/hw/qdev-core.h
-> >> +++ b/include/hw/qdev-core.h
-> >> @@ -285,6 +285,7 @@ DeviceState *qdev_try_create(BusState *bus, const char *name);
-> >>  void qdev_init_nofail(DeviceState *dev);
-> >>  void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
-> >>                                   int required_for_version);
-> >> +HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev);
-> >>  HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev);
-> >>  void qdev_unplug(DeviceState *dev, Error **errp);
-> >>  void qdev_simple_device_unplug_cb(HotplugHandler *hotplug_dev,
-> >> diff --git a/qdev-monitor.c b/qdev-monitor.c
-> >> index 8fd6df9..2891dde 100644
-> >> --- a/qdev-monitor.c
-> >> +++ b/qdev-monitor.c
-> >> @@ -626,6 +626,15 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
-> >>          return NULL;
-> >>      }
-> >>  
-> >> +    /* In case we don't have a bus, there must be a machine hotplug handler */
-> >> +    if (qdev_hotplug && !bus && !qdev_get_machine_hotplug_handler(dev)) {
-> > current machine hotplug handler serves both cold and hot-plug so in reality it's
-> > just  'plug' handler.
-> > 
-> > Is there a point -device/device_add devices on board that doesn't have 'hotplug'
-> > handler that would wire device up properly?
-> 
-> Sorry, I did not get that question ... do you mean whether there's any
-> code that uses qdev_device_add() to add a device without hotplug
-> controller? I don't think so. It's currently only used by
-> qmp_device_add() for the QMP/HMP command, in vl.c for -device and in the
-> USB code for xen-usb host device. So this function currently really only
-> makes sense for devices that have a hotplug controller.
+On Wed, Oct 4, 2017 at 9:34 AM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> On Wed, Oct 04, 2017 at 03:08:16PM +0200, Igor Mammedov wrote:
+>> On Wed, 4 Oct 2017 09:28:51 -0300
+>> Eduardo Habkost <ehabkost@redhat.com> wrote:
+>>
+>> > On Wed, Oct 04, 2017 at 01:12:32PM +0200, Igor Mammedov wrote:
+>> > > On Tue, 3 Oct 2017 14:41:17 -0700
+>> > > Alistair Francis <alistair.francis@xilinx.com> wrote:
+>> > >
+>> > > > On Tue, Oct 3, 2017 at 1:36 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>> > > > > On Tue, Oct 03, 2017 at 01:05:13PM -0700, Alistair Francis wrote:
+>> > > > >> List all possible valid CPU options.
+>> > > > >>
+>> > > > >> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> > > > >> ---
+>> > > > >>
+>> > > > >>  hw/arm/xlnx-zcu102.c         | 10 ++++++++++
+>> > > > >>  hw/arm/xlnx-zynqmp.c         | 16 +++++++++-------
+>> > > > >>  include/hw/arm/xlnx-zynqmp.h |  1 +
+>> > > > >>  3 files changed, 20 insertions(+), 7 deletions(-)
+>> > > > >>
+>> > > > >> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+>> > > > >> index 519a16ed98..039649e522 100644
+>> > > > >> --- a/hw/arm/xlnx-zcu102.c
+>> > > > >> +++ b/hw/arm/xlnx-zcu102.c
+>> > > > >> @@ -98,6 +98,8 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s, MachineState *machine)
+>> > > > >>      object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
+>> > > > >>                                &error_abort);
+>> > > > >>
+>> > > > >> +    object_property_set_str(OBJECT(&s->soc), machine->cpu_type, "cpu-type",
+>> > > > >> +                            &error_fatal);
+>> > > > >
+>> > > > > Do you have plans to support other CPU types to xlnx_zynqmp in
+>> > > > > the future?  If not, I wouldn't bother adding the cpu-type
+>> > > > > property and the extra boilerplate code if it's always going to
+>> > > > > be set to cortex-a53.
+>> > > >
+>> > > > No, it'll always be A53.
+>> > > >
+>> > > > I did think of that, but I also wanted to use the new option! I also
+>> > > > think there is an advantage in sanely handling users '-cpu' option,
+>> > > > before now we just ignored it, so I think it still does give a
+>> > > > benefit. That'll be especially important on the Xilinx tree (sometimes
+>> > > > people use our machines with a different CPU to 'benchmark' or test
+>> > > > other CPUs with our CoSimulation setup). So I think it does make sense
+>> > > > to keep in.
+>> > > if cpu isn't user settable, one could just outright die if cpu_type
+>> > > is not NULL and say that user's CLI is wrong.
+>> > > (i.e. don't give users illusion that they allowed to use '-cpu')
+>> >
+>> > Isn't it exactly what this patch does, by setting:
+>> >     mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a53");
+>> >     mc->valid_cpu_types = xlnx_zynqmp_valid_cpus;
+>> > ?
+>> >
+>> > Except that "-cpu cortex-a53" won't die, which is a good thing.
+>> allowing "-cpu cortex-a53" here, would allow to use feature parsing
+>> which weren't allowed or were ignored before if user supplied '-cpu'.
+>> so I'd more strict and refuse any -cpu and break CLI that tries to use it
+>> if board has non configurable cpu type. It would be easier to relax
+>> restriction later if necessary.
+>>
+>> using validate_cpus here just to have users for the new code,
+>> doesn't seem like valid justification and at that it makes board
+>> code more complex where it's not necessary and build in cpu type
+>> works just fine.
+>
+> It's up to the board maintainer to decide what's the best option.
+> Both features are independent from each other and can be
+> implemented by machine core.
 
-I assume you are talking only about hotpluggable devices.  With
--device, qdev_device_add() is also used for devices that don't
-have a hotplug controller, but this is supposed to be true only
-for non-hotpluggable devices.
+Noooo!
 
--- 
-Eduardo
+My hope with this series is that eventually we could hit a state where
+every single machine acts the same way with the -cpu option.
+
+I really don't like what we do now where some boards use it, some
+boards error and some boars just ignore the option. I think we should
+agree on something and every machine should follow the same flow so
+that users know what to expect when they use the -cpu option.
+
+If this means we allow machines to specify they don't support the
+option or only have a single element in the list of supported options
+doesn't really matter, but all machines should do the same thing.
+
+>
+> In either case, the valid_cpu_types feature will be still very
+> useful for boards like pxa270 and sa1110, which support -cpu but
+> only with specific families of CPU types (grep for
+> "strncmp(cpu_type").
+>
+>>
+>> wrt centralized way to refuse -cpu if board doesn't support it,
+>> (which is not really related to this series) following could be done:
+>>
+>> when cpu_model removal is completely done I plan to replace
+>>   vl.c
+>>      cpu_parse_cpu_model(machine_class->default_cpu_type, cpu_model)
+>> with
+>>      cpu_parse_cpu_model(DEFAULT_TARGET_CPU_TYPE, cpu_model)
+>>
+>> so that we could drop temporary guard
+>>
+>>      if (machine_class->default_cpu_type) {
+>
+> This sounds good to me, even if we don't reject -cpu on any
+> board.
+>
+>
+>>
+>> with that it would be possible to tell from machine_run_board_init()
+>> that board doesn't provide cpu but user provided '-cpu'
+>> so we would be able to:
+>>   if ((machine_class->default_cpu_type == NULL) &&
+>>       (machine->cpu_type != NULL))
+>>           error_fatal("machine doesn't support -cpu option");
+>
+> I won't complain too much if a board maintainer really wants to
+> make the board reject -cpu completely, but it's up to them.
+
+I disagree. I think a standard way of doing it is better. At least for
+each architecture. The ARM -cpu option is very confusing at the moment
+and it really doesn't need to be that bad.
+
+>
+> Personally, I'd prefer to have all boards setting
+> default_cpu_type even if they support only one CPU model, so
+> clients don't need a special case for boards that don't support
+> -cpu.
+
+I agree, I think having one CPU makes more sense. It makes it easier
+to add support for more cpus in the future and allows the users to use
+the -cpu option without killing QEMU.
+
+Thanks,
+Alistair
+
+>
+> --
+> Eduardo
+>
