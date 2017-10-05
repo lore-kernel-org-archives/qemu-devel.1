@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e08xZ-00036B-Js
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:23 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e08xi-0003G8-DH
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e08xW-0003QO-Ps
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:17 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e08xf-0003eN-4T
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:26 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu,  5 Oct 2017 18:24:39 +0200
-Message-Id: <1507220690-265042-13-git-send-email-imammedo@redhat.com>
+Date: Thu,  5 Oct 2017 18:24:44 +0200
+Message-Id: <1507220690-265042-18-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
 References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 12/23] ppc: move '-cpu foo,
- compat=xxx' parsing into ppc_cpu_parse_featurestr()
+Subject: [Qemu-devel] [PATCH 17/23] ppc: spapr: use generic cpu_model parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,199 +22,274 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
 
-there is a dedicated callback CPUClass::parse_features
-which purpose is to convert -cpu features into a set of
-global properties AND deal with compat/legacy features
-that couldn't be directly translated into CPU's properties.
+use generic cpu_model parsing introduced by
+ (6063d4c0f vl.c: convert cpu_model to cpu type and set of global properties before machine_init())
 
-Create ppc variant of it (ppc_cpu_parse_featurestr) and
-move 'compat=val' handling from spapr_cpu_core.c into it.
-That removes a dependency of board/core code on cpu_model
-parsing and would let to reuse common -cpu parsing
-introduced by 6063d4c0
+it allows to:
+  * replace sPAPRMachineClass::tcg_default_cpu with
+    MachineClass::default_cpu_type
+  * drop cpu_parse_cpu_model() from hw/ppc/spapr.c and reuse
+    one in vl.c
+  * simplify spapr_get_cpu_core_type() by removing
+    not needed anymore recurrsion since alias look up
+    happens earlier at vl.c and spapr_get_cpu_core_type()
+    works only with resulted from that cpu type.
+  * spapr no more needs to parse/depend on being phased out
+    MachineState::cpu_model, all tha parsing done by generic
+    code and target specific callback.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- include/hw/ppc/spapr.h      |  1 -
- target/ppc/cpu-qom.h        |  1 +
- hw/ppc/spapr.c              |  2 +-
- hw/ppc/spapr_cpu_core.c     | 50 --------------------------------------
- target/ppc/translate_init.c | 58 +++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 60 insertions(+), 52 deletions(-)
+PS:
+  patch is a little bit big but it's hard to split it due
+  to dependencies, so pls bear with it.
+---
+ include/hw/ppc/spapr.h          |  1 -
+ include/hw/ppc/spapr_cpu_core.h |  2 +-
+ target/ppc/cpu.h                |  1 -
+ hw/ppc/spapr.c                  | 16 ++++------------
+ hw/ppc/spapr_cpu_core.c         | 30 ++++++++++--------------------
+ target/ppc/kvm.c                |  9 ++++++---
+ target/ppc/translate_init.c     | 26 +++++++++++++-------------
+ 7 files changed, 34 insertions(+), 51 deletions(-)
 
 diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index c1b365f..8ca4f94 100644
+index 8ca4f94..9d21ca9 100644
 --- a/include/hw/ppc/spapr.h
 +++ b/include/hw/ppc/spapr.h
-@@ -659,7 +659,6 @@ void spapr_hotplug_req_add_by_count_indexed(sPAPRDRConnectorType drc_type,
-                                             uint32_t count, uint32_t index);
- void spapr_hotplug_req_remove_by_count_indexed(sPAPRDRConnectorType drc_type,
-                                                uint32_t count, uint32_t index);
--void spapr_cpu_parse_features(sPAPRMachineState *spapr);
- int spapr_hpt_shift_for_ramsize(uint64_t ramsize);
- void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
-                           Error **errp);
-diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-index d0cf6ca..429b47f 100644
---- a/target/ppc/cpu-qom.h
-+++ b/target/ppc/cpu-qom.h
-@@ -181,6 +181,7 @@ typedef struct PowerPCCPUClass {
-     DeviceRealize parent_realize;
-     DeviceUnrealize parent_unrealize;
-     void (*parent_reset)(CPUState *cpu);
-+    void (*parent_parse_features)(const char *type, char *str, Error **errp);
+@@ -60,7 +60,6 @@ struct sPAPRMachineClass {
+     /*< public >*/
+     bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMBs */
+     bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
+-    const char *tcg_default_cpu; /* which (TCG) CPU to simulate by default */
+     bool pre_2_10_has_unused_icps;
+     void (*phb_placement)(sPAPRMachineState *spapr, uint32_t index,
+                           uint64_t *buid, hwaddr *pio, 
+diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
+index 42765de..f2d48d6 100644
+--- a/include/hw/ppc/spapr_cpu_core.h
++++ b/include/hw/ppc/spapr_cpu_core.h
+@@ -37,5 +37,5 @@ typedef struct sPAPRCPUCoreClass {
+     const char *cpu_type;
+ } sPAPRCPUCoreClass;
  
-     uint32_t pvr;
-     bool (*pvr_match)(struct PowerPCCPUClass *pcc, uint32_t pvr);
+-char *spapr_get_cpu_core_type(const char *model);
++const char *spapr_get_cpu_core_type(const char *cpu_type);
+ #endif
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 64aef17..989761b 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1278,7 +1278,6 @@ extern const struct VMStateDescription vmstate_ppc_cpu;
+ 
+ /*****************************************************************************/
+ void ppc_translate_init(void);
+-const char *ppc_cpu_lookup_alias(const char *alias);
+ /* you can call this signal handler from your SIGBUS and SIGSEGV
+    signal handlers to inform the virtual CPU of exceptions. non zero
+    is returned if the signal was handled by the virtual CPU.  */
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index ff87f15..01b3012 100644
+index 0661dba..29de845 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -2366,7 +2366,7 @@ static void ppc_spapr_init(MachineState *machine)
-         machine->cpu_model = kvm_enabled() ? "host" : smc->tcg_default_cpu;
+@@ -2123,7 +2123,7 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
+ {
+     MachineState *machine = MACHINE(spapr);
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
+-    char *type = spapr_get_cpu_core_type(machine->cpu_model);
++    const char *type = spapr_get_cpu_core_type(machine->cpu_type);
+     int smt = kvmppc_smt_threads();
+     const CPUArchIdList *possible_cpus;
+     int boot_cores_nr = smp_cpus / smp_threads;
+@@ -2178,7 +2178,6 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
+             object_property_set_bool(core, true, "realized", &error_fatal);
+         }
+     }
+-    g_free(type);
+ }
+ 
+ static void spapr_set_vsmt_mode(sPAPRMachineState *spapr, Error **errp)
+@@ -2362,12 +2361,6 @@ static void ppc_spapr_init(MachineState *machine)
      }
  
--    spapr_cpu_parse_features(spapr);
-+    cpu_parse_cpu_model(TYPE_POWERPC_CPU, machine->cpu_model);
- 
+     /* init CPUs */
+-    if (machine->cpu_model == NULL) {
+-        machine->cpu_model = kvm_enabled() ? "host" : smc->tcg_default_cpu;
+-    }
+-
+-    cpu_parse_cpu_model(TYPE_POWERPC_CPU, machine->cpu_model);
+-
      spapr_set_vsmt_mode(spapr, &error_fatal);
  
+     spapr_init_cpus(spapr);
+@@ -3258,7 +3251,7 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     MachineClass *mc = MACHINE_GET_CLASS(hotplug_dev);
+     Error *local_err = NULL;
+     CPUCore *cc = CPU_CORE(dev);
+-    char *base_core_type = spapr_get_cpu_core_type(machine->cpu_model);
++    const char *base_core_type = spapr_get_cpu_core_type(machine->cpu_type);
+     const char *type = object_get_typename(OBJECT(dev));
+     CPUArchId *core_slot;
+     int index;
+@@ -3304,7 +3297,6 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     numa_cpu_pre_plug(core_slot, dev, &local_err);
+ 
+ out:
+-    g_free(base_core_type);
+     error_propagate(errp, local_err);
+ }
+ 
+@@ -3603,7 +3595,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+     hc->unplug_request = spapr_machine_device_unplug_request;
+ 
+     smc->dr_lmb_enabled = true;
+-    smc->tcg_default_cpu = "power8_v2.0";
++    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power8_v2.0");
+     mc->has_hotpluggable_cpus = true;
+     smc->resize_hpt_default = SPAPR_RESIZE_HPT_ENABLED;
+     fwc->get_dev_path = spapr_get_fw_dev_path;
+@@ -3849,7 +3841,7 @@ static void spapr_machine_2_7_class_options(MachineClass *mc)
+     sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+ 
+     spapr_machine_2_8_class_options(mc);
+-    smc->tcg_default_cpu = "power7_v2.3";
++    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power7_v2.3");
+     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_7);
+     smc->phb_placement = phb_placement_2_7;
+ }
 diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 3dea5ff..427d47f 100644
+index f2da4be..2c47850 100644
 --- a/hw/ppc/spapr_cpu_core.c
 +++ b/hw/ppc/spapr_cpu_core.c
-@@ -21,56 +21,6 @@
- #include "sysemu/hw_accel.h"
- #include "qemu/error-report.h"
- 
--void spapr_cpu_parse_features(sPAPRMachineState *spapr)
--{
--    /*
--     * Backwards compatibility hack:
--     *
--     *   CPUs had a "compat=" property which didn't make sense for
--     *   anything except pseries.  It was replaced by "max-cpu-compat"
--     *   machine option.  This supports old command lines like
--     *       -cpu POWER8,compat=power7
--     *   By stripping the compat option and applying it to the machine
--     *   before passing it on to the cpu level parser.
--     */
--    gchar **inpieces;
--    gchar *newprops;
--    int i, j;
--    gchar *compat_str = NULL;
--
--    inpieces = g_strsplit(MACHINE(spapr)->cpu_model, ",", 0);
--
--    /* inpieces[0] is the actual model string */
--    i = 1;
--    j = 1;
--    while (inpieces[i]) {
--        if (g_str_has_prefix(inpieces[i], "compat=")) {
--            /* in case of multiple compat= options */
--            g_free(compat_str);
--            compat_str = inpieces[i];
--        } else {
--            j++;
--        }
--
--        i++;
--        /* Excise compat options from list */
--        inpieces[j] = inpieces[i];
--    }
--
--    if (compat_str) {
--        char *val = compat_str + strlen("compat=");
--
--        object_property_set_str(OBJECT(spapr), val, "max-cpu-compat",
--                                &error_fatal);
--
--    }
--
--    newprops = g_strjoinv(",", inpieces);
--    cpu_parse_cpu_model(TYPE_POWERPC_CPU, newprops);
--    g_free(newprops);
--    g_strfreev(inpieces);
--}
--
- static void spapr_cpu_reset(void *opaque)
+@@ -61,29 +61,19 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu,
+  * Return the sPAPR CPU core type for @model which essentially is the CPU
+  * model specified with -cpu cmdline option.
+  */
+-char *spapr_get_cpu_core_type(const char *model)
++const char *spapr_get_cpu_core_type(const char *cpu_type)
  {
-     PowerPCCPU *cpu = opaque;
+-    char *core_type;
+-    gchar **model_pieces = g_strsplit(model, ",", 2);
+-    gchar *cpu_model = g_ascii_strdown(model_pieces[0], -1);
+-    g_strfreev(model_pieces);
+-
+-    core_type = g_strdup_printf("%s-" TYPE_SPAPR_CPU_CORE, cpu_model);
+-
+-    /* Check whether it exists or whether we have to look up an alias name */
+-    if (!object_class_by_name(core_type)) {
+-        const char *realmodel;
+-
+-        g_free(core_type);
+-        core_type = NULL;
+-        realmodel = ppc_cpu_lookup_alias(cpu_model);
+-        if (realmodel) {
+-            core_type = spapr_get_cpu_core_type(realmodel);
+-        }
++    int len = strlen(cpu_type) - strlen(POWERPC_CPU_TYPE_SUFFIX);
++    char *core_type = g_strdup_printf(SPAPR_CPU_CORE_TYPE_NAME("%.*s"),
++                                      len, cpu_type);
++    ObjectClass *oc = object_class_by_name(core_type);
++
++    g_free(core_type);
++    if (!oc) {
++        return NULL;
+     }
+-    g_free(cpu_model);
+ 
+-    return core_type;
++    return object_class_get_name(oc);
+ }
+ 
+ static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index cb5777a..abc222e 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -123,7 +123,7 @@ static bool kvmppc_is_pr(KVMState *ks)
+     return kvm_vm_check_extension(ks, KVM_CAP_PPC_GET_PVINFO) != 0;
+ }
+ 
+-static int kvm_ppc_register_host_cpu_type(void);
++static int kvm_ppc_register_host_cpu_type(MachineState *ms);
+ 
+ int kvm_arch_init(MachineState *ms, KVMState *s)
+ {
+@@ -163,7 +163,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+                         "VM to stall at times!\n");
+     }
+ 
+-    kvm_ppc_register_host_cpu_type();
++    kvm_ppc_register_host_cpu_type(ms);
+ 
+     return 0;
+ }
+@@ -2487,12 +2487,13 @@ PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
+     return pvr_pcc;
+ }
+ 
+-static int kvm_ppc_register_host_cpu_type(void)
++static int kvm_ppc_register_host_cpu_type(MachineState *ms)
+ {
+     TypeInfo type_info = {
+         .name = TYPE_HOST_POWERPC_CPU,
+         .class_init = kvmppc_host_cpu_class_init,
+     };
++    MachineClass *mc = MACHINE_GET_CLASS(ms);
+     PowerPCCPUClass *pvr_pcc;
+     ObjectClass *oc;
+     DeviceClass *dc;
+@@ -2504,6 +2505,8 @@ static int kvm_ppc_register_host_cpu_type(void)
+     }
+     type_info.parent = object_class_get_name(OBJECT_CLASS(pvr_pcc));
+     type_register(&type_info);
++    /* override TCG default cpu type with 'host' cpu model */
++    mc->default_cpu_type = TYPE_HOST_POWERPC_CPU;
+ 
+     oc = object_class_by_name(type_info.name);
+     g_assert(oc);
 diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index c6399a3..5ee91e8 100644
+index 5ee91e8..a968e86 100644
 --- a/target/ppc/translate_init.c
 +++ b/target/ppc/translate_init.c
-@@ -10313,6 +10313,62 @@ static ObjectClass *ppc_cpu_class_by_name(const char *name)
- 
-     return NULL;
+@@ -10277,6 +10277,19 @@ PowerPCCPUClass *ppc_cpu_class_by_pvr_mask(uint32_t pvr)
+     return pcc;
  }
-+static void ppc_cpu_parse_featurestr(const char *typename, char *features,
-+                                     Error **errp)
+ 
++static const char *ppc_cpu_lookup_alias(const char *alias)
 +{
-+    const PowerPCCPUClass *pcc;
-+    char *compat_str = NULL;
-+    char *s = features;
-+    char **inpieces;
-+    Error *local_err = NULL;
-+    int i;
++    int ai;
 +
-+    if (!features) {
-+        return;
-+    }
-+
-+    /*
-+     * Backwards compatibility hack:
-+     *
-+     *   CPUs had a "compat=" property which didn't make sense for
-+     *   anything except pseries.  It was replaced by "max-cpu-compat"
-+     *   machine option.  This supports old command lines like
-+     *       -cpu POWER8,compat=power7
-+     *   By stripping the compat option and applying it to the machine
-+     *   before passing it on to the cpu level parser.
-+     */
-+    inpieces = g_strsplit(features, ",", 0);
-+    *s = '\0';
-+    for (i = 0; inpieces[i]; i++) {
-+        if (g_str_has_prefix(inpieces[i], "compat=")) {
-+            compat_str = inpieces[i];
-+            continue;
-+        }
-+        if ((i != 0) && (s != features)) {
-+            s = g_stpcpy(s, ",");
-+        }
-+        s = g_stpcpy(s, inpieces[i]);
-+    }
-+
-+    if (compat_str) {
-+        Object *machine = qdev_get_machine();
-+        if (machine) {
-+            char *v = compat_str + strlen("compat=");
-+            object_property_set_str(machine, v, "max-cpu-compat", &local_err);
-+        } else {
-+            error_setg(&local_err, "Not supported property: %s", compat_str);
++    for (ai = 0; ppc_cpu_aliases[ai].alias != NULL; ai++) {
++        if (strcmp(ppc_cpu_aliases[ai].alias, alias) == 0) {
++            return ppc_cpu_aliases[ai].model;
 +        }
 +    }
-+    g_strfreev(inpieces);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
 +
-+    /* do property processing with generic handler */
-+    pcc = POWERPC_CPU_CLASS(object_class_by_name(typename));
-+    pcc->parent_parse_features(typename, features, errp);
++    return NULL;
 +}
- 
- const char *ppc_cpu_lookup_alias(const char *alias)
++
+ static ObjectClass *ppc_cpu_class_by_name(const char *name)
  {
-@@ -10706,6 +10762,8 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
-     cc->reset = ppc_cpu_reset;
+     char *cpu_model, *typename;
+@@ -10370,19 +10383,6 @@ static void ppc_cpu_parse_featurestr(const char *typename, char *features,
+     pcc->parent_parse_features(typename, features, errp);
+ }
  
-     cc->class_by_name = ppc_cpu_class_by_name;
-+    pcc->parent_parse_features = cc->parse_features;
-+    cc->parse_features = ppc_cpu_parse_featurestr;
-     cc->has_work = ppc_cpu_has_work;
-     cc->do_interrupt = ppc_cpu_do_interrupt;
-     cc->cpu_exec_interrupt = ppc_cpu_exec_interrupt;
+-const char *ppc_cpu_lookup_alias(const char *alias)
+-{
+-    int ai;
+-
+-    for (ai = 0; ppc_cpu_aliases[ai].alias != NULL; ai++) {
+-        if (strcmp(ppc_cpu_aliases[ai].alias, alias) == 0) {
+-            return ppc_cpu_aliases[ai].model;
+-        }
+-    }
+-
+-    return NULL;
+-}
+-
+ PowerPCCPUClass *ppc_cpu_get_family_class(PowerPCCPUClass *pcc)
+ {
+     ObjectClass *oc = OBJECT_CLASS(pcc);
 -- 
 2.7.4
