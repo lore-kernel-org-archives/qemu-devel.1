@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e07pG-0005MI-2f
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 11:12:42 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e07py-0005l0-GZ
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 11:13:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e07pC-0001il-5m
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 11:12:38 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:46876)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e07pB-0001iH-U5
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 11:12:34 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id m72so2783817wmc.1
-	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 08:12:33 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20171005100106.30118-1-kraxel@redhat.com>
-References: <20171005100106.30118-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Oct 2017 16:12:12 +0100
-Message-ID: <CAFEAcA-9F++KngXrHGE=t7qZhdU2gCGKKSwHXYdLR6EhEfO4Qg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/6] Ui 20171005 patches
+	(envelope-from <cohuck@redhat.com>) id 1e07pu-000261-MR
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 11:13:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35352)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e07pu-00025e-FZ
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 11:13:18 -0400
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Thu,  5 Oct 2017 17:13:13 +0200
+Message-Id: <20171005151313.32015-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH] s390x/MAINTAINERS: add mailing list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +21,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>
+To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, thuth@redhat.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-On 5 October 2017 at 11:01, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> The following changes since commit d147f7e815f97cb477e223586bcb80c316ae10ea:
->
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-10-03 16:27:24 +0100)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/ui-20171005-pull-request
->
-> for you to fetch changes up to 47247520ac44592cc7343138380bd6099f83262f:
->
->   ui: don't export qemu_input_event_new_key (2017-10-05 11:21:51 +0200)
->
-> ----------------------------------------------------------------
-> ui: use keycodemapdb for key code mappings, part one
->
-> ----------------------------------------------------------------
+There's a new qemu-s390x@nongnu.org mailing list: add it to the
+s390 sections.
 
-Fails to build, all platforms:
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ MAINTAINERS | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-make: Entering directory `/home/pm215/qemu/build/all'
-config-host.mak is out-of-date, running configure
-make: *** No rule to make target `ui/input-keymap-linux-to-qcode.c',
-needed by `Makefile'. Stop.
-make: *** Waiting for unfinished jobs....
-Install prefix    /usr/local
-BIOS directory    /usr/local/share/qemu
-firmware path     /usr/local/share/qemu-firmware
-binary directory  /usr/local/bin
-library directory /usr/local/lib
-module directory  /usr/local/lib/qemu
-[etc]
-replication support yes
-VxHS block device no
-make: Leaving directory `/home/pm215/qemu/build/all'
-
-That make complains about the missing .c file before it has
-finished running configure looks suspicious. I think there's
-a race here with parallel make.
-
-thanks
--- PMM
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 772ac209e1..f1b096ca08 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -216,6 +216,7 @@ S: Maintained
+ F: target/s390x/
+ F: hw/s390x/
+ F: disas/s390.c
++L: qemu-s390x@nongnu.org
+ 
+ SH4
+ M: Aurelien Jarno <aurelien@aurel32.net>
+@@ -309,6 +310,7 @@ F: include/hw/s390x/s390_flic.h
+ F: gdb-xml/s390*.xml
+ T: git git://github.com/cohuck/qemu.git s390-next
+ T: git git://github.com/borntraeger/qemu.git s390-next
++L: qemu-s390x@nongnu.org
+ 
+ X86
+ M: Paolo Bonzini <pbonzini@redhat.com>
+@@ -807,6 +809,7 @@ F: pc-bios/s390-ccw.img
+ F: default-configs/s390x-softmmu.mak
+ T: git git://github.com/cohuck/qemu.git s390-next
+ T: git git://github.com/borntraeger/qemu.git s390-next
++L: qemu-s390x@nongnu.org
+ 
+ UniCore32 Machines
+ -------------
+@@ -1036,6 +1039,7 @@ F: hw/vfio/ccw.c
+ F: hw/s390x/s390-ccw.c
+ F: include/hw/s390x/s390-ccw.h
+ T: git git://github.com/cohuck/qemu.git s390-next
++L: qemu-s390x@nongnu.org
+ 
+ vhost
+ M: Michael S. Tsirkin <mst@redhat.com>
+@@ -1079,6 +1083,7 @@ S: Supported
+ F: hw/s390x/virtio-ccw.[hc]
+ T: git git://github.com/cohuck/qemu.git s390-next
+ T: git git://github.com/borntraeger/qemu.git s390-next
++L: qemu-s390x@nongnu.org
+ 
+ virtio-input
+ M: Gerd Hoffmann <kraxel@redhat.com>
+@@ -1709,6 +1714,7 @@ M: Richard Henderson <rth@twiddle.net>
+ S: Maintained
+ F: tcg/s390/
+ F: disas/s390.c
++L: qemu-s390x@nongnu.org
+ 
+ SPARC target
+ S: Odd Fixes
+-- 
+2.13.6
