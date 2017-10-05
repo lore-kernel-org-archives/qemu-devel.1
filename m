@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dzxn8-0005qq-E0
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 00:29:47 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dzxqO-0006dN-TM
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 00:33:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dzxn5-0002SD-A9
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 00:29:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46380)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dzxn5-0002RH-3w
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 00:29:43 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20171002152552.27999-1-armbru@redhat.com>
-	<20171002152552.27999-16-armbru@redhat.com>
-	<CAJ+F1CKSuJ2Zk6B4baESAdmM6RNeGFszJ1H41ZWxg+dXEcW7zQ@mail.gmail.com>
-Date: Thu, 05 Oct 2017 06:29:39 +0200
-In-Reply-To: <CAJ+F1CKSuJ2Zk6B4baESAdmM6RNeGFszJ1H41ZWxg+dXEcW7zQ@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 4 Oct 2017
-	14:02:54 +0200")
-Message-ID: <87wp4ai5e4.fsf@dusky.pond.sub.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dzxqL-0005j5-QH
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 00:33:08 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1506092407-26985-1-git-send-email-peter.maydell@linaro.org>
+	<1506092407-26985-21-git-send-email-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <e03aefd1-81bb-10b0-f325-fdce7e60c7a6@amsat.org>
+Date: Thu, 5 Oct 2017 01:33:01 -0300
 MIME-Version: 1.0
+In-Reply-To: <1506092407-26985-21-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 15/32] tests/qapi-schema: Improve
- simple union coverage
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 20/20] nvic: Add missing code
+ for writing SHCSR.HARDFAULTPENDED bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+On 09/22/2017 12:00 PM, Peter Maydell wrote:
+> When we added support for the new SHCSR bits in v8M in commit
+> 437d59c17e9 the code to support writing to the new HARDFAULTPENDED
+> bit was accidentally only added for non-secure writes; the
+> secure banked version of the bit should also be writable.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/intc/armv7m_nvic.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+> index bd1d5d3..22d5e6e 100644
+> --- a/hw/intc/armv7m_nvic.c
+> +++ b/hw/intc/armv7m_nvic.c
+> @@ -1230,6 +1230,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
 
-> On Mon, Oct 2, 2017 at 5:25 PM, Markus Armbruster <armbru@redhat.com> wro=
-te:
->> This demonstrates a bug in the lowering of simple unions: if more than
->> one schema uses the same built-in type T for a simple union member,
->> they all generate the same q_obj_T_wrapper into their qapi-types.h.
->> They clash when you include more than one schema's qapi-types.h.
->
-> Ah, I don't remember seeing that when I splitted the schema in my
-> qapi-if / conditional series.
+        if (attrs.secure) {
 
-Simple union members of built-in type are rare.  I spotted the problem
-with options, then realized it's already possible with simple unions.
+if banked then arch is v8M,
 
-> Could it happen with non-built-in types ?
+>              s->sec_vectors[ARMV7M_EXCP_BUS].enabled = (value & (1 << 17)) != 0;
+>              s->sec_vectors[ARMV7M_EXCP_USAGE].enabled =
+>                  (value & (1 << 18)) != 0;
+> +            s->sec_vectors[ARMV7M_EXCP_HARD].pending = (value & (1 << 21)) != 0;
 
-Yes, but multiple q_obj_T_wrapper can clash only when their T also
-clash.  Name your types more wisely then.
+therefore this bit is present.
 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Thanks!
+>              /* SecureFault not banked, but RAZ/WI to NS */
+>              s->vectors[ARMV7M_EXCP_SECURE].active = (value & (1 << 4)) != 0;
+>              s->vectors[ARMV7M_EXCP_SECURE].enabled = (value & (1 << 19)) != 0;
+> 
