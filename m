@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1e09Xs-0001uK-Nk
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:02:52 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e09eE-0006F4-4r
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:09:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1e09Xm-00077H-MN
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:02:48 -0400
-References: <1506494000-31982-1-git-send-email-Bharat.Bhushan@nxp.com>
-	<20170927074109.GA31587@virtx40>
-	<AM5PR0401MB25450ACC804B20D93C4F2D9D9A780@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<9700cf30-65ed-9c55-c1b9-14bb8deb669f@redhat.com>
-	<20170927092147.GA32183@virtx40>
-	<0af599c0-f859-f90c-c999-bc4a0a678768@redhat.com>
-	<20171004114910.GA6932@virtx40>
-	<79234c56-c524-5359-de8a-f266b19821eb@redhat.com>
-	<9d173ea5-75a6-c684-7f8d-e2ec1d3eddff@redhat.com>
-	<1017080b-aa5f-4a1f-9905-e65f22717cd1@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <b740e8b7-5859-fd6a-1f1e-480aef6ef4f0@redhat.com>
-Date: Thu, 5 Oct 2017 19:02:24 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1e09eA-0006Yd-14
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:09:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44032)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e09e9-0006Y2-Na
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:09:17 -0400
+Date: Thu, 5 Oct 2017 14:09:06 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171005170906.GF4015@localhost.localdomain>
+References: <cover.1507059418.git.alistair.francis@xilinx.com>
+	<2a93b997d0acd369f35d68981a23ba491443daf6.1507059418.git.alistair.francis@xilinx.com>
+	<20171003203654.GD4760@localhost.localdomain>
+	<CAKmqyKN+QnBAS6c4mAb2EiTVQv3Km6EdmGXCFC3hVogL96QK1Q@mail.gmail.com>
+	<20171004131232.32f5caae@nial.brq.redhat.com>
+	<20171004122851.GJ4760@localhost.localdomain>
+	<20171004150816.41ffc161@nial.brq.redhat.com>
+	<20171004163434.GN4760@localhost.localdomain>
+	<CAKmqyKP6yqWfGbzDnWeeROO=_27TiVSBZvdw1PA5JbRH_m3tcA@mail.gmail.com>
+	<20171005110427.647fed06@nial.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1017080b-aa5f-4a1f-9905-e65f22717cd1@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v4 0/5] virtio-iommu: VFIO
- integration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171005110427.647fed06@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 3/5] xlnx-zcu102: Specify the valid CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,157 +35,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Linu Cherian <linuc.decode@gmail.com>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "mst@redhat.com" <mst@redhat.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, linu.cherian@cavium.com, "robin.murphy@arm.com" <robin.murphy@arm.com>, "bharatb.yadav@gmail.com" <bharatb.yadav@gmail.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Marcel Apfelbaum <marcel@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-Hi Linu,
-
-On 05/10/2017 14:13, Auger Eric wrote:
-> Hi Linu,
+On Thu, Oct 05, 2017 at 11:04:27AM +0200, Igor Mammedov wrote:
+> On Wed, 4 Oct 2017 14:39:20 -0700
+> Alistair Francis <alistair.francis@xilinx.com> wrote:
 > 
-> On 05/10/2017 13:54, Auger Eric wrote:
->> Hi Linu,
->> On 05/10/2017 12:46, Auger Eric wrote:
->>> Hi Linu,
->>> On 04/10/2017 13:49, Linu Cherian wrote:
->>>> Hi Eric,
->>>>
->>>>
->>>> On Wed Sep 27, 2017 at 11:24:01AM +0200, Auger Eric wrote:
->>>>> Hi Linu,
->>>>>
->>>>> On 27/09/2017 11:21, Linu Cherian wrote:
->>>>>> On Wed Sep 27, 2017 at 10:55:07AM +0200, Auger Eric wrote:
->>>>>>> Hi Linu,
->>>>>>>
->>>>>>> On 27/09/2017 10:30, Bharat Bhushan wrote:
->>>>>>>> Hi,
->>>>>>>>
->>>>>>>>> -----Original Message-----
->>>>>>>>> From: Linu Cherian [mailto:linuc.decode@gmail.com]
->>>>>>>>> Sent: Wednesday, September 27, 2017 1:11 PM
->>>>>>>>> To: Bharat Bhushan <bharat.bhushan@nxp.com>
->>>>>>>>> Cc: eric.auger@redhat.com; eric.auger.pro@gmail.com;
->>>>>>>>> peter.maydell@linaro.org; alex.williamson@redhat.com; mst@redhat.com;
->>>>>>>>> qemu-arm@nongnu.org; qemu-devel@nongnu.org; kevin.tian@intel.com;
->>>>>>>>> marc.zyngier@arm.com; tn@semihalf.com; will.deacon@arm.com;
->>>>>>>>> drjones@redhat.com; robin.murphy@arm.com; christoffer.dall@linaro.org;
->>>>>>>>> bharatb.yadav@gmail.com
->>>>>>>>> Subject: Re: [Qemu-arm] [PATCH v4 0/5] virtio-iommu: VFIO integration
->>>>>>>>>
->>>>>>>>> Hi,
->>>>>>>>>
->>>>>>>>> On Wed Sep 27, 2017 at 12:03:15PM +0530, Bharat Bhushan wrote:
->>>>>>>>>> This patch series integrates VFIO/VHOST with virtio-iommu.
->>>>>>>>>>
->>>>>>>>>> This version is mainly about rebasing on v4 version on virtio-iommu
->>>>>>>>>> device framework from Eric Augur and addresing review comments.
->>>>>>>>>>
->>>>>>>>>> This patch series allows PCI pass-through using virtio-iommu.
->>>>>>>>>>
->>>>>>>>>> This series is based on:
->>>>>>>>>>  - virtio-iommu kernel driver by Jean-Philippe Brucker
->>>>>>>>>>     [1] [RFC] virtio-iommu version 0.4
->>>>>>>>>>     git://linux-arm.org/virtio-iommu.git branch viommu/v0.4
->>>>>>>
->>>>>>> Just to make sure, do you use the v0.4 virtio-iommu driver from above
->>>>>>> branch?
->>>>>>>
->>>>>>> Thanks
->>>>>>
->>>>>> I am using git://linux-arm.org/linux-jpb.git branch virtio-iommu/v0.4.
->>>>>> Hope you are referring to the same.
->>>>>
->>>>> Yes that's the right one. I will also investigate on my side this afternoon.
->>>>>
->>>>> Thanks
->>>>>
->>>>> Eric
->>>>
->>>> With the below workaround, atleast ping works for me.
->>>>
->>>> diff --git a/drivers/iommu/virtio-iommu.c b/drivers/iommu/virtio-iommu.c
->>>> index 249964a..2904617 100644
->>>> --- a/drivers/iommu/virtio-iommu.c
->>>> +++ b/drivers/iommu/virtio-iommu.c
->>>>         .attach_dev             = viommu_attach_dev,
->>>>         .map                    = viommu_map,
->>>>         .unmap                  = viommu_unmap,
->>>> -       .map_sg                 = viommu_map_sg,
->>>> +       .map_sg                 = default_iommu_map_sg,
->>>>         .iova_to_phys           = viommu_iova_to_phys,
->>>>         .add_device             = viommu_add_device,
->>>>         .remove_device          = viommu_remove_device,
->>>>
->>>>
->>>> Looks like the qemu backend doesnt have support to handle the map requests from 
->>>> virtio_iommu_map_sg, since it  merges multiple map requests into one with 
->>>> mapsize larger than page size(for eg. 0x5000). 
->>> On my side I understand viommu_map_sg builds a VIRTIO_IOMMU_T_MAP
->>> request for each sg element. The map size matches the sg element size.
->>> Then each request is sent separately in _viommu_send_reqs_sync. I don't
->>> see any concatenation. Looks Jean has a plan to check if it can
->>> concatenate anything (/* TODO: merge physically-contiguous mappings if
->>> any */) but this is not implemented yet.
->>
->> Hopefully I was just able to reproduce your issue with an igb device. I
->> keep on debugging...
->>
->> vfio_get_vaddr 1 len=0x3000 iotlb->addr_mask=0x2fff
->> qemu-system-aarch64: iommu has granularity incompatible with target AS
->>
->>
->> Thanks
->>
->> Eric
->>>
->>> However you should be allowed to map 1 sg element of 5 pages and then
->>> notify the host about this event I think. Still looking at the code...
->>>
->>> I still can't reproduce the issue at the moment. What kind of device are
->>> you assigning?
->>>
->>> Thanks
->>>
->>> Eric
->>>>
->>>> Atleast vfio_get_vaddr called from vfio_iommu_map_notify in Qemu expects 
->>>> the map size to be a power of 2.
+> > On Wed, Oct 4, 2017 at 9:34 AM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > > On Wed, Oct 04, 2017 at 03:08:16PM +0200, Igor Mammedov wrote:  
+> > >> On Wed, 4 Oct 2017 09:28:51 -0300
+> > >> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > >>  
+> > >> > On Wed, Oct 04, 2017 at 01:12:32PM +0200, Igor Mammedov wrote:  
+> > >> > > On Tue, 3 Oct 2017 14:41:17 -0700
+> > >> > > Alistair Francis <alistair.francis@xilinx.com> wrote:
+> > >> > >  
+> > >> > > > On Tue, Oct 3, 2017 at 1:36 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:  
+> > >> > > > > On Tue, Oct 03, 2017 at 01:05:13PM -0700, Alistair Francis wrote:  
+> > >> > > > >> List all possible valid CPU options.
+> > >> > > > >>
+> > >> > > > >> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> > >> > > > >> ---
+> > >> > > > >>
+> > >> > > > >>  hw/arm/xlnx-zcu102.c         | 10 ++++++++++
+> > >> > > > >>  hw/arm/xlnx-zynqmp.c         | 16 +++++++++-------
+> > >> > > > >>  include/hw/arm/xlnx-zynqmp.h |  1 +
+> > >> > > > >>  3 files changed, 20 insertions(+), 7 deletions(-)
+> > >> > > > >>
+> > >> > > > >> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+> > >> > > > >> index 519a16ed98..039649e522 100644
+> > >> > > > >> --- a/hw/arm/xlnx-zcu102.c
+> > >> > > > >> +++ b/hw/arm/xlnx-zcu102.c
+> > >> > > > >> @@ -98,6 +98,8 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s, MachineState *machine)
+> > >> > > > >>      object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
+> > >> > > > >>                                &error_abort);
+> > >> > > > >>
+> > >> > > > >> +    object_property_set_str(OBJECT(&s->soc), machine->cpu_type, "cpu-type",
+> > >> > > > >> +                            &error_fatal);  
+> > >> > > > >
+> > >> > > > > Do you have plans to support other CPU types to xlnx_zynqmp in
+> > >> > > > > the future?  If not, I wouldn't bother adding the cpu-type
+> > >> > > > > property and the extra boilerplate code if it's always going to
+> > >> > > > > be set to cortex-a53.  
+> > >> > > >
+> > >> > > > No, it'll always be A53.
+> > >> > > >
+> > >> > > > I did think of that, but I also wanted to use the new option! I also
+> > >> > > > think there is an advantage in sanely handling users '-cpu' option,
+> > >> > > > before now we just ignored it, so I think it still does give a
+> > >> > > > benefit. That'll be especially important on the Xilinx tree (sometimes
+> > >> > > > people use our machines with a different CPU to 'benchmark' or test
+> > >> > > > other CPUs with our CoSimulation setup). So I think it does make sense
+> > >> > > > to keep in.  
+> > >> > > if cpu isn't user settable, one could just outright die if cpu_type
+> > >> > > is not NULL and say that user's CLI is wrong.
+> > >> > > (i.e. don't give users illusion that they allowed to use '-cpu')  
+> > >> >
+> > >> > Isn't it exactly what this patch does, by setting:
+> > >> >     mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a53");
+> > >> >     mc->valid_cpu_types = xlnx_zynqmp_valid_cpus;
+> > >> > ?
+> > >> >
+> > >> > Except that "-cpu cortex-a53" won't die, which is a good thing.  
+> > >> allowing "-cpu cortex-a53" here, would allow to use feature parsing
+> > >> which weren't allowed or were ignored before if user supplied '-cpu'.
+> > >> so I'd more strict and refuse any -cpu and break CLI that tries to use it
+> > >> if board has non configurable cpu type. It would be easier to relax
+> > >> restriction later if necessary.
+> > >>
+> > >> using validate_cpus here just to have users for the new code,
+> > >> doesn't seem like valid justification and at that it makes board
+> > >> code more complex where it's not necessary and build in cpu type
+> > >> works just fine.  
+> > >
+> > > It's up to the board maintainer to decide what's the best option.
+> > > Both features are independent from each other and can be
+> > > implemented by machine core.  
+> > 
+> > Noooo!
+> > 
+> > My hope with this series is that eventually we could hit a state where
+> > every single machine acts the same way with the -cpu option.
+> > 
+> > I really don't like what we do now where some boards use it, some
+> > boards error and some boars just ignore the option. I think we should
+> > agree on something and every machine should follow the same flow so
+> > that users know what to expect when they use the -cpu option.
+> > 
+> > If this means we allow machines to specify they don't support the
+> > option or only have a single element in the list of supported options
+> > doesn't really matter, but all machines should do the same thing.
+> > 
+> > >
+> > > In either case, the valid_cpu_types feature will be still very
+> > > useful for boards like pxa270 and sa1110, which support -cpu but
+> > > only with specific families of CPU types (grep for
+> > > "strncmp(cpu_type").
+> > >  
+> > >>
+> > >> wrt centralized way to refuse -cpu if board doesn't support it,
+> > >> (which is not really related to this series) following could be done:
+> > >>
+> > >> when cpu_model removal is completely done I plan to replace
+> > >>   vl.c
+> > >>      cpu_parse_cpu_model(machine_class->default_cpu_type, cpu_model)
+> > >> with
+> > >>      cpu_parse_cpu_model(DEFAULT_TARGET_CPU_TYPE, cpu_model)
+> > >>
+> > >> so that we could drop temporary guard
+> > >>
+> > >>      if (machine_class->default_cpu_type) {  
+> > >
+> > > This sounds good to me, even if we don't reject -cpu on any
+> > > board.
+> > >
+> > >  
+> > >>
+> > >> with that it would be possible to tell from machine_run_board_init()
+> > >> that board doesn't provide cpu but user provided '-cpu'
+> > >> so we would be able to:
+> > >>   if ((machine_class->default_cpu_type == NULL) &&
+> > >>       (machine->cpu_type != NULL))
+> > >>           error_fatal("machine doesn't support -cpu option");  
+> > >
+> > > I won't complain too much if a board maintainer really wants to
+> > > make the board reject -cpu completely, but it's up to them.  
+> > 
+> > I disagree. I think a standard way of doing it is better. At least for
+> > each architecture. The ARM -cpu option is very confusing at the moment
+> > and it really doesn't need to be that bad.
+> > 
+> > >
+> > > Personally, I'd prefer to have all boards setting
+> > > default_cpu_type even if they support only one CPU model, so
+> > > clients don't need a special case for boards that don't support
+> > > -cpu.  
+> > 
+> > I agree, I think having one CPU makes more sense. It makes it easier
+> > to add support for more cpus in the future and allows the users to use
+> > the -cpu option without killing QEMU.
+> I'm considering -cpu option as a legacy one that server 2 purposes now
+
+I'm not sure about "legacy", but the list of purposes looks
+accurate:
+
+>  1: pick cpu type for running instance
+
+This one has no replacement yet, so can we really call it legacy?
+
+>  2: convert optional features/legacy syntax to global properties
+>     for related cpu type
+
+This one has a replacement: -global.  But there's a difference
+between saying "-cpu features are implemented using -global" and
+"-cpu features are obsoleted by -global".  I don't think we can
+say it's obsolete or legacy unless existing management software
+is changed to be using something else.
+
+
 > 
-> Actually I missed the most important here ;-)
->>>>
->>>>  if (len & iotlb->addr_mask) {
-> This check looks suspiscious to me. In our case the len is not modified
-> by the previous translation and it fails, I don't see why. It should be
-> valid to be able to notify 5 granules.
+> It plays ok for machines with single type of cpu but doesn't really scale
+> to more and doesn't work well nor needed if we were to specify cpus on CLI
+> with -device (i.e. build machine from config/CLI)
 
-So after discussion with Alex, looks the way we notify the host
-currently is wrong. we set the addr_mask to the mapping/unmapping size
--1 whereas this should be a page mask instead (granule size or block
-size?). So if the guest maps 5 x 4kB pages we should send 5
-notifications for each page and not a single one. It is unclear to me if
-we can notify with hugepage/block page size mask. Peter may
-confirm/infirm this. in vsmmuv3 code I notify by granule or block size.
+This is a good point.  But -cpu is still a useful shortcut for
+boards that have a single CPU type.  What are the arguments we
+have to get rid of it completely?
 
-Bharat, please can you add this to your TODO list?
 
-Linu, thanks a lot for the time you spent debugging this issue.
-Curiously on my side, it is really seldom hit but it is ...
-
-Thanks!
-
-Eric
 > 
-> Thanks
+> So I would not extend usage '-cpu' to boards that have fixed cpu type,
+> because it really useless in that case and confuses users with idea that
+> they have ability/need to specify -cpu on fixed cpu board.
+
+If they try to choose any other CPU model, they will see an error
+message explicitly saying only one CPU type is supported.  What
+would be the harm?
+
 > 
-> Eric
->>>>         error_report("iommu has granularity incompatible with target AS");
->>>>         return false;
->>>>     }
->>>>
->>>> Just trying to understand how this is not hitting in your case. 
->>>>  
->>>>
->>>
->>
-> 
+> I'd be upfront with users and fail explicitly if -cpu is not supported
+> (yes, it is not uniform CLI behavior across machines but it makes
+> sense since not all machines are the same, there probably are other
+> options with which some machines error out with unsupported error,
+> -cpu is not any different case).
+
+I'm not strongly for/against neither of those two approaches, but
+I'm inclined towards letting all (or most) machines support -cpu
+as suggested by Alistair.
+
+I see advantages in having less code relying on -cpu, and
+replacing it with something more generic.  But I also see
+advantages into reusing the same logic (both inside QEMU and on
+management software) to query/configure/create CPUs for the cases
+where a single CPU type is used.
+
+I'd be more inclined to agree with you if -cpu was really an
+obsolete option that was already completely replaced by something
+else.  But the reality is that there's no generic mechanism to
+choose the CPU type yet.
+
+Unless we officially document -cpu as obsolete and point
+users/developers to a replacement, I don't see the problem with
+making "-cpu <model>" work on more (or all?) boards.
+
+-- 
+Eduardo
