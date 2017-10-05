@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e09tt-00087J-No
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:25:38 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e09yf-0002UZ-9D
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:30:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e09ti-0004fL-1S
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:25:33 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:39049
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1e09th-0004SU-9j
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:25:21 -0400
-References: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
-	<1507211474-188400-34-git-send-email-imammedo@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <d83f1682-840e-87b7-9e65-8b83af9d83b1@ilande.co.uk>
-Date: Thu, 5 Oct 2017 18:25:04 +0100
+	(envelope-from <richard.henderson@linaro.org>) id 1e09ye-0001cj-GQ
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:30:29 -0400
+Received: from mail-qt0-x231.google.com ([2607:f8b0:400d:c0d::231]:49075)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e09ye-0001cA-At
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:30:28 -0400
+Received: by mail-qt0-x231.google.com with SMTP id d13so26116013qta.5
+	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 10:30:28 -0700 (PDT)
+References: <1506092407-26985-1-git-send-email-peter.maydell@linaro.org>
+	<1506092407-26985-12-git-send-email-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <8c626067-0c52-1c2a-eabc-d6c1dbfbe4a9@linaro.org>
+Date: Thu, 5 Oct 2017 13:30:23 -0400
 MIME-Version: 1.0
-In-Reply-To: <1507211474-188400-34-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1506092407-26985-12-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 33/40] sparc: sparc: use generic
- cpu_model parsing
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 11/20] target/arm: Add support for
+ restoring v8M additional state context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,223 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, atar4qemu@gmail.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On 05/10/17 14:51, Igor Mammedov wrote:
-
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
-> CC: mark.cave-ayland@ilande.co.uk
-> CC: atar4qemu@gmail.com
-> ---
->  hw/sparc/sun4m.c | 29 ++++++++++++-----------------
->  1 file changed, 12 insertions(+), 17 deletions(-)
+On 09/22/2017 10:59 AM, Peter Maydell wrote:
+> For v8M, exceptions from Secure to Non-Secure state will save
+> callee-saved registers to the exception frame as well as the
+> caller-saved registers. Add support for unstacking these
+> registers in exception exit when necessary.
 > 
-> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-> index e1bdd48..68b2378 100644
-> --- a/hw/sparc/sun4m.c
-> +++ b/hw/sparc/sun4m.c
-> @@ -94,7 +94,6 @@ struct sun4m_hwdef {
->      } vsimm[MAX_VSIMMS];
->      hwaddr ecc_base;
->      uint64_t max_mem;
-> -    const char * const default_cpu_model;
->      uint32_t ecc_version;
->      uint32_t iommu_version;
->      uint16_t machine_id;
-> @@ -790,14 +789,14 @@ static const TypeInfo ram_info = {
->      .class_init    = ram_class_init,
->  };
->  
-> -static void cpu_devinit(const char *cpu_model, unsigned int id,
-> +static void cpu_devinit(const char *cpu_type, unsigned int id,
->                          uint64_t prom_addr, qemu_irq **cpu_irqs)
->  {
->      CPUState *cs;
->      SPARCCPU *cpu;
->      CPUSPARCState *env;
->  
-> -    cpu = SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
-> +    cpu = SPARC_CPU(cpu_create(cpu_type));
->      env = &cpu->env;
->  
->      cpu_sparc_set_id(env, id);
-> @@ -820,7 +819,6 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
->                            MachineState *machine)
->  {
->      DeviceState *slavio_intctl;
-> -    const char *cpu_model = machine->cpu_model;
->      unsigned int i;
->      void *iommu, *espdma, *ledma, *nvram;
->      qemu_irq *cpu_irqs[MAX_CPUS], slavio_irq[32], slavio_cpu_irq[MAX_CPUS],
-> @@ -833,11 +831,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
->      unsigned int num_vsimms;
->  
->      /* init CPUs */
-> -    if (!cpu_model)
-> -        cpu_model = hwdef->default_cpu_model;
-> -
->      for(i = 0; i < smp_cpus; i++) {
-> -        cpu_devinit(cpu_model, i, hwdef->slavio_base, &cpu_irqs[i]);
-> +        cpu_devinit(machine->cpu_type, i, hwdef->slavio_base, &cpu_irqs[i]);
->      }
->  
->      for (i = smp_cpus; i < MAX_CPUS; i++)
-> @@ -1074,7 +1069,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
->          .machine_id = ss5_id,
->          .iommu_version = 0x05000000,
->          .max_mem = 0x10000000,
-> -        .default_cpu_model = "Fujitsu MB86904",
->      },
->      /* SS-10 */
->      {
-> @@ -1100,7 +1094,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
->          .machine_id = ss10_id,
->          .iommu_version = 0x03000000,
->          .max_mem = 0xf00000000ULL,
-> -        .default_cpu_model = "TI SuperSparc II",
->      },
->      /* SS-600MP */
->      {
-> @@ -1124,7 +1117,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
->          .machine_id = ss600mp_id,
->          .iommu_version = 0x01000000,
->          .max_mem = 0xf00000000ULL,
-> -        .default_cpu_model = "TI SuperSparc II",
->      },
->      /* SS-20 */
->      {
-> @@ -1166,7 +1158,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
->          .machine_id = ss20_id,
->          .iommu_version = 0x13000000,
->          .max_mem = 0xf00000000ULL,
-> -        .default_cpu_model = "TI SuperSparc II",
->      },
->      /* Voyager */
->      {
-> @@ -1190,7 +1181,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
->          .machine_id = vger_id,
->          .iommu_version = 0x05000000,
->          .max_mem = 0x10000000,
-> -        .default_cpu_model = "Fujitsu MB86904",
->      },
->      /* LX */
->      {
-> @@ -1215,7 +1205,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
->          .machine_id = lx_id,
->          .iommu_version = 0x04000000,
->          .max_mem = 0x10000000,
-> -        .default_cpu_model = "TI MicroSparc I",
->      },
->      /* SS-4 */
->      {
-> @@ -1240,7 +1229,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
->          .machine_id = ss4_id,
->          .iommu_version = 0x05000000,
->          .max_mem = 0x10000000,
-> -        .default_cpu_model = "Fujitsu MB86904",
->      },
->      /* SPARCClassic */
->      {
-> @@ -1264,7 +1252,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
->          .machine_id = scls_id,
->          .iommu_version = 0x05000000,
->          .max_mem = 0x10000000,
-> -        .default_cpu_model = "TI MicroSparc I",
->      },
->      /* SPARCbook */
->      {
-> @@ -1288,7 +1275,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] = {
->          .machine_id = sbook_id,
->          .iommu_version = 0x05000000,
->          .max_mem = 0x10000000,
-> -        .default_cpu_model = "TI MicroSparc I",
->      },
->  };
->  
-> @@ -1355,6 +1341,7 @@ static void ss5_class_init(ObjectClass *oc, void *data)
->      mc->block_default_type = IF_SCSI;
->      mc->is_default = 1;
->      mc->default_boot_order = "c";
-> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
->  }
->  
->  static const TypeInfo ss5_type = {
-> @@ -1372,6 +1359,7 @@ static void ss10_class_init(ObjectClass *oc, void *data)
->      mc->block_default_type = IF_SCSI;
->      mc->max_cpus = 4;
->      mc->default_boot_order = "c";
-> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
->  }
->  
->  static const TypeInfo ss10_type = {
-> @@ -1389,6 +1377,7 @@ static void ss600mp_class_init(ObjectClass *oc, void *data)
->      mc->block_default_type = IF_SCSI;
->      mc->max_cpus = 4;
->      mc->default_boot_order = "c";
-> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
->  }
->  
->  static const TypeInfo ss600mp_type = {
-> @@ -1406,6 +1395,7 @@ static void ss20_class_init(ObjectClass *oc, void *data)
->      mc->block_default_type = IF_SCSI;
->      mc->max_cpus = 4;
->      mc->default_boot_order = "c";
-> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
->  }
->  
->  static const TypeInfo ss20_type = {
-> @@ -1422,6 +1412,7 @@ static void voyager_class_init(ObjectClass *oc, void *data)
->      mc->init = vger_init;
->      mc->block_default_type = IF_SCSI;
->      mc->default_boot_order = "c";
-> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
->  }
->  
->  static const TypeInfo voyager_type = {
-> @@ -1438,6 +1429,7 @@ static void ss_lx_class_init(ObjectClass *oc, void *data)
->      mc->init = ss_lx_init;
->      mc->block_default_type = IF_SCSI;
->      mc->default_boot_order = "c";
-> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
->  }
->  
->  static const TypeInfo ss_lx_type = {
-> @@ -1454,6 +1446,7 @@ static void ss4_class_init(ObjectClass *oc, void *data)
->      mc->init = ss4_init;
->      mc->block_default_type = IF_SCSI;
->      mc->default_boot_order = "c";
-> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
->  }
->  
->  static const TypeInfo ss4_type = {
-> @@ -1470,6 +1463,7 @@ static void scls_class_init(ObjectClass *oc, void *data)
->      mc->init = scls_init;
->      mc->block_default_type = IF_SCSI;
->      mc->default_boot_order = "c";
-> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
->  }
->  
->  static const TypeInfo scls_type = {
-> @@ -1486,6 +1480,7 @@ static void sbook_class_init(ObjectClass *oc, void *data)
->      mc->init = sbook_init;
->      mc->block_default_type = IF_SCSI;
->      mc->default_boot_order = "c";
-> +    mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
->  }
->  
->  static const TypeInfo sbook_type = {
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/helper.c | 30 ++++++++++++++++++++++++++++++
+>  1 file changed, 30 insertions(+)
 
-No objections to this patch but just to confirm from the previous
-discussion that the cpu type gets parsed in a way such that an existing
--cpu "TI SuperSparc II" option gets mapped to the correct
-"TI-SuperSparc-II" type? Presumably this is now handled at a different
-level?
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
-ATB,
-
-Mark.
+r~
