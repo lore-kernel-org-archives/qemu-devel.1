@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1e08Zf-0008Ez-TB
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:00:36 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e08dn-0002ol-KH
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:04:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1e08ZW-00069i-HX
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:00:35 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:32889)
+	(envelope-from <richard.henderson@linaro.org>) id 1e08dj-0001ef-Jh
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:04:51 -0400
+Received: from mail-qt0-x233.google.com ([2607:f8b0:400d:c0d::233]:49917)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1e08ZW-00068x-Aq
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:00:26 -0400
-Received: by mail-oi0-x244.google.com with SMTP id n129so8829710oia.0
-	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 09:00:26 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e08dj-0001e3-Fb
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:04:47 -0400
+Received: by mail-qt0-x233.google.com with SMTP id o3so26313388qte.6
+	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 09:04:47 -0700 (PDT)
+References: <1506092407-26985-1-git-send-email-peter.maydell@linaro.org>
+	<1506092407-26985-3-git-send-email-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <c0b514b4-6474-87ed-6fa0-c109761d243c@linaro.org>
+Date: Thu, 5 Oct 2017 12:04:43 -0400
 MIME-Version: 1.0
-In-Reply-To: <20171005155057.7664-1-berrange@redhat.com>
-References: <20171005155057.7664-1-berrange@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 5 Oct 2017 18:00:24 +0200
-Message-ID: <CAJ+F1CJ0P_xo+E4W2owjL6PyjiDXkpTXJe8A4ASmL9bL9V1kSw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] char: don't skip client cleanup if
- 'connected' flag is unset
+In-Reply-To: <1506092407-26985-3-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 02/20] target/arm: Don't switch to target
+ stack early in v7M exception return
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,95 +32,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On Thu, Oct 5, 2017 at 5:50 PM, Daniel P. Berrange <berrange@redhat.com> wr=
-ote:
-> The tcp_chr_free_connection & tcp_chr_disconnect methods both
-> skip all of their cleanup work unless the 's->connected' flag
-> is set.  This flag is set when the incoming client connection
-> is ready to use. Crucially this is *after* the TLS handshake
-> has been completed. So if the TLS handshake fails and we try
-> to cleanup the failed client, all the cleanup is skipped as
-> 's->connected' is still false.
->
-> The only important thing that should be skipped in this case
-> is sending of the CHR_EVENT_CLOSED, because we never got as
-> far as sending the corresponding CHR_EVENT_OPENED. Every other
-> bit of cleanup can be robust against being called even when
-> s->connected is false.
->
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
+On 09/22/2017 10:59 AM, Peter Maydell wrote:
+> Currently our M profile exception return code switches to the
+> target stack pointer relatively early in the process, before
+> it tries to pop the exception frame off the stack. This is
+> awkward for v8M for two reasons:
+>  * in v8M the process vs main stack pointer is not selected
+>    purely by the value of CONTROL.SPSEL, so updating SPSEL
+>    and relying on that to switch to the right stack pointer
+>    won't work
+>  * the stack we should be reading the stack frame from and
+>    the stack we will eventually switch to might not be the
+>    same if the guest is doing strange things
+> 
+> Change our exception return code to use a 'frame pointer'
+> to read the exception frame rather than assuming that we
+> can switch the live stack pointer this early.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->
-> Changed in v2:
->
->  - Remove conditional checks for NULL (Marc-Andr=C3=A9)
->  - Don't use camelCase variable name (Marc-Andr=C3=A9)
->
->  chardev/char-socket.c | 19 +++++++++----------
->  1 file changed, 9 insertions(+), 10 deletions(-)
->
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index e65148fe97..53eda8ef00 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -332,10 +332,6 @@ static void tcp_chr_free_connection(Chardev *chr)
->      SocketChardev *s =3D SOCKET_CHARDEV(chr);
->      int i;
->
-> -    if (!s->connected) {
-> -        return;
-> -    }
-> -
->      if (s->read_msgfds_num) {
->          for (i =3D 0; i < s->read_msgfds_num; i++) {
->              close(s->read_msgfds[i]);
-> @@ -394,22 +390,25 @@ static void update_disconnected_filename(SocketChar=
-dev *s)
->                                           s->is_listen, s->is_telnet);
+>  target/arm/helper.c | 127 +++++++++++++++++++++++++++++++++++++++-------------
+>  1 file changed, 95 insertions(+), 32 deletions(-)
+> 
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 8be78ea..f13b99d 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -6040,16 +6040,6 @@ static void v7m_push(CPUARMState *env, uint32_t val)
+>      stl_phys(cs->as, env->regs[13], val);
 >  }
->
-> +/* NB may be called even if tcp_chr_connect has not been
-> + * reached, due to TLS or telnet initialization failure,
-> + * so can *not* assume s->connected =3D=3D true
-> + */
->  static void tcp_chr_disconnect(Chardev *chr)
->  {
->      SocketChardev *s =3D SOCKET_CHARDEV(chr);
+>  
+> -static uint32_t v7m_pop(CPUARMState *env)
+> -{
+> -    CPUState *cs = CPU(arm_env_get_cpu(env));
+> -    uint32_t val;
 > -
-> -    if (!s->connected) {
-> -        return;
-> -    }
-> +    bool emit_close =3D s->connected;
->
->      tcp_chr_free_connection(chr);
->
-> -    if (s->listen_ioc) {
-> +    if (s->listen_ioc && s->listen_tag =3D=3D 0) {
->          s->listen_tag =3D qio_channel_add_watch(
->              QIO_CHANNEL(s->listen_ioc), G_IO_IN, tcp_chr_accept, chr, NU=
-LL);
->      }
->      update_disconnected_filename(s);
-> -    qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
-> +    if (emit_close) {
-> +        qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
-> +    }
->      if (s->reconnect_time) {
->          qemu_chr_socket_restart_timer(chr);
->      }
-> --
-> 2.13.5
->
->
+> -    val = ldl_phys(cs->as, env->regs[13]);
+> -    env->regs[13] += 4;
+> -    return val;
+> -}
+> -
+>  /* Return true if we're using the process stack pointer (not the MSP) */
+>  static bool v7m_using_psp(CPUARMState *env)
+>  {
+> @@ -6141,6 +6131,40 @@ void HELPER(v7m_bxns)(CPUARMState *env, uint32_t dest)
+>      env->regs[15] = dest & ~1;
+>  }
+>  
+> +static uint32_t *get_v7m_sp_ptr(CPUARMState *env, bool secure, bool threadmode,
+> +                                bool spsel)
+> +{
+> +    /* Return a pointer to the location where we currently store the
+> +     * stack pointer for the requested security state and thread mode.
+> +     * This pointer will become invalid if the CPU state is updated
+> +     * such that the stack pointers are switched around (eg changing
+> +     * the SPSEL control bit).
+> +     * Compare the v8M ARM ARM pseudocode LookUpSP_with_security_mode().
+> +     * Unlike that pseudocode, we require the caller to pass us in the
+> +     * SPSEL control bit value; this is because we also use this
+> +     * function in handling of pushing of the callee-saves registers
+> +     * part of the v8M stack frame, and in that case the SPSEL bit
+> +     * comes from the exception return magic LR value.
+
+Exception return magic lr value does not appear to match "pushing".  Did you
+mean "poping" here?
+
+Otherwise,
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
-
---=20
-Marc-Andr=C3=A9 Lureau
+r~
