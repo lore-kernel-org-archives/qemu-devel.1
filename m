@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e04DN-0007Hl-EJ
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:21:22 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e04MR-0002DI-KZ
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:30:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e04DK-0003MQ-Rb
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:21:17 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46730)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e04DK-0003M1-Lr
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:21:14 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e04DI-0008A2-6n
-	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 11:21:12 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0F8C02E819D
-	for <qemu-devel@nongnu.org>; Thu,  5 Oct 2017 11:21:09 +0000 (UTC)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e04MO-0005bU-Hd
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:30:39 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:6005 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1e04MO-0005Xa-5M
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:30:36 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <cecb7a50-6913-0d88-59b4-805463aba790@virtuozzo.com>
+Message-ID: <c3c3bfdb-3e8f-5443-3d6c-52ab5a95bc63@virtuozzo.com>
+Date: Thu, 5 Oct 2017 14:30:07 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 05 Oct 2017 11:07:36 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1721275 <1721275@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150712892432.28170.15132413345734525245.malonedeb@gac.canonical.com>
-Message-Id: <150720165623.21735.14616809224012717458.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1721275] Re: Support more ARM CPUs
+In-Reply-To: <cecb7a50-6913-0d88-59b4-805463aba790@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] nbd structured reply
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,55 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, Wouter Verhelst <w@uter.be>, Alex Bligh <alex@alex.org.uk>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>
 
-PS: in general I wouldn't unconditionally trust that QEMU emulating CPU
-X definitely does not implement any instructions that CPU X doesn't have
--- no real world code will notice, and we don't have any mechanism to
-automatically verify that we didn't accidentally forget to
-conditionalize an instruction on an architecture feature.
+21.09.2017 15:18, Vladimir Sementsov-Ogievskiy wrote:
+> Hi all!
+>
+> I'm about this:
+>
+> "A server SHOULD try to minimize the number of chunks sent in a reply, 
+> but MUST NOT mark a chunk as final if there is still a possibility of 
+> detecting an error before transmission of that chunk completes"
+>
+> What do we mean by "possibility"? Formally, such possibility exists 
+> always, so, we'll never mark a chunk as final.
+>
 
--- =
+One more question:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1721275
+for |NBD_REPLY_TYPE_ERROR and ||NBD_REPLY_TYPE_ERROR_OFFSET, why do we 
+need message_length field? why not to calc it as chunk.lenght - 4 for 
+||NBD_REPLY_TYPE_ERROR and chunk.lenght - 12 for 
+||NBD_REPLY_TYPE_ERROR_OFFSET?
 
-Title:
-  Support more ARM CPUs
+For example, with NBD_REPLY_TYPE_OFFSET_DATA variable data length is 
+calculated, not specified separately.
 
-Status in QEMU:
-  New
+What is the reason for server to send NBD_REPLY_TYPE_ERROR with 
+message_lenght < chunk.lenght - 4?
+|
 
-Bug description:
-  Hi,
-
-  This is an enhancement request, rather than a bug report.
-
-  After some discussions/presentations during the last Linaro Connect
-  (SFO17), I understand that it may be easy to add support for more ARM
-  CPUs in QEMU. I am interested in user-mode, if that matters.
-
-  I'm primarily using QEMU for GCC validations, and I'd like to make
-  sure that GCC doesn't generate instructions not supported by the CPU
-  it's supposed to generate code for.
-
-  I'd like to have:
-  cortex-m0
-  cortex-m4
-  cortex-m7
-  cortex-m23
-  cortex-m33
-
-  cortex-a35
-  cortex-a53
-  cortex-a57
-
-  Is it possible?
-  Is it the right place to ask?
-  Should I file separate requests for each?
-
-  Thanks
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1721275/+subscriptions
+-- 
+Best regards,
+Vladimir
