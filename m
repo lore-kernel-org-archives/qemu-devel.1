@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e072E-0000en-FW
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:22:02 -0400
+	(envelope-from <stefanha@redhat.com>) id 1e075o-0003Oi-J2
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:25:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e072A-0000eH-Q6
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:21:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51554)
+	(envelope-from <stefanha@redhat.com>) id 1e075k-0004wU-LI
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:25:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39526)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e072A-0000cB-Is
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:21:54 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7EE977F41C
-	for <qemu-devel@nongnu.org>; Thu,  5 Oct 2017 14:21:53 +0000 (UTC)
-Date: Thu, 5 Oct 2017 15:21:50 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171005142149.GE2556@work-vm>
-References: <20171005105157.10831-1-dgilbert@redhat.com>
-	<20171005105157.10831-4-dgilbert@redhat.com>
-	<19c477ab-a3dc-a994-905b-7a8d01298a76@redhat.com>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1e075k-0004vl-Ei
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:25:36 -0400
+Date: Thu, 5 Oct 2017 10:24:59 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171005142459.GE10969@stefanha-x1.localdomain>
+References: <20171004154420.34596-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <19c477ab-a3dc-a994-905b-7a8d01298a76@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 3/5] hmp-commands-info: Fix "info
- rocker-FOO" misspellings
+In-Reply-To: <20171004154420.34596-1-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH] checkpatch: fix incompatibility with old
+ perl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,48 +27,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, alex.williamson@redhat.com, berrange@redhat.com
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 05/10/2017 12:51, Dr. David Alan Gilbert (git) wrote:
-> > From: Markus Armbruster <armbru@redhat.com>
-> >=20
-> > Screwed up in commit da76ee7.
->=20
-> Let me introduce you to these two aliases:
->=20
->         whatis =3D "show -s --pretty=3D'tformat:%h (\"%s\", %cd)' --dat=
-e=3Dshort"
->         pwhatis =3D "show -s --pretty=3D'tformat:%h, \"%s\", %cd' --dat=
-e=3Dshort"
->=20
-> $ git whatis da76ee7
-> da76ee76f7 ("hmp-commands-info: move info_cmds content out of monitor.c=
-", 2015-09-16)
->=20
-> pwhatis is more appropriate if you are including the commit at the end
-> of a parenthetical remark, like
->=20
->    ... (see commit message for 53ec73e, "block: Use bdrv_drain to
->    replace uncessary bdrv_drain_all", 2015-07-07).
+On Wed, Oct 04, 2017 at 06:44:20PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+> Do not use '/r' modifier which was introduced in perl 5.14.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  scripts/checkpatch.pl | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Ah well, that was just Markus's message; personally I'd
-uses a=20
-Fixes: da76ee7
+Thanks, applied to my tracing tree:
+https://github.com/stefanha/qemu/commits/tracing
 
-then we've got a chance of automation.
-
-Dave
-
-> Paolo
->=20
-> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> > Message-Id: <20171002134538.23332-2-armbru@redhat.com>
-> > Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Stefan
