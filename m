@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06Yc-0007B6-Ld
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:23 -0400
+	(envelope-from <tgolembi@redhat.com>) id 1e06Yf-0007C3-Ql
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06Ya-0008G1-Lm
+	(envelope-from <tgolembi@redhat.com>) id 1e06Yc-0008Hi-Pk
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:25 -0400
+Received: from mail-wr0-f171.google.com ([209.85.128.171]:53276)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1e06Yc-0008GY-J1
 	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56080)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06Ya-0008Fc-Fz
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:20 -0400
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu,  5 Oct 2017 15:50:36 +0200
-Message-Id: <1507211474-188400-3-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
-References: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
+Received: by mail-wr0-f171.google.com with SMTP id y44so3195976wry.10
+	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 06:51:21 -0700 (PDT)
+Date: Thu, 5 Oct 2017 15:51:18 +0200
+From: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
+Message-ID: <20171005155118.51a5bea3@fiorina>
+In-Reply-To: <cover.1505998455.git.tgolembi@redhat.com>
+References: <cover.1505998455.git.tgolembi@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 02/40] qom: introduce
- type_register_static_array()
+Subject: Re: [Qemu-devel] [PATCH v2 0/1] linux: Buffers/caches in VirtIO
+ Balloon driver stats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: linux-mm@kvack.org, virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org, kvm@vger.kernel.org, virtio-dev@lists.oasis-open.org
+Cc: Wei Wang <wei.w.wang@intel.com>, Shaohua Li <shli@fb.com>, Huang Ying <ying.huang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-it will help to remove code duplication of registration
-static types in places that have open coded loop to
-perform batch type registering.
+On Thu, 21 Sep 2017 14:55:40 +0200
+Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com> wrote:
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
----
- include/qom/object.h | 10 ++++++++++
- qom/object.c         |  9 +++++++++
- 2 files changed, 19 insertions(+)
+> Linux driver part
+>=20
+> v2:
+> - fixed typos
+>=20
+> Tom=C3=A1=C5=A1 Golembiovsk=C3=BD (1):
+>   virtio_balloon: include buffers and cached memory statistics
+>=20
+>  drivers/virtio/virtio_balloon.c     | 11 +++++++++++
+>  include/uapi/linux/virtio_balloon.h |  4 +++-
+>  mm/swap_state.c                     |  1 +
+>  3 files changed, 15 insertions(+), 1 deletion(-)
+>=20
+> --=20
+> 2.14.1
+>=20
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 76a5e3a..ce25567 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -789,6 +789,16 @@ Type type_register_static(const TypeInfo *info);
- Type type_register(const TypeInfo *info);
-=20
- /**
-+ * type_register_static_array:
-+ * @infos: The array of the new type #TypeInfo structures.
-+ * @nr_infos: number of entries in @infos
-+ *
-+ * @infos and all of the strings it points to should exist for the life =
-time
-+ * that the type is registered.
-+ */
-+void type_register_static_array(const TypeInfo *infos, int nr_infos);
-+
-+/**
-  * object_class_dynamic_cast_assert:
-  * @klass: The #ObjectClass to attempt to cast.
-  * @typename: The QOM typename of the class to cast to.
-diff --git a/qom/object.c b/qom/object.c
-index 3e18537..f4c377a 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -151,6 +151,15 @@ TypeImpl *type_register_static(const TypeInfo *info)
-     return type_register(info);
- }
-=20
-+void type_register_static_array(const TypeInfo *infos, int nr_infos)
-+{
-+    int i;
-+
-+    for (i =3D 0; i < nr_infos; i++) {
-+        type_register_static(&infos[i]);
-+    }
-+}
-+
- static TypeImpl *type_get_by_name(const char *name)
- {
-     if (name =3D=3D NULL) {
+ping
+
 --=20
-2.7.4
+Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
