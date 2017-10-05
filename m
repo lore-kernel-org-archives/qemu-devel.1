@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e07MH-0007RH-1Q
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:42:42 -0400
+	(envelope-from <eblake@redhat.com>) id 1e07OS-0000fd-N8
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:44:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e07MG-0000pR-3y
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:42:41 -0400
+	(envelope-from <eblake@redhat.com>) id 1e07ON-0002Qk-5F
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:44:56 -0400
 References: <20171004014347.25099-1-eblake@redhat.com>
-	<20171004014347.25099-3-eblake@redhat.com>
-	<20171005143509.GF10969@stefanha-x1.localdomain>
+	<20171004014347.25099-6-eblake@redhat.com>
+	<20171005144119.GG10969@stefanha-x1.localdomain>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <ed2c2c4b-3894-6de1-082d-9476391a12ed@redhat.com>
-Date: Thu, 5 Oct 2017 09:41:59 -0500
+Message-ID: <36585356-7cb7-30c7-bfe4-db6a56796b1d@redhat.com>
+Date: Thu, 5 Oct 2017 09:44:36 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171005143509.GF10969@stefanha-x1.localdomain>
+In-Reply-To: <20171005144119.GG10969@stefanha-x1.localdomain>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="XpQqrDfke0e75fCAAeS8oAgoJqN7fcW5N"
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] block: Uniform handling of 0-length
- bdrv_get_block_status()
+	boundary="MxHIMhgElSuMXfF21xIbHk2EE11bqMPAr"
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] iotests: Add test 197 for covering
+ copy-on-read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +27,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, jcody@redhat.com, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, jcody@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XpQqrDfke0e75fCAAeS8oAgoJqN7fcW5N
+--MxHIMhgElSuMXfF21xIbHk2EE11bqMPAr
 From: Eric Blake <eblake@redhat.com>
 To: Stefan Hajnoczi <stefanha@redhat.com>
 Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com,
- jcody@redhat.com, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <ed2c2c4b-3894-6de1-082d-9476391a12ed@redhat.com>
-Subject: Re: [PATCH v2 2/5] block: Uniform handling of 0-length
- bdrv_get_block_status()
+ jcody@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Message-ID: <36585356-7cb7-30c7-bfe4-db6a56796b1d@redhat.com>
+Subject: Re: [PATCH v2 5/5] iotests: Add test 197 for covering copy-on-read
 References: <20171004014347.25099-1-eblake@redhat.com>
- <20171004014347.25099-3-eblake@redhat.com>
- <20171005143509.GF10969@stefanha-x1.localdomain>
-In-Reply-To: <20171005143509.GF10969@stefanha-x1.localdomain>
+ <20171004014347.25099-6-eblake@redhat.com>
+ <20171005144119.GG10969@stefanha-x1.localdomain>
+In-Reply-To: <20171005144119.GG10969@stefanha-x1.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 10/05/2017 09:35 AM, Stefan Hajnoczi wrote:
-> On Tue, Oct 03, 2017 at 08:43:44PM -0500, Eric Blake wrote:
->> Handle a 0-length block status request up front, with a uniform
->> return value claiming the area is not allocated.
+On 10/05/2017 09:41 AM, Stefan Hajnoczi wrote:
+> On Tue, Oct 03, 2017 at 08:43:47PM -0500, Eric Blake wrote:
+>> Add a test for qcow2 copy-on-read behavior, including exposure
+>> for the just-fixed bugs.
 >>
->> Most callers don't pass a length of 0 to bdrv_get_block_status()
->> and friends; but it definitely happens with a 0-length read when
->> copy-on-read is enabled.  While we could audit all callers to
->> ensure that they never make a 0-length request, and then assert
->> that fact, it was just as easy to fix things to always report
->> success (as long as the callers are careful to not go into an
->> infinite loop).  However, we had inconsistent behavior on whether
->> the status is reported as allocated or defers to the backing
->> layer, depending on what callbacks the driver implements, and
->> possibly wasting quite a few CPU cycles to get to that answer.
->> Consistently reporting unallocated up front doesn't really hurt
->> anything, and makes it easier both for callers (0-length requests
->> now have well-defined behavior) and for drivers (drivers don't
->> have to deal with 0-length requests).
+>> The copy-on-read behavior is always to a qcow2 image, but the
+>> test is careful to allow running with most image protocol/format
+>> combos as the backing file being copied from (luks being the
+>> exception, as it is harder to pass the right secret to all the
+>> right places).  In fact, for './check nbd', this appears to be
+>> the first time we've had a qcow2 image wrapping NBD, requiring
+>> an additional line in _filter_img_create to match the similar
+>> line in _filter_img_info.
+>>
+>> Invoking blkdebug to prove we don't write too much took some
+>> effort to get working; and it requires that $TEST_WRAP (based
+>> on $TEST_DIR) not be subject to word splitting.  We may decide
+>> later to have the entire iotests suite use relative rather than
+>> absolute names, to avoid problems inherited by the absolute
+>> name of $PWD or $TEST_DIR, at which point the sanity check in
+>> this commit could be simplified.
 >>
 >> Signed-off-by: Eric Blake <eblake@redhat.com>
 >>
 
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 >=20
-> If you respin, please consider using a separate if statement to make th=
-e
-> code clearer:
->=20
->   if (!nb_sectors) {
->       *pnum =3D 0;
->       return 0;
->   }
->   if (sector_num >=3D total_sectors) {
->       *pnum =3D 0;
->       return BDRV_BLOCK_EOF;
->   }
+> Aside from the 2GB request issue:
 
-In fact, I think I would prefer to prioritize BDRV_BLOCK_EOF as the
-first condition, rather than the second, by swapping those two
-statements (that is, reading beyond EOF should set the EOF bit,
-regardless of whether nb_sectors was non-zero).
+I'm wondering if it is easy enough to just capture the qemu-io output
+into a temporary holding area, grep that for success or OOM, then skip
+the test on OOM (for small machines) or log the success (for beefy
+spots), so that at least the test will not hold up CI efforts on small
+machines.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -95,7 +84,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---XpQqrDfke0e75fCAAeS8oAgoJqN7fcW5N
+--MxHIMhgElSuMXfF21xIbHk2EE11bqMPAr
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -104,14 +93,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnWRLcACgkQp6FrSiUn
-Q2rgeAgAlAOOkoU0FlSSmkoZf8gdxf5+rgMlI72kpvcwkY/y7BmWWhAOBu/+Mok6
-pdzdsKUGL5fAi9ugQHcpIBzGVB4MRDfNR6Pdnz0fflpqGDCFCCeL9IwtgORDpkuC
-j7iZ6NWNY1M8I10I/ALCBDY53+aj9LSDuk5uUHYXeoyMWtf4NB+yFgH6MX2PgQMK
-Z6ptc11sWq7ANN22ifywYAkKqmSLlZqAe9gkr3a5JvldG230trv9ILEag0XTuFYC
-83t+46B1h/7qFpvc/UZGi/23rdUVsfZmWTi91rNGyOxzkHkxtdfzlqW9H+mV+lwV
-EV1E84mvuUeLe1rCrT+2MY0vm9Cfvw==
-=SHT4
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnWRVQACgkQp6FrSiUn
+Q2pVsQf8DKuOPw1JGmtcpnH8C/JREGavqRv0WCJverPzLLkk88EXUekxmvn1eST/
+HIfEI0yCaQ9Fh0C36P4T7TyROzO86fVjh451AhFKjyZyEscVN4/B1XPozzFjaF7c
+SRHSbRevRHfgL6r7h5YA2+nzHTlu9tADdR1doWy17GL8lQg2EV9BntStGwvzdoPS
+XU0RWBdotW8od1KHCxlVw4zFPA22X62JsVGJNrGHXxRQJg4+PDKwxjyOzr5kT/t+
+EHJtFymdGBSqIY10u1vbBMvitYmJGGZAKeZ4QooTQVEky6G2gU41CrzhZr16pUNJ
+kxK665ZdD3J9/IYrKIbdrJeVUXkqcQ==
+=xtrn
 -----END PGP SIGNATURE-----
 
---XpQqrDfke0e75fCAAeS8oAgoJqN7fcW5N--
+--MxHIMhgElSuMXfF21xIbHk2EE11bqMPAr--
