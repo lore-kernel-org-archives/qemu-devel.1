@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1e048l-0003xh-8T
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:16:32 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1e048i-0003vx-2k
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:16:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1e048i-0000IF-Hb
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:16:31 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:56940)
+	(envelope-from <a.perevalov@samsung.com>) id 1e048f-0000Fk-CK
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:16:28 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:56929)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1e048i-0000HX-8a
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:16:28 -0400
+	id 1e048f-0000F5-1r
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:16:25 -0400
 From: Alexey Perevalov <a.perevalov@samsung.com>
-Date: Thu, 05 Oct 2017 14:16:09 +0300
-Message-id: <1507202170-22619-6-git-send-email-a.perevalov@samsung.com>
-In-reply-to: <1507202170-22619-1-git-send-email-a.perevalov@samsung.com>
-References: <1507202170-22619-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20171005111625eucas1p28ad35b246e6f964ca7d642cfa60df10d@eucas1p2.samsung.com>
-Subject: [Qemu-devel] [PATCH v11 5/6] migration: add blocktime calculation
- into postcopy-test
+Date: Thu, 05 Oct 2017 14:16:04 +0300
+Message-id: <1507202170-22619-1-git-send-email-a.perevalov@samsung.com>
+References: <CGME20171005111622eucas1p2093fedb3a69ca522d6b8260377b75419@eucas1p2.samsung.com>
+Subject: [Qemu-devel] [PATCH v11 0/6] calculate blocktime for postcopy live
+ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,137 +27,122 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Perevalov <a.perevalov@samsung.com>, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com, i.maximets@samsung.com, heetae82.ahn@samsung.com
 
-This patch just requests blocktime calculation,
-and check it in case when UFFD_FEATURE_THREAD_ID feature is set
-on the host.
+This is 11th version.
 
-Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
----
- tests/postcopy-test.c | 63 +++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 48 insertions(+), 15 deletions(-)
+The rationale for that idea is following:
+vCPU could suspend during postcopy live migration until faulted
+page is not copied into kernel. Downtime on source side it's a value -
+time interval since source turn vCPU off, till destination start runnig
+vCPU. But that value was proper value for precopy migration it really shows
+amount of time when vCPU is down. But not for postcopy migration, because
+several vCPU threads could susppend after vCPU was started. That is important
+to estimate packet drop for SDN software.
 
-diff --git a/tests/postcopy-test.c b/tests/postcopy-test.c
-index 8142f2a..4231cce 100644
---- a/tests/postcopy-test.c
-+++ b/tests/postcopy-test.c
-@@ -24,7 +24,8 @@
- 
- const unsigned start_address = 1024 * 1024;
- const unsigned end_address = 100 * 1024 * 1024;
--bool got_stop;
-+static bool got_stop;
-+static bool uffd_feature_thread_id;
- 
- #if defined(__linux__)
- #include <sys/syscall.h>
-@@ -54,6 +55,7 @@ static bool ufd_version_check(void)
-         g_test_message("Skipping test: UFFDIO_API failed");
-         return false;
-     }
-+    uffd_feature_thread_id = api_struct.features & UFFD_FEATURE_THREAD_ID;
- 
-     ioctl_mask = (__u64)1 << _UFFDIO_REGISTER |
-                  (__u64)1 << _UFFDIO_UNREGISTER;
-@@ -265,22 +267,48 @@ static uint64_t get_migration_pass(void)
-     return result;
- }
- 
--static void wait_for_migration_complete(void)
-+static bool get_src_status(void)
- {
-     QDict *rsp, *rsp_return;
-+    const char *status;
-+    bool result;
-+
-+    rsp = return_or_event(qmp("{ 'execute': 'query-migrate' }"));
-+    rsp_return = qdict_get_qdict(rsp, "return");
-+    status = qdict_get_str(rsp_return, "status");
-+    g_assert_cmpstr(status, !=,  "failed");
-+    result = strcmp(status, "completed") == 0;
-+    QDECREF(rsp);
-+    return result;
-+}
-+
-+static void read_blocktime(void)
-+{
-+    QDict *rsp, *rsp_return;
-+
-+    rsp = return_or_event(qmp("{ 'execute': 'query-migrate' }"));
-+    rsp_return = qdict_get_qdict(rsp, "return");
-+    g_assert(qdict_haskey(rsp_return, "postcopy-blocktime"));
-+    QDECREF(rsp);
-+}
-+
-+static void wait_for_migration_complete(QTestState *from, QTestState *to)
-+{
-     bool completed;
- 
-     do {
--        const char *status;
--
--        rsp = return_or_event(qmp("{ 'execute': 'query-migrate' }"));
--        rsp_return = qdict_get_qdict(rsp, "return");
--        status = qdict_get_str(rsp_return, "status");
--        completed = strcmp(status, "completed") == 0;
--        g_assert_cmpstr(status, !=,  "failed");
--        QDECREF(rsp);
-+
-+        /* test src state */
-+        global_qtest = from;
-+        completed = get_src_status();
-+
-         usleep(1000 * 100);
-     } while (!completed);
-+
-+    if (uffd_feature_thread_id) {
-+        global_qtest = to;
-+        read_blocktime();
-+    }
- }
- 
- static void wait_for_migration_pass(void)
-@@ -364,8 +392,6 @@ static void test_migrate(void)
-     char *bootpath = g_strdup_printf("%s/bootsect", tmpfs);
-     const char *arch = qtest_get_arch();
- 
--    got_stop = false;
--
-     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
-         init_bootfile_x86(bootpath);
-         cmd_src = g_strdup_printf("-machine accel=kvm:tcg -m 150M"
-@@ -425,6 +451,15 @@ static void test_migrate(void)
-     g_assert(qdict_haskey(rsp, "return"));
-     QDECREF(rsp);
- 
-+    global_qtest = to;
-+    rsp = qmp("{ 'execute': 'migrate-set-capabilities',"
-+                  "'arguments': { "
-+                      "'capabilities': [ {"
-+                          "'capability': 'postcopy-blocktime',"
-+                          "'state': true } ] } }");
-+    g_assert(qdict_haskey(rsp, "return"));
-+    QDECREF(rsp);
-+
-     /* We want to pick a speed slow enough that the test completes
-      * quickly, but that it doesn't complete precopy even on a slow
-      * machine, so also set the downtime.
-@@ -441,7 +476,6 @@ static void test_migrate(void)
-     g_assert(qdict_haskey(rsp, "return"));
-     QDECREF(rsp);
- 
--
-     /* Wait for the first serial output from the source */
-     wait_for_serial("src_serial");
- 
-@@ -467,8 +501,7 @@ static void test_migrate(void)
-     qmp_eventwait("RESUME");
- 
-     wait_for_serial("dest_serial");
--    global_qtest = from;
--    wait_for_migration_complete();
-+    wait_for_migration_complete(from, to);
- 
-     qtest_quit(from);
- 
+(V11 -> V10)
+    - rebase
+    - update documentation (comment from David)
+    - postcopy_notifier was removed from PostcopyBlocktimeContext (comment from
+David)
+    - fix "since 2.10" for postcopy-vcpu-blocktime (comment from Eric)
+    - fix order in mark_postcopy_blocktime_begin/end (comment from David),
+but I think it still have a slim race condition
+    - remove error_report from fill_destination_postcopy_migration_info (comment
+from David)
+
+(V9 -> V10)
+    - rebase
+    - patch "update kernel header for UFFD_FEATURE_*" has changed,
+and was generated by  scripts/update-linux-headers.sh as David suggested. 
+
+
+(V8 -> V9)
+    - rebase
+    - traces
+
+(V7 -> V8)
+    - just one comma in
+"migration: fix hardcoded function name in error report"
+It was really missed, but fixed in futher patch.
+
+(V6 -> V7)
+    - copied bitmap was placed into RAMBlock as another migration
+related bitmaps.
+    - Ordering of mark_postcopy_blocktime_end call and ordering
+of checking copied bitmap were changed.
+    - linewrap style defects
+    - new patch "postcopy_place_page factoring out"
+    - postcopy_ram_supported_by_host accepts
+MigrationIncomingState in qmp_migrate_set_capabilities
+    - minor fixes of documentation. 
+    and huge description of get_postcopy_total_blocktime was
+moved. Davids comment.
+
+(V5 -> V6)
+    - blocktime was added into hmp command. Comment from David.
+    - bitmap for copied pages was added as well as check in *_begin/_end
+functions. Patch uses just introduced RAMBLOCK_FOREACH. Comment from David.
+    - description of receive_ufd_features/request_ufd_features. Comment from David.
+    - commit message headers/@since references were modified. Comment from Eric.
+    - also typos in documentation. Comment from Eric.
+    - style and description of field in MigrationInfo. Comment from Eric.
+    - ufd_check_and_apply (former ufd_version_check) is calling twice,
+so my previous patch contained double allocation of blocktime context and
+as a result memory leak. In this patch series it was fixed.
+
+(V4 -> V5)
+    - fill_destination_postcopy_migration_info empty stub was missed for none linux
+build
+
+(V3 -> V4)
+    - get rid of Downtime as a name for vCPU waiting time during postcopy migration
+    - PostcopyBlocktimeContext renamed (it was just BlocktimeContext)
+    - atomic operations are used for dealing with fields of PostcopyBlocktimeContext
+affected in both threads.
+    - hardcoded function names in error_report were replaced to %s and __line__
+    - this patch set includes postcopy-downtime capability, but it used on
+destination, coupled with not possibility to return calculated downtime back
+to source to show it in query-migrate, it looks like a big trade off
+    - UFFD_API have to be sent notwithstanding need or not to ask kernel
+for a feature, due to kernel expects it in any case (see patch comment)
+    - postcopy_downtime included into query-migrate output
+    - also this patch set includes trivial fix
+migration: fix hardcoded function name in error report
+maybe that is a candidate for qemu-trivial mailing list, but I already
+sent "migration: Fixed code style" and it was unclaimed.
+
+(V2 -> V3)
+    - Downtime calculation approach was changed, thanks to Peter Xu
+    - Due to previous point no more need to keep GTree as well as bitmap of cpus.
+So glib changes aren't included in this patch set, it could be resent in
+another patch set, if it will be a good reason for it.
+    - No procfs traces in this patchset, if somebody wants it, you could get it
+from patchwork site to track down page fault initiators.
+    - UFFD_FEATURE_THREAD_ID is requesting only when kernel supports it
+    - It doesn't send back the downtime, just trace it
+
+This patch set is based on commit
+[PATCH v10 0/3] Add bitmap for received pages in postcopy migration
+
+Both patch sets were rebased on 
+commit d147f7e815f97cb477e223586bcb80c316ae10ea
+
+Alexey Perevalov (6):
+  migration: introduce postcopy-blocktime capability
+  migration: add postcopy blocktime ctx into MigrationIncomingState
+  migration: calculate vCPU blocktime on dst side
+  migration: postcopy_blocktime documentation
+  migration: add blocktime calculation into postcopy-test
+  migration: add postcopy total blocktime into query-migrate
+
+ docs/devel/migration.txt |  13 +++
+ hmp.c                    |  15 +++
+ migration/migration.c    |  51 +++++++++-
+ migration/migration.h    |  13 +++
+ migration/postcopy-ram.c | 257 ++++++++++++++++++++++++++++++++++++++++++++++-
+ migration/trace-events   |   6 +-
+ qapi/migration.json      |  16 ++-
+ tests/postcopy-test.c    |  63 +++++++++---
+ 8 files changed, 411 insertions(+), 23 deletions(-)
+
 -- 
 2.7.4
