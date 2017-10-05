@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1e08Bd-0007Qu-1Z
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 11:35:47 -0400
+	(envelope-from <stefanha@redhat.com>) id 1e08D3-00008N-1f
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 11:37:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1e08BZ-0002l2-6T
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 11:35:45 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:38712)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1e08BZ-0002ks-24
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 11:35:41 -0400
-Received: by mail-oi0-x244.google.com with SMTP id t134so1778240oih.5
-	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 08:35:40 -0700 (PDT)
+	(envelope-from <stefanha@redhat.com>) id 1e08D0-0003m8-AK
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 11:37:12 -0400
+Date: Thu, 5 Oct 2017 11:36:52 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171005153652.GH10969@stefanha-x1.localdomain>
+References: <20171004014347.25099-1-eblake@redhat.com>
+	<20171004014347.25099-5-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171005152856.6166-1-berrange@redhat.com>
-References: <20171005152856.6166-1-berrange@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 5 Oct 2017 17:35:39 +0200
-Message-ID: <CAJ+F1C+t+1Zf8CTsWMddS6WP4jFXDUqex_wa9kJtZW-VkzgEvg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] char: don't skip client cleanup if
- 'connected' flag is unset
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171004014347.25099-5-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 4/5] block: Perform copy-on-read in loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,112 +23,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, jcody@redhat.com, qemu-block@nongnu.org, qemu-stable@nongnu.org, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Hi
-
-On Thu, Oct 5, 2017 at 5:28 PM, Daniel P. Berrange <berrange@redhat.com> wr=
-ote:
-> The tcp_chr_free_connection & tcp_chr_disconnect methods both
-> skip all of their cleanup work unless the 's->connected' flag
-> is set.  This flag is set when the incoming client connection
-> is ready to use. Crucially this is *after* the TLS handshake
-> has been completed. So if the TLS handshake fails and we try
-> to cleanup the failed client, all the cleanup is skipped as
-> 's->connected' is still false.
->
-> The only important thing that should be skipped in this case
-> is sending of the CHR_EVENT_CLOSED, because we never got as
-> far as sending the corresponding CHR_EVENT_OPENED. Every other
-> bit of cleanup can be robust against being called even when
-> s->connected is false.
->
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+On Tue, Oct 03, 2017 at 08:43:46PM -0500, Eric Blake wrote:
+> Improve our braindead copy-on-read implementation.  Pre-patch,
+> we have multiple issues:
+> - we create a bounce buffer and perform a write for the entire
+> request, even if the active image already has 99% of the
+> clusters occupied, and really only needs to copy-on-read the
+> remaining 1% of the clusters
+> - our bounce buffer was as large as the read request, and can
+> needlessly exhaust our memory by using double the memory of
+> the request size (the original request plus our bounce buffer),
+> rather than a capped maximum overhead beyond the original
+> - if a driver has a max_transfer limit, we are bypassing the
+> normal code in bdrv_aligned_preadv() that fragments to that
+> limit, and instead attempt to read the entire buffer from the
+> driver in one go, which some drivers may assert on
+> - a client can request a large request of nearly 2G such that
+> rounding the request out to cluster boundaries results in a
+> byte count larger than 2G.  While this cannot exceed 32 bits,
+> it DOES have some follow-on problems:
+> -- the call to bdrv_driver_pread() can assert for exceeding
+> BDRV_REQUEST_MAX_BYTES, if the driver is old and lacks
+> .bdrv_co_preadv
+> -- if the buffer is all zeroes, the subsequent call to
+> bdrv_co_do_pwrite_zeroes is a no-op due to a negative size,
+> which means we did not actually copy on read
+> 
+> Fix all of these issues by breaking up the action into a loop,
+> where each iteration is capped to sane limits.  Also, querying
+> the allocation status allows us to optimize: when data is
+> already present in the active layer, we don't need to bounce.
+> 
+> Note that the code has a telling comment that copy-on-read
+> should probably be a filter driver rather than a bolt-in hack
+> in io.c; but that remains a task for another day.
+> 
+> CC: qemu-stable@nongnu.org
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
 > ---
->  chardev/char-socket.c | 31 +++++++++++++++++--------------
->  1 file changed, 17 insertions(+), 14 deletions(-)
->
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index e65148fe97..a34d4d72c2 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -332,10 +332,6 @@ static void tcp_chr_free_connection(Chardev *chr)
->      SocketChardev *s =3D SOCKET_CHARDEV(chr);
->      int i;
->
-> -    if (!s->connected) {
-> -        return;
-> -    }
-> -
->      if (s->read_msgfds_num) {
->          for (i =3D 0; i < s->read_msgfds_num; i++) {
->              close(s->read_msgfds[i]);
-> @@ -347,10 +343,14 @@ static void tcp_chr_free_connection(Chardev *chr)
->
->      tcp_set_msgfds(chr, NULL, 0);
->      remove_fd_in_watch(chr);
-> -    object_unref(OBJECT(s->sioc));
-> -    s->sioc =3D NULL;
-> -    object_unref(OBJECT(s->ioc));
-> -    s->ioc =3D NULL;
-> +    if (s->sioc) {
-> +        object_unref(OBJECT(s->sioc));
-> +        s->sioc =3D NULL;
-> +    }
-> +    if (s->ioc) {
-> +        object_unref(OBJECT(s->ioc));
-> +        s->ioc =3D NULL;
-> +    }
+> v2: avoid uninit ret on 0-length op [patchew, Kevin]
+> ---
+>  block/io.c | 120 +++++++++++++++++++++++++++++++++++++++++--------------------
+>  1 file changed, 82 insertions(+), 38 deletions(-)
 
-object_unref() and OBJECT() are null-safe.
-
->      g_free(chr->filename);
->      chr->filename =3D NULL;
->      s->connected =3D 0;
-> @@ -394,22 +394,25 @@ static void update_disconnected_filename(SocketChar=
-dev *s)
->                                           s->is_listen, s->is_telnet);
->  }
->
-> +/* NB may be called even if tcp_chr_connect has not been
-> + * reached, due to TLS or telnet initialization failure,
-> + * so can *not* assume s->connected =3D=3D true
-> + */
->  static void tcp_chr_disconnect(Chardev *chr)
->  {
->      SocketChardev *s =3D SOCKET_CHARDEV(chr);
-> -
-> -    if (!s->connected) {
-> -        return;
-> -    }
-> +    bool emitClose =3D s->connected;
-
-ewh, which code style do you pick today? :)
-
->
->      tcp_chr_free_connection(chr);
->
-> -    if (s->listen_ioc) {
-> +    if (s->listen_ioc && s->listen_tag =3D=3D 0) {
->          s->listen_tag =3D qio_channel_add_watch(
->              QIO_CHANNEL(s->listen_ioc), G_IO_IN, tcp_chr_accept, chr, NU=
-LL);
->      }
->      update_disconnected_filename(s);
-> -    qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
-> +    if (emitClose) {
-> +        qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
-> +    }
->      if (s->reconnect_time) {
->          qemu_chr_socket_restart_timer(chr);
->      }
-> --
-> 2.13.5
->
->
-
-other than that, looks good to me
-
---=20
-Marc-Andr=C3=A9 Lureau
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
