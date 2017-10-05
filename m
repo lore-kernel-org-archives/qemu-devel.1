@@ -1,36 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1e05OG-0001fF-C1
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 08:36:37 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e05OH-0001fM-1v
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 08:36:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1e05OD-0001tC-7s
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 08:36:36 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56636
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1e05OD-0001s7-2J
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e05OD-0001uE-Mq
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 08:36:37 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:49423)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e05OD-0001tN-Hy
 	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 08:36:33 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v95CZO9u049949
-	for <qemu-devel@nongnu.org>; Thu, 5 Oct 2017 08:36:28 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ddmbk1y8n-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 08:36:28 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Thu, 5 Oct 2017 13:36:27 +0100
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Thu,  5 Oct 2017 14:36:23 +0200
-In-Reply-To: <1507206983-16096-1-git-send-email-pmorel@linux.vnet.ibm.com>
-References: <1507206983-16096-1-git-send-email-pmorel@linux.vnet.ibm.com>
-Message-Id: <1507206983-16096-2-git-send-email-pmorel@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v1] pci: Set PCI-bus device entry before
- initializing bus master
+Received: by mail-qt0-x241.google.com with SMTP id o3so24997277qte.6
+	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 05:36:33 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1506935300-132598-2-git-send-email-imammedo@redhat.com>
+	<1507111682-66171-1-git-send-email-imammedo@redhat.com>
+	<1507111682-66171-3-git-send-email-imammedo@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8f2b09ab-3691-85bc-b4da-88f79c08bd5e@amsat.org>
+Date: Thu, 5 Oct 2017 09:36:28 -0300
+MIME-Version: 1.0
+In-Reply-To: <1507111682-66171-3-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] qom: introduce
+ type_register_static_array()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,58 +37,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, marcel@redhat.com, cohuck@redhat.com, zyimin@linux.vnet.ibm.com
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com
 
-When initializing the PCI-bus master pci_init_bus_master(PCIDevice *)
-calls pci_device_iommu_address_space(PCIDevice *) which in turn calls
-iommu_bus->iommu_fn(bus, opaque,devfn)
+On 10/04/2017 07:08 AM, Igor Mammedov wrote:
+> it will help to remove code duplication of registration
+> static types in places that have open coded loop to
+> perform batch type registering.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-If the device entry of the PCI-bus is not initialized to point to the
-PCIDevice structure, the iommu_fn() function, getting only bus and
-devno, is unable to retrieve the PCIDevice.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Usually it is not a problem as the DMA address space is depending of
-the BUS but in an architecture like S390, each PCI Device can have
-its own DMA address space.
-Being able to setup the DMA address space at the right moment will
-greatly simplify the implementation.
-
-This patch proposes to setup the bus device entry before calling
-pci_init_bus_master() and reset the entry in case of error.
-
-Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
----
- hw/pci/pci.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 1e6fb88..3e64492 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -1026,6 +1026,7 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
-     address_space_init(&pci_dev->bus_master_as,
-                        &pci_dev->bus_master_container_region, pci_dev->name);
- 
-+    bus->devices[devfn] = pci_dev;
-     if (qdev_hotplug) {
-         pci_init_bus_master(pci_dev);
-     }
-@@ -1062,6 +1063,7 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
-     if (local_err) {
-         error_propagate(errp, local_err);
-         do_pci_unregister_device(pci_dev);
-+        bus->devices[devfn] = NULL;
-         return NULL;
-     }
- 
-@@ -1071,7 +1073,6 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
-         config_write = pci_default_write_config;
-     pci_dev->config_read = config_read;
-     pci_dev->config_write = config_write;
--    bus->devices[devfn] = pci_dev;
-     pci_dev->version_id = 2; /* Current pci device vmstate version */
-     return pci_dev;
- }
--- 
-2.7.4
+> ---
+>  include/qom/object.h | 10 ++++++++++
+>  qom/object.c         |  9 +++++++++
+>  2 files changed, 19 insertions(+)
+> 
+> diff --git a/include/qom/object.h b/include/qom/object.h
+> index 76a5e3a..ce25567 100644
+> --- a/include/qom/object.h
+> +++ b/include/qom/object.h
+> @@ -789,6 +789,16 @@ Type type_register_static(const TypeInfo *info);
+>  Type type_register(const TypeInfo *info);
+>  
+>  /**
+> + * type_register_static_array:
+> + * @infos: The array of the new type #TypeInfo structures.
+> + * @nr_infos: number of entries in @infos
+> + *
+> + * @infos and all of the strings it points to should exist for the life time
+> + * that the type is registered.
+> + */
+> +void type_register_static_array(const TypeInfo *infos, int nr_infos);
+> +
+> +/**
+>   * object_class_dynamic_cast_assert:
+>   * @klass: The #ObjectClass to attempt to cast.
+>   * @typename: The QOM typename of the class to cast to.
+> diff --git a/qom/object.c b/qom/object.c
+> index 3e18537..f4c377a 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -151,6 +151,15 @@ TypeImpl *type_register_static(const TypeInfo *info)
+>      return type_register(info);
+>  }
+>  
+> +void type_register_static_array(const TypeInfo *infos, int nr_infos)
+> +{
+> +    int i;
+> +
+> +    for (i = 0; i < nr_infos; i++) {
+> +        type_register_static(&infos[i]);
+> +    }
+> +}
+> +
+>  static TypeImpl *type_get_by_name(const char *name)
+>  {
+>      if (name == NULL) {
+> 
