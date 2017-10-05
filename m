@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e02ek-0000Ko-Fy
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 05:41:27 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e02wE-0003zB-6F
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 05:59:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e02eh-0006dd-6G
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 05:41:26 -0400
-References: <ce76e902-f048-1110-15cf-0dc7251322b2@virtuozzo.com>
-	<20170912094622.GC29136@localhost.localdomain>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e02w9-00042R-CP
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 05:59:30 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:6045 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1e02w9-00041Q-08
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 05:59:25 -0400
+References: <20170925135801.144261-1-vsementsov@virtuozzo.com>
+	<20170925135801.144261-9-vsementsov@virtuozzo.com>
+	<b8b01f1a-6e7b-342f-02b6-b7386bff1500@redhat.com>
+	<a4fb096f-7995-ad85-64b7-68a124410e86@redhat.com>
+	<cdec3d7e-04c9-a5e3-d0e7-293e2c7633c8@virtuozzo.com>
+	<ca5a605d-e548-5860-1e40-abcac6017683@virtuozzo.com>
+	<ad2fa9f3-29b1-c00b-1e51-07604f0b45e0@redhat.com>
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <4eebe41a-ddb3-a078-04eb-409fd305dd7c@virtuozzo.com>
-Date: Thu, 5 Oct 2017 12:41:16 +0300
+Message-ID: <0dbd80a0-e6ff-43d6-eab3-7e81675e2a2b@virtuozzo.com>
+Date: Thu, 5 Oct 2017 12:59:15 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170912094622.GC29136@localhost.localdomain>
+In-Reply-To: <ad2fa9f3-29b1-c00b-1e51-07604f0b45e0@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] loading bitmaps in invalidate_cache fails
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 8/8] nbd: Minimal structured
+ read for client
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,137 +35,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
 
-12.09.2017 12:46, Kevin Wolf wrote:
-> Am 11.09.2017 um 18:51 hat Vladimir Sementsov-Ogievskiy geschrieben:
->> Hi Kevin!
->>
->> I'm confused with relations of permissions and invalidation, can you p=
-lease
->> help?
->>
->> Now dirty bitmaps are loaded in invalidate_cache. Here is a problem wi=
-th
->> migration:
->>
->> 1. destination starts (inactive)
->>
->> 2. load bitmaps readonly
->>
->> ...
->>
->> 3. invalidate_cache: here we should make our loaded bitmaps RW, ie set
->> BdrvDirtyBitmap->readonly
->>
->>  =C2=A0 to false and set IN_USE bit in the image. But the latter goes =
-into
->> "bdrv_aligned_pwritev: Assertion `child->perm & BLK_PERM_WRITE' failed=
-",
->>
->>  =C2=A0 because in bdrv_invalidate_cache we call bdrv_set_perm after
->> drv->bdrv_invalidate_cache.
->>
->>
->> What is the true way of fixing this?
-> It's all still a bit of a mess. :-(
+03.10.2017 17:06, Paolo Bonzini wrote:
+> On 03/10/2017 15:35, Vladimir Sementsov-Ogievskiy wrote:
+>>>> In the end this probably means that you have a read_chunk_header
+>>>> function and a read_chunk function.=C2=A0 READ has a loop that calls
+>>>> read_chunk_header followed by direct reading into the QEMUIOVector,
+>>>> while everyone else calls read_chunk.
+>>> accordingly to spec, we can receive several error reply chunks to any
+>>> request,
+>>> so loop, receiving them should be common for all requests I think
+>> as well as handling error chunks should be common..
+> Yes, reading error chunks should be part of read_chunk_header.
 >
-> I think it makes a lot of sense that we should activate the lower layer=
-s
-> first, so the order in bdrv_invalidate_cache() looks wrong. It should b=
-e
-> something like this:
->
-> 1. invalidate_cache() for the children
-> 2. Update permissions for non-BDRV_O_INACTIVE
-> 3. Call drv->bdrv_invalidate_cache()
->
-> I'm currently working on some fixes related to bdrv_reopen() where
-> things become tricky because the updated permissions shouldn't depend o=
-n
-> the current state, but on the state after the operation has finished.
->
-> You get something similar here, but I think just making sure that we
-> clear BDRV_O_INACTIVE before updating the permissions is enough here.
-> The only thing to be careful is that in error cases, we need to revert
-> both the flag and the permissions then.
->
-> Kevin
+> Paolo
 
-I have experimented a bit. Permission for qcow2 bs is actually set in=20
-"parent->role->activate(parent, &local_err);",
-
-so a patch like this fixes the bug (of course, some roll back of=20
-set_perm and activate should be added to error path)
-
-@@ -4126,21 +4129,6 @@ void bdrv_invalidate_cache(BlockDriverState *bs,=20
-Error **errp)
- =C2=A0=C2=A0=C2=A0=C2=A0 }
-
- =C2=A0=C2=A0=C2=A0=C2=A0 bs->open_flags &=3D ~BDRV_O_INACTIVE;
--=C2=A0=C2=A0=C2=A0 if (bs->drv->bdrv_invalidate_cache) {
--=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bs->drv->bdrv_invalidate_cach=
-e(bs, &local_err);
--=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (local_err) {
--=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bs->o=
-pen_flags |=3D BDRV_O_INACTIVE;
--=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error=
-_propagate(errp, local_err);
--=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retur=
-n;
--=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
--=C2=A0=C2=A0=C2=A0 }
--
--=C2=A0=C2=A0=C2=A0 ret =3D refresh_total_sectors(bs, bs->total_sectors);
--=C2=A0=C2=A0=C2=A0 if (ret < 0) {
--=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bs->open_flags |=3D BDRV_O_IN=
-ACTIVE;
--=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg_errno(errp, -ret, =
-"Could not refresh total sector=20
-count");
--=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
--=C2=A0=C2=A0=C2=A0 }
-
- =C2=A0=C2=A0=C2=A0=C2=A0 /* Update permissions, they may differ for inac=
-tive nodes */
- =C2=A0=C2=A0=C2=A0=C2=A0 bdrv_get_cumulative_perm(bs, &perm, &shared_per=
-m);
-@@ -4161,6 +4149,22 @@ void bdrv_invalidate_cache(BlockDriverState *bs,=20
-Error **errp)
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- }
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
- =C2=A0=C2=A0=C2=A0=C2=A0 }
-+
-+=C2=A0=C2=A0=C2=A0 if (bs->drv->bdrv_invalidate_cache) {
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bs->drv->bdrv_invalidate_cach=
-e(bs, &local_err);
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (local_err) {
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bs->o=
-pen_flags |=3D BDRV_O_INACTIVE;
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error=
-_propagate(errp, local_err);
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retur=
-n;
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-+=C2=A0=C2=A0=C2=A0 }
-+
-+=C2=A0=C2=A0=C2=A0 ret =3D refresh_total_sectors(bs, bs->total_sectors);
-+=C2=A0=C2=A0=C2=A0 if (ret < 0) {
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bs->open_flags |=3D BDRV_O_IN=
-ACTIVE;
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg_errno(errp, -ret, =
-"Could not refresh total sector=20
-count");
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
-+=C2=A0=C2=A0=C2=A0 }
- =C2=A0}
-
-
-however, I doubt that it is safe to call ->activate before=20
-invalidate_cache... I have no more ideas, just a patch that shows a=20
-regression :(
 
 --=20
 Best regards,
