@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e02A3-0002BB-4s
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 05:09:48 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e02D5-0003N9-E3
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 05:12:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e02A2-0001bc-9q
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 05:09:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40720)
+	(envelope-from <imammedo@redhat.com>) id 1e02D0-0005nu-Ec
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 05:12:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60412)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e02A2-0001a7-3M
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 05:09:42 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e02D0-0005nS-4q
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 05:12:46 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 490A7882FB
-	for <qemu-devel@nongnu.org>; Thu,  5 Oct 2017 09:09:41 +0000 (UTC)
-Date: Thu, 5 Oct 2017 10:09:37 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171005090937.GA4300@work-vm>
-References: <20171002134538.23332-1-armbru@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 2746BC04AC50
+	for <qemu-devel@nongnu.org>; Thu,  5 Oct 2017 09:12:45 +0000 (UTC)
+Date: Thu, 5 Oct 2017 11:12:41 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171005111241.4085e98d@nial.brq.redhat.com>
+In-Reply-To: <5165bbdd-b36a-ab89-e819-c85a788f8415@redhat.com>
+References: <1507049162-27026-1-git-send-email-thuth@redhat.com>
+	<20171003184946.GR17385@localhost.localdomain>
+	<20171005103629.156e9a9b@nial.brq.redhat.com>
+	<5165bbdd-b36a-ab89-e819-c85a788f8415@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171002134538.23332-1-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] hmp-commands-info: Texinfo fixes
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qdev: Check for the availability of a
+ hotplug controller before adding a device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,22 +36,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> Markus Armbruster (3):
->   hmp-commands-info: Fix "info rocker-FOO" misspellings
->   hmp-commands-info: Move Texinfo stanzas to conventional place
->   hmp-commands-info: Change "@findex FOO" to "@findex info FOO"
+On Thu, 5 Oct 2017 11:00:29 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Queued for HMP
-
->  hmp-commands-info.hx | 138 +++++++++++++++++++++++++--------------------------
->  1 file changed, 69 insertions(+), 69 deletions(-)
+> On 05.10.2017 10:36, Igor Mammedov wrote:
+> > On Tue, 3 Oct 2017 15:49:46 -0300
+> > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >   
+> >> On Tue, Oct 03, 2017 at 06:46:02PM +0200, Thomas Huth wrote:  
+> >>> The qdev_unplug() function contains a g_assert(hotplug_ctrl) statement,
+> >>> so QEMU crashes when the user tries to device_add + device_del a device
+> >>> that does not have a corresponding hotplug controller. This could be
+> >>> provoked for a couple of devices in the past (see commit 4c93950659487c7ad
+> >>> or 84ebd3e8c7d4fe955 for example). So devices clearly need a hotplug
+> >>> controller when they are suitable for device_add.
+> >>> The code in qdev_device_add() already checks whether the bus has a proper
+> >>> hotplug controller, but for devices that do not have a corresponding bus,
+> >>> there is no appropriate check available. In that case we should check
+> >>> whether the machine itself provides a suitable hotplug controller and
+> >>> refuse to plug the device if none is available.
+> >>>
+> >>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >>> ---
+> >>>  This is the follow-up patch from my earlier try "hw/core/qdev: Do not
+> >>>  allow hot-plugging without hotplug controller" ... AFAICS the function
+> >>>  qdev_device_add() is now the right spot to do the check.
+> >>>
+> >>>  hw/core/qdev.c         | 28 ++++++++++++++++++++--------
+> >>>  include/hw/qdev-core.h |  1 +
+> >>>  qdev-monitor.c         |  9 +++++++++
+> >>>  3 files changed, 30 insertions(+), 8 deletions(-)
+> >>>
+> >>> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> >>> index 606ab53..a953ec9 100644
+> >>> --- a/hw/core/qdev.c
+> >>> +++ b/hw/core/qdev.c
+> >>> @@ -253,19 +253,31 @@ void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
+> >>>      dev->alias_required_for_version = required_for_version;
+> >>>  }
+> >>>  
+> >>> +HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev)
+> >>> +{
+> >>> +    MachineState *machine;
+> >>> +    MachineClass *mc;
+> >>> +    Object *m_obj = qdev_get_machine();
+> >>> +
+> >>> +    if (object_dynamic_cast(m_obj, TYPE_MACHINE)) {
+> >>> +        machine = MACHINE(m_obj);
+> >>> +        mc = MACHINE_GET_CLASS(machine);
+> >>> +        if (mc->get_hotplug_handler) {
+> >>> +            return mc->get_hotplug_handler(machine, dev);
+> >>> +        }
+> >>> +    }
+> >>> +
+> >>> +    return NULL;
+> >>> +}
+> >>> +
+> >>>  HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev)
+> >>>  {
+> >>> -    HotplugHandler *hotplug_ctrl = NULL;
+> >>> +    HotplugHandler *hotplug_ctrl;
+> >>>  
+> >>>      if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
+> >>>          hotplug_ctrl = dev->parent_bus->hotplug_handler;
+> >>> -    } else if (object_dynamic_cast(qdev_get_machine(), TYPE_MACHINE)) {
+> >>> -        MachineState *machine = MACHINE(qdev_get_machine());
+> >>> -        MachineClass *mc = MACHINE_GET_CLASS(machine);
+> >>> -
+> >>> -        if (mc->get_hotplug_handler) {
+> >>> -            hotplug_ctrl = mc->get_hotplug_handler(machine, dev);
+> >>> -        }
+> >>> +    } else {
+> >>> +        hotplug_ctrl = qdev_get_machine_hotplug_handler(dev);
+> >>>      }
+> >>>      return hotplug_ctrl;
+> >>>  }
+> >>> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> >>> index 0891461..5aa536d 100644
+> >>> --- a/include/hw/qdev-core.h
+> >>> +++ b/include/hw/qdev-core.h
+> >>> @@ -285,6 +285,7 @@ DeviceState *qdev_try_create(BusState *bus, const char *name);
+> >>>  void qdev_init_nofail(DeviceState *dev);
+> >>>  void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
+> >>>                                   int required_for_version);
+> >>> +HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev);
+> >>>  HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev);
+> >>>  void qdev_unplug(DeviceState *dev, Error **errp);
+> >>>  void qdev_simple_device_unplug_cb(HotplugHandler *hotplug_dev,
+> >>> diff --git a/qdev-monitor.c b/qdev-monitor.c
+> >>> index 8fd6df9..2891dde 100644
+> >>> --- a/qdev-monitor.c
+> >>> +++ b/qdev-monitor.c
+> >>> @@ -626,6 +626,15 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+> >>>          return NULL;
+> >>>      }
+> >>>  
+> >>> +    /* In case we don't have a bus, there must be a machine hotplug handler */
+> >>> +    if (qdev_hotplug && !bus && !qdev_get_machine_hotplug_handler(dev)) {
+> >>> +        error_setg(errp, "Device '%s' can not be hotplugged on this machine",
+> >>> +                   driver);
+> >>> +        object_unparent(OBJECT(dev));    
+> >>
+> >> Isn't it better to check qdev_get_machine_hotplug_handler()
+> >> earlier (before the qdev_set_parent_bus() and qdev_set_id()
+> >> lines), so object_unparent() isn't necessary?
+> >>
+> >> (We probably don't need to call object_unparent() here, already,
+> >> because bus is NULL.  But moving the check before the "if (bus)
+> >> qdev_set_parent_bus()" statement would make this more obvious).  
+> > it might be bus or bus-less device, so making check before
+> > qdev_set_parent_bus() should be simpler.  
 > 
-> -- 
-> 2.13.6
+> The check for devices that have a bus is already done earlier in this
+> function ("if (qdev_hotplug && bus && !qbus_is_hotpluggable(bus))") ...
+> but yes, I'll move the new check for bus-less devices a little bit
+> earlier so that the unparent is not necessary anymore.
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >> I would prefer to eventually make
+> >> MachineClass::get_hotplug_handler() get a typename or
+> >> DeviceClass* argument instead of DeviceState*, so we don't even
+> >> create the device object.  But I don't think it's a requirement
+> >> for this bug fix.  
+> > choice of hotplug handler might theoretically depend on plugged
+> > device instance (over-engineered? as far as I recall none does it so far)  
+> 
+> Yes, currently we might be able to do it with the typename only ... but
+> that seems to be a rather big rework right now, and we might indeed need
+> a real device instance later again, so I'd prefer to rather not do that
+> rework right now.
+it was just remark why it uses 'dev' and a call for an action.
+
+> 
+> >>> +        object_unref(OBJECT(dev));
+> >>> +        return NULL;
+> >>> +    }  
+> > wrt error exit path, I'd rework error path in qdev_device_add() in separate patch first
+> > to look like it is in device_set_realized() and then just jump to appropriate label
+> > from here.  
+> 
+> Ok, I can have a try whether that looks better.
+the function already has couple error exit point that
+duplicate cleanup steps, so it probably would read better
+with cleanup
+
+> 
+>  Thomas
+> 
