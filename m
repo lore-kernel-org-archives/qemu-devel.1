@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06Z1-0007YN-7S
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:49 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e06Z3-0007ak-IX
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06Yv-0008Vj-LG
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59766)
+	(envelope-from <imammedo@redhat.com>) id 1e06Z0-00008B-AY
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54448)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06Yv-0008V9-G5
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:41 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06Z0-00007J-4A
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:46 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu,  5 Oct 2017 15:50:54 +0200
-Message-Id: <1507211474-188400-21-git-send-email-imammedo@redhat.com>
+Date: Thu,  5 Oct 2017 15:50:58 +0200
+Message-Id: <1507211474-188400-25-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
 References: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 20/40] sh4: shix: use generic cpu_model
- parsing
+Subject: [Qemu-devel] [PATCH v2 24/40] xtensa: cleanup cpu type name
+ composition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +28,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, jcmvbkbc@gmail.com
 
-default cpu model 'any' resolves to type TYPE_SH7750R_CPU
-in superh_cpu_class_by_name(), so use it directly.
+use new XTENSA_CPU_TYPE_NAME to compose CPU type name
+to bring xtensa in line with all other targets that
+will similar macro.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
-v2:
-  - Explain in commit message why default cpu model 'any' is
-    replaced by TYPE_SH7750R_CPU (Philippe Mathieu-Daud=C3=A9)
-
-CC: Magnus Damm <magnus.damm@gmail.com>
-CC: Aurelien Jarno <aurelien@aurel32.net>
+CC: jcmvbkbc@gmail.com
 ---
- hw/sh4/shix.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ target/xtensa/cpu.h    | 4 ++++
+ target/xtensa/cpu.c    | 2 +-
+ target/xtensa/helper.c | 2 +-
+ 3 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/hw/sh4/shix.c b/hw/sh4/shix.c
-index 50ee36a..4add230 100644
---- a/hw/sh4/shix.c
-+++ b/hw/sh4/shix.c
-@@ -45,7 +45,6 @@
+diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+index 4803331..b17d7d9 100644
+--- a/target/xtensa/cpu.h
++++ b/target/xtensa/cpu.h
+@@ -469,11 +469,15 @@ void xtensa_cpu_do_unaligned_access(CPUState *cpu, =
+vaddr addr,
+ #define cpu_signal_handler cpu_xtensa_signal_handler
+ #define cpu_list xtensa_cpu_list
 =20
- static void shix_init(MachineState *machine)
- {
--    const char *cpu_model =3D machine->cpu_model;
-     int ret;
-     SuperHCPU *cpu;
-     struct SH7750State *s;
-@@ -53,10 +52,7 @@ static void shix_init(MachineState *machine)
-     MemoryRegion *rom =3D g_new(MemoryRegion, 1);
-     MemoryRegion *sdram =3D g_new(MemoryRegion, 2);
-    =20
--    if (!cpu_model)
--        cpu_model =3D "any";
--
--    cpu =3D SUPERH_CPU(cpu_generic_init(TYPE_SUPERH_CPU, cpu_model));
-+    cpu =3D SUPERH_CPU(cpu_create(machine->cpu_type));
++#define XTENSA_CPU_TYPE_SUFFIX "-" TYPE_XTENSA_CPU
++#define XTENSA_CPU_TYPE_NAME(model) model XTENSA_CPU_TYPE_SUFFIX
++
+ #ifdef TARGET_WORDS_BIGENDIAN
+ #define XTENSA_DEFAULT_CPU_MODEL "fsf"
+ #else
+ #define XTENSA_DEFAULT_CPU_MODEL "dc232b"
+ #endif
++#define XTENSA_DEFAULT_CPU_TYPE XTENSA_CPU_TYPE_NAME(XTENSA_DEFAULT_CPU_=
+MODEL)
 =20
-     /* Allocate memory space */
-     memory_region_init_ram(rom, NULL, "shix.rom", 0x4000, &error_fatal);
-@@ -89,6 +85,7 @@ static void shix_machine_init(MachineClass *mc)
-     mc->desc =3D "shix card";
-     mc->init =3D shix_init;
-     mc->is_default =3D 1;
-+    mc->default_cpu_type =3D TYPE_SH7750R_CPU;
+ #define cpu_init(cpu_model) cpu_generic_init(TYPE_XTENSA_CPU, cpu_model)
+=20
+diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
+index dcdc765..b5f7079 100644
+--- a/target/xtensa/cpu.c
++++ b/target/xtensa/cpu.c
+@@ -83,7 +83,7 @@ static ObjectClass *xtensa_cpu_class_by_name(const char=
+ *cpu_model)
+     ObjectClass *oc;
+     char *typename;
+=20
+-    typename =3D g_strdup_printf("%s-" TYPE_XTENSA_CPU, cpu_model);
++    typename =3D g_strdup_printf(XTENSA_CPU_TYPE_NAME("%s"), cpu_model);
+     oc =3D object_class_by_name(typename);
+     g_free(typename);
+     if (oc =3D=3D NULL || !object_class_dynamic_cast(oc, TYPE_XTENSA_CPU=
+) ||
+diff --git a/target/xtensa/helper.c b/target/xtensa/helper.c
+index e8fba20..216f198 100644
+--- a/target/xtensa/helper.c
++++ b/target/xtensa/helper.c
+@@ -76,7 +76,7 @@ void xtensa_register_core(XtensaConfigList *node)
+=20
+     node->next =3D xtensa_cores;
+     xtensa_cores =3D node;
+-    type.name =3D g_strdup_printf("%s-" TYPE_XTENSA_CPU, node->config->n=
+ame);
++    type.name =3D g_strdup_printf(XTENSA_CPU_TYPE_NAME("%s"), node->conf=
+ig->name);
+     type_register(&type);
+     g_free((gpointer)type.name);
  }
-=20
- DEFINE_MACHINE("shix", shix_machine_init)
 --=20
 2.7.4
