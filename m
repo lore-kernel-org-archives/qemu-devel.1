@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e08xK-0002oS-Op
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:08 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e08xU-0002wV-AJ
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e08xJ-0003Ee-Lm
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:02 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e08xQ-0003J7-9H
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:12 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu,  5 Oct 2017 18:24:31 +0200
-Message-Id: <1507220690-265042-5-git-send-email-imammedo@redhat.com>
+Date: Thu,  5 Oct 2017 18:24:35 +0200
+Message-Id: <1507220690-265042-9-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
 References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 04/23] ppc: mpc8544ds/e500plat: use generic
- cpu_model parsing
+Subject: [Qemu-devel] [PATCH 08/23] ppc: replace cpu_model with cpu_type on
+ ref405ep, taihu boards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,68 +25,55 @@ Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, 
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/ppc/e500.c      | 8 +-------
- hw/ppc/e500plat.c  | 1 +
- hw/ppc/mpc8544ds.c | 2 ++
- 3 files changed, 4 insertions(+), 7 deletions(-)
+ hw/ppc/ppc405_uc.c   | 6 ++++--
+ hw/ppc/ppc4xx_devs.c | 4 ++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index db0e49a..9178e70 100644
---- a/hw/ppc/e500.c
-+++ b/hw/ppc/e500.c
-@@ -803,11 +803,6 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-     SysBusDevice *s;
-     PPCE500CCSRState *ccsr;
+diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
+index 8e58065..205ebce 100644
+--- a/hw/ppc/ppc405_uc.c
++++ b/hw/ppc/ppc405_uc.c
+@@ -1629,7 +1629,8 @@ CPUPPCState *ppc405cr_init(MemoryRegion *address_space_mem,
+     qemu_irq *pic, *irqs;
  
--    /* Setup CPUs */
--    if (machine->cpu_model == NULL) {
--        machine->cpu_model = "e500v2_v30";
--    }
--
-     irqs = g_malloc0(smp_cpus * sizeof(qemu_irq *));
-     irqs[0] = g_malloc0(smp_cpus * sizeof(qemu_irq) * OPENPIC_OUTPUT_NB);
-     for (i = 0; i < smp_cpus; i++) {
-@@ -815,8 +810,7 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-         CPUState *cs;
-         qemu_irq *input;
+     memset(clk_setup, 0, sizeof(clk_setup));
+-    cpu = ppc4xx_init("405cr", &clk_setup[PPC405CR_CPU_CLK],
++    cpu = ppc4xx_init(POWERPC_CPU_TYPE_NAME("405crc"),
++                      &clk_setup[PPC405CR_CPU_CLK],
+                       &clk_setup[PPC405CR_TMR_CLK], sysclk);
+     env = &cpu->env;
+     /* Memory mapped devices registers */
+@@ -1981,7 +1982,8 @@ CPUPPCState *ppc405ep_init(MemoryRegion *address_space_mem,
  
--        cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
--                                           machine->cpu_model));
-+        cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
-         env = &cpu->env;
-         cs = CPU(cpu);
+     memset(clk_setup, 0, sizeof(clk_setup));
+     /* init CPUs */
+-    cpu = ppc4xx_init("405ep", &clk_setup[PPC405EP_CPU_CLK],
++    cpu = ppc4xx_init(POWERPC_CPU_TYPE_NAME("405ep"),
++                      &clk_setup[PPC405EP_CPU_CLK],
+                       &tlb_clk_setup, sysclk);
+     env = &cpu->env;
+     clk_setup[PPC405EP_CPU_CLK].cb = tlb_clk_setup.cb;
+diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
+index 6d7f785..2e96389 100644
+--- a/hw/ppc/ppc4xx_devs.c
++++ b/hw/ppc/ppc4xx_devs.c
+@@ -48,7 +48,7 @@ static void ppc4xx_reset(void *opaque)
  
-diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
-index 94b4545..e59e80f 100644
---- a/hw/ppc/e500plat.c
-+++ b/hw/ppc/e500plat.c
-@@ -64,6 +64,7 @@ static void e500plat_machine_init(MachineClass *mc)
-     mc->init = e500plat_init;
-     mc->max_cpus = 32;
-     mc->has_dynamic_sysbus = true;
-+    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("e500v2_v30");
- }
- 
- DEFINE_MACHINE("ppce500", e500plat_machine_init)
-diff --git a/hw/ppc/mpc8544ds.c b/hw/ppc/mpc8544ds.c
-index 27b8289..1717953 100644
---- a/hw/ppc/mpc8544ds.c
-+++ b/hw/ppc/mpc8544ds.c
-@@ -16,6 +16,7 @@
- #include "sysemu/device_tree.h"
- #include "hw/ppc/openpic.h"
- #include "qemu/error-report.h"
-+#include "cpu.h"
- 
- static void mpc8544ds_fixup_devtree(PPCE500Params *params, void *fdt)
+ /*****************************************************************************/
+ /* Generic PowerPC 4xx processor instantiation */
+-PowerPCCPU *ppc4xx_init(const char *cpu_model,
++PowerPCCPU *ppc4xx_init(const char *cpu_type,
+                         clk_setup_t *cpu_clk, clk_setup_t *tb_clk,
+                         uint32_t sysclk)
  {
-@@ -55,6 +56,7 @@ static void ppce500_machine_init(MachineClass *mc)
-     mc->desc = "mpc8544ds";
-     mc->init = mpc8544ds_init;
-     mc->max_cpus = 15;
-+    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("e500v2_v30");
- }
+@@ -56,7 +56,7 @@ PowerPCCPU *ppc4xx_init(const char *cpu_model,
+     CPUPPCState *env;
  
- DEFINE_MACHINE("mpc8544ds", ppce500_machine_init)
+     /* init CPUs */
+-    cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, cpu_model));
++    cpu = POWERPC_CPU(cpu_create(cpu_type));
+     env = &cpu->env;
+ 
+     cpu_clk->cb = NULL; /* We don't care about CPU clock frequency changes */
 -- 
 2.7.4
