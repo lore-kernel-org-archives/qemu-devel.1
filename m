@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1e048j-0003wY-96
+	(envelope-from <a.perevalov@samsung.com>) id 1e048j-0003wZ-9d
 	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:16:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1e048h-0000Ho-Uw
+	(envelope-from <a.perevalov@samsung.com>) id 1e048g-0000Gp-HM
 	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:16:29 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:56938)
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:42759)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1e048h-0000H7-Nu
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:16:27 -0400
+	id 1e048g-0000GA-7u
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:16:26 -0400
 From: Alexey Perevalov <a.perevalov@samsung.com>
-Date: Thu, 05 Oct 2017 14:16:08 +0300
-Message-id: <1507202170-22619-5-git-send-email-a.perevalov@samsung.com>
+Date: Thu, 05 Oct 2017 14:16:06 +0300
+Message-id: <1507202170-22619-3-git-send-email-a.perevalov@samsung.com>
 In-reply-to: <1507202170-22619-1-git-send-email-a.perevalov@samsung.com>
 References: <1507202170-22619-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20171005111624eucas1p193bfeb0e428c8eee6180a1f7b96c0713@eucas1p1.samsung.com>
-Subject: [Qemu-devel] [PATCH v11 4/6] migration: postcopy_blocktime
- documentation
+	<CGME20171005111623eucas1p272597c60842087cac3ade92b88212eff@eucas1p2.samsung.com>
+Subject: [Qemu-devel] [PATCH v11 2/6] migration: add postcopy blocktime ctx
+ into MigrationIncomingState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +29,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Perevalov <a.perevalov@samsung.com>, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com, i.maximets@samsung.com, heetae82.ahn@samsung.com
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+This patch adds request to kernel space for UFFD_FEATURE_THREAD_ID,
+in case when this feature is provided by kernel.
+
+PostcopyBlocktimeContext is incapsulated inside postcopy-ram.c,
+due to it's postcopy only feature.
+Also it defines PostcopyBlocktimeContext's instance live time.
+Information from PostcopyBlocktimeContext instance will be provided
+much after postcopy migration end, instance of PostcopyBlocktimeContext
+will live till QEMU exit, but part of it (vcpu_addr,
+page_fault_vcpu_time) used only during calculation, will be released
+when postcopy ended or failed.
+
+To enable postcopy blocktime calculation on destination, need to request
+proper capabiltiy (Patch for documentation will be at the tail of the patch
+set).
+
+As an example following command enable that capability, assume QEMU was
+started with
+-chardev socket,id=charmonitor,path=/var/lib/migrate-vm-monitor.sock
+option to control it
+
+[root@host]#printf "{\"execute\" : \"qmp_capabilities\"}\r\n \
+{\"execute\": \"migrate-set-capabilities\" , \"arguments\":   {
+\"capabilities\": [ { \"capability\": \"postcopy-blocktime\", \"state\":
+true } ] } }" | nc -U /var/lib/migrate-vm-monitor.sock
+
+Or just with HMP
+(qemu) migrate_set_capability postcopy-blocktime on
+
 Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 ---
- docs/devel/migration.txt | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ migration/migration.h    |  8 +++++++
+ migration/postcopy-ram.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 67 insertions(+)
 
-diff --git a/docs/devel/migration.txt b/docs/devel/migration.txt
-index 4030703..cebfe7a 100644
---- a/docs/devel/migration.txt
-+++ b/docs/devel/migration.txt
-@@ -402,6 +402,19 @@ will now cause the transition from precopy to postcopy.
- It can be issued immediately after migration is started or any
- time later on.  Issuing it after the end of a migration is harmless.
+diff --git a/migration/migration.h b/migration/migration.h
+index c12ceba..2bae992 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -22,6 +22,8 @@
+ #include "hw/qdev.h"
+ #include "io/channel.h"
  
-+Blocktime is a postcopy live migration metric, intended to show
-+how long the vCPU was in state of interruptable sleep due to pagefault.
-+That metric is calculated both for all vCPUs as overlapped value, and
-+separately for each vCPU. These values are calculated on destination side.
-+To enable postcopy blocktime calculation, enter following command on destination
-+monitor:
++struct PostcopyBlocktimeContext;
 +
-+migrate_set_capability postcopy-blocktime on
+ /* State for the incoming migration */
+ struct MigrationIncomingState {
+     QEMUFile *from_src_file;
+@@ -59,6 +61,12 @@ struct MigrationIncomingState {
+     /* The coroutine we should enter (back) after failover */
+     Coroutine *migration_incoming_co;
+     QemuSemaphore colo_incoming_sem;
 +
-+Postcopy blocktime can be retrieved by query-migrate qmp command.
-+postcopy-blocktime value of qmp command will show overlapped blocking time for
-+all vCPU, postcopy-vcpu-blocktime will show list of blocking time per vCPU.
++    /*
++     * PostcopyBlocktimeContext to keep information for postcopy
++     * live migration, to calculate vCPU block time
++     * */
++    struct PostcopyBlocktimeContext *blocktime_ctx;
+ };
+ 
+ MigrationIncomingState *migration_incoming_get_current(void);
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index bec6c2c..c18ec5a 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -61,6 +61,52 @@ struct PostcopyDiscardState {
+ #include <sys/eventfd.h>
+ #include <linux/userfaultfd.h>
+ 
++typedef struct PostcopyBlocktimeContext {
++    /* time when page fault initiated per vCPU */
++    int64_t *page_fault_vcpu_time;
++    /* page address per vCPU */
++    uint64_t *vcpu_addr;
++    int64_t total_blocktime;
++    /* blocktime per vCPU */
++    int64_t *vcpu_blocktime;
++    /* point in time when last page fault was initiated */
++    int64_t last_begin;
++    /* number of vCPU are suspended */
++    int smp_cpus_down;
 +
- Note: During the postcopy phase, the bandwidth limits set using
- migrate_set_speed is ignored (to avoid delaying requested pages that
- the destination is waiting for).
++    /*
++     * Handler for exit event, necessary for
++     * releasing whole blocktime_ctx
++     */
++    Notifier exit_notifier;
++} PostcopyBlocktimeContext;
++
++static void destroy_blocktime_context(struct PostcopyBlocktimeContext *ctx)
++{
++    g_free(ctx->page_fault_vcpu_time);
++    g_free(ctx->vcpu_addr);
++    g_free(ctx->vcpu_blocktime);
++    g_free(ctx);
++}
++
++static void migration_exit_cb(Notifier *n, void *data)
++{
++    PostcopyBlocktimeContext *ctx = container_of(n, PostcopyBlocktimeContext,
++                                                 exit_notifier);
++    destroy_blocktime_context(ctx);
++}
++
++static struct PostcopyBlocktimeContext *blocktime_context_new(void)
++{
++    PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
++    ctx->page_fault_vcpu_time = g_new0(int64_t, smp_cpus);
++    ctx->vcpu_addr = g_new0(uint64_t, smp_cpus);
++    ctx->vcpu_blocktime = g_new0(int64_t, smp_cpus);
++
++    ctx->exit_notifier.notify = migration_exit_cb;
++    qemu_add_exit_notifier(&ctx->exit_notifier);
++    return ctx;
++}
+ 
+ /**
+  * receive_ufd_features: check userfault fd features, to request only supported
+@@ -153,6 +199,19 @@ static bool ufd_check_and_apply(int ufd, MigrationIncomingState *mis)
+         }
+     }
+ 
++#ifdef UFFD_FEATURE_THREAD_ID
++    if (migrate_postcopy_blocktime() && mis &&
++        UFFD_FEATURE_THREAD_ID & supported_features) {
++        /* kernel supports that feature */
++        /* don't create blocktime_context if it exists */
++        if (!mis->blocktime_ctx) {
++            mis->blocktime_ctx = blocktime_context_new();
++        }
++
++        asked_features |= UFFD_FEATURE_THREAD_ID;
++    }
++#endif
++
+     /*
+      * request features, even if asked_features is 0, due to
+      * kernel expects UFFD_API before UFFDIO_REGISTER, per
 -- 
 2.7.4
