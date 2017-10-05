@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e094e-000197-GL
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:32:37 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e096v-00031s-Tl
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:34:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e094Y-0001ps-PW
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:32:36 -0400
-Received: from mail-qt0-x233.google.com ([2607:f8b0:400d:c0d::233]:53993)
+	(envelope-from <richard.henderson@linaro.org>) id 1e096u-0004gi-VP
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:34:57 -0400
+Received: from mail-qt0-x22a.google.com ([2607:f8b0:400d:c0d::22a]:45907)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e094Y-0001pF-Jy
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:32:30 -0400
-Received: by mail-qt0-x233.google.com with SMTP id 47so26428115qts.10
-	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 09:32:30 -0700 (PDT)
+	id 1e096u-0004gJ-S1
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:34:56 -0400
+Received: by mail-qt0-x22a.google.com with SMTP id k1so15487516qti.2
+	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 09:34:56 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 References: <1506092407-26985-1-git-send-email-peter.maydell@linaro.org>
 	<1506092407-26985-9-git-send-email-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0136d727-d125-7eed-ca13-02011cbdf921@linaro.org>
-Date: Thu, 5 Oct 2017 12:32:27 -0400
+	<0136d727-d125-7eed-ca13-02011cbdf921@linaro.org>
+Message-ID: <4aa8a101-7de4-43d5-716a-b188a7190277@linaro.org>
+Date: Thu, 5 Oct 2017 12:34:53 -0400
 MIME-Version: 1.0
-In-Reply-To: <1506092407-26985-9-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <0136d727-d125-7eed-ca13-02011cbdf921@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -35,32 +36,17 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-On 09/22/2017 10:59 AM, Peter Maydell wrote:
-> +        if ((env->regs[15] & 1) && !arm_feature(env, ARM_FEATURE_V8)) {
->              qemu_log_mask(LOG_GUEST_ERROR,
->                            "M profile return from interrupt with misaligned "
-> -                          "PC is UNPREDICTABLE\n");
-> -            /* Actual hardware seems to ignore the lsbit, and there are several
-> -             * RTOSes out there which incorrectly assume the r15 in the stack
-> -             * frame should be a Thumb-style "lsbit indicates ARM/Thumb" value.
-> -             */
-> -            env->regs[15] &= ~1U;
-> +                          "PC is UNPREDICTABLE on v7M\n");
->          }
-> +        env->regs[15] &= ~1U;
+On 10/05/2017 12:32 PM, Richard Henderson wrote:
+>     if (env->regs[15] & 1) {
+>         if (!arm_feature(env, ARM_FEATURE_V8)) {
+>             qemu_log_mask(...);
+>         }
+>         env->regs[15] &= ~1U;
+>     }
 
-If you're going to always test regs[15] & 1, you might as well use that and
-avoid an unlikely(?) writeback.
-
-    if (env->regs[15] & 1) {
-        if (!arm_feature(env, ARM_FEATURE_V8)) {
-            qemu_log_mask(...);
-        }
-        env->regs[15] &= ~1U;
-    }
-
-Otherwise,
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Bah.  Even better to move the bit clear statement before the feature check.
+The two loads from env->regs[15] will no longer be separated by a function call
+and therefore CSEd by the compiler.
 
 
 r~
