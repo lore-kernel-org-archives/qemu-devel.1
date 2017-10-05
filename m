@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dzwqY-0005aQ-7h
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 23:29:15 -0400
+	(envelope-from <armbru@redhat.com>) id 1dzxhf-0004x9-IX
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 00:24:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dzwqV-00080Y-5U
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 23:29:14 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1506092407-26985-1-git-send-email-peter.maydell@linaro.org>
-	<1506092407-26985-17-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <88468bf1-594d-9b2e-1dbe-669073e42e76@amsat.org>
-Date: Thu, 5 Oct 2017 00:29:07 -0300
+	(envelope-from <armbru@redhat.com>) id 1dzxhc-0006Ow-EW
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 00:24:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45288)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dzxhc-0006OX-7x
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 00:24:04 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20171002152552.27999-1-armbru@redhat.com>
+	<20171002152552.27999-15-armbru@redhat.com>
+	<CAJ+F1C+gsgG+Nbmj56DACRCAdWk==Ud=CCtfppc-jy4L41QoMw@mail.gmail.com>
+Date: Thu, 05 Oct 2017 06:24:01 +0200
+In-Reply-To: <CAJ+F1C+gsgG+Nbmj56DACRCAdWk==Ud=CCtfppc-jy4L41QoMw@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 4 Oct 2017
+	13:52:43 +0200")
+Message-ID: <87376yjk7y.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1506092407-26985-17-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 16/20] target/arm: Factor out
- "get mmuidx for specified security state"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 14/32] qapi: Rework generated code for
+ built-in types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +31,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 09/22/2017 12:00 PM, Peter Maydell wrote:
-> For the SG instruction and secure function return we are going
-> to want to do memory accesses using the MMU index of the CPU
-> in secure state, even though the CPU is currently in non-secure
-> state. Write arm_v7m_mmu_idx_for_secstate() to do this job,
-> and use it in cpu_mmu_index().
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Hi
+>
+> On Mon, Oct 2, 2017 at 5:25 PM, Markus Armbruster <armbru@redhat.com> wro=
+te:
+>> qapi-types.py and qapi-visit.py generate some C code for built-in
+>> types.  To make this work with multiple schemas, we generate code for
+>> built-ins into .c files only when the user asks for it with -b.  The
+>> user is responsible for linking exactly one set of files generated
+>> with -b per program.  We generate code for built-ins into .h
+>> regardless of -b, but guard it with a preprocessor symbol.
+>>
+>> This is cumbersome and inflexible.  Move the code generated for
+>> built-in types into separate files builtin-qapi-{types,visit}.{c,h}.
+>> Run qapi-types.py and qapi-visit.py without a schema argument to
+>> generate them.  Drop their option -b.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>
+>
+> Good idea!
+> I think I would still prefer to see a seperate argument to generate
+> builtin files (rather than absence of schema), but this is minor
+> detail.
 
-> ---
->  target/arm/cpu.h | 32 +++++++++++++++++++++-----------
->  1 file changed, 21 insertions(+), 11 deletions(-)
-> 
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 70c1f85..89d49cd 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -2329,23 +2329,33 @@ static inline int arm_mmu_idx_to_el(ARMMMUIdx mmu_idx)
->      }
->  }
->  
-> +/* Return the MMU index for a v7M CPU in the specified security state */
-> +static inline ARMMMUIdx arm_v7m_mmu_idx_for_secstate(CPUARMState *env,
-> +                                                     bool secstate)
-> +{
-> +    int el = arm_current_el(env);
-> +    ARMMMUIdx mmu_idx;
-> +
-> +    if (el == 0) {
-> +        mmu_idx = secstate ? ARMMMUIdx_MSUser : ARMMMUIdx_MUser;
-> +    } else {
-> +        mmu_idx = secstate ? ARMMMUIdx_MSPriv : ARMMMUIdx_MPriv;
-> +    }
-> +
-> +    if (armv7m_nvic_neg_prio_requested(env->nvic, secstate)) {
-> +        mmu_idx = secstate ? ARMMMUIdx_MSNegPri : ARMMMUIdx_MNegPri;
-> +    }
-> +
-> +    return mmu_idx;
-> +}
-> +
->  /* Determine the current mmu_idx to use for normal loads/stores */
->  static inline int cpu_mmu_index(CPUARMState *env, bool ifetch)
->  {
->      int el = arm_current_el(env);
->  
->      if (arm_feature(env, ARM_FEATURE_M)) {
-> -        ARMMMUIdx mmu_idx;
-> -
-> -        if (el == 0) {
-> -            mmu_idx = env->v7m.secure ? ARMMMUIdx_MSUser : ARMMMUIdx_MUser;
-> -        } else {
-> -            mmu_idx = env->v7m.secure ? ARMMMUIdx_MSPriv : ARMMMUIdx_MPriv;
-> -        }
-> -
-> -        if (armv7m_nvic_neg_prio_requested(env->nvic, env->v7m.secure)) {
-> -            mmu_idx = env->v7m.secure ? ARMMMUIdx_MSNegPri : ARMMMUIdx_MNegPri;
-> -        }
-> +        ARMMMUIdx mmu_idx = arm_v7m_mmu_idx_for_secstate(env, env->v7m.secure);
->  
->          return arm_to_core_mmu_idx(mmu_idx);
->      }
-> 
+An option to generate built-ins would have to conflict with -p and the
+positional argument.  I tried the stupidest solution that could possibly
+work first.
+
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+Thanks!
