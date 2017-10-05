@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1e048m-0003yn-Go
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:16:39 -0400
+	(envelope-from <bounces@canonical.com>) id 1e04DN-0007Hm-FJ
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:21:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1e048j-0000JI-JU
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:16:32 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:56945)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1e048j-0000IS-Am
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:16:29 -0400
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Date: Thu, 05 Oct 2017 14:16:10 +0300
-Message-id: <1507202170-22619-7-git-send-email-a.perevalov@samsung.com>
-In-reply-to: <1507202170-22619-1-git-send-email-a.perevalov@samsung.com>
-References: <1507202170-22619-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20171005111626eucas1p2ea023000ede617c0b8509f11c99fc10a@eucas1p2.samsung.com>
-Subject: [Qemu-devel] [PATCH v11 6/6] migration: add postcopy total
- blocktime into query-migrate
+	(envelope-from <bounces@canonical.com>) id 1e04DK-0003ML-QY
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:21:17 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46692)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e04DK-0003LW-JY
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:21:14 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e04DH-0008Au-S1
+	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 11:21:11 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 46F742E818D
+	for <qemu-devel@nongnu.org>; Thu,  5 Oct 2017 11:21:08 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 05 Oct 2017 11:06:16 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1721275 <1721275@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150712892432.28170.15132413345734525245.malonedeb@gac.canonical.com>
+Message-Id: <150720157641.28375.10436443125246795022.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1721275] Re: Support more ARM CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,275 +37,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alexey Perevalov <a.perevalov@samsung.com>, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com, i.maximets@samsung.com, heetae82.ahn@samsung.com
 
-Postcopy total blocktime is available on destination side only.
-But query-migrate was possible only for source. This patch
-adds ability to call query-migrate on destination.
-To be able to see postcopy blocktime, need to request postcopy-blocktime
-capability.
+M0 is hard, because it's v6M which we don't support. M4 we already have
+(but only the no-fpu variant). M7 we don't currently have -- what would
+be the differences from M4? M33 is in the works (it's v8M). M23 is
+harder, because it's v8M-baseline which is the v8M equivalent to v6M.
+A53 and A57 we already have. How would A35 differ from A53/A57 ?
 
-The query-migrate command will show following sample result:
-{"return":
-    "postcopy-vcpu-blocktime": [115, 100],
-    "status": "completed",
-    "postcopy-blocktime": 100
-}}
+-- =
 
-postcopy_vcpu_blocktime contains list, where the first item is the first
-vCPU in QEMU.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1721275
 
-This patch has a drawback, it combines states of incoming and
-outgoing migration. Ongoing migration state will overwrite incoming
-state. Looks like better to separate query-migrate for incoming and
-outgoing migration or add parameter to indicate type of migration.
+Title:
+  Support more ARM CPUs
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
----
- hmp.c                    | 15 +++++++++++++
- migration/migration.c    | 42 ++++++++++++++++++++++++++++++++----
- migration/migration.h    |  4 ++++
- migration/postcopy-ram.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++
- migration/trace-events   |  1 +
- qapi/migration.json      | 11 +++++++++-
- 6 files changed, 124 insertions(+), 5 deletions(-)
+Status in QEMU:
+  New
 
-diff --git a/hmp.c b/hmp.c
-index ace729d..1939c02 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -264,6 +264,21 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
-                        info->cpu_throttle_percentage);
-     }
- 
-+    if (info->has_postcopy_blocktime) {
-+        monitor_printf(mon, "postcopy blocktime: %" PRId64 "\n",
-+                       info->postcopy_blocktime);
-+    }
-+
-+    if (info->has_postcopy_vcpu_blocktime) {
-+        Visitor *v;
-+        char *str;
-+        v = string_output_visitor_new(false, &str);
-+        visit_type_int64List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
-+        visit_complete(v, &str);
-+        monitor_printf(mon, "postcopy vcpu blocktime: %s\n", str);
-+        g_free(str);
-+        visit_free(v);
-+    }
-     qapi_free_MigrationInfo(info);
-     qapi_free_MigrationCapabilityStatusList(caps);
- }
-diff --git a/migration/migration.c b/migration/migration.c
-index 713f070..91fe885 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -584,14 +584,15 @@ static void populate_disk_info(MigrationInfo *info)
-     }
- }
- 
--MigrationInfo *qmp_query_migrate(Error **errp)
-+static void fill_source_migration_info(MigrationInfo *info)
- {
--    MigrationInfo *info = g_malloc0(sizeof(*info));
-     MigrationState *s = migrate_get_current();
- 
-     switch (s->state) {
-     case MIGRATION_STATUS_NONE:
-         /* no migration has happened ever */
-+        /* do not overwrite destination migration status */
-+        return;
-         break;
-     case MIGRATION_STATUS_SETUP:
-         info->has_status = true;
-@@ -640,8 +641,6 @@ MigrationInfo *qmp_query_migrate(Error **errp)
-         break;
-     }
-     info->status = s->state;
--
--    return info;
- }
- 
- /**
-@@ -705,6 +704,41 @@ static bool migrate_caps_check(bool *cap_list,
-     return true;
- }
- 
-+static void fill_destination_migration_info(MigrationInfo *info)
-+{
-+    MigrationIncomingState *mis = migration_incoming_get_current();
-+
-+    switch (mis->state) {
-+    case MIGRATION_STATUS_NONE:
-+        return;
-+        break;
-+    case MIGRATION_STATUS_SETUP:
-+    case MIGRATION_STATUS_CANCELLING:
-+    case MIGRATION_STATUS_CANCELLED:
-+    case MIGRATION_STATUS_ACTIVE:
-+    case MIGRATION_STATUS_POSTCOPY_ACTIVE:
-+    case MIGRATION_STATUS_FAILED:
-+    case MIGRATION_STATUS_COLO:
-+        info->has_status = true;
-+        break;
-+    case MIGRATION_STATUS_COMPLETED:
-+        info->has_status = true;
-+        fill_destination_postcopy_migration_info(info);
-+        break;
-+    }
-+    info->status = mis->state;
-+}
-+
-+MigrationInfo *qmp_query_migrate(Error **errp)
-+{
-+    MigrationInfo *info = g_malloc0(sizeof(*info));
-+
-+    fill_destination_migration_info(info);
-+    fill_source_migration_info(info);
-+
-+    return info;
-+}
-+
- void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
-                                   Error **errp)
- {
-diff --git a/migration/migration.h b/migration/migration.h
-index 2bae992..cb68768 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -71,6 +71,10 @@ struct MigrationIncomingState {
- 
- MigrationIncomingState *migration_incoming_get_current(void);
- void migration_incoming_state_destroy(void);
-+/*
-+ * Functions to work with blocktime context
-+ */
-+void fill_destination_postcopy_migration_info(MigrationInfo *info);
- 
- #define TYPE_MIGRATION "migration"
- 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 2e10870..a203bae 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -108,6 +108,55 @@ static struct PostcopyBlocktimeContext *blocktime_context_new(void)
-     return ctx;
- }
- 
-+static int64List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
-+{
-+    int64List *list = NULL, *entry = NULL;
-+    int i;
-+
-+    for (i = smp_cpus - 1; i >= 0; i--) {
-+        entry = g_new0(int64List, 1);
-+        entry->value = ctx->vcpu_blocktime[i];
-+        entry->next = list;
-+        list = entry;
-+    }
-+
-+    return list;
-+}
-+
-+/*
-+ * This function just populates MigrationInfo from postcopy's
-+ * blocktime context. It will not populate MigrationInfo,
-+ * unless postcopy-blocktime capability was set.
-+ *
-+ * @info: pointer to MigrationInfo to populate
-+ */
-+void fill_destination_postcopy_migration_info(MigrationInfo *info)
-+{
-+    MigrationIncomingState *mis = migration_incoming_get_current();
-+    PostcopyBlocktimeContext *bc = mis->blocktime_ctx;
-+
-+    if (!bc) {
-+        return;
-+    }
-+
-+    info->has_postcopy_blocktime = true;
-+    info->postcopy_blocktime = bc->total_blocktime;
-+    info->has_postcopy_vcpu_blocktime = true;
-+    info->postcopy_vcpu_blocktime = get_vcpu_blocktime_list(bc);
-+}
-+
-+static uint64_t get_postcopy_total_blocktime(void)
-+{
-+    MigrationIncomingState *mis = migration_incoming_get_current();
-+    PostcopyBlocktimeContext *bc = mis->blocktime_ctx;
-+
-+    if (!bc) {
-+        return 0;
-+    }
-+
-+    return bc->total_blocktime;
-+}
-+
- /**
-  * receive_ufd_features: check userfault fd features, to request only supported
-  * features in the future.
-@@ -482,6 +531,9 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
-         munmap(mis->postcopy_tmp_zero_page, mis->largest_page_size);
-         mis->postcopy_tmp_zero_page = NULL;
-     }
-+    trace_postcopy_ram_incoming_cleanup_blocktime(
-+            get_postcopy_total_blocktime());
-+
-     trace_postcopy_ram_incoming_cleanup_exit();
-     return 0;
- }
-@@ -958,6 +1010,10 @@ void *postcopy_get_tmp_page(MigrationIncomingState *mis)
- 
- #else
- /* No target OS support, stubs just fail */
-+void fill_destination_postcopy_migration_info(MigrationInfo *info)
-+{
-+}
-+
- bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
- {
-     error_report("%s: No OS support", __func__);
-diff --git a/migration/trace-events b/migration/trace-events
-index b0c8708..f667981 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -198,6 +198,7 @@ postcopy_ram_incoming_cleanup_closeuf(void) ""
- postcopy_ram_incoming_cleanup_entry(void) ""
- postcopy_ram_incoming_cleanup_exit(void) ""
- postcopy_ram_incoming_cleanup_join(void) ""
-+postcopy_ram_incoming_cleanup_blocktime(uint64_t total) "total blocktime %" PRIu64
- save_xbzrle_page_skipping(void) ""
- save_xbzrle_page_overflow(void) ""
- ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 0f2af26..bf19984 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -150,6 +150,13 @@
- #              @status is 'failed'. Clients should not attempt to parse the
- #              error strings. (Since 2.7)
- #
-+# @postcopy-blocktime: total time when all vCPU were blocked during postcopy
-+#           live migration (Since 2.11)
-+#
-+# @postcopy-vcpu-blocktime: list of the postcopy blocktime per vCPU (Since 2.11)
-+#
-+
-+#
- # Since: 0.14.0
- ##
- { 'struct': 'MigrationInfo',
-@@ -161,7 +168,9 @@
-            '*downtime': 'int',
-            '*setup-time': 'int',
-            '*cpu-throttle-percentage': 'int',
--           '*error-desc': 'str'} }
-+           '*error-desc': 'str',
-+           '*postcopy-blocktime' : 'int64',
-+           '*postcopy-vcpu-blocktime': ['int64']} }
- 
- ##
- # @query-migrate:
--- 
-2.7.4
+Bug description:
+  Hi,
+
+  This is an enhancement request, rather than a bug report.
+
+  After some discussions/presentations during the last Linaro Connect
+  (SFO17), I understand that it may be easy to add support for more ARM
+  CPUs in QEMU. I am interested in user-mode, if that matters.
+
+  I'm primarily using QEMU for GCC validations, and I'd like to make
+  sure that GCC doesn't generate instructions not supported by the CPU
+  it's supposed to generate code for.
+
+  I'd like to have:
+  cortex-m0
+  cortex-m4
+  cortex-m7
+  cortex-m23
+  cortex-m33
+
+  cortex-a35
+  cortex-a53
+  cortex-a57
+
+  Is it possible?
+  Is it the right place to ask?
+  Should I file separate requests for each?
+
+  Thanks
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1721275/+subscriptions
