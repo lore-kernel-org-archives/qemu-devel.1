@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55356)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dzy3V-0001UV-BU
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 00:46:42 -0400
+	id 1dzy8J-0002Wo-TL
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 00:51:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dzy3S-00012I-81
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 00:46:41 -0400
+	id 1dzy8G-0004Zo-SS
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 00:51:39 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1506092407-26985-1-git-send-email-peter.maydell@linaro.org>
-	<1506092407-26985-16-git-send-email-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b2c72b55-fa9f-f50e-da70-225fbe01db45@amsat.org>
-Date: Thu, 5 Oct 2017 01:46:33 -0300
+Message-ID: <c00f7502-c67a-f1b1-2a05-70215be6fa2b@amsat.org>
+Date: Thu, 5 Oct 2017 01:51:33 -0300
 MIME-Version: 1.0
-In-Reply-To: <1506092407-26985-16-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1506092407-26985-1-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 15/20] target/arm: Fix
- calculation of secure mm_idx values
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 00/20] ARM v8M: exception entry,
+ exit and security
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +31,19 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-On 09/22/2017 12:00 PM, Peter Maydell wrote:
-> In cpu_mmu_index() we try to do this:
->         if (env->v7m.secure) {
->             mmu_idx += ARMMMUIdx_MSUser;
->         }
-> but it will give the wrong answer, because ARMMMUIdx_MSUser
-> includes the 0x40 ARM_MMU_IDX_M field, and so does the
-> mmu_idx we're adding to, and we'll end up with 0x8n rather
-> than 0x4n. This error is then nullified by the call to
-> arm_to_core_mmu_idx() which masks out the high part, but
-> we're about to factor out the code that calculates the
-> ARMMMUIdx values so it can be used without passing it through
-> arm_to_core_mmu_idx(), so fix this bug first.
+On 09/22/2017 11:59 AM, Peter Maydell wrote:
+> Another week, another set of v8M patches.
+> This lot adds:
+>  * v8M and security extension changes in exception entry and exit
+>  * the Security Attribution Unit
+>  * SG and BLXNS instructions
+>  * secure function return
+>  * and a couple of fixes for bugs in already-in-master changes
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Most of this is just plodding through fairly obvious implementation,
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Heavy stuff still...
 
-> ---
->  target/arm/cpu.h | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
-> 
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 441e584..70c1f85 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -2335,14 +2335,16 @@ static inline int cpu_mmu_index(CPUARMState *env, bool ifetch)
->      int el = arm_current_el(env);
->  
->      if (arm_feature(env, ARM_FEATURE_M)) {
-> -        ARMMMUIdx mmu_idx = el == 0 ? ARMMMUIdx_MUser : ARMMMUIdx_MPriv;
-> +        ARMMMUIdx mmu_idx;
->  
-> -        if (armv7m_nvic_neg_prio_requested(env->nvic, env->v7m.secure)) {
-> -            mmu_idx = ARMMMUIdx_MNegPri;
-> +        if (el == 0) {
-> +            mmu_idx = env->v7m.secure ? ARMMMUIdx_MSUser : ARMMMUIdx_MUser;
-> +        } else {
-> +            mmu_idx = env->v7m.secure ? ARMMMUIdx_MSPriv : ARMMMUIdx_MPriv;
->          }
->  
-> -        if (env->v7m.secure) {
-> -            mmu_idx += ARMMMUIdx_MSUser;
-> +        if (armv7m_nvic_neg_prio_requested(env->nvic, env->v7m.secure)) {
-> +            mmu_idx = env->v7m.secure ? ARMMMUIdx_MSNegPri : ARMMMUIdx_MNegPri;
->          }
->  
->          return arm_to_core_mmu_idx(mmu_idx);
-> 
+> but the handling of the SG instruction is a bit funky (see commit
+> messages in those patches for detail).
+[...]
