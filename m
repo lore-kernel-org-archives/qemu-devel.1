@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06Yu-0007Qh-L1
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:44 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e06Yy-0007Vb-Sr
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06Ys-0008Rj-C8
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34954)
+	(envelope-from <imammedo@redhat.com>) id 1e06Yx-00005j-W9
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35336)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06Ys-0008Qp-3m
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:38 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06Yx-000052-NO
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:43 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu,  5 Oct 2017 15:50:51 +0200
-Message-Id: <1507211474-188400-18-git-send-email-imammedo@redhat.com>
+Date: Thu,  5 Oct 2017 15:50:56 +0200
+Message-Id: <1507211474-188400-23-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
 References: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 17/40] openrisc: cleanup cpu type name
- composition
+Subject: [Qemu-devel] [PATCH v2 22/40] sh4: simplify
+ superh_cpu_class_by_name()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,142 +28,95 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, shorne@gmail.com
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, aurelien@aurel32.net
 
-use new OPENRISC_CPU_TYPE_NAME to compose CPU type name and get
-rid of intermediate OpenRISCCPUInfo/openrisc_cpu_register_types()
-which is replaced by static TypeInfo array.
+currently for sh4 cpu_model argument for '-cpu' option
+could be either 'cpu model' name or cpu_typename.
+
+however typically '-cpu' takes 'cpu model' name and
+cpu type for sh4 target isn't advertised publicly
+('-cpu help' prints only 'cpu model' names) so we
+shouldn't care about this use case (it's more of a bug).
+
+1. Drop '-cpu cpu_typename' to align with the rest of
+   targets.
+2. Compose searched for typename from cpu model and use
+   it with object_class_by_name() directly instead of
+   over-complicated
+       object_class_get_list()
+       g_slist_find_custom() + superh_cpu_name_compare()
+
+With #1 droped, #2 could be used for both lookups which
+simplifies superh_cpu_class_by_name() quite a bit.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Acked-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
-v2:  rename type_init_from_array into DEFINE_TYPES
+v2:
+  - there is no need to NULL-initialize 'oc' in superh_cpu_class_by_name(=
+)
+    also drop extra ';' (Philippe Mathieu-Daud=C3=A9)
 
-CC: shorne@gmail.com
+CC: aurelien@aurel32.net
 ---
- target/openrisc/cpu.h |  3 +++
- target/openrisc/cpu.c | 69 +++++++++++++++++----------------------------=
-------
- 2 files changed, 26 insertions(+), 46 deletions(-)
+ target/sh4/cpu.c | 34 ++++++++++++----------------------
+ 1 file changed, 12 insertions(+), 22 deletions(-)
 
-diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-index f51b89a..576cf66 100644
---- a/target/openrisc/cpu.h
-+++ b/target/openrisc/cpu.h
-@@ -390,6 +390,9 @@ int cpu_openrisc_get_phys_data(OpenRISCCPU *cpu,
-=20
- #define cpu_init(cpu_model) cpu_generic_init(TYPE_OPENRISC_CPU, cpu_mode=
-l)
-=20
-+#define OPENRISC_CPU_TYPE_SUFFIX "-" TYPE_OPENRISC_CPU
-+#define OPENRISC_CPU_TYPE_NAME(model) model OPENRISC_CPU_TYPE_SUFFIX
-+
- #include "exec/cpu-all.h"
-=20
- #define TB_FLAGS_DFLAG 1
-diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
-index af9cdcc..629831a 100644
---- a/target/openrisc/cpu.c
-+++ b/target/openrisc/cpu.c
-@@ -108,7 +108,7 @@ static ObjectClass *openrisc_cpu_class_by_name(const =
-char *cpu_model)
-     ObjectClass *oc;
-     char *typename;
-=20
--    typename =3D g_strdup_printf("%s-" TYPE_OPENRISC_CPU, cpu_model);
-+    typename =3D g_strdup_printf(OPENRISC_CPU_TYPE_NAME("%s"), cpu_model=
-);
-     oc =3D object_class_by_name(typename);
-     g_free(typename);
-     if (oc !=3D NULL && (!object_class_dynamic_cast(oc, TYPE_OPENRISC_CP=
-U) ||
-@@ -133,16 +133,6 @@ static void openrisc_any_initfn(Object *obj)
-     cpu->env.cpucfgr =3D CPUCFGR_NSGF | CPUCFGR_OB32S | CPUCFGR_EVBARP;
- }
-=20
--typedef struct OpenRISCCPUInfo {
--    const char *name;
--    void (*initfn)(Object *obj);
--} OpenRISCCPUInfo;
--
--static const OpenRISCCPUInfo openrisc_cpus[] =3D {
--    { .name =3D "or1200",      .initfn =3D or1200_initfn },
--    { .name =3D "any",         .initfn =3D openrisc_any_initfn },
--};
--
- static void openrisc_cpu_class_init(ObjectClass *oc, void *data)
- {
-     OpenRISCCPUClass *occ =3D OPENRISC_CPU_CLASS(oc);
-@@ -172,40 +162,6 @@ static void openrisc_cpu_class_init(ObjectClass *oc,=
- void *data)
-     cc->gdb_num_core_regs =3D 32 + 3;
- }
-=20
--static void cpu_register(const OpenRISCCPUInfo *info)
--{
--    TypeInfo type_info =3D {
--        .parent =3D TYPE_OPENRISC_CPU,
--        .instance_size =3D sizeof(OpenRISCCPU),
--        .instance_init =3D info->initfn,
--        .class_size =3D sizeof(OpenRISCCPUClass),
--    };
--
--    type_info.name =3D g_strdup_printf("%s-" TYPE_OPENRISC_CPU, info->na=
-me);
--    type_register(&type_info);
--    g_free((void *)type_info.name);
--}
--
--static const TypeInfo openrisc_cpu_type_info =3D {
--    .name =3D TYPE_OPENRISC_CPU,
--    .parent =3D TYPE_CPU,
--    .instance_size =3D sizeof(OpenRISCCPU),
--    .instance_init =3D openrisc_cpu_initfn,
--    .abstract =3D true,
--    .class_size =3D sizeof(OpenRISCCPUClass),
--    .class_init =3D openrisc_cpu_class_init,
--};
--
--static void openrisc_cpu_register_types(void)
--{
--    int i;
--
--    type_register_static(&openrisc_cpu_type_info);
--    for (i =3D 0; i < ARRAY_SIZE(openrisc_cpus); i++) {
--        cpu_register(&openrisc_cpus[i]);
--    }
--}
--
- /* Sort alphabetically by type name, except for "any". */
- static gint openrisc_cpu_list_compare(gconstpointer a, gconstpointer b)
- {
-@@ -254,4 +210,25 @@ void cpu_openrisc_list(FILE *f, fprintf_function cpu=
-_fprintf)
+diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
+index 72f1dec..e715560 100644
+--- a/target/sh4/cpu.c
++++ b/target/sh4/cpu.c
+@@ -120,36 +120,26 @@ void sh4_cpu_list(FILE *f, fprintf_function cpu_fpr=
+intf)
      g_slist_free(list);
  }
 =20
--type_init(openrisc_cpu_register_types)
-+#define DEFINE_OPENRISC_CPU_TYPE(cpu_model, initfn) \
-+    {                                               \
-+        .parent =3D TYPE_OPENRISC_CPU,                \
-+        .instance_init =3D initfn,                    \
-+        .name =3D OPENRISC_CPU_TYPE_NAME(cpu_model),  \
-+    }
-+
-+static const TypeInfo openrisc_cpus_type_infos[] =3D {
-+    { /* base class should be registered first */
-+        .name =3D TYPE_OPENRISC_CPU,
-+        .parent =3D TYPE_CPU,
-+        .instance_size =3D sizeof(OpenRISCCPU),
-+        .instance_init =3D openrisc_cpu_initfn,
-+        .abstract =3D true,
-+        .class_size =3D sizeof(OpenRISCCPUClass),
-+        .class_init =3D openrisc_cpu_class_init,
-+    },
-+    DEFINE_OPENRISC_CPU_TYPE("or1200", or1200_initfn),
-+    DEFINE_OPENRISC_CPU_TYPE("any", openrisc_any_initfn),
-+};
-+
-+DEFINE_TYPES(openrisc_cpus_type_infos)
+-static gint superh_cpu_name_compare(gconstpointer a, gconstpointer b)
+-{
+-    const SuperHCPUClass *scc =3D SUPERH_CPU_CLASS(a);
+-    const char *name =3D b;
+-
+-    return strcasecmp(scc->name, name);
+-}
+-
+ static ObjectClass *superh_cpu_class_by_name(const char *cpu_model)
+ {
+     ObjectClass *oc;
+-    GSList *list, *item;
++    char *s, *typename =3D NULL;
+=20
+-    if (strcasecmp(cpu_model, "any") =3D=3D 0) {
+-        return object_class_by_name(TYPE_SH7750R_CPU);
++    s =3D g_ascii_strdown(cpu_model, -1);
++    if (strcmp(s, "any") =3D=3D 0) {
++        oc =3D object_class_by_name(TYPE_SH7750R_CPU);
++        goto out;
+     }
+=20
+-    oc =3D object_class_by_name(cpu_model);
+-    if (oc !=3D NULL && object_class_dynamic_cast(oc, TYPE_SUPERH_CPU) !=
+=3D NULL
+-        && !object_class_is_abstract(oc)) {
+-        return oc;
++    typename =3D g_strdup_printf(SUPERH_CPU_TYPE_NAME("%s"), s);
++    oc =3D object_class_by_name(typename);
++    if (oc !=3D NULL && object_class_is_abstract(oc)) {
++        oc =3D NULL;
+     }
+=20
+-    oc =3D NULL;
+-    list =3D object_class_get_list(TYPE_SUPERH_CPU, false);
+-    item =3D g_slist_find_custom(list, cpu_model, superh_cpu_name_compar=
+e);
+-    if (item !=3D NULL) {
+-        oc =3D item->data;
+-    }
+-    g_slist_free(list);
++out:
++    g_free(s);
++    g_free(typename);
+     return oc;
+ }
+=20
 --=20
 2.7.4
