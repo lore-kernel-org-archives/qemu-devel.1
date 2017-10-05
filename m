@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e0BQK-0007gL-IH
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:03:16 -0400
+	(envelope-from <eblake@redhat.com>) id 1e0BQb-0007qp-9v
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:03:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e0BQJ-0002C1-HU
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:03:08 -0400
+	(envelope-from <eblake@redhat.com>) id 1e0BQY-0002MO-2F
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:03:25 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu,  5 Oct 2017 14:02:43 -0500
-Message-Id: <20171005190248.5537-2-eblake@redhat.com>
+Date: Thu,  5 Oct 2017 14:02:45 -0500
+Message-Id: <20171005190248.5537-4-eblake@redhat.com>
 In-Reply-To: <20171005190248.5537-1-eblake@redhat.com>
 References: <20171005190248.5537-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/6] qemu-io: Add -C for opening with
- copy-on-read
+Subject: [Qemu-devel] [PATCH v3 3/6] iotests: Restore stty settings on
+ completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,92 +23,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Make it easier to enable copy-on-read during iotests, by
-exposing a new bool option to main and open.
+Executing qemu with a terminal as stdin will temporarily alter stty
+settings on that terminal (for example, disabling echo), because of
+how we run both the monitor and any multiplexing with guest input.
+Normally, qemu restores the original settings on exit; but if an
+iotest triggers qemu to abort in the middle, we can be left with
+the altered terminal setup.  This can make life very annoying when
+debugging an iotest failure (not everyone remembers the trick of
+blind-typing 'stty sane' without echo, and some people prefer
+terminal settings that are slightly different than the defaults
+picked by 'stty sane').
+
+It is possible to avoid qemu corrupting the terminal by not passing
+a terminal to qemu's stdin in the first place (as in, use
+'./check ... </dev/null'), but that's extra typing to have to
+remember.  But running 'exec </dev/null' in the harness seems like
+it might be too heavy of a hammer.  So I instead went the the
+solution of saving and restoring the stty settings, only when the
+harness detects that it is run interactively.
+
+I tested this patch by forcing an allocation failure (I can't
+guarantee that this particular limit will work on all setups, but
+it shows the idea):
+ $ (ulimit -S -v 500000; ./check -qcow2 1)
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
 ---
- qemu-io.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+v3: new patch
+---
+ tests/qemu-iotests/check | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/qemu-io.c b/qemu-io.c
-index 265445ad89..c70bde3eb1 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -102,6 +102,7 @@ static void open_help(void)
- " Opens a file for subsequent use by all of the other qemu-io commands.\n"
- " -r, -- open file read-only\n"
- " -s, -- use snapshot file\n"
-+" -C, -- use copy-on-read\n"
- " -n, -- disable host cache, short for -t none\n"
- " -U, -- force shared permissions\n"
- " -k, -- use kernel AIO implementation (on Linux only)\n"
-@@ -120,7 +121,7 @@ static const cmdinfo_t open_cmd = {
-     .argmin     = 1,
-     .argmax     = -1,
-     .flags      = CMD_NOFILE_OK,
--    .args       = "[-rsnkU] [-t cache] [-d discard] [-o options] [path]",
-+    .args       = "[-rsCnkU] [-t cache] [-d discard] [-o options] [path]",
-     .oneline    = "open the file specified by path",
-     .help       = open_help,
- };
-@@ -145,7 +146,7 @@ static int open_f(BlockBackend *blk, int argc, char **argv)
-     QDict *opts;
-     bool force_share = false;
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index 176cb8e937..e6b6ff7a04 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -134,6 +134,13 @@ export VALGRIND_QEMU=
+ export IMGKEYSECRET=
+ export IMGOPTSSYNTAX=false
 
--    while ((c = getopt(argc, argv, "snro:kt:d:U")) != -1) {
-+    while ((c = getopt(argc, argv, "snCro:kt:d:U")) != -1) {
-         switch (c) {
-         case 's':
-             flags |= BDRV_O_SNAPSHOT;
-@@ -154,6 +155,9 @@ static int open_f(BlockBackend *blk, int argc, char **argv)
-             flags |= BDRV_O_NOCACHE;
-             writethrough = false;
-             break;
-+        case 'C':
-+            flags |= BDRV_O_COPY_ON_READ;
-+            break;
-         case 'r':
-             readonly = 1;
-             break;
-@@ -251,6 +255,7 @@ static void usage(const char *name)
- "  -r, --read-only      export read-only\n"
- "  -s, --snapshot       use snapshot file\n"
- "  -n, --nocache        disable host cache, short for -t none\n"
-+"  -C, --copy-on-read   enable copy-on-read\n"
- "  -m, --misalign       misalign allocations for O_DIRECT\n"
- "  -k, --native-aio     use kernel AIO implementation (on Linux only)\n"
- "  -t, --cache=MODE     use the given cache mode for the image\n"
-@@ -439,7 +444,7 @@ static QemuOptsList file_opts = {
- int main(int argc, char **argv)
- {
-     int readonly = 0;
--    const char *sopt = "hVc:d:f:rsnmkt:T:U";
-+    const char *sopt = "hVc:d:f:rsnCmkt:T:U";
-     const struct option lopt[] = {
-         { "help", no_argument, NULL, 'h' },
-         { "version", no_argument, NULL, 'V' },
-@@ -448,6 +453,7 @@ int main(int argc, char **argv)
-         { "read-only", no_argument, NULL, 'r' },
-         { "snapshot", no_argument, NULL, 's' },
-         { "nocache", no_argument, NULL, 'n' },
-+        { "copy-on-read", no_argument, NULL, 'C' },
-         { "misalign", no_argument, NULL, 'm' },
-         { "native-aio", no_argument, NULL, 'k' },
-         { "discard", required_argument, NULL, 'd' },
-@@ -492,6 +498,9 @@ int main(int argc, char **argv)
-             flags |= BDRV_O_NOCACHE;
-             writethrough = false;
-             break;
-+        case 'C':
-+            flags |= BDRV_O_COPY_ON_READ;
-+            break;
-         case 'd':
-             if (bdrv_parse_discard_flags(optarg, &flags) < 0) {
-                 error_report("Invalid discard option: %s", optarg);
++# Save current tty settings, since an aborting qemu call may leave things
++# screwed up
++STTY_RESTORE=
++if test -t 0; then
++    STTY_RESTORE=$(stty -g)
++fi
++
+ for r
+ do
+
+@@ -664,6 +671,9 @@ END        { if (NR > 0) {
+         needwrap=false
+     fi
+
++    if test -n "$STTY_RESTORE"; then
++        stty $STTY_RESTORE
++    fi
+     rm -f "${TEST_DIR}"/*.out "${TEST_DIR}"/*.err "${TEST_DIR}"/*.time
+     rm -f "${TEST_DIR}"/check.pid "${TEST_DIR}"/check.sts
+     rm -f $tmp.*
 -- 
 2.13.6
