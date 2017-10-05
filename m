@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06Z5-0007cd-EC
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:52 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e06Z6-0007dl-KM
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06Z1-00009G-AN
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35344)
+	(envelope-from <imammedo@redhat.com>) id 1e06Z2-0000Ac-IK
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35578)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06Z1-00008S-3i
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:47 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06Z2-00009e-8V
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:48 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu,  5 Oct 2017 15:50:59 +0200
-Message-Id: <1507211474-188400-26-git-send-email-imammedo@redhat.com>
+Date: Thu,  5 Oct 2017 15:51:00 +0200
+Message-Id: <1507211474-188400-27-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
 References: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 25/40] xtensa: sim: use generic cpu_model
- parsing
+Subject: [Qemu-devel] [PATCH v2 26/40] xtensa: lx60/lx200/ml605/kc705: use
+ generic cpu_model parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,19 +35,25 @@ Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
 CC: jcmvbkbc@gmail.com
 ---
- hw/xtensa/sim.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ hw/xtensa/xtfpga.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
-index b3580b1..2bb883b 100644
---- a/hw/xtensa/sim.c
-+++ b/hw/xtensa/sim.c
-@@ -75,16 +75,11 @@ static void xtensa_sim_init(MachineState *machine)
-     XtensaCPU *cpu =3D NULL;
-     CPUXtensaState *env =3D NULL;
-     ram_addr_t ram_size =3D machine->ram_size;
+diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+index a19cceb..1971ecf 100644
+--- a/hw/xtensa/xtfpga.c
++++ b/hw/xtensa/xtfpga.c
+@@ -220,19 +220,14 @@ static void lx_init(const LxBoardDesc *board, Machi=
+neState *machine)
+     DriveInfo *dinfo;
+     pflash_t *flash =3D NULL;
+     QemuOpts *machine_opts =3D qemu_get_machine_opts();
 -    const char *cpu_model =3D machine->cpu_model;
-     const char *kernel_filename =3D machine->kernel_filename;
+     const char *kernel_filename =3D qemu_opt_get(machine_opts, "kernel")=
+;
+     const char *kernel_cmdline =3D qemu_opt_get(machine_opts, "append");
+     const char *dtb_filename =3D qemu_opt_get(machine_opts, "dtb");
+     const char *initrd_filename =3D qemu_opt_get(machine_opts, "initrd")=
+;
      int n;
 =20
 -    if (!cpu_model) {
@@ -61,13 +67,41 @@ index b3580b1..2bb883b 100644
          env =3D &cpu->env;
 =20
          env->sregs[PRID] =3D n;
-@@ -133,6 +128,7 @@ static void xtensa_sim_machine_init(MachineClass *mc)
-     mc->init =3D xtensa_sim_init;
+@@ -454,6 +449,7 @@ static void xtensa_lx60_class_init(ObjectClass *oc, v=
+oid *data)
+     mc->desc =3D "lx60 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
+     mc->init =3D xtensa_lx60_init;
      mc->max_cpus =3D 4;
-     mc->no_serial =3D 1;
 +    mc->default_cpu_type =3D XTENSA_DEFAULT_CPU_TYPE;
  }
 =20
- DEFINE_MACHINE("sim", xtensa_sim_machine_init)
+ static const TypeInfo xtensa_lx60_type =3D {
+@@ -469,6 +465,7 @@ static void xtensa_lx200_class_init(ObjectClass *oc, =
+void *data)
+     mc->desc =3D "lx200 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
+     mc->init =3D xtensa_lx200_init;
+     mc->max_cpus =3D 4;
++    mc->default_cpu_type =3D XTENSA_DEFAULT_CPU_TYPE;
+ }
+=20
+ static const TypeInfo xtensa_lx200_type =3D {
+@@ -484,6 +481,7 @@ static void xtensa_ml605_class_init(ObjectClass *oc, =
+void *data)
+     mc->desc =3D "ml605 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
+     mc->init =3D xtensa_ml605_init;
+     mc->max_cpus =3D 4;
++    mc->default_cpu_type =3D XTENSA_DEFAULT_CPU_TYPE;
+ }
+=20
+ static const TypeInfo xtensa_ml605_type =3D {
+@@ -499,6 +497,7 @@ static void xtensa_kc705_class_init(ObjectClass *oc, =
+void *data)
+     mc->desc =3D "kc705 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
+     mc->init =3D xtensa_kc705_init;
+     mc->max_cpus =3D 4;
++    mc->default_cpu_type =3D XTENSA_DEFAULT_CPU_TYPE;
+ }
+=20
+ static const TypeInfo xtensa_kc705_type =3D {
 --=20
 2.7.4
