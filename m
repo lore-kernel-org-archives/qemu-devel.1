@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06Yi-0007El-KO
+	(envelope-from <imammedo@redhat.com>) id 1e06Yj-0007G9-OE
 	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06Yh-0008Kr-EB
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59182)
+	(envelope-from <imammedo@redhat.com>) id 1e06Yd-0008Ii-PC
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56326)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06Yh-0008Kd-5e
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:27 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06Yd-0008I6-Is
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:23 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu,  5 Oct 2017 15:50:42 +0200
-Message-Id: <1507211474-188400-9-git-send-email-imammedo@redhat.com>
+Date: Thu,  5 Oct 2017 15:50:39 +0200
+Message-Id: <1507211474-188400-6-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
 References: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 08/40] lm32: cleanup cpu type name
- composition
+Subject: [Qemu-devel] [PATCH v2 05/40] alpha: use generic cpu_model parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,147 +27,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, michael@walle.cc
-
-introduce LM32_CPU_TYPE_NAME macro and consistently use it
-to construct cpu type names. While at it replace dynamic
-cpu type name composition with static data.
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, rth@twiddle.net
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: Richard Henderson <rth@twiddle.net>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Acked-by: Michael Walle <michael@walle.cc>
 ---
-v2:  rename type_init_from_array into DEFINE_TYPES
-
-CC: michael@walle.cc
+CC: rth@twiddle.net
 ---
- target/lm32/cpu.h |  3 +++
- target/lm32/cpu.c | 74 +++++++++++++++++--------------------------------=
-------
- 2 files changed, 25 insertions(+), 52 deletions(-)
+ hw/alpha/dp264.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/target/lm32/cpu.h b/target/lm32/cpu.h
-index de265b5..2279594 100644
---- a/target/lm32/cpu.h
-+++ b/target/lm32/cpu.h
-@@ -257,6 +257,9 @@ bool lm32_cpu_do_semihosting(CPUState *cs);
-=20
- #define cpu_init(cpu_model) cpu_generic_init(TYPE_LM32_CPU, cpu_model)
-=20
-+#define LM32_CPU_TYPE_SUFFIX "-" TYPE_LM32_CPU
-+#define LM32_CPU_TYPE_NAME(model) model LM32_CPU_TYPE_SUFFIX
-+
- #define cpu_list lm32_cpu_list
- #define cpu_signal_handler cpu_lm32_signal_handler
-=20
-diff --git a/target/lm32/cpu.c b/target/lm32/cpu.c
-index bf081f5..43d84a1 100644
---- a/target/lm32/cpu.c
-+++ b/target/lm32/cpu.c
-@@ -51,7 +51,7 @@ static void lm32_cpu_list_entry(gpointer data, gpointer=
- user_data)
-     const char *typename =3D object_class_get_name(oc);
-     char *name;
-=20
--    name =3D g_strndup(typename, strlen(typename) - strlen("-" TYPE_LM32=
-_CPU));
-+    name =3D g_strndup(typename, strlen(typename) - strlen(LM32_CPU_TYPE=
-_SUFFIX));
-     (*s->cpu_fprintf)(s->file, "  %s\n", name);
-     g_free(name);
- }
-@@ -221,32 +221,12 @@ static void lm32_full_cpu_initfn(Object *obj)
-                   | LM32_FEATURE_CYCLE_COUNT;
- }
-=20
--typedef struct LM32CPUInfo {
--    const char *name;
--    void (*initfn)(Object *obj);
--} LM32CPUInfo;
--
--static const LM32CPUInfo lm32_cpus[] =3D {
--    {
--        .name =3D "lm32-basic",
--        .initfn =3D lm32_basic_cpu_initfn,
--    },
--    {
--        .name =3D "lm32-standard",
--        .initfn =3D lm32_standard_cpu_initfn,
--    },
--    {
--        .name =3D "lm32-full",
--        .initfn =3D lm32_full_cpu_initfn,
--    },
--};
--
- static ObjectClass *lm32_cpu_class_by_name(const char *cpu_model)
+diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
+index 1b12130..babd6ea 100644
+--- a/hw/alpha/dp264.c
++++ b/hw/alpha/dp264.c
+@@ -51,7 +51,6 @@ static int clipper_pci_map_irq(PCIDevice *d, int irq_nu=
+m)
+ static void clipper_init(MachineState *machine)
  {
-     ObjectClass *oc;
-     char *typename;
+     ram_addr_t ram_size =3D machine->ram_size;
+-    const char *cpu_model =3D machine->cpu_model ? machine->cpu_model : =
+"ev67";
+     const char *kernel_filename =3D machine->kernel_filename;
+     const char *kernel_cmdline =3D machine->kernel_cmdline;
+     const char *initrd_filename =3D machine->initrd_filename;
+@@ -67,7 +66,7 @@ static void clipper_init(MachineState *machine)
+     /* Create up to 4 cpus.  */
+     memset(cpus, 0, sizeof(cpus));
+     for (i =3D 0; i < smp_cpus; ++i) {
+-        cpus[i] =3D ALPHA_CPU(cpu_generic_init(TYPE_ALPHA_CPU, cpu_model=
+));
++        cpus[i] =3D ALPHA_CPU(cpu_create(machine->cpu_type));
+     }
 =20
--    typename =3D g_strdup_printf("%s-" TYPE_LM32_CPU, cpu_model);
-+    typename =3D g_strdup_printf(LM32_CPU_TYPE_NAME("%s"), cpu_model);
-     oc =3D object_class_by_name(typename);
-     g_free(typename);
-     if (oc !=3D NULL && (!object_class_dynamic_cast(oc, TYPE_LM32_CPU) |=
-|
-@@ -288,36 +268,26 @@ static void lm32_cpu_class_init(ObjectClass *oc, vo=
-id *data)
-     cc->disas_set_info =3D lm32_cpu_disas_set_info;
+     cpus[0]->env.trap_arg0 =3D ram_size;
+@@ -179,6 +178,7 @@ static void clipper_machine_init(MachineClass *mc)
+     mc->block_default_type =3D IF_IDE;
+     mc->max_cpus =3D 4;
+     mc->is_default =3D 1;
++    mc->default_cpu_type =3D ALPHA_CPU_TYPE_NAME("ev67");
  }
 =20
--static void lm32_register_cpu_type(const LM32CPUInfo *info)
--{
--    TypeInfo type_info =3D {
--        .parent =3D TYPE_LM32_CPU,
--        .instance_init =3D info->initfn,
--    };
--
--    type_info.name =3D g_strdup_printf("%s-" TYPE_LM32_CPU, info->name);
--    type_register(&type_info);
--    g_free((void *)type_info.name);
--}
-+#define DEFINE_LM32_CPU_TYPE(cpu_model, initfn) \
-+    { \
-+        .parent =3D TYPE_LM32_CPU, \
-+        .name =3D LM32_CPU_TYPE_NAME(cpu_model), \
-+        .instance_init =3D initfn, \
-+    }
-=20
--static const TypeInfo lm32_cpu_type_info =3D {
--    .name =3D TYPE_LM32_CPU,
--    .parent =3D TYPE_CPU,
--    .instance_size =3D sizeof(LM32CPU),
--    .instance_init =3D lm32_cpu_initfn,
--    .abstract =3D true,
--    .class_size =3D sizeof(LM32CPUClass),
--    .class_init =3D lm32_cpu_class_init,
-+static const TypeInfo lm32_cpus_type_infos[] =3D {
-+    { /* base class should be registered first */
-+         .name =3D TYPE_LM32_CPU,
-+         .parent =3D TYPE_CPU,
-+         .instance_size =3D sizeof(LM32CPU),
-+         .instance_init =3D lm32_cpu_initfn,
-+         .abstract =3D true,
-+         .class_size =3D sizeof(LM32CPUClass),
-+         .class_init =3D lm32_cpu_class_init,
-+    },
-+    DEFINE_LM32_CPU_TYPE("lm32-basic", lm32_basic_cpu_initfn),
-+    DEFINE_LM32_CPU_TYPE("lm32-standard", lm32_standard_cpu_initfn),
-+    DEFINE_LM32_CPU_TYPE("lm32-full", lm32_full_cpu_initfn),
- };
-=20
--static void lm32_cpu_register_types(void)
--{
--    int i;
--
--    type_register_static(&lm32_cpu_type_info);
--    for (i =3D 0; i < ARRAY_SIZE(lm32_cpus); i++) {
--        lm32_register_cpu_type(&lm32_cpus[i]);
--    }
--}
--
--type_init(lm32_cpu_register_types)
-+DEFINE_TYPES(lm32_cpus_type_infos)
+ DEFINE_MACHINE("clipper", clipper_machine_init)
 --=20
 2.7.4
