@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06Z6-0007dl-KM
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:53 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e06Z8-0007fi-Cr
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06Z2-0000Ac-IK
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35578)
+	(envelope-from <imammedo@redhat.com>) id 1e06Z7-0000IF-D0
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35802)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06Z2-00009e-8V
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:48 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06Z7-0000GN-4k
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:53 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu,  5 Oct 2017 15:51:00 +0200
-Message-Id: <1507211474-188400-27-git-send-email-imammedo@redhat.com>
+Date: Thu,  5 Oct 2017 15:51:03 +0200
+Message-Id: <1507211474-188400-30-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
 References: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 26/40] xtensa: lx60/lx200/ml605/kc705: use
- generic cpu_model parsing
+Subject: [Qemu-devel] [PATCH v2 29/40] tricore: cleanup cpu type name
+ composition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +28,138 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, jcmvbkbc@gmail.com
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, kbastian@mail.uni-paderborn.de
+
+introduce TRICORE_CPU_TYPE_NAME macro and use it to construct
+cpu type names. While at it move cpu type_infos into one
+array and register it directly with type_init_from_array()
+instead of custom tricore_cpu_register_types()/cpu_register()
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
-CC: jcmvbkbc@gmail.com
----
- hw/xtensa/xtfpga.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+v2:  rename type_init_from_array into DEFINE_TYPES
 
-diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-index a19cceb..1971ecf 100644
---- a/hw/xtensa/xtfpga.c
-+++ b/hw/xtensa/xtfpga.c
-@@ -220,19 +220,14 @@ static void lx_init(const LxBoardDesc *board, Machi=
-neState *machine)
-     DriveInfo *dinfo;
-     pflash_t *flash =3D NULL;
-     QemuOpts *machine_opts =3D qemu_get_machine_opts();
--    const char *cpu_model =3D machine->cpu_model;
-     const char *kernel_filename =3D qemu_opt_get(machine_opts, "kernel")=
-;
-     const char *kernel_cmdline =3D qemu_opt_get(machine_opts, "append");
-     const char *dtb_filename =3D qemu_opt_get(machine_opts, "dtb");
-     const char *initrd_filename =3D qemu_opt_get(machine_opts, "initrd")=
-;
-     int n;
+CC: kbastian@mail.uni-paderborn.de
+---
+ target/tricore/cpu.h |  2 ++
+ target/tricore/cpu.c | 68 ++++++++++++++++------------------------------=
+------
+ 2 files changed, 22 insertions(+), 48 deletions(-)
+
+diff --git a/target/tricore/cpu.h b/target/tricore/cpu.h
+index bc53c40..f41d2ce 100644
+--- a/target/tricore/cpu.h
++++ b/target/tricore/cpu.h
+@@ -413,6 +413,8 @@ static inline void cpu_get_tb_cpu_state(CPUTriCoreSta=
+te *env, target_ulong *pc,
 =20
--    if (!cpu_model) {
--        cpu_model =3D XTENSA_DEFAULT_CPU_MODEL;
--    }
+ #define cpu_init(cpu_model) cpu_generic_init(TYPE_TRICORE_CPU, cpu_model=
+)
+=20
++#define TRICORE_CPU_TYPE_SUFFIX "-" TYPE_TRICORE_CPU
++#define TRICORE_CPU_TYPE_NAME(model) model TRICORE_CPU_TYPE_SUFFIX
+=20
+ /* helpers.c */
+ int cpu_tricore_handle_mmu_fault(CPUState *cpu, target_ulong address,
+diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
+index 871eb35..ed94dee 100644
+--- a/target/tricore/cpu.c
++++ b/target/tricore/cpu.c
+@@ -120,7 +120,7 @@ static ObjectClass *tricore_cpu_class_by_name(const c=
+har *cpu_model)
+     ObjectClass *oc;
+     char *typename;
+=20
+-    typename =3D g_strdup_printf("%s-" TYPE_TRICORE_CPU, cpu_model);
++    typename =3D g_strdup_printf(TRICORE_CPU_TYPE_NAME("%s"), cpu_model)=
+;
+     oc =3D object_class_by_name(typename);
+     g_free(typename);
+     if (!oc || !object_class_dynamic_cast(oc, TYPE_TRICORE_CPU) ||
+@@ -151,19 +151,6 @@ static void tc27x_initfn(Object *obj)
+     set_feature(&cpu->env, TRICORE_FEATURE_161);
+ }
+=20
+-typedef struct TriCoreCPUInfo {
+-    const char *name;
+-    void (*initfn)(Object *obj);
+-    void (*class_init)(ObjectClass *oc, void *data);
+-} TriCoreCPUInfo;
 -
-     for (n =3D 0; n < smp_cpus; n++) {
--        cpu =3D XTENSA_CPU(cpu_generic_init(TYPE_XTENSA_CPU, cpu_model))=
-;
-+        cpu =3D XTENSA_CPU(cpu_create(machine->cpu_type));
-         env =3D &cpu->env;
-=20
-         env->sregs[PRID] =3D n;
-@@ -454,6 +449,7 @@ static void xtensa_lx60_class_init(ObjectClass *oc, v=
-oid *data)
-     mc->desc =3D "lx60 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
-     mc->init =3D xtensa_lx60_init;
-     mc->max_cpus =3D 4;
-+    mc->default_cpu_type =3D XTENSA_DEFAULT_CPU_TYPE;
- }
-=20
- static const TypeInfo xtensa_lx60_type =3D {
-@@ -469,6 +465,7 @@ static void xtensa_lx200_class_init(ObjectClass *oc, =
+-static const TriCoreCPUInfo tricore_cpus[] =3D {
+-    { .name =3D "tc1796",      .initfn =3D tc1796_initfn },
+-    { .name =3D "tc1797",      .initfn =3D tc1797_initfn },
+-    { .name =3D "tc27x",       .initfn =3D tc27x_initfn },
+-    { .name =3D NULL }
+-};
+-
+ static void tricore_cpu_class_init(ObjectClass *c, void *data)
+ {
+     TriCoreCPUClass *mcc =3D TRICORE_CPU_CLASS(c);
+@@ -184,41 +171,26 @@ static void tricore_cpu_class_init(ObjectClass *c, =
 void *data)
-     mc->desc =3D "lx200 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
-     mc->init =3D xtensa_lx200_init;
-     mc->max_cpus =3D 4;
-+    mc->default_cpu_type =3D XTENSA_DEFAULT_CPU_TYPE;
+     cc->get_phys_page_attrs_debug =3D tricore_cpu_get_phys_page_attrs_de=
+bug;
  }
 =20
- static const TypeInfo xtensa_lx200_type =3D {
-@@ -484,6 +481,7 @@ static void xtensa_ml605_class_init(ObjectClass *oc, =
-void *data)
-     mc->desc =3D "ml605 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
-     mc->init =3D xtensa_ml605_init;
-     mc->max_cpus =3D 4;
-+    mc->default_cpu_type =3D XTENSA_DEFAULT_CPU_TYPE;
- }
+-static void cpu_register(const TriCoreCPUInfo *info)
+-{
+-    TypeInfo type_info =3D {
+-        .parent =3D TYPE_TRICORE_CPU,
++#define DEFINE_TRICORE_CPU_TYPE(cpu_model, initfn) \
++    {                                              \
++        .parent =3D TYPE_TRICORE_CPU,                \
++        .instance_init =3D initfn,                   \
++        .name =3D TRICORE_CPU_TYPE_NAME(cpu_model),  \
++    }
++
++static const TypeInfo tricore_cpu_type_infos[] =3D {
++    {
++        .name =3D TYPE_TRICORE_CPU,
++        .parent =3D TYPE_CPU,
+         .instance_size =3D sizeof(TriCoreCPU),
+-        .instance_init =3D info->initfn,
++        .instance_init =3D tricore_cpu_initfn,
++        .abstract =3D true,
+         .class_size =3D sizeof(TriCoreCPUClass),
+-        .class_init =3D info->class_init,
+-    };
+-
+-    type_info.name =3D g_strdup_printf("%s-" TYPE_TRICORE_CPU, info->nam=
+e);
+-    type_register(&type_info);
+-    g_free((void *)type_info.name);
+-}
+-
+-static const TypeInfo tricore_cpu_type_info =3D {
+-    .name =3D TYPE_TRICORE_CPU,
+-    .parent =3D TYPE_CPU,
+-    .instance_size =3D sizeof(TriCoreCPU),
+-    .instance_init =3D tricore_cpu_initfn,
+-    .abstract =3D true,
+-    .class_size =3D sizeof(TriCoreCPUClass),
+-    .class_init =3D tricore_cpu_class_init,
++        .class_init =3D tricore_cpu_class_init,
++    },
++    DEFINE_TRICORE_CPU_TYPE("tc1796", tc1796_initfn),
++    DEFINE_TRICORE_CPU_TYPE("tc1797", tc1797_initfn),
++    DEFINE_TRICORE_CPU_TYPE("tc27x", tc27x_initfn),
+ };
 =20
- static const TypeInfo xtensa_ml605_type =3D {
-@@ -499,6 +497,7 @@ static void xtensa_kc705_class_init(ObjectClass *oc, =
-void *data)
-     mc->desc =3D "kc705 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
-     mc->init =3D xtensa_kc705_init;
-     mc->max_cpus =3D 4;
-+    mc->default_cpu_type =3D XTENSA_DEFAULT_CPU_TYPE;
- }
-=20
- static const TypeInfo xtensa_kc705_type =3D {
+-static void tricore_cpu_register_types(void)
+-{
+-    const TriCoreCPUInfo *info =3D tricore_cpus;
+-
+-    type_register_static(&tricore_cpu_type_info);
+-
+-    while (info->name) {
+-        cpu_register(info);
+-        info++;
+-    }
+-}
+-
+-type_init(tricore_cpu_register_types)
++DEFINE_TYPES(tricore_cpu_type_infos)
 --=20
 2.7.4
