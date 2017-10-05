@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e03lC-000352-PY
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 06:52:14 -0400
+	(envelope-from <prvs=4442ceff9=Ian.Jackson@citrix.com>)
+	id 1e041x-0000Vg-Id
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:09:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e03l6-0003Un-RR
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 06:52:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34386)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e03l6-0003TU-Lo
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 06:52:04 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8C460C0587E8
-	for <qemu-devel@nongnu.org>; Thu,  5 Oct 2017 10:52:03 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu,  5 Oct 2017 11:51:56 +0100
-Message-Id: <20171005105157.10831-5-dgilbert@redhat.com>
-In-Reply-To: <20171005105157.10831-1-dgilbert@redhat.com>
-References: <20171005105157.10831-1-dgilbert@redhat.com>
+	(envelope-from <prvs=4442ceff9=Ian.Jackson@citrix.com>)
+	id 1e041u-00029h-94
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:09:29 -0400
+Received: from smtp02.citrix.com ([66.165.176.63]:13998)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=4442ceff9=Ian.Jackson@citrix.com>)
+	id 1e041u-00029J-3D
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:09:26 -0400
+From: Ian Jackson <ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 4/5] hmp-commands-info: Move Texinfo stanzas to
- conventional place
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Message-ID: <22998.4833.991131.797982@mariner.uk.xensource.com>
+Date: Thu, 5 Oct 2017 12:09:21 +0100
+In-Reply-To: <150714217015.153.939212709472417601@b58463cdfd5f>
+References: <1507132392-25051-1-git-send-email-ian.jackson@eu.citrix.com>
+	<150714217015.153.939212709472417601@b58463cdfd5f>
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] xen: xen-domid-restrict improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,66 +31,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com
+Cc: famz@redhat.com, anthony.perard@citrix.com, ross.lagerwall@citrix.com, sstabellini@kernel.org, jgross@suse.com, xen-devel@nongnu.org
 
-From: Markus Armbruster <armbru@redhat.com>
+no-reply@patchew.org writes ("Re: [Qemu-devel] [PATCH v2 0/7] xen: xen-domid-restrict improvements"):
 
-A command's STEXI..ETEXI stanza follows the command's initializer.
-Two commands got them backwards.  Correct that.
+> ERROR: consider using qemu_strtoul in preference to strtoul
+> #42: FILE: os-posix.c:160:
+> +        lv = strtoul(optarg, &ep, 0); /* can't qemu_strtoul, want *ep=='.' */
+> 
+> total: 1 errors, 0 warnings, 80 lines checked
+> 
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20171002134538.23332-3-armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hmp-commands-info.hx | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+As I said earlier, it is not clear to me what to do about this.
 
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index 574db7d24e..d27d3b1227 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -837,12 +837,6 @@ STEXI
- Show information about hotpluggable CPUs
- ETEXI
-=20
--STEXI
--@item info vm-generation-id
--@findex vm-generation-id
--Show Virtual Machine Generation ID
--ETEXI
--
-     {
-         .name       =3D "vm-generation-id",
-         .args_type  =3D "",
-@@ -852,10 +846,9 @@ ETEXI
-     },
-=20
- STEXI
--@item info memory_size_summary
--@findex memory_size_summary
--Display the amount of initially allocated and present hotpluggable (if
--enabled) memory in bytes.
-+@item info vm-generation-id
-+@findex vm-generation-id
-+Show Virtual Machine Generation ID
- ETEXI
-=20
-     {
-@@ -868,6 +861,13 @@ ETEXI
-     },
-=20
- STEXI
-+@item info memory_size_summary
-+@findex memory_size_summary
-+Display the amount of initially allocated and present hotpluggable (if
-+enabled) memory in bytes.
-+ETEXI
-+
-+STEXI
- @end table
- ETEXI
-=20
---=20
-2.13.6
+checkpatch's suggestion to use qemu_strtoul is appropriate.  But,
+qemu_strtoul isn't quite a 100% replacement for all strtoul use cases,
+and this is one of the exceptions.
+
+I have added this comment and you'll see in the patch that surrounding
+that line there is attention paid to the error handling, overflows,
+etc.
+
+Maybe I should submit a patch to checkpatch that causes this
+suggestion to go away if qemu_strtoul is mentioned "nearby" (maybe on
+the same line or an adjacent line), so that the use of qemu_strtoul
+rather thanraw strtoul has indeed been "considered" as the message
+suggests ?
+
+Regards,
+Ian.
