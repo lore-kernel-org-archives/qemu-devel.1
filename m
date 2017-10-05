@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e02y1-00057Y-Qy
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 06:01:25 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e02xw-00054F-6e
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 06:01:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e02xw-0005VF-Bk
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 06:01:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35280)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e02xw-0005US-6R
+	(envelope-from <kraxel@redhat.com>) id 1e02xt-0005QS-Hb
 	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 06:01:16 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+Received: from mx1.redhat.com ([209.132.183.28]:53540)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e02xt-0005P5-9F
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 06:01:13 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 38FF7356F2
-	for <qemu-devel@nongnu.org>; Thu,  5 Oct 2017 10:01:15 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1A9FE7E454
+	for <qemu-devel@nongnu.org>; Thu,  5 Oct 2017 10:01:12 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  5 Oct 2017 12:01:06 +0200
-Message-Id: <20171005100106.30118-7-kraxel@redhat.com>
+Date: Thu,  5 Oct 2017 12:01:01 +0200
+Message-Id: <20171005100106.30118-2-kraxel@redhat.com>
 In-Reply-To: <20171005100106.30118-1-kraxel@redhat.com>
 References: <20171005100106.30118-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 6/6] ui: don't export qemu_input_event_new_key
+Subject: [Qemu-devel] [PULL 1/6] build: automatically handle GIT submodule
+ checkout for dtc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,41 +35,221 @@ Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-All public code should use qemu_input_event_send_key* functions
-instead of creating an event directly.
+Currently if DTC is required by configure and not available in the host
+OS install, we exit with an error message telling the user to checkout a
+git submodule or install the library.
+
+This introduces automatic handling of the git submodule checkout process
+and enables it for dtc. This only runs if building from GIT, so users of
+release tarballs still need the system library install. The current state
+of the git checkout is stashed in .git-submodule-status, and a helper
+program is used to determine if this state matches the desired submodule
+state. A dependency against 'Makefile' ensures that the submodule state
+is refreshed at the start of the build process
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170929101201.21039-7-berrange@redhat.com
+Message-id: 20170929101201.21039-2-berrange@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/ui/input.h | 1 -
- ui/input.c         | 2 +-
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ configure                | 46 ++++++++++++++++++++++++++--------------------
+ Makefile                 | 25 ++++++++++++++++++++++++-
+ .gitignore               |  1 +
+ MAINTAINERS              |  6 ++++++
+ scripts/git-submodule.sh | 38 ++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 95 insertions(+), 21 deletions(-)
+ create mode 100755 scripts/git-submodule.sh
 
-diff --git a/include/ui/input.h b/include/ui/input.h
-index 479cc46cfc..f8cee43f65 100644
---- a/include/ui/input.h
-+++ b/include/ui/input.h
-@@ -38,7 +38,6 @@ void qemu_input_event_send_impl(QemuConsole *src, InputEvent *evt);
- void qemu_input_event_sync(void);
- void qemu_input_event_sync_impl(void);
+diff --git a/configure b/configure
+index 6587e8014b..38f1710c80 100755
+--- a/configure
++++ b/configure
+@@ -264,6 +264,7 @@ cc_i386=i386-pc-linux-gnu-gcc
+ libs_qga=""
+ debug_info="yes"
+ stack_protector=""
++git_submodules=""
  
--InputEvent *qemu_input_event_new_key(KeyValue *key, bool down);
- void qemu_input_event_send_key(QemuConsole *src, KeyValue *key, bool down);
- void qemu_input_event_send_key_number(QemuConsole *src, int num, bool down);
- void qemu_input_event_send_key_qcode(QemuConsole *src, QKeyCode q, bool down);
-diff --git a/ui/input.c b/ui/input.c
-index 4b241aa823..290b47354a 100644
---- a/ui/input.c
-+++ b/ui/input.c
-@@ -386,7 +386,7 @@ void qemu_input_event_sync(void)
-     replay_input_sync_event();
- }
+ # Don't accept a target_list environment variable.
+ unset target_list
+@@ -3584,27 +3585,30 @@ EOF
+   if compile_prog "" "$fdt_libs" ; then
+     # system DTC is good - use it
+     fdt=yes
+-  elif test -d ${source_path}/dtc/libfdt ; then
+-    # have submodule DTC - use it
+-    fdt=yes
+-    dtc_internal="yes"
+-    mkdir -p dtc
+-    if [ "$pwd_is_source_path" != "y" ] ; then
+-       symlink "$source_path/dtc/Makefile" "dtc/Makefile"
+-       symlink "$source_path/dtc/scripts" "dtc/scripts"
+-    fi
+-    fdt_cflags="-I\$(SRC_PATH)/dtc/libfdt"
+-    fdt_libs="-L\$(BUILD_DIR)/dtc/libfdt $fdt_libs"
+-  elif test "$fdt" = "yes" ; then
+-    # have neither and want - prompt for system/submodule install
+-    error_exit "DTC (libfdt) version >= 1.4.2 not present. Your options:" \
+-        "  (1) Preferred: Install the DTC (libfdt) devel package" \
+-        "  (2) Fetch the DTC submodule, using:" \
+-        "      git submodule update --init dtc"
+   else
+-    # don't have and don't want
+-    fdt_libs=
+-    fdt=no
++      # have GIT checkout, so activate dtc submodule
++      if test -e "${source_path}/.git" ; then
++          git_submodules="${git_submodules} dtc"
++      fi
++      if test -d "${source_path}/dtc/libfdt" || test -e "${source_path}/.git" ; then
++          fdt=yes
++          dtc_internal="yes"
++          mkdir -p dtc
++          if [ "$pwd_is_source_path" != "y" ] ; then
++              symlink "$source_path/dtc/Makefile" "dtc/Makefile"
++              symlink "$source_path/dtc/scripts" "dtc/scripts"
++          fi
++          fdt_cflags="-I\$(SRC_PATH)/dtc/libfdt"
++          fdt_libs="-L\$(BUILD_DIR)/dtc/libfdt $fdt_libs"
++      elif test "$fdt" = "yes" ; then
++          # Not a git build & no libfdt found, prompt for system install
++          error_exit "DTC (libfdt) version >= 1.4.2 not present." \
++                     "Please install the DTC (libfdt) devel package"
++      else
++          # don't have and don't want
++          fdt_libs=
++          fdt=no
++      fi
+   fi
+ fi
  
--InputEvent *qemu_input_event_new_key(KeyValue *key, bool down)
-+static InputEvent *qemu_input_event_new_key(KeyValue *key, bool down)
- {
-     InputEvent *evt = g_new0(InputEvent, 1);
-     evt->u.key.data = g_new0(InputKeyEvent, 1);
+@@ -5295,6 +5299,7 @@ echo "local state directory   queried at runtime"
+ echo "Windows SDK       $win_sdk"
+ fi
+ echo "Source path       $source_path"
++echo "GIT submodules    $git_submodules"
+ echo "C compiler        $cc"
+ echo "Host C compiler   $host_cc"
+ echo "C++ compiler      $cxx"
+@@ -5483,6 +5488,7 @@ echo "extra_cxxflags=$EXTRA_CXXFLAGS" >> $config_host_mak
+ echo "extra_ldflags=$EXTRA_LDFLAGS" >> $config_host_mak
+ echo "qemu_localedir=$qemu_localedir" >> $config_host_mak
+ echo "libs_softmmu=$libs_softmmu" >> $config_host_mak
++echo "GIT_SUBMODULES=$git_submodules" >> $config_host_mak
+ 
+ echo "ARCH=$ARCH" >> $config_host_mak
+ 
+diff --git a/Makefile b/Makefile
+index cee6e28659..cec0f44374 100644
+--- a/Makefile
++++ b/Makefile
+@@ -14,6 +14,29 @@ ifneq ($(wildcard config-host.mak),)
+ all:
+ include config-host.mak
+ 
++git-submodule-update:
++
++.PHONY: git-submodule-update
++
++ifeq (0,$(MAKELEVEL))
++  git_module_status := $(shell \
++    cd '$(SRC_PATH)' && \
++    ./scripts/git-submodule.sh status $(GIT_SUBMODULES); \
++    echo $$?; \
++  )
++
++ifeq (1,$(git_module_status))
++git-submodule-update:
++	$(call quiet-command, \
++          (cd $(SRC_PATH) && ./scripts/git-submodule.sh update $(GIT_SUBMODULES)), \
++          "GIT","$(GIT_SUBMODULES)")
++endif
++endif
++
++.git-submodule-status: git-submodule-update
++
++Makefile: .git-submodule-status
++
+ # Check that we're not trying to do an out-of-tree build from
+ # a tree that's been used for an in-tree build.
+ ifneq ($(realpath $(SRC_PATH)),$(realpath .))
+@@ -330,7 +353,7 @@ DTC_MAKE_ARGS=-I$(SRC_PATH)/dtc VPATH=$(SRC_PATH)/dtc -C dtc V="$(V)" LIBFDT_src
+ DTC_CFLAGS=$(CFLAGS) $(QEMU_CFLAGS)
+ DTC_CPPFLAGS=-I$(BUILD_DIR)/dtc -I$(SRC_PATH)/dtc -I$(SRC_PATH)/dtc/libfdt
+ 
+-subdir-dtc:dtc/libfdt dtc/tests
++subdir-dtc: .git-submodule-status dtc/libfdt dtc/tests
+ 	$(call quiet-command,$(MAKE) $(DTC_MAKE_ARGS) CPPFLAGS="$(DTC_CPPFLAGS)" CFLAGS="$(DTC_CFLAGS)" LDFLAGS="$(LDFLAGS)" ARFLAGS="$(ARFLAGS)" CC="$(CC)" AR="$(AR)" LD="$(LD)" $(SUBDIR_MAKEFLAGS) libfdt/libfdt.a,)
+ 
+ dtc/%:
+diff --git a/.gitignore b/.gitignore
+index 3a7e01dc6a..b5e115d96b 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -113,6 +113,7 @@
+ /docs/version.texi
+ *.tps
+ .stgit-*
++.git-submodule-status
+ cscope.*
+ tags
+ TAGS
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 932443df41..7708bbb21d 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1947,3 +1947,9 @@ M: Daniel P. Berrange <berrange@redhat.com>
+ S: Odd Fixes
+ F: docs/devel/build-system.txt
+ 
++Build System
++------------
++GIT submodules
++M: Daniel P. Berrange <berrange@redhat.com>
++S: Odd Fixes
++F: scripts/git-submodule.sh
+diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
+new file mode 100755
+index 0000000000..9f73f0e6e3
+--- /dev/null
++++ b/scripts/git-submodule.sh
+@@ -0,0 +1,38 @@
++#!/bin/bash
++#
++# This code is licensed under the GPL version 2 or later.  See
++# the COPYING file in the top-level directory.
++
++set -e
++
++substat=".git-submodule-status"
++
++command=$1
++shift
++modules="$@"
++
++if test -z "$modules"
++then
++    test -e $substat || touch $substat
++    exit 0
++fi
++
++if ! test -e ".git"
++then
++    echo "$0: unexpectedly called with submodules but no git checkout exists"
++    exit 1
++fi
++
++case "$command" in
++status)
++    test -f "$substat" || exit 1
++    trap "rm -f ${substat}.tmp" EXIT
++    git submodule status $modules > "${substat}.tmp"
++    diff "${substat}" "${substat}.tmp" >/dev/null
++    exit $?
++    ;;
++update)
++    git submodule update --init $modules 1>/dev/null 2>&1
++    git submodule status $modules > "${substat}"
++    ;;
++esac
 -- 
 2.9.3
