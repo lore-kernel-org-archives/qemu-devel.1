@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dzuNG-0006hw-OF
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 20:50:51 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dzvFP-0006H4-9s
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 21:46:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dzuND-00088v-MB
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 20:50:50 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:43301)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dzuND-00088M-Cz
-	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 20:50:47 -0400
-Date: Wed, 4 Oct 2017 20:50:43 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20171005005043.GA20425@flamenco>
-References: <87poasgjyh.fsf@frigg.lan>
-	<CAFEAcA8XP+8Jz9Dn-mEQ3CCrVj00t3HA0praQ-OSggtQGAmQ5Q@mail.gmail.com>
-	<87d16o53xr.fsf@frigg.lan>
-	<CAFEAcA9FhXKVKe1E_pVDWX3u0W7WuKQmO54Z1Jgj-iL980yPew@mail.gmail.com>
-	<87o9pywt8k.fsf@frigg.lan> <87shf5zlty.fsf@frigg.lan>
-	<20170929175943.GA25038@flamenco> <87vak1w53a.fsf@frigg.lan>
-	<20170930180941.GA22048@flamenco> <8760bu333n.fsf@frigg.lan>
+	(envelope-from <jsnow@redhat.com>) id 1dzvFN-0003QY-I8
+	for qemu-devel@nongnu.org; Wed, 04 Oct 2017 21:46:47 -0400
+References: <20171004015205.20724-1-jsnow@redhat.com>
+	<20171004182732.GE9801@localhost.localdomain>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <7fd66217-8eda-8de2-f34f-148f69f9df4d@redhat.com>
+Date: Wed, 4 Oct 2017 21:46:24 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8760bu333n.fsf@frigg.lan>
-Subject: Re: [Qemu-devel] [PATCH v6 01/22] instrument: Add documentation
+In-Reply-To: <20171004182732.GE9801@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] blockjobs: add explicit job reaping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,87 +24,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
 
-On Thu, Oct 05, 2017 at 02:28:12 +0300, Lluís Vilanova wrote:
-> Emilio G Cota writes:
-> > I see some potential problems with this:
-> > 1. Instrumenters' accesses could generate exceptions. I presume we'd want to avoid
-> >    this, or leave it as a debug-only kind of option.
+"Oh boy, another email from John! I bet it's concisely worded."
+
+Ha ha. I see my reputation precedes me.
+
+"Holy crap dude, that's a lot of words you've typed down there!"
+
+It's okay, skip to the "TLDR" for the conclusion I arrived at if you
+don't care how I got there!
+
+"Sigh, okay, John."
+
+Yes!!
+
+On 10/04/2017 02:27 PM, Kevin Wolf wrote:
+> Am 04.10.2017 um 03:52 hat John Snow geschrieben:
+>> For jobs that complete when a monitor isn't looking, there's no way to
+>> tell what the job's final return code was. We need to allow jobs to
+>> remain in the list until queried for reliable management.
 > 
-> The API takes care of telling you if the access could be performed
-> successfully. If you access the instruction's memory representation at
-> translation time, it should be able to perform the access, since QEMU's
-> translation loop just had to do so in order to access that instruction (I should
-> check what happens in the corner case where another guest CPU changes the page
-> table, since I'm not sure if the address translation functions I'm using in QEMU
-> will use the per-vCPU TLB cache or always traverse the page table).
-
-That was my concern, I'd rather just perform the read once, that is, the read(s)
-done by ops->insn_translate.
-
-> > 2. Instrumenters won't know where the end of an instruction (for variable-length
-> >   ISAs) or of a TB is (TB != basic block). For instructions one could have a loop
-> >   where we read byte-by-byte and pass it to the decoder, something similar to
-> >   what we have in the capstone code recently posted to the list (v4). For TBs,
-> >   we really should have a way to delimit the length of the TB. This is further
-> >   complicated if we want instrumentation to be inserted *before* a TB is
-> >   translated.
+> Just a short summary of what I discussed with John on IRC:
 > 
-> > Some thoughts on the latter problem: if we want a tb_trans_pre callback, like
-> > Pin/DynamoRIO provide, instead of doing two passes (one to delimit the TB and
-> > call the tb_trans_pre callback, to then generate the translated TB), we could:
-> >   - have a tb_trans_pre callback. This callback inserts an exec-time callback
-> >     with a user-defined pointer (let's call it **tb_info). The callback has
-> >     no arguments, perhaps just the pc.
-> >   - have a tb_trans_post callback. This one passes a copy of the guest
-> >     instructions. The instrumenter then can allocate whatever data structure
-> >     to represent the TB (*tb_info), and copies this pointer to **tb_info, so
-> >     that at execution time, we can obtain tb_info _before_ the TB is executed.
-> >     After the callback returns, the copy of the guest instructions can be freed.
-> >   This has two disadvantages:
-> >   - We have an extra dereference to find tb_info
-> >   - If it turns out that the TB should not be instrumented, we have generated
-> >     a callback for nothing.
+> Another important reason why we want to have an explicit end of block
+> jobs is that job completion often makes changes to the graph. For a
+> management tool that manages the block graph on a node level, it is a
+> big problem if graph changes can happen at any point that can lead to
+> bad race conditions. Giving the management tool control over the end of
+> the block job makes it aware that graph changes happen.
 > 
-> That's precisely one of the reasons why I proposed adding instrumentation points
-> before and after events happen (e.g., instrument right after translating an
-> instruction, where you know its size).
+> This means that compared to this RFC series, we need to move the waiting
+> earlier in the process:
 > 
-> What you propose is actually a broader issue, how to allow instrumentors to pass
-> their own data to execution-time functions "after the fact". For this, I
-> implemented "promises", a kind of generalization of what gen_icount() does (you
-> pass a value to the execution-time callback that is computed later during
-> translation-time).
+> 1. Block job is done and calls block_job_completed()
+> 2. Wait for other block jobs in the same job transaction to complete
+> 3. Send a (new) QMP event to the management tool to notify it that the
+>    job is ready to be reaped
 
-I see. I implemented what I suggested above, i.e. tb_trans_cb
-(i.e. post_trans) passes an opaque descriptor of the TB (which can
-be iterated over insn by insn) and the return value (void *) of this
-cb will be passed by tb_exec_cb (i.e. pre_exec).  Perf-wise this
-is pretty OK, turns out even if we don't end up caring about the
-TB, the additional per-TB helper (which might not end up calling
-a callback) does not introduce significant overhead at execution time.
+Oh, I suppose to distinguish it from "COMPLETED" in that sense, because
+it isn't actually COMPLETED anymore under your vision, so it requires a
+new event in this proposal.
 
-The major hurdle I found is what to do when removing a plugin,
-so that we avoid flushing potentially all translated code. What I ended up
-doing is adding a per-TB list of "plugin_tb" descriptors, which
-track these user pointers so that (1) each plugin gets the right
-pointer, and (2) if n_plugins > 1, we still have a single helper
-that dispatches the callbacks instead of n_plugin helpers.
+This becomes a bit messy, bumping up against both "READY" and a
+transactional pre-completed state semantically. Uhhhh, for lack of a
+better word in the timeframe I'd like to complete this email in, let's
+call this new theoretical state "PENDING"?
 
-If I understand correctly, with promises we directly generate
-a callback, which has the promise(s) as one (or more) of its
-arguments. This is neat and very flexible. However, it forces us to
-retranslate the TB when the plugin is removed (if we're lazy we could
-flush all TBs), and if we have several plugins, we end up with one
-helper per callback, instead of a single one.
-None of this is a huge deal though, I just think is worth considering.
+So presently, a job goes through the following life cycle:
 
-Also, I'm not sure Peter and others would be happy with allowing
-plugin code to generate arbitrary callbacks (IIRC arbitrary code
-has already been ruled out). So perhaps a more restrictive option
-like what I suggested above would be more palatable.
+1. CREATED --> RUNNING
+2. RUNNING <--> PAUSED
+3. RUNNING --> (READY | COMPLETED | CANCELED)
+4. READY --> (COMPLETED | CANCELED)
+5. (COMPLETED | CANCELED) --> NULL
 
-Cheers,
+Where we emit an event upon entering "READY", "COMPLETED" or "CANCELED".
 
-		Emilio
+My patchset here effectively adds a new optional terminal state:
+
+5. (COMPLETED | CANCELED) --> (NULL | FINISHED)
+6. FINISHED --> NULL
+
+Where the last transition from FINISHED to NULL is performed via
+block-job-reap, but notably we get to re-use the events for COMPLETED |
+CANCELED to indicate the availability of this operation to be performed.
+
+What happens in the case of transactionally managed jobs presently is
+that jobs get stuck as they enter the COMPLETED|CANCELED state. If you
+were to query them they behave as if they're RUNNING. There's no
+discrete state that exists for this presently.
+
+You can cancel these as normal, but I'm not sure if you can pause them,
+actually. (Note to self, test that.) I think they have almost exactly
+like any RUNNING job would.
+
+What you're proposing here is the formalization of the pre-completion
+state ("PENDING") and that in this state, a job outside of a transaction
+can exist until it is manually told to finally, once and for all,
+actually finish its business. We can use this as a hook to perform and
+last graph changes so they will not come as a surprise to the management
+application. Maybe this operation should be called "Finalize". Again,
+for lack of a better term in the timeframe, I'll refer to it as such for
+now.
+
+I think importantly this actually distinguishes it from "reap" in that
+the commit phase can still fail, so we can't let the job follow that
+auto transition back to the NULL state. That means that we'd need both a
+block-job-finalize AND a block-job-reap to accomplish both of the
+following goals:
+
+(1) Allow the management application to control graph changes [libvirt]
+(2) Prevent auto transitions to NULL state for asynchronous clients [A
+requirement mentioned by Virtuozzo]
+
+It looks like this, overall:
+
+1. CREATED --> RUNNING
+2. RUNNING <--> PAUSED
+3. RUNNING --> PENDING
+	via: auto transition
+	event: BLOCK_JOB_PENDING
+4. PENDING --> (COMPLETED | CANCELED)
+	via: block-job-finalize
+	event: (COMPLETED | ERROR)
+5. (COMPLETED | CANCELED) --> (NULL | FINISHED)
+	via: auto transition
+	event: none
+6. FINISHED --> NULL
+	via: block-job-reap
+	event: none
+
+"Hey, wait, where did the ready state go?"
+
+Good question, I'm not sure how it fits in to something like "PENDING"
+which is, I think NEARLY equivalent to a proposed pending->finalized
+transition. Is it meaningful to have a job go from
+running->ready->pending or running->pending->ready? I actually doubt it is.
+
+The only difference really is that not all jobs use the READY -->
+COMPLETE transition. We could implement it into those jobs if the job is
+created with some kind of boolean, like
+
+auto-complete: true/false
+
+where this defaults to true, the legacy behavior.
+
+For "mirror" we would just omit allowing people to set this setting
+(auto-complete is effectively always off) because it is requisite and
+essential to the operation of the job.
+
+"OK, maybe that could work; what about transactions?"
+
+Transactions have to be a bit of their own case, I think.
+
+Essentially jobs that transactionally complete already hang around in
+pending until all jobs complete, so they can do so together.
+
+What we don't really want is to force users to have to dig into the jobs
+manually and complete each one individually. (I think...?) or have to
+deal with the managerial nightmare of having some autocomplete, some
+that don't, etc.
+
+What I propose for transactions is:
+
+1) Add a new property for transactions also named "auto-complete"
+2) If the property is set to false, Jobs in this transaction will have
+their auto-complete values forcibly set to false
+3) Once all jobs in the transaction are set to pending, emit an event
+("TRANSACTION_READY", for instance)
+4) Allow the transaction to be manually committed.
+
+The alternative is to leave it on a per-job basis and just stipulate
+that any bizarre or inconvenient configurations are the fault of the
+caller. Leaving transactions completely untouched should theoretically work.
+
+> 4. On block-job-reap, call the .commit/.abort callbacks of the jobs in
+>    the transaction. They will do most of the work that is currently done
+>    in the completion callbacks, in particular any graph changes. If we
+>    need to allow error cases, we can add a .prepare_completion callback
+>    that can still let the whole transaction fail.
+
+Makes sense by analogy. Probably worth having anyway. I moved some
+likely-to-deadlock code from the backup cleanup into .commit even when
+it runs outside of transactions. Other jobs can likely benefit from some
+simplified assumptions by running in that context, too.
+
+> 5. Send the final QMP completion event for each job in the transaction
+>    with the final error code. This is the existing BLOCK_JOB_COMPLETED
+>    or BLOCK_JOB_CANCELLED event.
+> 
+> The current RFC still executes .commit/.abort before block-job-reap, so
+> the graph changes happen too early to be under control of the management
+> tool.
+> 
+>> RFC:
+>> The next version will add tests for transactions.
+>> Kevin, can you please take a look at bdrv_is_root_node and how it is
+>> used with respect to do_drive_backup? I suspect that in this case that
+>> "is root" should actually be "true", but a node in use by a job has
+>> two roles; child_root and child_job, so it starts returning false here.
+>>
+>> That's fine because we prevent a collision that way, but it makes the
+>> error messages pretty bad and misleading. Do you have a quick suggestion?
+>> (Should I just amend the loop to allow non-root nodes as long as they
+>> happen to be jobs so that the job creation code can check permissions?)
+> 
+> We kind of sidestepped this problem by deciding that there is no real
+> reason for the backup job to require the source to be a root node.
+> 
+> I'm not completely sure how we could easily get a better message while
+> still requiring a root node (and I suppose there are other places that
+> rightfully still require a root node). Ignoring children with child_job
+> feels ugly, but might be the best option.
+> 
+> Note that this will not make the conflicting command work suddenly,
+> because every node that has a child_job parent also has op blockers for
+> everything, but the error message should be less confusing than "is not
+> a root node".
+> 
+> Kevin
+> 
+
+TLDR:
+
+- I think we may need to have optional manual completion steps both
+before and after the job .prepare()/.commit()/.abort() phase.
+- Before, like "block-job-complete" to allow graph changes to be under
+management tool control, and
+- After, so that final job success status can be queried even if the
+event was missed.
+
+Proposal:
+
+(1) Extend block-job-complete semantics to all jobs that opt in via
+"auto-complete: false" which is not allowed to be set for mirror jobs
+(2) If the modern overloading of the BLOCK_JOB_READY event is apt to
+cause confusion for existing tools, a new event BLOCK_JOB_PENDING could
+be emitted instead for any job capable of accepting the
+auto-complete=true/false parameter and emit it upon reaching this state.
+(3) Continue forward with this patchset's current persistent/reap
+nomenclature to prevent automatic cleanup if desired, and
+(4) Implement transaction-wide settings for auto-complete alongside a
+new "transaction complete" event to allow for a transaction-wide
+"complete" command.
+
+Hopefully that's not too braindead.
+
+--js
