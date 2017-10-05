@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e08xj-0003HV-Jk
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:28 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e08xi-0003GC-EZ
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e08xi-0003ht-BX
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:27 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e08xg-0003fl-AH
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:26 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu,  5 Oct 2017 18:24:46 +0200
-Message-Id: <1507220690-265042-20-git-send-email-imammedo@redhat.com>
+Date: Thu,  5 Oct 2017 18:24:45 +0200
+Message-Id: <1507220690-265042-19-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
 References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 19/23] ppc: pnv: normalize core/chip type names
+Subject: [Qemu-devel] [PATCH 18/23] ppc: pnv: use generic cpu_model parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,87 +22,142 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
 
-typically for cpus/core type names following convention is used
+use common cpu_model prasing in vl.c and set default cpu_model
+using generic MachineClass::default_cpu_type.
 
-   new_type_prefix-superclass_typename
+Beside of switching to generic infrastructure it solves several
+issues.
 
-make PNV core/chip to follow common convention.
+ * ppc_cpu_class_by_name() is used to deal with lower/upper case
+   and alias translations into actual cpu type, which fixes
+    '-M powernv -cpu power8' and '-M powernv -cpu power9_v1.0'
+   usecases which error out with:
+    'invalid CPU model 'FOO' for powernv machine'
+ * allows to switch to lower-case typenames in pnv chip/core name
+   (by convention typnames should be lower-case)
+ * replace aliased names /power8, power9, .../ with exact cpu model
+   names (i.e. typenames should be stable but aliases might decide to
+   point to other cpu model withi family or changed by kvm). It will
+   also help to simplify pnv_chip/core code and get rid of dependency
+   on cpu_model parsing.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- include/hw/ppc/pnv.h      | 11 +++++++----
- include/hw/ppc/pnv_core.h |  2 ++
- hw/ppc/pnv.c              |  2 +-
- hw/ppc/pnv_core.c         |  2 +-
- 4 files changed, 11 insertions(+), 6 deletions(-)
+ include/hw/ppc/pnv.h |  8 ++++----
+ hw/ppc/pnv.c         | 22 ++++++++++------------
+ hw/ppc/pnv_core.c    |  2 +-
+ 3 files changed, 15 insertions(+), 17 deletions(-)
 
 diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 2525f7f..d82eee1 100644
+index 9c5437d..2525f7f 100644
 --- a/include/hw/ppc/pnv.h
 +++ b/include/hw/ppc/pnv.h
-@@ -80,19 +80,22 @@ typedef struct PnvChipClass {
+@@ -80,19 +80,19 @@ typedef struct PnvChipClass {
      uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
  } PnvChipClass;
  
--#define TYPE_PNV_CHIP_POWER8E TYPE_PNV_CHIP "-power8e_v2.1"
-+#define PNV_CHIP_TYPE_SUFFIX "-" TYPE_PNV_CHIP
-+#define PNV_CHIP_TYPE_NAME(cpu_model) cpu_model PNV_CHIP_TYPE_SUFFIX
-+
-+#define TYPE_PNV_CHIP_POWER8E PNV_CHIP_TYPE_NAME("power8e_v2.1")
+-#define TYPE_PNV_CHIP_POWER8E TYPE_PNV_CHIP "-POWER8E"
++#define TYPE_PNV_CHIP_POWER8E TYPE_PNV_CHIP "-power8e_v2.1"
  #define PNV_CHIP_POWER8E(obj) \
      OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER8E)
  
--#define TYPE_PNV_CHIP_POWER8 TYPE_PNV_CHIP "-power8_v2.0"
-+#define TYPE_PNV_CHIP_POWER8 PNV_CHIP_TYPE_NAME("power8_v2.0")
+-#define TYPE_PNV_CHIP_POWER8 TYPE_PNV_CHIP "-POWER8"
++#define TYPE_PNV_CHIP_POWER8 TYPE_PNV_CHIP "-power8_v2.0"
  #define PNV_CHIP_POWER8(obj) \
      OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER8)
  
--#define TYPE_PNV_CHIP_POWER8NVL TYPE_PNV_CHIP "-power8nvl_v1.0"
-+#define TYPE_PNV_CHIP_POWER8NVL PNV_CHIP_TYPE_NAME("power8nvl_v1.0")
+-#define TYPE_PNV_CHIP_POWER8NVL TYPE_PNV_CHIP "-POWER8NVL"
++#define TYPE_PNV_CHIP_POWER8NVL TYPE_PNV_CHIP "-power8nvl_v1.0"
  #define PNV_CHIP_POWER8NVL(obj) \
      OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER8NVL)
  
--#define TYPE_PNV_CHIP_POWER9 TYPE_PNV_CHIP "-power9_v1.0"
-+#define TYPE_PNV_CHIP_POWER9 PNV_CHIP_TYPE_NAME("power9_v1.0")
+-#define TYPE_PNV_CHIP_POWER9 TYPE_PNV_CHIP "-POWER9"
++#define TYPE_PNV_CHIP_POWER9 TYPE_PNV_CHIP "-power9_v1.0"
  #define PNV_CHIP_POWER9(obj) \
      OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER9)
  
-diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
-index 2955a41..3360c4b 100644
---- a/include/hw/ppc/pnv_core.h
-+++ b/include/hw/ppc/pnv_core.h
-@@ -45,6 +45,8 @@ typedef struct PnvCoreClass {
-     ObjectClass *cpu_oc;
- } PnvCoreClass;
- 
-+#define PNV_CORE_TYPE_SUFFIX "-" TYPE_PNV_CORE
-+#define PNV_CORE_TYPE_NAME(cpu_model) cpu_model PNV_CORE_TYPE_SUFFIX
- extern char *pnv_core_typename(const char *model);
- 
- #endif /* _PPC_PNV_CORE_H */
 diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 4169837..9c5eb7c 100644
+index d46d91c..4169837 100644
 --- a/hw/ppc/pnv.c
 +++ b/hw/ppc/pnv.c
-@@ -609,7 +609,7 @@ static void ppc_powernv_init(MachineState *machine)
+@@ -607,16 +607,13 @@ static void ppc_powernv_init(MachineState *machine)
+         }
+     }
  
+-    /* We need some cpu model to instantiate the PnvChip class */
+-    if (machine->cpu_model == NULL) {
+-        machine->cpu_model = "POWER8";
+-    }
+-
      /* Create the processor chips */
-     i = strlen(machine->cpu_type) - strlen(POWERPC_CPU_TYPE_SUFFIX);
--    chip_typename = g_strdup_printf(TYPE_PNV_CHIP "-%.*s",
-+    chip_typename = g_strdup_printf(PNV_CHIP_TYPE_NAME("%.*s"),
-                                     i, machine->cpu_type);
+-    chip_typename = g_strdup_printf(TYPE_PNV_CHIP "-%s", machine->cpu_model);
++    i = strlen(machine->cpu_type) - strlen(POWERPC_CPU_TYPE_SUFFIX);
++    chip_typename = g_strdup_printf(TYPE_PNV_CHIP "-%.*s",
++                                    i, machine->cpu_type);
      if (!object_class_by_name(chip_typename)) {
-         error_report("invalid CPU model '%.*s' for %s machine",
+-        error_report("invalid CPU model '%s' for %s machine",
+-                     machine->cpu_model, MACHINE_GET_CLASS(machine)->name);
++        error_report("invalid CPU model '%.*s' for %s machine",
++                     i, machine->cpu_type, MACHINE_GET_CLASS(machine)->name);
+         exit(1);
+     }
+ 
+@@ -716,7 +713,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PnvChipClass *k = PNV_CHIP_CLASS(klass);
+ 
+-    k->cpu_model = "POWER8E";
++    k->cpu_model = "power8e_v2.1";
+     k->chip_type = PNV_CHIP_POWER8E;
+     k->chip_cfam_id = 0x221ef04980000000ull;  /* P8 Murano DD2.1 */
+     k->cores_mask = POWER8E_CORE_MASK;
+@@ -738,7 +735,7 @@ static void pnv_chip_power8_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PnvChipClass *k = PNV_CHIP_CLASS(klass);
+ 
+-    k->cpu_model = "POWER8";
++    k->cpu_model = "power8_v2.0";
+     k->chip_type = PNV_CHIP_POWER8;
+     k->chip_cfam_id = 0x220ea04980000000ull; /* P8 Venice DD2.0 */
+     k->cores_mask = POWER8_CORE_MASK;
+@@ -760,7 +757,7 @@ static void pnv_chip_power8nvl_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PnvChipClass *k = PNV_CHIP_CLASS(klass);
+ 
+-    k->cpu_model = "POWER8NVL";
++    k->cpu_model = "power8nvl_v1.0";
+     k->chip_type = PNV_CHIP_POWER8NVL;
+     k->chip_cfam_id = 0x120d304980000000ull;  /* P8 Naples DD1.0 */
+     k->cores_mask = POWER8_CORE_MASK;
+@@ -782,7 +779,7 @@ static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PnvChipClass *k = PNV_CHIP_CLASS(klass);
+ 
+-    k->cpu_model = "POWER9";
++    k->cpu_model = "power9_v1.0";
+     k->chip_type = PNV_CHIP_POWER9;
+     k->chip_cfam_id = 0x100d104980000000ull; /* P9 Nimbus DD1.0 */
+     k->cores_mask = POWER9_CORE_MASK;
+@@ -1133,6 +1130,7 @@ static void powernv_machine_class_init(ObjectClass *oc, void *data)
+     mc->init = ppc_powernv_init;
+     mc->reset = ppc_powernv_reset;
+     mc->max_cpus = MAX_CPUS;
++    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power8_v2.0");
+     mc->block_default_type = IF_IDE; /* Pnv provides a AHCI device for
+                                       * storage */
+     mc->no_parallel = 1;
 diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index 44b0b24..b3e3f23 100644
+index 6726483..44b0b24 100644
 --- a/hw/ppc/pnv_core.c
 +++ b/hw/ppc/pnv_core.c
-@@ -252,5 +252,5 @@ type_init(pnv_core_register_types)
+@@ -227,7 +227,7 @@ static const TypeInfo pnv_core_info = {
+ };
  
- char *pnv_core_typename(const char *model)
- {
--    return g_strdup_printf(TYPE_PNV_CORE "-%s", model);
-+    return g_strdup_printf(PNV_CORE_TYPE_NAME("%s"), model);
- }
+ static const char *pnv_core_models[] = {
+-    "POWER8E", "POWER8", "POWER8NVL", "POWER9"
++    "power8e_v2.1", "power8_v2.0", "power8nvl_v1.0", "power9_v1.0"
+ };
+ 
+ static void pnv_core_register_types(void)
 -- 
 2.7.4
