@@ -1,39 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e0Bj9-0001WO-QB
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:23:06 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e0Blp-0002LW-11
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:25:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e0BiQ-0007P2-BN
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:22:35 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48394)
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e0Bll-0001o6-Pd
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:25:21 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32862)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e0BiQ-0007O0-0m
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:21:50 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1e0Bll-0001mn-E6
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:25:17 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v95JLjax092563
-	for <qemu-devel@nongnu.org>; Thu, 5 Oct 2017 15:21:45 -0400
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ddsapvun1-1
+	v95JOlvq051670
+	for <qemu-devel@nongnu.org>; Thu, 5 Oct 2017 15:25:12 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ddqq2b1pr-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 15:21:45 -0400
+	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 15:25:11 -0400
 Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Thu, 5 Oct 2017 15:21:41 -0400
-References: <1507222112-20315-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<1507222112-20315-11-git-send-email-stefanb@linux.vnet.ibm.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Thu, 5 Oct 2017 15:21:37 -0400
-MIME-Version: 1.0
-In-Reply-To: <1507222112-20315-11-git-send-email-stefanb@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <0375382f-9713-c292-9ff2-32a76e0ed789@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PULL v1 10/10] specs: Describe the TPM support in
- QEMU
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Thu, 5 Oct 2017 13:25:09 -0600
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Thu,  5 Oct 2017 16:24:58 -0300
+Message-Id: <20171005192458.610-1-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 1/1] hw/ppc/spapr_drc.c: adding drc->dev into
+ detach quiesce condition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,19 +37,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, amarnath.valluri@intel.com, marcandre.lureau@gmail.com
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com
 
-On 10/05/2017 12:48 PM, Stefan Berger wrote:
-> This patch adds a description of the current TPM support in QEMU
-> to the specs.
->
-> Several public specs are referenced via their landing page on the
-> trustedcomputinggroup.org website.
->
-> Signed-off-by: Stefan Berger <address@hidden>
-> Reviewed-by: Laszlo Ersek <address@hidden>
+In cases where a device is hotplugged and hot-unplugged shortly after,
+there is a chance of QEMU breaking with the following message:
 
-This is obviously a mess-up. I'll fixed that on my github account, which 
-now puts the last change at 3bfc6666c21bf9e437734bb3e90db7e5b5f6b8bf.
+hw/ppc/spapr_drc.c:417:spapr_drc_detach: assertion failed: (drc->dev)
+Aborted
 
-    Stefan
+spapr_drc_detach makes a g_assert(drc->dev) to ensure that the following
+spapr_drc_release call is able to execute the appropriate callback
+using drc->dev as a parameter. However, in a scenario where a hotplug
+is quickly followed by a hot-unplug, this g_assert can be reached before
+the hotplug operation sets drc->dev in spapr_drc_attach.
+
+This patch makes use of the awaiting quiesce mechanism inside
+spapr_drc_detach to fix this scenario. Inside spapr_drc_detach there is a
+quiesce condition that relies on drc->state being equal to drck->empty_state.
+If this doesn't happen, it is considered that the drc is not ready to be
+detached. By extending this condition to include drc->dev being non-null
+we cover this situation where the drc is still being attached and drc->dev
+isn't set yet during the detach.
+
+Fixes: https://bugs.launchpad.net/qemu/+bug/1718118
+Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+---
+ hw/ppc/spapr_drc.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index 915e9b51c4..6ad8190360 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -414,11 +414,9 @@ void spapr_drc_detach(sPAPRDRConnector *drc)
+ 
+     trace_spapr_drc_detach(spapr_drc_index(drc));
+ 
+-    g_assert(drc->dev);
+-
+     drc->unplug_requested = true;
+ 
+-    if (drc->state != drck->empty_state) {
++    if (!drc->dev || (drc->state != drck->empty_state)) {
+         trace_spapr_drc_awaiting_quiesce(spapr_drc_index(drc));
+         return;
+     }
+-- 
+2.13.6
