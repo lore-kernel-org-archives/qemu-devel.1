@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <malbarbo@gmail.com>) id 1e066y-00011a-5G
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:22:49 -0400
+	(envelope-from <eblake@redhat.com>) id 1e06LE-0003iU-7Q
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:37:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <malbarbo@gmail.com>) id 1e066u-0001kt-3n
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:22:48 -0400
+	(envelope-from <eblake@redhat.com>) id 1e06LB-00076R-3Z
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:37:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:10079)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1e06LA-00076B-R0
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:37:29 -0400
+References: <cecb7a50-6913-0d88-59b4-805463aba790@virtuozzo.com>
+	<c3c3bfdb-3e8f-5443-3d6c-52ab5a95bc63@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3ba450aa-a4ff-0601-5912-896717e3bf65@redhat.com>
+Date: Thu, 5 Oct 2017 08:37:25 -0500
 MIME-Version: 1.0
-In-Reply-To: <82b1a00d-ea31-c76f-96bd-402828cceebf@redhat.com>
-References: <CAHpsRN-XzxjJZb=rb0iHMv4Afv=2H3N5U7p4+NNJFPkxgSLMXg@mail.gmail.com>
-	<43071208-759c-6476-0cb0-c4e7e0daaf77@redhat.com>
-	<CAHpsRN9s_qa_knpn0QRVu0UasFrx1c+nvy2rY6hHB7GvnRkCZg@mail.gmail.com>
-	<82b1a00d-ea31-c76f-96bd-402828cceebf@redhat.com>
-From: Marco A L Barbosa <malbarbo@gmail.com>
-Date: Thu, 5 Oct 2017 10:22:41 -0300
-Message-ID: <CAHpsRN-MpkJyBsO2y0DEOyuo_wAGT+F-y6yzQT=ObL220rZ9eg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] linux-user: Add random
- ioctls
+In-Reply-To: <c3c3bfdb-3e8f-5443-3d6c-52ab5a95bc63@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="0Bw9o3obd6HqxQPwDXo1mHiSO8K0gdNqX"
+Subject: Re: [Qemu-devel] nbd structured reply
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +28,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Wouter Verhelst <w@uter.be>, Alex Bligh <alex@alex.org.uk>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>
 
-I submitted a new patch. Thanks.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--0Bw9o3obd6HqxQPwDXo1mHiSO8K0gdNqX
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Wouter Verhelst <w@uter.be>, Alex Bligh <alex@alex.org.uk>
+Cc: qemu-devel <qemu-devel@nongnu.org>,
+ "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>
+Message-ID: <3ba450aa-a4ff-0601-5912-896717e3bf65@redhat.com>
+Subject: Re: nbd structured reply
+References: <cecb7a50-6913-0d88-59b4-805463aba790@virtuozzo.com>
+ <c3c3bfdb-3e8f-5443-3d6c-52ab5a95bc63@virtuozzo.com>
+In-Reply-To: <c3c3bfdb-3e8f-5443-3d6c-52ab5a95bc63@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 5, 2017 at 7:35 AM, Laurent Vivier <lvivier@redhat.com> wrote:
+On 10/05/2017 06:30 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 21.09.2017 15:18, Vladimir Sementsov-Ogievskiy wrote:
+>> Hi all!
+>>
+>> I'm about this:
+>>
+>> "A server SHOULD try to minimize the number of chunks sent in a reply,=
 
-> On 05/10/2017 12:24, Marco A L Barbosa wrote:
-> >     I doesn't look really trivial...
-> >
-> >     To manage the buf field you must read buf_size and it cannot be done
-> in
-> >     a generic way: you must define a function to translate the buffer,
-> use
-> >     IOCTL_SPECIAL() with RNDADDENTROPY and RNDGETPOOL.
-> >
-> >     You should send your patch using "git send-email" or "git publish"
-> >     instead of adding it in you email client.
-> >
-> >
-> > Thanks for your advices.
-> >
-> > My use case only requires support for RNDGETENTCNT... Considering that
-> > RNDADDENTROPY and RNDGETPOOL are non trivial, would a patch with only
-> > RNDGETENTCNT, RNDADDTOENTCNT, RNDZAPENTCNT and RNDCLEARPOOL be accepted?
->
-> I think you can only post what you use. If it is tested, it's better...
->
-> Thanks,
-> Laurent
->
+>> but MUST NOT mark a chunk as final if there is still a possibility of
+>> detecting an error before transmission of that chunk completes"
+>>
+>> What do we mean by "possibility"? Formally, such possibility exists
+>> always, so, we'll never mark a chunk as final.
+>>
+>=20
+> One more question:
+>=20
+> for |NBD_REPLY_TYPE_ERROR and ||NBD_REPLY_TYPE_ERROR_OFFSET, why do we
+> need message_length field? why not to calc it as chunk.lenght - 4 for
+> ||NBD_REPLY_TYPE_ERROR and chunk.lenght - 12 for
+> ||NBD_REPLY_TYPE_ERROR_OFFSET?
+
+For consistency.  If _all_ NBD_REPLY_TYPE_ERROR* message have a
+message_length field, then it is easier to write a generic handler that
+knows how to deal with an unknown error, no matter what command the
+error is sent in response to.  Ideally, a server should never send an
+error message that the client is not expecting, but having a robust
+protocol that lets clients deal with bad servers is worth the redundancy
+caused by being consistent, and we are more likely to add additional
+error modes to existing commands than we are to add more success modes.
+
+>=20
+> For example, with NBD_REPLY_TYPE_OFFSET_DATA variable data length is
+> calculated, not specified separately.
+
+That's because non-error types don't have the same consistency concerns;
+if we want to introduce a new success response, we'll probably introduce
+it via a new command, rather than as a reply to an existing command.
+Furthermore, while error replies are likely to have a free-form text
+error description, success replies tend to not need it.  The layout of
+the error types is designed to make it easy to grab the free-form error
+message from a known location for display to the user, even if the
+client has no idea what the rest of the error means, as that may be a
+useful debugging aid.
+
+>=20
+> What is the reason for server to send NBD_REPLY_TYPE_ERROR with
+> message_lenght < chunk.lenght - 4?
+
+In all likelihood, all well-written servers will never send garbage
+bytes (possible only when setting chunk.length larger than
+message_length + sizeof(documented fields)).  But we wrote the spec to
+be conservative, in case we want to add a later defined field that
+earlier clients will still gracefully ignore, rather than strict
+(allowing inequality, instead of requiring exact lengths, lets a client
+skip over what it considers garbage bytes rather than dropping the
+connection because a too-new server tried to send useful information in
+those bytes).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
+--0Bw9o3obd6HqxQPwDXo1mHiSO8K0gdNqX
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- 
-Marco A L Barbosa
-http://malbarbo.pro.br
---
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnWNZUACgkQp6FrSiUn
+Q2rWKQgAgz3S/qmhRGEzKbmN7WlGX4ircjy2pPYoZ1KjW4AtB6a2tya0HedQpr+Z
+VbkbzMEFi0uYbA2rAh42EF/PVEfoopLhTTp+uAC7pW0rU44yp+h+vBSiBI3r9Hae
+l/3dBDA1RGKJx7FzF9wwUgRQTWuXVZL+HF3U3p4FXCihyTegU9lcv/a1RGvOZ96t
+l2ORMuJc5I7dYk16t2n2jDlGDGIlsnVKc6Zy2kYAAA88KHjUdpml2LNyj/ITwdlZ
+bp5DVfkEC2auZyQXDzsDn7XAXt25tsm0pzd9TImCPYyGMBcJFk5GmWwKanpmhGIU
+IExWoAFNzQVBGiISBUziQpcvnLFIyg==
+=1XJL
+-----END PGP SIGNATURE-----
+
+--0Bw9o3obd6HqxQPwDXo1mHiSO8K0gdNqX--
