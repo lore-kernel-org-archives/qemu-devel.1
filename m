@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e0ENm-0000T7-9l
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 18:12:43 -0400
+	(envelope-from <bounces@canonical.com>) id 1e0Eaa-00033l-3U
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 18:25:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e0ENl-0006SV-1J
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 18:12:42 -0400
-References: <20170925135801.144261-1-vsementsov@virtuozzo.com>
-	<20170925135801.144261-9-vsementsov@virtuozzo.com>
-	<b8b01f1a-6e7b-342f-02b6-b7386bff1500@redhat.com>
-	<a4fb096f-7995-ad85-64b7-68a124410e86@redhat.com>
-	<cdec3d7e-04c9-a5e3-d0e7-293e2c7633c8@virtuozzo.com>
-	<ca5a605d-e548-5860-1e40-abcac6017683@virtuozzo.com>
-	<ad2fa9f3-29b1-c00b-1e51-07604f0b45e0@redhat.com>
-	<9c3e29b4-3ec9-4fd7-3d80-122f908d059f@virtuozzo.com>
-	<d54f0fca-6680-cce3-571e-df80a377d48e@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8f9f485a-b3b0-f14a-20ed-86578a96644e@redhat.com>
-Date: Thu, 5 Oct 2017 17:12:30 -0500
+	(envelope-from <bounces@canonical.com>) id 1e0EaW-0000qV-2U
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 18:25:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57808)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e0EaV-0000pE-Pc
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 18:25:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e0EaT-00088v-Qa
+	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 22:25:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C4A1D2E80CB
+	for <qemu-devel@nongnu.org>; Thu,  5 Oct 2017 22:25:49 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <d54f0fca-6680-cce3-571e-df80a377d48e@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="EH66b2s8pFixido4mKTfDPGxAfFsopfrO"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 8/8] nbd: Minimal structured
- read for client
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 05 Oct 2017 22:19:12 -0000
+From: dann frazier <dann.frazier@canonical.com>
+Reply-To: Bug 1719196 <1719196@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150626680089.6094.17724106932405637799.malonedeb@soybean.canonical.com>
+Message-Id: <150724195275.21899.14366213638080589382.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1719196] Re: [arm64 ocata] newly created
+ instances are unable to raise network interfaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,145 +37,288 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---EH66b2s8pFixido4mKTfDPGxAfFsopfrO
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
-Message-ID: <8f9f485a-b3b0-f14a-20ed-86578a96644e@redhat.com>
-Subject: Re: [Qemu-block] [PATCH 8/8] nbd: Minimal structured read for client
-References: <20170925135801.144261-1-vsementsov@virtuozzo.com>
- <20170925135801.144261-9-vsementsov@virtuozzo.com>
- <b8b01f1a-6e7b-342f-02b6-b7386bff1500@redhat.com>
- <a4fb096f-7995-ad85-64b7-68a124410e86@redhat.com>
- <cdec3d7e-04c9-a5e3-d0e7-293e2c7633c8@virtuozzo.com>
- <ca5a605d-e548-5860-1e40-abcac6017683@virtuozzo.com>
- <ad2fa9f3-29b1-c00b-1e51-07604f0b45e0@redhat.com>
- <9c3e29b4-3ec9-4fd7-3d80-122f908d059f@virtuozzo.com>
- <d54f0fca-6680-cce3-571e-df80a377d48e@redhat.com>
-In-Reply-To: <d54f0fca-6680-cce3-571e-df80a377d48e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Thanks so much for doing that Sean.
 
-On 10/05/2017 05:36 AM, Paolo Bonzini wrote:
-> On 05/10/2017 12:02, Vladimir Sementsov-Ogievskiy wrote:
->> 03.10.2017 17:06, Paolo Bonzini wrote:
->>> On 03/10/2017 15:35, Vladimir Sementsov-Ogievskiy wrote:
->>>>>> In the end this probably means that you have a read_chunk_header
->>>>>> function and a read_chunk function.=C2=A0 READ has a loop that cal=
-ls
->>>>>> read_chunk_header followed by direct reading into the QEMUIOVector=
-,
->>>>>> while everyone else calls read_chunk.
->>>>> accordingly to spec, we can receive several error reply chunks to a=
-ny
->>>>> request,
->>>>> so loop, receiving them should be common for all requests I think
->>>> as well as handling error chunks should be common..
->>> Yes, reading error chunks should be part of read_chunk_header.
->>>
->>> Paolo
->>
->> So, you want a loop in READ, and separate loop for other commands? The=
-n
->> we will have separate loop for BLOCK_STATUS and for all future command=
-s
->> with specific replies?
->=20
-> There should be a separate loop for each command.
->=20
-> The only difference between READ and other commands is that READ
-> receives directly in QEMUIOVector, while other commands can use a commo=
-n
-> function to to receive each structured reply chunk into malloc-ed memor=
-y.
+Omitting expected changes (uuid, mac address, etc), here's are the
+significant changes I see:
 
-To make sure we're on the same page, here's how I see it.  At a high
-level, we have:
+1) N uses the QEMU 'virt' model, O uses 'virt-2.8'
+2) N and O both expose a pci root, but N also exposed 2 PCI bridges that O =
+does not.
+3) N exposes an additional serial device.
+4) N and O both use an apparmor seclabel. However, O also has a DAC model.
 
-Each command calls nbd_co_send_request once, then calls
-nbd_co_receive_reply in a loop until there is an indication of the last
-packet.  nbd_co_receive_reply waits for data to come from the server,
-and parses the header.
+#4 is the most interesting to me. Is there a way to configure ocata nova
+to not enable DAC?
 
-If the packet is unrecognized, report failure and request a quit
-(negative return value)
+-- =
 
-If it is old-style:
-- if the command is read, and we did not negotiate structured read, then
-we also read the payload into qiov
-- if the command is read, but we negotiated structured read, the server
-is buggy, so report the bug and request a quit
-- for all other commands, there is no payload, return success or failure
-to the caller based on the header payload
-- at any rate, the reply to the caller is that this is the final packet,
-and there is no payload returned (so we return negative or 1, but never 0=
-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1719196
 
-Otherwise, it is new-style:
-- if we did not negotiate structured reply, the server is buggy, so
-report the bug and request a quit (negative return)
-- if the chunk is an error, we process the entire packet and report the
-error; if we have any commands that care about the error details, we
-could return the error in a malloc'd discriminated union, but we can
-probably get by without that. If callers don't care about details, but
-the error chunk is not final, it may be easier to just store the fact
-that an error occurred and return 0 to tell the caller to keep looping,
-and return the negative value later when the final chunk is finally recei=
-ved
-- if the chunk is NBD_REPLY_TYPE_NONE, there is no payload, and this
-should be the final chunk, so the return to the caller can be the same
-as for old-style (return 1 if we had no earlier error packets, or the
-saved negative value corresponding to the first error received)
-- if the command is read, we can read the payload into qiov (saves
-malloc'ing space for the reply only to copy it into the qiov), so we
-don't have to return any data
-- for any other command, we malloc space for the non-error payload, and
-then it is up to the command's loop to process the payload
+Title:
+  [arm64 ocata] newly created instances are unable to raise network
+  interfaces
 
-so the signature can be something like:
+Status in libvirt:
+  New
+Status in QEMU:
+  New
 
-int nbd_co_receive_reply(NBDClientSession *s, QEMUIOVector *qiov,
-                         void **payload)
+Bug description:
+  arm64 Ocata ,
 
-where it returns -errno on failure, 0 if the command is not complete,
-and 1 if the command is done.  READ passes qiov, which is fully
-populated when the function returns 1; all other commands pass NULL.
-Commands pass NULL for payload if they don't expect a payload return
-(this includes READ); but a command that expects a payload
-(BLOCK_STATUS) passes a pointer in payload and gets malloc'd space
-stored there if return is 0 or 1.
+  I'm testing to see I can get Ocata running on arm64 and using the
+  openstack-base bundle to deploy it.  I have added the bundle to the
+  log file attached to this bug.
 
-Does that sound like we're on the right design track?
+  When I create a new instance via nova, the VM comes up and runs,
+  however fails to raise its eth0 interface. This occurs on both
+  internal and external networks.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+  ubuntu@openstackaw:~$ nova list
+  +--------------------------------------+---------+--------+------------+-=
+------------+--------------------+
+  | ID                                   | Name    | Status | Task State | =
+Power State | Networks           |
+  +--------------------------------------+---------+--------+------------+-=
+------------+--------------------+
+  | dcaf6d51-f81e-4cbd-ac77-0c5d21bde57c | sfeole1 | ACTIVE | -          | =
+Running     | internal=3D10.5.5.3  |
+  | aa0b8aee-5650-41f4-8fa0-aeccdc763425 | sfeole2 | ACTIVE | -          | =
+Running     | internal=3D10.5.5.13 |
+  +--------------------------------------+---------+--------+------------+-=
+------------+--------------------+
+  ubuntu@openstackaw:~$ nova show aa0b8aee-5650-41f4-8fa0-aeccdc763425
+  +--------------------------------------+---------------------------------=
+-------------------------+
+  | Property                             | Value                           =
+                         |
+  +--------------------------------------+---------------------------------=
+-------------------------+
+  | OS-DCF:diskConfig                    | MANUAL                          =
+                         |
+  | OS-EXT-AZ:availability_zone          | nova                            =
+                         |
+  | OS-EXT-SRV-ATTR:host                 | awrep3                          =
+                         |
+  | OS-EXT-SRV-ATTR:hypervisor_hostname  | awrep3.maas                     =
+                         |
+  | OS-EXT-SRV-ATTR:instance_name        | instance-00000003               =
+                         |
+  | OS-EXT-STS:power_state               | 1                               =
+                         |
+  | OS-EXT-STS:task_state                | -                               =
+                         |
+  | OS-EXT-STS:vm_state                  | active                          =
+                         |
+  | OS-SRV-USG:launched_at               | 2017-09-24T14:23:08.000000      =
+                         |
+  | OS-SRV-USG:terminated_at             | -                               =
+                         |
+  | accessIPv4                           |                                 =
+                         |
+  | accessIPv6                           |                                 =
+                         |
+  | config_drive                         |                                 =
+                         |
+  | created                              | 2017-09-24T14:22:41Z            =
+                         |
+  | flavor                               | m1.small (717660ae-0440-4b19-a76=
+2-ffeb32a0575c)          |
+  | hostId                               | 5612a00671c47255d2ebd6737a64ec9b=
+d3a5866d1233ecf3e988b025 |
+  | id                                   | aa0b8aee-5650-41f4-8fa0-aeccdc76=
+3425                     |
+  | image                                | zestynosplash (e88fd1bd-f040-44d=
+8-9e7c-c462ccf4b945)     |
+  | internal network                     | 10.5.5.13                       =
+                         |
+  | key_name                             | mykey                           =
+                         |
+  | metadata                             | {}                              =
+                         |
+  | name                                 | sfeole2                         =
+                         |
+  | os-extended-volumes:volumes_attached | []                              =
+                         |
+  | progress                             | 0                               =
+                         |
+  | security_groups                      | default                         =
+                         |
+  | status                               | ACTIVE                          =
+                         |
+  | tenant_id                            | 9f7a21c1ad264fec81abc09f3960ad1d=
+                         |
+  | updated                              | 2017-09-24T14:23:09Z            =
+                         |
+  | user_id                              | e6bb6f5178a248c1b5ae66ed388f9040=
+                         |
+  +--------------------------------------+---------------------------------=
+-------------------------+
 
 
---EH66b2s8pFixido4mKTfDPGxAfFsopfrO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  As seen above the instances boot an run.  Full Console output is
+  attached to this bug.
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+  =
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnWrk4ACgkQp6FrSiUn
-Q2qFTgf/czipiignWnA4DWxvRfDZqp7x+8PqI8shQprKlHbBBqsqQCY3IPMTvoVZ
-2SD1bjtBsNQj6MxXDrZXBIOKFwY8LlKO1uKoqV+JdxCBS26Qh43nR2XIbew8NY38
-4ylz/xC5uX+uHJtA8BAnV/WVutevVM02LRPwdHyQPN9bhCMy6wKJSx4Kj2zDI5p7
-QW5luj5YXCEh5+VCLsRUJh4Gs6WHMCVnxTKE4LeDR5zpcmeok6EDmAeFLxyOTAgM
-zODbfdXJZPHbw484c6ku7WObL/d/pGPOrpssv8LgL2978FTJsjBALnoS/Qi7idxg
-t2h64AXBqeR4HWAyQcTFQ4KlhkQTEg==
-=dm1h
------END PGP SIGNATURE-----
+  [  OK  ] Started Initial cloud-init job (pre-networking).
+  [  OK  ] Reached target Network (Pre).
+  [  OK  ] Started AppArmor initialization.
+           Starting Raise network interfaces...
+  [FAILED] Failed to start Raise network interfaces.
+  See 'systemctl status networking.service' for details.
+           Starting Initial cloud-init job (metadata service crawler)...
+  [  OK  ] Reached target Network.
+  [  315.051902] cloud-init[881]: Cloud-init v. 0.7.9 running 'init' at Fri=
+, 22 Sep 2017 18:29:15 +0000. Up 314.70 seconds.
+  [  315.057291] cloud-init[881]: ci-info: +++++++++++++++++++++++++++Net d=
+evice info+++++++++++++++++++++++++++
+  [  315.060338] cloud-init[881]: ci-info: +--------+------+-----------+---=
+--------+-------+-------------------+
+  [  315.063308] cloud-init[881]: ci-info: | Device |  Up  |  Address  |   =
+ Mask   | Scope |     Hw-Address    |
+  [  315.066304] cloud-init[881]: ci-info: +--------+------+-----------+---=
+--------+-------+-------------------+
+  [  315.069303] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
+  .     |   .   | fa:16:3e:39:4c:48 |
+  [  315.072308] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
+  .     |   d   | fa:16:3e:39:4c:48 |
+  [  315.075260] cloud-init[881]: ci-info: |  lo:   | True | 127.0.0.1 | 25=
+5.0.0.0 |   .   |         .         |
+  [  315.078258] cloud-init[881]: ci-info: |  lo:   | True |     .     |   =
+  .     |   d   |         .         |
+  [  315.081249] cloud-init[881]: ci-info: +--------+------+-----------+---=
+--------+-------+-------------------+
+  [  315.084240] cloud-init[881]: 2017-09-22 18:29:15,393 - url_helper.py[W=
+ARNING]: Calling 'http://169.254.169.254/2009-04-04/meta-data/instance-id' =
+failed [0/120s]: request error [HTTPConnectionPool(host=3D'169.254.169.254'=
+, port=3D80): Max retries exceeded with url: /2009-04-04/meta-data/instance=
+-id (Caused by NewConnectionError('<requests.packages.urllib3.connection.HT=
+TPConnection object at 0xffffb10794e0>: Failed to establish a new connectio=
+n: [Errno 101] Network is unreachable',))]
 
---EH66b2s8pFixido4mKTfDPGxAfFsopfrO--
+
+  =
+
+  ----------------
+
+
+  I have checked all services in neutron and made sure that they are
+  running and restarted in neutron-gateway
+
+  =
+
+   [ + ]  neutron-dhcp-agent
+   [ + ]  neutron-l3-agent
+   [ + ]  neutron-lbaasv2-agent
+   [ + ]  neutron-metadata-agent
+   [ + ]  neutron-metering-agent
+   [ + ]  neutron-openvswitch-agent
+   [ + ]  neutron-ovs-cleanup
+
+  and have also restarted and checked the nova-compute logs for their
+  neutron counterparts.
+
+  =
+
+   [ + ]  neutron-openvswitch-agent
+   [ + ]  neutron-ovs-cleanup
+
+
+   There are some warnings/errors in the neutron-gateway logs which I
+  have attached the full tarball in a separate attachment to this bug:
+
+  2017-09-24 14:39:33.152 10322 INFO ryu.base.app_manager [-] instantiating=
+ app ryu.controller.ofp_handler of OFPHandler
+  2017-09-24 14:39:33.153 10322 INFO ryu.base.app_manager [-] instantiating=
+ app ryu.app.ofctl.service of OfctlService
+  2017-09-24 14:39:39.577 10322 ERROR neutron.agent.ovsdb.impl_vsctl [req-2=
+f084ae8-13dc-47dc-b351-24c8f3c57067 - - - - -] Unable to execute ['ovs-vsct=
+l', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manage=
+r', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'Op=
+en_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1; =
+Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Transa=
+ction causes multiple rows in \"Manager\" table to have identical values (\=
+"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with UU=
+ID e02a5f7f-bfd2-4a1d-ae3c-0321db4bd3fb, existed in the database before thi=
+s transaction and was not modified by the transaction.  Second row, with UU=
+ID 6e9aba3a-471a-4976-bffd-b7131bbe5377, was inserted by this transaction."=
+,"error":"constraint violation"}
+
+
+  These warnings/errors also occur on the nova-compute hosts in
+  /var/log/neutron/
+
+
+  =
+
+  2017-09-22 18:54:52.130 387556 INFO ryu.base.app_manager [-] instantiatin=
+g app ryu.app.ofctl.service of OfctlService
+  2017-09-22 18:54:56.124 387556 ERROR neutron.agent.ovsdb.impl_vsctl [req-=
+e291c2f9-a123-422c-be7c-fadaeb5decfa - - - - -] Unable to execute ['ovs-vsc=
+tl', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manag=
+er', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'O=
+pen_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1;=
+ Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Trans=
+action causes multiple rows in \"Manager\" table to have identical values (=
+\"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with U=
+UID 9f27ddee-9881-4cbc-9777-2f42fee735e9, was inserted by this transaction.=
+  Second row, with UUID ccf0e097-09d5-449c-b353-6b69781dc3f7, existed in th=
+e database before this transaction and was not modified by the transaction.=
+","error":"constraint violation"}
+
+
+  I'm not sure if the above error could be pertaining to the failure, I
+  have also attached those logs to this bug as well...
+
+  =
+
+  .
+  (neutron) agent-list
+  +--------------------------------------+----------------------+--------+-=
+------------------+-------+----------------+---------------------------+
+  | id                                   | agent_type           | host   | =
+availability_zone | alive | admin_state_up | binary                    |
+  +--------------------------------------+----------------------+--------+-=
+------------------+-------+----------------+---------------------------+
+  | 0cca03fb-abb2-4704-8b0b-e7d3e117d882 | DHCP agent           | awrep1 | =
+nova              | :-)   | True           | neutron-dhcp-agent        |
+  | 14a5fd52-fbc3-450c-96d5-4e9a65776dad | L3 agent             | awrep1 | =
+nova              | :-)   | True           | neutron-l3-agent          |
+  | 2ebc7238-5e61-41f8-bc60-df14ec6b226b | Loadbalancerv2 agent | awrep1 | =
+                  | :-)   | True           | neutron-lbaasv2-agent     |
+  | 4f6275be-fc8b-4994-bdac-13a4b76f6a83 | Metering agent       | awrep1 | =
+                  | :-)   | True           | neutron-metering-agent    |
+  | 86ecc6b0-c100-4298-b861-40c17516cc08 | Open vSwitch agent   | awrep1 | =
+                  | :-)   | True           | neutron-openvswitch-agent |
+  | 947ad3ab-650b-4b96-a520-00441ecb33e7 | Open vSwitch agent   | awrep4 | =
+                  | :-)   | True           | neutron-openvswitch-agent |
+  | 996b0692-7d19-4641-bec3-e057f4a856f6 | Open vSwitch agent   | awrep3 | =
+                  | :-)   | True           | neutron-openvswitch-agent |
+  | ab6b1065-0b98-4cf3-9f46-6bddba0c5e75 | Metadata agent       | awrep1 | =
+                  | :-)   | True           | neutron-metadata-agent    |
+  | fe24f622-b77c-4eed-ae22-18e4195cf763 | Open vSwitch agent   | awrep2 | =
+                  | :-)   | True           | neutron-openvswitch-agent |
+  +--------------------------------------+----------------------+--------+-=
+------------------+-------+----------------+---------------------------+
+
+  =
+
+  Should neutron-openvswitch be assigned to the 'nova' availability zone? =
+
+
+  I have also attached the ovs-vsctl show from a nova-compute host and
+  the neutron-gateway host to ensure that the open v switch routes are
+  correct.
+
+  =
+
+  I can supply more logs if required.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/libvirt/+bug/1719196/+subscriptions
