@@ -1,34 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e0Eaa-00033l-3U
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 18:25:57 -0400
+	(envelope-from <doug16k@gmail.com>) id 1e0FPZ-0003Fs-Ki
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 19:18:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e0EaW-0000qV-2U
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 18:25:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57808)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e0EaV-0000pE-Pc
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 18:25:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e0EaT-00088v-Qa
-	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 22:25:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C4A1D2E80CB
-	for <qemu-devel@nongnu.org>; Thu,  5 Oct 2017 22:25:49 +0000 (UTC)
+	(envelope-from <doug16k@gmail.com>) id 1e0FPX-0000Bv-4d
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 19:18:37 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 05 Oct 2017 22:19:12 -0000
-From: dann frazier <dann.frazier@canonical.com>
-Reply-To: Bug 1719196 <1719196@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150626680089.6094.17724106932405637799.malonedeb@soybean.canonical.com>
-Message-Id: <150724195275.21899.14366213638080589382.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1719196] Re: [arm64 ocata] newly created
- instances are unable to raise network interfaces
+From: Doug Gale <doug16k@gmail.com>
+Date: Thu, 5 Oct 2017 19:18:33 -0400
+Message-ID: <CAEfK_45dZvxvBNQpPLo71ZJhrPN5_GJr8uJ2pJZpCaFf0+i3YA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Patch to add helpful tracing output for driver authors
+ in NVMe emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,288 +20,510 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: qemu-block@nongnu.org, keith.busch@intel.com, kwolf@redhat.com, mreitz@redhat.com
 
-Thanks so much for doing that Sean.
+I added the tracing output in this patch to assist me in implementing
+an NVMe driver. It helped tremendously.
 
-Omitting expected changes (uuid, mac address, etc), here's are the
-significant changes I see:
+>From 1d19086cdef8d492929852d582cb41dcc5026f71 Mon Sep 17 00:00:00 2001
+From: Doug Gale <doug16k@gmail.com>
+Date: Thu, 5 Oct 2017 19:02:03 -0400
+Subject: [PATCH] Add tracing output to NVMe emulation to help driver authors.
 
-1) N uses the QEMU 'virt' model, O uses 'virt-2.8'
-2) N and O both expose a pci root, but N also exposed 2 PCI bridges that O =
-does not.
-3) N exposes an additional serial device.
-4) N and O both use an apparmor seclabel. However, O also has a DAC model.
+It is off by default, enable it by uncommenting #define DEBUG_NVME
+or through CFLAGS
 
-#4 is the most interesting to me. Is there a way to configure ocata nova
-to not enable DAC?
+Signed-off-by: Doug Gale <doug16k@gmail.com>
+---
+ hw/block/nvme.c | 191 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 177 insertions(+), 14 deletions(-)
 
--- =
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 9aa32692a3..74220c0171 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -36,6 +36,14 @@
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1719196
+ #include "nvme.h"
 
-Title:
-  [arm64 ocata] newly created instances are unable to raise network
-  interfaces
++//#define DEBUG_NVME
++
++#ifdef DEBUG_NVME
++#define DPRINTF(fmt, ...) fprintf(stderr, "nvme: " fmt "\n", ## __VA_ARGS__)
++#else
++#define DPRINTF(fmt, ...) ((void)0)
++#endif
++
+ static void nvme_process_sq(void *opaque);
 
-Status in libvirt:
-  New
-Status in QEMU:
-  New
+ static void nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
+@@ -86,10 +94,14 @@ static void nvme_isr_notify(NvmeCtrl *n, NvmeCQueue *cq)
+ {
+     if (cq->irq_enabled) {
+         if (msix_enabled(&(n->parent_obj))) {
++            DPRINTF("raising MSI-X IRQ vector %u", cq->vector);
+             msix_notify(&(n->parent_obj), cq->vector);
+         } else {
++            DPRINTF("pulsing IRQ pin");
+             pci_irq_pulse(&n->parent_obj);
+         }
++    } else {
++        DPRINTF("IRQ is masked");
+     }
+ }
 
-Bug description:
-  arm64 Ocata ,
+@@ -101,9 +113,11 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg,
+QEMUIOVector *iov, uint64_t prp1,
+     int num_prps = (len >> n->page_bits) + 1;
 
-  I'm testing to see I can get Ocata running on arm64 and using the
-  openstack-base bundle to deploy it.  I have added the bundle to the
-  log file attached to this bug.
+     if (!prp1) {
++        DPRINTF("Invalid PRP!");
+         return NVME_INVALID_FIELD | NVME_DNR;
+     } else if (n->cmbsz && prp1 >= n->ctrl_mem.addr &&
+                prp1 < n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size)) {
++        DPRINTF("PRP in controller memory");
+         qsg->nsg = 0;
+         qemu_iovec_init(iov, num_prps);
+         qemu_iovec_add(iov, (void *)&n->cmbuf[prp1 -
+n->ctrl_mem.addr], trans_len);
+@@ -168,6 +182,7 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg,
+QEMUIOVector *iov, uint64_t prp1,
 
-  When I create a new instance via nova, the VM comes up and runs,
-  however fails to raise its eth0 interface. This occurs on both
-  internal and external networks.
+  unmap:
+     qemu_sglist_destroy(qsg);
++    DPRINTF("invalid SGL!");
+     return NVME_INVALID_FIELD | NVME_DNR;
+ }
 
-  ubuntu@openstackaw:~$ nova list
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  | ID                                   | Name    | Status | Task State | =
-Power State | Networks           |
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  | dcaf6d51-f81e-4cbd-ac77-0c5d21bde57c | sfeole1 | ACTIVE | -          | =
-Running     | internal=3D10.5.5.3  |
-  | aa0b8aee-5650-41f4-8fa0-aeccdc763425 | sfeole2 | ACTIVE | -          | =
-Running     | internal=3D10.5.5.13 |
-  +--------------------------------------+---------+--------+------------+-=
-------------+--------------------+
-  ubuntu@openstackaw:~$ nova show aa0b8aee-5650-41f4-8fa0-aeccdc763425
-  +--------------------------------------+---------------------------------=
--------------------------+
-  | Property                             | Value                           =
-                         |
-  +--------------------------------------+---------------------------------=
--------------------------+
-  | OS-DCF:diskConfig                    | MANUAL                          =
-                         |
-  | OS-EXT-AZ:availability_zone          | nova                            =
-                         |
-  | OS-EXT-SRV-ATTR:host                 | awrep3                          =
-                         |
-  | OS-EXT-SRV-ATTR:hypervisor_hostname  | awrep3.maas                     =
-                         |
-  | OS-EXT-SRV-ATTR:instance_name        | instance-00000003               =
-                         |
-  | OS-EXT-STS:power_state               | 1                               =
-                         |
-  | OS-EXT-STS:task_state                | -                               =
-                         |
-  | OS-EXT-STS:vm_state                  | active                          =
-                         |
-  | OS-SRV-USG:launched_at               | 2017-09-24T14:23:08.000000      =
-                         |
-  | OS-SRV-USG:terminated_at             | -                               =
-                         |
-  | accessIPv4                           |                                 =
-                         |
-  | accessIPv6                           |                                 =
-                         |
-  | config_drive                         |                                 =
-                         |
-  | created                              | 2017-09-24T14:22:41Z            =
-                         |
-  | flavor                               | m1.small (717660ae-0440-4b19-a76=
-2-ffeb32a0575c)          |
-  | hostId                               | 5612a00671c47255d2ebd6737a64ec9b=
-d3a5866d1233ecf3e988b025 |
-  | id                                   | aa0b8aee-5650-41f4-8fa0-aeccdc76=
-3425                     |
-  | image                                | zestynosplash (e88fd1bd-f040-44d=
-8-9e7c-c462ccf4b945)     |
-  | internal network                     | 10.5.5.13                       =
-                         |
-  | key_name                             | mykey                           =
-                         |
-  | metadata                             | {}                              =
-                         |
-  | name                                 | sfeole2                         =
-                         |
-  | os-extended-volumes:volumes_attached | []                              =
-                         |
-  | progress                             | 0                               =
-                         |
-  | security_groups                      | default                         =
-                         |
-  | status                               | ACTIVE                          =
-                         |
-  | tenant_id                            | 9f7a21c1ad264fec81abc09f3960ad1d=
-                         |
-  | updated                              | 2017-09-24T14:23:09Z            =
-                         |
-  | user_id                              | e6bb6f5178a248c1b5ae66ed388f9040=
-                         |
-  +--------------------------------------+---------------------------------=
--------------------------+
+@@ -178,16 +193,22 @@ static uint16_t nvme_dma_read_prp(NvmeCtrl *n,
+uint8_t *ptr, uint32_t len,
+     QEMUIOVector iov;
+     uint16_t status = NVME_SUCCESS;
 
++    DPRINTF("DMA read, prp1=0x%"PRIx64" prp2=0x%"PRIx64,
++            prp1, prp2);
++
+     if (nvme_map_prp(&qsg, &iov, prp1, prp2, len, n)) {
++        DPRINTF("DMA read invalid PRP field!");
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
+     if (qsg.nsg > 0) {
+         if (dma_buf_read(ptr, len, &qsg)) {
++            DPRINTF("DMA read invalid SGL field!");
+             status = NVME_INVALID_FIELD | NVME_DNR;
+         }
+         qemu_sglist_destroy(&qsg);
+     } else {
+         if (qemu_iovec_to_buf(&iov, 0, ptr, len) != len) {
++            DPRINTF("invalid field!");
+             status = NVME_INVALID_FIELD | NVME_DNR;
+         }
+         qemu_iovec_destroy(&iov);
+@@ -274,6 +295,7 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n,
+NvmeNamespace *ns, NvmeCmd *cmd,
+     uint32_t aio_nlb = nlb << (data_shift - BDRV_SECTOR_BITS);
 
-  As seen above the instances boot an run.  Full Console output is
-  attached to this bug.
+     if (slba + nlb > ns->id_ns.nsze) {
++        DPRINTF("Invalid LBA!");
+         return NVME_LBA_RANGE | NVME_DNR;
+     }
 
-  =
+@@ -301,13 +323,19 @@ static uint16_t nvme_rw(NvmeCtrl *n,
+NvmeNamespace *ns, NvmeCmd *cmd,
+     int is_write = rw->opcode == NVME_CMD_WRITE ? 1 : 0;
+     enum BlockAcctType acct = is_write ? BLOCK_ACCT_WRITE : BLOCK_ACCT_READ;
 
-  [  OK  ] Started Initial cloud-init job (pre-networking).
-  [  OK  ] Reached target Network (Pre).
-  [  OK  ] Started AppArmor initialization.
-           Starting Raise network interfaces...
-  [FAILED] Failed to start Raise network interfaces.
-  See 'systemctl status networking.service' for details.
-           Starting Initial cloud-init job (metadata service crawler)...
-  [  OK  ] Reached target Network.
-  [  315.051902] cloud-init[881]: Cloud-init v. 0.7.9 running 'init' at Fri=
-, 22 Sep 2017 18:29:15 +0000. Up 314.70 seconds.
-  [  315.057291] cloud-init[881]: ci-info: +++++++++++++++++++++++++++Net d=
-evice info+++++++++++++++++++++++++++
-  [  315.060338] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.063308] cloud-init[881]: ci-info: | Device |  Up  |  Address  |   =
- Mask   | Scope |     Hw-Address    |
-  [  315.066304] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.069303] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
-  .     |   .   | fa:16:3e:39:4c:48 |
-  [  315.072308] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
-  .     |   d   | fa:16:3e:39:4c:48 |
-  [  315.075260] cloud-init[881]: ci-info: |  lo:   | True | 127.0.0.1 | 25=
-5.0.0.0 |   .   |         .         |
-  [  315.078258] cloud-init[881]: ci-info: |  lo:   | True |     .     |   =
-  .     |   d   |         .         |
-  [  315.081249] cloud-init[881]: ci-info: +--------+------+-----------+---=
---------+-------+-------------------+
-  [  315.084240] cloud-init[881]: 2017-09-22 18:29:15,393 - url_helper.py[W=
-ARNING]: Calling 'http://169.254.169.254/2009-04-04/meta-data/instance-id' =
-failed [0/120s]: request error [HTTPConnectionPool(host=3D'169.254.169.254'=
-, port=3D80): Max retries exceeded with url: /2009-04-04/meta-data/instance=
--id (Caused by NewConnectionError('<requests.packages.urllib3.connection.HT=
-TPConnection object at 0xffffb10794e0>: Failed to establish a new connectio=
-n: [Errno 101] Network is unreachable',))]
++    DPRINTF("%s %"PRIu32" blocks (%"PRIu64" bytes) from LBA %"PRIu64,
++            is_write ? "write" : "read",
++            nlb, data_size, slba);
++
+     if ((slba + nlb) > ns->id_ns.nsze) {
+         block_acct_invalid(blk_get_stats(n->conf.blk), acct);
++        DPRINTF("Invalid LBA!");
+         return NVME_LBA_RANGE | NVME_DNR;
+     }
 
+     if (nvme_map_prp(&req->qsg, &req->iov, prp1, prp2, data_size, n)) {
+         block_acct_invalid(blk_get_stats(n->conf.blk), acct);
++        DPRINTF("Invalid PRP!");
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
 
-  =
+@@ -337,6 +365,7 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeCmd
+*cmd, NvmeRequest *req)
+     uint32_t nsid = le32_to_cpu(cmd->nsid);
 
-  ----------------
+     if (nsid == 0 || nsid > n->num_namespaces) {
++        DPRINTF("Invalid namespace!");
+         return NVME_INVALID_NSID | NVME_DNR;
+     }
 
+@@ -350,6 +379,7 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeCmd
+*cmd, NvmeRequest *req)
+     case NVME_CMD_READ:
+         return nvme_rw(n, ns, cmd, req);
+     default:
++        DPRINTF("Invalid opcode!");
+         return NVME_INVALID_OPCODE | NVME_DNR;
+     }
+ }
+@@ -374,9 +404,12 @@ static uint16_t nvme_del_sq(NvmeCtrl *n, NvmeCmd *cmd)
+     uint16_t qid = le16_to_cpu(c->qid);
 
-  I have checked all services in neutron and made sure that they are
-  running and restarted in neutron-gateway
+     if (!qid || nvme_check_sqid(n, qid)) {
++        DPRINTF("invalid submission queue deletion! qid=%u", qid);
+         return NVME_INVALID_QID | NVME_DNR;
+     }
 
-  =
++    DPRINTF("submission queue deleted, qid=%u", qid);
++
+     sq = n->sq[qid];
+     while (!QTAILQ_EMPTY(&sq->out_req_list)) {
+         req = QTAILQ_FIRST(&sq->out_req_list);
+@@ -439,21 +472,31 @@ static uint16_t nvme_create_sq(NvmeCtrl *n, NvmeCmd *cmd)
+     uint16_t qflags = le16_to_cpu(c->sq_flags);
+     uint64_t prp1 = le64_to_cpu(c->prp1);
 
-   [ + ]  neutron-dhcp-agent
-   [ + ]  neutron-l3-agent
-   [ + ]  neutron-lbaasv2-agent
-   [ + ]  neutron-metadata-agent
-   [ + ]  neutron-metering-agent
-   [ + ]  neutron-openvswitch-agent
-   [ + ]  neutron-ovs-cleanup
++    DPRINTF("attempting to create submission queue"
++            ", addr=0x%"PRIx64", cqid=%u, size=%u",
++            prp1, cqid, qsize);
++
+     if (!cqid || nvme_check_cqid(n, cqid)) {
++        DPRINTF("...invalid completion queue id!");
+         return NVME_INVALID_CQID | NVME_DNR;
+     }
+     if (!sqid || !nvme_check_sqid(n, sqid)) {
++        DPRINTF("...invalid submission queue id!");
+         return NVME_INVALID_QID | NVME_DNR;
+     }
+     if (!qsize || qsize > NVME_CAP_MQES(n->bar.cap)) {
++        DPRINTF("...invalid queue size!");
+         return NVME_MAX_QSIZE_EXCEEDED | NVME_DNR;
+     }
+     if (!prp1 || prp1 & (n->page_size - 1)) {
++        DPRINTF("...invalid address!");
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
+     if (!(NVME_SQ_FLAGS_PC(qflags))) {
++        DPRINTF("...invalid flags!");
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
++    DPRINTF("...success");
+     sq = g_malloc0(sizeof(*sq));
+     nvme_init_sq(sq, n, prp1, sqid, cqid, qsize + 1);
+     return NVME_SUCCESS;
+@@ -477,13 +520,16 @@ static uint16_t nvme_del_cq(NvmeCtrl *n, NvmeCmd *cmd)
+     uint16_t qid = le16_to_cpu(c->qid);
 
-  and have also restarted and checked the nova-compute logs for their
-  neutron counterparts.
+     if (!qid || nvme_check_cqid(n, qid)) {
++        DPRINTF("Invalid completion queue ID!");
+         return NVME_INVALID_CQID | NVME_DNR;
+     }
 
-  =
+     cq = n->cq[qid];
+     if (!QTAILQ_EMPTY(&cq->sq_list)) {
++        DPRINTF("invalid completion queue deletion! id=%u", qid);
+         return NVME_INVALID_QUEUE_DEL;
+     }
++    DPRINTF("deleted completion queue, id=%u", qid);
+     nvme_free_cq(cq, n);
+     return NVME_SUCCESS;
+ }
+@@ -516,21 +562,32 @@ static uint16_t nvme_create_cq(NvmeCtrl *n, NvmeCmd *cmd)
+     uint16_t qflags = le16_to_cpu(c->cq_flags);
+     uint64_t prp1 = le64_to_cpu(c->prp1);
 
-   [ + ]  neutron-openvswitch-agent
-   [ + ]  neutron-ovs-cleanup
++    DPRINTF("attempting to create completion queue"
++            ", addr=0x%"PRIx64", cqid=%u"
++            ", vector=%u, size=%u, intr_en=%u",
++            prp1, cqid, vector, qsize, NVME_CQ_FLAGS_IEN(qflags));
++
+     if (!cqid || !nvme_check_cqid(n, cqid)) {
++        DPRINTF("...invalid completion queue id!");
+         return NVME_INVALID_CQID | NVME_DNR;
+     }
+     if (!qsize || qsize > NVME_CAP_MQES(n->bar.cap)) {
++        DPRINTF("...invalid queue size!");
+         return NVME_MAX_QSIZE_EXCEEDED | NVME_DNR;
+     }
+     if (!prp1) {
++        DPRINTF("...invalid address!");
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
+     if (vector > n->num_queues) {
++        DPRINTF("...invalid interrupt vector!");
+         return NVME_INVALID_IRQ_VECTOR | NVME_DNR;
+     }
+     if (!(NVME_CQ_FLAGS_PC(qflags))) {
++        DPRINTF("...invalid flags!");
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
++    DPRINTF("...success");
 
+     cq = g_malloc0(sizeof(*cq));
+     nvme_init_cq(cq, n, prp1, cqid, vector, qsize + 1,
+@@ -555,10 +612,16 @@ static uint16_t nvme_identify_ns(NvmeCtrl *n,
+NvmeIdentify *c)
+     uint64_t prp2 = le64_to_cpu(c->prp2);
 
-   There are some warnings/errors in the neutron-gateway logs which I
-  have attached the full tarball in a separate attachment to this bug:
+     if (nsid == 0 || nsid > n->num_namespaces) {
++        DPRINTF("...invalid namespace ID!");
+         return NVME_INVALID_NSID | NVME_DNR;
+     }
 
-  2017-09-24 14:39:33.152 10322 INFO ryu.base.app_manager [-] instantiating=
- app ryu.controller.ofp_handler of OFPHandler
-  2017-09-24 14:39:33.153 10322 INFO ryu.base.app_manager [-] instantiating=
- app ryu.app.ofctl.service of OfctlService
-  2017-09-24 14:39:39.577 10322 ERROR neutron.agent.ovsdb.impl_vsctl [req-2=
-f084ae8-13dc-47dc-b351-24c8f3c57067 - - - - -] Unable to execute ['ovs-vsct=
-l', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manage=
-r', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'Op=
-en_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1; =
-Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Transa=
-ction causes multiple rows in \"Manager\" table to have identical values (\=
-"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with UU=
-ID e02a5f7f-bfd2-4a1d-ae3c-0321db4bd3fb, existed in the database before thi=
-s transaction and was not modified by the transaction.  Second row, with UU=
-ID 6e9aba3a-471a-4976-bffd-b7131bbe5377, was inserted by this transaction."=
-,"error":"constraint violation"}
+     ns = &n->namespaces[nsid - 1];
++
++    DPRINTF("identify namespace, nlbaf=%u", ns->id_ns.nlbaf);
++    DPRINTF("identify namespace, lbaf[0]=0x%"PRIx32,
++            *(uint32_t*)&ns->id_ns.lbaf[0]);
++
+     return nvme_dma_read_prp(n, (uint8_t *)&ns->id_ns, sizeof(ns->id_ns),
+         prp1, prp2);
+ }
+@@ -595,12 +658,18 @@ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
 
+     switch (le32_to_cpu(c->cns)) {
+     case 0x00:
++        DPRINTF("...identify namespace %u",
++                le32_to_cpu(c->nsid));
+         return nvme_identify_ns(n, c);
+     case 0x01:
++        DPRINTF("...identify controller");
+         return nvme_identify_ctrl(n, c);
+     case 0x02:
++        DPRINTF("...identify namespace list, after %u",
++                le32_to_cpu(c->nsid));
+         return nvme_identify_nslist(n, c);
+     default:
++        DPRINTF("...invalid CNS: %u!", le32_to_cpu(c->cns));
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
+ }
+@@ -618,6 +687,7 @@ static uint16_t nvme_get_feature(NvmeCtrl *n,
+NvmeCmd *cmd, NvmeRequest *req)
+         result = cpu_to_le32((n->num_queues - 2) | ((n->num_queues -
+2) << 16));
+         break;
+     default:
++        DPRINTF("Invalid field!");
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
 
-  These warnings/errors also occur on the nova-compute hosts in
-  /var/log/neutron/
+@@ -635,10 +705,15 @@ static uint16_t nvme_set_feature(NvmeCtrl *n,
+NvmeCmd *cmd, NvmeRequest *req)
+         blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
+         break;
+     case NVME_NUMBER_OF_QUEUES:
++        DPRINTF("Requested cq_count=%u, sq_count=%u,"
++                " responding with cq_count=%u, sq_count=%u",
++                (dw11 & 0xFFFF) + 1, ((dw11 >> 16) & 0xFFFF) + 1,
++                n->num_queues - 1, n->num_queues - 1);
+         req->cqe.result =
+             cpu_to_le32((n->num_queues - 2) | ((n->num_queues - 2) << 16));
+         break;
+     default:
++        DPRINTF("Invalid field!");
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
+     return NVME_SUCCESS;
+@@ -648,20 +723,28 @@ static uint16_t nvme_admin_cmd(NvmeCtrl *n,
+NvmeCmd *cmd, NvmeRequest *req)
+ {
+     switch (cmd->opcode) {
+     case NVME_ADM_CMD_DELETE_SQ:
++        DPRINTF("received admin command: delete submission queue");
+         return nvme_del_sq(n, cmd);
+     case NVME_ADM_CMD_CREATE_SQ:
++        DPRINTF("received admin command: create submission queue");
+         return nvme_create_sq(n, cmd);
+     case NVME_ADM_CMD_DELETE_CQ:
++        DPRINTF("received admin command: delete completion queue");
+         return nvme_del_cq(n, cmd);
+     case NVME_ADM_CMD_CREATE_CQ:
++        DPRINTF("received admin command: create completion queue");
+         return nvme_create_cq(n, cmd);
+     case NVME_ADM_CMD_IDENTIFY:
++        DPRINTF("received admin command: identify");
+         return nvme_identify(n, cmd);
+     case NVME_ADM_CMD_SET_FEATURES:
++        DPRINTF("received admin command: set features");
+         return nvme_set_feature(n, cmd, req);
+     case NVME_ADM_CMD_GET_FEATURES:
++        DPRINTF("received admin command: get features");
+         return nvme_get_feature(n, cmd, req);
+     default:
++        DPRINTF("received admin command: invalid opcode!");
+         return NVME_INVALID_OPCODE | NVME_DNR;
+     }
+ }
+@@ -721,15 +804,70 @@ static int nvme_start_ctrl(NvmeCtrl *n)
+     uint32_t page_bits = NVME_CC_MPS(n->bar.cc) + 12;
+     uint32_t page_size = 1 << page_bits;
 
+-    if (n->cq[0] || n->sq[0] || !n->bar.asq || !n->bar.acq ||
+-            n->bar.asq & (page_size - 1) || n->bar.acq & (page_size - 1) ||
+-            NVME_CC_MPS(n->bar.cc) < NVME_CAP_MPSMIN(n->bar.cap) ||
+-            NVME_CC_MPS(n->bar.cc) > NVME_CAP_MPSMAX(n->bar.cap) ||
+-            NVME_CC_IOCQES(n->bar.cc) < NVME_CTRL_CQES_MIN(n->id_ctrl.cqes) ||
+-            NVME_CC_IOCQES(n->bar.cc) > NVME_CTRL_CQES_MAX(n->id_ctrl.cqes) ||
+-            NVME_CC_IOSQES(n->bar.cc) < NVME_CTRL_SQES_MIN(n->id_ctrl.sqes) ||
+-            NVME_CC_IOSQES(n->bar.cc) > NVME_CTRL_SQES_MAX(n->id_ctrl.sqes) ||
+-            !NVME_AQA_ASQS(n->bar.aqa) || !NVME_AQA_ACQS(n->bar.aqa)) {
++    if (n->cq[0]) {
++        DPRINTF("nvme_start_ctrl failed because cq[0]");
++        return -1;
++    }
++    if (n->sq[0]) {
++        DPRINTF("nvme_start_ctrl failed because sq[0]");
++        return -1;
++    }
++    if (!n->bar.asq) {
++        DPRINTF("nvme_start_ctrl failed because !bar.asq");
++        return -1;
++    }
++    if (!n->bar.acq) {
++        DPRINTF("nvme_start_ctrl failed because !bar.acq");
++        return -1;
++    }
++    if (n->bar.asq & (page_size - 1)) {
++        DPRINTF("nvme_start_ctrl failed because"
++                " bar.asq is not page aligned");
++        return -1;
++    }
++    if (n->bar.acq & (page_size - 1)) {
++        DPRINTF("nvme_start_ctrl failed because"
++                " bar.acq is not page aligned");
++        return -1;
++    }
++    if (NVME_CC_MPS(n->bar.cc) < NVME_CAP_MPSMIN(n->bar.cap)) {
++        DPRINTF("nvme_start_ctrl failed because"
++                " page size is too small");
++        return -1;
++    }
++    if (NVME_CC_MPS(n->bar.cc) > NVME_CAP_MPSMAX(n->bar.cap)) {
++        DPRINTF("nvme_start_ctrl failed because"
++                " page size is too large");
++        return -1;
++    }
++    if (NVME_CC_IOCQES(n->bar.cc) < NVME_CTRL_CQES_MIN(n->id_ctrl.cqes)) {
++        DPRINTF("nvme_start_ctrl failed because"
++                " completion queue entry size is too small");
++        return -1;
++    }
++    if (NVME_CC_IOCQES(n->bar.cc) > NVME_CTRL_CQES_MAX(n->id_ctrl.cqes)) {
++        DPRINTF("nvme_start_ctrl failed because"
++                " completion queue entry size is too large");
++        return -1;
++    }
++    if (NVME_CC_IOSQES(n->bar.cc) < NVME_CTRL_SQES_MIN(n->id_ctrl.sqes)) {
++        DPRINTF("nvme_start_ctrl failed because"
++                " submit queue entry size is too small");
++        return -1;
++    }
++    if (NVME_CC_IOSQES(n->bar.cc) > NVME_CTRL_SQES_MAX(n->id_ctrl.sqes)) {
++        DPRINTF("nvme_start_ctrl failed because"
++                " submit queue entry size is too large");
++        return -1;
++    }
++    if (!NVME_AQA_ASQS(n->bar.aqa)) {
++        DPRINTF("nvme_start_ctrl failed because"
++                " admin submit queue size is zero");
++        return -1;
++    }
++    if (!NVME_AQA_ACQS(n->bar.aqa)) {
++        DPRINTF("nvme_start_ctrl failed because"
++                " admin completion queue size is zero");
+         return -1;
+     }
 
-  =
-
-  2017-09-22 18:54:52.130 387556 INFO ryu.base.app_manager [-] instantiatin=
-g app ryu.app.ofctl.service of OfctlService
-  2017-09-22 18:54:56.124 387556 ERROR neutron.agent.ovsdb.impl_vsctl [req-=
-e291c2f9-a123-422c-be7c-fadaeb5decfa - - - - -] Unable to execute ['ovs-vsc=
-tl', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manag=
-er', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'O=
-pen_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1;=
- Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Trans=
-action causes multiple rows in \"Manager\" table to have identical values (=
-\"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with U=
-UID 9f27ddee-9881-4cbc-9777-2f42fee735e9, was inserted by this transaction.=
-  Second row, with UUID ccf0e097-09d5-449c-b353-6b69781dc3f7, existed in th=
-e database before this transaction and was not modified by the transaction.=
-","error":"constraint violation"}
-
-
-  I'm not sure if the above error could be pertaining to the failure, I
-  have also attached those logs to this bug as well...
-
-  =
-
-  .
-  (neutron) agent-list
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-  | id                                   | agent_type           | host   | =
-availability_zone | alive | admin_state_up | binary                    |
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-  | 0cca03fb-abb2-4704-8b0b-e7d3e117d882 | DHCP agent           | awrep1 | =
-nova              | :-)   | True           | neutron-dhcp-agent        |
-  | 14a5fd52-fbc3-450c-96d5-4e9a65776dad | L3 agent             | awrep1 | =
-nova              | :-)   | True           | neutron-l3-agent          |
-  | 2ebc7238-5e61-41f8-bc60-df14ec6b226b | Loadbalancerv2 agent | awrep1 | =
-                  | :-)   | True           | neutron-lbaasv2-agent     |
-  | 4f6275be-fc8b-4994-bdac-13a4b76f6a83 | Metering agent       | awrep1 | =
-                  | :-)   | True           | neutron-metering-agent    |
-  | 86ecc6b0-c100-4298-b861-40c17516cc08 | Open vSwitch agent   | awrep1 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | 947ad3ab-650b-4b96-a520-00441ecb33e7 | Open vSwitch agent   | awrep4 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | 996b0692-7d19-4641-bec3-e057f4a856f6 | Open vSwitch agent   | awrep3 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  | ab6b1065-0b98-4cf3-9f46-6bddba0c5e75 | Metadata agent       | awrep1 | =
-                  | :-)   | True           | neutron-metadata-agent    |
-  | fe24f622-b77c-4eed-ae22-18e4195cf763 | Open vSwitch agent   | awrep2 | =
-                  | :-)   | True           | neutron-openvswitch-agent |
-  +--------------------------------------+----------------------+--------+-=
-------------------+-------+----------------+---------------------------+
-
-  =
-
-  Should neutron-openvswitch be assigned to the 'nova' availability zone? =
-
-
-  I have also attached the ovs-vsctl show from a nova-compute host and
-  the neutron-gateway host to ensure that the open v switch routes are
-  correct.
-
-  =
-
-  I can supply more logs if required.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/libvirt/+bug/1719196/+subscriptions
+@@ -749,16 +887,25 @@ static int nvme_start_ctrl(NvmeCtrl *n)
+ static void nvme_write_bar(NvmeCtrl *n, hwaddr offset, uint64_t data,
+     unsigned size)
+ {
++    DPRINTF("wrote pci config offset=0x%"PRIx64" data=0x%"PRIx64"",
++            offset, data);
++
+     switch (offset) {
+     case 0xc:
++        DPRINTF("...interrupt mask set 0x%"PRIx64"",
++                data & 0xffffffff);
+         n->bar.intms |= data & 0xffffffff;
+         n->bar.intmc = n->bar.intms;
+         break;
+     case 0x10:
++        DPRINTF("...interrupt mask clr 0x%"PRIx64"",
++                data & 0xffffffff);
+         n->bar.intms &= ~(data & 0xffffffff);
+         n->bar.intmc = n->bar.intms;
+         break;
+     case 0x14:
++        DPRINTF("...controller config 0x%"PRIx64"",
++                data & 0xffffffff);
+         /* Windows first sends data, then sends enable bit */
+         if (!NVME_CC_EN(data) && !NVME_CC_EN(n->bar.cc) &&
+             !NVME_CC_SHN(data) && !NVME_CC_SHN(n->bar.cc))
+@@ -769,39 +916,55 @@ static void nvme_write_bar(NvmeCtrl *n, hwaddr
+offset, uint64_t data,
+         if (NVME_CC_EN(data) && !NVME_CC_EN(n->bar.cc)) {
+             n->bar.cc = data;
+             if (nvme_start_ctrl(n)) {
++                DPRINTF("...nvme_start_ctrl failed!");
+                 n->bar.csts = NVME_CSTS_FAILED;
+             } else {
++                DPRINTF("...nvme_start_ctrl success, now ready!");
+                 n->bar.csts = NVME_CSTS_READY;
+             }
+         } else if (!NVME_CC_EN(data) && NVME_CC_EN(n->bar.cc)) {
++            DPRINTF("...enable bit cleared");
+             nvme_clear_ctrl(n);
+             n->bar.csts &= ~NVME_CSTS_READY;
+         }
+         if (NVME_CC_SHN(data) && !(NVME_CC_SHN(n->bar.cc))) {
+-                nvme_clear_ctrl(n);
+-                n->bar.cc = data;
+-                n->bar.csts |= NVME_CSTS_SHST_COMPLETE;
++            DPRINTF("...shutdown complete");
++            nvme_clear_ctrl(n);
++            n->bar.cc = data;
++            n->bar.csts |= NVME_CSTS_SHST_COMPLETE;
+         } else if (!NVME_CC_SHN(data) && NVME_CC_SHN(n->bar.cc)) {
+-                n->bar.csts &= ~NVME_CSTS_SHST_COMPLETE;
+-                n->bar.cc = data;
++            DPRINTF("...no shutdown, normal operation");
++            n->bar.csts &= ~NVME_CSTS_SHST_COMPLETE;
++            n->bar.cc = data;
+         }
+         break;
+     case 0x24:
++        DPRINTF("...admin queue attributes set to %u",
++                (uint32_t)(data & 0xffffffff));
+         n->bar.aqa = data & 0xffffffff;
+         break;
+     case 0x28:
++        DPRINTF("...admin submission queue address set to %"PRIx64,
++                data);
+         n->bar.asq = data;
+         break;
+     case 0x2c:
++        DPRINTF("...admin submission queue high half of address set to %x",
++                (uint32_t)(data & 0xffffffff));
+         n->bar.asq |= data << 32;
+         break;
+     case 0x30:
++        DPRINTF("...admin completion queue address set to %"PRIx64,
++                data);
+         n->bar.acq = data;
+         break;
+     case 0x34:
++        DPRINTF("...admin completion queue high half of address set to %x",
++                (uint32_t)(data & 0xffffffff));
+         n->bar.acq |= data << 32;
+         break;
+     default:
++        DPRINTF("...ignored!");
+         break;
+     }
+ }
+-- 
+2.11.0
