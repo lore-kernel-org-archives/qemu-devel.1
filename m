@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1e09id-00010Y-Tq
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:13:57 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1e09if-000116-JU
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:13:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1e09iZ-0002kC-UT
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:13:55 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1e09id-0002mw-SQ
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:13:57 -0400
 From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Date: Thu,  5 Oct 2017 19:13:07 +0200
-Message-Id: <20171005171309.1250-1-maxime.coquelin@redhat.com>
-Subject: [Qemu-devel] [REBASED 0/2] exec: further refine
- address_space_get_iotlb_entry()
+Date: Thu,  5 Oct 2017 19:13:09 +0200
+Message-Id: <20171005171309.1250-3-maxime.coquelin@redhat.com>
+In-Reply-To: <20171005171309.1250-1-maxime.coquelin@redhat.com>
+References: <20171005171309.1250-1-maxime.coquelin@redhat.com>
+Subject: [Qemu-devel] [REBASED 2/2] exec: simplify
+ address_space_get_iotlb_entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,52 +23,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peterx@redhat.com, pbonzini@redhat.com, mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
 Cc: qemu-stable@nongnu.org, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-This series is a rebase of the first two patches of Peter's series
-improving address_space_get_iotlb_entry():
-Message-Id: <1496404254-17429-1-git-send-email-peterx@redhat.com>
+From: Peter Xu <peterx@redhat.com>
 
-It is actually not only an improvement, but fixes a regression in the way
-IOTLB updates sent to the backends are generated.
-The regression is introduced by patch:
-a764040cc8 ("exec: abstract address_space_do_translate()")
+This patch let address_space_get_iotlb_entry() to use the newly
+introduced page_mask parameter in flatview_do_translate(). Then we
+will be sure the IOTLB can be aligned to page mask, also we should
+nicely support huge pages now when introducing a764040.
 
-Prior to this patch IOTLB entries sent to the backend were aligned on the
-guest page boundaries (both addresses and size).
-For example, with the guest using 2MB pages:
- * Backend sends IOTLB miss request for iova = 0x112378fb4
- * QEMU replies with an IOTLB update with iova = 0x112200000, size = 0x200000
- * Bakend insert above entry in its cache and compute the translation
-In this case, if the backend needs later to translate 0x112378004, it will
-result in a cache it and no need to send another IOTLB miss.
+Fixes: a764040 ("exec: abstract address_space_do_translate()")
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+---
+ exec.c | 31 ++++++++++---------------------
+ 1 file changed, 10 insertions(+), 21 deletions(-)
 
-With this patch, the addr of the IOTLB entry will be the address requested
-via the IOTLB miss, the size is computed to cover the remaining of the guest
-page.
-The same example gives:
- * Backend sends IOTLB miss request for iova = 0x112378fb4
- * QEMU replies with an IOTLB update with iova = 112378fb4, size = 0x8704c
- * Bakend insert above entry in its cache and compute the translation
-In this case, if the backend needs later to translate 0x112378004, it will
-result in another cache miss:
- * Backend sends IOTLB miss request for iova = 0x112378004
- * QEMU replies with an IOTLB update with iova = 0x112378004, size = 0x87FFC
- * Bakend insert above entry in its cache and compute the translation
-It results in having much more IOTLB misses, and more importantly it pollutes
-the device IOTLB cache by multiplying the number of entries that moreover
-overlap.
-
-Note that current Kernel & User backends implementation do not merge contiguous
-and overlapping IOTLB entries at device IOTLB cache insertion.
-
-This series fixes this regression, so that IOTLB updates are aligned on
-guest's page boundaries.
-
-Peter Xu (2):
-  exec: add page_mask for flatview_do_translate
-  exec: simplify address_space_get_iotlb_entry
-
- exec.c | 75 +++++++++++++++++++++++++++++++++++++++++++-----------------------
- 1 file changed, 49 insertions(+), 26 deletions(-)
-
+diff --git a/exec.c b/exec.c
+index c5f2752f7d..39fc96a19e 100644
+--- a/exec.c
++++ b/exec.c
+@@ -551,14 +551,14 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
+                                             bool is_write)
+ {
+     MemoryRegionSection section;
+-    hwaddr xlat, plen;
++    hwaddr xlat, page_mask;
+ 
+-    /* Try to get maximum page mask during translation. */
+-    plen = (hwaddr)-1;
+-
+-    /* This can never be MMIO. */
+-    section = flatview_do_translate(address_space_to_flatview(as), addr,
+-                                    &xlat, &plen, NULL, is_write, false, &as);
++    /*
++     * This can never be MMIO, and we don't really care about plen,
++     * but page mask.
++     */
++    section = flatview_do_translate(address_space_to_flatview(as), addr, &xlat,
++                                    NULL, &page_mask, is_write, false, &as);
+ 
+     /* Illegal translation */
+     if (section.mr == &io_mem_unassigned) {
+@@ -569,22 +569,11 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
+     xlat += section.offset_within_address_space -
+         section.offset_within_region;
+ 
+-    if (plen == (hwaddr)-1) {
+-        /*
+-         * We use default page size here. Logically it only happens
+-         * for identity mappings.
+-         */
+-        plen = TARGET_PAGE_SIZE;
+-    }
+-
+-    /* Convert to address mask */
+-    plen -= 1;
+-
+     return (IOMMUTLBEntry) {
+         .target_as = as,
+-        .iova = addr & ~plen,
+-        .translated_addr = xlat & ~plen,
+-        .addr_mask = plen,
++        .iova = addr & ~page_mask,
++        .translated_addr = xlat & ~page_mask,
++        .addr_mask = page_mask,
+         /* IOTLBs are for DMAs, and DMA only allows on RAMs. */
+         .perm = IOMMU_RW,
+     };
 -- 
 2.13.6
