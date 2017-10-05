@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e0Ct8-0001eo-6L
+	(envelope-from <ehabkost@redhat.com>) id 1e0Ct8-0001er-7I
 	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 16:36:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e0Ct3-0000BU-5B
+	(envelope-from <ehabkost@redhat.com>) id 1e0Ct4-0000D7-Kq
 	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 16:36:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54212)
+Received: from mx1.redhat.com ([209.132.183.28]:52184)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e0Ct2-0000Ap-RI
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 16:36:53 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e0Ct4-0000C8-Bw
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 16:36:54 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu,  5 Oct 2017 17:36:35 -0300
-Message-Id: <20171005203638.19255-7-ehabkost@redhat.com>
+Date: Thu,  5 Oct 2017 17:36:36 -0300
+Message-Id: <20171005203638.19255-8-ehabkost@redhat.com>
 In-Reply-To: <20171005203638.19255-1-ehabkost@redhat.com>
 References: <20171005203638.19255-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 6/9] qemu-options: Deprecate -nodefconfig
+Subject: [Qemu-devel] [PULL 7/9] config: qemu_config_parse() return number
+ of config groups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,74 +25,99 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Since 2012 (commit ba6212d8 "Eliminate cpus-x86_64.conf file") we
-have no default config files that would be disabled using
--nodefconfig.  Update documentation and document -nodefconfig as
-deprecated.
+Change qemu_config_parse() to return the number of config groups
+in success and -EINVAL on error. This will allow callers of
+qemu_config_parse() to check if something was really loaded from
+the config file.
 
-Cc: Markus Armbruster <armbru@redhat.com>
-Acked-by: Alistair Francis <alistair.francis@xilinx.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20171004030025.7866-3-ehabkost@redhat.com>
+All existing callers of qemu_config_parse() and
+qemu_read_config_file() only check if the return value was
+negative, so the change shouldn't affect them.
+
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20171004025043.3788-2-ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- qemu-doc.texi   |  4 ++++
- qemu-options.hx | 17 ++++-------------
- 2 files changed, 8 insertions(+), 13 deletions(-)
+ block/blkdebug.c   |  1 -
+ util/qemu-config.c | 15 +++++++--------
+ 2 files changed, 7 insertions(+), 9 deletions(-)
 
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index ecd186a159..d8bb2c664f 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -2496,6 +2496,10 @@ would automatically enable USB support on the machine type.
- If using the new syntax, USB support must be explicitly
- enabled via the ``-machine usb=on'' argument.
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index 46e53f2f09..dfdf9b91aa 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -244,7 +244,6 @@ static int read_config(BDRVBlkdebugState *s, const char *filename,
+         ret = qemu_config_parse(f, config_groups, filename);
+         if (ret < 0) {
+             error_setg(errp, "Could not parse blkdebug config file");
+-            ret = -EINVAL;
+             goto fail;
+         }
+     }
+diff --git a/util/qemu-config.c b/util/qemu-config.c
+index 405dd1a1d7..99b0e46fa3 100644
+--- a/util/qemu-config.c
++++ b/util/qemu-config.c
+@@ -385,6 +385,7 @@ void qemu_config_write(FILE *fp)
+     }
+ }
  
-+@subsection -nodefconfig (since 2.11.0)
-+
-+The ``-nodefconfig`` argument is a synonym for ``-no-user-config``.
-+
- @section qemu-img command line arguments
++/* Returns number of config groups on success, -errno on error */
+ int qemu_config_parse(FILE *fp, QemuOptsList **lists, const char *fname)
+ {
+     char line[1024], group[64], id[64], arg[64], value[1024];
+@@ -392,7 +393,8 @@ int qemu_config_parse(FILE *fp, QemuOptsList **lists, const char *fname)
+     QemuOptsList *list = NULL;
+     Error *local_err = NULL;
+     QemuOpts *opts = NULL;
+-    int res = -1, lno = 0;
++    int res = -EINVAL, lno = 0;
++    int count = 0;
  
- @subsection convert -s (since 2.0.0)
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 39225ae6c3..981742d191 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4067,26 +4067,17 @@ Write device configuration to @var{file}. The @var{file} can be either filename
- command line and device configuration into file or dash @code{-}) character to print the
- output to stdout. This can be later used as input file for @code{-readconfig} option.
- ETEXI
--DEF("nodefconfig", 0, QEMU_OPTION_nodefconfig,
--    "-nodefconfig\n"
--    "                do not load default config files at startup\n",
--    QEMU_ARCH_ALL)
--STEXI
--@item -nodefconfig
--@findex -nodefconfig
--Normally QEMU loads configuration files from @var{sysconfdir} and @var{datadir} at startup.
--The @code{-nodefconfig} option will prevent QEMU from loading any of those config files.
--ETEXI
-+HXCOMM Deprecated, same as -no-user-config
-+DEF("nodefconfig", 0, QEMU_OPTION_nodefconfig, "", QEMU_ARCH_ALL)
- DEF("no-user-config", 0, QEMU_OPTION_nouserconfig,
-     "-no-user-config\n"
--    "                do not load user-provided config files at startup\n",
-+    "                do not load default user-provided config files at startup\n",
-     QEMU_ARCH_ALL)
- STEXI
- @item -no-user-config
- @findex -no-user-config
- The @code{-no-user-config} option makes QEMU not load any of the user-provided
--config files on @var{sysconfdir}, but won't make it skip the QEMU-provided config
--files from @var{datadir}.
-+config files on @var{sysconfdir}.
- ETEXI
- DEF("trace", HAS_ARG, QEMU_OPTION_trace,
-     "-trace [[enable=]<pattern>][,events=<file>][,file=<file>]\n"
+     loc_push_none(&loc);
+     while (fgets(line, sizeof(line), fp) != NULL) {
+@@ -413,6 +415,7 @@ int qemu_config_parse(FILE *fp, QemuOptsList **lists, const char *fname)
+                 goto out;
+             }
+             opts = qemu_opts_create(list, id, 1, NULL);
++            count++;
+             continue;
+         }
+         if (sscanf(line, "[%63[^]]]", group) == 1) {
+@@ -423,6 +426,7 @@ int qemu_config_parse(FILE *fp, QemuOptsList **lists, const char *fname)
+                 goto out;
+             }
+             opts = qemu_opts_create(list, NULL, 0, &error_abort);
++            count++;
+             continue;
+         }
+         value[0] = '\0';
+@@ -447,7 +451,7 @@ int qemu_config_parse(FILE *fp, QemuOptsList **lists, const char *fname)
+         error_report("error reading file");
+         goto out;
+     }
+-    res = 0;
++    res = count;
+ out:
+     loc_pop(&loc);
+     return res;
+@@ -464,12 +468,7 @@ int qemu_read_config_file(const char *filename)
+ 
+     ret = qemu_config_parse(f, vm_config_groups, filename);
+     fclose(f);
+-
+-    if (ret == 0) {
+-        return 0;
+-    } else {
+-        return -EINVAL;
+-    }
++    return ret;
+ }
+ 
+ static void config_parse_qdict_section(QDict *options, QemuOptsList *opts,
 -- 
 2.13.6
