@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e0B2d-0003ol-JX
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 14:39:14 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e0B3f-0004DK-Jn
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 14:39:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e0B01-0004RJ-Km
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 14:38:39 -0400
-Received: from 17.mo4.mail-out.ovh.net ([46.105.41.16]:48413)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e0B01-0004HU-7w
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 14:35:57 -0400
-Received: from player772.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id C505EC945F
-	for <qemu-devel@nongnu.org>; Thu,  5 Oct 2017 20:35:45 +0200 (CEST)
-Date: Thu, 5 Oct 2017 20:35:28 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171005203528.21de2933@bahia.lan>
-In-Reply-To: <1507220690-265042-12-git-send-email-imammedo@redhat.com>
-References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-	<1507220690-265042-12-git-send-email-imammedo@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1e0B3Z-00012f-L0
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 14:39:43 -0400
+Received: from mail-qt0-x232.google.com ([2607:f8b0:400d:c0d::232]:47872)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e0B3Z-00011e-Dn
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 14:39:37 -0400
+Received: by mail-qt0-x232.google.com with SMTP id z50so22160881qtj.4
+	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 11:39:37 -0700 (PDT)
+References: <1506092407-26985-1-git-send-email-peter.maydell@linaro.org>
+	<1506092407-26985-15-git-send-email-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <562a5db1-ab3b-1d77-eb8e-69af276bcac3@linaro.org>
+Date: Thu, 5 Oct 2017 14:39:33 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1506092407-26985-15-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 11/23] ppc: spapr: replace
- ppc_cpu_parse_features() with cpu_parse_cpu_model()
+Subject: Re: [Qemu-devel] [PATCH 14/20] target/arm: Implement security
+ attribute lookups for memory accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,101 +32,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, "open list:ppce500" <qemu-ppc@nongnu.org>, "Edgar
-	E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On Thu,  5 Oct 2017 18:24:38 +0200
-Igor Mammedov <imammedo@redhat.com> wrote:
-
-> ppc_cpu_parse_features() is doing practically the same thing as
-> generic cpu_parse_cpu_model(). So remove duplicated impl. and
-> reuse generic one.
+On 09/22/2017 11:00 AM, Peter Maydell wrote:
+> Implement the security attribute lookups for memory accesses
+> in the get_phys_addr() functions, causing these to generate
+> various kinds of SecureFault for bad accesses.
 > 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> The major subtlety in this code relates to handling of the
+> case when the security attributes the SAU assigns to the
+> address don't match the current security state of the CPU.
+> 
+> In the ARM ARM pseudocode for validating instruction
+> accesses, the security attributes of the address determine
+> whether the Secure or NonSecure MPU state is used. At face
+> value, handling this would require us to encode the relevant
+> bits of state into mmu_idx for both S and NS at once, which
+> would result in our needing 16 mmu indexes. Fortunately we
+> don't actually need to do this because a mismatch between
+> address attributes and CPU state means either:
+>  * some kind of fault (usually a SecureFault, but in theory
+>    perhaps a UserFault for unaligned access to Device memory)
+>  * execution of the SG instruction in NS state from a
+>    Secure & NonSecure code region
+> 
+> The purpose of SG is simply to flip the CPU into Secure
+> state, so we can handle it by emulating execution of that
+> instruction directly in arm_v7m_cpu_do_interrupt(), which
+> means we can treat all the mismatch cases as "throw an
+> exception" and we don't need to encode the state of the
+> other MPU bank into our mmu_idx values.
+> 
+> This commit doesn't include the actual emulation of SG;
+> it also doesn't include implementation of the IDAU, which
+> is a per-board way to specify hard-coded memory attributes
+> for addresses, which override the CPU-internal SAU if they
+> specify a more secure setting than the SAU is programmed to.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
+>  target/arm/internals.h |  15 ++++
+>  target/arm/helper.c    | 182 ++++++++++++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 195 insertions(+), 2 deletions(-)
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
->  include/hw/ppc/ppc.h    |  2 --
->  hw/ppc/ppc.c            | 25 -------------------------
->  hw/ppc/spapr_cpu_core.c |  9 ++++-----
->  3 files changed, 4 insertions(+), 32 deletions(-)
-> 
-> diff --git a/include/hw/ppc/ppc.h b/include/hw/ppc/ppc.h
-> index 4e7fe11..ff0ac30 100644
-> --- a/include/hw/ppc/ppc.h
-> +++ b/include/hw/ppc/ppc.h
-> @@ -105,6 +105,4 @@ enum {
->  
->  /* ppc_booke.c */
->  void ppc_booke_timers_init(PowerPCCPU *cpu, uint32_t freq, uint32_t flags);
-> -
-> -void ppc_cpu_parse_features(const char *cpu_model);
->  #endif
-> diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
-> index 05da316..7ec35de 100644
-> --- a/hw/ppc/ppc.c
-> +++ b/hw/ppc/ppc.c
-> @@ -1359,28 +1359,3 @@ void PPC_debug_write (void *opaque, uint32_t addr, uint32_t val)
->          break;
->      }
->  }
-> -
-> -void ppc_cpu_parse_features(const char *cpu_model)
-> -{
-> -    CPUClass *cc;
-> -    ObjectClass *oc;
-> -    const char *typename;
-> -    gchar **model_pieces;
-> -
-> -    model_pieces = g_strsplit(cpu_model, ",", 2);
-> -    if (!model_pieces[0]) {
-> -        error_report("Invalid/empty CPU model name");
-> -        exit(1);
-> -    }
-> -
-> -    oc = cpu_class_by_name(TYPE_POWERPC_CPU, model_pieces[0]);
-> -    if (oc == NULL) {
-> -        error_report("Unable to find CPU definition: %s", model_pieces[0]);
-> -        exit(1);
-> -    }
-> -
-> -    typename = object_class_get_name(oc);
-> -    cc = CPU_CLASS(oc);
-> -    cc->parse_features(typename, model_pieces[1], &error_fatal);
-> -    g_strfreev(model_pieces);
-> -}
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 3e20b1d..3dea5ff 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -34,6 +34,7 @@ void spapr_cpu_parse_features(sPAPRMachineState *spapr)
->       *   before passing it on to the cpu level parser.
->       */
->      gchar **inpieces;
-> +    gchar *newprops;
->      int i, j;
->      gchar *compat_str = NULL;
->  
-> @@ -58,17 +59,15 @@ void spapr_cpu_parse_features(sPAPRMachineState *spapr)
->  
->      if (compat_str) {
->          char *val = compat_str + strlen("compat=");
-> -        gchar *newprops = g_strjoinv(",", inpieces);
->  
->          object_property_set_str(OBJECT(spapr), val, "max-cpu-compat",
->                                  &error_fatal);
->  
-> -        ppc_cpu_parse_features(newprops);
-> -        g_free(newprops);
-> -    } else {
-> -        ppc_cpu_parse_features(MACHINE(spapr)->cpu_model);
->      }
->  
-> +    newprops = g_strjoinv(",", inpieces);
-> +    cpu_parse_cpu_model(TYPE_POWERPC_CPU, newprops);
-> +    g_free(newprops);
->      g_strfreev(inpieces);
->  }
->  
+
+r~
