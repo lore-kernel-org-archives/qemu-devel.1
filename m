@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1e0B7O-0006v3-Pd
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 14:43:35 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e0BDy-0001Zp-0U
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 14:50:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1e0B7J-0005Ve-OR
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 14:43:34 -0400
-Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:54479)
+	(envelope-from <richard.henderson@linaro.org>) id 1e0BDw-0006Go-SQ
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 14:50:22 -0400
+Received: from mail-qt0-x233.google.com ([2607:f8b0:400d:c0d::233]:47974)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1e0B7J-0005VO-JM
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 14:43:29 -0400
-Received: by mail-it0-x241.google.com with SMTP id 72so1968268itk.3
-	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 11:43:29 -0700 (PDT)
-From: John Arbuckle <programmingkidx@gmail.com>
-Date: Thu,  5 Oct 2017 14:43:09 -0400
-Message-Id: <20171005184309.14521-1-programmingkidx@gmail.com>
-Subject: [Qemu-devel] [PATCH] Make scrolling work again
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e0BDw-0006Fj-Ne
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 14:50:20 -0400
+Received: by mail-qt0-x233.google.com with SMTP id z50so22221351qtj.4
+	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 11:50:20 -0700 (PDT)
+References: <1506092407-26985-1-git-send-email-peter.maydell@linaro.org>
+	<1506092407-26985-18-git-send-email-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <cd16f792-28a0-95b8-6a68-73f1427e6d38@linaro.org>
+Date: Thu, 5 Oct 2017 14:50:17 -0400
+MIME-Version: 1.0
+In-Reply-To: <1506092407-26985-18-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 17/20] target/arm: Implement SG instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,128 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: John Arbuckle <programmingkidx@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-Make scrolling in the monitor work.
+On 09/22/2017 11:00 AM, Peter Maydell wrote:
+> Implement the SG instruction, which we emulate 'by hand' in the
+> exception handling code path.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/helper.c | 129 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 124 insertions(+), 5 deletions(-)
+> 
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index b1ecb66..8df819d 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -41,6 +41,10 @@ typedef struct V8M_SAttributes {
+>      bool irvalid;
+>  } V8M_SAttributes;
+>  
+> +static void v8m_security_lookup(CPUARMState *env, uint32_t address,
+> +                                MMUAccessType access_type, ARMMMUIdx mmu_idx,
+> +                                V8M_SAttributes *sattrs);
+> +
+>  /* Definitions for the PMCCNTR and PMCR registers */
+>  #define PMCRD   0x8
+>  #define PMCRC   0x4
+> @@ -6724,6 +6728,123 @@ static void arm_log_exception(int idx)
+>      }
+>  }
+>  
+> +static bool v7m_read_half_insn(ARMCPU *cpu, ARMMMUIdx mmu_idx, uint16_t *insn)
+> +{
 
-Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
----
- ui/cocoa.m | 88 +++++++++++++++++++++++++++++++++++++++-----------------------
- 1 file changed, 56 insertions(+), 32 deletions(-)
+This function doesn't take an address ...
 
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 93e56d0518..5545c42b9c 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -281,6 +281,7 @@ - (void) switchSurface:(DisplaySurface *)surface;
- - (void) grabMouse;
- - (void) ungrabMouse;
- - (void) toggleFullScreen:(id)sender;
-+- (void) handleMonitorInput:(NSEvent *)event;
- - (void) handleEvent:(NSEvent *)event;
- - (void) setAbsoluteEnabled:(BOOL)tIsAbsoluteEnabled;
- /* The state surrounding mouse grabbing is potentially confusing.
-@@ -554,6 +555,60 @@ - (void) toggleStatefulModifier: (int)keycode {
-     qemu_input_event_send_key_qcode(dcl->con, keycode, false);
- }
- 
-+// Does the work of sending input to the monitor
-+- (void) handleMonitorInput:(NSEvent *)event
-+{
-+    int keysym = 0;
-+    int control_key = 0;
-+
-+    // if the control key is down
-+    if ([event modifierFlags] & NSEventModifierFlagControl) {
-+        control_key = 4; // shifts by one nibble (hex digit)
-+    }
-+
-+    /* translates Macintosh keycodes to QEMU's keysym */
-+    int translation_matrix[] = {
-+        [0 ... 0xff] = 0,   // invalid key
-+
-+        [kVK_UpArrow]       = QEMU_KEY_UP,
-+        [kVK_DownArrow]     = QEMU_KEY_DOWN,
-+        [kVK_RightArrow]    = QEMU_KEY_RIGHT,
-+        [kVK_LeftArrow]     = QEMU_KEY_LEFT,
-+        [kVK_Home]          = QEMU_KEY_HOME,
-+        [kVK_End]           = QEMU_KEY_END,
-+        [kVK_PageUp]        = QEMU_KEY_PAGEUP,
-+        [kVK_PageDown]      = QEMU_KEY_PAGEDOWN,
-+        [kVK_ForwardDelete] = QEMU_KEY_DELETE,
-+        [kVK_Delete]        = QEMU_KEY_BACKSPACE,
-+
-+        /*
-+         * Shift value by one hex digit.
-+         * Since no key has a 3 digit hex value there is no chance
-+         * for overlap.
-+         */
-+        [kVK_UpArrow << 4]       = QEMU_KEY_CTRL_UP,
-+        [kVK_DownArrow << 4]     = QEMU_KEY_CTRL_DOWN,
-+        [kVK_RightArrow << 4]    = QEMU_KEY_CTRL_RIGHT,
-+        [kVK_LeftArrow << 4]     = QEMU_KEY_CTRL_LEFT,
-+        [kVK_Home << 4]          = QEMU_KEY_CTRL_HOME,
-+        [kVK_End << 4]           = QEMU_KEY_CTRL_END,
-+        [kVK_PageUp << 4]        = QEMU_KEY_CTRL_PAGEUP,
-+        [kVK_PageDown << 4]      = QEMU_KEY_CTRL_PAGEDOWN,
-+    };
-+
-+    keysym = translation_matrix[[event keyCode] << control_key];
-+
-+    // if not a key that needs translating
-+    if (keysym == 0) {
-+        NSString *ks = [event characters];
-+        if ([ks length] > 0)
-+            keysym = [ks characterAtIndex:0];
-+    }
-+
-+    if(keysym)
-+        kbd_put_keysym(keysym);
-+}
-+
- - (void) handleEvent:(NSEvent *)event
- {
-     COCOA_DEBUG("QemuCocoaView: handleEvent\n");
-@@ -641,38 +696,7 @@ - (void) handleEvent:(NSEvent *)event
- 
-             // handlekeys for Monitor
-             } else {
--                int keysym = 0;
--                switch([event keyCode]) {
--                case 115:
--                    keysym = QEMU_KEY_HOME;
--                    break;
--                case 117:
--                    keysym = QEMU_KEY_DELETE;
--                    break;
--                case 119:
--                    keysym = QEMU_KEY_END;
--                    break;
--                case 123:
--                    keysym = QEMU_KEY_LEFT;
--                    break;
--                case 124:
--                    keysym = QEMU_KEY_RIGHT;
--                    break;
--                case 125:
--                    keysym = QEMU_KEY_DOWN;
--                    break;
--                case 126:
--                    keysym = QEMU_KEY_UP;
--                    break;
--                default:
--                    {
--                        NSString *ks = [event characters];
--                        if ([ks length] > 0)
--                            keysym = [ks characterAtIndex:0];
--                    }
--                }
--                if (keysym)
--                    kbd_put_keysym(keysym);
-+                [self handleMonitorInput: event];
-             }
-             break;
-         case NSEventTypeKeyUp:
--- 
-2.13.5 (Apple Git-94)
+> +    if (get_phys_addr(env, env->regs[15], MMU_INST_FETCH, mmu_idx,
+> +                      &physaddr, &attrs, &prot, &page_size, &fsr, &fi)) {
+
+... reading it directly from r15 ...
+
+> +    if (insn != 0xe97f) {
+> +        /* Not an SG instruction first half (we choose the IMPDEF
+> +         * early-SG-check option).
+> +         */
+> +        goto gen_invep;
+> +    }
+> +
+> +    if (!v7m_read_half_insn(cpu, mmu_idx, &insn)) {
+> +        return false;
+> +    }
+> +
+> +    if (insn != 0xe97f) {
+> +        /* Not an SG instruction second half */
+> +        goto gen_invep;
+> +    }
+
+... but somehow expects to get two different values read from the same address?
+
+Certainly you'd get the wrong exception frame if you incremented r15 in between.
+
+> +    env->regs[15] += 4;
+
+... that make this right and the implicit address to the readers wrong.
+
+I don't see anything else amiss in the patch.
+
+
+r~
