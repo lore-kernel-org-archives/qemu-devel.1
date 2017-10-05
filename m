@@ -1,17 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1e09if-000117-JU
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:13:58 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e09kz-0002lv-3u
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:16:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1e09ib-0002lA-Jm
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:13:57 -0400
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Date: Thu,  5 Oct 2017 19:13:08 +0200
-Message-Id: <20171005171309.1250-2-maxime.coquelin@redhat.com>
-In-Reply-To: <20171005171309.1250-1-maxime.coquelin@redhat.com>
-References: <20171005171309.1250-1-maxime.coquelin@redhat.com>
-Subject: [Qemu-devel] [REBASED 1/2] exec: add page_mask for
- flatview_do_translate
+	(envelope-from <richard.henderson@linaro.org>) id 1e09kv-0004sX-9k
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:16:21 -0400
+Received: from mail-qt0-x236.google.com ([2607:f8b0:400d:c0d::236]:56231)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e09kv-0004rt-3r
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:16:17 -0400
+Received: by mail-qt0-x236.google.com with SMTP id x54so26659337qth.12
+	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 10:16:17 -0700 (PDT)
+References: <1506092407-26985-1-git-send-email-peter.maydell@linaro.org>
+	<1506092407-26985-11-git-send-email-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7ebb8d29-a45d-5d78-58e8-0ac0cfb150d7@linaro.org>
+Date: Thu, 5 Oct 2017 13:16:13 -0400
+MIME-Version: 1.0
+In-Reply-To: <1506092407-26985-11-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 10/20] target/arm: Update excret sanity
+ checks for v8M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,145 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peterx@redhat.com, pbonzini@redhat.com, mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Maxime Coquelin <maxime.coquelin@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-From: Peter Xu <peterx@redhat.com>
+On 09/22/2017 10:59 AM, Peter Maydell wrote:
+> In v8M, more bits are defined in the exception-return magic
+> values; update the code that checks these so we accept
+> the v8M values when the CPU permits them.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/helper.c | 73 ++++++++++++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 58 insertions(+), 15 deletions(-)
 
-The function is originally used for flatview_space_translate() and what
-we care about most is (xlat, plen) range. However for iotlb requests, we
-don't really care about "plen", but the size of the page that "xlat" is
-located on. While, plen cannot really contain this information.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-A simple example to show why "plen" is not good for IOTLB translations:
 
-E.g., for huge pages, it is possible that guest mapped 1G huge page on
-device side that used this GPA range:
-
-  0x100000000 - 0x13fffffff
-
-Then let's say we want to translate one IOVA that finally mapped to GPA
-0x13ffffe00 (which is located on this 1G huge page). Then here we'll
-get:
-
-  (xlat, plen) = (0x13fffe00, 0x200)
-
-So the IOTLB would be only covering a very small range since from
-"plen" (which is 0x200 bytes) we cannot tell the size of the page.
-
-Actually we can really know that this is a huge page - we just throw the
-information away in flatview_do_translate().
-
-This patch introduced "page_mask" optional parameter to capture that
-page mask info. Also, I made "plen" an optional parameter as well, with
-some comments for the whole function.
-
-No functional change yet.
-
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
----
- exec.c | 46 ++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 40 insertions(+), 6 deletions(-)
-
-diff --git a/exec.c b/exec.c
-index 7a80460725..c5f2752f7d 100644
---- a/exec.c
-+++ b/exec.c
-@@ -467,11 +467,29 @@ address_space_translate_internal(AddressSpaceDispatch *d, hwaddr addr, hwaddr *x
-     return section;
- }
- 
--/* Called from RCU critical section */
-+/**
-+ * flatview_do_translate - translate an address in FlatView
-+ *
-+ * @fv: the flat view that we want to translate on
-+ * @addr: the address to be translated in above address space
-+ * @xlat: the translated address offset within memory region. It
-+ *        cannot be @NULL.
-+ * @plen_out: valid read/write length of the translated address. It
-+ *            can be @NULL when we don't care about it.
-+ * @page_mask_out: page mask for the translated address. This
-+ *            should only be meaningful for IOMMU translated
-+ *            addresses, since there may be huge pages that this bit
-+ *            would tell. It can be @NULL if we don't care about it.
-+ * @is_write: whether the translation operation is for write
-+ * @is_mmio: whether this can be MMIO, set true if it can
-+ *
-+ * This function is called from RCU critical section
-+ */
- static MemoryRegionSection flatview_do_translate(FlatView *fv,
-                                                  hwaddr addr,
-                                                  hwaddr *xlat,
--                                                 hwaddr *plen,
-+                                                 hwaddr *plen_out,
-+                                                 hwaddr *page_mask_out,
-                                                  bool is_write,
-                                                  bool is_mmio,
-                                                  AddressSpace **target_as)
-@@ -480,11 +498,17 @@ static MemoryRegionSection flatview_do_translate(FlatView *fv,
-     MemoryRegionSection *section;
-     IOMMUMemoryRegion *iommu_mr;
-     IOMMUMemoryRegionClass *imrc;
-+    hwaddr page_mask = TARGET_PAGE_MASK;
-+    hwaddr plen = (hwaddr)(-1);
-+
-+    if (plen_out) {
-+        plen = *plen_out;
-+    }
- 
-     for (;;) {
-         section = address_space_translate_internal(
-                 flatview_to_dispatch(fv), addr, &addr,
--                plen, is_mmio);
-+                &plen, is_mmio);
- 
-         iommu_mr = memory_region_get_iommu(section->mr);
-         if (!iommu_mr) {
-@@ -496,7 +520,8 @@ static MemoryRegionSection flatview_do_translate(FlatView *fv,
-                                 IOMMU_WO : IOMMU_RO);
-         addr = ((iotlb.translated_addr & ~iotlb.addr_mask)
-                 | (addr & iotlb.addr_mask));
--        *plen = MIN(*plen, (addr | iotlb.addr_mask) - addr + 1);
-+        page_mask = iotlb.addr_mask;
-+        plen = MIN(plen, (addr | iotlb.addr_mask) - addr + 1);
-         if (!(iotlb.perm & (1 << is_write))) {
-             goto translate_fail;
-         }
-@@ -507,6 +532,14 @@ static MemoryRegionSection flatview_do_translate(FlatView *fv,
- 
-     *xlat = addr;
- 
-+    if (page_mask_out) {
-+        *page_mask_out = page_mask;
-+    }
-+
-+    if (plen_out) {
-+        *plen_out = plen;
-+    }
-+
-     return *section;
- 
- translate_fail:
-@@ -525,7 +558,7 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
- 
-     /* This can never be MMIO. */
-     section = flatview_do_translate(address_space_to_flatview(as), addr,
--                                    &xlat, &plen, is_write, false, &as);
-+                                    &xlat, &plen, NULL, is_write, false, &as);
- 
-     /* Illegal translation */
-     if (section.mr == &io_mem_unassigned) {
-@@ -569,7 +602,8 @@ MemoryRegion *flatview_translate(FlatView *fv, hwaddr addr, hwaddr *xlat,
-     AddressSpace *as = NULL;
- 
-     /* This can be MMIO, so setup MMIO bit. */
--    section = flatview_do_translate(fv, addr, xlat, plen, is_write, true, &as);
-+    section = flatview_do_translate(fv, addr, xlat, plen, NULL,
-+                                    is_write, true, &as);
-     mr = section.mr;
- 
-     if (xen_enabled() && memory_access_is_direct(mr, is_write)) {
--- 
-2.13.6
+r~
