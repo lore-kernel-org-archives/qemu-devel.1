@@ -1,39 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e021I-0005rN-Of
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 05:00:46 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e0258-0007E2-6h
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 05:04:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e0218-0000nM-Nh
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 05:00:40 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45940)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1e0218-0000m3-9A
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 05:00:30 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v958xCKY021030
-	for <qemu-devel@nongnu.org>; Thu, 5 Oct 2017 05:00:25 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ddf96pwdq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 05:00:21 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 5 Oct 2017 10:00:19 +0100
-References: <1507193105-15627-1-git-send-email-thuth@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu, 5 Oct 2017 11:00:14 +0200
+	(envelope-from <imammedo@redhat.com>) id 1e0253-0003yk-8X
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 05:04:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51940)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e0253-0003xf-0H
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 05:04:33 -0400
+Date: Thu, 5 Oct 2017 11:04:27 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171005110427.647fed06@nial.brq.redhat.com>
+In-Reply-To: <CAKmqyKP6yqWfGbzDnWeeROO=_27TiVSBZvdw1PA5JbRH_m3tcA@mail.gmail.com>
+References: <cover.1507059418.git.alistair.francis@xilinx.com>
+	<2a93b997d0acd369f35d68981a23ba491443daf6.1507059418.git.alistair.francis@xilinx.com>
+	<20171003203654.GD4760@localhost.localdomain>
+	<CAKmqyKN+QnBAS6c4mAb2EiTVQv3Km6EdmGXCFC3hVogL96QK1Q@mail.gmail.com>
+	<20171004131232.32f5caae@nial.brq.redhat.com>
+	<20171004122851.GJ4760@localhost.localdomain>
+	<20171004150816.41ffc161@nial.brq.redhat.com>
+	<20171004163434.GN4760@localhost.localdomain>
+	<CAKmqyKP6yqWfGbzDnWeeROO=_27TiVSBZvdw1PA5JbRH_m3tcA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1507193105-15627-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <0b169349-658d-3f65-85d6-6957f082df1b@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/s390x: Mark the "sclpquiesce" device
- with user_creatable = false
+Subject: Re: [Qemu-devel] [PATCH v1 3/5] xlnx-zcu102: Specify the valid CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,43 +34,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Eric Farman <farman@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Jason J Herne <jjherne@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, Jing Liu <liujbjl@linux.vnet.ibm.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, QingFeng Hao <haoqf@linux.vnet.ibm.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Fei Li <sherrylf@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Yang Chen <bjcyang@linux.vnet.ibm.com>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
 
+On Wed, 4 Oct 2017 14:39:20 -0700
+Alistair Francis <alistair.francis@xilinx.com> wrote:
 
-
-On 10/05/2017 10:45 AM, Thomas Huth wrote:
-> The "sclpquiesce" device is just an internal device that should not be
-> created by the user directly. Though it currently does not seem to cause
-> any obvious trouble when the user instantiates an additional device, let's
-> better mark it with user_creatable = false to avoid unexpected behavior,
-> e.g. because the quiesce notifier gets registered multiple times.
+> On Wed, Oct 4, 2017 at 9:34 AM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > On Wed, Oct 04, 2017 at 03:08:16PM +0200, Igor Mammedov wrote:  
+> >> On Wed, 4 Oct 2017 09:28:51 -0300
+> >> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >>  
+> >> > On Wed, Oct 04, 2017 at 01:12:32PM +0200, Igor Mammedov wrote:  
+> >> > > On Tue, 3 Oct 2017 14:41:17 -0700
+> >> > > Alistair Francis <alistair.francis@xilinx.com> wrote:
+> >> > >  
+> >> > > > On Tue, Oct 3, 2017 at 1:36 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:  
+> >> > > > > On Tue, Oct 03, 2017 at 01:05:13PM -0700, Alistair Francis wrote:  
+> >> > > > >> List all possible valid CPU options.
+> >> > > > >>
+> >> > > > >> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> >> > > > >> ---
+> >> > > > >>
+> >> > > > >>  hw/arm/xlnx-zcu102.c         | 10 ++++++++++
+> >> > > > >>  hw/arm/xlnx-zynqmp.c         | 16 +++++++++-------
+> >> > > > >>  include/hw/arm/xlnx-zynqmp.h |  1 +
+> >> > > > >>  3 files changed, 20 insertions(+), 7 deletions(-)
+> >> > > > >>
+> >> > > > >> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+> >> > > > >> index 519a16ed98..039649e522 100644
+> >> > > > >> --- a/hw/arm/xlnx-zcu102.c
+> >> > > > >> +++ b/hw/arm/xlnx-zcu102.c
+> >> > > > >> @@ -98,6 +98,8 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s, MachineState *machine)
+> >> > > > >>      object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
+> >> > > > >>                                &error_abort);
+> >> > > > >>
+> >> > > > >> +    object_property_set_str(OBJECT(&s->soc), machine->cpu_type, "cpu-type",
+> >> > > > >> +                            &error_fatal);  
+> >> > > > >
+> >> > > > > Do you have plans to support other CPU types to xlnx_zynqmp in
+> >> > > > > the future?  If not, I wouldn't bother adding the cpu-type
+> >> > > > > property and the extra boilerplate code if it's always going to
+> >> > > > > be set to cortex-a53.  
+> >> > > >
+> >> > > > No, it'll always be A53.
+> >> > > >
+> >> > > > I did think of that, but I also wanted to use the new option! I also
+> >> > > > think there is an advantage in sanely handling users '-cpu' option,
+> >> > > > before now we just ignored it, so I think it still does give a
+> >> > > > benefit. That'll be especially important on the Xilinx tree (sometimes
+> >> > > > people use our machines with a different CPU to 'benchmark' or test
+> >> > > > other CPUs with our CoSimulation setup). So I think it does make sense
+> >> > > > to keep in.  
+> >> > > if cpu isn't user settable, one could just outright die if cpu_type
+> >> > > is not NULL and say that user's CLI is wrong.
+> >> > > (i.e. don't give users illusion that they allowed to use '-cpu')  
+> >> >
+> >> > Isn't it exactly what this patch does, by setting:
+> >> >     mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a53");
+> >> >     mc->valid_cpu_types = xlnx_zynqmp_valid_cpus;
+> >> > ?
+> >> >
+> >> > Except that "-cpu cortex-a53" won't die, which is a good thing.  
+> >> allowing "-cpu cortex-a53" here, would allow to use feature parsing
+> >> which weren't allowed or were ignored before if user supplied '-cpu'.
+> >> so I'd more strict and refuse any -cpu and break CLI that tries to use it
+> >> if board has non configurable cpu type. It would be easier to relax
+> >> restriction later if necessary.
+> >>
+> >> using validate_cpus here just to have users for the new code,
+> >> doesn't seem like valid justification and at that it makes board
+> >> code more complex where it's not necessary and build in cpu type
+> >> works just fine.  
+> >
+> > It's up to the board maintainer to decide what's the best option.
+> > Both features are independent from each other and can be
+> > implemented by machine core.  
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Noooo!
+> 
+> My hope with this series is that eventually we could hit a state where
+> every single machine acts the same way with the -cpu option.
+> 
+> I really don't like what we do now where some boards use it, some
+> boards error and some boars just ignore the option. I think we should
+> agree on something and every machine should follow the same flow so
+> that users know what to expect when they use the -cpu option.
+> 
+> If this means we allow machines to specify they don't support the
+> option or only have a single element in the list of supported options
+> doesn't really matter, but all machines should do the same thing.
+> 
+> >
+> > In either case, the valid_cpu_types feature will be still very
+> > useful for boards like pxa270 and sa1110, which support -cpu but
+> > only with specific families of CPU types (grep for
+> > "strncmp(cpu_type").
+> >  
+> >>
+> >> wrt centralized way to refuse -cpu if board doesn't support it,
+> >> (which is not really related to this series) following could be done:
+> >>
+> >> when cpu_model removal is completely done I plan to replace
+> >>   vl.c
+> >>      cpu_parse_cpu_model(machine_class->default_cpu_type, cpu_model)
+> >> with
+> >>      cpu_parse_cpu_model(DEFAULT_TARGET_CPU_TYPE, cpu_model)
+> >>
+> >> so that we could drop temporary guard
+> >>
+> >>      if (machine_class->default_cpu_type) {  
+> >
+> > This sounds good to me, even if we don't reject -cpu on any
+> > board.
+> >
+> >  
+> >>
+> >> with that it would be possible to tell from machine_run_board_init()
+> >> that board doesn't provide cpu but user provided '-cpu'
+> >> so we would be able to:
+> >>   if ((machine_class->default_cpu_type == NULL) &&
+> >>       (machine->cpu_type != NULL))
+> >>           error_fatal("machine doesn't support -cpu option");  
+> >
+> > I won't complain too much if a board maintainer really wants to
+> > make the board reject -cpu completely, but it's up to them.  
+> 
+> I disagree. I think a standard way of doing it is better. At least for
+> each architecture. The ARM -cpu option is very confusing at the moment
+> and it really doesn't need to be that bad.
+> 
+> >
+> > Personally, I'd prefer to have all boards setting
+> > default_cpu_type even if they support only one CPU model, so
+> > clients don't need a special case for boards that don't support
+> > -cpu.  
+> 
+> I agree, I think having one CPU makes more sense. It makes it easier
+> to add support for more cpus in the future and allows the users to use
+> the -cpu option without killing QEMU.
+I'm considering -cpu option as a legacy one that server 2 purposes now
+ 1: pick cpu type for running instance
+ 2: convert optional features/legacy syntax to global properties
+    for related cpu type
 
-Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+It plays ok for machines with single type of cpu but doesn't really scale
+to more and doesn't work well nor needed if we were to specify cpus on CLI
+with -device (i.e. build machine from config/CLI)
 
-> ---
->  hw/s390x/sclpquiesce.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+So I would not extend usage '-cpu' to boards that have fixed cpu type,
+because it really useless in that case and confuses users with idea that
+they have ability/need to specify -cpu on fixed cpu board.
+
+I'd be upfront with users and fail explicitly if -cpu is not supported
+(yes, it is not uniform CLI behavior across machines but it makes
+sense since not all machines are the same, there probably are other
+options with which some machines error out with unsupported error,
+-cpu is not any different case).
+
 > 
-> diff --git a/hw/s390x/sclpquiesce.c b/hw/s390x/sclpquiesce.c
-> index 762cb18..0241643 100644
-> --- a/hw/s390x/sclpquiesce.c
-> +++ b/hw/s390x/sclpquiesce.c
-> @@ -118,8 +118,13 @@ static void quiesce_class_init(ObjectClass *klass, void *data)
->      dc->reset = quiesce_reset;
->      dc->vmsd = &vmstate_sclpquiesce;
->      set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-> -    k->init = quiesce_init;
-> +    /*
-> +     * Reason: This is just an internal device - the notifier should
-> +     * not be registered multiple times in quiesce_init()
-> +     */
-> +    dc->user_creatable = false;
+> Thanks,
+> Alistair
 > 
-> +    k->init = quiesce_init;
->      k->get_send_mask = send_mask;
->      k->get_receive_mask = receive_mask;
->      k->can_handle_event = can_handle_event;
-> 
+> >
+> > --
+> > Eduardo
+> >  
