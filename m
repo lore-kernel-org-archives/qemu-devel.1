@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1e07Bw-00088g-0m
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:32:01 -0400
+	(envelope-from <stefanha@redhat.com>) id 1e07FI-0001tO-7m
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:35:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1e07Bv-0001xf-5N
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:32:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43698)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1e07Bu-0001t0-UU
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:31:59 -0400
-Date: Thu, 5 Oct 2017 16:31:51 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20171005143151.wkxcj5njhevxhnow@eukaryote>
-References: <034d01d2d94d$9d6be9d0$d843bd70$@gmail.com>
-	<029301d2e062$601f0c30$205d2490$@gmail.com>
-	<029401d2e064$87f5ccb0$97e16610$@gmail.com>
+	(envelope-from <stefanha@redhat.com>) id 1e07FG-0000W7-WF
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:35:28 -0400
+Date: Thu, 5 Oct 2017 10:35:09 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171005143509.GF10969@stefanha-x1.localdomain>
+References: <20171004014347.25099-1-eblake@redhat.com>
+	<20171004014347.25099-3-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <029401d2e064$87f5ccb0$97e16610$@gmail.com>
-Subject: Re: [Qemu-devel] FW: Are there any qemu emulated SR-IOV devices?
+In-Reply-To: <20171004014347.25099-3-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] block: Uniform handling of 0-length
+ bdrv_get_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +24,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mwoodpatrick@gmail.com
-Cc: qemu-devel@nongnu.org, knut.omang@oracle.com, marcel.apfelbaum@gmail.com, mst@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, jcody@redhat.com, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-[Sorry, I'm a bit late in responding, as I missed this e-mail.]
+On Tue, Oct 03, 2017 at 08:43:44PM -0500, Eric Blake wrote:
+> Handle a 0-length block status request up front, with a uniform
+> return value claiming the area is not allocated.
+> 
+> Most callers don't pass a length of 0 to bdrv_get_block_status()
+> and friends; but it definitely happens with a 0-length read when
+> copy-on-read is enabled.  While we could audit all callers to
+> ensure that they never make a 0-length request, and then assert
+> that fact, it was just as easy to fix things to always report
+> success (as long as the callers are careful to not go into an
+> infinite loop).  However, we had inconsistent behavior on whether
+> the status is reported as allocated or defers to the backing
+> layer, depending on what callbacks the driver implements, and
+> possibly wasting quite a few CPU cycles to get to that answer.
+> Consistently reporting unallocated up front doesn't really hurt
+> anything, and makes it easier both for callers (0-length requests
+> now have well-defined behavior) and for drivers (drivers don't
+> have to deal with 0-length requests).
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
+> ---
+> v2: new patch
+> ---
+>  block/io.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/io.c b/block/io.c
+> index e0f904583f..1f5baac41d 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -1773,9 +1773,9 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
+>          return total_sectors;
+>      }
+> 
+> -    if (sector_num >= total_sectors) {
+> +    if (sector_num >= total_sectors || !nb_sectors) {
+>          *pnum = 0;
+> -        return BDRV_BLOCK_EOF;
+> +        return sector_num >= total_sectors ? BDRV_BLOCK_EOF : 0;
+>      }
 
-On Thu, Jun 08, 2017 at 07:35:52AM -0700, mwoodpatrick@gmail.com wrote:
-> I wanted to play around with SR-IOV using qemu and was wondering if there
-> are any qemu emulated SR-IOV devices I could experiment with?
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Near as I know there isn't any existing emulated SR-IOV device in QEMU.
-But yes, an emulated SR-IOV would also be useful for testing purposes
-for projects like OpenStack, without having the need for real hardware.
+If you respin, please consider using a separate if statement to make the
+code clearer:
 
-> If not I plan on creating one and would appreciate any pointers to documents
-> describing how to add an emulated device that supports more than 8 functions
-> and has ARI enabled
-
-I'm far from an expert on this area, but just wanted to point out that
-there's some existing support for SR-IOV in QEMU, added via:
-
-    [PATCH v6 0/4] pcie: Add support for Single Root I/O Virtualization --
-    https://lists.nongnu.org/archive/html/qemu-devel/2015-10/msg05155.html
-
-Knut Omang (Cced) who added the above support also had some notes here
-on how to implement an SR-IOV capable device.:
-
-    https://lists.nongnu.org/archive/html/qemu-devel/2015-10/msg05157.html
-    -- pcie: Add some SR/IOV API documentation	in docs/pcie_sriov.txt
-
-        "Add a small intro + minimal documentation for how to implement
-        SR/IOV support for an emulated device.
-
-
-[...]
- 
--- 
-/kashyap
+  if (!nb_sectors) {
+      *pnum = 0;
+      return 0;
+  }
+  if (sector_num >= total_sectors) {
+      *pnum = 0;
+      return BDRV_BLOCK_EOF;
+  }
