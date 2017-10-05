@@ -1,27 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e05KJ-0007hM-G3
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 08:32:37 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e05M8-0000Qr-Mn
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 08:34:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e05KD-0006ZF-VX
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 08:32:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42100)
+	(envelope-from <ehabkost@redhat.com>) id 1e05M2-0008Ac-MK
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 08:34:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41026)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1e05KD-0006YP-PK
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 08:32:25 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e05M2-00089g-D0
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 08:34:18 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CB0973B75E
-	for <qemu-devel@nongnu.org>; Thu,  5 Oct 2017 12:32:24 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu,  5 Oct 2017 14:32:17 +0200
-Message-Id: <1507206738-816-2-git-send-email-thuth@redhat.com>
-In-Reply-To: <1507206738-816-1-git-send-email-thuth@redhat.com>
-References: <1507206738-816-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] qdev_monitor: Simplify error handling in
- qdev_device_add()
+	by mx1.redhat.com (Postfix) with ESMTPS id 78B80780D2
+	for <qemu-devel@nongnu.org>; Thu,  5 Oct 2017 12:34:17 +0000 (UTC)
+Date: Thu, 5 Oct 2017 09:34:14 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171005123414.GE4015@localhost.localdomain>
+References: <20171004025043.3788-1-ehabkost@redhat.com>
+	<20171004025043.3788-3-ehabkost@redhat.com>
+	<87376zv58m.fsf@dusky.pond.sub.org>
+	<20171004122308.GI4760@localhost.localdomain>
+	<20171004205727.GC5259@localhost.localdomain>
+	<87infugpe6.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87infugpe6.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v4 2/2] vl: Deprecate auto-loading of
+ qemu.conf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +38,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-Instead of doing the clean-ups on errors multiple times, introduce
-a jump label at the end of the function that can be used by all
-error paths that need this cleanup.
+On Thu, Oct 05, 2017 at 07:00:33AM +0200, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+> 
+> > On Wed, Oct 04, 2017 at 09:23:08AM -0300, Eduardo Habkost wrote:
+> >> On Wed, Oct 04, 2017 at 07:42:17AM +0200, Markus Armbruster wrote:
+> >> > Eduardo Habkost <ehabkost@redhat.com> writes:
+> >> > 
+> >> > > In case there were options set in the default config file, print
+> >> > > a warning so users can update their scripts.
+> >> > >
+> >> > > If somebody wants to keep the config file as-is, avoid the
+> >> > > warning and use a command-line that will work in future QEMU
+> >> > > versions, they can use:
+> >> > >
+> >> > >  $QEMU -no-user-config -readconfig /etc/qemu/qemu.conf
+> >> > >
+> >> > > I was going to include the suggestion in the warning message, but
+> >> > > I thought it could make it more confusing.  The suggestion is
+> >> > > documented in qemu-doc.texi.
+> >> > >
+> >> > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> >> > > ---
+> >> > > Changes v3 -> v4:
+> >> > > * Use warn_report() instead of error_report("warning: ...")
+> >> > >   (Eric Blake)
+> >> > > * Document as a deprecated feature in qemu-doc.texi
+> >> > > * Update subject line
+> >> > >   (was: "vl: Print warning when a default config file is loaded")
+> >> > >
+> >> > > Changes v2 -> v3:
+> >> > > * Rebase (no code changes)
+> >> > > * Commit message update: suggest -no-user-config
+> >> > > ---
+> >> > >  vl.c          | 6 ++++++
+> >> > >  qemu-doc.texi | 8 ++++++++
+> >> > >  2 files changed, 14 insertions(+)
+> >> > >
+> >> > > diff --git a/vl.c b/vl.c
+> >> > > index 3fed457921..1b0ecdf74e 100644
+> >> > > --- a/vl.c
+> >> > > +++ b/vl.c
+> >> > > @@ -3066,6 +3066,12 @@ static int qemu_read_default_config_file(void)
+> >> > >          return ret;
+> >> > >      }
+> >> > >  
+> >> > > +    if (ret > 0) {
+> >> > > +        loc_set_none();
+> >> > 
+> >> > Sure we need this here?
+> >> 
+> >> IIRC we needed it in the original version, but I don't remember
+> >> why.  I will check this.
+> >
+> > This is the result if we don't clear error location state:
+> >
+> >   $ ./x86_64-softmmu/qemu-system-x86_64 -monitor stdio -display none -device foobar
+> >   qemu-system-x86_64: -device foobar: warning: Future QEMU versions won't load /usr/local/etc/qemu/qemu.conf automatically
+> >                       ^^^^^^^^^^^^^^
+> >
+> > However, it's probably better to do this right after the loop,
+> > just like we already do in the second option parsing loop:
+> >
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> > diff --git a/vl.c b/vl.c
+> > index f9acc17c01..a8fd247d71 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -3067,7 +3067,6 @@ static int qemu_read_default_config_file(void)
+> >      }
+> >  
+> >      if (ret > 0) {
+> > -        loc_set_none();
+> >          warn_report("Future QEMU versions won't load %s automatically",
+> >                       CONFIG_QEMU_CONFDIR "/qemu.conf");
+> >      }
+> > @@ -3224,6 +3223,11 @@ int main(int argc, char **argv, char **envp)
+> >              }
+> >          }
+> >      }
+> > +    /*
+> > +     * Clear error location left behind by the loop.
+> > +     * Best done right after the loop.  Do not insert code here!
+> > +     */
+> > +    loc_set_none();
+> >  
+> >      if (userconfig) {
+> >          if (qemu_read_default_config_file() < 0) {
+> 
+> Hmm, could this hunk be a bug fix?  Consider before the patch:
+> 
+>     qemu_read_default_config_file()
+>         qemu_read_config_file()
+>             qemu_config_parse()
+>                 error_report() or error_report_err()
+> 
+> I suspect this uses current location left behind by the loop
+> inappropriately.  If true, the hunk should be a separate bug fix patch.
 
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- qdev-monitor.c | 21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
+It does, but nothing was broken because the only thing between
+the two option parsing loops is qemu_read_default_config_file(),
+and qemu_config_parse() calls loc_push_none() immediately.
 
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index 8fd6df9..cb2b109 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -620,22 +620,21 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
- 
-     /* set properties */
-     if (qemu_opt_foreach(opts, set_property, dev, &err)) {
--        error_propagate(errp, err);
--        object_unparent(OBJECT(dev));
--        object_unref(OBJECT(dev));
--        return NULL;
-+        goto err_del_dev;
-     }
- 
-     dev->opts = opts;
-     object_property_set_bool(OBJECT(dev), true, "realized", &err);
--    if (err != NULL) {
--        error_propagate(errp, err);
--        dev->opts = NULL;
--        object_unparent(OBJECT(dev));
--        object_unref(OBJECT(dev));
--        return NULL;
-+    if (!err) {
-+        return dev;
-     }
--    return dev;
-+    dev->opts = NULL;
-+
-+err_del_dev:
-+    error_propagate(errp, err);
-+    object_unparent(OBJECT(dev));
-+    object_unref(OBJECT(dev));
-+    return NULL;
- }
- 
- 
+But it makes sense as a separate patch anyway.  I will send a new
+series.
+
 -- 
-1.8.3.1
+Eduardo
