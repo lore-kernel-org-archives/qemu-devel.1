@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e02xw-00054U-Ib
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 06:01:21 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e02y1-00057Y-Qy
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 06:01:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e02xu-0005SJ-1U
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 06:01:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57752)
+	(envelope-from <kraxel@redhat.com>) id 1e02xw-0005VF-Bk
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 06:01:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35280)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e02xt-0005Q3-QK
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 06:01:13 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e02xw-0005US-6R
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 06:01:16 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CA20BC04AC41
-	for <qemu-devel@nongnu.org>; Thu,  5 Oct 2017 10:01:12 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 38FF7356F2
+	for <qemu-devel@nongnu.org>; Thu,  5 Oct 2017 10:01:15 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  5 Oct 2017 12:01:02 +0200
-Message-Id: <20171005100106.30118-3-kraxel@redhat.com>
+Date: Thu,  5 Oct 2017 12:01:06 +0200
+Message-Id: <20171005100106.30118-7-kraxel@redhat.com>
 In-Reply-To: <20171005100106.30118-1-kraxel@redhat.com>
 References: <20171005100106.30118-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 2/6] docker: don't rely on submodules existing
- in the main checkout
+Subject: [Qemu-devel] [PULL 6/6] ui: don't export qemu_input_event_new_key
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,80 +34,41 @@ Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-When building the tarball to pass into the docker/vm test image,
-the code relies on the git submodules being checked out in the
-main checkout.
-
-ie if the developer has not run 'git submodule update --init dtc'
-many of the docker tests will fail due to the libfdt package not
-being present in the test images. Patchew manually checks out the
-dtc submodule in the main git checkout, but this is a bad idea.
-
-When running tests we want to have a predictable set of submodules
-included in the source that's tested. The build environment is
-completely independent of the developers host OS, so the submodules
-the developer has checked out should not be considered relevant for
-the tests.
-
-This changes the archive-source.sh script so that it clones the
-current git checkout into a temporary directory, checks out a
-fixed set of submodules, builds the tarball and finally removes
-the temporary git clone.
+All public code should use qemu_input_event_send_key* functions
+instead of creating an event directly.
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170929101201.21039-3-berrange@redhat.com
+Message-id: 20170929101201.21039-7-berrange@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- scripts/archive-source.sh | 34 ++++++++++++++++++++++++++++------
- 1 file changed, 28 insertions(+), 6 deletions(-)
+ include/ui/input.h | 1 -
+ ui/input.c         | 2 +-
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
-index c4e7d98f4d..4029de7b20 100755
---- a/scripts/archive-source.sh
-+++ b/scripts/archive-source.sh
-@@ -18,15 +18,37 @@ if test $# -lt 1; then
-     error "Usage: $0 <output tarball>"
- fi
+diff --git a/include/ui/input.h b/include/ui/input.h
+index 479cc46cfc..f8cee43f65 100644
+--- a/include/ui/input.h
++++ b/include/ui/input.h
+@@ -38,7 +38,6 @@ void qemu_input_event_send_impl(QemuConsole *src, InputEvent *evt);
+ void qemu_input_event_sync(void);
+ void qemu_input_event_sync_impl(void);
  
--tar_file="$1"
--list_file="$1.list"
--submodules=$(git submodule foreach --recursive --quiet 'echo $name')
-+tar_file=`realpath "$1"`
-+list_file="${tar_file}.list"
-+vroot_dir="${tar_file}.vroot"
+-InputEvent *qemu_input_event_new_key(KeyValue *key, bool down);
+ void qemu_input_event_send_key(QemuConsole *src, KeyValue *key, bool down);
+ void qemu_input_event_send_key_number(QemuConsole *src, int num, bool down);
+ void qemu_input_event_send_key_qcode(QemuConsole *src, QKeyCode q, bool down);
+diff --git a/ui/input.c b/ui/input.c
+index 4b241aa823..290b47354a 100644
+--- a/ui/input.c
++++ b/ui/input.c
+@@ -386,7 +386,7 @@ void qemu_input_event_sync(void)
+     replay_input_sync_event();
+ }
  
--if test $? -ne 0; then
--    error "git submodule command failed"
-+# We want a predictable list of submodules for builds, that is
-+# independent of what the developer currently has initialized
-+# in their checkout, because the build environment is completely
-+# different to the host OS.
-+submodules="dtc"
-+
-+trap "status=$?; rm -rf \"$list_file\" \"$vroot_dir\"; exit \$status" 0 1 2 3 15
-+
-+if git diff-index --quiet HEAD -- &>/dev/null
-+then
-+    HEAD=HEAD
-+else
-+    HEAD=`git stash create`
- fi
-+git clone --shared . "$vroot_dir"
-+test $? -ne 0 && error "failed to clone into '$vroot_dir'"
- 
--trap "status=$?; rm -f \"$list_file\"; exit \$status" 0 1 2 3 15
-+cd "$vroot_dir"
-+test $? -ne 0 && error "failed to change into '$vroot_dir'"
-+
-+git checkout $HEAD
-+test $? -ne 0 && error "failed to checkout $HEAD revision"
-+
-+for sm in $submodules; do
-+    git submodule update --init $sm
-+    test $? -ne 0 && error "failed to init submodule $sm"
-+done
- 
- if test -n "$submodules"; then
-     {
+-InputEvent *qemu_input_event_new_key(KeyValue *key, bool down)
++static InputEvent *qemu_input_event_new_key(KeyValue *key, bool down)
+ {
+     InputEvent *evt = g_new0(InputEvent, 1);
+     evt->u.key.data = g_new0(InputKeyEvent, 1);
 -- 
 2.9.3
