@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e08xQ-0002sb-Gy
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:14 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e08xQ-0002t5-Ul
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e08xN-0003HT-Dr
+	(envelope-from <imammedo@redhat.com>) id 1e08xL-0003GJ-BL
 	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:08 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu,  5 Oct 2017 18:24:33 +0200
-Message-Id: <1507220690-265042-7-git-send-email-imammedo@redhat.com>
+Date: Thu,  5 Oct 2017 18:24:32 +0200
+Message-Id: <1507220690-265042-6-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
 References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 06/23] ppc: mac_oldworld: use generic cpu_model
+Subject: [Qemu-devel] [PATCH 05/23] ppc: mac_newworld: use generic cpu_model
  parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,33 +25,42 @@ Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, 
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/ppc/mac_oldworld.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ hw/ppc/mac_newworld.c | 15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
 
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index bc7c8b7..010ea36 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -108,11 +108,8 @@ static void ppc_heathrow_init(MachineState *machine)
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index 6d0ace2..3fa7c42 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -174,16 +174,8 @@ static void ppc_core99_init(MachineState *machine)
      linux_boot = (kernel_filename != NULL);
  
      /* init CPUs */
--    if (machine->cpu_model == NULL)
--        machine->cpu_model = "G3";
+-    if (machine->cpu_model == NULL) {
+-#ifdef TARGET_PPC64
+-        machine->cpu_model = "970fx";
+-#else
+-        machine->cpu_model = "G4";
+-#endif
+-    }
      for (i = 0; i < smp_cpus; i++) {
 -        cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
 -                                           machine->cpu_model));
 +        cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
          env = &cpu->env;
  
-         /* Set time-base frequency to 16.6 Mhz */
-@@ -385,6 +382,7 @@ static void heathrow_class_init(ObjectClass *oc, void *data)
-     /* TOFIX "cad" when Mac floppy is implemented */
+         /* Set time-base frequency to 100 Mhz */
+@@ -520,6 +512,11 @@ static void core99_machine_class_init(ObjectClass *oc, void *data)
+     mc->max_cpus = MAX_CPUS;
      mc->default_boot_order = "cd";
-     mc->kvm_type = heathrow_kvm_type;
-+    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("750_v3.1");
+     mc->kvm_type = core99_kvm_type;
++#ifdef TARGET_PPC64
++    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("970fx_v3.1");
++#else
++    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("7400_v2.9");
++#endif
  }
  
- static const TypeInfo ppc_heathrow_machine_info = {
+ static const TypeInfo core99_machine_info = {
 -- 
 2.7.4
