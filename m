@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1e075o-0003Oi-J2
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:25:41 -0400
+	(envelope-from <stefanha@redhat.com>) id 1e0767-0003c1-7Q
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:26:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1e075k-0004wU-LI
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:25:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39526)
+	(envelope-from <stefanha@redhat.com>) id 1e0763-00059o-9b
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:25:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56114)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1e075k-0004vl-Ei
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:25:36 -0400
-Date: Thu, 5 Oct 2017 10:24:59 -0400
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1e0763-00058x-4M
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 10:25:55 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171005142459.GE10969@stefanha-x1.localdomain>
-References: <20171004154420.34596-1-vsementsov@virtuozzo.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171004154420.34596-1-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] checkpatch: fix incompatibility with old
- perl
+Date: Thu,  5 Oct 2017 10:25:46 -0400
+Message-Id: <20171005142547.1363-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL 0/1] Tracing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,18 +21,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, alex.williamson@redhat.com, berrange@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Wed, Oct 04, 2017 at 06:44:20PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> Do not use '/r' modifier which was introduced in perl 5.14.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  scripts/checkpatch.pl | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+The following changes since commit 5456c6a4ec9cd8fc314ddc303e88bf85c110975c:
 
-Thanks, applied to my tracing tree:
-https://github.com/stefanha/qemu/commits/tracing
+  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2017-10-05 12:02:21 +0100)
 
-Stefan
+are available in the git repository at:
+
+  git://github.com/stefanha/qemu.git tags/tracing-pull-request
+
+for you to fetch changes up to 45042732f39ecd42794c256bf98f231e58849c3e:
+
+  checkpatch: fix incompatibility with old perl (2017-10-05 10:22:44 -0400)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+
+Vladimir Sementsov-Ogievskiy (1):
+  checkpatch: fix incompatibility with old perl
+
+ scripts/checkpatch.pl | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+-- 
+2.13.6
