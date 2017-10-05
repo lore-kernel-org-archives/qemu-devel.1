@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e05M8-0000Qr-Mn
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 08:34:25 -0400
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1e05OF-0001fC-Pc
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 08:36:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e05M2-0008Ac-MK
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 08:34:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41026)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e05M2-00089g-D0
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 08:34:18 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 78B80780D2
-	for <qemu-devel@nongnu.org>; Thu,  5 Oct 2017 12:34:17 +0000 (UTC)
-Date: Thu, 5 Oct 2017 09:34:14 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171005123414.GE4015@localhost.localdomain>
-References: <20171004025043.3788-1-ehabkost@redhat.com>
-	<20171004025043.3788-3-ehabkost@redhat.com>
-	<87376zv58m.fsf@dusky.pond.sub.org>
-	<20171004122308.GI4760@localhost.localdomain>
-	<20171004205727.GC5259@localhost.localdomain>
-	<87infugpe6.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87infugpe6.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v4 2/2] vl: Deprecate auto-loading of
- qemu.conf
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1e05OC-0001s0-N4
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 08:36:35 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38620
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
+	id 1e05OC-0001rW-Fy
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 08:36:32 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v95CYT8B099985
+	for <qemu-devel@nongnu.org>; Thu, 5 Oct 2017 08:36:27 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ddhdgt7he-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 08:36:27 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
+	Thu, 5 Oct 2017 13:36:25 +0100
+From: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Date: Thu,  5 Oct 2017 14:36:22 +0200
+Message-Id: <1507206983-16096-1-git-send-email-pmorel@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v1][RFC] pci: Set PCI-bus device entry before
+ initializing bus master
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,114 +37,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, marcel@redhat.com, cohuck@redhat.com, zyimin@linux.vnet.ibm.com
 
-On Thu, Oct 05, 2017 at 07:00:33AM +0200, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
-> 
-> > On Wed, Oct 04, 2017 at 09:23:08AM -0300, Eduardo Habkost wrote:
-> >> On Wed, Oct 04, 2017 at 07:42:17AM +0200, Markus Armbruster wrote:
-> >> > Eduardo Habkost <ehabkost@redhat.com> writes:
-> >> > 
-> >> > > In case there were options set in the default config file, print
-> >> > > a warning so users can update their scripts.
-> >> > >
-> >> > > If somebody wants to keep the config file as-is, avoid the
-> >> > > warning and use a command-line that will work in future QEMU
-> >> > > versions, they can use:
-> >> > >
-> >> > >  $QEMU -no-user-config -readconfig /etc/qemu/qemu.conf
-> >> > >
-> >> > > I was going to include the suggestion in the warning message, but
-> >> > > I thought it could make it more confusing.  The suggestion is
-> >> > > documented in qemu-doc.texi.
-> >> > >
-> >> > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> >> > > ---
-> >> > > Changes v3 -> v4:
-> >> > > * Use warn_report() instead of error_report("warning: ...")
-> >> > >   (Eric Blake)
-> >> > > * Document as a deprecated feature in qemu-doc.texi
-> >> > > * Update subject line
-> >> > >   (was: "vl: Print warning when a default config file is loaded")
-> >> > >
-> >> > > Changes v2 -> v3:
-> >> > > * Rebase (no code changes)
-> >> > > * Commit message update: suggest -no-user-config
-> >> > > ---
-> >> > >  vl.c          | 6 ++++++
-> >> > >  qemu-doc.texi | 8 ++++++++
-> >> > >  2 files changed, 14 insertions(+)
-> >> > >
-> >> > > diff --git a/vl.c b/vl.c
-> >> > > index 3fed457921..1b0ecdf74e 100644
-> >> > > --- a/vl.c
-> >> > > +++ b/vl.c
-> >> > > @@ -3066,6 +3066,12 @@ static int qemu_read_default_config_file(void)
-> >> > >          return ret;
-> >> > >      }
-> >> > >  
-> >> > > +    if (ret > 0) {
-> >> > > +        loc_set_none();
-> >> > 
-> >> > Sure we need this here?
-> >> 
-> >> IIRC we needed it in the original version, but I don't remember
-> >> why.  I will check this.
-> >
-> > This is the result if we don't clear error location state:
-> >
-> >   $ ./x86_64-softmmu/qemu-system-x86_64 -monitor stdio -display none -device foobar
-> >   qemu-system-x86_64: -device foobar: warning: Future QEMU versions won't load /usr/local/etc/qemu/qemu.conf automatically
-> >                       ^^^^^^^^^^^^^^
-> >
-> > However, it's probably better to do this right after the loop,
-> > just like we already do in the second option parsing loop:
-> >
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> > diff --git a/vl.c b/vl.c
-> > index f9acc17c01..a8fd247d71 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -3067,7 +3067,6 @@ static int qemu_read_default_config_file(void)
-> >      }
-> >  
-> >      if (ret > 0) {
-> > -        loc_set_none();
-> >          warn_report("Future QEMU versions won't load %s automatically",
-> >                       CONFIG_QEMU_CONFDIR "/qemu.conf");
-> >      }
-> > @@ -3224,6 +3223,11 @@ int main(int argc, char **argv, char **envp)
-> >              }
-> >          }
-> >      }
-> > +    /*
-> > +     * Clear error location left behind by the loop.
-> > +     * Best done right after the loop.  Do not insert code here!
-> > +     */
-> > +    loc_set_none();
-> >  
-> >      if (userconfig) {
-> >          if (qemu_read_default_config_file() < 0) {
-> 
-> Hmm, could this hunk be a bug fix?  Consider before the patch:
-> 
->     qemu_read_default_config_file()
->         qemu_read_config_file()
->             qemu_config_parse()
->                 error_report() or error_report_err()
-> 
-> I suspect this uses current location left behind by the loop
-> inappropriately.  If true, the hunk should be a separate bug fix patch.
+When initializing the PCI-bus master pci_init_bus_master(PCIDevice *)
+calls pci_device_iommu_address_space(PCIDevice *) which in turn calls
+iommu_bus->iommu_fn(bus, opaque,devfn)
 
-It does, but nothing was broken because the only thing between
-the two option parsing loops is qemu_read_default_config_file(),
-and qemu_config_parse() calls loc_push_none() immediately.
+If the device entry of the PCI-bus is not initialized to point to the
+PCIDevice structure, the iommu_fn() function, getting only bus and
+devno, is unable to retrieve the PCIDevice.
 
-But it makes sense as a separate patch anyway.  I will send a new
-series.
+Usually it is not a problem as the DMA address space is depending of
+the BUS but in an architecture like S390x, each PCI Device can have
+its own DMA address space.
+Being able to setup the DMA address space at the right moment will
+greatly simplify the hotplug implementation for these architectures.
+
+This patch proposes to setup the bus device entry before calling
+pci_init_bus_master() and reset the entry in case of error.
+
+
+Pierre Morel (1):
+  pci: Set PCI-bus device entry before initializing bus master
+
+ hw/pci/pci.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 -- 
-Eduardo
+2.7.4
