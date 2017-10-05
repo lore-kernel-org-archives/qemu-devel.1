@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e08xo-0003NU-BL
+	(envelope-from <imammedo@redhat.com>) id 1e08xo-0003NJ-5Y
 	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e08xj-0003ju-My
+	(envelope-from <imammedo@redhat.com>) id 1e08xm-0003pZ-Q5
 	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:32 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu,  5 Oct 2017 18:24:47 +0200
-Message-Id: <1507220690-265042-21-git-send-email-imammedo@redhat.com>
+Date: Thu,  5 Oct 2017 18:24:49 +0200
+Message-Id: <1507220690-265042-23-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
 References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 20/23] ppc: pnv: drop PnvCoreClass::cpu_oc field
+Subject: [Qemu-devel] [PATCH 22/23] ppc: pnv: drop PnvChipClass::cpu_model
+ field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,87 +23,159 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
 
-deduce cpu type directly from core type instead of
-maintaining type mapping in PnvCoreClass::cpu_oc and doing
-extra cpu_model parsing in pnv_core_class_init()
+deduce core type directly from chip type instead of
+maintaining type mapping in PnvChipClass::cpu_model.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
+ include/hw/ppc/pnv.h      |  1 -
  include/hw/ppc/pnv_core.h |  1 -
- hw/ppc/pnv_core.c         | 18 ++++++++++++------
- 2 files changed, 12 insertions(+), 7 deletions(-)
+ hw/ppc/pnv.c              | 25 +++++++++++++------------
+ hw/ppc/pnv_core.c         |  5 -----
+ 4 files changed, 13 insertions(+), 19 deletions(-)
 
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index d82eee1..20244da 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -69,7 +69,6 @@ typedef struct PnvChipClass {
+     SysBusDeviceClass parent_class;
+ 
+     /*< public >*/
+-    const char *cpu_model;
+     PnvChipType  chip_type;
+     uint64_t     chip_cfam_id;
+     uint64_t     cores_mask;
 diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
-index 3360c4b..a336a1f 100644
+index a336a1f..e337af7 100644
 --- a/include/hw/ppc/pnv_core.h
 +++ b/include/hw/ppc/pnv_core.h
-@@ -42,7 +42,6 @@ typedef struct PnvCore {
- 
- typedef struct PnvCoreClass {
-     DeviceClass parent_class;
--    ObjectClass *cpu_oc;
- } PnvCoreClass;
+@@ -46,6 +46,5 @@ typedef struct PnvCoreClass {
  
  #define PNV_CORE_TYPE_SUFFIX "-" TYPE_PNV_CORE
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index b3e3f23..acdfa17 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -27,6 +27,16 @@
- #include "hw/ppc/pnv_xscom.h"
- #include "hw/ppc/xics.h"
+ #define PNV_CORE_TYPE_NAME(cpu_model) cpu_model PNV_CORE_TYPE_SUFFIX
+-extern char *pnv_core_typename(const char *model);
  
-+static const char *pvn_core_cpu_typename(PnvCore *pc)
+ #endif /* _PPC_PNV_CORE_H */
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 9c5eb7c..ab7083b 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -55,6 +55,16 @@
+ #define KERNEL_LOAD_ADDR        0x20000000
+ #define INITRD_LOAD_ADDR        0x40000000
+ 
++static const char *pvn_chip_core_typename(const PnvChip *o)
 +{
-+    const char *core_type = object_class_get_name(object_get_class(OBJECT(pc)));
-+    int len = strlen(core_type) - strlen(PNV_CORE_TYPE_SUFFIX);
-+    char *s = g_strdup_printf(POWERPC_CPU_TYPE_NAME("%.*s"), len, core_type);
-+    const char *cpu_type = object_class_get_name(object_class_by_name(s));
++    const char *chip_type = object_class_get_name(object_get_class(OBJECT(o)));
++    int len = strlen(chip_type) - strlen(PNV_CHIP_TYPE_SUFFIX);
++    char *s = g_strdup_printf(PNV_CORE_TYPE_NAME("%.*s"), len, chip_type);
++    const char *core_type = object_class_get_name(object_class_by_name(s));
 +    g_free(s);
-+    return cpu_type;
++    return core_type;
 +}
 +
- static void powernv_cpu_reset(void *opaque)
- {
-     PowerPCCPU *cpu = opaque;
-@@ -148,8 +158,7 @@ static void pnv_core_realize(DeviceState *dev, Error **errp)
- {
-     PnvCore *pc = PNV_CORE(OBJECT(dev));
-     CPUCore *cc = CPU_CORE(OBJECT(dev));
--    PnvCoreClass *pcc = PNV_CORE_GET_CLASS(OBJECT(dev));
--    const char *typename = object_class_get_name(pcc->cpu_oc);
-+    const char *typename = pvn_core_cpu_typename(pc);
-     size_t size = object_type_get_instance_size(typename);
-     Error *local_err = NULL;
-     void *obj;
-@@ -211,11 +220,9 @@ static Property pnv_core_properties[] = {
- static void pnv_core_class_init(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(oc);
--    PnvCoreClass *pcc = PNV_CORE_CLASS(oc);
+ /*
+  * On Power Systems E880 (POWER8), the max cpus (threads) should be :
+  *     4 * 4 sockets * 12 cores * 8 threads = 1536
+@@ -270,8 +280,7 @@ static int pnv_chip_lpc_offset(PnvChip *chip, void *fdt)
  
-     dc->realize = pnv_core_realize;
-     dc->props = pnv_core_properties;
--    pcc->cpu_oc = cpu_class_by_name(TYPE_POWERPC_CPU, data);
+ static void powernv_populate_chip(PnvChip *chip, void *fdt)
+ {
+-    PnvChipClass *pcc = PNV_CHIP_GET_CLASS(chip);
+-    char *typename = pnv_core_typename(pcc->cpu_model);
++    const char *typename = pvn_chip_core_typename(chip);
+     size_t typesize = object_type_get_instance_size(typename);
+     int i;
+ 
+@@ -301,7 +310,6 @@ static void powernv_populate_chip(PnvChip *chip, void *fdt)
+         powernv_populate_memory_node(fdt, chip->chip_id, chip->ram_start,
+                                      chip->ram_size);
+     }
+-    g_free(typename);
  }
  
- static const TypeInfo pnv_core_info = {
-@@ -223,6 +230,7 @@ static const TypeInfo pnv_core_info = {
-     .parent         = TYPE_CPU_CORE,
-     .instance_size  = sizeof(PnvCore),
-     .class_size     = sizeof(PnvCoreClass),
-+    .class_init = pnv_core_class_init,
-     .abstract       = true,
+ static void powernv_populate_rtc(ISADevice *d, void *fdt, int lpc_off)
+@@ -713,7 +721,6 @@ static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PnvChipClass *k = PNV_CHIP_CLASS(klass);
+ 
+-    k->cpu_model = "power8e_v2.1";
+     k->chip_type = PNV_CHIP_POWER8E;
+     k->chip_cfam_id = 0x221ef04980000000ull;  /* P8 Murano DD2.1 */
+     k->cores_mask = POWER8E_CORE_MASK;
+@@ -735,7 +742,6 @@ static void pnv_chip_power8_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PnvChipClass *k = PNV_CHIP_CLASS(klass);
+ 
+-    k->cpu_model = "power8_v2.0";
+     k->chip_type = PNV_CHIP_POWER8;
+     k->chip_cfam_id = 0x220ea04980000000ull; /* P8 Venice DD2.0 */
+     k->cores_mask = POWER8_CORE_MASK;
+@@ -757,7 +763,6 @@ static void pnv_chip_power8nvl_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PnvChipClass *k = PNV_CHIP_CLASS(klass);
+ 
+-    k->cpu_model = "power8nvl_v1.0";
+     k->chip_type = PNV_CHIP_POWER8NVL;
+     k->chip_cfam_id = 0x120d304980000000ull;  /* P8 Naples DD1.0 */
+     k->cores_mask = POWER8_CORE_MASK;
+@@ -779,7 +784,6 @@ static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PnvChipClass *k = PNV_CHIP_CLASS(klass);
+ 
+-    k->cpu_model = "power9_v1.0";
+     k->chip_type = PNV_CHIP_POWER9;
+     k->chip_cfam_id = 0x100d104980000000ull; /* P9 Nimbus DD1.0 */
+     k->cores_mask = POWER9_CORE_MASK;
+@@ -854,7 +858,7 @@ static void pnv_chip_init(Object *obj)
+ static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
+ {
+     PnvChipClass *pcc = PNV_CHIP_GET_CLASS(chip);
+-    char *typename = pnv_core_typename(pcc->cpu_model);
++    const char *typename = pvn_chip_core_typename(chip);
+     size_t typesize = object_type_get_instance_size(typename);
+     int i, j;
+     char *name;
+@@ -879,8 +883,6 @@ static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
+             memory_region_add_subregion(&chip->icp_mmio, pir << 12, &icp->mmio);
+         }
+     }
+-
+-    g_free(typename);
+ }
+ 
+ static void pnv_chip_realize(DeviceState *dev, Error **errp)
+@@ -888,7 +890,7 @@ static void pnv_chip_realize(DeviceState *dev, Error **errp)
+     PnvChip *chip = PNV_CHIP(dev);
+     Error *error = NULL;
+     PnvChipClass *pcc = PNV_CHIP_GET_CLASS(chip);
+-    char *typename = pnv_core_typename(pcc->cpu_model);
++    const char *typename = pvn_chip_core_typename(chip);
+     size_t typesize = object_type_get_instance_size(typename);
+     int i, core_hwid;
+ 
+@@ -947,7 +949,6 @@ static void pnv_chip_realize(DeviceState *dev, Error **errp)
+                                 &PNV_CORE(pnv_core)->xscom_regs);
+         i++;
+     }
+-    g_free(typename);
+ 
+     /* Create LPC controller */
+     object_property_set_bool(OBJECT(&chip->lpc), true, "realized",
+diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+index 000c87e..621b69e 100644
+--- a/hw/ppc/pnv_core.c
++++ b/hw/ppc/pnv_core.c
+@@ -246,9 +246,4 @@ static const TypeInfo pnv_core_infos[] = {
+     DEFINE_PNV_CORE_TYPE("power9_v1.0"),
  };
  
-@@ -239,8 +247,6 @@ static void pnv_core_register_types(void)
-         TypeInfo ti = {
-             .parent = TYPE_PNV_CORE,
-             .instance_size = sizeof(PnvCore),
--            .class_init = pnv_core_class_init,
--            .class_data = (void *) pnv_core_models[i],
-         };
-         ti.name = pnv_core_typename(pnv_core_models[i]);
-         type_register(&ti);
+-char *pnv_core_typename(const char *model)
+-{
+-    return g_strdup_printf(PNV_CORE_TYPE_NAME("%s"), model);
+-}
+-
+ DEFINE_TYPES(pnv_core_infos)
 -- 
 2.7.4
