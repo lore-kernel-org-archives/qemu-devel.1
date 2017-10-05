@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06ZB-0007iV-16
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:58 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e06ZC-0007jb-Ei
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06Z5-0000D2-9D
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51686)
+	(envelope-from <imammedo@redhat.com>) id 1e06Z9-0000Kk-CZ
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37063)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06Z5-0000CS-0s
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:51 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06Z9-0000JT-6Q
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:55 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu,  5 Oct 2017 15:51:01 +0200
-Message-Id: <1507211474-188400-28-git-send-email-imammedo@redhat.com>
+Date: Thu,  5 Oct 2017 15:51:05 +0200
+Message-Id: <1507211474-188400-32-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
 References: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 27/40] unicore32: cleanup cpu type name
+Subject: [Qemu-devel] [PATCH v2 31/40] sparc: cleanup cpu type name
  composition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,143 +28,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, gxt@mprc.pku.edu.cn
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-use new UNICORE32_CPU_TYPE_NAME to compose CPU type
-name and get rid of intermediate
-   UniCore32CPUInfo/uc32_cpu_register_types()
-which is replaced by static TypeInfo array and
-type_init_from_array()
+introduce SPARC_CPU_TYPE_NAME macro and use it to
+construct cpu type names.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
-v2:  rename type_init_from_array into DEFINE_TYPES
-
-CC: gxt@mprc.pku.edu.cn
+macro will also be used in follow up patches to define
+default cpu types per board
 ---
- target/unicore32/cpu.h |  3 +++
- target/unicore32/cpu.c | 61 +++++++++++++++++---------------------------=
-------
- 2 files changed, 23 insertions(+), 41 deletions(-)
+ target/sparc/cpu.h | 3 +++
+ target/sparc/cpu.c | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/target/unicore32/cpu.h b/target/unicore32/cpu.h
-index 7724108..3dc6fbc 100644
---- a/target/unicore32/cpu.h
-+++ b/target/unicore32/cpu.h
-@@ -167,6 +167,9 @@ static inline int cpu_mmu_index(CPUUniCore32State *en=
-v, bool ifetch)
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+index 1598f65..7aa45c9 100644
+--- a/target/sparc/cpu.h
++++ b/target/sparc/cpu.h
+@@ -658,6 +658,9 @@ int cpu_sparc_signal_handler(int host_signum, void *p=
+info, void *puc);
+ #define cpu_init(cpu_model) cpu_generic_init(TYPE_SPARC_CPU, cpu_model)
+ #endif
 =20
- #define cpu_init(cpu_model) cpu_generic_init(TYPE_UNICORE32_CPU, cpu_mod=
-el)
-=20
-+#define UNICORE32_CPU_TYPE_SUFFIX "-" TYPE_UNICORE32_CPU
-+#define UNICORE32_CPU_TYPE_NAME(model) model UNICORE32_CPU_TYPE_SUFFIX
++#define SPARC_CPU_TYPE_SUFFIX "-" TYPE_SPARC_CPU
++#define SPARC_CPU_TYPE_NAME(model) model SPARC_CPU_TYPE_SUFFIX
 +
- static inline void cpu_get_tb_cpu_state(CPUUniCore32State *env, target_u=
-long *pc,
-                                         target_ulong *cs_base, uint32_t =
-*flags)
+ #define cpu_signal_handler cpu_sparc_signal_handler
+ #define cpu_list sparc_cpu_list
+=20
+diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+index beab90f..f09ba50 100644
+--- a/target/sparc/cpu.c
++++ b/target/sparc/cpu.c
+@@ -712,7 +712,7 @@ static bool sparc_cpu_has_work(CPUState *cs)
+=20
+ static char *sparc_cpu_type_name(const char *cpu_model)
  {
-diff --git a/target/unicore32/cpu.c b/target/unicore32/cpu.c
-index 138acc9..242ecca 100644
---- a/target/unicore32/cpu.c
-+++ b/target/unicore32/cpu.c
-@@ -44,7 +44,7 @@ static ObjectClass *uc32_cpu_class_by_name(const char *=
-cpu_model)
-     ObjectClass *oc;
-     char *typename;
+-    char *name =3D g_strdup_printf("%s-" TYPE_SPARC_CPU, cpu_model);
++    char *name =3D g_strdup_printf(SPARC_CPU_TYPE_NAME("%s"), cpu_model)=
+;
+     char *s =3D name;
 =20
--    typename =3D g_strdup_printf("%s-" TYPE_UNICORE32_CPU, cpu_model);
-+    typename =3D g_strdup_printf(UNICORE32_CPU_TYPE_NAME("%s"), cpu_mode=
-l);
-     oc =3D object_class_by_name(typename);
-     g_free(typename);
-     if (oc !=3D NULL && (!object_class_dynamic_cast(oc, TYPE_UNICORE32_C=
-PU) ||
-@@ -54,11 +54,6 @@ static ObjectClass *uc32_cpu_class_by_name(const char =
-*cpu_model)
-     return oc;
- }
-=20
--typedef struct UniCore32CPUInfo {
--    const char *name;
--    void (*instance_init)(Object *obj);
--} UniCore32CPUInfo;
--
- static void unicore_ii_cpu_initfn(Object *obj)
- {
-     UniCore32CPU *cpu =3D UNICORE32_CPU(obj);
-@@ -90,11 +85,6 @@ static void uc32_any_cpu_initfn(Object *obj)
-     set_snan_bit_is_one(1, &env->ucf64.fp_status);
- }
-=20
--static const UniCore32CPUInfo uc32_cpus[] =3D {
--    { .name =3D "UniCore-II", .instance_init =3D unicore_ii_cpu_initfn }=
-,
--    { .name =3D "any",        .instance_init =3D uc32_any_cpu_initfn },
--};
--
- static void uc32_cpu_realizefn(DeviceState *dev, Error **errp)
- {
-     CPUState *cs =3D CPU(dev);
-@@ -165,36 +155,25 @@ static void uc32_cpu_class_init(ObjectClass *oc, vo=
-id *data)
-     dc->vmsd =3D &vmstate_uc32_cpu;
- }
-=20
--static void uc32_register_cpu_type(const UniCore32CPUInfo *info)
--{
--    TypeInfo type_info =3D {
--        .parent =3D TYPE_UNICORE32_CPU,
--        .instance_init =3D info->instance_init,
--    };
--
--    type_info.name =3D g_strdup_printf("%s-" TYPE_UNICORE32_CPU, info->n=
-ame);
--    type_register(&type_info);
--    g_free((void *)type_info.name);
--}
-+#define DEFINE_UNICORE32_CPU_TYPE(cpu_model, initfn) \
-+    {                                                \
-+        .parent =3D TYPE_UNICORE32_CPU,                \
-+        .instance_init =3D initfn,                     \
-+        .name =3D UNICORE32_CPU_TYPE_NAME(cpu_model),  \
-+    }
-=20
--static const TypeInfo uc32_cpu_type_info =3D {
--    .name =3D TYPE_UNICORE32_CPU,
--    .parent =3D TYPE_CPU,
--    .instance_size =3D sizeof(UniCore32CPU),
--    .instance_init =3D uc32_cpu_initfn,
--    .abstract =3D true,
--    .class_size =3D sizeof(UniCore32CPUClass),
--    .class_init =3D uc32_cpu_class_init,
-+static const TypeInfo uc32_cpu_type_infos[] =3D {
-+    {
-+        .name =3D TYPE_UNICORE32_CPU,
-+        .parent =3D TYPE_CPU,
-+        .instance_size =3D sizeof(UniCore32CPU),
-+        .instance_init =3D uc32_cpu_initfn,
-+        .abstract =3D true,
-+        .class_size =3D sizeof(UniCore32CPUClass),
-+        .class_init =3D uc32_cpu_class_init,
-+    },
-+    DEFINE_UNICORE32_CPU_TYPE("UniCore-II", unicore_ii_cpu_initfn),
-+    DEFINE_UNICORE32_CPU_TYPE("any", uc32_any_cpu_initfn),
- };
-=20
--static void uc32_cpu_register_types(void)
--{
--    int i;
--
--    type_register_static(&uc32_cpu_type_info);
--    for (i =3D 0; i < ARRAY_SIZE(uc32_cpus); i++) {
--        uc32_register_cpu_type(&uc32_cpus[i]);
--    }
--}
--
--type_init(uc32_cpu_register_types)
-+DEFINE_TYPES(uc32_cpu_type_infos)
+     /* SPARC cpu model names happen to have whitespaces,
 --=20
 2.7.4
