@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1e0460-0001tm-Q9
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:13:42 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1e0462-0001tw-Oz
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:13:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1e045x-000657-F9
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:13:40 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:56652)
+	(envelope-from <a.perevalov@samsung.com>) id 1e045w-00064g-TS
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:13:42 -0400
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:42454)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1e045x-00062s-5j
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:13:37 -0400
+	id 1e045w-00061P-Jw
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:13:36 -0400
 From: Alexey Perevalov <a.perevalov@samsung.com>
-Date: Thu, 05 Oct 2017 14:13:20 +0300
-Message-id: <1507202000-22469-4-git-send-email-a.perevalov@samsung.com>
-In-reply-to: <1507202000-22469-1-git-send-email-a.perevalov@samsung.com>
-References: <1507202000-22469-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20171005111333eucas1p1c3c8d82ae9e35e6f4a6d610fbe375932@eucas1p1.samsung.com>
-Subject: [Qemu-devel] [PATCH v10 3/3] migration: add bitmap for received page
+Date: Thu, 05 Oct 2017 14:13:17 +0300
+Message-id: <1507202000-22469-1-git-send-email-a.perevalov@samsung.com>
+References: <CGME20171005111331eucas1p1b227e8a4e0d564caa28b22893f90ee78@eucas1p1.samsung.com>
+Subject: [Qemu-devel] [PATCH v10 0/3] Add bitmap for received pages in
+ postcopy migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,215 +27,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Perevalov <a.perevalov@samsung.com>, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com, i.maximets@samsung.com, heetae82.ahn@samsung.com
 
-This patch adds ability to track down already received
-pages, it's necessary for calculation vCPU block time in
-postcopy migration feature, and for recovery after
-postcopy migration failure.
+This is 10th version of
+[PATCH v1 0/2] Add bitmap for copied pages in postcopy migration
+cover message from there
 
-Also it's necessary to solve shared memory issue in
-postcopy livemigration. Information about received pages
-will be transferred to the software virtual bridge
-(e.g. OVS-VSWITCHD), to avoid fallocate (unmap) for
-already received pages. fallocate syscall is required for
-remmaped shared memory, due to remmaping itself blocks
-ioctl(UFFDIO_COPY, ioctl in this case will end with EEXIT
-error (struct page is exists after remmap).
+This is a separate patch set, it derived from
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg456004.html
 
-Bitmap is placed into RAMBlock as another postcopy/precopy
-related bitmaps.
+There are several possible use cases:
+1. solve issue with postcopy live migration and shared memory.
+OVS-VSWITCH requires information about copied pages, to fallocate
+newly allocated pages.
+2. calculation vCPU blocktime
+for more details see
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg456004.html
+3. Recovery after fail in the middle of postcopy migration 
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
----
- include/exec/ram_addr.h  | 10 ++++++++++
- migration/postcopy-ram.c | 17 ++++++++++++-----
- migration/ram.c          | 40 ++++++++++++++++++++++++++++++++++++++++
+----------------------------------------------------------------
+V10 -> V9
+    - ramblock_recv_bitmap_clear was removed from patchset, due to
+I didn't find any usage of it in existing patchsets based on this patch.
+
+V8 -> V9
+    - patch: "migration: fix incorrect postcopy recved_bitmap" from
+"[RFC 00/29] Migration: postcopy failure recovery" patch set was squashed
+into the latest patch of this patchset, getpagesize was replaced to
+qemu_target_page_size, as David suggested.
+    - for the sake of API uniformity semantics of all functions were
+changed, now RAMBlock *rb is the first argument, as well as in bitmap API.
+    - Also define TARGET_PAGE_BITS was replaced to qemu_target_page_bits in
+all other places of this patchset, for uniformity and maintenance. 
+
+V7 -> V8
+    - removed unnecessary renaming and moving of block variable to ram_load's
+function scope
+    - ramblock_recv_map_init became static function
+
+V6 -> V7
+    - rebased on
+[PATCH v7 0/5] Create setup/cleanup methods for migration incoming side
+    - live time of the received map was changed (ram_load_setup/ram_load_cleanup) 
+
+V5 -> V6
+    - call ramblock_recv_map_init from migration_fd_process_incoming (Peter suggested)But finalization is still in ram_load_cleanup as Juan suggested.    
+
+V4 -> V5
+    - remove ramblock_recv_bitmap_clear_range in favor to bitmap_clear (comment from David)
+    - single invocation place for ramblock_recv_bitmap_set (comment from Peter)
+    - minor changes like removing comment from qemu_ufd_copy_ioctl and local variable from
+ramblock_recv_map_init (comment from Peter)
+
+V3 -> V4
+    - clear_bit instead of ramblock_recv_bitmap_clear in ramblock_recv_bitmap_clear_range,
+it reduced number of operation (comment from Juan)
+    - for postcopy ramblock_recv_bitmap_set is calling after page was copied,
+only in case of success (comment from David)
+    - indentation fixes (comment from Juan)
+
+V2 -> V3
+    - ramblock_recv_map_init call is placed into migration_incoming_get_current,
+looks like it's general place for both precopy and postcopy case.
+    - received bitmap memory releasing is placed into ram_load_cleanup,
+unfortunatelly, it calls only in case of precopy.
+    - precopy case and discard ram block case
+    - function renaming, and another minor cleanups
+
+V1 -> V2
+    - change in terminology s/copied/received/g
+    - granularity became TARGET_PAGE_SIZE, but not actual page size of the
+ramblock
+    - movecopiedmap & get_copiedmap_size were removed, until patch set where
+it will be necessary
+    - releasing memory of receivedmap was added into ram_load_cleanup
+    - new patch "migration: introduce qemu_ufd_copy_ioctl helper"
+
+Patchset is based on:
+commit d147f7e815f97cb477e223586bcb80c316ae10ea
+Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging
+
+Alexey Perevalov (3):
+  migration: postcopy_place_page factoring out
+  migration: introduce qemu_ufd_copy_ioctl helper
+  migration: add bitmap for received page
+
+ include/exec/ram_addr.h  | 10 +++++++++
+ migration/postcopy-ram.c | 54 +++++++++++++++++++++++++++++++-----------------
+ migration/postcopy-ram.h |  4 ++--
+ migration/ram.c          | 44 +++++++++++++++++++++++++++++++++++++--
  migration/ram.h          |  5 +++++
- 4 files changed, 67 insertions(+), 5 deletions(-)
+ 5 files changed, 94 insertions(+), 23 deletions(-)
 
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index d017639..6cbc02a 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -47,6 +47,8 @@ struct RAMBlock {
-      * of the postcopy phase
-      */
-     unsigned long *unsentmap;
-+    /* bitmap of already received pages in postcopy */
-+    unsigned long *receivedmap;
- };
- 
- static inline bool offset_in_ramblock(RAMBlock *b, ram_addr_t offset)
-@@ -60,6 +62,14 @@ static inline void *ramblock_ptr(RAMBlock *block, ram_addr_t offset)
-     return (char *)block->host + offset;
- }
- 
-+static inline unsigned long int ramblock_recv_bitmap_offset(void *host_addr,
-+                                                            RAMBlock *rb)
-+{
-+    uint64_t host_addr_offset =
-+            (uint64_t)(uintptr_t)(host_addr - (void *)rb->host);
-+    return host_addr_offset >> TARGET_PAGE_BITS;
-+}
-+
- long qemu_getrampagesize(void);
- unsigned long last_ram_page(void);
- RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 8bf6432..bec6c2c 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -642,22 +642,28 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
- }
- 
- static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
--        void *from_addr, uint64_t pagesize)
-+                               void *from_addr, uint64_t pagesize, RAMBlock *rb)
- {
-+    int ret;
-     if (from_addr) {
-         struct uffdio_copy copy_struct;
-         copy_struct.dst = (uint64_t)(uintptr_t)host_addr;
-         copy_struct.src = (uint64_t)(uintptr_t)from_addr;
-         copy_struct.len = pagesize;
-         copy_struct.mode = 0;
--        return ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
-+        ret = ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
-     } else {
-         struct uffdio_zeropage zero_struct;
-         zero_struct.range.start = (uint64_t)(uintptr_t)host_addr;
-         zero_struct.range.len = pagesize;
-         zero_struct.mode = 0;
--        return ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
-+        ret = ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
-+    }
-+    if (!ret) {
-+        ramblock_recv_bitmap_set_range(rb, host_addr,
-+                                       pagesize / qemu_target_page_size());
-     }
-+    return ret;
- }
- 
- /*
-@@ -674,7 +680,7 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
-      * which would be slightly cheaper, but we'd have to be careful
-      * of the order of updating our page state.
-      */
--    if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize)) {
-+    if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize, rb)) {
-         int e = errno;
-         error_report("%s: %s copy host: %p from: %p (size: %zd)",
-                      __func__, strerror(e), host, from, pagesize);
-@@ -696,7 +702,8 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
-     trace_postcopy_place_page_zero(host);
- 
-     if (qemu_ram_pagesize(rb) == getpagesize()) {
--        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, getpagesize())) {
-+        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, getpagesize(),
-+                                rb)) {
-             int e = errno;
-             error_report("%s: %s zero host: %p",
-                          __func__, strerror(e), host);
-diff --git a/migration/ram.c b/migration/ram.c
-index 304ac59..c30db15 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -44,6 +44,7 @@
- #include "qemu/error-report.h"
- #include "trace.h"
- #include "exec/ram_addr.h"
-+#include "exec/target_page.h"
- #include "qemu/rcu_queue.h"
- #include "migration/colo.h"
- #include "migration/block.h"
-@@ -148,6 +149,35 @@ out:
-     return ret;
- }
- 
-+static void ramblock_recv_map_init(void)
-+{
-+    RAMBlock *rb;
-+
-+    RAMBLOCK_FOREACH(rb) {
-+        assert(!rb->receivedmap);
-+        rb->receivedmap = bitmap_new(rb->max_length >> qemu_target_page_bits());
-+    }
-+}
-+
-+int ramblock_recv_bitmap_test(RAMBlock *rb, void *host_addr)
-+{
-+    return test_bit(ramblock_recv_bitmap_offset(host_addr, rb),
-+                    rb->receivedmap);
-+}
-+
-+void ramblock_recv_bitmap_set(RAMBlock *rb, void *host_addr)
-+{
-+    set_bit_atomic(ramblock_recv_bitmap_offset(host_addr, rb), rb->receivedmap);
-+}
-+
-+void ramblock_recv_bitmap_set_range(RAMBlock *rb, void *host_addr,
-+                                    size_t nr)
-+{
-+    bitmap_set_atomic(rb->receivedmap,
-+                      ramblock_recv_bitmap_offset(host_addr, rb),
-+                      nr);
-+}
-+
- /*
-  * An outstanding page request, on the source, having been received
-  * and queued
-@@ -1999,6 +2029,8 @@ int ram_discard_range(const char *rbname, uint64_t start, size_t length)
-         goto err;
-     }
- 
-+    bitmap_clear(rb->receivedmap, start >> qemu_target_page_bits(),
-+                 length >> qemu_target_page_bits());
-     ret = ram_block_discard_range(rb, start, length);
- 
- err:
-@@ -2534,13 +2566,20 @@ static int ram_load_setup(QEMUFile *f, void *opaque)
- {
-     xbzrle_load_setup();
-     compress_threads_load_setup();
-+    ramblock_recv_map_init();
-     return 0;
- }
- 
- static int ram_load_cleanup(void *opaque)
- {
-+    RAMBlock *rb;
-     xbzrle_load_cleanup();
-     compress_threads_load_cleanup();
-+
-+    RAMBLOCK_FOREACH(rb) {
-+        g_free(rb->receivedmap);
-+        rb->receivedmap = NULL;
-+    }
-     return 0;
- }
- 
-@@ -2755,6 +2794,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-                 ret = -EINVAL;
-                 break;
-             }
-+            ramblock_recv_bitmap_set(block, host);
-             trace_ram_load_loop(block->idstr, (uint64_t)addr, flags, host);
-         }
- 
-diff --git a/migration/ram.h b/migration/ram.h
-index 4a72d66..3f5dd23 100644
---- a/migration/ram.h
-+++ b/migration/ram.h
-@@ -57,4 +57,9 @@ int ram_discard_range(const char *block_name, uint64_t start, size_t length);
- int ram_postcopy_incoming_init(MigrationIncomingState *mis);
- 
- void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
-+
-+int ramblock_recv_bitmap_test(RAMBlock *rb, void *host_addr);
-+void ramblock_recv_bitmap_set(RAMBlock *rb, void *host_addr);
-+void ramblock_recv_bitmap_set_range(RAMBlock *rb, void *host_addr, size_t nr);
-+
- #endif
 -- 
 2.7.4
