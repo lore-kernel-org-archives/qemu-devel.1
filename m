@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06Yu-0007Qn-MG
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:41 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06Ys-0008Sq-Uf
+	(envelope-from <imammedo@redhat.com>) id 1e06Ys-0007O4-CK
 	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59594)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06Ys-0008RV-PT
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <imammedo@redhat.com>) id 1e06Yo-0008O3-Ey
 	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34738)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06Yo-0008NH-9O
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:34 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu,  5 Oct 2017 15:50:52 +0200
-Message-Id: <1507211474-188400-19-git-send-email-imammedo@redhat.com>
+Date: Thu,  5 Oct 2017 15:50:48 +0200
+Message-Id: <1507211474-188400-15-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
 References: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 18/40] openrisc: use generic cpu_model
- parsing
+Subject: [Qemu-devel] [PATCH v2 14/40] moxie: fix qemu-system-moxie failing
+ to start with CLI "-cpu MoxieLite"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +28,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, shorne@gmail.com
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, green@moxielogic.com
+
+It 'works' with default CPU only because of bug in
+moxie_cpu_class_by_name() where it treats cpu_model
+as type name and default cpu_model also happens to be
+type name. But specifying explicitly cpu on CLI,
+ex: '-cpu MoxieLite', makes QEMU fail since
+moxie_cpu_class_by_name() doesn't traslate cpu_model
+to cpu type and fails to find corresponding object class.
+
+Fix moxie_cpu_class_by_name() to do proper
+   cpu_model -> cpu type
+translation and fix default cpu_model to be cpu_model
+instead of being typename.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
-CC: shorne@gmail.com
+CC: green@moxielogic.com
 ---
- hw/openrisc/openrisc_sim.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ hw/moxie/moxiesim.c | 2 +-
+ target/moxie/cpu.c  | 7 ++++++-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
-index 86bf284..f61b63d 100644
---- a/hw/openrisc/openrisc_sim.c
-+++ b/hw/openrisc/openrisc_sim.c
-@@ -98,18 +98,13 @@ static void cpu_openrisc_load_kernel(ram_addr_t ram_s=
-ize,
- static void openrisc_sim_init(MachineState *machine)
- {
-     ram_addr_t ram_size =3D machine->ram_size;
--    const char *cpu_model =3D machine->cpu_model;
-     const char *kernel_filename =3D machine->kernel_filename;
-     OpenRISCCPU *cpu =3D NULL;
-     MemoryRegion *ram;
-     int n;
+diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
+index 5ea8dd3..01b9f34 100644
+--- a/hw/moxie/moxiesim.c
++++ b/hw/moxie/moxiesim.c
+@@ -116,7 +116,7 @@ static void moxiesim_init(MachineState *machine)
 =20
--    if (!cpu_model) {
--        cpu_model =3D "or1200";
--    }
--
-     for (n =3D 0; n < smp_cpus; n++) {
--        cpu =3D OPENRISC_CPU(cpu_generic_init(TYPE_OPENRISC_CPU, cpu_mod=
-el));
-+        cpu =3D OPENRISC_CPU(cpu_create(machine->cpu_type));
-         qemu_register_reset(main_cpu_reset, cpu);
-         main_cpu_reset(cpu);
+     /* Init CPUs. */
+     if (cpu_model =3D=3D NULL) {
+-        cpu_model =3D "MoxieLite-moxie-cpu";
++        cpu_model =3D "MoxieLite";
      }
-@@ -138,6 +133,7 @@ static void openrisc_sim_machine_init(MachineClass *m=
-c)
-     mc->init =3D openrisc_sim_init;
-     mc->max_cpus =3D 1;
-     mc->is_default =3D 1;
-+    mc->default_cpu_type =3D OPENRISC_CPU_TYPE_NAME("or1200");
- }
+     cpu =3D MOXIE_CPU(cpu_generic_init(TYPE_MOXIE_CPU, cpu_model));
+     env =3D &cpu->env;
+diff --git a/target/moxie/cpu.c b/target/moxie/cpu.c
+index 30bd44f..d4626a1 100644
+--- a/target/moxie/cpu.c
++++ b/target/moxie/cpu.c
+@@ -89,7 +89,12 @@ static void moxie_cpu_initfn(Object *obj)
 =20
- DEFINE_MACHINE("or1k-sim", openrisc_sim_machine_init)
+ static ObjectClass *moxie_cpu_class_by_name(const char *cpu_model)
+ {
+-    ObjectClass *oc =3D object_class_by_name(cpu_model);
++    ObjectClass *oc;
++    char *typename;
++
++    typename =3D g_strdup_printf("%s-" TYPE_MOXIE_CPU, cpu_model);
++    oc =3D object_class_by_name(typename);
++    g_free(typename);
+     if (oc !=3D NULL && (!object_class_dynamic_cast(oc, TYPE_MOXIE_CPU) =
+||
+                        object_class_is_abstract(oc))) {
+         return NULL;
 --=20
 2.7.4
