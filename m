@@ -1,32 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e09hE-0000Fm-Gi
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:12:46 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1e09id-00010Y-Tq
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:13:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e09go-0001JR-88
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:12:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60720)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e09gn-0001I0-Uj
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:12:02 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D0B65780CE
-	for <qemu-devel@nongnu.org>; Thu,  5 Oct 2017 17:12:00 +0000 (UTC)
-Date: Thu, 5 Oct 2017 14:11:59 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171005171159.GG4015@localhost.localdomain>
-References: <1507206738-816-1-git-send-email-thuth@redhat.com>
-	<1507206738-816-2-git-send-email-thuth@redhat.com>
-	<20171005155912.5871c4d7@nial.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171005155912.5871c4d7@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] qdev_monitor: Simplify error handling
- in qdev_device_add()
+	(envelope-from <maxime.coquelin@redhat.com>) id 1e09iZ-0002kC-UT
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 13:13:55 -0400
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Date: Thu,  5 Oct 2017 19:13:07 +0200
+Message-Id: <20171005171309.1250-1-maxime.coquelin@redhat.com>
+Subject: [Qemu-devel] [REBASED 0/2] exec: further refine
+ address_space_get_iotlb_entry()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,62 +18,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: peterx@redhat.com, pbonzini@redhat.com, mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-On Thu, Oct 05, 2017 at 03:59:12PM +0200, Igor Mammedov wrote:
-> On Thu,  5 Oct 2017 14:32:17 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
-> 
-> > Instead of doing the clean-ups on errors multiple times, introduce
-> > a jump label at the end of the function that can be used by all
-> > error paths that need this cleanup.
-> > 
-> > Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > ---
-> >  qdev-monitor.c | 21 ++++++++++-----------
-> >  1 file changed, 10 insertions(+), 11 deletions(-)
-> > 
-> > diff --git a/qdev-monitor.c b/qdev-monitor.c
-> > index 8fd6df9..cb2b109 100644
-> > --- a/qdev-monitor.c
-> > +++ b/qdev-monitor.c
-> > @@ -620,22 +620,21 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
-> >  
-> >      /* set properties */
-> >      if (qemu_opt_foreach(opts, set_property, dev, &err)) {
-> > -        error_propagate(errp, err);
-> > -        object_unparent(OBJECT(dev));
-> > -        object_unref(OBJECT(dev));
-> > -        return NULL;
-> > +        goto err_del_dev;
-> >      }
-> >  
-> >      dev->opts = opts;
-> >      object_property_set_bool(OBJECT(dev), true, "realized", &err);
-> > -    if (err != NULL) {
-> > -        error_propagate(errp, err);
-> > -        dev->opts = NULL;
-> > -        object_unparent(OBJECT(dev));
-> > -        object_unref(OBJECT(dev));
-> > -        return NULL;
-> > +    if (!err) {
-> > +        return dev;
-> >      }
-> typically the same error check pattern is used through out the function
-> so I'd not do inversion here. i.e. keep normal flow non-branched and jump on error
-> 
->  if (err != NULL) {
->     goto err_del_dev;
->  }
->  return dev;
-> 
->  err_del_dev:
->     dev->opts = NULL;
+This series is a rebase of the first two patches of Peter's series
+improving address_space_get_iotlb_entry():
+Message-Id: <1496404254-17429-1-git-send-email-peterx@redhat.com>
 
-I prefer this pattern also.  It makes the success/error paths
-very easy to spot.
+It is actually not only an improvement, but fixes a regression in the way
+IOTLB updates sent to the backends are generated.
+The regression is introduced by patch:
+a764040cc8 ("exec: abstract address_space_do_translate()")
+
+Prior to this patch IOTLB entries sent to the backend were aligned on the
+guest page boundaries (both addresses and size).
+For example, with the guest using 2MB pages:
+ * Backend sends IOTLB miss request for iova = 0x112378fb4
+ * QEMU replies with an IOTLB update with iova = 0x112200000, size = 0x200000
+ * Bakend insert above entry in its cache and compute the translation
+In this case, if the backend needs later to translate 0x112378004, it will
+result in a cache it and no need to send another IOTLB miss.
+
+With this patch, the addr of the IOTLB entry will be the address requested
+via the IOTLB miss, the size is computed to cover the remaining of the guest
+page.
+The same example gives:
+ * Backend sends IOTLB miss request for iova = 0x112378fb4
+ * QEMU replies with an IOTLB update with iova = 112378fb4, size = 0x8704c
+ * Bakend insert above entry in its cache and compute the translation
+In this case, if the backend needs later to translate 0x112378004, it will
+result in another cache miss:
+ * Backend sends IOTLB miss request for iova = 0x112378004
+ * QEMU replies with an IOTLB update with iova = 0x112378004, size = 0x87FFC
+ * Bakend insert above entry in its cache and compute the translation
+It results in having much more IOTLB misses, and more importantly it pollutes
+the device IOTLB cache by multiplying the number of entries that moreover
+overlap.
+
+Note that current Kernel & User backends implementation do not merge contiguous
+and overlapping IOTLB entries at device IOTLB cache insertion.
+
+This series fixes this regression, so that IOTLB updates are aligned on
+guest's page boundaries.
+
+Peter Xu (2):
+  exec: add page_mask for flatview_do_translate
+  exec: simplify address_space_get_iotlb_entry
+
+ exec.c | 75 +++++++++++++++++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 49 insertions(+), 26 deletions(-)
 
 -- 
-Eduardo
+2.13.6
