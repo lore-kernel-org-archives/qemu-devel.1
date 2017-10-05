@@ -1,39 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e09KT-0006iE-J5
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:49:03 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e09Kh-0006tB-Q6
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:49:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e09KP-0001tR-H4
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:48:57 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38484
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e09Kd-000272-L2
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:49:11 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46316)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e09KP-0001sq-Bp
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:48:53 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	id 1e09Kd-00026S-C8
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:49:07 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v95GiJZM065808
-	for <qemu-devel@nongnu.org>; Thu, 5 Oct 2017 12:48:48 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ddn48v4pk-1
+	v95Gm9xI087348
+	for <qemu-devel@nongnu.org>; Thu, 5 Oct 2017 12:49:06 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ddpu5wwj1-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 12:48:48 -0400
+	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 12:49:06 -0400
 Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Thu, 5 Oct 2017 12:48:47 -0400
+	Thu, 5 Oct 2017 12:49:04 -0400
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Thu,  5 Oct 2017 12:48:28 -0400
+Date: Thu,  5 Oct 2017 12:48:32 -0400
 In-Reply-To: <1507222112-20315-1-git-send-email-stefanb@linux.vnet.ibm.com>
 References: <1507222112-20315-1-git-send-email-stefanb@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <1507222112-20315-7-git-send-email-stefanb@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v1 06/10] tpm-backend: Move realloc_buffer()
- implementation to tpm-tis model
+Message-Id: <1507222112-20315-11-git-send-email-stefanb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PULL v1 10/10] specs: Describe the TPM support in QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,139 +40,147 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, amarnath.valluri@intel.com, marcandre.lureau@gmail.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-From: Amarnath Valluri <amarnath.valluri@intel.com>
+This patch adds a description of the current TPM support in QEMU
+to the specs.
 
-buffer reallocation is very unlikely to be backend specific. Hence move i=
-nside
-the tis.
+Several public specs are referenced via their landing page on the
+trustedcomputinggroup.org website.
 
-Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
-Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Signed-off-by: Stefan Berger <address@hidden>
+Reviewed-by: Laszlo Ersek <address@hidden>
 ---
- backends/tpm.c               |  9 ---------
- hw/tpm/tpm_passthrough.c     | 12 ------------
- hw/tpm/tpm_tis.c             | 14 ++++++++++++--
- include/sysemu/tpm_backend.h | 12 ------------
- 4 files changed, 12 insertions(+), 35 deletions(-)
+ docs/specs/tpm.txt | 123 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 123 insertions(+)
+ create mode 100644 docs/specs/tpm.txt
 
-diff --git a/backends/tpm.c b/backends/tpm.c
-index de313c9..37c84b7 100644
---- a/backends/tpm.c
-+++ b/backends/tpm.c
-@@ -80,15 +80,6 @@ bool tpm_backend_had_startup_error(TPMBackend *s)
-     return s->had_startup_error;
- }
-=20
--size_t tpm_backend_realloc_buffer(TPMBackend *s, TPMSizedBuffer *sb)
--{
--    TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
--
--    assert(k->ops->realloc_buffer);
--
--    return k->ops->realloc_buffer(sb);
--}
--
- void tpm_backend_deliver_request(TPMBackend *s)
- {
-     g_thread_pool_push(s->thread_pool, (gpointer)TPM_BACKEND_CMD_PROCESS=
-_CMD,
-diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-index 84fc49a..22d3460 100644
---- a/hw/tpm/tpm_passthrough.c
-+++ b/hw/tpm/tpm_passthrough.c
-@@ -247,17 +247,6 @@ static int tpm_passthrough_reset_tpm_established_fla=
-g(TPMBackend *tb,
-     return 0;
- }
-=20
--static size_t tpm_passthrough_realloc_buffer(TPMSizedBuffer *sb)
--{
--    size_t wanted_size =3D 4096; /* Linux tpm.c buffer size */
--
--    if (sb->size !=3D wanted_size) {
--        sb->buffer =3D g_realloc(sb->buffer, wanted_size);
--        sb->size =3D wanted_size;
--    }
--    return sb->size;
--}
--
- static void tpm_passthrough_cancel_cmd(TPMBackend *tb)
- {
-     TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
-@@ -435,7 +424,6 @@ static const TPMDriverOps tpm_passthrough_driver =3D =
-{
-     .opts                     =3D tpm_passthrough_cmdline_opts,
-     .desc                     =3D "Passthrough TPM backend driver",
-     .create                   =3D tpm_passthrough_create,
--    .realloc_buffer           =3D tpm_passthrough_realloc_buffer,
-     .reset                    =3D tpm_passthrough_reset,
-     .cancel_cmd               =3D tpm_passthrough_cancel_cmd,
-     .get_tpm_established_flag =3D tpm_passthrough_get_tpm_established_fl=
-ag,
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index a6440fe..d5118e7 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -963,6 +963,16 @@ static int tpm_tis_do_startup_tpm(TPMState *s)
-     return tpm_backend_startup_tpm(s->be_driver);
- }
-=20
-+static void tpm_tis_realloc_buffer(TPMSizedBuffer *sb)
-+{
-+    size_t wanted_size =3D 4096; /* Linux tpm.c buffer size */
+diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+new file mode 100644
+index 0000000..914daac
+--- /dev/null
++++ b/docs/specs/tpm.txt
+@@ -0,0 +1,123 @@
++QEMU TPM Device
++===============
 +
-+    if (sb->size !=3D wanted_size) {
-+        sb->buffer =3D g_realloc(sb->buffer, wanted_size);
-+        sb->size =3D wanted_size;
-+    }
-+}
++= Guest-side Hardware Interface =
 +
- /*
-  * Get the TPMVersion of the backend device being used
-  */
-@@ -1010,9 +1020,9 @@ static void tpm_tis_reset(DeviceState *dev)
-         tis->loc[c].state =3D TPM_TIS_STATE_IDLE;
-=20
-         tis->loc[c].w_offset =3D 0;
--        tpm_backend_realloc_buffer(s->be_driver, &tis->loc[c].w_buffer);
-+        tpm_tis_realloc_buffer(&tis->loc[c].w_buffer);
-         tis->loc[c].r_offset =3D 0;
--        tpm_backend_realloc_buffer(s->be_driver, &tis->loc[c].r_buffer);
-+        tpm_tis_realloc_buffer(&tis->loc[c].r_buffer);
-     }
-=20
-     tpm_tis_do_startup_tpm(s);
-diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
-index e96c191..2c798a1 100644
---- a/include/sysemu/tpm_backend.h
-+++ b/include/sysemu/tpm_backend.h
-@@ -84,8 +84,6 @@ struct TPMDriverOps {
-     /* start up the TPM on the backend */
-     int (*startup_tpm)(TPMBackend *t);
-=20
--    size_t (*realloc_buffer)(TPMSizedBuffer *sb);
--
-     void (*reset)(TPMBackend *t);
-=20
-     void (*cancel_cmd)(TPMBackend *t);
-@@ -140,16 +138,6 @@ int tpm_backend_startup_tpm(TPMBackend *s);
- bool tpm_backend_had_startup_error(TPMBackend *s);
-=20
- /**
-- * tpm_backend_realloc_buffer:
-- * @s: the backend
-- * @sb: the TPMSizedBuffer to re-allocated to the size suitable for the
-- *      backend.
-- *
-- * This function returns the size of the allocated buffer
-- */
--size_t tpm_backend_realloc_buffer(TPMBackend *s, TPMSizedBuffer *sb);
--
--/**
-  * tpm_backend_deliver_request:
-  * @s: the backend to send the request to
-  *
---=20
++The QEMU TPM emulation implements a TPM TIS hardware interface following the
++Trusted Computing Group's specification "TCG PC Client Specific TPM Interface
++Specification (TIS)", Specification Version 1.3, 21 March 2013. This
++specification, or a later version of it, can be accessed from the following
++URL:
++
++https://trustedcomputinggroup.org/pc-client-work-group-pc-client-specific-tpm-interface-specification-tis/
++
++The TIS interface makes a memory mapped IO region in the area 0xfed40000 -
++0xfed44fff available to the guest operating system.
++
++
++QEMU files related to TPM TIS interface:
++ - hw/tpm/tpm_tis.c
++ - hw/tpm/tpm_tis.h
++
++
++= ACPI Interface =
++
++The TPM device is defined with ACPI ID "PNP0C31". QEMU builds a SSDT and passes
++it into the guest through the fw_cfg device. The device description contains
++the base address of the TIS interface 0xfed40000 and the size of the MMIO area
++(0x5000). In case a TPM2 is used by QEMU, a TPM2 ACPI table is also provided.
++The device is described to be used in polling mode rather than interrupt mode
++primarily because no unused IRQ could be found.
++
++To support measurement logs to be written by the firmware, e.g. SeaBIOS, a TCPA
++table is implemented. This table provides a 64kb buffer where the firmware can
++write its log into. For TPM 2 only a more recent version of the TPM2 table
++provides support for measurements logs and a TCPA table does not need to be
++created.
++
++The TCPA and TPM2 ACPI tables follow the Trusted Computing Group specification
++"TCG ACPI Specification" Family "1.2" and "2.0", Level 00 Revision 00.37. This
++specification, or a later version of it, can be accessed from the following
++URL:
++
++https://trustedcomputinggroup.org/tcg-acpi-specification/
++
++
++QEMU files related to TPM ACPI tables:
++ - hw/i386/acpi-build.c
++ - include/hw/acpi/tpm.h
++
++
++= TPM backend devices =
++
++The TPM implementation is split into two parts, frontend and backend. The
++frontend part is the hardware interface, such as the TPM TIS interface
++described earlier, and the other part is the TPM backend interface. The backend
++interfaces implement the interaction with a TPM device, which may be a physical
++or an emulated device. The split between the front- and backend devices allows
++a frontend to be connected with any available backend. This enables the TIS
++interface to be used with the passthrough backend or the (future) swtpm backend.
++
++
++QEMU files related to TPM backends:
++ - backends/tpm.c
++ - include/sysemu/tpm_backend.h
++ - include/sysemu/tpm_backend_int.h
++
++
++== The QEMU TPM passthrough device ==
++
++In case QEMU is run on Linux as the host operating system it is possible to
++make the hardware TPM device available to a single QEMU guest. In this case the
++user must make sure that no other program is using the device, e.g., /dev/tpm0,
++before trying to start QEMU with it.
++
++The passthrough driver uses the host's TPM device for sending TPM commands
++and receiving responses from. Besides that it accesses the TPM device's sysfs
++entry for support of command cancellation. Since none of the state of a
++hardware TPM can be migrated between hosts, virtual machine migration is
++disabled when the TPM passthrough driver is used.
++
++Since the host's TPM device will already be initialized by the host's firmware,
++certain commands, e.g. TPM_Startup(), sent by the virtual firmware for device
++initialization, will fail. In this case the firmware should not use the TPM.
++
++Sharing the device with the host is generally not a recommended usage scenario
++for a TPM device. The primary reason for this is that two operating systems can
++then access the device's single set of resources, such as platform configuration
++registers (PCRs). Applications or kernel security subsystems, such as the
++Linux Integrity Measurement Architecture (IMA), are not expecting to share PCRs.
++
++
++QEMU files related to the TPM passthrough device:
++ - hw/tpm/tpm_passthrough.c
++ - hw/tpm/tpm_util.c
++ - hw/tpm/tpm_util.h
++
++
++Command line to start QEMU with the TPM passthrough device using the host's
++hardware TPM /dev/tpm0:
++
++qemu-system-x86_64 -display sdl -enable-kvm \
++  -m 1024 -boot d -bios bios-256k.bin -boot menu=on \
++  -tpmdev passthrough,id=tpm0,path=/dev/tpm0 \
++  -device tpm-tis,tpmdev=tpm0 test.img
++
++The following commands should result in similar output inside the VM with a
++Linux kernel that either has the TPM TIS driver built-in or available as a
++module:
++
++#> dmesg | grep -i tpm
++[    0.711310] tpm_tis 00:06: 1.2 TPM (device=id 0x1, rev-id 1)
++
++#> dmesg | grep TCPA
++[    0.000000] ACPI: TCPA 0x0000000003FFD191C 000032 (v02 BOCHS  \
++    BXPCTCPA 0000001 BXPC 00000001)
++
++#> ls -l /dev/tpm*
++crw-------. 1 root root 10, 224 Jul 11 10:11 /dev/tpm0
++
++#> find /sys/devices/ | grep pcrs$ | xargs cat
++PCR-00: 35 4E 3B CE 23 9F 38 59 ...
++...
++PCR-23: 00 00 00 00 00 00 00 00 ...
+-- 
 2.5.5
