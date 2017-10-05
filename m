@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e08UY-0006P8-F5
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 11:55:19 -0400
+	(envelope-from <eblake@redhat.com>) id 1e08V7-0006gh-8M
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 11:55:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e08US-0002V1-Ht
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 11:55:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:9190)
+	(envelope-from <eblake@redhat.com>) id 1e08V3-0002vw-5v
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 11:55:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39146)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e08US-0002Te-A1
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 11:55:12 -0400
-Date: Thu, 5 Oct 2017 16:55:04 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171005155504.GK12106@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171005100106.30118-1-kraxel@redhat.com>
-	<CAFEAcA-9F++KngXrHGE=t7qZhdU2gCGKKSwHXYdLR6EhEfO4Qg@mail.gmail.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1e08V2-0002vb-SE
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 11:55:49 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C61705AFC7
+	for <qemu-devel@nongnu.org>; Thu,  5 Oct 2017 15:55:47 +0000 (UTC)
+References: <20171005155057.7664-1-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4e9f79ee-9966-6332-d429-19e88399f633@redhat.com>
+Date: Thu, 5 Oct 2017 10:55:36 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-9F++KngXrHGE=t7qZhdU2gCGKKSwHXYdLR6EhEfO4Qg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 0/6] Ui 20171005 patches
+In-Reply-To: <20171005155057.7664-1-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vnWBdMe55NmVB1eciKQxqSVPBprwejTvM"
+Subject: Re: [Qemu-devel] [PATCH v2] char: don't skip client cleanup if
+ 'connected' flag is unset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +34,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-On Thu, Oct 05, 2017 at 04:12:12PM +0100, Peter Maydell wrote:
-> On 5 October 2017 at 11:01, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> > The following changes since commit d147f7e815f97cb477e223586bcb80c316ae10ea:
-> >
-> >   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-10-03 16:27:24 +0100)
-> >
-> > are available in the git repository at:
-> >
-> >   git://git.kraxel.org/qemu tags/ui-20171005-pull-request
-> >
-> > for you to fetch changes up to 47247520ac44592cc7343138380bd6099f83262f:
-> >
-> >   ui: don't export qemu_input_event_new_key (2017-10-05 11:21:51 +0200)
-> >
-> > ----------------------------------------------------------------
-> > ui: use keycodemapdb for key code mappings, part one
-> >
-> > ----------------------------------------------------------------
-> 
-> Fails to build, all platforms:
-> 
-> make: Entering directory `/home/pm215/qemu/build/all'
-> config-host.mak is out-of-date, running configure
-> make: *** No rule to make target `ui/input-keymap-linux-to-qcode.c',
-> needed by `Makefile'. Stop.
-> make: *** Waiting for unfinished jobs....
-> Install prefix    /usr/local
-> BIOS directory    /usr/local/share/qemu
-> firmware path     /usr/local/share/qemu-firmware
-> binary directory  /usr/local/bin
-> library directory /usr/local/lib
-> module directory  /usr/local/lib/qemu
-> [etc]
-> replication support yes
-> VxHS block device no
-> make: Leaving directory `/home/pm215/qemu/build/all'
-> 
-> That make complains about the missing .c file before it has
-> finished running configure looks suspicious. I think there's
-> a race here with parallel make.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vnWBdMe55NmVB1eciKQxqSVPBprwejTvM
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Message-ID: <4e9f79ee-9966-6332-d429-19e88399f633@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] char: don't skip client cleanup if
+ 'connected' flag is unset
+References: <20171005155057.7664-1-berrange@redhat.com>
+In-Reply-To: <20171005155057.7664-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Am I right in thinking from this snippet, that you applied the patch
-series to an existing checkout with built files and then just did a
-'make', as opposed todoing a git clean + configure + make sequence.
+On 10/05/2017 10:50 AM, Daniel P. Berrange wrote:
+> The tcp_chr_free_connection & tcp_chr_disconnect methods both
+> skip all of their cleanup work unless the 's->connected' flag
+> is set.  This flag is set when the incoming client connection
+> is ready to use. Crucially this is *after* the TLS handshake
+> has been completed. So if the TLS handshake fails and we try
+> to cleanup the failed client, all the cleanup is skipped as
+> 's->connected' is still false.
+>=20
+> The only important thing that should be skipped in this case
+> is sending of the CHR_EVENT_CLOSED, because we never got as
+> far as sending the corresponding CHR_EVENT_OPENED. Every other
+> bit of cleanup can be robust against being called even when
+> s->connected is false.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>=20
+> Changed in v2:
+>=20
+>  - Remove conditional checks for NULL (Marc-Andr=C3=A9)
+>  - Don't use camelCase variable name (Marc-Andr=C3=A9)
 
-That would explain why this failed - the list of submodules is not
-populated in the pre-existing config-host.mak. So we wouldn't checkout
-the new submodules, and so the deps in the GENERATED_FILES list won't
-be satisfied.  I'll figure out how to make this correctly cope with
-gracefully upgrading from a dev's existing checkout...
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--vnWBdMe55NmVB1eciKQxqSVPBprwejTvM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnWVfgACgkQp6FrSiUn
+Q2qSNgf/bNnETs6/6KYThyfDUT+jpEgNSIfb5Pb83hgb9JIwNycF1L4u1tP4QzuP
+hQeMlA4s+A3LLzg2fQgfyhdpCTWwB5Tw0Q28du7tphUXrqGIyW/H+67aq9sIROem
+ACDxNB/V5Bmcvyfhi1pqc00jzSisznvQZf9CXe5ptv/oPTt50Q7LZhappJ3dFaRd
+qU3Eqs3PQYZ43L9/H69iIKSa3hGQsjEQCIlX6l9hp4OPPDamd27gKvkh8hXjiJV3
+tJKz7aiGn19yGCGG19Eq9CRjfGobuJJGL2fROyyjSWUxk9fge87YiCX2kjdusCyj
+EeNQxP2thcgVFLlU7T8AUHRMn7M34g==
+=mtKo
+-----END PGP SIGNATURE-----
+
+--vnWBdMe55NmVB1eciKQxqSVPBprwejTvM--
