@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06Yf-0007Bt-LJ
+	(envelope-from <imammedo@redhat.com>) id 1e06Yg-0007CK-5k
 	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06YZ-0008Ek-IF
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40208)
+	(envelope-from <imammedo@redhat.com>) id 1e06Ye-0008Jo-W0
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34444)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06YZ-0008Dd-9z
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:19 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06Ye-0008JF-No
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:24 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu,  5 Oct 2017 15:50:34 +0200
-Message-Id: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
+Date: Thu,  5 Oct 2017 15:50:40 +0200
+Message-Id: <1507211474-188400-7-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
+References: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 00/40] generalize parsing of cpu_model (part
- 2)
+Subject: [Qemu-devel] [PATCH v2 06/40] cris: cleanup cpu type name
+ composition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,172 +28,160 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, edgar.iglesias@gmail.com
 
+replace ambiguous TYPE macro with a new CRIS_CPU_TYPE_NAME
+and use it consistently in the code.
 
-Changelog:
- v2:
-    - replace "qom: add helper type_init_from_array()" with 3 new patches
-      * qom: update doc comment for type_register[_static]()             =
-             =20
-      * qom: introduce type_register_static_array()                      =
-             =20
-      * qom: add helper macro DEFINE_TYPES()
-    - s/type_init_from_array/DEFINE_TYPES/ across series in
-        "FOO: cleanup cpu type name composition" patches
-    - re-add lost DEFINE_CRIS_CPU_TYPE() in
-        "cris: cleanup cpu type name composition"
-    - improve commit message in
-        "sh4: shix: use generic cpu_model parsing"
-    - drop  NULL-initialization in
-        "sh4: simplify superh_cpu_class_by_name()"
-    - pick up Reviewed/Acked-bys from v1
-        I took a liberty to keep all of them because of
-        s/type_init_from_array/DEFINE_TYPES/ renaming in reviewed
-        "FOO: cleanup cpu type name composition" patches was trivial
-        and it passed tests locally so works as expected.
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+v2:
+  - rename type_init_from_array into DEFINE_TYPES
+  - add & use DEFINE_CRIS_CPU_TYPE (Philippe Mathieu-Daud=C3=A9 <f4bug@am=
+sat.org>)
 
-this series is continuation of effort to remove boards dependency on
-cpu_model parsing and generalizing default cpu type handling.
-For background story look at merged:=20
-
-  [PATCH v2 0/5] generalize parsing of cpu_model (x86/arm)
-  https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03564.html
-
-thisi series mostly consist of 3 types of patches:
- 1: unifying cpu type name composing by introdicing=20
-        FOO_CPU_TYPE_NAME() macro across targets
- 2: replacing simple static(and needlessly dynamic) cpu type registration=
-s
-    with common pattern where typinfo is put into array which
-    is used to batch register cpu types with new helper DEFINE_TYPES()
- 3: main patches that generalize cpu_model parsing for boards
-
-I'm releasing independent subset that takes care of all
-targets/boards except null-machine, ppc and *-user targets
-(as they are still work in progress and PPC part is big
-enough to deserve its own series)
-
-I've tried to test all converted boards but there were a lot
-so I've might have missed some.
-
-git tree for testing:
-  https://github.com/imammedo/qemu/branches cpu_init_removal_part2_v2
-
-For reference v1:
-  https://lists.nongnu.org/archive/html/qemu-devel/2017-10/msg00036.html
-
-PS:
- rebased on top of ehabkost/machine-next tree to avoid resolve conflicts =
-with
- queued "qom/cpu: move cpu_model null check to  cpu_class_by_name()"
-
-CC: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
-Igor Mammedov (40):
-  qom: update doc comment for type_register[_static]()
-  qom: introduce type_register_static_array()
-  qom: add helper macro DEFINE_TYPES()
-  alpha: cleanup cpu type name composition
-  alpha: use generic cpu_model parsing
-  cris: cleanup cpu type name composition
-  cris: use generic cpu_model parsing
-  lm32: cleanup cpu type name composition
-  lm32: milkymist: use generic cpu_model parsing
-  lm32: lm32_boards: use generic cpu_model parsing
-  m68k: cleanup cpu type name composition
-  m68k: an5206: use generic cpu_model parsing
-  m68k: mcf5208: use generic cpu_model parsing
-  moxie: fix qemu-system-moxie failing to start with CLI "-cpu
-    MoxieLite"
-  moxie: cleanup cpu type name composition
-  moxie: use generic cpu_model parsing
-  openrisc: cleanup cpu type name composition
-  openrisc: use generic cpu_model parsing
-  sh4: r2d: use generic cpu_model parsing
-  sh4: shix: use generic cpu_model parsing
-  sh4: cleanup cpu type name composition
-  sh4: simplify superh_cpu_class_by_name()
-  sh4: remove SuperHCPUClass::name field
-  xtensa: cleanup cpu type name composition
-  xtensa: sim: use generic cpu_model parsing
-  xtensa: lx60/lx200/ml605/kc705: use generic cpu_model parsing
-  unicore32: cleanup cpu type name composition
-  unicore32: use generic cpu_model parsing
-  tricore: cleanup cpu type name composition
-  tricore: use generic cpu_model parsing
-  sparc: cleanup cpu type name composition
-  sparc: sun4u/sun4v/niagara: use generic cpu_model parsing
-  sparc: sparc: use generic cpu_model parsing
-  sparc: leon3: use generic cpu_model parsing
-  mips: use object_new() instead of gnew()+object_initialize()
-  mips: malta/boston: replace cpu_model with cpu_type
-  mips: fulong2e: replace cpu_model with cpu_type
-  mips: Magnum/Acer Pica 61: replace cpu_model with cpu_type
-  mips: mipssim: replace cpu_model with cpu_type
-  mips: r4k: replace cpu_model with cpu_type
-
- include/hw/mips/cps.h          |   2 +-
- include/hw/sparc/sparc64.h     |   3 +-
- include/qom/object.h           |  50 ++++++++++++++++++-
- target/alpha/cpu.h             |   3 ++
- target/cris/cpu.h              |   3 ++
- target/lm32/cpu.h              |   3 ++
- target/m68k/cpu.h              |   3 ++
- target/mips/cpu.h              |   8 ++-
- target/moxie/cpu.h             |   3 ++
- target/openrisc/cpu.h          |   3 ++
- target/sh4/cpu-qom.h           |   8 ++-
- target/sh4/cpu.h               |   3 ++
- target/sparc/cpu.h             |   3 ++
- target/tricore/cpu.h           |   2 +
- target/unicore32/cpu.h         |   3 ++
- target/xtensa/cpu.h            |   4 ++
- hw/alpha/dp264.c               |   4 +-
- hw/cris/axis_dev88.c           |   7 +--
- hw/lm32/lm32_boards.c          |  14 ++----
- hw/lm32/milkymist.c            |   7 +--
- hw/m68k/an5206.c               |   7 +--
- hw/m68k/mcf5208.c              |   7 +--
- hw/mips/boston.c               |  14 +++---
- hw/mips/cps.c                  |   4 +-
- hw/mips/mips_fulong2e.c        |   7 +--
- hw/mips/mips_jazz.c            |   8 ++-
- hw/mips/mips_malta.c           |  36 ++++++--------
- hw/mips/mips_mipssim.c         |  15 +++---
- hw/mips/mips_r4k.c             |  16 +++---
- hw/moxie/moxiesim.c            |   7 +--
- hw/openrisc/openrisc_sim.c     |   8 +--
- hw/sh4/r2d.c                   |   8 +--
- hw/sh4/shix.c                  |   7 +--
- hw/sparc/leon3.c               |   8 +--
- hw/sparc/sun4m.c               |  29 +++++------
- hw/sparc64/niagara.c           |   4 +-
- hw/sparc64/sparc64.c           |   8 +--
- hw/sparc64/sun4u.c             |   8 ++-
- hw/tricore/tricore_testboard.c |   6 +--
- hw/unicore32/puv3.c            |   8 +--
- hw/xtensa/sim.c                |   8 +--
- hw/xtensa/xtfpga.c             |  11 ++---
- qom/object.c                   |   9 ++++
- target/alpha/cpu.c             | 107 +++++++++++++----------------------=
+CC: edgar.iglesias@gmail.com
+---
+ target/cris/cpu.h |  3 +++
+ target/cris/cpu.c | 81 +++++++++++++++++++------------------------------=
 ------
- target/cris/cpu.c              |  81 +++++++++++--------------------
- target/lm32/cpu.c              |  74 +++++++++-------------------
- target/m68k/cpu.c              |  75 +++++++++++------------------
- target/mips/cpu.c              |   2 +-
- target/mips/translate.c        |  20 +++-----
- target/mips/translate_init.c   |  12 -----
- target/moxie/cpu.c             |  61 +++++++++--------------
- target/openrisc/cpu.c          |  69 +++++++++-----------------
- target/sh4/cpu.c               | 107 +++++++++++++++--------------------=
-------
- target/sparc/cpu.c             |   2 +-
- target/tricore/cpu.c           |  68 ++++++++------------------
- target/unicore32/cpu.c         |  61 ++++++++---------------
- target/xtensa/cpu.c            |   2 +-
- target/xtensa/helper.c         |   2 +-
- 58 files changed, 442 insertions(+), 680 deletions(-)
+ 2 files changed, 30 insertions(+), 54 deletions(-)
 
+diff --git a/target/cris/cpu.h b/target/cris/cpu.h
+index 5d822de..b64fa35 100644
+--- a/target/cris/cpu.h
++++ b/target/cris/cpu.h
+@@ -269,6 +269,9 @@ enum {
+=20
+ #define cpu_init(cpu_model) cpu_generic_init(TYPE_CRIS_CPU, cpu_model)
+=20
++#define CRIS_CPU_TYPE_SUFFIX "-" TYPE_CRIS_CPU
++#define CRIS_CPU_TYPE_NAME(name) (name CRIS_CPU_TYPE_SUFFIX)
++
+ #define cpu_signal_handler cpu_cris_signal_handler
+=20
+ /* MMU modes definitions */
+diff --git a/target/cris/cpu.c b/target/cris/cpu.c
+index 88d93f2..adf1bc4 100644
+--- a/target/cris/cpu.c
++++ b/target/cris/cpu.c
+@@ -71,11 +71,11 @@ static ObjectClass *cris_cpu_class_by_name(const char=
+ *cpu_model)
+=20
+ #if defined(CONFIG_USER_ONLY)
+     if (strcasecmp(cpu_model, "any") =3D=3D 0) {
+-        return object_class_by_name("crisv32-" TYPE_CRIS_CPU);
++        return object_class_by_name(CRIS_CPU_TYPE_NAME("crisv32"));
+     }
+ #endif
+=20
+-    typename =3D g_strdup_printf("%s-" TYPE_CRIS_CPU, cpu_model);
++    typename =3D g_strdup_printf(CRIS_CPU_TYPE_NAME("%s"), cpu_model);
+     oc =3D object_class_by_name(typename);
+     g_free(typename);
+     if (oc !=3D NULL && (!object_class_dynamic_cast(oc, TYPE_CRIS_CPU) |=
+|
+@@ -108,7 +108,7 @@ static void cris_cpu_list_entry(gpointer data, gpoint=
+er user_data)
+     const char *typename =3D object_class_get_name(oc);
+     char *name;
+=20
+-    name =3D g_strndup(typename, strlen(typename) - strlen("-" TYPE_CRIS=
+_CPU));
++    name =3D g_strndup(typename, strlen(typename) - strlen(CRIS_CPU_TYPE=
+_SUFFIX));
+     (*s->cpu_fprintf)(s->file, "  %s\n", name);
+     g_free(name);
+ }
+@@ -259,38 +259,6 @@ static void crisv32_cpu_class_init(ObjectClass *oc, =
+void *data)
+     ccc->vr =3D 32;
+ }
+=20
+-#define TYPE(model) model "-" TYPE_CRIS_CPU
+-
+-static const TypeInfo cris_cpu_model_type_infos[] =3D {
+-    {
+-        .name =3D TYPE("crisv8"),
+-        .parent =3D TYPE_CRIS_CPU,
+-        .class_init =3D crisv8_cpu_class_init,
+-    }, {
+-        .name =3D TYPE("crisv9"),
+-        .parent =3D TYPE_CRIS_CPU,
+-        .class_init =3D crisv9_cpu_class_init,
+-    }, {
+-        .name =3D TYPE("crisv10"),
+-        .parent =3D TYPE_CRIS_CPU,
+-        .class_init =3D crisv10_cpu_class_init,
+-    }, {
+-        .name =3D TYPE("crisv11"),
+-        .parent =3D TYPE_CRIS_CPU,
+-        .class_init =3D crisv11_cpu_class_init,
+-    }, {
+-        .name =3D TYPE("crisv17"),
+-        .parent =3D TYPE_CRIS_CPU,
+-        .class_init =3D crisv17_cpu_class_init,
+-    }, {
+-        .name =3D TYPE("crisv32"),
+-        .parent =3D TYPE_CRIS_CPU,
+-        .class_init =3D crisv32_cpu_class_init,
+-    }
+-};
+-
+-#undef TYPE
+-
+ static void cris_cpu_class_init(ObjectClass *oc, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(oc);
+@@ -324,24 +292,29 @@ static void cris_cpu_class_init(ObjectClass *oc, vo=
+id *data)
+     cc->disas_set_info =3D cris_disas_set_info;
+ }
+=20
+-static const TypeInfo cris_cpu_type_info =3D {
+-    .name =3D TYPE_CRIS_CPU,
+-    .parent =3D TYPE_CPU,
+-    .instance_size =3D sizeof(CRISCPU),
+-    .instance_init =3D cris_cpu_initfn,
+-    .abstract =3D true,
+-    .class_size =3D sizeof(CRISCPUClass),
+-    .class_init =3D cris_cpu_class_init,
+-};
++#define DEFINE_CRIS_CPU_TYPE(cpu_model, initfn) \
++     {                                          \
++         .parent =3D TYPE_CRIS_CPU,               \
++         .class_init =3D initfn,                  \
++         .name =3D CRIS_CPU_TYPE_NAME(cpu_model), \
++     }
+=20
+-static void cris_cpu_register_types(void)
+-{
+-    int i;
+-
+-    type_register_static(&cris_cpu_type_info);
+-    for (i =3D 0; i < ARRAY_SIZE(cris_cpu_model_type_infos); i++) {
+-        type_register_static(&cris_cpu_model_type_infos[i]);
+-    }
+-}
++static const TypeInfo cris_cpu_model_type_infos[] =3D {
++    {
++        .name =3D TYPE_CRIS_CPU,
++        .parent =3D TYPE_CPU,
++        .instance_size =3D sizeof(CRISCPU),
++        .instance_init =3D cris_cpu_initfn,
++        .abstract =3D true,
++        .class_size =3D sizeof(CRISCPUClass),
++        .class_init =3D cris_cpu_class_init,
++    },
++    DEFINE_CRIS_CPU_TYPE("crisv8", crisv8_cpu_class_init),
++    DEFINE_CRIS_CPU_TYPE("crisv9", crisv9_cpu_class_init),
++    DEFINE_CRIS_CPU_TYPE("crisv10", crisv10_cpu_class_init),
++    DEFINE_CRIS_CPU_TYPE("crisv11", crisv11_cpu_class_init),
++    DEFINE_CRIS_CPU_TYPE("crisv17", crisv17_cpu_class_init),
++    DEFINE_CRIS_CPU_TYPE("crisv32", crisv32_cpu_class_init),
++};
+=20
+-type_init(cris_cpu_register_types)
++DEFINE_TYPES(cris_cpu_model_type_infos)
 --=20
 2.7.4
