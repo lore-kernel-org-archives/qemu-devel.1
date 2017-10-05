@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=4442ceff9=Ian.Jackson@citrix.com>)
-	id 1e041x-0000Vg-Id
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:09:30 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1e0460-0001tk-6k
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:13:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=4442ceff9=Ian.Jackson@citrix.com>)
-	id 1e041u-00029h-94
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:09:29 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:13998)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=4442ceff9=Ian.Jackson@citrix.com>)
-	id 1e041u-00029J-3D
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:09:26 -0400
-From: Ian Jackson <ian.jackson@eu.citrix.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Message-ID: <22998.4833.991131.797982@mariner.uk.xensource.com>
-Date: Thu, 5 Oct 2017 12:09:21 +0100
-In-Reply-To: <150714217015.153.939212709472417601@b58463cdfd5f>
-References: <1507132392-25051-1-git-send-email-ian.jackson@eu.citrix.com>
-	<150714217015.153.939212709472417601@b58463cdfd5f>
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] xen: xen-domid-restrict improvements
+	(envelope-from <a.perevalov@samsung.com>) id 1e045w-00064X-TM
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:13:40 -0400
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:42456)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1e045w-000622-J9
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 07:13:36 -0400
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Date: Thu, 05 Oct 2017 14:13:19 +0300
+Message-id: <1507202000-22469-3-git-send-email-a.perevalov@samsung.com>
+In-reply-to: <1507202000-22469-1-git-send-email-a.perevalov@samsung.com>
+References: <1507202000-22469-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20171005111332eucas1p164cbc61ee4cb82c4bf6d592a32bba46b@eucas1p1.samsung.com>
+Subject: [Qemu-devel] [PATCH v10 2/3] migration: introduce
+ qemu_ufd_copy_ioctl helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +27,85 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, anthony.perard@citrix.com, ross.lagerwall@citrix.com, sstabellini@kernel.org, jgross@suse.com, xen-devel@nongnu.org
+Cc: Alexey Perevalov <a.perevalov@samsung.com>, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com, i.maximets@samsung.com, heetae82.ahn@samsung.com
 
-no-reply@patchew.org writes ("Re: [Qemu-devel] [PATCH v2 0/7] xen: xen-domid-restrict improvements"):
+Just for placing auxilary operations inside helper,
+auxilary operations like: track received pages,
+notify about copying operation in futher patches.
 
-> ERROR: consider using qemu_strtoul in preference to strtoul
-> #42: FILE: os-posix.c:160:
-> +        lv = strtoul(optarg, &ep, 0); /* can't qemu_strtoul, want *ep=='.' */
-> 
-> total: 1 errors, 0 warnings, 80 lines checked
-> 
-> Your patch has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+---
+ migration/postcopy-ram.c | 34 +++++++++++++++++++++-------------
+ 1 file changed, 21 insertions(+), 13 deletions(-)
 
-As I said earlier, it is not clear to me what to do about this.
-
-checkpatch's suggestion to use qemu_strtoul is appropriate.  But,
-qemu_strtoul isn't quite a 100% replacement for all strtoul use cases,
-and this is one of the exceptions.
-
-I have added this comment and you'll see in the patch that surrounding
-that line there is attention paid to the error handling, overflows,
-etc.
-
-Maybe I should submit a patch to checkpatch that causes this
-suggestion to go away if qemu_strtoul is mentioned "nearby" (maybe on
-the same line or an adjacent line), so that the use of qemu_strtoul
-rather thanraw strtoul has indeed been "considered" as the message
-suggests ?
-
-Regards,
-Ian.
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index d3073b9..8bf6432 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -641,6 +641,25 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+     return 0;
+ }
+ 
++static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
++        void *from_addr, uint64_t pagesize)
++{
++    if (from_addr) {
++        struct uffdio_copy copy_struct;
++        copy_struct.dst = (uint64_t)(uintptr_t)host_addr;
++        copy_struct.src = (uint64_t)(uintptr_t)from_addr;
++        copy_struct.len = pagesize;
++        copy_struct.mode = 0;
++        return ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
++    } else {
++        struct uffdio_zeropage zero_struct;
++        zero_struct.range.start = (uint64_t)(uintptr_t)host_addr;
++        zero_struct.range.len = pagesize;
++        zero_struct.mode = 0;
++        return ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
++    }
++}
++
+ /*
+  * Place a host page (from) at (host) atomically
+  * returns 0 on success
+@@ -648,20 +667,14 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+                         RAMBlock *rb)
+ {
+-    struct uffdio_copy copy_struct;
+     size_t pagesize = qemu_ram_pagesize(rb);
+ 
+-    copy_struct.dst = (uint64_t)(uintptr_t)host;
+-    copy_struct.src = (uint64_t)(uintptr_t)from;
+-    copy_struct.len = pagesize;
+-    copy_struct.mode = 0;
+-
+     /* copy also acks to the kernel waking the stalled thread up
+      * TODO: We can inhibit that ack and only do it if it was requested
+      * which would be slightly cheaper, but we'd have to be careful
+      * of the order of updating our page state.
+      */
+-    if (ioctl(mis->userfault_fd, UFFDIO_COPY, &copy_struct)) {
++    if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize)) {
+         int e = errno;
+         error_report("%s: %s copy host: %p from: %p (size: %zd)",
+                      __func__, strerror(e), host, from, pagesize);
+@@ -683,12 +696,7 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+     trace_postcopy_place_page_zero(host);
+ 
+     if (qemu_ram_pagesize(rb) == getpagesize()) {
+-        struct uffdio_zeropage zero_struct;
+-        zero_struct.range.start = (uint64_t)(uintptr_t)host;
+-        zero_struct.range.len = getpagesize();
+-        zero_struct.mode = 0;
+-
+-        if (ioctl(mis->userfault_fd, UFFDIO_ZEROPAGE, &zero_struct)) {
++        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, getpagesize())) {
+             int e = errno;
+             error_report("%s: %s zero host: %p",
+                          __func__, strerror(e), host);
+-- 
+2.7.4
