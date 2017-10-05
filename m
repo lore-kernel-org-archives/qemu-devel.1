@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06Z7-0007ep-F9
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:54 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e06ZB-0007iV-16
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06Z5-0000Ek-VK
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53192)
+	(envelope-from <imammedo@redhat.com>) id 1e06Z5-0000D2-9D
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51686)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06Z5-0000Ck-P2
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06Z5-0000CS-0s
 	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:51:51 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu,  5 Oct 2017 15:51:02 +0200
-Message-Id: <1507211474-188400-29-git-send-email-imammedo@redhat.com>
+Date: Thu,  5 Oct 2017 15:51:01 +0200
+Message-Id: <1507211474-188400-28-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
 References: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 28/40] unicore32: use generic cpu_model
- parsing
+Subject: [Qemu-devel] [PATCH v2 27/40] unicore32: cleanup cpu type name
+ composition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +28,143 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Guan Xuetao <gxt@mprc.pku.edu.cn>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, gxt@mprc.pku.edu.cn
+
+use new UNICORE32_CPU_TYPE_NAME to compose CPU type
+name and get rid of intermediate
+   UniCore32CPUInfo/uc32_cpu_register_types()
+which is replaced by static TypeInfo array and
+type_init_from_array()
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
-CC: Guan Xuetao <gxt@mprc.pku.edu.cn>
----
- hw/unicore32/puv3.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+v2:  rename type_init_from_array into DEFINE_TYPES
 
-diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
-index 504ea46..1b39cc0 100644
---- a/hw/unicore32/puv3.c
-+++ b/hw/unicore32/puv3.c
-@@ -112,7 +112,6 @@ static void puv3_load_kernel(const char *kernel_filen=
-ame)
- static void puv3_init(MachineState *machine)
+CC: gxt@mprc.pku.edu.cn
+---
+ target/unicore32/cpu.h |  3 +++
+ target/unicore32/cpu.c | 61 +++++++++++++++++---------------------------=
+------
+ 2 files changed, 23 insertions(+), 41 deletions(-)
+
+diff --git a/target/unicore32/cpu.h b/target/unicore32/cpu.h
+index 7724108..3dc6fbc 100644
+--- a/target/unicore32/cpu.h
++++ b/target/unicore32/cpu.h
+@@ -167,6 +167,9 @@ static inline int cpu_mmu_index(CPUUniCore32State *en=
+v, bool ifetch)
+=20
+ #define cpu_init(cpu_model) cpu_generic_init(TYPE_UNICORE32_CPU, cpu_mod=
+el)
+=20
++#define UNICORE32_CPU_TYPE_SUFFIX "-" TYPE_UNICORE32_CPU
++#define UNICORE32_CPU_TYPE_NAME(model) model UNICORE32_CPU_TYPE_SUFFIX
++
+ static inline void cpu_get_tb_cpu_state(CPUUniCore32State *env, target_u=
+long *pc,
+                                         target_ulong *cs_base, uint32_t =
+*flags)
  {
-     ram_addr_t ram_size =3D machine->ram_size;
--    const char *cpu_model =3D machine->cpu_model;
-     const char *kernel_filename =3D machine->kernel_filename;
-     const char *initrd_filename =3D machine->initrd_filename;
-     CPUUniCore32State *env;
-@@ -123,11 +122,7 @@ static void puv3_init(MachineState *machine)
-         exit(1);
-     }
+diff --git a/target/unicore32/cpu.c b/target/unicore32/cpu.c
+index 138acc9..242ecca 100644
+--- a/target/unicore32/cpu.c
++++ b/target/unicore32/cpu.c
+@@ -44,7 +44,7 @@ static ObjectClass *uc32_cpu_class_by_name(const char *=
+cpu_model)
+     ObjectClass *oc;
+     char *typename;
 =20
--    if (!cpu_model) {
--        cpu_model =3D "UniCore-II";
--    }
--
--    cpu =3D UNICORE32_CPU(cpu_generic_init(TYPE_UNICORE32_CPU, cpu_model=
-));
-+    cpu =3D UNICORE32_CPU(cpu_create(machine->cpu_type));
-     env =3D &cpu->env;
-=20
-     puv3_soc_init(env);
-@@ -140,6 +135,7 @@ static void puv3_machine_init(MachineClass *mc)
-     mc->desc =3D "PKUnity Version-3 based on UniCore32";
-     mc->init =3D puv3_init;
-     mc->is_default =3D 1;
-+    mc->default_cpu_type =3D UNICORE32_CPU_TYPE_NAME("UniCore-II");
+-    typename =3D g_strdup_printf("%s-" TYPE_UNICORE32_CPU, cpu_model);
++    typename =3D g_strdup_printf(UNICORE32_CPU_TYPE_NAME("%s"), cpu_mode=
+l);
+     oc =3D object_class_by_name(typename);
+     g_free(typename);
+     if (oc !=3D NULL && (!object_class_dynamic_cast(oc, TYPE_UNICORE32_C=
+PU) ||
+@@ -54,11 +54,6 @@ static ObjectClass *uc32_cpu_class_by_name(const char =
+*cpu_model)
+     return oc;
  }
 =20
- DEFINE_MACHINE("puv3", puv3_machine_init)
+-typedef struct UniCore32CPUInfo {
+-    const char *name;
+-    void (*instance_init)(Object *obj);
+-} UniCore32CPUInfo;
+-
+ static void unicore_ii_cpu_initfn(Object *obj)
+ {
+     UniCore32CPU *cpu =3D UNICORE32_CPU(obj);
+@@ -90,11 +85,6 @@ static void uc32_any_cpu_initfn(Object *obj)
+     set_snan_bit_is_one(1, &env->ucf64.fp_status);
+ }
+=20
+-static const UniCore32CPUInfo uc32_cpus[] =3D {
+-    { .name =3D "UniCore-II", .instance_init =3D unicore_ii_cpu_initfn }=
+,
+-    { .name =3D "any",        .instance_init =3D uc32_any_cpu_initfn },
+-};
+-
+ static void uc32_cpu_realizefn(DeviceState *dev, Error **errp)
+ {
+     CPUState *cs =3D CPU(dev);
+@@ -165,36 +155,25 @@ static void uc32_cpu_class_init(ObjectClass *oc, vo=
+id *data)
+     dc->vmsd =3D &vmstate_uc32_cpu;
+ }
+=20
+-static void uc32_register_cpu_type(const UniCore32CPUInfo *info)
+-{
+-    TypeInfo type_info =3D {
+-        .parent =3D TYPE_UNICORE32_CPU,
+-        .instance_init =3D info->instance_init,
+-    };
+-
+-    type_info.name =3D g_strdup_printf("%s-" TYPE_UNICORE32_CPU, info->n=
+ame);
+-    type_register(&type_info);
+-    g_free((void *)type_info.name);
+-}
++#define DEFINE_UNICORE32_CPU_TYPE(cpu_model, initfn) \
++    {                                                \
++        .parent =3D TYPE_UNICORE32_CPU,                \
++        .instance_init =3D initfn,                     \
++        .name =3D UNICORE32_CPU_TYPE_NAME(cpu_model),  \
++    }
+=20
+-static const TypeInfo uc32_cpu_type_info =3D {
+-    .name =3D TYPE_UNICORE32_CPU,
+-    .parent =3D TYPE_CPU,
+-    .instance_size =3D sizeof(UniCore32CPU),
+-    .instance_init =3D uc32_cpu_initfn,
+-    .abstract =3D true,
+-    .class_size =3D sizeof(UniCore32CPUClass),
+-    .class_init =3D uc32_cpu_class_init,
++static const TypeInfo uc32_cpu_type_infos[] =3D {
++    {
++        .name =3D TYPE_UNICORE32_CPU,
++        .parent =3D TYPE_CPU,
++        .instance_size =3D sizeof(UniCore32CPU),
++        .instance_init =3D uc32_cpu_initfn,
++        .abstract =3D true,
++        .class_size =3D sizeof(UniCore32CPUClass),
++        .class_init =3D uc32_cpu_class_init,
++    },
++    DEFINE_UNICORE32_CPU_TYPE("UniCore-II", unicore_ii_cpu_initfn),
++    DEFINE_UNICORE32_CPU_TYPE("any", uc32_any_cpu_initfn),
+ };
+=20
+-static void uc32_cpu_register_types(void)
+-{
+-    int i;
+-
+-    type_register_static(&uc32_cpu_type_info);
+-    for (i =3D 0; i < ARRAY_SIZE(uc32_cpus); i++) {
+-        uc32_register_cpu_type(&uc32_cpus[i]);
+-    }
+-}
+-
+-type_init(uc32_cpu_register_types)
++DEFINE_TYPES(uc32_cpu_type_infos)
 --=20
 2.7.4
