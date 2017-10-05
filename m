@@ -1,30 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e0BZj-0006Zh-Sg
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:12:52 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e0Bj9-0001WO-QB
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:23:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e0BZg-0003SN-Jd
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:12:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47920)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1e0BZg-0003Qm-9o
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:12:48 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 707A7128B
-	for <qemu-devel@nongnu.org>; Thu,  5 Oct 2017 19:12:47 +0000 (UTC)
-References: <20171005190725.18712-1-dgilbert@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <68e4ca68-75de-6e02-01e0-5e52e8a79742@redhat.com>
-Date: Thu, 5 Oct 2017 14:12:45 -0500
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e0BiQ-0007P2-BN
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:22:35 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48394)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1e0BiQ-0007O0-0m
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:21:50 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v95JLjax092563
+	for <qemu-devel@nongnu.org>; Thu, 5 Oct 2017 15:21:45 -0400
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ddsapvun1-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 15:21:45 -0400
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Thu, 5 Oct 2017 15:21:41 -0400
+References: <1507222112-20315-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<1507222112-20315-11-git-send-email-stefanb@linux.vnet.ibm.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Thu, 5 Oct 2017 15:21:37 -0400
 MIME-Version: 1.0
-In-Reply-To: <20171005190725.18712-1-dgilbert@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="mDPB5oxXHLPP3lTWTc9sj47E5LaK8p8lK"
-Subject: Re: [Qemu-devel] [PATCH] qemu_opt_print: Remove shadowing opt decl
+In-Reply-To: <1507222112-20315-11-git-send-email-stefanb@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <0375382f-9713-c292-9ff2-32a76e0ed789@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PULL v1 10/10] specs: Describe the TPM support in
+ QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,73 +42,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, amarnath.valluri@intel.com, marcandre.lureau@gmail.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mDPB5oxXHLPP3lTWTc9sj47E5LaK8p8lK
-From: Eric Blake <eblake@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
- qemu-devel@nongnu.org, armbru@redhat.com
-Message-ID: <68e4ca68-75de-6e02-01e0-5e52e8a79742@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu_opt_print: Remove shadowing opt decl
-References: <20171005190725.18712-1-dgilbert@redhat.com>
-In-Reply-To: <20171005190725.18712-1-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 10/05/2017 12:48 PM, Stefan Berger wrote:
+> This patch adds a description of the current TPM support in QEMU
+> to the specs.
+>
+> Several public specs are referenced via their landing page on the
+> trustedcomputinggroup.org website.
+>
+> Signed-off-by: Stefan Berger <address@hidden>
+> Reviewed-by: Laszlo Ersek <address@hidden>
 
-On 10/05/2017 02:07 PM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> opt was declared as a separate local inside the last loop,
-> shadowing the local at the top of the function.
->=20
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  util/qemu-option.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+This is obviously a mess-up. I'll fixed that on my github account, which 
+now puts the last change at 3bfc6666c21bf9e437734bb3e90db7e5b5f6b8bf.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
->=20
-> diff --git a/util/qemu-option.c b/util/qemu-option.c
-> index 9b1dc8093b..877c5b4d67 100644
-> --- a/util/qemu-option.c
-> +++ b/util/qemu-option.c
-> @@ -766,7 +766,7 @@ void qemu_opts_print(QemuOpts *opts, const char *se=
-parator)
->      }
->      for (; desc && desc->name; desc++) {
->          const char *value;
-> -        QemuOpt *opt =3D qemu_opt_find(opts, desc->name);
-> +        opt =3D qemu_opt_find(opts, desc->name);
-> =20
->          value =3D opt ? opt->str : desc->def_value_str;
->          if (!value) {
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---mDPB5oxXHLPP3lTWTc9sj47E5LaK8p8lK
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnWhC4ACgkQp6FrSiUn
-Q2qG2gf+MSTjApUXcXFgrTojbb1ZsImvA8rbJueduSjjqlU5HKmy2p7yGJKFpKVm
-xr7OAG6DIzv0kX/xfRHIeJZmBtM8oGex1dbewnhmXW+ApHXY45W76UJ38G+byXZe
-400RWZNmXY5hgetn+yuRsNmwWJqcuCunMGfmdrs6VcfFF3XyYcW+lfzV23TFMc3F
-WV/ax2jsiClAdUFI3+UCjitr3ftYS1pZ2g2GaSOWv2TQSmxHfIsj2M7YFrN6PkUh
-TCAsv5i3hz3UCQpzpUec0OL9D+Nv+roM+u8BdIn3xjl/AIOp67M8a7m6bYfq6XbU
-kumvYN2AnvW3xYgkeGASoGvXI5UN8w==
-=gPVf
------END PGP SIGNATURE-----
-
---mDPB5oxXHLPP3lTWTc9sj47E5LaK8p8lK--
+    Stefan
