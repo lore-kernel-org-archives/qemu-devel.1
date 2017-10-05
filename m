@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e0BQL-0007gr-BN
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:03:10 -0400
+	(envelope-from <eblake@redhat.com>) id 1e0BQK-0007gL-IH
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:03:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e0BQK-0002CV-DI
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:03:09 -0400
+	(envelope-from <eblake@redhat.com>) id 1e0BQJ-0002C1-HU
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 15:03:08 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu,  5 Oct 2017 14:02:42 -0500
-Message-Id: <20171005190248.5537-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/6] block: Avoid copy-on-read assertions
+Date: Thu,  5 Oct 2017 14:02:43 -0500
+Message-Id: <20171005190248.5537-2-eblake@redhat.com>
+In-Reply-To: <20171005190248.5537-1-eblake@redhat.com>
+References: <20171005190248.5537-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/6] qemu-io: Add -C for opening with
+ copy-on-read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,52 +21,94 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-During my quest to switch block status to be byte-based, John
-forced me to evaluate whether we have a situation during
-copy-on-read where we could exceed BDRV_REQUEST_MAX_BYTES [1].
-Sure enough, we have a number of pre-existing bugs in the
-copy-on-read code.  Fix those, along with adding a test.
+Make it easier to enable copy-on-read during iotests, by
+exposing a new bool option to main and open.
 
-Available as a tag at:
-git fetch git://repo.or.cz/qemu/ericb.git nbd-copy-on-read-v3
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ qemu-io.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-Since v2 (available at [2]):
-- add a new patch to fix an iotests wart
-- tweak patch 5 (now 6) to skip rather than fail on limited memory [patchew]
-- tweak patch 2 condition for legibility [Stefan]
-- add R-b
+diff --git a/qemu-io.c b/qemu-io.c
+index 265445ad89..c70bde3eb1 100644
+--- a/qemu-io.c
++++ b/qemu-io.c
+@@ -102,6 +102,7 @@ static void open_help(void)
+ " Opens a file for subsequent use by all of the other qemu-io commands.\n"
+ " -r, -- open file read-only\n"
+ " -s, -- use snapshot file\n"
++" -C, -- use copy-on-read\n"
+ " -n, -- disable host cache, short for -t none\n"
+ " -U, -- force shared permissions\n"
+ " -k, -- use kernel AIO implementation (on Linux only)\n"
+@@ -120,7 +121,7 @@ static const cmdinfo_t open_cmd = {
+     .argmin     = 1,
+     .argmax     = -1,
+     .flags      = CMD_NOFILE_OK,
+-    .args       = "[-rsnkU] [-t cache] [-d discard] [-o options] [path]",
++    .args       = "[-rsCnkU] [-t cache] [-d discard] [-o options] [path]",
+     .oneline    = "open the file specified by path",
+     .help       = open_help,
+ };
+@@ -145,7 +146,7 @@ static int open_f(BlockBackend *blk, int argc, char **argv)
+     QDict *opts;
+     bool force_share = false;
 
-[1] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg07286.html
-[2] https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg00524.html
-
-001/6:[----] [--] 'qemu-io: Add -C for opening with copy-on-read'
-002/6:[0008] [FC] 'block: Uniform handling of 0-length bdrv_get_block_status()'
-003/6:[down] 'iotests: Restore stty settings on completion'
-004/6:[----] [--] 'block: Add blkdebug hook for copy-on-read'
-005/6:[----] [--] 'block: Perform copy-on-read in loop'
-006/6:[0013] [FC] 'iotests: Add test 197 for covering copy-on-read'
-
-Eric Blake (6):
-  qemu-io: Add -C for opening with copy-on-read
-  block: Uniform handling of 0-length bdrv_get_block_status()
-  iotests: Restore stty settings on completion
-  block: Add blkdebug hook for copy-on-read
-  block: Perform copy-on-read in loop
-  iotests: Add test 197 for covering copy-on-read
-
- qapi/block-core.json             |   5 +-
- block/io.c                       | 123 +++++++++++++++++++++++++++------------
- qemu-io.c                        |  15 ++++-
- tests/qemu-iotests/common.filter |   1 +
- tests/qemu-iotests/197           | 109 ++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/197.out       |  26 +++++++++
- tests/qemu-iotests/check         |  10 ++++
- tests/qemu-iotests/group         |   1 +
- 8 files changed, 249 insertions(+), 41 deletions(-)
- create mode 100755 tests/qemu-iotests/197
- create mode 100644 tests/qemu-iotests/197.out
-
+-    while ((c = getopt(argc, argv, "snro:kt:d:U")) != -1) {
++    while ((c = getopt(argc, argv, "snCro:kt:d:U")) != -1) {
+         switch (c) {
+         case 's':
+             flags |= BDRV_O_SNAPSHOT;
+@@ -154,6 +155,9 @@ static int open_f(BlockBackend *blk, int argc, char **argv)
+             flags |= BDRV_O_NOCACHE;
+             writethrough = false;
+             break;
++        case 'C':
++            flags |= BDRV_O_COPY_ON_READ;
++            break;
+         case 'r':
+             readonly = 1;
+             break;
+@@ -251,6 +255,7 @@ static void usage(const char *name)
+ "  -r, --read-only      export read-only\n"
+ "  -s, --snapshot       use snapshot file\n"
+ "  -n, --nocache        disable host cache, short for -t none\n"
++"  -C, --copy-on-read   enable copy-on-read\n"
+ "  -m, --misalign       misalign allocations for O_DIRECT\n"
+ "  -k, --native-aio     use kernel AIO implementation (on Linux only)\n"
+ "  -t, --cache=MODE     use the given cache mode for the image\n"
+@@ -439,7 +444,7 @@ static QemuOptsList file_opts = {
+ int main(int argc, char **argv)
+ {
+     int readonly = 0;
+-    const char *sopt = "hVc:d:f:rsnmkt:T:U";
++    const char *sopt = "hVc:d:f:rsnCmkt:T:U";
+     const struct option lopt[] = {
+         { "help", no_argument, NULL, 'h' },
+         { "version", no_argument, NULL, 'V' },
+@@ -448,6 +453,7 @@ int main(int argc, char **argv)
+         { "read-only", no_argument, NULL, 'r' },
+         { "snapshot", no_argument, NULL, 's' },
+         { "nocache", no_argument, NULL, 'n' },
++        { "copy-on-read", no_argument, NULL, 'C' },
+         { "misalign", no_argument, NULL, 'm' },
+         { "native-aio", no_argument, NULL, 'k' },
+         { "discard", required_argument, NULL, 'd' },
+@@ -492,6 +498,9 @@ int main(int argc, char **argv)
+             flags |= BDRV_O_NOCACHE;
+             writethrough = false;
+             break;
++        case 'C':
++            flags |= BDRV_O_COPY_ON_READ;
++            break;
+         case 'd':
+             if (bdrv_parse_discard_flags(optarg, &flags) < 0) {
+                 error_report("Invalid discard option: %s", optarg);
 -- 
 2.13.6
