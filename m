@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e08xi-0003G8-DH
+	(envelope-from <imammedo@redhat.com>) id 1e08xj-0003HV-Jk
 	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e08xf-0003eN-4T
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:26 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e08xi-0003ht-BX
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:25:27 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu,  5 Oct 2017 18:24:44 +0200
-Message-Id: <1507220690-265042-18-git-send-email-imammedo@redhat.com>
+Date: Thu,  5 Oct 2017 18:24:46 +0200
+Message-Id: <1507220690-265042-20-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
 References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 17/23] ppc: spapr: use generic cpu_model parsing
+Subject: [Qemu-devel] [PATCH 19/23] ppc: pnv: normalize core/chip type names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,274 +22,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
 
-use generic cpu_model parsing introduced by
- (6063d4c0f vl.c: convert cpu_model to cpu type and set of global properties before machine_init())
+typically for cpus/core type names following convention is used
 
-it allows to:
-  * replace sPAPRMachineClass::tcg_default_cpu with
-    MachineClass::default_cpu_type
-  * drop cpu_parse_cpu_model() from hw/ppc/spapr.c and reuse
-    one in vl.c
-  * simplify spapr_get_cpu_core_type() by removing
-    not needed anymore recurrsion since alias look up
-    happens earlier at vl.c and spapr_get_cpu_core_type()
-    works only with resulted from that cpu type.
-  * spapr no more needs to parse/depend on being phased out
-    MachineState::cpu_model, all tha parsing done by generic
-    code and target specific callback.
+   new_type_prefix-superclass_typename
+
+make PNV core/chip to follow common convention.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-PS:
-  patch is a little bit big but it's hard to split it due
-  to dependencies, so pls bear with it.
----
- include/hw/ppc/spapr.h          |  1 -
- include/hw/ppc/spapr_cpu_core.h |  2 +-
- target/ppc/cpu.h                |  1 -
- hw/ppc/spapr.c                  | 16 ++++------------
- hw/ppc/spapr_cpu_core.c         | 30 ++++++++++--------------------
- target/ppc/kvm.c                |  9 ++++++---
- target/ppc/translate_init.c     | 26 +++++++++++++-------------
- 7 files changed, 34 insertions(+), 51 deletions(-)
+ include/hw/ppc/pnv.h      | 11 +++++++----
+ include/hw/ppc/pnv_core.h |  2 ++
+ hw/ppc/pnv.c              |  2 +-
+ hw/ppc/pnv_core.c         |  2 +-
+ 4 files changed, 11 insertions(+), 6 deletions(-)
 
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 8ca4f94..9d21ca9 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -60,7 +60,6 @@ struct sPAPRMachineClass {
-     /*< public >*/
-     bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMBs */
-     bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
--    const char *tcg_default_cpu; /* which (TCG) CPU to simulate by default */
-     bool pre_2_10_has_unused_icps;
-     void (*phb_placement)(sPAPRMachineState *spapr, uint32_t index,
-                           uint64_t *buid, hwaddr *pio, 
-diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
-index 42765de..f2d48d6 100644
---- a/include/hw/ppc/spapr_cpu_core.h
-+++ b/include/hw/ppc/spapr_cpu_core.h
-@@ -37,5 +37,5 @@ typedef struct sPAPRCPUCoreClass {
-     const char *cpu_type;
- } sPAPRCPUCoreClass;
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 2525f7f..d82eee1 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -80,19 +80,22 @@ typedef struct PnvChipClass {
+     uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
+ } PnvChipClass;
  
--char *spapr_get_cpu_core_type(const char *model);
-+const char *spapr_get_cpu_core_type(const char *cpu_type);
- #endif
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 64aef17..989761b 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1278,7 +1278,6 @@ extern const struct VMStateDescription vmstate_ppc_cpu;
- 
- /*****************************************************************************/
- void ppc_translate_init(void);
--const char *ppc_cpu_lookup_alias(const char *alias);
- /* you can call this signal handler from your SIGBUS and SIGSEGV
-    signal handlers to inform the virtual CPU of exceptions. non zero
-    is returned if the signal was handled by the virtual CPU.  */
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 0661dba..29de845 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2123,7 +2123,7 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
- {
-     MachineState *machine = MACHINE(spapr);
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
--    char *type = spapr_get_cpu_core_type(machine->cpu_model);
-+    const char *type = spapr_get_cpu_core_type(machine->cpu_type);
-     int smt = kvmppc_smt_threads();
-     const CPUArchIdList *possible_cpus;
-     int boot_cores_nr = smp_cpus / smp_threads;
-@@ -2178,7 +2178,6 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
-             object_property_set_bool(core, true, "realized", &error_fatal);
-         }
-     }
--    g_free(type);
- }
- 
- static void spapr_set_vsmt_mode(sPAPRMachineState *spapr, Error **errp)
-@@ -2362,12 +2361,6 @@ static void ppc_spapr_init(MachineState *machine)
-     }
- 
-     /* init CPUs */
--    if (machine->cpu_model == NULL) {
--        machine->cpu_model = kvm_enabled() ? "host" : smc->tcg_default_cpu;
--    }
--
--    cpu_parse_cpu_model(TYPE_POWERPC_CPU, machine->cpu_model);
--
-     spapr_set_vsmt_mode(spapr, &error_fatal);
- 
-     spapr_init_cpus(spapr);
-@@ -3258,7 +3251,7 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     MachineClass *mc = MACHINE_GET_CLASS(hotplug_dev);
-     Error *local_err = NULL;
-     CPUCore *cc = CPU_CORE(dev);
--    char *base_core_type = spapr_get_cpu_core_type(machine->cpu_model);
-+    const char *base_core_type = spapr_get_cpu_core_type(machine->cpu_type);
-     const char *type = object_get_typename(OBJECT(dev));
-     CPUArchId *core_slot;
-     int index;
-@@ -3304,7 +3297,6 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     numa_cpu_pre_plug(core_slot, dev, &local_err);
- 
- out:
--    g_free(base_core_type);
-     error_propagate(errp, local_err);
- }
- 
-@@ -3603,7 +3595,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     hc->unplug_request = spapr_machine_device_unplug_request;
- 
-     smc->dr_lmb_enabled = true;
--    smc->tcg_default_cpu = "power8_v2.0";
-+    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power8_v2.0");
-     mc->has_hotpluggable_cpus = true;
-     smc->resize_hpt_default = SPAPR_RESIZE_HPT_ENABLED;
-     fwc->get_dev_path = spapr_get_fw_dev_path;
-@@ -3849,7 +3841,7 @@ static void spapr_machine_2_7_class_options(MachineClass *mc)
-     sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
- 
-     spapr_machine_2_8_class_options(mc);
--    smc->tcg_default_cpu = "power7_v2.3";
-+    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power7_v2.3");
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_7);
-     smc->phb_placement = phb_placement_2_7;
- }
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index f2da4be..2c47850 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -61,29 +61,19 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu,
-  * Return the sPAPR CPU core type for @model which essentially is the CPU
-  * model specified with -cpu cmdline option.
-  */
--char *spapr_get_cpu_core_type(const char *model)
-+const char *spapr_get_cpu_core_type(const char *cpu_type)
- {
--    char *core_type;
--    gchar **model_pieces = g_strsplit(model, ",", 2);
--    gchar *cpu_model = g_ascii_strdown(model_pieces[0], -1);
--    g_strfreev(model_pieces);
--
--    core_type = g_strdup_printf("%s-" TYPE_SPAPR_CPU_CORE, cpu_model);
--
--    /* Check whether it exists or whether we have to look up an alias name */
--    if (!object_class_by_name(core_type)) {
--        const char *realmodel;
--
--        g_free(core_type);
--        core_type = NULL;
--        realmodel = ppc_cpu_lookup_alias(cpu_model);
--        if (realmodel) {
--            core_type = spapr_get_cpu_core_type(realmodel);
--        }
-+    int len = strlen(cpu_type) - strlen(POWERPC_CPU_TYPE_SUFFIX);
-+    char *core_type = g_strdup_printf(SPAPR_CPU_CORE_TYPE_NAME("%.*s"),
-+                                      len, cpu_type);
-+    ObjectClass *oc = object_class_by_name(core_type);
+-#define TYPE_PNV_CHIP_POWER8E TYPE_PNV_CHIP "-power8e_v2.1"
++#define PNV_CHIP_TYPE_SUFFIX "-" TYPE_PNV_CHIP
++#define PNV_CHIP_TYPE_NAME(cpu_model) cpu_model PNV_CHIP_TYPE_SUFFIX
 +
-+    g_free(core_type);
-+    if (!oc) {
-+        return NULL;
-     }
--    g_free(cpu_model);
++#define TYPE_PNV_CHIP_POWER8E PNV_CHIP_TYPE_NAME("power8e_v2.1")
+ #define PNV_CHIP_POWER8E(obj) \
+     OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER8E)
  
--    return core_type;
-+    return object_class_get_name(oc);
- }
+-#define TYPE_PNV_CHIP_POWER8 TYPE_PNV_CHIP "-power8_v2.0"
++#define TYPE_PNV_CHIP_POWER8 PNV_CHIP_TYPE_NAME("power8_v2.0")
+ #define PNV_CHIP_POWER8(obj) \
+     OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER8)
  
- static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index cb5777a..abc222e 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -123,7 +123,7 @@ static bool kvmppc_is_pr(KVMState *ks)
-     return kvm_vm_check_extension(ks, KVM_CAP_PPC_GET_PVINFO) != 0;
- }
+-#define TYPE_PNV_CHIP_POWER8NVL TYPE_PNV_CHIP "-power8nvl_v1.0"
++#define TYPE_PNV_CHIP_POWER8NVL PNV_CHIP_TYPE_NAME("power8nvl_v1.0")
+ #define PNV_CHIP_POWER8NVL(obj) \
+     OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER8NVL)
  
--static int kvm_ppc_register_host_cpu_type(void);
-+static int kvm_ppc_register_host_cpu_type(MachineState *ms);
+-#define TYPE_PNV_CHIP_POWER9 TYPE_PNV_CHIP "-power9_v1.0"
++#define TYPE_PNV_CHIP_POWER9 PNV_CHIP_TYPE_NAME("power9_v1.0")
+ #define PNV_CHIP_POWER9(obj) \
+     OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER9)
  
- int kvm_arch_init(MachineState *ms, KVMState *s)
+diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
+index 2955a41..3360c4b 100644
+--- a/include/hw/ppc/pnv_core.h
++++ b/include/hw/ppc/pnv_core.h
+@@ -45,6 +45,8 @@ typedef struct PnvCoreClass {
+     ObjectClass *cpu_oc;
+ } PnvCoreClass;
+ 
++#define PNV_CORE_TYPE_SUFFIX "-" TYPE_PNV_CORE
++#define PNV_CORE_TYPE_NAME(cpu_model) cpu_model PNV_CORE_TYPE_SUFFIX
+ extern char *pnv_core_typename(const char *model);
+ 
+ #endif /* _PPC_PNV_CORE_H */
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 4169837..9c5eb7c 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -609,7 +609,7 @@ static void ppc_powernv_init(MachineState *machine)
+ 
+     /* Create the processor chips */
+     i = strlen(machine->cpu_type) - strlen(POWERPC_CPU_TYPE_SUFFIX);
+-    chip_typename = g_strdup_printf(TYPE_PNV_CHIP "-%.*s",
++    chip_typename = g_strdup_printf(PNV_CHIP_TYPE_NAME("%.*s"),
+                                     i, machine->cpu_type);
+     if (!object_class_by_name(chip_typename)) {
+         error_report("invalid CPU model '%.*s' for %s machine",
+diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+index 44b0b24..b3e3f23 100644
+--- a/hw/ppc/pnv_core.c
++++ b/hw/ppc/pnv_core.c
+@@ -252,5 +252,5 @@ type_init(pnv_core_register_types)
+ 
+ char *pnv_core_typename(const char *model)
  {
-@@ -163,7 +163,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-                         "VM to stall at times!\n");
-     }
- 
--    kvm_ppc_register_host_cpu_type();
-+    kvm_ppc_register_host_cpu_type(ms);
- 
-     return 0;
+-    return g_strdup_printf(TYPE_PNV_CORE "-%s", model);
++    return g_strdup_printf(PNV_CORE_TYPE_NAME("%s"), model);
  }
-@@ -2487,12 +2487,13 @@ PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
-     return pvr_pcc;
- }
- 
--static int kvm_ppc_register_host_cpu_type(void)
-+static int kvm_ppc_register_host_cpu_type(MachineState *ms)
- {
-     TypeInfo type_info = {
-         .name = TYPE_HOST_POWERPC_CPU,
-         .class_init = kvmppc_host_cpu_class_init,
-     };
-+    MachineClass *mc = MACHINE_GET_CLASS(ms);
-     PowerPCCPUClass *pvr_pcc;
-     ObjectClass *oc;
-     DeviceClass *dc;
-@@ -2504,6 +2505,8 @@ static int kvm_ppc_register_host_cpu_type(void)
-     }
-     type_info.parent = object_class_get_name(OBJECT_CLASS(pvr_pcc));
-     type_register(&type_info);
-+    /* override TCG default cpu type with 'host' cpu model */
-+    mc->default_cpu_type = TYPE_HOST_POWERPC_CPU;
- 
-     oc = object_class_by_name(type_info.name);
-     g_assert(oc);
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 5ee91e8..a968e86 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -10277,6 +10277,19 @@ PowerPCCPUClass *ppc_cpu_class_by_pvr_mask(uint32_t pvr)
-     return pcc;
- }
- 
-+static const char *ppc_cpu_lookup_alias(const char *alias)
-+{
-+    int ai;
-+
-+    for (ai = 0; ppc_cpu_aliases[ai].alias != NULL; ai++) {
-+        if (strcmp(ppc_cpu_aliases[ai].alias, alias) == 0) {
-+            return ppc_cpu_aliases[ai].model;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
- static ObjectClass *ppc_cpu_class_by_name(const char *name)
- {
-     char *cpu_model, *typename;
-@@ -10370,19 +10383,6 @@ static void ppc_cpu_parse_featurestr(const char *typename, char *features,
-     pcc->parent_parse_features(typename, features, errp);
- }
- 
--const char *ppc_cpu_lookup_alias(const char *alias)
--{
--    int ai;
--
--    for (ai = 0; ppc_cpu_aliases[ai].alias != NULL; ai++) {
--        if (strcmp(ppc_cpu_aliases[ai].alias, alias) == 0) {
--            return ppc_cpu_aliases[ai].model;
--        }
--    }
--
--    return NULL;
--}
--
- PowerPCCPUClass *ppc_cpu_get_family_class(PowerPCCPUClass *pcc)
- {
-     ObjectClass *oc = OBJECT_CLASS(pcc);
 -- 
 2.7.4
