@@ -1,34 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e09JG-0005Yd-6M
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:47:44 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e09KM-0006dT-U0
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:48:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e09JB-0000eV-2Y
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:47:42 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39100
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e09KI-0001lm-0s
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:48:50 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49760
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e09JA-0000dg-QZ
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:47:36 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	id 1e09KH-0001lN-Rw
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 12:48:45 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v95GivYu040670
-	for <qemu-devel@nongnu.org>; Thu, 5 Oct 2017 12:47:33 -0400
+	v95Gim1K119865
+	for <qemu-devel@nongnu.org>; Thu, 5 Oct 2017 12:48:41 -0400
 Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ddqw6jabd-1
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ddr6w19m5-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 12:47:33 -0400
+	for <qemu-devel@nongnu.org>; Thu, 05 Oct 2017 12:48:41 -0400
 Received: from localhost
 	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Thu, 5 Oct 2017 12:47:32 -0400
+	Thu, 5 Oct 2017 12:48:40 -0400
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Thu,  5 Oct 2017 12:47:27 -0400
-Message-Id: <1507222047-20115-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH] specs: Extend TPM spec with TPM emulator
- description
+Date: Thu,  5 Oct 2017 12:48:23 -0400
+In-Reply-To: <1507222112-20315-1-git-send-email-stefanb@linux.vnet.ibm.com>
+References: <1507222112-20315-1-git-send-email-stefanb@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1507222112-20315-2-git-send-email-stefanb@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v1 01/10] tpm-backend: Remove unneeded member
+ variable from backend class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,108 +43,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: amarnath.valluri@intel.com, marcandre.lureau@gmail.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, amarnath.valluri@intel.com, marcandre.lureau@gmail.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-Following the recent extension of QEMU with a TPM emulator device,
-update the specs describing for how to interact with the device.
+From: Amarnath Valluri <amarnath.valluri@intel.com>
 
-The results of commands run inside a Linux VM are expected to be
-similar to those when the TPM passthrough device is used, so we
-just reuse that.
+TPMDriverOps inside TPMBackend is not required, as it is supposed to be a=
+ class
+member. The only possible reason for keeping in TPMBackend was, to get th=
+e
+backend type in tpm.c where dedicated backend api, tpm_backend_get_type()=
+ is
+present.
 
-Fix a typo on the way.
-
+Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 ---
- docs/specs/tpm.txt | 79 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 79 insertions(+)
+ hw/tpm/tpm_passthrough.c     | 4 ----
+ include/sysemu/tpm_backend.h | 1 -
+ tpm.c                        | 2 +-
+ 3 files changed, 1 insertion(+), 6 deletions(-)
 
-diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
-index 914daac..9bef8b3 100644
---- a/docs/specs/tpm.txt
-+++ b/docs/specs/tpm.txt
-@@ -121,3 +121,82 @@ crw-------. 1 root root 10, 224 Jul 11 10:11 /dev/tpm0
- PCR-00: 35 4E 3B CE 23 9F 38 59 ...
- ...
- PCR-23: 00 00 00 00 00 00 00 00 ...
-+
-+
-+== The QEMU TPM emulator device ==
-+
-+The TPM emulator device uses an external TPM emulator called 'swtpm' for
-+sending TPM commands to and receiving responses from. The swtpm program
-+must have been started before trying to access it through the TPM emulator
-+with QEMU.
-+
-+The TPM emulator implements a command channel for transferring TPM commands
-+and responses as well as a control channel over which control commands can
-+be sent. The specification for the control channel can be found here:
-+
-+https://github.com/stefanberger/swtpm/blob/master/man/man3/swtpm_ioctls.pod
-+
-+
-+The control channel serves the purpose of resetting, initializing, and
-+migrating the TPM state, among other things.
-+
-+The swtpm program behaves like a hardware TPM and therefore needs to be
-+initialized by the firmware running inside the QEMU virtual machine.
-+One necessary step for initializing the device is to send the TPM_Startup
-+command to it. SeaBIOS, for example, has been instrumented to initialize
-+a TPM 1.2 or TPM 2 device using this command.
-+
-+
-+QEMU files related to the TPM emulator device:
-+ - hw/tpm/tpm_emulator.c
-+ - hw/tpm/tpm_util.c
-+ - hw/tpm/tpm_util.h
-+
-+
-+The following commands start the swtpm with a UnixIO control channel over
-+a socket interface. They do not need to be run as root.
-+
-+mkdir /tmp/mytpm1
-+swtpm socket --tpmstate dir=/tmp/mytpm1 \
-+  --ctrl type=unixio,path=/tmp/mytpm1/swtpm-sock \
-+  --log level=20
-+
-+Command line to start QEMU with the TPM emulator device using the host's
-+hardware TPM /dev/tpm0:
-+
-+qemu-system-x86_64 -display sdl -enable-kvm \
-+  -m 1024 -boot d -bios bios-256k.bin -boot menu=on \
-+  -chardev socket,id=chrtpm,path=/tmp/mytpm1/swtpm-sock \
-+  -tpmdev emulator,id=tpm0,chardev=chrtpm \
-+  -device tpm-tis,tpmdev=tpm0 test.img
-+
-+
-+In case SeaBIOS is used as firmware, it should show the TPM menu item
-+after entering the menu with 'ESC'.
-+
-+Select boot device:
-+1. DVD/CD [ata1-0: QEMU DVD-ROM ATAPI-4 DVD/CD]
-+[...]
-+5. Legacy option rom
-+
-+t. TPM Configuration
-+
-+
-+The following commands should result in similar output inside the VM with a
-+Linux kernel that either has the TPM TIS driver built-in or available as a
-+module:
-+
-+#> dmesg | grep -i tpm
-+[    0.711310] tpm_tis 00:06: 1.2 TPM (device=id 0x1, rev-id 1)
-+
-+#> dmesg | grep TCPA
-+[    0.000000] ACPI: TCPA 0x0000000003FFD191C 000032 (v02 BOCHS  \
-+    BXPCTCPA 0000001 BXPC 00000001)
-+
-+#> ls -l /dev/tpm*
-+crw-------. 1 root root 10, 224 Jul 11 10:11 /dev/tpm0
-+
-+#> find /sys/devices/ | grep pcrs$ | xargs cat
-+PCR-00: 35 4E 3B CE 23 9F 38 59 ...
-+...
-+PCR-23: 00 00 00 00 00 00 00 00 ...
--- 
+diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+index 9234eb3..a0baf5f 100644
+--- a/hw/tpm/tpm_passthrough.c
++++ b/hw/tpm/tpm_passthrough.c
+@@ -46,8 +46,6 @@
+ #define TPM_PASSTHROUGH(obj) \
+     OBJECT_CHECK(TPMPassthruState, (obj), TYPE_TPM_PASSTHROUGH)
+=20
+-static const TPMDriverOps tpm_passthrough_driver;
+-
+ /* data structures */
+ typedef struct TPMPassthruThreadParams {
+     TPMState *tpm_state;
+@@ -462,8 +460,6 @@ static TPMBackend *tpm_passthrough_create(QemuOpts *o=
+pts, const char *id)
+     /* let frontend set the fe_model to proper value */
+     tb->fe_model =3D -1;
+=20
+-    tb->ops =3D &tpm_passthrough_driver;
+-
+     if (tpm_passthrough_handle_device_opts(opts, tb)) {
+         goto err_exit;
+     }
+diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
+index b0a9731..3708413 100644
+--- a/include/sysemu/tpm_backend.h
++++ b/include/sysemu/tpm_backend.h
+@@ -50,7 +50,6 @@ struct TPMBackend {
+     enum TpmModel fe_model;
+     char *path;
+     char *cancel_path;
+-    const TPMDriverOps *ops;
+=20
+     QLIST_ENTRY(TPMBackend) list;
+ };
+diff --git a/tpm.c b/tpm.c
+index 2d830d0..abedf3f 100644
+--- a/tpm.c
++++ b/tpm.c
+@@ -211,7 +211,7 @@ static TPMInfo *qmp_query_tpm_inst(TPMBackend *drv)
+     res->model =3D drv->fe_model;
+     res->options =3D g_new0(TpmTypeOptions, 1);
+=20
+-    switch (drv->ops->type) {
++    switch (tpm_backend_get_type(drv)) {
+     case TPM_TYPE_PASSTHROUGH:
+         res->options->type =3D TPM_TYPE_OPTIONS_KIND_PASSTHROUGH;
+         tpo =3D g_new0(TPMPassthroughOptions, 1);
+--=20
 2.5.5
