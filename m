@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06ZN-0007vJ-5j
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:52:10 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e06ZM-0007ut-SM
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:52:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e06ZM-0000Z9-9A
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:52:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41032)
+	(envelope-from <imammedo@redhat.com>) id 1e06ZG-0000Ti-Ge
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:52:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57838)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06ZL-0000YD-RQ
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:52:07 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e06ZG-0000S9-7J
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 09:52:02 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu,  5 Oct 2017 15:51:14 +0200
-Message-Id: <1507211474-188400-41-git-send-email-imammedo@redhat.com>
+Date: Thu,  5 Oct 2017 15:51:10 +0200
+Message-Id: <1507211474-188400-37-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
 References: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 40/40] mips: r4k: replace cpu_model with
- cpu_type
+Subject: [Qemu-devel] [PATCH v2 36/40] mips: malta/boston: replace cpu_model
+ with cpu_type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +28,301 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, aurelien@aurel32.net, yongbok.kim@imgtec.com
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, paul.burton@imgtec.com, aurelien@aurel32.net, yongbok.kim@imgtec.com
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
+CC: paul.burton@imgtec.com
 CC: aurelien@aurel32.net
 CC: yongbok.kim@imgtec.com
 ---
- hw/mips/mips_r4k.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ include/hw/mips/cps.h        |  2 +-
+ target/mips/cpu.h            |  8 ++++++--
+ hw/mips/boston.c             | 11 +++++------
+ hw/mips/cps.c                |  4 ++--
+ hw/mips/mips_malta.c         | 33 +++++++++++++++------------------
+ target/mips/cpu.c            |  2 +-
+ target/mips/translate.c      | 20 ++++++--------------
+ target/mips/translate_init.c | 12 ------------
+ 8 files changed, 36 insertions(+), 56 deletions(-)
 
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index 1272d4e..3bbb182 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -163,7 +163,6 @@ static
- void mips_r4k_init(MachineState *machine)
- {
-     ram_addr_t ram_size =3D machine->ram_size;
--    const char *cpu_model =3D machine->cpu_model;
-     const char *kernel_filename =3D machine->kernel_filename;
-     const char *kernel_cmdline =3D machine->kernel_cmdline;
-     const char *initrd_filename =3D machine->initrd_filename;
-@@ -186,14 +185,7 @@ void mips_r4k_init(MachineState *machine)
-     int be;
+diff --git a/include/hw/mips/cps.h b/include/hw/mips/cps.h
+index 526b8d0..aab1af9 100644
+--- a/include/hw/mips/cps.h
++++ b/include/hw/mips/cps.h
+@@ -34,7 +34,7 @@ typedef struct MIPSCPSState {
 =20
-     /* init CPUs */
+     uint32_t num_vp;
+     uint32_t num_irq;
+-    char *cpu_model;
++    char *cpu_type;
+=20
+     MemoryRegion container;
+     MIPSGCRState gcr;
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 66265e4..7f8ba5f 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -740,8 +740,12 @@ enum {
+ int cpu_mips_signal_handler(int host_signum, void *pinfo, void *puc);
+=20
+ #define cpu_init(cpu_model) cpu_generic_init(TYPE_MIPS_CPU, cpu_model)
+-bool cpu_supports_cps_smp(const char *cpu_model);
+-bool cpu_supports_isa(const char *cpu_model, unsigned int isa);
++
++#define MIPS_CPU_TYPE_SUFFIX "-" TYPE_MIPS_CPU
++#define MIPS_CPU_TYPE_NAME(model) model MIPS_CPU_TYPE_SUFFIX
++
++bool cpu_supports_cps_smp(const char *cpu_type);
++bool cpu_supports_isa(const char *cpu_type, unsigned int isa);
+ void cpu_set_exception_base(int vp_index, target_ulong address);
+=20
+ /* mips_int.c */
+diff --git a/hw/mips/boston.c b/hw/mips/boston.c
+index e815be6..1cb4b6a 100644
+--- a/hw/mips/boston.c
++++ b/hw/mips/boston.c
+@@ -437,7 +437,6 @@ static void boston_mach_init(MachineState *machine)
+     DeviceState *dev;
+     BostonState *s;
+     Error *err =3D NULL;
+-    const char *cpu_model;
+     MemoryRegion *flash, *ddr, *ddr_low_alias, *lcd, *platreg;
+     MemoryRegion *sys_mem =3D get_system_memory();
+     XilinxPCIEHost *pcie2;
+@@ -453,25 +452,24 @@ static void boston_mach_init(MachineState *machine)
+         exit(1);
+     }
+=20
+-    cpu_model =3D machine->cpu_model ?: "I6400";
+-
+     dev =3D qdev_create(NULL, TYPE_MIPS_BOSTON);
+     qdev_init_nofail(dev);
+=20
+     s =3D BOSTON(dev);
+     s->mach =3D machine;
+=20
+-    if (!cpu_supports_cps_smp(cpu_model)) {
++    if (!cpu_supports_cps_smp(machine->cpu_type)) {
+         error_report("Boston requires CPUs which support CPS");
+         exit(1);
+     }
+=20
+-    is_64b =3D cpu_supports_isa(cpu_model, ISA_MIPS64);
++    is_64b =3D cpu_supports_isa(machine->cpu_type, ISA_MIPS64);
+=20
+     s->cps =3D MIPS_CPS(object_new(TYPE_MIPS_CPS));
+     qdev_set_parent_bus(DEVICE(s->cps), sysbus_get_default());
+=20
+-    object_property_set_str(OBJECT(s->cps), cpu_model, "cpu-model", &err=
+);
++    object_property_set_str(OBJECT(s->cps), machine->cpu_type, "cpu-type=
+",
++                            &err);
+     object_property_set_int(OBJECT(s->cps), smp_cpus, "num-vp", &err);
+     object_property_set_bool(OBJECT(s->cps), true, "realized", &err);
+=20
+@@ -571,6 +569,7 @@ static void boston_mach_class_init(MachineClass *mc)
+     mc->block_default_type =3D IF_IDE;
+     mc->default_ram_size =3D 1 * G_BYTE;
+     mc->max_cpus =3D 16;
++    mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("I6400");
+ }
+=20
+ DEFINE_MACHINE("boston", boston_mach_class_init)
+diff --git a/hw/mips/cps.c b/hw/mips/cps.c
+index fe5c630..4285d19 100644
+--- a/hw/mips/cps.c
++++ b/hw/mips/cps.c
+@@ -71,7 +71,7 @@ static void mips_cps_realize(DeviceState *dev, Error **=
+errp)
+     bool itu_present =3D false;
+=20
+     for (i =3D 0; i < s->num_vp; i++) {
+-        cpu =3D MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, s->cpu_model));
++        cpu =3D MIPS_CPU(cpu_create(s->cpu_type));
+=20
+         /* Init internal devices */
+         cpu_mips_irq_init_cpu(cpu);
+@@ -160,7 +160,7 @@ static void mips_cps_realize(DeviceState *dev, Error =
+**errp)
+ static Property mips_cps_properties[] =3D {
+     DEFINE_PROP_UINT32("num-vp", MIPSCPSState, num_vp, 1),
+     DEFINE_PROP_UINT32("num-irq", MIPSCPSState, num_irq, 256),
+-    DEFINE_PROP_STRING("cpu-model", MIPSCPSState, cpu_model),
++    DEFINE_PROP_STRING("cpu-type", MIPSCPSState, cpu_type),
+     DEFINE_PROP_END_OF_LIST()
+ };
+=20
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index b6a58c7..ec6af4a 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -923,7 +923,7 @@ static void main_cpu_reset(void *opaque)
+     }
+ }
+=20
+-static void create_cpu_without_cps(const char *cpu_model,
++static void create_cpu_without_cps(const char *cpu_type,
+                                    qemu_irq *cbus_irq, qemu_irq *i8259_i=
+rq)
+ {
+     CPUMIPSState *env;
+@@ -931,7 +931,7 @@ static void create_cpu_without_cps(const char *cpu_mo=
+del,
+     int i;
+=20
+     for (i =3D 0; i < smp_cpus; i++) {
+-        cpu =3D MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
++        cpu =3D MIPS_CPU(cpu_create(cpu_type));
+=20
+         /* Init internal devices */
+         cpu_mips_irq_init_cpu(cpu);
+@@ -945,7 +945,7 @@ static void create_cpu_without_cps(const char *cpu_mo=
+del,
+     *cbus_irq =3D env->irq[4];
+ }
+=20
+-static void create_cps(MaltaState *s, const char *cpu_model,
++static void create_cps(MaltaState *s, const char *cpu_type,
+                        qemu_irq *cbus_irq, qemu_irq *i8259_irq)
+ {
+     Error *err =3D NULL;
+@@ -953,7 +953,7 @@ static void create_cps(MaltaState *s, const char *cpu=
+_model,
+     s->cps =3D MIPS_CPS(object_new(TYPE_MIPS_CPS));
+     qdev_set_parent_bus(DEVICE(s->cps), sysbus_get_default());
+=20
+-    object_property_set_str(OBJECT(s->cps), cpu_model, "cpu-model", &err=
+);
++    object_property_set_str(OBJECT(s->cps), cpu_type, "cpu-type", &err);
+     object_property_set_int(OBJECT(s->cps), smp_cpus, "num-vp", &err);
+     object_property_set_bool(OBJECT(s->cps), true, "realized", &err);
+     if (err !=3D NULL) {
+@@ -967,21 +967,13 @@ static void create_cps(MaltaState *s, const char *c=
+pu_model,
+     *cbus_irq =3D NULL;
+ }
+=20
+-static void create_cpu(MaltaState *s, const char *cpu_model,
+-                       qemu_irq *cbus_irq, qemu_irq *i8259_irq)
++static void mips_create_cpu(MaltaState *s, const char *cpu_type,
++                            qemu_irq *cbus_irq, qemu_irq *i8259_irq)
+ {
 -    if (cpu_model =3D=3D NULL) {
 -#ifdef TARGET_MIPS64
--        cpu_model =3D "R4000";
+-        cpu_model =3D "20Kc";
 -#else
 -        cpu_model =3D "24Kf";
 -#endif
 -    }
--    cpu =3D MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-+    cpu =3D MIPS_CPU(cpu_create(machine->cpu_type));
-     env =3D &cpu->env;
+-
+-    if ((smp_cpus > 1) && cpu_supports_cps_smp(cpu_model)) {
+-        create_cps(s, cpu_model, cbus_irq, i8259_irq);
++    if ((smp_cpus > 1) && cpu_supports_cps_smp(cpu_type)) {
++        create_cps(s, cpu_type, cbus_irq, i8259_irq);
+     } else {
+-        create_cpu_without_cps(cpu_model, cbus_irq, i8259_irq);
++        create_cpu_without_cps(cpu_type, cbus_irq, i8259_irq);
+     }
+ }
 =20
-     reset_info =3D g_malloc0(sizeof(ResetData));
-@@ -303,6 +295,12 @@ static void mips_machine_init(MachineClass *mc)
-     mc->desc =3D "mips r4k platform";
-     mc->init =3D mips_r4k_init;
+@@ -1038,7 +1030,7 @@ void mips_malta_init(MachineState *machine)
+     }
+=20
+     /* create CPU */
+-    create_cpu(s, machine->cpu_model, &cbus_irq, &i8259_irq);
++    mips_create_cpu(s, machine->cpu_type, &cbus_irq, &i8259_irq);
+=20
+     /* allocate RAM */
+     if (ram_size > (2048u << 20)) {
+@@ -1264,6 +1256,11 @@ static void mips_malta_machine_init(MachineClass *=
+mc)
      mc->block_default_type =3D IF_IDE;
+     mc->max_cpus =3D 16;
+     mc->is_default =3D 1;
 +#ifdef TARGET_MIPS64
-+    mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("R4000");
++    mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("20Kc");
 +#else
 +    mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("24Kf");
 +#endif
-+
  }
 =20
- DEFINE_MACHINE("mips", mips_machine_init)
+ DEFINE_MACHINE("malta", mips_malta_machine_init)
+diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+index c15b894..24a8907 100644
+--- a/target/mips/cpu.c
++++ b/target/mips/cpu.c
+@@ -158,7 +158,7 @@ static void mips_cpu_initfn(Object *obj)
+=20
+ static char *mips_cpu_type_name(const char *cpu_model)
+ {
+-    return g_strdup_printf("%s-" TYPE_MIPS_CPU, cpu_model);
++    return g_strdup_printf(MIPS_CPU_TYPE_NAME("%s"), cpu_model);
+ }
+=20
+ static ObjectClass *mips_cpu_class_by_name(const char *cpu_model)
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index d16d879..3d76fc6 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -20523,24 +20523,16 @@ void cpu_mips_realize_env(CPUMIPSState *env)
+     mvp_init(env, env->cpu_model);
+ }
+=20
+-bool cpu_supports_cps_smp(const char *cpu_model)
++bool cpu_supports_cps_smp(const char *cpu_type)
+ {
+-    const mips_def_t *def =3D cpu_mips_find_by_name(cpu_model);
+-    if (!def) {
+-        return false;
+-    }
+-
+-    return (def->CP0_Config3 & (1 << CP0C3_CMGCR)) !=3D 0;
++    const MIPSCPUClass *mcc =3D MIPS_CPU_CLASS(object_class_by_name(cpu_=
+type));
++    return (mcc->cpu_def->CP0_Config3 & (1 << CP0C3_CMGCR)) !=3D 0;
+ }
+=20
+-bool cpu_supports_isa(const char *cpu_model, unsigned int isa)
++bool cpu_supports_isa(const char *cpu_type, unsigned int isa)
+ {
+-    const mips_def_t *def =3D cpu_mips_find_by_name(cpu_model);
+-    if (!def) {
+-        return false;
+-    }
+-
+-    return (def->insn_flags & isa) !=3D 0;
++    const MIPSCPUClass *mcc =3D MIPS_CPU_CLASS(object_class_by_name(cpu_=
+type));
++    return (mcc->cpu_def->insn_flags & isa) !=3D 0;
+ }
+=20
+ void cpu_set_exception_base(int vp_index, target_ulong address)
+diff --git a/target/mips/translate_init.c b/target/mips/translate_init.c
+index 8bbded4..c7ba6ee 100644
+--- a/target/mips/translate_init.c
++++ b/target/mips/translate_init.c
+@@ -755,18 +755,6 @@ const mips_def_t mips_defs[] =3D
+ };
+ const int mips_defs_number =3D ARRAY_SIZE(mips_defs);
+=20
+-static const mips_def_t *cpu_mips_find_by_name (const char *name)
+-{
+-    int i;
+-
+-    for (i =3D 0; i < ARRAY_SIZE(mips_defs); i++) {
+-        if (strcasecmp(name, mips_defs[i].name) =3D=3D 0) {
+-            return &mips_defs[i];
+-        }
+-    }
+-    return NULL;
+-}
+-
+ void mips_cpu_list (FILE *f, fprintf_function cpu_fprintf)
+ {
+     int i;
 --=20
 2.7.4
