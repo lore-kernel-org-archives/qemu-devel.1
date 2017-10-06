@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1e0V1i-00048w-Gu
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:59:03 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1e0V1k-0004B1-A5
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:59:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1e0V1h-0007lK-LL
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:59:02 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37712)
+	(envelope-from <pm215@archaic.org.uk>) id 1e0V1j-0007o0-Js
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:59:04 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37716)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1e0V1h-0007eF-Ep
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:59:01 -0400
+	id 1e0V1j-0007kt-Cf
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:59:03 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1e0V1e-0002wF-Nv
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 16:58:58 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1e0V1d-0002vL-JO
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 16:58:57 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  6 Oct 2017 16:59:37 +0100
-Message-Id: <1507305585-20608-13-git-send-email-peter.maydell@linaro.org>
+Date: Fri,  6 Oct 2017 16:59:35 +0100
+Message-Id: <1507305585-20608-11-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1507305585-20608-1-git-send-email-peter.maydell@linaro.org>
 References: <1507305585-20608-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 12/20] target/arm: Add new-in-v8M SFSR and SFAR
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 10/20] target/arm: Warn about restoring to
+ unaligned stack
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,114 +33,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Add the new M profile Secure Fault Status Register
-and Secure Fault Address Register.
+Attempting to do an exception return with an exception frame that
+is not 8-aligned is UNPREDICTABLE in v8M; warn about this.
+(It is not UNPREDICTABLE in v7M, and our implementation can
+handle the merely-4-aligned case fine, so we don't need to
+do anything except warn.)
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 1506092407-26985-10-git-send-email-peter.maydell@linaro.org
+Message-id: 1506092407-26985-8-git-send-email-peter.maydell@linaro.org
 ---
- target/arm/cpu.h      | 12 ++++++++++++
- hw/intc/armv7m_nvic.c | 34 ++++++++++++++++++++++++++++++++++
- target/arm/machine.c  |  2 ++
- 3 files changed, 48 insertions(+)
+ target/arm/helper.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index ad6eff4..9e3a16d 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -443,8 +443,10 @@ typedef struct CPUARMState {
-         uint32_t cfsr[M_REG_NUM_BANKS]; /* Configurable Fault Status */
-         uint32_t hfsr; /* HardFault Status */
-         uint32_t dfsr; /* Debug Fault Status Register */
-+        uint32_t sfsr; /* Secure Fault Status Register */
-         uint32_t mmfar[M_REG_NUM_BANKS]; /* MemManage Fault Address */
-         uint32_t bfar; /* BusFault Address */
-+        uint32_t sfar; /* Secure Fault Address Register */
-         unsigned mpu_ctrl[M_REG_NUM_BANKS]; /* MPU_CTRL */
-         int exception;
-         uint32_t primask[M_REG_NUM_BANKS];
-@@ -1260,6 +1262,16 @@ FIELD(V7M_DFSR, DWTTRAP, 2, 1)
- FIELD(V7M_DFSR, VCATCH, 3, 1)
- FIELD(V7M_DFSR, EXTERNAL, 4, 1)
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index bee0f5d..bb57be7 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -6413,6 +6413,13 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+                                               return_to_sp_process);
+         uint32_t frameptr = *frame_sp_p;
  
-+/* V7M SFSR bits */
-+FIELD(V7M_SFSR, INVEP, 0, 1)
-+FIELD(V7M_SFSR, INVIS, 1, 1)
-+FIELD(V7M_SFSR, INVER, 2, 1)
-+FIELD(V7M_SFSR, AUVIOL, 3, 1)
-+FIELD(V7M_SFSR, INVTRAN, 4, 1)
-+FIELD(V7M_SFSR, LSPERR, 5, 1)
-+FIELD(V7M_SFSR, SFARVALID, 6, 1)
-+FIELD(V7M_SFSR, LSERR, 7, 1)
++        if (!QEMU_IS_ALIGNED(frameptr, 8) &&
++            arm_feature(env, ARM_FEATURE_V8)) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "M profile exception return with non-8-aligned SP "
++                          "for destination state is UNPREDICTABLE\n");
++        }
 +
- /* v7M MPU_CTRL bits */
- FIELD(V7M_MPU_CTRL, ENABLE, 0, 1)
- FIELD(V7M_MPU_CTRL, HFNMIENA, 1, 1)
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index a1041c2..deea637 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -1017,6 +1017,22 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
-             goto bad_offset;
-         }
-         return cpu->env.pmsav8.mair1[attrs.secure];
-+    case 0xde4: /* SFSR */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_V8)) {
-+            goto bad_offset;
-+        }
-+        if (!attrs.secure) {
-+            return 0;
-+        }
-+        return cpu->env.v7m.sfsr;
-+    case 0xde8: /* SFAR */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_V8)) {
-+            goto bad_offset;
-+        }
-+        if (!attrs.secure) {
-+            return 0;
-+        }
-+        return cpu->env.v7m.sfar;
-     default:
-     bad_offset:
-         qemu_log_mask(LOG_GUEST_ERROR, "NVIC: Bad read offset 0x%x\n", offset);
-@@ -1368,6 +1384,24 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-          * only affect cacheability, and we don't implement caching.
-          */
-         break;
-+    case 0xde4: /* SFSR */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_V8)) {
-+            goto bad_offset;
-+        }
-+        if (!attrs.secure) {
-+            return;
-+        }
-+        cpu->env.v7m.sfsr &= ~value; /* W1C */
-+        break;
-+    case 0xde8: /* SFAR */
-+        if (!arm_feature(&cpu->env, ARM_FEATURE_V8)) {
-+            goto bad_offset;
-+        }
-+        if (!attrs.secure) {
-+            return;
-+        }
-+        cpu->env.v7m.sfsr = value;
-+        break;
-     case 0xf00: /* Software Triggered Interrupt Register */
-     {
-         int excnum = (value & 0x1ff) + NVIC_FIRST_IRQ;
-diff --git a/target/arm/machine.c b/target/arm/machine.c
-index 29df7ac..a0d7ed8 100644
---- a/target/arm/machine.c
-+++ b/target/arm/machine.c
-@@ -276,6 +276,8 @@ static const VMStateDescription vmstate_m_security = {
-         VMSTATE_UINT32(env.v7m.ccr[M_REG_S], ARMCPU),
-         VMSTATE_UINT32(env.v7m.mmfar[M_REG_S], ARMCPU),
-         VMSTATE_UINT32(env.v7m.cfsr[M_REG_S], ARMCPU),
-+        VMSTATE_UINT32(env.v7m.sfsr, ARMCPU),
-+        VMSTATE_UINT32(env.v7m.sfar, ARMCPU),
-         VMSTATE_END_OF_LIST()
-     }
- };
+         /* Pop registers. TODO: make these accesses use the correct
+          * attributes and address space (S/NS, priv/unpriv) and handle
+          * memory transaction failures.
 -- 
 2.7.4
