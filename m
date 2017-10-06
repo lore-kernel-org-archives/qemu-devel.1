@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e0T9l-0000nJ-UF
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:59:14 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e0TAT-0001Ml-UQ
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:59:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e0T9l-0005s7-8x
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:59:14 -0400
-Received: from mail-qt0-x233.google.com ([2607:f8b0:400d:c0d::233]:50160)
+	(envelope-from <richard.henderson@linaro.org>) id 1e0TAT-0006Yw-8f
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:59:58 -0400
+Received: from mail-qt0-x22e.google.com ([2607:f8b0:400d:c0d::22e]:55735)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e0T9l-0005rp-3Z
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:59:13 -0400
-Received: by mail-qt0-x233.google.com with SMTP id o3so31560017qte.6
-	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 06:59:12 -0700 (PDT)
+	id 1e0TAT-0006YC-3z
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:59:57 -0400
+Received: by mail-qt0-x22e.google.com with SMTP id x54so31488666qth.12
+	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 06:59:56 -0700 (PDT)
 References: <20170928203708.9376-1-david@redhat.com>
-	<20170928203708.9376-25-david@redhat.com>
+	<20170928203708.9376-26-david@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d83db737-b536-27b1-1321-85b290193acf@linaro.org>
-Date: Fri, 6 Oct 2017 09:59:09 -0400
+Message-ID: <2c85866e-b61f-c3fe-441b-56ebaf91d6d4@linaro.org>
+Date: Fri, 6 Oct 2017 09:59:53 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170928203708.9376-25-david@redhat.com>
+In-Reply-To: <20170928203708.9376-26-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 24/30] s390x/tcg: implement STOP and
- RESET interrupts for TCG
+Subject: Re: [Qemu-devel] [PATCH v2 25/30] s390x/tcg: flush the tlb on SIGP
+ SET PREFIX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,27 +36,14 @@ To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 Cc: thuth@redhat.com, cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>
 
 On 09/28/2017 04:37 PM, David Hildenbrand wrote:
-> Implement them like KVM implements/handles them. Both can only be
-> triggered via SIGP instructions. RESET has (almos)the lowest priority if
-> the CPU is running, and the highest if the CPU is STOPPED. This is handled
-> in SIGP code already. On delivery, we only have to care about the
-> "CPU running" scenario.
+> Thanks to Aurelien Jarno for doing this in his prototype.
 > 
-> STOP is defined to be delivered after all other interrupts have been
-> delivered. Therefore it has the actual lowest priority.
-> 
-> As both can wake up a CPU if sleeping, indicate them correctly to
-> external code (e.g. cpu_has_work()).
+> We can flush the whole TLB as this should happen really rarely.
 > 
 > Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  target/s390x/cpu.h         |  4 ++++
->  target/s390x/excp_helper.c | 16 +++++++++++++++-
->  target/s390x/helper.c      |  1 +
->  target/s390x/internal.h    |  2 ++
->  target/s390x/interrupt.c   | 32 +++++++++++++++++++++++++++-----
->  target/s390x/sigp.c        |  2 ++
->  6 files changed, 51 insertions(+), 6 deletions(-)
+>  target/s390x/sigp.c | 1 +
+>  1 file changed, 1 insertion(+)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
