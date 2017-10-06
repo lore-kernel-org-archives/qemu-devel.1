@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e0T7z-0008Ch-4m
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:57:29 -0400
+	(envelope-from <berrange@redhat.com>) id 1e0T98-0000NB-UR
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:58:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e0T7t-00047o-B4
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:57:23 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:49092)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e0T7s-00046b-Ue
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:57:17 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id u5so12932035wrc.5
-	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 06:57:16 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1e0T94-00059d-0L
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:58:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34830)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e0T93-000589-OR
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:58:29 -0400
+Date: Fri, 6 Oct 2017 14:58:22 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171006135822.GG26575@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171006111342.6665-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170918195100.17593-5-andrew.smirnov@gmail.com>
-References: <20170918195100.17593-1-andrew.smirnov@gmail.com>
-	<20170918195100.17593-5-andrew.smirnov@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Oct 2017 14:56:55 +0100
-Message-ID: <CAFEAcA-_E2aV78AnODfAvjObYpHdWXwxBxJLHDR9qS8yR9YM3g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 04/17] imx_fec: Change queue flushing
- heuristics
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171006111342.6665-1-kraxel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] keycodemapdb: try fix makefile deps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,119 +27,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Smirnov <andrew.smirnov@gmail.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-On 18 September 2017 at 20:50, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
-> In current implementation, packet queue flushing logic seem to suffer
-> from a deadlock like scenario if a packet is received by the interface
-> before before Rx ring is initialized by Guest's driver. Consider the
-> following sequence of events:
->
->         1. A QEMU instance is started against a TAP device on Linux
->            host, running Linux guest, e. g., something to the effect
->            of:
->
->            qemu-system-arm \
->               -net nic,model=imx.fec,netdev=lan0 \
->               netdev tap,id=lan0,ifname=tap0,script=no,downscript=no \
->               ... rest of the arguments ...
->
->         2. Once QEMU starts, but before guest reaches the point where
->            FEC deriver is done initializing the HW, Guest, via TAP
->            interface, receives a number of multicast MDNS packets from
->            Host (not necessarily true for every OS, but it happens at
->            least on Fedora 25)
->
->         3. Recieving a packet in such a state results in
->            imx_eth_can_receive() returning '0', which in turn causes
->            tap_send() to disable corresponding event (tap.c:203)
->
->         4. Once Guest's driver reaches the point where it is ready to
->            recieve packets it prepares Rx ring descriptors and writes
->            ENET_RDAR_RDAR to ENET_RDAR register to indicate to HW that
->            more descriptors are ready. And at this points emulation
->            layer does this:
->
->                  s->regs[index] = ENET_RDAR_RDAR;
->                  imx_eth_enable_rx(s);
->
->            which, combined with:
->
->                   if (!s->regs[ENET_RDAR]) {
->                      qemu_flush_queued_packets(qemu_get_queue(s->nic));
->                   }
->
->            results in Rx queue never being flushed and corresponding
->            I/O event beign disabled.
->
-> Change the code to remember the fact that can_receive callback was
-> called before Rx ring was ready and use it to make a decision if
-> receive queue needs to be flushed.
->
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: qemu-devel@nongnu.org
-> Cc: qemu-arm@nongnu.org
-> Cc: yurovsky@gmail.com
-> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+On Fri, Oct 06, 2017 at 01:13:42PM +0200, Gerd Hoffmann wrote:
+> (1) make .git-submodule-status depend on config-host.mak,
+>     for GIT_SUBMODULES changes.
+> 
+> (2) make $(KEYCODEMAP_{GEN,CSV}) depend on .git-submodule-status
+>     so make knows what to do if they are not there.
+> 
+> I still get errors because make tries to generate the files before they are checked out,
+> but make seems to notice it has to start over and correctly generates the files on the
+> second attempt.
+> 
+> [ ... ]
+>   GEN     config-host.h
+>   GEN     module_block.h
+>   GEN     ui/input-keymap-linux-to-qcode.c
+>   GEN     ui/input-keymap-qcode-to-qnum.c
+>   GEN     ui/input-keymap-qnum-to-qcode.c
+> python: can't open file '/home/kraxel/projects/qemu/ui/keycodemapdb/tools/keymap-gen': [Errno 2] No such file or directory
+> python: can't open file '/home/kraxel/projects/qemu/ui/keycodemapdb/tools/keymap-gen': [Errno 2] No such file or directory
+> python: can't open file '/home/kraxel/projects/qemu/ui/keycodemapdb/tools/keymap-gen': [Errno 2] No such file or directory
+
+We could perhaps avoid that error message by changing the make rule to
+do    "test -e $(KEYCODEMAP_GEN) && $(KEYCODEMAP_GEN) || exit 0"
+
+> make: Leaving directory `/home/kraxel/projects/qemu/build-default'
+> make: Entering directory `/home/kraxel/projects/qemu/build-default'
+>   GIT     ui/keycodemapdb
+>   GEN     trace/generated-tcg-tracers.h
+>   GEN     trace/generated-helpers-wrappers.h
+>   GEN     trace/generated-helpers.h
+>   GEN     trace/generated-helpers.c
+>   GEN     ui/input-keymap-linux-to-qcode.c
+>   GEN     ui/input-keymap-qcode-to-qnum.c
+>   GEN     ui/input-keymap-qnum-to-qcode.c
+>   CC      qga/main.o
+> [ ... ]
 > ---
->  hw/net/imx_fec.c         | 6 ++++--
->  include/hw/net/imx_fec.h | 1 +
->  2 files changed, 5 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
-> index 84085afe09..767402909d 100644
-> --- a/hw/net/imx_fec.c
-> +++ b/hw/net/imx_fec.c
-> @@ -544,8 +544,9 @@ static void imx_eth_enable_rx(IMXFECState *s)
->
->      if (rx_ring_full) {
->          FEC_PRINTF("RX buffer full\n");
-> -    } else if (!s->regs[ENET_RDAR]) {
-> +    } else if (s->needs_flush) {
->          qemu_flush_queued_packets(qemu_get_queue(s->nic));
-> +        s->needs_flush = false;
->      }
->
->      s->regs[ENET_RDAR] = rx_ring_full ? 0 : ENET_RDAR_RDAR;
-> @@ -930,7 +931,8 @@ static int imx_eth_can_receive(NetClientState *nc)
->
->      FEC_PRINTF("\n");
->
-> -    return s->regs[ENET_RDAR] ? 1 : 0;
-> +    s->needs_flush = !s->regs[ENET_RDAR];
-> +    return !!s->regs[ENET_RDAR];
->  }
->
->  static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
-> diff --git a/include/hw/net/imx_fec.h b/include/hw/net/imx_fec.h
-> index 62ad473b05..4bc8f03ec2 100644
-> --- a/include/hw/net/imx_fec.h
-> +++ b/include/hw/net/imx_fec.h
-> @@ -252,6 +252,7 @@ typedef struct IMXFECState {
->      uint32_t phy_int_mask;
->
->      bool is_fec;
-> +    bool needs_flush;
->  } IMXFECState;
+>  Makefile | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 1d3b31f074..c97258629e 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -33,7 +33,7 @@ git-submodule-update:
+>  endif
+>  endif
+>  
+> -.git-submodule-status: git-submodule-update
+> +.git-submodule-status: git-submodule-update config-host.mak
+>  
+>  Makefile: .git-submodule-status
+>  
+> @@ -225,7 +225,7 @@ KEYCODEMAP_FILES = \
+>  
+>  GENERATED_FILES += $(KEYCODEMAP_FILES)
+>  
+> -ui/input-keymap-%.c: $(KEYCODEMAP_GEN) $(KEYCODEMAP_CSV) $(SRC_PATH)/ui/Makefile.objs .git-submodule-status
+> +ui/input-keymap-%.c: $(KEYCODEMAP_GEN) $(KEYCODEMAP_CSV) $(SRC_PATH)/ui/Makefile.objs
+>  	$(call quiet-command,\
+>  	    src=$$(echo $@ | sed -E -e "s,^ui/input-keymap-(.+)-to-(.+)\.c$$,\1,") && \
+>  	    dst=$$(echo $@ | sed -E -e "s,^ui/input-keymap-(.+)-to-(.+)\.c$$,\2,") && \
+> @@ -235,6 +235,9 @@ ui/input-keymap-%.c: $(KEYCODEMAP_GEN) $(KEYCODEMAP_CSV) $(SRC_PATH)/ui/Makefile
+>  	          code-map $(KEYCODEMAP_CSV) $${src} $${dst} \
+>  	        > $@ || rm $@, "GEN", "$@")
+>  
+> +$(KEYCODEMAP_GEN): .git-submodule-status
+> +$(KEYCODEMAP_CSV): .git-submodule-status
+> +
+>  # Don't try to regenerate Makefile or configure
+>  # We don't generate any of them
+>  Makefile: ;
 
-This looks odd -- I don't think you should need extra
-state here. Conceptually what you want is:
+This looks like a plausible solution to the problem. I've just kicked off
+a travis buld with the patch applied:
 
- * in the can_receive callback, test some function of
-various bits of device state to decide whether you can
-take data
- * in the rest of the device, whenever the device state
-changes such that you were previously not able to take
-data but now you can, call qemu_flush_queued_packets().
+https://travis-ci.org/berrange/qemu/builds/284220642
 
-You shouldn't need any extra state to do this, you just
-need to fix the bug where you have a code path that
-flips ENET_RDAR from 0 to 1 without calling flush
-(you might for instance have a helper function for
-"set ENET_RDAR" that encapsulates setting the state
-and arranging that flush is called).
-
-thanks
--- PMM
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
