@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e0OY4-0001Mo-Fm
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 05:04:06 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e0Oa3-0002Rh-Kc
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 05:06:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e0OY1-0007WJ-A7
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 05:04:00 -0400
-Date: Fri, 6 Oct 2017 11:03:52 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171006110352.64b7a814@nial.brq.redhat.com>
-In-Reply-To: <20171006035447.GP3260@umbus.fritz.box>
-References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-	<1507220690-265042-13-git-send-email-imammedo@redhat.com>
-	<20171006035447.GP3260@umbus.fritz.box>
+	(envelope-from <kwolf@redhat.com>) id 1e0OZx-0001Ni-Jv
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 05:06:03 -0400
+Date: Fri, 6 Oct 2017 11:05:37 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171006090537.GA4325@localhost.localdomain>
+References: <20171004015205.20724-1-jsnow@redhat.com>
+	<20171004182732.GE9801@localhost.localdomain>
+	<7fd66217-8eda-8de2-f34f-148f69f9df4d@redhat.com>
+	<20171005113818.GA4416@localhost.localdomain>
+	<40eebf9c-611a-3924-91d9-b006738c7dee@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 12/23] ppc: move '-cpu foo,
- compat=xxx' parsing into ppc_cpu_parse_featurestr()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <40eebf9c-611a-3924-91d9-b006738c7dee@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] blockjobs: add explicit job reaping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,232 +26,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?UTF-8?B?SGVy?= =?UTF-8?B?dsOp?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
+To: John Snow <jsnow@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, pkrempa@redhat.com, jtc@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Fri, 6 Oct 2017 14:54:47 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Thu, Oct 05, 2017 at 06:24:39PM +0200, Igor Mammedov wrote:
-> > there is a dedicated callback CPUClass::parse_features
-> > which purpose is to convert -cpu features into a set of
-> > global properties AND deal with compat/legacy features
-> > that couldn't be directly translated into CPU's properties.
+Am 06.10.2017 um 05:56 hat John Snow geschrieben:
+> On 10/05/2017 07:38 AM, Kevin Wolf wrote:
+> > Let me try to just consolidate all of the above into a single state
+> > machine:
 > > 
-> > Create ppc variant of it (ppc_cpu_parse_featurestr) and
-> > move 'compat=val' handling from spapr_cpu_core.c into it.
-> > That removes a dependency of board/core code on cpu_model
-> > parsing and would let to reuse common -cpu parsing
-> > introduced by 6063d4c0
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
+> > 1.  CREATED --> RUNNING
+> >         driver callback: .start
+> > 2a. RUNNING --> READY | CANCELLED
+> >         via: auto transition (when bulk copy is finished) / block-job-cancel
+> >         event: BLOCK_JOB_READY
+> > 2b. READY --> READY (COMPLETING) | READY (CANCELLING)
+> >         via: block-job-complete / block-job-cancel
+> >         event: none
+> >         driver callback: .complete / none
+> > 3.  READY (CANCELLING | COMPLETING) --> DONE
+> >         via: auto transition
+> >              (CANCELLING: after draining in-flight mirror requests;
+> >               COMPLETING: when images are in sync)
+> >         event: BLOCK_JOB_DONE
 > 
-> Hrm.  I'm a bit unsure about this.  The fact that the board code is
-> involved in the parsing here is deliberate.  Basically 'compat=' never
-> made sense as a cpu property, it always should have been a machine
-> property.
+> I have some doubts about "DONE" necessarily coming prior to "PENDING" as
+> this means that the transaction gives up control of the jobs at this
+> point, and then "PENDING" jobs may complete one without the other,
+> especially if we introduce a PREPARE() callback.
 > 
-> With this patch we'll still (correctly) fail on a non spapr machine at
-> the point where we do:
-> 
-> +            object_property_set_str(machine, v, "max-cpu-compat", &local_err);
-> 
-> Though probably with a rather cryptic error.
-I's possible to guard it and apply to only SPAPR machine
-or trying to find property first before setting it.
+> (At least, if I've understood you correctly that "DONE" is the phase
+> where jobs queue up, ready to be dispatched by the transaction mechanism.)
 
-> 
-> It still pollutes the cpu code with spapr's past mistake though.  I'm
-> not sure if this is a good tradeoff.
-CPUClass::parse_features callback was introduced to deal with 
-legacy and compatibility nuances of "-cpu" CLI option, so I'm moving
-compat mistake back where it belongs so it will pollute code dealing
-with hacks.
+Yes. This means that DONE is state where a job end up when it has
+completed its work, which is generally a different point in time for
+each job in the transaction. Something has to come there, and it can't
+be PENDING yet because the transaction hasn't completed yet.
 
-It also cleans the road for removal of global cpu_model by moving
-dependency from board code to a callback designed to parse cpu_model.
+In other words, DONE is the inactive state that exists today, but is
+externally exposed as RUNNING even though the job isn't actually doing
+any work any more.
 
+I don't see though why this means that the transaction has to give up
+control?
 
-> > ---
-> >  include/hw/ppc/spapr.h      |  1 -
-> >  target/ppc/cpu-qom.h        |  1 +
-> >  hw/ppc/spapr.c              |  2 +-
-> >  hw/ppc/spapr_cpu_core.c     | 50 --------------------------------------
-> >  target/ppc/translate_init.c | 58 +++++++++++++++++++++++++++++++++++++++++++++
-> >  5 files changed, 60 insertions(+), 52 deletions(-)
-> > 
-> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > index c1b365f..8ca4f94 100644
-> > --- a/include/hw/ppc/spapr.h
-> > +++ b/include/hw/ppc/spapr.h
-> > @@ -659,7 +659,6 @@ void spapr_hotplug_req_add_by_count_indexed(sPAPRDRConnectorType drc_type,
-> >                                              uint32_t count, uint32_t index);
-> >  void spapr_hotplug_req_remove_by_count_indexed(sPAPRDRConnectorType drc_type,
-> >                                                 uint32_t count, uint32_t index);
-> > -void spapr_cpu_parse_features(sPAPRMachineState *spapr);
-> >  int spapr_hpt_shift_for_ramsize(uint64_t ramsize);
-> >  void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
-> >                            Error **errp);
-> > diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-> > index d0cf6ca..429b47f 100644
-> > --- a/target/ppc/cpu-qom.h
-> > +++ b/target/ppc/cpu-qom.h
-> > @@ -181,6 +181,7 @@ typedef struct PowerPCCPUClass {
-> >      DeviceRealize parent_realize;
-> >      DeviceUnrealize parent_unrealize;
-> >      void (*parent_reset)(CPUState *cpu);
-> > +    void (*parent_parse_features)(const char *type, char *str, Error **errp);
-> >  
-> >      uint32_t pvr;
-> >      bool (*pvr_match)(struct PowerPCCPUClass *pcc, uint32_t pvr);
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index ff87f15..01b3012 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -2366,7 +2366,7 @@ static void ppc_spapr_init(MachineState *machine)
-> >          machine->cpu_model = kvm_enabled() ? "host" : smc->tcg_default_cpu;
-> >      }
-> >  
-> > -    spapr_cpu_parse_features(spapr);
-> > +    cpu_parse_cpu_model(TYPE_POWERPC_CPU, machine->cpu_model);
-> >  
-> >      spapr_set_vsmt_mode(spapr, &error_fatal);
-> >  
-> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> > index 3dea5ff..427d47f 100644
-> > --- a/hw/ppc/spapr_cpu_core.c
-> > +++ b/hw/ppc/spapr_cpu_core.c
-> > @@ -21,56 +21,6 @@
-> >  #include "sysemu/hw_accel.h"
-> >  #include "qemu/error-report.h"
-> >  
-> > -void spapr_cpu_parse_features(sPAPRMachineState *spapr)
-> > -{
-> > -    /*
-> > -     * Backwards compatibility hack:
-> > -     *
-> > -     *   CPUs had a "compat=" property which didn't make sense for
-> > -     *   anything except pseries.  It was replaced by "max-cpu-compat"
-> > -     *   machine option.  This supports old command lines like
-> > -     *       -cpu POWER8,compat=power7
-> > -     *   By stripping the compat option and applying it to the machine
-> > -     *   before passing it on to the cpu level parser.
-> > -     */
-> > -    gchar **inpieces;
-> > -    gchar *newprops;
-> > -    int i, j;
-> > -    gchar *compat_str = NULL;
-> > -
-> > -    inpieces = g_strsplit(MACHINE(spapr)->cpu_model, ",", 0);
-> > -
-> > -    /* inpieces[0] is the actual model string */
-> > -    i = 1;
-> > -    j = 1;
-> > -    while (inpieces[i]) {
-> > -        if (g_str_has_prefix(inpieces[i], "compat=")) {
-> > -            /* in case of multiple compat= options */
-> > -            g_free(compat_str);
-> > -            compat_str = inpieces[i];
-> > -        } else {
-> > -            j++;
-> > -        }
-> > -
-> > -        i++;
-> > -        /* Excise compat options from list */
-> > -        inpieces[j] = inpieces[i];
-> > -    }
-> > -
-> > -    if (compat_str) {
-> > -        char *val = compat_str + strlen("compat=");
-> > -
-> > -        object_property_set_str(OBJECT(spapr), val, "max-cpu-compat",
-> > -                                &error_fatal);
-> > -
-> > -    }
-> > -
-> > -    newprops = g_strjoinv(",", inpieces);
-> > -    cpu_parse_cpu_model(TYPE_POWERPC_CPU, newprops);
-> > -    g_free(newprops);
-> > -    g_strfreev(inpieces);
-> > -}
-> > -
-> >  static void spapr_cpu_reset(void *opaque)
-> >  {
-> >      PowerPCCPU *cpu = opaque;
-> > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> > index c6399a3..5ee91e8 100644
-> > --- a/target/ppc/translate_init.c
-> > +++ b/target/ppc/translate_init.c
-> > @@ -10313,6 +10313,62 @@ static ObjectClass *ppc_cpu_class_by_name(const char *name)
-> >  
-> >      return NULL;
-> >  }
-> > +static void ppc_cpu_parse_featurestr(const char *typename, char *features,
-> > +                                     Error **errp)
-> > +{
-> > +    const PowerPCCPUClass *pcc;
-> > +    char *compat_str = NULL;
-> > +    char *s = features;
-> > +    char **inpieces;
-> > +    Error *local_err = NULL;
-> > +    int i;
-> > +
-> > +    if (!features) {
-> > +        return;
-> > +    }
-> > +
-> > +    /*
-> > +     * Backwards compatibility hack:
-> > +     *
-> > +     *   CPUs had a "compat=" property which didn't make sense for
-> > +     *   anything except pseries.  It was replaced by "max-cpu-compat"
-> > +     *   machine option.  This supports old command lines like
-> > +     *       -cpu POWER8,compat=power7
-> > +     *   By stripping the compat option and applying it to the machine
-> > +     *   before passing it on to the cpu level parser.
-> > +     */
-> > +    inpieces = g_strsplit(features, ",", 0);
-> > +    *s = '\0';
-> > +    for (i = 0; inpieces[i]; i++) {
-> > +        if (g_str_has_prefix(inpieces[i], "compat=")) {
-> > +            compat_str = inpieces[i];
-> > +            continue;
-> > +        }
-> > +        if ((i != 0) && (s != features)) {
-> > +            s = g_stpcpy(s, ",");
-> > +        }
-> > +        s = g_stpcpy(s, inpieces[i]);
-> > +    }
-> > +
-> > +    if (compat_str) {
-> > +        Object *machine = qdev_get_machine();
-> > +        if (machine) {
-> > +            char *v = compat_str + strlen("compat=");
-> > +            object_property_set_str(machine, v, "max-cpu-compat", &local_err);
-> > +        } else {
-> > +            error_setg(&local_err, "Not supported property: %s", compat_str);
-> > +        }
-> > +    }
-> > +    g_strfreev(inpieces);
-> > +    if (local_err) {
-> > +        error_propagate(errp, local_err);
-> > +        return;
-> > +    }
-> > +
-> > +    /* do property processing with generic handler */
-> > +    pcc = POWERPC_CPU_CLASS(object_class_by_name(typename));
-> > +    pcc->parent_parse_features(typename, features, errp);
-> > +}
-> >  
-> >  const char *ppc_cpu_lookup_alias(const char *alias)
-> >  {
-> > @@ -10706,6 +10762,8 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
-> >      cc->reset = ppc_cpu_reset;
-> >  
-> >      cc->class_by_name = ppc_cpu_class_by_name;
-> > +    pcc->parent_parse_features = cc->parse_features;
-> > +    cc->parse_features = ppc_cpu_parse_featurestr;
-> >      cc->has_work = ppc_cpu_has_work;
-> >      cc->do_interrupt = ppc_cpu_do_interrupt;
-> >      cc->cpu_exec_interrupt = ppc_cpu_exec_interrupt;  
-> 
+> I think jobs needs to not clear that transactional hurdle until they've
+> been allowed to call prepare so that we can be guaranteed that any
+> changes that occur after that point in time will not fail (and cannot
+> any longer affect the transactional group.)
+
+The earliest point where the transaction can be removed from the picture
+is the first call of block-job-finalize for any job in the transaction.
+This is where all jobs of the transaction need to complete at least
+their .prepare stage, otherwise this first job can't be finalised.
+
+As we discussed yesterday, block-job-finalize is really an operation on
+the whole transaction, but keeping it at the job level in the external
+interface spares us managing transactions as named objects.
+
+Kevin
