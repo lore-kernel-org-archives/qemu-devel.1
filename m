@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=44560dde8=Ian.Jackson@citrix.com>)
-	id 1e0XLi-0002Uh-B6
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 14:27:51 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e0Y22-0006Na-Rw
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 15:11:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=44560dde8=Ian.Jackson@citrix.com>)
-	id 1e0XLg-0002wx-0q
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 14:27:50 -0400
-Received: from smtp.citrix.com ([66.165.176.89]:29347)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=44560dde8=Ian.Jackson@citrix.com>)
-	id 1e0XLf-0002uw-Ny
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 14:27:47 -0400
-From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Fri, 6 Oct 2017 19:27:21 +0100
-Message-ID: <1507314444-30835-6-git-send-email-ian.jackson@eu.citrix.com>
+	(envelope-from <no-reply@patchew.org>) id 1e0Y1z-00076r-IA
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 15:11:34 -0400
+Resent-Message-Id: <E1e0Y1z-00076r-IA@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21341)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e0Y1z-0006x0-Ab
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 15:11:31 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150731700204.216.10260373585669997056@b58463cdfd5f>
 In-Reply-To: <1507314444-30835-1-git-send-email-ian.jackson@eu.citrix.com>
-References: <1507314444-30835-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 5/8] xen: move xc_interface compatibility
- fallback further up the file
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 6 Oct 2017 12:10:02 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 0/8] xen: xen-domid-restrict improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
+To: ian.jackson@eu.citrix.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, anthony.perard@citrix.com, ross.lagerwall@citrix.com, sstabellini@kernel.org, jgross@suse.com, xen-devel@lists.xenproject.org
 
-We are going to want to use the dummy xendevicemodel_handle type in
-new stub functions in the CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
-section.  So we need to provide that definition, or (as applicable)
-include the appropriate header, earlier in the file.
-
-(Ideally the newer compatibility layers would be at the bottom of the
-file, so that they can naturally benefit from the compatibility layers
-for earlier version.  But that's rather too much for this series.)
-
-No functional change.
-
-Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
----
-v2: New patch in v2 of the series
----
- include/hw/xen/xen_common.h | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
-
-diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-index 3f44a63..8efdb8a 100644
---- a/include/hw/xen/xen_common.h
-+++ b/include/hw/xen/xen_common.h
-@@ -78,6 +78,17 @@ static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
- 
- extern xenforeignmemory_handle *xen_fmem;
- 
-+#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
-+
-+typedef xc_interface xendevicemodel_handle;
-+
-+#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
-+
-+#undef XC_WANT_COMPAT_DEVICEMODEL_API
-+#include <xendevicemodel.h>
-+
-+#endif
-+
- #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
- 
- #define XEN_COMPAT_PHYSMAP
-@@ -105,8 +116,6 @@ static inline int xentoolcore_restrict_all(domid_t domid)
- 
- #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
- 
--typedef xc_interface xendevicemodel_handle;
--
- static inline xendevicemodel_handle *xendevicemodel_open(
-     struct xentoollog_logger *logger, unsigned int open_flags)
- {
-@@ -228,11 +237,6 @@ static inline int xendevicemodel_set_mem_type(
-     return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
- }
- 
--#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
--
--#undef XC_WANT_COMPAT_DEVICEMODEL_API
--#include <xendevicemodel.h>
--
- #endif
- 
- extern xendevicemodel_handle *xen_dmod;
--- 
-2.1.4
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MDczMTQ0NDQtMzA4MzUtMS1naXQtc2VuZC1lbWFpbC1pYW4uamFja3NvbkBl
+dS5jaXRyaXguY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC84XSB4ZW46IHhl
+bi1kb21pZC1yZXN0cmljdCBpbXByb3ZlbWVudHMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
+IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
+RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
+dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQg
+bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
+CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
+bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
+cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
+ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
+VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
+NDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmYxMTdmNTNiOWUg
+UkZDIGNvbmZpZ3VyZTogZG9fY29tcGlsZXI6IER1bXAgc29tZSBleHRyYSBpbmZvIHVuZGVyIGJh
+c2gKOGM1YzA1NTk5ZiBvcy1wb3NpeDogUHJvdmlkZSBuZXcgLXJ1bmFzaWQgb3B0aW9uCjAxNzdi
+YTY4OGQgeGVuOiBkZXN0cm95X2h2bV9kb21haW46IFRyeSB4ZW5kZXZpY2Vtb2RlbF9zaHV0ZG93
+bgoyZGIxYzg5ODc3IHhlbjogbW92ZSB4Y19pbnRlcmZhY2UgY29tcGF0aWJpbGl0eSBmYWxsYmFj
+ayBmdXJ0aGVyIHVwIHRoZSBmaWxlCmRhNjRiZDYxMDQgeGVuOiBkZXN0cm95X2h2bV9kb21haW46
+IE1vdmUgcmVhc29uIGludG8gYSB2YXJpYWJsZQo3OGYzNWFjYzBhIHhlbjogZGVmZXIgY2FsbCB0
+byB4ZW5fcmVzdHJpY3QgdW50aWwganVzdCBiZWZvcmUgb3Nfc2V0dXBfcG9zdAozM2I0NmUwOGRk
+IHhlbjogcmVzdHJpY3Q6IHVzZSB4ZW50b29sY29yZV9yZXN0cmljdF9hbGwKMGVlYjQzMjNhYiB4
+ZW46IGxpbmsgYWdhaW5zdCB4ZW50b29sY29yZQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tp
+bmcgUEFUQ0ggMS84OiB4ZW46IGxpbmsgYWdhaW5zdCB4ZW50b29sY29yZS4uLgpDaGVja2luZyBQ
+QVRDSCAyLzg6IHhlbjogcmVzdHJpY3Q6IHVzZSB4ZW50b29sY29yZV9yZXN0cmljdF9hbGwuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMy84OiB4ZW46IGRlZmVyIGNhbGwgdG8geGVuX3Jlc3RyaWN0IHVudGls
+IGp1c3QgYmVmb3JlIG9zX3NldHVwX3Bvc3QuLi4KQ2hlY2tpbmcgUEFUQ0ggNC84OiB4ZW46IGRl
+c3Ryb3lfaHZtX2RvbWFpbjogTW92ZSByZWFzb24gaW50byBhIHZhcmlhYmxlLi4uCkNoZWNraW5n
+IFBBVENIIDUvODogeGVuOiBtb3ZlIHhjX2ludGVyZmFjZSBjb21wYXRpYmlsaXR5IGZhbGxiYWNr
+IGZ1cnRoZXIgdXAgdGhlIGZpbGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNi84OiB4ZW46IGRlc3Ryb3lf
+aHZtX2RvbWFpbjogVHJ5IHhlbmRldmljZW1vZGVsX3NodXRkb3duLi4uCkNoZWNraW5nIFBBVENI
+IDcvODogb3MtcG9zaXg6IFByb3ZpZGUgbmV3IC1ydW5hc2lkIG9wdGlvbi4uLgpFUlJPUjogY29u
+c2lkZXIgdXNpbmcgcWVtdV9zdHJ0b3VsIGluIHByZWZlcmVuY2UgdG8gc3RydG91bAojNDI6IEZJ
+TEU6IG9zLXBvc2l4LmM6MTYwOgorICAgICAgICBsdiA9IHN0cnRvdWwob3B0YXJnLCAmZXAsIDAp
+OyAvKiBjYW4ndCBxZW11X3N0cnRvdWwsIHdhbnQgKmVwPT0nLicgKi8KCnRvdGFsOiAxIGVycm9y
+cywgMCB3YXJuaW5ncywgOTQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
+YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
+b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
+IE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggOC84OiBSRkMgY29uZmlndXJlOiBkb19jb21w
+aWxlcjogRHVtcCBzb21lIGV4dHJhIGluZm8gdW5kZXIgYmFzaC4uLgo9PT0gT1VUUFVUIEVORCA9
+PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRl
+ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
+c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
