@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0OPI-0004X1-1Y
+	(envelope-from <dgibson@ozlabs.org>) id 1e0OPI-0004XQ-JN
 	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 04:54:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0OPE-0008E2-Vf
+	(envelope-from <dgibson@ozlabs.org>) id 1e0OPH-0008HJ-KL
 	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 04:54:56 -0400
-Date: Fri, 6 Oct 2017 19:37:05 +1100
+Date: Fri, 6 Oct 2017 19:54:39 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171006083705.GX3260@umbus.fritz.box>
-References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-	<1507220690-265042-20-git-send-email-imammedo@redhat.com>
+Message-ID: <20171006085439.GC10961@umbus.fritz.box>
+References: <20171005192458.610-1-danielhb@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Swav0nNPrA3tWuBp"
+	protocol="application/pgp-signature"; boundary="hOcCNbCCxyk/YU74"
 Content-Disposition: inline
-In-Reply-To: <1507220690-265042-20-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 19/23] ppc: pnv: normalize core/chip type
- names
+In-Reply-To: <20171005192458.610-1-danielhb@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] hw/ppc/spapr_drc.c: adding drc->dev
+ into detach quiesce condition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,101 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com
 
 
---Swav0nNPrA3tWuBp
+--hOcCNbCCxyk/YU74
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 05, 2017 at 06:24:46PM +0200, Igor Mammedov wrote:
-> typically for cpus/core type names following convention is used
+On Thu, Oct 05, 2017 at 04:24:58PM -0300, Daniel Henrique Barboza wrote:
+> In cases where a device is hotplugged and hot-unplugged shortly after,
+> there is a chance of QEMU breaking with the following message:
 >=20
->    new_type_prefix-superclass_typename
+> hw/ppc/spapr_drc.c:417:spapr_drc_detach: assertion failed: (drc->dev)
+> Aborted
 >=20
-> make PNV core/chip to follow common convention.
+> spapr_drc_detach makes a g_assert(drc->dev) to ensure that the following
+> spapr_drc_release call is able to execute the appropriate callback
+> using drc->dev as a parameter. However, in a scenario where a hotplug
+> is quickly followed by a hot-unplug, this g_assert can be reached before
+> the hotplug operation sets drc->dev in spapr_drc_attach.
 >=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> This patch makes use of the awaiting quiesce mechanism inside
+> spapr_drc_detach to fix this scenario. Inside spapr_drc_detach there is a
+> quiesce condition that relies on drc->state being equal to drck->empty_st=
+ate.
+> If this doesn't happen, it is considered that the drc is not ready to be
+> detached. By extending this condition to include drc->dev being non-null
+> we cover this situation where the drc is still being attached and drc->dev
+> isn't set yet during the detach.
 
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Hrm.  I thought the plug and unplug operations were serialized by the
+BQL.  So, we need some more explanation of exactly how we get here.
 
+But, more importantly, this is broken.  If we get here and attach
+hasn't completed yet, then we abort, *leaving the attach actions in
+place* meaning the device *isn't* unplugged.
+
+>=20
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1718118
+> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 > ---
->  include/hw/ppc/pnv.h      | 11 +++++++----
->  include/hw/ppc/pnv_core.h |  2 ++
->  hw/ppc/pnv.c              |  2 +-
->  hw/ppc/pnv_core.c         |  2 +-
->  4 files changed, 11 insertions(+), 6 deletions(-)
+>  hw/ppc/spapr_drc.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 >=20
-> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> index 2525f7f..d82eee1 100644
-> --- a/include/hw/ppc/pnv.h
-> +++ b/include/hw/ppc/pnv.h
-> @@ -80,19 +80,22 @@ typedef struct PnvChipClass {
->      uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
->  } PnvChipClass;
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index 915e9b51c4..6ad8190360 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -414,11 +414,9 @@ void spapr_drc_detach(sPAPRDRConnector *drc)
 > =20
-> -#define TYPE_PNV_CHIP_POWER8E TYPE_PNV_CHIP "-power8e_v2.1"
-> +#define PNV_CHIP_TYPE_SUFFIX "-" TYPE_PNV_CHIP
-> +#define PNV_CHIP_TYPE_NAME(cpu_model) cpu_model PNV_CHIP_TYPE_SUFFIX
-> +
-> +#define TYPE_PNV_CHIP_POWER8E PNV_CHIP_TYPE_NAME("power8e_v2.1")
->  #define PNV_CHIP_POWER8E(obj) \
->      OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER8E)
+>      trace_spapr_drc_detach(spapr_drc_index(drc));
 > =20
-> -#define TYPE_PNV_CHIP_POWER8 TYPE_PNV_CHIP "-power8_v2.0"
-> +#define TYPE_PNV_CHIP_POWER8 PNV_CHIP_TYPE_NAME("power8_v2.0")
->  #define PNV_CHIP_POWER8(obj) \
->      OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER8)
+> -    g_assert(drc->dev);
+> -
+>      drc->unplug_requested =3D true;
 > =20
-> -#define TYPE_PNV_CHIP_POWER8NVL TYPE_PNV_CHIP "-power8nvl_v1.0"
-> +#define TYPE_PNV_CHIP_POWER8NVL PNV_CHIP_TYPE_NAME("power8nvl_v1.0")
->  #define PNV_CHIP_POWER8NVL(obj) \
->      OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER8NVL)
-> =20
-> -#define TYPE_PNV_CHIP_POWER9 TYPE_PNV_CHIP "-power9_v1.0"
-> +#define TYPE_PNV_CHIP_POWER9 PNV_CHIP_TYPE_NAME("power9_v1.0")
->  #define PNV_CHIP_POWER9(obj) \
->      OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER9)
-> =20
-> diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
-> index 2955a41..3360c4b 100644
-> --- a/include/hw/ppc/pnv_core.h
-> +++ b/include/hw/ppc/pnv_core.h
-> @@ -45,6 +45,8 @@ typedef struct PnvCoreClass {
->      ObjectClass *cpu_oc;
->  } PnvCoreClass;
-> =20
-> +#define PNV_CORE_TYPE_SUFFIX "-" TYPE_PNV_CORE
-> +#define PNV_CORE_TYPE_NAME(cpu_model) cpu_model PNV_CORE_TYPE_SUFFIX
->  extern char *pnv_core_typename(const char *model);
-> =20
->  #endif /* _PPC_PNV_CORE_H */
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 4169837..9c5eb7c 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -609,7 +609,7 @@ static void ppc_powernv_init(MachineState *machine)
-> =20
->      /* Create the processor chips */
->      i =3D strlen(machine->cpu_type) - strlen(POWERPC_CPU_TYPE_SUFFIX);
-> -    chip_typename =3D g_strdup_printf(TYPE_PNV_CHIP "-%.*s",
-> +    chip_typename =3D g_strdup_printf(PNV_CHIP_TYPE_NAME("%.*s"),
->                                      i, machine->cpu_type);
->      if (!object_class_by_name(chip_typename)) {
->          error_report("invalid CPU model '%.*s' for %s machine",
-> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> index 44b0b24..b3e3f23 100644
-> --- a/hw/ppc/pnv_core.c
-> +++ b/hw/ppc/pnv_core.c
-> @@ -252,5 +252,5 @@ type_init(pnv_core_register_types)
-> =20
->  char *pnv_core_typename(const char *model)
->  {
-> -    return g_strdup_printf(TYPE_PNV_CORE "-%s", model);
-> +    return g_strdup_printf(PNV_CORE_TYPE_NAME("%s"), model);
->  }
+> -    if (drc->state !=3D drck->empty_state) {
+> +    if (!drc->dev || (drc->state !=3D drck->empty_state)) {
+>          trace_spapr_drc_awaiting_quiesce(spapr_drc_index(drc));
+>          return;
+>      }
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -127,24 +93,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Swav0nNPrA3tWuBp
+--hOcCNbCCxyk/YU74
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnXQLEACgkQbDjKyiDZ
-s5IgAhAAyxCYkqnrw5Ryw0Zy9yBU6ZcMLYHPAoTtrogkc6OY4xHW7C8KgajO6b+O
-3HB+GLIjJMy1nxxo6ECKyU+oNj5w7TLdM5QaPLeDSKf4rWFyT30T1CoohGB1g94e
-g6MHKk+xtHyfYQQq4k97C3yIl1mOac/jfOI4G5WmvBHrxW+gG/spD8JR7+ostS+q
-y2hYMJbM1ay5LxRFepK1U1Ymc2ZLQqhvH60RLEHdR9VLgmeBwvS4DrblbQcOxHeI
-RkPMBUxHTMtS54DlnYRtUq2sImWVf/80Dd2zb0Xq+418E30vvFlvv56PPtN5+kWl
-LuTgXut/uHFhjj3AwNQZzOUXzZUakcxBO3XfMPiDF3aK3M9FpSHGJBipZgS8sL+Q
-X6j5nWx6X/iLtIloAA3ozQCTGmKfLXfYdO1HamKwLQSCNr3D+YeCrVnR24vWqI3q
-K7rO3RZCIIzSYs149uA8DlCweRZ+r0l7fSmVk5iLrguJCPerc87Q+sm0jtamYwIB
-TfuFB0sw4qegi/IhremZzo2EPWkGit3bWUdF1T/c+6UCb/F8qBdJV2H5+0N5mZA6
-pG/0kVSQf7EdqBoiojC4W2fZAg0+/XyV1Ndym+4oKWjWO08CWGdAExZNmn81PQ/1
-Y2n7J3vwerT2dMtQSyJMOBfu/NEGL0UTL4+YOV3/YRQhgDKRRpY=
-=2VRF
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnXRM8ACgkQbDjKyiDZ
+s5LNEA//VS/dTlX9UYOAgtso9dEZS5999QFiw2X18QuKs/b6v3bYLDUBg56DLppk
+TiIDLZ1cj2uD+rTSlekG69lW6sUt9q3IhrkRpvW05clfWusSNJQOYHU47Vxb57ds
+fni7GeV00df01sjRgpFcGl9L+LOa/MH/r6po0fu+7Onpce6uCKUjA24EqdMnXzd+
+gXqKJ20mOD3OQqe/grLJhLDPsQtWCUFcS586dKN9X33xE3QsTi+m2ZPOG5bkUKfv
+xuVWoFRnwwIz4L1aImE4IAU/5wMLw7RxEGmJVFX5T2DO6MsqKTBZLBOxtWIFmroG
+7IUpmNxLVSWcgT3G3t/mDTq13FSczVa402UJlT/kPfpJN9CIA2ELgmOt2msP2Dtz
+cFCWVTAFTWvD4eh5XWCzGnsqToZ92FhfAd5bMU/c6ZOHUXR4uNS51bTSAmP2mF5y
+9o+P2KconjvQavN/nxjXWG4D/++Pb4RiynFKTfTrVDJ2Xwyi1Pfp8wZ+ysoAoVBB
+CS7koZR8SC2tRC64PXEckW1c7Q3pEr0z1tCaz545zswfXzDdFlmSR1RJ2sBzRa+P
+ny0VxmpiIS3tDUwGmCzlwzjQpZEyppGE0spmHOCUwBX3dWBHgZ6f33bWIcwXpYOU
+YL3XvmOymNJOLsd2y8lkX6mywzTMKVKmk9VDknwXEKUd5zYcOHc=
+=B1gk
 -----END PGP SIGNATURE-----
 
---Swav0nNPrA3tWuBp--
+--hOcCNbCCxyk/YU74--
