@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e0ROU-0001Dw-6y
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:06:19 -0400
+	(envelope-from <otubo@redhat.com>) id 1e0RS9-00028S-0U
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:10:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e0ROO-00014D-JW
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:06:18 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38734)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e0ROO-000126-DJ
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:06:12 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e0ROM-0008WH-Hp
-	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 12:06:10 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7FECA2E80C7
-	for <qemu-devel@nongnu.org>; Fri,  6 Oct 2017 12:06:10 +0000 (UTC)
+	(envelope-from <otubo@redhat.com>) id 1e0RS4-0004Yv-W9
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:10:04 -0400
+Date: Fri, 6 Oct 2017 14:09:48 +0200
+From: "Eduardo Otubo\"" <otubo@redhat.com>
+Message-ID: <20171006120948.GA12173@vader>
+References: <20170922154014.29350-1-f4bug@amsat.org>
+	<20170922160111.31885-1-f4bug@amsat.org>
+	<a6bedac0-0e58-8709-f549-a602914c9077@reactos.org>
+	<400dde93-d110-ee49-b2a0-76ea633b4abe@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <400dde93-d110-ee49-b2a0-76ea633b4abe@amsat.org>
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 06 Oct 2017 11:53:44 -0000
-From: Quentin Casasnovas <601946@bugs.launchpad.net>
-Reply-To: Bug 601946 <601946@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20100705154408.6052.2473.malonedeb@potassium.ubuntu.com>
-Message-Id: <150729082459.7593.10336002211512254746.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 601946] Re: [Feature request] qemu-img
- multi-threaded compressed image conversion
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH 23/34] hw/dma/i8257: rename
+ DMA_init() to i8257_dma_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,31 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, qemu-trivial@nongnu.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-@Jinank I have not started working on this at all, so please go ahead!
-Let me know if I can help with testing or anything, we make quite
-extensive use of nbd and qcow2 images internally.
+On Fri, Sep 22, 2017 at 03:08:03PM -0300, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> On 09/22/2017 02:43 PM, Herv=C3=A9 Poussineau wrote:
+> > Le 22/09/2017 =C3=A0 18:01, Philippe Mathieu-Daud=C3=A9 a =C3=A9crit =
+:
+> [...]
+> > > +void i8257_dma_init(ISABus *bus, int high_page_enable);
+> > > +
+> >=20
+> > As you're changing the DMA_init prototype, can you add an Error **err=
+p
+> > parameter, and pass &error_abort in each caller?
+> >=20
+> > See http://lists.gnu.org/archive/html/qemu-devel/2017-09/msg00262.htm=
+l
+> > for more details
+>=20
+> If Eduardo doesn't have a patch ready I can do it.
 
--- =
+Please go ahead.
+You can also use my patch set (v2) for that as a base if you want.
+https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg08007.html
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/601946
-
-Title:
-  [Feature request] qemu-img multi-threaded compressed image conversion
-
-Status in QEMU:
-  New
-
-Bug description:
-  Feature request:
-  qemu-img multi-threaded compressed image conversion
-
-  Suppose I want to convert raw image to compressed qcow2. Multi-
-  threaded conversion will be much faster, because bottleneck is
-  compressing data.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/601946/+subscriptions
+--=20
+Eduardo Otubo
+Senior Software Engineer @ RedHat
