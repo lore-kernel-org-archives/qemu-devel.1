@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e0QqF-0007wF-17
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 07:30:56 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e0R4r-00027s-R7
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 07:46:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e0QqB-0002Kz-LZ
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 07:30:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59800)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e0QqB-0002K7-EF
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 07:30:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e0QqA-00019X-AS
-	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 11:30:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4D2D52E80CB
-	for <qemu-devel@nongnu.org>; Fri,  6 Oct 2017 11:30:50 +0000 (UTC)
+	(envelope-from <ehabkost@redhat.com>) id 1e0R4p-0000E2-4G
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 07:46:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53772)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e0R4o-0000CF-Pi
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 07:45:59 -0400
+Date: Fri, 6 Oct 2017 08:45:49 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171006114549.GN4015@localhost.localdomain>
+References: <20171003203654.GD4760@localhost.localdomain>
+	<CAKmqyKN+QnBAS6c4mAb2EiTVQv3Km6EdmGXCFC3hVogL96QK1Q@mail.gmail.com>
+	<20171004131232.32f5caae@nial.brq.redhat.com>
+	<20171004122851.GJ4760@localhost.localdomain>
+	<20171004150816.41ffc161@nial.brq.redhat.com>
+	<20171004163434.GN4760@localhost.localdomain>
+	<CAKmqyKP6yqWfGbzDnWeeROO=_27TiVSBZvdw1PA5JbRH_m3tcA@mail.gmail.com>
+	<20171005110427.647fed06@nial.brq.redhat.com>
+	<20171005170906.GF4015@localhost.localdomain>
+	<20171006102312.3a9a76c2@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 06 Oct 2017 11:21:08 -0000
-From: Greg Kurz <groug@kaod.org>
-Reply-To: Bug 1721744 <1721744@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150728578413.796.15373444520066064008.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150728886813.8130.14646885344900219104.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1721744] Re: Help content missing for newly added
- machine properties
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171006102312.3a9a76c2@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 3/5] xlnx-zcu102: Specify the valid CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,132 +35,317 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Marcel Apfelbaum <marcel@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-Hmm... -h is common to all targets, ie, you should only find properties
-that can be passed to -machine for all qemu-system-* binaries (I don't
-know how s390-squash-mcss landed there but it looks wrong).
+On Fri, Oct 06, 2017 at 10:23:12AM +0200, Igor Mammedov wrote:
+> On Thu, 5 Oct 2017 14:09:06 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> 
+> > On Thu, Oct 05, 2017 at 11:04:27AM +0200, Igor Mammedov wrote:
+> > > On Wed, 4 Oct 2017 14:39:20 -0700
+> > > Alistair Francis <alistair.francis@xilinx.com> wrote:
+> > >   
+> > > > On Wed, Oct 4, 2017 at 9:34 AM, Eduardo Habkost <ehabkost@redhat.com> wrote:  
+> > > > > On Wed, Oct 04, 2017 at 03:08:16PM +0200, Igor Mammedov wrote:    
+> > > > >> On Wed, 4 Oct 2017 09:28:51 -0300
+> > > > >> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > > > >>    
+> > > > >> > On Wed, Oct 04, 2017 at 01:12:32PM +0200, Igor Mammedov wrote:    
+> > > > >> > > On Tue, 3 Oct 2017 14:41:17 -0700
+> > > > >> > > Alistair Francis <alistair.francis@xilinx.com> wrote:
+> > > > >> > >    
+> > > > >> > > > On Tue, Oct 3, 2017 at 1:36 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:    
+> > > > >> > > > > On Tue, Oct 03, 2017 at 01:05:13PM -0700, Alistair Francis wrote:    
+> > > > >> > > > >> List all possible valid CPU options.
+> > > > >> > > > >>
+> > > > >> > > > >> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> > > > >> > > > >> ---
+> > > > >> > > > >>
+> > > > >> > > > >>  hw/arm/xlnx-zcu102.c         | 10 ++++++++++
+> > > > >> > > > >>  hw/arm/xlnx-zynqmp.c         | 16 +++++++++-------
+> > > > >> > > > >>  include/hw/arm/xlnx-zynqmp.h |  1 +
+> > > > >> > > > >>  3 files changed, 20 insertions(+), 7 deletions(-)
+> > > > >> > > > >>
+> > > > >> > > > >> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+> > > > >> > > > >> index 519a16ed98..039649e522 100644
+> > > > >> > > > >> --- a/hw/arm/xlnx-zcu102.c
+> > > > >> > > > >> +++ b/hw/arm/xlnx-zcu102.c
+> > > > >> > > > >> @@ -98,6 +98,8 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s, MachineState *machine)
+> > > > >> > > > >>      object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
+> > > > >> > > > >>                                &error_abort);
+> > > > >> > > > >>
+> > > > >> > > > >> +    object_property_set_str(OBJECT(&s->soc), machine->cpu_type, "cpu-type",
+> > > > >> > > > >> +                            &error_fatal);    
+> > > > >> > > > >
+> > > > >> > > > > Do you have plans to support other CPU types to xlnx_zynqmp in
+> > > > >> > > > > the future?  If not, I wouldn't bother adding the cpu-type
+> > > > >> > > > > property and the extra boilerplate code if it's always going to
+> > > > >> > > > > be set to cortex-a53.    
+> > > > >> > > >
+> > > > >> > > > No, it'll always be A53.
+> > > > >> > > >
+> > > > >> > > > I did think of that, but I also wanted to use the new option! I also
+> > > > >> > > > think there is an advantage in sanely handling users '-cpu' option,
+> > > > >> > > > before now we just ignored it, so I think it still does give a
+> > > > >> > > > benefit. That'll be especially important on the Xilinx tree (sometimes
+> > > > >> > > > people use our machines with a different CPU to 'benchmark' or test
+> > > > >> > > > other CPUs with our CoSimulation setup). So I think it does make sense
+> > > > >> > > > to keep in.    
+> > > > >> > > if cpu isn't user settable, one could just outright die if cpu_type
+> > > > >> > > is not NULL and say that user's CLI is wrong.
+> > > > >> > > (i.e. don't give users illusion that they allowed to use '-cpu')    
+> > > > >> >
+> > > > >> > Isn't it exactly what this patch does, by setting:
+> > > > >> >     mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a53");
+> > > > >> >     mc->valid_cpu_types = xlnx_zynqmp_valid_cpus;
+> > > > >> > ?
+> > > > >> >
+> > > > >> > Except that "-cpu cortex-a53" won't die, which is a good thing.    
+> > > > >> allowing "-cpu cortex-a53" here, would allow to use feature parsing
+> > > > >> which weren't allowed or were ignored before if user supplied '-cpu'.
+> > > > >> so I'd more strict and refuse any -cpu and break CLI that tries to use it
+> > > > >> if board has non configurable cpu type. It would be easier to relax
+> > > > >> restriction later if necessary.
+> > > > >>
+> > > > >> using validate_cpus here just to have users for the new code,
+> > > > >> doesn't seem like valid justification and at that it makes board
+> > > > >> code more complex where it's not necessary and build in cpu type
+> > > > >> works just fine.    
+> > > > >
+> > > > > It's up to the board maintainer to decide what's the best option.
+> > > > > Both features are independent from each other and can be
+> > > > > implemented by machine core.    
+> > > > 
+> > > > Noooo!
+> > > > 
+> > > > My hope with this series is that eventually we could hit a state where
+> > > > every single machine acts the same way with the -cpu option.
+> > > > 
+> > > > I really don't like what we do now where some boards use it, some
+> > > > boards error and some boars just ignore the option. I think we should
+> > > > agree on something and every machine should follow the same flow so
+> > > > that users know what to expect when they use the -cpu option.
+> > > > 
+> > > > If this means we allow machines to specify they don't support the
+> > > > option or only have a single element in the list of supported options
+> > > > doesn't really matter, but all machines should do the same thing.
+> > > >   
+> > > > >
+> > > > > In either case, the valid_cpu_types feature will be still very
+> > > > > useful for boards like pxa270 and sa1110, which support -cpu but
+> > > > > only with specific families of CPU types (grep for
+> > > > > "strncmp(cpu_type").
+> > > > >    
+> > > > >>
+> > > > >> wrt centralized way to refuse -cpu if board doesn't support it,
+> > > > >> (which is not really related to this series) following could be done:
+> > > > >>
+> > > > >> when cpu_model removal is completely done I plan to replace
+> > > > >>   vl.c
+> > > > >>      cpu_parse_cpu_model(machine_class->default_cpu_type, cpu_model)
+> > > > >> with
+> > > > >>      cpu_parse_cpu_model(DEFAULT_TARGET_CPU_TYPE, cpu_model)
+> > > > >>
+> > > > >> so that we could drop temporary guard
+> > > > >>
+> > > > >>      if (machine_class->default_cpu_type) {    
+> > > > >
+> > > > > This sounds good to me, even if we don't reject -cpu on any
+> > > > > board.
+> > > > >
+> > > > >    
+> > > > >>
+> > > > >> with that it would be possible to tell from machine_run_board_init()
+> > > > >> that board doesn't provide cpu but user provided '-cpu'
+> > > > >> so we would be able to:
+> > > > >>   if ((machine_class->default_cpu_type == NULL) &&
+> > > > >>       (machine->cpu_type != NULL))
+> > > > >>           error_fatal("machine doesn't support -cpu option");    
+> > > > >
+> > > > > I won't complain too much if a board maintainer really wants to
+> > > > > make the board reject -cpu completely, but it's up to them.    
+> > > > 
+> > > > I disagree. I think a standard way of doing it is better. At least for
+> > > > each architecture. The ARM -cpu option is very confusing at the moment
+> > > > and it really doesn't need to be that bad.
+> > > >   
+> > > > >
+> > > > > Personally, I'd prefer to have all boards setting
+> > > > > default_cpu_type even if they support only one CPU model, so
+> > > > > clients don't need a special case for boards that don't support
+> > > > > -cpu.    
+> > > > 
+> > > > I agree, I think having one CPU makes more sense. It makes it easier
+> > > > to add support for more cpus in the future and allows the users to use
+> > > > the -cpu option without killing QEMU.  
+> > > I'm considering -cpu option as a legacy one that server 2 purposes now  
+> > 
+> > I'm not sure about "legacy", but the list of purposes looks
+> > accurate:
+> > 
+> > >  1: pick cpu type for running instance  
+> > 
+> > This one has no replacement yet, so can we really call it legacy?
+> not really, it's not going anywhere in near future
+> 
+> > 
+> > >  2: convert optional features/legacy syntax to global properties
+> > >     for related cpu type  
+> > 
+> > This one has a replacement: -global.  But there's a difference
+> > between saying "-cpu features are implemented using -global" and
+> > "-cpu features are obsoleted by -global".  I don't think we can
+> > say it's obsolete or legacy unless existing management software
+> > is changed to be using something else.
+> > 
+> > 
+> > > 
+> > > It plays ok for machines with single type of cpu but doesn't really scale
+> > > to more and doesn't work well nor needed if we were to specify cpus on CLI
+> > > with -device (i.e. build machine from config/CLI)  
+> > 
+> > This is a good point.  But -cpu is still a useful shortcut for
+> > boards that have a single CPU type.  What are the arguments we
+> > have to get rid of it completely?
+> boards that have single cpu type don't need -cpu. since cpu is not
+> configurable there.
 
-The right way to query properties supported by a pseries machine type
-is:
-
-$ ./ppc64-softmmu/qemu-system-ppc64 -machine pseries,help
-pseries-2.11.kvm-type=3Dstring (Specifies the KVM virtualization mode (HV, =
-PR))
-pseries-2.11.vsmt=3Duint32 (Virtual SMT: KVM behaves as if this were the ho=
-st's SMT mode)
-pseries-2.11.modern-hotplug-events=3Dbool (Use dedicated hotplug event mech=
-anism in place of standard EPOW events when possible (required for memory h=
-ot-unplug support))
-pseries-2.11.max-cpu-compat=3Dstring (Maximum permitted CPU compatibility m=
-ode. Valid values are power6, power7, power7+, power8, power9.)
-pseries-2.11.resize-hpt=3Dstring (Resizing of the Hash Page Table (enabled,=
- disabled, required))
-pseries-2.11.kvm-shadow-mem=3Dint (KVM shadow MMU size)
-pseries-2.11.enforce-config-section=3Dbool (Set on to enforce configuration=
- section migration)
-pseries-2.11.initrd=3Dstring (Linux initial ramdisk file)
-pseries-2.11.mem-merge=3Dbool (Enable/disable memory merge support)
-pseries-2.11.firmware=3Dstring (Firmware image)
-pseries-2.11.dtb=3Dstring (Linux kernel device tree file)
-pseries-2.11.suppress-vmdesc=3Dbool (Set on to disable self-describing migr=
-ation)
-pseries-2.11.usb=3Dbool (Set on/off to enable/disable usb)
-pseries-2.11.kernel=3Dstring (Linux kernel image file)
-pseries-2.11.dt-compatible=3Dstring (Overrides the "compatible" property of=
- the dt root node)
-pseries-2.11.igd-passthru=3Dbool (Set on/off to enable/disable igd passthro=
-u)
-pseries-2.11.dumpdtb=3Dstring (Dump current dtb to a file and quit)
-pseries-2.11.append=3Dstring (Linux kernel command line)
-pseries-2.11.accel=3Dstring (Accelerator list)
-pseries-2.11.kernel-irqchip=3DOnOffSplit (Configure KVM in-kernel irqchip)
-pseries-2.11.dump-guest-core=3Dbool (Include guest memory in  a core dump)
-pseries-2.11.phandle-start=3Dint (The first phandle ID we may generate dyna=
-mically)
-pseries-2.11.graphics=3Dbool (Set on/off to enable/disable graphics emulati=
-on)
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1721744
-
-Title:
-  Help content missing for newly added machine properties
-
-Status in QEMU:
-  New
-
-Bug description:
-  =
-
-  Help content missing for newly added machine properties, it would be need=
-ed by libvirt and other management layers to query to add support, Thanks.
-
-  max-cpu-compat,vsmt,modern-hotplug-events,resize-hpt
-
-  Steps:
-  1. Compile qemu @below commit
-  2. ./ppc64-softmmu/qemu-system-ppc64 -h
-  ....
-  -machine [type=3D]name[,prop[=3Dvalue][,...]]
-                  selects emulated machine ('-machine help' for list)
-                  property accel=3Daccel1[:accel2[:...]] selects accelerator
-                  supported accelerators are kvm, xen, hax or tcg (default:=
- tcg)
-                  kernel_irqchip=3Don|off|split controls accelerated irqchi=
-p support (default=3Doff)
-                  vmport=3Don|off|auto controls emulation of vmport (defaul=
-t: auto)
-                  kvm_shadow_mem=3Dsize of KVM shadow MMU in bytes
-                  dump-guest-core=3Don|off include guest memory in a core d=
-ump (default=3Don)
-                  mem-merge=3Don|off controls memory merge support (default=
-: on)
-                  igd-passthru=3Don|off controls IGD GFX passthrough suppor=
-t (default=3Doff)
-                  aes-key-wrap=3Don|off controls support for AES key wrappi=
-ng (default=3Don)
-                  dea-key-wrap=3Don|off controls support for DEA key wrappi=
-ng (default=3Don)
-                  suppress-vmdesc=3Don|off disables self-describing migrati=
-on (default=3Doff)
-                  nvdimm=3Don|off controls NVDIMM support (default=3Doff)
-                  enforce-config-section=3Don|off enforce configuration sec=
-tion migration (default=3Doff)
-                  s390-squash-mcss=3Don|off controls support for squashing =
-into default css (default=3Doff)
-  ....
-
-  =3D=3D=3D> Not showing help of mentioned properties.
+They don't need -cpu, but there's no need to reject "-cpu FOO" if
+we know FOO is the CPU model used by the board.  This is the only
+difference between what you propose and what Alistair proposes,
+right?
 
 
-  Verified at todays below commit
-  #git show
-  commit d8f932cc696250cb740240d668b39df5fbb2d5a0
-  Merge: 67caeea 4504273
-  Author: Peter Maydell <peter.maydell@linaro.org>
-  Date:   Thu Oct 5 16:54:29 2017 +0100
+> 
+> 
+> > > So I would not extend usage '-cpu' to boards that have fixed cpu type,
+> > > because it really useless in that case and confuses users with idea that
+> > > they have ability/need to specify -cpu on fixed cpu board.  
+> > 
+> > If they try to choose any other CPU model, they will see an error
+> > message explicitly saying only one CPU type is supported.  What
+> > would be the harm?
+> I guess I've already pointed drawbacks from interface point of view,
+> from maintainer pov it will be extra code to maintain valid cpus
+> vs just 'create_cpu(MY_CPU_TYPE)'
+> this patch is vivid example of the case
 
-      Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-requ=
-est' into staging
-      =
+With this part I agree.  We don't need to add boilerplate code to
+board init if the CPU model will always be the same.
 
-      # gpg: Signature made Thu 05 Oct 2017 15:25:21 BST
-      # gpg:                using RSA key 0x9CA4ABB381AB73C8
-      # gpg: Good signature from "Stefan Hajnoczi <stefanha@redhat.com>"
-      # gpg:                 aka "Stefan Hajnoczi <stefanha@gmail.com>"
-      # Primary key fingerprint: 8695 A8BF D3F9 7CDA AC35  775A 9CA4 ABB3 8=
-1AB 73C8
-      =
+But I would still prefer to do this:
 
-      * remotes/stefanha/tags/tracing-pull-request:
-        checkpatch: fix incompatibility with old perl
-      =
+  create_cpu(MY_CPU_TYPE);  // at XXX_init()
+[...]
+  static void xxx_class_init(...) {
+      mc->default_cpu_type = MY_CPU_TYPE;
+      /* Reason: XXX_init() is hardcoded to MY_CPU_TYPE */
+      mc->valid_cpu_types = { MY_CPU_TYPE, NULL };
+  }
 
-      Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+because this will let management software know that the board
+creates CPU of type MY_CPU_TYPE.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1721744/+subscriptions
+> 
+> 
+> > > I'd be upfront with users and fail explicitly if -cpu is not supported
+> > > (yes, it is not uniform CLI behavior across machines but it makes
+> > > sense since not all machines are the same, there probably are other
+> > > options with which some machines error out with unsupported error,
+> > > -cpu is not any different case).  
+> > 
+> > I'm not strongly for/against neither of those two approaches, but
+> > I'm inclined towards letting all (or most) machines support -cpu
+> > as suggested by Alistair.
+> Alistair said 'I also wanted to use the new option!'
+> and not allow users to specify a cpu for 'testing' that will be ignored anyways.
+> there are 2 ways to do the later 
+>   1. complicated, do it using valid_cpus as in this patch
+>      and error out if wrong cpu is specified
+>   2. simple, error out if board doesn't allow to change cpu type.
+>      could also be done from one centralized place and
+>      a board developer won't need to add extra to to support
+>      default/valid cpus at all
+
+Well, the "complicated" option is just 2 lines of code at
+class_init.  (see above)
+
+
+>  
+> > I see advantages in having less code relying on -cpu, and
+> > replacing it with something more generic.  But I also see
+> > advantages into reusing the same logic (both inside QEMU and on
+> > management software) to query/configure/create CPUs for the cases
+> > where a single CPU type is used.
+> management shouldn't care about querying cpu types for machines
+> with fixed cpu as it won't be really able to configure it.
+
+Management could show the user what's the CPU used by the board.
+"-machine BOARD -cpu help" could show the user what's the CPU
+used by the board.
+
+> 
+> 
+> > I'd be more inclined to agree with you if -cpu was really an
+> > obsolete option that was already completely replaced by something
+> > else.  But the reality is that there's no generic mechanism to
+> > choose the CPU type yet.
+> there is no choice with fixed cpu boards, it's just soldered on.
+
+True, but what's the harm in saying "there's no choice, and the
+only choice is cortex-a53" instead of "there's no choice, and I
+won't tell you what's the CPU type"?
+
+>  
+> > Unless we officially document -cpu as obsolete and point
+> > users/developers to a replacement, I don't see the problem with
+> > making "-cpu <model>" work on more (or all?) boards.
+> as I've already pointed out issues are:
+>  - it's confusing for user (he/she sees ability to specify cpu)
+
+Where exactly does the user "sees" the ability to specify the CPU?
+
+>  - using -cpu won't have any effect in practice
+
+True, but why this is a problem?
+
+"-cpu qemu64" doesn't have any effect in practice in x86 but we
+don't make PC reject "-cpu qemu64".  "-cpu cortex-a53" won't have
+any effect on xlnz-zcu102, but we don't need to make QEMU error
+out, either.
+
+
+>  - extra code vs just creating build in cpu, confusing for developer
+
+The extra code is just 2 lines of code in class_init.
+
+We could even make it 1 line of code, if we define
+valid_cpu_types=NULL as equivalent to { default_cpu_type, NULL }
+(but only after we make all boards that truly support -cpu today
+set valid_cpu_types).
+
+> 
+> all of above could be avoided by bailing out if -cpu is used with
+> fixed cpu boards.
+
+The only problem I see above is "extra code", but it's only
+2 lines of code on class_init.
+
+This means I don't think it's an argument against doing it on a
+specific board if the board maintainer wants to.
+
+However, this might be an argument for not requiring it to be
+done on all boards, unless there's a visible benefit for the user
+or management software.
+
+> 
+> PS:
+> I can come up with another option that have a fixed value
+> for a some boards, should we replace their hardcoded values
+> with extra generic handling of useless for board option too?
+> Lets not go down the road of enabling something where it
+> doesn't make much sense and only adds up to confusion/maintenance.
+
+-- 
+Eduardo
