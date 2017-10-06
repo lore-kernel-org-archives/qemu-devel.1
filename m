@@ -1,22 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0N5A-0006Ov-Bj
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:30:09 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e0N9x-0001hm-5r
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:35:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0N55-0002cc-Q7
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:30:04 -0400
-Date: Fri, 6 Oct 2017 14:54:47 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171006035447.GP3260@umbus.fritz.box>
-References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-	<1507220690-265042-13-git-send-email-imammedo@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e0N9u-0007v0-2Q
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:35:01 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:23737 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1e0N9t-0007sC-Kf
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:34:57 -0400
+References: <20170925135801.144261-1-vsementsov@virtuozzo.com>
+	<20170925135801.144261-9-vsementsov@virtuozzo.com>
+	<b8b01f1a-6e7b-342f-02b6-b7386bff1500@redhat.com>
+	<a4fb096f-7995-ad85-64b7-68a124410e86@redhat.com>
+	<cdec3d7e-04c9-a5e3-d0e7-293e2c7633c8@virtuozzo.com>
+	<ca5a605d-e548-5860-1e40-abcac6017683@virtuozzo.com>
+	<ad2fa9f3-29b1-c00b-1e51-07604f0b45e0@redhat.com>
+	<9c3e29b4-3ec9-4fd7-3d80-122f908d059f@virtuozzo.com>
+	<d54f0fca-6680-cce3-571e-df80a377d48e@redhat.com>
+	<8f9f485a-b3b0-f14a-20ed-86578a96644e@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <f0100e4f-648a-e2d4-efcd-9549b62b35b1@virtuozzo.com>
+Date: Fri, 6 Oct 2017 10:34:50 +0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="FTsVDVnBYKo0tCDH"
-Content-Disposition: inline
-In-Reply-To: <1507220690-265042-13-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 12/23] ppc: move '-cpu foo,
- compat=xxx' parsing into ppc_cpu_parse_featurestr()
+In-Reply-To: <8f9f485a-b3b0-f14a-20ed-86578a96644e@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 8/8] nbd: Minimal structured
+ read for client
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,264 +38,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
 
+06.10.2017 01:12, Eric Blake wrote:
+> On 10/05/2017 05:36 AM, Paolo Bonzini wrote:
+>> On 05/10/2017 12:02, Vladimir Sementsov-Ogievskiy wrote:
+>>> 03.10.2017 17:06, Paolo Bonzini wrote:
+>>>> On 03/10/2017 15:35, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>>> In the end this probably means that you have a read_chunk_header
+>>>>>>> function and a read_chunk function.=C2=A0 READ has a loop that ca=
+lls
+>>>>>>> read_chunk_header followed by direct reading into the QEMUIOVecto=
+r,
+>>>>>>> while everyone else calls read_chunk.
+>>>>>> accordingly to spec, we can receive several error reply chunks to =
+any
+>>>>>> request,
+>>>>>> so loop, receiving them should be common for all requests I think
+>>>>> as well as handling error chunks should be common..
+>>>> Yes, reading error chunks should be part of read_chunk_header.
+>>>>
+>>>> Paolo
+>>> So, you want a loop in READ, and separate loop for other commands? Th=
+en
+>>> we will have separate loop for BLOCK_STATUS and for all future comman=
+ds
+>>> with specific replies?
+>> There should be a separate loop for each command.
+>>
+>> The only difference between READ and other commands is that READ
+>> receives directly in QEMUIOVector, while other commands can use a comm=
+on
+>> function to to receive each structured reply chunk into malloc-ed memo=
+ry.
+> To make sure we're on the same page, here's how I see it.  At a high
+> level, we have:
+>
+> Each command calls nbd_co_send_request once, then calls
+> nbd_co_receive_reply in a loop until there is an indication of the last
+> packet.  nbd_co_receive_reply waits for data to come from the server,
+> and parses the header.
+>
+> If the packet is unrecognized, report failure and request a quit
+> (negative return value)
+>
+> If it is old-style:
+> - if the command is read, and we did not negotiate structured read, the=
+n
+> we also read the payload into qiov
+> - if the command is read, but we negotiated structured read, the server
+> is buggy, so report the bug and request a quit
+> - for all other commands, there is no payload, return success or failur=
+e
+> to the caller based on the header payload
+> - at any rate, the reply to the caller is that this is the final packet=
+,
+> and there is no payload returned (so we return negative or 1, but never=
+ 0)
+>
+> Otherwise, it is new-style:
+> - if we did not negotiate structured reply, the server is buggy, so
+> report the bug and request a quit (negative return)
+> - if the chunk is an error, we process the entire packet and report the
+> error; if we have any commands that care about the error details, we
+> could return the error in a malloc'd discriminated union, but we can
+> probably get by without that. If callers don't care about details, but
+> the error chunk is not final, it may be easier to just store the fact
+> that an error occurred and return 0 to tell the caller to keep looping,
+> and return the negative value later when the final chunk is finally rec=
+eived
+> - if the chunk is NBD_REPLY_TYPE_NONE, there is no payload, and this
+> should be the final chunk, so the return to the caller can be the same
+> as for old-style (return 1 if we had no earlier error packets, or the
+> saved negative value corresponding to the first error received)
+> - if the command is read, we can read the payload into qiov (saves
+> malloc'ing space for the reply only to copy it into the qiov), so we
 
---FTsVDVnBYKo0tCDH
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+but here you said "This is putting a LOT of smarts directly into the=20
+receive routine"
 
-On Thu, Oct 05, 2017 at 06:24:39PM +0200, Igor Mammedov wrote:
-> there is a dedicated callback CPUClass::parse_features
-> which purpose is to convert -cpu features into a set of
-> global properties AND deal with compat/legacy features
-> that couldn't be directly translated into CPU's properties.
->=20
-> Create ppc variant of it (ppc_cpu_parse_featurestr) and
-> move 'compat=3Dval' handling from spapr_cpu_core.c into it.
-> That removes a dependency of board/core code on cpu_model
-> parsing and would let to reuse common -cpu parsing
-> introduced by 6063d4c0
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> don't have to return any data
+> - for any other command, we malloc space for the non-error payload, and
+> then it is up to the command's loop to process the payload
+>
+> so the signature can be something like:
+>
+> int nbd_co_receive_reply(NBDClientSession *s, QEMUIOVector *qiov,
+>                           void **payload)
+>
+> where it returns -errno on failure, 0 if the command is not complete,
+> and 1 if the command is done.  READ passes qiov, which is fully
+> populated when the function returns 1; all other commands pass NULL.
+> Commands pass NULL for payload if they don't expect a payload return
+> (this includes READ); but a command that expects a payload
+> (BLOCK_STATUS) passes a pointer in payload and gets malloc'd space
+> stored there if return is 0 or 1.
+>
+> Does that sound like we're on the right design track?
+>
 
-Hrm.  I'm a bit unsure about this.  The fact that the board code is
-involved in the parsing here is deliberate.  Basically 'compat=3D' never
-made sense as a cpu property, it always should have been a machine
-property.
-
-With this patch we'll still (correctly) fail on a non spapr machine at
-the point where we do:
-
-+            object_property_set_str(machine, v, "max-cpu-compat", &local_e=
-rr);
-
-Though probably with a rather cryptic error.
-
-It still pollutes the cpu code with spapr's past mistake though.  I'm
-not sure if this is a good tradeoff.
-
-> ---
->  include/hw/ppc/spapr.h      |  1 -
->  target/ppc/cpu-qom.h        |  1 +
->  hw/ppc/spapr.c              |  2 +-
->  hw/ppc/spapr_cpu_core.c     | 50 --------------------------------------
->  target/ppc/translate_init.c | 58 +++++++++++++++++++++++++++++++++++++++=
-++++++
->  5 files changed, 60 insertions(+), 52 deletions(-)
->=20
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index c1b365f..8ca4f94 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -659,7 +659,6 @@ void spapr_hotplug_req_add_by_count_indexed(sPAPRDRCo=
-nnectorType drc_type,
->                                              uint32_t count, uint32_t ind=
-ex);
->  void spapr_hotplug_req_remove_by_count_indexed(sPAPRDRConnectorType drc_=
-type,
->                                                 uint32_t count, uint32_t =
-index);
-> -void spapr_cpu_parse_features(sPAPRMachineState *spapr);
->  int spapr_hpt_shift_for_ramsize(uint64_t ramsize);
->  void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
->                            Error **errp);
-> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-> index d0cf6ca..429b47f 100644
-> --- a/target/ppc/cpu-qom.h
-> +++ b/target/ppc/cpu-qom.h
-> @@ -181,6 +181,7 @@ typedef struct PowerPCCPUClass {
->      DeviceRealize parent_realize;
->      DeviceUnrealize parent_unrealize;
->      void (*parent_reset)(CPUState *cpu);
-> +    void (*parent_parse_features)(const char *type, char *str, Error **e=
-rrp);
-> =20
->      uint32_t pvr;
->      bool (*pvr_match)(struct PowerPCCPUClass *pcc, uint32_t pvr);
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index ff87f15..01b3012 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2366,7 +2366,7 @@ static void ppc_spapr_init(MachineState *machine)
->          machine->cpu_model =3D kvm_enabled() ? "host" : smc->tcg_default=
-_cpu;
->      }
-> =20
-> -    spapr_cpu_parse_features(spapr);
-> +    cpu_parse_cpu_model(TYPE_POWERPC_CPU, machine->cpu_model);
-> =20
->      spapr_set_vsmt_mode(spapr, &error_fatal);
-> =20
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 3dea5ff..427d47f 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -21,56 +21,6 @@
->  #include "sysemu/hw_accel.h"
->  #include "qemu/error-report.h"
-> =20
-> -void spapr_cpu_parse_features(sPAPRMachineState *spapr)
-> -{
-> -    /*
-> -     * Backwards compatibility hack:
-> -     *
-> -     *   CPUs had a "compat=3D" property which didn't make sense for
-> -     *   anything except pseries.  It was replaced by "max-cpu-compat"
-> -     *   machine option.  This supports old command lines like
-> -     *       -cpu POWER8,compat=3Dpower7
-> -     *   By stripping the compat option and applying it to the machine
-> -     *   before passing it on to the cpu level parser.
-> -     */
-> -    gchar **inpieces;
-> -    gchar *newprops;
-> -    int i, j;
-> -    gchar *compat_str =3D NULL;
-> -
-> -    inpieces =3D g_strsplit(MACHINE(spapr)->cpu_model, ",", 0);
-> -
-> -    /* inpieces[0] is the actual model string */
-> -    i =3D 1;
-> -    j =3D 1;
-> -    while (inpieces[i]) {
-> -        if (g_str_has_prefix(inpieces[i], "compat=3D")) {
-> -            /* in case of multiple compat=3D options */
-> -            g_free(compat_str);
-> -            compat_str =3D inpieces[i];
-> -        } else {
-> -            j++;
-> -        }
-> -
-> -        i++;
-> -        /* Excise compat options from list */
-> -        inpieces[j] =3D inpieces[i];
-> -    }
-> -
-> -    if (compat_str) {
-> -        char *val =3D compat_str + strlen("compat=3D");
-> -
-> -        object_property_set_str(OBJECT(spapr), val, "max-cpu-compat",
-> -                                &error_fatal);
-> -
-> -    }
-> -
-> -    newprops =3D g_strjoinv(",", inpieces);
-> -    cpu_parse_cpu_model(TYPE_POWERPC_CPU, newprops);
-> -    g_free(newprops);
-> -    g_strfreev(inpieces);
-> -}
-> -
->  static void spapr_cpu_reset(void *opaque)
->  {
->      PowerPCCPU *cpu =3D opaque;
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index c6399a3..5ee91e8 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -10313,6 +10313,62 @@ static ObjectClass *ppc_cpu_class_by_name(const =
-char *name)
-> =20
->      return NULL;
->  }
-> +static void ppc_cpu_parse_featurestr(const char *typename, char *feature=
-s,
-> +                                     Error **errp)
-> +{
-> +    const PowerPCCPUClass *pcc;
-> +    char *compat_str =3D NULL;
-> +    char *s =3D features;
-> +    char **inpieces;
-> +    Error *local_err =3D NULL;
-> +    int i;
-> +
-> +    if (!features) {
-> +        return;
-> +    }
-> +
-> +    /*
-> +     * Backwards compatibility hack:
-> +     *
-> +     *   CPUs had a "compat=3D" property which didn't make sense for
-> +     *   anything except pseries.  It was replaced by "max-cpu-compat"
-> +     *   machine option.  This supports old command lines like
-> +     *       -cpu POWER8,compat=3Dpower7
-> +     *   By stripping the compat option and applying it to the machine
-> +     *   before passing it on to the cpu level parser.
-> +     */
-> +    inpieces =3D g_strsplit(features, ",", 0);
-> +    *s =3D '\0';
-> +    for (i =3D 0; inpieces[i]; i++) {
-> +        if (g_str_has_prefix(inpieces[i], "compat=3D")) {
-> +            compat_str =3D inpieces[i];
-> +            continue;
-> +        }
-> +        if ((i !=3D 0) && (s !=3D features)) {
-> +            s =3D g_stpcpy(s, ",");
-> +        }
-> +        s =3D g_stpcpy(s, inpieces[i]);
-> +    }
-> +
-> +    if (compat_str) {
-> +        Object *machine =3D qdev_get_machine();
-> +        if (machine) {
-> +            char *v =3D compat_str + strlen("compat=3D");
-> +            object_property_set_str(machine, v, "max-cpu-compat", &local=
-_err);
-> +        } else {
-> +            error_setg(&local_err, "Not supported property: %s", compat_=
-str);
-> +        }
-> +    }
-> +    g_strfreev(inpieces);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +
-> +    /* do property processing with generic handler */
-> +    pcc =3D POWERPC_CPU_CLASS(object_class_by_name(typename));
-> +    pcc->parent_parse_features(typename, features, errp);
-> +}
-> =20
->  const char *ppc_cpu_lookup_alias(const char *alias)
->  {
-> @@ -10706,6 +10762,8 @@ static void ppc_cpu_class_init(ObjectClass *oc, v=
-oid *data)
->      cc->reset =3D ppc_cpu_reset;
-> =20
->      cc->class_by_name =3D ppc_cpu_class_by_name;
-> +    pcc->parent_parse_features =3D cc->parse_features;
-> +    cc->parse_features =3D ppc_cpu_parse_featurestr;
->      cc->has_work =3D ppc_cpu_has_work;
->      cc->do_interrupt =3D ppc_cpu_do_interrupt;
->      cc->cpu_exec_interrupt =3D ppc_cpu_exec_interrupt;
 
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---FTsVDVnBYKo0tCDH
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnW/oUACgkQbDjKyiDZ
-s5KomRAAhAzQ5o4OGNYX6u0+Ef2uFupHndAsW7nzP3obGVBSxlJ8aHAcDadmaul6
-fDlykjF4F+PQ5BCOp0QEu30mKBvePWhoXwa68MBIgjsz8+az4KedxrEv9xN0S+ee
-9HOOCAxP7dwYrcl9gxww5AIBF7iPFjhUn4AKxmgarEpVlPWF8LIacORTF/rWUuti
-X7BwoE2f282v7zjoSWeS8yFuH4m0jTttq8SA6vV7hvbSA/aj8lECQuhRqZ/yeA9f
-0yQlMl/+MKDqmiGhF4WeOjqNdVNppL0QE5HDKJgFS2niP3BVWDoS1AJRiNI+SjmZ
-11CTzi6bVoCdbELn4CLH+KtjlJlg7qXugMJlgLbLQxjexNoV9SQCKjD17Mx4decn
-sqGxNZXCx82qRx9iPgEleA4ap4Dsk3C++L6YPjUNatoqa2JNR2lYpDnDxyl8d8N+
-sxOkpLp9E4PxYbT2Z7KHAN+qxekq3lrw7ChcxHgwj1/ETH1yyhG3F7+BpTxhyOSS
-pkwaaOf4rkTEEb3OSqY0wANp/36lfnipwKq7Onq0ORNkHdZLDbUbgKgwzZTNmT0g
-QUZhA9fcjELliSD6j6j1YMLoI6BOMY4NQfFEvPFCWLcIBvqCgzUB1Nav3tMrMKLJ
-jg4AsUUE7tyDP45JzNFYaiUwvjkjub4O9yHSaeRsSs9ICq/s4gw=
-=5+eR
------END PGP SIGNATURE-----
-
---FTsVDVnBYKo0tCDH--
+Best regards,
+Vladimir
