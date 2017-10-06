@@ -1,25 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e0Y22-0006Na-Rw
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 15:11:36 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e0ZGk-0005yn-Uq
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 16:30:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e0Y1z-00076r-IA
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 15:11:34 -0400
-Resent-Message-Id: <E1e0Y1z-00076r-IA@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21341)
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e0ZGh-0001gs-Qe
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 16:30:50 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54686)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1e0Y1z-0006x0-Ab
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 15:11:31 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150731700204.216.10260373585669997056@b58463cdfd5f>
-In-Reply-To: <1507314444-30835-1-git-send-email-ian.jackson@eu.citrix.com>
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1e0ZGh-0001gQ-Hm
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 16:30:47 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v96KTE1k111965
+	for <qemu-devel@nongnu.org>; Fri, 6 Oct 2017 16:30:42 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2deeuqdu61-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 16:30:41 -0400
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Fri, 6 Oct 2017 14:30:40 -0600
+References: <150730254473.16260.6484345241358746630.stgit@bahia>
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Fri, 6 Oct 2017 17:30:34 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 6 Oct 2017 12:10:02 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 0/8] xen: xen-domid-restrict improvements
+In-Reply-To: <150730254473.16260.6484345241358746630.stgit@bahia>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <26557b12-750c-02bf-a8a3-ae887ceca9d4@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] spapr_pci: fail gracefully with
+ non-pseries machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +42,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ian.jackson@eu.citrix.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, anthony.perard@citrix.com, ross.lagerwall@citrix.com, sstabellini@kernel.org, jgross@suse.com, xen-devel@lists.xenproject.org
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MDczMTQ0NDQtMzA4MzUtMS1naXQtc2VuZC1lbWFpbC1pYW4uamFja3NvbkBl
-dS5jaXRyaXguY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC84XSB4ZW46IHhl
-bi1kb21pZC1yZXN0cmljdCBpbXByb3ZlbWVudHMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
-IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
-RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQg
-bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
-CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
-bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
-cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
-ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
-NDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmYxMTdmNTNiOWUg
-UkZDIGNvbmZpZ3VyZTogZG9fY29tcGlsZXI6IER1bXAgc29tZSBleHRyYSBpbmZvIHVuZGVyIGJh
-c2gKOGM1YzA1NTk5ZiBvcy1wb3NpeDogUHJvdmlkZSBuZXcgLXJ1bmFzaWQgb3B0aW9uCjAxNzdi
-YTY4OGQgeGVuOiBkZXN0cm95X2h2bV9kb21haW46IFRyeSB4ZW5kZXZpY2Vtb2RlbF9zaHV0ZG93
-bgoyZGIxYzg5ODc3IHhlbjogbW92ZSB4Y19pbnRlcmZhY2UgY29tcGF0aWJpbGl0eSBmYWxsYmFj
-ayBmdXJ0aGVyIHVwIHRoZSBmaWxlCmRhNjRiZDYxMDQgeGVuOiBkZXN0cm95X2h2bV9kb21haW46
-IE1vdmUgcmVhc29uIGludG8gYSB2YXJpYWJsZQo3OGYzNWFjYzBhIHhlbjogZGVmZXIgY2FsbCB0
-byB4ZW5fcmVzdHJpY3QgdW50aWwganVzdCBiZWZvcmUgb3Nfc2V0dXBfcG9zdAozM2I0NmUwOGRk
-IHhlbjogcmVzdHJpY3Q6IHVzZSB4ZW50b29sY29yZV9yZXN0cmljdF9hbGwKMGVlYjQzMjNhYiB4
-ZW46IGxpbmsgYWdhaW5zdCB4ZW50b29sY29yZQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tp
-bmcgUEFUQ0ggMS84OiB4ZW46IGxpbmsgYWdhaW5zdCB4ZW50b29sY29yZS4uLgpDaGVja2luZyBQ
-QVRDSCAyLzg6IHhlbjogcmVzdHJpY3Q6IHVzZSB4ZW50b29sY29yZV9yZXN0cmljdF9hbGwuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMy84OiB4ZW46IGRlZmVyIGNhbGwgdG8geGVuX3Jlc3RyaWN0IHVudGls
-IGp1c3QgYmVmb3JlIG9zX3NldHVwX3Bvc3QuLi4KQ2hlY2tpbmcgUEFUQ0ggNC84OiB4ZW46IGRl
-c3Ryb3lfaHZtX2RvbWFpbjogTW92ZSByZWFzb24gaW50byBhIHZhcmlhYmxlLi4uCkNoZWNraW5n
-IFBBVENIIDUvODogeGVuOiBtb3ZlIHhjX2ludGVyZmFjZSBjb21wYXRpYmlsaXR5IGZhbGxiYWNr
-IGZ1cnRoZXIgdXAgdGhlIGZpbGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNi84OiB4ZW46IGRlc3Ryb3lf
-aHZtX2RvbWFpbjogVHJ5IHhlbmRldmljZW1vZGVsX3NodXRkb3duLi4uCkNoZWNraW5nIFBBVENI
-IDcvODogb3MtcG9zaXg6IFByb3ZpZGUgbmV3IC1ydW5hc2lkIG9wdGlvbi4uLgpFUlJPUjogY29u
-c2lkZXIgdXNpbmcgcWVtdV9zdHJ0b3VsIGluIHByZWZlcmVuY2UgdG8gc3RydG91bAojNDI6IEZJ
-TEU6IG9zLXBvc2l4LmM6MTYwOgorICAgICAgICBsdiA9IHN0cnRvdWwob3B0YXJnLCAmZXAsIDAp
-OyAvKiBjYW4ndCBxZW11X3N0cnRvdWwsIHdhbnQgKmVwPT0nLicgKi8KCnRvdGFsOiAxIGVycm9y
-cywgMCB3YXJuaW5ncywgOTQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggOC84OiBSRkMgY29uZmlndXJlOiBkb19jb21w
-aWxlcjogRHVtcCBzb21lIGV4dHJhIGluZm8gdW5kZXIgYmFzaC4uLgo9PT0gT1VUUFVUIEVORCA9
-PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRl
-ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
-c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+
+
+On 10/06/2017 12:09 PM, Greg Kurz wrote:
+> QEMU currently crashes when the user tries to add a spapr-pci-host-bridge
+> on a non-pseries machine:
+>
+> $ qemu-system-ppc64 -M ppce500 -device spapr-pci-host-bridge,index=1
+> hw/ppc/spapr_pci.c:1535:spapr_phb_realize:
+> Object 0x1003dacae60 is not an instance of type spapr-machine
+> Aborted (core dumped)
+>
+> The same thing happens with the deprecated but still available child type
+> spapr-pci-vfio-host-bridge.
+>
+> Fix both by checking the machine type with object_dynamic_cast().
+>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+
+>   hw/ppc/spapr_pci.c |    8 +++++++-
+>   1 file changed, 7 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 5049ced4e8b4..9e85106f51f8 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1507,7 +1507,7 @@ static void spapr_pci_unplug_request(HotplugHandler *plug_handler,
+>
+>   static void spapr_phb_realize(DeviceState *dev, Error **errp)
+>   {
+> -    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+> +    sPAPRMachineState *spapr;
+>       SysBusDevice *s = SYS_BUS_DEVICE(dev);
+>       sPAPRPHBState *sphb = SPAPR_PCI_HOST_BRIDGE(s);
+>       PCIHostState *phb = PCI_HOST_BRIDGE(s);
+> @@ -1519,6 +1519,12 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+>       const unsigned windows_supported =
+>           sphb->ddw_enabled ? SPAPR_PCI_DMA_MAX_WINDOWS : 1;
+>
+> +    spapr = (sPAPRMachineState *) qdev_get_machine();
+> +    if (!object_dynamic_cast((Object *) spapr, TYPE_SPAPR_MACHINE)) {
+> +        error_setg(errp, TYPE_SPAPR_PCI_HOST_BRIDGE " needs a pseries machine");
+> +        return;
+> +    }
+> +
+>       if (sphb->index != (uint32_t)-1) {
+>           sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+>           Error *local_err = NULL;
+>
+>
