@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e0Oue-0001sc-Ji
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 05:27:21 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e0OyI-0002kn-MW
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 05:31:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e0OuZ-0002nq-Ji
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 05:27:20 -0400
-Date: Fri, 6 Oct 2017 11:27:10 +0200
+	(envelope-from <imammedo@redhat.com>) id 1e0OyA-0005M7-Ea
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 05:31:06 -0400
+Date: Fri, 6 Oct 2017 11:30:54 +0200
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171006112710.3fab9960@nial.brq.redhat.com>
-In-Reply-To: <20171006093925.71e1b3cd@bahia.lan>
+Message-ID: <20171006113054.2af54a45@nial.brq.redhat.com>
+In-Reply-To: <20171006083419.GW3260@umbus.fritz.box>
 References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-	<1507220690-265042-17-git-send-email-imammedo@redhat.com>
-	<20171006093925.71e1b3cd@bahia.lan>
+	<1507220690-265042-19-git-send-email-imammedo@redhat.com>
+	<20171006083419.GW3260@umbus.fritz.box>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 16/23] ppc: spapr: use cpu model names as
- tcg defaults instead of aliases
+Subject: Re: [Qemu-devel] [PATCH 18/23] ppc: pnv: use generic cpu_model
+ parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +25,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, "open list:ppce500" <qemu-ppc@nongnu.org>, "Edgar
-	E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?UTF-8?B?SGVy?= =?UTF-8?B?dsOp?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
 
-On Fri, 6 Oct 2017 09:39:25 +0200
-Greg Kurz <groug@kaod.org> wrote:
+On Fri, 6 Oct 2017 19:34:19 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> On Thu,  5 Oct 2017 18:24:43 +0200
-> Igor Mammedov <imammedo@redhat.com> wrote:
-> 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---  
-> 
-> So... this is preparatory work for the next patch because the generic cpu_model
-> parsing code doesn't handle aliases, is it ?
-generic parsing does handle aliases thanks to ppc_cpu_class_by_name() callback
-but generic parsing doesn't parse default cpu model as it doesn't exists
-it works with default cpu TYPE.
-
-So yes it's preparation for the next patch where exact default cpu model
-is converted into cpu type with help of POWERPC_CPU_TYPE_NAME(), like its done
-everywhere else.
-
-> 
-> >  hw/ppc/spapr.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> On Thu, Oct 05, 2017 at 06:24:45PM +0200, Igor Mammedov wrote:
+> > use common cpu_model prasing in vl.c and set default cpu_model
+> > using generic MachineClass::default_cpu_type.
 > > 
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index ad7afd6..0661dba 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -3603,7 +3603,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-> >      hc->unplug_request = spapr_machine_device_unplug_request;
+> > Beside of switching to generic infrastructure it solves several
+> > issues.
+> > 
+> >  * ppc_cpu_class_by_name() is used to deal with lower/upper case
+> >    and alias translations into actual cpu type, which fixes
+> >     '-M powernv -cpu power8' and '-M powernv -cpu power9_v1.0'
+> >    usecases which error out with:
+> >     'invalid CPU model 'FOO' for powernv machine'
+> >  * allows to switch to lower-case typenames in pnv chip/core name
+> >    (by convention typnames should be lower-case)
+> >  * replace aliased names /power8, power9, .../ with exact cpu model
+> >    names (i.e. typenames should be stable but aliases might decide to
+> >    point to other cpu model withi family or changed by kvm). It will
+> >    also help to simplify pnv_chip/core code and get rid of dependency
+> >    on cpu_model parsing.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> >  include/hw/ppc/pnv.h |  8 ++++----
+> >  hw/ppc/pnv.c         | 22 ++++++++++------------
+> >  hw/ppc/pnv_core.c    |  2 +-
+> >  3 files changed, 15 insertions(+), 17 deletions(-)
+> > 
+> > diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+> > index 9c5437d..2525f7f 100644
+> > --- a/include/hw/ppc/pnv.h
+> > +++ b/include/hw/ppc/pnv.h
+> > @@ -80,19 +80,19 @@ typedef struct PnvChipClass {
+> >      uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
+> >  } PnvChipClass;
 > >  
-> >      smc->dr_lmb_enabled = true;
-> > -    smc->tcg_default_cpu = "POWER8";
-> > +    smc->tcg_default_cpu = "power8_v2.0";
-> >      mc->has_hotpluggable_cpus = true;
-> >      smc->resize_hpt_default = SPAPR_RESIZE_HPT_ENABLED;
-> >      fwc->get_dev_path = spapr_get_fw_dev_path;
-> > @@ -3849,7 +3849,7 @@ static void spapr_machine_2_7_class_options(MachineClass *mc)
-> >      sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+> > -#define TYPE_PNV_CHIP_POWER8E TYPE_PNV_CHIP "-POWER8E"
+> > +#define TYPE_PNV_CHIP_POWER8E TYPE_PNV_CHIP "-power8e_v2.1"
+> >  #define PNV_CHIP_POWER8E(obj) \
+> >      OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER8E)
 > >  
-> >      spapr_machine_2_8_class_options(mc);
-> > -    smc->tcg_default_cpu = "POWER7";
-> > +    smc->tcg_default_cpu = "power7_v2.3";
-> >      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_7);
-> >      smc->phb_placement = phb_placement_2_7;
-> >  }  
+> > -#define TYPE_PNV_CHIP_POWER8 TYPE_PNV_CHIP "-POWER8"
+> > +#define TYPE_PNV_CHIP_POWER8 TYPE_PNV_CHIP "-power8_v2.0"
+> >  #define PNV_CHIP_POWER8(obj) \
+> >      OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER8)
+> >  
+> > -#define TYPE_PNV_CHIP_POWER8NVL TYPE_PNV_CHIP "-POWER8NVL"
+> > +#define TYPE_PNV_CHIP_POWER8NVL TYPE_PNV_CHIP "-power8nvl_v1.0"
+> >  #define PNV_CHIP_POWER8NVL(obj) \
+> >      OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER8NVL)
+> >  
+> > -#define TYPE_PNV_CHIP_POWER9 TYPE_PNV_CHIP "-POWER9"
+> > +#define TYPE_PNV_CHIP_POWER9 TYPE_PNV_CHIP "-power9_v1.0"  
+> 
+> Uh.. we really should add a DD2 power9 before we make this change.
+> Making a DD1.0 (read, buggy as hell) chip the default is not
+> sensible.  Especially since we don't implement the various DD1 bugs
+> and differences in qemu.
+I guess pnv owner will have to it,
+I can't help here /me uses whatever is in code right now/
+
+btw: in my tests when booting machine with power9, qemu crashes
+(it happens on master as well, so this series in not to blame)
+
+> 
+> >  #define PNV_CHIP_POWER9(obj) \
+> >      OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER9)
+> >  
+> > diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> > index d46d91c..4169837 100644
+> > --- a/hw/ppc/pnv.c
+> > +++ b/hw/ppc/pnv.c
+> > @@ -607,16 +607,13 @@ static void ppc_powernv_init(MachineState *machine)
+> >          }
+> >      }
+> >  
+> > -    /* We need some cpu model to instantiate the PnvChip class */
+> > -    if (machine->cpu_model == NULL) {
+> > -        machine->cpu_model = "POWER8";
+> > -    }
+> > -
+> >      /* Create the processor chips */
+> > -    chip_typename = g_strdup_printf(TYPE_PNV_CHIP "-%s", machine->cpu_model);
+> > +    i = strlen(machine->cpu_type) - strlen(POWERPC_CPU_TYPE_SUFFIX);
+> > +    chip_typename = g_strdup_printf(TYPE_PNV_CHIP "-%.*s",
+> > +                                    i, machine->cpu_type);
+> >      if (!object_class_by_name(chip_typename)) {
+> > -        error_report("invalid CPU model '%s' for %s machine",
+> > -                     machine->cpu_model, MACHINE_GET_CLASS(machine)->name);
+> > +        error_report("invalid CPU model '%.*s' for %s machine",
+> > +                     i, machine->cpu_type, MACHINE_GET_CLASS(machine)->name);
+> >          exit(1);
+> >      }
+> >  
+> > @@ -716,7 +713,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data)
+> >      DeviceClass *dc = DEVICE_CLASS(klass);
+> >      PnvChipClass *k = PNV_CHIP_CLASS(klass);
+> >  
+> > -    k->cpu_model = "POWER8E";
+> > +    k->cpu_model = "power8e_v2.1";
+> >      k->chip_type = PNV_CHIP_POWER8E;
+> >      k->chip_cfam_id = 0x221ef04980000000ull;  /* P8 Murano DD2.1 */
+> >      k->cores_mask = POWER8E_CORE_MASK;
+> > @@ -738,7 +735,7 @@ static void pnv_chip_power8_class_init(ObjectClass *klass, void *data)
+> >      DeviceClass *dc = DEVICE_CLASS(klass);
+> >      PnvChipClass *k = PNV_CHIP_CLASS(klass);
+> >  
+> > -    k->cpu_model = "POWER8";
+> > +    k->cpu_model = "power8_v2.0";
+> >      k->chip_type = PNV_CHIP_POWER8;
+> >      k->chip_cfam_id = 0x220ea04980000000ull; /* P8 Venice DD2.0 */
+> >      k->cores_mask = POWER8_CORE_MASK;
+> > @@ -760,7 +757,7 @@ static void pnv_chip_power8nvl_class_init(ObjectClass *klass, void *data)
+> >      DeviceClass *dc = DEVICE_CLASS(klass);
+> >      PnvChipClass *k = PNV_CHIP_CLASS(klass);
+> >  
+> > -    k->cpu_model = "POWER8NVL";
+> > +    k->cpu_model = "power8nvl_v1.0";
+> >      k->chip_type = PNV_CHIP_POWER8NVL;
+> >      k->chip_cfam_id = 0x120d304980000000ull;  /* P8 Naples DD1.0 */
+> >      k->cores_mask = POWER8_CORE_MASK;
+> > @@ -782,7 +779,7 @@ static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
+> >      DeviceClass *dc = DEVICE_CLASS(klass);
+> >      PnvChipClass *k = PNV_CHIP_CLASS(klass);
+> >  
+> > -    k->cpu_model = "POWER9";
+> > +    k->cpu_model = "power9_v1.0";
+> >      k->chip_type = PNV_CHIP_POWER9;
+> >      k->chip_cfam_id = 0x100d104980000000ull; /* P9 Nimbus DD1.0 */
+> >      k->cores_mask = POWER9_CORE_MASK;
+> > @@ -1133,6 +1130,7 @@ static void powernv_machine_class_init(ObjectClass *oc, void *data)
+> >      mc->init = ppc_powernv_init;
+> >      mc->reset = ppc_powernv_reset;
+> >      mc->max_cpus = MAX_CPUS;
+> > +    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power8_v2.0");
+> >      mc->block_default_type = IF_IDE; /* Pnv provides a AHCI device for
+> >                                        * storage */
+> >      mc->no_parallel = 1;
+> > diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+> > index 6726483..44b0b24 100644
+> > --- a/hw/ppc/pnv_core.c
+> > +++ b/hw/ppc/pnv_core.c
+> > @@ -227,7 +227,7 @@ static const TypeInfo pnv_core_info = {
+> >  };
+> >  
+> >  static const char *pnv_core_models[] = {
+> > -    "POWER8E", "POWER8", "POWER8NVL", "POWER9"
+> > +    "power8e_v2.1", "power8_v2.0", "power8nvl_v1.0", "power9_v1.0"
+> >  };
+> >  
+> >  static void pnv_core_register_types(void)  
 > 
