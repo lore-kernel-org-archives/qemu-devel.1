@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e0UyQ-0001AZ-RQ
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:42 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e0UyT-0001FE-S2
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e0UyM-0003zp-S0
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:38 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e0UyS-000492-2u
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:41 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  6 Oct 2017 17:54:04 +0200
-Message-Id: <20171006155422.10135-37-kwolf@redhat.com>
+Date: Fri,  6 Oct 2017 17:54:11 +0200
+Message-Id: <20171006155422.10135-44-kwolf@redhat.com>
 In-Reply-To: <20171006155422.10135-1-kwolf@redhat.com>
 References: <20171006155422.10135-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 36/54] qemu-iotests: Test commit block job where
- top has two parents
+Subject: [Qemu-devel] [PULL 43/54] iotests: Add test 197 for covering
+ copy-on-read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,24 +23,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
+From: Eric Blake <eblake@redhat.com>
+
+Add a test for qcow2 copy-on-read behavior, including exposure
+for the just-fixed bugs.
+
+The copy-on-read behavior is always to a qcow2 image, but the
+test is careful to allow running with most image protocol/format
+combos as the backing file being copied from (luks being the
+exception, as it is harder to pass the right secret to all the
+right places).  In fact, for './check nbd', this appears to be
+the first time we've had a qcow2 image wrapping NBD, requiring
+an additional line in _filter_img_create to match the similar
+line in _filter_img_info.
+
+Invoking blkdebug to prove we don't write too much took some
+effort to get working; and it requires that $TEST_WRAP (based
+on $TEST_DIR) not be subject to word splitting.  We may decide
+later to have the entire iotests suite use relative rather than
+absolute names, to avoid problems inherited by the absolute
+name of $PWD or $TEST_DIR, at which point the sanity check in
+this commit could be simplified.
+
+This test requires at least 2G of consecutive memory to succeed;
+as such, it is prone to spurious failures, particularly on
+32-bit machines under load.  This situation is detected and
+triggers an early exit to skip the test, rather than a failure.
+To manually provoke this setup on a beefier machine, I used:
+  $ (ulimit -S -v 1000000; ./check -qcow2 197)
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/191     | 153 +++++++++
- tests/qemu-iotests/191.out | 827 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 981 insertions(+)
- create mode 100755 tests/qemu-iotests/191
- create mode 100644 tests/qemu-iotests/191.out
+ tests/qemu-iotests/197           | 109 +++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/197.out       |  26 ++++++++++
+ tests/qemu-iotests/common.filter |   1 +
+ tests/qemu-iotests/group         |   1 +
+ 4 files changed, 137 insertions(+)
+ create mode 100755 tests/qemu-iotests/197
+ create mode 100644 tests/qemu-iotests/197.out
 
-diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
+diff --git a/tests/qemu-iotests/197 b/tests/qemu-iotests/197
 new file mode 100755
-index 0000000000..ac2b88fd78
+index 0000000000..887eb4f496
 --- /dev/null
-+++ b/tests/qemu-iotests/191
-@@ -0,0 +1,153 @@
++++ b/tests/qemu-iotests/197
+@@ -0,0 +1,109 @@
 +#!/bin/bash
 +#
-+# Test commit block job where top has two parents
++# Test case for copy-on-read into qcow2
 +#
 +# Copyright (C) 2017 Red Hat, Inc.
 +#
@@ -59,982 +90,146 @@ index 0000000000..ac2b88fd78
 +#
 +
 +# creator
-+owner=kwolf@redhat.com
++owner=eblake@redhat.com
 +
-+seq=`basename $0`
++seq="$(basename $0)"
 +echo "QA output created by $seq"
 +
-+here=`pwd`
++here="$PWD"
 +status=1 # failure is the default!
-+
-+MIG_SOCKET="${TEST_DIR}/migrate"
-+
-+_cleanup()
-+{
-+    rm -f "${TEST_IMG}.mid"
-+    rm -f "${TEST_IMG}.ovl2"
-+    rm -f "${TEST_IMG}.ovl3"
-+    _cleanup_test_img
-+    _cleanup_qemu
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
 +
 +# get standard environment, filters and checks
 +. ./common.rc
 +. ./common.filter
-+. ./common.qemu
 +
-+_supported_fmt qcow2
-+_unsupported_imgopts compat=0.10
-+_supported_proto file
++TEST_WRAP="$TEST_DIR/t.wrap.qcow2"
++BLKDBG_CONF="$TEST_DIR/blkdebug.conf"
++
++# Sanity check: our use of blkdebug fails if $TEST_DIR contains spaces
++# or other problems
++case "$TEST_DIR" in
++    *[^-_a-zA-Z0-9/]*)
++        _notrun "Suspicious TEST_DIR='$TEST_DIR', cowardly refusing to run" ;;
++esac
++
++_cleanup()
++{
++    _cleanup_test_img
++    rm -f "$BLKDBG_CONF"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# Test is supported for any backing file; but we force qcow2 for our wrapper.
++_supported_fmt generic
++_supported_proto generic
 +_supported_os Linux
-+
-+size=64M
-+
-+echo
-+echo === Preparing and starting VM ===
-+echo
-+
-+TEST_IMG="${TEST_IMG}.base" _make_test_img $size
-+TEST_IMG="${TEST_IMG}.mid" _make_test_img -b "${TEST_IMG}.base"
-+_make_test_img -b "${TEST_IMG}.mid"
-+TEST_IMG="${TEST_IMG}.ovl2" _make_test_img -b "${TEST_IMG}.mid"
-+
-+$QEMU_IO -c 'write -P 0x55 1M 64k' "${TEST_IMG}.mid" | _filter_qemu_io
-+
-+qemu_comm_method="qmp"
-+qmp_pretty="y"
-+
-+_launch_qemu \
-+    -blockdev "driver=${IMGFMT},file.driver=file,file.filename=${TEST_IMG}.base,node-name=base" \
-+    -blockdev "driver=${IMGFMT},file.driver=file,file.filename=${TEST_IMG}.mid,node-name=mid,backing=base" \
-+    -blockdev "driver=${IMGFMT},file.driver=file,file.filename=${TEST_IMG},node-name=top,backing=mid" \
-+    -blockdev "driver=${IMGFMT},file.driver=file,file.filename=${TEST_IMG}.ovl2,node-name=top2,backing=mid"
-+h=$QEMU_HANDLE
-+_send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" '^}'
++# LUKS support may be possible, but it complicates things.
++_unsupported_fmt luks
 +
 +echo
-+echo === Perform commit job ===
++echo '=== Copy-on-read ==='
 +echo
 +
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'block-commit',
-+       'arguments': { 'job-id': 'commit0',
-+                      'device': 'top',
-+                      'base':'$TEST_IMG.base',
-+                      'top': '$TEST_IMG.mid' } }" \
-+    "BLOCK_JOB_COMPLETED"
-+_send_qemu_cmd $h "" "^}"
++# Prep the images
++_make_test_img 4G
++$QEMU_IO -c "write -P 55 3G 1k" "$TEST_IMG" | _filter_qemu_io
++IMGPROTO=file IMGFMT=qcow2 IMGOPTS= TEST_IMG_FILE="$TEST_WRAP" \
++    _make_test_img -F "$IMGFMT" -b "$TEST_IMG" | _filter_img_create
++$QEMU_IO -f qcow2 -c "write -z -u 1M 64k" "$TEST_WRAP" | _filter_qemu_io
 +
-+echo
-+echo === Check that both top and top2 point to base now ===
-+echo
++# Ensure that a read of two clusters, but where one is already allocated,
++# does not re-write the allocated cluster
++cat > "$BLKDBG_CONF" <<EOF
++[inject-error]
++event = "cor_write"
++sector = "2048"
++EOF
++$QEMU_IO -c "open -C \
++ -o driver=blkdebug,config=$BLKDBG_CONF,image.driver=qcow2 $TEST_WRAP" \
++ -c "read -P 0 1M 128k" | _filter_qemu_io
 +
-+_send_qemu_cmd $h "{ 'execute': 'query-named-block-nodes' }" "^}" |
-+    _filter_generated_node_ids
++# Read the areas we want copied. A zero-length read should still be a
++# no-op.  The next read is under 2G, but aligned so that rounding to
++# clusters copies more than 2G of zeroes. The final read will pick up
++# the non-zero data in the same cluster.  Since a 2G read may exhaust
++# memory on some machines (particularly 32-bit), we skip the test if
++# that fails due to memory pressure.
++$QEMU_IO -f qcow2 -C -c "read 0 0" "$TEST_WRAP" | _filter_qemu_io
++output=$($QEMU_IO -f qcow2 -C -c "read -P 0 1k $((2*1024*1024*1024 - 512))" \
++        "$TEST_WRAP" 2>&1 | _filter_qemu_io)
++case $output in
++    *allocate*)
++        _notrun "Insufficent memory to run test" ;;
++    *) printf '%s\n' "$output" ;;
++esac
++$QEMU_IO -f qcow2 -C -c "read -P 0 $((3*1024*1024*1024 + 1024)) 1k" \
++    "$TEST_WRAP" | _filter_qemu_io
 +
-+_send_qemu_cmd $h "{ 'execute': 'quit' }" "^}"
-+wait=1 _cleanup_qemu
++# Copy-on-read is incompatible with read-only
++$QEMU_IO -f qcow2 -C -r "$TEST_WRAP" 2>&1 | _filter_testdir
 +
-+_img_info
-+TEST_IMG="$TEST_IMG.ovl2" _img_info
-+
-+
-+echo
-+echo === Preparing and starting VM with -drive ===
-+echo
-+
-+TEST_IMG="${TEST_IMG}.base" _make_test_img $size
-+TEST_IMG="${TEST_IMG}.mid" _make_test_img -b "${TEST_IMG}.base"
-+_make_test_img -b "${TEST_IMG}.mid"
-+TEST_IMG="${TEST_IMG}.ovl2" _make_test_img -b "${TEST_IMG}.mid"
-+TEST_IMG="${TEST_IMG}.ovl3" _make_test_img -b "${TEST_IMG}.ovl2"
-+
-+$QEMU_IO -c 'write -P 0x55 1M 64k' "${TEST_IMG}.mid" | _filter_qemu_io
-+
-+qemu_comm_method="qmp"
-+qmp_pretty="y"
-+
-+_launch_qemu \
-+    -drive "driver=${IMGFMT},file=${TEST_IMG},node-name=top,backing.node-name=mid" \
-+    -drive "driver=${IMGFMT},file=${TEST_IMG}.ovl3,node-name=top2,backing.backing=mid"
-+h=$QEMU_HANDLE
-+_send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" '^}'
-+
-+echo
-+echo === Perform commit job ===
-+echo
-+
-+_send_qemu_cmd $h \
-+    "{ 'execute': 'block-commit',
-+       'arguments': { 'job-id': 'commit0',
-+                      'device': 'top',
-+                      'base':'$TEST_IMG.base',
-+                      'top': '$TEST_IMG.mid' } }" \
-+    "BLOCK_JOB_COMPLETED"
-+_send_qemu_cmd $h "" "^}"
-+
-+echo
-+echo === Check that both top and top2 point to base now ===
-+echo
-+
-+_send_qemu_cmd $h "{ 'execute': 'query-named-block-nodes' }" "^}" |
-+    _filter_generated_node_ids
-+
-+_send_qemu_cmd $h "{ 'execute': 'quit' }" "^}"
-+wait=1 _cleanup_qemu
-+
-+_img_info
-+TEST_IMG="$TEST_IMG.ovl2" _img_info
++# Break the backing chain, and show that images are identical, and that
++# we properly copied over explicit zeros.
++$QEMU_IMG rebase -u -b "" -f qcow2 "$TEST_WRAP"
++$QEMU_IO -f qcow2 -c map "$TEST_WRAP"
++_check_test_img
++$QEMU_IMG compare -f $IMGFMT -F qcow2 "$TEST_IMG" "$TEST_WRAP"
 +
 +# success, all done
-+echo "*** done"
-+rm -f $seq.full
++echo '*** done'
 +status=0
-diff --git a/tests/qemu-iotests/191.out b/tests/qemu-iotests/191.out
+diff --git a/tests/qemu-iotests/197.out b/tests/qemu-iotests/197.out
 new file mode 100644
-index 0000000000..7bfcd2d5d8
+index 0000000000..52b4137d7b
 --- /dev/null
-+++ b/tests/qemu-iotests/191.out
-@@ -0,0 +1,827 @@
-+QA output created by 191
++++ b/tests/qemu-iotests/197.out
+@@ -0,0 +1,26 @@
++QA output created by 197
 +
-+=== Preparing and starting VM ===
++=== Copy-on-read ===
 +
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=67108864
-+Formatting 'TEST_DIR/t.IMGFMT.mid', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.mid
-+Formatting 'TEST_DIR/t.IMGFMT.ovl2', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.mid
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=4294967296
++wrote 1024/1024 bytes at offset 3221225472
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Formatting 'TEST_DIR/t.wrap.IMGFMT', fmt=IMGFMT size=4294967296 backing_file=TEST_DIR/t.IMGFMT backing_fmt=IMGFMT
 +wrote 65536/65536 bytes at offset 1048576
 +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{
-+    "return": {
-+    }
-+}
-+
-+=== Perform commit job ===
-+
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "BLOCK_JOB_COMPLETED",
-+    "data": {
-+        "device": "commit0",
-+        "len": 67108864,
-+        "offset": 67108864,
-+        "speed": 0,
-+        "type": "commit"
-+    }
-+}
-+
-+=== Check that both top and top2 point to base now ===
-+
-+{
-+    "return": [
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "backing-image": {
-+                    "virtual-size": 67108864,
-+                    "filename": "TEST_DIR/t.qcow2.base",
-+                    "cluster-size": 65536,
-+                    "format": "qcow2",
-+                    "actual-size": 397312,
-+                    "format-specific": {
-+                        "type": "qcow2",
-+                        "data": {
-+                            "compat": "1.1",
-+                            "lazy-refcounts": false,
-+                            "refcount-bits": 16,
-+                            "corrupt": false
-+                        }
-+                    },
-+                    "dirty-flag": false
-+                },
-+                "backing-filename-format": "qcow2",
-+                "virtual-size": 67108864,
-+                "filename": "TEST_DIR/t.qcow2.ovl2",
-+                "cluster-size": 65536,
-+                "format": "qcow2",
-+                "actual-size": 200704,
-+                "format-specific": {
-+                    "type": "qcow2",
-+                    "data": {
-+                        "compat": "1.1",
-+                        "lazy-refcounts": false,
-+                        "refcount-bits": 16,
-+                        "corrupt": false
-+                    }
-+                },
-+                "full-backing-filename": "TEST_DIR/t.qcow2.base",
-+                "backing-filename": "TEST_DIR/t.qcow2.base",
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "top2",
-+            "backing_file_depth": 1,
-+            "drv": "qcow2",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "backing_file": "TEST_DIR/t.qcow2.base",
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.ovl2",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 197120,
-+                "filename": "TEST_DIR/t.qcow2.ovl2",
-+                "format": "file",
-+                "actual-size": 200704,
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "file",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.ovl2",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "backing-image": {
-+                    "virtual-size": 67108864,
-+                    "filename": "TEST_DIR/t.qcow2.base",
-+                    "cluster-size": 65536,
-+                    "format": "qcow2",
-+                    "actual-size": 397312,
-+                    "format-specific": {
-+                        "type": "qcow2",
-+                        "data": {
-+                            "compat": "1.1",
-+                            "lazy-refcounts": false,
-+                            "refcount-bits": 16,
-+                            "corrupt": false
-+                        }
-+                    },
-+                    "dirty-flag": false
-+                },
-+                "backing-filename-format": "qcow2",
-+                "virtual-size": 67108864,
-+                "filename": "TEST_DIR/t.qcow2",
-+                "cluster-size": 65536,
-+                "format": "qcow2",
-+                "actual-size": 200704,
-+                "format-specific": {
-+                    "type": "qcow2",
-+                    "data": {
-+                        "compat": "1.1",
-+                        "lazy-refcounts": false,
-+                        "refcount-bits": 16,
-+                        "corrupt": false
-+                    }
-+                },
-+                "full-backing-filename": "TEST_DIR/t.qcow2.base",
-+                "backing-filename": "TEST_DIR/t.qcow2.base",
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "top",
-+            "backing_file_depth": 1,
-+            "drv": "qcow2",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "backing_file": "TEST_DIR/t.qcow2.base",
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 197120,
-+                "filename": "TEST_DIR/t.qcow2",
-+                "format": "file",
-+                "actual-size": 200704,
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "file",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "backing-image": {
-+                    "virtual-size": 67108864,
-+                    "filename": "TEST_DIR/t.qcow2.base",
-+                    "cluster-size": 65536,
-+                    "format": "qcow2",
-+                    "actual-size": 397312,
-+                    "format-specific": {
-+                        "type": "qcow2",
-+                        "data": {
-+                            "compat": "1.1",
-+                            "lazy-refcounts": false,
-+                            "refcount-bits": 16,
-+                            "corrupt": false
-+                        }
-+                    },
-+                    "dirty-flag": false
-+                },
-+                "backing-filename-format": "qcow2",
-+                "virtual-size": 67108864,
-+                "filename": "TEST_DIR/t.qcow2.mid",
-+                "cluster-size": 65536,
-+                "format": "qcow2",
-+                "actual-size": 397312,
-+                "format-specific": {
-+                    "type": "qcow2",
-+                    "data": {
-+                        "compat": "1.1",
-+                        "lazy-refcounts": false,
-+                        "refcount-bits": 16,
-+                        "corrupt": false
-+                    }
-+                },
-+                "full-backing-filename": "TEST_DIR/t.qcow2.base",
-+                "backing-filename": "TEST_DIR/t.qcow2.base",
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "mid",
-+            "backing_file_depth": 1,
-+            "drv": "qcow2",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "backing_file": "TEST_DIR/t.qcow2.base",
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.mid",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 393216,
-+                "filename": "TEST_DIR/t.qcow2.mid",
-+                "format": "file",
-+                "actual-size": 397312,
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "file",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.mid",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 67108864,
-+                "filename": "TEST_DIR/t.qcow2.base",
-+                "cluster-size": 65536,
-+                "format": "qcow2",
-+                "actual-size": 397312,
-+                "format-specific": {
-+                    "type": "qcow2",
-+                    "data": {
-+                        "compat": "1.1",
-+                        "lazy-refcounts": false,
-+                        "refcount-bits": 16,
-+                        "corrupt": false
-+                    }
-+                },
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "base",
-+            "backing_file_depth": 0,
-+            "drv": "qcow2",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.base",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 393216,
-+                "filename": "TEST_DIR/t.qcow2.base",
-+                "format": "file",
-+                "actual-size": 397312,
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "file",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.base",
-+            "encryption_key_missing": false
-+        }
-+    ]
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "SHUTDOWN",
-+    "data": {
-+        "guest": false
-+    }
-+}
-+image: TEST_DIR/t.IMGFMT
-+file format: IMGFMT
-+virtual size: 64M (67108864 bytes)
-+cluster_size: 65536
-+backing file: TEST_DIR/t.IMGFMT.base
-+backing file format: IMGFMT
-+image: TEST_DIR/t.IMGFMT.ovl2
-+file format: IMGFMT
-+virtual size: 64M (67108864 bytes)
-+cluster_size: 65536
-+backing file: TEST_DIR/t.IMGFMT.base
-+backing file format: IMGFMT
-+
-+=== Preparing and starting VM with -drive ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=67108864
-+Formatting 'TEST_DIR/t.IMGFMT.mid', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.mid
-+Formatting 'TEST_DIR/t.IMGFMT.ovl2', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.mid
-+Formatting 'TEST_DIR/t.IMGFMT.ovl3', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.ovl2
-+wrote 65536/65536 bytes at offset 1048576
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{
-+    "return": {
-+    }
-+}
-+
-+=== Perform commit job ===
-+
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "BLOCK_JOB_COMPLETED",
-+    "data": {
-+        "device": "commit0",
-+        "len": 67108864,
-+        "offset": 67108864,
-+        "speed": 0,
-+        "type": "commit"
-+    }
-+}
-+
-+=== Check that both top and top2 point to base now ===
-+
-+{
-+    "return": [
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "backing-image": {
-+                    "virtual-size": 67108864,
-+                    "filename": "TEST_DIR/t.qcow2.base",
-+                    "cluster-size": 65536,
-+                    "format": "qcow2",
-+                    "actual-size": 397312,
-+                    "format-specific": {
-+                        "type": "qcow2",
-+                        "data": {
-+                            "compat": "1.1",
-+                            "lazy-refcounts": false,
-+                            "refcount-bits": 16,
-+                            "corrupt": false
-+                        }
-+                    },
-+                    "dirty-flag": false
-+                },
-+                "backing-filename-format": "qcow2",
-+                "virtual-size": 67108864,
-+                "filename": "TEST_DIR/t.qcow2.ovl2",
-+                "cluster-size": 65536,
-+                "format": "qcow2",
-+                "actual-size": 200704,
-+                "format-specific": {
-+                    "type": "qcow2",
-+                    "data": {
-+                        "compat": "1.1",
-+                        "lazy-refcounts": false,
-+                        "refcount-bits": 16,
-+                        "corrupt": false
-+                    }
-+                },
-+                "full-backing-filename": "TEST_DIR/t.qcow2.base",
-+                "backing-filename": "TEST_DIR/t.qcow2.base",
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": true,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 1,
-+            "drv": "qcow2",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "backing_file": "TEST_DIR/t.qcow2.base",
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.ovl2",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 197120,
-+                "filename": "TEST_DIR/t.qcow2.ovl2",
-+                "format": "file",
-+                "actual-size": 200704,
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": true,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "file",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.ovl2",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "backing-image": {
-+                    "backing-image": {
-+                        "virtual-size": 67108864,
-+                        "filename": "TEST_DIR/t.qcow2.base",
-+                        "cluster-size": 65536,
-+                        "format": "qcow2",
-+                        "actual-size": 397312,
-+                        "format-specific": {
-+                            "type": "qcow2",
-+                            "data": {
-+                                "compat": "1.1",
-+                                "lazy-refcounts": false,
-+                                "refcount-bits": 16,
-+                                "corrupt": false
-+                            }
-+                        },
-+                        "dirty-flag": false
-+                    },
-+                    "backing-filename-format": "qcow2",
-+                    "virtual-size": 67108864,
-+                    "filename": "TEST_DIR/t.qcow2.ovl2",
-+                    "cluster-size": 65536,
-+                    "format": "qcow2",
-+                    "actual-size": 200704,
-+                    "format-specific": {
-+                        "type": "qcow2",
-+                        "data": {
-+                            "compat": "1.1",
-+                            "lazy-refcounts": false,
-+                            "refcount-bits": 16,
-+                            "corrupt": false
-+                        }
-+                    },
-+                    "full-backing-filename": "TEST_DIR/t.qcow2.base",
-+                    "backing-filename": "TEST_DIR/t.qcow2.base",
-+                    "dirty-flag": false
-+                },
-+                "backing-filename-format": "qcow2",
-+                "virtual-size": 67108864,
-+                "filename": "TEST_DIR/t.qcow2.ovl3",
-+                "cluster-size": 65536,
-+                "format": "qcow2",
-+                "actual-size": 200704,
-+                "format-specific": {
-+                    "type": "qcow2",
-+                    "data": {
-+                        "compat": "1.1",
-+                        "lazy-refcounts": false,
-+                        "refcount-bits": 16,
-+                        "corrupt": false
-+                    }
-+                },
-+                "full-backing-filename": "TEST_DIR/t.qcow2.ovl2",
-+                "backing-filename": "TEST_DIR/t.qcow2.ovl2",
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "top2",
-+            "backing_file_depth": 2,
-+            "drv": "qcow2",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "backing_file": "TEST_DIR/t.qcow2.ovl2",
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.ovl3",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 197120,
-+                "filename": "TEST_DIR/t.qcow2.ovl3",
-+                "format": "file",
-+                "actual-size": 200704,
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "file",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.ovl3",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 67108864,
-+                "filename": "TEST_DIR/t.qcow2.base",
-+                "cluster-size": 65536,
-+                "format": "qcow2",
-+                "actual-size": 397312,
-+                "format-specific": {
-+                    "type": "qcow2",
-+                    "data": {
-+                        "compat": "1.1",
-+                        "lazy-refcounts": false,
-+                        "refcount-bits": 16,
-+                        "corrupt": false
-+                    }
-+                },
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": true,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "qcow2",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.base",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 393216,
-+                "filename": "TEST_DIR/t.qcow2.base",
-+                "format": "file",
-+                "actual-size": 397312,
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": true,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "file",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2.base",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "backing-image": {
-+                    "virtual-size": 67108864,
-+                    "filename": "TEST_DIR/t.qcow2.base",
-+                    "cluster-size": 65536,
-+                    "format": "qcow2",
-+                    "actual-size": 397312,
-+                    "format-specific": {
-+                        "type": "qcow2",
-+                        "data": {
-+                            "compat": "1.1",
-+                            "lazy-refcounts": false,
-+                            "refcount-bits": 16,
-+                            "corrupt": false
-+                        }
-+                    },
-+                    "dirty-flag": false
-+                },
-+                "backing-filename-format": "qcow2",
-+                "virtual-size": 67108864,
-+                "filename": "TEST_DIR/t.qcow2",
-+                "cluster-size": 65536,
-+                "format": "qcow2",
-+                "actual-size": 200704,
-+                "format-specific": {
-+                    "type": "qcow2",
-+                    "data": {
-+                        "compat": "1.1",
-+                        "lazy-refcounts": false,
-+                        "refcount-bits": 16,
-+                        "corrupt": false
-+                    }
-+                },
-+                "full-backing-filename": "TEST_DIR/t.qcow2.base",
-+                "backing-filename": "TEST_DIR/t.qcow2.base",
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "top",
-+            "backing_file_depth": 1,
-+            "drv": "qcow2",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "backing_file": "TEST_DIR/t.qcow2.base",
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 197120,
-+                "filename": "TEST_DIR/t.qcow2",
-+                "format": "file",
-+                "actual-size": 200704,
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "file",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2",
-+            "encryption_key_missing": false
-+        }
-+    ]
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "SHUTDOWN",
-+    "data": {
-+        "guest": false
-+    }
-+}
-+image: TEST_DIR/t.IMGFMT
-+file format: IMGFMT
-+virtual size: 64M (67108864 bytes)
-+cluster_size: 65536
-+backing file: TEST_DIR/t.IMGFMT.base
-+backing file format: IMGFMT
-+image: TEST_DIR/t.IMGFMT.ovl2
-+file format: IMGFMT
-+virtual size: 64M (67108864 bytes)
-+cluster_size: 65536
-+backing file: TEST_DIR/t.IMGFMT.base
-+backing file format: IMGFMT
++read 131072/131072 bytes at offset 1048576
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 0/0 bytes at offset 0
++0 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 2147483136/2147483136 bytes at offset 1024
++2 GiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 1024/1024 bytes at offset 3221226496
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++can't open device TEST_DIR/t.wrap.qcow2: Can't use copy-on-read on read-only device
++2 GiB (0x80010000) bytes     allocated at offset 0 bytes (0x0)
++1023.938 MiB (0x3fff0000) bytes not allocated at offset 2 GiB (0x80010000)
++64 KiB (0x10000) bytes     allocated at offset 3 GiB (0xc0000000)
++1023.938 MiB (0x3fff0000) bytes not allocated at offset 3 GiB (0xc0010000)
++No errors were found on the image.
++Images are identical.
 +*** done
+diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
+index 9d5442ecd9..227b37e941 100644
+--- a/tests/qemu-iotests/common.filter
++++ b/tests/qemu-iotests/common.filter
+@@ -111,6 +111,7 @@ _filter_img_create()
+     sed -e "s#$IMGPROTO:$TEST_DIR#TEST_DIR#g" \
+         -e "s#$TEST_DIR#TEST_DIR#g" \
+         -e "s#$IMGFMT#IMGFMT#g" \
++        -e 's#nbd:127.0.0.1:10810#TEST_DIR/t.IMGFMT#g' \
+         -e "s# encryption=off##g" \
+         -e "s# cluster_size=[0-9]\\+##g" \
+         -e "s# table_size=[0-9]\\+##g" \
 diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index cdccee319e..595f4fd416 100644
+index 595f4fd416..83da427c0a 100644
 --- a/tests/qemu-iotests/group
 +++ b/tests/qemu-iotests/group
-@@ -188,6 +188,7 @@
- 188 rw auto quick
- 189 rw auto
- 190 rw auto quick
-+191 rw auto
+@@ -192,3 +192,4 @@
  192 rw auto quick
  194 rw auto migration quick
  195 rw auto quick
++197 rw auto quick
 -- 
 2.13.6
