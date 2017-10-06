@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e0JsF-0000KB-Dh
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 00:04:32 -0400
+	(envelope-from <armbru@redhat.com>) id 1e0L7Q-0001jv-Bo
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 01:24:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e0JsC-0003kF-9f
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 00:04:31 -0400
-Date: Fri, 6 Oct 2017 07:04:21 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171006070355-mutt-send-email-mst@kernel.org>
-References: <20171005171309.1250-1-maxime.coquelin@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1e0L7N-000083-8c
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 01:24:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33852)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1e0L7N-00007l-2Q
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 01:24:13 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20171002152552.27999-1-armbru@redhat.com>
+	<20171002152552.27999-3-armbru@redhat.com>
+	<c3221525-70bc-475d-07c0-bbf47b507e5e@redhat.com>
+Date: Fri, 06 Oct 2017 07:24:07 +0200
+In-Reply-To: <c3221525-70bc-475d-07c0-bbf47b507e5e@redhat.com> (Eric Blake's
+	message of "Thu, 5 Oct 2017 09:58:38 -0500")
+Message-ID: <87k208alxk.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171005171309.1250-1-maxime.coquelin@redhat.com>
-Subject: Re: [Qemu-devel] [REBASED 0/2] exec: further refine
- address_space_get_iotlb_entry()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC PATCH 02/32] texi2pod: Support @verbatim
+ environment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,59 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: peterx@redhat.com, pbonzini@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-On Thu, Oct 05, 2017 at 07:13:07PM +0200, Maxime Coquelin wrote:
-> This series is a rebase of the first two patches of Peter's series
-> improving address_space_get_iotlb_entry():
-> Message-Id: <1496404254-17429-1-git-send-email-peterx@redhat.com>
-> 
-> It is actually not only an improvement, but fixes a regression in the way
-> IOTLB updates sent to the backends are generated.
-> The regression is introduced by patch:
-> a764040cc8 ("exec: abstract address_space_do_translate()")
-> 
-> Prior to this patch IOTLB entries sent to the backend were aligned on the
-> guest page boundaries (both addresses and size).
-> For example, with the guest using 2MB pages:
->  * Backend sends IOTLB miss request for iova = 0x112378fb4
->  * QEMU replies with an IOTLB update with iova = 0x112200000, size = 0x200000
->  * Bakend insert above entry in its cache and compute the translation
-> In this case, if the backend needs later to translate 0x112378004, it will
-> result in a cache it and no need to send another IOTLB miss.
-> 
-> With this patch, the addr of the IOTLB entry will be the address requested
-> via the IOTLB miss, the size is computed to cover the remaining of the guest
-> page.
-> The same example gives:
->  * Backend sends IOTLB miss request for iova = 0x112378fb4
->  * QEMU replies with an IOTLB update with iova = 112378fb4, size = 0x8704c
->  * Bakend insert above entry in its cache and compute the translation
-> In this case, if the backend needs later to translate 0x112378004, it will
-> result in another cache miss:
->  * Backend sends IOTLB miss request for iova = 0x112378004
->  * QEMU replies with an IOTLB update with iova = 0x112378004, size = 0x87FFC
->  * Bakend insert above entry in its cache and compute the translation
-> It results in having much more IOTLB misses, and more importantly it pollutes
-> the device IOTLB cache by multiplying the number of entries that moreover
-> overlap.
-> 
-> Note that current Kernel & User backends implementation do not merge contiguous
-> and overlapping IOTLB entries at device IOTLB cache insertion.
-> 
-> This series fixes this regression, so that IOTLB updates are aligned on
-> guest's page boundaries.
+Eric Blake <eblake@redhat.com> writes:
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> On 10/02/2017 10:25 AM, Markus Armbruster wrote:
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  scripts/texi2pod.pl | 11 +++++++++--
+>>  1 file changed, 9 insertions(+), 2 deletions(-)
+>
+> My perl is a bit rusty, but I think I can handle this one.
+>
+>> 
+>> diff --git a/scripts/texi2pod.pl b/scripts/texi2pod.pl
+>> index 39ce584a32..2171f8b819 100755
+>> --- a/scripts/texi2pod.pl
+>> +++ b/scripts/texi2pod.pl
+>> @@ -85,6 +85,13 @@ if (defined $out) {
+>>  
+>>  while(defined $inf) {
+>>  while(<$inf>) {
+>> +    # Verbatim environment
+>> +    if (defined $endw and $endw eq "verbatim"
+>> +	and not (/^\@end\s+([a-z]+)/ and $1 eq $endw)) {
+>
+> You anchored to the beginning, but not the end, of the line; that means
+> you accept '@end verbatim garbage' as an end marker.  Worth adding $?
 
+Cribbed from
 
-> Peter Xu (2):
->   exec: add page_mask for flatview_do_translate
->   exec: simplify address_space_get_iotlb_entry
-> 
->  exec.c | 75 +++++++++++++++++++++++++++++++++++++++++++-----------------------
->  1 file changed, 49 insertions(+), 26 deletions(-)
-> 
-> -- 
-> 2.13.6
+    # End-block handler goes up here because it needs to operate even
+    # if we are skipping.
+    /^\@end\s+([a-z]+)/ and do {
+	# Ignore @end foo, where foo is not an operation which may
+	# cause us to skip, if we are presently skipping.
+	my $ended = $1;
+	next if $skipping && $ended !~ /^(?:ifset|ifclear|ignore|menu|iftex|copying)$/;
+
+	die "\@end $ended without \@$ended at line $.\n" unless defined $endw;
+	die "\@$endw ended by \@end $ended at line $.\n" unless $ended eq $endw;
+
+	$endw = pop @endwstack;
+
+I'd prefer to stick to this regexp.
+
+texi2pod.pl parses quite sloppily in general.
+
+> If that's the only change, I'm okay with adding:
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Does this apply to the unchanged patch, too?
