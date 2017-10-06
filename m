@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0OPN-0004fJ-T7
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 04:55:08 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e0OY4-0001Mo-Fm
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 05:04:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0OPH-0008HV-PC
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 04:55:01 -0400
-Date: Fri, 6 Oct 2017 19:46:34 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171006084634.GA10961@umbus.fritz.box>
+	(envelope-from <imammedo@redhat.com>) id 1e0OY1-0007WJ-A7
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 05:04:00 -0400
+Date: Fri, 6 Oct 2017 11:03:52 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171006110352.64b7a814@nial.brq.redhat.com>
+In-Reply-To: <20171006035447.GP3260@umbus.fritz.box>
 References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-	<1507220690-265042-23-git-send-email-imammedo@redhat.com>
+	<1507220690-265042-13-git-send-email-imammedo@redhat.com>
+	<20171006035447.GP3260@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="UugvWAfsgieZRqgk"
-Content-Disposition: inline
-In-Reply-To: <1507220690-265042-23-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 22/23] ppc: pnv: drop
- PnvChipClass::cpu_model field
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 12/23] ppc: move '-cpu foo,
+ compat=xxx' parsing into ppc_cpu_parse_featurestr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,211 +25,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?UTF-8?B?SGVy?= =?UTF-8?B?dsOp?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
+
+On Fri, 6 Oct 2017 14:54:47 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> On Thu, Oct 05, 2017 at 06:24:39PM +0200, Igor Mammedov wrote:
+> > there is a dedicated callback CPUClass::parse_features
+> > which purpose is to convert -cpu features into a set of
+> > global properties AND deal with compat/legacy features
+> > that couldn't be directly translated into CPU's properties.
+> > 
+> > Create ppc variant of it (ppc_cpu_parse_featurestr) and
+> > move 'compat=val' handling from spapr_cpu_core.c into it.
+> > That removes a dependency of board/core code on cpu_model
+> > parsing and would let to reuse common -cpu parsing
+> > introduced by 6063d4c0
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
+> 
+> Hrm.  I'm a bit unsure about this.  The fact that the board code is
+> involved in the parsing here is deliberate.  Basically 'compat=' never
+> made sense as a cpu property, it always should have been a machine
+> property.
+> 
+> With this patch we'll still (correctly) fail on a non spapr machine at
+> the point where we do:
+> 
+> +            object_property_set_str(machine, v, "max-cpu-compat", &local_err);
+> 
+> Though probably with a rather cryptic error.
+I's possible to guard it and apply to only SPAPR machine
+or trying to find property first before setting it.
+
+> 
+> It still pollutes the cpu code with spapr's past mistake though.  I'm
+> not sure if this is a good tradeoff.
+CPUClass::parse_features callback was introduced to deal with 
+legacy and compatibility nuances of "-cpu" CLI option, so I'm moving
+compat mistake back where it belongs so it will pollute code dealing
+with hacks.
+
+It also cleans the road for removal of global cpu_model by moving
+dependency from board code to a callback designed to parse cpu_model.
 
 
---UugvWAfsgieZRqgk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Oct 05, 2017 at 06:24:49PM +0200, Igor Mammedov wrote:
-> deduce core type directly from chip type instead of
-> maintaining type mapping in PnvChipClass::cpu_model.
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  include/hw/ppc/pnv.h      |  1 -
->  include/hw/ppc/pnv_core.h |  1 -
->  hw/ppc/pnv.c              | 25 +++++++++++++------------
->  hw/ppc/pnv_core.c         |  5 -----
->  4 files changed, 13 insertions(+), 19 deletions(-)
->=20
-> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> index d82eee1..20244da 100644
-> --- a/include/hw/ppc/pnv.h
-> +++ b/include/hw/ppc/pnv.h
-> @@ -69,7 +69,6 @@ typedef struct PnvChipClass {
->      SysBusDeviceClass parent_class;
-> =20
->      /*< public >*/
-> -    const char *cpu_model;
->      PnvChipType  chip_type;
->      uint64_t     chip_cfam_id;
->      uint64_t     cores_mask;
-> diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
-> index a336a1f..e337af7 100644
-> --- a/include/hw/ppc/pnv_core.h
-> +++ b/include/hw/ppc/pnv_core.h
-> @@ -46,6 +46,5 @@ typedef struct PnvCoreClass {
-> =20
->  #define PNV_CORE_TYPE_SUFFIX "-" TYPE_PNV_CORE
->  #define PNV_CORE_TYPE_NAME(cpu_model) cpu_model PNV_CORE_TYPE_SUFFIX
-> -extern char *pnv_core_typename(const char *model);
-> =20
->  #endif /* _PPC_PNV_CORE_H */
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 9c5eb7c..ab7083b 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -55,6 +55,16 @@
->  #define KERNEL_LOAD_ADDR        0x20000000
->  #define INITRD_LOAD_ADDR        0x40000000
-> =20
-> +static const char *pvn_chip_core_typename(const PnvChip *o)
-
-s/pvn/pnv/ again.
-
-> +{
-> +    const char *chip_type =3D object_class_get_name(object_get_class(OBJ=
-ECT(o)));
-> +    int len =3D strlen(chip_type) - strlen(PNV_CHIP_TYPE_SUFFIX);
-> +    char *s =3D g_strdup_printf(PNV_CORE_TYPE_NAME("%.*s"), len, chip_ty=
-pe);
-> +    const char *core_type =3D object_class_get_name(object_class_by_name=
-(s));
-> +    g_free(s);
-> +    return core_type;
-> +}
-> +
->  /*
->   * On Power Systems E880 (POWER8), the max cpus (threads) should be :
->   *     4 * 4 sockets * 12 cores * 8 threads =3D 1536
-> @@ -270,8 +280,7 @@ static int pnv_chip_lpc_offset(PnvChip *chip, void *f=
-dt)
-> =20
->  static void powernv_populate_chip(PnvChip *chip, void *fdt)
->  {
-> -    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-> -    char *typename =3D pnv_core_typename(pcc->cpu_model);
-> +    const char *typename =3D pvn_chip_core_typename(chip);
->      size_t typesize =3D object_type_get_instance_size(typename);
->      int i;
-> =20
-> @@ -301,7 +310,6 @@ static void powernv_populate_chip(PnvChip *chip, void=
- *fdt)
->          powernv_populate_memory_node(fdt, chip->chip_id, chip->ram_start,
->                                       chip->ram_size);
->      }
-> -    g_free(typename);
->  }
-> =20
->  static void powernv_populate_rtc(ISADevice *d, void *fdt, int lpc_off)
-> @@ -713,7 +721,6 @@ static void pnv_chip_power8e_class_init(ObjectClass *=
-klass, void *data)
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
->      PnvChipClass *k =3D PNV_CHIP_CLASS(klass);
-> =20
-> -    k->cpu_model =3D "power8e_v2.1";
->      k->chip_type =3D PNV_CHIP_POWER8E;
->      k->chip_cfam_id =3D 0x221ef04980000000ull;  /* P8 Murano DD2.1 */
->      k->cores_mask =3D POWER8E_CORE_MASK;
-> @@ -735,7 +742,6 @@ static void pnv_chip_power8_class_init(ObjectClass *k=
-lass, void *data)
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
->      PnvChipClass *k =3D PNV_CHIP_CLASS(klass);
-> =20
-> -    k->cpu_model =3D "power8_v2.0";
->      k->chip_type =3D PNV_CHIP_POWER8;
->      k->chip_cfam_id =3D 0x220ea04980000000ull; /* P8 Venice DD2.0 */
->      k->cores_mask =3D POWER8_CORE_MASK;
-> @@ -757,7 +763,6 @@ static void pnv_chip_power8nvl_class_init(ObjectClass=
- *klass, void *data)
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
->      PnvChipClass *k =3D PNV_CHIP_CLASS(klass);
-> =20
-> -    k->cpu_model =3D "power8nvl_v1.0";
->      k->chip_type =3D PNV_CHIP_POWER8NVL;
->      k->chip_cfam_id =3D 0x120d304980000000ull;  /* P8 Naples DD1.0 */
->      k->cores_mask =3D POWER8_CORE_MASK;
-> @@ -779,7 +784,6 @@ static void pnv_chip_power9_class_init(ObjectClass *k=
-lass, void *data)
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
->      PnvChipClass *k =3D PNV_CHIP_CLASS(klass);
-> =20
-> -    k->cpu_model =3D "power9_v1.0";
->      k->chip_type =3D PNV_CHIP_POWER9;
->      k->chip_cfam_id =3D 0x100d104980000000ull; /* P9 Nimbus DD1.0 */
->      k->cores_mask =3D POWER9_CORE_MASK;
-> @@ -854,7 +858,7 @@ static void pnv_chip_init(Object *obj)
->  static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
->  {
->      PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-> -    char *typename =3D pnv_core_typename(pcc->cpu_model);
-> +    const char *typename =3D pvn_chip_core_typename(chip);
->      size_t typesize =3D object_type_get_instance_size(typename);
->      int i, j;
->      char *name;
-> @@ -879,8 +883,6 @@ static void pnv_chip_icp_realize(PnvChip *chip, Error=
- **errp)
->              memory_region_add_subregion(&chip->icp_mmio, pir << 12, &icp=
-->mmio);
->          }
->      }
-> -
-> -    g_free(typename);
->  }
-> =20
->  static void pnv_chip_realize(DeviceState *dev, Error **errp)
-> @@ -888,7 +890,7 @@ static void pnv_chip_realize(DeviceState *dev, Error =
-**errp)
->      PnvChip *chip =3D PNV_CHIP(dev);
->      Error *error =3D NULL;
->      PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-> -    char *typename =3D pnv_core_typename(pcc->cpu_model);
-> +    const char *typename =3D pvn_chip_core_typename(chip);
->      size_t typesize =3D object_type_get_instance_size(typename);
->      int i, core_hwid;
-> =20
-> @@ -947,7 +949,6 @@ static void pnv_chip_realize(DeviceState *dev, Error =
-**errp)
->                                  &PNV_CORE(pnv_core)->xscom_regs);
->          i++;
->      }
-> -    g_free(typename);
-> =20
->      /* Create LPC controller */
->      object_property_set_bool(OBJECT(&chip->lpc), true, "realized",
-> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> index 000c87e..621b69e 100644
-> --- a/hw/ppc/pnv_core.c
-> +++ b/hw/ppc/pnv_core.c
-> @@ -246,9 +246,4 @@ static const TypeInfo pnv_core_infos[] =3D {
->      DEFINE_PNV_CORE_TYPE("power9_v1.0"),
->  };
-> =20
-> -char *pnv_core_typename(const char *model)
-> -{
-> -    return g_strdup_printf(PNV_CORE_TYPE_NAME("%s"), model);
-> -}
-> -
->  DEFINE_TYPES(pnv_core_infos)
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---UugvWAfsgieZRqgk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnXQukACgkQbDjKyiDZ
-s5LaURAAkdO4B6zo3YHFruMJIQv+idsNT1V/y4fiFq3y3iU6zl8wEHrra5DPqhUZ
-ALjAnjsgHgcmvxSjJkMhuMzhU466IJWxTDVIbJ6sZX5IpKCasRsMSPIy/OJ1tggl
-0h/RDPOSrfBA/73Y2A8vkmPUN/DtGaqCe2C71H685Nf6G2DTd/zWmlZkX+QKk7N2
-X+iSjda9/ku0EoMlk0R7UmD7JOTz+UL8uivBPh4jtBSwxVycDw7aR376/dVDRuUi
-RAa0KBcPzeffhLxO0N+b3r0FRpucM1yBuQDhHbd/QEHqjppvAqLV9oBHFxjLFHGh
-ZJDzIp9AuMdCk9GMmUHk/DLU/LJHO5TLCVXeK3otPuMP5HP71cO3dxvxubusaBHg
-igH8oD/34c7Sg22xhFoig3QoRVWePTAMuFCNPy8Ycmd76dn8y+ACO06gWM8xhiTp
-gGf43zbMj/l55rZ/dVtV2taRuDnwrwAqWm2BjAIiWLe4UBTYRL6kV6oQqo6U/O/1
-gLgZ1htdfNimRBsxzO9WIgvBmBZEyAbjiIP8P/n9nzrXRCjcrfgDER54H1aPj7eH
-viWfllAlSVdgS74iZSDQ38MFKgXAtVZekTSjLC/o+8wY/UR+fSrSJ8+eypm0LsCw
-V2Mcy4nKMzAjQ2t8g3t9LgLiY8MmuMgtOIqmCWe9a7R0CikyFHI=
-=j8Wc
------END PGP SIGNATURE-----
-
---UugvWAfsgieZRqgk--
+> > ---
+> >  include/hw/ppc/spapr.h      |  1 -
+> >  target/ppc/cpu-qom.h        |  1 +
+> >  hw/ppc/spapr.c              |  2 +-
+> >  hw/ppc/spapr_cpu_core.c     | 50 --------------------------------------
+> >  target/ppc/translate_init.c | 58 +++++++++++++++++++++++++++++++++++++++++++++
+> >  5 files changed, 60 insertions(+), 52 deletions(-)
+> > 
+> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> > index c1b365f..8ca4f94 100644
+> > --- a/include/hw/ppc/spapr.h
+> > +++ b/include/hw/ppc/spapr.h
+> > @@ -659,7 +659,6 @@ void spapr_hotplug_req_add_by_count_indexed(sPAPRDRConnectorType drc_type,
+> >                                              uint32_t count, uint32_t index);
+> >  void spapr_hotplug_req_remove_by_count_indexed(sPAPRDRConnectorType drc_type,
+> >                                                 uint32_t count, uint32_t index);
+> > -void spapr_cpu_parse_features(sPAPRMachineState *spapr);
+> >  int spapr_hpt_shift_for_ramsize(uint64_t ramsize);
+> >  void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
+> >                            Error **errp);
+> > diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+> > index d0cf6ca..429b47f 100644
+> > --- a/target/ppc/cpu-qom.h
+> > +++ b/target/ppc/cpu-qom.h
+> > @@ -181,6 +181,7 @@ typedef struct PowerPCCPUClass {
+> >      DeviceRealize parent_realize;
+> >      DeviceUnrealize parent_unrealize;
+> >      void (*parent_reset)(CPUState *cpu);
+> > +    void (*parent_parse_features)(const char *type, char *str, Error **errp);
+> >  
+> >      uint32_t pvr;
+> >      bool (*pvr_match)(struct PowerPCCPUClass *pcc, uint32_t pvr);
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index ff87f15..01b3012 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -2366,7 +2366,7 @@ static void ppc_spapr_init(MachineState *machine)
+> >          machine->cpu_model = kvm_enabled() ? "host" : smc->tcg_default_cpu;
+> >      }
+> >  
+> > -    spapr_cpu_parse_features(spapr);
+> > +    cpu_parse_cpu_model(TYPE_POWERPC_CPU, machine->cpu_model);
+> >  
+> >      spapr_set_vsmt_mode(spapr, &error_fatal);
+> >  
+> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> > index 3dea5ff..427d47f 100644
+> > --- a/hw/ppc/spapr_cpu_core.c
+> > +++ b/hw/ppc/spapr_cpu_core.c
+> > @@ -21,56 +21,6 @@
+> >  #include "sysemu/hw_accel.h"
+> >  #include "qemu/error-report.h"
+> >  
+> > -void spapr_cpu_parse_features(sPAPRMachineState *spapr)
+> > -{
+> > -    /*
+> > -     * Backwards compatibility hack:
+> > -     *
+> > -     *   CPUs had a "compat=" property which didn't make sense for
+> > -     *   anything except pseries.  It was replaced by "max-cpu-compat"
+> > -     *   machine option.  This supports old command lines like
+> > -     *       -cpu POWER8,compat=power7
+> > -     *   By stripping the compat option and applying it to the machine
+> > -     *   before passing it on to the cpu level parser.
+> > -     */
+> > -    gchar **inpieces;
+> > -    gchar *newprops;
+> > -    int i, j;
+> > -    gchar *compat_str = NULL;
+> > -
+> > -    inpieces = g_strsplit(MACHINE(spapr)->cpu_model, ",", 0);
+> > -
+> > -    /* inpieces[0] is the actual model string */
+> > -    i = 1;
+> > -    j = 1;
+> > -    while (inpieces[i]) {
+> > -        if (g_str_has_prefix(inpieces[i], "compat=")) {
+> > -            /* in case of multiple compat= options */
+> > -            g_free(compat_str);
+> > -            compat_str = inpieces[i];
+> > -        } else {
+> > -            j++;
+> > -        }
+> > -
+> > -        i++;
+> > -        /* Excise compat options from list */
+> > -        inpieces[j] = inpieces[i];
+> > -    }
+> > -
+> > -    if (compat_str) {
+> > -        char *val = compat_str + strlen("compat=");
+> > -
+> > -        object_property_set_str(OBJECT(spapr), val, "max-cpu-compat",
+> > -                                &error_fatal);
+> > -
+> > -    }
+> > -
+> > -    newprops = g_strjoinv(",", inpieces);
+> > -    cpu_parse_cpu_model(TYPE_POWERPC_CPU, newprops);
+> > -    g_free(newprops);
+> > -    g_strfreev(inpieces);
+> > -}
+> > -
+> >  static void spapr_cpu_reset(void *opaque)
+> >  {
+> >      PowerPCCPU *cpu = opaque;
+> > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> > index c6399a3..5ee91e8 100644
+> > --- a/target/ppc/translate_init.c
+> > +++ b/target/ppc/translate_init.c
+> > @@ -10313,6 +10313,62 @@ static ObjectClass *ppc_cpu_class_by_name(const char *name)
+> >  
+> >      return NULL;
+> >  }
+> > +static void ppc_cpu_parse_featurestr(const char *typename, char *features,
+> > +                                     Error **errp)
+> > +{
+> > +    const PowerPCCPUClass *pcc;
+> > +    char *compat_str = NULL;
+> > +    char *s = features;
+> > +    char **inpieces;
+> > +    Error *local_err = NULL;
+> > +    int i;
+> > +
+> > +    if (!features) {
+> > +        return;
+> > +    }
+> > +
+> > +    /*
+> > +     * Backwards compatibility hack:
+> > +     *
+> > +     *   CPUs had a "compat=" property which didn't make sense for
+> > +     *   anything except pseries.  It was replaced by "max-cpu-compat"
+> > +     *   machine option.  This supports old command lines like
+> > +     *       -cpu POWER8,compat=power7
+> > +     *   By stripping the compat option and applying it to the machine
+> > +     *   before passing it on to the cpu level parser.
+> > +     */
+> > +    inpieces = g_strsplit(features, ",", 0);
+> > +    *s = '\0';
+> > +    for (i = 0; inpieces[i]; i++) {
+> > +        if (g_str_has_prefix(inpieces[i], "compat=")) {
+> > +            compat_str = inpieces[i];
+> > +            continue;
+> > +        }
+> > +        if ((i != 0) && (s != features)) {
+> > +            s = g_stpcpy(s, ",");
+> > +        }
+> > +        s = g_stpcpy(s, inpieces[i]);
+> > +    }
+> > +
+> > +    if (compat_str) {
+> > +        Object *machine = qdev_get_machine();
+> > +        if (machine) {
+> > +            char *v = compat_str + strlen("compat=");
+> > +            object_property_set_str(machine, v, "max-cpu-compat", &local_err);
+> > +        } else {
+> > +            error_setg(&local_err, "Not supported property: %s", compat_str);
+> > +        }
+> > +    }
+> > +    g_strfreev(inpieces);
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        return;
+> > +    }
+> > +
+> > +    /* do property processing with generic handler */
+> > +    pcc = POWERPC_CPU_CLASS(object_class_by_name(typename));
+> > +    pcc->parent_parse_features(typename, features, errp);
+> > +}
+> >  
+> >  const char *ppc_cpu_lookup_alias(const char *alias)
+> >  {
+> > @@ -10706,6 +10762,8 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
+> >      cc->reset = ppc_cpu_reset;
+> >  
+> >      cc->class_by_name = ppc_cpu_class_by_name;
+> > +    pcc->parent_parse_features = cc->parse_features;
+> > +    cc->parse_features = ppc_cpu_parse_featurestr;
+> >      cc->has_work = ppc_cpu_has_work;
+> >      cc->do_interrupt = ppc_cpu_do_interrupt;
+> >      cc->cpu_exec_interrupt = ppc_cpu_exec_interrupt;  
+> 
