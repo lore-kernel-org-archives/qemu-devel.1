@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1e0ZyF-000655-K1
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 17:15:48 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e0aYA-0003pX-TX
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 17:52:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1e0ZyC-0000kg-Ci
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 17:15:47 -0400
-Received: from 13.mo6.mail-out.ovh.net ([188.165.56.124]:59365)
+	(envelope-from <ehabkost@redhat.com>) id 1e0aY6-0001T3-2Y
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 17:52:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46804)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1e0ZyC-0000k5-5x
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 17:15:44 -0400
-Received: from player787.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id AF69E112CCA
-	for <qemu-devel@nongnu.org>; Fri,  6 Oct 2017 23:15:40 +0200 (CEST)
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-References: <20171005164959.26024-1-clg@kaod.org>
-	<20171005164959.26024-2-clg@kaod.org>
-	<20171006090722.GD10961@umbus.fritz.box>
-Message-ID: <63250b25-6c88-17a1-df4b-6a1e385ae7dd@kaod.org>
-Date: Fri, 6 Oct 2017 23:15:31 +0200
-MIME-Version: 1.0
-In-Reply-To: <20171006090722.GD10961@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] spapr/rtas: disable the decrementer
- interrupt when a CPU is unplugged
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e0aY5-0001RY-SN
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 17:52:49 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9BB0A883B8
+	for <qemu-devel@nongnu.org>; Fri,  6 Oct 2017 21:52:48 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Fri,  6 Oct 2017 18:52:37 -0300
+Message-Id: <20171006215244.27104-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/7] x86: Rework KVM-defaults compat code,
+ enable kvm_pv_unhalt by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,82 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On 10/06/2017 11:07 AM, David Gibson wrote:
-> On Thu, Oct 05, 2017 at 06:49:58PM +0200, C=E9dric Le Goater wrote:
->> When a CPU is stopped with the 'stop-self' RTAS call, its state
->> 'halted' is switched to 1 and, in this case, the MSR is not taken into
->> account anymore in the cpu_has_work() routine. Only the pending
->> hardware interrupts are checked with their LPCR:PECE* enablement bit.
->>
->> If the DECR timer fires after 'stop-self' is called and before the CPU
->> 'stop' state is reached, the nearly-dead CPU will have some work to do
->> and the guest will crash. This case happens very frequently with the
->> not yet upstream P9 XIVE exploitation mode. In XICS mode, the DECR is
->> occasionally fired but after 'stop' state, so no work is to be done
->> and the guest survives.
->>
->> I suspect there is a race between the QEMU mainloop triggering the
->> timers and the TCG CPU thread but I could not quite identify the root
->> cause. To be safe, let's disable the decrementer interrupt in the LPCR
->> when the CPU is halted and reenable it when the CPU is restarted.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>  hw/ppc/spapr_rtas.c | 16 ++++++++++++++++
->>  1 file changed, 16 insertions(+)
->>
->> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
->> index cdf0b607a0a0..2389220c9738 100644
->> --- a/hw/ppc/spapr_rtas.c
->> +++ b/hw/ppc/spapr_rtas.c
->> @@ -174,6 +174,15 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAP=
-RMachineState *spapr,
->>          kvm_cpu_synchronize_state(cs);
->> =20
->>          env->msr =3D (1ULL << MSR_SF) | (1ULL << MSR_ME);
->> +
->> +        /* Enable DECR interrupt */
->> +        if (env->mmu_model =3D=3D POWERPC_MMU_3_00) {
->=20
-> Hm.  Checking mmu_model doesn't seem right to me.  I mean, it'll get
-> the right answer in practice, but the LPCR programming has nothing
-> whatsoever to do with the MMU.
->=20
-> I think explicitly checking if cpu_ is a POWER9 instance with
-> object_dynamic_cast would be a better option.
+This series enables kvm_pv_unhalt by default on pc-*-2.11 and
+newer.
 
-OK. So I guess we should change the switch statement in cpu_ppc_set_papr(=
-)
-also.
+To do that, I first reworked the existing
+x86_cpu_change_kvm_default() logic to use compat_props instead,
+so we don't need to make the chain of pc_compat_*() functions
+grow.
 
-C.=20
+Based-on: 20171006132502.9191-1-ehabkost@redhat.com
+(Subject: [PATCH] isapc: Remove unnecessary migration compatibility code)
 
->=20
->> +            env->spr[SPR_LPCR] |=3D LPCR_DEE;
->> +        } else {
->> +            /* P7 and P8 both have same bit for DECR */
->> +            env->spr[SPR_LPCR] |=3D LPCR_P8_PECE3;
->> +        }
->> +
->>          env->nip =3D start;
->>          env->gpr[3] =3D r3;
->>          cs->halted =3D 0;
->> @@ -210,6 +219,13 @@ static void rtas_stop_self(PowerPCCPU *cpu, sPAPR=
-MachineState *spapr,
->>       * no need to bother with specific bits, we just clear it.
->>       */
->>      env->msr =3D 0;
->> +
->> +    if (env->mmu_model =3D=3D POWERPC_MMU_3_00) {
->> +        env->spr[SPR_LPCR] &=3D ~LPCR_DEE;
->> +    } else {
->> +        /* P7 and P8 both have same bit for DECR */
->> +        env->spr[SPR_LPCR] &=3D ~LPCR_P8_PECE3;
->> +    }
->>  }
->> =20
->>  static inline int sysparm_st(target_ulong addr, target_ulong len,
->=20
+Eduardo Habkost (7):
+  qemu-doc: Document minimum kernel version for KVM in x86_64
+  target/i386: x86_cpu_expand_feature() helper
+  target/i386: Use global variables to control KVM defaults
+  kvm: Define KVM_FEAT_* even if CONFIG_KVM is not defined
+  target/i386: Handle kvm_auto_* compat in x86_cpu_expand_features()
+  pc: Use compat_props to control KVM defaults compatibility
+  target/i386: Enable kvm_pv_unhalt by default
+
+ include/hw/i386/pc.h   | 12 +++++++
+ target/i386/cpu.h      | 22 +++++++------
+ target/i386/kvm_i386.h |  9 ++++++
+ hw/i386/pc_piix.c      |  7 ++--
+ target/i386/cpu.c      | 88 +++++++++++++++++++++++++++++++++-----------------
+ qemu-doc.texi          |  9 ++++++
+ 6 files changed, 105 insertions(+), 42 deletions(-)
+
+-- 
+2.13.6
