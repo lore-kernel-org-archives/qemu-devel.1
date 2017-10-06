@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e0PRa-0006SS-TW
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:30 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e0PRj-0006a5-85
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e0PRR-00088F-EW
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40594)
+	(envelope-from <cohuck@redhat.com>) id 1e0PRZ-0008I1-R0
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55230)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e0PRR-00086U-6a
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:13 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e0PRZ-0008HO-Kj
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:21 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri,  6 Oct 2017 11:59:42 +0200
-Message-Id: <20171006095956.27534-20-cohuck@redhat.com>
+Date: Fri,  6 Oct 2017 11:59:45 +0200
+Message-Id: <20171006095956.27534-23-cohuck@redhat.com>
 In-Reply-To: <20171006095956.27534-1-cohuck@redhat.com>
 References: <20171006095956.27534-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 19/33] s390x/3270: handle writes of arbitrary
- length
+Subject: [Qemu-devel] [PULL 22/33] s390x/cpumodel: fix max STFL(E) bit number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,97 +24,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
+From: David Hildenbrand <david@redhat.com>
 
-The problem is, that the current implementation places unrealistic and
-arbitrary constraints on the length of writes to the device (that is the
-outbound requests), by asserting ccw.count being such that that even the
-worst case escaped payload will fit an  more or less arbitrary sized
-buffer. Actually on protocol level there is nothing to justify such
-a limitation.
+Not that it would matter in the near future, but it is actually 2048
+bytes, therefore 16384 possible bits.
 
-Another strange thing is the return value which more or less reflects
-the size (written) after escaping instead of before escaping. This
-is strange, because this return value is used to calculate SCSW.count.
-
-Let us teach 3270 how to deal with arbitrary long writes.
-
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Reported-by: Jason J . Herne <jjherne@linux.vnet.ibm.com>
-Tested-by: Jason J . Herne <jjherne@linux.vnet.ibm.com>
-Message-Id: <20170920172314.102710-3-pasic@linux.vnet.ibm.com>
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20170928134609.16985-4-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/char/terminal3270.c | 30 ++++++++++++++++++------------
- 1 file changed, 18 insertions(+), 12 deletions(-)
+ target/s390x/cpu_features.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/char/terminal3270.c b/hw/char/terminal3270.c
-index c976a63cc2..a109ce5987 100644
---- a/hw/char/terminal3270.c
-+++ b/hw/char/terminal3270.c
-@@ -30,7 +30,6 @@ typedef struct Terminal3270 {
-     uint8_t inv[INPUT_BUFFER_SIZE];
-     uint8_t outv[OUTPUT_BUFFER_SIZE];
-     int in_len;
--    int out_len;
-     bool handshake_done;
-     guint timer_tag;
- } Terminal3270;
-@@ -145,7 +144,6 @@ static void chr_event(void *opaque, int event)
+diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+index 1d3a036393..31a4676f05 100644
+--- a/target/s390x/cpu_features.c
++++ b/target/s390x/cpu_features.c
+@@ -381,7 +381,7 @@ void s390_add_from_feat_block(S390FeatBitmap features, S390FeatType type,
  
-     /* Ensure the initial status correct, always reset them. */
-     t->in_len = 0;
--    t->out_len = 0;
-     t->handshake_done = false;
-     if (t->timer_tag) {
-         g_source_remove(t->timer_tag);
-@@ -231,8 +229,9 @@ static int write_payload_3270(EmulatedCcw3270Device *dev, uint8_t cmd)
-     Terminal3270 *t = TERMINAL_3270(dev);
-     int retval = 0;
-     int count = ccw_dstream_avail(get_cds(t));
--
--    assert(count <= (OUTPUT_BUFFER_SIZE - 3) / 2);
-+    int bound = (OUTPUT_BUFFER_SIZE - 3) / 2;
-+    int len = MIN(count, bound);
-+    int out_len = 0;
- 
-     if (!t->handshake_done) {
-         if (!(t->outv[0] == IAC && t->outv[1] != IAC)) {
-@@ -247,16 +246,23 @@ static int write_payload_3270(EmulatedCcw3270Device *dev, uint8_t cmd)
-         /* We just say we consumed all data if there's no backend. */
-         return count;
-     }
--    t->outv[0] = cmd;
--    ccw_dstream_read_buf(get_cds(t), &t->outv[1], count);
--    t->out_len = count + 1;
- 
--    t->out_len = insert_IAC_escape_char(t->outv, t->out_len);
--    t->outv[t->out_len++] = IAC;
--    t->outv[t->out_len++] = IAC_EOR;
-+    t->outv[out_len++] = cmd;
-+    do {
-+        ccw_dstream_read_buf(get_cds(t), &t->outv[out_len], len);
-+        count = ccw_dstream_avail(get_cds(t));
-+        out_len += len;
- 
--    retval = qemu_chr_fe_write_all(&t->chr, t->outv, t->out_len);
--    return (retval <= 0) ? 0 : (retval - 3);
-+        out_len = insert_IAC_escape_char(t->outv, out_len);
-+        if (!count) {
-+            t->outv[out_len++] = IAC;
-+            t->outv[out_len++] = IAC_EOR;
-+        }
-+        retval = qemu_chr_fe_write_all(&t->chr, t->outv, out_len);
-+        len = MIN(count, bound);
-+        out_len = 0;
-+    } while (len && retval >= 0);
-+    return (retval <= 0) ? 0 : get_cds(t)->count;
- }
- 
- static Property terminal_properties[] = {
+     switch (type) {
+     case S390_FEAT_TYPE_STFL:
+-       nr_bits = 2048;
++       nr_bits = 16384;
+        break;
+     case S390_FEAT_TYPE_PLO:
+        nr_bits = 256;
 -- 
 2.13.6
