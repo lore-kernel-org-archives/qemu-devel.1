@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1e0W7U-0001UV-8j
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 13:09:05 -0400
+	(envelope-from <armbru@redhat.com>) id 1e0WFf-0004A3-7q
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 13:17:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1e0W7Q-0006iE-Vp
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 13:09:04 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:53987)
+	(envelope-from <armbru@redhat.com>) id 1e0WFb-0004rY-V0
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 13:17:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42536)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1e0W7Q-0006gR-Ow
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 13:09:00 -0400
-Date: Fri, 6 Oct 2017 13:08:57 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20171006170857.GA26136@flamenco>
-References: <1502149958-23381-1-git-send-email-cota@braap.org>
-	<20171005234831.GB23670@flamenco> <87a814y27e.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1e0WFb-0004qM-M3
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 13:17:27 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170913132417.24384-1-david@redhat.com>
+	<20170913132417.24384-19-david@redhat.com>
+	<87k20eq9em.fsf@dusky.pond.sub.org>
+	<20171004100415.0f0ded10.cohuck@redhat.com>
+	<87k20bm6cw.fsf@dusky.pond.sub.org>
+	<20171004150956.0901d6c1.cohuck@redhat.com>
+Date: Fri, 06 Oct 2017 19:17:20 +0200
+In-Reply-To: <20171004150956.0901d6c1.cohuck@redhat.com> (Cornelia Huck's
+	message of "Wed, 4 Oct 2017 15:09:56 +0200")
+Message-ID: <87wp48xkkf.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87a814y27e.fsf@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 00/22] tcg: tb_lock removal
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 18/22] s390x: implement
+ query-hotpluggable-cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +33,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Matthew Rosato <mjrosato@linux.vnet.ibm.com>, thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>
 
-On Fri, Oct 06, 2017 at 11:56:21 +0100, Alex Bennée wrote:
-> 
-> Emilio G. Cota <cota@braap.org> writes:
-> 
-> > On Mon, Aug 07, 2017 at 19:52:16 -0400, Emilio G. Cota wrote:
-> >> This series applies on top of the "multiple TCG contexts" series, v4:
-> >>   https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg06769.html
-> > (snip)
-> >> Please review!
-> >
-> > Turns out this patchset breaks icount, even after fixing the patchset
-> > it is based on (see [1]).
-> 
-> Isn't icount only used in single-threaded mode though?
+Cornelia Huck <cohuck@redhat.com> writes:
 
-Yes, but it also hits some code paths that get executed very rarely
-(or not at all) in !icount mode. And we still acquire locks in single-threaded
-mode -- the breakage is most likely due to a missing page_unlock somewhere.
+> On Wed, 04 Oct 2017 14:42:55 +0200
+> Markus Armbruster <armbru@redhat.com> wrote:
+>
+>> Cornelia Huck <cohuck@redhat.com> writes:
+>>=20
+>> > On Mon, 02 Oct 2017 09:46:41 +0200
+>> > Markus Armbruster <armbru@redhat.com> wrote:
+>> >=20=20
+>> >> David Hildenbrand <david@redhat.com> writes:
+>> >>=20=20=20
+>> >> > CPU hotplug is only possible on a per core basis on s390x. So let's
+>> >> > add possible_cpus and properly wire everything up.
+>> >> >
+>> >> > Signed-off-by: David Hildenbrand <david@redhat.com>=20=20=20=20
+>> >> [...]=20=20
+>> >> > diff --git a/qapi-schema.json b/qapi-schema.json
+>> >> > index f3af2cb851..79e9f85404 100644
+>> >> > --- a/qapi-schema.json
+>> >> > +++ b/qapi-schema.json
+>> >> > @@ -3121,6 +3121,22 @@
+>> >> >  #      }
+>> >> >  #    ]}
+>> >> >  #
+>> >> > +# For s390x-virtio-ccw machine type started with -smp 1,maxcpus=3D=
+2 -cpu qemu
+>> >> > +# (Since: 2.11):
+>> >> > +#
+>> >> > +# -> { "execute": "query-hotpluggable-cpus" }
+>> >> > +# <- {"return": [
+>> >> > +#      {
+>> >> > +#         "type": "qemu-s390-cpu", "vcpus-count": 1,
+>> >> > +#         "props": { "core-id": 1 }
+>> >> > +#      },
+>> >> > +#      {
+>> >> > +#         "qom-path": "/machine/unattached/device[0]",
+>> >> > +#         "type": "qemu-s390-cpu", "vcpus-count": 1,
+>> >> > +#         "props": { "core-id": 0 }
+>> >> > +#      }
+>> >> > +#    ]}
+>> >> > +#
+>> >> >  ##
+>> >> >  { 'command': 'query-hotpluggable-cpus', 'returns': ['HotpluggableC=
+PU'] }=20=20=20=20
+>> >>=20
+>> >> Please stick in '# Example:' like we do in query-hotpluggable-cpus's =
+doc
+>> >> comment.  I expect the generated documentation to be illegible[*]
+>> >> without it.=20=20
+>> >
+>> > Should '# Example:' go before each of the examples (instead of the
+>> > beginning of the example block), then?=20=20
+>>=20
+>> Whatever makes the generated documentation look better.
+>
+> The pdf indeed looks ugly, but that's a preexisting problem, and adding
+> more '# Example:' lines does not really help.
+>
+> The basic issue is that the code expects just one example and no
+> additional text for the '# Example:' tag -- the explaining text for the
+> various statements ends up looking like the qmp examples. That should
+> be improved before doing a patch on top for this command (and I don't
+> really have the skills or time to improve the output, sorry.)
 
-Cheers,
-
-		Emilio
+Marc-Andr=C3=A9, any ideas?
