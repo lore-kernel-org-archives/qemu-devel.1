@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0N5C-0006Pe-45
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:30:12 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0N55-0002cJ-JB
+	(envelope-from <dgibson@ozlabs.org>) id 1e0N56-0006OZ-Uz
 	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:30:06 -0400
-Date: Fri, 6 Oct 2017 15:01:12 +1100
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1e0N55-0002cA-J8
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:30:00 -0400
+Date: Fri, 6 Oct 2017 15:15:44 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171006040112.GR3260@umbus.fritz.box>
-References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-	<1507220690-265042-15-git-send-email-imammedo@redhat.com>
+Message-ID: <20171006041544.GS3260@umbus.fritz.box>
+References: <1504511031-26834-1-git-send-email-s1seetee@linux.vnet.ibm.com>
+	<5577a43c-0c60-a1c7-e5ab-7b940225ea85@amsat.org>
+	<0476b7f3-e760-273a-7edf-07ff90157dc4@linux.vnet.ibm.com>
+	<a2b139bd-f389-be61-b38f-51fa4fe64523@redhat.com>
+	<1cc1c650-9b82-0332-6d63-fce3334745da@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="UuuTb5hZdWr4w/Ub"
+	protocol="application/pgp-signature"; boundary="EDQ/wMYGX5nr2pOQ"
 Content-Disposition: inline
-In-Reply-To: <1507220690-265042-15-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 14/23] ppc: spapr: use cpu type name
- directly
+In-Reply-To: <1cc1c650-9b82-0332-6d63-fce3334745da@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v5] vl: exit if maxcpus is
+ negative
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,137 +28,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
+To: seeteena <s1seetee@linux.vnet.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Eduardo Habkost <ehabkost@redhat.com>
 
 
---UuuTb5hZdWr4w/Ub
-Content-Type: text/plain; charset=us-ascii
+--EDQ/wMYGX5nr2pOQ
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 05, 2017 at 06:24:41PM +0200, Igor Mammedov wrote:
-> replace sPAPRCPUCoreClass::cpu_class with cpu type name
-> since it were needed just to get that at points it were
-> accessed.
+On Thu, Sep 28, 2017 at 06:38:55PM +0530, seeteena wrote:
 >=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Thanks Thomas. Since you already put them on cc. I will wait for the
+> response.
 
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+At this point, I think your patch has been lost in the noise, I'm
+afraid.  I suggest reposting, CCing those suggested people from the
+start.  I'd also suggest CCing qemu-trivial@nongnu.org, I think this
+patch meets the guidelines for a trivial patch.
 
-> ---
->  include/hw/ppc/spapr_cpu_core.h |  2 +-
->  hw/ppc/spapr.c                  |  6 ++----
->  hw/ppc/spapr_cpu_core.c         | 13 +++++--------
->  target/ppc/kvm.c                |  2 +-
->  4 files changed, 9 insertions(+), 14 deletions(-)
 >=20
-> diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_c=
-ore.h
-> index 66dcf52..264ce68 100644
-> --- a/include/hw/ppc/spapr_cpu_core.h
-> +++ b/include/hw/ppc/spapr_cpu_core.h
-> @@ -34,7 +34,7 @@ typedef struct sPAPRCPUCore {
-> =20
->  typedef struct sPAPRCPUCoreClass {
->      DeviceClass parent_class;
-> -    ObjectClass *cpu_class;
-> +    const char *cpu_type;
->  } sPAPRCPUCoreClass;
-> =20
->  char *spapr_get_cpu_core_type(const char *model);
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 01b3012..ad7afd6 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -3142,8 +3142,7 @@ void spapr_core_release(DeviceState *dev)
->      if (smc->pre_2_10_has_unused_icps) {
->          sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
->          sPAPRCPUCoreClass *scc =3D SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
-> -        const char *typename =3D object_class_get_name(scc->cpu_class);
-> -        size_t size =3D object_type_get_instance_size(typename);
-> +        size_t size =3D object_type_get_instance_size(scc->cpu_type);
->          int i;
-> =20
->          for (i =3D 0; i < cc->nr_threads; i++) {
-> @@ -3239,8 +3238,7 @@ static void spapr_core_plug(HotplugHandler *hotplug=
-_dev, DeviceState *dev,
-> =20
->      if (smc->pre_2_10_has_unused_icps) {
->          sPAPRCPUCoreClass *scc =3D SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
-> -        const char *typename =3D object_class_get_name(scc->cpu_class);
-> -        size_t size =3D object_type_get_instance_size(typename);
-> +        size_t size =3D object_type_get_instance_size(scc->cpu_type);
->          int i;
-> =20
->          for (i =3D 0; i < cc->nr_threads; i++) {
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 01f4ec8..8e13e52 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -90,8 +90,7 @@ static void spapr_cpu_core_unrealizefn(DeviceState *dev=
-, Error **errp)
->  {
->      sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
->      sPAPRCPUCoreClass *scc =3D SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
-> -    const char *typename =3D object_class_get_name(scc->cpu_class);
-> -    size_t size =3D object_type_get_instance_size(typename);
-> +    size_t size =3D object_type_get_instance_size(scc->cpu_type);
->      CPUCore *cc =3D CPU_CORE(dev);
->      int i;
-> =20
-> @@ -152,8 +151,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
-Error **errp)
->      sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
->      sPAPRCPUCoreClass *scc =3D SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
->      CPUCore *cc =3D CPU_CORE(OBJECT(dev));
-> -    const char *typename =3D object_class_get_name(scc->cpu_class);
-> -    size_t size =3D object_type_get_instance_size(typename);
-> +    size_t size =3D object_type_get_instance_size(scc->cpu_type);
->      Error *local_err =3D NULL;
->      void *obj;
->      int i, j;
-> @@ -172,7 +170,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
-Error **errp)
-> =20
->          obj =3D sc->threads + i * size;
-> =20
-> -        object_initialize(obj, size, typename);
-> +        object_initialize(obj, size, scc->cpu_type);
->          cs =3D CPU(obj);
->          cpu =3D POWERPC_CPU(cs);
->          cs->cpu_index =3D cc->core_id + i;
-> @@ -230,14 +228,13 @@ void spapr_cpu_core_class_init(ObjectClass *oc, voi=
-d *data)
->      dc->realize =3D spapr_cpu_core_realize;
->      dc->unrealize =3D spapr_cpu_core_unrealizefn;
->      dc->props =3D spapr_cpu_core_properties;
-> -    scc->cpu_class =3D cpu_class_by_name(TYPE_POWERPC_CPU, data);
-> -    g_assert(scc->cpu_class);
-> +    scc->cpu_type =3D data;
->  }
-> =20
->  #define DEFINE_SPAPR_CPU_CORE_TYPE(cpu_model) \
->      {                                                   \
->          .parent =3D TYPE_SPAPR_CPU_CORE,                  \
-> -        .class_data =3D (void *) cpu_model,               \
-> +        .class_data =3D (void *) POWERPC_CPU_TYPE_NAME(cpu_model), \
->          .class_init =3D spapr_cpu_core_class_init,        \
->          .name =3D SPAPR_CPU_CORE_TYPE_NAME(cpu_model),    \
->      }
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 171d3d8..c2152ed 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2514,7 +2514,7 @@ static int kvm_ppc_register_host_cpu_type(void)
->      type_info.instance_size =3D sizeof(sPAPRCPUCore);
->      type_info.instance_init =3D NULL;
->      type_info.class_init =3D spapr_cpu_core_class_init;
-> -    type_info.class_data =3D (void *) "host";
-> +    type_info.class_data =3D (void *) POWERPC_CPU_TYPE_NAME("host");
->      type_register(&type_info);
->      g_free((void *)type_info.name);
->  #endif
+>=20
+> On 09/25/2017 02:21 PM, Thomas Huth wrote:
+> > On 25.09.2017 10:43, seeteena wrote:
+> > > Hi Philippe,
+> > >=20
+> > > I have not seen patch went upstream..
+> > You need to get the attention of a maintainer who could pick up the
+> > patch, e.g. by putting them on CC:. See the MAINTAINERS file for who is
+> > responsible for the various parts of QEMU. I've put Eduardo (Numa) and
+> > Paolo (vl.c) on CC: now, I hope one of them can pick up the patch.
+> >=20
+> >   Thomas
+> >=20
+> >=20
+> > > On 09/04/2017 09:12 PM, Philippe Mathieu-Daud=E9 wrote:
+> > > > On 09/04/2017 04:43 AM, Seeteena Thoufeek wrote:
+> > > > > ---Steps to Reproduce---
+> > > > >=20
+> > > > > When passed a negative number to 'maxcpus' parameter, Qemu aborts
+> > > > > with a core dump.
+> > > > >=20
+> > > > > Run the following command with maxcpus argument as negative number
+> > > > >=20
+> > > > > ppc64-softmmu/qemu-system-ppc64 --nographic -vga none -machine
+> > > > > pseries,accel=3Dkvm,kvm-type=3DHV -m size=3D200g -device virtio-b=
+lk-pci,
+> > > > > drive=3Drootdisk -drive file=3D/home/images/pegas-1.0-ppc64le.qco=
+w2,
+> > > > > if=3Dnone,cache=3Dnone,id=3Drootdisk,format=3Dqcow2 -monitor teln=
+et
+> > > > > :127.0.0.1:1234,server,nowait -net nic,model=3Dvirtio -net
+> > > > > user -redir tcp:2000::22 -device nec-usb-xhci -smp 8,cores=3D1,
+> > > > > threads=3D1,maxcpus=3D-12
+> > > > >=20
+> > > > > (process:12149): GLib-ERROR **: gmem.c:130: failed to allocate
+> > > > >  =A0 18446744073709550568 bytes
+> > > > >=20
+> > > > > Trace/breakpoint trap
+> > > > >=20
+> > > > > Reported-by: R.Nageswara Sastry <rnsastry@linux.vnet.ibm.com>
+> > > > > Signed-off-by: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
+> > > > Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> > > >=20
+> > > > > ---
+> > > > > v1 -> v2:
+> > > > >  =A0=A0 - Fix the error check in vl.c to make it generic.
+> > > > > v2 -> v3:
+> > > > >  =A0=A0 - Fix coding style pointed out by patchew.
+> > > > >  =A0=A0 - Fix check for "<=3D 0" instead of just "< 0".
+> > > > > v3 -> v4:
+> > > > >  =A0=A0 - Fix subject line.
+> > > > >  =A0=A0 - Removed space before ":" from vl.c:1248
+> > > > >  =A0=A0 - Removed Reviewed-by: flag
+> > > > > v4-> v5:
+> > > > >  =A0=A0 - Code rework to declare max_cpus as unsigned int in syse=
+mu.h
+> > > > >  =A0=A0 - Remove the error check in vl.c referred in v2.
+> > > > >  =A0=A0 - declare max_cpus as unsigned int in vl.c
+> > > > > ---
+> > > > >  =A0 include/sysemu/sysemu.h | 2 +-
+> > > > >  =A0 vl.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0 | 6 +++---
+> > > > >  =A0 2 files changed, 4 insertions(+), 4 deletions(-)
+> > > > >=20
+> > > > > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> > > > > index b213696..c083869 100644
+> > > > > --- a/include/sysemu/sysemu.h
+> > > > > +++ b/include/sysemu/sysemu.h
+> > > > > @@ -113,7 +113,7 @@ extern int win2k_install_hack;
+> > > > >  =A0 extern int alt_grab;
+> > > > >  =A0 extern int ctrl_grab;
+> > > > >  =A0 extern int smp_cpus;
+> > > > > -extern int max_cpus;
+> > > > > +extern unsigned int max_cpus;
+> > > > >  =A0 extern int cursor_hide;
+> > > > >  =A0 extern int graphic_rotate;
+> > > > >  =A0 extern int no_quit;
+> > > > > diff --git a/vl.c b/vl.c
+> > > > > index 8e247cc..1470c21 100644
+> > > > > --- a/vl.c
+> > > > > +++ b/vl.c
+> > > > > @@ -164,7 +164,7 @@ Chardev *sclp_hds[MAX_SCLP_CONSOLES];
+> > > > >  =A0 int win2k_install_hack =3D 0;
+> > > > >  =A0 int singlestep =3D 0;
+> > > > >  =A0 int smp_cpus =3D 1;
+> > > > > -int max_cpus =3D 1;
+> > > > > +unsigned int max_cpus =3D 1;
+> > > > >  =A0 int smp_cores =3D 1;
+> > > > >  =A0 int smp_threads =3D 1;
+> > > > >  =A0 int acpi_enabled =3D 1;
+> > > > > @@ -4233,8 +4233,8 @@ int main(int argc, char **argv, char **envp)
+> > > > >  =A0 =A0=A0=A0=A0=A0 machine_class->max_cpus =3D machine_class->m=
+ax_cpus ?: 1; /*
+> > > > > Default to UP */
+> > > > >  =A0=A0=A0=A0=A0 if (max_cpus > machine_class->max_cpus) {
+> > > > > -=A0=A0=A0=A0=A0=A0=A0 error_report("Number of SMP CPUs requested=
+ (%d) exceeds max
+> > > > > CPUs "
+> > > > > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "su=
+pported by machine '%s' (%d)", max_cpus,
+> > > > > +=A0=A0=A0=A0=A0=A0=A0 error_report("Invalid SMP CPUs %d. The max=
+ CPUs "
+> > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "su=
+pported by machine '%s' is %d", max_cpus,
+> > > > >  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0 machine_class->name, machine_class->max_cpus);
+> > > > >  =A0=A0=A0=A0=A0=A0=A0=A0=A0 exit(1);
+> > > > >  =A0=A0=A0=A0=A0 }
+> > > > >=20
+> > >=20
+>=20
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -163,24 +167,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---UuuTb5hZdWr4w/Ub
+--EDQ/wMYGX5nr2pOQ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnXAAgACgkQbDjKyiDZ
-s5LacBAA3iR+UHVrZewupjB8CK7aPJ1aYAIDfiQg20sLtuA4P1M2mlZWJJBwgrL6
-LtSrMWqC7uenHRM+nD5YDu7fb+qysrX4DeLMJiCSBTekndL+QdvMjYEKC91Unmq1
-+oSg+62KQyJOmv81uZqtPZPTadwzT9PISDTLuQf5f6oCZSJj8BQQexsTn/fqHQIU
-tKeNqr5Jc6c7oYd2ocF07xYJZZ3l5ugABSdNSdNGEd3Ecsch9LHhEPOo+uBZ0FV1
-4erHrfvI2hmC47Vdf4UBQ4G4M5O+PTuYMtbXrbxcNFamcWGKpAN6uNvTZa/V/Nfz
-ey1iC3Qf8EMKwpqjlWRsR1Dy9MO1TCCPgz48K7H+hZtB4DO9NhQX/E+kZm/pYIxn
-TG5drlq3kluab+02/Ybbv3SfzC/CHyExHZis8aD/h0kqxSXcedZpqa0abzOzTLx4
-fAIeNaN39mfJJxXaKuRXCqjBbiAG1Xz7gB66A+aLnVt+xkiyrbICK2JLZCC0Xi35
-6LazrTviqgAga5V41v+UpvyCGdHy0fo+OG06MmTYswIi3sl9VFpmowHgRWzRFy53
-47n0BwAMUxMkP5NTBuRzu5/pg5lyNnEwHcTU6aWYMDnCAOOQanKrmh2Mab8tMV57
-kVDAIZ3LLZLbLz9zeDxTkdVtn+fj5kO456DMfBbVbLWawExLnfI=
-=7StQ
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnXA20ACgkQbDjKyiDZ
+s5Iekg//VFofVDlUfcP4WAiaTYlCrPb2M+pprCooKVn/id5zG3sRB1Jp9tJxR7+X
+OMjsndOynj0z0XmzoKU6fxejhmMVMTm8SazXRqJqJuMyvjlVyz6D+KkUv4yisPiT
+8tmhqVjjmIl4Ea43n2fTsl1VD34nsYCUvWBQRFpw71VKXRAUQjmy7SVWKglBJTZd
+327S4lLlSas4h0t+P42OWdd/u+HseMU0ndnPyGutm+1JBQmytSanFhUFgvWQJ7Pj
+xCgQ03zyiuIXzDRvJWvjPydoQQf8KAtPvaf5VKRdAX7NZGc2/x4VJuZdQh0xxjT7
+2RpXho+IJpN1UjXfeci5rsRatqiPcNbhR9shkqQIFdlHAlzunNiDdniRqblbK8Qd
+XVrDnTIyDKqgVtF4QyAFDwhXetTkgIZPF6GekYUgUiPJkV50gQ5gTyg0/zCEtOod
+yChGxCTw635RjtwLkq6Pp50qX0htlXLXlP0HIRPKYvGQAaJV2ClrJMHF1n9wRW64
+f6sIFEUlTiZP4tTZrjPv7riloDReYPRvfNAt2PwBp9I/wXUneqAflhkBF3qNqTZN
+T2ceEdT9qO6RehyKv2QrluCsWitSgrnfsph5KymrXps/zEX8iPwq95riZZpAKFds
+Jz6QxM3uWggdEWlcR6e0aRcG+bvsl3Pd9fdTqiWV2rYqR6vg2aw=
+=NS21
 -----END PGP SIGNATURE-----
 
---UuuTb5hZdWr4w/Ub--
+--EDQ/wMYGX5nr2pOQ--
