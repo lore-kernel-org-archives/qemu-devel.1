@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0N59-0006Om-86
+	(envelope-from <dgibson@ozlabs.org>) id 1e0N56-0006OY-Qo
 	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:30:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0N58-0002gY-25
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:30:03 -0400
-Date: Fri, 6 Oct 2017 16:04:39 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1e0N55-0002cT-JL
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:30:00 -0400
+Date: Fri, 6 Oct 2017 14:58:31 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171006050439.GV3260@umbus.fritz.box>
+Message-ID: <20171006035831.GQ3260@umbus.fritz.box>
 References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-	<1507220690-265042-18-git-send-email-imammedo@redhat.com>
+	<1507220690-265042-14-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="m5R8f+g8StfRwQ/I"
+	protocol="application/pgp-signature"; boundary="2VmY8g3XFtK+hx8d"
 Content-Disposition: inline
-In-Reply-To: <1507220690-265042-18-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 17/23] ppc: spapr: use generic cpu_model
- parsing
+In-Reply-To: <1507220690-265042-14-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 13/23] ppc: spapr: define core types
+ statically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,121 +29,145 @@ To: Igor Mammedov <imammedo@redhat.com>
 Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
 
 
---m5R8f+g8StfRwQ/I
+--2VmY8g3XFtK+hx8d
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 05, 2017 at 06:24:44PM +0200, Igor Mammedov wrote:
-> use generic cpu_model parsing introduced by
->  (6063d4c0f vl.c: convert cpu_model to cpu type and set of global propert=
-ies before machine_init())
->=20
-> it allows to:
->   * replace sPAPRMachineClass::tcg_default_cpu with
->     MachineClass::default_cpu_type
->   * drop cpu_parse_cpu_model() from hw/ppc/spapr.c and reuse
->     one in vl.c
->   * simplify spapr_get_cpu_core_type() by removing
->     not needed anymore recurrsion since alias look up
->     happens earlier at vl.c and spapr_get_cpu_core_type()
->     works only with resulted from that cpu type.
->   * spapr no more needs to parse/depend on being phased out
->     MachineState::cpu_model, all tha parsing done by generic
->     code and target specific callback.
+On Thu, Oct 05, 2017 at 06:24:40PM +0200, Igor Mammedov wrote:
+> spapr core type definition doesn't have any fields that
+> require it to be defined at runtime. So replace code
+> that fills in TypeInfo at runtime with static TypeInfo
+> array that does the same at complie time.
 >=20
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+
 > ---
-> PS:
->   patch is a little bit big but it's hard to split it due
->   to dependencies, so pls bear with it.
-
-[snip]
-> -static int kvm_ppc_register_host_cpu_type(void)
-> +static int kvm_ppc_register_host_cpu_type(MachineState *ms)
->  {
->      TypeInfo type_info =3D {
->          .name =3D TYPE_HOST_POWERPC_CPU,
->          .class_init =3D kvmppc_host_cpu_class_init,
->      };
-> +    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
->      PowerPCCPUClass *pvr_pcc;
->      ObjectClass *oc;
->      DeviceClass *dc;
-> @@ -2504,6 +2505,8 @@ static int kvm_ppc_register_host_cpu_type(void)
->      }
->      type_info.parent =3D object_class_get_name(OBJECT_CLASS(pvr_pcc));
->      type_register(&type_info);
-> +    /* override TCG default cpu type with 'host' cpu model */
-> +    mc->default_cpu_type =3D TYPE_HOST_POWERPC_CPU;
-
-Ugh.  I dislike this, it changes the default cpu type to 'host' for
-*all* machine types, whereas previously it was just true for pseries.
-That wasn't by accident.
-
-In general, I think we want there to be a single default CPU type for
-a machine, regardless of TCG vs. KVM.  This is particularly true for
-many of the ppc machine types - they will only work with a CPU in the
-right "family" (e500 / 440 / POWERx, wahtever); in many of these cases
-KVM PR is usable, but using -cpu host could easily break the machine
-type.
-
-'pseries' is different, it (and only it) can be used with KVM HV - and
-usually is.  And KVM HV *only* works with -cpu host, due to hardware
-limitations.
-
->      oc =3D object_class_by_name(type_info.name);
->      g_assert(oc);
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index 5ee91e8..a968e86 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -10277,6 +10277,19 @@ PowerPCCPUClass *ppc_cpu_class_by_pvr_mask(uint3=
-2_t pvr)
->      return pcc;
+>  include/hw/ppc/spapr_cpu_core.h |  2 +
+>  hw/ppc/spapr_cpu_core.c         | 85 +++++++++++++----------------------=
+------
+>  2 files changed, 29 insertions(+), 58 deletions(-)
+>=20
+> diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_c=
+ore.h
+> index 93051e9..66dcf52 100644
+> --- a/include/hw/ppc/spapr_cpu_core.h
+> +++ b/include/hw/ppc/spapr_cpu_core.h
+> @@ -21,6 +21,8 @@
+>  #define SPAPR_CPU_CORE_GET_CLASS(obj) \
+>       OBJECT_GET_CLASS(sPAPRCPUCoreClass, (obj), TYPE_SPAPR_CPU_CORE)
+> =20
+> +#define SPAPR_CPU_CORE_TYPE_NAME(model) model "-" TYPE_SPAPR_CPU_CORE
+> +
+>  typedef struct sPAPRCPUCore {
+>      /*< private >*/
+>      CPUCore parent_obj;
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 427d47f..01f4ec8 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -217,36 +217,6 @@ err:
+>      error_propagate(errp, local_err);
 >  }
 > =20
-> +static const char *ppc_cpu_lookup_alias(const char *alias)
-> +{
-> +    int ai;
-> +
-> +    for (ai =3D 0; ppc_cpu_aliases[ai].alias !=3D NULL; ai++) {
-> +        if (strcmp(ppc_cpu_aliases[ai].alias, alias) =3D=3D 0) {
-> +            return ppc_cpu_aliases[ai].model;
-> +        }
-> +    }
-> +
-> +    return NULL;
-> +}
-> +
->  static ObjectClass *ppc_cpu_class_by_name(const char *name)
->  {
->      char *cpu_model, *typename;
-> @@ -10370,19 +10383,6 @@ static void ppc_cpu_parse_featurestr(const char =
-*typename, char *features,
->      pcc->parent_parse_features(typename, features, errp);
+> -static const char *spapr_core_models[] =3D {
+> -    /* 970 */
+> -    "970_v2.2",
+> -
+> -    /* 970MP variants */
+> -    "970mp_v1.0",
+> -    "970mp_v1.1",
+> -
+> -    /* POWER5+ */
+> -    "power5+_v2.1",
+> -
+> -    /* POWER7 */
+> -    "power7_v2.3",
+> -
+> -    /* POWER7+ */
+> -    "power7+_v2.1",
+> -
+> -    /* POWER8 */
+> -    "power8_v2.0",
+> -
+> -    /* POWER8E */
+> -    "power8e_v2.1",
+> -
+> -    /* POWER8NVL */
+> -    "power8nvl_v1.0",
+> -
+> -    /* POWER9 */
+> -    "power9_v1.0",
+> -};
+> -
+>  static Property spapr_cpu_core_properties[] =3D {
+>      DEFINE_PROP_INT32("node-id", sPAPRCPUCore, node_id, CPU_UNSET_NUMA_N=
+ODE_ID),
+>      DEFINE_PROP_END_OF_LIST()
+> @@ -264,33 +234,32 @@ void spapr_cpu_core_class_init(ObjectClass *oc, voi=
+d *data)
+>      g_assert(scc->cpu_class);
 >  }
 > =20
-> -const char *ppc_cpu_lookup_alias(const char *alias)
+> -static const TypeInfo spapr_cpu_core_type_info =3D {
+> -    .name =3D TYPE_SPAPR_CPU_CORE,
+> -    .parent =3D TYPE_CPU_CORE,
+> -    .abstract =3D true,
+> -    .instance_size =3D sizeof(sPAPRCPUCore),
+> -    .class_size =3D sizeof(sPAPRCPUCoreClass),
+> -};
+> -
+> -static void spapr_cpu_core_register_types(void)
 > -{
-> -    int ai;
+> -    int i;
 > -
-> -    for (ai =3D 0; ppc_cpu_aliases[ai].alias !=3D NULL; ai++) {
-> -        if (strcmp(ppc_cpu_aliases[ai].alias, alias) =3D=3D 0) {
-> -            return ppc_cpu_aliases[ai].model;
-> -        }
-> -    }
+> -    type_register_static(&spapr_cpu_core_type_info);
 > -
-> -    return NULL;
+> -    for (i =3D 0; i < ARRAY_SIZE(spapr_core_models); i++) {
+> -        TypeInfo type_info =3D {
+> -            .parent =3D TYPE_SPAPR_CPU_CORE,
+> -            .instance_size =3D sizeof(sPAPRCPUCore),
+> -            .class_init =3D spapr_cpu_core_class_init,
+> -            .class_data =3D (void *) spapr_core_models[i],
+> -        };
+> -
+> -        type_info.name =3D g_strdup_printf("%s-" TYPE_SPAPR_CPU_CORE,
+> -                                         spapr_core_models[i]);
+> -        type_register(&type_info);
+> -        g_free((void *)type_info.name);
+> +#define DEFINE_SPAPR_CPU_CORE_TYPE(cpu_model) \
+> +    {                                                   \
+> +        .parent =3D TYPE_SPAPR_CPU_CORE,                  \
+> +        .class_data =3D (void *) cpu_model,               \
+> +        .class_init =3D spapr_cpu_core_class_init,        \
+> +        .name =3D SPAPR_CPU_CORE_TYPE_NAME(cpu_model),    \
+>      }
 > -}
-> -
-
-This code motion of ppc_cpu_lookup_alias appears to be unrelated to
-the rest of the patch.
-
->  PowerPCCPUClass *ppc_cpu_get_family_class(PowerPCCPUClass *pcc)
->  {
->      ObjectClass *oc =3D OBJECT_CLASS(pcc);
+> =20
+> -type_init(spapr_cpu_core_register_types)
+> +static const TypeInfo spapr_cpu_core_type_infos[] =3D {
+> +    {
+> +        .name =3D TYPE_SPAPR_CPU_CORE,
+> +        .parent =3D TYPE_CPU_CORE,
+> +        .abstract =3D true,
+> +        .instance_size =3D sizeof(sPAPRCPUCore),
+> +        .class_size =3D sizeof(sPAPRCPUCoreClass),
+> +    },
+> +    DEFINE_SPAPR_CPU_CORE_TYPE("970_v2.2"),
+> +    DEFINE_SPAPR_CPU_CORE_TYPE("970mp_v1.0"),
+> +    DEFINE_SPAPR_CPU_CORE_TYPE("970mp_v1.1"),
+> +    DEFINE_SPAPR_CPU_CORE_TYPE("power5+_v2.1"),
+> +    DEFINE_SPAPR_CPU_CORE_TYPE("power7_v2.3"),
+> +    DEFINE_SPAPR_CPU_CORE_TYPE("power7+_v2.1"),
+> +    DEFINE_SPAPR_CPU_CORE_TYPE("power8_v2.0"),
+> +    DEFINE_SPAPR_CPU_CORE_TYPE("power8e_v2.1"),
+> +    DEFINE_SPAPR_CPU_CORE_TYPE("power8nvl_v1.0"),
+> +    DEFINE_SPAPR_CPU_CORE_TYPE("power9_v1.0"),
+> +};
+> +
+> +DEFINE_TYPES(spapr_cpu_core_type_infos)
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -151,24 +175,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---m5R8f+g8StfRwQ/I
+--2VmY8g3XFtK+hx8d
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnXDuQACgkQbDjKyiDZ
-s5JxHBAAnuxfny21ilbuVd67y3kChYY+WQXq7L172Ai8M73Try4FnZarVCqASXKA
-e3LpovezGLsQF2hAKQ4PqkMdAS2av8/v8jthXTexQFxVXAUWJ4QRMV+Lwdh8c5Ot
-R6gsnvm0OchAJT8RC7asIDhRFR/I0mzlBXLxTYDdKPcV+A9Y1blPwlk7vPXUAqu0
-6buj6DX+4LiiYmx4AlmtcPHARGeJivOVDBiLdhSyLRYtg6PMKWtEwtKLzP+ViVyg
-EdyhRw6okrsNs1OCOw9VpSbWLdjJ+On2NfO5OIfImwQeDLqYuM8+k/0mfNaElKGR
-HotJKbk5YJQktZAB8+RMfuMupIh2zhnGVHJ4izxCMR1Xv4GvmL8RSVyynZleqxiE
-Y5Akta24XyE1lBqWgpWLl9KKdpvyv82EX4l713lYaAMw9ACvQKBXm9tX4tABurat
-/yohNimw3Bb1symD8y/AQLzzgc3g411+cPMB78hUJcyWJaJZXxkH3Pp7nkDV9UWh
-aqJ44RqG1g6FFuIKTwVXSNKUJbOPqBji7Vkdg1OhiRJVT0U19MxNfV2kLwHeOwmh
-uTY7bAitbu57LV38Exqg2DLKdm1vWxQz1gT8evH9WroDRJW5xXNLp8OAcAX2NhUk
-5iZ0aIxbebAagp2O9afAkXt2xgM56HFv4n1tZ+YHaQQiPn+vZB8=
-=0Z1Q
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnW/2cACgkQbDjKyiDZ
+s5KHlQ//eCO5kH9x5aXNzvfalW36ZfqU07X637QF1XIrbu0HveLHcLuenrKbuPb8
+O9Ak+52I/ur4vD+LY5nwza7AYbJRkS4UnY+bTwqKUEW66Zf/jI4vdz3KFZb2wsNb
+Cw4Mq1FnUJPSz6cbQKiCKDeaB0ysg7hoG2g9s5NsDDNZlEKvldenWaJDtpP0ADBs
+wvyyhA0Gtc34Rg4MCbOj/zHmzWCeeZWFs0Ryh00Y7LG1ujfj3eVwnWphMQxV8e6i
+cNfRCU7BbkfkfxFeZF72gbHcEheNmvs7ZIcMa+05nw7uYuqJn8wWZgO5NIjd2K+k
+JGMeRK32lzY2iyiGDlIPtWQk+Oic9d2VWt6zqO2FY3HWFOr8BxCRPnRAWUqSjQ2+
+6YYGOykiKwg9PtNTXfGcydD5cnrPc12e/6B7fp9dlpresbFKTCPlJfSJvbV0FJqS
+gge4+v4a4aJAWDghNle4l+FbRbZBt0U5fLXQ03tJl9oD2y6LyWHCJAkxilzkIuh6
+a0PCCMQPB7IiZWWilz/lumbfmSsgsrYPURU6b6irI4uR07wmEuua7WIwWwMl6oSi
+T16wfvgJEu3DG74BbhFPWxyzHjcFs9PZrqRKGQe9rpLScq8lBMcs9HxIfZc2cUow
+iv/m+8p+AkvMEnm9AtDMQqrv14+TWJ7hvJjMGwUolAGMSEXjKxU=
+=ZRGA
 -----END PGP SIGNATURE-----
 
---m5R8f+g8StfRwQ/I--
+--2VmY8g3XFtK+hx8d--
