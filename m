@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40831)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e0cOj-0007BQ-4q
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 19:51:17 -0400
+	id 1e0cOk-0007DC-Rj
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 19:51:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e0cOg-0004zB-Ng
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 19:51:17 -0400
+	id 1e0cOk-00051v-4I
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 19:51:18 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri,  6 Oct 2017 20:49:07 -0300
-Message-Id: <20171006235023.11952-13-f4bug@amsat.org>
+Date: Fri,  6 Oct 2017 20:49:08 -0300
+Message-Id: <20171006235023.11952-14-f4bug@amsat.org>
 In-Reply-To: <20171006235023.11952-1-f4bug@amsat.org>
 References: <20171006235023.11952-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 12/88] backends/hostmem: use g_new() family of
+Subject: [Qemu-devel] [PATCH 13/88] Dirty Bitmaps: use g_new() family of
  functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,35 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu trival <qemu-trivial@nongnu.org>
+To: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu trival <qemu-trivial@nongnu.org>, qemu-block@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+[PMD: squashed tests/test-hbitmap.c changes]
 ---
- backends/hostmem.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/test-hbitmap.c | 2 +-
+ util/hbitmap.c       | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index ee2c2d5bfd..6a12f920c2 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -78,7 +78,7 @@ host_memory_backend_get_host_nodes(Object *obj, Visitor *v, const char *name,
-         return;
+diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
+index af41642346..fea3a64712 100644
+--- a/tests/test-hbitmap.c
++++ b/tests/test-hbitmap.c
+@@ -122,7 +122,7 @@ static void hbitmap_test_truncate_impl(TestHBitmapData *data,
+ 
+     n = hbitmap_test_array_size(size);
+     m = hbitmap_test_array_size(data->old_size);
+-    data->bits = g_realloc(data->bits, sizeof(unsigned long) * n);
++    data->bits = g_renew(unsigned long, data->bits, n);
+     if (n > m) {
+         memset(&data->bits[m], 0x00, sizeof(unsigned long) * (n - m));
      }
- 
--    *node = g_malloc0(sizeof(**node));
-+    *node = g_new0(uint16List, 1);
-     (*node)->value = value;
-     node = &(*node)->next;
- 
-@@ -88,7 +88,7 @@ host_memory_backend_get_host_nodes(Object *obj, Visitor *v, const char *name,
-             break;
+diff --git a/util/hbitmap.c b/util/hbitmap.c
+index 2f9d0fdbd0..4eb0188836 100644
+--- a/util/hbitmap.c
++++ b/util/hbitmap.c
+@@ -668,7 +668,7 @@ void hbitmap_truncate(HBitmap *hb, uint64_t size)
          }
- 
--        *node = g_malloc0(sizeof(**node));
-+        *node = g_new0(uint16List, 1);
-         (*node)->value = value;
-         node = &(*node)->next;
-     } while (true);
+         old = hb->sizes[i];
+         hb->sizes[i] = size;
+-        hb->levels[i] = g_realloc(hb->levels[i], size * sizeof(unsigned long));
++        hb->levels[i] = g_renew(unsigned long, hb->levels[i], size);
+         if (!shrink) {
+             memset(&hb->levels[i][old], 0x00,
+                    (size - old) * sizeof(*hb->levels[i]));
 -- 
 2.14.2
