@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e0PRj-0006a5-85
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:32 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e0PRg-0006XE-Nw
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e0PRZ-0008I1-R0
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55230)
+	(envelope-from <cohuck@redhat.com>) id 1e0PRd-0008LM-Ka
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58664)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e0PRZ-0008HO-Kj
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:21 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e0PRd-0008KW-Ak
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:25 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri,  6 Oct 2017 11:59:45 +0200
-Message-Id: <20171006095956.27534-23-cohuck@redhat.com>
+Date: Fri,  6 Oct 2017 11:59:46 +0200
+Message-Id: <20171006095956.27534-24-cohuck@redhat.com>
 In-Reply-To: <20171006095956.27534-1-cohuck@redhat.com>
 References: <20171006095956.27534-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 22/33] s390x/cpumodel: fix max STFL(E) bit number
+Subject: [Qemu-devel] [PULL 23/33] target/s390x: get rid of next_core_id
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +28,121 @@ Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, bor
 
 From: David Hildenbrand <david@redhat.com>
 
-Not that it would matter in the near future, but it is actually 2048
-bytes, therefore 16384 possible bits.
+core_id is not needed by linux-user, as the core_id a.k.a. CPU address
+is only accessible from kernel space.
 
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Therefore, drop next_core_id and make cpu_index get autoassigned again
+for linux-user.
+
+While at it, shield core_id and cpuid completely from linux-user. cpuid
+can also only be queried from kernel space.
+
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170928134609.16985-4-david@redhat.com>
+Message-Id: <20170928134609.16985-5-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/cpu_features.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/s390x/cpu-qom.h    |  2 --
+ target/s390x/cpu.c        | 14 +++++++-------
+ target/s390x/cpu.h        |  2 ++
+ target/s390x/cpu_models.c |  2 ++
+ 4 files changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-index 1d3a036393..31a4676f05 100644
---- a/target/s390x/cpu_features.c
-+++ b/target/s390x/cpu_features.c
-@@ -381,7 +381,7 @@ void s390_add_from_feat_block(S390FeatBitmap features, S390FeatType type,
+diff --git a/target/s390x/cpu-qom.h b/target/s390x/cpu-qom.h
+index 2e446fab51..0510c49e07 100644
+--- a/target/s390x/cpu-qom.h
++++ b/target/s390x/cpu-qom.h
+@@ -54,8 +54,6 @@ typedef struct S390CPUClass {
+     bool is_migration_safe;
+     const char *desc;
  
-     switch (type) {
-     case S390_FEAT_TYPE_STFL:
--       nr_bits = 2048;
-+       nr_bits = 16384;
-        break;
-     case S390_FEAT_TYPE_PLO:
-        nr_bits = 256;
+-    uint32_t next_core_id;
+-
+     DeviceRealize parent_realize;
+     void (*parent_reset)(CPUState *cpu);
+     void (*load_normal)(CPUState *cpu);
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 4920da3625..f42e28ea25 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -178,8 +178,9 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
+ {
+     CPUState *cs = CPU(dev);
+     S390CPUClass *scc = S390_CPU_GET_CLASS(dev);
++#if !defined(CONFIG_USER_ONLY)
+     S390CPU *cpu = S390_CPU(dev);
+-    CPUS390XState *env = &cpu->env;
++#endif
+     Error *err = NULL;
+ 
+     /* the model has to be realized before qemu_init_vcpu() due to kvm */
+@@ -195,11 +196,6 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
+                    max_cpus - 1);
+         goto out;
+     }
+-#else
+-    /* implicitly set for linux-user only */
+-    cpu->env.core_id = scc->next_core_id;
+-    scc->next_core_id++;
+-#endif
+ 
+     if (cpu_exists(cpu->env.core_id)) {
+         error_setg(&err, "Unable to add CPU with core-id: %" PRIu32
+@@ -208,7 +204,9 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
+     }
+ 
+     /* sync cs->cpu_index and env->core_id. The latter is needed for TCG. */
+-    cs->cpu_index = env->core_id;
++    cs->cpu_index = cpu->env.core_id;
++#endif
++
+     cpu_exec_realizefn(cs, &err);
+     if (err != NULL) {
+         goto out;
+@@ -440,7 +438,9 @@ static gchar *s390_gdb_arch_name(CPUState *cs)
+ }
+ 
+ static Property s390x_cpu_properties[] = {
++#if !defined(CONFIG_USER_ONLY)
+     DEFINE_PROP_UINT32("core-id", S390CPU, env.core_id, 0),
++#endif
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index c57ef71f6d..ff3cc59c02 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -151,8 +151,10 @@ struct CPUS390XState {
+ 
+     CPU_COMMON
+ 
++#if !defined(CONFIG_USER_ONLY)
+     uint32_t core_id; /* PoP "CPU address", same as cpu_index */
+     uint64_t cpuid;
++#endif
+ 
+     uint64_t tod_offset;
+     uint64_t tod_basetime;
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index 48dd7beddd..07ef8a3b6e 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -945,11 +945,13 @@ void s390_realize_cpu_model(CPUState *cs, Error **errp)
+ 
+     apply_cpu_model(cpu->model, errp);
+ 
++#if !defined(CONFIG_USER_ONLY)
+     cpu->env.cpuid = s390_cpuid_from_cpu_model(cpu->model);
+     if (tcg_enabled()) {
+         /* basic mode, write the cpu address into the first 4 bit of the ID */
+         cpu->env.cpuid = deposit64(cpu->env.cpuid, 54, 4, cpu->env.core_id);
+     }
++#endif
+ }
+ 
+ static void get_feature(Object *obj, Visitor *v, const char *name,
 -- 
 2.13.6
