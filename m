@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e0PRB-00062E-7T
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:00:58 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e0PRC-00063E-Tj
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e0PR8-0007jY-BV
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:00:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53036)
+	(envelope-from <cohuck@redhat.com>) id 1e0PRC-0007ns-04
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:00:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51848)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e0PR8-0007ip-4t
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:00:54 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e0PRB-0007mX-QM
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:00:57 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri,  6 Oct 2017 11:59:36 +0200
-Message-Id: <20171006095956.27534-14-cohuck@redhat.com>
+Date: Fri,  6 Oct 2017 11:59:38 +0200
+Message-Id: <20171006095956.27534-16-cohuck@redhat.com>
 In-Reply-To: <20171006095956.27534-1-cohuck@redhat.com>
 References: <20171006095956.27534-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 13/33] s390x/tcg: make lura(g) use the new _real
- mmu.
+Subject: [Qemu-devel] [PULL 15/33] s390x/tcg: make testblock use the new
+ _real mmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +29,48 @@ Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, bor
 
 From: David Hildenbrand <david@redhat.com>
 
-Looks like, lurag was not loading 64bit but only 32bit.
-
-As we properly handle the return address now, we can drop
-potential_page_fault().
+Low address protection checks will be moved into the mmu later.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170926183318.12995-4-david@redhat.com>
+Message-Id: <20170926183318.12995-6-david@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/mem_helper.c | 8 ++------
- target/s390x/translate.c  | 2 --
- 2 files changed, 2 insertions(+), 8 deletions(-)
+ target/s390x/mem_helper.c | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
 
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index a254613dc2..bc50bc0686 100644
+index b4f2779428..3650c1b678 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -1959,16 +1959,12 @@ void HELPER(purge)(CPUS390XState *env)
- /* load using real address */
- uint64_t HELPER(lura)(CPUS390XState *env, uint64_t addr)
+@@ -1688,17 +1688,9 @@ uint32_t HELPER(testblock)(CPUS390XState *env, uint64_t real_addr)
  {
--    CPUState *cs = CPU(s390_env_get_cpu(env));
--
--    return (uint32_t)ldl_phys(cs->as, wrap_address(env, addr));
-+    return cpu_ldl_real_ra(env, wrap_address(env, addr), GETPC());
- }
+     uintptr_t ra = GETPC();
+     CPUState *cs = CPU(s390_env_get_cpu(env));
+-    uint64_t abs_addr;
+     int i;
  
- uint64_t HELPER(lurag)(CPUS390XState *env, uint64_t addr)
- {
--    CPUState *cs = CPU(s390_env_get_cpu(env));
--
--    return ldq_phys(cs->as, wrap_address(env, addr));
-+    return cpu_ldq_real_ra(env, wrap_address(env, addr), GETPC());
- }
+-    real_addr = wrap_address(env, real_addr);
+-    abs_addr = mmu_real2abs(env, real_addr) & TARGET_PAGE_MASK;
+-    if (!address_space_access_valid(&address_space_memory, abs_addr,
+-                                    TARGET_PAGE_SIZE, true)) {
+-        cpu_restore_state(cs, ra);
+-        program_interrupt(env, PGM_ADDRESSING, 4);
+-        return 1;
+-    }
++    real_addr = wrap_address(env, real_addr) & TARGET_PAGE_MASK;
  
- /* store using real address */
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 78ffd8ff24..f64a31760e 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -2967,7 +2967,6 @@ static ExitStatus op_lpq(DisasContext *s, DisasOps *o)
- static ExitStatus op_lura(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_lura(o->out, cpu_env, o->in2);
-     return NO_EXIT;
- }
-@@ -2975,7 +2974,6 @@ static ExitStatus op_lura(DisasContext *s, DisasOps *o)
- static ExitStatus op_lurag(DisasContext *s, DisasOps *o)
- {
-     check_privileged(s);
--    potential_page_fault(s);
-     gen_helper_lurag(o->out, cpu_env, o->in2);
-     return NO_EXIT;
- }
+     /* Check low-address protection */
+     if ((env->cregs[0] & CR0_LOWPROT) && real_addr < 0x2000) {
+@@ -1708,7 +1700,7 @@ uint32_t HELPER(testblock)(CPUS390XState *env, uint64_t real_addr)
+     }
+ 
+     for (i = 0; i < TARGET_PAGE_SIZE; i += 8) {
+-        stq_phys(cs->as, abs_addr + i, 0);
++        cpu_stq_real_ra(env, real_addr + i, 0, ra);
+     }
+ 
+     return 0;
 -- 
 2.13.6
