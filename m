@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e0VDo-0006Rp-Mx
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 12:11:33 -0400
+	(envelope-from <armbru@redhat.com>) id 1e0VFv-0008PC-90
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 12:13:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e0VDk-0004Ey-MX
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 12:11:32 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47786)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e0VDk-0004DE-Gd
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 12:11:28 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e0VDj-0003Hi-Bw
-	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 16:11:27 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 585EA2E80CE
-	for <qemu-devel@nongnu.org>; Fri,  6 Oct 2017 16:11:27 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1e0VFt-00064P-5C
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 12:13:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33944)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1e0VFs-00063m-VL
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 12:13:41 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 02EB0285C1
+	for <qemu-devel@nongnu.org>; Fri,  6 Oct 2017 16:13:40 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20171005190725.18712-1-dgilbert@redhat.com>
+	<874lrc92u1.fsf@dusky.pond.sub.org>
+Date: Fri, 06 Oct 2017 18:13:38 +0200
+In-Reply-To: <874lrc92u1.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Fri, 06 Oct 2017 09:01:58 +0200")
+Message-ID: <87d1601cgd.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 06 Oct 2017 15:59:26 -0000
-From: Stefano Maffulli <1691109@bugs.launchpad.net>
-Reply-To: Bug 1691109 <1691109@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149494197837.9319.2077559864368104737.malonedeb@wampee.canonical.com>
-Message-Id: <150730556711.22243.8467084709552657253.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1691109] Re: qemu-kvm not working as nested
- inside ESX 6.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] qemu_opt_print: Remove shadowing opt decl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,39 +33,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-** No longer affects: openstack-community
+Markus Armbruster <armbru@redhat.com> writes:
 
--- =
+> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
+>
+>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>>
+>> opt was declared as a separate local inside the last loop,
+>> shadowing the local at the top of the function.
+>>
+>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>
+> I can take this through my tree.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1691109
-
-Title:
-  qemu-kvm not working as nested inside ESX 6.0
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  ESX 6.0 (virt bits exposed) - Ubuntu 16.04 + qemu-kvm 1:2.8+dfsg-
-  3ubuntu2~cloud0 - CirrOS launched by OpenStack (devstack master)
-
-  =
-
-  VM will start with -machine =3D 'pc-i440fx-zesty' and will stuck in "boot=
-ing from hard disk"
-
-  to fix it you can manually change -machine to 'pc-i440fx-2.3'
-
-  also, ISOs boots well, so I think it`s something about block devices
-  configuration introduced in new machine type.
-
-  p.s.
-  also confirmed with RHEL instead of Ubuntu as KVM host - new machine type=
- don`t work
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1691109/+subscriptions
+I'd like to change the headline to "option: Remove shadowing opt decl
+from qemu_opt_print()", if that's alright with you.
