@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0JCy-0002cR-QT
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 23:21:53 -0400
+	(envelope-from <bharat.bhushan@nxp.com>) id 1e0Jae-0004RV-GF
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 23:46:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0JCj-0005Gd-L6
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 23:21:52 -0400
-Date: Fri, 6 Oct 2017 14:09:25 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171006030925.GI3260@umbus.fritz.box>
-References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-	<1507220690-265042-7-git-send-email-imammedo@redhat.com>
+	(envelope-from <bharat.bhushan@nxp.com>) id 1e0Jaa-0007Rs-IE
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 23:46:20 -0400
+From: Bharat Bhushan <bharat.bhushan@nxp.com>
+Date: Fri, 6 Oct 2017 03:46:11 +0000
+Message-ID: <AM5PR0401MB254548523AC95D0A2A8A92E69A710@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+References: <1506494000-31982-1-git-send-email-Bharat.Bhushan@nxp.com>
+	<20170927074109.GA31587@virtx40>
+	<AM5PR0401MB25450ACC804B20D93C4F2D9D9A780@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<9700cf30-65ed-9c55-c1b9-14bb8deb669f@redhat.com>
+	<20170927092147.GA32183@virtx40>
+	<0af599c0-f859-f90c-c999-bc4a0a678768@redhat.com>
+	<20171004114910.GA6932@virtx40>
+	<79234c56-c524-5359-de8a-f266b19821eb@redhat.com>
+	<9d173ea5-75a6-c684-7f8d-e2ec1d3eddff@redhat.com>
+	<1017080b-aa5f-4a1f-9905-e65f22717cd1@redhat.com>
+	<b740e8b7-5859-fd6a-1f1e-480aef6ef4f0@redhat.com>
+In-Reply-To: <b740e8b7-5859-fd6a-1f1e-480aef6ef4f0@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="je2i5r69C8+2chMc"
-Content-Disposition: inline
-In-Reply-To: <1507220690-265042-7-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 06/23] ppc: mac_oldworld: use generic
- cpu_model parsing
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v4 0/5] virtio-iommu: VFIO
+ integration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +34,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
+To: Auger Eric <eric.auger@redhat.com>, Linu Cherian <linuc.decode@gmail.com>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "mst@redhat.com" <mst@redhat.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "linu.cherian@cavium.com" <linu.cherian@cavium.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "bharatb.yadav@gmail.com" <bharatb.yadav@gmail.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
 
 
---je2i5r69C8+2chMc
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 05, 2017 at 06:24:33PM +0200, Igor Mammedov wrote:
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
->  hw/ppc/mac_oldworld.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
+> >> Thanks
+> >>
+> >> Eric
+> >>>
+> >>> However you should be allowed to map 1 sg element of 5 pages and
+> >>> then notify the host about this event I think. Still looking at the c=
+ode...
+> >>>
+> >>> I still can't reproduce the issue at the moment. What kind of device
+> >>> are you assigning?
+> >>>
+> >>> Thanks
+> >>>
+> >>> Eric
+> >>>>
+> >>>> Atleast vfio_get_vaddr called from vfio_iommu_map_notify in Qemu
+> >>>> expects the map size to be a power of 2.
+> >
+> > Actually I missed the most important here ;-)
+> >>>>
+> >>>>  if (len & iotlb->addr_mask) {
+> > This check looks suspiscious to me. In our case the len is not
+> > modified by the previous translation and it fails, I don't see why. It
+> > should be valid to be able to notify 5 granules.
 >=20
-> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-> index bc7c8b7..010ea36 100644
-> --- a/hw/ppc/mac_oldworld.c
-> +++ b/hw/ppc/mac_oldworld.c
-> @@ -108,11 +108,8 @@ static void ppc_heathrow_init(MachineState *machine)
->      linux_boot =3D (kernel_filename !=3D NULL);
-> =20
->      /* init CPUs */
-> -    if (machine->cpu_model =3D=3D NULL)
-> -        machine->cpu_model =3D "G3";
->      for (i =3D 0; i < smp_cpus; i++) {
-> -        cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
-> -                                           machine->cpu_model));
-> +        cpu =3D POWERPC_CPU(cpu_create(machine->cpu_type));
->          env =3D &cpu->env;
-> =20
->          /* Set time-base frequency to 16.6 Mhz */
-> @@ -385,6 +382,7 @@ static void heathrow_class_init(ObjectClass *oc, void=
- *data)
->      /* TOFIX "cad" when Mac floppy is implemented */
->      mc->default_boot_order =3D "cd";
->      mc->kvm_type =3D heathrow_kvm_type;
-> +    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("750_v3.1");
->  }
-> =20
->  static const TypeInfo ppc_heathrow_machine_info =3D {
+> So after discussion with Alex, looks the way we notify the host currently=
+ is
+> wrong. we set the addr_mask to the mapping/unmapping size
+> -1 whereas this should be a page mask instead (granule size or block size=
+?).
+> So if the guest maps 5 x 4kB pages we should send 5 notifications for eac=
+h
+> page and not a single one. It is unclear to me if we can notify with
+> hugepage/block page size mask. Peter may confirm/infirm this. in vsmmuv3
+> code I notify by granule or block size.
+>=20
+> Bharat, please can you add this to your TODO list?
+>=20
+> Linu, thanks a lot for the time you spent debugging this issue.
+> Curiously on my side, it is really seldom hit but it is ...
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Thanks Linu and Eric, I added this to my todo list.
+While I am still not able to reproduce the issue.  I tried with e1000 and n=
+ow try with ixgbe device. May I know which device can be used to reproduce =
+this issue?
 
---je2i5r69C8+2chMc
-Content-Type: application/pgp-signature; name="signature.asc"
+Thanks
+-Bharat
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnW8+UACgkQbDjKyiDZ
-s5LzNw/+IqK5U+3hgPz91F3W3GZaWT9w5DKNApYV9ZPBOx217UF2gBG7ALcShXA+
-nLssTeE/KCgkAXBkeNEY0WuBqU/Vftc+j3amsslPEw+N8Pje+iKOVCYcar0ZeWiA
-LX/ilSvzw3JPlVUFwMT9dNF8YTjGcQGh6RyxPUxey4LUyS52E5wJpoCEum2a7vLs
-rD6M5iWXrukuSqMNgZClh5UEmK3nQFaopO/0qilWPA3Ivukq3FK9typktXKaynrT
-IqO2ViTTqnSPlewTaaBGN7yX/3R7SW+2YFp/ad3x/YNGpEB3dJzubvFhuf5joGIa
-qI5YBwYBWtV2/SoQsj8QAB8/ZC47JX+o6R5j8J0dHCHwnZJw7CT3wHLgnu4C4EMf
-fKVJ9BtECRmKWBzy1gTZVzlxTRzR+fmuISw1FxNPueDUP4jrtVFCzOQCyvERES82
-TRUj9nTRnhApxquvSqJ4sOlAEzXPEmuvvscYbkzOwOt5qdYcrx07Gjtq8YprWKrj
-eMCpt24Qph9BqGA03N4kyCtT6YUjzPkJRQhNPG8M0+83+zJK+dR3m1UPGDO3psBO
-Z6vomofhQdHjVHrNclT/0+Svi5HJZN80FIf5hp3IB7r6sfr30XS68GUnp+gHedDg
-JtxuYFi4GEMsFneSRDxk5fjm5pp6dZ/iOH5cJHou/X7EzQMu+aw=
-=1v68
------END PGP SIGNATURE-----
-
---je2i5r69C8+2chMc--
+>=20
+> Thanks!
+>=20
+> Eric
+> >
+> > Thanks
+> >
+> > Eric
+> >>>>         error_report("iommu has granularity incompatible with target=
+ AS");
+> >>>>         return false;
+> >>>>     }
+> >>>>
+> >>>> Just trying to understand how this is not hitting in your case.
+> >>>>
+> >>>>
+> >>>
+> >>
+> >
