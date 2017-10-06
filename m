@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e0UxQ-0008Tp-9V
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:54:37 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e0UxR-0008Vr-SC
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:54:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e0UxP-0002NK-HU
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:54:36 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e0UxQ-0002P4-AX
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:54:37 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  6 Oct 2017 17:53:29 +0200
-Message-Id: <20171006155422.10135-2-kwolf@redhat.com>
+Date: Fri,  6 Oct 2017 17:53:31 +0200
+Message-Id: <20171006155422.10135-4-kwolf@redhat.com>
 In-Reply-To: <20171006155422.10135-1-kwolf@redhat.com>
 References: <20171006155422.10135-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 01/54] block: Typo fix in copy_on_readv()
+Subject: [Qemu-devel] [PULL 03/54] hbitmap: Rename serialization_granularity
+ to serialization_align
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,24 +25,135 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Eric Blake <eblake@redhat.com>
 
+The only client of hbitmap_serialization_granularity() is dirty-bitmap's
+bdrv_dirty_bitmap_serialization_align().  Keeping the two names consistent
+is worthwhile, and the shorter name is more representative of what the
+function returns (the required alignment to be used for start/count of
+other serialization functions, where violating the alignment causes
+assertion failures).
+
 Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/io.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/qemu/hbitmap.h |  8 ++++----
+ block/dirty-bitmap.c   |  2 +-
+ tests/test-hbitmap.c   | 10 +++++-----
+ util/hbitmap.c         |  8 ++++----
+ 4 files changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/block/io.c b/block/io.c
-index 4378ae4c7d..d633b0f851 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -954,7 +954,7 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
-     /* FIXME We cannot require callers to have write permissions when all they
-      * are doing is a read request. If we did things right, write permissions
-      * would be obtained anyway, but internally by the copy-on-read code. As
--     * long as it is implemented here rather than in a separat filter driver,
-+     * long as it is implemented here rather than in a separate filter driver,
-      * the copy-on-read code doesn't have its own BdrvChild, however, for which
-      * it could request permissions. Therefore we have to bypass the permission
-      * system for the moment. */
+diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+index d3a74a21fc..81e78043d1 100644
+--- a/include/qemu/hbitmap.h
++++ b/include/qemu/hbitmap.h
+@@ -159,16 +159,16 @@ bool hbitmap_get(const HBitmap *hb, uint64_t item);
+ bool hbitmap_is_serializable(const HBitmap *hb);
+ 
+ /**
+- * hbitmap_serialization_granularity:
++ * hbitmap_serialization_align:
+  * @hb: HBitmap to operate on.
+  *
+- * Granularity of serialization chunks, used by other serialization functions.
+- * For every chunk:
++ * Required alignment of serialization chunks, used by other serialization
++ * functions. For every chunk:
+  * 1. Chunk start should be aligned to this granularity.
+  * 2. Chunk size should be aligned too, except for last chunk (for which
+  *      start + count == hb->size)
+  */
+-uint64_t hbitmap_serialization_granularity(const HBitmap *hb);
++uint64_t hbitmap_serialization_align(const HBitmap *hb);
+ 
+ /**
+  * hbitmap_serialization_size:
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 30462d4f9a..0490ca3aff 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -617,7 +617,7 @@ uint64_t bdrv_dirty_bitmap_serialization_size(const BdrvDirtyBitmap *bitmap,
+ 
+ uint64_t bdrv_dirty_bitmap_serialization_align(const BdrvDirtyBitmap *bitmap)
+ {
+-    return hbitmap_serialization_granularity(bitmap->bitmap);
++    return hbitmap_serialization_align(bitmap->bitmap);
+ }
+ 
+ void bdrv_dirty_bitmap_serialize_part(const BdrvDirtyBitmap *bitmap,
+diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
+index 1acb353889..af41642346 100644
+--- a/tests/test-hbitmap.c
++++ b/tests/test-hbitmap.c
+@@ -738,15 +738,15 @@ static void test_hbitmap_meta_one(TestHBitmapData *data, const void *unused)
+     }
+ }
+ 
+-static void test_hbitmap_serialize_granularity(TestHBitmapData *data,
+-                                               const void *unused)
++static void test_hbitmap_serialize_align(TestHBitmapData *data,
++                                         const void *unused)
+ {
+     int r;
+ 
+     hbitmap_test_init(data, L3 * 2, 3);
+     g_assert(hbitmap_is_serializable(data->hb));
+ 
+-    r = hbitmap_serialization_granularity(data->hb);
++    r = hbitmap_serialization_align(data->hb);
+     g_assert_cmpint(r, ==, 64 << 3);
+ }
+ 
+@@ -974,8 +974,8 @@ int main(int argc, char **argv)
+     hbitmap_test_add("/hbitmap/meta/word", test_hbitmap_meta_word);
+     hbitmap_test_add("/hbitmap/meta/sector", test_hbitmap_meta_sector);
+ 
+-    hbitmap_test_add("/hbitmap/serialize/granularity",
+-                     test_hbitmap_serialize_granularity);
++    hbitmap_test_add("/hbitmap/serialize/align",
++                     test_hbitmap_serialize_align);
+     hbitmap_test_add("/hbitmap/serialize/basic",
+                      test_hbitmap_serialize_basic);
+     hbitmap_test_add("/hbitmap/serialize/part",
+diff --git a/util/hbitmap.c b/util/hbitmap.c
+index 21535cc90b..2f9d0fdbd0 100644
+--- a/util/hbitmap.c
++++ b/util/hbitmap.c
+@@ -413,14 +413,14 @@ bool hbitmap_is_serializable(const HBitmap *hb)
+ {
+     /* Every serialized chunk must be aligned to 64 bits so that endianness
+      * requirements can be fulfilled on both 64 bit and 32 bit hosts.
+-     * We have hbitmap_serialization_granularity() which converts this
++     * We have hbitmap_serialization_align() which converts this
+      * alignment requirement from bitmap bits to items covered (e.g. sectors).
+      * That value is:
+      *    64 << hb->granularity
+      * Since this value must not exceed UINT64_MAX, hb->granularity must be
+      * less than 58 (== 64 - 6, where 6 is ld(64), i.e. 1 << 6 == 64).
+      *
+-     * In order for hbitmap_serialization_granularity() to always return a
++     * In order for hbitmap_serialization_align() to always return a
+      * meaningful value, bitmaps that are to be serialized must have a
+      * granularity of less than 58. */
+ 
+@@ -437,7 +437,7 @@ bool hbitmap_get(const HBitmap *hb, uint64_t item)
+     return (hb->levels[HBITMAP_LEVELS - 1][pos >> BITS_PER_LEVEL] & bit) != 0;
+ }
+ 
+-uint64_t hbitmap_serialization_granularity(const HBitmap *hb)
++uint64_t hbitmap_serialization_align(const HBitmap *hb)
+ {
+     assert(hbitmap_is_serializable(hb));
+ 
+@@ -454,7 +454,7 @@ static void serialization_chunk(const HBitmap *hb,
+                                 unsigned long **first_el, uint64_t *el_count)
+ {
+     uint64_t last = start + count - 1;
+-    uint64_t gran = hbitmap_serialization_granularity(hb);
++    uint64_t gran = hbitmap_serialization_align(hb);
+ 
+     assert((start & (gran - 1)) == 0);
+     assert((last >> hb->granularity) < hb->size);
 -- 
 2.13.6
