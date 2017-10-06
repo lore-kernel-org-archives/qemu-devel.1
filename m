@@ -1,23 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1e0LJb-0004pY-2M
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 01:36:52 -0400
+	(envelope-from <sandipan@linux.vnet.ibm.com>) id 1e0LNC-0006dL-Ev
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 01:40:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1e0LJZ-0003M0-PL
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 01:36:51 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1507034861-4661-1-git-send-email-jan.dakinevich@virtuozzo.com>
-	<1507034861-4661-2-git-send-email-jan.dakinevich@virtuozzo.com>
-	<e77d7b78-a2ff-51a3-360e-c7d5d4e7006b@redhat.com>
-	<7735fee8-dcc0-edc1-2fd3-f2aee7fe2df1@virtuozzo.com>
-Date: Fri, 06 Oct 2017 07:36:37 +0200
-In-Reply-To: <7735fee8-dcc0-edc1-2fd3-f2aee7fe2df1@virtuozzo.com> (Jan
-	Dakinevich's message of "Tue, 3 Oct 2017 17:32:49 +0300")
-Message-ID: <87wp4896sa.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] virtio: introduce `query-virtio'
- QMP command
+	(envelope-from <sandipan@linux.vnet.ibm.com>) id 1e0LN9-0005SE-Ac
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 01:40:34 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37138)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sandipan@linux.vnet.ibm.com>)
+	id 1e0LN9-0005QX-1k
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 01:40:31 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v965cxjZ004405
+	for <qemu-devel@nongnu.org>; Fri, 6 Oct 2017 01:40:23 -0400
+Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ddugu5d3d-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 01:40:23 -0400
+Received: from localhost
+	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <sandipan@linux.vnet.ibm.com>;
+	Fri, 6 Oct 2017 15:40:21 +1000
+Received: from d23av04.au.ibm.com (d23av04.au.ibm.com [9.190.235.139])
+	by d23relay07.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v965eIcj46203116
+	for <qemu-devel@nongnu.org>; Fri, 6 Oct 2017 16:40:18 +1100
+Received: from d23av04.au.ibm.com (localhost [127.0.0.1])
+	by d23av04.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v965eLJX015445
+	for <qemu-devel@nongnu.org>; Fri, 6 Oct 2017 16:40:21 +1100
+From: Sandipan Das <sandipan@linux.vnet.ibm.com>
+Date: Fri,  6 Oct 2017 11:10:14 +0530
+Message-Id: <20171006054014.17282-1-sandipan@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v4] target/ppc: Fix carry flag setting for
+ shift algebraic instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,193 +44,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org, Amit Shah <amit@kernel.org>, Jason Wang <jasowang@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: richard.henderson@linaro.org, david@gibson.dropbear.id.au
+Cc: nikunj@linux.vnet.ibm.com, agraf@suse.de, qemu-devel@nongnu.org
 
-Jan Dakinevich <jan.dakinevich@virtuozzo.com> writes:
+For POWER ISA v3.0, the XER bit CA32 needs to be set by the shift
+right algebraic instructions whenever the CA bit is to be set. This
+change affects the following instructions:
+  * Shift Right Algebraic Word (sraw[.])
+  * Shift Right Algebraic Word Immediate (srawi[.])
+  * Shift Right Algebraic Doubleword (srad[.])
+  * Shift Right Algebraic Doubleword Immediate (sradi[.])
 
-> On 10/03/2017 05:02 PM, Eric Blake wrote:
->> On 10/03/2017 07:47 AM, Jan Dakinevich wrote:
->>> The command is intended for gathering virtio information such as status,
->>> feature bits, negotiation status. It is convenient and useful for debug
->>> purpose.
->>>
->>> The commands returns generic virtio information for virtio such as
->>> common feature names and status bits names and information for all
->>> attached to current machine devices.
->>>
->>> To retrieve names of device-specific features `get_feature_name'
->>> callback in VirtioDeviceClass also was introduced.
->>>
->>> Cc: Denis V. Lunev <den@virtuozzo.com>
->>> Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
->>> ---
->>>  hw/block/virtio-blk.c       |  21 +++++++++
->>>  hw/char/virtio-serial-bus.c |  15 +++++++
->>>  hw/display/virtio-gpu.c     |  13 ++++++
->>>  hw/net/virtio-net.c         |  35 +++++++++++++++
->>>  hw/scsi/virtio-scsi.c       |  16 +++++++
->>>  hw/virtio/Makefile.objs     |   2 +
->>>  hw/virtio/virtio-balloon.c  |  15 +++++++
->>>  hw/virtio/virtio-stub.c     |   9 ++++
->>>  hw/virtio/virtio.c          | 101 ++++++++++++++++++++++++++++++++++++++++++++
->>>  include/hw/virtio/virtio.h  |   2 +
->>>  qapi-schema.json            |   1 +
->>>  qapi/virtio.json            |  94 +++++++++++++++++++++++++++++++++++++++++
->>>  12 files changed, 324 insertions(+)
->>>  create mode 100644 hw/virtio/virtio-stub.c
->>>  create mode 100644 qapi/virtio.json
->> 
->> This creates a new .json file, but does not touch MAINTAINERS.  Our idea
->> in splitting the .json files was to make it easier for each sub-file
->> that needs a specific maintainer in addition to the overall *.json line
->> for QAPI maintainers, so this may deserve a MAINTAINERS entry.
->> 
->
-> Ok.
->
->>> +++ b/qapi/virtio.json
->>> @@ -0,0 +1,94 @@
->>> +# -*- Mode: Python -*-
->>> +#
->>> +
->>> +##
->>> +# = Virtio devices
->>> +##
->>> +
->>> +{ 'include': 'common.json' }
->>> +
->>> +##
->>> +# @VirtioInfoBit:
->>> +#
->>> +# Named virtio bit
->>> +#
->>> +# @bit: bit number
->>> +#
->>> +# @name: bit name
->>> +#
->>> +# Since: 2.11.0
->>> +#
->>> +##
->>> +{
->>> +    'struct': 'VirtioInfoBit',
->>> +    'data': {
->>> +        'bit': 'uint64',
->> 
->> Why is this a 64-bit value? Are the values 0-63, or are they 1, 2, 4, 8,
->> ...?  The documentation on 'bit number' is rather sparse.
->
-> I would prefer `uint' here, but I don't see generic unsigned type (may
-> be, I am mistaken). I could use uint8 here, though.
->
->> 
->>> +        'name': 'str'
->> 
->> Wouldn't an enum type be better than an open-ended string?
->> 
->
-> Bit names are not known here, they are obtained from virtio device
-> implementations.
+Signed-off-by: Sandipan Das <sandipan@linux.vnet.ibm.com>
+---
+v2: Add tcg_temp_free() required in gen_sraw() and gen_srad()
 
-What exactly uses these bits?
+v3: Remove explicit checking for ISA v3.0 when setting CA32
 
-Why do these uses justify pass-through?  By pass-through, I mean the
-messenger (QEMU) merely passes them along, without understanding them.
-Defeats introspection.
+v4: Set CA32 only when CA is being modified (as Richard suggested)
+    Set CA32 after checking for ISA300 in gen_* functions (as David suggested)
+---
+ target/ppc/int_helper.c | 16 ++++++++--------
+ target/ppc/translate.c  | 12 ++++++++++++
+ 2 files changed, 20 insertions(+), 8 deletions(-)
 
->>> +    }
->>> +}
->>> +
->>> +##
->>> +# @VirtioInfoDevice:
->>> +#
->>> +# Information about specific virtio device
->>> +#
->>> +# @qom_path: QOM path of the device
->> 
->> Please make this 'qom-path' - new interfaces should prefer '-' over '_'.
->
-> Ok.
->
->>> +#
->>> +# @feature-names: names of device-specific features
->>> +#
->>> +# @host-features: bitmask of features, provided by devices
->>> +#
->>> +# @guest-features: bitmask of features, acknowledged by guest
->>> +#
->>> +# @status: virtio device status bitmask
->>> +#
->>> +# Since: 2.11.0
->>> +#
->>> +##
->>> +{
->>> +    'struct': 'VirtioInfoDevice',
->>> +    'data': {
->>> +        'qom_path': 'str',
->>> +        'feature-names': ['VirtioInfoBit'],
->>> +        'host-features': 'uint64',
->>> +        'guest-features': 'uint64',
->>> +        'status': 'uint64'
->> 
->> I'm wondering if this is the best representation (where the caller has
->> to parse the integer and then lookup in feature-names what each bit of
->> the integer represents).  But I'm not sure I have anything better off
->> the top of my head.
->> 
->
-> Consider it as way to tell caller about names of supported features.
-
-"Unsigned integer interpreted as combination of well-known bit-valued
-symbols" is a fine C interface, but a pretty horrid QMP interface.
-What's wrong with doing a set the straightforward way as "array of
-enum"?
-
->>> +    }
->>> +}
->>> +
->>> +##
->>> +# @VirtioInfo:
->>> +#
->>> +# Information about virtio devices
->>> +#
->>> +# @feature-names: names of common virtio features
->>> +#
->>> +# @status-names: names of bits which represents virtio device status
->>> +#
->>> +# @devices: list of per-device virtio information
->>> +#
->>> +# Since: 2.11.0
->>> +#
->>> +##
->>> +{
->>> +    'struct': 'VirtioInfo',
->>> +    'data': {
->>> +        'feature-names': ['VirtioInfoBit'],
->> 
->> Why is feature-names listed at two different nestings of the return value?
->> 
->
-> These are different feature names. First names are common and predefined
-> for all devices. Second names are device-specific.
->
->>> +        'status-names': ['VirtioInfoBit'],
->>> +        'devices': ['VirtioInfoDevice']
->>> +    }
->>> +}
->>> +
->>> +
->>> +##
->>> +# @query-virtio:
->>> +#
->>> +# Returns generic and per-device virtio information
->>> +#
->>> +# Since: 2.11.0
->>> +#
->>> +##
->>> +{
->>> +    'command': 'query-virtio',
->>> +    'returns': 'VirtioInfo'
->>> +}
->>>
->> 
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index da4e1a62c9..1c013a0ee3 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -219,17 +219,17 @@ target_ulong helper_sraw(CPUPPCState *env, target_ulong value,
+             shift &= 0x1f;
+             ret = (int32_t)value >> shift;
+             if (likely(ret >= 0 || (value & ((1 << shift) - 1)) == 0)) {
+-                env->ca = 0;
++                env->ca32 = env->ca = 0;
+             } else {
+-                env->ca = 1;
++                env->ca32 = env->ca = 1;
+             }
+         } else {
+             ret = (int32_t)value;
+-            env->ca = 0;
++            env->ca32 = env->ca = 0;
+         }
+     } else {
+         ret = (int32_t)value >> 31;
+-        env->ca = (ret != 0);
++        env->ca32 = env->ca = (ret != 0);
+     }
+     return (target_long)ret;
+ }
+@@ -245,17 +245,17 @@ target_ulong helper_srad(CPUPPCState *env, target_ulong value,
+             shift &= 0x3f;
+             ret = (int64_t)value >> shift;
+             if (likely(ret >= 0 || (value & ((1ULL << shift) - 1)) == 0)) {
+-                env->ca = 0;
++                env->ca32 = env->ca = 0;
+             } else {
+-                env->ca = 1;
++                env->ca32 = env->ca = 1;
+             }
+         } else {
+             ret = (int64_t)value;
+-            env->ca = 0;
++            env->ca32 = env->ca = 0;
+         }
+     } else {
+         ret = (int64_t)value >> 63;
+-        env->ca = (ret != 0);
++        env->ca32 = env->ca = (ret != 0);
+     }
+     return ret;
+ }
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 606b605ba0..a81ff69d75 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -2181,6 +2181,9 @@ static void gen_srawi(DisasContext *ctx)
+     if (sh == 0) {
+         tcg_gen_ext32s_tl(dst, src);
+         tcg_gen_movi_tl(cpu_ca, 0);
++        if (is_isa300(ctx)) {
++            tcg_gen_movi_tl(cpu_ca32, 0);
++        }
+     } else {
+         TCGv t0;
+         tcg_gen_ext32s_tl(dst, src);
+@@ -2190,6 +2193,9 @@ static void gen_srawi(DisasContext *ctx)
+         tcg_gen_and_tl(cpu_ca, cpu_ca, t0);
+         tcg_temp_free(t0);
+         tcg_gen_setcondi_tl(TCG_COND_NE, cpu_ca, cpu_ca, 0);
++        if (is_isa300(ctx)) {
++            tcg_gen_mov_tl(cpu_ca32, cpu_ca);
++        }
+         tcg_gen_sari_tl(dst, dst, sh);
+     }
+     if (unlikely(Rc(ctx->opcode) != 0)) {
+@@ -2259,6 +2265,9 @@ static inline void gen_sradi(DisasContext *ctx, int n)
+     if (sh == 0) {
+         tcg_gen_mov_tl(dst, src);
+         tcg_gen_movi_tl(cpu_ca, 0);
++        if (is_isa300(ctx)) {
++            tcg_gen_movi_tl(cpu_ca32, 0);
++        }
+     } else {
+         TCGv t0;
+         tcg_gen_andi_tl(cpu_ca, src, (1ULL << sh) - 1);
+@@ -2267,6 +2276,9 @@ static inline void gen_sradi(DisasContext *ctx, int n)
+         tcg_gen_and_tl(cpu_ca, cpu_ca, t0);
+         tcg_temp_free(t0);
+         tcg_gen_setcondi_tl(TCG_COND_NE, cpu_ca, cpu_ca, 0);
++        if (is_isa300(ctx)) {
++            tcg_gen_mov_tl(cpu_ca32, cpu_ca);
++        }
+         tcg_gen_sari_tl(dst, src, sh);
+     }
+     if (unlikely(Rc(ctx->opcode) != 0)) {
+-- 
+2.13.6
