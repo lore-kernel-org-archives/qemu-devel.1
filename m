@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=445054343=Paul.Durrant@citrix.com>)
-	id 1e0SXk-0002xA-CF
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:19:58 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e0SaS-0004BD-VX
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:22:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=445054343=Paul.Durrant@citrix.com>)
-	id 1e0SXg-0002hr-Gz
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:19:56 -0400
-Received: from smtp.eu.citrix.com ([185.25.65.24]:39575)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=445054343=Paul.Durrant@citrix.com>)
-	id 1e0SXg-0002fl-4V
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:19:52 -0400
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Fri, 6 Oct 2017 13:19:48 +0000
-Message-ID: <56626155ee594136b8fe0d0de03ca4f5@AMSPEX02CL03.citrite.net>
-References: <1507133891-26013-1-git-send-email-ian.jackson@eu.citrix.com>
-	<892cb484-361b-f1c1-c294-6b5d7b5e92fb@citrix.com>
-In-Reply-To: <892cb484-361b-f1c1-c294-6b5d7b5e92fb@citrix.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1e0SaR-0004rF-SW
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:22:44 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:48990)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e0SaR-0004qe-Kr
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:22:43 -0400
+Received: by mail-wm0-x234.google.com with SMTP id i124so7554725wmf.3
+	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 06:22:43 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH v2 0/*] xen: xen-domid-restrict
- improvements
+In-Reply-To: <CAFEAcA8dmJLEz_J5z8hCipmPgjxm5WE0D-6DPs5mA3HC_5ou6Q@mail.gmail.com>
+References: <1506092407-26985-1-git-send-email-peter.maydell@linaro.org>
+	<1506092407-26985-3-git-send-email-peter.maydell@linaro.org>
+	<c0b514b4-6474-87ed-6fa0-c109761d243c@linaro.org>
+	<CAFEAcA8dmJLEz_J5z8hCipmPgjxm5WE0D-6DPs5mA3HC_5ou6Q@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Oct 2017 14:22:21 +0100
+Message-ID: <CAFEAcA_H_cgEPs1+aJ4fWzPys8-0Omyn_BtHGhJVwWuNbrr=gQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 02/20] target/arm: Don't switch to target
+ stack early in v7M exception return
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,121 +32,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ross Lagerwall <ross.lagerwall@citrix.com>, Ian Jackson <Ian.Jackson@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Stefano
-	Stabellini <sstabellini@kernel.org>, Juergen Gross <jgross@suse.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBYZW4tZGV2ZWwgW21haWx0bzp4
-ZW4tZGV2ZWwtYm91bmNlc0BsaXN0cy54ZW4ub3JnXSBPbiBCZWhhbGYgT2YNCj4gUm9zcyBMYWdl
-cndhbGwNCj4gU2VudDogMDYgT2N0b2JlciAyMDE3IDEzOjU4DQo+IFRvOiBJYW4gSmFja3NvbiA8
-SWFuLkphY2tzb25AY2l0cml4LmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBDYzogQW50
-aG9ueSBQZXJhcmQgPGFudGhvbnkucGVyYXJkQGNpdHJpeC5jb20+OyB4ZW4tDQo+IGRldmVsQGxp
-c3RzLnhlbnByb2plY3Qub3JnOyBTdGVmYW5vIFN0YWJlbGxpbmkgPHNzdGFiZWxsaW5pQGtlcm5l
-bC5vcmc+Ow0KPiBKdWVyZ2VuIEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+DQo+IFN1YmplY3Q6IFJl
-OiBbWGVuLWRldmVsXSBbUEFUQ0ggdjIgMC8qXSB4ZW46IHhlbi1kb21pZC1yZXN0cmljdA0KPiBp
-bXByb3ZlbWVudHMNCj4gDQo+IE9uIDEwLzA0LzIwMTcgMDU6MTggUE0sIElhbiBKYWNrc29uIHdy
-b3RlOg0KPiA+IChSZXNlbmRpbmcgdGhpcyBiZWNhdXNlIDEuIEkgZ290IHRoZSBDQyBmb3IgeGVu
-LWRldmVsIHdyb25nOyAyLiBJIGdvdA0KPiA+IHRoZSBzdWJqZWN0IHdyb25nOiB0aGVyZSBhcmUg
-YWN0dWFsbHkgOCBwYXRjaGVzOyAzLiBJIG1hbmdsZWQNCj4gPiBBbnRob255J3MgbmFtZSBpbiB0
-aGVoZWFkZXJzLiAgU29ycnkgZm9yIHRoZSBub2lzZS4pDQo+ID4NCj4gPiBJIGhhdmUgYmVlbiB3
-b3JraW5nIG9uIHRyeWluZyB0byBnZXQgcWVtdSwgd2hlbiBydW5uaW5nIGFzIGEgWGVuDQo+ID4g
-ZGV2aWNlIG1vZGVsLCB0byBfYWN0dWFsbHlfIG5vdCBoYXZlIHBvd2VyIGVxdWl2YWxlbnQgdG8g
-cm9vdC4NCj4gPg0KPiA+IEkgdGhpbmsgSSBoYXZlIGFjaGlldmVkIHRoaXMsIHdpdGggc29tZSBs
-aW1pdGF0aW9ucyAod2hpY2ggd2lsbCBiZQ0KPiA+IGRpc2N1c3NlZCBpbiBteSBzZXJpZXMgYWdh
-aW5zdCB4ZW4uZ2l0Lg0KPiA+DQo+ID4gSG93ZXZlciwgdGhlcmUgYXJlIGNoYW5nZXMgdG8gcWVt
-dSBuZWVkZWQuICBJbiBwYXJ0aWN1bGFyDQo+ID4NCj4gPiAgICogVGhlIC14ZW4tZG9taWQtcmVz
-dHJpY3Qgb3B0aW9uIGRvZXMgbm90IHdvcmsgcHJvcGVybHkgcmlnaHQgbm93Lg0KPiA+ICAgICBJ
-dCBvbmx5IHJlc3RyaWN0cyBhIHNtYWxsIHN1YnNldCBvZiB0aGUgZGVzY3JpcHRvcnMgcWVtdSBo
-YXMgb3Blbi4NCj4gPiAgICAgSSBhbSBpbnRyb2R1Y2luZyBhIG5ldyBsaWJyYXJ5IGNhbGwgaW4g
-dGhlIFhlbiBsaWJyYXJpZXMgZm9yIHRoaXMsDQo+ID4gICAgIHhlbnRvb2xjb3JlX3Jlc3RyaWN0
-X2FsbC4NCj4gPg0KPiANCj4gSGkgSWFuLA0KPiANCj4gSSdtIHRlc3RpbmcgeW91ciBRRU1VIGFu
-ZCBYZW4gcGF0Y2ggc2VyaWVzIGFuZCBmb3VuZCB0aGF0IGFmdGVyIGJlaW5nDQo+IHJlc3RyaWN0
-ZWQsIFFFTVUgZmFpbHMgdG8gc2V0dXAgdXAgdGhlIFZHQSBtZW1vcnkgcHJvcGVybHkgd2hpY2gg
-Y2F1c2VzDQo+IGEgY29tcGxldGUgc3RhbGwgd2l0aCBzdGR2Z2EuIFdpdGggY2lycnVzIGl0IG1v
-c3RseSB3b3JrcyBhbHRob3VnaCBpdA0KPiBzZWVtcyB0byBoYXZlIHJlZHVjZWQgcGVyZm9ybWFu
-Y2UuDQo+IA0KPiBJIHRoaW5rIGl0IGhhcHBlbnMgd2hlbiB0aGUgVk0gc2V0cyB1cCB0aGUgQkFS
-IHNvbWUgdGltZSBhZnRlcg0KPiB4ZW5fcmVzdHJpY3QoKSBoYXMgYmVlbiBjYWxsZWQuIFRoZSBm
-YWlsdXJlIGNvbWVzIGZyb20gUUVNVSBjYWxsaW5nDQo+IHhjX2RvbWFpbl9hZGRfdG9fcGh5c21h
-cCgpIHdoaWNoIGNhbGxzIGRvX21lbW9yeV9vcCgpIGFuZCBmaW5hbGx5DQo+IHhlbmNhbGwyKCku
-IEJ1dCB0aGUgdW5kZXJseWluZyB4ZW5jYWxsIGZkIGhhcyBiZWVuIHJlcGxhY2VkIHdpdGggL2Rl
-di9udWxsLg0KDQpPaCwgdGhhdCdzIGEgUElUQS4gVGhpcyBpcyBiZWNhdXNlIG9mIHRoZSBzbGln
-aHRseSBoYWNreSB3YXkgdGhhdCB0aGUgVlJBTSBpcyBkZWFsdCB3aXRoIChpdCBuZWVkaW5nIHRv
-IGJlIG1vdmVkIGludG8gdGhlIEJBUiBvZiB0aGUgUENJIFZHQSBkZXZpY2UgYXQgdGhlIHBvaW50
-IHdoZXJlIGd1ZXN0IGZpcm13YXJlIHByb2dyYW1zIGl0KS4gTWF5YmUgd2UgbmVlZCBhIG5ldyBk
-bV9vcCBmb3IgdGhpcz8NCg0KICBQYXVsDQoNCj4gDQo+IEhlcmUgaXMgc29tZSBkZWJ1ZyBvdXRw
-dXQsIGFsbCBvZiB3aGljaCBvY2N1cnMgYWZ0ZXIgdGhlIGNhbGwgdG8NCj4geGVudG9vbGNvcmVf
-cmVzdHJpY3RfYWxsKCkgaGFzIGNvbXBsZXRlZC4gMDA6MDIuMCBpcyB0aGUgVkdBIGRldmljZS4N
-Cj4gDQo+IHBjaV91cGRhdGVfbWFwcGluZ3NfYWRkIGQ9MHg3ZmVlMGIxNTQwMDAgMDA6MDMuMA0K
-PiAxLDB4ZjAwMDAwMDArMHgxMDAwMDAwDQo+IHBjaV91cGRhdGVfbWFwcGluZ3NfYWRkIGQ9MHg3
-ZmVlMGIxZGUwMDAgMDA6MDIuMA0KPiAwLDB4ZjEwMDAwMDArMHg4MDAwMDANCj4geGVuX2NsaWVu
-dF9zZXRfbWVtb3J5IDB4ZjEwMDAwMDAgc2l6ZSAweDgwMDAwMCwgbG9nX2RpcnR5IDENCj4geGVu
-OiBtYXBwaW5nIHZyYW0gdG8gZjEwMDAwMDAgLSBmMTgwMDAwMA0KPiB4ZW46IGFkZF90b19waHlz
-bWFwIE1GTiA4MDAwMCB0byBQRk4gZjEwMDAgZmFpbGVkOiAyNSAoZXJybm86IDI1KQ0KPiBwY2lf
-dXBkYXRlX21hcHBpbmdzX2FkZCBkPTB4N2ZlZTBiMTU0MDAwIDAwOjAzLjAgMCwweGMwMDArMHgx
-MDANCj4gcGNpX3VwZGF0ZV9tYXBwaW5nc19hZGQgZD0weDdmZWUwYjFhNDAwMCAwMDowNC4wIDAs
-MHhjMTAwKzB4MTAwDQo+IHBjaV91cGRhdGVfbWFwcGluZ3NfYWRkIGQ9MHg3ZmVlMGIxYTQwMDAg
-MDA6MDQuMCAxLDB4ZjE4MDAwMDArMHgxMDANCj4gcGNpX3VwZGF0ZV9tYXBwaW5nc19hZGQgZD0w
-eDdmZWUwYjAwNmUwMCAwMDowMS4yIDQsMHhjMjAwKzB4MjANCj4gcGNpX3VwZGF0ZV9tYXBwaW5n
-c19hZGQgZD0weDdmZWUwYjY1YzAwMCAwMDowMS4xIDQsMHhjMjIwKzB4MTANCj4gcGNpX3VwZGF0
-ZV9tYXBwaW5nc19hZGQgZD0weDdmZWUwYjY1YzAwMCAwMDowMS4xIDQsMHhjMjIwKzB4MTANCj4g
-cGNpX3VwZGF0ZV9tYXBwaW5nc19hZGQgZD0weDdmZWUwYjY1YzAwMCAwMDowMS4xIDQsMHhjMjIw
-KzB4MTANCj4gcGNpX3VwZGF0ZV9tYXBwaW5nc19hZGQgZD0weDdmZWUwYjY1YzAwMCAwMDowMS4x
-IDQsMHhjMjIwKzB4MTANCj4gcGNpX3VwZGF0ZV9tYXBwaW5nc19hZGQgZD0weDdmZWUwYjY1YzAw
-MCAwMDowMS4xIDQsMHhjMjIwKzB4MTANCj4gcGNpX3VwZGF0ZV9tYXBwaW5nc19hZGQgZD0weDdm
-ZWUwYjY1YzAwMCAwMDowMS4xIDQsMHhjMjIwKzB4MTANCj4gcGNpX3VwZGF0ZV9tYXBwaW5nc19h
-ZGQgZD0weDdmZWUwYjY1YzAwMCAwMDowMS4xIDQsMHhjMjIwKzB4MTANCj4gcGNpX3VwZGF0ZV9t
-YXBwaW5nc19hZGQgZD0weDdmZWUwYjY1YzAwMCAwMDowMS4xIDQsMHhjMjIwKzB4MTANCj4gcGNp
-X3VwZGF0ZV9tYXBwaW5nc19hZGQgZD0weDdmZWUwYjAwNmUwMCAwMDowMS4yIDQsMHhjMjAwKzB4
-MjANCj4gcGNpX3VwZGF0ZV9tYXBwaW5nc19hZGQgZD0weDdmZWUwYjAwNmUwMCAwMDowMS4yIDQs
-MHhjMjAwKzB4MjANCj4gcGNpX3VwZGF0ZV9tYXBwaW5nc19hZGQgZD0weDdmZWUwYjAwNmUwMCAw
-MDowMS4yIDQsMHhjMjAwKzB4MjANCj4gcGNpX3VwZGF0ZV9tYXBwaW5nc19hZGQgZD0weDdmZWUw
-YjAwNmUwMCAwMDowMS4yIDQsMHhjMjAwKzB4MjANCj4gcGNpX3VwZGF0ZV9tYXBwaW5nc19hZGQg
-ZD0weDdmZWUwYjAwNmUwMCAwMDowMS4yIDQsMHhjMjAwKzB4MjANCj4gcGNpX3VwZGF0ZV9tYXBw
-aW5nc19hZGQgZD0weDdmZWUwYjAwNmUwMCAwMDowMS4yIDQsMHhjMjAwKzB4MjANCj4gcGNpX3Vw
-ZGF0ZV9tYXBwaW5nc19hZGQgZD0weDdmZWUwYjAwNmUwMCAwMDowMS4yIDQsMHhjMjAwKzB4MjAN
-Cj4gcGNpX3VwZGF0ZV9tYXBwaW5nc19hZGQgZD0weDdmZWUwYjFkZTAwMCAwMDowMi4wDQo+IDAs
-MHhmMTAwMDAwMCsweDgwMDAwMA0KPiB4ZW5fY2xpZW50X3NldF9tZW1vcnkgMHhmMTAwMDAwMCBz
-aXplIDB4ODAwMDAwLCBsb2dfZGlydHkgMQ0KPiBwY2lfdXBkYXRlX21hcHBpbmdzX2FkZCBkPTB4
-N2ZlZTBiMWRlMDAwIDAwOjAyLjANCj4gMCwweGYxMDAwMDAwKzB4ODAwMDAwDQo+IHhlbl9jbGll
-bnRfc2V0X21lbW9yeSAweGYxMDAwMDAwIHNpemUgMHg4MDAwMDAsIGxvZ19kaXJ0eSAxDQo+IHBj
-aV91cGRhdGVfbWFwcGluZ3NfYWRkIGQ9MHg3ZmVlMGIxZGUwMDAgMDA6MDIuMA0KPiAwLDB4ZjEw
-MDAwMDArMHg4MDAwMDANCj4geGVuX2NsaWVudF9zZXRfbWVtb3J5IDB4ZjEwMDAwMDAgc2l6ZSAw
-eDgwMDAwMCwgbG9nX2RpcnR5IDENCj4gcGNpX3VwZGF0ZV9tYXBwaW5nc19hZGQgZD0weDdmZWUw
-YjFkZTAwMCAwMDowMi4wDQo+IDAsMHhmMTAwMDAwMCsweDgwMDAwMA0KPiB4ZW5fY2xpZW50X3Nl
-dF9tZW1vcnkgMHhmMTAwMDAwMCBzaXplIDB4ODAwMDAwLCBsb2dfZGlydHkgMQ0KPiBwY2lfdXBk
-YXRlX21hcHBpbmdzX2FkZCBkPTB4N2ZlZTBiMWRlMDAwIDAwOjAyLjANCj4gMCwweGYxMDAwMDAw
-KzB4ODAwMDAwDQo+IHhlbl9jbGllbnRfc2V0X21lbW9yeSAweGYxMDAwMDAwIHNpemUgMHg4MDAw
-MDAsIGxvZ19kaXJ0eSAxDQo+IHBjaV91cGRhdGVfbWFwcGluZ3NfYWRkIGQ9MHg3ZmVlMGIxZGUw
-MDAgMDA6MDIuMA0KPiAwLDB4ZjEwMDAwMDArMHg4MDAwMDANCj4geGVuX2NsaWVudF9zZXRfbWVt
-b3J5IDB4ZjEwMDAwMDAgc2l6ZSAweDgwMDAwMCwgbG9nX2RpcnR5IDENCj4gcGNpX3VwZGF0ZV9t
-YXBwaW5nc19hZGQgZD0weDdmZWUwYjFkZTAwMCAwMDowMi4wDQo+IDAsMHhmMTAwMDAwMCsweDgw
-MDAwMA0KPiB4ZW5fY2xpZW50X3NldF9tZW1vcnkgMHhmMTAwMDAwMCBzaXplIDB4ODAwMDAwLCBs
-b2dfZGlydHkgMQ0KPiBwY2lfdXBkYXRlX21hcHBpbmdzX2FkZCBkPTB4N2ZlZTBiMTU0MDAwIDAw
-OjAzLjAgMCwweGMwMDArMHgxMDANCj4gcGNpX3VwZGF0ZV9tYXBwaW5nc19hZGQgZD0weDdmZWUw
-YjE1NDAwMCAwMDowMy4wDQo+IDEsMHhmMDAwMDAwMCsweDEwMDAwMDANCj4gcGNpX3VwZGF0ZV9t
-YXBwaW5nc19hZGQgZD0weDdmZWUwYjE1NDAwMCAwMDowMy4wIDAsMHhjMDAwKzB4MTAwDQo+IHBj
-aV91cGRhdGVfbWFwcGluZ3NfYWRkIGQ9MHg3ZmVlMGIxNTQwMDAgMDA6MDMuMA0KPiAxLDB4ZjAw
-MDAwMDArMHgxMDAwMDAwDQo+IHBjaV91cGRhdGVfbWFwcGluZ3NfYWRkIGQ9MHg3ZmVlMGIxNTQw
-MDAgMDA6MDMuMCAwLDB4YzAwMCsweDEwMA0KPiBwY2lfdXBkYXRlX21hcHBpbmdzX2FkZCBkPTB4
-N2ZlZTBiMTU0MDAwIDAwOjAzLjANCj4gMSwweGYwMDAwMDAwKzB4MTAwMDAwMA0KPiBwY2lfdXBk
-YXRlX21hcHBpbmdzX2FkZCBkPTB4N2ZlZTBiMTU0MDAwIDAwOjAzLjAgMCwweGMwMDArMHgxMDAN
-Cj4gcGNpX3VwZGF0ZV9tYXBwaW5nc19hZGQgZD0weDdmZWUwYjE1NDAwMCAwMDowMy4wDQo+IDEs
-MHhmMDAwMDAwMCsweDEwMDAwMDANCj4gcGNpX3VwZGF0ZV9tYXBwaW5nc19hZGQgZD0weDdmZWUw
-YjE1NDAwMCAwMDowMy4wIDAsMHhjMDAwKzB4MTAwDQo+IHBjaV91cGRhdGVfbWFwcGluZ3NfYWRk
-IGQ9MHg3ZmVlMGIxNTQwMDAgMDA6MDMuMA0KPiAxLDB4ZjAwMDAwMDArMHgxMDAwMDAwDQo+IHBj
-aV91cGRhdGVfbWFwcGluZ3NfYWRkIGQ9MHg3ZmVlMGIxNTQwMDAgMDA6MDMuMCAwLDB4YzAwMCsw
-eDEwMA0KPiBwY2lfdXBkYXRlX21hcHBpbmdzX2FkZCBkPTB4N2ZlZTBiMTU0MDAwIDAwOjAzLjAN
-Cj4gMSwweGYwMDAwMDAwKzB4MTAwMDAwMA0KPiBwY2lfdXBkYXRlX21hcHBpbmdzX2FkZCBkPTB4
-N2ZlZTBiMTU0MDAwIDAwOjAzLjAgMCwweGMwMDArMHgxMDANCj4gcGNpX3VwZGF0ZV9tYXBwaW5n
-c19hZGQgZD0weDdmZWUwYjE1NDAwMCAwMDowMy4wDQo+IDEsMHhmMDAwMDAwMCsweDEwMDAwMDAN
-Cj4gDQo+IEFwYXJ0IGZyb20gdGhpcyBpc3N1ZSwgSSB3YXMgYWJsZSB0byBib290IHVwIGFuZCBz
-aHV0IGRvd24gYSBWTSwgdXNpbmcNCj4gLXhlbi1kb21pZC1yZXN0cmljdCwgLWNocm9vdCwgYW5k
-IC1ydW5hc2lkLg0KPiANCj4gVGhlcmUgaXMgYSBjYXZlYXQgd2hlbiB1c2luZyAteGVuLWRvbWlk
-LXJlc3RyaWN0IGFuZCAtY2hyb290IGF0IHRoZSBzYW1lDQo+IHRpbWUuIFRoZSByZXN0cmljdGlv
-biBoYXBwZW5zIGFmdGVyIGNocm9vdGluZywgc28gdGhlIGNocm9vdCBkaXJlY3RvcnkNCj4gaGFz
-IHRvIGNvbnRhaW4gYSB2YWxpZCAvZGV2L251bGwuIFRoaXMgaXMgYSBiaXQgYW5ub3lpbmcgYW5k
-IHByZXZlbnRzDQo+IHRoZSBjaHJvb3QgYmVpbmcgb24gYSAibm9kZXYiIG1vdW50Lg0KPiANCj4g
-UmVnYXJkcywNCj4gLS0NCj4gUm9zcyBMYWdlcndhbGwNCj4gDQo+IF9fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fDQo+IFhlbi1kZXZlbCBtYWlsaW5nIGxpc3QN
-Cj4gWGVuLWRldmVsQGxpc3RzLnhlbi5vcmcNCj4gaHR0cHM6Ly9saXN0cy54ZW4ub3JnL3hlbi1k
-ZXZlbA0K
+On 5 October 2017 at 17:20, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 5 October 2017 at 17:04, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>> On 09/22/2017 10:59 AM, Peter Maydell wrote:
+>>> +static uint32_t *get_v7m_sp_ptr(CPUARMState *env, bool secure, bool threadmode,
+>>> +                                bool spsel)
+>>> +{
+>>> +    /* Return a pointer to the location where we currently store the
+>>> +     * stack pointer for the requested security state and thread mode.
+>>> +     * This pointer will become invalid if the CPU state is updated
+>>> +     * such that the stack pointers are switched around (eg changing
+>>> +     * the SPSEL control bit).
+>>> +     * Compare the v8M ARM ARM pseudocode LookUpSP_with_security_mode().
+>>> +     * Unlike that pseudocode, we require the caller to pass us in the
+>>> +     * SPSEL control bit value; this is because we also use this
+>>> +     * function in handling of pushing of the callee-saves registers
+>>> +     * part of the v8M stack frame, and in that case the SPSEL bit
+>>> +     * comes from the exception return magic LR value.
+>>
+>> Exception return magic lr value does not appear to match "pushing".  Did you
+>> mean "poping" here?
+>
+> No, because the code creates the exception magic LR value for an
+> exception entry, and then uses it to determine which SPSEL to use.
+> In the tailchained-exception case we use the magic LR that
+> the attempted exception-exit got when figuring out where we need
+> to push more registers as part of the tailchaining. The pseudocode
+> chooses to open-code the "find the right stack pointer" for that
+> codepath (in pseudocode function PushCalleeStack), whereas for this
+> QEMU code I opted to make the utility function more specific. That's
+> what this comment is trying to gesture at.
+>
+> [The push-on-exception-entry code is in "target/arm: Add v8M support
+> to exception entry code"]
+
+I'm going to change this part of the comment to read
+     * Compare the v8M ARM ARM pseudocode LookUpSP_with_security_mode().
+     * Unlike that pseudocode, we require the caller to pass us in the
+     * SPSEL control bit value; this is because we also use this
+     * function in handling of pushing of the callee-saves registers
+     * part of the v8M stack frame (pseudocode PushCalleeStack()),
+     * and in the tailchain codepath the SPSEL bit comes from the exception
+     * return magic LR value from the previous exception. The pseudocode
+     * opencodes the stack-selection in PushCalleeStack(), but we prefer
+     * to make this utility function generic enough to do the job.
+
+which hopefully is a little clearer.
+
+thanks
+-- PMM
