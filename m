@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e0P4B-0006L5-5c
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 05:37:12 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e0PGo-0001ov-BR
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 05:50:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e0P47-00020N-7P
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 05:37:11 -0400
-Date: Fri, 6 Oct 2017 11:37:02 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171006113702.4a7d0380@nial.brq.redhat.com>
-In-Reply-To: <20171006091202.GG10961@umbus.fritz.box>
-References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-	<1507220690-265042-5-git-send-email-imammedo@redhat.com>
-	<20171006030256.GF3260@umbus.fritz.box>
-	<20171006102738.06b23f3f@nial.brq.redhat.com>
-	<20171006091202.GG10961@umbus.fritz.box>
+	(envelope-from <kwolf@redhat.com>) id 1e0PGk-0007Yy-GZ
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 05:50:14 -0400
+Date: Fri, 6 Oct 2017 11:49:56 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171006094956.GB4325@localhost.localdomain>
+References: <CAEfK_45dZvxvBNQpPLo71ZJhrPN5_GJr8uJ2pJZpCaFf0+i3YA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 04/23] ppc: mpc8544ds/e500plat: use generic
- cpu_model parsing
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAEfK_45dZvxvBNQpPLo71ZJhrPN5_GJr8uJ2pJZpCaFf0+i3YA@mail.gmail.com>
+Subject: Re: [Qemu-devel] Patch to add helpful tracing output for driver
+ authors in NVMe emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +23,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?UTF-8?B?SGVy?= =?UTF-8?B?dsOp?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
+To: Doug Gale <doug16k@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block@nongnu.org, keith.busch@intel.com, mreitz@redhat.com, stefanha@redhat.com
 
-On Fri, 6 Oct 2017 20:12:02 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Fri, Oct 06, 2017 at 10:27:38AM +0200, Igor Mammedov wrote:
-> > On Fri, 6 Oct 2017 14:02:56 +1100
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >   
-> > > On Thu, Oct 05, 2017 at 06:24:31PM +0200, Igor Mammedov wrote:  
-> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>    
-> > > 
-> > > Acked-by: David Gibson <david@gibson.dropbear.id.au>
-> > > 
-> > > Do you want me to queue the ppc patches here, or do you already have a
-> > > plan for that?  
-> > Id didn't want to distract others with only PPC related code so
-> > I've posted this series separately for you to merge it via PPC tree  
+Am 06.10.2017 um 01:18 hat Doug Gale geschrieben:
+> I added the tracing output in this patch to assist me in implementing
+> an NVMe driver. It helped tremendously.
 > 
-> Ok.  I'm happy to do that, but I have queries on a few patches, so at
-> this point I'm anticipating a respin.
-I'm planing to do it (most likely on Monday)
+> From 1d19086cdef8d492929852d582cb41dcc5026f71 Mon Sep 17 00:00:00 2001
+> From: Doug Gale <doug16k@gmail.com>
+> Date: Thu, 5 Oct 2017 19:02:03 -0400
+> Subject: [PATCH] Add tracing output to NVMe emulation to help driver authors.
+> 
+> It is off by default, enable it by uncommenting #define DEBUG_NVME
+> or through CFLAGS
+> 
+> Signed-off-by: Doug Gale <doug16k@gmail.com>
 
-> Just to be clear, you're intending for me to take the whole series?
-> Or just the patches within the ppc code?
-if 1-3/23 isn't in master by the time you take series, you'd need them as well
-(it shouldn't cause any conflicts if Eduardo merges them first)
+I think it's generally preferable to use the actual tracing
+infrastructure instead of fprintf. This would allow to enable the trace
+points with the command line options instead of only at compile time and
+also to get machine-readable output if necessary.
+
+The tracing infrastructure is documented in docs/devel/tracing.txt.
+
+Kevin
