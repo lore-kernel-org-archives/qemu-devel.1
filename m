@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57355)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1e0LCP-0003cJ-Et
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 01:29:26 -0400
+	(envelope-from <armbru@redhat.com>) id 1e0LJb-0004pY-2M
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 01:36:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1e0LCM-0003xX-BF
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 01:29:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39604)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1e0LCM-0003w6-61
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 01:29:22 -0400
+	(envelope-from <armbru@redhat.com>) id 1e0LJZ-0003M0-PL
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 01:36:51 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <20171002152552.27999-1-armbru@redhat.com>
-	<20171002152552.27999-20-armbru@redhat.com>
-	<CAJ+F1CJYd4LqyPtkmr40tnCKhDV63urnAhUgkX=M++njtPmgYw@mail.gmail.com>
-	<87sheyi4uj.fsf@dusky.pond.sub.org>
-	<CAJ+F1CJbOkWCbJZj0D-oBT4STr7zqG1hdhB70eyShG6taSmRSw@mail.gmail.com>
-Date: Fri, 06 Oct 2017 07:29:19 +0200
-In-Reply-To: <CAJ+F1CJbOkWCbJZj0D-oBT4STr7zqG1hdhB70eyShG6taSmRSw@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Thu, 5 Oct 2017
-	16:13:32 +0200")
-Message-ID: <877ew8alow.fsf@dusky.pond.sub.org>
+References: <1507034861-4661-1-git-send-email-jan.dakinevich@virtuozzo.com>
+	<1507034861-4661-2-git-send-email-jan.dakinevich@virtuozzo.com>
+	<e77d7b78-a2ff-51a3-360e-c7d5d4e7006b@redhat.com>
+	<7735fee8-dcc0-edc1-2fd3-f2aee7fe2df1@virtuozzo.com>
+Date: Fri, 06 Oct 2017 07:36:37 +0200
+In-Reply-To: <7735fee8-dcc0-edc1-2fd3-f2aee7fe2df1@virtuozzo.com> (Jan
+	Dakinevich's message of "Tue, 3 Oct 2017 17:32:49 +0300")
+Message-ID: <87wp4896sa.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 19/32] qapi: Accept double-quoted
- strings
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] virtio: introduce `query-virtio'
+ QMP command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,55 +26,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org, Amit Shah <amit@kernel.org>, Jason Wang <jasowang@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+Jan Dakinevich <jan.dakinevich@virtuozzo.com> writes:
 
-> On Thu, Oct 5, 2017 at 6:41 AM, Markus Armbruster <armbru@redhat.com> wro=
-te:
->> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
->>
->>> On Mon, Oct 2, 2017 at 5:25 PM, Markus Armbruster <armbru@redhat.com> w=
-rote:
->>>> The QAPI schema parser has always accepted only single-quoted strings,
->>>> even though JSON strings are double-quoted.  Accept double-quoted
->>>> strings as well, so you can write strings containing single quotes
->>>> without backslash escapes.
->>>>
->>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> On 10/03/2017 05:02 PM, Eric Blake wrote:
+>> On 10/03/2017 07:47 AM, Jan Dakinevich wrote:
+>>> The command is intended for gathering virtio information such as status,
+>>> feature bits, negotiation status. It is convenient and useful for debug
+>>> purpose.
 >>>
->>> What's the motivation to allow both? If we were to switch from single
->>> to double quote only, that would make more sense.
->>
->> Abandoning single quotes now would require us to touch pretty much every
->> line of code in the schemas.  I don't think correcting quotes is worth
->> wrecking git-blame.
->>
+>>> The commands returns generic virtio information for virtio such as
+>>> common feature names and status bits names and information for all
+>>> attached to current machine devices.
+>>>
+>>> To retrieve names of device-specific features `get_feature_name'
+>>> callback in VirtioDeviceClass also was introduced.
+>>>
+>>> Cc: Denis V. Lunev <den@virtuozzo.com>
+>>> Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+>>> ---
+>>>  hw/block/virtio-blk.c       |  21 +++++++++
+>>>  hw/char/virtio-serial-bus.c |  15 +++++++
+>>>  hw/display/virtio-gpu.c     |  13 ++++++
+>>>  hw/net/virtio-net.c         |  35 +++++++++++++++
+>>>  hw/scsi/virtio-scsi.c       |  16 +++++++
+>>>  hw/virtio/Makefile.objs     |   2 +
+>>>  hw/virtio/virtio-balloon.c  |  15 +++++++
+>>>  hw/virtio/virtio-stub.c     |   9 ++++
+>>>  hw/virtio/virtio.c          | 101 ++++++++++++++++++++++++++++++++++++++++++++
+>>>  include/hw/virtio/virtio.h  |   2 +
+>>>  qapi-schema.json            |   1 +
+>>>  qapi/virtio.json            |  94 +++++++++++++++++++++++++++++++++++++++++
+>>>  12 files changed, 324 insertions(+)
+>>>  create mode 100644 hw/virtio/virtio-stub.c
+>>>  create mode 100644 qapi/virtio.json
+>> 
+>> This creates a new .json file, but does not touch MAINTAINERS.  Our idea
+>> in splitting the .json files was to make it easier for each sub-file
+>> that needs a specific maintainer in addition to the overall *.json line
+>> for QAPI maintainers, so this may deserve a MAINTAINERS entry.
+>> 
 >
-> Recent (and upcoming) changes to the schema are already quite
-> invasive. I think we could do it, convert all strings to double-quote,
-> and it would help with getting the schema closer to a valid json.
+> Ok.
+>
+>>> +++ b/qapi/virtio.json
+>>> @@ -0,0 +1,94 @@
+>>> +# -*- Mode: Python -*-
+>>> +#
+>>> +
+>>> +##
+>>> +# = Virtio devices
+>>> +##
+>>> +
+>>> +{ 'include': 'common.json' }
+>>> +
+>>> +##
+>>> +# @VirtioInfoBit:
+>>> +#
+>>> +# Named virtio bit
+>>> +#
+>>> +# @bit: bit number
+>>> +#
+>>> +# @name: bit name
+>>> +#
+>>> +# Since: 2.11.0
+>>> +#
+>>> +##
+>>> +{
+>>> +    'struct': 'VirtioInfoBit',
+>>> +    'data': {
+>>> +        'bit': 'uint64',
+>> 
+>> Why is this a 64-bit value? Are the values 0-63, or are they 1, 2, 4, 8,
+>> ...?  The documentation on 'bit number' is rather sparse.
+>
+> I would prefer `uint' here, but I don't see generic unsigned type (may
+> be, I am mistaken). I could use uint8 here, though.
+>
+>> 
+>>> +        'name': 'str'
+>> 
+>> Wouldn't an enum type be better than an open-ended string?
+>> 
+>
+> Bit names are not known here, they are obtained from virtio device
+> implementations.
 
-Is the recent (and upcoming) churn *that* bad?  Got numbers?
+What exactly uses these bits?
 
-> Fwiw, there are tools like
-> https://commondatastorage.googleapis.com/chrome-infra-docs/flat/depot_too=
-ls/docs/html/git-hyper-blame.html
-> to skip commits in git-blame. It's also fairly easy to run git blame
-> before the reformatting commit.
+Why do these uses justify pass-through?  By pass-through, I mean the
+messenger (QEMU) merely passes them along, without understanding them.
+Defeats introspection.
 
-Both techniques add friction...
+>>> +    }
+>>> +}
+>>> +
+>>> +##
+>>> +# @VirtioInfoDevice:
+>>> +#
+>>> +# Information about specific virtio device
+>>> +#
+>>> +# @qom_path: QOM path of the device
+>> 
+>> Please make this 'qom-path' - new interfaces should prefer '-' over '_'.
+>
+> Ok.
+>
+>>> +#
+>>> +# @feature-names: names of device-specific features
+>>> +#
+>>> +# @host-features: bitmask of features, provided by devices
+>>> +#
+>>> +# @guest-features: bitmask of features, acknowledged by guest
+>>> +#
+>>> +# @status: virtio device status bitmask
+>>> +#
+>>> +# Since: 2.11.0
+>>> +#
+>>> +##
+>>> +{
+>>> +    'struct': 'VirtioInfoDevice',
+>>> +    'data': {
+>>> +        'qom_path': 'str',
+>>> +        'feature-names': ['VirtioInfoBit'],
+>>> +        'host-features': 'uint64',
+>>> +        'guest-features': 'uint64',
+>>> +        'status': 'uint64'
+>> 
+>> I'm wondering if this is the best representation (where the caller has
+>> to parse the integer and then lookup in feature-names what each bit of
+>> the integer represents).  But I'm not sure I have anything better off
+>> the top of my head.
+>> 
+>
+> Consider it as way to tell caller about names of supported features.
 
->> Sadly, the schema language is neither JSON, nor an established extension
->> of JSON, nor Python.  This commit brings the schema language one step
->> closer to a superset of JSON.  I feel "homegrown superset" is a slightly
->> less bad idea than "homegrown with large overlap".
->>
->> Naming the schema files .json was in bad taste.
->>
->>> otherwise, patch looks good
->>
->> Ready to upgrade to R-by now?
->>
->> Want me to work more of my rationale into the commit message?
+"Unsigned integer interpreted as combination of well-known bit-valued
+symbols" is a fine C interface, but a pretty horrid QMP interface.
+What's wrong with doing a set the straightforward way as "array of
+enum"?
+
+>>> +    }
+>>> +}
+>>> +
+>>> +##
+>>> +# @VirtioInfo:
+>>> +#
+>>> +# Information about virtio devices
+>>> +#
+>>> +# @feature-names: names of common virtio features
+>>> +#
+>>> +# @status-names: names of bits which represents virtio device status
+>>> +#
+>>> +# @devices: list of per-device virtio information
+>>> +#
+>>> +# Since: 2.11.0
+>>> +#
+>>> +##
+>>> +{
+>>> +    'struct': 'VirtioInfo',
+>>> +    'data': {
+>>> +        'feature-names': ['VirtioInfoBit'],
+>> 
+>> Why is feature-names listed at two different nestings of the return value?
+>> 
+>
+> These are different feature names. First names are common and predefined
+> for all devices. Second names are device-specific.
+>
+>>> +        'status-names': ['VirtioInfoBit'],
+>>> +        'devices': ['VirtioInfoDevice']
+>>> +    }
+>>> +}
+>>> +
+>>> +
+>>> +##
+>>> +# @query-virtio:
+>>> +#
+>>> +# Returns generic and per-device virtio information
+>>> +#
+>>> +# Since: 2.11.0
+>>> +#
+>>> +##
+>>> +{
+>>> +    'command': 'query-virtio',
+>>> +    'returns': 'VirtioInfo'
+>>> +}
+>>>
+>> 
