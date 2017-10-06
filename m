@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0N58-0006Ol-V5
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:30:07 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e0N5A-0006Ov-Bj
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:30:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0N57-0002fy-Ss
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:30:02 -0400
-Date: Fri, 6 Oct 2017 15:43:33 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1e0N55-0002cc-Q7
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:30:04 -0400
+Date: Fri, 6 Oct 2017 14:54:47 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171006044333.GU3260@umbus.fritz.box>
+Message-ID: <20171006035447.GP3260@umbus.fritz.box>
 References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-	<1507220690-265042-17-git-send-email-imammedo@redhat.com>
+	<1507220690-265042-13-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="XUmrTyVHrg2/ImRG"
+	protocol="application/pgp-signature"; boundary="FTsVDVnBYKo0tCDH"
 Content-Disposition: inline
-In-Reply-To: <1507220690-265042-17-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 16/23] ppc: spapr: use cpu model names as
- tcg defaults instead of aliases
+In-Reply-To: <1507220690-265042-13-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 12/23] ppc: move '-cpu foo,
+ compat=xxx' parsing into ppc_cpu_parse_featurestr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +29,235 @@ To: Igor Mammedov <imammedo@redhat.com>
 Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
 
 
---XUmrTyVHrg2/ImRG
+--FTsVDVnBYKo0tCDH
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 05, 2017 at 06:24:43PM +0200, Igor Mammedov wrote:
+On Thu, Oct 05, 2017 at 06:24:39PM +0200, Igor Mammedov wrote:
+> there is a dedicated callback CPUClass::parse_features
+> which purpose is to convert -cpu features into a set of
+> global properties AND deal with compat/legacy features
+> that couldn't be directly translated into CPU's properties.
+>=20
+> Create ppc variant of it (ppc_cpu_parse_featurestr) and
+> move 'compat=3Dval' handling from spapr_cpu_core.c into it.
+> That removes a dependency of board/core code on cpu_model
+> parsing and would let to reuse common -cpu parsing
+> introduced by 6063d4c0
+>=20
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Hrm.  I'm a bit unsure about this.  The fact that the board code is
+involved in the parsing here is deliberate.  Basically 'compat=3D' never
+made sense as a cpu property, it always should have been a machine
+property.
+
+With this patch we'll still (correctly) fail on a non spapr machine at
+the point where we do:
+
++            object_property_set_str(machine, v, "max-cpu-compat", &local_e=
+rr);
+
+Though probably with a rather cryptic error.
+
+It still pollutes the cpu code with spapr's past mistake though.  I'm
+not sure if this is a good tradeoff.
 
 > ---
->  hw/ppc/spapr.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  include/hw/ppc/spapr.h      |  1 -
+>  target/ppc/cpu-qom.h        |  1 +
+>  hw/ppc/spapr.c              |  2 +-
+>  hw/ppc/spapr_cpu_core.c     | 50 --------------------------------------
+>  target/ppc/translate_init.c | 58 +++++++++++++++++++++++++++++++++++++++=
+++++++
+>  5 files changed, 60 insertions(+), 52 deletions(-)
 >=20
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index c1b365f..8ca4f94 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -659,7 +659,6 @@ void spapr_hotplug_req_add_by_count_indexed(sPAPRDRCo=
+nnectorType drc_type,
+>                                              uint32_t count, uint32_t ind=
+ex);
+>  void spapr_hotplug_req_remove_by_count_indexed(sPAPRDRConnectorType drc_=
+type,
+>                                                 uint32_t count, uint32_t =
+index);
+> -void spapr_cpu_parse_features(sPAPRMachineState *spapr);
+>  int spapr_hpt_shift_for_ramsize(uint64_t ramsize);
+>  void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
+>                            Error **errp);
+> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+> index d0cf6ca..429b47f 100644
+> --- a/target/ppc/cpu-qom.h
+> +++ b/target/ppc/cpu-qom.h
+> @@ -181,6 +181,7 @@ typedef struct PowerPCCPUClass {
+>      DeviceRealize parent_realize;
+>      DeviceUnrealize parent_unrealize;
+>      void (*parent_reset)(CPUState *cpu);
+> +    void (*parent_parse_features)(const char *type, char *str, Error **e=
+rrp);
+> =20
+>      uint32_t pvr;
+>      bool (*pvr_match)(struct PowerPCCPUClass *pcc, uint32_t pvr);
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index ad7afd6..0661dba 100644
+> index ff87f15..01b3012 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -3603,7 +3603,7 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
->      hc->unplug_request =3D spapr_machine_device_unplug_request;
+> @@ -2366,7 +2366,7 @@ static void ppc_spapr_init(MachineState *machine)
+>          machine->cpu_model =3D kvm_enabled() ? "host" : smc->tcg_default=
+_cpu;
+>      }
 > =20
->      smc->dr_lmb_enabled =3D true;
-> -    smc->tcg_default_cpu =3D "POWER8";
-> +    smc->tcg_default_cpu =3D "power8_v2.0";
->      mc->has_hotpluggable_cpus =3D true;
->      smc->resize_hpt_default =3D SPAPR_RESIZE_HPT_ENABLED;
->      fwc->get_dev_path =3D spapr_get_fw_dev_path;
-> @@ -3849,7 +3849,7 @@ static void spapr_machine_2_7_class_options(Machine=
-Class *mc)
->      sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+> -    spapr_cpu_parse_features(spapr);
+> +    cpu_parse_cpu_model(TYPE_POWERPC_CPU, machine->cpu_model);
 > =20
->      spapr_machine_2_8_class_options(mc);
-> -    smc->tcg_default_cpu =3D "POWER7";
-> +    smc->tcg_default_cpu =3D "power7_v2.3";
->      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_7);
->      smc->phb_placement =3D phb_placement_2_7;
+>      spapr_set_vsmt_mode(spapr, &error_fatal);
+> =20
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 3dea5ff..427d47f 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -21,56 +21,6 @@
+>  #include "sysemu/hw_accel.h"
+>  #include "qemu/error-report.h"
+> =20
+> -void spapr_cpu_parse_features(sPAPRMachineState *spapr)
+> -{
+> -    /*
+> -     * Backwards compatibility hack:
+> -     *
+> -     *   CPUs had a "compat=3D" property which didn't make sense for
+> -     *   anything except pseries.  It was replaced by "max-cpu-compat"
+> -     *   machine option.  This supports old command lines like
+> -     *       -cpu POWER8,compat=3Dpower7
+> -     *   By stripping the compat option and applying it to the machine
+> -     *   before passing it on to the cpu level parser.
+> -     */
+> -    gchar **inpieces;
+> -    gchar *newprops;
+> -    int i, j;
+> -    gchar *compat_str =3D NULL;
+> -
+> -    inpieces =3D g_strsplit(MACHINE(spapr)->cpu_model, ",", 0);
+> -
+> -    /* inpieces[0] is the actual model string */
+> -    i =3D 1;
+> -    j =3D 1;
+> -    while (inpieces[i]) {
+> -        if (g_str_has_prefix(inpieces[i], "compat=3D")) {
+> -            /* in case of multiple compat=3D options */
+> -            g_free(compat_str);
+> -            compat_str =3D inpieces[i];
+> -        } else {
+> -            j++;
+> -        }
+> -
+> -        i++;
+> -        /* Excise compat options from list */
+> -        inpieces[j] =3D inpieces[i];
+> -    }
+> -
+> -    if (compat_str) {
+> -        char *val =3D compat_str + strlen("compat=3D");
+> -
+> -        object_property_set_str(OBJECT(spapr), val, "max-cpu-compat",
+> -                                &error_fatal);
+> -
+> -    }
+> -
+> -    newprops =3D g_strjoinv(",", inpieces);
+> -    cpu_parse_cpu_model(TYPE_POWERPC_CPU, newprops);
+> -    g_free(newprops);
+> -    g_strfreev(inpieces);
+> -}
+> -
+>  static void spapr_cpu_reset(void *opaque)
+>  {
+>      PowerPCCPU *cpu =3D opaque;
+> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> index c6399a3..5ee91e8 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -10313,6 +10313,62 @@ static ObjectClass *ppc_cpu_class_by_name(const =
+char *name)
+> =20
+>      return NULL;
 >  }
+> +static void ppc_cpu_parse_featurestr(const char *typename, char *feature=
+s,
+> +                                     Error **errp)
+> +{
+> +    const PowerPCCPUClass *pcc;
+> +    char *compat_str =3D NULL;
+> +    char *s =3D features;
+> +    char **inpieces;
+> +    Error *local_err =3D NULL;
+> +    int i;
+> +
+> +    if (!features) {
+> +        return;
+> +    }
+> +
+> +    /*
+> +     * Backwards compatibility hack:
+> +     *
+> +     *   CPUs had a "compat=3D" property which didn't make sense for
+> +     *   anything except pseries.  It was replaced by "max-cpu-compat"
+> +     *   machine option.  This supports old command lines like
+> +     *       -cpu POWER8,compat=3Dpower7
+> +     *   By stripping the compat option and applying it to the machine
+> +     *   before passing it on to the cpu level parser.
+> +     */
+> +    inpieces =3D g_strsplit(features, ",", 0);
+> +    *s =3D '\0';
+> +    for (i =3D 0; inpieces[i]; i++) {
+> +        if (g_str_has_prefix(inpieces[i], "compat=3D")) {
+> +            compat_str =3D inpieces[i];
+> +            continue;
+> +        }
+> +        if ((i !=3D 0) && (s !=3D features)) {
+> +            s =3D g_stpcpy(s, ",");
+> +        }
+> +        s =3D g_stpcpy(s, inpieces[i]);
+> +    }
+> +
+> +    if (compat_str) {
+> +        Object *machine =3D qdev_get_machine();
+> +        if (machine) {
+> +            char *v =3D compat_str + strlen("compat=3D");
+> +            object_property_set_str(machine, v, "max-cpu-compat", &local=
+_err);
+> +        } else {
+> +            error_setg(&local_err, "Not supported property: %s", compat_=
+str);
+> +        }
+> +    }
+> +    g_strfreev(inpieces);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    /* do property processing with generic handler */
+> +    pcc =3D POWERPC_CPU_CLASS(object_class_by_name(typename));
+> +    pcc->parent_parse_features(typename, features, errp);
+> +}
+> =20
+>  const char *ppc_cpu_lookup_alias(const char *alias)
+>  {
+> @@ -10706,6 +10762,8 @@ static void ppc_cpu_class_init(ObjectClass *oc, v=
+oid *data)
+>      cc->reset =3D ppc_cpu_reset;
+> =20
+>      cc->class_by_name =3D ppc_cpu_class_by_name;
+> +    pcc->parent_parse_features =3D cc->parse_features;
+> +    cc->parse_features =3D ppc_cpu_parse_featurestr;
+>      cc->has_work =3D ppc_cpu_has_work;
+>      cc->do_interrupt =3D ppc_cpu_do_interrupt;
+>      cc->cpu_exec_interrupt =3D ppc_cpu_exec_interrupt;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -74,24 +265,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---XUmrTyVHrg2/ImRG
+--FTsVDVnBYKo0tCDH
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnXCfUACgkQbDjKyiDZ
-s5JZaxAAhgok3mUSy3XLuzEUtHukeWMH++hx4ndElx0wHbl1+xf8A0woR8XTL+sk
-93hxKcJsO/E/6pykssFxqUxBfsebBdLC6yqMq0lrikZrP98c+RKDknLhlcoJKDkv
-Os/M4tBa1eYTy565nA4iQMbiQblpKg6RB85PtS13E6zHUmILgY7qZUXn3FFN9+v9
-UboI6b2BYOs8Gn/v/nVEbjnGy+dSjaAtdGtrp1LJ6WbgdgcZK6OTHNqOywp4bS3h
-DsFHt3U8/izhJVtIcBVsQIZYdmovApsvYW+kjGXuZoKVUAm+qx8U3BTj1rHe0gyC
-NKFM/4+abrELVw1NMVY0MV3FCMertB2tId5nqnLiMp9NMG0s1bE7EgTPY8VMu/IW
-sM0Ii14KImzFR8Hr9XQs6KO9N64ugwFc0euSQY9f2bbIzIly+i/YPGwapMNc+lRh
-ZvqGrvnb+NJequUnYaTYk7AWk+DAau0UA5xnI+YGXBv+XDYTuJVSEOBqG9HGlUWl
-yVkCfohpcriAHJkK1gN/p+LiFATVucVwEDQPaL+Etrl+p72BhGsluZEmWf4n2e8k
-NdTNRo6BnlpRcks8uCys/8YMChRw7GiObp03Hth6FpoI+za/DfoWgXZfc8R0Wc7Z
-/yrIW2udYXnfuzlFAQW9+CVF+/2/vbayDGC9CWl6Ol+cFljYCKM=
-=sBHt
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnW/oUACgkQbDjKyiDZ
+s5KomRAAhAzQ5o4OGNYX6u0+Ef2uFupHndAsW7nzP3obGVBSxlJ8aHAcDadmaul6
+fDlykjF4F+PQ5BCOp0QEu30mKBvePWhoXwa68MBIgjsz8+az4KedxrEv9xN0S+ee
+9HOOCAxP7dwYrcl9gxww5AIBF7iPFjhUn4AKxmgarEpVlPWF8LIacORTF/rWUuti
+X7BwoE2f282v7zjoSWeS8yFuH4m0jTttq8SA6vV7hvbSA/aj8lECQuhRqZ/yeA9f
+0yQlMl/+MKDqmiGhF4WeOjqNdVNppL0QE5HDKJgFS2niP3BVWDoS1AJRiNI+SjmZ
+11CTzi6bVoCdbELn4CLH+KtjlJlg7qXugMJlgLbLQxjexNoV9SQCKjD17Mx4decn
+sqGxNZXCx82qRx9iPgEleA4ap4Dsk3C++L6YPjUNatoqa2JNR2lYpDnDxyl8d8N+
+sxOkpLp9E4PxYbT2Z7KHAN+qxekq3lrw7ChcxHgwj1/ETH1yyhG3F7+BpTxhyOSS
+pkwaaOf4rkTEEb3OSqY0wANp/36lfnipwKq7Onq0ORNkHdZLDbUbgKgwzZTNmT0g
+QUZhA9fcjELliSD6j6j1YMLoI6BOMY4NQfFEvPFCWLcIBvqCgzUB1Nav3tMrMKLJ
+jg4AsUUE7tyDP45JzNFYaiUwvjkjub4O9yHSaeRsSs9ICq/s4gw=
+=5+eR
 -----END PGP SIGNATURE-----
 
---XUmrTyVHrg2/ImRG--
+--FTsVDVnBYKo0tCDH--
