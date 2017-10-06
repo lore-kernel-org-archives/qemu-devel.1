@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e0TDI-0003hk-Fy
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 10:02:53 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e0TDW-0003v8-Vk
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 10:03:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e0TDC-00010j-Vf
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 10:02:52 -0400
-Received: from mail-qt0-x236.google.com ([2607:f8b0:400d:c0d::236]:52215)
+	(envelope-from <peter.maydell@linaro.org>) id 1e0TDS-0001GL-TK
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 10:03:07 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:53213)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e0TDC-00010c-Qa
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 10:02:46 -0400
-Received: by mail-qt0-x236.google.com with SMTP id q4so31565210qtq.8
-	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 07:02:46 -0700 (PDT)
-References: <20170928203708.9376-1-david@redhat.com>
-	<20170928203708.9376-27-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ab1c14fe-95c3-0954-ec16-3ff43c2037f5@linaro.org>
-Date: Fri, 6 Oct 2017 10:02:43 -0400
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e0TDS-0001Eb-MF
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 10:03:02 -0400
+Received: by mail-wr0-x231.google.com with SMTP id k62so13099080wrc.9
+	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 07:03:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170928203708.9376-27-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 26/30] s390x/tcg: switch to new SIGP
- handling code
+In-Reply-To: <20170918195100.17593-8-andrew.smirnov@gmail.com>
+References: <20170918195100.17593-1-andrew.smirnov@gmail.com>
+	<20170918195100.17593-8-andrew.smirnov@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Oct 2017 15:02:41 +0100
+Message-ID: <CAFEAcA_+HDjZWHbNhedzL7he=-1WPMRePh917-9BZJK0AYqPdg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 07/17] imx_fec: Emulate SHIFT16 in
+ ENETx_RACC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +30,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>
+To: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On 09/28/2017 04:37 PM, David Hildenbrand wrote:
->  static ExitStatus op_sigp(DisasContext *s, DisasOps *o)
->  {
->      TCGv_i32 r1 = tcg_const_i32(get_field(s->fields, r1));
-> +    TCGv_i32 r3 = tcg_const_i32(get_field(s->fields, r3));
->      check_privileged(s);
-> -    potential_page_fault(s);
-> -    gen_helper_sigp(cc_op, cpu_env, o->in2, r1, o->in1);
-> +    gen_helper_sigp(cc_op, cpu_env, o->in2, r1, r3);
->      set_cc_static(s);
->      tcg_temp_free_i32(r1);
-> +    tcg_temp_free_i32(r3);
->      return NO_EXIT;
->  }
+On 18 September 2017 at 20:50, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
+> Needed to support latest Linux kernel driver which relies on that
+> functionality.
+>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: qemu-devel@nongnu.org
+> Cc: qemu-arm@nongnu.org
+> Cc: yurovsky@gmail.com
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> ---
+>  hw/net/imx_fec.c         | 23 +++++++++++++++++++++++
+>  include/hw/net/imx_fec.h |  2 ++
+>  2 files changed, 25 insertions(+)
+>
+> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+> index 8a77136d38..bd62d7a75f 100644
+> --- a/hw/net/imx_fec.c
+> +++ b/hw/net/imx_fec.c
+> @@ -1037,6 +1037,7 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+>      uint32_t buf_addr;
+>      unsigned int buf_len;
+>      size_t size = len;
+> +    bool shift16 = s->regs[ENET_RACC] & ENET_RACC_SHIFT16;
+>
+>      FEC_PRINTF("len %d\n", (int)size);
+>
+> @@ -1049,6 +1050,10 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+>      /* 4 bytes for the CRC.  */
+>      size += 4;
+>
+> +    if (shift16) {
+> +        size += 2;
+> +    }
+> +
+>      /* Huge frames are truncted.  */
+>      if (size > s->regs[ENET_FTRL]) {
+>          size = s->regs[ENET_FTRL];
+> @@ -1085,6 +1090,24 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+>              buf_len += size - 4;
+>          }
+>          buf_addr = bd.data;
+> +
+> +        if (shift16) {
+> +            /*
+> +             * If SHIFT16 bit of ENETx_RACC register is set we need to
+> +             * align the payload to 4-byte boundary.
+> +             */
+> +            const uint8_t zeros[2] = { 0 };
+> +
+> +            dma_memory_write(&address_space_memory, buf_addr,
+> +                             zeros, sizeof(zeros));
+> +
+> +            buf_addr += sizeof(zeros);
+> +            buf_len  -= sizeof(zeros);
+> +
+> +            shift16 = false; /* We only do this once per Ethernet
+> +                              * frame */
+> +        }
+> +
 
-You want to change insn-data.def as well.
+Can you avoid having an end-of-source-line comment that wraps
+to multiple lines, please? (put it on a line of its own, or
+edit down to fit.) Otherwise
 
--    C(0xae00, SIGP,    RS_a,  Z,   r3_o, a2, 0, 0, sigp, 0)
-+    C(0xae00, SIGP,    RS_a,  Z,   0, a2, 0, 0, sigp, 0)
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Otherwise,
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
+thanks
+-- PMM
