@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e0TWk-0000GR-NX
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 10:23:00 -0400
+	(envelope-from <prvs=44560dde8=Ian.Jackson@citrix.com>)
+	id 1e0TY1-0000u6-9d
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 10:24:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e0TWj-0006mS-Ep
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 10:22:58 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:46576)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e0TWj-0006l1-3x
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 10:22:57 -0400
-Received: by mail-wm0-x230.google.com with SMTP id m72so7952682wmc.1
-	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 07:22:56 -0700 (PDT)
+	(envelope-from <prvs=44560dde8=Ian.Jackson@citrix.com>)
+	id 1e0TXx-0008A0-AI
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 10:24:17 -0400
+Received: from smtp02.citrix.com ([66.165.176.63]:55396)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=44560dde8=Ian.Jackson@citrix.com>)
+	id 1e0TXx-00088z-4m
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 10:24:13 -0400
+From: Ian Jackson <ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <20170918195100.17593-14-andrew.smirnov@gmail.com>
-References: <20170918195100.17593-1-andrew.smirnov@gmail.com>
-	<20170918195100.17593-14-andrew.smirnov@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Oct 2017 15:22:35 +0100
-Message-ID: <CAFEAcA-WWzrcRHQZK4oXxz30hcOMuRpr+om7r=+reg7OysX3hA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 13/17] i.MX: Add code to emulate i.MX2
- watchdog IP block
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Message-ID: <22999.37385.529283.864427@mariner.uk.xensource.com>
+Date: Fri, 6 Oct 2017 15:24:09 +0100
+In-Reply-To: <CAFEAcA-xTX8sL-ybzTs0p68B522ME=ckLo6NL=A1WV8N8bSwoQ@mail.gmail.com>
+References: <1507133891-26013-1-git-send-email-ian.jackson@eu.citrix.com>
+	<1507133891-26013-8-git-send-email-ian.jackson@eu.citrix.com>
+	<CAFEAcA-xTX8sL-ybzTs0p68B522ME=ckLo6NL=A1WV8N8bSwoQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 7/8] os-posix: Provide new -runasid option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,176 +31,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Smirnov <andrew.smirnov@gmail.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, "open list:X86" <xen-devel@lists.xenproject.org>, xen-devel@nongnu.org
 
-On 18 September 2017 at 20:50, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
-> Add enough code to emulate i.MX2 watchdog IP block so it would be
-> possible to reboot the machine running Linux Guest.
->
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: qemu-devel@nongnu.org
-> Cc: qemu-arm@nongnu.org
-> Cc: yurovsky@gmail.com
-> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
-> ---
->  hw/misc/Makefile.objs      |   1 +
->  hw/misc/imx2_wdt.c         | 117 +++++++++++++++++++++++++++++++++++++++++++++
->  include/hw/misc/imx2_wdt.h |  36 ++++++++++++++
->  3 files changed, 154 insertions(+)
->  create mode 100644 hw/misc/imx2_wdt.c
->  create mode 100644 include/hw/misc/imx2_wdt.h
->
-> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-> index ac1be05a03..c393a93456 100644
-> --- a/hw/misc/Makefile.objs
-> +++ b/hw/misc/Makefile.objs
-> @@ -35,6 +35,7 @@ obj-$(CONFIG_IMX) += imx25_ccm.o
->  obj-$(CONFIG_IMX) += imx6_ccm.o
->  obj-$(CONFIG_IMX) += imx6_src.o
->  obj-$(CONFIG_IMX) += imx7_ccm.o
-> +obj-$(CONFIG_IMX) += imx2_wdt.o
->  obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
->  obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
->  obj-$(CONFIG_MAINSTONE) += mst_fpga.o
-> diff --git a/hw/misc/imx2_wdt.c b/hw/misc/imx2_wdt.c
-> new file mode 100644
-> index 0000000000..9d97a19511
-> --- /dev/null
-> +++ b/hw/misc/imx2_wdt.c
-> @@ -0,0 +1,117 @@
-> +/*
-> + * Copyright (c) 2017, Impinj, Inc.
-> + *
-> + * i.MX2 Watchdog IP block
-> + *
-> + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "qemu-common.h"
-> +#include "hw/hw.h"
-> +#include "exec/memory.h"
-> +#include "exec/address-spaces.h"
-> +#include "hw/sysbus.h"
-> +#include "qemu/log.h"
-> +#include "qemu/timer.h"
-> +#include "sysemu/sysemu.h"
-> +#include "sysemu/watchdog.h"
-> +#include "qemu/error-report.h"
-> +#include "qemu/sizes.h"
+Peter Maydell writes ("Re: [Qemu-devel] [PATCH 7/8] os-posix: Provide new -runasid option"):
+> On 4 October 2017 at 17:18, Ian Jackson <ian.jackson@eu.citrix.com> wrote:
+> >  static void change_process_uid(void)
+> >  {
+> > -    if (user_pwd) {
+> > -        if (setgid(user_pwd->pw_gid) < 0) {
+> > +    if (user_pwd || user_uid != (uid_t)-1) {
+> > +        if (setgid(user_pwd ? user_pwd->pw_gid : user_gid) < 0) {
+> >              fprintf(stderr, "Failed to setgid(%d)\n", user_pwd->pw_gid);
+> 
+> If you're changing the gid we pass to setgid() I think you should
+> also change the value we tell the user we tried to use in the
+> error message, or it could be rather confusing.
 
-That's an awful lot of includes for a very simple device. Are
-you sure they're all needed?
+Thanks for the review.  Sorry about the mess here.  I have fixed all
+these problems.
 
-> +
-> +#include "hw/misc/imx2_wdt.h"
-> +
-> +
-> +#define IMX2_WDT_WCR_WDA       BIT(5)          /* -> External Reset WDOG_B */
-> +#define IMX2_WDT_WCR_SRS       BIT(4)          /* -> Software Reset Signal */
-> +
-> +static uint64_t imx2_wdt_read(void *opaque, hwaddr addr,
-> +                              unsigned int size)
-> +{
-> +    IMX2WdtState *s = opaque;
-> +    const size_t index = addr / sizeof(s->reg[0]);
-> +
-> +    if (index < ARRAY_SIZE(s->reg))
-> +        return s->reg[index];
-> +    else
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: Bad offset 0x%"HWADDR_PRIx"\n", __func__, addr);
-> +
-> +    return 0xDEADBEEF;
-> +}
-> +
-> +static void imx2_wdt_write(void *opaque, hwaddr addr,
-> +                           uint64_t val64, unsigned int size)
-> +{
-> +    uint16_t value  = val64;
-> +    IMX2WdtState *s = opaque;
-> +    const size_t index = addr / sizeof(s->reg[0]);
-> +
-> +    switch (index) {
-> +    case IMX2_WDT_WCR:
-> +        if (value & (IMX2_WDT_WCR_WDA | IMX2_WDT_WCR_SRS))
-> +            watchdog_perform_action();
-
-Missing "break"?
-
-Also checkpatch should tell you you need more braces.
-
-> +    default:
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: Bad offset 0x%"HWADDR_PRIx"\n", __func__, addr);
-> +    }
-> +}
-> +
-> +static const MemoryRegionOps imx2_wdt_ops = {
-> +    .read  = imx2_wdt_read,
-> +    .write = imx2_wdt_write,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .valid = {
-> +        /*
-> +         * Our device would not work correctly if the guest was doing
-> +         * unaligned access. This might not be a limitation on the real
-> +         * device but in practice there is no reason for a guest to access
-> +         * this device unaligned.
-> +         */
-
-This sounds like it's perhaps a job for .impl.unaligned
-rather than .valid.unaligned ?
-
-> +        .min_access_size = 4,
-> +        .max_access_size = 4,
-> +        .unaligned = false,
-> +    },
-> +};
-> +
-> +static void imx2_wdt_realize(DeviceState *dev, Error **errp)
-> +{
-> +    IMX2WdtState *s = IMX2_WDT(dev);
-> +
-> +    memory_region_init_io(&s->mmio, OBJECT(dev),
-> +                          &imx2_wdt_ops, s,
-> +                          TYPE_IMX2_WDT".mmio", SZ_64K);
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
-> +}
-> +
-> +static void imx2_wdt_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->realize = imx2_wdt_realize;
-> +
-> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-> +}
-> +
-> +static const TypeInfo imx2_wdt_info = {
-> +    .name          = TYPE_IMX2_WDT,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(IMX2WdtState),
-> +    .class_init    = imx2_wdt_class_init,
-> +};
-
-This device needs a reset function and vmstate description.
-
-> +
-> +static WatchdogTimerModel model = {
-> +    .wdt_name = "imx2-watchdog",
-> +    .wdt_description = "i.MX2 Watchdog",
-> +};
-> +
-> +static void imx2_wdt_register_type(void)
-> +{
-> +    watchdog_add_model(&model);
-> +    type_register_static(&imx2_wdt_info);
-> +}
-
-thanks
--- PMM
+Ian.
