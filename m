@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e0RmM-0001Ty-GG
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:30:59 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1e0RnW-00023Z-Ml
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:32:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e0RmG-0008A8-9A
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:30:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44150)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e0RmG-000890-2X
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:30:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e0RmE-0002mO-0y
-	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 12:30:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 057F32E80D4
-	for <qemu-devel@nongnu.org>; Fri,  6 Oct 2017 12:30:50 +0000 (UTC)
+	(envelope-from <pbonzini@redhat.com>) id 1e0RnR-0000uz-Qg
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:32:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50016)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e0RnR-0000tB-Hv
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:32:05 -0400
+References: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
+	<150706931752.3830.12126799989731308076@sif>
+	<20171006102329.GN10961@umbus.fritz.box>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9edef8ed-9231-32de-ace5-790ee9de960b@redhat.com>
+Date: Fri, 6 Oct 2017 14:31:35 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 06 Oct 2017 12:25:21 -0000
-From: Greg Kurz <groug@kaod.org>
-Reply-To: Bug 1721744 <1721744@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150728578413.796.15373444520066064008.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150729272263.1064.6082291608581828657.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1721744] Re: Help content missing for newly added
- machine properties
+In-Reply-To: <20171006102329.GN10961@umbus.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Cc8sLupTVXIKhKXv8srUTi3DT6eKBpBCf"
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/3] qdev/vfio: defer DEVICE_DEL
+ to avoid races with libvirt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,91 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, groug@kaod.org, armbru@redhat.com, alex.williamson@redhat.com
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Cc8sLupTVXIKhKXv8srUTi3DT6eKBpBCf
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, groug@kaod.org,
+ armbru@redhat.com, alex.williamson@redhat.com
+Message-ID: <9edef8ed-9231-32de-ace5-790ee9de960b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/3] qdev/vfio: defer DEVICE_DEL to
+ avoid races with libvirt
+References: <1501119055-4060-1-git-send-email-mdroth@linux.vnet.ibm.com>
+ <150706931752.3830.12126799989731308076@sif>
+ <20171006102329.GN10961@umbus.fritz.box>
+In-Reply-To: <20171006102329.GN10961@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 06/10/2017 12:23, David Gibson wrote:
+> On Tue, Oct 03, 2017 at 05:21:57PM -0500, Michael Roth wrote:
+>> Patch 1/3 is also needed for another series that Greg is working on
+>> and I don't want to hold that up for this series, so if it's
+>> preferred that we just post that patch separately in the meantime
+>> please let me know.
+>=20
+> Yeah, now that I've understood the issue properly, I also think this
+> is a good idea.  I recommend reposting.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1721744
+Yes, please do!
 
-Title:
-  Help content missing for newly added machine properties
+Thanks,
 
-Status in QEMU:
-  Invalid
-
-Bug description:
-  =
-
-  Help content missing for newly added machine properties, it would be need=
-ed by libvirt and other management layers to query to add support, Thanks.
-
-  max-cpu-compat,vsmt,modern-hotplug-events,resize-hpt
-
-  Steps:
-  1. Compile qemu @below commit
-  2. ./ppc64-softmmu/qemu-system-ppc64 -h
-  ....
-  -machine [type=3D]name[,prop[=3Dvalue][,...]]
-                  selects emulated machine ('-machine help' for list)
-                  property accel=3Daccel1[:accel2[:...]] selects accelerator
-                  supported accelerators are kvm, xen, hax or tcg (default:=
- tcg)
-                  kernel_irqchip=3Don|off|split controls accelerated irqchi=
-p support (default=3Doff)
-                  vmport=3Don|off|auto controls emulation of vmport (defaul=
-t: auto)
-                  kvm_shadow_mem=3Dsize of KVM shadow MMU in bytes
-                  dump-guest-core=3Don|off include guest memory in a core d=
-ump (default=3Don)
-                  mem-merge=3Don|off controls memory merge support (default=
-: on)
-                  igd-passthru=3Don|off controls IGD GFX passthrough suppor=
-t (default=3Doff)
-                  aes-key-wrap=3Don|off controls support for AES key wrappi=
-ng (default=3Don)
-                  dea-key-wrap=3Don|off controls support for DEA key wrappi=
-ng (default=3Don)
-                  suppress-vmdesc=3Don|off disables self-describing migrati=
-on (default=3Doff)
-                  nvdimm=3Don|off controls NVDIMM support (default=3Doff)
-                  enforce-config-section=3Don|off enforce configuration sec=
-tion migration (default=3Doff)
-                  s390-squash-mcss=3Don|off controls support for squashing =
-into default css (default=3Doff)
-  ....
-
-  =3D=3D=3D> Not showing help of mentioned properties.
+Paolo
 
 
-  Verified at todays below commit
-  #git show
-  commit d8f932cc696250cb740240d668b39df5fbb2d5a0
-  Merge: 67caeea 4504273
-  Author: Peter Maydell <peter.maydell@linaro.org>
-  Date:   Thu Oct 5 16:54:29 2017 +0100
+--Cc8sLupTVXIKhKXv8srUTi3DT6eKBpBCf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-      Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-requ=
-est' into staging
-      =
+-----BEGIN PGP SIGNATURE-----
 
-      # gpg: Signature made Thu 05 Oct 2017 15:25:21 BST
-      # gpg:                using RSA key 0x9CA4ABB381AB73C8
-      # gpg: Good signature from "Stefan Hajnoczi <stefanha@redhat.com>"
-      # gpg:                 aka "Stefan Hajnoczi <stefanha@gmail.com>"
-      # Primary key fingerprint: 8695 A8BF D3F9 7CDA AC35  775A 9CA4 ABB3 8=
-1AB 73C8
-      =
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlnXd6cACgkQv/vSX3jH
+roNc9Af/cwz/UxUjJvpZUcOS4P7qKQt+thbbmio4TEpRyUCrYThM/FZQrCjUNOt/
+p3HY1c28bJVbZztAWAXhlyrZ3sKVccjZY/skahBfbYqYDnwmdBoMixcIIS1mKiZr
+EimCpGiqIbXla4kUYeqXFQErD992omeWgtDBKdxlOjniIrEOw8zeTHeHaLmCJ3Tm
+1TJZBd8W/L1zjlAfdhofHxAoBduUb4T9YDmfuKo99YfsQ+2zBO2qPs5ctaHGdDr8
+am3FMdLHN68IK3s6k+PwQJtsWNyP/QV+Q9joTGYZu5+XZPId2VJm4S8JwRO9GyqP
+eZ0gxM9zv6du2KVh7EaMwu2mfG/pZA==
+=ab85
+-----END PGP SIGNATURE-----
 
-      * remotes/stefanha/tags/tracing-pull-request:
-        checkpatch: fix incompatibility with old perl
-      =
-
-      Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1721744/+subscriptions
+--Cc8sLupTVXIKhKXv8srUTi3DT6eKBpBCf--
