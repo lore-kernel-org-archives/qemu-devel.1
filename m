@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <swetheendra.t@gmail.com>) id 1e0Wb2-0001nv-54
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 13:39:37 -0400
+	(envelope-from <cota@braap.org>) id 1e0WuM-0004Ny-4g
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 13:59:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <swetheendra.t@gmail.com>) id 1e0Wb1-0008Ih-Cj
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 13:39:36 -0400
-Received: from mail-qt0-x22b.google.com ([2607:f8b0:400d:c0d::22b]:46326)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <swetheendra.t@gmail.com>)
-	id 1e0Wb1-0008Hz-7I
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 13:39:35 -0400
-Received: by mail-qt0-x22b.google.com with SMTP id 6so23702510qtw.3
-	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 10:39:35 -0700 (PDT)
+	(envelope-from <cota@braap.org>) id 1e0WuJ-0003Gn-3w
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 13:59:34 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:36437)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1e0WuI-0003GV-UF
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 13:59:31 -0400
+Date: Fri, 6 Oct 2017 13:59:29 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20171006175929.GA28281@flamenco>
+References: <87d16o53xr.fsf@frigg.lan>
+	<CAFEAcA9FhXKVKe1E_pVDWX3u0W7WuKQmO54Z1Jgj-iL980yPew@mail.gmail.com>
+	<87o9pywt8k.fsf@frigg.lan> <87shf5zlty.fsf@frigg.lan>
+	<20170929175943.GA25038@flamenco> <87vak1w53a.fsf@frigg.lan>
+	<20170930180941.GA22048@flamenco> <8760bu333n.fsf@frigg.lan>
+	<20171005005043.GA20425@flamenco> <87vajsl3h7.fsf@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <CAMSFjdgsAUNknNRvBWWt1HBSmWiKOY+iz7+o4dc5gwS3FCs9wg@mail.gmail.com>
-References: <CAMSFjdhUGDQd9sGTFGeP31BCBqoN-tZyO7bmyj63wBfV5d1tBg@mail.gmail.com>
-	<CAMSFjdi01EzUmy=JYeOkvqK8JUHQ2wM99GSr2Jx1Nf-AbkUgnw@mail.gmail.com>
-	<20171006162838.GD4325@localhost.localdomain>
-	<CAMSFjdgsAUNknNRvBWWt1HBSmWiKOY+iz7+o4dc5gwS3FCs9wg@mail.gmail.com>
-From: Swetheendra Tallamraju <swetheendra.t@gmail.com>
-Date: Fri, 6 Oct 2017 13:39:34 -0400
-Message-ID: <CAMSFjdhQJ8X_sk-R8rvYN9_DOx8Egw9k0ZY5dW3KyiqxfZg2FA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Qemu Documentation
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87vajsl3h7.fsf@frigg.lan>
+Subject: Re: [Qemu-devel] [PATCH v6 01/22] instrument: Add documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +32,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Infact emulation of virtual USB already exists. I want to add functionality
-of booting from USB. Can you refer which source files to llok on and
-modify.
+On Fri, Oct 06, 2017 at 18:07:16 +0300, Lluís Vilanova wrote:
+> Emilio G Cota writes:
+> > On Thu, Oct 05, 2017 at 02:28:12 +0300, Lluís Vilanova wrote:
+> >> The API takes care of telling you if the access could be performed
+> >> successfully. If you access the instruction's memory representation at
+> >> translation time, it should be able to perform the access, since QEMU's
+> >> translation loop just had to do so in order to access that instruction (I should
+> >> check what happens in the corner case where another guest CPU changes the page
+> >> table, since I'm not sure if the address translation functions I'm using in QEMU
+> >> will use the per-vCPU TLB cache or always traverse the page table).
+> 
+> > That was my concern, I'd rather just perform the read once, that is, the read(s)
+> > done by ops->insn_translate.
+> 
+> If your concern is on performance, that should not be an issue, since you'd be
+> using the memory peek functions at translation-time. Furthermore, since others
+> suggested having memory peek anyway, that's a nicer way (to me) to compose APIs
+> (and is less complex to implement).
 
-On Fri, Oct 6, 2017 at 1:01 PM, Swetheendra Tallamraju <
-swetheendra.t@gmail.com> wrote:
+My concern was the same as yours, correctness -- what happens if something
+changes between the two reads? Because the two reads should always return
+the same thing.
 
-> I want to write a new virtual USB code and boot from USB by attaching at
-> command line. This functionality exists for hard drive CDROM network
-> devices but not for USB right. If it exists can you please tell me
-> directory path for code ?
->
-> On Oct 6, 2017 12:28 PM, "Kevin Wolf" <kwolf@redhat.com> wrote:
->
->> Am 05.10.2017 um 23:56 hat Swetheendra Tallamraju geschrieben:
->> > I want yo add extra functionality of booting from virtual USB through
->> qemu.
->> > I need to write a new block of code in /hw/USB to emulate virtual USB. I
->> > don't have any clue of how to procced. Code documentation of other
->> devices
->> > like hub network would help us understanding and implementing usb
->>
->> QEMU already has support for emulating USB devices. What is it
->> specifically that the existing code doesn't provide and you want to add?
->>
->> Kevin
->>
->> > On Thu, Oct 5, 2017 at 12:03 AM, Swetheendra Tallamraju <
->> > swetheendra.t@gmail.com> wrote:
->> >
->> > > I am working on qemu source code to provide extra functionality of
->> > > emulating virtual usb. Can I get any  documentation for the qemu
->> source
->> > > code that helps me in implementing this?
->> > >
->>
->
+> > I see. I implemented what I suggested above, i.e. tb_trans_cb
+> > (i.e. post_trans) passes an opaque descriptor of the TB (which can
+> > be iterated over insn by insn) and the return value (void *) of this
+> > cb will be passed by tb_exec_cb (i.e. pre_exec).  Perf-wise this
+> > is pretty OK, turns out even if we don't end up caring about the
+> > TB, the additional per-TB helper (which might not end up calling
+> > a callback) does not introduce significant overhead at execution time.
+> 
+> So you build this structure after translating the whole TB, and the user can
+> iterate it to check the translated instructions. This is closer to other
+> existing tools: you iterate the structure and then decide which/how to
+> instrument instructions, memory accesses, etc within it.
+
+Correct. I suspect they went with this design because it makes sense to
+do this preprocessing once, instead of having each plugin do it
+themselves. I'm not sure how much we should care about supporting multiple
+plugins, but the impression I get from DynamoRIO is that it seems important
+to users.
+
+> My only concern is that this is much more complex than the simpler API I propose
+> (you must build the informational structures, generate calls to every possible
+> instrumentation call, which will be optimized-out by TCG if the user decides not
+> to use them, and overall pay in performance for any unused functionality),
+> whereas your approach can be implemented on top of it.
+
+It's pretty simple; tr_ops->translate_insn has to copy each insn.
+For instance, on aarch64 (disas_a64 is called from tr_translate_insn):
+
+-static void disas_a64_insn(CPUARMState *env, DisasContext *s)
++static void disas_a64_insn(CPUARMState *env, DisasContext *s, struct qemu_plugin_insn *q_insn)
+ {
+     uint32_t insn;
+
+     insn = arm_ldl_code(env, s->pc, s->sctlr_b);
++    if (q_insn) {
++        qemu_plugin_insn_append(q_insn, &insn, sizeof(insn));
++    }
+
+It takes some memory though (we duplicate the guest code), but perf-wise this
+isn't a big deal (an empty callback on every TB execution incurs only a 10-15%
+perf slowdown).
+
+I don't understand the part where you say that the instrumentation call can
+be optimized out. Is there a special value of a "TCG promise" (at tb_trans_post
+time) that removes the previously generated callback (at tb_trans_pre time)?
+Otherwise I don't see how selective TB instrumentation can work at tb_trans_pre
+time.
+
+Thanks,
+
+		E.
