@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e0PR7-0005za-Te
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:00:57 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e0PRB-00062G-86
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e0PR0-0007dX-2e
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:00:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39800)
+	(envelope-from <cohuck@redhat.com>) id 1e0PRA-0007lB-6M
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:00:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41860)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e0PQz-0007cw-QY
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:00:46 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e0PR9-0007kV-W7
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:00:56 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri,  6 Oct 2017 11:59:33 +0200
-Message-Id: <20171006095956.27534-11-cohuck@redhat.com>
+Date: Fri,  6 Oct 2017 11:59:37 +0200
+Message-Id: <20171006095956.27534-15-cohuck@redhat.com>
 In-Reply-To: <20171006095956.27534-1-cohuck@redhat.com>
 References: <20171006095956.27534-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 10/33] s390x/css: support ccw IDA
+Subject: [Qemu-devel] [PULL 14/33] s390x/tcg: make stora(g) use the new
+ _real mmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,153 +25,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
+From: David Hildenbrand <david@redhat.com>
 
-Let's add indirect data addressing support for our virtual channel
-subsystem. This implementation does not bother with any kind of
-prefetching. We simply step through the IDAL on demand.
+As we properly handle the return address now, we can drop
+potential_page_fault().
 
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Message-Id: <20170921180841.24490-6-pasic@linux.vnet.ibm.com>
-Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20170926183318.12995-5-david@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/s390x/css.c | 114 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 113 insertions(+), 1 deletion(-)
+ target/s390x/mem_helper.c | 8 ++------
+ target/s390x/translate.c  | 2 --
+ 2 files changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index ab7333fde8..35683d7954 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -831,6 +831,118 @@ incr:
-     return 0;
- }
- 
-+/* returns values between 1 and bsz, where bsz is a power of 2 */
-+static inline uint16_t ida_continuous_left(hwaddr cda, uint64_t bsz)
-+{
-+    return bsz - (cda & (bsz - 1));
-+}
-+
-+static inline uint64_t ccw_ida_block_size(uint8_t flags)
-+{
-+    if ((flags & CDS_F_C64) && !(flags & CDS_F_I2K)) {
-+        return 1ULL << 12;
-+    }
-+    return 1ULL << 11;
-+}
-+
-+static inline int ida_read_next_idaw(CcwDataStream *cds)
-+{
-+    union {uint64_t fmt2; uint32_t fmt1; } idaw;
-+    int ret;
-+    hwaddr idaw_addr;
-+    bool idaw_fmt2 = cds->flags & CDS_F_C64;
-+    bool ccw_fmt1 = cds->flags & CDS_F_FMT;
-+
-+    if (idaw_fmt2) {
-+        idaw_addr = cds->cda_orig + sizeof(idaw.fmt2) * cds->at_idaw;
-+        if (idaw_addr & 0x07 || !cds_ccw_addrs_ok(idaw_addr, 0, ccw_fmt1)) {
-+            return -EINVAL; /* channel program check */
-+        }
-+        ret = address_space_rw(&address_space_memory, idaw_addr,
-+                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt2,
-+                               sizeof(idaw.fmt2), false);
-+        cds->cda = be64_to_cpu(idaw.fmt2);
-+    } else {
-+        idaw_addr = cds->cda_orig + sizeof(idaw.fmt1) * cds->at_idaw;
-+        if (idaw_addr & 0x03 || !cds_ccw_addrs_ok(idaw_addr, 0, ccw_fmt1)) {
-+            return -EINVAL; /* channel program check */
-+        }
-+        ret = address_space_rw(&address_space_memory, idaw_addr,
-+                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt1,
-+                               sizeof(idaw.fmt1), false);
-+        cds->cda = be64_to_cpu(idaw.fmt1);
-+        if (cds->cda & 0x80000000) {
-+            return -EINVAL; /* channel program check */
-+        }
-+    }
-+    ++(cds->at_idaw);
-+    if (ret != MEMTX_OK) {
-+        /* assume inaccessible address */
-+        return -EINVAL; /* channel program check */
-+    }
-+    return 0;
-+}
-+
-+static int ccw_dstream_rw_ida(CcwDataStream *cds, void *buff, int len,
-+                              CcwDataStreamOp op)
-+{
-+    uint64_t bsz = ccw_ida_block_size(cds->flags);
-+    int ret = 0;
-+    uint16_t cont_left, iter_len;
-+
-+    ret = cds_check_len(cds, len);
-+    if (ret <= 0) {
-+        return ret;
-+    }
-+    if (!cds->at_idaw) {
-+        /* read first idaw */
-+        ret = ida_read_next_idaw(cds);
-+        if (ret) {
-+            goto err;
-+        }
-+        cont_left = ida_continuous_left(cds->cda, bsz);
-+    } else {
-+        cont_left = ida_continuous_left(cds->cda, bsz);
-+        if (cont_left == bsz) {
-+            ret = ida_read_next_idaw(cds);
-+            if (ret) {
-+                goto err;
-+            }
-+            if (cds->cda & (bsz - 1)) {
-+                ret = -EINVAL; /* channel program check */
-+                goto err;
-+            }
-+        }
-+    }
-+    do {
-+        iter_len = MIN(len, cont_left);
-+        if (op != CDS_OP_A) {
-+            ret = address_space_rw(&address_space_memory, cds->cda,
-+                                   MEMTXATTRS_UNSPECIFIED, buff, iter_len, op);
-+            if (ret != MEMTX_OK) {
-+                /* assume inaccessible address */
-+                ret = -EINVAL; /* channel program check */
-+                goto err;
-+            }
-+        }
-+        cds->at_byte += iter_len;
-+        cds->cda += iter_len;
-+        len -= iter_len;
-+        if (!len) {
-+            break;
-+        }
-+        ret = ida_read_next_idaw(cds);
-+        if (ret) {
-+            goto err;
-+        }
-+        cont_left = bsz;
-+    } while (true);
-+    return ret;
-+err:
-+    cds->flags |= CDS_F_STREAM_BROKEN;
-+    return ret;
-+}
-+
- void ccw_dstream_init(CcwDataStream *cds, CCW1 const *ccw, ORB const *orb)
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index bc50bc0686..b4f2779428 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -1970,9 +1970,7 @@ uint64_t HELPER(lurag)(CPUS390XState *env, uint64_t addr)
+ /* store using real address */
+ void HELPER(stura)(CPUS390XState *env, uint64_t addr, uint64_t v1)
  {
-     /*
-@@ -849,7 +961,7 @@ void ccw_dstream_init(CcwDataStream *cds, CCW1 const *ccw, ORB const *orb)
-     if (!(cds->flags & CDS_F_IDA)) {
-         cds->op_handler = ccw_dstream_rw_noflags;
-     } else {
--        assert(false);
-+        cds->op_handler = ccw_dstream_rw_ida;
-     }
- }
+-    CPUState *cs = CPU(s390_env_get_cpu(env));
+-
+-    stl_phys(cs->as, wrap_address(env, addr), (uint32_t)v1);
++    cpu_stl_real_ra(env, wrap_address(env, addr), (uint32_t)v1, GETPC());
  
+     if ((env->psw.mask & PSW_MASK_PER) &&
+         (env->cregs[9] & PER_CR9_EVENT_STORE) &&
+@@ -1985,9 +1983,7 @@ void HELPER(stura)(CPUS390XState *env, uint64_t addr, uint64_t v1)
+ 
+ void HELPER(sturg)(CPUS390XState *env, uint64_t addr, uint64_t v1)
+ {
+-    CPUState *cs = CPU(s390_env_get_cpu(env));
+-
+-    stq_phys(cs->as, wrap_address(env, addr), v1);
++    cpu_stq_real_ra(env, wrap_address(env, addr), v1, GETPC());
+ 
+     if ((env->psw.mask & PSW_MASK_PER) &&
+         (env->cregs[9] & PER_CR9_EVENT_STORE) &&
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index f64a31760e..9ef95141f9 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -4126,7 +4126,6 @@ static ExitStatus op_stnosm(DisasContext *s, DisasOps *o)
+ static ExitStatus op_stura(DisasContext *s, DisasOps *o)
+ {
+     check_privileged(s);
+-    potential_page_fault(s);
+     gen_helper_stura(cpu_env, o->in2, o->in1);
+     return NO_EXIT;
+ }
+@@ -4134,7 +4133,6 @@ static ExitStatus op_stura(DisasContext *s, DisasOps *o)
+ static ExitStatus op_sturg(DisasContext *s, DisasOps *o)
+ {
+     check_privileged(s);
+-    potential_page_fault(s);
+     gen_helper_sturg(cpu_env, o->in2, o->in1);
+     return NO_EXIT;
+ }
 -- 
 2.13.6
