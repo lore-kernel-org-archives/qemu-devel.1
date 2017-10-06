@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=44560dde8=Ian.Jackson@citrix.com>)
-	id 1e0TRd-00071Z-Ih
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 10:17:42 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e0TWk-0000GR-NX
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 10:23:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=44560dde8=Ian.Jackson@citrix.com>)
-	id 1e0TRV-0000xk-Pw
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 10:17:41 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:11133)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=44560dde8=Ian.Jackson@citrix.com>)
-	id 1e0TRV-0000vC-IB
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 10:17:33 -0400
-From: Ian Jackson <ian.jackson@eu.citrix.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1e0TWj-0006mS-Ep
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 10:22:58 -0400
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:46576)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e0TWj-0006l1-3x
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 10:22:57 -0400
+Received: by mail-wm0-x230.google.com with SMTP id m72so7952682wmc.1
+	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 07:22:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Message-ID: <22999.36984.558631.191104@mariner.uk.xensource.com>
-Date: Fri, 6 Oct 2017 15:17:28 +0100
-In-Reply-To: <892cb484-361b-f1c1-c294-6b5d7b5e92fb@citrix.com>
-References: <1507133891-26013-1-git-send-email-ian.jackson@eu.citrix.com>
-	<892cb484-361b-f1c1-c294-6b5d7b5e92fb@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/*] xen: xen-domid-restrict improvements
+In-Reply-To: <20170918195100.17593-14-andrew.smirnov@gmail.com>
+References: <20170918195100.17593-1-andrew.smirnov@gmail.com>
+	<20170918195100.17593-14-andrew.smirnov@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Oct 2017 15:22:35 +0100
+Message-ID: <CAFEAcA-WWzrcRHQZK4oXxz30hcOMuRpr+om7r=+reg7OysX3hA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 13/17] i.MX: Add code to emulate i.MX2
+ watchdog IP block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +30,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ross Lagerwall <ross.lagerwall@citrix.com>
-Cc: Ian Jackson <ian.jackson@eu.citrix.com>, qemu-devel@nongnu.org, Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, Juergen Gross <jgross@suse.com>, Stefano  Stabellini <sstabellini@kernel.org>
+To: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-Ross Lagerwall writes ("Re: [PATCH v2 0/*] xen: xen-domid-restrict improvements"):
-> On 10/04/2017 05:18 PM, Ian Jackson wrote:
-> > However, there are changes to qemu needed.  In particular
-> > 
-> >   * The -xen-domid-restrict option does not work properly right now.
-> >     It only restricts a small subset of the descriptors qemu has open.
-> >     I am introducing a new library call in the Xen libraries for this,
-> >     xentoolcore_restrict_all.
-...
-> I'm testing your QEMU and Xen patch series and found that after being 
-> restricted, QEMU fails to setup up the VGA memory properly which causes 
-> a complete stall with stdvga. With cirrus it mostly works although it 
-> seems to have reduced performance.
+On 18 September 2017 at 20:50, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
+> Add enough code to emulate i.MX2 watchdog IP block so it would be
+> possible to reboot the machine running Linux Guest.
+>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: qemu-devel@nongnu.org
+> Cc: qemu-arm@nongnu.org
+> Cc: yurovsky@gmail.com
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> ---
+>  hw/misc/Makefile.objs      |   1 +
+>  hw/misc/imx2_wdt.c         | 117 +++++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/misc/imx2_wdt.h |  36 ++++++++++++++
+>  3 files changed, 154 insertions(+)
+>  create mode 100644 hw/misc/imx2_wdt.c
+>  create mode 100644 include/hw/misc/imx2_wdt.h
+>
+> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+> index ac1be05a03..c393a93456 100644
+> --- a/hw/misc/Makefile.objs
+> +++ b/hw/misc/Makefile.objs
+> @@ -35,6 +35,7 @@ obj-$(CONFIG_IMX) += imx25_ccm.o
+>  obj-$(CONFIG_IMX) += imx6_ccm.o
+>  obj-$(CONFIG_IMX) += imx6_src.o
+>  obj-$(CONFIG_IMX) += imx7_ccm.o
+> +obj-$(CONFIG_IMX) += imx2_wdt.o
+>  obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
+>  obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
+>  obj-$(CONFIG_MAINSTONE) += mst_fpga.o
+> diff --git a/hw/misc/imx2_wdt.c b/hw/misc/imx2_wdt.c
+> new file mode 100644
+> index 0000000000..9d97a19511
+> --- /dev/null
+> +++ b/hw/misc/imx2_wdt.c
+> @@ -0,0 +1,117 @@
+> +/*
+> + * Copyright (c) 2017, Impinj, Inc.
+> + *
+> + * i.MX2 Watchdog IP block
+> + *
+> + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "qemu-common.h"
+> +#include "hw/hw.h"
+> +#include "exec/memory.h"
+> +#include "exec/address-spaces.h"
+> +#include "hw/sysbus.h"
+> +#include "qemu/log.h"
+> +#include "qemu/timer.h"
+> +#include "sysemu/sysemu.h"
+> +#include "sysemu/watchdog.h"
+> +#include "qemu/error-report.h"
+> +#include "qemu/sizes.h"
 
-Thanks for your testing.
+That's an awful lot of includes for a very simple device. Are
+you sure they're all needed?
 
-I admit that I didn't look at the VGA console of my guest.  I'm using
-cirrus but my guest isn't using it very much.  I use the "serial"
-console instead.
+> +
+> +#include "hw/misc/imx2_wdt.h"
+> +
+> +
+> +#define IMX2_WDT_WCR_WDA       BIT(5)          /* -> External Reset WDOG_B */
+> +#define IMX2_WDT_WCR_SRS       BIT(4)          /* -> Software Reset Signal */
+> +
+> +static uint64_t imx2_wdt_read(void *opaque, hwaddr addr,
+> +                              unsigned int size)
+> +{
+> +    IMX2WdtState *s = opaque;
+> +    const size_t index = addr / sizeof(s->reg[0]);
+> +
+> +    if (index < ARRAY_SIZE(s->reg))
+> +        return s->reg[index];
+> +    else
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "%s: Bad offset 0x%"HWADDR_PRIx"\n", __func__, addr);
+> +
+> +    return 0xDEADBEEF;
+> +}
+> +
+> +static void imx2_wdt_write(void *opaque, hwaddr addr,
+> +                           uint64_t val64, unsigned int size)
+> +{
+> +    uint16_t value  = val64;
+> +    IMX2WdtState *s = opaque;
+> +    const size_t index = addr / sizeof(s->reg[0]);
+> +
+> +    switch (index) {
+> +    case IMX2_WDT_WCR:
+> +        if (value & (IMX2_WDT_WCR_WDA | IMX2_WDT_WCR_SRS))
+> +            watchdog_perform_action();
 
-> I think it happens when the VM sets up the BAR some time after 
-> xen_restrict() has been called. The failure comes from QEMU calling 
-> xc_domain_add_to_physmap() which calls do_memory_op() and finally 
-> xencall2(). But the underlying xencall fd has been replaced with /dev/null.
+Missing "break"?
 
-I think to fix this properly, we will need to add a dmop version of
-XENMEM_add_to_physmap.  I don't propose to try to do that for Xen
-4.10.  In the meantime I think this is good enough for "tech preview",
-and provides a base to work on.
+Also checkpatch should tell you you need more braces.
 
-> There is a caveat when using -xen-domid-restrict and -chroot at the same 
-> time. The restriction happens after chrooting, so the chroot directory 
-> has to contain a valid /dev/null. This is a bit annoying and prevents 
-> the chroot being on a "nodev" mount.
+> +    default:
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "%s: Bad offset 0x%"HWADDR_PRIx"\n", __func__, addr);
+> +    }
+> +}
+> +
+> +static const MemoryRegionOps imx2_wdt_ops = {
+> +    .read  = imx2_wdt_read,
+> +    .write = imx2_wdt_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +    .valid = {
+> +        /*
+> +         * Our device would not work correctly if the guest was doing
+> +         * unaligned access. This might not be a limitation on the real
+> +         * device but in practice there is no reason for a guest to access
+> +         * this device unaligned.
+> +         */
 
-How annoying.  I will fix the relevant qemu patch to do the Xen
-restrict before os_setup_post.
+This sounds like it's perhaps a job for .impl.unaligned
+rather than .valid.unaligned ?
 
-Ian.
+> +        .min_access_size = 4,
+> +        .max_access_size = 4,
+> +        .unaligned = false,
+> +    },
+> +};
+> +
+> +static void imx2_wdt_realize(DeviceState *dev, Error **errp)
+> +{
+> +    IMX2WdtState *s = IMX2_WDT(dev);
+> +
+> +    memory_region_init_io(&s->mmio, OBJECT(dev),
+> +                          &imx2_wdt_ops, s,
+> +                          TYPE_IMX2_WDT".mmio", SZ_64K);
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
+> +}
+> +
+> +static void imx2_wdt_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->realize = imx2_wdt_realize;
+> +
+> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> +}
+> +
+> +static const TypeInfo imx2_wdt_info = {
+> +    .name          = TYPE_IMX2_WDT,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(IMX2WdtState),
+> +    .class_init    = imx2_wdt_class_init,
+> +};
+
+This device needs a reset function and vmstate description.
+
+> +
+> +static WatchdogTimerModel model = {
+> +    .wdt_name = "imx2-watchdog",
+> +    .wdt_description = "i.MX2 Watchdog",
+> +};
+> +
+> +static void imx2_wdt_register_type(void)
+> +{
+> +    watchdog_add_model(&model);
+> +    type_register_static(&imx2_wdt_info);
+> +}
+
+thanks
+-- PMM
