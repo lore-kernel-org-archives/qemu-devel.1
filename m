@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53262)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=44560dde8=Ian.Jackson@citrix.com>)
-	id 1e0XLi-0002UQ-97
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 14:27:51 -0400
+	id 1e0XLh-0002RF-Ea
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 14:27:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=44560dde8=Ian.Jackson@citrix.com>)
-	id 1e0XLf-0002vb-4s
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 14:27:50 -0400
-Received: from smtp.citrix.com ([66.165.176.89]:29347)
+	id 1e0XLg-0002xB-8X
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 14:27:49 -0400
+Received: from smtp02.citrix.com ([66.165.176.63]:43624)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=44560dde8=Ian.Jackson@citrix.com>)
-	id 1e0XLe-0002uw-Vb
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 14:27:47 -0400
+	id 1e0XLf-0002rk-WA
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 14:27:48 -0400
 From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Fri, 6 Oct 2017 19:27:17 +0100
-Message-ID: <1507314444-30835-2-git-send-email-ian.jackson@eu.citrix.com>
+Date: Fri, 6 Oct 2017 19:27:22 +0100
+Message-ID: <1507314444-30835-7-git-send-email-ian.jackson@eu.citrix.com>
 In-Reply-To: <1507314444-30835-1-git-send-email-ian.jackson@eu.citrix.com>
 References: <1507314444-30835-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 1/8] xen: link against xentoolcore
+Subject: [Qemu-devel] [PATCH 6/8] xen: destroy_hvm_domain: Try
+ xendevicemodel_shutdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +30,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <Ian.Jackson@eu.citrix.com>
+Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-From: Anthony PERARD <anthony.perard@citrix.com>
+xc_interface_open etc. is not going to work if we have dropped
+privilege, but xendevicemodel_shutdown will if everything is new
+enough.
 
-Xen libraries 4.10 will include a new xentoolcore library, without
-which xendevicemodel et al will not work.
+xendevicemodel_shutdown is only availabe in Xen 4.10 and later, so
+provide a stub for earlier versions.
 
 Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
 ---
- configure | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+v2: Add compatibility stub for Xen < 4.10.
+    Fix coding style.
 
-diff --git a/configure b/configure
-index fd7e3a5..6f691df 100755
---- a/configure
-+++ b/configure
-@@ -2072,7 +2072,7 @@ if test "$xen" != "no" ; then
-       $($pkg_config --modversion xencontrol | sed 's/\./ /g') )"
-     xen=yes
-     xen_pc="xencontrol xenstore xenguest xenforeignmemory xengnttab"
--    xen_pc="$xen_pc xenevtchn xendevicemodel"
-+    xen_pc="$xen_pc xenevtchn xendevicemodel xentoolcore"
-     QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags $xen_pc)"
-     libs_softmmu="$($pkg_config --libs $xen_pc) $libs_softmmu"
-     LDFLAGS="$($pkg_config --libs $xen_pc) $LDFLAGS"
-@@ -2104,18 +2104,20 @@ EOF
-         cat > $TMPC <<EOF &&
- #undef XC_WANT_COMPAT_MAP_FOREIGN_API
- #include <xenforeignmemory.h>
-+#include <xentoolcore.h>
- int main(void) {
-   xenforeignmemory_handle *xfmem;
+Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
+---
+ hw/i386/xen/xen-hvm.c       | 10 ++++++++++
+ include/hw/xen/xen_common.h |  7 +++++++
+ 2 files changed, 17 insertions(+)
+
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index 83420cd..25b8b14 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -1386,9 +1386,19 @@ void destroy_hvm_domain(bool reboot)
+ {
+     xc_interface *xc_handle;
+     int sts;
++    int rc;
  
-   xfmem = xenforeignmemory_open(0, 0);
-   xenforeignmemory_map2(xfmem, 0, 0, 0, 0, 0, 0, 0);
-+  xentoolcore_restrict_all(0);
+     unsigned int reason = reboot ? SHUTDOWN_reboot : SHUTDOWN_poweroff;
  
-   return 0;
++    if (xen_dmod) {
++        rc = xendevicemodel_shutdown(xen_dmod, xen_domid, reason);
++        if (!rc) {
++            return;
++        }
++        perror("xendevicemodel_shutdown failed");
++        /* well, try the old thing then */
++    }
++
+     xc_handle = xc_interface_open(0, 0, 0);
+     if (xc_handle == NULL) {
+         fprintf(stderr, "Cannot acquire xenctrl handle\n");
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index 8efdb8a..1d6fb57 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -108,6 +108,13 @@ static inline int xentoolcore_restrict_all(domid_t domid)
+     return -1;
  }
- EOF
--        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs"
-+        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs -lxentoolcore"
-       then
--      xen_stable_libs="-lxendevicemodel $xen_stable_libs"
-+      xen_stable_libs="-lxendevicemodel $xen_stable_libs -lxentoolcore"
-       xen_ctrl_version=41000
-       xen=yes
-     elif
+ 
++static inline int xendevicemodel_shutdown(xendevicemodel_handle *dmod,
++                                          domid_t domid, unsigned int reason)
++{
++    errno = ENOTTY;
++    return -1;
++}
++
+ #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 41000 */
+ 
+ #include <xentoolcore.h>
 -- 
 2.1.4
