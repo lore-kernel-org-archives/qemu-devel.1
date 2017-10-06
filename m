@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e0P0E-000471-Vz
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 05:33:12 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e0P2y-0005Td-PZ
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 05:36:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e0P09-0006mL-Tp
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 05:33:07 -0400
-Date: Fri, 6 Oct 2017 11:32:58 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171006113258.6f350f59@nial.brq.redhat.com>
-In-Reply-To: <20171006084634.GA10961@umbus.fritz.box>
+	(envelope-from <dgibson@ozlabs.org>) id 1e0P2u-0000qY-PX
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 05:35:56 -0400
+Date: Fri, 6 Oct 2017 20:35:41 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171006093541.GJ10961@umbus.fritz.box>
 References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-	<1507220690-265042-23-git-send-email-imammedo@redhat.com>
-	<20171006084634.GA10961@umbus.fritz.box>
+	<1507220690-265042-18-git-send-email-imammedo@redhat.com>
+	<20171006050439.GV3260@umbus.fritz.box>
+	<20171006112005.11850a76@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 22/23] ppc: pnv: drop
- PnvChipClass::cpu_model field
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="6J7GEvtanOfV9oXA"
+Content-Disposition: inline
+In-Reply-To: <20171006112005.11850a76@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 17/23] ppc: spapr: use generic cpu_model
+ parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,171 +27,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?UTF-8?B?SGVy?= =?UTF-8?B?dsOp?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
 
-On Fri, 6 Oct 2017 19:46:34 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> On Thu, Oct 05, 2017 at 06:24:49PM +0200, Igor Mammedov wrote:
-> > deduce core type directly from chip type instead of
-> > maintaining type mapping in PnvChipClass::cpu_model.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> >  include/hw/ppc/pnv.h      |  1 -
-> >  include/hw/ppc/pnv_core.h |  1 -
-> >  hw/ppc/pnv.c              | 25 +++++++++++++------------
-> >  hw/ppc/pnv_core.c         |  5 -----
-> >  4 files changed, 13 insertions(+), 19 deletions(-)
-> > 
-> > diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> > index d82eee1..20244da 100644
-> > --- a/include/hw/ppc/pnv.h
-> > +++ b/include/hw/ppc/pnv.h
-> > @@ -69,7 +69,6 @@ typedef struct PnvChipClass {
-> >      SysBusDeviceClass parent_class;
-> >  
-> >      /*< public >*/
-> > -    const char *cpu_model;
-> >      PnvChipType  chip_type;
-> >      uint64_t     chip_cfam_id;
-> >      uint64_t     cores_mask;
-> > diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
-> > index a336a1f..e337af7 100644
-> > --- a/include/hw/ppc/pnv_core.h
-> > +++ b/include/hw/ppc/pnv_core.h
-> > @@ -46,6 +46,5 @@ typedef struct PnvCoreClass {
-> >  
-> >  #define PNV_CORE_TYPE_SUFFIX "-" TYPE_PNV_CORE
-> >  #define PNV_CORE_TYPE_NAME(cpu_model) cpu_model PNV_CORE_TYPE_SUFFIX
-> > -extern char *pnv_core_typename(const char *model);
-> >  
-> >  #endif /* _PPC_PNV_CORE_H */
-> > diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> > index 9c5eb7c..ab7083b 100644
-> > --- a/hw/ppc/pnv.c
-> > +++ b/hw/ppc/pnv.c
-> > @@ -55,6 +55,16 @@
-> >  #define KERNEL_LOAD_ADDR        0x20000000
-> >  #define INITRD_LOAD_ADDR        0x40000000
-> >  
-> > +static const char *pvn_chip_core_typename(const PnvChip *o)  
-> 
-> s/pvn/pnv/ again.
-copypast bites again :/,
-I'll fix it up on respin
+--6J7GEvtanOfV9oXA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> > +{
-> > +    const char *chip_type = object_class_get_name(object_get_class(OBJECT(o)));
-> > +    int len = strlen(chip_type) - strlen(PNV_CHIP_TYPE_SUFFIX);
-> > +    char *s = g_strdup_printf(PNV_CORE_TYPE_NAME("%.*s"), len, chip_type);
-> > +    const char *core_type = object_class_get_name(object_class_by_name(s));
-> > +    g_free(s);
-> > +    return core_type;
-> > +}
-> > +
-> >  /*
-> >   * On Power Systems E880 (POWER8), the max cpus (threads) should be :
-> >   *     4 * 4 sockets * 12 cores * 8 threads = 1536
-> > @@ -270,8 +280,7 @@ static int pnv_chip_lpc_offset(PnvChip *chip, void *fdt)
-> >  
-> >  static void powernv_populate_chip(PnvChip *chip, void *fdt)
-> >  {
-> > -    PnvChipClass *pcc = PNV_CHIP_GET_CLASS(chip);
-> > -    char *typename = pnv_core_typename(pcc->cpu_model);
-> > +    const char *typename = pvn_chip_core_typename(chip);
-> >      size_t typesize = object_type_get_instance_size(typename);
-> >      int i;
-> >  
-> > @@ -301,7 +310,6 @@ static void powernv_populate_chip(PnvChip *chip, void *fdt)
-> >          powernv_populate_memory_node(fdt, chip->chip_id, chip->ram_start,
-> >                                       chip->ram_size);
-> >      }
-> > -    g_free(typename);
-> >  }
-> >  
-> >  static void powernv_populate_rtc(ISADevice *d, void *fdt, int lpc_off)
-> > @@ -713,7 +721,6 @@ static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data)
-> >      DeviceClass *dc = DEVICE_CLASS(klass);
-> >      PnvChipClass *k = PNV_CHIP_CLASS(klass);
-> >  
-> > -    k->cpu_model = "power8e_v2.1";
-> >      k->chip_type = PNV_CHIP_POWER8E;
-> >      k->chip_cfam_id = 0x221ef04980000000ull;  /* P8 Murano DD2.1 */
-> >      k->cores_mask = POWER8E_CORE_MASK;
-> > @@ -735,7 +742,6 @@ static void pnv_chip_power8_class_init(ObjectClass *klass, void *data)
-> >      DeviceClass *dc = DEVICE_CLASS(klass);
-> >      PnvChipClass *k = PNV_CHIP_CLASS(klass);
-> >  
-> > -    k->cpu_model = "power8_v2.0";
-> >      k->chip_type = PNV_CHIP_POWER8;
-> >      k->chip_cfam_id = 0x220ea04980000000ull; /* P8 Venice DD2.0 */
-> >      k->cores_mask = POWER8_CORE_MASK;
-> > @@ -757,7 +763,6 @@ static void pnv_chip_power8nvl_class_init(ObjectClass *klass, void *data)
-> >      DeviceClass *dc = DEVICE_CLASS(klass);
-> >      PnvChipClass *k = PNV_CHIP_CLASS(klass);
-> >  
-> > -    k->cpu_model = "power8nvl_v1.0";
-> >      k->chip_type = PNV_CHIP_POWER8NVL;
-> >      k->chip_cfam_id = 0x120d304980000000ull;  /* P8 Naples DD1.0 */
-> >      k->cores_mask = POWER8_CORE_MASK;
-> > @@ -779,7 +784,6 @@ static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
-> >      DeviceClass *dc = DEVICE_CLASS(klass);
-> >      PnvChipClass *k = PNV_CHIP_CLASS(klass);
-> >  
-> > -    k->cpu_model = "power9_v1.0";
-> >      k->chip_type = PNV_CHIP_POWER9;
-> >      k->chip_cfam_id = 0x100d104980000000ull; /* P9 Nimbus DD1.0 */
-> >      k->cores_mask = POWER9_CORE_MASK;
-> > @@ -854,7 +858,7 @@ static void pnv_chip_init(Object *obj)
-> >  static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
-> >  {
-> >      PnvChipClass *pcc = PNV_CHIP_GET_CLASS(chip);
-> > -    char *typename = pnv_core_typename(pcc->cpu_model);
-> > +    const char *typename = pvn_chip_core_typename(chip);
-> >      size_t typesize = object_type_get_instance_size(typename);
-> >      int i, j;
-> >      char *name;
-> > @@ -879,8 +883,6 @@ static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
-> >              memory_region_add_subregion(&chip->icp_mmio, pir << 12, &icp->mmio);
-> >          }
-> >      }
-> > -
-> > -    g_free(typename);
-> >  }
-> >  
-> >  static void pnv_chip_realize(DeviceState *dev, Error **errp)
-> > @@ -888,7 +890,7 @@ static void pnv_chip_realize(DeviceState *dev, Error **errp)
-> >      PnvChip *chip = PNV_CHIP(dev);
-> >      Error *error = NULL;
-> >      PnvChipClass *pcc = PNV_CHIP_GET_CLASS(chip);
-> > -    char *typename = pnv_core_typename(pcc->cpu_model);
-> > +    const char *typename = pvn_chip_core_typename(chip);
-> >      size_t typesize = object_type_get_instance_size(typename);
-> >      int i, core_hwid;
-> >  
-> > @@ -947,7 +949,6 @@ static void pnv_chip_realize(DeviceState *dev, Error **errp)
-> >                                  &PNV_CORE(pnv_core)->xscom_regs);
-> >          i++;
-> >      }
-> > -    g_free(typename);
-> >  
-> >      /* Create LPC controller */
-> >      object_property_set_bool(OBJECT(&chip->lpc), true, "realized",
-> > diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> > index 000c87e..621b69e 100644
-> > --- a/hw/ppc/pnv_core.c
-> > +++ b/hw/ppc/pnv_core.c
-> > @@ -246,9 +246,4 @@ static const TypeInfo pnv_core_infos[] = {
-> >      DEFINE_PNV_CORE_TYPE("power9_v1.0"),
-> >  };
-> >  
-> > -char *pnv_core_typename(const char *model)
-> > -{
-> > -    return g_strdup_printf(PNV_CORE_TYPE_NAME("%s"), model);
-> > -}
-> > -
-> >  DEFINE_TYPES(pnv_core_infos)  
-> 
+On Fri, Oct 06, 2017 at 11:20:05AM +0200, Igor Mammedov wrote:
+> On Fri, 6 Oct 2017 16:04:39 +1100
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > On Thu, Oct 05, 2017 at 06:24:44PM +0200, Igor Mammedov wrote:
+> > > use generic cpu_model parsing introduced by
+> > >  (6063d4c0f vl.c: convert cpu_model to cpu type and set of global pro=
+perties before machine_init())
+> > >=20
+> > > it allows to:
+> > >   * replace sPAPRMachineClass::tcg_default_cpu with
+> > >     MachineClass::default_cpu_type
+> > >   * drop cpu_parse_cpu_model() from hw/ppc/spapr.c and reuse
+> > >     one in vl.c
+> > >   * simplify spapr_get_cpu_core_type() by removing
+> > >     not needed anymore recurrsion since alias look up
+> > >     happens earlier at vl.c and spapr_get_cpu_core_type()
+> > >     works only with resulted from that cpu type.
+> > >   * spapr no more needs to parse/depend on being phased out
+> > >     MachineState::cpu_model, all tha parsing done by generic
+> > >     code and target specific callback.
+> > >=20
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > ---
+> > > PS:
+> > >   patch is a little bit big but it's hard to split it due
+> > >   to dependencies, so pls bear with it. =20
+> >=20
+> > [snip]
+> > > -static int kvm_ppc_register_host_cpu_type(void)
+> > > +static int kvm_ppc_register_host_cpu_type(MachineState *ms)
+> > >  {
+> > >      TypeInfo type_info =3D {
+> > >          .name =3D TYPE_HOST_POWERPC_CPU,
+> > >          .class_init =3D kvmppc_host_cpu_class_init,
+> > >      };
+> > > +    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
+> > >      PowerPCCPUClass *pvr_pcc;
+> > >      ObjectClass *oc;
+> > >      DeviceClass *dc;
+> > > @@ -2504,6 +2505,8 @@ static int kvm_ppc_register_host_cpu_type(void)
+> > >      }
+> > >      type_info.parent =3D object_class_get_name(OBJECT_CLASS(pvr_pcc)=
+);
+> > >      type_register(&type_info);
+> > > +    /* override TCG default cpu type with 'host' cpu model */
+> > > +    mc->default_cpu_type =3D TYPE_HOST_POWERPC_CPU; =20
+> >=20
+> > Ugh.  I dislike this, it changes the default cpu type to 'host' for
+> > *all* machine types, whereas previously it was just true for pseries.
+> > That wasn't by accident.
+> >=20
+> > In general, I think we want there to be a single default CPU type for
+> > a machine, regardless of TCG vs. KVM.  This is particularly true for
+> > many of the ppc machine types - they will only work with a CPU in the
+> > right "family" (e500 / 440 / POWERx, wahtever); in many of these cases
+> > KVM PR is usable, but using -cpu host could easily break the machine
+> > type.
+> >=20
+> > 'pseries' is different, it (and only it) can be used with KVM HV - and
+> > usually is.  And KVM HV *only* works with -cpu host, due to hardware
+> > limitations.
+> I'd keep override in spapr_machine_class_init() but it's not possible
+> since it's called before kvm option is parsed and machine is prerequisite=
+ for kvm option
+>=20
+> how about following fixup?
+>=20
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index abc222e..48dc3f7 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -2505,8 +2505,10 @@ static int kvm_ppc_register_host_cpu_type(MachineS=
+tate *ms)
+>      }
+>      type_info.parent =3D object_class_get_name(OBJECT_CLASS(pvr_pcc));
+>      type_register(&type_info);
+> -    /* override TCG default cpu type with 'host' cpu model */
+> -    mc->default_cpu_type =3D TYPE_HOST_POWERPC_CPU;
+> +    if (object_dynamic_cast(ms, TYPE_SPAPR_MACHINE)) {
+> +        /* override TCG default cpu type with 'host' cpu model */
+> +        mc->default_cpu_type =3D TYPE_HOST_POWERPC_CPU;
+> +    }
+> =20
+>      oc =3D object_class_by_name(type_info.name);
+>      g_assert(oc);
+
+Hm, ugly.  But if that's what we have to do, that's what we have to
+do.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--6J7GEvtanOfV9oXA
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnXTmgACgkQbDjKyiDZ
+s5JZURAA48oa5MGwkSoRhtmBGdGF1CXzDIrJuO039oj/LeyZ9k1KBOffFjfz35Eb
+Zepp6V0p9fCtnHgsbaC0bFioW4Wj6GboiWoFpI5g1WahouJMFbywiv4+LTLC9cy9
+7ndEQ9zU62qsH4glMSMkC08+t9aQL79NN1oCSxREI6D/PgJpLO5ll95i668BsWmZ
+j/ejxPt2IYjsqHC6ugm/4roK4roYqepvRIN5tm58Iz4gOh6VseuJsBsneoCYf0xg
+Wzp9A1BN25CCLZdnKH6VSwgIg7y4Q8s0wascIO5mdwTmwx0PahAjoRojC/RV6PlP
+nyWd2aWhIcl7Zgdj6y5Wzi1vvVohkKylk4TcrVcJqCyqx0gQ+hWGMOvXrp8yHK01
+/igBPVXuJN8ZUnrooks+TcRTMq2o6xKdLbSHU3ieBdIM3m7k+8/Slhn6VbTgfnht
+nvKwNgVbVws0Is6ZNxz5P0OEPvid5TlsT2cdAjYc+U+8KB1EaLkbGEcXbTxtpnsi
+WYg5TFVaKb5lE6my3HniIQWgy89bXE4aABQpJgGBAkqMnmhE2XxGFveLtdzCtesE
+31l09rLbTDZqPONKGrEhjfpnmv/X/wwfpeYZBS6UV6hbCQAShH1AeWsTOU74NtkW
+3BJM1f1F7R/Tj26oqNVzKzMlNTRbhF7c5WYAhP/DTW2KCsGWwW0=
+=egct
+-----END PGP SIGNATURE-----
+
+--6J7GEvtanOfV9oXA--
