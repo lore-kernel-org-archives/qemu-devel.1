@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e0Nz1-0007To-Jg
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 04:27:48 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e0NzF-0007d9-Np
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 04:28:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e0Nyx-0007hn-1H
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 04:27:47 -0400
-Date: Fri, 6 Oct 2017 10:27:38 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171006102738.06b23f3f@nial.brq.redhat.com>
-In-Reply-To: <20171006030256.GF3260@umbus.fritz.box>
-References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-	<1507220690-265042-5-git-send-email-imammedo@redhat.com>
-	<20171006030256.GF3260@umbus.fritz.box>
+	(envelope-from <dgilbert@redhat.com>) id 1e0NzE-00083S-DI
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 04:28:01 -0400
+Date: Fri, 6 Oct 2017 09:27:42 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171006082741.GA2166@work-vm>
+References: <1507034861-4661-1-git-send-email-jan.dakinevich@virtuozzo.com>
+	<1507034861-4661-2-git-send-email-jan.dakinevich@virtuozzo.com>
+	<e77d7b78-a2ff-51a3-360e-c7d5d4e7006b@redhat.com>
+	<7735fee8-dcc0-edc1-2fd3-f2aee7fe2df1@virtuozzo.com>
+	<87wp4896sa.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 04/23] ppc: mpc8544ds/e500plat: use generic
- cpu_model parsing
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87wp4896sa.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] virtio: introduce `query-virtio'
+ QMP command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,86 +27,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?UTF-8?B?SGVy?= =?UTF-8?B?dsOp?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Jan Dakinevich <jan.dakinevich@virtuozzo.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org, Amit Shah <amit@kernel.org>, Jason Wang <jasowang@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Fri, 6 Oct 2017 14:02:56 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+* Markus Armbruster (armbru@redhat.com) wrote:
+> Jan Dakinevich <jan.dakinevich@virtuozzo.com> writes:
+> 
+> > On 10/03/2017 05:02 PM, Eric Blake wrote:
+> >> On 10/03/2017 07:47 AM, Jan Dakinevich wrote:
+> >>> The command is intended for gathering virtio information such as status,
+> >>> feature bits, negotiation status. It is convenient and useful for debug
+> >>> purpose.
+> >>>
+> >>> The commands returns generic virtio information for virtio such as
+> >>> common feature names and status bits names and information for all
+> >>> attached to current machine devices.
+> >>>
+> >>> To retrieve names of device-specific features `get_feature_name'
+> >>> callback in VirtioDeviceClass also was introduced.
+> >>>
+> >>> Cc: Denis V. Lunev <den@virtuozzo.com>
+> >>> Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+> >>> ---
+> >>>  hw/block/virtio-blk.c       |  21 +++++++++
+> >>>  hw/char/virtio-serial-bus.c |  15 +++++++
+> >>>  hw/display/virtio-gpu.c     |  13 ++++++
+> >>>  hw/net/virtio-net.c         |  35 +++++++++++++++
+> >>>  hw/scsi/virtio-scsi.c       |  16 +++++++
+> >>>  hw/virtio/Makefile.objs     |   2 +
+> >>>  hw/virtio/virtio-balloon.c  |  15 +++++++
+> >>>  hw/virtio/virtio-stub.c     |   9 ++++
+> >>>  hw/virtio/virtio.c          | 101 ++++++++++++++++++++++++++++++++++++++++++++
+> >>>  include/hw/virtio/virtio.h  |   2 +
+> >>>  qapi-schema.json            |   1 +
+> >>>  qapi/virtio.json            |  94 +++++++++++++++++++++++++++++++++++++++++
+> >>>  12 files changed, 324 insertions(+)
+> >>>  create mode 100644 hw/virtio/virtio-stub.c
+> >>>  create mode 100644 qapi/virtio.json
+> >> 
+> >> This creates a new .json file, but does not touch MAINTAINERS.  Our idea
+> >> in splitting the .json files was to make it easier for each sub-file
+> >> that needs a specific maintainer in addition to the overall *.json line
+> >> for QAPI maintainers, so this may deserve a MAINTAINERS entry.
+> >> 
+> >
+> > Ok.
+> >
+> >>> +++ b/qapi/virtio.json
+> >>> @@ -0,0 +1,94 @@
+> >>> +# -*- Mode: Python -*-
+> >>> +#
+> >>> +
+> >>> +##
+> >>> +# = Virtio devices
+> >>> +##
+> >>> +
+> >>> +{ 'include': 'common.json' }
+> >>> +
+> >>> +##
+> >>> +# @VirtioInfoBit:
+> >>> +#
+> >>> +# Named virtio bit
+> >>> +#
+> >>> +# @bit: bit number
+> >>> +#
+> >>> +# @name: bit name
+> >>> +#
+> >>> +# Since: 2.11.0
+> >>> +#
+> >>> +##
+> >>> +{
+> >>> +    'struct': 'VirtioInfoBit',
+> >>> +    'data': {
+> >>> +        'bit': 'uint64',
+> >> 
+> >> Why is this a 64-bit value? Are the values 0-63, or are they 1, 2, 4, 8,
+> >> ...?  The documentation on 'bit number' is rather sparse.
+> >
+> > I would prefer `uint' here, but I don't see generic unsigned type (may
+> > be, I am mistaken). I could use uint8 here, though.
+> >
+> >> 
+> >>> +        'name': 'str'
+> >> 
+> >> Wouldn't an enum type be better than an open-ended string?
+> >> 
+> >
+> > Bit names are not known here, they are obtained from virtio device
+> > implementations.
+> 
+> What exactly uses these bits?
+> 
+> Why do these uses justify pass-through?  By pass-through, I mean the
+> messenger (QEMU) merely passes them along, without understanding them.
+> Defeats introspection.
 
-> On Thu, Oct 05, 2017 at 06:24:31PM +0200, Igor Mammedov wrote:
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
-> 
-> Acked-by: David Gibson <david@gibson.dropbear.id.au>
-> 
-> Do you want me to queue the ppc patches here, or do you already have a
-> plan for that?
-Id didn't want to distract others with only PPC related code so
-I've posted this series separately for you to merge it via PPC tree
+It should be noted originally it was HMP - this was just a debug command
+and it's only getting the need to be introspectable because people
+insisted it had a QMP version.
 
+I think the intent is to print all flags, even ones we dont yet
+understand.
 
+Dave
+
+> >>> +    }
+> >>> +}
+> >>> +
+> >>> +##
+> >>> +# @VirtioInfoDevice:
+> >>> +#
+> >>> +# Information about specific virtio device
+> >>> +#
+> >>> +# @qom_path: QOM path of the device
+> >> 
+> >> Please make this 'qom-path' - new interfaces should prefer '-' over '_'.
+> >
+> > Ok.
+> >
+> >>> +#
+> >>> +# @feature-names: names of device-specific features
+> >>> +#
+> >>> +# @host-features: bitmask of features, provided by devices
+> >>> +#
+> >>> +# @guest-features: bitmask of features, acknowledged by guest
+> >>> +#
+> >>> +# @status: virtio device status bitmask
+> >>> +#
+> >>> +# Since: 2.11.0
+> >>> +#
+> >>> +##
+> >>> +{
+> >>> +    'struct': 'VirtioInfoDevice',
+> >>> +    'data': {
+> >>> +        'qom_path': 'str',
+> >>> +        'feature-names': ['VirtioInfoBit'],
+> >>> +        'host-features': 'uint64',
+> >>> +        'guest-features': 'uint64',
+> >>> +        'status': 'uint64'
+> >> 
+> >> I'm wondering if this is the best representation (where the caller has
+> >> to parse the integer and then lookup in feature-names what each bit of
+> >> the integer represents).  But I'm not sure I have anything better off
+> >> the top of my head.
+> >> 
+> >
+> > Consider it as way to tell caller about names of supported features.
 > 
-> > ---
-> >  hw/ppc/e500.c      | 8 +-------
-> >  hw/ppc/e500plat.c  | 1 +
-> >  hw/ppc/mpc8544ds.c | 2 ++
-> >  3 files changed, 4 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-> > index db0e49a..9178e70 100644
-> > --- a/hw/ppc/e500.c
-> > +++ b/hw/ppc/e500.c
-> > @@ -803,11 +803,6 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-> >      SysBusDevice *s;
-> >      PPCE500CCSRState *ccsr;
-> >  
-> > -    /* Setup CPUs */
-> > -    if (machine->cpu_model == NULL) {
-> > -        machine->cpu_model = "e500v2_v30";
-> > -    }
-> > -
-> >      irqs = g_malloc0(smp_cpus * sizeof(qemu_irq *));
-> >      irqs[0] = g_malloc0(smp_cpus * sizeof(qemu_irq) * OPENPIC_OUTPUT_NB);
-> >      for (i = 0; i < smp_cpus; i++) {
-> > @@ -815,8 +810,7 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
-> >          CPUState *cs;
-> >          qemu_irq *input;
-> >  
-> > -        cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
-> > -                                           machine->cpu_model));
-> > +        cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
-> >          env = &cpu->env;
-> >          cs = CPU(cpu);
-> >  
-> > diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
-> > index 94b4545..e59e80f 100644
-> > --- a/hw/ppc/e500plat.c
-> > +++ b/hw/ppc/e500plat.c
-> > @@ -64,6 +64,7 @@ static void e500plat_machine_init(MachineClass *mc)
-> >      mc->init = e500plat_init;
-> >      mc->max_cpus = 32;
-> >      mc->has_dynamic_sysbus = true;
-> > +    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("e500v2_v30");
-> >  }
-> >  
-> >  DEFINE_MACHINE("ppce500", e500plat_machine_init)
-> > diff --git a/hw/ppc/mpc8544ds.c b/hw/ppc/mpc8544ds.c
-> > index 27b8289..1717953 100644
-> > --- a/hw/ppc/mpc8544ds.c
-> > +++ b/hw/ppc/mpc8544ds.c
-> > @@ -16,6 +16,7 @@
-> >  #include "sysemu/device_tree.h"
-> >  #include "hw/ppc/openpic.h"
-> >  #include "qemu/error-report.h"
-> > +#include "cpu.h"
-> >  
-> >  static void mpc8544ds_fixup_devtree(PPCE500Params *params, void *fdt)
-> >  {
-> > @@ -55,6 +56,7 @@ static void ppce500_machine_init(MachineClass *mc)
-> >      mc->desc = "mpc8544ds";
-> >      mc->init = mpc8544ds_init;
-> >      mc->max_cpus = 15;
-> > +    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("e500v2_v30");
-> >  }
-> >  
-> >  DEFINE_MACHINE("mpc8544ds", ppce500_machine_init)  
+> "Unsigned integer interpreted as combination of well-known bit-valued
+> symbols" is a fine C interface, but a pretty horrid QMP interface.
+> What's wrong with doing a set the straightforward way as "array of
+> enum"?
 > 
+> >>> +    }
+> >>> +}
+> >>> +
+> >>> +##
+> >>> +# @VirtioInfo:
+> >>> +#
+> >>> +# Information about virtio devices
+> >>> +#
+> >>> +# @feature-names: names of common virtio features
+> >>> +#
+> >>> +# @status-names: names of bits which represents virtio device status
+> >>> +#
+> >>> +# @devices: list of per-device virtio information
+> >>> +#
+> >>> +# Since: 2.11.0
+> >>> +#
+> >>> +##
+> >>> +{
+> >>> +    'struct': 'VirtioInfo',
+> >>> +    'data': {
+> >>> +        'feature-names': ['VirtioInfoBit'],
+> >> 
+> >> Why is feature-names listed at two different nestings of the return value?
+> >> 
+> >
+> > These are different feature names. First names are common and predefined
+> > for all devices. Second names are device-specific.
+> >
+> >>> +        'status-names': ['VirtioInfoBit'],
+> >>> +        'devices': ['VirtioInfoDevice']
+> >>> +    }
+> >>> +}
+> >>> +
+> >>> +
+> >>> +##
+> >>> +# @query-virtio:
+> >>> +#
+> >>> +# Returns generic and per-device virtio information
+> >>> +#
+> >>> +# Since: 2.11.0
+> >>> +#
+> >>> +##
+> >>> +{
+> >>> +    'command': 'query-virtio',
+> >>> +    'returns': 'VirtioInfo'
+> >>> +}
+> >>>
+> >> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
