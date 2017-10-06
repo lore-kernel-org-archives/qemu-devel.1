@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e0PRd-0006V1-R0
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:28 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e0PRa-0006SS-TW
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e0PRX-0008FX-Ur
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32005)
+	(envelope-from <cohuck@redhat.com>) id 1e0PRR-00088F-EW
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40594)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e0PRX-0008D7-P2
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:19 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e0PRR-00086U-6a
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:01:13 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri,  6 Oct 2017 11:59:44 +0200
-Message-Id: <20171006095956.27534-22-cohuck@redhat.com>
+Date: Fri,  6 Oct 2017 11:59:42 +0200
+Message-Id: <20171006095956.27534-20-cohuck@redhat.com>
 In-Reply-To: <20171006095956.27534-1-cohuck@redhat.com>
 References: <20171006095956.27534-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 21/33] s390x: raise CPU hotplug irq after really
- hotplugged
+Subject: [Qemu-devel] [PULL 19/33] s390x/3270: handle writes of arbitrary
+ length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +25,97 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
 
-From: David Hildenbrand <david@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
 
-Let's move it into the machine, so we trigger the IRQ after setting
-ms->possible_cpus (which SCLP uses to construct the list of
-online CPUs).
+The problem is, that the current implementation places unrealistic and
+arbitrary constraints on the length of writes to the device (that is the
+outbound requests), by asserting ccw.count being such that that even the
+worst case escaped payload will fit an  more or less arbitrary sized
+buffer. Actually on protocol level there is nothing to justify such
+a limitation.
 
-This also fixes a problem reported by Thomas Huth, whereby qemu can be
-crashed using the none machine
+Another strange thing is the return value which more or less reflects
+the size (written) after escaping instead of before escaping. This
+is strange, because this return value is used to calculate SCSW.count.
 
-qemu-s390x-softmmu -M none -monitor stdio
--> device_add qemu-s390-cpu
+Let us teach 3270 how to deal with arbitrary long writes.
 
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170928134609.16985-3-david@redhat.com>
+Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Reported-by: Jason J . Herne <jjherne@linux.vnet.ibm.com>
+Tested-by: Jason J . Herne <jjherne@linux.vnet.ibm.com>
+Message-Id: <20170920172314.102710-3-pasic@linux.vnet.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/s390x/s390-virtio-ccw.c | 4 ++++
- target/s390x/cpu.c         | 8 --------
- 2 files changed, 4 insertions(+), 8 deletions(-)
+ hw/char/terminal3270.c | 30 ++++++++++++++++++------------
+ 1 file changed, 18 insertions(+), 12 deletions(-)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 2c689d50bc..679a1a858c 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -307,6 +307,10 @@ static void s390_cpu_plug(HotplugHandler *hotplug_dev,
+diff --git a/hw/char/terminal3270.c b/hw/char/terminal3270.c
+index c976a63cc2..a109ce5987 100644
+--- a/hw/char/terminal3270.c
++++ b/hw/char/terminal3270.c
+@@ -30,7 +30,6 @@ typedef struct Terminal3270 {
+     uint8_t inv[INPUT_BUFFER_SIZE];
+     uint8_t outv[OUTPUT_BUFFER_SIZE];
+     int in_len;
+-    int out_len;
+     bool handshake_done;
+     guint timer_tag;
+ } Terminal3270;
+@@ -145,7 +144,6 @@ static void chr_event(void *opaque, int event)
  
-     g_assert(!ms->possible_cpus->cpus[cpu->env.core_id].cpu);
-     ms->possible_cpus->cpus[cpu->env.core_id].cpu = OBJECT(dev);
-+
-+    if (dev->hotplugged) {
-+        raise_irq_cpu_hotplug();
-+    }
+     /* Ensure the initial status correct, always reset them. */
+     t->in_len = 0;
+-    t->out_len = 0;
+     t->handshake_done = false;
+     if (t->timer_tag) {
+         g_source_remove(t->timer_tag);
+@@ -231,8 +229,9 @@ static int write_payload_3270(EmulatedCcw3270Device *dev, uint8_t cmd)
+     Terminal3270 *t = TERMINAL_3270(dev);
+     int retval = 0;
+     int count = ccw_dstream_avail(get_cds(t));
+-
+-    assert(count <= (OUTPUT_BUFFER_SIZE - 3) / 2);
++    int bound = (OUTPUT_BUFFER_SIZE - 3) / 2;
++    int len = MIN(count, bound);
++    int out_len = 0;
+ 
+     if (!t->handshake_done) {
+         if (!(t->outv[0] == IAC && t->outv[1] != IAC)) {
+@@ -247,16 +246,23 @@ static int write_payload_3270(EmulatedCcw3270Device *dev, uint8_t cmd)
+         /* We just say we consumed all data if there's no backend. */
+         return count;
+     }
+-    t->outv[0] = cmd;
+-    ccw_dstream_read_buf(get_cds(t), &t->outv[1], count);
+-    t->out_len = count + 1;
+ 
+-    t->out_len = insert_IAC_escape_char(t->outv, t->out_len);
+-    t->outv[t->out_len++] = IAC;
+-    t->outv[t->out_len++] = IAC_EOR;
++    t->outv[out_len++] = cmd;
++    do {
++        ccw_dstream_read_buf(get_cds(t), &t->outv[out_len], len);
++        count = ccw_dstream_avail(get_cds(t));
++        out_len += len;
+ 
+-    retval = qemu_chr_fe_write_all(&t->chr, t->outv, t->out_len);
+-    return (retval <= 0) ? 0 : (retval - 3);
++        out_len = insert_IAC_escape_char(t->outv, out_len);
++        if (!count) {
++            t->outv[out_len++] = IAC;
++            t->outv[out_len++] = IAC_EOR;
++        }
++        retval = qemu_chr_fe_write_all(&t->chr, t->outv, out_len);
++        len = MIN(count, bound);
++        out_len = 0;
++    } while (len && retval >= 0);
++    return (retval <= 0) ? 0 : get_cds(t)->count;
  }
  
- static void s390_machine_reset(void)
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 34538c3ab9..4920da3625 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -41,7 +41,6 @@
- #include "hw/hw.h"
- #include "sysemu/arch_init.h"
- #include "sysemu/sysemu.h"
--#include "hw/s390x/sclp.h"
- #endif
- 
- #define CR0_RESET       0xE0UL
-@@ -227,13 +226,6 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
- #endif
- 
-     scc->parent_realize(dev, &err);
--
--#if !defined(CONFIG_USER_ONLY)
--    if (dev->hotplugged) {
--        raise_irq_cpu_hotplug();
--    }
--#endif
--
- out:
-     error_propagate(errp, err);
- }
+ static Property terminal_properties[] = {
 -- 
 2.13.6
