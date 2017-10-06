@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e0Uye-0001RS-74
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:53 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e0Uyh-0001U5-21
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e0Uyd-0004Ps-AK
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:52 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e0Uyd-0004Pa-5c
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:55 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  6 Oct 2017 17:54:19 +0200
-Message-Id: <20171006155422.10135-52-kwolf@redhat.com>
+Date: Fri,  6 Oct 2017 17:54:17 +0200
+Message-Id: <20171006155422.10135-50-kwolf@redhat.com>
 In-Reply-To: <20171006155422.10135-1-kwolf@redhat.com>
 References: <20171006155422.10135-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 51/54] iotests: Fix 195 if IMGFMT is part of
- TEST_DIR
+Subject: [Qemu-devel] [PULL 49/54] block: support passthrough of
+ BDRV_REQ_FUA in crypto driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,52 +23,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Max Reitz <mreitz@redhat.com>
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-do_run_qemu() in iotest 195 first applies _filter_imgfmt when printing
-qemu's command line and _filter_testdir only afterwards.  Therefore, if
-the image format is part of the test directory path, _filter_testdir
-will no longer apply and the actual output will differ from the
-reference output even in case of success.
+The BDRV_REQ_FUA flag can trivially be allowed in the crypt driver
+as a passthrough to the underlying block driver.
 
-For example, TEST_DIR might be "/tmp/test-qcow2", in which case
-_filter_imgfmt first transforms this to "/tmp/test-IMGFMT" which is no
-longer recognized as the TEST_DIR by _filter_testdir.
-
-Fix this by not applying _filter_imgfmt in do_run_qemu() but in
-run_qemu() instead, and only after _filter_testdir.
-
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20170927211334.3988-1-mreitz@redhat.com
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Message-id: 20170927125340.12360-7-berrange@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/195 | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ block/crypto.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/195 b/tests/qemu-iotests/195
-index 05a239cbf5..e7a403ded2 100755
---- a/tests/qemu-iotests/195
-+++ b/tests/qemu-iotests/195
-@@ -44,15 +44,16 @@ _supported_os Linux
+diff --git a/block/crypto.c b/block/crypto.c
+index edf53d49d1..60ddf8623e 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -279,6 +279,9 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
+         return -EINVAL;
+     }
  
- function do_run_qemu()
- {
--    echo Testing: "$@" | _filter_imgfmt
-+    echo Testing: "$@"
-     $QEMU -nographic -qmp-pretty stdio -serial none "$@"
-     echo
- }
++    bs->supported_write_flags = BDRV_REQ_FUA &
++        bs->file->bs->supported_write_flags;
++
+     opts = qemu_opts_create(opts_spec, NULL, 0, &error_abort);
+     qemu_opts_absorb_qdict(opts, options, &local_err);
+     if (local_err) {
+@@ -462,7 +465,7 @@ block_crypto_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+     uint64_t sector_size = qcrypto_block_get_sector_size(crypto->block);
+     uint64_t payload_offset = qcrypto_block_get_payload_offset(crypto->block);
  
- function run_qemu()
- {
--    do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_qemu | _filter_qmp \
--                          | _filter_qemu_io | _filter_generated_node_ids
-+    do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_imgfmt | _filter_qemu \
-+                          | _filter_qmp | _filter_qemu_io \
-+                          | _filter_generated_node_ids
- }
+-    assert(!flags);
++    assert(!(flags & ~BDRV_REQ_FUA));
+     assert(payload_offset < INT64_MAX);
+     assert(QEMU_IS_ALIGNED(offset, sector_size));
+     assert(QEMU_IS_ALIGNED(bytes, sector_size));
+@@ -495,7 +498,7 @@ block_crypto_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+         qemu_iovec_add(&hd_qiov, cipher_data, cur_bytes);
  
- size=64M
+         ret = bdrv_co_pwritev(bs->file, payload_offset + offset + bytes_done,
+-                              cur_bytes, &hd_qiov, 0);
++                              cur_bytes, &hd_qiov, flags);
+         if (ret < 0) {
+             goto cleanup;
+         }
 -- 
 2.13.6
