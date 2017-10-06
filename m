@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e0WwR-0005GJ-CP
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 14:01:44 -0400
+	(envelope-from <prvs=44560dde8=Ian.Jackson@citrix.com>)
+	id 1e0XLe-0002Ng-Lj
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 14:27:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e0WwO-0004x0-BK
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 14:01:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33784)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e0WwO-0004w5-5S
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 14:01:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e0WwK-0000hL-Ep
-	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 18:01:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 273C42E81A2
-	for <qemu-devel@nongnu.org>; Fri,  6 Oct 2017 18:01:33 +0000 (UTC)
+	(envelope-from <prvs=44560dde8=Ian.Jackson@citrix.com>)
+	id 1e0XLb-0002t0-IN
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 14:27:46 -0400
+Received: from smtp02.citrix.com ([66.165.176.63]:43624)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=44560dde8=Ian.Jackson@citrix.com>)
+	id 1e0XLb-0002rk-CP
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 14:27:43 -0400
+From: Ian Jackson <ian.jackson@eu.citrix.com>
+Date: Fri, 6 Oct 2017 19:27:16 +0100
+Message-ID: <1507314444-30835-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 06 Oct 2017 17:46:26 -0000
-From: Thomas Huth <1691109@bugs.launchpad.net>
-Reply-To: Bug 1691109 <1691109@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149494197837.9319.2077559864368104737.malonedeb@wampee.canonical.com>
-Message-Id: <150731198867.15501.4037372442579527652.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1691109] Re: qemu-kvm not working as nested
- inside ESX 6.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 0/8] xen: xen-domid-restrict improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,38 +27,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org
 
-** Project changed: qemu =3D> qemu (Ubuntu)
+I have been working on trying to get qemu, when running as a Xen
+device model, to _actually_ not have power equivalent to root.
 
--- =
+I think I have achieved this, with some limitations (which are
+discussed in my series against xen.git.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1691109
+However, there are changes to qemu needed.  In particular
 
-Title:
-  qemu-kvm not working as nested inside ESX 6.0
+ * The -xen-domid-restrict option does not work properly right now.
+   It only restricts a small subset of the descriptors qemu has open.
+   I am introducing a new library call in the Xen libraries for this,
+   xentoolcore_restrict_all.
 
-Status in qemu package in Ubuntu:
-  Confirmed
+ * We need to call a different function on domain shutdown.
 
-Bug description:
-  ESX 6.0 (virt bits exposed) - Ubuntu 16.04 + qemu-kvm 1:2.8+dfsg-
-  3ubuntu2~cloud0 - CirrOS launched by OpenStack (devstack master)
+ * The restriction operation needs to be done at a slightly different
+   time, necessitating a new hook.
 
-  =
+ * Additionally, in the future, we intend to be able to set aside
+   a uid range for these qemus to run in, and that involves being
+   able to tell qemu to drop privilege by numeric uid and gid.
 
-  VM will start with -machine =3D 'pc-i440fx-zesty' and will stuck in "boot=
-ing from hard disk"
+Thanks to Anthony Perard, Peter Maydell and Ross Lagerwall for
+assistance, review and testing.
 
-  to fix it you can manually change -machine to 'pc-i440fx-2.3'
+At least the first patch of this, "xen: link against xentoolcore",
+will very likely be necessary, since the corresponding xen.git series
+is likely to make Xen 4.10.
 
-  also, ISOs boots well, so I think it`s something about block devices
-  configuration introduced in new machine type.
-
-  p.s.
-  also confirmed with RHEL instead of Ubuntu as KVM host - new machine type=
- don`t work
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1691109/+subscriptions
+Ian.
