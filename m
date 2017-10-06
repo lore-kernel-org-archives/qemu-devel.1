@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e0Uxy-0000d6-4G
+	(envelope-from <kwolf@redhat.com>) id 1e0Uxx-0000cP-EV
 	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e0Uxu-0003Ey-5S
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:10 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e0Uxv-0003Im-SM
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:09 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  6 Oct 2017 17:53:48 +0200
-Message-Id: <20171006155422.10135-21-kwolf@redhat.com>
+Date: Fri,  6 Oct 2017 17:53:51 +0200
+Message-Id: <20171006155422.10135-24-kwolf@redhat.com>
 In-Reply-To: <20171006155422.10135-1-kwolf@redhat.com>
 References: <20171006155422.10135-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 20/54] dirty-bitmap: Switch bdrv_set_dirty() to
- bytes
+Subject: [Qemu-devel] [PULL 23/54] qemu-iotests: remove dead code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,96 +22,286 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Eric Blake <eblake@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Both callers already had bytes available, but were scaling to
-sectors.  Move the scaling to internal code.  In the case of
-bdrv_aligned_pwritev(), we are now passing the exact offset
-rather than a rounded sector-aligned value, but that's okay
-as long as dirty bitmap widens start/bytes to granularity
-boundaries.
+This includes shell function, shell variables and command line options
+(randomize.awk does not exist).
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/block_int.h | 2 +-
- block/dirty-bitmap.c      | 7 ++++---
- block/io.c                | 6 ++----
- 3 files changed, 7 insertions(+), 8 deletions(-)
+ tests/qemu-iotests/check         | 28 -----------------
+ tests/qemu-iotests/common        | 23 --------------
+ tests/qemu-iotests/common.config | 26 ---------------
+ tests/qemu-iotests/common.rc     | 68 ----------------------------------------
+ 4 files changed, 145 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 99abe2ce74..79366b94b5 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -1028,7 +1028,7 @@ void blk_dev_eject_request(BlockBackend *blk, bool force);
- bool blk_dev_is_tray_open(BlockBackend *blk);
- bool blk_dev_is_medium_locked(BlockBackend *blk);
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index 4583a0c269..041780b09f 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -65,7 +65,6 @@ then
+     export SOCKET_SCM_HELPER="$build_iotests/socket_scm_helper"
+ fi
  
--void bdrv_set_dirty(BlockDriverState *bs, int64_t cur_sector, int64_t nr_sect);
-+void bdrv_set_dirty(BlockDriverState *bs, int64_t offset, int64_t bytes);
- bool bdrv_requests_pending(BlockDriverState *bs);
+-# if ./qemu exists, it should be prioritized and will be chosen by common.config
+ if [[ -z "$QEMU_PROG" && ! -x './qemu' ]]
+ then
+     arch=$(uname -m 2> /dev/null)
+@@ -140,12 +139,6 @@ _timestamp()
  
- void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out);
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 117837b3cc..58a3f330a9 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -628,10 +628,10 @@ void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap)
-     hbitmap_deserialize_finish(bitmap->bitmap);
- }
- 
--void bdrv_set_dirty(BlockDriverState *bs, int64_t cur_sector,
--                    int64_t nr_sectors)
-+void bdrv_set_dirty(BlockDriverState *bs, int64_t offset, int64_t bytes)
+ _wrapup()
  {
-     BdrvDirtyBitmap *bitmap;
-+    int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
+-    # for hangcheck ...
+-    # remove files that were used by hangcheck
+-    #
+-    [ -f "${TEST_DIR}"/check.pid ] && rm -rf "${TEST_DIR}"/check.pid
+-    [ -f "${TEST_DIR}"/check.sts ] && rm -rf "${TEST_DIR}"/check.sts
+-
+     if $showme
+     then
+         :
+@@ -201,24 +194,6 @@ END        { if (NR > 0) {
  
-     if (QLIST_EMPTY(&bs->dirty_bitmaps)) {
-         return;
-@@ -643,7 +643,8 @@ void bdrv_set_dirty(BlockDriverState *bs, int64_t cur_sector,
-             continue;
-         }
-         assert(!bdrv_dirty_bitmap_readonly(bitmap));
--        hbitmap_set(bitmap->bitmap, cur_sector, nr_sectors);
-+        hbitmap_set(bitmap->bitmap, offset >> BDRV_SECTOR_BITS,
-+                    end_sector - (offset >> BDRV_SECTOR_BITS));
-     }
-     bdrv_dirty_bitmaps_unlock(bs);
+ trap "_wrapup; exit \$status" 0 1 2 3 15
+ 
+-# for hangcheck ...
+-# Save pid of check in a well known place, so that hangcheck can be sure it
+-# has the right pid (getting the pid from ps output is not reliable enough).
+-#
+-rm -rf "${TEST_DIR}"/check.pid
+-echo $$ > "${TEST_DIR}"/check.pid
+-
+-# for hangcheck ...
+-# Save the status of check in a well known place, so that hangcheck can be
+-# sure to know where check is up to (getting test number from ps output is
+-# not reliable enough since the trace stuff has been introduced).
+-#
+-rm -rf "${TEST_DIR}"/check.sts
+-echo "preamble" > "${TEST_DIR}"/check.sts
+-
+-# don't leave old full output behind on a clean run
+-rm -f check.full
+-
+ [ -f $TIMESTAMP_FILE ] || touch $TIMESTAMP_FILE
+ 
+ FULL_IMGFMT_DETAILS=`_full_imgfmt_details`
+@@ -276,9 +251,6 @@ do
+         fi
+         rm -f core $seq.notrun
+ 
+-        # for hangcheck ...
+-        echo "$seq" > "${TEST_DIR}"/check.sts
+-
+         start=`_wallclock`
+         $timestamp && printf %s "        [$(date "+%T")]"
+ 
+diff --git a/tests/qemu-iotests/common b/tests/qemu-iotests/common
+index d34c11c056..867918895b 100644
+--- a/tests/qemu-iotests/common
++++ b/tests/qemu-iotests/common
+@@ -19,17 +19,6 @@
+ # common procedures for QA scripts
+ #
+ 
+-_setenvironment()
+-{
+-    MSGVERB="text:action"
+-    export MSGVERB
+-}
+-
+-rm -f "$OUTPUT_DIR/$iam.out"
+-_setenvironment
+-
+-check=${check-true}
+-
+ diff="diff -u"
+ verbose=false
+ debug=false
+@@ -40,7 +29,6 @@ showme=false
+ sortme=false
+ expunge=true
+ have_test_arg=false
+-randomize=false
+ cachemode=false
+ rm -f $tmp.list $tmp.tmp $tmp.sed
+ 
+@@ -170,7 +158,6 @@ other options
+     -n                  show me, do not run tests
+     -o options          -o options to pass to qemu-img create/convert
+     -T                  output timestamps
+-    -r                  randomize test order
+     -c mode             cache mode
+ 
+ testlist options
+@@ -327,11 +314,6 @@ testlist options
+             cachemode=true
+             xpand=false
+             ;;
+-        -r)        # randomize test order
+-            randomize=true
+-            xpand=false
+-            ;;
+-
+         -T)        # turn on timestamp output
+             timestamp=true
+             xpand=false
+@@ -445,11 +427,6 @@ fi
+ list=`sort $tmp.list`
+ rm -f $tmp.list $tmp.tmp $tmp.sed
+ 
+-if $randomize
+-then
+-    list=`echo $list | awk -f randomize.awk`
+-fi
+-
+ [ "$QEMU" = "" ] && _fatal "qemu not found"
+ [ "$QEMU_IMG" = "" ] && _fatal "qemu-img not found"
+ [ "$QEMU_IO" = "" ] && _fatal "qemu-io not found"
+diff --git a/tests/qemu-iotests/common.config b/tests/qemu-iotests/common.config
+index e0883a0c65..b599c72211 100644
+--- a/tests/qemu-iotests/common.config
++++ b/tests/qemu-iotests/common.config
+@@ -15,33 +15,14 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
+-#
+-# setup and check for config parameters, and in particular
+-#
+-# EMAIL -           email of the script runner.
+-# TEST_DIR -        scratch test directory
+-#
+-# - These can be added to $HOST_CONFIG_DIR (witch default to ./config)
+-#   below or a separate local configuration file can be used (using
+-#   the HOST_OPTIONS variable).
+-# - This script is shared by the stress test system and the auto-qa
+-#   system (includes both regression test and benchmark components).
+-# - this script shouldn't make any assertions about filesystem
+-#   validity or mountedness.
+-#
+-
+ # all tests should use a common language setting to prevent golden
+ # output mismatches.
+ export LANG=C
+ 
+ PATH=".:$PATH"
+ 
+-HOST=`hostname -s 2> /dev/null`
+ HOSTOS=`uname -s`
+ 
+-EMAIL=root@localhost    # where auto-qa will send its status messages
+-export HOST_OPTIONS=${HOST_OPTIONS:=local.config}
+-export CHECK_OPTIONS=${CHECK_OPTIONS:="-g auto"}
+ export PWD=`pwd`
+ 
+ export _QEMU_HANDLE=0
+@@ -78,11 +59,6 @@ _fatal()
+ export AWK_PROG="`set_prog_path awk`"
+ [ "$AWK_PROG" = "" ] && _fatal "awk not found"
+ 
+-export SED_PROG="`set_prog_path sed`"
+-[ "$SED_PROG" = "" ] && _fatal "sed not found"
+-
+-export PS_ALL_FLAGS="-ef"
+-
+ if [ -z "$QEMU_PROG" ]; then
+     export QEMU_PROG="`set_prog_path qemu`"
+ fi
+@@ -198,8 +174,6 @@ fi
+ 
+ export QEMU_DEFAULT_MACHINE="$default_machine"
+ 
+-[ -f /etc/qemu-iotest.config ]       && . /etc/qemu-iotest.config
+-
+ if [ -z "$TEST_DIR" ]; then
+         TEST_DIR=`pwd`/scratch
+ fi
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index 8d486dbeb4..5938d5145f 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -293,51 +293,6 @@ _img_info()
+         done
  }
-diff --git a/block/io.c b/block/io.c
-index d633b0f851..e0f904583f 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1334,7 +1334,6 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
-     bool waited;
-     int ret;
  
--    int64_t start_sector = offset >> BDRV_SECTOR_BITS;
-     int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
-     uint64_t bytes_remaining = bytes;
-     int max_transfer;
-@@ -1409,7 +1408,7 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
-     bdrv_debug_event(bs, BLKDBG_PWRITEV_DONE);
+-_get_pids_by_name()
+-{
+-    if [ $# -ne 1 ]
+-    then
+-        echo "Usage: _get_pids_by_name process-name" 1>&2
+-        exit 1
+-    fi
+-
+-    # Algorithm ... all ps(1) variants have a time of the form MM:SS or
+-    # HH:MM:SS before the psargs field, use this as the search anchor.
+-    #
+-    # Matches with $1 (process-name) occur if the first psarg is $1
+-    # or ends in /$1 ... the matching uses sed's regular expressions,
+-    # so passing a regex into $1 will work.
+-
+-    ps $PS_ALL_FLAGS \
+-    | sed -n \
+-        -e 's/$/ /' \
+-        -e 's/[         ][         ]*/ /g' \
+-        -e 's/^ //' \
+-        -e 's/^[^ ]* //' \
+-        -e "/[0-9]:[0-9][0-9]  *[^ ]*\/$1 /s/ .*//p" \
+-        -e "/[0-9]:[0-9][0-9]  *$1 /s/ .*//p"
+-}
+-
+-# fqdn for localhost
+-#
+-_get_fqdn()
+-{
+-    host=`hostname`
+-    $NSLOOKUP_PROG $host | $AWK_PROG '{ if ($1 == "Name:") print $2 }'
+-}
+-
+-# check if run as root
+-#
+-_need_to_be_root()
+-{
+-    id=`id | $SED_PROG -e 's/(.*//' -e 's/.*=//'`
+-    if [ "$id" -ne 0 ]
+-    then
+-        echo "Arrgh ... you need to be root (not uid=$id) to run this test"
+-        exit 1
+-    fi
+-}
+-
+ # bail out, setting up .notrun file
+ #
+ _notrun()
+@@ -491,28 +446,5 @@ _full_platform_details()
+     echo "$os/$platform $host $kernel"
+ }
  
-     atomic_inc(&bs->write_gen);
--    bdrv_set_dirty(bs, start_sector, end_sector - start_sector);
-+    bdrv_set_dirty(bs, offset, bytes);
- 
-     stat64_max(&bs->wr_highest_offset, offset + bytes);
- 
-@@ -2438,8 +2437,7 @@ int coroutine_fn bdrv_co_pdiscard(BlockDriverState *bs, int64_t offset,
-     ret = 0;
- out:
-     atomic_inc(&bs->write_gen);
--    bdrv_set_dirty(bs, req.offset >> BDRV_SECTOR_BITS,
--                   req.bytes >> BDRV_SECTOR_BITS);
-+    bdrv_set_dirty(bs, req.offset, req.bytes);
-     tracked_request_end(&req);
-     bdrv_dec_in_flight(bs);
-     return ret;
+-_link_out_file()
+-{
+-   if [ -z "$1" ]; then
+-      echo Error must pass \$seq.
+-      exit
+-   fi
+-   rm -f $1
+-   if [ "`uname`" == "IRIX64" ] || [ "`uname`" == "IRIX" ]; then
+-      ln -s $1.irix $1
+-   elif [ "`uname`" == "Linux" ]; then
+-      ln -s $1.linux $1
+-   else
+-      echo Error test $seq does not run on the operating system: `uname`
+-      exit
+-   fi
+-}
+-
+-_die()
+-{
+-        echo $@
+-        exit 1
+-}
+-
+ # make sure this script returns success
+ true
 -- 
 2.13.6
