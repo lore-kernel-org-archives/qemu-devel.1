@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e0PQp-0005kb-5V
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:00:38 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e0PQs-0005mi-NX
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:00:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e0PQe-0007Jv-SX
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:00:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40792)
+	(envelope-from <cohuck@redhat.com>) id 1e0PQm-0007Qj-TR
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:00:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56558)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e0PQe-0007J8-CB
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:00:24 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e0PQm-0007Q3-Mg
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:00:32 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri,  6 Oct 2017 11:59:28 +0200
-Message-Id: <20171006095956.27534-6-cohuck@redhat.com>
+Date: Fri,  6 Oct 2017 11:59:30 +0200
+Message-Id: <20171006095956.27534-8-cohuck@redhat.com>
 In-Reply-To: <20171006095956.27534-1-cohuck@redhat.com>
 References: <20171006095956.27534-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 05/33] s390x/kvm: fix and cleanup storing CPU
- status
+Subject: [Qemu-devel] [PULL 07/33] s390x/css: use ccw data stream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,114 +24,59 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
 
-From: David Hildenbrand <david@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
 
-env->psa is a 64bit value, while we copy 4 bytes into the save area,
-resulting always in 0 getting stored.
+Replace direct access which implicitly assumes no IDA
+or MIDA with the new ccw data stream interface which should
+cope with these transparently in the future.
 
-Let's try to reduce such errors by using a proper structure. While at
-it, use correct cpu->be conversion (and get_psw_mask()), as we will be
-reusing this code for TCG soon.
+Note that checking the return code for ccw_dstream_* will be
+done in a follow-on patch.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170922140338.6068-1-david@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Message-Id: <20170921180841.24490-3-pasic@linux.vnet.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/kvm.c | 62 ++++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 42 insertions(+), 20 deletions(-)
+ hw/s390x/css.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index c65d76f01a..7f8c6c4993 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -1556,22 +1556,37 @@ static int do_store_adtl_status(S390CPU *cpu, hwaddr addr, hwaddr len)
-     return 0;
- }
- 
-+struct sigp_save_area {
-+    uint64_t    fprs[16];                       /* 0x0000 */
-+    uint64_t    grs[16];                        /* 0x0080 */
-+    PSW         psw;                            /* 0x0100 */
-+    uint8_t     pad_0x0110[0x0118 - 0x0110];    /* 0x0110 */
-+    uint32_t    prefix;                         /* 0x0118 */
-+    uint32_t    fpc;                            /* 0x011c */
-+    uint8_t     pad_0x0120[0x0124 - 0x0120];    /* 0x0120 */
-+    uint32_t    todpr;                          /* 0x0124 */
-+    uint64_t    cputm;                          /* 0x0128 */
-+    uint64_t    ckc;                            /* 0x0130 */
-+    uint8_t     pad_0x0138[0x0140 - 0x0138];    /* 0x0138 */
-+    uint32_t    ars[16];                        /* 0x0140 */
-+    uint64_t    crs[16];                        /* 0x0384 */
-+};
-+QEMU_BUILD_BUG_ON(sizeof(struct sigp_save_area) != 512);
-+
- #define KVM_S390_STORE_STATUS_DEF_ADDR offsetof(LowCore, floating_pt_save_area)
--#define SAVE_AREA_SIZE 512
- static int kvm_s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch)
- {
-     static const uint8_t ar_id = 1;
--    uint64_t ckc = cpu->env.ckc >> 8;
--    void *mem;
-+    struct sigp_save_area *sa;
-+    hwaddr len = sizeof(*sa);
-     int i;
--    hwaddr len = SAVE_AREA_SIZE;
- 
--    mem = cpu_physical_memory_map(addr, &len, 1);
--    if (!mem) {
-+    sa = cpu_physical_memory_map(addr, &len, 1);
-+    if (!sa) {
-         return -EFAULT;
-     }
--    if (len != SAVE_AREA_SIZE) {
--        cpu_physical_memory_unmap(mem, len, 1, 0);
-+    if (len != sizeof(*sa)) {
-+        cpu_physical_memory_unmap(sa, len, 1, 0);
-         return -EFAULT;
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 248e9d47e5..390c78f7d0 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -894,6 +894,7 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
      }
  
-@@ -1579,19 +1594,26 @@ static int kvm_s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch)
-         cpu_physical_memory_write(offsetof(LowCore, ar_access_id), &ar_id, 1);
+     /* Look at the command. */
++    ccw_dstream_init(&sch->cds, &ccw, &(sch->orb));
+     switch (ccw.cmd_code) {
+     case CCW_CMD_NOOP:
+         /* Nothing to do. */
+@@ -907,8 +908,8 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
+             }
+         }
+         len = MIN(ccw.count, sizeof(sch->sense_data));
+-        cpu_physical_memory_write(ccw.cda, sch->sense_data, len);
+-        sch->curr_status.scsw.count = ccw.count - len;
++        ccw_dstream_write_buf(&sch->cds, sch->sense_data, len);
++        sch->curr_status.scsw.count = ccw_dstream_residual_count(&sch->cds);
+         memset(sch->sense_data, 0, sizeof(sch->sense_data));
+         ret = 0;
+         break;
+@@ -934,8 +935,8 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
+         } else {
+             sense_id.reserved = 0;
+         }
+-        cpu_physical_memory_write(ccw.cda, &sense_id, len);
+-        sch->curr_status.scsw.count = ccw.count - len;
++        ccw_dstream_write_buf(&sch->cds, &sense_id, len);
++        sch->curr_status.scsw.count = ccw_dstream_residual_count(&sch->cds);
+         ret = 0;
+         break;
      }
-     for (i = 0; i < 16; ++i) {
--        *((uint64_t *)mem + i) = get_freg(&cpu->env, i)->ll;
--    }
--    memcpy(mem + 128, &cpu->env.regs, 128);
--    memcpy(mem + 256, &cpu->env.psw, 16);
--    memcpy(mem + 280, &cpu->env.psa, 4);
--    memcpy(mem + 284, &cpu->env.fpc, 4);
--    memcpy(mem + 292, &cpu->env.todpr, 4);
--    memcpy(mem + 296, &cpu->env.cputm, 8);
--    memcpy(mem + 304, &ckc, 8);
--    memcpy(mem + 320, &cpu->env.aregs, 64);
--    memcpy(mem + 384, &cpu->env.cregs, 128);
-+        sa->fprs[i] = cpu_to_be64(get_freg(&cpu->env, i)->ll);
-+    }
-+    for (i = 0; i < 16; ++i) {
-+        sa->grs[i] = cpu_to_be64(cpu->env.regs[i]);
-+    }
-+    sa->psw.addr = cpu_to_be64(cpu->env.psw.addr);
-+    sa->psw.mask = cpu_to_be64(get_psw_mask(&cpu->env));
-+    sa->prefix = cpu_to_be32(cpu->env.psa);
-+    sa->fpc = cpu_to_be32(cpu->env.fpc);
-+    sa->todpr = cpu_to_be32(cpu->env.todpr);
-+    sa->cputm = cpu_to_be64(cpu->env.cputm);
-+    sa->ckc = cpu_to_be64(cpu->env.ckc >> 8);
-+    for (i = 0; i < 16; ++i) {
-+        sa->ars[i] = cpu_to_be32(cpu->env.aregs[i]);
-+    }
-+    for (i = 0; i < 16; ++i) {
-+        sa->ars[i] = cpu_to_be64(cpu->env.cregs[i]);
-+    }
- 
--    cpu_physical_memory_unmap(mem, len, 1, len);
-+    cpu_physical_memory_unmap(sa, len, 1, len);
- 
-     return 0;
- }
 -- 
 2.13.6
