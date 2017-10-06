@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e0RnZ-00023s-Gs
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:32:14 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e0S02-0005UQ-KZ
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:45:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e0RnV-0000zR-Lw
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:32:13 -0400
-References: <20171006114624.10771-1-maxime.coquelin@redhat.com>
-	<20171006114624.10771-2-maxime.coquelin@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1a2849a9-1dc8-eb8b-8f59-5c9ca4849e1c@redhat.com>
-Date: Fri, 6 Oct 2017 14:31:50 +0200
+	(envelope-from <richard.henderson@linaro.org>) id 1e0S01-0004gV-Qw
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:45:06 -0400
+Received: from mail-qt0-x230.google.com ([2607:f8b0:400d:c0d::230]:46018)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e0S01-0004fs-Le
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:45:05 -0400
+Received: by mail-qt0-x230.google.com with SMTP id k1so20125418qti.2
+	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 05:45:05 -0700 (PDT)
+References: <20171006054014.17282-1-sandipan@linux.vnet.ibm.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e0da7019-5914-5c42-9e21-a9f6e110bfe4@linaro.org>
+Date: Fri, 6 Oct 2017 08:45:02 -0400
 MIME-Version: 1.0
-In-Reply-To: <20171006114624.10771-2-maxime.coquelin@redhat.com>
+In-Reply-To: <20171006054014.17282-1-sandipan@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] exec: add page_mask for
- flatview_do_translate
+Subject: Re: [Qemu-devel] [PATCH v4] target/ppc: Fix carry flag setting for
+ shift algebraic instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>, peterx@redhat.com, mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org
+To: Sandipan Das <sandipan@linux.vnet.ibm.com>, david@gibson.dropbear.id.au
+Cc: nikunj@linux.vnet.ibm.com, agraf@suse.de, qemu-devel@nongnu.org
 
-On 06/10/2017 13:46, Maxime Coquelin wrote:
-> +    hwaddr page_mask = ~TARGET_PAGE_MASK;
-> +    hwaddr plen = (hwaddr)(-1);
-> +
-> +    if (plen_out) {
-> +        plen = *plen_out;
-> +    }
->  
->      for (;;) {
->          section = address_space_translate_internal(
->                  flatview_to_dispatch(fv), addr, &addr,
-> -                plen, is_mmio);
-> +                &plen, is_mmio);
->  
->          iommu_mr = memory_region_get_iommu(section->mr);
->          if (!iommu_mr) {
-> @@ -496,7 +520,8 @@ static MemoryRegionSection flatview_do_translate(FlatView *fv,
->                                  IOMMU_WO : IOMMU_RO);
->          addr = ((iotlb.translated_addr & ~iotlb.addr_mask)
->                  | (addr & iotlb.addr_mask));
-> -        *plen = MIN(*plen, (addr | iotlb.addr_mask) - addr + 1);
-> +        page_mask = iotlb.addr_mask;
+On 10/06/2017 01:40 AM, Sandipan Das wrote:
+> For POWER ISA v3.0, the XER bit CA32 needs to be set by the shift
+> right algebraic instructions whenever the CA bit is to be set. This
+> change affects the following instructions:
+>   * Shift Right Algebraic Word (sraw[.])
+>   * Shift Right Algebraic Word Immediate (srawi[.])
+>   * Shift Right Algebraic Doubleword (srad[.])
+>   * Shift Right Algebraic Doubleword Immediate (sradi[.])
+> 
+> Signed-off-by: Sandipan Das <sandipan@linux.vnet.ibm.com>
+> ---
+> v2: Add tcg_temp_free() required in gen_sraw() and gen_srad()
+> 
+> v3: Remove explicit checking for ISA v3.0 when setting CA32
+> 
+> v4: Set CA32 only when CA is being modified (as Richard suggested)
+>     Set CA32 after checking for ISA300 in gen_* functions (as David suggested)
+> ---
+>  target/ppc/int_helper.c | 16 ++++++++--------
+>  target/ppc/translate.c  | 12 ++++++++++++
+>  2 files changed, 20 insertions(+), 8 deletions(-)
 
-Should this be "page_mask &= iotlb.addr_mask"?
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-If you have multiple IOMMUs on top of each other (yeah, I know...) I
-think the smallest size should win.  This is also consistent with the
-MIN in the line below.
 
-Otherwise looks good.
-
-Paolo
-
-> +        plen = MIN(plen, (addr | iotlb.addr_mask) - addr + 1);
->          if (!(iotlb.perm & (1 << is_write))) {
->              goto translate_fail;
+r~
