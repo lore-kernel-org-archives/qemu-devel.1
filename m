@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e0Uy7-0000qy-6V
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:21 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e0Uy8-0000sl-S6
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e0Uy5-0003Xs-Mp
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:19 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e0Uy7-0003b0-LZ
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:20 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  6 Oct 2017 17:53:55 +0200
-Message-Id: <20171006155422.10135-28-kwolf@redhat.com>
+Date: Fri,  6 Oct 2017 17:53:57 +0200
+Message-Id: <20171006155422.10135-30-kwolf@redhat.com>
 In-Reply-To: <20171006155422.10135-1-kwolf@redhat.com>
 References: <20171006155422.10135-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 27/54] qemu-iotests: limit non-_PROG-suffixed
- variables to common.rc
+Subject: [Qemu-devel] [PULL 29/54] qemu-iotests: disintegrate more parts of
+ common.config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,267 +25,194 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-These are never used by "check", with one exception that does not need
-$QEMU_OPTIONS.  Keep them in common.rc, which will be soon included only
-by the tests.
+Split "check" parts from tests part.
+
+For the directory setup, the actual computation of directories goes
+in "check", while the sanity checks go in the tests.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/039.out       | 10 +++---
- tests/qemu-iotests/061.out       |  4 +--
- tests/qemu-iotests/137.out       |  2 +-
- tests/qemu-iotests/common.config | 69 ++--------------------------------------
- tests/qemu-iotests/common.rc     | 65 +++++++++++++++++++++++++++++++++++++
- 5 files changed, 75 insertions(+), 75 deletions(-)
+ tests/qemu-iotests/common        | 24 ++++++++++++++++++++
+ tests/qemu-iotests/common.config | 49 ----------------------------------------
+ tests/qemu-iotests/common.qemu   |  1 +
+ tests/qemu-iotests/common.rc     | 25 ++++++++++++++++++++
+ 4 files changed, 50 insertions(+), 49 deletions(-)
 
-diff --git a/tests/qemu-iotests/039.out b/tests/qemu-iotests/039.out
-index c6e0ac2da3..724d7b2508 100644
---- a/tests/qemu-iotests/039.out
-+++ b/tests/qemu-iotests/039.out
-@@ -11,7 +11,7 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.config: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
-+./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
-     exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
- else
-     exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-@@ -50,7 +50,7 @@ read 512/512 bytes at offset 0
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.config: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
-+./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
-     exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
- else
-     exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-@@ -68,7 +68,7 @@ incompatible_features     0x0
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.config: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
-+./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
-     exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
- else
-     exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-@@ -91,7 +91,7 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.config: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
-+./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
-     exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
- else
-     exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-@@ -105,7 +105,7 @@ Data may be corrupted, or further writes to the image may corrupt it.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.config: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
-+./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
-     exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
- else
-     exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
-index a431b7f305..942485de99 100644
---- a/tests/qemu-iotests/061.out
-+++ b/tests/qemu-iotests/061.out
-@@ -57,7 +57,7 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- wrote 131072/131072 bytes at offset 0
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.config: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
-+./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
-     exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
- else
-     exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-@@ -219,7 +219,7 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- wrote 131072/131072 bytes at offset 0
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.config: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
-+./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
-     exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
- else
-     exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-diff --git a/tests/qemu-iotests/137.out b/tests/qemu-iotests/137.out
-index c0e753483b..05efd74d17 100644
---- a/tests/qemu-iotests/137.out
-+++ b/tests/qemu-iotests/137.out
-@@ -31,7 +31,7 @@ Cache clean interval too big
- Unsupported value 'blubb' for qcow2 option 'overlap-check'. Allowed are any of the following: none, constant, cached, all
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--./common.config: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
-+./common.rc: Killed                  ( if [ "${VALGRIND_QEMU}" == "y" ]; then
-     exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
- else
-     exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-diff --git a/tests/qemu-iotests/common.config b/tests/qemu-iotests/common.config
-index c97c63983f..c7f0a7a7e0 100644
---- a/tests/qemu-iotests/common.config
-+++ b/tests/qemu-iotests/common.config
-@@ -40,71 +40,6 @@ _optstr_add()
+diff --git a/tests/qemu-iotests/common b/tests/qemu-iotests/common
+index abacc24114..ee313af92f 100644
+--- a/tests/qemu-iotests/common
++++ b/tests/qemu-iotests/common
+@@ -48,6 +48,14 @@ set_prog_path()
      fi
  }
  
--_qemu_wrapper()
--{
--    (
--        if [ -n "${QEMU_NEED_PID}" ]; then
--            echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid"
--        fi
--        exec "$QEMU_PROG" $QEMU_OPTIONS "$@"
--    )
--}
--
--_qemu_img_wrapper()
--{
--    (exec "$QEMU_IMG_PROG" $QEMU_IMG_OPTIONS "$@")
--}
--
--_qemu_io_wrapper()
--{
--    local VALGRIND_LOGFILE="${TEST_DIR}"/$$.valgrind
--    local QEMU_IO_ARGS="$QEMU_IO_OPTIONS"
--    if [ "$IMGOPTSSYNTAX" = "true" ]; then
--        QEMU_IO_ARGS="--image-opts $QEMU_IO_ARGS"
--        if [ -n "$IMGKEYSECRET" ]; then
--            QEMU_IO_ARGS="--object secret,id=keysec0,data=$IMGKEYSECRET $QEMU_IO_ARGS"
--        fi
--    fi
--    local RETVAL
--    (
--        if [ "${VALGRIND_QEMU}" == "y" ]; then
--            exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@"
--        else
--            exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@"
--        fi
--    )
--    RETVAL=$?
--    if [ "${VALGRIND_QEMU}" == "y" ]; then
--        if [ $RETVAL == 99 ]; then
--            cat "${VALGRIND_LOGFILE}"
--        fi
--        rm -f "${VALGRIND_LOGFILE}"
--    fi
--    (exit $RETVAL)
--}
--
--_qemu_nbd_wrapper()
--{
--    (
--        echo $BASHPID > "${QEMU_TEST_DIR}/qemu-nbd.pid"
--        exec "$QEMU_NBD_PROG" $QEMU_NBD_OPTIONS "$@"
--    )
--}
--
--_qemu_vxhs_wrapper()
--{
--    (
--        echo $BASHPID > "${TEST_DIR}/qemu-vxhs.pid"
--        exec "$QEMU_VXHS_PROG" $QEMU_VXHS_OPTIONS "$@"
--    )
--}
--
--export QEMU=_qemu_wrapper
--export QEMU_IMG=_qemu_img_wrapper
--export QEMU_IO=_qemu_io_wrapper
--export QEMU_NBD=_qemu_nbd_wrapper
--export QEMU_VXHS=_qemu_vxhs_wrapper
--
- QEMU_IMG_EXTRA_ARGS=
- if [ "$IMGOPTSSYNTAX" = "true" ]; then
-     QEMU_IMG_EXTRA_ARGS="--image-opts $QEMU_IMG_EXTRA_ARGS"
-@@ -115,8 +50,8 @@ fi
- export QEMU_IMG_EXTRA_ARGS
- 
- 
--default_machine=$($QEMU -machine help | sed -n '/(default)/ s/ .*//p')
--default_alias_machine=$($QEMU -machine help | \
-+default_machine=$($QEMU_PROG -machine help | sed -n '/(default)/ s/ .*//p')
-+default_alias_machine=$($QEMU_PROG -machine help | \
-    sed -n "/(alias of $default_machine)/ { s/ .*//p; q; }")
- if [[ "$default_alias_machine" ]]; then
-     default_machine="$default_alias_machine"
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index 6f6e03366f..e7f74b4dbd 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -50,6 +50,71 @@ then
-     fi
++if [ -z "$TEST_DIR" ]; then
++        TEST_DIR=`pwd`/scratch
++fi
++
++if [ ! -e "$TEST_DIR" ]; then
++        mkdir "$TEST_DIR"
++fi
++
+ diff="diff -u"
+ verbose=false
+ debug=false
+@@ -440,6 +448,13 @@ if [ "$IMGFMT" == "luks" ] && ! (echo "$IMGOPTS" | grep "iter-time=" > /dev/null
+     IMGOPTS=$(_optstr_add "$IMGOPTS" "iter-time=10")
  fi
  
-+_qemu_wrapper()
-+{
-+    (
-+        if [ -n "${QEMU_NEED_PID}" ]; then
-+            echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid"
-+        fi
-+        exec "$QEMU_PROG" $QEMU_OPTIONS "$@"
-+    )
-+}
++if [ -z "$SAMPLE_IMG_DIR" ]; then
++        SAMPLE_IMG_DIR="$source_iotests/sample_images"
++fi
 +
-+_qemu_img_wrapper()
-+{
-+    (exec "$QEMU_IMG_PROG" $QEMU_IMG_OPTIONS "$@")
-+}
++export TEST_DIR
++export SAMPLE_IMG_DIR
 +
-+_qemu_io_wrapper()
-+{
-+    local VALGRIND_LOGFILE="${TEST_DIR}"/$$.valgrind
-+    local QEMU_IO_ARGS="$QEMU_IO_OPTIONS"
-+    if [ "$IMGOPTSSYNTAX" = "true" ]; then
-+        QEMU_IO_ARGS="--image-opts $QEMU_IO_ARGS"
-+        if [ -n "$IMGKEYSECRET" ]; then
-+            QEMU_IO_ARGS="--object secret,id=keysec0,data=$IMGKEYSECRET $QEMU_IO_ARGS"
-+        fi
-+    fi
-+    local RETVAL
-+    (
-+        if [ "${VALGRIND_QEMU}" == "y" ]; then
-+            exec valgrind --log-file="${VALGRIND_LOGFILE}" --error-exitcode=99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@"
-+        else
-+            exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@"
-+        fi
-+    )
-+    RETVAL=$?
-+    if [ "${VALGRIND_QEMU}" == "y" ]; then
-+        if [ $RETVAL == 99 ]; then
-+            cat "${VALGRIND_LOGFILE}"
-+        fi
-+        rm -f "${VALGRIND_LOGFILE}"
-+    fi
-+    (exit $RETVAL)
-+}
+ if [ -s $tmp.list ]
+ then
+     # found some valid test numbers ... this is good
+@@ -524,3 +539,12 @@ if [ -x "$build_iotests/socket_scm_helper" ]
+ then
+     export SOCKET_SCM_HELPER="$build_iotests/socket_scm_helper"
+ fi
 +
-+_qemu_nbd_wrapper()
-+{
-+    (
-+        echo $BASHPID > "${QEMU_TEST_DIR}/qemu-nbd.pid"
-+        exec "$QEMU_NBD_PROG" $QEMU_NBD_OPTIONS "$@"
-+    )
-+}
++default_machine=$($QEMU_PROG -machine help | sed -n '/(default)/ s/ .*//p')
++default_alias_machine=$($QEMU_PROG -machine help | \
++   sed -n "/(alias of $default_machine)/ { s/ .*//p; q; }")
++if [[ "$default_alias_machine" ]]; then
++    default_machine="$default_alias_machine"
++fi
 +
-+_qemu_vxhs_wrapper()
-+{
-+    (
-+        echo $BASHPID > "${TEST_DIR}/qemu-vxhs.pid"
-+        exec "$QEMU_VXHS_PROG" $QEMU_VXHS_OPTIONS "$@"
-+    )
-+}
-+
-+export QEMU=_qemu_wrapper
-+export QEMU_IMG=_qemu_img_wrapper
-+export QEMU_IO=_qemu_io_wrapper
-+export QEMU_NBD=_qemu_nbd_wrapper
-+export QEMU_VXHS=_qemu_vxhs_wrapper
-+
++export QEMU_DEFAULT_MACHINE="$default_machine"
+diff --git a/tests/qemu-iotests/common.config b/tests/qemu-iotests/common.config
+index c7f0a7a7e0..cdcda54546 100644
+--- a/tests/qemu-iotests/common.config
++++ b/tests/qemu-iotests/common.config
+@@ -26,8 +26,6 @@ arch=`uname -m`
+ 
+ export PWD=`pwd`
+ 
+-export _QEMU_HANDLE=0
+-
+ # make sure we have a standard umask
+ umask 022
+ 
+@@ -40,52 +38,5 @@ _optstr_add()
+     fi
+ }
+ 
+-QEMU_IMG_EXTRA_ARGS=
+-if [ "$IMGOPTSSYNTAX" = "true" ]; then
+-    QEMU_IMG_EXTRA_ARGS="--image-opts $QEMU_IMG_EXTRA_ARGS"
+-    if [ -n "$IMGKEYSECRET" ]; then
+-        QEMU_IMG_EXTRA_ARGS="--object secret,id=keysec0,data=$IMGKEYSECRET $QEMU_IMG_EXTRA_ARGS"
+-    fi
+-fi
+-export QEMU_IMG_EXTRA_ARGS
+-
+-
+-default_machine=$($QEMU_PROG -machine help | sed -n '/(default)/ s/ .*//p')
+-default_alias_machine=$($QEMU_PROG -machine help | \
+-   sed -n "/(alias of $default_machine)/ { s/ .*//p; q; }")
+-if [[ "$default_alias_machine" ]]; then
+-    default_machine="$default_alias_machine"
+-fi
+-
+-export QEMU_DEFAULT_MACHINE="$default_machine"
+-
+-if [ -z "$TEST_DIR" ]; then
+-        TEST_DIR=`pwd`/scratch
+-fi
+-
+-QEMU_TEST_DIR="${TEST_DIR}"
+-
+-if [ ! -e "$TEST_DIR" ]; then
+-        mkdir "$TEST_DIR"
+-fi
+-
+-if [ ! -d "$TEST_DIR" ]; then
+-    echo "common.config: Error: \$TEST_DIR ($TEST_DIR) is not a directory"
+-    exit 1
+-fi
+-
+-export TEST_DIR
+-
+-if [ -z "$SAMPLE_IMG_DIR" ]; then
+-        SAMPLE_IMG_DIR="$source_iotests/sample_images"
+-fi
+-
+-if [ ! -d "$SAMPLE_IMG_DIR" ]; then
+-    echo "common.config: Error: \$SAMPLE_IMG_DIR ($SAMPLE_IMG_DIR) is not a directory"
+-    exit 1
+-fi
+-
+-export SAMPLE_IMG_DIR
+-
+ # make sure this script returns success
+ true
+diff --git a/tests/qemu-iotests/common.qemu b/tests/qemu-iotests/common.qemu
+index 7645f1dc72..9f9aecc9df 100644
+--- a/tests/qemu-iotests/common.qemu
++++ b/tests/qemu-iotests/common.qemu
+@@ -31,6 +31,7 @@ QEMU_FIFO_IN="${QEMU_TEST_DIR}/qmp-in-$$"
+ QEMU_FIFO_OUT="${QEMU_TEST_DIR}/qmp-out-$$"
+ 
+ QEMU_HANDLE=0
++export _QEMU_HANDLE=0
+ 
+ # If bash version is >= 4.1, these will be overwritten and dynamic
+ # file descriptor values assigned.
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index 20f6821a69..f4dc0104e6 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -114,6 +114,10 @@ export QEMU_VXHS=_qemu_vxhs_wrapper
+ 
  if [ "$IMGOPTSSYNTAX" = "true" ]; then
      DRIVER="driver=$IMGFMT"
++    QEMU_IMG_EXTRA_ARGS="--image-opts $QEMU_IMG_EXTRA_ARGS"
++    if [ -n "$IMGKEYSECRET" ]; then
++        QEMU_IMG_EXTRA_ARGS="--object secret,id=keysec0,data=$IMGKEYSECRET $QEMU_IMG_EXTRA_ARGS"
++    fi
      if [ "$IMGFMT" = "luks" ]; then
+         DRIVER="$DRIVER,key-secret=keysec0"
+     fi
+@@ -133,6 +137,7 @@ if [ "$IMGOPTSSYNTAX" = "true" ]; then
+         TEST_IMG="$DRIVER,file.driver=$IMGPROTO,file.filename=$TEST_DIR/t.$IMGFMT"
+     fi
+ else
++    QEMU_IMG_EXTRA_ARGS=
+     if [ "$IMGPROTO" = "file" ]; then
+         TEST_IMG=$TEST_DIR/t.$IMGFMT
+     elif [ "$IMGPROTO" = "nbd" ]; then
+@@ -153,6 +158,26 @@ else
+ fi
+ ORIG_TEST_IMG="$TEST_IMG"
+ 
++if [ -z "$TEST_DIR" ]; then
++        TEST_DIR=`pwd`/scratch
++fi
++
++QEMU_TEST_DIR="${TEST_DIR}"
++
++if [ ! -e "$TEST_DIR" ]; then
++        mkdir "$TEST_DIR"
++fi
++
++if [ ! -d "$TEST_DIR" ]; then
++    echo "common.config: Error: \$TEST_DIR ($TEST_DIR) is not a directory"
++    exit 1
++fi
++
++if [ ! -d "$SAMPLE_IMG_DIR" ]; then
++    echo "common.config: Error: \$SAMPLE_IMG_DIR ($SAMPLE_IMG_DIR) is not a directory"
++    exit 1
++fi
++
+ _use_sample_img()
+ {
+     SAMPLE_IMG_FILE="${1%\.bz2}"
 -- 
 2.13.6
