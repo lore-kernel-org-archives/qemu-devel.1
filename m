@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0JCk-0002MA-Ms
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 23:21:39 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e0JCk-0002MB-P1
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 23:21:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0JCj-0005GW-Kv
+	(envelope-from <dgibson@ozlabs.org>) id 1e0JCj-0005GG-Hq
 	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 23:21:38 -0400
-Date: Fri, 6 Oct 2017 14:14:16 +1100
+Date: Fri, 6 Oct 2017 14:21:16 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171006031416.GM3260@umbus.fritz.box>
-References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-	<1507220690-265042-11-git-send-email-imammedo@redhat.com>
+Message-ID: <20171006032116.GO3260@umbus.fritz.box>
+References: <20171003062310.9919-1-sandipan@linux.vnet.ibm.com>
+	<6c84dd7f-4441-0624-d6a4-bffe837eea49@linaro.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="bNLLTo5eXWXFd6av"
+	protocol="application/pgp-signature"; boundary="6kWzDLe2BYLyVXGp"
 Content-Disposition: inline
-In-Reply-To: <1507220690-265042-11-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 10/23] ppc: 40p/prep: replace cpu_model
- with cpu_type
+In-Reply-To: <6c84dd7f-4441-0624-d6a4-bffe837eea49@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v3] target/ppc: Fix carry flag setting for
+ shift algebraic instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +25,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Sandipan Das <sandipan@linux.vnet.ibm.com>, agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, nikunj@linux.vnet.ibm.com
 
 
---bNLLTo5eXWXFd6av
+--6kWzDLe2BYLyVXGp
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 05, 2017 at 06:24:37PM +0200, Igor Mammedov wrote:
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
->  hw/ppc/prep.c | 12 ++++--------
->  1 file changed, 4 insertions(+), 8 deletions(-)
+On Thu, Oct 05, 2017 at 08:42:56AM -0400, Richard Henderson wrote:
+> On 10/03/2017 02:23 AM, Sandipan Das wrote:
+> > @@ -231,6 +231,10 @@ target_ulong helper_sraw(CPUPPCState *env, target_=
+ulong value,
+> >          ret =3D (int32_t)value >> 31;
+> >          env->ca =3D (ret !=3D 0);
+> >      }
+> > +
+> > +    /* update CA32 for ISA v3.0 */
+> > +    env->ca32 =3D env->ca;
 >=20
-> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> index 94138a4..6f8accc 100644
-> --- a/hw/ppc/prep.c
-> +++ b/hw/ppc/prep.c
-> @@ -517,11 +517,8 @@ static void ppc_prep_init(MachineState *machine)
->      linux_boot =3D (kernel_filename !=3D NULL);
-> =20
->      /* init CPUs */
-> -    if (machine->cpu_model =3D=3D NULL)
-> -        machine->cpu_model =3D "602";
->      for (i =3D 0; i < smp_cpus; i++) {
-> -        cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
-> -                                           machine->cpu_model));
-> +        cpu =3D POWERPC_CPU(cpu_create(machine->cpu_type));
->          env =3D &cpu->env;
-> =20
->          if (env->flags & POWERPC_FLAG_RTC_CLK) {
-> @@ -684,6 +681,7 @@ static void prep_machine_init(MachineClass *mc)
->      mc->block_default_type =3D IF_IDE;
->      mc->max_cpus =3D MAX_CPUS;
->      mc->default_boot_order =3D "cad";
-> +    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("602");
->  }
-> =20
->  static int prep_set_cmos_checksum(DeviceState *dev, void *opaque)
-> @@ -718,10 +716,7 @@ static void ibm_40p_init(MachineState *machine)
->      char boot_device;
-> =20
->      /* init CPU */
-> -    if (!machine->cpu_model) {
-> -        machine->cpu_model =3D "604";
-> -    }
-> -    cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, machine->cpu_=
-model));
-> +    cpu =3D POWERPC_CPU(cpu_create(machine->cpu_type));
->      env =3D &cpu->env;
->      if (PPC_INPUT(env) !=3D PPC_FLAGS_INPUT_6xx) {
->          error_report("only 6xx bus is supported on this machine");
-> @@ -894,6 +889,7 @@ static void ibm_40p_machine_init(MachineClass *mc)
->      mc->default_ram_size =3D 128 * M_BYTE;
->      mc->block_default_type =3D IF_SCSI;
->      mc->default_boot_order =3D "c";
-> +    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("604");
->  }
-> =20
->  DEFINE_MACHINE("40p", ibm_40p_machine_init)
+> As I said before, modify ca32 only when ca is modified.
+> E.g.
+>=20
+>   env->ca32 =3D env->ca =3D (ret !=3D 0);
+>=20
+> > @@ -257,6 +261,10 @@ target_ulong helper_srad(CPUPPCState *env, target_=
+ulong value,
+> >          ret =3D (int64_t)value >> 63;
+> >          env->ca =3D (ret !=3D 0);
+> >      }
+> > +
+> > +    /* update CA32 for ISA v3.0 */
+> > +    env->ca32 =3D env->ca;
+>=20
+> Likewise.
+>=20
+> > @@ -2192,6 +2192,10 @@ static void gen_srawi(DisasContext *ctx)
+> >          tcg_gen_setcondi_tl(TCG_COND_NE, cpu_ca, cpu_ca, 0);
+> >          tcg_gen_sari_tl(dst, dst, sh);
+> >      }
+> > +
+> > +    /* update CA32 for ISA v3.0 */
+> > +    tcg_gen_mov_tl(cpu_ca32, cpu_ca);
+>=20
+> Likewise.
+
+Also, for the helper functions it definitely makes sense to always set
+CA32 when CA is set, regardless of CPU model, it's close enough to
+free.  When we're generating code, however, the trade-off is
+different, we only need to test the CPU model at translate time, but
+we need to execute the generated instrucitons potentially more times.
+
+So I'm wondering if for the gen_* functions we _should_ be checking
+for ISA300 before generating the CA32 update instructions.
+
+>=20
+> > @@ -2269,6 +2273,10 @@ static inline void gen_sradi(DisasContext *ctx, =
+int n)
+> >          tcg_gen_setcondi_tl(TCG_COND_NE, cpu_ca, cpu_ca, 0);
+> >          tcg_gen_sari_tl(dst, src, sh);
+> >      }
+> > +
+> > +    /* update CA32 for ISA v3.0 */
+> > +    tcg_gen_mov_tl(cpu_ca32, cpu_ca);
+>=20
+> Likewise.
+>=20
+>=20
+> r~
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -96,24 +102,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---bNLLTo5eXWXFd6av
+--6kWzDLe2BYLyVXGp
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnW9QgACgkQbDjKyiDZ
-s5IrcxAA5d8iNRAfgSkbapmUztJyKbCW4hTdGAxeP3dj18Y01ZSq1Fu/rP4cLB+H
-pvJ/5HXGIQJLonZ0mbC4BYtuj45pNc4K0jCrlsAYnGUvzYTIJIHVggOQWYVKw3Iu
-VxbewRB6xigdI4Ydmp3LKb49YDeVrHK/tzF2OWtdRraT0uxELFTqXf+Xcyy+KNXf
-7jGS8Tm2cLjGHM2NZSYdWL+ez1pHU9OZA2fzsOnQ5fdEA9O0OoUMv/T+Nq+lWahJ
-vt0aKuF/W4Otz6s8SERCUqyIVJQosivNmfmbsELgpDdk0+CfN5PexV8FWrL1fpJu
-1HOYGYe75UfG+oTs+nAC4ll2DQ6YQU5OzRtGPdTcCjRsEe4RuSJy00hO7h3jXSde
-8G6SEeS1shnof/eHqlfJfUsfFltolP/XFvknpGks8Z6Sp1m3jaE/90rdmYlyfB6j
-thzx56fX/Yrnww9HmWF2HI7rkZHFybnWoSyLXgDtDSET4GhvzRTTAIhEcfmF1IER
-Rwpe4H7rQ2icsrHIu2yju/M4L7zcMapyQecyXF5MqUvm4tqlNagknLesJX6y84mq
-5eWjfnoM2UYk+PKTIiRoWLJJH0uzasMSTbesFCLY61KF+urCXDIzfl2xlQ5jGfqc
-by9CRGrB5gt4bS+7jhn5ByReQPqMteIcnmrW0nuIxvWvxXY1+50=
-=JMgk
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnW9qwACgkQbDjKyiDZ
+s5JlWRAAwbfHjE/0ZN+8BXA5EFNuMcaz186q32aFYGyr2xmlV27WfvrCyNxYLAeP
+ldtC3CYn02oxioT+KLterzjLugZi4N4wqH28SgceWHzKZJ5clf8IElWN9MyN9o31
+ZxQrDLoyD88IA6ixHYdJWRCQ9em+HkhC/dKUShktYChcdZwuZI/Cj4K1sLx977YE
+7QRcmrBh2Iy9UldGsxKY9aTQqiD8WEgMVSvQSzEqmbCKm+bO98eFmnP4OD6vRonU
+67XFu28dLEsxMASB9ARmRd+i1rmIZM/1CEzj3nyjq14OltTlVF7w1qOxR0jNjVe2
+ndI073RtSu1WG/6e/ve+zokRJlw8xntNfrLO+y7r4dBWK/NjkT/OnGMb5ono0TpF
+crkIsFHdfWILPfXRxKbgKM1NMNNQEMQJY3SG8nNtnI+eXpqhKDKCTvbKcwwHVPRF
+5f+MjSa3StnrdL8LHTdgOb3j+RDS3Q+OHWzXnO4y23P5V7O66K7/mM6nSL4juPUe
+1H8o0g0qRPZwBXvRqhrNddGHzNGtDDt9nD1Ee9N+r0alnVsVroziyiVRSQiVGWgG
+Oz9MBtdkeTcx1clgc0YGc96jOHxsSDvqIXEANk8lcCZPePo0vbCPccoJXFDn6wBq
+mXqyIfhz7DGY2PwjFfAnZTp1PjIFxxXalyCjgATnmsk12Ni60MU=
+=Ef1A
 -----END PGP SIGNATURE-----
 
---bNLLTo5eXWXFd6av--
+--6kWzDLe2BYLyVXGp--
