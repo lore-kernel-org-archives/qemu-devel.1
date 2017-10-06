@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41532)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e0cPe-0008AM-7y
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 19:52:15 -0400
+	id 1e0cPf-0008BH-AB
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 19:52:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e0cPb-0005i4-6h
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 19:52:14 -0400
+	id 1e0cPe-0005lh-Fs
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 19:52:15 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri,  6 Oct 2017 20:49:23 -0300
-Message-Id: <20171006235023.11952-29-f4bug@amsat.org>
+Date: Fri,  6 Oct 2017 20:49:24 -0300
+Message-Id: <20171006235023.11952-30-f4bug@amsat.org>
 In-Reply-To: <20171006235023.11952-1-f4bug@amsat.org>
 References: <20171006235023.11952-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 28/88] disas: use g_new() family of functions
+Subject: [Qemu-devel] [PATCH 29/88] SPARC: use g_new() family of functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,61 +26,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>
+To: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu trival <qemu-trivial@nongnu.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-[PMD: fixed const cast, squashed M68K + NiosII + SPARC, renamed subject "disas"]
+[PMD: split of disas/sparc.c change]
 ---
- disas/m68k.c  | 3 +--
- disas/nios2.c | 3 +--
- disas/sparc.c | 3 +--
- 3 files changed, 3 insertions(+), 6 deletions(-)
+ hw/sparc/leon3.c     | 2 +-
+ hw/sparc64/sparc64.c | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/disas/m68k.c b/disas/m68k.c
-index 61b689ef3e..31cf6ea5f9 100644
---- a/disas/m68k.c
-+++ b/disas/m68k.c
-@@ -1886,8 +1886,7 @@ print_insn_m68k (bfd_vma memaddr, disassemble_info *info)
+diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+index ec2816bf94..05e7adefb8 100644
+--- a/hw/sparc/leon3.c
++++ b/hw/sparc/leon3.c
+@@ -132,7 +132,7 @@ static void leon3_generic_hw_init(MachineState *machine)
+     cpu_sparc_set_id(env, 0);
  
-       /* Then create a sorted table of pointers
- 	 that point into the unsorted table.  */
--      opc_pointer[0] = malloc (sizeof (struct m68k_opcode *)
--                               * m68k_numopcodes);
-+      opc_pointer[0] = g_new(const struct m68k_opcode *, m68k_numopcodes);
-       opcodes[0] = opc_pointer[0];
+     /* Reset data */
+-    reset_info        = g_malloc0(sizeof(ResetData));
++    reset_info        = g_new0(ResetData, 1);
+     reset_info->cpu   = cpu;
+     reset_info->sp    = 0x40000000 + ram_size;
+     qemu_register_reset(main_cpu_reset, reset_info);
+diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
+index 097d529ff1..6f2197fc13 100644
+--- a/hw/sparc64/sparc64.c
++++ b/hw/sparc64/sparc64.c
+@@ -160,7 +160,7 @@ static CPUTimer *cpu_timer_create(const char *name, SPARCCPU *cpu,
+                                   QEMUBHFunc *cb, uint32_t frequency,
+                                   uint64_t disabled_mask, uint64_t npt_mask)
+ {
+-    CPUTimer *timer = g_malloc0(sizeof(CPUTimer));
++    CPUTimer *timer = g_new0(CPUTimer, 1);
  
-       for (i = 1; i < 16; i++)
-diff --git a/disas/nios2.c b/disas/nios2.c
-index b342936d21..9e6e1e6a1f 100644
---- a/disas/nios2.c
-+++ b/disas/nios2.c
-@@ -2625,8 +2625,7 @@ nios2_init_opcode_hash (nios2_disassembler_state *state)
+     timer->name = name;
+     timer->frequency = frequency;
+@@ -368,7 +368,7 @@ SPARCCPU *sparc64_cpu_devinit(const char *cpu_model,
+                                     hstick_frequency, TICK_INT_DIS,
+                                     TICK_NPT_MASK);
  
- 	if (bucket)
- 	  {
--	    new_hash =
--	      (nios2_opcode_hash *) malloc (sizeof (nios2_opcode_hash));
-+	    new_hash = g_new(nios2_opcode_hash, 1);
- 	    if (new_hash == NULL)
- 	      {
- 		fprintf (stderr,
-diff --git a/disas/sparc.c b/disas/sparc.c
-index f120f4e86d..6d0adab8a7 100644
---- a/disas/sparc.c
-+++ b/disas/sparc.c
-@@ -2684,8 +2684,7 @@ print_insn_sparc (bfd_vma memaddr, disassemble_info *info)
-       current_arch_mask = compute_arch_mask (info->mach);
- 
-       if (!opcodes_initialized)
--        sorted_opcodes =
--          malloc (sparc_num_opcodes * sizeof (sparc_opcode *));
-+        sorted_opcodes = g_new(const sparc_opcode *, sparc_num_opcodes);
-       /* Reset the sorted table so we can resort it.  */
-       for (i = 0; i < sparc_num_opcodes; ++i)
-         sorted_opcodes[i] = &sparc_opcodes[i];
+-    reset_info = g_malloc0(sizeof(ResetData));
++    reset_info = g_new0(ResetData, 1);
+     reset_info->cpu = cpu;
+     reset_info->prom_addr = prom_addr;
+     qemu_register_reset(main_cpu_reset, reset_info);
 -- 
 2.14.2
