@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0JCj-0002M3-C9
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 23:21:39 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e0JCl-0002MH-Qb
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 23:21:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0JCg-0005DX-T0
-	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 23:21:37 -0400
-Date: Fri, 6 Oct 2017 14:02:56 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1e0JCk-0005HG-7F
+	for qemu-devel@nongnu.org; Thu, 05 Oct 2017 23:21:39 -0400
+Date: Fri, 6 Oct 2017 14:08:49 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171006030256.GF3260@umbus.fritz.box>
+Message-ID: <20171006030849.GH3260@umbus.fritz.box>
 References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-	<1507220690-265042-5-git-send-email-imammedo@redhat.com>
+	<1507220690-265042-6-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="oPYnW2SrAqZUvu4n"
+	protocol="application/pgp-signature"; boundary="r21wuLfwIlf/vvzy"
 Content-Disposition: inline
-In-Reply-To: <1507220690-265042-5-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 04/23] ppc: mpc8544ds/e500plat: use generic
+In-Reply-To: <1507220690-265042-6-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/23] ppc: mac_newworld: use generic
  cpu_model parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,86 +29,55 @@ To: Igor Mammedov <imammedo@redhat.com>
 Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
 
 
---oPYnW2SrAqZUvu4n
+--r21wuLfwIlf/vvzy
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 05, 2017 at 06:24:31PM +0200, Igor Mammedov wrote:
+On Thu, Oct 05, 2017 at 06:24:32PM +0200, Igor Mammedov wrote:
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
-Do you want me to queue the ppc patches here, or do you already have a
-plan for that?
-
 > ---
->  hw/ppc/e500.c      | 8 +-------
->  hw/ppc/e500plat.c  | 1 +
->  hw/ppc/mpc8544ds.c | 2 ++
->  3 files changed, 4 insertions(+), 7 deletions(-)
+>  hw/ppc/mac_newworld.c | 15 ++++++---------
+>  1 file changed, 6 insertions(+), 9 deletions(-)
 >=20
-> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-> index db0e49a..9178e70 100644
-> --- a/hw/ppc/e500.c
-> +++ b/hw/ppc/e500.c
-> @@ -803,11 +803,6 @@ void ppce500_init(MachineState *machine, PPCE500Para=
-ms *params)
->      SysBusDevice *s;
->      PPCE500CCSRState *ccsr;
+> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+> index 6d0ace2..3fa7c42 100644
+> --- a/hw/ppc/mac_newworld.c
+> +++ b/hw/ppc/mac_newworld.c
+> @@ -174,16 +174,8 @@ static void ppc_core99_init(MachineState *machine)
+>      linux_boot =3D (kernel_filename !=3D NULL);
 > =20
-> -    /* Setup CPUs */
+>      /* init CPUs */
 > -    if (machine->cpu_model =3D=3D NULL) {
-> -        machine->cpu_model =3D "e500v2_v30";
+> -#ifdef TARGET_PPC64
+> -        machine->cpu_model =3D "970fx";
+> -#else
+> -        machine->cpu_model =3D "G4";
+> -#endif
 > -    }
-> -
->      irqs =3D g_malloc0(smp_cpus * sizeof(qemu_irq *));
->      irqs[0] =3D g_malloc0(smp_cpus * sizeof(qemu_irq) * OPENPIC_OUTPUT_N=
-B);
 >      for (i =3D 0; i < smp_cpus; i++) {
-> @@ -815,8 +810,7 @@ void ppce500_init(MachineState *machine, PPCE500Param=
-s *params)
->          CPUState *cs;
->          qemu_irq *input;
-> =20
 > -        cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
 > -                                           machine->cpu_model));
 > +        cpu =3D POWERPC_CPU(cpu_create(machine->cpu_type));
 >          env =3D &cpu->env;
->          cs =3D CPU(cpu);
 > =20
-> diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
-> index 94b4545..e59e80f 100644
-> --- a/hw/ppc/e500plat.c
-> +++ b/hw/ppc/e500plat.c
-> @@ -64,6 +64,7 @@ static void e500plat_machine_init(MachineClass *mc)
->      mc->init =3D e500plat_init;
->      mc->max_cpus =3D 32;
->      mc->has_dynamic_sysbus =3D true;
-> +    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("e500v2_v30");
+>          /* Set time-base frequency to 100 Mhz */
+> @@ -520,6 +512,11 @@ static void core99_machine_class_init(ObjectClass *o=
+c, void *data)
+>      mc->max_cpus =3D MAX_CPUS;
+>      mc->default_boot_order =3D "cd";
+>      mc->kvm_type =3D core99_kvm_type;
+> +#ifdef TARGET_PPC64
+> +    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("970fx_v3.1");
+> +#else
+> +    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("7400_v2.9");
+> +#endif
 >  }
 > =20
->  DEFINE_MACHINE("ppce500", e500plat_machine_init)
-> diff --git a/hw/ppc/mpc8544ds.c b/hw/ppc/mpc8544ds.c
-> index 27b8289..1717953 100644
-> --- a/hw/ppc/mpc8544ds.c
-> +++ b/hw/ppc/mpc8544ds.c
-> @@ -16,6 +16,7 @@
->  #include "sysemu/device_tree.h"
->  #include "hw/ppc/openpic.h"
->  #include "qemu/error-report.h"
-> +#include "cpu.h"
-> =20
->  static void mpc8544ds_fixup_devtree(PPCE500Params *params, void *fdt)
->  {
-> @@ -55,6 +56,7 @@ static void ppce500_machine_init(MachineClass *mc)
->      mc->desc =3D "mpc8544ds";
->      mc->init =3D mpc8544ds_init;
->      mc->max_cpus =3D 15;
-> +    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("e500v2_v30");
->  }
-> =20
->  DEFINE_MACHINE("mpc8544ds", ppce500_machine_init)
+>  static const TypeInfo core99_machine_info =3D {
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -116,24 +85,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---oPYnW2SrAqZUvu4n
+--r21wuLfwIlf/vvzy
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnW8mAACgkQbDjKyiDZ
-s5JVDQ/8CCbZdqziCPmfwiEUxRAt8/TTcFv65TVnEUEyaHSoSLTW1UeScPgYTefP
-5POZK9EGfgGRhcvY9Y/Yt/ijlQtgziRV0cjaQsFJ7zqsA0981t4lb5QmNRMMxLtc
-RBppUyy5cJm0iVAjEi4MNBsHJAnL069BsbUB+uEVi6cV21vZwywkwYf0su1cVfhj
-igHaHjw88n+ZkUjpEIHMNCgi2cAGW8wBgWTDGGe2VHOEUmAu4eEhTrLOr51V/JQw
-LJi8Mc3TAtudWZtDMwbllo6LxotjX/c+QkYhrmAI4c3qOeRaEjtnLXjDbxSOncN/
-FXyRzK1wLPvdCRajLREHv2+59jzqSfxwUaEXjizWC61G5KvMA2/8AYssX/WwfI2S
-amFiYeK50eyzpr2D4OnEZMFXJQyd+IWhwj7ch4W/UKCGscIC45vSFolmKfnnx27F
-382yR503g3N+1r3MxAW/y2bMhEPPeOeSj2LJ61vbw1QWtbp2AMU1ZbMkdubBdBNA
-FHzSo8Fu7SaYBkMYNisiJAg+j1mK6LL91ikfOUR2FgAcvddO3u301CKhJn9qnCl/
-ppG9U5h3h61EdaHGWstEb5I9Jt+Gv/5j5KYQgc+zEseI50tvmW0CZRdra3s/gBTr
-hlq2rcNP6ASh0/CWFmLVA7lVuxaUHilxT6CQOLxOKZpHwoh0s1c=
-=coiu
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnW88EACgkQbDjKyiDZ
+s5LaOA//QnTDyNqv4gCWltb8mnveyvQXKs+jn4WGnzCG1w5QHglYnzF0NsVJ3JUB
+SwhslFC1DJJNipsSQ3EBPrZJa7KY/OPDVvIAcqBYvkVMWYgRFYo6UVrybXHKbpRO
+09g3r+ntxRpG/XFj17ktiQiFWnzFxWS6AirBTpV1y9qR7V+Dvjz1VcR7wqzs0C5c
+D7GYUNCdWiX9Oi1CPQrfQ1JJmUvjrDZ63iQ3QI/yVQlQDxVtmIZeZTwMNS8bY1zP
+ktL+tph+L4B3N7kaqFnAVjdP82aWR6G+XqV70GtOqZZQqrRdlrAKY7hj49nEn/Zg
+dFUgUqr2AD5gExqrYUh6qoahI7zKzn/xFQ+gR5wlNcwXJfQmEIpRC4LHbBBPbJ6u
+7xrSLre3c1cPpA+kpjeOkBiF2SVfVK4ilHQqYJkJqzIDI2rez8xFnLNlK+nrWAH+
+bExuZ20PRkBPw3GvQjybcIoJYSv0R54yOdrvhB5ir7WbTiQ4XYjJtUflpXtMJiFw
+lyUSdnRewjDsdoKhddHEozinENm7/6DrgjO8n/dkBYqAxd6H28Vz/x7HiW8yRmtj
+IF7DOwSeCrJxwMKOMNPI3enUKLGdqsWGvpw/HClj0pWMRwASSULf0JR+GmJ5xNN0
+fQvpK54q0s8vSw91ISiCosNgSECTCL5IatDLKavrmuBp1nF7siM=
+=yLN+
 -----END PGP SIGNATURE-----
 
---oPYnW2SrAqZUvu4n--
+--r21wuLfwIlf/vvzy--
