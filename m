@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e0SDB-0002BA-A4
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:58:42 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e0SDx-0002eB-JO
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:59:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e0SD8-0000Q8-7v
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:58:41 -0400
-Received: from mail-wm0-f46.google.com ([74.125.82.46]:54951)
+	(envelope-from <peter.maydell@linaro.org>) id 1e0SDw-0001K5-Rj
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:59:29 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:46538)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e0SD8-0000ON-0T
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:58:38 -0400
-Received: by mail-wm0-f46.google.com with SMTP id i124so7759900wmf.3
-	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 05:58:37 -0700 (PDT)
-References: <20170922151208.24590-1-aik@ozlabs.ru>
-	<df2f7ce1-a868-4a99-52ec-d4f934e1b7b7@redhat.com>
-	<f0f20f2a-6946-1b44-768f-3ec8035d5e74@ozlabs.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ba3606b7-1f69-9498-b480-8e24521718da@redhat.com>
-Date: Fri, 6 Oct 2017 14:58:27 +0200
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e0SDw-0001JC-JB
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:59:28 -0400
+Received: by mail-wm0-x235.google.com with SMTP id m72so7497929wmc.1
+	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 05:59:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <f0f20f2a-6946-1b44-768f-3ec8035d5e74@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH qemu] virtio-pci: Replace modern_as
- with direct access to modern_bar
+In-Reply-To: <1507133891-26013-8-git-send-email-ian.jackson@eu.citrix.com>
+References: <1507133891-26013-1-git-send-email-ian.jackson@eu.citrix.com>
+	<1507133891-26013-8-git-send-email-ian.jackson@eu.citrix.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Oct 2017 13:59:06 +0100
+Message-ID: <CAFEAcA-xTX8sL-ybzTs0p68B522ME=ckLo6NL=A1WV8N8bSwoQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 7/8] os-posix: Provide new -runasid option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,21 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
+To: Ian Jackson <ian.jackson@eu.citrix.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, "open list:X86" <xen-devel@lists.xenproject.org>, xen-devel@nongnu.org
 
-On 03/10/2017 04:11, Alexey Kardashevskiy wrote:
->>> What is best to do if MR is not found (and is it possible in practice)?
->>> assert or redirect to unassigned memory?
->> Do nothing at all, I think.
-> Repost without asserts?
+On 4 October 2017 at 17:18, Ian Jackson <ian.jackson@eu.citrix.com> wrote:
+> This allows the caller to specify a uid and gid to use, even if there
+> is no corresponding password entry.  This will be useful in certain
+> Xen configurations.
+>
+> Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
+> ---
 
-Yes, I guess so.
 
->> I haven't thought much about the endian switches, but it looks good
->> apart from that.
-> What is next? Michael?
+> @@ -166,17 +187,19 @@ void os_parse_cmd_args(int index, const char *optarg)
+>
+>  static void change_process_uid(void)
+>  {
+> -    if (user_pwd) {
+> -        if (setgid(user_pwd->pw_gid) < 0) {
+> +    if (user_pwd || user_uid != (uid_t)-1) {
+> +        if (setgid(user_pwd ? user_pwd->pw_gid : user_gid) < 0) {
+>              fprintf(stderr, "Failed to setgid(%d)\n", user_pwd->pw_gid);
 
-Yes, I was going to ping him about this patch too.
+If you're changing the gid we pass to setgid() I think you should
+also change the value we tell the user we tried to use in the
+error message, or it could be rather confusing.
 
-Paolo
+>              exit(1);
+>          }
+> -        if (initgroups(user_pwd->pw_name, user_pwd->pw_gid) < 0) {
+> +        if ((user_pwd
+> +             ? initgroups(user_pwd->pw_name, user_pwd->pw_gid)
+> +             : setgroups(1, &user_gid)) < 0) {
+>              fprintf(stderr, "Failed to initgroups(\"%s\", %d)\n",
+>                      user_pwd->pw_name, user_pwd->pw_gid);
+
+...and here we might claim we failed initgroups() when we actually
+failed setgroups().
+
+>              exit(1);
+>          }
+> -        if (setuid(user_pwd->pw_uid) < 0) {
+> +        if (setuid(user_pwd ? user_pwd->pw_uid : user_gid) < 0) {
+>              fprintf(stderr, "Failed to setuid(%d)\n", user_pwd->pw_uid);
+
+This error message should be updated too.
+
+thanks
+-- PMM
