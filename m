@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e0UyL-000158-Ek
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:38 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e0UyQ-00019f-52
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e0UyJ-0003uz-Tc
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:33 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e0UyM-0003zY-Mq
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:38 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  6 Oct 2017 17:54:05 +0200
-Message-Id: <20171006155422.10135-38-kwolf@redhat.com>
+Date: Fri,  6 Oct 2017 17:54:08 +0200
+Message-Id: <20171006155422.10135-41-kwolf@redhat.com>
 In-Reply-To: <20171006155422.10135-1-kwolf@redhat.com>
 References: <20171006155422.10135-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 37/54] commit: Remove overlay_bs
+Subject: [Qemu-devel] [PULL 40/54] iotests: Restore stty settings on
+ completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,246 +23,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-We don't need to make any assumptions about the graph layout above the
-top node of the commit operation any more. Remove the use of
-bdrv_find_overlay() and related variables from the commit job code.
+From: Eric Blake <eblake@redhat.com>
 
-bdrv_drop_intermediate() doesn't use the 'active' parameter any more, so
-we can just drop it.
+Executing qemu with a terminal as stdin will temporarily alter stty
+settings on that terminal (for example, disabling echo), because of
+how we run both the monitor and any multiplexing with guest input.
+Normally, qemu restores the original settings on exit; but if an
+iotest triggers qemu to abort in the middle, we can be left with
+the altered terminal setup.  This can make life very annoying when
+debugging an iotest failure (not everyone remembers the trick of
+blind-typing 'stty sane' without echo, and some people prefer
+terminal settings that are slightly different than the defaults
+picked by 'stty sane').
 
-The overlay node was previously added to the block job to get a
-BLK_PERM_GRAPH_MOD. We really need to respect those permissions in
-bdrv_drop_intermediate() now, but as long as we haven't figured out yet
-how BLK_PERM_GRAPH_MOD is actually supposed to work, just leave a TODO
-comment there.
+It is possible to avoid qemu corrupting the terminal by not passing
+a terminal to qemu's stdin in the first place (as in, use
+'./check ... </dev/null'), but that's extra typing to have to
+remember.  But running 'exec </dev/null' in the harness seems like
+it might be too heavy of a hammer.  So I instead went the the
+solution of saving and restoring the stty settings, only when the
+harness detects that it is run interactively.
 
-With this change, it is now possible to perform another block job on an
-overlay node without conflicts. qemu-iotests 030 is changed accordingly.
+I tested this patch by forcing an allocation failure (I can't
+guarantee that this particular limit will work on all setups, but
+it shows the idea):
+ $ (ulimit -S -v 500000; ./check -qcow2 1)
 
+Signed-off-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- include/block/block.h  |  3 +--
- block.c                |  6 +++--
- block/commit.c         | 62 ++++++++++++--------------------------------------
- tests/qemu-iotests/030 |  4 ----
- 4 files changed, 20 insertions(+), 55 deletions(-)
+ tests/qemu-iotests/check | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 3c3af462e4..d5c2731a03 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -315,8 +315,7 @@ int bdrv_commit(BlockDriverState *bs);
- int bdrv_change_backing_file(BlockDriverState *bs,
-     const char *backing_file, const char *backing_fmt);
- void bdrv_register(BlockDriver *bdrv);
--int bdrv_drop_intermediate(BlockDriverState *active, BlockDriverState *top,
--                           BlockDriverState *base,
-+int bdrv_drop_intermediate(BlockDriverState *top, BlockDriverState *base,
-                            const char *backing_file_str);
- BlockDriverState *bdrv_find_overlay(BlockDriverState *active,
-                                     BlockDriverState *bs);
-diff --git a/block.c b/block.c
-index 1b098d4d09..46eb1728da 100644
---- a/block.c
-+++ b/block.c
-@@ -3491,8 +3491,8 @@ BlockDriverState *bdrv_find_base(BlockDriverState *bs)
-  *  if active == top, that is considered an error
-  *
-  */
--int bdrv_drop_intermediate(BlockDriverState *active, BlockDriverState *top,
--                           BlockDriverState *base, const char *backing_file_str)
-+int bdrv_drop_intermediate(BlockDriverState *top, BlockDriverState *base,
-+                           const char *backing_file_str)
- {
-     BdrvChild *c, *next;
-     Error *local_err = NULL;
-@@ -3510,6 +3510,8 @@ int bdrv_drop_intermediate(BlockDriverState *active, BlockDriverState *top,
-     }
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index 176cb8e937..e6b6ff7a04 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -134,6 +134,13 @@ export VALGRIND_QEMU=
+ export IMGKEYSECRET=
+ export IMGOPTSSYNTAX=false
  
-     /* success - we can delete the intermediate states, and link top->base */
-+    /* TODO Check graph modification op blockers (BLK_PERM_GRAPH_MOD) once
-+     * we've figured out how they should work. */
-     backing_file_str = backing_file_str ? backing_file_str : base->filename;
- 
-     QLIST_FOREACH_SAFE(c, &top->parents, next_parent, next) {
-diff --git a/block/commit.c b/block/commit.c
-index 610e1cd8f5..5036eec434 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -36,13 +36,11 @@ enum {
- typedef struct CommitBlockJob {
-     BlockJob common;
-     RateLimit limit;
--    BlockDriverState *active;
-     BlockDriverState *commit_top_bs;
-     BlockBackend *top;
-     BlockBackend *base;
-     BlockdevOnError on_error;
-     int base_flags;
--    int orig_overlay_flags;
-     char *backing_file_str;
- } CommitBlockJob;
- 
-@@ -81,18 +79,15 @@ static void commit_complete(BlockJob *job, void *opaque)
- {
-     CommitBlockJob *s = container_of(job, CommitBlockJob, common);
-     CommitCompleteData *data = opaque;
--    BlockDriverState *active = s->active;
-     BlockDriverState *top = blk_bs(s->top);
-     BlockDriverState *base = blk_bs(s->base);
--    BlockDriverState *overlay_bs = bdrv_find_overlay(active, s->commit_top_bs);
-+    BlockDriverState *commit_top_bs = s->commit_top_bs;
-     int ret = data->ret;
-     bool remove_commit_top_bs = false;
- 
--    /* Make sure overlay_bs and top stay around until bdrv_set_backing_hd() */
-+    /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
-     bdrv_ref(top);
--    if (overlay_bs) {
--        bdrv_ref(overlay_bs);
--    }
-+    bdrv_ref(commit_top_bs);
- 
-     /* Remove base node parent that still uses BLK_PERM_WRITE/RESIZE before
-      * the normal backing chain can be restored. */
-@@ -100,9 +95,9 @@ static void commit_complete(BlockJob *job, void *opaque)
- 
-     if (!block_job_is_cancelled(&s->common) && ret == 0) {
-         /* success */
--        ret = bdrv_drop_intermediate(active, s->commit_top_bs, base,
-+        ret = bdrv_drop_intermediate(s->commit_top_bs, base,
-                                      s->backing_file_str);
--    } else if (overlay_bs) {
-+    } else {
-         /* XXX Can (or should) we somehow keep 'consistent read' blocked even
-          * after the failed/cancelled commit job is gone? If we already wrote
-          * something to base, the intermediate images aren't valid any more. */
-@@ -115,9 +110,6 @@ static void commit_complete(BlockJob *job, void *opaque)
-     if (s->base_flags != bdrv_get_flags(base)) {
-         bdrv_reopen(base, s->base_flags, NULL);
-     }
--    if (overlay_bs && s->orig_overlay_flags != bdrv_get_flags(overlay_bs)) {
--        bdrv_reopen(overlay_bs, s->orig_overlay_flags, NULL);
--    }
-     g_free(s->backing_file_str);
-     blk_unref(s->top);
- 
-@@ -134,10 +126,13 @@ static void commit_complete(BlockJob *job, void *opaque)
-      * filter driver from the backing chain. Do this as the final step so that
-      * the 'consistent read' permission can be granted.  */
-     if (remove_commit_top_bs) {
--        bdrv_set_backing_hd(overlay_bs, top, &error_abort);
-+        bdrv_child_try_set_perm(commit_top_bs->backing, 0, BLK_PERM_ALL,
-+                                &error_abort);
-+        bdrv_replace_node(commit_top_bs, backing_bs(commit_top_bs),
-+                          &error_abort);
-     }
- 
--    bdrv_unref(overlay_bs);
-+    bdrv_unref(commit_top_bs);
-     bdrv_unref(top);
- }
- 
-@@ -283,10 +278,8 @@ void commit_start(const char *job_id, BlockDriverState *bs,
- {
-     CommitBlockJob *s;
-     BlockReopenQueue *reopen_queue = NULL;
--    int orig_overlay_flags;
-     int orig_base_flags;
-     BlockDriverState *iter;
--    BlockDriverState *overlay_bs;
-     BlockDriverState *commit_top_bs = NULL;
-     Error *local_err = NULL;
-     int ret;
-@@ -297,31 +290,19 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-         return;
-     }
- 
--    overlay_bs = bdrv_find_overlay(bs, top);
--
--    if (overlay_bs == NULL) {
--        error_setg(errp, "Could not find overlay image for %s:", top->filename);
--        return;
--    }
--
-     s = block_job_create(job_id, &commit_job_driver, bs, 0, BLK_PERM_ALL,
-                          speed, BLOCK_JOB_DEFAULT, NULL, NULL, errp);
-     if (!s) {
-         return;
-     }
- 
--    orig_base_flags    = bdrv_get_flags(base);
--    orig_overlay_flags = bdrv_get_flags(overlay_bs);
--
--    /* convert base & overlay_bs to r/w, if necessary */
-+    /* convert base to r/w, if necessary */
-+    orig_base_flags = bdrv_get_flags(base);
-     if (!(orig_base_flags & BDRV_O_RDWR)) {
-         reopen_queue = bdrv_reopen_queue(reopen_queue, base, NULL,
-                                          orig_base_flags | BDRV_O_RDWR);
-     }
--    if (!(orig_overlay_flags & BDRV_O_RDWR)) {
--        reopen_queue = bdrv_reopen_queue(reopen_queue, overlay_bs, NULL,
--                                         orig_overlay_flags | BDRV_O_RDWR);
--    }
++# Save current tty settings, since an aborting qemu call may leave things
++# screwed up
++STTY_RESTORE=
++if test -t 0; then
++    STTY_RESTORE=$(stty -g)
++fi
 +
-     if (reopen_queue) {
-         bdrv_reopen_multiple(bdrv_get_aio_context(bs), reopen_queue, &local_err);
-         if (local_err != NULL) {
-@@ -382,14 +363,6 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-         goto fail;
-     }
+ for r
+ do
  
--    /* overlay_bs must be blocked because it needs to be modified to
--     * update the backing image string. */
--    ret = block_job_add_bdrv(&s->common, "overlay of top", overlay_bs,
--                             BLK_PERM_GRAPH_MOD, BLK_PERM_ALL, errp);
--    if (ret < 0) {
--        goto fail;
--    }
--
-     s->base = blk_new(BLK_PERM_CONSISTENT_READ
-                       | BLK_PERM_WRITE
-                       | BLK_PERM_RESIZE,
-@@ -408,13 +381,8 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-         goto fail;
-     }
+@@ -664,6 +671,9 @@ END        { if (NR > 0) {
+         needwrap=false
+     fi
  
--    s->active = bs;
--
--    s->base_flags          = orig_base_flags;
--    s->orig_overlay_flags  = orig_overlay_flags;
--
-+    s->base_flags = orig_base_flags;
-     s->backing_file_str = g_strdup(backing_file_str);
--
-     s->on_error = on_error;
- 
-     trace_commit_start(bs, base, top, s);
-@@ -429,7 +397,7 @@ fail:
-         blk_unref(s->top);
-     }
-     if (commit_top_bs) {
--        bdrv_set_backing_hd(overlay_bs, top, &error_abort);
-+        bdrv_replace_node(commit_top_bs, top, &error_abort);
-     }
-     block_job_early_fail(&s->common);
- }
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index d745cb4cde..18838948fa 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -287,10 +287,6 @@ class TestParallelOps(iotests.QMPTestCase):
-         result = self.vm.qmp('block-stream', device='node6', base=self.imgs[4], job_id='stream-node6-v2')
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
--        # This fails because block-commit needs to block node6, the overlay of the 'top' image
--        result = self.vm.qmp('block-stream', device='node7', base=self.imgs[5], job_id='stream-node6-v3')
--        self.assert_qmp(result, 'error/class', 'GenericError')
--
-         # This fails because block-commit currently blocks the active layer even if it's not used
-         result = self.vm.qmp('block-stream', device='drive0', base=self.imgs[5], job_id='stream-drive0')
-         self.assert_qmp(result, 'error/class', 'GenericError')
++    if test -n "$STTY_RESTORE"; then
++        stty $STTY_RESTORE
++    fi
+     rm -f "${TEST_DIR}"/*.out "${TEST_DIR}"/*.err "${TEST_DIR}"/*.time
+     rm -f "${TEST_DIR}"/check.pid "${TEST_DIR}"/check.sts
+     rm -f $tmp.*
 -- 
 2.13.6
