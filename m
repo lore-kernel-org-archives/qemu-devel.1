@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1e0T4Q-00050F-Ml
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:53:43 -0400
+	(envelope-from <berrange@redhat.com>) id 1e0T5I-0005ok-Tw
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:54:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1e0T4P-0001bh-NA
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:53:42 -0400
-Date: Fri, 6 Oct 2017 09:53:35 -0400
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20171006135335.GA7742@stefanha-x1.localdomain>
+	(envelope-from <berrange@redhat.com>) id 1e0T5I-0002Dc-0B
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 09:54:37 -0400
+Date: Fri, 6 Oct 2017 14:54:25 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171006135425.GF26575@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <CAEfK_45dZvxvBNQpPLo71ZJhrPN5_GJr8uJ2pJZpCaFf0+i3YA@mail.gmail.com>
-	<20171006094956.GB4325@localhost.localdomain>
+	<62e835a4-ba5d-e620-47d2-180932a33426@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20171006094956.GB4325@localhost.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] Patch to add helpful tracing output
- for driver authors in NVMe emulation
+In-Reply-To: <62e835a4-ba5d-e620-47d2-180932a33426@redhat.com>
+Subject: Re: [Qemu-devel] Patch to add helpful tracing output for driver
+ authors in NVMe emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,15 +25,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Doug Gale <doug16k@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, keith.busch@intel.com, stefanha@redhat.com, qemu-devel <qemu-devel@nongnu.org>, qemu-block@nongnu.org, mreitz@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: Doug Gale <doug16k@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, keith.busch@intel.com, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-On Fri, Oct 06, 2017 at 11:49:56AM +0200, Kevin Wolf wrote:
-> Am 06.10.2017 um 01:18 hat Doug Gale geschrieben:
+On Fri, Oct 06, 2017 at 08:50:31AM -0500, Eric Blake wrote:
+> On 10/05/2017 06:18 PM, Doug Gale wrote:
 > > I added the tracing output in this patch to assist me in implementing
 > > an NVMe driver. It helped tremendously.
 > > 
-> > From 1d19086cdef8d492929852d582cb41dcc5026f71 Mon Sep 17 00:00:00 2001
+> >>From 1d19086cdef8d492929852d582cb41dcc5026f71 Mon Sep 17 00:00:00 2001
 > > From: Doug Gale <doug16k@gmail.com>
 > > Date: Thu, 5 Oct 2017 19:02:03 -0400
 > > Subject: [PATCH] Add tracing output to NVMe emulation to help driver authors.
@@ -41,24 +42,42 @@ On Fri, Oct 06, 2017 at 11:49:56AM +0200, Kevin Wolf wrote:
 > > or through CFLAGS
 > > 
 > > Signed-off-by: Doug Gale <doug16k@gmail.com>
+> > ---
+> >  hw/block/nvme.c | 191 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
+> >  1 file changed, 177 insertions(+), 14 deletions(-)
+> > 
+> > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> > index 9aa32692a3..74220c0171 100644
+> > --- a/hw/block/nvme.c
+> > +++ b/hw/block/nvme.c
+> > @@ -36,6 +36,14 @@
+> > 
+> >  #include "nvme.h"
+> > 
+> > +//#define DEBUG_NVME
+> > +
+> > +#ifdef DEBUG_NVME
+> > +#define DPRINTF(fmt, ...) fprintf(stderr, "nvme: " fmt "\n", ## __VA_ARGS__)
+> > +#else
+> > +#define DPRINTF(fmt, ...) ((void)0)
+> > +#endif
 > 
-> I think it's generally preferable to use the actual tracing
-> infrastructure instead of fprintf. This would allow to enable the trace
-> points with the command line options instead of only at compile time and
-> also to get machine-readable output if necessary.
-> 
-> The tracing infrastructure is documented in docs/devel/tracing.txt.
+> As Kevin said, using trace-events is nicer than fprintf().  But if you
+> absolutely insist on fprintf(), then do NOT do it like this, because
+> this leads to bit-rot.  Instead, do it in a form that lets -Wformat
+> checking work even when tracing is disabled:
 
-Here is a quick example of enabling trace events whose name starts with
-"cpu_":
+[snip]
 
-  $ x86_64-softmmu/qemu-system-x86_64 -trace enable=cpu_\*
-  7996@1507297762.170096:cpu_get_apic_base 0x00000000fee00900
+IMHO using of trace() instead of fprintf() is pretty much mandatory
+at this point. We've been making a concious effort to replace fprintfs
+with trace across code, so shouldn't add more fprintfs. It is just so
+much more useful to be able to enable the debugging without having to
+recompile the binary.
 
-The default trace backend prints to QEMU's log (stderr).  This makes it
-easy to get at tracing output during development.
-
-In order to add trace events to nvme.c you need to edit
-hw/block/trace-events.  I suggest naming them with a "nvme_" prefix.
-
-Stefan
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
