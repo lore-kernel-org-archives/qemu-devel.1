@@ -1,27 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1e0QIt-0000Xc-Pn
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:56:28 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e0QZq-00037R-9i
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 07:13:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1e0QIr-0003Id-7l
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:56:27 -0400
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:49295)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1e0QIq-0003H8-Ux
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 06:56:25 -0400
-Received: by mail-wr0-x232.google.com with SMTP id p10so10971749wrc.6
-	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 03:56:24 -0700 (PDT)
-References: <1502149958-23381-1-git-send-email-cota@braap.org>
-	<20171005234831.GB23670@flamenco>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20171005234831.GB23670@flamenco>
-Date: Fri, 06 Oct 2017 11:56:21 +0100
-Message-ID: <87a814y27e.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 00/22] tcg: tb_lock removal
+	(envelope-from <kraxel@redhat.com>) id 1e0QZm-0000sZ-3y
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 07:13:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48638)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e0QZl-0000r6-Rh
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 07:13:54 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri,  6 Oct 2017 13:13:42 +0200
+Message-Id: <20171006111342.6665-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] keycodemapdb: try fix makefile deps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +21,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
 
+(1) make .git-submodule-status depend on config-host.mak,
+    for GIT_SUBMODULES changes.
 
-Emilio G. Cota <cota@braap.org> writes:
+(2) make $(KEYCODEMAP_{GEN,CSV}) depend on .git-submodule-status
+    so make knows what to do if they are not there.
 
-> On Mon, Aug 07, 2017 at 19:52:16 -0400, Emilio G. Cota wrote:
->> This series applies on top of the "multiple TCG contexts" series, v4:
->>   https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg06769.html
-> (snip)
->> Please review!
->
-> Turns out this patchset breaks icount, even after fixing the patchset
-> it is based on (see [1]).
+I still get errors because make tries to generate the files before they are checked out,
+but make seems to notice it has to start over and correctly generates the files on the
+second attempt.
 
-Isn't icount only used in single-threaded mode though?
+[ ... ]
+  GEN     config-host.h
+  GEN     module_block.h
+  GEN     ui/input-keymap-linux-to-qcode.c
+  GEN     ui/input-keymap-qcode-to-qnum.c
+  GEN     ui/input-keymap-qnum-to-qcode.c
+python: can't open file '/home/kraxel/projects/qemu/ui/keycodemapdb/tools/keymap-gen': [Errno 2] No such file or directory
+python: can't open file '/home/kraxel/projects/qemu/ui/keycodemapdb/tools/keymap-gen': [Errno 2] No such file or directory
+python: can't open file '/home/kraxel/projects/qemu/ui/keycodemapdb/tools/keymap-gen': [Errno 2] No such file or directory
+make: Leaving directory `/home/kraxel/projects/qemu/build-default'
+make: Entering directory `/home/kraxel/projects/qemu/build-default'
+  GIT     ui/keycodemapdb
+  GEN     trace/generated-tcg-tracers.h
+  GEN     trace/generated-helpers-wrappers.h
+  GEN     trace/generated-helpers.h
+  GEN     trace/generated-helpers.c
+  GEN     ui/input-keymap-linux-to-qcode.c
+  GEN     ui/input-keymap-qcode-to-qnum.c
+  GEN     ui/input-keymap-qnum-to-qcode.c
+  CC      qga/main.o
+[ ... ]
+---
+ Makefile | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
->
-> The last good patch in the series is patch 10:
-> "translate-all: work page-by-page in tb_invalidate_phys_range_1".
-> I have no time to look into fixing that, so if you end up reviewing
-> this set, please review only patches 1-10.
->
-> The good news is that patches > 10 get really hairy, so this should
-> reduce the review burden substantially.
->
-> Thanks,
->
-> 		Emilio
->
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg01198.html
-
-
---
-Alex Benn=C3=A9e
+diff --git a/Makefile b/Makefile
+index 1d3b31f074..c97258629e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -33,7 +33,7 @@ git-submodule-update:
+ endif
+ endif
+ 
+-.git-submodule-status: git-submodule-update
++.git-submodule-status: git-submodule-update config-host.mak
+ 
+ Makefile: .git-submodule-status
+ 
+@@ -225,7 +225,7 @@ KEYCODEMAP_FILES = \
+ 
+ GENERATED_FILES += $(KEYCODEMAP_FILES)
+ 
+-ui/input-keymap-%.c: $(KEYCODEMAP_GEN) $(KEYCODEMAP_CSV) $(SRC_PATH)/ui/Makefile.objs .git-submodule-status
++ui/input-keymap-%.c: $(KEYCODEMAP_GEN) $(KEYCODEMAP_CSV) $(SRC_PATH)/ui/Makefile.objs
+ 	$(call quiet-command,\
+ 	    src=$$(echo $@ | sed -E -e "s,^ui/input-keymap-(.+)-to-(.+)\.c$$,\1,") && \
+ 	    dst=$$(echo $@ | sed -E -e "s,^ui/input-keymap-(.+)-to-(.+)\.c$$,\2,") && \
+@@ -235,6 +235,9 @@ ui/input-keymap-%.c: $(KEYCODEMAP_GEN) $(KEYCODEMAP_CSV) $(SRC_PATH)/ui/Makefile
+ 	          code-map $(KEYCODEMAP_CSV) $${src} $${dst} \
+ 	        > $@ || rm $@, "GEN", "$@")
+ 
++$(KEYCODEMAP_GEN): .git-submodule-status
++$(KEYCODEMAP_CSV): .git-submodule-status
++
+ # Don't try to regenerate Makefile or configure
+ # We don't generate any of them
+ Makefile: ;
+-- 
+2.9.3
