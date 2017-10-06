@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e0aYA-0003pX-TX
+	(envelope-from <ehabkost@redhat.com>) id 1e0aYA-0003pW-TM
 	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 17:52:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e0aY6-0001T3-2Y
+	(envelope-from <ehabkost@redhat.com>) id 1e0aY9-0001YG-Jl
 	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 17:52:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46804)
+Received: from mx1.redhat.com ([209.132.183.28]:39306)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e0aY5-0001RY-SN
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 17:52:49 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e0aY9-0001X7-DU
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 17:52:53 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9BB0A883B8
-	for <qemu-devel@nongnu.org>; Fri,  6 Oct 2017 21:52:48 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 65E0A85543
+	for <qemu-devel@nongnu.org>; Fri,  6 Oct 2017 21:52:52 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri,  6 Oct 2017 18:52:37 -0300
-Message-Id: <20171006215244.27104-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/7] x86: Rework KVM-defaults compat code,
- enable kvm_pv_unhalt by default
+Date: Fri,  6 Oct 2017 18:52:38 -0300
+Message-Id: <20171006215244.27104-2-ehabkost@redhat.com>
+In-Reply-To: <20171006215244.27104-1-ehabkost@redhat.com>
+References: <20171006215244.27104-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/7] qemu-doc: Document minimum kernel version
+ for KVM in x86_64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +33,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-This series enables kvm_pv_unhalt by default on pc-*-2.11 and
-newer.
+The default set of KVM CPU features require the host kernel to
+support them.  KVM_PV_EOI is the newest one, and was included on
+Linux v3.6 (Linux commit ae7a2a3f).
 
-To do that, I first reworked the existing
-x86_cpu_change_kvm_default() logic to use compat_props instead,
-so we don't need to make the chain of pc_compat_*() functions
-grow.
+Running on an old host might break management software
+expectations because the latest machine-type won't be runnable
+while older machine-types might be runnable.  Document v3.6 as
+the minimum kernel version for KVM on x86_64.
 
-Based-on: 20171006132502.9191-1-ehabkost@redhat.com
-(Subject: [PATCH] isapc: Remove unnecessary migration compatibility code)
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ qemu-doc.texi | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-Eduardo Habkost (7):
-  qemu-doc: Document minimum kernel version for KVM in x86_64
-  target/i386: x86_cpu_expand_feature() helper
-  target/i386: Use global variables to control KVM defaults
-  kvm: Define KVM_FEAT_* even if CONFIG_KVM is not defined
-  target/i386: Handle kvm_auto_* compat in x86_cpu_expand_features()
-  pc: Use compat_props to control KVM defaults compatibility
-  target/i386: Enable kvm_pv_unhalt by default
-
- include/hw/i386/pc.h   | 12 +++++++
- target/i386/cpu.h      | 22 +++++++------
- target/i386/kvm_i386.h |  9 ++++++
- hw/i386/pc_piix.c      |  7 ++--
- target/i386/cpu.c      | 88 +++++++++++++++++++++++++++++++++-----------------
- qemu-doc.texi          |  9 ++++++
- 6 files changed, 105 insertions(+), 42 deletions(-)
-
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index ecd186a159..be45b6b6f6 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -37,6 +37,7 @@
+ * QEMU System emulator for non PC targets::
+ * QEMU Guest Agent::
+ * QEMU User space emulator::
++* System requirements::
+ * Implementation notes::
+ * Deprecated features::
+ * License::
+@@ -2348,6 +2349,14 @@ Act as if the host page size was 'pagesize' bytes
+ Run the emulation in single step mode.
+ @end table
+ 
++@node System requirements
++@chapter System requirements
++
++@section KVM kernel module
++
++On x86_64 hosts, the default set of CPU features enabled by the KVM accelerator
++require the host to be running Linux v3.6 or newer.
++
+ 
+ @include qemu-tech.texi
+ 
 -- 
 2.13.6
