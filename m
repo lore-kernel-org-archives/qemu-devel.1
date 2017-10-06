@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1e0RS9-00028S-0U
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:10:05 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e0RZu-0005ET-0D
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:18:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1e0RS4-0004Yv-W9
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:10:04 -0400
-Date: Fri, 6 Oct 2017 14:09:48 +0200
-From: "Eduardo Otubo\"" <otubo@redhat.com>
-Message-ID: <20171006120948.GA12173@vader>
-References: <20170922154014.29350-1-f4bug@amsat.org>
-	<20170922160111.31885-1-f4bug@amsat.org>
-	<a6bedac0-0e58-8709-f549-a602914c9077@reactos.org>
-	<400dde93-d110-ee49-b2a0-76ea633b4abe@amsat.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1e0RZs-0005Kv-UH
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:18:05 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:51931)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e0RZs-0005Jj-Mh
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 08:18:04 -0400
+Received: by mail-wm0-x235.google.com with SMTP id f4so7589327wme.0
+	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 05:18:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <400dde93-d110-ee49-b2a0-76ea633b4abe@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH 23/34] hw/dma/i8257: rename
- DMA_init() to i8257_dma_init()
+In-Reply-To: <20171005203638.19255-1-ehabkost@redhat.com>
+References: <20171005203638.19255-1-ehabkost@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Oct 2017 13:17:42 +0100
+Message-ID: <CAFEAcA-jBzTXWNrRCB8GXm2FcZdT3pPFZiGT6O6Oc8qpfSK_jA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/9] x86 and machine queue, 2017-10-05
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +28,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, qemu-trivial@nongnu.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Sep 22, 2017 at 03:08:03PM -0300, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> On 09/22/2017 02:43 PM, Herv=C3=A9 Poussineau wrote:
-> > Le 22/09/2017 =C3=A0 18:01, Philippe Mathieu-Daud=C3=A9 a =C3=A9crit =
-:
-> [...]
-> > > +void i8257_dma_init(ISABus *bus, int high_page_enable);
-> > > +
-> >=20
-> > As you're changing the DMA_init prototype, can you add an Error **err=
-p
-> > parameter, and pass &error_abort in each caller?
-> >=20
-> > See http://lists.gnu.org/archive/html/qemu-devel/2017-09/msg00262.htm=
-l
-> > for more details
->=20
-> If Eduardo doesn't have a patch ready I can do it.
+On 5 October 2017 at 21:36, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> The following changes since commit d8f932cc696250cb740240d668b39df5fbb2d5a0:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-request' into staging (2017-10-05 16:54:29 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/ehabkost/qemu.git tags/x86-and-machine-pull-request
+>
+> for you to fetch changes up to 7d7e9c4fd6873d9624956cbe0a5cbfae59b7f8af:
+>
+>   x86: Correct translation of some rdgsbase and wrgsbase encodings (2017-10-05 17:30:06 -0300)
+>
+> ----------------------------------------------------------------
+> x86 and machine queue, 2017-10-05
+>
+> Includes x86, NUMA, ACPI, QOM, CPU, and option/config parsing
+> patches.
+>
+> Highlights:
+> * Deprecation of -nodefconfig option;
+> * MachineClass::valid_cpu_types field.
+>
+> ----------------------------------------------------------------
 
-Please go ahead.
-You can also use my patch set (v2) for that as a base if you want.
-https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg08007.html
+This fails tests, I'm afraid:
 
---=20
-Eduardo Otubo
-Senior Software Engineer @ RedHat
+TEST: tests/bios-tables-test... (pid=5565)
+  /i386/acpi/piix4:
+Looking for expected file 'tests/acpi-test-data/pc/DSDT'
+
+Using expected file 'tests/acpi-test-data/pc/DSDT'
+
+Looking for expected file 'tests/acpi-test-data/pc/APIC'
+
+Using expected file 'tests/acpi-test-data/pc/APIC'
+
+Looking for expected file 'tests/acpi-test-data/pc/HPET'
+
+Using expected file 'tests/acpi-test-data/pc/HPET'
+OK
+  /i386/acpi/q35:
+[snip]
+  /i386/acpi/piix4/memhp:
+Looking for expected file 'tests/acpi-test-data/pc/DSDT.memhp'
+
+Using expected file 'tests/acpi-test-data/pc/DSDT.memhp'
+
+Looking for expected file 'tests/acpi-test-data/pc/APIC.memhp'
+
+Looking for expected file 'tests/acpi-test-data/pc/APIC'
+
+Using expected file 'tests/acpi-test-data/pc/APIC'
+
+Looking for expected file 'tests/acpi-test-data/pc/HPET.memhp'
+
+Looking for expected file 'tests/acpi-test-data/pc/HPET'
+
+Using expected file 'tests/acpi-test-data/pc/HPET'
+
+Looking for expected file 'tests/acpi-test-data/pc/SRAT.memhp'
+
+Using expected file 'tests/acpi-test-data/pc/SRAT.memhp'
+
+Looking for expected file 'tests/acpi-test-data/pc/SLIT.memhp'
+
+Using expected file 'tests/acpi-test-data/pc/SLIT.memhp'
+acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-6QYK7Y.dsl,
+aml:/tmp/aml-E8YK7Y], Expected [asl:/tmp/asl-1H1I7Y.dsl,
+aml:tests/acpi-test-data/pc/DSDT.memhp].
+acpi-test: Warning. not showing difference since no diff utility is
+specified. Set 'DIFF' environment variable to a preferred diff utility
+and run 'make V=1 check' again to see ASL difference.OK
+
+and same for /i386/acpi/piix4/numamem and for the
+equivalent q35 tests.
+
+Fails on s390, netbsd, freebsd, aarch32, x86-64.
+
+As an aside, these acpi tests are a bit noisy with
+V=1, especially the extra blank lines.
+
+thanks
+-- PMM
