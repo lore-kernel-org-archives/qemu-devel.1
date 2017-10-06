@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42179)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e0cQY-0000Ux-1H
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 19:53:10 -0400
+	id 1e0cQb-0000YL-7o
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 19:53:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e0cQX-0006RC-8F
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 19:53:10 -0400
+	id 1e0cQa-0006UL-CL
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 19:53:13 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri,  6 Oct 2017 20:49:40 -0300
-Message-Id: <20171006235023.11952-46-f4bug@amsat.org>
+Date: Fri,  6 Oct 2017 20:49:41 -0300
+Message-Id: <20171006235023.11952-47-f4bug@amsat.org>
 In-Reply-To: <20171006235023.11952-1-f4bug@amsat.org>
 References: <20171006235023.11952-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 45/88] hw/display: use g_new() family of
+Subject: [Qemu-devel] [PATCH 46/88] hw/display/vga: use g_new() family of
  functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,46 +27,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu trival <qemu-trivial@nongnu.org>, qemu-arm@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu trival <qemu-trivial@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
-
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-[PMD: squashed pxa2xx_lcd.c]
 ---
-Andrzej should the tc6393xb files go under the PXA2XX section in MAINTAINERS?
+Gerd: should those files go under Graphics section in MAINTAINERS?
 
- hw/display/pxa2xx_lcd.c | 2 +-
- hw/display/tc6393xb.c   | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ hw/display/vga-isa-mm.c | 6 +++---
+ hw/display/vga.c        | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/display/pxa2xx_lcd.c b/hw/display/pxa2xx_lcd.c
-index 845521c5b2..0ca997cae2 100644
---- a/hw/display/pxa2xx_lcd.c
-+++ b/hw/display/pxa2xx_lcd.c
-@@ -1006,7 +1006,7 @@ PXA2xxLCDState *pxa2xx_lcdc_init(MemoryRegion *sysmem,
-     PXA2xxLCDState *s;
-     DisplaySurface *surface;
+diff --git a/hw/display/vga-isa-mm.c b/hw/display/vga-isa-mm.c
+index 51ccbccc41..7af72864df 100644
+--- a/hw/display/vga-isa-mm.c
++++ b/hw/display/vga-isa-mm.c
+@@ -105,12 +105,12 @@ static void vga_mm_init(ISAVGAMMState *s, hwaddr vram_base,
+     MemoryRegion *s_ioport_ctrl, *vga_io_memory;
  
--    s = (PXA2xxLCDState *) g_malloc0(sizeof(PXA2xxLCDState));
-+    s = g_new0(PXA2xxLCDState, 1);
-     s->invalidated = 1;
-     s->irq = irq;
-     s->sysmem = sysmem;
-diff --git a/hw/display/tc6393xb.c b/hw/display/tc6393xb.c
-index 74d10af3d4..2bd73a27e0 100644
---- a/hw/display/tc6393xb.c
-+++ b/hw/display/tc6393xb.c
-@@ -570,7 +570,7 @@ TC6393xbState *tc6393xb_init(MemoryRegion *sysmem, uint32_t base, qemu_irq irq)
-         },
-     };
+     s->it_shift = it_shift;
+-    s_ioport_ctrl = g_malloc(sizeof(*s_ioport_ctrl));
++    s_ioport_ctrl = g_new(MemoryRegion, 1);
+     memory_region_init_io(s_ioport_ctrl, NULL, &vga_mm_ctrl_ops, s,
+                           "vga-mm-ctrl", 0x100000);
+     memory_region_set_flush_coalesced(s_ioport_ctrl);
  
--    s = (TC6393xbState *) g_malloc0(sizeof(TC6393xbState));
-+    s = g_new0(TC6393xbState, 1);
-     s->irq = irq;
-     s->gpio_in = qemu_allocate_irqs(tc6393xb_gpio_set, s, TC6393XB_GPIOS);
+-    vga_io_memory = g_malloc(sizeof(*vga_io_memory));
++    vga_io_memory = g_new(MemoryRegion, 1);
+     /* XXX: endianness? */
+     memory_region_init_io(vga_io_memory, NULL, &vga_mem_ops, &s->vga,
+                           "vga-mem", 0x20000);
+@@ -130,7 +130,7 @@ int isa_vga_mm_init(hwaddr vram_base,
+ {
+     ISAVGAMMState *s;
  
+-    s = g_malloc0(sizeof(*s));
++    s = g_new0(ISAVGAMMState, 1);
+ 
+     s->vga.vram_size_mb = VGA_RAM_SIZE >> 20;
+     vga_common_init(&s->vga, NULL, true);
+diff --git a/hw/display/vga.c b/hw/display/vga.c
+index ed24ef7076..bdefa60f30 100644
+--- a/hw/display/vga.c
++++ b/hw/display/vga.c
+@@ -2236,7 +2236,7 @@ MemoryRegion *vga_init_io(VGACommonState *s, Object *obj,
+     *vga_ports = vga_portio_list;
+     *vbe_ports = vbe_portio_list;
+ 
+-    vga_mem = g_malloc(sizeof(*vga_mem));
++    vga_mem = g_new(MemoryRegion, 1);
+     memory_region_init_io(vga_mem, obj, &vga_mem_ops, s,
+                           "vga-lowmem", 0x20000);
+     memory_region_set_flush_coalesced(vga_mem);
 -- 
 2.14.2
