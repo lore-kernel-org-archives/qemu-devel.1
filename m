@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40619)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e0cOS-0006z4-DP
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 19:51:01 -0400
+	id 1e0cOV-00072T-Jk
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 19:51:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e0cOR-0004od-Ap
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 19:51:00 -0400
+	id 1e0cOU-0004r7-HN
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 19:51:03 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri,  6 Oct 2017 20:49:02 -0300
-Message-Id: <20171006235023.11952-8-f4bug@amsat.org>
+Date: Fri,  6 Oct 2017 20:49:03 -0300
+Message-Id: <20171006235023.11952-9-f4bug@amsat.org>
 In-Reply-To: <20171006235023.11952-1-f4bug@amsat.org>
 References: <20171006235023.11952-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 07/88] Audio: use g_new() family of functions
+Subject: [Qemu-devel] [PATCH 08/88] BT: use g_new() family of functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,128 +26,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
 Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu trival <qemu-trivial@nongnu.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-[PMD: added audio/alsaaudio.c and audio/coreaudio.c]
+[PMD: another use in hw/bt/l2cap.c]
 ---
- audio/alsaaudio.c    | 2 +-
- audio/coreaudio.c    | 2 +-
- audio/dsoundaudio.c  | 2 +-
- audio/ossaudio.c     | 2 +-
- audio/paaudio.c      | 2 +-
- audio/wavaudio.c     | 2 +-
- audio/wavcapture.c   | 2 +-
- hw/audio/intel-hda.c | 2 +-
- 8 files changed, 8 insertions(+), 8 deletions(-)
+ bt-host.c     | 2 +-
+ bt-vhci.c     | 2 +-
+ hw/bt/core.c  | 4 ++--
+ hw/bt/hci.c   | 4 ++--
+ hw/bt/l2cap.c | 6 +++---
+ 5 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/audio/alsaaudio.c b/audio/alsaaudio.c
-index 3652a7b5fa..1a129c79e3 100644
---- a/audio/alsaaudio.c
-+++ b/audio/alsaaudio.c
-@@ -1126,7 +1126,7 @@ static ALSAConf glob_conf = {
+diff --git a/bt-host.c b/bt-host.c
+index 2f8f631c25..ad9e45ea43 100644
+--- a/bt-host.c
++++ b/bt-host.c
+@@ -177,7 +177,7 @@ struct HCIInfo *bt_host_hci(const char *id)
+     }
+ # endif
  
- static void *alsa_audio_init (void)
+-    s = g_malloc0(sizeof(struct bt_host_hci_s));
++    s = g_new0(struct bt_host_hci_s, 1);
+     s->fd = fd;
+     s->hci.cmd_send = bt_host_cmd;
+     s->hci.sco_send = bt_host_sco;
+diff --git a/bt-vhci.c b/bt-vhci.c
+index 9d277c32bf..a885e2b8b9 100644
+--- a/bt-vhci.c
++++ b/bt-vhci.c
+@@ -157,7 +157,7 @@ void bt_vhci_init(struct HCIInfo *info)
+         exit(-1);
+     }
+ 
+-    s = g_malloc0(sizeof(struct bt_vhci_s));
++    s = g_new0(struct bt_vhci_s, 1);
+     s->fd = fd;
+     s->info = info ?: qemu_next_hci();
+     s->info->opaque = s;
+diff --git a/hw/bt/core.c b/hw/bt/core.c
+index 615f0af073..281bb40501 100644
+--- a/hw/bt/core.c
++++ b/hw/bt/core.c
+@@ -55,7 +55,7 @@ static void bt_dummy_lmp_acl_resp(struct bt_link_s *link,
+ /* Slaves that don't hold any additional per link state can use these */
+ static void bt_dummy_lmp_connection_request(struct bt_link_s *req)
  {
--    ALSAConf *conf = g_malloc(sizeof(ALSAConf));
-+    ALSAConf *conf = g_new(ALSAConf, 1);
-     *conf = glob_conf;
-     return conf;
- }
-diff --git a/audio/coreaudio.c b/audio/coreaudio.c
-index c75142084f..651b390b5e 100644
---- a/audio/coreaudio.c
-+++ b/audio/coreaudio.c
-@@ -687,7 +687,7 @@ static CoreaudioConf glob_conf = {
+-    struct bt_link_s *link = g_malloc0(sizeof(struct bt_link_s));
++    struct bt_link_s *link = g_new0(struct bt_link_s, 1);
  
- static void *coreaudio_audio_init (void)
+     link->slave = req->slave;
+     link->host = req->host;
+@@ -135,7 +135,7 @@ struct bt_scatternet_s *qemu_find_bt_vlan(int id)
+         if (vlan->id == id)
+             return &vlan->net;
+     }
+-    vlan = g_malloc0(sizeof(struct bt_vlan_s));
++    vlan = g_new0(struct bt_vlan_s, 1);
+     vlan->id = id;
+     pvlan = &first_bt_vlan;
+     while (*pvlan != NULL)
+diff --git a/hw/bt/hci.c b/hw/bt/hci.c
+index 476ebec0ab..08e65eb62e 100644
+--- a/hw/bt/hci.c
++++ b/hw/bt/hci.c
+@@ -742,7 +742,7 @@ static void bt_hci_connection_reject_event(struct bt_hci_s *hci,
+ static void bt_hci_connection_accept(struct bt_hci_s *hci,
+                 struct bt_device_s *host)
  {
--    CoreaudioConf *conf = g_malloc(sizeof(CoreaudioConf));
-+    CoreaudioConf *conf = g_new(CoreaudioConf, 1);
-     *conf = glob_conf;
+-    struct bt_hci_link_s *link = g_malloc0(sizeof(struct bt_hci_link_s));
++    struct bt_hci_link_s *link = g_new0(struct bt_hci_link_s, 1);
+     evt_conn_complete params;
+     uint16_t handle;
+     uint8_t status = HCI_SUCCESS;
+@@ -2158,7 +2158,7 @@ static void bt_hci_destroy(struct bt_device_s *dev)
  
-     return conf;
-diff --git a/audio/dsoundaudio.c b/audio/dsoundaudio.c
-index 516846eb80..0492d9075e 100644
---- a/audio/dsoundaudio.c
-+++ b/audio/dsoundaudio.c
-@@ -787,7 +787,7 @@ static void *dsound_audio_init (void)
+ struct HCIInfo *bt_new_hci(struct bt_scatternet_s *net)
  {
-     int err;
-     HRESULT hr;
--    dsound *s = g_malloc0(sizeof(dsound));
-+    dsound *s = g_new0(dsound, 1);
+-    struct bt_hci_s *s = g_malloc0(sizeof(struct bt_hci_s));
++    struct bt_hci_s *s = g_new0(struct bt_hci_s, 1);
  
-     s->conf = glob_conf;
-     hr = CoInitialize (NULL);
-diff --git a/audio/ossaudio.c b/audio/ossaudio.c
-index 0edd7ea5fe..50d772011c 100644
---- a/audio/ossaudio.c
-+++ b/audio/ossaudio.c
-@@ -846,7 +846,7 @@ static OSSConf glob_conf = {
+     s->lm.inquiry_done = timer_new_ns(QEMU_CLOCK_VIRTUAL, bt_hci_inquiry_done, s);
+     s->lm.inquiry_next = timer_new_ns(QEMU_CLOCK_VIRTUAL, bt_hci_inquiry_next, s);
+diff --git a/hw/bt/l2cap.c b/hw/bt/l2cap.c
+index e342045140..94f5067d6e 100644
+--- a/hw/bt/l2cap.c
++++ b/hw/bt/l2cap.c
+@@ -1241,7 +1241,7 @@ static void l2cap_lmp_connection_request(struct bt_link_s *link)
  
- static void *oss_audio_init (void)
- {
--    OSSConf *conf = g_malloc(sizeof(OSSConf));
-+    OSSConf *conf = g_new(OSSConf, 1);
-     *conf = glob_conf;
+     /* Always accept - we only get called if (dev->device->page_scan).  */
  
-     if (access(conf->devpath_in, R_OK | W_OK) < 0 ||
-diff --git a/audio/paaudio.c b/audio/paaudio.c
-index 65beb6f010..fc32960c25 100644
---- a/audio/paaudio.c
-+++ b/audio/paaudio.c
-@@ -814,7 +814,7 @@ static PAConf glob_conf = {
+-    l2cap = g_malloc0(sizeof(struct slave_l2cap_instance_s));
++    l2cap = g_new0(struct slave_l2cap_instance_s, 1);
+     l2cap->link.slave = &dev->device;
+     l2cap->link.host = link->host;
+     l2cap_init(&l2cap->l2cap, &l2cap->link, 0);
+@@ -1262,7 +1262,7 @@ static void l2cap_lmp_connection_complete(struct bt_link_s *link)
+         return;
+     }
  
- static void *qpa_audio_init (void)
- {
--    paaudio *g = g_malloc(sizeof(paaudio));
-+    paaudio *g = g_new(paaudio, 1);
-     g->conf = glob_conf;
-     g->mainloop = NULL;
-     g->context = NULL;
-diff --git a/audio/wavaudio.c b/audio/wavaudio.c
-index 341eec3121..f90a02610f 100644
---- a/audio/wavaudio.c
-+++ b/audio/wavaudio.c
-@@ -231,7 +231,7 @@ static WAVConf glob_conf = {
+-    l2cap = g_malloc0(sizeof(struct l2cap_instance_s));
++    l2cap = g_new0(struct l2cap_instance_s, 1);
+     l2cap_init(l2cap, link, 1);
  
- static void *wav_audio_init (void)
- {
--    WAVConf *conf = g_malloc(sizeof(WAVConf));
-+    WAVConf *conf = g_new(WAVConf, 1);
-     *conf = glob_conf;
-     return conf;
- }
-diff --git a/audio/wavcapture.c b/audio/wavcapture.c
-index 5863803584..a744b748a5 100644
---- a/audio/wavcapture.c
-+++ b/audio/wavcapture.c
-@@ -145,7 +145,7 @@ int wav_start_capture (CaptureState *s, const char *path, int freq,
-     ops.capture = wav_capture;
-     ops.destroy = wav_destroy;
+     link->acl_mode = acl_active;
+@@ -1358,7 +1358,7 @@ void bt_l2cap_psm_register(struct bt_l2cap_device_s *dev, int psm, int min_mtu,
+         exit(-1);
+     }
  
--    wav = g_malloc0 (sizeof (*wav));
-+    wav = g_new0(WAVState, 1);
- 
-     shift = bits16 + stereo;
-     hdr[34] = bits16 ? 0x10 : 0x08;
-diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
-index 18a50a8f83..3a2b611d41 100644
---- a/hw/audio/intel-hda.c
-+++ b/hw/audio/intel-hda.c
-@@ -470,7 +470,7 @@ static void intel_hda_parse_bdl(IntelHDAState *d, IntelHDAStream *st)
-     addr = intel_hda_addr(st->bdlp_lbase, st->bdlp_ubase);
-     st->bentries = st->lvi +1;
-     g_free(st->bpl);
--    st->bpl = g_malloc(sizeof(bpl) * st->bentries);
-+    st->bpl = g_new(bpl, st->bentries);
-     for (i = 0; i < st->bentries; i++, addr += 16) {
-         pci_dma_read(&d->pci, addr, buf, 16);
-         st->bpl[i].addr  = le64_to_cpu(*(uint64_t *)buf);
+-    new_psm = g_malloc0(sizeof(*new_psm));
++    new_psm = g_new0(struct bt_l2cap_psm_s, 1);
+     new_psm->psm = psm;
+     new_psm->min_mtu = min_mtu;
+     new_psm->new_channel = new_channel;
 -- 
 2.14.2
