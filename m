@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e0Uxz-0000er-8F
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:16 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e0Uy5-0000om-RU
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e0Uxy-0003Ow-AW
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:11 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e0Uy4-0003Wi-FK
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:55:17 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  6 Oct 2017 17:53:53 +0200
-Message-Id: <20171006155422.10135-26-kwolf@redhat.com>
+Date: Fri,  6 Oct 2017 17:53:54 +0200
+Message-Id: <20171006155422.10135-27-kwolf@redhat.com>
 In-Reply-To: <20171006155422.10135-1-kwolf@redhat.com>
 References: <20171006155422.10135-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 25/54] qemu-iotests: move "check" code out of
- common.rc
+Subject: [Qemu-devel] [PULL 26/54] qemu-iotests: cleanup and fix search for
+ programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,158 +25,259 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-Some functions in common.rc are never used by the tests.  Move
-them out of that file and into common, which is already included
-only by "check".
+Instead of ./check failing when a binary is missing, we try each test
+case now and each one fails with tons of test case diffs.  Also, all the
+variables were initialized by "check" prior to "common" being sourced,
+and then (uselessly) checked for emptiness again in "check".
 
-Code that actually *is* common to "check" and tests can be placed in
-common.config.
+Centralize the search for programs in "common" (which will soon be
+one with "check"), including the "realpath" invocation which can be done
+just once in "check" rather than in the tests.
+
+For qnio_server, move the detection to "common", simplifying
+set_prog_path to stop handling the unused second argument, and
+embedding the "realpath" pass.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/common        | 25 ++++++++++++++++++++++++-
- tests/qemu-iotests/common.config | 12 ++++++++++++
- tests/qemu-iotests/common.rc     | 40 ----------------------------------------
- 3 files changed, 36 insertions(+), 41 deletions(-)
+ tests/qemu-iotests/check         | 41 ---------------------
+ tests/qemu-iotests/common        | 77 +++++++++++++++++++++++++++++++++++++---
+ tests/qemu-iotests/common.config | 61 +------------------------------
+ 3 files changed, 73 insertions(+), 106 deletions(-)
 
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index 67da67bd54..03871d0681 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -60,47 +60,6 @@ fi
+ 
+ build_root="$build_iotests/../.."
+ 
+-if [ -x "$build_iotests/socket_scm_helper" ]
+-then
+-    export SOCKET_SCM_HELPER="$build_iotests/socket_scm_helper"
+-fi
+-
+-if [[ -z "$QEMU_PROG" && ! -x './qemu' ]]
+-then
+-    arch=$(uname -m 2> /dev/null)
+-
+-    if [[ -n $arch && -x "$build_root/$arch-softmmu/qemu-system-$arch" ]]
+-    then
+-        export QEMU_PROG="$build_root/$arch-softmmu/qemu-system-$arch"
+-    else
+-        pushd "$build_root" > /dev/null
+-        for binary in *-softmmu/qemu-system-*
+-        do
+-            if [ -x "$binary" ]
+-            then
+-                export QEMU_PROG="$build_root/$binary"
+-                break
+-            fi
+-        done
+-        popd > /dev/null
+-    fi
+-fi
+-
+-if [[ -z $QEMU_IMG_PROG && -x "$build_root/qemu-img" && ! -x './qemu-img' ]]
+-then
+-    export QEMU_IMG_PROG="$build_root/qemu-img"
+-fi
+-
+-if [[ -z $QEMU_IO_PROG && -x "$build_root/qemu-io" && ! -x './qemu-io' ]]
+-then
+-    export QEMU_IO_PROG="$build_root/qemu-io"
+-fi
+-
+-if [[ -z $QEMU_NBD_PROG && -x "$build_root/qemu-nbd" && ! -x './qemu-nbd' ]]
+-then
+-    export QEMU_NBD_PROG="$build_root/qemu-nbd"
+-fi
+-
+ # we need common.env
+ if ! . "$build_iotests/common.env"
+ then
 diff --git a/tests/qemu-iotests/common b/tests/qemu-iotests/common
-index 130f647a4d..2e98e64d5c 100644
+index 2e98e64d5c..abacc24114 100644
 --- a/tests/qemu-iotests/common
 +++ b/tests/qemu-iotests/common
-@@ -19,6 +19,24 @@
- # common procedures for QA scripts
- #
+@@ -37,6 +37,17 @@ _full_platform_details()
+     echo "$os/$platform $host $kernel"
+ }
  
-+_full_imgfmt_details()
++# $1 = prog to look for
++set_prog_path()
 +{
-+    if [ -n "$IMGOPTS" ]; then
-+        echo "$IMGFMT ($IMGOPTS)"
++    p=`command -v $1 2> /dev/null`
++    if [ -n "$p" -a -x "$p" ]; then
++        realpath -- "$(type -p "$p")"
 +    else
-+        echo "$IMGFMT"
++        return 1
 +    fi
-+}
-+
-+_full_platform_details()
-+{
-+    os=`uname -s`
-+    host=`hostname -s`
-+    kernel=`uname -r`
-+    platform=`uname -m`
-+    echo "$os/$platform $host $kernel"
 +}
 +
  diff="diff -u"
  verbose=false
  debug=false
-@@ -404,7 +422,12 @@ if [ "$IMGOPTSSYNTAX" != "true" ]; then
+@@ -450,10 +461,66 @@ fi
+ list=`sort $tmp.list`
+ rm -f $tmp.list $tmp.tmp $tmp.sed
+ 
+-[ "$QEMU" = "" ] && _fatal "qemu not found"
+-[ "$QEMU_IMG" = "" ] && _fatal "qemu-img not found"
+-[ "$QEMU_IO" = "" ] && _fatal "qemu-io not found"
++if [ -z "$QEMU_PROG" ]
++then
++    if [ -x "$build_iotests/qemu" ]; then
++        export QEMU_PROG="$build_iotests/qemu"
++    elif [ -x "$build_root/$arch-softmmu/qemu-system-$arch" ]; then
++        export QEMU_PROG="$build_root/$arch-softmmu/qemu-system-$arch"
++    else
++        pushd "$build_root" > /dev/null
++        for binary in *-softmmu/qemu-system-*
++        do
++            if [ -x "$binary" ]
++            then
++                export QEMU_PROG="$build_root/$binary"
++                break
++            fi
++        done
++        popd > /dev/null
++        [ "$QEMU_PROG" = "" ] && _init_error "qemu not found"
++    fi
++fi
++export QEMU_PROG=$(realpath -- "$(type -p "$QEMU_PROG")")
++
++if [ -z "$QEMU_IMG_PROG" ]; then
++    if [ -x "$build_iotests/qemu-img" ]; then
++        export QEMU_IMG_PROG="$build_iotests/qemu-img"
++    elif [ -x "$build_root/qemu-img" ]; then
++        export QEMU_IMG_PROG="$build_root/qemu-img"
++    else
++        _init_error "qemu-img not found"
++    fi
++fi
++export QEMU_IMG_PROG=$(realpath -- "$(type -p "$QEMU_IMG_PROG")")
++
++if [ -z "$QEMU_IO_PROG" ]; then
++    if [ -x "$build_iotests/qemu-io" ]; then
++        export QEMU_IO_PROG="$build_iotests/qemu-io"
++    elif [ -x "$build_root/qemu-io" ]; then
++        export QEMU_IO_PROG="$build_root/qemu-io"
++    else
++        _init_error "qemu-io not found"
++    fi
++fi
++export QEMU_IO_PROG=$(realpath -- "$(type -p "$QEMU_IO_PROG")")
+ 
+-if [ "$IMGPROTO" = "nbd" ] ; then
+-    [ "$QEMU_NBD" = "" ] && _fatal "qemu-nbd not found"
++if [ -z $QEMU_NBD_PROG ]; then
++    if [ -x "$build_iotests/qemu-nbd" ]; then
++        export QEMU_NBD_PROG="$build_iotests/qemu-nbd"
++    elif [ -x "$build_root/qemu-nbd" ]; then
++        export QEMU_NBD_PROG="$build_root/qemu-nbd"
++    else
++        _init_error "qemu-nbd not found"
++    fi
++fi
++export QEMU_NBD_PROG=$(realpath -- "$(type -p "$QEMU_NBD_PROG")")
++
++if [ -z "$QEMU_VXHS_PROG" ]; then
++  export QEMU_VXHS_PROG="`set_prog_path qnio_server`"
++fi
++
++if [ -x "$build_iotests/socket_scm_helper" ]
++then
++    export SOCKET_SCM_HELPER="$build_iotests/socket_scm_helper"
  fi
- 
- # Set default options for qemu-img create -o if they were not specified
--_set_default_imgopts
-+if [ "$IMGFMT" == "qcow2" ] && ! (echo "$IMGOPTS" | grep "compat=" > /dev/null); then
-+    IMGOPTS=$(_optstr_add "$IMGOPTS" "compat=1.1")
-+fi
-+if [ "$IMGFMT" == "luks" ] && ! (echo "$IMGOPTS" | grep "iter-time=" > /dev/null); then
-+    IMGOPTS=$(_optstr_add "$IMGOPTS" "iter-time=10")
-+fi
- 
- if [ -s $tmp.list ]
- then
 diff --git a/tests/qemu-iotests/common.config b/tests/qemu-iotests/common.config
-index 0f571d46eb..91da65f3dc 100644
+index 91da65f3dc..c97c63983f 100644
 --- a/tests/qemu-iotests/common.config
 +++ b/tests/qemu-iotests/common.config
-@@ -27,6 +27,9 @@ export PWD=`pwd`
+@@ -22,6 +22,7 @@ export LANG=C
+ PATH=".:$PATH"
  
- export _QEMU_HANDLE=0
+ HOSTOS=`uname -s`
++arch=`uname -m`
  
-+# make sure we have a standard umask
-+umask 022
-+
- # $1 = prog to look for, $2* = default pathnames if not found in $PATH
- set_prog_path()
+ export PWD=`pwd`
+ 
+@@ -30,28 +31,6 @@ export _QEMU_HANDLE=0
+ # make sure we have a standard umask
+ umask 022
+ 
+-# $1 = prog to look for, $2* = default pathnames if not found in $PATH
+-set_prog_path()
+-{
+-    p=`command -v $1 2> /dev/null`
+-    if [ -n "$p" -a -x "$p" ]; then
+-        echo $p
+-        return 0
+-    fi
+-    p=$1
+-
+-    shift
+-    for f; do
+-        if [ -x $f ]; then
+-            echo $f
+-            return 0
+-        fi
+-    done
+-
+-    echo ""
+-    return 1
+-}
+-
+ _optstr_add()
  {
-@@ -49,6 +52,15 @@ set_prog_path()
-     return 1
- }
- 
-+_optstr_add()
-+{
-+    if [ -n "$1" ]; then
-+        echo "$1,$2"
-+    else
-+        echo "$2"
-+    fi
-+}
-+
- _fatal()
- {
-     echo "$*"
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index 5938d5145f..6f6e03366f 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -50,9 +50,6 @@ then
+     if [ -n "$1" ]; then
+@@ -61,44 +40,6 @@ _optstr_add()
      fi
- fi
- 
--# make sure we have a standard umask
--umask 022
--
- if [ "$IMGOPTSSYNTAX" = "true" ]; then
-     DRIVER="driver=$IMGFMT"
-     if [ "$IMGFMT" = "luks" ]; then
-@@ -94,25 +91,6 @@ else
- fi
- ORIG_TEST_IMG="$TEST_IMG"
- 
--_optstr_add()
--{
--    if [ -n "$1" ]; then
--        echo "$1,$2"
--    else
--        echo "$2"
--    fi
--}
--
--_set_default_imgopts()
--{
--    if [ "$IMGFMT" == "qcow2" ] && ! (echo "$IMGOPTS" | grep "compat=" > /dev/null); then
--        IMGOPTS=$(_optstr_add "$IMGOPTS" "compat=1.1")
--    fi
--    if [ "$IMGFMT" == "luks" ] && ! (echo "$IMGOPTS" | grep "iter-time=" > /dev/null); then
--        IMGOPTS=$(_optstr_add "$IMGOPTS" "iter-time=10")
--    fi
--}
--
- _use_sample_img()
- {
-     SAMPLE_IMG_FILE="${1%\.bz2}"
-@@ -428,23 +406,5 @@ _require_command()
-     [ -x "$c" ] || _notrun "$1 utility required, skipped this test"
  }
  
--_full_imgfmt_details()
+-_fatal()
 -{
--    if [ -n "$IMGOPTS" ]; then
--        echo "$IMGFMT ($IMGOPTS)"
--    else
--        echo "$IMGFMT"
--    fi
+-    echo "$*"
+-    status=1
+-    exit 1
 -}
 -
--_full_platform_details()
--{
--    os=`uname -s`
--    host=`hostname -s`
--    kernel=`uname -r`
--    platform=`uname -m`
--    echo "$os/$platform $host $kernel"
--}
+-if [ -z "$QEMU_PROG" ]; then
+-    export QEMU_PROG="`set_prog_path qemu`"
+-fi
 -
- # make sure this script returns success
- true
+-if [ -z "$QEMU_IMG_PROG" ]; then
+-    export QEMU_IMG_PROG="`set_prog_path qemu-img`"
+-fi
+-
+-if [ -z "$QEMU_IO_PROG" ]; then
+-    export QEMU_IO_PROG="`set_prog_path qemu-io`"
+-fi
+-
+-if [ -z "$QEMU_NBD_PROG" ]; then
+-    export QEMU_NBD_PROG="`set_prog_path qemu-nbd`"
+-fi
+-
+-if [ -z "$QEMU_VXHS_PROG" ]; then
+-    export QEMU_VXHS_PROG="`set_prog_path qnio_server`"
+-fi
+-
+-export QEMU_PROG=$(realpath -- "$(type -p "$QEMU_PROG")")
+-export QEMU_IMG_PROG=$(realpath -- "$(type -p "$QEMU_IMG_PROG")")
+-export QEMU_IO_PROG=$(realpath -- "$(type -p "$QEMU_IO_PROG")")
+-export QEMU_NBD_PROG=$(realpath -- "$(type -p "$QEMU_NBD_PROG")")
+-
+-# This program is not built as part of qemu but (possibly) provided by the
+-# system, so it may not be present at all
+-if [ -n "$QEMU_VXHS_PROG" ]; then
+-    export QEMU_VXHS_PROG=$(realpath -- "$(type -p "$QEMU_VXHS_PROG")")
+-fi
+-
+ _qemu_wrapper()
+ {
+     (
 -- 
 2.13.6
