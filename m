@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e0N9x-0001hm-5r
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:35:03 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e0NCL-0003EZ-8w
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:37:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e0N9u-0007v0-2Q
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:35:01 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:23737 helo=relay.sw.ru)
+	(envelope-from <imammedo@redhat.com>) id 1e0NCI-0001oy-3q
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:37:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58812)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1e0N9t-0007sC-Kf
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:34:57 -0400
-References: <20170925135801.144261-1-vsementsov@virtuozzo.com>
-	<20170925135801.144261-9-vsementsov@virtuozzo.com>
-	<b8b01f1a-6e7b-342f-02b6-b7386bff1500@redhat.com>
-	<a4fb096f-7995-ad85-64b7-68a124410e86@redhat.com>
-	<cdec3d7e-04c9-a5e3-d0e7-293e2c7633c8@virtuozzo.com>
-	<ca5a605d-e548-5860-1e40-abcac6017683@virtuozzo.com>
-	<ad2fa9f3-29b1-c00b-1e51-07604f0b45e0@redhat.com>
-	<9c3e29b4-3ec9-4fd7-3d80-122f908d059f@virtuozzo.com>
-	<d54f0fca-6680-cce3-571e-df80a377d48e@redhat.com>
-	<8f9f485a-b3b0-f14a-20ed-86578a96644e@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <f0100e4f-648a-e2d4-efcd-9549b62b35b1@virtuozzo.com>
-Date: Fri, 6 Oct 2017 10:34:50 +0300
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e0NCH-0001oF-Qs
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:37:26 -0400
+Date: Fri, 6 Oct 2017 09:37:21 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171006093721.5abd84ef@nial.brq.redhat.com>
+In-Reply-To: <d83f1682-840e-87b7-9e65-8b83af9d83b1@ilande.co.uk>
+References: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
+	<1507211474-188400-34-git-send-email-imammedo@redhat.com>
+	<d83f1682-840e-87b7-9e65-8b83af9d83b1@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <8f9f485a-b3b0-f14a-20ed-86578a96644e@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 8/8] nbd: Minimal structured
- read for client
+Subject: Re: [Qemu-devel] [PATCH v2 33/40] sparc: sparc: use generic
+ cpu_model parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,107 +29,257 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, atar4qemu@gmail.com
 
-06.10.2017 01:12, Eric Blake wrote:
-> On 10/05/2017 05:36 AM, Paolo Bonzini wrote:
->> On 05/10/2017 12:02, Vladimir Sementsov-Ogievskiy wrote:
->>> 03.10.2017 17:06, Paolo Bonzini wrote:
->>>> On 03/10/2017 15:35, Vladimir Sementsov-Ogievskiy wrote:
->>>>>>> In the end this probably means that you have a read_chunk_header
->>>>>>> function and a read_chunk function.=C2=A0 READ has a loop that ca=
-lls
->>>>>>> read_chunk_header followed by direct reading into the QEMUIOVecto=
-r,
->>>>>>> while everyone else calls read_chunk.
->>>>>> accordingly to spec, we can receive several error reply chunks to =
-any
->>>>>> request,
->>>>>> so loop, receiving them should be common for all requests I think
->>>>> as well as handling error chunks should be common..
->>>> Yes, reading error chunks should be part of read_chunk_header.
->>>>
->>>> Paolo
->>> So, you want a loop in READ, and separate loop for other commands? Th=
-en
->>> we will have separate loop for BLOCK_STATUS and for all future comman=
-ds
->>> with specific replies?
->> There should be a separate loop for each command.
->>
->> The only difference between READ and other commands is that READ
->> receives directly in QEMUIOVector, while other commands can use a comm=
-on
->> function to to receive each structured reply chunk into malloc-ed memo=
-ry.
-> To make sure we're on the same page, here's how I see it.  At a high
-> level, we have:
->
-> Each command calls nbd_co_send_request once, then calls
-> nbd_co_receive_reply in a loop until there is an indication of the last
-> packet.  nbd_co_receive_reply waits for data to come from the server,
-> and parses the header.
->
-> If the packet is unrecognized, report failure and request a quit
-> (negative return value)
->
-> If it is old-style:
-> - if the command is read, and we did not negotiate structured read, the=
-n
-> we also read the payload into qiov
-> - if the command is read, but we negotiated structured read, the server
-> is buggy, so report the bug and request a quit
-> - for all other commands, there is no payload, return success or failur=
-e
-> to the caller based on the header payload
-> - at any rate, the reply to the caller is that this is the final packet=
-,
-> and there is no payload returned (so we return negative or 1, but never=
- 0)
->
-> Otherwise, it is new-style:
-> - if we did not negotiate structured reply, the server is buggy, so
-> report the bug and request a quit (negative return)
-> - if the chunk is an error, we process the entire packet and report the
-> error; if we have any commands that care about the error details, we
-> could return the error in a malloc'd discriminated union, but we can
-> probably get by without that. If callers don't care about details, but
-> the error chunk is not final, it may be easier to just store the fact
-> that an error occurred and return 0 to tell the caller to keep looping,
-> and return the negative value later when the final chunk is finally rec=
-eived
-> - if the chunk is NBD_REPLY_TYPE_NONE, there is no payload, and this
-> should be the final chunk, so the return to the caller can be the same
-> as for old-style (return 1 if we had no earlier error packets, or the
-> saved negative value corresponding to the first error received)
-> - if the command is read, we can read the payload into qiov (saves
-> malloc'ing space for the reply only to copy it into the qiov), so we
+On Thu, 5 Oct 2017 18:25:04 +0100
+Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
 
-but here you said "This is putting a LOT of smarts directly into the=20
-receive routine"
+> On 05/10/17 14:51, Igor Mammedov wrote:
+>=20
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > ---
+> > CC: mark.cave-ayland@ilande.co.uk
+> > CC: atar4qemu@gmail.com
+> > ---
+> >  hw/sparc/sun4m.c | 29 ++++++++++++-----------------
+> >  1 file changed, 12 insertions(+), 17 deletions(-)
+> >=20
+> > diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+> > index e1bdd48..68b2378 100644
+> > --- a/hw/sparc/sun4m.c
+> > +++ b/hw/sparc/sun4m.c
+> > @@ -94,7 +94,6 @@ struct sun4m_hwdef {
+> >      } vsimm[MAX_VSIMMS];
+> >      hwaddr ecc_base;
+> >      uint64_t max_mem;
+> > -    const char * const default_cpu_model;
+> >      uint32_t ecc_version;
+> >      uint32_t iommu_version;
+> >      uint16_t machine_id;
+> > @@ -790,14 +789,14 @@ static const TypeInfo ram_info =3D {
+> >      .class_init    =3D ram_class_init,
+> >  };
+> > =20
+> > -static void cpu_devinit(const char *cpu_model, unsigned int id,
+> > +static void cpu_devinit(const char *cpu_type, unsigned int id,
+> >                          uint64_t prom_addr, qemu_irq **cpu_irqs)
+> >  {
+> >      CPUState *cs;
+> >      SPARCCPU *cpu;
+> >      CPUSPARCState *env;
+> > =20
+> > -    cpu =3D SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+> > +    cpu =3D SPARC_CPU(cpu_create(cpu_type));
+> >      env =3D &cpu->env;
+> > =20
+> >      cpu_sparc_set_id(env, id);
+> > @@ -820,7 +819,6 @@ static void sun4m_hw_init(const struct sun4m_hwdef =
+*hwdef,
+> >                            MachineState *machine)
+> >  {
+> >      DeviceState *slavio_intctl;
+> > -    const char *cpu_model =3D machine->cpu_model;
+> >      unsigned int i;
+> >      void *iommu, *espdma, *ledma, *nvram;
+> >      qemu_irq *cpu_irqs[MAX_CPUS], slavio_irq[32], slavio_cpu_irq[MAX_C=
+PUS],
+> > @@ -833,11 +831,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef=
+ *hwdef,
+> >      unsigned int num_vsimms;
+> > =20
+> >      /* init CPUs */
+> > -    if (!cpu_model)
+> > -        cpu_model =3D hwdef->default_cpu_model;
+> > -
+> >      for(i =3D 0; i < smp_cpus; i++) {
+> > -        cpu_devinit(cpu_model, i, hwdef->slavio_base, &cpu_irqs[i]);
+> > +        cpu_devinit(machine->cpu_type, i, hwdef->slavio_base, &cpu_irq=
+s[i]);
+> >      }
+> > =20
+> >      for (i =3D smp_cpus; i < MAX_CPUS; i++)
+> > @@ -1074,7 +1069,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] =
+=3D {
+> >          .machine_id =3D ss5_id,
+> >          .iommu_version =3D 0x05000000,
+> >          .max_mem =3D 0x10000000,
+> > -        .default_cpu_model =3D "Fujitsu MB86904",
+> >      },
+> >      /* SS-10 */
+> >      {
+> > @@ -1100,7 +1094,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] =
+=3D {
+> >          .machine_id =3D ss10_id,
+> >          .iommu_version =3D 0x03000000,
+> >          .max_mem =3D 0xf00000000ULL,
+> > -        .default_cpu_model =3D "TI SuperSparc II",
+> >      },
+> >      /* SS-600MP */
+> >      {
+> > @@ -1124,7 +1117,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] =
+=3D {
+> >          .machine_id =3D ss600mp_id,
+> >          .iommu_version =3D 0x01000000,
+> >          .max_mem =3D 0xf00000000ULL,
+> > -        .default_cpu_model =3D "TI SuperSparc II",
+> >      },
+> >      /* SS-20 */
+> >      {
+> > @@ -1166,7 +1158,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] =
+=3D {
+> >          .machine_id =3D ss20_id,
+> >          .iommu_version =3D 0x13000000,
+> >          .max_mem =3D 0xf00000000ULL,
+> > -        .default_cpu_model =3D "TI SuperSparc II",
+> >      },
+> >      /* Voyager */
+> >      {
+> > @@ -1190,7 +1181,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] =
+=3D {
+> >          .machine_id =3D vger_id,
+> >          .iommu_version =3D 0x05000000,
+> >          .max_mem =3D 0x10000000,
+> > -        .default_cpu_model =3D "Fujitsu MB86904",
+> >      },
+> >      /* LX */
+> >      {
+> > @@ -1215,7 +1205,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] =
+=3D {
+> >          .machine_id =3D lx_id,
+> >          .iommu_version =3D 0x04000000,
+> >          .max_mem =3D 0x10000000,
+> > -        .default_cpu_model =3D "TI MicroSparc I",
+> >      },
+> >      /* SS-4 */
+> >      {
+> > @@ -1240,7 +1229,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] =
+=3D {
+> >          .machine_id =3D ss4_id,
+> >          .iommu_version =3D 0x05000000,
+> >          .max_mem =3D 0x10000000,
+> > -        .default_cpu_model =3D "Fujitsu MB86904",
+> >      },
+> >      /* SPARCClassic */
+> >      {
+> > @@ -1264,7 +1252,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] =
+=3D {
+> >          .machine_id =3D scls_id,
+> >          .iommu_version =3D 0x05000000,
+> >          .max_mem =3D 0x10000000,
+> > -        .default_cpu_model =3D "TI MicroSparc I",
+> >      },
+> >      /* SPARCbook */
+> >      {
+> > @@ -1288,7 +1275,6 @@ static const struct sun4m_hwdef sun4m_hwdefs[] =
+=3D {
+> >          .machine_id =3D sbook_id,
+> >          .iommu_version =3D 0x05000000,
+> >          .max_mem =3D 0x10000000,
+> > -        .default_cpu_model =3D "TI MicroSparc I",
+> >      },
+> >  };
+> > =20
+> > @@ -1355,6 +1341,7 @@ static void ss5_class_init(ObjectClass *oc, void =
+*data)
+> >      mc->block_default_type =3D IF_SCSI;
+> >      mc->is_default =3D 1;
+> >      mc->default_boot_order =3D "c";
+> > +    mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
+> >  }
+> > =20
+> >  static const TypeInfo ss5_type =3D {
+> > @@ -1372,6 +1359,7 @@ static void ss10_class_init(ObjectClass *oc, void=
+ *data)
+> >      mc->block_default_type =3D IF_SCSI;
+> >      mc->max_cpus =3D 4;
+> >      mc->default_boot_order =3D "c";
+> > +    mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
+> >  }
+> > =20
+> >  static const TypeInfo ss10_type =3D {
+> > @@ -1389,6 +1377,7 @@ static void ss600mp_class_init(ObjectClass *oc, v=
+oid *data)
+> >      mc->block_default_type =3D IF_SCSI;
+> >      mc->max_cpus =3D 4;
+> >      mc->default_boot_order =3D "c";
+> > +    mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
+> >  }
+> > =20
+> >  static const TypeInfo ss600mp_type =3D {
+> > @@ -1406,6 +1395,7 @@ static void ss20_class_init(ObjectClass *oc, void=
+ *data)
+> >      mc->block_default_type =3D IF_SCSI;
+> >      mc->max_cpus =3D 4;
+> >      mc->default_boot_order =3D "c";
+> > +    mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
+> >  }
+> > =20
+> >  static const TypeInfo ss20_type =3D {
+> > @@ -1422,6 +1412,7 @@ static void voyager_class_init(ObjectClass *oc, v=
+oid *data)
+> >      mc->init =3D vger_init;
+> >      mc->block_default_type =3D IF_SCSI;
+> >      mc->default_boot_order =3D "c";
+> > +    mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
+> >  }
+> > =20
+> >  static const TypeInfo voyager_type =3D {
+> > @@ -1438,6 +1429,7 @@ static void ss_lx_class_init(ObjectClass *oc, voi=
+d *data)
+> >      mc->init =3D ss_lx_init;
+> >      mc->block_default_type =3D IF_SCSI;
+> >      mc->default_boot_order =3D "c";
+> > +    mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
+> >  }
+> > =20
+> >  static const TypeInfo ss_lx_type =3D {
+> > @@ -1454,6 +1446,7 @@ static void ss4_class_init(ObjectClass *oc, void =
+*data)
+> >      mc->init =3D ss4_init;
+> >      mc->block_default_type =3D IF_SCSI;
+> >      mc->default_boot_order =3D "c";
+> > +    mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
+> >  }
+> > =20
+> >  static const TypeInfo ss4_type =3D {
+> > @@ -1470,6 +1463,7 @@ static void scls_class_init(ObjectClass *oc, void=
+ *data)
+> >      mc->init =3D scls_init;
+> >      mc->block_default_type =3D IF_SCSI;
+> >      mc->default_boot_order =3D "c";
+> > +    mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
+> >  }
+> > =20
+> >  static const TypeInfo scls_type =3D {
+> > @@ -1486,6 +1480,7 @@ static void sbook_class_init(ObjectClass *oc, voi=
+d *data)
+> >      mc->init =3D sbook_init;
+> >      mc->block_default_type =3D IF_SCSI;
+> >      mc->default_boot_order =3D "c";
+> > +    mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
+> >  }
+> > =20
+> >  static const TypeInfo sbook_type =3D { =20
+>=20
+> No objections to this patch but just to confirm from the previous
+> discussion that the cpu type gets parsed in a way such that an existing
+> -cpu "TI SuperSparc II" option gets mapped to the correct
+> "TI-SuperSparc-II" type? Presumably this is now handled at a different
+> level?
+old way still works, see sparc_cpu_type_name()
 
-> don't have to return any data
-> - for any other command, we malloc space for the non-error payload, and
-> then it is up to the command's loop to process the payload
->
-> so the signature can be something like:
->
-> int nbd_co_receive_reply(NBDClientSession *s, QEMUIOVector *qiov,
->                           void **payload)
->
-> where it returns -errno on failure, 0 if the command is not complete,
-> and 1 if the command is done.  READ passes qiov, which is fully
-> populated when the function returns 1; all other commands pass NULL.
-> Commands pass NULL for payload if they don't expect a payload return
-> (this includes READ); but a command that expects a payload
-> (BLOCK_STATUS) passes a pointer in payload and gets malloc'd space
-> stored there if return is 0 or 1.
->
-> Does that sound like we're on the right design track?
->
-
-
---=20
-Best regards,
-Vladimir
+call chain is
+ vl.c:
+   machine->cpu_type =3D cpu_parse_cpu_model()
+                          -> sparc_cpu_class_by_name()
+                               -> sparc_cpu_type_name()
+  =20
+>=20
+>=20
+> ATB,
+>=20
+> Mark.
+>=20
