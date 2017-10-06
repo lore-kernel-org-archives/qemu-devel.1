@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0N56-0006OX-Ni
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:30:03 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e0N59-0006Om-86
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:30:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e0N55-0002c9-IA
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:30:00 -0400
-Date: Fri, 6 Oct 2017 15:41:04 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1e0N58-0002gY-25
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 03:30:03 -0400
+Date: Fri, 6 Oct 2017 16:04:39 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171006044104.GT3260@umbus.fritz.box>
+Message-ID: <20171006050439.GV3260@umbus.fritz.box>
 References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-	<1507220690-265042-16-git-send-email-imammedo@redhat.com>
+	<1507220690-265042-18-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="NZ00oluAJr3A0NMv"
+	protocol="application/pgp-signature"; boundary="m5R8f+g8StfRwQ/I"
 Content-Disposition: inline
-In-Reply-To: <1507220690-265042-16-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 15/23] ppc: spapr: register 'host' core
- type along with the rest of core types
+In-Reply-To: <1507220690-265042-18-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 17/23] ppc: spapr: use generic cpu_model
+ parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,87 +29,121 @@ To: Igor Mammedov <imammedo@redhat.com>
 Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
 
 
---NZ00oluAJr3A0NMv
+--m5R8f+g8StfRwQ/I
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 05, 2017 at 06:24:42PM +0200, Igor Mammedov wrote:
-> consolidate 'host' core type registration by moving it from
-> KVM specific code into spapr_cpu_core.c, similar like it's
-> done in x86 target.
+On Thu, Oct 05, 2017 at 06:24:44PM +0200, Igor Mammedov wrote:
+> use generic cpu_model parsing introduced by
+>  (6063d4c0f vl.c: convert cpu_model to cpu type and set of global propert=
+ies before machine_init())
+>=20
+> it allows to:
+>   * replace sPAPRMachineClass::tcg_default_cpu with
+>     MachineClass::default_cpu_type
+>   * drop cpu_parse_cpu_model() from hw/ppc/spapr.c and reuse
+>     one in vl.c
+>   * simplify spapr_get_cpu_core_type() by removing
+>     not needed anymore recurrsion since alias look up
+>     happens earlier at vl.c and spapr_get_cpu_core_type()
+>     works only with resulted from that cpu type.
+>   * spapr no more needs to parse/depend on being phased out
+>     MachineState::cpu_model, all tha parsing done by generic
+>     code and target specific callback.
 >=20
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-
-IIUC this will change behaviour slightly: with this patch the 'host'
-core type will show up whenever CONFIG_KVM is set, even if the KVM
-accelerator is disabled on the command line.  Previously it would not.
-
-Is this change intentional?
-
 > ---
->  include/hw/ppc/spapr_cpu_core.h |  1 -
->  hw/ppc/spapr_cpu_core.c         |  5 ++++-
->  target/ppc/kvm.c                | 11 -----------
->  3 files changed, 4 insertions(+), 13 deletions(-)
->=20
-> diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_c=
-ore.h
-> index 264ce68..42765de 100644
-> --- a/include/hw/ppc/spapr_cpu_core.h
-> +++ b/include/hw/ppc/spapr_cpu_core.h
-> @@ -38,5 +38,4 @@ typedef struct sPAPRCPUCoreClass {
->  } sPAPRCPUCoreClass;
-> =20
->  char *spapr_get_cpu_core_type(const char *model);
-> -void spapr_cpu_core_class_init(ObjectClass *oc, void *data);
->  #endif
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 8e13e52..f2da4be 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -220,7 +220,7 @@ static Property spapr_cpu_core_properties[] =3D {
->      DEFINE_PROP_END_OF_LIST()
->  };
-> =20
-> -void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
-> +static void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
+> PS:
+>   patch is a little bit big but it's hard to split it due
+>   to dependencies, so pls bear with it.
+
+[snip]
+> -static int kvm_ppc_register_host_cpu_type(void)
+> +static int kvm_ppc_register_host_cpu_type(MachineState *ms)
 >  {
->      DeviceClass *dc =3D DEVICE_CLASS(oc);
->      sPAPRCPUCoreClass *scc =3D SPAPR_CPU_CORE_CLASS(oc);
-> @@ -257,6 +257,9 @@ static const TypeInfo spapr_cpu_core_type_infos[] =3D=
- {
->      DEFINE_SPAPR_CPU_CORE_TYPE("power8e_v2.1"),
->      DEFINE_SPAPR_CPU_CORE_TYPE("power8nvl_v1.0"),
->      DEFINE_SPAPR_CPU_CORE_TYPE("power9_v1.0"),
-> +#ifdef CONFIG_KVM
-> +    DEFINE_SPAPR_CPU_CORE_TYPE("host"),
-> +#endif
->  };
-> =20
->  DEFINE_TYPES(spapr_cpu_core_type_infos)
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index c2152ed..cb5777a 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2508,17 +2508,6 @@ static int kvm_ppc_register_host_cpu_type(void)
+>      TypeInfo type_info =3D {
+>          .name =3D TYPE_HOST_POWERPC_CPU,
+>          .class_init =3D kvmppc_host_cpu_class_init,
+>      };
+> +    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
+>      PowerPCCPUClass *pvr_pcc;
+>      ObjectClass *oc;
+>      DeviceClass *dc;
+> @@ -2504,6 +2505,8 @@ static int kvm_ppc_register_host_cpu_type(void)
+>      }
+>      type_info.parent =3D object_class_get_name(OBJECT_CLASS(pvr_pcc));
+>      type_register(&type_info);
+> +    /* override TCG default cpu type with 'host' cpu model */
+> +    mc->default_cpu_type =3D TYPE_HOST_POWERPC_CPU;
+
+Ugh.  I dislike this, it changes the default cpu type to 'host' for
+*all* machine types, whereas previously it was just true for pseries.
+That wasn't by accident.
+
+In general, I think we want there to be a single default CPU type for
+a machine, regardless of TCG vs. KVM.  This is particularly true for
+many of the ppc machine types - they will only work with a CPU in the
+right "family" (e500 / 440 / POWERx, wahtever); in many of these cases
+KVM PR is usable, but using -cpu host could easily break the machine
+type.
+
+'pseries' is different, it (and only it) can be used with KVM HV - and
+usually is.  And KVM HV *only* works with -cpu host, due to hardware
+limitations.
+
 >      oc =3D object_class_by_name(type_info.name);
 >      g_assert(oc);
+> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> index 5ee91e8..a968e86 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -10277,6 +10277,19 @@ PowerPCCPUClass *ppc_cpu_class_by_pvr_mask(uint3=
+2_t pvr)
+>      return pcc;
+>  }
 > =20
-> -#if defined(TARGET_PPC64)
-> -    type_info.name =3D g_strdup_printf("%s-"TYPE_SPAPR_CPU_CORE, "host");
-> -    type_info.parent =3D TYPE_SPAPR_CPU_CORE,
-> -    type_info.instance_size =3D sizeof(sPAPRCPUCore);
-> -    type_info.instance_init =3D NULL;
-> -    type_info.class_init =3D spapr_cpu_core_class_init;
-> -    type_info.class_data =3D (void *) POWERPC_CPU_TYPE_NAME("host");
-> -    type_register(&type_info);
-> -    g_free((void *)type_info.name);
-> -#endif
+> +static const char *ppc_cpu_lookup_alias(const char *alias)
+> +{
+> +    int ai;
+> +
+> +    for (ai =3D 0; ppc_cpu_aliases[ai].alias !=3D NULL; ai++) {
+> +        if (strcmp(ppc_cpu_aliases[ai].alias, alias) =3D=3D 0) {
+> +            return ppc_cpu_aliases[ai].model;
+> +        }
+> +    }
+> +
+> +    return NULL;
+> +}
+> +
+>  static ObjectClass *ppc_cpu_class_by_name(const char *name)
+>  {
+>      char *cpu_model, *typename;
+> @@ -10370,19 +10383,6 @@ static void ppc_cpu_parse_featurestr(const char =
+*typename, char *features,
+>      pcc->parent_parse_features(typename, features, errp);
+>  }
+> =20
+> -const char *ppc_cpu_lookup_alias(const char *alias)
+> -{
+> -    int ai;
 > -
->      /*
->       * Update generic CPU family class alias (e.g. on a POWER8NVL host,
->       * we want "POWER8" to be a "family" alias that points to the current
+> -    for (ai =3D 0; ppc_cpu_aliases[ai].alias !=3D NULL; ai++) {
+> -        if (strcmp(ppc_cpu_aliases[ai].alias, alias) =3D=3D 0) {
+> -            return ppc_cpu_aliases[ai].model;
+> -        }
+> -    }
+> -
+> -    return NULL;
+> -}
+> -
+
+This code motion of ppc_cpu_lookup_alias appears to be unrelated to
+the rest of the patch.
+
+>  PowerPCCPUClass *ppc_cpu_get_family_class(PowerPCCPUClass *pcc)
+>  {
+>      ObjectClass *oc =3D OBJECT_CLASS(pcc);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -117,24 +151,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---NZ00oluAJr3A0NMv
+--m5R8f+g8StfRwQ/I
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnXCV4ACgkQbDjKyiDZ
-s5I0rw/+KUrRosQ+vkNUcNbVozLuhEeRgA6MjuoKSGambEZyQxcm4jX5IXr0ePa2
-G4k7ts4QPELnN+ZGYlrYKKDjWP5UlfVp4toaZPn+++MvFqv1lvFZx8GU+Cc7TqIi
-r2KtYPP6+6aZHaDvQEI2m13o/3upFfFJy1cHC8WHxIrbnpPDBzWdzCYOrsj1uCN+
-zjO6LXqLtZIi2eAAabP5AQWJHIg7Oeev++LitowQiB7IrBujYj7I4KaQukn/2VRd
-9Tj0tLR58r8fHNWEToH36RoPV71Fn/FtCM41veeXGvX7oHoOS6FPD11NBwRXHRJR
-ole3bhhTxCR1ZTXel4uXGKx+EKEPpyCp6HUIJhXZc5fPpyq/8u6+IA4bArS0TUb9
-EkmazmF3yBzHiv2x5tTGTI8GTnt+Gg6S37QJekhiFhWH4kNMo+lezeKxQpL5ckNz
-nLOFZqvNBPcCooDa43ulqKOob3uHxhbyyN5bpHqF29mY8HF6f/ycB4qjLqNmJUyp
-HDO5O/7aROW9uPknRBHyIdyA1EQ4jFkVle8bNYO7lV4cgIsOWSRdKwy7aw+uhjjZ
-FtRgfVZXJwri9H9EOdeMamDSfvAO93zg3e4yyPjjgCv6nd30gw1ifT7ujN+TQRc4
-nSkQi7LCONNfs5Ztk47S0LZp5iFmRlBhVmUOG5Ul7ejGRm4VEkU=
-=O3dU
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnXDuQACgkQbDjKyiDZ
+s5JxHBAAnuxfny21ilbuVd67y3kChYY+WQXq7L172Ai8M73Try4FnZarVCqASXKA
+e3LpovezGLsQF2hAKQ4PqkMdAS2av8/v8jthXTexQFxVXAUWJ4QRMV+Lwdh8c5Ot
+R6gsnvm0OchAJT8RC7asIDhRFR/I0mzlBXLxTYDdKPcV+A9Y1blPwlk7vPXUAqu0
+6buj6DX+4LiiYmx4AlmtcPHARGeJivOVDBiLdhSyLRYtg6PMKWtEwtKLzP+ViVyg
+EdyhRw6okrsNs1OCOw9VpSbWLdjJ+On2NfO5OIfImwQeDLqYuM8+k/0mfNaElKGR
+HotJKbk5YJQktZAB8+RMfuMupIh2zhnGVHJ4izxCMR1Xv4GvmL8RSVyynZleqxiE
+Y5Akta24XyE1lBqWgpWLl9KKdpvyv82EX4l713lYaAMw9ACvQKBXm9tX4tABurat
+/yohNimw3Bb1symD8y/AQLzzgc3g411+cPMB78hUJcyWJaJZXxkH3Pp7nkDV9UWh
+aqJ44RqG1g6FFuIKTwVXSNKUJbOPqBji7Vkdg1OhiRJVT0U19MxNfV2kLwHeOwmh
+uTY7bAitbu57LV38Exqg2DLKdm1vWxQz1gT8evH9WroDRJW5xXNLp8OAcAX2NhUk
+5iZ0aIxbebAagp2O9afAkXt2xgM56HFv4n1tZ+YHaQQiPn+vZB8=
+=0Z1Q
 -----END PGP SIGNATURE-----
 
---NZ00oluAJr3A0NMv--
+--m5R8f+g8StfRwQ/I--
