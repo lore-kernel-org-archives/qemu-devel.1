@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e0Uhb-0003uG-UD
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:38:16 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e0UxQ-0008Tv-Es
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:54:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e0UhW-0007ga-8c
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:38:15 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:47585)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e0UhW-0007ft-22
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:38:10 -0400
-Received: by mail-wr0-x229.google.com with SMTP id y44so7980419wrd.4
-	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 08:38:09 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20171006152751.GR4015@localhost.localdomain>
-References: <20171005203638.19255-1-ehabkost@redhat.com>
-	<CAFEAcA-jBzTXWNrRCB8GXm2FcZdT3pPFZiGT6O6Oc8qpfSK_jA@mail.gmail.com>
-	<20171006152751.GR4015@localhost.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Oct 2017 16:37:48 +0100
-Message-ID: <CAFEAcA94pKm22fX1kCr72-SsM06Z2AMUZ65a7zJ_UPrarkBg1w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/9] x86 and machine queue, 2017-10-05
+	(envelope-from <kwolf@redhat.com>) id 1e0UxP-0002Nm-NL
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 11:54:36 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Fri,  6 Oct 2017 17:53:30 +0200
+Message-Id: <20171006155422.10135-3-kwolf@redhat.com>
+In-Reply-To: <20171006155422.10135-1-kwolf@redhat.com>
+References: <20171006155422.10135-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 02/54] block: Make bdrv_img_create() size
+ selection easier to read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +20,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-On 6 October 2017 at 16:27, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> On Fri, Oct 06, 2017 at 01:17:42PM +0100, Peter Maydell wrote:
->> This fails tests, I'm afraid:
-> [...]
->> acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-6QYK7Y.dsl,
->> aml:/tmp/aml-E8YK7Y], Expected [asl:/tmp/asl-1H1I7Y.dsl,
->> aml:tests/acpi-test-data/pc/DSDT.memhp].
->> acpi-test: Warning. not showing difference since no diff utility is
->> specified. Set 'DIFF' environment variable to a preferred diff utility
->> and run 'make V=1 check' again to see ASL difference.OK
->>
->> and same for /i386/acpi/piix4/numamem and for the
->> equivalent q35 tests.
->>
->> Fails on s390, netbsd, freebsd, aarch32, x86-64.
->>
->
-> Oops, sorry!
->
-> I need to find out why it didn't fail on travis-ci:
-> https://travis-ci.org/ehabkost/qemu/builds/283884670
+From: Eric Blake <eblake@redhat.com>
 
-My guess is that one of {iasl installed, iasl not installed}
-is broken, but the travis environments don't test both.
+All callers of bdrv_img_create() pass in a size, or -1 to read the
+size from the backing file.  We then set that size as the QemuOpt
+default, which means we will reuse that default rather than the
+final parameter to qemu_opt_get_size() several lines later.  But
+it is rather confusing to read subsequent checks of 'size == -1'
+when it looks (without seeing the full context) like size defaults
+to 0; it also doesn't help that a size of 0 is valid (for some
+formats).
 
-thanks
--- PMM
+Rework the logic to make things more legible.
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block.c b/block.c
+index 5c65fac672..528cda7b2c 100644
+--- a/block.c
++++ b/block.c
+@@ -4488,7 +4488,7 @@ void bdrv_img_create(const char *filename, const char *fmt,
+ 
+     /* The size for the image must always be specified, unless we have a backing
+      * file and we have not been forbidden from opening it. */
+-    size = qemu_opt_get_size(opts, BLOCK_OPT_SIZE, 0);
++    size = qemu_opt_get_size(opts, BLOCK_OPT_SIZE, img_size);
+     if (backing_file && !(flags & BDRV_O_NO_BACKING)) {
+         BlockDriverState *bs;
+         char *full_backing = g_new0(char, PATH_MAX);
+-- 
+2.13.6
