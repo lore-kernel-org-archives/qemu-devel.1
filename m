@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e0glP-0003qS-Kr
-	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 00:31:00 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e0hSD-0002KF-7W
+	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 01:15:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e0glK-0004Bi-Un
-	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 00:30:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56048)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e0glK-0004AF-Nv
-	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 00:30:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e0glI-0003GJ-6p
-	for <qemu-devel@nongnu.org>; Sat, 07 Oct 2017 04:30:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 327F52E80EC
-	for <qemu-devel@nongnu.org>; Sat,  7 Oct 2017 04:30:50 +0000 (UTC)
+	(envelope-from <dgibson@ozlabs.org>) id 1e0hSC-0008Rt-0Z
+	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 01:15:13 -0400
+Date: Sat, 7 Oct 2017 15:40:37 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171007044037.GF10050@umbus.fritz.box>
+References: <20171006235023.11952-1-f4bug@amsat.org>
+	<20171006235023.11952-58-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 07 Oct 2017 04:17:30 -0000
-From: Launchpad Bug Tracker <1050694@bugs.launchpad.net>
-Reply-To: Bug 1050694 <1050694@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20120914010448.8303.73336.malonedeb@gac.canonical.com>
-Message-Id: <150734985057.28496.17457279081533299374.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1050694] Re: Interrupt 0xffffffff when debug is
- turned on
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="TeJTyD9hb8KJN2Jy"
+Content-Disposition: inline
+In-Reply-To: <20171006235023.11952-58-f4bug@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH 57/88] ppc: use g_new() family of functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,112 +24,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Alexander Graf <agraf@suse.de>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu trival <qemu-trivial@nongnu.org>, qemu-ppc@nongnu.org
 
-[Expired for QEMU because there has been no activity for 60 days.]
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+--TeJTyD9hb8KJN2Jy
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On Fri, Oct 06, 2017 at 08:49:52PM -0300, Philippe Mathieu-Daud=E9 wrote:
+> From: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+>=20
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> [PMD: replaced g_new0() -> g_new() in mac_newworld.c, added
+> virtex_ml507]
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1050694
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
-Title:
-  Interrupt 0xffffffff when debug is turned on
+> ---
+>  hw/intc/heathrow_pic.c | 2 +-
+>  hw/ppc/mac_newworld.c  | 5 ++---
+>  hw/ppc/mac_oldworld.c  | 2 +-
+>  hw/ppc/virtex_ml507.c  | 2 +-
+>  4 files changed, 5 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/hw/intc/heathrow_pic.c b/hw/intc/heathrow_pic.c
+> index 171f5ed814..90c1e6a4b1 100644
+> --- a/hw/intc/heathrow_pic.c
+> +++ b/hw/intc/heathrow_pic.c
+> @@ -201,7 +201,7 @@ qemu_irq *heathrow_pic_init(MemoryRegion **pmem,
+>  {
+>      HeathrowPICS *s;
+> =20
+> -    s =3D g_malloc0(sizeof(HeathrowPICS));
+> +    s =3D g_new0(HeathrowPICS, 1);
+>      /* only 1 CPU */
+>      s->irqs =3D irqs[0];
+>      memory_region_init_io(&s->mem, NULL, &heathrow_pic_ops, s,
+> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+> index 6d0ace20ca..59cded95b8 100644
+> --- a/hw/ppc/mac_newworld.c
+> +++ b/hw/ppc/mac_newworld.c
+> @@ -295,7 +295,7 @@ static void ppc_core99_init(MachineState *machine)
+>      memory_region_init_io(unin2_memory, NULL, &unin_ops, token, "unin", =
+0x1000);
+>      memory_region_add_subregion(get_system_memory(), 0xf3000000, unin2_m=
+emory);
+> =20
+> -    openpic_irqs =3D g_malloc0(smp_cpus * sizeof(qemu_irq *));
+> +    openpic_irqs =3D g_new0(qemu_irq *, smp_cpus);
+>      openpic_irqs[0] =3D
+>          g_malloc0(smp_cpus * sizeof(qemu_irq) * OPENPIC_OUTPUT_NB);
+>      for (i =3D 0; i < smp_cpus; i++) {
+> @@ -339,8 +339,6 @@ static void ppc_core99_init(MachineState *machine)
+>          }
+>      }
+> =20
+> -    pic =3D g_new0(qemu_irq, 64);
+> -
+>      dev =3D qdev_create(NULL, TYPE_OPENPIC);
+>      qdev_prop_set_uint32(dev, "model", OPENPIC_MODEL_KEYLARGO);
+>      qdev_init_nofail(dev);
+> @@ -353,6 +351,7 @@ static void ppc_core99_init(MachineState *machine)
+>          }
+>      }
+> =20
+> +    pic =3D g_new(qemu_irq, 64);
+>      for (i =3D 0; i < 64; i++) {
+>          pic[i] =3D qdev_get_gpio_in(dev, i);
+>      }
+> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+> index bc7c8b7bd7..50ad9c56cb 100644
+> --- a/hw/ppc/mac_oldworld.c
+> +++ b/hw/ppc/mac_oldworld.c
+> @@ -232,7 +232,7 @@ static void ppc_heathrow_init(MachineState *machine)
+>      memory_region_add_subregion(sysmem, 0xfe000000, isa);
+> =20
+>      /* XXX: we register only 1 output pin for heathrow PIC */
+> -    heathrow_irqs =3D g_malloc0(smp_cpus * sizeof(qemu_irq *));
+> +    heathrow_irqs =3D g_new0(qemu_irq *, smp_cpus);
+>      heathrow_irqs[0] =3D
+>          g_malloc0(smp_cpus * sizeof(qemu_irq) * 1);
+>      /* Connect the heathrow PIC outputs to the 6xx bus */
+> diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+> index ed9b406fd3..ed6e054611 100644
+> --- a/hw/ppc/virtex_ml507.c
+> +++ b/hw/ppc/virtex_ml507.c
+> @@ -104,7 +104,7 @@ static PowerPCCPU *ppc440_init_xilinx(ram_addr_t *ram=
+_size,
+>      ppc_dcr_init(env, NULL, NULL);
+> =20
+>      /* interrupt controller */
+> -    irqs =3D g_malloc0(sizeof(qemu_irq) * PPCUIC_OUTPUT_NB);
+> +    irqs =3D g_new0(qemu_irq, PPCUIC_OUTPUT_NB);
+>      irqs[PPCUIC_OUTPUT_INT] =3D ((qemu_irq *)env->irq_inputs)[PPC40x_INP=
+UT_INT];
+>      irqs[PPCUIC_OUTPUT_CINT] =3D ((qemu_irq *)env->irq_inputs)[PPC40x_IN=
+PUT_CINT];
+>      ppcuic_init(env, irqs, 0x0C0, 0, 1);
 
-Status in QEMU:
-  Expired
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Bug description:
-  Hi,
+--TeJTyD9hb8KJN2Jy
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  I have been getting a GPF when I enable interrupts, working on
-  implementing processes and a scheduler. When I comment out the
-  scheduler code, I still get the GPF. I used the following QEMU command
-  line to capture a log:
+-----BEGIN PGP SIGNATURE-----
 
-  qemu-system-i386 -smp 4 -monitor stdio -cpu core2duo -D
-  /home/adam/century/util/qemu.log -d int,in_asm -s -hda
-  "$harddisk_image" -m 3.5G
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnYWsUACgkQbDjKyiDZ
+s5IciRAAoYze7hsdm1B2PNRBC+tZsP3+u6RAi2L/B9UwuOGBZ2lHtvor5JYIxhcO
+6P8T8NiygQMnEBiLFDRe2+ZV+8C78MyjcqREj4OqbukLrjGuwDwq/yYOV1ft6e+B
+lAv7A8LbERHWEEWzXS9CMJmoGQeTkNm2zQmregYCjNbks7tjFJLfTD23vk3C5/G4
+215DB5pXpnqVhdnnHm5c1W0Ls8A/gHD7MlgDkmjKVBKWIw3WoG3Q6XOoTx2YICvZ
+TxHuTVpB8zKiL/GkFb4efFCZQVAhKPW5nrZNfhX+Gs196Q472UlRAITsa5ofU55R
+TM4Tn3+hMdykEjkS+yStKK1Sg36oQek9XmrH76EZxNifOuDObmPjw9uj04WMykJX
+Wkbf9gEY5F1ngR1/M+tScZ1yTEB1iGbii5K3ydLxd5uvHuqPI/ke8OjoUV6J4tGD
+QtBqwPUTmq8Q3BYYCpu3bXjL7u0k06Zo+bB+dRtl/0FHWh56sBu6rTD5Sm0jffSI
+f7XwaXvxmfp2iOrUzABWf4/xam/5tEfU7zF27/ybO85sfVLzAGGu3ISiCzU+bFw9
+eBqIXuKxezAeKh57yGI16fNqJ7/+TcocupVChM74CzVzOPsG9cIwegAsuAdCRvt+
+nhx4iaxsbz1FHwdGFnGpZwt+xxTjWj3RQVmeniAtpj4MIMznR94=
+=p/H8
+-----END PGP SIGNATURE-----
 
-  Rather than posting the entire log, I need some help interpreting the fol=
-lowing section (notice "INT=3D0xffffffff" on the top line):
-  Servicing hardware INT=3D0xffffffff
-  1: v=3Dffffffff e=3D0000 i=3D0 cpl=3D0 IP=3D0008:0010b63f pc=3D0010b63f S=
-P=3D0010:0012b768 EAX=3D00000000
-  EAX=3D00000000 EBX=3D00002000 ECX=3D00000018 EDX=3D05a00780
-  ESI=3D00112faa EDI=3D000b8fa0 EBP=3D0012b780 ESP=3D0012b768
-  EIP=3D0010b63f EFL=3D00207202 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D0
-  ES =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS [-WA]
-  CS =3D0008 00000000 ffffffff 00cf9a00 DPL=3D0 CS32 [-R-]
-  SS =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS [-WA]
-  DS =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS [-WA]
-  FS =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS [-WA]
-  GS =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS [-WA]
-  LDT=3D0000 00000000 00000000 00008200 DPL=3D0 LDT
-  TR =3D0008 00000580 00000067 00008900 DPL=3D0 TSS32-avl
-  GDT=3D 00127760 00000027
-  IDT=3D 00122f40 000007ff
-  CR0=3D80000011 CR2=3D00000000 CR3=3D0014a000 CR4=3D00000000
-  DR0=3D00000000 DR1=3D00000000 DR2=3D00000000 DR3=3D00000000
-  DR6=3Dffff0ff0 DR7=3D00000400
-  CCS=3D00000024 CCD=3D0012b75c CCO=3DADDL
-  EFER=3D0000000000000000
-  check_exception old: 0xffffffff new 0xd
-  2: v=3D0d e=3Dfffffffa i=3D0 cpl=3D0 IP=3D0008:0010b63f pc=3D0010b63f SP=
-=3D0010:0012b768 EAX=3D00000000
-  EAX=3D00000000 EBX=3D00002000 ECX=3D00000018 EDX=3D05a00780
-  ESI=3D00112faa EDI=3D000b8fa0 EBP=3D0012b780 ESP=3D0012b768
-  EIP=3D0010b63f EFL=3D00207202 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D0
-  ES =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS [-WA]
-  CS =3D0008 00000000 ffffffff 00cf9a00 DPL=3D0 CS32 [-R-]
-  SS =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS [-WA]
-  DS =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS [-WA]
-  FS =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS [-WA]
-  GS =3D0010 00000000 ffffffff 00cf9300 DPL=3D0 DS [-WA]
-  LDT=3D0000 00000000 00000000 00008200 DPL=3D0 LDT
-  TR =3D0008 00000580 00000067 00008900 DPL=3D0 TSS32-avl
-  GDT=3D 00127760 00000027
-  IDT=3D 00122f40 000007ff
-  CR0=3D80000011 CR2=3D00000000 CR3=3D0014a000 CR4=3D00000000
-  DR0=3D00000000 DR1=3D00000000 DR2=3D00000000 DR3=3D00000000
-  DR6=3Dffff0ff0 DR7=3D00000400
-  CCS=3D00000024 CCD=3D0012b75c CCO=3DADDL
-  EFER=3D0000000000000000
-
-  To the best of my ability to interpret, I an getting an undefined
-  interrupt, which is then triggering a GPF, which is caught. However,
-  do not know where it might be coming from.
-
-  Some additional information:
-
-  This command works:
-
-  qemu-system-i386 -smp 4 -monitor stdio -cpu core2duo -s -hda
-  "$harddisk_image" -m 3.5G
-
-  This command works:
-
-  qemu-system-i386 -monitor stdio -cpu core2duo -D
-  /home/adam/century/util/qemu.log -d int,in_asm -s -hda
-  "$harddisk_image" -m 3.5G
-
-  And, as above, this does not:
-
-  qemu-system-i386 -smp 4 -monitor stdio -cpu core2duo -D
-  /home/adam/century/util/qemu.log -d int,in_asm -s -hda
-  "$harddisk_image" -m 3.5G
-
-  [adam@os-development ~]$ qemu-system-i386 -version
-  QEMU emulator version 1.2.0, Copyright (c) 2003-2008 Fabrice Bellard
-
-  Attached is an image as a test case.  Please let me know if you need
-  any additional information.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1050694/+subscriptions
+--TeJTyD9hb8KJN2Jy--
