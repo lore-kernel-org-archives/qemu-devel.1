@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1e0dGt-0006d6-S0
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 20:47:16 -0400
+	(envelope-from <zxq_yx_007@163.com>) id 1e0dMf-0003Fk-Ks
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 20:53:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1e0dGq-0002Sb-QH
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 20:47:15 -0400
+	(envelope-from <zxq_yx_007@163.com>) id 1e0dMa-0007c0-Px
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 20:53:13 -0400
 Content-Type: text/plain;
 	charset=gb2312
 Mime-Version: 1.0 (1.0)
 From: xiaoqiang zhao <zxq_yx_007@163.com>
 In-Reply-To: <20171006235023.11952-52-f4bug@amsat.org>
-Date: Sat, 7 Oct 2017 08:46:50 +0800
+Date: Sat, 7 Oct 2017 08:52:49 +0800
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <2F978D95-3433-4ABB-8421-B43017497006@163.com>
+Message-Id: <407A891B-3689-4D56-A133-4ACFD6FE63AB@163.com>
 References: <20171006235023.11952-1-f4bug@amsat.org>
 	<20171006235023.11952-52-f4bug@amsat.org>
 Subject: Re: [Qemu-devel] [PATCH 51/88] hw/timer: use g_new() family of
@@ -44,15 +44,17 @@ eu-Daud=A8=A6 <f4bug@amsat.org> =D0=B4=B5=C0=A3=BA
 > --- a/hw/timer/slavio_timer.c
 > +++ b/hw/timer/slavio_timer.c
 > @@ -385,7 +385,7 @@ static void slavio_timer_init(Object *obj)
->       uint64_t size;
->       char timer_name[20];
+>      uint64_t size;
+>      char timer_name[20];
 >=20
 > -        tc =3D g_malloc0(sizeof(TimerContext));
 > +        tc =3D g_new0(TimerContext, 1);
->       tc->s =3D s;
->       tc->timer_index =3D i;
+>      tc->s =3D s;
+>      tc->timer_index =3D i;
 >=20
 > --=20
 > 2.14.2
 
-Reviewed-by: xiaoqiang zhao <zxq_yx_007@163.com>=
+Resend due to email blocks.
+
+Reviewed-by: xiaoqiang zhao <zxq_yx_007@163.com>
