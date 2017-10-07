@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e0g2f-0007SK-9z
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 23:44:46 -0400
+	(envelope-from <bounces@canonical.com>) id 1e0glP-0003qT-LD
+	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 00:31:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e0g2e-00068P-EL
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 23:44:45 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171006235023.11952-1-f4bug@amsat.org>
-	<20171006235023.11952-72-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5c3044e1-abfd-5156-6098-21844ba6d928@amsat.org>
-Date: Sat, 7 Oct 2017 00:44:32 -0300
+	(envelope-from <bounces@canonical.com>) id 1e0glK-0004BV-Nm
+	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 00:30:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56032)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e0glK-0004A4-H1
+	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 00:30:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e0glH-0003Fv-AA
+	for <qemu-devel@nongnu.org>; Sat, 07 Oct 2017 04:30:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6657E2E81AF
+	for <qemu-devel@nongnu.org>; Sat,  7 Oct 2017 04:30:49 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171006235023.11952-72-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 71/88] block: avoid use of g_new0()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 07 Oct 2017 04:17:29 -0000
+From: Launchpad Bug Tracker <1088617@bugs.launchpad.net>
+Reply-To: Bug 1088617 <1088617@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20121210194219.16564.99346.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150734984966.28496.454495700855510859.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1088617] Re: qemu-system-mipsel save/restore
+ broken
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +37,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu trival <qemu-trivial@nongnu.org>, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 10/06/2017 08:50 PM, Philippe Mathieu-Daudé wrote:
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  block/qcow2.c | 2 +-
->  block/vhdx.c  | 9 +++++----
->  2 files changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index f63d1831f8..3e7d6c81be 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -2738,7 +2738,7 @@ static int qcow2_create2(const char *filename, int64_t total_size,
->  
->      /* Write the header */
->      QEMU_BUILD_BUG_ON((1 << MIN_CLUSTER_BITS) < sizeof(*header));
-> -    header = g_malloc0(cluster_size);
-> +    header = g_malloc(cluster_size);
+[Expired for QEMU because there has been no activity for 60 days.]
 
-self-NACK since this is wrong.
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
->      *header = (QCowHeader) {
->          .magic                      = cpu_to_be32(QCOW_MAGIC),
->          .version                    = cpu_to_be32(version),
-> diff --git a/block/vhdx.c b/block/vhdx.c
-> index 8260fb46cd..91e532df8a 100644
-> --- a/block/vhdx.c
-> +++ b/block/vhdx.c
-> @@ -244,10 +244,11 @@ static void vhdx_region_register(BDRVVHDXState *s,
->  {
->      VHDXRegionEntry *r;
->  
-> -    r = g_new0(VHDXRegionEntry, 1);
-> -
-> -    r->start = start;
-> -    r->end = start + length;
-> +    r = g_new(VHDXRegionEntry, 1);
-> +    *r = (VHDXRegionEntry) {
-> +        .start = start,
-> +        .end = start + length,
+-- =
 
-this is not wrong since all members are initialized, but it is not good
-code practice (if the VHDXRegionEntry structure is expanded with another
-member).
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1088617
 
-> +    };
->  
->      QLIST_INSERT_HEAD(&s->regions, r, entries);
->  }
-> 
+Title:
+  qemu-system-mipsel save/restore broken
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  Save and restore on mipsel seems to be broken (tested with commit
+  1c97e303d4ea80a2691334b0febe87a50660f99d). To reproduce:
+
+  1. Download debian_squeeze_mipsel_standard.qcow2 and vmlinux-2.6.32-5
+  -4kc-malta from from http://people.debian.org/~aurel32/qemu/mipsel/
+
+  2. Boot the system. I had to ^D past a Bus error in fsck, which may be an=
+other bug (haven't investigated). The command line used was:
+  qemu-system-mipsel -M malta -kernel vmlinux-2.6.32-5-4kc-malta -hda debia=
+n_squeeze_mipsel_standard.qcow2 -append "root=3D/dev/sda1 console=3Dtty0" -=
+k en-us -vnc :0
+
+  3. Once the system is booted, go to the monitor and do "savevm
+  booted". Then quit.
+
+  4. Re-run qemu-system-mipsel again with "-loadvm booted". The guest
+  system comes back but is hung (the monitor remains responsive,
+  however).
+
+  I also captured a debug log, which is attached. The immediate cause of
+  the freeze seems to be that it's stuck in a loop repeatedly handling
+  the same page fault over and over.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1088617/+subscriptions
