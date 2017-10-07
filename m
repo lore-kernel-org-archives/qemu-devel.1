@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1e0rIJ-0001n8-Sx
-	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 11:45:40 -0400
+	(envelope-from <stefan@weilnetz.de>) id 1e0rRp-0003mG-TP
+	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 11:55:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1e0rIJ-0004qj-2i
-	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 11:45:39 -0400
-References: <20171006235023.11952-1-f4bug@amsat.org>
-	<20171006235023.11952-14-f4bug@amsat.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <286173de-a624-56c6-4521-576c8a9f97ce@redhat.com>
-Date: Sat, 7 Oct 2017 11:45:21 -0400
+	(envelope-from <stefan@weilnetz.de>) id 1e0rRn-0001eH-9s
+	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 11:55:29 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:58550
+	helo=v2201612906741603.powersrv.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefan@weilnetz.de>) id 1e0rRm-0001dS-MQ
+	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 11:55:26 -0400
+From: Stefan Weil <sw@weilnetz.de>
+Date: Sat,  7 Oct 2017 17:55:22 +0200
+Message-Id: <20171007155522.25436-1-sw@weilnetz.de>
 MIME-Version: 1.0
-In-Reply-To: <20171006235023.11952-14-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 13/88] Dirty Bitmaps: use g_new() family of
- functions
+Subject: [Qemu-devel] [PATCH] oslib-posix: Fix compiler warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +25,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu trival <qemu-trivial@nongnu.org>, qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Weil <sw@weilnetz.de>
 
+gcc warning:
 
+/qemu/util/oslib-posix.c:304:11: error:
+ variable =E2=80=98addr=E2=80=99 might be clobbered by =E2=80=98longjmp=E2=
+=80=99 or =E2=80=98vfork=E2=80=99
+ [-Werror=3Dclobbered]
 
-On 10/06/2017 07:49 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> [PMD: squashed tests/test-hbitmap.c changes]
-> ---
->  tests/test-hbitmap.c | 2 +-
->  util/hbitmap.c       | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
-> index af41642346..fea3a64712 100644
-> --- a/tests/test-hbitmap.c
-> +++ b/tests/test-hbitmap.c
-> @@ -122,7 +122,7 @@ static void hbitmap_test_truncate_impl(TestHBitmapD=
-ata *data,
-> =20
->      n =3D hbitmap_test_array_size(size);
->      m =3D hbitmap_test_array_size(data->old_size);
-> -    data->bits =3D g_realloc(data->bits, sizeof(unsigned long) * n);
-> +    data->bits =3D g_renew(unsigned long, data->bits, n);
->      if (n > m) {
->          memset(&data->bits[m], 0x00, sizeof(unsigned long) * (n - m));
->      }
-> diff --git a/util/hbitmap.c b/util/hbitmap.c
-> index 2f9d0fdbd0..4eb0188836 100644
-> --- a/util/hbitmap.c
-> +++ b/util/hbitmap.c
-> @@ -668,7 +668,7 @@ void hbitmap_truncate(HBitmap *hb, uint64_t size)
->          }
->          old =3D hb->sizes[i];
->          hb->sizes[i] =3D size;
-> -        hb->levels[i] =3D g_realloc(hb->levels[i], size * sizeof(unsig=
-ned long));
-> +        hb->levels[i] =3D g_renew(unsigned long, hb->levels[i], size);
->          if (!shrink) {
->              memset(&hb->levels[i][old], 0x00,
->                     (size - old) * sizeof(*hb->levels[i]));
->=20
+Use also an unsigned loop variable which better matches numpages.
 
-Hm, I guess g_renew() isn't a new addition to glib, and we can safely
-use it.
+Signed-off-by: Stefan Weil <sw@weilnetz.de>
+---
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Please cc qemu-trivial if you think this is trivial enough.
 
-And for convenience, this can be staged by whomever wishes to stage the
-whole 88 patch enchilada:
+Thanks,
+Stefan
 
-Acked-by: John Snow <jsnow@redhat.com>
+index 80086c549f..eb66a6f63c 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -301,11 +301,7 @@ static void sigbus_handler(int signal)
+ static void *do_touch_pages(void *arg)
+ {
+     MemsetThread *memset_args =3D (MemsetThread *)arg;
+-    char *addr =3D memset_args->addr;
+-    uint64_t numpages =3D memset_args->numpages;
+-    uint64_t hpagesize =3D memset_args->hpagesize;
+     sigset_t set, oldset;
+-    int i =3D 0;
+=20
+     /* unblock SIGBUS */
+     sigemptyset(&set);
+@@ -315,6 +311,10 @@ static void *do_touch_pages(void *arg)
+     if (sigsetjmp(memset_args->env, 1)) {
+         memset_thread_failed =3D true;
+     } else {
++        char *addr =3D memset_args->addr;
++        uint64_t numpages =3D memset_args->numpages;
++        uint64_t hpagesize =3D memset_args->hpagesize;
++        unsigned i;
+         for (i =3D 0; i < numpages; i++) {
+             /*
+              * Read & write back the same value, so we don't
+--=20
+2.11.0
