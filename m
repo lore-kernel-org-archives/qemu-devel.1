@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1e0ckU-0001at-83
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 20:13:47 -0400
+	(envelope-from <shorne@gmail.com>) id 1e0cmh-0003kR-Rz
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 20:16:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1e0ckR-0003sk-3t
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 20:13:46 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:38869)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1e0ckQ-0003sL-Tq
-	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 20:13:43 -0400
-Received: by mail-pg0-x241.google.com with SMTP id j3so4006923pga.5
-	for <qemu-devel@nongnu.org>; Fri, 06 Oct 2017 17:13:42 -0700 (PDT)
-Date: Sat, 7 Oct 2017 09:13:40 +0900
+	(envelope-from <shorne@gmail.com>) id 1e0cme-00059i-NK
+	for qemu-devel@nongnu.org; Fri, 06 Oct 2017 20:16:03 -0400
+Date: Sat, 7 Oct 2017 09:15:57 +0900
 From: Stafford Horne <shorne@gmail.com>
-Message-ID: <20171007001340.GD2630@lianli.shorne-pla.net>
-References: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
-	<1507211474-188400-19-git-send-email-imammedo@redhat.com>
+Message-ID: <20171007001557.GE2630@lianli.shorne-pla.net>
+References: <20171006235023.11952-1-f4bug@amsat.org>
+	<20171006235023.11952-26-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1507211474-188400-19-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 18/40] openrisc: use generic cpu_model
- parsing
+In-Reply-To: <20171006235023.11952-26-f4bug@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH 25/88] OpenRISC: use g_new() family of
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +25,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Jia Liu <proljc@gmail.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu trival <qemu-trivial@nongnu.org>
 
-On Thu, Oct 05, 2017 at 03:50:52PM +0200, Igor Mammedov wrote:
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-Less lines of code, thanks.
+On Fri, Oct 06, 2017 at 08:49:20PM -0300, Philippe Mathieu-Daudé wrote:
+> From: Marc-André Lureau <marcandre.lureau@redhat.com>
+> 
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 Acked-by: Stafford Horne <shorne@gmail.com>
 
+> [PMD: squashed openrisc_sim.c]
 > ---
-> CC: shorne@gmail.com
-> ---
->  hw/openrisc/openrisc_sim.c | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
+>  hw/openrisc/openrisc_sim.c | 2 +-
+>  target/openrisc/mmu.c      | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 > 
 > diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
-> index 86bf284..f61b63d 100644
+> index 86bf2849c4..1eb381549c 100644
 > --- a/hw/openrisc/openrisc_sim.c
 > +++ b/hw/openrisc/openrisc_sim.c
-> @@ -98,18 +98,13 @@ static void cpu_openrisc_load_kernel(ram_addr_t ram_size,
->  static void openrisc_sim_init(MachineState *machine)
->  {
->      ram_addr_t ram_size = machine->ram_size;
-> -    const char *cpu_model = machine->cpu_model;
->      const char *kernel_filename = machine->kernel_filename;
->      OpenRISCCPU *cpu = NULL;
->      MemoryRegion *ram;
->      int n;
->  
-> -    if (!cpu_model) {
-> -        cpu_model = "or1200";
-> -    }
-> -
->      for (n = 0; n < smp_cpus; n++) {
-> -        cpu = OPENRISC_CPU(cpu_generic_init(TYPE_OPENRISC_CPU, cpu_model));
-> +        cpu = OPENRISC_CPU(cpu_create(machine->cpu_type));
->          qemu_register_reset(main_cpu_reset, cpu);
+> @@ -114,7 +114,7 @@ static void openrisc_sim_init(MachineState *machine)
 >          main_cpu_reset(cpu);
 >      }
-> @@ -138,6 +133,7 @@ static void openrisc_sim_machine_init(MachineClass *mc)
->      mc->init = openrisc_sim_init;
->      mc->max_cpus = 1;
->      mc->is_default = 1;
-> +    mc->default_cpu_type = OPENRISC_CPU_TYPE_NAME("or1200");
->  }
 >  
->  DEFINE_MACHINE("or1k-sim", openrisc_sim_machine_init)
+> -    ram = g_malloc(sizeof(*ram));
+> +    ram = g_new(MemoryRegion, 1);
+>      memory_region_init_ram(ram, NULL, "openrisc.ram", ram_size, &error_fatal);
+>      memory_region_add_subregion(get_system_memory(), 0, ram);
+>  
+> diff --git a/target/openrisc/mmu.c b/target/openrisc/mmu.c
+> index ce2a29dd1a..4789a35b67 100644
+> --- a/target/openrisc/mmu.c
+> +++ b/target/openrisc/mmu.c
+> @@ -247,7 +247,7 @@ hwaddr openrisc_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+>  
+>  void cpu_openrisc_mmu_init(OpenRISCCPU *cpu)
+>  {
+> -    cpu->env.tlb = g_malloc0(sizeof(CPUOpenRISCTLBContext));
+> +    cpu->env.tlb = g_new0(CPUOpenRISCTLBContext, 1);
+>  
+>      cpu->env.tlb->cpu_openrisc_map_address_code = &cpu_openrisc_get_phys_nommu;
+>      cpu->env.tlb->cpu_openrisc_map_address_data = &cpu_openrisc_get_phys_nommu;
 > -- 
-> 2.7.4
+> 2.14.2
 > 
