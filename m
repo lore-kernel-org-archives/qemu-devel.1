@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e0k7r-0004Tb-9b
-	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 04:06:24 -0400
+	(envelope-from <ldoktor@redhat.com>) id 1e0kRE-0007Yo-9L
+	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 04:26:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e0k7q-0005Iu-6q
-	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 04:06:23 -0400
-Received: from 7.mo4.mail-out.ovh.net ([178.33.253.54]:48778)
+	(envelope-from <ldoktor@redhat.com>) id 1e0kRB-0000ZS-2b
+	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 04:26:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38028)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e0k7q-0005CR-17
-	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 04:06:22 -0400
-Received: from player772.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id A9527D08E1
-	for <qemu-devel@nongnu.org>; Sat,  7 Oct 2017 10:06:12 +0200 (CEST)
-Date: Sat, 7 Oct 2017 10:06:00 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171007100600.306d9280@bahia.lan>
-In-Reply-To: <20171007051925.GJ10050@umbus.fritz.box>
-References: <150730254473.16260.6484345241358746630.stgit@bahia>
-	<20171007051925.GJ10050@umbus.fritz.box>
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1e0kRA-0000YE-Oi
+	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 04:26:20 -0400
+References: <20171005172013.3098-1-ehabkost@redhat.com>
+	<20171005172013.3098-3-ehabkost@redhat.com>
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+Message-ID: <7af19e5a-702e-fd41-951b-47a542269929@redhat.com>
+Date: Sat, 7 Oct 2017 10:26:14 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/hRvlVQsKgaYxmf+IRbYNBSG";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH] spapr_pci: fail gracefully with
- non-pseries machine types
+In-Reply-To: <20171005172013.3098-3-ehabkost@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="da2OS2H2OMdArVq0Q8HaP2scxp9MgbsXp"
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] scripts: Remove debug parameter
+ from QEMUMonitorProtocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,94 +29,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
---Sig_/hRvlVQsKgaYxmf+IRbYNBSG
-Content-Type: text/plain; charset=US-ASCII
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--da2OS2H2OMdArVq0Q8HaP2scxp9MgbsXp
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa
+ <crosa@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <f4bug@amsat.org>
+Message-ID: <7af19e5a-702e-fd41-951b-47a542269929@redhat.com>
+Subject: Re: [PATCH v2 2/3] scripts: Remove debug parameter from
+ QEMUMonitorProtocol
+References: <20171005172013.3098-1-ehabkost@redhat.com>
+ <20171005172013.3098-3-ehabkost@redhat.com>
+In-Reply-To: <20171005172013.3098-3-ehabkost@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, 7 Oct 2017 16:19:25 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+Dne 5.10.2017 v 19:20 Eduardo Habkost napsal(a):
+> Use logging module for the QMP debug messages.  The only scripts
+> that set debug=3DTrue are iotests.py and guestperf/engine.py, and
+> they already call logging.basicConfig() to set up logging.
+>=20
+> Scripts that don't configure logging are safe as long as they
+> don't need debugging output, because debug messages don't trigger
+> the "No handlers could be found for logger" message from the
+> Python logging module.
+>=20
+> Scripts that already configure logging but don't use debug=3DTrue
+> (e.g. scripts/vm/basevm.py) will get QMP debugging enabled for
+> free.
+>=20
+> Cc: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>
+> Cc: Fam Zheng <famz@redhat.com>
+> Cc: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> Changes v1 -> v2:
+> * Actually remove debug parameter from method definition
+>   (Fam Zheng)
+> * Fix "<<<" vs ">>>" confusion
+>   (Fam Zheng)
+> * Remove "import sys" line
+>   (Luk=C3=A1=C5=A1 Doktor)
+> ---
+>  scripts/qemu.py    |  3 +--
+>  scripts/qmp/qmp.py | 16 +++++++---------
+>  2 files changed, 8 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index c9a106fbce..f6d2e68627 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -177,8 +177,7 @@ class QEMUMachine(object):
+> =20
+>      def _pre_launch(self):
+>          self._qmp =3D qmp.qmp.QEMUMonitorProtocol(self._monitor_addres=
+s,
+> -                                                server=3DTrue,
+> -                                                debug=3Dself._debug)
+> +                                                server=3DTrue)
+> =20
+>      def _post_launch(self):
+>          self._qmp.accept()
+> diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
+> index ef12e8a1a0..07c9632e9e 100644
+> --- a/scripts/qmp/qmp.py
+> +++ b/scripts/qmp/qmp.py
+> @@ -11,7 +11,7 @@
+>  import json
+>  import errno
+>  import socket
+> -import sys
+> +import logging
+> =20
+> =20
+>  class QMPError(Exception):
+> @@ -32,12 +32,14 @@ class QMPTimeoutError(QMPError):
+> =20
+>  class QEMUMonitorProtocol(object):
+> =20
+> +    #: Logger object for debugging messages
+> +    logger =3D logging.getLogger('QMP')
+>      #: Socket's error class
+>      error =3D socket.error
+>      #: Socket's timeout
+>      timeout =3D socket.timeout
+> =20
+> -    def __init__(self, address, server=3DFalse, debug=3DFalse):
+> +    def __init__(self, address, server=3DFalse):
+>          """
+>          Create a QEMUMonitorProtocol class.
+> =20
+> @@ -51,7 +53,6 @@ class QEMUMonitorProtocol(object):
+>          """
+>          self.__events =3D []
+>          self.__address =3D address
+> -        self._debug =3D debug
+>          self.__sock =3D self.__get_sock()
+>          self.__sockfile =3D None
+>          if server:
+> @@ -83,8 +84,7 @@ class QEMUMonitorProtocol(object):
+>                  return
+>              resp =3D json.loads(data)
+>              if 'event' in resp:
+> -                if self._debug:
+> -                    print >>sys.stderr, "QMP:<<< %s" % resp
+> +                self.logger.debug("<<< %s", resp)
+>                  self.__events.append(resp)
+>                  if not only_event:
+>                      continue
+> @@ -164,8 +164,7 @@ class QEMUMonitorProtocol(object):
+>          @return QMP response as a Python dict or None if the connectio=
+n has
+>                  been closed
+>          """
+> -        if self._debug:
+> -            print >>sys.stderr, "QMP:>>> %s" % qmp_cmd
+> +        self.logger.debug(">>> %s", qmp_cmd)
+>          try:
+>              self.__sock.sendall(json.dumps(qmp_cmd))
+>          except socket.error as err:
+> @@ -173,8 +172,7 @@ class QEMUMonitorProtocol(object):
+>                  return
+>              raise socket.error(err)
+>          resp =3D self.__json_read()
+> -        if self._debug:
+> -            print >>sys.stderr, "QMP:<<< %s" % resp
+> +        self.logger.debug("<<< %s", resp)
+>          return resp
+> =20
+>      def cmd(self, name, args=3DNone, cmd_id=3DNone):
+>=20
 
-> On Fri, Oct 06, 2017 at 05:09:04PM +0200, Greg Kurz wrote:
-> > QEMU currently crashes when the user tries to add a spapr-pci-host-brid=
-ge
-> > on a non-pseries machine:
-> >=20
-> > $ qemu-system-ppc64 -M ppce500 -device spapr-pci-host-bridge,index=3D1
-> > hw/ppc/spapr_pci.c:1535:spapr_phb_realize:
-> > Object 0x1003dacae60 is not an instance of type spapr-machine
-> > Aborted (core dumped)
-> >=20
-> > The same thing happens with the deprecated but still available child ty=
-pe
-> > spapr-pci-vfio-host-bridge.
-> >=20
-> > Fix both by checking the machine type with object_dynamic_cast().
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org> =20
->=20
->=20
->=20
-> > ---
-> >  hw/ppc/spapr_pci.c |    8 +++++++-
-> >  1 file changed, 7 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> > index 5049ced4e8b4..9e85106f51f8 100644
-> > --- a/hw/ppc/spapr_pci.c
-> > +++ b/hw/ppc/spapr_pci.c
-> > @@ -1507,7 +1507,7 @@ static void spapr_pci_unplug_request(HotplugHandl=
-er *plug_handler,
-> > =20
-> >  static void spapr_phb_realize(DeviceState *dev, Error **errp)
-> >  {
-> > -    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-> > +    sPAPRMachineState *spapr;
-> >      SysBusDevice *s =3D SYS_BUS_DEVICE(dev);
-> >      sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(s);
-> >      PCIHostState *phb =3D PCI_HOST_BRIDGE(s);
-> > @@ -1519,6 +1519,12 @@ static void spapr_phb_realize(DeviceState *dev, =
-Error **errp)
-> >      const unsigned windows_supported =3D
-> >          sphb->ddw_enabled ? SPAPR_PCI_DMA_MAX_WINDOWS : 1;
-> > =20
-> > +    spapr =3D (sPAPRMachineState *) qdev_get_machine();
-> > +    if (!object_dynamic_cast((Object *) spapr, TYPE_SPAPR_MACHINE)) {
-> > +        error_setg(errp, TYPE_SPAPR_PCI_HOST_BRIDGE " needs a pseries =
-machine");
-> > +        return;
-> > +    } =20
->=20
-> This is slightly clunky.  You could instead use OBJECT_CHECK in the
-> initializer, then just if (!spapr) here.
->=20
+This one looks good, but in order to no break qemu-iotests verbose mode i=
+t requires fix to qtest/iotests:
 
-Unless I'm missing something, OBJECT_CHECK() is precisely what we're
-removing with this patch to avoid the runtime assert...
+```diff
+diff --git a/scripts/qtest.py b/scripts/qtest.py
+index df0daf2..0e955a8 100644
+--- a/scripts/qtest.py
++++ b/scripts/qtest.py
+@@ -77,12 +77,12 @@ class QEMUQtestMachine(qemu.QEMUMachine):
+     '''A QEMU VM'''
+=20
+     def __init__(self, binary, args=3DNone, name=3DNone, test_dir=3D"/va=
+r/tmp",
+-                 socket_scm_helper=3DNone):
++                 socket_scm_helper=3DNone, debug=3DFalse):
+         if name is None:
+             name =3D "qemu-%d" % os.getpid()
+         super(QEMUQtestMachine,
+               self).__init__(binary, args, name=3Dname, test_dir=3Dtest_=
+dir,
+-                             socket_scm_helper=3Dsocket_scm_helper)
++                             socket_scm_helper=3Dsocket_scm_helper, debu=
+g=3Ddebug)
+         self._qtest =3D None
+         self._qtest_path =3D os.path.join(test_dir, name + "-qtest.sock"=
+)
+=20
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
+y
+index 1af117e..989ebd3 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -193,9 +193,8 @@ class VM(qtest.QEMUQtestMachine):
+         name =3D "qemu%s-%d" % (path_suffix, os.getpid())
+         super(VM, self).__init__(qemu_prog, qemu_opts, name=3Dname,
+                                  test_dir=3Dtest_dir,
+-                                 socket_scm_helper=3Dsocket_scm_helper)
+-        if debug:
+-            self._debug =3D True
++                                 socket_scm_helper=3Dsocket_scm_helper,
++                                 debug=3Ddebug)
+         self._num_drives =3D 0
+=20
+     def add_device(self, opts):
+```
 
-#define SPAPR_MACHINE(obj) \
-    OBJECT_CHECK(sPAPRMachineState, (obj), TYPE_SPAPR_MACHINE)
+(because the `debug` used to be set after `__init__`, but the logging is =
+initialized during `__init__`.)
 
-> > +
-> >      if (sphb->index !=3D (uint32_t)-1) {
-> >          sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> >          Error *local_err =3D NULL;
-> >  =20
->=20
->=20
+Therefor conditional ACK when the qtest/iotest fix precedes this commit.
+
+Luk=C3=A1=C5=A1
 
 
---Sig_/hRvlVQsKgaYxmf+IRbYNBSG
-Content-Type: application/pgp-signature
+--da2OS2H2OMdArVq0Q8HaP2scxp9MgbsXp
+Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWdiK6AAKCRAC/DrrAQHb
-wv9ZAKCEk/7LdCylGuG7m4Jg5r8PQjv9pACfaCSXSsqnC4Ljm/F2TQN/jBLyWvw=
-=6i2c
+iQEwBAEBCAAaBQJZ2I+mExxsZG9rdG9yQHJlZGhhdC5jb20ACgkQJrNi5H/PIsE/
+8wgAslUvTCvFlUFLjICZ53LARj8161HJv6MVCMLHIy5xGb7EaVbsju667Cmy+HyW
+w8u2aCl7JnkTFYIRGB2yGn2yBnQdLyKNfYzmyfjXzefhBMiWADAXJbAXQZLVXJZw
+oWYr+S7cbhD9nXifjDflACusWbMH2uUzACHdEepGfFLtXiA2vGISFOuKTcs6PpJZ
+XCjv5HwqhPBW/wB3eGJ0wYDVfqB+BzCLq8BxSbnFw3edvIyLG/Da7c+PVWerKE6i
+JsBiS/z5nVLQb7IFum/ZfMnlGMYba+0Ufl54ss6wtSY+eMpLGDs2StqXgBhoybLd
+f+ArVphaKndeJ7KND6FUFtiInQ==
+=QhWq
 -----END PGP SIGNATURE-----
 
---Sig_/hRvlVQsKgaYxmf+IRbYNBSG--
+--da2OS2H2OMdArVq0Q8HaP2scxp9MgbsXp--
