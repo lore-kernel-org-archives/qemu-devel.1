@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <koushikcseist@gmail.com>) id 1e0jvM-00036Y-DT
-	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 03:53:29 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e0pwK-0006pj-DG
+	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 10:18:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <koushikcseist@gmail.com>) id 1e0jvL-0005tL-EB
-	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 03:53:28 -0400
-Received: from mail-it0-x22e.google.com ([2607:f8b0:4001:c0b::22e]:55244)
+	(envelope-from <peter.maydell@linaro.org>) id 1e0pwJ-0001tN-Gu
+	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 10:18:52 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:48092)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <koushikcseist@gmail.com>)
-	id 1e0jvL-0005t3-9N
-	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 03:53:27 -0400
-Received: by mail-it0-x22e.google.com with SMTP id 72so7286635itk.3
-	for <qemu-devel@nongnu.org>; Sat, 07 Oct 2017 00:53:26 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e0pwJ-0001rt-9Z
+	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 10:18:51 -0400
+Received: by mail-wm0-x229.google.com with SMTP id t69so12822037wmt.2
+	for <qemu-devel@nongnu.org>; Sat, 07 Oct 2017 07:18:50 -0700 (PDT)
 MIME-Version: 1.0
-From: Koushik Dutta <koushikcseist@gmail.com>
-Date: Sat, 7 Oct 2017 13:23:25 +0530
-Message-ID: <CAFq1WaKFes0czd9bKSWA0jbBWGiBk-vu+Owra6u-JGGjADui5g@mail.gmail.com>
+In-Reply-To: <20171006235023.11952-1-f4bug@amsat.org>
+References: <20171006235023.11952-1-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 7 Oct 2017 15:18:29 +0100
+Message-ID: <CAFEAcA_ua3Y=OC_HDq98st-8+7ZScmYXU0Sj=XUgfTm4POY0iA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Using qemu command not able launch VM
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 00/88] use g_new() family of functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,38 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, qemu trival <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Hi All (qemu members),
+On 7 October 2017 at 00:48, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> w=
+rote:
+> Hi,
+>
+> This is a follow-up of Marc-Andr=C3=A9's clang-tidy series [1].
+> While chatting we realized we were trying to reach the same goal, Marc-An=
+dr=C3=A9
+> using clang-tidy and me using spatch; so he let me finish his series appl=
+ying
+> my changes over his.
+> I also included Jan's patch which fits well.
+>
+> Summary:
+> - 1 bugfix (memory leak)
+> - few optimizations (avoid to zeroise when all memory is assigned)
+> - bunch of mechanical refactors
 
-I installed qemu utility in my host machine. I want to start Virtual
-machine using qemu command.
+88 patches is way too many for a single series, even if it is
+mostly mechanical.
 
-My host machine: Intel-X86
-Script for launching VM :
-
-T=/home/koushik/vpp/cloud_ubuntu_img
-    sudo qemu-system-i386  -enable-kvm -m 1024 -smp
-sockets=1,cpus=4,cores=2 -cpu host \
-    -vga none -nographic \
-    -kernel $T/vmlinuz-4.4.0-96-generic --append "console=ttyAMA0
-root=/dev/vda rw"  \
-    -drive file=$T/custom32.img,if=virtio,aio=threads \
-    -chardev socket,id=char1,path=/tmp/sock1.sock \
-    -netdev type=vhost-user,id=mynet1,chardev=char1,vhostforce\
-    -device virtio-net-pci,mac=00:00:00:00:00:01,netdev=mynet1 \
-    -object
-memory-backend-file,id=mem,size=1024M,mem-path=/dev/hugepages,share=on \
-    -numa node,memdev=mem -mem-prealloc \
-    #-debugcon file:debug.log -global isa-debugcon.iobase=0x402
-
-
-Bug:  Invalid netdev type
-
-Please let me know where i did wrong.
-Please help me.
-Thanks to all in advance.
-
-
-Thanks & Regards,
-Koushik
+thanks
+-- PMM
