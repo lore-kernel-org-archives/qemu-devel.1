@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1e0sBI-0007Ay-15
-	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 12:42:29 -0400
+	(envelope-from <clg@kaod.org>) id 1e0sDO-0008IM-Fy
+	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 12:44:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1e0sBE-0004Wk-V1
-	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 12:42:28 -0400
-Received: from 1.mo177.mail-out.ovh.net ([178.33.107.143]:34488)
+	(envelope-from <clg@kaod.org>) id 1e0sDL-0005a8-Cr
+	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 12:44:38 -0400
+Received: from 10.mo177.mail-out.ovh.net ([46.105.73.133]:32980)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1e0sBE-0004WC-P7
-	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 12:42:24 -0400
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1e0sDL-0005Zi-6U
+	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 12:44:35 -0400
 Received: from player779.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id B494979680
-	for <qemu-devel@nongnu.org>; Sat,  7 Oct 2017 18:42:23 +0200 (CEST)
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id D314F7CD93
+	for <qemu-devel@nongnu.org>; Sat,  7 Oct 2017 18:44:33 +0200 (CEST)
 References: <20170920070135.31379-1-clg@kaod.org>
-	<20170920070135.31379-2-clg@kaod.org>
-	<CAFEAcA9-dmTD3v1YU7Wr5EcA53z=c_WxS0K1+1zbw16q=vj-vQ@mail.gmail.com>
+	<CAFEAcA9Avqgbm7sZTKuex9dOp-1wzw0Moa8XVvXw5GZjSeC5Xw@mail.gmail.com>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <528c49b8-0d94-dad7-c664-c8a91b6b4a2e@kaod.org>
-Date: Sat, 7 Oct 2017 18:42:17 +0200
+Message-ID: <7fb02e55-68dc-8509-7c2b-d049eca19d9e@kaod.org>
+Date: Sat, 7 Oct 2017 18:44:28 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9-dmTD3v1YU7Wr5EcA53z=c_WxS0K1+1zbw16q=vj-vQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA9Avqgbm7sZTKuex9dOp-1wzw0Moa8XVvXw5GZjSeC5Xw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] aspeed: add support for the
- witherspoon-bmc board
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] aspeed: add a witherspoon-bmc
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,103 +35,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On 10/06/2017 05:10 PM, Peter Maydell wrote:
+On 10/06/2017 05:13 PM, Peter Maydell wrote:
 > On 20 September 2017 at 08:01, C=C3=A9dric Le Goater <clg@kaod.org> wro=
 te:
->> The Witherspoon boards are OpenPOWER system hosting POWER9 Processors.
->> Let's add support for their BMC including a couple of I2C devices as
->> found on real HW.
+>> Hello,
 >>
->> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->> ---
->>  hw/arm/aspeed.c | 49 ++++++++++++++++++++++++++++++++++++++++++++++++=
-+
->>  1 file changed, 49 insertions(+)
+>> This series adds a new Aspeed machine to emulate the BMC of a
+>> Witherspoon system. It also extends the other Aspeed machines with I2C
+>> devices and adds a simple model for the pca9552 LED blinker present on
+>> the witherspoon board.
 >>
->> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
->> index ab895ad490af..81f522f711ae 100644
->> --- a/hw/arm/aspeed.c
->> +++ b/hw/arm/aspeed.c
->> @@ -46,6 +46,7 @@ enum {
->>      PALMETTO_BMC,
->>      AST2500_EVB,
->>      ROMULUS_BMC,
->> +    WITHERSPOON_BMC,
->>  };
+>> Thanks,
 >>
->>  /* Palmetto hardware value: 0x120CE416 */
->> @@ -83,8 +84,12 @@ enum {
->>          SCU_AST2500_HW_STRAP_ACPI_ENABLE |                           =
-   \
->>          SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
+>> C.
 >>
->> +/* Witherspoon hardware value: 0xF10AD216 (but use romulus definition=
-) */
->> +#define WITHERSPOON_BMC_HW_STRAP1 ROMULUS_BMC_HW_STRAP1
->> +
->>  static void palmetto_bmc_i2c_init(AspeedBoardState *bmc);
->>  static void ast2500_evb_i2c_init(AspeedBoardState *bmc);
->> +static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc);
+>> Changes since v1:
 >>
->>  static const AspeedBoardConfig aspeed_boards[] =3D {
->>      [PALMETTO_BMC] =3D {
->> @@ -110,6 +115,14 @@ static const AspeedBoardConfig aspeed_boards[] =3D=
- {
->>          .spi_model =3D "mx66l1g45g",
->>          .num_cs    =3D 2,
->>      },
->> +    [WITHERSPOON_BMC]  =3D {
->> +        .soc_name  =3D "ast2500-a1",
->> +        .hw_strap1 =3D WITHERSPOON_BMC_HW_STRAP1,
->> +        .fmc_model =3D "mx25l25635e",
->> +        .spi_model =3D "mx66l1g45g",
->> +        .num_cs    =3D 2,
->> +        .i2c_init  =3D witherspoon_bmc_i2c_init,
->> +    },
->>  };
+>>  - introduced smbus_eeprom_init_one()
 >>
->>  #define FIRMWARE_ADDR 0x0
->> @@ -337,11 +350,47 @@ static const TypeInfo romulus_bmc_type =3D {
->>      .class_init =3D romulus_bmc_class_init,
->>  };
->>
->> +static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
->> +{
->> +    AspeedSoCState *soc =3D &bmc->soc;
->> +
->> +    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), "tmp42=
-3", 0x4c);
->> +    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 5), "tmp42=
-3", 0x4c);
->> +
->> +    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 9), "tmp10=
-5", 0x4a);
->> +}
->> +
->> +static void witherspoon_bmc_init(MachineState *machine)
->> +{
->> +    aspeed_board_init(machine, &aspeed_boards[WITHERSPOON_BMC]);
->> +}
->> +
->> +static void witherspoon_bmc_class_init(ObjectClass *oc, void *data)
->> +{
->> +    MachineClass *mc =3D MACHINE_CLASS(oc);
->> +
->> +    mc->desc =3D "OpenPOWER Witherspoon BMC (ARM1176)";
->> +    mc->init =3D witherspoon_bmc_init;
->> +    mc->max_cpus =3D 1;
->> +    mc->no_sdcard =3D 1;
->> +    mc->no_floppy =3D 1;
->> +    mc->no_cdrom =3D 1;
->> +    mc->no_parallel =3D 1;
->> +    mc->ignore_memory_transaction_failures =3D true;
+>> C=C3=A9dric Le Goater (6):
+>>   aspeed: add support for the witherspoon-bmc board
+>>   aspeed: add an I2C RTC device to all machines
+>>   smbus: add a smbus_eeprom_init_one() routine
+>>   aspeed: Add EEPROM I2C devices
+>>   misc: add pca9552 LED blinker model
+>>   aspeed: add the pc9552 chips to the witherspoon machine
 >=20
-> Please don't set this flag for new board models, it is only
-> for our legacy existing ones. Instead implement any devices
-> that you need for guest code to boot (stub them out with
-> create_unimplemented_device() if you like).
+> Hi -- I've made a couple of review comments and nothing else
+> leapt out as obviously wrong, but I'm hoping that somebody more
+> familiar with the aspeed devices will do review...
 
-OK. I am discovering this. I will take a look for the next
-round.
+Joel,=20
 
-C.=20
+Now that we have updated the DTs, could you please take a look=20
+to make sure that the I2C busses in the models have devices=20
+which makes sense with the real boards.
+
+Thanks,
+
+C.  =20
