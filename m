@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1e0sDO-0008IM-Fy
-	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 12:44:40 -0400
+	(envelope-from <bounces@canonical.com>) id 1e13A0-0000gW-59
+	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 00:25:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1e0sDL-0005a8-Cr
-	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 12:44:38 -0400
-Received: from 10.mo177.mail-out.ovh.net ([46.105.73.133]:32980)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1e0sDL-0005Zi-6U
-	for qemu-devel@nongnu.org; Sat, 07 Oct 2017 12:44:35 -0400
-Received: from player779.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id D314F7CD93
-	for <qemu-devel@nongnu.org>; Sat,  7 Oct 2017 18:44:33 +0200 (CEST)
-References: <20170920070135.31379-1-clg@kaod.org>
-	<CAFEAcA9Avqgbm7sZTKuex9dOp-1wzw0Moa8XVvXw5GZjSeC5Xw@mail.gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <7fb02e55-68dc-8509-7c2b-d049eca19d9e@kaod.org>
-Date: Sat, 7 Oct 2017 18:44:28 +0200
+	(envelope-from <bounces@canonical.com>) id 1e139x-0004qh-00
+	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 00:25:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39804)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e139w-0004qE-Pl
+	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 00:25:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e139t-00075O-JM
+	for <qemu-devel@nongnu.org>; Sun, 08 Oct 2017 04:25:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 907E12E80C7
+	for <qemu-devel@nongnu.org>; Sun,  8 Oct 2017 04:25:45 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9Avqgbm7sZTKuex9dOp-1wzw0Moa8XVvXw5GZjSeC5Xw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] aspeed: add a witherspoon-bmc
- machine
+Date: Sun, 08 Oct 2017 04:17:20 -0000
+From: Launchpad Bug Tracker <1709025@bugs.launchpad.net>
+Reply-To: Bug 1709025 <1709025@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150209306745.21201.16700911445033219702.malonedeb@wampee.canonical.com>
+Message-Id: <150743624249.13125.13017114430876214384.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1709025] Re: Disk corrupted after snapshot
+ deletion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,45 +37,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
 
-On 10/06/2017 05:13 PM, Peter Maydell wrote:
-> On 20 September 2017 at 08:01, C=C3=A9dric Le Goater <clg@kaod.org> wro=
-te:
->> Hello,
->>
->> This series adds a new Aspeed machine to emulate the BMC of a
->> Witherspoon system. It also extends the other Aspeed machines with I2C
->> devices and adds a simple model for the pca9552 LED blinker present on
->> the witherspoon board.
->>
->> Thanks,
->>
->> C.
->>
->> Changes since v1:
->>
->>  - introduced smbus_eeprom_init_one()
->>
->> C=C3=A9dric Le Goater (6):
->>   aspeed: add support for the witherspoon-bmc board
->>   aspeed: add an I2C RTC device to all machines
->>   smbus: add a smbus_eeprom_init_one() routine
->>   aspeed: Add EEPROM I2C devices
->>   misc: add pca9552 LED blinker model
->>   aspeed: add the pc9552 chips to the witherspoon machine
->=20
-> Hi -- I've made a couple of review comments and nothing else
-> leapt out as obviously wrong, but I'm hoping that somebody more
-> familiar with the aspeed devices will do review...
+[Expired for QEMU because there has been no activity for 60 days.]
 
-Joel,=20
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-Now that we have updated the DTs, could you please take a look=20
-to make sure that the I2C busses in the models have devices=20
-which makes sense with the real boards.
+-- =
 
-Thanks,
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1709025
 
-C.  =20
+Title:
+  Disk corrupted after snapshot deletion
+
+Status in QEMU:
+  Expired
+
+Bug description:
+    I found the vm disk corruption after snapshot deletion sometimes(the pr=
+obability is very low, I'm afraid i can't reproduce it). And I found there =
+is a patch for it as follow, but I'm not sure whether the patch repaired th=
+e bug. =
+
+    Drain disk before snapshot deletion can't guarantee anything, there is =
+still pending IO in snapshot-deletion process. Anyone can help?
+
+  author	Zhang Haoyu <zhanghy@sangfor.com>	2014-10-21 16:38:01 +0800
+  committer	Stefan Hajnoczi <stefanha@redhat.com>	2014-11-03 09:48:42 +0000
+  commit	3432a1929ee18e08787ce35476abd74f2c93a17c (patch)
+  tree	13a81c0a46707d91622f1593ccf7b926935371fd /block/snapshot.c
+  parent	573742a5431a99ceaba6968ae269cee247727cce (diff)
+  snapshot: add bdrv_drain_all() to bdrv_snapshot_delete() to avoid concurr=
+ency problem
+  If there are still pending i/o while deleting snapshot,
+  because deleting snapshot is done in non-coroutine context, and
+  the pending i/o read/write (bdrv_co_do_rw) is done in coroutine context,
+  so it's possible to cause concurrency problem between above two operation=
+s.
+  Add bdrv_drain_all() to bdrv_snapshot_delete() to avoid this problem.
+
+  Signed-off-by: Zhang Haoyu <zhanghy@sangfor.com>
+  Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+  Message-id: 201410211637596311287@sangfor.com
+  Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+  Diffstat (limited to 'block/snapshot.c')
+  -rw-r--r--	block/snapshot.c	4	=
+
+  1 files changed, 4 insertions, 0 deletions
+  diff --git a/block/snapshot.c b/block/snapshot.c
+  index 85c52ff..698e1a1 100644
+  --- a/block/snapshot.c
+  +++ b/block/snapshot.c
+  @@ -236,6 +236,10 @@ int bdrv_snapshot_delete(BlockDriverState *bs,
+           error_setg(errp, "snapshot_id and name are both NULL");
+           return -EINVAL;
+       }
+  +
+  +    /* drain all pending i/o before deleting snapshot */
+  +    bdrv_drain_all();
+  +
+       if (drv->bdrv_snapshot_delete) {
+           return drv->bdrv_snapshot_delete(bs, snapshot_id, name, errp);
+       }
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1709025/+subscriptions
