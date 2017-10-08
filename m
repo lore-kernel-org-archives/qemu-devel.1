@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e1Hpo-000522-JR
-	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 16:06:01 -0400
+	(envelope-from <edgar@xilinx.com>) id 1e1JwK-0006Gy-HZ
+	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 18:20:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e1Hpn-0002QB-Kz
-	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 16:06:00 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:49030)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e1Hpn-0002PZ-DJ
-	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 16:05:59 -0400
-Received: by mail-wm0-x233.google.com with SMTP id i124so17622176wmf.3
-	for <qemu-devel@nongnu.org>; Sun, 08 Oct 2017 13:05:58 -0700 (PDT)
+	(envelope-from <edgar@xilinx.com>) id 1e1JwJ-00052y-JL
+	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 18:20:52 -0400
+Date: Mon, 9 Oct 2017 05:20:29 +0700
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Message-ID: <20171008222029.GA29979@toto>
+References: <cover.1505929556.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <150748304313.11627.11685667181516412731.stgit@bahia.lan>
-References: <150748304313.11627.11685667181516412731.stgit@bahia.lan>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 8 Oct 2017 21:05:37 +0100
-Message-ID: <CAFEAcA-HYzVowLcomUJRNfb+_DFKqOKuW+X5kZBg1S4o_9pbyg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] spapr: introduce
- SPAPR_MACHINE_NOASSERT()
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <cover.1505929556.git.alistair.francis@xilinx.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/8]  Add the ZynqMP PMU and IPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +22,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-devel@nongnu.org, edgar.iglesias@gmail.com, alistair23@gmail.com, qemu-arm@nongnu.org
 
-On 8 October 2017 at 18:17, Greg Kurz <groug@kaod.org> wrote:
-> A spapr-cpu-core device can only be plugged into a pseries machine. This
-> is checked in spapr_cpu_core_realize() with object_dynamic_cast() instead
-> of the usual SPAPR_MACHINE() macro because we don't want QEMU to abort.
->
-> This patch moves the gory details to a SPAPR_MACHINE_NOASSERT() macro
-> that acts like the SPAPR_MACHINE() one, except it returns NULL instead
-> of aborting if its argument doesn't point to a pseries machine type.
->
-> This is done for two reasons:
-> - it makes the code nicer
-> - it may be used by other pseries-specific devices like PHBs for example
->
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/ppc/spapr_cpu_core.c |    7 +++----
->  include/hw/ppc/spapr.h  |    3 +++
->  2 files changed, 6 insertions(+), 4 deletions(-)
->
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 37beb56e8b18..5fde07614218 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -199,7 +199,7 @@ error:
->
->  static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
->  {
-> -    sPAPRMachineState *spapr;
-> +    sPAPRMachineState *spapr = SPAPR_MACHINE_NOASSERT(qdev_get_machine());
->      sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
->      sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
->      CPUCore *cc = CPU_CORE(OBJECT(dev));
-> @@ -209,9 +209,8 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
->      void *obj;
->      int i, j;
->
-> -    spapr = (sPAPRMachineState *) qdev_get_machine();
-> -    if (!object_dynamic_cast((Object *) spapr, TYPE_SPAPR_MACHINE)) {
-> -        error_setg(errp, "spapr-cpu-core needs a pseries machine");
-> +    if (!spapr) {
-> +        error_setg(errp, TYPE_SPAPR_CPU_CORE " needs a pseries machine");
->          return;
->      }
->
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index c1b365f56431..4933da8083df 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -43,6 +43,9 @@ typedef struct sPAPRMachineClass sPAPRMachineClass;
->  #define SPAPR_MACHINE_CLASS(klass) \
->      OBJECT_CLASS_CHECK(sPAPRMachineClass, klass, TYPE_SPAPR_MACHINE)
->
-> +#define SPAPR_MACHINE_NOASSERT(obj) \
-> +    ((sPAPRMachineState *) object_dynamic_cast(obj, TYPE_SPAPR_MACHINE))
-> +
+On Wed, Sep 20, 2017 at 03:01:31PM -0700, Alistair Francis wrote:
+> 
+> This series adds the ZynqMP Power Management Unit (PMU) machine with basic
+> functionality.
+> 
+> The machine only has the
+>  - CPU
+>  - Memory
+>  - Interrupt controller
+>  - IPI device
+> 
+> connected, but that is enough to run some of the ROM and firmware
+> code on the machine
+> 
+> The series also adds the IPI device and connects it to the ZynqMP ARM
+> side and the ZynqMP PMU. These IPI devices don't connect between the ARM
+> and MicroBlaze instances though.
+> 
+> v3:
+>  - Add the interrupt controller
+>  - Replace some of the error_fatals with errp
+>  - Fix the PMU CPU name
 
-I don't think this is a great idea. Doing things with pointers
-that might not be of the right type should be obvious, not hidden
-under macros. An opencoded call to object_dynamic_cast is how the
-rest of the codebase does this; it's a bit of a weird way
-to write "isinstance()" but there you go. If we want to
-improve the way we write this sort of thing we should do
-so as a general improvement to the QOM APIs and conventions,
-not just a single thing in SPAPR code.
+Hi Alistair,
 
-thanks
--- PMM
+
+Sorry for the super long delay...
+
+I think this mostly looks good but I was wondering if we really need
+to have a board specific (zcu102) PMU?
+
+Best regards,
+Edgar
+
+
+
+> 
+> 
+> 
+> Alistair Francis (8):
+>   xlnx-zynqmp-pmu: Initial commit of the ZynqMP PMU
+>   xlnx-zynqmp-pmu: Add the CPU and memory
+>   aarch64-softmmu.mak: Use an ARM specific config
+>   xlnx-pmu-iomod-intc: Add the PMU Interrupt controller
+>   xlnx-zynqmp-pmu: Connect the PMU interrupt controller
+>   xlnx-zynqmp-ipi: Initial version of the Xilinx IPI device
+>   xlnx-zynqmp-pmu: Connect the IPI device to the PMU
+>   xlnx-zynqmp: Connect the IPI device to the ZynqMP SoC
+> 
+>  default-configs/aarch64-softmmu.mak    |   1 +
+>  default-configs/microblaze-softmmu.mak |   1 +
+>  hw/arm/Makefile.objs                   |   2 +-
+>  hw/arm/xlnx-zynqmp.c                   |  14 +
+>  hw/display/Makefile.objs               |   2 +-
+>  hw/dma/Makefile.objs                   |   2 +-
+>  hw/intc/Makefile.objs                  |   2 +
+>  hw/intc/xlnx-pmu-iomod-intc.c          | 554 +++++++++++++++++++++++++++++++++
+>  hw/intc/xlnx-zynqmp-ipi.c              | 377 ++++++++++++++++++++++
+>  hw/microblaze/Makefile.objs            |   1 +
+>  hw/microblaze/xlnx-zynqmp-pmu.c        | 200 ++++++++++++
+>  include/hw/arm/xlnx-zynqmp.h           |   2 +
+>  include/hw/intc/xlnx-pmu-iomod-intc.h  |  58 ++++
+>  include/hw/intc/xlnx-zynqmp-ipi.h      |  57 ++++
+>  14 files changed, 1270 insertions(+), 3 deletions(-)
+>  create mode 100644 hw/intc/xlnx-pmu-iomod-intc.c
+>  create mode 100644 hw/intc/xlnx-zynqmp-ipi.c
+>  create mode 100644 hw/microblaze/xlnx-zynqmp-pmu.c
+>  create mode 100644 include/hw/intc/xlnx-pmu-iomod-intc.h
+>  create mode 100644 include/hw/intc/xlnx-zynqmp-ipi.h
+> 
+> -- 
+> 2.11.0
+> 
