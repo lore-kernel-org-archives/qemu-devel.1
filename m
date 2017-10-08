@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e1FCz-0004TI-JY
+	(envelope-from <groug@kaod.org>) id 1e1FCz-0004TH-JO
 	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 13:17:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e1FCv-0004mv-Nj
+	(envelope-from <groug@kaod.org>) id 1e1FCv-0004mo-Jn
 	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 13:17:45 -0400
-Received: from 2.mo4.mail-out.ovh.net ([46.105.72.36]:60147)
+Received: from 2.mo4.mail-out.ovh.net ([46.105.72.36]:57470)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e1FCv-0004jd-Hh
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e1FCv-0004mT-Co
 	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 13:17:41 -0400
 Received: from player772.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 309C8D69DD
-	for <qemu-devel@nongnu.org>; Sun,  8 Oct 2017 19:17:33 +0200 (CEST)
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 662EED69DE
+	for <qemu-devel@nongnu.org>; Sun,  8 Oct 2017 19:17:40 +0200 (CEST)
 From: Greg Kurz <groug@kaod.org>
-Date: Sun, 08 Oct 2017 19:17:23 +0200
-Message-ID: <150748304313.11627.11685667181516412731.stgit@bahia.lan>
+Date: Sun, 08 Oct 2017 19:17:37 +0200
+Message-ID: <150748305796.11627.10934374526997902580.stgit@bahia.lan>
+In-Reply-To: <150748304313.11627.11685667181516412731.stgit@bahia.lan>
+References: <150748304313.11627.11685667181516412731.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v2 1/2] spapr: introduce
- SPAPR_MACHINE_NOASSERT()
+Subject: [Qemu-devel] [PATCH v2 2/2] spapr_pci: fail gracefully with
+ non-pseries machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +33,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-A spapr-cpu-core device can only be plugged into a pseries machine. This
-is checked in spapr_cpu_core_realize() with object_dynamic_cast() instead
-of the usual SPAPR_MACHINE() macro because we don't want QEMU to abort.
+QEMU currently crashes when the user tries to add a spapr-pci-host-bridge
+on a non-pseries machine:
 
-This patch moves the gory details to a SPAPR_MACHINE_NOASSERT() macro
-that acts like the SPAPR_MACHINE() one, except it returns NULL instead
-of aborting if its argument doesn't point to a pseries machine type.
+$ qemu-system-ppc64 -M ppce500 -device spapr-pci-host-bridge,index=1
+hw/ppc/spapr_pci.c:1535:spapr_phb_realize:
+Object 0x1003dacae60 is not an instance of type spapr-machine
+Aborted (core dumped)
 
-This is done for two reasons:
-- it makes the code nicer
-- it may be used by other pseries-specific devices like PHBs for example
+The same thing happens with the deprecated but still available child type
+spapr-pci-vfio-host-bridge.
 
+Fix both by using the SPAPR_MACHINE_NOASSERT() macro in papr_phb_realize().
+
+Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr_cpu_core.c |    7 +++----
- include/hw/ppc/spapr.h  |    3 +++
- 2 files changed, 6 insertions(+), 4 deletions(-)
+v2: - use new SPAPR_MACHINE_NOASSERT() macro
+---
+ hw/ppc/spapr_pci.c |    7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 37beb56e8b18..5fde07614218 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -199,7 +199,7 @@ error:
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 5049ced4e8b4..4d6a91ebb9c2 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1507,7 +1507,7 @@ static void spapr_pci_unplug_request(HotplugHandler *plug_handler,
  
- static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+ static void spapr_phb_realize(DeviceState *dev, Error **errp)
  {
--    sPAPRMachineState *spapr;
+-    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
 +    sPAPRMachineState *spapr = SPAPR_MACHINE_NOASSERT(qdev_get_machine());
-     sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
-     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
-     CPUCore *cc = CPU_CORE(OBJECT(dev));
-@@ -209,9 +209,8 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-     void *obj;
-     int i, j;
+     SysBusDevice *s = SYS_BUS_DEVICE(dev);
+     sPAPRPHBState *sphb = SPAPR_PCI_HOST_BRIDGE(s);
+     PCIHostState *phb = PCI_HOST_BRIDGE(s);
+@@ -1519,6 +1519,11 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+     const unsigned windows_supported =
+         sphb->ddw_enabled ? SPAPR_PCI_DMA_MAX_WINDOWS : 1;
  
--    spapr = (sPAPRMachineState *) qdev_get_machine();
--    if (!object_dynamic_cast((Object *) spapr, TYPE_SPAPR_MACHINE)) {
--        error_setg(errp, "spapr-cpu-core needs a pseries machine");
 +    if (!spapr) {
-+        error_setg(errp, TYPE_SPAPR_CPU_CORE " needs a pseries machine");
-         return;
-     }
- 
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index c1b365f56431..4933da8083df 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -43,6 +43,9 @@ typedef struct sPAPRMachineClass sPAPRMachineClass;
- #define SPAPR_MACHINE_CLASS(klass) \
-     OBJECT_CLASS_CHECK(sPAPRMachineClass, klass, TYPE_SPAPR_MACHINE)
- 
-+#define SPAPR_MACHINE_NOASSERT(obj) \
-+    ((sPAPRMachineState *) object_dynamic_cast(obj, TYPE_SPAPR_MACHINE))
++        error_setg(errp, TYPE_SPAPR_PCI_HOST_BRIDGE " needs a pseries machine");
++        return;
++    }
 +
- typedef enum {
-     SPAPR_RESIZE_HPT_DEFAULT = 0,
-     SPAPR_RESIZE_HPT_DISABLED,
+     if (sphb->index != (uint32_t)-1) {
+         sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+         Error *local_err = NULL;
