@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e1AyW-0000WH-DA
-	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 08:46:33 -0400
+	(envelope-from <bounces@canonical.com>) id 1e1B2j-0001rz-Qo
+	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 08:50:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e1AyR-0004ba-HE
-	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 08:46:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45082)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e1AyR-0004b7-AH
-	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 08:46:27 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6709C4E4D0
-	for <qemu-devel@nongnu.org>; Sun,  8 Oct 2017 12:46:25 +0000 (UTC)
-Date: Sun, 8 Oct 2017 20:46:14 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171008124614.GA7792@pxdev.xzpeter.org>
-References: <1506070572-7549-1-git-send-email-peterx@redhat.com>
-	<1506070572-7549-2-git-send-email-peterx@redhat.com>
-	<20170922101652.GF9243@stefanha-x1.localdomain>
-	<87h8vh1nar.fsf@dusky.pond.sub.org>
+	(envelope-from <bounces@canonical.com>) id 1e1B2e-0006GT-U3
+	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 08:50:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50420)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e1B2e-0006Fy-NC
+	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 08:50:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e1B2b-0001Z4-9o
+	for <qemu-devel@nongnu.org>; Sun, 08 Oct 2017 12:50:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 435B92E8031
+	for <qemu-devel@nongnu.org>; Sun,  8 Oct 2017 12:50:45 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87h8vh1nar.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH 1/3] iothread: provide helpers for internal
- use
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 08 Oct 2017 12:43:30 -0000
+From: "htmldeveloper@gmail.com" <htmldeveloper@gmail.com>
+Reply-To: Bug 1722074 <1722074@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <150746661053.7454.6898170418757179619.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1722074] [NEW] warning: host doesn't support
+ requested feature: CPUID.01H:ECX.vmx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,62 +36,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <shajnocz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Mon, Oct 02, 2017 at 07:18:04PM +0200, Markus Armbruster wrote:
-> Stefan Hajnoczi <stefanha@redhat.com> writes:
-> 
-> > On Fri, Sep 22, 2017 at 04:56:10PM +0800, Peter Xu wrote:
-> >> IOThread is a general framework that contains IO loop environment and a
-> >> real thread behind.  It's also good to be used internally inside qemu.
-> >> Provide some helpers for it to create iothreads to be used internally.
-> >> 
-> >> Signed-off-by: Peter Xu <peterx@redhat.com>
-> >> ---
-> >>  include/sysemu/iothread.h |  8 ++++++++
-> >>  iothread.c                | 21 +++++++++++++++++++++
-> >>  2 files changed, 29 insertions(+)
-> >> 
-> >> diff --git a/include/sysemu/iothread.h b/include/sysemu/iothread.h
-> >> index d2985b3..b07663f 100644
-> >> --- a/include/sysemu/iothread.h
-> >> +++ b/include/sysemu/iothread.h
-> >> @@ -46,4 +46,12 @@ AioContext *iothread_get_aio_context(IOThread *iothread);
-> >>  void iothread_stop_all(void);
-> >>  GMainContext *iothread_get_g_main_context(IOThread *iothread);
-> >>  
-> >> +/*
-> >> + * Helpers used to allocate iothreads for internal use.  These
-> >> + * iothreads will not be seen by monitor clients when query using
-> >> + * "query-iothreads".
-> >> + */
-> >> +IOThread *iothread_create(const char *id, Error **errp);
-> >> +void iothread_destroy(IOThread *iothread);
-> >> +
-> >>  #endif /* IOTHREAD_H */
-> >> diff --git a/iothread.c b/iothread.c
-> >> index 44c8944..74e400c 100644
-> >> --- a/iothread.c
-> >> +++ b/iothread.c
-> >> @@ -354,3 +354,24 @@ GMainContext *iothread_get_g_main_context(IOThread *iothread)
-> >>  
-> >>      return iothread->worker_context;
-> >>  }
-> >> +
-> >> +static Object *iothread_get_internal_parent(void)
-> >> +{
-> >> +    return container_get(object_get_root(), "/internal-iothreads");
-> >> +}
-> >
-> > Markus, please advise on the following QMP API design issue.
-> 
-> Sorry for the slow response.  Is my advice still needed, or are you
-> good?
+Public bug reported:
 
-I see that the patches are in master now (latest version, not this
-one), and the consensus should be that internally used iothreads won't
-affect results of query-iothreads.  So I think we are good now.  Thanks,
+I encountered the bug today:
 
--- 
-Peter Xu
+warning: host doesn't support requested feature: CPUID.01H:ECX.vmx
+
+My Ubuntu have this version of QEMU installed:
+
+qemu-system-x86_64 --version
+
+QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.16), Copyright
+(c) 2003-2008 Fabrice Bellard
+
+And PC is a AMD Ryzen7 CPU built, and since it is not Intel CPU:
+
+
+cat /proc/cpuinfo |more
+
+processor	: 0
+vendor_id	: AuthenticAMD
+cpu family	: 23
+model		: 1
+model name	: AMD Ryzen 7 1700X Eight-Core Processor
+stepping	: 1
+microcode	: 0x800110e
+cpu MHz		: 2200.000
+cache size	: 512 KB
+physical id	: 0
+siblings	: 16
+core id		: 0
+cpu cores	: 8
+apicid		: 0
+initial apicid	: 0
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 13
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov =
+
+pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb r=
+dtscp
+ lm constant_tsc rep_good nopl nonstop_tsc extd_apicid aperfmperf pni pclmu=
+lqdq =
+
+monitor ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand=
+ lahf
+_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch o=
+svw s
+kinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_l2 mwaitx hw_ps=
+tate =
+
+vmmcall fsgsbase bmi1 avx2 smep bmi2 rdseed adx smap clflushopt sha_ni xsav=
+eopt =
+
+xsavec xgetbv1 xsaves clzero irperf arat npt lbrv svm_lock nrip_save tsc_sc=
+ale v
+mcb_clean flushbyasid decodeassists pausefilter pfthreshold avic overflow_r=
+ecov =
+
+succor smca
+bugs		: fxsave_leak sysret_ss_attrs null_seg
+bogomips	: 6787.24
+TLB size	: 2560 4K pages
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 48 bits physical, 48 bits virtual
+power management: ts ttp tm hwpstate eff_freq_ro [13] [14]
+
+processor	: 1
+vendor_id	: AuthenticAMD
+cpu family	: 23
+model		: 1
+model name	: AMD Ryzen 7 1700X Eight-Core Processor
+stepping	: 1
+microcode	: 0x800110e
+cpu MHz		: 2200.000
+cache size	: 512 KB
+
+>From other places, it can be seen that this is an AMD CPU issue:
+
+https://www.virtualmin.com/node/52227
+
+not sure?
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1722074
+
+Title:
+  warning: host doesn't support requested feature: CPUID.01H:ECX.vmx
+
+Status in QEMU:
+  New
+
+Bug description:
+  I encountered the bug today:
+
+  warning: host doesn't support requested feature: CPUID.01H:ECX.vmx
+
+  My Ubuntu have this version of QEMU installed:
+
+  qemu-system-x86_64 --version
+
+  QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.16),
+  Copyright (c) 2003-2008 Fabrice Bellard
+
+  And PC is a AMD Ryzen7 CPU built, and since it is not Intel CPU:
+
+  =
+
+  cat /proc/cpuinfo |more
+
+  processor	: 0
+  vendor_id	: AuthenticAMD
+  cpu family	: 23
+  model		: 1
+  model name	: AMD Ryzen 7 1700X Eight-Core Processor
+  stepping	: 1
+  microcode	: 0x800110e
+  cpu MHz		: 2200.000
+  cache size	: 512 KB
+  physical id	: 0
+  siblings	: 16
+  core id		: 0
+  cpu cores	: 8
+  apicid		: 0
+  initial apicid	: 0
+  fpu		: yes
+  fpu_exception	: yes
+  cpuid level	: 13
+  wp		: yes
+  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov =
+
+  pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb=
+ rdtscp
+   lm constant_tsc rep_good nopl nonstop_tsc extd_apicid aperfmperf pni pcl=
+mulqdq =
+
+  monitor ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdra=
+nd lahf
+  _lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch=
+ osvw s
+  kinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_l2 mwaitx hw_=
+pstate =
+
+  vmmcall fsgsbase bmi1 avx2 smep bmi2 rdseed adx smap clflushopt sha_ni xs=
+aveopt =
+
+  xsavec xgetbv1 xsaves clzero irperf arat npt lbrv svm_lock nrip_save tsc_=
+scale v
+  mcb_clean flushbyasid decodeassists pausefilter pfthreshold avic overflow=
+_recov =
+
+  succor smca
+  bugs		: fxsave_leak sysret_ss_attrs null_seg
+  bogomips	: 6787.24
+  TLB size	: 2560 4K pages
+  clflush size	: 64
+  cache_alignment	: 64
+  address sizes	: 48 bits physical, 48 bits virtual
+  power management: ts ttp tm hwpstate eff_freq_ro [13] [14]
+
+  processor	: 1
+  vendor_id	: AuthenticAMD
+  cpu family	: 23
+  model		: 1
+  model name	: AMD Ryzen 7 1700X Eight-Core Processor
+  stepping	: 1
+  microcode	: 0x800110e
+  cpu MHz		: 2200.000
+  cache size	: 512 KB
+
+  From other places, it can be seen that this is an AMD CPU issue:
+
+  https://www.virtualmin.com/node/52227
+
+  not sure?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1722074/+subscriptions
