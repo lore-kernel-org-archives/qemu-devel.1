@@ -1,41 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1e16cZ-0002LY-Mp
-	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 04:07:36 -0400
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1e16un-0006C3-7J
+	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 04:26:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1e16cW-0003nO-IJ
-	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 04:07:35 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57346
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1e16uk-0006Bn-2R
+	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 04:26:25 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42416)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
-	id 1e16cW-0003n6-CY
-	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 04:07:32 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	id 1e16uj-0006BG-Qh
+	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 04:26:22 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9884Bxn108304
-	for <qemu-devel@nongnu.org>; Sun, 8 Oct 2017 04:07:28 -0400
+	v988OEPY005008
+	for <qemu-devel@nongnu.org>; Sun, 8 Oct 2017 04:26:17 -0400
 Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dew4aqmsv-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dey8evua9-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sun, 08 Oct 2017 04:07:28 -0400
+	for <qemu-devel@nongnu.org>; Sun, 08 Oct 2017 04:26:17 -0400
 Received: from localhost
 	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
-	Sun, 8 Oct 2017 04:07:27 -0400
+	Sun, 8 Oct 2017 04:26:16 -0400
 References: <150659494872.25889.2069124544245723984.stgit@aravinda>
-	<150659511184.25889.10868411111377268218.stgit@aravinda>
-	<20171004013931.GS3260@umbus.fritz.box>
+	<150659510129.25889.17733386928036958909.stgit@aravinda>
+	<20171004013456.GR3260@umbus.fritz.box>
 From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Date: Sun, 8 Oct 2017 13:37:19 +0530
+Date: Sun, 8 Oct 2017 13:56:06 +0530
 MIME-Version: 1.0
-In-Reply-To: <20171004013931.GS3260@umbus.fritz.box>
+In-Reply-To: <20171004013456.GR3260@umbus.fritz.box>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Message-Id: <e0e0d09c-9b46-4b1d-05de-30e778b1cf10@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v5 6/6] migration: Block migration while
- handling machine check
+Message-Id: <9b20d8a7-c542-2b57-0b80-1787d7b044b6@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v5 5/6] ppc: spapr: Enable FWNMI capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,133 +47,152 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru, mahesh@linux.vnet
 
 
 
-On Wednesday 04 October 2017 07:09 AM, David Gibson wrote:
-> On Thu, Sep 28, 2017 at 04:08:31PM +0530, Aravinda Prasad wrote:
->> Block VM migration requests until the machine check
->> error handling is complete as (i) these errors are
->> specific to the source hardware and is irrelevant on
->> the target hardware, (ii) these errors cause data
->> corruption and should be handled before migration.
+On Wednesday 04 October 2017 07:04 AM, David Gibson wrote:
+> On Thu, Sep 28, 2017 at 04:08:21PM +0530, Aravinda Prasad wrote:
+>> Enable the KVM capability KVM_CAP_PPC_FWNMI so that
+>> the KVM causes guest exit with NMI as exit reason
+>> when it encounters a machine check exception on the
+>> address belonging to a guest. Without this capability
+>> enabled, KVM redirects machine check exceptions to
+>> guest's 0x200 vector.
 >>
 >> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
 >> ---
->>  hw/ppc/spapr_rtas.c    |    3 +++
->>  include/hw/ppc/spapr.h |    2 ++
->>  target/ppc/kvm.c       |   17 +++++++++++++++++
->>  3 files changed, 22 insertions(+)
+>>  hw/ppc/spapr_rtas.c  |   15 +++++++++++++++
+>>  target/ppc/kvm.c     |   13 +++++++++++++
+>>  target/ppc/kvm_ppc.h |    6 ++++++
+>>  3 files changed, 34 insertions(+)
 >>
 >> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
->> index d017a67..17f6567 100644
+>> index 08e9a5e..d017a67 100644
 >> --- a/hw/ppc/spapr_rtas.c
 >> +++ b/hw/ppc/spapr_rtas.c
->> @@ -47,6 +47,7 @@
+>> @@ -46,6 +46,7 @@
+>>  #include "qemu/cutils.h"
 >>  #include "trace.h"
 >>  #include "hw/ppc/fdt.h"
->>  #include "kvm_ppc.h"
->> +#include "migration/blocker.h"
+>> +#include "kvm_ppc.h"
 >>  
 >>  static void rtas_display_character(PowerPCCPU *cpu, sPAPRMachineState *spapr,
 >>                                     uint32_t token, uint32_t nargs,
->> @@ -390,6 +391,8 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
->>          spapr->mc_status = -1;
->>          qemu_cond_signal(&spapr->mc_delivery_cond);
->>          rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->> +        migrate_del_blocker(spapr->migration_blocker);
->> +        error_free(spapr->migration_blocker);
+>> @@ -354,6 +355,20 @@ static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
+>>                                    target_ulong args,
+>>                                    uint32_t nret, target_ulong rets)
+>>  {
+>> +    int ret;
+>> +
+>> +    ret = kvmppc_fwnmi_enable(cpu);
+> 
+> If you're enabling it here, doesn't that mean you need to disable it
+> on reset?
+
+We don't have a way in KVM to disable it once enabled.
+
+> 
+>> +    if (ret == 1) {
+>> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
+>> +        return;
+>> +    }
+>> +
+>> +    if (ret < 0) {
+>> +        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+>> +        return;
+>> +    }
+>> +
+>>      spapr->guest_machine_check_addr = rtas_ld(args, 1);
+>>      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>>  }
+>> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+>> index 7e4ce02..59b3322 100644
+>> --- a/target/ppc/kvm.c
+>> +++ b/target/ppc/kvm.c
+>> @@ -92,6 +92,7 @@ static int cap_mmu_radix;
+>>  static int cap_mmu_hash_v3;
+>>  static int cap_resize_hpt;
+>>  static int cap_ppc_pvr_compat;
+>> +static int cap_fwnmi;
+>>  
+>>  static uint32_t debug_inst_opcode;
+>>  
+>> @@ -150,6 +151,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>>      cap_mmu_radix = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
+>>      cap_mmu_hash_v3 = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V3);
+>>      cap_resize_hpt = kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HPT);
+>> +    cap_fwnmi = kvm_check_extension(s, KVM_CAP_PPC_FWNMI);
+>>      /*
+>>       * Note: setting it to false because there is not such capability
+>>       * in KVM at this moment.
+>> @@ -2142,6 +2144,17 @@ void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy)
 >>      }
 >>  }
 >>  
->> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
->> index a75e9cf..0890a44 100644
->> --- a/include/hw/ppc/spapr.h
->> +++ b/include/hw/ppc/spapr.h
->> @@ -7,6 +7,7 @@
->>  #include "hw/ppc/spapr_drc.h"
->>  #include "hw/mem/pc-dimm.h"
->>  #include "hw/ppc/spapr_ovec.h"
->> +#include "qapi/error.h"
->>  
->>  struct VIOsPAPRBus;
->>  struct sPAPRPHBState;
->> @@ -136,6 +137,7 @@ struct sPAPRMachineState {
->>      MemoryHotplugState hotplug_memory;
->>  
->>      const char *icp_type;
->> +    Error *migration_blocker;
+>> +int kvmppc_fwnmi_enable(PowerPCCPU *cpu)
+>> +{
+>> +    CPUState *cs = CPU(cpu);
+>> +
+>> +    if (!cap_fwnmi) {
+>> +        return 1;
+>> +    }
+>> +
+>> +    return kvm_vcpu_enable_cap(cs, KVM_CAP_PPC_FWNMI, 0);
 > 
-> This isn't a good name, because it's _specifically_ the fwnmi as a
-> migration blocker - trying to put another migration blocker in here
-> would break horribly, because nmi-interlock would clear it regardless.
+> Yeah, this is no good.  It means migration from a host that's fwnmi
+> capable to one that isn't will be subtly broken.  Instead you need to
+> make fwnmi capability a machine property.  If the property is
+> requested and the host kernel doesn't support it, you need to outright
+> fail, rather than try to fall back.
 
-Will rename it.
+Sure.
 
 > 
->>  };
+>> +}
+>> +
+>>  int kvmppc_smt_threads(void)
+>>  {
+>>      return cap_ppc_smt ? cap_ppc_smt : 1;
+>> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+>> index 0139dae..55b6df2 100644
+>> --- a/target/ppc/kvm_ppc.h
+>> +++ b/target/ppc/kvm_ppc.h
+>> @@ -28,6 +28,7 @@ void kvmppc_enable_clear_ref_mod_hcalls(void);
+>>  void kvmppc_set_papr(PowerPCCPU *cpu);
+>>  int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
+>>  void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
+>> +int kvmppc_fwnmi_enable(PowerPCCPU *cpu);
+>>  int kvmppc_smt_threads(void);
+>>  void kvmppc_hint_smt_possible(Error **errp);
+>>  int kvmppc_set_smt_threads(int smt);
+>> @@ -157,6 +158,11 @@ static inline void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy)
+>>  {
+>>  }
 >>  
->>  #define H_SUCCESS         0
->> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
->> index 59b3322..58de7ea 100644
->> --- a/target/ppc/kvm.c
->> +++ b/target/ppc/kvm.c
->> @@ -52,6 +52,7 @@
->>  #endif
->>  #include "elf.h"
->>  #include "sysemu/kvm_int.h"
->> +#include "migration/blocker.h"
->>  
->>  //#define DEBUG_KVM
->>  
->> @@ -2770,10 +2771,26 @@ int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run)
->>      sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
->>      PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
->>      target_ulong msr = 0;
->> +    Error *local_err = NULL;
->> +    int ret;
->>      bool type, le;
->>  
->>      cpu_synchronize_state(CPU(cpu));
->>  
->> +    error_setg(&spapr->migration_blocker,
->> +            "Live migration not supported during machine check error handling");
+>> +int kvmppc_fwnmi_enable(PowerPCCPU *cpu)
+>> +{
+>> +    return 1;
 > 
-> In fact, there's no real reason to generate the error here.  The
-> error's always the same so you could just create it at startup as a
-> global and just add/remove it to the block list.
-
-ok.
-
+> Likewise, this should be available, not banned, on TCG.  I think there
+> are existing problems with TCG<->KVM migration, but there's no
+> inherent reason they shouldn't work, so we don't want to introduce
+> extra reasons they don't.
 > 
->> +    ret = migrate_add_blocker(spapr->migration_blocker, &local_err);
->> +    if (ret < 0) {
->> +        /*
->> +         * We don't want to abort and let the migration to continue. In a
->> +         * rare case, the machine check handler will run on the target
->> +         * hardware. Though this is not preferable, it is better than aborting
-> 
-> Why is it not preferable?  I mean it's an edge case, but AFAICT it's
-> still the correct behaviour.
+> Even if TCG will never generate fwnmis (for now), it should allow the
+> guest to register for them.
 
-Will remove that line in the comment.
-
-> 
->> +         * the migration or killing the VM.
->> +         */
->> +        error_free(spapr->migration_blocker);
->> +        fprintf(stderr, "Warning: Machine check during VM migration\n");
-> 
-> Use error_report(), not fprintf().
-
-ok.
+Should this be then changed later only when TCG generates fwnmis?
+Because we don't want to set spapr->guest_machine_check_addr for TCG in
+rtas_ibm_nmi_register(). If set then all machine checks are redirected
+to this address which is not desirable for TCG as we still want machine
+checks to be passed via 0x200.
 
 Regards,
 Aravinda
 
 > 
->> +    }
+>> +}
 >> +
->>      /*
->>       * Properly set bits in MSR before we invoke the handler.
->>       * SRR0/1, DAR and DSISR are properly set by KVM
+>>  static inline int kvmppc_smt_threads(void)
+>>  {
+>>      return 1;
 >>
 > 
 
