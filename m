@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e1aHf-0003C3-Km
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:48:05 -0400
+	(envelope-from <mreitz@redhat.com>) id 1e1aJJ-00042n-2Z
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:49:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e1aHb-0002F1-NL
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:47:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34602)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e1aHb-0002EP-EO
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:47:55 -0400
-References: <20171006215244.27104-1-ehabkost@redhat.com>
-	<765f7133-0ccc-2239-d49b-55d8b2a24cc7@redhat.com>
-	<fddffbab-7aab-72b4-f42f-d18e94517350@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <17ed046b-2c29-340b-9802-f43a709715e2@redhat.com>
-Date: Mon, 9 Oct 2017 17:47:44 +0200
+	(envelope-from <mreitz@redhat.com>) id 1e1aJI-000301-5P
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:49:41 -0400
+References: <20171009153856.20387-1-berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <c2d4119f-a3b1-3f2c-cd2c-401d2438a650@redhat.com>
+Date: Mon, 9 Oct 2017 17:49:30 +0200
 MIME-Version: 1.0
-In-Reply-To: <fddffbab-7aab-72b4-f42f-d18e94517350@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/7] x86: Rework KVM-defaults compat code,
- enable kvm_pv_unhalt by default
+In-Reply-To: <20171009153856.20387-1-berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="pAcvdTX3JSQKNKHk9WB3vosjqdw9L3gTv"
+Subject: Re: [Qemu-devel] [PATCH v2] qcow2: Use BDRV_SECTOR_BITS instead of
+ its literal value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +24,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Waiman Long <longman@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Davidlohr Bueso <dave@stgolabs.net>
+To: Alberto Garcia <berto@igalia.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 09/10/2017 17:15, Waiman Long wrote:
-> On 10/09/2017 09:39 AM, Paolo Bonzini wrote:
->> On 06/10/2017 23:52, Eduardo Habkost wrote:
->>> This series enables kvm_pv_unhalt by default on pc-*-2.11 and
->>> newer.
->>
->> I've discussed PV spinlocks with some folks at Microsoft for a few wee=
-ks
->> now, and I'm not 100% sure about enabling kvm_pv_unhalt by default.
->> It's probably a good idea overall, but it does come with some caveats.
->>
->> The problem is that there were two different implementations of fair
->> spinlocks in Linux, ticket spinlocks and queued spinlocks.  When
->> kvm_pv_unhalt is disabled, ticket spinlocks sucked badly indeed; queue=
-d
->> spinlocks however simply revert to unfair spinlocks, which loses the
->> fairness but has the best performance.  See virt_spin_lock in
->> arch/x86/include/asm/qspinlock.h.
->>
->> Now, fair spinlocks are only really needed for large NUMA machines.
->> With a single NUMA node, for example, test-and-set spinlocks work well
->> enough; there's not _much_ need for fairness in practice, and the
->> paravirtualization does introduce some overhead.
->>
->> Therefore, the best performance would be achieved with kvm_pv_unhalt
->> disabled on small VMs, and enabled on large VMs spanning multiple host
->> NUMA nodes.
->>
->> Waiman, Davidlohr, do you have an opinion on this as well?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pAcvdTX3JSQKNKHk9WB3vosjqdw9L3gTv
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
+Message-ID: <c2d4119f-a3b1-3f2c-cd2c-401d2438a650@redhat.com>
+Subject: Re: [PATCH v2] qcow2: Use BDRV_SECTOR_BITS instead of its literal
+ value
+References: <20171009153856.20387-1-berto@igalia.com>
+In-Reply-To: <20171009153856.20387-1-berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2017-10-09 17:38, Alberto Garcia wrote:
+> BDRV_SECTOR_BITS is defined to be 9 in block.h (and BDRV_SECTOR_SIZE
+> is calculated from that), but there are still a couple of places where
+> we are using the literal value instead of the macro.
 >=20
-> I agree. Using unfair lock in a small VM is good for performance. The
-> only problem I see is how do we define what is small. Now, even a
-> machine with a single socket can have up to 28 cores, 56 threads. If a
-> VM has up to 56 vCPUs, we may still want pvqspinlock to be used.
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Yes.  Another possibility is to enable it when there is >1 NUMA node in
-the guest.  We generally don't do this kind of magic but higher layers
-(oVirt/OpenStack) do.
+Thanks, applied to my block branch:
 
-It also depends on how worse performance is with PV qspinlocks,
-especially since now there's also vcpu_is_preempted that has to be
-thrown in the mix.  A lot more testing is needed.
+https://github.com/XanClic/qemu/commits/block
 
-> Is the kvm_pv_unhalt flag a global one for all VMs within a machine? Or
-> can it be different for each VM? We may want to have this flag
-> dynamically determined depending on the configuration of the VM.
+Max
 
-It's per-VM, so that's easy.
 
-Paolo
+--pAcvdTX3JSQKNKHk9WB3vosjqdw9L3gTv
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlnbmooSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AYXkH+gLd/P9yDZGWI43EHN+7+SOxp1NoCUxj
+S/JMfY2tfe8GTZ+uqtzdJVZMukzaO6j+r/mRBDeweMBQUyW08y4ZiJO928xOiRAA
+veF4Z+5byAMV1l2TYqCy6LKyncxECSYSMYv/DqLZKBSGm3T4fmZWjjmdg2M/Uq/6
+bsxyu5KTXQ1qK7HtpEXKH24CI9UNPhHUMRpzl0dgoRCXmXi/1TAvLnpdPyCBl6Ot
+1ll40Ycq0h/3TXWnAk8jeHe+o4jWrIx7llnyhAwrkUA2DqAMHjFqwOXCP4GuCPXV
+I2CCEPQ/Fhl2RPiWRIDUZMRUD32bIS5F7XooV6Alp8CvsXW6pR6coVQ=
+=P6G5
+-----END PGP SIGNATURE-----
+
+--pAcvdTX3JSQKNKHk9WB3vosjqdw9L3gTv--
