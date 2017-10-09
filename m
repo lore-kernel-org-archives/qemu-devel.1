@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e1fGu-0004Fq-PS
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:07:34 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e1fGv-0004Fv-Nj
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:07:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e1fGs-0006cq-Ol
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:07:32 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:40560
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e1fGu-0006dd-9d
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:07:33 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:40564
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1e1fGs-0006cR-HP
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:07:30 -0400
+	id 1e1fGu-0006d7-2X
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:07:32 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Mon,  9 Oct 2017 22:07:02 +0100
-Message-Id: <1507583223-14819-8-git-send-email-mark.cave-ayland@ilande.co.uk>
+Date: Mon,  9 Oct 2017 22:07:03 +0100
+Message-Id: <1507583223-14819-9-git-send-email-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <1507583223-14819-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 References: <1507583223-14819-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 7/8] sparc32_dma: introduce new SPARC32_DMA
- type container object
+Subject: [Qemu-devel] [PATCH 8/8] sparc32_dma: remove is_ledma hack and
+ replace with memory region alias
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,180 +28,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-Create a new SPARC32_DMA container object (including an appropriate container
-memory region) and add instances of the SPARC32_ESPDMA_DEVICE and
-SPARC32_LEDMA_DEVICE as child objects. Also update sun4m.c to resolve the
-child objects accordingly.
+This hack originated from before the memory region API was introduced, and
+increased the size of the ledma DMA device to capture incorrect accesses
+beyond the end of the ledma device. A full analysis can be found on Artyom's
+blog at http://tyom.blogspot.co.uk/2010/10/bug-in-all-solaris-versions-after-57.html.
 
-Since the sun4m IOMMU is already QOMified we can find a reference to
-it using object_resolve_path_type() allowing us to completely remove all external
-references to the iommu pointer.
+With the memory API we can now simply alias the incorrect access onto its
+intended destination allowing us to remove the hack.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/dma/sparc32_dma.c           |   56 ++++++++++++++++++++++++++++++++++++++++
- hw/sparc/sun4m.c               |   18 ++++++-------
- include/hw/sparc/sparc32_dma.h |   12 +++++++++
- 3 files changed, 77 insertions(+), 9 deletions(-)
+ hw/dma/sparc32_dma.c           |   20 ++++++--------------
+ include/hw/sparc/sparc32_dma.h |    2 +-
+ 2 files changed, 7 insertions(+), 15 deletions(-)
 
 diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
-index b817472..c7aa4a4 100644
+index c7aa4a4..a26bc50 100644
 --- a/hw/dma/sparc32_dma.c
 +++ b/hw/dma/sparc32_dma.c
-@@ -30,6 +30,7 @@
- #include "hw/sparc/sparc32_dma.h"
- #include "hw/sparc/sun4m.h"
- #include "hw/sysbus.h"
-+#include "qapi/error.h"
- #include "trace.h"
+@@ -160,12 +160,6 @@ static uint64_t dma_mem_read(void *opaque, hwaddr addr,
+     DMADeviceState *s = opaque;
+     uint32_t saddr;
  
- /*
-@@ -321,11 +322,66 @@ static const TypeInfo sparc32_ledma_device_info = {
-     .instance_init = sparc32_ledma_device_init,
- };
+-    if (s->is_ledma && (addr > DMA_MAX_REG_OFFSET)) {
+-        /* aliased to espdma, but we can't get there from here */
+-        /* buggy driver if using undocumented behavior, just return 0 */
+-        trace_sparc32_dma_mem_readl(addr, 0);
+-        return 0;
+-    }
+     saddr = (addr & DMA_MASK) >> 2;
+     trace_sparc32_dma_mem_readl(addr, s->dmaregs[saddr]);
+     return s->dmaregs[saddr];
+@@ -177,11 +171,6 @@ static void dma_mem_write(void *opaque, hwaddr addr,
+     DMADeviceState *s = opaque;
+     uint32_t saddr;
  
-+static void sparc32_dma_init(Object *obj)
-+{
-+    SPARC32DMAState *s = SPARC32_DMA(obj);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+
-+    memory_region_init(&s->dmamem, OBJECT(s), "dma", DMA_SIZE + DMA_ETH_SIZE);
-+    sysbus_init_mmio(sbd, &s->dmamem);
-+}
-+
-+static void sparc32_dma_realize(DeviceState *dev, Error **errp)
-+{
-+    SPARC32DMAState *s = SPARC32_DMA(dev);
-+    DeviceState *d;
-+    SysBusDevice *sbd;
-+    Object *iommu;
-+
-+    iommu = object_resolve_path_type("", TYPE_SUN4M_IOMMU, NULL);
-+    if (!iommu) {
-+        error_setg(errp, "unable to locate sun4m IOMMU device");
-+        return;
-+    }
-+
-+    d = qdev_create(NULL, TYPE_SPARC32_ESPDMA_DEVICE);
-+    object_property_set_link(OBJECT(d), iommu, "iommu", errp);
-+    object_property_add_child(OBJECT(s), "espdma", OBJECT(d), errp);
-+    qdev_init_nofail(d);
-+    sbd = SYS_BUS_DEVICE(d);
-+    memory_region_add_subregion(&s->dmamem, 0x0,
-+                                sysbus_mmio_get_region(sbd, 0));
-+
-+    d = qdev_create(NULL, TYPE_SPARC32_LEDMA_DEVICE);
-+    object_property_set_link(OBJECT(d), iommu, "iommu", errp);
-+    object_property_add_child(OBJECT(s), "ledma", OBJECT(d), errp);
-+    qdev_init_nofail(d);
-+    sbd = SYS_BUS_DEVICE(d);
-+    memory_region_add_subregion(&s->dmamem, 0x10,
-+                                sysbus_mmio_get_region(sbd, 0));
-+}
-+
-+static void sparc32_dma_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = sparc32_dma_realize;
-+}
-+
-+static const TypeInfo sparc32_dma_info = {
-+    .name          = TYPE_SPARC32_DMA,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(SPARC32DMAState),
-+    .instance_init = sparc32_dma_init,
-+    .class_init    = sparc32_dma_class_init,
-+};
-+
- static void sparc32_dma_register_types(void)
- {
-     type_register_static(&sparc32_dma_device_info);
-     type_register_static(&sparc32_espdma_device_info);
-     type_register_static(&sparc32_ledma_device_info);
-+    type_register_static(&sparc32_dma_info);
+-    if (s->is_ledma && (addr > DMA_MAX_REG_OFFSET)) {
+-        /* aliased to espdma, but we can't get there from here */
+-        trace_sparc32_dma_mem_writel(addr, 0, val);
+-        return;
+-    }
+     saddr = (addr & DMA_MASK) >> 2;
+     trace_sparc32_dma_mem_writel(addr, s->dmaregs[saddr], val);
+     switch (saddr) {
+@@ -296,7 +285,6 @@ static void sparc32_espdma_device_init(Object *obj)
+ 
+     memory_region_init_io(&s->iomem, OBJECT(s), &dma_mem_ops, s,
+                           "espdma", DMA_SIZE);
+-    s->is_ledma = 0;
  }
  
- type_init(sparc32_dma_register_types)
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 12d36b5..b220694 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -307,13 +307,12 @@ static void *iommu_init(hwaddr addr, uint32_t version, qemu_irq irq)
-     return s;
+ static const TypeInfo sparc32_espdma_device_info = {
+@@ -311,8 +299,7 @@ static void sparc32_ledma_device_init(Object *obj)
+     DMADeviceState *s = SPARC32_DMA_DEVICE(obj);
+ 
+     memory_region_init_io(&s->iomem, OBJECT(s), &dma_mem_ops, s,
+-                          "ledma", DMA_ETH_SIZE);
+-    s->is_ledma = 1;
++                          "ledma", DMA_SIZE);
  }
  
--static void *sparc32_dma_init(hwaddr daddr, void *iommu, int is_ledma)
-+static void *sparc32_dma_init(hwaddr daddr)
- {
-     DeviceState *dev;
-     SysBusDevice *s;
- 
--    dev = qdev_create(NULL, is_ledma ? "sparc32-ledma" : "sparc32-espdma");
--    object_property_set_link(OBJECT(dev), OBJECT(iommu), "iommu", &error_abort);
-+    dev = qdev_create(NULL, TYPE_SPARC32_DMA);
-     qdev_init_nofail(dev);
-     s = SYS_BUS_DEVICE(dev);
-     sysbus_mmio_map(s, 0, daddr);
-@@ -818,8 +817,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
-     DeviceState *slavio_intctl;
-     const char *cpu_model = machine->cpu_model;
-     unsigned int i;
--    void *iommu, *nvram;
--    DeviceState *espdma, *ledma;
-+    void *nvram;
-+    DeviceState *dma, *espdma, *ledma;
-     SysBusDevice *sbd;
-     qemu_irq *cpu_irqs[MAX_CPUS], slavio_irq[32], slavio_cpu_irq[MAX_CPUS];
-     qemu_irq esp_reset, dma_enable;
-@@ -869,8 +868,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
-         afx_init(hwdef->afx_base);
-     }
- 
--    iommu = iommu_init(hwdef->iommu_base, hwdef->iommu_version,
--                       slavio_irq[30]);
-+    iommu_init(hwdef->iommu_base, hwdef->iommu_version, slavio_irq[30]);
- 
-     if (hwdef->iommu_pad_base) {
-         /* On the real hardware (SS-5, LX) the MMU is not padded, but aliased.
-@@ -880,11 +878,13 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
-         empty_slot_init(hwdef->iommu_pad_base,hwdef->iommu_pad_len);
-     }
- 
--    espdma = sparc32_dma_init(hwdef->dma_base, iommu, 0);
-+    dma = sparc32_dma_init(hwdef->dma_base);
+ static const TypeInfo sparc32_ledma_device_info = {
+@@ -359,6 +346,11 @@ static void sparc32_dma_realize(DeviceState *dev, Error **errp)
+     sbd = SYS_BUS_DEVICE(d);
+     memory_region_add_subregion(&s->dmamem, 0x10,
+                                 sysbus_mmio_get_region(sbd, 0));
 +
-+    espdma = DEVICE(object_resolve_path_component(OBJECT(dma), "espdma"));
-     sbd = SYS_BUS_DEVICE(espdma);
-     sysbus_connect_irq(sbd, 0, slavio_irq[18]);
++    /* Add ledma alias to handle SunOS 5.7 - Solaris 9 invalid access bug */
++    memory_region_init_alias(&s->ledma_alias, OBJECT(dev), "ledma-alias",
++                             sysbus_mmio_get_region(sbd, 0), 0x4, 0x4);
++    memory_region_add_subregion(&s->dmamem, 0x20, &s->ledma_alias);
+ }
  
--    ledma = sparc32_dma_init(hwdef->dma_base + 16ULL, iommu, 1);
-+    ledma = DEVICE(object_resolve_path_component(OBJECT(dma), "ledma"));
-     sbd = SYS_BUS_DEVICE(ledma);
-     sysbus_connect_irq(sbd, 0, slavio_irq[16]);
- 
+ static void sparc32_dma_class_init(ObjectClass *klass, void *data)
 diff --git a/include/hw/sparc/sparc32_dma.h b/include/hw/sparc/sparc32_dma.h
-index df7491d..131d4de 100644
+index 131d4de..67aa30c 100644
 --- a/include/hw/sparc/sparc32_dma.h
 +++ b/include/hw/sparc/sparc32_dma.h
-@@ -38,6 +38,18 @@ typedef struct LEDMADeviceState {
-     DMADeviceState parent_obj;
- } LEDMADeviceState;
+@@ -19,7 +19,6 @@ struct DMADeviceState {
+     qemu_irq irq;
+     void *iommu;
+     qemu_irq gpio[2];
+-    uint32_t is_ledma;
+ };
  
-+#define TYPE_SPARC32_DMA "sparc32-dma"
-+#define SPARC32_DMA(obj) OBJECT_CHECK(SPARC32DMAState, (obj), \
-+                                      TYPE_SPARC32_DMA)
-+
-+typedef struct SPARC32DMAState {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion dmamem;
-+    ESPDMADeviceState *espdma;
-+    LEDMADeviceState *ledma;
-+} SPARC32DMAState;
-+
- /* sparc32_dma.c */
- void ledma_memory_read(void *opaque, hwaddr addr,
-                        uint8_t *buf, int len, int do_bswap);
+ #define TYPE_SPARC32_ESPDMA_DEVICE "sparc32-espdma"
+@@ -46,6 +45,7 @@ typedef struct SPARC32DMAState {
+     SysBusDevice parent_obj;
+ 
+     MemoryRegion dmamem;
++    MemoryRegion ledma_alias;
+     ESPDMADeviceState *espdma;
+     LEDMADeviceState *ledma;
+ } SPARC32DMAState;
 -- 
 1.7.10.4
