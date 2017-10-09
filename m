@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1e1gM5-00070U-Sp
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 18:16:58 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e1gSd-0007wd-GH
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 18:23:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1e1gM5-00017m-5H
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 18:16:57 -0400
-References: <20171002143919.207741-1-vsementsov@virtuozzo.com>
-	<20171002143919.207741-3-vsementsov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <d488c01b-e1ba-a79a-38f1-dd881dc26ba0@redhat.com>
-Date: Mon, 9 Oct 2017 18:16:46 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e1gSY-00049I-Tj
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 18:23:43 -0400
+Resent-Message-Id: <E1e1gSY-00049I-Tj@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21392)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e1gSY-00048g-ND
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 18:23:38 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150758778512.270.15107434222651481306@b58463cdfd5f>
+In-Reply-To: <1507583223-14819-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <20171002143919.207741-3-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/5] backup: move from done_bitmap to
- copy_bitmap
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 9 Oct 2017 15:23:05 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/8] sun4m : sparc32_dma tidy-ups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,18 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+To: mark.cave-ayland@ilande.co.uk
+Cc: famz@redhat.com, qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-
-
-On 10/02/2017 10:39 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Use HBitmap copy_bitmap instead of done_bitmap. This is needed to
-> improve incremental backup in following patches and to unify backup
-> loop for full/incremental modes in future patches.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Jeff Cody <jcody@redhat.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
-Reviewed-by: John Snow <jsnow@redhat.com>
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MDc1ODMyMjMtMTQ4MTktMS1naXQtc2VuZC1lbWFpbC1tYXJrLmNhdmUtYXls
+YW5kQGlsYW5kZS5jby51awpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvOF0gc3VuNG0g
+OiBzcGFyYzMyX2RtYSB0aWR5LXVwcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
+YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
+YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1m
+b3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVj
+aG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMg
+JGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9j
+aGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAg
+ZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFND
+UklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4
+NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKOTM4MTU5OWI1ZiBzcGFyYzMy
+X2RtYTogcmVtb3ZlIGlzX2xlZG1hIGhhY2sgYW5kIHJlcGxhY2Ugd2l0aCBtZW1vcnkgcmVnaW9u
+IGFsaWFzCjM1MWFjMThhNzYgc3BhcmMzMl9kbWE6IGludHJvZHVjZSBuZXcgU1BBUkMzMl9ETUEg
+dHlwZSBjb250YWluZXIgb2JqZWN0CjJkMTk5ZTk2ZWUgc3BhcmMzMl9kbWE6IHVzZSBvYmplY3Qg
+bGluayBpbnN0ZWFkIG9mIHFkZXYgcHJvcGVydHkgdG8gcGFzcyBJT01NVSByZWZlcmVuY2UKM2Qx
+ZTBkMWFiNiBzdW40bV9pb21tdTogbW92ZSBUWVBFX1NVTjRNX0lPTU1VIGRlY2xhcmF0aW9uIHRv
+IHN1bjRtLmgKNmIyNDI3YTU5MCBzdW40bTogbW92ZSBETUEgZGV2aWNlIHdpcmluZyBmcm9tIHNw
+YXJjMzJfZG1hX2luaXQoKSB0byBzdW40bV9od19pbml0KCkKMjFjNjA3ZDgzMSBzcGFyYzMyX2Rt
+YTogbW92ZSB0eXBlIGRlY2xhcmF0aW9ucyBmcm9tIHNwYXJjMzJfZG1hLmMgdG8gc3BhcmMzMl9k
+bWEuaAo3NmNiMmJhNGJhIHNwYXJjMzJfZG1hOiBzcGxpdCBlc3AgYW5kIGxlIGludG8gc2VwYXJh
+dGUgRE1BIGRldmljZXMKYzMxYmNhMmZiNCBzcGFyYzMyX2RtYTogcmVuYW1lIFNQQVJDMzJfRE1B
+IHR5cGUgdG8gU1BBUkMzMl9ETUFfREVWSUNFCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
+ZyBQQVRDSCAxLzg6IHNwYXJjMzJfZG1hOiByZW5hbWUgU1BBUkMzMl9ETUEgdHlwZSB0byBTUEFS
+QzMyX0RNQV9ERVZJQ0UuLi4KQ2hlY2tpbmcgUEFUQ0ggMi84OiBzcGFyYzMyX2RtYTogc3BsaXQg
+ZXNwIGFuZCBsZSBpbnRvIHNlcGFyYXRlIERNQSBkZXZpY2VzLi4uCkNoZWNraW5nIFBBVENIIDMv
+ODogc3BhcmMzMl9kbWE6IG1vdmUgdHlwZSBkZWNsYXJhdGlvbnMgZnJvbSBzcGFyYzMyX2RtYS5j
+IHRvIHNwYXJjMzJfZG1hLmguLi4KQ2hlY2tpbmcgUEFUQ0ggNC84OiBzdW40bTogbW92ZSBETUEg
+ZGV2aWNlIHdpcmluZyBmcm9tIHNwYXJjMzJfZG1hX2luaXQoKSB0byBzdW40bV9od19pbml0KCku
+Li4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiM0Nzog
+RklMRTogaHcvc3BhcmMvc3VuNG0uYzo4MjQ6CisgICAgcWVtdV9pcnEgKmNwdV9pcnFzW01BWF9D
+UFVTXSwgc2xhdmlvX2lycVszMl0sIHNsYXZpb19jcHVfaXJxW01BWF9DUFVTXTsKICAgICAgICAg
+ICAgICBeCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDY2IGxpbmVzIGNoZWNrZWQKCllv
+dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvODog
+c3VuNG1faW9tbXU6IG1vdmUgVFlQRV9TVU40TV9JT01NVSBkZWNsYXJhdGlvbiB0byBzdW40bS5o
+Li4uCkNoZWNraW5nIFBBVENIIDYvODogc3BhcmMzMl9kbWE6IHVzZSBvYmplY3QgbGluayBpbnN0
+ZWFkIG9mIHFkZXYgcHJvcGVydHkgdG8gcGFzcyBJT01NVSByZWZlcmVuY2UuLi4KQ2hlY2tpbmcg
+UEFUQ0ggNy84OiBzcGFyYzMyX2RtYTogaW50cm9kdWNlIG5ldyBTUEFSQzMyX0RNQSB0eXBlIGNv
+bnRhaW5lciBvYmplY3QuLi4KQ2hlY2tpbmcgUEFUQ0ggOC84OiBzcGFyYzMyX2RtYTogcmVtb3Zl
+IGlzX2xlZG1hIGhhY2sgYW5kIHJlcGxhY2Ugd2l0aCBtZW1vcnkgcmVnaW9uIGFsaWFzLi4uCj09
+PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0K
+RW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcu
+b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlz
+dHMub3Jn
