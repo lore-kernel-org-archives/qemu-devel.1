@@ -1,30 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1e1VLO-0005Uy-Mh
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 06:31:31 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e1VhT-0000rC-8d
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 06:54:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1e1VLI-0005wm-OP
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 06:31:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37272)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1e1VLI-0005vM-Eo
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 06:31:24 -0400
-Date: Mon, 9 Oct 2017 06:31:17 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <1138849410.27888094.1507545077979.JavaMail.zimbra@redhat.com>
-In-Reply-To: <87wp48xkkf.fsf@dusky.pond.sub.org>
-References: <20170913132417.24384-1-david@redhat.com>
-	<20170913132417.24384-19-david@redhat.com>
-	<87k20eq9em.fsf@dusky.pond.sub.org>
-	<20171004100415.0f0ded10.cohuck@redhat.com>
-	<87k20bm6cw.fsf@dusky.pond.sub.org>
-	<20171004150956.0901d6c1.cohuck@redhat.com>
-	<87wp48xkkf.fsf@dusky.pond.sub.org>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e1VhN-0008Ai-HX
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 06:54:19 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33214)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1e1VhN-0008A2-8H
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 06:54:13 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v99As0FT025004
+	for <qemu-devel@nongnu.org>; Mon, 9 Oct 2017 06:54:08 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dg7fk93um-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 06:54:08 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Mon, 9 Oct 2017 11:54:06 +0100
+References: <20171004154144.88995-1-pasic@linux.vnet.ibm.com>
+	<20171004154144.88995-3-pasic@linux.vnet.ibm.com>
+	<d6d2d73d-65c9-7ae1-fd37-cb8e304781e7@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Mon, 9 Oct 2017 12:54:03 +0200
 MIME-Version: 1.0
+In-Reply-To: <d6d2d73d-65c9-7ae1-fd37-cb8e304781e7@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 18/22] s390x: implement
- query-hotpluggable-cpus
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <7f454872-fae3-35b0-eff4-227b2aa0f77d@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/8] s390x/css: IO instr handler ending
+ control
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,96 +44,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: qemu-s390x@nongnu.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-Hi
 
------ Original Message -----
-> Cornelia Huck <cohuck@redhat.com> writes:
->=20
-> > On Wed, 04 Oct 2017 14:42:55 +0200
-> > Markus Armbruster <armbru@redhat.com> wrote:
-> >
-> >> Cornelia Huck <cohuck@redhat.com> writes:
-> >>=20
-> >> > On Mon, 02 Oct 2017 09:46:41 +0200
-> >> > Markus Armbruster <armbru@redhat.com> wrote:
-> >> > =20
-> >> >> David Hildenbrand <david@redhat.com> writes:
-> >> >>  =20
-> >> >> > CPU hotplug is only possible on a per core basis on s390x. So let=
-'s
-> >> >> > add possible_cpus and properly wire everything up.
-> >> >> >
-> >> >> > Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> >> [...]
-> >> >> > diff --git a/qapi-schema.json b/qapi-schema.json
-> >> >> > index f3af2cb851..79e9f85404 100644
-> >> >> > --- a/qapi-schema.json
-> >> >> > +++ b/qapi-schema.json
-> >> >> > @@ -3121,6 +3121,22 @@
-> >> >> >  #      }
-> >> >> >  #    ]}
-> >> >> >  #
-> >> >> > +# For s390x-virtio-ccw machine type started with -smp 1,maxcpus=
-=3D2
-> >> >> > -cpu qemu
-> >> >> > +# (Since: 2.11):
-> >> >> > +#
-> >> >> > +# -> { "execute": "query-hotpluggable-cpus" }
-> >> >> > +# <- {"return": [
-> >> >> > +#      {
-> >> >> > +#         "type": "qemu-s390-cpu", "vcpus-count": 1,
-> >> >> > +#         "props": { "core-id": 1 }
-> >> >> > +#      },
-> >> >> > +#      {
-> >> >> > +#         "qom-path": "/machine/unattached/device[0]",
-> >> >> > +#         "type": "qemu-s390-cpu", "vcpus-count": 1,
-> >> >> > +#         "props": { "core-id": 0 }
-> >> >> > +#      }
-> >> >> > +#    ]}
-> >> >> > +#
-> >> >> >  ##
-> >> >> >  { 'command': 'query-hotpluggable-cpus', 'returns':
-> >> >> >  ['HotpluggableCPU'] }
-> >> >>=20
-> >> >> Please stick in '# Example:' like we do in query-hotpluggable-cpus'=
-s
-> >> >> doc
-> >> >> comment.  I expect the generated documentation to be illegible[*]
-> >> >> without it.
-> >> >
-> >> > Should '# Example:' go before each of the examples (instead of the
-> >> > beginning of the example block), then?
-> >>=20
-> >> Whatever makes the generated documentation look better.
-> >
-> > The pdf indeed looks ugly, but that's a preexisting problem, and adding
-> > more '# Example:' lines does not really help.
-> >
-> > The basic issue is that the code expects just one example and no
-> > additional text for the '# Example:' tag -- the explaining text for the
-> > various statements ends up looking like the qmp examples. That should
-> > be improved before doing a patch on top for this command (and I don't
-> > really have the skills or time to improve the output, sorry.)
->=20
-> Marc-Andr=C3=A9, any ideas?
->=20
 
-It's not supported atm. The ideas to fix this are pretty much a matter of t=
-aste.
+On 10/09/2017 10:20 AM, Thomas Huth wrote:
+> On 04.10.2017 17:41, Halil Pasic wrote:
+>> CSS code needs to tell the IO instruction handlers located in how should
+> 
+> located in how?
+> 
 
-I'd suggest to keep the code below the Example: section as @example/verbati=
-m by default. And introduce a new section syntax, like Example:: to do "man=
-ual" formatting.
+First, thanks for your review!
 
-Example::
+Wanted to say: in target/s390x/ioinst.c just forgot to copy paste.
 
-This text would be in regular format.
-1. and allow list, *strong* etc.
+>> the emulated instruction be ended. Currently this is done by returning
+>> generic (POSIX) error codes, and mapping them to outcomes like condition
+>> codes. This makes bugs easy to create and hard to recognise.
+>>
+>> As a preparation for moving a way form (mis)using generic error codes for
+>> flow control let us introduce a struct which tells the instruction
+>> handler function how to end the instruction, in a more straight-forward
+>> and less ambiguous way.
+>>
+>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>> ---
+>>  include/hw/s390x/css.h | 12 ++++++++++++
+>>  1 file changed, 12 insertions(+)
+>>
+>> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+>> index 0653d3c9be..66916b6546 100644
+>> --- a/include/hw/s390x/css.h
+>> +++ b/include/hw/s390x/css.h
+>> @@ -75,6 +75,18 @@ typedef struct CMBE {
+>>      uint32_t reserved[7];
+>>  } QEMU_PACKED CMBE;
+>>  
+>> +/* IO instructions conclude according this */
+>> +typedef struct IOInstEnding {
+>> +        /*
+>> +         * General semantic of cc codes of IO instructions is (brief):
+>> +         * 0 -- produced expected result
+>> +         * 1 --  status conditions were present or produced alternate result
+>> +         * 2 -- ineffective, because busy with previously initiated function
+>> +         * 3 -- ineffective, not operational
+>> +         */
+>> +        int cc;
+>> +} IOInstEnding;
+> 
+> Why do you need a struct for this? Do you plan to extend it later? If
+> so, I think you should mention that in the patch description. If not,
+> please use a named enum or a "typedef unsigned int IOInstEnding" instead.
+> 
+>  Thomas
 
-| -> { then have some code }
-| <- ...
+We may, we may not. In the previous version we also had to support
+do end a certain instruction with an addressing exception, but this
+is going away in patch #3. Honestly I don't expect this being extended.
 
-And regulat text again.
+I have other reasons for the struct. Type safety and clear semantics,
+and frankly at least for s390 and linux I don't see any downsides given
+what is written in the "zSeries ELF Application Binary Interface Supplement".
+Can you please explain to me what is the problem with using this struct, and
+what is the benefit switching to a unsigned int?
+
+Regards,
+Halil
+> 
