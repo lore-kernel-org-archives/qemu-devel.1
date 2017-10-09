@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e1Wvc-0000PI-96
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 08:13:01 -0400
+	(envelope-from <wlfightup@gmail.com>) id 1e1X3a-0001W3-V2
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 08:21:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e1WvX-0005zd-8z
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 08:13:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60634)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e1WvX-0005ym-0S
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 08:12:55 -0400
-Date: Mon, 9 Oct 2017 13:12:40 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171009121240.GK2374@work-vm>
-References: <20170628190047.26159-1-dgilbert@redhat.com>
-	<20170628190047.26159-25-dgilbert@redhat.com>
-	<2f4c1067-14a4-d943-0dff-790d705778f1@redhat.com>
-	<20170707115353.GD2451@work-vm> <20171003132351.GA2935@work-vm>
-	<0c312c2e-2ef1-07cb-10cc-69e21d38077d@redhat.com>
+	(envelope-from <wlfightup@gmail.com>) id 1e1X3a-0003kB-5N
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 08:21:14 -0400
+Received: from mail-qt0-x22b.google.com ([2607:f8b0:400d:c0d::22b]:46818)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <wlfightup@gmail.com>) id 1e1X3a-0003jj-0l
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 08:21:14 -0400
+Received: by mail-qt0-x22b.google.com with SMTP id 1so2462605qtn.3
+	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 05:21:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <0c312c2e-2ef1-07cb-10cc-69e21d38077d@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 24/29] vhost+postcopy: Lock around
- set_mem_table
+From: Paul Schlacter <wlfightup@gmail.com>
+Date: Mon, 9 Oct 2017 20:21:12 +0800
+Message-ID: <CADak6y7ZKX5oJv+oqFG1Kz2_mVArsnM18mw3uqAd3ei-s3JYVw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] hot plug cpu report error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,111 +25,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
+To: qemu-devel@nongnu.org
 
-* Maxime Coquelin (maxime.coquelin@redhat.com) wrote:
->=20
->=20
-> On 10/03/2017 03:23 PM, Dr. David Alan Gilbert wrote:
-> > * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
-> > > * Maxime Coquelin (maxime.coquelin@redhat.com) wrote:
-> > > >=20
-> > > >=20
-> > > > On 06/28/2017 09:00 PM, Dr. David Alan Gilbert (git) wrote:
-> > > > > From: "Dr. David Alan Gilbert"<dgilbert@redhat.com>
-> > > > >=20
-> > > > > **HACK - better solution needed **
-> > > > > We have the situation where:
-> > > > >=20
-> > > > >        qemu                      bridge
-> > > > >=20
-> > > > >        send set_mem_table
-> > > > >                                 map memory
-> > > > >     a)                          mark area with UFD
-> > > > >                                 send reply with map addresses
-> > > > >     b)                          start using
-> > > > >     c) receive reply
-> > > > >=20
-> > > > >     As soon as (a) happens qemu might start seeing faults
-> > > > > from memory accesses (but doesn't until b); but it can't
-> > > > > process those faults until (c) when it's received the
-> > > > > mmap addresses.
-> > > > >=20
-> > > > > Make the fault handler spin until it gets the reply in (c).
-> > > > >=20
-> > > > > At the very least this needs some proper locks, but preferably
-> > > > > we need to split the message.
-> > > >=20
-> > > > Yes, maybe the slave channel could be used to send the ufds with
-> > > > a dedicated request? The backend would set the reply-ack flag, so t=
-hat
-> > > > it starts accessing the guest memory only when Qemu is ready to han=
-dle
-> > > > faults.
-> > >=20
-> > > Yes, that would make life a lot easier.
-> > >=20
-> > > > Note that the slave channel support has not been implemented in Qem=
-u's
-> > > > libvhost-user yet, but this is something I can do if we feel the ne=
-ed.
-> > >=20
-> > > Can you tell me a bit about how the slave channel works?
-> >=20
-> > I've looked at the slave-channel; and I'm worried that it's not suitable
-> > for this case.
-> > The problem is that 'slave_read' is wired to a fd_handler that I think
-> > is serviced by the main thread,
-> I confirm, this is serviced by the main thread.
->=20
-> > and while postcopy is running I don't
-> > want to rely on the operation of the main thread (since it could be
-> > blocked by a page fault).
->=20
-> IIUC, you mean QEMU being blocked by a page fault.
+report error:
 
-Yes.
+intel_rapl: no valid rapl domains found in package 0
 
-> In this case, I don't think this is an issue, because QEMU doesn't rely
-> on the backend to handle the page fault, so the slave request can be
-> handled only once QEMU has handled the fault.
->=20
-> Maybe I am missing something?
+intel_rapl: no valid rapl domains found in package 0
 
-It feels delicate;  with the vhost client blocked waiting for the ack
-=66rom the qemu to the registration reply on the slave, and some other
-part blocked by a page fault, it makes it sound likely to hit deadlocks
-even if I can't put my finger on one.
 
-> > I could still use an explicit ack at that point though over the main
-> > channel I think (or use the slave synchronously?).
->=20
-> Can you please elaborate, I'm not sure to understand what you mean.
+and then will shutdown after in a moment of time
 
-In the world I'm currently working on I've got it just using the main
-channel but:
-   settable -> client
-   settable-results -> qemu
-   ack -> client
 
-all over the main channel with each side waiting for the other.
+qemu log :
 
-Dave
+qemu: qemu_mutex_lock: Invalid argument
+2017-10-09 09:27:34.781+0000: shutting down, reason=crashed
 
->=20
-> Thanks,
-> Maxime
->=20
-> > Dave
-> >=20
-> > > Dave
-> > >=20
-> > > > Maxime
-> > > --
-> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+Find a solution
