@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e1SsZ-0005qN-S8
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 03:53:37 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e1T9f-0001hK-5r
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 04:11:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e1SsW-0001WU-2L
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 03:53:35 -0400
-Date: Mon, 9 Oct 2017 17:59:32 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171009065932.GR10050@umbus.fritz.box>
-References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
-	<1507220690-265042-19-git-send-email-imammedo@redhat.com>
-	<20171006083419.GW3260@umbus.fritz.box>
-	<20171006113054.2af54a45@nial.brq.redhat.com>
-	<20171006112503.GB10050@umbus.fritz.box>
-	<20171009074415.71d9dbba@nial.brq.redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1e1T9b-0001ds-P4
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 04:11:15 -0400
+Date: Mon, 9 Oct 2017 09:11:02 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171009081101.GA2374@work-vm>
+References: <20171006235023.11952-1-f4bug@amsat.org>
+	<20171006235023.11952-32-f4bug@amsat.org>
+	<87r2ucrcsi.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="FiqEyLLt06qkB6ow"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20171009074415.71d9dbba@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 18/23] ppc: pnv: use generic cpu_model
- parsing
+In-Reply-To: <87r2ucrcsi.fsf@dusky.pond.sub.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 31/88] QMP: use g_new() family of functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,122 +25,253 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu trival <qemu-trivial@nongnu.org>, qemu-devel@nongnu.org
 
-
---FiqEyLLt06qkB6ow
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Oct 09, 2017 at 07:44:15AM +0200, Igor Mammedov wrote:
-> On Fri, 6 Oct 2017 22:25:03 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
+* Markus Armbruster (armbru@redhat.com) wrote:
+> Philippe Mathieu-Daud=E9 <f4bug@amsat.org> writes:
 >=20
-> > On Fri, Oct 06, 2017 at 11:30:54AM +0200, Igor Mammedov wrote:
-> > > On Fri, 6 Oct 2017 19:34:19 +1100
-> > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > >  =20
-> > > > On Thu, Oct 05, 2017 at 06:24:45PM +0200, Igor Mammedov wrote: =20
-> > > > > use common cpu_model prasing in vl.c and set default cpu_model
-> > > > > using generic MachineClass::default_cpu_type.
-> > > > >=20
-> > > > > Beside of switching to generic infrastructure it solves several
-> > > > > issues.
-> > > > >=20
-> > > > >  * ppc_cpu_class_by_name() is used to deal with lower/upper case
-> > > > >    and alias translations into actual cpu type, which fixes
-> > > > >     '-M powernv -cpu power8' and '-M powernv -cpu power9_v1.0'
-> > > > >    usecases which error out with:
-> > > > >     'invalid CPU model 'FOO' for powernv machine'
-> > > > >  * allows to switch to lower-case typenames in pnv chip/core name
-> > > > >    (by convention typnames should be lower-case)
-> > > > >  * replace aliased names /power8, power9, .../ with exact cpu mod=
-el
-> > > > >    names (i.e. typenames should be stable but aliases might decid=
-e to
-> > > > >    point to other cpu model withi family or changed by kvm). It w=
-ill
-> > > > >    also help to simplify pnv_chip/core code and get rid of depend=
-ency
-> > > > >    on cpu_model parsing.
-> > > > >=20
-> > > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > > > ---
-> > > > >  include/hw/ppc/pnv.h |  8 ++++----
-> > > > >  hw/ppc/pnv.c         | 22 ++++++++++------------
-> > > > >  hw/ppc/pnv_core.c    |  2 +-
-> > > > >  3 files changed, 15 insertions(+), 17 deletions(-)
-> > > > >=20
-> > > > > diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> > > > > index 9c5437d..2525f7f 100644
-> > > > > --- a/include/hw/ppc/pnv.h
-> > > > > +++ b/include/hw/ppc/pnv.h
-> > > > > @@ -80,19 +80,19 @@ typedef struct PnvChipClass {
-> > > > >      uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
-> > > > >  } PnvChipClass;
-> > > > > =20
-> > > > > -#define TYPE_PNV_CHIP_POWER8E TYPE_PNV_CHIP "-POWER8E"
-> > > > > +#define TYPE_PNV_CHIP_POWER8E TYPE_PNV_CHIP "-power8e_v2.1"
-> > > > >  #define PNV_CHIP_POWER8E(obj) \
-> > > > >      OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER8E)
-> > > > > =20
-> > > > > -#define TYPE_PNV_CHIP_POWER8 TYPE_PNV_CHIP "-POWER8"
-> > > > > +#define TYPE_PNV_CHIP_POWER8 TYPE_PNV_CHIP "-power8_v2.0"
-> > > > >  #define PNV_CHIP_POWER8(obj) \
-> > > > >      OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER8)
-> > > > > =20
-> > > > > -#define TYPE_PNV_CHIP_POWER8NVL TYPE_PNV_CHIP "-POWER8NVL"
-> > > > > +#define TYPE_PNV_CHIP_POWER8NVL TYPE_PNV_CHIP "-power8nvl_v1.0"
-> > > > >  #define PNV_CHIP_POWER8NVL(obj) \
-> > > > >      OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER8NVL)
-> > > > > =20
-> > > > > -#define TYPE_PNV_CHIP_POWER9 TYPE_PNV_CHIP "-POWER9"
-> > > > > +#define TYPE_PNV_CHIP_POWER9 TYPE_PNV_CHIP "-power9_v1.0"   =20
-> > > >=20
-> > > > Uh.. we really should add a DD2 power9 before we make this change.
-> > > > Making a DD1.0 (read, buggy as hell) chip the default is not
-> > > > sensible.  Especially since we don't implement the various DD1 bugs
-> > > > and differences in qemu. =20
-> > > I guess pnv owner will have to it,
-> > > I can't help here /me uses whatever is in code right now/ =20
-> >=20
-> > I just committed a patch to ppc-for-2.11 that adds POWER9 v2.0 to the
-> > code (and makes it the default).  Sorry, this will probably require a
-> > rebase of your stuff.
-> Do you have a pointer to the patch or even better ppc staging tree to reb=
-ase on?
+> > From: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> >
+> > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> > [PMD: more changes]
+> > ---
+> >  monitor.c                 | 14 +++++++-------
+> >  qmp.c                     | 14 +++++++-------
+> >  tests/test-qmp-commands.c | 14 +++++++-------
+> >  3 files changed, 21 insertions(+), 21 deletions(-)
+> >
+> > diff --git a/monitor.c b/monitor.c
+> > index fe0d1bdbb4..ea6a485f11 100644
+> > --- a/monitor.c
+> > +++ b/monitor.c
+> > @@ -906,7 +906,7 @@ static void query_commands_cb(QmpCommand *cmd, vo=
+id *opaque)
+> >          return;
+> >      }
+> > =20
+> > -    info =3D g_malloc0(sizeof(*info));
+> > +    info =3D g_new0(CommandInfoList, 1);
+> >      info->value =3D g_malloc0(sizeof(*info->value));
+> >      info->value->name =3D g_strdup(cmd->name);
+> >      info->next =3D *list;
+>=20
+> I'm not convinced rewriting
+>=20
+>        LHS =3D g_malloc(sizeof(*LHS));
+>=20
+> to
+>=20
+>        LHS =3D g_new(T, 1);
+>=20
+> where T is the type of LHS is worth the trouble.  The code before the
+> rewrite is pretty idiomatic.  There's no possibility of integer overflo=
+w
+> g_new() could avoid.  The types are obviously correct, so the additiona=
+l
+> type checking is quite unlikely to catch anything.  That leaves the
+> consistency argument.  I'm willing to hear it, but I feel it should be
+> heard in a patch series that does nothing else.
 
-Oh, sorry, when I say 'ppc-for-2.11' I'm referring to that staging
-tree.  You can find it at:
+The 'obviously correct' is the dodgy part of the argument here.
+How many bugs do we right that are obviously wrong?
 
-git://github.com/dgibson/qemu.git branch 'ppc-for-2.11'.
+t.c:13:20: warning: initialization from incompatible pointer type [-Winco=
+mpatible-pointer-types]
+     struct c *pc =3D g_new(struct b, 1);
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+seems good to me.
 
---FiqEyLLt06qkB6ow
-Content-Type: application/pgp-signature; name="signature.asc"
+Dave
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnbHk8ACgkQbDjKyiDZ
-s5KWEw//caYqieqWl/CWrI1OQ6yeuiFC+kjbopOnB1umjExgILwCNjqUiQKVUcaB
-X2YFo88wCjK92HzbJ1wQu1sTgaZJGJXjSKyakMIWIwsvs1f0b1hfhaZwX18jDqVL
-VOpPS0+u2CCx9spswVeO74UUaFV2EXV2nR3w2Ls9UO5asUu9CeA0mjh6x5H9mP7F
-cvQKX/+mLt1ARTKrsldjSwqka9v9XERLke+AAK2K1jgytaRktn0T7SDg9kqPODfl
-w+hdd20c2TJt3lOtd+8EWrr2gUR/MwX565L6UYw/DTs70uNTCYJZ9xzaISufSxJS
-Ren2wUMSTEGjHlD6QhRRrxkZ0R2xD5re9b1YaVBLsOGMmeQKl2BRUcOQbvJwCVem
-+AmvmwOtBkwpfwGBnZuPNbOBbwHKXXC9OD5mNa9NpuACbxh4hF0+5lUFF+euVL1p
-RSfceRb+qsyWMScGoEWB4K0b7JixWqSj7tympI63ndpwbvx8TviqdDS2gsRy79Qs
-HZbAetZWTTNWZwC5+fy5whNHS6EQAFFghJWRkUT4mwtnG1te6XH/Rmd7hupH6i6w
-+qem13VTRrVnzuJcVfqLDhw2eArByp0FlzRFignGS3xjqBlxtrGi1AhC5Gj0mn9P
-GdDh3BsURe/ATV/v2j6j1C7Xf0mGR2QjDwNsg+mHDzLwz6kG86I=
-=C6j3
------END PGP SIGNATURE-----
-
---FiqEyLLt06qkB6ow--
+> > @@ -1799,7 +1799,7 @@ static void hmp_wavcapture(Monitor *mon, const =
+QDict *qdict)
+> >      int nchannels =3D qdict_get_try_int(qdict, "nchannels", -1);
+> >      CaptureState *s;
+> > =20
+> > -    s =3D g_malloc0 (sizeof (*s));
+> > +    s =3D g_new0(CaptureState, 1);
+> > =20
+> >      freq =3D has_freq ? freq : 44100;
+> >      bits =3D has_bits ? bits : 16;
+>=20
+> This hunk is HMP, not QMP.
+>=20
+> > @@ -1947,7 +1947,7 @@ void qmp_getfd(const char *fdname, Error **errp=
+)
+> >          return;
+> >      }
+> > =20
+> > -    monfd =3D g_malloc0(sizeof(mon_fd_t));
+> > +    monfd =3D g_new0(mon_fd_t, 1);
+> >      monfd->name =3D g_strdup(fdname);
+> >      monfd->fd =3D fd;
+> > =20
+> > @@ -2110,7 +2110,7 @@ FdsetInfoList *qmp_query_fdsets(Error **errp)
+> >          QLIST_FOREACH(mon_fdset_fd, &mon_fdset->fds, next) {
+> >              FdsetFdInfoList *fdsetfd_info;
+> > =20
+> > -            fdsetfd_info =3D g_malloc0(sizeof(*fdsetfd_info));
+> > +            fdsetfd_info =3D g_new0(FdsetFdInfoList, 1);
+> >              fdsetfd_info->value =3D g_malloc0(sizeof(*fdsetfd_info->=
+value));
+> >              fdsetfd_info->value->fd =3D mon_fdset_fd->fd;
+> >              if (mon_fdset_fd->opaque) {
+> > @@ -2199,7 +2199,7 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bool ha=
+s_fdset_id, int64_t fdset_id,
+> >          }
+> >      }
+> > =20
+> > -    mon_fdset_fd =3D g_malloc0(sizeof(*mon_fdset_fd));
+> > +    mon_fdset_fd =3D g_new0(MonFdsetFd, 1);
+> >      mon_fdset_fd->fd =3D fd;
+> >      mon_fdset_fd->removed =3D false;
+> >      if (has_opaque) {
+> > @@ -2207,7 +2207,7 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bool ha=
+s_fdset_id, int64_t fdset_id,
+> >      }
+> >      QLIST_INSERT_HEAD(&mon_fdset->fds, mon_fdset_fd, next);
+> > =20
+> > -    fdinfo =3D g_malloc0(sizeof(*fdinfo));
+> > +    fdinfo =3D g_new0(AddfdInfo, 1);
+> >      fdinfo->fdset_id =3D mon_fdset->id;
+> >      fdinfo->fd =3D mon_fdset_fd->fd;
+> > =20
+> > @@ -4102,7 +4102,7 @@ void monitor_init(Chardev *chr, int flags)
+> >          is_first_init =3D 0;
+> >      }
+> > =20
+> > -    mon =3D g_malloc(sizeof(*mon));
+> > +    mon =3D g_new(Monitor, 1);
+> >      monitor_data_init(mon);
+> > =20
+> >      qemu_chr_fe_init(&mon->chr, chr, &error_abort);
+>=20
+> This is monitor core, not QMP.
+>=20
+> > diff --git a/qmp.c b/qmp.c
+> > index e8c303116a..e965020e37 100644
+> > --- a/qmp.c
+> > +++ b/qmp.c
+> > @@ -232,7 +232,7 @@ ObjectPropertyInfoList *qmp_qom_list(const char *=
+path, Error **errp)
+> >      while ((prop =3D object_property_iter_next(&iter))) {
+> >          ObjectPropertyInfoList *entry =3D g_malloc0(sizeof(*entry));
+> > =20
+> > -        entry->value =3D g_malloc0(sizeof(ObjectPropertyInfo));
+> > +        entry->value =3D g_new0(ObjectPropertyInfo, 1);
+> >          entry->next =3D props;
+> >          props =3D entry;
+> > =20
+> > @@ -432,7 +432,7 @@ static void qom_list_types_tramp(ObjectClass *kla=
+ss, void *data)
+> >      ObjectTypeInfo *info;
+> >      ObjectClass *parent =3D object_class_get_parent(klass);
+> > =20
+> > -    info =3D g_malloc0(sizeof(*info));
+> > +    info =3D g_new0(ObjectTypeInfo, 1);
+> >      info->name =3D g_strdup(object_class_get_name(klass));
+> >      info->has_abstract =3D info->abstract =3D object_class_is_abstra=
+ct(klass);
+> >      if (parent) {
+> > @@ -440,7 +440,7 @@ static void qom_list_types_tramp(ObjectClass *kla=
+ss, void *data)
+> >          info->parent =3D g_strdup(object_class_get_name(parent));
+> >      }
+> > =20
+> > -    e =3D g_malloc0(sizeof(*e));
+> > +    e =3D g_new0(ObjectTypeInfoList, 1);
+> >      e->value =3D info;
+> >      e->next =3D *pret;
+> >      *pret =3D e;
+> > @@ -490,7 +490,7 @@ static DevicePropertyInfo *make_device_property_i=
+nfo(ObjectClass *klass,
+> >                  return NULL;           /* no way to set it, don't sh=
+ow */
+> >              }
+> > =20
+> > -            info =3D g_malloc0(sizeof(*info));
+> > +            info =3D g_new0(DevicePropertyInfo, 1);
+> >              info->name =3D g_strdup(prop->name);
+> >              info->type =3D default_type ? g_strdup(default_type)
+> >                                        : g_strdup(prop->info->name);
+> > @@ -502,7 +502,7 @@ static DevicePropertyInfo *make_device_property_i=
+nfo(ObjectClass *klass,
+> >      } while (klass !=3D object_class_by_name(TYPE_DEVICE));
+> > =20
+> >      /* Not a qdev property, use the default type */
+> > -    info =3D g_malloc0(sizeof(*info));
+> > +    info =3D g_new0(DevicePropertyInfo, 1);
+> >      info->name =3D g_strdup(name);
+> >      info->type =3D g_strdup(default_type);
+> >      info->has_description =3D !!description;
+> > @@ -568,7 +568,7 @@ DevicePropertyInfoList *qmp_device_list_propertie=
+s(const char *typename,
+> >              continue;
+> >          }
+> > =20
+> > -        entry =3D g_malloc0(sizeof(*entry));
+> > +        entry =3D g_new0(DevicePropertyInfoList, 1);
+> >          entry->value =3D info;
+> >          entry->next =3D prop_list;
+> >          prop_list =3D entry;
+> > @@ -712,7 +712,7 @@ ACPIOSTInfoList *qmp_query_acpi_ospm_status(Error=
+ **errp)
+> > =20
+> >  MemoryInfo *qmp_query_memory_size_summary(Error **errp)
+> >  {
+> > -    MemoryInfo *mem_info =3D g_malloc0(sizeof(MemoryInfo));
+> > +    MemoryInfo *mem_info =3D g_new0(MemoryInfo, 1);
+> > =20
+> >      mem_info->base_memory =3D ram_size;
+> > =20
+> > diff --git a/tests/test-qmp-commands.c b/tests/test-qmp-commands.c
+> > index 904c89d4d4..e715c45a23 100644
+> > --- a/tests/test-qmp-commands.c
+> > +++ b/tests/test-qmp-commands.c
+> > @@ -28,8 +28,8 @@ UserDefTwo *qmp_user_def_cmd2(UserDefOne *ud1a,
+> >                                Error **errp)
+> >  {
+> >      UserDefTwo *ret;
+> > -    UserDefOne *ud1c =3D g_malloc0(sizeof(UserDefOne));
+> > -    UserDefOne *ud1d =3D g_malloc0(sizeof(UserDefOne));
+> > +    UserDefOne *ud1c =3D g_new0(UserDefOne, 1);
+> > +    UserDefOne *ud1d =3D g_new0(UserDefOne, 1);
+> > =20
+> >      ud1c->string =3D strdup(ud1a->string);
+> >      ud1c->integer =3D ud1a->integer;
+> > @@ -209,23 +209,23 @@ static void test_dealloc_types(void)
+> >      UserDefOne *ud1test, *ud1a, *ud1b;
+> >      UserDefOneList *ud1list;
+> > =20
+> > -    ud1test =3D g_malloc0(sizeof(UserDefOne));
+> > +    ud1test =3D g_new0(UserDefOne, 1);
+> >      ud1test->integer =3D 42;
+> >      ud1test->string =3D g_strdup("hi there 42");
+> > =20
+> >      qapi_free_UserDefOne(ud1test);
+> > =20
+> > -    ud1a =3D g_malloc0(sizeof(UserDefOne));
+> > +    ud1a =3D g_new0(UserDefOne, 1);
+> >      ud1a->integer =3D 43;
+> >      ud1a->string =3D g_strdup("hi there 43");
+> > =20
+> > -    ud1b =3D g_malloc0(sizeof(UserDefOne));
+> > +    ud1b =3D g_new0(UserDefOne, 1);
+> >      ud1b->integer =3D 44;
+> >      ud1b->string =3D g_strdup("hi there 44");
+> > =20
+> > -    ud1list =3D g_malloc0(sizeof(UserDefOneList));
+> > +    ud1list =3D g_new0(UserDefOneList, 1);
+> >      ud1list->value =3D ud1a;
+> > -    ud1list->next =3D g_malloc0(sizeof(UserDefOneList));
+> > +    ud1list->next =3D g_new0(UserDefOneList, 1);
+> >      ud1list->next->value =3D ud1b;
+> > =20
+> >      qapi_free_UserDefOneList(ud1list);
+>=20
+> Could squash together with PATCH 79 and call the result "monitor: Use
+> g_new() family of functions".
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
