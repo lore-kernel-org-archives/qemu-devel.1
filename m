@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e1gyk-0005XP-47
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 18:56:55 -0400
+	(envelope-from <jsnow@redhat.com>) id 1e1gym-0005Zn-PC
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 18:56:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e1gyh-0004s9-03
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 18:56:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:8557)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1e1gyg-0004rp-Ps
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 18:56:50 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 10 Oct 2017 00:55:47 +0200
-Message-Id: <20171009225623.29232-7-marcandre.lureau@redhat.com>
-In-Reply-To: <20171009225623.29232-1-marcandre.lureau@redhat.com>
-References: <20171009225623.29232-1-marcandre.lureau@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1e1gyl-0004uH-K9
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 18:56:56 -0400
+References: <20171002143919.207741-1-vsementsov@virtuozzo.com>
+	<20171002143919.207741-4-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <9e5c8b0a-d2f9-e051-f8fb-b9618982e6ea@redhat.com>
+Date: Mon, 9 Oct 2017 18:56:43 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 06/42] tpm: remove tpm_register_driver()
+In-Reply-To: <20171002143919.207741-4-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/5] backup: init copy_bitmap from
+ sync_bitmap for incremental
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,79 +25,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: amarnath.valluri@intel.com, stefanb@linux.vnet.ibm.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 
-No more users of be_drivers[], drop that too.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- include/sysemu/tpm_backend.h | 1 -
- hw/tpm/tpm_emulator.c        | 1 -
- hw/tpm/tpm_passthrough.c     | 1 -
- tpm.c                        | 8 --------
- 4 files changed, 11 deletions(-)
 
-diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
-index c6e5637f68..adb6a68076 100644
---- a/include/sysemu/tpm_backend.h
-+++ b/include/sysemu/tpm_backend.h
-@@ -216,6 +216,5 @@ TPMInfo *tpm_backend_query_tpm(TPMBackend *s);
- TPMBackend *qemu_find_tpm(const char *id);
-=20
- void tpm_register_model(enum TpmModel model);
--void tpm_register_driver(const TPMDriverOps *tdo);
-=20
- #endif
-diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
-index 5ddd7238d2..9e24a5f30e 100644
---- a/hw/tpm/tpm_emulator.c
-+++ b/hw/tpm/tpm_emulator.c
-@@ -581,7 +581,6 @@ static const TypeInfo tpm_emulator_info =3D {
- static void tpm_emulator_register(void)
- {
-     type_register_static(&tpm_emulator_info);
--    tpm_register_driver(&tpm_emulator_driver);
- }
-=20
- type_init(tpm_emulator_register)
-diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-index e6ace28b04..f04eab3e63 100644
---- a/hw/tpm/tpm_passthrough.c
-+++ b/hw/tpm/tpm_passthrough.c
-@@ -418,7 +418,6 @@ static const TypeInfo tpm_passthrough_info =3D {
- static void tpm_passthrough_register(void)
- {
-     type_register_static(&tpm_passthrough_info);
--    tpm_register_driver(&tpm_passthrough_driver);
- }
-=20
- type_init(tpm_passthrough_register)
-diff --git a/tpm.c b/tpm.c
-index ad2ed6a0da..75a589b837 100644
---- a/tpm.c
-+++ b/tpm.c
-@@ -23,7 +23,6 @@
- static QLIST_HEAD(, TPMBackend) tpm_backends =3D
-     QLIST_HEAD_INITIALIZER(tpm_backends);
-=20
--static TPMDriverOps const *be_drivers[TPM_TYPE__MAX];
- static bool tpm_models[TPM_MODEL__MAX];
-=20
- void tpm_register_model(enum TpmModel model)
-@@ -33,13 +32,6 @@ void tpm_register_model(enum TpmModel model)
-=20
- #ifdef CONFIG_TPM
-=20
--void tpm_register_driver(const TPMDriverOps *tdo)
--{
--    assert(!be_drivers[tdo->type]);
--
--    be_drivers[tdo->type] =3D tdo;
--}
--
- static const TPMDriverOps *
- tpm_driver_find_by_type(enum TpmType type)
- {
---=20
-2.14.1.146.gd35faa819
+On 10/02/2017 10:39 AM, Vladimir Sementsov-Ogievskiy wrote:
+> We should not copy non-dirty clusters in write notifiers. So,
+> initialize copy_bitmap from sync_bitmap.
+> 
+
+...! Duh, good find!!
+
+So, previously we'd copy extra sectors if they just so happened to be
+written to during the backup process. These would be totally redundant
+compared to the previous backups in the chain, by definition.
+
+Now, we allow the write to go through to the source image and let it
+dirty the bdrv dirty bitmap we have on standby.
+
+Good fix.
+
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/backup.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 44 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/backup.c b/block/backup.c
+> index 08efec639f..07f4ae846b 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -422,6 +422,43 @@ out:
+>      return ret;
+>  }
+>  
+> +/* init copy_bitmap from sync_bitmap */
+> +static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
+> +{
+> +    BdrvDirtyBitmapIter *dbi;
+> +    int64_t offset;
+> +    int64_t end = DIV_ROUND_UP(bdrv_dirty_bitmap_size(job->sync_bitmap),
+> +                               job->cluster_size);
+> +
+> +    dbi = bdrv_dirty_iter_new(job->sync_bitmap);
+> +    while ((offset = bdrv_dirty_iter_next(dbi)) != -1) {
+> +        int64_t cluster = offset / job->cluster_size;
+> +        int64_t next_cluster;
+> +
+> +        offset += bdrv_dirty_bitmap_granularity(job->sync_bitmap);
+> +        if (offset >= bdrv_dirty_bitmap_size(job->sync_bitmap)) {
+> +            hbitmap_set(job->copy_bitmap, cluster, end - cluster);
+> +            break;
+> +        }
+> +
+> +        offset = bdrv_dirty_bitmap_next_zero(job->sync_bitmap, offset);
+> +        if (offset == -1) {
+> +            hbitmap_set(job->copy_bitmap, cluster, end - cluster);
+> +            break;
+> +        }
+> +
+> +        next_cluster = DIV_ROUND_UP(offset, job->cluster_size);
+> +        hbitmap_set(job->copy_bitmap, cluster, next_cluster - cluster);
+> +        if (next_cluster >= end) {
+> +            break;
+> +        }
+> +
+
+Did you look into initializing this from a lower layer, e.g. a call to
+initialize-an-hbitmap-from-another-hbitmap?
+
+The loop might look a little cleaner that way and we might possibly get
+more utility out of it than a custom coded loop here in the backup code.
+
+> +        bdrv_set_dirty_iter(dbi, next_cluster * job->cluster_size);
+> +    }
+> +
+> +    bdrv_dirty_iter_free(dbi);
+> +}
+> +
+>  static void coroutine_fn backup_run(void *opaque)
+>  {
+>      BackupBlockJob *job = opaque;
+> @@ -435,20 +472,26 @@ static void coroutine_fn backup_run(void *opaque)
+>  
+>      nb_clusters = DIV_ROUND_UP(job->common.len, job->cluster_size);
+>      job->copy_bitmap = hbitmap_alloc(nb_clusters, 0);
+> -    hbitmap_set(job->copy_bitmap, 0, nb_clusters);
+
+Alright, so the last patch introduced a blunt initialization, and you've
+replaced it by more granular initializations.
+
+>  
+>      job->before_write.notify = backup_before_write_notify;
+>      bdrv_add_before_write_notifier(bs, &job->before_write);
+>  
+>      if (job->sync_mode == MIRROR_SYNC_MODE_NONE) {
+> +        /* Here we set all bits in job->copy_bitmap to allow copying clusters
+> +         * which are going to be changed (none-mode semantics). It doesn't mean
+> +         * that we want to copy _all_ clusters.
+> +         */
+
+Right, this is more like ALLOWING all sectors to be copied.
+
+Perhaps:
+
+"All bits are set to allow any cluster to be copied. This does not
+actually require them to be copied."
+
+> +        hbitmap_set(job->copy_bitmap, 0, nb_clusters);
+>          while (!block_job_is_cancelled(&job->common)) {
+>              /* Yield until the job is cancelled.  We just let our before_write
+>               * notify callback service CoW requests. */
+>              block_job_yield(&job->common);
+>          }
+>      } else if (job->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
+> +        backup_incremental_init_copy_bitmap(job);
+>          ret = backup_run_incremental(job);
+>      } else {
+> +        hbitmap_set(job->copy_bitmap, 0, nb_clusters);
+
+Maybe you could just factor these things out entirely:
+
+if (job->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
+  backup_incremental_init_copy_bitmap(job);
+} else {
+  hbitmap_set(job->copy_bitmap, 0, nb_clusters);
+}
+
+prior to the big switch statement.
+
+>          /* Both FULL and TOP SYNC_MODE's require copying.. */
+>          for (offset = 0; offset < job->common.len;
+>               offset += job->cluster_size) {
+> 
