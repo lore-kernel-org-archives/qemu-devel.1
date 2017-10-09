@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e1Rpa-0001N2-3s
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 02:46:27 -0400
+	(envelope-from <armbru@redhat.com>) id 1e1Rzi-0005X2-5y
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 02:56:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e1RpZ-0003L4-CH
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 02:46:26 -0400
+	(envelope-from <armbru@redhat.com>) id 1e1Rze-0007vC-B9
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 02:56:54 -0400
+From: Markus Armbruster <armbru@redhat.com>
 References: <20171006235023.11952-1-f4bug@amsat.org>
-	<20171006235023.11952-62-f4bug@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f9370e2b-5342-0035-f8bb-f7896c5e7c16@redhat.com>
-Date: Mon, 9 Oct 2017 08:46:09 +0200
+	<20171006235023.11952-89-f4bug@amsat.org>
+Date: Mon, 09 Oct 2017 08:46:57 +0200
+In-Reply-To: <20171006235023.11952-89-f4bug@amsat.org> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Fri, 6 Oct 2017 20:50:23
+	-0300")
+Message-ID: <87po9wstr2.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20171006235023.11952-62-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 61/88] tests: use g_new() family of
- functions
+Subject: Re: [Qemu-devel] [PATCH 88/88] scripts/coverity-model: use g_new()
+ family of functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,24 +26,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Laurent Vivier <lvivier@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu trival <qemu-trivial@nongnu.org>, qemu-block@nongnu.org
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?utf-8?Q?Mar?= =?utf-8?Q?c-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu trival <qemu-trivial@nongnu.org>, qemu-devel@nongnu.org
 
-On 07.10.2017 01:49, Philippe Mathieu-Daud=C3=A9 wrote:
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Please cc me on changes to stuff I maintain, as scripts/get_maintainer
+tells you :)
+
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> [PMD: split of some files in other commits of the same series, add libq=
-test.c]
 > ---
->  tests/ahci-test.c     | 4 ++--
->  tests/fw_cfg-test.c   | 4 ++--
->  tests/libqos/ahci.c   | 2 +-
->  tests/libqos/libqos.c | 2 +-
->  tests/libqos/malloc.c | 6 +++---
->  tests/libqtest.c      | 2 +-
->  tests/pc-cpu-test.c   | 2 +-
->  7 files changed, 11 insertions(+), 11 deletions(-)
+>  scripts/coverity-model.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/coverity-model.c b/scripts/coverity-model.c
+> index c702804f41..de07bffb57 100644
+> --- a/scripts/coverity-model.c
+> +++ b/scripts/coverity-model.c
+> @@ -363,7 +363,7 @@ int g_poll (GPollFD *fds, unsigned nfds, int timeout)
+>  typedef struct _GIOChannel GIOChannel;
+>  GIOChannel *g_io_channel_unix_new(int fd)
+>  {
+> -    GIOChannel *c =3D g_malloc0(sizeof(GIOChannel));
+> +    GIOChannel *c =3D g_new0(GIOChannel, 1);
+>      __coverity_escape__(fd);
+>      return c;
+>  }
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Hmm.
+
+The Coverity model carefully explains g_malloc0().  It doesn't explain
+g_new0().  With any luck, Coverity can see through g_new0() --- it's a
+macro in my <gmem.h>.  But why complicate matters?  The normal reason
+for changing g_malloc0() to g_new0() doesn't apply here.  Let's leave
+the model alone.
