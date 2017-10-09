@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e1cHQ-0001ST-Gu
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:55:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1e1cL9-0002OE-39
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:59:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e1cHN-0001Rc-Ri
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:55:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1e1cL6-00039l-F3
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:59:43 -0400
 References: <20171006235023.11952-1-f4bug@amsat.org>
-	<20171006235023.11952-22-f4bug@amsat.org>
+	<20171006235023.11952-35-f4bug@amsat.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <af4cb715-2015-02c4-98d4-4ec3133dc3e8@redhat.com>
-Date: Mon, 9 Oct 2017 12:55:41 -0500
+Message-ID: <e2221fca-f041-c1ac-143e-19fd72b31cd5@redhat.com>
+Date: Mon, 9 Oct 2017 12:59:31 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171006235023.11952-22-f4bug@amsat.org>
+In-Reply-To: <20171006235023.11952-35-f4bug@amsat.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="C878SmiSl60faa98soGEB6PSihBrgrqcH"
-Subject: Re: [Qemu-devel] [PATCH 21/88] NBD: use g_new() family of functions
+	boundary="8tBXAeO3PnjU9iuJmtpdCQBTHNugW7QPO"
+Subject: Re: [Qemu-devel] [PATCH 34/88] qapi: use g_new() family of functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,38 +24,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu trival <qemu-trivial@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu trival <qemu-trivial@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---C878SmiSl60faa98soGEB6PSihBrgrqcH
+--8tBXAeO3PnjU9iuJmtpdCQBTHNugW7QPO
 From: Eric Blake <eblake@redhat.com>
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
- Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
  qemu trival <qemu-trivial@nongnu.org>
-Message-ID: <af4cb715-2015-02c4-98d4-4ec3133dc3e8@redhat.com>
-Subject: Re: [PATCH 21/88] NBD: use g_new() family of functions
+Message-ID: <e2221fca-f041-c1ac-143e-19fd72b31cd5@redhat.com>
+Subject: Re: [PATCH 34/88] qapi: use g_new() family of functions
 References: <20171006235023.11952-1-f4bug@amsat.org>
- <20171006235023.11952-22-f4bug@amsat.org>
-In-Reply-To: <20171006235023.11952-22-f4bug@amsat.org>
+ <20171006235023.11952-35-f4bug@amsat.org>
+In-Reply-To: <20171006235023.11952-35-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 10/06/2017 06:49 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  nbd/server.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  qapi/opts-visitor.c           | 2 +-
+>  qapi/qapi-clone-visitor.c     | 2 +-
+>  qapi/qapi-dealloc-visitor.c   | 2 +-
+>  qapi/qobject-output-visitor.c | 2 +-
+>  qapi/string-input-visitor.c   | 2 +-
+>  qapi/string-output-visitor.c  | 2 +-
+>  6 files changed, 6 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
+> index 324b197495..34ac49f3c2 100644
+> --- a/qapi/opts-visitor.c
+> +++ b/qapi/opts-visitor.c
+> @@ -539,7 +539,7 @@ opts_visitor_new(const QemuOpts *opts)
+>      OptsVisitor *ov;
+> =20
+>      assert(opts);
+> -    ov =3D g_malloc0(sizeof *ov);
+> +    ov =3D g_new0(OptsVisitor, 1);
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Transformations like this are harder to justify - you have more typing
+rather than less, and no change in the amount of type-safety.
 
-I'm fine queueing this one through my NBD tree, if it doesn't go in as
-part of a larger series.
+If we really want to convert LHS =3D g_malloc0(sizeof(*LHS)), we probably=
+
+ought to have a stronger justification (consistency might be such an
+argument, if the entire series is applied and HACKING is updated to
+mention our new preferred style, and where the checked-in Coccinelle
+script can be easily re-run in the future to catch regressions).
+
+Converting LHS =3D g_malloc0(sizeof(type)) is a no-brainer, because it
+DOES add type-safety, and often results in less typing.  But I haven't
+looked at your entire series to see which patches fall in the no-brainer
+category vs. the weakly-argued consistency category.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -63,7 +88,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---C878SmiSl60faa98soGEB6PSihBrgrqcH
+--8tBXAeO3PnjU9iuJmtpdCQBTHNugW7QPO
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -72,14 +97,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnbuB0ACgkQp6FrSiUn
-Q2qmOgf9EYc0sA3DSpWR09mUmZeF/X/0YK1Pk2hOuWYtq8eSgzoRz88IHJic8Uf7
-p7VU9VG7wzH6oTpfK1kHQvZQABdUkbo2jyKduiuxwF2q5aD1oeq0mVsg1eGT78OI
-ytVQU3CKG8t/BYbpSJ5ZqmIJX/TlRiBjX0lVni0vVRAtTQihusy0cY8F2tqiu0d4
-ea/oO2wSoyWiaDtZbcpt0O+k68abN5y40ZiEIX3ycL6O4mDVr28C03Kbn226bWNU
-CyL/g0lnAQYAHz6FEdAAdM1ZLJHPEReTrqQ2ECtnQ9oxcm9OIzquZmmEuIihggLy
-tStdJqhMB4ymaLHU/eI5BToU3dYNTQ==
-=amnp
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnbuQMACgkQp6FrSiUn
+Q2pYDAf/bNENuoOOlnvpm4CNBPBADhDkXYCmvXGvIZQ1dzExSgvjJBgXudEcN987
+1iBAgJSiNYy48BrfGIAklFFeaAm8rEH1EJ1Jziq2aGPvWYYxg7ja01NTqVx3lKfG
+jPLbCVcMOkKfYKcdLeaI6KiSACDO5o4KhIOrzYDZALWqktH2kgXjJuDWLVSAdP0+
+JgUPKYhuOG35W/qouZUlALkGwZcDqQSSXekmlw6TMdXTxQRqvz1TvSI230Lgy7Sq
+Bx4Kw9dymHNfOzDe3CBFMzWUka15aI8mZ1Ef/jebXxaZdOiOtSEPipQ792dyu5IM
+67xAaCN9K/G9cCZqay5iaJJa+ezJKw==
+=uA/B
 -----END PGP SIGNATURE-----
 
---C878SmiSl60faa98soGEB6PSihBrgrqcH--
+--8tBXAeO3PnjU9iuJmtpdCQBTHNugW7QPO--
