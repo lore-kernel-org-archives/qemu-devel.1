@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1e1MCn-00079O-Ei
-	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 20:46:02 -0400
+	(envelope-from <andrew@aj.id.au>) id 1e1MEn-000822-FM
+	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 20:48:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1e1MCm-0007bH-EF
-	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 20:46:01 -0400
-Message-ID: <1507509945.5452.150.camel@aj.id.au>
+	(envelope-from <andrew@aj.id.au>) id 1e1MEm-0000Bv-Kx
+	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 20:48:05 -0400
+Message-ID: <1507510072.5452.151.camel@aj.id.au>
 From: Andrew Jeffery <andrew@aj.id.au>
-Date: Mon, 09 Oct 2017 11:15:45 +1030
-In-Reply-To: <20170920070135.31379-5-clg@kaod.org>
+Date: Mon, 09 Oct 2017 11:17:52 +1030
+In-Reply-To: <20170920070135.31379-7-clg@kaod.org>
 References: <20170920070135.31379-1-clg@kaod.org>
-	<20170920070135.31379-5-clg@kaod.org>
+	<20170920070135.31379-7-clg@kaod.org>
 Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-7fae1mlNxJg82wabGvuu"
+	protocol="application/pgp-signature"; boundary="=-eTx3SJYtBYAbjZOoBSKH"
 Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] aspeed: Add EEPROM I2C devices
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] aspeed: add the pc9552 chips to the
+ witherspoon machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,128 +28,75 @@ To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Peter Maydell <peter.may
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
 
---=-7fae1mlNxJg82wabGvuu
+--=-eTx3SJYtBYAbjZOoBSKH
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Wed, 2017-09-20 at 09:01 +0200, C=C3=A9dric Le Goater wrote:
-> The Aspeed boards have at least one EEPROM to hold the Vital Product
-> Data (VPD).
+> The pca9552 LED blinkers on the Witherspoon machine are used for leds
+> but also as GPIOs to control fans and GPUs.
 >=C2=A0
 > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
 Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
 
 > ---
->=C2=A0
-> Changes since v1:
->=C2=A0
-> =C2=A0- fixed palmetto EEPROM size
-> =C2=A0- used smbus_eeprom_init_one()
->=C2=A0
-> hw/arm/aspeed.c | 13 +++++++++++++
-> =C2=A01 file changed, 13 insertions(+)
+> =C2=A0hw/arm/aspeed.c | 4 ++++
+> =C2=A01 file changed, 4 insertions(+)
 >=C2=A0
 > diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-> index 362b683e9021..462f8008cff5 100644
+> index 462f8008cff5..2ae46d71bff7 100644
 > --- a/hw/arm/aspeed.c
 > +++ b/hw/arm/aspeed.c
-> @@ -17,6 +17,7 @@
-> =C2=A0#include "hw/arm/arm.h"
-> =C2=A0#include "hw/arm/aspeed_soc.h"
-> =C2=A0#include "hw/boards.h"
-> +#include "hw/i2c/smbus.h"
-> =C2=A0#include "qemu/log.h"
-> =C2=A0#include "sysemu/block-backend.h"
-> =C2=A0#include "sysemu/blockdev.h"
-> @@ -255,11 +256,15 @@ static void palmetto_bmc_i2c_init(AspeedBoardState =
-*bmc)
-> =C2=A0{
+> @@ -379,6 +379,8 @@ static void witherspoon_bmc_i2c_init(AspeedBoardState=
+ *bmc)
 > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0AspeedSoCState *soc =3D &bmc->soc;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0DeviceState *dev;
-> +=C2=A0=C2=A0=C2=A0=C2=A0uint8_t *eeprom_buf =3D g_malloc0(32 * 1024);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0uint8_t *eeprom_buf =3D g_malloc0(8 * 1024)=
+;
 > =C2=A0
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* The palmetto platform expects a ds3231 R=
-TC but a ds1338 is
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* enough to provide basic RTC feature=
-s. Alarms will be missing */
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0i2c_create_slave(aspeed_i2c_get_bus(DEVICE(=
-&soc->i2c), 0), "ds1338", 0x68);
-> =C2=A0
-> +=C2=A0=C2=A0=C2=A0=C2=A0smbus_eeprom_init_one(aspeed_i2c_get_bus(DEVICE(=
-&soc->i2c), 0), 0x50,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0eeprom_buf);
+> +=C2=A0=C2=A0=C2=A0=C2=A0i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc-=
+>i2c), 3), "pca9552", 0x60);
 > +
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* add a TMP423 temperature sensor */
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0dev =3D i2c_create_slave(aspeed_i2c_get_bus=
-(DEVICE(&soc->i2c), 2),
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0"tmp423", 0x4c);
-> @@ -297,6 +302,10 @@ static const TypeInfo palmetto_bmc_type =3D {
-> =C2=A0static void ast2500_evb_i2c_init(AspeedBoardState *bmc)
-> =C2=A0{
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0AspeedSoCState *soc =3D &bmc->soc;
-> +=C2=A0=C2=A0=C2=A0=C2=A0uint8_t *eeprom_buf =3D g_malloc0(8 * 1024);
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0smbus_eeprom_init_one(aspeed_i2c_get_bus(DEVICE(=
-&soc->i2c), 3), 0x50,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0eeprom_buf);
-> =C2=A0
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* The AST2500 EVB expects a LM75 but a TMP=
-105 is compatible */
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0i2c_create_slave(aspeed_i2c_get_bus(DEVICE(=
-&soc->i2c), 7), "tmp105", 0x4d);
-> @@ -368,6 +377,7 @@ static const TypeInfo romulus_bmc_type =3D {
-> =C2=A0static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
-> =C2=A0{
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0AspeedSoCState *soc =3D &bmc->soc;
-> +=C2=A0=C2=A0=C2=A0=C2=A0uint8_t *eeprom_buf =3D g_malloc0(8 * 1024);
-> =C2=A0
 > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0i2c_create_slave(aspeed_i2c_get_bus(DEVICE(=
 &soc->i2c), 4), "tmp423", 0x4c);
 > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0i2c_create_slave(aspeed_i2c_get_bus(DEVICE(=
 &soc->i2c), 5), "tmp423", 0x4c);
-> @@ -377,6 +387,9 @@ static void witherspoon_bmc_i2c_init(AspeedBoardState=
+> =C2=A0
+> @@ -390,6 +392,8 @@ static void witherspoon_bmc_i2c_init(AspeedBoardState=
  *bmc)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* The witherspoon board expects Epson RX89=
-00 I2C RTC but a ds1338 is
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0* good enough */
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0i2c_create_slave(aspeed_i2c_get_bus(DEVICE(=
-&soc->i2c), 11), "ds1338", 0x32);
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0smbus_eeprom_init_one(aspeed_i2c_get_bus(DEVICE(=
-&soc->i2c), 11), 0x51,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+> =C2=A0
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0smbus_eeprom_init_one(aspeed_i2c_get_bus(DE=
+VICE(&soc->i2c), 11), 0x51,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0eeprom_buf);
+=A0=C2=A0=C2=A0eeprom_buf);
+> +=C2=A0=C2=A0=C2=A0=C2=A0i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc-=
+>i2c), 11), "pca9552",
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A00x60);
 > =C2=A0}
 > =C2=A0
 > =C2=A0static void witherspoon_bmc_init(MachineState *machine)
---=-7fae1mlNxJg82wabGvuu
+--=-eTx3SJYtBYAbjZOoBSKH
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: This is a digitally signed message part
 Content-Transfer-Encoding: 7bit
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIcBAABCgAGBQJZ2sa5AAoJEJ0dnzgO5LT5DO4QAIuHGS6YhldhN26HZHf4mogk
-GxfdlM26SWTXHj5d3/xKtY1mthOcPJ4RyyPH6V3INB4Ohkyvu4sicKqLhfCptLWE
-VTfP+qXl9WH/67J9/Gogr88PxsGeZX0ZxYUQevO9JHs5SIFONWhOITQF42MbEs3/
-J2AR2308kVROGOe4Ef1zQNQMf0zv0oHjiOYkuj+zTKTf9u+cJwh/gcjnvUhqQxyn
-3yLwhCFK6fwg0C4TMHE1SD/xSJQZncFKyr6VevozsAd48iVyxsTMHw0M6wTs6gX6
-wMhh1k5BqCNdkDDYd26TIyYd3F0pBJ5809HsTqLnHP6nLiFxe6vxL31fTHtBKP7G
-a8Fb5fOzj2/NT4RTpDTqAxZm5Z4RxDC4nh06+kbmXQwO+4vb+aM014NkE+p6SYjy
-uUmX8HiYgiFCWrvmusMwfl7JTuYzW8TO95xRVo9WLX72UH/L1itgjjdC35nCsprb
-3udX4OG82mzxg4RKQzUuKAlY8yoOfZb5wr9casFXyQXXAy7/hZp4mvFfrWxuhZjR
-tfLvyTDX38GVx98IFbbp9RUPO+4eDU/rsa7kbrwcGdEd3BYJjJIQtQqJaCOTZbJR
-QENN2hEYzP4PqW0VO1N1A07QC4ttiwQkX4/oHcy1st2/nEDVpmOvKJ/u+QXyknd7
-yW2YMOoBn+AREMP8/lnj
-=naae
+iQIcBAABCgAGBQJZ2sc4AAoJEJ0dnzgO5LT5c8IP/R6u1SPk7my/NtGhKOIU2I8m
+nekuOKl7re2jVERZ/oFDW/mEwuXglT5nGyP0PDoBpWfp2McUob81a5U9BgBaY+Uj
+agr8o4EjRukMHjeFkAl0bOxFppsBULBRF8IVkusSCEw3wQGylbB6in3d/3vyAeRp
+20Is8dXf/FcGHQ5SzyzUT/EP+gWZqmt54JUj54LxjCj7o8LLvEowrGnLiVu3LisY
+0cILXAGW0DtKj4576BE6pxOExDqRsPd2Ht40PdvK6VpxjVEMZ3IV8mntYtGJ0FHV
+ieDLuWPbLlE70D1drjZ9jvdSN7c2xQIYydkLBEcCzEF0V+fhEdTXzhy8Y8bc4IZS
+FlUlo1EEqZr8gqMUGoDqYExC4Pg+ad6DdVXECAQOo8NYVQxezMi/mclLMkOdX0ZB
+P+PtNPvXLSolOUQRjVOOI6UIPcLVZx4kswmOcbmbNhXfxwVuZtJYL877jLjkTT3b
+IVbo9t9k8RwucPSqXJE5ZYtR0EIqtN7ZSK5sajAyPnlwGg1HHKntK5vt85D5iNsh
+VvJkSBKx4PZhMgG/eSs+upj8oIFQEelUj7/2+qKGcEP/7TJHQi5PQr1EkuF0XQXs
+xIOM38cX3MhrcaQvF50JaeyK4WWkAJfKdi1YJK2r8zknR2DUqqFo1deDRqEcZxld
++1pX3Nwvgz95J8yff2EL
+=7R2O
 -----END PGP SIGNATURE-----
 
---=-7fae1mlNxJg82wabGvuu--
+--=-eTx3SJYtBYAbjZOoBSKH--
