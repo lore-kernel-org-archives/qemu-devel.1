@@ -1,45 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e1Vrq-0004Fd-N0
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 07:05:12 -0400
+	(envelope-from <thuth@redhat.com>) id 1e1VuM-00055C-Cd
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 07:07:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e1Vrk-0004Z2-NW
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 07:05:02 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39258)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1e1Vrk-0004XS-Ec
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 07:04:56 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v99B4aUg122027
-	for <qemu-devel@nongnu.org>; Mon, 9 Oct 2017 07:04:52 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dg3rcuep6-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 07:04:51 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 9 Oct 2017 12:04:47 +0100
-References: <1505092240-10864-1-git-send-email-longpeng2@huawei.com>
-	<2d8ae3d3-438b-da84-4959-cf63f4f4ce99@linux.vnet.ibm.com>
-	<59B9D439.10807@huawei.com>
-	<7e490af1-9caa-c96d-5f62-308f1b5d8805@linux.vnet.ibm.com>
-	<59BF1E9B.2030408@huawei.com>
-	<64d90f78-a2ae-be37-672b-e47aa3d4ecb2@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA3FBCC5@DGGEMA505-MBX.china.huawei.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 9 Oct 2017 13:04:37 +0200
+	(envelope-from <thuth@redhat.com>) id 1e1VuI-0005vR-BP
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 07:07:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47466)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1e1VuI-0005v3-2J
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 07:07:34 -0400
+References: <20171004154144.88995-1-pasic@linux.vnet.ibm.com>
+	<20171004154144.88995-3-pasic@linux.vnet.ibm.com>
+	<d6d2d73d-65c9-7ae1-fd37-cb8e304781e7@redhat.com>
+	<7f454872-fae3-35b0-eff4-227b2aa0f77d@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6c17b274-cd75-7864-94b9-fc8abff1a786@redhat.com>
+Date: Mon, 9 Oct 2017 13:07:27 +0200
 MIME-Version: 1.0
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA3FBCC5@DGGEMA505-MBX.china.huawei.com>
+In-Reply-To: <7f454872-fae3-35b0-eff4-227b2aa0f77d@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <7eaac82c-0d8b-47f1-94dd-772b3abf31f9@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [RFC 0/8]
- virtio-crypto: add multiplexing mode support
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/8] s390x/css: IO instr handler ending
+ control
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,49 +31,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, longpeng <longpeng2@huawei.com>
-Cc: "wangxin (U)" <wangxinxin.wang@huawei.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "mst@redhat.com" <mst@redhat.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "cohuck@redhat.com" <cohuck@redhat.com>, Luonengjun <luonengjun@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "john.griffin@intel.com" <john.griffin@intel.com>, "agraf@suse.de" <agraf@suse.de>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: qemu-s390x@nongnu.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
 
-
-
-On 10/09/2017 11:22 AM, Gonglei (Arei) wrote:
-> The next patch refactors make sense to me, 
-> but why do we need to decouple the virtio-crypto.h?
-> 
-> 
-
-I wanted to be able to freely change the host side and test with an unchanged
-guest side, that's why I've done that. It's just for testing. I had to do that
-because we don't have a mux capable linux driver. Neither of these patches is
-intended for inclusion. I'm just trying to make a point with them: we can
-make this substantially simpler (compared to this RFC).
-
-So how do we proceed here? It would be nice to see a cleaned up version of
-this series soon. If I recall correctly there were also other things which
-can be done in a less convoluted manner.
-
->> The basic idea behind the whole thing is that tinging about the requests put
->> on the virtqueues in terms of just complicates things unnecessarily.
+On 09.10.2017 12:54, Halil Pasic wrote:
+>=20
+>=20
+> On 10/09/2017 10:20 AM, Thomas Huth wrote:
+>> On 04.10.2017 17:41, Halil Pasic wrote:
+>>> CSS code needs to tell the IO instruction handlers located in how sho=
+uld
 >>
->> I could guess I will post the interesting part as a reply to this and the less
->> interesting part (decoupling) as an attachment. You are supposed to apply first
->> the attachment then the part after the scissors line.
+>> located in how?
 >>
->> Of course should you could respin the series preferably with the test
->> included I can rebase my stuff.
+>=20
+> First, thanks for your review!
+>=20
+> Wanted to say: in target/s390x/ioinst.c just forgot to copy paste.
+>=20
+>>> the emulated instruction be ended. Currently this is done by returnin=
+g
+>>> generic (POSIX) error codes, and mapping them to outcomes like condit=
+ion
+>>> codes. This makes bugs easy to create and hard to recognise.
+>>>
+>>> As a preparation for moving a way form (mis)using generic error codes=
+ for
+>>> flow control let us introduce a struct which tells the instruction
+>>> handler function how to end the instruction, in a more straight-forwa=
+rd
+>>> and less ambiguous way.
+>>>
+>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>>> ---
+>>>  include/hw/s390x/css.h | 12 ++++++++++++
+>>>  1 file changed, 12 insertions(+)
+>>>
+>>> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+>>> index 0653d3c9be..66916b6546 100644
+>>> --- a/include/hw/s390x/css.h
+>>> +++ b/include/hw/s390x/css.h
+>>> @@ -75,6 +75,18 @@ typedef struct CMBE {
+>>>      uint32_t reserved[7];
+>>>  } QEMU_PACKED CMBE;
+>>> =20
+>>> +/* IO instructions conclude according this */
+>>> +typedef struct IOInstEnding {
+>>> +        /*
+>>> +         * General semantic of cc codes of IO instructions is (brief=
+):
+>>> +         * 0 -- produced expected result
+>>> +         * 1 --  status conditions were present or produced alternat=
+e result
+>>> +         * 2 -- ineffective, because busy with previously initiated =
+function
+>>> +         * 3 -- ineffective, not operational
+>>> +         */
+>>> +        int cc;
+>>> +} IOInstEnding;
 >>
->> Please let me know about your opinion.
+>> Why do you need a struct for this? Do you plan to extend it later? If
+>> so, I think you should mention that in the patch description. If not,
+>> please use a named enum or a "typedef unsigned int IOInstEnding" inste=
+ad.
 >>
-> Thanks for your work, Halil. What's your opinion about virtio crypto spec v20?
+>>  Thomas
+>=20
+> We may, we may not. In the previous version we also had to support
+> do end a certain instruction with an addressing exception, but this
+> is going away in patch #3. Honestly I don't expect this being extended.
+>=20
+> I have other reasons for the struct. Type safety and clear semantics,
+> and frankly at least for s390 and linux I don't see any downsides given
+> what is written in the "zSeries ELF Application Binary Interface Supple=
+ment".
+> Can you please explain to me what is the problem with using this struct=
+, and
+> what is the benefit switching to a unsigned int?
 
-I'm on it. I've already started witting on Friday but things turned out a bit more
-interesting that expected. So I've postponed to today. Of course the two things are
-connected. I will try to give some feedback today.
+First, returning a struct is ugly in most cases, since it might need to
+be passed on the stack if it is bigger than 8 bytes. Ok, that's likely
+not the case here (if the compiler / ABI is smart enough - I did not
+check), but still, if I see something like this, there is an alarm
+signal somewhere in my head that starts to ring...
 
-Regards,
-Halil
+Then, in the follow up patches, you do something like this:
 
-> 
-> Thanks,
-> -Gonglei
-> 
+   return (IOInstEnding){.cc =3D 0};
+
+... and that just looks very, very ugly in my eyes. The more I look at
+it, the more I think we really want to have a named enum instead. That
+will give you some sort of basic type safety and semantics, too, and
+we'll also get proper names for those magic values - otherwise I'll
+always have to look up what cc =3D 2 or cc =3D 3 means... (I always keep
+forgetting what each value means...)
+
+ Thomas
