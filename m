@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=4484f2008=Ian.Jackson@citrix.com>)
-	id 1e1bNs-0004Xl-8A
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 12:58:29 -0400
+	(envelope-from <longman@redhat.com>) id 1e1Zms-0007qj-Tw
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:16:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=4484f2008=Ian.Jackson@citrix.com>)
-	id 1e1bNp-00060T-5k
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 12:58:28 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:31854)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=4484f2008=Ian.Jackson@citrix.com>)
-	id 1e1bNo-0005zX-UH
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 12:58:25 -0400
-From: Ian Jackson <ian.jackson@eu.citrix.com>
+	(envelope-from <longman@redhat.com>) id 1e1Zmp-0003rr-PA
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:16:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58526)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <longman@redhat.com>) id 1e1Zmp-0003rJ-Iq
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:16:07 -0400
+References: <20171006215244.27104-1-ehabkost@redhat.com>
+	<765f7133-0ccc-2239-d49b-55d8b2a24cc7@redhat.com>
+From: Waiman Long <longman@redhat.com>
+Message-ID: <fddffbab-7aab-72b4-f42f-d18e94517350@redhat.com>
+Date: Mon, 9 Oct 2017 11:15:57 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Message-ID: <23003.43689.447516.6588@mariner.uk.xensource.com>
-Date: Mon, 9 Oct 2017 17:58:17 +0100
-In-Reply-To: <20171009155044.GC1771@perard.uk.xensource.com>
-References: <1507133891-26013-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1507133891-26013-4-git-send-email-ian.jackson@eu.citrix.com>
-	<20171009155044.GC1771@perard.uk.xensource.com>
-Subject: Re: [Qemu-devel] [PATCH 3/8] xen: defer call to xen_restrict until
- after os_setup_post
+In-Reply-To: <765f7133-0ccc-2239-d49b-55d8b2a24cc7@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 0/7] x86: Rework KVM-defaults compat code,
+ enable kvm_pv_unhalt by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, xen-devel@lists.xenproject.org, Juergen Gross <jgross@suse.com>, Stefano
-	Stabellini <sstabellini@kernel.org>, xen-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Davidlohr Bueso <dave@stgolabs.net>
 
-(My resend has crossed with your review.  Sorry about that.)
+On 10/09/2017 09:39 AM, Paolo Bonzini wrote:
+> On 06/10/2017 23:52, Eduardo Habkost wrote:
+>> This series enables kvm_pv_unhalt by default on pc-*-2.11 and
+>> newer.
+>>
+>> To do that, I first reworked the existing
+>> x86_cpu_change_kvm_default() logic to use compat_props instead,
+>> so we don't need to make the chain of pc_compat_*() functions
+>> grow.
+> I've discussed PV spinlocks with some folks at Microsoft for a few week=
+s
+> now, and I'm not 100% sure about enabling kvm_pv_unhalt by default.
+> It's probably a good idea overall, but it does come with some caveats.
+>
+> The problem is that there were two different implementations of fair
+> spinlocks in Linux, ticket spinlocks and queued spinlocks.  When
+> kvm_pv_unhalt is disabled, ticket spinlocks sucked badly indeed; queued=
 
-Anthony PERARD writes ("Re: [PATCH 3/8] xen: defer call to xen_restrict until after os_setup_post"):
-> On Wed, Oct 04, 2017 at 05:18:06PM +0100, Ian Jackson wrote:
+> spinlocks however simply revert to unfair spinlocks, which loses the
+> fairness but has the best performance.  See virt_spin_lock in
+> arch/x86/include/asm/qspinlock.h.
+>
+> Now, fair spinlocks are only really needed for large NUMA machines.
+> With a single NUMA node, for example, test-and-set spinlocks work well
+> enough; there's not _much_ need for fairness in practice, and the
+> paravirtualization does introduce some overhead.
+>
+> Therefore, the best performance would be achieved with kvm_pv_unhalt
+> disabled on small VMs, and enabled on large VMs spanning multiple host
+> NUMA nodes.
+>
+> Waiman, Davidlohr, do you have an opinion on this as well?
 
-> > +void xen_setup_post(void)
-> > +{
-> > +    int rc;
-> 
-> We probably want to check here if Xen is enable (via xen_enabled()).
-> xen_domid_restrict could be true when Xen is not used, even if it does
-> not make sense to use -xen-domid-restrict in that case.
+I agree. Using unfair lock in a small VM is good for performance. The
+only problem I see is how do we define what is small. Now, even a
+machine with a single socket can have up to 28 cores, 56 threads. If a
+VM has up to 56 vCPUs, we may still want pvqspinlock to be used.
 
-Should -xen-domid-restrict without xen_enabled() not fail ?  IMO it is
-normally better for an option which requests enhanced security to fail
-when it can't do its job, rather than just hoping that its
-inapplicability is intentional.
+Is the kvm_pv_unhalt flag a global one for all VMs within a machine? Or
+can it be different for each VM? We may want to have this flag
+dynamically determined depending on the configuration of the VM.
 
-OTOH I suppose there is an argument that without xen_enabled() the
-function of -xen-domid-restrict is achieved, in that without
-xen_enabled() qemu is unable (after dropping privileges) to act on
-Xen domains at all...
-
-Thanks,
-Ian.
+Regards,
+Longman
