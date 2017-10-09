@@ -1,36 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e1fLG-0007ye-Eb
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:12:03 -0400
+	(envelope-from <eblake@redhat.com>) id 1e1fd1-00052b-4d
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:30:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e1fLD-0001CJ-3X
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:12:02 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55378
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1e1fLC-0001Bx-Tk
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:11:59 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v99L8rxl042740
-	for <qemu-devel@nongnu.org>; Mon, 9 Oct 2017 17:11:54 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dgayvj6th-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 17:11:54 -0400
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Mon, 9 Oct 2017 15:11:53 -0600
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Mon,  9 Oct 2017 18:11:36 -0300
-In-Reply-To: <20171009211136.31640-1-danielhb@linux.vnet.ibm.com>
-References: <20171009211136.31640-1-danielhb@linux.vnet.ibm.com>
-Message-Id: <20171009211136.31640-2-danielhb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 1/1] hw/ppc/spapr.c: abort unplug_request if
- previous unplug isn't done
+	(envelope-from <eblake@redhat.com>) id 1e1fd0-0003a7-27
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:30:23 -0400
+References: <20171004020048.26379-1-eblake@redhat.com>
+	<20171004020048.26379-10-eblake@redhat.com>
+	<20171009200736.GA5170@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d9b40226-d9ea-c48a-3b00-82ed0ad2c874@redhat.com>
+Date: Mon, 9 Oct 2017 16:30:05 -0500
+MIME-Version: 1.0
+In-Reply-To: <20171009200736.GA5170@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="j5dgg7LHtDEHjdgjOmdJrll1hrcaS1AVN"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 09/23] block: Switch
+ BdrvCoGetBlockStatusData to byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,87 +26,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-LMB removal is completed only when the spapr_lmb_release callback
-is called after all DRCs of the dimm are detached. During this
-time, it is possible that a unplug request for the same dimm
-arrives, trying to detach DRCs that were detached by the guest
-in the first unplug_request.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--j5dgg7LHtDEHjdgjOmdJrll1hrcaS1AVN
+From: Eric Blake <eblake@redhat.com>
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <d9b40226-d9ea-c48a-3b00-82ed0ad2c874@redhat.com>
+Subject: Re: [Qemu-block] [PATCH v5 09/23] block: Switch
+ BdrvCoGetBlockStatusData to byte-based
+References: <20171004020048.26379-1-eblake@redhat.com>
+ <20171004020048.26379-10-eblake@redhat.com>
+ <20171009200736.GA5170@localhost.localdomain>
+In-Reply-To: <20171009200736.GA5170@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-BQL doesn't help in this case - the lock will prevent any concurrent
-removal from happening until the end of spapr_memory_unplug_request
-only. What happens is that the second unplug_request ends up calling
-spapr_drc_detach in a DRC that were detached already, causing an
-assert error in spapr_drc_detach (e.g
-https://bugs.launchpad.net/qemu/+bug/1718118).
+On 10/09/2017 03:07 PM, Jeff Cody wrote:
+> On Tue, Oct 03, 2017 at 09:00:34PM -0500, Eric Blake wrote:
+>> We are gradually converting to byte-based interfaces, as they are
+>> easier to reason about than sector-based.  Convert another internal
+>> type (no semantic change), and rename it to match the corresponding
+>> public function rename.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> Reviewed-by: Fam Zheng <famz@redhat.com>
+>> Reviewed-by: John Snow <jsnow@redhat.com>
+>>
+>> ---
 
-spapr_lmb_release uses a structure called sPAPRDIMMState, stored in the
-spapr->pending_dimm_unplugs QTAIL, to track how many LMB DRCs are left
-to be detached by the guest. When there are no more DRCs left, this
-structure is deleted and the pc-dimm unplug handler is called to
-finish the process.
+>>  static void coroutine_fn bdrv_get_block_status_above_co_entry(void *o=
+paque)
+>>  {
+>> -    BdrvCoGetBlockStatusData *data =3D opaque;
+>> +    BdrvCoBlockStatusData *data =3D opaque;
+>> +    int n;
+>>
+>>      data->ret =3D bdrv_co_get_block_status_above(data->bs, data->base=
+,
+>>                                                 data->mapping,
+>> -                                               data->sector_num,
+>> -                                               data->nb_sectors,
+>> -                                               data->pnum,
+>> +                                               data->offset >> BDRV_S=
+ECTOR_BITS,
+>> +                                               data->bytes >> BDRV_SE=
+CTOR_BITS,
+>> +                                               &n,
+>>                                                 data->file);
+>> +    *data->pnum =3D n * BDRV_SECTOR_SIZE;
+>=20
+> This throws a warning:
+>=20
+>  block/io.c: In function =E2=80=98bdrv_get_block_status_above_co_entry=E2=
+=80=99:
+>  block/io.c:1995:21: error: =E2=80=98n=E2=80=99 may be used uninitializ=
+ed in this function=20
+>        [-Werror=3Dmaybe-uninitialized] *data->pnum =3D n * BDRV_SECTOR_=
+SIZE;
+>=20
 
-This patch reuses the sPAPRDIMMState to allow unplug_request to know
-if there is an ongoing unplug process for a given dimm, aborting the
-unplug request in this case, by doing the following changes:
+Ugh - my curse of compiling development builds with -g instead of -O2,
+so I didn't see the warning.  Ideally, it would be nice if all the
+various bdrv_*_block_status functions would set *pnum to a sane value on
+all exit paths, including errors, but that is not the case in
+bdrv_co_get_block_status_above().
 
-- in spapr_lmb_release callback, move the dimm state removal to the
-end, after pc-dimm unplug handler. With this change we can check for
-the existence of the dimm state to see if the unplug process is
-done.
+>=20
+> It is fixed a couple patches from now, but it will still break git-bise=
+ct.
 
-- use spapr_pending_dimm_unplugs_find in spapr_memory_unplug_request
-to check if the dimm state exists. If positive, there is an unplug
-operation already in progress for this dimm, meaning that we should
-abort it and warn the user about it.
+Indeed.  Will fix on respin, as I have to do a v6 anyways for some minor
+rebasing conflict resolution.
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/1718118
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
----
- hw/ppc/spapr.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index ff87f155d5..7f9274d57d 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3054,14 +3054,13 @@ void spapr_lmb_release(DeviceState *dev)
-         return;
-     }
- 
--    spapr_pending_dimm_unplugs_remove(spapr, ds);
--
-     /*
-      * Now that all the LMBs have been removed by the guest, call the
-      * pc-dimm unplug handler to cleanup up the pc-dimm device.
-      */
-     pc_dimm_memory_unplug(dev, &spapr->hotplug_memory, mr);
-     object_unparent(OBJECT(dev));
-+    spapr_pending_dimm_unplugs_remove(spapr, ds);
- }
- 
- static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
-@@ -3090,6 +3089,19 @@ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
-         goto out;
-     }
- 
-+    /*
-+     * An existing pending dimm state for this DIMM means that there is an
-+     * unplug operation in progress, waiting for the spapr_lmb_release
-+     * callback to complete the job (BQL can't cover that far). In this case,
-+     * bail out to avoid detaching DRCs that were already released.
-+     */
-+    if (spapr_pending_dimm_unplugs_find(spapr, dimm)) {
-+        error_setg(&local_err,
-+                   "Memory unplug already in progress for device %s",
-+                   dev->id);
-+        goto out;
-+    }
-+
-     spapr_pending_dimm_unplugs_add(spapr, nr_lmbs, dimm);
- 
-     addr = addr_start;
--- 
-2.13.6
+
+--j5dgg7LHtDEHjdgjOmdJrll1hrcaS1AVN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnb6l4ACgkQp6FrSiUn
+Q2polwf/RSaeXN0Kl13rXAOKK+q024ERyzTfnQ0Qyr40FMdHaWOObwTVFuYcEgIV
+w3MBqgvPMoMG4UoUwxB6rjs1NW3ObBZ8ZpWDXz5AY8GbeQACc/CFATSiehJAJYnA
+MgpKDR4Sq8eMLub/lztNCtpqnEpwLVEh7Uma9ehs5r2kmDydWDQzxtLcItfBzhVF
+WbotCrqC3RVGPLAAk6qr8YauH9BqnZGLDNSVDY1jyhAPc5XRMXwXBSrK3rs24gsF
+6NaBQDPDSW2oQjcpJItM/vpvTw7zcb8+AQxvbPe1jmHwhWsmgPKLw2dlVw+B6HKH
+Rc15tYHrJi6ZUWkFgk3YsA070QIbWQ==
+=JXFZ
+-----END PGP SIGNATURE-----
+
+--j5dgg7LHtDEHjdgjOmdJrll1hrcaS1AVN--
