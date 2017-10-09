@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e1bq4-0000Uz-WB
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e1bq6-0000VF-Mo
 	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:27:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e1bq0-0004cq-RV
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:27:36 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:19679 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e1bq1-0004eC-50
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:27:38 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:26309 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1e1bq0-0004Z7-Et
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:27:32 -0400
+	id 1e1bq0-0004ZH-O7
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:27:33 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon,  9 Oct 2017 20:27:20 +0300
-Message-Id: <20171009172723.190282-15-vsementsov@virtuozzo.com>
+Date: Mon,  9 Oct 2017 20:27:10 +0300
+Message-Id: <20171009172723.190282-5-vsementsov@virtuozzo.com>
 In-Reply-To: <20171009172723.190282-1-vsementsov@virtuozzo.com>
 References: <20171009172723.190282-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 07/10] nbd/client: refactor
- nbd_receive_starttls
+Subject: [Qemu-devel] [PATCH v2 02/10] block/nbd-client: refactor
+ nbd_co_receive_reply
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,118 +28,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Split out nbd_receive_simple_option to be reused for structured reply
-option.
+Pass handle parameter directly, as the whole request isn't needed.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- nbd/client.c     | 64 ++++++++++++++++++++++++++++++++++++++++----------------
- nbd/trace-events |  7 ++++---
- 2 files changed, 50 insertions(+), 21 deletions(-)
+ block/nbd-client.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/nbd/client.c b/nbd/client.c
-index cd5a2c80ac..c8702a80b1 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -540,35 +540,63 @@ static int nbd_receive_query_exports(QIOChannel *ioc,
-     }
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index ddf273a6a4..c0683c3c83 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -180,11 +180,11 @@ err:
  }
  
--static QIOChannel *nbd_receive_starttls(QIOChannel *ioc,
--                                        QCryptoTLSCreds *tlscreds,
--                                        const char *hostname, Error **errp)
-+/* nbd_request_simple_option
-+ * return 1 for successful negotiation,
-+ *        0 if operation is unsupported,
-+ *        -1 with errp set for any other error
-+ */
-+static int nbd_request_simple_option(QIOChannel *ioc, int opt, Error **errp)
+ static int nbd_co_receive_reply(NBDClientSession *s,
+-                                NBDRequest *request,
++                                uint64_t handle,
+                                 QEMUIOVector *qiov)
  {
-     nbd_opt_reply reply;
--    QIOChannelTLS *tioc;
--    struct NBDTLSHandshakeData data = { 0 };
+     int ret;
+-    int i = HANDLE_TO_INDEX(s, request->handle);
++    int i = HANDLE_TO_INDEX(s, handle);
  
--    trace_nbd_receive_starttls_request();
--    if (nbd_send_option_request(ioc, NBD_OPT_STARTTLS, 0, NULL, errp) < 0) {
--        return NULL;
-+    trace_nbd_receive_simple_option_request(opt, nbd_opt_lookup(opt));
-+    if (nbd_send_option_request(ioc, opt, 0, NULL, errp) < 0) {
-+        return -1;
+     /* Wait until we're woken up by nbd_read_reply_entry.  */
+     s->requests[i].receiving = true;
+@@ -193,7 +193,7 @@ static int nbd_co_receive_reply(NBDClientSession *s,
+     if (!s->ioc || s->quit) {
+         ret = -EIO;
+     } else {
+-        assert(s->reply.handle == request->handle);
++        assert(s->reply.handle == handle);
+         ret = -s->reply.error;
+         if (qiov && s->reply.error == 0) {
+             if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
+@@ -241,7 +241,7 @@ static int nbd_co_request(BlockDriverState *bs,
+         return ret;
      }
  
--    trace_nbd_receive_starttls_reply();
--    if (nbd_receive_option_reply(ioc, NBD_OPT_STARTTLS, &reply, errp) < 0) {
--        return NULL;
-+    trace_nbd_receive_simple_option_reply(opt, nbd_opt_lookup(opt));
-+    if (nbd_receive_option_reply(ioc, opt, &reply, errp) < 0) {
-+        return -1;
-     }
+-    return nbd_co_receive_reply(client, request,
++    return nbd_co_receive_reply(client, request->handle,
+                                 request->type == NBD_CMD_READ ? qiov : NULL);
+ }
  
--    if (reply.type != NBD_REP_ACK) {
--        error_setg(errp, "Server rejected request to start TLS %" PRIx32,
--                   reply.type);
-+    if (reply.length != 0) {
-+        error_setg(errp, "Option %d ('%s') response length is %" PRIu32
-+                   " (it should be zero)", opt, nbd_opt_lookup(opt),
-+                   reply.length);
-         nbd_send_opt_abort(ioc);
--        return NULL;
-+        return -1;
-     }
- 
--    if (reply.length != 0) {
--        error_setg(errp, "Start TLS response was not zero %" PRIu32,
--                   reply.length);
-+    if (reply.type == NBD_REP_ERR_UNSUP) {
-+        return 0;
-+    }
-+
-+    if (reply.type != NBD_REP_ACK) {
-+        error_setg(errp, "Server rejected request for option %d (%s) "
-+                   "with reply %" PRIx32 " (%s)", opt, nbd_opt_lookup(opt),
-+                   reply.type, nbd_rep_lookup(reply.type));
-         nbd_send_opt_abort(ioc);
-+        return -1;
-+    }
-+
-+    trace_nbd_receive_simple_option_approved(opt, nbd_opt_lookup(opt));
-+    return 1;
-+}
-+
-+static QIOChannel *nbd_receive_starttls(QIOChannel *ioc,
-+                                        QCryptoTLSCreds *tlscreds,
-+                                        const char *hostname, Error **errp)
-+{
-+    int ret;
-+    QIOChannelTLS *tioc;
-+    struct NBDTLSHandshakeData data = { 0 };
-+
-+    ret = nbd_request_simple_option(ioc, NBD_OPT_STARTTLS, errp);
-+    if (ret <= 0) {
-+        if (ret == 0) {
-+            error_setg(errp, "Server don't support STARTTLS option");
-+            nbd_send_opt_abort(ioc);
-+        }
-         return NULL;
-     }
- 
-diff --git a/nbd/trace-events b/nbd/trace-events
-index 48a4f27682..ea44e6963f 100644
---- a/nbd/trace-events
-+++ b/nbd/trace-events
-@@ -9,9 +9,10 @@ nbd_opt_go_info_unknown(int info, const char *name) "Ignoring unknown info %d (%
- nbd_opt_go_info_block_size(uint32_t minimum, uint32_t preferred, uint32_t maximum) "Block sizes are 0x%" PRIx32 ", 0x%" PRIx32 ", 0x%" PRIx32
- nbd_receive_query_exports_start(const char *wantname) "Querying export list for '%s'"
- nbd_receive_query_exports_success(const char *wantname) "Found desired export name '%s'"
--nbd_receive_starttls_request(void) "Requesting TLS from server"
--nbd_receive_starttls_reply(void) "Getting TLS reply from server"
--nbd_receive_starttls_new_client(void) "TLS request approved, setting up TLS"
-+nbd_receive_simple_option_request(int opt, const char *name) "Requesting option %d (%s) from server"
-+nbd_receive_simple_option_reply(int opt, const char *name) "Getting reply for option %d (%s) from server"
-+nbd_receive_simple_option_approved(int opt, const char *name) "Option %d (%s) approved"
-+nbd_receive_starttls_new_client(void) "Setting up TLS"
- nbd_receive_starttls_tls_handshake(void) "Starting TLS handshake"
- nbd_receive_negotiate(void *tlscreds, const char *hostname) "Receiving negotiation tlscreds=%p hostname=%s"
- nbd_receive_negotiate_magic(uint64_t magic) "Magic is 0x%" PRIx64
 -- 
 2.11.1
