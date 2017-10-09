@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e1Oc9-0000lB-Oi
-	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 23:20:22 -0400
+	(envelope-from <peterx@redhat.com>) id 1e1PAP-0007vA-S6
+	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 23:55:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1e1Oc5-0003Zn-Mh
-	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 23:20:21 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:37513)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1e1Oc5-0003Zc-DT
-	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 23:20:17 -0400
-Received: by mail-pf0-x241.google.com with SMTP id z80so5784163pff.4
-	for <qemu-devel@nongnu.org>; Sun, 08 Oct 2017 20:20:17 -0700 (PDT)
-References: <20170922151208.24590-1-aik@ozlabs.ru>
-	<df2f7ce1-a868-4a99-52ec-d4f934e1b7b7@redhat.com>
-	<f0f20f2a-6946-1b44-768f-3ec8035d5e74@ozlabs.ru>
-	<ba3606b7-1f69-9498-b480-8e24521718da@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <3da73e23-7c1b-aecc-a908-4774b0807b83@ozlabs.ru>
-Date: Mon, 9 Oct 2017 14:20:12 +1100
+	(envelope-from <peterx@redhat.com>) id 1e1PAK-00050R-QS
+	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 23:55:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45964)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e1PAK-0004zO-Gu
+	for qemu-devel@nongnu.org; Sun, 08 Oct 2017 23:55:40 -0400
+Date: Mon, 9 Oct 2017 11:55:33 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171009035533.GA2196@pxdev.xzpeter.org>
+References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
+	<1504081950-2528-25-git-send-email-peterx@redhat.com>
+	<20170922113318.GH2620@work-vm>
+	<20170928023001.GC17044@pxdev.xzpeter.org>
+	<20171002110445.GB2218@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <ba3606b7-1f69-9498-b480-8e24521718da@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH qemu] virtio-pci: Replace modern_as
- with direct access to modern_bar
+Content-Disposition: inline
+In-Reply-To: <20171002110445.GB2218@work-vm>
+Subject: Re: [Qemu-devel] [RFC v2 24/33] migration: synchronize dirty bitmap
+ for resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,29 +31,274 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On 06/10/17 23:58, Paolo Bonzini wrote:
-> On 03/10/2017 04:11, Alexey Kardashevskiy wrote:
->>>> What is best to do if MR is not found (and is it possible in practice)?
->>>> assert or redirect to unassigned memory?
->>> Do nothing at all, I think.
->> Repost without asserts?
+On Mon, Oct 02, 2017 at 12:04:46PM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > On Fri, Sep 22, 2017 at 12:33:19PM +0100, Dr. David Alan Gilbert wrote:
+> > > * Peter Xu (peterx@redhat.com) wrote:
+> > > > This patch implements the first part of core RAM resume logic for
+> > > > postcopy. ram_resume_prepare() is provided for the work.
+> > > > 
+> > > > When the migration is interrupted by network failure, the dirty bitmap
+> > > > on the source side will be meaningless, because even the dirty bit is
+> > > > cleared, it is still possible that the sent page was lost along the way
+> > > > to destination. Here instead of continue the migration with the old
+> > > > dirty bitmap on source, we ask the destination side to send back its
+> > > > received bitmap, then invert it to be our initial dirty bitmap.
+> > > > 
+> > > > The source side send thread will issue the MIG_CMD_RECV_BITMAP requests,
+> > > > once per ramblock, to ask for the received bitmap. On destination side,
+> > > > MIG_RP_MSG_RECV_BITMAP will be issued, along with the requested bitmap.
+> > > > Data will be received on the return-path thread of source, and the main
+> > > > migration thread will be notified when all the ramblock bitmaps are
+> > > > synchronized.
+> > > > 
+> > > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > > ---
+> > > >  migration/migration.c  |  4 +++
+> > > >  migration/migration.h  |  1 +
+> > > >  migration/ram.c        | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++
+> > > >  migration/trace-events |  4 +++
+> > > >  4 files changed, 76 insertions(+)
+> > > > 
+> > > > diff --git a/migration/migration.c b/migration/migration.c
+> > > > index 19b7f3a5..19aed72 100644
+> > > > --- a/migration/migration.c
+> > > > +++ b/migration/migration.c
+> > > > @@ -2605,6 +2605,8 @@ static void migration_instance_finalize(Object *obj)
+> > > >  
+> > > >      g_free(params->tls_hostname);
+> > > >      g_free(params->tls_creds);
+> > > > +
+> > > > +    qemu_sem_destroy(&ms->rp_state.rp_sem);
+> > > >  }
+> > > >  
+> > > >  static void migration_instance_init(Object *obj)
+> > > > @@ -2629,6 +2631,8 @@ static void migration_instance_init(Object *obj)
+> > > >      params->has_downtime_limit = true;
+> > > >      params->has_x_checkpoint_delay = true;
+> > > >      params->has_block_incremental = true;
+> > > > +
+> > > > +    qemu_sem_init(&ms->rp_state.rp_sem, 1);
+> > > >  }
+> > > >  
+> > > >  /*
+> > > > diff --git a/migration/migration.h b/migration/migration.h
+> > > > index a3a0582..d041369 100644
+> > > > --- a/migration/migration.h
+> > > > +++ b/migration/migration.h
+> > > > @@ -107,6 +107,7 @@ struct MigrationState
+> > > >          QEMUFile     *from_dst_file;
+> > > >          QemuThread    rp_thread;
+> > > >          bool          error;
+> > > > +        QemuSemaphore rp_sem;
+> > > >      } rp_state;
+> > > >  
+> > > >      double mbps;
+> > > > diff --git a/migration/ram.c b/migration/ram.c
+> > > > index 5d938e3..afabcf5 100644
+> > > > --- a/migration/ram.c
+> > > > +++ b/migration/ram.c
+> > > > @@ -47,6 +47,7 @@
+> > > >  #include "exec/target_page.h"
+> > > >  #include "qemu/rcu_queue.h"
+> > > >  #include "migration/colo.h"
+> > > > +#include "savevm.h"
+> > > >  
+> > > >  /***********************************************************/
+> > > >  /* ram save/restore */
+> > > > @@ -295,6 +296,8 @@ struct RAMState {
+> > > >      RAMBlock *last_req_rb;
+> > > >      /* Queue of outstanding page requests from the destination */
+> > > >      QemuMutex src_page_req_mutex;
+> > > > +    /* Ramblock counts to sync dirty bitmap. Only used for recovery */
+> > > > +    int ramblock_to_sync;
+> > > >      QSIMPLEQ_HEAD(src_page_requests, RAMSrcPageRequest) src_page_requests;
+> > > >  };
+> > > >  typedef struct RAMState RAMState;
+> > > > @@ -2770,6 +2773,56 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+> > > >      return ret;
+> > > >  }
+> > > >  
+> > > > +/* Sync all the dirty bitmap with destination VM.  */
+> > > > +static int ram_dirty_bitmap_sync_all(MigrationState *s, RAMState *rs)
+> > > > +{
+> > > > +    RAMBlock *block;
+> > > > +    QEMUFile *file = s->to_dst_file;
+> > > > +    int ramblock_count = 0;
+> > > > +
+> > > > +    trace_ram_dirty_bitmap_sync_start();
+> > > > +
+> > > > +    /*
+> > > > +     * We do this in such order:
+> > > > +     *
+> > > > +     * 1. calculate block count
+> > > > +     * 2. fill in the count to N
+> > > > +     * 3. send MIG_CMD_RECV_BITMAP requests
+> > > > +     * 4. wait on the semaphore until N -> 0
+> > > > +     */
+> > > > +
+> > > > +    RAMBLOCK_FOREACH(block) {
+> > > > +        ramblock_count++;
+> > > > +    }
+> > > > +
+> > > > +    atomic_set(&rs->ramblock_to_sync, ramblock_count);
+> > > > +    RAMBLOCK_FOREACH(block) {
+> > > > +        qemu_savevm_send_recv_bitmap(file, block->idstr);
+> > > > +    }
+> > > > +
+> > > > +    trace_ram_dirty_bitmap_sync_wait();
+> > > 
+> > > Please include the RAMBlock name in the trace, so if it hangs we can
+> > > see where.
+> > 
+> > This is to note when we start to wait, while there is a trace below
+> > when we reload one single ramblock at [1].  Would that suffice?
 > 
-> Yes, I guess so.
+> If you easily have the name, it's worth including it in the trace before
+> you wait, so that if it fails and never gets out of this wait we'd
+> have the trace telling us the block it was waiting in.
 
-easy, done :)
+I see your point.  Currently I am sending the MIG_CMD_RECV_BITMAP cmds
+in batch, so there's no obvious way to know which one we are waiting
+for (actually currently logic would allow the destination to send back
+the ramblock bitmaps in different order as it wishes).  But I can add
+one more trace here:
+
+    RAMBLOCK_FOREACH(block) {
+        qemu_savevm_send_recv_bitmap(file, block->idstr);
+        trace_ram_dirty_bitmap_request(block->idstr);
+        ramblock_count++;
+    }
+
+And assuming destination is actually sending these bitmaps in order,
+then on console if we stuck at ramblock2, we can at least see:
+
+ram_dirty_bitmap_request: ramblock1
+ram_dirty_bitmap_request: ramblock2
+ram_dirty_bitmap_request: ramblock3
+...
+ram_dirty_bitmap_reload: ramblock1
+[console stuck here]
+
+I can also add one more trace at the entry of
+ram_dirty_bitmap_reload() if you like, so that if transmission is
+interrupted during sending one single bitmap we'll know exactly which
+bitmap we are sending.
 
 > 
->>> I haven't thought much about the endian switches, but it looks good
->>> apart from that.
->> What is next? Michael?
+> Dave
 > 
-> Yes, I was going to ping him about this patch too.
-> 
-> Paolo
-
+> > > 
+> > > > +
+> > > > +    /* Wait until all the ramblocks' dirty bitmap synced */
+> > > > +    while (atomic_read(&rs->ramblock_to_sync)) {
+> > > > +        qemu_sem_wait(&s->rp_state.rp_sem);
+> > > > +    }
+> > > 
+> > > Do you need to make ramblock_to_sync global and use atomics - I think
+> > > you can simplify it;  if you qemu_sem_init to 0, then I think you
+> > > can do:
+> > >    while (ramblock_count--) {
+> > >        qemu_sem_wait(&s->rp_state.rp_sem);
+> > >    }
+> > > 
+> > > qemu_sem_wait will block until the semaphore is >0....
+> > 
+> > You are right!
+> > 
+> > > 
+> > > > +
+> > > > +    trace_ram_dirty_bitmap_sync_complete();
+> > > > +
+> > > > +    return 0;
+> > > > +}
+> > > > +
+> > > > +static void ram_dirty_bitmap_reload_notify(MigrationState *s)
+> > > > +{
+> > > > +    atomic_dec(&ram_state->ramblock_to_sync);
+> > > > +    if (ram_state->ramblock_to_sync == 0) {
+> > > > +        /* Make sure the other thread gets the latest */
+> > > > +        trace_ram_dirty_bitmap_sync_notify();
+> > > > +        qemu_sem_post(&s->rp_state.rp_sem);
+> > > > +    }
+> > > 
+> > > then with the suggestion above you just do a qemu_sem_post each time.
+> > 
+> > Yes.  I'll also remove the notify trace since there is a better
+> > tracepoint before calling this function.
+> > 
+> > > 
+> > > > +}
+> > > > +
+> > > >  /*
+> > > >   * Read the received bitmap, revert it as the initial dirty bitmap.
+> > > >   * This is only used when the postcopy migration is paused but wants
+> > > > @@ -2841,12 +2894,25 @@ int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *block)
+> > > >  
+> > > >      trace_ram_dirty_bitmap_reload(block->idstr);
+> > 
+> > [1]
+> > 
+> > > >  
+> > > > +    /*
+> > > > +     * We succeeded to sync bitmap for current ramblock. If this is
+> > > > +     * the last one to sync, we need to notify the main send thread.
+> > > > +     */
+> > > > +    ram_dirty_bitmap_reload_notify(s);
+> > > > +
+> > > >      ret = 0;
+> > > >  out:
+> > > >      free(le_bitmap);
+> > > >      return ret;
+> > > >  }
+> > > >  
+> > > > +static int ram_resume_prepare(MigrationState *s, void *opaque)
+> > > > +{
+> > > > +    RAMState *rs = *(RAMState **)opaque;
+> > > > +
+> > > > +    return ram_dirty_bitmap_sync_all(s, rs);
+> > > > +}
+> > > > +
+> > > >  static SaveVMHandlers savevm_ram_handlers = {
+> > > >      .save_setup = ram_save_setup,
+> > > >      .save_live_iterate = ram_save_iterate,
+> > > > @@ -2857,6 +2923,7 @@ static SaveVMHandlers savevm_ram_handlers = {
+> > > >      .save_cleanup = ram_save_cleanup,
+> > > >      .load_setup = ram_load_setup,
+> > > >      .load_cleanup = ram_load_cleanup,
+> > > > +    .resume_prepare = ram_resume_prepare,
+> > > >  };
+> > > >  
+> > > >  void ram_mig_init(void)
+> > > > diff --git a/migration/trace-events b/migration/trace-events
+> > > > index 61b0d49..8962916 100644
+> > > > --- a/migration/trace-events
+> > > > +++ b/migration/trace-events
+> > > > @@ -81,6 +81,10 @@ ram_postcopy_send_discard_bitmap(void) ""
+> > > >  ram_save_page(const char *rbname, uint64_t offset, void *host) "%s: offset: 0x%" PRIx64 " host: %p"
+> > > >  ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: 0x%zx len: 0x%zx"
+> > > >  ram_dirty_bitmap_reload(char *str) "%s"
+> > > > +ram_dirty_bitmap_sync_start(void) ""
+> > > > +ram_dirty_bitmap_sync_wait(void) ""
+> > > > +ram_dirty_bitmap_sync_notify(void) ""
+> > > > +ram_dirty_bitmap_sync_complete(void) ""
+> > > >  
+> > > >  # migration/migration.c
+> > > >  await_return_path_close_on_source_close(void) ""
+> > > > -- 
+> > > > 2.7.4
+> > > > 
+> > > > 
+> > > --
+> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> > -- 
+> > Peter Xu
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 -- 
-Alexey
+Peter Xu
