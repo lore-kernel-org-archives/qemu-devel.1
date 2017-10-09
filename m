@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e1hVr-0006ui-O6
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 19:31:12 -0400
+	(envelope-from <jsnow@redhat.com>) id 1e1him-0000iz-VB
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 19:44:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e1hVm-0006Ty-RM
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 19:31:07 -0400
-Date: Mon, 9 Oct 2017 19:30:47 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20171009233047.GD5170@localhost.localdomain>
-References: <20171009215533.12530-1-mreitz@redhat.com>
-	<20171009215533.12530-4-mreitz@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1e1hil-0003lR-PO
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 19:44:29 -0400
+References: <20171002143919.207741-1-vsementsov@virtuozzo.com>
+	<20171002143919.207741-5-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <a7594875-cd6f-8195-4b86-d7f67ad9f208@redhat.com>
+Date: Mon, 9 Oct 2017 19:44:14 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171009215533.12530-4-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/3] iotests: Add
- cluster_size=64k to 125
+In-Reply-To: <20171002143919.207741-5-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/5] backup: simplify non-dirty bits
+ progress processing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,870 +25,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 
-On Mon, Oct 09, 2017 at 11:55:33PM +0200, Max Reitz wrote:
-> Apparently it would be a good idea to test that, too.
+
+
+On 10/02/2017 10:39 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Set fake progress for non-dirty clusters in copy_bitmap initialization,
+> to. It simplifies code and allows further refactoring.
 > 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  tests/qemu-iotests/125     |   7 +-
->  tests/qemu-iotests/125.out | 480 ++++++++++++++++++++++++++++++++++++++++-----
->  2 files changed, 437 insertions(+), 50 deletions(-)
 > 
-> diff --git a/tests/qemu-iotests/125 b/tests/qemu-iotests/125
-> index 9424313e82..c20c71570c 100755
-> --- a/tests/qemu-iotests/125
-> +++ b/tests/qemu-iotests/125
-> @@ -69,13 +69,15 @@ fi
->  # in B
->  CREATION_SIZE=$((2 * 1024 * 1024 - 48 * 1024))
->  
-> +# 512 is the actual test -- but it's good to test 64k as well, just to be sure.
-> +for cluster_size in 512 64k; do
->  # in kB
->  for GROWTH_SIZE in 16 48 80; do
->      for create_mode in off metadata falloc full; do
->          for growth_mode in off metadata falloc full; do
-> -            echo "--- growth_size=$GROWTH_SIZE create_mode=$create_mode growth_mode=$growth_mode ---"
-> +            echo "--- cluster_size=$cluster_size growth_size=$GROWTH_SIZE create_mode=$create_mode growth_mode=$growth_mode ---"
->  
-> -            IMGOPTS="preallocation=$create_mode,cluster_size=512" _make_test_img ${CREATION_SIZE}
-> +            IMGOPTS="preallocation=$create_mode,cluster_size=$cluster_size" _make_test_img ${CREATION_SIZE}
->              $QEMU_IMG resize -f "$IMGFMT" --preallocation=$growth_mode "$TEST_IMG" +${GROWTH_SIZE}K
->  
->              host_size_0=$(get_image_size_on_host)
-> @@ -123,6 +125,7 @@ for GROWTH_SIZE in 16 48 80; do
->          done
->      done
->  done
-> +done
->  
->  # success, all done
->  echo '*** done'
-> diff --git a/tests/qemu-iotests/125.out b/tests/qemu-iotests/125.out
-> index 3f4d6e31a6..596905f533 100644
-> --- a/tests/qemu-iotests/125.out
-> +++ b/tests/qemu-iotests/125.out
-> @@ -1,5 +1,5 @@
->  QA output created by 125
-> ---- growth_size=16 create_mode=off growth_mode=off ---
-> +--- cluster_size=512 growth_size=16 create_mode=off growth_mode=off ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -7,7 +7,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 16384/16384 bytes at offset 2048000
->  16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=16 create_mode=off growth_mode=metadata ---
-> +--- cluster_size=512 growth_size=16 create_mode=off growth_mode=metadata ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -15,7 +15,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 16384/16384 bytes at offset 2048000
->  16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=16 create_mode=off growth_mode=falloc ---
-> +--- cluster_size=512 growth_size=16 create_mode=off growth_mode=falloc ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -23,7 +23,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 16384/16384 bytes at offset 2048000
->  16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=16 create_mode=off growth_mode=full ---
-> +--- cluster_size=512 growth_size=16 create_mode=off growth_mode=full ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -31,7 +31,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 16384/16384 bytes at offset 2048000
->  16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=16 create_mode=metadata growth_mode=off ---
-> +--- cluster_size=512 growth_size=16 create_mode=metadata growth_mode=off ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -39,7 +39,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 16384/16384 bytes at offset 2048000
->  16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=16 create_mode=metadata growth_mode=metadata ---
-> +--- cluster_size=512 growth_size=16 create_mode=metadata growth_mode=metadata ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -47,7 +47,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 16384/16384 bytes at offset 2048000
->  16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=16 create_mode=metadata growth_mode=falloc ---
-> +--- cluster_size=512 growth_size=16 create_mode=metadata growth_mode=falloc ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -55,7 +55,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 16384/16384 bytes at offset 2048000
->  16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=16 create_mode=metadata growth_mode=full ---
-> +--- cluster_size=512 growth_size=16 create_mode=metadata growth_mode=full ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -63,7 +63,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 16384/16384 bytes at offset 2048000
->  16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=16 create_mode=falloc growth_mode=off ---
-> +--- cluster_size=512 growth_size=16 create_mode=falloc growth_mode=off ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -71,7 +71,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 16384/16384 bytes at offset 2048000
->  16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=16 create_mode=falloc growth_mode=metadata ---
-> +--- cluster_size=512 growth_size=16 create_mode=falloc growth_mode=metadata ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -79,7 +79,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 16384/16384 bytes at offset 2048000
->  16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=16 create_mode=falloc growth_mode=falloc ---
-> +--- cluster_size=512 growth_size=16 create_mode=falloc growth_mode=falloc ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -87,7 +87,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 16384/16384 bytes at offset 2048000
->  16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=16 create_mode=falloc growth_mode=full ---
-> +--- cluster_size=512 growth_size=16 create_mode=falloc growth_mode=full ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -95,7 +95,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 16384/16384 bytes at offset 2048000
->  16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=16 create_mode=full growth_mode=off ---
-> +--- cluster_size=512 growth_size=16 create_mode=full growth_mode=off ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -103,7 +103,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 16384/16384 bytes at offset 2048000
->  16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=16 create_mode=full growth_mode=metadata ---
-> +--- cluster_size=512 growth_size=16 create_mode=full growth_mode=metadata ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -111,7 +111,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 16384/16384 bytes at offset 2048000
->  16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=16 create_mode=full growth_mode=falloc ---
-> +--- cluster_size=512 growth_size=16 create_mode=full growth_mode=falloc ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -119,7 +119,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 16384/16384 bytes at offset 2048000
->  16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=16 create_mode=full growth_mode=full ---
-> +--- cluster_size=512 growth_size=16 create_mode=full growth_mode=full ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -127,7 +127,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 16384/16384 bytes at offset 2048000
->  16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=48 create_mode=off growth_mode=off ---
-> +--- cluster_size=512 growth_size=48 create_mode=off growth_mode=off ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -135,7 +135,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 49152/49152 bytes at offset 2048000
->  48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=48 create_mode=off growth_mode=metadata ---
-> +--- cluster_size=512 growth_size=48 create_mode=off growth_mode=metadata ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -143,7 +143,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 49152/49152 bytes at offset 2048000
->  48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=48 create_mode=off growth_mode=falloc ---
-> +--- cluster_size=512 growth_size=48 create_mode=off growth_mode=falloc ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -151,7 +151,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 49152/49152 bytes at offset 2048000
->  48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=48 create_mode=off growth_mode=full ---
-> +--- cluster_size=512 growth_size=48 create_mode=off growth_mode=full ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -159,7 +159,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 49152/49152 bytes at offset 2048000
->  48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=48 create_mode=metadata growth_mode=off ---
-> +--- cluster_size=512 growth_size=48 create_mode=metadata growth_mode=off ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -167,7 +167,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 49152/49152 bytes at offset 2048000
->  48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=48 create_mode=metadata growth_mode=metadata ---
-> +--- cluster_size=512 growth_size=48 create_mode=metadata growth_mode=metadata ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -175,7 +175,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 49152/49152 bytes at offset 2048000
->  48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=48 create_mode=metadata growth_mode=falloc ---
-> +--- cluster_size=512 growth_size=48 create_mode=metadata growth_mode=falloc ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -183,7 +183,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 49152/49152 bytes at offset 2048000
->  48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=48 create_mode=metadata growth_mode=full ---
-> +--- cluster_size=512 growth_size=48 create_mode=metadata growth_mode=full ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -191,7 +191,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 49152/49152 bytes at offset 2048000
->  48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=48 create_mode=falloc growth_mode=off ---
-> +--- cluster_size=512 growth_size=48 create_mode=falloc growth_mode=off ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -199,7 +199,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 49152/49152 bytes at offset 2048000
->  48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=48 create_mode=falloc growth_mode=metadata ---
-> +--- cluster_size=512 growth_size=48 create_mode=falloc growth_mode=metadata ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -207,7 +207,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 49152/49152 bytes at offset 2048000
->  48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=48 create_mode=falloc growth_mode=falloc ---
-> +--- cluster_size=512 growth_size=48 create_mode=falloc growth_mode=falloc ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -215,7 +215,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 49152/49152 bytes at offset 2048000
->  48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=48 create_mode=falloc growth_mode=full ---
-> +--- cluster_size=512 growth_size=48 create_mode=falloc growth_mode=full ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -223,7 +223,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 49152/49152 bytes at offset 2048000
->  48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=48 create_mode=full growth_mode=off ---
-> +--- cluster_size=512 growth_size=48 create_mode=full growth_mode=off ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -231,7 +231,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 49152/49152 bytes at offset 2048000
->  48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=48 create_mode=full growth_mode=metadata ---
-> +--- cluster_size=512 growth_size=48 create_mode=full growth_mode=metadata ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -239,7 +239,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 49152/49152 bytes at offset 2048000
->  48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=48 create_mode=full growth_mode=falloc ---
-> +--- cluster_size=512 growth_size=48 create_mode=full growth_mode=falloc ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -247,7 +247,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 49152/49152 bytes at offset 2048000
->  48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=48 create_mode=full growth_mode=full ---
-> +--- cluster_size=512 growth_size=48 create_mode=full growth_mode=full ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -255,7 +255,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 49152/49152 bytes at offset 2048000
->  48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=80 create_mode=off growth_mode=off ---
-> +--- cluster_size=512 growth_size=80 create_mode=off growth_mode=off ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -263,7 +263,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 81920/81920 bytes at offset 2048000
->  80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=80 create_mode=off growth_mode=metadata ---
-> +--- cluster_size=512 growth_size=80 create_mode=off growth_mode=metadata ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -271,7 +271,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 81920/81920 bytes at offset 2048000
->  80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=80 create_mode=off growth_mode=falloc ---
-> +--- cluster_size=512 growth_size=80 create_mode=off growth_mode=falloc ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -279,7 +279,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 81920/81920 bytes at offset 2048000
->  80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=80 create_mode=off growth_mode=full ---
-> +--- cluster_size=512 growth_size=80 create_mode=off growth_mode=full ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -287,7 +287,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 81920/81920 bytes at offset 2048000
->  80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=80 create_mode=metadata growth_mode=off ---
-> +--- cluster_size=512 growth_size=80 create_mode=metadata growth_mode=off ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -295,7 +295,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 81920/81920 bytes at offset 2048000
->  80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=80 create_mode=metadata growth_mode=metadata ---
-> +--- cluster_size=512 growth_size=80 create_mode=metadata growth_mode=metadata ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -303,7 +303,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 81920/81920 bytes at offset 2048000
->  80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=80 create_mode=metadata growth_mode=falloc ---
-> +--- cluster_size=512 growth_size=80 create_mode=metadata growth_mode=falloc ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -311,7 +311,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 81920/81920 bytes at offset 2048000
->  80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=80 create_mode=metadata growth_mode=full ---
-> +--- cluster_size=512 growth_size=80 create_mode=metadata growth_mode=full ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -319,7 +319,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 81920/81920 bytes at offset 2048000
->  80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=80 create_mode=falloc growth_mode=off ---
-> +--- cluster_size=512 growth_size=80 create_mode=falloc growth_mode=off ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -327,7 +327,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 81920/81920 bytes at offset 2048000
->  80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=80 create_mode=falloc growth_mode=metadata ---
-> +--- cluster_size=512 growth_size=80 create_mode=falloc growth_mode=metadata ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -335,7 +335,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 81920/81920 bytes at offset 2048000
->  80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=80 create_mode=falloc growth_mode=falloc ---
-> +--- cluster_size=512 growth_size=80 create_mode=falloc growth_mode=falloc ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -343,7 +343,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 81920/81920 bytes at offset 2048000
->  80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=80 create_mode=falloc growth_mode=full ---
-> +--- cluster_size=512 growth_size=80 create_mode=falloc growth_mode=full ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -351,7 +351,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 81920/81920 bytes at offset 2048000
->  80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=80 create_mode=full growth_mode=off ---
-> +--- cluster_size=512 growth_size=80 create_mode=full growth_mode=off ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -359,7 +359,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 81920/81920 bytes at offset 2048000
->  80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=80 create_mode=full growth_mode=metadata ---
-> +--- cluster_size=512 growth_size=80 create_mode=full growth_mode=metadata ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -367,7 +367,7 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 81920/81920 bytes at offset 2048000
->  80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=80 create_mode=full growth_mode=falloc ---
-> +--- cluster_size=512 growth_size=80 create_mode=full growth_mode=falloc ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> @@ -375,7 +375,391 @@ wrote 2048000/2048000 bytes at offset 0
->  wrote 81920/81920 bytes at offset 2048000
->  80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
-> ---- growth_size=80 create_mode=full growth_mode=full ---
-> +--- cluster_size=512 growth_size=80 create_mode=full growth_mode=full ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 81920/81920 bytes at offset 2048000
-> +80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=16 create_mode=off growth_mode=off ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 16384/16384 bytes at offset 2048000
-> +16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=16 create_mode=off growth_mode=metadata ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 16384/16384 bytes at offset 2048000
-> +16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=16 create_mode=off growth_mode=falloc ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 16384/16384 bytes at offset 2048000
-> +16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=16 create_mode=off growth_mode=full ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 16384/16384 bytes at offset 2048000
-> +16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=16 create_mode=metadata growth_mode=off ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 16384/16384 bytes at offset 2048000
-> +16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=16 create_mode=metadata growth_mode=metadata ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 16384/16384 bytes at offset 2048000
-> +16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=16 create_mode=metadata growth_mode=falloc ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 16384/16384 bytes at offset 2048000
-> +16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=16 create_mode=metadata growth_mode=full ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 16384/16384 bytes at offset 2048000
-> +16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=16 create_mode=falloc growth_mode=off ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 16384/16384 bytes at offset 2048000
-> +16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=16 create_mode=falloc growth_mode=metadata ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 16384/16384 bytes at offset 2048000
-> +16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=16 create_mode=falloc growth_mode=falloc ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 16384/16384 bytes at offset 2048000
-> +16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=16 create_mode=falloc growth_mode=full ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 16384/16384 bytes at offset 2048000
-> +16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=16 create_mode=full growth_mode=off ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 16384/16384 bytes at offset 2048000
-> +16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=16 create_mode=full growth_mode=metadata ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 16384/16384 bytes at offset 2048000
-> +16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=16 create_mode=full growth_mode=falloc ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 16384/16384 bytes at offset 2048000
-> +16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=16 create_mode=full growth_mode=full ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 16384/16384 bytes at offset 2048000
-> +16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=48 create_mode=off growth_mode=off ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 49152/49152 bytes at offset 2048000
-> +48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=48 create_mode=off growth_mode=metadata ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 49152/49152 bytes at offset 2048000
-> +48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=48 create_mode=off growth_mode=falloc ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 49152/49152 bytes at offset 2048000
-> +48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=48 create_mode=off growth_mode=full ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 49152/49152 bytes at offset 2048000
-> +48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=48 create_mode=metadata growth_mode=off ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 49152/49152 bytes at offset 2048000
-> +48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=48 create_mode=metadata growth_mode=metadata ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 49152/49152 bytes at offset 2048000
-> +48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=48 create_mode=metadata growth_mode=falloc ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 49152/49152 bytes at offset 2048000
-> +48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=48 create_mode=metadata growth_mode=full ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 49152/49152 bytes at offset 2048000
-> +48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=48 create_mode=falloc growth_mode=off ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 49152/49152 bytes at offset 2048000
-> +48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=48 create_mode=falloc growth_mode=metadata ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 49152/49152 bytes at offset 2048000
-> +48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=48 create_mode=falloc growth_mode=falloc ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 49152/49152 bytes at offset 2048000
-> +48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=48 create_mode=falloc growth_mode=full ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 49152/49152 bytes at offset 2048000
-> +48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=48 create_mode=full growth_mode=off ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 49152/49152 bytes at offset 2048000
-> +48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=48 create_mode=full growth_mode=metadata ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 49152/49152 bytes at offset 2048000
-> +48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=48 create_mode=full growth_mode=falloc ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 49152/49152 bytes at offset 2048000
-> +48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=48 create_mode=full growth_mode=full ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 49152/49152 bytes at offset 2048000
-> +48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=80 create_mode=off growth_mode=off ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 81920/81920 bytes at offset 2048000
-> +80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=80 create_mode=off growth_mode=metadata ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 81920/81920 bytes at offset 2048000
-> +80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=80 create_mode=off growth_mode=falloc ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 81920/81920 bytes at offset 2048000
-> +80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=80 create_mode=off growth_mode=full ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 81920/81920 bytes at offset 2048000
-> +80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=80 create_mode=metadata growth_mode=off ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 81920/81920 bytes at offset 2048000
-> +80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=80 create_mode=metadata growth_mode=metadata ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 81920/81920 bytes at offset 2048000
-> +80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=80 create_mode=metadata growth_mode=falloc ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 81920/81920 bytes at offset 2048000
-> +80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=80 create_mode=metadata growth_mode=full ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 81920/81920 bytes at offset 2048000
-> +80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=80 create_mode=falloc growth_mode=off ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 81920/81920 bytes at offset 2048000
-> +80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=80 create_mode=falloc growth_mode=metadata ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 81920/81920 bytes at offset 2048000
-> +80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=80 create_mode=falloc growth_mode=falloc ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 81920/81920 bytes at offset 2048000
-> +80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=80 create_mode=falloc growth_mode=full ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 81920/81920 bytes at offset 2048000
-> +80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=80 create_mode=full growth_mode=off ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 81920/81920 bytes at offset 2048000
-> +80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=80 create_mode=full growth_mode=metadata ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 81920/81920 bytes at offset 2048000
-> +80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=80 create_mode=full growth_mode=falloc ---
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-> +Image resized.
-> +wrote 2048000/2048000 bytes at offset 0
-> +1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +wrote 81920/81920 bytes at offset 2048000
-> +80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +
-> +--- cluster_size=64k growth_size=80 create_mode=full growth_mode=full ---
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
->  Image resized.
->  wrote 2048000/2048000 bytes at offset 0
-> -- 
-> 2.13.6
+> Motivation (some of these paragraphs may be needed in commit message...)
 > 
+
+lol! "pick and choose which paragraphs look good, stick some up there,
+maybe?"
+
+> 1. Current behavior is not good: setting fake progress leads to progress
+> hopping, so actually for sparse disk progress say nothing. We just move
+> all these hops to the beginning.
 > 
+
+To be fair, if it's sparse, the first update will be very soon.
+
+> 2. Big hop in the beginning is possible now too: if there is a hole at
+> the beginning of virtual disk.
+> 
+> 3. Now, there are some excuses for old behavior in comparison to new one:
+> backup progress is linear, cluster by cluster. But in future cluster
+> copying will be done by several coroutine-workers, several requests in
+> parallel, so it will make no sense to publish fake progress by parts in
+> parallel with non-sequential requests.
+> 
+
+I agree.
+
+> 4. Actually it's just a point of view: when we are actually skip clusters?
+> If go through disk sequentially, it's logical to say, that we skip clusters
+> between copied portions to the left and to the right of them. But even know
+> copying progress is not sequential because of write notifiers.
+> If copying is async, non-sequential, we can say in the very beginning, that
+> we skip these clusters and do not think about them later.
+> 
+
+Good observation.
+
+> So, I don't want to maintain portions of fake progress in the new backup
+> architecture. I understand, that this patch will change user's view
+> of backup progress, but formally it doesn't change: progress hops are just
+> moved to the beginning. Progress was meaningless for incremental backup and
+> it remains meaningless.
+> 
+
+Haha. Not meaningless, but it does carry less information than other
+progress meters. It is effectively a % complete meter, with a really bad
+estimate.
+
+> But what should we do with progress, really? It's obvious, that we need at
+> least one more field for block job status, for example, "skipped", which
+> would be amount of bytes which are not really processed but skipped by the
+> block job. So, more real progress may be calculated (by management tool) like
+> 
+> (job.offset - job.skipped) / (job.len - job.skipped)
+> 
+
+I'm not sure we actually need a new field... let's just say that the job
+length is the number of bytes described by the incremental backup. Every
+time we copy some, move offset forward. This would give a more
+appropriately linear/accurate sense of the progress.
+
+I think we are allowed to do this as I think we promise that these
+progress numbers mean essentially nothing...
+
+New fields that actually *do* report meaningful information, however,
+could be added. bytesCopied would be a prime candidate.
+
+> And this progress will be more precise if information about skipped bytes
+> is provided earlier, and current patch is close to this idea.
+> 
+> So, if you agree, I can make a patch for 'skipped' too, but it actually not
+> related to the series, so I hope that current patch will be merged anyway.
+> (I need it for backup refactoring, not for accurate progress)
+> 
+
+>  block/backup.c | 18 +++---------------
+>  1 file changed, 3 insertions(+), 15 deletions(-)
+> 
+> diff --git a/block/backup.c b/block/backup.c
+> index 07f4ae846b..52df7bb19e 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -369,7 +369,6 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+>      int64_t offset;
+>      int64_t cluster;
+>      int64_t end;
+> -    int64_t last_cluster = -1;
+>      BdrvDirtyBitmapIter *dbi;
+>  
+>      granularity = bdrv_dirty_bitmap_granularity(job->sync_bitmap);
+> @@ -380,12 +379,6 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+>      while ((offset = bdrv_dirty_iter_next(dbi)) >= 0) {
+>          cluster = offset / job->cluster_size;
+>  
+> -        /* Fake progress updates for any clusters we skipped */
+> -        if (cluster != last_cluster + 1) {
+> -            job->common.offset += ((cluster - last_cluster - 1) *
+> -                                   job->cluster_size);
+> -        }
+> -
+>          for (end = cluster + clusters_per_iter; cluster < end; cluster++) {
+>              do {
+>                  if (yield_and_check(job)) {
+> @@ -407,14 +400,6 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+>          if (granularity < job->cluster_size) {
+>              bdrv_set_dirty_iter(dbi, cluster * job->cluster_size);
+>          }
+> -
+> -        last_cluster = cluster - 1;
+> -    }
+> -
+> -    /* Play some final catchup with the progress meter */
+> -    end = DIV_ROUND_UP(job->common.len, job->cluster_size);
+> -    if (last_cluster + 1 < end) {
+> -        job->common.offset += ((end - last_cluster - 1) * job->cluster_size);
+>      }
+>  
+>  out:
+> @@ -456,6 +441,9 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
+>          bdrv_set_dirty_iter(dbi, next_cluster * job->cluster_size);
+>      }
+>  
+> +    job->common.offset = job->common.len -
+> +                         hbitmap_count(job->copy_bitmap) * job->cluster_size;
+> +
+>      bdrv_dirty_iter_free(dbi);
+>  }
+>  
+> 
+
+Anything that makes less lines of code is nice, though, so if we cannot
+reduce the length of the job:
+
+Reviewed-by: John Snow <jsnow@redhat.com>
