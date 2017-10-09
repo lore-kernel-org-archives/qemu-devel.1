@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e1dcs-0006q2-5x
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:22:07 -0400
+	(envelope-from <cota@braap.org>) id 1e1dfj-0007Ze-By
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:25:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e1dcr-0000M7-3U
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:22:06 -0400
-References: <20171009172723.190282-1-vsementsov@virtuozzo.com>
-	<20171009172723.190282-11-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c3bf5c86-a1aa-5330-ce46-223c57866136@redhat.com>
-Date: Mon, 9 Oct 2017 14:21:55 -0500
+	(envelope-from <cota@braap.org>) id 1e1dfe-0001Th-Q9
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:25:03 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:41877)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1e1dfe-0001SQ-JB
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:24:58 -0400
+Date: Mon, 9 Oct 2017 15:24:55 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20171009192455.GA27135@flamenco>
+References: <1500616763-26560-1-git-send-email-cota@braap.org>
+	<1500616763-26560-2-git-send-email-cota@braap.org>
+	<CAJhHMCBpo1-6x9wJWE2oSv1RB=vH-WbA0RjMWYox_dtFfLAURA@mail.gmail.com>
+	<20170829211649.GA9108@flamenco>
+	<CAJhHMCAwpMHAiOeBZ+F2c0yKFPQxU3nU7+FGf75wOqFnYEc43w@mail.gmail.com>
+	<20170922204018.GA23631@flamenco>
+	<00656f91-760f-c46f-86dc-6c0d29192b3b@linaro.org>
+	<20171005232416.GA23670@flamenco>
 MIME-Version: 1.0
-In-Reply-To: <20171009172723.190282-11-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2t8qbNhLMnBtmQRJaSAFBakIcCklehI58"
-Subject: Re: [Qemu-devel] [PATCH v2 05/10] nbd: header constants indenting
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171005232416.GA23670@flamenco>
+Subject: Re: [Qemu-devel] [PATCH v4 11/43] tcg: define CF_PARALLEL and use
+ it for TB hashing along with CF_COUNT_MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +34,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Pranith Kumar <bobby.prani+qemu@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2t8qbNhLMnBtmQRJaSAFBakIcCklehI58
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
-Message-ID: <c3bf5c86-a1aa-5330-ce46-223c57866136@redhat.com>
-Subject: Re: [PATCH v2 05/10] nbd: header constants indenting
-References: <20171009172723.190282-1-vsementsov@virtuozzo.com>
- <20171009172723.190282-11-vsementsov@virtuozzo.com>
-In-Reply-To: <20171009172723.190282-11-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Oct 05, 2017 at 19:24:16 -0400, Emilio G. Cota wrote:
+> I'm including the fixups below.
 
-On 10/09/2017 12:27 PM, Vladimir Sementsov-Ogievskiy wrote:
-> Prepare indenting for the following commit.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/block/nbd.h | 15 ++++++++-------
->  nbd/nbd-internal.h  | 34 +++++++++++++++++-----------------
->  2 files changed, 25 insertions(+), 24 deletions(-)
+Just pushed v5 of this series. I rebased the series on top of the current master,
+and added the already mentioned fixes plus a new one (see below).
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Grab the patches from:
+  https://github.com/cota/qemu/tree/multi-tcg-v5
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Changes since v4:
+- Rebase to current master. (fixed a few conflicts, mostly due to some targets
+  having been converted to the generic translation loop.)
+- Add the removal of CF_COUNT_MASK as a separate "FIXUP" commit to signal
+  that this still requires attention.
+- Fix tb TC comparison function to support deletions (otherwise -icount breaks)
+- [new fix] TCG regions: Rely on max_cpus instead of smp_cpus. Otherwise we'd
+  break CPU hotplug on targets that support it. (max_cpus and smp_cpus are
+  set from the command line with -smp foo,maxcpus=bar; max_cpus is always
+  >= smp_cpus.)
 
+Thanks,
 
---2t8qbNhLMnBtmQRJaSAFBakIcCklehI58
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnbzFMACgkQp6FrSiUn
-Q2rk9gf5AQIsp7doOYp+uvN5MgQfRlDZaRuLNQz39D+RmsZbizKRo6vUFv3lsxUl
-mHwPJPlBBwYxWPgD5+j/5cuVqr4mm+KRXHGnD/PFncysXASSIEAKQClxCrdV7Sr9
-6O7+kCWDNPKADWXzYbi5Z11BeS7AO75b03rEHfvutieoPCgJMPJlS5TOzFJTsWMB
-W/MuXmaecPykX5W1ZsesLU6GebDJj5hJuA9Nyr8KMMCIV+HP1f1m99pNvcUXUcOw
-Gwqtz1Sm82vOE/wfETiCHf6ygk18O+WkA/CrkgpGpymypKBsjm6MEzCHafXGFKYH
-gpwc7NlA0PEeFlO3vK+6b9nXfKg+dw==
-=kuxZ
------END PGP SIGNATURE-----
-
---2t8qbNhLMnBtmQRJaSAFBakIcCklehI58--
+		Emilio
