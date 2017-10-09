@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=44841c655=anthony.perard@citrix.com>)
-	id 1e1Znh-0007tK-42
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:17:02 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1e1ZqE-000068-8z
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:19:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=44841c655=anthony.perard@citrix.com>)
-	id 1e1Znc-00049q-Rn
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:17:01 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:1775)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=44841c655=anthony.perard@citrix.com>)
-	id 1e1Znc-00049S-Lm
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:16:56 -0400
-Date: Mon, 9 Oct 2017 16:16:49 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20171009151649.GB1771@perard.uk.xensource.com>
-References: <20171009145542.GA1771@perard.uk.xensource.com>
-	<20171009150231.GN2954@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1e1Zq8-00053p-SU
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:19:38 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:47180)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1e1Zq8-00053K-K1
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:19:32 -0400
+Received: by mail-wm0-x229.google.com with SMTP id t69so23526919wmt.2
+	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 08:19:32 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon,  9 Oct 2017 16:19:26 +0100
+Message-Id: <20171009151926.1708-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20171009150231.GN2954@redhat.com>
-Subject: Re: [Qemu-devel]
- =?utf-8?b?4oCYdnRlX3Rlcm1pbmFsX2NvcHlfY2xpcGJvYXJk?=
- =?utf-8?q?=E2=80=99_is_deprecated?=
+Subject: [Qemu-devel] [RFC PATCH] linux-user/main: support dfilter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,40 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-On Mon, Oct 09, 2017 at 04:02:31PM +0100, Daniel P. Berrange wrote:
-> On Mon, Oct 09, 2017 at 03:55:42PM +0100, Anthony PERARD wrote:
-> > Hi,
-> > 
-> > Looks like vte_terminal_copy_clipboard() is been deprecated:
-> > 
-> >   CC      ui/gtk.o
-> > ui/gtk.c: In function ‘gd_menu_copy’
-> > ui/gtk.c:1705:5: error: ‘vte_terminal_copy_clipboard’ is deprecated [-Werror=deprecated-declarations]
-> >      vte_terminal_copy_clipboard(VTE_TERMINAL(vc->vte.terminal));
-> >      ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > In file included from /usr/include/vte-2.91/vte/vte.h:35:0,
-> >                  from ui/gtk.c:47:
-> > /usr/include/vte-2.91/vte/vtedeprecated.h:94:6: note: declared here
-> >  void vte_terminal_copy_clipboard(VteTerminal *terminal) _VTE_GNUC_NONNULL(1);
-> >       ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > cc1: all warnings being treated as errors
-> > make: *** [/local/home/sheep/work/qemu/rules.mak:66: ui/gtk.o] Error 1
-> 
-> The docs say it should be simply replaced with a call to
-> vte_terminal_copy_clipboard_format, using VTE_FORMAT_TEXT
-> as the format.
-> 
-> So we just need to make either the old or new method call
-> conditional on VTE version >= 0.50.0
-> 
-> Since you've got the new vte installed to test with, do you
-> want to write a patch for that :-)
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ linux-user/main.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-I was lazy, but yes, I can write the patch. Thanks for reading the doc
-:).
-
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 829f974662..5072aa855b 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -3854,6 +3854,11 @@ static void handle_arg_log(const char *arg)
+     qemu_set_log(mask);
+ }
+ 
++static void handle_arg_dfilter(const char *arg)
++{
++    qemu_set_dfilter_ranges(arg, NULL);
++}
++
+ static void handle_arg_log_filename(const char *arg)
+ {
+     qemu_set_log_filename(arg, &error_fatal);
+@@ -4054,6 +4059,8 @@ static const struct qemu_argument arg_table[] = {
+     {"d",          "QEMU_LOG",         true,  handle_arg_log,
+      "item[,...]", "enable logging of specified items "
+      "(use '-d help' for a list of items)"},
++    {"dfilter",    "QEMU_DFILTER",     true,  handle_arg_dfilter,
++     "range[,...]","filter logging based on address range"},
+     {"D",          "QEMU_LOG_FILENAME", true, handle_arg_log_filename,
+      "logfile",     "write logs to 'logfile' (default stderr)"},
+     {"p",          "QEMU_PAGESIZE",    true,  handle_arg_pagesize,
 -- 
-Anthony PERARD
+2.14.1
