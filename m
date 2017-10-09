@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e1bVX-0000mb-3a
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:06:24 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e1bVy-00014Y-Qd
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:06:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e1bVW-0001vf-3h
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:06:23 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:45379)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e1bVV-0001v4-Tk
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:06:22 -0400
-Received: by mail-wm0-x235.google.com with SMTP id q124so24436535wmb.0
-	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 10:06:21 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAHQ1cqFdjYgj9s2yz_LUv=uheK5Yy0YQ9o-3McLopAFqeVx43Q@mail.gmail.com>
-References: <20170918195100.17593-1-andrew.smirnov@gmail.com>
-	<20170918195100.17593-9-andrew.smirnov@gmail.com>
-	<CAFEAcA_5Yt4a3gE8pHAdE9RnY-SZoucMkt8CParasA1YQxKUfg@mail.gmail.com>
-	<CAHQ1cqFdjYgj9s2yz_LUv=uheK5Yy0YQ9o-3McLopAFqeVx43Q@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Oct 2017 18:06:00 +0100
-Message-ID: <CAFEAcA-DbWn2JcDuWOW-o5ov2uV1Kr_bHGpt5Q6Vi7PhEXn1tA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 08/17] imx_fec: Add support for multiple Tx
- DMA rings
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e1bVt-0002Av-Pi
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:06:50 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36961
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1e1bVt-0002Ae-JJ
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:06:45 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v99H4fOG119096
+	for <qemu-devel@nongnu.org>; Mon, 9 Oct 2017 13:06:42 -0400
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dgcabb6fu-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 13:06:42 -0400
+Received: from localhost
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Mon, 9 Oct 2017 13:06:40 -0400
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date: Mon,  9 Oct 2017 12:06:04 -0500
+Message-Id: <20171009170607.4155-1-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 0/3] qdev/vfio: defer DEVICE_DEL to avoid
+ races with libvirt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +37,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Smirnov <andrew.smirnov@gmail.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: david@gibson.dropbear.id.au, groug@kaod.org, peter.maydell@linaro.org, armbru@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, imammedo@redhat.com, ehabkost@redhat.com
 
-On 9 October 2017 at 16:38, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
-> On Fri, Oct 6, 2017 at 7:10 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 18 September 2017 at 20:50, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
->>> More recent version of the IP block support more than one Tx DMA ring,
->>> so add the code implementing that feature.
->>>
->>> Cc: Peter Maydell <peter.maydell@linaro.org>
->>> Cc: Jason Wang <jasowang@redhat.com>
->>> Cc: qemu-devel@nongnu.org
->>> Cc: qemu-arm@nongnu.org
->>> Cc: yurovsky@gmail.com
->>> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
->>
->> I'm surprised this doesn't mean "we have a property on the device
->> to indicate what IP version it is, which the boards set". Or are
->> all our current boards mismodelling their ethernet devices with the
->> wrong number of TX rings ?
->>
->
-> As far as I know the only already emulated SoC that this affects is
-> i.MX6, and, no, it doesn't mismodel its Ethernet device since it has
-> version of the IP block with only one Tx ring. I didn't add any notion
-> of versioning because it didn't seem necessary, since 3-ring IP block
-> should be backwards compatible with 1-ring version and host drivers
-> written for the latter will end up using only ring #1 of the 3-ring
-> block.
+This series was motivated by the discussion in this thread:
 
-It is guest visible if the guest looks for it, though, so I think
-we should have a device property to set the number of Tx rings
-(or to set the version number of the IP if that's in a guest
-visible register and a more useful way to model it) so we can
-get it right for both boards.
+  https://www.redhat.com/archives/libvir-list/2017-June/msg01370.html
 
-thanks
--- PMM
+The issue this series addresses is that when libvirt unplugs a VFIO PCI device,
+it may attempt to bind the host device back to the host driver when QEMU emits
+the DEVICE_DELETED event for the corresponding vfio-pci device. However, the
+VFIO group FD is not actually cleaned up until vfio-pci device is *finalized*
+by QEMU, whereas the event is emitted earlier during device_unparent.
+Depending on the host device and how long certain operations like resetting the
+device might take, this can in result in libvirt trying to rebind the device
+back to the host while it is still in use by VFIO, leading to host crashes or
+other unexpected behavior.
+
+In particular, Mellanox CX4 adapters on PowerNV hosts might not be fully
+quiesced by vfio-pci's finalize() routine until up to 6s after the
+DEVICE_DELETED was emitted, leading to detach-device on the libvirt side pretty
+much always crashing the host.
+
+Implementing this change requires 2 prereqs to ensure the same information is
+available when the DEVICE_DELETED is finally emitted:
+
+1) Storing the path in the composition patch, which is addressed by PATCH 1,
+   which was plucked from another pending series from Greg Kurz:
+
+   https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg07922.html
+
+   since we are now "disconnected" at the time the event is emitted, and
+
+2) Deferring qemu_opts_del of the DeviceState->QemuOpts till finalize, since
+   that is where DeviceState->id is stored. This was actually how it was
+   done in the past, so PATCH 2 simply reverts the change which moved it to
+   device_unparent.
+
+>From there it's just a mechanical move of the event from device_unparent to
+device_finalize.
+
+Since this was originally posted a kernel fix was merged to address the race
+on the kernel side (6586b561), but it would still be good to fix this on the
+QEMU side for older host kernel and for clearer semantics on the
+libvirt/management side.
+
+v2:
+ - rebased on master
+ - fixed up inaccurate comment in PATCH 1 (Eric)
+
+ hw/core/qdev.c         | 31 ++++++++++++++++++++-----------
+ include/hw/qdev-core.h |  1 +
+ 2 files changed, 21 insertions(+), 11 deletions(-)
