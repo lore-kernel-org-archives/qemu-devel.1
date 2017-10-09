@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e1cQ2-0004aF-M0
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 14:04:50 -0400
+	(envelope-from <eblake@redhat.com>) id 1e1cWm-0005db-44
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 14:11:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e1cPy-0005oB-2S
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 14:04:46 -0400
-References: <20171006235023.11952-1-f4bug@amsat.org>
-	<20171006235023.11952-32-f4bug@amsat.org>
-	<87r2ucrcsi.fsf@dusky.pond.sub.org> <20171009081101.GA2374@work-vm>
+	(envelope-from <eblake@redhat.com>) id 1e1cWh-0000Np-Tu
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 14:11:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57998)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1e1cWh-0000NL-KR
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 14:11:39 -0400
+References: <20171009170607.4155-1-mdroth@linux.vnet.ibm.com>
+	<20171009170607.4155-2-mdroth@linux.vnet.ibm.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <f9b0931d-0f17-8977-f115-0f30df39b7fb@redhat.com>
-Date: Mon, 9 Oct 2017 13:04:35 -0500
+Message-ID: <a31e42ae-f9d2-0bfc-04f9-6e6c2e35c9f8@redhat.com>
+Date: Mon, 9 Oct 2017 13:11:28 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171009081101.GA2374@work-vm>
+In-Reply-To: <20171009170607.4155-2-mdroth@linux.vnet.ibm.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="ck2wkndEoD4V5aS0iQ8LPeFJDLcT3gUGR"
-Subject: Re: [Qemu-devel] [PATCH 31/88] QMP: use g_new() family of functions
+	boundary="mp8tu1cmCPGNTDEk1P6q8kVdUXGCxkfnO"
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] qdev: store DeviceState's canonical
+ path to use when unparenting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,91 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu trival <qemu-trivial@nongnu.org>, qemu-devel@nongnu.org
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, "Michael S . Tsirkin" <mst@redhat.com>, groug@kaod.org, armbru@redhat.com, alex.williamson@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ck2wkndEoD4V5aS0iQ8LPeFJDLcT3gUGR
+--mp8tu1cmCPGNTDEk1P6q8kVdUXGCxkfnO
 From: Eric Blake <eblake@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
- Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu trival <qemu-trivial@nongnu.org>, qemu-devel@nongnu.org
-Message-ID: <f9b0931d-0f17-8977-f115-0f30df39b7fb@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 31/88] QMP: use g_new() family of functions
-References: <20171006235023.11952-1-f4bug@amsat.org>
- <20171006235023.11952-32-f4bug@amsat.org> <87r2ucrcsi.fsf@dusky.pond.sub.org>
- <20171009081101.GA2374@work-vm>
-In-Reply-To: <20171009081101.GA2374@work-vm>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com,
+ "Michael S . Tsirkin" <mst@redhat.com>, groug@kaod.org, armbru@redhat.com,
+ alex.williamson@redhat.com, imammedo@redhat.com, pbonzini@redhat.com,
+ david@gibson.dropbear.id.au
+Message-ID: <a31e42ae-f9d2-0bfc-04f9-6e6c2e35c9f8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] qdev: store DeviceState's canonical
+ path to use when unparenting
+References: <20171009170607.4155-1-mdroth@linux.vnet.ibm.com>
+ <20171009170607.4155-2-mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20171009170607.4155-2-mdroth@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 10/09/2017 03:11 AM, Dr. David Alan Gilbert wrote:
-
->>> =20
->>> -    info =3D g_malloc0(sizeof(*info));
->>> +    info =3D g_new0(CommandInfoList, 1);
->>>      info->value =3D g_malloc0(sizeof(*info->value));
->>>      info->value->name =3D g_strdup(cmd->name);
->>>      info->next =3D *list;
->>
->> I'm not convinced rewriting
->>
->>        LHS =3D g_malloc(sizeof(*LHS));
->>
->> to
->>
->>        LHS =3D g_new(T, 1);
->>
->> where T is the type of LHS is worth the trouble.  The code before the
->> rewrite is pretty idiomatic.  There's no possibility of integer overfl=
-ow
->> g_new() could avoid.  The types are obviously correct, so the addition=
-al
->> type checking is quite unlikely to catch anything.  That leaves the
->> consistency argument.  I'm willing to hear it, but I feel it should be=
-
->> heard in a patch series that does nothing else.
+On 10/09/2017 12:06 PM, Michael Roth wrote:
+> device_unparent(dev, ...) is called when a device is unparented,
+> either directly, or as a result of a parent device being
+> finalized, and handles some final cleanup for the device. Part
+> of this includes emiting a DEVICE_DELETED QMP event to notify
+> management, which includes the device's path in the composition
+> tree as provided by object_get_canonical_path().
 >=20
-> The 'obviously correct' is the dodgy part of the argument here.
-> How many bugs do we right that are obviously wrong?
->=20
-> t.c:13:20: warning: initialization from incompatible pointer type [-Win=
-compatible-pointer-types]
->      struct c *pc =3D g_new(struct b, 1);
->=20
-> seems good to me.
 
-Yes, that's a GOOD warning, and it proves that we DO get type safety
-when we convert:
+> +++ b/hw/core/qdev.c
+> @@ -928,6 +928,13 @@ static void device_set_realized(Object *obj, bool =
+value, Error **errp)
+>              goto post_realize_fail;
+>          }
+> =20
+> +        /*
+> +         * always free/re-initialize here since the value cannot be cl=
+eaned up
+> +         * in device_unrealize due to it's usage later on in the unplu=
+g path
 
-LHS =3D g_malloc(sizeof(type))
-
-into
-
-LHS =3D g_new(type, 1)
-
-but that's not what Markus was pointing out.  When we already have the
-correctly-typed object on the right hand side, as in:
-
-LHS =3D g_malloc(sizeof(*LHS))
-
-then the compiler will always give us the correct type of LHS, whereas wi=
-th:
-
-LHS =3D g_new(type, 1)
-
-we have to manually update the line if the type of LHS changes.
-
-Thus, converting malloc(sizeof(type)) into new(type, 1) is a no-brainer,
-but converting malloc(sizeof(*expr)) needs justification.  I'm not
-necessarily opposed to the conversion (if our justification is
-consistency, and where HACKING documents our style and where we have
-scripts that let us easily preserve our style), but I'm not sure I see
-the requisite justification in the current iteration of this series.
+s/it's/its/ (remember, "it's" is only appropriate if "it is" or "it has"
+can be substituted in its place; otherwise you meant the possessive "its"=
+)
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -117,7 +80,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---ck2wkndEoD4V5aS0iQ8LPeFJDLcT3gUGR
+--mp8tu1cmCPGNTDEk1P6q8kVdUXGCxkfnO
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -126,14 +89,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnbujMACgkQp6FrSiUn
-Q2ow7gf9Fv6yFtt5x9PvY5Ktggr0Wk/q8VrXKPV8yA13kw2OX3q6Yrqzi7diaXH8
-i1ndCy4s9HlUlI1S+Fi0Hpo9hT1hd3SFkvmv+EGAoCT5rMXzqvjTGwagZsljTLN6
-hd54ddphZObnn5qFekjK3CiJqFivYFDDwXU5ehd8JkaCoVhaBhR0BDVf7veqbQkK
-P+l3MECYD30mNPN88GyuilUWI6IqRxYeCnPQOdo7Dgrxn3s342OxwIYvhDKxlRO0
-zjKW2HPqGVkn5kGr7XkdddZ2+6sdlkLyK+PC757MGFlZ1acKoN/RoPhd4A58m150
-DA/cFDgBXIs9Wu70iX9kpXKuf/RJeQ==
-=4R8q
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnbu9AACgkQp6FrSiUn
+Q2oOXwf9GT5tFA/5h/FbWm2hmgzdPC8BVGgWUM+6KIOtZvB9FC4ADB0Q69nouA92
+tFDDh5zqudTVgmveQW9tm0HzX5ryFQ0eVVpzy6IEhWtHy8VIsg2JYHomgYN9X7zj
+7mcYf0CIYKCVooCupdnq54rZwgTNd0/mdzmIlAVqc+v6rweEkbuy9xBt4LbBH7uB
+Np+cluG256eQA7hRWWCK3+Sfn9gIi95aK063Pwj7REtNSQloWNrUkk9D1R6jr+vO
+/axxYat5N6ebIJAi2uM1BrvAH55Lb/1gp10SB2x46FJ+4GJk9N1bzcay4IGrgAmL
+qGqvOb1WExa4DSb/fk2vnkC5qcIOEw==
+=IvAz
 -----END PGP SIGNATURE-----
 
---ck2wkndEoD4V5aS0iQ8LPeFJDLcT3gUGR--
+--mp8tu1cmCPGNTDEk1P6q8kVdUXGCxkfnO--
