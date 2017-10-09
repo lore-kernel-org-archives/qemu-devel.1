@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <doug16k@gmail.com>) id 1e1d2H-0007RR-IR
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 14:44:18 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e1dBk-0000vM-G5
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 14:54:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <doug16k@gmail.com>) id 1e1d2G-0001m4-D2
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 14:44:17 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e1dBh-0007oR-Do
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 14:54:04 -0400
+Resent-Message-Id: <E1e1dBh-0007oR-Do@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21429)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e1dBh-0007o2-5w
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 14:54:01 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150757520156.270.13875315956284062915@b58463cdfd5f>
+In-Reply-To: <1507564902-9000-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <e46a6b2d-83e2-d558-028c-94ad41af8fa2@redhat.com>
-References: <CAEfK_45dZvxvBNQpPLo71ZJhrPN5_GJr8uJ2pJZpCaFf0+i3YA@mail.gmail.com>
-	<62e835a4-ba5d-e620-47d2-180932a33426@redhat.com>
-	<20171006135425.GF26575@redhat.com>
-	<CAEfK_444_fPwjnj1M8w8XNFFwiMJW-pdN7R1Tdu+FfvB38ZBtw@mail.gmail.com>
-	<20171006140137.GH26575@redhat.com>
-	<CAEfK_455Hr1afv-H6=9QMQErDGZJtOBgFMk2F8QJshYTLgOa1Q@mail.gmail.com>
-	<e46a6b2d-83e2-d558-028c-94ad41af8fa2@redhat.com>
-From: Doug Gale <doug16k@gmail.com>
-Date: Mon, 9 Oct 2017 14:44:14 -0400
-Message-ID: <CAEfK_44_43d5_KaGUf-FH7bHxre5BP1wCQu96p38bhskUqU+Ug@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Patch to add helpful tracing output for driver
- authors in NVMe emulation
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 9 Oct 2017 11:53:22 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v4 0/8] xen: xen-domid-restrict improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, keith.busch@intel.com, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: ian.jackson@eu.citrix.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, anthony.perard@citrix.com, ross.lagerwall@citrix.com, sstabellini@kernel.org, jgross@suse.com, xen-devel@lists.xenproject.org
 
-I used exclamations as a concise way of indicating that the driver did
-something nonsensical, or horribly invalid, like something likely to
-cause a memory corruption, trying to start the controller with a
-nonsense configuration, providing invalid PRDs or writing to
-unrecognized MMIO offsets that might hang or do something extremely
-bad on a poorly implemented controller. Exclaiming is not shouting, I
-thought shouting was when it was all uppercase.
-
-If a driver might trash memory or hang a controller, maybe it should
-shout at the driver author or person investigating an unstable VM.
-None of those messages with exclamations should ever happen. If any of
-them are possible when the driver is correct, then I have made a
-mistake.
-
-On Mon, Oct 9, 2017 at 11:52 AM, Eric Blake <eblake@redhat.com> wrote:
-> On 10/07/2017 02:51 AM, Doug Gale wrote:
->> Completely re-implemented patch, with significant improvements (now
->> specifies values in several places I missed, also reduced the amount
->> of redundant lines). I used the nvme_ as the tracing infrastructure
->> prefix. Tested with -trace nvme_* on the qemu command line, worked for
->> me.
->
-> This information belongs...
->
->>
->>>From 166f57458d60d363a10a0933c3e860985531ac96 Mon Sep 17 00:00:00 2001
->> From: Doug Gale <doug16k@gmail.com>
->> Date: Thu, 5 Oct 2017 19:02:03 -0400
->> Subject: [PATCH] Add tracing output to NVMe emulation to help driver authors.
->>
->> This uses the tracing infrastructure using nvme_ as the prefix.
->>
->> Signed-off-by: Doug Gale <doug16k@gmail.com>
->> ---
->
-> ...here, after the --- separator.  It is useful to the patch reviewer,
-> but does not need to be in the 'git log' history.  The maintainers use
-> 'git am' to process incoming patches, which automatically prunes review
-> comments located in this location.
->
-> Also, since this is a version 2 patch, it is best if your subject line
-> includes 'v2', and if you send the patch as a new top-level thread
-> rather than in-reply-to v1.  This can be done with 'git send-email -v2'.
->
-> The subject line is atypical; we tend to prefer 'topic: Short summary',
-> where you are missing the topic, you had a trailing dot that is not
-> typical, and where your line is longer than usual.  A better subject
-> line might be:
->
-> nvme: Add tracing output
->
->
-> For more helpful information on patch submission:
->
-> https://wiki.qemu.org/Contribute/SubmitAPatch
->
-> I didn't look closely at the patch itself, but did notice:
->
->> +nvme_mmio_start_failed(void) "setting controller enable bit failed!"
->> +nvme_mmio_start_success(void) "setting controller enable bit succeeded"
->> +nvme_mmio_stopped(void) "cleared controller enable bit"
->> +nvme_mmio_shutdown_set(void) "shutdown bit set"
->> +nvme_mmio_shutdown_cleared(void) "shutdown bit cleared"
->> +nvme_mmio_ignored(uint64_t offset, uint64_t data) "invalid MMIO
->> write, offset=0x%"PRIx64", data=%"PRIx64"!"
->
-> You have a couple of traces with a trailing '!'; that is atypical,
-> because we don't need our traces to shout at the user.
->
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
->
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MDc1NjQ5MDItOTAwMC0xLWdpdC1zZW5kLWVtYWlsLWlhbi5qYWNrc29uQGV1
+LmNpdHJpeC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NCAwLzhdIHhlbjogeGVu
+LWRvbWlkLXJlc3RyaWN0IGltcHJvdmVtZW50cwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
+IS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNF
+Li4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0
+IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBs
+b2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8K
+ICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3Jt
+YXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2Ny
+aXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAg
+ICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBU
+RVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0
+NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMmZlZmQ0ZTUxMiBj
+b25maWd1cmU6IGRvX2NvbXBpbGVyOiBEdW1wIHNvbWUgZXh0cmEgaW5mbyB1bmRlciBiYXNoCmIw
+ZWUyZGI0MzAgb3MtcG9zaXg6IFByb3ZpZGUgbmV3IC1ydW5hcyA8dWlkPi48Z2lkPiBmYWNpbGl0
+eQpiYmU2ZTYyMmJhIHhlbjogZGVzdHJveV9odm1fZG9tYWluOiBUcnkgeGVuZGV2aWNlbW9kZWxf
+c2h1dGRvd24KNDQzY2ZlZDlkYSB4ZW46IG1vdmUgeGNfaW50ZXJmYWNlIGNvbXBhdGliaWxpdHkg
+ZmFsbGJhY2sgZnVydGhlciB1cCB0aGUgZmlsZQo3ZTlkMjg2Yzk5IHhlbjogZGVzdHJveV9odm1f
+ZG9tYWluOiBNb3ZlIHJlYXNvbiBpbnRvIGEgdmFyaWFibGUKNTk3YTBkZTUwMCB4ZW46IGRlZmVy
+IGNhbGwgdG8geGVuX3Jlc3RyaWN0IHVudGlsIGp1c3QgYmVmb3JlIG9zX3NldHVwX3Bvc3QKOWI1
+ZTdkOGVmOCB4ZW46IHJlc3RyaWN0OiB1c2UgeGVudG9vbGNvcmVfcmVzdHJpY3RfYWxsCjU0Zjli
+MjQ4NGIgeGVuOiBsaW5rIGFnYWluc3QgeGVudG9vbGNvcmUKCj09PSBPVVRQVVQgQkVHSU4gPT09
+CkNoZWNraW5nIFBBVENIIDEvODogeGVuOiBsaW5rIGFnYWluc3QgeGVudG9vbGNvcmUuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMi84OiB4ZW46IHJlc3RyaWN0OiB1c2UgeGVudG9vbGNvcmVfcmVzdHJpY3Rf
+YWxsLi4uCkNoZWNraW5nIFBBVENIIDMvODogeGVuOiBkZWZlciBjYWxsIHRvIHhlbl9yZXN0cmlj
+dCB1bnRpbCBqdXN0IGJlZm9yZSBvc19zZXR1cF9wb3N0Li4uCkNoZWNraW5nIFBBVENIIDQvODog
+eGVuOiBkZXN0cm95X2h2bV9kb21haW46IE1vdmUgcmVhc29uIGludG8gYSB2YXJpYWJsZS4uLgpD
+aGVja2luZyBQQVRDSCA1Lzg6IHhlbjogbW92ZSB4Y19pbnRlcmZhY2UgY29tcGF0aWJpbGl0eSBm
+YWxsYmFjayBmdXJ0aGVyIHVwIHRoZSBmaWxlLi4uCkNoZWNraW5nIFBBVENIIDYvODogeGVuOiBk
+ZXN0cm95X2h2bV9kb21haW46IFRyeSB4ZW5kZXZpY2Vtb2RlbF9zaHV0ZG93bi4uLgpDaGVja2lu
+ZyBQQVRDSCA3Lzg6IG9zLXBvc2l4OiBQcm92aWRlIG5ldyAtcnVuYXMgPHVpZD4uPGdpZD4gZmFj
+aWxpdHkuLi4KRVJST1I6IGNvbnNpZGVyIHVzaW5nIHFlbXVfc3RydG91bCBpbiBwcmVmZXJlbmNl
+IHRvIHN0cnRvdWwKIzQ1OiBGSUxFOiBvcy1wb3NpeC5jOjE0MzoKKyAgICBsdiA9IHN0cnRvdWwo
+b3B0YXJnLCAmZXAsIDApOyAvKiBjYW4ndCBxZW11X3N0cnRvdWwsIHdhbnQgKmVwPT0nLicgKi8K
+CnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTAwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
+Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
+cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
+ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDgvODogY29uZmln
+dXJlOiBkb19jb21waWxlcjogRHVtcCBzb21lIGV4dHJhIGluZm8gdW5kZXIgYmFzaC4uLgo9PT0g
+T1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVt
+YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9y
+Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3Rz
+Lm9yZw==
