@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e1Tj3-0007dg-VA
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 04:47:50 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e1U15-0003Ua-UL
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 05:06:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e1Tiz-0002cs-PD
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 04:47:50 -0400
-Date: Mon, 9 Oct 2017 16:47:36 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171009084736.GF2196@pxdev.xzpeter.org>
-References: <20171006114624.10771-1-maxime.coquelin@redhat.com>
-	<20171006114624.10771-2-maxime.coquelin@redhat.com>
-	<1a2849a9-1dc8-eb8b-8f59-5c9ca4849e1c@redhat.com>
-	<ca80a3c7-c011-fe61-2af6-6261bd6f4d42@redhat.com>
-	<c4c02172-cf19-bd56-d120-f72e043a54e0@redhat.com>
-	<7ebed617-f286-5f35-e784-6b4b864e406a@redhat.com>
-	<20171009051731.GB2196@pxdev.xzpeter.org>
-	<0cb9b9c6-0d13-8136-2796-c564213ca8e5@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1e1U0x-0002lE-SA
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 05:06:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55810)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e1U0x-0002l6-Je
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 05:06:19 -0400
+Date: Mon, 9 Oct 2017 11:06:14 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171009110614.769c19e5.cohuck@redhat.com>
+In-Reply-To: <1507124979-8880-5-git-send-email-pmorel@linux.vnet.ibm.com>
+References: <1507124979-8880-1-git-send-email-pmorel@linux.vnet.ibm.com>
+	<1507124979-8880-5-git-send-email-pmorel@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <0cb9b9c6-0d13-8136-2796-c564213ca8e5@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] exec: add page_mask for
- flatview_do_translate
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 4/5] s390x/pci: Refuse to realize
+ VFIO-PCI if AIS needed but supported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,108 +28,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-On Mon, Oct 09, 2017 at 10:30:07AM +0200, Maxime Coquelin wrote:
-> Hi Peter,
->=20
-> On 10/09/2017 07:17 AM, Peter Xu wrote:
-> >On Fri, Oct 06, 2017 at 03:03:50PM +0200, Maxime Coquelin wrote:
-> >>
-> >>
-> >>On 10/06/2017 02:48 PM, Paolo Bonzini wrote:
-> >>>On 06/10/2017 14:46, Maxime Coquelin wrote:
-> >>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 addr =3D =
-((iotlb.translated_addr & ~iotlb.addr_mask)
-> >>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | (addr & iotlb.addr_mask));
-> >>>>>>-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *plen =3D MIN(*plen, =
-(addr | iotlb.addr_mask) - addr + 1);
-> >>>>>>+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 page_mask =3D iotlb.a=
-ddr_mask;
-> >>>>>
-> >>>>>Should this be "page_mask &=3D iotlb.addr_mask"?
-> >>>>>
-> >>>>>If you have multiple IOMMUs on top of each other (yeah, I know...)=
- I
-> >>>>>think the smallest size should win.=C2=A0 This is also consistent =
-with the
-> >>>>>MIN in the line below.
-> >>>>
-> >>>>I agree, but changin to "page_mask &=3D iotlb.addr_mask" will not b=
-e
-> >>>>enough, we also have to change the init value. Else we will always =
-end
-> >>>>up with 0xfff.
-> >>>>
-> >>>>Maybe we could do as plen was handled before, i.e. setting page_mas=
-k
-> >>>>init value to (hwaddr)(-1), and after the loop set it to
-> >>>>~TARGET_PAGE_MASK if it hasn't been changed.
-> >>>>
-> >>>>Does that sound reasonable?
-> >>>
-> >>>True that, in fact it makes sense for the "IOTLB entry" to represent=
- all
-> >>>of memory if there's no IOMMU at all.
-> >>
-> >>Indeed, that makes sense as no iommu means identity mapping. It would
-> >>moreover improve performance, as the vhost backend will only have a
-> >>single IOTLB entry in its cache.
-> >>
-> >>Maybe it is better to wait for Peter to understand the reason he limi=
-ted
-> >>it to the target page size?
-> >
-> >Sorry, just came back from a long holiday.
->=20
-> No problem.
->=20
-> >I was trying to use 4K as default to be safe (but yes the mask was not
-> >correct, thanks for fixing that!), to make sure the translated range
-> >covered by the IOMMUTLBEntry will always be safe to access (I thought
-> >that was how IOTLB was defined, but I may be wrong).  Using (-1) is
-> >good especially from performance POV as long as the caller knows the
-> >real memory boundary, but I'm not sure whether it'll break the IOTLB
-> >scemantic somehow.
->=20
-> Good point.
-> Maybe it would be safer to wrap the IOTLB entry to the memory region?
+On Wed,  4 Oct 2017 15:49:38 +0200
+Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
 
-The problem is that MR size may not be aligned with address masks.  I
-see it less meaningful if we need to further man-made a smaller mask.
+"not supported", surely?
 
-And wait, since you mentioned about MR... I think using -1 here may be
-wrong.  Although current MR is transparently mapped (the MR that
-covers the address to be translated), it does not mean the whole
-address space is transparently mapped.  SPAPR should be a good example
-that some ranges of the address space are mapped by IOMMU but some are
-not.
+> In S390x the Adapter Interrupt Suppression facility is used to mask
+> interrupts of other PCI devices during interruption handling.
+> 
+> VFIO PCI allows the interrupts to be delivered rapidely through KVM via
+> IRQfd or to be delivered through QEMU.
+> The choice is made through the x-kvm-intx and x-kvo-misx properties of
+> the VFIO PCI device.
+> 
+> If the VFIO PCI device is using the direct KVM access through IRQfd and
+> we know that KVM does not implement AIS support we refuse to realize the
+> VFIO PCI device.
+> 
+> In all other cases, emulation and VFIO PCI sending interrupts through
+> QEMU, we intercept the propagated IRQ, and protect it with the QEMU AIS
+> implementation before to send it to the guest through KVM.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+> ---
+>  hw/s390x/s390-pci-bus.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index d9c294a..4afe49b 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -21,18 +21,21 @@
+>  #include "hw/pci/pci_bus.h"
+>  #include "hw/pci/pci_bridge.h"
+>  #include "hw/pci/msi.h"
+> +#include "hw/vfio/pci.h"
+>  #include "qemu/error-report.h"
+>  
+>  #ifndef DEBUG_S390PCI_BUS
+>  #define DEBUG_S390PCI_BUS  0
+>  #endif
+>  
+> +#ifndef DPRINTF
+>  #define DPRINTF(fmt, ...)                                         \
+>      do {                                                          \
+>          if (DEBUG_S390PCI_BUS) {                                  \
+>              fprintf(stderr, "S390pci-bus: " fmt, ## __VA_ARGS__); \
+>          }                                                         \
+>      } while (0)
+> +#endif
 
->=20
-> >If we want to make it -1 for transparent mappings, maybe worth
-> >commenting it in definition of IOMMUTLBEntry.page_mask?
->=20
-> Yes, that makes sense.
+Ugh. Is there DPRINTF redefinition going on?
 
-According to above, I would vote for your previous solution: first use
--1 to get the minimum mask, then switch to PAGE_MASK before returning
-when needed.
+>  
+>  S390pciState *s390_get_phb(void)
+>  {
+> @@ -751,6 +754,15 @@ static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
+>          }
+>  
+>          if (object_dynamic_cast(OBJECT(dev), "vfio-pci")) {
+> +            S390FLICState *fs = s390_get_flic();
+> +            VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
+> +
+> +            if ((!vdev->no_kvm_msix || !vdev->no_kvm_msix) &&
 
->=20
-> >(Btw, thanks again for moving these patches forward; I tried to, but I
-> >  failed :)
->=20
-> I'm a bit faulty not to have reviewed/tested it in the first place ;)
+One of the no_kvm_msix should probably be something else :)
 
-:-)
+> +                (!fs || !fs->ais_supported)) {
+> +                error_setg(errp, "VFIO PCI is not supported "
+> +                           "because kernel has no AIS capability.");
 
-Thanks!
+I think failure is per-device (i.e., you would be able to plug a
+different vfio device if you turned off irqfd support for it); should
+that be reflected in the error message?
 
->=20
-> Thanks,
-> Maxime
+> +                return;
+> +            }
 
---=20
-Peter Xu
+Would it make sense to fail plugging before we try to create a zpci
+device?
+
+>              pbdev->fh |= FH_SHM_VFIO;
+>          } else {
+>              pbdev->fh |= FH_SHM_EMUL;
