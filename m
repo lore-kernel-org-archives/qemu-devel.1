@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1e1Xzj-0002Eo-Kg
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 09:21:20 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1e1YHT-0007Gd-5f
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 09:39:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1e1Xzf-0001ga-M3
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 09:21:19 -0400
-Date: Mon, 9 Oct 2017 15:21:12 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20171009132112.GA5553@toto>
-References: <20170922171323.10348-1-f4bug@amsat.org>
+	(envelope-from <pbonzini@redhat.com>) id 1e1YHQ-00069v-0f
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 09:39:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46714)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e1YHP-000695-Qx
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 09:39:35 -0400
+References: <20171006215244.27104-1-ehabkost@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <765f7133-0ccc-2239-d49b-55d8b2a24cc7@redhat.com>
+Date: Mon, 9 Oct 2017 15:39:26 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20170922171323.10348-1-f4bug@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH v5 0/7] Generalize MDIO framework
+In-Reply-To: <20171006215244.27104-1-ehabkost@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/7] x86: Rework KVM-defaults compat code,
+ enable kvm_pv_unhalt by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,55 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Grant Likely <grant.likely@arm.com>, Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Waiman Long <longman@redhat.com>, Davidlohr Bueso <dave@stgolabs.net>
 
-On Fri, Sep 22, 2017 at 02:13:16PM -0300, Philippe Mathieu-Daudé wrote:
-> Hi,
-> 
-> I have a follow up series using multiples PHY on the MDIO bus based on this
-> series.
+On 06/10/2017 23:52, Eduardo Habkost wrote:
+> This series enables kvm_pv_unhalt by default on pc-*-2.11 and
+> newer.
+>=20
+> To do that, I first reworked the existing
+> x86_cpu_change_kvm_default() logic to use compat_props instead,
+> so we don't need to make the chain of pc_compat_*() functions
+> grow.
 
-Hi Philippe!
+I've discussed PV spinlocks with some folks at Microsoft for a few weeks
+now, and I'm not 100% sure about enabling kvm_pv_unhalt by default.
+It's probably a good idea overall, but it does come with some caveats.
 
-I think this is a good improvement compared to todays state.
-It may make sense to have the generic mdio bus functions in mdio.c
-and specific phy models in separate files, thoughts?
+The problem is that there were two different implementations of fair
+spinlocks in Linux, ticket spinlocks and queued spinlocks.  When
+kvm_pv_unhalt is disabled, ticket spinlocks sucked badly indeed; queued
+spinlocks however simply revert to unfair spinlocks, which loses the
+fairness but has the best performance.  See virt_spin_lock in
+arch/x86/include/asm/qspinlock.h.
 
-Cheers,
-Edgar
+Now, fair spinlocks are only really needed for large NUMA machines.
+With a single NUMA node, for example, test-and-set spinlocks work well
+enough; there's not _much_ need for fairness in practice, and the
+paravirtualization does introduce some overhead.
 
+Therefore, the best performance would be achieved with kvm_pv_unhalt
+disabled on small VMs, and enabled on large VMs spanning multiple host
+NUMA nodes.
 
-> 
-> Regards,
-> 
-> Phil.
-> 
-> Grant's previous work:
-> http://lists.nongnu.org/archive/html/qemu-devel/2013-02/msg00257.html
-> 
-> "There is more work to be done, particularly in moving to the common GPIO api,
->  but that work can be done as a follow on patch series."
-> 
-> Grant Likely (7):
->   hw/mdio: Generalize etraxfs MDIO bitbanging emulation
->   hw/mdio: Add PHY register definition
->   hw/mdio: Generalize phy initialization routine
->   hw/mdio: Mask out read-only bits.
->   hw/mdio: Refactor bitbanging state machine
->   hw/mdio: Add VMState support
->   hw/mdio: Use bitbang core for smc91c111 network device
-> 
->  include/hw/net/mdio.h   | 124 +++++++++++++++++++++
->  hw/net/etraxfs_eth.c    | 291 +-----------------------------------------------
->  hw/net/mdio.c           | 280 ++++++++++++++++++++++++++++++++++++++++++++++
->  hw/net/smc91c111.c      |  27 ++++-
->  hw/net/xilinx_axienet.c | 189 +------------------------------
->  hw/net/Makefile.objs    |   2 +
->  6 files changed, 438 insertions(+), 475 deletions(-)
->  create mode 100644 include/hw/net/mdio.h
->  create mode 100644 hw/net/mdio.c
-> 
-> -- 
-> 2.14.1
-> 
+Waiman, Davidlohr, do you have an opinion on this as well?
+
+Paolo
