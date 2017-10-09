@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e1e5F-0003IG-VG
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:51:26 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e1e5J-0003Kf-Lt
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:51:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e1e5F-0006SZ-5k
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:51:26 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e1e5G-0006U7-OY
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:51:27 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon,  9 Oct 2017 21:50:53 +0200
-Message-Id: <1507578671-158758-7-git-send-email-imammedo@redhat.com>
+Date: Mon,  9 Oct 2017 21:50:54 +0200
+Message-Id: <1507578671-158758-8-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1507578671-158758-1-git-send-email-imammedo@redhat.com>
 References: <1507578671-158758-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 06/24] ppc: mac_oldworld: use generic
- cpu_model parsing
+Subject: [Qemu-devel] [PATCH v2 07/24] ppc: bamboo: use generic cpu_model
+ parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +26,33 @@ Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/mac_oldworld.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ hw/ppc/ppc440_bamboo.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index bc7c8b7..010ea36 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -108,11 +108,8 @@ static void ppc_heathrow_init(MachineState *machine)
-     linux_boot = (kernel_filename != NULL);
+diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+index f92d47f..693c215 100644
+--- a/hw/ppc/ppc440_bamboo.c
++++ b/hw/ppc/ppc440_bamboo.c
+@@ -182,11 +182,7 @@ static void bamboo_init(MachineState *machine)
+     int success;
+     int i;
  
-     /* init CPUs */
--    if (machine->cpu_model == NULL)
--        machine->cpu_model = "G3";
-     for (i = 0; i < smp_cpus; i++) {
--        cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
--                                           machine->cpu_model));
-+        cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
-         env = &cpu->env;
+-    /* Setup CPU. */
+-    if (machine->cpu_model == NULL) {
+-        machine->cpu_model = "440EP";
+-    }
+-    cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, machine->cpu_model));
++    cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
+     env = &cpu->env;
  
-         /* Set time-base frequency to 16.6 Mhz */
-@@ -385,6 +382,7 @@ static void heathrow_class_init(ObjectClass *oc, void *data)
-     /* TOFIX "cad" when Mac floppy is implemented */
-     mc->default_boot_order = "cd";
-     mc->kvm_type = heathrow_kvm_type;
-+    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("750_v3.1");
+     if (env->mmu_model != POWERPC_MMU_BOOKE) {
+@@ -297,6 +293,7 @@ static void bamboo_machine_init(MachineClass *mc)
+ {
+     mc->desc = "bamboo";
+     mc->init = bamboo_init;
++    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("440epb");
  }
  
- static const TypeInfo ppc_heathrow_machine_info = {
+ DEFINE_MACHINE("bamboo", bamboo_machine_init)
 -- 
 2.7.4
