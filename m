@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e1fGx-0004Gq-PB
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:07:36 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e1fLC-0007tz-HA
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:11:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e1fGw-0006fE-IY
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:07:35 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:40557
-	helo=s16892447.onlinehome-server.info)
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e1fL9-00017F-7g
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:11:58 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41434
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1e1fGw-0006bR-Bz
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:07:34 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Mon,  9 Oct 2017 22:07:00 +0100
-Message-Id: <1507583223-14819-6-git-send-email-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <1507583223-14819-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-References: <1507583223-14819-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 5/8] sun4m_iommu: move TYPE_SUN4M_IOMMU
- declaration to sun4m.h
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1e1fL9-00016X-23
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:11:55 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v99L8pfk023779
+	for <qemu-devel@nongnu.org>; Mon, 9 Oct 2017 17:11:50 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dggma8j4m-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 17:11:50 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Mon, 9 Oct 2017 15:11:49 -0600
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Mon,  9 Oct 2017 18:11:35 -0300
+Message-Id: <20171009211136.31640-1-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 0/1] Avoid LMB unplug if a previous unplug
+ isn't
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,78 +37,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, atar4qemu@gmail.com
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com
 
-This is in preparation to allow the type to be used elsewhere.
+v2:
+- changed the approach: abort the LMB unplug if there is already
+an unplug operation ongoing for the same DIMM.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/dma/sun4m_iommu.c     |   14 --------------
- include/hw/sparc/sun4m.h |   16 ++++++++++++++++
- 2 files changed, 16 insertions(+), 14 deletions(-)
+v1 can be found at
+http://lists.nongnu.org/archive/html/qemu-ppc/2017-10/msg00084.html
 
-diff --git a/hw/dma/sun4m_iommu.c b/hw/dma/sun4m_iommu.c
-index 335ef63..840064b 100644
---- a/hw/dma/sun4m_iommu.c
-+++ b/hw/dma/sun4m_iommu.c
-@@ -36,7 +36,6 @@
-  * http://mediacast.sun.com/users/Barton808/media/Sun4M_SystemArchitecture_edited2.pdf
-  */
- 
--#define IOMMU_NREGS         (4*4096/4)
- #define IOMMU_CTRL          (0x0000 >> 2)
- #define IOMMU_CTRL_IMPL     0xf0000000 /* Implementation */
- #define IOMMU_CTRL_VERS     0x0f000000 /* Version */
-@@ -128,19 +127,6 @@
- #define IOMMU_PAGE_SIZE     (1 << IOMMU_PAGE_SHIFT)
- #define IOMMU_PAGE_MASK     ~(IOMMU_PAGE_SIZE - 1)
- 
--#define TYPE_SUN4M_IOMMU "iommu"
--#define SUN4M_IOMMU(obj) OBJECT_CHECK(IOMMUState, (obj), TYPE_SUN4M_IOMMU)
--
--typedef struct IOMMUState {
--    SysBusDevice parent_obj;
--
--    MemoryRegion iomem;
--    uint32_t regs[IOMMU_NREGS];
--    hwaddr iostart;
--    qemu_irq irq;
--    uint32_t version;
--} IOMMUState;
--
- static uint64_t iommu_mem_read(void *opaque, hwaddr addr,
-                                unsigned size)
- {
-diff --git a/include/hw/sparc/sun4m.h b/include/hw/sparc/sun4m.h
-index 580d87b..1f1cf91 100644
---- a/include/hw/sparc/sun4m.h
-+++ b/include/hw/sparc/sun4m.h
-@@ -4,10 +4,26 @@
- #include "qemu-common.h"
- #include "exec/hwaddr.h"
- #include "qapi/qmp/types.h"
-+#include "hw/sysbus.h"
- 
- /* Devices used by sparc32 system.  */
- 
- /* iommu.c */
-+#define TYPE_SUN4M_IOMMU "iommu"
-+#define SUN4M_IOMMU(obj) OBJECT_CHECK(IOMMUState, (obj), TYPE_SUN4M_IOMMU)
-+
-+#define IOMMU_NREGS         (4 * 4096 / 4)
-+
-+typedef struct IOMMUState {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion iomem;
-+    uint32_t regs[IOMMU_NREGS];
-+    hwaddr iostart;
-+    qemu_irq irq;
-+    uint32_t version;
-+} IOMMUState;
-+
- void sparc_iommu_memory_rw(void *opaque, hwaddr addr,
-                                  uint8_t *buf, int len, int is_write);
- static inline void sparc_iommu_memory_read(void *opaque,
+This fixes https://bugs.launchpad.net/qemu/+bug/1718118 .
+
+Daniel Henrique Barboza (1):
+  hw/ppc/spapr.c: abort unplug_request if previous unplug isn't done
+
+ hw/ppc/spapr.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
 -- 
-1.7.10.4
+2.13.6
