@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e1gSd-0007wd-GH
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 18:23:44 -0400
+	(envelope-from <eblake@redhat.com>) id 1e1gUk-0000BR-9n
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 18:25:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e1gSY-00049I-Tj
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 18:23:43 -0400
-Resent-Message-Id: <E1e1gSY-00049I-Tj@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21392)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1e1gSY-00048g-ND
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 18:23:38 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150758778512.270.15107434222651481306@b58463cdfd5f>
-In-Reply-To: <1507583223-14819-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	(envelope-from <eblake@redhat.com>) id 1e1gUj-0005Cx-7o
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 18:25:54 -0400
+References: <20171009215533.12530-1-mreitz@redhat.com>
+	<20171009215533.12530-2-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7e2e97b0-bca9-bd38-7641-c38f1e38c586@redhat.com>
+Date: Mon, 9 Oct 2017 17:25:39 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 9 Oct 2017 15:23:05 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/8] sun4m : sparc32_dma tidy-ups
+In-Reply-To: <20171009215533.12530-2-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="aF8JPXUJqwKSm8qMHQUg38DR4OH8qlqec"
+Subject: Re: [Qemu-devel] [PATCH 1/3] qcow2: Fix unaligned preallocated
+ truncation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +25,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mark.cave-ayland@ilande.co.uk
-Cc: famz@redhat.com, qemu-devel@nongnu.org, atar4qemu@gmail.com
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Ping Li <pingl@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MDc1ODMyMjMtMTQ4MTktMS1naXQtc2VuZC1lbWFpbC1tYXJrLmNhdmUtYXls
-YW5kQGlsYW5kZS5jby51awpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvOF0gc3VuNG0g
-OiBzcGFyYzMyX2RtYSB0aWR5LXVwcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
-YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
-YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1m
-b3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVj
-aG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMg
-JGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9j
-aGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAg
-ZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFND
-UklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4
-NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKOTM4MTU5OWI1ZiBzcGFyYzMy
-X2RtYTogcmVtb3ZlIGlzX2xlZG1hIGhhY2sgYW5kIHJlcGxhY2Ugd2l0aCBtZW1vcnkgcmVnaW9u
-IGFsaWFzCjM1MWFjMThhNzYgc3BhcmMzMl9kbWE6IGludHJvZHVjZSBuZXcgU1BBUkMzMl9ETUEg
-dHlwZSBjb250YWluZXIgb2JqZWN0CjJkMTk5ZTk2ZWUgc3BhcmMzMl9kbWE6IHVzZSBvYmplY3Qg
-bGluayBpbnN0ZWFkIG9mIHFkZXYgcHJvcGVydHkgdG8gcGFzcyBJT01NVSByZWZlcmVuY2UKM2Qx
-ZTBkMWFiNiBzdW40bV9pb21tdTogbW92ZSBUWVBFX1NVTjRNX0lPTU1VIGRlY2xhcmF0aW9uIHRv
-IHN1bjRtLmgKNmIyNDI3YTU5MCBzdW40bTogbW92ZSBETUEgZGV2aWNlIHdpcmluZyBmcm9tIHNw
-YXJjMzJfZG1hX2luaXQoKSB0byBzdW40bV9od19pbml0KCkKMjFjNjA3ZDgzMSBzcGFyYzMyX2Rt
-YTogbW92ZSB0eXBlIGRlY2xhcmF0aW9ucyBmcm9tIHNwYXJjMzJfZG1hLmMgdG8gc3BhcmMzMl9k
-bWEuaAo3NmNiMmJhNGJhIHNwYXJjMzJfZG1hOiBzcGxpdCBlc3AgYW5kIGxlIGludG8gc2VwYXJh
-dGUgRE1BIGRldmljZXMKYzMxYmNhMmZiNCBzcGFyYzMyX2RtYTogcmVuYW1lIFNQQVJDMzJfRE1B
-IHR5cGUgdG8gU1BBUkMzMl9ETUFfREVWSUNFCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
-ZyBQQVRDSCAxLzg6IHNwYXJjMzJfZG1hOiByZW5hbWUgU1BBUkMzMl9ETUEgdHlwZSB0byBTUEFS
-QzMyX0RNQV9ERVZJQ0UuLi4KQ2hlY2tpbmcgUEFUQ0ggMi84OiBzcGFyYzMyX2RtYTogc3BsaXQg
-ZXNwIGFuZCBsZSBpbnRvIHNlcGFyYXRlIERNQSBkZXZpY2VzLi4uCkNoZWNraW5nIFBBVENIIDMv
-ODogc3BhcmMzMl9kbWE6IG1vdmUgdHlwZSBkZWNsYXJhdGlvbnMgZnJvbSBzcGFyYzMyX2RtYS5j
-IHRvIHNwYXJjMzJfZG1hLmguLi4KQ2hlY2tpbmcgUEFUQ0ggNC84OiBzdW40bTogbW92ZSBETUEg
-ZGV2aWNlIHdpcmluZyBmcm9tIHNwYXJjMzJfZG1hX2luaXQoKSB0byBzdW40bV9od19pbml0KCku
-Li4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiM0Nzog
-RklMRTogaHcvc3BhcmMvc3VuNG0uYzo4MjQ6CisgICAgcWVtdV9pcnEgKmNwdV9pcnFzW01BWF9D
-UFVTXSwgc2xhdmlvX2lycVszMl0sIHNsYXZpb19jcHVfaXJxW01BWF9DUFVTXTsKICAgICAgICAg
-ICAgICBeCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDY2IGxpbmVzIGNoZWNrZWQKCllv
-dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvODog
-c3VuNG1faW9tbXU6IG1vdmUgVFlQRV9TVU40TV9JT01NVSBkZWNsYXJhdGlvbiB0byBzdW40bS5o
-Li4uCkNoZWNraW5nIFBBVENIIDYvODogc3BhcmMzMl9kbWE6IHVzZSBvYmplY3QgbGluayBpbnN0
-ZWFkIG9mIHFkZXYgcHJvcGVydHkgdG8gcGFzcyBJT01NVSByZWZlcmVuY2UuLi4KQ2hlY2tpbmcg
-UEFUQ0ggNy84OiBzcGFyYzMyX2RtYTogaW50cm9kdWNlIG5ldyBTUEFSQzMyX0RNQSB0eXBlIGNv
-bnRhaW5lciBvYmplY3QuLi4KQ2hlY2tpbmcgUEFUQ0ggOC84OiBzcGFyYzMyX2RtYTogcmVtb3Zl
-IGlzX2xlZG1hIGhhY2sgYW5kIHJlcGxhY2Ugd2l0aCBtZW1vcnkgcmVnaW9uIGFsaWFzLi4uCj09
-PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0K
-RW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcu
-b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlz
-dHMub3Jn
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--aF8JPXUJqwKSm8qMHQUg38DR4OH8qlqec
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, Ping Li <pingl@redhat.com>
+Message-ID: <7e2e97b0-bca9-bd38-7641-c38f1e38c586@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] qcow2: Fix unaligned preallocated
+ truncation
+References: <20171009215533.12530-1-mreitz@redhat.com>
+ <20171009215533.12530-2-mreitz@redhat.com>
+In-Reply-To: <20171009215533.12530-2-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 10/09/2017 04:55 PM, Max Reitz wrote:
+> A qcow2 image file's length is not required to have a length that is a
+> multiple of the cluster size.  However, qcow2_refcount_area() expects a=
+n
+> aligned value for its @start_offset parameter, so we need to round
+> @old_file_size up to the next cluster boundary.
+>=20
+> Reported-by: pingl <pingl@redhat.com>
+
+Should we use a real name? My autocomplete when adding cc suggests Ping L=
+i.
+
+(The upcoming git 2.15.0 adds my patch that auto-cc's anyone listed in
+Reported-by, so we don't have to keep doing it manually:
+https://github.com/git/git/commit/09ac6737 - but that doesn't help you
+while you are still on 2.13.6)
+
+> Bug: https://bugzilla.redhat.com/show_bug.cgi?id=3D1414049
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/qcow2.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--aF8JPXUJqwKSm8qMHQUg38DR4OH8qlqec
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnb92MACgkQp6FrSiUn
+Q2o+iAgAo8LiQLRhY/grbkDD8c3rP+AFNYlN/N7dew9N9V3PzefVvtvig5Vw91fX
+Fndu88p6UK6qbjN1W4HawG/MvgPgvX6f2uNwvG5vepZHb5KPtULuMR5unahS0Hlg
+6vV3BYRXnBnyDawJugVKCaUpj3FZSFz2XkXoPCnAA2PQz3M0D20OwKz95IWOgv4D
+MUlKpq+fEOAcS1F9lpwdrDPRaST3iAkGjClXwpxLDWkptTB0O9+cJ2opAIzJOyk5
+3Q53wQ3OFwu7NcmlfJvL6mWQEytra6itFffQBpAhp+dqTTJbOlb85kPgRkLaSevI
+Nrl2wqcESrnKEEfwp2HlqZ4Pxs7dMw==
+=BKI3
+-----END PGP SIGNATURE-----
+
+--aF8JPXUJqwKSm8qMHQUg38DR4OH8qlqec--
