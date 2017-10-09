@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=44841c655=anthony.perard@citrix.com>)
-	id 1e1aLe-0005zb-1z
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:52:07 -0400
+	(envelope-from <eblake@redhat.com>) id 1e1aMZ-0006fv-CU
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:53:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=44841c655=anthony.perard@citrix.com>)
-	id 1e1aLY-00050L-2A
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:52:06 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:46831)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=44841c655=anthony.perard@citrix.com>)
-	id 1e1aLX-0004zQ-TG
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:52:00 -0400
-Date: Mon, 9 Oct 2017 16:50:44 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20171009155044.GC1771@perard.uk.xensource.com>
-References: <1507133891-26013-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1507133891-26013-4-git-send-email-ian.jackson@eu.citrix.com>
+	(envelope-from <eblake@redhat.com>) id 1e1aMT-0005Qi-RM
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:53:03 -0400
+References: <CAEfK_45dZvxvBNQpPLo71ZJhrPN5_GJr8uJ2pJZpCaFf0+i3YA@mail.gmail.com>
+	<62e835a4-ba5d-e620-47d2-180932a33426@redhat.com>
+	<20171006135425.GF26575@redhat.com>
+	<CAEfK_444_fPwjnj1M8w8XNFFwiMJW-pdN7R1Tdu+FfvB38ZBtw@mail.gmail.com>
+	<20171006140137.GH26575@redhat.com>
+	<CAEfK_455Hr1afv-H6=9QMQErDGZJtOBgFMk2F8QJshYTLgOa1Q@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e46a6b2d-83e2-d558-028c-94ad41af8fa2@redhat.com>
+Date: Mon, 9 Oct 2017 10:52:48 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1507133891-26013-4-git-send-email-ian.jackson@eu.citrix.com>
-Subject: Re: [Qemu-devel] [PATCH 3/8] xen: defer call to xen_restrict until
- after os_setup_post
+In-Reply-To: <CAEfK_455Hr1afv-H6=9QMQErDGZJtOBgFMk2F8QJshYTLgOa1Q@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="OfJAko1KLJptSEnQ0hDwR2Rw5wU0DPBV2"
+Subject: Re: [Qemu-devel] Patch to add helpful tracing output for driver
+ authors in NVMe emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,130 +29,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ian Jackson <ian.jackson@eu.citrix.com>
-Cc: qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, xen-devel@lists.xenproject.org, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@nongnu.org
+To: Doug Gale <doug16k@gmail.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, keith.busch@intel.com, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-On Wed, Oct 04, 2017 at 05:18:06PM +0100, Ian Jackson wrote:
-> We need to restrict *all* the control fds that qemu opens.  Looking in
-> /proc/PID/fd shows there are many; their allocation seems scattered
-> throughout Xen support code in qemu.
-> 
-> We must postpone the restrict call until roughly the same time as qemu
-> changes its uid, chroots (if applicable), and so on.
-> 
-> There doesn't seem to be an appropriate hook already.  The RunState
-> change hook fires at different times depending on exactly what mode
-> qemu is operating in.
-> 
-> And it appears that no-one but the Xen code wants a hook at this phase
-> of execution.  So, introduce a bare call to a new function
-> xen_setup_post, just after os_setup_post.  Also provide the
-> appropriate stub for when Xen compilation is disabled.
-> 
-> Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OfJAko1KLJptSEnQ0hDwR2Rw5wU0DPBV2
+From: Eric Blake <eblake@redhat.com>
+To: Doug Gale <doug16k@gmail.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, keith.busch@intel.com,
+ kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+Message-ID: <e46a6b2d-83e2-d558-028c-94ad41af8fa2@redhat.com>
+Subject: Re: [Qemu-devel] Patch to add helpful tracing output for driver
+ authors in NVMe emulation
+References: <CAEfK_45dZvxvBNQpPLo71ZJhrPN5_GJr8uJ2pJZpCaFf0+i3YA@mail.gmail.com>
+ <62e835a4-ba5d-e620-47d2-180932a33426@redhat.com>
+ <20171006135425.GF26575@redhat.com>
+ <CAEfK_444_fPwjnj1M8w8XNFFwiMJW-pdN7R1Tdu+FfvB38ZBtw@mail.gmail.com>
+ <20171006140137.GH26575@redhat.com>
+ <CAEfK_455Hr1afv-H6=9QMQErDGZJtOBgFMk2F8QJshYTLgOa1Q@mail.gmail.com>
+In-Reply-To: <CAEfK_455Hr1afv-H6=9QMQErDGZJtOBgFMk2F8QJshYTLgOa1Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 10/07/2017 02:51 AM, Doug Gale wrote:
+> Completely re-implemented patch, with significant improvements (now
+> specifies values in several places I missed, also reduced the amount
+> of redundant lines). I used the nvme_ as the tracing infrastructure
+> prefix. Tested with -trace nvme_* on the qemu command line, worked for
+> me.
+
+This information belongs...
+
+>=20
+>>From 166f57458d60d363a10a0933c3e860985531ac96 Mon Sep 17 00:00:00 2001
+> From: Doug Gale <doug16k@gmail.com>
+> Date: Thu, 5 Oct 2017 19:02:03 -0400
+> Subject: [PATCH] Add tracing output to NVMe emulation to help driver au=
+thors.
+>=20
+> This uses the tracing infrastructure using nvme_ as the prefix.
+>=20
+> Signed-off-by: Doug Gale <doug16k@gmail.com>
 > ---
->  hw/i386/xen/xen-hvm.c   |  8 --------
->  hw/xen/xen-common.c     | 13 +++++++++++++
->  include/sysemu/sysemu.h |  2 ++
->  stubs/xen-hvm.c         |  5 +++++
->  vl.c                    |  1 +
->  5 files changed, 21 insertions(+), 8 deletions(-)
-> 
-> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-> index d9ccd5d..7b60ec6 100644
-> --- a/hw/i386/xen/xen-hvm.c
-> +++ b/hw/i386/xen/xen-hvm.c
-> @@ -1254,14 +1254,6 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
->          goto err;
->      }
->  
-> -    if (xen_domid_restrict) {
-> -        rc = xen_restrict(xen_domid);
-> -        if (rc < 0) {
-> -            error_report("failed to restrict: error %d", errno);
-> -            goto err;
-> -        }
-> -    }
-> -
->      xen_create_ioreq_server(xen_domid, &state->ioservid);
->  
->      state->exit.notify = xen_exit_notifier;
-> diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
-> index 632a938..4056420 100644
-> --- a/hw/xen/xen-common.c
-> +++ b/hw/xen/xen-common.c
-> @@ -117,6 +117,19 @@ static void xen_change_state_handler(void *opaque, int running,
->      }
->  }
->  
-> +void xen_setup_post(void)
-> +{
-> +    int rc;
 
-We probably want to check here if Xen is enable (via xen_enabled()).
-xen_domid_restrict could be true when Xen is not used, even if it does
-not make sense to use -xen-domid-restrict in that case.
+=2E..here, after the --- separator.  It is useful to the patch reviewer,
+but does not need to be in the 'git log' history.  The maintainers use
+'git am' to process incoming patches, which automatically prunes review
+comments located in this location.
 
-> +    if (xen_domid_restrict) {
-> +        rc = xen_restrict(xen_domid);
-> +        if (rc < 0) {
-> +            perror("xen: failed to restrict");
-> +            exit(1);
-> +        }
-> +    }
-> +}
-> +
->  static int xen_init(MachineState *ms)
->  {
->      xen_xc = xc_interface_open(0, 0, 0);
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index b213696..b064a55 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -93,6 +93,8 @@ void qemu_remove_machine_init_done_notifier(Notifier *notify);
->  
->  void qemu_announce_self(void);
->  
-> +void xen_setup_post(void);
-> +
->  extern int autostart;
->  
->  typedef enum {
-> diff --git a/stubs/xen-hvm.c b/stubs/xen-hvm.c
-> index 3ca6c51..9701feb 100644
-> --- a/stubs/xen-hvm.c
-> +++ b/stubs/xen-hvm.c
-> @@ -13,6 +13,7 @@
->  #include "hw/xen/xen.h"
->  #include "exec/memory.h"
->  #include "qmp-commands.h"
-> +#include "sysemu/sysemu.h"
->  
->  int xen_pci_slot_get_pirq(PCIDevice *pci_dev, int irq_num)
->  {
-> @@ -61,3 +62,7 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
->  void qmp_xen_set_global_dirty_log(bool enable, Error **errp)
->  {
->  }
-> +
-> +void xen_setup_post(void)
-> +{
-> +}
-> diff --git a/vl.c b/vl.c
-> index fb1f05b..9e7d541 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -4793,6 +4793,7 @@ int main(int argc, char **argv, char **envp)
->      }
->  
->      os_setup_post();
-> +    xen_setup_post();
->  
->      main_loop();
->      replay_disable_events();
-> -- 
-> 2.1.4
-> 
+Also, since this is a version 2 patch, it is best if your subject line
+includes 'v2', and if you send the patch as a new top-level thread
+rather than in-reply-to v1.  This can be done with 'git send-email -v2'.
 
--- 
-Anthony PERARD
+The subject line is atypical; we tend to prefer 'topic: Short summary',
+where you are missing the topic, you had a trailing dot that is not
+typical, and where your line is longer than usual.  A better subject
+line might be:
+
+nvme: Add tracing output
+
+
+For more helpful information on patch submission:
+
+https://wiki.qemu.org/Contribute/SubmitAPatch
+
+I didn't look closely at the patch itself, but did notice:
+
+> +nvme_mmio_start_failed(void) "setting controller enable bit failed!"
+> +nvme_mmio_start_success(void) "setting controller enable bit succeeded=
+"
+> +nvme_mmio_stopped(void) "cleared controller enable bit"
+> +nvme_mmio_shutdown_set(void) "shutdown bit set"
+> +nvme_mmio_shutdown_cleared(void) "shutdown bit cleared"
+> +nvme_mmio_ignored(uint64_t offset, uint64_t data) "invalid MMIO
+> write, offset=3D0x%"PRIx64", data=3D%"PRIx64"!"
+
+You have a couple of traces with a trailing '!'; that is atypical,
+because we don't need our traces to shout at the user.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--OfJAko1KLJptSEnQ0hDwR2Rw5wU0DPBV2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnbm1AACgkQp6FrSiUn
+Q2pVrAf+KjPs2SWhzScnFof07N0nDgfTa/rXmwO7jZF/hFjjH5gpY8lOw9FIAFdg
+XSRYDOoa8/EfbgSXnft8TcJLQnzcGG350Kk1TrRAFMyisCH9oyjBcGSg2MNbgGP8
+WuAsQZ39eLtgDKGr2e24M+8WedxzgUiqaUiWP5i+++JvIfQy5CFSy4iTC01qcG02
+viY9TGaop3+7trB60ZKsBbj0SVYoY2cOH41YI1BWEgb7baSZVTYZija2QbejIYpc
+XApau4JwtJ9vZc6OBFtuTnc4wOnQ2G3IF9ojKkOzJNhD5g680PNQjp6dUbpckPzG
+WIDbhgJRPjzU9COT8AB6E4HwoAmE4A==
+=DG2Y
+-----END PGP SIGNATURE-----
+
+--OfJAko1KLJptSEnQ0hDwR2Rw5wU0DPBV2--
