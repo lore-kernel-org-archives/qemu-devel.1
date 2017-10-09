@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <d@vidbuchanan.co.uk>) id 1e1Wf5-0005XY-N4
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 07:55:56 -0400
+	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1e1XBC-0003ti-57
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 08:29:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <d@vidbuchanan.co.uk>) id 1e1Wf2-0005xv-C8
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 07:55:55 -0400
-Received: from mx.pawnmail.com ([107.191.103.103]:39728 helo=pawnmail.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <d@vidbuchanan.co.uk>) id 1e1Wf2-0005wu-6o
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 07:55:52 -0400
-References: <20170828122906.18993-1-kraxel@redhat.com>
-From: David Buchanan <d@vidbuchanan.co.uk>
-Message-ID: <e64a628c-3377-f3f5-0646-079a2a175354@vidbuchanan.co.uk>
-Date: Mon, 9 Oct 2017 12:55:29 +0100
+	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1e1XB8-00005s-4T
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 08:29:06 -0400
+Received: from www262.sakura.ne.jp ([2001:e42:101:1:202:181:97:72]:17255)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
+	id 1e1XB7-0008Vu-Me
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 08:29:02 -0400
+References: <1506744354-20979-1-git-send-email-wei.w.wang@intel.com>
+	<1506744354-20979-2-git-send-email-wei.w.wang@intel.com>
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Message-ID: <3b575060-e30b-1afe-96a8-6a9f732d5528@I-love.SAKURA.ne.jp>
+Date: Mon, 9 Oct 2017 20:30:00 +0900
 MIME-Version: 1.0
-In-Reply-To: <20170828122906.18993-1-kraxel@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="NWpfbg4Fc6ub1kicvm2conkMQJtEth5kM"
-Subject: Re: [Qemu-devel] [PATCH v2] vga: stop passing pointers to
- vga_draw_line* functions
+In-Reply-To: <1506744354-20979-2-git-send-email-wei.w.wang@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v16 1/5] lib/xbitmap: Introduce xbitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: P J P <ppandit@redhat.com>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NWpfbg4Fc6ub1kicvm2conkMQJtEth5kM
-From: David Buchanan <d@vidbuchanan.co.uk>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: P J P <ppandit@redhat.com>
-Message-ID: <e64a628c-3377-f3f5-0646-079a2a175354@vidbuchanan.co.uk>
-Subject: Re: [PATCH v2] vga: stop passing pointers to vga_draw_line* functions
-References: <20170828122906.18993-1-kraxel@redhat.com>
-In-Reply-To: <20170828122906.18993-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 2017/09/30 13:05, Wei Wang wrote:
+>  /**
+> + *  xb_preload - preload for xb_set_bit()
+> + *  @gfp_mask: allocation mask to use for preloading
+> + *
+> + * Preallocate memory to use for the next call to xb_set_bit(). This function
+> + * returns with preemption disabled. It will be enabled by xb_preload_end().
+> + */
+> +void xb_preload(gfp_t gfp)
+> +{
+> +	if (__radix_tree_preload(gfp, XB_PRELOAD_SIZE) < 0)
+> +		preempt_disable();
+> +
+> +	if (!this_cpu_read(ida_bitmap)) {
+> +		struct ida_bitmap *bitmap = kmalloc(sizeof(*bitmap), gfp);
+> +
+> +		if (!bitmap)
+> +			return;
+> +		bitmap = this_cpu_cmpxchg(ida_bitmap, NULL, bitmap);
+> +		kfree(bitmap);
+> +	}
+> +}
 
-I might be mistaken, but I don't think this patch actually fixes
-CVE-2017-13672. I tested the latest git repo (last commit 530049bc1d)
-against my initial reproducer, and QEMU still segfaults.
+I'm not sure whether this function is safe.
 
-I think this is because the actual OOB read occurs inside pixman, which
-of course is not affected by this patch. Perhaps bounds checks need to
-be applied to the arguments passed into pixman?
-
-
---NWpfbg4Fc6ub1kicvm2conkMQJtEth5kM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEt87yIm65OG/7THLK9E3dinJwx5kFAlnbY7cACgkQ9E3dinJw
-x5nmkwgAjagmq+GBHkHHULP/JR4+FsfWZDifMCt+Ha12HDzd2o9biw9tnWpzpsxf
-DAk1BcaPLDIKQE2bT+x1Qso750RZRhTBTnPaPjP+PINVpPdaEbsX1RStISF5Kikn
-5/W0UuYrzrVZYAdNoew8O7rkieZlU7ETV/07lueU9sB/8oNWU7eifg1zirIIKAzs
-3Z45nw+p6a0a9yJk79EtIwO2PhHAf6JT4ulRD2CzZBGi1dgCrpDXH8/+Im0nClqZ
-lkOA8VFAcsuJN92mGfoc7c+UxzlLwziNPHk2KNbF6PTnVSpZwd03/Ld7Bh2Youio
-CN62RCPYFr3A74rGtNV+YNeI4dVs4g==
-=uJxD
------END PGP SIGNATURE-----
-
---NWpfbg4Fc6ub1kicvm2conkMQJtEth5kM--
+__radix_tree_preload() returns 0 with preemption disabled upon success.
+xb_preload() disables preemption if __radix_tree_preload() fails.
+Then, kmalloc() is called with preemption disabled, isn't it?
+But xb_set_page() calls xb_preload(GFP_KERNEL) which might sleep...
