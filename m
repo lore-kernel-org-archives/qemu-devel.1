@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e1dFw-0001ij-Hg
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 14:58:26 -0400
+	(envelope-from <bounces@canonical.com>) id 1e1dIw-0002lJ-7Z
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:01:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e1dFt-0002sK-EQ
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 14:58:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55564)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e1dFt-0002qS-4a
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 14:58:21 -0400
-Date: Mon, 9 Oct 2017 19:58:13 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171009185812.GR2374@work-vm>
-References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
-	<1504081950-2528-11-git-send-email-peterx@redhat.com>
-	<20170921192903.GH3401@work-vm>
-	<20170927073441.GD25011@pxdev.xzpeter.org>
+	(envelope-from <bounces@canonical.com>) id 1e1dIt-0005JB-6X
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:01:30 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39762)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e1dIt-0005I1-0h
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:01:27 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e1dIq-0003kW-12
+	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 19:01:24 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C8B102E808D
+	for <qemu-devel@nongnu.org>; Mon,  9 Oct 2017 19:01:20 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170927073441.GD25011@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [RFC v2 10/33] migration: allow dst vm pause on
- postcopy
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 09 Oct 2017 18:48:00 -0000
+From: John Snow <1719282@bugs.launchpad.net>
+Reply-To: Bug 1719282 <1719282@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150633291490.21822.10650098875082014124.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150757488067.21970.16977992109616289175.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1719282] Re: Unable to boot after drive-mirror
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,222 +36,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: qemu-devel@nongnu.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Thu, Sep 21, 2017 at 08:29:03PM +0100, Dr. David Alan Gilbert wrote:
-> > * Peter Xu (peterx@redhat.com) wrote:
-> > > When there is IO error on the incoming channel (e.g., network down),
-> > > instead of bailing out immediately, we allow the dst vm to switch to the
-> > > new POSTCOPY_PAUSE state. Currently it is still simple - it waits the
-> > > new semaphore, until someone poke it for another attempt.
-> > > 
-> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > ---
-> > >  migration/migration.c  |  1 +
-> > >  migration/migration.h  |  3 +++
-> > >  migration/savevm.c     | 60 ++++++++++++++++++++++++++++++++++++++++++++++++--
-> > >  migration/trace-events |  2 ++
-> > >  4 files changed, 64 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/migration/migration.c b/migration/migration.c
-> > > index 8d26ea8..80de212 100644
-> > > --- a/migration/migration.c
-> > > +++ b/migration/migration.c
-> > > @@ -146,6 +146,7 @@ MigrationIncomingState *migration_incoming_get_current(void)
-> > >          memset(&mis_current, 0, sizeof(MigrationIncomingState));
-> > >          qemu_mutex_init(&mis_current.rp_mutex);
-> > >          qemu_event_init(&mis_current.main_thread_load_event, false);
-> > > +        qemu_sem_init(&mis_current.postcopy_pause_sem_dst, 0);
-> > >          once = true;
-> > >      }
-> > >      return &mis_current;
-> > > diff --git a/migration/migration.h b/migration/migration.h
-> > > index 0c957c9..c423682 100644
-> > > --- a/migration/migration.h
-> > > +++ b/migration/migration.h
-> > > @@ -60,6 +60,9 @@ struct MigrationIncomingState {
-> > >      /* The coroutine we should enter (back) after failover */
-> > >      Coroutine *migration_incoming_co;
-> > >      QemuSemaphore colo_incoming_sem;
-> > > +
-> > > +    /* notify PAUSED postcopy incoming migrations to try to continue */
-> > > +    QemuSemaphore postcopy_pause_sem_dst;
-> > >  };
-> > >  
-> > >  MigrationIncomingState *migration_incoming_get_current(void);
-> > > diff --git a/migration/savevm.c b/migration/savevm.c
-> > > index 7172f14..3777124 100644
-> > > --- a/migration/savevm.c
-> > > +++ b/migration/savevm.c
-> > > @@ -1488,8 +1488,8 @@ static int loadvm_postcopy_ram_handle_discard(MigrationIncomingState *mis,
-> > >   */
-> > >  static void *postcopy_ram_listen_thread(void *opaque)
-> > >  {
-> > > -    QEMUFile *f = opaque;
-> > >      MigrationIncomingState *mis = migration_incoming_get_current();
-> > > +    QEMUFile *f = mis->from_src_file;
-> > >      int load_res;
-> > >  
-> > >      migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
-> > > @@ -1503,6 +1503,14 @@ static void *postcopy_ram_listen_thread(void *opaque)
-> > >       */
-> > >      qemu_file_set_blocking(f, true);
-> > >      load_res = qemu_loadvm_state_main(f, mis);
-> > > +
-> > > +    /*
-> > > +     * This is tricky, but, mis->from_src_file can change after it
-> > > +     * returns, when postcopy recovery happened. In the future, we may
-> > > +     * want a wrapper for the QEMUFile handle.
-> > > +     */
-> > > +    f = mis->from_src_file;
-> > > +
-> > >      /* And non-blocking again so we don't block in any cleanup */
-> > >      qemu_file_set_blocking(f, false);
-> > >  
-> > > @@ -1581,7 +1589,7 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
-> > >      /* Start up the listening thread and wait for it to signal ready */
-> > >      qemu_sem_init(&mis->listen_thread_sem, 0);
-> > >      qemu_thread_create(&mis->listen_thread, "postcopy/listen",
-> > > -                       postcopy_ram_listen_thread, mis->from_src_file,
-> > > +                       postcopy_ram_listen_thread, NULL,
-> > >                         QEMU_THREAD_DETACHED);
-> > >      qemu_sem_wait(&mis->listen_thread_sem);
-> > >      qemu_sem_destroy(&mis->listen_thread_sem);
-> > > @@ -1966,11 +1974,44 @@ void qemu_loadvm_state_cleanup(void)
-> > >      }
-> > >  }
-> > >  
-> > > +/* Return true if we should continue the migration, or false. */
-> > > +static bool postcopy_pause_incoming(MigrationIncomingState *mis)
-> > > +{
-> > > +    trace_postcopy_pause_incoming();
-> > > +
-> > > +    migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
-> > > +                      MIGRATION_STATUS_POSTCOPY_PAUSED);
-> > > +
-> > > +    assert(mis->from_src_file);
-> > > +    qemu_file_shutdown(mis->from_src_file);
-> > > +    qemu_fclose(mis->from_src_file);
-> > > +    mis->from_src_file = NULL;
-> > > +
-> > > +    assert(mis->to_src_file);
-> > > +    qemu_mutex_lock(&mis->rp_mutex);
-> > > +    qemu_file_shutdown(mis->to_src_file);
-> > 
-> > Should you not do the shutdown() before the lock?
-> > For example if the other thread is stuck, with rp_mutex
-> > held, trying to write to to_src_file, then you'll block
-> > waiting for the mutex.  If you call shutdown and then take
-> > the lock, the other thread will error and release the lock.
-> 
-> The problem is that IMHO QEMUFile is not yet thread-safe itself.  So
-> if we operate on it (even to shut it down) logically we need to have
-> the lock, right?
+It *looks* to me at a glance like the sequence should be safe, but I
+don't have any hunches for what could be going wrong, or why.
 
-That probably needs fixing for 'shutdown' under the assumption that
-   a) No one has or is deleting/freeing the QEMUFile
-   b) No one is closing the QEMUFile
+Can you please post:
 
-The whole point of using shutdown() is it forces any stuck send()'s or
-read()'s to fail rather than staying stuck.
+(1) The command-line used to launch QEMU on the source machine, and
+(2) The command-line used to launch QEMU on the destination machine from th=
+e mirrored image?
 
-> Then, IMHO the question would be: when will the send() be stuck in the
-> other thread?
-> 
-> Normally the only case I can think of is that source didn't recv()
-> fast enough, and we even consumed all the write buffer in dst side (I
-> don't really know how kernel manages the buffers though, and e.g. how
-> the size of buffer is defined...).
-> 
-> But when reach here, the channel (say, from_src_file and to_src_file,
-> since both of them are using the same channel behind the QEMUFile
-> interface) should already be broken in some way, then IIUC even there
-> is a send() in the other thread, it should return at some point with a
-> failure as well, just like how we reached here (possibly due to a
-> read() failure).
+-- =
 
-We have to be careful about this; a network can fail in a way it
-gets stuck rather than fails - this can get stuck until a full TCP
-disconnection; and that takes about 30mins (from memory).
-The nice thing about using 'shutdown' is that you can kill the existing
-connection if it's hung. (Which then makes an interesting question;
-the rules in your migrate-incoming command become different if you
-want to declare it's failed!).  Having said that, you're right that at
-this point stuff has already failed - so do we need the shutdown?
-(You might want to do the shutdown as part of the recovery earlier
-or as a separate command to force the failure)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1719282
 
-> > I'm not quite sure what will happen if we end up calling this
-> > before the main thread has been returned from postcopy and the
-> > device loading is complete.
-> 
-> IIUC you mean the time starts from when we got MIG_CMD_PACKAGED until
-> main thread finishes handling that package?
+Title:
+  Unable to boot after drive-mirror
 
-Yes.
+Status in QEMU:
+  New
 
-> Normally I think that should not matter much since during handling the
-> package it should hardly fail (we were reading from a buffer QIO
-> channel, no real IOs there)... 
+Bug description:
+  Hi,
+  I am using "drive-mirror" qmp block-job command to transfer VM disk image=
+ to other path (different physical disk on host).
+  Unfortunately after shutting down and starting from new image, VM is unab=
+le to boot and qrub enters rescue mode displaying following error:
+  ```
+  error: file '/grub/i386-pc/normal.mod' not found.
+  Entering rescue mode...
+  grub rescue>
+  ```
 
-Note that while the main thread is reading the package, the listener
-thread is receiving pages, so you can legally get a failure at that
-point when the fd fails as it's receiving pages at the same time
-as reading the devices.
-(There's an argument that if it fails before you've received all
-your devices then perhaps you can just restart the source)
+  To investigate the problem, I compared both RAW images using linux
+  "cmp -l" command and found out that they differ in 569028 bytes
+  starting from address 185598977 to 252708864 which are located on
+  /boot partition.
 
-> But I agree about the reasoning.  How
-> about one more patch to postpone the "active" to "postcopy-active"
-> state change after the package is handled correctly?  Like:
-> 
-> --------------
-> diff --git a/migration/savevm.c b/migration/savevm.c                     
-> index b5c3214034..8317b2a7e2 100644 
-> --- a/migration/savevm.c            
-> +++ b/migration/savevm.c            
-> @@ -1573,8 +1573,6 @@ static void *postcopy_ram_listen_thread(void *opaque)                                                                       
->      QEMUFile *f = mis->from_src_file;                                   
->      int load_res;                  
->                                     
-> -    migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,             
-> -                                   MIGRATION_STATUS_POSTCOPY_ACTIVE);   
->      qemu_sem_post(&mis->listen_thread_sem);                             
->      trace_postcopy_ram_listen_thread_start();                           
->                                     
-> @@ -1817,6 +1815,9 @@ static int loadvm_handle_cmd_packaged(MigrationIncomingState *mis)                                                          
->      qemu_fclose(packf);            
->      object_unref(OBJECT(bioc));    
->                                     
-> +    migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,             
-> +                                   MIGRATION_STATUS_POSTCOPY_ACTIVE);   
-> +                                   
->      return ret;                    
->  }                                  
-> --------------
-> 
-> This function will only be called with "postcopy-active" state.
+  So I mounted /boot partition of mirrored RAW image on host OS and it
+  seems that file-system is broken and grub folder is not recognized.
+  But /boot on original RAW image has no problem.
 
-I *think* that's safe; you've got to be careful, but I can't see
-anyone on the destination that cares about the destinction.
+  Mirrored Image:
+  ls -l /mnt/vm-boot/
+  ls: cannot access /mnt/vm-boot/grub: Structure needs cleaning
+  total 38168
+  -rw-r--r-- 1 root root   157721 Oct 19  2016 config-3.16.0-4-amd64
+  -rw-r--r-- 1 root root   129281 Sep 20  2015 config-3.2.0-4-amd64
+  d????????? ? ?    ?           ?            ? grub
+  -rw-r--r-- 1 root root 15739360 Nov  2  2016 initrd.img-3.16.0-4-amd64
+  -rw-r--r-- 1 root root 12115412 Oct 10  2015 initrd.img-3.2.0-4-amd64
+  drwxr-xr-x 2 root root    12288 Oct  7  2013 lost+found
+  -rw-r--r-- 1 root root  2679264 Oct 19  2016 System.map-3.16.0-4-amd64
+  -rw-r--r-- 1 root root  2114662 Sep 20  2015 System.map-3.2.0-4-amd64
+  -rw-r--r-- 1 root root  3126448 Oct 19  2016 vmlinuz-3.16.0-4-amd64
+  -rw-r--r-- 1 root root  2842592 Sep 20  2015 vmlinuz-3.2.0-4-amd64
 
-> > Also, at this point have we guaranteed no one else is about
-> > to do an op on mis->to_src_file and will seg?
-> 
-> I think no?  Since IMHO the main thread is playing with the buffer QIO
-> channel, rather than the real one?
+  Original Image:
+  ls /mnt/vm-boot/ -l
+  total 38173
+  -rw-r--r-- 1 root root   157721 Oct 19  2016 config-3.16.0-4-amd64
+  -rw-r--r-- 1 root root   129281 Sep 20  2015 config-3.2.0-4-amd64
+  drwxr-xr-x 5 root root     5120 Nov  2  2016 grub
+  -rw-r--r-- 1 root root 15739360 Nov  2  2016 initrd.img-3.16.0-4-amd64
+  -rw-r--r-- 1 root root 12115412 Oct 10  2015 initrd.img-3.2.0-4-amd64
+  drwxr-xr-x 2 root root    12288 Oct  7  2013 lost+found
+  -rw-r--r-- 1 root root  2679264 Oct 19  2016 System.map-3.16.0-4-amd64
+  -rw-r--r-- 1 root root  2114662 Sep 20  2015 System.map-3.2.0-4-amd64
+  -rw-r--r-- 1 root root  3126448 Oct 19  2016 vmlinuz-3.16.0-4-amd64
+  -rw-r--r-- 1 root root  2842592 Sep 20  2015 vmlinuz-3.2.0-4-amd64
 
-OK.
+  ls /mnt/vm-boot/grub/ -l
+  total 2376
+  -rw-r--r-- 1 root root      48 Oct  7  2013 device.map
+  drwxr-xr-x 2 root root    1024 Oct 10  2015 fonts
+  -r--r--r-- 1 root root    9432 Nov  2  2016 grub.cfg
+  -rw-r--r-- 1 root root    1024 Oct  7  2013 grubenv
+  drwxr-xr-x 2 root root    6144 Aug  6  2016 i386-pc
+  drwxr-xr-x 2 root root    1024 Aug  6  2016 locale
+  -rw-r--r-- 1 root root 2400500 Aug  6  2016 unicode.pf2
 
-> (btw, could I ask what's "seg"? :)
+  qemu Version: 2.7.0-10
 
-just short for segmentation fault; sig 11.
+  Host OS: Debian 8x64
+  Guest OS: Debian 8x64
 
-Dave
+  QMP Commands log:
+  socat UNIX-CONNECT:/var/run/qemu-server/48016.qmp STDIO
+  {"QMP": {"version": {"qemu": {"micro": 0, "minor": 7, "major": 2}, "packa=
+ge": "pve-qemu-kvm_2.7.0-10"}, "capabilities": []}}
+  { "execute": "qmp_capabilities" }
+  {"return": {}}
+  { "execute": "drive-mirror",
+    "arguments": {
+      "device": "drive-ide0",
+      "target": "/diskc/48016/vm-48016-disk-2.raw",
+      "sync": "full",
+      "mode": "absolute-paths",
+      "speed": 0
+    }
+  }
+  {"return": {}}
+  {"timestamp": {"seconds": 1506331591, "microseconds": 623095}, "event": "=
+BLOCK_JOB_READY", "data": {"device": "drive-ide0", "len": 269445758976, "of=
+fset": 269445758976, "speed": 0, "type": "mirror"}}
+  {"timestamp": {"seconds": 1506332641, "microseconds": 245272}, "event": "=
+SHUTDOWN"}
+  {"timestamp": {"seconds": 1506332641, "microseconds": 377751}, "event": "=
+BLOCK_JOB_COMPLETED", "data": {"device": "drive-ide0", "len": 271707340800,=
+ "offset": 271707340800, "speed": 0, "type": "mirror"}}
 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1719282/+subscriptions
