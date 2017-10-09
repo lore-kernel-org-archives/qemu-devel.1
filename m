@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1e1aJJ-00042n-2Z
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:49:42 -0400
+	(envelope-from <clg@kaod.org>) id 1e1aJQ-00047E-IT
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:49:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1e1aJI-000301-5P
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:49:41 -0400
-References: <20171009153856.20387-1-berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <c2d4119f-a3b1-3f2c-cd2c-401d2438a650@redhat.com>
-Date: Mon, 9 Oct 2017 17:49:30 +0200
+	(envelope-from <clg@kaod.org>) id 1e1aJK-00032q-Lw
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:49:48 -0400
+Received: from 5.mo4.mail-out.ovh.net ([188.165.44.50]:41154)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1e1aJK-00030t-F9
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:49:42 -0400
+Received: from player746.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id E2A85D5D1E
+	for <qemu-devel@nongnu.org>; Mon,  9 Oct 2017 17:49:40 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Mon,  9 Oct 2017 17:49:26 +0200
+Message-Id: <20171009154930.29095-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20171009153856.20387-1-berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="pAcvdTX3JSQKNKHk9WB3vosjqdw9L3gTv"
-Subject: Re: [Qemu-devel] [PATCH v2] qcow2: Use BDRV_SECTOR_BITS instead of
- its literal value
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 0/4] disable the decrementer interrupt when
+ a CPU is unplugged
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,55 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pAcvdTX3JSQKNKHk9WB3vosjqdw9L3gTv
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-Message-ID: <c2d4119f-a3b1-3f2c-cd2c-401d2438a650@redhat.com>
-Subject: Re: [PATCH v2] qcow2: Use BDRV_SECTOR_BITS instead of its literal
- value
-References: <20171009153856.20387-1-berto@igalia.com>
-In-Reply-To: <20171009153856.20387-1-berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hello,
 
-On 2017-10-09 17:38, Alberto Garcia wrote:
-> BDRV_SECTOR_BITS is defined to be 9 in block.h (and BDRV_SECTOR_SIZE
-> is calculated from that), but there are still a couple of places where
-> we are using the literal value instead of the macro.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/qcow2.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+When a CPU is stopped with the 'stop-self' RTAS call, its state
+'halted' is switched to 1 and, in this case, the MSR is not taken into
+account anymore in the cpu_has_work() routine. Only the pending
+hardware interrupts are checked with their LPCR:PECE* enablement bit.
 
-Thanks, applied to my block branch:
+If the DECR timer fires after 'stop-self' is called and before the CPU
+'stop' state is reached, the nearly-dead CPU will have some work to do
+and the guest will crash. This case happens very frequently with the
+not yet upstream P9 XIVE exploitation mode. In XICS mode, the DECR is
+occasionally fired but after 'stop' state, so no work is to be done
+and the guest survives.
 
-https://github.com/XanClic/qemu/commits/block
+I suspect there is a race between the QEMU mainloop triggering the
+timers and the TCG CPU thread but I could not quite identify the root
+cause. To be safe, let's disable the decrementer interrupt in the LPCR
+when the CPU is halted and reenable it when the CPU is restarted.
+Reseting the MSR is now pointless, so remove this dubious workaround.
 
-Max
+Thanks,
 
+C.
 
---pAcvdTX3JSQKNKHk9WB3vosjqdw9L3gTv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Changes in v2:
 
------BEGIN PGP SIGNATURE-----
+ - used a new routine ppc_cpu_pvr_match() to discriminate CPU versions
+ - removed the LPCR:PECE* enablement bit when the CPU is initialized
+   if it is a secondary
+ - included Nikunj's fix to reboot SMP TCG guests
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlnbmooSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AYXkH+gLd/P9yDZGWI43EHN+7+SOxp1NoCUxj
-S/JMfY2tfe8GTZ+uqtzdJVZMukzaO6j+r/mRBDeweMBQUyW08y4ZiJO928xOiRAA
-veF4Z+5byAMV1l2TYqCy6LKyncxECSYSMYv/DqLZKBSGm3T4fmZWjjmdg2M/Uq/6
-bsxyu5KTXQ1qK7HtpEXKH24CI9UNPhHUMRpzl0dgoRCXmXi/1TAvLnpdPyCBl6Ot
-1ll40Ycq0h/3TXWnAk8jeHe+o4jWrIx7llnyhAwrkUA2DqAMHjFqwOXCP4GuCPXV
-I2CCEPQ/Fhl2RPiWRIDUZMRUD32bIS5F7XooV6Alp8CvsXW6pR6coVQ=
-=P6G5
------END PGP SIGNATURE-----
+C=C3=A9dric Le Goater (4):
+  target/ppc: export ppc_cpu_pvr_match() helper
+  spapr/rtas: disable the decrementer interrupt when a CPU is unplugged
+  spapr/rtas: fix reboot of a a SMP TCG guest
+  spapr/rtas: do not reset the MSR in stop-self command
 
---pAcvdTX3JSQKNKHk9WB3vosjqdw9L3gTv--
+ hw/ppc/spapr_cpu_core.c     | 12 ++++++++++++
+ hw/ppc/spapr_rtas.c         | 28 +++++++++++++++++++---------
+ include/hw/ppc/ppc.h        |  1 +
+ target/ppc/machine.c        |  5 +++--
+ target/ppc/translate_init.c | 19 +++++++++++++++++--
+ 5 files changed, 52 insertions(+), 13 deletions(-)
+
+--=20
+2.13.6
