@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1e1UVV-00056y-Ap
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 05:37:54 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1e1UWA-0005Zy-6Z
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 05:38:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1e1UVQ-0002AV-Vm
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 05:37:53 -0400
-Received: from mga11.intel.com ([192.55.52.93]:58344)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1e1UVQ-00028n-Nb
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 05:37:48 -0400
-Message-ID: <59DB43DD.30409@intel.com>
-Date: Mon, 09 Oct 2017 17:39:41 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1e1UW5-0002SS-Hy
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 05:38:34 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:46183)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1e1UW5-0002Ri-CO
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 05:38:29 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id m72so20772210wmc.1
+	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 02:38:28 -0700 (PDT)
+References: <20171006235023.11952-1-f4bug@amsat.org>
+	<20171006235023.11952-79-f4bug@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20171006235023.11952-79-f4bug@amsat.org>
+Date: Mon, 09 Oct 2017 10:38:26 +0100
+Message-ID: <877ew4bqzx.fsf@linaro.org>
 MIME-Version: 1.0
-References: <1506744354-20979-1-git-send-email-wei.w.wang@intel.com>
-	<1506864327.1916.3.camel@icloud.com>
-In-Reply-To: <1506864327.1916.3.camel@icloud.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v16 0/5] Virtio-balloon Enhancement
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 78/88] gdb: use g_new() family of functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,17 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Damian Tometzki <damian.tometzki@icloud.com>, virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com
-Cc: david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu trival <qemu-trivial@nongnu.org>
 
-On 10/01/2017 09:25 PM, Damian Tometzki wrote:
-> Hello,
+
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+
+> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 >
-> where i can found the patch in git.kernel.org ?
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  gdbstub.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
+> diff --git a/gdbstub.c b/gdbstub.c
+> index 2a94030d3b..5f0d8af1c0 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -1786,7 +1786,7 @@ static void gdb_accept(void)
+>      /* set short latency */
+>      socket_set_nodelay(fd);
+>
+> -    s =3D g_malloc0(sizeof(GDBState));
+> +    s =3D g_new0(GDBState, 1);
+>      s->c_cpu =3D first_cpu;
+>      s->g_cpu =3D first_cpu;
+>      s->fd =3D fd;
+> @@ -1980,7 +1980,7 @@ int gdbserver_start(const char *device)
+>
+>      s =3D gdbserver_state;
+>      if (!s) {
+> -        s =3D g_malloc0(sizeof(GDBState));
+> +        s =3D g_new0(GDBState, 1);
+>          gdbserver_state =3D s;
+>
+>          qemu_add_vm_change_state_handler(gdb_vm_state_change, NULL);
 
-We don't have patches there. If you want to try this feature, you can 
-get the qemu side draft code here: https://github.com/wei-w-wang/qemu-lm
 
-Best,
-Wei
+--
+Alex Benn=C3=A9e
