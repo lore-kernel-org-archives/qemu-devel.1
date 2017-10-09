@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e1bZA-0003Uh-M3
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:10:12 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e1bbv-0005Dg-Fz
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:13:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e1bZ4-0003eo-HK
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:10:08 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:52589)
+	(envelope-from <peter.maydell@linaro.org>) id 1e1bbu-0005ed-JN
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:12:59 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:50189)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e1bZ4-0003dP-9s
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:10:02 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id k4so25361820wmc.1
-	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 10:10:02 -0700 (PDT)
+	id 1e1bbu-0005e3-DX
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:12:58 -0400
+Received: by mail-wm0-x231.google.com with SMTP id u138so24381387wmu.5
+	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 10:12:58 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAHQ1cqGy5xaqf4sVT34fv=cRDTDhpi2Vfx01SA2+cvdYqiArPA@mail.gmail.com>
-References: <20170918195100.17593-1-andrew.smirnov@gmail.com>
-	<20170918195100.17593-17-andrew.smirnov@gmail.com>
-	<CAFEAcA_a_YLw4u5SwCF-L_n630iiJJwyphbKc2M-orvFs7dERg@mail.gmail.com>
-	<CAHQ1cqGy5xaqf4sVT34fv=cRDTDhpi2Vfx01SA2+cvdYqiArPA@mail.gmail.com>
+In-Reply-To: <1504286483-23327-8-git-send-email-eric.auger@redhat.com>
+References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
+	<1504286483-23327-8-git-send-email-eric.auger@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Oct 2017 18:09:40 +0100
-Message-ID: <CAFEAcA-MyTaffU7mEV3XH95NOvFmaKm2a=VkFbDU6n6dwTpuRA@mail.gmail.com>
+Date: Mon, 9 Oct 2017 18:12:36 +0100
+Message-ID: <CAFEAcA-QNCreM0JQZYgHpE5kwXoidrY=gxzSfSgMJsEZ_5D=Jg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 16/17] i.MX: Add i.MX7 SOC implementation.
+Subject: Re: [Qemu-devel] [PATCH v7 07/20] hw/arm/smmuv3: Queue helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Smirnov <andrew.smirnov@gmail.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, Radha Mohan <mohun106@gmail.com>, Trey Cain <tcain@qti.qualcomm.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Will Deacon <will.deacon@arm.com>, jean-philippe.brucker@arm.com, robin.murphy@arm.com, Peter Xu <peterx@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, wtownsen@redhat.com
 
-On 9 October 2017 at 17:18, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
-> On Fri, Oct 6, 2017 at 7:38 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 18 September 2017 at 20:50, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
->>> +static void fsl_imx7_realize(DeviceState *dev, Error **errp)
->>> +{
->>> +    FslIMX7State *s = FSL_IMX7(dev);
->>> +    Object *o;
->>> +    int i;
->>> +    qemu_irq irq;
->>> +
->>> +    for_each_cpu(i) {
->>> +       o = OBJECT(&s->cpu[i]);
->>> +
->>> +        object_property_set_int(o, QEMU_PSCI_CONDUIT_SMC,
->>> +                                "psci-conduit", &error_abort);
->>> +
->>> +        object_property_set_bool(o, false, "has_el3", &error_abort);
->>
->> Does this SoC's CPU really not have EL3?
->>
+On 1 September 2017 at 18:21, Eric Auger <eric.auger@redhat.com> wrote:
+> We introduce helpers to read/write into the circular queues.
+> smmuv3_read_cmdq and smmuv3_write_evtq will become static
+> later on.
 >
-> The SoC support TrustZone, so I thing it does have EL3. This setting
-> however was breaking SMP support(I can't remember more details) and
-> that's why I added the code setting it to "false".
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-The idea is that for new boards (where we start from "no guest
-code works") we try to model the hardware correctly from the
-start, ie figure out why SMP doesn't work if you say you have
-EL3 (probably because either you need to provide boot code
-for the other CPUs or implement a power controller, depending
-on how SMP secondary CPU start works on this hardware).
-Existing board models that were added before we got EL3 working
-tend to set has_el3 to false even though the h/w we're modelling
-has EL3, because they're maintaining backwards compatibility with
-previous released versions of QEMU where we didn't implement EL3.
-New boards don't have that back-compat requirement, so if it's
-not too hard to get it working from the start that's preferable.
+See comments on a previous patch where I suggest a better
+way to implement the queue increment/wrapping handling.
+
+> +typedef enum {
+> +    CMD_Q_EMPTY,
+> +    CMD_Q_FULL,
+> +    CMD_Q_PARTIALLY_FILLED,
+> +} SMMUQStatus;
+> +
+> +#define Q_ENTRY(q, idx)  (q->base + q->ent_size * idx)
+> +#define Q_WRAP(q, pc)    ((pc) >> (q)->shift)
+> +#define Q_IDX(q, pc)     ((pc) & ((1 << (q)->shift) - 1))
+> +
+> +static inline SMMUQStatus __smmu_queue_status(SMMUV3State *s, SMMUQueue *q)
+
+No __ prefixes, please.
+
+> +{
+> +    uint32_t prod = Q_IDX(q, q->prod);
+> +    uint32_t cons = Q_IDX(q, q->cons);
+> +
+> +    if ((prod == cons) && (q->wrap.prod != q->wrap.cons)) {
+> +        return CMD_Q_FULL;
+> +    } else if ((prod == cons) && (q->wrap.prod == q->wrap.cons)) {
+> +        return CMD_Q_EMPTY;
+> +    }
+> +    return CMD_Q_PARTIALLY_FILLED;
+> +}
+> +#define smmu_is_q_full(s, q) (__smmu_queue_status(s, q) == CMD_Q_FULL)
+> +#define smmu_is_q_empty(s, q) (__smmu_queue_status(s, q) == CMD_Q_EMPTY)
+> +
+> +static inline int __smmu_q_enabled(SMMUV3State *s, uint32_t q)
+> +{
+> +    return smmu_read32_reg(s, SMMU_REG_CR0) & q;
+> +}
+> +#define smmu_cmd_q_enabled(s) __smmu_q_enabled(s, SMMU_CR0_CMDQ_ENABLE)
+> +#define smmu_evt_q_enabled(s) __smmu_q_enabled(s, SMMU_CR0_EVTQ_ENABLE)
+
+This code seems to be rather macro-happy.
 
 thanks
 -- PMM
