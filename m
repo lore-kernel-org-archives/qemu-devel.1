@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e1Xn4-0007qN-5i
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 09:08:15 -0400
+	(envelope-from <d@vidbuchanan.co.uk>) id 1e1Wf5-0005XY-N4
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 07:55:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e1Xmz-0000sa-4v
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 09:08:14 -0400
-Received: from mail-wm0-f42.google.com ([74.125.82.42]:48843)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e1Xmy-0000qE-RP
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 09:08:09 -0400
-Received: by mail-wm0-f42.google.com with SMTP id i124so22273045wmf.3
-	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 06:08:08 -0700 (PDT)
-References: <20171004104636.7963-1-quintela@redhat.com>
-	<20171004104636.7963-6-quintela@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <103e0580-1a2b-b4c1-31d7-a6907602cc7e@redhat.com>
-Date: Mon, 9 Oct 2017 15:08:04 +0200
+	(envelope-from <d@vidbuchanan.co.uk>) id 1e1Wf2-0005xv-C8
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 07:55:55 -0400
+Received: from mx.pawnmail.com ([107.191.103.103]:39728 helo=pawnmail.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <d@vidbuchanan.co.uk>) id 1e1Wf2-0005wu-6o
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 07:55:52 -0400
+References: <20170828122906.18993-1-kraxel@redhat.com>
+From: David Buchanan <d@vidbuchanan.co.uk>
+Message-ID: <e64a628c-3377-f3f5-0646-079a2a175354@vidbuchanan.co.uk>
+Date: Mon, 9 Oct 2017 12:55:29 +0100
 MIME-Version: 1.0
-In-Reply-To: <20171004104636.7963-6-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9 05/12] migration: Create ram_multifd_page
+In-Reply-To: <20170828122906.18993-1-kraxel@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NWpfbg4Fc6ub1kicvm2conkMQJtEth5kM"
+Subject: Re: [Qemu-devel] [PATCH v2] vga: stop passing pointers to
+ vga_draw_line* functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,293 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: P J P <ppandit@redhat.com>
 
-On 04/10/2017 12:46, Juan Quintela wrote:
-> The function still don't use multifd, but we have simplified
-> ram_save_page, xbzrle and RDMA stuff is gone.  We have added a new
-> counter and a new flag for this type of pages.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NWpfbg4Fc6ub1kicvm2conkMQJtEth5kM
+From: David Buchanan <d@vidbuchanan.co.uk>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: P J P <ppandit@redhat.com>
+Message-ID: <e64a628c-3377-f3f5-0646-079a2a175354@vidbuchanan.co.uk>
+Subject: Re: [PATCH v2] vga: stop passing pointers to vga_draw_line* functions
+References: <20170828122906.18993-1-kraxel@redhat.com>
+In-Reply-To: <20170828122906.18993-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I still disagree with the approach, and still haven't gotten a good
-explanation of why it is too difficult to just have multiple migration
-streams.
+I might be mistaken, but I don't think this patch actually fixes
+CVE-2017-13672. I tested the latest git repo (last commit 530049bc1d)
+against my initial reproducer, and QEMU still segfaults.
 
-Paolo
+I think this is because the actual OOB read occurs inside pixman, which
+of course is not affected by this patch. Perhaps bounds checks need to
+be applied to the arguments passed into pixman?
 
-> --
-> Add last_page parameter
-> Add commets for done and address
-> Remove multifd field, it is the same than normal pages
-> Merge next patch, now we send multiple pages at a time
-> Remove counter for multifd pages, it is identical to normal pages
-> Use iovec's instead of creating the equivalent.
-> Clear memory used by pages (dave)
-> Use g_new0(danp)
-> define MULTIFD_CONTINUE
-> ---
->  migration/ram.c | 132 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 131 insertions(+), 1 deletion(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index b57006594b..c0af538f5f 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -50,6 +50,7 @@
->  #include "migration/block.h"
->  #include "sysemu/sysemu.h"
->  #include "qemu/uuid.h"
-> +#include "qemu/iov.h"
->  
->  /***********************************************************/
->  /* ram save/restore */
-> @@ -69,6 +70,7 @@
->  #define RAM_SAVE_FLAG_XBZRLE   0x40
->  /* 0x80 is reserved in migration.h start with 0x100 next */
->  #define RAM_SAVE_FLAG_COMPRESS_PAGE    0x100
-> +#define RAM_SAVE_FLAG_MULTIFD_PAGE     0x200
->  
->  static inline bool is_zero_range(uint8_t *p, uint64_t size)
->  {
-> @@ -362,14 +364,29 @@ static void compress_threads_save_setup(void)
->  
->  /* Multiple fd's */
->  
-> +/* used to continue on the same multifd group */
-> +#define MULTIFD_CONTINUE UINT16_MAX
-> +
-> +typedef struct {
-> +    int num;
-> +    size_t size;
-> +    struct iovec *iov;
-> +} multifd_pages_t;
-> +
->  struct MultiFDSendParams {
-> +    /* not changed */
->      uint8_t id;
->      char *name;
->      QemuThread thread;
->      QIOChannel *c;
->      QemuSemaphore sem;
->      QemuMutex mutex;
-> +    /* protected by param mutex */
->      bool quit;
-> +    multifd_pages_t pages;
-> +    /* protected by multifd mutex */
-> +    /* has the thread finish the last submitted job */
-> +    bool done;
->  };
->  typedef struct MultiFDSendParams MultiFDSendParams;
->  
-> @@ -377,8 +394,26 @@ struct {
->      MultiFDSendParams *params;
->      /* number of created threads */
->      int count;
-> +    QemuMutex mutex;
-> +    QemuSemaphore sem;
-> +    multifd_pages_t pages;
->  } *multifd_send_state;
->  
-> +static void multifd_init_pages(multifd_pages_t *pages)
-> +{
-> +    pages->num = 0;
-> +    pages->size = migrate_multifd_page_count();
-> +    pages->iov = g_new0(struct iovec, pages->size);
-> +}
-> +
-> +static void multifd_clear_pages(multifd_pages_t *pages)
-> +{
-> +    pages->num = 0;
-> +    pages->size = 0;
-> +    g_free(pages->iov);
-> +    pages->iov = NULL;
-> +}
-> +
->  static void terminate_multifd_send_threads(Error *errp)
->  {
->      int i;
-> @@ -417,9 +452,11 @@ int multifd_save_cleanup(Error **errp)
->          socket_send_channel_destroy(p->c);
->          g_free(p->name);
->          p->name = NULL;
-> +        multifd_clear_pages(&p->pages);
->      }
->      g_free(multifd_send_state->params);
->      multifd_send_state->params = NULL;
-> +    multifd_clear_pages(&multifd_send_state->pages);
->      g_free(multifd_send_state);
->      multifd_send_state = NULL;
->      return ret;
-> @@ -446,6 +483,7 @@ static void *multifd_send_thread(void *opaque)
->          terminate_multifd_send_threads(local_err);
->          return NULL;
->      }
-> +    qemu_sem_post(&multifd_send_state->sem);
->  
->      while (true) {
->          qemu_mutex_lock(&p->mutex);
-> @@ -453,6 +491,15 @@ static void *multifd_send_thread(void *opaque)
->              qemu_mutex_unlock(&p->mutex);
->              break;
->          }
-> +        if (p->pages.num) {
-> +            p->pages.num = 0;
-> +            qemu_mutex_unlock(&p->mutex);
-> +            qemu_mutex_lock(&multifd_send_state->mutex);
-> +            p->done = true;
-> +            qemu_mutex_unlock(&multifd_send_state->mutex);
-> +            qemu_sem_post(&multifd_send_state->sem);
-> +            continue;
-> +        }
->          qemu_mutex_unlock(&p->mutex);
->          qemu_sem_wait(&p->sem);
->      }
-> @@ -493,6 +540,9 @@ int multifd_save_setup(void)
->      multifd_send_state = g_malloc0(sizeof(*multifd_send_state));
->      multifd_send_state->params = g_new0(MultiFDSendParams, thread_count);
->      multifd_send_state->count = 0;
-> +    qemu_mutex_init(&multifd_send_state->mutex);
-> +    qemu_sem_init(&multifd_send_state->sem, 0);
-> +    multifd_init_pages(&multifd_send_state->pages);
->      for (i = 0; i < thread_count; i++) {
->          MultiFDSendParams *p = &multifd_send_state->params[i];
->  
-> @@ -500,12 +550,52 @@ int multifd_save_setup(void)
->          qemu_sem_init(&p->sem, 0);
->          p->quit = false;
->          p->id = i;
-> +        p->done = true;
-> +        multifd_init_pages(&p->pages);
->          p->name = g_strdup_printf("multifdsend_%d", i);
->          socket_send_channel_create(multifd_new_channel_async, p);
->      }
->      return 0;
->  }
->  
-> +static uint16_t multifd_send_page(uint8_t *address, bool last_page)
-> +{
-> +    int i;
-> +    MultiFDSendParams *p = NULL; /* make happy gcc */
-> +    multifd_pages_t *pages = &multifd_send_state->pages;
-> +
-> +    pages->iov[pages->num].iov_base = address;
-> +    pages->iov[pages->num].iov_len = TARGET_PAGE_SIZE;
-> +    pages->num++;
-> +
-> +    if (!last_page) {
-> +        if (pages->num < (pages->size - 1)) {
-> +            return MULTIFD_CONTINUE;
-> +        }
-> +    }
-> +
-> +    qemu_sem_wait(&multifd_send_state->sem);
-> +    qemu_mutex_lock(&multifd_send_state->mutex);
-> +    for (i = 0; i < multifd_send_state->count; i++) {
-> +        p = &multifd_send_state->params[i];
-> +
-> +        if (p->done) {
-> +            p->done = false;
-> +            break;
-> +        }
-> +    }
-> +    qemu_mutex_unlock(&multifd_send_state->mutex);
-> +    qemu_mutex_lock(&p->mutex);
-> +    p->pages.num = pages->num;
-> +    iov_copy(p->pages.iov, pages->num, pages->iov, pages->num, 0,
-> +             iov_size(pages->iov, pages->num));
-> +    pages->num = 0;
-> +    qemu_mutex_unlock(&p->mutex);
-> +    qemu_sem_post(&p->sem);
-> +
-> +    return 0;
-> +}
-> +
->  struct MultiFDRecvParams {
->      uint8_t id;
->      char *name;
-> @@ -1086,6 +1176,31 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
->      return pages;
->  }
->  
-> +static int ram_multifd_page(RAMState *rs, PageSearchStatus *pss,
-> +                            bool last_stage)
-> +{
-> +    int pages;
-> +    uint8_t *p;
-> +    RAMBlock *block = pss->block;
-> +    ram_addr_t offset = pss->page << TARGET_PAGE_BITS;
-> +
-> +    p = block->host + offset;
-> +
-> +    pages = save_zero_page(rs, block, offset, p);
-> +    if (pages == -1) {
-> +        ram_counters.transferred +=
-> +            save_page_header(rs, rs->f, block,
-> +                             offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
-> +        qemu_put_buffer(rs->f, p, TARGET_PAGE_SIZE);
-> +        multifd_send_page(p, rs->migration_dirty_pages == 1);
-> +        ram_counters.transferred += TARGET_PAGE_SIZE;
-> +        pages = 1;
-> +        ram_counters.normal++;
-> +    }
-> +
-> +    return pages;
-> +}
-> +
->  static int do_compress_ram_page(QEMUFile *f, RAMBlock *block,
->                                  ram_addr_t offset)
->  {
-> @@ -1514,6 +1629,8 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
->          if (migrate_use_compression() &&
->              (rs->ram_bulk_stage || !migrate_use_xbzrle())) {
->              res = ram_save_compressed_page(rs, pss, last_stage);
-> +        } else if (migrate_use_multifd()) {
-> +            res = ram_multifd_page(rs, pss, last_stage);
->          } else {
->              res = ram_save_page(rs, pss, last_stage);
->          }
-> @@ -2810,6 +2927,10 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->      if (!migrate_use_compression()) {
->          invalid_flags |= RAM_SAVE_FLAG_COMPRESS_PAGE;
->      }
-> +
-> +    if (!migrate_use_multifd()) {
-> +        invalid_flags |= RAM_SAVE_FLAG_MULTIFD_PAGE;
-> +    }
->      /* This RCU critical section can be very long running.
->       * When RCU reclaims in the code start to become numerous,
->       * it will be necessary to reduce the granularity of this
-> @@ -2834,13 +2955,17 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->              if (flags & invalid_flags & RAM_SAVE_FLAG_COMPRESS_PAGE) {
->                  error_report("Received an unexpected compressed page");
->              }
-> +            if (flags & invalid_flags  & RAM_SAVE_FLAG_MULTIFD_PAGE) {
-> +                error_report("Received an unexpected multifd page");
-> +            }
->  
->              ret = -EINVAL;
->              break;
->          }
->  
->          if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
-> -                     RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)) {
-> +                     RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE |
-> +                     RAM_SAVE_FLAG_MULTIFD_PAGE)) {
->              RAMBlock *block = ram_block_from_stream(f, flags);
->  
->              host = host_from_ram_block_offset(block, addr);
-> @@ -2928,6 +3053,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->                  break;
->              }
->              break;
-> +
-> +        case RAM_SAVE_FLAG_MULTIFD_PAGE:
-> +            qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
-> +            break;
-> +
->          case RAM_SAVE_FLAG_EOS:
->              /* normal exit */
->              break;
-> 
+
+--NWpfbg4Fc6ub1kicvm2conkMQJtEth5kM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEt87yIm65OG/7THLK9E3dinJwx5kFAlnbY7cACgkQ9E3dinJw
+x5nmkwgAjagmq+GBHkHHULP/JR4+FsfWZDifMCt+Ha12HDzd2o9biw9tnWpzpsxf
+DAk1BcaPLDIKQE2bT+x1Qso750RZRhTBTnPaPjP+PINVpPdaEbsX1RStISF5Kikn
+5/W0UuYrzrVZYAdNoew8O7rkieZlU7ETV/07lueU9sB/8oNWU7eifg1zirIIKAzs
+3Z45nw+p6a0a9yJk79EtIwO2PhHAf6JT4ulRD2CzZBGi1dgCrpDXH8/+Im0nClqZ
+lkOA8VFAcsuJN92mGfoc7c+UxzlLwziNPHk2KNbF6PTnVSpZwd03/Ld7Bh2Youio
+CN62RCPYFr3A74rGtNV+YNeI4dVs4g==
+=uJxD
+-----END PGP SIGNATURE-----
+
+--NWpfbg4Fc6ub1kicvm2conkMQJtEth5kM--
