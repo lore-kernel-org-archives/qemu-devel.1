@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e1e5j-0003oH-U2
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:51:57 -0400
+	(envelope-from <gugnani.2@buckeyemail.osu.edu>) id 1e1dSf-0004TZ-5K
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:11:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e1e5g-0006hY-LK
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:51:56 -0400
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon,  9 Oct 2017 21:51:10 +0200
-Message-Id: <1507578671-158758-24-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1507578671-158758-1-git-send-email-imammedo@redhat.com>
-References: <1507578671-158758-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 23/24] ppc: pnv: drop
- PnvChipClass::cpu_model field
+	(envelope-from <gugnani.2@buckeyemail.osu.edu>) id 1e1dSc-0002GY-09
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:11:33 -0400
+Received: from mail-bl2nam02on0132.outbound.protection.outlook.com
+	([104.47.38.132]:22848
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <gugnani.2@buckeyemail.osu.edu>)
+	id 1e1dSb-0002G5-Mu
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:11:29 -0400
+From: "Gugnani, Shashank" <gugnani.2@buckeyemail.osu.edu>
+Date: Mon, 9 Oct 2017 19:11:27 +0000
+Message-ID: <CY4PR0101MB291815E29308B3C75D26876FE9740@CY4PR0101MB2918.prod.exchangelabs.com>
+Content-Language: en-US
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] Co-routine re-entered recursively
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,165 +28,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-deduce core type directly from chip type instead of
-maintaining type mapping in PnvChipClass::cpu_model.
+Hi,
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-v2:
-  - fix typo: s/pvn_chip_core_typename/pnv_chip_core_typename/
----
- include/hw/ppc/pnv.h      |  1 -
- include/hw/ppc/pnv_core.h |  1 -
- hw/ppc/pnv.c              | 25 +++++++++++++------------
- hw/ppc/pnv_core.c         |  5 -----
- 4 files changed, 13 insertions(+), 19 deletions(-)
 
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index d82eee1..20244da 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -69,7 +69,6 @@ typedef struct PnvChipClass {
-     SysBusDeviceClass parent_class;
- 
-     /*< public >*/
--    const char *cpu_model;
-     PnvChipType  chip_type;
-     uint64_t     chip_cfam_id;
-     uint64_t     cores_mask;
-diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
-index a336a1f..e337af7 100644
---- a/include/hw/ppc/pnv_core.h
-+++ b/include/hw/ppc/pnv_core.h
-@@ -46,6 +46,5 @@ typedef struct PnvCoreClass {
- 
- #define PNV_CORE_TYPE_SUFFIX "-" TYPE_PNV_CORE
- #define PNV_CORE_TYPE_NAME(cpu_model) cpu_model PNV_CORE_TYPE_SUFFIX
--extern char *pnv_core_typename(const char *model);
- 
- #endif /* _PPC_PNV_CORE_H */
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 3eafa28..80c7f62 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -55,6 +55,16 @@
- #define KERNEL_LOAD_ADDR        0x20000000
- #define INITRD_LOAD_ADDR        0x40000000
- 
-+static const char *pnv_chip_core_typename(const PnvChip *o)
-+{
-+    const char *chip_type = object_class_get_name(object_get_class(OBJECT(o)));
-+    int len = strlen(chip_type) - strlen(PNV_CHIP_TYPE_SUFFIX);
-+    char *s = g_strdup_printf(PNV_CORE_TYPE_NAME("%.*s"), len, chip_type);
-+    const char *core_type = object_class_get_name(object_class_by_name(s));
-+    g_free(s);
-+    return core_type;
-+}
-+
- /*
-  * On Power Systems E880 (POWER8), the max cpus (threads) should be :
-  *     4 * 4 sockets * 12 cores * 8 threads = 1536
-@@ -269,8 +279,7 @@ static int pnv_chip_lpc_offset(PnvChip *chip, void *fdt)
- 
- static void powernv_populate_chip(PnvChip *chip, void *fdt)
- {
--    PnvChipClass *pcc = PNV_CHIP_GET_CLASS(chip);
--    char *typename = pnv_core_typename(pcc->cpu_model);
-+    const char *typename = pnv_chip_core_typename(chip);
-     size_t typesize = object_type_get_instance_size(typename);
-     int i;
- 
-@@ -300,7 +309,6 @@ static void powernv_populate_chip(PnvChip *chip, void *fdt)
-         powernv_populate_memory_node(fdt, chip->chip_id, chip->ram_start,
-                                      chip->ram_size);
-     }
--    g_free(typename);
- }
- 
- static void powernv_populate_rtc(ISADevice *d, void *fdt, int lpc_off)
-@@ -712,7 +720,6 @@ static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     PnvChipClass *k = PNV_CHIP_CLASS(klass);
- 
--    k->cpu_model = "power8e_v2.1";
-     k->chip_type = PNV_CHIP_POWER8E;
-     k->chip_cfam_id = 0x221ef04980000000ull;  /* P8 Murano DD2.1 */
-     k->cores_mask = POWER8E_CORE_MASK;
-@@ -734,7 +741,6 @@ static void pnv_chip_power8_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     PnvChipClass *k = PNV_CHIP_CLASS(klass);
- 
--    k->cpu_model = "power8_v2.0";
-     k->chip_type = PNV_CHIP_POWER8;
-     k->chip_cfam_id = 0x220ea04980000000ull; /* P8 Venice DD2.0 */
-     k->cores_mask = POWER8_CORE_MASK;
-@@ -756,7 +762,6 @@ static void pnv_chip_power8nvl_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     PnvChipClass *k = PNV_CHIP_CLASS(klass);
- 
--    k->cpu_model = "power8nvl_v1.0";
-     k->chip_type = PNV_CHIP_POWER8NVL;
-     k->chip_cfam_id = 0x120d304980000000ull;  /* P8 Naples DD1.0 */
-     k->cores_mask = POWER8_CORE_MASK;
-@@ -778,7 +783,6 @@ static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     PnvChipClass *k = PNV_CHIP_CLASS(klass);
- 
--    k->cpu_model = "power9_v1.0";
-     k->chip_type = PNV_CHIP_POWER9;
-     k->chip_cfam_id = 0x100d104980000000ull; /* P9 Nimbus DD1.0 */
-     k->cores_mask = POWER9_CORE_MASK;
-@@ -853,7 +857,7 @@ static void pnv_chip_init(Object *obj)
- static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
- {
-     PnvChipClass *pcc = PNV_CHIP_GET_CLASS(chip);
--    char *typename = pnv_core_typename(pcc->cpu_model);
-+    const char *typename = pnv_chip_core_typename(chip);
-     size_t typesize = object_type_get_instance_size(typename);
-     int i, j;
-     char *name;
-@@ -878,8 +882,6 @@ static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
-             memory_region_add_subregion(&chip->icp_mmio, pir << 12, &icp->mmio);
-         }
-     }
--
--    g_free(typename);
- }
- 
- static void pnv_chip_realize(DeviceState *dev, Error **errp)
-@@ -887,7 +889,7 @@ static void pnv_chip_realize(DeviceState *dev, Error **errp)
-     PnvChip *chip = PNV_CHIP(dev);
-     Error *error = NULL;
-     PnvChipClass *pcc = PNV_CHIP_GET_CLASS(chip);
--    char *typename = pnv_core_typename(pcc->cpu_model);
-+    const char *typename = pnv_chip_core_typename(chip);
-     size_t typesize = object_type_get_instance_size(typename);
-     int i, core_hwid;
- 
-@@ -946,7 +948,6 @@ static void pnv_chip_realize(DeviceState *dev, Error **errp)
-                                 &PNV_CORE(pnv_core)->xscom_regs);
-         i++;
-     }
--    g_free(typename);
- 
-     /* Create LPC controller */
-     object_property_set_bool(OBJECT(&chip->lpc), true, "realized",
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index 438dbd1..71eb90a 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -246,9 +246,4 @@ static const TypeInfo pnv_core_infos[] = {
-     DEFINE_PNV_CORE_TYPE("power9_v1.0"),
- };
- 
--char *pnv_core_typename(const char *model)
--{
--    return g_strdup_printf(PNV_CORE_TYPE_NAME("%s"), model);
--}
--
- DEFINE_TYPES(pnv_core_infos)
--- 
-2.7.4
+I'm trying to modify the NVMe emulator in QEMU to use multiple threads.
+
+After making necessary changes, I see this error: 'Co-routine re-entered re=
+cursively'
+
+Can anybody tell me the reason for this error? Is there anything I can do t=
+o fix this issue?
+
+
+Thanks,
+
+Shashank
