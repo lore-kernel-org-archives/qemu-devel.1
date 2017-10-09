@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e1bVy-00014X-QX
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:06:51 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e1bW0-00014t-2W
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:06:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e1bVt-0002Ao-Mj
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:06:50 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54552
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e1bVu-0002BR-Tj
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:06:52 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44342)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1e1bVt-00029s-HA
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:06:45 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v99H4e5x083552
-	for <qemu-devel@nongnu.org>; Mon, 9 Oct 2017 13:06:41 -0400
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dgc1m44r3-1
+	id 1e1bVu-0002B4-KQ
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:06:46 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v99H4fpJ012206
+	for <qemu-devel@nongnu.org>; Mon, 9 Oct 2017 13:06:42 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dgb0eqg82-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 13:06:41 -0400
+	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 13:06:42 -0400
 Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 9 Oct 2017 13:06:40 -0400
+	Mon, 9 Oct 2017 13:06:41 -0400
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  9 Oct 2017 12:06:05 -0500
+Date: Mon,  9 Oct 2017 12:06:06 -0500
 In-Reply-To: <20171009170607.4155-1-mdroth@linux.vnet.ibm.com>
 References: <20171009170607.4155-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20171009170607.4155-2-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 1/3] qdev: store DeviceState's canonical
- path to use when unparenting
+Message-Id: <20171009170607.4155-3-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 2/3] Revert "qdev: Free QemuOpts when the
+ QOM path goes away"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,102 +39,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: david@gibson.dropbear.id.au, groug@kaod.org, peter.maydell@linaro.org, armbru@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, imammedo@redhat.com, ehabkost@redhat.com, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: david@gibson.dropbear.id.au, groug@kaod.org, peter.maydell@linaro.org, armbru@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, imammedo@redhat.com, ehabkost@redhat.com
 
-device_unparent(dev, ...) is called when a device is unparented,
-either directly, or as a result of a parent device being
-finalized, and handles some final cleanup for the device. Part
-of this includes emiting a DEVICE_DELETED QMP event to notify
-management, which includes the device's path in the composition
-tree as provided by object_get_canonical_path().
+This reverts commit abed886ec60cf239a03515cf0b30fb11fa964c44.
 
-object_get_canonical_path() assumes the device is still connected
-to the machine/root container, and will assert otherwise, but
-in some situations this isn't the case:
+This patch originally addressed an issue where a DEVICE_DELETED
+event could be emitted (in device_unparent()) before a Device's
+QemuOpts were cleaned up (in device_finalize()), leading to a
+"duplicate ID" error if management attempted to immediately add
+a device with the same ID in response to the DEVICE_DELETED event.
 
-If the parent is finalized as a result of object_unparent(), it
-will still be attached to the composition tree at the time any
-children are unparented as a result of that same call to
-object_unparent(). However, in some cases, object_unparent()
-will complete without finalizing the parent device, due to
-lingering references that won't be released till some time later.
-One such example is if the parent has MemoryRegion children (which
-take a ref on their parent), who in turn have AddressSpace's (which
-take a ref on their regions), since those AddressSpaces get cleaned
-up asynchronously by the RCU thread.
+An alternative will be implemented in a subsequent patch where we
+defer the DEVICE_DELETED event until device_finalize(), which would
+also prevent the race, so we revert the original fix in preparation.
 
-In this case qdev:device_unparent() may be called for a child Device
-that no longer has a path to the root/machine container, causing
-object_get_canonical_path() to assert.
-
-Fix this by storing the canonical path during realize() so the
-information will still be available for device_unparent() in such
-cases.
-
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 Tested-by: Eric Auger <eric.auger@redhat.com>
 ---
- hw/core/qdev.c         | 16 +++++++++++++---
- include/hw/qdev-core.h |  1 +
- 2 files changed, 14 insertions(+), 3 deletions(-)
+ hw/core/qdev.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 606ab53c42..0542e1879f 100644
+index 0542e1879f..f7c66d9bd0 100644
 --- a/hw/core/qdev.c
 +++ b/hw/core/qdev.c
-@@ -928,6 +928,13 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
-             goto post_realize_fail;
-         }
+@@ -1068,6 +1068,7 @@ static void device_finalize(Object *obj)
+     NamedGPIOList *ngl, *next;
  
-+        /*
-+         * always free/re-initialize here since the value cannot be cleaned up
-+         * in device_unrealize due to it's usage later on in the unplug path
-+         */
-+        g_free(dev->canonical_path);
-+        dev->canonical_path = object_get_canonical_path(OBJECT(dev));
-+
-         if (qdev_get_vmsd(dev)) {
-             if (vmstate_register_with_alias_id(dev, -1, qdev_get_vmsd(dev), dev,
-                                                dev->instance_id_alias,
-@@ -984,6 +991,7 @@ child_realize_fail:
+     DeviceState *dev = DEVICE(obj);
++    qemu_opts_del(dev->opts);
+ 
+     QLIST_FOREACH_SAFE(ngl, &dev->gpios, node, next) {
+         QLIST_REMOVE(ngl, node);
+@@ -1117,9 +1118,6 @@ static void device_unparent(Object *obj)
+         g_free(dev->canonical_path);
+         dev->canonical_path = NULL;
      }
+-
+-    qemu_opts_del(dev->opts);
+-    dev->opts = NULL;
+ }
  
- post_realize_fail:
-+    g_free(dev->canonical_path);
-     if (dc->unrealize) {
-         dc->unrealize(dev, NULL);
-     }
-@@ -1102,10 +1110,12 @@ static void device_unparent(Object *obj)
- 
-     /* Only send event if the device had been completely realized */
-     if (dev->pending_deleted_event) {
--        gchar *path = object_get_canonical_path(OBJECT(dev));
-+        g_assert(dev->canonical_path);
- 
--        qapi_event_send_device_deleted(!!dev->id, dev->id, path, &error_abort);
--        g_free(path);
-+        qapi_event_send_device_deleted(!!dev->id, dev->id, dev->canonical_path,
-+                                       &error_abort);
-+        g_free(dev->canonical_path);
-+        dev->canonical_path = NULL;
-     }
- 
-     qemu_opts_del(dev->opts);
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 089146197f..0a71bf83f0 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -153,6 +153,7 @@ struct DeviceState {
-     /*< public >*/
- 
-     const char *id;
-+    char *canonical_path;
-     bool realized;
-     bool pending_deleted_event;
-     QemuOpts *opts;
+ static void device_class_init(ObjectClass *class, void *data)
 -- 
 2.11.0
