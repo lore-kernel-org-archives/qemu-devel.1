@@ -1,21 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1e1ZVK-0003ZP-US
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 10:58:07 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e1ZYL-0004O2-1R
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:01:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1e1ZVJ-0002sd-Rz
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 10:58:03 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e1ZYH-0004WQ-W6
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:01:09 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50082
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1e1ZYH-0004WC-QH
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:01:05 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v99F0Hb1106634
+	for <qemu-devel@nongnu.org>; Mon, 9 Oct 2017 11:01:02 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dgayv191t-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 11:01:01 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Mon, 9 Oct 2017 16:01:00 +0100
+References: <20171004154144.88995-1-pasic@linux.vnet.ibm.com>
+	<20171004154144.88995-3-pasic@linux.vnet.ibm.com>
+	<d6d2d73d-65c9-7ae1-fd37-cb8e304781e7@redhat.com>
+	<7f454872-fae3-35b0-eff4-227b2aa0f77d@linux.vnet.ibm.com>
+	<6c17b274-cd75-7864-94b9-fc8abff1a786@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Mon, 9 Oct 2017 17:00:56 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-_E2aV78AnODfAvjObYpHdWXwxBxJLHDR9qS8yR9YM3g@mail.gmail.com>
-References: <20170918195100.17593-1-andrew.smirnov@gmail.com>
-	<20170918195100.17593-5-andrew.smirnov@gmail.com>
-	<CAFEAcA-_E2aV78AnODfAvjObYpHdWXwxBxJLHDR9qS8yR9YM3g@mail.gmail.com>
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Mon, 9 Oct 2017 07:57:57 -0700
-Message-ID: <CAHQ1cqGnxnMLezakUt6ZhZemW9BTe43bZ2a2O8Mf9b9YNQis8w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 04/17] imx_fec: Change queue flushing
- heuristics
+In-Reply-To: <6c17b274-cd75-7864-94b9-fc8abff1a786@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <da4228cb-d32c-dc77-0a80-bac306f07c24@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/8] s390x/css: IO instr handler ending
+ control
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,129 +47,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On Fri, Oct 6, 2017 at 6:56 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 18 September 2017 at 20:50, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
->> In current implementation, packet queue flushing logic seem to suffer
->> from a deadlock like scenario if a packet is received by the interface
->> before before Rx ring is initialized by Guest's driver. Consider the
->> following sequence of events:
+
+
+On 10/09/2017 01:07 PM, Thomas Huth wrote:
+> On 09.10.2017 12:54, Halil Pasic wrote:
 >>
->>         1. A QEMU instance is started against a TAP device on Linux
->>            host, running Linux guest, e. g., something to the effect
->>            of:
 >>
->>            qemu-system-arm \
->>               -net nic,model=imx.fec,netdev=lan0 \
->>               netdev tap,id=lan0,ifname=tap0,script=no,downscript=no \
->>               ... rest of the arguments ...
+>> On 10/09/2017 10:20 AM, Thomas Huth wrote:
+>>> On 04.10.2017 17:41, Halil Pasic wrote:
+>>>> CSS code needs to tell the IO instruction handlers located in how should
+>>>
+>>> located in how?
+>>>
 >>
->>         2. Once QEMU starts, but before guest reaches the point where
->>            FEC deriver is done initializing the HW, Guest, via TAP
->>            interface, receives a number of multicast MDNS packets from
->>            Host (not necessarily true for every OS, but it happens at
->>            least on Fedora 25)
+>> First, thanks for your review!
 >>
->>         3. Recieving a packet in such a state results in
->>            imx_eth_can_receive() returning '0', which in turn causes
->>            tap_send() to disable corresponding event (tap.c:203)
+>> Wanted to say: in target/s390x/ioinst.c just forgot to copy paste.
 >>
->>         4. Once Guest's driver reaches the point where it is ready to
->>            recieve packets it prepares Rx ring descriptors and writes
->>            ENET_RDAR_RDAR to ENET_RDAR register to indicate to HW that
->>            more descriptors are ready. And at this points emulation
->>            layer does this:
+>>>> the emulated instruction be ended. Currently this is done by returning
+>>>> generic (POSIX) error codes, and mapping them to outcomes like condition
+>>>> codes. This makes bugs easy to create and hard to recognise.
+>>>>
+>>>> As a preparation for moving a way form (mis)using generic error codes for
+>>>> flow control let us introduce a struct which tells the instruction
+>>>> handler function how to end the instruction, in a more straight-forward
+>>>> and less ambiguous way.
+>>>>
+>>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>>>> ---
+>>>>  include/hw/s390x/css.h | 12 ++++++++++++
+>>>>  1 file changed, 12 insertions(+)
+>>>>
+>>>> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+>>>> index 0653d3c9be..66916b6546 100644
+>>>> --- a/include/hw/s390x/css.h
+>>>> +++ b/include/hw/s390x/css.h
+>>>> @@ -75,6 +75,18 @@ typedef struct CMBE {
+>>>>      uint32_t reserved[7];
+>>>>  } QEMU_PACKED CMBE;
+>>>>  
+>>>> +/* IO instructions conclude according this */
+>>>> +typedef struct IOInstEnding {
+>>>> +        /*
+>>>> +         * General semantic of cc codes of IO instructions is (brief):
+>>>> +         * 0 -- produced expected result
+>>>> +         * 1 --  status conditions were present or produced alternate result
+>>>> +         * 2 -- ineffective, because busy with previously initiated function
+>>>> +         * 3 -- ineffective, not operational
+>>>> +         */
+>>>> +        int cc;
+>>>> +} IOInstEnding;
+>>>
+>>> Why do you need a struct for this? Do you plan to extend it later? If
+>>> so, I think you should mention that in the patch description. If not,
+>>> please use a named enum or a "typedef unsigned int IOInstEnding" instead.
+>>>
+>>>  Thomas
 >>
->>                  s->regs[index] = ENET_RDAR_RDAR;
->>                  imx_eth_enable_rx(s);
+>> We may, we may not. In the previous version we also had to support
+>> do end a certain instruction with an addressing exception, but this
+>> is going away in patch #3. Honestly I don't expect this being extended.
 >>
->>            which, combined with:
->>
->>                   if (!s->regs[ENET_RDAR]) {
->>                      qemu_flush_queued_packets(qemu_get_queue(s->nic));
->>                   }
->>
->>            results in Rx queue never being flushed and corresponding
->>            I/O event beign disabled.
->>
->> Change the code to remember the fact that can_receive callback was
->> called before Rx ring was ready and use it to make a decision if
->> receive queue needs to be flushed.
->>
->> Cc: Peter Maydell <peter.maydell@linaro.org>
->> Cc: Jason Wang <jasowang@redhat.com>
->> Cc: qemu-devel@nongnu.org
->> Cc: qemu-arm@nongnu.org
->> Cc: yurovsky@gmail.com
->> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
->> ---
->>  hw/net/imx_fec.c         | 6 ++++--
->>  include/hw/net/imx_fec.h | 1 +
->>  2 files changed, 5 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
->> index 84085afe09..767402909d 100644
->> --- a/hw/net/imx_fec.c
->> +++ b/hw/net/imx_fec.c
->> @@ -544,8 +544,9 @@ static void imx_eth_enable_rx(IMXFECState *s)
->>
->>      if (rx_ring_full) {
->>          FEC_PRINTF("RX buffer full\n");
->> -    } else if (!s->regs[ENET_RDAR]) {
->> +    } else if (s->needs_flush) {
->>          qemu_flush_queued_packets(qemu_get_queue(s->nic));
->> +        s->needs_flush = false;
->>      }
->>
->>      s->regs[ENET_RDAR] = rx_ring_full ? 0 : ENET_RDAR_RDAR;
->> @@ -930,7 +931,8 @@ static int imx_eth_can_receive(NetClientState *nc)
->>
->>      FEC_PRINTF("\n");
->>
->> -    return s->regs[ENET_RDAR] ? 1 : 0;
->> +    s->needs_flush = !s->regs[ENET_RDAR];
->> +    return !!s->regs[ENET_RDAR];
->>  }
->>
->>  static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
->> diff --git a/include/hw/net/imx_fec.h b/include/hw/net/imx_fec.h
->> index 62ad473b05..4bc8f03ec2 100644
->> --- a/include/hw/net/imx_fec.h
->> +++ b/include/hw/net/imx_fec.h
->> @@ -252,6 +252,7 @@ typedef struct IMXFECState {
->>      uint32_t phy_int_mask;
->>
->>      bool is_fec;
->> +    bool needs_flush;
->>  } IMXFECState;
->
-> This looks odd -- I don't think you should need extra
-> state here. Conceptually what you want is:
->
->  * in the can_receive callback, test some function of
-> various bits of device state to decide whether you can
-> take data
->  * in the rest of the device, whenever the device state
-> changes such that you were previously not able to take
-> data but now you can, call qemu_flush_queued_packets().
->
-> You shouldn't need any extra state to do this, you just
-> need to fix the bug where you have a code path that
-> flips ENET_RDAR from 0 to 1 without calling flush
-> (you might for instance have a helper function for
-> "set ENET_RDAR" that encapsulates setting the state
-> and arranging that flush is called).
+>> I have other reasons for the struct. Type safety and clear semantics,
+>> and frankly at least for s390 and linux I don't see any downsides given
+>> what is written in the "zSeries ELF Application Binary Interface Supplement".
+>> Can you please explain to me what is the problem with using this struct, and
+>> what is the benefit switching to a unsigned int?
+> 
+> First, returning a struct is ugly in most cases, since it might need to
+> be passed on the stack if it is bigger than 8 bytes. Ok, that's likely
+> not the case here (if the compiler / ABI is smart enough - I did not
+> check), but still, if I see something like this, there is an alarm
+> signal somewhere in my head that starts to ring...
 >
 
-I don't know if you've seen my response to Jason Wang, but I think he
-was proposing something similar, and, as I said, that should work fine
-and the only reason I didn't do it that way was to avoid doing a flush
-every time that host driver drains full RX-ring and gives it back to
-the IP block.
+Yeah, the ABI is smart enough (where it matters) and this one is obviously
+less that 8 bytes. I read this as you  assumed that the return won't be
+passed via register (general purpose register 2 for a z host + ELF assumed),
+and that would have been ugly indeed.
 
-I'll give this a try in v2.
+Btw I have seen putting an integral into a struct for type checking
+in the linux kernel too. For instance from:
+arch/s390/include/asm/page.h
 
-Thanks,
-Andrey Smirnov
+"""
+/*
+ * These are used to make use of C type-checking..
+ */
+
+typedef struct { unsigned long pgprot; } pgprot_t;
+typedef struct { unsigned long pgste; } pgste_t;
+typedef struct { unsigned long pte; } pte_t;
+typedef struct { unsigned long pmd; } pmd_t;
+typedef struct { unsigned long pud; } pud_t;
+typedef struct { unsigned long pgd; } pgd_t;
+typedef pte_t *pgtable_t;
+
+#define pgprot_val(x)   ((x).pgprot)
+#define pgste_val(x)    ((x).pgste)
+#define pte_val(x)      ((x).pte)
+#define pmd_val(x)      ((x).pmd)
+#define pud_val(x)      ((x).pud)
+#define pgd_val(x)      ((x).pgd)
+
+#define __pgste(x)      ((pgste_t) { (x) } )
+#define __pte(x)        ((pte_t) { (x) } )
+#define __pmd(x)        ((pmd_t) { (x) } )
+#define __pud(x)        ((pud_t) { (x) } )
+#define __pgd(x)        ((pgd_t) { (x) } )
+#define __pgprot(x)     ((pgprot_t) { (x) } )
+"""
+
+If you think, I could add a similar comment indicating that my
+struct is also just for type-checking.
+
+> Then, in the follow up patches, you do something like this:
+> 
+>    return (IOInstEnding){.cc = 0};
+> 
+> ... and that just looks very, very ugly in my eyes. The more I look at
+
+Interesting, I found this quite expressive.
+
+> it, the more I think we really want to have a named enum instead. That
+> will give you some sort of basic type safety and semantics, too, and
+
+AFAIK we don't have strongly typed enums in C, at least not from
+the language perspective. In c++ we got enum class and enum struct
+with c++11 for that reason.
+
+> we'll also get proper names for those magic values - otherwise I'll
+> always have to look up what cc = 2 or cc = 3 means... (I always keep
+> forgetting what each value means...)
+
+Can you suggest some proper names for those magic values? Unfortunately
+the PoP refers to this stuff as setting condition code [0-3], so in my
+reading the numbers are the canonical names for this stuff. The best
+'proper names' I can think of for these are CC_0, CC_1, CC_2, and CC_3.
+
+IMHO better names and type safety are two different problems, so if you
+do come up with better names, we can use that regardless of the type
+safety solution.
+
+I'm also not sure when do we tend to use defines and when enums. This
+is clearly a the value associated with the tag matters mightily situation
+so I would at least want to assign explicit values to the individual
+enumerator constants.
+
+Sorry, I may be a bit to persistent on this one: I don't think it's
+a huge difference, but I don't feel great about changing something to
+what I think is (slightly) worse without being first convinced that
+I was wrong.
+
+Regards,
+Halil
+
+> 
+>  Thomas
+> 
