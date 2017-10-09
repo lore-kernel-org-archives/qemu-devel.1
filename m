@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e1bq5-0000V4-2M
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e1bq6-0000VD-Ih
 	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:27:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e1bq1-0004dn-28
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:27:36 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:18687 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e1bq1-0004eN-5m
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:27:38 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:32767 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1e1bq0-0004ZG-JX
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:27:32 -0400
+	id 1e1bq0-0004ZE-Nl
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:27:33 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon,  9 Oct 2017 20:27:06 +0300
-Message-Id: <20171009172723.190282-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 00/10] nbd minimal structured read
+Date: Mon,  9 Oct 2017 20:27:08 +0300
+Message-Id: <20171009172723.190282-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20171009172723.190282-1-vsementsov@virtuozzo.com>
+References: <20171009172723.190282-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v2 1/7] block/nbd-client: refactor
+ nbd_co_receive_reply
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +28,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Minimally implement nbd structured read extension.
+"NBDReply *reply" parameter of nbd_co_receive_reply is used only
+to pass return value for nbd_co_request (reply.error). Remove it
+and use function return value instead.
 
-v2:
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/nbd-client.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
 
-clone: tag up-nbd-minimal-structured-read-v2 from https://src.openvz.org/scm/~vsementsov/qemu.git
-online: https://src.openvz.org/users/vsementsov/repos/qemu/browse?at=up-nbd-minimal-structured-read-v2
-
-01: improve assertion (Eric)
-02: add Eric's r-b
-06: define NBD_SREP_TYPE_OFFSET_HOLE and NBD_SREP_TYPE_ERROR_OFFSET
-    here (Eric)
-07: fix return value of nbd_request_simple_option
-08-09: new patches
-10: mostly rewritten
-
-Vladimir Sementsov-Ogievskiy (10):
-  block/nbd-client: assert qiov len once in nbd_co_request
-  block/nbd-client: refactor nbd_co_receive_reply
-  nbd: rename NBD_REPLY_MAGIC to NBD_SIMPLE_REPLY_MAGIC
-  nbd-server: refactor simple reply sending
-  nbd: header constants indenting
-  nbd: Minimal structured read for server
-  nbd/client: refactor nbd_receive_starttls
-  nbd: share some nbd entities to be reused in block/nbd-client.c
-  nbd/client: prepare nbd_receive_reply for structured reply
-  nbd: Minimal structured read for client
-
- include/block/nbd.h                      | 132 ++++++++++-
- nbd/nbd-internal.h                       |  65 +++---
- block/nbd-client.c                       | 364 ++++++++++++++++++++++++++++---
- nbd/client.c                             | 205 +++++++++++------
- nbd/server.c                             | 189 +++++++++++-----
- nbd/trace-events                         |  10 +-
- tests/qemu-iotests/nbd-fault-injector.py |   4 +-
- 7 files changed, 756 insertions(+), 213 deletions(-)
-
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index ee7f758e68..acd8e5d007 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -178,26 +178,26 @@ err:
+     return rc;
+ }
+ 
+-static void nbd_co_receive_reply(NBDClientSession *s,
+-                                 NBDRequest *request,
+-                                 NBDReply *reply,
+-                                 QEMUIOVector *qiov)
++static int nbd_co_receive_reply(NBDClientSession *s,
++                                NBDRequest *request,
++                                QEMUIOVector *qiov)
+ {
++    int ret;
+     int i = HANDLE_TO_INDEX(s, request->handle);
+ 
+     /* Wait until we're woken up by nbd_read_reply_entry.  */
+     s->requests[i].receiving = true;
+     qemu_coroutine_yield();
+     s->requests[i].receiving = false;
+-    *reply = s->reply;
+-    if (reply->handle != request->handle || !s->ioc || s->quit) {
+-        reply->error = EIO;
++    if (s->reply.handle != request->handle || !s->ioc || s->quit) {
++        ret = -EIO;
+     } else {
+-        if (qiov && reply->error == 0) {
++        ret = -s->reply.error;
++        if (qiov && s->reply.error == 0) {
+             assert(request->len == iov_size(qiov->iov, qiov->niov));
+             if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
+                                       NULL) < 0) {
+-                reply->error = EIO;
++                ret = -EIO;
+                 s->quit = true;
+             }
+         }
+@@ -217,6 +217,8 @@ static void nbd_co_receive_reply(NBDClientSession *s,
+     s->in_flight--;
+     qemu_co_queue_next(&s->free_sema);
+     qemu_co_mutex_unlock(&s->send_mutex);
++
++    return ret;
+ }
+ 
+ static int nbd_co_request(BlockDriverState *bs,
+@@ -224,7 +226,6 @@ static int nbd_co_request(BlockDriverState *bs,
+                           QEMUIOVector *qiov)
+ {
+     NBDClientSession *client = nbd_get_client_session(bs);
+-    NBDReply reply;
+     int ret;
+ 
+     assert(!qiov || request->type == NBD_CMD_WRITE ||
+@@ -232,12 +233,11 @@ static int nbd_co_request(BlockDriverState *bs,
+     ret = nbd_co_send_request(bs, request,
+                               request->type == NBD_CMD_WRITE ? qiov : NULL);
+     if (ret < 0) {
+-        reply.error = -ret;
+-    } else {
+-        nbd_co_receive_reply(client, request, &reply,
+-                             request->type == NBD_CMD_READ ? qiov : NULL);
++        return ret;
+     }
+-    return -reply.error;
++
++    return nbd_co_receive_reply(client, request,
++                                request->type == NBD_CMD_READ ? qiov : NULL);
+ }
+ 
+ int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
 -- 
 2.11.1
