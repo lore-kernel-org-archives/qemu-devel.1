@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e1e5J-0003Kf-Lt
+	(envelope-from <imammedo@redhat.com>) id 1e1e5O-0003OY-Km
 	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:51:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e1e5G-0006U7-OY
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:51:27 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e1e5K-0006W0-3m
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:51:34 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon,  9 Oct 2017 21:50:54 +0200
-Message-Id: <1507578671-158758-8-git-send-email-imammedo@redhat.com>
+Date: Mon,  9 Oct 2017 21:50:56 +0200
+Message-Id: <1507578671-158758-10-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1507578671-158758-1-git-send-email-imammedo@redhat.com>
 References: <1507578671-158758-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 07/24] ppc: bamboo: use generic cpu_model
- parsing
+Subject: [Qemu-devel] [PATCH v2 09/24] ppc: virtex-ml507: replace cpu_model
+ with cpu_type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +26,50 @@ Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/ppc440_bamboo.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ hw/ppc/virtex_ml507.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
 
-diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
-index f92d47f..693c215 100644
---- a/hw/ppc/ppc440_bamboo.c
-+++ b/hw/ppc/ppc440_bamboo.c
-@@ -182,11 +182,7 @@ static void bamboo_init(MachineState *machine)
-     int success;
+diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+index ed9b406..5ac4f76 100644
+--- a/hw/ppc/virtex_ml507.c
++++ b/hw/ppc/virtex_ml507.c
+@@ -89,14 +89,14 @@ static void mmubooke_create_initial_mapping(CPUPPCState *env,
+ 
+ static PowerPCCPU *ppc440_init_xilinx(ram_addr_t *ram_size,
+                                       int do_init,
+-                                      const char *cpu_model,
++                                      const char *cpu_type,
+                                       uint32_t sysclk)
+ {
+     PowerPCCPU *cpu;
+     CPUPPCState *env;
+     qemu_irq *irqs;
+ 
+-    cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, cpu_model));
++    cpu = POWERPC_CPU(cpu_create(cpu_type));
+     env = &cpu->env;
+ 
+     ppc_booke_timers_init(cpu, sysclk, 0/* no flags */);
+@@ -211,11 +211,7 @@ static void virtex_init(MachineState *machine)
      int i;
  
--    /* Setup CPU. */
+     /* init CPUs */
 -    if (machine->cpu_model == NULL) {
--        machine->cpu_model = "440EP";
+-        machine->cpu_model = "440-Xilinx";
 -    }
--    cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, machine->cpu_model));
-+    cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
+-
+-    cpu = ppc440_init_xilinx(&ram_size, 1, machine->cpu_model, 400000000);
++    cpu = ppc440_init_xilinx(&ram_size, 1, machine->cpu_type, 400000000);
      env = &cpu->env;
  
      if (env->mmu_model != POWERPC_MMU_BOOKE) {
-@@ -297,6 +293,7 @@ static void bamboo_machine_init(MachineClass *mc)
+@@ -307,6 +303,7 @@ static void virtex_machine_init(MachineClass *mc)
  {
-     mc->desc = "bamboo";
-     mc->init = bamboo_init;
-+    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("440epb");
+     mc->desc = "Xilinx Virtex ML507 reference design";
+     mc->init = virtex_init;
++    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("440-xilinx");
  }
  
- DEFINE_MACHINE("bamboo", bamboo_machine_init)
+ DEFINE_MACHINE("virtex-ml507", virtex_machine_init)
 -- 
 2.7.4
