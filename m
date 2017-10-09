@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e1bq6-0000VO-Tq
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:27:40 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e1bq5-0000V5-2r
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:27:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e1bq1-0004eI-5T
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:27:38 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:38006 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e1bq0-0004dF-ST
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:27:36 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:37662 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1e1bq0-0004Zg-Nf
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:27:33 -0400
+	id 1e1bq0-0004ZB-G0
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 13:27:32 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon,  9 Oct 2017 20:27:12 +0300
-Message-Id: <20171009172723.190282-7-vsementsov@virtuozzo.com>
+Date: Mon,  9 Oct 2017 20:27:13 +0300
+Message-Id: <20171009172723.190282-8-vsementsov@virtuozzo.com>
 In-Reply-To: <20171009172723.190282-1-vsementsov@virtuozzo.com>
 References: <20171009172723.190282-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 03/10] nbd: rename NBD_REPLY_MAGIC to
- NBD_SIMPLE_REPLY_MAGIC
+Subject: [Qemu-devel] [PATCH v2 4/7] block/nbd-client: drop reply field from
+ NBDClientSession
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,91 +28,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-To be consistent when NBD_STRUCTURED_REPLY_MAGIC will be introduced.
+Drop 'reply' from NBDClientSession. It's used to only deliver request
+return code to receiving coroutine. Instead introduce per-request ret
+variable to simplify the scheme and make further refactoring possible.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- nbd/nbd-internal.h                       | 2 +-
- nbd/client.c                             | 4 ++--
- nbd/server.c                             | 4 ++--
- tests/qemu-iotests/nbd-fault-injector.py | 4 ++--
- 4 files changed, 7 insertions(+), 7 deletions(-)
+ block/nbd-client.h |  2 +-
+ block/nbd-client.c | 22 +++++++++-------------
+ 2 files changed, 10 insertions(+), 14 deletions(-)
 
-diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
-index 8a609a227f..2d6663de23 100644
---- a/nbd/nbd-internal.h
-+++ b/nbd/nbd-internal.h
-@@ -47,7 +47,7 @@
- #define NBD_OLDSTYLE_NEGOTIATE_SIZE (8 + 8 + 8 + 4 + 124)
+diff --git a/block/nbd-client.h b/block/nbd-client.h
+index 3f97d31013..4bc8fe3993 100644
+--- a/block/nbd-client.h
++++ b/block/nbd-client.h
+@@ -22,6 +22,7 @@ typedef struct {
+     bool receiving;         /* waiting for read_reply_co? */
+     NBDRequest *request;
+     QEMUIOVector *qiov;
++    int ret;
+ } NBDClientRequest;
  
- #define NBD_REQUEST_MAGIC       0x25609513
--#define NBD_REPLY_MAGIC         0x67446698
-+#define NBD_SIMPLE_REPLY_MAGIC  0x67446698
- #define NBD_OPTS_MAGIC          0x49484156454F5054LL
- #define NBD_CLIENT_MAGIC        0x0000420281861253LL
- #define NBD_REP_MAGIC           0x0003e889045565a9LL
-diff --git a/nbd/client.c b/nbd/client.c
-index 68a0bc1ffc..cd5a2c80ac 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -931,7 +931,7 @@ int nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
+ typedef struct NBDClientSession {
+@@ -35,7 +36,6 @@ typedef struct NBDClientSession {
+     int in_flight;
+ 
+     NBDClientRequest requests[MAX_NBD_REQUESTS];
+-    NBDReply reply;
+     bool quit;
+ } NBDClientSession;
+ 
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index f7b642f079..f331f08a9a 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -74,10 +74,10 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
+     uint64_t i;
+     int ret = 0;
+     Error *local_err = NULL;
++    NBDReply reply;
+ 
+     while (!s->quit) {
+-        assert(s->reply.handle == 0);
+-        ret = nbd_receive_reply(s->ioc, &s->reply, &local_err);
++        ret = nbd_receive_reply(s->ioc, &reply, &local_err);
+         if (ret < 0) {
+             error_report_err(local_err);
+         }
+@@ -89,18 +89,18 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
+          * handler acts as a synchronization point and ensures that only
+          * one coroutine is called until the reply finishes.
+          */
+-        i = HANDLE_TO_INDEX(s, s->reply.handle);
++        i = HANDLE_TO_INDEX(s, reply.handle);
+         if (i >= MAX_NBD_REQUESTS ||
+             !s->requests[i].coroutine ||
+             !s->requests[i].receiving ||
+-            s->reply.handle != s->requests[i].request->handle)
++            reply.handle != s->requests[i].request->handle)
+         {
+             break;
+         }
+ 
+-        if (s->reply.error == 0 &&
+-            s->requests[i].request->type == NBD_CMD_READ)
+-        {
++        s->requests[i].ret = -reply.error;
++
++        if (reply.error == 0 && s->requests[i].request->type == NBD_CMD_READ) {
+             QEMUIOVector *qiov = s->requests[i].qiov;
+             assert(qiov != NULL);
+             assert(s->requests[i].request->len ==
+@@ -108,7 +108,7 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
+             if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
+                                       NULL) < 0)
+             {
+-                s->reply.error = EIO;
++                s->requests[i].ret = -EIO;
+                 break;
+             }
+         }
+@@ -211,11 +211,7 @@ static int nbd_co_receive_reply(NBDClientSession *s, NBDRequest *request)
+     if (!s->ioc || s->quit) {
+         ret = -EIO;
+     } else {
+-        assert(s->reply.handle == request->handle);
+-        ret = -s->reply.error;
+-
+-        /* Tell the read handler to read another header.  */
+-        s->reply.handle = 0;
++        ret = s->requests[i].ret;
      }
  
-     /* Reply
--       [ 0 ..  3]    magic   (NBD_REPLY_MAGIC)
-+       [ 0 ..  3]    magic   (NBD_SIMPLE_REPLY_MAGIC)
-        [ 4 ..  7]    error   (0 == no error)
-        [ 7 .. 15]    handle
-      */
-@@ -949,7 +949,7 @@ int nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
-     }
-     trace_nbd_receive_reply(magic, reply->error, reply->handle);
- 
--    if (magic != NBD_REPLY_MAGIC) {
-+    if (magic != NBD_SIMPLE_REPLY_MAGIC) {
-         error_setg(errp, "invalid magic (got 0x%" PRIx32 ")", magic);
-         return -EINVAL;
-     }
-diff --git a/nbd/server.c b/nbd/server.c
-index 993ade30bb..a1b21a6951 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -911,11 +911,11 @@ static int nbd_send_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
-     trace_nbd_send_reply(reply->error, reply->handle);
- 
-     /* Reply
--       [ 0 ..  3]    magic   (NBD_REPLY_MAGIC)
-+       [ 0 ..  3]    magic   (NBD_SIMPLE_REPLY_MAGIC)
-        [ 4 ..  7]    error   (0 == no error)
-        [ 7 .. 15]    handle
-      */
--    stl_be_p(buf, NBD_REPLY_MAGIC);
-+    stl_be_p(buf, NBD_SIMPLE_REPLY_MAGIC);
-     stl_be_p(buf + 4, reply->error);
-     stq_be_p(buf + 8, reply->handle);
- 
-diff --git a/tests/qemu-iotests/nbd-fault-injector.py b/tests/qemu-iotests/nbd-fault-injector.py
-index 1c10dcb51c..8a04d979aa 100755
---- a/tests/qemu-iotests/nbd-fault-injector.py
-+++ b/tests/qemu-iotests/nbd-fault-injector.py
-@@ -56,7 +56,7 @@ NBD_CMD_READ = 0
- NBD_CMD_WRITE = 1
- NBD_CMD_DISC = 2
- NBD_REQUEST_MAGIC = 0x25609513
--NBD_REPLY_MAGIC = 0x67446698
-+NBD_SIMPLE_REPLY_MAGIC = 0x67446698
- NBD_PASSWD = 0x4e42444d41474943
- NBD_OPTS_MAGIC = 0x49484156454F5054
- NBD_CLIENT_MAGIC = 0x0000420281861253
-@@ -166,7 +166,7 @@ def read_request(conn):
-     return req
- 
- def write_reply(conn, error, handle):
--    buf = reply_struct.pack(NBD_REPLY_MAGIC, error, handle)
-+    buf = reply_struct.pack(NBD_SIMPLE_REPLY_MAGIC, error, handle)
-     conn.send(buf, event='reply')
- 
- def handle_connection(conn, use_export):
+     s->requests[i].coroutine = NULL;
 -- 
 2.11.1
