@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e1dBk-0000vM-G5
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 14:54:05 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e1dFw-0001ij-Hg
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 14:58:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e1dBh-0007oR-Do
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 14:54:04 -0400
-Resent-Message-Id: <E1e1dBh-0007oR-Do@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21429)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1e1dBh-0007o2-5w
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 14:54:01 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150757520156.270.13875315956284062915@b58463cdfd5f>
-In-Reply-To: <1507564902-9000-1-git-send-email-ian.jackson@eu.citrix.com>
+	(envelope-from <dgilbert@redhat.com>) id 1e1dFt-0002sK-EQ
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 14:58:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55564)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e1dFt-0002qS-4a
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 14:58:21 -0400
+Date: Mon, 9 Oct 2017 19:58:13 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171009185812.GR2374@work-vm>
+References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
+	<1504081950-2528-11-git-send-email-peterx@redhat.com>
+	<20170921192903.GH3401@work-vm>
+	<20170927073441.GD25011@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 9 Oct 2017 11:53:22 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v4 0/8] xen: xen-domid-restrict improvements
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170927073441.GD25011@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC v2 10/33] migration: allow dst vm pause on
+ postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +30,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ian.jackson@eu.citrix.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, anthony.perard@citrix.com, ross.lagerwall@citrix.com, sstabellini@kernel.org, jgross@suse.com, xen-devel@lists.xenproject.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MDc1NjQ5MDItOTAwMC0xLWdpdC1zZW5kLWVtYWlsLWlhbi5qYWNrc29uQGV1
-LmNpdHJpeC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NCAwLzhdIHhlbjogeGVu
-LWRvbWlkLXJlc3RyaWN0IGltcHJvdmVtZW50cwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
-IS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNF
-Li4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0
-IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBs
-b2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8K
-ICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3Jt
-YXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2Ny
-aXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAg
-ICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBU
-RVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0
-NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMmZlZmQ0ZTUxMiBj
-b25maWd1cmU6IGRvX2NvbXBpbGVyOiBEdW1wIHNvbWUgZXh0cmEgaW5mbyB1bmRlciBiYXNoCmIw
-ZWUyZGI0MzAgb3MtcG9zaXg6IFByb3ZpZGUgbmV3IC1ydW5hcyA8dWlkPi48Z2lkPiBmYWNpbGl0
-eQpiYmU2ZTYyMmJhIHhlbjogZGVzdHJveV9odm1fZG9tYWluOiBUcnkgeGVuZGV2aWNlbW9kZWxf
-c2h1dGRvd24KNDQzY2ZlZDlkYSB4ZW46IG1vdmUgeGNfaW50ZXJmYWNlIGNvbXBhdGliaWxpdHkg
-ZmFsbGJhY2sgZnVydGhlciB1cCB0aGUgZmlsZQo3ZTlkMjg2Yzk5IHhlbjogZGVzdHJveV9odm1f
-ZG9tYWluOiBNb3ZlIHJlYXNvbiBpbnRvIGEgdmFyaWFibGUKNTk3YTBkZTUwMCB4ZW46IGRlZmVy
-IGNhbGwgdG8geGVuX3Jlc3RyaWN0IHVudGlsIGp1c3QgYmVmb3JlIG9zX3NldHVwX3Bvc3QKOWI1
-ZTdkOGVmOCB4ZW46IHJlc3RyaWN0OiB1c2UgeGVudG9vbGNvcmVfcmVzdHJpY3RfYWxsCjU0Zjli
-MjQ4NGIgeGVuOiBsaW5rIGFnYWluc3QgeGVudG9vbGNvcmUKCj09PSBPVVRQVVQgQkVHSU4gPT09
-CkNoZWNraW5nIFBBVENIIDEvODogeGVuOiBsaW5rIGFnYWluc3QgeGVudG9vbGNvcmUuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMi84OiB4ZW46IHJlc3RyaWN0OiB1c2UgeGVudG9vbGNvcmVfcmVzdHJpY3Rf
-YWxsLi4uCkNoZWNraW5nIFBBVENIIDMvODogeGVuOiBkZWZlciBjYWxsIHRvIHhlbl9yZXN0cmlj
-dCB1bnRpbCBqdXN0IGJlZm9yZSBvc19zZXR1cF9wb3N0Li4uCkNoZWNraW5nIFBBVENIIDQvODog
-eGVuOiBkZXN0cm95X2h2bV9kb21haW46IE1vdmUgcmVhc29uIGludG8gYSB2YXJpYWJsZS4uLgpD
-aGVja2luZyBQQVRDSCA1Lzg6IHhlbjogbW92ZSB4Y19pbnRlcmZhY2UgY29tcGF0aWJpbGl0eSBm
-YWxsYmFjayBmdXJ0aGVyIHVwIHRoZSBmaWxlLi4uCkNoZWNraW5nIFBBVENIIDYvODogeGVuOiBk
-ZXN0cm95X2h2bV9kb21haW46IFRyeSB4ZW5kZXZpY2Vtb2RlbF9zaHV0ZG93bi4uLgpDaGVja2lu
-ZyBQQVRDSCA3Lzg6IG9zLXBvc2l4OiBQcm92aWRlIG5ldyAtcnVuYXMgPHVpZD4uPGdpZD4gZmFj
-aWxpdHkuLi4KRVJST1I6IGNvbnNpZGVyIHVzaW5nIHFlbXVfc3RydG91bCBpbiBwcmVmZXJlbmNl
-IHRvIHN0cnRvdWwKIzQ1OiBGSUxFOiBvcy1wb3NpeC5jOjE0MzoKKyAgICBsdiA9IHN0cnRvdWwo
-b3B0YXJnLCAmZXAsIDApOyAvKiBjYW4ndCBxZW11X3N0cnRvdWwsIHdhbnQgKmVwPT0nLicgKi8K
-CnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTAwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
-Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDgvODogY29uZmln
-dXJlOiBkb19jb21waWxlcjogRHVtcCBzb21lIGV4dHJhIGluZm8gdW5kZXIgYmFzaC4uLgo9PT0g
-T1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVt
-YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9y
-Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3Rz
-Lm9yZw==
+* Peter Xu (peterx@redhat.com) wrote:
+> On Thu, Sep 21, 2017 at 08:29:03PM +0100, Dr. David Alan Gilbert wrote:
+> > * Peter Xu (peterx@redhat.com) wrote:
+> > > When there is IO error on the incoming channel (e.g., network down),
+> > > instead of bailing out immediately, we allow the dst vm to switch to the
+> > > new POSTCOPY_PAUSE state. Currently it is still simple - it waits the
+> > > new semaphore, until someone poke it for another attempt.
+> > > 
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > ---
+> > >  migration/migration.c  |  1 +
+> > >  migration/migration.h  |  3 +++
+> > >  migration/savevm.c     | 60 ++++++++++++++++++++++++++++++++++++++++++++++++--
+> > >  migration/trace-events |  2 ++
+> > >  4 files changed, 64 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/migration/migration.c b/migration/migration.c
+> > > index 8d26ea8..80de212 100644
+> > > --- a/migration/migration.c
+> > > +++ b/migration/migration.c
+> > > @@ -146,6 +146,7 @@ MigrationIncomingState *migration_incoming_get_current(void)
+> > >          memset(&mis_current, 0, sizeof(MigrationIncomingState));
+> > >          qemu_mutex_init(&mis_current.rp_mutex);
+> > >          qemu_event_init(&mis_current.main_thread_load_event, false);
+> > > +        qemu_sem_init(&mis_current.postcopy_pause_sem_dst, 0);
+> > >          once = true;
+> > >      }
+> > >      return &mis_current;
+> > > diff --git a/migration/migration.h b/migration/migration.h
+> > > index 0c957c9..c423682 100644
+> > > --- a/migration/migration.h
+> > > +++ b/migration/migration.h
+> > > @@ -60,6 +60,9 @@ struct MigrationIncomingState {
+> > >      /* The coroutine we should enter (back) after failover */
+> > >      Coroutine *migration_incoming_co;
+> > >      QemuSemaphore colo_incoming_sem;
+> > > +
+> > > +    /* notify PAUSED postcopy incoming migrations to try to continue */
+> > > +    QemuSemaphore postcopy_pause_sem_dst;
+> > >  };
+> > >  
+> > >  MigrationIncomingState *migration_incoming_get_current(void);
+> > > diff --git a/migration/savevm.c b/migration/savevm.c
+> > > index 7172f14..3777124 100644
+> > > --- a/migration/savevm.c
+> > > +++ b/migration/savevm.c
+> > > @@ -1488,8 +1488,8 @@ static int loadvm_postcopy_ram_handle_discard(MigrationIncomingState *mis,
+> > >   */
+> > >  static void *postcopy_ram_listen_thread(void *opaque)
+> > >  {
+> > > -    QEMUFile *f = opaque;
+> > >      MigrationIncomingState *mis = migration_incoming_get_current();
+> > > +    QEMUFile *f = mis->from_src_file;
+> > >      int load_res;
+> > >  
+> > >      migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+> > > @@ -1503,6 +1503,14 @@ static void *postcopy_ram_listen_thread(void *opaque)
+> > >       */
+> > >      qemu_file_set_blocking(f, true);
+> > >      load_res = qemu_loadvm_state_main(f, mis);
+> > > +
+> > > +    /*
+> > > +     * This is tricky, but, mis->from_src_file can change after it
+> > > +     * returns, when postcopy recovery happened. In the future, we may
+> > > +     * want a wrapper for the QEMUFile handle.
+> > > +     */
+> > > +    f = mis->from_src_file;
+> > > +
+> > >      /* And non-blocking again so we don't block in any cleanup */
+> > >      qemu_file_set_blocking(f, false);
+> > >  
+> > > @@ -1581,7 +1589,7 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
+> > >      /* Start up the listening thread and wait for it to signal ready */
+> > >      qemu_sem_init(&mis->listen_thread_sem, 0);
+> > >      qemu_thread_create(&mis->listen_thread, "postcopy/listen",
+> > > -                       postcopy_ram_listen_thread, mis->from_src_file,
+> > > +                       postcopy_ram_listen_thread, NULL,
+> > >                         QEMU_THREAD_DETACHED);
+> > >      qemu_sem_wait(&mis->listen_thread_sem);
+> > >      qemu_sem_destroy(&mis->listen_thread_sem);
+> > > @@ -1966,11 +1974,44 @@ void qemu_loadvm_state_cleanup(void)
+> > >      }
+> > >  }
+> > >  
+> > > +/* Return true if we should continue the migration, or false. */
+> > > +static bool postcopy_pause_incoming(MigrationIncomingState *mis)
+> > > +{
+> > > +    trace_postcopy_pause_incoming();
+> > > +
+> > > +    migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
+> > > +                      MIGRATION_STATUS_POSTCOPY_PAUSED);
+> > > +
+> > > +    assert(mis->from_src_file);
+> > > +    qemu_file_shutdown(mis->from_src_file);
+> > > +    qemu_fclose(mis->from_src_file);
+> > > +    mis->from_src_file = NULL;
+> > > +
+> > > +    assert(mis->to_src_file);
+> > > +    qemu_mutex_lock(&mis->rp_mutex);
+> > > +    qemu_file_shutdown(mis->to_src_file);
+> > 
+> > Should you not do the shutdown() before the lock?
+> > For example if the other thread is stuck, with rp_mutex
+> > held, trying to write to to_src_file, then you'll block
+> > waiting for the mutex.  If you call shutdown and then take
+> > the lock, the other thread will error and release the lock.
+> 
+> The problem is that IMHO QEMUFile is not yet thread-safe itself.  So
+> if we operate on it (even to shut it down) logically we need to have
+> the lock, right?
+
+That probably needs fixing for 'shutdown' under the assumption that
+   a) No one has or is deleting/freeing the QEMUFile
+   b) No one is closing the QEMUFile
+
+The whole point of using shutdown() is it forces any stuck send()'s or
+read()'s to fail rather than staying stuck.
+
+> Then, IMHO the question would be: when will the send() be stuck in the
+> other thread?
+> 
+> Normally the only case I can think of is that source didn't recv()
+> fast enough, and we even consumed all the write buffer in dst side (I
+> don't really know how kernel manages the buffers though, and e.g. how
+> the size of buffer is defined...).
+> 
+> But when reach here, the channel (say, from_src_file and to_src_file,
+> since both of them are using the same channel behind the QEMUFile
+> interface) should already be broken in some way, then IIUC even there
+> is a send() in the other thread, it should return at some point with a
+> failure as well, just like how we reached here (possibly due to a
+> read() failure).
+
+We have to be careful about this; a network can fail in a way it
+gets stuck rather than fails - this can get stuck until a full TCP
+disconnection; and that takes about 30mins (from memory).
+The nice thing about using 'shutdown' is that you can kill the existing
+connection if it's hung. (Which then makes an interesting question;
+the rules in your migrate-incoming command become different if you
+want to declare it's failed!).  Having said that, you're right that at
+this point stuff has already failed - so do we need the shutdown?
+(You might want to do the shutdown as part of the recovery earlier
+or as a separate command to force the failure)
+
+> > I'm not quite sure what will happen if we end up calling this
+> > before the main thread has been returned from postcopy and the
+> > device loading is complete.
+> 
+> IIUC you mean the time starts from when we got MIG_CMD_PACKAGED until
+> main thread finishes handling that package?
+
+Yes.
+
+> Normally I think that should not matter much since during handling the
+> package it should hardly fail (we were reading from a buffer QIO
+> channel, no real IOs there)... 
+
+Note that while the main thread is reading the package, the listener
+thread is receiving pages, so you can legally get a failure at that
+point when the fd fails as it's receiving pages at the same time
+as reading the devices.
+(There's an argument that if it fails before you've received all
+your devices then perhaps you can just restart the source)
+
+> But I agree about the reasoning.  How
+> about one more patch to postpone the "active" to "postcopy-active"
+> state change after the package is handled correctly?  Like:
+> 
+> --------------
+> diff --git a/migration/savevm.c b/migration/savevm.c                     
+> index b5c3214034..8317b2a7e2 100644 
+> --- a/migration/savevm.c            
+> +++ b/migration/savevm.c            
+> @@ -1573,8 +1573,6 @@ static void *postcopy_ram_listen_thread(void *opaque)                                                                       
+>      QEMUFile *f = mis->from_src_file;                                   
+>      int load_res;                  
+>                                     
+> -    migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,             
+> -                                   MIGRATION_STATUS_POSTCOPY_ACTIVE);   
+>      qemu_sem_post(&mis->listen_thread_sem);                             
+>      trace_postcopy_ram_listen_thread_start();                           
+>                                     
+> @@ -1817,6 +1815,9 @@ static int loadvm_handle_cmd_packaged(MigrationIncomingState *mis)                                                          
+>      qemu_fclose(packf);            
+>      object_unref(OBJECT(bioc));    
+>                                     
+> +    migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,             
+> +                                   MIGRATION_STATUS_POSTCOPY_ACTIVE);   
+> +                                   
+>      return ret;                    
+>  }                                  
+> --------------
+> 
+> This function will only be called with "postcopy-active" state.
+
+I *think* that's safe; you've got to be careful, but I can't see
+anyone on the destination that cares about the destinction.
+
+> > Also, at this point have we guaranteed no one else is about
+> > to do an op on mis->to_src_file and will seg?
+> 
+> I think no?  Since IMHO the main thread is playing with the buffer QIO
+> channel, rather than the real one?
+
+OK.
+
+> (btw, could I ask what's "seg"? :)
+
+just short for segmentation fault; sig 11.
+
+Dave
+
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
