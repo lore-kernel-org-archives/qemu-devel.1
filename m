@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1e1ZfH-0006lQ-3c
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:08:25 -0400
+	(envelope-from <prvs=44841c655=anthony.perard@citrix.com>)
+	id 1e1Znh-0007tK-42
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:17:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1e1ZfB-0007jS-4X
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:08:19 -0400
-References: <20171009144840.973-1-berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <8796fa81-4168-9931-1f29-a6331e40fc0e@redhat.com>
-Date: Mon, 9 Oct 2017 17:07:56 +0200
+	(envelope-from <prvs=44841c655=anthony.perard@citrix.com>)
+	id 1e1Znc-00049q-Rn
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:17:01 -0400
+Received: from smtp02.citrix.com ([66.165.176.63]:1775)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=44841c655=anthony.perard@citrix.com>)
+	id 1e1Znc-00049S-Lm
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:16:56 -0400
+Date: Mon, 9 Oct 2017 16:16:49 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20171009151649.GB1771@perard.uk.xensource.com>
+References: <20171009145542.GA1771@perard.uk.xensource.com>
+	<20171009150231.GN2954@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171009144840.973-1-berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="3oVJNtto5HcaNGbPEVXh1w9CbDEuu59TR"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qcow2: Use BDRV_SECTOR_BITS
- instead of its literal value
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20171009150231.GN2954@redhat.com>
+Subject: Re: [Qemu-devel]
+ =?utf-8?b?4oCYdnRlX3Rlcm1pbmFsX2NvcHlfY2xpcGJvYXJk?=
+ =?utf-8?q?=E2=80=99_is_deprecated?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,117 +33,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3oVJNtto5HcaNGbPEVXh1w9CbDEuu59TR
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-Message-ID: <8796fa81-4168-9931-1f29-a6331e40fc0e@redhat.com>
-Subject: Re: [Qemu-block] [PATCH] qcow2: Use BDRV_SECTOR_BITS instead of its
- literal value
-References: <20171009144840.973-1-berto@igalia.com>
-In-Reply-To: <20171009144840.973-1-berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, Oct 09, 2017 at 04:02:31PM +0100, Daniel P. Berrange wrote:
+> On Mon, Oct 09, 2017 at 03:55:42PM +0100, Anthony PERARD wrote:
+> > Hi,
+> > 
+> > Looks like vte_terminal_copy_clipboard() is been deprecated:
+> > 
+> >   CC      ui/gtk.o
+> > ui/gtk.c: In function ‘gd_menu_copy’
+> > ui/gtk.c:1705:5: error: ‘vte_terminal_copy_clipboard’ is deprecated [-Werror=deprecated-declarations]
+> >      vte_terminal_copy_clipboard(VTE_TERMINAL(vc->vte.terminal));
+> >      ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > In file included from /usr/include/vte-2.91/vte/vte.h:35:0,
+> >                  from ui/gtk.c:47:
+> > /usr/include/vte-2.91/vte/vtedeprecated.h:94:6: note: declared here
+> >  void vte_terminal_copy_clipboard(VteTerminal *terminal) _VTE_GNUC_NONNULL(1);
+> >       ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > cc1: all warnings being treated as errors
+> > make: *** [/local/home/sheep/work/qemu/rules.mak:66: ui/gtk.o] Error 1
+> 
+> The docs say it should be simply replaced with a call to
+> vte_terminal_copy_clipboard_format, using VTE_FORMAT_TEXT
+> as the format.
+> 
+> So we just need to make either the old or new method call
+> conditional on VTE version >= 0.50.0
+> 
+> Since you've got the new vte installed to test with, do you
+> want to write a patch for that :-)
 
-On 2017-10-09 16:48, Alberto Garcia wrote:
-> BDRV_SECTOR_BITS is defined to be 9 in block.h (and BDRV_SECTOR_SIZE
-> is calculated from that), but there are still a few placed where we
-> are using the literal value instead of the macro.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/qcow2-cluster.c | 6 +++---
->  block/qcow2.c         | 4 ++--
->  2 files changed, 5 insertions(+), 5 deletions(-)
->=20
-> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-> index 0e5aec81cb..0a63604af6 100644
-> --- a/block/qcow2-cluster.c
-> +++ b/block/qcow2-cluster.c
-> @@ -748,8 +748,8 @@ uint64_t qcow2_alloc_compressed_cluster_offset(Bloc=
-kDriverState *bs,
->          return 0;
->      }
-> =20
-> -    nb_csectors =3D ((cluster_offset + compressed_size - 1) >> 9) -
-> -                  (cluster_offset >> 9);
-> +    nb_csectors =3D ((cluster_offset + compressed_size - 1) >> BDRV_SE=
-CTOR_BITS) -
-> +                  (cluster_offset >> BDRV_SECTOR_BITS);
+I was lazy, but yes, I can write the patch. Thanks for reading the doc
+:).
 
-I'm not sure about this one, because technically this is not the block
-layer's sector size but actually 512 bytes ("Compressed size of the
-images in sectors of 512 bytes" as per the spec).
-
-> =20
->      cluster_offset |=3D QCOW_OFLAG_COMPRESSED |
->                        ((uint64_t)nb_csectors << s->csize_shift);
-> @@ -1582,7 +1582,7 @@ int qcow2_decompress_cluster(BlockDriverState *bs=
-, uint64_t cluster_offset)
->          }
-> =20
->          BLKDBG_EVENT(bs->file, BLKDBG_READ_COMPRESSED);
-> -        ret =3D bdrv_read(bs->file, coffset >> 9, s->cluster_data,
-> +        ret =3D bdrv_read(bs->file, coffset >> BDRV_SECTOR_BITS, s->cl=
-uster_data,
->                          nb_csectors);
-
-Here it would probably be better to make it bdrv_pread() and then... Use
-csize instead of nb_csectors, I guess...?
-
-Max
-
->          if (ret < 0) {
->              return ret;
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index f63d1831f8..dff903e05c 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -1139,7 +1139,7 @@ static int qcow2_do_open(BlockDriverState *bs, QD=
-ict *options, int flags,
-> =20
->      s->cluster_bits =3D header.cluster_bits;
->      s->cluster_size =3D 1 << s->cluster_bits;
-> -    s->cluster_sectors =3D 1 << (s->cluster_bits - 9);
-> +    s->cluster_sectors =3D 1 << (s->cluster_bits - BDRV_SECTOR_BITS);
-> =20
->      /* Initialise version 3 header fields */
->      if (header.version =3D=3D 2) {
-> @@ -1636,7 +1636,7 @@ static int64_t coroutine_fn qcow2_co_get_block_st=
-atus(BlockDriverState *bs,
-> =20
->      bytes =3D MIN(INT_MAX, nb_sectors * BDRV_SECTOR_SIZE);
->      qemu_co_mutex_lock(&s->lock);
-> -    ret =3D qcow2_get_cluster_offset(bs, sector_num << 9, &bytes,
-> +    ret =3D qcow2_get_cluster_offset(bs, sector_num << BDRV_SECTOR_BIT=
-S, &bytes,
->                                     &cluster_offset);
->      qemu_co_mutex_unlock(&s->lock);
->      if (ret < 0) {
->=20
-
-
-
---3oVJNtto5HcaNGbPEVXh1w9CbDEuu59TR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlnbkMwSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A5iQH/3GBeRt/9VYCbgrDK14gTIHjgntXxb0u
-TFKQb1Uo3PDwFgnPS+xs1RX0Dfbn6h8UqXSBSRi2551mnYL1AOEK7pmoQA0pIq1Z
-n9tSrQH3ZT539c/0YqbmA+2hh5nnuCTfebqPLjdW9a3m2v99uwXHcsJD0FARnHOU
-9cVEUBo+GCW+sLeHeCpnmbRe+e+2kzZ9QuJ+ELPq9XjOqXEzZmnsMxMMw6FIT+dh
-o6pD3Vue5pvAGLcjun0pN/QIifoF6HM31IzUYVBmtgF7lq2XENNi1Fivb+10v8pX
-XQ8t05ldKQDDluDeLsre6os3Q6VlPINqzTvqcFs/jKK5kG4Y/Ag1ISo=
-=xpdJ
------END PGP SIGNATURE-----
-
---3oVJNtto5HcaNGbPEVXh1w9CbDEuu59TR--
+-- 
+Anthony PERARD
