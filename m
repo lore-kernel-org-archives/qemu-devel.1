@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1e1SUi-0005p8-N3
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 03:28:57 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e1SYv-0007L2-Dg
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 03:33:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1e1SUf-0005rf-Ii
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 03:28:56 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20171006235023.11952-1-f4bug@amsat.org>
-	<20171006235023.11952-3-f4bug@amsat.org>
-Date: Mon, 09 Oct 2017 09:28:48 +0200
-In-Reply-To: <20171006235023.11952-3-f4bug@amsat.org> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Fri, 6 Oct 2017 20:48:57
-	-0300")
-Message-ID: <87vajord8v.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 02/88] cocci: add more g_new()
- transformations
+	(envelope-from <kraxel@redhat.com>) id 1e1SYs-00085H-A6
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 03:33:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52086)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e1SYs-000851-3U
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 03:33:14 -0400
+Message-ID: <1507534390.32088.5.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 09 Oct 2017 09:33:10 +0200
+In-Reply-To: <87376suayp.fsf@dusky.pond.sub.org>
+References: <CY4PR15MB1464F1EE43FD8CA97C728FD3F3760@CY4PR15MB1464.namprd15.prod.outlook.com>
+	<87376suayp.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] What is the status of the QEMU sound rework?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,110 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu trival <qemu-trivial@nongnu.org>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, Zir Blazer <zir_blazer@hotmail.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-The commit message should explain the additional transformations briefly
-and informally.  In particular, why they're a good idea.  Same for PATCH
-3-5.
+  Hi,
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+> > GSoC 2015 QEMU rework of the sound environmental variables
+> > https://wiki.qemu.org/Google_Summer_of_Code_2015#QEMU_audio_backend
 
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  scripts/coccinelle/g_new.cocci | 73 ++++++++++++++++++++++++++++++++++++=
-++++++
->  1 file changed, 73 insertions(+)
->
-> diff --git a/scripts/coccinelle/g_new.cocci b/scripts/coccinelle/g_new.co=
-cci
-> index 1e57685a6b..c767325a21 100644
-> --- a/scripts/coccinelle/g_new.cocci
-> +++ b/scripts/coccinelle/g_new.cocci
-> @@ -80,6 +80,49 @@ expression p, n;
->  -g_try_realloc(p, sizeof(T) * (n))
->  +g_try_renew(T, p, n)
->=20=20
-> +@@
-> +type T;
-> +expression n;
-> +@@
-> +(
-> +-g_malloc_n(n, sizeof(T))
-> ++g_new(T, n)
-> +|
-> +-g_malloc0_n(n, sizeof(T))
-> ++g_new0(T, n)
-> +|
-> +-g_try_malloc_n(n, sizeof(T))
-> ++g_try_new(T, n)
-> +|
-> +-g_try_malloc0_n(n, sizeof(T))
-> ++g_try_new0(T, n)
-> +)
-> +
-> +@@
-> +type T;
-> +identifier m;
-> +@@
-> +T *m;
-> +...
-> +(
-> +-m =3D g_malloc(sizeof(*m));
-> ++m =3D g_new(T, 1);
-> +|
-> +-m =3D g_malloc0(sizeof(*m));
-> ++m =3D g_new0(T, 1);
-> +|
-> +-m =3D g_try_malloc(sizeof(*m));
-> ++m =3D g_try_new(T, 1);
-> +|
-> +-m =3D g_try_malloc0(sizeof(*m));
-> ++m =3D g_try_new0(T, 1);
-> +)
-> +
-> +////////////////////////////////////////
+Code is here:
+https://www.kraxel.org/cgit/qemu/log/?h=testing/audio.gsoc
 
-Please scratch this line.  Overly elaborate comment decoration.
+Merge was blocked back then due to depending on a QAPI updates.  Those
+QAPI updates are merged meanwhile, even though it took quite a while
+(merged late 2016 IIRC).
 
-> +//
-> +// last transformations: cleanups
-> +//
-> +
->  // drop superfluous cast
->  @@
->  type T;
-> @@ -99,3 +142,33 @@ expression p, n;
->  @@
->  -(T *)g_renew(T, p, n)
->  +g_renew(T, p, n)
-> +@@
-> +type T;
-> +expression n;
-> +@@
-> +(
-> +-(T *)g_try_new(T, n)
-> ++g_try_new(T, n)
-> +|
-> +-(T *)g_try_new0(T, n)
-> ++g_try_new0(T, n)
-> +)
-> +
-> +// drop superfluous parenthesis
-> +@@
-> +type T;
-> +expression c;
-> +@@
-> +(
-> +-g_new(T, (c))
-> ++g_new(T, c)
-> +|
-> +-g_try_new(T, (c))
-> ++g_try_new(T, c)
-> +|
-> +-g_new0(T, (c))
-> ++g_new0(T, c)
-> +|
-> +-g_try_new0(T, (c))
-> ++g_try_new0(T, c)
-> +)
+So, this series basically needs a rebase.  I suspect that is a multi-
+week project minimum.  May well expand to be multiple months.  Which
+leads us to ...
+
+> > GSoC 2017 QEMU rework a patch series that did precisely that
+> > https://wiki.qemu.org/Google_Summer_of_Code_2017#QEMU_audio_backend
+
+... this one.  But no student was interested in this project.
+
+Fundamental issue is that right now there is not really someone paying
+attention to audio in qemu.
+
+I'm currently the maintainer, but due to also being busy with other
+stuff I hardly find time to do anything beyond picking up fixes from
+the mailing list, maybe do some basic testing (depending on the kind of
+patches) and do a audio pull request now and then.
+
+> > Is anyone tinkering with the idea of making a paravirtualized Sound
+> > Card and its associated Drivers for the mainstream OSes to try to
+> > fix once and for all the sound issues?
+
+I suspect the problems are more in the qemu audio backends.  The issues
+seem to be different depending on which backend you use.  So creating a
+paravirtual sound card may not be the solution for that problem ...
+
+cheers,
+  Gerd
