@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e1ZrQ-0000yR-BX
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:20:57 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1e1ZtQ-0002AB-6K
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:23:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e1ZrK-0006Ci-Pq
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:20:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53840)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e1ZrK-0006CN-J3
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:20:46 -0400
-Date: Mon, 9 Oct 2017 18:20:30 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171009181612-mutt-send-email-mst@kernel.org>
-References: <1506744354-20979-1-git-send-email-wei.w.wang@intel.com>
-	<1506744354-20979-4-git-send-email-wei.w.wang@intel.com>
+	(envelope-from <andrew.smirnov@gmail.com>) id 1e1ZtP-0006tz-8a
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 11:22:56 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1506744354-20979-4-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v16 3/5] virtio-balloon: VIRTIO_BALLOON_F_SG
+In-Reply-To: <CAFEAcA_+HDjZWHbNhedzL7he=-1WPMRePh917-9BZJK0AYqPdg@mail.gmail.com>
+References: <20170918195100.17593-1-andrew.smirnov@gmail.com>
+	<20170918195100.17593-8-andrew.smirnov@gmail.com>
+	<CAFEAcA_+HDjZWHbNhedzL7he=-1WPMRePh917-9BZJK0AYqPdg@mail.gmail.com>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Mon, 9 Oct 2017 08:22:52 -0700
+Message-ID: <CAHQ1cqEF=H_T64zA-_eJG_yi7xb8etG8RB+xLQinxi4H6EKXTg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 07/17] imx_fec: Emulate SHIFT16 in
+ ENETx_RACC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On Sat, Sep 30, 2017 at 12:05:52PM +0800, Wei Wang wrote:
-> +static inline void xb_set_page(struct virtio_balloon *vb,
-> +			       struct page *page,
-> +			       unsigned long *pfn_min,
-> +			       unsigned long *pfn_max)
-> +{
-> +	unsigned long pfn = page_to_pfn(page);
-> +
-> +	*pfn_min = min(pfn, *pfn_min);
-> +	*pfn_max = max(pfn, *pfn_max);
-> +	xb_preload(GFP_KERNEL);
-> +	xb_set_bit(&vb->page_xb, pfn);
-> +	xb_preload_end();
-> +}
-> +
+On Fri, Oct 6, 2017 at 7:02 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 18 September 2017 at 20:50, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
+>> Needed to support latest Linux kernel driver which relies on that
+>> functionality.
+>>
+>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>> Cc: Jason Wang <jasowang@redhat.com>
+>> Cc: qemu-devel@nongnu.org
+>> Cc: qemu-arm@nongnu.org
+>> Cc: yurovsky@gmail.com
+>> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+>> ---
+>>  hw/net/imx_fec.c         | 23 +++++++++++++++++++++++
+>>  include/hw/net/imx_fec.h |  2 ++
+>>  2 files changed, 25 insertions(+)
+>>
+>> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+>> index 8a77136d38..bd62d7a75f 100644
+>> --- a/hw/net/imx_fec.c
+>> +++ b/hw/net/imx_fec.c
+>> @@ -1037,6 +1037,7 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+>>      uint32_t buf_addr;
+>>      unsigned int buf_len;
+>>      size_t size = len;
+>> +    bool shift16 = s->regs[ENET_RACC] & ENET_RACC_SHIFT16;
+>>
+>>      FEC_PRINTF("len %d\n", (int)size);
+>>
+>> @@ -1049,6 +1050,10 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+>>      /* 4 bytes for the CRC.  */
+>>      size += 4;
+>>
+>> +    if (shift16) {
+>> +        size += 2;
+>> +    }
+>> +
+>>      /* Huge frames are truncted.  */
+>>      if (size > s->regs[ENET_FTRL]) {
+>>          size = s->regs[ENET_FTRL];
+>> @@ -1085,6 +1090,24 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+>>              buf_len += size - 4;
+>>          }
+>>          buf_addr = bd.data;
+>> +
+>> +        if (shift16) {
+>> +            /*
+>> +             * If SHIFT16 bit of ENETx_RACC register is set we need to
+>> +             * align the payload to 4-byte boundary.
+>> +             */
+>> +            const uint8_t zeros[2] = { 0 };
+>> +
+>> +            dma_memory_write(&address_space_memory, buf_addr,
+>> +                             zeros, sizeof(zeros));
+>> +
+>> +            buf_addr += sizeof(zeros);
+>> +            buf_len  -= sizeof(zeros);
+>> +
+>> +            shift16 = false; /* We only do this once per Ethernet
+>> +                              * frame */
+>> +        }
+>> +
+>
+> Can you avoid having an end-of-source-line comment that wraps
+> to multiple lines, please? (put it on a line of its own, or
+> edit down to fit.) Otherwise
+>
 
-So, this will allocate memory
+Sure, will fix in v2.
 
-...
-
-> @@ -198,9 +327,12 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
->  	struct page *page;
->  	struct balloon_dev_info *vb_dev_info = &vb->vb_dev_info;
->  	LIST_HEAD(pages);
-> +	bool use_sg = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_SG);
-> +	unsigned long pfn_max = 0, pfn_min = ULONG_MAX;
->  
-> -	/* We can only do one array worth at a time. */
-> -	num = min(num, ARRAY_SIZE(vb->pfns));
-> +	/* Traditionally, we can only do one array worth at a time. */
-> +	if (!use_sg)
-> +		num = min(num, ARRAY_SIZE(vb->pfns));
->  
->  	mutex_lock(&vb->balloon_lock);
->  	/* We can't release more pages than taken */
-
-And is sometimes called on OOM.
-
-
-I suspect we need to
-
-1. keep around some memory for leak on oom
-
-2. for non oom allocate outside locks
-
-
--- 
-MST
+Thanks,
+Andrey Smirnov
