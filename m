@@ -1,17 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1e1XdT-0001N2-O0
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 08:58:20 -0400
+	(envelope-from <berrange@redhat.com>) id 1e1Xhi-0004di-FO
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 09:02:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1e1XdS-0002Dx-KT
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 08:58:19 -0400
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Mon,  9 Oct 2017 18:29:40 +0530
-Message-Id: <20171009125940.24220-9-ashijeetacharya@gmail.com>
-In-Reply-To: <20171009125940.24220-1-ashijeetacharya@gmail.com>
-References: <20171009125940.24220-1-ashijeetacharya@gmail.com>
-Subject: [Qemu-devel] [PATCH v9 8/8] vmdk: Make vmdk_get_cluster_offset()
- return cluster offset only
+	(envelope-from <berrange@redhat.com>) id 1e1Xhe-0005Zh-Da
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 09:02:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40548)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e1Xhe-0005Z3-7e
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 09:02:38 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3EDE57E430
+	for <qemu-devel@nongnu.org>; Mon,  9 Oct 2017 13:02:37 +0000 (UTC)
+Date: Mon, 9 Oct 2017 14:02:18 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171009130218.GK2954@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170911165929.2791-1-marcandre.lureau@redhat.com>
+	<20170911165929.2791-3-marcandre.lureau@redhat.com>
+	<20171009110336.GA17824@redhat.com>
+	<20171009144344.38bbd1e9@nial.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171009144344.38bbd1e9@nial.brq.redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 2/7] hw/misc: add vmcoreinfo device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,128 +37,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: kwolf@redhat.com, jsnow@redhat.com, mreitz@redhat.com, stefanha@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, anderson@redhat.com, lersek@redhat.com
 
-vmdk_alloc_clusters() introduced earlier now handles the task of
-allocating clusters and performing COW when needed. Thus we can change
-vmdk_get_cluster_offset() to stick to the sole purpose of returning
-cluster offset using sector number. Update the changes at all call
-sites.
+On Mon, Oct 09, 2017 at 02:43:44PM +0200, Igor Mammedov wrote:
+> On Mon, 9 Oct 2017 12:03:36 +0100
+> "Daniel P. Berrange" <berrange@redhat.com> wrote:
+>=20
+> > On Mon, Sep 11, 2017 at 06:59:24PM +0200, Marc-Andr=C3=A9 Lureau wrot=
+e:
+> > > See docs/specs/vmcoreinfo.txt for details.
+> > >=20
+> > > "etc/vmcoreinfo" fw_cfg entry is added when using "-device vmcorein=
+fo". =20
+> >=20
+> > I'm wondering if you considered just adding the entry to fw_cfg by
+> > default, without requiring any -device arg ? Unless I'm misunderstand=
+ing,
+> > this doesn't feel like a device to me - its just a well known bucket
+> > in fw_cfg IIUC ?  Obviously its existance would need to be tied to
+> > the latest machine type for ABI reasons though. The benefit of this
+> > is that it would "just work" without us having to plumb it through to
+> > all the downstream applications that use QEMU for mgmt guest (OpenSta=
+ck,
+> > oVirt, GNOME Boxes, virt-manager, and countless other mgmt apps).
+> it follows model set by pvpanic device, it's easier to manage from migr=
+ation
+> POV, one could use it even for old machine types with new qemu (just by=
+ adding
+> device, it makes instance not backwards migratable to old qemu but shou=
+ld work
+> for forward migration) and if user doesn't need it, device could be jus=
+t omitted
+> from CLI.
 
-Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
----
- block/vmdk.c | 56 ++++++++++++--------------------------------------------
- 1 file changed, 12 insertions(+), 44 deletions(-)
+Sure but it means that in effect no one will have this functionality enab=
+led
+for several years. pvpanic has been around a long time and I rarely see i=
+t
+present in configured guests :-(
 
-diff --git a/block/vmdk.c b/block/vmdk.c
-index cbeffb1552..497e30f6df 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -1511,25 +1511,16 @@ static int vmdk_alloc_clusters(BlockDriverState *bs,
-  * For flat extents, the start offset as parsed from the description file is
-  * returned.
-  *
-- * For sparse extents, look up in L1, L2 table. If allocate is true, return an
-- * offset for a new cluster and update L2 cache. If there is a backing file,
-- * COW is done before returning; otherwise, zeroes are written to the allocated
-- * cluster. Both COW and zero writing skips the sector range
-- * [@skip_start_sector, @skip_end_sector) passed in by caller, because caller
-- * has new data to write there.
-+ * For sparse extents, look up the L1, L2 table.
-  *
-  * Returns: VMDK_OK if cluster exists and mapped in the image.
-- *          VMDK_UNALLOC if cluster is not mapped and @allocate is false.
-- *          VMDK_ERROR if failed.
-+ *          VMDK_UNALLOC if cluster is not mapped.
-+ *          VMDK_ERROR if failed
-  */
- static int vmdk_get_cluster_offset(BlockDriverState *bs,
-                                    VmdkExtent *extent,
--                                   VmdkMetaData *m_data,
-                                    uint64_t offset,
--                                   bool allocate,
--                                   uint64_t *cluster_offset,
--                                   uint64_t skip_start_bytes,
--                                   uint64_t skip_end_bytes)
-+                                   uint64_t *cluster_offset)
- {
-     int l1_index, l2_offset, l2_index;
-     uint32_t *l2_table;
-@@ -1554,31 +1545,9 @@ static int vmdk_get_cluster_offset(BlockDriverState *bs,
-     }
- 
-     if (!cluster_sector || zeroed) {
--        if (!allocate) {
--            return zeroed ? VMDK_ZEROED : VMDK_UNALLOC;
--        }
--
--        cluster_sector = extent->next_cluster_sector;
--        extent->next_cluster_sector += extent->cluster_sectors;
--
--        /* First of all we write grain itself, to avoid race condition
--         * that may to corrupt the image.
--         * This problem may occur because of insufficient space on host disk
--         * or inappropriate VM shutdown.
--         */
--        ret = vmdk_perform_cow(bs, extent, cluster_sector * BDRV_SECTOR_SIZE,
--                                offset, skip_start_bytes, skip_end_bytes);
--        if (ret) {
--            return ret;
--        }
--        if (m_data) {
--            m_data->valid = 1;
--            m_data->l1_index = l1_index;
--            m_data->l2_index = l2_index;
--            m_data->l2_offset = l2_offset;
--            m_data->l2_cache_entry = &l2_table[l2_index];
--        }
-+        return zeroed ? VMDK_ZEROED : VMDK_UNALLOC;
-     }
-+
-     *cluster_offset = cluster_sector << BDRV_SECTOR_BITS;
-     return VMDK_OK;
- }
-@@ -1621,9 +1590,7 @@ static int64_t coroutine_fn vmdk_co_get_block_status(BlockDriverState *bs,
-         return 0;
-     }
-     qemu_co_mutex_lock(&s->lock);
--    ret = vmdk_get_cluster_offset(bs, extent, NULL,
--                                  sector_num * 512, false, &offset,
--                                  0, 0);
-+    ret = vmdk_get_cluster_offset(bs, extent, sector_num * 512, &offset);
-     qemu_co_mutex_unlock(&s->lock);
- 
-     index_in_cluster = vmdk_find_index_in_cluster(extent, sector_num);
-@@ -1814,13 +1781,14 @@ vmdk_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-             ret = -EIO;
-             goto fail;
-         }
--        ret = vmdk_get_cluster_offset(bs, extent, NULL,
--                                      offset, false, &cluster_offset, 0, 0);
-+
-         offset_in_cluster = vmdk_find_offset_in_cluster(extent, offset);
- 
-         n_bytes = MIN(bytes, extent->cluster_sectors * BDRV_SECTOR_SIZE
-                              - offset_in_cluster);
- 
-+        ret = vmdk_get_cluster_offset(bs, extent, offset, &cluster_offset);
-+
-         if (ret != VMDK_OK) {
-             /* if not allocated, try to read from parent image, if exist */
-             if (bs->backing && ret != VMDK_ZEROED) {
-@@ -2565,9 +2533,9 @@ static int vmdk_check(BlockDriverState *bs, BdrvCheckResult *result,
-             ret = -EINVAL;
-             break;
-         }
--        ret = vmdk_get_cluster_offset(bs, extent, NULL,
-+        ret = vmdk_get_cluster_offset(bs, extent,
-                                       sector_num << BDRV_SECTOR_BITS,
--                                      false, &cluster_offset, 0, 0);
-+                                      &cluster_offset);
-         if (ret == VMDK_ERROR) {
-             fprintf(stderr,
-                     "ERROR: could not get cluster_offset for sector %"
--- 
-2.13.5
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
