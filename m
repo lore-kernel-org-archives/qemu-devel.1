@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1e1awt-0003Tp-2H
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 12:30:41 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e1azq-0004K1-Kc
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 12:33:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1e1awr-0006Nt-Jw
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 12:30:35 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e1azY-00008p-4G
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 12:33:38 -0400
+Resent-Message-Id: <E1e1azY-00008p-4G@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21411)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e1azX-0008PG-Rm
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 12:33:20 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150756673596.261.13431247368132967890@b58463cdfd5f>
+In-Reply-To: <20171009151926.1708-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-wjuFzQuxOGz2UbjL6qSO7H75WzKHPVrqhT40QMaLLog@mail.gmail.com>
-References: <20170918195100.17593-1-andrew.smirnov@gmail.com>
-	<20170918195100.17593-18-andrew.smirnov@gmail.com>
-	<CAFEAcA-wjuFzQuxOGz2UbjL6qSO7H75WzKHPVrqhT40QMaLLog@mail.gmail.com>
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Mon, 9 Oct 2017 09:30:21 -0700
-Message-ID: <CAHQ1cqF5c=kq9USPUb9DdH9AePEVMxOV_MhAY6bHMV6H4Zm6FQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 17/17] Implement support for i.MX7 Sabre
- board
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 9 Oct 2017 09:32:16 -0700 (PDT)
+Subject: Re: [Qemu-devel] [RFC PATCH] linux-user/main: support dfilter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,162 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
+To: alex.bennee@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu
 
-On Fri, Oct 6, 2017 at 7:42 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 18 September 2017 at 20:51, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
->> Cc: Peter Maydell <peter.maydell@linaro.org>
->> Cc: qemu-devel@nongnu.org
->> Cc: qemu-arm@nongnu.org
->> Cc: yurovsky@gmail.com
->> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
->> ---
->>  hw/arm/Makefile.objs   |   2 +-
->>  hw/arm/mcimx7d-sabre.c | 100 +++++++++++++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 101 insertions(+), 1 deletion(-)
->>  create mode 100644 hw/arm/mcimx7d-sabre.c
->>
->> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
->> index 33f6051ae3..fc4a963de8 100644
->> --- a/hw/arm/Makefile.objs
->> +++ b/hw/arm/Makefile.objs
->> @@ -19,5 +19,5 @@ obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
->>  obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
->>  obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
->>  obj-$(CONFIG_MPS2) += mps2.o
->> -obj-$(CONFIG_FSL_IMX7) += fsl-imx7.o
->> +obj-$(CONFIG_FSL_IMX7) += fsl-imx7.o mcimx7d-sabre.o
->>
->> diff --git a/hw/arm/mcimx7d-sabre.c b/hw/arm/mcimx7d-sabre.c
->> new file mode 100644
->> index 0000000000..34e3933db8
->> --- /dev/null
->> +++ b/hw/arm/mcimx7d-sabre.c
->> @@ -0,0 +1,100 @@
->> +/*
->> + * Copyright (c) 2017, Impinj, Inc.
->> + *
->> + * MCIMX7D_SABRE Board System emulation.
->> + *
->> + * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
->> + *
->> + * This code is licensed under the GPL, version 2 or later.
->> + * See the file `COPYING' in the top level directory.
->> + *
->> + * It (partially) emulates a mcimx7d_sabre board, with a Freescale
->> + * i.MX7 SoC
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "qapi/error.h"
->> +#include "qemu-common.h"
->> +#include "hw/arm/fsl-imx7.h"
->> +#include "hw/boards.h"
->> +#include "sysemu/sysemu.h"
->> +#include "sysemu/device_tree.h"
->> +#include "qemu/error-report.h"
->> +#include "sysemu/qtest.h"
->> +#include "net/net.h"
->> +
->> +typedef struct {
->> +    FslIMX7State soc;
->> +    MemoryRegion ram;
->> +} MCIMX7Sabre;
->> +
->> +static void mcimx7d_add_psci_node(const struct arm_boot_info *boot_info, void *fdt)
->> +{
->> +    const char comp[] = "arm,psci-0.2\0arm,psci";
->> +
->> +    qemu_fdt_add_subnode(fdt, "/psci");
->> +    qemu_fdt_setprop(fdt, "/psci", "compatible", comp, sizeof(comp));
->> +    qemu_fdt_setprop_string(fdt, "/psci", "method", "smc");
->> +}
->
-> You shouldn't need this -- we should just be able to work with whatever
-> the real hardware's device tree is. ("virt" is a special case because
-> we create our own device tree there.)
->
-
-Upstream kernel for i.MX7 relies on PSCI to support SMP and this is a
-kind of DT fixup that would normally be done by a PSCI-compatible
-bootloader. I can remove this code, but it would effectively disable
-SMP on vanilla DT/kernel combos.
-
->> +
->> +static void mcimx7d_sabre_init(MachineState *machine)
->> +{
->> +    static struct arm_boot_info boot_info;
->> +    MCIMX7Sabre *s = g_new0(MCIMX7Sabre, 1);
->> +    Object *soc;
->> +    int i;
->> +
->> +    if (machine->ram_size > FSL_IMX7_MMDC_SIZE) {
->> +        error_report("RAM size " RAM_ADDR_FMT " above max supported (%08x)",
->> +                     machine->ram_size, FSL_IMX7_MMDC_SIZE);
->> +        exit(1);
->> +    }
->> +
->> +    boot_info = (struct arm_boot_info) {
->> +        .loader_start = FSL_IMX7_MMDC_ADDR,
->> +        .board_id = -1,
->> +        .ram_size = machine->ram_size,
->> +        .kernel_filename = machine->kernel_filename,
->> +        .kernel_cmdline = machine->kernel_cmdline,
->> +        .initrd_filename = machine->initrd_filename,
->> +        .nb_cpus = smp_cpus,
->> +        .modify_dtb = mcimx7d_add_psci_node,
->> +    };
->> +
->> +    object_initialize(&s->soc, sizeof(s->soc), TYPE_FSL_IMX7);
->> +    soc = OBJECT(&s->soc);
->> +    object_property_add_child(OBJECT(machine), "soc", soc, &error_fatal);
->> +    object_property_set_bool(soc, true, "realized", &error_fatal);
->> +
->> +    memory_region_allocate_system_memory(&s->ram, NULL, "mcimx7d-sabre.ram",
->> +                                         machine->ram_size);
->> +    memory_region_add_subregion(get_system_memory(),
->> +                                FSL_IMX7_MMDC_ADDR, &s->ram);
->> +
->> +    for (i = 0; i < FSL_IMX7_NUM_USDHCS; i++) {
->> +        BusState *bus;
->> +        DeviceState *carddev;
->> +        DriveInfo *di;
->> +        BlockBackend *blk;
->> +
->> +        di = drive_get_next(IF_SD);
->> +        blk = di ? blk_by_legacy_dinfo(di) : NULL;
->> +        bus = qdev_get_child_bus(DEVICE(&s->soc.usdhc[i]), "sd-bus");
->> +        carddev = qdev_create(bus, TYPE_SD_CARD);
->> +        qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
->> +        object_property_set_bool(OBJECT(carddev), true, "realized", &error_fatal);
->> +    }
->> +
->> +    if (!qtest_enabled()) {
->> +        arm_load_kernel(&s->soc.cpu[0], &boot_info);
->> +    }
->> +}
->> +
->> +static void mcimx7d_sabre_machine_init(MachineClass *mc)
->> +{
->> +    mc->desc = "Freescale i.MX7 DUAL SABRE (Cortex A7)";
->> +    mc->init = mcimx7d_sabre_init;
->> +    mc->max_cpus = FSL_IMX7_NUM_CPUS;
->> +    mc->ignore_memory_transaction_failures = true;
->
-> Please don't set this flag on new board models -- it is only
-> for legacy existing board models (where we don't know what
-> running guest code might be broken by turning bad accesses
-> into guest aborts. For a new board model, you should leave
-> the flag unset and instead stub out any devices that you
-> need to using create_unimplemented_device() so that your
-> guest code boots.
-
-That flag didn't exist when I started porting this board and I only
-discovered it a couple of hours before I prepared v1 of the patchset,
-since I didn't want to submit the code that wouldn't work but didn't
-have time to implements all of the missing blocks. I'll update v2, to
-get rid of it.
-
-Thanks,
-Andrey Smirnov
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcxMDA5MTUxOTI2LjE3MDgtMS1hbGV4LmJlbm5lZUBsaW5hcm8ub3JnClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUkZDIFBBVENIXSBsaW51eC11c2VyL21haW46IHN1cHBvcnQg
+ZGZpbHRlcgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNl
+Cm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAK
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZl
+cnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBB
+VENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYg
+ISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
+bWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAg
+IG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpV
+cGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0
+cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAg
+ICAgICAgIHBhdGNoZXcvMTUwNzU2NDkwMi05MDAwLTEtZ2l0LXNlbmQtZW1haWwtaWFuLmphY2tz
+b25AZXUuY2l0cml4LmNvbSAtPiBwYXRjaGV3LzE1MDc1NjQ5MDItOTAwMC0xLWdpdC1zZW5kLWVt
+YWlsLWlhbi5qYWNrc29uQGV1LmNpdHJpeC5jb20KIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAg
+cGF0Y2hldy8yMDE3MTAwOTE1MTkyNi4xNzA4LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZyAtPiBw
+YXRjaGV3LzIwMTcxMDA5MTUxOTI2LjE3MDgtMS1hbGV4LmJlbm5lZUBsaW5hcm8ub3JnCiAqIFtu
+ZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxNzEwMDkxNTU0MzEuMTQwOTMtMS1tcmVp
+dHpAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcxMDA5MTU1NDMxLjE0MDkzLTEtbXJlaXR6QHJl
+ZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwowNTE1OGIwZTZhIGxpbnV4
+LXVzZXIvbWFpbjogc3VwcG9ydCBkZmlsdGVyCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
+ZyBQQVRDSCAxLzE6IGxpbnV4LXVzZXIvbWFpbjogc3VwcG9ydCBkZmlsdGVyLi4uCkVSUk9SOiBz
+cGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzM0OiBGSUxFOiBsaW51eC11
+c2VyL21haW4uYzo0MDYzOgorICAgICAicmFuZ2VbLC4uLl0iLCJmaWx0ZXIgbG9nZ2luZyBiYXNl
+ZCBvbiBhZGRyZXNzIHJhbmdlIn0sCiAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBlcnJv
+cnMsIDAgd2FybmluZ3MsIDE5IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHBy
+b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
+cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
+biBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
+aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
+dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
+Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
