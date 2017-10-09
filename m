@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e1ZKB-0007xz-MM
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 10:46:32 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1e1ZLj-0000Ye-D2
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 10:48:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e1ZKA-0004UV-IY
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 10:46:31 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:47564)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e1ZKA-0004TU-AE
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 10:46:30 -0400
-Received: by mail-wm0-x231.google.com with SMTP id t69so23234967wmt.2
-	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 07:46:30 -0700 (PDT)
+	(envelope-from <andrew.smirnov@gmail.com>) id 1e1ZLf-0005dL-Ft
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 10:48:07 -0400
 MIME-Version: 1.0
-In-Reply-To: <1504286483-23327-4-git-send-email-eric.auger@redhat.com>
-References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
-	<1504286483-23327-4-git-send-email-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Oct 2017 15:46:08 +0100
-Message-ID: <CAFEAcA_N+7F__C-xdiB+HqmRY0H=8q5rzBGkxwrjhbBrgqSKPA@mail.gmail.com>
+In-Reply-To: <CAFEAcA9M9ZpcAHB4eZ2zh9jA6YSWpLoEPiAznnL2-SSdJoW+Mw@mail.gmail.com>
+References: <20170918195100.17593-1-andrew.smirnov@gmail.com>
+	<20170918195100.17593-3-andrew.smirnov@gmail.com>
+	<CAFEAcA9M9ZpcAHB4eZ2zh9jA6YSWpLoEPiAznnL2-SSdJoW+Mw@mail.gmail.com>
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Mon, 9 Oct 2017 07:47:56 -0700
+Message-ID: <CAHQ1cqEQpgr1Qgwr9rUnpiUXs_=jKSnzpJFQ=Q6GK+5vpT-x6A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v7 03/20] hw/arm/smmu-common:
- smmu_read/write_sysmem
+Subject: Re: [Qemu-devel] [PATCH 02/17] imx_fec: Do not calculate FEC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,97 +23,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, Radha Mohan <mohun106@gmail.com>, Trey Cain <tcain@qti.qualcomm.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Will Deacon <will.deacon@arm.com>, jean-philippe.brucker@arm.com, robin.murphy@arm.com, Peter Xu <peterx@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, wtownsen@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrey Yurovsky <yurovsky@gmail.com>
 
-On 1 September 2017 at 18:21, Eric Auger <eric.auger@redhat.com> wrote:
-> Those two functions will be used to access configuration
-> data (STE, CD) and page table entries in guest RAM.
+On Fri, Oct 6, 2017 at 6:48 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 18 September 2017 at 20:50, Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
+>> Save some computation time and avoid calculating CRC's frame
+>>
+>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>> Cc: Jason Wang <jasowang@redhat.com>
+>> Cc: qemu-devel@nongnu.org
+>> Cc: qemu-arm@nongnu.org
+>> Cc: yurovsky@gmail.com
+>> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+>> ---
+>>  hw/net/imx_fec.c | 9 +++------
+>>  1 file changed, 3 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+>> index 88b4b049d7..75822344fc 100644
+>> --- a/hw/net/imx_fec.c
+>> +++ b/hw/net/imx_fec.c
+>> @@ -1032,9 +1032,7 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+>>      IMXENETBufDesc bd;
+>>      uint32_t flags = 0;
+>>      uint32_t addr;
+>> -    uint32_t crc;
+>>      uint32_t buf_addr;
+>> -    uint8_t *crc_ptr;
+>>      unsigned int buf_len;
+>>      size_t size = len;
+>>
+>> @@ -1048,8 +1046,6 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+>>
+>>      /* 4 bytes for the CRC.  */
+>>      size += 4;
+>> -    crc = cpu_to_be32(crc32(~0, buf, size));
+>> -    crc_ptr = (uint8_t *) &crc;
+>>
+>>      /* Huge frames are truncted.  */
+>>      if (size > ENET_MAX_FRAME_SIZE) {
+>> @@ -1090,9 +1086,10 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+>>          dma_memory_write(&address_space_memory, buf_addr, buf, buf_len);
+>>          buf += buf_len;
+>>          if (size < 4) {
+>> +            const uint8_t zeros[4] = { 0 };
+>> +
+>>              dma_memory_write(&address_space_memory, buf_addr + buf_len,
+>> -                             crc_ptr, 4 - size);
+>> -            crc_ptr += 4 - size;
+>> +                             zeros, 4 - size);
+>>          }
+>>          bd.flags &= ~ENET_BD_E;
+>>          if (size == 0) {
 >
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  hw/arm/smmu-common.c         | 37 +++++++++++++++++++++++++++++++++++++
->  include/hw/arm/smmu-common.h |  5 +++++
->  2 files changed, 42 insertions(+)
->
-> diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-> index 3e67992..2a94547 100644
-> --- a/hw/arm/smmu-common.c
-> +++ b/hw/arm/smmu-common.c
-> @@ -30,6 +30,43 @@
->  #include "qemu/error-report.h"
->  #include "hw/arm/smmu-common.h"
->
-> +inline MemTxResult smmu_read_sysmem(dma_addr_t addr, void *buf, dma_addr_t len,
-> +                                    bool secure)
-> +{
-> +    MemTxAttrs attrs = {.unspecified = 1, .secure = secure};
-
-This isn't right. .unspecified = 1 means "transaction master has
-not explicitly specified any attributes", but you are specifying
-one (the secure one).
-
-> +    switch (len) {
-> +    case 4:
-> +        *(uint32_t *)buf = ldl_le_phys(&address_space_memory, addr);
-> +        break;
-> +    case 8:
-> +        *(uint64_t *)buf = ldq_le_phys(&address_space_memory, addr);
-> +        break;
-> +    default:
-> +        return address_space_rw(&address_space_memory, addr,
-> +                                attrs, buf, len, false);
-
-Why do we have the special cases for 4 and 8? In particular, those
-code paths will not correctly detect memory transaction failures.
-
-> +    }
-> +    return MEMTX_OK;
-> +}
-> +
-> +inline void
-> +smmu_write_sysmem(dma_addr_t addr, void *buf, dma_addr_t len, bool secure)
-> +{
-> +    MemTxAttrs attrs = {.unspecified = 1, .secure = secure};
-> +
-> +    switch (len) {
-> +    case 4:
-> +        stl_le_phys(&address_space_memory, addr, *(uint32_t *)buf);
-> +        break;
-> +    case 8:
-> +        stq_le_phys(&address_space_memory, addr, *(uint64_t *)buf);
-> +        break;
-> +    default:
-> +        address_space_rw(&address_space_memory, addr,
-> +                         attrs, buf, len, true);
-> +    }
-> +}
-> +
->  /******************/
->  /* Infrastructure */
->  /******************/
-> diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
-> index 20f3fe6..a5999b0 100644
-> --- a/include/hw/arm/smmu-common.h
-> +++ b/include/hw/arm/smmu-common.h
-> @@ -111,4 +111,9 @@ static inline uint16_t smmu_get_sid(SMMUDevice *sdev)
->  {
->      return  ((pci_bus_num(sdev->bus) & 0xff) << 8) | sdev->devfn;
->  }
-> +
-> +MemTxResult smmu_read_sysmem(dma_addr_t addr, void *buf,
-> +                             dma_addr_t len, bool secure);
-> +void smmu_write_sysmem(dma_addr_t addr, void *buf, dma_addr_t len, bool secure);
-> +
-
-There are so few callers of this that I'm inclined to think you
-should just open code the right kind of memory accessor function
-in the callsites rather than having a weird switch statement.
-
->  #endif  /* HW_ARM_SMMU_COMMON */
-> --
-> 2.5.5
+> This looks a bit odd. Doesn't the hardware calculate the CRC here?
 >
 
-thanks
--- PMM
+It does, it just seemed to me that since the hardware also has a "CRC
+error" bit in its status register, there would be few if any users of
+the actual calculated CRC value. Given how eTSEC emulation layer gets
+away without calculating CRC I thought that it might be possible to
+have this optimization here as well.
+
+I can drop this patch if this seems risky.
+
+Thanks,
+Andrey Smirnov
