@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e1fqm-0006mZ-1z
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:44:37 -0400
+	(envelope-from <jsnow@redhat.com>) id 1e1fxU-0007tY-Lw
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:51:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e1fqi-0002H6-3z
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:44:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44202)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e1fqh-0002Gq-TQ
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:44:32 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8A7A12576C
-	for <qemu-devel@nongnu.org>; Mon,  9 Oct 2017 21:44:30 +0000 (UTC)
-Date: Tue, 10 Oct 2017 00:44:26 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171010003951-mutt-send-email-mst@kernel.org>
-References: <20170911165929.2791-1-marcandre.lureau@redhat.com>
-	<20170911165929.2791-3-marcandre.lureau@redhat.com>
-	<20171009110336.GA17824@redhat.com>
-	<20171009144344.38bbd1e9@nial.brq.redhat.com>
-	<20171009130218.GK2954@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1e1fxT-0005QG-Kh
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 17:51:32 -0400
+References: <20171002143919.207741-1-vsementsov@virtuozzo.com>
+	<20171002143919.207741-2-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <72e73c18-7220-9c3a-967c-82171b16689c@redhat.com>
+Date: Mon, 9 Oct 2017 17:51:18 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20171009130218.GK2954@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 2/7] hw/misc: add vmcoreinfo device
+In-Reply-To: <20171002143919.207741-2-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/5] hbitmap: add next_zero function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,64 +24,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, ehabkost@redhat.com, qemu-devel@nongnu.org, anderson@redhat.com, lersek@redhat.com
-
-On Mon, Oct 09, 2017 at 02:02:18PM +0100, Daniel P. Berrange wrote:
-> On Mon, Oct 09, 2017 at 02:43:44PM +0200, Igor Mammedov wrote:
-> > On Mon, 9 Oct 2017 12:03:36 +0100
-> > "Daniel P. Berrange" <berrange@redhat.com> wrote:
-> >=20
-> > > On Mon, Sep 11, 2017 at 06:59:24PM +0200, Marc-Andr=E9 Lureau wrote=
-:
-> > > > See docs/specs/vmcoreinfo.txt for details.
-> > > >=20
-> > > > "etc/vmcoreinfo" fw_cfg entry is added when using "-device vmcore=
-info". =20
-> > >=20
-> > > I'm wondering if you considered just adding the entry to fw_cfg by
-> > > default, without requiring any -device arg ? Unless I'm misundersta=
-nding,
-> > > this doesn't feel like a device to me - its just a well known bucke=
-t
-> > > in fw_cfg IIUC ?  Obviously its existance would need to be tied to
-> > > the latest machine type for ABI reasons though. The benefit of this
-> > > is that it would "just work" without us having to plumb it through =
-to
-> > > all the downstream applications that use QEMU for mgmt guest (OpenS=
-tack,
-> > > oVirt, GNOME Boxes, virt-manager, and countless other mgmt apps).
-> > it follows model set by pvpanic device, it's easier to manage from mi=
-gration
-> > POV, one could use it even for old machine types with new qemu (just =
-by adding
-> > device, it makes instance not backwards migratable to old qemu but sh=
-ould work
-> > for forward migration) and if user doesn't need it, device could be j=
-ust omitted
-> > from CLI.
->=20
-> Sure but it means that in effect no one will have this functionality en=
-abled
-> for several years. pvpanic has been around a long time and I rarely see=
- it
-> present in configured guests :-(
->=20
->=20
-> Regards,
-> Daniel
-
-libvirt runs with -nodefaults, right? I'd argue pretty strongly -nodefaul=
-ts
-shouldn't add optional devices anyway.
-
-So it's up to you guys, you can add it to VMs by default if you want to.
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 
 
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
+
+On 10/02/2017 10:39 AM, Vladimir Sementsov-Ogievskiy wrote:
+> The function searches for next zero bit.
+> Also add interface for BdrvDirtyBitmap.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  include/block/dirty-bitmap.h |  1 +
+>  include/qemu/hbitmap.h       |  8 ++++++++
+>  block/dirty-bitmap.c         |  5 +++++
+>  util/hbitmap.c               | 29 +++++++++++++++++++++++++++++
+>  4 files changed, 43 insertions(+)
+> 
+> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+> index 3579a7597c..a591c27213 100644
+> --- a/include/block/dirty-bitmap.h
+> +++ b/include/block/dirty-bitmap.h
+> @@ -91,5 +91,6 @@ bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
+>  BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
+>                                          BdrvDirtyBitmap *bitmap);
+>  char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
+> +int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t start);
+>  
+>  #endif
+> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+> index 81e78043d1..6b6490ecad 100644
+> --- a/include/qemu/hbitmap.h
+> +++ b/include/qemu/hbitmap.h
+> @@ -292,6 +292,14 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first);
+>   */
+>  unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi);
+>  
+> +/* hbitmap_next_zero:
+> + * @hb: The HBitmap to operate on
+> + * @start: The bit to start from.
+> + *
+> + * Find next not dirty bit.
+> + */
+> +int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start);
+> +
+>  /* hbitmap_create_meta:
+>   * Create a "meta" hbitmap to track dirtiness of the bits in this HBitmap.
+>   * The caller owns the created bitmap and must call hbitmap_free_meta(hb) to
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index bd04e991b1..7879d13ddb 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -715,3 +715,8 @@ char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp)
+>  {
+>      return hbitmap_sha256(bitmap->bitmap, errp);
+>  }
+> +
+> +int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset)
+> +{
+> +    return hbitmap_next_zero(bitmap->bitmap, offset);
+> +}
+> diff --git a/util/hbitmap.c b/util/hbitmap.c
+> index 2f9d0fdbd0..ffcdbc5587 100644
+> --- a/util/hbitmap.c
+> +++ b/util/hbitmap.c
+> @@ -188,6 +188,35 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first)
+>      }
+>  }
+>  
+> +int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start)
+> +{
+> +    size_t pos = (start >> hb->granularity) >> BITS_PER_LEVEL;
+> +    unsigned long *last_lev = hb->levels[HBITMAP_LEVELS - 1];
+> +    uint64_t sz = hb->sizes[HBITMAP_LEVELS - 1];
+> +    unsigned long cur = last_lev[pos];
+> +    unsigned start_bit_offset =
+> +            (start >> hb->granularity) & (BITS_PER_LONG - 1);
+> +    int64_t res;
+
+Prefer a line separating declarations from statements.
+
+> +    cur |= (1UL << start_bit_offset) - 1;
+> +    assert((start >> hb->granularity) < hb->size);
+> +
+> +    if (cur == (unsigned long)-1) {
+> +        do {
+> +            pos++;
+> +        } while (pos < sz && last_lev[pos] == (unsigned long)-1);
+> +
+> +        if (pos >= sz) {
+> +            return -1;
+> +        }
+> +
+> +        cur = last_lev[pos];
+> +    }
+> +
+> +    res = (pos << BITS_PER_LEVEL) + ctol(cur);
+> +
+> +    return res < hb->size ? (res << hb->granularity) : -1;
+> +}
+> +
+>  bool hbitmap_empty(const HBitmap *hb)
+>  {
+>      return hb->count == 0;
+> 
+
+And a test would be nice.
+
+Reviewed-by: John Snow <jsnow@redhat.com>
