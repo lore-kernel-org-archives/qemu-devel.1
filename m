@@ -1,51 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1e1Te4-0006Bg-Ss
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 04:42:45 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e1TeH-0006Ff-Uj
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 04:43:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1e1Te0-0008Dq-TJ
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 04:42:40 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53220
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
-	id 1e1Te0-0008DO-O4
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 04:42:36 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v998cpsJ020288
-	for <qemu-devel@nongnu.org>; Mon, 9 Oct 2017 04:42:33 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dg4ywt6nq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 04:42:32 -0400
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
-	Mon, 9 Oct 2017 04:42:32 -0400
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
-	[9.57.199.111])
-	by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v998gTK741877572
-	for <qemu-devel@nongnu.org>; Mon, 9 Oct 2017 08:42:29 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5DD06AC040
-	for <qemu-devel@nongnu.org>; Mon,  9 Oct 2017 04:43:08 -0400 (EDT)
-Received: from zyimindembp.cn.ibm.com (unknown [9.115.193.250])
-	by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP id AE821AC03F
-	for <qemu-devel@nongnu.org>; Mon,  9 Oct 2017 04:43:07 -0400 (EDT)
-References: <1507206983-16096-1-git-send-email-pmorel@linux.vnet.ibm.com>
-	<1507206983-16096-2-git-send-email-pmorel@linux.vnet.ibm.com>
-From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Date: Mon, 9 Oct 2017 16:42:26 +0800
+	(envelope-from <cohuck@redhat.com>) id 1e1TeD-0008HO-OW
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 04:42:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39710)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e1TeD-0008H5-FY
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 04:42:49 -0400
+Date: Mon, 9 Oct 2017 10:42:44 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171009104244.02d60070.cohuck@redhat.com>
+In-Reply-To: <1507124979-8880-4-git-send-email-pmorel@linux.vnet.ibm.com>
+References: <1507124979-8880-1-git-send-email-pmorel@linux.vnet.ibm.com>
+	<1507124979-8880-4-git-send-email-pmorel@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1507206983-16096-2-git-send-email-pmorel@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Message-Id: <a98e74ba-549f-c76f-c53f-56e3b574fde1@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1] pci: Set PCI-bus device entry before
- initializing bus master
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 3/5] s390x/intc: Emulate Adapter
+ Interrupt Suppression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -54,64 +28,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-I strongly agree. This will make IOMMU assignment easier.
+On Wed,  4 Oct 2017 15:49:37 +0200
+Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
 
-
-=D4=DA 2017/10/5 =CF=C2=CE=E78:36, Pierre Morel =D0=B4=B5=C0:
-> When initializing the PCI-bus master pci_init_bus_master(PCIDevice *)
-> calls pci_device_iommu_address_space(PCIDevice *) which in turn calls
-> iommu_bus->iommu_fn(bus, opaque,devfn)
->
-> If the device entry of the PCI-bus is not initialized to point to the
-> PCIDevice structure, the iommu_fn() function, getting only bus and
-> devno, is unable to retrieve the PCIDevice.
->
-> Usually it is not a problem as the DMA address space is depending of
-> the BUS but in an architecture like S390, each PCI Device can have
-> its own DMA address space.
-> Being able to setup the DMA address space at the right moment will
-> greatly simplify the implementation.
->
-> This patch proposes to setup the bus device entry before calling
-> pci_init_bus_master() and reset the entry in case of error.
->
+> Emulate the Adapter Interrupt Suppression in the KVM FLIC interface when
+> the kernel does not support AIS.
+> 
+> When the kernel KVM does not support AIS, we can not support VFIO PCI
+> devices but we still can support emulated devices if we emulate AIS
+> inside QEMU.
+> Let's emulate AIS, allowing to use emulated PCI devices without KVM AIS
+> support.
+> 
 > Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
 > ---
->   hw/pci/pci.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 1e6fb88..3e64492 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -1026,6 +1026,7 @@ static PCIDevice *do_pci_register_device(PCIDevic=
-e *pci_dev, PCIBus *bus,
->       address_space_init(&pci_dev->bus_master_as,
->                          &pci_dev->bus_master_container_region, pci_dev=
-->name);
->
-> +    bus->devices[devfn] =3D pci_dev;
->       if (qdev_hotplug) {
->           pci_init_bus_master(pci_dev);
->       }
-> @@ -1062,6 +1063,7 @@ static PCIDevice *do_pci_register_device(PCIDevic=
-e *pci_dev, PCIBus *bus,
->       if (local_err) {
->           error_propagate(errp, local_err);
->           do_pci_unregister_device(pci_dev);
-> +        bus->devices[devfn] =3D NULL;
->           return NULL;
->       }
->
-> @@ -1071,7 +1073,6 @@ static PCIDevice *do_pci_register_device(PCIDevic=
-e *pci_dev, PCIBus *bus,
->           config_write =3D pci_default_write_config;
->       pci_dev->config_read =3D config_read;
->       pci_dev->config_write =3D config_write;
-> -    bus->devices[devfn] =3D pci_dev;
->       pci_dev->version_id =3D 2; /* Current pci device vmstate version =
-*/
->       return pci_dev;
->   }
+>  hw/intc/s390_flic.c     |  3 +-
+>  hw/intc/s390_flic_kvm.c | 76 ++++++++++++++++++++++++++++++++++++++++---------
+>  2 files changed, 64 insertions(+), 15 deletions(-)
+> 
+> diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
+> index 6eaf178..33a7cde 100644
+> --- a/hw/intc/s390_flic.c
+> +++ b/hw/intc/s390_flic.c
+> @@ -185,8 +185,7 @@ static void s390_flic_common_realize(DeviceState *dev, Error **errp)
+>                     " (%d > %d)", max_batch, ADAPTER_ROUTES_MAX_GSI);
+>          return;
+>      }
+> -
+> -    fs->ais_supported = s390_has_feat(S390_FEAT_ADAPTER_INT_SUPPRESSION);
+> +    fs->ais_supported = false;
+>  }
+>  
+>  static void s390_flic_class_init(ObjectClass *oc, void *data)
+> diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
+> index 7ead17a..fd1aa22 100644
+> --- a/hw/intc/s390_flic_kvm.c
+> +++ b/hw/intc/s390_flic_kvm.c
+> @@ -33,6 +33,8 @@ typedef struct KVMS390FLICState {
+>  
+>      uint32_t fd;
+>      bool clear_io_supported;
+> +    uint8_t simm;
+> +    uint8_t nimm;
+>  } KVMS390FLICState;
+
+Instead of duplicating this, move simm/nimm into the common flic state?
+
+>  
+>  DeviceState *s390_flic_kvm_create(void)
+> @@ -164,11 +166,24 @@ static int kvm_s390_modify_ais_mode(S390FLICState *fs, uint8_t isc,
+>          .addr = (uint64_t)&req,
+>      };
+>  
+> -    if (!fs->ais_supported) {
+> -        return -ENOSYS;
+> +    if (fs->ais_supported) {
+> +        return ioctl(flic->fd, KVM_SET_DEVICE_ATTR, &attr) ? -errno : 0;
+>      }
+>  
+> -    return ioctl(flic->fd, KVM_SET_DEVICE_ATTR, &attr) ? -errno : 0;
+> +    /* Kernel does not support AIS, emulate it here */
+> +    switch (mode) {
+> +    case SIC_IRQ_MODE_ALL:
+> +        flic->simm &= ~AIS_MODE_MASK(isc);
+> +        flic->nimm &= ~AIS_MODE_MASK(isc);
+> +        break;
+> +    case SIC_IRQ_MODE_SINGLE:
+> +        flic->simm |= AIS_MODE_MASK(isc);
+> +        flic->nimm &= ~AIS_MODE_MASK(isc);
+> +        break;
+> +    default:
+> +        return -EINVAL;
+> +    }
+
+That's just the same as for the qemu flic. What about creating a
+wrapper (to be called from css.c) in the common flic code that calls a
+specific callback (only needed for kvm) and falls back to emulating if
+it was not successful?
+
+> +    return 0;
+>  }
+>  
+>  static int kvm_s390_inject_airq(S390FLICState *fs, uint8_t type,
+> @@ -180,12 +195,23 @@ static int kvm_s390_inject_airq(S390FLICState *fs, uint8_t type,
+>          .group = KVM_DEV_FLIC_AIRQ_INJECT,
+>          .attr = id,
+>      };
+> +    uint32_t io_int_word = (isc << 27) | IO_INT_WORD_AI;
+>  
+> -    if (!fs->ais_supported) {
+> -        return -ENOSYS;
+> +    if (fs->ais_supported) {
+> +        return ioctl(flic->fd, KVM_SET_DEVICE_ATTR, &attr) ? -errno : 0;
+>      }
+>  
+> -    return ioctl(flic->fd, KVM_SET_DEVICE_ATTR, &attr) ? -errno : 0;
+> +    /* Kernel does not support AIS, emulate it here */
+> +    if (flags && (flic->nimm & AIS_MODE_MASK(isc))) {
+> +        return 0;
+> +    }
+> +
+> +    s390_io_interrupt(0, 0, 0, io_int_word);
+> +
+> +    if (flags && (flic->simm & AIS_MODE_MASK(isc))) {
+> +        flic->nimm |= AIS_MODE_MASK(isc);
+> +    }
+
+Same here: I think doing this in the generic flic would make sense.
+
+> +    return 0;
+>  }
+>  
+>  /**
+> @@ -557,6 +583,32 @@ static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
+>      test_attr.group = KVM_DEV_FLIC_CLEAR_IO_IRQ;
+>      flic_state->clear_io_supported = !ioctl(flic_state->fd,
+>                                              KVM_HAS_DEVICE_ATTR, test_attr);
+> +    /* To support ais we need all these three FLIC attributes */
+> +    test_attr.group = KVM_DEV_FLIC_AISM;
+> +    ret = !ioctl(flic_state->fd, KVM_HAS_DEVICE_ATTR, test_attr);
+> +    flic_state->parent_obj.ais_supported &= ret;
+> +
+> +    test_attr.group = KVM_DEV_FLIC_AIRQ_INJECT;
+> +    ret = !ioctl(flic_state->fd, KVM_HAS_DEVICE_ATTR, test_attr);
+> +    flic_state->parent_obj.ais_supported &= ret;
+> +
+> +    test_attr.group = KVM_DEV_FLIC_AISM_ALL;
+> +    ret &= !ioctl(flic_state->fd, KVM_HAS_DEVICE_ATTR, test_attr);
+> +    flic_state->parent_obj.ais_supported &= ret;
+> +
+> +    /* For buggy kernels we need to really test that the attribute is supported */
+
+Ugh.
+
+> +    {
+> +        struct kvm_s390_ais_req req = {
+> +            .mode = SIC_IRQ_MODE_ALL,
+> +        };
+> +        struct kvm_device_attr attr = {
+> +            .group = KVM_DEV_FLIC_AISM,
+> +            .addr = (uint64_t)&req,
+> +        };
+> +        ret = !ioctl(flic_state->fd, KVM_SET_DEVICE_ATTR, &attr);
+> +    }
+> +    flic_state->parent_obj.ais_supported &= ret;
+> +
+>      return;
+>  fail:
+>      error_propagate(errp, errp_local);
+> @@ -578,13 +630,11 @@ static void kvm_s390_flic_reset(DeviceState *dev)
+>  
+>      flic_disable_wait_pfault(flic);
+>  
+> -    if (fs->ais_supported) {
+> -        for (isc = 0; isc <= MAX_ISC; isc++) {
+> -            rc = kvm_s390_modify_ais_mode(fs, isc, SIC_IRQ_MODE_ALL);
+> -            if (rc) {
+> -                error_report("Failed to reset ais mode for isc %d: %s",
+> -                             isc, strerror(-rc));
+> -            }
+> +    for (isc = 0; isc <= MAX_ISC; isc++) {
+> +        rc = kvm_s390_modify_ais_mode(fs, isc, SIC_IRQ_MODE_ALL);
+> +        if (rc) {
+> +            error_report("Failed to reset ais mode for isc %d: %s",
+> +                         isc, strerror(-rc));
+>          }
+>      }
+>  
