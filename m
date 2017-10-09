@@ -1,41 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e1dM1-0003P6-ND
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:04:43 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e1dTW-0004j7-Ae
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:12:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1e1dLy-0006yA-JB
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:04:41 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60278
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1e1dLy-0006xr-Cu
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:04:38 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v99J4XMj118315
-	for <qemu-devel@nongnu.org>; Mon, 9 Oct 2017 15:04:33 -0400
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dg9jbb2n7-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 15:04:33 -0400
-Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 9 Oct 2017 13:04:28 -0600
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <dgilbert@redhat.com>) id 1e1dTS-0002rI-TX
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:12:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50710)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e1dTS-0002q0-Iw
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 15:12:22 -0400
+Date: Mon, 9 Oct 2017 20:12:15 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171009191214.GA3481@work-vm>
+References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
+	<1504081950-2528-21-git-send-email-peterx@redhat.com>
+	<20170922110542.GD2620@work-vm>
+	<20170927100416.GA17044@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <a31e42ae-f9d2-0bfc-04f9-6e6c2e35c9f8@redhat.com>
-References: <20171009170607.4155-1-mdroth@linux.vnet.ibm.com>
-	<20171009170607.4155-2-mdroth@linux.vnet.ibm.com>
-	<a31e42ae-f9d2-0bfc-04f9-6e6c2e35c9f8@redhat.com>
-Date: Mon, 09 Oct 2017 14:04:15 -0500
-Message-Id: <150757585588.11829.8041044493563314894@sif>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] qdev: store DeviceState's canonical
- path to use when unparenting
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170927100416.GA17044@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC v2 20/33] migration: new message
+ MIG_RP_MSG_RECV_BITMAP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,46 +30,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, "Michael S . Tsirkin" <mst@redhat.com>, groug@kaod.org, armbru@redhat.com, alex.williamson@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-Quoting Eric Blake (2017-10-09 13:11:28)
-> On 10/09/2017 12:06 PM, Michael Roth wrote:
-> > device_unparent(dev, ...) is called when a device is unparented,
-> > either directly, or as a result of a parent device being
-> > finalized, and handles some final cleanup for the device. Part
-> > of this includes emiting a DEVICE_DELETED QMP event to notify
-> > management, which includes the device's path in the composition
-> > tree as provided by object_get_canonical_path().
-> > =
+* Peter Xu (peterx@redhat.com) wrote:
+> On Fri, Sep 22, 2017 at 12:05:42PM +0100, Dr. David Alan Gilbert wrote:
+> 
+> [...]
+> 
+> > > diff --git a/migration/ram.c b/migration/ram.c
+> > > index 7e20097..5d938e3 100644
+> > > --- a/migration/ram.c
+> > > +++ b/migration/ram.c
+> > > @@ -182,6 +182,70 @@ void ramblock_recv_bitmap_clear(RAMBlock *rb, void *host_addr)
+> > >      clear_bit(ramblock_recv_bitmap_offset(host_addr, rb), rb->receivedmap);
+> > >  }
+> > >  
+> > > +#define  RAMBLOCK_RECV_BITMAP_ENDING  (0x0123456789abcdefULL)
+> > > +
+> > > +/*
+> > > + * Format: bitmap_size (8 bytes) + whole_bitmap (N bytes).
+> > > + *
+> > > + * Returns >0 if success with sent bytes, or <0 if error.
+> > > + */
+> > > +int64_t ramblock_recv_bitmap_send(QEMUFile *file,
+> > > +                                  const char *block_name)
+> > > +{
+> > > +    RAMBlock *block = qemu_ram_block_by_name(block_name);
+> > > +    unsigned long *le_bitmap, nbits;
+> > > +    uint64_t size;
+> > > +
+> > > +    if (!block) {
+> > > +        error_report("%s: invalid block name: %s", __func__, block_name);
+> > > +        return -1;
+> > > +    }
+> > > +
+> > > +    nbits = block->used_length >> TARGET_PAGE_BITS;
+> > > +
+> > > +    /*
+> > > +     * Make sure the tmp bitmap buffer is big enough, e.g., on 32bit
+> > > +     * machines we may need 4 more bytes for padding (see below
+> > > +     * comment). So extend it a bit before hand.
+> > > +     */
+> > > +    le_bitmap = bitmap_new(nbits + BITS_PER_LONG);
+> > 
+> > I do worry what will happen on really huge RAMBlocks; the worst case is
+> > that this temporary bitmap is a few GB.
+> 
+> IIUC the bitmap ratio is 32K, so the ramblock will be 1GB only if the
+> guest RAM region size is 1GB * 32K = 32TB.
+> 
+> Then, can I just assume allocating (only) 1GB temporary memory for a
+> guest using more than 32TB memory not a problem? :-)
+> 
+> I hope I didn't calculate it wrongly though.
 
-> =
+No, I think that's right; I was off a few bits.
+If they've got 32TB of RAM, then 1GB is probably no issue.
 
-> > +++ b/hw/core/qdev.c
-> > @@ -928,6 +928,13 @@ static void device_set_realized(Object *obj, bool =
-value, Error **errp)
-> >              goto post_realize_fail;
-> >          }
-> >  =
+Dave
 
-> > +        /*
-> > +         * always free/re-initialize here since the value cannot be cl=
-eaned up
-> > +         * in device_unrealize due to it's usage later on in the unplu=
-g path
-> =
-
-> s/it's/its/ (remember, "it's" is only appropriate if "it is" or "it has"
-> can be substituted in its place; otherwise you meant the possessive "its")
-
-Thanks, just inattentiveness on my part. Will send a v3 soon if there are
-no other comments.
-
-> =
-
-> -- =
-
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
->=20
+> > 
+> > > +    /*
+> > > +     * Always use little endian when sending the bitmap. This is
+> > > +     * required that when source and destination VMs are not using the
+> > > +     * same endianess. (Note: big endian won't work.)
+> > > +     */
+> > > +    bitmap_to_le(le_bitmap, block->receivedmap, nbits);
+> > > +
+> > > +    /* Size of the bitmap, in bytes */
+> > > +    size = nbits / 8;
+> > > +
+> > > +    /*
+> > > +     * size is always aligned to 8 bytes for 64bit machines, but it
+> > > +     * may not be true for 32bit machines. We need this padding to
+> > > +     * make sure the migration can survive even between 32bit and
+> > > +     * 64bit machines.
+> > > +     */
+> > > +    size = ROUND_UP(size, 8);
+> > > +
+> > > +    qemu_put_be64(file, size);
+> > > +    qemu_put_buffer(file, (const uint8_t *)le_bitmap, size);
+> > > +    /*
+> > > +     * Mark as an end, in case the middle part is screwed up due to
+> > > +     * some "misterious" reason.
+> > > +     */
+> > > +    qemu_put_be64(file, RAMBLOCK_RECV_BITMAP_ENDING);
+> > > +    qemu_fflush(file);
+> > > +
+> > > +    free(le_bitmap);
+> > > +
+> > > +    if (qemu_file_get_error(file)) {
+> > > +        return qemu_file_get_error(file);
+> > > +    }
+> > > +
+> > > +    return size + sizeof(size);
+> > > +}
+> > > +
+> > >  /*
+> > >   * An outstanding page request, on the source, having been received
+> > >   * and queued
+> > > @@ -2706,6 +2770,83 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+> > >      return ret;
+> > >  }
+> > >  
+> > > +/*
+> > > + * Read the received bitmap, revert it as the initial dirty bitmap.
+> > > + * This is only used when the postcopy migration is paused but wants
+> > > + * to resume from a middle point.
+> > > + */
+> > > +int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *block)
+> > > +{
+> > > +    int ret = -EINVAL;
+> > > +    QEMUFile *file = s->rp_state.from_dst_file;
+> > > +    unsigned long *le_bitmap, nbits = block->used_length >> TARGET_PAGE_BITS;
+> > > +    uint64_t local_size = nbits / 8;
+> > > +    uint64_t size, end_mark;
+> > > +
+> > > +    if (s->state != MIGRATION_STATUS_POSTCOPY_RECOVER) {
+> > > +        error_report("%s: incorrect state %s", __func__,
+> > > +                     MigrationStatus_lookup[s->state]);
+> > > +        return -EINVAL;
+> > > +    }
+> > > +
+> > > +    /*
+> > > +     * Note: see comments in ramblock_recv_bitmap_send() on why we
+> > > +     * need the endianess convertion, and the paddings.
+> > > +     */
+> > > +    local_size = ROUND_UP(local_size, 8);
+> > > +
+> > > +    /* Add addings */
+> > > +    le_bitmap = bitmap_new(nbits + BITS_PER_LONG);
+> > > +
+> > > +    size = qemu_get_be64(file);
+> > > +
+> > > +    /* The size of the bitmap should match with our ramblock */
+> > > +    if (size != local_size) {
+> > > +        error_report("%s: ramblock '%s' bitmap size mismatch "
+> > > +                     "(0x%lx != 0x%lx)", __func__, block->idstr,
+> > > +                     size, local_size);
+> > 
+> > You need to use PRIx64 formatters there - %lx isn't portable.
+> 
+> Yes. Fixing.
+> 
+> > 
+> > > +        ret = -EINVAL;
+> > > +        goto out;
+> > > +    }
+> > > +
+> > > +    size = qemu_get_buffer(file, (uint8_t *)le_bitmap, local_size);
+> > > +    end_mark = qemu_get_be64(file);
+> > > +
+> > > +    ret = qemu_file_get_error(file);
+> > > +    if (ret || size != local_size) {
+> > > +        error_report("%s: read bitmap failed for ramblock '%s': %d",
+> > > +                     __func__, block->idstr, ret);
+> > 
+> > You might like to include size/local_size in the error.
+> 
+> Will do.  Thanks,
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
