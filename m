@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e1V5m-0003B9-2m
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 06:15:23 -0400
+	(envelope-from <mlureau@redhat.com>) id 1e1VLO-0005Uy-Mh
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 06:31:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e1V5h-0005eG-VE
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 06:15:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54160)
+	(envelope-from <mlureau@redhat.com>) id 1e1VLI-0005wm-OP
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 06:31:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37272)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e1V5h-0005c8-CM
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 06:15:17 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 59088356E1
-	for <qemu-devel@nongnu.org>; Mon,  9 Oct 2017 10:15:16 +0000 (UTC)
-Date: Mon, 9 Oct 2017 11:15:04 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171009101504.GF2954@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171004104636.7963-1-quintela@redhat.com>
-	<20171004104636.7963-5-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1e1VLI-0005vM-Eo
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 06:31:24 -0400
+Date: Mon, 9 Oct 2017 06:31:17 -0400 (EDT)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <1138849410.27888094.1507545077979.JavaMail.zimbra@redhat.com>
+In-Reply-To: <87wp48xkkf.fsf@dusky.pond.sub.org>
+References: <20170913132417.24384-1-david@redhat.com>
+	<20170913132417.24384-19-david@redhat.com>
+	<87k20eq9em.fsf@dusky.pond.sub.org>
+	<20171004100415.0f0ded10.cohuck@redhat.com>
+	<87k20bm6cw.fsf@dusky.pond.sub.org>
+	<20171004150956.0901d6c1.cohuck@redhat.com>
+	<87wp48xkkf.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171004104636.7963-5-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v9 04/12] migration: Start of multiple fd
- work
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 18/22] s390x: implement
+ query-hotpluggable-cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,98 +33,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, Oct 04, 2017 at 12:46:28PM +0200, Juan Quintela wrote:
-> We create new channels for each new thread created. We send through
-> them a string containing <uuid> multifd <channel number> so we are
-> sure that we connect the right channels in both sides.
+Hi
 
-This message needs updating now that we send a struct.
+----- Original Message -----
+> Cornelia Huck <cohuck@redhat.com> writes:
+>=20
+> > On Wed, 04 Oct 2017 14:42:55 +0200
+> > Markus Armbruster <armbru@redhat.com> wrote:
+> >
+> >> Cornelia Huck <cohuck@redhat.com> writes:
+> >>=20
+> >> > On Mon, 02 Oct 2017 09:46:41 +0200
+> >> > Markus Armbruster <armbru@redhat.com> wrote:
+> >> > =20
+> >> >> David Hildenbrand <david@redhat.com> writes:
+> >> >>  =20
+> >> >> > CPU hotplug is only possible on a per core basis on s390x. So let=
+'s
+> >> >> > add possible_cpus and properly wire everything up.
+> >> >> >
+> >> >> > Signed-off-by: David Hildenbrand <david@redhat.com>
+> >> >> [...]
+> >> >> > diff --git a/qapi-schema.json b/qapi-schema.json
+> >> >> > index f3af2cb851..79e9f85404 100644
+> >> >> > --- a/qapi-schema.json
+> >> >> > +++ b/qapi-schema.json
+> >> >> > @@ -3121,6 +3121,22 @@
+> >> >> >  #      }
+> >> >> >  #    ]}
+> >> >> >  #
+> >> >> > +# For s390x-virtio-ccw machine type started with -smp 1,maxcpus=
+=3D2
+> >> >> > -cpu qemu
+> >> >> > +# (Since: 2.11):
+> >> >> > +#
+> >> >> > +# -> { "execute": "query-hotpluggable-cpus" }
+> >> >> > +# <- {"return": [
+> >> >> > +#      {
+> >> >> > +#         "type": "qemu-s390-cpu", "vcpus-count": 1,
+> >> >> > +#         "props": { "core-id": 1 }
+> >> >> > +#      },
+> >> >> > +#      {
+> >> >> > +#         "qom-path": "/machine/unattached/device[0]",
+> >> >> > +#         "type": "qemu-s390-cpu", "vcpus-count": 1,
+> >> >> > +#         "props": { "core-id": 0 }
+> >> >> > +#      }
+> >> >> > +#    ]}
+> >> >> > +#
+> >> >> >  ##
+> >> >> >  { 'command': 'query-hotpluggable-cpus', 'returns':
+> >> >> >  ['HotpluggableCPU'] }
+> >> >>=20
+> >> >> Please stick in '# Example:' like we do in query-hotpluggable-cpus'=
+s
+> >> >> doc
+> >> >> comment.  I expect the generated documentation to be illegible[*]
+> >> >> without it.
+> >> >
+> >> > Should '# Example:' go before each of the examples (instead of the
+> >> > beginning of the example block), then?
+> >>=20
+> >> Whatever makes the generated documentation look better.
+> >
+> > The pdf indeed looks ugly, but that's a preexisting problem, and adding
+> > more '# Example:' lines does not really help.
+> >
+> > The basic issue is that the code expects just one example and no
+> > additional text for the '# Example:' tag -- the explaining text for the
+> > various statements ends up looking like the qmp examples. That should
+> > be improved before doing a patch on top for this command (and I don't
+> > really have the skills or time to improve the output, sorry.)
+>=20
+> Marc-Andr=C3=A9, any ideas?
+>=20
 
+It's not supported atm. The ideas to fix this are pretty much a matter of t=
+aste.
 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index b83f8977c5..b57006594b 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -414,9 +425,27 @@ int multifd_save_cleanup(Error **errp)
->      return ret;
->  }
->  
-> +typedef struct {
-> +    uint32_t version;
-> +    uint8_t id;
-> +    char uuid[UUID_FMT_LEN];
-> +} MigrateMultiFDInit_t;
+I'd suggest to keep the code below the Example: section as @example/verbati=
+m by default. And introduce a new section syntax, like Example:: to do "man=
+ual" formatting.
 
-We add an __attribute__((packed)) here since we send it directly
-on the wire. Perhaps put 'uuid' field before 'id' when doing that
-so 'uuid' gets a more natural alignment.
+Example::
 
-If we use 'unsigned char uuid[16]' then you don't need to convert
-from string format either...
+This text would be in regular format.
+1. and allow list, *strong* etc.
 
->  static void *multifd_send_thread(void *opaque)
->  {
->      MultiFDSendParams *p = opaque;
-> +    MigrateMultiFDInit_t msg;
-> +    Error *local_err = NULL;
-> +    size_t ret;
-> +
-> +    msg.version = 1;
-> +    msg.id = p->id;
-> +    qemu_uuid_unparse(&qemu_uuid, (char *)&msg.uuid);
+| -> { then have some code }
+| <- ...
 
-eg this could be   memcpy(msg.uuid, qemu_uuid.data, sizeof(msg.uuid))
-
-> +    ret = qio_channel_write_all(p->c, (char *)&msg, sizeof(msg), &local_err);
-> +    if (ret != 0) {
-> +        terminate_multifd_send_threads(local_err);
-> +        return NULL;
-> +    }
->  
->      while (true) {
->          qemu_mutex_lock(&p->mutex);
-> @@ -431,6 +460,27 @@ static void *multifd_send_thread(void *opaque)
->      return NULL;
->  }
-
-> +void multifd_new_channel(QIOChannel *ioc)
-> +{
-> +    MultiFDRecvParams *p;
-> +    MigrateMultiFDInit_t msg;
-> +    Error *local_err = NULL;
-> +    char *uuid;
-> +    size_t ret;
-> +
-> +    ret = qio_channel_read_all(ioc, (char *)&msg, sizeof(msg), &local_err);
-> +    if (ret != 0) {
-> +        terminate_multifd_recv_threads(local_err);
-> +        return;
-> +    }
-> +
-> +    uuid = qemu_uuid_unparse_strdup(&qemu_uuid);
-
-...and here we would avoid need to unparse, instead..
-
-> +
-> +    if (strcmp(msg.uuid, uuid)) {
-
-  memcmp(msg.uuid, qemu_uuid.data, sizeof(msg.uuid) != 0
-
-> +        g_free(uuid);
-> +        error_setg(&local_err, "multifd: received uuid '%s' and expected "
-> +                   "uuid '%s' for channel %hhd", msg.uuid, uuid, msg.id);
-> +        terminate_multifd_recv_threads(local_err);
-> +        return;
-> +    }
-> +    g_free(uuid);
-> +
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+And regulat text again.
