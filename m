@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e1QRk-0005TY-6Q
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 01:17:45 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e1Qra-0002be-0q
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 01:44:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e1QRg-0005MV-6D
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 01:17:44 -0400
-Date: Mon, 9 Oct 2017 13:17:31 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171009051731.GB2196@pxdev.xzpeter.org>
-References: <20171006114624.10771-1-maxime.coquelin@redhat.com>
-	<20171006114624.10771-2-maxime.coquelin@redhat.com>
-	<1a2849a9-1dc8-eb8b-8f59-5c9ca4849e1c@redhat.com>
-	<ca80a3c7-c011-fe61-2af6-6261bd6f4d42@redhat.com>
-	<c4c02172-cf19-bd56-d120-f72e043a54e0@redhat.com>
-	<7ebed617-f286-5f35-e784-6b4b864e406a@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1e1QrW-00007L-RO
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 01:44:26 -0400
+Date: Mon, 9 Oct 2017 07:44:15 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171009074415.71d9dbba@nial.brq.redhat.com>
+In-Reply-To: <20171006112503.GB10050@umbus.fritz.box>
+References: <1507220690-265042-1-git-send-email-imammedo@redhat.com>
+	<1507220690-265042-19-git-send-email-imammedo@redhat.com>
+	<20171006083419.GW3260@umbus.fritz.box>
+	<20171006113054.2af54a45@nial.brq.redhat.com>
+	<20171006112503.GB10050@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <7ebed617-f286-5f35-e784-6b4b864e406a@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] exec: add page_mask for
- flatview_do_translate
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 18/23] ppc: pnv: use generic cpu_model
+ parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +27,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?UTF-8?B?SGVy?= =?UTF-8?B?dsOp?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "open list:ppce500" <qemu-ppc@nongnu.org>
 
-On Fri, Oct 06, 2017 at 03:03:50PM +0200, Maxime Coquelin wrote:
->=20
->=20
-> On 10/06/2017 02:48 PM, Paolo Bonzini wrote:
-> >On 06/10/2017 14:46, Maxime Coquelin wrote:
-> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 addr =3D ((=
-iotlb.translated_addr & ~iotlb.addr_mask)
-> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | (addr & iotlb.addr_mask));
-> >>>>-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *plen =3D MIN(*plen, (a=
-ddr | iotlb.addr_mask) - addr + 1);
-> >>>>+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 page_mask =3D iotlb.add=
-r_mask;
-> >>>
-> >>>Should this be "page_mask &=3D iotlb.addr_mask"?
-> >>>
-> >>>If you have multiple IOMMUs on top of each other (yeah, I know...) I
-> >>>think the smallest size should win.=C2=A0 This is also consistent wi=
-th the
-> >>>MIN in the line below.
-> >>
-> >>I agree, but changin to "page_mask &=3D iotlb.addr_mask" will not be
-> >>enough, we also have to change the init value. Else we will always en=
-d
-> >>up with 0xfff.
-> >>
-> >>Maybe we could do as plen was handled before, i.e. setting page_mask
-> >>init value to (hwaddr)(-1), and after the loop set it to
-> >>~TARGET_PAGE_MASK if it hasn't been changed.
-> >>
-> >>Does that sound reasonable?
-> >
-> >True that, in fact it makes sense for the "IOTLB entry" to represent a=
-ll
-> >of memory if there's no IOMMU at all.
->=20
-> Indeed, that makes sense as no iommu means identity mapping. It would
-> moreover improve performance, as the vhost backend will only have a
-> single IOTLB entry in its cache.
->=20
-> Maybe it is better to wait for Peter to understand the reason he limite=
-d
-> it to the target page size?
+On Fri, 6 Oct 2017 22:25:03 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-Sorry, just came back from a long holiday.
-
-I was trying to use 4K as default to be safe (but yes the mask was not
-correct, thanks for fixing that!), to make sure the translated range
-covered by the IOMMUTLBEntry will always be safe to access (I thought
-that was how IOTLB was defined, but I may be wrong).  Using (-1) is
-good especially from performance POV as long as the caller knows the
-real memory boundary, but I'm not sure whether it'll break the IOTLB
-scemantic somehow.
-
-If we want to make it -1 for transparent mappings, maybe worth
-commenting it in definition of IOMMUTLBEntry.page_mask?
-
-(Btw, thanks again for moving these patches forward; I tried to, but I
- failed :)
-
---=20
-Peter Xu
+> On Fri, Oct 06, 2017 at 11:30:54AM +0200, Igor Mammedov wrote:
+> > On Fri, 6 Oct 2017 19:34:19 +1100
+> > David Gibson <david@gibson.dropbear.id.au> wrote:
+> >   
+> > > On Thu, Oct 05, 2017 at 06:24:45PM +0200, Igor Mammedov wrote:  
+> > > > use common cpu_model prasing in vl.c and set default cpu_model
+> > > > using generic MachineClass::default_cpu_type.
+> > > > 
+> > > > Beside of switching to generic infrastructure it solves several
+> > > > issues.
+> > > > 
+> > > >  * ppc_cpu_class_by_name() is used to deal with lower/upper case
+> > > >    and alias translations into actual cpu type, which fixes
+> > > >     '-M powernv -cpu power8' and '-M powernv -cpu power9_v1.0'
+> > > >    usecases which error out with:
+> > > >     'invalid CPU model 'FOO' for powernv machine'
+> > > >  * allows to switch to lower-case typenames in pnv chip/core name
+> > > >    (by convention typnames should be lower-case)
+> > > >  * replace aliased names /power8, power9, .../ with exact cpu model
+> > > >    names (i.e. typenames should be stable but aliases might decide to
+> > > >    point to other cpu model withi family or changed by kvm). It will
+> > > >    also help to simplify pnv_chip/core code and get rid of dependency
+> > > >    on cpu_model parsing.
+> > > > 
+> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > > ---
+> > > >  include/hw/ppc/pnv.h |  8 ++++----
+> > > >  hw/ppc/pnv.c         | 22 ++++++++++------------
+> > > >  hw/ppc/pnv_core.c    |  2 +-
+> > > >  3 files changed, 15 insertions(+), 17 deletions(-)
+> > > > 
+> > > > diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+> > > > index 9c5437d..2525f7f 100644
+> > > > --- a/include/hw/ppc/pnv.h
+> > > > +++ b/include/hw/ppc/pnv.h
+> > > > @@ -80,19 +80,19 @@ typedef struct PnvChipClass {
+> > > >      uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
+> > > >  } PnvChipClass;
+> > > >  
+> > > > -#define TYPE_PNV_CHIP_POWER8E TYPE_PNV_CHIP "-POWER8E"
+> > > > +#define TYPE_PNV_CHIP_POWER8E TYPE_PNV_CHIP "-power8e_v2.1"
+> > > >  #define PNV_CHIP_POWER8E(obj) \
+> > > >      OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER8E)
+> > > >  
+> > > > -#define TYPE_PNV_CHIP_POWER8 TYPE_PNV_CHIP "-POWER8"
+> > > > +#define TYPE_PNV_CHIP_POWER8 TYPE_PNV_CHIP "-power8_v2.0"
+> > > >  #define PNV_CHIP_POWER8(obj) \
+> > > >      OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER8)
+> > > >  
+> > > > -#define TYPE_PNV_CHIP_POWER8NVL TYPE_PNV_CHIP "-POWER8NVL"
+> > > > +#define TYPE_PNV_CHIP_POWER8NVL TYPE_PNV_CHIP "-power8nvl_v1.0"
+> > > >  #define PNV_CHIP_POWER8NVL(obj) \
+> > > >      OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER8NVL)
+> > > >  
+> > > > -#define TYPE_PNV_CHIP_POWER9 TYPE_PNV_CHIP "-POWER9"
+> > > > +#define TYPE_PNV_CHIP_POWER9 TYPE_PNV_CHIP "-power9_v1.0"    
+> > > 
+> > > Uh.. we really should add a DD2 power9 before we make this change.
+> > > Making a DD1.0 (read, buggy as hell) chip the default is not
+> > > sensible.  Especially since we don't implement the various DD1 bugs
+> > > and differences in qemu.  
+> > I guess pnv owner will have to it,
+> > I can't help here /me uses whatever is in code right now/  
+> 
+> I just committed a patch to ppc-for-2.11 that adds POWER9 v2.0 to the
+> code (and makes it the default).  Sorry, this will probably require a
+> rebase of your stuff.
+Do you have a pointer to the patch or even better ppc staging tree to rebase on?
