@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e1trE-0007Zg-Dw
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 08:42:01 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1e1trE-0007Zq-Lv
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 08:42:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e1trA-0006DS-Gj
+	(envelope-from <pbonzini@redhat.com>) id 1e1trA-0006DZ-P2
 	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 08:42:00 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:53215)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e1trA-0006D5-9S
+Received: from mx1.redhat.com ([209.132.183.28]:48856)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e1trA-0006DB-Id
 	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 08:41:56 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id k4so4927088wmc.1
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 05:41:56 -0700 (PDT)
+References: <1507638879-200718-1-git-send-email-imammedo@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <542ba874-d38d-7510-be33-7b53b10d7251@redhat.com>
+Date: Tue, 10 Oct 2017 14:41:19 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170913074140.5160-2-kraxel@redhat.com>
-References: <20170913074140.5160-1-kraxel@redhat.com>
-	<20170913074140.5160-2-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Oct 2017 13:41:34 +0100
-Message-ID: <CAFEAcA81zTzhq_X-g=5vnVXG3tU1Y=3ge_CHH45Mj1d0ZaDFdw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 1/6] vga: fix display update region
- calculation (split screen)
+In-Reply-To: <1507638879-200718-1-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pc: make sure that plugged CPUs are of the
+ same type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, P J P <ppandit@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, rth@twiddle.net, ehabkost@redhat.com, groug@kaod.org
 
-On 13 September 2017 at 08:41, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> vga display update mis-calculated the region for the dirty bitmap
-> snapshot in case split screen mode is used.  This can trigger an
-> assert in cpu_physical_memory_snapshot_get_dirty().
->
-> Impact:  DoS for privileged guest users.
->
-> Fixes: CVE-2017-13673
-> Fixes: fec5e8c92becad223df9d972770522f64aafdb72
-> Cc: P J P <ppandit@redhat.com>
-> Reported-by: David Buchanan <d@vidbuchanan.co.uk>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> Message-id: 20170828123307.15392-1-kraxel@redhat.com
+On 10/10/2017 14:34, Igor Mammedov wrote:
+> heterogeneous cpus are not supported and hotplugging different
+> cpu model crashes QEMU:
+> 
+>   qemu-system-x86_64 -cpu qemu64 -smp 1,maxcpus=2
+>   (qemu) device_add host-x86_64-cpu,socket-id=1,core-id=0,thread-id=0,id=foo
+>   (qemu) info cpus
+>   error: failed to get MSR 0x38d
+>   qemu-system-x86_64: target/i386/kvm.c:2121: kvm_get_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
+>   Aborted (core dumped)
+> 
+> Gracefully fail hotplug process in case of user mistake.
+> 
+> Reported-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 > ---
->  hw/display/vga.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/display/vga.c b/hw/display/vga.c
-> index 3433102ef3..ad7a46563c 100644
-> --- a/hw/display/vga.c
-> +++ b/hw/display/vga.c
-> @@ -1628,9 +1628,15 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
->      y1 = 0;
->
->      if (!full_update) {
-> +        ram_addr_t region_start = addr1;
-> +        ram_addr_t region_end = addr1 + line_offset * height;
->          vga_sync_dirty_bitmap(s);
-> -        snap = memory_region_snapshot_and_clear_dirty(&s->vram, addr1,
-> -                                                      line_offset * height,
-> +        if (s->line_compare < height) {
-> +            /* split screen mode */
-> +            region_start = 0;
-> +        }
-> +        snap = memory_region_snapshot_and_clear_dirty(&s->vram, region_start,
-> +                                                      region_end - region_start,
->                                                        DIRTY_MEMORY_VGA);
->      }
+>  hw/i386/pc.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 05985d4..8e307f7 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1876,8 +1876,15 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>      CPUArchId *cpu_slot;
+>      X86CPUTopoInfo topo;
+>      X86CPU *cpu = X86_CPU(dev);
+> +    MachineState *ms = MACHINE(hotplug_dev);
+>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+>  
+> +    if(!object_dynamic_cast(OBJECT(cpu), ms->cpu_type)) {
+> +        error_setg(errp, "Invalid CPU type, expected cpu type: '%s'",
+> +                   ms->cpu_type);
+> +        return;
+> +    }
+> +
+>      /* if APIC ID is not set, set it based on socket/core/thread properties */
+>      if (cpu->apic_id == UNASSIGNED_APIC_ID) {
+>          int max_socket = (max_cpus - 1) / smp_threads / smp_cores;
+> 
 
-Hi; Coverity complains about this change, that
-        ram_addr_t region_end = addr1 + line_offset * height;
+Queued, thanks!
 
-is a potential overflow-before-widen because we calculate
-line_offset * height as a 32x32 bit multiply and then
-assign it to a 64 bit variable, rather than doing a
-64 bit multiply. We could shut it up by casting line_offset
-to ram_addr_t...
-
-I don't know whether it's actually possible in this case
-for the input values to be such that the multiply result
-is bigger than 32 bits.
-
-(CID 1381409.)
-
-thanks
--- PMM
+Paolo
