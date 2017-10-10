@@ -1,27 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e1rji-0003e6-LG
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 06:26:07 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1e1rkc-0004AU-MM
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 06:27:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e1rje-0000hf-MC
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 06:26:06 -0400
-Received: from mail-wm0-f46.google.com ([74.125.82.46]:54739)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e1rje-0000gD-FS
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 06:26:02 -0400
-Received: by mail-wm0-f46.google.com with SMTP id i124so3818656wmf.3
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 03:26:02 -0700 (PDT)
-References: <20171010094247.10173-1-maxime.coquelin@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1e1rkY-00022x-NC
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 06:27:02 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2c23634c-3d47-9bba-259f-fea2d1998cf9@redhat.com>
-Date: Tue, 10 Oct 2017 12:25:59 +0200
-MIME-Version: 1.0
-In-Reply-To: <20171010094247.10173-1-maxime.coquelin@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] exec: further refine
- address_space_get_iotlb_entry()
+Date: Tue, 10 Oct 2017 12:26:55 +0200
+Message-Id: <20171010102655.23322-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] build: remove CONFIG_LIBDECNUMBER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,88 +17,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>, peterx@redhat.com, mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org
 
-On 10/10/2017 11:42, Maxime Coquelin wrote:
-> This series is a rebase of the first two patches of Peter's series
-> improving address_space_get_iotlb_entry():
-> Message-Id: <1496404254-17429-1-git-send-email-peterx@redhat.com>
-> 
-> This third version sets initial page mask to ~0. In case of multiple iommus
-> chained on top of each other, the min page mask og the iommus is selected.
-> If no iommu, target's default page size is used (4K on x86_64).
-> 
-> This new revision also fixes an off-by-one error in memory notifier code,
-> spotted during code review, that could lead to the notifyee to receive
-> unexpected notifications for ranges it isn't registered to.
-> 
-> This series does not include Michael's suggestion to replace the use of page
-> masks by page length for IOTLB entries, to be able to support non power of
-> two page sizes. Idea is that it could be used for para-virtualized IOMMU
-> devices, but only para-virtualized device I'm aware of is the upcoming
-> virtio-iommu which also uses page masks. Moreover, these fixes are quite
-> urgent as they fix a regression which has a big impact on vhost performance.
-> 
-> As mentioned, the series is actually not only an improvement, but it fixes a
-> regression in the way IOTLB updates sent to the backends are generated.
-> The regression is introduced by patch:
-> a764040cc8 ("exec: abstract address_space_do_translate()")
-> 
-> Prior to patch a764040cc8, IOTLB entries sent to the backend were aligned on
-> the guest page boundaries (both addresses and size).
-> For example, with the guest using 2MB pages:
->  * Backend sends IOTLB miss request for iova = 0x112378fb4
->  * QEMU replies with an IOTLB update with iova = 0x112200000, size = 0x200000
->  * Bakend insert above entry in its cache and compute the translation
-> In this case, if the backend needs later to translate 0x112378004, it will
-> result in a cache it and no need to send another IOTLB miss.
-> 
-> With patch a764040cc8, the addr of the IOTLB entry is the address requested
-> via the IOTLB miss, the size is computed to cover the remaining of the guest
-> page.
-> The same example gives:
->  * Backend sends IOTLB miss request for iova = 0x112378fb4
->  * QEMU replies with an IOTLB update with iova = 112378fb4, size = 0x8704c
->  * Bakend insert above entry in its cache and compute the translation
-> In this case, if the backend needs later to translate 0x112378004, it will
-> result in another cache miss:
->  * Backend sends IOTLB miss request for iova = 0x112378004
->  * QEMU replies with an IOTLB update with iova = 0x112378004, size = 0x87FFC
->  * Bakend insert above entry in its cache and compute the translation
-> It results in having much more IOTLB misses, and more importantly it pollutes
-> the device IOTLB cache by multiplying the number of entries that moreover
-> overlap.
-> 
-> Note that current Kernel & User backends implementation do not merge contiguous
-> and overlapping IOTLB entries at device IOTLB cache insertion.
-> 
-> This series fixes this regression, so that IOTLB updates are aligned on
-> guest's page boundaries.
-> 
-> Changes since v2:
-> =================
-> - Init page mask to ~0UL, and select the smallest mask in case of multiple
->   iommu chained. If no iommu, use target's page mask. (Paolo)
-> - Add patch 3 to fix off-by-one error in notifier.
-> 
-> Changes since rebase:
-> =====================
-> - Fix page_mask initial value
-> - Apply Michael's on second patch
-> 
-> Maxime Coquelin (1):
->   memory: fix off-by-one error in memory_region_notify_one()
-> 
-> Peter Xu (2):
->   exec: add page_mask for flatview_do_translate
->   exec: simplify address_space_get_iotlb_entry
-> 
->  exec.c   | 80 +++++++++++++++++++++++++++++++++++++++++++---------------------
->  memory.c |  2 +-
->  2 files changed, 55 insertions(+), 27 deletions(-)
-> 
+It is used only by PPC TCG, so just move it in target/ppc/Makefile.objs
 
-Queued, thanks.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ Makefile.target                           | 6 ------
+ default-configs/ppc-linux-user.mak        | 1 -
+ default-configs/ppc-softmmu.mak           | 1 -
+ default-configs/ppc64-linux-user.mak      | 1 -
+ default-configs/ppc64-softmmu.mak         | 1 -
+ default-configs/ppc64abi32-linux-user.mak | 1 -
+ default-configs/ppc64le-linux-user.mak    | 1 -
+ default-configs/ppcemb-softmmu.mak        | 1 -
+ target/ppc/Makefile.objs                  | 5 +++++
+ 9 files changed, 5 insertions(+), 13 deletions(-)
 
-Paolo
+diff --git a/Makefile.target b/Makefile.target
+index a4b292d2e2..e4244c188a 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -102,12 +102,6 @@ obj-y += target/$(TARGET_BASE_ARCH)/
+ obj-y += disas.o
+ obj-$(call notempty,$(TARGET_XML_FILES)) += gdbstub-xml.o
+ 
+-obj-$(CONFIG_LIBDECNUMBER) += libdecnumber/decContext.o
+-obj-$(CONFIG_LIBDECNUMBER) += libdecnumber/decNumber.o
+-obj-$(CONFIG_LIBDECNUMBER) += libdecnumber/dpd/decimal32.o
+-obj-$(CONFIG_LIBDECNUMBER) += libdecnumber/dpd/decimal64.o
+-obj-$(CONFIG_LIBDECNUMBER) += libdecnumber/dpd/decimal128.o
+-
+ #########################################################
+ # Linux user emulator target
+ 
+diff --git a/default-configs/ppc-linux-user.mak b/default-configs/ppc-linux-user.mak
+index 260ba41836..6273df2930 100644
+--- a/default-configs/ppc-linux-user.mak
++++ b/default-configs/ppc-linux-user.mak
+@@ -1,2 +1 @@
+ # Default configuration for ppc-linux-user
+-CONFIG_LIBDECNUMBER=y
+diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+index d7a3755881..bb225c6e46 100644
+--- a/default-configs/ppc-softmmu.mak
++++ b/default-configs/ppc-softmmu.mak
+@@ -46,7 +46,6 @@ CONFIG_E500=y
+ CONFIG_OPENPIC_KVM=$(call land,$(CONFIG_E500),$(CONFIG_KVM))
+ CONFIG_PLATFORM_BUS=y
+ CONFIG_ETSEC=y
+-CONFIG_LIBDECNUMBER=y
+ CONFIG_SM501=y
+ # For PReP
+ CONFIG_SERIAL_ISA=y
+diff --git a/default-configs/ppc64-linux-user.mak b/default-configs/ppc64-linux-user.mak
+index e731ce016e..422d3fbaeb 100644
+--- a/default-configs/ppc64-linux-user.mak
++++ b/default-configs/ppc64-linux-user.mak
+@@ -1,2 +1 @@
+ # Default configuration for ppc64-linux-user
+-CONFIG_LIBDECNUMBER=y
+diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
+index 9086475bf6..d1b3a6dd50 100644
+--- a/default-configs/ppc64-softmmu.mak
++++ b/default-configs/ppc64-softmmu.mak
+@@ -51,7 +51,6 @@ CONFIG_E500=y
+ CONFIG_OPENPIC_KVM=$(call land,$(CONFIG_E500),$(CONFIG_KVM))
+ CONFIG_PLATFORM_BUS=y
+ CONFIG_ETSEC=y
+-CONFIG_LIBDECNUMBER=y
+ CONFIG_SM501=y
+ # For pSeries
+ CONFIG_XICS=$(CONFIG_PSERIES)
+diff --git a/default-configs/ppc64abi32-linux-user.mak b/default-configs/ppc64abi32-linux-user.mak
+index c244d07d56..1c657ec9bb 100644
+--- a/default-configs/ppc64abi32-linux-user.mak
++++ b/default-configs/ppc64abi32-linux-user.mak
+@@ -1,2 +1 @@
+ # Default configuration for ppc64abi32-linux-user
+-CONFIG_LIBDECNUMBER=y
+diff --git a/default-configs/ppc64le-linux-user.mak b/default-configs/ppc64le-linux-user.mak
+index 4ba4eae6ce..63f4269023 100644
+--- a/default-configs/ppc64le-linux-user.mak
++++ b/default-configs/ppc64le-linux-user.mak
+@@ -1,2 +1 @@
+ # Default configuration for ppc64le-linux-user
+-CONFIG_LIBDECNUMBER=y
+diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
+index 635923a166..13917fb7a3 100644
+--- a/default-configs/ppcemb-softmmu.mak
++++ b/default-configs/ppcemb-softmmu.mak
+@@ -15,5 +15,4 @@ CONFIG_PTIMER=y
+ CONFIG_I8259=y
+ CONFIG_XILINX=y
+ CONFIG_XILINX_ETHLITE=y
+-CONFIG_LIBDECNUMBER=y
+ CONFIG_SM501=y
+diff --git a/target/ppc/Makefile.objs b/target/ppc/Makefile.objs
+index f92ba67ebd..ba61012bef 100644
+--- a/target/ppc/Makefile.objs
++++ b/target/ppc/Makefile.objs
+@@ -15,5 +15,10 @@ obj-y += int_helper.o
+ obj-y += timebase_helper.o
+ obj-y += misc_helper.o
+ obj-y += mem_helper.o
++obj-y += ../../libdecnumber/decContext.o
++obj-y += ../../libdecnumber/decNumber.o
++obj-y += ../../libdecnumber/dpd/decimal32.o
++obj-y += ../../libdecnumber/dpd/decimal64.o
++obj-y += ../../libdecnumber/dpd/decimal128.o
+ obj-$(CONFIG_USER_ONLY) += user_only_helper.o
+ obj-y += gdbstub.o
+-- 
+2.14.2
