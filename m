@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1e1oUc-0002O4-S9
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 02:58:23 -0400
+	(envelope-from <amarnath.valluri@intel.com>) id 1e1oi6-0004mL-Om
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 03:12:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1e1oUb-00027B-Km
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 02:58:18 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <CAEfK_45dZvxvBNQpPLo71ZJhrPN5_GJr8uJ2pJZpCaFf0+i3YA@mail.gmail.com>
-	<62e835a4-ba5d-e620-47d2-180932a33426@redhat.com>
-	<20171006135425.GF26575@redhat.com>
-	<CAEfK_444_fPwjnj1M8w8XNFFwiMJW-pdN7R1Tdu+FfvB38ZBtw@mail.gmail.com>
-	<20171006140137.GH26575@redhat.com>
-	<CAEfK_455Hr1afv-H6=9QMQErDGZJtOBgFMk2F8QJshYTLgOa1Q@mail.gmail.com>
-	<e46a6b2d-83e2-d558-028c-94ad41af8fa2@redhat.com>
-	<CAEfK_44_43d5_KaGUf-FH7bHxre5BP1wCQu96p38bhskUqU+Ug@mail.gmail.com>
-Date: Tue, 10 Oct 2017 08:58:08 +0200
-In-Reply-To: <CAEfK_44_43d5_KaGUf-FH7bHxre5BP1wCQu96p38bhskUqU+Ug@mail.gmail.com>
-	(Doug Gale's message of "Mon, 9 Oct 2017 14:44:14 -0400")
-Message-ID: <87h8v7lcan.fsf@dusky.pond.sub.org>
+	(envelope-from <amarnath.valluri@intel.com>) id 1e1oi0-0001LF-Df
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 03:12:14 -0400
+Received: from mga04.intel.com ([192.55.52.120]:56069)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
+	id 1e1oi0-0001G9-3d
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 03:12:08 -0400
+From: "Valluri, Amarnath" <amarnath.valluri@intel.com>
+Date: Tue, 10 Oct 2017 07:12:01 +0000
+Message-ID: <1507619560.4061.19.camel@intel.com>
+References: <20171009225623.29232-1-marcandre.lureau@redhat.com>
+	<20171009225623.29232-9-marcandre.lureau@redhat.com>
+In-Reply-To: <20171009225623.29232-9-marcandre.lureau@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A5A5584DE100A041B6A6900896987D1C@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Patch to add helpful tracing output for driver
- authors in NVMe emulation
+Subject: Re: [Qemu-devel] [PATCH 08/42] tpm: remove TPMDriverOps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +30,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Doug Gale <doug16k@gmail.com>
-Cc: Eric Blake <eblake@redhat.com>, kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel <qemu-devel@nongnu.org>, mreitz@redhat.com, keith.busch@intel.com
+To: "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "stefanb@linux.vnet.ibm.com" <stefanb@linux.vnet.ibm.com>
 
-Doug Gale <doug16k@gmail.com> writes:
-
-> I used exclamations as a concise way of indicating that the driver did
-> something nonsensical, or horribly invalid, like something likely to
-> cause a memory corruption, trying to start the controller with a
-> nonsense configuration, providing invalid PRDs or writing to
-> unrecognized MMIO offsets that might hang or do something extremely
-> bad on a poorly implemented controller. Exclaiming is not shouting, I
-> thought shouting was when it was all uppercase.
->
-> If a driver might trash memory or hang a controller, maybe it should
-> shout at the driver author or person investigating an unstable VM.
-> None of those messages with exclamations should ever happen. If any of
-> them are possible when the driver is correct, then I have made a
-> mistake.
-
-Please do not top-quote on this mailing list.
-
-Existing tracepoints do not use exclamation marks to signal severity.
-
-Consider using assertions for "if this happens, either the program's
-state is shot (and continuing is unsafe), or the author's mental state
-was shot (and continuing is probably unsafe, too)" conditions.
-Tracepoints are for tracing.
-
-> On Mon, Oct 9, 2017 at 11:52 AM, Eric Blake <eblake@redhat.com> wrote:
->> On 10/07/2017 02:51 AM, Doug Gale wrote:
->>> Completely re-implemented patch, with significant improvements (now
->>> specifies values in several places I missed, also reduced the amount
->>> of redundant lines). I used the nvme_ as the tracing infrastructure
->>> prefix. Tested with -trace nvme_* on the qemu command line, worked for
->>> me.
->>
->> This information belongs...
->>
->>>
->>>>From 166f57458d60d363a10a0933c3e860985531ac96 Mon Sep 17 00:00:00 2001
->>> From: Doug Gale <doug16k@gmail.com>
->>> Date: Thu, 5 Oct 2017 19:02:03 -0400
->>> Subject: [PATCH] Add tracing output to NVMe emulation to help driver authors.
->>>
->>> This uses the tracing infrastructure using nvme_ as the prefix.
->>>
->>> Signed-off-by: Doug Gale <doug16k@gmail.com>
->>> ---
->>
->> ...here, after the --- separator.  It is useful to the patch reviewer,
->> but does not need to be in the 'git log' history.  The maintainers use
->> 'git am' to process incoming patches, which automatically prunes review
->> comments located in this location.
->>
->> Also, since this is a version 2 patch, it is best if your subject line
->> includes 'v2', and if you send the patch as a new top-level thread
->> rather than in-reply-to v1.  This can be done with 'git send-email -v2'.
->>
->> The subject line is atypical; we tend to prefer 'topic: Short summary',
->> where you are missing the topic, you had a trailing dot that is not
->> typical, and where your line is longer than usual.  A better subject
->> line might be:
->>
->> nvme: Add tracing output
->>
->>
->> For more helpful information on patch submission:
->>
->> https://wiki.qemu.org/Contribute/SubmitAPatch
->>
->> I didn't look closely at the patch itself, but did notice:
->>
->>> +nvme_mmio_start_failed(void) "setting controller enable bit failed!"
->>> +nvme_mmio_start_success(void) "setting controller enable bit succeeded"
->>> +nvme_mmio_stopped(void) "cleared controller enable bit"
->>> +nvme_mmio_shutdown_set(void) "shutdown bit set"
->>> +nvme_mmio_shutdown_cleared(void) "shutdown bit cleared"
->>> +nvme_mmio_ignored(uint64_t offset, uint64_t data) "invalid MMIO
->>> write, offset=0x%"PRIx64", data=%"PRIx64"!"
->>
->> You have a couple of traces with a trailing '!'; that is atypical,
->> because we don't need our traces to shout at the user.
+T24gVHVlLCAyMDE3LTEwLTEwIGF0IDAwOjU1ICswMjAwLCBNYXJjLUFuZHLDqSBMdXJlYXUgd3Jv
+dGU6DQo+IFVzZSBUUE1CYWNrZW5kQ2xhc3MgdG8gaG9sZCBjbGFzcyBtZXRob2RzL2ZpZWxkcy4N
+Cj4gDQo+IFNpZ25lZC1vZmYtYnk6IE1hcmMtQW5kcsOpIEx1cmVhdSA8bWFyY2FuZHJlLmx1cmVh
+dUByZWRoYXQuY29tPg0KPiAtLS0NCj4gwqBpbmNsdWRlL3N5c2VtdS90cG1fYmFja2VuZC5oIHwg
+MTUgKysrKystLS0tLS0tLS0tDQo+IMKgYmFja2VuZHMvdHBtLmPCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqB8IDMxICsrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0NCj4gwqBody90
+cG0vdHBtX2VtdWxhdG9yLmPCoMKgwqDCoMKgwqDCoMKgfCAyOSArKysrKysrKysrKystLS0tLS0t
+LS0tLS0tLS0tLQ0KPiDCoGh3L3RwbS90cG1fcGFzc3Rocm91Z2guY8KgwqDCoMKgwqB8IDI1ICsr
+KysrKysrKysrLS0tLS0tLS0tLS0tLS0NCj4gwqB0cG0uY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHwgMjAgKysrKysrKysrLS0tLS0tLS0tLS0NCj4gwqBz
+Y3JpcHRzL2NoZWNrcGF0Y2gucGzCoMKgwqDCoMKgwqDCoMKgfMKgwqAxIC0NCj4gwqA2IGZpbGVz
+IGNoYW5nZWQsIDUzIGluc2VydGlvbnMoKyksIDY4IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAt
+LWdpdCBhL2luY2x1ZGUvc3lzZW11L3RwbV9iYWNrZW5kLmgNCj4gYi9pbmNsdWRlL3N5c2VtdS90
+cG1fYmFja2VuZC5oDQo+IGluZGV4IDYzMDkzNTUxYTEuLmE0Mjg4ZGYwMzggMTAwNjQ0DQo+IC0t
+LSBhL2luY2x1ZGUvc3lzZW11L3RwbV9iYWNrZW5kLmgNCj4gKysrIGIvaW5jbHVkZS9zeXNlbXUv
+dHBtX2JhY2tlbmQuaA0KPiBAQCAtMjksNyArMjksNyBAQA0KPiDCoA0KPiDCoHR5cGVkZWYgc3Ry
+dWN0IFRQTUJhY2tlbmRDbGFzcyBUUE1CYWNrZW5kQ2xhc3M7DQo+IMKgdHlwZWRlZiBzdHJ1Y3Qg
+VFBNQmFja2VuZCBUUE1CYWNrZW5kOw0KPiAtdHlwZWRlZiBzdHJ1Y3QgVFBNRHJpdmVyT3BzIFRQ
+TURyaXZlck9wczsNCj4gKw0KPiDCoHR5cGVkZWYgdm9pZCAoVFBNUmVjdkRhdGFDQikoVFBNU3Rh
+dGUgKiwgdWludDhfdCBsb2N0eSwgYm9vbA0KPiBzZWxmdGVzdF9kb25lKTsNCj4gwqANCj4gwqB0
+eXBlZGVmIGVudW0gVFBNQmFja2VuZENtZCB7DQo+IEBAIC01OSwxNCArNTksNiBAQCBzdHJ1Y3Qg
+VFBNQmFja2VuZCB7DQo+IMKgc3RydWN0IFRQTUJhY2tlbmRDbGFzcyB7DQo+IMKgwqDCoMKgwqBP
+YmplY3RDbGFzcyBwYXJlbnRfY2xhc3M7DQo+IMKgDQo+IC3CoMKgwqDCoGNvbnN0IFRQTURyaXZl
+ck9wcyAqb3BzOw0KPiAtDQo+IC3CoMKgwqDCoHZvaWQgKCpvcGVuZWQpKFRQTUJhY2tlbmQgKnMs
+IEVycm9yICoqZXJycCk7DQo+IC0NCj4gLcKgwqDCoMKgdm9pZCAoKmhhbmRsZV9yZXF1ZXN0KShU
+UE1CYWNrZW5kICpzLCBUUE1CYWNrZW5kQ21kIGNtZCk7DQo+IC19Ow0KPiAtDQo+IC1zdHJ1Y3Qg
+VFBNRHJpdmVyT3BzIHsNCj4gwqDCoMKgwqDCoGVudW0gVHBtVHlwZSB0eXBlOw0KPiDCoMKgwqDC
+oMKgY29uc3QgUWVtdU9wdERlc2MgKm9wdHM7DQo+IMKgwqDCoMKgwqAvKiBnZXQgYSBkZXNjcmlw
+dGl2ZSB0ZXh0IG9mIHRoZSBiYWNrZW5kIHRvIGRpc3BsYXkgdG8gdGhlIHVzZXINCj4gKi8NCj4g
+QEAgLTkwLDggKzgyLDExIEBAIHN0cnVjdCBUUE1Ecml2ZXJPcHMgew0KPiDCoMKgwqDCoMKgVFBN
+VmVyc2lvbiAoKmdldF90cG1fdmVyc2lvbikoVFBNQmFja2VuZCAqdCk7DQo+IMKgDQo+IMKgwqDC
+oMKgwqBUcG1UeXBlT3B0aW9ucyAqKCpnZXRfdHBtX29wdGlvbnMpKFRQTUJhY2tlbmQgKnQpOw0K
+PiAtfTsNCj4gwqANCj4gK8KgwqDCoMKgdm9pZCAoKm9wZW5lZCkoVFBNQmFja2VuZCAqcywgRXJy
+b3IgKiplcnJwKTsNCj4gKw0KPiArwqDCoMKgwqB2b2lkICgqaGFuZGxlX3JlcXVlc3QpKFRQTUJh
+Y2tlbmQgKnMsIFRQTUJhY2tlbmRDbWQgY21kKTsNCj4gK307DQo+IMKgDQo+IMKgLyoqDQo+IMKg
+ICogdHBtX2JhY2tlbmRfZ2V0X3R5cGU6DQo+IGRpZmYgLS1naXQgYS9iYWNrZW5kcy90cG0uYyBi
+L2JhY2tlbmRzL3RwbS5jDQo+IGluZGV4IDM3Yzg0YjdjNjYuLmNhM2E3OGVlYTggMTAwNjQ0DQo+
+IC0tLSBhL2JhY2tlbmRzL3RwbS5jDQo+ICsrKyBiL2JhY2tlbmRzL3RwbS5jDQo+IEBAIC00MSw3
+ICs0MSw3IEBAIGVudW0gVHBtVHlwZSB0cG1fYmFja2VuZF9nZXRfdHlwZShUUE1CYWNrZW5kICpz
+KQ0KPiDCoHsNCj4gwqDCoMKgwqDCoFRQTUJhY2tlbmRDbGFzcyAqayA9IFRQTV9CQUNLRU5EX0dF
+VF9DTEFTUyhzKTsNCj4gwqANCj4gLcKgwqDCoMKgcmV0dXJuIGstPm9wcy0+dHlwZTsNCj4gK8Kg
+wqDCoMKgcmV0dXJuIGstPnR5cGU7DQo+IMKgfQ0KPiDCoA0KPiDCoGludCB0cG1fYmFja2VuZF9p
+bml0KFRQTUJhY2tlbmQgKnMsIFRQTVN0YXRlICpzdGF0ZSwNCj4gQEAgLTUzLDcgKzUzLDcgQEAg
+aW50IHRwbV9iYWNrZW5kX2luaXQoVFBNQmFja2VuZCAqcywgVFBNU3RhdGUNCj4gKnN0YXRlLA0K
+PiDCoMKgwqDCoMKgcy0+cmVjdl9kYXRhX2NhbGxiYWNrID0gZGF0YWNiOw0KPiDCoMKgwqDCoMKg
+cy0+aGFkX3N0YXJ0dXBfZXJyb3IgPSBmYWxzZTsNCj4gwqANCj4gLcKgwqDCoMKgcmV0dXJuIGst
+Pm9wcy0+aW5pdCA/IGstPm9wcy0+aW5pdChzKSA6IDA7DQo+ICvCoMKgwqDCoHJldHVybiBrLT5p
+bml0ID8gay0+aW5pdChzKSA6IDA7DQo+IMKgfQ0KPiDCoA0KPiDCoGludCB0cG1fYmFja2VuZF9z
+dGFydHVwX3RwbShUUE1CYWNrZW5kICpzKQ0KPiBAQCAtNjgsNyArNjgsNyBAQCBpbnQgdHBtX2Jh
+Y2tlbmRfc3RhcnR1cF90cG0oVFBNQmFja2VuZCAqcykNCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqBOVUxMKTsNCj4gwqDCoMKgwqDCoGdfdGhyZWFkX3Bvb2xfcHVzaChzLT50aHJlYWRfcG9vbCwN
+Cj4gKGdwb2ludGVyKVRQTV9CQUNLRU5EX0NNRF9JTklULCBOVUxMKTsNCj4gwqANCj4gLcKgwqDC
+oMKgcmVzID0gay0+b3BzLT5zdGFydHVwX3RwbSA/IGstPm9wcy0+c3RhcnR1cF90cG0ocykgOiAw
+Ow0KPiArwqDCoMKgwqByZXMgPSBrLT5zdGFydHVwX3RwbSA/IGstPnN0YXJ0dXBfdHBtKHMpIDog
+MDsNCj4gwqANCj4gwqDCoMKgwqDCoHMtPmhhZF9zdGFydHVwX2Vycm9yID0gKHJlcyAhPSAwKTsN
+Cj4gwqANCj4gQEAgLTkwLDggKzkwLDggQEAgdm9pZCB0cG1fYmFja2VuZF9yZXNldChUUE1CYWNr
+ZW5kICpzKQ0KPiDCoHsNCj4gwqDCoMKgwqDCoFRQTUJhY2tlbmRDbGFzcyAqayA9IFRQTV9CQUNL
+RU5EX0dFVF9DTEFTUyhzKTsNCj4gwqANCj4gLcKgwqDCoMKgaWYgKGstPm9wcy0+cmVzZXQpIHsN
+Cj4gLcKgwqDCoMKgwqDCoMKgwqBrLT5vcHMtPnJlc2V0KHMpOw0KPiArwqDCoMKgwqBpZiAoay0+
+cmVzZXQpIHsNCj4gK8KgwqDCoMKgwqDCoMKgwqBrLT5yZXNldChzKTsNCj4gwqDCoMKgwqDCoH0N
+Cj4gwqANCj4gwqDCoMKgwqDCoHRwbV9iYWNrZW5kX3RocmVhZF9lbmQocyk7DQo+IEBAIC0xMDMs
+MzQgKzEwMywzNCBAQCB2b2lkIHRwbV9iYWNrZW5kX2NhbmNlbF9jbWQoVFBNQmFja2VuZCAqcykN
+Cj4gwqB7DQo+IMKgwqDCoMKgwqBUUE1CYWNrZW5kQ2xhc3MgKmsgPSBUUE1fQkFDS0VORF9HRVRf
+Q0xBU1Mocyk7DQo+IMKgDQo+IC3CoMKgwqDCoGFzc2VydChrLT5vcHMtPmNhbmNlbF9jbWQpOw0K
+PiArwqDCoMKgwqBhc3NlcnQoay0+Y2FuY2VsX2NtZCk7DQo+IMKgDQo+IC3CoMKgwqDCoGstPm9w
+cy0+Y2FuY2VsX2NtZChzKTsNCj4gK8KgwqDCoMKgay0+Y2FuY2VsX2NtZChzKTsNCj4gwqB9DQo+
+IMKgDQo+IMKgYm9vbCB0cG1fYmFja2VuZF9nZXRfdHBtX2VzdGFibGlzaGVkX2ZsYWcoVFBNQmFj
+a2VuZCAqcykNCj4gwqB7DQo+IMKgwqDCoMKgwqBUUE1CYWNrZW5kQ2xhc3MgKmsgPSBUUE1fQkFD
+S0VORF9HRVRfQ0xBU1Mocyk7DQo+IMKgDQo+IC3CoMKgwqDCoHJldHVybiBrLT5vcHMtPmdldF90
+cG1fZXN0YWJsaXNoZWRfZmxhZyA/DQo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgay0+b3BzLT5n
+ZXRfdHBtX2VzdGFibGlzaGVkX2ZsYWcocykgOiBmYWxzZTsNCj4gK8KgwqDCoMKgcmV0dXJuIGst
+PmdldF90cG1fZXN0YWJsaXNoZWRfZmxhZyA/DQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgay0+
+Z2V0X3RwbV9lc3RhYmxpc2hlZF9mbGFnKHMpIDogZmFsc2U7DQo+IMKgfQ0KPiDCoA0KPiDCoGlu
+dCB0cG1fYmFja2VuZF9yZXNldF90cG1fZXN0YWJsaXNoZWRfZmxhZyhUUE1CYWNrZW5kICpzLCB1
+aW50OF90DQo+IGxvY3R5KQ0KPiDCoHsNCj4gwqDCoMKgwqDCoFRQTUJhY2tlbmRDbGFzcyAqayA9
+IFRQTV9CQUNLRU5EX0dFVF9DTEFTUyhzKTsNCj4gwqANCj4gLcKgwqDCoMKgcmV0dXJuIGstPm9w
+cy0+cmVzZXRfdHBtX2VzdGFibGlzaGVkX2ZsYWcgPw0KPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oGstPm9wcy0+cmVzZXRfdHBtX2VzdGFibGlzaGVkX2ZsYWcocywgbG9jdHkpIDogMDsNCj4gK8Kg
+wqDCoMKgcmV0dXJuIGstPnJlc2V0X3RwbV9lc3RhYmxpc2hlZF9mbGFnID8NCj4gK8KgwqDCoMKg
+wqDCoMKgwqDCoMKgwqBrLT5yZXNldF90cG1fZXN0YWJsaXNoZWRfZmxhZyhzLCBsb2N0eSkgOiAw
+Ow0KPiDCoH0NCj4gwqANCj4gwqBUUE1WZXJzaW9uIHRwbV9iYWNrZW5kX2dldF90cG1fdmVyc2lv
+bihUUE1CYWNrZW5kICpzKQ0KPiDCoHsNCj4gwqDCoMKgwqDCoFRQTUJhY2tlbmRDbGFzcyAqayA9
+IFRQTV9CQUNLRU5EX0dFVF9DTEFTUyhzKTsNCj4gwqANCj4gLcKgwqDCoMKgYXNzZXJ0KGstPm9w
+cy0+Z2V0X3RwbV92ZXJzaW9uKTsNCj4gK8KgwqDCoMKgYXNzZXJ0KGstPmdldF90cG1fdmVyc2lv
+bik7DQo+IMKgDQo+IC3CoMKgwqDCoHJldHVybiBrLT5vcHMtPmdldF90cG1fdmVyc2lvbihzKTsN
+Cj4gK8KgwqDCoMKgcmV0dXJuIGstPmdldF90cG1fdmVyc2lvbihzKTsNCj4gwqB9DQo+IMKgDQo+
+IMKgVFBNSW5mbyAqdHBtX2JhY2tlbmRfcXVlcnlfdHBtKFRQTUJhY2tlbmQgKnMpDQo+IEBAIC0x
+NDAsOCArMTQwLDkgQEAgVFBNSW5mbyAqdHBtX2JhY2tlbmRfcXVlcnlfdHBtKFRQTUJhY2tlbmQg
+KnMpDQo+IMKgDQo+IMKgwqDCoMKgwqBpbmZvLT5pZCA9IGdfc3RyZHVwKHMtPmlkKTsNCj4gwqDC
+oMKgwqDCoGluZm8tPm1vZGVsID0gcy0+ZmVfbW9kZWw7DQo+IC3CoMKgwqDCoGluZm8tPm9wdGlv
+bnMgPSBrLT5vcHMtPmdldF90cG1fb3B0aW9ucyA/DQo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgay0+b3BzLT5nZXRfdHBtX29wdGlvbnMocykgOiBOVUxMOw0KPiAr
+wqDCoMKgwqBpZiAoay0+Z2V0X3RwbV9vcHRpb25zKSB7DQo+ICvCoMKgwqDCoMKgwqDCoMKgaW5m
+by0+b3B0aW9ucyA9IGstPmdldF90cG1fb3B0aW9ucyhzKTsNCj4gK8KgwqDCoMKgfQ0KPiDCoA0K
+PiDCoMKgwqDCoMKgcmV0dXJuIGluZm87DQo+IMKgfQ0KPiBkaWZmIC0tZ2l0IGEvaHcvdHBtL3Rw
+bV9lbXVsYXRvci5jIGIvaHcvdHBtL3RwbV9lbXVsYXRvci5jDQo+IGluZGV4IDllMjRhNWYzMGUu
+LmJiNWE2NWI0OTIgMTAwNjQ0DQo+IC0tLSBhL2h3L3RwbS90cG1fZW11bGF0b3IuYw0KPiArKysg
+Yi9ody90cG0vdHBtX2VtdWxhdG9yLmMNCj4gQEAgLTYwLDggKzYwLDYgQEANCj4gwqANCj4gwqAj
+ZGVmaW5lIFRQTV9FTVVMQVRPUl9JTVBMRU1FTlRTX0FMTF9DQVBTKFMsIGNhcCkgKCgoUyktPmNh
+cHMgJg0KPiAoY2FwKSkgPT0gKGNhcCkpDQo+IMKgDQo+IC1zdGF0aWMgY29uc3QgVFBNRHJpdmVy
+T3BzIHRwbV9lbXVsYXRvcl9kcml2ZXI7DQo+IC0NCj4gwqAvKiBkYXRhIHN0cnVjdHVyZXMgKi8N
+Cj4gwqB0eXBlZGVmIHN0cnVjdCBUUE1FbXVsYXRvciB7DQo+IMKgwqDCoMKgwqBUUE1CYWNrZW5k
+IHBhcmVudDsNCj4gQEAgLTUwNCwyMCArNTAyLDYgQEAgc3RhdGljIGNvbnN0IFFlbXVPcHREZXNj
+DQo+IHRwbV9lbXVsYXRvcl9jbWRsaW5lX29wdHNbXSA9IHsNCj4gwqDCoMKgwqDCoHsgLyogZW5k
+IG9mIGxpc3QgKi8gfSwNCj4gwqB9Ow0KPiDCoA0KPiAtc3RhdGljIGNvbnN0IFRQTURyaXZlck9w
+cyB0cG1fZW11bGF0b3JfZHJpdmVyID0gew0KPiAtwqDCoMKgwqAudHlwZcKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoD0gVFBNX1RZUEVfRU1VTEFUT1IsDQpXZSBjYW4g
+cmVtb3ZlICd0eXBlJyBmcm9tIGNsYXNzLCBhbmQgZXZlbiB0cG1fYmFja2VuZF9nZXRfdHlwZSgp
+IEFQSQ0KYWxzbyBmcm9tIGJhY2tlbmQsIHRoZXJlIGFyZSBubyB0YWtlcnMgZm9yIHRoaXMuDQoN
+Cj4gLcKgwqDCoMKgLm9wdHPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqA9IHRwbV9lbXVsYXRvcl9jbWRsaW5lX29wdHMsDQo+IC3CoMKgwqDCoC5kZXNjwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgPSAiVFBNIGVtdWxhdG9yIGJhY2tlbmQg
+ZHJpdmVyIiwNCkFuZCBpIGZlZWwsIHRoZSBhYm92ZSB0d28gbWVtYmVycyBhcmUgYmV0dGVyIHN1
+aXRlZCBmb3IgT2JqZWN0IG1lbWJlcnMNCnRoYW4gQ2xhc3MuDQoNCi0gQW1hcm5hdGg=
