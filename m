@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e1qwr-0002Xu-7C
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 05:35:43 -0400
+	(envelope-from <peterx@redhat.com>) id 1e1qzO-00041M-QH
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 05:38:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e1qwl-0003GJ-52
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 05:35:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33508)
+	(envelope-from <peterx@redhat.com>) id 1e1qzI-0005TG-6P
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 05:38:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:30838)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e1qwk-0003F0-NY
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 05:35:31 -0400
-Date: Tue, 10 Oct 2017 11:35:20 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171010113520.6c3d03e3.cohuck@redhat.com>
-In-Reply-To: <e59c8274-c390-b99f-85dd-ec3763520ff1@linux.vnet.ibm.com>
-References: <1507124979-8880-1-git-send-email-pmorel@linux.vnet.ibm.com>
-	<1507124979-8880-5-git-send-email-pmorel@linux.vnet.ibm.com>
-	<20171009084506.77da9d5c@t450s.home>
-	<e59c8274-c390-b99f-85dd-ec3763520ff1@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e1qzH-0005SS-Tj
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 05:38:08 -0400
+Date: Tue, 10 Oct 2017 17:38:01 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171010093801.GC20686@pxdev.xzpeter.org>
+References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
+	<1504081950-2528-11-git-send-email-peterx@redhat.com>
+	<20170921192903.GH3401@work-vm>
+	<20170927073441.GD25011@pxdev.xzpeter.org>
+	<20171009185812.GR2374@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 4/5] s390x/pci: Refuse to realize
- VFIO-PCI if AIS needed but supported
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171009185812.GR2374@work-vm>
+Subject: Re: [Qemu-devel] [RFC v2 10/33] migration: allow dst vm pause on
+ postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,107 +31,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, agraf@suse.de
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On Mon, 9 Oct 2017 19:16:23 +0200
-Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
-
-> On 09/10/2017 16:45, Alex Williamson wrote:
-> > On Wed,  4 Oct 2017 15:49:38 +0200
-> > Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
-> >   
-> >> In S390x the Adapter Interrupt Suppression facility is used to mask
-> >> interrupts of other PCI devices during interruption handling.
-> >>
-> >> VFIO PCI allows the interrupts to be delivered rapidely through KVM via
-> >> IRQfd or to be delivered through QEMU.
-> >> The choice is made through the x-kvm-intx and x-kvo-misx properties of
-> >> the VFIO PCI device.
-> >>
-> >> If the VFIO PCI device is using the direct KVM access through IRQfd and
-> >> we know that KVM does not implement AIS support we refuse to realize the
-> >> VFIO PCI device.
-> >>
-> >> In all other cases, emulation and VFIO PCI sending interrupts through
-> >> QEMU, we intercept the propagated IRQ, and protect it with the QEMU AIS
-> >> implementation before to send it to the guest through KVM.
-> >>
-> >> Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
-> >> ---
-> >>   hw/s390x/s390-pci-bus.c | 12 ++++++++++++
-> >>   1 file changed, 12 insertions(+)
-> >>
-> >> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> >> index d9c294a..4afe49b 100644
-> >> --- a/hw/s390x/s390-pci-bus.c
-> >> +++ b/hw/s390x/s390-pci-bus.c
-> >> @@ -21,18 +21,21 @@
-> >>   #include "hw/pci/pci_bus.h"
-> >>   #include "hw/pci/pci_bridge.h"
-> >>   #include "hw/pci/msi.h"
-> >> +#include "hw/vfio/pci.h"
-> >>   #include "qemu/error-report.h"
-> >>   
-> >>   #ifndef DEBUG_S390PCI_BUS
-> >>   #define DEBUG_S390PCI_BUS  0
-> >>   #endif
-> >>   
-> >> +#ifndef DPRINTF
-> >>   #define DPRINTF(fmt, ...)                                         \
-> >>       do {                                                          \
-> >>           if (DEBUG_S390PCI_BUS) {                                  \
-> >>               fprintf(stderr, "S390pci-bus: " fmt, ## __VA_ARGS__); \
-> >>           }                                                         \
-> >>       } while (0)
-> >> +#endif  
+On Mon, Oct 09, 2017 at 07:58:13PM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > On Thu, Sep 21, 2017 at 08:29:03PM +0100, Dr. David Alan Gilbert wrote:
+> > > * Peter Xu (peterx@redhat.com) wrote:
+> > > > When there is IO error on the incoming channel (e.g., network down),
+> > > > instead of bailing out immediately, we allow the dst vm to switch to the
+> > > > new POSTCOPY_PAUSE state. Currently it is still simple - it waits the
+> > > > new semaphore, until someone poke it for another attempt.
+> > > > 
+> > > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > > ---
+> > > >  migration/migration.c  |  1 +
+> > > >  migration/migration.h  |  3 +++
+> > > >  migration/savevm.c     | 60 ++++++++++++++++++++++++++++++++++++++++++++++++--
+> > > >  migration/trace-events |  2 ++
+> > > >  4 files changed, 64 insertions(+), 2 deletions(-)
+> > > > 
+> > > > diff --git a/migration/migration.c b/migration/migration.c
+> > > > index 8d26ea8..80de212 100644
+> > > > --- a/migration/migration.c
+> > > > +++ b/migration/migration.c
+> > > > @@ -146,6 +146,7 @@ MigrationIncomingState *migration_incoming_get_current(void)
+> > > >          memset(&mis_current, 0, sizeof(MigrationIncomingState));
+> > > >          qemu_mutex_init(&mis_current.rp_mutex);
+> > > >          qemu_event_init(&mis_current.main_thread_load_event, false);
+> > > > +        qemu_sem_init(&mis_current.postcopy_pause_sem_dst, 0);
+> > > >          once = true;
+> > > >      }
+> > > >      return &mis_current;
+> > > > diff --git a/migration/migration.h b/migration/migration.h
+> > > > index 0c957c9..c423682 100644
+> > > > --- a/migration/migration.h
+> > > > +++ b/migration/migration.h
+> > > > @@ -60,6 +60,9 @@ struct MigrationIncomingState {
+> > > >      /* The coroutine we should enter (back) after failover */
+> > > >      Coroutine *migration_incoming_co;
+> > > >      QemuSemaphore colo_incoming_sem;
+> > > > +
+> > > > +    /* notify PAUSED postcopy incoming migrations to try to continue */
+> > > > +    QemuSemaphore postcopy_pause_sem_dst;
+> > > >  };
+> > > >  
+> > > >  MigrationIncomingState *migration_incoming_get_current(void);
+> > > > diff --git a/migration/savevm.c b/migration/savevm.c
+> > > > index 7172f14..3777124 100644
+> > > > --- a/migration/savevm.c
+> > > > +++ b/migration/savevm.c
+> > > > @@ -1488,8 +1488,8 @@ static int loadvm_postcopy_ram_handle_discard(MigrationIncomingState *mis,
+> > > >   */
+> > > >  static void *postcopy_ram_listen_thread(void *opaque)
+> > > >  {
+> > > > -    QEMUFile *f = opaque;
+> > > >      MigrationIncomingState *mis = migration_incoming_get_current();
+> > > > +    QEMUFile *f = mis->from_src_file;
+> > > >      int load_res;
+> > > >  
+> > > >      migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+> > > > @@ -1503,6 +1503,14 @@ static void *postcopy_ram_listen_thread(void *opaque)
+> > > >       */
+> > > >      qemu_file_set_blocking(f, true);
+> > > >      load_res = qemu_loadvm_state_main(f, mis);
+> > > > +
+> > > > +    /*
+> > > > +     * This is tricky, but, mis->from_src_file can change after it
+> > > > +     * returns, when postcopy recovery happened. In the future, we may
+> > > > +     * want a wrapper for the QEMUFile handle.
+> > > > +     */
+> > > > +    f = mis->from_src_file;
+> > > > +
+> > > >      /* And non-blocking again so we don't block in any cleanup */
+> > > >      qemu_file_set_blocking(f, false);
+> > > >  
+> > > > @@ -1581,7 +1589,7 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
+> > > >      /* Start up the listening thread and wait for it to signal ready */
+> > > >      qemu_sem_init(&mis->listen_thread_sem, 0);
+> > > >      qemu_thread_create(&mis->listen_thread, "postcopy/listen",
+> > > > -                       postcopy_ram_listen_thread, mis->from_src_file,
+> > > > +                       postcopy_ram_listen_thread, NULL,
+> > > >                         QEMU_THREAD_DETACHED);
+> > > >      qemu_sem_wait(&mis->listen_thread_sem);
+> > > >      qemu_sem_destroy(&mis->listen_thread_sem);
+> > > > @@ -1966,11 +1974,44 @@ void qemu_loadvm_state_cleanup(void)
+> > > >      }
+> > > >  }
+> > > >  
+> > > > +/* Return true if we should continue the migration, or false. */
+> > > > +static bool postcopy_pause_incoming(MigrationIncomingState *mis)
+> > > > +{
+> > > > +    trace_postcopy_pause_incoming();
+> > > > +
+> > > > +    migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
+> > > > +                      MIGRATION_STATUS_POSTCOPY_PAUSED);
+> > > > +
+> > > > +    assert(mis->from_src_file);
+> > > > +    qemu_file_shutdown(mis->from_src_file);
+> > > > +    qemu_fclose(mis->from_src_file);
+> > > > +    mis->from_src_file = NULL;
+> > > > +
+> > > > +    assert(mis->to_src_file);
+> > > > +    qemu_mutex_lock(&mis->rp_mutex);
+> > > > +    qemu_file_shutdown(mis->to_src_file);
+> > > 
+> > > Should you not do the shutdown() before the lock?
+> > > For example if the other thread is stuck, with rp_mutex
+> > > held, trying to write to to_src_file, then you'll block
+> > > waiting for the mutex.  If you call shutdown and then take
+> > > the lock, the other thread will error and release the lock.
 > > 
-> > Maybe a sign we shouldn't be including vfio/pci.h
-> >   
-> >>   S390pciState *s390_get_phb(void)
-> >>   {
-> >> @@ -751,6 +754,15 @@ static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
-> >>           }
-> >>   
-> >>           if (object_dynamic_cast(OBJECT(dev), "vfio-pci")) {
-> >> +            S390FLICState *fs = s390_get_flic();
-> >> +            VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-> >> +
-> >> +            if ((!vdev->no_kvm_msix || !vdev->no_kvm_msix) &&
-> >> +                (!fs || !fs->ais_supported)) {
-> >> +                error_setg(errp, "VFIO PCI is not supported "
-> >> +                           "because kernel has no AIS capability.");
-> >> +                return;
-> >> +            }  
+> > The problem is that IMHO QEMUFile is not yet thread-safe itself.  So
+> > if we operate on it (even to shut it down) logically we need to have
+> > the lock, right?
+> 
+> That probably needs fixing for 'shutdown' under the assumption that
+>    a) No one has or is deleting/freeing the QEMUFile
+>    b) No one is closing the QEMUFile
+> 
+> The whole point of using shutdown() is it forces any stuck send()'s or
+> read()'s to fail rather than staying stuck.
+
+I see.  I just noticed that actually qemu_file_shutdown() is
+thread-safe itself - it boils down to the system shutdown() call (as
+long as the above assumption is there).
+
+Let me call qemu_file_shutdown() first before taking the lock to make
+sure send()/recv() hang won't happen.
+
+> 
+> > Then, IMHO the question would be: when will the send() be stuck in the
+> > other thread?
 > > 
+> > Normally the only case I can think of is that source didn't recv()
+> > fast enough, and we even consumed all the write buffer in dst side (I
+> > don't really know how kernel manages the buffers though, and e.g. how
+> > the size of buffer is defined...).
 > > 
-> > Hmm, you're basically looking at private data structure fields for
-> > experimental disable flags, which no user, or more importantly no
-> > management tool, could rightfully be expected to provide.  Can we not
-> > take this into account to automatically do the right thing, ie.
-> > automatically set the necessary flag during the device realize?  Thanks,  
+> > But when reach here, the channel (say, from_src_file and to_src_file,
+> > since both of them are using the same channel behind the QEMUFile
+> > interface) should already be broken in some way, then IIUC even there
+> > is a send() in the other thread, it should return at some point with a
+> > failure as well, just like how we reached here (possibly due to a
+> > read() failure).
 > 
-> I am not sure to understand.
-> 
-> Here we are in a s390x specific device and without vfio/pci.h, we have 
-> no access to the PCI VFIOdevice structure from the realize function.
-> 
-> Do you mean to add an entry in the VFIOPCIdevice realize?
-> A new quirk ?
-> An architecture callback, because we also need access to S390FLICState ?
-> 
-> 
-> We also have the possibility to not fall-back to AIS emulation for VFIO
-> but we would loose the possibility to migrate to a host not supporting AIS.
+> We have to be careful about this; a network can fail in a way it
+> gets stuck rather than fails - this can get stuck until a full TCP
+> disconnection; and that takes about 30mins (from memory).
+> The nice thing about using 'shutdown' is that you can kill the existing
+> connection if it's hung. (Which then makes an interesting question;
+> the rules in your migrate-incoming command become different if you
+> want to declare it's failed!).  Having said that, you're right that at
+> this point stuff has already failed - so do we need the shutdown?
+> (You might want to do the shutdown as part of the recovery earlier
+> or as a separate command to force the failure)
 
-Thinking about this some more: The problem is generally "if we have to
-fall back to ais emulation, we cannot support any pci device that
-bypasses qemu's interrupt injection", no?
+I assume if I call shutdown before the lock then we'll be good then.
 
-So this would imply vfio devices where the experimental switch is not
-used, but also virtio-pci if it is configured to use irqfd, I think.
+> 
+> > > I'm not quite sure what will happen if we end up calling this
+> > > before the main thread has been returned from postcopy and the
+> > > device loading is complete.
+> > 
+> > IIUC you mean the time starts from when we got MIG_CMD_PACKAGED until
+> > main thread finishes handling that package?
+> 
+> Yes.
+> 
+> > Normally I think that should not matter much since during handling the
+> > package it should hardly fail (we were reading from a buffer QIO
+> > channel, no real IOs there)... 
+> 
+> Note that while the main thread is reading the package, the listener
+> thread is receiving pages, so you can legally get a failure at that
+> point when the fd fails as it's receiving pages at the same time
+> as reading the devices.
+> (There's an argument that if it fails before you've received all
+> your devices then perhaps you can just restart the source)
 
-The ugly thing is that the platform-specific code depends on a property
-of the plugged device being set or not set... and that's likely to be
-different from device type to device type, and may not even be
-configurable for some device types.
+Yes.
+
+> 
+> > But I agree about the reasoning.  How
+> > about one more patch to postpone the "active" to "postcopy-active"
+> > state change after the package is handled correctly?  Like:
+> > 
+> > --------------
+> > diff --git a/migration/savevm.c b/migration/savevm.c                     
+> > index b5c3214034..8317b2a7e2 100644 
+> > --- a/migration/savevm.c            
+> > +++ b/migration/savevm.c            
+> > @@ -1573,8 +1573,6 @@ static void *postcopy_ram_listen_thread(void *opaque)                                                                       
+> >      QEMUFile *f = mis->from_src_file;                                   
+> >      int load_res;                  
+> >                                     
+> > -    migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,             
+> > -                                   MIGRATION_STATUS_POSTCOPY_ACTIVE);   
+> >      qemu_sem_post(&mis->listen_thread_sem);                             
+> >      trace_postcopy_ram_listen_thread_start();                           
+> >                                     
+> > @@ -1817,6 +1815,9 @@ static int loadvm_handle_cmd_packaged(MigrationIncomingState *mis)                                                          
+> >      qemu_fclose(packf);            
+> >      object_unref(OBJECT(bioc));    
+> >                                     
+> > +    migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,             
+> > +                                   MIGRATION_STATUS_POSTCOPY_ACTIVE);   
+> > +                                   
+> >      return ret;                    
+> >  }                                  
+> > --------------
+> > 
+> > This function will only be called with "postcopy-active" state.
+> 
+> I *think* that's safe; you've got to be careful, but I can't see
+> anyone on the destination that cares about the destinction.
+
+Indeed, but I'd say that's the best thing I can think of (and the
+simplest).  Even, not sure whether it'll be more clear if we set
+postcopy-active state right before starting the VM on destination,
+say, at the beginning of loadvm_postcopy_handle_run_bh().
+
+> 
+> > > Also, at this point have we guaranteed no one else is about
+> > > to do an op on mis->to_src_file and will seg?
+> > 
+> > I think no?  Since IMHO the main thread is playing with the buffer QIO
+> > channel, rather than the real one?
+> 
+> OK.
+> 
+> > (btw, could I ask what's "seg"? :)
+> 
+> just short for segmentation fault; sig 11.
+
+I see.  Thanks!
+
+> 
+> Dave
+> 
+> > -- 
+> > Peter Xu
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+-- 
+Peter Xu
