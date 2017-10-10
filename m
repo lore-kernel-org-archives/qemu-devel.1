@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e1wLG-0000Yx-MM
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:21:14 -0400
+	(envelope-from <lvivier@redhat.com>) id 1e1wM5-00015Q-4g
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:22:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e1wLA-00088R-Nn
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:21:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32902)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e1wLA-00087m-DZ
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:21:04 -0400
-Date: Tue, 10 Oct 2017 18:21:00 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171010181646-mutt-send-email-mst@kernel.org>
-References: <20170911165929.2791-1-marcandre.lureau@redhat.com>
-	<20170911165929.2791-3-marcandre.lureau@redhat.com>
-	<20171009110336.GA17824@redhat.com>
-	<20171009144344.38bbd1e9@nial.brq.redhat.com>
-	<20171009130218.GK2954@redhat.com>
-	<20171010003951-mutt-send-email-mst@kernel.org>
-	<20171010083143.GA30015@redhat.com>
-	<CAJ+F1CLGJLXYnJ8SnrbVkWc6bdU2geYKeEaKrxWaYBhXwA=Opg@mail.gmail.com>
-	<20171010150628.GI30015@redhat.com>
+	(envelope-from <lvivier@redhat.com>) id 1e1wM0-0000VK-Hl
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:22:01 -0400
+References: <20171010132159.15787-1-david@gibson.dropbear.id.au>
+	<20171010164431.168777e9@bahia.lan>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <955ac977-e20b-4c55-bbaa-a51c41f2bed3@redhat.com>
+Date: Tue, 10 Oct 2017 17:21:53 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20171010150628.GI30015@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 2/7] hw/misc: add vmcoreinfo device
+In-Reply-To: <20171010164431.168777e9@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] spapr: Correct RAM size calculation for
+ HPT resizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,106 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU <qemu-devel@nongnu.org>, Dave Anderson <anderson@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Tue, Oct 10, 2017 at 04:06:28PM +0100, Daniel P. Berrange wrote:
-> On Tue, Oct 10, 2017 at 05:00:18PM +0200, Marc-Andr=E9 Lureau wrote:
-> > Hi
-> >=20
-> > On Tue, Oct 10, 2017 at 10:31 AM, Daniel P. Berrange
-> > <berrange@redhat.com> wrote:
-> > > On Tue, Oct 10, 2017 at 12:44:26AM +0300, Michael S. Tsirkin wrote:
-> > >> On Mon, Oct 09, 2017 at 02:02:18PM +0100, Daniel P. Berrange wrote=
-:
-> > >> > On Mon, Oct 09, 2017 at 02:43:44PM +0200, Igor Mammedov wrote:
-> > >> > > On Mon, 9 Oct 2017 12:03:36 +0100
-> > >> > > "Daniel P. Berrange" <berrange@redhat.com> wrote:
-> > >> > >
-> > >> > > > On Mon, Sep 11, 2017 at 06:59:24PM +0200, Marc-Andr=E9 Lurea=
-u wrote:
-> > >> > > > > See docs/specs/vmcoreinfo.txt for details.
-> > >> > > > >
-> > >> > > > > "etc/vmcoreinfo" fw_cfg entry is added when using "-device=
- vmcoreinfo".
-> > >> > > >
-> > >> > > > I'm wondering if you considered just adding the entry to fw_=
-cfg by
-> > >> > > > default, without requiring any -device arg ? Unless I'm misu=
-nderstanding,
-> > >> > > > this doesn't feel like a device to me - its just a well know=
-n bucket
-> > >> > > > in fw_cfg IIUC ?  Obviously its existance would need to be t=
-ied to
-> > >> > > > the latest machine type for ABI reasons though. The benefit =
-of this
-> > >> > > > is that it would "just work" without us having to plumb it t=
-hrough to
-> > >> > > > all the downstream applications that use QEMU for mgmt guest=
- (OpenStack,
-> > >> > > > oVirt, GNOME Boxes, virt-manager, and countless other mgmt a=
-pps).
-> > >> > > it follows model set by pvpanic device, it's easier to manage =
-from migration
-> > >> > > POV, one could use it even for old machine types with new qemu=
- (just by adding
-> > >> > > device, it makes instance not backwards migratable to old qemu=
- but should work
-> > >> > > for forward migration) and if user doesn't need it, device cou=
-ld be just omitted
-> > >> > > from CLI.
-> > >> >
-> > >> > Sure but it means that in effect no one will have this functiona=
-lity enabled
-> > >> > for several years. pvpanic has been around a long time and I rar=
-ely see it
-> > >> > present in configured guests :-(
-> > >> >
-> > >> >
-> > >> > Regards,
-> > >> > Daniel
-> > >>
-> > >> libvirt runs with -nodefaults, right? I'd argue pretty strongly -n=
-odefaults
-> > >> shouldn't add optional devices anyway.
-> > >
-> > > This isn't really adding a device though is it - it is just a well =
-known
-> > > location in fw_cfg to receive data.
-> >=20
-> > Enabling the device on some configurations by default can be done as =
-a
-> > follow-up patch. Can we get this series reviewed & merged?
->=20
-> The problem with the -device approach + turning it on by default is tha=
-t there
-> is no way to turn it off again if you don't want it. eg there's way to =
-undo
-> an implicit '-device foo' except via -nodefaults, but since libvirt use=
-s that
-> already it would negate the effect of enabling it by default unconditio=
-nally.
->=20
-> Your previous approach of "-global fw_cfg.vmcoreinfo=3Don" is nicer in =
-this
-> respect, as you can trivially turn it on/off, overriding the default st=
-ate
-> in both directions.
->=20
-> Regards,
-> Daniel
+On 10/10/2017 16:44, Greg Kurz wrote:
+> On Wed, 11 Oct 2017 00:21:59 +1100
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+> 
+>> In order to prevent the guest from forcing the allocation of large amounts
+>> of qemu memory (or host kernel memory, in the case of KVM HV), we limit
+>> the size of Hashed Page Table (HPT) it is allowed to allocated, based on
+>> its RAM size.
+>>
+>> However, the current calculation is not correct: it only adds up the size
+>> of plugged memory, ignoring the base memory size.  This patch corrects it.
+>>
+>> While we're there, use get_plugged_memory_size() instead of directly
+>> calling pc_existing_dimms_capacity().  The only difference is that it
+>> will abort on failure, which is right: a failure here indicates something
+>> wrong within qemu.
+>>
+>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>> ---
+>>  hw/ppc/spapr_hcall.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+>> index 8d72bb7c1c..06af1b15c0 100644
+>> --- a/hw/ppc/spapr_hcall.c
+>> +++ b/hw/ppc/spapr_hcall.c
+>> @@ -494,7 +494,7 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
+>>          return H_PARAMETER;
+>>      }
+>>  
+>> -    current_ram_size = pc_existing_dimms_capacity(&error_fatal);
+>> +    current_ram_size = ram_size + get_plugged_memory_size();
+> 
+> current_ram_size is initialized earlier in this function:
+> 
+>     uint64_t current_ram_size = MACHINE(spapr)->ram_size;
+> 
+> which is is initialized to ram_size in vl.c. Why not doing:
+> 
+>     current_ram_size += get_plugged_memory_size();
+> 
+> ?
 
+I agree, it seems like the original intend of the first patch...
 
-Interesting. IIUC you are saying that a property can have on/off/auto
-options, while -device only has on/off.
-
-Seems like something that's worth looking into generally. I'm not sure
-why is should this device be special though.
-
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
+Thanks,
+Laurent
