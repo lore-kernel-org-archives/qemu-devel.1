@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e1vQz-0005HE-UL
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:23:03 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e1vS4-0005o6-4Q
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:24:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e1vQy-0000y9-Lu
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:23:01 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:54813)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e1vQy-0000xk-Cs
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:23:00 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id i124so5838815wmf.3
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 07:23:00 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1e1vRy-0001Lu-Gt
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:24:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53888)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e1vRy-0001LZ-B2
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:24:02 -0400
+Date: Tue, 10 Oct 2017 16:23:54 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171010162354.78381c3a.cohuck@redhat.com>
+In-Reply-To: <20170928203708.9376-3-david@redhat.com>
+References: <20170928203708.9376-1-david@redhat.com>
+	<20170928203708.9376-3-david@redhat.com>
 MIME-Version: 1.0
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Oct 2017 15:22:38 +0100
-Message-ID: <CAFEAcA-KNF0Q2HisqN8s0zhm1dyPxFrKri6tYNpUai_=OnAppw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] updating to a u-boot without the case-sensitive
- filename clash
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 02/30] s390x/tcg: cleanup service
+ interrupt injection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +28,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, thuth@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <richard.henderson@linaro.org>
 
-Hi; we currently have an issue with the u-boot we're using where it
-has a file and a directory that differ only in case (scripts/Kconfig
-and scripts/kconfig/). This means that QEMU's release tarballs won't
-unpack on a case-insensitive filesystem (OSX, Windows).
+On Thu, 28 Sep 2017 22:36:40 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-u-boot have now fixed this upstream:
-http://git.denx.de/?p=u-boot.git;a=commitdiff;h=610eec7f0593574c034054ba54fc1c934755e208
+> There are still some leftovers from old virtio interrupts in there.
+> Most importantly, we don't have to queue service interrupts anymore.
+> Just like KVM, we can simply multiplex the SCLP service interrupts and
+> avoid the queue.
+> 
+> Also, now only valid parametes/cpu_addr will be stored on service
 
-but we need to decide how best to get this fix into QEMU so that
-our tarballs will unpack, both for the upcoming QEMU 2.11 and
-ideally for future point releases based on 2.10.
+s/parametes/parameters/
 
-I can see a couple of options:
- (1) wait for next u-boot release (scheduled for Nov 13, 2017),
-     and move to that
-     [downsides: would be in the middle of QEMU's own release cycle,
-      pretty late to fix any problems with the new version;
-      rather a big change to put into stable]
- (2) move to u-boot current head-of-unstable
-     [downsides: would mean running some random git commit version,
-      also not really very suitable for stable]
- (3) backport the upstream fix to sit on top of the u-boot version
-     we're currently using (I think the patch should apply as-is)
-     [downsides: would need to figure out how to get that commit into
-      the mirror of the u-boot repo that we use; would a build of it
-      claim a misleading u-boot version number?]
- (4) suggest your better idea here!
+> interrupts.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/cpu.c         |  2 --
+>  target/s390x/cpu.h         | 10 +---------
+>  target/s390x/excp_helper.c | 16 +++++-----------
+>  target/s390x/internal.h    |  2 --
+>  target/s390x/interrupt.c   | 18 ++++--------------
+>  5 files changed, 10 insertions(+), 38 deletions(-)
+> 
 
-Thoughts?
+> diff --git a/target/s390x/interrupt.c b/target/s390x/interrupt.c
+> index b9c30f86d7..cbc7b7696d 100644
+> --- a/target/s390x/interrupt.c
+> +++ b/target/s390x/interrupt.c
+> @@ -54,22 +54,12 @@ void program_interrupt(CPUS390XState *env, uint32_t code, int ilen)
+>  }
+>  
+>  #if !defined(CONFIG_USER_ONLY)
+> -void cpu_inject_ext(S390CPU *cpu, uint32_t code, uint32_t param,
+> -                    uint64_t param64)
+> +static void cpu_inject_service(S390CPU *cpu, uint32_t param)
+>  {
+>      CPUS390XState *env = &cpu->env;
+>  
+> -    if (env->ext_index == MAX_EXT_QUEUE - 1) {
+> -        /* ugh - can't queue anymore. Let's drop. */
+> -        return;
+> -    }
+> -
+> -    env->ext_index++;
+> -    assert(env->ext_index < MAX_EXT_QUEUE);
+> -
+> -    env->ext_queue[env->ext_index].code = code;
+> -    env->ext_queue[env->ext_index].param = param;
+> -    env->ext_queue[env->ext_index].param64 = param64;
+> +    /* multiplexing is good enough for sclp - also kvm does that internally */
 
-(Proposals for automated tests to ensure we don't run into the
-case-sensitivity problem again in future also welcome.)
+"kvm does that internally as well"?
 
-thanks
--- PMM
+(Can fix while applying.)
+
+> +    env->service_param |= param;
+>  
+>      env->pending_int |= INTERRUPT_EXT_SERVICE;
+>      cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
+> @@ -145,7 +135,7 @@ void s390_sclp_extint(uint32_t parm)
+>      } else {
+>          S390CPU *dummy_cpu = s390_cpu_addr2state(0);
+>  
+> -        cpu_inject_ext(dummy_cpu, EXT_SERVICE, parm, 0);
+> +        cpu_inject_service(dummy_cpu, parm);
+>      }
+>  }
+>  
