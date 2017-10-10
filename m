@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55872)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e1x3I-0001ps-ET
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:06:41 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e1x3N-0001sK-PI
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:06:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e1x3D-0006eW-Hl
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:06:40 -0400
-Date: Tue, 10 Oct 2017 13:00:15 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1e1x3I-0006gj-0o
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:06:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43334)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e1x3H-0006gU-Qs
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:06:39 -0400
+Date: Tue, 10 Oct 2017 13:03:57 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171010160015.GF3246@localhost.localdomain>
-References: <20171010133241.11330-1-lvivier@redhat.com>
+Message-ID: <20171010160357.GG3246@localhost.localdomain>
+References: <20171005203638.19255-1-ehabkost@redhat.com>
+	<CAFEAcA-jBzTXWNrRCB8GXm2FcZdT3pPFZiGT6O6Oc8qpfSK_jA@mail.gmail.com>
+	<20171006152751.GR4015@localhost.localdomain>
+	<CAFEAcA94pKm22fX1kCr72-SsM06Z2AMUZ65a7zJ_UPrarkBg1w@mail.gmail.com>
+	<4479e30f-801d-0d8e-712d-06f2dd987528@cn.fujitsu.com>
+	<20171010125231.GD4015@localhost.localdomain>
+	<CAFEAcA_M-6yb1Vx0dT77zg8wUO+vNzawTNnubmd=OO_CB6t9vg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171010133241.11330-1-lvivier@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] pc: remove useless hot_add_cpu
- initialisation
+In-Reply-To: <CAFEAcA_M-6yb1Vx0dT77zg8wUO+vNzawTNnubmd=OO_CB6t9vg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 0/9] x86 and machine queue, 2017-10-05
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,19 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, "Michael S . Tsirkin" <mst@redhat.com>, Anthony Perard <anthony.perard@citrix.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Dou Liyang <douly.fnst@cn.fujitsu.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, Oct 10, 2017 at 03:32:41PM +0200, Laurent Vivier wrote:
-> Since 4458fb3a79 (pc: Eliminate pc_default_machine_options()),
-> hot_add_cpu is set in pc_machine_class_init(), so we don't
-> need to set it in pc_q35_machine_options(), pc_i440fx_machine_options()
-> and xenfv_machine_options(), except to clear it in
-> pc_i440fx_1_4_machine_opt().
+On Tue, Oct 10, 2017 at 01:56:55PM +0100, Peter Maydell wrote:
+> On 10 October 2017 at 13:52, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > This shouldn't happen if CONFIG_IASL is not defined.  Did you run
+> > configure again after removing iasl?
 > 
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> I've neither added nor removed iasl from the build systems
+> in question. Pull request tests just apply the pull and
+> run make/make check.
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+I understand.  The question was about the test failure reported
+by Dou Liyang.
 
 -- 
 Eduardo
