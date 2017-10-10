@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e20EJ-0000X8-1s
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:15 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e20EF-0000UW-TR
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e20EH-0004za-UA
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:14 -0400
-Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:45679)
+	(envelope-from <richard.henderson@linaro.org>) id 1e20EB-0004tg-Kb
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:11 -0400
+Received: from mail-pf0-x236.google.com ([2607:f8b0:400e:c00::236]:54757)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e20EH-0004y9-Oc
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:13 -0400
-Received: by mail-pf0-x233.google.com with SMTP id d28so3568998pfe.2
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 12:30:13 -0700 (PDT)
+	id 1e20EB-0004tO-D5
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:07 -0400
+Received: by mail-pf0-x236.google.com with SMTP id m28so13339172pfi.11
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 12:30:07 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 10 Oct 2017 12:29:48 -0700
-Message-Id: <20171010193003.28857-6-richard.henderson@linaro.org>
-In-Reply-To: <20171010193003.28857-1-richard.henderson@linaro.org>
-References: <20171010193003.28857-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL v2 05/20] cpu-exec: rename have_tb_lock to
- acquired_tb_lock in tb_find
+Date: Tue, 10 Oct 2017 12:29:43 -0700
+Message-Id: <20171010193003.28857-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 00/20] Queued TCG patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +28,88 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
+Cc: peter.maydell@linaro.org
 
-From: "Emilio G. Cota" <cota@braap.org>
+One trivial cleanup from Jiang.  Cherry-picking half of Emilio's
+patch set that has been reviewed.
 
-Reusing the have_tb_lock name, which is also defined in translate-all.c,
-makes code reviewing unnecessarily harder.
+Changes since v1:
+  * Dropped 2 mprotect changes that Werrored on w32.
+  * Dropped tcg optimize patch that broke arm32 host.
 
-Avoid potential confusion by renaming the local have_tb_lock variable
-to something else.
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- accel/tcg/cpu-exec.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+r~
 
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index ff6866624a..32104b8d8c 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -372,7 +372,7 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
-     TranslationBlock *tb;
-     target_ulong cs_base, pc;
-     uint32_t flags;
--    bool have_tb_lock = false;
-+    bool acquired_tb_lock = false;
- 
-     /* we record a subset of the CPU state. It will
-        always be the same before a given translated block
-@@ -391,7 +391,7 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
-              */
-             mmap_lock();
-             tb_lock();
--            have_tb_lock = true;
-+            acquired_tb_lock = true;
- 
-             /* There's a chance that our desired tb has been translated while
-              * taking the locks so we check again inside the lock.
-@@ -419,15 +419,15 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
- #endif
-     /* See if we can patch the calling TB. */
-     if (last_tb && !qemu_loglevel_mask(CPU_LOG_TB_NOCHAIN)) {
--        if (!have_tb_lock) {
-+        if (!acquired_tb_lock) {
-             tb_lock();
--            have_tb_lock = true;
-+            acquired_tb_lock = true;
-         }
-         if (!tb->invalid) {
-             tb_add_jump(last_tb, tb_exit, tb);
-         }
-     }
--    if (have_tb_lock) {
-+    if (acquired_tb_lock) {
-         tb_unlock();
-     }
-     return tb;
--- 
-2.13.6
+
+The following changes since commit 567d0a19c7998fa366598b83d5a6e5f0759d3ea9:
+
+  Merge remote-tracking branch 'remotes/ehabkost/tags/x86-and-machine-pull-request' into staging (2017-10-10 13:25:46 +0100)
+
+are available in the git repository at:
+
+  git://github.com/rth7680/qemu.git tags/pull-tcg-20171010
+
+for you to fetch changes up to 8df8d529ed958de4e23dcbf38bd34eff1a4716f2:
+
+  tcg/mips: delete commented out extern keyword. (2017-10-10 09:45:01 -0700)
+
+----------------------------------------------------------------
+Queued TCG patches
+
+----------------------------------------------------------------
+Emilio G. Cota (19):
+      cputlb: bring back tlb_flush_count under !TLB_DEBUG
+      tcg: fix corruption of code_time profiling counter upon tb_flush
+      exec-all: fix typos in TranslationBlock's documentation
+      translate-all: make have_tb_lock static
+      cpu-exec: rename have_tb_lock to acquired_tb_lock in tb_find
+      tcg/i386: constify tcg_target_callee_save_regs
+      tcg/mips: constify tcg_target_callee_save_regs
+      tcg: remove addr argument from lookup_tb_ptr
+      tcg: consolidate TB lookups in tb_lookup__cpu_state
+      exec-all: bring tb->invalid into tb->cflags
+      translate-all: define and use DEBUG_TB_FLUSH_GATE
+      exec-all: introduce TB_PAGE_ADDR_FMT
+      translate-all: define and use DEBUG_TB_INVALIDATE_GATE
+      translate-all: define and use DEBUG_TB_CHECK_GATE
+      exec-all: extract tb->tc_* into a separate struct tc_tb
+      tci: move tci_regs to tcg_qemu_tb_exec's stack
+      tcg: take .helpers out of TCGContext
+      util: move qemu_real_host_page_size/mask to osdep.h
+      tcg: define TCG_HIGHWATER
+
+Jiang Biao (1):
+      tcg/mips: delete commented out extern keyword.
+
+ accel/tcg/tcg-runtime.h    |   2 +-
+ include/exec/cpu-all.h     |   2 -
+ include/exec/cpu-defs.h    |   1 +
+ include/exec/cputlb.h      |   3 +-
+ include/exec/exec-all.h    |  19 +-
+ include/exec/tb-lookup.h   |  49 ++++
+ include/qemu/osdep.h       |   6 +
+ tcg/tcg-op.h               |   4 +-
+ tcg/tcg.h                  |   2 -
+ accel/tcg/cpu-exec.c       |  73 +++---
+ accel/tcg/cputlb.c         |  17 +-
+ accel/tcg/tcg-runtime.c    |  34 +--
+ accel/tcg/translate-all.c  |  96 +++++---
+ exec.c                     |   4 -
+ target/alpha/translate.c   |   2 +-
+ target/arm/translate-a64.c |   4 +-
+ target/arm/translate.c     |   5 +-
+ target/hppa/translate.c    |   6 +-
+ target/i386/translate.c    |  17 +-
+ target/mips/translate.c    |   4 +-
+ target/s390x/translate.c   |   2 +-
+ target/sh4/translate.c     |   4 +-
+ tcg/i386/tcg-target.inc.c  |   2 +-
+ tcg/mips/tcg-target.inc.c  |   4 +-
+ tcg/tcg-op.c               |   4 +-
+ tcg/tcg.c                  |  18 +-
+ tcg/tci.c                  | 552 +++++++++++++++++++++++----------------------
+ util/pagesize.c            |  18 ++
+ util/Makefile.objs         |   1 +
+ 29 files changed, 521 insertions(+), 434 deletions(-)
+ create mode 100644 include/exec/tb-lookup.h
+ create mode 100644 util/pagesize.c
