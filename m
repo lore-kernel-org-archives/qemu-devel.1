@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e1pB6-0004aB-Rt
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 03:42:13 -0400
+	(envelope-from <armbru@redhat.com>) id 1e1pCt-0005Qn-AW
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 03:44:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e1pB3-0007OR-MN
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 03:42:12 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:28489
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1e1pB3-0007Mn-Ae
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 03:42:09 -0400
-References: <20171005203638.19255-1-ehabkost@redhat.com>
-	<CAFEAcA-jBzTXWNrRCB8GXm2FcZdT3pPFZiGT6O6Oc8qpfSK_jA@mail.gmail.com>
-	<20171006152751.GR4015@localhost.localdomain>
-	<CAFEAcA94pKm22fX1kCr72-SsM06Z2AMUZ65a7zJ_UPrarkBg1w@mail.gmail.com>
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <4479e30f-801d-0d8e-712d-06f2dd987528@cn.fujitsu.com>
-Date: Tue, 10 Oct 2017 15:41:56 +0800
+	(envelope-from <armbru@redhat.com>) id 1e1pCq-0007zS-5d
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 03:44:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51340)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1e1pCp-0007yo-VW
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 03:44:00 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1507133891-26013-1-git-send-email-ian.jackson@eu.citrix.com>
+	<1507133891-26013-8-git-send-email-ian.jackson@eu.citrix.com>
+	<877ew4ub3u.fsf@dusky.pond.sub.org>
+	<23003.36902.664875.346194@mariner.uk.xensource.com>
+Date: Tue, 10 Oct 2017 09:43:56 +0200
+In-Reply-To: <23003.36902.664875.346194@mariner.uk.xensource.com> (Ian
+	Jackson's message of "Mon, 9 Oct 2017 16:05:10 +0100")
+Message-ID: <878tgjla6b.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA94pKm22fX1kCr72-SsM06Z2AMUZ65a7zJ_UPrarkBg1w@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 0/9] x86 and machine queue, 2017-10-05
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 7/8] os-posix: Provide new -runasid option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Ian Jackson <ian.jackson@eu.citrix.com>
+Cc: Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, xen-devel@nongnu.org
 
-Hi Eduardo,
+Ian Jackson <ian.jackson@eu.citrix.com> writes:
 
-I couldn't reproduce the failure too. But, I have some concern below.
-
-At 10/06/2017 11:37 PM, Peter Maydell wrote:
-> On 6 October 2017 at 16:27, Eduardo Habkost <ehabkost@redhat.com> wrote:
->> On Fri, Oct 06, 2017 at 01:17:42PM +0100, Peter Maydell wrote:
->>> This fails tests, I'm afraid:
->> [...]
->>> acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-6QYK7Y.dsl,
->>> aml:/tmp/aml-E8YK7Y], Expected [asl:/tmp/asl-1H1I7Y.dsl,
->>> aml:tests/acpi-test-data/pc/DSDT.memhp].
-
-This warning is about memory hot-plug tests. DSDT mismatch is too
-strange, I hope to see their difference.
-
->>> acpi-test: Warning. not showing difference since no diff utility is
->>> specified. Set 'DIFF' environment variable to a preferred diff utility
->>> and run 'make V=1 check' again to see ASL difference.OK
->>>
->>> and same for /i386/acpi/piix4/numamem and for the
->>> equivalent q35 tests.
->>>
->>> Fails on s390, netbsd, freebsd, aarch32, x86-64.
->>>
->>
->> Oops, sorry!
->>
->> I need to find out why it didn't fail on travis-ci:
->> https://travis-ci.org/ehabkost/qemu/builds/283884670
+> Markus Armbruster writes ("Re: [Qemu-devel] [PATCH 7/8] os-posix: Provide new -runasid option"):
+>> The last thing the QEMU command line needs is more exotic options.  Are
+>> you sure we need a new one here?  Can we make existing -runas serve?
+>> Precedence: Coreutils[*].  Pseudo-code:
+>> 
+>>     if argument is a decimal number starting with '+':
+>>         user ID
+>>     else if argument is a valid user name:
+>>         user name
+>>     else if argument is a valid user ID:
+>>         user ID
+>>     else:
+>>         error
 >
-> My guess is that one of {iasl installed, iasl not installed}
-> is broken, but the travis environments don't test both.
->
-If we want do the "bios-tables-test", we need iasl support.
+> I can do this.  So -runas <uid>.<gid> then.  I don't think it makes
+> sense to try to -runas <uid> because: you wouldn't have a username
+> to pass to initgroups: not calling initgroups would be a bear trap;
+> and otherwise we wouldn't know what gid to use.
 
-otherwise, when I run "make V=1 check" without iasl, the test
-will report error:
+Actually, a numeric UID without group name or ID could be made to work
+just fine as long as it maps to a user name.  The use case may not be
+worth the bother, though.
 
-...
-TEST: tests/bios-tables-test... (pid=1006)
-   /i386/acpi/piix4:
-Looking for expected file 'tests/acpi-test-data/pc/DSDT'
+Using '.' to separate user and group is suboptimal, because POSIX
+portable user and group names may contain it:
 
-Using expected file 'tests/acpi-test-data/pc/DSDT'
+    3.426 User Name
 
-Looking for expected file 'tests/acpi-test-data/pc/APIC'
+    A string that is used to identify a user; see also User Database.
+    To be portable across systems conforming to IEEE Std 1003.1-2001,
+    the value is composed of characters from the portable filename
+    character set.  The hyphen should not be used as the first character
+    of a portable user name.
 
-Using expected file 'tests/acpi-test-data/pc/APIC'
+and
 
-Looking for expected file 'tests/acpi-test-data/pc/HPET'
+    3.276 Portable Filename Character Set
 
-Using expected file 'tests/acpi-test-data/pc/HPET'
-**
-ERROR:tests/bios-tables-test.c:328:load_asl: assertion failed (error == 
-NULL): Failed to execute child process "iasl" (No such file or 
-directory) (g-exec-error-quark, 8)
-FAIL
-...
+    The set of characters from which portable filenames are constructed.
 
-Thanks,
-	dou.
-> thanks
-> -- PMM
->
->
->
->
+        A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+        a b c d e f g h i j k l m n o p q r s t u v w x y z
+        0 1 2 3 4 5 6 7 8 9 . _ -
+
+http://pubs.opengroup.org/onlinepubs/000095399/basedefs/xbd_chap03.html
+
+Coreutils uses ':'.  Let's follow its lead.
