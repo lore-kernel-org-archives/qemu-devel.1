@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1e1sRm-0004kU-Bw
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:11:44 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e1sSw-0005Ru-7i
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:12:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1e1sRh-000232-D6
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:11:38 -0400
-Received: from www262.sakura.ne.jp ([2001:e42:101:1:202:181:97:72]:42614)
+	(envelope-from <kraxel@redhat.com>) id 1e1sSr-0002gw-Da
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:12:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52998)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <penguin-kernel@I-love.SAKURA.ne.jp>)
-	id 1e1sRg-0000YQ-V1
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:11:33 -0400
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-References: <1506744354-20979-1-git-send-email-wei.w.wang@intel.com>
-	<1506744354-20979-4-git-send-email-wei.w.wang@intel.com>
-	<20171009181612-mutt-send-email-mst@kernel.org>
-	<59DC76BA.7070202@intel.com>
-In-Reply-To: <59DC76BA.7070202@intel.com>
-Message-Id: <201710102008.FIG57851.QFJLMtVOFOHFOS@I-love.SAKURA.ne.jp>
-Date: Tue, 10 Oct 2017 20:08:37 +0900
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Subject: Re: [Qemu-devel] [PATCH v16 3/5] virtio-balloon: VIRTIO_BALLOON_F_SG
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e1sSr-0002fo-4u
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:12:45 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 10 Oct 2017 13:12:40 +0200
+Message-Id: <20171010111240.27607-3-kraxel@redhat.com>
+In-Reply-To: <20171010111240.27607-1-kraxel@redhat.com>
+References: <20171010111240.27607-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 2/2] vga: handle cirrus vbe mode wraparounds.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,88 +23,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wei.w.wang@intel.com, mst@redhat.com
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: qemu-devel@nongnu.org
+Cc: d@vidbuchanan.co.uk, Gerd Hoffmann <kraxel@redhat.com>, P J P <ppandit@redhat.com>
 
-Wei Wang wrote:
-> On 10/09/2017 11:20 PM, Michael S. Tsirkin wrote:
-> > On Sat, Sep 30, 2017 at 12:05:52PM +0800, Wei Wang wrote:
-> >> +static inline void xb_set_page(struct virtio_balloon *vb,
-> >> +			       struct page *page,
-> >> +			       unsigned long *pfn_min,
-> >> +			       unsigned long *pfn_max)
-> >> +{
-> >> +	unsigned long pfn = page_to_pfn(page);
-> >> +
-> >> +	*pfn_min = min(pfn, *pfn_min);
-> >> +	*pfn_max = max(pfn, *pfn_max);
-> >> +	xb_preload(GFP_KERNEL);
-> >> +	xb_set_bit(&vb->page_xb, pfn);
-> >> +	xb_preload_end();
-> >> +}
-> >> +
-> > So, this will allocate memory
-> >
-> > ...
-> >
-> >> @@ -198,9 +327,12 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
-> >>   	struct page *page;
-> >>   	struct balloon_dev_info *vb_dev_info = &vb->vb_dev_info;
-> >>   	LIST_HEAD(pages);
-> >> +	bool use_sg = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_SG);
-> >> +	unsigned long pfn_max = 0, pfn_min = ULONG_MAX;
-> >>   
-> >> -	/* We can only do one array worth at a time. */
-> >> -	num = min(num, ARRAY_SIZE(vb->pfns));
-> >> +	/* Traditionally, we can only do one array worth at a time. */
-> >> +	if (!use_sg)
-> >> +		num = min(num, ARRAY_SIZE(vb->pfns));
-> >>   
-> >>   	mutex_lock(&vb->balloon_lock);
-> >>   	/* We can't release more pages than taken */
-> > And is sometimes called on OOM.
-> >
-> >
-> > I suspect we need to
-> >
-> > 1. keep around some memory for leak on oom
-> >
-> > 2. for non oom allocate outside locks
-> >
-> >
-> 
-> I think maybe we can optimize the existing balloon logic, which could 
-> remove the big balloon lock:
-> 
-> It would not be necessary to have the inflating and deflating run at the 
-> same time.
-> For example, 1st request to inflate 7G RAM, when 1GB has been given to 
-> the host (so 6G left), the
-> 2nd request to deflate 5G is received. Instead of waiting for the 1st 
-> request to inflate 6G and then
-> continuing with the 2nd request to deflate 5G, we can do a diff (6G to 
-> inflate - 5G to deflate) immediately,
-> and got 1G to inflate. In this way, all that driver will do is to simply 
-> inflate another 1G.
-> 
-> Same for the OOM case: when OOM asks for 1G, while inflating 5G is in 
-> progress, then the driver can
-> deduct 1G from the amount that needs to inflate, and as a result, it 
-> will inflate 4G.
-> 
-> In this case, we will never have the inflating and deflating task run at 
-> the same time, so I think it is
-> possible to remove the lock, and therefore, we will not have that 
-> deadlock issue.
-> 
-> What would you guys think?
+Commit "3d90c62548 vga: stop passing pointers to vga_draw_line*
+functions" is incomplete.  It doesn't handle the case that the vga
+rendering code tries to create a shared surface, i.e. a pixman image
+backed by vga video memory.  That can not work in case the guest display
+wraps from end of video memory to the start.  So force shadowing in that
+case.  Also adjust the snapshot region calculation.
 
-What is balloon_lock at virtballoon_migratepage() for?
+Can trigger with cirrus only, when programming vbe modes using the bochs
+api (stdvga, also qxl and virtio-vga in vga compat mode) wrap arounds
+can't happen.
 
-  e22504296d4f64fb "virtio_balloon: introduce migration primitives to balloon pages"
-  f68b992bbb474641 "virtio_balloon: fix race by fill and leak"
+Fixes: CVE-2017-13672
+Fixes: 3d90c6254863693a6b13d918d2b8682e08bbc681
+Cc: P J P <ppandit@redhat.com>
+Reported-by: David Buchanan <d@vidbuchanan.co.uk>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/vga.c | 28 +++++++++++++++++++++-------
+ 1 file changed, 21 insertions(+), 7 deletions(-)
 
-And even if we could remove balloon_lock, you still cannot use
-__GFP_DIRECT_RECLAIM at xb_set_page(). I think you will need to use
-"whether it is safe to wait" flag from
-"[PATCH] virtio: avoid possible OOM lockup at virtballoon_oom_notify()" .
+diff --git a/hw/display/vga.c b/hw/display/vga.c
+index bf774e3402..1afceb6f16 100644
+--- a/hw/display/vga.c
++++ b/hw/display/vga.c
+@@ -1465,13 +1465,13 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+     DisplaySurface *surface = qemu_console_surface(s->con);
+     int y1, y, update, linesize, y_start, double_scan, mask, depth;
+     int width, height, shift_control, bwidth, bits;
+-    ram_addr_t page0, page1;
++    ram_addr_t page0, page1, region_start, region_end;
+     DirtyBitmapSnapshot *snap = NULL;
+     int disp_width, multi_scan, multi_run;
+     uint8_t *d;
+     uint32_t v, addr1, addr;
+     vga_draw_line_func *vga_draw_line = NULL;
+-    bool share_surface;
++    bool share_surface, force_shadow = false;
+     pixman_format_code_t format;
+ #ifdef HOST_WORDS_BIGENDIAN
+     bool byteswap = !s->big_endian_fb;
+@@ -1484,6 +1484,15 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+     s->get_resolution(s, &width, &height);
+     disp_width = width;
+ 
++    region_start = (s->start_addr * 4);
++    region_end = region_start + s->line_offset * height;
++    if (region_end > s->vbe_size) {
++        /* wraps around (can happen with cirrus vbe modes) */
++        region_start = 0;
++        region_end = s->vbe_size;
++        force_shadow = true;
++    }
++
+     shift_control = (s->gr[VGA_GFX_MODE] >> 5) & 3;
+     double_scan = (s->cr[VGA_CRTC_MAX_SCAN] >> 7);
+     if (shift_control != 1) {
+@@ -1523,7 +1532,7 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+     format = qemu_default_pixman_format(depth, !byteswap);
+     if (format) {
+         share_surface = dpy_gfx_check_format(s->con, format)
+-            && !s->force_shadow;
++            && !s->force_shadow && !force_shadow;
+     } else {
+         share_surface = false;
+     }
+@@ -1627,8 +1636,6 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+     y1 = 0;
+ 
+     if (!full_update) {
+-        ram_addr_t region_start = addr1;
+-        ram_addr_t region_end = addr1 + s->line_offset * height;
+         vga_sync_dirty_bitmap(s);
+         if (s->line_compare < height) {
+             /* split screen mode */
+@@ -1651,10 +1658,17 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+             addr = (addr & ~0x8000) | ((y1 & 2) << 14);
+         }
+         update = full_update;
+-        page0 = addr;
+-        page1 = addr + bwidth - 1;
++        page0 = addr & s->vbe_size_mask;
++        page1 = (addr + bwidth - 1) & s->vbe_size_mask;
+         if (full_update) {
+             update = 1;
++        } else if (page1 < page0) {
++            /* scanline wraps from end of video memory to the start */
++            assert(force_shadow);
++            update = memory_region_snapshot_get_dirty(&s->vram, snap,
++                                                      page0, 0);
++            update |= memory_region_snapshot_get_dirty(&s->vram, snap,
++                                                       page1, 0);
+         } else {
+             update = memory_region_snapshot_get_dirty(&s->vram, snap,
+                                                       page0, page1 - page0);
+-- 
+2.9.3
