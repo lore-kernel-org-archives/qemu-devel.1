@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e22DQ-0003Hy-Ru
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:37:29 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e22Db-0003P6-T4
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:37:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e22DP-0002UN-VB
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:37:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60862)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e22DW-0002WI-V3
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:37:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44994)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1e22DP-0002To-Ow
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:37:27 -0400
+	id 1e22DW-0002W4-P3
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:37:34 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 10 Oct 2017 23:34:56 +0200
-Message-Id: <20171010213506.22989-18-marcandre.lureau@redhat.com>
+Date: Tue, 10 Oct 2017 23:34:57 +0200
+Message-Id: <20171010213506.22989-19-marcandre.lureau@redhat.com>
 In-Reply-To: <20171010213506.22989-1-marcandre.lureau@redhat.com>
 References: <20171010213506.22989-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 17/27] vhost-user-scsi: remove VUS_MAX_LUNS
+Subject: [Qemu-devel] [PULL v2 18/27] vhost-user-scsi: remove unimplemented
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +31,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, changpeng.liu@intel.com, f4bug@amsat.org, felipe@nutanix.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-There is no code to support more than 1 yet, no need for that today.
-
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- contrib/vhost-user-scsi/vhost-user-scsi.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ contrib/vhost-user-scsi/vhost-user-scsi.c | 21 +++------------------
+ 1 file changed, 3 insertions(+), 18 deletions(-)
 
 diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-us=
 er-scsi/vhost-user-scsi.c
-index 38fe451619..6b55cc71d3 100644
+index 6b55cc71d3..26b17f348b 100644
 --- a/contrib/vhost-user-scsi/vhost-user-scsi.c
 +++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
-@@ -53,8 +53,6 @@
-=20
- /** vhost-user-scsi specific definitions **/
-=20
-- /* Only 1 LUN and device supported today */
--#define VUS_MAX_LUNS 1
- #define VUS_ISCSI_INITIATOR "iqn.2016-11.com.nutanix:vhost-user-scsi"
-=20
- typedef struct iscsi_lun {
-@@ -67,7 +65,7 @@ typedef struct vhost_scsi_dev {
-     int server_sock;
-     GMainLoop *loop;
-     GTree *fdmap;   /* fd -> gsource context id */
--    iscsi_lun_t luns[VUS_MAX_LUNS];
-+    iscsi_lun_t lun;
- } vhost_scsi_dev_t;
-=20
- /** glib event loop integration for libvhost-user and misc callbacks **/
-@@ -535,7 +533,7 @@ static void vus_proc_req(VuDev *vu_dev, int idx)
-         }
-         rsp =3D (VirtIOSCSICmdResp *)elem->in_sg[0].iov_base;
-=20
--        if (handle_cmd_sync(vdev_scsi->luns[0].iscsi_ctx,
-+        if (handle_cmd_sync(vdev_scsi->lun.iscsi_ctx,
-                             req, &elem->out_sg[1], elem->out_num - 1,
-                             rsp, &elem->in_sg[1], elem->in_num - 1) !=3D=
- 0) {
-             vus_panic_cb(vu_dev, NULL);
-@@ -720,7 +718,7 @@ int main(int argc, char **argv)
+@@ -471,16 +471,6 @@ static void vus_del_watch_cb(VuDev *vu_dev, int fd)
      }
-     vdev_scsi =3D vdev_scsi_new(sock);
+ }
 =20
--    if (iscsi_add_lun(&vdev_scsi->luns[0], iscsi_uri) !=3D 0) {
-+    if (iscsi_add_lun(&vdev_scsi->lun, iscsi_uri) !=3D 0) {
-         goto err;
+-static void vus_proc_ctl(VuDev *vu_dev, int idx)
+-{
+-    /* Control VQ not implemented */
+-}
+-
+-static void vus_proc_evt(VuDev *vu_dev, int idx)
+-{
+-    /* Event VQ not implemented */
+-}
+-
+ static void vus_proc_req(VuDev *vu_dev, int idx)
+ {
+     vhost_scsi_dev_t *vdev_scsi;
+@@ -561,14 +551,9 @@ static void vus_queue_set_started(VuDev *vu_dev, int=
+ idx, bool started)
+=20
+     vq =3D vu_get_queue(vu_dev, idx);
+=20
+-    switch (idx) {
+-    case 0:
+-        vu_set_queue_handler(vu_dev, vq, started ? vus_proc_ctl : NULL);
+-        break;
+-    case 1:
+-        vu_set_queue_handler(vu_dev, vq, started ? vus_proc_evt : NULL);
+-        break;
+-    default:
++    if (idx =3D=3D 0 || idx =3D=3D 1) {
++        PDBG("queue %d unimplemented", idx);
++    } else {
+         vu_set_queue_handler(vu_dev, vq, started ? vus_proc_req : NULL);
      }
-=20
+ }
 --=20
 2.15.0.rc0.40.gaefcc5f6f
