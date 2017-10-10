@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e1v4o-0007vz-Ou
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:00:13 -0400
+	(envelope-from <lvivier@redhat.com>) id 1e1v4s-0007zu-9w
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:00:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e1v4i-0001tn-II
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:00:06 -0400
-Date: Tue, 10 Oct 2017 15:59:40 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171010135940.GJ4177@dhcp-200-186.str.redhat.com>
-References: <20171004020048.26379-1-eblake@redhat.com>
-	<20171004020048.26379-2-eblake@redhat.com>
+	(envelope-from <lvivier@redhat.com>) id 1e1v4i-0001tt-O9
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:00:10 -0400
+References: <20171010132159.15787-1-david@gibson.dropbear.id.au>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <0639ec04-a340-4d8b-995f-249b6dd93cf6@redhat.com>
+Date: Tue, 10 Oct 2017 15:59:51 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171004020048.26379-2-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 01/23] block: Allow NULL file for
- bdrv_get_block_status()
+In-Reply-To: <20171010132159.15787-1-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] spapr: Correct RAM size calculation for
+ HPT resizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,219 +24,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org, clg@kaod.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Am 04.10.2017 um 04:00 hat Eric Blake geschrieben:
-> Not all callers care about which BDS owns the mapping for a given
-> range of the file.  This patch merely simplifies the callers by
-> consolidating the logic in the common call point, while guaranteeing
-> a non-NULL file to all the driver callbacks, for no semantic change.
-> The only caller that does not care about pnum is bdrv_is_allocated,
-> as invoked by vvfat; we can likewise add assertions that the rest
-> of the stack does not have to worry about a NULL pnum.
+On 10/10/2017 15:21, David Gibson wrote:
+> In order to prevent the guest from forcing the allocation of large amounts
+> of qemu memory (or host kernel memory, in the case of KVM HV), we limit
+> the size of Hashed Page Table (HPT) it is allowed to allocated, based on
+> its RAM size.
 > 
-> Furthermore, this will also set the stage for a future cleanup: when
-> a caller does not care about which BDS owns an offset, it would be
-> nice to allow the driver to optimize things to not have to return
-> BDRV_BLOCK_OFFSET_VALID in the first place.  In the case of fragmented
-> allocation (for example, it's fairly easy to create a qcow2 image
-> where consecutive guest addresses are not at consecutive host
-> addresses), the current contract requires bdrv_get_block_status()
-> to clamp *pnum to the limit where host addresses are no longer
-> consecutive, but allowing a NULL file means that *pnum could be
-> set to the full length of known-allocated data.
+> However, the current calculation is not correct: it only adds up the size
+> of plugged memory, ignoring the base memory size.  This patch corrects it.
 > 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+> While we're there, use get_plugged_memory_size() instead of directly
+> calling pc_existing_dimms_capacity().  The only difference is that it
+> will abort on failure, which is right: a failure here indicates something
+> wrong within qemu.
 > 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
-> v5: use second label for cleaner exit logic [John], use local_pnum
-> v4: only context changes
-> v3: rebase to recent changes (qcow2_measure), dropped R-b
-> v2: use local variable and final transfer, rather than assignment
-> of parameter to local
-> [previously in different series]:
-> v2: new patch, https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg05645.html
-> ---
->  include/block/block_int.h | 10 ++++----
->  block/io.c                | 58 ++++++++++++++++++++++++++---------------------
->  block/mirror.c            |  3 +--
->  block/qcow2.c             |  8 ++-----
->  qemu-img.c                | 10 ++++----
->  5 files changed, 45 insertions(+), 44 deletions(-)
+>  hw/ppc/spapr_hcall.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index 79366b94b5..3b4158f576 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -202,10 +202,12 @@ struct BlockDriver {
->          int64_t offset, int bytes);
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 8d72bb7c1c..06af1b15c0 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -494,7 +494,7 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
+>          return H_PARAMETER;
+>      }
+>  
+> -    current_ram_size = pc_existing_dimms_capacity(&error_fatal);
+> +    current_ram_size = ram_size + get_plugged_memory_size();
+>  
+>      /* We only allow the guest to allocate an HPT one order above what
+>       * we'd normally give them (to stop a small guest claiming a huge
 > 
->      /*
-> -     * Building block for bdrv_block_status[_above]. The driver should
-> -     * answer only according to the current layer, and should not
-> -     * set BDRV_BLOCK_ALLOCATED, but may set BDRV_BLOCK_RAW.  See block.h
-> -     * for the meaning of _DATA, _ZERO, and _OFFSET_VALID.
-> +     * Building block for bdrv_block_status[_above] and
-> +     * bdrv_is_allocated[_above].  The driver should answer only
-> +     * according to the current layer, and should not set
-> +     * BDRV_BLOCK_ALLOCATED, but may set BDRV_BLOCK_RAW.  See block.h
-> +     * for the meaning of _DATA, _ZERO, and _OFFSET_VALID.  The block
-> +     * layer guarantees non-NULL pnum and file.
->       */
->      int64_t coroutine_fn (*bdrv_co_get_block_status)(BlockDriverState *bs,
->          int64_t sector_num, int nb_sectors, int *pnum,
-> diff --git a/block/io.c b/block/io.c
-> index 1e246315a7..e5a6f63eea 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -698,7 +698,6 @@ int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags flags)
->  {
->      int64_t target_sectors, ret, nb_sectors, sector_num = 0;
->      BlockDriverState *bs = child->bs;
-> -    BlockDriverState *file;
->      int n;
-> 
->      target_sectors = bdrv_nb_sectors(bs);
-> @@ -711,7 +710,7 @@ int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags flags)
->          if (nb_sectors <= 0) {
->              return 0;
->          }
-> -        ret = bdrv_get_block_status(bs, sector_num, nb_sectors, &n, &file);
-> +        ret = bdrv_get_block_status(bs, sector_num, nb_sectors, &n, NULL);
->          if (ret < 0) {
->              error_report("error getting block status at sector %" PRId64 ": %s",
->                           sector_num, strerror(-ret));
-> @@ -1800,8 +1799,9 @@ int64_t coroutine_fn bdrv_co_get_block_status_from_backing(BlockDriverState *bs,
->   * beyond the end of the disk image it will be clamped; if 'pnum' is set to
->   * the end of the image, then the returned value will include BDRV_BLOCK_EOF.
->   *
-> - * If returned value is positive and BDRV_BLOCK_OFFSET_VALID bit is set, 'file'
-> - * points to the BDS which the sector range is allocated in.
-> + * If returned value is positive, BDRV_BLOCK_OFFSET_VALID bit is set, and
-> + * 'file' is non-NULL, then '*file' points to the BDS which the sector range
-> + * is allocated in.
->   */
->  static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
->                                                       int64_t sector_num,
-> @@ -1811,16 +1811,19 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
->      int64_t total_sectors;
->      int64_t n;
->      int64_t ret, ret2;
-> +    BlockDriverState *local_file = NULL;
-> +    int local_pnum = 0;
 
-I don't quite see what the point of local_pnum is if we assert anyway
-that the real pnum is non-NULL.
+According to the content of qmp_query_memory_size_summary(), it's the
+good way to compute the memory size...
 
-> -    *file = NULL;
-> +    assert(pnum);
->      total_sectors = bdrv_nb_sectors(bs);
->      if (total_sectors < 0) {
-> -        return total_sectors;
-> +        ret = total_sectors;
-> +        goto early_out;
->      }
-> 
->      if (sector_num >= total_sectors || !nb_sectors) {
-> -        *pnum = 0;
-> -        return sector_num >= total_sectors ? BDRV_BLOCK_EOF : 0;
-> +        ret = sector_num >= total_sectors ? BDRV_BLOCK_EOF : 0;
-> +        goto early_out;
->      }
-> 
->      n = total_sectors - sector_num;
-> @@ -1829,30 +1832,30 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
->      }
-> 
->      if (!bs->drv->bdrv_co_get_block_status) {
-> -        *pnum = nb_sectors;
-> +        local_pnum = nb_sectors;
->          ret = BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
->          if (sector_num + nb_sectors == total_sectors) {
->              ret |= BDRV_BLOCK_EOF;
->          }
->          if (bs->drv->protocol_name) {
->              ret |= BDRV_BLOCK_OFFSET_VALID | (sector_num * BDRV_SECTOR_SIZE);
-> -            *file = bs;
-> +            local_file = bs;
->          }
-> -        return ret;
-> +        goto early_out;
->      }
-> 
->      bdrv_inc_in_flight(bs);
-> -    ret = bs->drv->bdrv_co_get_block_status(bs, sector_num, nb_sectors, pnum,
-> -                                            file);
-> +    ret = bs->drv->bdrv_co_get_block_status(bs, sector_num, nb_sectors,
-> +                                            &local_pnum, &local_file);
->      if (ret < 0) {
-> -        *pnum = 0;
-> +        local_pnum = 0;
->          goto out;
->      }
-> 
->      if (ret & BDRV_BLOCK_RAW) {
-> -        assert(ret & BDRV_BLOCK_OFFSET_VALID && *file);
-> -        ret = bdrv_co_get_block_status(*file, ret >> BDRV_SECTOR_BITS,
-> -                                       *pnum, pnum, file);
-> +        assert(ret & BDRV_BLOCK_OFFSET_VALID && local_file);
-> +        ret = bdrv_co_get_block_status(local_file, ret >> BDRV_SECTOR_BITS,
-> +                                       local_pnum, &local_pnum, &local_file);
->          goto out;
->      }
-> 
-> @@ -1870,14 +1873,13 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
->          }
->      }
-> 
-> -    if (*file && *file != bs &&
-> +    if (local_file && local_file != bs &&
->          (ret & BDRV_BLOCK_DATA) && !(ret & BDRV_BLOCK_ZERO) &&
->          (ret & BDRV_BLOCK_OFFSET_VALID)) {
-> -        BlockDriverState *file2;
->          int file_pnum;
-> 
-> -        ret2 = bdrv_co_get_block_status(*file, ret >> BDRV_SECTOR_BITS,
-> -                                        *pnum, &file_pnum, &file2);
-> +        ret2 = bdrv_co_get_block_status(local_file, ret >> BDRV_SECTOR_BITS,
-> +                                        local_pnum, &file_pnum, NULL);
->          if (ret2 >= 0) {
->              /* Ignore errors.  This is just providing extra information, it
->               * is useful but not necessary.
-> @@ -1892,17 +1894,22 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
->                  ret |= BDRV_BLOCK_ZERO;
->              } else {
->                  /* Limit request to the range reported by the protocol driver */
-> -                *pnum = file_pnum;
-> +                local_pnum = file_pnum;
->                  ret |= (ret2 & BDRV_BLOCK_ZERO);
->              }
->          }
->      }
-> 
-> -out:
-> + out:
-
-git grep tells me that the old style (unindented label, as opposed to
-indented by a single space) is a lot more common both within the block
-layer and across qemu as a whole.
-
->      bdrv_dec_in_flight(bs);
-> -    if (ret >= 0 && sector_num + *pnum == total_sectors) {
-> +    if (ret >= 0 && sector_num + local_pnum == total_sectors) {
->          ret |= BDRV_BLOCK_EOF;
->      }
-> + early_out:
-
-So it's better to change this one to match the old out: than the other
-way round.
-
-> +    *pnum = local_pnum;
-> +    if (file) {
-> +        *file = local_file;
-> +    }
->      return ret;
->  }
-
-Kevin
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
