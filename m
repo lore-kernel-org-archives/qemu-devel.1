@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e1r8w-0000ZW-AU
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 05:48:12 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1e1rDu-0001tL-VE
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 05:53:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e1r8q-0002eA-Di
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 05:48:06 -0400
-Date: Tue, 10 Oct 2017 11:47:38 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171010094738.GF4177@dhcp-200-186.str.redhat.com>
-References: <20170913181910.29688-1-mreitz@redhat.com>
-	<20170913181910.29688-11-mreitz@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1e1rDr-0006FD-Si
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 05:53:15 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:54380)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1e1rDr-0006EJ-Ic
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 05:53:11 -0400
+Received: by mail-wm0-x232.google.com with SMTP id i124so3548135wmf.3
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 02:53:09 -0700 (PDT)
+References: <CAFEAcA_qCmsekM+bQT8qa7hceSSm2vcoYs-eTzKyH_BOpiVVcw@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA_qCmsekM+bQT8qa7hceSSm2vcoYs-eTzKyH_BOpiVVcw@mail.gmail.com>
+Date: Tue, 10 Oct 2017 10:53:07 +0100
+Message-ID: <87zi8z9vng.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170913181910.29688-11-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 10/18] block/mirror: Make source the file
- child
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] tcg/translate-all.c:169: tb_lock: Assertion
+ `!have_tb_lock' failed when doing cpu_restore_state in usermode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,102 +30,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-Am 13.09.2017 um 20:19 hat Max Reitz geschrieben:
-> Regarding the source BDS, the mirror BDS is arguably a filter node.
-> Therefore, the source BDS should be its "file" child.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
-TODO: Justification why this doesn't break things like
-bdrv_is_allocated_above() that iterate through the backing chain.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
->  block/mirror.c             | 127 ++++++++++++++++++++++++++++++++++-----------
->  block/qapi.c               |  25 ++++++---
->  tests/qemu-iotests/141.out |   4 +-
->  3 files changed, 119 insertions(+), 37 deletions(-)
-> 
-> diff --git a/block/qapi.c b/block/qapi.c
-> index 7fa2437923..ee792d0cbc 100644
-> --- a/block/qapi.c
-> +++ b/block/qapi.c
-> @@ -147,9 +147,13 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
->  
->          /* Skip automatically inserted nodes that the user isn't aware of for
->           * query-block (blk != NULL), but not for query-named-block-nodes */
-> -        while (blk && bs0->drv && bs0->implicit) {
-> -            bs0 = backing_bs(bs0);
-> -            assert(bs0);
-> +        while (blk && bs0 && bs0->drv && bs0->implicit) {
-> +            if (bs0->backing) {
-> +                bs0 = backing_bs(bs0);
-> +            } else {
-> +                assert(bs0->file);
-> +                bs0 = bs0->file->bs;
-> +            }
->          }
->      }
+> Running the test program
+> http://people.linaro.org/~peter.maydell/thumb-over-page
+> (source at http://people.linaro.org/~peter.maydell/thumb-over-page.c)
+> in the usermode emulator:
+>  ./build/x86/arm-linux-user/qemu-arm
+> ~/linaro/qemu-misc-tests/thumb-over-page
 
-Maybe backing_bs() should skip filters? If so, need to show that all
-existing users of backing_bs() really want to skip filters. If not,
-explain why the missing backing_bs() callers don't need it (I'm quite
-sure that some do).
+Does this fail when run via system mode as well?
 
-Also, if we attack this at the backing_bs() level, we need to audit
-code that it doesn't directly use bs->backing.
+>
+> results in an assertion failure:
+> write_insns1: T32 insn crossing page boundary
+> Calling into buffer at 0x6fff9
+> qemu-arm: /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/translate=
+-all.c:169:
+> tb_lock: Assertion `!have_tb_lock' failed.
+> qemu-arm: /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/translate=
+-all.c:169:
+> tb_lock: Assertion `!have_tb_lock' failed.
+> Segmentation fault (core dumped)
+>
+> It ought to exit successfully:
+> write_insns1: T32 insn crossing page boundary
+> Calling into buffer at 0x6fff9
+> got sig 11
+> fault pc 0x6fffe r0 0x1
+> e104462:xenial:qemu$
+>
+> (so this is a regression).
 
-> @@ -1135,44 +1146,88 @@ static const BlockJobDriver commit_active_job_driver = {
->      .drain                  = mirror_drain,
->  };
->  
-> +static void source_child_inherit_fmt_options(int *child_flags,
-> +                                             QDict *child_options,
-> +                                             int parent_flags,
-> +                                             QDict *parent_options)
-> +{
-> +    child_backing.inherit_options(child_flags, child_options,
-> +                                  parent_flags, parent_options);
-> +}
-> +
-> +static char *source_child_get_parent_desc(BdrvChild *c)
-> +{
-> +    return child_backing.get_parent_desc(c);
-> +}
-> +
-> +static void source_child_cb_drained_begin(BdrvChild *c)
-> +{
-> +    BlockDriverState *bs = c->opaque;
-> +    MirrorBDSOpaque *s = bs->opaque;
-> +
-> +    if (s && s->job) {
-> +        block_job_drained_begin(&s->job->common);
-> +    }
-> +    bdrv_drained_begin(bs);
-> +}
-> +
-> +static void source_child_cb_drained_end(BdrvChild *c)
-> +{
-> +    BlockDriverState *bs = c->opaque;
-> +    MirrorBDSOpaque *s = bs->opaque;
-> +
-> +    if (s && s->job) {
-> +        block_job_drained_end(&s->job->common);
-> +    }
-> +    bdrv_drained_end(bs);
-> +}
-> +
-> +static BdrvChildRole source_child_role = {
-> +    .inherit_options    = source_child_inherit_fmt_options,
-> +    .get_parent_desc    = source_child_get_parent_desc,
-> +    .drained_begin      = source_child_cb_drained_begin,
-> +    .drained_end        = source_child_cb_drained_end,
-> +};
+OK I'll have a look at how we broke this.
 
-Wouldn't it make much more sense to use a standard child role and just
-implement BlockDriver callbacks for .bdrv_drained_begin/end? It seems
-that master still only has .bdrv_co_drain (which is begin), but one of
-Manos' pending series adds the missing end callback.
+>
+> Here's a backtrace:
+>
+> qemu-arm: /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/translate=
+-all.c:169:
+> tb_lock: Assertion `!have_tb_lock' failed.
+>
+> Thread 1 "qemu-arm" received signal SIGABRT, Aborted.
+> 0x00007ffff6851428 in __GI_raise (sig=3Dsig@entry=3D6) at
+> ../sysdeps/unix/sysv/linux/raise.c:54
+> 54      ../sysdeps/unix/sysv/linux/raise.c: No such file or directory.
+> (gdb) bt
+> #0  0x00007ffff6851428 in __GI_raise (sig=3Dsig@entry=3D6) at
+> ../sysdeps/unix/sysv/linux/raise.c:54
+> #1  0x00007ffff685302a in __GI_abort () at abort.c:89
+> #2  0x00007ffff6849bd7 in __assert_fail_base (fmt=3D<optimised out>,
+>     assertion=3Dassertion@entry=3D0x55555570a0ae "!have_tb_lock",
+>     file=3Dfile@entry=3D0x55555570a020
+> "/home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/translate-all.c",
+> line=3Dline@entry=3D169,
+>     function=3Dfunction@entry=3D0x55555570a208 <__PRETTY_FUNCTION__.27063>
+> "tb_lock") at assert.c:92
+> #3  0x00007ffff6849c82 in __GI___assert_fail (assertion=3D0x55555570a0ae
+> "!have_tb_lock",
+>     file=3D0x55555570a020
+> "/home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/translate-all.c",
+>     line=3D169, function=3D0x55555570a208 <__PRETTY_FUNCTION__.27063>
+> "tb_lock") at assert.c:101
+> #4  0x00005555555cd50c in tb_lock ()
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/translate-al=
+l.c:169
+> #5  0x00005555555cda34 in cpu_restore_state (cpu=3D0x555557a1d930,
+> retaddr=3D93824992991167)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/translate-al=
+l.c:353
+> #6  0x00005555555d0765 in handle_cpu_signal (pc=3D93824992991165,
+> address=3D458752, is_write=3D0,
+>     old_set=3D0x7fffffffd2a8) at
+> /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/user-exec.c:125
+> #7  0x00005555555d0808 in cpu_arm_signal_handler (host_signum=3D11,
+> pinfo=3D0x7fffffffd2b0,
+>     puc=3D0x7fffffffd180) at
+> /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/user-exec.c:230
+> #8  0x00005555555fce44 in host_signal_handler (host_signum=3D11,
+> info=3D0x7fffffffd2b0,
+>     puc=3D0x7fffffffd180) at
+> /home/petmay01/linaro/qemu-from-laptop/qemu/linux-user/signal.c:646
+> #9  <signal handler called>
+> #10 0x000055555560d7bd in lduw_he_p (ptr=3D0x7ffefee1b000)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/include/qemu/bswap.h:3=
+17
+> #11 0x000055555560d836 in lduw_le_p (ptr=3D0x7ffefee1b000)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/include/qemu/bswap.h:3=
+59
+> #12 0x000055555561f868 in cpu_lduw_code (env=3D0x555557a25bc0, ptr=3D4587=
+52)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/include/exec/cpu_ldst_=
+useronly_template.h:68
+> #13 0x000055555561f8fd in arm_lduw_code (env=3D0x555557a25bc0,
+> addr=3D458752, sctlr_b=3Dfalse)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/arm_ldst.h:=
+50
+> #14 0x000055555563c059 in disas_thumb2_insn (env=3D0x555557a25bc0,
+> s=3D0x7fffffffd9e0, insn_hw1=3D61952)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/translate.c=
+:9739
+> #15 0x00005555556416c7 in disas_thumb_insn (env=3D0x555557a25bc0,
+> s=3D0x7fffffffd9e0)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/translate.c=
+:11821
+> #16 0x0000555555641f3f in thumb_tr_translate_insn
+> (dcbase=3D0x7fffffffd9e0, cpu=3D0x555557a1d930)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/translate.c=
+:12104
+> #17 0x00005555555d0218 in translator_loop (ops=3D0x555555982480
+> <thumb_translator_ops>,
+>     db=3D0x7fffffffd9e0, cpu=3D0x555557a1d930, tb=3D0x555555a21cc0
+> <static_code_gen_buffer+206880>)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/translator.c=
+:104
+> #18 0x0000555555642446 in gen_intermediate_code (cpu=3D0x555557a1d930,
+>     tb=3D0x555555a21cc0 <static_code_gen_buffer+206880>)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/translate.c=
+:12300
+> #19 0x00005555555ceac0 in tb_gen_code (cpu=3D0x555557a1d930, pc=3D458750,
+> cs_base=3D0, flags=3D524417,
+>     cflags=3D0) at
+> /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/translate-all.c:1283
+> #20 0x00005555555cba65 in tb_find (cpu=3D0x555557a1d930,
+>     last_tb=3D0x555555a21bc0 <static_code_gen_buffer+206624>, tb_exit=3D1)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/cpu-exec.c:4=
+02
+> #21 0x00005555555cc18a in cpu_exec (cpu=3D0x555557a1d930)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/cpu-exec.c:7=
+10
+> #22 0x00005555555d36ea in cpu_loop (env=3D0x555557a25bc0)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/linux-user/main.c:570
+> #23 0x00005555555d59f9 in main (argc=3D2, argv=3D0x7fffffffe458,
+> envp=3D0x7fffffffe470)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/linux-user/main.c:4858
+>
+> This is probably partly because of the silly way we handle guest
+> faults trying to read code in the translator.
+>
+> thanks
+> -- PMM
 
-Kevin
+
+--
+Alex Benn=C3=A9e
