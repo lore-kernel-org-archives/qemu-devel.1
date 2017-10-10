@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=449813866=anthony.perard@citrix.com>)
-	id 1e2052-0005DI-Ru
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:20:41 -0400
+	(envelope-from <jsnow@redhat.com>) id 1e208X-0006jD-F2
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:24:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=449813866=anthony.perard@citrix.com>)
-	id 1e2051-00013b-3E
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:20:40 -0400
-Received: from smtp.citrix.com ([66.165.176.89]:30522)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=449813866=anthony.perard@citrix.com>)
-	id 1e2050-00012u-IL
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:20:38 -0400
-Date: Tue, 10 Oct 2017 12:48:06 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20171010114806.GG1771@perard.uk.xensource.com>
-References: <1507564902-9000-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1507564902-9000-4-git-send-email-ian.jackson@eu.citrix.com>
+	(envelope-from <jsnow@redhat.com>) id 1e208W-0002Zb-Cr
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:24:17 -0400
+References: <20171004020048.26379-1-eblake@redhat.com>
+	<20171004020048.26379-2-eblake@redhat.com>
+	<20171010135940.GJ4177@dhcp-200-186.str.redhat.com>
+	<67e98ca7-e861-a646-b701-b8f7453f2951@redhat.com>
+	<46e7ca23-fb38-7620-90fb-04982e5b9ad0@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <06af49fb-6e94-d8c0-3701-7579e55c92a5@redhat.com>
+Date: Tue, 10 Oct 2017 15:24:02 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1507564902-9000-4-git-send-email-ian.jackson@eu.citrix.com>
-Subject: Re: [Qemu-devel] [PATCH 3/8] xen: defer call to xen_restrict until
- just before os_setup_post
+In-Reply-To: <46e7ca23-fb38-7620-90fb-04982e5b9ad0@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 01/23] block: Allow NULL file for
+ bdrv_get_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ian Jackson <ian.jackson@eu.citrix.com>
-Cc: qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org
+To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: famz@redhat.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Mon, Oct 09, 2017 at 05:01:37PM +0100, Ian Jackson wrote:
-> We need to restrict *all* the control fds that qemu opens.  Looking in
-> /proc/PID/fd shows there are many; their allocation seems scattered
-> throughout Xen support code in qemu.
-> 
-> We must postpone the restrict call until roughly the same time as qemu
-> changes its uid, chroots (if applicable), and so on.
-> 
-> There doesn't seem to be an appropriate hook already.  The RunState
-> change hook fires at different times depending on exactly what mode
-> qemu is operating in.
-> 
-> And it appears that no-one but the Xen code wants a hook at this phase
-> of execution.  So, introduce a bare call to a new function
-> xen_setup_post, just before os_setup_post.  Also provide the
-> appropriate stub for when Xen compilation is disabled.
-> 
-> We do the restriction before rather than after os_setup_post, because
-> xen_restrict may need to open /dev/null, and os_setup_post might have
-> called chroot.
-> 
-> Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 
--- 
-Anthony PERARD
+On 10/10/2017 03:00 PM, Eric Blake wrote:
+> On 10/10/2017 09:43 AM, Eric Blake wrote:
+> 
+>>>> ---
+>>>> v5: use second label for cleaner exit logic [John], use local_pnum
+>>
+>>>> @@ -1811,16 +1811,19 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
+>>>>      int64_t total_sectors;
+>>>>      int64_t n;
+>>>>      int64_t ret, ret2;
+>>>> +    BlockDriverState *local_file = NULL;
+>>>> +    int local_pnum = 0;
+>>>
+>>> I don't quite see what the point of local_pnum is if we assert anyway
+>>> that the real pnum is non-NULL.
+>>
+>> I did it in parallel with fallout from John's review on v4:
+>> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg06958.html
+>>
+>> but since it wasn't specifically asked for, and is now getting
+>> questions, I'm fine with not having it in v6.
+> 
+> Okay, I re-read v4, and here's the comment (on 21/23) that led to my
+> experiment in v5 patch 1 with local_pnum:
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg00293.html
+> 
+> and I did argue:
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg00311.html
+> 
+
+Well, Kevin's the boss :D
+
+>>> Is it asking for trouble to be updating pnum here before we undo our
+>>> alignment corrections? For readability reasons and preventing an
+>>> accidental context-based oopsy-daisy.
+>>
+>> As in, write the code to make all calculations in a temporary, and then
+>> assign *pnum only at the end?  I suppose I can tweak the code along
+>> those lines, but I'm not sure it will make the end result any more legible.
+> 
