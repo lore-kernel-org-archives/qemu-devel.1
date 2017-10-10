@@ -1,26 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1e217r-0001di-Nd
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 16:27:41 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2191-0002Nu-F8
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 16:28:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1e217o-0000h4-IF
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 16:27:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60546)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1e217o-0000gk-9I
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 16:27:36 -0400
-Date: Tue, 10 Oct 2017 14:27:06 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20171010142706.360019aa@t450s.home>
-In-Reply-To: <20171010140334.8231-7-kraxel@redhat.com>
-References: <20171010140334.8231-1-kraxel@redhat.com>
-	<20171010140334.8231-7-kraxel@redhat.com>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e218y-00019z-9V
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 16:28:51 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38720)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1e218y-00019k-1R
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 16:28:48 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9AKSRG2028378
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 16:28:44 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dh2s6r5qw-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 16:28:44 -0400
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Tue, 10 Oct 2017 16:28:43 -0400
+References: <20171009225623.29232-1-marcandre.lureau@redhat.com>
+	<20171009225623.29232-30-marcandre.lureau@redhat.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Tue, 10 Oct 2017 16:28:40 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RfC PATCH 6/6] vfio/display: add dmabuf support
- (v15)
+In-Reply-To: <20171009225623.29232-30-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <c7f746e1-2cef-899c-af5c-c5b949d732c7@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 29/42] tpm-be: update optional function
+ pointers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,280 +42,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Tina Zhang <tina.zhang@intel.com>, intel-gvt-dev@lists.freedesktop.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: amarnath.valluri@intel.com
 
-On Tue, 10 Oct 2017 16:03:34 +0200
-Gerd Hoffmann <kraxel@redhat.com> wrote:
+On 10/09/2017 06:56 PM, Marc-Andr=C3=A9 Lureau wrote:
+> QEMU code doesn't generally have assert() for mandatory
+> callbacks/function pointers, probably because the crash is pretty
+> obvious. Document the methods instead of going into the code.
+>
+> Make get_tpm_options() mandatory to implement (since all
+> backend implementation have it).
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-> Wire up dma-buf based display.
-> 
-> TODO: drop debug code and messages.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
->  hw/vfio/pci.h     |  12 ++++
->  hw/vfio/display.c | 183 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 193 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-> index c03c4b3eb0..1ab6f6abde 100644
-> --- a/hw/vfio/pci.h
-> +++ b/hw/vfio/pci.h
-> @@ -19,6 +19,7 @@
->  #include "qemu/event_notifier.h"
->  #include "qemu/queue.h"
->  #include "qemu/timer.h"
-> +#include "ui/console.h"
->  
->  #define PCI_ANY_ID (~0)
->  
-> @@ -98,6 +99,14 @@ typedef struct VFIOMSIXInfo {
->      unsigned long *pending;
->  } VFIOMSIXInfo;
->  
-> +typedef struct VFIODMABuf VFIODMABuf;
-> +struct VFIODMABuf {
-> +    QemuDmaBuf  buf;
-> +    uint32_t pos_x, pos_y;
-> +    int dmabuf_id;
-> +    QTAILQ_ENTRY(VFIODMABuf) next;
-> +};
-
-Not really pci specific, maybe common.h?
-
-> +
->  typedef struct VFIOPCIDevice {
->      PCIDevice pdev;
->      VFIODevice vbasedev;
-> @@ -152,6 +161,9 @@ typedef struct VFIOPCIDevice {
->      uint32_t region_size;
->      void *region_mmap;
->      DisplaySurface *region_surface;
-> +    QTAILQ_HEAD(, VFIODMABuf) dmabufs;
-> +    VFIODMABuf *primary;
-> +    VFIODMABuf *cursor;
-
-All of these part of a VFIODisplay struct, dynamically allocated?
-
->  } VFIOPCIDevice;
->  
->  uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
-> diff --git a/hw/vfio/display.c b/hw/vfio/display.c
-> index 8211bcc6d4..f45fd1fb98 100644
-> --- a/hw/vfio/display.c
-> +++ b/hw/vfio/display.c
-> @@ -18,6 +18,186 @@
->  #include "ui/console.h"
->  #include "pci.h"
->  
-> +/* FIXME */
-> +#ifndef DRM_PLANE_TYPE_PRIMARY
-> +# define DRM_PLANE_TYPE_PRIMARY 1
-> +# define DRM_PLANE_TYPE_CURSOR  2
-> +#endif
-> +
-> +static VFIODMABuf *vfio_display_get_dmabuf(VFIOPCIDevice *vdev,
-> +                                           uint32_t plane_type)
-> +{
-> +    struct vfio_device_gfx_plane_info plane;
-> +    struct vfio_device_gfx_dmabuf_fd gfd;
-> +    VFIODMABuf *dmabuf;
-> +    static int errcnt;
-> +    int ret;
-> +
-> +    memset(&plane, 0, sizeof(plane));
-> +    plane.argsz = sizeof(plane);
-> +    plane.flags = VFIO_GFX_PLANE_TYPE_DMABUF;
-> +    plane.drm_plane_type = plane_type;
-> +    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_QUERY_GFX_PLANE, &plane);
-> +    if (ret < 0) {
-> +        fprintf(stderr, "(%d) ioctl VFIO_DEVICE_QUERY_GFX_PLANE(%s): %s\r",
-> +                ++errcnt,
-> +                (plane_type == DRM_PLANE_TYPE_PRIMARY) ? "primary" : "cursor",
-> +                strerror(errno));
-> +        fflush(stderr);
-> +        return NULL;
-> +    }
-> +    if (!plane.drm_format || !plane.size) {
-> +        fprintf(stderr, "(%d) %s plane not initialized by guest\r",
-> +                ++errcnt,
-> +                (plane_type == DRM_PLANE_TYPE_PRIMARY) ? "primary" : "cursor");
-> +        fflush(stderr);
-> +        return NULL;
-> +    }
-
-Assuming stderr is part of the to-be-removed debugging...
-
-Looks pretty straight forward otherwise.  I like the LRU dmabuf
-freeing, but is it mostly for validating the interface?  My impression
-is that we'd reach a steady state with a single plane and single
-cursor so I wonder if keeping that cache really provides a noticeable
-benefit.  Perhaps for a Linux guest switching between vt and graphics
-mode?  It also seems like the primary and cursor will be fighting for
-the head of the list, so if we keep lists, maybe they should be per
-plane type.
-
-This uses the x-display option for now, how do we move past that to get
-automatic configuration?  Thanks,
-
-Alex
-
-> +
-> +    QTAILQ_FOREACH(dmabuf, &vdev->dmabufs, next) {
-> +        if (dmabuf->dmabuf_id == plane.dmabuf_id) {
-> +            /* found in list, move to head, return it */
-> +            QTAILQ_REMOVE(&vdev->dmabufs, dmabuf, next);
-> +            QTAILQ_INSERT_HEAD(&vdev->dmabufs, dmabuf, next);
-> +            if (plane_type == DRM_PLANE_TYPE_CURSOR) {
-> +                dmabuf->pos_x      = plane.x_pos;
-> +                dmabuf->pos_y      = plane.y_pos;
-> +            }
-> +#if 1
-> +            if (plane.width != dmabuf->buf.width ||
-> +                plane.height != dmabuf->buf.height) {
-> +                fprintf(stderr, "%s: cached dmabuf mismatch: id %d, "
-> +                        "kernel %dx%d, cached %dx%d, plane %s\n",
-> +                        __func__, plane.dmabuf_id,
-> +                        plane.width, plane.height,
-> +                        dmabuf->buf.width, dmabuf->buf.height,
-> +                        (plane_type == DRM_PLANE_TYPE_PRIMARY)
-> +                        ? "primary" : "cursor");
-> +                abort();
-> +            }
-> +#endif
-> +            return dmabuf;
-> +        }
-> +    }
-> +
-> +    memset(&gfd, 0, sizeof(gfd));
-> +    gfd.argsz = sizeof(gfd);
-> +    gfd.dmabuf_id = plane.dmabuf_id;
-> +    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_GET_GFX_DMABUF, &gfd);
-> +    if (ret < 0) {
-> +        fprintf(stderr, "(%d) ioctl VFIO_DEVICE_GET_GFX_DMABUF: %s\r",
-> +                ++errcnt, strerror(errno));
-> +        return NULL;
-> +    }
-> +
-> +    fprintf(stderr, "%s: new dmabuf: id %d, res %dx%d, "
-> +            "format %c%c%c%c, plane %s, fd %d, hot +%d+%d\n",
-> +            __func__, plane.dmabuf_id,
-> +            plane.width, plane.height,
-> +            (plane.drm_format >>  0) & 0xff,
-> +            (plane.drm_format >>  8) & 0xff,
-> +            (plane.drm_format >> 16) & 0xff,
-> +            (plane.drm_format >> 24) & 0xff,
-> +            (plane_type == DRM_PLANE_TYPE_PRIMARY) ? "primary" : "cursor",
-> +            gfd.dmabuf_fd,
-> +            plane.x_pos, plane.y_pos);
-> +
-> +    dmabuf = g_new0(VFIODMABuf, 1);
-> +    dmabuf->dmabuf_id  = plane.dmabuf_id;
-> +    dmabuf->buf.width  = plane.width;
-> +    dmabuf->buf.height = plane.height;
-> +    dmabuf->buf.stride = plane.stride;
-> +    dmabuf->buf.fourcc = plane.drm_format;
-> +    dmabuf->buf.fd     = gfd.dmabuf_fd;
-> +    if (plane_type == DRM_PLANE_TYPE_CURSOR) {
-> +        dmabuf->pos_x      = plane.x_pos;
-> +        dmabuf->pos_y      = plane.y_pos;
-> +    }
-> +
-> +    QTAILQ_INSERT_HEAD(&vdev->dmabufs, dmabuf, next);
-> +    return dmabuf;
-> +}
-> +
-> +static void vfio_display_free_dmabufs(VFIOPCIDevice *vdev)
-> +{
-> +    char log[128]; int pos = 0;
-> +    VFIODMABuf *dmabuf, *tmp;
-> +    uint32_t keep = 8;
-> +
-> +    QTAILQ_FOREACH_SAFE(dmabuf, &vdev->dmabufs, next, tmp) {
-> +        if (keep > 0) {
-> +            pos += sprintf(log + pos, " %d", dmabuf->buf.fd);
-> +            keep--;
-> +            continue;
-> +        }
-> +        assert(dmabuf != vdev->primary);
-> +        QTAILQ_REMOVE(&vdev->dmabufs, dmabuf, next);
-> +        fprintf(stderr, "%s: free dmabuf: fd %d (keep%s)\n",
-> +                __func__, dmabuf->buf.fd, log);
-> +        dpy_gl_release_dmabuf(vdev->display_con, &dmabuf->buf);
-> +        close(dmabuf->buf.fd);
-> +        g_free(dmabuf);
-> +    }
-> +}
-> +
-> +static void vfio_display_dmabuf_update(void *opaque)
-> +{
-> +    VFIOPCIDevice *vdev = opaque;
-> +    VFIODMABuf *primary, *cursor;
-> +    bool free_bufs = false;
-> +
-> +    primary = vfio_display_get_dmabuf(vdev, DRM_PLANE_TYPE_PRIMARY);
-> +    if (primary == NULL) {
-> +        return;
-> +    }
-> +
-> +    if (vdev->primary != primary) {
-> +        vdev->primary = primary;
-> +        qemu_console_resize(vdev->display_con,
-> +                            primary->buf.width, primary->buf.height);
-> +        dpy_gl_scanout_dmabuf(vdev->display_con,
-> +                              &primary->buf);
-> +        free_bufs = true;
-> +    }
-> +
-> +    cursor = vfio_display_get_dmabuf(vdev, DRM_PLANE_TYPE_CURSOR);
-> +    if (vdev->cursor != cursor) {
-> +        vdev->cursor = cursor;
-> +        free_bufs = true;
-> +    }
-> +    if (cursor != NULL) {
-> +        dpy_gl_cursor_dmabuf(vdev->display_con,
-> +                             &cursor->buf,
-> +                             cursor->pos_x,
-> +                             cursor->pos_y);
-> +    }
-> +
-> +    dpy_gl_update(vdev->display_con, 0, 0,
-> +                  primary->buf.width, primary->buf.height);
-> +
-> +    if (free_bufs) {
-> +        vfio_display_free_dmabufs(vdev);
-> +    }
-> +}
-> +
-> +static const GraphicHwOps vfio_display_dmabuf_ops = {
-> +    .gfx_update = vfio_display_dmabuf_update,
-> +};
-> +
-> +static int vfio_display_dmabuf_init(VFIOPCIDevice *vdev, Error **errp)
-> +{
-> +    if (!display_opengl) {
-> +        error_setg(errp, "vfio-display-dmabuf: opengl not available");
-> +        return -1;
-> +    }
-> +
-> +    vdev->display_con = graphic_console_init(DEVICE(vdev), 0,
-> +                                             &vfio_display_dmabuf_ops,
-> +                                             vdev);
-> +    /* TODO: disable hotplug (there is no graphic_console_close) */
-> +    return 0;
-> +}
-> +
->  /* ---------------------------------------------------------------------- */
->  
->  static void vfio_display_region_update(void *opaque)
-> @@ -121,8 +301,7 @@ int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp)
->      probe.flags = VFIO_GFX_PLANE_TYPE_PROBE | VFIO_GFX_PLANE_TYPE_DMABUF;
->      ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_QUERY_GFX_PLANE, &probe);
->      if (ret == 0) {
-> -        error_setg(errp, "vfio-display: dmabuf support not implemented yet");
-> -        return -1;
-> +        return vfio_display_dmabuf_init(vdev, errp);
->      }
->  
->      memset(&probe, 0, sizeof(probe));
+>   include/sysemu/tpm_backend.h | 5 ++++-
+>   backends/tpm.c               | 9 +--------
+>   2 files changed, 5 insertions(+), 9 deletions(-)
+>
+> diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.=
+h
+> index a893e586ae..594bb50782 100644
+> --- a/include/sysemu/tpm_backend.h
+> +++ b/include/sysemu/tpm_backend.h
+> @@ -66,15 +66,18 @@ struct TPMBackendClass {
+>
+>       TPMBackend *(*create)(QemuOpts *opts, const char *id);
+>
+> -    /* start up the TPM on the backend */
+> +    /* start up the TPM on the backend - optional */
+>       int (*startup_tpm)(TPMBackend *t);
+>
+> +    /* optional */
+>       void (*reset)(TPMBackend *t);
+>
+>       void (*cancel_cmd)(TPMBackend *t);
+>
+> +    /* optional */
+>       bool (*get_tpm_established_flag)(TPMBackend *t);
+>
+> +    /* optional */
+>       int (*reset_tpm_established_flag)(TPMBackend *t, uint8_t locty);
+>
+>       TPMVersion (*get_tpm_version)(TPMBackend *t);
+> diff --git a/backends/tpm.c b/backends/tpm.c
+> index 7e636fbc7a..7777467c44 100644
+> --- a/backends/tpm.c
+> +++ b/backends/tpm.c
+> @@ -33,7 +33,6 @@ static void tpm_backend_worker_thread(gpointer data, =
+gpointer user_data)
+>       TPMBackend *s =3D TPM_BACKEND(user_data);
+>       TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
+>
+> -    assert(k->handle_request !=3D NULL);
+>       k->handle_request(s, (TPMBackendCmd *)data);
+>
+>       qemu_bh_schedule(s->bh);
+> @@ -114,8 +113,6 @@ void tpm_backend_cancel_cmd(TPMBackend *s)
+>   {
+>       TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
+>
+> -    assert(k->cancel_cmd);
+> -
+>       k->cancel_cmd(s);
+>   }
+>
+> @@ -139,8 +136,6 @@ TPMVersion tpm_backend_get_tpm_version(TPMBackend *=
+s)
+>   {
+>       TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
+>
+> -    assert(k->get_tpm_version);
+> -
+>       return k->get_tpm_version(s);
+>   }
+>
+> @@ -152,9 +147,7 @@ TPMInfo *tpm_backend_query_tpm(TPMBackend *s)
+>
+>       info->id =3D g_strdup(s->id);
+>       info->model =3D tic->model;
+> -    if (k->get_tpm_options) {
+> -        info->options =3D k->get_tpm_options(s);
+> -    }
+> +    info->options =3D k->get_tpm_options(s);
+>
+>       return info;
+>   }
