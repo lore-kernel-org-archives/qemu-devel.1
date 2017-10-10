@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e1kbf-0002iM-AQ
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 22:49:27 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e1kdd-0004bl-3l
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 22:51:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e1kbY-00022C-WA
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 22:49:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37056)
+	(envelope-from <ehabkost@redhat.com>) id 1e1kdA-0004An-QP
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 22:51:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60864)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e1kbY-00020C-Gk
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 22:49:12 -0400
-Date: Mon, 9 Oct 2017 23:49:07 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e1kdA-00049x-Ce
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 22:50:52 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2C32046289
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 02:50:51 +0000 (UTC)
+Date: Mon, 9 Oct 2017 23:50:49 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171010024907.GZ4015@localhost.localdomain>
+Message-ID: <20171010025049.GA4015@localhost.localdomain>
 References: <20171005172013.3098-1-ehabkost@redhat.com>
-	<20171005172013.3098-3-ehabkost@redhat.com>
-	<7af19e5a-702e-fd41-951b-47a542269929@redhat.com>
+	<20171005172013.3098-4-ehabkost@redhat.com>
+	<cf1d369d-6c59-8513-2662-ca10c58c517c@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <7af19e5a-702e-fd41-951b-47a542269929@redhat.com>
+In-Reply-To: <cf1d369d-6c59-8513-2662-ca10c58c517c@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] scripts: Remove debug parameter
- from QEMUMonitorProtocol
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] scripts: Remove debug parameter
+ from QEMUMachine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,194 +37,123 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>
-Cc: qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <crosa@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-On Sat, Oct 07, 2017 at 10:26:14AM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
+On Sat, Oct 07, 2017 at 10:34:57AM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
 > Dne 5.10.2017 v 19:20 Eduardo Habkost napsal(a):
-> > Use logging module for the QMP debug messages.  The only scripts
-> > that set debug=3DTrue are iotests.py and guestperf/engine.py, and
-> > they already call logging.basicConfig() to set up logging.
+> > All scripts that use the QEMUMachine and QEMUQtestMachine classes
+> > (device-crash-test, tests/migration/*, iotests.py, basevm.py)
+> > already configure logging.
 > >=20
-> > Scripts that don't configure logging are safe as long as they
-> > don't need debugging output, because debug messages don't trigger
-> > the "No handlers could be found for logger" message from the
-> > Python logging module.
+> > The basicConfig() call inside QEMUMachine.__init__() is being
+> > kept just to make sure a script would still work if it didn't
+> > configure logging.
 > >=20
-> > Scripts that already configure logging but don't use debug=3DTrue
-> > (e.g. scripts/vm/basevm.py) will get QMP debugging enabled for
-> > free.
-> >=20
-> > Cc: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>
-> > Cc: Fam Zheng <famz@redhat.com>
-> > Cc: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
 > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > > ---
-> > Changes v1 -> v2:
-> > * Actually remove debug parameter from method definition
-> >   (Fam Zheng)
-> > * Fix "<<<" vs ">>>" confusion
-> >   (Fam Zheng)
-> > * Remove "import sys" line
-> >   (Luk=C3=A1=C5=A1 Doktor)
-> > ---
-> >  scripts/qemu.py    |  3 +--
-> >  scripts/qmp/qmp.py | 16 +++++++---------
-> >  2 files changed, 8 insertions(+), 11 deletions(-)
+> >  scripts/qemu.py                     | 6 ++----
+> >  tests/migration/guestperf/engine.py | 6 ++----
+> >  tests/qemu-iotests/iotests.py       | 2 --
+> >  3 files changed, 4 insertions(+), 10 deletions(-)
 > >=20
 > > diff --git a/scripts/qemu.py b/scripts/qemu.py
-> > index c9a106fbce..f6d2e68627 100644
+> > index f6d2e68627..9bfdf6d37d 100644
 > > --- a/scripts/qemu.py
 > > +++ b/scripts/qemu.py
-> > @@ -177,8 +177,7 @@ class QEMUMachine(object):
+> > @@ -54,7 +54,7 @@ class QEMUMachine(object):
 > > =20
-> >      def _pre_launch(self):
-> >          self._qmp =3D qmp.qmp.QEMUMonitorProtocol(self._monitor_addr=
-ess,
-> > -                                                server=3DTrue,
-> > -                                                debug=3Dself._debug)
-> > +                                                server=3DTrue)
+> >      def __init__(self, binary, args=3DNone, wrapper=3DNone, name=3DN=
+one,
+> >                   test_dir=3D"/var/tmp", monitor_address=3DNone,
+> > -                 socket_scm_helper=3DNone, debug=3DFalse):
+> > +                 socket_scm_helper=3DNone):
+> >          '''
+> >          Initialize a QEMUMachine
 > > =20
-> >      def _post_launch(self):
-> >          self._qmp.accept()
-> > diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
-> > index ef12e8a1a0..07c9632e9e 100644
-> > --- a/scripts/qmp/qmp.py
-> > +++ b/scripts/qmp/qmp.py
-> > @@ -11,7 +11,7 @@
-> >  import json
-> >  import errno
-> >  import socket
-> > -import sys
-> > +import logging
-> > =20
-> > =20
-> >  class QMPError(Exception):
-> > @@ -32,12 +32,14 @@ class QMPTimeoutError(QMPError):
-> > =20
-> >  class QEMUMonitorProtocol(object):
-> > =20
-> > +    #: Logger object for debugging messages
-> > +    logger =3D logging.getLogger('QMP')
-> >      #: Socket's error class
-> >      error =3D socket.error
-> >      #: Socket's timeout
-> >      timeout =3D socket.timeout
-> > =20
-> > -    def __init__(self, address, server=3DFalse, debug=3DFalse):
-> > +    def __init__(self, address, server=3DFalse):
-> >          """
-> >          Create a QEMUMonitorProtocol class.
-> > =20
-> > @@ -51,7 +53,6 @@ class QEMUMonitorProtocol(object):
-> >          """
-> >          self.__events =3D []
-> >          self.__address =3D address
+> > @@ -65,7 +65,6 @@ class QEMUMachine(object):
+> >          @param test_dir: where to create socket and log file
+> >          @param monitor_address: address for QMP monitor
+> >          @param socket_scm_helper: helper program, required for send_=
+fd_scm()"
+> > -        @param debug: enable debug mode
+> >          @note: Qemu process is not started until launch() is used.
+> >          '''
+> >          if args is None:
+> > @@ -85,12 +84,11 @@ class QEMUMachine(object):
+> >          self._events =3D []
+> >          self._iolog =3D None
+> >          self._socket_scm_helper =3D socket_scm_helper
 > > -        self._debug =3D debug
-> >          self.__sock =3D self.__get_sock()
-> >          self.__sockfile =3D None
-> >          if server:
-> > @@ -83,8 +84,7 @@ class QEMUMonitorProtocol(object):
-> >                  return
-> >              resp =3D json.loads(data)
-> >              if 'event' in resp:
-> > -                if self._debug:
-> > -                    print >>sys.stderr, "QMP:<<< %s" % resp
-> > +                self.logger.debug("<<< %s", resp)
-> >                  self.__events.append(resp)
-> >                  if not only_event:
-> >                      continue
-> > @@ -164,8 +164,7 @@ class QEMUMonitorProtocol(object):
-> >          @return QMP response as a Python dict or None if the connect=
-ion has
-> >                  been closed
-> >          """
-> > -        if self._debug:
-> > -            print >>sys.stderr, "QMP:>>> %s" % qmp_cmd
-> > +        self.logger.debug(">>> %s", qmp_cmd)
-> >          try:
-> >              self.__sock.sendall(json.dumps(qmp_cmd))
-> >          except socket.error as err:
-> > @@ -173,8 +172,7 @@ class QEMUMonitorProtocol(object):
-> >                  return
-> >              raise socket.error(err)
-> >          resp =3D self.__json_read()
-> > -        if self._debug:
-> > -            print >>sys.stderr, "QMP:<<< %s" % resp
-> > +        self.logger.debug("<<< %s", resp)
-> >          return resp
+> >          self._qmp =3D None
+> >          self._qemu_full_args =3D None
 > > =20
-> >      def cmd(self, name, args=3DNone, cmd_id=3DNone):
+> >          # just in case logging wasn't configured by the main script:
+> > -        logging.basicConfig(level=3D(logging.DEBUG if debug else log=
+ging.WARN))
+> > +        logging.basicConfig()
+> Yes, this behaves the same as `debug=3DFalse`
+>=20
+> > =20
+> >      def __enter__(self):
+> >          return self
+> > diff --git a/tests/migration/guestperf/engine.py b/tests/migration/gu=
+estperf/engine.py
+> > index 0a13050bc6..e14d4320b2 100644
+> > --- a/tests/migration/guestperf/engine.py
+> > +++ b/tests/migration/guestperf/engine.py
+> > @@ -388,15 +388,13 @@ class Engine(object):
+> >                                 args=3Dself._get_src_args(hardware),
+> >                                 wrapper=3Dself._get_src_wrapper(hardw=
+are),
+> >                                 name=3D"qemu-src-%d" % os.getpid(),
+> > -                               monitor_address=3Dsrcmonaddr,
+> > -                               debug=3Dself._debug)
+> > +                               monitor_address=3Dsrcmonaddr)
+> > =20
+> >          dst =3D qemu.QEMUMachine(self._binary,
+> >                                 args=3Dself._get_dst_args(hardware, u=
+ri),
+> >                                 wrapper=3Dself._get_dst_wrapper(hardw=
+are),
+> >                                 name=3D"qemu-dst-%d" % os.getpid(),
+> > -                               monitor_address=3Ddstmonaddr,
+> > -                               debug=3Dself._debug)
+> > +                               monitor_address=3Ddstmonaddr)
+> > =20
+> >          try:
+> >              src.launch()
+> > diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotes=
+ts.py
+> > index 36a7757aaf..6f057904a9 100644
+> > --- a/tests/qemu-iotests/iotests.py
+> > +++ b/tests/qemu-iotests/iotests.py
+> > @@ -195,8 +195,6 @@ class VM(qtest.QEMUQtestMachine):
+> >          super(VM, self).__init__(qemu_prog, qemu_opts, name=3Dname,
+> >                                   test_dir=3Dtest_dir,
+> >                                   socket_scm_helper=3Dsocket_scm_help=
+er)
+> > -        if debug:
+> > -            self._debug =3D True
+>=20
+> And this is the main issue. So instead of the fix I proposed in
+> previous commit major changes to
+> "tests/qemu-iotests/iotests.py" are necessary.
+
+Could you clarify what those major changes are?
+
+iotests.py was already changed to call basicConfig() according to
+args.debug in main().
+
+
+>=20
+> >          self._num_drives =3D 0
+> > =20
+> >      def add_device(self, opts):
 > >=20
 >=20
-> This one looks good, but in order to no break qemu-iotests verbose mode=
- it requires fix to qtest/iotests:
->=20
-> ```diff
-> diff --git a/scripts/qtest.py b/scripts/qtest.py
-> index df0daf2..0e955a8 100644
-> --- a/scripts/qtest.py
-> +++ b/scripts/qtest.py
-> @@ -77,12 +77,12 @@ class QEMUQtestMachine(qemu.QEMUMachine):
->      '''A QEMU VM'''
-> =20
->      def __init__(self, binary, args=3DNone, name=3DNone, test_dir=3D"/=
-var/tmp",
-> -                 socket_scm_helper=3DNone):
-> +                 socket_scm_helper=3DNone, debug=3DFalse):
->          if name is None:
->              name =3D "qemu-%d" % os.getpid()
->          super(QEMUQtestMachine,
->                self).__init__(binary, args, name=3Dname, test_dir=3Dtes=
-t_dir,
-> -                             socket_scm_helper=3Dsocket_scm_helper)
-> +                             socket_scm_helper=3Dsocket_scm_helper, de=
-bug=3Ddebug)
->          self._qtest =3D None
->          self._qtest_path =3D os.path.join(test_dir, name + "-qtest.soc=
-k")
-> =20
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests=
-.py
-> index 1af117e..989ebd3 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -193,9 +193,8 @@ class VM(qtest.QEMUQtestMachine):
->          name =3D "qemu%s-%d" % (path_suffix, os.getpid())
->          super(VM, self).__init__(qemu_prog, qemu_opts, name=3Dname,
->                                   test_dir=3Dtest_dir,
-> -                                 socket_scm_helper=3Dsocket_scm_helper=
-)
-> -        if debug:
-> -            self._debug =3D True
-> +                                 socket_scm_helper=3Dsocket_scm_helper=
-,
-> +                                 debug=3Ddebug)
->          self._num_drives =3D 0
-> =20
->      def add_device(self, opts):
-> ```
 
-I'm confused by why the above patch is necessary.  We are in the
-process of removing the 'debug' parameter from QEMUMachine and
-QEMUMonitorProtocol, why would we add a debug parameter to
-QEMUQtestMachine and iotests.py?
 
->=20
-> (because the `debug` used to be set after `__init__`, but the logging i=
-s initialized during `__init__`.)
->=20
-> Therefor conditional ACK when the qtest/iotest fix precedes this commit=
-.
 
-Do you mean the following?
-
-  Message-Id: <20170927130339.21444-3-ehabkost@redhat.com>
-  Subject: [Qemu-devel] [PATCH 2/5] iotests: Set up Python logging
-  https://www.mail-archive.com/qemu-devel@nongnu.org/msg485036.html
-  https://github.com/ehabkost/qemu/commit/afa79b55676dcd1859aa9d1f983c9df=
-bbcc13197
-
-It is already queued on python-next.
 
 --=20
 Eduardo
