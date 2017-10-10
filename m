@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4f-0007wB-Ge
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:10 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4g-0007xB-HU
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4Z-0007SL-LP
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58410)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4f-0007Zo-F5
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47584)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1e1y4Z-0007RF-ET
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:03 -0400
+	id 1e1y4f-0007ZF-8b
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:09 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 10 Oct 2017 19:11:09 +0200
-Message-Id: <20171010171122.9756-15-marcandre.lureau@redhat.com>
+Date: Tue, 10 Oct 2017 19:11:11 +0200
+Message-Id: <20171010171122.9756-17-marcandre.lureau@redhat.com>
 In-Reply-To: <20171010171122.9756-1-marcandre.lureau@redhat.com>
 References: <20171010171122.9756-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 14/27] vhost-user-scsi: use NULL pointer
+Subject: [Qemu-devel] [PULL 16/27] vhost-user-scsi: remove
+ vdev_scsi_add_iscsi_lun()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,22 +34,44 @@ Cc: pbonzini@redhat.com, f4bug@amsat.org, changpeng.liu@intel.com, felipe@nutani
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- contrib/vhost-user-scsi/vhost-user-scsi.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ contrib/vhost-user-scsi/vhost-user-scsi.c | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
 
 diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-us=
 er-scsi/vhost-user-scsi.c
-index a9a4066eeb..dd0de1fc89 100644
+index 0573ae794e..38fe451619 100644
 --- a/contrib/vhost-user-scsi/vhost-user-scsi.c
 +++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
-@@ -684,7 +684,7 @@ static int vdev_scsi_run(vhost_scsi_dev_t *vdev_scsi)
-     assert(vdev_scsi->server_sock >=3D 0);
-     assert(vdev_scsi->loop);
+@@ -657,20 +657,6 @@ static vhost_scsi_dev_t *vdev_scsi_new(int server_so=
+ck)
+     return vdev_scsi;
+ }
 =20
--    cli_sock =3D accept(vdev_scsi->server_sock, (void *)0, (void *)0);
-+    cli_sock =3D accept(vdev_scsi->server_sock, NULL, NULL);
-     if (cli_sock < 0) {
-         perror("accept");
-         return -1;
+-static int vdev_scsi_add_iscsi_lun(vhost_scsi_dev_t *vdev_scsi,
+-                                   char *iscsi_uri, uint32_t lun)
+-{
+-    assert(vdev_scsi);
+-    assert(iscsi_uri);
+-    assert(lun < VUS_MAX_LUNS);
+-
+-    if (iscsi_add_lun(&vdev_scsi->luns[lun], iscsi_uri) !=3D 0) {
+-        return -1;
+-    }
+-
+-    return 0;
+-}
+-
+ static int vdev_scsi_run(vhost_scsi_dev_t *vdev_scsi)
+ {
+     int cli_sock;
+@@ -734,7 +720,7 @@ int main(int argc, char **argv)
+     }
+     vdev_scsi =3D vdev_scsi_new(sock);
+=20
+-    if (vdev_scsi_add_iscsi_lun(vdev_scsi, iscsi_uri, 0) !=3D 0) {
++    if (iscsi_add_lun(&vdev_scsi->luns[0], iscsi_uri) !=3D 0) {
+         goto err;
+     }
+=20
 --=20
 2.15.0.rc0.40.gaefcc5f6f
