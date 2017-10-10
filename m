@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4t-00088T-Qi
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:29 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4z-0008D2-37
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4o-0007fk-3S
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41450)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4y-0007kM-3T
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57622)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1e1y4n-0007fR-TZ
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:18 -0400
+	id 1e1y4x-0007k2-Qh
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:28 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 10 Oct 2017 19:11:15 +0200
-Message-Id: <20171010171122.9756-21-marcandre.lureau@redhat.com>
+Date: Tue, 10 Oct 2017 19:11:18 +0200
+Message-Id: <20171010171122.9756-24-marcandre.lureau@redhat.com>
 In-Reply-To: <20171010171122.9756-1-marcandre.lureau@redhat.com>
 References: <20171010171122.9756-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 20/27] vhost-user-scsi: avoid use of iscsi_
- namespace
+Subject: [Qemu-devel] [PULL 23/27] vhost-user-scsi: simplify source handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,36 +30,144 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, f4bug@amsat.org, changpeng.liu@intel.com, felipe@nutanix.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-It is confusing and could easily conflict with future versions.
+Using a hashtable.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- contrib/vhost-user-scsi/vhost-user-scsi.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ contrib/vhost-user-scsi/vhost-user-scsi.c | 45 +++++++++----------------=
+------
+ 1 file changed, 12 insertions(+), 33 deletions(-)
 
 diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-us=
 er-scsi/vhost-user-scsi.c
-index fdd6014712..c7f9d82142 100644
+index 0e6784187c..2e1100dea3 100644
 --- a/contrib/vhost-user-scsi/vhost-user-scsi.c
 +++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
-@@ -247,7 +247,7 @@ struct scsi_task {
+@@ -65,7 +65,7 @@ typedef struct VusDev {
+     VuDev vu_dev;
+     int server_sock;
+     GMainLoop *loop;
+-    GTree *fdmap;   /* fd -> gsource context id */
++    GHashTable *fdmap;   /* fd -> gsource */
+     VusIscsiLun lun;
+ } VusDev;
+=20
+@@ -83,11 +83,6 @@ typedef struct vus_gsrc {
+     GPollFD gfd;
+ } vus_gsrc_t;
+=20
+-static gint vus_fdmap_compare(gconstpointer a, gconstpointer b)
+-{
+-    return (b > a) - (b < a);
+-}
+-
+ static gboolean vus_gsrc_prepare(GSource *src, gint *timeout)
+ {
+     assert(timeout);
+@@ -128,8 +123,8 @@ static GSourceFuncs vus_gsrc_funcs =3D {
+     NULL
+ };
+=20
+-static void vus_gsrc_new(VusDev *vdev_scsi, int fd, GIOCondition cond,
+-                         vu_watch_cb vu_cb, GSourceFunc gsrc_cb, gpointe=
+r data)
++static GSource *vus_gsrc_new(VusDev *vdev_scsi, int fd, GIOCondition con=
+d,
++                             vu_watch_cb vu_cb, GSourceFunc gsrc_cb, gpo=
+inter data)
+ {
+     GSource *vus_gsrc;
+     vus_gsrc_t *vus_src;
+@@ -143,7 +138,6 @@ static void vus_gsrc_new(VusDev *vdev_scsi, int fd, G=
+IOCondition cond,
+     vus_gsrc =3D g_source_new(&vus_gsrc_funcs, sizeof(vus_gsrc_t));
+     g_source_set_callback(vus_gsrc, (GSourceFunc) vu_cb, data, NULL);
+     vus_src =3D (vus_gsrc_t *)vus_gsrc;
+-
+     vus_src->vdev_scsi =3D vdev_scsi;
+     vus_src->gfd.fd =3D fd;
+     vus_src->gfd.events =3D cond;
+@@ -154,8 +148,7 @@ static void vus_gsrc_new(VusDev *vdev_scsi, int fd, G=
+IOCondition cond,
+     assert(id);
+     g_source_unref(vus_gsrc);
+=20
+-    g_tree_insert(vdev_scsi->fdmap, (gpointer)(uintptr_t)fd,
+-                                    (gpointer)(uintptr_t)id);
++    return vus_gsrc;
+ }
 =20
  /** libiscsi integration **/
-=20
--static int iscsi_add_lun(VusIscsiLun *lun, char *iscsi_uri)
-+static int vus_iscsi_add_lun(VusIscsiLun *lun, char *iscsi_uri)
+@@ -348,43 +341,27 @@ static void vus_panic_cb(VuDev *vu_dev, const char =
+*buf)
+ static void vus_add_watch_cb(VuDev *vu_dev, int fd, int vu_evt, vu_watch=
+_cb cb,
+                              void *pvt)
  {
-     struct iscsi_url *iscsi_url;
-     struct iscsi_context *iscsi_ctx;
-@@ -703,7 +703,7 @@ int main(int argc, char **argv)
-     }
-     vdev_scsi =3D vdev_scsi_new(sock);
++    GSource *src;
+     VusDev *vdev_scsi;
+-    guint id;
 =20
--    if (iscsi_add_lun(&vdev_scsi->lun, iscsi_uri) !=3D 0) {
-+    if (vus_iscsi_add_lun(&vdev_scsi->lun, iscsi_uri) !=3D 0) {
-         goto err;
-     }
+     assert(vu_dev);
+     assert(fd >=3D 0);
+     assert(cb);
 =20
+     vdev_scsi =3D container_of(vu_dev, VusDev, vu_dev);
+-    id =3D (guint)(uintptr_t)g_tree_lookup(vdev_scsi->fdmap,
+-                                         (gpointer)(uintptr_t)fd);
+-    if (id) {
+-        GSource *vus_src =3D g_main_context_find_source_by_id(NULL, id);
+-        assert(vus_src);
+-        g_source_destroy(vus_src);
+-        (void)g_tree_remove(vdev_scsi->fdmap, (gpointer)(uintptr_t)fd);
+-    }
+-
+-    vus_gsrc_new(vdev_scsi, fd, vu_evt, cb, NULL, pvt);
++    src =3D vus_gsrc_new(vdev_scsi, fd, vu_evt, cb, NULL, pvt);
++    g_hash_table_replace(vdev_scsi->fdmap, GINT_TO_POINTER(fd), src);
+ }
+=20
+ static void vus_del_watch_cb(VuDev *vu_dev, int fd)
+ {
+     VusDev *vdev_scsi;
+-    guint id;
+=20
+     assert(vu_dev);
+     assert(fd >=3D 0);
+=20
+     vdev_scsi =3D container_of(vu_dev, VusDev, vu_dev);
+-    id =3D (guint)(uintptr_t)g_tree_lookup(vdev_scsi->fdmap,
+-                                         (gpointer)(uintptr_t)fd);
+-    if (id) {
+-        GSource *vus_src =3D g_main_context_find_source_by_id(NULL, id);
+-        assert(vus_src);
+-        g_source_destroy(vus_src);
+-        (void)g_tree_remove(vdev_scsi->fdmap, (gpointer)(uintptr_t)fd);
+-    }
++    g_hash_table_remove(vdev_scsi->fdmap, GINT_TO_POINTER(fd));
+ }
+=20
+ static void vus_proc_req(VuDev *vu_dev, int idx)
+@@ -540,7 +517,7 @@ static void vdev_scsi_free(VusDev *vdev_scsi)
+         close(vdev_scsi->server_sock);
+     }
+     g_main_loop_unref(vdev_scsi->loop);
+-    g_tree_destroy(vdev_scsi->fdmap);
++    g_hash_table_unref(vdev_scsi->fdmap);
+     g_free(vdev_scsi);
+ }
+=20
+@@ -551,7 +528,9 @@ static VusDev *vdev_scsi_new(int server_sock)
+     vdev_scsi =3D g_new0(VusDev, 1);
+     vdev_scsi->server_sock =3D server_sock;
+     vdev_scsi->loop =3D g_main_loop_new(NULL, FALSE);
+-    vdev_scsi->fdmap =3D g_tree_new(vus_fdmap_compare);
++    vdev_scsi->fdmap =3D
++        g_hash_table_new_full(NULL, NULL, NULL,
++                              (GDestroyNotify) g_source_destroy);
+=20
+     return vdev_scsi;
+ }
 --=20
 2.15.0.rc0.40.gaefcc5f6f
