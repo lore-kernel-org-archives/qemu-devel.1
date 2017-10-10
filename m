@@ -1,36 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e1pxJ-0000oY-3k
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:32:02 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e1q2I-0003Uw-0j
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:37:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e1pxD-0003wV-A6
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:32:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53906)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e1pxD-0003w7-1D
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:31:55 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1E0FD81DED
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 08:31:54 +0000 (UTC)
-Date: Tue, 10 Oct 2017 09:31:43 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171010083143.GA30015@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170911165929.2791-1-marcandre.lureau@redhat.com>
-	<20170911165929.2791-3-marcandre.lureau@redhat.com>
-	<20171009110336.GA17824@redhat.com>
-	<20171009144344.38bbd1e9@nial.brq.redhat.com>
-	<20171009130218.GK2954@redhat.com>
-	<20171010003951-mutt-send-email-mst@kernel.org>
+	(envelope-from <kwolf@redhat.com>) id 1e1q2H-0007Hd-6g
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:37:10 -0400
+Date: Tue, 10 Oct 2017 10:36:51 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171010083651.GC4177@dhcp-200-186.str.redhat.com>
+References: <20170913181910.29688-1-mreitz@redhat.com>
+	<20170913181910.29688-3-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20171010003951-mutt-send-email-mst@kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 2/7] hw/misc: add vmcoreinfo device
+In-Reply-To: <20170913181910.29688-3-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 02/18] block: BDS deletion during
+ bdrv_drain_recurse
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,70 +24,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, ehabkost@redhat.com, qemu-devel@nongnu.org, anderson@redhat.com, lersek@redhat.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Tue, Oct 10, 2017 at 12:44:26AM +0300, Michael S. Tsirkin wrote:
-> On Mon, Oct 09, 2017 at 02:02:18PM +0100, Daniel P. Berrange wrote:
-> > On Mon, Oct 09, 2017 at 02:43:44PM +0200, Igor Mammedov wrote:
-> > > On Mon, 9 Oct 2017 12:03:36 +0100
-> > > "Daniel P. Berrange" <berrange@redhat.com> wrote:
-> > >=20
-> > > > On Mon, Sep 11, 2017 at 06:59:24PM +0200, Marc-Andr=C3=A9 Lureau =
-wrote:
-> > > > > See docs/specs/vmcoreinfo.txt for details.
-> > > > >=20
-> > > > > "etc/vmcoreinfo" fw_cfg entry is added when using "-device vmco=
-reinfo". =20
-> > > >=20
-> > > > I'm wondering if you considered just adding the entry to fw_cfg b=
-y
-> > > > default, without requiring any -device arg ? Unless I'm misunders=
-tanding,
-> > > > this doesn't feel like a device to me - its just a well known buc=
-ket
-> > > > in fw_cfg IIUC ?  Obviously its existance would need to be tied t=
-o
-> > > > the latest machine type for ABI reasons though. The benefit of th=
-is
-> > > > is that it would "just work" without us having to plumb it throug=
-h to
-> > > > all the downstream applications that use QEMU for mgmt guest (Ope=
-nStack,
-> > > > oVirt, GNOME Boxes, virt-manager, and countless other mgmt apps).
-> > > it follows model set by pvpanic device, it's easier to manage from =
-migration
-> > > POV, one could use it even for old machine types with new qemu (jus=
-t by adding
-> > > device, it makes instance not backwards migratable to old qemu but =
-should work
-> > > for forward migration) and if user doesn't need it, device could be=
- just omitted
-> > > from CLI.
-> >=20
-> > Sure but it means that in effect no one will have this functionality =
-enabled
-> > for several years. pvpanic has been around a long time and I rarely s=
-ee it
-> > present in configured guests :-(
-> >=20
-> >=20
-> > Regards,
-> > Daniel
->=20
-> libvirt runs with -nodefaults, right? I'd argue pretty strongly -nodefa=
-ults
-> shouldn't add optional devices anyway.
+Am 13.09.2017 um 20:18 hat Max Reitz geschrieben:
+> Drainined a BDS child may lead to both the original BDS and/or its other
+> children being deleted (e.g. if the original BDS represents a block
+> job).  We should prepare for this in both bdrv_drain_recurse() and
+> bdrv_drained_begin() by monitoring whether the BDS we are about to drain
+> still exists at all.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
-This isn't really adding a device though is it - it is just a well known
-location in fw_cfg to receive data.
+How hard would it be to write a test case for this? qemu-iotests
+probably isn't the right tool, but I feel a C unit test would be
+possible.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> -    QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
+> -        BlockDriverState *bs = child->bs;
+> -        bool in_main_loop =
+> -            qemu_get_current_aio_context() == qemu_get_aio_context();
+> -        assert(bs->refcnt > 0);
+
+Would it make sense to keep this assertion for the !deleted case?
+
+> -        if (in_main_loop) {
+> -            /* In case the recursive bdrv_drain_recurse processes a
+> -             * block_job_defer_to_main_loop BH and modifies the graph,
+> -             * let's hold a reference to bs until we are done.
+> -             *
+> -             * IOThread doesn't have such a BH, and it is not safe to call
+> -             * bdrv_unref without BQL, so skip doing it there.
+> -             */
+> -            bdrv_ref(bs);
+> -        }
+> -        waited |= bdrv_drain_recurse(bs);
+> -        if (in_main_loop) {
+> -            bdrv_unref(bs);
+> +    /* Draining children may result in other children being removed and maybe
+> +     * even deleted, so copy the children list first */
+
+Maybe it's just me, but I failed to understand this correctly at first.
+How about "being removed from their parent" to clarify that it's not the
+BDS that is removed, but just the reference?
+
+Kevin
