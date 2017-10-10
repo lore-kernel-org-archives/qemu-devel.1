@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e1u1Z-0002bH-7b
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 08:52:45 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e1u3J-0003DQ-Ot
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 08:54:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e1u1V-0003Tw-5O
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 08:52:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56868)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e1u1U-0003TQ-OD
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 08:52:37 -0400
-Date: Tue, 10 Oct 2017 09:52:31 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171010125231.GD4015@localhost.localdomain>
-References: <20171005203638.19255-1-ehabkost@redhat.com>
-	<CAFEAcA-jBzTXWNrRCB8GXm2FcZdT3pPFZiGT6O6Oc8qpfSK_jA@mail.gmail.com>
-	<20171006152751.GR4015@localhost.localdomain>
-	<CAFEAcA94pKm22fX1kCr72-SsM06Z2AMUZ65a7zJ_UPrarkBg1w@mail.gmail.com>
-	<4479e30f-801d-0d8e-712d-06f2dd987528@cn.fujitsu.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1e1u3F-0004F9-L3
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 08:54:29 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:54235)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e1u3F-0004Eo-DV
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 08:54:25 -0400
+Received: by mail-wm0-x235.google.com with SMTP id q132so5021414wmd.2
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 05:54:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4479e30f-801d-0d8e-712d-06f2dd987528@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PULL 0/9] x86 and machine queue, 2017-10-05
+In-Reply-To: <20170920201737.25723-4-f4bug@amsat.org>
+References: <20170920201737.25723-1-f4bug@amsat.org>
+	<20170920201737.25723-4-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 10 Oct 2017 13:54:03 +0100
+Message-ID: <CAFEAcA_wci=BT69jDM6uNa=JCM=b5GD4pO2vRQUNi6cX-B1QGA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v11 3/5] msf2: Add Smartfusion2 SPI
+ controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Subbaraya Sundeep <sundeep.lkml@gmail.com>, Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, Oct 10, 2017 at 03:41:56PM +0800, Dou Liyang wrote:
-> Hi Eduardo,
-> 
-> I couldn't reproduce the failure too. But, I have some concern below.
-> 
-> At 10/06/2017 11:37 PM, Peter Maydell wrote:
-> > On 6 October 2017 at 16:27, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > > On Fri, Oct 06, 2017 at 01:17:42PM +0100, Peter Maydell wrote:
-> > > > This fails tests, I'm afraid:
-> > > [...]
-> > > > acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-6QYK7Y.dsl,
-> > > > aml:/tmp/aml-E8YK7Y], Expected [asl:/tmp/asl-1H1I7Y.dsl,
-> > > > aml:tests/acpi-test-data/pc/DSDT.memhp].
-> 
-> This warning is about memory hot-plug tests. DSDT mismatch is too
-> strange, I hope to see their difference.
-> 
-> > > > acpi-test: Warning. not showing difference since no diff utility is
-> > > > specified. Set 'DIFF' environment variable to a preferred diff utility
-> > > > and run 'make V=1 check' again to see ASL difference.OK
-> > > > 
-> > > > and same for /i386/acpi/piix4/numamem and for the
-> > > > equivalent q35 tests.
-> > > > 
-> > > > Fails on s390, netbsd, freebsd, aarch32, x86-64.
-> > > > 
-> > > 
-> > > Oops, sorry!
-> > > 
-> > > I need to find out why it didn't fail on travis-ci:
-> > > https://travis-ci.org/ehabkost/qemu/builds/283884670
-> > 
-> > My guess is that one of {iasl installed, iasl not installed}
-> > is broken, but the travis environments don't test both.
-> > 
-> If we want do the "bios-tables-test", we need iasl support.
-> 
-> otherwise, when I run "make V=1 check" without iasl, the test
-> will report error:
-> 
-> ...
-> TEST: tests/bios-tables-test... (pid=1006)
->   /i386/acpi/piix4:
-> Looking for expected file 'tests/acpi-test-data/pc/DSDT'
-> 
-> Using expected file 'tests/acpi-test-data/pc/DSDT'
-> 
-> Looking for expected file 'tests/acpi-test-data/pc/APIC'
-> 
-> Using expected file 'tests/acpi-test-data/pc/APIC'
-> 
-> Looking for expected file 'tests/acpi-test-data/pc/HPET'
-> 
-> Using expected file 'tests/acpi-test-data/pc/HPET'
-> **
-> ERROR:tests/bios-tables-test.c:328:load_asl: assertion failed (error ==
-> NULL): Failed to execute child process "iasl" (No such file or directory)
-> (g-exec-error-quark, 8)
-> FAIL
+On 20 September 2017 at 21:17, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+> wrote:
+> From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+>
+> Modelled Microsemi's Smartfusion2 SPI controller.
+>
+> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-This shouldn't happen if CONFIG_IASL is not defined.  Did you run
-configure again after removing iasl?
+> +#define FRAMESZ_MASK         0x1F
 
--- 
-Eduardo
+> +static void set_fifodepth(MSSSpiState *s)
+> +{
+> +    unsigned int size =3D s->regs[R_SPI_DFSIZE] & FRAMESZ_MASK;
+> +
+> +    if (size <=3D 8) {
+> +        s->fifo_depth =3D 32;
+> +    } else if (size <=3D 16) {
+> +        s->fifo_depth =3D 16;
+> +    } else if (size <=3D 32) {
+> +        s->fifo_depth =3D 8;
+> +    } else {
+> +        s->fifo_depth =3D 4;
+> +    }
+> +}
+
+Hi. Coverity points out (CID 1381483) that the "else" case here
+is dead code, because the FRAMESZ_MASK of 0x1F means that size
+cannot be 32 or more.
+
+Paolo kindly checked up with the spec at
+https://www.eecs.umich.edu/courses/eecs373/readings/Actel_SmartFusion_MSS_U=
+serGuide.pdf
+which says that this register's field is bits [5:0] which
+would imply an 0x3f mask is needed. On the other hand it also
+says that "maximum value is 32", so what is the else clause
+doing anyway?
+
+thanks
+-- PMM
