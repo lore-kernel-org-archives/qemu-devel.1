@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e22Bs-0001tS-R0
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:35:53 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e22C3-00024E-AR
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:36:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e22Br-0001OJ-Un
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:35:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40828)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e22By-0001QG-5r
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:36:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49132)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1e22Br-0001O6-Ot
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:35:51 -0400
+	id 1e22Bx-0001Pu-VA
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:35:58 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 10 Oct 2017 23:34:42 +0200
-Message-Id: <20171010213506.22989-4-marcandre.lureau@redhat.com>
+Date: Tue, 10 Oct 2017 23:34:43 +0200
+Message-Id: <20171010213506.22989-5-marcandre.lureau@redhat.com>
 In-Reply-To: <20171010213506.22989-1-marcandre.lureau@redhat.com>
 References: <20171010213506.22989-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 03/27] build-sys: make vhost-user-scsi depend
- on libvhost-user.a
+Subject: [Qemu-devel] [PULL v2 04/27] libvhost-user: drop dependency on glib
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +30,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, changpeng.liu@intel.com, f4bug@amsat.org, felipe@nutanix.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
----
- Makefile      | 2 +-
- Makefile.objs | 1 -
- 2 files changed, 1 insertion(+), 2 deletions(-)
+libvhost-user is meant to be free of glib dependency. Make sure it is
+by droping qemu/osdep.h (which included glib.h)
 
-diff --git a/Makefile b/Makefile
-index 64d3a9e244..97b4508d7d 100644
---- a/Makefile
-+++ b/Makefile
-@@ -480,7 +480,7 @@ ivshmem-client$(EXESUF): $(ivshmem-client-obj-y) $(CO=
-MMON_LDADDS)
- ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $^)
- endif
--vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y)
-+vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) libvhost-user.a
- 	$(call LINK, $^)
+This fixes a bad malloc()/g_free() pair.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+---
+ contrib/libvhost-user/libvhost-user.c | 29 ++++++++++++++++++++++++++---
+ 1 file changed, 26 insertions(+), 3 deletions(-)
+
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
+r/libvhost-user.c
+index d27d6303db..a0e0da4ccb 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -13,14 +13,35 @@
+  * later.  See the COPYING file in the top-level directory.
+  */
 =20
- module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.=
-mak
-diff --git a/Makefile.objs b/Makefile.objs
-index bdfa3b6177..d4f973a8fc 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -115,7 +115,6 @@ libvhost-user-obj-y =3D contrib/libvhost-user/
- vhost-user-scsi.o-cflags :=3D $(LIBISCSI_CFLAGS)
- vhost-user-scsi.o-libs :=3D $(LIBISCSI_LIBS)
- vhost-user-scsi-obj-y =3D contrib/vhost-user-scsi/
--vhost-user-scsi-obj-y +=3D contrib/libvhost-user/libvhost-user.o
+-#include <qemu/osdep.h>
++/* this code avoids GLib dependency */
++#include <stdlib.h>
++#include <stdio.h>
++#include <unistd.h>
++#include <stdarg.h>
++#include <errno.h>
++#include <string.h>
++#include <assert.h>
++#include <inttypes.h>
++#include <sys/types.h>
++#include <sys/socket.h>
+ #include <sys/eventfd.h>
++#include <sys/mman.h>
+ #include <linux/vhost.h>
 =20
- ######################################################################
- trace-events-subdirs =3D
++#include "qemu/compiler.h"
+ #include "qemu/atomic.h"
+=20
+ #include "libvhost-user.h"
+=20
++/* usually provided by GLib */
++#ifndef MIN
++#define MIN(x, y) ({                            \
++            typeof(x) _min1 =3D (x);              \
++            typeof(y) _min2 =3D (y);              \
++            (void) (&_min1 =3D=3D &_min2);          \
++            _min1 < _min2 ? _min1 : _min2; })
++#endif
++
+ #define VHOST_USER_HDR_SIZE offsetof(VhostUserMsg, payload.u64)
+=20
+ /* The version of the protocol we support */
+@@ -81,7 +102,9 @@ vu_panic(VuDev *dev, const char *msg, ...)
+     va_list ap;
+=20
+     va_start(ap, msg);
+-    buf =3D g_strdup_vprintf(msg, ap);
++    if (vasprintf(&buf, msg, ap) < 0) {
++        buf =3D NULL;
++    }
+     va_end(ap);
+=20
+     dev->broken =3D true;
+@@ -853,7 +876,7 @@ vu_dispatch(VuDev *dev)
+     success =3D true;
+=20
+ end:
+-    g_free(vmsg.data);
++    free(vmsg.data);
+     return success;
+ }
+=20
 --=20
 2.15.0.rc0.40.gaefcc5f6f
