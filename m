@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e1yj4-0007tN-JL
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:53:55 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e1yjL-0008AC-5A
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:54:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e1yj1-0001RA-Ez
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:53:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58752)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e1yj1-0001Qv-8Q
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:53:51 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0BFFCC04AC6E
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 17:53:50 +0000 (UTC)
-Date: Tue, 10 Oct 2017 14:53:44 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171010175344.GH3246@localhost.localdomain>
-References: <20171006132502.9191-1-ehabkost@redhat.com>
-	<20171010134204.135a9425@nial.brq.redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1e1yjK-0001c0-3z
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:54:11 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:47644)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e1yjJ-0001bf-TL
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:54:10 -0400
+Received: by mail-wm0-x232.google.com with SMTP id t69so7461328wmt.2
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 10:54:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171010134204.135a9425@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] isapc: Remove unnecessary migration
- compatibility code
+In-Reply-To: <CAFEAcA8d+UkhOJKovyedTye=8mD0mcbEScHm58RKyCuzYezxqA@mail.gmail.com>
+References: <20171010171122.9756-1-marcandre.lureau@redhat.com>
+	<CAFEAcA8d+UkhOJKovyedTye=8mD0mcbEScHm58RKyCuzYezxqA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 10 Oct 2017 18:53:48 +0100
+Message-ID: <CAFEAcA-O8hz-oa4H=L51O9iHCikdijY_ZYzREiYsgPyHG91fgQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/27] vhost-user patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,47 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Felipe Franciosi <felipe@nutanix.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, changpeng liu <changpeng.liu@intel.com>
 
-On Tue, Oct 10, 2017 at 01:42:04PM +0200, Igor Mammedov wrote:
-> On Fri,  6 Oct 2017 10:25:02 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
-> > We don't touch isapc when we change guest ABI and add new entries
-> > to PC_COMPAT_* or new PCMachineClass compat flags.  This means
-> > isapc never guaranteed guest ABI and cross-QEMU-version live
-> > migration compatibility.  There's no point in keeping code for
-> > kvm-pv-eoi and APIC ID compatibility in pc_init_isa().
-> > 
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+On 10 October 2017 at 18:22, Peter Maydell <peter.maydell@linaro.org> wrote=
+:
+> On 10 October 2017 at 18:10, Marc-Andr=C3=A9 Lureau
+> <marcandre.lureau@redhat.com> wrote:
+>> The following changes since commit 567d0a19c7998fa366598b83d5a6e5f0759d3=
+ea9:
+>>
+>>   Merge remote-tracking branch 'remotes/ehabkost/tags/x86-and-machine-pu=
+ll-request' into staging (2017-10-10 13:25:46 +0100)
+>>
+>> are available in the Git repository at:
+>>
+>>   https://github.com/elmarco/qemu.git tags/vus-pull-request
+>>
+>> for you to fetch changes up to 25f1fe82c64c8c4922254d63195e1d9cffbb0507:
+>>
+>>   vhost-user-scsi: remove server_sock from VusDev (2017-10-10 19:06:06 +=
+0200)
+>>
+>> ----------------------------------------------------------------
+>>
+>> ----------------------------------------------------------------
+>
+> Hi. I'm afraid this fails to build:
 
-Thanks!
+And windows build:
 
-Michael, do you prefer those pc*.c patches that touch only
-CPU-related code to go always through your tree, or can I merge
-them through x86-next without your Acked-by if it's appropriate?
 
-> 
-> > ---
-> >  hw/i386/pc_piix.c | 2 --
-> >  1 file changed, 2 deletions(-)
-> > 
-> > diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> > index 9ff79b1fd9..31646e63c4 100644
-> > --- a/hw/i386/pc_piix.c
-> > +++ b/hw/i386/pc_piix.c
-> > @@ -378,8 +378,6 @@ static void pc_compat_0_13(MachineState *machine)
-> >  
-> >  static void pc_init_isa(MachineState *machine)
-> >  {
-> > -    x86_cpu_change_kvm_default("kvm-pv-eoi", NULL);
-> > -    enable_compat_apic_id_mode();
-> >      pc_init1(machine, TYPE_I440FX_PCI_HOST_BRIDGE, TYPE_I440FX_PCI_DEVICE);
-> >  }
-> >  
-> 
+  CC      contrib/libvhost-user/libvhost-user.o
+/home/petmay01/linaro/qemu-for-merges/contrib/libvhost-user/libvhost-user.c=
+:26:24:
+fatal error: sys/socket.h: No such file or directory
+compilation terminated.
 
--- 
-Eduardo
+You don't need to include sys/socket.h directly if you include
+qemu/osdep.h, because that header will pull it in.
+
+That may just run you into something else that doesn't work on
+Windows, of course.
+
+thanks
+-- PMM
