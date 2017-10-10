@@ -1,30 +1,46 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53108)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1e1sss-0003XN-MI
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:39:40 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e1svL-000513-7q
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:42:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1e1ssp-0002b6-Ht
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:39:38 -0400
-Received: from mga04.intel.com ([192.55.52.120]:19551)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
-	id 1e1ssp-0002aV-7U
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:39:35 -0400
-From: "Valluri, Amarnath" <amarnath.valluri@intel.com>
-Date: Tue, 10 Oct 2017 11:39:31 +0000
-Message-ID: <1507635610.4061.33.camel@intel.com>
-References: <20171009225623.29232-1-marcandre.lureau@redhat.com>
-	<20171009225623.29232-32-marcandre.lureau@redhat.com>
-	<1507623384.4061.29.camel@intel.com>
-	<267628815.28174009.1507632456608.JavaMail.zimbra@redhat.com>
-In-Reply-To: <267628815.28174009.1507632456608.JavaMail.zimbra@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F23939651F0C9646A678470E8015DA23@intel.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e1svA-0003l1-Hz
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:42:06 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56268
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1e1svA-0003kN-C1
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:42:00 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9ABdUo1112349
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 07:41:56 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dgve6c2m2-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 07:41:56 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 10 Oct 2017 12:41:53 +0100
+References: <20171004154144.88995-1-pasic@linux.vnet.ibm.com>
+	<20171004154144.88995-3-pasic@linux.vnet.ibm.com>
+	<d6d2d73d-65c9-7ae1-fd37-cb8e304781e7@redhat.com>
+	<7f454872-fae3-35b0-eff4-227b2aa0f77d@linux.vnet.ibm.com>
+	<6c17b274-cd75-7864-94b9-fc8abff1a786@redhat.com>
+	<da4228cb-d32c-dc77-0a80-bac306f07c24@linux.vnet.ibm.com>
+	<0120aa4c-ffce-79c0-8c87-c7c1100232eb@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 10 Oct 2017 13:41:50 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 31/42] tpm-backend: move set 'id' to common
- code
+In-Reply-To: <0120aa4c-ffce-79c0-8c87-c7c1100232eb@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <9d77c8e9-f875-4e42-5306-b847904b4a47@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/8] s390x/css: IO instr handler ending
+ control
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,91 +49,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>
-Cc: "stefanb@linux.vnet.ibm.com" <stefanb@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-T24gVHVlLCAyMDE3LTEwLTEwIGF0IDA2OjQ3IC0wNDAwLCBNYXJjLUFuZHLDqSBMdXJlYXUgd3Jv
-dGU6DQo+IEhpDQo+IA0KPiAtLS0tLSBPcmlnaW5hbCBNZXNzYWdlIC0tLS0tDQo+ID4gDQo+ID4g
-T24gVHVlLCAyMDE3LTEwLTEwIGF0IDAwOjU2ICswMjAwLCBNYXJjLUFuZHLDqSBMdXJlYXUgd3Jv
-dGU6DQo+ID4gPiANCj4gPiA+IFNpZ25lZC1vZmYtYnk6IE1hcmMtQW5kcsOpIEx1cmVhdSA8bWFy
-Y2FuZHJlLmx1cmVhdUByZWRoYXQuY29tPg0KPiA+ID4gLS0tDQo+ID4gPiDCoGluY2x1ZGUvc3lz
-ZW11L3RwbV9iYWNrZW5kLmggfMKgwqAyICstDQo+ID4gPiDCoGh3L3RwbS90cG1fZW11bGF0b3Iu
-Y8KgwqDCoMKgwqDCoMKgwqB8IDEyICsrKy0tLS0tLS0tLQ0KPiA+ID4gwqBody90cG0vdHBtX3Bh
-c3N0aHJvdWdoLmPCoMKgwqDCoMKgfMKgwqA5ICsrKy0tLS0tLQ0KPiA+ID4gwqB0cG0uY8KgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHzCoMKgMyArKy0NCj4g
-PiA+IMKgNCBmaWxlcyBjaGFuZ2VkLCA5IGluc2VydGlvbnMoKyksIDE3IGRlbGV0aW9ucygtKQ0K
-PiA+ID4gDQo+ID4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9zeXNlbXUvdHBtX2JhY2tlbmQuaA0K
-PiA+ID4gYi9pbmNsdWRlL3N5c2VtdS90cG1fYmFja2VuZC5oDQo+ID4gPiBpbmRleCA1OTRiYjUw
-NzgyLi44ODFiZTk3ZWUzIDEwMDY0NA0KPiA+ID4gLS0tIGEvaW5jbHVkZS9zeXNlbXUvdHBtX2Jh
-Y2tlbmQuaA0KPiA+ID4gKysrIGIvaW5jbHVkZS9zeXNlbXUvdHBtX2JhY2tlbmQuaA0KPiA+ID4g
-QEAgLTY0LDcgKzY0LDcgQEAgc3RydWN0IFRQTUJhY2tlbmRDbGFzcyB7DQo+ID4gPiDCoMKgwqDC
-oMKgLyogZ2V0IGEgZGVzY3JpcHRpdmUgdGV4dCBvZiB0aGUgYmFja2VuZCB0byBkaXNwbGF5IHRv
-IHRoZQ0KPiA+ID4gdXNlcg0KPiA+ID4gKi8NCj4gPiA+IMKgwqDCoMKgwqBjb25zdCBjaGFyICpk
-ZXNjOw0KPiA+ID4gwqANCj4gPiA+IC3CoMKgwqDCoFRQTUJhY2tlbmQgKigqY3JlYXRlKShRZW11
-T3B0cyAqb3B0cywgY29uc3QgY2hhciAqaWQpOw0KPiA+ID4gK8KgwqDCoMKgVFBNQmFja2VuZCAq
-KCpjcmVhdGUpKFFlbXVPcHRzICpvcHRzKTsNCj4gPiA+IMKgDQo+ID4gPiDCoMKgwqDCoMKgLyog
-c3RhcnQgdXAgdGhlIFRQTSBvbiB0aGUgYmFja2VuZCAtIG9wdGlvbmFsICovDQo+ID4gPiDCoMKg
-wqDCoMKgaW50ICgqc3RhcnR1cF90cG0pKFRQTUJhY2tlbmQgKnQpOw0KPiA+ID4gZGlmZiAtLWdp
-dCBhL2h3L3RwbS90cG1fZW11bGF0b3IuYyBiL2h3L3RwbS90cG1fZW11bGF0b3IuYw0KPiA+ID4g
-aW5kZXggMzY0NTQ4MzdiMy4uMzE1ODE5MzI5YiAxMDA2NDQNCj4gPiA+IC0tLSBhL2h3L3RwbS90
-cG1fZW11bGF0b3IuYw0KPiA+ID4gKysrIGIvaHcvdHBtL3RwbV9lbXVsYXRvci5jDQo+ID4gPiBA
-QCAtNDUzLDIyICs0NTMsMTYgQEAgZXJyOg0KPiA+ID4gwqDCoMKgwqDCoHJldHVybiAtMTsNCj4g
-PiA+IMKgfQ0KPiA+ID4gwqANCj4gPiA+IC1zdGF0aWMgVFBNQmFja2VuZCAqdHBtX2VtdWxhdG9y
-X2NyZWF0ZShRZW11T3B0cyAqb3B0cywgY29uc3QNCj4gPiA+IGNoYXINCj4gPiA+ICppZCkNCj4g
-PiA+ICtzdGF0aWMgVFBNQmFja2VuZCAqdHBtX2VtdWxhdG9yX2NyZWF0ZShRZW11T3B0cyAqb3B0
-cykNCj4gPiA+IMKgew0KPiA+ID4gwqDCoMKgwqDCoFRQTUJhY2tlbmQgKnRiID0gVFBNX0JBQ0tF
-TkQob2JqZWN0X25ldyhUWVBFX1RQTV9FTVVMQVRPUikpOw0KPiA+ID4gwqANCj4gPiA+IC3CoMKg
-wqDCoHRiLT5pZCA9IGdfc3RyZHVwKGlkKTsNCj4gPiA+IC0NCj4gPiA+IMKgwqDCoMKgwqBpZiAo
-dHBtX2VtdWxhdG9yX2hhbmRsZV9kZXZpY2Vfb3B0cyhUUE1fRU1VTEFUT1IodGIpLCBvcHRzKSkN
-Cj4gPiA+IHsNCj4gPiA+IC3CoMKgwqDCoMKgwqDCoMKgZ290byBlcnJfZXhpdDsNCj4gPiA+ICvC
-oMKgwqDCoMKgwqDCoMKgb2JqZWN0X3VucmVmKE9CSkVDVCh0YikpOw0KPiA+ID4gK8KgwqDCoMKg
-wqDCoMKgwqByZXR1cm4gTlVMTDsNCj4gPiA+IMKgwqDCoMKgwqB9DQo+ID4gPiDCoA0KPiA+ID4g
-wqDCoMKgwqDCoHJldHVybiB0YjsNCj4gPiA+IC0NCj4gPiA+IC1lcnJfZXhpdDoNCj4gPiA+IC3C
-oMKgwqDCoG9iamVjdF91bnJlZihPQkpFQ1QodGIpKTsNCj4gPiA+IC0NCj4gPiA+IC3CoMKgwqDC
-oHJldHVybiBOVUxMOw0KPiA+ID4gwqB9DQo+ID4gPiDCoA0KPiA+ID4gwqBzdGF0aWMgVHBtVHlw
-ZU9wdGlvbnMgKnRwbV9lbXVsYXRvcl9nZXRfdHBtX29wdGlvbnMoVFBNQmFja2VuZA0KPiA+ID4g
-KnRiKQ0KPiA+ID4gZGlmZiAtLWdpdCBhL2h3L3RwbS90cG1fcGFzc3Rocm91Z2guYyBiL2h3L3Rw
-bS90cG1fcGFzc3Rocm91Z2guYw0KPiA+ID4gaW5kZXggOTMyNmNiZmRjOS4uNzM3MWQ1MDczOSAx
-MDA2NDQNCj4gPiA+IC0tLSBhL2h3L3RwbS90cG1fcGFzc3Rocm91Z2guYw0KPiA+ID4gKysrIGIv
-aHcvdHBtL3RwbV9wYXNzdGhyb3VnaC5jDQo+ID4gPiBAQCAtMjg0LDEzICsyODQsMTAgQEANCj4g
-PiA+IHRwbV9wYXNzdGhyb3VnaF9oYW5kbGVfZGV2aWNlX29wdHMoVFBNUGFzc3RocnVTdGF0ZSAq
-dHBtX3B0LA0KPiA+ID4gUWVtdU9wdHMNCj4gPiA+ICpvcHRzKQ0KPiA+ID4gwqDCoMKgwqDCoHJl
-dHVybiAxOw0KPiA+ID4gwqB9DQo+ID4gPiDCoA0KPiA+ID4gLXN0YXRpYyBUUE1CYWNrZW5kICp0
-cG1fcGFzc3Rocm91Z2hfY3JlYXRlKFFlbXVPcHRzICpvcHRzLCBjb25zdA0KPiA+ID4gY2hhcg0K
-PiA+ID4gKmlkKQ0KPiA+ID4gK3N0YXRpYyBUUE1CYWNrZW5kICp0cG1fcGFzc3Rocm91Z2hfY3Jl
-YXRlKFFlbXVPcHRzICpvcHRzKQ0KPiA+ID4gwqB7DQo+ID4gPiDCoMKgwqDCoMKgT2JqZWN0ICpv
-YmogPSBvYmplY3RfbmV3KFRZUEVfVFBNX1BBU1NUSFJPVUdIKTsNCj4gPiA+IC3CoMKgwqDCoFRQ
-TUJhY2tlbmQgKnRiID0gVFBNX0JBQ0tFTkQob2JqKTsNCj4gPiA+IC3CoMKgwqDCoFRQTVBhc3N0
-aHJ1U3RhdGUgKnRwbV9wdCA9IFRQTV9QQVNTVEhST1VHSCh0Yik7DQo+ID4gPiAtDQo+ID4gPiAt
-wqDCoMKgwqB0Yi0+aWQgPSBnX3N0cmR1cChpZCk7DQo+ID4gPiArwqDCoMKgwqBUUE1QYXNzdGhy
-dVN0YXRlICp0cG1fcHQgPSBUUE1fUEFTU1RIUk9VR0gob2JqKTsNCj4gPiA+IMKgDQo+ID4gPiDC
-oMKgwqDCoMKgaWYgKHRwbV9wYXNzdGhyb3VnaF9oYW5kbGVfZGV2aWNlX29wdHModHBtX3B0LCBv
-cHRzKSkgew0KPiA+ID4gwqDCoMKgwqDCoMKgwqDCoMKgZ290byBlcnJfZXhpdDsNCj4gPiA+IEBA
-IC0zMDEsNyArMjk4LDcgQEAgc3RhdGljIFRQTUJhY2tlbmQNCj4gPiA+ICp0cG1fcGFzc3Rocm91
-Z2hfY3JlYXRlKFFlbXVPcHRzICpvcHRzLCBjb25zdCBjaGFyICppZCkNCj4gPiA+IMKgwqDCoMKg
-wqDCoMKgwqDCoGdvdG8gZXJyX2V4aXQ7DQo+ID4gPiDCoMKgwqDCoMKgfQ0KPiA+ID4gwqANCj4g
-PiA+IC3CoMKgwqDCoHJldHVybiB0YjsNCj4gPiA+ICvCoMKgwqDCoHJldHVybiBUUE1fQkFDS0VO
-RChvYmopOw0KPiA+ID4gwqANCj4gPiA+IMKgZXJyX2V4aXQ6DQo+ID4gPiDCoMKgwqDCoMKgb2Jq
-ZWN0X3VucmVmKG9iaik7DQo+ID4gPiBkaWZmIC0tZ2l0IGEvdHBtLmMgYi90cG0uYw0KPiA+ID4g
-aW5kZXggYTQ2ZWU1ZjE0NC4uMzcyOThmM2YwMyAxMDA2NDQNCj4gPiA+IC0tLSBhL3RwbS5jDQo+
-ID4gPiArKysgYi90cG0uYw0KPiA+ID4gQEAgLTEyOSwxMSArMTI5LDEyIEBAIHN0YXRpYyBpbnQg
-dHBtX2luaXRfdHBtZGV2KHZvaWQgKmR1bW15LA0KPiA+ID4gUWVtdU9wdHMgKm9wdHMsIEVycm9y
-ICoqZXJycCkNCj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybiAxOw0KPiA+ID4gwqDCoMKg
-wqDCoH0NCj4gPiA+IMKgDQo+ID4gPiAtwqDCoMKgwqBkcnYgPSBiZS0+Y3JlYXRlKG9wdHMsIGlk
-KTsNCj4gPiA+ICvCoMKgwqDCoGRydiA9IGJlLT5jcmVhdGUob3B0cyk7DQo+ID4gPiDCoMKgwqDC
-oMKgaWYgKCFkcnYpIHsNCj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybiAxOw0KPiA+ID4g
-wqDCoMKgwqDCoH0NCj4gPiA+IMKgDQo+ID4gPiArwqDCoMKgwqBkcnYtPmlkID0gZ19zdHJkdXAo
-aWQpOw0KPiA+IEkga2luZCBvZiBvcHBvc2UgdGhpcyBjaGFuZ2UsIGluc3RlYWQgd2hhdCBhYm91
-dCBhZGRpbmcgbmV3DQo+ID4gVFBNQmFja2VuZA0KPiA+IGFwaSBzYXkgLSBUUE1CYWNrZW5kKiB0
-cG1fYmFja2VuZF9jcmVhdGUoY29uc3QgY2hhciAqdHlwZSwgY29uc3QNCj4gPiBRZW11T3B0cyAq
-b3B0cyksIHRoYXQgc2hvdWxkIGhhbmRsZSB0aGlzIGNvbW1vbiBjb2RlLCBhbmQgcmV0dXJucw0K
-PiA+IHRoZQ0KPiA+IG5ld2x5IGluc3RhbnRpYXRlZCBiYWNrZW5kIG9iamVjdC4NCj4gVGhhdCB3
-b3VsZCBiZSBhIG1vcmUgY29tcGxpY2F0ZWQgcmVmYWN0b3JpbmcgdGhhbiB3aGF0IEkgcHJvcG9z
-ZQ0KPiBoZXJlLCB3aGljaCBpcyBiYXNpYyBjb21tb24gY29kZSByZWZhY3RvcmluZy4gVG8gY2xh
-cmlmeSB5b3VyDQo+IHByb3Bvc2FsLCBtYWtlIGEgZm9sbG93LXVwIHBhdGNoPw0KWWVzLCBvayB3
-aXRoIGEgZm9sbG93LXVwIHBhdGNoLg0KPiANCj4gQW5vdGhlciBpbnRlcmVzdGluZyBhcHByb2Fj
-aCB3b3VsZCBiZSB0byBpbXBsZW1lbnQgVVNFUl9DUkVBVEFCTEUgKEkNCj4gaGF2ZSBhbiBleHBl
-cmltZW50YWwgcGF0Y2ggZm9yIHRoYXQpLiBUaGlzIGFsbG93cyB0byB1c2UgLW9iamVjdCB0cG0t
-DQo+IHBhc3N0aHJvdWdoLGlkPS4uLHBhdGg9Li4gYW5kIHdpbGwgY2hhbmdlIHRoZSB3YXkgYmFj
-a2VuZHMgYXJlDQo+IGNyZWF0ZWQgJiBpbml0aWFsaXplZC4NClRoaXMgYXBwcm9hY2ggaXMgcmVh
-bGx5IGludGVyZXN0aW5nLg0KDQotIEFtYXJuYXRo
+[..]
+>>
+>> Yeah, the ABI is smart enough (where it matters) and this one is obviously
+>> less that 8 bytes. I read this as you  assumed that the return won't be
+>> passed via register (general purpose register 2 for a z host + ELF assumed),
+>> and that would have been ugly indeed.
+>>
+>> Btw I have seen putting an integral into a struct for type checking
+>> in the linux kernel too. For instance from:
+>> arch/s390/include/asm/page.h
+>>
+>> """
+>> /*
+>>  * These are used to make use of C type-checking..
+>>  */
+>>
+>> typedef struct { unsigned long pgprot; } pgprot_t;
+>> typedef struct { unsigned long pgste; } pgste_t;
+>> typedef struct { unsigned long pte; } pte_t;
+>> typedef struct { unsigned long pmd; } pmd_t;
+>> typedef struct { unsigned long pud; } pud_t;
+>> typedef struct { unsigned long pgd; } pgd_t;
+>> typedef pte_t *pgtable_t;
+>>
+>> #define pgprot_val(x)   ((x).pgprot)
+>> #define pgste_val(x)    ((x).pgste)
+>> #define pte_val(x)      ((x).pte)
+>> #define pmd_val(x)      ((x).pmd)
+>> #define pud_val(x)      ((x).pud)
+>> #define pgd_val(x)      ((x).pgd)
+>>
+>> #define __pgste(x)      ((pgste_t) { (x) } )
+>> #define __pte(x)        ((pte_t) { (x) } )
+>> #define __pmd(x)        ((pmd_t) { (x) } )
+>> #define __pud(x)        ((pud_t) { (x) } )
+>> #define __pgd(x)        ((pgd_t) { (x) } )
+>> #define __pgprot(x)     ((pgprot_t) { (x) } )
+>> """
+>>
+>> If you think, I could add a similar comment indicating that my
+>> struct is also just for type-checking.
+> 
+> No, I think you've got the reason here slightly wrong. The kernel only
+> uses this since the pte_t and friends need to be urgently portable
+> between the different architectures. Have a look at the kernel
+> Documentation/CodingStyle file, it explicitly mentions this in chapter 5
+> ("Typedefs").
+>
+
+Disclaimer: I agree with your conclusion, the maintainers will have
+to make the final call here. I will still reply point by point for
+the fun of pointless academic discussions.
+
+IMHO we don't talk about typedefs here but about type checking. Btw QEMU
+has the exact opposite policy regarding typedefs and structs than Linux.
+You want to say that the comment at the top of my quote is wrong, and
+that it should be rather "These are used for hiding representation.."
+that "These are used to make use of C type-checking.."?
+
+I'm also curious which of the rules would your original suggestion of
+doing "typedef unsigned int IOInstEnding" match (from chapter 5
+"Typedefs")? ;)
+
+ 
+>>> Then, in the follow up patches, you do something like this:
+>>>
+>>>    return (IOInstEnding){.cc = 0};
+>>>
+>>> ... and that just looks very, very ugly in my eyes. The more I look at
+>>
+>> Interesting, I found this quite expressive.
+> 
+> C'mon, we're writing C code, not Java ;-)
+
+Yeah, me written much C++ and also Java before might be a part
+of the problem. Btw there is no such construct in Java AFAIR :P.
+> 
+>>> it, the more I think we really want to have a named enum instead. That
+>>> will give you some sort of basic type safety and semantics, too, and
+>>
+>> AFAIK we don't have strongly typed enums in C, at least not from
+>> the language perspective. In c++ we got enum class and enum struct
+>> with c++11 for that reason.
+>>
+>>> we'll also get proper names for those magic values - otherwise I'll
+>>> always have to look up what cc = 2 or cc = 3 means... (I always keep
+>>> forgetting what each value means...)
+>>
+>> Can you suggest some proper names for those magic values? Unfortunately
+>> the PoP refers to this stuff as setting condition code [0-3], so in my
+>> reading the numbers are the canonical names for this stuff. The best
+>> 'proper names' I can think of for these are CC_0, CC_1, CC_2, and CC_3.
+> 
+> Well, you already gave a description in your comment in the  struct
+> IOInstEnding, so maybe something similar? Or maybe this could even be
+> merged with the definitions for the SIGP status codes:
+> 
+> #define SIGP_CC_ORDER_CODE_ACCEPTED 0
+> #define SIGP_CC_STATUS_STORED       1
+> #define SIGP_CC_BUSY                2
+> #define SIGP_CC_NOT_OPERATIONAL     3
+> 
+> ?
+> 
+
+Maybe.
+
+>> Sorry, I may be a bit to persistent on this one: I don't think it's
+>> a huge difference, but I don't feel great about changing something to
+>> what I think is (slightly) worse without being first convinced that
+>> I was wrong.
+> 
+> In the end, the code has to be accepted by the maintainers, so let's
+> leave the decision up to them whether they like this typedef struct
+> IOInstEnding or not...
+
+I agree. Especially if the change in behavior in #3 does not get trough
+I will have to revert indicating exceptions too (like in v1), and then
+I really need the struct (which can be still less than 8 bytes).
+
+I assume you have seen my reply to Connie about the benefit: among others
+it prevents using something like -EFAULT as a cc by accident which neither
+an enum nor a typedef does.
+
+In practice, I think either of the proposed solutions will do.
+
+Halil
+ 
+> 
+>  Thomas
+> 
