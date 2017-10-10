@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e20EV-0000gl-6E
+	(envelope-from <richard.henderson@linaro.org>) id 1e20EX-0000l4-MU
 	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e20EM-00053f-Iq
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:22 -0400
-Received: from mail-pf0-x230.google.com ([2607:f8b0:400e:c00::230]:47077)
+	(envelope-from <richard.henderson@linaro.org>) id 1e20EW-00056M-MM
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:29 -0400
+Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:50211)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e20EM-00053L-A4
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:18 -0400
-Received: by mail-pf0-x230.google.com with SMTP id p87so9224696pfj.3
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 12:30:18 -0700 (PDT)
+	id 1e20EW-00055T-Gs
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:28 -0400
+Received: by mail-pf0-x233.google.com with SMTP id m63so18277566pfk.7
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 12:30:26 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 10 Oct 2017 12:29:51 -0700
-Message-Id: <20171010193003.28857-9-richard.henderson@linaro.org>
+Date: Tue, 10 Oct 2017 12:29:57 -0700
+Message-Id: <20171010193003.28857-15-richard.henderson@linaro.org>
 In-Reply-To: <20171010193003.28857-1-richard.henderson@linaro.org>
 References: <20171010193003.28857-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL v2 08/20] tcg: remove addr argument from
- lookup_tb_ptr
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 14/20] translate-all: define and use
+ DEBUG_TB_CHECK_GATE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,318 +35,86 @@ Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-It is unlikely that we will ever want to call this helper passing
-an argument other than the current PC. So just remove the argument,
-and use the pc we already get from cpu_get_tb_cpu_state.
+This prevents bit rot by ensuring the debug code is compiled when
+building a user-mode target.
 
-This change paves the way to having a common "tb_lookup" function.
+Unfortunately the helpers are user-mode-only so we cannot fully
+get rid of the ifdef checks. Add a comment to explain this.
 
+Suggested-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/tcg/tcg-runtime.h    |  2 +-
- tcg/tcg-op.h               |  4 ++--
- accel/tcg/tcg-runtime.c    | 20 ++++++++++----------
- target/alpha/translate.c   |  2 +-
- target/arm/translate-a64.c |  4 ++--
- target/arm/translate.c     |  5 +----
- target/hppa/translate.c    |  6 +++---
- target/i386/translate.c    | 17 +++++------------
- target/mips/translate.c    |  4 ++--
- target/s390x/translate.c   |  2 +-
- target/sh4/translate.c     |  4 ++--
- tcg/tcg-op.c               |  4 ++--
- 12 files changed, 32 insertions(+), 42 deletions(-)
+ accel/tcg/translate-all.c | 28 ++++++++++++++++++++++------
+ 1 file changed, 22 insertions(+), 6 deletions(-)
 
-diff --git a/accel/tcg/tcg-runtime.h b/accel/tcg/tcg-runtime.h
-index c41d38a557..1df17d0ba9 100644
---- a/accel/tcg/tcg-runtime.h
-+++ b/accel/tcg/tcg-runtime.h
-@@ -24,7 +24,7 @@ DEF_HELPER_FLAGS_1(clrsb_i64, TCG_CALL_NO_RWG_SE, i64, i64)
- DEF_HELPER_FLAGS_1(ctpop_i32, TCG_CALL_NO_RWG_SE, i32, i32)
- DEF_HELPER_FLAGS_1(ctpop_i64, TCG_CALL_NO_RWG_SE, i64, i64)
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 6b853b329c..26efad302d 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -82,6 +82,12 @@
+ #undef DEBUG_TB_CHECK
+ #endif
  
--DEF_HELPER_FLAGS_2(lookup_tb_ptr, TCG_CALL_NO_WG_SE, ptr, env, tl)
-+DEF_HELPER_FLAGS_1(lookup_tb_ptr, TCG_CALL_NO_WG_SE, ptr, env)
- 
- DEF_HELPER_FLAGS_1(exit_atomic, TCG_CALL_NO_WG, noreturn, env)
- 
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index 5d3278f243..18d01b2f43 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -797,7 +797,7 @@ static inline void tcg_gen_exit_tb(uintptr_t val)
- void tcg_gen_goto_tb(unsigned idx);
- 
- /**
-- * tcg_gen_lookup_and_goto_ptr() - look up a TB and jump to it if valid
-+ * tcg_gen_lookup_and_goto_ptr() - look up the current TB, jump to it if valid
-  * @addr: Guest address of the target TB
-  *
-  * If the TB is not valid, jump to the epilogue.
-@@ -805,7 +805,7 @@ void tcg_gen_goto_tb(unsigned idx);
-  * This operation is optional. If the TCG backend does not implement goto_ptr,
-  * this op is equivalent to calling tcg_gen_exit_tb() with 0 as the argument.
-  */
--void tcg_gen_lookup_and_goto_ptr(TCGv addr);
-+void tcg_gen_lookup_and_goto_ptr(void);
- 
- #if TARGET_LONG_BITS == 32
- #define tcg_temp_new() tcg_temp_new_i32()
-diff --git a/accel/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
-index aafb171294..b75394aba8 100644
---- a/accel/tcg/tcg-runtime.c
-+++ b/accel/tcg/tcg-runtime.c
-@@ -144,33 +144,33 @@ uint64_t HELPER(ctpop_i64)(uint64_t arg)
-     return ctpop64(arg);
- }
- 
--void *HELPER(lookup_tb_ptr)(CPUArchState *env, target_ulong addr)
-+void *HELPER(lookup_tb_ptr)(CPUArchState *env)
- {
-     CPUState *cpu = ENV_GET_CPU(env);
-     TranslationBlock *tb;
-     target_ulong cs_base, pc;
--    uint32_t flags, addr_hash;
-+    uint32_t flags, hash;
- 
--    addr_hash = tb_jmp_cache_hash_func(addr);
--    tb = atomic_rcu_read(&cpu->tb_jmp_cache[addr_hash]);
-     cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
-+    hash = tb_jmp_cache_hash_func(pc);
-+    tb = atomic_rcu_read(&cpu->tb_jmp_cache[hash]);
- 
-     if (unlikely(!(tb
--                   && tb->pc == addr
-+                   && tb->pc == pc
-                    && tb->cs_base == cs_base
-                    && tb->flags == flags
-                    && tb->trace_vcpu_dstate == *cpu->trace_dstate))) {
--        tb = tb_htable_lookup(cpu, addr, cs_base, flags);
-+        tb = tb_htable_lookup(cpu, pc, cs_base, flags);
-         if (!tb) {
-             return tcg_ctx.code_gen_epilogue;
-         }
--        atomic_set(&cpu->tb_jmp_cache[addr_hash], tb);
-+        atomic_set(&cpu->tb_jmp_cache[hash], tb);
-     }
- 
--    qemu_log_mask_and_addr(CPU_LOG_EXEC, addr,
-+    qemu_log_mask_and_addr(CPU_LOG_EXEC, pc,
-                            "Chain %p [%d: " TARGET_FMT_lx "] %s\n",
--                           tb->tc_ptr, cpu->cpu_index, addr,
--                           lookup_symbol(addr));
-+                           tb->tc_ptr, cpu->cpu_index, pc,
-+                           lookup_symbol(pc));
-     return tb->tc_ptr;
- }
- 
-diff --git a/target/alpha/translate.c b/target/alpha/translate.c
-index 5a92c4accb..f32c95b9a1 100644
---- a/target/alpha/translate.c
-+++ b/target/alpha/translate.c
-@@ -3029,7 +3029,7 @@ static void alpha_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
-         /* FALLTHRU */
-     case DISAS_PC_UPDATED:
-         if (!use_exit_tb(ctx)) {
--            tcg_gen_lookup_and_goto_ptr(cpu_pc);
-+            tcg_gen_lookup_and_goto_ptr();
-             break;
-         }
-         /* FALLTHRU */
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 899ffb96fc..a39b9d3633 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -379,7 +379,7 @@ static inline void gen_goto_tb(DisasContext *s, int n, uint64_t dest)
-         } else if (s->base.singlestep_enabled) {
-             gen_exception_internal(EXCP_DEBUG);
-         } else {
--            tcg_gen_lookup_and_goto_ptr(cpu_pc);
-+            tcg_gen_lookup_and_goto_ptr();
-             s->base.is_jmp = DISAS_NORETURN;
-         }
-     }
-@@ -11363,7 +11363,7 @@ static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
-             gen_a64_set_pc_im(dc->pc);
-             /* fall through */
-         case DISAS_JUMP:
--            tcg_gen_lookup_and_goto_ptr(cpu_pc);
-+            tcg_gen_lookup_and_goto_ptr();
-             break;
-         case DISAS_EXIT:
-             tcg_gen_exit_tb(0);
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index ab1a12a1b8..fdc46cc525 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -4173,10 +4173,7 @@ static inline bool use_goto_tb(DisasContext *s, target_ulong dest)
- 
- static void gen_goto_ptr(void)
- {
--    TCGv addr = tcg_temp_new();
--    tcg_gen_extu_i32_tl(addr, cpu_R[15]);
--    tcg_gen_lookup_and_goto_ptr(addr);
--    tcg_temp_free(addr);
-+    tcg_gen_lookup_and_goto_ptr();
- }
- 
- /* This will end the TB but doesn't guarantee we'll return to
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index b6e2652341..26242f4b3c 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -505,7 +505,7 @@ static void gen_goto_tb(DisasContext *ctx, int which,
-         if (ctx->base.singlestep_enabled) {
-             gen_excp_1(EXCP_DEBUG);
-         } else {
--            tcg_gen_lookup_and_goto_ptr(cpu_iaoq_f);
-+            tcg_gen_lookup_and_goto_ptr();
-         }
++#ifdef DEBUG_TB_CHECK
++#define DEBUG_TB_CHECK_GATE 1
++#else
++#define DEBUG_TB_CHECK_GATE 0
++#endif
++
+ /* Access to the various translations structures need to be serialised via locks
+  * for consistency. This is automatic for SoftMMU based system
+  * emulation due to its single threaded nature. In user-mode emulation
+@@ -950,7 +956,13 @@ void tb_flush(CPUState *cpu)
      }
  }
-@@ -1515,7 +1515,7 @@ static DisasJumpType do_ibranch(DisasContext *ctx, TCGv dest,
-         if (link != 0) {
-             tcg_gen_movi_tl(cpu_gr[link], ctx->iaoq_n);
-         }
--        tcg_gen_lookup_and_goto_ptr(cpu_iaoq_f);
-+        tcg_gen_lookup_and_goto_ptr();
-         return nullify_end(ctx, DISAS_NEXT);
-     } else {
-         cond_prep(&ctx->null_cond);
-@@ -3873,7 +3873,7 @@ static void hppa_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
-         if (ctx->base.singlestep_enabled) {
-             gen_excp_1(EXCP_DEBUG);
-         } else {
--            tcg_gen_lookup_and_goto_ptr(cpu_iaoq_f);
-+            tcg_gen_lookup_and_goto_ptr();
-         }
-         break;
-     default:
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 7b920115f9..5d61fa96ad 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -2511,7 +2511,7 @@ static void gen_bnd_jmp(DisasContext *s)
-    If RECHECK_TF, emit a rechecking helper for #DB, ignoring the state of
-    S->TF.  This is used by the syscall/sysret insns.  */
+ 
+-#ifdef DEBUG_TB_CHECK
++/*
++ * Formerly ifdef DEBUG_TB_CHECK. These debug functions are user-mode-only,
++ * so in order to prevent bit rot we compile them unconditionally in user-mode,
++ * and let the optimizer get rid of them by wrapping their user-only callers
++ * with if (DEBUG_TB_CHECK_GATE).
++ */
++#ifdef CONFIG_USER_ONLY
+ 
  static void
--do_gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf, TCGv jr)
-+do_gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf, bool jr)
+ do_tb_invalidate_check(struct qht *ht, void *p, uint32_t hash, void *userp)
+@@ -994,7 +1006,7 @@ static void tb_page_check(void)
+     qht_iter(&tcg_ctx.tb_ctx.htable, do_tb_page_check, NULL);
+ }
+ 
+-#endif
++#endif /* CONFIG_USER_ONLY */
+ 
+ static inline void tb_page_remove(TranslationBlock **ptb, TranslationBlock *tb)
  {
-     gen_update_cc_op(s);
+@@ -1236,8 +1248,10 @@ static void tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
+     h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->trace_vcpu_dstate);
+     qht_insert(&tcg_ctx.tb_ctx.htable, tb, h);
  
-@@ -2532,12 +2532,8 @@ do_gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf, TCGv jr)
-         tcg_gen_exit_tb(0);
-     } else if (s->tf) {
-         gen_helper_single_step(cpu_env);
--    } else if (!TCGV_IS_UNUSED(jr)) {
--        TCGv vaddr = tcg_temp_new();
--
--        tcg_gen_add_tl(vaddr, jr, cpu_seg_base[R_CS]);
--        tcg_gen_lookup_and_goto_ptr(vaddr);
--        tcg_temp_free(vaddr);
-+    } else if (jr) {
-+        tcg_gen_lookup_and_goto_ptr();
-     } else {
-         tcg_gen_exit_tb(0);
-     }
-@@ -2547,10 +2543,7 @@ do_gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf, TCGv jr)
- static inline void
- gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf)
- {
--    TCGv unused;
--
--    TCGV_UNUSED(unused);
--    do_gen_eob_worker(s, inhibit, recheck_tf, unused);
-+    do_gen_eob_worker(s, inhibit, recheck_tf, false);
+-#ifdef DEBUG_TB_CHECK
+-    tb_page_check();
++#ifdef CONFIG_USER_ONLY
++    if (DEBUG_TB_CHECK_GATE) {
++        tb_page_check();
++    }
+ #endif
  }
  
- /* End of block.
-@@ -2569,7 +2562,7 @@ static void gen_eob(DisasContext *s)
- /* Jump to register */
- static void gen_jr(DisasContext *s, TCGv dest)
- {
--    do_gen_eob_worker(s, false, false, dest);
-+    do_gen_eob_worker(s, false, false, true);
- }
- 
- /* generate a jump to eip. No segment change must happen before as a
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index d16d879df7..ac05f3aa09 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -4303,7 +4303,7 @@ static inline void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
-             save_cpu_state(ctx, 0);
-             gen_helper_raise_exception_debug(cpu_env);
+@@ -2223,8 +2237,10 @@ int page_unprotect(target_ulong address, uintptr_t pc)
+             /* and since the content will be modified, we must invalidate
+                the corresponding translated code. */
+             current_tb_invalidated |= tb_invalidate_phys_page(addr, pc);
+-#ifdef DEBUG_TB_CHECK
+-            tb_invalidate_check(addr);
++#ifdef CONFIG_USER_ONLY
++            if (DEBUG_TB_CHECK_GATE) {
++                tb_invalidate_check(addr);
++            }
+ #endif
          }
--        tcg_gen_lookup_and_goto_ptr(cpu_PC);
-+        tcg_gen_lookup_and_goto_ptr();
-     }
- }
- 
-@@ -10883,7 +10883,7 @@ static void gen_branch(DisasContext *ctx, int insn_bytes)
-                 save_cpu_state(ctx, 0);
-                 gen_helper_raise_exception_debug(cpu_env);
-             }
--            tcg_gen_lookup_and_goto_ptr(cpu_PC);
-+            tcg_gen_lookup_and_goto_ptr();
-             break;
-         default:
-             fprintf(stderr, "unknown branch 0x%x\n", proc_hflags);
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 9ef95141f9..165d2cac3e 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -5949,7 +5949,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-         } else if (use_exit_tb(&dc) || status == EXIT_PC_STALE_NOCHAIN) {
-             tcg_gen_exit_tb(0);
-         } else {
--            tcg_gen_lookup_and_goto_ptr(psw_addr);
-+            tcg_gen_lookup_and_goto_ptr();
-         }
-         break;
-     default:
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 10191073b2..8db9fba26e 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -261,7 +261,7 @@ static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
-         } else if (use_exit_tb(ctx)) {
-             tcg_gen_exit_tb(0);
-         } else {
--            tcg_gen_lookup_and_goto_ptr(cpu_pc);
-+            tcg_gen_lookup_and_goto_ptr();
-         }
-     }
- }
-@@ -278,7 +278,7 @@ static void gen_jump(DisasContext * ctx)
-         } else if (use_exit_tb(ctx)) {
-             tcg_gen_exit_tb(0);
-         } else {
--            tcg_gen_lookup_and_goto_ptr(cpu_pc);
-+            tcg_gen_lookup_and_goto_ptr();
-         }
-     } else {
- 	gen_goto_tb(ctx, 0, ctx->delayed_pc);
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index 688d91755b..d3c0e4799e 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -2588,11 +2588,11 @@ void tcg_gen_goto_tb(unsigned idx)
-     tcg_gen_op1i(INDEX_op_goto_tb, idx);
- }
- 
--void tcg_gen_lookup_and_goto_ptr(TCGv addr)
-+void tcg_gen_lookup_and_goto_ptr(void)
- {
-     if (TCG_TARGET_HAS_goto_ptr && !qemu_loglevel_mask(CPU_LOG_TB_NOCHAIN)) {
-         TCGv_ptr ptr = tcg_temp_new_ptr();
--        gen_helper_lookup_tb_ptr(ptr, tcg_ctx.tcg_env, addr);
-+        gen_helper_lookup_tb_ptr(ptr, tcg_ctx.tcg_env);
-         tcg_gen_op1i(INDEX_op_goto_ptr, GET_TCGV_PTR(ptr));
-         tcg_temp_free_ptr(ptr);
-     } else {
+         mprotect((void *)g2h(host_start), qemu_host_page_size,
 -- 
 2.13.6
