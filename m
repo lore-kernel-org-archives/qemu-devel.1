@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e20EG-0000V3-Ji
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:14 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e20EJ-0000X8-1s
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e20EE-0004v2-Az
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:12 -0400
-Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:48756)
+	(envelope-from <richard.henderson@linaro.org>) id 1e20EH-0004za-UA
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:14 -0400
+Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:45679)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e20EE-0004ui-2U
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:10 -0400
-Received: by mail-pf0-x233.google.com with SMTP id b79so5987003pfk.5
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 12:30:09 -0700 (PDT)
+	id 1e20EH-0004y9-Oc
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:13 -0400
+Received: by mail-pf0-x233.google.com with SMTP id d28so3568998pfe.2
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 12:30:13 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 10 Oct 2017 12:29:45 -0700
-Message-Id: <20171010193003.28857-3-richard.henderson@linaro.org>
+Date: Tue, 10 Oct 2017 12:29:48 -0700
+Message-Id: <20171010193003.28857-6-richard.henderson@linaro.org>
 In-Reply-To: <20171010193003.28857-1-richard.henderson@linaro.org>
 References: <20171010193003.28857-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 02/20] tcg: fix corruption of code_time
- profiling counter upon tb_flush
+Subject: [Qemu-devel] [PULL v2 05/20] cpu-exec: rename have_tb_lock to
+ acquired_tb_lock in tb_find
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,94 +32,59 @@ Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Whenever there is an overflow in code_gen_buffer (e.g. we run out
-of space in it and have to flush it), the code_time profiling counter
-ends up with an invalid value (that is, code_time -= profile_getclock(),
-without later on getting += profile_getclock() due to the goto).
+Reusing the have_tb_lock name, which is also defined in translate-all.c,
+makes code reviewing unnecessarily harder.
 
-Fix it by using the ti variable, so that we only update code_time
-when there is no overflow. Note that in case there is an overflow
-we fail to account for the elapsed coding time, but this is quite rare
-so we can probably live with it.
-
-"info jit" before/after, roughly at the same time during debian-arm bootup:
-
-- before:
-Statistics:
-TB flush count      1
-TB invalidate count 4665
-TLB flush count     998
-JIT cycles          -615191529184601 (-256329.804 s at 2.4 GHz)
-translated TBs      302310 (aborted=0 0.0%)
-avg ops/TB          48.4 max=438
-deleted ops/TB      8.54
-avg temps/TB        32.31 max=38
-avg host code/TB    361.5
-avg search data/TB  24.5
-cycles/op           -42014693.0
-cycles/in byte      -121444900.2
-cycles/out byte     -5629031.1
-cycles/search byte     -83114481.0
-  gen_interm time   -0.0%
-  gen_code time     100.0%
-optim./code time    -0.0%
-liveness/code time  -0.0%
-cpu_restore count   6236
-  avg cycles        110.4
-
-- after:
-Statistics:
-TB flush count      1
-TB invalidate count 4665
-TLB flush count     1010
-JIT cycles          1996899624 (0.832 s at 2.4 GHz)
-translated TBs      297961 (aborted=0 0.0%)
-avg ops/TB          48.5 max=438
-deleted ops/TB      8.56
-avg temps/TB        32.31 max=38
-avg host code/TB    361.8
-avg search data/TB  24.5
-cycles/op           138.2
-cycles/in byte      398.4
-cycles/out byte     18.5
-cycles/search byte     273.1
-  gen_interm time   14.0%
-  gen_code time     86.0%
-optim./code time    19.4%
-liveness/code time  10.3%
-cpu_restore count   6372
-  avg cycles        111.0
+Avoid potential confusion by renaming the local have_tb_lock variable
+to something else.
 
 Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/tcg/translate-all.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ accel/tcg/cpu-exec.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 6b5d4bece2..b3bfe65059 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1300,7 +1300,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
- #ifdef CONFIG_PROFILER
-     tcg_ctx.tb_count++;
-     tcg_ctx.interm_time += profile_getclock() - ti;
--    tcg_ctx.code_time -= profile_getclock();
-+    ti = profile_getclock();
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index ff6866624a..32104b8d8c 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -372,7 +372,7 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
+     TranslationBlock *tb;
+     target_ulong cs_base, pc;
+     uint32_t flags;
+-    bool have_tb_lock = false;
++    bool acquired_tb_lock = false;
+ 
+     /* we record a subset of the CPU state. It will
+        always be the same before a given translated block
+@@ -391,7 +391,7 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
+              */
+             mmap_lock();
+             tb_lock();
+-            have_tb_lock = true;
++            acquired_tb_lock = true;
+ 
+             /* There's a chance that our desired tb has been translated while
+              * taking the locks so we check again inside the lock.
+@@ -419,15 +419,15 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
  #endif
- 
-     /* ??? Overflow could be handled better here.  In particular, we
-@@ -1318,7 +1318,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+     /* See if we can patch the calling TB. */
+     if (last_tb && !qemu_loglevel_mask(CPU_LOG_TB_NOCHAIN)) {
+-        if (!have_tb_lock) {
++        if (!acquired_tb_lock) {
+             tb_lock();
+-            have_tb_lock = true;
++            acquired_tb_lock = true;
+         }
+         if (!tb->invalid) {
+             tb_add_jump(last_tb, tb_exit, tb);
+         }
      }
- 
- #ifdef CONFIG_PROFILER
--    tcg_ctx.code_time += profile_getclock();
-+    tcg_ctx.code_time += profile_getclock() - ti;
-     tcg_ctx.code_in_len += tb->size;
-     tcg_ctx.code_out_len += gen_code_size;
-     tcg_ctx.search_out_len += search_size;
+-    if (have_tb_lock) {
++    if (acquired_tb_lock) {
+         tb_unlock();
+     }
+     return tb;
 -- 
 2.13.6
