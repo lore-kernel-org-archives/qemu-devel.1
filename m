@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1e1iAa-0005FF-JH
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:13:13 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e1iq7-00029v-VF
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1e1iAZ-0004dc-HO
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:13:12 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e1iq6-0004GD-3s
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:08 -0400
+Received: from mail-pf0-x231.google.com ([2607:f8b0:400e:c00::231]:52377)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e1iq5-0004FP-Ui
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:06 -0400
+Received: by mail-pf0-x231.google.com with SMTP id a1so12238343pfj.9
+	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 17:56:05 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Mon,  9 Oct 2017 17:55:38 -0700
+Message-Id: <20171010005600.28735-2-richard.henderson@linaro.org>
+In-Reply-To: <20171010005600.28735-1-richard.henderson@linaro.org>
+References: <20171010005600.28735-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20171008222029.GA29979@toto>
-References: <cover.1505929556.git.alistair.francis@xilinx.com>
-	<20171008222029.GA29979@toto>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Mon, 9 Oct 2017 17:12:39 -0700
-Message-ID: <CAKmqyKMEbQ3JbqMxeeOTBV92ixRVDfw1wFi57xNKGyF82DSC_Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 0/8] Add the ZynqMP PMU and IPI
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 01/23] cputlb: bring back tlb_flush_count under
+ !TLB_DEBUG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,91 +30,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@gmail.com>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
-On Sun, Oct 8, 2017 at 3:20 PM, Edgar E. Iglesias
-<edgar.iglesias@xilinx.com> wrote:
-> On Wed, Sep 20, 2017 at 03:01:31PM -0700, Alistair Francis wrote:
->>
->> This series adds the ZynqMP Power Management Unit (PMU) machine with basic
->> functionality.
->>
->> The machine only has the
->>  - CPU
->>  - Memory
->>  - Interrupt controller
->>  - IPI device
->>
->> connected, but that is enough to run some of the ROM and firmware
->> code on the machine
->>
->> The series also adds the IPI device and connects it to the ZynqMP ARM
->> side and the ZynqMP PMU. These IPI devices don't connect between the ARM
->> and MicroBlaze instances though.
->>
->> v3:
->>  - Add the interrupt controller
->>  - Replace some of the error_fatals with errp
->>  - Fix the PMU CPU name
->
-> Hi Alistair,
->
->
-> Sorry for the super long delay...
->
-> I think this mostly looks good but I was wondering if we really need
-> to have a board specific (zcu102) PMU?
+From: "Emilio G. Cota" <cota@braap.org>
 
-It doesn't have to be board specific. What I wanted though was an SoC
-and a machine so that maybe one day we could add the PMU SoC to the
-ARM ZCU102 machine. After that it was hard to think of a name to
-differentiate the SoC and the machine. Do you have a recommendation on
-names?
+Commit f0aff0f124 ("cputlb: add assert_cpu_is_self checks") buried
+the increment of tlb_flush_count under TLB_DEBUG. This results in
+"info jit" always (mis)reporting 0 TLB flushes when !TLB_DEBUG.
 
-Thanks,
-Alistair
+Besides, under MTTCG tlb_flush_count is updated by several threads,
+so in order not to lose counts we'd either have to use atomic ops
+or distribute the counter, which is more scalable.
 
->
-> Best regards,
-> Edgar
->
->
->
->>
->>
->>
->> Alistair Francis (8):
->>   xlnx-zynqmp-pmu: Initial commit of the ZynqMP PMU
->>   xlnx-zynqmp-pmu: Add the CPU and memory
->>   aarch64-softmmu.mak: Use an ARM specific config
->>   xlnx-pmu-iomod-intc: Add the PMU Interrupt controller
->>   xlnx-zynqmp-pmu: Connect the PMU interrupt controller
->>   xlnx-zynqmp-ipi: Initial version of the Xilinx IPI device
->>   xlnx-zynqmp-pmu: Connect the IPI device to the PMU
->>   xlnx-zynqmp: Connect the IPI device to the ZynqMP SoC
->>
->>  default-configs/aarch64-softmmu.mak    |   1 +
->>  default-configs/microblaze-softmmu.mak |   1 +
->>  hw/arm/Makefile.objs                   |   2 +-
->>  hw/arm/xlnx-zynqmp.c                   |  14 +
->>  hw/display/Makefile.objs               |   2 +-
->>  hw/dma/Makefile.objs                   |   2 +-
->>  hw/intc/Makefile.objs                  |   2 +
->>  hw/intc/xlnx-pmu-iomod-intc.c          | 554 +++++++++++++++++++++++++++++++++
->>  hw/intc/xlnx-zynqmp-ipi.c              | 377 ++++++++++++++++++++++
->>  hw/microblaze/Makefile.objs            |   1 +
->>  hw/microblaze/xlnx-zynqmp-pmu.c        | 200 ++++++++++++
->>  include/hw/arm/xlnx-zynqmp.h           |   2 +
->>  include/hw/intc/xlnx-pmu-iomod-intc.h  |  58 ++++
->>  include/hw/intc/xlnx-zynqmp-ipi.h      |  57 ++++
->>  14 files changed, 1270 insertions(+), 3 deletions(-)
->>  create mode 100644 hw/intc/xlnx-pmu-iomod-intc.c
->>  create mode 100644 hw/intc/xlnx-zynqmp-ipi.c
->>  create mode 100644 hw/microblaze/xlnx-zynqmp-pmu.c
->>  create mode 100644 include/hw/intc/xlnx-pmu-iomod-intc.h
->>  create mode 100644 include/hw/intc/xlnx-zynqmp-ipi.h
->>
->> --
->> 2.11.0
->>
+This patch does the latter by embedding tlb_flush_count in CPUArchState.
+The global count is then easily obtained by iterating over the CPU list.
+
+Note that this change also requires updating the accessors to
+tlb_flush_count to use atomic_read/set whenever there may be conflicting
+accesses (as defined in C11) to it.
+
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ include/exec/cpu-defs.h   |  1 +
+ include/exec/cputlb.h     |  3 +--
+ accel/tcg/cputlb.c        | 17 ++++++++++++++---
+ accel/tcg/translate-all.c |  2 +-
+ 4 files changed, 17 insertions(+), 6 deletions(-)
+
+diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
+index bc8e7f848d..e43ff8346b 100644
+--- a/include/exec/cpu-defs.h
++++ b/include/exec/cpu-defs.h
+@@ -137,6 +137,7 @@ typedef struct CPUIOTLBEntry {
+     CPUTLBEntry tlb_v_table[NB_MMU_MODES][CPU_VTLB_SIZE];               \
+     CPUIOTLBEntry iotlb[NB_MMU_MODES][CPU_TLB_SIZE];                    \
+     CPUIOTLBEntry iotlb_v[NB_MMU_MODES][CPU_VTLB_SIZE];                 \
++    size_t tlb_flush_count;                                             \
+     target_ulong tlb_flush_addr;                                        \
+     target_ulong tlb_flush_mask;                                        \
+     target_ulong vtlb_index;                                            \
+diff --git a/include/exec/cputlb.h b/include/exec/cputlb.h
+index 3f941783c5..c91db211bc 100644
+--- a/include/exec/cputlb.h
++++ b/include/exec/cputlb.h
+@@ -23,7 +23,6 @@
+ /* cputlb.c */
+ void tlb_protect_code(ram_addr_t ram_addr);
+ void tlb_unprotect_code(ram_addr_t ram_addr);
+-extern int tlb_flush_count;
+-
++size_t tlb_flush_count(void);
+ #endif
+ #endif
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index bcbcc4db6c..5b1ef1442c 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -92,8 +92,18 @@ static void flush_all_helper(CPUState *src, run_on_cpu_func fn,
+     }
+ }
+ 
+-/* statistics */
+-int tlb_flush_count;
++size_t tlb_flush_count(void)
++{
++    CPUState *cpu;
++    size_t count = 0;
++
++    CPU_FOREACH(cpu) {
++        CPUArchState *env = cpu->env_ptr;
++
++        count += atomic_read(&env->tlb_flush_count);
++    }
++    return count;
++}
+ 
+ /* This is OK because CPU architectures generally permit an
+  * implementation to drop entries from the TLB at any time, so
+@@ -112,7 +122,8 @@ static void tlb_flush_nocheck(CPUState *cpu)
+     }
+ 
+     assert_cpu_is_self(cpu);
+-    tlb_debug("(count: %d)\n", tlb_flush_count++);
++    atomic_set(&env->tlb_flush_count, env->tlb_flush_count + 1);
++    tlb_debug("(count: %zu)\n", tlb_flush_count());
+ 
+     tb_lock();
+ 
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 2d1ed06065..6b5d4bece2 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -1936,7 +1936,7 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
+             atomic_read(&tcg_ctx.tb_ctx.tb_flush_count));
+     cpu_fprintf(f, "TB invalidate count %d\n",
+             tcg_ctx.tb_ctx.tb_phys_invalidate_count);
+-    cpu_fprintf(f, "TLB flush count     %d\n", tlb_flush_count);
++    cpu_fprintf(f, "TLB flush count     %zu\n", tlb_flush_count());
+     tcg_dump_info(f, cpu_fprintf);
+ 
+     tb_unlock();
+-- 
+2.13.6
