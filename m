@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e1iqQ-0002Oi-C9
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:27 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e1iqU-0002Su-9F
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e1iqM-0004WM-NR
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:25 -0400
-Received: from mail-pf0-x22f.google.com ([2607:f8b0:400e:c00::22f]:53905)
+	(envelope-from <richard.henderson@linaro.org>) id 1e1iqT-0004Zg-8W
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:30 -0400
+Received: from mail-pf0-x235.google.com ([2607:f8b0:400e:c00::235]:54345)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e1iqM-0004Vt-Hf
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:22 -0400
-Received: by mail-pf0-x22f.google.com with SMTP id n73so8794306pfg.10
-	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 17:56:22 -0700 (PDT)
+	id 1e1iqT-0004ZL-1o
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:29 -0400
+Received: by mail-pf0-x235.google.com with SMTP id m28so10542062pfi.11
+	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 17:56:28 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon,  9 Oct 2017 17:55:51 -0700
-Message-Id: <20171010005600.28735-15-richard.henderson@linaro.org>
+Date: Mon,  9 Oct 2017 17:55:56 -0700
+Message-Id: <20171010005600.28735-20-richard.henderson@linaro.org>
 In-Reply-To: <20171010005600.28735-1-richard.henderson@linaro.org>
 References: <20171010005600.28735-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 14/23] translate-all: define and use
- DEBUG_TB_CHECK_GATE
+Subject: [Qemu-devel] [PULL 19/23] util: move qemu_real_host_page_size/mask
+ to osdep.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,86 +32,112 @@ Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-This prevents bit rot by ensuring the debug code is compiled when
-building a user-mode target.
+These only depend on the host and therefore belong in the common
+osdep, not in a target-dependent object.
 
-Unfortunately the helpers are user-mode-only so we cannot fully
-get rid of the ifdef checks. Add a comment to explain this.
+While at it, query the host during an init constructor, which guarantees
+the page size will be well-defined throughout the execution of the program.
 
-Suggested-by: Alex Bennée <alex.bennee@linaro.org>
+Suggested-by: Richard Henderson <rth@twiddle.net>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/tcg/translate-all.c | 28 ++++++++++++++++++++++------
- 1 file changed, 22 insertions(+), 6 deletions(-)
+ include/exec/cpu-all.h |  2 --
+ include/qemu/osdep.h   |  6 ++++++
+ exec.c                 |  4 ----
+ util/pagesize.c        | 18 ++++++++++++++++++
+ util/Makefile.objs     |  1 +
+ 5 files changed, 25 insertions(+), 6 deletions(-)
+ create mode 100644 util/pagesize.c
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 6b853b329c..26efad302d 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -82,6 +82,12 @@
- #undef DEBUG_TB_CHECK
- #endif
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index ffe43d5654..778031c3d7 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -229,8 +229,6 @@ extern int target_page_bits;
+ /* Using intptr_t ensures that qemu_*_page_mask is sign-extended even
+  * when intptr_t is 32-bit and we are aligning a long long.
+  */
+-extern uintptr_t qemu_real_host_page_size;
+-extern intptr_t qemu_real_host_page_mask;
+ extern uintptr_t qemu_host_page_size;
+ extern intptr_t qemu_host_page_mask;
  
-+#ifdef DEBUG_TB_CHECK
-+#define DEBUG_TB_CHECK_GATE 1
-+#else
-+#define DEBUG_TB_CHECK_GATE 0
-+#endif
-+
- /* Access to the various translations structures need to be serialised via locks
-  * for consistency. This is automatic for SoftMMU based system
-  * emulation due to its single threaded nature. In user-mode emulation
-@@ -950,7 +956,13 @@ void tb_flush(CPUState *cpu)
-     }
- }
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 9dd318a7dd..826650c58a 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -505,6 +505,12 @@ char *qemu_get_pid_name(pid_t pid);
+  */
+ pid_t qemu_fork(Error **errp);
  
--#ifdef DEBUG_TB_CHECK
-+/*
-+ * Formerly ifdef DEBUG_TB_CHECK. These debug functions are user-mode-only,
-+ * so in order to prevent bit rot we compile them unconditionally in user-mode,
-+ * and let the optimizer get rid of them by wrapping their user-only callers
-+ * with if (DEBUG_TB_CHECK_GATE).
++/* Using intptr_t ensures that qemu_*_page_mask is sign-extended even
++ * when intptr_t is 32-bit and we are aligning a long long.
 + */
-+#ifdef CONFIG_USER_ONLY
++extern uintptr_t qemu_real_host_page_size;
++extern intptr_t qemu_real_host_page_mask;
++
+ extern int qemu_icache_linesize;
+ extern int qemu_dcache_linesize;
  
- static void
- do_tb_invalidate_check(struct qht *ht, void *p, uint32_t hash, void *userp)
-@@ -994,7 +1006,7 @@ static void tb_page_check(void)
-     qht_iter(&tcg_ctx.tb_ctx.htable, do_tb_page_check, NULL);
- }
+diff --git a/exec.c b/exec.c
+index 7a80460725..6378714a2b 100644
+--- a/exec.c
++++ b/exec.c
+@@ -120,8 +120,6 @@ int use_icount;
  
--#endif
-+#endif /* CONFIG_USER_ONLY */
+ uintptr_t qemu_host_page_size;
+ intptr_t qemu_host_page_mask;
+-uintptr_t qemu_real_host_page_size;
+-intptr_t qemu_real_host_page_mask;
  
- static inline void tb_page_remove(TranslationBlock **ptb, TranslationBlock *tb)
+ bool set_preferred_target_page_bits(int bits)
  {
-@@ -1236,8 +1248,10 @@ static void tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
-     h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->trace_vcpu_dstate);
-     qht_insert(&tcg_ctx.tb_ctx.htable, tb, h);
- 
--#ifdef DEBUG_TB_CHECK
--    tb_page_check();
-+#ifdef CONFIG_USER_ONLY
-+    if (DEBUG_TB_CHECK_GATE) {
-+        tb_page_check();
-+    }
- #endif
- }
- 
-@@ -2223,8 +2237,10 @@ int page_unprotect(target_ulong address, uintptr_t pc)
-             /* and since the content will be modified, we must invalidate
-                the corresponding translated code. */
-             current_tb_invalidated |= tb_invalidate_phys_page(addr, pc);
--#ifdef DEBUG_TB_CHECK
--            tb_invalidate_check(addr);
-+#ifdef CONFIG_USER_ONLY
-+            if (DEBUG_TB_CHECK_GATE) {
-+                tb_invalidate_check(addr);
-+            }
- #endif
-         }
-         mprotect((void *)g2h(host_start), qemu_host_page_size,
+@@ -3606,8 +3604,6 @@ void page_size_init(void)
+ {
+     /* NOTE: we can always suppose that qemu_host_page_size >=
+        TARGET_PAGE_SIZE */
+-    qemu_real_host_page_size = getpagesize();
+-    qemu_real_host_page_mask = -(intptr_t)qemu_real_host_page_size;
+     if (qemu_host_page_size == 0) {
+         qemu_host_page_size = qemu_real_host_page_size;
+     }
+diff --git a/util/pagesize.c b/util/pagesize.c
+new file mode 100644
+index 0000000000..998632cf6e
+--- /dev/null
++++ b/util/pagesize.c
+@@ -0,0 +1,18 @@
++/*
++ * pagesize.c - query the host about its page size
++ *
++ * Copyright (C) 2017, Emilio G. Cota <cota@braap.org>
++ * License: GNU GPL, version 2 or later.
++ *   See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++
++uintptr_t qemu_real_host_page_size;
++intptr_t qemu_real_host_page_mask;
++
++static void __attribute__((constructor)) init_real_host_page_size(void)
++{
++    qemu_real_host_page_size = getpagesize();
++    qemu_real_host_page_mask = -(intptr_t)qemu_real_host_page_size;
++}
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index 50a55ecc75..2973b0a323 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -40,6 +40,7 @@ util-obj-y += buffer.o
+ util-obj-y += timed-average.o
+ util-obj-y += base64.o
+ util-obj-y += log.o
++util-obj-y += pagesize.o
+ util-obj-y += qdist.o
+ util-obj-y += qht.o
+ util-obj-y += range.o
 -- 
 2.13.6
