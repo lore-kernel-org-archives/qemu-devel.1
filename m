@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1e1phj-0004tv-Ow
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:15:56 -0400
+	(envelope-from <th.huth@gmail.com>) id 1e1phm-0004uY-Jo
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:15:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarnath.valluri@intel.com>) id 1e1phe-0002Ze-PU
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:15:55 -0400
-Received: from mga02.intel.com ([134.134.136.20]:15999)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
-	id 1e1phe-0002Yz-F9
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:15:50 -0400
-From: "Valluri, Amarnath" <amarnath.valluri@intel.com>
-Date: Tue, 10 Oct 2017 08:15:46 +0000
-Message-ID: <1507623384.4061.29.camel@intel.com>
-References: <20171009225623.29232-1-marcandre.lureau@redhat.com>
-	<20171009225623.29232-32-marcandre.lureau@redhat.com>
-In-Reply-To: <20171009225623.29232-32-marcandre.lureau@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <39AC2A1FC254AE488CAFDB379D0DC206@intel.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <th.huth@gmail.com>) id 1e1phh-0002bB-L2
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:15:58 -0400
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:56875)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1e1phh-0002at-EF
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:15:53 -0400
+Received: by mail-wm0-f68.google.com with SMTP id l68so2743263wmd.5
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 01:15:53 -0700 (PDT)
+References: <88c14424-9813-5e68-0aa7-38f3cde0a491@tuxfamily.org>
+	<8ae225f4-b3b8-b09d-03ed-9e8b38a051a5@denx.de>
+From: Thomas Huth <huth@tuxfamily.org>
+Message-ID: <53ae3fc6-90ea-a154-752d-fe50b3d01642@tuxfamily.org>
+Date: Tue, 10 Oct 2017 10:15:49 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 31/42] tpm-backend: move set 'id' to common
- code
+In-Reply-To: <8ae225f4-b3b8-b09d-03ed-9e8b38a051a5@denx.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] qemu-system-nios2 hangs when emulator is quit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,72 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "stefanb@linux.vnet.ibm.com" <stefanb@linux.vnet.ibm.com>
+To: Marek Vasut <marex@denx.de>, Chris Wulff <crwulff@gmail.com>
+Cc: Richard Henderson <rth@twiddle.net>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-T24gVHVlLCAyMDE3LTEwLTEwIGF0IDAwOjU2ICswMjAwLCBNYXJjLUFuZHLDqSBMdXJlYXUgd3Jv
-dGU6DQo+IFNpZ25lZC1vZmYtYnk6IE1hcmMtQW5kcsOpIEx1cmVhdSA8bWFyY2FuZHJlLmx1cmVh
-dUByZWRoYXQuY29tPg0KPiAtLS0NCj4gwqBpbmNsdWRlL3N5c2VtdS90cG1fYmFja2VuZC5oIHzC
-oMKgMiArLQ0KPiDCoGh3L3RwbS90cG1fZW11bGF0b3IuY8KgwqDCoMKgwqDCoMKgwqB8IDEyICsr
-Ky0tLS0tLS0tLQ0KPiDCoGh3L3RwbS90cG1fcGFzc3Rocm91Z2guY8KgwqDCoMKgwqB8wqDCoDkg
-KysrLS0tLS0tDQo+IMKgdHBtLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqB8wqDCoDMgKystDQo+IMKgNCBmaWxlcyBjaGFuZ2VkLCA5IGluc2VydGlvbnMo
-KyksIDE3IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvc3lzZW11L3Rw
-bV9iYWNrZW5kLmgNCj4gYi9pbmNsdWRlL3N5c2VtdS90cG1fYmFja2VuZC5oDQo+IGluZGV4IDU5
-NGJiNTA3ODIuLjg4MWJlOTdlZTMgMTAwNjQ0DQo+IC0tLSBhL2luY2x1ZGUvc3lzZW11L3RwbV9i
-YWNrZW5kLmgNCj4gKysrIGIvaW5jbHVkZS9zeXNlbXUvdHBtX2JhY2tlbmQuaA0KPiBAQCAtNjQs
-NyArNjQsNyBAQCBzdHJ1Y3QgVFBNQmFja2VuZENsYXNzIHsNCj4gwqDCoMKgwqDCoC8qIGdldCBh
-IGRlc2NyaXB0aXZlIHRleHQgb2YgdGhlIGJhY2tlbmQgdG8gZGlzcGxheSB0byB0aGUgdXNlcg0K
-PiAqLw0KPiDCoMKgwqDCoMKgY29uc3QgY2hhciAqZGVzYzsNCj4gwqANCj4gLcKgwqDCoMKgVFBN
-QmFja2VuZCAqKCpjcmVhdGUpKFFlbXVPcHRzICpvcHRzLCBjb25zdCBjaGFyICppZCk7DQo+ICvC
-oMKgwqDCoFRQTUJhY2tlbmQgKigqY3JlYXRlKShRZW11T3B0cyAqb3B0cyk7DQo+IMKgDQo+IMKg
-wqDCoMKgwqAvKiBzdGFydCB1cCB0aGUgVFBNIG9uIHRoZSBiYWNrZW5kIC0gb3B0aW9uYWwgKi8N
-Cj4gwqDCoMKgwqDCoGludCAoKnN0YXJ0dXBfdHBtKShUUE1CYWNrZW5kICp0KTsNCj4gZGlmZiAt
-LWdpdCBhL2h3L3RwbS90cG1fZW11bGF0b3IuYyBiL2h3L3RwbS90cG1fZW11bGF0b3IuYw0KPiBp
-bmRleCAzNjQ1NDgzN2IzLi4zMTU4MTkzMjliIDEwMDY0NA0KPiAtLS0gYS9ody90cG0vdHBtX2Vt
-dWxhdG9yLmMNCj4gKysrIGIvaHcvdHBtL3RwbV9lbXVsYXRvci5jDQo+IEBAIC00NTMsMjIgKzQ1
-MywxNiBAQCBlcnI6DQo+IMKgwqDCoMKgwqByZXR1cm4gLTE7DQo+IMKgfQ0KPiDCoA0KPiAtc3Rh
-dGljIFRQTUJhY2tlbmQgKnRwbV9lbXVsYXRvcl9jcmVhdGUoUWVtdU9wdHMgKm9wdHMsIGNvbnN0
-IGNoYXINCj4gKmlkKQ0KPiArc3RhdGljIFRQTUJhY2tlbmQgKnRwbV9lbXVsYXRvcl9jcmVhdGUo
-UWVtdU9wdHMgKm9wdHMpDQo+IMKgew0KPiDCoMKgwqDCoMKgVFBNQmFja2VuZCAqdGIgPSBUUE1f
-QkFDS0VORChvYmplY3RfbmV3KFRZUEVfVFBNX0VNVUxBVE9SKSk7DQo+IMKgDQo+IC3CoMKgwqDC
-oHRiLT5pZCA9IGdfc3RyZHVwKGlkKTsNCj4gLQ0KPiDCoMKgwqDCoMKgaWYgKHRwbV9lbXVsYXRv
-cl9oYW5kbGVfZGV2aWNlX29wdHMoVFBNX0VNVUxBVE9SKHRiKSwgb3B0cykpIHsNCj4gLcKgwqDC
-oMKgwqDCoMKgwqBnb3RvIGVycl9leGl0Ow0KPiArwqDCoMKgwqDCoMKgwqDCoG9iamVjdF91bnJl
-ZihPQkpFQ1QodGIpKTsNCj4gK8KgwqDCoMKgwqDCoMKgwqByZXR1cm4gTlVMTDsNCj4gwqDCoMKg
-wqDCoH0NCj4gwqANCj4gwqDCoMKgwqDCoHJldHVybiB0YjsNCj4gLQ0KPiAtZXJyX2V4aXQ6DQo+
-IC3CoMKgwqDCoG9iamVjdF91bnJlZihPQkpFQ1QodGIpKTsNCj4gLQ0KPiAtwqDCoMKgwqByZXR1
-cm4gTlVMTDsNCj4gwqB9DQo+IMKgDQo+IMKgc3RhdGljIFRwbVR5cGVPcHRpb25zICp0cG1fZW11
-bGF0b3JfZ2V0X3RwbV9vcHRpb25zKFRQTUJhY2tlbmQgKnRiKQ0KPiBkaWZmIC0tZ2l0IGEvaHcv
-dHBtL3RwbV9wYXNzdGhyb3VnaC5jIGIvaHcvdHBtL3RwbV9wYXNzdGhyb3VnaC5jDQo+IGluZGV4
-IDkzMjZjYmZkYzkuLjczNzFkNTA3MzkgMTAwNjQ0DQo+IC0tLSBhL2h3L3RwbS90cG1fcGFzc3Ro
-cm91Z2guYw0KPiArKysgYi9ody90cG0vdHBtX3Bhc3N0aHJvdWdoLmMNCj4gQEAgLTI4NCwxMyAr
-Mjg0LDEwIEBADQo+IHRwbV9wYXNzdGhyb3VnaF9oYW5kbGVfZGV2aWNlX29wdHMoVFBNUGFzc3Ro
-cnVTdGF0ZSAqdHBtX3B0LCBRZW11T3B0cw0KPiAqb3B0cykNCj4gwqDCoMKgwqDCoHJldHVybiAx
-Ow0KPiDCoH0NCj4gwqANCj4gLXN0YXRpYyBUUE1CYWNrZW5kICp0cG1fcGFzc3Rocm91Z2hfY3Jl
-YXRlKFFlbXVPcHRzICpvcHRzLCBjb25zdCBjaGFyDQo+ICppZCkNCj4gK3N0YXRpYyBUUE1CYWNr
-ZW5kICp0cG1fcGFzc3Rocm91Z2hfY3JlYXRlKFFlbXVPcHRzICpvcHRzKQ0KPiDCoHsNCj4gwqDC
-oMKgwqDCoE9iamVjdCAqb2JqID0gb2JqZWN0X25ldyhUWVBFX1RQTV9QQVNTVEhST1VHSCk7DQo+
-IC3CoMKgwqDCoFRQTUJhY2tlbmQgKnRiID0gVFBNX0JBQ0tFTkQob2JqKTsNCj4gLcKgwqDCoMKg
-VFBNUGFzc3RocnVTdGF0ZSAqdHBtX3B0ID0gVFBNX1BBU1NUSFJPVUdIKHRiKTsNCj4gLQ0KPiAt
-wqDCoMKgwqB0Yi0+aWQgPSBnX3N0cmR1cChpZCk7DQo+ICvCoMKgwqDCoFRQTVBhc3N0aHJ1U3Rh
-dGUgKnRwbV9wdCA9IFRQTV9QQVNTVEhST1VHSChvYmopOw0KPiDCoA0KPiDCoMKgwqDCoMKgaWYg
-KHRwbV9wYXNzdGhyb3VnaF9oYW5kbGVfZGV2aWNlX29wdHModHBtX3B0LCBvcHRzKSkgew0KPiDC
-oMKgwqDCoMKgwqDCoMKgwqBnb3RvIGVycl9leGl0Ow0KPiBAQCAtMzAxLDcgKzI5OCw3IEBAIHN0
-YXRpYyBUUE1CYWNrZW5kDQo+ICp0cG1fcGFzc3Rocm91Z2hfY3JlYXRlKFFlbXVPcHRzICpvcHRz
-LCBjb25zdCBjaGFyICppZCkNCj4gwqDCoMKgwqDCoMKgwqDCoMKgZ290byBlcnJfZXhpdDsNCj4g
-wqDCoMKgwqDCoH0NCj4gwqANCj4gLcKgwqDCoMKgcmV0dXJuIHRiOw0KPiArwqDCoMKgwqByZXR1
-cm4gVFBNX0JBQ0tFTkQob2JqKTsNCj4gwqANCj4gwqBlcnJfZXhpdDoNCj4gwqDCoMKgwqDCoG9i
-amVjdF91bnJlZihvYmopOw0KPiBkaWZmIC0tZ2l0IGEvdHBtLmMgYi90cG0uYw0KPiBpbmRleCBh
-NDZlZTVmMTQ0Li4zNzI5OGYzZjAzIDEwMDY0NA0KPiAtLS0gYS90cG0uYw0KPiArKysgYi90cG0u
-Yw0KPiBAQCAtMTI5LDExICsxMjksMTIgQEAgc3RhdGljIGludCB0cG1faW5pdF90cG1kZXYodm9p
-ZCAqZHVtbXksDQo+IFFlbXVPcHRzICpvcHRzLCBFcnJvciAqKmVycnApDQo+IMKgwqDCoMKgwqDC
-oMKgwqDCoHJldHVybiAxOw0KPiDCoMKgwqDCoMKgfQ0KPiDCoA0KPiAtwqDCoMKgwqBkcnYgPSBi
-ZS0+Y3JlYXRlKG9wdHMsIGlkKTsNCj4gK8KgwqDCoMKgZHJ2ID0gYmUtPmNyZWF0ZShvcHRzKTsN
-Cj4gwqDCoMKgwqDCoGlmICghZHJ2KSB7DQo+IMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybiAxOw0K
-PiDCoMKgwqDCoMKgfQ0KPiDCoA0KPiArwqDCoMKgwqBkcnYtPmlkID0gZ19zdHJkdXAoaWQpOw0K
-SSBraW5kIG9mIG9wcG9zZSB0aGlzIGNoYW5nZSwgaW5zdGVhZCB3aGF0IGFib3V0IGFkZGluZyBu
-ZXcgVFBNQmFja2VuZA0KYXBpIHNheSAtIFRQTUJhY2tlbmQqIHRwbV9iYWNrZW5kX2NyZWF0ZShj
-b25zdCBjaGFyICp0eXBlLCBjb25zdA0KUWVtdU9wdHMgKm9wdHMpLCB0aGF0IHNob3VsZCBoYW5k
-bGUgdGhpcyBjb21tb24gY29kZSwgYW5kIHJldHVybnMgdGhlDQpuZXdseSBpbnN0YW50aWF0ZWQg
-YmFja2VuZCBvYmplY3QuDQoNCi0gQW1hcm5hdGg=
+On 10.10.2017 09:57, Marek Vasut wrote:
+> On 10/10/2017 09:20 AM, Thomas Huth wrote:
+>>  Hi Chris, hi Marek,
+> 
+> Hi,
+> 
+>> I recently noticed that when I start qemu-system-nios2 (build from the
+>> very latest git master branch) and then type "quit" at the monitor (or
+>> simply try to close the GTK window), QEMU does not shut down right and
+>> hangs somewhere in pause_all_vcpus() forever.
+>> Do you have any idea what might be wrong here?
+> 
+> Nope, can you debug it and ev. send patch ?
+
+Backtrace looks like this:
+
+#0  0x00007ffff7931945 in pthread_cond_wait@@GLIBC_2.3.2 () at /lib64/libpthread.so.0
+#1  0x00005555557cf9c5 in qemu_cond_wait (cond=cond@entry=0x555555b5f9c0 <qemu_pause_cond>, mutex=mutex@entry=0x555555b5fa40 <qemu_global_mutex>) at util/qemu-thread-posix.c:161
+#2  0x0000555555606ee8 in pause_all_vcpus () at cpus.c:1620
+#3  0x00005555555cc43a in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>)
+    at vl.c:4906
+
+Looks like the CPU does not get stopped right? Unfortunately, I've got no
+good clue how to debug that further right now...
+
+> We're talking about git HEAD, right ?
+
+Yes.
+
+ Thomas
