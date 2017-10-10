@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e1iqI-0002IT-8i
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:20 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e1iqI-0002It-O5
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e1iqG-0004RE-MV
+	(envelope-from <richard.henderson@linaro.org>) id 1e1iqH-0004S3-Pm
 	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:18 -0400
-Received: from mail-pf0-x235.google.com ([2607:f8b0:400e:c00::235]:48099)
+Received: from mail-pf0-x236.google.com ([2607:f8b0:400e:c00::236]:54344)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e1iqG-0004Qs-DQ
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:16 -0400
-Received: by mail-pf0-x235.google.com with SMTP id z11so5533039pfk.4
-	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 17:56:16 -0700 (PDT)
+	id 1e1iqH-0004Re-Jd
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:17 -0400
+Received: by mail-pf0-x236.google.com with SMTP id m28so10541643pfi.11
+	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 17:56:17 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon,  9 Oct 2017 17:55:46 -0700
-Message-Id: <20171010005600.28735-10-richard.henderson@linaro.org>
+Date: Mon,  9 Oct 2017 17:55:47 -0700
+Message-Id: <20171010005600.28735-11-richard.henderson@linaro.org>
 In-Reply-To: <20171010005600.28735-1-richard.henderson@linaro.org>
 References: <20171010005600.28735-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 09/23] tcg: consolidate TB lookups in
- tb_lookup__cpu_state
+Subject: [Qemu-devel] [PULL 10/23] exec-all: bring tb->invalid into
+ tb->cflags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,262 +32,91 @@ Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-This avoids duplicating code. cpu_exec_step will also use the
-new common function once we integrate parallel_cpus into tb->cflags.
-
-Note that in this commit we also fix a race, described by Richard Henderson
-during review. Think of this scenario with threads A and B:
-
-   (A) Lookup succeeds for TB in hash without tb_lock
-        (B) Sets the TB's tb->invalid flag
-        (B) Removes the TB from tb_htable
-        (B) Clears all CPU's tb_jmp_cache
-   (A) Store TB into local tb_jmp_cache
-
-Given that order of events, (A) will keep executing that invalid TB until
-another flush of its tb_jmp_cache happens, which in theory might never happen.
-We can fix this by checking the tb->invalid flag every time we look up a TB
-from tb_jmp_cache, so that in the above scenario, next time we try to find
-that TB in tb_jmp_cache, we won't, and will therefore be forced to look it
-up in tb_htable.
-
-Performance-wise, I measured a small improvement when booting debian-arm.
-Note that inlining pays off:
-
- Performance counter stats for 'taskset -c 0 qemu-system-arm \
-	-machine type=virt -nographic -smp 1 -m 4096 \
-	-netdev user,id=unet,hostfwd=tcp::2222-:22 \
-	-device virtio-net-device,netdev=unet \
-	-drive file=jessie.qcow2,id=myblock,index=0,if=none \
-	-device virtio-blk-device,drive=myblock \
-	-kernel kernel.img -append console=ttyAMA0 root=/dev/vda1 \
-	-name arm,debug-threads=on -smp 1' (10 runs):
-
-Before:
-      18714.917392 task-clock                #    0.952 CPUs utilized            ( +-  0.95% )
-            23,142 context-switches          #    0.001 M/sec                    ( +-  0.50% )
-                 1 CPU-migrations            #    0.000 M/sec
-            10,558 page-faults               #    0.001 M/sec                    ( +-  0.95% )
-    53,957,727,252 cycles                    #    2.883 GHz                      ( +-  0.91% ) [83.33%]
-    24,440,599,852 stalled-cycles-frontend   #   45.30% frontend cycles idle     ( +-  1.20% ) [83.33%]
-    16,495,714,424 stalled-cycles-backend    #   30.57% backend  cycles idle     ( +-  0.95% ) [66.66%]
-    76,267,572,582 instructions              #    1.41  insns per cycle
-                                             #    0.32  stalled cycles per insn  ( +-  0.87% ) [83.34%]
-    12,692,186,323 branches                  #  678.186 M/sec                    ( +-  0.92% ) [83.35%]
-       263,486,879 branch-misses             #    2.08% of all branches          ( +-  0.73% ) [83.34%]
-
-      19.648474449 seconds time elapsed                                          ( +-  0.82% )
-
-After, w/ inline (this patch):
-      18471.376627 task-clock                #    0.955 CPUs utilized            ( +-  0.96% )
-            23,048 context-switches          #    0.001 M/sec                    ( +-  0.48% )
-                 1 CPU-migrations            #    0.000 M/sec
-            10,708 page-faults               #    0.001 M/sec                    ( +-  0.81% )
-    53,208,990,796 cycles                    #    2.881 GHz                      ( +-  0.98% ) [83.34%]
-    23,941,071,673 stalled-cycles-frontend   #   44.99% frontend cycles idle     ( +-  0.95% ) [83.34%]
-    16,161,773,848 stalled-cycles-backend    #   30.37% backend  cycles idle     ( +-  0.76% ) [66.67%]
-    75,786,269,766 instructions              #    1.42  insns per cycle
-                                             #    0.32  stalled cycles per insn  ( +-  1.24% ) [83.34%]
-    12,573,617,143 branches                  #  680.708 M/sec                    ( +-  1.34% ) [83.33%]
-       260,235,550 branch-misses             #    2.07% of all branches          ( +-  0.66% ) [83.33%]
-
-      19.340502161 seconds time elapsed                                          ( +-  0.56% )
-
-After, w/o inline:
-      18791.253967 task-clock                #    0.954 CPUs utilized            ( +-  0.78% )
-            23,230 context-switches          #    0.001 M/sec                    ( +-  0.42% )
-                 1 CPU-migrations            #    0.000 M/sec
-            10,563 page-faults               #    0.001 M/sec                    ( +-  1.27% )
-    54,168,674,622 cycles                    #    2.883 GHz                      ( +-  0.80% ) [83.34%]
-    24,244,712,629 stalled-cycles-frontend   #   44.76% frontend cycles idle     ( +-  1.37% ) [83.33%]
-    16,288,648,572 stalled-cycles-backend    #   30.07% backend  cycles idle     ( +-  0.95% ) [66.66%]
-    77,659,755,503 instructions              #    1.43  insns per cycle
-                                             #    0.31  stalled cycles per insn  ( +-  0.97% ) [83.34%]
-    12,922,780,045 branches                  #  687.702 M/sec                    ( +-  1.06% ) [83.34%]
-       261,962,386 branch-misses             #    2.03% of all branches          ( +-  0.71% ) [83.35%]
-
-      19.700174670 seconds time elapsed                                          ( +-  0.56% )
+This gets rid of a hole in struct TranslationBlock.
 
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/tb-lookup.h | 49 ++++++++++++++++++++++++++++++++++++++++++++++++
- accel/tcg/cpu-exec.c     | 47 ++++++++++++++++++----------------------------
- accel/tcg/tcg-runtime.c  | 24 ++++++------------------
- 3 files changed, 73 insertions(+), 47 deletions(-)
- create mode 100644 include/exec/tb-lookup.h
+ include/exec/exec-all.h   | 3 +--
+ include/exec/tb-lookup.h  | 2 +-
+ accel/tcg/cpu-exec.c      | 4 ++--
+ accel/tcg/translate-all.c | 3 +--
+ 4 files changed, 5 insertions(+), 7 deletions(-)
 
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index a9a8bb6f83..3135aaf4c9 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -314,12 +314,11 @@ struct TranslationBlock {
+ #define CF_NOCACHE     0x10000 /* To be freed after execution */
+ #define CF_USE_ICOUNT  0x20000
+ #define CF_IGNORE_ICOUNT 0x40000 /* Do not generate icount code */
++#define CF_INVALID     0x80000 /* TB is stale. Setters must acquire tb_lock */
+ 
+     /* Per-vCPU dynamic tracing state used to generate this TB */
+     uint32_t trace_vcpu_dstate;
+ 
+-    uint16_t invalid;
+-
+     void *tc_ptr;    /* pointer to the translated code */
+     uint8_t *tc_search;  /* pointer to search data */
+     /* original tb when cflags has CF_NOCACHE */
 diff --git a/include/exec/tb-lookup.h b/include/exec/tb-lookup.h
-new file mode 100644
-index 0000000000..9d32cb0c6e
---- /dev/null
+index 9d32cb0c6e..436b6d5ecf 100644
+--- a/include/exec/tb-lookup.h
 +++ b/include/exec/tb-lookup.h
-@@ -0,0 +1,49 @@
-+/*
-+ * Copyright (C) 2017, Emilio G. Cota <cota@braap.org>
-+ *
-+ * License: GNU GPL, version 2 or later.
-+ *   See the COPYING file in the top-level directory.
-+ */
-+#ifndef EXEC_TB_LOOKUP_H
-+#define EXEC_TB_LOOKUP_H
-+
-+#include "qemu/osdep.h"
-+
-+#ifdef NEED_CPU_H
-+#include "cpu.h"
-+#else
-+#include "exec/poison.h"
-+#endif
-+
-+#include "exec/exec-all.h"
-+#include "exec/tb-hash.h"
-+
-+/* Might cause an exception, so have a longjmp destination ready */
-+static inline TranslationBlock *
-+tb_lookup__cpu_state(CPUState *cpu, target_ulong *pc, target_ulong *cs_base,
-+                     uint32_t *flags)
-+{
-+    CPUArchState *env = (CPUArchState *)cpu->env_ptr;
-+    TranslationBlock *tb;
-+    uint32_t hash;
-+
-+    cpu_get_tb_cpu_state(env, pc, cs_base, flags);
-+    hash = tb_jmp_cache_hash_func(*pc);
-+    tb = atomic_rcu_read(&cpu->tb_jmp_cache[hash]);
-+    if (likely(tb &&
-+               tb->pc == *pc &&
-+               tb->cs_base == *cs_base &&
-+               tb->flags == *flags &&
-+               tb->trace_vcpu_dstate == *cpu->trace_dstate &&
-+               !atomic_read(&tb->invalid))) {
-+        return tb;
-+    }
-+    tb = tb_htable_lookup(cpu, *pc, *cs_base, *flags);
-+    if (tb == NULL) {
-+        return NULL;
-+    }
-+    atomic_set(&cpu->tb_jmp_cache[hash], tb);
-+    return tb;
-+}
-+
-+#endif /* EXEC_TB_LOOKUP_H */
+@@ -35,7 +35,7 @@ tb_lookup__cpu_state(CPUState *cpu, target_ulong *pc, target_ulong *cs_base,
+                tb->cs_base == *cs_base &&
+                tb->flags == *flags &&
+                tb->trace_vcpu_dstate == *cpu->trace_dstate &&
+-               !atomic_read(&tb->invalid))) {
++               !(atomic_read(&tb->cflags) & CF_INVALID))) {
+         return tb;
+     }
+     tb = tb_htable_lookup(cpu, *pc, *cs_base, *flags);
 diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index 32104b8d8c..f8a1d68db7 100644
+index f8a1d68db7..9cd809d607 100644
 --- a/accel/tcg/cpu-exec.c
 +++ b/accel/tcg/cpu-exec.c
-@@ -28,6 +28,7 @@
- #include "exec/address-spaces.h"
- #include "qemu/rcu.h"
- #include "exec/tb-hash.h"
-+#include "exec/tb-lookup.h"
- #include "exec/log.h"
- #include "qemu/main-loop.h"
- #if defined(TARGET_I386) && !defined(CONFIG_USER_ONLY)
-@@ -368,43 +369,31 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
-                                         TranslationBlock *last_tb,
-                                         int tb_exit)
- {
--    CPUArchState *env = (CPUArchState *)cpu->env_ptr;
-     TranslationBlock *tb;
-     target_ulong cs_base, pc;
-     uint32_t flags;
-     bool acquired_tb_lock = false;
- 
--    /* we record a subset of the CPU state. It will
--       always be the same before a given translated block
--       is executed. */
--    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
--    tb = atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(pc)]);
--    if (unlikely(!tb || tb->pc != pc || tb->cs_base != cs_base ||
--                 tb->flags != flags ||
--                 tb->trace_vcpu_dstate != *cpu->trace_dstate)) {
--        tb = tb_htable_lookup(cpu, pc, cs_base, flags);
--        if (!tb) {
--
--            /* mmap_lock is needed by tb_gen_code, and mmap_lock must be
--             * taken outside tb_lock. As system emulation is currently
--             * single threaded the locks are NOPs.
--             */
--            mmap_lock();
--            tb_lock();
--            acquired_tb_lock = true;
--
--            /* There's a chance that our desired tb has been translated while
--             * taking the locks so we check again inside the lock.
--             */
--            tb = tb_htable_lookup(cpu, pc, cs_base, flags);
--            if (!tb) {
--                /* if no translated code available, then translate it now */
--                tb = tb_gen_code(cpu, pc, cs_base, flags, 0);
--            }
-+    tb = tb_lookup__cpu_state(cpu, &pc, &cs_base, &flags);
-+    if (tb == NULL) {
-+        /* mmap_lock is needed by tb_gen_code, and mmap_lock must be
-+         * taken outside tb_lock. As system emulation is currently
-+         * single threaded the locks are NOPs.
-+         */
-+        mmap_lock();
-+        tb_lock();
-+        acquired_tb_lock = true;
- 
--            mmap_unlock();
-+        /* There's a chance that our desired tb has been translated while
-+         * taking the locks so we check again inside the lock.
-+         */
-+        tb = tb_htable_lookup(cpu, pc, cs_base, flags);
-+        if (likely(tb == NULL)) {
-+            /* if no translated code available, then translate it now */
-+            tb = tb_gen_code(cpu, pc, cs_base, flags, 0);
+@@ -294,7 +294,7 @@ static bool tb_cmp(const void *p, const void *d)
+         tb->cs_base == desc->cs_base &&
+         tb->flags == desc->flags &&
+         tb->trace_vcpu_dstate == desc->trace_vcpu_dstate &&
+-        !atomic_read(&tb->invalid)) {
++        !(atomic_read(&tb->cflags) & CF_INVALID)) {
+         /* check next page if needed */
+         if (tb->page_addr[1] == -1) {
+             return true;
+@@ -412,7 +412,7 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
+             tb_lock();
+             acquired_tb_lock = true;
          }
- 
-+        mmap_unlock();
-         /* We add the TB in the virtual pc hash table for the fast lookup */
-         atomic_set(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(pc)], tb);
+-        if (!tb->invalid) {
++        if (!(tb->cflags & CF_INVALID)) {
+             tb_add_jump(last_tb, tb_exit, tb);
+         }
      }
-diff --git a/accel/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
-index b75394aba8..d0edd944b0 100644
---- a/accel/tcg/tcg-runtime.c
-+++ b/accel/tcg/tcg-runtime.c
-@@ -27,7 +27,7 @@
- #include "exec/helper-proto.h"
- #include "exec/cpu_ldst.h"
- #include "exec/exec-all.h"
--#include "exec/tb-hash.h"
-+#include "exec/tb-lookup.h"
- #include "disas/disas.h"
- #include "exec/log.h"
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index a7c1d4e3f2..ed65d68709 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -1073,7 +1073,7 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr)
  
-@@ -149,24 +149,12 @@ void *HELPER(lookup_tb_ptr)(CPUArchState *env)
-     CPUState *cpu = ENV_GET_CPU(env);
-     TranslationBlock *tb;
-     target_ulong cs_base, pc;
--    uint32_t flags, hash;
--
--    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
--    hash = tb_jmp_cache_hash_func(pc);
--    tb = atomic_rcu_read(&cpu->tb_jmp_cache[hash]);
--
--    if (unlikely(!(tb
--                   && tb->pc == pc
--                   && tb->cs_base == cs_base
--                   && tb->flags == flags
--                   && tb->trace_vcpu_dstate == *cpu->trace_dstate))) {
--        tb = tb_htable_lookup(cpu, pc, cs_base, flags);
--        if (!tb) {
--            return tcg_ctx.code_gen_epilogue;
--        }
--        atomic_set(&cpu->tb_jmp_cache[hash], tb);
--    }
-+    uint32_t flags;
+     assert_tb_locked();
  
-+    tb = tb_lookup__cpu_state(cpu, &pc, &cs_base, &flags);
-+    if (tb == NULL) {
-+        return tcg_ctx.code_gen_epilogue;
-+    }
-     qemu_log_mask_and_addr(CPU_LOG_EXEC, pc,
-                            "Chain %p [%d: " TARGET_FMT_lx "] %s\n",
-                            tb->tc_ptr, cpu->cpu_index, pc,
+-    atomic_set(&tb->invalid, true);
++    atomic_set(&tb->cflags, tb->cflags | CF_INVALID);
+ 
+     /* remove the TB from the hash list */
+     phys_pc = tb->page_addr[0] + (tb->pc & ~TARGET_PAGE_MASK);
+@@ -1269,7 +1269,6 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+     tb->flags = flags;
+     tb->cflags = cflags;
+     tb->trace_vcpu_dstate = *cpu->trace_dstate;
+-    tb->invalid = false;
+ 
+ #ifdef CONFIG_PROFILER
+     tcg_ctx.tb_count1++; /* includes aborted translations because of
 -- 
 2.13.6
