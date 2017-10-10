@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e20Eb-0000pa-W3
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:35 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e20EY-00057b-GV
+	(envelope-from <richard.henderson@linaro.org>) id 1e20EZ-0000mo-DW
 	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:33 -0400
-Received: from mail-pf0-x22a.google.com ([2607:f8b0:400e:c00::22a]:43070)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <richard.henderson@linaro.org>) id 1e20ET-00055P-QX
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:31 -0400
+Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:54759)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e20EY-00057H-BH
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:30 -0400
-Received: by mail-pf0-x22a.google.com with SMTP id d2so15081441pfh.0
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 12:30:30 -0700 (PDT)
+	id 1e20ET-00054m-Jy
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:25 -0400
+Received: by mail-pf0-x233.google.com with SMTP id m28so13339949pfi.11
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 12:30:23 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 10 Oct 2017 12:30:00 -0700
-Message-Id: <20171010193003.28857-18-richard.henderson@linaro.org>
+Date: Tue, 10 Oct 2017 12:29:55 -0700
+Message-Id: <20171010193003.28857-13-richard.henderson@linaro.org>
 In-Reply-To: <20171010193003.28857-1-richard.henderson@linaro.org>
 References: <20171010193003.28857-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 17/20] tcg: take .helpers out of TCGContext
+Subject: [Qemu-devel] [PULL v2 12/20] exec-all: introduce TB_PAGE_ADDR_FMT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,81 +34,57 @@ Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Groundwork for supporting multiple TCG contexts.
+And fix the following warning when DEBUG_TB_INVALIDATE is enabled
+in translate-all.c:
 
-The hash table becomes read-only after it is filled in,
-so we can save space by keeping just a global pointer to it.
+  CC      mipsn32-linux-user/accel/tcg/translate-all.o
+/data/src/qemu/accel/tcg/translate-all.c: In function ‘tb_alloc_page’:
+/data/src/qemu/accel/tcg/translate-all.c:1201:16: error: format ‘%lx’ expects argument of type ‘long unsigned int’, but argument 2 has type ‘tb_page_addr_t {aka unsigned int}’ [-Werror=format=]
+         printf("protecting code page: 0x" TARGET_FMT_lx "\n",
+                ^
+cc1: all warnings being treated as errors
+/data/src/qemu/rules.mak:66: recipe for target 'accel/tcg/translate-all.o' failed
+make[1]: *** [accel/tcg/translate-all.o] Error 1
+Makefile:328: recipe for target 'subdir-mipsn32-linux-user' failed
+make: *** [subdir-mipsn32-linux-user] Error 2
+cota@flamenco:/data/src/qemu/build ((18f3fe1...) *$)$
 
 Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/tcg.h |  2 --
- tcg/tcg.c | 10 +++++-----
- 2 files changed, 5 insertions(+), 7 deletions(-)
+ include/exec/exec-all.h   | 2 ++
+ accel/tcg/translate-all.c | 3 +--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 25662c36d4..b2d42e3136 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -656,8 +656,6 @@ struct TCGContext {
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 3135aaf4c9..79f8041811 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -31,8 +31,10 @@
+    type.  */
+ #if defined(CONFIG_USER_ONLY)
+ typedef abi_ulong tb_page_addr_t;
++#define TB_PAGE_ADDR_FMT TARGET_ABI_FMT_lx
+ #else
+ typedef ram_addr_t tb_page_addr_t;
++#define TB_PAGE_ADDR_FMT RAM_ADDR_FMT
+ #endif
  
-     tcg_insn_unit *code_ptr;
- 
--    GHashTable *helpers;
--
- #ifdef CONFIG_PROFILER
-     /* profiling info */
-     int64_t tb_count1;
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index a874bdd41f..ee60798438 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -318,6 +318,7 @@ typedef struct TCGHelperInfo {
- static const TCGHelperInfo all_helpers[] = {
- #include "exec/helper-tcg.h"
- };
-+static GHashTable *helper_table;
- 
- static int indirect_reg_alloc_order[ARRAY_SIZE(tcg_target_reg_alloc_order)];
- static void process_op_defs(TCGContext *s);
-@@ -328,7 +329,6 @@ void tcg_context_init(TCGContext *s)
-     TCGOpDef *def;
-     TCGArgConstraint *args_ct;
-     int *sorted_args;
--    GHashTable *helper_table;
- 
-     memset(s, 0, sizeof(*s));
-     s->nb_globals = 0;
-@@ -356,7 +356,7 @@ void tcg_context_init(TCGContext *s)
- 
-     /* Register helpers.  */
-     /* Use g_direct_hash/equal for direct pointer comparisons on func.  */
--    s->helpers = helper_table = g_hash_table_new(NULL, NULL);
-+    helper_table = g_hash_table_new(NULL, NULL);
- 
-     for (i = 0; i < ARRAY_SIZE(all_helpers); ++i) {
-         g_hash_table_insert(helper_table, (gpointer)all_helpers[i].func,
-@@ -982,7 +982,7 @@ void tcg_gen_callN(TCGContext *s, void *func, TCGArg ret,
-     unsigned sizemask, flags;
-     TCGHelperInfo *info;
- 
--    info = g_hash_table_lookup(s->helpers, (gpointer)func);
-+    info = g_hash_table_lookup(helper_table, (gpointer)func);
-     flags = info->flags;
-     sizemask = info->sizemask;
- 
-@@ -1211,8 +1211,8 @@ static char *tcg_get_arg_str_idx(TCGContext *s, char *buf,
- static inline const char *tcg_find_helper(TCGContext *s, uintptr_t val)
- {
-     const char *ret = NULL;
--    if (s->helpers) {
--        TCGHelperInfo *info = g_hash_table_lookup(s->helpers, (gpointer)val);
-+    if (helper_table) {
-+        TCGHelperInfo *info = g_hash_table_lookup(helper_table, (gpointer)val);
-         if (info) {
-             ret = info->name;
-         }
+ #include "qemu/log.h"
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 799b027e79..90b3eed9c6 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -1193,8 +1193,7 @@ static inline void tb_alloc_page(TranslationBlock *tb,
+         mprotect(g2h(page_addr), qemu_host_page_size,
+                  (prot & PAGE_BITS) & ~PAGE_WRITE);
+ #ifdef DEBUG_TB_INVALIDATE
+-        printf("protecting code page: 0x" TARGET_FMT_lx "\n",
+-               page_addr);
++        printf("protecting code page: 0x" TB_PAGE_ADDR_FMT "\n", page_addr);
+ #endif
+     }
+ #else
 -- 
 2.13.6
