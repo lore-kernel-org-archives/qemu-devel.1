@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e1vpg-0001c4-7I
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:48:36 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1e1vpq-0001jy-LA
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:48:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e1vpf-0005r6-9E
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:48:32 -0400
-References: <20171004020048.26379-1-eblake@redhat.com>
-	<20171010125858.GI4177@dhcp-200-186.str.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f222503d-2157-b260-38c8-8d3875c7fcf4@redhat.com>
-Date: Tue, 10 Oct 2017 09:48:12 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1e1vpn-0005ud-Ey
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:48:42 -0400
+Date: Tue, 10 Oct 2017 16:48:34 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <20171010144834.GC5553@toto>
+References: <cover.1505929556.git.alistair.francis@xilinx.com>
+	<20171008222029.GA29979@toto>
+	<CAKmqyKMEbQ3JbqMxeeOTBV92ixRVDfw1wFi57xNKGyF82DSC_Q@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20171010125858.GI4177@dhcp-200-186.str.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="hwIdKrwpqpNc044qT0BI01jfLv8feghw0"
-Subject: Re: [Qemu-devel] [PATCH v5 00/23] make bdrv_get_block_status
- byte-based
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKmqyKMEbQ3JbqMxeeOTBV92ixRVDfw1wFi57xNKGyF82DSC_Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/8] Add the ZynqMP PMU and IPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,79 +24,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hwIdKrwpqpNc044qT0BI01jfLv8feghw0
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com, famz@redhat.com,
- qemu-block@nongnu.org
-Message-ID: <f222503d-2157-b260-38c8-8d3875c7fcf4@redhat.com>
-Subject: Re: [PATCH v5 00/23] make bdrv_get_block_status byte-based
-References: <20171004020048.26379-1-eblake@redhat.com>
- <20171010125858.GI4177@dhcp-200-186.str.redhat.com>
-In-Reply-To: <20171010125858.GI4177@dhcp-200-186.str.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 10/10/2017 07:58 AM, Kevin Wolf wrote:
-> Am 04.10.2017 um 04:00 hat Eric Blake geschrieben:
->> There are patches floating around to add NBD_CMD_BLOCK_STATUS,
->> but NBD wants to report status on byte granularity (even if the
->> reporting will probably be naturally aligned to sectors or even
->> much higher levels).  I've therefore started the task of
->> converting our block status code to report at a byte granularity
->> rather than sectors.
->>
->> Now that 2.11 is open, I'm rebasing/reposting the remaining patches.
->>
->> The overall conversion currently looks like:
->> part 1: bdrv_is_allocated (merged, commit 51b0a488)
->> part 2: dirty-bitmap (v10 is queued [1])
->> part 3: bdrv_get_block_status (this series, v4 at [2])
->> part 4: .bdrv_co_block_status (v3 is posted [4], mostly reviewed)
->>
->> Available as a tag at:
->> git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-status-v4
->>
->> Based-on: <20170925145526.32690-1-eblake@redhat.com>
->> ([PATCH v10 00/20] make dirty-bitmap byte-based)
->> Based-on: <20171004014347.25099-1-eblake@redhat.com>
->> ([PATCH v2 0/5] block: Avoid copy-on-read assertions)
->=20
-> We merged v3 of that series, which causes merge conflicts in this one.
-> I can try to give the patches a look without applying them, but can you=
-
-> rebase, please?
-
-Yep, and I have other comments to address anyway.  v6 coming up later tod=
-ay.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+On Mon, Oct 09, 2017 at 05:12:39PM -0700, Alistair Francis wrote:
+> On Sun, Oct 8, 2017 at 3:20 PM, Edgar E. Iglesias
+> <edgar.iglesias@xilinx.com> wrote:
+> > On Wed, Sep 20, 2017 at 03:01:31PM -0700, Alistair Francis wrote:
+> >>
+> >> This series adds the ZynqMP Power Management Unit (PMU) machine with basic
+> >> functionality.
+> >>
+> >> The machine only has the
+> >>  - CPU
+> >>  - Memory
+> >>  - Interrupt controller
+> >>  - IPI device
+> >>
+> >> connected, but that is enough to run some of the ROM and firmware
+> >> code on the machine
+> >>
+> >> The series also adds the IPI device and connects it to the ZynqMP ARM
+> >> side and the ZynqMP PMU. These IPI devices don't connect between the ARM
+> >> and MicroBlaze instances though.
+> >>
+> >> v3:
+> >>  - Add the interrupt controller
+> >>  - Replace some of the error_fatals with errp
+> >>  - Fix the PMU CPU name
+> >
+> > Hi Alistair,
+> >
+> >
+> > Sorry for the super long delay...
+> >
+> > I think this mostly looks good but I was wondering if we really need
+> > to have a board specific (zcu102) PMU?
+> 
+> It doesn't have to be board specific. What I wanted though was an SoC
+> and a machine so that maybe one day we could add the PMU SoC to the
+> ARM ZCU102 machine. After that it was hard to think of a name to
+> differentiate the SoC and the machine. Do you have a recommendation on
+> names?
 
 
---hwIdKrwpqpNc044qT0BI01jfLv8feghw0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Hi Alistair,
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Yes, I agree with your approach but I got a little confused by the names.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnc3a0ACgkQp6FrSiUn
-Q2pV9wgAoqnivl1LkYdwgeV9Rgqmtt6RU5m1d2V8LnGjRLmTpD5yNyJTLkc60ATQ
-NazjNkZZjhynXBLLJ8cmL6+H6FOe6ULgWEkmRti65sPA+gBpPEP57ARi00EE8N1G
-zXuq/bsTs11No1Rkbz3Bw2m8atRT+SzG6okboZcbcusRxYznLMqtTiJqdlfTFQ/6
-MupkUb2OD84aYNBOereCl8x0j65RjHk2DIWDF1RQOcbKuB3J/kGji381UKQGKjdh
-7A+XWK3+Ch2t2TlkmF1nFppLLhAR3wwbQFUGeZCZDzeV9BMJnI8Vrj0rZO3L+tHu
-tzocV90gRvDx9MBxo2xxbnnsxLBM9Q==
-=dCwT
------END PGP SIGNATURE-----
+I think all the stuff that is inside the PMU subsystem architecture-wise
+should have generic PMU names (no ZCU102). I.e the ROM, the RAM, the IOModule,
+interrupt controller etc.
 
---hwIdKrwpqpNc044qT0BI01jfLv8feghw0--
+The IPI block can be outside of the PMU module and be instantiated by the
+board or perhaps better if we could reuse some of the ZynqMP modules
+instantiated by the ZCU102 machine to get a CPU-less PS for the PMU
+to interact with. Or something along those lines.
+How does that sound?
+
+Best regards,
+Edgar
