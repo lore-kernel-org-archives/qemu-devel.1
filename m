@@ -1,24 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e1zm7-0001HO-Qp
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:01:10 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e1zzv-0003i4-PQ
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:15:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e1zm3-0001J3-PZ
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:01:07 -0400
-References: <20171004020048.26379-1-eblake@redhat.com>
-	<20171004020048.26379-2-eblake@redhat.com>
-	<20171010135940.GJ4177@dhcp-200-186.str.redhat.com>
-	<67e98ca7-e861-a646-b701-b8f7453f2951@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <46e7ca23-fb38-7620-90fb-04982e5b9ad0@redhat.com>
-Date: Tue, 10 Oct 2017 14:00:48 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1e1zzs-0007CN-Ik
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:15:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59318)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e1zzs-0007Bv-0k
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:15:20 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B7F064A702
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 19:15:18 +0000 (UTC)
+Date: Tue, 10 Oct 2017 16:15:02 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171010191502.GA32108@localhost.localdomain>
+References: <20170911165929.2791-1-marcandre.lureau@redhat.com>
+	<20170911165929.2791-3-marcandre.lureau@redhat.com>
+	<20171009110336.GA17824@redhat.com>
+	<20171009144344.38bbd1e9@nial.brq.redhat.com>
+	<20171009130218.GK2954@redhat.com>
+	<20171010003951-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <67e98ca7-e861-a646-b701-b8f7453f2951@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="aMdi0EilwwGTwiM5MMsocvKFee7f1vqku"
-Subject: Re: [Qemu-devel] [PATCH v5 01/23] block: Allow NULL file for
- bdrv_get_block_status()
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20171010003951-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 2/7] hw/misc: add vmcoreinfo device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,91 +38,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: famz@redhat.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, anderson@redhat.com, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Igor Mammedov <imammedo@redhat.com>, lersek@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aMdi0EilwwGTwiM5MMsocvKFee7f1vqku
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: famz@redhat.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
-Message-ID: <46e7ca23-fb38-7620-90fb-04982e5b9ad0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 01/23] block: Allow NULL file for
- bdrv_get_block_status()
-References: <20171004020048.26379-1-eblake@redhat.com>
- <20171004020048.26379-2-eblake@redhat.com>
- <20171010135940.GJ4177@dhcp-200-186.str.redhat.com>
- <67e98ca7-e861-a646-b701-b8f7453f2951@redhat.com>
-In-Reply-To: <67e98ca7-e861-a646-b701-b8f7453f2951@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 10/10/2017 09:43 AM, Eric Blake wrote:
-
->>> ---
->>> v5: use second label for cleaner exit logic [John], use local_pnum
+On Tue, Oct 10, 2017 at 12:44:26AM +0300, Michael S. Tsirkin wrote:
+> On Mon, Oct 09, 2017 at 02:02:18PM +0100, Daniel P. Berrange wrote:
+> > On Mon, Oct 09, 2017 at 02:43:44PM +0200, Igor Mammedov wrote:
+> > > On Mon, 9 Oct 2017 12:03:36 +0100
+> > > "Daniel P. Berrange" <berrange@redhat.com> wrote:
+> > >=20
+> > > > On Mon, Sep 11, 2017 at 06:59:24PM +0200, Marc-Andr=E9 Lureau wro=
+te:
+> > > > > See docs/specs/vmcoreinfo.txt for details.
+> > > > >=20
+> > > > > "etc/vmcoreinfo" fw_cfg entry is added when using "-device vmco=
+reinfo". =20
+> > > >=20
+> > > > I'm wondering if you considered just adding the entry to fw_cfg b=
+y
+> > > > default, without requiring any -device arg ? Unless I'm misunders=
+tanding,
+> > > > this doesn't feel like a device to me - its just a well known buc=
+ket
+> > > > in fw_cfg IIUC ?  Obviously its existance would need to be tied t=
+o
+> > > > the latest machine type for ABI reasons though. The benefit of th=
+is
+> > > > is that it would "just work" without us having to plumb it throug=
+h to
+> > > > all the downstream applications that use QEMU for mgmt guest (Ope=
+nStack,
+> > > > oVirt, GNOME Boxes, virt-manager, and countless other mgmt apps).
+> > > it follows model set by pvpanic device, it's easier to manage from =
+migration
+> > > POV, one could use it even for old machine types with new qemu (jus=
+t by adding
+> > > device, it makes instance not backwards migratable to old qemu but =
+should work
+> > > for forward migration) and if user doesn't need it, device could be=
+ just omitted
+> > > from CLI.
+> >=20
+> > Sure but it means that in effect no one will have this functionality =
+enabled
+> > for several years. pvpanic has been around a long time and I rarely s=
+ee it
+> > present in configured guests :-(
+> >=20
+> >=20
+> > Regards,
+> > Daniel
 >=20
->>> @@ -1811,16 +1811,19 @@ static int64_t coroutine_fn bdrv_co_get_block=
-_status(BlockDriverState *bs,
->>>      int64_t total_sectors;
->>>      int64_t n;
->>>      int64_t ret, ret2;
->>> +    BlockDriverState *local_file =3D NULL;
->>> +    int local_pnum =3D 0;
->>
->> I don't quite see what the point of local_pnum is if we assert anyway
->> that the real pnum is non-NULL.
+> libvirt runs with -nodefaults, right? I'd argue pretty strongly -nodefa=
+ults
+> shouldn't add optional devices anyway.
+
+Does it mean every time we make a PC device configurable, we
+should make it be disabled by -nodefaults, and require libvirt to
+adapt?
+
+I don't think that would be a good idea.  Imagine the hassle the
+"pc: make .* configurable" patches[1] would generate for libvirt.
+
 >=20
-> I did it in parallel with fallout from John's review on v4:
-> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg06958.html
->=20
-> but since it wasn't specifically asked for, and is now getting
-> questions, I'm fine with not having it in v6.
+> So it's up to you guys, you can add it to VMs by default if you want to=
+.
 
-Okay, I re-read v4, and here's the comment (on 21/23) that led to my
-experiment in v5 patch 1 with local_pnum:
+To be honest, I think "no defaults" is a misleading name for an
+option.  If it really meant "create no optional device at all",
+it would eventually become a synonym for "-machine none", and I
+don't think that's its goal.
 
-https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg00293.html
+I expect PC to always have a set of devices/features that are
+disabled by -nodefaults, and a set of devices/features that are
+not disabled by -nodefaults.  We need good judgement to decide on
+which set the device will be, and I believe Daniel exposed good
+arguments to put vmcoreinfo in the second set.
 
-and I did argue:
-
-https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg00311.html
-
->> Is it asking for trouble to be updating pnum here before we undo our
->> alignment corrections? For readability reasons and preventing an
->> accidental context-based oopsy-daisy.
->=20
-> As in, write the code to make all calculations in a temporary, and then=
-
-> assign *pnum only at the end?  I suppose I can tweak the code along
-> those lines, but I'm not sure it will make the end result any more legi=
-ble.
+[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg393493.html
+    Subject: [RFC PATCH v2 00/12] Guest startup time optimization
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---aMdi0EilwwGTwiM5MMsocvKFee7f1vqku
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlndGOAACgkQp6FrSiUn
-Q2okTQgAjJ6LLNNbH2KfaIy3xOGd2/KxljZ3Ue9im4dNurIdntPcYsEntiMXd+Rm
-xstpq/P+tRBfU4jMg1BKatgqKAYXMBK55/T/sJHCXd58kBbk/gJhKvOK8CMrRoju
-opsixutBhehSNMJWrYxTE3jGJMcnSV/ajYVPC7YY//xREYBsLAWlPMBeK93xm8MQ
-XDJPm332xwzRCxj7ZgjU6uLANYXELHgR59i/NLFo44aH5VkffDltc+j4XTxKcDxn
-93bxN+NrTAtwDAB46+48t4uhQvWPrx/v2NQghGobvE93NhQ3Xbg8mVzEbjPzoNcC
-I+nNNl/+PnkPAJaQ6pbZHAJMR9a0fw==
-=mZhq
------END PGP SIGNATURE-----
-
---aMdi0EilwwGTwiM5MMsocvKFee7f1vqku--
+Eduardo
