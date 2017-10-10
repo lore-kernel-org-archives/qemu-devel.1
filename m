@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=449813866=anthony.perard@citrix.com>)
-	id 1e1wu2-0003Ze-Md
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:57:07 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e1wuq-0004Lj-AJ
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:57:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=449813866=anthony.perard@citrix.com>)
-	id 1e1wty-00029f-13
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:57:06 -0400
-Received: from smtp.citrix.com ([66.165.176.89]:48627)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=449813866=anthony.perard@citrix.com>)
-	id 1e1wtx-00026I-Hx
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:57:01 -0400
-Date: Tue, 10 Oct 2017 11:32:15 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20171010103215.GD1771@perard.uk.xensource.com>
-References: <1507564902-9000-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1507564902-9000-2-git-send-email-ian.jackson@eu.citrix.com>
-	<23003.41880.818255.728737@mariner.uk.xensource.com>
+	(envelope-from <ehabkost@redhat.com>) id 1e1wuk-0002VL-M2
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:57:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50712)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e1wuk-0002Tc-DP
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:57:50 -0400
+Date: Tue, 10 Oct 2017 12:50:03 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171010155003.GD3246@localhost.localdomain>
+References: <20171006215244.27104-1-ehabkost@redhat.com>
+	<765f7133-0ccc-2239-d49b-55d8b2a24cc7@redhat.com>
+	<fddffbab-7aab-72b4-f42f-d18e94517350@redhat.com>
+	<17ed046b-2c29-340b-9802-f43a709715e2@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <23003.41880.818255.728737@mariner.uk.xensource.com>
-Subject: Re: [Qemu-devel] [PATCH 1/8] xen: link against xentoolcore
+In-Reply-To: <17ed046b-2c29-340b-9802-f43a709715e2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/7] x86: Rework KVM-defaults compat code,
+ enable kvm_pv_unhalt by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ian Jackson <ian.jackson@eu.citrix.com>
-Cc: qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Waiman Long <longman@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Davidlohr Bueso <dave@stgolabs.net>, libvir-list@redhat.com
 
-On Mon, Oct 09, 2017 at 05:28:08PM +0100, Ian Jackson wrote:
-> Ian Jackson writes ("[PATCH 1/8] xen: link against xentoolcore"):
-> > From: Anthony PERARD <anthony.perard@citrix.com>
+(CCing libvir-list)
+
+On Mon, Oct 09, 2017 at 05:47:44PM +0200, Paolo Bonzini wrote:
+> On 09/10/2017 17:15, Waiman Long wrote:
+> > On 10/09/2017 09:39 AM, Paolo Bonzini wrote:
+> >> On 06/10/2017 23:52, Eduardo Habkost wrote:
+> >>> This series enables kvm_pv_unhalt by default on pc-*-2.11 and
+> >>> newer.
+> >>
+> >> I've discussed PV spinlocks with some folks at Microsoft for a few weeks
+> >> now, and I'm not 100% sure about enabling kvm_pv_unhalt by default.
+> >> It's probably a good idea overall, but it does come with some caveats.
+> >>
+> >> The problem is that there were two different implementations of fair
+> >> spinlocks in Linux, ticket spinlocks and queued spinlocks.  When
+> >> kvm_pv_unhalt is disabled, ticket spinlocks sucked badly indeed; queued
+> >> spinlocks however simply revert to unfair spinlocks, which loses the
+> >> fairness but has the best performance.  See virt_spin_lock in
+> >> arch/x86/include/asm/qspinlock.h.
+> >>
+> >> Now, fair spinlocks are only really needed for large NUMA machines.
+> >> With a single NUMA node, for example, test-and-set spinlocks work well
+> >> enough; there's not _much_ need for fairness in practice, and the
+> >> paravirtualization does introduce some overhead.
+> >>
+> >> Therefore, the best performance would be achieved with kvm_pv_unhalt
+> >> disabled on small VMs, and enabled on large VMs spanning multiple host
+> >> NUMA nodes.
+> >>
+> >> Waiman, Davidlohr, do you have an opinion on this as well?
 > > 
-> > Xen libraries 4.10 will include a new xentoolcore library, without
-> > which xendevicemodel et al will not work.
+> > I agree. Using unfair lock in a small VM is good for performance. The
+> > only problem I see is how do we define what is small. Now, even a
+> > machine with a single socket can have up to 28 cores, 56 threads. If a
+> > VM has up to 56 vCPUs, we may still want pvqspinlock to be used.
 > 
-> The xentoolcore library was just committed to xen.git#staging, so at
-> least this patch (or something like it) should go into qemu RSN.
+> Yes.  Another possibility is to enable it when there is >1 NUMA node in
+> the guest.  We generally don't do this kind of magic but higher layers
+> (oVirt/OpenStack) do.
 
-I don't think it is necessary to do anything in qemu. The linker should
-find on its own the new libxentoolcore as long as an option
--Wl,-rpath-link= provide the right path to xentoolcore when building
-qemu from xen.git.  In other cases, the pkg-config files should be
-enough (configure doesn't need to known about a new xentoolcore.pc
-file).
+Can't the guest make this decision, instead of the host?
 
-> Anthony, do you plan to cherry pick this into the xen-specific qemu
-> branch used for osstest tests ?
 > 
-> Thanks,
-> Ian.
+> It also depends on how worse performance is with PV qspinlocks,
+> especially since now there's also vcpu_is_preempted that has to be
+> thrown in the mix.  A lot more testing is needed.
+> 
+
+This is an interesting case for "-cpu host"/host-passthrough:
+usage of "-cpu host" has an implicit assumption that no feature
+will decrease performance just because we told the guest that it
+is available.
+
+Can't the guest choose the most reasonable option based on the
+information we provide to it, instead of having to hide
+information from the guest to get better performance?
+
+
+> > Is the kvm_pv_unhalt flag a global one for all VMs within a machine? Or
+> > can it be different for each VM? We may want to have this flag
+> > dynamically determined depending on the configuration of the VM.
+> 
+> It's per-VM, so that's easy.
 
 -- 
-Anthony PERARD
+Eduardo
