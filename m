@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e1sax-0000D1-Cm
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:21:13 -0400
+	(envelope-from <peterx@redhat.com>) id 1e1slb-0001mN-Ak
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:32:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e1sas-00088o-Do
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:21:07 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38078)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e1sas-00084l-7X
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:21:02 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e1sap-0007tl-NF
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 11:20:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 23F212E80D0
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 11:20:59 +0000 (UTC)
+	(envelope-from <peterx@redhat.com>) id 1e1slV-0006JS-8o
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:32:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34346)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e1slU-0006Is-W9
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:32:01 -0400
+Date: Tue, 10 Oct 2017 19:31:54 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171010113154.GF20686@pxdev.xzpeter.org>
+References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
+	<1504081950-2528-11-git-send-email-peterx@redhat.com>
+	<20170921192903.GH3401@work-vm>
+	<20170927073441.GD25011@pxdev.xzpeter.org>
+	<20171009185812.GR2374@work-vm>
+	<20171010093801.GC20686@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 10 Oct 2017 11:08:38 -0000
-From: Daniel Berrange <1718964@bugs.launchpad.net>
-Reply-To: Bug 1718964 <1718964@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150609439728.30760.16378952760062218203.malonedeb@wampee.canonical.com>
-Message-Id: <150763371906.7556.3760502057562078090.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1718964] Re: Memory leak when using websocket
- over a low speed network
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171010093801.GC20686@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC v2 10/33] migration: allow dst vm pause on
+ postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,135 +32,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-In the modern code this needs fixing in the io/channel-websock.c impl -
-it is checking the output buffer limit against the wrong buffer - it
-uses 'rawoutput' instead of 'encoutput', so this fix is easy enough
-there.
+On Tue, Oct 10, 2017 at 05:38:01PM +0800, Peter Xu wrote:
 
-The code is in fact broken all the way back to day1 of the introduction
-of websockets support though in QEMU 1.2.1 In the historical code it can
-be fixed by checking ws_output.offset in vnc_update_client as I
-mentioned previously
+[...]
 
--- =
+> > > But I agree about the reasoning.  How
+> > > about one more patch to postpone the "active" to "postcopy-active"
+> > > state change after the package is handled correctly?  Like:
+> > > 
+> > > --------------
+> > > diff --git a/migration/savevm.c b/migration/savevm.c                     
+> > > index b5c3214034..8317b2a7e2 100644 
+> > > --- a/migration/savevm.c            
+> > > +++ b/migration/savevm.c            
+> > > @@ -1573,8 +1573,6 @@ static void *postcopy_ram_listen_thread(void *opaque)                                                                       
+> > >      QEMUFile *f = mis->from_src_file;                                   
+> > >      int load_res;                  
+> > >                                     
+> > > -    migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,             
+> > > -                                   MIGRATION_STATUS_POSTCOPY_ACTIVE);   
+> > >      qemu_sem_post(&mis->listen_thread_sem);                             
+> > >      trace_postcopy_ram_listen_thread_start();                           
+> > >                                     
+> > > @@ -1817,6 +1815,9 @@ static int loadvm_handle_cmd_packaged(MigrationIncomingState *mis)                                                          
+> > >      qemu_fclose(packf);            
+> > >      object_unref(OBJECT(bioc));    
+> > >                                     
+> > > +    migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,             
+> > > +                                   MIGRATION_STATUS_POSTCOPY_ACTIVE);   
+> > > +                                   
+> > >      return ret;                    
+> > >  }                                  
+> > > --------------
+> > > 
+> > > This function will only be called with "postcopy-active" state.
+> > 
+> > I *think* that's safe; you've got to be careful, but I can't see
+> > anyone on the destination that cares about the destinction.
+> 
+> Indeed, but I'd say that's the best thing I can think of (and the
+> simplest).  Even, not sure whether it'll be more clear if we set
+> postcopy-active state right before starting the VM on destination,
+> say, at the beginning of loadvm_postcopy_handle_run_bh().
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1718964
+When thinking about this, I had another question.
 
-Title:
-  Memory leak when using websocket over a low speed network
+How do we handle the case if we failed to send the device states in
+postcopy_start()?  In that, we do qemu_savevm_send_packaged() then we
+assume we are good and return with success. However
+qemu_savevm_send_packaged() only means that the data is queued in
+write buffer of source host, it does not mean that destination has
+loaded the device states correctly.  It's still possible that
+destination VM failed to receive the whole packaged data, but source
+thought it had done so without problem.
 
-Status in QEMU:
-  New
+Then source will continue with postcopy-active, destination VM will
+instead fail, then fail the source. VM should be lost then since it's
+postcopy rather than precopy.
 
-Bug description:
-  Description of problem
-  -------------------------
+Meanwhile, this cannot be handled by postcopy recovery, since IIUC
+postcopy recovery only works after the states are at least loaded on
+destination VM (I'll avoid going deeper to think a more complex
+protocol for postcopy recovery, please see below).
 
-  When VNC is connected to QEMU via websocket over a low speed network
-  (e.g. 300KB/S Wide Area Network), and there is a lot of frame buffer
-  update, the VNC Client will get stuck, the cursor is almost impossible
-  to move, which may result in accumulation of a large number of data in
-  the QEMU process (memory consumption will keep increasing).
+I think the best/simplest thing to do when encountering this error is
+that, when this happens we just fail the migration on source and
+continue running on source, which should be the same failure handling
+path with precopy.  But still it seems that we don't have a good
+mechanism to detect the error when sending MIG_CMD_PACKAGED message
+fails in some way (we can add one ACK from dst->src, however it breaks
+old VMs).
 
-  =
+Before going further, would my worry make any sense?
 
-  Environment
-  -------------------------
-  All of the following versions have been tested:
+(I hope this can be a separate problem from postcopy recovery series,
+ if it is indeed a problem.  For postcopy recovery, I hope the idea of
+ postponing setup POSTCOPY_ACTIVE would suffice)
 
-  QEMU: 2.5.1 / 2.6.0 / 2.8.1.1 / 2.9.0 / 2.10.0
-  Host OS: Ubuntu 16.04 Server LTS / CentOS 7 x86_64_1611
-  Guest OS: Windows 7 64bit / Ubuntu 16.04 Desktop LTS
-  Client OS: Windows 7 64bit / Windows 10 64bit
-  Client Browser: IE 11.0.9600 / Chrome 60.0.3112 / Firefox 55.0.2
-  VNC Client: TigerVNC Viewer 1.8 / UltraVNC Viewer 1.2.1.5 / TightVNC View=
-er 2.8.8 =
-
-  VNC Web Client: noVNC 0.5.1 / noVNC 0.61 / noVNC 0.62
-  VNC Server: TigerVNC 1.8 / x11vnc 0.9.13 / TightVNC 2.8.8
-  VNC Client: TigerVNC Viewer 1.8 / UltraVNC Viewer 1.2.1.5 / TightVNC View=
-er 2.8.8
-
-  =
-
-  Steps to reproduce:
-  -------------------------
-  100% reproducible.
-
-  1. Launch a QEMU instance with websocket option:
-  qemu-system-x86_64 -enable-kvm -m 6G ./win_x64.qcow2 -vnc :1,websocket=3D=
-5701
-
-  2. Open VNC Web Client (noVNC/vnc.html) in browser and connect to QEMU
-  VM via websocket
-
-  3. Play a video (e.g. Watch YouTube) on VM (To produce a lot of frame
-  buffer update)
-
-  4. Limit (e.g. Use NetLimiter) the client inbound bandwidth to 300KB/S
-  (To simulate a low speed WAN)
-
-  5. Then client's output gets stuck(less than 1 fps), the cursor is
-  almost impossible to move
-
-  6. Observe QEMU process on the host, more and more data are
-  accumulated in the process, the consumption of memory continues to
-  keep increasing
-
-  =
-
-  Current result:
-  -------------------------
-  [Top - Initial status]
-    PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMA=
-ND         =
-
-   2725 root      20   0 7229144 5.910g  23024 S  16.3 18.9   0:12.84 qemu-=
-system-x86_64
-
-  [Top - After an hour's playing w/o limit (6-8MB/S)]
-    PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMA=
-ND         =
-
-   2725 root      20   0 7370284 6.046g  23132 S  28.0 19.3  35:58.15 qemu-=
-system-x86_64
-
-  [Top - Limit the bandwidth and continue to playing for another an hour (3=
-00KB/S)]
-    PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMA=
-ND         =
-
-   2725 root      20   0 11.029g 8.853g  23132 S  20.0 28.2  72:14.17 qemu-=
-system-x86_64
-
-  Also test several other combinations in the same environment:
-
-  1. Client(VNC Viewer) - Server(QEMU)
-  2. Client(VNC Viewer) - Server(tigervnc/x11vnc/tightvnc)
-  3. Client(noVNC)      - Server(tigervnc/x11vnc/tightvnc)
-
-  Likewise, the client's inbound bandwidth is limited to 300KB/S, =
-
-  although a lot of frame are lost, all of they still works (at least the m=
-ouse is movable).
-
-  It's found that when connect to QEMU via websocket, it never drop any fra=
-mes.
-  QEMU still sends a lot of data to its websocket even when the network is =
-congested, =
-
-  the process is continually consuming more memory, then it gets stack.
-
-  =
-
-  Expected results:
-  -------------------------
-  When the network is poor (non-LAN), QEMU would reduce the VNC data send t=
-o its websocket correspondingly, and the memory usage remains stable.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1718964/+subscriptions
+-- 
+Peter Xu
