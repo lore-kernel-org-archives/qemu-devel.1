@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e1xbs-0007A7-Jz
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:42:25 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e1xiz-0000N6-LL
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:49:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e1xbp-00087s-IR
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:42:24 -0400
-Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:54862)
+	(envelope-from <richard.henderson@linaro.org>) id 1e1xiw-0003Ke-IH
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:49:45 -0400
+Received: from mail-pf0-x231.google.com ([2607:f8b0:400e:c00::231]:45023)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e1xbp-00087X-C9
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:42:21 -0400
-Received: by mail-pf0-x233.google.com with SMTP id m28so12869017pfi.11
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 09:42:21 -0700 (PDT)
-References: <20171010151811.19935-1-pbonzini@redhat.com>
+	id 1e1xiw-0003Jj-Bc
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:49:42 -0400
+Received: by mail-pf0-x231.google.com with SMTP id x7so7528446pfa.1
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 09:49:42 -0700 (PDT)
+References: <20170928203708.9376-1-david@redhat.com>
+	<20170928203708.9376-2-david@redhat.com>
+	<cf1fd114-9b28-88b1-baac-669407631846@redhat.com>
+	<20171010162006.4e541412.cohuck@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <70503bef-87c2-e642-3890-fadf4fc5e4a5@linaro.org>
-Date: Tue, 10 Oct 2017 09:42:17 -0700
+Message-ID: <5c1d4292-2044-8d0b-c563-8617ff603a8b@linaro.org>
+Date: Tue, 10 Oct 2017 09:49:38 -0700
 MIME-Version: 1.0
-In-Reply-To: <20171010151811.19935-1-pbonzini@redhat.com>
+In-Reply-To: <20171010162006.4e541412.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] nios2: define tcg_env
+Subject: Re: [Qemu-devel] [PATCH v2 01/30] s390x/tcg: turn INTERRUPT_EXT
+ into a mask
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +34,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: Marek Vasut <marex@denx.de>, thuth@redhat.com, qemu-stable@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org
 
-On 10/10/2017 08:18 AM, Paolo Bonzini wrote:
-> This should be done by all target and, since commit 53f6672bcf
-> ("gen-icount: use tcg_ctx.tcg_env instead of cpu_env", 2017-06-30),
-> is causing the NIOS2 target to hang.
-> 
-> This is because the test for "should I exit to the main loop"
-> was being done with the correct offset to the icount decrementer,
-> but using TCG temporary 0 (the frame pointer) rather than the
-> env pointer.
-> 
-> Cc: qemu-stable@nongnu.org
-> Cc: Marek Vasut <marex@denx.de>
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  target/nios2/translate.c | 1 +
->  1 file changed, 1 insertion(+)
+On 10/10/2017 07:20 AM, Cornelia Huck wrote:
+>> The last two function look similar enough that you could merge the
+>> functions, e.g.:
+>>
+>> void cpu_inject_ext_pending_bit(S390CPU *cpu, int bit)
+>> {
+>>     CPUS390XState *env = &cpu->env;
+>>
+>>     env->pending_int |= bit;
+>>     cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
+>> }
+>>
+>> ?
+>>
+>> Apart from that, the patch looks fine to me.
+>>
+>>  Thomas
+> FWIW, I'd prefer to keep these as separate functions.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Certainly.  In a later patch they diverge much more than would be easily
+separated as Thomas suggests.
 
 
 r~
