@@ -1,32 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e1wXU-0005VG-CN
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:33:52 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e1wc8-0007Ym-Uv
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:38:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e1wXQ-00060w-81
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:33:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36352)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e1wXQ-00060V-0n
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:33:44 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 192E9A1F41
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 15:33:43 +0000 (UTC)
-Date: Tue, 10 Oct 2017 12:33:35 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171010153335.GC3246@localhost.localdomain>
-References: <20171006215244.27104-1-ehabkost@redhat.com>
-	<20171006215244.27104-2-ehabkost@redhat.com>
-	<f4bd17b9-42ca-0e2a-1a84-57b17510bb30@redhat.com>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e1wc5-0000Yo-Qf
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:38:36 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54992
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1e1wc5-0000YZ-Kx
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:38:33 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9AFY40a115648
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 11:38:29 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dgy08q7p2-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 11:38:28 -0400
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Tue, 10 Oct 2017 11:38:28 -0400
+References: <20171009225623.29232-1-marcandre.lureau@redhat.com>
+	<20171009225623.29232-15-marcandre.lureau@redhat.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Tue, 10 Oct 2017 11:38:23 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f4bd17b9-42ca-0e2a-1a84-57b17510bb30@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/7] qemu-doc: Document minimum kernel
- version for KVM in x86_64
+In-Reply-To: <20171009225623.29232-15-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <dc288f2f-9c13-bd39-6cd2-781014a6f699@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 14/42] tpm: add TPMBackendCmd to hold the
+ request state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,60 +43,255 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: amarnath.valluri@intel.com
 
-On Mon, Oct 09, 2017 at 03:40:02PM +0200, Paolo Bonzini wrote:
-> On 06/10/2017 23:52, Eduardo Habkost wrote:
-> > The default set of KVM CPU features require the host kernel to
-> > support them.  KVM_PV_EOI is the newest one, and was included on
-> > Linux v3.6 (Linux commit ae7a2a3f).
-> > 
-> > Running on an old host might break management software
-> > expectations because the latest machine-type won't be runnable
-> > while older machine-types might be runnable.  Document v3.6 as
-> > the minimum kernel version for KVM on x86_64.
-> > 
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  qemu-doc.texi | 9 +++++++++
-> >  1 file changed, 9 insertions(+)
-> > 
-> > diff --git a/qemu-doc.texi b/qemu-doc.texi
-> > index ecd186a159..be45b6b6f6 100644
-> > --- a/qemu-doc.texi
-> > +++ b/qemu-doc.texi
-> > @@ -37,6 +37,7 @@
-> >  * QEMU System emulator for non PC targets::
-> >  * QEMU Guest Agent::
-> >  * QEMU User space emulator::
-> > +* System requirements::
-> >  * Implementation notes::
-> >  * Deprecated features::
-> >  * License::
-> > @@ -2348,6 +2349,14 @@ Act as if the host page size was 'pagesize' bytes
-> >  Run the emulation in single step mode.
-> >  @end table
-> >  
-> > +@node System requirements
-> > +@chapter System requirements
-> > +
-> > +@section KVM kernel module
-> > +
-> > +On x86_64 hosts, the default set of CPU features enabled by the KVM accelerator
-> > +require the host to be running Linux v3.6 or newer.
-> > +
-> >  
-> >  @include qemu-tech.texi
-> >  
-> > 
-> 
-> Maybe we should expand on the consequences of running on older versions?
+On 10/09/2017 06:55 PM, Marc-Andr=C3=A9 Lureau wrote:
+> This simplifies a bit locality handling, and argument passing, and
+> could pave the way to queuing requests (if that makes sense).
 
-I intentionally tried to not make any commitment to what should
-happen if running an older kernel.  But a quick explanation of
-what can happen is probably a good idea.  I will try to come up
-with something.
+We won't queue requests. The TPM interfaces all send one request and=20
+expect the driver to wait until the response comes back.
 
--- 
-Eduardo
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+
+> ---
+>   hw/tpm/tpm_int.h             |  1 +
+>   include/sysemu/tpm_backend.h | 16 +++++++++++++---
+>   backends/tpm.c               |  6 +++---
+>   hw/tpm/tpm_emulator.c        | 29 +++++++++++++++--------------
+>   hw/tpm/tpm_passthrough.c     | 24 +++++-------------------
+>   hw/tpm/tpm_tis.c             | 18 +++++++++++++-----
+>   6 files changed, 50 insertions(+), 44 deletions(-)
+>
+> diff --git a/hw/tpm/tpm_int.h b/hw/tpm/tpm_int.h
+> index f2f285b3cc..6d7b3dc850 100644
+> --- a/hw/tpm/tpm_int.h
+> +++ b/hw/tpm/tpm_int.h
+> @@ -26,6 +26,7 @@ struct TPMState {
+>  =20
+>       uint8_t     locty_number;
+>       TPMLocality *locty_data;
+> +    TPMBackendCmd cmd;
+>  =20
+>       char *backend;
+>       TPMBackend *be_driver;
+> diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.=
+h
+> index 9c83a512e1..3bb90be3de 100644
+> --- a/include/sysemu/tpm_backend.h
+> +++ b/include/sysemu/tpm_backend.h
+> @@ -30,7 +30,16 @@
+>   typedef struct TPMBackendClass TPMBackendClass;
+>   typedef struct TPMBackend TPMBackend;
+>  =20
+> -typedef void (TPMRecvDataCB)(TPMState *, bool selftest_done);
+> +typedef void (TPMRecvDataCB)(TPMState *);
+> +
+> +typedef struct TPMBackendCmd {
+> +    uint8_t locty;
+> +    const uint8_t *in;
+> +    uint32_t in_len;
+> +    uint8_t *out;
+> +    uint32_t out_len;
+> +    bool selftest_done;
+> +} TPMBackendCmd;
+>  =20
+>   struct TPMBackend {
+>       Object parent;
+> @@ -76,7 +85,7 @@ struct TPMBackendClass {
+>  =20
+>       void (*opened)(TPMBackend *s, Error **errp);
+>  =20
+> -    void (*handle_request)(TPMBackend *s);
+> +    void (*handle_request)(TPMBackend *s, TPMBackendCmd *cmd);
+>   };
+>  =20
+>   /**
+> @@ -121,11 +130,12 @@ bool tpm_backend_had_startup_error(TPMBackend *s)=
+;
+>   /**
+>    * tpm_backend_deliver_request:
+>    * @s: the backend to send the request to
+> + * @cmd: the command to deliver
+>    *
+>    * Send a request to the backend. The backend will then send the requ=
+est
+>    * to the TPM implementation.
+>    */
+> -void tpm_backend_deliver_request(TPMBackend *s);
+> +void tpm_backend_deliver_request(TPMBackend *s, TPMBackendCmd *cmd);
+>  =20
+>   /**
+>    * tpm_backend_reset:
+> diff --git a/backends/tpm.c b/backends/tpm.c
+> index 34e82085ec..dc7c831ff8 100644
+> --- a/backends/tpm.c
+> +++ b/backends/tpm.c
+> @@ -25,7 +25,7 @@ static void tpm_backend_worker_thread(gpointer data, =
+gpointer user_data)
+>       TPMBackendClass *k  =3D TPM_BACKEND_GET_CLASS(s);
+>  =20
+>       assert(k->handle_request !=3D NULL);
+> -    k->handle_request(s);
+> +    k->handle_request(s, (TPMBackendCmd *)data);
+>   }
+>  =20
+>   static void tpm_backend_thread_end(TPMBackend *s)
+> @@ -76,9 +76,9 @@ bool tpm_backend_had_startup_error(TPMBackend *s)
+>       return s->had_startup_error;
+>   }
+>  =20
+> -void tpm_backend_deliver_request(TPMBackend *s)
+> +void tpm_backend_deliver_request(TPMBackend *s, TPMBackendCmd *cmd)
+>   {
+> -    g_thread_pool_push(s->thread_pool, NULL, NULL);
+> +    g_thread_pool_push(s->thread_pool, cmd, NULL);
+>   }
+>  =20
+>   void tpm_backend_reset(TPMBackend *s)
+> diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
+> index 4fe405353a..788ab9876d 100644
+> --- a/hw/tpm/tpm_emulator.c
+> +++ b/hw/tpm/tpm_emulator.c
+> @@ -172,28 +172,29 @@ static int tpm_emulator_set_locality(TPMEmulator =
+*tpm_emu, uint8_t locty_number)
+>       return 0;
+>   }
+>  =20
+> -static void tpm_emulator_handle_request(TPMBackend *tb)
+> +static void tpm_emulator_handle_request(TPMBackend *tb, TPMBackendCmd =
+*cmd)
+>   {
+>       TPMEmulator *tpm_emu =3D TPM_EMULATOR(tb);
+> -    TPMLocality *locty =3D NULL;
+> -    bool selftest_done =3D false;
+>       Error *err =3D NULL;
+>  =20
+>       DPRINTF("processing TPM command");
+>  =20
+> -    locty =3D tb->tpm_state->locty_data;
+> -    if (tpm_emulator_set_locality(tpm_emu,
+> -                                  tb->tpm_state->locty_number) < 0 ||
+> -        tpm_emulator_unix_tx_bufs(tpm_emu, locty->w_buffer.buffer,
+> -                                  locty->w_offset, locty->r_buffer.buf=
+fer,
+> -                                  locty->r_buffer.size, &selftest_done=
+,
+> -                                  &err) < 0) {
+> -        tpm_util_write_fatal_error_response(locty->r_buffer.buffer,
+> -                                            locty->r_buffer.size);
+> -        error_report_err(err);
+> +    if (tpm_emulator_set_locality(tpm_emu, tb->tpm_state->locty_number=
+) < 0) {
+> +        goto error;
+> +    }
+> +
+> +    if (tpm_emulator_unix_tx_bufs(tpm_emu, cmd->in, cmd->in_len,
+> +                                  cmd->out, cmd->out_len,
+> +                                  &cmd->selftest_done, &err) < 0) {
+> +        goto error;
+>       }
+>  =20
+> -    tb->recv_data_callback(tb->tpm_state, selftest_done);
+> +    tb->recv_data_callback(tb->tpm_state);
+> +    return;
+> +
+> +error:
+> +    tpm_util_write_fatal_error_response(cmd->out, cmd->out_len);
+> +    error_report_err(err);
+>   }
+>  =20
+>   static int tpm_emulator_probe_caps(TPMEmulator *tpm_emu)
+> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+> index 0ae4596932..93d72b8e9e 100644
+> --- a/hw/tpm/tpm_passthrough.c
+> +++ b/hw/tpm/tpm_passthrough.c
+> @@ -137,30 +137,16 @@ err_exit:
+>       return ret;
+>   }
+>  =20
+> -static int tpm_passthrough_unix_transfer(TPMPassthruState *tpm_pt,
+> -                                         const TPMLocality *locty_data=
+,
+> -                                         bool *selftest_done)
+> -{
+> -    return tpm_passthrough_unix_tx_bufs(tpm_pt,
+> -                                        locty_data->w_buffer.buffer,
+> -                                        locty_data->w_offset,
+> -                                        locty_data->r_buffer.buffer,
+> -                                        locty_data->r_buffer.size,
+> -                                        selftest_done);
+> -}
+> -
+> -static void tpm_passthrough_handle_request(TPMBackend *tb)
+> +static void tpm_passthrough_handle_request(TPMBackend *tb, TPMBackendC=
+md *cmd)
+>   {
+>       TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
+> -    bool selftest_done =3D false;
+>  =20
+> -    DPRINTF("tpm_passthrough: processing command\n");
+> +    DPRINTF("tpm_passthrough: processing command %p\n", cmd);
+>  =20
+> -    tpm_passthrough_unix_transfer(tpm_pt,
+> -                                  tb->tpm_state->locty_data,
+> -                                  &selftest_done);
+> +    tpm_passthrough_unix_tx_bufs(tpm_pt, cmd->in, cmd->in_len,
+> +                                 cmd->out, cmd->out_len, &cmd->selftes=
+t_done);
+>  =20
+> -    tb->recv_data_callback(tb->tpm_state, selftest_done);
+> +    tb->recv_data_callback(tb->tpm_state);
+>   }
+>  =20
+>   static void tpm_passthrough_reset(TPMBackend *tb)
+> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+> index 345a4fbee5..ffed7bfaf9 100644
+> --- a/hw/tpm/tpm_tis.c
+> +++ b/hw/tpm/tpm_tis.c
+> @@ -215,7 +215,15 @@ static void tpm_tis_tpm_send(TPMState *s, uint8_t =
+locty)
+>        */
+>       tis->loc[locty].state =3D TPM_TIS_STATE_EXECUTION;
+>  =20
+> -    tpm_backend_deliver_request(s->be_driver);
+> +    s->cmd =3D (TPMBackendCmd) {
+> +        .locty =3D locty,
+> +        .in =3D s->locty_data->w_buffer.buffer,
+> +        .in_len =3D s->locty_data->w_offset,
+> +        .out =3D s->locty_data->r_buffer.buffer,
+> +        .out_len =3D s->locty_data->r_buffer.size
+> +    };
+> +
+> +    tpm_backend_deliver_request(s->be_driver, &s->cmd);
+>   }
+>  =20
+>   /* raise an interrupt if allowed */
+> @@ -352,7 +360,7 @@ static void tpm_tis_receive_bh(void *opaque)
+>   {
+>       TPMState *s =3D opaque;
+>       TPMTISEmuState *tis =3D &s->s.tis;
+> -    uint8_t locty =3D s->locty_number;
+> +    uint8_t locty =3D s->cmd.locty;
+>  =20
+>       tpm_tis_sts_set(&tis->loc[locty],
+>                       TPM_TIS_STS_VALID | TPM_TIS_STS_DATA_AVAILABLE);
+> @@ -371,11 +379,11 @@ static void tpm_tis_receive_bh(void *opaque)
+>   /*
+>    * Callback from the TPM to indicate that the response was received.
+>    */
+> -static void tpm_tis_receive_cb(TPMState *s,
+> -                               bool is_selftest_done)
+> +static void tpm_tis_receive_cb(TPMState *s)
+>   {
+>       TPMTISEmuState *tis =3D &s->s.tis;
+> -    uint8_t locty =3D s->locty_number;
+> +    bool is_selftest_done =3D s->cmd.selftest_done;
+> +    uint8_t locty =3D s->cmd.locty;
+>       uint8_t l;
+>  =20
+>       if (is_selftest_done) {
