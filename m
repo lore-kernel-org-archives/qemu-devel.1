@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e1sSw-0005Ru-7i
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:12:51 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e1sSw-0005Ry-8u
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:12:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e1sSr-0002gw-Da
+	(envelope-from <kraxel@redhat.com>) id 1e1sSu-0002iH-91
 	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:12:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52998)
+Received: from mx1.redhat.com ([209.132.183.28]:53410)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e1sSr-0002fo-4u
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:12:45 -0400
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e1sSu-0002hv-3F
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:12:48 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 10 Oct 2017 13:12:40 +0200
-Message-Id: <20171010111240.27607-3-kraxel@redhat.com>
+Date: Tue, 10 Oct 2017 13:12:39 +0200
+Message-Id: <20171010111240.27607-2-kraxel@redhat.com>
 In-Reply-To: <20171010111240.27607-1-kraxel@redhat.com>
 References: <20171010111240.27607-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] vga: handle cirrus vbe mode wraparounds.
+Subject: [Qemu-devel] [PATCH v2 1/2] vga: drop line_offset variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,101 +24,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: d@vidbuchanan.co.uk, Gerd Hoffmann <kraxel@redhat.com>, P J P <ppandit@redhat.com>
+Cc: d@vidbuchanan.co.uk, Gerd Hoffmann <kraxel@redhat.com>
 
-Commit "3d90c62548 vga: stop passing pointers to vga_draw_line*
-functions" is incomplete.  It doesn't handle the case that the vga
-rendering code tries to create a shared surface, i.e. a pixman image
-backed by vga video memory.  That can not work in case the guest display
-wraps from end of video memory to the start.  So force shadowing in that
-case.  Also adjust the snapshot region calculation.
-
-Can trigger with cirrus only, when programming vbe modes using the bochs
-api (stdvga, also qxl and virtio-vga in vga compat mode) wrap arounds
-can't happen.
-
-Fixes: CVE-2017-13672
-Fixes: 3d90c6254863693a6b13d918d2b8682e08bbc681
-Cc: P J P <ppandit@redhat.com>
-Reported-by: David Buchanan <d@vidbuchanan.co.uk>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/display/vga.c | 28 +++++++++++++++++++++-------
- 1 file changed, 21 insertions(+), 7 deletions(-)
+ hw/display/vga.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/hw/display/vga.c b/hw/display/vga.c
-index bf774e3402..1afceb6f16 100644
+index ed24ef7076..bf774e3402 100644
 --- a/hw/display/vga.c
 +++ b/hw/display/vga.c
-@@ -1465,13 +1465,13 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+@@ -1464,7 +1464,7 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+ {
      DisplaySurface *surface = qemu_console_surface(s->con);
      int y1, y, update, linesize, y_start, double_scan, mask, depth;
-     int width, height, shift_control, bwidth, bits;
--    ram_addr_t page0, page1;
-+    ram_addr_t page0, page1, region_start, region_end;
+-    int width, height, shift_control, line_offset, bwidth, bits;
++    int width, height, shift_control, bwidth, bits;
+     ram_addr_t page0, page1;
      DirtyBitmapSnapshot *snap = NULL;
      int disp_width, multi_scan, multi_run;
-     uint8_t *d;
-     uint32_t v, addr1, addr;
-     vga_draw_line_func *vga_draw_line = NULL;
--    bool share_surface;
-+    bool share_surface, force_shadow = false;
-     pixman_format_code_t format;
- #ifdef HOST_WORDS_BIGENDIAN
-     bool byteswap = !s->big_endian_fb;
-@@ -1484,6 +1484,15 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
-     s->get_resolution(s, &width, &height);
-     disp_width = width;
- 
-+    region_start = (s->start_addr * 4);
-+    region_end = region_start + s->line_offset * height;
-+    if (region_end > s->vbe_size) {
-+        /* wraps around (can happen with cirrus vbe modes) */
-+        region_start = 0;
-+        region_end = s->vbe_size;
-+        force_shadow = true;
-+    }
-+
-     shift_control = (s->gr[VGA_GFX_MODE] >> 5) & 3;
-     double_scan = (s->cr[VGA_CRTC_MAX_SCAN] >> 7);
-     if (shift_control != 1) {
-@@ -1523,7 +1532,7 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
-     format = qemu_default_pixman_format(depth, !byteswap);
-     if (format) {
-         share_surface = dpy_gfx_check_format(s->con, format)
--            && !s->force_shadow;
-+            && !s->force_shadow && !force_shadow;
-     } else {
-         share_surface = false;
+@@ -1614,7 +1614,6 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+         s->cursor_invalidate(s);
      }
-@@ -1627,8 +1636,6 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
-     y1 = 0;
+ 
+-    line_offset = s->line_offset;
+ #if 0
+     printf("w=%d h=%d v=%d line_offset=%d cr[0x09]=0x%02x cr[0x17]=0x%02x linecmp=%d sr[0x01]=0x%02x\n",
+            width, height, v, line_offset, s->cr[9], s->cr[VGA_CRTC_MODE],
+@@ -1629,7 +1628,7 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
  
      if (!full_update) {
--        ram_addr_t region_start = addr1;
--        ram_addr_t region_end = addr1 + s->line_offset * height;
+         ram_addr_t region_start = addr1;
+-        ram_addr_t region_end = addr1 + line_offset * height;
++        ram_addr_t region_end = addr1 + s->line_offset * height;
          vga_sync_dirty_bitmap(s);
          if (s->line_compare < height) {
              /* split screen mode */
-@@ -1651,10 +1658,17 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
-             addr = (addr & ~0x8000) | ((y1 & 2) << 14);
-         }
-         update = full_update;
--        page0 = addr;
--        page1 = addr + bwidth - 1;
-+        page0 = addr & s->vbe_size_mask;
-+        page1 = (addr + bwidth - 1) & s->vbe_size_mask;
-         if (full_update) {
-             update = 1;
-+        } else if (page1 < page0) {
-+            /* scanline wraps from end of video memory to the start */
-+            assert(force_shadow);
-+            update = memory_region_snapshot_get_dirty(&s->vram, snap,
-+                                                      page0, 0);
-+            update |= memory_region_snapshot_get_dirty(&s->vram, snap,
-+                                                       page1, 0);
+@@ -1681,7 +1680,7 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+         if (!multi_run) {
+             mask = (s->cr[VGA_CRTC_MODE] & 3) ^ 3;
+             if ((y1 & mask) == mask)
+-                addr1 += line_offset;
++                addr1 += s->line_offset;
+             y1++;
+             multi_run = multi_scan;
          } else {
-             update = memory_region_snapshot_get_dirty(&s->vram, snap,
-                                                       page0, page1 - page0);
 -- 
 2.9.3
