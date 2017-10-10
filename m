@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e22En-0004QX-GT
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:38:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1e22Ix-0008Jl-HR
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:43:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e22Em-0002wU-KM
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:38:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53890)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1e22Em-0002wE-Bd
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:38:52 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 10 Oct 2017 23:35:06 +0200
-Message-Id: <20171010213506.22989-28-marcandre.lureau@redhat.com>
-In-Reply-To: <20171010213506.22989-1-marcandre.lureau@redhat.com>
-References: <20171010213506.22989-1-marcandre.lureau@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1e22Iw-0004zF-Lw
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:43:11 -0400
+References: <20171010134205.6120-1-vsementsov@virtuozzo.com>
+	<00ece7c6-3c55-f84b-adcf-27869a596eb5@redhat.com>
+	<19ae13ac-92f1-04e0-ad7a-6e0e0d152b9f@openvz.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <61ec4431-25a1-a834-515d-2629a7c70f19@redhat.com>
+Date: Tue, 10 Oct 2017 16:42:58 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 27/27] vhost-user-scsi: remove server_sock
- from VusDev
+In-Reply-To: <19ae13ac-92f1-04e0-ad7a-6e0e0d152b9f@openvz.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="5m0Uob3tkIcb0qCwNNIufWDbTVpm6eKgb"
+Subject: Re: [Qemu-devel] [PATCH RFC] file-posix: make lock_fd read-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,139 +25,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, changpeng.liu@intel.com, f4bug@amsat.org, felipe@nutanix.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: "Denis V. Lunev" <den@openvz.org>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, berrange@redhat.com
 
-It is unneeded in the VusDev device structure, and also simplify a bit
-the code.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5m0Uob3tkIcb0qCwNNIufWDbTVpm6eKgb
+From: Eric Blake <eblake@redhat.com>
+To: "Denis V. Lunev" <den@openvz.org>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, berrange@redhat.com
+Message-ID: <61ec4431-25a1-a834-515d-2629a7c70f19@redhat.com>
+Subject: Re: [PATCH RFC] file-posix: make lock_fd read-only
+References: <20171010134205.6120-1-vsementsov@virtuozzo.com>
+ <00ece7c6-3c55-f84b-adcf-27869a596eb5@redhat.com>
+ <19ae13ac-92f1-04e0-ad7a-6e0e0d152b9f@openvz.org>
+In-Reply-To: <19ae13ac-92f1-04e0-ad7a-6e0e0d152b9f@openvz.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
----
- contrib/vhost-user-scsi/vhost-user-scsi.c | 77 ++++++++++---------------=
-------
- 1 file changed, 24 insertions(+), 53 deletions(-)
+On 10/10/2017 02:30 PM, Denis V. Lunev wrote:
+> On 10/10/2017 09:50 PM, Eric Blake wrote:
+>> On 10/10/2017 08:42 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> We do not reopen lock_fd on bdrv_reopen which leads to problems on
+>>> reopen image RO. So, lets make lock_fd be always RO.
+>>> This is correct, because qemu_lock_fd always called with exclusive=3D=
+false
+>>> on lock_fd.
+>> How is that correct?  file-posix.c calls:
+>>             ret =3D qemu_lock_fd_test(s->lock_fd, off, 1, true);
+>> where exclusive being true in turn sets:
+>>         .l_type   =3D exclusive ? F_WRLCK : F_RDLCK,
+>>
+>> and F_WRLCK requests fail on a RO fd with EBADF.
+> this works fine for us as here we do not get the lock but just
+> query it.
+>=20
 
-diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-us=
-er-scsi/vhost-user-scsi.c
-index 615e2a76bb..54c1191db0 100644
---- a/contrib/vhost-user-scsi/vhost-user-scsi.c
-+++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
-@@ -28,7 +28,6 @@ typedef struct VusIscsiLun {
- typedef struct VusDev {
-     VugDev parent;
-=20
--    int server_sock;
-     VusIscsiLun lun;
-     GMainLoop *loop;
- } VusDev;
-@@ -357,57 +356,12 @@ fail:
-=20
- /** vhost-user-scsi **/
-=20
--static void vdev_scsi_free(VusDev *vdev_scsi)
--{
--    if (vdev_scsi->server_sock >=3D 0) {
--        close(vdev_scsi->server_sock);
--    }
--    g_main_loop_unref(vdev_scsi->loop);
--    g_free(vdev_scsi);
--}
--
--static VusDev *vdev_scsi_new(int server_sock)
--{
--    VusDev *vdev_scsi;
--
--    vdev_scsi =3D g_new0(VusDev, 1);
--    vdev_scsi->server_sock =3D server_sock;
--    vdev_scsi->loop =3D g_main_loop_new(NULL, FALSE);
--
--    return vdev_scsi;
--}
--
--static int vdev_scsi_run(VusDev *vdev_scsi)
--{
--    int cli_sock;
--
--    assert(vdev_scsi);
--    assert(vdev_scsi->server_sock >=3D 0);
--
--    cli_sock =3D accept(vdev_scsi->server_sock, NULL, NULL);
--    if (cli_sock < 0) {
--        perror("accept");
--        return -1;
--    }
--
--    vug_init(&vdev_scsi->parent,
--             cli_sock,
--             vus_panic_cb,
--             &vus_iface);
--
--    g_main_loop_run(vdev_scsi->loop);
--
--    vug_deinit(&vdev_scsi->parent);
--
--    return 0;
--}
--
- int main(int argc, char **argv)
- {
-     VusDev *vdev_scsi =3D NULL;
-     char *unix_fn =3D NULL;
-     char *iscsi_uri =3D NULL;
--    int sock, opt, err =3D EXIT_SUCCESS;
-+    int lsock =3D -1, csock =3D -1, opt, err =3D EXIT_SUCCESS;
-=20
-     while ((opt =3D getopt(argc, argv, "u:i:")) !=3D -1) {
-         switch (opt) {
-@@ -427,25 +381,42 @@ int main(int argc, char **argv)
-         goto help;
-     }
-=20
--    sock =3D unix_sock_new(unix_fn);
--    if (sock < 0) {
-+    lsock =3D unix_sock_new(unix_fn);
-+    if (lsock < 0) {
-         goto err;
-     }
--    vdev_scsi =3D vdev_scsi_new(sock);
-=20
--    if (vus_iscsi_add_lun(&vdev_scsi->lun, iscsi_uri) !=3D 0) {
-+    csock =3D accept(lsock, NULL, NULL);
-+    if (csock < 0) {
-+        perror("accept");
-         goto err;
-     }
-=20
--    if (vdev_scsi_run(vdev_scsi) !=3D 0) {
-+    vdev_scsi =3D g_new0(VusDev, 1);
-+    vdev_scsi->loop =3D g_main_loop_new(NULL, FALSE);
-+
-+    if (vus_iscsi_add_lun(&vdev_scsi->lun, iscsi_uri) !=3D 0) {
-         goto err;
-     }
-=20
-+    vug_init(&vdev_scsi->parent, csock, vus_panic_cb, &vus_iface);
-+
-+    g_main_loop_run(vdev_scsi->loop);
-+
-+    vug_deinit(&vdev_scsi->parent);
-+
- out:
-     if (vdev_scsi) {
--        vdev_scsi_free(vdev_scsi);
-+        g_main_loop_unref(vdev_scsi->loop);
-+        g_free(vdev_scsi);
-         unlink(unix_fn);
-     }
-+    if (csock >=3D 0) {
-+        close(csock);
-+    }
-+    if (lsock >=3D 0) {
-+        close(lsock);
-+    }
-     g_free(unix_fn);
-     g_free(iscsi_uri);
-=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ftruncate(fd, 1024);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fcntl(fd, F_SETLK, &fl_rd);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fcntl(fd, F_GETLK, &fl_wr);
+
+Trying with F_OFD_SETLK (which is more important, because it matches
+what we prefer to use) gives the same results as your strace (remember
+to #define _GNU_SOURCE 1 before compilation, to get F_OFD_SETLK into scop=
+e).
+
+>=20
+> The key is that in test cod we do not _set_ the lock, but query it! Thi=
+s
+> is allowed even on
+> RDONLY file descriptor.
+
+Hmm, you're right: file-posix only uses qemu_lock_fd() to set locks
+(with exclusive =3D=3D false), and qemu_lock_fd_test() to query locks
+(there, exclusive =3D=3D true means to probe if a write lock can be grabb=
+ed,
+but does not actually grab one so it doesn't care whether the fd is RW.
+We ).
+
+We'd need a lot more explanation in the commit message (for example, you
+still haven't stated an actual backtrace or error message you got when
+the lock file is left RW), but you may have just convinced me that the
+conversion to always use a RO lock fd is correct, at least for
+file-posix' use of fcntl locking.
+
 --=20
-2.15.0.rc0.40.gaefcc5f6f
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--5m0Uob3tkIcb0qCwNNIufWDbTVpm6eKgb
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlndPuIACgkQp6FrSiUn
+Q2qLcQf8CucHNRfBQRtsL3vSnYEJ7Donigppcu2b5qBqVMNfG+glkddHgSybBaAD
+guYFkrPk0F4WX75q7vL6E1DRkRlAFWC3Lcnt1U8hKLd7tGAIpFKI2R0hE6pGTVBg
+d0y8ioY4t03lkg/sncRu4rRjJ5dvpzZRovghYh6hk2W3YwBfRn9p7CvEV9fRvzFt
+9AjAkaQhxb7HCxEH7axfzj6G37HbmOoZsXO1+Up14ZQYh5MBaXl/gNJuSyZNsUv6
+R6KX/po5f8qZU2PZoE+av3HWrkpmfsUWJSE56T23Te1wgqurS9yrbtWxJTybX1xi
+xWzjp5zYvgfAo7Rc2HkYM7Kj+FcRhQ==
+=CNQB
+-----END PGP SIGNATURE-----
+
+--5m0Uob3tkIcb0qCwNNIufWDbTVpm6eKgb--
