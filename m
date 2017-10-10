@@ -1,44 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1e1wyx-0007AV-1g
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:02:17 -0400
+	(envelope-from <ldoktor@redhat.com>) id 1e1x0H-000892-UJ
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:03:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1e1wys-0004zJ-5F
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:02:11 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33480
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1e1wyr-0004yY-Vm
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:02:06 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9AFxi3O006548
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 12:01:59 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dgygw6r2v-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 12:01:59 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Tue, 10 Oct 2017 17:01:56 +0100
-References: <1507124979-8880-1-git-send-email-pmorel@linux.vnet.ibm.com>
-	<1507124979-8880-5-git-send-email-pmorel@linux.vnet.ibm.com>
-	<20171009084506.77da9d5c@t450s.home>
-	<e59c8274-c390-b99f-85dd-ec3763520ff1@linux.vnet.ibm.com>
-	<20171010113520.6c3d03e3.cohuck@redhat.com>
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Date: Tue, 10 Oct 2017 18:01:53 +0200
+	(envelope-from <ldoktor@redhat.com>) id 1e1x0B-0005UT-K9
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:03:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52104)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1e1x0B-0005Tn-7L
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:03:27 -0400
+References: <20171005172013.3098-1-ehabkost@redhat.com>
+	<20171005172013.3098-3-ehabkost@redhat.com>
+	<7af19e5a-702e-fd41-951b-47a542269929@redhat.com>
+	<20171010024907.GZ4015@localhost.localdomain>
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+Message-ID: <b64d22d3-50be-3bf6-9f27-12931b811389@redhat.com>
+Date: Tue, 10 Oct 2017 18:03:14 +0200
 MIME-Version: 1.0
-In-Reply-To: <20171010113520.6c3d03e3.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <1952d9c1-6ef8-0f1d-d89a-08e1236ad275@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 4/5] s390x/pci: Refuse to realize
- VFIO-PCI if AIS needed but supported
+In-Reply-To: <20171010024907.GZ4015@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2XPuQc1wLCcXbJC1h9RjMFKjeosiMOuLT"
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] scripts: Remove debug parameter
+ from QEMUMonitorProtocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,146 +31,243 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, agraf@suse.de
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On 10/10/2017 11:35, Cornelia Huck wrote:
-> On Mon, 9 Oct 2017 19:16:23 +0200
-> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
->=20
->> On 09/10/2017 16:45, Alex Williamson wrote:
->>> On Wed,  4 Oct 2017 15:49:38 +0200
->>> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
->>>   =20
->>>> In S390x the Adapter Interrupt Suppression facility is used to mask
->>>> interrupts of other PCI devices during interruption handling.
->>>>
->>>> VFIO PCI allows the interrupts to be delivered rapidely through KVM =
-via
->>>> IRQfd or to be delivered through QEMU.
->>>> The choice is made through the x-kvm-intx and x-kvo-misx properties =
-of
->>>> the VFIO PCI device.
->>>>
->>>> If the VFIO PCI device is using the direct KVM access through IRQfd =
-and
->>>> we know that KVM does not implement AIS support we refuse to realize=
- the
->>>> VFIO PCI device.
->>>>
->>>> In all other cases, emulation and VFIO PCI sending interrupts throug=
-h
->>>> QEMU, we intercept the propagated IRQ, and protect it with the QEMU =
-AIS
->>>> implementation before to send it to the guest through KVM.
->>>>
->>>> Signed-off-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
->>>> ---
->>>>    hw/s390x/s390-pci-bus.c | 12 ++++++++++++
->>>>    1 file changed, 12 insertions(+)
->>>>
->>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
->>>> index d9c294a..4afe49b 100644
->>>> --- a/hw/s390x/s390-pci-bus.c
->>>> +++ b/hw/s390x/s390-pci-bus.c
->>>> @@ -21,18 +21,21 @@
->>>>    #include "hw/pci/pci_bus.h"
->>>>    #include "hw/pci/pci_bridge.h"
->>>>    #include "hw/pci/msi.h"
->>>> +#include "hw/vfio/pci.h"
->>>>    #include "qemu/error-report.h"
->>>>   =20
->>>>    #ifndef DEBUG_S390PCI_BUS
->>>>    #define DEBUG_S390PCI_BUS  0
->>>>    #endif
->>>>   =20
->>>> +#ifndef DPRINTF
->>>>    #define DPRINTF(fmt, ...)                                        =
- \
->>>>        do {                                                         =
- \
->>>>            if (DEBUG_S390PCI_BUS) {                                 =
- \
->>>>                fprintf(stderr, "S390pci-bus: " fmt, ## __VA_ARGS__);=
- \
->>>>            }                                                        =
- \
->>>>        } while (0)
->>>> +#endif
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2XPuQc1wLCcXbJC1h9RjMFKjeosiMOuLT
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b64d22d3-50be-3bf6-9f27-12931b811389@redhat.com>
+Subject: Re: [PATCH v2 2/3] scripts: Remove debug parameter from
+ QEMUMonitorProtocol
+References: <20171005172013.3098-1-ehabkost@redhat.com>
+ <20171005172013.3098-3-ehabkost@redhat.com>
+ <7af19e5a-702e-fd41-951b-47a542269929@redhat.com>
+ <20171010024907.GZ4015@localhost.localdomain>
+In-Reply-To: <20171010024907.GZ4015@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Dne 10.10.2017 v 04:49 Eduardo Habkost napsal(a):
+> On Sat, Oct 07, 2017 at 10:26:14AM +0200, Luk=C3=A1=C5=A1 Doktor wrote:=
+
+>> Dne 5.10.2017 v 19:20 Eduardo Habkost napsal(a):
+>>> Use logging module for the QMP debug messages.  The only scripts
+>>> that set debug=3DTrue are iotests.py and guestperf/engine.py, and
+>>> they already call logging.basicConfig() to set up logging.
 >>>
->>> Maybe a sign we shouldn't be including vfio/pci.h
->>>   =20
->>>>    S390pciState *s390_get_phb(void)
->>>>    {
->>>> @@ -751,6 +754,15 @@ static void s390_pcihost_hot_plug(HotplugHandle=
-r *hotplug_dev,
->>>>            }
->>>>   =20
->>>>            if (object_dynamic_cast(OBJECT(dev), "vfio-pci")) {
->>>> +            S390FLICState *fs =3D s390_get_flic();
->>>> +            VFIOPCIDevice *vdev =3D DO_UPCAST(VFIOPCIDevice, pdev, =
-pdev);
->>>> +
->>>> +            if ((!vdev->no_kvm_msix || !vdev->no_kvm_msix) &&
->>>> +                (!fs || !fs->ais_supported)) {
->>>> +                error_setg(errp, "VFIO PCI is not supported "
->>>> +                           "because kernel has no AIS capability.")=
-;
->>>> +                return;
->>>> +            }
+>>> Scripts that don't configure logging are safe as long as they
+>>> don't need debugging output, because debug messages don't trigger
+>>> the "No handlers could be found for logger" message from the
+>>> Python logging module.
 >>>
+>>> Scripts that already configure logging but don't use debug=3DTrue
+>>> (e.g. scripts/vm/basevm.py) will get QMP debugging enabled for
+>>> free.
 >>>
->>> Hmm, you're basically looking at private data structure fields for
->>> experimental disable flags, which no user, or more importantly no
->>> management tool, could rightfully be expected to provide.  Can we not
->>> take this into account to automatically do the right thing, ie.
->>> automatically set the necessary flag during the device realize?  Than=
-ks,
+>>> Cc: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>
+>>> Cc: Fam Zheng <famz@redhat.com>
+>>> Cc: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
+>>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>>> ---
+>>> Changes v1 -> v2:
+>>> * Actually remove debug parameter from method definition
+>>>   (Fam Zheng)
+>>> * Fix "<<<" vs ">>>" confusion
+>>>   (Fam Zheng)
+>>> * Remove "import sys" line
+>>>   (Luk=C3=A1=C5=A1 Doktor)
+>>> ---
+>>>  scripts/qemu.py    |  3 +--
+>>>  scripts/qmp/qmp.py | 16 +++++++---------
+>>>  2 files changed, 8 insertions(+), 11 deletions(-)
+>>>
+>>> diff --git a/scripts/qemu.py b/scripts/qemu.py
+>>> index c9a106fbce..f6d2e68627 100644
+>>> --- a/scripts/qemu.py
+>>> +++ b/scripts/qemu.py
+>>> @@ -177,8 +177,7 @@ class QEMUMachine(object):
+>>> =20
+>>>      def _pre_launch(self):
+>>>          self._qmp =3D qmp.qmp.QEMUMonitorProtocol(self._monitor_addr=
+ess,
+>>> -                                                server=3DTrue,
+>>> -                                                debug=3Dself._debug)=
+
+>>> +                                                server=3DTrue)
+>>> =20
+>>>      def _post_launch(self):
+>>>          self._qmp.accept()
+>>> diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
+>>> index ef12e8a1a0..07c9632e9e 100644
+>>> --- a/scripts/qmp/qmp.py
+>>> +++ b/scripts/qmp/qmp.py
+>>> @@ -11,7 +11,7 @@
+>>>  import json
+>>>  import errno
+>>>  import socket
+>>> -import sys
+>>> +import logging
+>>> =20
+>>> =20
+>>>  class QMPError(Exception):
+>>> @@ -32,12 +32,14 @@ class QMPTimeoutError(QMPError):
+>>> =20
+>>>  class QEMUMonitorProtocol(object):
+>>> =20
+>>> +    #: Logger object for debugging messages
+>>> +    logger =3D logging.getLogger('QMP')
+>>>      #: Socket's error class
+>>>      error =3D socket.error
+>>>      #: Socket's timeout
+>>>      timeout =3D socket.timeout
+>>> =20
+>>> -    def __init__(self, address, server=3DFalse, debug=3DFalse):
+>>> +    def __init__(self, address, server=3DFalse):
+>>>          """
+>>>          Create a QEMUMonitorProtocol class.
+>>> =20
+>>> @@ -51,7 +53,6 @@ class QEMUMonitorProtocol(object):
+>>>          """
+>>>          self.__events =3D []
+>>>          self.__address =3D address
+>>> -        self._debug =3D debug
+>>>          self.__sock =3D self.__get_sock()
+>>>          self.__sockfile =3D None
+>>>          if server:
+>>> @@ -83,8 +84,7 @@ class QEMUMonitorProtocol(object):
+>>>                  return
+>>>              resp =3D json.loads(data)
+>>>              if 'event' in resp:
+>>> -                if self._debug:
+>>> -                    print >>sys.stderr, "QMP:<<< %s" % resp
+>>> +                self.logger.debug("<<< %s", resp)
+>>>                  self.__events.append(resp)
+>>>                  if not only_event:
+>>>                      continue
+>>> @@ -164,8 +164,7 @@ class QEMUMonitorProtocol(object):
+>>>          @return QMP response as a Python dict or None if the connect=
+ion has
+>>>                  been closed
+>>>          """
+>>> -        if self._debug:
+>>> -            print >>sys.stderr, "QMP:>>> %s" % qmp_cmd
+>>> +        self.logger.debug(">>> %s", qmp_cmd)
+>>>          try:
+>>>              self.__sock.sendall(json.dumps(qmp_cmd))
+>>>          except socket.error as err:
+>>> @@ -173,8 +172,7 @@ class QEMUMonitorProtocol(object):
+>>>                  return
+>>>              raise socket.error(err)
+>>>          resp =3D self.__json_read()
+>>> -        if self._debug:
+>>> -            print >>sys.stderr, "QMP:<<< %s" % resp
+>>> +        self.logger.debug("<<< %s", resp)
+>>>          return resp
+>>> =20
+>>>      def cmd(self, name, args=3DNone, cmd_id=3DNone):
+>>>
 >>
->> I am not sure to understand.
+>> This one looks good, but in order to no break qemu-iotests verbose mod=
+e it requires fix to qtest/iotests:
 >>
->> Here we are in a s390x specific device and without vfio/pci.h, we have
->> no access to the PCI VFIOdevice structure from the realize function.
->>
->> Do you mean to add an entry in the VFIOPCIdevice realize?
->> A new quirk ?
->> An architecture callback, because we also need access to S390FLICState=
- ?
->>
->>
->> We also have the possibility to not fall-back to AIS emulation for VFI=
-O
->> but we would loose the possibility to migrate to a host not supporting=
- AIS.
+>> ```diff
+>> diff --git a/scripts/qtest.py b/scripts/qtest.py
+>> index df0daf2..0e955a8 100644
+>> --- a/scripts/qtest.py
+>> +++ b/scripts/qtest.py
+>> @@ -77,12 +77,12 @@ class QEMUQtestMachine(qemu.QEMUMachine):
+>>      '''A QEMU VM'''
+>> =20
+>>      def __init__(self, binary, args=3DNone, name=3DNone, test_dir=3D"=
+/var/tmp",
+>> -                 socket_scm_helper=3DNone):
+>> +                 socket_scm_helper=3DNone, debug=3DFalse):
+>>          if name is None:
+>>              name =3D "qemu-%d" % os.getpid()
+>>          super(QEMUQtestMachine,
+>>                self).__init__(binary, args, name=3Dname, test_dir=3Dte=
+st_dir,
+>> -                             socket_scm_helper=3Dsocket_scm_helper)
+>> +                             socket_scm_helper=3Dsocket_scm_helper, d=
+ebug=3Ddebug)
+>>          self._qtest =3D None
+>>          self._qtest_path =3D os.path.join(test_dir, name + "-qtest.so=
+ck")
+>> =20
+>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotest=
+s.py
+>> index 1af117e..989ebd3 100644
+>> --- a/tests/qemu-iotests/iotests.py
+>> +++ b/tests/qemu-iotests/iotests.py
+>> @@ -193,9 +193,8 @@ class VM(qtest.QEMUQtestMachine):
+>>          name =3D "qemu%s-%d" % (path_suffix, os.getpid())
+>>          super(VM, self).__init__(qemu_prog, qemu_opts, name=3Dname,
+>>                                   test_dir=3Dtest_dir,
+>> -                                 socket_scm_helper=3Dsocket_scm_helpe=
+r)
+>> -        if debug:
+>> -            self._debug =3D True
+>> +                                 socket_scm_helper=3Dsocket_scm_helpe=
+r,
+>> +                                 debug=3Ddebug)
+>>          self._num_drives =3D 0
+>> =20
+>>      def add_device(self, opts):
+>> ```
 >=20
-> Thinking about this some more: The problem is generally "if we have to
-> fall back to ais emulation, we cannot support any pci device that
-> bypasses qemu's interrupt injection", no?
+> I'm confused by why the above patch is necessary.  We are in the
+> process of removing the 'debug' parameter from QEMUMachine and
+> QEMUMonitorProtocol, why would we add a debug parameter to
+> QEMUQtestMachine and iotests.py?
 >=20
-> So this would imply vfio devices where the experimental switch is not
-> used, but also virtio-pci if it is configured to use irqfd, I think.
+>>
+>> (because the `debug` used to be set after `__init__`, but the logging =
+is initialized during `__init__`.)
+>>
+>> Therefor conditional ACK when the qtest/iotest fix precedes this commi=
+t.
 >=20
-> The ugly thing is that the platform-specific code depends on a property
-> of the plugged device being set or not set... and that's likely to be
-> different from device type to device type, and may not even be
-> configurable for some device types.
+> Do you mean the following?
+>=20
+>   Message-Id: <20170927130339.21444-3-ehabkost@redhat.com>
+>   Subject: [Qemu-devel] [PATCH 2/5] iotests: Set up Python logging
+>   https://www.mail-archive.com/qemu-devel@nongnu.org/msg485036.html
+>   https://github.com/ehabkost/qemu/commit/afa79b55676dcd1859aa9d1f983c9=
+dfbbcc13197
 >=20
 
-Yes, right.
-Since in the case we have no AIS in KVM only PCI is impacted, do you=20
-think we can fence IRQFD for MSI with
+I'm sorry, my fault. With the afa79b55676dcd1859aa9d1f983c9dfbbcc13197 co=
+mmit it works well and I haven't found any other issues.
 
-kvm_msi_via_irqfd_allowed =3D false;
+Reviewed-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>=20
 
-in kvm_arch_init_irq_routing() ?
+> It is already queued on python-next.
+>=20
 
-In fact, if we also verify the AIS availability in the same routine we=20
-can avoid the ugly include of vfio/pci.h
 
-Regards,
 
-Pierre
+--2XPuQc1wLCcXbJC1h9RjMFKjeosiMOuLT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEwBAEBCAAaBQJZ3O9CExxsZG9rdG9yQHJlZGhhdC5jb20ACgkQJrNi5H/PIsEi
+TQf+PMKzWLDwu2lOVkumEy/PEnkYe8nSZ7GUM1gadwjRZ1Vh1PsGBPrtVF8bPlS9
+OFdcuTIEm3/HPahQHLSwn11xXzsLVYrhVMFWYuqpAXTUzQ5MvVOLyUwm36e4/hA9
+Tr7FQ+vLzo/Qj2kaMosLs7khGlzmmLbjdJHi+pQXOMTXJq7AnOCIytLCR/Q/+Uru
++NRtWFyUtgRnimuSnm95dKtANxOgkVgDUbrSlQjL/wFoXW5BRrziu1g5XoJnFAK+
+l4yqBmoGXyCTM27ZoTYRJ2JutsKAPg4znUeSOXQ1ZRL8Lo4S4ApTtgdBHEGIC1Vr
+yJuLtBUxwLdZiV5OvFOHLLa7aA==
+=JMWm
+-----END PGP SIGNATURE-----
+
+--2XPuQc1wLCcXbJC1h9RjMFKjeosiMOuLT--
