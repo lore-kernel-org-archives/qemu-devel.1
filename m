@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1e1rDu-0001tL-VE
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 05:53:16 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e1rFV-0002T5-OS
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 05:54:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1e1rDr-0006FD-Si
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 05:53:15 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:54380)
+	(envelope-from <peter.maydell@linaro.org>) id 1e1rFU-00070X-SN
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 05:54:53 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:46718)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1e1rDr-0006EJ-Ic
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 05:53:11 -0400
-Received: by mail-wm0-x232.google.com with SMTP id i124so3548135wmf.3
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 02:53:09 -0700 (PDT)
-References: <CAFEAcA_qCmsekM+bQT8qa7hceSSm2vcoYs-eTzKyH_BOpiVVcw@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA_qCmsekM+bQT8qa7hceSSm2vcoYs-eTzKyH_BOpiVVcw@mail.gmail.com>
-Date: Tue, 10 Oct 2017 10:53:07 +0100
-Message-ID: <87zi8z9vng.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e1rFU-0006zx-MN
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 05:54:52 -0400
+Received: by mail-wm0-x233.google.com with SMTP id m72so3472773wmc.1
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 02:54:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <f3871f0a-7df2-a5e0-1770-8df04bb76750@kaod.org>
+References: <20170920070135.31379-1-clg@kaod.org>
+	<20170920070135.31379-2-clg@kaod.org>
+	<CAFEAcA9-dmTD3v1YU7Wr5EcA53z=c_WxS0K1+1zbw16q=vj-vQ@mail.gmail.com>
+	<f3871f0a-7df2-a5e0-1770-8df04bb76750@kaod.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 10 Oct 2017 10:54:30 +0100
+Message-ID: <CAFEAcA-kJ-qEoo-2ZWaH0XPv-cJA4O3wZAW=FwmM5nUU4-mVBg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] tcg/translate-all.c:169: tb_lock: Assertion
- `!have_tb_lock' failed when doing cpu_restore_state in usermode
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] aspeed: add support for the
+ witherspoon-bmc board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,151 +33,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> Running the test program
-> http://people.linaro.org/~peter.maydell/thumb-over-page
-> (source at http://people.linaro.org/~peter.maydell/thumb-over-page.c)
-> in the usermode emulator:
->  ./build/x86/arm-linux-user/qemu-arm
-> ~/linaro/qemu-misc-tests/thumb-over-page
-
-Does this fail when run via system mode as well?
-
+On 10 October 2017 at 10:19, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> On 10/06/2017 05:10 PM, Peter Maydell wrote:
+>>> +    mc->ignore_memory_transaction_failures =3D true;
+>>
+>> Please don't set this flag for new board models, it is only
+>> for our legacy existing ones. Instead implement any devices
+>> that you need for guest code to boot (stub them out with
+>> create_unimplemented_device() if you like).
 >
-> results in an assertion failure:
-> write_insns1: T32 insn crossing page boundary
-> Calling into buffer at 0x6fff9
-> qemu-arm: /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/translate=
--all.c:169:
-> tb_lock: Assertion `!have_tb_lock' failed.
-> qemu-arm: /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/translate=
--all.c:169:
-> tb_lock: Assertion `!have_tb_lock' failed.
-> Segmentation fault (core dumped)
+> I have dug into this a little more and it seems that it is
+> required for the Aspeed bootloader (a modified u-boot) which
+> uses static variables in early init phases. So legacy firmwares
+> won't work in QEMU but will on real HW.
 >
-> It ought to exit successfully:
-> write_insns1: T32 insn crossing page boundary
-> Calling into buffer at 0x6fff9
-> got sig 11
-> fault pc 0x6fffe r0 0x1
-> e104462:xenial:qemu$
->
-> (so this is a regression).
+> It's fine with me but what is the goal of the approach ? Force
+> SoC providers into fixing their FW when they use QEMU ?
 
-OK I'll have a look at how we broke this.
+The goal is to model hardware correctly. Hardware gives
+aborts if you touch a physical address with no device there,
+and so QEMU's model should do the same. If you have guest
+code that touches a physical address and blows up because
+of an abort (but doesn't when run on h/w) then either:
+ * it is trying to probe a device that exists in real h/w:
+   you need to provide a stub implementation in QEMU
+ * the SoC's bus fabric really doesn't pass aborts back
+   to the CPU; I think this is unlikely, but you can model
+   it at the SoC level with a suitable default memory region
 
->
-> Here's a backtrace:
->
-> qemu-arm: /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/translate=
--all.c:169:
-> tb_lock: Assertion `!have_tb_lock' failed.
->
-> Thread 1 "qemu-arm" received signal SIGABRT, Aborted.
-> 0x00007ffff6851428 in __GI_raise (sig=3Dsig@entry=3D6) at
-> ../sysdeps/unix/sysv/linux/raise.c:54
-> 54      ../sysdeps/unix/sysv/linux/raise.c: No such file or directory.
-> (gdb) bt
-> #0  0x00007ffff6851428 in __GI_raise (sig=3Dsig@entry=3D6) at
-> ../sysdeps/unix/sysv/linux/raise.c:54
-> #1  0x00007ffff685302a in __GI_abort () at abort.c:89
-> #2  0x00007ffff6849bd7 in __assert_fail_base (fmt=3D<optimised out>,
->     assertion=3Dassertion@entry=3D0x55555570a0ae "!have_tb_lock",
->     file=3Dfile@entry=3D0x55555570a020
-> "/home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/translate-all.c",
-> line=3Dline@entry=3D169,
->     function=3Dfunction@entry=3D0x55555570a208 <__PRETTY_FUNCTION__.27063>
-> "tb_lock") at assert.c:92
-> #3  0x00007ffff6849c82 in __GI___assert_fail (assertion=3D0x55555570a0ae
-> "!have_tb_lock",
->     file=3D0x55555570a020
-> "/home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/translate-all.c",
->     line=3D169, function=3D0x55555570a208 <__PRETTY_FUNCTION__.27063>
-> "tb_lock") at assert.c:101
-> #4  0x00005555555cd50c in tb_lock ()
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/translate-al=
-l.c:169
-> #5  0x00005555555cda34 in cpu_restore_state (cpu=3D0x555557a1d930,
-> retaddr=3D93824992991167)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/translate-al=
-l.c:353
-> #6  0x00005555555d0765 in handle_cpu_signal (pc=3D93824992991165,
-> address=3D458752, is_write=3D0,
->     old_set=3D0x7fffffffd2a8) at
-> /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/user-exec.c:125
-> #7  0x00005555555d0808 in cpu_arm_signal_handler (host_signum=3D11,
-> pinfo=3D0x7fffffffd2b0,
->     puc=3D0x7fffffffd180) at
-> /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/user-exec.c:230
-> #8  0x00005555555fce44 in host_signal_handler (host_signum=3D11,
-> info=3D0x7fffffffd2b0,
->     puc=3D0x7fffffffd180) at
-> /home/petmay01/linaro/qemu-from-laptop/qemu/linux-user/signal.c:646
-> #9  <signal handler called>
-> #10 0x000055555560d7bd in lduw_he_p (ptr=3D0x7ffefee1b000)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/include/qemu/bswap.h:3=
-17
-> #11 0x000055555560d836 in lduw_le_p (ptr=3D0x7ffefee1b000)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/include/qemu/bswap.h:3=
-59
-> #12 0x000055555561f868 in cpu_lduw_code (env=3D0x555557a25bc0, ptr=3D4587=
-52)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/include/exec/cpu_ldst_=
-useronly_template.h:68
-> #13 0x000055555561f8fd in arm_lduw_code (env=3D0x555557a25bc0,
-> addr=3D458752, sctlr_b=3Dfalse)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/arm_ldst.h:=
-50
-> #14 0x000055555563c059 in disas_thumb2_insn (env=3D0x555557a25bc0,
-> s=3D0x7fffffffd9e0, insn_hw1=3D61952)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/translate.c=
-:9739
-> #15 0x00005555556416c7 in disas_thumb_insn (env=3D0x555557a25bc0,
-> s=3D0x7fffffffd9e0)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/translate.c=
-:11821
-> #16 0x0000555555641f3f in thumb_tr_translate_insn
-> (dcbase=3D0x7fffffffd9e0, cpu=3D0x555557a1d930)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/translate.c=
-:12104
-> #17 0x00005555555d0218 in translator_loop (ops=3D0x555555982480
-> <thumb_translator_ops>,
->     db=3D0x7fffffffd9e0, cpu=3D0x555557a1d930, tb=3D0x555555a21cc0
-> <static_code_gen_buffer+206880>)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/translator.c=
-:104
-> #18 0x0000555555642446 in gen_intermediate_code (cpu=3D0x555557a1d930,
->     tb=3D0x555555a21cc0 <static_code_gen_buffer+206880>)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/translate.c=
-:12300
-> #19 0x00005555555ceac0 in tb_gen_code (cpu=3D0x555557a1d930, pc=3D458750,
-> cs_base=3D0, flags=3D524417,
->     cflags=3D0) at
-> /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/translate-all.c:1283
-> #20 0x00005555555cba65 in tb_find (cpu=3D0x555557a1d930,
->     last_tb=3D0x555555a21bc0 <static_code_gen_buffer+206624>, tb_exit=3D1)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/cpu-exec.c:4=
-02
-> #21 0x00005555555cc18a in cpu_exec (cpu=3D0x555557a1d930)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/accel/tcg/cpu-exec.c:7=
-10
-> #22 0x00005555555d36ea in cpu_loop (env=3D0x555557a25bc0)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/linux-user/main.c:570
-> #23 0x00005555555d59f9 in main (argc=3D2, argv=3D0x7fffffffe458,
-> envp=3D0x7fffffffe470)
->     at /home/petmay01/linaro/qemu-from-laptop/qemu/linux-user/main.c:4858
->
-> This is probably partly because of the silly way we handle guest
-> faults trying to read code in the translator.
->
-> thanks
-> -- PMM
+The purpose of the flag is purely for existing board models,
+where it is impossible to enable the correct (abort)
+behaviour without possibly breaking guest code images that
+work for people using released QEMU code. On a new board
+model we don't have that problem and we can get it right
+from the start. If we don't get it right from the start
+then we will never have a chance to fix it in future.
 
+Our mismodelling of this (not turning accesses to invalid
+addresses into CPU aborts) meant that in the past it was
+possible to be lazy when implementing a board model and
+just not model half the hardware at all. Now it isn't,
+but I don't think that adding a set of calls to
+create_unimplemented_device() is a significant imposition.
 
---
-Alex Benn=C3=A9e
+thanks
+-- PMM
