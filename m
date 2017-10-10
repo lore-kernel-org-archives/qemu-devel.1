@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e1xiz-0000N6-LL
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:49:49 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e1xjY-0000iu-73
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:50:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e1xiw-0003Ke-IH
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:49:45 -0400
-Received: from mail-pf0-x231.google.com ([2607:f8b0:400e:c00::231]:45023)
+	(envelope-from <peter.maydell@linaro.org>) id 1e1xjU-0004Kt-8i
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:50:20 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:47727)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e1xiw-0003Jj-Bc
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:49:42 -0400
-Received: by mail-pf0-x231.google.com with SMTP id x7so7528446pfa.1
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 09:49:42 -0700 (PDT)
-References: <20170928203708.9376-1-david@redhat.com>
-	<20170928203708.9376-2-david@redhat.com>
-	<cf1fd114-9b28-88b1-baac-669407631846@redhat.com>
-	<20171010162006.4e541412.cohuck@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <5c1d4292-2044-8d0b-c563-8617ff603a8b@linaro.org>
-Date: Tue, 10 Oct 2017 09:49:38 -0700
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e1xjU-0004IV-1O
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:50:16 -0400
+Received: by mail-wm0-x232.google.com with SMTP id t69so6993042wmt.2
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 09:50:15 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20171010162006.4e541412.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 01/30] s390x/tcg: turn INTERRUPT_EXT
- into a mask
+In-Reply-To: <20171010151811.19935-1-pbonzini@redhat.com>
+References: <20171010151811.19935-1-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 10 Oct 2017 17:49:54 +0100
+Message-ID: <CAFEAcA_=qfeuk-J-oGruTXcKiWriKo9A8a+FOn1pcbnb6kCdrg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] nios2: define tcg_env
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,30 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Marek Vasut <marex@denx.de>, Thomas Huth <thuth@redhat.com>, qemu-stable <qemu-stable@nongnu.org>
 
-On 10/10/2017 07:20 AM, Cornelia Huck wrote:
->> The last two function look similar enough that you could merge the
->> functions, e.g.:
->>
->> void cpu_inject_ext_pending_bit(S390CPU *cpu, int bit)
->> {
->>     CPUS390XState *env = &cpu->env;
->>
->>     env->pending_int |= bit;
->>     cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
->> }
->>
->> ?
->>
->> Apart from that, the patch looks fine to me.
->>
->>  Thomas
-> FWIW, I'd prefer to keep these as separate functions.
+On 10 October 2017 at 16:18, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> This should be done by all target and, since commit 53f6672bcf
+> ("gen-icount: use tcg_ctx.tcg_env instead of cpu_env", 2017-06-30),
+> is causing the NIOS2 target to hang.
+>
+> This is because the test for "should I exit to the main loop"
+> was being done with the correct offset to the icount decrementer,
+> but using TCG temporary 0 (the frame pointer) rather than the
+> env pointer.
+>
+> Cc: qemu-stable@nongnu.org
+> Cc: Marek Vasut <marex@denx.de>
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  target/nios2/translate.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/target/nios2/translate.c b/target/nios2/translate.c
+> index 6b0961837d..54fbe898df 100644
+> --- a/target/nios2/translate.c
+> +++ b/target/nios2/translate.c
+> @@ -948,6 +948,7 @@ void nios2_tcg_init(void)
+>      int i;
+>
+>      cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
+> +    tcg_ctx.tcg_env = cpu_env;
+>
+>      for (i = 0; i < NUM_CORE_REGS; i++) {
+>          cpu_R[i] = tcg_global_mem_new(cpu_env,
+> --
 
-Certainly.  In a later patch they diverge much more than would be easily
-separated as Thomas suggests.
+Is there somewhere we could put an assert() so we can catch this
+error for future targets rather than them just silently generating
+bad code?
 
-
-r~
+thanks
+-- PMM
