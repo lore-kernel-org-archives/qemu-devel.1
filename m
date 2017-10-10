@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1e249F-0006zr-B8
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 19:41:18 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1e24KW-0001Wj-Jk
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 19:52:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1e249C-0001VC-M0
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 19:41:17 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:54975)
+	(envelope-from <sstabellini@kernel.org>) id 1e24KT-0007H6-VT
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 19:52:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38300)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1e249C-0001Uw-Fb
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 19:41:14 -0400
-Date: Tue, 10 Oct 2017 19:41:10 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20171010234110.GA6467@flamenco>
-References: <20171010214540.30970-1-richard.henderson@linaro.org>
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1e24KT-0007Gf-P4
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 19:52:53 -0400
+Date: Tue, 10 Oct 2017 16:52:48 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <20171002170132.GA2116@perard.uk.xensource.com>
+Message-ID: <alpine.DEB.2.10.1710101651560.3105@sstabellini-ThinkPad-X260>
+References: <1506437019-17946-1-git-send-email-owen.smith@citrix.com>
+	<1506437019-17946-4-git-send-email-owen.smith@citrix.com>
+	<20171002170132.GA2116@perard.uk.xensource.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171010214540.30970-1-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH] tcg: Initialize cpu_env generically
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH 3/3 v4] xenfb: Add
+ [feature|request]-raw-pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,19 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Anthony PERARD <anthony.perard@citrix.com>
+Cc: Owen Smith <owen.smith@citrix.com>, sstabellini@kernel.org, kraxel@redhat.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
 
-On Tue, Oct 10, 2017 at 14:45:40 -0700, Richard Henderson wrote:
-> This is identical for each target.  So, move the initialization to
-> common code.  Move the variable itself out of tcg_ctx and name it
-> cpu_env to minimize changes within targets.
+On Mon, 2 Oct 2017, Anthony PERARD wrote:
+> On Tue, Sep 26, 2017 at 02:43:39PM +0000, Owen Smith wrote:
+> > Writes "feature-raw-pointer" during init to indicate the backend
+> > can pass raw unscaled values for absolute axes to the frontend.
+> > Frontends set "request-raw-pointer" to indicate the backend should
+> > not attempt to scale absolute values to console size.
+> > "request-raw-pointer" is only valid if "request-abs-pointer" is
+> > also set. Raw unscaled pointer values are in the range [0, 0x7fff]
+> > 
+> > Signed-off-by: Owen Smith <owen.smith@citrix.com>
 > 
-> This also means we can remove tcg_global_reg_new_{ptr,i32,i64},
-> since there are no longer global-register temps created by targets.
+> Hi Owen,
 > 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Why did you remove the following from the commit description?
+> > "feature-raw-pointer" and "request-raw-pointer" added to Xen
+> > header in commit 7868654ff7fe5e4a2eeae2b277644fa884a5031e
+> 
+> I think that with it, you could have kept stefano's reviewed-by tag.
 
-Reviewed-by: Emilio G. Cota <cota@braap.org>
+Hi Anthony,
 
-		E.
+Have you tested this series with a few of different guests? Do you
+consider it safe to merge? If so, we can send it upstream (either via
+xen or via ui as Gerd kindly offered). 
