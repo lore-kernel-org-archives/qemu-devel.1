@@ -1,39 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e1wUv-00044p-5x
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:31:13 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e1wVC-0004BU-Oe
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:31:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e1wUp-0004wS-L9
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:31:09 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51534
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e1wV7-00051a-0M
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:31:26 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39578)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e1wUp-0004wB-GP
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:31:03 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9AFQFE8048545
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 11:30:59 -0400
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dgwp7mdr0-1
+	id 1e1wV6-00051D-Kr
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:31:20 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9AFUrtP131748
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 11:31:15 -0400
+Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dgxvtqfxy-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 11:30:58 -0400
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 11:31:15 -0400
 Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Tue, 10 Oct 2017 09:30:57 -0600
+	Tue, 10 Oct 2017 09:31:14 -0600
 References: <20171009225623.29232-1-marcandre.lureau@redhat.com>
-	<20171009225623.29232-10-marcandre.lureau@redhat.com>
+	<20171009225623.29232-11-marcandre.lureau@redhat.com>
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Tue, 10 Oct 2017 11:30:54 -0400
+Date: Tue, 10 Oct 2017 11:31:11 -0400
 MIME-Version: 1.0
-In-Reply-To: <20171009225623.29232-10-marcandre.lureau@redhat.com>
+In-Reply-To: <20171009225623.29232-11-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <792b870a-38ab-c32b-f36e-bc9117ea64e4@linux.vnet.ibm.com>
+Message-Id: <0eb7e5ad-9f6e-9aa8-d0f7-0cc3d70a3d3e@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 09/42] tpm: remove init() class method
+Subject: Re: [Qemu-devel] [PATCH 10/42] tpm: remove configure_tpm() hop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,47 +45,37 @@ To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel
 Cc: amarnath.valluri@intel.com
 
 On 10/09/2017 06:55 PM, Marc-Andr=C3=A9 Lureau wrote:
-> No backend use it.
->
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
 > ---
->   include/sysemu/tpm_backend.h | 2 --
->   backends/tpm.c               | 4 +---
->   2 files changed, 1 insertion(+), 5 deletions(-)
+>   tpm.c | 7 +------
+>   1 file changed, 1 insertion(+), 6 deletions(-)
 >
-> diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.=
-h
-> index a4288df038..b08f985500 100644
-> --- a/include/sysemu/tpm_backend.h
-> +++ b/include/sysemu/tpm_backend.h
-> @@ -66,8 +66,6 @@ struct TPMBackendClass {
->  =20
->       TPMBackend *(*create)(QemuOpts *opts, const char *id);
->  =20
-> -    /* initialize the backend */
-> -    int (*init)(TPMBackend *t);
->       /* start up the TPM on the backend */
->       int (*startup_tpm)(TPMBackend *t);
->  =20
-> diff --git a/backends/tpm.c b/backends/tpm.c
-> index ca3a78eea8..dc750d48c9 100644
-> --- a/backends/tpm.c
-> +++ b/backends/tpm.c
-> @@ -47,13 +47,11 @@ enum TpmType tpm_backend_get_type(TPMBackend *s)
->   int tpm_backend_init(TPMBackend *s, TPMState *state,
->                        TPMRecvDataCB *datacb)
->   {
-> -    TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
-> -
->       s->tpm_state =3D state;
->       s->recv_data_callback =3D datacb;
->       s->had_startup_error =3D false;
->  =20
-> -    return k->init ? k->init(s) : 0;
-> +    return 0;
+> diff --git a/tpm.c b/tpm.c
+> index 4882501bd7..45520f555d 100644
+> --- a/tpm.c
+> +++ b/tpm.c
+> @@ -86,7 +86,7 @@ TPMBackend *qemu_find_tpm(const char *id)
+>       return NULL;
 >   }
 >  =20
->   int tpm_backend_startup_tpm(TPMBackend *s)
+> -static int configure_tpm(QemuOpts *opts)
+> +static int tpm_init_tpmdev(void *dummy, QemuOpts *opts, Error **errp)
+>   {
+>       const char *value;
+>       const char *id;
+> @@ -145,11 +145,6 @@ static int configure_tpm(QemuOpts *opts)
+>       return 0;
+>   }
+>  =20
+> -static int tpm_init_tpmdev(void *dummy, QemuOpts *opts, Error **errp)
+> -{
+> -    return configure_tpm(opts);
+> -}
+> -
+>   /*
+>    * Walk the list of TPM backend drivers that are in use and call thei=
+r
+>    * destroy function to have them cleaned up.
