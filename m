@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e1vm1-0006yM-5C
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:44:46 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e1voF-0000Xg-QB
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:47:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e1vlx-0003Xn-UU
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:44:45 -0400
-Received: from 17.mo4.mail-out.ovh.net ([46.105.41.16]:38805)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e1vlx-0003XN-Nv
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:44:41 -0400
-Received: from player772.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 1CFACDB4D6
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 16:44:39 +0200 (CEST)
-Date: Tue, 10 Oct 2017 16:44:31 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171010164431.168777e9@bahia.lan>
-In-Reply-To: <20171010132159.15787-1-david@gibson.dropbear.id.au>
-References: <20171010132159.15787-1-david@gibson.dropbear.id.au>
+	(envelope-from <kwolf@redhat.com>) id 1e1voB-00058N-Qk
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:47:03 -0400
+Date: Tue, 10 Oct 2017 16:46:44 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171010144644.GL4177@dhcp-200-186.str.redhat.com>
+References: <20171004020048.26379-1-eblake@redhat.com>
+	<20171004020048.26379-8-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] spapr: Correct RAM size calculation for
- HPT resizing
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171004020048.26379-8-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 07/23] block: Convert
+ bdrv_get_block_status() to bytes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: lvivier@redhat.com, clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Wed, 11 Oct 2017 00:21:59 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> In order to prevent the guest from forcing the allocation of large amounts
-> of qemu memory (or host kernel memory, in the case of KVM HV), we limit
-> the size of Hashed Page Table (HPT) it is allowed to allocated, based on
-> its RAM size.
+Am 04.10.2017 um 04:00 hat Eric Blake geschrieben:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  In the common case, allocation is unlikely to ever use
+> values that are not naturally sector-aligned, but it is possible
+> that byte-based values will let us be more precise about allocation
+> at the end of an unaligned file that can do byte-based access.
 > 
-> However, the current calculation is not correct: it only adds up the size
-> of plugged memory, ignoring the base memory size.  This patch corrects it.
+> Changing the name of the function from bdrv_get_block_status() to
+> bdrv_block_status() ensures that the compiler enforces that all
+> callers are updated.  For now, the io.c layer still assert()s that
+> all callers are sector-aligned, but that can be relaxed when a later
+> patch implements byte-based block status in the drivers.
 > 
-> While we're there, use get_plugged_memory_size() instead of directly
-> calling pc_existing_dimms_capacity().  The only difference is that it
-> will abort on failure, which is right: a failure here indicates something
-> wrong within qemu.
+> Note that we have an inherent limitation in the BDRV_BLOCK_* return
+> values: BDRV_BLOCK_OFFSET_VALID can only return the start of a
+> sector, even if we later relax the interface to query for the status
+> starting at an intermediate byte; document the obvious interpretation
+> that valid offsets are always sector-relative.
 > 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> Therefore, for the most part this patch is just the addition of scaling
+> at the callers followed by inverse scaling at bdrv_block_status().  But
+> some code, particularly bdrv_is_allocated(), gets a lot simpler because
+> it no longer has to mess with sectors.
+> 
+> For ease of review, bdrv_get_block_status_above() will be tackled
+> separately.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
 > ---
->  hw/ppc/spapr_hcall.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> v5: drop pointless 'if (pnum)' [John], add comment
+> v4: no change
+> v3: clamp bytes to 32-bits, rather than asserting
+> v2: rebase to earlier changes
+> ---
+>  include/block/block.h | 12 +++++++-----
+>  block/io.c            | 35 +++++++++++++++++++++++------------
+>  block/qcow2-cluster.c |  2 +-
+>  qemu-img.c            | 20 +++++++++++---------
+>  4 files changed, 42 insertions(+), 27 deletions(-)
 > 
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 8d72bb7c1c..06af1b15c0 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -494,7 +494,7 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
->          return H_PARAMETER;
->      }
->  
-> -    current_ram_size = pc_existing_dimms_capacity(&error_fatal);
-> +    current_ram_size = ram_size + get_plugged_memory_size();
+> diff --git a/include/block/block.h b/include/block/block.h
+> index be49c4ae9d..4ecd2c4a65 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
 
-current_ram_size is initialized earlier in this function:
+A bit above the first hunk:
 
-    uint64_t current_ram_size = MACHINE(spapr)->ram_size;
+ * Allocation status flags for bdrv_get_block_status() and friends.
 
-which is is initialized to ram_size in vl.c. Why not doing:
+This should be bdrv_block_status() now.
 
-    current_ram_size += get_plugged_memory_size();
+> @@ -138,8 +138,10 @@ typedef struct HDGeometry {
+>   *
+>   * If BDRV_BLOCK_OFFSET_VALID is set, bits 9-62 (BDRV_BLOCK_OFFSET_MASK)
+>   * represent the offset in the returned BDS that is allocated for the
+> - * corresponding raw data; however, whether that offset actually contains
+> - * data also depends on BDRV_BLOCK_DATA and BDRV_BLOCK_ZERO, as follows:
+> + * corresponding raw data.  Individual bytes are at the same sector-relative
+> + * locations (and thus, this bit cannot be set for mappings which are
+> + * not equivalent modulo 512).  However, whether that offset actually
+> + * contains data also depends on BDRV_BLOCK_DATA, as follows:
 
-?
+This suggests to me that it was a bad idea to embed the offset in the
+bitmask. In the long run, we should probably make flags and offset two
+separate things (e.g. making offset a new by-reference parameter).
 
->  
->      /* We only allow the guest to allocate an HPT one order above what
->       * we'd normally give them (to stop a small guest claiming a huge
+Kevin
