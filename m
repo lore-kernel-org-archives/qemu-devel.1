@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e1kdd-0004bl-3l
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 22:51:32 -0400
+	(envelope-from <sw@weilnetz.de>) id 1e1nGB-0000Oq-1e
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 01:39:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e1kdA-0004An-QP
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 22:51:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60864)
+	(envelope-from <sw@weilnetz.de>) id 1e1nG7-0002Bh-VC
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 01:39:19 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:55702
+	helo=v2201612906741603.powersrv.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e1kdA-00049x-Ce
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 22:50:52 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2C32046289
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 02:50:51 +0000 (UTC)
-Date: Mon, 9 Oct 2017 23:50:49 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171010025049.GA4015@localhost.localdomain>
-References: <20171005172013.3098-1-ehabkost@redhat.com>
-	<20171005172013.3098-4-ehabkost@redhat.com>
-	<cf1d369d-6c59-8513-2662-ca10c58c517c@redhat.com>
+	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1e1nG7-0002BR-Oj
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 01:39:15 -0400
+References: <20171007155522.25436-1-sw@weilnetz.de>
+	<bfac5ec4-885e-7531-2d00-ce48bf518a6d@linaro.org>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <c01459d1-81f4-8af3-4e52-f7703ff389ea@weilnetz.de>
+Date: Tue, 10 Oct 2017 07:39:13 +0200
 MIME-Version: 1.0
+In-Reply-To: <bfac5ec4-885e-7531-2d00-ce48bf518a6d@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <cf1d369d-6c59-8513-2662-ca10c58c517c@redhat.com>
+Content-Language: de-DE
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] scripts: Remove debug parameter
- from QEMUMachine
+Subject: Re: [Qemu-devel] [PATCH] oslib-posix: Fix compiler warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,124 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>
-Cc: qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Sat, Oct 07, 2017 at 10:34:57AM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
-> Dne 5.10.2017 v 19:20 Eduardo Habkost napsal(a):
-> > All scripts that use the QEMUMachine and QEMUQtestMachine classes
-> > (device-crash-test, tests/migration/*, iotests.py, basevm.py)
-> > already configure logging.
-> >=20
-> > The basicConfig() call inside QEMUMachine.__init__() is being
-> > kept just to make sure a script would still work if it didn't
-> > configure logging.
-> >=20
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  scripts/qemu.py                     | 6 ++----
-> >  tests/migration/guestperf/engine.py | 6 ++----
-> >  tests/qemu-iotests/iotests.py       | 2 --
-> >  3 files changed, 4 insertions(+), 10 deletions(-)
-> >=20
-> > diff --git a/scripts/qemu.py b/scripts/qemu.py
-> > index f6d2e68627..9bfdf6d37d 100644
-> > --- a/scripts/qemu.py
-> > +++ b/scripts/qemu.py
-> > @@ -54,7 +54,7 @@ class QEMUMachine(object):
-> > =20
-> >      def __init__(self, binary, args=3DNone, wrapper=3DNone, name=3DN=
-one,
-> >                   test_dir=3D"/var/tmp", monitor_address=3DNone,
-> > -                 socket_scm_helper=3DNone, debug=3DFalse):
-> > +                 socket_scm_helper=3DNone):
-> >          '''
-> >          Initialize a QEMUMachine
-> > =20
-> > @@ -65,7 +65,6 @@ class QEMUMachine(object):
-> >          @param test_dir: where to create socket and log file
-> >          @param monitor_address: address for QMP monitor
-> >          @param socket_scm_helper: helper program, required for send_=
-fd_scm()"
-> > -        @param debug: enable debug mode
-> >          @note: Qemu process is not started until launch() is used.
-> >          '''
-> >          if args is None:
-> > @@ -85,12 +84,11 @@ class QEMUMachine(object):
-> >          self._events =3D []
-> >          self._iolog =3D None
-> >          self._socket_scm_helper =3D socket_scm_helper
-> > -        self._debug =3D debug
-> >          self._qmp =3D None
-> >          self._qemu_full_args =3D None
-> > =20
-> >          # just in case logging wasn't configured by the main script:
-> > -        logging.basicConfig(level=3D(logging.DEBUG if debug else log=
-ging.WARN))
-> > +        logging.basicConfig()
-> Yes, this behaves the same as `debug=3DFalse`
+Am 09.10.2017 um 23:58 schrieb Richard Henderson:
+> On 10/07/2017 08:55 AM, Stefan Weil wrote:
+>> +        char *addr =3D memset_args->addr;
+>> +        uint64_t numpages =3D memset_args->numpages;
+>> +        uint64_t hpagesize =3D memset_args->hpagesize;
+>> +        unsigned i;
 >=20
-> > =20
-> >      def __enter__(self):
-> >          return self
-> > diff --git a/tests/migration/guestperf/engine.py b/tests/migration/gu=
-estperf/engine.py
-> > index 0a13050bc6..e14d4320b2 100644
-> > --- a/tests/migration/guestperf/engine.py
-> > +++ b/tests/migration/guestperf/engine.py
-> > @@ -388,15 +388,13 @@ class Engine(object):
-> >                                 args=3Dself._get_src_args(hardware),
-> >                                 wrapper=3Dself._get_src_wrapper(hardw=
-are),
-> >                                 name=3D"qemu-src-%d" % os.getpid(),
-> > -                               monitor_address=3Dsrcmonaddr,
-> > -                               debug=3Dself._debug)
-> > +                               monitor_address=3Dsrcmonaddr)
-> > =20
-> >          dst =3D qemu.QEMUMachine(self._binary,
-> >                                 args=3Dself._get_dst_args(hardware, u=
-ri),
-> >                                 wrapper=3Dself._get_dst_wrapper(hardw=
-are),
-> >                                 name=3D"qemu-dst-%d" % os.getpid(),
-> > -                               monitor_address=3Ddstmonaddr,
-> > -                               debug=3Dself._debug)
-> > +                               monitor_address=3Ddstmonaddr)
-> > =20
-> >          try:
-> >              src.launch()
-> > diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotes=
-ts.py
-> > index 36a7757aaf..6f057904a9 100644
-> > --- a/tests/qemu-iotests/iotests.py
-> > +++ b/tests/qemu-iotests/iotests.py
-> > @@ -195,8 +195,6 @@ class VM(qtest.QEMUQtestMachine):
-> >          super(VM, self).__init__(qemu_prog, qemu_opts, name=3Dname,
-> >                                   test_dir=3Dtest_dir,
-> >                                   socket_scm_helper=3Dsocket_scm_help=
-er)
-> > -        if debug:
-> > -            self._debug =3D True
+> Match numpages properly while you're at it?
 >=20
-> And this is the main issue. So instead of the fix I proposed in
-> previous commit major changes to
-> "tests/qemu-iotests/iotests.py" are necessary.
-
-Could you clarify what those major changes are?
-
-iotests.py was already changed to call basicConfig() according to
-args.debug in main().
-
-
 >=20
-> >          self._num_drives =3D 0
-> > =20
-> >      def add_device(self, opts):
-> >=20
->=20
+> r~
 
+Do you mean using uint64_t for the loop variable i?
 
+Sure. I only hesitated to do that because it is so huge.
+A 64 bit loop variable looks strange, and the loop would
+take some time if it really uses that range. :-)
+Feel free to change that if you apply the patch.
 
+Or did you think of using size_t for numpages?
+The current code uses both size_t and uint64_t
+which could be cleaned as well, maybe even replacing
+both by uint32_t (or do we expect more pages?).
 
---=20
-Eduardo
+Stefan
