@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1e1q5U-0004QV-L7
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:40:34 -0400
+	(envelope-from <berrange@redhat.com>) id 1e1q5x-0004cP-4G
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:40:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1e1q5K-00006L-Jh
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:40:28 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2324)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1e1q5K-0008T8-04
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:40:18 -0400
-Message-ID: <59DC865F.3040307@huawei.com>
-Date: Tue, 10 Oct 2017 16:35:43 +0800
-From: "Longpeng (Mike)" <longpeng2@huawei.com>
+	(envelope-from <berrange@redhat.com>) id 1e1q5t-0000Mt-UI
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:40:57 -0400
+Date: Tue, 10 Oct 2017 09:40:35 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171010084035.GB30015@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171009172723.190282-1-vsementsov@virtuozzo.com>
+	<20171009172723.190282-9-vsementsov@virtuozzo.com>
+	<5c57b76e-eb34-7825-9c8b-9ee5bd909b02@redhat.com>
 MIME-Version: 1.0
-References: <1505092240-10864-1-git-send-email-longpeng2@huawei.com>
-	<2d8ae3d3-438b-da84-4959-cf63f4f4ce99@linux.vnet.ibm.com>
-	<59B9D439.10807@huawei.com>
-	<7e490af1-9caa-c96d-5f62-308f1b5d8805@linux.vnet.ibm.com>
-	<59BF1E9B.2030408@huawei.com>
-	<64d90f78-a2ae-be37-672b-e47aa3d4ecb2@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA3FBCC5@DGGEMA505-MBX.china.huawei.com>
-	<7eaac82c-0d8b-47f1-94dd-772b3abf31f9@linux.vnet.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DA3FBDD3@DGGEMA505-MBX.china.huawei.com>
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA3FBDD3@DGGEMA505-MBX.china.huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [virtio-dev] Re: [RFC 0/8]
- virtio-crypto: add multiplexing mode support
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5c57b76e-eb34-7825-9c8b-9ee5bd909b02@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 04/10] nbd-server: refactor simple reply
+ sending
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,73 +26,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: "wangxin (U)" <wangxinxin.wang@huawei.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "mst@redhat.com" <mst@redhat.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "cohuck@redhat.com" <cohuck@redhat.com>, Luonengjun <luonengjun@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "john.griffin@intel.com" <john.griffin@intel.com>, "agraf@suse.de" <agraf@suse.de>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-
-
-On 2017/10/9 19:17, Gonglei (Arei) wrote:
-
+On Mon, Oct 09, 2017 at 02:18:10PM -0500, Eric Blake wrote:
+> [adding Dan for a qio question - search for your name below]
 > 
->> -----Original Message-----
->> From: Halil Pasic [mailto:pasic@linux.vnet.ibm.com]
->> Sent: Monday, October 09, 2017 7:05 PM
->>
->> On 10/09/2017 11:22 AM, Gonglei (Arei) wrote:
->>> The next patch refactors make sense to me,
->>> but why do we need to decouple the virtio-crypto.h?
->>>
->>>
->>
->> I wanted to be able to freely change the host side and test with an unchanged
->> guest side, that's why I've done that. It's just for testing. I had to do that
->> because we don't have a mux capable linux driver. Neither of these patches is
->> intended for inclusion. I'm just trying to make a point with them: we can
->> make this substantially simpler (compared to this RFC).
->>
-> I see.
-> 
->> So how do we proceed here? It would be nice to see a cleaned up version of
-> 
-> Maybe Longpeng can apply your test patches in the following patch set when
-> he has time. @Longpeng
-> 
+> On 10/09/2017 12:27 PM, Vladimir Sementsov-Ogievskiy wrote:
+> > Get rid of calculating structure fields offsets by hand and set_cork,
+> > rename nbd_co_send_reply to nbd_co_send_simple_reply. Do not use
+> > NBDReply which will be upgraded in future patches to handle both simple
+> > and structured replies and will be used only in the client.
+> > 
+> > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> > ---
+> >  include/block/nbd.h |  6 ++++
+> >  nbd/nbd-internal.h  |  9 +++++
+> >  nbd/server.c        | 97 ++++++++++++++++++++++-------------------------------
+> >  3 files changed, 56 insertions(+), 56 deletions(-)
 
-OK, I'll take Halil's approach in the following patch set. But I think the spec
-is more important in the current, hope Halil would give more useful suggestions. :)
-
->> this series soon. If I recall correctly there were also other things which
->> can be done in a less convoluted manner.
->>
-> Oh? Which things?
+> > -static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len,
+> > -                             Error **errp)
+> > +static int coroutine_fn nbd_co_send_iov(NBDClient *client, struct iovec *iov,
+> > +                                        unsigned niov, Error **errp)
+> >  {
+> > -    NBDClient *client = req->client;
+> >      int ret;
+> >  
+> >      g_assert(qemu_in_coroutine());
+> > -
+> > -    trace_nbd_co_send_reply(reply->handle, reply->error, len);
+> > -
+> >      qemu_co_mutex_lock(&client->send_lock);
+> >      client->send_coroutine = qemu_coroutine_self();
+> >  
+> > -    if (!len) {
+> > -        ret = nbd_send_reply(client->ioc, reply, errp);
+> > -    } else {
+> > -        qio_channel_set_cork(client->ioc, true);
+> > -        ret = nbd_send_reply(client->ioc, reply, errp);
+> > -        if (ret == 0) {
+> > -            ret = nbd_write(client->ioc, req->data, len, errp);
+> > -            if (ret < 0) {
+> > -                ret = -EIO;
+> > -            }
+> > -        }
+> > -        qio_channel_set_cork(client->ioc, false);
+> > -    }
+> > +    ret = nbd_writev(client->ioc, iov, niov, errp);
 > 
->>>> The basic idea behind the whole thing is that tinging about the requests put
->>>> on the virtqueues in terms of just complicates things unnecessarily.
->>>>
->>>> I could guess I will post the interesting part as a reply to this and the less
->>>> interesting part (decoupling) as an attachment. You are supposed to apply
->> first
->>>> the attachment then the part after the scissors line.
->>>>
->>>> Of course should you could respin the series preferably with the test
->>>> included I can rebase my stuff.
->>>>
->>>> Please let me know about your opinion.
->>>>
->>> Thanks for your work, Halil. What's your opinion about virtio crypto spec v20?
->>
->> I'm on it. I've already started witting on Friday but things turned out a bit more
->> interesting that expected. So I've postponed to today. Of course the two things
->> are
->> connected. I will try to give some feedback today.
->>
-> Sounds good.
+> ...the transmission is now done via iov so that you can send two buffers
+> at once without having to play with the cork,...
 > 
-> Thanks,
-> -Gonglei
-> 
+> Dan - are we guaranteed that qio_channel_writev_all() with a multi-iov
+> argument called by one thread will send all its data in order, without
+> being interleaved with any other parallel coroutine also calling
+> qio_channel_writev_all()?  In other words, it looks like the NBD code
+> was previously using manual cork changes to ensure that two halves of a
+> message were sent without interleave, but Vladimir is now relying on the
+> qio code to do that under the hood.
 
+The I/O channels code does not make guarantees wrt concurrent usage of
+threads or coroutines. It is the callers responsibility to avoid any
+concurrent usage for all APIs. With coroutines you are at least avoiding
+the danger of corrupting memory state, but you still have risk of unexpected
+data ordering.
 
--- 
+IOW, if you have 2 coroutines each doing a series writes on the same QIOChannel
+object, and one does a yield, I/O can certainly be interleaved between the two.
+This is true whether doing multiple qio_channel_writev() calls directly, or
+whether using qio_channel_writev_all().
+
+Unless I'm misunderstanding though, cork did not offer you protection in
+this scenario either. cork just prevents the data being transmitted onto
+the wire immediately - ie it ensures that if you do 2 writes, they get
+sent in 1 TCP packet instead of many TCP packets.
+
+If you have multiple coroutines writing to the channel at the same time
+and one yielded in its series of writes, the I/O from multiple coroutines
+will get merged into that 1 single TCP packet when uncorked.
+
+So if this concurrent usage is a problem NBD was already broken AFAICT.
+
 Regards,
-Longpeng(Mike)
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
