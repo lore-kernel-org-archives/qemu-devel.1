@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e1ssk-0003Tj-E6
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:39:32 -0400
+	(envelope-from <amarnath.valluri@intel.com>) id 1e1sss-0003XN-MI
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:39:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e1ssi-0002YT-Gp
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:39:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60698)
+	(envelope-from <amarnath.valluri@intel.com>) id 1e1ssp-0002b6-Ht
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:39:38 -0400
+Received: from mga04.intel.com ([192.55.52.120]:19551)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e1ssi-0002Y7-8w
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:39:28 -0400
-Date: Tue, 10 Oct 2017 13:39:23 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171010133923.081f7d23.cohuck@redhat.com>
-In-Reply-To: <0120aa4c-ffce-79c0-8c87-c7c1100232eb@redhat.com>
-References: <20171004154144.88995-1-pasic@linux.vnet.ibm.com>
-	<20171004154144.88995-3-pasic@linux.vnet.ibm.com>
-	<d6d2d73d-65c9-7ae1-fd37-cb8e304781e7@redhat.com>
-	<7f454872-fae3-35b0-eff4-227b2aa0f77d@linux.vnet.ibm.com>
-	<6c17b274-cd75-7864-94b9-fc8abff1a786@redhat.com>
-	<da4228cb-d32c-dc77-0a80-bac306f07c24@linux.vnet.ibm.com>
-	<0120aa4c-ffce-79c0-8c87-c7c1100232eb@redhat.com>
+	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
+	id 1e1ssp-0002aV-7U
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 07:39:35 -0400
+From: "Valluri, Amarnath" <amarnath.valluri@intel.com>
+Date: Tue, 10 Oct 2017 11:39:31 +0000
+Message-ID: <1507635610.4061.33.camel@intel.com>
+References: <20171009225623.29232-1-marcandre.lureau@redhat.com>
+	<20171009225623.29232-32-marcandre.lureau@redhat.com>
+	<1507623384.4061.29.camel@intel.com>
+	<267628815.28174009.1507632456608.JavaMail.zimbra@redhat.com>
+In-Reply-To: <267628815.28174009.1507632456608.JavaMail.zimbra@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F23939651F0C9646A678470E8015DA23@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/8] s390x/css: IO instr handler ending
- control
+Subject: Re: [Qemu-devel] [PATCH 31/42] tpm-backend: move set 'id' to common
+ code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,49 +33,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>
+Cc: "stefanb@linux.vnet.ibm.com" <stefanb@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Tue, 10 Oct 2017 12:28:35 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 09.10.2017 17:00, Halil Pasic wrote:
-> > 
-> > 
-> > On 10/09/2017 01:07 PM, Thomas Huth wrote:  
-
-> >> Then, in the follow up patches, you do something like this:
-> >>
-> >>    return (IOInstEnding){.cc = 0};
-> >>
-> >> ... and that just looks very, very ugly in my eyes. The more I look at  
-> > 
-> > Interesting, I found this quite expressive.  
-> 
-> C'mon, we're writing C code, not Java ;-)
-
-Every time I read that construct, I die a little bit inside...
-
-> Well, you already gave a description in your comment in the  struct
-> IOInstEnding, so maybe something similar? Or maybe this could even be
-> merged with the definitions for the SIGP status codes:
-> 
-> #define SIGP_CC_ORDER_CODE_ACCEPTED 0
-> #define SIGP_CC_STATUS_STORED       1
-> #define SIGP_CC_BUSY                2
-> #define SIGP_CC_NOT_OPERATIONAL     3
-
-I'd rather not reuse the definitions for a different instruction, even
-if they are similar in semantics.
-
-> > Sorry, I may be a bit to persistent on this one: I don't think it's
-> > a huge difference, but I don't feel great about changing something to
-> > what I think is (slightly) worse without being first convinced that
-> > I was wrong.  
-> 
-> In the end, the code has to be accepted by the maintainers, so let's
-> leave the decision up to them whether they like this typedef struct
-> IOInstEnding or not...
-
-Here's a strong 'do not like' from me... using an enum or define is
-fine with me.
+T24gVHVlLCAyMDE3LTEwLTEwIGF0IDA2OjQ3IC0wNDAwLCBNYXJjLUFuZHLDqSBMdXJlYXUgd3Jv
+dGU6DQo+IEhpDQo+IA0KPiAtLS0tLSBPcmlnaW5hbCBNZXNzYWdlIC0tLS0tDQo+ID4gDQo+ID4g
+T24gVHVlLCAyMDE3LTEwLTEwIGF0IDAwOjU2ICswMjAwLCBNYXJjLUFuZHLDqSBMdXJlYXUgd3Jv
+dGU6DQo+ID4gPiANCj4gPiA+IFNpZ25lZC1vZmYtYnk6IE1hcmMtQW5kcsOpIEx1cmVhdSA8bWFy
+Y2FuZHJlLmx1cmVhdUByZWRoYXQuY29tPg0KPiA+ID4gLS0tDQo+ID4gPiDCoGluY2x1ZGUvc3lz
+ZW11L3RwbV9iYWNrZW5kLmggfMKgwqAyICstDQo+ID4gPiDCoGh3L3RwbS90cG1fZW11bGF0b3Iu
+Y8KgwqDCoMKgwqDCoMKgwqB8IDEyICsrKy0tLS0tLS0tLQ0KPiA+ID4gwqBody90cG0vdHBtX3Bh
+c3N0aHJvdWdoLmPCoMKgwqDCoMKgfMKgwqA5ICsrKy0tLS0tLQ0KPiA+ID4gwqB0cG0uY8KgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHzCoMKgMyArKy0NCj4g
+PiA+IMKgNCBmaWxlcyBjaGFuZ2VkLCA5IGluc2VydGlvbnMoKyksIDE3IGRlbGV0aW9ucygtKQ0K
+PiA+ID4gDQo+ID4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9zeXNlbXUvdHBtX2JhY2tlbmQuaA0K
+PiA+ID4gYi9pbmNsdWRlL3N5c2VtdS90cG1fYmFja2VuZC5oDQo+ID4gPiBpbmRleCA1OTRiYjUw
+NzgyLi44ODFiZTk3ZWUzIDEwMDY0NA0KPiA+ID4gLS0tIGEvaW5jbHVkZS9zeXNlbXUvdHBtX2Jh
+Y2tlbmQuaA0KPiA+ID4gKysrIGIvaW5jbHVkZS9zeXNlbXUvdHBtX2JhY2tlbmQuaA0KPiA+ID4g
+QEAgLTY0LDcgKzY0LDcgQEAgc3RydWN0IFRQTUJhY2tlbmRDbGFzcyB7DQo+ID4gPiDCoMKgwqDC
+oMKgLyogZ2V0IGEgZGVzY3JpcHRpdmUgdGV4dCBvZiB0aGUgYmFja2VuZCB0byBkaXNwbGF5IHRv
+IHRoZQ0KPiA+ID4gdXNlcg0KPiA+ID4gKi8NCj4gPiA+IMKgwqDCoMKgwqBjb25zdCBjaGFyICpk
+ZXNjOw0KPiA+ID4gwqANCj4gPiA+IC3CoMKgwqDCoFRQTUJhY2tlbmQgKigqY3JlYXRlKShRZW11
+T3B0cyAqb3B0cywgY29uc3QgY2hhciAqaWQpOw0KPiA+ID4gK8KgwqDCoMKgVFBNQmFja2VuZCAq
+KCpjcmVhdGUpKFFlbXVPcHRzICpvcHRzKTsNCj4gPiA+IMKgDQo+ID4gPiDCoMKgwqDCoMKgLyog
+c3RhcnQgdXAgdGhlIFRQTSBvbiB0aGUgYmFja2VuZCAtIG9wdGlvbmFsICovDQo+ID4gPiDCoMKg
+wqDCoMKgaW50ICgqc3RhcnR1cF90cG0pKFRQTUJhY2tlbmQgKnQpOw0KPiA+ID4gZGlmZiAtLWdp
+dCBhL2h3L3RwbS90cG1fZW11bGF0b3IuYyBiL2h3L3RwbS90cG1fZW11bGF0b3IuYw0KPiA+ID4g
+aW5kZXggMzY0NTQ4MzdiMy4uMzE1ODE5MzI5YiAxMDA2NDQNCj4gPiA+IC0tLSBhL2h3L3RwbS90
+cG1fZW11bGF0b3IuYw0KPiA+ID4gKysrIGIvaHcvdHBtL3RwbV9lbXVsYXRvci5jDQo+ID4gPiBA
+QCAtNDUzLDIyICs0NTMsMTYgQEAgZXJyOg0KPiA+ID4gwqDCoMKgwqDCoHJldHVybiAtMTsNCj4g
+PiA+IMKgfQ0KPiA+ID4gwqANCj4gPiA+IC1zdGF0aWMgVFBNQmFja2VuZCAqdHBtX2VtdWxhdG9y
+X2NyZWF0ZShRZW11T3B0cyAqb3B0cywgY29uc3QNCj4gPiA+IGNoYXINCj4gPiA+ICppZCkNCj4g
+PiA+ICtzdGF0aWMgVFBNQmFja2VuZCAqdHBtX2VtdWxhdG9yX2NyZWF0ZShRZW11T3B0cyAqb3B0
+cykNCj4gPiA+IMKgew0KPiA+ID4gwqDCoMKgwqDCoFRQTUJhY2tlbmQgKnRiID0gVFBNX0JBQ0tF
+TkQob2JqZWN0X25ldyhUWVBFX1RQTV9FTVVMQVRPUikpOw0KPiA+ID4gwqANCj4gPiA+IC3CoMKg
+wqDCoHRiLT5pZCA9IGdfc3RyZHVwKGlkKTsNCj4gPiA+IC0NCj4gPiA+IMKgwqDCoMKgwqBpZiAo
+dHBtX2VtdWxhdG9yX2hhbmRsZV9kZXZpY2Vfb3B0cyhUUE1fRU1VTEFUT1IodGIpLCBvcHRzKSkN
+Cj4gPiA+IHsNCj4gPiA+IC3CoMKgwqDCoMKgwqDCoMKgZ290byBlcnJfZXhpdDsNCj4gPiA+ICvC
+oMKgwqDCoMKgwqDCoMKgb2JqZWN0X3VucmVmKE9CSkVDVCh0YikpOw0KPiA+ID4gK8KgwqDCoMKg
+wqDCoMKgwqByZXR1cm4gTlVMTDsNCj4gPiA+IMKgwqDCoMKgwqB9DQo+ID4gPiDCoA0KPiA+ID4g
+wqDCoMKgwqDCoHJldHVybiB0YjsNCj4gPiA+IC0NCj4gPiA+IC1lcnJfZXhpdDoNCj4gPiA+IC3C
+oMKgwqDCoG9iamVjdF91bnJlZihPQkpFQ1QodGIpKTsNCj4gPiA+IC0NCj4gPiA+IC3CoMKgwqDC
+oHJldHVybiBOVUxMOw0KPiA+ID4gwqB9DQo+ID4gPiDCoA0KPiA+ID4gwqBzdGF0aWMgVHBtVHlw
+ZU9wdGlvbnMgKnRwbV9lbXVsYXRvcl9nZXRfdHBtX29wdGlvbnMoVFBNQmFja2VuZA0KPiA+ID4g
+KnRiKQ0KPiA+ID4gZGlmZiAtLWdpdCBhL2h3L3RwbS90cG1fcGFzc3Rocm91Z2guYyBiL2h3L3Rw
+bS90cG1fcGFzc3Rocm91Z2guYw0KPiA+ID4gaW5kZXggOTMyNmNiZmRjOS4uNzM3MWQ1MDczOSAx
+MDA2NDQNCj4gPiA+IC0tLSBhL2h3L3RwbS90cG1fcGFzc3Rocm91Z2guYw0KPiA+ID4gKysrIGIv
+aHcvdHBtL3RwbV9wYXNzdGhyb3VnaC5jDQo+ID4gPiBAQCAtMjg0LDEzICsyODQsMTAgQEANCj4g
+PiA+IHRwbV9wYXNzdGhyb3VnaF9oYW5kbGVfZGV2aWNlX29wdHMoVFBNUGFzc3RocnVTdGF0ZSAq
+dHBtX3B0LA0KPiA+ID4gUWVtdU9wdHMNCj4gPiA+ICpvcHRzKQ0KPiA+ID4gwqDCoMKgwqDCoHJl
+dHVybiAxOw0KPiA+ID4gwqB9DQo+ID4gPiDCoA0KPiA+ID4gLXN0YXRpYyBUUE1CYWNrZW5kICp0
+cG1fcGFzc3Rocm91Z2hfY3JlYXRlKFFlbXVPcHRzICpvcHRzLCBjb25zdA0KPiA+ID4gY2hhcg0K
+PiA+ID4gKmlkKQ0KPiA+ID4gK3N0YXRpYyBUUE1CYWNrZW5kICp0cG1fcGFzc3Rocm91Z2hfY3Jl
+YXRlKFFlbXVPcHRzICpvcHRzKQ0KPiA+ID4gwqB7DQo+ID4gPiDCoMKgwqDCoMKgT2JqZWN0ICpv
+YmogPSBvYmplY3RfbmV3KFRZUEVfVFBNX1BBU1NUSFJPVUdIKTsNCj4gPiA+IC3CoMKgwqDCoFRQ
+TUJhY2tlbmQgKnRiID0gVFBNX0JBQ0tFTkQob2JqKTsNCj4gPiA+IC3CoMKgwqDCoFRQTVBhc3N0
+aHJ1U3RhdGUgKnRwbV9wdCA9IFRQTV9QQVNTVEhST1VHSCh0Yik7DQo+ID4gPiAtDQo+ID4gPiAt
+wqDCoMKgwqB0Yi0+aWQgPSBnX3N0cmR1cChpZCk7DQo+ID4gPiArwqDCoMKgwqBUUE1QYXNzdGhy
+dVN0YXRlICp0cG1fcHQgPSBUUE1fUEFTU1RIUk9VR0gob2JqKTsNCj4gPiA+IMKgDQo+ID4gPiDC
+oMKgwqDCoMKgaWYgKHRwbV9wYXNzdGhyb3VnaF9oYW5kbGVfZGV2aWNlX29wdHModHBtX3B0LCBv
+cHRzKSkgew0KPiA+ID4gwqDCoMKgwqDCoMKgwqDCoMKgZ290byBlcnJfZXhpdDsNCj4gPiA+IEBA
+IC0zMDEsNyArMjk4LDcgQEAgc3RhdGljIFRQTUJhY2tlbmQNCj4gPiA+ICp0cG1fcGFzc3Rocm91
+Z2hfY3JlYXRlKFFlbXVPcHRzICpvcHRzLCBjb25zdCBjaGFyICppZCkNCj4gPiA+IMKgwqDCoMKg
+wqDCoMKgwqDCoGdvdG8gZXJyX2V4aXQ7DQo+ID4gPiDCoMKgwqDCoMKgfQ0KPiA+ID4gwqANCj4g
+PiA+IC3CoMKgwqDCoHJldHVybiB0YjsNCj4gPiA+ICvCoMKgwqDCoHJldHVybiBUUE1fQkFDS0VO
+RChvYmopOw0KPiA+ID4gwqANCj4gPiA+IMKgZXJyX2V4aXQ6DQo+ID4gPiDCoMKgwqDCoMKgb2Jq
+ZWN0X3VucmVmKG9iaik7DQo+ID4gPiBkaWZmIC0tZ2l0IGEvdHBtLmMgYi90cG0uYw0KPiA+ID4g
+aW5kZXggYTQ2ZWU1ZjE0NC4uMzcyOThmM2YwMyAxMDA2NDQNCj4gPiA+IC0tLSBhL3RwbS5jDQo+
+ID4gPiArKysgYi90cG0uYw0KPiA+ID4gQEAgLTEyOSwxMSArMTI5LDEyIEBAIHN0YXRpYyBpbnQg
+dHBtX2luaXRfdHBtZGV2KHZvaWQgKmR1bW15LA0KPiA+ID4gUWVtdU9wdHMgKm9wdHMsIEVycm9y
+ICoqZXJycCkNCj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybiAxOw0KPiA+ID4gwqDCoMKg
+wqDCoH0NCj4gPiA+IMKgDQo+ID4gPiAtwqDCoMKgwqBkcnYgPSBiZS0+Y3JlYXRlKG9wdHMsIGlk
+KTsNCj4gPiA+ICvCoMKgwqDCoGRydiA9IGJlLT5jcmVhdGUob3B0cyk7DQo+ID4gPiDCoMKgwqDC
+oMKgaWYgKCFkcnYpIHsNCj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybiAxOw0KPiA+ID4g
+wqDCoMKgwqDCoH0NCj4gPiA+IMKgDQo+ID4gPiArwqDCoMKgwqBkcnYtPmlkID0gZ19zdHJkdXAo
+aWQpOw0KPiA+IEkga2luZCBvZiBvcHBvc2UgdGhpcyBjaGFuZ2UsIGluc3RlYWQgd2hhdCBhYm91
+dCBhZGRpbmcgbmV3DQo+ID4gVFBNQmFja2VuZA0KPiA+IGFwaSBzYXkgLSBUUE1CYWNrZW5kKiB0
+cG1fYmFja2VuZF9jcmVhdGUoY29uc3QgY2hhciAqdHlwZSwgY29uc3QNCj4gPiBRZW11T3B0cyAq
+b3B0cyksIHRoYXQgc2hvdWxkIGhhbmRsZSB0aGlzIGNvbW1vbiBjb2RlLCBhbmQgcmV0dXJucw0K
+PiA+IHRoZQ0KPiA+IG5ld2x5IGluc3RhbnRpYXRlZCBiYWNrZW5kIG9iamVjdC4NCj4gVGhhdCB3
+b3VsZCBiZSBhIG1vcmUgY29tcGxpY2F0ZWQgcmVmYWN0b3JpbmcgdGhhbiB3aGF0IEkgcHJvcG9z
+ZQ0KPiBoZXJlLCB3aGljaCBpcyBiYXNpYyBjb21tb24gY29kZSByZWZhY3RvcmluZy4gVG8gY2xh
+cmlmeSB5b3VyDQo+IHByb3Bvc2FsLCBtYWtlIGEgZm9sbG93LXVwIHBhdGNoPw0KWWVzLCBvayB3
+aXRoIGEgZm9sbG93LXVwIHBhdGNoLg0KPiANCj4gQW5vdGhlciBpbnRlcmVzdGluZyBhcHByb2Fj
+aCB3b3VsZCBiZSB0byBpbXBsZW1lbnQgVVNFUl9DUkVBVEFCTEUgKEkNCj4gaGF2ZSBhbiBleHBl
+cmltZW50YWwgcGF0Y2ggZm9yIHRoYXQpLiBUaGlzIGFsbG93cyB0byB1c2UgLW9iamVjdCB0cG0t
+DQo+IHBhc3N0aHJvdWdoLGlkPS4uLHBhdGg9Li4gYW5kIHdpbGwgY2hhbmdlIHRoZSB3YXkgYmFj
+a2VuZHMgYXJlDQo+IGNyZWF0ZWQgJiBpbml0aWFsaXplZC4NClRoaXMgYXBwcm9hY2ggaXMgcmVh
+bGx5IGludGVyZXN0aW5nLg0KDQotIEFtYXJuYXRo
