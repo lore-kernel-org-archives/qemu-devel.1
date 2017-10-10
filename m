@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57623)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <spheenik@zoidberg.machine.schrodt.org>)
-	id 1e1yZf-0000Jg-1X
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:44:14 -0400
+	id 1e1ybA-0001ra-Kn
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:45:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <spheenik@zoidberg.machine.schrodt.org>)
-	id 1e1yZb-0005fU-15
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:44:11 -0400
-Received: from hermes.schrodt.org ([2a01:488:66:1000:b24d:49f5:0:1]:45640)
+	id 1e1yb6-0006h0-IU
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:45:44 -0400
+Received: from hermes.schrodt.org ([2a01:488:66:1000:b24d:49f5:0:1]:46268)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <spheenik@zoidberg.machine.schrodt.org>)
-	id 1e1yZa-0005ez-Iy
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:44:06 -0400
-Received: from schapa.schrodt.org ([46.237.225.84]:56102
-	helo=zoidberg.machine.schrodt.org)
-	by lvps178-77-73-245.dedicated.hosteurope.de with esmtps
-	(TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256) (Exim 4.80)
-	(envelope-from <spheenik@zoidberg.machine.schrodt.org>)
-	id 1e1yZX-0007Gy-Mq
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 19:44:03 +0200
-Received: from spheenik by zoidberg.machine.schrodt.org with local (Exim 4.89)
-	(envelope-from <spheenik@zoidberg.machine.schrodt.org>)
-	id 1e1yZX-0006QU-DM
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 19:44:03 +0200
-From: Martin Schrodt <martin@schrodt.org>
-Date: Tue, 10 Oct 2017 19:44:03 +0200
-Message-Id: <20171010174403.24660-1-martin@schrodt.org>
+	id 1e1yb6-0006gJ-39
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:45:40 -0400
+From: qemu@martin.schrodt.org
+Date: Tue, 10 Oct 2017 19:45:38 +0200
+Message-Id: <20171010174538.25074-1-qemu@martin.schrodt.org>
 Subject: [Qemu-devel] [PATCH] Several fixes for the Pulse Audio driver,
  and the HDA device.
 List-Id: <qemu-devel.nongnu.org>
@@ -37,6 +26,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Martin Schrodt <martin@schrodt.org>
+
+From: Martin Schrodt <martin@schrodt.org>
 
 Please see
 
