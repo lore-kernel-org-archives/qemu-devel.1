@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4k-000809-C3
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:15 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4g-0007xD-HW
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4h-0007cN-6w
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56984)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4c-0007W6-NR
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52850)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1e1y4h-0007b3-13
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:11 -0400
+	id 1e1y4c-0007Ud-H7
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:06 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 10 Oct 2017 19:11:12 +0200
-Message-Id: <20171010171122.9756-18-marcandre.lureau@redhat.com>
+Date: Tue, 10 Oct 2017 19:11:10 +0200
+Message-Id: <20171010171122.9756-16-marcandre.lureau@redhat.com>
 In-Reply-To: <20171010171122.9756-1-marcandre.lureau@redhat.com>
 References: <20171010171122.9756-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 17/27] vhost-user-scsi: remove VUS_MAX_LUNS
+Subject: [Qemu-devel] [PULL 15/27] vhost-user-scsi: assert() in
+ iscsi_add_lun()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +31,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, f4bug@amsat.org, changpeng.liu@intel.com, felipe@nutanix.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-There is no code to support more than 1 yet, no need for that today.
+Instead of a preliminary check, add an assert to the function that has
+the pre-condition.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- contrib/vhost-user-scsi/vhost-user-scsi.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ contrib/vhost-user-scsi/vhost-user-scsi.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
 diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-us=
 er-scsi/vhost-user-scsi.c
-index 38fe451619..6b55cc71d3 100644
+index dd0de1fc89..0573ae794e 100644
 --- a/contrib/vhost-user-scsi/vhost-user-scsi.c
 +++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
-@@ -53,8 +53,6 @@
+@@ -257,6 +257,7 @@ static int iscsi_add_lun(iscsi_lun_t *lun, char *iscs=
+i_uri)
 =20
- /** vhost-user-scsi specific definitions **/
+     assert(lun);
+     assert(iscsi_uri);
++    assert(!lun->iscsi_ctx);
 =20
-- /* Only 1 LUN and device supported today */
--#define VUS_MAX_LUNS 1
- #define VUS_ISCSI_INITIATOR "iqn.2016-11.com.nutanix:vhost-user-scsi"
+     iscsi_ctx =3D iscsi_create_context(VUS_ISCSI_INITIATOR);
+     if (!iscsi_ctx) {
+@@ -663,11 +664,6 @@ static int vdev_scsi_add_iscsi_lun(vhost_scsi_dev_t =
+*vdev_scsi,
+     assert(iscsi_uri);
+     assert(lun < VUS_MAX_LUNS);
 =20
- typedef struct iscsi_lun {
-@@ -67,7 +65,7 @@ typedef struct vhost_scsi_dev {
-     int server_sock;
-     GMainLoop *loop;
-     GTree *fdmap;   /* fd -> gsource context id */
--    iscsi_lun_t luns[VUS_MAX_LUNS];
-+    iscsi_lun_t lun;
- } vhost_scsi_dev_t;
-=20
- /** glib event loop integration for libvhost-user and misc callbacks **/
-@@ -535,7 +533,7 @@ static void vus_proc_req(VuDev *vu_dev, int idx)
-         }
-         rsp =3D (VirtIOSCSICmdResp *)elem->in_sg[0].iov_base;
-=20
--        if (handle_cmd_sync(vdev_scsi->luns[0].iscsi_ctx,
-+        if (handle_cmd_sync(vdev_scsi->lun.iscsi_ctx,
-                             req, &elem->out_sg[1], elem->out_num - 1,
-                             rsp, &elem->in_sg[1], elem->in_num - 1) !=3D=
- 0) {
-             vus_panic_cb(vu_dev, NULL);
-@@ -720,7 +718,7 @@ int main(int argc, char **argv)
+-    if (vdev_scsi->luns[lun].iscsi_ctx) {
+-        PERR("Lun %d already configured", lun);
+-        return -1;
+-    }
+-
+     if (iscsi_add_lun(&vdev_scsi->luns[lun], iscsi_uri) !=3D 0) {
+         return -1;
      }
-     vdev_scsi =3D vdev_scsi_new(sock);
-=20
--    if (iscsi_add_lun(&vdev_scsi->luns[0], iscsi_uri) !=3D 0) {
-+    if (iscsi_add_lun(&vdev_scsi->lun, iscsi_uri) !=3D 0) {
-         goto err;
-     }
-=20
 --=20
 2.15.0.rc0.40.gaefcc5f6f
