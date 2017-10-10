@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1e1otA-0007zO-FH
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 03:23:41 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1e1ox2-0000zS-0u
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 03:27:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1e1ot5-0006Bh-TC
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 03:23:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49121)
+	(envelope-from <wei.w.wang@intel.com>) id 1e1owx-00088M-9c
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 03:27:40 -0400
+Received: from mga02.intel.com ([134.134.136.20]:54719)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1e1ot5-0006BK-N3
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 03:23:35 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <CAFq1WaKFes0czd9bKSWA0jbBWGiBk-vu+Owra6u-JGGjADui5g@mail.gmail.com>
-	<9138d85e-26c5-71f5-54c0-44da066169c3@redhat.com>
-Date: Tue, 10 Oct 2017 09:23:32 +0200
-In-Reply-To: <9138d85e-26c5-71f5-54c0-44da066169c3@redhat.com> (John Snow's
-	message of "Mon, 9 Oct 2017 11:41:25 -0400")
-Message-ID: <87d15vlb4b.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1e1owx-000880-0i
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 03:27:35 -0400
+Message-ID: <59DC76BA.7070202@intel.com>
+Date: Tue, 10 Oct 2017 15:28:58 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Using qemu command not able launch VM
+References: <1506744354-20979-1-git-send-email-wei.w.wang@intel.com>
+	<1506744354-20979-4-git-send-email-wei.w.wang@intel.com>
+	<20171009181612-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20171009181612-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v16 3/5] virtio-balloon: VIRTIO_BALLOON_F_SG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +29,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Koushik Dutta <koushikcseist@gmail.com>, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com, Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 
-John Snow <jsnow@redhat.com> writes:
-
-> On 10/07/2017 03:53 AM, Koushik Dutta wrote:
->> Hi All (qemu members),
->> 
->> I installed qemu utility in my host machine. I want to start Virtual
->> machine using qemu command.
->> 
->> My host machine: Intel-X86
->> Script for launching VM :
->> 
->> T=/home/koushik/vpp/cloud_ubuntu_img
->>     sudo qemu-system-i386  -enable-kvm -m 1024 -smp
->> sockets=1,cpus=4,cores=2 -cpu host \
->>     -vga none -nographic \
->>     -kernel $T/vmlinuz-4.4.0-96-generic --append "console=ttyAMA0
->> root=/dev/vda rw"  \
->>     -drive file=$T/custom32.img,if=virtio,aio=threads \
->>     -chardev socket,id=char1,path=/tmp/sock1.sock \
->>     -netdev type=vhost-user,id=mynet1,chardev=char1,vhostforce\
->>     -device virtio-net-pci,mac=00:00:00:00:00:01,netdev=mynet1 \
->>     -object
->> memory-backend-file,id=mem,size=1024M,mem-path=/dev/hugepages,share=on \
->>     -numa node,memdev=mem -mem-prealloc \
->>     #-debugcon file:debug.log -global isa-debugcon.iobase=0x402
->> 
->> 
->> Bug:  Invalid netdev type
->> 
->> Please let me know where i did wrong.
-
-Sure: you didn't quote the full error message :)
-
-Please try again.
-
->> Please help me.
->> Thanks to all in advance.
->> 
->> 
->> Thanks & Regards,
->> Koushik
->> 
+On 10/09/2017 11:20 PM, Michael S. Tsirkin wrote:
+> On Sat, Sep 30, 2017 at 12:05:52PM +0800, Wei Wang wrote:
+>> +static inline void xb_set_page(struct virtio_balloon *vb,
+>> +			       struct page *page,
+>> +			       unsigned long *pfn_min,
+>> +			       unsigned long *pfn_max)
+>> +{
+>> +	unsigned long pfn = page_to_pfn(page);
+>> +
+>> +	*pfn_min = min(pfn, *pfn_min);
+>> +	*pfn_max = max(pfn, *pfn_max);
+>> +	xb_preload(GFP_KERNEL);
+>> +	xb_set_bit(&vb->page_xb, pfn);
+>> +	xb_preload_end();
+>> +}
+>> +
+> So, this will allocate memory
 >
-> type isn't a named parameter, it's positional.
+> ...
 >
-> -netdev vhost-user,foo=bar
+>> @@ -198,9 +327,12 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
+>>   	struct page *page;
+>>   	struct balloon_dev_info *vb_dev_info = &vb->vb_dev_info;
+>>   	LIST_HEAD(pages);
+>> +	bool use_sg = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_SG);
+>> +	unsigned long pfn_max = 0, pfn_min = ULONG_MAX;
+>>   
+>> -	/* We can only do one array worth at a time. */
+>> -	num = min(num, ARRAY_SIZE(vb->pfns));
+>> +	/* Traditionally, we can only do one array worth at a time. */
+>> +	if (!use_sg)
+>> +		num = min(num, ARRAY_SIZE(vb->pfns));
+>>   
+>>   	mutex_lock(&vb->balloon_lock);
+>>   	/* We can't release more pages than taken */
+> And is sometimes called on OOM.
 >
-> Please take a look at the output from -help. look for "vhost-user."
+>
+> I suspect we need to
+>
+> 1. keep around some memory for leak on oom
+>
+> 2. for non oom allocate outside locks
+>
+>
 
-Actually, -netdev vhost-user,... is shorthand for -netdev
-type=vhost-user,...
+I think maybe we can optimize the existing balloon logic, which could 
+remove the big balloon lock:
 
-I suspect the actual problem is vhost-user not being compiled in, i.e.
-CONFIG_VHOST_NET_USED is off.  Sadly, this isn't reflected in --help.
-Screwed up in commit 03ce574442d.
+It would not be necessary to have the inflating and deflating run at the 
+same time.
+For example, 1st request to inflate 7G RAM, when 1GB has been given to 
+the host (so 6G left), the
+2nd request to deflate 5G is received. Instead of waiting for the 1st 
+request to inflate 6G and then
+continuing with the 2nd request to deflate 5G, we can do a diff (6G to 
+inflate - 5G to deflate) immediately,
+and got 1G to inflate. In this way, all that driver will do is to simply 
+inflate another 1G.
+
+Same for the OOM case: when OOM asks for 1G, while inflating 5G is in 
+progress, then the driver can
+deduct 1G from the amount that needs to inflate, and as a result, it 
+will inflate 4G.
+
+In this case, we will never have the inflating and deflating task run at 
+the same time, so I think it is
+possible to remove the lock, and therefore, we will not have that 
+deadlock issue.
+
+What would you guys think?
+
+Best,
+Wei
