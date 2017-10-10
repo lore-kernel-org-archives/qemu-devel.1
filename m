@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e1jGU-0001EU-5q
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 21:23:23 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e1jNd-0002L9-LF
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 21:30:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e1jGR-0003UD-2f
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 21:23:22 -0400
-Received: from mail-pf0-x22f.google.com ([2607:f8b0:400e:c00::22f]:52494)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e1jGQ-0003Ts-Q8
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 21:23:18 -0400
-Received: by mail-pf0-x22f.google.com with SMTP id a1so12299026pfj.9
-	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 18:23:18 -0700 (PDT)
-References: <1500616763-26560-1-git-send-email-cota@braap.org>
-	<1500616763-26560-2-git-send-email-cota@braap.org>
-	<CAJhHMCBpo1-6x9wJWE2oSv1RB=vH-WbA0RjMWYox_dtFfLAURA@mail.gmail.com>
-	<20170829211649.GA9108@flamenco>
-	<CAJhHMCAwpMHAiOeBZ+F2c0yKFPQxU3nU7+FGf75wOqFnYEc43w@mail.gmail.com>
-	<20170922204018.GA23631@flamenco>
-	<00656f91-760f-c46f-86dc-6c0d29192b3b@linaro.org>
-	<20171005232416.GA23670@flamenco> <20171009192455.GA27135@flamenco>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ea4fb2af-fcea-b832-dbfd-32b3da2a63a3@linaro.org>
-Date: Mon, 9 Oct 2017 18:23:14 -0700
+	(envelope-from <no-reply@patchew.org>) id 1e1jNa-0006zl-FH
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 21:30:45 -0400
+Resent-Message-Id: <E1e1jNa-0006zl-FH@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21394)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e1jNa-0006ye-8L
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 21:30:42 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150759902942.270.5607007709157830473@b58463cdfd5f>
+In-Reply-To: <20171010005600.28735-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20171009192455.GA27135@flamenco>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 11/43] tcg: define CF_PARALLEL and use
- it for TB hashing along with CF_COUNT_MASK
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 9 Oct 2017 18:30:29 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 00/23] Queued TCG patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,34 +28,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Pranith Kumar <bobby.prani+qemu@gmail.com>
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On 10/09/2017 12:24 PM, Emilio G. Cota wrote:
-> On Thu, Oct 05, 2017 at 19:24:16 -0400, Emilio G. Cota wrote:
->> I'm including the fixups below.
-> 
-> Just pushed v5 of this series. I rebased the series on top of the current master,
-> and added the already mentioned fixes plus a new one (see below).
-> 
-> Grab the patches from:
->   https://github.com/cota/qemu/tree/multi-tcg-v5
-
-Thanks.  I was just about to do this rebase myself.
-
-> Changes since v4:
-> - Rebase to current master. (fixed a few conflicts, mostly due to some targets
->   having been converted to the generic translation loop.)
-> - Add the removal of CF_COUNT_MASK as a separate "FIXUP" commit to signal
->   that this still requires attention.
-> - Fix tb TC comparison function to support deletions (otherwise -icount breaks)
-> - [new fix] TCG regions: Rely on max_cpus instead of smp_cpus. Otherwise we'd
->   break CPU hotplug on targets that support it. (max_cpus and smp_cpus are
->   set from the command line with -smp foo,maxcpus=bar; max_cpus is always
->   >= smp_cpus.)
-
-Excellent.  I'll work on reviewing these changes this week.
-In the meantime, I've cherry-picked about half of the patch set.
-
-
-r~
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcxMDEwMDA1NjAwLjI4NzM1LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
+Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDAvMjNdIFF1ZXVlZCBUQ0cgcGF0Y2hl
+cwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
+b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRC
+QVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRu
+LyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQg
+c2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
+Y2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgo
+bisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGlu
+ZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEg
+bmV3IGJyYW5jaCAndGVzdCcKMDIwMDkyMjE4YyB0Y2cvbWlwczogZGVsZXRlIGNvbW1lbnRlZCBv
+dXQgZXh0ZXJuIGtleXdvcmQuCmE5MzA3ODA3MjEgdGNnOiBkZWZpbmUgVENHX0hJR0hXQVRFUgo4
+MDI2ODg0YjcxIHRyYW5zbGF0ZS1hbGw6IHVzZSBxZW11X3Byb3RlY3Rfcnd4L25vbmUgaGVscGVy
+cwpmMzU1MWU4ODZhIG9zZGVwOiBpbnRyb2R1Y2UgcWVtdV9tcHJvdGVjdF9yd3gvbm9uZQo0NWYw
+ZDc2N2VlIHV0aWw6IG1vdmUgcWVtdV9yZWFsX2hvc3RfcGFnZV9zaXplL21hc2sgdG8gb3NkZXAu
+aAo0ZjU3N2ZlMzk3IHRjZzogYWxsb2NhdGUgb3B0aW1pemVyIHRlbXBzIHdpdGggdGNnX21hbGxv
+YwozNzVhOTAzYTY3IHRjZzogdGFrZSAuaGVscGVycyBvdXQgb2YgVENHQ29udGV4dAo0YWNkODE3
+YTM5IHRjaTogbW92ZSB0Y2lfcmVncyB0byB0Y2dfcWVtdV90Yl9leGVjJ3Mgc3RhY2sKYjk2NDNj
+Nzc4MyBleGVjLWFsbDogZXh0cmFjdCB0Yi0+dGNfKiBpbnRvIGEgc2VwYXJhdGUgc3RydWN0IHRj
+X3RiCjY5YjM5YzNjMTMgdHJhbnNsYXRlLWFsbDogZGVmaW5lIGFuZCB1c2UgREVCVUdfVEJfQ0hF
+Q0tfR0FURQo2Njc3ZTg3MjU3IHRyYW5zbGF0ZS1hbGw6IGRlZmluZSBhbmQgdXNlIERFQlVHX1RC
+X0lOVkFMSURBVEVfR0FURQo3MWZlNTY4MGYwIGV4ZWMtYWxsOiBpbnRyb2R1Y2UgVEJfUEFHRV9B
+RERSX0ZNVApkZThkNGE5ZTNiIHRyYW5zbGF0ZS1hbGw6IGRlZmluZSBhbmQgdXNlIERFQlVHX1RC
+X0ZMVVNIX0dBVEUKYWU3NWE1YjliNCBleGVjLWFsbDogYnJpbmcgdGItPmludmFsaWQgaW50byB0
+Yi0+Y2ZsYWdzCjJhYTM5NmY2ZmQgdGNnOiBjb25zb2xpZGF0ZSBUQiBsb29rdXBzIGluIHRiX2xv
+b2t1cF9fY3B1X3N0YXRlCmI2OWFhNWY1ZjEgdGNnOiByZW1vdmUgYWRkciBhcmd1bWVudCBmcm9t
+IGxvb2t1cF90Yl9wdHIKMzY2NzVmYTk3MSB0Y2cvbWlwczogY29uc3RpZnkgdGNnX3RhcmdldF9j
+YWxsZWVfc2F2ZV9yZWdzCmQyNWVkOTUwMzkgdGNnL2kzODY6IGNvbnN0aWZ5IHRjZ190YXJnZXRf
+Y2FsbGVlX3NhdmVfcmVncwo4NDQzNGViYzg0IGNwdS1leGVjOiByZW5hbWUgaGF2ZV90Yl9sb2Nr
+IHRvIGFjcXVpcmVkX3RiX2xvY2sgaW4gdGJfZmluZAowZDhiYjYwMWE4IHRyYW5zbGF0ZS1hbGw6
+IG1ha2UgaGF2ZV90Yl9sb2NrIHN0YXRpYwpkNzdlZjg1Mjk3IGV4ZWMtYWxsOiBmaXggdHlwb3Mg
+aW4gVHJhbnNsYXRpb25CbG9jaydzIGRvY3VtZW50YXRpb24KN2ZhMjNiNTE5ZiB0Y2c6IGZpeCBj
+b3JydXB0aW9uIG9mIGNvZGVfdGltZSBwcm9maWxpbmcgY291bnRlciB1cG9uIHRiX2ZsdXNoCjZl
+NzVhNTdkNjkgY3B1dGxiOiBicmluZyBiYWNrIHRsYl9mbHVzaF9jb3VudCB1bmRlciAhVExCX0RF
+QlVHCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzIzOiBjcHV0bGI6IGJy
+aW5nIGJhY2sgdGxiX2ZsdXNoX2NvdW50IHVuZGVyICFUTEJfREVCVUcuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMi8yMzogdGNnOiBmaXggY29ycnVwdGlvbiBvZiBjb2RlX3RpbWUgcHJvZmlsaW5nIGNvdW50
+ZXIgdXBvbiB0Yl9mbHVzaC4uLgpDaGVja2luZyBQQVRDSCAzLzIzOiBleGVjLWFsbDogZml4IHR5
+cG9zIGluIFRyYW5zbGF0aW9uQmxvY2sncyBkb2N1bWVudGF0aW9uLi4uCkNoZWNraW5nIFBBVENI
+IDQvMjM6IHRyYW5zbGF0ZS1hbGw6IG1ha2UgaGF2ZV90Yl9sb2NrIHN0YXRpYy4uLgpDaGVja2lu
+ZyBQQVRDSCA1LzIzOiBjcHUtZXhlYzogcmVuYW1lIGhhdmVfdGJfbG9jayB0byBhY3F1aXJlZF90
+Yl9sb2NrIGluIHRiX2ZpbmQuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8yMzogdGNnL2kzODY6IGNvbnN0
+aWZ5IHRjZ190YXJnZXRfY2FsbGVlX3NhdmVfcmVncy4uLgpDaGVja2luZyBQQVRDSCA3LzIzOiB0
+Y2cvbWlwczogY29uc3RpZnkgdGNnX3RhcmdldF9jYWxsZWVfc2F2ZV9yZWdzLi4uCkNoZWNraW5n
+IFBBVENIIDgvMjM6IHRjZzogcmVtb3ZlIGFkZHIgYXJndW1lbnQgZnJvbSBsb29rdXBfdGJfcHRy
+Li4uCkNoZWNraW5nIFBBVENIIDkvMjM6IHRjZzogY29uc29saWRhdGUgVEIgbG9va3VwcyBpbiB0
+Yl9sb29rdXBfX2NwdV9zdGF0ZS4uLgpDaGVja2luZyBQQVRDSCAxMC8yMzogZXhlYy1hbGw6IGJy
+aW5nIHRiLT5pbnZhbGlkIGludG8gdGItPmNmbGFncy4uLgpDaGVja2luZyBQQVRDSCAxMS8yMzog
+dHJhbnNsYXRlLWFsbDogZGVmaW5lIGFuZCB1c2UgREVCVUdfVEJfRkxVU0hfR0FURS4uLgpDaGVj
+a2luZyBQQVRDSCAxMi8yMzogZXhlYy1hbGw6IGludHJvZHVjZSBUQl9QQUdFX0FERFJfRk1ULi4u
+CkNoZWNraW5nIFBBVENIIDEzLzIzOiB0cmFuc2xhdGUtYWxsOiBkZWZpbmUgYW5kIHVzZSBERUJV
+R19UQl9JTlZBTElEQVRFX0dBVEUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvMjM6IHRyYW5zbGF0ZS1h
+bGw6IGRlZmluZSBhbmQgdXNlIERFQlVHX1RCX0NIRUNLX0dBVEUuLi4KQ2hlY2tpbmcgUEFUQ0gg
+MTUvMjM6IGV4ZWMtYWxsOiBleHRyYWN0IHRiLT50Y18qIGludG8gYSBzZXBhcmF0ZSBzdHJ1Y3Qg
+dGNfdGIuLi4KQ2hlY2tpbmcgUEFUQ0ggMTYvMjM6IHRjaTogbW92ZSB0Y2lfcmVncyB0byB0Y2df
+cWVtdV90Yl9leGVjJ3Mgc3RhY2suLi4KQ2hlY2tpbmcgUEFUQ0ggMTcvMjM6IHRjZzogdGFrZSAu
+aGVscGVycyBvdXQgb2YgVENHQ29udGV4dC4uLgpDaGVja2luZyBQQVRDSCAxOC8yMzogdGNnOiBh
+bGxvY2F0ZSBvcHRpbWl6ZXIgdGVtcHMgd2l0aCB0Y2dfbWFsbG9jLi4uCkNoZWNraW5nIFBBVENI
+IDE5LzIzOiB1dGlsOiBtb3ZlIHFlbXVfcmVhbF9ob3N0X3BhZ2Vfc2l6ZS9tYXNrIHRvIG9zZGVw
+LmguLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvMjM6IG9zZGVwOiBpbnRyb2R1Y2UgcWVtdV9tcHJvdGVj
+dF9yd3gvbm9uZS4uLgpDaGVja2luZyBQQVRDSCAyMS8yMzogdHJhbnNsYXRlLWFsbDogdXNlIHFl
+bXVfcHJvdGVjdF9yd3gvbm9uZSBoZWxwZXJzLi4uCkNoZWNraW5nIFBBVENIIDIyLzIzOiB0Y2c6
+IGRlZmluZSBUQ0dfSElHSFdBVEVSLi4uCkNoZWNraW5nIFBBVENIIDIzLzIzOiB0Y2cvbWlwczog
+ZGVsZXRlIGNvbW1lbnRlZCBvdXQgZXh0ZXJuIGtleXdvcmQuLi4uCkVSUk9SOiBleHRlcm5zIHNo
+b3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMyMjogRklMRTogdGNnL21pcHMvdGNnLXRhcmdl
+dC5pbmMuYzozOToKK2ludCBsaW5rX2Vycm9yKHZvaWQpOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
+cm5pbmdzLCA4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
+bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
+IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
+TkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6
+IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDov
+L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
+bEBmcmVlbGlzdHMub3Jn
