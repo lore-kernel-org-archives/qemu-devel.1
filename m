@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e1q5x-0004cP-4G
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:40:58 -0400
+	(envelope-from <marex@denx.de>) id 1e1qNG-0001fp-U8
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:58:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e1q5t-0000Mt-UI
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:40:57 -0400
-Date: Tue, 10 Oct 2017 09:40:35 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171010084035.GB30015@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171009172723.190282-1-vsementsov@virtuozzo.com>
-	<20171009172723.190282-9-vsementsov@virtuozzo.com>
-	<5c57b76e-eb34-7825-9c8b-9ee5bd909b02@redhat.com>
+	(envelope-from <marex@denx.de>) id 1e1qNB-0003QD-Uv
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:58:51 -0400
+Received: from mail-out.m-online.net ([212.18.0.9]:56604)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marex@denx.de>) id 1e1qNB-0003Pf-Np
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:58:45 -0400
+References: <88c14424-9813-5e68-0aa7-38f3cde0a491@tuxfamily.org>
+	<8ae225f4-b3b8-b09d-03ed-9e8b38a051a5@denx.de>
+	<53ae3fc6-90ea-a154-752d-fe50b3d01642@tuxfamily.org>
+From: Marek Vasut <marex@denx.de>
+Message-ID: <ec8104bb-4a82-77af-aa16-127963d9c834@denx.de>
+Date: Tue, 10 Oct 2017 10:58:40 +0200
 MIME-Version: 1.0
+In-Reply-To: <53ae3fc6-90ea-a154-752d-fe50b3d01642@tuxfamily.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5c57b76e-eb34-7825-9c8b-9ee5bd909b02@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 04/10] nbd-server: refactor simple reply
- sending
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] qemu-system-nios2 hangs when emulator is quit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,91 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Thomas Huth <huth@tuxfamily.org>, Chris Wulff <crwulff@gmail.com>
+Cc: Richard Henderson <rth@twiddle.net>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, Oct 09, 2017 at 02:18:10PM -0500, Eric Blake wrote:
-> [adding Dan for a qio question - search for your name below]
+On 10/10/2017 10:15 AM, Thomas Huth wrote:
+> On 10.10.2017 09:57, Marek Vasut wrote:
+>> On 10/10/2017 09:20 AM, Thomas Huth wrote:
+>>>  Hi Chris, hi Marek,
+>>
+>> Hi,
+>>
+>>> I recently noticed that when I start qemu-system-nios2 (build from the
+>>> very latest git master branch) and then type "quit" at the monitor (or
+>>> simply try to close the GTK window), QEMU does not shut down right and
+>>> hangs somewhere in pause_all_vcpus() forever.
+>>> Do you have any idea what might be wrong here?
+>>
+>> Nope, can you debug it and ev. send patch ?
 > 
-> On 10/09/2017 12:27 PM, Vladimir Sementsov-Ogievskiy wrote:
-> > Get rid of calculating structure fields offsets by hand and set_cork,
-> > rename nbd_co_send_reply to nbd_co_send_simple_reply. Do not use
-> > NBDReply which will be upgraded in future patches to handle both simple
-> > and structured replies and will be used only in the client.
-> > 
-> > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> > ---
-> >  include/block/nbd.h |  6 ++++
-> >  nbd/nbd-internal.h  |  9 +++++
-> >  nbd/server.c        | 97 ++++++++++++++++++++++-------------------------------
-> >  3 files changed, 56 insertions(+), 56 deletions(-)
-
-> > -static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len,
-> > -                             Error **errp)
-> > +static int coroutine_fn nbd_co_send_iov(NBDClient *client, struct iovec *iov,
-> > +                                        unsigned niov, Error **errp)
-> >  {
-> > -    NBDClient *client = req->client;
-> >      int ret;
-> >  
-> >      g_assert(qemu_in_coroutine());
-> > -
-> > -    trace_nbd_co_send_reply(reply->handle, reply->error, len);
-> > -
-> >      qemu_co_mutex_lock(&client->send_lock);
-> >      client->send_coroutine = qemu_coroutine_self();
-> >  
-> > -    if (!len) {
-> > -        ret = nbd_send_reply(client->ioc, reply, errp);
-> > -    } else {
-> > -        qio_channel_set_cork(client->ioc, true);
-> > -        ret = nbd_send_reply(client->ioc, reply, errp);
-> > -        if (ret == 0) {
-> > -            ret = nbd_write(client->ioc, req->data, len, errp);
-> > -            if (ret < 0) {
-> > -                ret = -EIO;
-> > -            }
-> > -        }
-> > -        qio_channel_set_cork(client->ioc, false);
-> > -    }
-> > +    ret = nbd_writev(client->ioc, iov, niov, errp);
+> Backtrace looks like this:
 > 
-> ...the transmission is now done via iov so that you can send two buffers
-> at once without having to play with the cork,...
+> #0  0x00007ffff7931945 in pthread_cond_wait@@GLIBC_2.3.2 () at /lib64/libpthread.so.0
+> #1  0x00005555557cf9c5 in qemu_cond_wait (cond=cond@entry=0x555555b5f9c0 <qemu_pause_cond>, mutex=mutex@entry=0x555555b5fa40 <qemu_global_mutex>) at util/qemu-thread-posix.c:161
+> #2  0x0000555555606ee8 in pause_all_vcpus () at cpus.c:1620
+> #3  0x00005555555cc43a in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>)
+>     at vl.c:4906
 > 
-> Dan - are we guaranteed that qio_channel_writev_all() with a multi-iov
-> argument called by one thread will send all its data in order, without
-> being interleaved with any other parallel coroutine also calling
-> qio_channel_writev_all()?  In other words, it looks like the NBD code
-> was previously using manual cork changes to ensure that two halves of a
-> message were sent without interleave, but Vladimir is now relying on the
-> qio code to do that under the hood.
+> Looks like the CPU does not get stopped right? Unfortunately, I've got no
+> good clue how to debug that further right now...
 
-The I/O channels code does not make guarantees wrt concurrent usage of
-threads or coroutines. It is the callers responsibility to avoid any
-concurrent usage for all APIs. With coroutines you are at least avoiding
-the danger of corrupting memory state, but you still have risk of unexpected
-data ordering.
+I'd look at pause_all_vcpus() and check why it is stuck.
+I'm a bit overloaded at the moment, so I don't have time to dig in it.
 
-IOW, if you have 2 coroutines each doing a series writes on the same QIOChannel
-object, and one does a yield, I/O can certainly be interleaved between the two.
-This is true whether doing multiple qio_channel_writev() calls directly, or
-whether using qio_channel_writev_all().
+>> We're talking about git HEAD, right ?
+> 
+> Yes.
+> 
+>  Thomas
+> 
 
-Unless I'm misunderstanding though, cork did not offer you protection in
-this scenario either. cork just prevents the data being transmitted onto
-the wire immediately - ie it ensures that if you do 2 writes, they get
-sent in 1 TCP packet instead of many TCP packets.
 
-If you have multiple coroutines writing to the channel at the same time
-and one yielded in its series of writes, the I/O from multiple coroutines
-will get merged into that 1 single TCP packet when uncorked.
-
-So if this concurrent usage is a problem NBD was already broken AFAICT.
-
-Regards,
-Daniel
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Best regards,
+Marek Vasut
