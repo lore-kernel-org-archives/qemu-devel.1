@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharat.bhushan@nxp.com>) id 1e1oF3-0000AL-IE
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 02:42:18 -0400
+	(envelope-from <armbru@redhat.com>) id 1e1oUc-0002O4-S9
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 02:58:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharat.bhushan@nxp.com>) id 1e1oEz-00031q-BQ
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 02:42:13 -0400
-From: Bharat Bhushan <bharat.bhushan@nxp.com>
-Date: Tue, 10 Oct 2017 06:42:04 +0000
-Message-ID: <AM5PR0401MB254512CE483DD6E684037A629A750@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-References: <1506494000-31982-1-git-send-email-Bharat.Bhushan@nxp.com>
-	<20170927074109.GA31587@virtx40>
-	<AM5PR0401MB25450ACC804B20D93C4F2D9D9A780@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<9700cf30-65ed-9c55-c1b9-14bb8deb669f@redhat.com>
-	<20170927092147.GA32183@virtx40>
-	<0af599c0-f859-f90c-c999-bc4a0a678768@redhat.com>
-	<20171004114910.GA6932@virtx40>
-	<79234c56-c524-5359-de8a-f266b19821eb@redhat.com>
-	<9d173ea5-75a6-c684-7f8d-e2ec1d3eddff@redhat.com>
-	<1017080b-aa5f-4a1f-9905-e65f22717cd1@redhat.com>
-	<b740e8b7-5859-fd6a-1f1e-480aef6ef4f0@redhat.com>
-	<AM5PR0401MB254548523AC95D0A2A8A92E69A710@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-In-Reply-To: <AM5PR0401MB254548523AC95D0A2A8A92E69A710@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <armbru@redhat.com>) id 1e1oUb-00027B-Km
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 02:58:18 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <CAEfK_45dZvxvBNQpPLo71ZJhrPN5_GJr8uJ2pJZpCaFf0+i3YA@mail.gmail.com>
+	<62e835a4-ba5d-e620-47d2-180932a33426@redhat.com>
+	<20171006135425.GF26575@redhat.com>
+	<CAEfK_444_fPwjnj1M8w8XNFFwiMJW-pdN7R1Tdu+FfvB38ZBtw@mail.gmail.com>
+	<20171006140137.GH26575@redhat.com>
+	<CAEfK_455Hr1afv-H6=9QMQErDGZJtOBgFMk2F8QJshYTLgOa1Q@mail.gmail.com>
+	<e46a6b2d-83e2-d558-028c-94ad41af8fa2@redhat.com>
+	<CAEfK_44_43d5_KaGUf-FH7bHxre5BP1wCQu96p38bhskUqU+Ug@mail.gmail.com>
+Date: Tue, 10 Oct 2017 08:58:08 +0200
+In-Reply-To: <CAEfK_44_43d5_KaGUf-FH7bHxre5BP1wCQu96p38bhskUqU+Ug@mail.gmail.com>
+	(Doug Gale's message of "Mon, 9 Oct 2017 14:44:14 -0400")
+Message-ID: <87h8v7lcan.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v4 0/5] virtio-iommu: VFIO
- integration
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Patch to add helpful tracing output for driver
+ authors in NVMe emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,108 +30,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharat Bhushan <bharat.bhushan@nxp.com>, Auger Eric <eric.auger@redhat.com>, Linu Cherian <linuc.decode@gmail.com>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "mst@redhat.com" <mst@redhat.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "linu.cherian@cavium.com" <linu.cherian@cavium.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "bharatb.yadav@gmail.com" <bharatb.yadav@gmail.com>
+To: Doug Gale <doug16k@gmail.com>
+Cc: Eric Blake <eblake@redhat.com>, kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel <qemu-devel@nongnu.org>, mreitz@redhat.com, keith.busch@intel.com
 
-Hi Alex, Eric,
+Doug Gale <doug16k@gmail.com> writes:
 
-> -----Original Message-----
-> From: Qemu-devel [mailto:qemu-devel-
-> bounces+bharat.bhushan=3Dnxp.com@nongnu.org] On Behalf Of Bharat
-> Bhushan
-> Sent: Friday, October 06, 2017 9:16 AM
-> To: Auger Eric <eric.auger@redhat.com>; Linu Cherian
-> <linuc.decode@gmail.com>
-> Cc: peter.maydell@linaro.org; kevin.tian@intel.com; mst@redhat.com;
-> marc.zyngier@arm.com; tn@semihalf.com; will.deacon@arm.com;
-> drjones@redhat.com; qemu-devel@nongnu.org;
-> alex.williamson@redhat.com; qemu-arm@nongnu.org;
-> linu.cherian@cavium.com; eric.auger.pro@gmail.com;
-> robin.murphy@arm.com; christoffer.dall@linaro.org;
-> bharatb.yadav@gmail.com
-> Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v4 0/5] virtio-iommu: VFIO
-> integration
->=20
->=20
->=20
-> > >> Thanks
-> > >>
-> > >> Eric
-> > >>>
-> > >>> However you should be allowed to map 1 sg element of 5 pages and
-> > >>> then notify the host about this event I think. Still looking at the=
- code...
-> > >>>
-> > >>> I still can't reproduce the issue at the moment. What kind of
-> > >>> device are you assigning?
-> > >>>
-> > >>> Thanks
-> > >>>
-> > >>> Eric
-> > >>>>
-> > >>>> Atleast vfio_get_vaddr called from vfio_iommu_map_notify in Qemu
-> > >>>> expects the map size to be a power of 2.
-> > >
-> > > Actually I missed the most important here ;-)
-> > >>>>
-> > >>>>  if (len & iotlb->addr_mask) {
-> > > This check looks suspiscious to me. In our case the len is not
-> > > modified by the previous translation and it fails, I don't see why.
-> > > It should be valid to be able to notify 5 granules.
-> >
-> > So after discussion with Alex, looks the way we notify the host
-> > currently is wrong. we set the addr_mask to the mapping/unmapping size
-> > -1 whereas this should be a page mask instead (granule size or block si=
-ze?).
-> > So if the guest maps 5 x 4kB pages we should send 5 notifications for
-> > each page and not a single one. It is unclear to me if we can notify
-> > with hugepage/block page size mask. Peter may confirm/infirm this. in
-> > vsmmuv3 code I notify by granule or block size.
+> I used exclamations as a concise way of indicating that the driver did
+> something nonsensical, or horribly invalid, like something likely to
+> cause a memory corruption, trying to start the controller with a
+> nonsense configuration, providing invalid PRDs or writing to
+> unrecognized MMIO offsets that might hang or do something extremely
+> bad on a poorly implemented controller. Exclaiming is not shouting, I
+> thought shouting was when it was all uppercase.
+>
+> If a driver might trash memory or hang a controller, maybe it should
+> shout at the driver author or person investigating an unstable VM.
+> None of those messages with exclamations should ever happen. If any of
+> them are possible when the driver is correct, then I have made a
+> mistake.
 
-My understanding is that host provides supported page sizes (page_size_mask=
-), and Size of each notification to host should be exactly best fit of supp=
-orted page-size and/or multiples of supported page-sizes.
-So if guest maps 20K size (single request), and supported page size is 4K, =
-so we can still send one 20K size request.
-Not sure I get it, why multiples of supported page-size cannot be provided =
-in one notification to host.
+Please do not top-quote on this mailing list.
 
-Thanks
--Bharat
+Existing tracepoints do not use exclamation marks to signal severity.
 
-> >
-> > Bharat, please can you add this to your TODO list?
-> >
-> > Linu, thanks a lot for the time you spent debugging this issue.
-> > Curiously on my side, it is really seldom hit but it is ...
->=20
-> Thanks Linu and Eric, I added this to my todo list.
-> While I am still not able to reproduce the issue.  I tried with e1000 and=
- now
-> try with ixgbe device. May I know which device can be used to reproduce t=
-his
-> issue?
->=20
-> Thanks
-> -Bharat
->=20
-> >
-> > Thanks!
-> >
-> > Eric
-> > >
-> > > Thanks
-> > >
-> > > Eric
-> > >>>>         error_report("iommu has granularity incompatible with targ=
-et
-> AS");
-> > >>>>         return false;
-> > >>>>     }
-> > >>>>
-> > >>>> Just trying to understand how this is not hitting in your case.
-> > >>>>
-> > >>>>
-> > >>>
-> > >>
-> > >
+Consider using assertions for "if this happens, either the program's
+state is shot (and continuing is unsafe), or the author's mental state
+was shot (and continuing is probably unsafe, too)" conditions.
+Tracepoints are for tracing.
+
+> On Mon, Oct 9, 2017 at 11:52 AM, Eric Blake <eblake@redhat.com> wrote:
+>> On 10/07/2017 02:51 AM, Doug Gale wrote:
+>>> Completely re-implemented patch, with significant improvements (now
+>>> specifies values in several places I missed, also reduced the amount
+>>> of redundant lines). I used the nvme_ as the tracing infrastructure
+>>> prefix. Tested with -trace nvme_* on the qemu command line, worked for
+>>> me.
+>>
+>> This information belongs...
+>>
+>>>
+>>>>From 166f57458d60d363a10a0933c3e860985531ac96 Mon Sep 17 00:00:00 2001
+>>> From: Doug Gale <doug16k@gmail.com>
+>>> Date: Thu, 5 Oct 2017 19:02:03 -0400
+>>> Subject: [PATCH] Add tracing output to NVMe emulation to help driver authors.
+>>>
+>>> This uses the tracing infrastructure using nvme_ as the prefix.
+>>>
+>>> Signed-off-by: Doug Gale <doug16k@gmail.com>
+>>> ---
+>>
+>> ...here, after the --- separator.  It is useful to the patch reviewer,
+>> but does not need to be in the 'git log' history.  The maintainers use
+>> 'git am' to process incoming patches, which automatically prunes review
+>> comments located in this location.
+>>
+>> Also, since this is a version 2 patch, it is best if your subject line
+>> includes 'v2', and if you send the patch as a new top-level thread
+>> rather than in-reply-to v1.  This can be done with 'git send-email -v2'.
+>>
+>> The subject line is atypical; we tend to prefer 'topic: Short summary',
+>> where you are missing the topic, you had a trailing dot that is not
+>> typical, and where your line is longer than usual.  A better subject
+>> line might be:
+>>
+>> nvme: Add tracing output
+>>
+>>
+>> For more helpful information on patch submission:
+>>
+>> https://wiki.qemu.org/Contribute/SubmitAPatch
+>>
+>> I didn't look closely at the patch itself, but did notice:
+>>
+>>> +nvme_mmio_start_failed(void) "setting controller enable bit failed!"
+>>> +nvme_mmio_start_success(void) "setting controller enable bit succeeded"
+>>> +nvme_mmio_stopped(void) "cleared controller enable bit"
+>>> +nvme_mmio_shutdown_set(void) "shutdown bit set"
+>>> +nvme_mmio_shutdown_cleared(void) "shutdown bit cleared"
+>>> +nvme_mmio_ignored(uint64_t offset, uint64_t data) "invalid MMIO
+>>> write, offset=0x%"PRIx64", data=%"PRIx64"!"
+>>
+>> You have a couple of traces with a trailing '!'; that is atypical,
+>> because we don't need our traces to shout at the user.
