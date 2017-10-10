@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1e208X-0006jD-F2
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:24:18 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e20EG-0000V3-Ji
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1e208W-0002Zb-Cr
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:24:17 -0400
-References: <20171004020048.26379-1-eblake@redhat.com>
-	<20171004020048.26379-2-eblake@redhat.com>
-	<20171010135940.GJ4177@dhcp-200-186.str.redhat.com>
-	<67e98ca7-e861-a646-b701-b8f7453f2951@redhat.com>
-	<46e7ca23-fb38-7620-90fb-04982e5b9ad0@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <06af49fb-6e94-d8c0-3701-7579e55c92a5@redhat.com>
-Date: Tue, 10 Oct 2017 15:24:02 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e20EE-0004v2-Az
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:12 -0400
+Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:48756)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e20EE-0004ui-2U
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:10 -0400
+Received: by mail-pf0-x233.google.com with SMTP id b79so5987003pfk.5
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 12:30:09 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue, 10 Oct 2017 12:29:45 -0700
+Message-Id: <20171010193003.28857-3-richard.henderson@linaro.org>
+In-Reply-To: <20171010193003.28857-1-richard.henderson@linaro.org>
+References: <20171010193003.28857-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <46e7ca23-fb38-7620-90fb-04982e5b9ad0@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 01/23] block: Allow NULL file for
- bdrv_get_block_status()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 02/20] tcg: fix corruption of code_time
+ profiling counter upon tb_flush
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +30,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: famz@redhat.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
+From: "Emilio G. Cota" <cota@braap.org>
 
+Whenever there is an overflow in code_gen_buffer (e.g. we run out
+of space in it and have to flush it), the code_time profiling counter
+ends up with an invalid value (that is, code_time -= profile_getclock(),
+without later on getting += profile_getclock() due to the goto).
 
-On 10/10/2017 03:00 PM, Eric Blake wrote:
-> On 10/10/2017 09:43 AM, Eric Blake wrote:
-> 
->>>> ---
->>>> v5: use second label for cleaner exit logic [John], use local_pnum
->>
->>>> @@ -1811,16 +1811,19 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
->>>>      int64_t total_sectors;
->>>>      int64_t n;
->>>>      int64_t ret, ret2;
->>>> +    BlockDriverState *local_file = NULL;
->>>> +    int local_pnum = 0;
->>>
->>> I don't quite see what the point of local_pnum is if we assert anyway
->>> that the real pnum is non-NULL.
->>
->> I did it in parallel with fallout from John's review on v4:
->> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg06958.html
->>
->> but since it wasn't specifically asked for, and is now getting
->> questions, I'm fine with not having it in v6.
-> 
-> Okay, I re-read v4, and here's the comment (on 21/23) that led to my
-> experiment in v5 patch 1 with local_pnum:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg00293.html
-> 
-> and I did argue:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg00311.html
-> 
+Fix it by using the ti variable, so that we only update code_time
+when there is no overflow. Note that in case there is an overflow
+we fail to account for the elapsed coding time, but this is quite rare
+so we can probably live with it.
 
-Well, Kevin's the boss :D
+"info jit" before/after, roughly at the same time during debian-arm bootup:
 
->>> Is it asking for trouble to be updating pnum here before we undo our
->>> alignment corrections? For readability reasons and preventing an
->>> accidental context-based oopsy-daisy.
->>
->> As in, write the code to make all calculations in a temporary, and then
->> assign *pnum only at the end?  I suppose I can tweak the code along
->> those lines, but I'm not sure it will make the end result any more legible.
-> 
+- before:
+Statistics:
+TB flush count      1
+TB invalidate count 4665
+TLB flush count     998
+JIT cycles          -615191529184601 (-256329.804 s at 2.4 GHz)
+translated TBs      302310 (aborted=0 0.0%)
+avg ops/TB          48.4 max=438
+deleted ops/TB      8.54
+avg temps/TB        32.31 max=38
+avg host code/TB    361.5
+avg search data/TB  24.5
+cycles/op           -42014693.0
+cycles/in byte      -121444900.2
+cycles/out byte     -5629031.1
+cycles/search byte     -83114481.0
+  gen_interm time   -0.0%
+  gen_code time     100.0%
+optim./code time    -0.0%
+liveness/code time  -0.0%
+cpu_restore count   6236
+  avg cycles        110.4
+
+- after:
+Statistics:
+TB flush count      1
+TB invalidate count 4665
+TLB flush count     1010
+JIT cycles          1996899624 (0.832 s at 2.4 GHz)
+translated TBs      297961 (aborted=0 0.0%)
+avg ops/TB          48.5 max=438
+deleted ops/TB      8.56
+avg temps/TB        32.31 max=38
+avg host code/TB    361.8
+avg search data/TB  24.5
+cycles/op           138.2
+cycles/in byte      398.4
+cycles/out byte     18.5
+cycles/search byte     273.1
+  gen_interm time   14.0%
+  gen_code time     86.0%
+optim./code time    19.4%
+liveness/code time  10.3%
+cpu_restore count   6372
+  avg cycles        111.0
+
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ accel/tcg/translate-all.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 6b5d4bece2..b3bfe65059 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -1300,7 +1300,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+ #ifdef CONFIG_PROFILER
+     tcg_ctx.tb_count++;
+     tcg_ctx.interm_time += profile_getclock() - ti;
+-    tcg_ctx.code_time -= profile_getclock();
++    ti = profile_getclock();
+ #endif
+ 
+     /* ??? Overflow could be handled better here.  In particular, we
+@@ -1318,7 +1318,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+     }
+ 
+ #ifdef CONFIG_PROFILER
+-    tcg_ctx.code_time += profile_getclock();
++    tcg_ctx.code_time += profile_getclock() - ti;
+     tcg_ctx.code_in_len += tb->size;
+     tcg_ctx.code_out_len += gen_code_size;
+     tcg_ctx.search_out_len += search_size;
+-- 
+2.13.6
