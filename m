@@ -1,39 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e1kRc-0002T6-Lh
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 22:38:57 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e1kSo-0003Da-73
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 22:40:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e1kRZ-00027O-I5
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 22:38:56 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58678)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e1kRZ-00026m-9O
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 22:38:53 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9A2cmss101408
-	for <qemu-devel@nongnu.org>; Mon, 9 Oct 2017 22:38:48 -0400
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dgbtck9g3-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 22:38:47 -0400
-Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Mon, 9 Oct 2017 20:38:46 -0600
-References: <20171009225623.29232-1-marcandre.lureau@redhat.com>
-	<20171009225623.29232-5-marcandre.lureau@redhat.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Mon, 9 Oct 2017 22:38:42 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e1kSl-00033O-3W
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 22:40:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48748)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e1kSk-00032u-UD
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 22:40:07 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Mon,  9 Oct 2017 23:39:53 -0300
+Message-Id: <20171010024001.4526-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171009225623.29232-5-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <d77d7d64-f64e-b208-0160-40adbb8521b5@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 04/42] tpm: lookup tpm backend class in
- tpm_driver_find_by_type()
+Subject: [Qemu-devel] [PULL v2 0/8] x86 and machine queue, 2017-10-09
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,77 +24,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: amarnath.valluri@intel.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-On 10/09/2017 06:55 PM, Marc-Andr=C3=A9 Lureau wrote:
-> One step towards removing TPMDriverOps and driver registration.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Changes on v2:
+* Removed NUMA/ACPI patches until we figure out what's breaking
+  the tests.
+  (See: https://www.mail-archive.com/qemu-devel@nongnu.org/msg486368.html=
+)
+  Note that I didn't reproduce the failure yet.  I am just
+  removing those patches because they are the only ones touching
+  ACPI code.
 
-Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+The following changes since commit 530049bc1dcc24c1178a29d99ca08b6dd08413=
+e0:
 
+  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into sta=
+ging (2017-10-06 17:43:02 +0100)
 
-> ---
->   tpm.c | 29 +++++++++++++++++++++--------
->   1 file changed, 21 insertions(+), 8 deletions(-)
->
-> diff --git a/tpm.c b/tpm.c
-> index bc7d7470a8..04de8da5fd 100644
-> --- a/tpm.c
-> +++ b/tpm.c
-> @@ -47,6 +47,24 @@ void tpm_register_driver(const TPMDriverOps *tdo)
->       be_drivers[tdo->type] =3D tdo;
->   }
->
-> +static const TPMDriverOps *
-> +tpm_driver_find_by_type(enum TpmType type)
-> +{
-> +    ObjectClass *oc;
-> +    TPMBackendClass *bc;
-> +    char *typename =3D g_strdup_printf("tpm-%s", TpmType_str(type));
-> +
-> +    oc =3D object_class_by_name(typename);
-> +    g_free(typename);
-> +
-> +    if (!object_class_dynamic_cast(oc, TYPE_TPM_BACKEND)) {
-> +        return NULL;
-> +    }
-> +
-> +    bc =3D TPM_BACKEND_CLASS(oc);
-> +    return bc->ops;
-> +}
-> +
->   /*
->    * Walk the list of available TPM backend drivers and display them on=
- the
->    * screen.
-> @@ -58,11 +76,11 @@ static void tpm_display_backend_drivers(void)
->       fprintf(stderr, "Supported TPM types (choose only one):\n");
->
->       for (i =3D 0; i < TPM_TYPE__MAX; i++) {
-> -        if (be_drivers[i] =3D=3D NULL) {
-> +        const TPMDriverOps *ops =3D tpm_driver_find_by_type(i);
-> +        if (!ops) {
->               continue;
->           }
-> -        fprintf(stderr, "%12s   %s\n",
-> -                TpmType_str(i), be_drivers[i]->desc);
-> +        fprintf(stderr, "%12s   %s\n", TpmType_str(i), ops->desc);
->       }
->       fprintf(stderr, "\n");
->   }
-> @@ -196,11 +214,6 @@ int tpm_config_parse(QemuOptsList *opts_list, cons=
-t char *optarg)
->
->   #endif /* CONFIG_TPM */
->
-> -static const TPMDriverOps *tpm_driver_find_by_type(enum TpmType type)
-> -{
-> -    return be_drivers[type];
-> -}
-> -
->   /*
->    * Walk the list of active TPM backends and collect information about=
- them
->    * following the schema description in qapi-schema.json.
+are available in the git repository at:
+
+  git://github.com/ehabkost/qemu.git tags/x86-and-machine-pull-request
+
+for you to fetch changes up to e0dd5fd41a1a38766009f442967fab700d2d0550:
+
+  x86: Correct translation of some rdgsbase and wrgsbase encodings (2017-=
+10-09 23:29:20 -0300)
+
+----------------------------------------------------------------
+x86 and machine queue, 2017-10-09
+
+Includes x86, QOM, CPU, and option/config parsing patches.
+
+Highlights:
+* Deprecation of -nodefconfig option;
+* MachineClass::valid_cpu_types field.
+
+----------------------------------------------------------------
+
+Alistair Francis (1):
+  machine: Add a valid_cpu_types property
+
+Eduardo Habkost (3):
+  vl: Eliminate defconfig variable
+  qemu-options: Deprecate -nodefconfig
+  config: qemu_config_parse() return number of config groups
+
+Igor Mammedov (1):
+  qom: update doc comment for type_register[_static]()
+
+Philippe Mathieu-Daud=C3=A9 (1):
+  qom/cpu: move cpu_model null check to cpu_class_by_name()
+
+Seeteena Thoufeek (1):
+  vl: exit if maxcpus is negative
+
+Todd Eisenberger (1):
+  x86: Correct translation of some rdgsbase and wrgsbase encodings
+
+ include/hw/boards.h     |  1 +
+ include/qom/object.h    |  4 ++--
+ include/sysemu/sysemu.h |  2 +-
+ block/blkdebug.c        |  1 -
+ hw/core/machine.c       | 32 ++++++++++++++++++++++++++++++++
+ qom/cpu.c               |  7 ++++++-
+ target/alpha/cpu.c      |  6 +-----
+ target/arm/cpu.c        |  4 ----
+ target/cris/cpu.c       |  4 ----
+ target/i386/translate.c |  4 ++--
+ target/lm32/cpu.c       |  4 ----
+ target/m68k/cpu.c       |  4 ----
+ target/mips/cpu.c       |  4 ----
+ target/moxie/cpu.c      |  8 +-------
+ target/openrisc/cpu.c   |  4 ----
+ target/sh4/cpu.c        |  3 ---
+ target/sparc/cpu.c      |  4 ----
+ target/tricore/cpu.c    |  4 ----
+ target/unicore32/cpu.c  |  4 ----
+ target/xtensa/cpu.c     |  4 ----
+ util/qemu-config.c      | 15 +++++++--------
+ vl.c                    | 11 ++++-------
+ qemu-doc.texi           |  4 ++++
+ qemu-options.hx         | 17 ++++-------------
+ 24 files changed, 65 insertions(+), 90 deletions(-)
+
+--=20
+2.13.6
