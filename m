@@ -1,39 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e1jR9-0003jv-6l
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 21:34:25 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e1jRD-0003mR-3C
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 21:34:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e1jR6-0000D9-07
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 21:34:23 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40620
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e1jR9-0000G6-U1
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 21:34:27 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37080)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e1jR5-0000CX-Pv
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 21:34:19 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9A1Y9sm057636
-	for <qemu-devel@nongnu.org>; Mon, 9 Oct 2017 21:34:15 -0400
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dgjf95d46-1
+	id 1e1jR9-0000FO-Kb
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 21:34:23 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9A1YAfH142661
+	for <qemu-devel@nongnu.org>; Mon, 9 Oct 2017 21:34:22 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dgd11d195-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 21:34:15 -0400
+	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 21:34:22 -0400
 Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Mon, 9 Oct 2017 19:34:14 -0600
+	Mon, 9 Oct 2017 19:34:21 -0600
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Mon,  9 Oct 2017 21:33:47 -0400
+Date: Mon,  9 Oct 2017 21:33:51 -0400
 In-Reply-To: <1507599235-25123-1-git-send-email-stefanb@linux.vnet.ibm.com>
 References: <1507599235-25123-1-git-send-email-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <1507599235-25123-3-git-send-email-stefanb@linux.vnet.ibm.com>
+Message-Id: <1507599235-25123-7-git-send-email-stefanb@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 02/10] tpm-backend: Move thread handling
- inside TPMBackend
+Subject: [Qemu-devel] [PULL v2 06/10] tpm-backend: Move realloc_buffer()
+ implementation to tpm-tis model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,436 +46,137 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, amarnath.valluri@intel.com, marcan
 
 From: Amarnath Valluri <amarnath.valluri@intel.com>
 
-Move thread handling inside TPMBackend, this way backend implementations =
-need
-not to maintain their own thread life cycle, instead they needs to implem=
-ent
-'handle_request()' class method that always been called from a thread.
-
-This change made tpm_backend_int.h kind of useless, hence removed it.
+buffer reallocation is very unlikely to be backend specific. Hence move i=
+nside
+the tis.
 
 Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 ---
- backends/tpm.c                   | 62 +++++++++++++++++++++++++---------=
-------
- hw/tpm/tpm_passthrough.c         | 58 ++++++----------------------------=
----
- include/sysemu/tpm_backend.h     | 32 +++++++++++++--------
- include/sysemu/tpm_backend_int.h | 41 --------------------------
- 4 files changed, 67 insertions(+), 126 deletions(-)
- delete mode 100644 include/sysemu/tpm_backend_int.h
+ backends/tpm.c               |  9 ---------
+ hw/tpm/tpm_passthrough.c     | 12 ------------
+ hw/tpm/tpm_tis.c             | 14 ++++++++++++--
+ include/sysemu/tpm_backend.h | 12 ------------
+ 4 files changed, 12 insertions(+), 35 deletions(-)
 
 diff --git a/backends/tpm.c b/backends/tpm.c
-index 536f262..ce56c3b 100644
+index de313c9..37c84b7 100644
 --- a/backends/tpm.c
 +++ b/backends/tpm.c
-@@ -18,7 +18,24 @@
- #include "qapi/qmp/qerror.h"
- #include "sysemu/tpm.h"
- #include "qemu/thread.h"
--#include "sysemu/tpm_backend_int.h"
-+
-+static void tpm_backend_worker_thread(gpointer data, gpointer user_data)
-+{
-+    TPMBackend *s =3D TPM_BACKEND(user_data);
-+    TPMBackendClass *k  =3D TPM_BACKEND_GET_CLASS(s);
-+
-+    assert(k->handle_request !=3D NULL);
-+    k->handle_request(s, (TPMBackendCmd)data);
-+}
-+
-+static void tpm_backend_thread_end(TPMBackend *s)
-+{
-+    if (s->thread_pool) {
-+        g_thread_pool_push(s->thread_pool, (gpointer)TPM_BACKEND_CMD_END=
-, NULL);
-+        g_thread_pool_free(s->thread_pool, FALSE, TRUE);
-+        s->thread_pool =3D NULL;
-+    }
-+}
-=20
- enum TpmType tpm_backend_get_type(TPMBackend *s)
- {
-@@ -39,6 +56,8 @@ void tpm_backend_destroy(TPMBackend *s)
-     TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
-=20
-     k->ops->destroy(s);
-+
-+    tpm_backend_thread_end(s);
+@@ -80,15 +80,6 @@ bool tpm_backend_had_startup_error(TPMBackend *s)
+     return s->had_startup_error;
  }
 =20
- int tpm_backend_init(TPMBackend *s, TPMState *state,
-@@ -46,13 +65,23 @@ int tpm_backend_init(TPMBackend *s, TPMState *state,
- {
-     TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
-=20
--    return k->ops->init(s, state, datacb);
-+    s->tpm_state =3D state;
-+    s->recv_data_callback =3D datacb;
-+
-+    return k->ops->init(s);
- }
-=20
- int tpm_backend_startup_tpm(TPMBackend *s)
- {
-     TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
-=20
-+    /* terminate a running TPM */
-+    tpm_backend_thread_end(s);
-+
-+    s->thread_pool =3D g_thread_pool_new(tpm_backend_worker_thread, s, 1=
-, TRUE,
-+                                       NULL);
-+    g_thread_pool_push(s->thread_pool, (gpointer)TPM_BACKEND_CMD_INIT, N=
-ULL);
-+
-     return k->ops->startup_tpm(s);
- }
-=20
-@@ -72,9 +101,8 @@ size_t tpm_backend_realloc_buffer(TPMBackend *s, TPMSi=
-zedBuffer *sb)
-=20
- void tpm_backend_deliver_request(TPMBackend *s)
- {
+-size_t tpm_backend_realloc_buffer(TPMBackend *s, TPMSizedBuffer *sb)
+-{
 -    TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
 -
--    k->ops->deliver_request(s);
-+    g_thread_pool_push(s->thread_pool, (gpointer)TPM_BACKEND_CMD_PROCESS=
-_CMD,
-+                       NULL);
- }
-=20
- void tpm_backend_reset(TPMBackend *s)
-@@ -82,6 +110,8 @@ void tpm_backend_reset(TPMBackend *s)
-     TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
-=20
-     k->ops->reset(s);
-+
-+    tpm_backend_thread_end(s);
- }
-=20
- void tpm_backend_cancel_cmd(TPMBackend *s)
-@@ -156,29 +186,14 @@ static void tpm_backend_instance_init(Object *obj)
-                              tpm_backend_prop_get_opened,
-                              tpm_backend_prop_set_opened,
-                              NULL);
+-    assert(k->ops->realloc_buffer);
+-
+-    return k->ops->realloc_buffer(sb);
 -}
-=20
--void tpm_backend_thread_deliver_request(TPMBackendThread *tbt)
--{
--   g_thread_pool_push(tbt->pool, (gpointer)TPM_BACKEND_CMD_PROCESS_CMD, =
-NULL);
- }
-=20
--void tpm_backend_thread_create(TPMBackendThread *tbt,
--                               GFunc func, gpointer user_data)
-+static void tpm_backend_instance_finalize(Object *obj)
+-
+ void tpm_backend_deliver_request(TPMBackend *s)
  {
--    if (!tbt->pool) {
--        tbt->pool =3D g_thread_pool_new(func, user_data, 1, TRUE, NULL);
--        g_thread_pool_push(tbt->pool, (gpointer)TPM_BACKEND_CMD_INIT, NU=
-LL);
--    }
--}
-+    TPMBackend *s =3D TPM_BACKEND(obj);
-=20
--void tpm_backend_thread_end(TPMBackendThread *tbt)
--{
--    if (tbt->pool) {
--        g_thread_pool_push(tbt->pool, (gpointer)TPM_BACKEND_CMD_END, NUL=
-L);
--        g_thread_pool_free(tbt->pool, FALSE, TRUE);
--        tbt->pool =3D NULL;
--    }
-+    tpm_backend_thread_end(s);
- }
-=20
- static const TypeInfo tpm_backend_info =3D {
-@@ -186,6 +201,7 @@ static const TypeInfo tpm_backend_info =3D {
-     .parent =3D TYPE_OBJECT,
-     .instance_size =3D sizeof(TPMBackend),
-     .instance_init =3D tpm_backend_instance_init,
-+    .instance_finalize =3D tpm_backend_instance_finalize,
-     .class_size =3D sizeof(TPMBackendClass),
-     .abstract =3D true,
- };
+     g_thread_pool_push(s->thread_pool, (gpointer)TPM_BACKEND_CMD_PROCESS=
+_CMD,
 diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-index a0baf5f..f50d9cf 100644
+index 84fc49a..22d3460 100644
 --- a/hw/tpm/tpm_passthrough.c
 +++ b/hw/tpm/tpm_passthrough.c
-@@ -30,7 +30,6 @@
- #include "tpm_int.h"
- #include "hw/hw.h"
- #include "hw/i386/pc.h"
--#include "sysemu/tpm_backend_int.h"
- #include "tpm_tis.h"
- #include "tpm_util.h"
-=20
-@@ -47,20 +46,9 @@
-     OBJECT_CHECK(TPMPassthruState, (obj), TYPE_TPM_PASSTHROUGH)
-=20
- /* data structures */
--typedef struct TPMPassthruThreadParams {
--    TPMState *tpm_state;
--
--    TPMRecvDataCB *recv_data_callback;
--    TPMBackend *tb;
--} TPMPassthruThreadParams;
--
- struct TPMPassthruState {
-     TPMBackend parent;
-=20
--    TPMBackendThread tbt;
--
--    TPMPassthruThreadParams tpm_thread_params;
--
-     char *tpm_dev;
-     int tpm_fd;
-     bool tpm_executing;
-@@ -214,12 +202,9 @@ static int tpm_passthrough_unix_transfer(TPMPassthru=
-State *tpm_pt,
-                                         selftest_done);
- }
-=20
--static void tpm_passthrough_worker_thread(gpointer data,
--                                          gpointer user_data)
-+static void tpm_passthrough_handle_request(TPMBackend *tb, TPMBackendCmd=
- cmd)
- {
--    TPMPassthruThreadParams *thr_parms =3D user_data;
--    TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(thr_parms->tb);
--    TPMBackendCmd cmd =3D (TPMBackendCmd)data;
-+    TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
-     bool selftest_done =3D false;
-=20
-     DPRINTF("tpm_passthrough: processing command type %d\n", cmd);
-@@ -227,12 +212,12 @@ static void tpm_passthrough_worker_thread(gpointer =
-data,
-     switch (cmd) {
-     case TPM_BACKEND_CMD_PROCESS_CMD:
-         tpm_passthrough_unix_transfer(tpm_pt,
--                                      thr_parms->tpm_state->locty_data,
-+                                      tb->tpm_state->locty_data,
-                                       &selftest_done);
-=20
--        thr_parms->recv_data_callback(thr_parms->tpm_state,
--                                      thr_parms->tpm_state->locty_number=
-,
--                                      selftest_done);
-+        tb->recv_data_callback(tb->tpm_state,
-+                               tb->tpm_state->locty_number,
-+                               selftest_done);
-         break;
-     case TPM_BACKEND_CMD_INIT:
-     case TPM_BACKEND_CMD_END:
-@@ -248,15 +233,6 @@ static void tpm_passthrough_worker_thread(gpointer d=
-ata,
-  */
- static int tpm_passthrough_startup_tpm(TPMBackend *tb)
- {
--    TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
--
--    /* terminate a running TPM */
--    tpm_backend_thread_end(&tpm_pt->tbt);
--
--    tpm_backend_thread_create(&tpm_pt->tbt,
--                              tpm_passthrough_worker_thread,
--                              &tpm_pt->tpm_thread_params);
--
+@@ -247,17 +247,6 @@ static int tpm_passthrough_reset_tpm_established_fla=
+g(TPMBackend *tb,
      return 0;
  }
 =20
-@@ -268,20 +244,11 @@ static void tpm_passthrough_reset(TPMBackend *tb)
-=20
-     tpm_passthrough_cancel_cmd(tb);
-=20
--    tpm_backend_thread_end(&tpm_pt->tbt);
--
-     tpm_pt->had_startup_error =3D false;
- }
-=20
--static int tpm_passthrough_init(TPMBackend *tb, TPMState *s,
--                                TPMRecvDataCB *recv_data_cb)
-+static int tpm_passthrough_init(TPMBackend *tb)
- {
--    TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
--
--    tpm_pt->tpm_thread_params.tpm_state =3D s;
--    tpm_pt->tpm_thread_params.recv_data_callback =3D recv_data_cb;
--    tpm_pt->tpm_thread_params.tb =3D tb;
--
-     return 0;
- }
-=20
-@@ -315,13 +282,6 @@ static size_t tpm_passthrough_realloc_buffer(TPMSize=
-dBuffer *sb)
-     return sb->size;
- }
-=20
--static void tpm_passthrough_deliver_request(TPMBackend *tb)
+-static size_t tpm_passthrough_realloc_buffer(TPMSizedBuffer *sb)
 -{
--    TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
+-    size_t wanted_size =3D 4096; /* Linux tpm.c buffer size */
 -
--    tpm_backend_thread_deliver_request(&tpm_pt->tbt);
+-    if (sb->size !=3D wanted_size) {
+-        sb->buffer =3D g_realloc(sb->buffer, wanted_size);
+-        sb->size =3D wanted_size;
+-    }
+-    return sb->size;
 -}
 -
  static void tpm_passthrough_cancel_cmd(TPMBackend *tb)
  {
      TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
-@@ -483,8 +443,6 @@ static void tpm_passthrough_destroy(TPMBackend *tb)
-=20
-     tpm_passthrough_cancel_cmd(tb);
-=20
--    tpm_backend_thread_end(&tpm_pt->tbt);
--
-     qemu_close(tpm_pt->tpm_fd);
-     qemu_close(tpm_pt->cancel_fd);
-=20
-@@ -520,7 +478,6 @@ static const TPMDriverOps tpm_passthrough_driver =3D =
+@@ -435,7 +424,6 @@ static const TPMDriverOps tpm_passthrough_driver =3D =
 {
-     .realloc_buffer           =3D tpm_passthrough_realloc_buffer,
+     .opts                     =3D tpm_passthrough_cmdline_opts,
+     .desc                     =3D "Passthrough TPM backend driver",
+     .create                   =3D tpm_passthrough_create,
+-    .realloc_buffer           =3D tpm_passthrough_realloc_buffer,
      .reset                    =3D tpm_passthrough_reset,
-     .had_startup_error        =3D tpm_passthrough_get_startup_error,
--    .deliver_request          =3D tpm_passthrough_deliver_request,
      .cancel_cmd               =3D tpm_passthrough_cancel_cmd,
      .get_tpm_established_flag =3D tpm_passthrough_get_tpm_established_fl=
 ag,
-     .reset_tpm_established_flag =3D tpm_passthrough_reset_tpm_establishe=
-d_flag,
-@@ -540,6 +497,7 @@ static void tpm_passthrough_class_init(ObjectClass *k=
-lass, void *data)
-     TPMBackendClass *tbc =3D TPM_BACKEND_CLASS(klass);
-=20
-     tbc->ops =3D &tpm_passthrough_driver;
-+    tbc->handle_request =3D tpm_passthrough_handle_request;
+diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+index a6440fe..d5118e7 100644
+--- a/hw/tpm/tpm_tis.c
++++ b/hw/tpm/tpm_tis.c
+@@ -963,6 +963,16 @@ static int tpm_tis_do_startup_tpm(TPMState *s)
+     return tpm_backend_startup_tpm(s->be_driver);
  }
 =20
- static const TypeInfo tpm_passthrough_info =3D {
++static void tpm_tis_realloc_buffer(TPMSizedBuffer *sb)
++{
++    size_t wanted_size =3D 4096; /* Linux tpm.c buffer size */
++
++    if (sb->size !=3D wanted_size) {
++        sb->buffer =3D g_realloc(sb->buffer, wanted_size);
++        sb->size =3D wanted_size;
++    }
++}
++
+ /*
+  * Get the TPMVersion of the backend device being used
+  */
+@@ -1010,9 +1020,9 @@ static void tpm_tis_reset(DeviceState *dev)
+         tis->loc[c].state =3D TPM_TIS_STATE_IDLE;
+=20
+         tis->loc[c].w_offset =3D 0;
+-        tpm_backend_realloc_buffer(s->be_driver, &tis->loc[c].w_buffer);
++        tpm_tis_realloc_buffer(&tis->loc[c].w_buffer);
+         tis->loc[c].r_offset =3D 0;
+-        tpm_backend_realloc_buffer(s->be_driver, &tis->loc[c].r_buffer);
++        tpm_tis_realloc_buffer(&tis->loc[c].r_buffer);
+     }
+=20
+     tpm_tis_do_startup_tpm(s);
 diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
-index 3708413..58308b3 100644
+index e96c191..2c798a1 100644
 --- a/include/sysemu/tpm_backend.h
 +++ b/include/sysemu/tpm_backend.h
-@@ -29,22 +29,24 @@
-=20
- typedef struct TPMBackendClass TPMBackendClass;
- typedef struct TPMBackend TPMBackend;
--
- typedef struct TPMDriverOps TPMDriverOps;
-+typedef void (TPMRecvDataCB)(TPMState *, uint8_t locty, bool selftest_do=
-ne);
-=20
--struct TPMBackendClass {
--    ObjectClass parent_class;
--
--    const TPMDriverOps *ops;
--
--    void (*opened)(TPMBackend *s, Error **errp);
--};
-+typedef enum TPMBackendCmd {
-+    TPM_BACKEND_CMD_INIT =3D 1,
-+    TPM_BACKEND_CMD_PROCESS_CMD,
-+    TPM_BACKEND_CMD_END,
-+    TPM_BACKEND_CMD_TPM_RESET,
-+} TPMBackendCmd;
-=20
- struct TPMBackend {
-     Object parent;
-=20
-     /*< protected >*/
-     bool opened;
-+    TPMState *tpm_state;
-+    GThreadPool *thread_pool;
-+    TPMRecvDataCB *recv_data_callback;
-=20
-     char *id;
-     enum TpmModel fe_model;
-@@ -54,7 +56,15 @@ struct TPMBackend {
-     QLIST_ENTRY(TPMBackend) list;
- };
-=20
--typedef void (TPMRecvDataCB)(TPMState *, uint8_t locty, bool selftest_do=
-ne);
-+struct TPMBackendClass {
-+    ObjectClass parent_class;
-+
-+    const TPMDriverOps *ops;
-+
-+    void (*opened)(TPMBackend *s, Error **errp);
-+
-+    void (*handle_request)(TPMBackend *s, TPMBackendCmd cmd);
-+};
-=20
- typedef struct TPMSizedBuffer {
-     uint32_t size;
-@@ -71,7 +81,7 @@ struct TPMDriverOps {
-     void (*destroy)(TPMBackend *t);
-=20
-     /* initialize the backend */
--    int (*init)(TPMBackend *t, TPMState *s, TPMRecvDataCB *datacb);
-+    int (*init)(TPMBackend *t);
+@@ -84,8 +84,6 @@ struct TPMDriverOps {
      /* start up the TPM on the backend */
      int (*startup_tpm)(TPMBackend *t);
-     /* returns true if nothing will ever answer TPM requests */
-@@ -79,8 +89,6 @@ struct TPMDriverOps {
 =20
-     size_t (*realloc_buffer)(TPMSizedBuffer *sb);
-=20
--    void (*deliver_request)(TPMBackend *t);
+-    size_t (*realloc_buffer)(TPMSizedBuffer *sb);
 -
      void (*reset)(TPMBackend *t);
 =20
      void (*cancel_cmd)(TPMBackend *t);
-diff --git a/include/sysemu/tpm_backend_int.h b/include/sysemu/tpm_backen=
-d_int.h
-deleted file mode 100644
-index 00639dd..0000000
---- a/include/sysemu/tpm_backend_int.h
-+++ /dev/null
-@@ -1,41 +0,0 @@
--/*
-- *  common TPM backend driver functions
+@@ -140,16 +138,6 @@ int tpm_backend_startup_tpm(TPMBackend *s);
+ bool tpm_backend_had_startup_error(TPMBackend *s);
+=20
+ /**
+- * tpm_backend_realloc_buffer:
+- * @s: the backend
+- * @sb: the TPMSizedBuffer to re-allocated to the size suitable for the
+- *      backend.
 - *
-- *  Copyright (c) 2012-2013 IBM Corporation
-- *  Authors:
-- *    Stefan Berger <stefanb@us.ibm.com>
-- *
-- * This library is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU Lesser General Public
-- * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-- *
-- * This library is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- * Lesser General Public License for more details.
-- *
-- * You should have received a copy of the GNU Lesser General Public
-- * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>
+- * This function returns the size of the allocated buffer
 - */
+-size_t tpm_backend_realloc_buffer(TPMBackend *s, TPMSizedBuffer *sb);
 -
--#ifndef TPM_BACKEND_INT_H
--#define TPM_BACKEND_INT_H
--
--typedef struct TPMBackendThread {
--    GThreadPool *pool;
--} TPMBackendThread;
--
--void tpm_backend_thread_deliver_request(TPMBackendThread *tbt);
--void tpm_backend_thread_create(TPMBackendThread *tbt,
--                               GFunc func, gpointer user_data);
--void tpm_backend_thread_end(TPMBackendThread *tbt);
--
--typedef enum TPMBackendCmd {
--    TPM_BACKEND_CMD_INIT =3D 1,
--    TPM_BACKEND_CMD_PROCESS_CMD,
--    TPM_BACKEND_CMD_END,
--    TPM_BACKEND_CMD_TPM_RESET,
--} TPMBackendCmd;
--
--#endif /* TPM_BACKEND_INT_H */
+-/**
+  * tpm_backend_deliver_request:
+  * @s: the backend to send the request to
+  *
 --=20
 2.5.5
