@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1e1x0H-000892-UJ
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:03:38 -0400
+	(envelope-from <konrad.wilk@oracle.com>) id 1e1x2u-0001ZN-Lx
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:06:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1e1x0B-0005UT-K9
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:03:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52104)
+	(envelope-from <konrad.wilk@oracle.com>) id 1e1x2p-0006Wz-NF
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:06:16 -0400
+Received: from userp1040.oracle.com ([156.151.31.81]:46976)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1e1x0B-0005Tn-7L
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:03:27 -0400
-References: <20171005172013.3098-1-ehabkost@redhat.com>
-	<20171005172013.3098-3-ehabkost@redhat.com>
-	<7af19e5a-702e-fd41-951b-47a542269929@redhat.com>
-	<20171010024907.GZ4015@localhost.localdomain>
-From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
-Message-ID: <b64d22d3-50be-3bf6-9f27-12931b811389@redhat.com>
-Date: Tue, 10 Oct 2017 18:03:14 +0200
+	(Exim 4.71) (envelope-from <konrad.wilk@oracle.com>)
+	id 1e1x2p-0006UL-EL
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 12:06:11 -0400
+Date: Tue, 10 Oct 2017 12:05:44 -0400
+From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Message-ID: <20171010160544.GA1772@char.us.oracle.com>
+References: <20170911043820.14617-1-haozhong.zhang@intel.com>
+	<20170911044157.15403-1-haozhong.zhang@intel.com>
+	<20170911160818.1bd44a82@nial.brq.redhat.com>
+	<alpine.DEB.2.10.1709111119480.19719@sstabellini-ThinkPad-X260>
+	<20170912031509.vufszbju3s2v2bw3@hz-desktop>
 MIME-Version: 1.0
-In-Reply-To: <20171010024907.GZ4015@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2XPuQc1wLCcXbJC1h9RjMFKjeosiMOuLT"
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] scripts: Remove debug parameter
- from QEMUMonitorProtocol
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170912031509.vufszbju3s2v2bw3@hz-desktop>
+Subject: Re: [Qemu-devel] [RFC QEMU PATCH v3 00/10] Implement vNVDIMM for
+ Xen HVM guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,243 +32,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Stefano Stabellini <sstabellini@kernel.org>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, xen-devel@lists.xen.org, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, ian.jackson@eu.citrix.com, wei.liu2@citrix.com, george.dunlap@citrix.com, JBeulich@suse.com, andrew.cooper3@citrix.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2XPuQc1wLCcXbJC1h9RjMFKjeosiMOuLT
-From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b64d22d3-50be-3bf6-9f27-12931b811389@redhat.com>
-Subject: Re: [PATCH v2 2/3] scripts: Remove debug parameter from
- QEMUMonitorProtocol
-References: <20171005172013.3098-1-ehabkost@redhat.com>
- <20171005172013.3098-3-ehabkost@redhat.com>
- <7af19e5a-702e-fd41-951b-47a542269929@redhat.com>
- <20171010024907.GZ4015@localhost.localdomain>
-In-Reply-To: <20171010024907.GZ4015@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Sep 12, 2017 at 11:15:09AM +0800, Haozhong Zhang wrote:
+> On 09/11/17 11:52 -0700, Stefano Stabellini wrote:
+> > CC'ing xen-devel, and the Xen tools and x86 maintainers.
+> > 
+> > On Mon, 11 Sep 2017, Igor Mammedov wrote:
+> > > On Mon, 11 Sep 2017 12:41:47 +0800
+> > > Haozhong Zhang <haozhong.zhang@intel.com> wrote:
+> > > 
+> > > > This is the QEMU part patches that works with the associated Xen
+> > > > patches to enable vNVDIMM support for Xen HVM domains. Xen relies on
+> > > > QEMU to build guest NFIT and NVDIMM namespace devices, and allocate
+> > > > guest address space for vNVDIMM devices.
+> > > > 
+> > > > All patches can be found at
+> > > >   Xen:  https://github.com/hzzhan9/xen.git nvdimm-rfc-v3
+> > > >   QEMU: https://github.com/hzzhan9/qemu.git xen-nvdimm-rfc-v3
+> > > > 
+> > > > Patch 1 is to avoid dereferencing the NULL pointer to non-existing
+> > > > label data, as the Xen side support for labels is not implemented yet.
+> > > > 
+> > > > Patch 2 & 3 add a memory backend dedicated for Xen usage and a hotplug
+> > > > memory region for Xen guest, in order to make the existing nvdimm
+> > > > device plugging path work on Xen.
+> > > > 
+> > > > Patch 4 - 10 build and cooy NFIT from QEMU to Xen guest, when QEMU is
+> > > > used as the Xen device model.
+> > > 
+> > > I've skimmed over patch-set and can't say that I'm happy with
+> > > number of xen_enabled() invariants it introduced as well as
+> > > with partial blobs it creates.
+> > 
+> > I have not read the series (Haozhong, please CC me, Anthony and
+> > xen-devel to the whole series next time), but yes, indeed. Let's not add
+> > more xen_enabled() if possible.
+> > 
+> > Haozhong, was there a design document thread on xen-devel about this? If
+> > so, did it reach a conclusion? Was the design accepted? If so, please
+> > add a link to the design doc in the introductory email, so that
+> > everybody can read it and be on the same page.
+> 
+> Yes, there is a design [1] discussed and reviewed. Section 4.3 discussed
+> the guest ACPI.
+> 
+> [1] https://lists.xenproject.org/archives/html/xen-devel/2016-07/msg01921.html
 
-Dne 10.10.2017 v 04:49 Eduardo Habkost napsal(a):
-> On Sat, Oct 07, 2017 at 10:26:14AM +0200, Luk=C3=A1=C5=A1 Doktor wrote:=
+Igor, did you have a chance to read it?
 
->> Dne 5.10.2017 v 19:20 Eduardo Habkost napsal(a):
->>> Use logging module for the QMP debug messages.  The only scripts
->>> that set debug=3DTrue are iotests.py and guestperf/engine.py, and
->>> they already call logging.basicConfig() to set up logging.
->>>
->>> Scripts that don't configure logging are safe as long as they
->>> don't need debugging output, because debug messages don't trigger
->>> the "No handlers could be found for logger" message from the
->>> Python logging module.
->>>
->>> Scripts that already configure logging but don't use debug=3DTrue
->>> (e.g. scripts/vm/basevm.py) will get QMP debugging enabled for
->>> free.
->>>
->>> Cc: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>
->>> Cc: Fam Zheng <famz@redhat.com>
->>> Cc: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
->>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->>> ---
->>> Changes v1 -> v2:
->>> * Actually remove debug parameter from method definition
->>>   (Fam Zheng)
->>> * Fix "<<<" vs ">>>" confusion
->>>   (Fam Zheng)
->>> * Remove "import sys" line
->>>   (Luk=C3=A1=C5=A1 Doktor)
->>> ---
->>>  scripts/qemu.py    |  3 +--
->>>  scripts/qmp/qmp.py | 16 +++++++---------
->>>  2 files changed, 8 insertions(+), 11 deletions(-)
->>>
->>> diff --git a/scripts/qemu.py b/scripts/qemu.py
->>> index c9a106fbce..f6d2e68627 100644
->>> --- a/scripts/qemu.py
->>> +++ b/scripts/qemu.py
->>> @@ -177,8 +177,7 @@ class QEMUMachine(object):
->>> =20
->>>      def _pre_launch(self):
->>>          self._qmp =3D qmp.qmp.QEMUMonitorProtocol(self._monitor_addr=
-ess,
->>> -                                                server=3DTrue,
->>> -                                                debug=3Dself._debug)=
+.. see below
+> 
+> > 
+> > 
+> > > I'd like to reduce above and a way to do this might be making xen 
+> > >  1. use fw_cfg
+> > >  2. fetch QEMU build acpi tables from fw_cfg
+> > >  3. extract nvdim tables (which is trivial) and use them
+> > > 
+> > > looking at xen_load_linux(), it seems possible to use fw_cfg.
+> > > 
+> > > So what's stopping xen from using it elsewhere?,
+> > > instead of adding more xen specific code to do 'the same'
+> > > job and not reusing/sharing common code with tcg/kvm.
+> > 
+> > So far, ACPI tables have not been generated by QEMU. Xen HVM machines
+> > rely on a firmware-like application called "hvmloader" that runs in
+> > guest context and generates the ACPI tables. I have no opinions on
+> > hvmloader and I'll let the Xen maintainers talk about it. However, keep
+> > in mind that with an HVM guest some devices are emulated by Xen and/or
+> > by other device emulators that can run alongside QEMU. QEMU doesn't have
+> > a full few of the system.
+> > 
+> > Here the question is: does it have to be QEMU the one to generate the
+> > ACPI blobs for the nvdimm? It would be nicer if it was up to hvmloader
+> > like the rest, instead of introducing this split-brain design about
+> > ACPI. We need to see a design doc to fully understand this.
+> >
+> 
+> hvmloader runs in the guest and is responsible to build/load guest
+> ACPI. However, it's not capable to build AML at runtime (for the lack
+> of AML builder). If any guest ACPI object is needed (e.g. by guest
+> DSDT), it has to be generated from ASL by iasl at Xen compile time and
+> then be loaded by hvmloader at runtime.
+> 
+> Xen includes an OperationRegion "BIOS" in the static generated guest
+> DSDT, whose address is hardcoded and which contains a list of values
+> filled by hvmloader at runtime. Other ACPI objects can refer to those
+> values (e.g., the number of vCPUs). But it's not enough for generating
+> guest NVDIMM ACPI objects at compile time and then being customized
+> and loaded by hvmload, because its structure (i.e., the number of
+> namespace devices) cannot be decided util the guest config is known.
+> 
+> Alternatively, we may introduce an AML builder in hvmloader and build
+> all guest ACPI completely in hvmloader. Looking at the similar
+> implementation in QEMU, it would not be small, compared to the current
+> size of hvmloader. Besides, I'm still going to let QEMU handle guest
+> NVDIMM _DSM and _FIT calls, which is another reason I use QEMU to
+> build NVDIMM ACPI.
+> 
+> > If the design doc thread led into thinking that it has to be QEMU to
+> > generate them, then would it make the code nicer if we used fw_cfg to
+> > get the (full or partial) tables from QEMU, as Igor suggested?
+> 
+> I'll have a look at the code (which I didn't notice) pointed by Igor.
 
->>> +                                                server=3DTrue)
->>> =20
->>>      def _post_launch(self):
->>>          self._qmp.accept()
->>> diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
->>> index ef12e8a1a0..07c9632e9e 100644
->>> --- a/scripts/qmp/qmp.py
->>> +++ b/scripts/qmp/qmp.py
->>> @@ -11,7 +11,7 @@
->>>  import json
->>>  import errno
->>>  import socket
->>> -import sys
->>> +import logging
->>> =20
->>> =20
->>>  class QMPError(Exception):
->>> @@ -32,12 +32,14 @@ class QMPTimeoutError(QMPError):
->>> =20
->>>  class QEMUMonitorProtocol(object):
->>> =20
->>> +    #: Logger object for debugging messages
->>> +    logger =3D logging.getLogger('QMP')
->>>      #: Socket's error class
->>>      error =3D socket.error
->>>      #: Socket's timeout
->>>      timeout =3D socket.timeout
->>> =20
->>> -    def __init__(self, address, server=3DFalse, debug=3DFalse):
->>> +    def __init__(self, address, server=3DFalse):
->>>          """
->>>          Create a QEMUMonitorProtocol class.
->>> =20
->>> @@ -51,7 +53,6 @@ class QEMUMonitorProtocol(object):
->>>          """
->>>          self.__events =3D []
->>>          self.__address =3D address
->>> -        self._debug =3D debug
->>>          self.__sock =3D self.__get_sock()
->>>          self.__sockfile =3D None
->>>          if server:
->>> @@ -83,8 +84,7 @@ class QEMUMonitorProtocol(object):
->>>                  return
->>>              resp =3D json.loads(data)
->>>              if 'event' in resp:
->>> -                if self._debug:
->>> -                    print >>sys.stderr, "QMP:<<< %s" % resp
->>> +                self.logger.debug("<<< %s", resp)
->>>                  self.__events.append(resp)
->>>                  if not only_event:
->>>                      continue
->>> @@ -164,8 +164,7 @@ class QEMUMonitorProtocol(object):
->>>          @return QMP response as a Python dict or None if the connect=
-ion has
->>>                  been closed
->>>          """
->>> -        if self._debug:
->>> -            print >>sys.stderr, "QMP:>>> %s" % qmp_cmd
->>> +        self.logger.debug(">>> %s", qmp_cmd)
->>>          try:
->>>              self.__sock.sendall(json.dumps(qmp_cmd))
->>>          except socket.error as err:
->>> @@ -173,8 +172,7 @@ class QEMUMonitorProtocol(object):
->>>                  return
->>>              raise socket.error(err)
->>>          resp =3D self.__json_read()
->>> -        if self._debug:
->>> -            print >>sys.stderr, "QMP:<<< %s" % resp
->>> +        self.logger.debug("<<< %s", resp)
->>>          return resp
->>> =20
->>>      def cmd(self, name, args=3DNone, cmd_id=3DNone):
->>>
->>
->> This one looks good, but in order to no break qemu-iotests verbose mod=
-e it requires fix to qtest/iotests:
->>
->> ```diff
->> diff --git a/scripts/qtest.py b/scripts/qtest.py
->> index df0daf2..0e955a8 100644
->> --- a/scripts/qtest.py
->> +++ b/scripts/qtest.py
->> @@ -77,12 +77,12 @@ class QEMUQtestMachine(qemu.QEMUMachine):
->>      '''A QEMU VM'''
->> =20
->>      def __init__(self, binary, args=3DNone, name=3DNone, test_dir=3D"=
-/var/tmp",
->> -                 socket_scm_helper=3DNone):
->> +                 socket_scm_helper=3DNone, debug=3DFalse):
->>          if name is None:
->>              name =3D "qemu-%d" % os.getpid()
->>          super(QEMUQtestMachine,
->>                self).__init__(binary, args, name=3Dname, test_dir=3Dte=
-st_dir,
->> -                             socket_scm_helper=3Dsocket_scm_helper)
->> +                             socket_scm_helper=3Dsocket_scm_helper, d=
-ebug=3Ddebug)
->>          self._qtest =3D None
->>          self._qtest_path =3D os.path.join(test_dir, name + "-qtest.so=
-ck")
->> =20
->> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotest=
-s.py
->> index 1af117e..989ebd3 100644
->> --- a/tests/qemu-iotests/iotests.py
->> +++ b/tests/qemu-iotests/iotests.py
->> @@ -193,9 +193,8 @@ class VM(qtest.QEMUQtestMachine):
->>          name =3D "qemu%s-%d" % (path_suffix, os.getpid())
->>          super(VM, self).__init__(qemu_prog, qemu_opts, name=3Dname,
->>                                   test_dir=3Dtest_dir,
->> -                                 socket_scm_helper=3Dsocket_scm_helpe=
-r)
->> -        if debug:
->> -            self._debug =3D True
->> +                                 socket_scm_helper=3Dsocket_scm_helpe=
-r,
->> +                                 debug=3Ddebug)
->>          self._num_drives =3D 0
->> =20
->>      def add_device(self, opts):
->> ```
->=20
-> I'm confused by why the above patch is necessary.  We are in the
-> process of removing the 'debug' parameter from QEMUMachine and
-> QEMUMonitorProtocol, why would we add a debug parameter to
-> QEMUQtestMachine and iotests.py?
->=20
->>
->> (because the `debug` used to be set after `__init__`, but the logging =
-is initialized during `__init__`.)
->>
->> Therefor conditional ACK when the qtest/iotest fix precedes this commi=
-t.
->=20
-> Do you mean the following?
->=20
->   Message-Id: <20170927130339.21444-3-ehabkost@redhat.com>
->   Subject: [Qemu-devel] [PATCH 2/5] iotests: Set up Python logging
->   https://www.mail-archive.com/qemu-devel@nongnu.org/msg485036.html
->   https://github.com/ehabkost/qemu/commit/afa79b55676dcd1859aa9d1f983c9=
-dfbbcc13197
->=20
+And there is a spec too!
 
-I'm sorry, my fault. With the afa79b55676dcd1859aa9d1f983c9dfbbcc13197 co=
-mmit it works well and I haven't found any other issues.
+https://github.com/qemu/qemu/blob/master/docs/specs/fw_cfg.txt
 
-Reviewed-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>=20
+Igor, did you have in mind to use FW_CFG_FILE_DIR to retrieve the
+ACPI AML code?
 
-> It is already queued on python-next.
->=20
-
-
-
---2XPuQc1wLCcXbJC1h9RjMFKjeosiMOuLT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEwBAEBCAAaBQJZ3O9CExxsZG9rdG9yQHJlZGhhdC5jb20ACgkQJrNi5H/PIsEi
-TQf+PMKzWLDwu2lOVkumEy/PEnkYe8nSZ7GUM1gadwjRZ1Vh1PsGBPrtVF8bPlS9
-OFdcuTIEm3/HPahQHLSwn11xXzsLVYrhVMFWYuqpAXTUzQ5MvVOLyUwm36e4/hA9
-Tr7FQ+vLzo/Qj2kaMosLs7khGlzmmLbjdJHi+pQXOMTXJq7AnOCIytLCR/Q/+Uru
-+NRtWFyUtgRnimuSnm95dKtANxOgkVgDUbrSlQjL/wFoXW5BRrziu1g5XoJnFAK+
-l4yqBmoGXyCTM27ZoTYRJ2JutsKAPg4znUeSOXQ1ZRL8Lo4S4ApTtgdBHEGIC1Vr
-yJuLtBUxwLdZiV5OvFOHLLa7aA==
-=JMWm
------END PGP SIGNATURE-----
-
---2XPuQc1wLCcXbJC1h9RjMFKjeosiMOuLT--
+> 
+> One possible issue to use fw_cfg is how to avoid the conflict between
+> ACPI built by QEMU and ACPI built by hvmloader (e.g., both may use the
+> same table signature / device names / ...). In my current design, QEMU
+> will pass the table signatures and device names used in its ACPI to
+> Xen, and Xen can check the conflict with its own ACPI. Perhaps we can
+> add necessary functions in fw_cfg as well. Anyway, let me first look
+> at the code.
+> 
+> Thanks,
+> Haozhong
