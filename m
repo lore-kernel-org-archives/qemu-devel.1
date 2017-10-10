@@ -1,21 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e1pvJ-0008OW-Me
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:30:02 -0400
+	(envelope-from <berrange@redhat.com>) id 1e1pxJ-0000oY-3k
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:32:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e1pvF-0001Ch-KE
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:29:57 -0400
-From: Thomas Huth <thuth@redhat.com>
-References: <1506524313-20037-1-git-send-email-thuth@redhat.com>
-Message-ID: <e5e8a117-f055-cd1e-e805-8e1e336eb897@redhat.com>
-Date: Tue, 10 Oct 2017 10:29:40 +0200
+	(envelope-from <berrange@redhat.com>) id 1e1pxD-0003wV-A6
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:32:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53906)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e1pxD-0003w7-1D
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:31:55 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1E0FD81DED
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 08:31:54 +0000 (UTC)
+Date: Tue, 10 Oct 2017 09:31:43 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171010083143.GA30015@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170911165929.2791-1-marcandre.lureau@redhat.com>
+	<20170911165929.2791-3-marcandre.lureau@redhat.com>
+	<20171009110336.GA17824@redhat.com>
+	<20171009144344.38bbd1e9@nial.brq.redhat.com>
+	<20171009130218.GK2954@redhat.com>
+	<20171010003951-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1506524313-20037-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] disas: Always initialize
- read_memory_inner_func properly
+Content-Disposition: inline
+In-Reply-To: <20171010003951-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 2/7] hw/misc: add vmcoreinfo device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +39,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Julian Brown <julian@codesourcery.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, ehabkost@redhat.com, qemu-devel@nongnu.org, anderson@redhat.com, lersek@redhat.com
 
-On 27.09.2017 16:58, Thomas Huth wrote:
-> I've recently seen this with valgrind while running the HMP tester:
-> 
-> ==22373== Conditional jump or move depends on uninitialised value(s)
-> ==22373==    at 0x4A41FD: arm_disas_set_info (cpu.c:504)
-> ==22373==    by 0x3867A7: monitor_disas (disas.c:390)
-> ==22373==    by 0x38E80E: memory_dump (monitor.c:1339)
-> ==22373==    by 0x38FA43: handle_hmp_command (monitor.c:3123)
-> ==22373==    by 0x38FB9E: qmp_human_monitor_command (monitor.c:613)
-> ==22373==    by 0x4E3124: qmp_marshal_human_monitor_command (qmp-marshal.c:1736)
-> ==22373==    by 0x769678: do_qmp_dispatch (qmp-dispatch.c:104)
-> ==22373==    by 0x769678: qmp_dispatch (qmp-dispatch.c:131)
-> ==22373==    by 0x38B734: handle_qmp_command (monitor.c:3853)
-> ==22373==    by 0x76ED07: json_message_process_token (json-streamer.c:105)
-> ==22373==    by 0x78D40A: json_lexer_feed_char (json-lexer.c:323)
-> ==22373==    by 0x78D4CD: json_lexer_feed (json-lexer.c:373)
-> ==22373==    by 0x38A08D: monitor_qmp_read (monitor.c:3895)
-> 
-> And indeed, in monitor_disas, the read_memory_inner_func variable was
-> not initialized, but arm_disas_set_info() expects this to be NULL
-> or a valid pointer. Let's properly set this to NULL in the
-> INIT_DISASSEMBLE_INFO to fix it in all functions that use the
-> disassemble_info struct.
-> 
-> Fixes: f7478a92dd9ee2276bfaa5b7317140d3f9d6a53b ("Fix Thumb-1 BE32 execution")
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  disas.c             | 1 -
->  include/disas/bfd.h | 1 +
->  2 files changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/disas.c b/disas.c
-> index d6a1eb9..54eea3f 100644
-> --- a/disas.c
-> +++ b/disas.c
-> @@ -190,7 +190,6 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
->  
->      s.cpu = cpu;
->      s.info.read_memory_func = target_read_memory;
-> -    s.info.read_memory_inner_func = NULL;
->      s.info.buffer_vma = code;
->      s.info.buffer_length = size;
->      s.info.print_address_func = generic_print_address;
-> diff --git a/include/disas/bfd.h b/include/disas/bfd.h
-> index b01e002..d99da68 100644
-> --- a/include/disas/bfd.h
-> +++ b/include/disas/bfd.h
-> @@ -479,6 +479,7 @@ int generic_symbol_at_address(bfd_vma, struct disassemble_info *);
->    (INFO).buffer_vma = 0, \
->    (INFO).buffer_length = 0, \
->    (INFO).read_memory_func = buffer_read_memory, \
-> +  (INFO).read_memory_inner_func = NULL, \
->    (INFO).memory_error_func = perror_memory, \
->    (INFO).print_address_func = generic_print_address, \
->    (INFO).print_insn = NULL, \
-> 
+On Tue, Oct 10, 2017 at 12:44:26AM +0300, Michael S. Tsirkin wrote:
+> On Mon, Oct 09, 2017 at 02:02:18PM +0100, Daniel P. Berrange wrote:
+> > On Mon, Oct 09, 2017 at 02:43:44PM +0200, Igor Mammedov wrote:
+> > > On Mon, 9 Oct 2017 12:03:36 +0100
+> > > "Daniel P. Berrange" <berrange@redhat.com> wrote:
+> > >=20
+> > > > On Mon, Sep 11, 2017 at 06:59:24PM +0200, Marc-Andr=C3=A9 Lureau =
+wrote:
+> > > > > See docs/specs/vmcoreinfo.txt for details.
+> > > > >=20
+> > > > > "etc/vmcoreinfo" fw_cfg entry is added when using "-device vmco=
+reinfo". =20
+> > > >=20
+> > > > I'm wondering if you considered just adding the entry to fw_cfg b=
+y
+> > > > default, without requiring any -device arg ? Unless I'm misunders=
+tanding,
+> > > > this doesn't feel like a device to me - its just a well known buc=
+ket
+> > > > in fw_cfg IIUC ?  Obviously its existance would need to be tied t=
+o
+> > > > the latest machine type for ABI reasons though. The benefit of th=
+is
+> > > > is that it would "just work" without us having to plumb it throug=
+h to
+> > > > all the downstream applications that use QEMU for mgmt guest (Ope=
+nStack,
+> > > > oVirt, GNOME Boxes, virt-manager, and countless other mgmt apps).
+> > > it follows model set by pvpanic device, it's easier to manage from =
+migration
+> > > POV, one could use it even for old machine types with new qemu (jus=
+t by adding
+> > > device, it makes instance not backwards migratable to old qemu but =
+should work
+> > > for forward migration) and if user doesn't need it, device could be=
+ just omitted
+> > > from CLI.
+> >=20
+> > Sure but it means that in effect no one will have this functionality =
+enabled
+> > for several years. pvpanic has been around a long time and I rarely s=
+ee it
+> > present in configured guests :-(
+> >=20
+> >=20
+> > Regards,
+> > Daniel
+>=20
+> libvirt runs with -nodefaults, right? I'd argue pretty strongly -nodefa=
+ults
+> shouldn't add optional devices anyway.
 
-Ping?
+This isn't really adding a device though is it - it is just a well known
+location in fw_cfg to receive data.
 
- Thomas
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
