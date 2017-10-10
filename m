@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=44954d255=Ian.Jackson@citrix.com>)
-	id 1e23O8-0005WA-0g
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 18:52:36 -0400
+	(envelope-from <prvs=449813866=anthony.perard@citrix.com>)
+	id 1e23Wb-0007pu-EG
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 19:01:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=44954d255=Ian.Jackson@citrix.com>)
-	id 1e23O6-0004lr-TK
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 18:52:36 -0400
-Received: from smtp.citrix.com ([66.165.176.89]:21360)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=44954d255=Ian.Jackson@citrix.com>)
-	id 1e23O6-0004k6-MK
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 18:52:34 -0400
-From: Ian Jackson <ian.jackson@eu.citrix.com>
+	(envelope-from <prvs=449813866=anthony.perard@citrix.com>)
+	id 1e23Wa-0008K8-PN
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 19:01:21 -0400
+Date: Tue, 10 Oct 2017 16:37:33 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20171010153733.GM1771@perard.uk.xensource.com>
+References: <20170922154014.29350-1-f4bug@amsat.org>
+	<20170922154014.29350-13-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Message-ID: <23005.86.889060.625202@mariner.uk.xensource.com>
-Date: Tue, 10 Oct 2017 18:16:06 +0100
-In-Reply-To: <20171010114001.GF1771@perard.uk.xensource.com>
-References: <1507133891-26013-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1507133891-26013-4-git-send-email-ian.jackson@eu.citrix.com>
-	<20171009155044.GC1771@perard.uk.xensource.com>
-	<23003.43689.447516.6588@mariner.uk.xensource.com>
-	<20171010114001.GF1771@perard.uk.xensource.com>
-Subject: Re: [Qemu-devel] [PATCH 3/8] xen: defer call to xen_restrict until
- after os_setup_post
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20170922154014.29350-13-f4bug@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH 12/34] misc: remove old i386 dependency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,17 +26,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, xen-devel@lists.xenproject.org, Juergen Gross <jgross@suse.com>, Stefano
-	Stabellini <sstabellini@kernel.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-Anthony PERARD writes ("Re: [PATCH 3/8] xen: defer call to xen_restrict until after os_setup_post"):
-> I'm tring to find out what does calling xen_restrict_all(0), when
-> running an non-Xen guest. I think it would just lock(), then unlock()
-> then there should not be any handle to restrict, and return 0; is that
-> right?
+On Fri, Sep 22, 2017 at 12:39:52PM -0300, Philippe Mathieu-Daudé wrote:
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  hw/audio/pcspk.c                    | 1 -
+>  hw/i386/kvm/pci-assign.c            | 1 -
+>  hw/i386/pci-assign-load-rom.c       | 1 -
+>  hw/i386/xen/xen_platform.c          | 1 -
+>  hw/isa/vt82c686.c                   | 1 -
+>  hw/misc/ivshmem.c                   | 1 -
+>  hw/misc/sga.c                       | 1 -
+>  hw/pci-bridge/pci_expander_bridge.c | 1 -
+>  monitor.c                           | 1 -
+>  9 files changed, 9 deletions(-)
+> 
 
-Yes.  If the process has not opened any Xen control handles,
-xentoolcore_restrict_all is a no-op.
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 
-Ian.
+-- 
+Anthony PERARD
