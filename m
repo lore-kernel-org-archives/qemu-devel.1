@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e1z4Y-0007Fw-Hd
+	(envelope-from <quintela@redhat.com>) id 1e1z4V-0007D6-BV
 	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 14:16:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e1z4U-0002Nk-OR
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 14:16:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54656)
+	(envelope-from <quintela@redhat.com>) id 1e1z4Q-0002MK-Rw
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 14:16:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57274)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e1z4U-0002NM-I1
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 14:16:02 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e1z4Q-0002Li-LD
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 14:15:58 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ADB1B552EA
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 18:16:01 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BBD65C04AC73
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 18:15:57 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Tue, 10 Oct 2017 20:15:39 +0200
-Message-Id: <20171010181542.24168-8-quintela@redhat.com>
+Date: Tue, 10 Oct 2017 20:15:38 +0200
+Message-Id: <20171010181542.24168-7-quintela@redhat.com>
 In-Reply-To: <20171010181542.24168-1-quintela@redhat.com>
 References: <20171010181542.24168-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 07/10] migration: Don't play games with the
- requested cache size
+Subject: [Qemu-devel] [PATCH 06/10] migration: Make sure that we pass the
+ right cache size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,46 +33,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Now that we check that the value passed is a power of 2, we don't need
-to play games when comparing what is the size that is going to take
-the cache.
+Instead of passing silently round down the number of pages, make it an
+error that the cache size is not a multiple of 2.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/ram.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ migration/page_cache.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 47501460c8..c84f22d759 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -135,12 +135,14 @@ int64_t xbzrle_cache_resize(int64_t new_size, Error **errp)
-         return -1;
+diff --git a/migration/page_cache.c b/migration/page_cache.c
+index 9a9d13d6a2..96268c3aea 100644
+--- a/migration/page_cache.c
++++ b/migration/page_cache.c
+@@ -58,6 +58,13 @@ PageCache *cache_init(int64_t new_size, size_t page_size, Error **errp)
+         return NULL;
      }
  
-+    if (new_size == migrate_xbzrle_cache_size()) {
-+        /* nothing to do */
-+        return new_size;
++    /* round down to the nearest power of 2 */
++    if (!is_power_of_2(num_pages)) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "cache size",
++                   "is not a power of two number of pages");
++        return NULL;
 +    }
 +
-     XBZRLE_cache_lock();
- 
-     if (XBZRLE.cache != NULL) {
--        if (pow2floor(new_size) == migrate_xbzrle_cache_size()) {
--            goto out_new_size;
--        }
-         new_cache = cache_init(new_size, TARGET_PAGE_SIZE, errp);
-         if (!new_cache) {
-             ret = -1;
-@@ -151,8 +153,7 @@ int64_t xbzrle_cache_resize(int64_t new_size, Error **errp)
-         XBZRLE.cache = new_cache;
+     /* We prefer not to abort if there is no memory */
+     cache = g_try_malloc(sizeof(*cache));
+     if (!cache) {
+@@ -65,11 +72,6 @@ PageCache *cache_init(int64_t new_size, size_t page_size, Error **errp)
+                    "Failed to allocate cache");
+         return NULL;
      }
- 
--out_new_size:
--    ret = pow2floor(new_size);
-+    ret = new_size;
- out:
-     XBZRLE_cache_unlock();
-     return ret;
+-    /* round down to the nearest power of 2 */
+-    if (!is_power_of_2(num_pages)) {
+-        num_pages = pow2floor(num_pages);
+-        DPRINTF("rounding down to %" PRId64 "\n", num_pages);
+-    }
+     cache->page_size = page_size;
+     cache->num_items = 0;
+     cache->max_num_items = num_pages;
 -- 
 2.13.6
