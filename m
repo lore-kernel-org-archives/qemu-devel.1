@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e1o7M-0006rv-TP
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 02:34:18 -0400
+	(envelope-from <bharat.bhushan@nxp.com>) id 1e1oF3-0000AL-IE
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 02:42:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e1o7I-0006wN-55
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 02:34:16 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:43495
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1e1o7H-0006vp-UP
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 02:34:12 -0400
-References: <150758778512.270.15107434222651481306@b58463cdfd5f>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <bccb4e7a-cc09-1643-1dc4-bd1c9f58d592@ilande.co.uk>
-Date: Tue, 10 Oct 2017 07:33:48 +0100
-MIME-Version: 1.0
-In-Reply-To: <150758778512.270.15107434222651481306@b58463cdfd5f>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <bharat.bhushan@nxp.com>) id 1e1oEz-00031q-BQ
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 02:42:13 -0400
+From: Bharat Bhushan <bharat.bhushan@nxp.com>
+Date: Tue, 10 Oct 2017 06:42:04 +0000
+Message-ID: <AM5PR0401MB254512CE483DD6E684037A629A750@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+References: <1506494000-31982-1-git-send-email-Bharat.Bhushan@nxp.com>
+	<20170927074109.GA31587@virtx40>
+	<AM5PR0401MB25450ACC804B20D93C4F2D9D9A780@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<9700cf30-65ed-9c55-c1b9-14bb8deb669f@redhat.com>
+	<20170927092147.GA32183@virtx40>
+	<0af599c0-f859-f90c-c999-bc4a0a678768@redhat.com>
+	<20171004114910.GA6932@virtx40>
+	<79234c56-c524-5359-de8a-f266b19821eb@redhat.com>
+	<9d173ea5-75a6-c684-7f8d-e2ec1d3eddff@redhat.com>
+	<1017080b-aa5f-4a1f-9905-e65f22717cd1@redhat.com>
+	<b740e8b7-5859-fd6a-1f1e-480aef6ef4f0@redhat.com>
+	<AM5PR0401MB254548523AC95D0A2A8A92E69A710@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+In-Reply-To: <AM5PR0401MB254548523AC95D0A2A8A92E69A710@AM5PR0401MB2545.eurprd04.prod.outlook.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/8] sun4m : sparc32_dma tidy-ups
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v4 0/5] virtio-iommu: VFIO
+ integration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,87 +35,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, no-reply@patchew.org
-Cc: famz@redhat.com, atar4qemu@gmail.com
+To: Bharat Bhushan <bharat.bhushan@nxp.com>, Auger Eric <eric.auger@redhat.com>, Linu Cherian <linuc.decode@gmail.com>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "mst@redhat.com" <mst@redhat.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "linu.cherian@cavium.com" <linu.cherian@cavium.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "bharatb.yadav@gmail.com" <bharatb.yadav@gmail.com>
 
-On 09/10/17 23:23, no-reply@patchew.org wrote:
+Hi Alex, Eric,
 
-> Hi,
-> 
-> This series seems to have some coding style problems. See output below for
-> more information:
-> 
-> Type: series
-> Message-id: 1507583223-14819-1-git-send-email-mark.cave-ayland@ilande.co.uk
-> Subject: [Qemu-devel] [PATCH 0/8] sun4m : sparc32_dma tidy-ups
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> 
-> BASE=base
-> n=1
-> total=$(git log --oneline $BASE.. | wc -l)
-> failed=0
-> 
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> 
-> commits="$(git log --format=%H --reverse $BASE..)"
-> for c in $commits; do
->     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
->     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
->         failed=1
->         echo
->     fi
->     n=$((n+1))
-> done
-> 
-> exit $failed
-> === TEST SCRIPT END ===
-> 
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> Switched to a new branch 'test'
-> 9381599b5f sparc32_dma: remove is_ledma hack and replace with memory region alias
-> 351ac18a76 sparc32_dma: introduce new SPARC32_DMA type container object
-> 2d199e96ee sparc32_dma: use object link instead of qdev property to pass IOMMU reference
-> 3d1e0d1ab6 sun4m_iommu: move TYPE_SUN4M_IOMMU declaration to sun4m.h
-> 6b2427a590 sun4m: move DMA device wiring from sparc32_dma_init() to sun4m_hw_init()
-> 21c607d831 sparc32_dma: move type declarations from sparc32_dma.c to sparc32_dma.h
-> 76cb2ba4ba sparc32_dma: split esp and le into separate DMA devices
-> c31bca2fb4 sparc32_dma: rename SPARC32_DMA type to SPARC32_DMA_DEVICE
-> 
-> === OUTPUT BEGIN ===
-> Checking PATCH 1/8: sparc32_dma: rename SPARC32_DMA type to SPARC32_DMA_DEVICE...
-> Checking PATCH 2/8: sparc32_dma: split esp and le into separate DMA devices...
-> Checking PATCH 3/8: sparc32_dma: move type declarations from sparc32_dma.c to sparc32_dma.h...
-> Checking PATCH 4/8: sun4m: move DMA device wiring from sparc32_dma_init() to sun4m_hw_init()...
-> ERROR: spaces required around that '*' (ctx:WxV)
-> #47: FILE: hw/sparc/sun4m.c:824:
-> +    qemu_irq *cpu_irqs[MAX_CPUS], slavio_irq[32], slavio_cpu_irq[MAX_CPUS];
->               ^
-> 
-> total: 1 errors, 0 warnings, 66 lines checked
-> 
-> Your patch has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 
-> Checking PATCH 5/8: sun4m_iommu: move TYPE_SUN4M_IOMMU declaration to sun4m.h...
-> Checking PATCH 6/8: sparc32_dma: use object link instead of qdev property to pass IOMMU reference...
-> Checking PATCH 7/8: sparc32_dma: introduce new SPARC32_DMA type container object...
-> Checking PATCH 8/8: sparc32_dma: remove is_ledma hack and replace with memory region alias...
-> === OUTPUT END ===
-> 
-> Test command exited with code: 1
+> -----Original Message-----
+> From: Qemu-devel [mailto:qemu-devel-
+> bounces+bharat.bhushan=3Dnxp.com@nongnu.org] On Behalf Of Bharat
+> Bhushan
+> Sent: Friday, October 06, 2017 9:16 AM
+> To: Auger Eric <eric.auger@redhat.com>; Linu Cherian
+> <linuc.decode@gmail.com>
+> Cc: peter.maydell@linaro.org; kevin.tian@intel.com; mst@redhat.com;
+> marc.zyngier@arm.com; tn@semihalf.com; will.deacon@arm.com;
+> drjones@redhat.com; qemu-devel@nongnu.org;
+> alex.williamson@redhat.com; qemu-arm@nongnu.org;
+> linu.cherian@cavium.com; eric.auger.pro@gmail.com;
+> robin.murphy@arm.com; christoffer.dall@linaro.org;
+> bharatb.yadav@gmail.com
+> Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v4 0/5] virtio-iommu: VFIO
+> integration
+>=20
+>=20
+>=20
+> > >> Thanks
+> > >>
+> > >> Eric
+> > >>>
+> > >>> However you should be allowed to map 1 sg element of 5 pages and
+> > >>> then notify the host about this event I think. Still looking at the=
+ code...
+> > >>>
+> > >>> I still can't reproduce the issue at the moment. What kind of
+> > >>> device are you assigning?
+> > >>>
+> > >>> Thanks
+> > >>>
+> > >>> Eric
+> > >>>>
+> > >>>> Atleast vfio_get_vaddr called from vfio_iommu_map_notify in Qemu
+> > >>>> expects the map size to be a power of 2.
+> > >
+> > > Actually I missed the most important here ;-)
+> > >>>>
+> > >>>>  if (len & iotlb->addr_mask) {
+> > > This check looks suspiscious to me. In our case the len is not
+> > > modified by the previous translation and it fails, I don't see why.
+> > > It should be valid to be able to notify 5 granules.
+> >
+> > So after discussion with Alex, looks the way we notify the host
+> > currently is wrong. we set the addr_mask to the mapping/unmapping size
+> > -1 whereas this should be a page mask instead (granule size or block si=
+ze?).
+> > So if the guest maps 5 x 4kB pages we should send 5 notifications for
+> > each page and not a single one. It is unclear to me if we can notify
+> > with hugepage/block page size mask. Peter may confirm/infirm this. in
+> > vsmmuv3 code I notify by granule or block size.
 
-This is strange - I get no errors when I run scripts/checkpatch.pl from
-git master locally on the output of git format-patch.
+My understanding is that host provides supported page sizes (page_size_mask=
+), and Size of each notification to host should be exactly best fit of supp=
+orted page-size and/or multiples of supported page-sizes.
+So if guest maps 20K size (single request), and supported page size is 4K, =
+so we can still send one 20K size request.
+Not sure I get it, why multiples of supported page-size cannot be provided =
+in one notification to host.
 
-I'm not convinced this is correct either as there are plenty of other
-"Type *foo" declarations within the patch itself. Presumably this is
-because there are extra rules somewhere for qemu_irq?
+Thanks
+-Bharat
 
-
-ATB,
-
-Mark.
+> >
+> > Bharat, please can you add this to your TODO list?
+> >
+> > Linu, thanks a lot for the time you spent debugging this issue.
+> > Curiously on my side, it is really seldom hit but it is ...
+>=20
+> Thanks Linu and Eric, I added this to my todo list.
+> While I am still not able to reproduce the issue.  I tried with e1000 and=
+ now
+> try with ixgbe device. May I know which device can be used to reproduce t=
+his
+> issue?
+>=20
+> Thanks
+> -Bharat
+>=20
+> >
+> > Thanks!
+> >
+> > Eric
+> > >
+> > > Thanks
+> > >
+> > > Eric
+> > >>>>         error_report("iommu has granularity incompatible with targ=
+et
+> AS");
+> > >>>>         return false;
+> > >>>>     }
+> > >>>>
+> > >>>> Just trying to understand how this is not hitting in your case.
+> > >>>>
+> > >>>>
+> > >>>
+> > >>
+> > >
