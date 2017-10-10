@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e1pUq-00011Z-1B
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:02:37 -0400
+	(envelope-from <benh@kernel.crashing.org>) id 1e1pbJ-0002iT-8D
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:09:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e1pUm-0001Sv-Uu
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:02:36 -0400
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20171009172723.190282-1-vsementsov@virtuozzo.com>
-	<20171009172723.190282-18-vsementsov@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <24bd15b7-8119-4bb4-85f4-b5187a0339e2@redhat.com>
-Date: Tue, 10 Oct 2017 10:02:27 +0200
-MIME-Version: 1.0
-In-Reply-To: <20171009172723.190282-18-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 10/10] nbd: Minimal structured read for
- client
+	(envelope-from <benh@kernel.crashing.org>) id 1e1pbC-0005tS-Vr
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:09:17 -0400
+Message-ID: <1507622927.25065.200.camel@kernel.crashing.org>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date: Tue, 10 Oct 2017 10:08:47 +0200
+In-Reply-To: <20171009154930.29095-3-clg@kaod.org>
+References: <20171009154930.29095-1-clg@kaod.org>
+	<20171009154930.29095-3-clg@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] spapr/rtas: disable the decrementer
+ interrupt when a CPU is unplugged
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,154 +24,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, eblake@redhat.com, den@openvz.org
+To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-On 09/10/2017 19:27, Vladimir Sementsov-Ogievskiy wrote:
-> 
-> +    int ret = nbd_co_do_receive_one_chunk(s, handle, only_structured,
-> +                                          &request_ret, qiov, payload);
+On Mon, 2017-10-09 at 17:49 +0200, C=C3=A9dric Le Goater wrote:
+> When a CPU is stopped with the 'stop-self' RTAS call, its state
+> 'halted' is switched to 1 and, in this case, the MSR is not taken into
+> account anymore in the cpu_has_work() routine. Only the pending
+> hardware interrupts are checked with their LPCR:PECE* enablement bit.
+>=20
+> If the DECR timer fires after 'stop-self' is called and before the CPU
+> 'stop' state is reached, the nearly-dead CPU will have some work to do
+> and the guest will crash. This case happens very frequently with the
+> not yet upstream P9 XIVE exploitation mode. In XICS mode, the DECR is
+> occasionally fired but after 'stop' state, so no work is to be done
+> and the guest survives.
+>=20
+> I suspect there is a race between the QEMU mainloop triggering the
+> timers and the TCG CPU thread but I could not quite identify the root
+> cause. To be safe, let's disable the decrementer interrupt in the LPCR
+> when the CPU is halted and reenable it when the CPU is restarted.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+We should disable external interrupts and doorbells too no ? IE, we
+could clear all of PECE in fact.
+
+> ---
+>=20
+> Changes in v2:
+>=20
+>  - used a new routine ppc_cpu_pvr_match() to discriminate CPU versions
+>  - removed the LPCR:PECE* enablement bit when the CPU is initialized
+>    if it is a secondary
+>=20
+>  hw/ppc/spapr_rtas.c         | 20 ++++++++++++++++++++
+>  target/ppc/translate_init.c | 19 +++++++++++++++++--
+>  2 files changed, 37 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index cdf0b607a0a0..dfdbf1e2c6f8 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -46,6 +46,7 @@
+>  #include "qemu/cutils.h"
+>  #include "trace.h"
+>  #include "hw/ppc/fdt.h"
+> +#include "target/ppc/cpu-models.h"
+> =20
+>  static void rtas_display_character(PowerPCCPU *cpu, sPAPRMachineState =
+*spapr,
+>                                     uint32_t token, uint32_t nargs,
+> @@ -174,6 +175,15 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPR=
+MachineState *spapr,
+>          kvm_cpu_synchronize_state(cs);
+> =20
+>          env->msr =3D (1ULL << MSR_SF) | (1ULL << MSR_ME);
 > +
-> +    if (ret < 0) {
-> +        s->quit = true;
+> +        /* Enable DECR interrupt */
+> +        if (ppc_cpu_pvr_match(cpu, CPU_POWERPC_LOGICAL_3_00)) {
+> +            env->spr[SPR_LPCR] |=3D LPCR_DEE;
+> +        } else {
+> +            /* P7 and P8 both have same bit for DECR */
+> +            env->spr[SPR_LPCR] |=3D LPCR_P8_PECE3;
+> +        }
+> +
+>          env->nip =3D start;
+>          env->gpr[3] =3D r3;
+>          cs->halted =3D 0;
+> @@ -210,6 +220,16 @@ static void rtas_stop_self(PowerPCCPU *cpu, sPAPRM=
+achineState *spapr,
+>       * no need to bother with specific bits, we just clear it.
+>       */
+>      env->msr =3D 0;
+> +
+> +    /* Don't let the decremeter run on a CPU being stopped. This could
+> +     * deliver an interrupt on a dying CPU and crash the guest.
+> +     */
+> +    if (ppc_cpu_pvr_match(cpu, CPU_POWERPC_LOGICAL_3_00)) {
+> +        env->spr[SPR_LPCR] &=3D ~LPCR_DEE;
 > +    } else {
-> +        /* For assert at loop start in nbd_read_reply_entry */
-> +        if (reply) {
-> +            *reply = s->reply;
-> +        }
-
-reply is always non-NULL, right?
-
-> +        s->reply.handle = 0;
-> +        ret = request_ret;
+> +        /* P7 and P8 both have same bit for DECR */
+> +        env->spr[SPR_LPCR] &=3D ~LPCR_P8_PECE3;
 > +    }
->  
-
-...
-
-> +static int nbd_co_receive_return_code(NBDClientSession *s, uint64_t handle)
-> +{
-> +    int ret = 0;
-> +    int i = HANDLE_TO_INDEX(s, handle);
-> +    NBDReply reply;
-> +    bool only_structured = false;
+>  }
+> =20
+>  static inline int sysparm_st(target_ulong addr, target_ulong len,
+> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> index 0d6379fcc5b4..1a62159843e7 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -8905,6 +8905,7 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtual=
+Hypervisor *vhyp)
+>      CPUPPCState *env =3D &cpu->env;
+>      ppc_spr_t *lpcr =3D &env->spr_cb[SPR_LPCR];
+>      ppc_spr_t *amor =3D &env->spr_cb[SPR_AMOR];
+> +    CPUState *cs =3D CPU(cpu);
+> =20
+>      cpu->vhyp =3D vhyp;
+> =20
+> @@ -8946,8 +8947,15 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtua=
+lHypervisor *vhyp)
+>          } else {
+>              lpcr->default_value &=3D ~(LPCR_UPRT | LPCR_GTSE);
+>          }
+> -        lpcr->default_value |=3D LPCR_PDEE | LPCR_HDEE | LPCR_EEE | LP=
+CR_DEE |
+> +        lpcr->default_value |=3D LPCR_PDEE | LPCR_HDEE | LPCR_EEE |
+>                                 LPCR_OEE;
 > +
-> +    do {
-> +        int rc = nbd_co_receive_one_chunk(s, handle, only_structured,
-> +                                          NULL, &reply, NULL);
-
-Is rc > 0 propagated correctly?
-
-> +        if (rc < 0 || nbd_reply_is_simple(&reply)) {
-> +            if (ret == 0) {
-> +                ret = rc;
-> +            }
-> +            only_structured = true;
-> +            continue;
+> +        /* Only let the decremeter wake up the boot CPU. The RTAS
+> +         * command start-cpu will enable it on secondaries.
+> +         */
+> +        if (cs =3D=3D first_cpu) {
+> +            lpcr->default_value |=3D LPCR_DEE;
 > +        }
-
-> +    } while (!s->quit && nbd_reply_is_structured(&s->reply) &&
-> +             !(s->reply.structured.flags & NBD_SREP_FLAG_DONE));
+>          break;
+>      default:
+>          /* P7 and P8 has slightly different PECE bits, mostly because =
+P8 adds
+> @@ -8955,7 +8963,14 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtua=
+lHypervisor *vhyp)
+>           * will work as expected for both implementations
+>           */
+>          lpcr->default_value |=3D LPCR_P8_PECE0 | LPCR_P8_PECE1 | LPCR_=
+P8_PECE2 |
+> -                               LPCR_P8_PECE3 | LPCR_P8_PECE4;
+> +                               LPCR_P8_PECE4;
 > +
-> +    s->requests[i].coroutine = NULL;
-> +
-> +    qemu_co_mutex_lock(&s->send_mutex);
-> +    s->in_flight--;
-> +    qemu_co_queue_next(&s->free_sema);
-> +    qemu_co_mutex_unlock(&s->send_mutex);
-
-The code after the loop is duplicated.
-
-An idea could be to wrap nbd_co_receive_one_chunk with an iterator like
-
-typedef struct NBDReplyChunkIter {
-    int ret;
-    bool done, only_structured;
-} NBDReplyChunkIter;
-
-#define NBD_FOREACH_REPLY_CHUNK(s, handle, iter, qiov, reply, payload, \
-                                structured)                            \
-    for (iter = (NBDReplyChunkIter) { .only_structured = structured }; \
-         nbd_reply_chunk_iter_receive(s, &iter, qiov, &reply, handle,  \
-                                      payload);;)
-
-bool coroutine_fn nbd_reply_chunk_iter_receive(...)
-{
-    if (s->quit) {
-        if (iter->ret == 0) {
-            iter->ret = -EIO;
-        }
-        goto break_loop;
-    }
-    /* Handle the end of the previous iteration.  */
-    if (iter->done) {
-        goto break_loop;
-    }
-
-    rc = nbd_co_receive_one_chunk(s, handle, iter->only_structured,
-                                  qiov, reply, payload);
-    if (rc < 0) {
-        assert(s->quit);
-        if (iter->ret == 0) {
-            iter->ret = rc;
-        }
-        goto break_loop;
-    }
-
-    /* No structured reply?  Do not execute the body of
-     * NBD_FOREACH_REPLY_CHUNK.
-     */
-    if (nbd_reply_is_simple(&s->reply) || s->quit) {
-        goto break_loop;
-    }
-
-    iter->only_structured = true;
-    if (s->reply.structured.flags & NBD_SREP_FLAG_DONE) {
-        iter->ret = rc;
-        iter->done = true;
-        /* Execute the loop body, but this iteration is the last.  */
-        return true;
-    }
-
-    /* An error reply must have NBD_SREP_FLAG_DONE set, otherwise it is
-     * a protocol error (FIXME: is this true?  but if not, how do you
-     * cope with multiple error replies?)
-     */
-    if (rc > 0) {
-        s->quit = true;
-        iter->ret = -EIO;
-        goto break_loop;
-    }
-    return true;
-
-break_loop:
-    iter->done = true;
-
-    s->requests[HANDLE_TO_INDEX(s, handle)].coroutine = NULL;
-
-    qemu_co_mutex_lock(&s->send_mutex);
-    s->in_flight--;
-    qemu_co_queue_next(&s->free_sema);
-    qemu_co_mutex_unlock(&s->send_mutex);
-    return false;
-}
-
-so this loop could be written like
-
-    FOR_EACH_REPLY_CHUNK(s, handle, iter, NULL, &reply, NULL) {
-        if (reply.structured.type != NBD_SREP_TYPE_NONE) {
-            /* not allowed reply type */
-            s->quit = true;
-            break;
-        }
-    }
-    return iter.ret;
-
-and likewise for nbd_co_receive_cmdread_reply.  The iterator is a bit
-more complex, but it abstracts all the protocol handling and avoids lots
-of duplicated code.
-
-Paolo
-
-> +    return ret;
-> +}
+> +        /* Only let the decremeter wake up the boot CPU. The RTAS
+> +         * command start-cpu will enable it on secondaries.
+> +         */
+> +        if (cs =3D=3D first_cpu) {
+> +            lpcr->default_value |=3D LPCR_P8_PECE3;
+> +        }
+>      }
+> =20
+>      /* We should be followed by a CPU reset but update the active valu=
+e
