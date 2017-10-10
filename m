@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4D-0007WK-PZ
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:11:42 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4F-0007XW-Fq
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:11:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4B-0007El-Of
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:11:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41214)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y49-0007EA-Q3
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:11:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51494)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1e1y4B-0007EZ-IV
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:11:39 -0400
+	id 1e1y49-0007Dq-Jc
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:11:37 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 10 Oct 2017 19:11:00 +0200
-Message-Id: <20171010171122.9756-6-marcandre.lureau@redhat.com>
+Date: Tue, 10 Oct 2017 19:10:59 +0200
+Message-Id: <20171010171122.9756-5-marcandre.lureau@redhat.com>
 In-Reply-To: <20171010171122.9756-1-marcandre.lureau@redhat.com>
 References: <20171010171122.9756-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 05/27] libvhost-user: improve vu_queue_pop() doc
+Subject: [Qemu-devel] [PULL 04/27] libvhost-user: drop dependency on glib
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +30,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, f4bug@amsat.org, changpeng.liu@intel.com, felipe@nutanix.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
----
- contrib/libvhost-user/libvhost-user.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+libvhost-user is meant to be free of glib dependency. Make sure it is
+by droping qemu/osdep.h (which included glib.h)
 
-diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
-r/libvhost-user.h
-index 4021f1124e..5825b66880 100644
---- a/contrib/libvhost-user/libvhost-user.h
-+++ b/contrib/libvhost-user/libvhost-user.h
-@@ -358,7 +358,8 @@ void vu_queue_notify(VuDev *dev, VuVirtq *vq);
-  * @vq: a VuVirtq queue
-  * @sz: the size of struct to return (must be >=3D VuVirtqElement)
-  *
-- * Returns: a VuVirtqElement filled from the queue or NULL.
-+ * Returns: a VuVirtqElement filled from the queue or NULL. The
-+ * returned element must be free()-d by the caller.
+This fixes a bad malloc()/g_free() pair.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+---
+ contrib/libvhost-user/libvhost-user.c | 29 ++++++++++++++++++++++++++---
+ 1 file changed, 26 insertions(+), 3 deletions(-)
+
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
+r/libvhost-user.c
+index d27d6303db..a0e0da4ccb 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -13,14 +13,35 @@
+  * later.  See the COPYING file in the top-level directory.
   */
- void *vu_queue_pop(VuDev *dev, VuVirtq *vq, size_t sz);
+=20
+-#include <qemu/osdep.h>
++/* this code avoids GLib dependency */
++#include <stdlib.h>
++#include <stdio.h>
++#include <unistd.h>
++#include <stdarg.h>
++#include <errno.h>
++#include <string.h>
++#include <assert.h>
++#include <inttypes.h>
++#include <sys/types.h>
++#include <sys/socket.h>
+ #include <sys/eventfd.h>
++#include <sys/mman.h>
+ #include <linux/vhost.h>
+=20
++#include "qemu/compiler.h"
+ #include "qemu/atomic.h"
+=20
+ #include "libvhost-user.h"
+=20
++/* usually provided by GLib */
++#ifndef MIN
++#define MIN(x, y) ({                            \
++            typeof(x) _min1 =3D (x);              \
++            typeof(y) _min2 =3D (y);              \
++            (void) (&_min1 =3D=3D &_min2);          \
++            _min1 < _min2 ? _min1 : _min2; })
++#endif
++
+ #define VHOST_USER_HDR_SIZE offsetof(VhostUserMsg, payload.u64)
+=20
+ /* The version of the protocol we support */
+@@ -81,7 +102,9 @@ vu_panic(VuDev *dev, const char *msg, ...)
+     va_list ap;
+=20
+     va_start(ap, msg);
+-    buf =3D g_strdup_vprintf(msg, ap);
++    if (vasprintf(&buf, msg, ap) < 0) {
++        buf =3D NULL;
++    }
+     va_end(ap);
+=20
+     dev->broken =3D true;
+@@ -853,7 +876,7 @@ vu_dispatch(VuDev *dev)
+     success =3D true;
+=20
+ end:
+-    g_free(vmsg.data);
++    free(vmsg.data);
+     return success;
+ }
 =20
 --=20
 2.15.0.rc0.40.gaefcc5f6f
