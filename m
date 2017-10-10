@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e1v8O-0001ja-5c
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:03:49 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e1v8M-0001jY-0c
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:03:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e1v8J-00048P-0P
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:03:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46202)
+	(envelope-from <kraxel@redhat.com>) id 1e1v8H-00047o-A4
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:03:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35983)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e1v8I-000482-OG
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:03:42 -0400
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e1v8H-00047P-1c
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:03:41 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 10 Oct 2017 16:03:33 +0200
-Message-Id: <20171010140334.8231-6-kraxel@redhat.com>
+Date: Tue, 10 Oct 2017 16:03:29 +0200
+Message-Id: <20171010140334.8231-2-kraxel@redhat.com>
 In-Reply-To: <20171010140334.8231-1-kraxel@redhat.com>
 References: <20171010140334.8231-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [RfC PATCH 5/6] vfio/display: adding region support
+Subject: [Qemu-devel] [RfC PATCH 1/6] headers: update
+ linux-headers/linux/vfio.h (intel-gvt kernel patches, v15)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,144 +27,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alex Williamson <alex.williamson@redhat.com>, Tina Zhang <tina.zhang@intel.com>, intel-gvt-dev@lists.freedesktop.org, Gerd Hoffmann <kraxel@redhat.com>
 
-Wire up region-based display.  UNTESTED.
-
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/vfio/pci.h     |  6 ++++
- hw/vfio/display.c | 96 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 100 insertions(+), 2 deletions(-)
+ linux-headers/linux/vfio.h | 62 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 62 insertions(+)
 
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index 3c1b0a33ab..c03c4b3eb0 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -146,6 +146,12 @@ typedef struct VFIOPCIDevice {
-     bool no_kvm_intx;
-     bool no_kvm_msi;
-     bool no_kvm_msix;
-+    /* vgpu local display */
-+    QemuConsole *display_con;
-+    uint32_t region_index;
-+    uint32_t region_size;
-+    void *region_mmap;
-+    DisplaySurface *region_surface;
- } VFIOPCIDevice;
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index 4e7ab4c52a..ff30feb1eb 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -502,6 +502,68 @@ struct vfio_pci_hot_reset {
  
- uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
-diff --git a/hw/vfio/display.c b/hw/vfio/display.c
-index 064ec95f3e..8211bcc6d4 100644
---- a/hw/vfio/display.c
-+++ b/hw/vfio/display.c
-@@ -18,6 +18,99 @@
- #include "ui/console.h"
- #include "pci.h"
+ #define VFIO_DEVICE_PCI_HOT_RESET	_IO(VFIO_TYPE, VFIO_BASE + 13)
  
-+/* ---------------------------------------------------------------------- */
-+
-+static void vfio_display_region_update(void *opaque)
-+{
-+    VFIOPCIDevice *vdev = opaque;
-+    struct vfio_device_gfx_plane_info plane;
-+    struct vfio_region_info *region = NULL;
-+    pixman_format_code_t format = PIXMAN_x8r8g8b8;
-+    int ret;
-+
-+    memset(&plane, 0, sizeof(plane));
-+    plane.argsz = sizeof(plane);
-+    plane.flags = VFIO_GFX_PLANE_TYPE_REGION;
-+    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_QUERY_GFX_PLANE, &plane);
-+    if (ret < 0) {
-+        fprintf(stderr, "ioctl VFIO_DEVICE_QUERY_GFX_PLANE: %s\n",
-+                strerror(errno));
-+        return;
-+    }
-+    if (!plane.drm_format || !plane.size) {
-+        return;
-+    }
-+    format = qemu_drm_format_to_pixman(plane.drm_format);
-+
-+    if (vdev->region_mmap && vdev->region_index != plane.region_index) {
-+        /* region changed */
-+        munmap(vdev->region_mmap, vdev->region_size);
-+        vdev->region_mmap = NULL;
-+        vdev->region_surface = NULL;
-+    }
-+
-+    if (vdev->region_surface &&
-+        (surface_width(vdev->region_surface) != plane.width ||
-+         surface_height(vdev->region_surface) != plane.height ||
-+         surface_format(vdev->region_surface) != format)) {
-+        /* size changed */
-+        vdev->region_surface = NULL;
-+    }
-+
-+    if (vdev->region_mmap == NULL) {
-+        /* mmap region */
-+        ret = vfio_get_region_info(&vdev->vbasedev, plane.region_index,
-+                                   &region);
-+        if (ret != 0) {
-+            fprintf(stderr, "%s: vfio_get_region_info(%d): %s\n",
-+                    __func__, plane.region_index, strerror(-ret));
-+            return;
-+        }
-+        vdev->region_size = region->size;
-+        vdev->region_mmap = mmap(NULL, region->size,
-+                                 PROT_READ, MAP_SHARED,
-+                                 vdev->vbasedev.fd,
-+                                 region->offset);
-+        if (vdev->region_mmap == MAP_FAILED) {
-+            fprintf(stderr, "%s: mmap region %d: %s\n", __func__,
-+                    plane.region_index, strerror(errno));
-+            vdev->region_mmap = NULL;
-+            g_free(region);
-+            return;
-+        }
-+        g_free(region);
-+    }
-+
-+    if (vdev->region_surface == NULL) {
-+        /* create surface */
-+        vdev->region_surface = qemu_create_displaysurface_from
-+            (plane.width, plane.height, format,
-+             plane.stride, vdev->region_mmap);
-+        dpy_gfx_replace_surface(vdev->display_con, vdev->region_surface);
-+    }
-+
-+    /* full screen update */
-+    dpy_gfx_update(vdev->display_con, 0, 0,
-+                   surface_width(vdev->region_surface),
-+                   surface_height(vdev->region_surface));
-+
-+}
-+
-+static const GraphicHwOps vfio_display_region_ops = {
-+    .gfx_update = vfio_display_region_update,
++/**
++ * VFIO_DEVICE_QUERY_GFX_PLANE - _IOW(VFIO_TYPE, VFIO_BASE + 14,
++ *                                    struct vfio_device_query_gfx_plane)
++ *
++ * Set the drm_plane_type and flags, then retrieve the gfx plane info.
++ *
++ * flags supported:
++ * - VFIO_GFX_PLANE_TYPE_PROBE and VFIO_GFX_PLANE_TYPE_DMABUF are set
++ *   to ask if the mdev supports dma-buf. 0 on support, -EINVAL on no
++ *   support for dma-buf.
++ * - VFIO_GFX_PLANE_TYPE_PROBE and VFIO_GFX_PLANE_TYPE_REGION are set
++ *   to ask if the mdev supports region. 0 on support, -EINVAL on no
++ *   support for region.
++ * - VFIO_GFX_PLANE_TYPE_DMABUF or VFIO_GFX_PLANE_TYPE_REGION is set
++ *   with each call to query the plane info.
++ * - Others are invalid and return -EINVAL.
++ *
++ * Return: 0 on success, -ENODEV with all out fields zero on mdev
++ * device initialization, -errno on other failure.
++ */
++struct vfio_device_gfx_plane_info {
++	__u32 argsz;
++	__u32 flags;
++#define VFIO_GFX_PLANE_TYPE_PROBE (1 << 0)
++#define VFIO_GFX_PLANE_TYPE_DMABUF (1 << 1)
++#define VFIO_GFX_PLANE_TYPE_REGION (1 << 2)
++	/* in */
++	__u32 drm_plane_type;	/* type of plane: DRM_PLANE_TYPE_* */
++	/* out */
++	__u32 drm_format;	/* drm format of plane */
++	__u64 drm_format_mod;   /* tiled mode */
++	__u32 width;	/* width of plane */
++	__u32 height;	/* height of plane */
++	__u32 stride;	/* stride of plane */
++	__u32 size;	/* size of plane in bytes, align on page*/
++	__u32 x_pos;	/* horizontal position of cursor plane */
++	__u32 y_pos;	/* vertical position of cursor plane*/
++	union {
++		__u32 region_index;	/* region index */
++		__s32 dmabuf_id;	/* dma-buf fd */
++	};
 +};
 +
-+static int vfio_display_region_init(VFIOPCIDevice *vdev, Error **errp)
-+{
-+    vdev->display_con = graphic_console_init(DEVICE(vdev), 0,
-+                                             &vfio_display_region_ops,
-+                                             vdev);
-+    /* TODO: disable hotplug (there is no graphic_console_close) */
-+    return 0;
-+}
++#define VFIO_DEVICE_QUERY_GFX_PLANE _IO(VFIO_TYPE, VFIO_BASE + 14)
 +
-+/* ---------------------------------------------------------------------- */
++/**
++ * VFIO_DEVICE_GET_GFX_DMABUF - _IOW(VFIO_TYPE, VFIO_BASE + 15,
++ *				    struct vfio_device_gfx_dmabuf_fd)
++ *
++ * Return: 0 on success, -errno on failure.
++ */
++struct vfio_device_gfx_dmabuf_fd {
++	__u32 argsz;
++	__u32 flags;
++	/* in */
++	__u32 dmabuf_id;
++	/* out */
++	__s32 dmabuf_fd;
++};
 +
- int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp)
- {
-     struct vfio_device_gfx_plane_info probe;
-@@ -37,8 +130,7 @@ int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp)
-     probe.flags = VFIO_GFX_PLANE_TYPE_PROBE | VFIO_GFX_PLANE_TYPE_REGION;
-     ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_QUERY_GFX_PLANE, &probe);
-     if (ret == 0) {
--        error_setg(errp, "vfio-display: region support not implemented yet");
--        return -1;
-+        return vfio_display_region_init(vdev, errp);
-     }
++#define VFIO_DEVICE_GET_GFX_DMABUF _IO(VFIO_TYPE, VFIO_BASE + 15)
++
+ /* -------- API for Type1 VFIO IOMMU -------- */
  
-     error_setg(errp, "vfio: device doesn't support any (known) display method");
+ /**
 -- 
 2.9.3
