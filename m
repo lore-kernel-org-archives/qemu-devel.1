@@ -1,39 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1e1pfN-0003se-6s
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:13:30 -0400
+	(envelope-from <amarnath.valluri@intel.com>) id 1e1phj-0004tv-Ow
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:15:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1e1pfG-0000bg-UQ
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:13:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41050)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1e1pfG-0000aJ-LM
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:13:22 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9A8BvQq013271
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 04:13:18 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dgs4h3r92-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 04:13:17 -0400
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Tue, 10 Oct 2017 04:13:15 -0400
-Date: Tue, 10 Oct 2017 16:13:10 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20171004154144.88995-1-pasic@linux.vnet.ibm.com>
-	<20171004154144.88995-4-pasic@linux.vnet.ibm.com>
+	(envelope-from <amarnath.valluri@intel.com>) id 1e1phe-0002Ze-PU
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:15:55 -0400
+Received: from mga02.intel.com ([134.134.136.20]:15999)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
+	id 1e1phe-0002Yz-F9
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 04:15:50 -0400
+From: "Valluri, Amarnath" <amarnath.valluri@intel.com>
+Date: Tue, 10 Oct 2017 08:15:46 +0000
+Message-ID: <1507623384.4061.29.camel@intel.com>
+References: <20171009225623.29232-1-marcandre.lureau@redhat.com>
+	<20171009225623.29232-32-marcandre.lureau@redhat.com>
+In-Reply-To: <20171009225623.29232-32-marcandre.lureau@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <39AC2A1FC254AE488CAFDB379D0DC206@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171004154144.88995-4-pasic@linux.vnet.ibm.com>
-Message-Id: <20171010081310.GA4754@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/8] s390x: improve error handling for
- SSCH and RSCH
+Subject: Re: [Qemu-devel] [PATCH 31/42] tpm-backend: move set 'id' to common
+ code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,129 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "stefanb@linux.vnet.ibm.com" <stefanb@linux.vnet.ibm.com>
 
-* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-10-04 17:41:39 +0200]:
-
-[...]
-
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 4f47dbc8b0..b2978c3bae 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -1003,12 +1003,11 @@ static void sch_handle_start_func_virtual(SubchDev *sch)
-> 
->  }
-> 
-> -static int sch_handle_start_func_passthrough(SubchDev *sch)
-> +static IOInstEnding sch_handle_start_func_passthrough(SubchDev *sch)
->  {
-> 
->      PMCW *p = &sch->curr_status.pmcw;
->      SCSW *s = &sch->curr_status.scsw;
-> -    int ret;
-> 
->      ORB *orb = &sch->orb;
->      if (!(s->ctrl & SCSW_ACTL_SUSP)) {
-> @@ -1022,31 +1021,11 @@ static int sch_handle_start_func_passthrough(SubchDev *sch)
->       */
->      if (!(orb->ctrl0 & ORB_CTRL0_MASK_PFCH) ||
->          !(orb->ctrl0 & ORB_CTRL0_MASK_C64)) {
-> -        return -EINVAL;
-> +        sch_gen_unit_exception(sch);
-> +        css_inject_io_interrupt(sch);
-Last cycle, we agreed to add some log here. Sth. like:
-warn_report("vfio-ccw requires PFCH and C64 flags set...");
-
-I promised to do a fix for this piece of code. But since this patch
-already fixed it, I guess what I have to do is to add the log only? Or
-you would like to add it by yourself? ;)
-
-> +        return (IOInstEnding){.cc = 0};
->      }
-> -
-> -    ret = s390_ccw_cmd_request(orb, s, sch->driver_data);
-> -    switch (ret) {
-> -    /* Currently we don't update control block and just return the cc code. */
-> -    case 0:
-> -        break;
-> -    case -EBUSY:
-> -        break;
-> -    case -ENODEV:
-> -        break;
-> -    case -EACCES:
-> -        /* Let's reflect an inaccessible host device by cc 3. */
-> -        ret = -ENODEV;
-> -        break;
-> -    default:
-> -       /*
-> -        * All other return codes will trigger a program check,
-> -        * or set cc to 1.
-> -        */
-> -       break;
-> -    };
-> -
-> -    return ret;
-> +    return s390_ccw_cmd_request(sch);
->  }
-> 
->  /*
-[...]
-
-> @@ -1084,16 +1063,15 @@ int do_subchannel_work_passthrough(SubchDev *sch)
->          /* TODO: Halt handling */
->          sch_handle_halt_func(sch);
->      } else if (s->ctrl & SCSW_FCTL_START_FUNC) {
-> -        ret = sch_handle_start_func_passthrough(sch);
-> +        return sch_handle_start_func_passthrough(sch);
->      }
-> -
-> -    return ret;
-> +    return (IOInstEnding){.cc = 0};
->  }
-> 
-> -static int do_subchannel_work(SubchDev *sch)
-> +static IOInstEnding do_subchannel_work(SubchDev *sch)
->  {
->      if (!sch->do_subchannel_work) {
-> -        return -EINVAL;
-> +        return (IOInstEnding){.cc = 1};
-This keeps the logic here as-is, so it is right.
-
-Anybody agrees that also adding an assert() here?
-
-[...]
-
-> diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
-> index 8614dda6f8..5d2c305b71 100644
-> --- a/hw/s390x/s390-ccw.c
-> +++ b/hw/s390x/s390-ccw.c
-> @@ -18,15 +18,14 @@
->  #include "hw/s390x/css-bridge.h"
->  #include "hw/s390x/s390-ccw.h"
-> 
-> -int s390_ccw_cmd_request(ORB *orb, SCSW *scsw, void *data)
-> +IOInstEnding s390_ccw_cmd_request(SubchDev *sch)
->  {
-> -    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(data);
-> +    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(sch->driver_data);
-> 
-> -    if (cdc->handle_request) {
-> -        return cdc->handle_request(orb, scsw, data);
-> -    } else {
-> -        return -ENOSYS;
-> +    if (!cdc->handle_request) {
-> +        return (IOInstEnding){.cc = 1};
-Same consideration as the last comment.
-
->      }
-> +    return cdc->handle_request(sch);
->  }
-> 
->  static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
-
-[...]
-
--- 
-Dong Jia Shi
+T24gVHVlLCAyMDE3LTEwLTEwIGF0IDAwOjU2ICswMjAwLCBNYXJjLUFuZHLDqSBMdXJlYXUgd3Jv
+dGU6DQo+IFNpZ25lZC1vZmYtYnk6IE1hcmMtQW5kcsOpIEx1cmVhdSA8bWFyY2FuZHJlLmx1cmVh
+dUByZWRoYXQuY29tPg0KPiAtLS0NCj4gwqBpbmNsdWRlL3N5c2VtdS90cG1fYmFja2VuZC5oIHzC
+oMKgMiArLQ0KPiDCoGh3L3RwbS90cG1fZW11bGF0b3IuY8KgwqDCoMKgwqDCoMKgwqB8IDEyICsr
+Ky0tLS0tLS0tLQ0KPiDCoGh3L3RwbS90cG1fcGFzc3Rocm91Z2guY8KgwqDCoMKgwqB8wqDCoDkg
+KysrLS0tLS0tDQo+IMKgdHBtLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqB8wqDCoDMgKystDQo+IMKgNCBmaWxlcyBjaGFuZ2VkLCA5IGluc2VydGlvbnMo
+KyksIDE3IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvc3lzZW11L3Rw
+bV9iYWNrZW5kLmgNCj4gYi9pbmNsdWRlL3N5c2VtdS90cG1fYmFja2VuZC5oDQo+IGluZGV4IDU5
+NGJiNTA3ODIuLjg4MWJlOTdlZTMgMTAwNjQ0DQo+IC0tLSBhL2luY2x1ZGUvc3lzZW11L3RwbV9i
+YWNrZW5kLmgNCj4gKysrIGIvaW5jbHVkZS9zeXNlbXUvdHBtX2JhY2tlbmQuaA0KPiBAQCAtNjQs
+NyArNjQsNyBAQCBzdHJ1Y3QgVFBNQmFja2VuZENsYXNzIHsNCj4gwqDCoMKgwqDCoC8qIGdldCBh
+IGRlc2NyaXB0aXZlIHRleHQgb2YgdGhlIGJhY2tlbmQgdG8gZGlzcGxheSB0byB0aGUgdXNlcg0K
+PiAqLw0KPiDCoMKgwqDCoMKgY29uc3QgY2hhciAqZGVzYzsNCj4gwqANCj4gLcKgwqDCoMKgVFBN
+QmFja2VuZCAqKCpjcmVhdGUpKFFlbXVPcHRzICpvcHRzLCBjb25zdCBjaGFyICppZCk7DQo+ICvC
+oMKgwqDCoFRQTUJhY2tlbmQgKigqY3JlYXRlKShRZW11T3B0cyAqb3B0cyk7DQo+IMKgDQo+IMKg
+wqDCoMKgwqAvKiBzdGFydCB1cCB0aGUgVFBNIG9uIHRoZSBiYWNrZW5kIC0gb3B0aW9uYWwgKi8N
+Cj4gwqDCoMKgwqDCoGludCAoKnN0YXJ0dXBfdHBtKShUUE1CYWNrZW5kICp0KTsNCj4gZGlmZiAt
+LWdpdCBhL2h3L3RwbS90cG1fZW11bGF0b3IuYyBiL2h3L3RwbS90cG1fZW11bGF0b3IuYw0KPiBp
+bmRleCAzNjQ1NDgzN2IzLi4zMTU4MTkzMjliIDEwMDY0NA0KPiAtLS0gYS9ody90cG0vdHBtX2Vt
+dWxhdG9yLmMNCj4gKysrIGIvaHcvdHBtL3RwbV9lbXVsYXRvci5jDQo+IEBAIC00NTMsMjIgKzQ1
+MywxNiBAQCBlcnI6DQo+IMKgwqDCoMKgwqByZXR1cm4gLTE7DQo+IMKgfQ0KPiDCoA0KPiAtc3Rh
+dGljIFRQTUJhY2tlbmQgKnRwbV9lbXVsYXRvcl9jcmVhdGUoUWVtdU9wdHMgKm9wdHMsIGNvbnN0
+IGNoYXINCj4gKmlkKQ0KPiArc3RhdGljIFRQTUJhY2tlbmQgKnRwbV9lbXVsYXRvcl9jcmVhdGUo
+UWVtdU9wdHMgKm9wdHMpDQo+IMKgew0KPiDCoMKgwqDCoMKgVFBNQmFja2VuZCAqdGIgPSBUUE1f
+QkFDS0VORChvYmplY3RfbmV3KFRZUEVfVFBNX0VNVUxBVE9SKSk7DQo+IMKgDQo+IC3CoMKgwqDC
+oHRiLT5pZCA9IGdfc3RyZHVwKGlkKTsNCj4gLQ0KPiDCoMKgwqDCoMKgaWYgKHRwbV9lbXVsYXRv
+cl9oYW5kbGVfZGV2aWNlX29wdHMoVFBNX0VNVUxBVE9SKHRiKSwgb3B0cykpIHsNCj4gLcKgwqDC
+oMKgwqDCoMKgwqBnb3RvIGVycl9leGl0Ow0KPiArwqDCoMKgwqDCoMKgwqDCoG9iamVjdF91bnJl
+ZihPQkpFQ1QodGIpKTsNCj4gK8KgwqDCoMKgwqDCoMKgwqByZXR1cm4gTlVMTDsNCj4gwqDCoMKg
+wqDCoH0NCj4gwqANCj4gwqDCoMKgwqDCoHJldHVybiB0YjsNCj4gLQ0KPiAtZXJyX2V4aXQ6DQo+
+IC3CoMKgwqDCoG9iamVjdF91bnJlZihPQkpFQ1QodGIpKTsNCj4gLQ0KPiAtwqDCoMKgwqByZXR1
+cm4gTlVMTDsNCj4gwqB9DQo+IMKgDQo+IMKgc3RhdGljIFRwbVR5cGVPcHRpb25zICp0cG1fZW11
+bGF0b3JfZ2V0X3RwbV9vcHRpb25zKFRQTUJhY2tlbmQgKnRiKQ0KPiBkaWZmIC0tZ2l0IGEvaHcv
+dHBtL3RwbV9wYXNzdGhyb3VnaC5jIGIvaHcvdHBtL3RwbV9wYXNzdGhyb3VnaC5jDQo+IGluZGV4
+IDkzMjZjYmZkYzkuLjczNzFkNTA3MzkgMTAwNjQ0DQo+IC0tLSBhL2h3L3RwbS90cG1fcGFzc3Ro
+cm91Z2guYw0KPiArKysgYi9ody90cG0vdHBtX3Bhc3N0aHJvdWdoLmMNCj4gQEAgLTI4NCwxMyAr
+Mjg0LDEwIEBADQo+IHRwbV9wYXNzdGhyb3VnaF9oYW5kbGVfZGV2aWNlX29wdHMoVFBNUGFzc3Ro
+cnVTdGF0ZSAqdHBtX3B0LCBRZW11T3B0cw0KPiAqb3B0cykNCj4gwqDCoMKgwqDCoHJldHVybiAx
+Ow0KPiDCoH0NCj4gwqANCj4gLXN0YXRpYyBUUE1CYWNrZW5kICp0cG1fcGFzc3Rocm91Z2hfY3Jl
+YXRlKFFlbXVPcHRzICpvcHRzLCBjb25zdCBjaGFyDQo+ICppZCkNCj4gK3N0YXRpYyBUUE1CYWNr
+ZW5kICp0cG1fcGFzc3Rocm91Z2hfY3JlYXRlKFFlbXVPcHRzICpvcHRzKQ0KPiDCoHsNCj4gwqDC
+oMKgwqDCoE9iamVjdCAqb2JqID0gb2JqZWN0X25ldyhUWVBFX1RQTV9QQVNTVEhST1VHSCk7DQo+
+IC3CoMKgwqDCoFRQTUJhY2tlbmQgKnRiID0gVFBNX0JBQ0tFTkQob2JqKTsNCj4gLcKgwqDCoMKg
+VFBNUGFzc3RocnVTdGF0ZSAqdHBtX3B0ID0gVFBNX1BBU1NUSFJPVUdIKHRiKTsNCj4gLQ0KPiAt
+wqDCoMKgwqB0Yi0+aWQgPSBnX3N0cmR1cChpZCk7DQo+ICvCoMKgwqDCoFRQTVBhc3N0aHJ1U3Rh
+dGUgKnRwbV9wdCA9IFRQTV9QQVNTVEhST1VHSChvYmopOw0KPiDCoA0KPiDCoMKgwqDCoMKgaWYg
+KHRwbV9wYXNzdGhyb3VnaF9oYW5kbGVfZGV2aWNlX29wdHModHBtX3B0LCBvcHRzKSkgew0KPiDC
+oMKgwqDCoMKgwqDCoMKgwqBnb3RvIGVycl9leGl0Ow0KPiBAQCAtMzAxLDcgKzI5OCw3IEBAIHN0
+YXRpYyBUUE1CYWNrZW5kDQo+ICp0cG1fcGFzc3Rocm91Z2hfY3JlYXRlKFFlbXVPcHRzICpvcHRz
+LCBjb25zdCBjaGFyICppZCkNCj4gwqDCoMKgwqDCoMKgwqDCoMKgZ290byBlcnJfZXhpdDsNCj4g
+wqDCoMKgwqDCoH0NCj4gwqANCj4gLcKgwqDCoMKgcmV0dXJuIHRiOw0KPiArwqDCoMKgwqByZXR1
+cm4gVFBNX0JBQ0tFTkQob2JqKTsNCj4gwqANCj4gwqBlcnJfZXhpdDoNCj4gwqDCoMKgwqDCoG9i
+amVjdF91bnJlZihvYmopOw0KPiBkaWZmIC0tZ2l0IGEvdHBtLmMgYi90cG0uYw0KPiBpbmRleCBh
+NDZlZTVmMTQ0Li4zNzI5OGYzZjAzIDEwMDY0NA0KPiAtLS0gYS90cG0uYw0KPiArKysgYi90cG0u
+Yw0KPiBAQCAtMTI5LDExICsxMjksMTIgQEAgc3RhdGljIGludCB0cG1faW5pdF90cG1kZXYodm9p
+ZCAqZHVtbXksDQo+IFFlbXVPcHRzICpvcHRzLCBFcnJvciAqKmVycnApDQo+IMKgwqDCoMKgwqDC
+oMKgwqDCoHJldHVybiAxOw0KPiDCoMKgwqDCoMKgfQ0KPiDCoA0KPiAtwqDCoMKgwqBkcnYgPSBi
+ZS0+Y3JlYXRlKG9wdHMsIGlkKTsNCj4gK8KgwqDCoMKgZHJ2ID0gYmUtPmNyZWF0ZShvcHRzKTsN
+Cj4gwqDCoMKgwqDCoGlmICghZHJ2KSB7DQo+IMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybiAxOw0K
+PiDCoMKgwqDCoMKgfQ0KPiDCoA0KPiArwqDCoMKgwqBkcnYtPmlkID0gZ19zdHJkdXAoaWQpOw0K
+SSBraW5kIG9mIG9wcG9zZSB0aGlzIGNoYW5nZSwgaW5zdGVhZCB3aGF0IGFib3V0IGFkZGluZyBu
+ZXcgVFBNQmFja2VuZA0KYXBpIHNheSAtIFRQTUJhY2tlbmQqIHRwbV9iYWNrZW5kX2NyZWF0ZShj
+b25zdCBjaGFyICp0eXBlLCBjb25zdA0KUWVtdU9wdHMgKm9wdHMpLCB0aGF0IHNob3VsZCBoYW5k
+bGUgdGhpcyBjb21tb24gY29kZSwgYW5kIHJldHVybnMgdGhlDQpuZXdseSBpbnN0YW50aWF0ZWQg
+YmFja2VuZCBvYmplY3QuDQoNCi0gQW1hcm5hdGg=
