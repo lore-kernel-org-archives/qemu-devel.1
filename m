@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e22Bc-0001ls-EX
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:35:37 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e22Bg-0001m9-NN
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:35:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e22BY-00015C-20
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:35:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36770)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e22Bf-0001HM-QM
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:35:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47216)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1e22BX-00014o-P5
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:35:31 -0400
+	id 1e22Bf-0001Fo-Jk
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:35:39 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 10 Oct 2017 23:34:39 +0200
-Message-Id: <20171010213506.22989-1-marcandre.lureau@redhat.com>
+Date: Tue, 10 Oct 2017 23:34:40 +0200
+Message-Id: <20171010213506.22989-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20171010213506.22989-1-marcandre.lureau@redhat.com>
+References: <20171010213506.22989-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 00/27] vhost-user patches
+Subject: [Qemu-devel] [PULL v2 01/27] glib-compat: move
+ G_SOURCE_CONTINUE/REMOVE there
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +31,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, changpeng.liu@intel.com, f4bug@amsat.org, felipe@nutanix.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The following changes since commit 567d0a19c7998fa366598b83d5a6e5f0759d3e=
-a9:
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Acked-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+---
+ include/glib-compat.h                     | 7 +++++++
+ contrib/vhost-user-scsi/vhost-user-scsi.c | 8 --------
+ 2 files changed, 7 insertions(+), 8 deletions(-)
 
-  Merge remote-tracking branch 'remotes/ehabkost/tags/x86-and-machine-pul=
-l-request' into staging (2017-10-10 13:25:46 +0100)
-
-are available in the Git repository at:
-
-  https://github.com/elmarco/qemu.git tags/vus-pull-request
-
-for you to fetch changes up to 53a2e1b523e9015423583e431f4229a0ad35e6cd:
-
-  vhost-user-scsi: remove server_sock from VusDev (2017-10-10 23:31:09 +0=
-200)
-
-----------------------------------------------------------------
-
-----------------------------------------------------------------
-
-Marc-Andr=C3=A9 Lureau (27):
-  glib-compat: move G_SOURCE_CONTINUE/REMOVE there
-  build-sys: fix libvhost-user.a build
-  build-sys: make vhost-user-scsi depend on libvhost-user.a
-  libvhost-user: drop dependency on glib
-  libvhost-user: improve vu_queue_pop() doc
-  vhost-user-scsi: use g_strdup()
-  vhost-user-scsi: connect unix socket before allocating
-  vhost-user-scsi: code style fixes
-  vhost-user-scsi: use glib allocation
-  vhost-user-scsi: glib calls that allocate don't return NULL
-  vhost-user-scsi: also free the gtree
-  vhost-user-scsi: remove vdev_scsi_find_by_vu()
-  vhost-user-scsi: simplify unix path cleanup
-  vhost-user-scsi: use NULL pointer
-  vhost-user-scsi: assert() in iscsi_add_lun()
-  vhost-user-scsi: remove vdev_scsi_add_iscsi_lun()
-  vhost-user-scsi: remove VUS_MAX_LUNS
-  vhost-user-scsi: remove unimplemented functions
-  vhost-user-scsi: rename VUS types
-  vhost-user-scsi: avoid use of iscsi_ namespace
-  vhost-user-scsi: don't copy iscsi/scsi-lowlevel.h
-  vhost-user-scsi: drop extra callback pointer
-  vhost-user-scsi: simplify source handling
-  vhost-user-scsi: use glib logging
-  libvhost-user: add glib source helper
-  vhost-user-scsi: use libvhost-user glib helper
-  vhost-user-scsi: remove server_sock from VusDev
-
- contrib/libvhost-user/libvhost-user-glib.h |  32 ++
- contrib/libvhost-user/libvhost-user.h      |   3 +-
- include/glib-compat.h                      |   7 +
- contrib/libvhost-user/libvhost-user-glib.c | 154 +++++++
- contrib/libvhost-user/libvhost-user.c      |  29 +-
- contrib/vhost-user-scsi/vhost-user-scsi.c  | 629 +++++------------------=
-------
- Makefile                                   |   3 +-
- Makefile.objs                              |   1 -
- contrib/libvhost-user/Makefile.objs        |   2 +-
- tests/Makefile.include                     |   2 +-
- 10 files changed, 315 insertions(+), 547 deletions(-)
- create mode 100644 contrib/libvhost-user/libvhost-user-glib.h
- create mode 100644 contrib/libvhost-user/libvhost-user-glib.c
-
+diff --git a/include/glib-compat.h b/include/glib-compat.h
+index e15aca2d40..c49cf87196 100644
+--- a/include/glib-compat.h
++++ b/include/glib-compat.h
+@@ -356,5 +356,12 @@ g_test_add_data_func_full(const char *path,
+ }
+ #endif
+=20
++/* Small compat shim from glib 2.32 */
++#ifndef G_SOURCE_CONTINUE
++#define G_SOURCE_CONTINUE TRUE
++#endif
++#ifndef G_SOURCE_REMOVE
++#define G_SOURCE_REMOVE FALSE
++#endif
+=20
+ #endif
+diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-us=
+er-scsi/vhost-user-scsi.c
+index b5ae02c96f..78bcc65f5a 100644
+--- a/contrib/vhost-user-scsi/vhost-user-scsi.c
++++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
+@@ -17,14 +17,6 @@
+=20
+ #include <glib.h>
+=20
+-/* Small compat shim from glib 2.32 */
+-#ifndef G_SOURCE_CONTINUE
+-#define G_SOURCE_CONTINUE TRUE
+-#endif
+-#ifndef G_SOURCE_REMOVE
+-#define G_SOURCE_REMOVE FALSE
+-#endif
+-
+ /* #define VUS_DEBUG 1 */
+=20
+ /** Log helpers **/
 --=20
 2.15.0.rc0.40.gaefcc5f6f
