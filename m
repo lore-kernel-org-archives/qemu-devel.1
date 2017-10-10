@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e1vCP-00050c-MM
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:08:03 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e1vHM-0007Wp-Fi
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:13:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e1vCG-0006Rg-BH
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:07:57 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:49737)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e1vCG-0006RB-3A
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:07:48 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id b189so5492834wmd.4
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 07:07:48 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1e1vHH-0001Ot-9f
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:13:04 -0400
+Date: Tue, 10 Oct 2017 16:12:44 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171010161244.056fef78@nial.brq.redhat.com>
+In-Reply-To: <20171010133241.11330-1-lvivier@redhat.com>
+References: <20171010133241.11330-1-lvivier@redhat.com>
 MIME-Version: 1.0
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Oct 2017 15:07:26 +0100
-Message-ID: <CAFEAcA-zUTfLOBkOeLc4e1Ok0dnKD=hWsdeR47125MhMnwV7UA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] proposed schedule for 2.11 release
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pc: remove useless hot_add_cpu
+ initialisation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,28 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-trivial@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael
+	S . Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org, Anthony Perard <anthony.perard@citrix.com>
 
-OK, here's a strawman proposal for the 2.11 release cycle,
-based on aiming for a 5 Dec release date and working backwards
-with the same cadence as 2.10.
+On Tue, 10 Oct 2017 15:32:41 +0200
+Laurent Vivier <lvivier@redhat.com> wrote:
 
-2017-10-31 Soft freeze -- all feature changes must already be in a
-           pull request that's been sent to the mailing list
-2017-11-07 Hard freeze, tag rc0
-2017-11-14 Tag rc1
-2017-11-21 Tag rc2
-2017-11-28 Tag rc3
-2017-12-05 Release (or rc4 if we need it)
-2017-12-12 Release if we needed an rc4
+> Since 4458fb3a79 (pc: Eliminate pc_default_machine_options()),
+> hot_add_cpu is set in pc_machine_class_init(), so we don't
+> need to set it in pc_q35_machine_options(), pc_i440fx_machine_options()
+> and xenfv_machine_options(), except to clear it in
+> pc_i440fx_1_4_machine_opt().
+> 
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-
-That makes softfreeze in 3 weeks time. I'd rather not push
-the times back any further because we end up in serious
-risk of running into the christmas holiday period.
-
-(I'm still unconvinced by the 1-week softfreeze schedule.)
-
-thanks
--- PMM
+> ---
+>  hw/i386/pc_piix.c | 2 --
+>  hw/i386/pc_q35.c  | 1 -
+>  2 files changed, 3 deletions(-)
+> 
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 9ff79b1fd9..caf166aede 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -428,7 +428,6 @@ static void pc_i440fx_machine_options(MachineClass *m)
+>  {
+>      m->family = "pc_piix";
+>      m->desc = "Standard PC (i440FX + PIIX, 1996)";
+> -    m->hot_add_cpu = pc_hot_add_cpu;
+>      m->default_machine_opts = "firmware=bios-256k.bin";
+>      m->default_display = "std";
+>  }
+> @@ -1123,7 +1122,6 @@ static void xenfv_machine_options(MachineClass *m)
+>      m->desc = "Xen Fully-virtualized PC";
+>      m->max_cpus = HVM_MAX_VCPUS;
+>      m->default_machine_opts = "accel=xen";
+> -    m->hot_add_cpu = pc_hot_add_cpu;
+>  }
+>  
+>  DEFINE_PC_MACHINE(xenfv, "xenfv", pc_xen_hvm_init,
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 6c4ec4be4e..da3ea602e1 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -295,7 +295,6 @@ static void pc_q35_machine_options(MachineClass *m)
+>  {
+>      m->family = "pc_q35";
+>      m->desc = "Standard PC (Q35 + ICH9, 2009)";
+> -    m->hot_add_cpu = pc_hot_add_cpu;
+>      m->units_per_default_bus = 1;
+>      m->default_machine_opts = "firmware=bios-256k.bin";
+>      m->default_display = "std";
