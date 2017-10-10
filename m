@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4K-0007bc-2o
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4F-0007XT-Ef
 	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:11:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4I-0007Ij-Vo
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:11:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42212)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4E-0007GJ-II
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:11:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41570)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1e1y4I-0007IE-NT
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:11:46 -0400
+	id 1e1y4E-0007Fp-Bu
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:11:42 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 10 Oct 2017 19:11:03 +0200
-Message-Id: <20171010171122.9756-9-marcandre.lureau@redhat.com>
+Date: Tue, 10 Oct 2017 19:11:01 +0200
+Message-Id: <20171010171122.9756-7-marcandre.lureau@redhat.com>
 In-Reply-To: <20171010171122.9756-1-marcandre.lureau@redhat.com>
 References: <20171010171122.9756-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 08/27] vhost-user-scsi: code style fixes
+Subject: [Qemu-devel] [PULL 06/27] vhost-user-scsi: use g_strdup()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,89 +30,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, f4bug@amsat.org, changpeng.liu@intel.com, felipe@nutanix.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
+Since vhost-user-scsi uses glib.
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- contrib/vhost-user-scsi/vhost-user-scsi.c | 20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
+ contrib/vhost-user-scsi/vhost-user-scsi.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
 diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-us=
 er-scsi/vhost-user-scsi.c
-index e01bf31296..fe567452cd 100644
+index 78bcc65f5a..1fb57da2da 100644
 --- a/contrib/vhost-user-scsi/vhost-user-scsi.c
 +++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
-@@ -305,7 +305,8 @@ fail:
- }
-=20
- static struct scsi_task *scsi_task_new(int cdb_len, uint8_t *cdb, int di=
-r,
--                                       int xfer_len) {
-+                                       int xfer_len)
-+{
-     struct scsi_task *task;
-=20
-     assert(cdb_len > 0);
-@@ -344,7 +345,8 @@ static int handle_cmd_sync(struct iscsi_context *ctx,
-                            VirtIOSCSICmdReq *req,
-                            struct iovec *out, unsigned int out_len,
-                            VirtIOSCSICmdResp *rsp,
--                           struct iovec *in, unsigned int in_len) {
-+                           struct iovec *in, unsigned int in_len)
-+{
-     struct scsi_task *task;
-     uint32_t dir;
-     uint32_t len;
-@@ -454,7 +456,8 @@ static void vus_panic_cb(VuDev *vu_dev, const char *b=
-uf)
- }
-=20
- static void vus_add_watch_cb(VuDev *vu_dev, int fd, int vu_evt, vu_watch=
-_cb cb,
--                             void *pvt) {
-+                             void *pvt)
-+{
-     vhost_scsi_dev_t *vdev_scsi;
-     guint id;
-=20
-@@ -529,7 +532,7 @@ static void vus_proc_req(VuDev *vu_dev, int idx)
-         return;
+@@ -822,10 +822,10 @@ int main(int argc, char **argv)
+         case 'h':
+             goto help;
+         case 'u':
+-            unix_fn =3D strdup(optarg);
++            unix_fn =3D g_strdup(optarg);
+             break;
+         case 'i':
+-            iscsi_uri =3D strdup(optarg);
++            iscsi_uri =3D g_strdup(optarg);
+             break;
+         default:
+             goto help;
+@@ -854,12 +854,8 @@ out:
+         vdev_scsi_deinit(vdev_scsi);
+         free(vdev_scsi);
      }
+-    if (unix_fn) {
+-        free(unix_fn);
+-    }
+-    if (iscsi_uri) {
+-        free(iscsi_uri);
+-    }
++    g_free(unix_fn);
++    g_free(iscsi_uri);
 =20
--    if ((idx < 0) || (idx >=3D VHOST_MAX_NR_VIRTQUEUE)) {
-+    if (idx < 0 || idx >=3D VHOST_MAX_NR_VIRTQUEUE) {
-         PERR("VQ Index out of range: %d", idx);
-         vus_panic_cb(vu_dev, NULL);
-         return;
-@@ -556,8 +559,8 @@ static void vus_proc_req(VuDev *vu_dev, int idx)
-         }
-         PDBG("Popped elem@%p", elem);
+     return err;
 =20
--        assert(!((elem->out_num > 1) && (elem->in_num > 1)));
--        assert((elem->out_num > 0) && (elem->in_num > 0));
-+        assert(!(elem->out_num > 1 && elem->in_num > 1));
-+        assert(elem->out_num > 0 && elem->in_num > 0);
-=20
-         if (elem->out_sg[0].iov_len < sizeof(VirtIOSCSICmdReq)) {
-             PERR("Invalid virtio-scsi req header");
-@@ -593,7 +596,7 @@ static void vus_queue_set_started(VuDev *vu_dev, int =
-idx, bool started)
-=20
-     assert(vu_dev);
-=20
--    if ((idx < 0) || (idx >=3D VHOST_MAX_NR_VIRTQUEUE)) {
-+    if (idx < 0 || idx >=3D VHOST_MAX_NR_VIRTQUEUE) {
-         PERR("VQ Index out of range: %d", idx);
-         vus_panic_cb(vu_dev, NULL);
-         return;
-@@ -748,7 +751,8 @@ err:
- }
-=20
- static int vdev_scsi_add_iscsi_lun(vhost_scsi_dev_t *vdev_scsi,
--                                   char *iscsi_uri, uint32_t lun) {
-+                                   char *iscsi_uri, uint32_t lun)
-+{
-     assert(vdev_scsi);
-     assert(iscsi_uri);
-     assert(lun < VUS_MAX_LUNS);
 --=20
 2.15.0.rc0.40.gaefcc5f6f
