@@ -1,40 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e1wc8-0007Ym-Uv
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:38:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1e1wcF-0007b1-4d
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:38:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e1wc5-0000Yo-Qf
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:38:36 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54992
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e1wc5-0000YZ-Kx
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:38:33 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9AFY40a115648
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 11:38:29 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dgy08q7p2-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 11:38:28 -0400
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Tue, 10 Oct 2017 11:38:28 -0400
-References: <20171009225623.29232-1-marcandre.lureau@redhat.com>
-	<20171009225623.29232-15-marcandre.lureau@redhat.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Tue, 10 Oct 2017 11:38:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1e1wcE-0000b4-1e
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:38:43 -0400
+References: <20171004020048.26379-1-eblake@redhat.com>
+	<20171004020048.26379-8-eblake@redhat.com>
+	<20171010144644.GL4177@dhcp-200-186.str.redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5a011341-2da7-b028-3fb4-aa2cc1065412@redhat.com>
+Date: Tue, 10 Oct 2017 10:38:23 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171009225623.29232-15-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <dc288f2f-9c13-bd39-6cd2-781014a6f699@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 14/42] tpm: add TPMBackendCmd to hold the
- request state
+In-Reply-To: <20171010144644.GL4177@dhcp-200-186.str.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="UlI9k87WnWRRsPOT4hhPOnwGBbuIQWH4A"
+Subject: Re: [Qemu-devel] [PATCH v5 07/23] block: Convert
+ bdrv_get_block_status() to bytes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,255 +26,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: amarnath.valluri@intel.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 10/09/2017 06:55 PM, Marc-Andr=C3=A9 Lureau wrote:
-> This simplifies a bit locality handling, and argument passing, and
-> could pave the way to queuing requests (if that makes sense).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UlI9k87WnWRRsPOT4hhPOnwGBbuIQWH4A
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, famz@redhat.com,
+ qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <5a011341-2da7-b028-3fb4-aa2cc1065412@redhat.com>
+Subject: Re: [PATCH v5 07/23] block: Convert bdrv_get_block_status() to bytes
+References: <20171004020048.26379-1-eblake@redhat.com>
+ <20171004020048.26379-8-eblake@redhat.com>
+ <20171010144644.GL4177@dhcp-200-186.str.redhat.com>
+In-Reply-To: <20171010144644.GL4177@dhcp-200-186.str.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-We won't queue requests. The TPM interfaces all send one request and=20
-expect the driver to wait until the response comes back.
+On 10/10/2017 09:46 AM, Kevin Wolf wrote:
+> Am 04.10.2017 um 04:00 hat Eric Blake geschrieben:
+>> We are gradually moving away from sector-based interfaces, towards
+>> byte-based.  In the common case, allocation is unlikely to ever use
+>> values that are not naturally sector-aligned, but it is possible
+>> that byte-based values will let us be more precise about allocation
+>> at the end of an unaligned file that can do byte-based access.
+>>
+>> Changing the name of the function from bdrv_get_block_status() to
+>> bdrv_block_status() ensures that the compiler enforces that all
+>> callers are updated.  For now, the io.c layer still assert()s that
+>> all callers are sector-aligned, but that can be relaxed when a later
+>> patch implements byte-based block status in the drivers.
+>>
+>> Note that we have an inherent limitation in the BDRV_BLOCK_* return
+>> values: BDRV_BLOCK_OFFSET_VALID can only return the start of a
+>> sector, even if we later relax the interface to query for the status
+>> starting at an intermediate byte; document the obvious interpretation
+>> that valid offsets are always sector-relative.
+>>
+>> Therefore, for the most part this patch is just the addition of scalin=
+g
+>> at the callers followed by inverse scaling at bdrv_block_status().  Bu=
+t
+>> some code, particularly bdrv_is_allocated(), gets a lot simpler becaus=
+e
+>> it no longer has to mess with sectors.
+>>
+>> For ease of review, bdrv_get_block_status_above() will be tackled
+>> separately.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>
 
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> +++ b/include/block/block.h
+>=20
+> A bit above the first hunk:
+>=20
+>  * Allocation status flags for bdrv_get_block_status() and friends.
+>=20
+> This should be bdrv_block_status() now.
 
-Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Good catch. It wasn't there on v1, but I forgot to re-grep when rebasing.=
 
-> ---
->   hw/tpm/tpm_int.h             |  1 +
->   include/sysemu/tpm_backend.h | 16 +++++++++++++---
->   backends/tpm.c               |  6 +++---
->   hw/tpm/tpm_emulator.c        | 29 +++++++++++++++--------------
->   hw/tpm/tpm_passthrough.c     | 24 +++++-------------------
->   hw/tpm/tpm_tis.c             | 18 +++++++++++++-----
->   6 files changed, 50 insertions(+), 44 deletions(-)
->
-> diff --git a/hw/tpm/tpm_int.h b/hw/tpm/tpm_int.h
-> index f2f285b3cc..6d7b3dc850 100644
-> --- a/hw/tpm/tpm_int.h
-> +++ b/hw/tpm/tpm_int.h
-> @@ -26,6 +26,7 @@ struct TPMState {
->  =20
->       uint8_t     locty_number;
->       TPMLocality *locty_data;
-> +    TPMBackendCmd cmd;
->  =20
->       char *backend;
->       TPMBackend *be_driver;
-> diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.=
-h
-> index 9c83a512e1..3bb90be3de 100644
-> --- a/include/sysemu/tpm_backend.h
-> +++ b/include/sysemu/tpm_backend.h
-> @@ -30,7 +30,16 @@
->   typedef struct TPMBackendClass TPMBackendClass;
->   typedef struct TPMBackend TPMBackend;
->  =20
-> -typedef void (TPMRecvDataCB)(TPMState *, bool selftest_done);
-> +typedef void (TPMRecvDataCB)(TPMState *);
-> +
-> +typedef struct TPMBackendCmd {
-> +    uint8_t locty;
-> +    const uint8_t *in;
-> +    uint32_t in_len;
-> +    uint8_t *out;
-> +    uint32_t out_len;
-> +    bool selftest_done;
-> +} TPMBackendCmd;
->  =20
->   struct TPMBackend {
->       Object parent;
-> @@ -76,7 +85,7 @@ struct TPMBackendClass {
->  =20
->       void (*opened)(TPMBackend *s, Error **errp);
->  =20
-> -    void (*handle_request)(TPMBackend *s);
-> +    void (*handle_request)(TPMBackend *s, TPMBackendCmd *cmd);
->   };
->  =20
->   /**
-> @@ -121,11 +130,12 @@ bool tpm_backend_had_startup_error(TPMBackend *s)=
-;
->   /**
->    * tpm_backend_deliver_request:
->    * @s: the backend to send the request to
-> + * @cmd: the command to deliver
->    *
->    * Send a request to the backend. The backend will then send the requ=
-est
->    * to the TPM implementation.
->    */
-> -void tpm_backend_deliver_request(TPMBackend *s);
-> +void tpm_backend_deliver_request(TPMBackend *s, TPMBackendCmd *cmd);
->  =20
->   /**
->    * tpm_backend_reset:
-> diff --git a/backends/tpm.c b/backends/tpm.c
-> index 34e82085ec..dc7c831ff8 100644
-> --- a/backends/tpm.c
-> +++ b/backends/tpm.c
-> @@ -25,7 +25,7 @@ static void tpm_backend_worker_thread(gpointer data, =
-gpointer user_data)
->       TPMBackendClass *k  =3D TPM_BACKEND_GET_CLASS(s);
->  =20
->       assert(k->handle_request !=3D NULL);
-> -    k->handle_request(s);
-> +    k->handle_request(s, (TPMBackendCmd *)data);
->   }
->  =20
->   static void tpm_backend_thread_end(TPMBackend *s)
-> @@ -76,9 +76,9 @@ bool tpm_backend_had_startup_error(TPMBackend *s)
->       return s->had_startup_error;
->   }
->  =20
-> -void tpm_backend_deliver_request(TPMBackend *s)
-> +void tpm_backend_deliver_request(TPMBackend *s, TPMBackendCmd *cmd)
->   {
-> -    g_thread_pool_push(s->thread_pool, NULL, NULL);
-> +    g_thread_pool_push(s->thread_pool, cmd, NULL);
->   }
->  =20
->   void tpm_backend_reset(TPMBackend *s)
-> diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
-> index 4fe405353a..788ab9876d 100644
-> --- a/hw/tpm/tpm_emulator.c
-> +++ b/hw/tpm/tpm_emulator.c
-> @@ -172,28 +172,29 @@ static int tpm_emulator_set_locality(TPMEmulator =
-*tpm_emu, uint8_t locty_number)
->       return 0;
->   }
->  =20
-> -static void tpm_emulator_handle_request(TPMBackend *tb)
-> +static void tpm_emulator_handle_request(TPMBackend *tb, TPMBackendCmd =
-*cmd)
->   {
->       TPMEmulator *tpm_emu =3D TPM_EMULATOR(tb);
-> -    TPMLocality *locty =3D NULL;
-> -    bool selftest_done =3D false;
->       Error *err =3D NULL;
->  =20
->       DPRINTF("processing TPM command");
->  =20
-> -    locty =3D tb->tpm_state->locty_data;
-> -    if (tpm_emulator_set_locality(tpm_emu,
-> -                                  tb->tpm_state->locty_number) < 0 ||
-> -        tpm_emulator_unix_tx_bufs(tpm_emu, locty->w_buffer.buffer,
-> -                                  locty->w_offset, locty->r_buffer.buf=
-fer,
-> -                                  locty->r_buffer.size, &selftest_done=
-,
-> -                                  &err) < 0) {
-> -        tpm_util_write_fatal_error_response(locty->r_buffer.buffer,
-> -                                            locty->r_buffer.size);
-> -        error_report_err(err);
-> +    if (tpm_emulator_set_locality(tpm_emu, tb->tpm_state->locty_number=
-) < 0) {
-> +        goto error;
-> +    }
-> +
-> +    if (tpm_emulator_unix_tx_bufs(tpm_emu, cmd->in, cmd->in_len,
-> +                                  cmd->out, cmd->out_len,
-> +                                  &cmd->selftest_done, &err) < 0) {
-> +        goto error;
->       }
->  =20
-> -    tb->recv_data_callback(tb->tpm_state, selftest_done);
-> +    tb->recv_data_callback(tb->tpm_state);
-> +    return;
-> +
-> +error:
-> +    tpm_util_write_fatal_error_response(cmd->out, cmd->out_len);
-> +    error_report_err(err);
->   }
->  =20
->   static int tpm_emulator_probe_caps(TPMEmulator *tpm_emu)
-> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-> index 0ae4596932..93d72b8e9e 100644
-> --- a/hw/tpm/tpm_passthrough.c
-> +++ b/hw/tpm/tpm_passthrough.c
-> @@ -137,30 +137,16 @@ err_exit:
->       return ret;
->   }
->  =20
-> -static int tpm_passthrough_unix_transfer(TPMPassthruState *tpm_pt,
-> -                                         const TPMLocality *locty_data=
-,
-> -                                         bool *selftest_done)
-> -{
-> -    return tpm_passthrough_unix_tx_bufs(tpm_pt,
-> -                                        locty_data->w_buffer.buffer,
-> -                                        locty_data->w_offset,
-> -                                        locty_data->r_buffer.buffer,
-> -                                        locty_data->r_buffer.size,
-> -                                        selftest_done);
-> -}
-> -
-> -static void tpm_passthrough_handle_request(TPMBackend *tb)
-> +static void tpm_passthrough_handle_request(TPMBackend *tb, TPMBackendC=
-md *cmd)
->   {
->       TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
-> -    bool selftest_done =3D false;
->  =20
-> -    DPRINTF("tpm_passthrough: processing command\n");
-> +    DPRINTF("tpm_passthrough: processing command %p\n", cmd);
->  =20
-> -    tpm_passthrough_unix_transfer(tpm_pt,
-> -                                  tb->tpm_state->locty_data,
-> -                                  &selftest_done);
-> +    tpm_passthrough_unix_tx_bufs(tpm_pt, cmd->in, cmd->in_len,
-> +                                 cmd->out, cmd->out_len, &cmd->selftes=
-t_done);
->  =20
-> -    tb->recv_data_callback(tb->tpm_state, selftest_done);
-> +    tb->recv_data_callback(tb->tpm_state);
->   }
->  =20
->   static void tpm_passthrough_reset(TPMBackend *tb)
-> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-> index 345a4fbee5..ffed7bfaf9 100644
-> --- a/hw/tpm/tpm_tis.c
-> +++ b/hw/tpm/tpm_tis.c
-> @@ -215,7 +215,15 @@ static void tpm_tis_tpm_send(TPMState *s, uint8_t =
-locty)
->        */
->       tis->loc[locty].state =3D TPM_TIS_STATE_EXECUTION;
->  =20
-> -    tpm_backend_deliver_request(s->be_driver);
-> +    s->cmd =3D (TPMBackendCmd) {
-> +        .locty =3D locty,
-> +        .in =3D s->locty_data->w_buffer.buffer,
-> +        .in_len =3D s->locty_data->w_offset,
-> +        .out =3D s->locty_data->r_buffer.buffer,
-> +        .out_len =3D s->locty_data->r_buffer.size
-> +    };
-> +
-> +    tpm_backend_deliver_request(s->be_driver, &s->cmd);
->   }
->  =20
->   /* raise an interrupt if allowed */
-> @@ -352,7 +360,7 @@ static void tpm_tis_receive_bh(void *opaque)
->   {
->       TPMState *s =3D opaque;
->       TPMTISEmuState *tis =3D &s->s.tis;
-> -    uint8_t locty =3D s->locty_number;
-> +    uint8_t locty =3D s->cmd.locty;
->  =20
->       tpm_tis_sts_set(&tis->loc[locty],
->                       TPM_TIS_STS_VALID | TPM_TIS_STS_DATA_AVAILABLE);
-> @@ -371,11 +379,11 @@ static void tpm_tis_receive_bh(void *opaque)
->   /*
->    * Callback from the TPM to indicate that the response was received.
->    */
-> -static void tpm_tis_receive_cb(TPMState *s,
-> -                               bool is_selftest_done)
-> +static void tpm_tis_receive_cb(TPMState *s)
->   {
->       TPMTISEmuState *tis =3D &s->s.tis;
-> -    uint8_t locty =3D s->locty_number;
-> +    bool is_selftest_done =3D s->cmd.selftest_done;
-> +    uint8_t locty =3D s->cmd.locty;
->       uint8_t l;
->  =20
->       if (is_selftest_done) {
+
+>> @@ -138,8 +138,10 @@ typedef struct HDGeometry {
+>>   *
+>>   * If BDRV_BLOCK_OFFSET_VALID is set, bits 9-62 (BDRV_BLOCK_OFFSET_MA=
+SK)
+>>   * represent the offset in the returned BDS that is allocated for the=
+
+>> - * corresponding raw data; however, whether that offset actually cont=
+ains
+>> - * data also depends on BDRV_BLOCK_DATA and BDRV_BLOCK_ZERO, as follo=
+ws:
+>> + * corresponding raw data.  Individual bytes are at the same sector-r=
+elative
+>> + * locations (and thus, this bit cannot be set for mappings which are=
+
+>> + * not equivalent modulo 512).  However, whether that offset actually=
+
+>> + * contains data also depends on BDRV_BLOCK_DATA, as follows:
+>=20
+> This suggests to me that it was a bad idea to embed the offset in the
+> bitmask. In the long run, we should probably make flags and offset two
+> separate things (e.g. making offset a new by-reference parameter).
+
+As this (plus the next series) is all about changing the driver
+interface, NOW is as good a time as any to split those into two separate
+parameters.  In fact, returning an offset only makes sense when the
+caller also is asking for what file is associated with the offset, and
+patch 1 of this series already changed several callers to pass NULL when
+they don't care about the file.
+
+Unless anyone has a reason why I should NOT split the offset from the
+bitmask, I can proceed with making that change for v6 (it will be a bit
+more rebase churn as a result - but thinking about the long-term
+interface is worth the short-term pain).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--UlI9k87WnWRRsPOT4hhPOnwGBbuIQWH4A
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnc6W8ACgkQp6FrSiUn
+Q2rhDgf/WlhSLWGfwPtyHntJAQxDovbUcoRbd36xSjJ0ADbx3UwgWWPuMkrK7M9L
+LeIku5CMlGcPOIK54q1OpKgv/nfkP8d3iGTVjEFclRmgkMbbArInBKBfMJ226YmU
+7kjKB1FQk6SsWiqDIbf2cS4GjZbZAtPrpikLM+ntU0RxzeuId/fGR0iZOF+s8G+I
+RPMSGpaUV2828JmQzsiVDDOXEOOtva17Ypq4xxJp57gvm3n2i3CXwlMeWF/oTJXd
+8OcOkgil9cpTtHwoHTAO56Du7bbLHJ1yyjcFH9WRYVrSwPOFinGpvSOfTwyigoyU
+H8x116FYUl2pOpCg0Gi0QnL7Z0EW8A==
+=ROjM
+-----END PGP SIGNATURE-----
+
+--UlI9k87WnWRRsPOT4hhPOnwGBbuIQWH4A--
