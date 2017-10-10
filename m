@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e1iqI-0002It-O5
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:19 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e1iqL-0002LH-5P
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e1iqH-0004S3-Pm
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:18 -0400
-Received: from mail-pf0-x236.google.com ([2607:f8b0:400e:c00::236]:54344)
+	(envelope-from <richard.henderson@linaro.org>) id 1e1iqK-0004Tb-7o
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:21 -0400
+Received: from mail-pf0-x235.google.com ([2607:f8b0:400e:c00::235]:43662)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e1iqH-0004Re-Jd
-	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:17 -0400
-Received: by mail-pf0-x236.google.com with SMTP id m28so10541643pfi.11
-	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 17:56:17 -0700 (PDT)
+	id 1e1iqK-0004TE-2D
+	for qemu-devel@nongnu.org; Mon, 09 Oct 2017 20:56:20 -0400
+Received: by mail-pf0-x235.google.com with SMTP id d2so12283029pfh.0
+	for <qemu-devel@nongnu.org>; Mon, 09 Oct 2017 17:56:19 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon,  9 Oct 2017 17:55:47 -0700
-Message-Id: <20171010005600.28735-11-richard.henderson@linaro.org>
+Date: Mon,  9 Oct 2017 17:55:49 -0700
+Message-Id: <20171010005600.28735-13-richard.henderson@linaro.org>
 In-Reply-To: <20171010005600.28735-1-richard.henderson@linaro.org>
 References: <20171010005600.28735-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 10/23] exec-all: bring tb->invalid into
- tb->cflags
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 12/23] exec-all: introduce TB_PAGE_ADDR_FMT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,91 +34,57 @@ Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-This gets rid of a hole in struct TranslationBlock.
+And fix the following warning when DEBUG_TB_INVALIDATE is enabled
+in translate-all.c:
+
+  CC      mipsn32-linux-user/accel/tcg/translate-all.o
+/data/src/qemu/accel/tcg/translate-all.c: In function ‘tb_alloc_page’:
+/data/src/qemu/accel/tcg/translate-all.c:1201:16: error: format ‘%lx’ expects argument of type ‘long unsigned int’, but argument 2 has type ‘tb_page_addr_t {aka unsigned int}’ [-Werror=format=]
+         printf("protecting code page: 0x" TARGET_FMT_lx "\n",
+                ^
+cc1: all warnings being treated as errors
+/data/src/qemu/rules.mak:66: recipe for target 'accel/tcg/translate-all.o' failed
+make[1]: *** [accel/tcg/translate-all.o] Error 1
+Makefile:328: recipe for target 'subdir-mipsn32-linux-user' failed
+make: *** [subdir-mipsn32-linux-user] Error 2
+cota@flamenco:/data/src/qemu/build ((18f3fe1...) *$)$
 
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/exec-all.h   | 3 +--
- include/exec/tb-lookup.h  | 2 +-
- accel/tcg/cpu-exec.c      | 4 ++--
+ include/exec/exec-all.h   | 2 ++
  accel/tcg/translate-all.c | 3 +--
- 4 files changed, 5 insertions(+), 7 deletions(-)
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index a9a8bb6f83..3135aaf4c9 100644
+index 3135aaf4c9..79f8041811 100644
 --- a/include/exec/exec-all.h
 +++ b/include/exec/exec-all.h
-@@ -314,12 +314,11 @@ struct TranslationBlock {
- #define CF_NOCACHE     0x10000 /* To be freed after execution */
- #define CF_USE_ICOUNT  0x20000
- #define CF_IGNORE_ICOUNT 0x40000 /* Do not generate icount code */
-+#define CF_INVALID     0x80000 /* TB is stale. Setters must acquire tb_lock */
+@@ -31,8 +31,10 @@
+    type.  */
+ #if defined(CONFIG_USER_ONLY)
+ typedef abi_ulong tb_page_addr_t;
++#define TB_PAGE_ADDR_FMT TARGET_ABI_FMT_lx
+ #else
+ typedef ram_addr_t tb_page_addr_t;
++#define TB_PAGE_ADDR_FMT RAM_ADDR_FMT
+ #endif
  
-     /* Per-vCPU dynamic tracing state used to generate this TB */
-     uint32_t trace_vcpu_dstate;
- 
--    uint16_t invalid;
--
-     void *tc_ptr;    /* pointer to the translated code */
-     uint8_t *tc_search;  /* pointer to search data */
-     /* original tb when cflags has CF_NOCACHE */
-diff --git a/include/exec/tb-lookup.h b/include/exec/tb-lookup.h
-index 9d32cb0c6e..436b6d5ecf 100644
---- a/include/exec/tb-lookup.h
-+++ b/include/exec/tb-lookup.h
-@@ -35,7 +35,7 @@ tb_lookup__cpu_state(CPUState *cpu, target_ulong *pc, target_ulong *cs_base,
-                tb->cs_base == *cs_base &&
-                tb->flags == *flags &&
-                tb->trace_vcpu_dstate == *cpu->trace_dstate &&
--               !atomic_read(&tb->invalid))) {
-+               !(atomic_read(&tb->cflags) & CF_INVALID))) {
-         return tb;
-     }
-     tb = tb_htable_lookup(cpu, *pc, *cs_base, *flags);
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index f8a1d68db7..9cd809d607 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -294,7 +294,7 @@ static bool tb_cmp(const void *p, const void *d)
-         tb->cs_base == desc->cs_base &&
-         tb->flags == desc->flags &&
-         tb->trace_vcpu_dstate == desc->trace_vcpu_dstate &&
--        !atomic_read(&tb->invalid)) {
-+        !(atomic_read(&tb->cflags) & CF_INVALID)) {
-         /* check next page if needed */
-         if (tb->page_addr[1] == -1) {
-             return true;
-@@ -412,7 +412,7 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
-             tb_lock();
-             acquired_tb_lock = true;
-         }
--        if (!tb->invalid) {
-+        if (!(tb->cflags & CF_INVALID)) {
-             tb_add_jump(last_tb, tb_exit, tb);
-         }
-     }
+ #include "qemu/log.h"
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index a7c1d4e3f2..ed65d68709 100644
+index 799b027e79..90b3eed9c6 100644
 --- a/accel/tcg/translate-all.c
 +++ b/accel/tcg/translate-all.c
-@@ -1073,7 +1073,7 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr)
- 
-     assert_tb_locked();
- 
--    atomic_set(&tb->invalid, true);
-+    atomic_set(&tb->cflags, tb->cflags | CF_INVALID);
- 
-     /* remove the TB from the hash list */
-     phys_pc = tb->page_addr[0] + (tb->pc & ~TARGET_PAGE_MASK);
-@@ -1269,7 +1269,6 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     tb->flags = flags;
-     tb->cflags = cflags;
-     tb->trace_vcpu_dstate = *cpu->trace_dstate;
--    tb->invalid = false;
- 
- #ifdef CONFIG_PROFILER
-     tcg_ctx.tb_count1++; /* includes aborted translations because of
+@@ -1193,8 +1193,7 @@ static inline void tb_alloc_page(TranslationBlock *tb,
+         mprotect(g2h(page_addr), qemu_host_page_size,
+                  (prot & PAGE_BITS) & ~PAGE_WRITE);
+ #ifdef DEBUG_TB_INVALIDATE
+-        printf("protecting code page: 0x" TARGET_FMT_lx "\n",
+-               page_addr);
++        printf("protecting code page: 0x" TB_PAGE_ADDR_FMT "\n", page_addr);
+ #endif
+     }
+ #else
 -- 
 2.13.6
