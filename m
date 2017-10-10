@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e1rac-00087W-HI
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 06:16:47 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1e1rci-0000Uk-7T
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 06:18:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e1raY-0003vP-61
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 06:16:42 -0400
-Date: Tue, 10 Oct 2017 12:16:22 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171010101622.GH4177@dhcp-200-186.str.redhat.com>
-References: <20170913181910.29688-1-mreitz@redhat.com>
-	<20170913181910.29688-16-mreitz@redhat.com>
-	<20170914155738.GE7370@stefanha-x1.localdomain>
-	<2f1c5239-0cde-d164-b803-ebf807e684f2@redhat.com>
-	<20170918100626.GE31063@stefanha-x1.localdomain>
-	<d6dbcebf-6dce-4803-0be0-a9f48a73a32f@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1e1rcd-0005Iv-76
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 06:18:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60096)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e1rcd-0005I8-0L
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 06:18:47 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1E9784A6FB
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 10:18:46 +0000 (UTC)
+References: <20171004114008.14849-1-berrange@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <935e06c7-1be4-60c3-24a6-e8d670dac9a1@redhat.com>
+Date: Tue, 10 Oct 2017 12:18:39 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="wac7ysb48OaltWcw"
-Content-Disposition: inline
-In-Reply-To: <d6dbcebf-6dce-4803-0be0-a9f48a73a32f@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 15/18] block/mirror: Add
- active mirroring
+In-Reply-To: <20171004114008.14849-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 0/2] Reporting of rotation rate for disks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,144 +33,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: John Snow <jsnow@redhat.com>
 
+On 04/10/2017 13:40, Daniel P. Berrange wrote:
+> 
+> There is no mechanism to report this information to virtio-blk.
+> We could perhaps argue that people should use virtio-scsi instead,
+> because fixing virtio-blk would require enhancement to both QEMU
+> and Linux virtio-blk drivers (and other guest OS drivers too)
 
---wac7ysb48OaltWcw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I think long-term virtio-blk should only be used for high-performance
+scenarios where the guest SCSI layer slows down things sensibly.  So
+perhaps virtio-blk should always report itself as non-rotational.
 
-Am 18.09.2017 um 18:26 hat Max Reitz geschrieben:
-> On 2017-09-18 12:06, Stefan Hajnoczi wrote:
-> > On Sat, Sep 16, 2017 at 03:58:01PM +0200, Max Reitz wrote:
-> >> On 2017-09-14 17:57, Stefan Hajnoczi wrote:
-> >>> On Wed, Sep 13, 2017 at 08:19:07PM +0200, Max Reitz wrote:
-> >>>> This patch implements active synchronous mirroring.  In active mode,=
- the
-> >>>> passive mechanism will still be in place and is used to copy all
-> >>>> initially dirty clusters off the source disk; but every write request
-> >>>> will write data both to the source and the target disk, so the source
-> >>>> cannot be dirtied faster than data is mirrored to the target.  Also,
-> >>>> once the block job has converged (BLOCK_JOB_READY sent), source and
-> >>>> target are guaranteed to stay in sync (unless an error occurs).
-> >>>>
-> >>>> Optionally, dirty data can be copied to the target disk on read
-> >>>> operations, too.
-> >>>>
-> >>>> Active mode is completely optional and currently disabled at runtime=
-=2E  A
-> >>>> later patch will add a way for users to enable it.
-> >>>>
-> >>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> >>>> ---
-> >>>>  qapi/block-core.json |  23 +++++++
-> >>>>  block/mirror.c       | 187 ++++++++++++++++++++++++++++++++++++++++=
-+++++++++--
-> >>>>  2 files changed, 205 insertions(+), 5 deletions(-)
-> >>>>
-> >>>> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> >>>> index bb11815608..e072cfa67c 100644
-> >>>> --- a/qapi/block-core.json
-> >>>> +++ b/qapi/block-core.json
-> >>>> @@ -938,6 +938,29 @@
-> >>>>    'data': ['top', 'full', 'none', 'incremental'] }
-> >>>> =20
-> >>>>  ##
-> >>>> +# @MirrorCopyMode:
-> >>>> +#
-> >>>> +# An enumeration whose values tell the mirror block job when to
-> >>>> +# trigger writes to the target.
-> >>>> +#
-> >>>> +# @passive: copy data in background only.
-> >>>> +#
-> >>>> +# @active-write: when data is written to the source, write it
-> >>>> +#                (synchronously) to the target as well.  In additio=
-n,
-> >>>> +#                data is copied in background just like in @passive
-> >>>> +#                mode.
-> >>>> +#
-> >>>> +# @active-read-write: write data to the target (synchronously) both
-> >>>> +#                     when it is read from and written to the sourc=
-e.
-> >>>> +#                     In addition, data is copied in background just
-> >>>> +#                     like in @passive mode.
-> >>>
-> >>> I'm not sure the terms "active"/"passive" are helpful.  "Active commi=
-t"
-> >>> means committing the top-most BDS while the guest is accessing it.  T=
-he
-> >>> "passive" mirror block still works on the top-most BDS while the guest
-> >>> is accessing it.
-> >>>
-> >>> Calling it "asynchronous" and "synchronous" is clearer to me.  It's a=
-lso
-> >>> the terminology used in disk replication (e.g. DRBD).
-> >>
-> >> I'd be OK with that, too, but I think I remember that in the past at
-> >> least Kevin made a clear distinction between active/passive and
-> >> sync/async when it comes to mirroring.
-> >>
-> >>> Ideally the user wouldn't have to worry about async vs sync because Q=
-EMU
-> >>> would switch modes as appropriate in order to converge.  That way
-> >>> libvirt also doesn't have to worry about this.
-> >>
-> >> So here you mean async/sync in the way I meant it, i.e., whether the
-> >> mirror operations themselves are async/sync?
-> >=20
-> > The meaning I had in mind is:
-> >=20
-> > Sync mirroring means a guest write waits until the target write
-> > completes.
->=20
-> I.e. active-sync, ...
->=20
-> > Async mirroring means guest writes completes independently of target
-> > writes.
->=20
-> ... i.e. passive or active-async in the future.
+> I'm unclear if there is anything I should have done wrt the
+> device migration vmstate when adding this extra field, or if it
+> is safe to just expect the mgmt app to set the property correctly
+> on src+dst ?
 
-So we already have at least three different modes, sync/async doesn't
-quite cut it anyway. There's a reason why we have been talking about
-both active/passive and sync/async.
+That should be enough, yes.
 
-When I was looking at the code, it actually occurred to me that there
-are more possible different modes than I thought there were: This patch
-waits for successful completion on the source before it even attempts to
-write to the destination.
-
-Wouldn't it be generally (i.e. in the success case) more useful if we
-start both requests at the same time and only wait for both to complete,
-avoiding to double the latency? If the source write fails, we're out of
-sync, obviously, so we'd have to mark the block dirty again.
-
-By the way, what happens when the guest modifies the RAM during the
-request? Is it acceptable even for writes if source and target differ
-after a successful write operation? Don't we need a bounce buffer
-anyway?
-
-Kevin
-
---wac7ysb48OaltWcw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJZ3J32AAoJEH8JsnLIjy/W644P/1M3dV/CDasCZfLZWQRunSAC
-devZaCDB+OrXIAu3CWsRETnaUvpokmvMQO3Dun5qMprTPm1X4cSZ4geFfQvHjrL/
-MsnlqMLnlMNBFGTO6GkO50Bm4aOcpNwk5KRh5dYptsngBM11s63/nWtxKP7mqQ3D
-BxrbNKQDr9Mg7E0BlkyZXQX9N0sspTe2h05souwhMUS6xIPWRJb6facrY+GNxmrs
-uZMRO844Y1yrdoj6Auz/Ly3yd6Dh0ybN1RCxD5z+Iz7PtBneBjVzwx9jsUHaXwbV
-y7heml2CNWR84DI/geY0z3WB6wgfO/GVPpjGSjtUO++3FvH8AQtQlAaQDurY4VTN
-bMkcQSBQR9CAzB2eebgz4xRv+iH4DwBEaTVd/IeiRKJsajQBf2SmISFfa+kMEmEj
-uHiDhnW/ECvm7qtDciepNtw8NTODpNFYveFnbktoTQIh1VE0H6pKwUHTXn2E20dI
-oPK9NtRd4veipIuqW34FWRzTON6nWEHPKMJkJWGQ2dt1mcOenXAsJh7eFalNPEb9
-ltXP5ytc9NLDkkNT4VGi+ObbNediPJbchLkWOCd6d9bUwen4oPtA/wmS1hypUAST
-epOu4OtblXunfakuPsrpK9/5XSwEKKAc8PbEeyV0ZfINILbEYmFP3e/9S7REvfgO
-wqQS9fG9BAm9qqlx1Iyf
-=GYwJ
------END PGP SIGNATURE-----
-
---wac7ysb48OaltWcw--
+Paolo
