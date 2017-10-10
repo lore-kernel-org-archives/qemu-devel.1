@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e20Ec-0000ps-5G
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:35 -0400
+	(envelope-from <prvs=449813866=anthony.perard@citrix.com>)
+	id 1e20G3-00029D-TH
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:32:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e20Eb-00058X-2F
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:34 -0400
-Received: from mail-pf0-x231.google.com ([2607:f8b0:400e:c00::231]:47480)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e20Ea-00058G-T0
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:30:32 -0400
-Received: by mail-pf0-x231.google.com with SMTP id z11so8330548pfk.4
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 12:30:32 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 10 Oct 2017 12:30:02 -0700
-Message-Id: <20171010193003.28857-20-richard.henderson@linaro.org>
-In-Reply-To: <20171010193003.28857-1-richard.henderson@linaro.org>
-References: <20171010193003.28857-1-richard.henderson@linaro.org>
+	(envelope-from <prvs=449813866=anthony.perard@citrix.com>)
+	id 1e20Fy-0005gb-V9
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:32:03 -0400
+Received: from smtp.citrix.com ([66.165.176.89]:47962)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=449813866=anthony.perard@citrix.com>)
+	id 1e20Fy-0005fS-I0
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 15:31:58 -0400
+Date: Tue, 10 Oct 2017 12:55:15 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20171010115515.GI1771@perard.uk.xensource.com>
+References: <1507564902-9000-1-git-send-email-ian.jackson@eu.citrix.com>
+	<1507564902-9000-7-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 19/20] tcg: define TCG_HIGHWATER
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1507564902-9000-7-git-send-email-ian.jackson@eu.citrix.com>
+Subject: Re: [Qemu-devel] [PATCH 6/8] xen: destroy_hvm_domain: Try
+ xendevicemodel_shutdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +31,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
+To: Ian Jackson <ian.jackson@eu.citrix.com>
+Cc: qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org
 
-From: "Emilio G. Cota" <cota@braap.org>
+On Mon, Oct 09, 2017 at 05:01:40PM +0100, Ian Jackson wrote:
+> xc_interface_open etc. is not going to work if we have dropped
+> privilege, but xendevicemodel_shutdown will if everything is new
+> enough.
+> 
+> xendevicemodel_shutdown is only availabe in Xen 4.10 and later, so
+> provide a stub for earlier versions.
+> 
+> Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-Will come in handy very soon.
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/tcg.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index ee60798438..4492e1eb3f 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -116,6 +116,8 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
- static bool tcg_out_ldst_finalize(TCGContext *s);
- #endif
- 
-+#define TCG_HIGHWATER 1024
-+
- static TCGRegSet tcg_target_available_regs[2];
- static TCGRegSet tcg_target_call_clobber_regs;
- 
-@@ -430,7 +432,7 @@ void tcg_prologue_init(TCGContext *s)
-     /* Compute a high-water mark, at which we voluntarily flush the buffer
-        and start over.  The size here is arbitrary, significantly larger
-        than we expect the code generation for any one opcode to require.  */
--    s->code_gen_highwater = s->code_gen_buffer + (total_size - 1024);
-+    s->code_gen_highwater = s->code_gen_buffer + (total_size - TCG_HIGHWATER);
- 
-     tcg_register_jit(s->code_gen_buffer, total_size);
- 
 -- 
-2.13.6
+Anthony PERARD
