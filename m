@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y41-0007RE-Vo
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:11:33 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y47-0007RU-Af
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:11:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y41-0007BF-0g
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:11:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:6723)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y46-0007DB-El
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:11:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51334)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1e1y40-0007B3-Qg
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:11:28 -0400
+	id 1e1y46-0007Cy-8Y
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:11:34 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 10 Oct 2017 19:10:56 +0200
-Message-Id: <20171010171122.9756-2-marcandre.lureau@redhat.com>
+Date: Tue, 10 Oct 2017 19:10:58 +0200
+Message-Id: <20171010171122.9756-4-marcandre.lureau@redhat.com>
 In-Reply-To: <20171010171122.9756-1-marcandre.lureau@redhat.com>
 References: <20171010171122.9756-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 01/27] glib-compat: move
- G_SOURCE_CONTINUE/REMOVE there
+Subject: [Qemu-devel] [PULL 03/27] build-sys: make vhost-user-scsi depend on
+ libvhost-user.a
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,48 +32,38 @@ To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, f4bug@amsat.org, changpeng.liu@intel.com, felipe@nutanix.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Acked-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/glib-compat.h                     | 7 +++++++
- contrib/vhost-user-scsi/vhost-user-scsi.c | 8 --------
- 2 files changed, 7 insertions(+), 8 deletions(-)
+ Makefile      | 2 +-
+ Makefile.objs | 1 -
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/include/glib-compat.h b/include/glib-compat.h
-index e15aca2d40..c49cf87196 100644
---- a/include/glib-compat.h
-+++ b/include/glib-compat.h
-@@ -356,5 +356,12 @@ g_test_add_data_func_full(const char *path,
- }
- #endif
+diff --git a/Makefile b/Makefile
+index a0fe721c5b..c2ee765659 100644
+--- a/Makefile
++++ b/Makefile
+@@ -480,7 +480,7 @@ ivshmem-client$(EXESUF): $(ivshmem-client-obj-y) $(CO=
+MMON_LDADDS)
+ ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
+ 	$(call LINK, $^)
+ endif
+-vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y)
++vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) libvhost-user.a
+ 	$(call LINK, $^)
 =20
-+/* Small compat shim from glib 2.32 */
-+#ifndef G_SOURCE_CONTINUE
-+#define G_SOURCE_CONTINUE TRUE
-+#endif
-+#ifndef G_SOURCE_REMOVE
-+#define G_SOURCE_REMOVE FALSE
-+#endif
+ module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.=
+mak
+diff --git a/Makefile.objs b/Makefile.objs
+index bdfa3b6177..d4f973a8fc 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -115,7 +115,6 @@ libvhost-user-obj-y =3D contrib/libvhost-user/
+ vhost-user-scsi.o-cflags :=3D $(LIBISCSI_CFLAGS)
+ vhost-user-scsi.o-libs :=3D $(LIBISCSI_LIBS)
+ vhost-user-scsi-obj-y =3D contrib/vhost-user-scsi/
+-vhost-user-scsi-obj-y +=3D contrib/libvhost-user/libvhost-user.o
 =20
- #endif
-diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-us=
-er-scsi/vhost-user-scsi.c
-index b5ae02c96f..78bcc65f5a 100644
---- a/contrib/vhost-user-scsi/vhost-user-scsi.c
-+++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
-@@ -17,14 +17,6 @@
-=20
- #include <glib.h>
-=20
--/* Small compat shim from glib 2.32 */
--#ifndef G_SOURCE_CONTINUE
--#define G_SOURCE_CONTINUE TRUE
--#endif
--#ifndef G_SOURCE_REMOVE
--#define G_SOURCE_REMOVE FALSE
--#endif
--
- /* #define VUS_DEBUG 1 */
-=20
- /** Log helpers **/
+ ######################################################################
+ trace-events-subdirs =3D
 --=20
 2.15.0.rc0.40.gaefcc5f6f
