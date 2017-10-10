@@ -1,15 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Jim.Quigley@oracle.com>) id 1e1rgG-0002vW-2Z
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 06:22:33 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e1tgB-0008Cq-VH
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 08:30:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Jim.Quigley@oracle.com>) id 1e1rgE-0007Dp-Qm
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 06:22:32 -0400
-From: Jim Quigley <Jim.Quigley@oracle.com>
-Date: Tue, 10 Oct 2017 06:22:08 -0400
-Message-Id: <1507630928-28307-1-git-send-email-Jim.Quigley@oracle.com>
-Subject: [Qemu-devel] [PATCH] hw/vfio: improve error message when cannot
- init vfio event notifiers
+	(envelope-from <dgilbert@redhat.com>) id 1e1tg4-0004yx-W6
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 08:30:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59368)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e1tg4-0004xr-Mm
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 08:30:28 -0400
+Date: Tue, 10 Oct 2017 13:30:18 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171010123017.GE2132@work-vm>
+References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
+	<1504081950-2528-11-git-send-email-peterx@redhat.com>
+	<20170921192903.GH3401@work-vm>
+	<20170927073441.GD25011@pxdev.xzpeter.org>
+	<20171009185812.GR2374@work-vm>
+	<20171010093801.GC20686@pxdev.xzpeter.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171010093801.GC20686@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC v2 10/33] migration: allow dst vm pause on
+ postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,111 +32,258 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, mjt@tls.msk.ru, laurent@vivier.eu, alex.williamson@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-More information is required to assist trouble-shooting when
-QEMU fails to initialise the event notifications for devices
-assigned with VFIO-PCI. Instead of supplying the user with a cryptic
-error number only, print out a proper error message with strerror()
-so that the user has a better way to figure out what the problem is.
+* Peter Xu (peterx@redhat.com) wrote:
+> On Mon, Oct 09, 2017 at 07:58:13PM +0100, Dr. David Alan Gilbert wrote:
+> > * Peter Xu (peterx@redhat.com) wrote:
+> > > On Thu, Sep 21, 2017 at 08:29:03PM +0100, Dr. David Alan Gilbert wrote:
+> > > > * Peter Xu (peterx@redhat.com) wrote:
+> > > > > When there is IO error on the incoming channel (e.g., network down),
+> > > > > instead of bailing out immediately, we allow the dst vm to switch to the
+> > > > > new POSTCOPY_PAUSE state. Currently it is still simple - it waits the
+> > > > > new semaphore, until someone poke it for another attempt.
+> > > > > 
+> > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > > > ---
+> > > > >  migration/migration.c  |  1 +
+> > > > >  migration/migration.h  |  3 +++
+> > > > >  migration/savevm.c     | 60 ++++++++++++++++++++++++++++++++++++++++++++++++--
+> > > > >  migration/trace-events |  2 ++
+> > > > >  4 files changed, 64 insertions(+), 2 deletions(-)
+> > > > > 
+> > > > > diff --git a/migration/migration.c b/migration/migration.c
+> > > > > index 8d26ea8..80de212 100644
+> > > > > --- a/migration/migration.c
+> > > > > +++ b/migration/migration.c
+> > > > > @@ -146,6 +146,7 @@ MigrationIncomingState *migration_incoming_get_current(void)
+> > > > >          memset(&mis_current, 0, sizeof(MigrationIncomingState));
+> > > > >          qemu_mutex_init(&mis_current.rp_mutex);
+> > > > >          qemu_event_init(&mis_current.main_thread_load_event, false);
+> > > > > +        qemu_sem_init(&mis_current.postcopy_pause_sem_dst, 0);
+> > > > >          once = true;
+> > > > >      }
+> > > > >      return &mis_current;
+> > > > > diff --git a/migration/migration.h b/migration/migration.h
+> > > > > index 0c957c9..c423682 100644
+> > > > > --- a/migration/migration.h
+> > > > > +++ b/migration/migration.h
+> > > > > @@ -60,6 +60,9 @@ struct MigrationIncomingState {
+> > > > >      /* The coroutine we should enter (back) after failover */
+> > > > >      Coroutine *migration_incoming_co;
+> > > > >      QemuSemaphore colo_incoming_sem;
+> > > > > +
+> > > > > +    /* notify PAUSED postcopy incoming migrations to try to continue */
+> > > > > +    QemuSemaphore postcopy_pause_sem_dst;
+> > > > >  };
+> > > > >  
+> > > > >  MigrationIncomingState *migration_incoming_get_current(void);
+> > > > > diff --git a/migration/savevm.c b/migration/savevm.c
+> > > > > index 7172f14..3777124 100644
+> > > > > --- a/migration/savevm.c
+> > > > > +++ b/migration/savevm.c
+> > > > > @@ -1488,8 +1488,8 @@ static int loadvm_postcopy_ram_handle_discard(MigrationIncomingState *mis,
+> > > > >   */
+> > > > >  static void *postcopy_ram_listen_thread(void *opaque)
+> > > > >  {
+> > > > > -    QEMUFile *f = opaque;
+> > > > >      MigrationIncomingState *mis = migration_incoming_get_current();
+> > > > > +    QEMUFile *f = mis->from_src_file;
+> > > > >      int load_res;
+> > > > >  
+> > > > >      migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+> > > > > @@ -1503,6 +1503,14 @@ static void *postcopy_ram_listen_thread(void *opaque)
+> > > > >       */
+> > > > >      qemu_file_set_blocking(f, true);
+> > > > >      load_res = qemu_loadvm_state_main(f, mis);
+> > > > > +
+> > > > > +    /*
+> > > > > +     * This is tricky, but, mis->from_src_file can change after it
+> > > > > +     * returns, when postcopy recovery happened. In the future, we may
+> > > > > +     * want a wrapper for the QEMUFile handle.
+> > > > > +     */
+> > > > > +    f = mis->from_src_file;
+> > > > > +
+> > > > >      /* And non-blocking again so we don't block in any cleanup */
+> > > > >      qemu_file_set_blocking(f, false);
+> > > > >  
+> > > > > @@ -1581,7 +1589,7 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
+> > > > >      /* Start up the listening thread and wait for it to signal ready */
+> > > > >      qemu_sem_init(&mis->listen_thread_sem, 0);
+> > > > >      qemu_thread_create(&mis->listen_thread, "postcopy/listen",
+> > > > > -                       postcopy_ram_listen_thread, mis->from_src_file,
+> > > > > +                       postcopy_ram_listen_thread, NULL,
+> > > > >                         QEMU_THREAD_DETACHED);
+> > > > >      qemu_sem_wait(&mis->listen_thread_sem);
+> > > > >      qemu_sem_destroy(&mis->listen_thread_sem);
+> > > > > @@ -1966,11 +1974,44 @@ void qemu_loadvm_state_cleanup(void)
+> > > > >      }
+> > > > >  }
+> > > > >  
+> > > > > +/* Return true if we should continue the migration, or false. */
+> > > > > +static bool postcopy_pause_incoming(MigrationIncomingState *mis)
+> > > > > +{
+> > > > > +    trace_postcopy_pause_incoming();
+> > > > > +
+> > > > > +    migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
+> > > > > +                      MIGRATION_STATUS_POSTCOPY_PAUSED);
+> > > > > +
+> > > > > +    assert(mis->from_src_file);
+> > > > > +    qemu_file_shutdown(mis->from_src_file);
+> > > > > +    qemu_fclose(mis->from_src_file);
+> > > > > +    mis->from_src_file = NULL;
+> > > > > +
+> > > > > +    assert(mis->to_src_file);
+> > > > > +    qemu_mutex_lock(&mis->rp_mutex);
+> > > > > +    qemu_file_shutdown(mis->to_src_file);
+> > > > 
+> > > > Should you not do the shutdown() before the lock?
+> > > > For example if the other thread is stuck, with rp_mutex
+> > > > held, trying to write to to_src_file, then you'll block
+> > > > waiting for the mutex.  If you call shutdown and then take
+> > > > the lock, the other thread will error and release the lock.
+> > > 
+> > > The problem is that IMHO QEMUFile is not yet thread-safe itself.  So
+> > > if we operate on it (even to shut it down) logically we need to have
+> > > the lock, right?
+> > 
+> > That probably needs fixing for 'shutdown' under the assumption that
+> >    a) No one has or is deleting/freeing the QEMUFile
+> >    b) No one is closing the QEMUFile
+> > 
+> > The whole point of using shutdown() is it forces any stuck send()'s or
+> > read()'s to fail rather than staying stuck.
+> 
+> I see.  I just noticed that actually qemu_file_shutdown() is
+> thread-safe itself - it boils down to the system shutdown() call (as
+> long as the above assumption is there).
+> 
+> Let me call qemu_file_shutdown() first before taking the lock to make
+> sure send()/recv() hang won't happen.
+> 
+> > 
+> > > Then, IMHO the question would be: when will the send() be stuck in the
+> > > other thread?
+> > > 
+> > > Normally the only case I can think of is that source didn't recv()
+> > > fast enough, and we even consumed all the write buffer in dst side (I
+> > > don't really know how kernel manages the buffers though, and e.g. how
+> > > the size of buffer is defined...).
+> > > 
+> > > But when reach here, the channel (say, from_src_file and to_src_file,
+> > > since both of them are using the same channel behind the QEMUFile
+> > > interface) should already be broken in some way, then IIUC even there
+> > > is a send() in the other thread, it should return at some point with a
+> > > failure as well, just like how we reached here (possibly due to a
+> > > read() failure).
+> > 
+> > We have to be careful about this; a network can fail in a way it
+> > gets stuck rather than fails - this can get stuck until a full TCP
+> > disconnection; and that takes about 30mins (from memory).
+> > The nice thing about using 'shutdown' is that you can kill the existing
+> > connection if it's hung. (Which then makes an interesting question;
+> > the rules in your migrate-incoming command become different if you
+> > want to declare it's failed!).  Having said that, you're right that at
+> > this point stuff has already failed - so do we need the shutdown?
+> > (You might want to do the shutdown as part of the recovery earlier
+> > or as a separate command to force the failure)
+> 
+> I assume if I call shutdown before the lock then we'll be good then.
 
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
-Signed-off-by: Jim Quigley <Jim.Quigley@oracle.com>
----
-Cc: qemu-trivial@nongnu.org
-Cc: mjt@tls.msk.ru
-Cc: laurent@vivier.eu
-Cc: alex.williamson@redhat.com
----
- hw/vfio/pci.c | 35 ++++++++++++++++++++++++-----------
- 1 file changed, 24 insertions(+), 11 deletions(-)
+The question is what happens if you only allow recovery if we're already
+in postcopy-paused state; in the case of a hung socket, since no IO has
+actually failed yet, you will still be in postcopy-active.
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 31e1edf..3bffb93 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -430,13 +430,16 @@ static int vfio_enable_vectors(VFIOPCIDevice *vdev, bool msix)
- static void vfio_add_kvm_msi_virq(VFIOPCIDevice *vdev, VFIOMSIVector *vector,
-                                   int vector_n, bool msix)
- {
--    int virq;
-+    int virq, ret;
- 
-     if ((msix && vdev->no_kvm_msix) || (!msix && vdev->no_kvm_msi)) {
-         return;
-     }
- 
--    if (event_notifier_init(&vector->kvm_interrupt, 0)) {
-+    ret = event_notifier_init(&vector->kvm_interrupt, 0);
-+    if (ret) {
-+        error_report("vfio (%s): Error: unable to init event notifier: %s (%d)",
-+                     __func__, strerror(-ret), -ret);
-         return;
-     }
- 
-@@ -486,8 +489,11 @@ static int vfio_msix_vector_do_use(PCIDevice *pdev, unsigned int nr,
-     if (!vector->use) {
-         vector->vdev = vdev;
-         vector->virq = -1;
--        if (event_notifier_init(&vector->interrupt, 0)) {
--            error_report("vfio: Error: event_notifier_init failed");
-+        ret = event_notifier_init(&vector->interrupt, 0);
-+        if (ret) {
-+            error_report("vfio (%s): Error: "
-+                         "unable to init event notifier: %s (%d)",
-+                         __func__, strerror(-ret), -ret);
-         }
-         vector->use = true;
-         msix_vector_use(pdev, nr);
-@@ -658,8 +664,11 @@ retry:
-         vector->virq = -1;
-         vector->use = true;
- 
--        if (event_notifier_init(&vector->interrupt, 0)) {
--            error_report("vfio: Error: event_notifier_init failed");
-+        ret = event_notifier_init(&vector->interrupt, 0);
-+        if (ret) {
-+            error_report("vfio (%s): Error: "
-+                         "unable to init event notifier: %s (%d)",
-+                         __func__, strerror(-ret), -ret);
-         }
- 
-         qemu_set_fd_handler(event_notifier_get_fd(&vector->interrupt),
-@@ -2471,8 +2480,10 @@ static void vfio_register_err_notifier(VFIOPCIDevice *vdev)
-         return;
-     }
- 
--    if (event_notifier_init(&vdev->err_notifier, 0)) {
--        error_report("vfio: Unable to init event notifier for error detection");
-+    ret = event_notifier_init(&vdev->err_notifier, 0);
-+    if (ret) {
-+        error_report("vfio (%s): Error: unable to init event notifier: %s (%d)"
-+            " for error detection", __func__, strerror(-ret), -ret);
-         vdev->pci_aer = false;
-         return;
-     }
-@@ -2553,7 +2564,7 @@ static void vfio_register_req_notifier(VFIOPCIDevice *vdev)
- {
-     struct vfio_irq_info irq_info = { .argsz = sizeof(irq_info),
-                                       .index = VFIO_PCI_REQ_IRQ_INDEX };
--    int argsz;
-+    int argsz, ret;
-     struct vfio_irq_set *irq_set;
-     int32_t *pfd;
- 
-@@ -2566,8 +2577,10 @@ static void vfio_register_req_notifier(VFIOPCIDevice *vdev)
-         return;
-     }
- 
--    if (event_notifier_init(&vdev->req_notifier, 0)) {
--        error_report("vfio: Unable to init event notifier for device request");
-+    ret = event_notifier_init(&vdev->req_notifier, 0);
-+    if (ret) {
-+        error_report("vfio (%s): Error: unable to init event notifier: %s (%d)"
-+            " for device request", __func__, strerror(-ret), -ret);
-         return;
-     }
- 
--- 
-1.8.3.1
+Dave
+
+> > 
+> > > > I'm not quite sure what will happen if we end up calling this
+> > > > before the main thread has been returned from postcopy and the
+> > > > device loading is complete.
+> > > 
+> > > IIUC you mean the time starts from when we got MIG_CMD_PACKAGED until
+> > > main thread finishes handling that package?
+> > 
+> > Yes.
+> > 
+> > > Normally I think that should not matter much since during handling the
+> > > package it should hardly fail (we were reading from a buffer QIO
+> > > channel, no real IOs there)... 
+> > 
+> > Note that while the main thread is reading the package, the listener
+> > thread is receiving pages, so you can legally get a failure at that
+> > point when the fd fails as it's receiving pages at the same time
+> > as reading the devices.
+> > (There's an argument that if it fails before you've received all
+> > your devices then perhaps you can just restart the source)
+> 
+> Yes.
+> 
+> > 
+> > > But I agree about the reasoning.  How
+> > > about one more patch to postpone the "active" to "postcopy-active"
+> > > state change after the package is handled correctly?  Like:
+> > > 
+> > > --------------
+> > > diff --git a/migration/savevm.c b/migration/savevm.c                     
+> > > index b5c3214034..8317b2a7e2 100644 
+> > > --- a/migration/savevm.c            
+> > > +++ b/migration/savevm.c            
+> > > @@ -1573,8 +1573,6 @@ static void *postcopy_ram_listen_thread(void *opaque)                                                                       
+> > >      QEMUFile *f = mis->from_src_file;                                   
+> > >      int load_res;                  
+> > >                                     
+> > > -    migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,             
+> > > -                                   MIGRATION_STATUS_POSTCOPY_ACTIVE);   
+> > >      qemu_sem_post(&mis->listen_thread_sem);                             
+> > >      trace_postcopy_ram_listen_thread_start();                           
+> > >                                     
+> > > @@ -1817,6 +1815,9 @@ static int loadvm_handle_cmd_packaged(MigrationIncomingState *mis)                                                          
+> > >      qemu_fclose(packf);            
+> > >      object_unref(OBJECT(bioc));    
+> > >                                     
+> > > +    migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,             
+> > > +                                   MIGRATION_STATUS_POSTCOPY_ACTIVE);   
+> > > +                                   
+> > >      return ret;                    
+> > >  }                                  
+> > > --------------
+> > > 
+> > > This function will only be called with "postcopy-active" state.
+> > 
+> > I *think* that's safe; you've got to be careful, but I can't see
+> > anyone on the destination that cares about the destinction.
+> 
+> Indeed, but I'd say that's the best thing I can think of (and the
+> simplest).  Even, not sure whether it'll be more clear if we set
+> postcopy-active state right before starting the VM on destination,
+> say, at the beginning of loadvm_postcopy_handle_run_bh().
+> 
+> > 
+> > > > Also, at this point have we guaranteed no one else is about
+> > > > to do an op on mis->to_src_file and will seg?
+> > > 
+> > > I think no?  Since IMHO the main thread is playing with the buffer QIO
+> > > channel, rather than the real one?
+> > 
+> > OK.
+> > 
+> > > (btw, could I ask what's "seg"? :)
+> > 
+> > just short for segmentation fault; sig 11.
+> 
+> I see.  Thanks!
+> 
+> > 
+> > Dave
+> > 
+> > > -- 
+> > > Peter Xu
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
