@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e1voF-0000Xg-QB
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:47:07 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e1voM-0000e3-HL
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:47:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e1voB-00058N-Qk
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:47:03 -0400
-Date: Tue, 10 Oct 2017 16:46:44 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171010144644.GL4177@dhcp-200-186.str.redhat.com>
-References: <20171004020048.26379-1-eblake@redhat.com>
-	<20171004020048.26379-8-eblake@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1e1voI-0005I6-Sc
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:47:10 -0400
+Received: from mail-pf0-x231.google.com ([2607:f8b0:400e:c00::231]:46440)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e1voI-0005HX-MD
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:47:06 -0400
+Received: by mail-pf0-x231.google.com with SMTP id p87so8401466pfj.3
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 07:47:06 -0700 (PDT)
+References: <20171010102655.23322-1-pbonzini@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e53dac45-195e-88d2-fd50-083658cb6d4d@linaro.org>
+Date: Tue, 10 Oct 2017 07:47:03 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171004020048.26379-8-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 07/23] block: Convert
- bdrv_get_block_status() to bytes
+In-Reply-To: <20171010102655.23322-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] build: remove CONFIG_LIBDECNUMBER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,74 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org
 
-Am 04.10.2017 um 04:00 hat Eric Blake geschrieben:
-> We are gradually moving away from sector-based interfaces, towards
-> byte-based.  In the common case, allocation is unlikely to ever use
-> values that are not naturally sector-aligned, but it is possible
-> that byte-based values will let us be more precise about allocation
-> at the end of an unaligned file that can do byte-based access.
+On 10/10/2017 03:26 AM, Paolo Bonzini wrote:
+> It is used only by PPC TCG, so just move it in target/ppc/Makefile.objs
 > 
-> Changing the name of the function from bdrv_get_block_status() to
-> bdrv_block_status() ensures that the compiler enforces that all
-> callers are updated.  For now, the io.c layer still assert()s that
-> all callers are sector-aligned, but that can be relaxed when a later
-> patch implements byte-based block status in the drivers.
-> 
-> Note that we have an inherent limitation in the BDRV_BLOCK_* return
-> values: BDRV_BLOCK_OFFSET_VALID can only return the start of a
-> sector, even if we later relax the interface to query for the status
-> starting at an intermediate byte; document the obvious interpretation
-> that valid offsets are always sector-relative.
-> 
-> Therefore, for the most part this patch is just the addition of scaling
-> at the callers followed by inverse scaling at bdrv_block_status().  But
-> some code, particularly bdrv_is_allocated(), gets a lot simpler because
-> it no longer has to mess with sectors.
-> 
-> For ease of review, bdrv_get_block_status_above() will be tackled
-> separately.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> 
-> ---
-> v5: drop pointless 'if (pnum)' [John], add comment
-> v4: no change
-> v3: clamp bytes to 32-bits, rather than asserting
-> v2: rebase to earlier changes
-> ---
->  include/block/block.h | 12 +++++++-----
->  block/io.c            | 35 +++++++++++++++++++++++------------
->  block/qcow2-cluster.c |  2 +-
->  qemu-img.c            | 20 +++++++++++---------
->  4 files changed, 42 insertions(+), 27 deletions(-)
-> 
-> diff --git a/include/block/block.h b/include/block/block.h
-> index be49c4ae9d..4ecd2c4a65 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-A bit above the first hunk:
+FWIW, it *should* be used by target/s390x as well.
 
- * Allocation status flags for bdrv_get_block_status() and friends.
+> diff --git a/target/ppc/Makefile.objs b/target/ppc/Makefile.objs
+> index f92ba67ebd..ba61012bef 100644
+> --- a/target/ppc/Makefile.objs
+> +++ b/target/ppc/Makefile.objs
+> @@ -15,5 +15,10 @@ obj-y += int_helper.o
+>  obj-y += timebase_helper.o
+>  obj-y += misc_helper.o
+>  obj-y += mem_helper.o
+> +obj-y += ../../libdecnumber/decContext.o
+> +obj-y += ../../libdecnumber/decNumber.o
+> +obj-y += ../../libdecnumber/dpd/decimal32.o
+> +obj-y += ../../libdecnumber/dpd/decimal64.o
+> +obj-y += ../../libdecnumber/dpd/decimal128.o
+>  obj-$(CONFIG_USER_ONLY) += user_only_helper.o
+>  obj-y += gdbstub.o
 
-This should be bdrv_block_status() now.
+I suppose this isn't horrible, if it needed to be replicated.
 
-> @@ -138,8 +138,10 @@ typedef struct HDGeometry {
->   *
->   * If BDRV_BLOCK_OFFSET_VALID is set, bits 9-62 (BDRV_BLOCK_OFFSET_MASK)
->   * represent the offset in the returned BDS that is allocated for the
-> - * corresponding raw data; however, whether that offset actually contains
-> - * data also depends on BDRV_BLOCK_DATA and BDRV_BLOCK_ZERO, as follows:
-> + * corresponding raw data.  Individual bytes are at the same sector-relative
-> + * locations (and thus, this bit cannot be set for mappings which are
-> + * not equivalent modulo 512).  However, whether that offset actually
-> + * contains data also depends on BDRV_BLOCK_DATA, as follows:
 
-This suggests to me that it was a bad idea to embed the offset in the
-bitmask. In the long run, we should probably make flags and offset two
-separate things (e.g. making offset a new by-reference parameter).
-
-Kevin
+r~
