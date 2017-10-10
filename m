@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e23l3-0002Mg-7x
+	(envelope-from <no-reply@patchew.org>) id 1e23l3-0002Mf-7u
 	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 19:16:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e23ky-0007Jb-TJ
+	(envelope-from <no-reply@patchew.org>) id 1e23ky-0007Jj-U3
 	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 19:16:17 -0400
-Resent-Message-Id: <E1e23ky-0007Jb-TJ@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21460)
+Resent-Message-Id: <E1e23ky-0007Jj-U3@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21463)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1e23ky-0007Hr-L0
+	id 1e23ky-0007Ht-L9
 	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 19:16:12 -0400
 Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150767734588.285.13061485712177864744@b58463cdfd5f>
-In-Reply-To: <20171010171218.14298-1-martin@schrodt.org>
+Message-ID: <150767736094.285.14313770238196766647@b58463cdfd5f>
+In-Reply-To: <20171010174403.24660-1-martin@schrodt.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 From: no-reply@patchew.org
-Date: Tue, 10 Oct 2017 16:15:46 -0700 (PDT)
+Date: Tue, 10 Oct 2017 16:16:01 -0700 (PDT)
 Subject: Re: [Qemu-devel] [PATCH] Several fixes for the Pulse Audio driver,
  and the HDA device.
 List-Id: <qemu-devel.nongnu.org>
@@ -30,11 +30,11 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: martin@schrodt.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
 SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
 LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcxMDEwMTcxMjE4LjE0Mjk4LTEtbWFydGluQHNjaHJvZHQub3JnClN1Ympl
+c3NhZ2UtaWQ6IDIwMTcxMDEwMTc0NDAzLjI0NjYwLTEtbWFydGluQHNjaHJvZHQub3JnClN1Ympl
 Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIFNldmVyYWwgZml4ZXMgZm9yIHRoZSBQdWxzZSBBdWRp
 byBkcml2ZXIsIGFuZCB0aGUgSERBIGRldmljZS4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
 IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
@@ -46,7 +46,7 @@ bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
 cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
 ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
 VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
-NDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjE0ZjZhZWFiMzQg
+NDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmU0OWY5NGVmN2Ig
 U2V2ZXJhbCBmaXhlcyBmb3IgdGhlIFB1bHNlIEF1ZGlvIGRyaXZlciwgYW5kIHRoZSBIREEgZGV2
 aWNlLgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBTZXZlcmFsIGZp
 eGVzIGZvciB0aGUgUHVsc2UgQXVkaW8gZHJpdmVyLCBhbmQgdGhlIEhEQSBkZXZpY2UuLi4uCkVS
