@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e1wFo-0005Wp-Pr
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:15:38 -0400
+	(envelope-from <mst@redhat.com>) id 1e1wGR-0005pc-En
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:16:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e1wFk-0004ER-Gg
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:15:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41208)
+	(envelope-from <mst@redhat.com>) id 1e1wGM-0004cT-Vs
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:16:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:1565)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e1wFk-0004Dl-5K
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:15:28 -0400
-Date: Tue, 10 Oct 2017 16:15:13 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171010151513.GK30015@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAFEAcA-KNF0Q2HisqN8s0zhm1dyPxFrKri6tYNpUai_=OnAppw@mail.gmail.com>
-	<1726032a-16fb-3eae-1dbf-f711d4e98a5a@redhat.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e1wGM-0004bz-Mi
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:16:06 -0400
+Date: Tue, 10 Oct 2017 18:15:54 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171010180636-mutt-send-email-mst@kernel.org>
+References: <1506744354-20979-1-git-send-email-wei.w.wang@intel.com>
+	<1506744354-20979-6-git-send-email-wei.w.wang@intel.com>
+	<20171001060305-mutt-send-email-mst@kernel.org>
+	<286AC319A985734F985F78AFA26841F73932025A@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1726032a-16fb-3eae-1dbf-f711d4e98a5a@redhat.com>
-Subject: Re: [Qemu-devel] updating to a u-boot without the case-sensitive
- filename clash
+In-Reply-To: <286AC319A985734F985F78AFA26841F73932025A@shsmsx102.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v16 5/5] virtio-balloon:
+ VIRTIO_BALLOON_F_CTRL_VQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +30,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "mhocko@kernel.org" <mhocko@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "willy@infradead.org" <willy@infradead.org>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>
 
-On Tue, Oct 10, 2017 at 10:06:35AM -0500, Eric Blake wrote:
-> On 10/10/2017 09:22 AM, Peter Maydell wrote:
-> > Hi; we currently have an issue with the u-boot we're using where it
-> > has a file and a directory that differ only in case (scripts/Kconfig
-> > and scripts/kconfig/). This means that QEMU's release tarballs won't
-> > unpack on a case-insensitive filesystem (OSX, Windows).
+On Mon, Oct 02, 2017 at 04:38:01PM +0000, Wang, Wei W wrote:
+> On Sunday, October 1, 2017 11:19 AM, Michael S. Tsirkin wrote:
+> > On Sat, Sep 30, 2017 at 12:05:54PM +0800, Wei Wang wrote:
+> > > +static void ctrlq_send_cmd(struct virtio_balloon *vb,
+> > > +			  struct virtio_balloon_ctrlq_cmd *cmd,
+> > > +			  bool inbuf)
+> > > +{
+> > > +	struct virtqueue *vq = vb->ctrl_vq;
+> > > +
+> > > +	ctrlq_add_cmd(vq, cmd, inbuf);
+> > > +	if (!inbuf) {
+> > > +		/*
+> > > +		 * All the input cmd buffers are replenished here.
+> > > +		 * This is necessary because the input cmd buffers are lost
+> > > +		 * after live migration. The device needs to rewind all of
+> > > +		 * them from the ctrl_vq.
 > > 
-> > u-boot have now fixed this upstream:
-> > http://git.denx.de/?p=u-boot.git;a=commitdiff;h=610eec7f0593574c034054ba54fc1c934755e208
-> > 
-> > but we need to decide how best to get this fix into QEMU so that
-> > our tarballs will unpack, both for the upcoming QEMU 2.11 and
-> > ideally for future point releases based on 2.10.
-> > 
-> > I can see a couple of options:
-> >  (1) wait for next u-boot release (scheduled for Nov 13, 2017),
-> >      and move to that
-> >      [downsides: would be in the middle of QEMU's own release cycle,
-> >       pretty late to fix any problems with the new version;
-> >       rather a big change to put into stable]
-> >  (2) move to u-boot current head-of-unstable
-> >      [downsides: would mean running some random git commit version,
-> >       also not really very suitable for stable]
-> >  (3) backport the upstream fix to sit on top of the u-boot version
-> >      we're currently using (I think the patch should apply as-is)
-> >      [downsides: would need to figure out how to get that commit into
-> >       the mirror of the u-boot repo that we use; would a build of it
-> >       claim a misleading u-boot version number?]
-> >  (4) suggest your better idea here!
-> > 
-> > Thoughts?
+> > Confused. Live migration somehow loses state? Why is that and why is it a good
+> > idea? And how do you know this is migration even?
+> > Looks like all you know is you got free page end. Could be any reason for this.
 > 
-> half-and-half? Use option (1) for 2.11 (that is, wait for November's
-> release there), but option (3) for 2.10.2 (that is, backport just the
-> fix onto the u-boot version uses in 2.10.x right now)?  (I'm not sure
-> I'm a fan of the idea of split maintenance like that, but am throwing it
-> out as a possible (4) since you asked).
+> 
+> I think this would be something that the current live migration lacks - what the
+> device read from the vq is not transferred during live migration, an example is the 
+> stat_vq_elem: 
+> Line 476 at https://github.com/qemu/qemu/blob/master/hw/virtio/virtio-balloon.c
 
-There's always the "do nothing" option for the stable branch too.
+This does not touch guest memory though it just manipulates
+internal state to make it easier to migrate.
+It's transparent to guest as migration should be.
 
-It isn't nice but there is a workaround, which we could easily publicise
-on the '/download/' page of the website until 2.11 comes out
+> For all the things that are added to the vq and need to be held by the device
+> to use later need to consider the situation that live migration might happen at any
+> time and they need to be re-taken from the vq by the device on the destination
+> machine.
+> 
+> So, even without this live migration optimization feature, I think all the things that are 
+> added to the vq for the device to hold, need a way for the device to rewind back from
+> the vq - re-adding all the elements to the vq is a trick to keep a record of all of them
+> on the vq so that the device side rewinding can work. 
+> 
+> Please let me know if anything is missed or if you have other suggestions.
+
+IMO migration should pass enough data source to destination for
+destination to continue where source left off without guest help.
+
+> 
+> > > +static void ctrlq_handle(struct virtqueue *vq) {
+> > > +	struct virtio_balloon *vb = vq->vdev->priv;
+> > > +	struct virtio_balloon_ctrlq_cmd *msg;
+> > > +	unsigned int class, cmd, len;
+> > > +
+> > > +	msg = (struct virtio_balloon_ctrlq_cmd *)virtqueue_get_buf(vq, &len);
+> > > +	if (unlikely(!msg))
+> > > +		return;
+> > > +
+> > > +	/* The outbuf is sent by the host for recycling, so just return. */
+> > > +	if (msg == &vb->free_page_cmd_out)
+> > > +		return;
+> > > +
+> > > +	class = virtio32_to_cpu(vb->vdev, msg->class);
+> > > +	cmd =  virtio32_to_cpu(vb->vdev, msg->cmd);
+> > > +
+> > > +	switch (class) {
+> > > +	case VIRTIO_BALLOON_CTRLQ_CLASS_FREE_PAGE:
+> > > +		if (cmd == VIRTIO_BALLOON_FREE_PAGE_F_STOP) {
+> > > +			vb->report_free_page_stop = true;
+> > > +		} else if (cmd == VIRTIO_BALLOON_FREE_PAGE_F_START) {
+> > > +			vb->report_free_page_stop = false;
+> > > +			queue_work(vb->balloon_wq, &vb-
+> > >report_free_page_work);
+> > > +		}
+> > > +		vb->free_page_cmd_in.class =
+> > > +
+> > 	VIRTIO_BALLOON_CTRLQ_CLASS_FREE_PAGE;
+> > > +		ctrlq_send_cmd(vb, &vb->free_page_cmd_in, true);
+> > > +	break;
+> > > +	default:
+> > > +		dev_warn(&vb->vdev->dev, "%s: cmd class not supported\n",
+> > > +			 __func__);
+> > > +	}
+> > 
+> > Manipulating report_free_page_stop without any locks looks very suspicious.
+> 
+> > Also, what if we get two start commands? we should restart from beginning,
+> > should we not?
+> > 
+> 
+> 
+> Yes, it will start to report free pages from the beginning.
+> walk_free_mem_block() doesn't maintain any internal status, so the invoking of
+> it will always start from the beginning.
+
+Well yes but it will first complete the previous walk.
+
+> 
+> > > +/* Ctrlq commands related to VIRTIO_BALLOON_CTRLQ_CLASS_FREE_PAGE
+> > */
+> > > +#define VIRTIO_BALLOON_FREE_PAGE_F_STOP		0
+> > > +#define VIRTIO_BALLOON_FREE_PAGE_F_START	1
+> > > +
+> > >  #endif /* _LINUX_VIRTIO_BALLOON_H */
+> > 
+> > The stop command does not appear to be thought through.
+> > 
+> > Let's assume e.g. you started migration. You ask guest for free pages.
+> > Then you cancel it.  There are a bunch of pages in free vq and you are getting
+> > more.  You now want to start migration again. What to do?
+> > 
+> > A bunch of vq flushing and waiting will maybe do the trick, but waiting on guest
+> > is never a great idea.
+> > 
+> 
+> 
+> I think the device can flush (pop out what's left in the vq and push them back) the
+> vq right after the Stop command is sent to the guest, rather than doing the flush
+> when the 2nd initiation of live migration begins. The entries pushed back to the vq
+> will be in the used ring, what would the device need to wait for?
+
+You will be getting stale pages in available ring which were possibly
+taken out of free list since memory is not tracked when migration is not
+going on.
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
+> > I previously suggested pushing the stop/start commands from guest to host on
+> > the free page vq, and including an ID in host to guest and guest to host
+> > commands. This way ctrl vq is just for host to guest commands, and host
+> > matches commands and knows which command is a free page in response to.
+> > 
+> > I still think it's a good idea but go ahead and propose something else that works.
+> > 
+> 
+> Thanks for the suggestion. Probably I haven't fully understood it. Please see the example
+> below:
+> 
+> 1) host-to-guest ctrl_vq:
+> StartCMD, ID=1
+> 
+> 2) guest-to-host free_page_vq:
+> free_page, ID=1
+> free_page, ID=1
+> free_page, ID=1
+> free_page, ID=1
+> 
+> 3) host-to-guest ctrl_vq:
+> StopCMD, ID=1
+> 
+> 4) initiate the 2nd try of live migration via host-to-guest ctrl_vq:
+> StartCMD, ID=2
+> 
+> 5) the guest-to-host free_page_vq might look like this:
+> free_page, ID=1
+> free_page, ID=1
+> free_page, ID=2
+> free_page, ID=2
+> 
+> The device will need to drop (pop out the two entries and push them back)
+> the first 2 obsolete free pages which are sent by ID=1.
+
+yes. But you do not have to attach id to each page.
+
+It can be:
+
+ID=1
+free_page
+free_page
+ID=2
+free_page
+free_page
+
+
+
+> I haven't found the benefits above yet. The device will perform the same operations
+> to get rid of the old free pages. If we drop the old free pages after the StopCMD (
+> ID may also not be needed in this case), the overhead won't be added to the live
+> migration time.
+> Would you have any thought about this?
+> 
+> 
+> Best,
+> Wei
+> 
+
+As these are separate vqs there is not clean way to know whether
+free_page was queued before or after stop command.
+Sending the ID helps detect where the free pages for a given start
+command are.
