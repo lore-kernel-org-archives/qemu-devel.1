@@ -1,40 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e1wWR-0004vq-RW
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:32:47 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e1wXU-0005VG-CN
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:33:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e1wWN-0005aK-Ty
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:32:43 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57107
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e1wWN-0005Zy-Nv
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:32:39 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9AFVMfl127725
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 11:32:35 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dgwesdnu7-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 11:32:35 -0400
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Tue, 10 Oct 2017 09:32:34 -0600
-References: <20171009225623.29232-1-marcandre.lureau@redhat.com>
-	<20171009225623.29232-14-marcandre.lureau@redhat.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Tue, 10 Oct 2017 11:32:30 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e1wXQ-00060w-81
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:33:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36352)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e1wXQ-00060V-0n
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:33:44 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 192E9A1F41
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 15:33:43 +0000 (UTC)
+Date: Tue, 10 Oct 2017 12:33:35 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171010153335.GC3246@localhost.localdomain>
+References: <20171006215244.27104-1-ehabkost@redhat.com>
+	<20171006215244.27104-2-ehabkost@redhat.com>
+	<f4bd17b9-42ca-0e2a-1a84-57b17510bb30@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171009225623.29232-14-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <69f82087-3ab7-b1f3-f043-85e7a467d06f@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 13/42] tpm: remove locty argument from
- receive_cb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f4bd17b9-42ca-0e2a-1a84-57b17510bb30@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/7] qemu-doc: Document minimum kernel
+ version for KVM in x86_64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,88 +35,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: amarnath.valluri@intel.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On 10/09/2017 06:55 PM, Marc-Andr=C3=A9 Lureau wrote:
-> The tpm_state is passed as argument, the assert() is pointless since
-> we give it the value of tpm_state->locty_number already.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On Mon, Oct 09, 2017 at 03:40:02PM +0200, Paolo Bonzini wrote:
+> On 06/10/2017 23:52, Eduardo Habkost wrote:
+> > The default set of KVM CPU features require the host kernel to
+> > support them.  KVM_PV_EOI is the newest one, and was included on
+> > Linux v3.6 (Linux commit ae7a2a3f).
+> > 
+> > Running on an old host might break management software
+> > expectations because the latest machine-type won't be runnable
+> > while older machine-types might be runnable.  Document v3.6 as
+> > the minimum kernel version for KVM on x86_64.
+> > 
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> >  qemu-doc.texi | 9 +++++++++
+> >  1 file changed, 9 insertions(+)
+> > 
+> > diff --git a/qemu-doc.texi b/qemu-doc.texi
+> > index ecd186a159..be45b6b6f6 100644
+> > --- a/qemu-doc.texi
+> > +++ b/qemu-doc.texi
+> > @@ -37,6 +37,7 @@
+> >  * QEMU System emulator for non PC targets::
+> >  * QEMU Guest Agent::
+> >  * QEMU User space emulator::
+> > +* System requirements::
+> >  * Implementation notes::
+> >  * Deprecated features::
+> >  * License::
+> > @@ -2348,6 +2349,14 @@ Act as if the host page size was 'pagesize' bytes
+> >  Run the emulation in single step mode.
+> >  @end table
+> >  
+> > +@node System requirements
+> > +@chapter System requirements
+> > +
+> > +@section KVM kernel module
+> > +
+> > +On x86_64 hosts, the default set of CPU features enabled by the KVM accelerator
+> > +require the host to be running Linux v3.6 or newer.
+> > +
+> >  
+> >  @include qemu-tech.texi
+> >  
+> > 
+> 
+> Maybe we should expand on the consequences of running on older versions?
 
-Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+I intentionally tried to not make any commitment to what should
+happen if running an older kernel.  But a quick explanation of
+what can happen is probably a good idea.  I will try to come up
+with something.
 
-> ---
->   include/sysemu/tpm_backend.h | 2 +-
->   hw/tpm/tpm_emulator.c        | 3 +--
->   hw/tpm/tpm_passthrough.c     | 4 +---
->   hw/tpm/tpm_tis.c             | 5 ++---
->   4 files changed, 5 insertions(+), 9 deletions(-)
->
-> diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.=
-h
-> index 7d7ebfc21d..9c83a512e1 100644
-> --- a/include/sysemu/tpm_backend.h
-> +++ b/include/sysemu/tpm_backend.h
-> @@ -30,7 +30,7 @@
->   typedef struct TPMBackendClass TPMBackendClass;
->   typedef struct TPMBackend TPMBackend;
->  =20
-> -typedef void (TPMRecvDataCB)(TPMState *, uint8_t locty, bool selftest_=
-done);
-> +typedef void (TPMRecvDataCB)(TPMState *, bool selftest_done);
->  =20
->   struct TPMBackend {
->       Object parent;
-> diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
-> index dadc264182..4fe405353a 100644
-> --- a/hw/tpm/tpm_emulator.c
-> +++ b/hw/tpm/tpm_emulator.c
-> @@ -193,8 +193,7 @@ static void tpm_emulator_handle_request(TPMBackend =
-*tb)
->           error_report_err(err);
->       }
->  =20
-> -    tb->recv_data_callback(tb->tpm_state, tb->tpm_state->locty_number,
-> -                           selftest_done);
-> +    tb->recv_data_callback(tb->tpm_state, selftest_done);
->   }
->  =20
->   static int tpm_emulator_probe_caps(TPMEmulator *tpm_emu)
-> diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-> index fed3d69799..0ae4596932 100644
-> --- a/hw/tpm/tpm_passthrough.c
-> +++ b/hw/tpm/tpm_passthrough.c
-> @@ -160,9 +160,7 @@ static void tpm_passthrough_handle_request(TPMBacke=
-nd *tb)
->                                     tb->tpm_state->locty_data,
->                                     &selftest_done);
->  =20
-> -    tb->recv_data_callback(tb->tpm_state,
-> -                           tb->tpm_state->locty_number,
-> -                           selftest_done);
-> +    tb->recv_data_callback(tb->tpm_state, selftest_done);
->   }
->  =20
->   static void tpm_passthrough_reset(TPMBackend *tb)
-> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-> index c54dac32de..345a4fbee5 100644
-> --- a/hw/tpm/tpm_tis.c
-> +++ b/hw/tpm/tpm_tis.c
-> @@ -371,14 +371,13 @@ static void tpm_tis_receive_bh(void *opaque)
->   /*
->    * Callback from the TPM to indicate that the response was received.
->    */
-> -static void tpm_tis_receive_cb(TPMState *s, uint8_t locty,
-> +static void tpm_tis_receive_cb(TPMState *s,
->                                  bool is_selftest_done)
->   {
->       TPMTISEmuState *tis =3D &s->s.tis;
-> +    uint8_t locty =3D s->locty_number;
->       uint8_t l;
->  =20
-> -    assert(s->locty_number =3D=3D locty);
-> -
->       if (is_selftest_done) {
->           for (l =3D 0; l < TPM_TIS_NUM_LOCALITIES; l++) {
->               tis->loc[locty].sts |=3D TPM_TIS_STS_SELFTEST_DONE;
+-- 
+Eduardo
