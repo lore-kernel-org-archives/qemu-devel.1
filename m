@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e22CK-0002E8-3a
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:36:20 -0400
+	(envelope-from <ppandit@redhat.com>) id 1e22CM-0002G1-7J
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:36:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e22CF-0001eQ-6A
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:36:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54790)
+	(envelope-from <ppandit@redhat.com>) id 1e22CL-0001nr-8z
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:36:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36204)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1e22CF-0001ct-05
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:36:15 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 10 Oct 2017 23:34:45 +0200
-Message-Id: <20171010213506.22989-7-marcandre.lureau@redhat.com>
-In-Reply-To: <20171010213506.22989-1-marcandre.lureau@redhat.com>
-References: <20171010213506.22989-1-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 06/27] vhost-user-scsi: use g_strdup()
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1e22CL-0001lA-2Q
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 17:36:21 -0400
+From: P J P <ppandit@redhat.com>
+Date: Wed, 11 Oct 2017 03:06:08 +0530
+Message-Id: <20171010213608.31567-1-ppandit@redhat.com>
+Subject: [Qemu-devel] [PATCH] cirrus: keep vga vram pointer within bounds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +21,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, changpeng.liu@intel.com, f4bug@amsat.org, felipe@nutanix.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Qemu Developers <qemu-devel@nongnu.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Niu Guoxiang <niuguoxiang@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-Since vhost-user-scsi uses glib.
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+'dst' pointer could exceed vga vram size when writing to the
+cirrus memory area; it'd lead to an OOB access issue. Add check
+to avoid it.
+
+Reported-by: Niu Guoxiang <niuguoxiang@huawei.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 ---
- contrib/vhost-user-scsi/vhost-user-scsi.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ hw/display/cirrus_vga.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-us=
-er-scsi/vhost-user-scsi.c
-index 78bcc65f5a..1fb57da2da 100644
---- a/contrib/vhost-user-scsi/vhost-user-scsi.c
-+++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
-@@ -822,10 +822,10 @@ int main(int argc, char **argv)
-         case 'h':
-             goto help;
-         case 'u':
--            unix_fn =3D strdup(optarg);
-+            unix_fn =3D g_strdup(optarg);
-             break;
-         case 'i':
--            iscsi_uri =3D strdup(optarg);
-+            iscsi_uri =3D g_strdup(optarg);
-             break;
-         default:
-             goto help;
-@@ -854,12 +854,8 @@ out:
-         vdev_scsi_deinit(vdev_scsi);
-         free(vdev_scsi);
+diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+index afc290ab91..451a736262 100644
+--- a/hw/display/cirrus_vga.c
++++ b/hw/display/cirrus_vga.c
+@@ -2047,8 +2047,11 @@ static void cirrus_mem_writeb_mode4and5_8bpp(CirrusVGAState * s,
+ 	}
+ 	val <<= 1;
+ 	dst++;
++        if (dst >= s->vga.vram_ptr + s->vga.vram_size) {
++            break;
++        }
      }
--    if (unix_fn) {
--        free(unix_fn);
--    }
--    if (iscsi_uri) {
--        free(iscsi_uri);
--    }
-+    g_free(unix_fn);
-+    g_free(iscsi_uri);
-=20
-     return err;
-=20
---=20
-2.15.0.rc0.40.gaefcc5f6f
+-    memory_region_set_dirty(&s->vga.vram, offset, 8);
++    memory_region_set_dirty(&s->vga.vram, offset, x);
+ }
+ 
+ static void cirrus_mem_writeb_mode4and5_16bpp(CirrusVGAState * s,
+@@ -2071,8 +2074,11 @@ static void cirrus_mem_writeb_mode4and5_16bpp(CirrusVGAState * s,
+ 	}
+ 	val <<= 1;
+ 	dst += 2;
++        if (dst >= s->vga.vram_ptr + s->vga.vram_size) {
++            break;
++        }
+     }
+-    memory_region_set_dirty(&s->vga.vram, offset, 16);
++    memory_region_set_dirty(&s->vga.vram, offset, x<<1);
+ }
+ 
+ /***************************************
+-- 
+2.13.6
