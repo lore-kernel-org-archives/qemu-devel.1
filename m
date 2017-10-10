@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e1vON-00049t-Po
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:20:23 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e1vQz-0005HE-UL
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:23:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e1vOH-0007W2-Dd
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:20:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40320)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e1vOH-0007VR-4q
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:20:13 -0400
-Date: Tue, 10 Oct 2017 16:20:06 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171010162006.4e541412.cohuck@redhat.com>
-In-Reply-To: <cf1fd114-9b28-88b1-baac-669407631846@redhat.com>
-References: <20170928203708.9376-1-david@redhat.com>
-	<20170928203708.9376-2-david@redhat.com>
-	<cf1fd114-9b28-88b1-baac-669407631846@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1e1vQy-0000y9-Lu
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:23:01 -0400
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:54813)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e1vQy-0000xk-Cs
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 10:23:00 -0400
+Received: by mail-wm0-x22d.google.com with SMTP id i124so5838815wmf.3
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 07:23:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 01/30] s390x/tcg: turn INTERRUPT_EXT
- into a mask
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 10 Oct 2017 15:22:38 +0100
+Message-ID: <CAFEAcA-KNF0Q2HisqN8s0zhm1dyPxFrKri6tYNpUai_=OnAppw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] updating to a u-boot without the case-sensitive
+ filename clash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,86 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Fri, 6 Oct 2017 09:08:45 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+Hi; we currently have an issue with the u-boot we're using where it
+has a file and a directory that differ only in case (scripts/Kconfig
+and scripts/kconfig/). This means that QEMU's release tarballs won't
+unpack on a case-insensitive filesystem (OSX, Windows).
 
-> On 28.09.2017 22:36, David Hildenbrand wrote:
-> > External interrupts are currently all handled like floating external
-> > interrupts, they are queued. Let's prepare for a split of floating
-> > and local interrupts by turning INTERRUPT_EXT into a mask.
-> > 
-> > While we can have various floating external interrupts of one kind, there
-> > is usually only one (or a fixed number) of the local external interrupts.
-> > 
-> > So turn INTERRUPT_EXT into a mask and properly indicate the kind of
-> > external interrupt. Floating interrupts will have to moved out of
-> > one CPU instance later once we have SMP support.
-> > 
-> > The only floating external interrupts used right now are SERVICE
-> > interrupts, so let's use that name. Following patches will clean up
-> > SERVICE interrupt injection.
-> > 
-> > This get's rid of the ugly special handling for cpu timer and clock
-> > comparator interrupts. And we really only store the parameters as
-> > defined by the PoP.
-> > 
-> > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> > Signed-off-by: David Hildenbrand <david@redhat.com>
-> > ---
-> >  target/s390x/cpu.h         | 13 ++++++----
-> >  target/s390x/excp_helper.c | 63 +++++++++++++++++++++++-----------------------
-> >  target/s390x/helper.c      | 12 ++-------
-> >  target/s390x/internal.h    |  2 ++
-> >  target/s390x/interrupt.c   | 18 ++++++++++++-
-> >  5 files changed, 61 insertions(+), 47 deletions(-)  
-> [...]
-> > diff --git a/target/s390x/interrupt.c b/target/s390x/interrupt.c
-> > index 058e219fe5..b9c30f86d7 100644
-> > --- a/target/s390x/interrupt.c
-> > +++ b/target/s390x/interrupt.c
-> > @@ -71,7 +71,23 @@ void cpu_inject_ext(S390CPU *cpu, uint32_t code, uint32_t param,
-> >      env->ext_queue[env->ext_index].param = param;
-> >      env->ext_queue[env->ext_index].param64 = param64;
-> >  
-> > -    env->pending_int |= INTERRUPT_EXT;
-> > +    env->pending_int |= INTERRUPT_EXT_SERVICE;
-> > +    cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
-> > +}
-> > +
-> > +void cpu_inject_clock_comparator(S390CPU *cpu)
-> > +{
-> > +    CPUS390XState *env = &cpu->env;
-> > +
-> > +    env->pending_int |= INTERRUPT_EXT_CLOCK_COMPARATOR;
-> > +    cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
-> > +}
-> > +
-> > +void cpu_inject_cpu_timer(S390CPU *cpu)
-> > +{
-> > +    CPUS390XState *env = &cpu->env;
-> > +
-> > +    env->pending_int |= INTERRUPT_EXT_CPU_TIMER;
-> >      cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
-> >  }  
-> 
-> The last two function look similar enough that you could merge the
-> functions, e.g.:
-> 
-> void cpu_inject_ext_pending_bit(S390CPU *cpu, int bit)
-> {
->     CPUS390XState *env = &cpu->env;
-> 
->     env->pending_int |= bit;
->     cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
-> }
-> 
-> ?
-> 
-> Apart from that, the patch looks fine to me.
-> 
->  Thomas
+u-boot have now fixed this upstream:
+http://git.denx.de/?p=u-boot.git;a=commitdiff;h=610eec7f0593574c034054ba54fc1c934755e208
 
-FWIW, I'd prefer to keep these as separate functions.
+but we need to decide how best to get this fix into QEMU so that
+our tarballs will unpack, both for the upcoming QEMU 2.11 and
+ideally for future point releases based on 2.10.
+
+I can see a couple of options:
+ (1) wait for next u-boot release (scheduled for Nov 13, 2017),
+     and move to that
+     [downsides: would be in the middle of QEMU's own release cycle,
+      pretty late to fix any problems with the new version;
+      rather a big change to put into stable]
+ (2) move to u-boot current head-of-unstable
+     [downsides: would mean running some random git commit version,
+      also not really very suitable for stable]
+ (3) backport the upstream fix to sit on top of the u-boot version
+     we're currently using (I think the patch should apply as-is)
+     [downsides: would need to figure out how to get that commit into
+      the mirror of the u-boot repo that we use; would a build of it
+      claim a misleading u-boot version number?]
+ (4) suggest your better idea here!
+
+Thoughts?
+
+(Proposals for automated tests to ensure we don't run into the
+case-sensitivity problem again in future also welcome.)
+
+thanks
+-- PMM
