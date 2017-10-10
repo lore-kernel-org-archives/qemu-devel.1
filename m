@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4w-0008An-IZ
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:27 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4t-00087z-8E
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4u-0007ic-Fg
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46362)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e1y4q-0007gi-2u
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57298)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1e1y4u-0007iE-9c
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:24 -0400
+	id 1e1y4p-0007gO-QY
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 13:12:20 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 10 Oct 2017 19:11:17 +0200
-Message-Id: <20171010171122.9756-23-marcandre.lureau@redhat.com>
+Date: Tue, 10 Oct 2017 19:11:16 +0200
+Message-Id: <20171010171122.9756-22-marcandre.lureau@redhat.com>
 In-Reply-To: <20171010171122.9756-1-marcandre.lureau@redhat.com>
 References: <20171010171122.9756-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 22/27] vhost-user-scsi: drop extra callback
- pointer
+Subject: [Qemu-devel] [PULL 21/27] vhost-user-scsi: don't copy
+ iscsi/scsi-lowlevel.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,63 +31,157 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, f4bug@amsat.org, changpeng.liu@intel.com, felipe@nutanix.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Use the one from the source with casting, like any other glib source.
+There is no need to include hw/virtio/virtio-scsi.h, then the conflict
+with SCSI_XFER enum goes away.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- contrib/vhost-user-scsi/vhost-user-scsi.c | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+ contrib/vhost-user-scsi/vhost-user-scsi.c | 96 +++----------------------=
+------
+ 1 file changed, 9 insertions(+), 87 deletions(-)
 
 diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-us=
 er-scsi/vhost-user-scsi.c
-index cfac1ce1fe..0e6784187c 100644
+index c7f9d82142..cfac1ce1fe 100644
 --- a/contrib/vhost-user-scsi/vhost-user-scsi.c
 +++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
-@@ -81,7 +81,6 @@ typedef struct vus_gsrc {
-     GSource parent;
-     VusDev *vdev_scsi;
-     GPollFD gfd;
--    vu_watch_cb vu_cb;
- } vus_gsrc_t;
+@@ -12,8 +12,9 @@
 =20
- static gint vus_fdmap_compare(gconstpointer a, gconstpointer b)
-@@ -112,18 +111,13 @@ static gboolean vus_gsrc_dispatch(GSource *src, GSo=
-urceFunc cb, gpointer data)
-     vus_gsrc_t *vus_src =3D (vus_gsrc_t *)src;
+ #include "qemu/osdep.h"
+ #include "contrib/libvhost-user/libvhost-user.h"
+-#include "hw/virtio/virtio-scsi.h"
++#include "standard-headers/linux/virtio_scsi.h"
+ #include "iscsi/iscsi.h"
++#include "iscsi/scsi-lowlevel.h"
 =20
-     assert(vus_src);
--    assert(!(vus_src->vu_cb && cb));
+ #include <glib.h>
 =20
-     vdev_scsi =3D vus_src->vdev_scsi;
-=20
-     assert(vdev_scsi);
-=20
--    if (cb) {
--        return cb(data);
--    }
--    if (vus_src->vu_cb) {
--        vus_src->vu_cb(&vdev_scsi->vu_dev, vus_src->gfd.revents, data);
--    }
-+    ((vu_watch_cb)cb)(&vdev_scsi->vu_dev, vus_src->gfd.revents, data);
-+
-     return G_SOURCE_CONTINUE;
+@@ -163,90 +164,11 @@ static void vus_gsrc_new(VusDev *vdev_scsi, int fd,=
+ GIOCondition cond,
+                                     (gpointer)(uintptr_t)id);
  }
 =20
-@@ -147,12 +141,12 @@ static void vus_gsrc_new(VusDev *vdev_scsi, int fd,=
- GIOCondition cond,
-     assert(!(vu_cb && gsrc_cb));
+-/* from libiscsi's scsi-lowlevel.h **
+- *
+- * nb. We can't directly include scsi-lowlevel.h due to a namespace conf=
+lict:
+- *     QEMU's scsi.h also defines "SCSI_XFER_NONE".
+- */
+-
+-#define SCSI_CDB_MAX_SIZE           16
+-
+-struct scsi_iovector {
+-    struct scsi_iovec *iov;
+-    int niov;
+-    int nalloc;
+-    size_t offset;
+-    int consumed;
+-};
+-
+-struct scsi_allocated_memory {
+-    struct scsi_allocated_memory *next;
+-    char buf[0];
+-};
+-
+-struct scsi_data {
+-    int            size;
+-    unsigned char *data;
+-};
+-
+-enum scsi_sense_key {
+-    SCSI_SENSE_NO_SENSE            =3D 0x00,
+-    SCSI_SENSE_RECOVERED_ERROR     =3D 0x01,
+-    SCSI_SENSE_NOT_READY           =3D 0x02,
+-    SCSI_SENSE_MEDIUM_ERROR        =3D 0x03,
+-    SCSI_SENSE_HARDWARE_ERROR      =3D 0x04,
+-    SCSI_SENSE_ILLEGAL_REQUEST     =3D 0x05,
+-    SCSI_SENSE_UNIT_ATTENTION      =3D 0x06,
+-    SCSI_SENSE_DATA_PROTECTION     =3D 0x07,
+-    SCSI_SENSE_BLANK_CHECK         =3D 0x08,
+-    SCSI_SENSE_VENDOR_SPECIFIC     =3D 0x09,
+-    SCSI_SENSE_COPY_ABORTED        =3D 0x0a,
+-    SCSI_SENSE_COMMAND_ABORTED     =3D 0x0b,
+-    SCSI_SENSE_OBSOLETE_ERROR_CODE =3D 0x0c,
+-    SCSI_SENSE_OVERFLOW_COMMAND    =3D 0x0d,
+-    SCSI_SENSE_MISCOMPARE          =3D 0x0e
+-};
+-
+-struct scsi_sense {
+-    unsigned char       error_type;
+-    enum scsi_sense_key key;
+-    int                 ascq;
+-    unsigned            sense_specific:1;
+-    unsigned            ill_param_in_cdb:1;
+-    unsigned            bit_pointer_valid:1;
+-    unsigned char       bit_pointer;
+-    uint16_t            field_pointer;
+-};
+-
+-enum scsi_residual {
+-    SCSI_RESIDUAL_NO_RESIDUAL =3D 0,
+-    SCSI_RESIDUAL_UNDERFLOW,
+-    SCSI_RESIDUAL_OVERFLOW
+-};
+-
+-struct scsi_task {
+-    int status;
+-    int cdb_size;
+-    int xfer_dir;
+-    int expxferlen;
+-    unsigned char cdb[SCSI_CDB_MAX_SIZE];
+-    enum scsi_residual residual_status;
+-    size_t residual;
+-    struct scsi_sense sense;
+-    struct scsi_data datain;
+-    struct scsi_allocated_memory *mem;
+-    void *ptr;
+-
+-    uint32_t itt;
+-    uint32_t cmdsn;
+-    uint32_t lun;
+-
+-    struct scsi_iovector iovector_in;
+-    struct scsi_iovector iovector_out;
+-};
+-
+ /** libiscsi integration **/
 =20
-     vus_gsrc =3D g_source_new(&vus_gsrc_funcs, sizeof(vus_gsrc_t));
-+    g_source_set_callback(vus_gsrc, (GSourceFunc) vu_cb, data, NULL);
-     vus_src =3D (vus_gsrc_t *)vus_gsrc;
++typedef struct virtio_scsi_cmd_req VirtIOSCSICmdReq;
++typedef struct virtio_scsi_cmd_resp VirtIOSCSICmdResp;
++
+ static int vus_iscsi_add_lun(VusIscsiLun *lun, char *iscsi_uri)
+ {
+     struct iscsi_url *iscsi_url;
+@@ -365,12 +287,12 @@ static int handle_cmd_sync(struct iscsi_context *ct=
+x,
+     if (!out_len && !in_len) {
+         dir =3D SCSI_XFER_NONE;
+     } else if (out_len) {
+-        dir =3D SCSI_XFER_TO_DEV;
++        dir =3D SCSI_XFER_WRITE;
+         for (i =3D 0; i < out_len; i++) {
+             len +=3D out[i].iov_len;
+         }
+     } else {
+-        dir =3D SCSI_XFER_FROM_DEV;
++        dir =3D SCSI_XFER_READ;
+         for (i =3D 0; i < in_len; i++) {
+             len +=3D in[i].iov_len;
+         }
+@@ -378,10 +300,10 @@ static int handle_cmd_sync(struct iscsi_context *ct=
+x,
 =20
-     vus_src->vdev_scsi =3D vdev_scsi;
-     vus_src->gfd.fd =3D fd;
-     vus_src->gfd.events =3D cond;
--    vus_src->vu_cb =3D vu_cb;
+     task =3D scsi_task_new(cdb_len, req->cdb, dir, len);
 =20
-     g_source_add_poll(vus_gsrc, &vus_src->gfd);
-     g_source_set_callback(vus_gsrc, gsrc_cb, data, NULL);
+-    if (dir =3D=3D SCSI_XFER_TO_DEV) {
++    if (dir =3D=3D SCSI_XFER_WRITE) {
+         task->iovector_out.iov =3D (struct scsi_iovec *)out;
+         task->iovector_out.niov =3D out_len;
+-    } else if (dir =3D=3D SCSI_XFER_FROM_DEV) {
++    } else if (dir =3D=3D SCSI_XFER_READ) {
+         task->iovector_in.iov =3D (struct scsi_iovec *)in;
+         task->iovector_in.niov =3D in_len;
+     }
 --=20
 2.15.0.rc0.40.gaefcc5f6f
