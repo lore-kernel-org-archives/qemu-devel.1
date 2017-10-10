@@ -1,36 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1e1wrl-0001ZG-NW
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:54:50 -0400
+	(envelope-from <clg@kaod.org>) id 1e1wtL-00031V-6Z
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:56:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1e1wrg-0000fA-W0
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:54:45 -0400
-Received: from 4.mo178.mail-out.ovh.net ([46.105.49.171]:33887)
+	(envelope-from <clg@kaod.org>) id 1e1wtG-0001fF-N1
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:56:23 -0400
+Received: from 10.mo178.mail-out.ovh.net ([46.105.76.150]:57919)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1e1wrg-0000eM-Qh
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:54:40 -0400
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1e1wtG-0001cu-Dr
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 11:56:18 -0400
 Received: from player728.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id CB02459E91
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 17:54:38 +0200 (CEST)
-References: <20170920070135.31379-1-clg@kaod.org>
-	<20170920070135.31379-2-clg@kaod.org>
-	<CAFEAcA9-dmTD3v1YU7Wr5EcA53z=c_WxS0K1+1zbw16q=vj-vQ@mail.gmail.com>
-	<f3871f0a-7df2-a5e0-1770-8df04bb76750@kaod.org>
-	<CAFEAcA-kJ-qEoo-2ZWaH0XPv-cJA4O3wZAW=FwmM5nUU4-mVBg@mail.gmail.com>
-	<900ffff3-3667-7e17-bf38-7c6a520ed838@kaod.org>
-	<CAFEAcA-tZG-mVMk-kfxZz3oKOSBr9QDpwJWc_CSvqc7An8NNbg@mail.gmail.com>
-	<cf00417c-86a6-cf7c-eea7-b1b46d9b2cc1@kaod.org>
-	<CAFEAcA9mMCAPdgTPtEtEBMa1go0XNDCgZHmUR4bRYpTJibK9_A@mail.gmail.com>
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id AFB2159E91
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 17:56:16 +0200 (CEST)
+References: <20171009154930.29095-1-clg@kaod.org>
+	<20171009154930.29095-3-clg@kaod.org>
+	<1507622927.25065.200.camel@kernel.crashing.org>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <10c8381c-904f-681a-28c1-1f069ba29219@kaod.org>
-Date: Tue, 10 Oct 2017 17:54:30 +0200
+Message-ID: <9060b77b-356e-a2b2-cf48-d55261032376@kaod.org>
+Date: Tue, 10 Oct 2017 17:56:08 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9mMCAPdgTPtEtEBMa1go0XNDCgZHmUR4bRYpTJibK9_A@mail.gmail.com>
+In-Reply-To: <1507622927.25065.200.camel@kernel.crashing.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] aspeed: add support for the
- witherspoon-bmc board
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] spapr/rtas: disable the decrementer
+ interrupt when a CPU is unplugged
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,44 +33,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-On 10/10/2017 05:45 PM, Peter Maydell wrote:
-> On 10 October 2017 at 16:38, C=C3=A9dric Le Goater <clg@kaod.org> wrote=
-:
->> On 10/10/2017 03:24 PM, Peter Maydell wrote:
->>> On 10 October 2017 at 14:21, C=C3=A9dric Le Goater <clg@kaod.org> wro=
-te:
->>>> On 10/10/2017 11:54 AM, Peter Maydell wrote:
->>>>> The goal is to model hardware correctly. Hardware gives
->>>>> aborts if you touch a physical address with no device there,
->>>>> and so QEMU's model should do the same. If you have guest
->>>>> code that touches a physical address and blows up because
->>>>> of an abort (but doesn't when run on h/w) then either:
->>>>>  * it is trying to probe a device that exists in real h/w:
->>>>>    you need to provide a stub implementation in QEMU
->>>>>  * the SoC's bus fabric really doesn't pass aborts back
->>>>>    to the CPU; I think this is unlikely, but you can model
->>>>>    it at the SoC level with a suitable default memory region
->>>>
->>>> well, that is case it seems.
->>>
->>> If it is, then we should model the SoC that way, ie find
->>> out from the hardware docs what part of the bus fabric
->>> ignores decode errors and use memory regions with the
->>> right default behaviour to cover the relevant address
->>> ranges.
+On 10/10/2017 10:08 AM, Benjamin Herrenschmidt wrote:
+> On Mon, 2017-10-09 at 17:49 +0200, C=C3=A9dric Le Goater wrote:
+>> When a CPU is stopped with the 'stop-self' RTAS call, its state
+>> 'halted' is switched to 1 and, in this case, the MSR is not taken into
+>> account anymore in the cpu_has_work() routine. Only the pending
+>> hardware interrupts are checked with their LPCR:PECE* enablement bit.
 >>
->> The addresses generating memory fault errors are all in
->> the region where the BMC SPI Flash Memory is mapped :
->> [ 20000000-2FFFFFFF ]
+>> If the DECR timer fires after 'stop-self' is called and before the CPU
+>> 'stop' state is reached, the nearly-dead CPU will have some work to do
+>> and the guest will crash. This case happens very frequently with the
+>> not yet upstream P9 XIVE exploitation mode. In XICS mode, the DECR is
+>> occasionally fired but after 'stop' state, so no work is to be done
+>> and the guest survives.
+>>
+>> I suspect there is a race between the QEMU mainloop triggering the
+>> timers and the TCG CPU thread but I could not quite identify the root
+>> cause. To be safe, let's disable the decrementer interrupt in the LPCR
+>> when the CPU is halted and reenable it when the CPU is restarted.
+>>
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 >=20
-> If there's an actual flash device there then this sounds
-> like my first case above, where we just need to stub out
-> that range of addresses until we get round to really
-> implementing the flash device.
+> We should disable external interrupts and doorbells too no ? IE, we
+> could clear all of PECE in fact.
 
-but it is implemented ! and the region available.
+and enable them all in 'start-cpu' for secondaries then ?=20
 
-C.
+C.=20
+
+
+>=20
+>> ---
+>>
+>> Changes in v2:
+>>
+>>  - used a new routine ppc_cpu_pvr_match() to discriminate CPU versions
+>>  - removed the LPCR:PECE* enablement bit when the CPU is initialized
+>>    if it is a secondary
+>>
+>>  hw/ppc/spapr_rtas.c         | 20 ++++++++++++++++++++
+>>  target/ppc/translate_init.c | 19 +++++++++++++++++--
+>>  2 files changed, 37 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+>> index cdf0b607a0a0..dfdbf1e2c6f8 100644
+>> --- a/hw/ppc/spapr_rtas.c
+>> +++ b/hw/ppc/spapr_rtas.c
+>> @@ -46,6 +46,7 @@
+>>  #include "qemu/cutils.h"
+>>  #include "trace.h"
+>>  #include "hw/ppc/fdt.h"
+>> +#include "target/ppc/cpu-models.h"
+>> =20
+>>  static void rtas_display_character(PowerPCCPU *cpu, sPAPRMachineState=
+ *spapr,
+>>                                     uint32_t token, uint32_t nargs,
+>> @@ -174,6 +175,15 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAP=
+RMachineState *spapr,
+>>          kvm_cpu_synchronize_state(cs);
+>> =20
+>>          env->msr =3D (1ULL << MSR_SF) | (1ULL << MSR_ME);
+>> +
+>> +        /* Enable DECR interrupt */
+>> +        if (ppc_cpu_pvr_match(cpu, CPU_POWERPC_LOGICAL_3_00)) {
+>> +            env->spr[SPR_LPCR] |=3D LPCR_DEE;
+>> +        } else {
+>> +            /* P7 and P8 both have same bit for DECR */
+>> +            env->spr[SPR_LPCR] |=3D LPCR_P8_PECE3;
+>> +        }
+>> +
+>>          env->nip =3D start;
+>>          env->gpr[3] =3D r3;
+>>          cs->halted =3D 0;
+>> @@ -210,6 +220,16 @@ static void rtas_stop_self(PowerPCCPU *cpu, sPAPR=
+MachineState *spapr,
+>>       * no need to bother with specific bits, we just clear it.
+>>       */
+>>      env->msr =3D 0;
+>> +
+>> +    /* Don't let the decremeter run on a CPU being stopped. This coul=
+d
+>> +     * deliver an interrupt on a dying CPU and crash the guest.
+>> +     */
+>> +    if (ppc_cpu_pvr_match(cpu, CPU_POWERPC_LOGICAL_3_00)) {
+>> +        env->spr[SPR_LPCR] &=3D ~LPCR_DEE;
+>> +    } else {
+>> +        /* P7 and P8 both have same bit for DECR */
+>> +        env->spr[SPR_LPCR] &=3D ~LPCR_P8_PECE3;
+>> +    }
+>>  }
+>> =20
+>>  static inline int sysparm_st(target_ulong addr, target_ulong len,
+>> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+>> index 0d6379fcc5b4..1a62159843e7 100644
+>> --- a/target/ppc/translate_init.c
+>> +++ b/target/ppc/translate_init.c
+>> @@ -8905,6 +8905,7 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtua=
+lHypervisor *vhyp)
+>>      CPUPPCState *env =3D &cpu->env;
+>>      ppc_spr_t *lpcr =3D &env->spr_cb[SPR_LPCR];
+>>      ppc_spr_t *amor =3D &env->spr_cb[SPR_AMOR];
+>> +    CPUState *cs =3D CPU(cpu);
+>> =20
+>>      cpu->vhyp =3D vhyp;
+>> =20
+>> @@ -8946,8 +8947,15 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtu=
+alHypervisor *vhyp)
+>>          } else {
+>>              lpcr->default_value &=3D ~(LPCR_UPRT | LPCR_GTSE);
+>>          }
+>> -        lpcr->default_value |=3D LPCR_PDEE | LPCR_HDEE | LPCR_EEE | L=
+PCR_DEE |
+>> +        lpcr->default_value |=3D LPCR_PDEE | LPCR_HDEE | LPCR_EEE |
+>>                                 LPCR_OEE;
+>> +
+>> +        /* Only let the decremeter wake up the boot CPU. The RTAS
+>> +         * command start-cpu will enable it on secondaries.
+>> +         */
+>> +        if (cs =3D=3D first_cpu) {
+>> +            lpcr->default_value |=3D LPCR_DEE;
+>> +        }
+>>          break;
+>>      default:
+>>          /* P7 and P8 has slightly different PECE bits, mostly because=
+ P8 adds
+>> @@ -8955,7 +8963,14 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtu=
+alHypervisor *vhyp)
+>>           * will work as expected for both implementations
+>>           */
+>>          lpcr->default_value |=3D LPCR_P8_PECE0 | LPCR_P8_PECE1 | LPCR=
+_P8_PECE2 |
+>> -                               LPCR_P8_PECE3 | LPCR_P8_PECE4;
+>> +                               LPCR_P8_PECE4;
+>> +
+>> +        /* Only let the decremeter wake up the boot CPU. The RTAS
+>> +         * command start-cpu will enable it on secondaries.
+>> +         */
+>> +        if (cs =3D=3D first_cpu) {
+>> +            lpcr->default_value |=3D LPCR_P8_PECE3;
+>> +        }
+>>      }
+>> =20
+>>      /* We should be followed by a CPU reset but update the active val=
+ue
