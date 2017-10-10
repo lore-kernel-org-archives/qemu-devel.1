@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e1tZh-0004DU-Oj
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 08:23:57 -0400
+	(envelope-from <Jim.Quigley@oracle.com>) id 1e1rgG-0002vW-2Z
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 06:22:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e1tZg-0001xa-O0
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 08:23:53 -0400
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:43428)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e1tZg-0001xB-Gl
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 08:23:52 -0400
-Received: by mail-wm0-x22e.google.com with SMTP id m72so15636849wmc.0
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 05:23:52 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20171010005600.28735-1-richard.henderson@linaro.org>
-References: <20171010005600.28735-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Oct 2017 13:23:30 +0100
-Message-ID: <CAFEAcA9iZauiFoFU9G3cjGAha7W-7EXoVSTixujeWRXL0M-oXw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/23] Queued TCG patches
+	(envelope-from <Jim.Quigley@oracle.com>) id 1e1rgE-0007Dp-Qm
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 06:22:32 -0400
+From: Jim Quigley <Jim.Quigley@oracle.com>
+Date: Tue, 10 Oct 2017 06:22:08 -0400
+Message-Id: <1507630928-28307-1-git-send-email-Jim.Quigley@oracle.com>
+Subject: [Qemu-devel] [PATCH] hw/vfio: improve error message when cannot
+ init vfio event notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +18,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, mjt@tls.msk.ru, laurent@vivier.eu, alex.williamson@redhat.com
 
-On 10 October 2017 at 01:55, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> One trivial cleanup from Jiang.  Cherry-picking half of Emilio's
-> patch set that has been reviewed.
->
->
-> r~
->
->
-> The following changes since commit 530049bc1dcc24c1178a29d99ca08b6dd08413=
-e0:
->
->   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into sta=
-ging (2017-10-06 17:43:02 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/rth7680/qemu.git tags/pull-tcg-20171009
->
-> for you to fetch changes up to 5de8a6a471ba6b86c6b4fb681e5a3c594ed5a684:
->
->   tcg/mips: delete commented out extern keyword. (2017-10-09 17:07:32 -07=
-00)
->
-> ----------------------------------------------------------------
-> Queued tcg patches
->
-> ----------------------------------------------------------------
+More information is required to assist trouble-shooting when
+QEMU fails to initialise the event notifications for devices
+assigned with VFIO-PCI. Instead of supplying the user with a cryptic
+error number only, print out a proper error message with strerror()
+so that the user has a better way to figure out what the problem is.
 
-This fails to build on w32, I'm afraid:
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+Signed-off-by: Jim Quigley <Jim.Quigley@oracle.com>
+---
+Cc: qemu-trivial@nongnu.org
+Cc: mjt@tls.msk.ru
+Cc: laurent@vivier.eu
+Cc: alex.williamson@redhat.com
+---
+ hw/vfio/pci.c | 35 ++++++++++++++++++++++++-----------
+ 1 file changed, 24 insertions(+), 11 deletions(-)
 
-/home/petmay01/linaro/qemu-for-merges/util/osdep.c:85:22: error:
-format =E2=80=98%d=E2=80=99 expects argument of type =E2=80=98int=E2=80=99,=
- but argument 3 has type
-=E2=80=98DWORD {aka long unsigned int}=E2=80=99 [-Werror=3Dformat=3D]
-         error_report("%s: VirtualProtect failed with error code %d",
-                      ^
-
-
-and on aarch32 host, the alpha bios boot test fails:
-
-QTEST_QEMU_BINARY=3Dalpha-softmmu/qemu-system-alpha QTEST_QEMU_IMG=3Dqemu-i=
-mg MALLOC
-_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))} gtester -k --v=
-erbose
--m=3Dquick tests/boot-serial-test tests/qmp-test tests/device-introspect-te=
-st test
-s/qom-test tests/test-hmp
-TEST: tests/boot-serial-test... (pid=3D20893)
-  /alpha/boot-serial/clipper:                                          **
-ERROR:/home/peter.maydell/qemu/tests/boot-serial-test.c:68:check_guest_outp=
-ut: a
-ssertion failed: (output_ok)
-FAIL
-GTester: last random seed: R02Sa8d34a40641001b23d1e3c2a89a29b09
-(pid=3D20898)
-FAIL: tests/boot-serial-test
-
-
-thanks
--- PMM
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 31e1edf..3bffb93 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -430,13 +430,16 @@ static int vfio_enable_vectors(VFIOPCIDevice *vdev, bool msix)
+ static void vfio_add_kvm_msi_virq(VFIOPCIDevice *vdev, VFIOMSIVector *vector,
+                                   int vector_n, bool msix)
+ {
+-    int virq;
++    int virq, ret;
+ 
+     if ((msix && vdev->no_kvm_msix) || (!msix && vdev->no_kvm_msi)) {
+         return;
+     }
+ 
+-    if (event_notifier_init(&vector->kvm_interrupt, 0)) {
++    ret = event_notifier_init(&vector->kvm_interrupt, 0);
++    if (ret) {
++        error_report("vfio (%s): Error: unable to init event notifier: %s (%d)",
++                     __func__, strerror(-ret), -ret);
+         return;
+     }
+ 
+@@ -486,8 +489,11 @@ static int vfio_msix_vector_do_use(PCIDevice *pdev, unsigned int nr,
+     if (!vector->use) {
+         vector->vdev = vdev;
+         vector->virq = -1;
+-        if (event_notifier_init(&vector->interrupt, 0)) {
+-            error_report("vfio: Error: event_notifier_init failed");
++        ret = event_notifier_init(&vector->interrupt, 0);
++        if (ret) {
++            error_report("vfio (%s): Error: "
++                         "unable to init event notifier: %s (%d)",
++                         __func__, strerror(-ret), -ret);
+         }
+         vector->use = true;
+         msix_vector_use(pdev, nr);
+@@ -658,8 +664,11 @@ retry:
+         vector->virq = -1;
+         vector->use = true;
+ 
+-        if (event_notifier_init(&vector->interrupt, 0)) {
+-            error_report("vfio: Error: event_notifier_init failed");
++        ret = event_notifier_init(&vector->interrupt, 0);
++        if (ret) {
++            error_report("vfio (%s): Error: "
++                         "unable to init event notifier: %s (%d)",
++                         __func__, strerror(-ret), -ret);
+         }
+ 
+         qemu_set_fd_handler(event_notifier_get_fd(&vector->interrupt),
+@@ -2471,8 +2480,10 @@ static void vfio_register_err_notifier(VFIOPCIDevice *vdev)
+         return;
+     }
+ 
+-    if (event_notifier_init(&vdev->err_notifier, 0)) {
+-        error_report("vfio: Unable to init event notifier for error detection");
++    ret = event_notifier_init(&vdev->err_notifier, 0);
++    if (ret) {
++        error_report("vfio (%s): Error: unable to init event notifier: %s (%d)"
++            " for error detection", __func__, strerror(-ret), -ret);
+         vdev->pci_aer = false;
+         return;
+     }
+@@ -2553,7 +2564,7 @@ static void vfio_register_req_notifier(VFIOPCIDevice *vdev)
+ {
+     struct vfio_irq_info irq_info = { .argsz = sizeof(irq_info),
+                                       .index = VFIO_PCI_REQ_IRQ_INDEX };
+-    int argsz;
++    int argsz, ret;
+     struct vfio_irq_set *irq_set;
+     int32_t *pfd;
+ 
+@@ -2566,8 +2577,10 @@ static void vfio_register_req_notifier(VFIOPCIDevice *vdev)
+         return;
+     }
+ 
+-    if (event_notifier_init(&vdev->req_notifier, 0)) {
+-        error_report("vfio: Unable to init event notifier for device request");
++    ret = event_notifier_init(&vdev->req_notifier, 0);
++    if (ret) {
++        error_report("vfio (%s): Error: unable to init event notifier: %s (%d)"
++            " for device request", __func__, strerror(-ret), -ret);
+         return;
+     }
+ 
+-- 
+1.8.3.1
