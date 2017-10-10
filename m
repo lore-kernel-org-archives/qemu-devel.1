@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e1uX3-0003gN-7t
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 09:25:19 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e1uXO-0003yS-00
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 09:25:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e1uWt-0004rt-C1
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 09:25:13 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:53886)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e1uWt-0004rU-69
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 09:25:03 -0400
-Received: by mail-wm0-x231.google.com with SMTP id q132so5303210wmd.2
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 06:25:03 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1e1uXJ-0005ND-3B
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 09:25:33 -0400
+Date: Tue, 10 Oct 2017 15:25:20 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171010152520.4d77f7dc.cohuck@redhat.com>
+In-Reply-To: <20171006235023.11952-27-f4bug@amsat.org>
+References: <20171006235023.11952-1-f4bug@amsat.org>
+	<20171006235023.11952-27-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <900ffff3-3667-7e17-bf38-7c6a520ed838@kaod.org>
-References: <20170920070135.31379-1-clg@kaod.org>
-	<20170920070135.31379-2-clg@kaod.org>
-	<CAFEAcA9-dmTD3v1YU7Wr5EcA53z=c_WxS0K1+1zbw16q=vj-vQ@mail.gmail.com>
-	<f3871f0a-7df2-a5e0-1770-8df04bb76750@kaod.org>
-	<CAFEAcA-kJ-qEoo-2ZWaH0XPv-cJA4O3wZAW=FwmM5nUU4-mVBg@mail.gmail.com>
-	<900ffff3-3667-7e17-bf38-7c6a520ed838@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Oct 2017 14:24:41 +0100
-Message-ID: <CAFEAcA-tZG-mVMk-kfxZz3oKOSBr9QDpwJWc_CSvqc7An8NNbg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] aspeed: add support for the
- witherspoon-bmc board
+Subject: Re: [Qemu-devel] [PATCH 26/88] S390: use g_new() family of functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,29 +23,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu trival <qemu-trivial@nongnu.org>, qemu-s390x@nongnu.org
 
-On 10 October 2017 at 14:21, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> On 10/10/2017 11:54 AM, Peter Maydell wrote:
->> The goal is to model hardware correctly. Hardware gives
->> aborts if you touch a physical address with no device there,
->> and so QEMU's model should do the same. If you have guest
->> code that touches a physical address and blows up because
->> of an abort (but doesn't when run on h/w) then either:
->>  * it is trying to probe a device that exists in real h/w:
->>    you need to provide a stub implementation in QEMU
->>  * the SoC's bus fabric really doesn't pass aborts back
->>    to the CPU; I think this is unlikely, but you can model
->>    it at the SoC level with a suitable default memory region
->
-> well, that is case it seems.
+On Fri,  6 Oct 2017 20:49:21 -0300
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
-If it is, then we should model the SoC that way, ie find
-out from the hardware docs what part of the bus fabric
-ignores decode errors and use memory regions with the
-right default behaviour to cover the relevant address
-ranges.
+> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> [PMD: more changes in hw/s390x/css.c, added target/s390x/cpu_models.c]
+> ---
+>  hw/s390x/css.c            | 10 +++++-----
+>  hw/s390x/s390-pci-bus.c   |  4 ++--
+>  target/s390x/cpu_models.c | 12 ++++++------
+>  target/s390x/diag.c       |  2 +-
+>  4 files changed, 14 insertions(+), 14 deletions(-)
 
-thanks
--- PMM
+Thanks, applied.
