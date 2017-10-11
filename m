@@ -1,39 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1e280A-0004D9-MJ
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 23:48:11 -0400
+	(envelope-from <andrew@aj.id.au>) id 1e281v-0004lh-EQ
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 23:50:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1e2807-00077q-B2
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 23:48:10 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33928)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1e2807-00077a-28
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 23:48:07 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9B3hkPQ004081
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 23:48:02 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dh7ck2a6k-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 23:48:02 -0400
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Tue, 10 Oct 2017 21:48:01 -0600
-Date: Wed, 11 Oct 2017 11:47:56 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20171004154144.88995-1-pasic@linux.vnet.ibm.com>
-	<20171004154144.88995-4-pasic@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171004154144.88995-4-pasic@linux.vnet.ibm.com>
-Message-Id: <20171011034756.GC4754@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/8] s390x: improve error handling for
- SSCH and RSCH
+	(envelope-from <andrew@aj.id.au>) id 1e281u-0007fD-G0
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 23:49:59 -0400
+Message-ID: <1507693785.5452.175.camel@aj.id.au>
+From: Andrew Jeffery <andrew@aj.id.au>
+Date: Wed, 11 Oct 2017 14:19:45 +1030
+In-Reply-To: <48144f71-c876-0e89-f01e-cbfe87687aee@kaod.org>
+References: <20170920070135.31379-1-clg@kaod.org>
+	<20170920070135.31379-2-clg@kaod.org>
+	<1507507449.5452.147.camel@aj.id.au>
+	<48144f71-c876-0e89-f01e-cbfe87687aee@kaod.org>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-GQfEwtRaPYaNTDX4TOmI"
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] aspeed: add support for the
+ witherspoon-bmc board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,152 +26,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-10-04 17:41:39 +0200]:
 
-> Simplify the error handling of the SSCH and RSCH handler avoiding
-> arbitrary and cryptic error codes being used to tell how the instruction
-> is supposed to end.  Let the code detecting the condition tell how it's
-> to be handled in a less ambiguous way.  It's best to handle SSCH and RSCH
-> in one go as the emulation of the two shares a lot of code.
-> 
-> For passthrough this change isn't pure refactoring, but changes the
-> way kernel reported EFAULT is handled. After clarifying the kernel
-> interface we decided that EFAULT shall be mapped to unit exception.
-> Same goes for unexpected error codes.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> ---
-> 
-> AFAIR we decided in the previous round to rather do transformation
-> and fixing in one patch than touch stuff twice. Hence this patch
-> ain't pure transformation any more.
-> ---
->  hw/s390x/css.c              | 83 +++++++++++++--------------------------------
->  hw/s390x/s390-ccw.c         | 11 +++---
->  hw/vfio/ccw.c               | 30 ++++++++++++----
->  include/hw/s390x/css.h      | 24 +++++++++----
->  include/hw/s390x/s390-ccw.h |  2 +-
->  target/s390x/ioinst.c       | 53 ++++-------------------------
->  6 files changed, 77 insertions(+), 126 deletions(-)
-> 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 4f47dbc8b0..b2978c3bae 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -1003,12 +1003,11 @@ static void sch_handle_start_func_virtual(SubchDev *sch)
-> 
->  }
-> 
-> -static int sch_handle_start_func_passthrough(SubchDev *sch)
-> +static IOInstEnding sch_handle_start_func_passthrough(SubchDev *sch)
->  {
-> 
->      PMCW *p = &sch->curr_status.pmcw;
->      SCSW *s = &sch->curr_status.scsw;
-> -    int ret;
-> 
->      ORB *orb = &sch->orb;
->      if (!(s->ctrl & SCSW_ACTL_SUSP)) {
-> @@ -1022,31 +1021,11 @@ static int sch_handle_start_func_passthrough(SubchDev *sch)
->       */
->      if (!(orb->ctrl0 & ORB_CTRL0_MASK_PFCH) ||
->          !(orb->ctrl0 & ORB_CTRL0_MASK_C64)) {
-> -        return -EINVAL;
-> +        sch_gen_unit_exception(sch);
-> +        css_inject_io_interrupt(sch);
-> +        return (IOInstEnding){.cc = 0};
-This behavior change is not mentioned in the commit message. Right?
+--=-GQfEwtRaPYaNTDX4TOmI
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-[...]
+On Tue, 2017-10-10 at 15:30 +0200, C=C3=A9dric Le Goater wrote:
+> On 10/09/2017 02:04 AM, Andrew Jeffery wrote:
+> > On Wed, 2017-09-20 at 09:01 +0200, C=C3=A9dric Le Goater wrote:
+> > > The Witherspoon boards are OpenPOWER system hosting POWER9 Processors=
+.
+> > > Let's add support for their BMC including a couple of I2C devices as
+> > > found on real HW.
+> > > =C2=A0
+> > > > > > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> > > ---
+> > > =C2=A0hw/arm/aspeed.c | 49 ++++++++++++++++++++++++++++++++++++++++++=
++++++++
+> > > =C2=A01 file changed, 49 insertions(+)
+> > > =C2=A0
+> > > diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+> > > index ab895ad490af..81f522f711ae 100644
+> > > --- a/hw/arm/aspeed.c
+> > > +++ b/hw/arm/aspeed.c
+> > > @@ -46,6 +46,7 @@ enum {
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0PALMETTO_BMC,
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0AST2500_EVB,
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ROMULUS_BMC,
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0WITHERSPOON_BMC,
+> > > =C2=A0};
+> > > =C2=A0
+> > > =C2=A0/* Palmetto hardware value: 0x120CE416 */
+> > > @@ -83,8 +84,12 @@ enum {
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0SCU_AST2500_HW_=
+STRAP_ACPI_ENABLE |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0\
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0SCU_HW_STRAP_SP=
+I_MODE(SCU_HW_STRAP_SPI_MASTER))
+> > > =C2=A0
+> > > +/* Witherspoon hardware value: 0xF10AD216 (but use romulus definitio=
+n) */
+> > > +#define WITHERSPOON_BMC_HW_STRAP1 ROMULUS_BMC_HW_STRAP1
+> > > +
+> > > =C2=A0static void palmetto_bmc_i2c_init(AspeedBoardState *bmc);
+> > > =C2=A0static void ast2500_evb_i2c_init(AspeedBoardState *bmc);
+> > > +static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc);
+> > > =C2=A0
+> > > =C2=A0static const AspeedBoardConfig aspeed_boards[] =3D {
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0[PALMETTO_BMC] =3D {
+> > > @@ -110,6 +115,14 @@ static const AspeedBoardConfig aspeed_boards[] =
+=3D {
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.spi_model =3D =
+"mx66l1g45g",
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.num_cs=C2=A0=
+=C2=A0=C2=A0=C2=A0=3D 2,
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0},
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0[WITHERSPOON_BMC]=C2=A0=C2=A0=3D {
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.soc_name=C2=A0=C2=
+=A0=3D "ast2500-a1",
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.hw_strap1 =3D WITHE=
+RSPOON_BMC_HW_STRAP1,
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.fmc_model =3D "mx25=
+l25635e",
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.spi_model =3D "mx66=
+l1g45g",
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.num_cs=C2=A0=C2=A0=
+=C2=A0=C2=A0=3D 2,
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.i2c_init=C2=A0=C2=
+=A0=3D witherspoon_bmc_i2c_init,
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0},
+> > > =C2=A0};
+> > > =C2=A0
+> > > =C2=A0#define FIRMWARE_ADDR 0x0
+> > > @@ -337,11 +350,47 @@ static const TypeInfo romulus_bmc_type =3D {
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.class_init =3D romulus_bmc_class_init,
+> > > =C2=A0};
+> > > =C2=A0
+> > > +static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
+> > > +{
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0AspeedSoCState *soc =3D &bmc->soc;
+> > > +
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&=
+soc->i2c), 4), "tmp423", 0x4c);
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&=
+soc->i2c), 5), "tmp423", 0x4c);
+> > > +
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&=
+soc->i2c), 9), "tmp105", 0x4a);
+> >=20
+> > Looks like I need to track down newer versions of the schematics I have=
+.
+>=20
+> the device on the board is a tmp275 but the tmp105 model is compatible.
 
-> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> index a8baadf57a..dbb5b201de 100644
-> --- a/hw/vfio/ccw.c
-> +++ b/hw/vfio/ccw.c
-> @@ -23,6 +23,7 @@
->  #include "hw/s390x/s390-ccw.h"
->  #include "hw/s390x/ccw-device.h"
->  #include "qemu/error-report.h"
-> +#include "cpu.h"
-We need this because?
+It neither device is listed in the version I have :)
 
-> 
->  #define TYPE_VFIO_CCW "vfio-ccw"
->  typedef struct VFIOCCWDevice {
-> @@ -47,9 +48,9 @@ struct VFIODeviceOps vfio_ccw_ops = {
->      .vfio_compute_needs_reset = vfio_ccw_compute_needs_reset,
->  };
-> 
-> -static int vfio_ccw_handle_request(ORB *orb, SCSW *scsw, void *data)
-> +static IOInstEnding vfio_ccw_handle_request(SubchDev *sch)
->  {
-> -    S390CCWDevice *cdev = data;
-> +    S390CCWDevice *cdev = sch->driver_data;
->      VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
->      struct ccw_io_region *region = vcdev->io_region;
->      int ret;
-> @@ -60,8 +61,8 @@ static int vfio_ccw_handle_request(ORB *orb, SCSW *scsw, void *data)
-> 
->      memset(region, 0, sizeof(*region));
-> 
-> -    memcpy(region->orb_area, orb, sizeof(ORB));
-> -    memcpy(region->scsw_area, scsw, sizeof(SCSW));
-> +    memcpy(region->orb_area, &sch->orb, sizeof(ORB));
-> +    memcpy(region->scsw_area, &sch->curr_status.scsw, sizeof(SCSW));
-> 
->  again:
->      ret = pwrite(vcdev->vdev.fd, region,
-> @@ -71,10 +72,25 @@ again:
->              goto again;
->          }
->          error_report("vfio-ccw: wirte I/O region failed with errno=%d", errno);
-> -        return -errno;
-> +        ret = -errno;
-> +    } else {
-> +        ret = region->ret_code;
-> +    }
-> +    switch (-ret) {
-> +    /* Currently we don't update control block and just return the cc code. */
-This is not true anymore? At least for the EFAULT case.
+Andrew
+--=-GQfEwtRaPYaNTDX4TOmI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
 
-> +    case 0:
-> +        return (IOInstEnding){.cc = 0};
-> +    case EBUSY:
-> +        return (IOInstEnding){.cc = 2};
-> +    case ENODEV:
-> +    case EACCES:
-> +        return (IOInstEnding){.cc = 3};
-> +    case EFAULT:
-> +    default:
-> +        sch_gen_unit_exception(sch);
-> +        css_inject_io_interrupt(sch);
-> +        return (IOInstEnding){.cc = 0};
->      }
-> -
-> -    return region->ret_code;
->  }
-> 
->  static void vfio_ccw_reset(DeviceState *dev)
-> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-> index 66916b6546..2116c6b3c7 100644
-> --- a/include/hw/s390x/css.h
-> +++ b/include/hw/s390x/css.h
-[...]
+-----BEGIN PGP SIGNATURE-----
 
-> @@ -197,13 +208,14 @@ SubchDev *css_find_subch(uint8_t m, uint8_t cssid, uint8_t ssid,
->                           uint16_t schid);
->  bool css_subch_visible(SubchDev *sch);
->  void css_conditional_io_interrupt(SubchDev *sch);
-> +
-Extra change.
+iQIcBAABCgAGBQJZ3ZTZAAoJEJ0dnzgO5LT56qQP/1+xsFeE5zIZrR7vbMYs5AdR
+aMYXE57yOJ3NGEa0X9TowSfUCvD0yMYI6+svBPnVS4meJGyhrcqgLvfYrX0f4GWA
+/BycMTznMmKI41E44OSBg2ThfK8kPdfJUD92pwblUcXcEFiypBjq/D0Ny7DGZa4q
+KHCTh3lWxduaVlrxRJ9woLygw6XSkjeop/+3HuD5rOQWTAqx34oN+RsbHv4BvhDI
+665Vozk6Hro95/WjOf5x2arXQmsP54KgvvzLD6srIy3H75XYidxKzG06lgfhmfeH
+Xzihmb9myD6qC+d/n54YFZeTPQYqYtse6YUTbnfOxkW+TK8MxvSuqmIPS+HEFXMW
+niQDixEXUnWWf7Lf+32OOw7QVL8sRAtvTbY0NSCQYXh/2bDXPVfRWH7+GJTGsMbo
+HEufePODvKWN9bLc4iRd514J4v4ce9VRZ4xmo06fe5SQQx5JcTqkd1nO8IwBWfsQ
+RmFLQgmIkY9C6o2FayLCD1ewCihGPCGw111eC7+T0Hruu/qos3ByVZlcB8yM/Uwt
+Lee45W9GZJhk/kowFsbgemQc/v8smOS8UB2+dPr6VLGcv8wLi6j/Rmx0N15n7pkU
+HA/xwuWkHyKeOgxA5d6Iy3iMdsEiluOhD7d55izfaFrD/OjJxxXiDcHBcpN3CgF6
+mtOPiJd2aIu0O6+n6+my
+=l1LG
+-----END PGP SIGNATURE-----
 
->  int css_do_stsch(SubchDev *sch, SCHIB *schib);
->  bool css_schid_final(int m, uint8_t cssid, uint8_t ssid, uint16_t schid);
->  int css_do_msch(SubchDev *sch, const SCHIB *schib);
-[...]
-
--- 
-Dong Jia Shi
+--=-GQfEwtRaPYaNTDX4TOmI--
