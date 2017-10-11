@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38982)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e2B1S-0002fI-GG
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:01:43 -0400
+	(envelope-from <carenas@gmail.com>) id 1e2B9c-0003lf-PV
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:10:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e2B1P-0003OJ-BC
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:01:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43092)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e2B1P-0003Mj-4W
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:01:39 -0400
-Message-ID: <1507705293.31518.7.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 11 Oct 2017 09:01:33 +0200
-In-Reply-To: <20171010142706.360019aa@t450s.home>
-References: <20171010140334.8231-1-kraxel@redhat.com>
-	<20171010140334.8231-7-kraxel@redhat.com>
-	<20171010142706.360019aa@t450s.home>
+	(envelope-from <carenas@gmail.com>) id 1e2B9b-0007LM-S1
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:10:08 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:49551)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <carenas@gmail.com>) id 1e2B9b-0007Kq-MJ
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:10:07 -0400
+Received: by mail-wm0-x236.google.com with SMTP id b189so2409829wmd.4
+	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 00:10:06 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170925231924.31303-1-carenas@gmail.com>
+References: <20170925231924.31303-1-carenas@gmail.com>
+From: Carlo Arenas <carenas@gmail.com>
+Date: Wed, 11 Oct 2017 00:10:04 -0700
+Message-ID: <CAPUEspg5AO_XzLa1n3cCTrz+22WYk5BZrE28ufDjPP7Y3KN2+Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RfC PATCH 6/6] vfio/display: add dmabuf support
- (v15)
+Subject: Re: [Qemu-devel] linux-user: refactor socket.h into architecture
+ specific sockbits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, Tina Zhang <tina.zhang@intel.com>, intel-gvt-dev@lists.freedesktop.org
+To: qemu-devel@nongnu.org
+Cc: laurent@vivier.eu, riku.voipio@iki.fi
 
-  Hi,
+ping
 
-> Looks pretty straight forward otherwise.=C2=A0=C2=A0I like the LRU dmab=
-uf
-> freeing, but is it mostly for validating the interface?=C2=A0=C2=A0My
-> impression
-> is that we'd reach a steady state with a single plane and single
-> cursor so I wonder if keeping that cache really provides a noticeable
-> benefit.
+some of the patches already have a Reviewed-by as shown by :
 
-Really depends on what the guest is doing.  I didn't do too much
-testing with various cache sizes and guests yet.
+  http://patchwork.ozlabs.org/patch/818378/
 
-> =C2=A0=C2=A0Perhaps for a Linux guest switching between vt and graphics
-> mode?
-
-fbcon/vt is one dmabuf.  xorg I have seen using multiple primary plane
-dma-bufs, dunno why, doesn't change often.  wayland does page-flipping
-on each rendered frame, which translates to very frequent dma-buf
-changes and I expect the caching will pay off here.
-
-cursor dma-buf with xorg changes each time the cursor shape changes.
-
-> =C2=A0=C2=A0It also seems like the primary and cursor will be fighting =
-for
-> the head of the list, so if we keep lists, maybe they should be per
-> plane type.
-
-Makes sense indeed.
-
-> This uses the x-display option for now, how do we move past that to
-> get
-> automatic configuration?
-
-I think a OnOffAuto display property would be the best choice.
-
-cheers,
-  Gerd
+On Mon, Sep 25, 2017 at 4:19 PM, Carlo Marcelo Arenas Bel=C3=B3n
+<carenas@gmail.com> wrote:
+> the definitions in socket.h are meant to reflect the ones in linux for ea=
+ch
+> respective target, but are sometimes difficult to maintain.
+>
+> hppa (AKA parisc) was initially merged with an independent file that mirr=
+ors
+> more closely the corresponding one in linux but hasn't been updated since=
+.
+>
+> this series updates hppa with the latest bits from linux 4.14 and makes s=
+ure
+> all relevant architectures had a sockbits file that would be easy to main=
+tain
+> going forward.
+>
+> most of the changes are pretty mechanical and I had made (thanks to Laure=
+nt's
+> tough review) every effort to ensure no value gets changed accidentaly an=
+d
+> all changes (even the ones where the value remains but is now in a differ=
+ent
+> base to better match what was used in the linux headers) are documented, =
+so
+> it should be fairly safe and will fix bugs (mostly for sparc).
+>
