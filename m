@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e2Cb4-0001BB-2K
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 04:42:34 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e2Cbw-0001xH-PD
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 04:43:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e2Cb3-0003iB-3y
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 04:42:34 -0400
-Date: Wed, 11 Oct 2017 10:42:14 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171011084214.GB4593@dhcp-200-186.str.redhat.com>
-References: <20171004020048.26379-1-eblake@redhat.com>
-	<20171004020048.26379-2-eblake@redhat.com>
-	<20171010135940.GJ4177@dhcp-200-186.str.redhat.com>
-	<67e98ca7-e861-a646-b701-b8f7453f2951@redhat.com>
-	<46e7ca23-fb38-7620-90fb-04982e5b9ad0@redhat.com>
-	<06af49fb-6e94-d8c0-3701-7579e55c92a5@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <06af49fb-6e94-d8c0-3701-7579e55c92a5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 01/23] block: Allow NULL file for
- bdrv_get_block_status()
+	(envelope-from <kraxel@redhat.com>) id 1e2Cbs-0004Mn-L3
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 04:43:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:27425)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e2Cbs-0004MS-EF
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 04:43:24 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 11 Oct 2017 10:43:14 +0200
+Message-Id: <20171011084314.21752-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] cirrus: fix oob access in mode4and5 write
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +22,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, famz@redhat.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: niuguoxiang@huawei.com, Gerd Hoffmann <kraxel@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-Am 10.10.2017 um 21:24 hat John Snow geschrieben:
-> 
-> 
-> On 10/10/2017 03:00 PM, Eric Blake wrote:
-> > On 10/10/2017 09:43 AM, Eric Blake wrote:
-> > 
-> >>>> ---
-> >>>> v5: use second label for cleaner exit logic [John], use local_pnum
-> >>
-> >>>> @@ -1811,16 +1811,19 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
-> >>>>      int64_t total_sectors;
-> >>>>      int64_t n;
-> >>>>      int64_t ret, ret2;
-> >>>> +    BlockDriverState *local_file = NULL;
-> >>>> +    int local_pnum = 0;
-> >>>
-> >>> I don't quite see what the point of local_pnum is if we assert anyway
-> >>> that the real pnum is non-NULL.
-> >>
-> >> I did it in parallel with fallout from John's review on v4:
-> >> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg06958.html
-> >>
-> >> but since it wasn't specifically asked for, and is now getting
-> >> questions, I'm fine with not having it in v6.
-> > 
-> > Okay, I re-read v4, and here's the comment (on 21/23) that led to my
-> > experiment in v5 patch 1 with local_pnum:
-> > 
-> > https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg00293.html
-> > 
-> > and I did argue:
-> > 
-> > https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg00311.html
-> 
-> Well, Kevin's the boss :D
+Move dst calculation into the loop, so we apply the mask on each
+interation and will not overflow vga memory.
 
-I'm not sure how renaming *pnum into local_pnum addresses your concerns?
-We still update local_pnum before we undo our alignment corrections. Or
-are you talking about some other part of these mails?
+Cc: Prasad J Pandit <pjp@fedoraproject.org>
+Reported-by: Niu Guoxiang <niuguoxiang@huawei.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/cirrus_vga.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-Kevin
+diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+index afc290ab91..077a8cb74f 100644
+--- a/hw/display/cirrus_vga.c
++++ b/hw/display/cirrus_vga.c
+@@ -2038,15 +2038,14 @@ static void cirrus_mem_writeb_mode4and5_8bpp(CirrusVGAState * s,
+     unsigned val = mem_value;
+     uint8_t *dst;
+ 
+-    dst = s->vga.vram_ptr + (offset &= s->cirrus_addr_mask);
+     for (x = 0; x < 8; x++) {
++        dst = s->vga.vram_ptr + ((offset + x) & s->cirrus_addr_mask);
+ 	if (val & 0x80) {
+ 	    *dst = s->cirrus_shadow_gr1;
+ 	} else if (mode == 5) {
+ 	    *dst = s->cirrus_shadow_gr0;
+ 	}
+ 	val <<= 1;
+-	dst++;
+     }
+     memory_region_set_dirty(&s->vga.vram, offset, 8);
+ }
+@@ -2060,8 +2059,8 @@ static void cirrus_mem_writeb_mode4and5_16bpp(CirrusVGAState * s,
+     unsigned val = mem_value;
+     uint8_t *dst;
+ 
+-    dst = s->vga.vram_ptr + (offset &= s->cirrus_addr_mask);
+     for (x = 0; x < 8; x++) {
++        dst = s->vga.vram_ptr + ((offset + 2 * x) & s->cirrus_addr_mask & ~1);
+ 	if (val & 0x80) {
+ 	    *dst = s->cirrus_shadow_gr1;
+ 	    *(dst + 1) = s->vga.gr[0x11];
+@@ -2070,7 +2069,6 @@ static void cirrus_mem_writeb_mode4and5_16bpp(CirrusVGAState * s,
+ 	    *(dst + 1) = s->vga.gr[0x10];
+ 	}
+ 	val <<= 1;
+-	dst += 2;
+     }
+     memory_region_set_dirty(&s->vga.vram, offset, 16);
+ }
+-- 
+2.9.3
