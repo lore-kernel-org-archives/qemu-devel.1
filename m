@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e2F9H-0005Kl-RW
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 07:26:05 -0400
+	(envelope-from <bounces@canonical.com>) id 1e2F9H-0005Kk-R1
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 07:26:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e2F9G-0004Hv-0e
+	(envelope-from <bounces@canonical.com>) id 1e2F9C-0004FO-SU
 	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 07:26:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36396)
+Received: from indium.canonical.com ([91.189.90.7]:36220)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e2F9F-0004H5-Ms
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 07:26:01 -0400
+	id 1e2F9C-0004Ep-Hi
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 07:25:58 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e2F9E-00027j-4N
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 11:26:00 +0000
+	id 1e2F9A-00020t-Jx
+	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 11:25:56 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 00E1C2E80CB
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 11:26:00 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 8E80D2E80C0
+	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 11:25:56 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Oct 2017 11:18:58 -0000
+Date: Wed, 11 Oct 2017 11:17:42 -0000
 From: ChristianEhrhardt <1719196@bugs.launchpad.net>
 Reply-To: Bug 1719196 <1719196@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150626680089.6094.17724106932405637799.malonedeb@soybean.canonical.com>
-Message-Id: <150772073913.1539.7993093654992353875.malone@chaenomeles.canonical.com>
+Message-Id: <150772066250.8049.7846070032638227660.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1719196] Re: [arm64 ocata] newly created
  instances are unable to raise network interfaces
@@ -39,9 +39,178 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Note - be careful if you mean upstream qemu/libvirt (as the bug was filed) =
-or the packages in Ubuntu (I added tasks for these).
-I try to spot both, but will be more on-track for the latter.
+Hi,
+I was reading into this after being back from PTO (actually back next monda=
+y).
+I was wondering as I tested (without openstack) just that last week with Da=
+nnf on the Rally).
+And indeed it seems to work for me on Artful (which as we all know is =3DOc=
+ata in terms of SW stack).
+
+$ cat arm-template.xml =
+
+<domain type=3D'kvm'>
+        <os>
+                <type arch=3D'aarch64' machine=3D'virt'>hvm</type>
+                <loader readonly=3D'yes' type=3D'pflash'>/usr/share/AAVMF/A=
+AVMF_CODE.fd</loader>
+                <nvram template=3D'/usr/share/AAVMF/AAVMF_CODE.fd'>/tmp/AAV=
+MF_CODE.fd</nvram>
+                <boot dev=3D'hd'/>
+        </os>
+        <features>
+                <acpi/>
+                <apic/>
+                <pae/>
+        </features>
+        <cpu mode=3D'custom' match=3D'exact'>
+                <model fallback=3D'allow'>host</model>
+        </cpu>
+        <devices>
+                <interface type=3D'network'>
+                        <source network=3D'default'/>
+                        <model type=3D'virtio'/>
+                </interface>
+                <serial type=3D'pty'>
+                        <source path=3D'/dev/pts/3'/>
+                        <target port=3D'0'/>
+                </serial>
+        </devices>
+</domain>
+
+$ uvt-kvm create --template arm-template.xml --password=3Dubuntu artful-
+test4 release=3Dartful arch=3Darm64 label=3Ddaily
+
+The template is created in a way to let as much as possible for libvirt and=
+ qemu to fill in defaults. That way if one of them change we do not have to=
+ follow and adapt.
+Maybe such a thing is happening to you for the more "defined" xml that open=
+stack is sending.
+
+>From the hosts point of view all looks normal in journal, you see start and=
+ dhcp discover/offer/ack sequence:
+Okt 11 10:45:43 seidel kernel: virbr0: port 2(vnet0) entered learning state
+Okt 11 10:45:45 seidel kernel: virbr0: port 2(vnet0) entered forwarding sta=
+te
+Okt 11 10:45:45 seidel kernel: virbr0: topology change detected, propagating
+Okt 11 10:46:14 seidel dnsmasq-dhcp[2610]: DHCPDISCOVER(virbr0) 52:54:00:b1=
+:db:89
+Okt 11 10:46:14 seidel dnsmasq-dhcp[2610]: DHCPOFFER(virbr0) 192.168.122.13=
+ 52:54:00:b1:db:89
+Okt 11 10:46:14 seidel dnsmasq-dhcp[2610]: DHCPDISCOVER(virbr0) 52:54:00:b1=
+:db:89
+Okt 11 10:46:14 seidel dnsmasq-dhcp[2610]: DHCPOFFER(virbr0) 192.168.122.13=
+ 52:54:00:b1:db:89
+Okt 11 10:46:14 seidel dnsmasq-dhcp[2610]: DHCPREQUEST(virbr0) 192.168.122.=
+13 52:54:00:b1:db:89
+Okt 11 10:46:14 seidel dnsmasq-dhcp[2610]: DHCPACK(virbr0) 192.168.122.13 5=
+2:54:00:b1:db:89 ubuntu
+
+The guest also seems "normal" to me:
+$ uvt-kvm ssh artful-test4 -- journalctl -u systemd-networkd
+-- Logs begin at Wed 2017-10-11 10:46:03 UTC, end at Wed 2017-10-11 11:02:3=
+1 UTC. --
+Oct 11 10:46:11 ubuntu systemd[1]: Starting Network Service...
+Oct 11 10:46:11 ubuntu systemd-networkd[547]: Enumeration completed
+Oct 11 10:46:11 ubuntu systemd[1]: Started Network Service.
+Oct 11 10:46:11 ubuntu systemd-networkd[547]: enp1s0: IPv6 successfully ena=
+bled
+Oct 11 10:46:11 ubuntu systemd-networkd[547]: enp1s0: Gained carrier
+Oct 11 10:46:12 ubuntu systemd-networkd[547]: enp1s0: Gained IPv6LL
+Oct 11 10:46:14 ubuntu systemd-networkd[547]: enp1s0: DHCPv4 address 192.16=
+8.122.13/24 via 192.168.122.1
+Oct 11 10:46:14 ubuntu systemd-networkd[547]: Not connected to system bus, =
+ignoring transient hostname.
+Oct 11 10:46:24 ubuntu systemd-networkd[547]: enp1s0: Configured
+
+The biggest and obviously most important difference is in the networking th=
+at is used:
+    <interface type=3D'network'>
+      <mac address=3D'52:54:00:b1:db:89'/>
+      <source network=3D'default' bridge=3D'virbr0'/>
+      <target dev=3D'vnet0'/>
+      <model type=3D'virtio'/>
+      <alias name=3D'net0'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x01' slot=3D'0x00' fu=
+nction=3D'0x0'/>
+    </interface>
+
+While openstack generates a type=3D"bridge" network where the bridge is not=
+ managed by libvirt (compared to the default net I use).
+Never the less both setups create a bridge and tap the guest on it.
+So this should functionally be equivalent other than the bridge setup right?
+
+
+I tried to make a bridge type config matching to what I had before but clos=
+e to yours:
+    <interface type=3D'bridge'>
+      <mac address=3D'52:54:00:b1:db:89'/>
+      <source bridge=3D'virbr0'/>
+      <target dev=3D'vnet0'/>   =
+
+      <model type=3D'virtio'/>
+      <alias name=3D'net0'/>                =
+
+      <address type=3D'virtio-mmio'/>
+    </interface>
+
+But this again works:
+ubuntu@artful-test4:~$ journalctl -u systemd-networkd --no-pager
+-- Logs begin at Wed 2017-10-11 11:12:10 UTC, end at Wed 2017-10-11 11:13:0=
+0 UTC. --
+Oct 11 11:12:17 artful-test4 systemd[1]: Starting Network Service...
+Oct 11 11:12:17 artful-test4 systemd-networkd[604]: Enumeration completed
+Oct 11 11:12:17 artful-test4 systemd[1]: Started Network Service.
+Oct 11 11:12:17 artful-test4 systemd-networkd[604]: enp1s0: IPv6 successful=
+ly enabled
+Oct 11 11:12:17 artful-test4 systemd-networkd[604]: enp1s0: Gained carrier
+Oct 11 11:12:18 artful-test4 systemd-networkd[604]: enp1s0: Gained IPv6LL
+Oct 11 11:12:20 artful-test4 systemd-networkd[604]: enp1s0: DHCPv4 address =
+192.168.122.14/24 via 192.168.122.1
+Oct 11 11:12:20 artful-test4 systemd-networkd[604]: Not connected to system=
+ bus, ignoring transient hostname.
+Oct 11 11:12:30 artful-test4 systemd-networkd[604]: enp1s0: Configured
+
+Dumping the XML to check if it might have rewritten a lot shows me that my =
+config is good:
+    <interface type=3D'bridge'>
+      <mac address=3D'52:54:00:b1:db:89'/>
+      <source bridge=3D'virbr0'/>
+      <target dev=3D'vnet0'/>
+      <model type=3D'virtio'/>
+      <alias name=3D'net0'/>
+      <address type=3D'virtio-mmio'/>
+    </interface>
+
+So TL;DR a config almost the same as yours works.
+Yet the difference is that livbirt has set up 'virbr0' in my case and I'd a=
+ssume openstack did create qbrb5d335fc-46 on its own.
+
+As next step I'd recommend iterating your config around different bridge sc=
+enarios to find what breaks it.
+Then if reasonable try to exclude openstack from the equation as I shown ab=
+ove (or not if you think the fix needs to be in openstack).
+
+I hope this helped to get closer to the root casue, but I thought that a
+working example on the new Ocata stack might be the best start with.
+
+Note this was done on:
+libvirt-daemon-system          3.6.0-1ubuntu4
+qemu-kvm                       1:2.10+dfsg-0ubuntu1
+
+** Also affects: qemu (Ubuntu)
+   Importance: Undecided
+       Status: New
+
+** Also affects: libvirt (Ubuntu)
+   Importance: Undecided
+       Status: New
+
+** Changed in: libvirt (Ubuntu)
+       Status: New =3D> Incomplete
+
+** Changed in: qemu (Ubuntu)
+       Status: New =3D> Incomplete
 
 -- =
 
