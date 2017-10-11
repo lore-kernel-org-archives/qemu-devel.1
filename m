@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e2M6M-0006TG-8t
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 14:51:31 -0400
+	(envelope-from <pagupta@redhat.com>) id 1e2M6w-00075s-Bc
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 14:52:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e2M6J-0000tI-6q
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 14:51:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33578)
+	(envelope-from <pagupta@redhat.com>) id 1e2M6t-0001Cq-6z
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 14:52:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55574)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e2M6I-0000sa-UX
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 14:51:27 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Wed, 11 Oct 2017 15:51:03 -0300
-Message-Id: <20171011185103.26259-6-ehabkost@redhat.com>
-In-Reply-To: <20171011185103.26259-1-ehabkost@redhat.com>
-References: <20171011185103.26259-1-ehabkost@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 5/5] scripts: Remove debug parameter from
- QEMUMachine
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1e2M6t-0001C5-0P
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 14:52:03 -0400
+From: Pankaj Gupta <pagupta@redhat.com>
+Date: Thu, 12 Oct 2017 00:21:46 +0530
+Message-Id: <20171011185146.20295-1-pagupta@redhat.com>
+Subject: [Qemu-devel] [RFC] KVM "fake DAX" device flushing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,102 +21,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Cleber Rosa <crosa@redhat.com>
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, linux-mm@kvack.org
+Cc: jack@suse.cz, stefanha@redhat.com, dan.j.williams@intel.com, riel@redhat.com, haozhong.zhang@intel.com, nilal@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, ross.zwisler@intel.com, david@redhat.com, xiaoguangrong.eric@gmail.com, pagupta@redhat.com
 
-All scripts that use the QEMUMachine and QEMUQtestMachine classes
-(device-crash-test, tests/migration/*, iotests.py, basevm.py)
-already configure logging.
+We are sharing the prototype version of 'fake DAX' flushing
+interface for the initial feedback. This is still work in progress
+and not yet ready for merging.
 
-The basicConfig() call inside QEMUMachine.__init__() is being
-kept just to make sure a script would still work if it didn't
-configure logging.
+Protoype right now just implements basic functionality without advanced
+features with two major parts:
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20171005172013.3098-4-ehabkost@redhat.com>
-Reviewed-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- scripts/qemu.py                     | 6 ++----
- tests/migration/guestperf/engine.py | 6 ++----
- tests/qemu-iotests/iotests.py       | 2 --
- 3 files changed, 4 insertions(+), 10 deletions(-)
+- Qemu virtio-pmem device
+  It exposes a persistent memory range to KVM guest which at host side is file
+  backed memory and works as persistent memory device. In addition to this it
+  provides a virtio flushing interface for KVM guest to do a Qemu side sync for
+  guest DAX persistent memory range.  
 
-diff --git a/scripts/qemu.py b/scripts/qemu.py
-index f6d2e68627..9bfdf6d37d 100644
---- a/scripts/qemu.py
-+++ b/scripts/qemu.py
-@@ -54,7 +54,7 @@ class QEMUMachine(object):
-=20
-     def __init__(self, binary, args=3DNone, wrapper=3DNone, name=3DNone,
-                  test_dir=3D"/var/tmp", monitor_address=3DNone,
--                 socket_scm_helper=3DNone, debug=3DFalse):
-+                 socket_scm_helper=3DNone):
-         '''
-         Initialize a QEMUMachine
-=20
-@@ -65,7 +65,6 @@ class QEMUMachine(object):
-         @param test_dir: where to create socket and log file
-         @param monitor_address: address for QMP monitor
-         @param socket_scm_helper: helper program, required for send_fd_s=
-cm()"
--        @param debug: enable debug mode
-         @note: Qemu process is not started until launch() is used.
-         '''
-         if args is None:
-@@ -85,12 +84,11 @@ class QEMUMachine(object):
-         self._events =3D []
-         self._iolog =3D None
-         self._socket_scm_helper =3D socket_scm_helper
--        self._debug =3D debug
-         self._qmp =3D None
-         self._qemu_full_args =3D None
-=20
-         # just in case logging wasn't configured by the main script:
--        logging.basicConfig(level=3D(logging.DEBUG if debug else logging=
-.WARN))
-+        logging.basicConfig()
-=20
-     def __enter__(self):
-         return self
-diff --git a/tests/migration/guestperf/engine.py b/tests/migration/guestp=
-erf/engine.py
-index 0a13050bc6..e14d4320b2 100644
---- a/tests/migration/guestperf/engine.py
-+++ b/tests/migration/guestperf/engine.py
-@@ -388,15 +388,13 @@ class Engine(object):
-                                args=3Dself._get_src_args(hardware),
-                                wrapper=3Dself._get_src_wrapper(hardware)=
-,
-                                name=3D"qemu-src-%d" % os.getpid(),
--                               monitor_address=3Dsrcmonaddr,
--                               debug=3Dself._debug)
-+                               monitor_address=3Dsrcmonaddr)
-=20
-         dst =3D qemu.QEMUMachine(self._binary,
-                                args=3Dself._get_dst_args(hardware, uri),
-                                wrapper=3Dself._get_dst_wrapper(hardware)=
-,
-                                name=3D"qemu-dst-%d" % os.getpid(),
--                               monitor_address=3Ddstmonaddr,
--                               debug=3Dself._debug)
-+                               monitor_address=3Ddstmonaddr)
-=20
-         try:
-             src.launch()
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-index 36a7757aaf..6f057904a9 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -195,8 +195,6 @@ class VM(qtest.QEMUQtestMachine):
-         super(VM, self).__init__(qemu_prog, qemu_opts, name=3Dname,
-                                  test_dir=3Dtest_dir,
-                                  socket_scm_helper=3Dsocket_scm_helper)
--        if debug:
--            self._debug =3D True
-         self._num_drives =3D 0
-=20
-     def add_device(self, opts):
---=20
-2.13.6
+- Guest virtio-pmem driver
+  Reads persistent memory range from paravirt device and reserves system memory map.
+  It also allocates a block device corresponding to the pmem range which is accessed
+  by DAX capable file systems. (file system support is still pending).  
+  
+We shared the project idea for 'fake DAX' flushing interface here [1].
+Based on suggestions here [2], we implemented guest 'virtio-pmem'
+driver and Qemu paravirt device.
+
+[1] https://www.spinics.net/lists/kvm/msg149761.html
+[2] https://www.spinics.net/lists/kvm/msg153095.html
+
+Work yet to be done:
+
+- Separate out the common code used by ACPI pmem interface and
+  reuse it.
+
+- In pmem device memmap allocation and working. There is some parallel work
+  going on upstream related to 'memory_hotplug restructuring' [3] and also hitting
+  a memory section alignment issue [4].
+  
+  [3] https://lwn.net/Articles/712099/
+  [4] https://www.mail-archive.com/linux-nvdimm@lists.01.org/msg02978.html
+  
+- Provide DAX capable file-system(ext4 & XFS) support.
+- Qemu device flush functionality.
+- Qemu live migration work when host page cache is used.
+- Multiple virtio-pmem disks support.
+
+Prototype implementation for feedback:
+
+Kernel: https://github.com/pagupta/linux/commit/d15cf90074eae91aeed7a228da3faf319566dd40
+Qemu  : https://github.com/pagupta/qemu/commit/9c428db1e1076970e097e2b0ef8afe52509af823
+
+Please provide feedback. Also, I would be attending KVM Forum in Prague from (25-27 Oct). 
+If you are attending KVM forum/Linux conference, I would love to have a discussion on ideas 
+and future work.
+
+Thank you,
+Pankaj Gupta
