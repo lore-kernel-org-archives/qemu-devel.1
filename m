@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e2FmS-0000ji-D1
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 08:06:36 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e2FnA-00015q-MB
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 08:07:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e2FmR-0002bz-HL
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 08:06:32 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:52307)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e2FmR-0002bq-At
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 08:06:31 -0400
-Received: by mail-wm0-x229.google.com with SMTP id k4so4159385wmc.1
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 05:06:31 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1e2Fn9-0002uM-Sa
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 08:07:16 -0400
+Date: Wed, 11 Oct 2017 14:07:06 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171011120706.GF4593@dhcp-200-186.str.redhat.com>
+References: <CY4PR0101MB291815E29308B3C75D26876FE9740@CY4PR0101MB2918.prod.exchangelabs.com>
 MIME-Version: 1.0
-In-Reply-To: <20171010193003.28857-1-richard.henderson@linaro.org>
-References: <20171010193003.28857-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 11 Oct 2017 13:06:09 +0100
-Message-ID: <CAFEAcA9j-9ksG-RPsQJo9d94p1iN5rwu55vFxsjLx5ZLAWH5YA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/20] Queued TCG patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CY4PR0101MB291815E29308B3C75D26876FE9740@CY4PR0101MB2918.prod.exchangelabs.com>
+Subject: Re: [Qemu-devel] Co-routine re-entered recursively
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +22,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Gugnani, Shashank" <gugnani.2@buckeyemail.osu.edu>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu-block@nongnu.org
 
-On 10 October 2017 at 20:29, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> One trivial cleanup from Jiang.  Cherry-picking half of Emilio's
-> patch set that has been reviewed.
->
-> Changes since v1:
->   * Dropped 2 mprotect changes that Werrored on w32.
->   * Dropped tcg optimize patch that broke arm32 host.
->
->
-> r~
->
->
-> The following changes since commit 567d0a19c7998fa366598b83d5a6e5f0759d3ea9:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/x86-and-machine-pull-request' into staging (2017-10-10 13:25:46 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/rth7680/qemu.git tags/pull-tcg-20171010
->
-> for you to fetch changes up to 8df8d529ed958de4e23dcbf38bd34eff1a4716f2:
->
->   tcg/mips: delete commented out extern keyword. (2017-10-10 09:45:01 -0700)
->
-> ----------------------------------------------------------------
-> Queued TCG patches
->
+[ Cc: qemu-block ]
 
-Applied, thanks.
+Am 09.10.2017 um 21:11 hat Gugnani, Shashank geschrieben:
+> Hi,
+> 
+> I'm trying to modify the NVMe emulator in QEMU to use multiple threads.
+> 
+> After making necessary changes, I see this error: 'Co-routine re-entered recursively'
+> 
+> Can anybody tell me the reason for this error? Is there anything I can do to fix this issue?
 
--- PMM
+I suspect that you need to fix your locking. Are you sure you're holding
+the AioContext locks while you're making requests to the block layer?
+
+Kevin
