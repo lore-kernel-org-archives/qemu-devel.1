@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e2KwS-0003SS-93
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 13:37:13 -0400
+	(envelope-from <jsnow@redhat.com>) id 1e2L1q-0004px-Kb
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 13:42:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e2KwO-0003bD-SA
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 13:37:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56079)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e2KwO-0003aY-Js
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 13:37:08 -0400
-Date: Wed, 11 Oct 2017 18:36:56 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171011173656.GD2253@work-vm>
-References: <ea8f7d8d-9f07-517f-68cd-bdc87b900fa4@oracle.com>
+	(envelope-from <jsnow@redhat.com>) id 1e2L1p-0005fG-KI
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 13:42:46 -0400
+References: <20171004020048.26379-1-eblake@redhat.com>
+	<20171004020048.26379-2-eblake@redhat.com>
+	<20171010135940.GJ4177@dhcp-200-186.str.redhat.com>
+	<67e98ca7-e861-a646-b701-b8f7453f2951@redhat.com>
+	<46e7ca23-fb38-7620-90fb-04982e5b9ad0@redhat.com>
+	<06af49fb-6e94-d8c0-3701-7579e55c92a5@redhat.com>
+	<20171011084214.GB4593@dhcp-200-186.str.redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <de191a4c-342a-bf26-277b-2744951dcf29@redhat.com>
+Date: Wed, 11 Oct 2017 13:42:31 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ea8f7d8d-9f07-517f-68cd-bdc87b900fa4@oracle.com>
-Subject: Re: [Qemu-devel] QEMU migration cancellation
+In-Reply-To: <20171011084214.GB4593@dhcp-200-186.str.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 01/23] block: Allow NULL file for
+ bdrv_get_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,88 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jag Raman <jag.raman@oracle.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, Karl Heubaum <karl.heubaum@oracle.com>, Sunit Jain <sunit.jain@oracle.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, famz@redhat.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-* Jag Raman (jag.raman@oracle.com) wrote:
-> Hi,
 
-Hi Jag,
 
-> I'd like to check about the behavior of a QEMU instance when live
-> migration is cancelled.
+On 10/11/2017 04:42 AM, Kevin Wolf wrote:
+> Am 10.10.2017 um 21:24 hat John Snow geschrieben:
+>>
+>>
+>> On 10/10/2017 03:00 PM, Eric Blake wrote:
+>>> On 10/10/2017 09:43 AM, Eric Blake wrote:
+>>>
+>>>>>> ---
+>>>>>> v5: use second label for cleaner exit logic [John], use local_pnum
+>>>>
+>>>>>> @@ -1811,16 +1811,19 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
+>>>>>>      int64_t total_sectors;
+>>>>>>      int64_t n;
+>>>>>>      int64_t ret, ret2;
+>>>>>> +    BlockDriverState *local_file = NULL;
+>>>>>> +    int local_pnum = 0;
+>>>>>
+>>>>> I don't quite see what the point of local_pnum is if we assert anyway
+>>>>> that the real pnum is non-NULL.
+>>>>
+>>>> I did it in parallel with fallout from John's review on v4:
+>>>> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg06958.html
+>>>>
+>>>> but since it wasn't specifically asked for, and is now getting
+>>>> questions, I'm fine with not having it in v6.
+>>>
+>>> Okay, I re-read v4, and here's the comment (on 21/23) that led to my
+>>> experiment in v5 patch 1 with local_pnum:
+>>>
+>>> https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg00293.html
+>>>
+>>> and I did argue:
+>>>
+>>> https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg00311.html
+>>
+>> Well, Kevin's the boss :D
 > 
-> If the migration of a guest OS from source QEMU instance to destination
-> instance is cancelled, the destination instance exits with a failure
-> code. Could you please explain why this design decision was taken?
-
-There isn't really any communication of the cancellation - the source
-just stops, and the destination is left to conclude it's got an
-incomplete migration instance.
-
-> I'm wondering if it's OK to change the behavior of the destination
-> instance in this case. Would it be OK for the destination instance to
-> not exit with the failure code, and instead retry processing incoming
-> migration? I'm dealing with an internal bug report that's asking whether
-> it would make more sense for the destination process to hang around for
-> another attempt at migration than to be killed.
-
-Can you explain why you'd want that to happen in the case of a
-cancellation? I can see why you might want to do it in the event of
-a network failure (which is the case Peter is dealing with for
-postcopy);  but why after a cancellation?
-
-> We came across Peter's planned changes to migration postcopy[1] which
-> indicate that migration-cancellation is planned to be enhanced during
-> the postcopy phase. Are there any such enhancements planned for the
-> active phase as well?
-
-Not planned; as far as I know this is the first time anyone has asked
-for it;  it's probably possible to reuse some of Peter's code for it.
-Essentially you have many of the same problems, in particular you don't
-quite know how much of the data sent was actually received by the
-destination (hmm I wonder if we can modify Peter's code to allow it
-before it goes in :-)
-
-There may be some gotcha's to do with the exact point at which the
-cancellation happened (e.g. restarting after you've started serialising
-the device state may be trickier).
-
-> I'd also like to know the difference between qemu_fclose() &
-> qemu_file_shutdown(). The source instance currently uses the shutdown
-> function to terminate the connection between source & destination. But
-> it seems to disconnect the connection abruptly. Whereas fclose function
-> seems to disconnect it more gracefully. When I dug deeper, I couldn't
-> specifically tell the difference between the two. I'd like to know if I
-> could substitute the shutdown function with fclose function in
-> migrate_fd_cancel().
-
-close() closes the file descriptor and at that point it's no longer
-valid and could get reallocated.  So for example if another thread is still using it
-then the other thread (e.g. the migration thread) is suddenly trying to
-use a non-existing fd, even worse that fd could have been reallocated
-and it ends up writing migration data to a disk or network socket.
-As you say 'close' is graceful - the downside of that is that it waits
-to have sent all it's data and for some part of the TCP socket close
-to happen (I don't know the details).
-
-shutdown() doesn't deallocate the fd; it just forces all operations on
-it to error and return.  The nice part of this is that if the
-networking to the destination host has broken and you have a hung
-socket, you can still perform the shutdown(), and then restart a
-migration to a different host.    With close() you might have to wait
-10s of minutes for the TCP socket to eventually give up before erroring.
-Because it doesn't deallocate it, the migration threads just take
-the failure paths and don't do anything illegal, but just drop out
-at the end with a failed migration, whichever part of code they happened
-to have been stuck in.
-
-Dave
-
-> [1]: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg05892.html
+> I'm not sure how renaming *pnum into local_pnum addresses your concerns?
+> We still update local_pnum before we undo our alignment corrections. Or
+> are you talking about some other part of these mails?
 > 
-> Thanks!
-> --
-> Jag
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Kevin
+> 
+
+I made only a stylistic comment and it looked to me at a glance like it
+had resulted in conflicting feedback from you (since I all but asked for
+a local pnum) -- but my feedback was only minor stylistic stuff, so I'm
+deferring to you.
+
+--js
