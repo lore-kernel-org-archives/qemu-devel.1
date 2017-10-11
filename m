@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e2KjX-0007Ay-DK
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 13:23:53 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e2KkK-0007cj-2f
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 13:24:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e2KjW-0003im-6n
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 13:23:51 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1507578671-158758-1-git-send-email-imammedo@redhat.com>
-	<1507578671-158758-24-git-send-email-imammedo@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <cc201856-0592-ca57-a004-e591cd265d42@amsat.org>
-Date: Wed, 11 Oct 2017 14:23:38 -0300
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e2KkG-00040A-0M
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 13:24:40 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:37501 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1e2KkF-0003zn-Fx
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 13:24:35 -0400
+References: <20171009172723.190282-1-vsementsov@virtuozzo.com>
+	<20171009172723.190282-9-vsementsov@virtuozzo.com>
+	<5c57b76e-eb34-7825-9c8b-9ee5bd909b02@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <25ca38f0-fb7e-3db0-3889-45604ebcb612@virtuozzo.com>
+Date: Wed, 11 Oct 2017 20:24:18 +0300
 MIME-Version: 1.0
-In-Reply-To: <1507578671-158758-24-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <5c57b76e-eb34-7825-9c8b-9ee5bd909b02@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 23/24] ppc: pnv: drop
- PnvChipClass::cpu_model field
+Subject: Re: [Qemu-devel] [PATCH v2 04/10] nbd-server: refactor simple reply
+ sending
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,168 +31,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: "open list:ppce500" <qemu-ppc@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 10/09/2017 04:51 PM, Igor Mammedov wrote:
-> deduce core type directly from chip type instead of
-> maintaining type mapping in PnvChipClass::cpu_model.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+09.10.2017 22:18, Eric Blake wrote:
+> [adding Dan for a qio question - search for your name below]
+>
+> On 10/09/2017 12:27 PM, Vladimir Sementsov-Ogievskiy wrote:
+>> Get rid of calculating structure fields offsets by hand and set_cork,
+>> rename nbd_co_send_reply to nbd_co_send_simple_reply. Do not use
+>> NBDReply which will be upgraded in future patches to handle both simple
+>> and structured replies and will be used only in the client.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   include/block/nbd.h |  6 ++++
+>>   nbd/nbd-internal.h  |  9 +++++
+>>   nbd/server.c        | 97 ++++++++++++++++++++++-------------------------------
+>>   3 files changed, 56 insertions(+), 56 deletions(-)
+> Feels a bit big for one patch, although I'm borderline for being able to
+> take it as-is.
+>
+>> diff --git a/include/block/nbd.h b/include/block/nbd.h
+>> index 707fd37575..49008980f4 100644
+>> --- a/include/block/nbd.h
+>> +++ b/include/block/nbd.h
+>> @@ -63,6 +63,12 @@ struct NBDReply {
+>>   };
+>>   typedef struct NBDReply NBDReply;
+>>   
+>> +typedef struct NBDSimpleReply {
+>> +    uint32_t magic;  /* NBD_SIMPLE_REPLY_MAGIC */
+>> +    uint32_t error;
+>> +    uint64_t handle;
+>> +} QEMU_PACKED NBDSimpleReply;
+>> +
+> So (one of?) the goal of this patch is to use a packed struct for
+> on-the-wire transmissions, instead of manually packing things into
+> offsets by hand.  I can live with that.
+>
+>>   /* Transmission (export) flags: sent from server to client during handshake,
+>>      but describe what will happen during transmission */
+>>   #define NBD_FLAG_HAS_FLAGS      (1 << 0)        /* Flags are there */
+>> diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
+>> index 2d6663de23..320abef296 100644
+>> --- a/nbd/nbd-internal.h
+>> +++ b/nbd/nbd-internal.h
+>> @@ -113,6 +113,15 @@ static inline int nbd_write(QIOChannel *ioc, const void *buffer, size_t size,
+>>       return qio_channel_write_all(ioc, buffer, size, errp) < 0 ? -EIO : 0;
+>>   }
+>>   
+>> +/* nbd_writev
+>> + * Writes @size bytes to @ioc. Returns 0 on success.
+>> + */
+>> +static inline int nbd_writev(QIOChannel *ioc, const struct iovec *iov,
+>> +                             size_t niov, Error **errp)
+> Comment is wrong; you don't have a @size parameter.
+>
+>> +{
+>> +    return qio_channel_writev_all(ioc, iov, niov, errp) < 0 ? -EIO : 0;
+>> +}
+> Do we really need this, or can we just directly use
+> qio_channel_writev_all() at the lone site that uses this new interface?
+>
+>> +
+>>   struct NBDTLSHandshakeData {
+>>       GMainLoop *loop;
+>>       bool complete;
+>> diff --git a/nbd/server.c b/nbd/server.c
+>> index a1b21a6951..57d5598e0f 100644
+>> --- a/nbd/server.c
+>> +++ b/nbd/server.c
+>> @@ -902,26 +902,6 @@ static int nbd_receive_request(QIOChannel *ioc, NBDRequest *request,
+>>       return 0;
+>>   }
+>>   
+>> -static int nbd_send_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
+> So instead of taking a non-packed struct, doing the hand-packing here,
+> then sending the message, you split this up...
+>
+>> -static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len,
+>> -                             Error **errp)
+>> +static int coroutine_fn nbd_co_send_iov(NBDClient *client, struct iovec *iov,
+>> +                                        unsigned niov, Error **errp)
+>>   {
+>> -    NBDClient *client = req->client;
+>>       int ret;
+>>   
+>>       g_assert(qemu_in_coroutine());
+>> -
+>> -    trace_nbd_co_send_reply(reply->handle, reply->error, len);
+>> -
+>>       qemu_co_mutex_lock(&client->send_lock);
+>>       client->send_coroutine = qemu_coroutine_self();
+>>   
+>> -    if (!len) {
+>> -        ret = nbd_send_reply(client->ioc, reply, errp);
+>> -    } else {
+>> -        qio_channel_set_cork(client->ioc, true);
+>> -        ret = nbd_send_reply(client->ioc, reply, errp);
+>> -        if (ret == 0) {
+>> -            ret = nbd_write(client->ioc, req->data, len, errp);
+>> -            if (ret < 0) {
+>> -                ret = -EIO;
+>> -            }
+>> -        }
+>> -        qio_channel_set_cork(client->ioc, false);
+>> -    }
+>> +    ret = nbd_writev(client->ioc, iov, niov, errp);
+> ...the transmission is now done via iov so that you can send two buffers
+> at once without having to play with the cork,...
+>
+> Dan - are we guaranteed that qio_channel_writev_all() with a multi-iov
+> argument called by one thread will send all its data in order, without
+> being interleaved with any other parallel coroutine also calling
+> qio_channel_writev_all()?  In other words, it looks like the NBD code
+> was previously using manual cork changes to ensure that two halves of a
+> message were sent without interleave, but Vladimir is now relying on the
+> qio code to do that under the hood.
+>
+>>   
+>>       client->send_coroutine = NULL;
+>>       qemu_co_mutex_unlock(&client->send_lock);
+>> +
+>>       return ret;
+>>   }
+>>   
+>> +static inline void set_be_simple_reply(NBDSimpleReply *reply, uint64_t error,
+>> +                                       uint64_t handle)
+>> +{
+>> +    stl_be_p(&reply->magic, NBD_SIMPLE_REPLY_MAGIC);
+>> +    stl_be_p(&reply->error, error);
+>> +    stq_be_p(&reply->handle, handle);
+>> +}
+> ...loading the packed struct is now its own helper function,...
+>
+>> +
+>> +static int nbd_co_send_simple_reply(NBDClient *client,
+>> +                                    uint64_t handle,
+>> +                                    uint32_t error,
+>> +                                    void *data,
+>> +                                    size_t size,
+>> +                                    Error **errp)
+>> +{
+>> +    NBDSimpleReply reply;
+>> +    struct iovec iov[] = {
+>> +        {.iov_base = &reply, .iov_len = sizeof(reply)},
+>> +        {.iov_base = data, .iov_len = size}
+>> +    };
+>> +
+>> +    trace_nbd_co_send_reply(handle, error, size);
+>> +
+>> +    set_be_simple_reply(&reply, system_errno_to_nbd_errno(error), handle);
+>> +
+>> +    return nbd_co_send_iov(client, iov, size ? 2 : 1, errp);
+>> +}
+> ...and the function gets renamed, all at once.  Okay, maybe it IS easier
+> to review if split.  A good split might be:
+>
+> Focus on naming: Rename nbd_co_send_reply() to
+> nbd_co_send_simple_reply() in one patch (in fact, this part should be
+> squashed with the rename of the magic number in 3/10)
+>
+> Focus on conversion to on-the-wire representation: Add the packed struct
+> and set_be_simple_reply() in one patch, but still using corks
+>
+> Focus on simplified transmission: Switch to using iov to send both
+> halves of a two-part message in one transaction
+>
+>> +
+>>   /* nbd_co_receive_request
+>>    * Collect a client request. Return 0 if request looks valid, -EIO to drop
+>>    * connection right away, and any other negative value to report an error to
+>> @@ -1331,7 +1324,6 @@ static coroutine_fn void nbd_trip(void *opaque)
+>>       NBDExport *exp = client->exp;
+>>       NBDRequestData *req;
+>>       NBDRequest request = { 0 };    /* GCC thinks it can be used uninitialized */
+>> -    NBDReply reply;
+>>       int ret;
+>>       int flags;
+>>       int reply_data_len = 0;
+>> @@ -1351,11 +1343,7 @@ static coroutine_fn void nbd_trip(void *opaque)
+>>           goto disconnect;
+>>       }
+>>   
+>> -    reply.handle = request.handle;
+>> -    reply.error = 0;
+>> -
+>>       if (ret < 0) {
+>> -        reply.error = -ret;
+>>           goto reply;
+>>       }
+> Oh, and you're doing a fourth thing - tracking the error directly in ret
+> instead of buried in reply.error.  Could also be split.
+>
+>>   
+>>   reply:
+>>       if (local_err) {
+>> -        /* If we are here local_err is not fatal error, already stored in
+>> -         * reply.error */
+>> +        /* If we are here local_err is not fatal error, which should be sent
+>> +         * to client. */
+> Reads awkwardly (even pre-patch); maybe this is better:
+>
+> /* If we get here, local_err was not a fatal error, and should be sent
+> to the client. */
+>
+>>           error_report_err(local_err);
+>>           local_err = NULL;
+>>       }
+>>   
+>> -    if (nbd_co_send_reply(req, &reply, reply_data_len, &local_err) < 0) {
+>> +    if (nbd_co_send_simple_reply(req->client, request.handle,
+>> +                                 ret < 0 ? -ret : 0,
+>> +                                 req->data, reply_data_len, &local_err) < 0)
+>> +    {
+>>           error_prepend(&local_err, "Failed to send reply: ");
+>>           goto disconnect;
+>>       }
+>>
+> I'm not necessarily going to insist that you split things if I don't see
+> any other reasons to respin the series; but I might also try to do the
+> split locally and post it for you to see my thinking (remember, a series
+> of small patches that each do one thing well can be easier to review
+> than large patches, even if it results in more emails).
+>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Done, will send tomorrow. I agree, there are too many things in one patch.
 
-> ---
-> v2:
->   - fix typo: s/pvn_chip_core_typename/pnv_chip_core_typename/
-> ---
->  include/hw/ppc/pnv.h      |  1 -
->  include/hw/ppc/pnv_core.h |  1 -
->  hw/ppc/pnv.c              | 25 +++++++++++++------------
->  hw/ppc/pnv_core.c         |  5 -----
->  4 files changed, 13 insertions(+), 19 deletions(-)
-> 
-> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> index d82eee1..20244da 100644
-> --- a/include/hw/ppc/pnv.h
-> +++ b/include/hw/ppc/pnv.h
-> @@ -69,7 +69,6 @@ typedef struct PnvChipClass {
->      SysBusDeviceClass parent_class;
->  
->      /*< public >*/
-> -    const char *cpu_model;
->      PnvChipType  chip_type;
->      uint64_t     chip_cfam_id;
->      uint64_t     cores_mask;
-> diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
-> index a336a1f..e337af7 100644
-> --- a/include/hw/ppc/pnv_core.h
-> +++ b/include/hw/ppc/pnv_core.h
-> @@ -46,6 +46,5 @@ typedef struct PnvCoreClass {
->  
->  #define PNV_CORE_TYPE_SUFFIX "-" TYPE_PNV_CORE
->  #define PNV_CORE_TYPE_NAME(cpu_model) cpu_model PNV_CORE_TYPE_SUFFIX
-> -extern char *pnv_core_typename(const char *model);
->  
->  #endif /* _PPC_PNV_CORE_H */
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 3eafa28..80c7f62 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -55,6 +55,16 @@
->  #define KERNEL_LOAD_ADDR        0x20000000
->  #define INITRD_LOAD_ADDR        0x40000000
->  
-> +static const char *pnv_chip_core_typename(const PnvChip *o)
-> +{
-> +    const char *chip_type = object_class_get_name(object_get_class(OBJECT(o)));
-> +    int len = strlen(chip_type) - strlen(PNV_CHIP_TYPE_SUFFIX);
-> +    char *s = g_strdup_printf(PNV_CORE_TYPE_NAME("%.*s"), len, chip_type);
-> +    const char *core_type = object_class_get_name(object_class_by_name(s));
-> +    g_free(s);
-> +    return core_type;
-> +}
-> +
->  /*
->   * On Power Systems E880 (POWER8), the max cpus (threads) should be :
->   *     4 * 4 sockets * 12 cores * 8 threads = 1536
-> @@ -269,8 +279,7 @@ static int pnv_chip_lpc_offset(PnvChip *chip, void *fdt)
->  
->  static void powernv_populate_chip(PnvChip *chip, void *fdt)
->  {
-> -    PnvChipClass *pcc = PNV_CHIP_GET_CLASS(chip);
-> -    char *typename = pnv_core_typename(pcc->cpu_model);
-> +    const char *typename = pnv_chip_core_typename(chip);
->      size_t typesize = object_type_get_instance_size(typename);
->      int i;
->  
-> @@ -300,7 +309,6 @@ static void powernv_populate_chip(PnvChip *chip, void *fdt)
->          powernv_populate_memory_node(fdt, chip->chip_id, chip->ram_start,
->                                       chip->ram_size);
->      }
-> -    g_free(typename);
->  }
->  
->  static void powernv_populate_rtc(ISADevice *d, void *fdt, int lpc_off)
-> @@ -712,7 +720,6 @@ static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data)
->      DeviceClass *dc = DEVICE_CLASS(klass);
->      PnvChipClass *k = PNV_CHIP_CLASS(klass);
->  
-> -    k->cpu_model = "power8e_v2.1";
->      k->chip_type = PNV_CHIP_POWER8E;
->      k->chip_cfam_id = 0x221ef04980000000ull;  /* P8 Murano DD2.1 */
->      k->cores_mask = POWER8E_CORE_MASK;
-> @@ -734,7 +741,6 @@ static void pnv_chip_power8_class_init(ObjectClass *klass, void *data)
->      DeviceClass *dc = DEVICE_CLASS(klass);
->      PnvChipClass *k = PNV_CHIP_CLASS(klass);
->  
-> -    k->cpu_model = "power8_v2.0";
->      k->chip_type = PNV_CHIP_POWER8;
->      k->chip_cfam_id = 0x220ea04980000000ull; /* P8 Venice DD2.0 */
->      k->cores_mask = POWER8_CORE_MASK;
-> @@ -756,7 +762,6 @@ static void pnv_chip_power8nvl_class_init(ObjectClass *klass, void *data)
->      DeviceClass *dc = DEVICE_CLASS(klass);
->      PnvChipClass *k = PNV_CHIP_CLASS(klass);
->  
-> -    k->cpu_model = "power8nvl_v1.0";
->      k->chip_type = PNV_CHIP_POWER8NVL;
->      k->chip_cfam_id = 0x120d304980000000ull;  /* P8 Naples DD1.0 */
->      k->cores_mask = POWER8_CORE_MASK;
-> @@ -778,7 +783,6 @@ static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
->      DeviceClass *dc = DEVICE_CLASS(klass);
->      PnvChipClass *k = PNV_CHIP_CLASS(klass);
->  
-> -    k->cpu_model = "power9_v1.0";
->      k->chip_type = PNV_CHIP_POWER9;
->      k->chip_cfam_id = 0x100d104980000000ull; /* P9 Nimbus DD1.0 */
->      k->cores_mask = POWER9_CORE_MASK;
-> @@ -853,7 +857,7 @@ static void pnv_chip_init(Object *obj)
->  static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
->  {
->      PnvChipClass *pcc = PNV_CHIP_GET_CLASS(chip);
-> -    char *typename = pnv_core_typename(pcc->cpu_model);
-> +    const char *typename = pnv_chip_core_typename(chip);
->      size_t typesize = object_type_get_instance_size(typename);
->      int i, j;
->      char *name;
-> @@ -878,8 +882,6 @@ static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
->              memory_region_add_subregion(&chip->icp_mmio, pir << 12, &icp->mmio);
->          }
->      }
-> -
-> -    g_free(typename);
->  }
->  
->  static void pnv_chip_realize(DeviceState *dev, Error **errp)
-> @@ -887,7 +889,7 @@ static void pnv_chip_realize(DeviceState *dev, Error **errp)
->      PnvChip *chip = PNV_CHIP(dev);
->      Error *error = NULL;
->      PnvChipClass *pcc = PNV_CHIP_GET_CLASS(chip);
-> -    char *typename = pnv_core_typename(pcc->cpu_model);
-> +    const char *typename = pnv_chip_core_typename(chip);
->      size_t typesize = object_type_get_instance_size(typename);
->      int i, core_hwid;
->  
-> @@ -946,7 +948,6 @@ static void pnv_chip_realize(DeviceState *dev, Error **errp)
->                                  &PNV_CORE(pnv_core)->xscom_regs);
->          i++;
->      }
-> -    g_free(typename);
->  
->      /* Create LPC controller */
->      object_property_set_bool(OBJECT(&chip->lpc), true, "realized",
-> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> index 438dbd1..71eb90a 100644
-> --- a/hw/ppc/pnv_core.c
-> +++ b/hw/ppc/pnv_core.c
-> @@ -246,9 +246,4 @@ static const TypeInfo pnv_core_infos[] = {
->      DEFINE_PNV_CORE_TYPE("power9_v1.0"),
->  };
->  
-> -char *pnv_core_typename(const char *model)
-> -{
-> -    return g_strdup_printf(PNV_CORE_TYPE_NAME("%s"), model);
-> -}
-> -
->  DEFINE_TYPES(pnv_core_infos)
-> 
+-- 
+Best regards,
+Vladimir
