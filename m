@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e2DWT-0007Lo-9m
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 05:41:54 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1e2DXp-0007wr-ED
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 05:43:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e2DWP-0006Tq-CY
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 05:41:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58278)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e2DWP-0006TG-6H
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 05:41:49 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 02F3D8047E
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 09:41:48 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20171011092815.GE20372@redhat.com> (Daniel P. Berrange's message
-	of "Wed, 11 Oct 2017 10:28:15 +0100")
-References: <20171010181542.24168-1-quintela@redhat.com>
-	<20171010181542.24168-11-quintela@redhat.com>
-	<20171011092815.GE20372@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 11 Oct 2017 11:41:34 +0200
-Message-ID: <87376q10oh.fsf@secure.laptop>
+	(envelope-from <eric.auger@redhat.com>) id 1e2DXo-0007DI-AX
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 05:43:17 -0400
+References: <1506494000-31982-1-git-send-email-Bharat.Bhushan@nxp.com>
+	<20170927074109.GA31587@virtx40>
+	<AM5PR0401MB25450ACC804B20D93C4F2D9D9A780@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<9700cf30-65ed-9c55-c1b9-14bb8deb669f@redhat.com>
+	<20170927092147.GA32183@virtx40>
+	<0af599c0-f859-f90c-c999-bc4a0a678768@redhat.com>
+	<20171004114910.GA6932@virtx40>
+	<79234c56-c524-5359-de8a-f266b19821eb@redhat.com>
+	<9d173ea5-75a6-c684-7f8d-e2ec1d3eddff@redhat.com>
+	<1017080b-aa5f-4a1f-9905-e65f22717cd1@redhat.com>
+	<b740e8b7-5859-fd6a-1f1e-480aef6ef4f0@redhat.com>
+	<AM5PR0401MB254548523AC95D0A2A8A92E69A710@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<AM5PR0401MB254512CE483DD6E684037A629A750@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <2633883e-ed41-964b-9c27-bc36f86e9b4d@redhat.com>
+Date: Wed, 11 Oct 2017 11:42:55 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 10/10] migration: [RFC] Use proper types in
- json
+In-Reply-To: <AM5PR0401MB254512CE483DD6E684037A629A750@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v4 0/5] virtio-iommu: VFIO
+ integration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,73 +35,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Bharat Bhushan <bharat.bhushan@nxp.com>, Linu Cherian <linuc.decode@gmail.com>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "mst@redhat.com" <mst@redhat.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "linu.cherian@cavium.com" <linu.cherian@cavium.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "bharatb.yadav@gmail.com" <bharatb.yadav@gmail.com>
 
-"Daniel P. Berrange" <berrange@redhat.com> wrote:
-> On Tue, Oct 10, 2017 at 08:15:42PM +0200, Juan Quintela wrote:
->> We use int for everything (int64_t), and then we check that value is
->> between 0 and 255.  Change it to the valid types.
->> 
->> For qmp, the only real change is that now max_bandwidth allows to use
->> the k/M/G suffixes.
->
-> So on input apps previous would use:
->
->     "max-bandwidth":  1024
->
-> ie json numeric field, and would expect to see the same when reading
-> data back from QEMU.
->
-> With this change they could use a string field
->
->     "max-bandwidth":  "1k"
+Hi Bharat,
 
-Actually it is worse than that
+On 10/10/2017 08:42, Bharat Bhushan wrote:
+> Hi Alex, Eric,
+> 
+>> -----Original Message-----
+>> From: Qemu-devel [mailto:qemu-devel-
+>> bounces+bharat.bhushan=nxp.com@nongnu.org] On Behalf Of Bharat
+>> Bhushan
+>> Sent: Friday, October 06, 2017 9:16 AM
+>> To: Auger Eric <eric.auger@redhat.com>; Linu Cherian
+>> <linuc.decode@gmail.com>
+>> Cc: peter.maydell@linaro.org; kevin.tian@intel.com; mst@redhat.com;
+>> marc.zyngier@arm.com; tn@semihalf.com; will.deacon@arm.com;
+>> drjones@redhat.com; qemu-devel@nongnu.org;
+>> alex.williamson@redhat.com; qemu-arm@nongnu.org;
+>> linu.cherian@cavium.com; eric.auger.pro@gmail.com;
+>> robin.murphy@arm.com; christoffer.dall@linaro.org;
+>> bharatb.yadav@gmail.com
+>> Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v4 0/5] virtio-iommu: VFIO
+>> integration
+>>
+>>
+>>
+>>>>> Thanks
+>>>>>
+>>>>> Eric
+>>>>>>
+>>>>>> However you should be allowed to map 1 sg element of 5 pages and
+>>>>>> then notify the host about this event I think. Still looking at the code...
+>>>>>>
+>>>>>> I still can't reproduce the issue at the moment. What kind of
+>>>>>> device are you assigning?
+>>>>>>
+>>>>>> Thanks
+>>>>>>
+>>>>>> Eric
+>>>>>>>
+>>>>>>> Atleast vfio_get_vaddr called from vfio_iommu_map_notify in Qemu
+>>>>>>> expects the map size to be a power of 2.
+>>>>
+>>>> Actually I missed the most important here ;-)
+>>>>>>>
+>>>>>>>  if (len & iotlb->addr_mask) {
+>>>> This check looks suspiscious to me. In our case the len is not
+>>>> modified by the previous translation and it fails, I don't see why.
+>>>> It should be valid to be able to notify 5 granules.
+>>>
+>>> So after discussion with Alex, looks the way we notify the host
+>>> currently is wrong. we set the addr_mask to the mapping/unmapping size
+>>> -1 whereas this should be a page mask instead (granule size or block size?).
+>>> So if the guest maps 5 x 4kB pages we should send 5 notifications for
+>>> each page and not a single one. It is unclear to me if we can notify
+>>> with hugepage/block page size mask. Peter may confirm/infirm this. in
+>>> vsmmuv3 code I notify by granule or block size.
+> 
+> My understanding is that host provides supported page sizes (page_size_mask), and Size of each notification to host should be exactly best fit of supported page-size and/or multiples of supported page-sizes.
+> So if guest maps 20K size (single request), and supported page size is 4K, so we can still send one 20K size request.
+> Not sure I get it, why multiples of supported page-size cannot be provided in one notification to host.
+I think the IOTLB API was originally devised to manage only granule or
+block ^2 sizes. We might change this in the future but for the moment,
+with respect to this series,  I would simply recommend to stick to the
+existing API limitation and concurrently we can work on relaxing this
+constraint on another series.
 
+Thanks
 
-if you set:
-
-     "max-bandwidth":  1024
-
-it understand 1024M, and it outputs that big number
-
-      "max-bandwidth":  $((1024*1024*1024))
-
-(no, I don't know the value from memory)
-
-And yes, for migrate_set_parameter, we introduced it on 2.10.  We should
-have done the right thing, but  I didn't catch the error (Markus did,
-but too late, release were already done)
-
-> As long as QEMU's JSON parser accepts both number & string values
-> for the 'size' type it is still backwards compatible if an app
-> continues to use 1024 instead of "1k"
->
-> On *output* though (ie 'info migrate-parameters') this is not
-> compatible for applications, unless QEMU *always* uses the
-> numeric format when generating values. ie it must always
-> report 1024, and never "1k", as apps won't be expecting a string
-> with suffix.  I can't 100% tell whether this is the case or not,
-> so CC'ing Markus to confirm if changing "int" to "size" is
-> guaranteed back-compat in both directions
-
-This is why I asked.  My *understanding* was that my changes are NOP
-if you use the old interface, but I don't claim to be an expert on QAPI.
-
-(qemu) migrate_set_parameter 100
-(qemu) info migrate_parameters 
-...
-max-bandwidth: 104857600 bytes/second
-...
-(qemu) migrate_set_parameter max-bandwidth 1M
-(qemu) info migrate_parameters 
-...
-max-bandwidth: 1048576 bytes/second
-...
-(qemu) 
-
-This is the output with my changes applied, so I think that it works
-correctly on your example.
-
-Thanks, Juan.
+Eric
+> 
+> Thanks
+> -Bharat
+> 
+>>>
+>>> Bharat, please can you add this to your TODO list?
+>>>
+>>> Linu, thanks a lot for the time you spent debugging this issue.
+>>> Curiously on my side, it is really seldom hit but it is ...
+>>
+>> Thanks Linu and Eric, I added this to my todo list.
+>> While I am still not able to reproduce the issue.  I tried with e1000 and now
+>> try with ixgbe device. May I know which device can be used to reproduce this
+>> issue?
+>>
+>> Thanks
+>> -Bharat
+>>
+>>>
+>>> Thanks!
+>>>
+>>> Eric
+>>>>
+>>>> Thanks
+>>>>
+>>>> Eric
+>>>>>>>         error_report("iommu has granularity incompatible with target
+>> AS");
+>>>>>>>         return false;
+>>>>>>>     }
+>>>>>>>
+>>>>>>> Just trying to understand how this is not hitting in your case.
+>>>>>>>
+>>>>>>>
+>>>>>>
+>>>>>
+>>>>
+> 
