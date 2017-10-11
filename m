@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e2JuU-0005Tk-Bn
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 12:31:07 -0400
+	(envelope-from <eblake@redhat.com>) id 1e2K1v-00078G-UW
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 12:38:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e2JuQ-0007mk-Dy
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 12:31:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42460)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e2JuQ-0007mN-8D
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 12:31:02 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e2JuN-00050y-1n
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 16:30:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2FA112E817B
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 16:30:58 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1e2K1s-0002O6-04
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 12:38:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58734)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1e2K1r-0002Nj-Mc
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 12:38:43 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4322581DE7
+	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 16:38:42 +0000 (UTC)
+References: <20171011153843.9876-1-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <bb4d0ab0-fb08-edf6-0779-abf332a7af6a@redhat.com>
+Date: Wed, 11 Oct 2017 11:38:39 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Oct 2017 16:19:19 -0000
-From: Googulator <1722857@bugs.launchpad.net>
-Reply-To: Bug 1722857 <1722857@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <150773875950.15858.6612772865194948716.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1722857] [NEW] Missing PCI "programming
- interface" ID emulation for USB host controllers
+In-Reply-To: <20171011153843.9876-1-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="C9JA0m0eUF54tcckuQdehf1Grf2s40m3M"
+Subject: Re: [Qemu-devel] [PATCH] io: fix mem leak in websock error path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,58 +33,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 
-Public bug reported:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--C9JA0m0eUF54tcckuQdehf1Grf2s40m3M
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <bb4d0ab0-fb08-edf6-0779-abf332a7af6a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] io: fix mem leak in websock error path
+References: <20171011153843.9876-1-berrange@redhat.com>
+In-Reply-To: <20171011153843.9876-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Qemu doesn't currently emulate the correct value of the "register level
-programming interface" field in the PCI config space of USB host
-controllers. As a result, some guest operating systems (most notably
-Windows) fail to load e.g. generic xHCI drivers, and instead ask for a
-vendor-specific driver, which may not be always available.
+On 10/11/2017 10:38 AM, Daniel P. Berrange wrote:
+> Coverity pointed out the 'date' is not free()d in the error
+> path
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  io/channel-websock.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-Example: "-device nec-usb-xhci" emulates a Renesas (formerly NEC)
-uPD720202 xHCI controller. However, in the PCI config space, it shows us
-as class 0C, subclass 03, prog-if 00 (UHCI) where as the real uPD720202
-(and all real xHCI controllers) have prog-if 30 (xHCI). A Windows guest
-booted with this option will not recognize devices attached to the XHCI
-controller unless drivers from Renesas are manually installed first,
-even though recent Windows versions include a generic xHCI driver that
-works perfectly well with real uPD720202 hardware.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+>=20
+> diff --git a/io/channel-websock.c b/io/channel-websock.c
+> index aa35ef3274..a1c10ab719 100644
+> --- a/io/channel-websock.c
+> +++ b/io/channel-websock.c
+> @@ -355,6 +355,7 @@ static void qio_channel_websock_handshake_send_res_=
+ok(QIOChannelWebsock *ioc,
+>                              QIO_CHANNEL_WEBSOCK_GUID_LEN,
+>                              &accept,
+>                              errp) < 0) {
+> +        g_free(date);
+>          qio_channel_websock_handshake_send_res_err(
+>              ioc, QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_SERVER_ERR);
+>          return;
+>=20
 
--- =
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1722857
 
-Title:
-  Missing PCI "programming interface" ID emulation for USB host
-  controllers
+--C9JA0m0eUF54tcckuQdehf1Grf2s40m3M
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Status in QEMU:
-  New
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Bug description:
-  Qemu doesn't currently emulate the correct value of the "register
-  level programming interface" field in the PCI config space of USB host
-  controllers. As a result, some guest operating systems (most notably
-  Windows) fail to load e.g. generic xHCI drivers, and instead ask for a
-  vendor-specific driver, which may not be always available.
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlneSQ8ACgkQp6FrSiUn
+Q2rVrAf9FXVHRLWGOB8r4TL4XCaMk60ymTnZguSJ9rtK7rKKh4bl696uGy/x9J4y
+z8wgf+J1x40EeItKKb3f4+3BNiE6XJKtwAy19vDwApjXKuFgLBAfcvkKkAr3ngbX
+agO5WJ8humjUclK0bjy3gtzqq1xw1plX9uvVXp42n7ptEPD7UzTXdnrQMJ7VZfqv
+3uOp6wQ7A09tVV9NtEYSBV8QA5OK6Gt2QcsGyB1hsQSSLgfzWYpKXizy6k24GgRB
+VxSUqbF2fsFOXfp2YlOQILZHOiwOP96XPKfTwj6z0vlusUpLm1g6rh2j78sCrcu7
+0wSta0s5Xul31URSd27wx4V4yHQ7Ug==
+=AYwK
+-----END PGP SIGNATURE-----
 
-  Example: "-device nec-usb-xhci" emulates a Renesas (formerly NEC)
-  uPD720202 xHCI controller. However, in the PCI config space, it shows
-  us as class 0C, subclass 03, prog-if 00 (UHCI) where as the real
-  uPD720202 (and all real xHCI controllers) have prog-if 30 (xHCI). A
-  Windows guest booted with this option will not recognize devices
-  attached to the XHCI controller unless drivers from Renesas are
-  manually installed first, even though recent Windows versions include
-  a generic xHCI driver that works perfectly well with real uPD720202
-  hardware.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1722857/+subscriptions
+--C9JA0m0eUF54tcckuQdehf1Grf2s40m3M--
