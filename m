@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52710)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2IEE-0007qm-7I
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 10:43:28 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53510)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1e2IHh-0000Du-80
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 10:46:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2IEA-0001AR-4j
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 10:43:22 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58472)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e2IE9-00019x-SA
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 10:43:18 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9BEgqQR046806
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 10:43:12 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dhjx5s6wu-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 10:42:54 -0400
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Wed, 11 Oct 2017 08:42:32 -0600
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Wed, 11 Oct 2017 10:42:25 -0400
-Message-Id: <1507732945-23555-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2] tpm: Use EMSGSIZE instead of EBADMSG to
- compile on OpenBSD
+	(envelope-from <n54@gmx.com>) id 1e2IHe-0002Kn-21
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 10:46:57 -0400
+Received: from mout.gmx.net ([212.227.17.21]:56922)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1e2IHd-0002KZ-Mq
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 10:46:53 -0400
+References: <20171011083604.11820-1-kraxel@redhat.com>
+	<CAFEAcA9uXw7XYOBu9cKY+B=OWNbS=cRp7BKcXacLTaRLx9RWdA@mail.gmail.com>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <f5444f37-4931-d9e6-216e-2c0b78184a1e@gmx.com>
+Date: Wed, 11 Oct 2017 16:49:14 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9uXw7XYOBu9cKY+B=OWNbS=cRp7BKcXacLTaRLx9RWdA@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="V6AjVuMLlKROoeqDDi61ki9IpfpqBtcaf"
+Subject: Re: [Qemu-devel] [PULL 00/10] Ui 20171011 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,50 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, amarnath.valluri@intel.com, marcandre.lureau@gmail.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-EBADMSG was only added to OpenBSD very recently. To make QEMU compilable
-on older OpenBSD versions use EMSGSIZE instead when a mismatch between
-number of received bytes and message size indicated in the header was
-found.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--V6AjVuMLlKROoeqDDi61ki9IpfpqBtcaf
+From: Kamil Rytarowski <n54@gmx.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <f5444f37-4931-d9e6-216e-2c0b78184a1e@gmx.com>
+Subject: Re: [Qemu-devel] [PULL 00/10] Ui 20171011 patches
+References: <20171011083604.11820-1-kraxel@redhat.com>
+ <CAFEAcA9uXw7XYOBu9cKY+B=OWNbS=cRp7BKcXacLTaRLx9RWdA@mail.gmail.com>
+In-Reply-To: <CAFEAcA9uXw7XYOBu9cKY+B=OWNbS=cRp7BKcXacLTaRLx9RWdA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Return -EMSGSIZE and convert all other errnos in the same functions to
-return the negative errno.
+On 11.10.2017 16:37, Peter Maydell wrote:
+> The OpenBSD failure is because make now tries to run a
+> script that uses #!/bin/bash, and this machine doesn't
+> have bash installed. Do we really need to add bash to
+> our build-dependencies? The script doesn't seem like it's
+> doing anything that critically requires bash...
 
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
----
- hw/tpm/tpm_util.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+NetBSD installs bash by default to /usr/pkg/bin/bash, FreeBSD installs
+it to /usr/local/bin/bash. If bash is really needed it should be used
+with the "#!/usr/bin/env bash" shebang.
 
-diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
-index fb929f6..a83c6f4 100644
---- a/hw/tpm/tpm_util.c
-+++ b/hw/tpm/tpm_util.c
-@@ -71,7 +71,7 @@ static int tpm_util_test(int fd,
-         return errno;
-     }
-     if (n != requestlen) {
--        return EFAULT;
-+        return -EFAULT;
-     }
- 
-     FD_ZERO(&readfds);
-@@ -85,13 +85,13 @@ static int tpm_util_test(int fd,
- 
-     n = read(fd, &buf, sizeof(buf));
-     if (n < sizeof(struct tpm_resp_hdr)) {
--        return EFAULT;
-+        return -EFAULT;
-     }
- 
-     resp = (struct tpm_resp_hdr *)buf;
-     /* check the header */
-     if (be32_to_cpu(resp->len) != n) {
--        return EBADMSG;
-+        return -EMSGSIZE;
-     }
- 
-     *return_tag = be16_to_cpu(resp->tag);
--- 
-2.5.5
+
+--V6AjVuMLlKROoeqDDi61ki9IpfpqBtcaf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZ3i9vAAoJEEuzCOmwLnZsosAQAJIGOcy9oJNwHNI0noibAgCB
+SEdAW/W4jnaaUtTncL9iFT+a+DW48f3G6SzojoOxzvH9FiqfD87t+uxVqevoraVy
+jqA1N+zd7thC7V4O7AQvA+8IusfB6VD0Lopk6lUDopQjy9T6m10lzpQfV/MaP+ky
+rVO04r7wZSfQeaZ0LXRFfo8mMzWPJlVXUAnDzXB5wFzt4D3l9bRKWKoSJZm+LbMr
+cVP7EG22L4qU1AZg6L9+Ysx1DoQuE14wRQ+u5ts+kCsUBKHDbUj5LHirIxgLEia1
+K1MJZQfgr5Y2FwvWhkbiHP8IGn5FCsJnRBkXCzgsmjGYD/uduccjbLjPR+1g3HIa
+5YCbhNGjcO45tb5+4PoFEMmdCawVxsW9ZnkubvpyhXwiuWQ6SyZtpwjA3ZVOQrRz
+cvcUaxjn21oCIzIQm2oBn+Nw0JZ30fHDjjALOJ9xQoXjoD5OOKrBoxfV3qkukmPD
+Zh84onsIdc3+woSZ8DCfcZ28Ob8cx3lKNuKibuEI0uOoaaHQxP7oG7Zxf8W0MS1j
+VbaaWcKLWPrgEimpccFD2H3cO/10TDH9ZCx/PatujCD6vB8tAa0vTHFOvSCNKHPO
+fxXHGvwZfA3jhJALBNHpTuA9cCxAwiOEkcnnsm43Quv5ParClsPR0tFlwM4iuhwh
+mIvLX/5iKNs83dHSv28v
+=sLkv
+-----END PGP SIGNATURE-----
+
+--V6AjVuMLlKROoeqDDi61ki9IpfpqBtcaf--
