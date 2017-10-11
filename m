@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e26SH-0005OE-CZ
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 22:09:06 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e26bl-0007gd-ID
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 22:18:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e26SD-0001ny-DA
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 22:09:05 -0400
-Resent-Message-Id: <E1e26SD-0001ny-DA@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21418)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1e26SD-0001nT-68
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 22:09:01 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150768138469.285.11137026035130397652@b58463cdfd5f>
-In-Reply-To: <20171010213608.31567-1-ppandit@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1e26bd-0005Nb-Tp
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 22:18:49 -0400
+Received: from mail-pf0-x230.google.com ([2607:f8b0:400e:c00::230]:46624)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e26bd-0005NQ-Md
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 22:18:45 -0400
+Received: by mail-pf0-x230.google.com with SMTP id p87so359110pfj.3
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 19:18:45 -0700 (PDT)
+References: <1507556919-24992-1-git-send-email-peter.maydell@linaro.org>
+	<1507556919-24992-7-git-send-email-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <520fa164-103e-c09d-67af-5d0e9d8ebb9b@linaro.org>
+Date: Tue, 10 Oct 2017 19:18:42 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 10 Oct 2017 17:23:05 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] cirrus: keep vga vram pointer within bounds
+In-Reply-To: <1507556919-24992-7-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 6/9] target/arm: Pull Thumb insn word loads
+ up to top level
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +32,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ppandit@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, niuguoxiang@huawei.com, pjp@fedoraproject.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcxMDEwMjEzNjA4LjMxNTY3LTEtcHBhbmRpdEByZWRoYXQuY29tClN1Ympl
-Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGNpcnJ1czoga2VlcCB2Z2EgdnJhbSBwb2ludGVyIHdp
-dGhpbiBib3VuZHMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9
-YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxl
-ZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
-cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
-ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
-IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
-CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjYyOTAwYzRiNjYgY2lycnVzOiBrZWVwIHZnYSB2
-cmFtIHBvaW50ZXIgd2l0aGluIGJvdW5kcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcg
-UEFUQ0ggMS8xOiBjaXJydXM6IGtlZXAgdmdhIHZyYW0gcG9pbnRlciB3aXRoaW4gYm91bmRzLi4u
-CkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzw8JyAoY3R4OlZ4VikKIzQwOiBG
-SUxFOiBody9kaXNwbGF5L2NpcnJ1c192Z2EuYzoyMDgxOgorICAgIG1lbW9yeV9yZWdpb25fc2V0
-X2RpcnR5KCZzLT52Z2EudnJhbSwgb2Zmc2V0LCB4PDwxKTsKICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJu
-aW5ncywgMjQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTog
-MQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QGZyZWVsaXN0cy5vcmc=
+On 10/09/2017 06:48 AM, Peter Maydell wrote:
+> +    if ((insn >> 11) == 0x1e && (s->pc < s->next_page_start - 3)) {
+> +        /* 0b1111_0xxx_xxxx_xxxx : BL/BLX prefix, and the suffix
+> +         * is not on the next page; we merge this into a 32-bit
+> +         * insn.
+> +         */
+> +        return false;
+> +    }
+> +    /* 0b1110_1xxx_xxxx_xxxx : BLX suffix (or UNDEF);
+> +     * 0b1111_1xxx_xxxx_xxxx : BL suffix;
+> +     * 0b1111_0xxx_xxxx_xxxx : BL/BLX prefix on the end of a page
+> +     *  -- handle as single 16 bit insn
+> +     */
+
+I really had to search to find docs for this.  I suspect it's quite clear in v5
+manuals, but I didn't have one handy and arm.com seems to have dropped
+everything before v6M.  However, I did see a footnote in v7M that explained.
+
+But, everything appears to be in order.  It's a nice cleanup.
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
