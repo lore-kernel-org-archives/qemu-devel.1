@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e2CUv-0003wo-Gs
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 04:36:14 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e2CUv-0003x3-SV
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 04:36:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e2CUu-0007oE-8J
+	(envelope-from <kraxel@redhat.com>) id 1e2CUr-0007je-Pl
 	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 04:36:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54872)
+Received: from mx1.redhat.com ([209.132.183.28]:48236)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e2CUu-0007mo-07
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 04:36:12 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e2CUr-0007ib-Hz
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 04:36:09 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 159B0C04AC41
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 08:36:11 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9E4C5C0587F2
+	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 08:36:08 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 11 Oct 2017 10:36:00 +0200
-Message-Id: <20171011083604.11820-7-kraxel@redhat.com>
-In-Reply-To: <20171011083604.11820-1-kraxel@redhat.com>
-References: <20171011083604.11820-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 06/10] ui: don't export qemu_input_event_new_key
+Date: Wed, 11 Oct 2017 10:35:54 +0200
+Message-Id: <20171011083604.11820-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 00/10] Ui 20171011 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +28,94 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
+The following changes since commit 567d0a19c7998fa366598b83d5a6e5f0759d3ea9:
 
-All public code should use qemu_input_event_send_key* functions
-instead of creating an event directly.
+  Merge remote-tracking branch 'remotes/ehabkost/tags/x86-and-machine-pull-request' into staging (2017-10-10 13:25:46 +0100)
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170929101201.21039-7-berrange@redhat.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- include/ui/input.h | 1 -
- ui/input.c         | 2 +-
- 2 files changed, 1 insertion(+), 2 deletions(-)
+are available in the git repository at:
 
-diff --git a/include/ui/input.h b/include/ui/input.h
-index 479cc46cfc..f8cee43f65 100644
---- a/include/ui/input.h
-+++ b/include/ui/input.h
-@@ -38,7 +38,6 @@ void qemu_input_event_send_impl(QemuConsole *src, InputEvent *evt);
- void qemu_input_event_sync(void);
- void qemu_input_event_sync_impl(void);
- 
--InputEvent *qemu_input_event_new_key(KeyValue *key, bool down);
- void qemu_input_event_send_key(QemuConsole *src, KeyValue *key, bool down);
- void qemu_input_event_send_key_number(QemuConsole *src, int num, bool down);
- void qemu_input_event_send_key_qcode(QemuConsole *src, QKeyCode q, bool down);
-diff --git a/ui/input.c b/ui/input.c
-index 4b241aa823..290b47354a 100644
---- a/ui/input.c
-+++ b/ui/input.c
-@@ -386,7 +386,7 @@ void qemu_input_event_sync(void)
-     replay_input_sync_event();
- }
- 
--InputEvent *qemu_input_event_new_key(KeyValue *key, bool down)
-+static InputEvent *qemu_input_event_new_key(KeyValue *key, bool down)
- {
-     InputEvent *evt = g_new0(InputEvent, 1);
-     evt->u.key.data = g_new0(InputKeyEvent, 1);
+  git://git.kraxel.org/qemu tags/ui-20171011-pull-request
+
+for you to fetch changes up to 92328b7104ffc825f10c33f3fd1866e940a523f7:
+
+  ui/gtk: Fix deprecation of vte_terminal_copy_clipboard (2017-10-11 10:03:31 +0200)
+
+----------------------------------------------------------------
+ui: use keycodemapdb for key code mappings, part one (v2)
+ui: add qemu-keymap, update reverse keymaps (for qemu -k $map)
+ui: fix for vte 0.50
+
+----------------------------------------------------------------
+
+Anthony PERARD (1):
+  ui/gtk: Fix deprecation of vte_terminal_copy_clipboard
+
+Daniel P. Berrange (6):
+  build: automatically handle GIT submodule checkout for dtc
+  docker: don't rely on submodules existing in the main checkout
+  ui: add keycodemapdb repository as a GIT submodule
+  ui: convert common input code to keycodemapdb
+  ui: convert key events to QKeyCodes immediately
+  ui: don't export qemu_input_event_new_key
+
+Gerd Hoffmann (3):
+  tools: add qemu-keymap
+  Add pc-bios/keymaps/Makefile
+  pc-bios/keymaps: keymaps update
+
+ configure                 |   75 ++-
+ Makefile                  |   55 ++-
+ include/ui/input.h        |   12 +-
+ qemu-keymap.c             |  258 +++++++++++
+ ui/gtk.c                  |    5 +
+ ui/input-keymap.c         |  336 +-------------
+ ui/input.c                |   24 +-
+ .gitignore                |    2 +
+ .gitmodules               |    3 +
+ MAINTAINERS               |    6 +
+ pc-bios/keymaps/Makefile  |   56 +++
+ pc-bios/keymaps/ar        |  819 +++++++++++++++++++++++++++++----
+ pc-bios/keymaps/bepo      | 1108 +++++++++++++++++++++++++++++++--------------
+ pc-bios/keymaps/cz        |  861 ++++++++++++++++++++++++++++++++---
+ pc-bios/keymaps/da        |  732 +++++++++++++++++++++++++++++-
+ pc-bios/keymaps/de        |  767 ++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/de-ch     |  915 ++++++++++++++++++++++++++++++++-----
+ pc-bios/keymaps/en-gb     |  724 ++++++++++++++++++++++++++++-
+ pc-bios/keymaps/en-us     |  718 ++++++++++++++++++++++++++++-
+ pc-bios/keymaps/es        |  744 +++++++++++++++++++++++++++++-
+ pc-bios/keymaps/et        |  818 +++++++++++++++++++++++++++++----
+ pc-bios/keymaps/fi        |  814 ++++++++++++++++++++++++++++++---
+ pc-bios/keymaps/fo        |  881 ++++++++++++++++++++++++++++++++---
+ pc-bios/keymaps/fr        |  704 +++++++++++++++++++++++++++-
+ pc-bios/keymaps/fr-be     |  724 ++++++++++++++++++++++++++++-
+ pc-bios/keymaps/fr-ca     |  804 ++++++++++++++++++++++++++++++--
+ pc-bios/keymaps/fr-ch     |  800 ++++++++++++++++++++++++++++++--
+ pc-bios/keymaps/hr        |  752 +++++++++++++++++++++++++++++-
+ pc-bios/keymaps/hu        |  887 ++++++++++++++++++++++++++++++++----
+ pc-bios/keymaps/is        |  802 +++++++++++++++++++++++++++++---
+ pc-bios/keymaps/it        |  757 ++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/ja        |  792 +++++++++++++++++++++++++++++---
+ pc-bios/keymaps/lt        |  844 ++++++++++++++++++++++++++++++++--
+ pc-bios/keymaps/lv        |  766 +++++++++++++++++++++++++++++--
+ pc-bios/keymaps/mk        |  814 +++++++++++++++++++++++++++++----
+ pc-bios/keymaps/nl        |  794 +++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/no        |  758 ++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/pl        |  789 ++++++++++++++++++++++++++++++--
+ pc-bios/keymaps/pt        |  737 +++++++++++++++++++++++++++++-
+ pc-bios/keymaps/pt-br     |  775 ++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/ru        |  835 ++++++++++++++++++++++++++++++----
+ pc-bios/keymaps/th        |  878 +++++++++++++++++++++++++++++------
+ pc-bios/keymaps/tr        |  819 ++++++++++++++++++++++++++++++---
+ scripts/archive-source.sh |   34 +-
+ scripts/git-submodule.sh  |   38 ++
+ ui/keycodemapdb           |    1 +
+ 46 files changed, 24564 insertions(+), 2073 deletions(-)
+ create mode 100644 qemu-keymap.c
+ create mode 100644 pc-bios/keymaps/Makefile
+ create mode 100755 scripts/git-submodule.sh
+ create mode 160000 ui/keycodemapdb
+
 -- 
 2.9.3
