@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e2BSA-0006aJ-Ej
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:29:19 -0400
+	(envelope-from <lvivier@redhat.com>) id 1e2BdU-0008Pi-TH
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:41:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e2BS6-0005bN-Fd
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:29:18 -0400
-Received: from 7.mo4.mail-out.ovh.net ([178.33.253.54]:52910)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e2BS6-0005an-9O
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:29:14 -0400
-Received: from player772.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 951DCDA4E4
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 09:29:12 +0200 (CEST)
-Date: Wed, 11 Oct 2017 09:29:08 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171011092908.291c6cd6@bahia.lan>
-In-Reply-To: <20171007051925.GJ10050@umbus.fritz.box>
-References: <150730254473.16260.6484345241358746630.stgit@bahia>
-	<20171007051925.GJ10050@umbus.fritz.box>
+	(envelope-from <lvivier@redhat.com>) id 1e2BdR-0004I6-O7
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:41:00 -0400
+References: <20171011000649.22012-1-david@gibson.dropbear.id.au>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <08a90833-cf92-da0e-5f75-10c92a0c6446@redhat.com>
+Date: Wed, 11 Oct 2017 09:40:53 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/CZH3pr41fEXM+vD.sVXwb9F";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH] spapr_pci: fail gracefully with
- non-pseries machine types
+In-Reply-To: <20171011000649.22012-1-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv2] spapr: Correct RAM size calculation for
+ HPT resizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,120 +24,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org, clg@kaod.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
---Sig_/CZH3pr41fEXM+vD.sVXwb9F
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 11/10/2017 02:06, David Gibson wrote:
+> In order to prevent the guest from forcing the allocation of large amounts
+> of qemu memory (or host kernel memory, in the case of KVM HV), we limit
+> the size of Hashed Page Table (HPT) it is allowed to allocated, based on
+> its RAM size.
+> 
+> However, the current calculation is not correct: it only adds up the size
+> of plugged memory, ignoring the base memory size.  This patch corrects it.
+> 
+> While we're there, use get_plugged_memory_size() instead of directly
+> calling pc_existing_dimms_capacity().  The only difference is that it
+> will abort on failure, which is right: a failure here indicates something
+> wrong within qemu.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/spapr_hcall.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> Changes in v2:
+>   * Also remove redundant initializer of current_ram_size
+> 
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 8d72bb7c1c..0d59d1534d 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -472,7 +472,7 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
+>      target_ulong flags = args[0];
+>      int shift = args[1];
+>      sPAPRPendingHPT *pending = spapr->pending_hpt;
+> -    uint64_t current_ram_size = MACHINE(spapr)->ram_size;
+> +    uint64_t current_ram_size;
+>      int rc;
+>  
+>      if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED) {
+> @@ -494,7 +494,7 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
+>          return H_PARAMETER;
+>      }
+>  
+> -    current_ram_size = pc_existing_dimms_capacity(&error_fatal);
+> +    current_ram_size = MACHINE(spapr)->ram_size + get_plugged_memory_size();
+>  
+>      /* We only allow the guest to allocate an HPT one order above what
+>       * we'd normally give them (to stop a small guest claiming a huge
+> 
 
-On Sat, 7 Oct 2017 16:19:25 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Fri, Oct 06, 2017 at 05:09:04PM +0200, Greg Kurz wrote:
-> > QEMU currently crashes when the user tries to add a spapr-pci-host-brid=
-ge
-> > on a non-pseries machine:
-> >=20
-> > $ qemu-system-ppc64 -M ppce500 -device spapr-pci-host-bridge,index=3D1
-> > hw/ppc/spapr_pci.c:1535:spapr_phb_realize:
-> > Object 0x1003dacae60 is not an instance of type spapr-machine
-> > Aborted (core dumped)
-> >=20
-> > The same thing happens with the deprecated but still available child ty=
-pe
-> > spapr-pci-vfio-host-bridge.
-> >=20
-> > Fix both by checking the machine type with object_dynamic_cast().
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org> =20
->=20
->=20
->=20
-> > ---
-> >  hw/ppc/spapr_pci.c |    8 +++++++-
-> >  1 file changed, 7 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> > index 5049ced4e8b4..9e85106f51f8 100644
-> > --- a/hw/ppc/spapr_pci.c
-> > +++ b/hw/ppc/spapr_pci.c
-> > @@ -1507,7 +1507,7 @@ static void spapr_pci_unplug_request(HotplugHandl=
-er *plug_handler,
-> > =20
-> >  static void spapr_phb_realize(DeviceState *dev, Error **errp)
-> >  {
-> > -    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-> > +    sPAPRMachineState *spapr;
-> >      SysBusDevice *s =3D SYS_BUS_DEVICE(dev);
-> >      sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(s);
-> >      PCIHostState *phb =3D PCI_HOST_BRIDGE(s);
-> > @@ -1519,6 +1519,12 @@ static void spapr_phb_realize(DeviceState *dev, =
-Error **errp)
-> >      const unsigned windows_supported =3D
-> >          sphb->ddw_enabled ? SPAPR_PCI_DMA_MAX_WINDOWS : 1;
-> > =20
-> > +    spapr =3D (sPAPRMachineState *) qdev_get_machine();
-> > +    if (!object_dynamic_cast((Object *) spapr, TYPE_SPAPR_MACHINE)) {
-> > +        error_setg(errp, TYPE_SPAPR_PCI_HOST_BRIDGE " needs a pseries =
-machine");
-> > +        return;
-> > +    } =20
->=20
-> This is slightly clunky.  You could instead use OBJECT_CHECK in the
-> initializer, then just if (!spapr) here.
->=20
-
-The negative review on v2 seem to indicate we have an agreement on using
-object_dynamic_cast() explicitly. So we have two possibilities, either
-the "clunky" v1, or possibly:
-
--    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-+    /* We don't use SPAPR_MACHINE() in order to exit gracefully if the user
-+     * tries to add a PHB to a non-pseries machine.
-+     */
-+    sPAPRMachineState *spapr =3D
-+        (sPAPRMachineState *) object_dynamic_cast(qdev_get_machine(),
-+                                                  TYPE_SPAPR_MACHINE);
-     SysBusDevice *s =3D SYS_BUS_DEVICE(dev);
-     sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(s);
-     PCIHostState *phb =3D PCI_HOST_BRIDGE(s);
-     char *namebuf;
-     int i;
-     PCIBus *bus;
-     uint64_t msi_window_size =3D 4096;
-     sPAPRTCETable *tcet;
-     const unsigned windows_supported =3D
-         sphb->ddw_enabled ? SPAPR_PCI_DMA_MAX_WINDOWS : 1;
-=20
-+    if (!spapr) {
-+        error_setg(errp, TYPE_SPAPR_PCI_HOST_BRIDGE " needs a pseries mach=
-ine");
-+        return;
-+    }
-+
-
-Which one do you prefer ? I'll also change spapr_cpu_core_realize()
-if needed.
-
-> > +
-> >      if (sphb->index !=3D (uint32_t)-1) {
-> >          sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> >          Error *local_err =3D NULL;
-> >  =20
->=20
->=20
-
-
---Sig_/CZH3pr41fEXM+vD.sVXwb9F
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWd3IRAAKCRAC/DrrAQHb
-wob6AKCfSmULTLUXx/AcF+ze/GxAWpXCDACffNJgtUHTODcmkRoueGAzo7Z/D1E=
-=RBeO
------END PGP SIGNATURE-----
-
---Sig_/CZH3pr41fEXM+vD.sVXwb9F--
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
