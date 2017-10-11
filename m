@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e2CUu-0003vp-3K
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 04:36:17 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e2CV1-00043D-BL
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 04:36:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e2CUr-0007jr-S1
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 04:36:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36020)
+	(envelope-from <kraxel@redhat.com>) id 1e2CUu-0007pG-Tk
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 04:36:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34376)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e2CUr-0007iY-JT
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 04:36:09 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e2CUu-0007nj-LS
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 04:36:12 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9F0DF81DE2
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 08:36:08 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A6E59A797
+	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 08:36:11 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 11 Oct 2017 10:35:55 +0200
-Message-Id: <20171011083604.11820-2-kraxel@redhat.com>
+Date: Wed, 11 Oct 2017 10:36:01 +0200
+Message-Id: <20171011083604.11820-8-kraxel@redhat.com>
 In-Reply-To: <20171011083604.11820-1-kraxel@redhat.com>
 References: <20171011083604.11820-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 01/10] build: automatically handle GIT submodule
- checkout for dtc
+Subject: [Qemu-devel] [PULL 07/10] tools: add qemu-keymap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,225 +30,361 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
+qemu-keymap generates qemu reverse keymaps from xkb keymaps,
+which can be used with the qemu "-k" command line switch.
 
-Currently if DTC is required by configure and not available in the host
-OS install, we exit with an error message telling the user to checkout a
-git submodule or install the library.
-
-This introduces automatic handling of the git submodule checkout process
-and enables it for dtc. This only runs if building from GIT, so users of
-release tarballs still need the system library install. The current state
-of the git checkout is stashed in .git-submodule-status, and a helper
-program is used to determine if this state matches the desired submodule
-state. A dependency against 'Makefile' ensures that the submodule state
-is refreshed at the start of the build process
-
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170929101201.21039-2-berrange@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 20171005153330.19210-2-kraxel@redhat.com
 ---
- configure                | 46 ++++++++++++++++++++++++++--------------------
- Makefile                 | 25 ++++++++++++++++++++++++-
- .gitignore               |  1 +
- MAINTAINERS              |  6 ++++++
- scripts/git-submodule.sh | 38 ++++++++++++++++++++++++++++++++++++++
- 5 files changed, 95 insertions(+), 21 deletions(-)
- create mode 100755 scripts/git-submodule.sh
+ configure     |  23 ++++++
+ Makefile      |   5 ++
+ qemu-keymap.c | 258 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 286 insertions(+)
+ create mode 100644 qemu-keymap.c
 
 diff --git a/configure b/configure
-index 6587e8014b..38f1710c80 100755
+index 06f18ea9af..be53b6b104 100755
 --- a/configure
 +++ b/configure
-@@ -264,6 +264,7 @@ cc_i386=i386-pc-linux-gnu-gcc
- libs_qga=""
- debug_info="yes"
- stack_protector=""
-+git_submodules=""
+@@ -304,6 +304,7 @@ vde=""
+ vnc_sasl=""
+ vnc_jpeg=""
+ vnc_png=""
++xkbcommon=""
+ xen=""
+ xen_ctrl_version=""
+ xen_pv_domain_build="no"
+@@ -2908,6 +2909,21 @@ EOF
+ fi
  
- # Don't accept a target_list environment variable.
- unset target_list
-@@ -3584,27 +3585,30 @@ EOF
-   if compile_prog "" "$fdt_libs" ; then
-     # system DTC is good - use it
-     fdt=yes
--  elif test -d ${source_path}/dtc/libfdt ; then
--    # have submodule DTC - use it
--    fdt=yes
--    dtc_internal="yes"
--    mkdir -p dtc
--    if [ "$pwd_is_source_path" != "y" ] ; then
--       symlink "$source_path/dtc/Makefile" "dtc/Makefile"
--       symlink "$source_path/dtc/scripts" "dtc/scripts"
--    fi
--    fdt_cflags="-I\$(SRC_PATH)/dtc/libfdt"
--    fdt_libs="-L\$(BUILD_DIR)/dtc/libfdt $fdt_libs"
--  elif test "$fdt" = "yes" ; then
--    # have neither and want - prompt for system/submodule install
--    error_exit "DTC (libfdt) version >= 1.4.2 not present. Your options:" \
--        "  (1) Preferred: Install the DTC (libfdt) devel package" \
--        "  (2) Fetch the DTC submodule, using:" \
--        "      git submodule update --init dtc"
-   else
--    # don't have and don't want
--    fdt_libs=
--    fdt=no
-+      # have GIT checkout, so activate dtc submodule
-+      if test -e "${source_path}/.git" ; then
-+          git_submodules="${git_submodules} dtc"
-+      fi
-+      if test -d "${source_path}/dtc/libfdt" || test -e "${source_path}/.git" ; then
-+          fdt=yes
-+          dtc_internal="yes"
-+          mkdir -p dtc
-+          if [ "$pwd_is_source_path" != "y" ] ; then
-+              symlink "$source_path/dtc/Makefile" "dtc/Makefile"
-+              symlink "$source_path/dtc/scripts" "dtc/scripts"
-+          fi
-+          fdt_cflags="-I\$(SRC_PATH)/dtc/libfdt"
-+          fdt_libs="-L\$(BUILD_DIR)/dtc/libfdt $fdt_libs"
-+      elif test "$fdt" = "yes" ; then
-+          # Not a git build & no libfdt found, prompt for system install
-+          error_exit "DTC (libfdt) version >= 1.4.2 not present." \
-+                     "Please install the DTC (libfdt) devel package"
-+      else
-+          # don't have and don't want
-+          fdt_libs=
-+          fdt=no
-+      fi
+ ##########################################
++# xkbcommon probe
++if test "$xkbcommon" != "no" ; then
++  if $pkg_config xkbcommon --exists; then
++    xkbcommon_cflags=$($pkg_config xkbcommon --cflags)
++    xkbcommon_libs=$($pkg_config xkbcommon --libs)
++    xkbcommon=yes
++  else
++    if test "$xkbcommon" = "yes" ; then
++      feature_not_found "xkbcommon" "Install libxkbcommon-devel"
++    fi
++    xkbcommon=no
++  fi
++fi
++
++##########################################
+ # fnmatch() probe, used for ACL routines
+ fnmatch="no"
+ cat > $TMPC << EOF
+@@ -5107,6 +5123,9 @@ if test "$softmmu" = yes ; then
+     mpath=no
    fi
  fi
++if test "$xkbcommon" = "yes"; then
++  tools="qemu-keymap\$(EXESUF) $tools"
++fi
  
-@@ -5295,6 +5299,7 @@ echo "local state directory   queried at runtime"
- echo "Windows SDK       $win_sdk"
+ # Probe for guest agent support/options
+ 
+@@ -5606,6 +5625,10 @@ fi
+ if test "$vnc_png" = "yes" ; then
+   echo "CONFIG_VNC_PNG=y" >> $config_host_mak
  fi
- echo "Source path       $source_path"
-+echo "GIT submodules    $git_submodules"
- echo "C compiler        $cc"
- echo "Host C compiler   $host_cc"
- echo "C++ compiler      $cxx"
-@@ -5483,6 +5488,7 @@ echo "extra_cxxflags=$EXTRA_CXXFLAGS" >> $config_host_mak
- echo "extra_ldflags=$EXTRA_LDFLAGS" >> $config_host_mak
- echo "qemu_localedir=$qemu_localedir" >> $config_host_mak
- echo "libs_softmmu=$libs_softmmu" >> $config_host_mak
-+echo "GIT_SUBMODULES=$git_submodules" >> $config_host_mak
- 
- echo "ARCH=$ARCH" >> $config_host_mak
- 
++if test "$xkbcommon" = "yes" ; then
++  echo "XKBCOMMON_CFLAGS=$xkbcommon_cflags" >> $config_host_mak
++  echo "XKBCOMMON_LIBS=$xkbcommon_libs" >> $config_host_mak
++fi
+ if test "$fnmatch" = "yes" ; then
+   echo "CONFIG_FNMATCH=y" >> $config_host_mak
+ fi
 diff --git a/Makefile b/Makefile
-index cee6e28659..cec0f44374 100644
+index f76b87472c..70235c0442 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -14,6 +14,29 @@ ifneq ($(wildcard config-host.mak),)
- all:
- include config-host.mak
+@@ -418,6 +418,8 @@ qemu-io$(EXESUF): qemu-io.o $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj
  
-+git-submodule-update:
-+
-+.PHONY: git-submodule-update
-+
-+ifeq (0,$(MAKELEVEL))
-+  git_module_status := $(shell \
-+    cd '$(SRC_PATH)' && \
-+    ./scripts/git-submodule.sh status $(GIT_SUBMODULES); \
-+    echo $$?; \
-+  )
-+
-+ifeq (1,$(git_module_status))
-+git-submodule-update:
-+	$(call quiet-command, \
-+          (cd $(SRC_PATH) && ./scripts/git-submodule.sh update $(GIT_SUBMODULES)), \
-+          "GIT","$(GIT_SUBMODULES)")
-+endif
-+endif
-+
-+.git-submodule-status: git-submodule-update
-+
-+Makefile: .git-submodule-status
-+
- # Check that we're not trying to do an out-of-tree build from
- # a tree that's been used for an in-tree build.
- ifneq ($(realpath $(SRC_PATH)),$(realpath .))
-@@ -330,7 +353,7 @@ DTC_MAKE_ARGS=-I$(SRC_PATH)/dtc VPATH=$(SRC_PATH)/dtc -C dtc V="$(V)" LIBFDT_src
- DTC_CFLAGS=$(CFLAGS) $(QEMU_CFLAGS)
- DTC_CPPFLAGS=-I$(BUILD_DIR)/dtc -I$(SRC_PATH)/dtc -I$(SRC_PATH)/dtc/libfdt
+ qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
  
--subdir-dtc:dtc/libfdt dtc/tests
-+subdir-dtc: .git-submodule-status dtc/libfdt dtc/tests
- 	$(call quiet-command,$(MAKE) $(DTC_MAKE_ARGS) CPPFLAGS="$(DTC_CPPFLAGS)" CFLAGS="$(DTC_CFLAGS)" LDFLAGS="$(LDFLAGS)" ARFLAGS="$(ARFLAGS)" CC="$(CC)" AR="$(AR)" LD="$(LD)" $(SUBDIR_MAKEFLAGS) libfdt/libfdt.a,)
++qemu-keymap$(EXESUF): qemu-keymap.o ui/input-keymap.o $(COMMON_LDADDS)
++
+ fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
+ fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
  
- dtc/%:
-diff --git a/.gitignore b/.gitignore
-index 3a7e01dc6a..b5e115d96b 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -113,6 +113,7 @@
- /docs/version.texi
- *.tps
- .stgit-*
-+.git-submodule-status
- cscope.*
- tags
- TAGS
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 772ac209e1..bb585bbd8f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1949,3 +1949,9 @@ M: Daniel P. Berrange <berrange@redhat.com>
- S: Odd Fixes
- F: docs/devel/build-system.txt
+@@ -432,6 +434,9 @@ qemu-img-cmds.h: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
+ qemu-ga$(EXESUF): LIBS = $(LIBS_QGA)
+ qemu-ga$(EXESUF): QEMU_CFLAGS += -I qga/qapi-generated
  
-+Build System
-+------------
-+GIT submodules
-+M: Daniel P. Berrange <berrange@redhat.com>
-+S: Odd Fixes
-+F: scripts/git-submodule.sh
-diff --git a/scripts/git-submodule.sh b/scripts/git-submodule.sh
-new file mode 100755
-index 0000000000..9f73f0e6e3
++qemu-keymap$(EXESUF): LIBS += $(XKBCOMMON_LIBS)
++qemu-keymap$(EXESUF): QEMU_CFLAGS += $(XKBCOMMON_CFLAGS)
++
+ gen-out-type = $(subst .,-,$(suffix $@))
+ 
+ qapi-py = $(SRC_PATH)/scripts/qapi.py $(SRC_PATH)/scripts/ordereddict.py
+diff --git a/qemu-keymap.c b/qemu-keymap.c
+new file mode 100644
+index 0000000000..49e9167b86
 --- /dev/null
-+++ b/scripts/git-submodule.sh
-@@ -0,0 +1,38 @@
-+#!/bin/bash
-+#
-+# This code is licensed under the GPL version 2 or later.  See
-+# the COPYING file in the top-level directory.
++++ b/qemu-keymap.c
+@@ -0,0 +1,258 @@
++/*
++ * QEMU keymap utility
++ *
++ * Copyright Red Hat, Inc. 2017
++ *
++ * Authors:
++ *     Gerd Hoffmann <kraxel@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "qapi-types.h"
++#include "qemu/notify.h"
++#include "ui/input.h"
 +
-+set -e
++#include <xkbcommon/xkbcommon.h>
 +
-+substat=".git-submodule-status"
++struct xkb_rule_names names = {
++    .rules   = NULL,
++    .model   = "pc105",
++    .layout  = "us",
++    .variant = NULL,
++    .options = NULL,
++};
 +
-+command=$1
-+shift
-+modules="$@"
++static xkb_mod_mask_t shift;
++static xkb_mod_mask_t ctrl;
++static xkb_mod_mask_t altgr;
++static xkb_mod_mask_t numlock;
 +
-+if test -z "$modules"
-+then
-+    test -e $substat || touch $substat
-+    exit 0
-+fi
++static FILE *outfile;
 +
-+if ! test -e ".git"
-+then
-+    echo "$0: unexpectedly called with submodules but no git checkout exists"
-+    exit 1
-+fi
++/* ------------------------------------------------------------------------ */
 +
-+case "$command" in
-+status)
-+    test -f "$substat" || exit 1
-+    trap "rm -f ${substat}.tmp" EXIT
-+    git submodule status $modules > "${substat}.tmp"
-+    diff "${substat}" "${substat}.tmp" >/dev/null
-+    exit $?
-+    ;;
-+update)
-+    git submodule update --init $modules 1>/dev/null 2>&1
-+    git submodule status $modules > "${substat}"
-+    ;;
-+esac
++static uint32_t qcode_to_number(uint32_t qcode)
++{
++    KeyValue keyvalue;
++    uint32_t number;
++
++    keyvalue.type = KEY_VALUE_KIND_QCODE;
++    keyvalue.u.qcode.data = qcode;
++    number = qemu_input_key_value_to_number(&keyvalue);
++    assert(number != 0);
++    return number;
++}
++
++static void print_sym(xkb_keysym_t sym, uint32_t qcode, const char *mod)
++{
++    char name[64];
++
++    if (sym == XKB_KEY_NoSymbol) {
++        return;
++    }
++    xkb_keysym_get_name(sym, name, sizeof(name));
++
++    /* TODO: make ui/keymap.c parser accept QKeyCode names */
++    fprintf(outfile, "%s 0x%02x%s\n", name, qcode_to_number(qcode), mod);
++}
++
++static void walk_map(struct xkb_keymap *map, xkb_keycode_t code, void *data)
++{
++    struct xkb_state *state = data;
++    xkb_keysym_t kbase, knumlock, kshift, kaltgr, kaltgrshift;
++    uint32_t evdev, qcode;
++    char name[64];
++
++    fprintf(outfile, "\n");
++
++    /*
++     * map xkb keycode -> QKeyCode
++     *
++     * xkb keycode is linux evdev shifted by 8
++     */
++    evdev = code - 8;
++    qcode = qemu_input_linux_to_qcode(evdev);
++    if (qcode == Q_KEY_CODE_UNMAPPED) {
++        xkb_state_update_mask(state,  0, 0, 0,  0, 0, 0);
++        kbase = xkb_state_key_get_one_sym(state, code);
++        xkb_keysym_get_name(kbase, name, sizeof(name));
++        fprintf(outfile, "# evdev %d (0x%x): no evdev -> QKeyCode mapping"
++                " (xkb keysym %s)\n", evdev, evdev, name);
++        return;
++    }
++    fprintf(outfile, "# evdev %d (0x%x), QKeyCode \"%s\", number 0x%x\n",
++            evdev, evdev,
++            QKeyCode_lookup.array[qcode],
++            qcode_to_number(qcode));
++
++    /*
++     * check which modifier states generate which keysyms
++     */
++    xkb_state_update_mask(state,  0, 0, 0,  0, 0, 0);
++    kbase = xkb_state_key_get_one_sym(state, code);
++    print_sym(kbase, qcode, "");
++
++    xkb_state_update_mask(state,  0, 0, numlock,  0, 0, 0);
++    knumlock = xkb_state_key_get_one_sym(state, code);
++    if (kbase != knumlock) {
++        print_sym(knumlock, qcode, " numlock");
++    }
++
++    xkb_state_update_mask(state,  shift, 0, 0,  0, 0, 0);
++    kshift = xkb_state_key_get_one_sym(state, code);
++    if (kbase != kshift && knumlock != kshift) {
++        print_sym(kshift, qcode, " shift");
++    }
++
++    xkb_state_update_mask(state,  altgr, 0, 0,  0, 0, 0);
++    kaltgr = xkb_state_key_get_one_sym(state, code);
++    if (kbase != kaltgr) {
++        print_sym(kaltgr, qcode, " altgr");
++    }
++
++    xkb_state_update_mask(state,  altgr | shift, 0, 0,  0, 0, 0);
++    kaltgrshift = xkb_state_key_get_one_sym(state, code);
++    if (kshift != kaltgrshift && kaltgr != kaltgrshift) {
++        print_sym(kaltgrshift, qcode, " shift altgr");
++    }
++    return;
++}
++
++static void usage(FILE *out)
++{
++    fprintf(out,
++            "\n"
++            "This tool generates qemu reverse keymaps from xkb keymaps,\n"
++            "which can be used with the qemu \"-k\" command line switch.\n"
++            "\n"
++            "usage: qemu-keymap <options>\n"
++            "options:\n"
++            "    -h             print this text\n"
++            "    -f <file>      set output file          (default: stdout)\n"
++            "    -m <model>     set kbd model            (default: %s)\n"
++            "    -l <layout>    set kbd layout           (default: %s)\n"
++            "    -v <variant>   set kbd variant          (default: %s)\n"
++            "    -o <options>   set kbd options          (default: %s)\n"
++            "\n",
++            names.model, names.layout,
++            names.variant ?: "-",
++            names.options ?: "-");
++}
++
++int main(int argc, char *argv[])
++{
++    struct xkb_context *ctx;
++    struct xkb_keymap *map;
++    struct xkb_state *state;
++    xkb_mod_index_t mod, mods;
++    int rc;
++
++    for (;;) {
++        rc = getopt(argc, argv, "hm:l:v:o:f:");
++        if (rc == -1) {
++            break;
++        }
++        switch (rc) {
++        case 'm':
++            names.model = optarg;
++            break;
++        case 'l':
++            names.layout = optarg;
++            break;
++        case 'v':
++            names.variant = optarg;
++            break;
++        case 'o':
++            names.options = optarg;
++            break;
++        case 'f':
++            outfile = fopen(optarg, "w");
++            if (outfile == NULL) {
++                fprintf(stderr, "open %s: %s\n", optarg, strerror(errno));
++                exit(1);
++            }
++            break;
++        case 'h':
++            usage(stdout);
++            exit(0);
++        default:
++            usage(stderr);
++            exit(1);
++        }
++    }
++
++    if (outfile == NULL) {
++        outfile = stdout;
++    }
++
++    fprintf(outfile,
++            "#\n"
++            "# generated by qemu-keymap\n"
++            "#    model   : %s\n"
++            "#    layout  : %s\n"
++            "#    variant : %s\n"
++            "#    options : %s\n"
++            "\n",
++            names.model, names.layout,
++            names.variant ?: "-",
++            names.options ?: "-");
++
++    ctx = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
++    map = xkb_keymap_new_from_names(ctx, &names, XKB_KEYMAP_COMPILE_NO_FLAGS);
++    if (!map) {
++        /* libxkbcommon prints error */
++        exit(1);
++    }
++
++    fprintf(outfile, "# name: \"%s\"\n\n",
++            xkb_keymap_layout_get_name(map, 0));
++    fprintf(outfile, "# modifiers\n");
++    mods = xkb_keymap_num_mods(map);
++    for (mod = 0; mod < mods; mod++) {
++        fprintf(outfile, "#    %2d: %s\n",
++                mod, xkb_keymap_mod_get_name(map, mod));
++    }
++
++    mod = xkb_keymap_mod_get_index(map, "Shift");
++    shift = (1 << mod);
++    mod = xkb_keymap_mod_get_index(map, "Control");
++    ctrl = (1 << mod);
++    mod = xkb_keymap_mod_get_index(map, "AltGr");
++    altgr = (1 << mod);
++    mod = xkb_keymap_mod_get_index(map, "NumLock");
++    numlock = (1 << mod);
++
++    state = xkb_state_new(map);
++    xkb_keymap_key_for_each(map, walk_map, state);
++
++    /* add quirks */
++    fprintf(outfile,
++            "\n"
++            "#\n"
++            "# quirks section start\n"
++            "#\n"
++            "# Sometimes multiple keysyms map to the same keycodes.\n"
++            "# The keycode -> keysym lookup finds only one of the\n"
++            "# keysyms.  So append them here.\n"
++            "#\n"
++            "\n");
++    print_sym(XKB_KEY_Print,            Q_KEY_CODE_SYSRQ,      "");
++    print_sym(XKB_KEY_Sys_Req,          Q_KEY_CODE_SYSRQ,      "");
++    print_sym(XKB_KEY_Execute,          Q_KEY_CODE_SYSRQ,      "");
++
++    print_sym(XKB_KEY_KP_Decimal,       Q_KEY_CODE_KP_DECIMAL, " numlock");
++    print_sym(XKB_KEY_KP_Separator,     Q_KEY_CODE_KP_DECIMAL, " numlock");
++
++    print_sym(XKB_KEY_Alt_R,            Q_KEY_CODE_ALT_R,      "");
++    print_sym(XKB_KEY_ISO_Level3_Shift, Q_KEY_CODE_ALT_R,      "");
++    print_sym(XKB_KEY_Mode_switch,      Q_KEY_CODE_ALT_R,      "");
++
++    fprintf(outfile,
++            "\n"
++            "# quirks section end\n");
++
++    exit(0);
++}
 -- 
 2.9.3
