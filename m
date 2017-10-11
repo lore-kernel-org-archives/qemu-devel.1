@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1e2BRL-0006DP-3p
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:28:28 -0400
+	(envelope-from <groug@kaod.org>) id 1e2BSA-0006aJ-Ej
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:29:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1e2BRH-0005Q8-5w
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:28:27 -0400
-Received: from 1.mo177.mail-out.ovh.net ([178.33.107.143]:41570)
+	(envelope-from <groug@kaod.org>) id 1e2BS6-0005bN-Fd
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:29:18 -0400
+Received: from 7.mo4.mail-out.ovh.net ([178.33.253.54]:52910)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1e2BRG-0005Pg-VB
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:28:23 -0400
-Received: from player792.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 323B77C19F
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 09:28:20 +0200 (CEST)
-References: <20170920070135.31379-1-clg@kaod.org>
-	<20170920070135.31379-2-clg@kaod.org>
-	<1507507449.5452.147.camel@aj.id.au>
-	<48144f71-c876-0e89-f01e-cbfe87687aee@kaod.org>
-	<1507693785.5452.175.camel@aj.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <ca6255bb-64f8-10bf-1e1f-a693ae38f4c3@kaod.org>
-Date: Wed, 11 Oct 2017 09:28:14 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e2BS6-0005an-9O
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:29:14 -0400
+Received: from player772.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 951DCDA4E4
+	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 09:29:12 +0200 (CEST)
+Date: Wed, 11 Oct 2017 09:29:08 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171011092908.291c6cd6@bahia.lan>
+In-Reply-To: <20171007051925.GJ10050@umbus.fritz.box>
+References: <150730254473.16260.6484345241358746630.stgit@bahia>
+	<20171007051925.GJ10050@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <1507693785.5452.175.camel@aj.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] aspeed: add support for the
- witherspoon-bmc board
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/CZH3pr41fEXM+vD.sVXwb9F";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH] spapr_pci: fail gracefully with
+ non-pseries machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,106 +32,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On 10/11/2017 05:49 AM, Andrew Jeffery wrote:
-> On Tue, 2017-10-10 at 15:30 +0200, C=C3=A9dric Le Goater wrote:
->> On 10/09/2017 02:04 AM, Andrew Jeffery wrote:
->>> On Wed, 2017-09-20 at 09:01 +0200, C=C3=A9dric Le Goater wrote:
->>>> The Witherspoon boards are OpenPOWER system hosting POWER9 Processor=
-s.
->>>> Let's add support for their BMC including a couple of I2C devices as
->>>> found on real HW.
->>>> =C2=A0
->>>>>>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->>>> ---
->>>> =C2=A0hw/arm/aspeed.c | 49 +++++++++++++++++++++++++++++++++++++++++=
-++++++++
->>>> =C2=A01 file changed, 49 insertions(+)
->>>> =C2=A0
->>>> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
->>>> index ab895ad490af..81f522f711ae 100644
->>>> --- a/hw/arm/aspeed.c
->>>> +++ b/hw/arm/aspeed.c
->>>> @@ -46,6 +46,7 @@ enum {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0PALMETTO_BMC,
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0AST2500_EVB,
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ROMULUS_BMC,
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0WITHERSPOON_BMC,
->>>> =C2=A0};
->>>> =C2=A0
->>>> =C2=A0/* Palmetto hardware value: 0x120CE416 */
->>>> @@ -83,8 +84,12 @@ enum {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0SCU_AST2500_HW=
-_STRAP_ACPI_ENABLE |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0\
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0SCU_HW_STRAP_S=
-PI_MODE(SCU_HW_STRAP_SPI_MASTER))
->>>> =C2=A0
->>>> +/* Witherspoon hardware value: 0xF10AD216 (but use romulus definiti=
-on) */
->>>> +#define WITHERSPOON_BMC_HW_STRAP1 ROMULUS_BMC_HW_STRAP1
->>>> +
->>>> =C2=A0static void palmetto_bmc_i2c_init(AspeedBoardState *bmc);
->>>> =C2=A0static void ast2500_evb_i2c_init(AspeedBoardState *bmc);
->>>> +static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc);
->>>> =C2=A0
->>>> =C2=A0static const AspeedBoardConfig aspeed_boards[] =3D {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0[PALMETTO_BMC] =3D {
->>>> @@ -110,6 +115,14 @@ static const AspeedBoardConfig aspeed_boards[] =
-=3D {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.spi_model =3D=
- "mx66l1g45g",
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.num_cs=C2=A0=C2=
-=A0=C2=A0=C2=A0=3D 2,
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0},
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0[WITHERSPOON_BMC]=C2=A0=C2=A0=3D {
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.soc_name=C2=A0=C2=A0=
-=3D "ast2500-a1",
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.hw_strap1 =3D WITH=
-ERSPOON_BMC_HW_STRAP1,
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.fmc_model =3D "mx2=
-5l25635e",
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.spi_model =3D "mx6=
-6l1g45g",
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.num_cs=C2=A0=C2=A0=
-=C2=A0=C2=A0=3D 2,
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.i2c_init=C2=A0=C2=A0=
-=3D witherspoon_bmc_i2c_init,
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0},
->>>> =C2=A0};
->>>> =C2=A0
->>>> =C2=A0#define FIRMWARE_ADDR 0x0
->>>> @@ -337,11 +350,47 @@ static const TypeInfo romulus_bmc_type =3D {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.class_init =3D romulus_bmc_class_init=
-,
->>>> =C2=A0};
->>>> =C2=A0
->>>> +static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
->>>> +{
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0AspeedSoCState *soc =3D &bmc->soc;
->>>> +
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0i2c_create_slave(aspeed_i2c_get_bus(DEVICE(=
-&soc->i2c), 4), "tmp423", 0x4c);
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0i2c_create_slave(aspeed_i2c_get_bus(DEVICE(=
-&soc->i2c), 5), "tmp423", 0x4c);
->>>> +
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0i2c_create_slave(aspeed_i2c_get_bus(DEVICE(=
-&soc->i2c), 9), "tmp105", 0x4a);
->>>
->>> Looks like I need to track down newer versions of the schematics I ha=
-ve.
->>
->> the device on the board is a tmp275 but the tmp105 model is compatible=
-.
+--Sig_/CZH3pr41fEXM+vD.sVXwb9F
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+On Sat, 7 Oct 2017 16:19:25 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> On Fri, Oct 06, 2017 at 05:09:04PM +0200, Greg Kurz wrote:
+> > QEMU currently crashes when the user tries to add a spapr-pci-host-brid=
+ge
+> > on a non-pseries machine:
+> >=20
+> > $ qemu-system-ppc64 -M ppce500 -device spapr-pci-host-bridge,index=3D1
+> > hw/ppc/spapr_pci.c:1535:spapr_phb_realize:
+> > Object 0x1003dacae60 is not an instance of type spapr-machine
+> > Aborted (core dumped)
+> >=20
+> > The same thing happens with the deprecated but still available child ty=
+pe
+> > spapr-pci-vfio-host-bridge.
+> >=20
+> > Fix both by checking the machine type with object_dynamic_cast().
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org> =20
 >=20
-> It neither device is listed in the version I have :)
+>=20
+>=20
+> > ---
+> >  hw/ppc/spapr_pci.c |    8 +++++++-
+> >  1 file changed, 7 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> > index 5049ced4e8b4..9e85106f51f8 100644
+> > --- a/hw/ppc/spapr_pci.c
+> > +++ b/hw/ppc/spapr_pci.c
+> > @@ -1507,7 +1507,7 @@ static void spapr_pci_unplug_request(HotplugHandl=
+er *plug_handler,
+> > =20
+> >  static void spapr_phb_realize(DeviceState *dev, Error **errp)
+> >  {
+> > -    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+> > +    sPAPRMachineState *spapr;
+> >      SysBusDevice *s =3D SYS_BUS_DEVICE(dev);
+> >      sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(s);
+> >      PCIHostState *phb =3D PCI_HOST_BRIDGE(s);
+> > @@ -1519,6 +1519,12 @@ static void spapr_phb_realize(DeviceState *dev, =
+Error **errp)
+> >      const unsigned windows_supported =3D
+> >          sphb->ddw_enabled ? SPAPR_PCI_DMA_MAX_WINDOWS : 1;
+> > =20
+> > +    spapr =3D (sPAPRMachineState *) qdev_get_machine();
+> > +    if (!object_dynamic_cast((Object *) spapr, TYPE_SPAPR_MACHINE)) {
+> > +        error_setg(errp, TYPE_SPAPR_PCI_HOST_BRIDGE " needs a pseries =
+machine");
+> > +        return;
+> > +    } =20
+>=20
+> This is slightly clunky.  You could instead use OBJECT_CHECK in the
+> initializer, then just if (!spapr) here.
+>=20
 
-Here is my source :
+The negative review on v2 seem to indicate we have an agreement on using
+object_dynamic_cast() explicitly. So we have two possibilities, either
+the "clunky" v1, or possibly:
 
-	https://github.com/openbmc/linux/blob/dev-4.10/arch/arm/boot/dts/aspeed-=
-bmc-opp-witherspoon.dts#L504
+-    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
++    /* We don't use SPAPR_MACHINE() in order to exit gracefully if the user
++     * tries to add a PHB to a non-pseries machine.
++     */
++    sPAPRMachineState *spapr =3D
++        (sPAPRMachineState *) object_dynamic_cast(qdev_get_machine(),
++                                                  TYPE_SPAPR_MACHINE);
+     SysBusDevice *s =3D SYS_BUS_DEVICE(dev);
+     sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(s);
+     PCIHostState *phb =3D PCI_HOST_BRIDGE(s);
+     char *namebuf;
+     int i;
+     PCIBus *bus;
+     uint64_t msi_window_size =3D 4096;
+     sPAPRTCETable *tcet;
+     const unsigned windows_supported =3D
+         sphb->ddw_enabled ? SPAPR_PCI_DMA_MAX_WINDOWS : 1;
+=20
++    if (!spapr) {
++        error_setg(errp, TYPE_SPAPR_PCI_HOST_BRIDGE " needs a pseries mach=
+ine");
++        return;
++    }
++
 
-C.=20
+Which one do you prefer ? I'll also change spapr_cpu_core_realize()
+if needed.
+
+> > +
+> >      if (sphb->index !=3D (uint32_t)-1) {
+> >          sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> >          Error *local_err =3D NULL;
+> >  =20
+>=20
+>=20
+
+
+--Sig_/CZH3pr41fEXM+vD.sVXwb9F
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWd3IRAAKCRAC/DrrAQHb
+wob6AKCfSmULTLUXx/AcF+ze/GxAWpXCDACffNJgtUHTODcmkRoueGAzo7Z/D1E=
+=RBeO
+-----END PGP SIGNATURE-----
+
+--Sig_/CZH3pr41fEXM+vD.sVXwb9F--
