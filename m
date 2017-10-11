@@ -1,42 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e2EfJ-0001Hm-5U
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 06:55:06 -0400
+	(envelope-from <bounces@canonical.com>) id 1e2F9H-0005Kl-RW
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 07:26:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e2EfF-0003Jl-U1
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 06:55:05 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52252
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1e2EfF-0003JV-OI
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 06:55:01 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9BArhSo022278
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 06:54:58 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dhgmkcu9p-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 06:54:58 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 11 Oct 2017 11:54:56 +0100
-References: <20171004154144.88995-1-pasic@linux.vnet.ibm.com>
-	<20171004154144.88995-4-pasic@linux.vnet.ibm.com>
-	<20171011034756.GC4754@bjsdjshi@linux.vnet.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 11 Oct 2017 12:54:51 +0200
+	(envelope-from <bounces@canonical.com>) id 1e2F9G-0004Hv-0e
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 07:26:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36396)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e2F9F-0004H5-Ms
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 07:26:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e2F9E-00027j-4N
+	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 11:26:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 00E1C2E80CB
+	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 11:26:00 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20171011034756.GC4754@bjsdjshi@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <99b11584-bc55-acef-bb39-dca4c7cb3833@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/8] s390x: improve error handling for
- SSCH and RSCH
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 11 Oct 2017 11:18:58 -0000
+From: ChristianEhrhardt <1719196@bugs.launchpad.net>
+Reply-To: Bug 1719196 <1719196@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150626680089.6094.17724106932405637799.malonedeb@soybean.canonical.com>
+Message-Id: <150772073913.1539.7993093654992353875.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1719196] Re: [arm64 ocata] newly created
+ instances are unable to raise network interfaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,169 +37,282 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+
+Note - be careful if you mean upstream qemu/libvirt (as the bug was filed) =
+or the packages in Ubuntu (I added tasks for these).
+I try to spot both, but will be more on-track for the latter.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1719196
+
+Title:
+  [arm64 ocata] newly created instances are unable to raise network
+  interfaces
+
+Status in libvirt:
+  New
+Status in QEMU:
+  New
+Status in libvirt package in Ubuntu:
+  Incomplete
+Status in qemu package in Ubuntu:
+  Incomplete
+
+Bug description:
+  arm64 Ocata ,
+
+  I'm testing to see I can get Ocata running on arm64 and using the
+  openstack-base bundle to deploy it.  I have added the bundle to the
+  log file attached to this bug.
+
+  When I create a new instance via nova, the VM comes up and runs,
+  however fails to raise its eth0 interface. This occurs on both
+  internal and external networks.
+
+  ubuntu@openstackaw:~$ nova list
+  +--------------------------------------+---------+--------+------------+-=
+------------+--------------------+
+  | ID                                   | Name    | Status | Task State | =
+Power State | Networks           |
+  +--------------------------------------+---------+--------+------------+-=
+------------+--------------------+
+  | dcaf6d51-f81e-4cbd-ac77-0c5d21bde57c | sfeole1 | ACTIVE | -          | =
+Running     | internal=3D10.5.5.3  |
+  | aa0b8aee-5650-41f4-8fa0-aeccdc763425 | sfeole2 | ACTIVE | -          | =
+Running     | internal=3D10.5.5.13 |
+  +--------------------------------------+---------+--------+------------+-=
+------------+--------------------+
+  ubuntu@openstackaw:~$ nova show aa0b8aee-5650-41f4-8fa0-aeccdc763425
+  +--------------------------------------+---------------------------------=
+-------------------------+
+  | Property                             | Value                           =
+                         |
+  +--------------------------------------+---------------------------------=
+-------------------------+
+  | OS-DCF:diskConfig                    | MANUAL                          =
+                         |
+  | OS-EXT-AZ:availability_zone          | nova                            =
+                         |
+  | OS-EXT-SRV-ATTR:host                 | awrep3                          =
+                         |
+  | OS-EXT-SRV-ATTR:hypervisor_hostname  | awrep3.maas                     =
+                         |
+  | OS-EXT-SRV-ATTR:instance_name        | instance-00000003               =
+                         |
+  | OS-EXT-STS:power_state               | 1                               =
+                         |
+  | OS-EXT-STS:task_state                | -                               =
+                         |
+  | OS-EXT-STS:vm_state                  | active                          =
+                         |
+  | OS-SRV-USG:launched_at               | 2017-09-24T14:23:08.000000      =
+                         |
+  | OS-SRV-USG:terminated_at             | -                               =
+                         |
+  | accessIPv4                           |                                 =
+                         |
+  | accessIPv6                           |                                 =
+                         |
+  | config_drive                         |                                 =
+                         |
+  | created                              | 2017-09-24T14:22:41Z            =
+                         |
+  | flavor                               | m1.small (717660ae-0440-4b19-a76=
+2-ffeb32a0575c)          |
+  | hostId                               | 5612a00671c47255d2ebd6737a64ec9b=
+d3a5866d1233ecf3e988b025 |
+  | id                                   | aa0b8aee-5650-41f4-8fa0-aeccdc76=
+3425                     |
+  | image                                | zestynosplash (e88fd1bd-f040-44d=
+8-9e7c-c462ccf4b945)     |
+  | internal network                     | 10.5.5.13                       =
+                         |
+  | key_name                             | mykey                           =
+                         |
+  | metadata                             | {}                              =
+                         |
+  | name                                 | sfeole2                         =
+                         |
+  | os-extended-volumes:volumes_attached | []                              =
+                         |
+  | progress                             | 0                               =
+                         |
+  | security_groups                      | default                         =
+                         |
+  | status                               | ACTIVE                          =
+                         |
+  | tenant_id                            | 9f7a21c1ad264fec81abc09f3960ad1d=
+                         |
+  | updated                              | 2017-09-24T14:23:09Z            =
+                         |
+  | user_id                              | e6bb6f5178a248c1b5ae66ed388f9040=
+                         |
+  +--------------------------------------+---------------------------------=
+-------------------------+
 
 
+  As seen above the instances boot an run.  Full Console output is
+  attached to this bug.
 
-On 10/11/2017 05:47 AM, Dong Jia Shi wrote:
-> * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-10-04 17:41:39 +0200]:
-> 
->> Simplify the error handling of the SSCH and RSCH handler avoiding
->> arbitrary and cryptic error codes being used to tell how the instruction
->> is supposed to end.  Let the code detecting the condition tell how it's
->> to be handled in a less ambiguous way.  It's best to handle SSCH and RSCH
->> in one go as the emulation of the two shares a lot of code.
->>
->> For passthrough this change isn't pure refactoring, but changes the
->> way kernel reported EFAULT is handled. After clarifying the kernel
->> interface we decided that EFAULT shall be mapped to unit exception.
->> Same goes for unexpected error codes.
->>
->> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->> ---
->>
->> AFAIR we decided in the previous round to rather do transformation
->> and fixing in one patch than touch stuff twice. Hence this patch
->> ain't pure transformation any more.
->> ---
->>  hw/s390x/css.c              | 83 +++++++++++++--------------------------------
->>  hw/s390x/s390-ccw.c         | 11 +++---
->>  hw/vfio/ccw.c               | 30 ++++++++++++----
->>  include/hw/s390x/css.h      | 24 +++++++++----
->>  include/hw/s390x/s390-ccw.h |  2 +-
->>  target/s390x/ioinst.c       | 53 ++++-------------------------
->>  6 files changed, 77 insertions(+), 126 deletions(-)
->>
->> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
->> index 4f47dbc8b0..b2978c3bae 100644
->> --- a/hw/s390x/css.c
->> +++ b/hw/s390x/css.c
->> @@ -1003,12 +1003,11 @@ static void sch_handle_start_func_virtual(SubchDev *sch)
->>
->>  }
->>
->> -static int sch_handle_start_func_passthrough(SubchDev *sch)
->> +static IOInstEnding sch_handle_start_func_passthrough(SubchDev *sch)
->>  {
->>
->>      PMCW *p = &sch->curr_status.pmcw;
->>      SCSW *s = &sch->curr_status.scsw;
->> -    int ret;
->>
->>      ORB *orb = &sch->orb;
->>      if (!(s->ctrl & SCSW_ACTL_SUSP)) {
->> @@ -1022,31 +1021,11 @@ static int sch_handle_start_func_passthrough(SubchDev *sch)
->>       */
->>      if (!(orb->ctrl0 & ORB_CTRL0_MASK_PFCH) ||
->>          !(orb->ctrl0 & ORB_CTRL0_MASK_C64)) {
->> -        return -EINVAL;
->> +        sch_gen_unit_exception(sch);
->> +        css_inject_io_interrupt(sch);
->> +        return (IOInstEnding){.cc = 0};
-> This behavior change is not mentioned in the commit message. Right?
-> 
-No this particular change is not. Should I mention it explicitly?
-Maybe "Same goes for unexpected error codes and absence of required
-ORB flags."
+  =
+
+  [  OK  ] Started Initial cloud-init job (pre-networking).
+  [  OK  ] Reached target Network (Pre).
+  [  OK  ] Started AppArmor initialization.
+           Starting Raise network interfaces...
+  [FAILED] Failed to start Raise network interfaces.
+  See 'systemctl status networking.service' for details.
+           Starting Initial cloud-init job (metadata service crawler)...
+  [  OK  ] Reached target Network.
+  [  315.051902] cloud-init[881]: Cloud-init v. 0.7.9 running 'init' at Fri=
+, 22 Sep 2017 18:29:15 +0000. Up 314.70 seconds.
+  [  315.057291] cloud-init[881]: ci-info: +++++++++++++++++++++++++++Net d=
+evice info+++++++++++++++++++++++++++
+  [  315.060338] cloud-init[881]: ci-info: +--------+------+-----------+---=
+--------+-------+-------------------+
+  [  315.063308] cloud-init[881]: ci-info: | Device |  Up  |  Address  |   =
+ Mask   | Scope |     Hw-Address    |
+  [  315.066304] cloud-init[881]: ci-info: +--------+------+-----------+---=
+--------+-------+-------------------+
+  [  315.069303] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
+  .     |   .   | fa:16:3e:39:4c:48 |
+  [  315.072308] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
+  .     |   d   | fa:16:3e:39:4c:48 |
+  [  315.075260] cloud-init[881]: ci-info: |  lo:   | True | 127.0.0.1 | 25=
+5.0.0.0 |   .   |         .         |
+  [  315.078258] cloud-init[881]: ci-info: |  lo:   | True |     .     |   =
+  .     |   d   |         .         |
+  [  315.081249] cloud-init[881]: ci-info: +--------+------+-----------+---=
+--------+-------+-------------------+
+  [  315.084240] cloud-init[881]: 2017-09-22 18:29:15,393 - url_helper.py[W=
+ARNING]: Calling 'http://169.254.169.254/2009-04-04/meta-data/instance-id' =
+failed [0/120s]: request error [HTTPConnectionPool(host=3D'169.254.169.254'=
+, port=3D80): Max retries exceeded with url: /2009-04-04/meta-data/instance=
+-id (Caused by NewConnectionError('<requests.packages.urllib3.connection.HT=
+TPConnection object at 0xffffb10794e0>: Failed to establish a new connectio=
+n: [Errno 101] Network is unreachable',))]
 
 
+  =
+
+  ----------------
 
 
-> [...]
-> 
->> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
->> index a8baadf57a..dbb5b201de 100644
->> --- a/hw/vfio/ccw.c
->> +++ b/hw/vfio/ccw.c
->> @@ -23,6 +23,7 @@
->>  #include "hw/s390x/s390-ccw.h"
->>  #include "hw/s390x/ccw-device.h"
->>  #include "qemu/error-report.h"
->> +#include "cpu.h"
-> We need this because?
-> 
+  I have checked all services in neutron and made sure that they are
+  running and restarted in neutron-gateway
 
-No idea -- was not intentional. Probably slipped in when rebasing,
-or I don't know.
+  =
 
->>
->>  #define TYPE_VFIO_CCW "vfio-ccw"
->>  typedef struct VFIOCCWDevice {
->> @@ -47,9 +48,9 @@ struct VFIODeviceOps vfio_ccw_ops = {
->>      .vfio_compute_needs_reset = vfio_ccw_compute_needs_reset,
->>  };
->>
->> -static int vfio_ccw_handle_request(ORB *orb, SCSW *scsw, void *data)
->> +static IOInstEnding vfio_ccw_handle_request(SubchDev *sch)
->>  {
->> -    S390CCWDevice *cdev = data;
->> +    S390CCWDevice *cdev = sch->driver_data;
->>      VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
->>      struct ccw_io_region *region = vcdev->io_region;
->>      int ret;
->> @@ -60,8 +61,8 @@ static int vfio_ccw_handle_request(ORB *orb, SCSW *scsw, void *data)
->>
->>      memset(region, 0, sizeof(*region));
->>
->> -    memcpy(region->orb_area, orb, sizeof(ORB));
->> -    memcpy(region->scsw_area, scsw, sizeof(SCSW));
->> +    memcpy(region->orb_area, &sch->orb, sizeof(ORB));
->> +    memcpy(region->scsw_area, &sch->curr_status.scsw, sizeof(SCSW));
->>
->>  again:
->>      ret = pwrite(vcdev->vdev.fd, region,
->> @@ -71,10 +72,25 @@ again:
->>              goto again;
->>          }
->>          error_report("vfio-ccw: wirte I/O region failed with errno=%d", errno);
->> -        return -errno;
->> +        ret = -errno;
->> +    } else {
->> +        ret = region->ret_code;
->> +    }
->> +    switch (-ret) {
->> +    /* Currently we don't update control block and just return the cc code. */
-> This is not true anymore? At least for the EFAULT case.
-> 
+   [ + ]  neutron-dhcp-agent
+   [ + ]  neutron-l3-agent
+   [ + ]  neutron-lbaasv2-agent
+   [ + ]  neutron-metadata-agent
+   [ + ]  neutron-metering-agent
+   [ + ]  neutron-openvswitch-agent
+   [ + ]  neutron-ovs-cleanup
 
-Right I shall remove this.
+  and have also restarted and checked the nova-compute logs for their
+  neutron counterparts.
 
->> +    case 0:
->> +        return (IOInstEnding){.cc = 0};
->> +    case EBUSY:
->> +        return (IOInstEnding){.cc = 2};
->> +    case ENODEV:
->> +    case EACCES:
->> +        return (IOInstEnding){.cc = 3};
->> +    case EFAULT:
->> +    default:
->> +        sch_gen_unit_exception(sch);
->> +        css_inject_io_interrupt(sch);
->> +        return (IOInstEnding){.cc = 0};
->>      }
->> -
->> -    return region->ret_code;
->>  }
->>
->>  static void vfio_ccw_reset(DeviceState *dev)
->> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
->> index 66916b6546..2116c6b3c7 100644
->> --- a/include/hw/s390x/css.h
->> +++ b/include/hw/s390x/css.h
-> [...]
-> 
->> @@ -197,13 +208,14 @@ SubchDev *css_find_subch(uint8_t m, uint8_t cssid, uint8_t ssid,
->>                           uint16_t schid);
->>  bool css_subch_visible(SubchDev *sch);
->>  void css_conditional_io_interrupt(SubchDev *sch);
->> +
-> Extra change.
-> 
+  =
 
-Should be removed.
+   [ + ]  neutron-openvswitch-agent
+   [ + ]  neutron-ovs-cleanup
 
->>  int css_do_stsch(SubchDev *sch, SCHIB *schib);
->>  bool css_schid_final(int m, uint8_t cssid, uint8_t ssid, uint16_t schid);
->>  int css_do_msch(SubchDev *sch, const SCHIB *schib);
-> [...]
-> 
+
+   There are some warnings/errors in the neutron-gateway logs which I
+  have attached the full tarball in a separate attachment to this bug:
+
+  2017-09-24 14:39:33.152 10322 INFO ryu.base.app_manager [-] instantiating=
+ app ryu.controller.ofp_handler of OFPHandler
+  2017-09-24 14:39:33.153 10322 INFO ryu.base.app_manager [-] instantiating=
+ app ryu.app.ofctl.service of OfctlService
+  2017-09-24 14:39:39.577 10322 ERROR neutron.agent.ovsdb.impl_vsctl [req-2=
+f084ae8-13dc-47dc-b351-24c8f3c57067 - - - - -] Unable to execute ['ovs-vsct=
+l', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manage=
+r', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'Op=
+en_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1; =
+Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Transa=
+ction causes multiple rows in \"Manager\" table to have identical values (\=
+"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with UU=
+ID e02a5f7f-bfd2-4a1d-ae3c-0321db4bd3fb, existed in the database before thi=
+s transaction and was not modified by the transaction.  Second row, with UU=
+ID 6e9aba3a-471a-4976-bffd-b7131bbe5377, was inserted by this transaction."=
+,"error":"constraint violation"}
+
+
+  These warnings/errors also occur on the nova-compute hosts in
+  /var/log/neutron/
+
+
+  =
+
+  2017-09-22 18:54:52.130 387556 INFO ryu.base.app_manager [-] instantiatin=
+g app ryu.app.ofctl.service of OfctlService
+  2017-09-22 18:54:56.124 387556 ERROR neutron.agent.ovsdb.impl_vsctl [req-=
+e291c2f9-a123-422c-be7c-fadaeb5decfa - - - - -] Unable to execute ['ovs-vsc=
+tl', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manag=
+er', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'O=
+pen_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1;=
+ Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Trans=
+action causes multiple rows in \"Manager\" table to have identical values (=
+\"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with U=
+UID 9f27ddee-9881-4cbc-9777-2f42fee735e9, was inserted by this transaction.=
+  Second row, with UUID ccf0e097-09d5-449c-b353-6b69781dc3f7, existed in th=
+e database before this transaction and was not modified by the transaction.=
+","error":"constraint violation"}
+
+
+  I'm not sure if the above error could be pertaining to the failure, I
+  have also attached those logs to this bug as well...
+
+  =
+
+  .
+  (neutron) agent-list
+  +--------------------------------------+----------------------+--------+-=
+------------------+-------+----------------+---------------------------+
+  | id                                   | agent_type           | host   | =
+availability_zone | alive | admin_state_up | binary                    |
+  +--------------------------------------+----------------------+--------+-=
+------------------+-------+----------------+---------------------------+
+  | 0cca03fb-abb2-4704-8b0b-e7d3e117d882 | DHCP agent           | awrep1 | =
+nova              | :-)   | True           | neutron-dhcp-agent        |
+  | 14a5fd52-fbc3-450c-96d5-4e9a65776dad | L3 agent             | awrep1 | =
+nova              | :-)   | True           | neutron-l3-agent          |
+  | 2ebc7238-5e61-41f8-bc60-df14ec6b226b | Loadbalancerv2 agent | awrep1 | =
+                  | :-)   | True           | neutron-lbaasv2-agent     |
+  | 4f6275be-fc8b-4994-bdac-13a4b76f6a83 | Metering agent       | awrep1 | =
+                  | :-)   | True           | neutron-metering-agent    |
+  | 86ecc6b0-c100-4298-b861-40c17516cc08 | Open vSwitch agent   | awrep1 | =
+                  | :-)   | True           | neutron-openvswitch-agent |
+  | 947ad3ab-650b-4b96-a520-00441ecb33e7 | Open vSwitch agent   | awrep4 | =
+                  | :-)   | True           | neutron-openvswitch-agent |
+  | 996b0692-7d19-4641-bec3-e057f4a856f6 | Open vSwitch agent   | awrep3 | =
+                  | :-)   | True           | neutron-openvswitch-agent |
+  | ab6b1065-0b98-4cf3-9f46-6bddba0c5e75 | Metadata agent       | awrep1 | =
+                  | :-)   | True           | neutron-metadata-agent    |
+  | fe24f622-b77c-4eed-ae22-18e4195cf763 | Open vSwitch agent   | awrep2 | =
+                  | :-)   | True           | neutron-openvswitch-agent |
+  +--------------------------------------+----------------------+--------+-=
+------------------+-------+----------------+---------------------------+
+
+  =
+
+  Should neutron-openvswitch be assigned to the 'nova' availability zone? =
+
+
+  I have also attached the ovs-vsctl show from a nova-compute host and
+  the neutron-gateway host to ensure that the open v switch routes are
+  correct.
+
+  =
+
+  I can supply more logs if required.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/libvirt/+bug/1719196/+subscriptions
