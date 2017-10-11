@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e2I8c-0006qA-Mv
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 10:37:35 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2IEE-0007qm-7I
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 10:43:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e2I8Y-0006Ns-49
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 10:37:34 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:53623)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e2I8X-0006NW-TZ
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 10:37:30 -0400
-Received: by mail-wm0-x229.google.com with SMTP id q132so5448407wmd.2
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 07:37:29 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20171011083604.11820-1-kraxel@redhat.com>
-References: <20171011083604.11820-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 11 Oct 2017 15:37:08 +0100
-Message-ID: <CAFEAcA9uXw7XYOBu9cKY+B=OWNbS=cRp7BKcXacLTaRLx9RWdA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/10] Ui 20171011 patches
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2IEA-0001AR-4j
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 10:43:22 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58472)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1e2IE9-00019x-SA
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 10:43:18 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9BEgqQR046806
+	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 10:43:12 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dhjx5s6wu-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 10:42:54 -0400
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Wed, 11 Oct 2017 08:42:32 -0600
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Wed, 11 Oct 2017 10:42:25 -0400
+Message-Id: <1507732945-23555-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2] tpm: Use EMSGSIZE instead of EBADMSG to
+ compile on OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,93 +36,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, amarnath.valluri@intel.com, marcandre.lureau@gmail.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On 11 October 2017 at 09:35, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> The following changes since commit 567d0a19c7998fa366598b83d5a6e5f0759d3ea9:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/x86-and-machine-pull-request' into staging (2017-10-10 13:25:46 +0100)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/ui-20171011-pull-request
->
-> for you to fetch changes up to 92328b7104ffc825f10c33f3fd1866e940a523f7:
->
->   ui/gtk: Fix deprecation of vte_terminal_copy_clipboard (2017-10-11 10:03:31 +0200)
->
-> ----------------------------------------------------------------
-> ui: use keycodemapdb for key code mappings, part one (v2)
-> ui: add qemu-keymap, update reverse keymaps (for qemu -k $map)
-> ui: fix for vte 0.50
->
-> ----------------------------------------------------------------
+EBADMSG was only added to OpenBSD very recently. To make QEMU compilable
+on older OpenBSD versions use EMSGSIZE instead when a mismatch between
+number of received bytes and message size indicated in the header was
+found.
 
-Build failures:
+Return -EMSGSIZE and convert all other errnos in the same functions to
+return the negative errno.
 
-NetBSD:
-  CC      ui/input-keymap.o
-/root/qemu/ui/input-keymap.c:8:44: fatal error:
-ui/input-keymap-linux-to-qcode.c: No such file or directory
- #include "ui/input-keymap-linux-to-qcode.c"
-                                            ^
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+---
+ hw/tpm/tpm_util.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-FreeBSD:
-
-
-  CC      ui/input-keymap.o
-/root/qemu/ui/input-keymap.c:8:10: fatal error:
-'ui/input-keymap-linux-to-qcode.c' file not found
-#include "ui/input-keymap-linux-to-qcode.c"
-         ^
-
-OpenBSD:
-
-gmake: Entering directory '/home/qemu/build/all'
-/bin/sh: ./scripts/git-submodule.sh: No such file or directory
-gmake: Leaving directory '/home/qemu/build/all'
-gmake: Entering directory '/home/qemu/build/all'
-  GIT
-/bin/sh: ./scripts/git-submodule.sh: No such file or directory
-gmake: *** [Makefile:30: git-submodule-update] Error 1
-gmake: Leaving directory '/home/qemu/build/all'
-gmake: *** Waiting for unfinished jobs....
-gmake: Entering directory '/home/qemu/build/all'
-config-host.mak is out-of-date, running configure
-Install prefix    /usr/local
-[configure output snipped]
-gmake: Leaving directory '/home/qemu/build/all'
-
-AArch32 Linux:
-
-make: Entering directory '/home/peter.maydell/qemu/build/all-a32'
-config-host.mak is out-of-date, running configure
-Install prefix    /usr/local
-BIOS directory    /usr/local/share/qemu
-[...]
-VxHS block device no
-  GEN     config-host.h
-  GEN     module_block.h
-  GEN     ui/input-keymap-linux-to-qcode.c
-  GEN     ui/input-keymap-qcode-to-qnum.c
-  GEN     ui/input-keymap-qnum-to-qcode.c
-  GIT     ui/keycodemapdb dtc
-  GEN     trace/generated-tcg-tracers.h
-  GEN     trace/generated-helpers-wrappers.h
-  GEN     trace/generated-helpers.h
-  GEN     trace/generated-helpers.c
-Makefile:30: recipe for target 'git-submodule-update' failed
-make: *** [git-submodule-update] Error 128
-make: *** Waiting for unfinished jobs....
-make: Leaving directory '/home/peter.maydell/qemu/build/all-a32'
-
-
-The OpenBSD failure is because make now tries to run a
-script that uses #!/bin/bash, and this machine doesn't
-have bash installed. Do we really need to add bash to
-our build-dependencies? The script doesn't seem like it's
-doing anything that critically requires bash...
-
-thanks
--- PMM
+diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
+index fb929f6..a83c6f4 100644
+--- a/hw/tpm/tpm_util.c
++++ b/hw/tpm/tpm_util.c
+@@ -71,7 +71,7 @@ static int tpm_util_test(int fd,
+         return errno;
+     }
+     if (n != requestlen) {
+-        return EFAULT;
++        return -EFAULT;
+     }
+ 
+     FD_ZERO(&readfds);
+@@ -85,13 +85,13 @@ static int tpm_util_test(int fd,
+ 
+     n = read(fd, &buf, sizeof(buf));
+     if (n < sizeof(struct tpm_resp_hdr)) {
+-        return EFAULT;
++        return -EFAULT;
+     }
+ 
+     resp = (struct tpm_resp_hdr *)buf;
+     /* check the header */
+     if (be32_to_cpu(resp->len) != n) {
+-        return EBADMSG;
++        return -EMSGSIZE;
+     }
+ 
+     *return_tag = be16_to_cpu(resp->tag);
+-- 
+2.5.5
