@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1e2L1q-0004px-Kb
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 13:42:47 -0400
+	(envelope-from <eblake@redhat.com>) id 1e2LpT-0003Rg-7K
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 14:34:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1e2L1p-0005fG-KI
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 13:42:46 -0400
+	(envelope-from <eblake@redhat.com>) id 1e2LpS-0001el-AQ
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 14:34:03 -0400
 References: <20171004020048.26379-1-eblake@redhat.com>
-	<20171004020048.26379-2-eblake@redhat.com>
-	<20171010135940.GJ4177@dhcp-200-186.str.redhat.com>
-	<67e98ca7-e861-a646-b701-b8f7453f2951@redhat.com>
-	<46e7ca23-fb38-7620-90fb-04982e5b9ad0@redhat.com>
-	<06af49fb-6e94-d8c0-3701-7579e55c92a5@redhat.com>
-	<20171011084214.GB4593@dhcp-200-186.str.redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <de191a4c-342a-bf26-277b-2744951dcf29@redhat.com>
-Date: Wed, 11 Oct 2017 13:42:31 -0400
+	<20171004020048.26379-15-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c397dd86-5d4e-2c67-55b2-f6d3238a1db9@redhat.com>
+Date: Wed, 11 Oct 2017 13:33:49 -0500
 MIME-Version: 1.0
-In-Reply-To: <20171011084214.GB4593@dhcp-200-186.str.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 01/23] block: Allow NULL file for
- bdrv_get_block_status()
+In-Reply-To: <20171004020048.26379-15-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="qwDQksB5VOgnV4Of0LIn4Rf87fp78UkjO"
+Subject: Re: [Qemu-devel] [PATCH v5 14/23] qemu-img: Speed up compare on
+ pre-allocated larger file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +25,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, famz@redhat.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--qwDQksB5VOgnV4Of0LIn4Rf87fp78UkjO
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Message-ID: <c397dd86-5d4e-2c67-55b2-f6d3238a1db9@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 14/23] qemu-img: Speed up compare on
+ pre-allocated larger file
+References: <20171004020048.26379-1-eblake@redhat.com>
+ <20171004020048.26379-15-eblake@redhat.com>
+In-Reply-To: <20171004020048.26379-15-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 10/03/2017 09:00 PM, Eric Blake wrote:
+> Compare the following images with all-zero contents:
+> $ truncate --size 1M A
+> $ qemu-img create -f qcow2 -o preallocation=3Doff B 1G
+> $ qemu-img create -f qcow2 -o preallocation=3Dmetadata C 1G
+>=20
+
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: John Snow <jsnow@redhat.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>=20
+
+> +++ b/qemu-img.c
+> @@ -1481,11 +1481,11 @@ static int img_compare(int argc, char **argv)
+>          while (sector_num < progress_base) {
+>              int64_t count;
+>=20
+> -            ret =3D bdrv_is_allocated_above(blk_bs(blk_over), NULL,
+> +            ret =3D bdrv_block_status_above(blk_bs(blk_over), NULL,
+
+Just now noticing: in this function, ret is 32-bit, but
+bdrv_block_status_above() returns 64-bit values...
+
+>                                            sector_num * BDRV_SECTOR_SIZ=
+E,
+>                                            (progress_base - sector_num)=
+ *
+>                                            BDRV_SECTOR_SIZE,
+> -                                          &count);
+> +                                          &count, NULL);
+>              if (ret < 0) {
+
+=2E..which could make for a false positive in a static checker (none of
+our implementations return a negative value beyond INT_MIN for wrapping
+to be a serious concern).  So that's yet another reason why I am liking
+Kevin's proposal to split the returned offset to be a by-reference
+parameter rather than squashed into the return type, as it will let me
+use a 32-bit return type and avoid worrying about this corner case.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
+--qwDQksB5VOgnV4Of0LIn4Rf87fp78UkjO
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 10/11/2017 04:42 AM, Kevin Wolf wrote:
-> Am 10.10.2017 um 21:24 hat John Snow geschrieben:
->>
->>
->> On 10/10/2017 03:00 PM, Eric Blake wrote:
->>> On 10/10/2017 09:43 AM, Eric Blake wrote:
->>>
->>>>>> ---
->>>>>> v5: use second label for cleaner exit logic [John], use local_pnum
->>>>
->>>>>> @@ -1811,16 +1811,19 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
->>>>>>      int64_t total_sectors;
->>>>>>      int64_t n;
->>>>>>      int64_t ret, ret2;
->>>>>> +    BlockDriverState *local_file = NULL;
->>>>>> +    int local_pnum = 0;
->>>>>
->>>>> I don't quite see what the point of local_pnum is if we assert anyway
->>>>> that the real pnum is non-NULL.
->>>>
->>>> I did it in parallel with fallout from John's review on v4:
->>>> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg06958.html
->>>>
->>>> but since it wasn't specifically asked for, and is now getting
->>>> questions, I'm fine with not having it in v6.
->>>
->>> Okay, I re-read v4, and here's the comment (on 21/23) that led to my
->>> experiment in v5 patch 1 with local_pnum:
->>>
->>> https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg00293.html
->>>
->>> and I did argue:
->>>
->>> https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg00311.html
->>
->> Well, Kevin's the boss :D
-> 
-> I'm not sure how renaming *pnum into local_pnum addresses your concerns?
-> We still update local_pnum before we undo our alignment corrections. Or
-> are you talking about some other part of these mails?
-> 
-> Kevin
-> 
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-I made only a stylistic comment and it looked to me at a glance like it
-had resulted in conflicting feedback from you (since I all but asked for
-a local pnum) -- but my feedback was only minor stylistic stuff, so I'm
-deferring to you.
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlneZA0ACgkQp6FrSiUn
+Q2oHjggAlhO4Y0LjBexoGbDdIbFRsr1n0bo2gLsxx6p+e3h9XfBYXvldFbxo2z4m
+3XdDG/2oCu39dx7dffByg8bcGQHjLSuC0y9979fSzyyApCjcN2SnbsRc2e0IFsxg
+pQPWrF0Ej04DY2H0ASdkW4TffIQQkrDfy9Z+HzRdFftxNg71GuVRWThEImZvPlw8
+TucphkqklN6HxL5PQisF6/SeBe8ZoB+mCsr+/jRsrA2pix1PpW6rmBL0ZqNcbeQx
+uFGuG4KDGgJwQTc9YK1d+sbXZfYKQiNPYVFLO2PAbvcPi+eeGem1jNXl+YNiDnmA
+Am5SltcocBC9tJU3N40kQ+OaWhyT3Q==
+=Ppdq
+-----END PGP SIGNATURE-----
 
---js
+--qwDQksB5VOgnV4Of0LIn4Rf87fp78UkjO--
