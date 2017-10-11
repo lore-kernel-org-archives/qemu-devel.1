@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e2MSU-0005cj-3t
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 15:14:23 -0400
+	(envelope-from <dan.j.williams@intel.com>) id 1e2Mak-0002Dr-3Q
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 15:22:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e2MST-00056c-2b
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 15:14:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60394)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e2MSS-00056E-QB
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 15:14:21 -0400
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 11 Oct 2017 20:13:17 +0100
-Message-Id: <20171011191317.24157-8-dgilbert@redhat.com>
-In-Reply-To: <20171011191317.24157-1-dgilbert@redhat.com>
-References: <20171011191317.24157-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH 7/7] migration: pause-before-device for postcopy
+	(envelope-from <dan.j.williams@intel.com>) id 1e2Mai-0001na-VE
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 15:22:54 -0400
+Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:47027)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+	id 1e2Mai-0001jr-QS
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 15:22:52 -0400
+Received: by mail-oi0-x233.google.com with SMTP id n82so4829406oig.3
+	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 12:22:42 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20171011185146.20295-1-pagupta@redhat.com>
+References: <20171011185146.20295-1-pagupta@redhat.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Wed, 11 Oct 2017 12:22:41 -0700
+Message-ID: <CAPcyv4iav2gjHR63UfZmzp5u6mZciszarqrn=QXnvf+zjjgEUg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC] KVM "fake DAX" device flushing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,96 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, kwolf@redhat.com, jdenemar@redhat.com, wangjie88@huawei.com, quintela@redhat.com, peterx@redhat.com, mreitz@redhat.com
-Cc: berrange@redhat.com, eblake@redhat.com, fuweiwei2@huawei.com
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, KVM list <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-nvdimm <linux-nvdimm@ml01.01.org>, Linux MM <linux-mm@kvack.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Rik van Riel <riel@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Nitesh Narayan Lal <nilal@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Zwisler, Ross" <ross.zwisler@intel.com>, David Hildenbrand <david@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Wed, Oct 11, 2017 at 11:51 AM, Pankaj Gupta <pagupta@redhat.com> wrote:
+> We are sharing the prototype version of 'fake DAX' flushing
+> interface for the initial feedback. This is still work in progress
+> and not yet ready for merging.
+>
+> Protoype right now just implements basic functionality without advanced
+> features with two major parts:
+>
+> - Qemu virtio-pmem device
+>   It exposes a persistent memory range to KVM guest which at host side is file
+>   backed memory and works as persistent memory device. In addition to this it
+>   provides a virtio flushing interface for KVM guest to do a Qemu side sync for
+>   guest DAX persistent memory range.
+>
+> - Guest virtio-pmem driver
+>   Reads persistent memory range from paravirt device and reserves system memory map.
+>   It also allocates a block device corresponding to the pmem range which is accessed
+>   by DAX capable file systems. (file system support is still pending).
+>
+> We shared the project idea for 'fake DAX' flushing interface here [1].
+> Based on suggestions here [2], we implemented guest 'virtio-pmem'
+> driver and Qemu paravirt device.
+>
+> [1] https://www.spinics.net/lists/kvm/msg149761.html
+> [2] https://www.spinics.net/lists/kvm/msg153095.html
+>
+> Work yet to be done:
+>
+> - Separate out the common code used by ACPI pmem interface and
+>   reuse it.
+>
+> - In pmem device memmap allocation and working. There is some parallel work
+>   going on upstream related to 'memory_hotplug restructuring' [3] and also hitting
+>   a memory section alignment issue [4].
+>
+>   [3] https://lwn.net/Articles/712099/
+>   [4] https://www.mail-archive.com/linux-nvdimm@lists.01.org/msg02978.html
+>
+> - Provide DAX capable file-system(ext4 & XFS) support.
+> - Qemu device flush functionality.
+> - Qemu live migration work when host page cache is used.
+> - Multiple virtio-pmem disks support.
+>
+> Prototype implementation for feedback:
+>
+> Kernel: https://github.com/pagupta/linux/commit/d15cf90074eae91aeed7a228da3faf319566dd40
 
-Add pause-before-device support for postcopy.
-After starting postcopy it will transition
-    active->pause_before_device->postcopy_active
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/migration.c | 29 ++++++++++++++++++++++-------
- 1 file changed, 22 insertions(+), 7 deletions(-)
-
-diff --git a/migration/migration.c b/migration/migration.c
-index fa42918270..bdb6a30995 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -104,6 +104,9 @@ enum mig_rp_message_type {
- static MigrationState *current_migration;
- 
- static bool migration_object_check(MigrationState *ms, Error **errp);
-+static int migration_maybe_pause(MigrationState *s,
-+                                 int *current_active_state,
-+                                 int new_state);
- 
- void migration_object_init(void)
- {
-@@ -1829,8 +1832,11 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
-     QEMUFile *fb;
-     int64_t time_at_stop = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-     bool restart_block = false;
--    migrate_set_state(&ms->state, MIGRATION_STATUS_ACTIVE,
--                      MIGRATION_STATUS_POSTCOPY_ACTIVE);
-+    int cur_state = MIGRATION_STATUS_ACTIVE;
-+    if (!migrate_pause_before_device()) {
-+        migrate_set_state(&ms->state, MIGRATION_STATUS_ACTIVE,
-+                          MIGRATION_STATUS_POSTCOPY_ACTIVE);
-+    }
- 
-     trace_postcopy_start();
-     qemu_mutex_lock_iothread();
-@@ -1850,6 +1856,12 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
-     }
-     restart_block = true;
- 
-+    ret = migration_maybe_pause(ms, &cur_state,
-+                                MIGRATION_STATUS_POSTCOPY_ACTIVE);
-+    if (ret < 0) {
-+        goto fail;
-+    }
-+
-     /*
-      * Cause any non-postcopiable, but iterative devices to
-      * send out their final data.
-@@ -1986,7 +1998,9 @@ fail:
-  * called with the iothread locked
-  * Returns: 0 on success
-  */
--static int migration_maybe_pause(MigrationState *s, int *current_active_state)
-+static int migration_maybe_pause(MigrationState *s,
-+                                 int *current_active_state,
-+                                 int new_state)
- {
-     int ret;
-     if (!migrate_pause_before_device()) {
-@@ -2014,11 +2028,11 @@ static int migration_maybe_pause(MigrationState *s, int *current_active_state)
-                       MIGRATION_STATUS_PAUSE_BEFORE_DEVICE);
-     qemu_sem_wait(&s->pause_sem);
-     migrate_set_state(&s->state, MIGRATION_STATUS_PAUSE_BEFORE_DEVICE,
--                      MIGRATION_STATUS_DEVICE);
--    *current_active_state = MIGRATION_STATUS_DEVICE;
-+                      new_state);
-+    *current_active_state = new_state;
-     qemu_mutex_lock_iothread();
- 
--    return s->state == MIGRATION_STATUS_DEVICE ? 0 : -EINVAL;
-+    return s->state == new_state ? 0 : -EINVAL;
- }
- 
- /**
-@@ -2047,7 +2061,8 @@ static void migration_completion(MigrationState *s, int current_active_state,
-             bool inactivate = !migrate_colo_enabled();
-             ret = vm_stop_force_state(RUN_STATE_FINISH_MIGRATE);
-             if (ret >= 0) {
--                ret = migration_maybe_pause(s, &current_active_state);
-+                ret = migration_maybe_pause(s, &current_active_state,
-+                                            MIGRATION_STATUS_DEVICE);
-                 /* If this worked it will already have inactivated */
-                 inactivate &= !migrate_pause_before_device();
-             }
--- 
-2.13.6
+Please send this as a patch so it can be reviewed over email.
