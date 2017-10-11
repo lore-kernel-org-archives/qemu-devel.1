@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1e2FQg-0002pZ-2y
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 07:44:06 -0400
+	(envelope-from <mreitz@redhat.com>) id 1e2FTF-0003wU-Be
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 07:46:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1e2FQf-0005AU-7f
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 07:44:02 -0400
+	(envelope-from <mreitz@redhat.com>) id 1e2FTE-00071Q-Kh
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 07:46:41 -0400
 References: <20170913181910.29688-1-mreitz@redhat.com>
-	<20170913181910.29688-6-mreitz@redhat.com>
-	<20171010091420.GD4177@dhcp-200-186.str.redhat.com>
+	<20170913181910.29688-9-mreitz@redhat.com>
+	<20171010092727.GE4177@dhcp-200-186.str.redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <3ecdb2b4-735d-ac96-f1b8-e48ffa63e476@redhat.com>
-Date: Wed, 11 Oct 2017 13:43:44 +0200
+Message-ID: <d44f52ab-5068-d81d-392e-c8e559cbbf54@redhat.com>
+Date: Wed, 11 Oct 2017 13:46:22 +0200
 MIME-Version: 1.0
-In-Reply-To: <20171010091420.GD4177@dhcp-200-186.str.redhat.com>
+In-Reply-To: <20171010092727.GE4177@dhcp-200-186.str.redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="5mO7mj1HjCRRVIVEVe1RETHAufSM3HLpb"
-Subject: Re: [Qemu-devel] [PATCH 05/18] block/mirror: Convert to coroutines
+	boundary="uqxUG4SCnAHXfNt9O4LRr6wfv13muSEN8"
+Subject: Re: [Qemu-devel] [PATCH 08/18] block/mirror: Use source as a
+ BdrvChild
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +30,70 @@ To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5mO7mj1HjCRRVIVEVe1RETHAufSM3HLpb
+--uqxUG4SCnAHXfNt9O4LRr6wfv13muSEN8
 From: Max Reitz <mreitz@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Fam Zheng
  <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
  John Snow <jsnow@redhat.com>
-Message-ID: <3ecdb2b4-735d-ac96-f1b8-e48ffa63e476@redhat.com>
-Subject: Re: [PATCH 05/18] block/mirror: Convert to coroutines
+Message-ID: <d44f52ab-5068-d81d-392e-c8e559cbbf54@redhat.com>
+Subject: Re: [PATCH 08/18] block/mirror: Use source as a BdrvChild
 References: <20170913181910.29688-1-mreitz@redhat.com>
- <20170913181910.29688-6-mreitz@redhat.com>
- <20171010091420.GD4177@dhcp-200-186.str.redhat.com>
-In-Reply-To: <20171010091420.GD4177@dhcp-200-186.str.redhat.com>
+ <20170913181910.29688-9-mreitz@redhat.com>
+ <20171010092727.GE4177@dhcp-200-186.str.redhat.com>
+In-Reply-To: <20171010092727.GE4177@dhcp-200-186.str.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-10-10 11:14, Kevin Wolf wrote:
-> Am 13.09.2017 um 20:18 hat Max Reitz geschrieben:
->> In order to talk to the source BDS (and maybe in the future to the
->> target BDS as well) directly, we need to convert our existing AIO
->> requests into coroutine I/O requests.
+On 2017-10-10 11:27, Kevin Wolf wrote:
+> Am 13.09.2017 um 20:19 hat Max Reitz geschrieben:
+>> With this, the mirror_top_bs is no longer just a technically required
+>> node in the BDS graph but actually represents the block job operation.=
+
 >>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  block/mirror.c | 18 ++++++++++--------
+>>  1 file changed, 10 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/block/mirror.c b/block/mirror.c
+>> index 2ece38094d..9df4157511 100644
+>> --- a/block/mirror.c
+>> +++ b/block/mirror.c
+>> @@ -43,8 +43,8 @@ typedef struct MirrorBlockJob {
+>>      RateLimit limit;
+>>      BlockBackend *target;
+>>      BlockDriverState *mirror_top_bs;
+>> -    BlockDriverState *source;
+>>      BlockDriverState *base;
+>> +    BdrvChild *source;
 >=20
-> Please follow through with it and add a few patches that turn it into
-> natural coroutine code rather than just any coroutine code. I know I di=
-d
-> the same kind of half-assed conversion in qed, but mirror is code that
-> is actually used and that people look at for more than just a bad
-> example.
->=20
-> You'll probably notice more things when you do this, but the obvious
-> things would be changing mirror_co_read() into a mirror_co_copy() with
-> the former callbacks inlined; keeping op on the stack instead of
-> mallocing it in mirror_perform() and free it deep inside the nested
-> functions that used to be callbacks; and probably also cleaning up the
-> random calls to aio_context_acquire/release() that will now appear in
-> the middle of the function.
->=20
-> Anyway, that's for follow-up patches (though ideally in the same
-> series), so for this one you can have:
->=20
-> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+> Is it actually useful to store source seperately when we already have
+> mirror_top_bs->backing?
 
-Phew. :-)
+I'll take a look whether it is, and if it isn't, I'll probably add that
+as a separate patch (to keep this one as simple as it is).
 
-I think I'll write the patches (while working on v2), but I'll send them
-as a follow-up.
+I imagine it is not, right.
 
 Max
 
 
---5mO7mj1HjCRRVIVEVe1RETHAufSM3HLpb
+--uqxUG4SCnAHXfNt9O4LRr6wfv13muSEN8
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlneA/ESHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AfyQH/3PX2hczZI1IK2J2obwy/VSKuZ+gEqy5
-cNkRsSP2HHg10XqkWRcVGnnctNIYM3hYk80hnKLb1R0FomPp09rceYDG3C3rp6d0
-mc4rM9kIfRrPQ85OcFHMMe6JlQgj94Z5cWJ5o0R9bX4tAwDnaYrLlIeaOH+TLOCN
-q8EiAmZ0rxFVsb55xX81nq5MWO1jrQvamG8VuP6S0bDquPwNOXk+Yh5ScJiY1tnO
-FhKt63wTfINywp3R2ieCbhftD7PyVRRlMXzRSa+oxVqFvd3e7cc17p6j4zi4gAG2
-QDOdNIXSUAIAFPidw+PJyqfp8/yJ5DE417Qv1gyNOUKkqjPYPH+nlIs=
-=xJNg
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlneBI4SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AuAUH/jAggLGTquP3RquSbABnpfRtl55wuKsz
+o4DWrnYbAW3WvH0piVv9rEGEtRcw6449l7dXAeOt6T45tUIPtg0n5c/BKNySytlk
+w0XfvqASAWcpbHvs2gMiykrqiCA5Jri252GvemguWt09rt/DdHTHIlLS1Y/yA0r4
+zeYXgnA4/iADvmxxG88mLVHTQCLlqC3M+MqNKf/9669NiY4cAdiJKIyltTbV+Oxt
+1gs4FoLCQpjazEXvwEeiq42KdgNPm+x1BVlBNnKFW2QM9w0hoOfQo430rPlSIy38
+67L2tmuGYwSQUbj9gvhbvl3jr0Yd9AUHxYrpxSTK8GBTpCSWNIKUcBo=
+=9wjg
 -----END PGP SIGNATURE-----
 
---5mO7mj1HjCRRVIVEVe1RETHAufSM3HLpb--
+--uqxUG4SCnAHXfNt9O4LRr6wfv13muSEN8--
