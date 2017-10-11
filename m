@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e2M67-0006Ka-Ve
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 14:51:17 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e2M6D-0006Op-SL
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 14:51:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e2M66-0000kV-V5
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 14:51:16 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e2M6A-0000o1-Ps
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 14:51:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:25445)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e2M6A-0000nb-KB
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 14:51:18 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Wed, 11 Oct 2017 15:50:59 -0300
-Message-Id: <20171011185103.26259-2-ehabkost@redhat.com>
+Date: Wed, 11 Oct 2017 15:51:00 -0300
+Message-Id: <20171011185103.26259-3-ehabkost@redhat.com>
 In-Reply-To: <20171011185103.26259-1-ehabkost@redhat.com>
 References: <20171011185103.26259-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/5] iotests: Set up Python logging
+Subject: [Qemu-devel] [PULL 2/5] basevm: Call logging.basicConfig()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,48 +27,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Cleber Rosa <crosa@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Set up Python logging module instead of relying on
-QEMUMachine._debug to enable debugging messages.
+Just setting level=3DDEBUG when debug is enabled is not enough: we
+need to set up a log handler if we want debug messages generated
+using logging.getLogger(...).debug() to be printed.
 
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org
+This was not a problem before because logging.debug() calls
+logging.basicConfig() implicitly, but it's safer to not rely on
+that.
+
+Cc: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>
+Cc: Fam Zheng <famz@redhat.com>
+Cc: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20170927130339.21444-3-ehabkost@redhat.com>
+Message-Id: <20170927130339.21444-4-ehabkost@redhat.com>
 Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 3 +++
- 1 file changed, 3 insertions(+)
+ tests/vm/basevm.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-index 1af117e37d..36a7757aaf 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -28,6 +28,7 @@ import qtest
- import struct
- import json
- import signal
-+import logging
-=20
-=20
- # This will not work if arguments contain spaces but is necessary if we
-@@ -467,6 +468,8 @@ def main(supported_fmts=3D[], supported_oses=3D['linu=
-x']):
-     else:
-         output =3D StringIO.StringIO()
-=20
-+    logging.basicConfig(level=3D(logging.DEBUG if debug else logging.WAR=
-N))
-+
-     class MyTestRunner(unittest.TextTestRunner):
-         def __init__(self, stream=3Doutput, descriptions=3DTrue, verbosi=
-ty=3Dverbosity):
-             unittest.TextTestRunner.__init__(self, stream, descriptions,=
- verbosity)
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index 3c863bc237..686d88decf 100755
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -227,8 +227,8 @@ def main(vmcls):
+         if not argv and not args.build_qemu and not args.build_image:
+             print "Nothing to do?"
+             return 1
+-        if args.debug:
+-            logging.getLogger().setLevel(logging.DEBUG)
++        logging.basicConfig(level=3D(logging.DEBUG if args.debug
++                                   else logging.WARN))
+         vm =3D vmcls(debug=3Dargs.debug, vcpus=3Dargs.jobs)
+         if args.build_image:
+             if os.path.exists(args.image) and not args.force:
 --=20
 2.13.6
