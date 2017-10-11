@@ -1,19 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e2DDu-0003SD-3g
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 05:22:43 -0400
+	(envelope-from <berrange@redhat.com>) id 1e2DJV-0004vv-RS
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 05:28:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e2DDt-0004cG-62
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 05:22:42 -0400
-Date: Wed, 11 Oct 2017 11:22:30 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171011092230.GC4593@dhcp-200-186.str.redhat.com>
-References: <20171010134205.6120-1-vsementsov@virtuozzo.com>
+	(envelope-from <berrange@redhat.com>) id 1e2DJR-00073i-QK
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 05:28:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40640)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e2DJR-00073C-GW
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 05:28:25 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5BE4881E1E
+	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 09:28:24 +0000 (UTC)
+Date: Wed, 11 Oct 2017 10:28:15 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171011092815.GE20372@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171010181542.24168-1-quintela@redhat.com>
+	<20171010181542.24168-11-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20171010134205.6120-1-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH RFC] file-posix: make lock_fd read-only
+In-Reply-To: <20171010181542.24168-11-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 10/10] migration: [RFC] Use proper types in
+ json
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,51 +35,276 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, den@openvz.org, berrange@redhat.com, eblake@redhat.com, famz@redhat.com
+To: Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-[ Cc: Fam ]
-
-Am 10.10.2017 um 15:42 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> We do not reopen lock_fd on bdrv_reopen which leads to problems on
-> reopen image RO. So, lets make lock_fd be always RO.
-> This is correct, because qemu_lock_fd always called with exclusive=false
-> on lock_fd.
+On Tue, Oct 10, 2017 at 08:15:42PM +0200, Juan Quintela wrote:
+> We use int for everything (int64_t), and then we check that value is
+> between 0 and 255.  Change it to the valid types.
 > 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> For qmp, the only real change is that now max_bandwidth allows to use
+> the k/M/G suffixes.
+
+So on input apps previous would use:
+
+    "max-bandwidth":  1024
+
+ie json numeric field, and would expect to see the same when reading
+data back from QEMU.
+
+With this change they could use a string field
+
+    "max-bandwidth":  "1k"
+
+As long as QEMU's JSON parser accepts both number & string values
+for the 'size' type it is still backwards compatible if an app
+continues to use 1024 instead of "1k"
+
+On *output* though (ie 'info migrate-parameters') this is not
+compatible for applications, unless QEMU *always* uses the
+numeric format when generating values. ie it must always
+report 1024, and never "1k", as apps won't be expecting a string
+with suffix.  I can't 100% tell whether this is the case or not,
+so CC'ing Markus to confirm if changing "int" to "size" is
+guaranteed back-compat in both directions
+
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
+>  hmp.c                 | 22 +++++++++++-----------
+>  migration/migration.c | 49 ++++++++++++++++++++-----------------------------
+>  qapi/migration.json   | 20 ++++++++++----------
+>  3 files changed, 41 insertions(+), 50 deletions(-)
 > 
-> Hi all!
+> diff --git a/hmp.c b/hmp.c
+> index f73232399a..905dc93aef 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -293,23 +293,23 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+>  
+>      if (params) {
+>          assert(params->has_compress_level);
+> -        monitor_printf(mon, "%s: %" PRId64 "\n",
+> +        monitor_printf(mon, "%s: %u\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_COMPRESS_LEVEL),
+>              params->compress_level);
+>          assert(params->has_compress_threads);
+> -        monitor_printf(mon, "%s: %" PRId64 "\n",
+> +        monitor_printf(mon, "%s: %u\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_COMPRESS_THREADS),
+>              params->compress_threads);
+>          assert(params->has_decompress_threads);
+> -        monitor_printf(mon, "%s: %" PRId64 "\n",
+> +        monitor_printf(mon, "%s: %u\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_DECOMPRESS_THREADS),
+>              params->decompress_threads);
+>          assert(params->has_cpu_throttle_initial);
+> -        monitor_printf(mon, "%s: %" PRId64 "\n",
+> +        monitor_printf(mon, "%s: %u\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_CPU_THROTTLE_INITIAL),
+>              params->cpu_throttle_initial);
+>          assert(params->has_cpu_throttle_increment);
+> -        monitor_printf(mon, "%s: %" PRId64 "\n",
+> +        monitor_printf(mon, "%s: %u\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_CPU_THROTTLE_INCREMENT),
+>              params->cpu_throttle_increment);
+>          assert(params->has_tls_creds);
+> @@ -321,28 +321,28 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+>              MigrationParameter_str(MIGRATION_PARAMETER_TLS_HOSTNAME),
+>              params->tls_hostname);
+>          assert(params->has_max_bandwidth);
+> -        monitor_printf(mon, "%s: %" PRId64 " bytes/second\n",
+> +        monitor_printf(mon, "%s: %" PRIu64 " bytes/second\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_MAX_BANDWIDTH),
+>              params->max_bandwidth);
+>          assert(params->has_downtime_limit);
+> -        monitor_printf(mon, "%s: %" PRId64 " milliseconds\n",
+> +        monitor_printf(mon, "%s: %" PRIu64 " milliseconds\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_DOWNTIME_LIMIT),
+>              params->downtime_limit);
+>          assert(params->has_x_checkpoint_delay);
+> -        monitor_printf(mon, "%s: %" PRId64 "\n",
+> +        monitor_printf(mon, "%s: %u\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_X_CHECKPOINT_DELAY),
+>              params->x_checkpoint_delay);
+>          assert(params->has_block_incremental);
+>          monitor_printf(mon, "%s: %s\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_BLOCK_INCREMENTAL),
+>              params->block_incremental ? "on" : "off");
+> -        monitor_printf(mon, "%s: %" PRId64 "\n",
+> +        monitor_printf(mon, "%s: %u\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_X_MULTIFD_CHANNELS),
+>              params->x_multifd_channels);
+> -        monitor_printf(mon, "%s: %" PRId64 "\n",
+> +        monitor_printf(mon, "%s: %u\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_X_MULTIFD_PAGE_COUNT),
+>              params->x_multifd_page_count);
+> -        monitor_printf(mon, "%s: %" PRId64 "\n",
+> +        monitor_printf(mon, "%s: %" PRIu64 "\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
+>              params->xbzrle_cache_size);
+>      }
+> diff --git a/migration/migration.c b/migration/migration.c
+> index fcc0d64625..6d6dcc4e42 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -734,22 +734,20 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
+>  static bool migrate_params_check(MigrationParameters *params, Error **errp)
+>  {
+>      if (params->has_compress_level &&
+> -        (params->compress_level < 0 || params->compress_level > 9)) {
+> +        (params->compress_level > 9)) {
+>          error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "compress_level",
+>                     "is invalid, it should be in the range of 0 to 9");
+>          return false;
+>      }
+>  
+> -    if (params->has_compress_threads &&
+> -        (params->compress_threads < 1 || params->compress_threads > 255)) {
+> +    if (params->has_compress_threads && (params->compress_threads < 1)) {
+>          error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+>                     "compress_threads",
+>                     "is invalid, it should be in the range of 1 to 255");
+>          return false;
+>      }
+>  
+> -    if (params->has_decompress_threads &&
+> -        (params->decompress_threads < 1 || params->decompress_threads > 255)) {
+> +    if (params->has_decompress_threads && (params->decompress_threads < 1)) {
+>          error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+>                     "decompress_threads",
+>                     "is invalid, it should be in the range of 1 to 255");
+> @@ -774,38 +772,31 @@ static bool migrate_params_check(MigrationParameters *params, Error **errp)
+>          return false;
+>      }
+>  
+> -    if (params->has_max_bandwidth &&
+> -        (params->max_bandwidth < 0 || params->max_bandwidth > SIZE_MAX)) {
+> +    if (params->has_max_bandwidth && (params->max_bandwidth > SIZE_MAX)) {
+>          error_setg(errp, "Parameter 'max_bandwidth' expects an integer in the"
+>                           " range of 0 to %zu bytes/second", SIZE_MAX);
+>          return false;
+>      }
+>  
+>      if (params->has_downtime_limit &&
+> -        (params->downtime_limit < 0 ||
+> -         params->downtime_limit > MAX_MIGRATE_DOWNTIME)) {
+> +        (params->downtime_limit > MAX_MIGRATE_DOWNTIME)) {
+>          error_setg(errp, "Parameter 'downtime_limit' expects an integer in "
+>                           "the range of 0 to %d milliseconds",
+>                           MAX_MIGRATE_DOWNTIME);
+>          return false;
+>      }
+>  
+> -    if (params->has_x_checkpoint_delay && (params->x_checkpoint_delay < 0)) {
+> -        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+> -                    "x_checkpoint_delay",
+> -                    "is invalid, it should be positive");
+> -        return false;
+> -    }
+> -    if (params->has_x_multifd_channels &&
+> -        (params->x_multifd_channels < 1 || params->x_multifd_channels > 255)) {
+> +    /* x_checkpoint_delay is now always positive */
+> +
+> +    if (params->has_x_multifd_channels && (params->x_multifd_channels < 1)) {
+>          error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+>                     "multifd_channels",
+>                     "is invalid, it should be in the range of 1 to 255");
+>          return false;
+>      }
+>      if (params->has_x_multifd_page_count &&
+> -            (params->x_multifd_page_count < 1 ||
+> -             params->x_multifd_page_count > 10000)) {
+> +        (params->x_multifd_page_count < 1 ||
+> +         params->x_multifd_page_count > 10000)) {
+>          error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+>                     "multifd_page_count",
+>                     "is invalid, it should be in the range of 1 to 10000");
+> @@ -2301,33 +2292,33 @@ static Property migration_properties[] = {
+>                       send_section_footer, true),
+>  
+>      /* Migration parameters */
+> -    DEFINE_PROP_INT64("x-compress-level", MigrationState,
+> +    DEFINE_PROP_UINT8("x-compress-level", MigrationState,
+>                        parameters.compress_level,
+>                        DEFAULT_MIGRATE_COMPRESS_LEVEL),
+> -    DEFINE_PROP_INT64("x-compress-threads", MigrationState,
+> +    DEFINE_PROP_UINT8("x-compress-threads", MigrationState,
+>                        parameters.compress_threads,
+>                        DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT),
+> -    DEFINE_PROP_INT64("x-decompress-threads", MigrationState,
+> +    DEFINE_PROP_UINT8("x-decompress-threads", MigrationState,
+>                        parameters.decompress_threads,
+>                        DEFAULT_MIGRATE_DECOMPRESS_THREAD_COUNT),
+> -    DEFINE_PROP_INT64("x-cpu-throttle-initial", MigrationState,
+> +    DEFINE_PROP_UINT8("x-cpu-throttle-initial", MigrationState,
+>                        parameters.cpu_throttle_initial,
+>                        DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL),
+> -    DEFINE_PROP_INT64("x-cpu-throttle-increment", MigrationState,
+> +    DEFINE_PROP_UINT8("x-cpu-throttle-increment", MigrationState,
+>                        parameters.cpu_throttle_increment,
+>                        DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT),
+> -    DEFINE_PROP_INT64("x-max-bandwidth", MigrationState,
+> +    DEFINE_PROP_SIZE("x-max-bandwidth", MigrationState,
+>                        parameters.max_bandwidth, MAX_THROTTLE),
+> -    DEFINE_PROP_INT64("x-downtime-limit", MigrationState,
+> +    DEFINE_PROP_UINT64("x-downtime-limit", MigrationState,
+>                        parameters.downtime_limit,
+>                        DEFAULT_MIGRATE_SET_DOWNTIME),
+> -    DEFINE_PROP_INT64("x-checkpoint-delay", MigrationState,
+> +    DEFINE_PROP_UINT32("x-checkpoint-delay", MigrationState,
+>                        parameters.x_checkpoint_delay,
+>                        DEFAULT_MIGRATE_X_CHECKPOINT_DELAY),
+> -    DEFINE_PROP_INT64("x-multifd-channels", MigrationState,
+> +    DEFINE_PROP_UINT8("x-multifd-channels", MigrationState,
+>                        parameters.x_multifd_channels,
+>                        DEFAULT_MIGRATE_MULTIFD_CHANNELS),
+> -    DEFINE_PROP_INT64("x-multifd-page-count", MigrationState,
+> +    DEFINE_PROP_UINT32("x-multifd-page-count", MigrationState,
+>                        parameters.x_multifd_page_count,
+>                        DEFAULT_MIGRATE_MULTIFD_PAGE_COUNT),
+>      DEFINE_PROP_SIZE("xbzrle-cache-size", MigrationState,
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index 830b2e4480..81bd979912 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -656,19 +656,19 @@
+>  # Since: 2.4
+>  ##
+>  { 'struct': 'MigrationParameters',
+> -  'data': { '*compress-level': 'int',
+> -            '*compress-threads': 'int',
+> -            '*decompress-threads': 'int',
+> -            '*cpu-throttle-initial': 'int',
+> -            '*cpu-throttle-increment': 'int',
+> +  'data': { '*compress-level': 'uint8',
+> +            '*compress-threads': 'uint8',
+> +            '*decompress-threads': 'uint8',
+> +            '*cpu-throttle-initial': 'uint8',
+> +            '*cpu-throttle-increment': 'uint8',
+>              '*tls-creds': 'str',
+>              '*tls-hostname': 'str',
+> -            '*max-bandwidth': 'int',
+> -            '*downtime-limit': 'int',
+> -            '*x-checkpoint-delay': 'int',
+> +            '*max-bandwidth': 'size',
+> +            '*downtime-limit': 'uint64',
+> +            '*x-checkpoint-delay': 'uint32',
+>              '*block-incremental': 'bool' ,
+> -            '*x-multifd-channels': 'int',
+> -            '*x-multifd-page-count': 'int',
+> +            '*x-multifd-channels': 'uint8',
+> +            '*x-multifd-page-count': 'uint32',
+>              '*xbzrle-cache-size': 'size' } }
+>  
+>  ##
+> -- 
+> 2.13.6
 > 
-> We've faced the following problem with our shared-storage migration
-> scheme. We make an external snapshot and need base image to be reopened
-> RO. However, bdrv_reopen reopens only .fd of BDRVRawState but not
-> .lock_fd. So, .lock_fd is left opened RW and this breaks the whole
-> thing.
 > 
-> The simple fix is here: let's just open lock_fd as RO always. This
-> looks fine for current code, as we never try to set write locks
-> (qemu_lock_fd always called with exclusive=false).
-> 
-> However it will not work if we are going to use write locks.
 
-I was sure that we had discussed this during review, so I just went back
-and checked. Indeed, Fam originally had an unconditional O_RDONLY in
-some version of the image locking patches, but I actually found a
-potential problem with that back then:
-
-> Note that with /dev/fdset there can be cases where we can open a file
-> O_RDWR, but not O_RDONLY. Should we better just use the same flags as
-> for the s->fd?
-https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05107.html
-
-However, I'm now wondering whether we really still need a separate
-s->lock_fd or whether we can just use the normal image fd for this. If I
-understood the old threads correctly, the original reason for it was
-that during bdrv_reopen(), we couldn't safely migrate exclusive locks
-from the old fd to the new one. But as we aren't using exclusive locks
-any more, this shouldn't be a problem today.
-
-Fam, are there more reasons why we need a separate lock_fd?
-
-Kevin
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
