@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e2NEx-0002wg-4y
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 16:04:28 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1e2NFC-00032Y-FY
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 16:04:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e2NEs-000679-Q5
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 16:04:27 -0400
-Resent-Message-Id: <E1e2NEs-000679-Q5@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21493)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1e2NEs-00065b-Jl
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 16:04:22 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150775221993.288.12729708245081503434@b58463cdfd5f>
-In-Reply-To: <20171011191317.24157-1-dgilbert@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1e2NF7-0006Gp-Fj
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 16:04:42 -0400
+Received: from mail-wm0-f49.google.com ([74.125.82.49]:54370)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e2NF7-0006G0-9A
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 16:04:37 -0400
+Received: by mail-wm0-f49.google.com with SMTP id i124so7921421wmf.3
+	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 13:04:37 -0700 (PDT)
+References: <20171010174403.24660-1-martin@schrodt.org>
+	<d4647fac-4dbe-7f31-d03c-d8c4e8fcfbad@redhat.com>
+	<d853c85d-d59a-a65c-d672-f6dc6cdd15be@schrodt.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bcd43c04-84fa-36f0-ab14-3131a519c9b7@redhat.com>
+Date: Wed, 11 Oct 2017 22:04:33 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 11 Oct 2017 13:03:40 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/7] migration: pause-before-device
+In-Reply-To: <d853c85d-d59a-a65c-d672-f6dc6cdd15be@schrodt.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Several fixes for the Pulse Audio driver,
+ and the HDA device.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +32,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dgilbert@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, jdenemar@redhat.com, wangjie88@huawei.com, quintela@redhat.com, peterx@redhat.com, mreitz@redhat.com, fuweiwei2@huawei.com
+To: Martin Schrodt <martin@schrodt.org>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcxMDExMTkxMzE3LjI0MTU3LTEtZGdpbGJlcnRAcmVkaGF0LmNvbQpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvN10gbWlncmF0aW9uOiBwYXVzZS1iZWZvcmUtZGV2
-aWNlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
-CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2Ug
-JEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0gg
-JG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdp
-dCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
-YmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0k
-KChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
-aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczov
-L2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAg
-ICAgcGF0Y2hldy8xNTA3NzQyNjc2LTk5MDgtMS1naXQtc2VuZC1lbWFpbC1wZXRlci5tYXlkZWxs
-QGxpbmFyby5vcmcgLT4gcGF0Y2hldy8xNTA3NzQyNjc2LTk5MDgtMS1naXQtc2VuZC1lbWFpbC1w
-ZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hl
-dy8xNTA3NzUxMjQ5LTMwMzUtMS1naXQtc2VuZC1lbWFpbC1zdGVmYW5iQGxpbnV4LnZuZXQuaWJt
-LmNvbSAtPiBwYXRjaGV3LzE1MDc3NTEyNDktMzAzNS0xLWdpdC1zZW5kLWVtYWlsLXN0ZWZhbmJA
-bGludXgudm5ldC5pYm0uY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKODhkZGNk
-ZTgyZiBtaWdyYXRpb246IHBhdXNlLWJlZm9yZS1kZXZpY2UgZm9yIHBvc3Rjb3B5CjM0MTQzM2Qx
-OWIgbWlncmF0aW9uOiBhbGxvdyBjYW5jZWwgdG8gdW5wYXVzZQo0YTc2ZmJjMmIyIG1pZ3JhdGU6
-IEhNUCBtaWdhdGVfY29udGludWUKMjQzMDU0NzdlMCBtaWdyYXRpb246IG1pZ3JhdGUtY29udGlu
-dWUKZmM0OGFmNjQyYyBtaWdyYXRpb246IFdhaXQgZm9yIHNlbWFwaG9yZSBiZWZvcmUgY29tcGxl
-dGluZyBtaWdyYXRpb24KMjYzZTZkYzViZSBtaWdyYXRpb246IEFkZCAncGF1c2UtYmVmb3JlLWRl
-dmljZScgYW5kICdkZXZpY2UnIHN0YXR1c2VzCjc4MjdjMjUxMzIgbWlncmF0aW9uOiBBZGQgJ3Bh
-dXNlLWJlZm9yZS1kZXZpY2UnIGNhcGFiaWxpdHkKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
-aW5nIFBBVENIIDEvNzogbWlncmF0aW9uOiBBZGQgJ3BhdXNlLWJlZm9yZS1kZXZpY2UnIGNhcGFi
-aWxpdHkuLi4KQ2hlY2tpbmcgUEFUQ0ggMi83OiBtaWdyYXRpb246IEFkZCAncGF1c2UtYmVmb3Jl
-LWRldmljZScgYW5kICdkZXZpY2UnIHN0YXR1c2VzLi4uCkNoZWNraW5nIFBBVENIIDMvNzogbWln
-cmF0aW9uOiBXYWl0IGZvciBzZW1hcGhvcmUgYmVmb3JlIGNvbXBsZXRpbmcgbWlncmF0aW9uLi4u
-CkVSUk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRzIHNob3VsZCBiZSBvbiBuZXh0IGxpbmUKIzQ1OiBG
-SUxFOiBtaWdyYXRpb24vbWlncmF0aW9uLmM6MTk5NToKKyAgICB3aGlsZSAocWVtdV9zZW1fdGlt
-ZWR3YWl0KCZzLT5wYXVzZV9zZW0sIDEpID09IDApOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVj
-ZXNzYXJ5IGV2ZW4gZm9yIHNpbmdsZSBzdGF0ZW1lbnQgYmxvY2tzCiM0NTogRklMRTogbWlncmF0
-aW9uL21pZ3JhdGlvbi5jOjE5OTU6CisgICAgd2hpbGUgKHFlbXVfc2VtX3RpbWVkd2FpdCgmcy0+
-cGF1c2Vfc2VtLCAxKSA9PSAwKTsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgODAgbGlu
-ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tp
-bmcgUEFUQ0ggNC83OiBtaWdyYXRpb246IG1pZ3JhdGUtY29udGludWUuLi4KQ2hlY2tpbmcgUEFU
-Q0ggNS83OiBtaWdyYXRlOiBITVAgbWlnYXRlX2NvbnRpbnVlLi4uCkNoZWNraW5nIFBBVENIIDYv
-NzogbWlncmF0aW9uOiBhbGxvdyBjYW5jZWwgdG8gdW5wYXVzZS4uLgpDaGVja2luZyBQQVRDSCA3
-Lzc6IG1pZ3JhdGlvbjogcGF1c2UtYmVmb3JlLWRldmljZSBmb3IgcG9zdGNvcHkuLi4KPT09IE9V
-VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
-XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5v
-cmc=
+On 10/10/2017 20:32, Martin Schrodt wrote:
+> These 3 here are only paaudio.c
+> 
+> - Remove PA reader/writer threads from paaudio.c, and do IO from the
+> audio timer directly.
+> - Expose new configurable settings, such as TLENGTH and FRAGSIZE, plus
+> settings to
+>   enable PA_STREAM_ADJUST_LATENCY for input and output device separately.
+> - Fix the input delay when first using the input device.
+> 
+> and cannot really be separated, unfortunately.
+
+Sure they can! :)  This can actually be a good occasion to learn more of
+git.  Say you have this large patch in branch qemu-audio-v1, you can now do
+
+   git checkout -b qemu-audio-v2 qemu-audio-v1^
+   git checkout qemu-audio-v1 -- .
+   git reset
+
+This will create a branch *without* the patch, while putting the files
+*with* the patch in your working tree.
+
+Now you can add your changes gradually to the staging area of git (it is
+called the "index"):
+
+  git add -p
+
+This command will ask you interactively about staging each separate
+hunk, for files that git already tracks.  When done, you can run
+
+  git diff --staged
+
+to show the diff that is staged for commit.  And also
+
+  git diff
+
+to show the diff that is not staged yet.
+
+If you are happy with the staged changes, run:
+
+  git stash --keep-index
+
+and test them.  If there is a problem, fix it.  Then type
+
+  git commit -a -s
+
+to commit the staged changes to your local branch called qemu-audio-v2
+(write a good commit message now that the commit is fresh in your mind!).
+
+Now get back to the full changes:
+
+ git checkout qemu-audio-v1 -- .
+ git reset
+
+and restart from the "git add -p" step to get the next part of your
+patch.  Remember, each single one of your patches must build and runs
+(implementing the next logical step in the feature), and at the last
+patch, the feature is complete.
+
+Now format the patches as email messages, and send them to the list.
+Standing in the root of your QEMU directory, run the following:
+
+git fetch origin
+rm -f -- *.patch
+git format-patch --cover-letter --subject-prefix="PATCH v2" \
+  origin/master..
+
+This command will generate an email file for each one of your commits.
+The patch files will be numbered. The file numbered 0000 is a cover
+letter, which you should edit in-place:
+
+* in the Subject: line, summarize the goal of your series,
+
+* in the message body, describe the changes on a broad level.
+
+Now it's time to mail-bomb the list.  You have already used git
+send-email here so I won't get into further detail.
+
+(Loosely based on
+https://github.com/tianocore/tianocore.github.io/wiki/Laszlo's-unkempt-git-guide-for-edk2-contributors-and-maintainers)
+
+Thanks,
+
+Paolo
+
+> The third one is really only a consequence of the removal of the
+> additional audio thread.
