@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e2G0X-0006ek-71
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 08:21:06 -0400
+	(envelope-from <mreitz@redhat.com>) id 1e2G0j-0006k2-85
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 08:21:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e2G0U-0001c4-2v
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 08:21:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47958)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e2G0T-0001bW-So
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 08:21:02 -0400
-Date: Wed, 11 Oct 2017 14:20:53 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171011142053.1f1e2723.cohuck@redhat.com>
-In-Reply-To: <1952d9c1-6ef8-0f1d-d89a-08e1236ad275@linux.vnet.ibm.com>
-References: <1507124979-8880-1-git-send-email-pmorel@linux.vnet.ibm.com>
-	<1507124979-8880-5-git-send-email-pmorel@linux.vnet.ibm.com>
-	<20171009084506.77da9d5c@t450s.home>
-	<e59c8274-c390-b99f-85dd-ec3763520ff1@linux.vnet.ibm.com>
-	<20171010113520.6c3d03e3.cohuck@redhat.com>
-	<1952d9c1-6ef8-0f1d-d89a-08e1236ad275@linux.vnet.ibm.com>
+	(envelope-from <mreitz@redhat.com>) id 1e2G0h-0001gk-VM
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 08:21:17 -0400
+References: <20170913181910.29688-1-mreitz@redhat.com>
+	<20170913181910.29688-14-mreitz@redhat.com>
+	<20171010095836.GG4177@dhcp-200-186.str.redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <711eb725-4ebe-d2ea-7dd1-944b268c55d9@redhat.com>
+Date: Wed, 11 Oct 2017 14:20:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 4/5] s390x/pci: Refuse to realize
- VFIO-PCI if AIS needed but supported
+In-Reply-To: <20171010095836.GG4177@dhcp-200-186.str.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NHQbvRmUcoAROqRXj62UXHH7tkrkfxGvf"
+Subject: Re: [Qemu-devel] [PATCH 13/18] block/mirror: Keep write perm for
+ pending writes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +26,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, agraf@suse.de
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Tue, 10 Oct 2017 18:01:53 +0200
-Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NHQbvRmUcoAROqRXj62UXHH7tkrkfxGvf
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Fam Zheng
+ <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ John Snow <jsnow@redhat.com>
+Message-ID: <711eb725-4ebe-d2ea-7dd1-944b268c55d9@redhat.com>
+Subject: Re: [PATCH 13/18] block/mirror: Keep write perm for pending writes
+References: <20170913181910.29688-1-mreitz@redhat.com>
+ <20170913181910.29688-14-mreitz@redhat.com>
+ <20171010095836.GG4177@dhcp-200-186.str.redhat.com>
+In-Reply-To: <20171010095836.GG4177@dhcp-200-186.str.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Since in the case we have no AIS in KVM only PCI is impacted, do you 
-> think we can fence IRQFD for MSI with
-> 
-> kvm_msi_via_irqfd_allowed = false;
-> 
-> in kvm_arch_init_irq_routing() ?
+On 2017-10-10 11:58, Kevin Wolf wrote:
+> Am 13.09.2017 um 20:19 hat Max Reitz geschrieben:
+>> The owner of the mirror BDS might retire its write permission; but the=
+re
+>> may still be pending mirror operations so the mirror BDS cannot
+>> necessarily retire its write permission for its child then.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>=20
+> I'm confused. The child of mirror_top_bs is the source, but don't mirro=
+r
+> operations only write to the target?
 
-Hm, it seems we never set that for s390x... does that imply that we
-never support irqfd for pci anyway?
+I do know that the iotests added in the end fails without this patch, if
+it helps. :-)
 
-> 
-> In fact, if we also verify the AIS availability in the same routine we 
-> can avoid the ugly include of vfio/pci.h
+Right, for some reason I never thought about this...  OK, so the issue
+is that if you create a BB, submit a request and then delete it (the
+only BB), permissions requirements for the mirror BDS are dropped and
+then it in turn also drops its permissions on the source.
 
-If we can get the serialization right (and setting that value to false
-does indeed have the desired effect), that's probably the way to go.
+The issue now occurs whenever the BB is deleted before the write request
+checks the permissions on the source.  In passive mode, this does not
+happen because nothing yields before the permission check.
+
+In active mode, however, active_write_prepare() may yield due to
+mirror_wait_on_conflicts().  Since active_write_prepare() also creates
+an operation (before yielding), this patch "fixes" the issue.
+
+I think the real bug fix would be to also have a counter of (write)
+operations running on the source (incremented/decremented in
+bdrv_mirror_top_pwritev()) and to evaluate that in
+bdrv_mirror_top_child_perm().
+
+Max
+
+
+--NHQbvRmUcoAROqRXj62UXHH7tkrkfxGvf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlneDKYSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AVjcH/RcOJ3rq/tBqPhJDm/hxnHiSX7GAZScu
+4wHlhnoUEOCKPvNxckG/rPSYRE20RPADWK0XfZr3VW8kz7B2OIGou62z2aUE8nuN
+kA6xoZxTVqZzPKhYL0Ss8Zs996qDGP/prLwryz9a/VQGonDn9gGPHBYtZw+AzNj5
++S2kk81qAx86D13twDQUWAPA18DoMLVFeHAbB2irEsf8NZJEtQHpFyfHdWIzOf+z
+AncgdItgKPmyTgxh2OMKGsKeuYg9M3daaabRVLBh+9CnU8cknfgSAm/4h0AOgEFP
+Tb1cBSxfKguHaF4KNL2moyWQrOXvomSg2148MzsUPIdBTSDWndTsGNQ=
+=Nnjd
+-----END PGP SIGNATURE-----
+
+--NHQbvRmUcoAROqRXj62UXHH7tkrkfxGvf--
