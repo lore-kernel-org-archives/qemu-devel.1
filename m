@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50758)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e24ny-0006vO-8J
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 20:23:23 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e24rk-0007jG-Vt
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 20:27:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e24nu-0002uZ-S7
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 20:23:22 -0400
-Resent-Message-Id: <E1e24nu-0002uZ-S7@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21353)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1e24nu-0002uA-K4
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 20:23:18 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150768136994.285.7578673887197037203@b58463cdfd5f>
-In-Reply-To: <20171010193003.28857-1-richard.henderson@linaro.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1e24ri-0004ew-9M
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 20:27:17 -0400
+Received: from mail-pg0-x231.google.com ([2607:f8b0:400e:c05::231]:47404)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e24ri-0004eY-2L
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 20:27:14 -0400
+Received: by mail-pg0-x231.google.com with SMTP id r25so71288pgn.4
+	for <qemu-devel@nongnu.org>; Tue, 10 Oct 2017 17:27:13 -0700 (PDT)
+References: <1507556919-24992-1-git-send-email-peter.maydell@linaro.org>
+	<1507556919-24992-3-git-send-email-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e9f29609-b3e5-25fa-d9d6-903c16f7c8cf@linaro.org>
+Date: Tue, 10 Oct 2017 17:27:10 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 10 Oct 2017 17:22:50 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL v2 00/20] Queued TCG patches
+In-Reply-To: <1507556919-24992-3-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/9] target/arm: Implement SG instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +31,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcxMDEwMTkzMDAzLjI4ODU3LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgdjIgMDAvMjBdIFF1ZXVlZCBUQ0cgcGF0
-Y2hlcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49
-MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNl
-ICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENI
-ICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBn
-aXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
-bGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49
-JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRh
-dGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRv
-IGEgbmV3IGJyYW5jaCAndGVzdCcKM2JkZjcxYzhjYyB0Y2cvbWlwczogZGVsZXRlIGNvbW1lbnRl
-ZCBvdXQgZXh0ZXJuIGtleXdvcmQuCmI2ZGI3MDI0MmMgdGNnOiBkZWZpbmUgVENHX0hJR0hXQVRF
-Ugo4MTEwYWFhMzkwIHV0aWw6IG1vdmUgcWVtdV9yZWFsX2hvc3RfcGFnZV9zaXplL21hc2sgdG8g
-b3NkZXAuaAozYjUyZWIwN2MzIHRjZzogdGFrZSAuaGVscGVycyBvdXQgb2YgVENHQ29udGV4dAph
-MTk1Njk0OWZmIHRjaTogbW92ZSB0Y2lfcmVncyB0byB0Y2dfcWVtdV90Yl9leGVjJ3Mgc3RhY2sK
-NDEwOGUwMzU5OCBleGVjLWFsbDogZXh0cmFjdCB0Yi0+dGNfKiBpbnRvIGEgc2VwYXJhdGUgc3Ry
-dWN0IHRjX3RiCjI1NjVjMzJjYWIgdHJhbnNsYXRlLWFsbDogZGVmaW5lIGFuZCB1c2UgREVCVUdf
-VEJfQ0hFQ0tfR0FURQpiZThkMzg5MDNlIHRyYW5zbGF0ZS1hbGw6IGRlZmluZSBhbmQgdXNlIERF
-QlVHX1RCX0lOVkFMSURBVEVfR0FURQo1MDFjOWZjZjZlIGV4ZWMtYWxsOiBpbnRyb2R1Y2UgVEJf
-UEFHRV9BRERSX0ZNVAo0Y2M4ZWY4NjNlIHRyYW5zbGF0ZS1hbGw6IGRlZmluZSBhbmQgdXNlIERF
-QlVHX1RCX0ZMVVNIX0dBVEUKNmE2MWFkMjQ2YiBleGVjLWFsbDogYnJpbmcgdGItPmludmFsaWQg
-aW50byB0Yi0+Y2ZsYWdzCjFmYThhMzgyZWYgdGNnOiBjb25zb2xpZGF0ZSBUQiBsb29rdXBzIGlu
-IHRiX2xvb2t1cF9fY3B1X3N0YXRlCmIzNWRiZDM3ZmEgdGNnOiByZW1vdmUgYWRkciBhcmd1bWVu
-dCBmcm9tIGxvb2t1cF90Yl9wdHIKOGUwOWYxN2QyMSB0Y2cvbWlwczogY29uc3RpZnkgdGNnX3Rh
-cmdldF9jYWxsZWVfc2F2ZV9yZWdzCmM2ZjUyMDM0OGEgdGNnL2kzODY6IGNvbnN0aWZ5IHRjZ190
-YXJnZXRfY2FsbGVlX3NhdmVfcmVncwo0MWE4ZDA2MjE4IGNwdS1leGVjOiByZW5hbWUgaGF2ZV90
-Yl9sb2NrIHRvIGFjcXVpcmVkX3RiX2xvY2sgaW4gdGJfZmluZAozMjkzMTA3YjQ0IHRyYW5zbGF0
-ZS1hbGw6IG1ha2UgaGF2ZV90Yl9sb2NrIHN0YXRpYwphZDg2M2ZhYTRhIGV4ZWMtYWxsOiBmaXgg
-dHlwb3MgaW4gVHJhbnNsYXRpb25CbG9jaydzIGRvY3VtZW50YXRpb24KOGYxMGJhMmM0NiB0Y2c6
-IGZpeCBjb3JydXB0aW9uIG9mIGNvZGVfdGltZSBwcm9maWxpbmcgY291bnRlciB1cG9uIHRiX2Zs
-dXNoCjdmYjEwYTc5MmYgY3B1dGxiOiBicmluZyBiYWNrIHRsYl9mbHVzaF9jb3VudCB1bmRlciAh
-VExCX0RFQlVHCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzIwOiBjcHV0
-bGI6IGJyaW5nIGJhY2sgdGxiX2ZsdXNoX2NvdW50IHVuZGVyICFUTEJfREVCVUcuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMi8yMDogdGNnOiBmaXggY29ycnVwdGlvbiBvZiBjb2RlX3RpbWUgcHJvZmlsaW5n
-IGNvdW50ZXIgdXBvbiB0Yl9mbHVzaC4uLgpDaGVja2luZyBQQVRDSCAzLzIwOiBleGVjLWFsbDog
-Zml4IHR5cG9zIGluIFRyYW5zbGF0aW9uQmxvY2sncyBkb2N1bWVudGF0aW9uLi4uCkNoZWNraW5n
-IFBBVENIIDQvMjA6IHRyYW5zbGF0ZS1hbGw6IG1ha2UgaGF2ZV90Yl9sb2NrIHN0YXRpYy4uLgpD
-aGVja2luZyBQQVRDSCA1LzIwOiBjcHUtZXhlYzogcmVuYW1lIGhhdmVfdGJfbG9jayB0byBhY3F1
-aXJlZF90Yl9sb2NrIGluIHRiX2ZpbmQuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8yMDogdGNnL2kzODY6
-IGNvbnN0aWZ5IHRjZ190YXJnZXRfY2FsbGVlX3NhdmVfcmVncy4uLgpDaGVja2luZyBQQVRDSCA3
-LzIwOiB0Y2cvbWlwczogY29uc3RpZnkgdGNnX3RhcmdldF9jYWxsZWVfc2F2ZV9yZWdzLi4uCkNo
-ZWNraW5nIFBBVENIIDgvMjA6IHRjZzogcmVtb3ZlIGFkZHIgYXJndW1lbnQgZnJvbSBsb29rdXBf
-dGJfcHRyLi4uCkNoZWNraW5nIFBBVENIIDkvMjA6IHRjZzogY29uc29saWRhdGUgVEIgbG9va3Vw
-cyBpbiB0Yl9sb29rdXBfX2NwdV9zdGF0ZS4uLgpDaGVja2luZyBQQVRDSCAxMC8yMDogZXhlYy1h
-bGw6IGJyaW5nIHRiLT5pbnZhbGlkIGludG8gdGItPmNmbGFncy4uLgpDaGVja2luZyBQQVRDSCAx
-MS8yMDogdHJhbnNsYXRlLWFsbDogZGVmaW5lIGFuZCB1c2UgREVCVUdfVEJfRkxVU0hfR0FURS4u
-LgpDaGVja2luZyBQQVRDSCAxMi8yMDogZXhlYy1hbGw6IGludHJvZHVjZSBUQl9QQUdFX0FERFJf
-Rk1ULi4uCkNoZWNraW5nIFBBVENIIDEzLzIwOiB0cmFuc2xhdGUtYWxsOiBkZWZpbmUgYW5kIHVz
-ZSBERUJVR19UQl9JTlZBTElEQVRFX0dBVEUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvMjA6IHRyYW5z
-bGF0ZS1hbGw6IGRlZmluZSBhbmQgdXNlIERFQlVHX1RCX0NIRUNLX0dBVEUuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMTUvMjA6IGV4ZWMtYWxsOiBleHRyYWN0IHRiLT50Y18qIGludG8gYSBzZXBhcmF0ZSBz
-dHJ1Y3QgdGNfdGIuLi4KQ2hlY2tpbmcgUEFUQ0ggMTYvMjA6IHRjaTogbW92ZSB0Y2lfcmVncyB0
-byB0Y2dfcWVtdV90Yl9leGVjJ3Mgc3RhY2suLi4KQ2hlY2tpbmcgUEFUQ0ggMTcvMjA6IHRjZzog
-dGFrZSAuaGVscGVycyBvdXQgb2YgVENHQ29udGV4dC4uLgpDaGVja2luZyBQQVRDSCAxOC8yMDog
-dXRpbDogbW92ZSBxZW11X3JlYWxfaG9zdF9wYWdlX3NpemUvbWFzayB0byBvc2RlcC5oLi4uCkNo
-ZWNraW5nIFBBVENIIDE5LzIwOiB0Y2c6IGRlZmluZSBUQ0dfSElHSFdBVEVSLi4uCkNoZWNraW5n
-IFBBVENIIDIwLzIwOiB0Y2cvbWlwczogZGVsZXRlIGNvbW1lbnRlZCBvdXQgZXh0ZXJuIGtleXdv
-cmQuLi4uCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMyMjog
-RklMRTogdGNnL21pcHMvdGNnLXRhcmdldC5pbmMuYzozOToKK2ludCBsaW5rX2Vycm9yKHZvaWQp
-OwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
-Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
-b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
-ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On 10/09/2017 06:48 AM, Peter Maydell wrote:
+> Implement the SG instruction, which we emulate 'by hand' in the
+> exception handling code path.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/helper.c | 132 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 127 insertions(+), 5 deletions(-)
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
