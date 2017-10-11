@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e2Ams-00089n-5j
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 02:46:39 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e2B1S-0002fI-GG
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:01:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e2Amp-0004Lv-2a
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 02:46:38 -0400
-Date: Wed, 11 Oct 2017 17:41:23 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171011064123.GE10496@umbus.fritz.box>
-References: <20171009154930.29095-1-clg@kaod.org>
-	<20171009154930.29095-2-clg@kaod.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="hwvH6HDNit2nSK4j"
-Content-Disposition: inline
-In-Reply-To: <20171009154930.29095-2-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] target/ppc: export
- ppc_cpu_pvr_match() helper
+	(envelope-from <kraxel@redhat.com>) id 1e2B1P-0003OJ-BC
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:01:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43092)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e2B1P-0003Mj-4W
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 03:01:39 -0400
+Message-ID: <1507705293.31518.7.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 11 Oct 2017 09:01:33 +0200
+In-Reply-To: <20171010142706.360019aa@t450s.home>
+References: <20171010140334.8231-1-kraxel@redhat.com>
+	<20171010140334.8231-7-kraxel@redhat.com>
+	<20171010142706.360019aa@t450s.home>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RfC PATCH 6/6] vfio/display: add dmabuf support
+ (v15)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,93 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, Tina Zhang <tina.zhang@intel.com>, intel-gvt-dev@lists.freedesktop.org
 
+  Hi,
 
---hwvH6HDNit2nSK4j
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Looks pretty straight forward otherwise.=C2=A0=C2=A0I like the LRU dmab=
+uf
+> freeing, but is it mostly for validating the interface?=C2=A0=C2=A0My
+> impression
+> is that we'd reach a steady state with a single plane and single
+> cursor so I wonder if keeping that cache really provides a noticeable
+> benefit.
 
-On Mon, Oct 09, 2017 at 05:49:27PM +0200, C=E9dric Le Goater wrote:
-> It will be used to test the family of a CPU.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+Really depends on what the guest is doing.  I didn't do too much
+testing with various cache sizes and guests yet.
 
-I don't think this is useful, see comments on later patches.
+> =C2=A0=C2=A0Perhaps for a Linux guest switching between vt and graphics
+> mode?
 
-> ---
->  include/hw/ppc/ppc.h | 1 +
->  target/ppc/machine.c | 5 +++--
->  2 files changed, 4 insertions(+), 2 deletions(-)
->=20
-> diff --git a/include/hw/ppc/ppc.h b/include/hw/ppc/ppc.h
-> index 4e7fe110d67b..01e32fa03d2e 100644
-> --- a/include/hw/ppc/ppc.h
-> +++ b/include/hw/ppc/ppc.h
-> @@ -107,4 +107,5 @@ enum {
->  void ppc_booke_timers_init(PowerPCCPU *cpu, uint32_t freq, uint32_t flag=
-s);
-> =20
->  void ppc_cpu_parse_features(const char *cpu_model);
-> +bool ppc_cpu_pvr_match(PowerPCCPU *cpu, uint32_t pvr);
->  #endif
-> diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-> index 384caee800e6..6085a8c25fd3 100644
-> --- a/target/ppc/machine.c
-> +++ b/target/ppc/machine.c
-> @@ -4,6 +4,7 @@
->  #include "exec/exec-all.h"
->  #include "hw/hw.h"
->  #include "hw/boards.h"
-> +#include "hw/ppc/ppc.h"
->  #include "sysemu/kvm.h"
->  #include "helper_regs.h"
->  #include "mmu-hash64.h"
-> @@ -210,7 +211,7 @@ static int cpu_pre_save(void *opaque)
->   * between sufficiently similar PVRs, as determined by the CPU class's
->   * pvr_match() hook.
->   */
-> -static bool pvr_match(PowerPCCPU *cpu, uint32_t pvr)
-> +bool ppc_cpu_pvr_match(PowerPCCPU *cpu, uint32_t pvr)
->  {
->      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
-> =20
-> @@ -247,7 +248,7 @@ static int cpu_post_load(void *opaque, int version_id)
->      } else
->  #endif
->      {
-> -        if (!pvr_match(cpu, env->spr[SPR_PVR])) {
-> +        if (!ppc_cpu_pvr_match(cpu, env->spr[SPR_PVR])) {
->              return -1;
->          }
->      }
+fbcon/vt is one dmabuf.  xorg I have seen using multiple primary plane
+dma-bufs, dunno why, doesn't change often.  wayland does page-flipping
+on each rendered frame, which translates to very frequent dma-buf
+changes and I expect the caching will pay off here.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+cursor dma-buf with xorg changes each time the cursor shape changes.
 
---hwvH6HDNit2nSK4j
-Content-Type: application/pgp-signature; name="signature.asc"
+> =C2=A0=C2=A0It also seems like the primary and cursor will be fighting =
+for
+> the head of the list, so if we keep lists, maybe they should be per
+> plane type.
 
------BEGIN PGP SIGNATURE-----
+Makes sense indeed.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlndvRMACgkQbDjKyiDZ
-s5KJxxAAqeWc4lZFLsTIgQ2e2DK9OReOwCYYCuSxZafGa1L522UNGwoL9J/GwCBn
-iB7xwE/fOauUo3/8AxioEZPl9Xqz5/XyV6eAd05lqA6X3/3w6ymd2KZhm3sTCkPq
-Mo6rhe90/S02rcLUQVu2jkBpaFP7BeOWaKWJ48BwPBlN6QyE5ooosjo8D3V+ZL4x
-demn9wMXa4V1R85GpoTWGZO8XuaMXxZtamisx5gZed4Jqvea4ozEFQSn+Qky/ubO
-I21gM8YciFq4QPQ6uizuds5/xEfPDB2i2Juj/8S2UUl3IP+J80rVsDDGrftOcksR
-zxlEVRj+vlousQU/vpiyGQfIwlR7NbaV6bNdYb59nHF4VTOEs8bvvF4ldao7Ipmh
-WrZzfqUP2cYJ+pF9oH5ySzErIJkMn5McAA0p13EEwREO4payNpE9pHFkCfLYlUL/
-8XePGVZpxaEG3aSce/GEyfqDDcmONHvwTylGFU8VZBTXPeMIGRVoDnZaL7LQiQnr
-+QmDlLAdcC+bAzz+e79kxmv5MmX9jMCWNvTKXvO0lmP+Q/pSOB3M/0g5Qil6sISf
-l4h03rbc/rkeTter8kt/ZkZ09zGR7F1CT2m1evoasN6E7Or66gJhwRuXqka4hpK9
-MSGU/vj1EWEtS1jbYW55NVy3xf7Y+qTV/bGDUUpu603zOnQifV4=
-=L9nQ
------END PGP SIGNATURE-----
+> This uses the x-display option for now, how do we move past that to
+> get
+> automatic configuration?
 
---hwvH6HDNit2nSK4j--
+I think a OnOffAuto display property would be the best choice.
+
+cheers,
+  Gerd
