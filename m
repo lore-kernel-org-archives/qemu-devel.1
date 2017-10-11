@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e2NFC-00032Y-FY
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 16:04:44 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1e2NTX-0006M9-PM
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 16:19:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e2NF7-0006Gp-Fj
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 16:04:42 -0400
-Received: from mail-wm0-f49.google.com ([74.125.82.49]:54370)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e2NF7-0006G0-9A
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 16:04:37 -0400
-Received: by mail-wm0-f49.google.com with SMTP id i124so7921421wmf.3
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 13:04:37 -0700 (PDT)
-References: <20171010174403.24660-1-martin@schrodt.org>
-	<d4647fac-4dbe-7f31-d03c-d8c4e8fcfbad@redhat.com>
-	<d853c85d-d59a-a65c-d672-f6dc6cdd15be@schrodt.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bcd43c04-84fa-36f0-ab14-3131a519c9b7@redhat.com>
-Date: Wed, 11 Oct 2017 22:04:33 +0200
+	(envelope-from <sstabellini@kernel.org>) id 1e2NTT-0002Lp-P3
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 16:19:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34100)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1e2NTT-0002Kn-Iq
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 16:19:27 -0400
+Date: Wed, 11 Oct 2017 13:19:25 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <20171011154718.GQ1771@perard.uk.xensource.com>
+Message-ID: <alpine.DEB.2.10.1710111309400.3105@sstabellini-ThinkPad-X260>
+References: <1506437019-17946-1-git-send-email-owen.smith@citrix.com>
+	<1506437019-17946-4-git-send-email-owen.smith@citrix.com>
+	<20171002170132.GA2116@perard.uk.xensource.com>
+	<alpine.DEB.2.10.1710101651560.3105@sstabellini-ThinkPad-X260>
+	<20171011154718.GQ1771@perard.uk.xensource.com>
 MIME-Version: 1.0
-In-Reply-To: <d853c85d-d59a-a65c-d672-f6dc6cdd15be@schrodt.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Several fixes for the Pulse Audio driver,
- and the HDA device.
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH 3/3 v4] xenfb: Add
+ [feature|request]-raw-pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,92 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Martin Schrodt <martin@schrodt.org>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+To: Anthony PERARD <anthony.perard@citrix.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Owen Smith <owen.smith@citrix.com>, kraxel@redhat.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
 
-On 10/10/2017 20:32, Martin Schrodt wrote:
-> These 3 here are only paaudio.c
+On Wed, 11 Oct 2017, Anthony PERARD wrote:
+> On Tue, Oct 10, 2017 at 04:52:48PM -0700, Stefano Stabellini wrote:
+> > On Mon, 2 Oct 2017, Anthony PERARD wrote:
+> > > On Tue, Sep 26, 2017 at 02:43:39PM +0000, Owen Smith wrote:
+> > > > Writes "feature-raw-pointer" during init to indicate the backend
+> > > > can pass raw unscaled values for absolute axes to the frontend.
+> > > > Frontends set "request-raw-pointer" to indicate the backend should
+> > > > not attempt to scale absolute values to console size.
+> > > > "request-raw-pointer" is only valid if "request-abs-pointer" is
+> > > > also set. Raw unscaled pointer values are in the range [0, 0x7fff]
+> > > > 
+> > > > Signed-off-by: Owen Smith <owen.smith@citrix.com>
+> > > 
+> > > Hi Owen,
+> > > 
+> > > Why did you remove the following from the commit description?
+> > > > "feature-raw-pointer" and "request-raw-pointer" added to Xen
+> > > > header in commit 7868654ff7fe5e4a2eeae2b277644fa884a5031e
+> > > 
+> > > I think that with it, you could have kept stefano's reviewed-by tag.
+> > 
+> > Hi Anthony,
+> > 
+> > Have you tested this series with a few of different guests? Do you
+> > consider it safe to merge? If so, we can send it upstream (either via
+> > xen or via ui as Gerd kindly offered). 
 > 
-> - Remove PA reader/writer threads from paaudio.c, and do IO from the
-> audio timer directly.
-> - Expose new configurable settings, such as TLENGTH and FRAGSIZE, plus
-> settings to
->   enable PA_STREAM_ADJUST_LATENCY for input and output device separately.
-> - Fix the input delay when first using the input device.
+> Yes, I think it's fine.
 > 
-> and cannot really be separated, unfortunately.
+> The only observation I have is that on a Linux guest, when I have
+> usbdevice=tablet, with this series the pv mouse seems to become the
+> primary way of gueting mouse events (without, the tablet is primary).
+> So, on my VNC client instead of having both mouse in the guest and on my
+> desktop being at the same place, there is like a zoom of the mouse (the
+> zoom centered on the top-left corner). (That's better than relative
+> mouse event that we can get with the emulation.)
 
-Sure they can! :)  This can actually be a good occasion to learn more of
-git.  Say you have this large patch in branch qemu-audio-v1, you can now do
+Thanks for testing. I am not completely sure about what should be the
+right behavior when both usbdevice=tablet and pvmouse are present.
+Typically, PV devices take precedence over emulated devices, so maybe
+it is OK that PV mouse is the primary device in this case.
 
-   git checkout -b qemu-audio-v2 qemu-audio-v1^
-   git checkout qemu-audio-v1 -- .
-   git reset
+But we would need to document this behavioral change in the commit
+descriptions.
 
-This will create a branch *without* the patch, while putting the files
-*with* the patch in your working tree.
-
-Now you can add your changes gradually to the staging area of git (it is
-called the "index"):
-
-  git add -p
-
-This command will ask you interactively about staging each separate
-hunk, for files that git already tracks.  When done, you can run
-
-  git diff --staged
-
-to show the diff that is staged for commit.  And also
-
-  git diff
-
-to show the diff that is not staged yet.
-
-If you are happy with the staged changes, run:
-
-  git stash --keep-index
-
-and test them.  If there is a problem, fix it.  Then type
-
-  git commit -a -s
-
-to commit the staged changes to your local branch called qemu-audio-v2
-(write a good commit message now that the commit is fresh in your mind!).
-
-Now get back to the full changes:
-
- git checkout qemu-audio-v1 -- .
- git reset
-
-and restart from the "git add -p" step to get the next part of your
-patch.  Remember, each single one of your patches must build and runs
-(implementing the next logical step in the feature), and at the last
-patch, the feature is complete.
-
-Now format the patches as email messages, and send them to the list.
-Standing in the root of your QEMU directory, run the following:
-
-git fetch origin
-rm -f -- *.patch
-git format-patch --cover-letter --subject-prefix="PATCH v2" \
-  origin/master..
-
-This command will generate an email file for each one of your commits.
-The patch files will be numbered. The file numbered 0000 is a cover
-letter, which you should edit in-place:
-
-* in the Subject: line, summarize the goal of your series,
-
-* in the message body, describe the changes on a broad level.
-
-Now it's time to mail-bomb the list.  You have already used git
-send-email here so I won't get into further detail.
-
-(Loosely based on
-https://github.com/tianocore/tianocore.github.io/wiki/Laszlo's-unkempt-git-guide-for-edk2-contributors-and-maintainers)
-
-Thanks,
-
-Paolo
-
-> The third one is really only a consequence of the removal of the
-> additional audio thread.
+The other question is whether the "zoom of the mouse" you are seeing is
+normal or whether we can "fix" it somehow. I guess it has always been
+the case for PV mouse? It is not something new, is it?
