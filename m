@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2Mym-00007x-CU
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 15:47:46 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e2NEx-0002wg-4y
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 16:04:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2Myj-00039T-A9
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 15:47:44 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49924
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <no-reply@patchew.org>) id 1e2NEs-000679-Q5
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 16:04:27 -0400
+Resent-Message-Id: <E1e2NEs-000679-Q5@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21493)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e2Myj-000392-3n
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 15:47:41 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9BJiIeS086438
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 15:47:37 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dhnt8367m-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 15:47:37 -0400
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Wed, 11 Oct 2017 15:47:36 -0400
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Wed, 11 Oct 2017 15:47:29 -0400
-Message-Id: <1507751249-3035-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v3] tpm: Use EMSGSIZE instead of EBADMSG to
- compile on OpenBSD
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e2NEs-00065b-Jl
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 16:04:22 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150775221993.288.12729708245081503434@b58463cdfd5f>
+In-Reply-To: <20171011191317.24157-1-dgilbert@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 11 Oct 2017 13:03:40 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/7] migration: pause-before-device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,60 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, amarnath.valluri@intel.com, marcandre.lureau@gmail.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: dgilbert@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, jdenemar@redhat.com, wangjie88@huawei.com, quintela@redhat.com, peterx@redhat.com, mreitz@redhat.com, fuweiwei2@huawei.com
 
-EBADMSG was only added to OpenBSD very recently. To make QEMU compilable
-on older OpenBSD versions use EMSGSIZE instead when a mismatch between
-number of received bytes and message size indicated in the header was
-found.
-
-Return -EMSGSIZE and convert all other errnos in the same functions to
-return the negative errno.
-
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
----
- hw/tpm/tpm_util.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
-index fb929f6..73d7796 100644
---- a/hw/tpm/tpm_util.c
-+++ b/hw/tpm/tpm_util.c
-@@ -68,10 +68,10 @@ static int tpm_util_test(int fd,
- 
-     n = write(fd, request, requestlen);
-     if (n < 0) {
--        return errno;
-+        return -errno;
-     }
-     if (n != requestlen) {
--        return EFAULT;
-+        return -EFAULT;
-     }
- 
-     FD_ZERO(&readfds);
-@@ -80,18 +80,18 @@ static int tpm_util_test(int fd,
-     /* wait for a second */
-     n = select(fd + 1, &readfds, NULL, NULL, &tv);
-     if (n != 1) {
--        return errno;
-+        return -errno;
-     }
- 
-     n = read(fd, &buf, sizeof(buf));
-     if (n < sizeof(struct tpm_resp_hdr)) {
--        return EFAULT;
-+        return -EFAULT;
-     }
- 
-     resp = (struct tpm_resp_hdr *)buf;
-     /* check the header */
-     if (be32_to_cpu(resp->len) != n) {
--        return EBADMSG;
-+        return -EMSGSIZE;
-     }
- 
-     *return_tag = be16_to_cpu(resp->tag);
--- 
-2.5.5
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcxMDExMTkxMzE3LjI0MTU3LTEtZGdpbGJlcnRAcmVkaGF0LmNvbQpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvN10gbWlncmF0aW9uOiBwYXVzZS1iZWZvcmUtZGV2
+aWNlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
+CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2Ug
+JEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0gg
+JG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdp
+dCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
+YmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0k
+KChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
+aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczov
+L2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAg
+ICAgcGF0Y2hldy8xNTA3NzQyNjc2LTk5MDgtMS1naXQtc2VuZC1lbWFpbC1wZXRlci5tYXlkZWxs
+QGxpbmFyby5vcmcgLT4gcGF0Y2hldy8xNTA3NzQyNjc2LTk5MDgtMS1naXQtc2VuZC1lbWFpbC1w
+ZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hl
+dy8xNTA3NzUxMjQ5LTMwMzUtMS1naXQtc2VuZC1lbWFpbC1zdGVmYW5iQGxpbnV4LnZuZXQuaWJt
+LmNvbSAtPiBwYXRjaGV3LzE1MDc3NTEyNDktMzAzNS0xLWdpdC1zZW5kLWVtYWlsLXN0ZWZhbmJA
+bGludXgudm5ldC5pYm0uY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKODhkZGNk
+ZTgyZiBtaWdyYXRpb246IHBhdXNlLWJlZm9yZS1kZXZpY2UgZm9yIHBvc3Rjb3B5CjM0MTQzM2Qx
+OWIgbWlncmF0aW9uOiBhbGxvdyBjYW5jZWwgdG8gdW5wYXVzZQo0YTc2ZmJjMmIyIG1pZ3JhdGU6
+IEhNUCBtaWdhdGVfY29udGludWUKMjQzMDU0NzdlMCBtaWdyYXRpb246IG1pZ3JhdGUtY29udGlu
+dWUKZmM0OGFmNjQyYyBtaWdyYXRpb246IFdhaXQgZm9yIHNlbWFwaG9yZSBiZWZvcmUgY29tcGxl
+dGluZyBtaWdyYXRpb24KMjYzZTZkYzViZSBtaWdyYXRpb246IEFkZCAncGF1c2UtYmVmb3JlLWRl
+dmljZScgYW5kICdkZXZpY2UnIHN0YXR1c2VzCjc4MjdjMjUxMzIgbWlncmF0aW9uOiBBZGQgJ3Bh
+dXNlLWJlZm9yZS1kZXZpY2UnIGNhcGFiaWxpdHkKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
+aW5nIFBBVENIIDEvNzogbWlncmF0aW9uOiBBZGQgJ3BhdXNlLWJlZm9yZS1kZXZpY2UnIGNhcGFi
+aWxpdHkuLi4KQ2hlY2tpbmcgUEFUQ0ggMi83OiBtaWdyYXRpb246IEFkZCAncGF1c2UtYmVmb3Jl
+LWRldmljZScgYW5kICdkZXZpY2UnIHN0YXR1c2VzLi4uCkNoZWNraW5nIFBBVENIIDMvNzogbWln
+cmF0aW9uOiBXYWl0IGZvciBzZW1hcGhvcmUgYmVmb3JlIGNvbXBsZXRpbmcgbWlncmF0aW9uLi4u
+CkVSUk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRzIHNob3VsZCBiZSBvbiBuZXh0IGxpbmUKIzQ1OiBG
+SUxFOiBtaWdyYXRpb24vbWlncmF0aW9uLmM6MTk5NToKKyAgICB3aGlsZSAocWVtdV9zZW1fdGlt
+ZWR3YWl0KCZzLT5wYXVzZV9zZW0sIDEpID09IDApOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVj
+ZXNzYXJ5IGV2ZW4gZm9yIHNpbmdsZSBzdGF0ZW1lbnQgYmxvY2tzCiM0NTogRklMRTogbWlncmF0
+aW9uL21pZ3JhdGlvbi5jOjE5OTU6CisgICAgd2hpbGUgKHFlbXVfc2VtX3RpbWVkd2FpdCgmcy0+
+cGF1c2Vfc2VtLCAxKSA9PSAwKTsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgODAgbGlu
+ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tp
+bmcgUEFUQ0ggNC83OiBtaWdyYXRpb246IG1pZ3JhdGUtY29udGludWUuLi4KQ2hlY2tpbmcgUEFU
+Q0ggNS83OiBtaWdyYXRlOiBITVAgbWlnYXRlX2NvbnRpbnVlLi4uCkNoZWNraW5nIFBBVENIIDYv
+NzogbWlncmF0aW9uOiBhbGxvdyBjYW5jZWwgdG8gdW5wYXVzZS4uLgpDaGVja2luZyBQQVRDSCA3
+Lzc6IG1pZ3JhdGlvbjogcGF1c2UtYmVmb3JlLWRldmljZSBmb3IgcG9zdGNvcHkuLi4KPT09IE9V
+VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
+XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5v
+cmc=
