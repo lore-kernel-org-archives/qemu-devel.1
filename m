@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1e269p-0003Pf-8S
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 21:50:02 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e26SH-0005OE-CZ
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 22:09:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1e269k-0000tq-DV
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 21:50:01 -0400
-Received: from mga14.intel.com ([192.55.52.115]:57705)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1e269k-0000rn-4z
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 21:49:56 -0400
-Message-ID: <59DD7932.3070106@intel.com>
-Date: Wed, 11 Oct 2017 09:51:46 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <no-reply@patchew.org>) id 1e26SD-0001ny-DA
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 22:09:05 -0400
+Resent-Message-Id: <E1e26SD-0001ny-DA@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21418)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e26SD-0001nT-68
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 22:09:01 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150768138469.285.11137026035130397652@b58463cdfd5f>
+In-Reply-To: <20171010213608.31567-1-ppandit@redhat.com>
 MIME-Version: 1.0
-References: <1506744354-20979-4-git-send-email-wei.w.wang@intel.com>	<20171009181612-mutt-send-email-mst@kernel.org>	<59DC76BA.7070202@intel.com>	<201710102008.FIG57851.QFJLMtVOFOHFOS@I-love.SAKURA.ne.jp>	<59DCBDE9.4050404@intel.com>
-	<201710102209.DBE39528.MtFLOJQSFOFVOH@I-love.SAKURA.ne.jp>
-In-Reply-To: <201710102209.DBE39528.MtFLOJQSFOFVOH@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v16 3/5] virtio-balloon: VIRTIO_BALLOON_F_SG
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 10 Oct 2017 17:23:05 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] cirrus: keep vga vram pointer within bounds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, mst@redhat.com
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: ppandit@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, niuguoxiang@huawei.com, pjp@fedoraproject.org
 
-On 10/10/2017 09:09 PM, Tetsuo Handa wrote:
-> Wei Wang wrote:
->>> And even if we could remove balloon_lock, you still cannot use
->>> __GFP_DIRECT_RECLAIM at xb_set_page(). I think you will need to use
->>> "whether it is safe to wait" flag from
->>> "[PATCH] virtio: avoid possible OOM lockup at virtballoon_oom_notify()" .
->> Without the lock being held, why couldn't we use __GFP_DIRECT_RECLAIM at
->> xb_set_page()?
-> Because of dependency shown below.
->
-> leak_balloon()
->    xb_set_page()
->      xb_preload(GFP_KERNEL)
->        kmalloc(GFP_KERNEL)
->          __alloc_pages_may_oom()
->            Takes oom_lock
->            out_of_memory()
->              blocking_notifier_call_chain()
->                leak_balloon()
->                  xb_set_page()
->                    xb_preload(GFP_KERNEL)
->                      kmalloc(GFP_KERNEL)
->                        __alloc_pages_may_oom()
->                          Fails to take oom_lock and loop forever
-
-__alloc_pages_may_oom() uses mutex_trylock(&oom_lock).
-
-I think the second __alloc_pages_may_oom() will not continue since the
-first one is in progress.
-
->
-> By the way, is xb_set_page() safe?
-> Sleeping in the kernel with preemption disabled is a bug, isn't it?
-> __radix_tree_preload() returns 0 with preemption disabled upon success.
-> xb_preload() disables preemption if __radix_tree_preload() fails.
-> Then, kmalloc() is called with preemption disabled, isn't it?
-> But xb_set_page() calls xb_preload(GFP_KERNEL) which might sleep with
-> preemption disabled.
-
-Yes, I think that should not be expected, thanks.
-
-I plan to change it like this:
-
-bool xb_preload(gfp_t gfp)
-{
-         if (!this_cpu_read(ida_bitmap)) {
-                 struct ida_bitmap *bitmap = kmalloc(sizeof(*bitmap), gfp);
-
-                 if (!bitmap)
-                         return false;
-                 bitmap = this_cpu_cmpxchg(ida_bitmap, NULL, bitmap);
-                 kfree(bitmap);
-         }
-
-         if (__radix_tree_preload(gfp, XB_PRELOAD_SIZE) < 0)
-                 return false;
-
-         return true;
-}
-
-
-Best,
-Wei
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcxMDEwMjEzNjA4LjMxNTY3LTEtcHBhbmRpdEByZWRoYXQuY29tClN1Ympl
+Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGNpcnJ1czoga2VlcCB2Z2EgdnJhbSBwb2ludGVyIHdp
+dGhpbiBib3VuZHMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9
+YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxl
+ZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
+cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
+ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
+IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
+CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0
+Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjYyOTAwYzRiNjYgY2lycnVzOiBrZWVwIHZnYSB2
+cmFtIHBvaW50ZXIgd2l0aGluIGJvdW5kcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcg
+UEFUQ0ggMS8xOiBjaXJydXM6IGtlZXAgdmdhIHZyYW0gcG9pbnRlciB3aXRoaW4gYm91bmRzLi4u
+CkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzw8JyAoY3R4OlZ4VikKIzQwOiBG
+SUxFOiBody9kaXNwbGF5L2NpcnJ1c192Z2EuYzoyMDgxOgorICAgIG1lbW9yeV9yZWdpb25fc2V0
+X2RpcnR5KCZzLT52Z2EudnJhbSwgb2Zmc2V0LCB4PDwxKTsKICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJu
+aW5ncywgMjQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
+ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
+cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
+RVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTog
+MQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
+cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
+QGZyZWVsaXN0cy5vcmc=
