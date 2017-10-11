@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e2Kpg-0001fY-Rk
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 13:31:06 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e2KwS-0003SS-93
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 13:37:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e2Kod-0007HP-UV
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 13:30:12 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:33856)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e2Kod-0007H9-NP
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 13:29:07 -0400
-Received: by mail-qt0-x241.google.com with SMTP id y45so3311389qty.1
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 10:29:07 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171011153843.9876-1-berrange@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3c1b51df-68dd-a848-af36-cab7ef7114c3@amsat.org>
-Date: Wed, 11 Oct 2017 14:29:03 -0300
+	(envelope-from <dgilbert@redhat.com>) id 1e2KwO-0003bD-SA
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 13:37:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56079)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e2KwO-0003aY-Js
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 13:37:08 -0400
+Date: Wed, 11 Oct 2017 18:36:56 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171011173656.GD2253@work-vm>
+References: <ea8f7d8d-9f07-517f-68cd-bdc87b900fa4@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20171011153843.9876-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] io: fix mem leak in websock error path
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ea8f7d8d-9f07-517f-68cd-bdc87b900fa4@oracle.com>
+Subject: Re: [Qemu-devel] QEMU migration cancellation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,41 +26,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
+To: Jag Raman <jag.raman@oracle.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, Karl Heubaum <karl.heubaum@oracle.com>, Sunit Jain <sunit.jain@oracle.com>
 
-Hi Daniel,
+* Jag Raman (jag.raman@oracle.com) wrote:
+> Hi,
 
-On 10/11/2017 12:38 PM, Daniel P. Berrange wrote:
-> Coverity pointed out the 'date' is not free()d in the error
-> path
+Hi Jag,
+
+> I'd like to check about the behavior of a QEMU instance when live
+> migration is cancelled.
 > 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  io/channel-websock.c | 1 +
->  1 file changed, 1 insertion(+)
+> If the migration of a guest OS from source QEMU instance to destination
+> instance is cancelled, the destination instance exits with a failure
+> code. Could you please explain why this design decision was taken?
+
+There isn't really any communication of the cancellation - the source
+just stops, and the destination is left to conclude it's got an
+incomplete migration instance.
+
+> I'm wondering if it's OK to change the behavior of the destination
+> instance in this case. Would it be OK for the destination instance to
+> not exit with the failure code, and instead retry processing incoming
+> migration? I'm dealing with an internal bug report that's asking whether
+> it would make more sense for the destination process to hang around for
+> another attempt at migration than to be killed.
+
+Can you explain why you'd want that to happen in the case of a
+cancellation? I can see why you might want to do it in the event of
+a network failure (which is the case Peter is dealing with for
+postcopy);  but why after a cancellation?
+
+> We came across Peter's planned changes to migration postcopy[1] which
+> indicate that migration-cancellation is planned to be enhanced during
+> the postcopy phase. Are there any such enhancements planned for the
+> active phase as well?
+
+Not planned; as far as I know this is the first time anyone has asked
+for it;  it's probably possible to reuse some of Peter's code for it.
+Essentially you have many of the same problems, in particular you don't
+quite know how much of the data sent was actually received by the
+destination (hmm I wonder if we can modify Peter's code to allow it
+before it goes in :-)
+
+There may be some gotcha's to do with the exact point at which the
+cancellation happened (e.g. restarting after you've started serialising
+the device state may be trickier).
+
+> I'd also like to know the difference between qemu_fclose() &
+> qemu_file_shutdown(). The source instance currently uses the shutdown
+> function to terminate the connection between source & destination. But
+> it seems to disconnect the connection abruptly. Whereas fclose function
+> seems to disconnect it more gracefully. When I dug deeper, I couldn't
+> specifically tell the difference between the two. I'd like to know if I
+> could substitute the shutdown function with fclose function in
+> migrate_fd_cancel().
+
+close() closes the file descriptor and at that point it's no longer
+valid and could get reallocated.  So for example if another thread is still using it
+then the other thread (e.g. the migration thread) is suddenly trying to
+use a non-existing fd, even worse that fd could have been reallocated
+and it ends up writing migration data to a disk or network socket.
+As you say 'close' is graceful - the downside of that is that it waits
+to have sent all it's data and for some part of the TCP socket close
+to happen (I don't know the details).
+
+shutdown() doesn't deallocate the fd; it just forces all operations on
+it to error and return.  The nice part of this is that if the
+networking to the destination host has broken and you have a hung
+socket, you can still perform the shutdown(), and then restart a
+migration to a different host.    With close() you might have to wait
+10s of minutes for the TCP socket to eventually give up before erroring.
+Because it doesn't deallocate it, the migration threads just take
+the failure paths and don't do anything illegal, but just drop out
+at the end with a failed migration, whichever part of code they happened
+to have been stuck in.
+
+Dave
+
+> [1]: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg05892.html
 > 
-> diff --git a/io/channel-websock.c b/io/channel-websock.c
-> index aa35ef3274..a1c10ab719 100644
-> --- a/io/channel-websock.c
-> +++ b/io/channel-websock.c
-> @@ -355,6 +355,7 @@ static void qio_channel_websock_handshake_send_res_ok(QIOChannelWebsock *ioc,
->                              QIO_CHANNEL_WEBSOCK_GUID_LEN,
->                              &accept,
->                              errp) < 0) {
-> +        g_free(date);
-
-It looks cleaner to only call qio_channel_websock_date_str() before to
-use date, which is _after_ qcrypto_hash_base64() might fails.
-
->          qio_channel_websock_handshake_send_res_err(
->              ioc, QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_SERVER_ERR);
->          return;
-    }
-
-+   date = qio_channel_websock_date_str();
-    qio_channel_websock_handshake_send_res(
-        ioc, QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_OK, date, accept);
-
-    g_free(date);
-    g_free(accept);
-}
+> Thanks!
+> --
+> Jag
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
