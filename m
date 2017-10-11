@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e2IVn-0004m1-I9
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 11:01:32 -0400
+	(envelope-from <stefanha@redhat.com>) id 1e2Ia9-0005yL-FX
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 11:06:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e2IVi-0003Dr-2X
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 11:01:31 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:46646)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e2IVh-0003DL-SG
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 11:01:25 -0400
-Received: by mail-wm0-x233.google.com with SMTP id m72so5609171wmc.1
-	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 08:01:25 -0700 (PDT)
+	(envelope-from <stefanha@redhat.com>) id 1e2Ia5-0005lV-N2
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 11:06:01 -0400
+Date: Wed, 11 Oct 2017 16:05:45 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20171011150545.GC8121@stefanha-x1.localdomain>
+References: <20171009215533.12530-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1507732945-23555-1-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1507732945-23555-1-git-send-email-stefanb@linux.vnet.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 11 Oct 2017 16:01:03 +0100
-Message-ID: <CAFEAcA-TRT0TbkfVF7TFdGJQRWSdTaTgmyhvebfix+SSsP+a+A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] tpm: Use EMSGSIZE instead of EBADMSG to
- compile on OpenBSD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171009215533.12530-1-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3] qcow2: Fix preallocated truncation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +22,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, amarnath.valluri@intel.com, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On 11 October 2017 at 15:42, Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
-> EBADMSG was only added to OpenBSD very recently. To make QEMU compilable
-> on older OpenBSD versions use EMSGSIZE instead when a mismatch between
-> number of received bytes and message size indicated in the header was
-> found.
->
-> Return -EMSGSIZE and convert all other errnos in the same functions to
-> return the negative errno.
->
-> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> ---
->  hw/tpm/tpm_util.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
-> index fb929f6..a83c6f4 100644
-> --- a/hw/tpm/tpm_util.c
-> +++ b/hw/tpm/tpm_util.c
-> @@ -71,7 +71,7 @@ static int tpm_util_test(int fd,
->          return errno;
->      }
->      if (n != requestlen) {
-> -        return EFAULT;
-> +        return -EFAULT;
->      }
->
->      FD_ZERO(&readfds);
-> @@ -85,13 +85,13 @@ static int tpm_util_test(int fd,
->
->      n = read(fd, &buf, sizeof(buf));
->      if (n < sizeof(struct tpm_resp_hdr)) {
-> -        return EFAULT;
-> +        return -EFAULT;
->      }
->
->      resp = (struct tpm_resp_hdr *)buf;
->      /* check the header */
->      if (be32_to_cpu(resp->len) != n) {
-> -        return EBADMSG;
-> +        return -EMSGSIZE;
->      }
->
->      *return_tag = be16_to_cpu(resp->tag);
+On Mon, Oct 09, 2017 at 11:55:30PM +0200, Max Reitz wrote:
+> There are (at least...) two bugs in preallocated truncation, which this
+> series fixes.
+> 
+> Both would have been apparent if the the related iotest had used the
+> default cluster size in addition to 512 byte clusters, but alas, it did
+> not.  This is remedied by patch 3 of this series.
+> 
+> 
+> Max Reitz (3):
+>   qcow2: Fix unaligned preallocated truncation
+>   qcow2: Always execute preallocate() in a coroutine
+>   iotests: Add cluster_size=64k to 125
+> 
+>  block/qcow2.c              |  42 +++-
+>  tests/qemu-iotests/125     |   7 +-
+>  tests/qemu-iotests/125.out | 480 ++++++++++++++++++++++++++++++++++++++++-----
+>  3 files changed, 472 insertions(+), 57 deletions(-)
+> 
+> -- 
+> 2.13.6
+> 
 
-You also need to change the "return errno;" lines. "errno"
-contains positive errno values, so for a "return 0-or-negative-errno"
-convention you want "return -errno;".
-
-thanks
--- PMM
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
