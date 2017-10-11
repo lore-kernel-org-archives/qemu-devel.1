@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e2JGj-0006dx-9p
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 11:50:05 -0400
+	(envelope-from <stefanha@gmail.com>) id 1e2JIY-0007Rp-Nn
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 11:51:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e2JGf-0002KH-De
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 11:50:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43000)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e2JGf-0002Ip-3t
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 11:49:57 -0400
-Date: Wed, 11 Oct 2017 16:49:51 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171011154951.GA6163@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171011083604.11820-1-kraxel@redhat.com>
-	<CAFEAcA9uXw7XYOBu9cKY+B=OWNbS=cRp7BKcXacLTaRLx9RWdA@mail.gmail.com>
+	(envelope-from <stefanha@gmail.com>) id 1e2JIU-0003gy-Rz
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 11:51:54 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:52192)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1e2JIU-0003fg-KB
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 11:51:50 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id f4so6126074wme.0
+	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 08:51:49 -0700 (PDT)
+Date: Wed, 11 Oct 2017 16:51:46 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171011155146.GE8121@stefanha-x1.localdomain>
+References: <150737816601.1214.11131017369010701335.malonedeb@chaenomeles.canonical.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA9uXw7XYOBu9cKY+B=OWNbS=cRp7BKcXacLTaRLx9RWdA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/10] Ui 20171011 patches
+In-Reply-To: <150737816601.1214.11131017369010701335.malonedeb@chaenomeles.canonical.com>
+Subject: Re: [Qemu-devel] [Bug 1721952] [NEW] Network issue above 2.5.1.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,113 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Bug 1721952 <1721952@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org, Joan Moreau <jom@grosjo.net>
 
-On Wed, Oct 11, 2017 at 03:37:08PM +0100, Peter Maydell wrote:
-> On 11 October 2017 at 09:35, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> > The following changes since commit 567d0a19c7998fa366598b83d5a6e5f0759d3ea9:
-> >
-> >   Merge remote-tracking branch 'remotes/ehabkost/tags/x86-and-machine-pull-request' into staging (2017-10-10 13:25:46 +0100)
-> >
-> > are available in the git repository at:
-> >
-> >   git://git.kraxel.org/qemu tags/ui-20171011-pull-request
-> >
-> > for you to fetch changes up to 92328b7104ffc825f10c33f3fd1866e940a523f7:
-> >
-> >   ui/gtk: Fix deprecation of vte_terminal_copy_clipboard (2017-10-11 10:03:31 +0200)
-> >
-> > ----------------------------------------------------------------
-> > ui: use keycodemapdb for key code mappings, part one (v2)
-> > ui: add qemu-keymap, update reverse keymaps (for qemu -k $map)
-> > ui: fix for vte 0.50
-> >
-> > ----------------------------------------------------------------
+On Sat, Oct 07, 2017 at 12:09:25PM -0000, Joan Moreau via Qemu-devel wrote:
+> WHen running a QEMU guest (Windows7) on a linux x86-64 server, the network stops working after some time for any version above 2.5.1.1
 > 
-> Build failures:
+> In 2.5.1.1, all is fine (no issue with network)
+> Any version ablve (trying 2.10.1 now), the application in windows stops accessing the internet after a while
 > 
-> NetBSD:
->   CC      ui/input-keymap.o
-> /root/qemu/ui/input-keymap.c:8:44: fatal error:
-> ui/input-keymap-linux-to-qcode.c: No such file or directory
->  #include "ui/input-keymap-linux-to-qcode.c"
->                                             ^
+> THis is my starting line:
+> /usr/bin/qemu-system-x86_64 -machine pc-i440fx-1.7,accel=kvm -usb -usbdevice tablet -usbdevice keyboard -enable-kvm -cpu core2duo -smp 2 -drive file=winpro.qcow,index=0,media=disk,format=qco
+> w2 -m 4096 -vga vmware -vnc :3 -k en-us -device e1000,netdev=nic1 -netdev user,id=nic1,smb=/data/vps/files/,hostfwd=tcp::10053-:10053,hostfwd=tcp::3387-:3389 -rtc base=utc,clock=host -daemon
+> ize
 > 
-> FreeBSD:
-> 
-> 
->   CC      ui/input-keymap.o
-> /root/qemu/ui/input-keymap.c:8:10: fatal error:
-> 'ui/input-keymap-linux-to-qcode.c' file not found
-> #include "ui/input-keymap-linux-to-qcode.c"
->          ^
+> Thisis my configure line:
+> ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --enable-kvm --disable-gtk --disable-xen --disable-user --enable-vnc-sasl --disable-libusb --disable-debug-info --disable-spi
+> ce --enable-lzo --enable-pie --disable-werror --enable-linux-aio --enable-vhost-net --disable-tcmalloc --enable-vde --enable-nettle --disable-smartcard --enable-curl
 
-So something is still racing in these two.
+Does tcpdump on the host show outgoing connections to an external IP
+address (not a domain name)?  For example, try opening to
+http://172.99.69.163/ from inside the guest and check that there is a
+TCP SYN packet sent from the host to 172.99.69.163.
 
-I don't suppose you have the full log - interested if it
-ever run the "GIT     ui/keycodemapdb dtc" rule and/or
-re-ran configure earlier, or if this is literally all it
-did ?
+Do the hostfwd ports still work while internet access is down?
 
-> 
-> OpenBSD:
-> 
-> gmake: Entering directory '/home/qemu/build/all'
-> /bin/sh: ./scripts/git-submodule.sh: No such file or directory
-> gmake: Leaving directory '/home/qemu/build/all'
-> gmake: Entering directory '/home/qemu/build/all'
->   GIT
-> /bin/sh: ./scripts/git-submodule.sh: No such file or directory
-> gmake: *** [Makefile:30: git-submodule-update] Error 1
-> gmake: Leaving directory '/home/qemu/build/all'
-> gmake: *** Waiting for unfinished jobs....
-> gmake: Entering directory '/home/qemu/build/all'
-> config-host.mak is out-of-date, running configure
-> Install prefix    /usr/local
-> [configure output snipped]
-> gmake: Leaving directory '/home/qemu/build/all'
-> 
-> AArch32 Linux:
-> 
-> make: Entering directory '/home/peter.maydell/qemu/build/all-a32'
-> config-host.mak is out-of-date, running configure
-> Install prefix    /usr/local
-> BIOS directory    /usr/local/share/qemu
-> [...]
-> VxHS block device no
->   GEN     config-host.h
->   GEN     module_block.h
->   GEN     ui/input-keymap-linux-to-qcode.c
->   GEN     ui/input-keymap-qcode-to-qnum.c
->   GEN     ui/input-keymap-qnum-to-qcode.c
->   GIT     ui/keycodemapdb dtc
->   GEN     trace/generated-tcg-tracers.h
->   GEN     trace/generated-helpers-wrappers.h
->   GEN     trace/generated-helpers.h
->   GEN     trace/generated-helpers.c
-> Makefile:30: recipe for target 'git-submodule-update' failed
-
-Damn, we should not throw away stderr in scripts/git-submodule.sh,
-as its hides whatever error occurred for you here.
-
-> make: *** [git-submodule-update] Error 128
-> make: *** Waiting for unfinished jobs....
-> make: Leaving directory '/home/peter.maydell/qemu/build/all-a32'
-> 
-> 
-> The OpenBSD failure is because make now tries to run a
-> script that uses #!/bin/bash, and this machine doesn't
-> have bash installed. Do we really need to add bash to
-> our build-dependencies? The script doesn't seem like it's
-> doing anything that critically requires bash...
-
-Yeah, that's easily replacable with /bin/sh
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Stefan
