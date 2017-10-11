@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e2M64-0006IS-LW
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 14:51:13 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e2M67-0006Ka-Ve
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 14:51:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e2M61-0000ee-JO
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 14:51:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57116)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e2M61-0000dR-Dh
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 14:51:09 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e2M66-0000kV-V5
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 14:51:16 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Wed, 11 Oct 2017 15:50:58 -0300
-Message-Id: <20171011185103.26259-1-ehabkost@redhat.com>
+Date: Wed, 11 Oct 2017 15:50:59 -0300
+Message-Id: <20171011185103.26259-2-ehabkost@redhat.com>
+In-Reply-To: <20171011185103.26259-1-ehabkost@redhat.com>
+References: <20171011185103.26259-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/5] Python queue, 2017-10-11
+Subject: [Qemu-devel] [PULL 1/5] iotests: Set up Python logging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +23,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Cleber Rosa <crosa@redhat.com>
+Cc: Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-The following changes since commit bac960832015bf4c4c1b873011612e2675e446=
-4c:
+Set up Python logging module instead of relying on
+QEMUMachine._debug to enable debugging messages.
 
-  Merge remote-tracking branch 'remotes/elmarco/tags/vus-pull-request' in=
-to staging (2017-10-11 13:10:36 +0100)
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20170927130339.21444-3-ehabkost@redhat.com>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Reviewed-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ tests/qemu-iotests/iotests.py | 3 +++
+ 1 file changed, 3 insertions(+)
 
-are available in the git repository at:
-
-  git://github.com/ehabkost/qemu.git tags/python-next-pull-request
-
-for you to fetch changes up to 1a6d3757107181dc0b9baf3dd8ff40fb2a242b66:
-
-  scripts: Remove debug parameter from QEMUMachine (2017-10-11 15:15:17 -=
-0300)
-
-----------------------------------------------------------------
-Python queue, 2017-10-11
-
-----------------------------------------------------------------
-
-Eduardo Habkost (5):
-  iotests: Set up Python logging
-  basevm: Call logging.basicConfig()
-  guestperf: Configure logging on all shell frontends
-  scripts: Remove debug parameter from QEMUMonitorProtocol
-  scripts: Remove debug parameter from QEMUMachine
-
- scripts/qemu.py                     |  9 +++------
- scripts/qmp/qmp.py                  | 16 +++++++---------
- tests/migration/guestperf/engine.py |  6 ++----
- tests/migration/guestperf/shell.py  | 13 +++++++++++++
- tests/qemu-iotests/iotests.py       |  5 +++--
- tests/vm/basevm.py                  |  4 ++--
- 6 files changed, 30 insertions(+), 23 deletions(-)
-
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
+y
+index 1af117e37d..36a7757aaf 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -28,6 +28,7 @@ import qtest
+ import struct
+ import json
+ import signal
++import logging
+=20
+=20
+ # This will not work if arguments contain spaces but is necessary if we
+@@ -467,6 +468,8 @@ def main(supported_fmts=3D[], supported_oses=3D['linu=
+x']):
+     else:
+         output =3D StringIO.StringIO()
+=20
++    logging.basicConfig(level=3D(logging.DEBUG if debug else logging.WAR=
+N))
++
+     class MyTestRunner(unittest.TextTestRunner):
+         def __init__(self, stream=3Doutput, descriptions=3DTrue, verbosi=
+ty=3Dverbosity):
+             unittest.TextTestRunner.__init__(self, stream, descriptions,=
+ verbosity)
 --=20
 2.13.6
