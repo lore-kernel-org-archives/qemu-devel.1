@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e2Fnr-0001Ru-8p
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 08:08:05 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e2FqQ-0002q3-UN
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 08:10:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e2Fnm-0003FX-9H
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 08:07:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47808)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e2Fnm-0003EO-2s
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 08:07:54 -0400
-Date: Wed, 11 Oct 2017 14:07:43 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171011140743.4a535984.cohuck@redhat.com>
-In-Reply-To: <20170928203708.9376-1-david@redhat.com>
-References: <20170928203708.9376-1-david@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1e2FqQ-0004iy-0J
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 08:10:38 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:51786)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e2FqP-0004iZ-PK
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 08:10:37 -0400
+Received: by mail-wm0-x233.google.com with SMTP id f4so4215136wme.0
+	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 05:10:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/30] s390x: SMP for TCG
+In-Reply-To: <89139120-08aa-358c-f878-5c82a0d435b7@linux.vnet.ibm.com>
+References: <1507599235-25123-1-git-send-email-stefanb@linux.vnet.ibm.com>
+	<CAFEAcA-Kod+DTZ5MnG4JwswtKTj2PQw4Q8mhBN7sr50000M=Hg@mail.gmail.com>
+	<89139120-08aa-358c-f878-5c82a0d435b7@linux.vnet.ibm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 11 Oct 2017 13:10:16 +0100
+Message-ID: <CAFEAcA8c4j4ebT=QJH5un3__2wGNhp86FXuuGKboYHRsDPa-wg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 00/10] Merge tpm 2017/10/04
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +30,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, thuth@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <richard.henderson@linaro.org>
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, amarnath.valluri@intel.com, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
 
-On Thu, 28 Sep 2017 22:36:38 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On 11 October 2017 at 02:36, Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
+> I installed OpenBSD 6.2 for i386 . I could recreate this one. PRIx64 solves
+> it. I don't see the EBADMSG.  We include qemu/osdep.h in this file, so this
+> is odd.
 
-> This series is based on a couple of other patches floating around on
-> the mailing list (e.g. cleanups and LAP). The fist patches of v1 have
-> been sent as a separate series.
-> 
-> As I am working on kvm-unit-tests for SIGP, I discovered some bugs that
-> have been fixed in this series.
-> 
-> ======================================
-> I'll be on vacation until 15. October.
-> ======================================
-> 
-> This series contains:
-> - properly implement local external interrupts for TCG. Take care of
->   interrupt masks. Cleanup service interrupt handling.
-> - factor out KVM SIGP handling code into common code
-> - implement missing SIGP orders for TCG handled by the kernel for KVM
->   (including STOP and RESTART interrupts)
-> - make TCG use the new SIGP code - experimental SMP support for s390x TCG
-> - refactor STFL(E) implementation for TCG
-> - bunch of cleanups
-> 
-> Basically all SIGP instructions are fully supported.
-> 
-> Thanks to Aurelien Jarno for the initital prototype and showcasing that
-> supporting experimental SMP code can be implemented quite easily.
-> 
+OpenBSD only added EBADMSG to its headers very recently:
+https://github.com/openbsd/src/commit/bd616ed529e7c70988b09205b9cda0caa012efe8#diff-4c402341f93d93b29dc0f6eb539600f5
+It's not in 6.1 or earlier.
 
-Thanks, applied (with some minor changes, see the individual patches).
-
-> CPU hotplug does still not work correctly.
-
-Do you have an idea what still needs to be done?
+thanks
+-- PMM
