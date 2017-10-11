@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1e2H6n-0004aN-Rf
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 09:31:38 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e2HER-0006JV-U1
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 09:39:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1e2H6j-0000ZE-Qv
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 09:31:37 -0400
-Received: from mx2.suse.de ([195.135.220.15]:52853)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1e2H6j-0000Yd-Jn
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 09:31:33 -0400
-References: <CAFEAcA-KNF0Q2HisqN8s0zhm1dyPxFrKri6tYNpUai_=OnAppw@mail.gmail.com>
-	<96a6584b-ee29-13a2-622a-b07788ffcf79@linaro.org>
-	<150765743910.11829.11218016346709035274@sif>
-	<156e0052-1cff-f951-0142-bc1500f67aaa@redhat.com>
-From: Alexander Graf <agraf@suse.de>
-Message-ID: <51e72705-ef5b-8ce5-c909-02ca169375ae@suse.de>
-Date: Wed, 11 Oct 2017 15:31:29 +0200
+	(envelope-from <no-reply@patchew.org>) id 1e2HEN-0004FC-UU
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 09:39:31 -0400
+Resent-Message-Id: <E1e2HEN-0004FC-UU@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21474)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e2HEN-0004F1-MS
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 09:39:27 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150772912107.288.7743549322689037658@b58463cdfd5f>
+In-Reply-To: <1507726772-16661-1-git-send-email-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <156e0052-1cff-f951-0142-bc1500f67aaa@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] updating to a u-boot without the case-sensitive
- filename clash
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 11 Oct 2017 06:38:41 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] tpm: Use EMSGSIZE instead of EBADMSG to
+ compile on OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
+To: stefanb@linux.vnet.ibm.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, amarnath.valluri@intel.com, marcandre.lureau@gmail.com
 
-
-
-On 11.10.17 15:11, Thomas Huth wrote:
-> On 10.10.2017 19:43, Michael Roth wrote:
->> Quoting Richard Henderson (2017-10-10 11:32:22)
->>> On 10/10/2017 07:22 AM, Peter Maydell wrote:
->>>> I can see a couple of options:
->>>>  (1) wait for next u-boot release (scheduled for Nov 13, 2017),
->>>>      and move to that
->>>>      [downsides: would be in the middle of QEMU's own release cycle,
->>>>       pretty late to fix any problems with the new version;
->>>>       rather a big change to put into stable]
->>>>  (2) move to u-boot current head-of-unstable
->>>>      [downsides: would mean running some random git commit version,
->>>>       also not really very suitable for stable]
->>>
->>> It's always difficult to sync the release cycles of disjoint projects.
->>>
->>> You had nothing particularly good to say about using a non-released u-boot, so
->>> really you have two options:
->>>
->>>   (a) Update u-boot for 2.12 and not 2.11,
->>>   (b) Track u-boot during its release process, noticing and reporting problems,
->>>       and updating to the final release when it appears.  If you go this route,
->>>       you may well have to slip our release if theirs slips.
->>>
->>> The second option is not particularly appealing.
->>>
->>> Is there another possibility in which we split the packaging to cope with the
->>> current u-boot?  Normally no one builds u-boot; we simply package it for
->>> licensing.  If the packaging were in two parts, one could unpack the first part
->>> only and not encounter the problem.
->>
->> Would something like this be sufficient?
->>
->> diff --git a/scripts/make-release b/scripts/make-release
->> index fa6323fda8..96c21e7a74 100755
->> --- a/scripts/make-release
->> +++ b/scripts/make-release
->> @@ -20,6 +20,7 @@ git checkout "v${version}"
->>  git submodule update --init
->>  (cd roms/seabios && git describe --tags --long --dirty > .version)
->>  rm -rf .git roms/*/.git dtc/.git pixman/.git
->> +tar cfj roms/u-boot.tar.bz2 roms/u-boot && rm -rf roms/u-boot
-> 
-> FWIW, that sounds like a good idea to me, too.
-
-I think it's the easiest path forward. And given that we test the e500
-target in Travis, I doubt there's too much potential of breakage with
-the next major U-Boot update if we still care enough to update for 2.12.
-
-
-Alex
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MDc3MjY3NzItMTY2NjEtMS1naXQtc2VuZC1lbWFpbC1zdGVmYW5iQGxpbnV4
+LnZuZXQuaWJtLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSB0cG06IFVzZSBFTVNH
+U0laRSBpbnN0ZWFkIG9mIEVCQURNU0cgdG8gY29tcGlsZSBvbiBPcGVuQlNECgo9PT0gVEVTVCBT
+Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxv
+ZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUK
+CmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBj
+IGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdp
+dCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9y
+bWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAg
+ICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpl
+eGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIx
+ZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0
+Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8xNTA3
+NzI4MjkwLTYwNjItMS1naXQtc2VuZC1lbWFpbC10aG9tYXMudmVucmllc0BnbWFpbC5jb20gLT4g
+cGF0Y2hldy8xNTA3NzI4MjkwLTYwNjItMS1naXQtc2VuZC1lbWFpbC10aG9tYXMudmVucmllc0Bn
+bWFpbC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo1YWY1MGU0YzY0IHRwbTog
+VXNlIEVNU0dTSVpFIGluc3RlYWQgb2YgRUJBRE1TRyB0byBjb21waWxlIG9uIE9wZW5CU0QKCj09
+PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogdHBtOiBVc2UgRU1TR1NJWkUg
+aW5zdGVhZCBvZiBFQkFETVNHIHRvIGNvbXBpbGUgb24gT3BlbkJTRC4uLgpFUlJPUjogcmV0dXJu
+IG9mIGFuIGVycm5vIHNob3VsZCB0eXBpY2FsbHkgYmUgLXZlIChyZXR1cm4gLUVNU0dTSVpFKQoj
+MjM6IEZJTEU6IGh3L3RwbS90cG1fdXRpbC5jOjY5OgorICAgICAgICByZXR1cm4gRU1TR1NJWkU7
+Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDggbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
+aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNv
+bW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
+YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
+ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
