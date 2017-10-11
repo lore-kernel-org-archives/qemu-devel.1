@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e24Y8-0003gs-5j
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 20:07:01 -0400
+	(envelope-from <jiang.biao2@zte.com.cn>) id 1e24lQ-0006C3-91
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 20:20:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e24Y3-0004kt-VA
-	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 20:07:00 -0400
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 11 Oct 2017 11:06:49 +1100
-Message-Id: <20171011000649.22012-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCHv2] spapr: Correct RAM size calculation for HPT
- resizing
+	(envelope-from <jiang.biao2@zte.com.cn>) id 1e24lM-00025Q-RV
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 20:20:44 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:56798)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jiang.biao2@zte.com.cn>)
+	id 1e24lM-00022P-7T
+	for qemu-devel@nongnu.org; Tue, 10 Oct 2017 20:20:40 -0400
+Date: Wed, 11 Oct 2017 08:20:26 +0800 (CST)
+Message-ID: <201710110820264212648@zte.com.cn>
+In-Reply-To: CAFEAcA8YFPm3eCx62m7kEYgjY7SKCbnP=nZkGMWUt40JBA+ORQ@mail.gmail.com
+References: 1507622059-4493-1-git-send-email-jiang.biao2@zte.com.cn,
+	CAFEAcA8YFPm3eCx62m7kEYgjY7SKCbnP=nZkGMWUt40JBA+ORQ@mail.gmail.com
+Mime-Version: 1.0
+From: <jiang.biao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH=5D_scripts/checkpatch=2Epl=3A_fi?=
+ =?utf-8?q?x_false_error_ofexterns_checking=2E?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,51 +31,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: lvivier@redhat.com, groug@kaod.org, clg@kaod.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Cc: zhong.weidong@zte.com.cn, qemu-devel@nongnu.org
 
-In order to prevent the guest from forcing the allocation of large amounts
-of qemu memory (or host kernel memory, in the case of KVM HV), we limit
-the size of Hashed Page Table (HPT) it is allowed to allocated, based on
-its RAM size.
-
-However, the current calculation is not correct: it only adds up the size
-of plugged memory, ignoring the base memory size.  This patch corrects it.
-
-While we're there, use get_plugged_memory_size() instead of directly
-calling pc_existing_dimms_capacity().  The only difference is that it
-will abort on failure, which is right: a failure here indicates something
-wrong within qemu.
-
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr_hcall.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-Changes in v2:
-  * Also remove redundant initializer of current_ram_size
-
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 8d72bb7c1c..0d59d1534d 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -472,7 +472,7 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
-     target_ulong flags = args[0];
-     int shift = args[1];
-     sPAPRPendingHPT *pending = spapr->pending_hpt;
--    uint64_t current_ram_size = MACHINE(spapr)->ram_size;
-+    uint64_t current_ram_size;
-     int rc;
- 
-     if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED) {
-@@ -494,7 +494,7 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
-         return H_PARAMETER;
-     }
- 
--    current_ram_size = pc_existing_dimms_capacity(&error_fatal);
-+    current_ram_size = MACHINE(spapr)->ram_size + get_plugged_memory_size();
- 
-     /* We only allow the guest to allocate an HPT one order above what
-      * we'd normally give them (to stop a small guest claiming a huge
--- 
-2.13.6
+PiBPbiAxMCBPY3RvYmVyIDIwMTcgYXQgMDg6NTQsIEppYW5nIEJpYW8gPGppYW5nLmJpYW8yQHp0
+ZS5jb20uY24+IHdyb3RlOg0KDQoNCj4gPiBXaGVuIGFkZGluZyBhIGZ1bmN0aW9uIGRlY2xhcmF0
+aW9uIGluIGEgLmMgZmlsZSB3aXRob3V0IGV4dGVybg0KPiA+a2V5d29yayBkZWNvcmF0aW9uLCBj
+aGVja3BhdGNoLnBsIHdpbGwgcmVwb3J0ICpleHRlcm5zIHNob3VsZCBiZQ0KPiA+IGF2b2lkZWQg
+aW4gLmMgZmlsZXMqIGZhbHNlIGVycm9yLiBUaGlzIHBhdGNoIGZpeGVzIHRoZSBidWcuDQo+IA0K
+PiBJIGRvbid0IHRoaW5rIHRoaXMgaXMgYSBidWcuICJleHRlcm4gaW50IGZvbyh2b2lkKTsiIGFu
+ZA0KPiAiaW50IGZvbyh2b2lkKTsiIGhhdmUgdGhlIHNhbWUgZWZmZWN0OiB0aGV5IGRlY2xhcmUg
+YSBmdW5jdGlvbg0KPiBwcm90b3R5cGUgdGhhdCBjYW4gYmUgY2FsbGVkIGZyb20gb3V0c2lkZSB0
+aGUgZmlsZS4NCj4gV2UgZG9uJ3Qgd2FudCB0byBwZXJtaXQgdGhhdCBpbiBRRU1VLiBFaXRoZXI6
+DQo+ICAoMSkgdGhlIGZ1bmN0aW9uIGlzIGZvciB1c2Ugb25seSB3aXRoaW4gdGhpcyBmaWxlOiB0
+aGUNCj4gIGRlY2xhcmF0aW9uIHNob3VsZCBiZSAic3RhdGljIGludCBmb28odm9pZCk7Ig0KPiAg
+KDIpIHRoZSBmdW5jdGlvbiBpcyBmb3IgdXNlIGJ5IG90aGVyIGZpbGVzIHRvbzogdGhlDQo+ICBk
+ZWNsYXJhdGlvbiBzaG91bGQgYmUgaW4gYSBoZWFkZXIgZmlsZSwgbm90IGEgLmMgZmlsZSwNCj4g
+IHNvIHRoZSBvdGhlciBmaWxlcyBjYW4gdXNlIGl0DQo+IA0KPiBEbyB5b3UgaGF2ZSBhbiBleGFt
+cGxlIG9mIGNvZGUgd2hlcmUgdGhpcyB3YXJuaW5nIGlzIGEgcHJvYmxlbT8NCkhpIFBldGVyLA0K
+DQpJIHVuZGVyc3RhbmQgZXh0ZXJuYWwgZnVuY3Rpb25zIHNob3VsZCBiZSBwdXQgaW4gaGVhZGVy
+IGZpbGVzLiBCdXQgdGhlcmUNCg0KaXMgc29tZSByYXJlIGV4Y2VwdGlvbnMsIHRha2UgdGhlIGNv
+ZGUgc2VnbWVudCBpbiANCg0KDQp0Y2cvbWlwcy90Y2ctdGFyZ2V0LmluYy5jIGZvciBleGFtcGxl
+LA0KDQojaWYgVENHX1RBUkdFVF9SRUdfQklUUyA9PSAzMg0KIyBkZWZpbmUgTE9fT0ZGICAoTUlQ
+U19CRSAqIDQpDQojIGRlZmluZSBISV9PRkYgICg0IC0gTE9fT0ZGKQ0KI2Vsc2UNCi8qIFRvIGFz
+c2VydCBhdCBjb21waWxlLXRpbWUgdGhhdCB0aGVzZSB2YWx1ZXMgYXJlIG5ldmVyIHVzZWQNCiAg
+IGZvciBUQ0dfVEFSR0VUX1JFR19CSVRTID09IDY0LiAgKi8NCi8qIGV4dGVybiAqLyBpbnQgbGlu
+a19lcnJvcih2b2lkKTsNCiMgZGVmaW5lIExPX09GRiAgbGlua19lcnJvcigpDQojIGRlZmluZSBI
+SV9PRkYgIGxpbmtfZXJyb3IoKQ0KI2VuZGlmDQoNCkluIHRoaXMgY2FzZSwgdGhlIGV4dGVybmFs
+IGZ1bmNpdG9uIGlzIGp1c3QgdXNlZCB0byBhc3NlcnQgYXQgY29tcGxpZS10aW1lLg0KDQoNCklm
+IEkgbWFrZSBhIHBhdGNoIHRvIGRlbGV0ZSB0aGUgY29tbWVudGVkIG91dCBleHRlcm4gYmVmb3Jl
+ICppbnQgbGlua19lcnJvcigpKiwNCg0KdGhlIGNoZWNrcGF0Y2gucGwgd2lsbCBjb21wbGFpbiB0
+aGUgICpleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzKiANCg0KDQplcnJvci4N
+Cg0KVGhlIHNhbWUgdXNhZ2UgY2FuIGFsc28gYmUgZm91bmQgaW4gdGNnL3RjZy1vcC5jLA0KDQov
+KiBSZWR1Y2UgdGhlIG51bWJlciBvZiBpZmRlZnMgYmVsb3cuICBUaGlzIGFzc3VtZXMgdGhhdCBh
+bGwgdXNlcyBvZg0KICAgVENHVl9ISUdIIGFuZCBUQ0dWX0xPVyBhcmUgcHJvcGVybHkgcHJvdGVj
+dGVkIGJ5IGEgY29uZGl0aW9uYWwgdGhhdA0KICAgdGhlIGNvbXBpbGVyIGNhbiBlbGltaW5hdGUu
+ICAqLw0KI2lmIFRDR19UQVJHRVRfUkVHX0JJVFMgPT0gNjQNCmV4dGVybiBUQ0d2X2kzMiBUQ0dW
+X0xPV19saW5rX2Vycm9yKFRDR3ZfaTY0KTsNCmV4dGVybiBUQ0d2X2kzMiBUQ0dWX0hJR0hfbGlu
+a19lcnJvcihUQ0d2X2k2NCk7DQojZGVmaW5lIFRDR1ZfTE9XICBUQ0dWX0xPV19saW5rX2Vycm9y
+DQojZGVmaW5lIFRDR1ZfSElHSCBUQ0dWX0hJR0hfbGlua19lcnJvcg0KI2VuZGlmDQoNCkknbSBu
+b3Qgc3VyZSBpZiB0aGUgY2hlY2twYXRjaC5wbCBzaG91bGQgdGFrZSB0aGVzZSBjYXNlIGludG8g
+Y29uc2lkZXJhdGlvbi4gOikNCg0KVGhhbmtzLg0KDQoNCg0KDQoNClJlZ2FyZHMu
