@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41822)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e2EUr-0006aa-1h
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 06:44:18 -0400
+	(envelope-from <bounces@canonical.com>) id 1e2EXF-0007p8-U7
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 06:46:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e2EUl-0005Ql-UT
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 06:44:16 -0400
-Resent-Message-Id: <E1e2EUl-0005Ql-UT@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21334)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1e2EUl-0005Oe-MW
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 06:44:11 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150771862388.288.7275764832812347655@b58463cdfd5f>
-In-Reply-To: <1507712980-12135-1-git-send-email-thomas.venries@gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1e2EXA-0007GM-7P
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 06:46:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50554)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e2EXA-0007Ep-0K
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 06:46:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e2EX7-0003M2-3U
+	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 10:46:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D6CAB2E80D8
+	for <qemu-devel@nongnu.org>; Wed, 11 Oct 2017 10:46:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 11 Oct 2017 03:43:44 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] bcm2835_armtimer: add bcm2835 ARM timer
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 11 Oct 2017 10:30:55 -0000
+From: R Naveen Kumar <raju.naveenkumar.s@gmail.com>
+Reply-To: Bug 1719870 <1719870@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150651491208.6275.5437921155583182268.malonedeb@soybean.canonical.com>
+Message-Id: <150771785579.15429.7236243943711348750.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1719870] Re: Converting 100G VHDX fixed image to
+ QCOW2 fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +37,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: thomas.venries@gmail.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+To: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MDc3MTI5ODAtMTIxMzUtMS1naXQtc2VuZC1lbWFpbC10aG9tYXMudmVucmll
-c0BnbWFpbC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gYmNtMjgzNV9hcm10aW1l
-cjogYWRkIGJjbTI4MzUgQVJNIHRpbWVyCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
-bi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8
-IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAt
-LWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAg
-ZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0l
-cyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRz
-L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAg
-ICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1Qg
-U0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4
-ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpmZDU5NmI1NDFjIGJjbTI4
-MzVfYXJtdGltZXI6IGFkZCBiY20yODM1IEFSTSB0aW1lcgoKPT09IE9VVFBVVCBCRUdJTiA9PT0K
-Q2hlY2tpbmcgUEFUQ0ggMS8xOiBiY20yODM1X2FybXRpbWVyOiBhZGQgYmNtMjgzNSBBUk0gdGlt
-ZXIuLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQg
-J1snCiMxNDc6IEZJTEU6IGh3L3RpbWVyL2JjbTI4MzVfYXJtdGltZXIuYzo3MzoKK3N0YXRpYyBj
-b25zdCB1aW50MTZfdCBjdHJsX3ByZXNjYWxlIFtdID0geyAxLCAxNiwgMjU2LCAxIH07CgpFUlJP
-UjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVk
-CiMxOTU6IEZJTEU6IGh3L3RpbWVyL2JjbTI4MzVfYXJtdGltZXIuYzoxMjE6CisgICAgICAgIHJl
-dHVybiAocy0+cmF3X2lycSAmJiAocy0+Y3RybCAmIENUUkxfSU5UX0VOQUJMRSkpOwoKRVJST1I6
-IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAoj
-MjIwOiBGSUxFOiBody90aW1lci9iY20yODM1X2FybXRpbWVyLmM6MTQ2OgorICAgICAgICBpZiAo
-cy0+Y3RybCAmIENUUkxfVElNRVJfRU5BQkxFKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUg
-bmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMjM0OiBGSUxFOiBody90
-aW1lci9iY20yODM1X2FybXRpbWVyLmM6MTYwOgorICAgICAgICBpZiAocy0+Y3RybCAmIENUUkxf
-VElNRVJfRU5BQkxFKQpbLi4uXQoKdG90YWw6IDQgZXJyb3JzLCAwIHdhcm5pbmdzLCAzNjQgbGlu
-ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9V
-VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
-XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5v
-cmc=
+Bug is reproducible with setting VHDX Fixed Logicalsectorsize to 4096bytes
+>10G image created reflects as 1.2G virtual size in Qemu-img
+PS F:\> new-vhd -path test.vhdx -BlockSizeBytes 134217728 -SizeBytes 107374=
+18240 -Fixed -LogicalSectorSizeBytes 4096
+ComputerName            : XXXX
+Path                    : F:\test.vhdx
+VhdFormat               : VHDX
+VhdType                 : Fixed
+FileSize                : 10741612544
+Size                    : 10737418240
+MinimumSize             :
+LogicalSectorSize       : 4096
+PhysicalSectorSize      : 4096
+BlockSize               : 0
+ParentPath              :
+DiskIdentifier          : dfa84293-86f2-4ddf-aaff-14c04dae5df9
+FragmentationPercentage : 0
+Alignment               : 1
+Attached                : False
+DiskNumber              :
+Key                     :
+IsDeleted               : False
+Number                  :
+PS F:\> C:\temp\qemu-img\qemu-img.exe info .\test.vhdx
+image: .\test.vhdx
+file format: vhdx
+virtual size: 1.2G (1342177280 bytes)
+disk size: 10G
+cluster_size: 134217728
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1719870
+
+Title:
+  Converting 100G VHDX fixed image to QCOW2 fails
+
+Status in QEMU:
+  New
+
+Bug description:
+  Virtual Size recognized incorrectly for VHDX fixed disk and conversion
+  fails with error Expression: !qiov || bytes =3D=3D qiov->size
+
+
+  PS > & 'C:\Program Files\qemu\qemu-img.exe' --version
+  qemu-img version 2.10.0 (v2.10.0-11669-g579e69bd5b-dirty)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1719870/+subscriptions
