@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1e2aUW-0000fp-U9
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:13:25 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e2aUY-0000gp-8g
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:13:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1e2aUU-00017w-J5
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:13:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60548)
+	(envelope-from <kraxel@redhat.com>) id 1e2aUX-0001I7-E8
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:13:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45464)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1e2aUU-00017T-Ci
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:13:22 -0400
-Date: Thu, 12 Oct 2017 15:43:13 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <20171011084314.21752-1-kraxel@redhat.com>
-Message-ID: <nycvar.YSQ.7.76.1710121534380.2858@wniryva>
-References: <20171011084314.21752-1-kraxel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v2] cirrus: fix oob access in mode4and5
- write functions
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e2aUX-0001Ds-8C
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:13:25 -0400
+Message-ID: <1507803203.26812.20.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 12 Oct 2017 12:13:23 +0200
+In-Reply-To: <20171012100736.GH16125@redhat.com>
+References: <20171011083604.11820-1-kraxel@redhat.com>
+	<CAFEAcA9uXw7XYOBu9cKY+B=OWNbS=cRp7BKcXacLTaRLx9RWdA@mail.gmail.com>
+	<20171011154951.GA6163@redhat.com>
+	<CAFEAcA8OZALycKmsrC=MrftfF0YytXzRxGrzbetmSvddfTVf1g@mail.gmail.com>
+	<20171012082456.GB16125@redhat.com>
+	<1507800626.26812.13.camel@redhat.com>
+	<20171012093337.GE16125@redhat.com>
+	<1507802687.26812.17.camel@redhat.com>
+	<20171012100736.GH16125@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/10] Ui 20171011 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +34,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, niuguoxiang@huawei.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-+-- On Wed, 11 Oct 2017, Gerd Hoffmann wrote --+
-| Move dst calculation into the loop, so we apply the mask on each
+On Thu, 2017-10-12 at 11:07 +0100, Daniel P. Berrange wrote:
+> On Thu, Oct 12, 2017 at 12:04:47PM +0200, Gerd Hoffmann wrote:
+> > =C2=A0 Hi,
+> >=20
+> > > Not AFAICT - if i try it just never completes connect()
+> >=20
+> > Hmm, so maybe we should mirror the thing on git.qemu.org and use
+> > that?
+>=20
+> Can that be made 100% automated - I don't want to have to push
+> changes to
+> two different git repos.
 
-s/into the loop/inside for loop
+Yes, seabios works that way for example.
 
-| interation and will not overflow vga memory.
-
-s/interation/iteration
-
-
-| diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-| index afc290ab91..077a8cb74f 100644
-| --- a/hw/display/cirrus_vga.c
-| +++ b/hw/display/cirrus_vga.c
-| @@ -2038,15 +2038,14 @@ static void cirrus_mem_writeb_mode4and5_8bpp(CirrusVGAState * s,
-|      unsigned val = mem_value;
-|      uint8_t *dst;
-|  
-| -    dst = s->vga.vram_ptr + (offset &= s->cirrus_addr_mask);
-|      for (x = 0; x < 8; x++) {
-| +        dst = s->vga.vram_ptr + ((offset + x) & s->cirrus_addr_mask);
-|  	if (val & 0x80) {
-|  	    *dst = s->cirrus_shadow_gr1;
-|  	} else if (mode == 5) {
-|  	    *dst = s->cirrus_shadow_gr0;
-|  	}
-|  	val <<= 1;
-| -	dst++;
-|      }
-|      memory_region_set_dirty(&s->vga.vram, offset, 8);
-|  }
-| @@ -2060,8 +2059,8 @@ static void cirrus_mem_writeb_mode4and5_16bpp(CirrusVGAState * s,
-|      unsigned val = mem_value;
-|      uint8_t *dst;
-|  
-| -    dst = s->vga.vram_ptr + (offset &= s->cirrus_addr_mask);
-|      for (x = 0; x < 8; x++) {
-| +        dst = s->vga.vram_ptr + ((offset + 2 * x) & s->cirrus_addr_mask & ~1);
-|  	if (val & 0x80) {
-|  	    *dst = s->cirrus_shadow_gr1;
-|  	    *(dst + 1) = s->vga.gr[0x11];
-| @@ -2070,7 +2069,6 @@ static void cirrus_mem_writeb_mode4and5_16bpp(CirrusVGAState * s,
-|  	    *(dst + 1) = s->vga.gr[0x10];
-|  	}
-|  	val <<= 1;
-| -	dst += 2;
-|      }
-|      memory_region_set_dirty(&s->vga.vram, offset, 16);
-|  }
-
-Works to fix the issue.
-
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+cheers,
+  Gerd
