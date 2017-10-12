@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e2dvX-0007y0-Vb
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:53:37 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1e2dwI-0008Vn-KH
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:54:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e2dvW-0004wA-Sw
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:53:32 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:39222 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1e2dvW-0004vL-Gx
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:53:30 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 12 Oct 2017 16:53:12 +0300
-Message-Id: <20171012135313.227864-5-vsementsov@virtuozzo.com>
-In-Reply-To: <20171012135313.227864-1-vsementsov@virtuozzo.com>
-References: <20171012135313.227864-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 4/5] backup: simplify non-dirty bits progress
- processing
+	(envelope-from <paolo.bonzini@gmail.com>) id 1e2dwE-0005Mg-KE
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:54:18 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34180)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1e2dwE-0005M1-Cn
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:54:14 -0400
+Received: by mail-wm0-x244.google.com with SMTP id l10so4042458wmg.1
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 06:54:14 -0700 (PDT)
+Received: from 640k.lan (94-36-246-2.adsl-ull.clienti.tiscali.it.
+	[94.36.246.2]) by smtp.gmail.com with ESMTPSA id
+	s196sm333449wmb.26.2017.10.12.06.54.10 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 12 Oct 2017 06:54:10 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 12 Oct 2017 15:54:08 +0200
+Message-Id: <1507816448-86665-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] tco: add trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,82 +30,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: jsnow@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, stefanha@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+To: qemu-devel@nongnu.org
 
-Set fake progress for non-dirty clusters in copy_bitmap initialization,
-to. It simplifies code and allows further refactoring.
+Add trace events to the PCH watchdog timer, it can be useful to see how
+the guest is using it.
 
-This patch changes user's view of backup progress, but formally it
-doesn't changed: progress hops are just moved to the beginning.
-
-Actually it's just a point of view: when do we actually skip clusters?
-We can say in the very beginning, that we skip these clusters and do
-not think about them later.
-
-Of course, if go through disk sequentially, it's logical to say, that
-we skip clusters between copied portions to the left and to the right
-of them. But even now copying progress is not sequential because of
-write notifiers. Future patches will introduce new backup architecture
-which will do copying in several coroutines in parallel, so it will
-make no sense to publish fake progress by parts in parallel with
-other copying requests.
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/backup.c | 18 +++---------------
- 1 file changed, 3 insertions(+), 15 deletions(-)
+ hw/acpi/tco.c        | 11 +++++++++--
+ hw/acpi/trace-events |  4 ++++
+ 2 files changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index 71ad59b417..04608836d7 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -369,7 +369,6 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
-     int64_t offset;
-     int64_t cluster;
-     int64_t end;
--    int64_t last_cluster = -1;
-     BdrvDirtyBitmapIter *dbi;
+diff --git a/hw/acpi/tco.c b/hw/acpi/tco.c
+index 05b9d7b..0032db4 100644
+--- a/hw/acpi/tco.c
++++ b/hw/acpi/tco.c
+@@ -12,6 +12,7 @@
+ #include "hw/i386/ich9.h"
  
-     granularity = bdrv_dirty_bitmap_granularity(job->sync_bitmap);
-@@ -380,12 +379,6 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
-     while ((offset = bdrv_dirty_iter_next(dbi)) >= 0) {
-         cluster = offset / job->cluster_size;
+ #include "hw/acpi/tco.h"
++#include "trace.h"
  
--        /* Fake progress updates for any clusters we skipped */
--        if (cluster != last_cluster + 1) {
--            job->common.offset += ((cluster - last_cluster - 1) *
--                                   job->cluster_size);
--        }
--
-         for (end = cluster + clusters_per_iter; cluster < end; cluster++) {
-             do {
-                 if (yield_and_check(job)) {
-@@ -407,14 +400,6 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
-         if (granularity < job->cluster_size) {
-             bdrv_set_dirty_iter(dbi, cluster * job->cluster_size);
-         }
--
--        last_cluster = cluster - 1;
--    }
--
--    /* Play some final catchup with the progress meter */
--    end = DIV_ROUND_UP(job->common.len, job->cluster_size);
--    if (last_cluster + 1 < end) {
--        job->common.offset += ((end - last_cluster - 1) * job->cluster_size);
-     }
+ //#define DEBUG
  
- out:
-@@ -456,6 +441,9 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
-         bdrv_set_dirty_iter(dbi, next_cluster * job->cluster_size);
-     }
+@@ -41,8 +42,11 @@ enum {
  
-+    job->common.offset = job->common.len -
-+                         hbitmap_count(job->copy_bitmap) * job->cluster_size;
+ static inline void tco_timer_reload(TCOIORegs *tr)
+ {
+-    tr->expire_time = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+-        ((int64_t)(tr->tco.tmr & TCO_TMR_MASK) * TCO_TICK_NSEC);
++    int ticks = tr->tco.tmr & TCO_TMR_MASK;
++    int64_t nsec = (int64_t)ticks * TCO_TICK_NSEC;
 +
-     bdrv_dirty_iter_free(dbi);
++    trace_tco_timer_reload(ticks, nsec / 1000000);
++    tr->expire_time = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + nsec;
+     timer_mod(tr->tco_timer, tr->expire_time);
  }
  
+@@ -59,6 +63,9 @@ static void tco_timer_expired(void *opaque)
+     ICH9LPCState *lpc = container_of(pm, ICH9LPCState, pm);
+     uint32_t gcs = pci_get_long(lpc->chip_config + ICH9_CC_GCS);
+ 
++    trace_tco_timer_expired(tr->timeouts_no,
++			    lpc->pin_strap.spkr_hi,
++			    !!(gcs & ICH9_CC_GCS_NO_REBOOT));
+     tr->tco.rld = 0;
+     tr->tco.sts1 |= TCO_TIMEOUT;
+     if (++tr->timeouts_no == 2) {
+diff --git a/hw/acpi/trace-events b/hw/acpi/trace-events
+index e3b41e9..df0024f 100644
+--- a/hw/acpi/trace-events
++++ b/hw/acpi/trace-events
+@@ -30,3 +30,7 @@ cpuhp_acpi_ejecting_invalid_cpu(uint32_t idx) "0x%"PRIx32
+ cpuhp_acpi_ejecting_cpu(uint32_t idx) "0x%"PRIx32
+ cpuhp_acpi_write_ost_ev(uint32_t slot, uint32_t ev) "idx[0x%"PRIx32"] OST EVENT: 0x%"PRIx32
+ cpuhp_acpi_write_ost_status(uint32_t slot, uint32_t st) "idx[0x%"PRIx32"] OST STATUS: 0x%"PRIx32
++
++# hw/acpi/tco.c
++tco_timer_reload(int ticks, int msec) "ticks=%d (%d ms)"
++tco_timer_expired(int timeouts_no, bool strap, bool no_reboot) "timeouts_no=%d no_reboot=%d/%d"
 -- 
-2.11.1
+1.8.3.1
