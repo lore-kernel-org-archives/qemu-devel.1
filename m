@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e2dKG-0004S4-V4
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:15:01 -0400
+	(envelope-from <berto@igalia.com>) id 1e2dKS-0004g0-1g
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:15:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e2dKD-0006mA-MZ
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:15:00 -0400
+	(envelope-from <berto@igalia.com>) id 1e2dKO-0006rg-PE
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:15:12 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Thu, 12 Oct 2017 16:05:27 +0300
-Message-Id: <0c316e8b75e52d8485248ac18d691a6d7d0170ee.1507813391.git.berto@igalia.com>
+Date: Thu, 12 Oct 2017 16:05:17 +0300
+Message-Id: <1aabec73c000402304473c0f1afe1278a4658da3.1507813391.git.berto@igalia.com>
 In-Reply-To: <cover.1507813391.git.berto@igalia.com>
 References: <cover.1507813391.git.berto@igalia.com>
 In-Reply-To: <cover.1507813391.git.berto@igalia.com>
 References: <cover.1507813391.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 13/31] qcow2: Add l2_slice_size field to
- BDRVQcow2State
+Subject: [Qemu-devel] [PATCH 03/31] qcow2: Remove BDS parameter from
+ qcow2_cache_get_table_addr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,66 +25,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Alberto Garcia <berto@igalia.com>
 
-The BDRVQcow2State structure contains an l2_size field, which stores
-the number of 64-bit entries in an L2 table.
-
-For efficiency reasons we want to be able to load slices instead of
-full L2 tables, so we need to know how many entries an L2 slice can
-hold.
-
-An L2 slice is the portion of an L2 table that is loaded by the qcow2
-cache. At the moment that cache can only load complete tables,
-therefore an L2 slice has the same size as an L2 table (one cluster)
-and l2_size == l2_slice_size.
-
-Later we'll allow smaller slices, but until then we have to use this
-new l2_slice_size field to make the rest of the code ready for that.
+This function was only using the BlockDriverState parameter to get the
+cache table size (since it was equal to the cluster size). This is no
+longer necessary so this parameter can be removed.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2.c | 3 +++
- block/qcow2.h | 1 +
- 2 files changed, 4 insertions(+)
+ block/qcow2-cache.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 9f55e0a9ff..e5458fcffd 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -794,6 +794,7 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
- typedef struct Qcow2ReopenState {
-     Qcow2Cache *l2_table_cache;
-     Qcow2Cache *refcount_block_cache;
-+    int l2_slice_size;
-     bool use_lazy_refcounts;
-     int overlap_check;
-     bool discard_passthrough[QCOW2_DISCARD_MAX];
-@@ -875,6 +876,7 @@ static int qcow2_update_options_prepare(BlockDriverState *bs,
+diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
+index 72cb7148ff..98bd77f3fb 100644
+--- a/block/qcow2-cache.c
++++ b/block/qcow2-cache.c
+@@ -46,8 +46,7 @@ struct Qcow2Cache {
+     uint64_t                cache_clean_lru_counter;
+ };
+ 
+-static inline void *qcow2_cache_get_table_addr(BlockDriverState *bs,
+-                    Qcow2Cache *c, int table)
++static inline void *qcow2_cache_get_table_addr(Qcow2Cache *c, int table)
+ {
+     return (uint8_t *) c->table_array + (size_t) table * c->table_size;
+ }
+@@ -66,7 +65,7 @@ static void qcow2_cache_table_release(BlockDriverState *bs, Qcow2Cache *c,
+ {
+ /* Using MADV_DONTNEED to discard memory is a Linux-specific feature */
+ #ifdef CONFIG_LINUX
+-    void *t = qcow2_cache_get_table_addr(bs, c, i);
++    void *t = qcow2_cache_get_table_addr(c, i);
+     int align = getpagesize();
+     size_t mem_size = (size_t) c->table_size * num_tables;
+     size_t offset = QEMU_ALIGN_UP((uintptr_t) t, align) - (uintptr_t) t;
+@@ -210,7 +209,7 @@ static int qcow2_cache_entry_flush(BlockDriverState *bs, Qcow2Cache *c, int i)
+     }
+ 
+     ret = bdrv_pwrite(bs->file, c->entries[i].offset,
+-                      qcow2_cache_get_table_addr(bs, c, i), c->table_size);
++                      qcow2_cache_get_table_addr(c, i), c->table_size);
+     if (ret < 0) {
+         return ret;
+     }
+@@ -357,7 +356,7 @@ static int qcow2_cache_do_get(BlockDriverState *bs, Qcow2Cache *c,
+         }
+ 
+         ret = bdrv_pread(bs->file, offset,
+-                         qcow2_cache_get_table_addr(bs, c, i),
++                         qcow2_cache_get_table_addr(c, i),
+                          c->table_size);
+         if (ret < 0) {
+             return ret;
+@@ -369,7 +368,7 @@ static int qcow2_cache_do_get(BlockDriverState *bs, Qcow2Cache *c,
+     /* And return the right table */
+ found:
+     c->entries[i].ref++;
+-    *table = qcow2_cache_get_table_addr(bs, c, i);
++    *table = qcow2_cache_get_table_addr(c, i);
+ 
+     trace_qcow2_cache_get_done(qemu_coroutine_self(),
+                                c == s->l2_table_cache, i);
+@@ -418,7 +417,7 @@ void *qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
+ 
+     for (i = 0; i < c->size; i++) {
+         if (c->entries[i].offset == offset) {
+-            return qcow2_cache_get_table_addr(bs, c, i);
++            return qcow2_cache_get_table_addr(c, i);
          }
      }
- 
-+    r->l2_slice_size = s->cluster_size / sizeof(uint64_t);
-     r->l2_table_cache = qcow2_cache_create(bs, l2_cache_size);
-     r->refcount_block_cache = qcow2_cache_create(bs, refcount_cache_size);
-     if (r->l2_table_cache == NULL || r->refcount_block_cache == NULL) {
-@@ -1038,6 +1040,7 @@ static void qcow2_update_options_commit(BlockDriverState *bs,
-     }
-     s->l2_table_cache = r->l2_table_cache;
-     s->refcount_block_cache = r->refcount_block_cache;
-+    s->l2_slice_size = r->l2_slice_size;
- 
-     s->overlap_check = r->overlap_check;
-     s->use_lazy_refcounts = r->use_lazy_refcounts;
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 61c6c27673..9c1ea97f0e 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -251,6 +251,7 @@ typedef struct BDRVQcow2State {
-     int cluster_bits;
-     int cluster_size;
-     int cluster_sectors;
-+    int l2_slice_size;
-     int l2_bits;
-     int l2_size;
-     int l1_size;
+     return NULL;
 -- 
 2.11.0
