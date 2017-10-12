@@ -1,22 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1e2ih2-0002T4-AN
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 14:58:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1e2ihy-0002x1-6t
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 14:59:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1e2ih0-0004ti-Sl
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 14:58:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1e2ihw-0005qa-S2
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 14:59:50 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Thu, 12 Oct 2017 13:58:56 -0500
+Message-Id: <20171012185916.22776-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKMTqZA+t77XV3s2aicsbHHbF8h96w=dmWO9VHJkE0Uw8w@mail.gmail.com>
-References: <cover.1505929556.git.alistair.francis@xilinx.com>
-	<20171008222029.GA29979@toto>
-	<CAKmqyKMEbQ3JbqMxeeOTBV92ixRVDfw1wFi57xNKGyF82DSC_Q@mail.gmail.com>
-	<20171010144834.GC5553@toto>
-	<CAKmqyKMTqZA+t77XV3s2aicsbHHbF8h96w=dmWO9VHJkE0Uw8w@mail.gmail.com>
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Thu, 12 Oct 2017 20:58:43 +0200
-Message-ID: <CAJy5ezogexkDJzFp-YyvHqFPhJWrKhEZstwaBsN4njTB9qC=mw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 0/8] Add the ZynqMP PMU and IPI
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 00/20] add byte-based block_status driver
+ callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,94 +21,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com
 
-On Oct 10, 2017 7:59 PM, "Alistair Francis" <alistair.francis@xilinx.com>
-wrote:
+There are patches floating around to add NBD_CMD_BLOCK_STATUS,
+but NBD wants to report status on byte granularity (even if the
+reporting will probably be naturally aligned to sectors or even
+much higher levels).  I've therefore started the task of
+converting our block status code to report at a byte granularity
+rather than sectors.
 
-On Tue, Oct 10, 2017 at 7:48 AM, Edgar E. Iglesias
-<edgar.iglesias@gmail.com> wrote:
-> On Mon, Oct 09, 2017 at 05:12:39PM -0700, Alistair Francis wrote:
->> On Sun, Oct 8, 2017 at 3:20 PM, Edgar E. Iglesias
->> <edgar.iglesias@xilinx.com> wrote:
->> > On Wed, Sep 20, 2017 at 03:01:31PM -0700, Alistair Francis wrote:
->> >>
->> >> This series adds the ZynqMP Power Management Unit (PMU) machine with
-basic
->> >> functionality.
->> >>
->> >> The machine only has the
->> >>  - CPU
->> >>  - Memory
->> >>  - Interrupt controller
->> >>  - IPI device
->> >>
->> >> connected, but that is enough to run some of the ROM and firmware
->> >> code on the machine
->> >>
->> >> The series also adds the IPI device and connects it to the ZynqMP ARM
->> >> side and the ZynqMP PMU. These IPI devices don't connect between the
-ARM
->> >> and MicroBlaze instances though.
->> >>
->> >> v3:
->> >>  - Add the interrupt controller
->> >>  - Replace some of the error_fatals with errp
->> >>  - Fix the PMU CPU name
->> >
->> > Hi Alistair,
->> >
->> >
->> > Sorry for the super long delay...
->> >
->> > I think this mostly looks good but I was wondering if we really need
->> > to have a board specific (zcu102) PMU?
->>
->> It doesn't have to be board specific. What I wanted though was an SoC
->> and a machine so that maybe one day we could add the PMU SoC to the
->> ARM ZCU102 machine. After that it was hard to think of a name to
->> differentiate the SoC and the machine. Do you have a recommendation on
->> names?
->
->
-> Hi Alistair,
->
-> Yes, I agree with your approach but I got a little confused by the names.
->
-> I think all the stuff that is inside the PMU subsystem architecture-wise
-> should have generic PMU names (no ZCU102). I.e the ROM, the RAM, the
-IOModule,
-> interrupt controller etc.
+Now that 2.11 is open, I'm rebasing/reposting the remaining patches.
 
-Ok I can rename them to the ZynqMP PMU (the machine/board) and the
-ZynqMP PMU SoC. Does that work?
+The overall conversion currently looks like:
+part 1: bdrv_is_allocated (merged, commit 51b0a488)
+part 2: dirty-bitmap (merged, commit ca759622)
+part 3: bdrv_get_block_status (v6 is posted [1], partially reviewed)
+part 4: .bdrv_co_block_status (this series, v3 was here [2])
 
->
-> The IPI block can be outside of the PMU module and be instantiated by the
-> board or perhaps better if we could reuse some of the ZynqMP modules
-> instantiated by the ZCU102 machine to get a CPU-less PS for the PMU
-> to interact with. Or something along those lines.
-> How does that sound?>
+Available as a tag at:
+git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-callback-v4
 
-I'm a little unclear what you mean here.
+Based-on: <20171012034720.11947-1-eblake@redhat.com>
+([PATCH v6 00/24] make bdrv_get_block_status byte-based)
 
-Thanks,
-Alistair
+Since v3:
+- rebase to series 3 tweak in get_status interface
+- further simplify qed code
+- better documentation of optimization flag (s/mapping/want_zero/)
 
-> Best regards,
-> Edgar
->
+001/20:[0033] [FC] 'block: Add .bdrv_co_block_status() callback'
+002/20:[0077] [FC] 'block: Switch passthrough drivers to .bdrv_co_block_s=
+tatus()'
+003/20:[0020] [FC] 'file-posix: Switch to .bdrv_co_block_status()'
+004/20:[0019] [FC] 'gluster: Switch to .bdrv_co_block_status()'
+005/20:[----] [--] 'iscsi: Switch cluster_sectors to byte-based'
+006/20:[----] [--] 'iscsi: Switch iscsi_allocmap_update() to byte-based'
+007/20:[0022] [FC] 'iscsi: Switch to .bdrv_co_block_status()'
+008/20:[0013] [FC] 'null: Switch to .bdrv_co_block_status()'
+009/20:[0017] [FC] 'parallels: Switch to .bdrv_co_block_status()'
+010/20:[0014] [FC] 'qcow: Switch to .bdrv_co_block_status()'
+011/20:[0019] [FC] 'qcow2: Switch to .bdrv_co_block_status()'
+012/20:[0086] [FC] 'qed: Switch to .bdrv_co_block_status()'
+013/20:[0015] [FC] 'raw: Switch to .bdrv_co_block_status()'
+014/20:[0011] [FC] 'sheepdog: Switch to .bdrv_co_block_status()'
+015/20:[----] [--] 'vdi: Avoid bitrot of debugging code'
+016/20:[0017] [FC] 'vdi: Switch to .bdrv_co_block_status()'
+017/20:[0013] [FC] 'vmdk: Switch to .bdrv_co_block_status()'
+018/20:[0019] [FC] 'vpc: Switch to .bdrv_co_block_status()'
+019/20:[0010] [FC] 'vvfat: Switch to .bdrv_co_block_status()'
+020/20:[0019] [FC] 'block: Drop unused .bdrv_co_get_block_status()'
 
+Eric Blake (20):
+  block: Add .bdrv_co_block_status() callback
+  block: Switch passthrough drivers to .bdrv_co_block_status()
+  file-posix: Switch to .bdrv_co_block_status()
+  gluster: Switch to .bdrv_co_block_status()
+  iscsi: Switch cluster_sectors to byte-based
+  iscsi: Switch iscsi_allocmap_update() to byte-based
+  iscsi: Switch to .bdrv_co_block_status()
+  null: Switch to .bdrv_co_block_status()
+  parallels: Switch to .bdrv_co_block_status()
+  qcow: Switch to .bdrv_co_block_status()
+  qcow2: Switch to .bdrv_co_block_status()
+  qed: Switch to .bdrv_co_block_status()
+  raw: Switch to .bdrv_co_block_status()
+  sheepdog: Switch to .bdrv_co_block_status()
+  vdi: Avoid bitrot of debugging code
+  vdi: Switch to .bdrv_co_block_status()
+  vmdk: Switch to .bdrv_co_block_status()
+  vpc: Switch to .bdrv_co_block_status()
+  vvfat: Switch to .bdrv_co_block_status()
+  block: Drop unused .bdrv_co_get_block_status()
 
-Hi Alistair,
+ include/block/block.h     |   9 ++-
+ include/block/block_int.h |  43 +++++++------
+ block/io.c                |  80 +++++++++++-------------
+ block/blkdebug.c          |  20 +++---
+ block/commit.c            |   2 +-
+ block/file-posix.c        |  59 ++++++++++--------
+ block/gluster.c           |  67 +++++++++++---------
+ block/iscsi.c             | 154 +++++++++++++++++++++++++---------------=
+------
+ block/mirror.c            |   2 +-
+ block/null.c              |  23 +++----
+ block/parallels.c         |  22 ++++---
+ block/qcow.c              |  27 ++++----
+ block/qcow2.c             |  24 ++++----
+ block/qed.c               |  84 +++++++++----------------
+ block/raw-format.c        |  16 ++---
+ block/sheepdog.c          |  26 ++++----
+ block/throttle.c          |   2 +-
+ block/vdi.c               |  45 +++++++-------
+ block/vmdk.c              |  28 ++++-----
+ block/vpc.c               |  42 +++++++------
+ block/vvfat.c             |  16 +++--
+ 21 files changed, 404 insertions(+), 387 deletions(-)
 
-To clarify, if you create a pmu object, try to only put stuff in that
-object that belong to the pmu subsystem. The IPI block for example doesn't,
-it belongs outside of the pmu object allthough you will want to instate an
-ipi instance in the pmu machine.
-
-Hope that helps
-Edgar
-
-Sent from my phone
+--=20
+2.13.6
