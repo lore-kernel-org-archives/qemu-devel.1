@@ -1,33 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e2fgC-0000QU-C7
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:45:49 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e2fik-0001TI-MT
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:48:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e2fg8-0005aY-CX
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:45:48 -0400
-Received: from mail-wm0-f46.google.com ([74.125.82.46]:49626)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e2fg8-0005Zv-5C
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:45:44 -0400
-Received: by mail-wm0-f46.google.com with SMTP id b189so14269648wmd.4
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 08:45:43 -0700 (PDT)
-References: <20170911043820.14617-1-haozhong.zhang@intel.com>
-	<20170911044157.15403-1-haozhong.zhang@intel.com>
-	<20170911160818.1bd44a82@nial.brq.redhat.com>
-	<alpine.DEB.2.10.1709111119480.19719@sstabellini-ThinkPad-X260>
-	<20170912031509.vufszbju3s2v2bw3@hz-desktop>
-	<20171010160544.GA1772@char.us.oracle.com>
-	<20171012124544.dq3wyr65tefi3glk@hz-desktop>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f6478644-0d4a-6531-9016-aee2a0e76417@redhat.com>
-Date: Thu, 12 Oct 2017 17:45:39 +0200
-MIME-Version: 1.0
-In-Reply-To: <20171012124544.dq3wyr65tefi3glk@hz-desktop>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC QEMU PATCH v3 00/10] Implement vNVDIMM for
- Xen HVM guest
+	(envelope-from <imammedo@redhat.com>) id 1e2fig-0007Sc-Mp
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:48:26 -0400
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Thu, 12 Oct 2017 17:48:19 +0200
+Message-Id: <1507823299-270245-1-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1507578671-158758-15-git-send-email-imammedo@redhat.com>
+References: <1507578671-158758-15-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 14/24] fixup! ppc: spapr: use cpu type name
+ directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,56 +20,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Stefano Stabellini <sstabellini@kernel.org>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, xen-devel@lists.xen.org, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Richard Henderson <rth@twiddle.net>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, ian.jackson@eu.citrix.com, wei.liu2@citrix.com, george.dunlap@citrix.com, JBeulich@suse.com, andrew.cooper3@citrix.com
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, agraf@suse.de, david@gibson.dropbear.id.au, groug@kaod.org
 
-On 12/10/2017 14:45, Haozhong Zhang wrote:
-> Basically, QEMU builds two ROMs for guest, /rom@etc/acpi/tables and
-> /rom@etc/table-loader. The former is unstructured to guest, and
-> contains all data of guest ACPI. The latter is a BIOSLinkerLoader
-> organized as a set of commands, which direct the guest (e.g., SeaBIOS
-> on KVM/QEMU) to relocate data in the former file, recalculate checksum
-> of specified area, and fill guest address in specified ACPI field.
-> 
-> One part of my patches is to implement a mechanism to tell Xen which
-> part of ACPI data is a table (NFIT), and which part defines a
-> namespace device and what the device name is. I can add two new loader
-> commands for them respectively.
-> 
-> Because they just provide information and SeaBIOS in non-xen
-> environment ignores unrecognized commands, they will not break SeaBIOS
-> in non-xen environment.
-> 
-> On QEMU side, most Xen-specific hacks in ACPI builder could be
-> dropped, and replaced by adding the new loader commands (though they
-> may be used only by Xen).
-> 
-> On Xen side, a fw_cfg driver and a BIOSLinkerLoader command executor
-> are needed in, perhaps, hvmloader.
+follow up commit that registers host-spapr-cpu-core type unconditionally
+ "ppc: spapr: register 'host' core type  along with the rest of core types"
 
-If Xen has to parse BIOSLinkerLoader, it can use the existing commands
-to process a reduced set of ACPI tables.  In other words,
-etc/acpi/tables would only include the NFIT, the SSDT with namespace
-devices, and the XSDT.  etc/acpi/rsdp would include the RSDP table as usual.
+makes 'non' machine crash
+ ppc64-softmmu/qemu-system-ppc64 -M none -device host-spapr-cpu-core
+ ERROR:qom/object.c:217:object_type_get_instance_size: assertion failed: (type != NULL)
+ Aborted
 
-hvmloader can then:
+before it qemu fails cleanly with
+ ppc64-softmmu/qemu-system-ppc64 -M none -device host-spapr-cpu-core
+ qemu-system-ppc64: -device host-spapr-cpu-core: 'host-spapr-cpu-core' is not a valid device model name
 
-1) allocate some memory for where the XSDT will go
+spapr_cpu_core_realize() already has explicit check for pseries machine,
+so move access to host cpu type after it so 'none' machine would fail
+cleanly as expected.
 
-2) process the BIOSLinkerLoader like SeaBIOS would do
+Reported-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ hw/ppc/spapr_cpu_core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-3) find the RSDP in low memory, since the loader script must have placed
-it there.  If it cannot find it, allocate some low memory, fill it with
-the RSDP header and revision, and and jump to step 6
-
-4) If it found QEMU's RSDP, use it to find QEMU's XSDT
-
-5) Copy ACPI table pointers from QEMU to hvmloader's RSDT and/or XSDT.
-
-6) build hvmloader tables and link them into the RSDT and/or XSDT as usual.
-
-7) overwrite the RSDP in low memory with a pointer to hvmloader's own
-RSDT and/or XSDT, and updated the checksums
-
-QEMU's XSDT remains there somewhere in memory, unused but harmless.
-
-Paolo
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index b5bbb6a..7dbf9c3 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -151,7 +151,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+     sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
+     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
+     CPUCore *cc = CPU_CORE(OBJECT(dev));
+-    size_t size = object_type_get_instance_size(scc->cpu_type);
++    size_t size;
+     Error *local_err = NULL;
+     void *obj;
+     int i, j;
+@@ -162,6 +162,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
++    size = object_type_get_instance_size(scc->cpu_type);
+     sc->threads = g_malloc0(size * cc->nr_threads);
+     for (i = 0; i < cc->nr_threads; i++) {
+         char id[32];
+-- 
+2.7.4
