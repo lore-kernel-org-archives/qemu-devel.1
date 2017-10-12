@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1e2fxR-0003II-Qz
+	(envelope-from <pm215@archaic.org.uk>) id 1e2fxS-0003IZ-9z
 	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 12:03:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1e2fxQ-0004aN-4L
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 12:03:37 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37898)
+	(envelope-from <pm215@archaic.org.uk>) id 1e2fxR-0004bZ-8n
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 12:03:38 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37896)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1e2fxP-0004Z8-Rg
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 12:03:36 -0400
+	id 1e2fxR-0004Xg-2o
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 12:03:37 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1e2fxO-0000dj-GA
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 17:03:34 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1e2fxL-0000bb-Ms
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 17:03:31 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Oct 2017 17:03:29 +0100
-Message-Id: <1507824216-29058-7-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 12 Oct 2017 17:03:24 +0100
+Message-Id: <1507824216-29058-2-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1507824216-29058-1-git-send-email-peter.maydell@linaro.org>
 References: <1507824216-29058-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 06/13] target/arm: Implement secure function
- return
+Subject: [Qemu-devel] [PULL 01/13] watchdog/aspeed: fix variable type to
+ store reload value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,225 +33,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Secure function return happens when a non-secure function has been
-called using BLXNS and so has a particular magic LR value (either
-0xfefffffe or 0xfeffffff). The function return via BX behaves
-specially when the new PC value is this magic value, in the same
-way that exception returns are handled.
+From: Cédric Le Goater <clg@kaod.org>
 
-Adjust our BX excret guards so that they recognize the function
-return magic number as well, and perform the function-return
-unstacking in do_v7m_exception_exit().
+Initially from Anton D. Kachalov" <mouse@yandex-team.ru> but the SoB was
+missing.
 
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Acked-by: Andrew Jeffery <andrew@aj.id.au>
+Message-id: 20170920064915.30027-1-clg@kaod.org
+[clg: change commit log and subject
+      replace UL suffix by ULL ]
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 1507556919-24992-5-git-send-email-peter.maydell@linaro.org
 ---
- target/arm/internals.h |   7 +++
- target/arm/helper.c    | 115 +++++++++++++++++++++++++++++++++++++++++++++----
- target/arm/translate.c |  14 +++++-
- 3 files changed, 126 insertions(+), 10 deletions(-)
+ hw/watchdog/wdt_aspeed.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 1746737..43106a2 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -72,6 +72,13 @@ FIELD(V7M_EXCRET, DCRS, 5, 1)
- FIELD(V7M_EXCRET, S, 6, 1)
- FIELD(V7M_EXCRET, RES1, 7, 25) /* including the must-be-1 prefix */
+diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
+index 22bce36..95f6ad1 100644
+--- a/hw/watchdog/wdt_aspeed.c
++++ b/hw/watchdog/wdt_aspeed.c
+@@ -100,13 +100,13 @@ static uint64_t aspeed_wdt_read(void *opaque, hwaddr offset, unsigned size)
  
-+/* Minimum value which is a magic number for exception return */
-+#define EXC_RETURN_MIN_MAGIC 0xff000000
-+/* Minimum number which is a magic number for function or exception return
-+ * when using v8M security extension
-+ */
-+#define FNC_RETURN_MIN_MAGIC 0xfefffffe
-+
- /* We use a few fake FSR values for internal purposes in M profile.
-  * M profile cores don't have A/R format FSRs, but currently our
-  * get_phys_addr() code assumes A/R profile and reports failures via
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 47c5767..96113fe 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -6174,7 +6174,17 @@ void HELPER(v7m_bxns)(CPUARMState *env, uint32_t dest)
-      *  - if the return value is a magic value, do exception return (like BX)
-      *  - otherwise bit 0 of the return value is the target security state
-      */
--    if (dest >= 0xff000000) {
-+    uint32_t min_magic;
-+
-+    if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-+        /* Covers FNC_RETURN and EXC_RETURN magic */
-+        min_magic = FNC_RETURN_MIN_MAGIC;
-+    } else {
-+        /* EXC_RETURN magic only */
-+        min_magic = EXC_RETURN_MIN_MAGIC;
-+    }
-+
-+    if (dest >= min_magic) {
-         /* This is an exception return magic value; put it where
-          * do_v7m_exception_exit() expects and raise EXCEPTION_EXIT.
-          * Note that if we ever add gen_ss_advance() singlestep support to
-@@ -6470,12 +6480,19 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-     bool exc_secure = false;
-     bool return_to_secure;
- 
--    /* We can only get here from an EXCP_EXCEPTION_EXIT, and
--     * gen_bx_excret() enforces the architectural rule
--     * that jumps to magic addresses don't have magic behaviour unless
--     * we're in Handler mode (compare pseudocode BXWritePC()).
-+    /* If we're not in Handler mode then jumps to magic exception-exit
-+     * addresses don't have magic behaviour. However for the v8M
-+     * security extensions the magic secure-function-return has to
-+     * work in thread mode too, so to avoid doing an extra check in
-+     * the generated code we allow exception-exit magic to also cause the
-+     * internal exception and bring us here in thread mode. Correct code
-+     * will never try to do this (the following insn fetch will always
-+     * fault) so we the overhead of having taken an unnecessary exception
-+     * doesn't matter.
-      */
--    assert(arm_v7m_is_handler_mode(env));
-+    if (!arm_v7m_is_handler_mode(env)) {
-+        return;
-+    }
- 
-     /* In the spec pseudocode ExceptionReturn() is called directly
-      * from BXWritePC() and gets the full target PC value including
-@@ -6765,6 +6782,78 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-     qemu_log_mask(CPU_LOG_INT, "...successful exception return\n");
- }
- 
-+static bool do_v7m_function_return(ARMCPU *cpu)
-+{
-+    /* v8M security extensions magic function return.
-+     * We may either:
-+     *  (1) throw an exception (longjump)
-+     *  (2) return true if we successfully handled the function return
-+     *  (3) return false if we failed a consistency check and have
-+     *      pended a UsageFault that needs to be taken now
-+     *
-+     * At this point the magic return value is split between env->regs[15]
-+     * and env->thumb. We don't bother to reconstitute it because we don't
-+     * need it (all values are handled the same way).
-+     */
-+    CPUARMState *env = &cpu->env;
-+    uint32_t newpc, newpsr, newpsr_exc;
-+
-+    qemu_log_mask(CPU_LOG_INT, "...really v7M secure function return\n");
-+
-+    {
-+        bool threadmode, spsel;
-+        TCGMemOpIdx oi;
-+        ARMMMUIdx mmu_idx;
-+        uint32_t *frame_sp_p;
-+        uint32_t frameptr;
-+
-+        /* Pull the return address and IPSR from the Secure stack */
-+        threadmode = !arm_v7m_is_handler_mode(env);
-+        spsel = env->v7m.control[M_REG_S] & R_V7M_CONTROL_SPSEL_MASK;
-+
-+        frame_sp_p = get_v7m_sp_ptr(env, true, threadmode, spsel);
-+        frameptr = *frame_sp_p;
-+
-+        /* These loads may throw an exception (for MPU faults). We want to
-+         * do them as secure, so work out what MMU index that is.
-+         */
-+        mmu_idx = arm_v7m_mmu_idx_for_secstate(env, true);
-+        oi = make_memop_idx(MO_LE, arm_to_core_mmu_idx(mmu_idx));
-+        newpc = helper_le_ldul_mmu(env, frameptr, oi, 0);
-+        newpsr = helper_le_ldul_mmu(env, frameptr + 4, oi, 0);
-+
-+        /* Consistency checks on new IPSR */
-+        newpsr_exc = newpsr & XPSR_EXCP;
-+        if (!((env->v7m.exception == 0 && newpsr_exc == 0) ||
-+              (env->v7m.exception == 1 && newpsr_exc != 0))) {
-+            /* Pend the fault and tell our caller to take it */
-+            env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
-+            armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE,
-+                                    env->v7m.secure);
-+            qemu_log_mask(CPU_LOG_INT,
-+                          "...taking INVPC UsageFault: "
-+                          "IPSR consistency check failed\n");
-+            return false;
-+        }
-+
-+        *frame_sp_p = frameptr + 8;
-+    }
-+
-+    /* This invalidates frame_sp_p */
-+    switch_v7m_security_state(env, true);
-+    env->v7m.exception = newpsr_exc;
-+    env->v7m.control[M_REG_S] &= ~R_V7M_CONTROL_SFPA_MASK;
-+    if (newpsr & XPSR_SFPA) {
-+        env->v7m.control[M_REG_S] |= R_V7M_CONTROL_SFPA_MASK;
-+    }
-+    xpsr_write(env, 0, XPSR_IT);
-+    env->thumb = newpc & 1;
-+    env->regs[15] = newpc & ~1;
-+
-+    qemu_log_mask(CPU_LOG_INT, "...function return successful\n");
-+    return true;
-+}
-+
- static void arm_log_exception(int idx)
+ static void aspeed_wdt_reload(AspeedWDTState *s, bool pclk)
  {
-     if (qemu_loglevel_mask(CPU_LOG_INT)) {
-@@ -7049,8 +7138,18 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
-     case EXCP_IRQ:
-         break;
-     case EXCP_EXCEPTION_EXIT:
--        do_v7m_exception_exit(cpu);
--        return;
-+        if (env->regs[15] < EXC_RETURN_MIN_MAGIC) {
-+            /* Must be v8M security extension function return */
-+            assert(env->regs[15] >= FNC_RETURN_MIN_MAGIC);
-+            assert(arm_feature(env, ARM_FEATURE_M_SECURITY));
-+            if (do_v7m_function_return(cpu)) {
-+                return;
-+            }
-+        } else {
-+            do_v7m_exception_exit(cpu);
-+            return;
-+        }
-+        break;
-     default:
-         cpu_abort(cs, "Unhandled exception 0x%x\n", cs->exception_index);
-         return; /* Never happens.  Keep compiler happy.  */
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index caf0d58..5c6f9fe 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -964,7 +964,8 @@ static inline void gen_bx_excret(DisasContext *s, TCGv_i32 var)
-      * s->base.is_jmp that we need to do the rest of the work later.
-      */
-     gen_bx(s, var);
--    if (s->v7m_handler_mode && arm_dc_feature(s, ARM_FEATURE_M)) {
-+    if (arm_dc_feature(s, ARM_FEATURE_M_SECURITY) ||
-+        (s->v7m_handler_mode && arm_dc_feature(s, ARM_FEATURE_M))) {
-         s->base.is_jmp = DISAS_BX_EXCRET;
+-    uint32_t reload;
++    uint64_t reload;
+ 
+     if (pclk) {
+         reload = muldiv64(s->regs[WDT_RELOAD_VALUE], NANOSECONDS_PER_SECOND,
+                           s->pclk_freq);
+     } else {
+-        reload = s->regs[WDT_RELOAD_VALUE] * 1000;
++        reload = s->regs[WDT_RELOAD_VALUE] * 1000ULL;
      }
- }
-@@ -973,9 +974,18 @@ static inline void gen_bx_excret_final_code(DisasContext *s)
- {
-     /* Generate the code to finish possible exception return and end the TB */
-     TCGLabel *excret_label = gen_new_label();
-+    uint32_t min_magic;
-+
-+    if (arm_dc_feature(s, ARM_FEATURE_M_SECURITY)) {
-+        /* Covers FNC_RETURN and EXC_RETURN magic */
-+        min_magic = FNC_RETURN_MIN_MAGIC;
-+    } else {
-+        /* EXC_RETURN magic only */
-+        min_magic = EXC_RETURN_MIN_MAGIC;
-+    }
  
-     /* Is the new PC value in the magic range indicating exception return? */
--    tcg_gen_brcondi_i32(TCG_COND_GEU, cpu_R[15], 0xff000000, excret_label);
-+    tcg_gen_brcondi_i32(TCG_COND_GEU, cpu_R[15], min_magic, excret_label);
-     /* No: end the TB as we would for a DISAS_JMP */
-     if (is_singlestepping(s)) {
-         gen_singlestep_exception(s);
+     if (aspeed_wdt_is_enabled(s)) {
 -- 
 2.7.4
