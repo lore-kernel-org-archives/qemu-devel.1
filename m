@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2dXV-0007WQ-7T
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:28:42 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e2dYC-00089E-S5
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:29:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2dXU-0006Aa-84
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:28:41 -0400
-References: <150780535623.288.12272299760364683981@b58463cdfd5f>
-	<da4434ac-e912-172e-7d04-af09e11f813a@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <12b1ce4d-ce89-e2f4-e6fb-e057c6377972@redhat.com>
-Date: Thu, 12 Oct 2017 08:28:29 -0500
-MIME-Version: 1.0
-In-Reply-To: <da4434ac-e912-172e-7d04-af09e11f813a@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="KQvMDeqONGw8IjjOs5TjgRdlOwDkbLad2"
-Subject: Re: [Qemu-devel] [PATCH v3 00/13] nbd minimal structured read
+	(envelope-from <kraxel@redhat.com>) id 1e2dY7-0006Zd-Rv
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:29:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46494)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e2dY7-0006ZH-Lu
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:29:19 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B3EBF2D0FAD
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 13:29:18 +0000 (UTC)
+Message-ID: <1507814955.24675.1.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 12 Oct 2017 15:29:15 +0200
+In-Reply-To: <20171012112157.15647-1-marcandre.lureau@redhat.com>
+References: <20171012112157.15647-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] usb-ccid: remove needless migration state
+ code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,68 +33,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KQvMDeqONGw8IjjOs5TjgRdlOwDkbLad2
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org,
- mreitz@redhat.com, pbonzini@redhat.com, den@openvz.org
-Message-ID: <12b1ce4d-ce89-e2f4-e6fb-e057c6377972@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 00/13] nbd minimal structured read
-References: <150780535623.288.12272299760364683981@b58463cdfd5f>
- <da4434ac-e912-172e-7d04-af09e11f813a@virtuozzo.com>
-In-Reply-To: <da4434ac-e912-172e-7d04-af09e11f813a@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, 2017-10-12 at 13:21 +0200, Marc-Andr=C3=A9 Lureau wrote:
+> This code appears to be unused since its introduction. It should be
+> safe to remove from VMState.
 
-On 10/12/2017 06:15 AM, Vladimir Sementsov-Ogievskiy wrote:
-> This is a code movement, no changes.
->=20
+Well, almost:
 
->> Checking PATCH 11/13: nbd: share some nbd entities to be reused in
->> block/nbd-client.c...
->> ERROR: return of an errno should typically be -ve (return -EPERM)
->> #46: FILE: include/block/nbd.h:206:
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return EPERM;
+> @@ -1452,7 +1431,6 @@ static VMStateDescription ccid_vmstate =3D {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0VMSTATE_STRUCT_AR=
+RAY(pending_answers, USBCCIDState,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0PENDING_ANSWERS_NUM, 1, answer_vmstate,
+> Answer),
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0VMSTATE_UINT32(pe=
+nding_answers_num, USBCCIDState),
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0VMSTATE_UINT8(migratio=
+n_state, USBCCIDState),
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0VMSTATE_UINT32(st=
+ate_vmstate, USBCCIDState),
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0VMSTATE_END_OF_LI=
+ST()
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
 
-Indeed.  We could avoid the false positive by doing:
+We have to keep this (or some placeholder) so the vmstate format
+doesn't change.
 
-case ...:
-    ret =3D EPERM;
-    break;
-=2E..
-return ret;
-
-to hide the positive errno value, but I'm also fine ignoring checkpatch
-on this one.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---KQvMDeqONGw8IjjOs5TjgRdlOwDkbLad2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnfbf4ACgkQp6FrSiUn
-Q2oRtQf/T3XZBxjAKdKUu9tK8yfpLkLLmeJJfk1wkJ6eLMg9RlNa4a1WcDd1DTbp
-olU0Q29aTDkAnaBsLYr99WJm8CdZhIxy4/KN9h94sY0jQlTwzoIiiY613hv/bEnw
-vlcEefUJ05U7BMRytNbFyHOKTb9+MHukdwUineXdGha6f7fIuDmudzp2h1d0lZgK
-r7IFbXYvU7ytHqsjhRD6t0IMXzFaxGd2z0/IUXb+T7UIMx9e6Le4K1/KqIIZ2NzD
-Q30/mMEIT9E/6wQRufdbddpYY4DaTK8rCIg0/whgTybtNMQVnR5NuErzYSE6AvNo
-2yqni0/MZQUefD/ulccvTafFEXkaLA==
-=Nn5D
------END PGP SIGNATURE-----
-
---KQvMDeqONGw8IjjOs5TjgRdlOwDkbLad2--
+cheers,
+   Gerd
