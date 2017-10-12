@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e2ckn-000128-CC
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:38:22 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e2cpa-00023W-4t
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:43:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e2ckk-0003Lw-9G
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:38:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51922)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e2ckk-0003Jj-3H
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:38:18 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 16CD68765C
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 12:38:17 +0000 (UTC)
-Date: Thu, 12 Oct 2017 14:38:15 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171012143815.746b0d14@nial.brq.redhat.com>
-In-Reply-To: <20171012122826.GK16125@redhat.com>
-References: <20171012142153.125b5bd8@nial.brq.redhat.com>
-	<20171012122826.GK16125@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1e2cpZ-0000Z0-3c
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:43:18 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:56966)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e2cpY-0000YK-SF
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:43:17 -0400
+Received: by mail-wm0-x236.google.com with SMTP id l68so12987479wmd.5
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 05:43:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QAPI magician wanted ...
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Oct 2017 13:42:54 +0100
+Message-ID: <CAFEAcA81AZBaGu6nrLK51_6vWApMSpMDhb9OsnkdApMGebYK8w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] qemu.org: new git repos to be mirrored (qemu-palcode,
+ capstone, keycodemapdb)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,64 +27,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Jeff Cody <jcody@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Thu, 12 Oct 2017 13:28:26 +0100
-"Daniel P. Berrange" <berrange@redhat.com> wrote:
+On 12 October 2017 at 11:14, Daniel P. Berrange <berrange@redhat.com> wrote:
+> On Thu, Oct 12, 2017 at 12:13:23PM +0200, Gerd Hoffmann wrote:
+>> On Thu, 2017-10-12 at 11:07 +0100, Daniel P. Berrange wrote:
+>> > On Thu, Oct 12, 2017 at 12:04:47PM +0200, Gerd Hoffmann wrote:
+>> > > Hmm, so maybe we should mirror the thing on git.qemu.org and use
+>> > > that?
+>> >
+>> > Can that be made 100% automated - I don't want to have to push
+>> > changes to
+>> > two different git repos.
+>>
+>> Yes, seabios works that way for example.
+>
+> Ok, lets do that mirror then we can use git:// and we're consistent with
+> other submodules we use
 
-> On Thu, Oct 12, 2017 at 02:21:53PM +0200, Igor Mammedov wrote:
-> > 
-> > I'm working on introducing QMP command to set numa mappings
-> > via QMP interface at runtime instead of CLI.
-> > 
-> > I'd prefer to reuse NumaOptions for parsing input,
-> > but I can't wrap my head around QAPI magic.
-> > 
-> > So far I've added new command in qapi-schema.json:
-> > 
-> >   {
-> >     'command': 'set-numa-node',                                                    
-> >     'data': {'cmd': 'NumaOptions'}                                                 
-> >   }  
-> 
-> I don't see any point in the extra level of nesting you have here, vs
-> using NumaOptions as the data directly eg
-> 
->    {
->      'command': 'set-numa-node',
->      'data': 'NumaOptions'              
->    }
-I've tried that, it doesn't compile
-   'data' for command 'set-numa-node' cannot use union type 'NumaOptions'
+We also have RTH's capstone disassembler patchset which wants to
+use capstone as a more-or-less-required dependency, and we have
+the one loose end in our current submodules that the qemu-palcode
+rom is using a non-qemu.org URL.
 
-> 
-> 
-> > it at least compiles and manages to handle input without union part
-> > 
-> >   { "execute": "set-numa-node", "arguments": { "cmd": { "type": "node" } } }
-> > 
-> > however I can't figure out syntax that adds union part to it,
-> > I have tried something like this
-> > 
-> >   { "execute": "set-numa-node", "arguments": { "cmd": { "type": "node", "node" : { "nodeid": 1 } } } }
-> > 
-> > but it errors out with
-> > 
-> >   {"error": {"class": "GenericError", "desc": "Parameter 'cmd.node' is unexpected"}}
-> > 
-> > Any advice on how to make it work if possible at all or
-> > alternative ways how to achieve the end goal.  
-> 
-> I think the union gets flattenned - ie you probably want
-> 
->    { "execute": "set-numa-node", "arguments": { "cmd": { "type": "node", "nodeid": 1 } } }
-thanks, that works for me 
+So can we set up these repos to be mirrored on qemu.org:
+ * git://github.com/rth7680/qemu-palcode.git
+ * https://github.com/aquynh/capstone.git
+ * https://gitlab.com/keycodemap/keycodemapdb.git
 
-> 
-> Though with my suggestion above you could get it to just
-> 
->    { "execute": "set-numa-node", "arguments": { "type": "node", "nodeid": 1 } }
-> 
-> Regards,
-> Daniel
+please?
+
+thanks
+-- PMM
