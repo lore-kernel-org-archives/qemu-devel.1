@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e2dvb-00080W-0J
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e2dva-00080U-Vj
 	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:53:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e2dvX-0004wu-QW
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e2dvY-0004xd-Rh
 	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:53:35 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:33119 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:41936 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1e2dvX-0004vb-EQ
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:53:31 -0400
+	id 1e2dvY-0004wY-F7
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:53:32 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 12 Oct 2017 16:53:10 +0300
-Message-Id: <20171012135313.227864-3-vsementsov@virtuozzo.com>
+Date: Thu, 12 Oct 2017 16:53:13 +0300
+Message-Id: <20171012135313.227864-6-vsementsov@virtuozzo.com>
 In-Reply-To: <20171012135313.227864-1-vsementsov@virtuozzo.com>
 References: <20171012135313.227864-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 2/5] backup: move from done_bitmap to
- copy_bitmap
+Subject: [Qemu-devel] [PATCH 5/5] backup: use copy_bitmap in incremental
+ backup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,113 +28,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: jsnow@redhat.com, famz@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, stefanha@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-Use HBitmap copy_bitmap instead of done_bitmap. This is needed to
-improve incremental backup in following patches and to unify backup
-loop for full/incremental modes in future patches.
+We can use copy_bitmap instead of sync_bitmap. copy_bitmap is
+initialized from sync_bitmap and it is more informative: we will not try
+to process data, that is already in progress (by write notifier).
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- block/backup.c | 23 ++++++++++++++---------
- 1 file changed, 14 insertions(+), 9 deletions(-)
+ block/backup.c | 55 +++++++++++++++++--------------------------------------
+ 1 file changed, 17 insertions(+), 38 deletions(-)
 
 diff --git a/block/backup.c b/block/backup.c
-index 06ddbfd03d..6fdb4c33f7 100644
+index 04608836d7..6bf5fe6b32 100644
 --- a/block/backup.c
 +++ b/block/backup.c
-@@ -40,11 +40,12 @@ typedef struct BackupBlockJob {
-     BlockdevOnError on_target_error;
-     CoRwlock flush_rwlock;
-     uint64_t bytes_read;
--    unsigned long *done_bitmap;
-     int64_t cluster_size;
-     bool compress;
-     NotifierWithReturn before_write;
-     QLIST_HEAD(, CowRequest) inflight_reqs;
-+
-+    HBitmap *copy_bitmap;
- } BackupBlockJob;
+@@ -362,49 +362,28 @@ static bool coroutine_fn yield_and_check(BackupBlockJob *job)
  
- /* See if in-flight requests overlap and wait for them to complete */
-@@ -109,10 +110,11 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-     cow_request_begin(&cow_request, job, start, end);
- 
-     for (; start < end; start += job->cluster_size) {
--        if (test_bit(start / job->cluster_size, job->done_bitmap)) {
-+        if (!hbitmap_get(job->copy_bitmap, start / job->cluster_size)) {
-             trace_backup_do_cow_skip(job, start);
-             continue; /* already copied */
-         }
-+        hbitmap_reset(job->copy_bitmap, start / job->cluster_size, 1);
- 
-         trace_backup_do_cow_process(job, start);
- 
-@@ -132,6 +134,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-             if (error_is_read) {
-                 *error_is_read = true;
-             }
-+            hbitmap_set(job->copy_bitmap, start / job->cluster_size, 1);
-             goto out;
-         }
- 
-@@ -148,11 +151,10 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-             if (error_is_read) {
-                 *error_is_read = false;
-             }
-+            hbitmap_set(job->copy_bitmap, start / job->cluster_size, 1);
-             goto out;
-         }
- 
--        set_bit(start / job->cluster_size, job->done_bitmap);
+ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+ {
++    int ret;
+     bool error_is_read;
+-    int ret = 0;
+-    int clusters_per_iter;
+-    uint32_t granularity;
+-    int64_t offset;
+     int64_t cluster;
+-    int64_t end;
+-    BdrvDirtyBitmapIter *dbi;
 -
-         /* Publish progress, guest I/O counts as progress too.  Note that the
-          * offset field is an opaque progress value, it is not a disk offset.
-          */
-@@ -260,7 +262,7 @@ void backup_do_checkpoint(BlockJob *job, Error **errp)
+-    granularity = bdrv_dirty_bitmap_granularity(job->sync_bitmap);
+-    clusters_per_iter = MAX((granularity / job->cluster_size), 1);
+-    dbi = bdrv_dirty_iter_new(job->sync_bitmap);
+-
+-    /* Find the next dirty sector(s) */
+-    while ((offset = bdrv_dirty_iter_next(dbi)) >= 0) {
+-        cluster = offset / job->cluster_size;
+-
+-        for (end = cluster + clusters_per_iter; cluster < end; cluster++) {
+-            do {
+-                if (yield_and_check(job)) {
+-                    goto out;
+-                }
+-                ret = backup_do_cow(job, cluster * job->cluster_size,
+-                                    job->cluster_size, &error_is_read,
+-                                    false);
+-                if ((ret < 0) &&
+-                    backup_error_action(job, error_is_read, -ret) ==
+-                    BLOCK_ERROR_ACTION_REPORT) {
+-                    goto out;
+-                }
+-            } while (ret < 0);
+-        }
++    HBitmapIter hbi;
+ 
+-        /* If the bitmap granularity is smaller than the backup granularity,
+-         * we need to advance the iterator pointer to the next cluster. */
+-        if (granularity < job->cluster_size) {
+-            bdrv_set_dirty_iter(dbi, cluster * job->cluster_size);
+-        }
++    hbitmap_iter_init(&hbi, job->copy_bitmap, 0);
++    while ((cluster = hbitmap_iter_next(&hbi)) != -1) {
++        do {
++            if (yield_and_check(job)) {
++                return 0;
++            }
++            ret = backup_do_cow(job, cluster * job->cluster_size,
++                                job->cluster_size, &error_is_read, false);
++            if (ret < 0 && backup_error_action(job, error_is_read, -ret) ==
++                           BLOCK_ERROR_ACTION_REPORT)
++            {
++                return ret;
++            }
++        } while (ret < 0);
      }
  
-     len = DIV_ROUND_UP(backup_job->common.len, backup_job->cluster_size);
--    bitmap_zero(backup_job->done_bitmap, len);
-+    hbitmap_set(backup_job->copy_bitmap, 0, len);
+-out:
+-    bdrv_dirty_iter_free(dbi);
+-    return ret;
++    return 0;
  }
  
- void backup_wait_for_overlapping_requests(BlockJob *job, int64_t offset,
-@@ -425,19 +427,22 @@ static void coroutine_fn backup_run(void *opaque)
-     BackupBlockJob *job = opaque;
-     BackupCompleteData *data;
-     BlockDriverState *bs = blk_bs(job->common.blk);
--    int64_t offset;
-+    int64_t offset, nb_clusters;
-     int ret = 0;
- 
-     QLIST_INIT(&job->inflight_reqs);
-     qemu_co_rwlock_init(&job->flush_rwlock);
- 
--    job->done_bitmap = bitmap_new(DIV_ROUND_UP(job->common.len,
--                                               job->cluster_size));
-+    nb_clusters = DIV_ROUND_UP(job->common.len, job->cluster_size);
-+    job->copy_bitmap = hbitmap_alloc(nb_clusters, 0);
-+    hbitmap_set(job->copy_bitmap, 0, nb_clusters);
- 
-     job->before_write.notify = backup_before_write_notify;
-     bdrv_add_before_write_notifier(bs, &job->before_write);
- 
-     if (job->sync_mode == MIRROR_SYNC_MODE_NONE) {
-+        /* All bits are set in copy_bitmap to allow any cluster to be copied.
-+         * This does not actually require them to be copied. */
-         while (!block_job_is_cancelled(&job->common)) {
-             /* Yield until the job is cancelled.  We just let our before_write
-              * notify callback service CoW requests. */
-@@ -512,7 +517,7 @@ static void coroutine_fn backup_run(void *opaque)
-     /* wait until pending backup_do_cow() calls have completed */
-     qemu_co_rwlock_wrlock(&job->flush_rwlock);
-     qemu_co_rwlock_unlock(&job->flush_rwlock);
--    g_free(job->done_bitmap);
-+    hbitmap_free(job->copy_bitmap);
- 
-     data = g_malloc(sizeof(*data));
-     data->ret = ret;
+ /* init copy_bitmap from sync_bitmap */
 -- 
 2.11.1
