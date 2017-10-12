@@ -1,34 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e2UzP-0004HQ-Gc
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 00:20:56 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1e2VDJ-0005ui-Db
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 00:35:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e2UzL-0006XD-H6
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 00:20:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50140)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e2UzL-0006WW-Bm
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 00:20:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e2UzJ-0007eh-OZ
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 04:20:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AF0BE2E80CB
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 04:20:49 +0000 (UTC)
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1e2VDG-0008QR-5u
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 00:35:17 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59860)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1e2VDF-0008PJ-UE
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 00:35:14 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9C4Ynk2008268
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 00:35:09 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dhv1rv003-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 00:35:09 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Thu, 12 Oct 2017 05:35:07 +0100
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <20171009154930.29095-4-clg@kaod.org>
+References: <20171009154930.29095-1-clg@kaod.org>
+	<20171009154930.29095-4-clg@kaod.org>
+Date: Thu, 12 Oct 2017 10:04:58 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Oct 2017 04:12:32 -0000
-From: Geoffrey McRae <1722884@bugs.launchpad.net>
-Reply-To: Bug 1722884 <1722884@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150774787109.964.13450141235232669497.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150778155304.843.8014359061193857659.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1722884] Re: keyboard input while mouse moving
- triggers mouse failure
+Message-Id: <87shep3rwt.fsf@localhost.localdomain.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] spapr/rtas: fix reboot of a SMP TCG
+ guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,117 +42,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-Further to this, it appears to be a race condition with reading from the
-i8042 controller. I have turned on debugging of PS2 and KBD and filtered
-out the event that causes the issue. I have split the below up to show
-the valid reads for the mouse and then the sequence that triggers a
-reset when the keyboard is used.
+C=C3=A9dric Le Goater <clg@kaod.org> writes:
 
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read data=3D0x08
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read data=3D0x00
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read data=3D0x02
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read data=3D0x00
+> Just like for hot unplugged CPUs, when a guest is rebooted, the
+> secondary CPUs can be awaken by the decrementer and start entering
+> SLOF at the same time the boot CPU is.
+>
+> To be safe, let's disable the decrementer interrupt in the LPCR for
+> the secondaries.
+>
+> Based on previous work from Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+>
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read data=3D0x18
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read data=3D0xfe
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read data=3D0x02
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read data=3D0x00
+Reviewed-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read data=3D0x08
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read data=3D0x00
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read data=3D0x01
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read data=3D0x00
-
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read status=3D0x1d <-- the status changed on the 2nd call.
-KBD: kbd: read status=3D0x1d
-KBD: kbd: read data=3D0x9e
-
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read data=3D0x18
-KBD: kbd: read data=3D0xff <-- two data reads without checking status
-KBD: kbd: read status=3D0x3d <-- guest looking for mouse movements
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read data=3D0x02   <-- first byte
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read status=3D0x3d
-KBD: kbd: read data=3D0x00   <-- 2nd byte
-KBD: kbd: read status=3D0x1c <-- no more data, there should be two more byt=
-es
-KBD: kbd: read status=3D0x1c
-KBD: kbd: read status=3D0x1c
-
-here the host attempts to reset the device
-
-KBD: kbd: write cmd=3D0xd4   <-- write to mouse cmd
-KBD: kbd: read status=3D0x1c
-KBD: kbd: read status=3D0x1c
-KBD: kbd: read status=3D0x1c
-KBD: kbd: write data=3D0xff  <-- reset mouse
-kbd: write mouse 0xff
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1722884
-
-Title:
-  keyboard input while mouse moving triggers mouse failure
-
-Status in QEMU:
-  New
-
-Bug description:
-  When QEMU is getting a ton of mouse input events if keys are pressed
-  on the keyboard the scan code will be corrupted causing erroneous
-  behavior. I have confirmed this problem in the latest version in git
-  (530049bc1dcc24c1178a29d99ca08b6dd08413e0).
-
-  After the erroneous behavior the operating system issues a keyboard
-  reset which prevents the mouse from functioning until the operating
-  system is restarted.
-
-  This seems to only occur if the PS2 mouse is being used as the input,
-  the tablet input device doesn't exhibit this behavior.
-
-  The same problem was reported here also:
-  https://openxt.atlassian.net/browse/OXT-562
-
-  Host  : Debian 9
-  CPU   : Ryzen 1700X
-  RAM   : 16GB
-  Kernel: 4.12.0-0.bpo.2-amd64
-
-  Guest : Windows 10 (KVM)
-  RAM   : 8GB (1GB Huge pages)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1722884/+subscriptions
+> ---
+>  hw/ppc/spapr_cpu_core.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+>
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 37beb56e8b18..112868dc39d5 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -20,6 +20,7 @@
+>  #include "sysemu/numa.h"
+>  #include "sysemu/hw_accel.h"
+>  #include "qemu/error-report.h"
+> +#include "target/ppc/cpu-models.h"
+>
+>  void spapr_cpu_parse_features(sPAPRMachineState *spapr)
+>  {
+> @@ -86,6 +87,17 @@ static void spapr_cpu_reset(void *opaque)
+>      cs->halted =3D 1;
+>
+>      env->spr[SPR_HIOR] =3D 0;
+> +
+> +    /* Don't let the decremeter wake up CPUs other than the boot
+> +     * CPUs. this can cause issues when rebooting the guest */
+> +    if (cs !=3D first_cpu) {
+> +        if (ppc_cpu_pvr_match(cpu, CPU_POWERPC_LOGICAL_3_00)) {
+> +            env->spr[SPR_LPCR] &=3D ~LPCR_DEE;
+> +        } else {
+> +            /* P7 and P8 both have same bit for DECR */
+> +            env->spr[SPR_LPCR] &=3D ~LPCR_P8_PECE3;
+> +        }
+> +    }
+>  }
+>
+>  static void spapr_cpu_destroy(PowerPCCPU *cpu)
+> --=20
+> 2.13.6
