@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e2dI7-0002hW-Hs
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:12:48 -0400
+	(envelope-from <berto@igalia.com>) id 1e2dIK-0002rC-FC
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:13:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e2dI6-0004sf-I9
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:12:47 -0400
+	(envelope-from <berto@igalia.com>) id 1e2dIG-00053Q-F1
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:13:00 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Thu, 12 Oct 2017 16:05:24 +0300
-Message-Id: <cb0fd7a0aa76b107abe046293285041234a40a63.1507813391.git.berto@igalia.com>
+Date: Thu, 12 Oct 2017 16:05:26 +0300
+Message-Id: <0df578270b431a74b00109930825fa6145bf4873.1507813391.git.berto@igalia.com>
 In-Reply-To: <cover.1507813391.git.berto@igalia.com>
 References: <cover.1507813391.git.berto@igalia.com>
 In-Reply-To: <cover.1507813391.git.berto@igalia.com>
 References: <cover.1507813391.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 10/31] qcow2: Remove BDS parameter from
- qcow2_cache_discard()
+Subject: [Qemu-devel] [PATCH 12/31] qcow2: Add offset_to_l1_index()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +24,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Alberto Garcia <berto@igalia.com>
 
-This function was only using the BlockDriverState parameter to pass it
-to qcow2_cache_get_table_idx() and qcow2_cache_table_release(). This
-is no longer necessary so this parameter can be removed.
+Similar to offset_to_l2_index(), this function returns the index in
+the L1 table for a given guest offset. This is only used in a couple
+of places and it's not a particularly complex calculation, but it
+makes the code a bit more readable.
+
+Although in the qcow2_get_cluster_offset() case the old code was
+taking advantage of the l1_bits variable, we're going to get rid of
+the other uses of l1_bits in a later patch anyway, so it doesn't make
+sense to keep it just for this.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2-cache.c    | 2 +-
- block/qcow2-refcount.c | 6 +++---
- block/qcow2.h          | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ block/qcow2-cluster.c | 4 ++--
+ block/qcow2.h         | 5 +++++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
-index cc7995c4bf..4775bec838 100644
---- a/block/qcow2-cache.c
-+++ b/block/qcow2-cache.c
-@@ -420,7 +420,7 @@ void *qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
-     return NULL;
- }
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 45d05f86fe..f35bb20dd5 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -533,7 +533,7 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
  
--void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table)
-+void qcow2_cache_discard(Qcow2Cache *c, void *table)
- {
-     int i = qcow2_cache_get_table_idx(c, table);
+     /* seek to the l2 offset in the l1 table */
  
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index e93c1acd79..6eb71a2a5f 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -868,12 +868,12 @@ static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
-                                                 offset);
-             if (table != NULL) {
-                 qcow2_cache_put(s->refcount_block_cache, &refcount_block);
--                qcow2_cache_discard(bs, s->refcount_block_cache, table);
-+                qcow2_cache_discard(s->refcount_block_cache, table);
-             }
+-    l1_index = offset >> l1_bits;
++    l1_index = offset_to_l1_index(s, offset);
+     if (l1_index >= s->l1_size) {
+         type = QCOW2_CLUSTER_UNALLOCATED;
+         goto out;
+@@ -656,7 +656,7 @@ static int get_cluster_table(BlockDriverState *bs, uint64_t offset,
  
-             table = qcow2_cache_is_table_offset(bs, s->l2_table_cache, offset);
-             if (table != NULL) {
--                qcow2_cache_discard(bs, s->l2_table_cache, table);
-+                qcow2_cache_discard(s->l2_table_cache, table);
-             }
+     /* seek to the l2 offset in the l1 table */
  
-             if (s->discard_passthrough[type]) {
-@@ -3106,7 +3106,7 @@ static int qcow2_discard_refcount_block(BlockDriverState *bs,
-                                            discard_block_offs);
-     if (refblock) {
-         /* discard refblock from the cache if refblock is cached */
--        qcow2_cache_discard(bs, s->refcount_block_cache, refblock);
-+        qcow2_cache_discard(s->refcount_block_cache, refblock);
-     }
-     update_refcount_discard(bs, discard_block_offs, s->cluster_size);
- 
+-    l1_index = offset >> (s->l2_bits + s->cluster_bits);
++    l1_index = offset_to_l1_index(s, offset);
+     if (l1_index >= s->l1_size) {
+         ret = qcow2_grow_l1_table(bs, l1_index + 1, false);
+         if (ret < 0) {
 diff --git a/block/qcow2.h b/block/qcow2.h
-index 9e6b5102f0..ec0225c016 100644
+index c3ab19ddd0..61c6c27673 100644
 --- a/block/qcow2.h
 +++ b/block/qcow2.h
-@@ -665,7 +665,7 @@ int qcow2_cache_get_empty(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset,
- void qcow2_cache_put(Qcow2Cache *c, void **table);
- void *qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
-                                   uint64_t offset);
--void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table);
-+void qcow2_cache_discard(Qcow2Cache *c, void *table);
+@@ -463,6 +463,11 @@ static inline int64_t size_to_l1(BDRVQcow2State *s, int64_t size)
+     return (size + (1ULL << shift) - 1) >> shift;
+ }
  
- /* qcow2-bitmap.c functions */
- int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
++static inline int offset_to_l1_index(BDRVQcow2State *s, uint64_t offset)
++{
++    return offset >> (s->l2_bits + s->cluster_bits);
++}
++
+ static inline int offset_to_l2_index(BDRVQcow2State *s, int64_t offset)
+ {
+     return (offset >> s->cluster_bits) & (s->l2_size - 1);
 -- 
 2.11.0
