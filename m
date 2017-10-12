@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1e2fxS-0003IZ-9z
+	(envelope-from <pm215@archaic.org.uk>) id 1e2fxS-0003Io-K7
 	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 12:03:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1e2fxR-0004bZ-8n
+	(envelope-from <pm215@archaic.org.uk>) id 1e2fxR-0004bx-Nb
 	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 12:03:38 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37896)
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37902)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1e2fxR-0004Xg-2o
+	id 1e2fxR-0004as-Gf
 	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 12:03:37 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1e2fxL-0000bb-Ms
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 17:03:31 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1e2fxQ-0000fJ-Ep
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 17:03:36 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Oct 2017 17:03:24 +0100
-Message-Id: <1507824216-29058-2-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 12 Oct 2017 17:03:32 +0100
+Message-Id: <1507824216-29058-10-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1507824216-29058-1-git-send-email-peter.maydell@linaro.org>
 References: <1507824216-29058-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 01/13] watchdog/aspeed: fix variable type to
- store reload value
+Subject: [Qemu-devel] [PULL 09/13] target-arm: Simplify insn_crosses_page()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,42 +29,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Cédric Le Goater <clg@kaod.org>
+Recent changes have left insn_crosses_page() more complicated
+than it needed to be:
+ * it's only called from thumb_tr_translate_insn() so we know
+   for certain that we're looking at a Thumb insn
+ * the caller's check for dc->pc >= dc->next_page_start - 3
+   means that dc->pc can't possibly be 4 aligned, so there's
+   no need to check that (the check was partly there to ensure
+   that we didn't treat an ARM insn as Thumb, I think)
+ * we now have thumb_insn_is_16bit() which lets us do a precise
+   check of the length of the next insn, rather than opencoding
+   an inaccurate check
 
-Initially from Anton D. Kachalov" <mouse@yandex-team.ru> but the SoB was
-missing.
+Simplify it down to just loading the first half of the insn
+and calling thumb_insn_is_16bit() on it.
 
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Acked-by: Andrew Jeffery <andrew@aj.id.au>
-Message-id: 20170920064915.30027-1-clg@kaod.org
-[clg: change commit log and subject
-      replace UL suffix by ULL ]
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 1507556919-24992-8-git-send-email-peter.maydell@linaro.org
 ---
- hw/watchdog/wdt_aspeed.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/arm/translate.c | 27 ++++++---------------------
+ 1 file changed, 6 insertions(+), 21 deletions(-)
 
-diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
-index 22bce36..95f6ad1 100644
---- a/hw/watchdog/wdt_aspeed.c
-+++ b/hw/watchdog/wdt_aspeed.c
-@@ -100,13 +100,13 @@ static uint64_t aspeed_wdt_read(void *opaque, hwaddr offset, unsigned size)
- 
- static void aspeed_wdt_reload(AspeedWDTState *s, bool pclk)
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 19c136c..a5abdfa 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -11872,29 +11872,14 @@ static bool insn_crosses_page(CPUARMState *env, DisasContext *s)
  {
--    uint32_t reload;
-+    uint64_t reload;
+     /* Return true if the insn at dc->pc might cross a page boundary.
+      * (False positives are OK, false negatives are not.)
++     * We know this is a Thumb insn, and our caller ensures we are
++     * only called if dc->pc is less than 4 bytes from the page
++     * boundary, so we cross the page if the first 16 bits indicate
++     * that this is a 32 bit insn.
+      */
+-    uint16_t insn;
++    uint16_t insn = arm_lduw_code(env, s->pc, s->sctlr_b);
  
-     if (pclk) {
-         reload = muldiv64(s->regs[WDT_RELOAD_VALUE], NANOSECONDS_PER_SECOND,
-                           s->pclk_freq);
-     } else {
--        reload = s->regs[WDT_RELOAD_VALUE] * 1000;
-+        reload = s->regs[WDT_RELOAD_VALUE] * 1000ULL;
-     }
+-    if ((s->pc & 3) == 0) {
+-        /* At a 4-aligned address we can't be crossing a page */
+-        return false;
+-    }
+-
+-    /* This must be a Thumb insn */
+-    insn = arm_lduw_code(env, s->pc, s->sctlr_b);
+-
+-    if ((insn >> 11) >= 0x1d) {
+-        /* Top five bits 0b11101 / 0b11110 / 0b11111 : this is the
+-         * First half of a 32-bit Thumb insn. Thumb-1 cores might
+-         * end up actually treating this as two 16-bit insns (see the
+-         * code at the start of disas_thumb2_insn()) but we don't bother
+-         * to check for that as it is unlikely, and false positives here
+-         * are harmless.
+-         */
+-        return true;
+-    }
+-    /* Definitely a 16-bit insn, can't be crossing a page. */
+-    return false;
++    return !thumb_insn_is_16bit(s, insn);
+ }
  
-     if (aspeed_wdt_is_enabled(s)) {
+ static int arm_tr_init_disas_context(DisasContextBase *dcbase,
 -- 
 2.7.4
