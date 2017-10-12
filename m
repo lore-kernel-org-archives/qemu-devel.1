@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e2fva-0001qt-L8
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 12:01:43 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1e2fxO-0003HO-D3
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 12:03:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e2fvU-0003jQ-Mo
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 12:01:42 -0400
-Date: Thu, 12 Oct 2017 18:01:31 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171012180131.6871342d@nial.brq.redhat.com>
-In-Reply-To: <20171012172051.0c90ce58@bahia.lab.toulouse-stg.fr.ibm.com>
-References: <1507578671-158758-1-git-send-email-imammedo@redhat.com>
-	<1507578671-158758-14-git-send-email-imammedo@redhat.com>
-	<20171010092946.02beddd2@bahia.lan> <20171012143400.555ba3c0@bahia>
-	<20171012165839.6af44578@nial.brq.redhat.com>
-	<20171012172051.0c90ce58@bahia.lab.toulouse-stg.fr.ibm.com>
+	(envelope-from <pm215@archaic.org.uk>) id 1e2fxN-0004Yj-Iz
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 12:03:34 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37896)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1e2fxN-0004Xg-Aq
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 12:03:33 -0400
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1e2fxL-0000bN-49
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 17:03:31 +0100
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Oct 2017 17:03:23 +0100
+Message-Id: <1507824216-29058-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 13/24] ppc: spapr: define
- core types statically
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/13] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,69 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: "open list:ppce500" <qemu-ppc@nongnu.org>, =?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-On Thu, 12 Oct 2017 17:20:51 +0200
-Greg Kurz <groug@kaod.org> wrote:
+target-arm queue:
+ * mostly my latest v8M stuff, plus a couple of minor patches
 
-> On Thu, 12 Oct 2017 16:58:39 +0200
-> Igor Mammedov <imammedo@redhat.com> wrote:
-> 
-> > On Thu, 12 Oct 2017 15:10:30 +0200
-> > Greg Kurz <groug@kaod.org> wrote:
-> >   
-> > > On Tue, 10 Oct 2017 09:29:46 +0200
-> > > Greg Kurz <groug@kaod.org> wrote:
-> > >     
-> > > > On Mon,  9 Oct 2017 21:51:00 +0200
-> > > > Igor Mammedov <imammedo@redhat.com> wrote:
-> > > >       
-> > > > > spapr core type definition doesn't have any fields that
-> > > > > require it to be defined at runtime. So replace code
-> > > > > that fills in TypeInfo at runtime with static TypeInfo
-> > > > > array that does the same at complie time.
-> > > > > 
-> > > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > > > ---
-> > > > > v2:
-> > > > >   - fix rebase conflict: add newly added power9_v2 core
-> > > > > ---        
-> > > > 
-> > > > Reviewed-by: Greg Kurz <groug@kaod.org>
-> > > >       
-> > > 
-> > > Oops, this patch causes a regression when you try to pass a sPAPR core to
-> > > a non-pseries machine.
-> > > 
-> > > Without this patch:
-> > > 
-> > > $ ppc64-softmmu/qemu-system-ppc64 -M none -device host-spapr-cpu-core 
-> > > qemu-system-ppc64: -device host-spapr-cpu-core:
-> > >  'host-spapr-cpu-core' is not a valid device model name
-> > > 
-> > > With this patch:
-> > > 
-> > > $ ppc64-softmmu/qemu-system-ppc64 -M none -device host-spapr-cpu-core 
-> > > **
-> > > ERROR:qom/object.c:217:object_type_get_instance_size:
-> > >  assertion failed: (type != NULL)
-> > > Aborted    
-> > there shouldn't be type host-spapr-cpu-core with this patch since you don't have -enable-kvm on CLI
-> > maybe you are talking about
-> >     [PATCH v2 15/24] ppc: spapr: register 'host' core type  along with the rest of core types
-> >   
-> 
-> Oops you're right, I replied to the wrong mail... of course, I meant the
-> following commit in David's staging tree:
-> 
-> https://github.com/dgibson/qemu/commit/c18165144076cef0c17206f5231cf9787c944037
+The following changes since commit a0b261db8c030813e30a39eae47359ac2a37f7e2:
 
-fixed by:
-  [PATCH v2 14/24] fixup! ppc: spapr: use cpu type name  directly
+  Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-request' into staging (2017-10-12 10:02:09 +0100)
 
-also I've stumbled upon another issue, fixup also posted:
+are available in the git repository at:
 
-  [PATCH v2 18/24] fixup! ppc: spapr: use generic  cpu_model parsing
+  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20171012
 
-fixup well localized and didn't cause conflicts so there is no need to respin series
+for you to fetch changes up to cf5f7937b05c84d5565134f058c00cd48304a117:
+
+  nvic: Fix miscalculation of offsets into ITNS array (2017-10-12 16:33:16 +0100)
+
+----------------------------------------------------------------
+target-arm queue:
+ * v8M: SG, BLXNS, secure-return
+ * v8M: fixes for coverity issues in previous patches
+ * arm: fix armv7m_init() declaration to match definition
+ * watchdog/aspeed: fix variable type to store reload value
+
+----------------------------------------------------------------
+Cédric Le Goater (1):
+      watchdog/aspeed: fix variable type to store reload value
+
+Igor Mammedov (1):
+      arm: fix armv7m_init() declaration to match definition
+
+Peter Maydell (11):
+      target/arm: Add M profile secure MMU index values to get_a32_user_mem_index()
+      target/arm: Implement SG instruction
+      target/arm: Implement BLXNS
+      target/arm: Implement secure function return
+      target-arm: Don't check for "Thumb2 or M profile" for not-Thumb1
+      target/arm: Pull Thumb insn word loads up to top level
+      target-arm: Simplify insn_crosses_page()
+      target/arm: Support some Thumb insns being always unconditional
+      target/arm: Implement SG instruction corner cases
+      nvic: Add missing 'break'
+      nvic: Fix miscalculation of offsets into ITNS array
+
+ include/hw/arm/arm.h     |   2 +-
+ target/arm/helper.h      |   1 +
+ target/arm/internals.h   |   8 ++
+ hw/intc/armv7m_nvic.c    |   5 +-
+ hw/watchdog/wdt_aspeed.c |   4 +-
+ target/arm/helper.c      | 306 ++++++++++++++++++++++++++++++++++++++++++++--
+ target/arm/translate.c   | 310 ++++++++++++++++++++++++++++++++---------------
+ 7 files changed, 521 insertions(+), 115 deletions(-)
