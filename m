@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e2dG5-00010I-9l
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:10:42 -0400
+	(envelope-from <berto@igalia.com>) id 1e2dG4-0000zw-Oh
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:10:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e2dG4-0000ii-Dx
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:10:41 -0400
+	(envelope-from <berto@igalia.com>) id 1e2dG0-0000Yd-Kg
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:10:40 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Thu, 12 Oct 2017 16:05:42 +0300
-Message-Id: <97641359a12a95f2cc8cad3441432c552da6d369.1507813391.git.berto@igalia.com>
+Date: Thu, 12 Oct 2017 16:05:16 +0300
+Message-Id: <ec587eb4c7da744d2516028ed0c5ce840a96ea80.1507813391.git.berto@igalia.com>
 In-Reply-To: <cover.1507813391.git.berto@igalia.com>
 References: <cover.1507813391.git.berto@igalia.com>
 In-Reply-To: <cover.1507813391.git.berto@igalia.com>
 References: <cover.1507813391.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 28/31] qcow2: Rename l2_table in
- count_contiguous_clusters()
+Subject: [Qemu-devel] [PATCH 02/31] qcow2: Add table size field to Qcow2Cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +24,122 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Alberto Garcia <berto@igalia.com>
 
-This function doesn't need any changes to support L2 slices, but since
-it's now dealing with slices intead of full tables, the l2_table
-variable is renamed for clarity.
+The table size in the qcow2 cache is currently equal to the cluster
+size. This doesn't allow us to use the cache memory efficiently,
+particularly with large cluster sizes, so we need to be able to have
+smaller cache tables that are independent from the cluster size. This
+patch adds a new field to Qcow2Cache that we can use instead of the
+cluster size.
+
+The current table size is still being initialized to the cluster size,
+so there are no semantic changes yet, but this patch will allow us to
+prepare the rest of the code and simplify a few function calls.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2-cluster.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ block/qcow2-cache.c | 27 +++++++++++++--------------
+ 1 file changed, 13 insertions(+), 14 deletions(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index e7b07d3366..a961901da0 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -363,19 +363,19 @@ fail:
+diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
+index 75746a7f43..72cb7148ff 100644
+--- a/block/qcow2-cache.c
++++ b/block/qcow2-cache.c
+@@ -39,6 +39,7 @@ struct Qcow2Cache {
+     Qcow2CachedTable       *entries;
+     struct Qcow2Cache      *depends;
+     int                     size;
++    int                     table_size;
+     bool                    depends_on_flush;
+     void                   *table_array;
+     uint64_t                lru_counter;
+@@ -48,17 +49,15 @@ struct Qcow2Cache {
+ static inline void *qcow2_cache_get_table_addr(BlockDriverState *bs,
+                     Qcow2Cache *c, int table)
+ {
+-    BDRVQcow2State *s = bs->opaque;
+-    return (uint8_t *) c->table_array + (size_t) table * s->cluster_size;
++    return (uint8_t *) c->table_array + (size_t) table * c->table_size;
  }
  
- /*
-- * Checks how many clusters in a given L2 table are contiguous in the image
-+ * Checks how many clusters in a given L2 slice are contiguous in the image
-  * file. As soon as one of the flags in the bitmask stop_flags changes compared
-  * to the first cluster, the search is stopped and the cluster is not counted
-  * as contiguous. (This allows it, for example, to stop at the first compressed
-  * cluster which may require a different handling)
-  */
- static int count_contiguous_clusters(int nb_clusters, int cluster_size,
--        uint64_t *l2_table, uint64_t stop_flags)
-+        uint64_t *l2_slice, uint64_t stop_flags)
+ static inline int qcow2_cache_get_table_idx(BlockDriverState *bs,
+                   Qcow2Cache *c, void *table)
  {
-     int i;
-     QCow2ClusterType first_cluster_type;
-     uint64_t mask = stop_flags | L2E_OFFSET_MASK | QCOW_OFLAG_COMPRESSED;
--    uint64_t first_entry = be64_to_cpu(l2_table[0]);
-+    uint64_t first_entry = be64_to_cpu(l2_slice[0]);
-     uint64_t offset = first_entry & mask;
+-    BDRVQcow2State *s = bs->opaque;
+     ptrdiff_t table_offset = (uint8_t *) table - (uint8_t *) c->table_array;
+-    int idx = table_offset / s->cluster_size;
+-    assert(idx >= 0 && idx < c->size && table_offset % s->cluster_size == 0);
++    int idx = table_offset / c->table_size;
++    assert(idx >= 0 && idx < c->size && table_offset % c->table_size == 0);
+     return idx;
+ }
  
-     if (!offset) {
-@@ -388,7 +388,7 @@ static int count_contiguous_clusters(int nb_clusters, int cluster_size,
-            first_cluster_type == QCOW2_CLUSTER_ZERO_ALLOC);
+@@ -67,10 +66,9 @@ static void qcow2_cache_table_release(BlockDriverState *bs, Qcow2Cache *c,
+ {
+ /* Using MADV_DONTNEED to discard memory is a Linux-specific feature */
+ #ifdef CONFIG_LINUX
+-    BDRVQcow2State *s = bs->opaque;
+     void *t = qcow2_cache_get_table_addr(bs, c, i);
+     int align = getpagesize();
+-    size_t mem_size = (size_t) s->cluster_size * num_tables;
++    size_t mem_size = (size_t) c->table_size * num_tables;
+     size_t offset = QEMU_ALIGN_UP((uintptr_t) t, align) - (uintptr_t) t;
+     size_t length = QEMU_ALIGN_DOWN(mem_size - offset, align);
+     if (length > 0) {
+@@ -120,9 +118,10 @@ Qcow2Cache *qcow2_cache_create(BlockDriverState *bs, int num_tables)
  
-     for (i = 0; i < nb_clusters; i++) {
--        uint64_t l2_entry = be64_to_cpu(l2_table[i]) & mask;
-+        uint64_t l2_entry = be64_to_cpu(l2_slice[i]) & mask;
-         if (offset + (uint64_t) i * cluster_size != l2_entry) {
-             break;
+     c = g_new0(Qcow2Cache, 1);
+     c->size = num_tables;
++    c->table_size = s->cluster_size;
+     c->entries = g_try_new0(Qcow2CachedTable, num_tables);
+     c->table_array = qemu_try_blockalign(bs->file->bs,
+-                                         (size_t) num_tables * s->cluster_size);
++                                         (size_t) num_tables * c->table_size);
+ 
+     if (!c->entries || !c->table_array) {
+         qemu_vfree(c->table_array);
+@@ -191,13 +190,13 @@ static int qcow2_cache_entry_flush(BlockDriverState *bs, Qcow2Cache *c, int i)
+ 
+     if (c == s->refcount_block_cache) {
+         ret = qcow2_pre_write_overlap_check(bs, QCOW2_OL_REFCOUNT_BLOCK,
+-                c->entries[i].offset, s->cluster_size);
++                c->entries[i].offset, c->table_size);
+     } else if (c == s->l2_table_cache) {
+         ret = qcow2_pre_write_overlap_check(bs, QCOW2_OL_ACTIVE_L2,
+-                c->entries[i].offset, s->cluster_size);
++                c->entries[i].offset, c->table_size);
+     } else {
+         ret = qcow2_pre_write_overlap_check(bs, 0,
+-                c->entries[i].offset, s->cluster_size);
++                c->entries[i].offset, c->table_size);
+     }
+ 
+     if (ret < 0) {
+@@ -211,7 +210,7 @@ static int qcow2_cache_entry_flush(BlockDriverState *bs, Qcow2Cache *c, int i)
+     }
+ 
+     ret = bdrv_pwrite(bs->file, c->entries[i].offset,
+-                      qcow2_cache_get_table_addr(bs, c, i), s->cluster_size);
++                      qcow2_cache_get_table_addr(bs, c, i), c->table_size);
+     if (ret < 0) {
+         return ret;
+     }
+@@ -318,7 +317,7 @@ static int qcow2_cache_do_get(BlockDriverState *bs, Qcow2Cache *c,
+                           offset, read_from_disk);
+ 
+     /* Check if the table is already cached */
+-    i = lookup_index = (offset / s->cluster_size * 4) % c->size;
++    i = lookup_index = (offset / c->table_size * 4) % c->size;
+     do {
+         const Qcow2CachedTable *t = &c->entries[i];
+         if (t->offset == offset) {
+@@ -359,7 +358,7 @@ static int qcow2_cache_do_get(BlockDriverState *bs, Qcow2Cache *c,
+ 
+         ret = bdrv_pread(bs->file, offset,
+                          qcow2_cache_get_table_addr(bs, c, i),
+-                         s->cluster_size);
++                         c->table_size);
+         if (ret < 0) {
+             return ret;
          }
 -- 
 2.11.0
