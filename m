@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e2dJ9-0003YD-70
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:13:52 -0400
+	(envelope-from <berto@igalia.com>) id 1e2dJI-0003gA-GI
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:14:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e2dJ5-0005qO-53
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:13:51 -0400
+	(envelope-from <berto@igalia.com>) id 1e2dJF-0005za-4V
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:14:00 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Thu, 12 Oct 2017 16:05:29 +0300
-Message-Id: <f7b18f1194c2f40c16fef9b1a94d380aa9a3d67e.1507813391.git.berto@igalia.com>
+Date: Thu, 12 Oct 2017 16:05:19 +0300
+Message-Id: <a87e437600f689947a2289c62838e78ae7b49af7.1507813391.git.berto@igalia.com>
 In-Reply-To: <cover.1507813391.git.berto@igalia.com>
 References: <cover.1507813391.git.berto@igalia.com>
 In-Reply-To: <cover.1507813391.git.berto@igalia.com>
 References: <cover.1507813391.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 15/31] qcow2: Update l2_load() to support L2
- slices
+Subject: [Qemu-devel] [PATCH 05/31] qcow2: Remove BDS parameter from
+ qcow2_cache_table_release()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,87 +25,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Alberto Garcia <berto@igalia.com>
 
-Each entry in the qcow2 L2 cache stores a full L2 table (which uses a
-complete cluster in the qcow2 image). A cluster is usually too large
-to be used efficiently as the size for a cache entry, so we want to
-decouple both values by allowing smaller cache entries. Therefore the
-qcow2 L2 cache will no longer return full L2 tables but slices
-instead.
-
-This patch updates l2_load() so it can handle L2 slices correctly.
-Apart from the offset of the L2 table (which we already had) we also
-need the guest offset in order to calculate which one of the slices
-we need.
-
-An L2 slice has currently the same size as an L2 table (one cluster),
-so for now this function will load exactly the same data as before.
-
-This patch also removes a stale comment about the return value being
-a pointer to the L2 table. This function returns an error code since
-55c17e9821c474d5fcdebdc82ed2fc096777d611.
+This function was only using the BlockDriverState parameter to get the
+cache table size (since it was equal to the cluster size). This is no
+longer necessary so this parameter can be removed.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2-cluster.c | 28 +++++++++++++++++-----------
- 1 file changed, 17 insertions(+), 11 deletions(-)
+ block/qcow2-cache.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index f35bb20dd5..aafc19a21b 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -196,20 +196,26 @@ int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
- /*
-  * l2_load
-  *
-- * Loads a L2 table into memory. If the table is in the cache, the cache
-- * is used; otherwise the L2 table is loaded from the image file.
-+ * @bs: The BlockDriverState
-+ * @offset: A guest offset, used to calculate what slice of the L2
-+ *          table to load.
-+ * @l2_offset: Offset to the L2 table in the image file.
-+ * @l2_slice: Location to store the pointer to the L2 slice.
-  *
-- * Returns a pointer to the L2 table on success, or NULL if the read from
-- * the image file failed.
-+ * Loads a L2 slice into memory (L2 slices are the parts of L2 tables
-+ * that are loaded by the qcow2 cache). If the slice is in the cache,
-+ * the cache is used; otherwise the L2 slice is loaded from the image
-+ * file.
-  */
--
--static int l2_load(BlockDriverState *bs, uint64_t l2_offset,
--    uint64_t **l2_table)
-+static int l2_load(BlockDriverState *bs, uint64_t offset,
-+                   uint64_t l2_offset, uint64_t **l2_slice)
- {
-     BDRVQcow2State *s = bs->opaque;
-+    int start_of_slice = sizeof(uint64_t) *
-+        (offset_to_l2_index(s, offset) - offset_to_l2_slice_index(s, offset));
- 
--    return qcow2_cache_get(bs, s->l2_table_cache, l2_offset,
--                           (void **)l2_table);
-+    return qcow2_cache_get(bs, s->l2_table_cache, l2_offset + start_of_slice,
-+                           (void **)l2_slice);
+diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
+index cba6a165e8..dac99e95b0 100644
+--- a/block/qcow2-cache.c
++++ b/block/qcow2-cache.c
+@@ -59,8 +59,7 @@ static inline int qcow2_cache_get_table_idx(Qcow2Cache *c, void *table)
+     return idx;
  }
  
- /*
-@@ -554,7 +560,7 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
- 
-     /* load the l2 table in memory */
- 
--    ret = l2_load(bs, l2_offset, &l2_table);
-+    ret = l2_load(bs, offset, l2_offset, &l2_table);
-     if (ret < 0) {
-         return ret;
-     }
-@@ -677,7 +683,7 @@ static int get_cluster_table(BlockDriverState *bs, uint64_t offset,
- 
-     if (s->l1_table[l1_index] & QCOW_OFLAG_COPIED) {
-         /* load the l2 table in memory */
--        ret = l2_load(bs, l2_offset, &l2_table);
-+        ret = l2_load(bs, offset, l2_offset, &l2_table);
-         if (ret < 0) {
-             return ret;
+-static void qcow2_cache_table_release(BlockDriverState *bs, Qcow2Cache *c,
+-                                      int i, int num_tables)
++static void qcow2_cache_table_release(Qcow2Cache *c, int i, int num_tables)
+ {
+ /* Using MADV_DONTNEED to discard memory is a Linux-specific feature */
+ #ifdef CONFIG_LINUX
+@@ -102,7 +101,7 @@ void qcow2_cache_clean_unused(BlockDriverState *bs, Qcow2Cache *c)
          }
+ 
+         if (to_clean > 0) {
+-            qcow2_cache_table_release(bs, c, i - to_clean, to_clean);
++            qcow2_cache_table_release(c, i - to_clean, to_clean);
+         }
+     }
+ 
+@@ -294,7 +293,7 @@ int qcow2_cache_empty(BlockDriverState *bs, Qcow2Cache *c)
+         c->entries[i].lru_counter = 0;
+     }
+ 
+-    qcow2_cache_table_release(bs, c, 0, c->size);
++    qcow2_cache_table_release(c, 0, c->size);
+ 
+     c->lru_counter = 0;
+ 
+@@ -432,5 +431,5 @@ void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table)
+     c->entries[i].lru_counter = 0;
+     c->entries[i].dirty = false;
+ 
+-    qcow2_cache_table_release(bs, c, i, 1);
++    qcow2_cache_table_release(c, i, 1);
+ }
 -- 
 2.11.0
