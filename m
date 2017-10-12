@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2ii8-00034t-4A
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:00:01 -0400
+	(envelope-from <eblake@redhat.com>) id 1e2iiY-0003Uo-Kb
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:00:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2ii6-00061G-Rv
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:00:00 -0400
+	(envelope-from <eblake@redhat.com>) id 1e2iiU-0006Vu-9I
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:00:26 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 12 Oct 2017 13:58:57 -0500
-Message-Id: <20171012185916.22776-2-eblake@redhat.com>
+Date: Thu, 12 Oct 2017 13:58:58 -0500
+Message-Id: <20171012185916.22776-3-eblake@redhat.com>
 In-Reply-To: <20171012185916.22776-1-eblake@redhat.com>
 References: <20171012185916.22776-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 01/20] block: Add .bdrv_co_block_status()
- callback
+Subject: [Qemu-devel] [PATCH v4 02/20] block: Switch passthrough drivers to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,153 +21,203 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based. Now that the block layer exposes byte-based allocation,
-it's time to tackle the drivers.  Add a new callback that operates
-on as small as byte boundaries. Subsequent patches will then update
-individual drivers, then finally remove .bdrv_co_get_block_status().
-The old code now uses a goto in order to minimize churn at that later
-removal.  Update documentation in this patch so that the later
-removal can be a straight delete.
-
-The new code also passes through the 'want_zero' hint, which will
-allow subsequent patches to further optimize callers that only care
-about how much of the image is allocated (mapping is false), rather
-than full details about runs of zeroes and which offsets the
-allocation actually maps to (mapping is true).
-
-Note that most drivers give sector-aligned answers, except at
-end-of-file, even when request_alignment is smaller than a sector.
-However, bdrv_getlength() is sector-aligned (even though it gives a
-byte answer), often by exceeding the actual file size.  If we were to
-give back strict results, at least file-posix.c would report a
-transition from DATA to HOLE at the end of a file even in the middle
-of a sector, which can throw off callers; so we intentionally lie and
-state that any partial sector at the end of a file has the same
-status for the entire sector.  Maybe at some future day we can
-report actual file size instead of rounding up, but not for this
-series.
+byte-based.  Update the generic helpers, and all passthrough clients
+(blkdebug, commit, mirror, throttle) accordingly.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v4: rebase to master
-v3: no change
-v2: improve alignment handling, ensure all iotests still pass
+v4: rebase to interface tweak
+v3: rebase to addition of throttle driver
+v2: rebase to master, retitle while merging blkdebug, commit, and mirror
 ---
- include/block/block.h     |  9 ++++-----
- include/block/block_int.h | 12 +++++++++---
- block/io.c                | 30 +++++++++++++++++++++++++-----
- 3 files changed, 38 insertions(+), 13 deletions(-)
+ include/block/block_int.h | 28 ++++++++++++++++------------
+ block/io.c                | 36 ++++++++++++++++++++----------------
+ block/blkdebug.c          | 20 +++++++++++---------
+ block/commit.c            |  2 +-
+ block/mirror.c            |  2 +-
+ block/throttle.c          |  2 +-
+ 6 files changed, 50 insertions(+), 40 deletions(-)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index fbc21daf62..c5d6b2c933 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -136,11 +136,10 @@ typedef struct HDGeometry {
-  *                 that the block layer recompute the answer from the returned
-  *                 BDS; must be accompanied by just BDRV_BLOCK_OFFSET_VALID.
-  *
-- * If BDRV_BLOCK_OFFSET_VALID is set, bits 9-62 (BDRV_BLOCK_OFFSET_MASK) of
-- * the return value (old interface) or the entire map parameter (new
-- * interface) represent the offset in the returned BDS that is allocated for
-- * the corresponding raw data.  However, whether that offset actually
-- * contains data also depends on BDRV_BLOCK_DATA, as follows:
-+ * If BDRV_BLOCK_OFFSET_VALID is set, the map parameter represents the
-+ * host offset within the returned BDS that is allocated for the
-+ * corresponding raw guest data.  However, whether that offset
-+ * actually contains data also depends on BDRV_BLOCK_DATA, as follows:
-  *
-  * DATA ZERO OFFSET_VALID
-  *  t    t        t       sectors read as zero, returned file is zero at offset
 diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 4b9b23a08d..4153cd646d 100644
+index 4153cd646d..7c8503f693 100644
 --- a/include/block/block_int.h
 +++ b/include/block/block_int.h
-@@ -206,13 +206,19 @@ struct BlockDriver {
-      * bdrv_is_allocated[_above].  The driver should answer only
-      * according to the current layer, and should not set
-      * BDRV_BLOCK_ALLOCATED, but may set BDRV_BLOCK_RAW.  See block.h
--     * for the meaning of _DATA, _ZERO, and _OFFSET_VALID.  The block
--     * layer guarantees input aligned to request_alignment, as well as
--     * non-NULL pnum and file.
-+     * for the meaning of _DATA, _ZERO, and _OFFSET_VALID.  As a hint,
-+     * the flag want_zero is true if the caller cares more about
-+     * precise mappings (favor _OFFSET_VALID/_ZERO) or false for
-+     * overall allocation (favor larger *pnum).  The block layer
-+     * guarantees input aligned to request_alignment, as well as
-+     * non-NULL pnum, map, and file.
-      */
-     int64_t coroutine_fn (*bdrv_co_get_block_status)(BlockDriverState *bs,
-         int64_t sector_num, int nb_sectors, int *pnum,
-         BlockDriverState **file);
-+    int coroutine_fn (*bdrv_co_block_status)(BlockDriverState *bd,
-+        bool want_zero, int64_t offset, int64_t bytes, int64_t *pnum,
-+        int64_t *map, BlockDriverState **file);
+@@ -1018,23 +1018,27 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
+                                uint64_t *nperm, uint64_t *nshared);
 
-     /*
-      * Invalidate any cached meta-data.
+ /*
+- * Default implementation for drivers to pass bdrv_co_get_block_status() to
++ * Default implementation for drivers to pass bdrv_co_block_status() to
+  * their file.
+  */
+-int64_t coroutine_fn bdrv_co_get_block_status_from_file(BlockDriverState *bs,
+-                                                        int64_t sector_num,
+-                                                        int nb_sectors,
+-                                                        int *pnum,
+-                                                        BlockDriverState **file);
++int coroutine_fn bdrv_co_block_status_from_file(BlockDriverState *bs,
++                                                bool want_zero,
++                                                int64_t offset,
++                                                int64_t bytes,
++                                                int64_t *pnum,
++                                                int64_t *map,
++                                                BlockDriverState **file);
+ /*
+- * Default implementation for drivers to pass bdrv_co_get_block_status() to
++ * Default implementation for drivers to pass bdrv_co_block_status() to
+  * their backing file.
+  */
+-int64_t coroutine_fn bdrv_co_get_block_status_from_backing(BlockDriverState *bs,
+-                                                           int64_t sector_num,
+-                                                           int nb_sectors,
+-                                                           int *pnum,
+-                                                           BlockDriverState **file);
++int coroutine_fn bdrv_co_block_status_from_backing(BlockDriverState *bs,
++                                                   bool want_zero,
++                                                   int64_t offset,
++                                                   int64_t bytes,
++                                                   int64_t *pnum,
++                                                   int64_t *map,
++                                                   BlockDriverState **file);
+ const char *bdrv_get_parent_name(const BlockDriverState *bs);
+ void blk_dev_change_media_cb(BlockBackend *blk, bool load, Error **errp);
+ bool blk_dev_has_removable_media(BlockBackend *blk);
 diff --git a/block/io.c b/block/io.c
-index e4caa4acf1..ef9ea44667 100644
+index ef9ea44667..6a2a2e1484 100644
 --- a/block/io.c
 +++ b/block/io.c
-@@ -1843,7 +1843,7 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-         bytes = n;
-     }
+@@ -1754,30 +1754,34 @@ typedef struct BdrvCoBlockStatusData {
+     bool done;
+ } BdrvCoBlockStatusData;
 
--    if (!bs->drv->bdrv_co_get_block_status) {
-+    if (!bs->drv->bdrv_co_get_block_status && !bs->drv->bdrv_co_block_status) {
-         *pnum = bytes;
-         ret = BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
-         if (offset + bytes == total_size) {
-@@ -1860,13 +1860,14 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-     bdrv_inc_in_flight(bs);
+-int64_t coroutine_fn bdrv_co_get_block_status_from_file(BlockDriverState *bs,
+-                                                        int64_t sector_num,
+-                                                        int nb_sectors,
+-                                                        int *pnum,
+-                                                        BlockDriverState **file)
++int coroutine_fn bdrv_co_block_status_from_file(BlockDriverState *bs,
++                                                bool want_zero,
++                                                int64_t offset,
++                                                int64_t bytes,
++                                                int64_t *pnum,
++                                                int64_t *map,
++                                                BlockDriverState **file)
+ {
+     assert(bs->file && bs->file->bs);
+-    *pnum = nb_sectors;
++    *pnum = bytes;
++    *map = offset;
+     *file = bs->file->bs;
+-    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
+-           (sector_num << BDRV_SECTOR_BITS);
++    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
+ }
 
-     /* Round out to request_alignment boundaries */
--    /* TODO: until we have a byte-based driver callback, we also have to
--     * round out to sectors, even if that is bigger than request_alignment */
--    align = MAX(bs->bl.request_alignment, BDRV_SECTOR_SIZE);
-+    align = bs->bl.request_alignment;
-+    if (bs->drv->bdrv_co_get_block_status && align < BDRV_SECTOR_SIZE) {
-+        align = BDRV_SECTOR_SIZE;
-+    }
-     aligned_offset = QEMU_ALIGN_DOWN(offset, align);
-     aligned_bytes = ROUND_UP(offset + bytes, align) - aligned_offset;
+-int64_t coroutine_fn bdrv_co_get_block_status_from_backing(BlockDriverState *bs,
+-                                                           int64_t sector_num,
+-                                                           int nb_sectors,
+-                                                           int *pnum,
+-                                                           BlockDriverState **file)
++int coroutine_fn bdrv_co_block_status_from_backing(BlockDriverState *bs,
++                                                   bool want_zero,
++                                                   int64_t offset,
++                                                   int64_t bytes,
++                                                   int64_t *pnum,
++                                                   int64_t *map,
++                                                   BlockDriverState **file)
+ {
+     assert(bs->backing && bs->backing->bs);
+-    *pnum = nb_sectors;
++    *pnum = bytes;
++    *map = offset;
+     *file = bs->backing->bs;
+-    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
+-           (sector_num << BDRV_SECTOR_BITS);
++    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
+ }
 
--    {
-+    if (bs->drv->bdrv_co_get_block_status) {
-         int count; /* sectors */
-         int64_t longret;
+ /*
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index e21669979d..82c30357f8 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -627,15 +627,17 @@ static int coroutine_fn blkdebug_co_pdiscard(BlockDriverState *bs,
+     return bdrv_co_pdiscard(bs->file->bs, offset, bytes);
+ }
 
-@@ -1891,8 +1892,27 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-         }
-         ret = longret & ~BDRV_BLOCK_OFFSET_MASK;
-         *pnum = count * BDRV_SECTOR_SIZE;
-+        goto refine;
-     }
+-static int64_t coroutine_fn blkdebug_co_get_block_status(
+-    BlockDriverState *bs, int64_t sector_num, int nb_sectors, int *pnum,
+-    BlockDriverState **file)
++static int coroutine_fn blkdebug_co_block_status(BlockDriverState *bs,
++                                                 bool want_zero,
++                                                 int64_t offset,
++                                                 int64_t bytes,
++                                                 int64_t *pnum,
++                                                 int64_t *map,
++                                                 BlockDriverState **file)
+ {
+-    assert(QEMU_IS_ALIGNED(sector_num | nb_sectors,
+-                           DIV_ROUND_UP(bs->bl.request_alignment,
+-                                        BDRV_SECTOR_SIZE)));
+-    return bdrv_co_get_block_status_from_file(bs, sector_num, nb_sectors,
+-                                              pnum, file);
++    assert(QEMU_IS_ALIGNED(offset | bytes, bs->bl.request_alignment));
++    return bdrv_co_block_status_from_file(bs, want_zero, offset, bytes,
++                                          pnum, map, file);
+ }
 
-+    ret = bs->drv->bdrv_co_block_status(bs, want_zero, aligned_offset,
-+                                        aligned_bytes, pnum, &local_map,
-+                                        &local_file);
-+    if (ret < 0) {
-+        *pnum = 0;
-+        goto out;
-+    }
-+
-+    /*
-+     * total_size is always sector-aligned, by sometimes exceeding actual
-+     * file size. Expand pnum if it lands mid-sector due to end-of-file.
-+     */
-+    if (QEMU_ALIGN_UP(*pnum + aligned_offset,
-+                      BDRV_SECTOR_SIZE) == total_size) {
-+        *pnum = total_size - aligned_offset;
-+    }
-+
-+refine:
-     /*
-      * The driver's result must be a multiple of request_alignment.
-      * Clamp pnum and adjust map to original request.
+ static void blkdebug_close(BlockDriverState *bs)
+@@ -907,7 +909,7 @@ static BlockDriver bdrv_blkdebug = {
+     .bdrv_co_flush_to_disk  = blkdebug_co_flush,
+     .bdrv_co_pwrite_zeroes  = blkdebug_co_pwrite_zeroes,
+     .bdrv_co_pdiscard       = blkdebug_co_pdiscard,
+-    .bdrv_co_get_block_status = blkdebug_co_get_block_status,
++    .bdrv_co_block_status   = blkdebug_co_block_status,
+
+     .bdrv_debug_event           = blkdebug_debug_event,
+     .bdrv_debug_breakpoint      = blkdebug_debug_breakpoint,
+diff --git a/block/commit.c b/block/commit.c
+index 5036eec434..ec0511bac7 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -265,7 +265,7 @@ static void bdrv_commit_top_child_perm(BlockDriverState *bs, BdrvChild *c,
+ static BlockDriver bdrv_commit_top = {
+     .format_name                = "commit_top",
+     .bdrv_co_preadv             = bdrv_commit_top_preadv,
+-    .bdrv_co_get_block_status   = bdrv_co_get_block_status_from_backing,
++    .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
+     .bdrv_refresh_filename      = bdrv_commit_top_refresh_filename,
+     .bdrv_close                 = bdrv_commit_top_close,
+     .bdrv_child_perm            = bdrv_commit_top_child_perm,
+diff --git a/block/mirror.c b/block/mirror.c
+index 307b6391a8..79739d063e 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1094,7 +1094,7 @@ static BlockDriver bdrv_mirror_top = {
+     .bdrv_co_pwrite_zeroes      = bdrv_mirror_top_pwrite_zeroes,
+     .bdrv_co_pdiscard           = bdrv_mirror_top_pdiscard,
+     .bdrv_co_flush              = bdrv_mirror_top_flush,
+-    .bdrv_co_get_block_status   = bdrv_co_get_block_status_from_backing,
++    .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
+     .bdrv_refresh_filename      = bdrv_mirror_top_refresh_filename,
+     .bdrv_close                 = bdrv_mirror_top_close,
+     .bdrv_child_perm            = bdrv_mirror_top_child_perm,
+diff --git a/block/throttle.c b/block/throttle.c
+index 5bca76300f..76cd963a8c 100644
+--- a/block/throttle.c
++++ b/block/throttle.c
+@@ -224,7 +224,7 @@ static BlockDriver bdrv_throttle = {
+     .bdrv_reopen_prepare                =   throttle_reopen_prepare,
+     .bdrv_reopen_commit                 =   throttle_reopen_commit,
+     .bdrv_reopen_abort                  =   throttle_reopen_abort,
+-    .bdrv_co_get_block_status           =   bdrv_co_get_block_status_from_file,
++    .bdrv_co_block_status               =   bdrv_co_block_status_from_file,
+
+     .is_filter                          =   true,
+ };
 -- 
 2.13.6
