@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2imz-0006tZ-1A
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:05:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1e2inP-0007MI-T9
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:05:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2imy-0002X3-4l
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:05:01 -0400
+	(envelope-from <eblake@redhat.com>) id 1e2inO-0002wX-PF
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:05:27 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 12 Oct 2017 13:59:08 -0500
-Message-Id: <20171012185916.22776-13-eblake@redhat.com>
+Date: Thu, 12 Oct 2017 13:59:09 -0500
+Message-Id: <20171012185916.22776-14-eblake@redhat.com>
 In-Reply-To: <20171012185916.22776-1-eblake@redhat.com>
 References: <20171012185916.22776-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 12/20] qed: Switch to .bdrv_co_block_status()
+Subject: [Qemu-devel] [PATCH v4 13/20] raw: Switch to .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,138 +20,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, Max Reitz <mreitz@redhat.com>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based.  Update the qed driver accordingly, taking the opportunity
-to inline qed_is_allocated_cb() into its lone caller (the callback
-used to be important, until we switched qed to coroutines).  There is
-no intent to optimize based on the want_zero flag for this format.
+byte-based.  Update the raw driver accordingly.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v4: rebase to interface change, inline pointless callback
+v4: rebase to interface tweak
 v3: no change
-v2: rebase to mapping flag, fix mask in qed_is_allocated_cb
+v2: rebase to mapping
 ---
- block/qed.c | 84 +++++++++++++++++++++----------------------------------------
- 1 file changed, 28 insertions(+), 56 deletions(-)
+ block/raw-format.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/block/qed.c b/block/qed.c
-index 28e2ec89e8..cbab5b6f83 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -688,74 +688,46 @@ finish:
+diff --git a/block/raw-format.c b/block/raw-format.c
+index ab552c0954..830243a8e4 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -250,17 +250,17 @@ fail:
      return ret;
  }
 
--typedef struct {
--    BlockDriverState *bs;
--    Coroutine *co;
--    uint64_t pos;
--    int64_t status;
--    int *pnum;
--    BlockDriverState **file;
--} QEDIsAllocatedCB;
--
--/* Called with table_lock held.  */
--static void qed_is_allocated_cb(void *opaque, int ret, uint64_t offset, size_t len)
--{
--    QEDIsAllocatedCB *cb = opaque;
--    BDRVQEDState *s = cb->bs->opaque;
--    *cb->pnum = len / BDRV_SECTOR_SIZE;
--    switch (ret) {
--    case QED_CLUSTER_FOUND:
--        offset |= qed_offset_into_cluster(s, cb->pos);
--        cb->status = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | offset;
--        *cb->file = cb->bs->file->bs;
--        break;
--    case QED_CLUSTER_ZERO:
--        cb->status = BDRV_BLOCK_ZERO;
--        break;
--    case QED_CLUSTER_L2:
--    case QED_CLUSTER_L1:
--        cb->status = 0;
--        break;
--    default:
--        assert(ret < 0);
--        cb->status = ret;
--        break;
--    }
--
--    if (cb->co) {
--        aio_co_wake(cb->co);
--    }
--}
--
--static int64_t coroutine_fn bdrv_qed_co_get_block_status(BlockDriverState *bs,
--                                                 int64_t sector_num,
--                                                 int nb_sectors, int *pnum,
-+static int coroutine_fn bdrv_qed_co_block_status(BlockDriverState *bs,
-+                                                 bool want_zero,
-+                                                 int64_t pos, int64_t bytes,
-+                                                 int64_t *pnum, int64_t *map,
-                                                  BlockDriverState **file)
+-static int64_t coroutine_fn raw_co_get_block_status(BlockDriverState *bs,
+-                                            int64_t sector_num,
+-                                            int nb_sectors, int *pnum,
++static int coroutine_fn raw_co_block_status(BlockDriverState *bs,
++                                            bool want_zero, int64_t offset,
++                                            int64_t bytes, int64_t *pnum,
++                                            int64_t *map,
+                                             BlockDriverState **file)
  {
-     BDRVQEDState *s = bs->opaque;
--    size_t len = (size_t)nb_sectors * BDRV_SECTOR_SIZE;
--    QEDIsAllocatedCB cb = {
--        .bs = bs,
--        .pos = (uint64_t)sector_num * BDRV_SECTOR_SIZE,
--        .status = BDRV_BLOCK_OFFSET_MASK,
--        .pnum = pnum,
--        .file = file,
--    };
-+    size_t len;
-+    int status;
-     QEDRequest request = { .l2_table = NULL };
-     uint64_t offset;
-     int ret;
-
-     qemu_co_mutex_lock(&s->table_lock);
--    ret = qed_find_cluster(s, &request, cb.pos, &len, &offset);
--    qed_is_allocated_cb(&cb, ret, offset, len);
-+    ret = qed_find_cluster(s, &request, pos, &len, &offset);
-
--    /* The callback was invoked immediately */
--    assert(cb.status != BDRV_BLOCK_OFFSET_MASK);
-+    *pnum = len;
-+    switch (ret) {
-+    case QED_CLUSTER_FOUND:
-+        *map = offset | qed_offset_into_cluster(s, pos);
-+        status = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
-+        *file = bs->file->bs;
-+        break;
-+    case QED_CLUSTER_ZERO:
-+        status = BDRV_BLOCK_ZERO;
-+        break;
-+    case QED_CLUSTER_L2:
-+    case QED_CLUSTER_L1:
-+        status = 0;
-+        break;
-+    default:
-+        assert(ret < 0);
-+        status = ret;
-+        break;
-+    }
-
-     qed_unref_l2_cache_entry(request.l2_table);
-     qemu_co_mutex_unlock(&s->table_lock);
-
--    return cb.status;
-+    return status;
+     BDRVRawState *s = bs->opaque;
+-    *pnum = nb_sectors;
++    *pnum = bytes;
+     *file = bs->file->bs;
+-    sector_num += s->offset / BDRV_SECTOR_SIZE;
+-    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
+-           (sector_num << BDRV_SECTOR_BITS);
++    *map = offset + s->offset;
++    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
  }
 
- static BDRVQEDState *acb_to_s(QEDAIOCB *acb)
-@@ -1595,7 +1567,7 @@ static BlockDriver bdrv_qed = {
-     .bdrv_child_perm          = bdrv_format_default_perms,
-     .bdrv_create              = bdrv_qed_create,
-     .bdrv_has_zero_init       = bdrv_has_zero_init_1,
--    .bdrv_co_get_block_status = bdrv_qed_co_get_block_status,
-+    .bdrv_co_block_status     = bdrv_qed_co_block_status,
-     .bdrv_co_readv            = bdrv_qed_co_readv,
-     .bdrv_co_writev           = bdrv_qed_co_writev,
-     .bdrv_co_pwrite_zeroes    = bdrv_qed_co_pwrite_zeroes,
+ static int coroutine_fn raw_co_pwrite_zeroes(BlockDriverState *bs,
+@@ -496,7 +496,7 @@ BlockDriver bdrv_raw = {
+     .bdrv_co_pwritev      = &raw_co_pwritev,
+     .bdrv_co_pwrite_zeroes = &raw_co_pwrite_zeroes,
+     .bdrv_co_pdiscard     = &raw_co_pdiscard,
+-    .bdrv_co_get_block_status = &raw_co_get_block_status,
++    .bdrv_co_block_status = &raw_co_block_status,
+     .bdrv_truncate        = &raw_truncate,
+     .bdrv_getlength       = &raw_getlength,
+     .has_variable_length  = true,
 -- 
 2.13.6
