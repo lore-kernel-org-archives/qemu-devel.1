@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e2nfv-0005VW-JL
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 20:18:04 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e2o0C-0007eh-23
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 20:39:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e2nfr-0003Mi-Jz
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 20:18:03 -0400
-Resent-Message-Id: <E1e2nfr-0003Mi-Jz@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21321)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1e2nfr-0003Kg-DR
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 20:17:59 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150785384116.294.14994539169441424404@b58463cdfd5f>
-In-Reply-To: <1507852743-51639-1-git-send-email-eswierk@skyportsystems.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1e2o0A-0006MT-W1
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 20:39:00 -0400
+Date: Fri, 13 Oct 2017 10:53:38 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171012235338.GF28032@umbus.fritz.box>
+References: <1507823114-270153-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 12 Oct 2017 17:17:21 -0700 (PDT)
-Subject: Re: [Qemu-devel] [RFC] e1000: Faulty tx checksum offload corrupts
- packets
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="/aVve/J9H4Wl5yVO"
+Content-Disposition: inline
+In-Reply-To: <1507823114-270153-1-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] fixup! ppc: spapr: use cpu type name
+ directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +24,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, eswierk@skyportsystems.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, agraf@suse.de, groug@kaod.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MDc4NTI3NDMtNTE2MzktMS1naXQtc2VuZC1lbWFpbC1lc3dpZXJrQHNreXBv
-cnRzeXN0ZW1zLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1JGQ10gZTEwMDA6IEZhdWx0eSB0
-eCBjaGVja3N1bSBvZmZsb2FkIGNvcnJ1cHRzIHBhY2tldHMKCj09PSBURVNUIFNDUklQVCBCRUdJ
-TiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGlu
-ZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0i
-JChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1p
-dHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAx
-IC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwg
-fCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWls
-ZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxl
-ZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRk
-MWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjM4NGQ2
-MTk2OTUgZTEwMDA6IEZhdWx0eSB0eCBjaGVja3N1bSBvZmZsb2FkIGNvcnJ1cHRzIHBhY2tldHMK
-Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogZTEwMDA6IEZhdWx0eSB0
-eCBjaGVja3N1bSBvZmZsb2FkIGNvcnJ1cHRzIHBhY2tldHMuLi4KRVJST1I6IGxpbmUgb3ZlciA5
-MCBjaGFyYWN0ZXJzCiMxMjc6IEZJTEU6IGh3L25ldC9lMTAwMC5jOjU0OToKKyAgICAgICAgREJH
-T1VUKFRYRVJSLCAidHhzdW0gYnVnISB2ZXIgJWQgc3JjICUwOHggZHN0ICUwOHggbGVuICVkIHBy
-b3RvICVkIGNwdHNlICVkIHN1bV9uZWVkZWQgJXggb2xkc3VtICV4IG5ld3N1bSAleCByZWFsc3Vt
-ICV4XG4iLAoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0
-aGlzIHN0YXRlbWVudAojMTY5OiBGSUxFOiBody9uZXQvZTEwMDAuYzo1ODQ6CisgICAgICAgIGlm
-ICh0cC0+dHNvX3Byb3BzLnRjcCkgewpbLi4uXQogICAgICAgICAgICAgfQpbLi4uXQoKRVJST1I6
-IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMyMzA6IEZJTEU6IGh3L25ldC9lMTAwMC5jOjY0NDoK
-KyAgICBEQkdPVVQoVFhFUlIsICJjb250ZXh0IGRlc2NyaXB0b3I6IHRzZSAlZCBpcCAlZCB0Y3Ag
-JWQgaXBjc3MgJWQgaXBjc28gJWQgaXBjc2UgJWQgdHVjc3MgJWQgdHVjc28gJWQgdHVjc2UgJWRc
-biIsCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzIyOiBGSUxFOiBody9uZXQv
-ZTEwMDAuYzo3MzE6CisgICAgICAgICAgICBpZiAoc3ogPj0gdHAtPnRzb19wcm9wcy5oZHJfbGVu
-ICYmIHRwLT5zaXplIDwgdHAtPnRzb19wcm9wcy5oZHJfbGVuKSB7CgpFUlJPUjogZG8gbm90IHVz
-ZSBDOTkgLy8gY29tbWVudHMKIzQwMjogRklMRTogaHcvbmV0L2UxMDAweF9jb21tb24uaDoxOTY6
-CisgICAgdW5zaWduZWQgY2hhciBzdW1fbmVlZGVkOyAvLyBkb2Vzbid0IGJlbG9uZyBoZXJlCgpF
-UlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzQxMTogRklMRTogaHcvbmV0L2UxMDAw
-eF9jb21tb24uaDoyMDk6CisgICAgYm9vbCBjcHRzZTsgLy8gZG9lc24ndCBiZWxvbmcgaGVyZQoK
-RVJST1I6IE1pc3NpbmcgU2lnbmVkLW9mZi1ieTogbGluZShzKQoKdG90YWw6IDYgZXJyb3JzLCAx
-IHdhcm5pbmdzLCAyOTkgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
-LWRldmVsQGZyZWVsaXN0cy5vcmc=
+
+--/aVve/J9H4Wl5yVO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Oct 12, 2017 at 05:45:14PM +0200, Igor Mammedov wrote:
+> follow up commit that registers host-spapr-cpu-core type unconditionally
+>  "ppc: spapr: register 'host' core type  along with the rest of core type=
+s"
+>=20
+> makes 'non' machine crash
+>  ppc64-softmmu/qemu-system-ppc64 -M none -device host-spapr-cpu-core
+>  ERROR:qom/object.c:217:object_type_get_instance_size: assertion failed: =
+(type !=3D NULL)
+>  Aborted
+>=20
+> before it qemu fails cleanly with
+>  ppc64-softmmu/qemu-system-ppc64 -M none -device host-spapr-cpu-core
+>  qemu-system-ppc64: -device host-spapr-cpu-core: 'host-spapr-cpu-core' is=
+ not a valid device model name
+>=20
+> spapr_cpu_core_realize() already has explicit check for pseries machine,
+> so move access to host cpu type after it so 'none' machine would fail
+> cleanly as expected.
+>=20
+> Reported-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+
+Applied (folded into the original patch).
+
+> ---
+>  hw/ppc/spapr_cpu_core.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index b5bbb6a..7dbf9c3 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -151,7 +151,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
+Error **errp)
+>      sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
+>      sPAPRCPUCoreClass *scc =3D SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
+>      CPUCore *cc =3D CPU_CORE(OBJECT(dev));
+> -    size_t size =3D object_type_get_instance_size(scc->cpu_type);
+> +    size_t size;
+>      Error *local_err =3D NULL;
+>      void *obj;
+>      int i, j;
+> @@ -162,6 +162,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
+Error **errp)
+>          return;
+>      }
+> =20
+> +    size =3D object_type_get_instance_size(scc->cpu_type);
+>      sc->threads =3D g_malloc0(size * cc->nr_threads);
+>      for (i =3D 0; i < cc->nr_threads; i++) {
+>          char id[32];
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--/aVve/J9H4Wl5yVO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlngAH8ACgkQbDjKyiDZ
+s5JDPA/+P6IW068Ehcy2SC3t/dhtsvT//pCbETmGz4QIA6EH45n8IN7VWoVOnJ/O
+lz9FzF4NF1UDT+vUSgna6KfAuyPzogtlVw+D30t6iSKzZ/s2Ly63/xa5Xf8LrPWp
+iuqqANBmLcl1MtM/HtIDrKFr+IqSd5aqzT05Smt+76C2f9/ZlKVRyz0Bn9UB84c1
+5oToV6dYDETVpOeBPLIYtJnulipxOaOssXnPvWngDdBYYURah89XTr8Jb8/75Mpf
+aS7cRMwqUqGBITdoalS/bBg3EGynMH/8AEOizKbMKgmWkUZM35n7RA+aP6IBmh5X
+L4+K3JrI+OukgnEi5gjvmkiRZOIeM8jXgxD7/MjIM8G5H0tPHgirKFG2G4RbVw34
+qHGJORH+IJohTwUGTdFq2sqECTOlnzHJxuRcEhFcEqqCZ7TUQcdhfJELnOdnnycD
+NEVtdI4f59ZRoyQD/oto32roCB54/zrX9WUU2Ziy7KoNQpK9A01OOORvum5PEDMc
+PTv4SoIJnY4A1Kztc1nuHRPTwgbHkQjR4KAgNgITRhfsmJhLMq7Qft/fMPu0iqbp
+IvFho5ul7xnhYS+pCH0XIILCacj4+Kxh3fQt/L1ACa4QVljFQqhQ4hmr8ZqRN7Kv
+hjjJmrukO7E0oNVexhGDaGxcN+nluEftKLoKjVZPulznUP34T3E=
+=bF87
+-----END PGP SIGNATURE-----
+
+--/aVve/J9H4Wl5yVO--
