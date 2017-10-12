@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e2dHG-00021b-Fe
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:11:55 -0400
+	(envelope-from <berto@igalia.com>) id 1e2dHS-0002Bb-Sp
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:12:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e2dHC-0003gW-Pq
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:11:54 -0400
+	(envelope-from <berto@igalia.com>) id 1e2dHN-0003yI-1k
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:12:06 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Thu, 12 Oct 2017 16:05:35 +0300
-Message-Id: <b81d407426b4765f1599e18403a20d7d063f23fd.1507813391.git.berto@igalia.com>
+Date: Thu, 12 Oct 2017 16:05:34 +0300
+Message-Id: <f8369aaef1325ae291b605b72fd746a7a53bff91.1507813391.git.berto@igalia.com>
 In-Reply-To: <cover.1507813391.git.berto@igalia.com>
 References: <cover.1507813391.git.berto@igalia.com>
 In-Reply-To: <cover.1507813391.git.berto@igalia.com>
 References: <cover.1507813391.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 21/31] qcow2: Update handle_alloc() to support
+Subject: [Qemu-devel] [PATCH 20/31] qcow2: Update handle_copied() to support
  L2 slices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,7 +25,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Alberto Garcia <berto@igalia.com>
 
-handle_alloc() loads an L2 table and limits the number of checked
+handle_copied() loads an L2 table and limits the number of checked
 clusters to the amount that fits inside that table. Since we'll be
 loading L2 slices instead of full tables we need to update that limit.
 
@@ -34,24 +34,24 @@ this patch simply updates the variable name from l2_table to l2_slice.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2-cluster.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ block/qcow2-cluster.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index d74b3b047a..463b24a4fd 100644
+index 1dccdbdd94..d74b3b047a 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -1274,7 +1274,7 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
- {
+@@ -1119,7 +1119,7 @@ static int handle_copied(BlockDriverState *bs, uint64_t guest_offset,
      BDRVQcow2State *s = bs->opaque;
      int l2_index;
+     uint64_t cluster_offset;
 -    uint64_t *l2_table;
 +    uint64_t *l2_slice;
-     uint64_t entry;
      uint64_t nb_clusters;
+     unsigned int keep_clusters;
      int ret;
-@@ -1287,29 +1287,29 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
-     assert(*bytes > 0);
+@@ -1131,23 +1131,23 @@ static int handle_copied(BlockDriverState *bs, uint64_t guest_offset,
+                                 == offset_into_cluster(s, *host_offset));
  
      /*
 -     * Calculate the number of clusters to look for. We stop at L2 table
@@ -74,35 +74,28 @@ index d74b3b047a..463b24a4fd 100644
          return ret;
      }
  
--    entry = be64_to_cpu(l2_table[l2_index]);
-+    entry = be64_to_cpu(l2_slice[l2_index]);
+-    cluster_offset = be64_to_cpu(l2_table[l2_index]);
++    cluster_offset = be64_to_cpu(l2_slice[l2_index]);
  
-     /* For the moment, overwrite compressed clusters one by one */
-     if (entry & QCOW_OFLAG_COMPRESSED) {
-         nb_clusters = 1;
-     } else {
--        nb_clusters = count_cow_clusters(s, nb_clusters, l2_table, l2_index);
-+        nb_clusters = count_cow_clusters(s, nb_clusters, l2_slice, l2_index);
-     }
- 
-     /* This function is only called when there were no non-COW clusters, so if
-@@ -1327,7 +1327,7 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
-          * nb_clusters already to a range of COW clusters */
-         int preallocated_nb_clusters =
+     /* Check how many clusters are already allocated and don't need COW */
+     if (qcow2_get_cluster_type(cluster_offset) == QCOW2_CLUSTER_NORMAL
+@@ -1175,7 +1175,7 @@ static int handle_copied(BlockDriverState *bs, uint64_t guest_offset,
+         /* We keep all QCOW_OFLAG_COPIED clusters */
+         keep_clusters =
              count_contiguous_clusters(nb_clusters, s->cluster_size,
--                                      &l2_table[l2_index], QCOW_OFLAG_COPIED);
-+                                      &l2_slice[l2_index], QCOW_OFLAG_COPIED);
-         assert(preallocated_nb_clusters > 0);
+-                                      &l2_table[l2_index],
++                                      &l2_slice[l2_index],
+                                       QCOW_OFLAG_COPIED | QCOW_OFLAG_ZERO);
+         assert(keep_clusters <= nb_clusters);
  
-         nb_clusters = preallocated_nb_clusters;
-@@ -1338,7 +1338,7 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
-         keep_old_clusters = true;
-     }
+@@ -1190,7 +1190,7 @@ static int handle_copied(BlockDriverState *bs, uint64_t guest_offset,
  
+     /* Cleanup */
+ out:
 -    qcow2_cache_put(s->l2_table_cache, (void **) &l2_table);
 +    qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
  
-     if (!alloc_cluster_offset) {
-         /* Allocate, if necessary at a given offset in the image file */
+     /* Only return a host offset if we actually made progress. Otherwise we
+      * would make requirements for handle_alloc() that it can't fulfill */
 -- 
 2.11.0
