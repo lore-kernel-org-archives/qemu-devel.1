@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e2jCE-0003pZ-Gh
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:31:07 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1e2kA1-0003Dj-97
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 16:32:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e2jCB-0006JC-DF
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:31:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59328)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e2jCB-0006Il-6u
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:31:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e2jC9-0000aJ-RA
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 19:31:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C43D52E80CB
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 19:31:01 +0000 (UTC)
+	(envelope-from <vilanova@ac.upc.edu>) id 1e2k9y-0007QV-5U
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 16:32:53 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:46979)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1e2k9x-0007PZ-QU
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 16:32:50 -0400
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <20171010214540.30970-1-richard.henderson@linaro.org>
+	<87k200sw7c.fsf@frigg.lan>
+	<888cfe83-7c47-5673-7b1b-8280cc50d8ba@linaro.org>
+Date: Thu, 12 Oct 2017 23:32:39 +0300
+In-Reply-To: <888cfe83-7c47-5673-7b1b-8280cc50d8ba@linaro.org> (Richard
+	Henderson's message of "Thu, 12 Oct 2017 07:45:30 -0700")
+Message-ID: <87vajkgl94.fsf@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Oct 2017 19:24:41 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1723161 <1723161@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150782239801.1729.1327212510076491094.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150783628168.1135.15807112276961556760.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1723161] Re: Migration failing in qemu-2.10.1 but
- working qemu-2.9.1 and earlier with same options
+Subject: Re: [Qemu-devel] [PATCH] tcg: Initialize cpu_env generically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,70 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-Interesting; As a test could you try removing the cdrom entry (I doubt that=
-'ll help but it's worth a go).
-Also, is it possible for you to try a bisection?
+Richard Henderson writes:
 
-If I was to guess, I'd bet it's something relating to the pflash, but I
-don't know; it's unfortunate the block migration doesn't say what it got
-upset by.
+> On 10/11/2017 11:43 PM, Llu=C3=ADs Vilanova wrote:
+>>> /* Track which vCPU triggers events */
+>>> CPUState *cpu;                      /* *_trans */
+>>> -    TCGv_env tcg_env;                   /* *_exec  */
+>>=20
+>> I would rather keep it here instead of making a new global variable, sin=
+ce that
+>> should make it easier in the future to have multiple translation context=
+s.
 
-Are there no errors on the source side?
+> Why do you believe this prevents it?  The variable is literally identical=
+ for
+> *all* targets.
 
-Assuming there are no errors on the source side, I'd have to suggest
-taking a printf to migration/block.c block_load to find out which exit
-it's falling out of in there (at least I think that's what would cause
-that error)
+If someone decides to make tcg_ctx thread-local or have one per target
+architecture (supporting multiple target archs concurrently), having all th=
+at
+info on the tcg_ctx object is easier to track and modify, compared to having
+multiple global variables.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1723161
+> r~
 
-Title:
-  Migration failing in qemu-2.10.1 but working qemu-2.9.1 and earlier
-  with same options
+> PS: Everyone, please trim context that you don't care about.  If you just=
+ add
+> two lines in the middle of 1000, I'll not always find it.
 
-Status in QEMU:
-  New
+So true; I just went with the flow of the list, sorry.
 
-Bug description:
-  =
 
-  Qemu-2.10.1 migration failing with the following error:
-  Receiving block device images
-  qemu-system-x86_64: error while loading section id 2(block)
-  qemu-system-x86_64: load of migration failed: Input/output error
-
-  Migration is setup on the destination system of the migration using:
-  -incoming tcp:0:4444
-
-  Migration is initiated from the source using the following commands in it=
-s qemu monitor:
-  migrate -b "tcp:localhost:4444"
-
-  The command-line used in both the source and destination is:
-  qemu-system-x86_64 \
-          -nodefaults \
-          -pidfile vm0.pid \
-          -enable-kvm \
-          -machine q35 \
-          -cpu host -smp 2 \
-          -m 4096M \
-          -drive if=3Dpflash,format=3Draw,unit=3D0,file=3DOVMF_CODE.fd,read=
-only \
-          -drive if=3Dpflash,format=3Draw,unit=3D1,file=3DOVMF_VARS.fd \
-          -drive file=3D${HDRIVE},format=3Dqcow2 \
-          -drive media=3Dcdrom \
-          -usb -device usb-tablet \
-          -vga std -vnc :0 \
-          -net nic,macaddr=3D${TAPMACADDR} -net user,net=3D192.168.2.0/24,d=
-hcpstart=3D192.168.2.10 \
-          -serial stdio \
-          -monitor unix:${MONITORSOCKET},server,nowait
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1723161/+subscriptions
+Cheers,
+  Lluis
