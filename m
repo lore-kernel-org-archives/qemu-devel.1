@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e2b4S-0001H4-4m
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:50:33 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e2bTK-0004y2-UR
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:16:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e2b4O-0000kj-0z
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:50:32 -0400
-Resent-Message-Id: <E1e2b4O-0000kj-0z@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21359)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1e2b4N-0000i5-QO
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:50:27 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150780535623.288.12272299760364683981@b58463cdfd5f>
-In-Reply-To: <20171012095319.136610-1-vsementsov@virtuozzo.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e2bTG-0006xE-6Y
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:16:14 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:16695 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1e2bTF-0006vg-Qb
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:16:10 -0400
+References: <150780535623.288.12272299760364683981@b58463cdfd5f>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <da4434ac-e912-172e-7d04-af09e11f813a@virtuozzo.com>
+Date: Thu, 12 Oct 2017 14:15:52 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 12 Oct 2017 03:49:17 -0700 (PDT)
+In-Reply-To: <150780535623.288.12272299760364683981@b58463cdfd5f>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Subject: Re: [Qemu-devel] [PATCH v3 00/13] nbd minimal structured read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,77 +28,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: vsementsov@virtuozzo.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, pbonzini@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcxMDEyMDk1MzE5LjEzNjYxMC0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNv
-bQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAwLzEzXSBuYmQgbWluaW1hbCBzdHJ1
-Y3R1cmVkIHJlYWQKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9
-YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxl
-ZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
-cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
-ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
-IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
-CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9t
-IGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0g
-ICAgICAgICAgICBwYXRjaGV3LzIwMTcxMDA1MTUxMzEzLjMyMDE1LTEtY29odWNrQHJlZGhhdC5j
-b20gLT4gcGF0Y2hldy8yMDE3MTAwNTE1MTMxMy4zMjAxNS0xLWNvaHVja0ByZWRoYXQuY29tClN3
-aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKODAzYzk2YWVjYSBuYmQ6IE1pbmltYWwgc3Ry
-dWN0dXJlZCByZWFkIGZvciBjbGllbnQKNTViMjY5MmZmNiBuYmQvY2xpZW50OiBwcmVwYXJlIG5i
-ZF9yZWNlaXZlX3JlcGx5IGZvciBzdHJ1Y3R1cmVkIHJlcGx5CjMxNTVmOTlkM2EgbmJkOiBzaGFy
-ZSBzb21lIG5iZCBlbnRpdGllcyB0byBiZSByZXVzZWQgaW4gYmxvY2svbmJkLWNsaWVudC5jCmNm
-MTdlMmYyNmMgbmJkL2NsaWVudDogcmVmYWN0b3IgbmJkX3JlY2VpdmVfc3RhcnR0bHMKNzkzNGVj
-ZDZlMyBuYmQ6IE1pbmltYWwgc3RydWN0dXJlZCByZWFkIGZvciBzZXJ2ZXIKYWJmYzY3MWQ1ZSBu
-YmQ6IGhlYWRlciBjb25zdGFudHMgaW5kZW50aW5nCjFjMjk0NGQ5ZDEgbmJkLXNlcnZlcjogc2lt
-cGxpZnkgcmVwbHkgdHJhbnNtaXNzaW9uCmZlODdjMGY2OGMgbmJkL3NlcnZlcjogcmVmYWN0b3Ig
-bmJkX2NvX3NlbmRfc2ltcGxlX3JlcGx5IHBhcmFtZXRlcnMKYTlkZTc3ZDQxMSBuYmQvc2VydmVy
-OiBkbyBub3QgdXNlIE5CRFJlcGx5IHN0cnVjdHVyZQo2OTFmNDcwNzk3IG5iZC9zZXJ2ZXI6IHN0
-cnVjdHVyaXplIHNpbXBsZSByZXBseSBoZWFkZXIgc2VuZGluZwo3ZjE2NTJkYjBmIG5iZDogcmVu
-YW1lIHNvbWUgc2ltcGxlLXJlcXVlc3QgcmVsYXRlZCBvYmplY3RzIHRvIGJlIF9zaW1wbGVfCmFi
-MmU2YmEyZjYgYmxvY2svbmJkLWNsaWVudDogcmVmYWN0b3IgbmJkX2NvX3JlY2VpdmVfcmVwbHkK
-YzViYWVhOWU4NiBibG9jay9uYmQtY2xpZW50OiBhc3NlcnQgcWlvdiBsZW4gb25jZSBpbiBuYmRf
-Y29fcmVxdWVzdAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMzogYmxv
-Y2svbmJkLWNsaWVudDogYXNzZXJ0IHFpb3YgbGVuIG9uY2UgaW4gbmJkX2NvX3JlcXVlc3QuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMi8xMzogYmxvY2svbmJkLWNsaWVudDogcmVmYWN0b3IgbmJkX2NvX3Jl
-Y2VpdmVfcmVwbHkuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xMzogbmJkOiByZW5hbWUgc29tZSBzaW1w
-bGUtcmVxdWVzdCByZWxhdGVkIG9iamVjdHMgdG8gYmUgX3NpbXBsZV8uLi4KQ2hlY2tpbmcgUEFU
-Q0ggNC8xMzogbmJkL3NlcnZlcjogc3RydWN0dXJpemUgc2ltcGxlIHJlcGx5IGhlYWRlciBzZW5k
-aW5nLi4uCkNoZWNraW5nIFBBVENIIDUvMTM6IG5iZC9zZXJ2ZXI6IGRvIG5vdCB1c2UgTkJEUmVw
-bHkgc3RydWN0dXJlLi4uCkNoZWNraW5nIFBBVENIIDYvMTM6IG5iZC9zZXJ2ZXI6IHJlZmFjdG9y
-IG5iZF9jb19zZW5kX3NpbXBsZV9yZXBseSBwYXJhbWV0ZXJzLi4uCkNoZWNraW5nIFBBVENIIDcv
-MTM6IG5iZC1zZXJ2ZXI6IHNpbXBsaWZ5IHJlcGx5IHRyYW5zbWlzc2lvbi4uLgpDaGVja2luZyBQ
-QVRDSCA4LzEzOiBuYmQ6IGhlYWRlciBjb25zdGFudHMgaW5kZW50aW5nLi4uCkNoZWNraW5nIFBB
-VENIIDkvMTM6IG5iZDogTWluaW1hbCBzdHJ1Y3R1cmVkIHJlYWQgZm9yIHNlcnZlci4uLgpDaGVj
-a2luZyBQQVRDSCAxMC8xMzogbmJkL2NsaWVudDogcmVmYWN0b3IgbmJkX3JlY2VpdmVfc3RhcnR0
-bHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMTM6IG5iZDogc2hhcmUgc29tZSBuYmQgZW50aXRpZXMg
-dG8gYmUgcmV1c2VkIGluIGJsb2NrL25iZC1jbGllbnQuYy4uLgpFUlJPUjogcmV0dXJuIG9mIGFu
-IGVycm5vIHNob3VsZCB0eXBpY2FsbHkgYmUgLXZlIChyZXR1cm4gLUVQRVJNKQojNDY6IEZJTEU6
-IGluY2x1ZGUvYmxvY2svbmJkLmg6MjA2OgorICAgICAgICByZXR1cm4gRVBFUk07CgpFUlJPUjog
-cmV0dXJuIG9mIGFuIGVycm5vIHNob3VsZCB0eXBpY2FsbHkgYmUgLXZlIChyZXR1cm4gLUVJTykK
-IzQ4OiBGSUxFOiBpbmNsdWRlL2Jsb2NrL25iZC5oOjIwODoKKyAgICAgICAgcmV0dXJuIEVJTzsK
-CkVSUk9SOiByZXR1cm4gb2YgYW4gZXJybm8gc2hvdWxkIHR5cGljYWxseSBiZSAtdmUgKHJldHVy
-biAtRU5PTUVNKQojNTA6IEZJTEU6IGluY2x1ZGUvYmxvY2svbmJkLmg6MjEwOgorICAgICAgICBy
-ZXR1cm4gRU5PTUVNOwoKRVJST1I6IHJldHVybiBvZiBhbiBlcnJubyBzaG91bGQgdHlwaWNhbGx5
-IGJlIC12ZSAocmV0dXJuIC1FTk9TUEMpCiM1MjogRklMRTogaW5jbHVkZS9ibG9jay9uYmQuaDoy
-MTI6CisgICAgICAgIHJldHVybiBFTk9TUEM7CgpFUlJPUjogcmV0dXJuIG9mIGFuIGVycm5vIHNo
-b3VsZCB0eXBpY2FsbHkgYmUgLXZlIChyZXR1cm4gLUVTSFVURE9XTikKIzU0OiBGSUxFOiBpbmNs
-dWRlL2Jsb2NrL25iZC5oOjIxNDoKKyAgICAgICAgcmV0dXJuIEVTSFVURE9XTjsKCkVSUk9SOiBy
-ZXR1cm4gb2YgYW4gZXJybm8gc2hvdWxkIHR5cGljYWxseSBiZSAtdmUgKHJldHVybiAtRUlOVkFM
-KQojNTY6IEZJTEU6IGluY2x1ZGUvYmxvY2svbmJkLmg6MjE2OgorICAgICAgICByZXR1cm4gRUlO
-VkFMOwoKRVJST1I6IHJldHVybiBvZiBhbiBlcnJubyBzaG91bGQgdHlwaWNhbGx5IGJlIC12ZSAo
-cmV0dXJuIC1FSU5WQUwpCiM1OTogRklMRTogaW5jbHVkZS9ibG9jay9uYmQuaDoyMTk6CisgICAg
-cmV0dXJuIEVJTlZBTDsKCnRvdGFsOiA3IGVycm9ycywgMCB3YXJuaW5ncywgMTQ5IGxpbmVzIGNo
-ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBB
-VENIIDEyLzEzOiBuYmQvY2xpZW50OiBwcmVwYXJlIG5iZF9yZWNlaXZlX3JlcGx5IGZvciBzdHJ1
-Y3R1cmVkIHJlcGx5Li4uCkNoZWNraW5nIFBBVENIIDEzLzEzOiBuYmQ6IE1pbmltYWwgc3RydWN0
-dXJlZCByZWFkIGZvciBjbGllbnQuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
-ZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
-eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
-ayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+This is a code movement, no changes.
+
+12.10.2017 13:49, no-reply@patchew.org wrote:
+> Hi,
+>
+> This series seems to have some coding style problems. See output below for
+> more information:
+>
+> Type: series
+> Message-id: 20171012095319.136610-1-vsementsov@virtuozzo.com
+> Subject: [Qemu-devel] [PATCH v3 00/13] nbd minimal structured read
+>
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+>
+> BASE=base
+> n=1
+> total=$(git log --oneline $BASE.. | wc -l)
+> failed=0
+>
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+>
+> commits="$(git log --format=%H --reverse $BASE..)"
+> for c in $commits; do
+>      echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
+>      if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
+>          failed=1
+>          echo
+>      fi
+>      n=$((n+1))
+> done
+>
+> exit $failed
+> === TEST SCRIPT END ===
+>
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+>  From https://github.com/patchew-project/qemu
+>   t [tag update]            patchew/20171005151313.32015-1-cohuck@redhat.com -> patchew/20171005151313.32015-1-cohuck@redhat.com
+> Switched to a new branch 'test'
+> 803c96aeca nbd: Minimal structured read for client
+> 55b2692ff6 nbd/client: prepare nbd_receive_reply for structured reply
+> 3155f99d3a nbd: share some nbd entities to be reused in block/nbd-client.c
+> cf17e2f26c nbd/client: refactor nbd_receive_starttls
+> 7934ecd6e3 nbd: Minimal structured read for server
+> abfc671d5e nbd: header constants indenting
+> 1c2944d9d1 nbd-server: simplify reply transmission
+> fe87c0f68c nbd/server: refactor nbd_co_send_simple_reply parameters
+> a9de77d411 nbd/server: do not use NBDReply structure
+> 691f470797 nbd/server: structurize simple reply header sending
+> 7f1652db0f nbd: rename some simple-request related objects to be _simple_
+> ab2e6ba2f6 block/nbd-client: refactor nbd_co_receive_reply
+> c5baea9e86 block/nbd-client: assert qiov len once in nbd_co_request
+>
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/13: block/nbd-client: assert qiov len once in nbd_co_request...
+> Checking PATCH 2/13: block/nbd-client: refactor nbd_co_receive_reply...
+> Checking PATCH 3/13: nbd: rename some simple-request related objects to be _simple_...
+> Checking PATCH 4/13: nbd/server: structurize simple reply header sending...
+> Checking PATCH 5/13: nbd/server: do not use NBDReply structure...
+> Checking PATCH 6/13: nbd/server: refactor nbd_co_send_simple_reply parameters...
+> Checking PATCH 7/13: nbd-server: simplify reply transmission...
+> Checking PATCH 8/13: nbd: header constants indenting...
+> Checking PATCH 9/13: nbd: Minimal structured read for server...
+> Checking PATCH 10/13: nbd/client: refactor nbd_receive_starttls...
+> Checking PATCH 11/13: nbd: share some nbd entities to be reused in block/nbd-client.c...
+> ERROR: return of an errno should typically be -ve (return -EPERM)
+> #46: FILE: include/block/nbd.h:206:
+> +        return EPERM;
+>
+> ERROR: return of an errno should typically be -ve (return -EIO)
+> #48: FILE: include/block/nbd.h:208:
+> +        return EIO;
+>
+> ERROR: return of an errno should typically be -ve (return -ENOMEM)
+> #50: FILE: include/block/nbd.h:210:
+> +        return ENOMEM;
+>
+> ERROR: return of an errno should typically be -ve (return -ENOSPC)
+> #52: FILE: include/block/nbd.h:212:
+> +        return ENOSPC;
+>
+> ERROR: return of an errno should typically be -ve (return -ESHUTDOWN)
+> #54: FILE: include/block/nbd.h:214:
+> +        return ESHUTDOWN;
+>
+> ERROR: return of an errno should typically be -ve (return -EINVAL)
+> #56: FILE: include/block/nbd.h:216:
+> +        return EINVAL;
+>
+> ERROR: return of an errno should typically be -ve (return -EINVAL)
+> #59: FILE: include/block/nbd.h:219:
+> +    return EINVAL;
+>
+> total: 7 errors, 0 warnings, 149 lines checked
+>
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+>
+> Checking PATCH 12/13: nbd/client: prepare nbd_receive_reply for structured reply...
+> Checking PATCH 13/13: nbd: Minimal structured read for client...
+> === OUTPUT END ===
+>
+> Test command exited with code: 1
+>
+>
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@freelists.org
+
+
+-- 
+Best regards,
+Vladimir
