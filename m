@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1e2aRK-0006Rv-MY
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:10:12 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e2aTO-0008Hk-4k
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:12:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1e2aRE-0004dk-L5
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:10:06 -0400
-References: <1505807208-9063-1-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA-0MK18DakmNPRXCNYbDpBvzE0h12nNjg7zr+F_m0EnDw@mail.gmail.com>
-	<f3a263b7-27e6-26df-592d-a34902bab6fe@redhat.com>
-	<CAFEAcA_2RaRsvm_=V4iDNk_vMOtiWUZs3-SdMh+DSYqGyPE0PQ@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <08ce288c-610c-4dea-927d-262e7b75051f@redhat.com>
-Date: Thu, 12 Oct 2017 12:09:40 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1e2aTN-0007O8-7q
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:12:14 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:57278)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e2aTN-0007KV-1v
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:12:13 -0400
+Received: by mail-wm0-x235.google.com with SMTP id l68so11848243wmd.5
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 03:12:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_2RaRsvm_=V4iDNk_vMOtiWUZs3-SdMh+DSYqGyPE0PQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v4 00/16] VIRTIO-IOMMU device
+In-Reply-To: <20171012100736.GH16125@redhat.com>
+References: <20171011083604.11820-1-kraxel@redhat.com>
+	<CAFEAcA9uXw7XYOBu9cKY+B=OWNbS=cRp7BKcXacLTaRLx9RWdA@mail.gmail.com>
+	<20171011154951.GA6163@redhat.com>
+	<CAFEAcA8OZALycKmsrC=MrftfF0YytXzRxGrzbetmSvddfTVf1g@mail.gmail.com>
+	<20171012082456.GB16125@redhat.com>
+	<1507800626.26812.13.camel@redhat.com>
+	<20171012093337.GE16125@redhat.com>
+	<1507802687.26812.17.camel@redhat.com>
+	<20171012100736.GH16125@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Oct 2017 11:11:51 +0100
+Message-ID: <CAFEAcA9=eREYRnsAC=_gGpmY2a2ERaA8Xg3y1_F3vcBai0P-jA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/10] Ui 20171011 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,78 +36,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Wei Huang <wei@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>, Andrew Jones <drjones@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, jean-philippe.brucker@arm.com, Tomasz Nowicki <tn@semihalf.com>, Will Deacon <will.deacon@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, linuc.decode@gmail.com, Bharat Bhushan <bharat.bhushan@nxp.com>, Christoffer Dall <christoffer.dall@linaro.org>, eric.auger.pro@gmail.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Peter,
-
-On 12/10/2017 11:54, Peter Maydell wrote:
-> On 11 October 2017 at 17:08, Auger Eric <eric.auger@redhat.com> wrote:
->> Hi Peter,
+On 12 October 2017 at 11:07, Daniel P. Berrange <berrange@redhat.com> wrote:
+> On Thu, Oct 12, 2017 at 12:04:47PM +0200, Gerd Hoffmann wrote:
+>>   Hi,
 >>
->> On 11/10/2017 16:56, Peter Maydell wrote:
->>> On 19 September 2017 at 08:46, Eric Auger <eric.auger@redhat.com> wrote:
->>>> This series implements the virtio-iommu device.
->>>>
->>>> This v4 is an upgrade to v0.4 spec [1] and applies on QEMU v2.10.0.
->>>> - probe request support although no reserved region is returned at
->>>>   the moment
->>>> - unmap semantics less strict, as specified in v0.4
->>>> - device registration, attach/detach revisited
->>>> - split into smaller patches to ease review
->>>> - propose a way to inform the IOMMU mr about the page_size_mask
->>>>   of underlying HW IOMMU, if any
->>>> - remove warning associated with the translation of the MSI doorbell
->>>>
->>>> The device gets instantiated using the "-device virtio-iommu-device"
->>>> option. It currently works with ARM virt machine only, as the machine
->>>> must handle the dt binding between the virtio-mmio "iommu" node and
->>>> the PCI host bridge node.
->>>
->>> Could this work on x86, or is it inherently arm-only?
+>> > Not AFAICT - if i try it just never completes connect()
 >>
->> Yes this is the goal. At the moment the ACPI probing is not yet properly
->> specified but a Q35 prototype was developed in the Red Hat Virt team.
->> This will be presented at the KVM forum.
-> 
-> Since I have very little familiarity with virtio or iommu code,
-> I'd be much happier if this was reviewed as a generic virtio-iommu
-> by the x86/virtio devs and then the arm specific parts done second...
+>> Hmm, so maybe we should mirror the thing on git.qemu.org and use that?
+>
+> Can that be made 100% automated - I don't want to have to push changes to
+> two different git repos.
 
-Understood. I was rather expecting you to review the smmuv3 emulation
-code which you did, in a comprehensive manner ;-), and many thanks for that.
+All our git.qemu.org mirrors are automated, I think (there's a cron
+job on the server somewhere that syncs them with the upstream, IIRC?)
 
-Note sure this is time yet to get this RFC reviewed as
-- the v0.4 virtio-iommu driver it relies on was not officially submitted,
-- the virtio-iommu specification review has not really been reviewed,
-- the ACPI probing method has not been discussed yet.
-
-Jean-Philippe, please correct me if I am wrong.
-
-So to me, this is pure RFC at the moment.
-> 
-> I'm also not clear on what we're expecting the recommended or normal
-> way to do device passthrough is going to be -- this virtio-mmio,
-> or presenting the guest with an SMMUv3 interface? Do we really
-> need to implement both ?
-
-I think the KVM forum is the right place to sync as both approaches will
-be presented and some pros/cons + performance figures will be given.
-
-As we talk about choosing, there is one alternative that was suggested
-on the ML by Alex & Michael but never really get considered yet and
-maybe should be: using intel iommu emulation code for ARM. I aknowledge
-this deserves a thorough impact study on kernel and FW side but I would
-be happy to get your opinion about the QEMU side. Would you have a by-
-principle rejection of this idea to instantiate such an Intel device in
-mach virt or would it be something you would be ready to consider?
-
-Thanks
-
-Eric
-
-
-> 
-> thanks
-> -- PMM
-> 
+thanks
+-- PMM
