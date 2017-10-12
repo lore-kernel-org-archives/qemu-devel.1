@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1e2ccD-0006Bt-M1
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:29:30 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e2chX-0007qx-M3
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:35:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1e2ccA-0007vE-IS
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:29:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50496)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1e2ccA-0007ut-Ct
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:29:26 -0400
-Date: Thu, 12 Oct 2017 13:29:11 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20171012122911.GD5957@stefanha-x1.localdomain>
-References: <20170929033844.26935-1-peterx@redhat.com>
-	<20170929033844.26935-10-peterx@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1e2chW-0002Zs-R4
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:34:59 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:53638)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e2chW-0002Y5-HE
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:34:58 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id q132so12937520wmd.2
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 05:34:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170929033844.26935-10-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 09/22] monitor: create monitor dedicate
- iothread
+In-Reply-To: <20170928165414.7339-1-richard.henderson@linaro.org>
+References: <20170928165414.7339-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Oct 2017 13:34:36 +0100
+Message-ID: <CAFEAcA9aLDDFoTHY+wHGV3S-squwtxs7kaaA6iiCivnOH3ACbA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4 0/9] Support the Capstone disassembler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Sep 29, 2017 at 11:38:31AM +0800, Peter Xu wrote:
-> @@ -4126,10 +4150,23 @@ void monitor_init(Chardev *chr, int flags)
->      qemu_mutex_unlock(&monitor_lock);
->  }
->  
-> +static void monitor_io_thread_destroy(void)
-> +{
-> +    iothread_destroy(mon_global.mon_io_thread);
-> +    mon_global.mon_io_thread = NULL;
-> +}
-> +
->  void monitor_cleanup(void)
->  {
->      Monitor *mon, *next;
->  
-> +    /*
-> +     * We need to explicitly stop the iothread (but not destroy it),
-> +     * cleanup the monitor resources, then destroy the iothread.  See
-> +     * again on the glib bug mentioned in 2b316774f6 for a reason.
-> +     */
-> +    iothread_stop(mon_global.mon_io_thread);
-> +
->      qemu_mutex_lock(&monitor_lock);
->      QLIST_FOREACH_SAFE(mon, &mon_list, entry, next) {
->          QLIST_REMOVE(mon, entry);
-> @@ -4137,6 +4174,8 @@ void monitor_cleanup(void)
->          g_free(mon);
->      }
->      qemu_mutex_unlock(&monitor_lock);
-> +
-> +    monitor_io_thread_destroy();
->  }
+On 28 September 2017 at 17:54, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Changes since v3:
+>   * Adjust how the submodule is detected and invoked.
+>     - This should fix the reported patchew failure,
+>     - Fixes e.g. -m32 "cross" compilation, or similar
+>       abi-changing option sets.
+>
+>
+> r~
+>
+>
+> Richard Henderson (9):
+>   target/i386: Convert to disas_set_info hook
+>   target/ppc: Convert to disas_set_info hook
+>   disas: Remove unused flags arguments
+>   disas: Support the Capstone disassembler library
+>   i386: Support Capstone in disas_set_info
+>   arm: Support Capstone in disas_set_info
+>   ppc: Support Capstone in disas_set_info
+>   disas: Remove monitor_disas_is_physical
+>   disas: Add capstone as submodule
 
-Minor style comment, I would inline monitor_io_thread_destroy() into
-monitor_cleanup() instead of making it a function.
+I think the "add as submodule" patch might want to be
+revised in the light of the changes to handling of
+submodules that the current UI pull request is making,
+but are the first 8 patches here more or less ready to
+go in?
 
-monitor_io_thread_destroy() relies on iothread_stop() being called
-first.  Defining a function with no doc comment creates a risk that
-someone else will call it in the future without first calling
-iothread_stop().  It's safer to inline the code where it cannot be
-misused by accident.
+My other issue with patch 9 is that I think all our
+submodules should be for git repos hosted on
+git.qemu.org (ie mirrored from somewhere else). So
+we should get capstone mirrored first and then use it.
 
-Also, please name things "iothread" instead of "io_thread" for
-consistency.
-
-Stefan
+thanks
+-- PMM
