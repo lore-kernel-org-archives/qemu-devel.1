@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jean-philippe.brucker@arm.com>) id 1e2avq-00005f-0S
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:41:39 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e2b4S-0001H4-4m
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:50:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jean-philippe.brucker@arm.com>) id 1e2avp-0003GG-1O
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:41:38 -0400
-References: <1505807208-9063-1-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA-0MK18DakmNPRXCNYbDpBvzE0h12nNjg7zr+F_m0EnDw@mail.gmail.com>
-	<f3a263b7-27e6-26df-592d-a34902bab6fe@redhat.com>
-	<CAFEAcA_2RaRsvm_=V4iDNk_vMOtiWUZs3-SdMh+DSYqGyPE0PQ@mail.gmail.com>
-	<08ce288c-610c-4dea-927d-262e7b75051f@redhat.com>
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Message-ID: <1f4895e8-cc64-feb7-65e4-d17128c570d1@arm.com>
-Date: Thu, 12 Oct 2017 11:46:26 +0100
+	(envelope-from <no-reply@patchew.org>) id 1e2b4O-0000kj-0z
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:50:32 -0400
+Resent-Message-Id: <E1e2b4O-0000kj-0z@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21359)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e2b4N-0000i5-QO
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:50:27 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150780535623.288.12272299760364683981@b58463cdfd5f>
+In-Reply-To: <20171012095319.136610-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <08ce288c-610c-4dea-927d-262e7b75051f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v4 00/16] VIRTIO-IOMMU device
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 12 Oct 2017 03:49:17 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 00/13] nbd minimal structured read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +28,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Wei Huang <wei@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>, Andrew Jones <drjones@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, Will Deacon <Will.Deacon@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, Marc Zyngier <Marc.Zyngier@arm.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, "linuc.decode@gmail.com" <linuc.decode@gmail.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Christoffer Dall <christoffer.dall@linaro.org>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
+To: vsementsov@virtuozzo.com
+Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, pbonzini@redhat.com
 
-On 12/10/17 11:09, Auger Eric wrote:
-> Hi Peter,
-> 
-> On 12/10/2017 11:54, Peter Maydell wrote:
->> On 11 October 2017 at 17:08, Auger Eric <eric.auger@redhat.com> wrote:
->>> Hi Peter,
->>>
->>> On 11/10/2017 16:56, Peter Maydell wrote:
->>>> On 19 September 2017 at 08:46, Eric Auger <eric.auger@redhat.com> wrote:
->>>>> This series implements the virtio-iommu device.
->>>>>
->>>>> This v4 is an upgrade to v0.4 spec [1] and applies on QEMU v2.10.0.
->>>>> - probe request support although no reserved region is returned at
->>>>>   the moment
->>>>> - unmap semantics less strict, as specified in v0.4
->>>>> - device registration, attach/detach revisited
->>>>> - split into smaller patches to ease review
->>>>> - propose a way to inform the IOMMU mr about the page_size_mask
->>>>>   of underlying HW IOMMU, if any
->>>>> - remove warning associated with the translation of the MSI doorbell
->>>>>
->>>>> The device gets instantiated using the "-device virtio-iommu-device"
->>>>> option. It currently works with ARM virt machine only, as the machine
->>>>> must handle the dt binding between the virtio-mmio "iommu" node and
->>>>> the PCI host bridge node.
->>>>
->>>> Could this work on x86, or is it inherently arm-only?
->>>
->>> Yes this is the goal. At the moment the ACPI probing is not yet properly
->>> specified but a Q35 prototype was developed in the Red Hat Virt team.
->>> This will be presented at the KVM forum.
->>
->> Since I have very little familiarity with virtio or iommu code,
->> I'd be much happier if this was reviewed as a generic virtio-iommu
->> by the x86/virtio devs and then the arm specific parts done second...
-> 
-> Understood. I was rather expecting you to review the smmuv3 emulation
-> code which you did, in a comprehensive manner ;-), and many thanks for that.
-> 
-> Note sure this is time yet to get this RFC reviewed as
-> - the v0.4 virtio-iommu driver it relies on was not officially submitted,
-> - the virtio-iommu specification review has not really been reviewed,
-> - the ACPI probing method has not been discussed yet.
-> 
-> Jean-Philippe, please correct me if I am wrong.
-> 
-> So to me, this is pure RFC at the moment.
-
-Yes, having it as an RFC for the moment allowed to break compatibility
-between versions of the specification. The downside is that it probably
-doesn't get as many eyeballs as it would without an RFC tag (although I
-did receive tonnes of helpful comments). Maybe v0.5, that should be
-published shortly, can be a candidate for mainline.
-
-Thanks,
-Jean
-
->> I'm also not clear on what we're expecting the recommended or normal
->> way to do device passthrough is going to be -- this virtio-mmio,
->> or presenting the guest with an SMMUv3 interface? Do we really
->> need to implement both ?
-> 
-> I think the KVM forum is the right place to sync as both approaches will
-> be presented and some pros/cons + performance figures will be given.
-> 
-> As we talk about choosing, there is one alternative that was suggested
-> on the ML by Alex & Michael but never really get considered yet and
-> maybe should be: using intel iommu emulation code for ARM. I aknowledge
-> this deserves a thorough impact study on kernel and FW side but I would
-> be happy to get your opinion about the QEMU side. Would you have a by-
-> principle rejection of this idea to instantiate such an Intel device in
-> mach virt or would it be something you would be ready to consider?
-> 
-> Thanks
-> 
-> Eric
-> 
-> 
->>
->> thanks
->> -- PMM
->>
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcxMDEyMDk1MzE5LjEzNjYxMC0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNv
+bQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAwLzEzXSBuYmQgbWluaW1hbCBzdHJ1
+Y3R1cmVkIHJlYWQKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9
+YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxl
+ZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
+cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
+ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
+IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
+CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9t
+IGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0g
+ICAgICAgICAgICBwYXRjaGV3LzIwMTcxMDA1MTUxMzEzLjMyMDE1LTEtY29odWNrQHJlZGhhdC5j
+b20gLT4gcGF0Y2hldy8yMDE3MTAwNTE1MTMxMy4zMjAxNS0xLWNvaHVja0ByZWRoYXQuY29tClN3
+aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKODAzYzk2YWVjYSBuYmQ6IE1pbmltYWwgc3Ry
+dWN0dXJlZCByZWFkIGZvciBjbGllbnQKNTViMjY5MmZmNiBuYmQvY2xpZW50OiBwcmVwYXJlIG5i
+ZF9yZWNlaXZlX3JlcGx5IGZvciBzdHJ1Y3R1cmVkIHJlcGx5CjMxNTVmOTlkM2EgbmJkOiBzaGFy
+ZSBzb21lIG5iZCBlbnRpdGllcyB0byBiZSByZXVzZWQgaW4gYmxvY2svbmJkLWNsaWVudC5jCmNm
+MTdlMmYyNmMgbmJkL2NsaWVudDogcmVmYWN0b3IgbmJkX3JlY2VpdmVfc3RhcnR0bHMKNzkzNGVj
+ZDZlMyBuYmQ6IE1pbmltYWwgc3RydWN0dXJlZCByZWFkIGZvciBzZXJ2ZXIKYWJmYzY3MWQ1ZSBu
+YmQ6IGhlYWRlciBjb25zdGFudHMgaW5kZW50aW5nCjFjMjk0NGQ5ZDEgbmJkLXNlcnZlcjogc2lt
+cGxpZnkgcmVwbHkgdHJhbnNtaXNzaW9uCmZlODdjMGY2OGMgbmJkL3NlcnZlcjogcmVmYWN0b3Ig
+bmJkX2NvX3NlbmRfc2ltcGxlX3JlcGx5IHBhcmFtZXRlcnMKYTlkZTc3ZDQxMSBuYmQvc2VydmVy
+OiBkbyBub3QgdXNlIE5CRFJlcGx5IHN0cnVjdHVyZQo2OTFmNDcwNzk3IG5iZC9zZXJ2ZXI6IHN0
+cnVjdHVyaXplIHNpbXBsZSByZXBseSBoZWFkZXIgc2VuZGluZwo3ZjE2NTJkYjBmIG5iZDogcmVu
+YW1lIHNvbWUgc2ltcGxlLXJlcXVlc3QgcmVsYXRlZCBvYmplY3RzIHRvIGJlIF9zaW1wbGVfCmFi
+MmU2YmEyZjYgYmxvY2svbmJkLWNsaWVudDogcmVmYWN0b3IgbmJkX2NvX3JlY2VpdmVfcmVwbHkK
+YzViYWVhOWU4NiBibG9jay9uYmQtY2xpZW50OiBhc3NlcnQgcWlvdiBsZW4gb25jZSBpbiBuYmRf
+Y29fcmVxdWVzdAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMzogYmxv
+Y2svbmJkLWNsaWVudDogYXNzZXJ0IHFpb3YgbGVuIG9uY2UgaW4gbmJkX2NvX3JlcXVlc3QuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMi8xMzogYmxvY2svbmJkLWNsaWVudDogcmVmYWN0b3IgbmJkX2NvX3Jl
+Y2VpdmVfcmVwbHkuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xMzogbmJkOiByZW5hbWUgc29tZSBzaW1w
+bGUtcmVxdWVzdCByZWxhdGVkIG9iamVjdHMgdG8gYmUgX3NpbXBsZV8uLi4KQ2hlY2tpbmcgUEFU
+Q0ggNC8xMzogbmJkL3NlcnZlcjogc3RydWN0dXJpemUgc2ltcGxlIHJlcGx5IGhlYWRlciBzZW5k
+aW5nLi4uCkNoZWNraW5nIFBBVENIIDUvMTM6IG5iZC9zZXJ2ZXI6IGRvIG5vdCB1c2UgTkJEUmVw
+bHkgc3RydWN0dXJlLi4uCkNoZWNraW5nIFBBVENIIDYvMTM6IG5iZC9zZXJ2ZXI6IHJlZmFjdG9y
+IG5iZF9jb19zZW5kX3NpbXBsZV9yZXBseSBwYXJhbWV0ZXJzLi4uCkNoZWNraW5nIFBBVENIIDcv
+MTM6IG5iZC1zZXJ2ZXI6IHNpbXBsaWZ5IHJlcGx5IHRyYW5zbWlzc2lvbi4uLgpDaGVja2luZyBQ
+QVRDSCA4LzEzOiBuYmQ6IGhlYWRlciBjb25zdGFudHMgaW5kZW50aW5nLi4uCkNoZWNraW5nIFBB
+VENIIDkvMTM6IG5iZDogTWluaW1hbCBzdHJ1Y3R1cmVkIHJlYWQgZm9yIHNlcnZlci4uLgpDaGVj
+a2luZyBQQVRDSCAxMC8xMzogbmJkL2NsaWVudDogcmVmYWN0b3IgbmJkX3JlY2VpdmVfc3RhcnR0
+bHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMTM6IG5iZDogc2hhcmUgc29tZSBuYmQgZW50aXRpZXMg
+dG8gYmUgcmV1c2VkIGluIGJsb2NrL25iZC1jbGllbnQuYy4uLgpFUlJPUjogcmV0dXJuIG9mIGFu
+IGVycm5vIHNob3VsZCB0eXBpY2FsbHkgYmUgLXZlIChyZXR1cm4gLUVQRVJNKQojNDY6IEZJTEU6
+IGluY2x1ZGUvYmxvY2svbmJkLmg6MjA2OgorICAgICAgICByZXR1cm4gRVBFUk07CgpFUlJPUjog
+cmV0dXJuIG9mIGFuIGVycm5vIHNob3VsZCB0eXBpY2FsbHkgYmUgLXZlIChyZXR1cm4gLUVJTykK
+IzQ4OiBGSUxFOiBpbmNsdWRlL2Jsb2NrL25iZC5oOjIwODoKKyAgICAgICAgcmV0dXJuIEVJTzsK
+CkVSUk9SOiByZXR1cm4gb2YgYW4gZXJybm8gc2hvdWxkIHR5cGljYWxseSBiZSAtdmUgKHJldHVy
+biAtRU5PTUVNKQojNTA6IEZJTEU6IGluY2x1ZGUvYmxvY2svbmJkLmg6MjEwOgorICAgICAgICBy
+ZXR1cm4gRU5PTUVNOwoKRVJST1I6IHJldHVybiBvZiBhbiBlcnJubyBzaG91bGQgdHlwaWNhbGx5
+IGJlIC12ZSAocmV0dXJuIC1FTk9TUEMpCiM1MjogRklMRTogaW5jbHVkZS9ibG9jay9uYmQuaDoy
+MTI6CisgICAgICAgIHJldHVybiBFTk9TUEM7CgpFUlJPUjogcmV0dXJuIG9mIGFuIGVycm5vIHNo
+b3VsZCB0eXBpY2FsbHkgYmUgLXZlIChyZXR1cm4gLUVTSFVURE9XTikKIzU0OiBGSUxFOiBpbmNs
+dWRlL2Jsb2NrL25iZC5oOjIxNDoKKyAgICAgICAgcmV0dXJuIEVTSFVURE9XTjsKCkVSUk9SOiBy
+ZXR1cm4gb2YgYW4gZXJybm8gc2hvdWxkIHR5cGljYWxseSBiZSAtdmUgKHJldHVybiAtRUlOVkFM
+KQojNTY6IEZJTEU6IGluY2x1ZGUvYmxvY2svbmJkLmg6MjE2OgorICAgICAgICByZXR1cm4gRUlO
+VkFMOwoKRVJST1I6IHJldHVybiBvZiBhbiBlcnJubyBzaG91bGQgdHlwaWNhbGx5IGJlIC12ZSAo
+cmV0dXJuIC1FSU5WQUwpCiM1OTogRklMRTogaW5jbHVkZS9ibG9jay9uYmQuaDoyMTk6CisgICAg
+cmV0dXJuIEVJTlZBTDsKCnRvdGFsOiA3IGVycm9ycywgMCB3YXJuaW5ncywgMTQ5IGxpbmVzIGNo
+ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBB
+VENIIDEyLzEzOiBuYmQvY2xpZW50OiBwcmVwYXJlIG5iZF9yZWNlaXZlX3JlcGx5IGZvciBzdHJ1
+Y3R1cmVkIHJlcGx5Li4uCkNoZWNraW5nIFBBVENIIDEzLzEzOiBuYmQ6IE1pbmltYWwgc3RydWN0
+dXJlZCByZWFkIGZvciBjbGllbnQuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
+ZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
+eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
+ayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
