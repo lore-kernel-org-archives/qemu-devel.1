@@ -1,17 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2UU8-0003IU-QH
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 23:48:38 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1e2UYT-0006tx-A4
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 23:53:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2UU7-00083w-IY
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 23:48:36 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Wed, 11 Oct 2017 22:47:20 -0500
-Message-Id: <20171012034720.11947-25-eblake@redhat.com>
-In-Reply-To: <20171012034720.11947-1-eblake@redhat.com>
-References: <20171012034720.11947-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 24/24] qemu-io: Relax 'alloc' now that
- block-status doesn't assert
+	(envelope-from <wei.w.wang@intel.com>) id 1e2UYQ-0003XC-6Z
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 23:53:05 -0400
+Received: from mga11.intel.com ([192.55.52.93]:58485)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1e2UYP-0003WE-S5
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 23:53:02 -0400
+Message-ID: <59DEE790.5040809@intel.com>
+Date: Thu, 12 Oct 2017 11:54:56 +0800
+From: Wei Wang <wei.w.wang@intel.com>
+MIME-Version: 1.0
+References: <1506744354-20979-1-git-send-email-wei.w.wang@intel.com>
+	<1506744354-20979-6-git-send-email-wei.w.wang@intel.com>
+	<20171001060305-mutt-send-email-mst@kernel.org>
+	<286AC319A985734F985F78AFA26841F73932025A@shsmsx102.ccr.corp.intel.com>
+	<20171010180636-mutt-send-email-mst@kernel.org>
+	<59DDB428.4020208@intel.com>
+	<20171011161912-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20171011161912-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v16 5/5] virtio-balloon:
+ VIRTIO_BALLOON_F_CTRL_VQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,152 +34,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, Max Reitz <mreitz@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "mhocko@kernel.org" <mhocko@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "willy@infradead.org" <willy@infradead.org>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>
 
-Previously, the alloc command required that input parameters be
-sector-aligned and clamped to 32 bits, because the underlying
-bdrv_is_allocated used a 32-bit parameter and asserted aligned
-inputs.  But now that we have fixed block status to report a
-64-bit bytes value, and to properly round requests on behalf of
-guests, we can pass any values, and can use qemu-io to add
-coverage that our rounding is correct regardless of the guest
-alignment constraints.
+On 10/11/2017 09:49 PM, Michael S. Tsirkin wrote:
+> On Wed, Oct 11, 2017 at 02:03:20PM +0800, Wei Wang wrote:
+>> On 10/10/2017 11:15 PM, Michael S. Tsirkin wrote:
+>>> On Mon, Oct 02, 2017 at 04:38:01PM +0000, Wang, Wei W wrote:
+>>>> On Sunday, October 1, 2017 11:19 AM, Michael S. Tsirkin wrote:
+>>>>> On Sat, Sep 30, 2017 at 12:05:54PM +0800, Wei Wang wrote:
+>>>>>> +static void ctrlq_send_cmd(struct virtio_balloon *vb,
+>>>>>> +			  struct virtio_balloon_ctrlq_cmd *cmd,
+>>>>>> +			  bool inbuf)
+>>>>>> +{
+>>>>>> +	struct virtqueue *vq = vb->ctrl_vq;
+>>>>>> +
+>>>>>> +	ctrlq_add_cmd(vq, cmd, inbuf);
+>>>>>> +	if (!inbuf) {
+>>>>>> +		/*
+>>>>>> +		 * All the input cmd buffers are replenished here.
+>>>>>> +		 * This is necessary because the input cmd buffers are lost
+>>>>>> +		 * after live migration. The device needs to rewind all of
+>>>>>> +		 * them from the ctrl_vq.
+>>>>> Confused. Live migration somehow loses state? Why is that and why is it a good
+>>>>> idea? And how do you know this is migration even?
+>>>>> Looks like all you know is you got free page end. Could be any reason for this.
+>>>> I think this would be something that the current live migration lacks - what the
+>>>> device read from the vq is not transferred during live migration, an example is the
+>>>> stat_vq_elem:
+>>>> Line 476 at https://github.com/qemu/qemu/blob/master/hw/virtio/virtio-balloon.c
+>>> This does not touch guest memory though it just manipulates
+>>> internal state to make it easier to migrate.
+>>> It's transparent to guest as migration should be.
+>>>
+>>>> For all the things that are added to the vq and need to be held by the device
+>>>> to use later need to consider the situation that live migration might happen at any
+>>>> time and they need to be re-taken from the vq by the device on the destination
+>>>> machine.
+>>>>
+>>>> So, even without this live migration optimization feature, I think all the things that are
+>>>> added to the vq for the device to hold, need a way for the device to rewind back from
+>>>> the vq - re-adding all the elements to the vq is a trick to keep a record of all of them
+>>>> on the vq so that the device side rewinding can work.
+>>>>
+>>>> Please let me know if anything is missed or if you have other suggestions.
+>>> IMO migration should pass enough data source to destination for
+>>> destination to continue where source left off without guest help.
+>>>
+>> I'm afraid it would be difficult to pass the entire VirtQueueElement to the
+>> destination. I think
+>> that would also be the reason that stats_vq_elem chose to rewind from the
+>> guest vq, which re-do the
+>> virtqueue_pop() --> virtqueue_map_desc() steps (the QEMU virtual address to
+>> the guest physical
+>> address relationship may be changed on the destination).
+> Yes but note how that rewind does not involve modifying the ring.
+> It just rolls back some indices.
 
-Update iotest 177 to intentionally probe block status at
-unaligned boundaries as well as with a bytes value that does not
-map to 32-bit sectors, which also required tweaking the image
-prep to leave an unallocated portion to the image under test.
+Yes, it rolls back the indices, then the following 
+virtio_balloon_receive_stats()
+can re-pop out the previous entry given by the guest.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
+Recall how stats_vq_elem works: there is only one stats buffer, which is 
+used by the
+guest to report stats, and also used by the host to ask the guest for 
+stats report.
 
----
-v3: also test huge bytes value, R-b dropped
-v2: new patch
----
- qemu-io-cmds.c             | 13 -------------
- tests/qemu-iotests/177     | 12 ++++++++++--
- tests/qemu-iotests/177.out | 19 ++++++++++++++-----
- 3 files changed, 24 insertions(+), 20 deletions(-)
+So the host can roll back one previous entry and what it gets will 
+always be stat_vq_elem.
 
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index 3727fb43f3..de8e3de726 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -1769,10 +1769,6 @@ static int alloc_f(BlockBackend *blk, int argc, char **argv)
-     if (offset < 0) {
-         print_cvtnum_err(offset, argv[1]);
-         return 0;
--    } else if (!QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE)) {
--        printf("%" PRId64 " is not a sector-aligned value for 'offset'\n",
--               offset);
--        return 0;
-     }
 
-     if (argc == 3) {
-@@ -1780,19 +1776,10 @@ static int alloc_f(BlockBackend *blk, int argc, char **argv)
-         if (count < 0) {
-             print_cvtnum_err(count, argv[2]);
-             return 0;
--        } else if (count > INT_MAX * BDRV_SECTOR_SIZE) {
--            printf("length argument cannot exceed %llu, given %s\n",
--                   INT_MAX * BDRV_SECTOR_SIZE, argv[2]);
--            return 0;
-         }
-     } else {
-         count = BDRV_SECTOR_SIZE;
-     }
--    if (!QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE)) {
--        printf("%" PRId64 " is not a sector-aligned value for 'count'\n",
--               count);
--        return 0;
--    }
+Our case is a little more complex than that - we have both free_page_cmd_in
+(for host to guest command) and free_page_cmd_out (for guest to host 
+command) buffer
+passed via ctrl_vq. When the host rolls back one entry, it may get the 
+free_page_cmd_out
+buffer which can't be used as the host to guest buffer (i.e. 
+free_page_elem held by the device).
 
-     remaining = count;
-     sum_alloc = 0;
-diff --git a/tests/qemu-iotests/177 b/tests/qemu-iotests/177
-index f8ed8fb86b..28990977f1 100755
---- a/tests/qemu-iotests/177
-+++ b/tests/qemu-iotests/177
-@@ -51,7 +51,7 @@ echo "== setting up files =="
- TEST_IMG="$TEST_IMG.base" _make_test_img $size
- $QEMU_IO -c "write -P 11 0 $size" "$TEST_IMG.base" | _filter_qemu_io
- _make_test_img -b "$TEST_IMG.base"
--$QEMU_IO -c "write -P 22 0 $size" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IO -c "write -P 22 0 110M" "$TEST_IMG" | _filter_qemu_io
+So a trick in the driver is to refill the free_page_cmd_in buffer every 
+time after the free_page_cmd_out
+was sent to the host, so that when the host rewind one previous entry, 
+it can always get the
+free_page_cmd_in buffer (may be not a very nice method).
 
- # Limited to 64k max-transfer
- echo
-@@ -82,6 +82,13 @@ $QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
-          -c "discard 80000001 30M" | _filter_qemu_io
 
- echo
-+echo "== block status smaller than alignment =="
-+limits=align=4k
-+$QEMU_IO -c "open -o $options,$limits blkdebug::$TEST_IMG" \
-+	 -c "alloc 1 1" -c "alloc 0x6dffff0 1000" -c "alloc 127m 5P" \
-+	 -c map | _filter_qemu_io
-+
-+echo
- echo "== verify image content =="
 
- function verify_io()
-@@ -103,7 +110,8 @@ function verify_io()
-     echo read -P 0 32M 32M
-     echo read -P 22 64M 13M
-     echo read -P $discarded 77M 29M
--    echo read -P 22 106M 22M
-+    echo read -P 22 106M 4M
-+    echo read -P 11 110M 18M
- }
+>
+>> How about another direction which would be easier - using two 32-bit device
+>> specific configuration registers,
+>> Host2Guest and Guest2Host command registers, to replace the ctrlq for
+>> command exchange:
+>>
+>> The flow can be as follows:
+>>
+>> 1) Before Host sending a StartCMD, it flushes the free_page_vq in case any
+>> old free page hint is left there;
+>> 2) Host writes StartCMD to the Host2Guest register, and notifies the guest;
+>>
+>> 3) Upon receiving a configuration notification, Guest reads the Host2Guest
+>> register, and detaches all the used buffers from free_page_vq;
+>> (then for each StartCMD, the free_page_vq will always have no obsolete free
+>> page hints, right? )
+>>
+>> 4) Guest start report free pages:
+>>      4.1) Host may actively write StopCMD to the Host2Guest register before
+>> the guest finishes; or
+>>      4.2) Guest finishes reporting, write StopCMD  the Guest2HOST register,
+>> which traps to QEMU, to stop.
+>>
+>>
+>> Best,
+>> Wei
+> I am not sure it matters whether a VQ or the config are used to start/stop.
 
- verify_io | $QEMU_IO -r "$TEST_IMG" | _filter_qemu_io
-diff --git a/tests/qemu-iotests/177.out b/tests/qemu-iotests/177.out
-index 43a777836c..f788b55e20 100644
---- a/tests/qemu-iotests/177.out
-+++ b/tests/qemu-iotests/177.out
-@@ -5,8 +5,8 @@ Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134217728
- wrote 134217728/134217728 bytes at offset 0
- 128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base
--wrote 134217728/134217728 bytes at offset 0
--128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 115343360/115343360 bytes at offset 0
-+110 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
 
- == constrained alignment and max-transfer ==
- wrote 131072/131072 bytes at offset 1000
-@@ -26,6 +26,13 @@ wrote 33554432/33554432 bytes at offset 33554432
- discard 31457280/31457280 bytes at offset 80000001
- 30 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+Not matters, in terms of the flushing issue. The config method could 
+avoid the above rewind issue.
 
-+== block status smaller than alignment ==
-+1/1 bytes allocated at offset 1 bytes
-+16/1000 bytes allocated at offset 110 MiB
-+0/1048576 bytes allocated at offset 127 MiB
-+110 MiB (0x6e00000) bytes     allocated at offset 0 bytes (0x0)
-+18 MiB (0x1200000) bytes not allocated at offset 110 MiB (0x6e00000)
-+
- == verify image content ==
- read 1000/1000 bytes at offset 0
- 1000 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-@@ -43,12 +50,14 @@ read 13631488/13631488 bytes at offset 67108864
- 13 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 30408704/30408704 bytes at offset 80740352
- 29 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--read 23068672/23068672 bytes at offset 111149056
--22 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4194304/4194304 bytes at offset 111149056
-+4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 18874368/18874368 bytes at offset 115343360
-+18 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Offset          Length          File
- 0               0x800000        TEST_DIR/t.IMGFMT
- 0x900000        0x2400000       TEST_DIR/t.IMGFMT
- 0x3c00000       0x1100000       TEST_DIR/t.IMGFMT
--0x6a00000       0x1600000       TEST_DIR/t.IMGFMT
-+0x6a00000       0x400000        TEST_DIR/t.IMGFMT
- No errors were found on the image.
- *** done
--- 
-2.13.6
+
+> But I think flushing is very fragile. You will easily run into races
+> if one of the actors gets out of sync and keeps adding data.
+> I think adding an ID in the free vq stream is a more robust
+> approach.
+>
+
+Adding ID to the free vq would need the device to distinguish whether it 
+receives an ID or a free page hint,
+so an extra protocol is needed for the two sides to talk. Currently, we 
+directly assign the free page
+address to desc->addr. With ID support, we would need to first allocate 
+buffer for the protocol header,
+and add the free page address to the header, then desc->addr = &header.
+
+How about putting the ID to the command path? This would avoid the above 
+trouble.
+
+For example, using the 32-bit config registers:
+first 16-bit: Command field
+send 16-bit: ID field
+
+Then, the working flow would look like this:
+
+1) Host writes "Start, 1" to the Host2Guest register and notify;
+
+2) Guest reads Host2Guest register, and ACKs by writing "Start, 1" to 
+Guest2Host register;
+
+3) Guest starts report free pages;
+
+4) Each time when the host receives a free page hint from the 
+free_page_vq, it compares the ID fields of
+the Host2Guest and Guest2Host register. If matching, then filter out the 
+free page from the migration dirty bitmap,
+otherwise, simply push back without doing the filtering.
+
+
+Best,
+Wei
