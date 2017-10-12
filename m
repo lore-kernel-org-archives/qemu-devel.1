@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=451d893c3=Paul.Durrant@citrix.com>)
-	id 1e2YPi-0002H8-LQ
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 04:00:23 -0400
+	(envelope-from <berrange@redhat.com>) id 1e2Ykg-0006lz-Ny
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 04:21:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=451d893c3=Paul.Durrant@citrix.com>)
-	id 1e2YPa-0005K5-Ev
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 04:00:18 -0400
-Received: from smtp.citrix.com.au ([103.14.252.240]:59569)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=451d893c3=Paul.Durrant@citrix.com>)
-	id 1e2YPZ-0005Ev-QC
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 04:00:10 -0400
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Thu, 12 Oct 2017 07:58:50 +0000
-Message-ID: <e25a3501923944fbad8e3a560c5cf8f3@AMSPEX02CL03.citrite.net>
-References: <1506437019-17946-1-git-send-email-owen.smith@citrix.com>
-	<1506437019-17946-4-git-send-email-owen.smith@citrix.com>
-	<20171002170132.GA2116@perard.uk.xensource.com>
-	<alpine.DEB.2.10.1710101651560.3105@sstabellini-ThinkPad-X260>
-	<20171011154718.GQ1771@perard.uk.xensource.com>
-	<alpine.DEB.2.10.1710111309400.3105@sstabellini-ThinkPad-X260>
-In-Reply-To: <alpine.DEB.2.10.1710111309400.3105@sstabellini-ThinkPad-X260>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <berrange@redhat.com>) id 1e2Ykc-0006y5-JP
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 04:21:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51756)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e2Ykc-0006xJ-Cj
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 04:21:54 -0400
+Date: Thu, 12 Oct 2017 09:21:45 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171012082145.GA16125@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171011191317.24157-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH 3/3 v4] xenfb:
-	Add	[feature|request]-raw-pointer
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20171011191317.24157-1-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/7] migration: pause-before-device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,64 +27,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Stefano Stabellini' <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Owen Smith <owen.smith@citrix.com>, "kraxel@redhat.com" <kraxel@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jdenemar@redhat.com, wangjie88@huawei.com, quintela@redhat.com, peterx@redhat.com, mreitz@redhat.com, eblake@redhat.com, fuweiwei2@huawei.com
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBYZW4tZGV2ZWwgW21haWx0bzp4
-ZW4tZGV2ZWwtYm91bmNlc0BsaXN0cy54ZW4ub3JnXSBPbiBCZWhhbGYgT2YNCj4gU3RlZmFubyBT
-dGFiZWxsaW5pDQo+IFNlbnQ6IDExIE9jdG9iZXIgMjAxNyAyMToxOQ0KPiBUbzogQW50aG9ueSBQ
-ZXJhcmQgPGFudGhvbnkucGVyYXJkQGNpdHJpeC5jb20+DQo+IENjOiBxZW11LWRldmVsQG5vbmdu
-dS5vcmc7IHhlbi1kZXZlbEBsaXN0cy54ZW5wcm9qZWN0Lm9yZzsgU3RlZmFubw0KPiBTdGFiZWxs
-aW5pIDxzc3RhYmVsbGluaUBrZXJuZWwub3JnPjsgT3dlbiBTbWl0aCA8b3dlbi5zbWl0aEBjaXRy
-aXguY29tPjsNCj4ga3JheGVsQHJlZGhhdC5jb20NCj4gU3ViamVjdDogUmU6IFtYZW4tZGV2ZWxd
-IFtQQVRDSCAzLzMgdjRdIHhlbmZiOiBBZGQgW2ZlYXR1cmV8cmVxdWVzdF0tcmF3LQ0KPiBwb2lu
-dGVyDQo+IA0KPiBPbiBXZWQsIDExIE9jdCAyMDE3LCBBbnRob255IFBFUkFSRCB3cm90ZToNCj4g
-PiBPbiBUdWUsIE9jdCAxMCwgMjAxNyBhdCAwNDo1Mjo0OFBNIC0wNzAwLCBTdGVmYW5vIFN0YWJl
-bGxpbmkgd3JvdGU6DQo+ID4gPiBPbiBNb24sIDIgT2N0IDIwMTcsIEFudGhvbnkgUEVSQVJEIHdy
-b3RlOg0KPiA+ID4gPiBPbiBUdWUsIFNlcCAyNiwgMjAxNyBhdCAwMjo0MzozOVBNICswMDAwLCBP
-d2VuIFNtaXRoIHdyb3RlOg0KPiA+ID4gPiA+IFdyaXRlcyAiZmVhdHVyZS1yYXctcG9pbnRlciIg
-ZHVyaW5nIGluaXQgdG8gaW5kaWNhdGUgdGhlIGJhY2tlbmQNCj4gPiA+ID4gPiBjYW4gcGFzcyBy
-YXcgdW5zY2FsZWQgdmFsdWVzIGZvciBhYnNvbHV0ZSBheGVzIHRvIHRoZSBmcm9udGVuZC4NCj4g
-PiA+ID4gPiBGcm9udGVuZHMgc2V0ICJyZXF1ZXN0LXJhdy1wb2ludGVyIiB0byBpbmRpY2F0ZSB0
-aGUgYmFja2VuZCBzaG91bGQNCj4gPiA+ID4gPiBub3QgYXR0ZW1wdCB0byBzY2FsZSBhYnNvbHV0
-ZSB2YWx1ZXMgdG8gY29uc29sZSBzaXplLg0KPiA+ID4gPiA+ICJyZXF1ZXN0LXJhdy1wb2ludGVy
-IiBpcyBvbmx5IHZhbGlkIGlmICJyZXF1ZXN0LWFicy1wb2ludGVyIiBpcw0KPiA+ID4gPiA+IGFs
-c28gc2V0LiBSYXcgdW5zY2FsZWQgcG9pbnRlciB2YWx1ZXMgYXJlIGluIHRoZSByYW5nZSBbMCwg
-MHg3ZmZmXQ0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gU2lnbmVkLW9mZi1ieTogT3dlbiBTbWl0aCA8
-b3dlbi5zbWl0aEBjaXRyaXguY29tPg0KPiA+ID4gPg0KPiA+ID4gPiBIaSBPd2VuLA0KPiA+ID4g
-Pg0KPiA+ID4gPiBXaHkgZGlkIHlvdSByZW1vdmUgdGhlIGZvbGxvd2luZyBmcm9tIHRoZSBjb21t
-aXQgZGVzY3JpcHRpb24/DQo+ID4gPiA+ID4gImZlYXR1cmUtcmF3LXBvaW50ZXIiIGFuZCAicmVx
-dWVzdC1yYXctcG9pbnRlciIgYWRkZWQgdG8gWGVuDQo+ID4gPiA+ID4gaGVhZGVyIGluIGNvbW1p
-dCA3ODY4NjU0ZmY3ZmU1ZTRhMmVlYWUyYjI3NzY0NGZhODg0YTUwMzFlDQo+ID4gPiA+DQo+ID4g
-PiA+IEkgdGhpbmsgdGhhdCB3aXRoIGl0LCB5b3UgY291bGQgaGF2ZSBrZXB0IHN0ZWZhbm8ncyBy
-ZXZpZXdlZC1ieSB0YWcuDQo+ID4gPg0KPiA+ID4gSGkgQW50aG9ueSwNCj4gPiA+DQo+ID4gPiBI
-YXZlIHlvdSB0ZXN0ZWQgdGhpcyBzZXJpZXMgd2l0aCBhIGZldyBvZiBkaWZmZXJlbnQgZ3Vlc3Rz
-PyBEbyB5b3UNCj4gPiA+IGNvbnNpZGVyIGl0IHNhZmUgdG8gbWVyZ2U/IElmIHNvLCB3ZSBjYW4g
-c2VuZCBpdCB1cHN0cmVhbSAoZWl0aGVyIHZpYQ0KPiA+ID4geGVuIG9yIHZpYSB1aSBhcyBHZXJk
-IGtpbmRseSBvZmZlcmVkKS4NCj4gPg0KPiA+IFllcywgSSB0aGluayBpdCdzIGZpbmUuDQo+ID4N
-Cj4gPiBUaGUgb25seSBvYnNlcnZhdGlvbiBJIGhhdmUgaXMgdGhhdCBvbiBhIExpbnV4IGd1ZXN0
-LCB3aGVuIEkgaGF2ZQ0KPiA+IHVzYmRldmljZT10YWJsZXQsIHdpdGggdGhpcyBzZXJpZXMgdGhl
-IHB2IG1vdXNlIHNlZW1zIHRvIGJlY29tZSB0aGUNCj4gPiBwcmltYXJ5IHdheSBvZiBndWV0aW5n
-IG1vdXNlIGV2ZW50cyAod2l0aG91dCwgdGhlIHRhYmxldCBpcyBwcmltYXJ5KS4NCj4gPiBTbywg
-b24gbXkgVk5DIGNsaWVudCBpbnN0ZWFkIG9mIGhhdmluZyBib3RoIG1vdXNlIGluIHRoZSBndWVz
-dCBhbmQgb24gbXkNCj4gPiBkZXNrdG9wIGJlaW5nIGF0IHRoZSBzYW1lIHBsYWNlLCB0aGVyZSBp
-cyBsaWtlIGEgem9vbSBvZiB0aGUgbW91c2UgKHRoZQ0KPiA+IHpvb20gY2VudGVyZWQgb24gdGhl
-IHRvcC1sZWZ0IGNvcm5lcikuIChUaGF0J3MgYmV0dGVyIHRoYW4gcmVsYXRpdmUNCj4gPiBtb3Vz
-ZSBldmVudCB0aGF0IHdlIGNhbiBnZXQgd2l0aCB0aGUgZW11bGF0aW9uLikNCj4gDQo+IFRoYW5r
-cyBmb3IgdGVzdGluZy4gSSBhbSBub3QgY29tcGxldGVseSBzdXJlIGFib3V0IHdoYXQgc2hvdWxk
-IGJlIHRoZQ0KPiByaWdodCBiZWhhdmlvciB3aGVuIGJvdGggdXNiZGV2aWNlPXRhYmxldCBhbmQg
-cHZtb3VzZSBhcmUgcHJlc2VudC4NCj4gVHlwaWNhbGx5LCBQViBkZXZpY2VzIHRha2UgcHJlY2Vk
-ZW5jZSBvdmVyIGVtdWxhdGVkIGRldmljZXMsIHNvIG1heWJlDQo+IGl0IGlzIE9LIHRoYXQgUFYg
-bW91c2UgaXMgdGhlIHByaW1hcnkgZGV2aWNlIGluIHRoaXMgY2FzZS4NCj4gDQo+IEJ1dCB3ZSB3
-b3VsZCBuZWVkIHRvIGRvY3VtZW50IHRoaXMgYmVoYXZpb3JhbCBjaGFuZ2UgaW4gdGhlIGNvbW1p
-dA0KPiBkZXNjcmlwdGlvbnMuDQo+IA0KDQpJdCdzIHByb2JhYmx5IE9TIHNwZWNpZmljIHRob3Vn
-aC4gSSBndWVzcyB0aGUgYmVoYXZpb3VyIGNoYW5nZWQgYmVjYXVzZSB0aGUgT1MgZmF2b3VycyBh
-YnNvbHV0ZSBwb2ludGluZyBkZXZpY2VzIG92ZXIgcmVsYXRpdmUgb25lcyBhbmQgaG93IGl0IGhh
-cyB0d28gYWJzb2x1dGUgb25lcyB0byBjaG9vc2UgZnJvbS4gSG93IGl0IHJlY29uY2lsZXMgdGhv
-c2UsIHdobyBrbm93cz8NCg0KICBQYXVsDQoNCj4gVGhlIG90aGVyIHF1ZXN0aW9uIGlzIHdoZXRo
-ZXIgdGhlICJ6b29tIG9mIHRoZSBtb3VzZSIgeW91IGFyZSBzZWVpbmcgaXMNCj4gbm9ybWFsIG9y
-IHdoZXRoZXIgd2UgY2FuICJmaXgiIGl0IHNvbWVob3cuIEkgZ3Vlc3MgaXQgaGFzIGFsd2F5cyBi
-ZWVuDQo+IHRoZSBjYXNlIGZvciBQViBtb3VzZT8gSXQgaXMgbm90IHNvbWV0aGluZyBuZXcsIGlz
-IGl0Pw0KPiANCj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X18NCj4gWGVuLWRldmVsIG1haWxpbmcgbGlzdA0KPiBYZW4tZGV2ZWxAbGlzdHMueGVuLm9yZw0K
-PiBodHRwczovL2xpc3RzLnhlbi5vcmcveGVuLWRldmVsDQo=
+On Wed, Oct 11, 2017 at 08:13:10PM +0100, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Hi,
+>   This set attempts to make a race condition between migration and
+> drive-mirror (and other block users) soluble by allowing the migration
+> to be paused after the source qemu releases the block devices but
+> before the serialisation of the device state.
+> 
+> The symptom of this failure, as reported by Wangjie, is a:
+>    _co_do_pwritev: Assertion `!(bs->open_flags & 0x0800)' failed
+> 
+> and the source qemu dieing; so the problem is pretty nasty.
+> This has only been seen on 2.9 onwards, but the theory is that
+> prior to 2.9 it might have been happening anyway and we were
+> perhaps getting unreported corruptions (lost writes); so this
+> really needs fixing.
+> 
+> This flow came from discussions between Kevin and me, and we can't
+> see a way of fixing it without exposing a new state to the management
+> layer.
+> 
+> The flow is now:
+> 
+> (qemu) migrate_set_capability pause-before-device on
+> (qemu) migrate -d ...
+> (qemu) info migrate
+> ...
+> Migration status: pause-before-device
+> ...
+> << issue commands to clean up any block jobs>>
+> 
+> (qemu) migrate_continue pause-before-device
+> (qemu) info migrate
+> ...
+> Migration status: completed
+
+I'm curious why QEMU doesn't have enough info to clean up the block
+jobs automatically ? What is the key thing that libvirt knows about
+the block jobs, that QEMU is lacking ? If QEMU had the right info it
+could do it automatically & avoid this extra lock-step synchronization
+with libvirt.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
