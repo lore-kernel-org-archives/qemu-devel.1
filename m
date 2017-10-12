@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e2dwI-0008Vn-KH
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:54:19 -0400
+	(envelope-from <eblake@redhat.com>) id 1e2dzB-0002SO-El
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:57:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e2dwE-0005Mg-KE
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:54:18 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34180)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1e2dwE-0005M1-Cn
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:54:14 -0400
-Received: by mail-wm0-x244.google.com with SMTP id l10so4042458wmg.1
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 06:54:14 -0700 (PDT)
-Received: from 640k.lan (94-36-246-2.adsl-ull.clienti.tiscali.it.
-	[94.36.246.2]) by smtp.gmail.com with ESMTPSA id
-	s196sm333449wmb.26.2017.10.12.06.54.10 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 12 Oct 2017 06:54:10 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 12 Oct 2017 15:54:08 +0200
-Message-Id: <1507816448-86665-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] tco: add trace events
+	(envelope-from <eblake@redhat.com>) id 1e2dzA-0006to-IC
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:57:17 -0400
+References: <20171002143919.207741-1-vsementsov@virtuozzo.com>
+	<20171002143919.207741-5-vsementsov@virtuozzo.com>
+	<a7594875-cd6f-8195-4b86-d7f67ad9f208@redhat.com>
+	<2cb5ac95-e27c-2d13-b557-9dedc1f86473@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <28aa9488-8cf3-b71f-5c74-74c884fbe3be@redhat.com>
+Date: Thu, 12 Oct 2017 08:56:46 -0500
+MIME-Version: 1.0
+In-Reply-To: <2cb5ac95-e27c-2d13-b557-9dedc1f86473@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="g1cXWD6SHw1jKVXjV6R2bDONkgUN63Tej"
+Subject: Re: [Qemu-devel] [PATCH 4/5] backup: simplify non-dirty bits
+ progress processing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +27,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 
-Add trace events to the PCH watchdog timer, it can be useful to see how
-the guest is using it.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--g1cXWD6SHw1jKVXjV6R2bDONkgUN63Tej
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, mreitz@redhat.com,
+ stefanha@redhat.com, den@openvz.org
+Message-ID: <28aa9488-8cf3-b71f-5c74-74c884fbe3be@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/5] backup: simplify non-dirty bits progress
+ processing
+References: <20171002143919.207741-1-vsementsov@virtuozzo.com>
+ <20171002143919.207741-5-vsementsov@virtuozzo.com>
+ <a7594875-cd6f-8195-4b86-d7f67ad9f208@redhat.com>
+ <2cb5ac95-e27c-2d13-b557-9dedc1f86473@virtuozzo.com>
+In-Reply-To: <2cb5ac95-e27c-2d13-b557-9dedc1f86473@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/acpi/tco.c        | 11 +++++++++--
- hw/acpi/trace-events |  4 ++++
- 2 files changed, 13 insertions(+), 2 deletions(-)
+On 10/12/2017 06:42 AM, Vladimir Sementsov-Ogievskiy wrote:
 
-diff --git a/hw/acpi/tco.c b/hw/acpi/tco.c
-index 05b9d7b..0032db4 100644
---- a/hw/acpi/tco.c
-+++ b/hw/acpi/tco.c
-@@ -12,6 +12,7 @@
- #include "hw/i386/ich9.h"
- 
- #include "hw/acpi/tco.h"
-+#include "trace.h"
- 
- //#define DEBUG
- 
-@@ -41,8 +42,11 @@ enum {
- 
- static inline void tco_timer_reload(TCOIORegs *tr)
- {
--    tr->expire_time = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
--        ((int64_t)(tr->tco.tmr & TCO_TMR_MASK) * TCO_TICK_NSEC);
-+    int ticks = tr->tco.tmr & TCO_TMR_MASK;
-+    int64_t nsec = (int64_t)ticks * TCO_TICK_NSEC;
-+
-+    trace_tco_timer_reload(ticks, nsec / 1000000);
-+    tr->expire_time = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + nsec;
-     timer_mod(tr->tco_timer, tr->expire_time);
- }
- 
-@@ -59,6 +63,9 @@ static void tco_timer_expired(void *opaque)
-     ICH9LPCState *lpc = container_of(pm, ICH9LPCState, pm);
-     uint32_t gcs = pci_get_long(lpc->chip_config + ICH9_CC_GCS);
- 
-+    trace_tco_timer_expired(tr->timeouts_no,
-+			    lpc->pin_strap.spkr_hi,
-+			    !!(gcs & ICH9_CC_GCS_NO_REBOOT));
-     tr->tco.rld = 0;
-     tr->tco.sts1 |= TCO_TIMEOUT;
-     if (++tr->timeouts_no == 2) {
-diff --git a/hw/acpi/trace-events b/hw/acpi/trace-events
-index e3b41e9..df0024f 100644
---- a/hw/acpi/trace-events
-+++ b/hw/acpi/trace-events
-@@ -30,3 +30,7 @@ cpuhp_acpi_ejecting_invalid_cpu(uint32_t idx) "0x%"PRIx32
- cpuhp_acpi_ejecting_cpu(uint32_t idx) "0x%"PRIx32
- cpuhp_acpi_write_ost_ev(uint32_t slot, uint32_t ev) "idx[0x%"PRIx32"] OST EVENT: 0x%"PRIx32
- cpuhp_acpi_write_ost_status(uint32_t slot, uint32_t st) "idx[0x%"PRIx32"] OST STATUS: 0x%"PRIx32
-+
-+# hw/acpi/tco.c
-+tco_timer_reload(int ticks, int msec) "ticks=%d (%d ms)"
-+tco_timer_expired(int timeouts_no, bool strap, bool no_reboot) "timeouts_no=%d no_reboot=%d/%d"
--- 
-1.8.3.1
+>> I'm not sure we actually need a new field... let's just say that the j=
+ob
+>> length is the number of bytes described by the incremental backup. Eve=
+ry
+>> time we copy some, move offset forward. This would give a more
+>> appropriately linear/accurate sense of the progress.
+>>
+>> I think we are allowed to do this as I think we promise that these
+>> progress numbers mean essentially nothing...
+>=20
+> I'm not sure, length is published field, it is available in libvirt.
+> IMHO, If we change it semantics it should
+> firstly break our iotests but what it will break for users is
+> unpredictable..
+
+Libvirt already documents that progress numbers do NOT have any specific
+meaning other than a rough estimate of percentage complete, and that it
+IS acceptable for the numbers to jump around or move non-linearly during
+a job.  I see no problem with returning different numbers than
+previously if it makes our estimation of progress look smoother; it is
+not a semantics change by the definition we've given to the numbers, but
+merely a quality-of-implementation improvement.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--g1cXWD6SHw1jKVXjV6R2bDONkgUN63Tej
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnfdJ4ACgkQp6FrSiUn
+Q2rt7ggAocRL8DmLrq04dOXCcQ9voJlsH3I9g7VMxiJ3/FepTHBfvUI9qp4NuPfr
+Xzu0WjmoARYmH9hV5C0yV564du2Caj8V6MxMnjuR3+5rrKWL0oTgMtUMewhYCFu3
+bEz6k8KAJhwpIm2EB7ZBy+C8zo5R687ZwMWGI9gb5fuyMGMg/GXxG0TGSlsleOYT
+HH93brBmZmVj95Z9hFUdmzhJTzPNpW+HsH8EulT9nAr8254mqkbMjBGBaeLLyIVL
+3izui1qX0isC8tjE4K2GBrwbrvHA6WfaakW1/VSRwuGtGvL4opPaPcqMvugRZjeS
+PD/JQYyDN9ntHEKbSP5w4YcSY9oujw==
+=rITL
+-----END PGP SIGNATURE-----
+
+--g1cXWD6SHw1jKVXjV6R2bDONkgUN63Tej--
