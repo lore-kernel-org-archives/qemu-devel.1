@@ -1,27 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1e2WAD-00049g-Ej
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 01:36:10 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1e2WIq-0005Wq-B4
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 01:45:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1e2WAA-0005MM-AX
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 01:36:09 -0400
-Received: from userp1040.oracle.com ([156.151.31.81]:32841)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1e2WAA-0005KM-0y
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 01:36:06 -0400
-Message-ID: <1507786555.22971.4.camel@oracle.com>
-From: Knut Omang <knut.omang@oracle.com>
-Date: Thu, 12 Oct 2017 07:35:55 +0200
-In-Reply-To: <20171005143151.wkxcj5njhevxhnow@eukaryote>
-References: <034d01d2d94d$9d6be9d0$d843bd70$@gmail.com>
-	<029301d2e062$601f0c30$205d2490$@gmail.com>
-	<029401d2e064$87f5ccb0$97e16610$@gmail.com>
-	<20171005143151.wkxcj5njhevxhnow@eukaryote>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] FW: Are there any qemu emulated SR-IOV devices?
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1e2WIn-0003rf-8G
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 01:45:04 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38750)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1e2WIm-0003qi-Vn
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 01:45:01 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9C5iYqs005743
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 01:44:55 -0400
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dj18133ff-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 01:44:55 -0400
+Received: from localhost
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Wed, 11 Oct 2017 23:44:54 -0600
+Date: Thu, 12 Oct 2017 13:44:50 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20171004154144.88995-1-pasic@linux.vnet.ibm.com>
+	<20171004154144.88995-4-pasic@linux.vnet.ibm.com>
+	<20171011034756.GC4754@bjsdjshi@linux.vnet.ibm.com>
+	<99b11584-bc55-acef-bb39-dca4c7cb3833@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <99b11584-bc55-acef-bb39-dca4c7cb3833@linux.vnet.ibm.com>
+Message-Id: <20171012054450.GC29193@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/8] s390x: improve error handling for
+ SSCH and RSCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +44,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kashyap Chamarthy <kchamart@redhat.com>, mwoodpatrick@gmail.com
-Cc: qemu-devel@nongnu.org, marcel.apfelbaum@gmail.com, mst@redhat.com
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On Thu, 2017-10-05 at 16:31 +0200, Kashyap Chamarthy wrote:
-> [Sorry, I'm a bit late in responding, as I missed this e-mail.]
->=20
-> On Thu, Jun 08, 2017 at 07:35:52AM -0700, mwoodpatrick@gmail.com wrote:
-> > I wanted to play around with SR-IOV using qemu and was wondering if the=
-re
-> > are any qemu emulated SR-IOV devices I could experiment with?
->=20
-> Near as I know there isn't any existing emulated SR-IOV device in QEMU.
-> But yes, an emulated SR-IOV would also be useful for testing purposes
-> for projects like OpenStack, without having the need for real hardware.
->=20
-> > If not I plan on creating one and would appreciate any pointers to docu=
-ments
-> > describing how to add an emulated device that supports more than 8 func=
-tions
-> > and has ARI enabled
->=20
-> I'm far from an expert on this area, but just wanted to point out that
-> there's some existing support for SR-IOV in QEMU, added via:
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0[PATCH v6 0/4] pcie: Add support for Single Root =
-I/O Virtualization --
-> =C2=A0=C2=A0=C2=A0=C2=A0https://lists.nongnu.org/archive/html/qemu-devel/=
-2015-10/msg05155.html
->=20
-> Knut Omang (Cced) who added the above support also had some notes here
-> on how to implement an SR-IOV capable device.:
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0https://lists.nongnu.org/archive/html/qemu-devel/=
-2015-10/msg05157.html
-> =C2=A0=C2=A0=C2=A0=C2=A0-- pcie: Add some SR/IOV API documentation	in doc=
-s/pcie_sriov.txt
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"Add a small intro + mini=
-mal documentation for how to implement
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0SR/IOV support for an emu=
-lated device.
->=20
->=20
-> [...]
+* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-10-11 12:54:51 +0200]:
 
-These are not (yet) in QEMU but can still be found here:
+> 
+> 
+> On 10/11/2017 05:47 AM, Dong Jia Shi wrote:
+> > * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-10-04 17:41:39 +0200]:
+> > 
+> >> Simplify the error handling of the SSCH and RSCH handler avoiding
+> >> arbitrary and cryptic error codes being used to tell how the instruction
+> >> is supposed to end.  Let the code detecting the condition tell how it's
+> >> to be handled in a less ambiguous way.  It's best to handle SSCH and RSCH
+> >> in one go as the emulation of the two shares a lot of code.
+> >>
+> >> For passthrough this change isn't pure refactoring, but changes the
+> >> way kernel reported EFAULT is handled. After clarifying the kernel
+> >> interface we decided that EFAULT shall be mapped to unit exception.
+> >> Same goes for unexpected error codes.
+> >>
+> >> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> >> ---
+> >>
+> >> AFAIR we decided in the previous round to rather do transformation
+> >> and fixing in one patch than touch stuff twice. Hence this patch
+> >> ain't pure transformation any more.
+> >> ---
+> >>  hw/s390x/css.c              | 83 +++++++++++++--------------------------------
+> >>  hw/s390x/s390-ccw.c         | 11 +++---
+> >>  hw/vfio/ccw.c               | 30 ++++++++++++----
+> >>  include/hw/s390x/css.h      | 24 +++++++++----
+> >>  include/hw/s390x/s390-ccw.h |  2 +-
+> >>  target/s390x/ioinst.c       | 53 ++++-------------------------
+> >>  6 files changed, 77 insertions(+), 126 deletions(-)
+> >>
+> >> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> >> index 4f47dbc8b0..b2978c3bae 100644
+> >> --- a/hw/s390x/css.c
+> >> +++ b/hw/s390x/css.c
+> >> @@ -1003,12 +1003,11 @@ static void sch_handle_start_func_virtual(SubchDev *sch)
+> >>
+> >>  }
+> >>
+> >> -static int sch_handle_start_func_passthrough(SubchDev *sch)
+> >> +static IOInstEnding sch_handle_start_func_passthrough(SubchDev *sch)
+> >>  {
+> >>
+> >>      PMCW *p = &sch->curr_status.pmcw;
+> >>      SCSW *s = &sch->curr_status.scsw;
+> >> -    int ret;
+> >>
+> >>      ORB *orb = &sch->orb;
+> >>      if (!(s->ctrl & SCSW_ACTL_SUSP)) {
+> >> @@ -1022,31 +1021,11 @@ static int sch_handle_start_func_passthrough(SubchDev *sch)
+> >>       */
+> >>      if (!(orb->ctrl0 & ORB_CTRL0_MASK_PFCH) ||
+> >>          !(orb->ctrl0 & ORB_CTRL0_MASK_C64)) {
+> >> -        return -EINVAL;
+> >> +        sch_gen_unit_exception(sch);
+> >> +        css_inject_io_interrupt(sch);
+> >> +        return (IOInstEnding){.cc = 0};
+> > This behavior change is not mentioned in the commit message. Right?
+> > 
+> No this particular change is not. Should I mention it explicitly?
+I think so.
 
-https://github.com/knuto/qemu
+> Maybe "Same goes for unexpected error codes and absence of required
+> ORB flags."
+Sounds good for me.
 
-I try to rebase them from time to time.
-The reason why Michael has not accepted them (yet) is to my understanding t=
-he lack of
-working example devices - correct me if I am wrong.
+[...]
 
-I did provide the igb device which works as a proof of concept of a device =
-with 32 VFs and
-use of stride and ARI in that the SR/IOV logic itself can be verified, but =
-it is not a
-working device, just a quick hack on the e1000 code to make it look like an=
- igb with
-SR/IOV support.
-
-But as far as I know, several people have used the SR/IOV patches for their=
- own device
-models.=C2=A0
-
-We have a fairly elaborate and complex model (of an Infiniband HCA) that us=
-es this, and
-that has been used quite extensively, the problem is that the main part of =
-the code
-implementing the device is inside a simulation model outside of QEMU, just =
-communicating=20
-PCIe transactions with QEMU over a TCP connection. So it is not that easy t=
-o make use of
-inside QEMU.=C2=A0I do however want to pursue ways to provide the QEMU side=
- of that
-implementation to QEMU, as a tool for other device developers. If there are=
- more people
-interested in this domain, maybe we should have a BoF session about it at K=
-VM Forum.
-
-Thanks,
-Knut
+-- 
+Dong Jia Shi
