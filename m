@@ -1,48 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e2bv4-0001Z8-Ah
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:44:55 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e2c2l-0002rn-CN
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:52:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e2bv0-0001ZR-5w
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:44:54 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50146
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1e2buz-0001Z6-VX
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:44:50 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9CBiWBD031316
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 07:44:45 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dj5dcpd3x-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 07:44:45 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 12 Oct 2017 12:44:44 +0100
-References: <20171004154144.88995-1-pasic@linux.vnet.ibm.com>
-	<20171004154144.88995-3-pasic@linux.vnet.ibm.com>
-	<d6d2d73d-65c9-7ae1-fd37-cb8e304781e7@redhat.com>
-	<7f454872-fae3-35b0-eff4-227b2aa0f77d@linux.vnet.ibm.com>
-	<6c17b274-cd75-7864-94b9-fc8abff1a786@redhat.com>
-	<da4228cb-d32c-dc77-0a80-bac306f07c24@linux.vnet.ibm.com>
-	<0120aa4c-ffce-79c0-8c87-c7c1100232eb@redhat.com>
-	<9d77c8e9-f875-4e42-5306-b847904b4a47@linux.vnet.ibm.com>
-	<39f9e450-d618-6c4d-9401-031c5374ed88@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu, 12 Oct 2017 13:44:40 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1e2c2k-0006FX-EM
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:52:51 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:56165)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e2c2k-0006Ed-3b
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:52:50 -0400
+Received: by mail-wm0-x234.google.com with SMTP id u138so12678542wmu.4
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 04:52:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <39f9e450-d618-6c4d-9401-031c5374ed88@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <2b90291e-62a8-964f-286a-d8f1594b2d94@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/8] s390x/css: IO instr handler ending
- control
+In-Reply-To: <1506524205-20763-4-git-send-email-eric.auger@redhat.com>
+References: <1506524205-20763-1-git-send-email-eric.auger@redhat.com>
+	<1506524205-20763-4-git-send-email-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Oct 2017 12:52:28 +0100
+Message-ID: <CAFEAcA-a-7F0Ftj-hiYx2awxT7fYNpHnqe9nsj_S3Ps4Rb5wNw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC 3/3] hw/intc/arm_gicv3_its: Implement reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -51,158 +29,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, wanghaibin.wang@huawei.com, Vijay Kilari <vijay.kilari@gmail.com>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, wu.wubin@huawei.com
 
+On 27 September 2017 at 15:56, Eric Auger <eric.auger@redhat.com> wrote:
+> Currently the ITS is not reset and this causes trouble
+> when state backup is initiated before the guest has initialized
+> the ITS registers and especially GITS_CBASER<n>.
+>
+> We are likely to save register values set before the reset/
+> restart. The register values may not be consistent with the
+> data structures in RAM.
+>
+> So let's use the ITS KVM device new combo,
+> KVM_DEV_ARM_VGIC_GRP_CTRL/KVM_DEV_ARM_ITS_CTRL_RESET
+> to explicitly force the in-kernel emulated reset.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  hw/intc/arm_gicv3_its_common.c         |  5 ++---
+>  hw/intc/arm_gicv3_its_kvm.c            | 22 ++++++++++++++++++----
+>  include/hw/intc/arm_gicv3_its_common.h |  1 +
+>  3 files changed, 21 insertions(+), 7 deletions(-)
+>
+> diff --git a/hw/intc/arm_gicv3_its_common.c b/hw/intc/arm_gicv3_its_common.c
+> index 68b20fc..a2fe561 100644
+> --- a/hw/intc/arm_gicv3_its_common.c
+> +++ b/hw/intc/arm_gicv3_its_common.c
+> @@ -129,15 +129,14 @@ static void gicv3_its_common_reset(DeviceState *dev)
+>      s->creadr = 0;
+>      s->iidr = 0;
+>      memset(&s->baser, 0, sizeof(s->baser));
+> -
+> -    gicv3_its_post_load(s, 0);
 
+This doesn't look right as it means we won't write the QEMU
+initial device register values up to the kernel. I think we
+want to do that as well as call the specific reset ioctl,
+so that both userspace and the kernel are consistent in
+their idea of what's going on.
 
-On 10/12/2017 08:58 AM, Thomas Huth wrote:
-> On 10.10.2017 13:41, Halil Pasic wrote:
->> [..]
->>>>
->>>> Yeah, the ABI is smart enough (where it matters) and this one is obviously
->>>> less that 8 bytes. I read this as you  assumed that the return won't be
->>>> passed via register (general purpose register 2 for a z host + ELF assumed),
->>>> and that would have been ugly indeed.
->>>>
->>>> Btw I have seen putting an integral into a struct for type checking
->>>> in the linux kernel too. For instance from:
->>>> arch/s390/include/asm/page.h
->>>>
->>>> """
->>>> /*
->>>>  * These are used to make use of C type-checking..
->>>>  */
->>>>
->>>> typedef struct { unsigned long pgprot; } pgprot_t;
->>>> typedef struct { unsigned long pgste; } pgste_t;
->>>> typedef struct { unsigned long pte; } pte_t;
->>>> typedef struct { unsigned long pmd; } pmd_t;
->>>> typedef struct { unsigned long pud; } pud_t;
->>>> typedef struct { unsigned long pgd; } pgd_t;
->>>> typedef pte_t *pgtable_t;
->>>>
->>>> #define pgprot_val(x)   ((x).pgprot)
->>>> #define pgste_val(x)    ((x).pgste)
->>>> #define pte_val(x)      ((x).pte)
->>>> #define pmd_val(x)      ((x).pmd)
->>>> #define pud_val(x)      ((x).pud)
->>>> #define pgd_val(x)      ((x).pgd)
->>>>
->>>> #define __pgste(x)      ((pgste_t) { (x) } )
->>>> #define __pte(x)        ((pte_t) { (x) } )
->>>> #define __pmd(x)        ((pmd_t) { (x) } )
->>>> #define __pud(x)        ((pud_t) { (x) } )
->>>> #define __pgd(x)        ((pgd_t) { (x) } )
->>>> #define __pgprot(x)     ((pgprot_t) { (x) } )
->>>> """
->>>>
->>>> If you think, I could add a similar comment indicating that my
->>>> struct is also just for type-checking.
->>>
->>> No, I think you've got the reason here slightly wrong. The kernel only
->>> uses this since the pte_t and friends need to be urgently portable
->>> between the different architectures. Have a look at the kernel
->>> Documentation/CodingStyle file, it explicitly mentions this in chapter 5
->>> ("Typedefs").
->>
->> IMHO we don't talk about typedefs here but about type checking. Btw QEMU
->> has the exact opposite policy regarding typedefs and structs than Linux.
->> You want to say that the comment at the top of my quote is wrong, and
->> that it should be rather "These are used for hiding representation.."
->> that "These are used to make use of C type-checking.."?
-> 
-> I certainly did not want to say that you should change the comment. I
-> just wanted to point you to the fact that these typedefs in the kernel
-> are likely rather used for hiding representation indeed, and not so much
-> for type checking, so using them as an example for introducing something
-> like type checking here in QEMU is quite a bad example.
-> 
+>  }
+>
+>  static void gicv3_its_common_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> +    GICv3ITSCommonClass *c = ARM_GICV3_ITS_COMMON_CLASS(klass);
+>
+> -    dc->reset = gicv3_its_common_reset;
+> +    c->parent_reset = gicv3_its_common_reset;
+>      dc->vmsd = &vmstate_its;
+>  }
 
-I've noted. I won't look for another example. I don't understand
-your logic, but I'm afraid I've already taken too much of your
-precious time. 
+This isn't how we handle this for the arm_gicv3_kvm.c and arm_gic_kvm.c
+code which has a subclass reset/parent class reset. What we do there is:
+ * the parent_reset field is in the subclass's Class struct
+ * the subclass's reset function calls the parent_reset function
+ * the subclass's class_init function sets parent_reset to whatever
+   the old dc->reset was before setting dc->reset to its own reset
+   function
 
->> I'm also curious which of the rules would your original suggestion of
->> doing "typedef unsigned int IOInstEnding" match (from chapter 5
->> "Typedefs")? ;)
-> 
-> None, of course. That's the difference between the kernel and QEMU -
-> though I have to say that I rather prefer the kernel philosophy nowadays.
-> 
-> So yes, please don't do a "typedef unsigned int IOInstEnding" either. I
-> think the best match for QEMU would be a
-> 
-> typedef enum IOInstEnding {
->     CC_...,
->     CC_...,
->     CC_...,
->     CC_...
-> } IOInstEnding;
-> 
+I think we should be consistent in how we do this.
 
-I also prefer this over #define NAME val.
+> diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
+> index 120b86d..3c2e724 100644
+> --- a/hw/intc/arm_gicv3_its_kvm.c
+> +++ b/hw/intc/arm_gicv3_its_kvm.c
+> @@ -156,10 +156,6 @@ static void kvm_arm_its_post_load(GICv3ITSState *s)
+>      Error *err = NULL;
+>      int i;
+>
+> -    if (!s->iidr) {
+> -        return;
+> -    }
+> -
 
-> You then also should at least get some compiler checking thanks to
-> -Wswitch and -Wenum-compare, shouldn't you?
+This looks like an unrelated change, or at least not one mentioned
+in the commit message?
 
-None that matter. The switches are going away. And I also don't
-expect compares. The for me interesting wrong propagation scenario
-(e.g. return func_ret_errno()) isn't covered. It is not a big thing
-though.
+>      kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
+>                        GITS_IIDR, &s->iidr, true, &error_abort);
+>
+> @@ -195,6 +191,23 @@ static void kvm_arm_its_post_load(GICv3ITSState *s)
+>                        GITS_CTLR, &s->ctlr, true, &error_abort);
+>  }
+>
+> +static void kvm_arm_its_reset(DeviceState *dev)
+> +{
+> +    GICv3ITSState *s = ARM_GICV3_ITS_COMMON(dev);
+> +    GICv3ITSCommonClass *c = ARM_GICV3_ITS_COMMON_GET_CLASS(s);
+> +
+> +    c->parent_reset(dev);
+> +
+> +    if (!kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> +                               KVM_DEV_ARM_ITS_CTRL_RESET)) {
+> +        error_report("ITS KVM: reset is not supported by the kernel");
+> +        return;
+> +    }
+> +
+> +    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> +                      KVM_DEV_ARM_ITS_CTRL_RESET, NULL, true, &error_abort);
+> +}
+> +
+>  static Property kvm_arm_its_props[] = {
+>      DEFINE_PROP_LINK("parent-gicv3", GICv3ITSState, gicv3, "kvm-arm-gicv3",
+>                       GICv3State *),
+> @@ -211,6 +224,7 @@ static void kvm_arm_its_class_init(ObjectClass *klass, void *data)
+>      icc->send_msi = kvm_its_send_msi;
+>      icc->pre_save = kvm_arm_its_pre_save;
+>      icc->post_load = kvm_arm_its_post_load;
+> +    dc->reset = kvm_arm_its_reset;
+>  }
+>
+>  static const TypeInfo kvm_arm_its_info = {
+> diff --git a/include/hw/intc/arm_gicv3_its_common.h b/include/hw/intc/arm_gicv3_its_common.h
+> index fd1fe64..c158e9f 100644
+> --- a/include/hw/intc/arm_gicv3_its_common.h
+> +++ b/include/hw/intc/arm_gicv3_its_common.h
+> @@ -79,6 +79,7 @@ struct GICv3ITSCommonClass {
+>      int (*send_msi)(GICv3ITSState *s, uint32_t data, uint16_t devid);
+>      void (*pre_save)(GICv3ITSState *s);
+>      void (*post_load)(GICv3ITSState *s);
+> +    void (*parent_reset)(DeviceState *dev);
+>  };
+>
+>  typedef struct GICv3ITSCommonClass GICv3ITSCommonClass;
+> --
+> 2.5.5
+>
 
-I've compiled with:
-~/git/qemu/configure --target-list=s390x-softmmu --extra-cflags="-Wswitch -Wenum-compare"
-and gcc version 4.8.5
-
-> 
->> I assume you have seen my reply to Connie about the benefit: among others
->> it prevents using something like -EFAULT as a cc by accident which neither
->> an enum nor a typedef does.
-> 
-> A confused developer could still do something like "return
-> (IOInstEnding){.cc = -EFAULT};", so this is also not completely safe.
-
-Of course,but that would be a very confused programmer, who does not
-bother what his newly written code does, and does not care to look at the
-definition of  IOInstEnding which states the valid values of cc.
-Since we don't write Ada I was under the impression that just stating the
-valid values would be enough.
-
-#define IOINST_CC(v) (assert(!((v) & ~0x03ULL)), (IOInstEnding){.cc = (v)})
-
-or even better
-
-#define IOINST_CC(cv) ({QEMU_BUILD_BUG_ON((cv) & ~0x03ULL);\                      
-                        (IOInstEnding){.cc = (cv)};})
-
-and then
-
-return IOINST_CC(-EFAULT); 
-
-would fail with an runtime assert or at compile time respectively while
-good code would look like
-return IOINST_CC(1);
-
-Of course that would still eave the possibility of doing
-"IOInstEnding){.cc = -EFAULT}" directly. Now this is where my
-C skill ends (I don't know how to prohibit that, because we need
-the type public).
-
-In the end I found that such a mistake is unlikely enough, and
-I'm still keeping my opinion.
-
-I think I've understood your opinion: type checking is an overkill
-in this particular use-case. It's a legit opinion -- one I don't
-share, but one I can't argue with.
-
-Again, sorry for taking so much of your time. I'm bad at letting
-loose.
-
-Regards,
-Halil
-
-
-> 
->  Thomas
-> 
+thanks
+-- PMM
