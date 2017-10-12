@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2dPo-0000hh-Pq
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:20:45 -0400
+	(envelope-from <berrange@redhat.com>) id 1e2dUo-00052V-Oz
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:25:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2dPl-0001I6-Ik
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:20:44 -0400
-References: <20171012034720.11947-1-eblake@redhat.com>
-	<20171012034720.11947-24-eblake@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <61e393f8-fcc5-b098-d6f2-160091c448c2@redhat.com>
-Date: Thu, 12 Oct 2017 08:20:16 -0500
-MIME-Version: 1.0
-In-Reply-To: <20171012034720.11947-24-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="06TfIQahFfOPKqv57HFPBiwMtK7R3Do3i"
-Subject: Re: [Qemu-devel] [PATCH v6 23/24] qcow2: Relax is_zero() assertion
+	(envelope-from <berrange@redhat.com>) id 1e2dUl-0004bT-Cq
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:25:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49336)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e2dUl-0004bE-6b
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:25:51 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Thu, 12 Oct 2017 14:25:46 +0100
+Message-Id: <20171012132546.1741-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] io: fix mem leak in websock error path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +22,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---06TfIQahFfOPKqv57HFPBiwMtK7R3Do3i
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
-Message-ID: <61e393f8-fcc5-b098-d6f2-160091c448c2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 23/24] qcow2: Relax is_zero() assertion
-References: <20171012034720.11947-1-eblake@redhat.com>
- <20171012034720.11947-24-eblake@redhat.com>
-In-Reply-To: <20171012034720.11947-24-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Coverity pointed out the 'date' is not free()d in the error
+path
 
-On 10/11/2017 10:47 PM, Eric Blake wrote:
-> Now that bdrv_is_allocated accepts non-aligned inputs, we can
-> remove the TODO added in earlier refactoring.
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ io/channel-websock.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-I was a bit too hasty in the copy-and-paste from 22/24 - there is no
-assertion in this patch, so the subject would be better as:
-
-qcow2: Reduce is_zero() rounding
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---06TfIQahFfOPKqv57HFPBiwMtK7R3Do3i
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnfbBAACgkQp6FrSiUn
-Q2ppPQf9EBl1dbCPaxtd3WfZjOsFSQ6huEvgGV9h46GFd6EbYccogGKVOVB9oyNz
-OC2nTeWsadCkL5kZ8NlpfuvM9cxyajcedrQqYl95wlusRQEvqqWwL0HxxKvoKJzi
-4Yr711SedG0pjfqvSfa48+VnhZ45BgwOfF8sTScuYBMoVkKfPxBJkJiH1WvqEDee
-2XNaPgBuaCM+F+7hjpRa0FIxku3nkGxA4LgeeI/xB8HYmyeAPuQuldfGB68xKrkg
-iyYMRjGAj76UhBjvOrK8SEVshtNmgWFKFixFBdpVlDYfa+JWXS3P8qRWa1f5uPx/
-5R7Z2gLHiBTKCSyOJ+RDP2lyc//EvA==
-=7K9w
------END PGP SIGNATURE-----
-
---06TfIQahFfOPKqv57HFPBiwMtK7R3Do3i--
+diff --git a/io/channel-websock.c b/io/channel-websock.c
+index aa35ef3274..df2c3a9f99 100644
+--- a/io/channel-websock.c
++++ b/io/channel-websock.c
+@@ -341,7 +341,7 @@ static void qio_channel_websock_handshake_send_res_ok(QIOChannelWebsock *ioc,
+     char combined_key[QIO_CHANNEL_WEBSOCK_CLIENT_KEY_LEN +
+                       QIO_CHANNEL_WEBSOCK_GUID_LEN + 1];
+     char *accept = NULL;
+-    char *date = qio_channel_websock_date_str();
++    char *date = NULL;
+ 
+     g_strlcpy(combined_key, key, QIO_CHANNEL_WEBSOCK_CLIENT_KEY_LEN + 1);
+     g_strlcat(combined_key, QIO_CHANNEL_WEBSOCK_GUID,
+@@ -360,6 +360,7 @@ static void qio_channel_websock_handshake_send_res_ok(QIOChannelWebsock *ioc,
+         return;
+     }
+ 
++    date = qio_channel_websock_date_str();
+     qio_channel_websock_handshake_send_res(
+         ioc, QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_OK, date, accept);
+ 
+-- 
+2.13.5
