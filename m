@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2m1C-0005pw-UI
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 18:31:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1e2m4k-0006jQ-Nw
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 18:35:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2m1B-0003DK-UI
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 18:31:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1e2m4j-0004nC-Qj
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 18:35:34 -0400
 References: <20171012095319.136610-1-vsementsov@virtuozzo.com>
 	<20171012095319.136610-8-vsementsov@virtuozzo.com>
 	<f0852a65-aacc-6bc2-1b48-cf9ed197e361@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <41a1aa0d-16ae-5358-6982-bdd773d8ea95@redhat.com>
-Date: Thu, 12 Oct 2017 17:31:44 -0500
+Message-ID: <e77940fe-3d7d-862a-ef77-a2d802da4171@redhat.com>
+Date: Thu, 12 Oct 2017 17:35:23 -0500
 MIME-Version: 1.0
 In-Reply-To: <f0852a65-aacc-6bc2-1b48-cf9ed197e361@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="EUNe7Vm2TCMx9n0KrRtRFQGQRExOSicSM"
+	boundary="X8UReiqLLG1x65gxB1lTWov8p4mTLEXdD"
 Subject: Re: [Qemu-devel] [PATCH v3 07/13] nbd-server: simplify reply
  transmission
 List-Id: <qemu-devel.nongnu.org>
@@ -30,12 +30,12 @@ To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.o
 Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, mreitz@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---EUNe7Vm2TCMx9n0KrRtRFQGQRExOSicSM
+--X8UReiqLLG1x65gxB1lTWov8p4mTLEXdD
 From: Eric Blake <eblake@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, mreitz@redhat.com
-Message-ID: <41a1aa0d-16ae-5358-6982-bdd773d8ea95@redhat.com>
+Message-ID: <e77940fe-3d7d-862a-ef77-a2d802da4171@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH v3 07/13] nbd-server: simplify reply
  transmission
 References: <20171012095319.136610-1-vsementsov@virtuozzo.com>
@@ -57,9 +57,32 @@ e
 >>  nbd/server.c | 50 ++++++++++++++++++++++++--------------------------
 >>  1 file changed, 24 insertions(+), 26 deletions(-)
 >>
+>=20
+>> @@ -1203,36 +1220,17 @@ static int nbd_co_send_simple_reply(NBDClient =
+*client,
+>>                                      size_t len,
+>>                                      Error **errp)
+>>  {
+>> -    NBDSimpleReply simple_reply;
+>> -    int ret;
+>> -
+>> -    g_assert(qemu_in_coroutine());
+>> +    NBDSimpleReply reply;
+>=20
+> Why the rename from simple_reply to reply?
+>=20
+>> +    struct iovec iov[] =3D {
+>> +        {.iov_base =3D &reply, .iov_len =3D sizeof(reply)},
+>=20
+> I guess it made this line shorter.  But we could reduce some churn by
+> naming it 'reply' in the first place, back in earlier patches.  At the
+> same time, I'm not going to bother if there's not a reason to respin th=
+e
+> series (or at least the first half).
 
-Subject-line consistency: elsewhere you used nbd/server instead of
-nbd-server. I'll make the obvious tweak.
+Answering myself - you couldn't use the name 'reply' until 5/13 removed
+it as a parameter name, even though you introduced the name
+'simple_reply' in 4/13.  Okay, the rename is fine here.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -67,7 +90,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---EUNe7Vm2TCMx9n0KrRtRFQGQRExOSicSM
+--X8UReiqLLG1x65gxB1lTWov8p4mTLEXdD
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -76,14 +99,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnf7VAACgkQp6FrSiUn
-Q2ottgf7Bsglbl4PAZC/LUKORGThdSJzD/fNQKHaUO22eDZACX7bbv4imShgEc2v
-ejZ/7BmHw30unrnRn8fOBYD8c3aG5KJh8VCEhzcyCB0GaKej/jVh91wAOLejukGs
-zDM8Jsf4qdIQy8E6Kyz2jGSHNd8gOrcCWSjiP/V+wNNINLVVMpHHq6+zI2Hp2M5B
-cWYhTsqcoPqako8czKea0m+ddnec8SnjB7WhGYdNGx7snS/HCupIopCB0X/D06g1
-4H2UMQoWymXqdqd9dH5i4gUFu70Z2tOcwrGNsBdQlbigacZoOcn+/zt0eAx73jzb
-DgRih7JGCuWpu6Mg0o1dexrQJ1opaA==
-=xjMk
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnf7isACgkQp6FrSiUn
+Q2q6pwf9GHMi4u3qns4NZ6ofU5SZCnFszvCbpdApqIdHlq8Fj3yUin1Pr9gWVeic
+dxPrQnN83VPEMUq2BcXYN3cGhfJpjgpUAvpYLxztt8hGE/+q/1tXo+vgxc0HPPHl
+FH8hofrhmcafgVPqbLH1QBVH3pDd+Pl9VaMMHPnTEOEB5k6Xd1H3UgF02oU6ikTy
+O2HhAO/JztIvaG5H/6ny3k2xLbMiWtD4y2BC27QepNvGrlIJU4lWN9+ETmqEitCG
+5UaKHnL6AMzsu3PZf2D/1TCBMXnhU1FkY5FkD2KB5a0CPm4VH68i88PXoxUQq5sH
+GhOM0LmVriFVZelzuYzUFcfYZu8Lnw==
+=Keay
 -----END PGP SIGNATURE-----
 
---EUNe7Vm2TCMx9n0KrRtRFQGQRExOSicSM--
+--X8UReiqLLG1x65gxB1lTWov8p4mTLEXdD--
