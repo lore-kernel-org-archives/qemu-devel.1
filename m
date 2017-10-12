@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e2aBI-0001Fa-5u
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:53:34 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e2aCW-0002IU-L8
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:54:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e2aBF-0000Hv-Gi
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:53:32 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:23852 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1e2aBF-0000Dd-4F
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:53:29 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 12 Oct 2017 12:53:14 +0300
-Message-Id: <20171012095319.136610-9-vsementsov@virtuozzo.com>
-In-Reply-To: <20171012095319.136610-1-vsementsov@virtuozzo.com>
-References: <20171012095319.136610-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 08/13] nbd: header constants indenting
+	(envelope-from <peter.maydell@linaro.org>) id 1e2aCV-0001Nt-NZ
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:54:48 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:56097)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e2aCV-0001NH-GY
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:54:47 -0400
+Received: by mail-wm0-x232.google.com with SMTP id u138so11790492wmu.4
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 02:54:47 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <f3a263b7-27e6-26df-592d-a34902bab6fe@redhat.com>
+References: <1505807208-9063-1-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA-0MK18DakmNPRXCNYbDpBvzE0h12nNjg7zr+F_m0EnDw@mail.gmail.com>
+	<f3a263b7-27e6-26df-592d-a34902bab6fe@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Oct 2017 10:54:25 +0100
+Message-ID: <CAFEAcA_2RaRsvm_=V4iDNk_vMOtiWUZs3-SdMh+DSYqGyPE0PQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC v4 00/16] VIRTIO-IOMMU device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,88 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Wei Huang <wei@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>, Andrew Jones <drjones@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, jean-philippe.brucker@arm.com, Tomasz Nowicki <tn@semihalf.com>, Will Deacon <will.deacon@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, linuc.decode@gmail.com, Bharat Bhushan <bharat.bhushan@nxp.com>, Christoffer Dall <christoffer.dall@linaro.org>, eric.auger.pro@gmail.com
 
-Prepare indenting for the following commit.
+On 11 October 2017 at 17:08, Auger Eric <eric.auger@redhat.com> wrote:
+> Hi Peter,
+>
+> On 11/10/2017 16:56, Peter Maydell wrote:
+>> On 19 September 2017 at 08:46, Eric Auger <eric.auger@redhat.com> wrote:
+>>> This series implements the virtio-iommu device.
+>>>
+>>> This v4 is an upgrade to v0.4 spec [1] and applies on QEMU v2.10.0.
+>>> - probe request support although no reserved region is returned at
+>>>   the moment
+>>> - unmap semantics less strict, as specified in v0.4
+>>> - device registration, attach/detach revisited
+>>> - split into smaller patches to ease review
+>>> - propose a way to inform the IOMMU mr about the page_size_mask
+>>>   of underlying HW IOMMU, if any
+>>> - remove warning associated with the translation of the MSI doorbell
+>>>
+>>> The device gets instantiated using the "-device virtio-iommu-device"
+>>> option. It currently works with ARM virt machine only, as the machine
+>>> must handle the dt binding between the virtio-mmio "iommu" node and
+>>> the PCI host bridge node.
+>>
+>> Could this work on x86, or is it inherently arm-only?
+>
+> Yes this is the goal. At the moment the ACPI probing is not yet properly
+> specified but a Q35 prototype was developed in the Red Hat Virt team.
+> This will be presented at the KVM forum.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- include/block/nbd.h | 15 ++++++++-------
- nbd/nbd-internal.h  | 34 +++++++++++++++++-----------------
- 2 files changed, 25 insertions(+), 24 deletions(-)
+Since I have very little familiarity with virtio or iommu code,
+I'd be much happier if this was reviewed as a generic virtio-iommu
+by the x86/virtio devs and then the arm specific parts done second...
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 49008980f4..a6df5ce8b5 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -71,13 +71,14 @@ typedef struct NBDSimpleReply {
- 
- /* Transmission (export) flags: sent from server to client during handshake,
-    but describe what will happen during transmission */
--#define NBD_FLAG_HAS_FLAGS      (1 << 0)        /* Flags are there */
--#define NBD_FLAG_READ_ONLY      (1 << 1)        /* Device is read-only */
--#define NBD_FLAG_SEND_FLUSH     (1 << 2)        /* Send FLUSH */
--#define NBD_FLAG_SEND_FUA       (1 << 3)        /* Send FUA (Force Unit Access) */
--#define NBD_FLAG_ROTATIONAL     (1 << 4)        /* Use elevator algorithm - rotational media */
--#define NBD_FLAG_SEND_TRIM      (1 << 5)        /* Send TRIM (discard) */
--#define NBD_FLAG_SEND_WRITE_ZEROES (1 << 6)     /* Send WRITE_ZEROES */
-+#define NBD_FLAG_HAS_FLAGS         (1 << 0) /* Flags are there */
-+#define NBD_FLAG_READ_ONLY         (1 << 1) /* Device is read-only */
-+#define NBD_FLAG_SEND_FLUSH        (1 << 2) /* Send FLUSH */
-+#define NBD_FLAG_SEND_FUA          (1 << 3) /* Send FUA (Force Unit Access) */
-+#define NBD_FLAG_ROTATIONAL        (1 << 4) /* Use elevator algorithm -
-+                                               rotational media */
-+#define NBD_FLAG_SEND_TRIM         (1 << 5) /* Send TRIM (discard) */
-+#define NBD_FLAG_SEND_WRITE_ZEROES (1 << 6) /* Send WRITE_ZEROES */
- 
- /* New-style handshake (global) flags, sent from server to client, and
-    control what will happen during handshake phase. */
-diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
-index 2d6663de23..11a130d050 100644
---- a/nbd/nbd-internal.h
-+++ b/nbd/nbd-internal.h
-@@ -46,23 +46,23 @@
- /* Size of oldstyle negotiation */
- #define NBD_OLDSTYLE_NEGOTIATE_SIZE (8 + 8 + 8 + 4 + 124)
- 
--#define NBD_REQUEST_MAGIC       0x25609513
--#define NBD_SIMPLE_REPLY_MAGIC  0x67446698
--#define NBD_OPTS_MAGIC          0x49484156454F5054LL
--#define NBD_CLIENT_MAGIC        0x0000420281861253LL
--#define NBD_REP_MAGIC           0x0003e889045565a9LL
--
--#define NBD_SET_SOCK            _IO(0xab, 0)
--#define NBD_SET_BLKSIZE         _IO(0xab, 1)
--#define NBD_SET_SIZE            _IO(0xab, 2)
--#define NBD_DO_IT               _IO(0xab, 3)
--#define NBD_CLEAR_SOCK          _IO(0xab, 4)
--#define NBD_CLEAR_QUE           _IO(0xab, 5)
--#define NBD_PRINT_DEBUG         _IO(0xab, 6)
--#define NBD_SET_SIZE_BLOCKS     _IO(0xab, 7)
--#define NBD_DISCONNECT          _IO(0xab, 8)
--#define NBD_SET_TIMEOUT         _IO(0xab, 9)
--#define NBD_SET_FLAGS           _IO(0xab, 10)
-+#define NBD_REQUEST_MAGIC           0x25609513
-+#define NBD_SIMPLE_REPLY_MAGIC      0x67446698
-+#define NBD_OPTS_MAGIC              0x49484156454F5054LL
-+#define NBD_CLIENT_MAGIC            0x0000420281861253LL
-+#define NBD_REP_MAGIC               0x0003e889045565a9LL
-+
-+#define NBD_SET_SOCK                _IO(0xab, 0)
-+#define NBD_SET_BLKSIZE             _IO(0xab, 1)
-+#define NBD_SET_SIZE                _IO(0xab, 2)
-+#define NBD_DO_IT                   _IO(0xab, 3)
-+#define NBD_CLEAR_SOCK              _IO(0xab, 4)
-+#define NBD_CLEAR_QUE               _IO(0xab, 5)
-+#define NBD_PRINT_DEBUG             _IO(0xab, 6)
-+#define NBD_SET_SIZE_BLOCKS         _IO(0xab, 7)
-+#define NBD_DISCONNECT              _IO(0xab, 8)
-+#define NBD_SET_TIMEOUT             _IO(0xab, 9)
-+#define NBD_SET_FLAGS               _IO(0xab, 10)
- 
- /* NBD errors are based on errno numbers, so there is a 1:1 mapping,
-  * but only a limited set of errno values is specified in the protocol.
--- 
-2.11.1
+I'm also not clear on what we're expecting the recommended or normal
+way to do device passthrough is going to be -- this virtio-mmio,
+or presenting the guest with an SMMUv3 interface? Do we really
+need to implement both ?
+
+thanks
+-- PMM
