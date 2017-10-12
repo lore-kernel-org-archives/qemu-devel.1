@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2lFb-0001QQ-8u
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 17:42:44 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1e2lGt-00029b-3Z
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 17:44:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2lFa-0006Pf-A9
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 17:42:43 -0400
-References: <20171012095319.136610-1-vsementsov@virtuozzo.com>
-	<20171012095319.136610-5-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2250c65b-e347-5404-10de-4da240487fb3@redhat.com>
-Date: Thu, 12 Oct 2017 16:42:31 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1e2lGo-0007CW-16
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 17:44:03 -0400
+Received: from mail-wm0-f43.google.com ([74.125.82.43]:47433)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e2lGn-0007BD-PO
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 17:43:57 -0400
+Received: by mail-wm0-f43.google.com with SMTP id t69so16642395wmt.2
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 14:43:56 -0700 (PDT)
+References: <20171012143548.18581-1-pbonzini@redhat.com>
+	<20171012143548.18581-3-pbonzini@redhat.com>
+	<449dd7e8-42cd-fd4a-da2b-35f22552bc39@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f5592714-d129-9580-57d7-06de323503d8@redhat.com>
+Date: Thu, 12 Oct 2017 23:43:53 +0200
 MIME-Version: 1.0
-In-Reply-To: <20171012095319.136610-5-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="dN0EIEngUa6V3TfAoTKbXD7G44jLm1IMI"
-Subject: Re: [Qemu-devel] [PATCH v3 04/13] nbd/server: structurize simple
- reply header sending
+In-Reply-To: <449dd7e8-42cd-fd4a-da2b-35f22552bc39@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] target/i386: trap on instructions
+ longer than >15 bytes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,105 +32,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---dN0EIEngUa6V3TfAoTKbXD7G44jLm1IMI
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
-Message-ID: <2250c65b-e347-5404-10de-4da240487fb3@redhat.com>
-Subject: Re: [PATCH v3 04/13] nbd/server: structurize simple reply header
- sending
-References: <20171012095319.136610-1-vsementsov@virtuozzo.com>
- <20171012095319.136610-5-vsementsov@virtuozzo.com>
-In-Reply-To: <20171012095319.136610-5-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 12/10/2017 21:30, Richard Henderson wrote:
+> On 10/12/2017 07:35 AM, Paolo Bonzini wrote:
+>> Besides being more correct, arbitrarily long instruction allow the
+>> generation of a translation block that spans three pages.  This
+>> confuses the generator and even allows ring 3 code to poison the
+>> translation block cache and inject code into other processes that are
+>> in guest ring 3.
+>>
+>> This is an improved (and more invasive) fix for the bug fixed in commit
+>> 30663fd ("tcg/i386: Check the size of instruction being translated",
+>> 2017-03-24).  In addition to being more precise (and generating the
+>> right exception, which is #GP rather than #UD), it distinguishes better
+>> between page faults and too long instructions, as shown by this test case:
+>>
+>>     #include <sys/mman.h>
+>>     #include <string.h>
+>>     #include <stdio.h>
+>>
+>>     int main()
+>>     {
+>>             char *x = mmap(NULL, 8192, PROT_READ|PROT_WRITE|PROT_EXEC,
+>>                            MAP_PRIVATE|MAP_ANON, -1, 0);
+>>             memset(x, 0x66, 4096);
+>>             x[4096] = 0x90;
+>>             x[4097] = 0xc3;
+>>             char *i = x + 4096 - 15;
+>>             mprotect(x + 4096, 4096, PROT_READ|PROT_WRITE);
+>>             ((void(*)(void)) i) ();
+>>     }
+>>
+>> ... which produces a #GP without the mprotect, and a #PF with it.
+>>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>  target/i386/translate.c | 29 ++++++++++++++++++++++-------
+>>  1 file changed, 22 insertions(+), 7 deletions(-)
+> 
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> 
+>> +    if (sigsetjmp(s->jmpbuf, 0) != 0) {
+> 
+> Any particular reason to use sigsetjmp(x, 0) instead of setjmp(x)?
+> Certainly there are no signal frames that the longjmp will pass...
 
-On 10/12/2017 04:53 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Use packed structure instead of pointer arithmetics.
+sigsetjmp is used to _not_ save the signal mask.  On OS X setjmp saves
+the signal mask by default, which is slower.
 
-English is fun!  In the subject line, I'm fairly certain that
-"structurize" is not likely to be in any dictionary, yet it is a perfect
-word describing the patch, so I'm not touching it ;)
-
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/block/nbd.h |  6 ++++++
->  nbd/server.c        | 36 ++++++++++++++----------------------
->  2 files changed, 20 insertions(+), 22 deletions(-)
->=20
-
-> +++ b/nbd/server.c
-> @@ -902,26 +902,6 @@ static int nbd_receive_request(QIOChannel *ioc, NB=
-DRequest *request,
->      return 0;
->  }
-> =20
-> -static int nbd_send_reply(QIOChannel *ioc, NBDReply *reply, Error **er=
-rp)
-> -{
-> -    uint8_t buf[NBD_REPLY_SIZE];
-> -
-> -    reply->error =3D system_errno_to_nbd_errno(reply->error);
-> -
-> -    trace_nbd_send_reply(reply->error, reply->handle);
-
-We lose a trace here...
-
->  static int nbd_co_send_simple_reply(NBDRequestData *req, NBDReply *rep=
-ly,
->                                      int len, Error **errp)
->  {
->      NBDClient *client =3D req->client;
-> +    NBDSimpleReply simple_reply;
->      int ret;
-> =20
->      g_assert(qemu_in_coroutine());
-> =20
->      trace_nbd_co_send_simple_reply(reply->handle, reply->error, len);
-> =20
-> +    set_be_simple_reply(&simple_reply, system_errno_to_nbd_errno(reply=
-->error),
-> +                        reply->handle);
-> +
-
-=2E..but it always occurred immediately after another trace that has
-redundant information (well, the trace you kept shows pre- rather than
-post-translation of errno value to NBD wire value, and the trace you
-drop didn't show length).  I'm fine with the reduction, but it needs a
-tweak to trace-events to reap the dead trace.
-
-With that change,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---dN0EIEngUa6V3TfAoTKbXD7G44jLm1IMI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnf4ccACgkQp6FrSiUn
-Q2oGYAf9E6gAi0OrxeJYJYm/aVHKZXaoWVQdLOyZZROq3EeY3tSGVQ0fFivihLjT
-mWAGbWLYDhuhd7Ilx3MPPuuRBD416QDG3hbWLlQx6aL4uVpi7I8Xez/WOUaw1sSF
-LYxQkjox+VntAfhZGRtA4BA2p966AEU8mLqyME0MWYvNlypdUGIBZFeDSCzul25Q
-bz0/tSUvzozIbMK8Q8MfNilEb9b7X7anD5hFJ8KxSS7zjMV08FG4BepIqLDf0A9F
-VHIx+JUYE+r8TDI9nZuTi54xYOXdfZIRcMyZqAJ4IlZPnQuiYCUYBsd96c879xsU
-PG2juCoIAZ87+NqUyvUVkE+/GYcE2g==
-=uNQ5
------END PGP SIGNATURE-----
-
---dN0EIEngUa6V3TfAoTKbXD7G44jLm1IMI--
+Paolo
