@@ -1,31 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e2cEG-0006BE-4m
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:04:46 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e2cGN-0007To-TW
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:06:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e2cEC-00045v-PE
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:04:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60574)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e2cEC-00045h-G0
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:04:40 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5698725BB8
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 12:04:39 +0000 (UTC)
-Date: Thu, 12 Oct 2017 13:04:33 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171012120432.GC2343@work-vm>
-References: <20171010181542.24168-1-quintela@redhat.com>
-	<20171010181542.24168-10-quintela@redhat.com>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e2cGK-0004vI-HG
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:06:55 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33668
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1e2cGK-0004v3-B9
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:06:52 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9CC6CHB082733
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 08:06:48 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dj79ytgbq-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 08:06:47 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Thu, 12 Oct 2017 13:06:46 +0100
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+References: <20171004154144.88995-1-pasic@linux.vnet.ibm.com>
+	<20171004154144.88995-4-pasic@linux.vnet.ibm.com>
+	<20171010150733.444aa2fe.cohuck@redhat.com>
+	<aed45050-fd0e-4a81-679c-c59c23d75a98@linux.vnet.ibm.com>
+Date: Thu, 12 Oct 2017 14:06:42 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171010181542.24168-10-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 09/10] migration: Make xbzrle_cache_size a
- migration parameter
+In-Reply-To: <aed45050-fd0e-4a81-679c-c59c23d75a98@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <3e560962-d748-ccfa-ccab-c54f1a30bab4@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/8] s390x: improve error handling for
+ SSCH and RSCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,309 +46,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Right now it is a variable in MigrationState instead of a
-> MigrationParameter.  The change allows to set it as the rest of the
-> Migration parameters, from the command line, with
-> query_migration_paramters, set_migrate_parameters, etc.
+
+
+On 10/10/2017 04:36 PM, Halil Pasic wrote:
 > 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  hmp.c                 | 14 ++++++++++++++
->  migration/migration.c | 39 ++++++++++++++++++++++++++++++---------
->  migration/migration.h |  1 -
->  migration/ram.c       |  7 -------
->  qapi/migration.json   | 23 ++++++++++++++++++++---
->  5 files changed, 64 insertions(+), 20 deletions(-)
 > 
-> diff --git a/hmp.c b/hmp.c
-> index 739d330f4e..f73232399a 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -342,6 +342,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
->          monitor_printf(mon, "%s: %" PRId64 "\n",
->              MigrationParameter_str(MIGRATION_PARAMETER_X_MULTIFD_PAGE_COUNT),
->              params->x_multifd_page_count);
-> +        monitor_printf(mon, "%s: %" PRId64 "\n",
-> +            MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
-> +            params->xbzrle_cache_size);
->      }
->  
->      qapi_free_MigrationParameters(params);
-> @@ -1560,6 +1563,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
->      Visitor *v = string_input_visitor_new(valuestr);
->      MigrateSetParameters *p = g_new0(MigrateSetParameters, 1);
->      uint64_t valuebw = 0;
-> +    uint64_t cache_size;
->      Error *err = NULL;
->      int val, ret;
->  
-> @@ -1635,6 +1639,16 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
->          p->has_x_multifd_page_count = true;
->          visit_type_int(v, param, &p->x_multifd_page_count, &err);
->          break;
-> +    case MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE:
-> +        p->has_xbzrle_cache_size = true;
-> +        visit_type_size(v, param, &cache_size, &err);
-> +        if (err || cache_size > INT64_MAX
-> +            || (size_t)cache_size != cache_size) {
-> +            error_setg(&err, "Invalid size %s", valuestr);
-> +            break;
-> +        }
-> +        p->xbzrle_cache_size = cache_size;
-> +        break;
->      default:
->          assert(0);
->      }
-> diff --git a/migration/migration.c b/migration/migration.c
-> index f3d4503ce2..fcc0d64625 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -71,7 +71,7 @@
->  #define DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT 10
->  
->  /* Migration XBZRLE default cache size */
-> -#define DEFAULT_MIGRATE_CACHE_SIZE (64 * 1024 * 1024)
-> +#define DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE (64 * 1024 * 1024)
->  
->  /* The delay time (in ms) between two COLO checkpoints
->   * Note: Please change this default value to 10000 when we support hybrid mode.
-> @@ -512,6 +512,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
->      params->x_multifd_channels = s->parameters.x_multifd_channels;
->      params->has_x_multifd_page_count = true;
->      params->x_multifd_page_count = s->parameters.x_multifd_page_count;
-> +    params->has_xbzrle_cache_size = true;
-> +    params->xbzrle_cache_size = s->parameters.xbzrle_cache_size;
->  
->      return params;
->  }
-> @@ -810,6 +812,16 @@ static bool migrate_params_check(MigrationParameters *params, Error **errp)
->          return false;
->      }
->  
-> +    if (params->has_xbzrle_cache_size &&
-> +        (params->xbzrle_cache_size < qemu_target_page_size() ||
-> +         !is_power_of_2(params->xbzrle_cache_size))) {
-> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-> +                   "xbzrle_cache_size",
-> +                   "is invalid, it should be bigger than target page size"
-> +                   " and a power of two");
-> +        return false;
-> +    }
-> +
->      return true;
->  }
->  
-> @@ -871,6 +883,9 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
->      if (params->has_x_multifd_page_count) {
->          dest->x_multifd_page_count = params->x_multifd_page_count;
->      }
-> +    if (params->has_xbzrle_cache_size) {
-> +        dest->xbzrle_cache_size = params->xbzrle_cache_size;
-> +    }
->  }
->  
->  static void migrate_params_apply(MigrateSetParameters *params)
-> @@ -939,6 +954,10 @@ static void migrate_params_apply(MigrateSetParameters *params)
->      if (params->has_x_multifd_page_count) {
->          s->parameters.x_multifd_page_count = params->x_multifd_page_count;
->      }
-> +    if (params->has_xbzrle_cache_size) {
-> +        s->parameters.xbzrle_cache_size = params->xbzrle_cache_size;
-> +        xbzrle_cache_resize(params->xbzrle_cache_size, NULL);
-
-Not having the errp is a pain;   you've just moved all the error
-checking into xbzrle_cache_resize, so I think we really need an error
-pointer and to do something with it (even if it's just a local report).
-
-> +    }
->  }
->  
->  void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
-> @@ -1370,13 +1389,12 @@ void qmp_migrate_cancel(Error **errp)
->  
->  void qmp_migrate_set_cache_size(int64_t value, Error **errp)
->  {
-> -    MigrationState *s = migrate_get_current();
-> +    MigrateSetParameters p = {
-> +        .has_xbzrle_cache_size = true,
-> +        .xbzrle_cache_size = value,
-> +    };
->  
-> -    if (xbzrle_cache_resize(value, errp) < 0) {
-> -        return;
-> -    }
-> -
-> -    s->xbzrle_cache_size = value;
-> +    qmp_migrate_set_parameters(&p, errp);
->  }
->  
->  int64_t qmp_query_migrate_cache_size(Error **errp)
-> @@ -1542,7 +1560,7 @@ int64_t migrate_xbzrle_cache_size(void)
->  
->      s = migrate_get_current();
->  
-> -    return s->xbzrle_cache_size;
-> +    return s->parameters.xbzrle_cache_size;
->  }
->  
->  bool migrate_use_block(void)
-> @@ -2312,6 +2330,9 @@ static Property migration_properties[] = {
->      DEFINE_PROP_INT64("x-multifd-page-count", MigrationState,
->                        parameters.x_multifd_page_count,
->                        DEFAULT_MIGRATE_MULTIFD_PAGE_COUNT),
-> +    DEFINE_PROP_SIZE("xbzrle-cache-size", MigrationState,
-> +                      parameters.xbzrle_cache_size,
-> +                      DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE),
->  
->      /* Migration capabilities */
->      DEFINE_PROP_MIG_CAP("x-xbzrle", MIGRATION_CAPABILITY_XBZRLE),
-> @@ -2353,7 +2374,6 @@ static void migration_instance_init(Object *obj)
->      MigrationParameters *params = &ms->parameters;
->  
->      ms->state = MIGRATION_STATUS_NONE;
-> -    ms->xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE;
->      ms->mbps = -1;
->  
->      params->tls_hostname = g_strdup("");
-> @@ -2371,6 +2391,7 @@ static void migration_instance_init(Object *obj)
->      params->has_block_incremental = true;
->      params->has_x_multifd_channels = true;
->      params->has_x_multifd_page_count = true;
-> +    params->has_xbzrle_cache_size = true;
->  }
->  
->  /*
-> diff --git a/migration/migration.h b/migration/migration.h
-> index b83cceadc4..d2a8d319f1 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -107,7 +107,6 @@ struct MigrationState
->      int64_t downtime;
->      int64_t expected_downtime;
->      bool enabled_capabilities[MIGRATION_CAPABILITY__MAX];
-> -    int64_t xbzrle_cache_size;
->      int64_t setup_time;
->  
->      /* Flag set once the migration has been asked to enter postcopy */
-> diff --git a/migration/ram.c b/migration/ram.c
-> index ed4d3c6295..78e3b80e39 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -128,13 +128,6 @@ int xbzrle_cache_resize(int64_t new_size, Error **errp)
->          return -1;
->      }
->  
-> -    /* Cache should not be larger than guest ram size */
-> -    if (new_size > ram_bytes_total()) {
-> -        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "cache size",
-> -                   "exceeds guest ram size");
-> -        return -1;
-> -    }
-> -
->      if (new_size == migrate_xbzrle_cache_size()) {
->          /* nothing to do */
->          return new_size;
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index f8b365e3f5..830b2e4480 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -474,6 +474,10 @@
->  # @x-multifd-page-count: Number of pages sent together to a thread
->  #                        The default value is 16 (since 2.11)
->  #
-> +# @xbzrle-cache-size: cache size to be used by XBZRLE migration.  It
-> +#                     needs to be a multiple of the target page size
-
-and power of 2
-
-> +#                     (Since 2.11)
-> +#
->  # Since: 2.4
->  ##
->  { 'enum': 'MigrationParameter',
-> @@ -481,7 +485,8 @@
->             'cpu-throttle-initial', 'cpu-throttle-increment',
->             'tls-creds', 'tls-hostname', 'max-bandwidth',
->             'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
-> -           'x-multifd-channels', 'x-multifd-page-count' ] }
-> +           'x-multifd-channels', 'x-multifd-page-count',
-> +           'xbzrle-cache-size' ] }
->  
->  ##
->  # @MigrateSetParameters:
-> @@ -545,6 +550,9 @@
->  # @x-multifd-page-count: Number of pages sent together to a thread
->  #                        The default value is 16 (since 2.11)
->  #
-> +# @xbzrle-cache-size: cache size to be used by XBZRLE migration.  It
-> +#                     needs to be a multiple of the target page size
-> +#                     (Since 2.11)
-
-and power of 2
-
->  # Since: 2.4
->  ##
->  # TODO either fuse back into MigrationParameters, or make
-> @@ -562,7 +570,8 @@
->              '*x-checkpoint-delay': 'int',
->              '*block-incremental': 'bool',
->              '*x-multifd-channels': 'int',
-> -            '*x-multifd-page-count': 'int' } }
-> +            '*x-multifd-page-count': 'int',
-> +            '*xbzrle-cache-size': 'size' } }
->  
->  ##
->  # @migrate-set-parameters:
-> @@ -641,6 +650,9 @@
->  # @x-multifd-page-count: Number of pages sent together to a thread
->  #                        The default value is 16 (since 2.11)
->  #
-> +# @xbzrle-cache-size: cache size to be used by XBZRLE migration.  It
-> +#                     needs to be a multiple of the target page size
-> +#                     (Since 2.11)
-
-and power of 2 (wow this text is repeated a lot)
-
->  # Since: 2.4
->  ##
->  { 'struct': 'MigrationParameters',
-> @@ -656,7 +668,8 @@
->              '*x-checkpoint-delay': 'int',
->              '*block-incremental': 'bool' ,
->              '*x-multifd-channels': 'int',
-> -            '*x-multifd-page-count': 'int' } }
-> +            '*x-multifd-page-count': 'int',
-> +            '*xbzrle-cache-size': 'size' } }
->  
->  ##
->  # @query-migrate-parameters:
-> @@ -921,6 +934,8 @@
->  #
->  # Returns: nothing on success
->  #
-> +# Notes: This command is deprecated in favor of 'migrate-set-parameters'
-> +#
->  # Since: 1.2
->  #
->  # Example:
-> @@ -939,6 +954,8 @@
->  #
->  # Returns: XBZRLE cache size in bytes
->  #
-> +# Notes: This command is deprecated in favor of 'query-migrate-parameters'
-> +#
->  # Since: 1.2
->  #
->  # Example:
-> -- 
-> 2.13.6
-
-Dave
-
+> On 10/10/2017 03:07 PM, Cornelia Huck wrote:
+>> On Wed,  4 Oct 2017 17:41:39 +0200
+>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+>>
+>>> Simplify the error handling of the SSCH and RSCH handler avoiding
+>>> arbitrary and cryptic error codes being used to tell how the instruction
+>>> is supposed to end.  Let the code detecting the condition tell how it's
+>>> to be handled in a less ambiguous way.  It's best to handle SSCH and RSCH
+>>> in one go as the emulation of the two shares a lot of code.
+>>>
+>>> For passthrough this change isn't pure refactoring, but changes the
+>>> way kernel reported EFAULT is handled. After clarifying the kernel
+>>> interface we decided that EFAULT shall be mapped to unit exception.
+>>> Same goes for unexpected error codes.
+>>>
+>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>>> ---
+>>>
+>>> AFAIR we decided in the previous round to rather do transformation
+>>> and fixing in one patch than touch stuff twice. Hence this patch
+>>> ain't pure transformation any more.
+>>> ---
+>>>  hw/s390x/css.c              | 83 +++++++++++++--------------------------------
+>>>  hw/s390x/s390-ccw.c         | 11 +++---
+>>>  hw/vfio/ccw.c               | 30 ++++++++++++----
+>>>  include/hw/s390x/css.h      | 24 +++++++++----
+>>>  include/hw/s390x/s390-ccw.h |  2 +-
+>>>  target/s390x/ioinst.c       | 53 ++++-------------------------
+>>>  6 files changed, 77 insertions(+), 126 deletions(-)
+>>
+>> After browsing through this patch, I think the change will work just as
+>> well if you use e.g. #defines instead of the structure, won't it?
+>>
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Sure. We just loose type safety. For example if someone ever should try to
+> propagate a normal errno via return do_something() the compiler won't
+> catch it we effectively use int for both.
+> 
+>
+
+@Connie: Discussion seems to have died down quite a bit, and besides
+of the struct vs enum vs int and the point of Dong Jia I've seen no
+complaints.
+
+I would like to do a re-spin to accommodate the complaints, but before
+I abandon the IOInstEnding struct I would like to confirm, that this
+patch, and it's behavioral changes are OK. I would hate to do the dance
+backwards, because in the next iteration it turns out that we want to
+keep the "program_interrupt(env, PGM_ADDRESSING, 4);". Could you please
+pass your judgment on this patch (assuming I fix the issues found by
+Dong Jia)?
+
+Regards,
+Halil
