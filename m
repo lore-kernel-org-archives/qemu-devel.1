@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e2j4M-0001Wq-2I
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:22:59 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e2jCB-0003p3-9z
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:31:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e2j4J-0000tA-Ce
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:22:58 -0400
-Resent-Message-Id: <E1e2j4J-0000tA-Ce@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21452)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1e2j4J-0000sE-3g
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:22:55 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150783522220.294.9273927523316867120@b58463cdfd5f>
-In-Reply-To: <20171012143548.18581-1-pbonzini@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1e2jC8-0006Hn-7T
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:31:03 -0400
+Received: from mail-pf0-x235.google.com ([2607:f8b0:400e:c00::235]:45752)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e2jC7-0006HS-UL
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:31:00 -0400
+Received: by mail-pf0-x235.google.com with SMTP id d28so6310998pfe.2
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 12:30:59 -0700 (PDT)
+References: <20171012143548.18581-1-pbonzini@redhat.com>
+	<20171012143548.18581-3-pbonzini@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <449dd7e8-42cd-fd4a-da2b-35f22552bc39@linaro.org>
+Date: Thu, 12 Oct 2017 12:30:55 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 12 Oct 2017 12:07:02 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/2] target/i386: trap on instructions
+In-Reply-To: <20171012143548.18581-3-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] target/i386: trap on instructions
  longer than >15 bytes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,36 +32,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, richard.henderson@linaro.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcxMDEyMTQzNTQ4LjE4NTgxLTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvMl0gdGFyZ2V0L2kzODY6IHRyYXAgb24gaW5zdHJ1
-Y3Rpb25zIGxvbmdlciB0aGFuID4xNSBieXRlcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
-IS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNF
-Li4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0
-IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBs
-b2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8K
-ICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3Jt
-YXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2Ny
-aXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAg
-ICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBU
-RVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0
-NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNGU0OTU1MTA3MiB0
-YXJnZXQvaTM4NjogdHJhcCBvbiBpbnN0cnVjdGlvbnMgbG9uZ2VyIHRoYW4gPjE1IGJ5dGVzCjc0
-MjAyYTdhZWYgdGFyZ2V0L2kzODY6IGludHJvZHVjZSB4ODZfbGQqX2NvZGUKCj09PSBPVVRQVVQg
-QkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjogdGFyZ2V0L2kzODY6IGludHJvZHVjZSB4ODZf
-bGQqX2NvZGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8yOiB0YXJnZXQvaTM4NjogdHJhcCBvbiBpbnN0
-cnVjdGlvbnMgbG9uZ2VyIHRoYW4gPjE1IGJ5dGVzLi4uCkVSUk9SOiBVc2Ugb2Ygdm9sYXRpbGUg
-aXMgdXN1YWxseSB3cm9uZzogc2VlIERvY3VtZW50YXRpb24vdm9sYXRpbGUtY29uc2lkZXJlZC1o
-YXJtZnVsLnR4dAojNjk6IEZJTEU6IHRhcmdldC9pMzg2L3RyYW5zbGF0ZS5jOjE4ODE6CisgICAg
-ICAgICAgICB2b2xhdGlsZSB1aW50OF90IHVudXNlZCA9Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2Fy
-bmluZ3MsIDUzIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6
-IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDov
-L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
-bEBmcmVlbGlzdHMub3Jn
+On 10/12/2017 07:35 AM, Paolo Bonzini wrote:
+> Besides being more correct, arbitrarily long instruction allow the
+> generation of a translation block that spans three pages.  This
+> confuses the generator and even allows ring 3 code to poison the
+> translation block cache and inject code into other processes that are
+> in guest ring 3.
+> 
+> This is an improved (and more invasive) fix for the bug fixed in commit
+> 30663fd ("tcg/i386: Check the size of instruction being translated",
+> 2017-03-24).  In addition to being more precise (and generating the
+> right exception, which is #GP rather than #UD), it distinguishes better
+> between page faults and too long instructions, as shown by this test case:
+> 
+>     #include <sys/mman.h>
+>     #include <string.h>
+>     #include <stdio.h>
+> 
+>     int main()
+>     {
+>             char *x = mmap(NULL, 8192, PROT_READ|PROT_WRITE|PROT_EXEC,
+>                            MAP_PRIVATE|MAP_ANON, -1, 0);
+>             memset(x, 0x66, 4096);
+>             x[4096] = 0x90;
+>             x[4097] = 0xc3;
+>             char *i = x + 4096 - 15;
+>             mprotect(x + 4096, 4096, PROT_READ|PROT_WRITE);
+>             ((void(*)(void)) i) ();
+>     }
+> 
+> ... which produces a #GP without the mprotect, and a #PF with it.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  target/i386/translate.c | 29 ++++++++++++++++++++++-------
+>  1 file changed, 22 insertions(+), 7 deletions(-)
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+> +    if (sigsetjmp(s->jmpbuf, 0) != 0) {
+
+Any particular reason to use sigsetjmp(x, 0) instead of setjmp(x)?
+Certainly there are no signal frames that the longjmp will pass...
+
+
+r~
