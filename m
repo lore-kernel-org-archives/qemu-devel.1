@@ -1,35 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=451d893c3=Paul.Durrant@citrix.com>)
-	id 1e2Zxi-0006Hj-9F
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:39:31 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e2ZyH-0006YW-9C
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:40:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=451d893c3=Paul.Durrant@citrix.com>)
-	id 1e2Zxf-0005MM-6q
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:39:30 -0400
-Received: from smtp.citrix.com.au ([103.14.252.240]:24204)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=451d893c3=Paul.Durrant@citrix.com>)
-	id 1e2Zxe-0005Jy-IL
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:39:27 -0400
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Thu, 12 Oct 2017 09:39:16 +0000
-Message-ID: <0941888f3e184161a54e9c4509a1faab@AMSPEX02CL03.citrite.net>
-References: <1506437019-17946-1-git-send-email-owen.smith@citrix.com>
-	<1506437019-17946-4-git-send-email-owen.smith@citrix.com>
-	<20171002170132.GA2116@perard.uk.xensource.com>
-	<alpine.DEB.2.10.1710101651560.3105@sstabellini-ThinkPad-X260>
-	<20171011154718.GQ1771@perard.uk.xensource.com>
-	<alpine.DEB.2.10.1710111309400.3105@sstabellini-ThinkPad-X260>
-	<e25a3501923944fbad8e3a560c5cf8f3@AMSPEX02CL03.citrite.net>
-	<1507800365.26812.11.camel@redhat.com>
-In-Reply-To: <1507800365.26812.11.camel@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH 3/3 v4] xenfb: Add
- [feature|request]-raw-pointer
+	(envelope-from <imammedo@redhat.com>) id 1e2ZyE-0005pc-70
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:40:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50036)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e2ZyE-0005ol-1F
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:40:02 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 62A0E820F7
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 09:40:00 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Thu, 12 Oct 2017 11:39:58 +0200
+Message-Id: <1507801198-98182-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH] numa: fixup parsed NumaNodeOptions earlier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,35 +27,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Gerd Hoffmann' <kraxel@redhat.com>, 'Stefano Stabellini' <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Owen Smith <owen.smith@citrix.com>
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBHZXJkIEhvZmZtYW5uIFttYWls
-dG86a3JheGVsQHJlZGhhdC5jb21dDQo+IFNlbnQ6IDEyIE9jdG9iZXIgMjAxNyAxMDoyNg0KPiBU
-bzogUGF1bCBEdXJyYW50IDxQYXVsLkR1cnJhbnRAY2l0cml4LmNvbT47ICdTdGVmYW5vIFN0YWJl
-bGxpbmknDQo+IDxzc3RhYmVsbGluaUBrZXJuZWwub3JnPjsgQW50aG9ueSBQZXJhcmQgPGFudGhv
-bnkucGVyYXJkQGNpdHJpeC5jb20+DQo+IENjOiBxZW11LWRldmVsQG5vbmdudS5vcmc7IHhlbi1k
-ZXZlbEBsaXN0cy54ZW5wcm9qZWN0Lm9yZzsgT3dlbiBTbWl0aA0KPiA8b3dlbi5zbWl0aEBjaXRy
-aXguY29tPg0KPiBTdWJqZWN0OiBSZTogW1hlbi1kZXZlbF0gW1BBVENIIDMvMyB2NF0geGVuZmI6
-IEFkZCBbZmVhdHVyZXxyZXF1ZXN0XS1yYXctDQo+IHBvaW50ZXINCj4gDQo+ICAgSGksDQo+IA0K
-PiA+IEl0J3MgcHJvYmFibHkgT1Mgc3BlY2lmaWMgdGhvdWdoLiBJIGd1ZXNzIHRoZSBiZWhhdmlv
-dXIgY2hhbmdlZA0KPiA+IGJlY2F1c2UgdGhlIE9TIGZhdm91cnMgYWJzb2x1dGUgcG9pbnRpbmcg
-ZGV2aWNlcyBvdmVyIHJlbGF0aXZlIG9uZXMNCj4gPiBhbmQgaG93IGl0IGhhcyB0d28gYWJzb2x1
-dGUgb25lcyB0byBjaG9vc2UgZnJvbS4gSG93IGl0IHJlY29uY2lsZXMNCj4gPiB0aG9zZSwgd2hv
-IGtub3dzPw0KPiANCj4gVHlwaWNhbGx5IGhpZCBlbXVsYXRpb24gY2FsbHMgcWVtdV9pbnB1dF9o
-YW5kbGVyX2FjdGl2YXRlKCkgd2hlbiB0aGUNCj4gZ3Vlc3QgaW5pdGlhbGl6ZXMgdGhlIGRldmlj
-ZSwgd2hpY2ggbW92ZXMgdGhlIGRldmljZSB0byB0aGUgdG9wIG9mIHRoZQ0KPiBwcmlvcml0eSBs
-aXN0Lg0KPiANCj4gVmlzaWJsZSBlZmZlY3Qgb24gYSB0eXBpY2FsIGd1ZXN0IHdpdGggcHMvMiBt
-b3VzZSBhbmQgdXNiLXRhYmxldCBpcw0KPiB0aGF0IHFlbXUgc3dpdGNoZXMgZnJvbSByZWxhdGl2
-ZSBtb2RlIChtb3VzZSkgdG8gYWJzb2x1dGUgbW9kZSAodGFibGV0KQ0KPiAgd2hlbiB0aGUgZ3Vl
-c3QgbG9hZHMgdGhlIHVzYiBoaWQgZHJpdmVyLg0KPiANCj4gSSBzdXNwZWN0IHB2bW91c2UgaXMg
-ZG9pbmcgdGhlIHNhbWUgdGhpbmcuICBTbyBpdCBtYXkgc2ltcGx5IGRlcGVuZCBvbg0KPiBndWVz
-dCBkcml2ZXIgbG9hZCBvcmRlciB3aGVuZXZlciBwdm1vdXNlIG9yIHVzYi10YWJsZXQgaXMgdXNl
-ZC4NCj4gDQo+IFNpbXBsZXN0IGZpeCBpcyBwcm9iYWJseSB0byBvbmx5IGF0dGFjaCB0aGUgZGV2
-aWNlIHlvdSBwbGFuIHRvIHVzZSB0bw0KPiB0aGUgZ3Vlc3QuICBJZiB5b3UgY2FuJ3QgdHVybiBv
-ZmYgcHZtb3VzZSBmb3IgeGVuIGd1ZXN0cyB0aGVuIHlvdSBtaWdodA0KPiB3YW50IGRyb3AgdGhl
-IHFlbXVfaW5wdXRfaGFuZGxlcl9hY3RpdmF0ZSgpIGNhbGwsIHNvIGl0IGJlaGF2ZXMgc2ltbGlh
-cg0KPiB0byB0aGUgcHMvMiBtb3VzZSAoaXMgdXNlZCBpbiBjYXNlIG5vIG90aGVyIHBvaW50ZXIg
-ZGV2aWNlIGlzIHByZXNlbnQpLg0KDQpBdm9pZGluZyB0aGUgYWN0aXZhdGUgY2FsbCBzb3VuZHMg
-cmVhc29uYWJsZSBhbmQgc2hvdWxkIGF2b2lkIHRoZSBiZWhhdmlvdXJhbCBjaGFuZ2UuDQoNCkNo
-ZWVycywNCg0KICBQYXVsDQoNCj4gDQo+IEhUSCwNCj4gICBHZXJkDQoNCg==
+numa 'mem' option with suffix or without one is possible
+only on CLI/HMP. Instead of fixing up special suffix less
+CLI case deep in parse_numa_node() do it earlier right
+after option is parsed into NumaNodeOptions with OptVisistor
+so that the rest of the code would use valid values in
+NumaNodeOptions and won't have to reparse QemuOpts.
+
+It will help to isolate CLI/HMP parts in parse_numa() and
+split out parsed NumaNodeOptions processing into separate
+function that could be reused by QMP handler where we have
+only NumaNodeOptions and don't need any fixups.
+
+While at it reuse qemu_strtosz_MiB() instead of manually
+checking for suffixes.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ numa.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/numa.c b/numa.c
+index 17ea514..fb4c35a 100644
+--- a/numa.c
++++ b/numa.c
+@@ -38,6 +38,7 @@
+ #include "hw/mem/pc-dimm.h"
+ #include "qemu/option.h"
+ #include "qemu/config-file.h"
++#include "qemu/cutils.h"
+ 
+ QemuOptsList qemu_numa_opts = {
+     .name = "numa",
+@@ -142,7 +143,7 @@ uint32_t numa_get_node(ram_addr_t addr, Error **errp)
+ }
+ 
+ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+-                            QemuOpts *opts, Error **errp)
++                            Error **errp)
+ {
+     uint16_t nodenr;
+     uint16List *cpus = NULL;
+@@ -199,13 +200,7 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+     }
+ 
+     if (node->has_mem) {
+-        uint64_t mem_size = node->mem;
+-        const char *mem_str = qemu_opt_get(opts, "mem");
+-        /* Fix up legacy suffix-less format */
+-        if (g_ascii_isdigit(mem_str[strlen(mem_str) - 1])) {
+-            mem_size <<= 20;
+-        }
+-        numa_info[nodenr].node_mem = mem_size;
++        numa_info[nodenr].node_mem = node->mem;
+     }
+     if (node->has_memdev) {
+         Object *o;
+@@ -290,9 +285,15 @@ int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
+         goto end;
+     }
+ 
++    /* Fix up legacy suffix-less format */
++    if ((object->type == NUMA_OPTIONS_TYPE_NODE) && object->u.node.has_mem) {
++        const char *mem_str = qemu_opt_get(opts, "mem");
++        qemu_strtosz_MiB(mem_str, NULL, &object->u.node.mem);
++    }
++
+     switch (object->type) {
+     case NUMA_OPTIONS_TYPE_NODE:
+-        parse_numa_node(ms, &object->u.node, opts, &err);
++        parse_numa_node(ms, &object->u.node, &err);
+         if (err) {
+             goto end;
+         }
+-- 
+2.7.4
