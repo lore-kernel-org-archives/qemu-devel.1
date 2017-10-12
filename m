@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2lwy-0004Ya-Op
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 18:27:33 -0400
+	(envelope-from <riel@redhat.com>) id 1e2lx8-0004eL-6z
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 18:27:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2lwx-0001Sf-MJ
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 18:27:32 -0400
-References: <20171012095319.136610-1-vsementsov@virtuozzo.com>
-	<20171012095319.136610-8-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f0852a65-aacc-6bc2-1b48-cf9ed197e361@redhat.com>
-Date: Thu, 12 Oct 2017 17:27:22 -0500
-MIME-Version: 1.0
-In-Reply-To: <20171012095319.136610-8-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="AqoSprlhwb8XbHUNPuogTriAHWU37ptOS"
-Subject: Re: [Qemu-devel] [PATCH v3 07/13] nbd-server: simplify reply
- transmission
+	(envelope-from <riel@redhat.com>) id 1e2lx5-0001Vj-3w
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 18:27:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44214)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <riel@redhat.com>) id 1e2lx4-0001Uz-Rx
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 18:27:39 -0400
+Message-ID: <1507847249.21121.207.camel@redhat.com>
+From: Rik van Riel <riel@redhat.com>
+Date: Thu, 12 Oct 2017 18:27:29 -0400
+In-Reply-To: <1363955128.19944709.1507846719987.JavaMail.zimbra@redhat.com>
+References: <20171012155027.3277-1-pagupta@redhat.com>
+	<20171012155027.3277-3-pagupta@redhat.com>
+	<CAPcyv4i7k6aYK_y4zZtL6p8sW-E_Ft58d2HuxO=dYciqQxaoLg@mail.gmail.com>
+	<1567317495.19940236.1507843517318.JavaMail.zimbra@redhat.com>
+	<CAPcyv4gkri7t+3Unf0sc9AHMnz-v9G_qV_bJppLjUUNAn7drrQ@mail.gmail.com>
+	<1363955128.19944709.1507846719987.JavaMail.zimbra@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 2/2] KVM: add virtio-pmem driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,118 +31,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Pankaj Gupta <pagupta@redhat.com>, Dan Williams <dan.j.williams@intel.com>
+Cc: linux-kernel@vger.kernel.org, KVM list <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-nvdimm <linux-nvdimm@ml01.01.org>, Linux MM <linux-mm@kvack.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Nitesh Narayan Lal <nilal@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Ross Zwisler <ross.zwisler@intel.com>, David Hildenbrand <david@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AqoSprlhwb8XbHUNPuogTriAHWU37ptOS
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
-Message-ID: <f0852a65-aacc-6bc2-1b48-cf9ed197e361@redhat.com>
-Subject: Re: [PATCH v3 07/13] nbd-server: simplify reply transmission
-References: <20171012095319.136610-1-vsementsov@virtuozzo.com>
- <20171012095319.136610-8-vsementsov@virtuozzo.com>
-In-Reply-To: <20171012095319.136610-8-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, 2017-10-12 at 18:18 -0400, Pankaj Gupta wrote:
+> >=20
+> > On Thu, Oct 12, 2017 at 2:25 PM, Pankaj Gupta <pagupta@redhat.com>
+> > wrote:
+> > >=20
+> > > > > =C2=A0 This patch adds virtio-pmem driver for KVM guest.
+> > > > > =C2=A0 Guest reads the persistent memory range information
+> > > > > =C2=A0 over virtio bus from Qemu and reserves the range
+> > > > > =C2=A0 as persistent memory. Guest also allocates a block
+> > > > > =C2=A0 device corresponding to the pmem range which later
+> > > > > =C2=A0 can be accessed with DAX compatible file systems.
+> > > > > =C2=A0 Idea is to use the virtio channel between guest and
+> > > > > =C2=A0 host to perform the block device flush for guest pmem
+> > > > > =C2=A0 DAX device.
+> > > > >=20
+> > > > > =C2=A0 There is work to do including DAX file system support
+> > > > > =C2=A0 and other advanced features.
+> > > > >=20
+> > > > > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > > > > ---
+> > > > > =C2=A0drivers/virtio/Kconfig=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|=C2=A0=C2=A010 ++
+> > > > > =C2=A0drivers/virtio/Makefile=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0|=C2=A0=C2=A0=C2=A01 +
+> > > > > =C2=A0drivers/virtio/virtio_pmem.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+| 322
+> > > > > =C2=A0+++++++++++++++++++++++++++++++++++++++
+> > > > > =C2=A0include/uapi/linux/virtio_pmem.h |=C2=A0=C2=A055 +++++++
+> > > > > =C2=A04 files changed, 388 insertions(+)
+> > > > > =C2=A0create mode 100644 drivers/virtio/virtio_pmem.c
+> > > > > =C2=A0create mode 100644 include/uapi/linux/virtio_pmem.h
+> > > > >=20
+> > > > > diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
+> > > > > index cff773f15b7e..0192c4bda54b 100644
+> > > > > --- a/drivers/virtio/Kconfig
+> > > > > +++ b/drivers/virtio/Kconfig
+> > > > > @@ -38,6 +38,16 @@ config VIRTIO_PCI_LEGACY
+> > > > >=20
+> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0If =
+unsure, say Y.
+> > > > >=20
+> > > > > +config VIRTIO_PMEM
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tristate "Virtio pme=
+m driver"
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0depends on VIRTIO
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0---help---
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0This driver ad=
+ds persistent memory range within a
+> > > > > KVM guest.
 
-On 10/12/2017 04:53 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Send qiov via qio_channel_writev_all instead of calling nbd_write twice=
+With "Virtio Block Backed Pmem" we could name the config
+option VIRTIO_BLOCK_PMEM
 
-> with a cork.
+The documentation text could make it clear to people that the
+image shows up as a disk image on the host, but as a pmem
+memory range in the guest.
+
+> > > > I think we need to call this something other than persistent
+> > > > memory to
+> > > > make it clear that this not memory where the persistence can be
+> > > > managed from userspace. The persistence point always requires
+> > > >=20
+> > So currently /proc/iomem in a guest with a pmem device attached to
+> > a
+> > namespace looks like this:
+> >=20
+> > =C2=A0=C2=A0=C2=A0=C2=A0c00000000-13bfffffff : Persistent Memory
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0c00000000-13bfffffff : name=
+space2.0
+> >=20
+> > Can we call it "Virtio Shared Memory" to make it clear it is a
+> > different beast than typical "Persistent Memory"?=C2=A0=C2=A0You can =
+likely
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  nbd/server.c | 50 ++++++++++++++++++++++++--------------------------
->  1 file changed, 24 insertions(+), 26 deletions(-)
->=20
+> I think somewhere we need persistent keyword 'Virtio Persistent
+> Memory' or=C2=A0
+> so.
 
-> @@ -1203,36 +1220,17 @@ static int nbd_co_send_simple_reply(NBDClient *=
-client,
->                                      size_t len,
->                                      Error **errp)
->  {
-> -    NBDSimpleReply simple_reply;
-> -    int ret;
-> -
-> -    g_assert(qemu_in_coroutine());
-> +    NBDSimpleReply reply;
-
-Why the rename from simple_reply to reply?
-
-> +    struct iovec iov[] =3D {
-> +        {.iov_base =3D &reply, .iov_len =3D sizeof(reply)},
-
-I guess it made this line shorter.  But we could reduce some churn by
-naming it 'reply' in the first place, back in earlier patches.  At the
-same time, I'm not going to bother if there's not a reason to respin the
-series (or at least the first half).
-
-> +        {.iov_base =3D data, .iov_len =3D len}
-> +    };
-> =20
->      trace_nbd_co_send_simple_reply(handle, error, len);
-> =20
-> -    set_be_simple_reply(&simple_reply, system_errno_to_nbd_errno(error=
-),
-> -                        handle);
-> -
-> -    qemu_co_mutex_lock(&client->send_lock);
-> -    client->send_coroutine =3D qemu_coroutine_self();
-> -
-> -    if (!len) {
-> -        ret =3D nbd_write(client->ioc, &simple_reply, sizeof(simple_re=
-ply), NULL);
-> -    } else {
-> -        qio_channel_set_cork(client->ioc, true);
-> -        ret =3D nbd_write(client->ioc, &simple_reply, sizeof(simple_re=
-ply), NULL);
-> -        if (ret =3D=3D 0) {
-> -            ret =3D nbd_write(client->ioc, data, len, errp);
-> -            if (ret < 0) {
-> -                ret =3D -EIO;
-> -            }
-> -        }
-> -        qio_channel_set_cork(client->ioc, false);
-> -    }
-> +    set_be_simple_reply(&reply, system_errno_to_nbd_errno(error), hand=
-le);
-> =20
-> -    client->send_coroutine =3D NULL;
-> -    qemu_co_mutex_unlock(&client->send_lock);
-> -    return ret;
-> +    return nbd_co_send_iov(client, iov, len ? 2 : 1, errp);
-
-This part is definitely nicer!  Thanks for splitting the v2 patch, it
-made review a lot more pleasant.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---AqoSprlhwb8XbHUNPuogTriAHWU37ptOS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnf7EoACgkQp6FrSiUn
-Q2rvWwf+PtpuGewWkMBq57S/Svohy5MXYtUDt586+eBOasbeN97PUg4I8Jk8X370
-ypzOXvlc91OCgT6v5SgaTFFhz90kbVVHCKYtVsOC+wJsReCrEohrr6f2y/vLfiz9
-fFXqmh3vn6BBLwpKgHX+Pyq5L10smcJ7QnwPRbj+FPiKF89EC2Iptwiv8f7Jy9iA
-W3e0tkv3xBjTYUguZUCBvcWj/4pK3Gu/PNdhhuol3sA1JkGQEYR0mvrs5/+JjfY6
-9h51D17+cDvsm8den1fh4oWi38aJnTDkoh8vl1D8iB7UcM6VRfDZZl61/nOnrQM+
-LTsJ4SNmVTY5p6Dd1EWoDxw0qVdh4A==
-=aUiH
------END PGP SIGNATURE-----
-
---AqoSprlhwb8XbHUNPuogTriAHWU37ptOS--
+Still hoping for better ideas than "Virtio Block Backed Pmem" :)
