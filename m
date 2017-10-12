@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e2Zkr-0008UL-PP
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:26:14 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1e2Zlf-0000o8-AS
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:27:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e2Zko-0003uJ-1M
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:26:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37072)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e2Zkn-0003sZ-Qv
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:26:09 -0400
-Message-ID: <1507800365.26812.11.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 12 Oct 2017 11:26:05 +0200
-In-Reply-To: <e25a3501923944fbad8e3a560c5cf8f3@AMSPEX02CL03.citrite.net>
-References: <1506437019-17946-1-git-send-email-owen.smith@citrix.com>
-	<1506437019-17946-4-git-send-email-owen.smith@citrix.com>
-	<20171002170132.GA2116@perard.uk.xensource.com>
-	<alpine.DEB.2.10.1710101651560.3105@sstabellini-ThinkPad-X260>
-	<20171011154718.GQ1771@perard.uk.xensource.com>
-	<alpine.DEB.2.10.1710111309400.3105@sstabellini-ThinkPad-X260>
-	<e25a3501923944fbad8e3a560c5cf8f3@AMSPEX02CL03.citrite.net>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1e2Zle-0004eG-L1
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:27:03 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:34398)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1e2Zle-0004be-G1
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:27:02 -0400
+Received: by mail-oi0-x241.google.com with SMTP id h200so2187987oib.1
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 02:27:01 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20171012064448.20276-1-chen_han_xiao@126.com>
+References: <20171012064448.20276-1-chen_han_xiao@126.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 12 Oct 2017 11:26:59 +0200
+Message-ID: <CAJ+F1C+sj6o-XrYvT_MjEy3_tpM7zhZYm4cjBfUY0r1uPK2R9g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH 3/3 v4] xenfb: Add
- [feature|request]-raw-pointer
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qapi-docs: fix a comment typo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,31 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>, 'Stefano Stabellini' <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Owen Smith <owen.smith@citrix.com>
+To: Chen Hanxiao <chen_han_xiao@126.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU <qemu-devel@nongnu.org>
 
-  Hi,
+On Thu, Oct 12, 2017 at 8:44 AM, Chen Hanxiao <chen_han_xiao@126.com> wrote=
+:
+> From: Chen Hanxiao <chenhanxiao@gmail.com>
+>
+>   s/Subection/Subsection
+>
+> Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
 
-> It's probably OS specific though. I guess the behaviour changed
-> because the OS favours absolute pointing devices over relative ones
-> and how it has two absolute ones to choose from. How it reconciles
-> those, who knows?
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Typically hid emulation calls qemu_input_handler_activate() when the
-guest initializes the device, which moves the device to the top of the
-priority list.
 
-Visible effect on a typical guest with ps/2 mouse and usb-tablet is
-that qemu switches from relative mode (mouse) to absolute mode (tablet)
- when the guest loads the usb hid driver.
 
-I suspect pvmouse is doing the same thing.  So it may simply depend on
-guest driver load order whenever pvmouse or usb-tablet is used.
+> ---
+>  docs/devel/qapi-code-gen.txt | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+> index f04c63fe82..06ab699066 100644
+> --- a/docs/devel/qapi-code-gen.txt
+> +++ b/docs/devel/qapi-code-gen.txt
+> @@ -63,7 +63,7 @@ Comment text starting with '=3D' is a section title:
+>
+>  Double the '=3D' for a subsection title:
+>
+> -    # =3D=3D Subection title
+> +    # =3D=3D Subsection title
+>
+>  '|' denotes examples:
+>
+> --
+> 2.13.5
+>
+>
 
-Simplest fix is probably to only attach the device you plan to use to
-the guest.  If you can't turn off pvmouse for xen guests then you might
-want drop the qemu_input_handler_activate() call, so it behaves simliar
-to the ps/2 mouse (is used in case no other pointer device is present).
 
-HTH,
-  Gerd
+
+--=20
+Marc-Andr=C3=A9 Lureau
