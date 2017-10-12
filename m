@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2UTQ-0002d2-J0
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 23:47:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1e2UTX-0002jf-5C
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 23:48:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2UTP-0007O4-N0
-	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 23:47:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1e2UTU-0007U1-Ko
+	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 23:47:59 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 11 Oct 2017 22:47:02 -0500
-Message-Id: <20171012034720.11947-7-eblake@redhat.com>
+Date: Wed, 11 Oct 2017 22:47:05 -0500
+Message-Id: <20171012034720.11947-10-eblake@redhat.com>
 In-Reply-To: <20171012034720.11947-1-eblake@redhat.com>
 References: <20171012034720.11947-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 06/24] qemu-img: Switch get_block_status()
- to byte-based
+Subject: [Qemu-devel] [PATCH v6 09/24] block: Switch
+ BdrvCoGetBlockStatusData to byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,86 +21,121 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
 We are gradually converting to byte-based interfaces, as they are
-easier to reason about than sector-based.  Continue by converting
-an internal function (no semantic change), and simplifying its
-caller accordingly.
+easier to reason about than sector-based.  Convert another internal
+type (no semantic change), and rename it to match the corresponding
+public function rename.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 
 ---
-v2-v5: no change
+v6: fix -O2 compilation [Jeff], rebase to split return interface
+change [Kevin], drop R-b
+v4-v5: no change
+v3: rebase to context conflicts, simple enough to keep R-b
+v2: rebase to earlier changes
 ---
- qemu-img.c | 24 +++++++++++-------------
- 1 file changed, 11 insertions(+), 13 deletions(-)
+ block/io.c | 56 ++++++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 38 insertions(+), 18 deletions(-)
 
-diff --git a/qemu-img.c b/qemu-img.c
-index e9c7b30c91..af3effdec5 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -2671,14 +2671,16 @@ static void dump_map_entry(OutputFormat output_format, MapEntry *e,
-     }
+diff --git a/block/io.c b/block/io.c
+index 5805929ef0..da600a8dc3 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1745,17 +1745,18 @@ int bdrv_flush_all(void)
  }
 
--static int get_block_status(BlockDriverState *bs, int64_t sector_num,
--                            int nb_sectors, MapEntry *e)
-+static int get_block_status(BlockDriverState *bs, int64_t offset,
-+                            int64_t bytes, MapEntry *e)
+
+-typedef struct BdrvCoGetBlockStatusData {
++typedef struct BdrvCoBlockStatusData {
+     BlockDriverState *bs;
+     BlockDriverState *base;
+     bool want_zero;
+-    int64_t sector_num;
+-    int nb_sectors;
+-    int *pnum;
++    int64_t offset;
++    int64_t bytes;
++    int64_t *pnum;
++    int64_t *map;
+     BlockDriverState **file;
+-    int64_t ret;
++    int ret;
+     bool done;
+-} BdrvCoGetBlockStatusData;
++} BdrvCoBlockStatusData;
+
+ int64_t coroutine_fn bdrv_co_get_block_status_from_file(BlockDriverState *bs,
+                                                         int64_t sector_num,
+@@ -2005,14 +2006,24 @@ static int64_t coroutine_fn bdrv_co_get_block_status_above(BlockDriverState *bs,
+ /* Coroutine wrapper for bdrv_get_block_status_above() */
+ static void coroutine_fn bdrv_get_block_status_above_co_entry(void *opaque)
  {
-     int64_t ret;
-     int depth;
-     BlockDriverState *file;
-     bool has_offset;
-+    int nb_sectors = bytes >> BDRV_SECTOR_BITS;
+-    BdrvCoGetBlockStatusData *data = opaque;
++    BdrvCoBlockStatusData *data = opaque;
++    int n = 0;
++    int64_t ret;
 
-+    assert(bytes < INT_MAX);
-     /* As an optimization, we could cache the current range of unallocated
-      * clusters in each file of the chain, and avoid querying the same
-      * range repeatedly.
-@@ -2686,8 +2688,8 @@ static int get_block_status(BlockDriverState *bs, int64_t sector_num,
+-    data->ret = bdrv_co_get_block_status_above(data->bs, data->base,
+-                                               data->want_zero,
+-                                               data->sector_num,
+-                                               data->nb_sectors,
+-                                               data->pnum,
+-                                               data->file);
++    ret = bdrv_co_get_block_status_above(data->bs, data->base,
++                                         data->want_zero,
++                                         data->offset >> BDRV_SECTOR_BITS,
++                                         data->bytes >> BDRV_SECTOR_BITS,
++                                         &n,
++                                         data->file);
++    if (ret < 0) {
++        assert(INT_MIN <= ret);
++        data->ret = ret;
++    } else {
++        *data->pnum = n * BDRV_SECTOR_SIZE;
++        *data->map = ret & BDRV_BLOCK_OFFSET_MASK;
++        data->ret = ret & ~BDRV_BLOCK_OFFSET_MASK;
++    }
+     data->done = true;
+ }
 
-     depth = 0;
-     for (;;) {
--        ret = bdrv_get_block_status(bs, sector_num, nb_sectors, &nb_sectors,
--                                    &file);
-+        ret = bdrv_get_block_status(bs, offset >> BDRV_SECTOR_BITS, nb_sectors,
-+                                    &nb_sectors, &file);
-         if (ret < 0) {
-             return ret;
-         }
-@@ -2707,7 +2709,7 @@ static int get_block_status(BlockDriverState *bs, int64_t sector_num,
-     has_offset = !!(ret & BDRV_BLOCK_OFFSET_VALID);
+@@ -2029,13 +2040,16 @@ static int64_t bdrv_common_block_status_above(BlockDriverState *bs,
+                                               BlockDriverState **file)
+ {
+     Coroutine *co;
+-    BdrvCoGetBlockStatusData data = {
++    int64_t n;
++    int64_t map;
++    BdrvCoBlockStatusData data = {
+         .bs = bs,
+         .base = base,
+         .want_zero = want_zero,
+-        .sector_num = sector_num,
+-        .nb_sectors = nb_sectors,
+-        .pnum = pnum,
++        .offset = sector_num * BDRV_SECTOR_SIZE,
++        .bytes = nb_sectors * BDRV_SECTOR_SIZE,
++        .pnum = &n,
++        .map = &map,
+         .file = file,
+         .done = false,
+     };
+@@ -2049,7 +2063,13 @@ static int64_t bdrv_common_block_status_above(BlockDriverState *bs,
+         bdrv_coroutine_enter(bs, co);
+         BDRV_POLL_WHILE(bs, !data.done);
+     }
+-    return data.ret;
++    if (data.ret < 0) {
++        *pnum = 0;
++        return data.ret;
++    }
++    assert(QEMU_IS_ALIGNED(n | map, BDRV_SECTOR_SIZE));
++    *pnum = n >> BDRV_SECTOR_BITS;
++    return data.ret | map;
+ }
 
-     *e = (MapEntry) {
--        .start = sector_num * BDRV_SECTOR_SIZE,
-+        .start = offset,
-         .length = nb_sectors * BDRV_SECTOR_SIZE,
-         .data = !!(ret & BDRV_BLOCK_DATA),
-         .zero = !!(ret & BDRV_BLOCK_ZERO),
-@@ -2837,16 +2839,12 @@ static int img_map(int argc, char **argv)
-
-     length = blk_getlength(blk);
-     while (curr.start + curr.length < length) {
--        int64_t nsectors_left;
--        int64_t sector_num;
--        int n;
--
--        sector_num = (curr.start + curr.length) >> BDRV_SECTOR_BITS;
-+        int64_t offset = curr.start + curr.length;
-+        int64_t n;
-
-         /* Probe up to 1 GiB at a time.  */
--        nsectors_left = DIV_ROUND_UP(length, BDRV_SECTOR_SIZE) - sector_num;
--        n = MIN(1 << (30 - BDRV_SECTOR_BITS), nsectors_left);
--        ret = get_block_status(bs, sector_num, n, &next);
-+        n = QEMU_ALIGN_DOWN(MIN(1 << 30, length - offset), BDRV_SECTOR_SIZE);
-+        ret = get_block_status(bs, offset, n, &next);
-
-         if (ret < 0) {
-             error_report("Could not read file metadata: %s", strerror(-ret));
+ int64_t bdrv_get_block_status_above(BlockDriverState *bs,
 -- 
 2.13.6
