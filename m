@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e2fik-0001TI-MT
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:48:27 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1e2fjX-0001ry-US
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:49:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e2fig-0007Sc-Mp
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:48:26 -0400
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu, 12 Oct 2017 17:48:19 +0200
-Message-Id: <1507823299-270245-1-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1507578671-158758-15-git-send-email-imammedo@redhat.com>
-References: <1507578671-158758-15-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 14/24] fixup! ppc: spapr: use cpu type name
- directly
+	(envelope-from <pm215@archaic.org.uk>) id 1e2fjX-00089i-5f
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:49:15 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37892)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1e2fjW-00088O-Uv
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:49:15 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Oct 2017 16:30:45 +0100
+Message-Id: <1507822245-15748-3-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1507822245-15748-1-git-send-email-peter.maydell@linaro.org>
+References: <1507822245-15748-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 2/2] linux-user: Fix
+ TARGET_MTIOCTOP/MTIOCGET/MTIOCPOS values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,50 +26,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, agraf@suse.de, david@gibson.dropbear.id.au, groug@kaod.org
+Cc: patches@linaro.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, pgndev <pgnet.dev@gmail.com>
 
-follow up commit that registers host-spapr-cpu-core type unconditionally
- "ppc: spapr: register 'host' core type  along with the rest of core types"
+The TARGET_MTIOCTOP/TARGET_MTIOCGET/TARGET_MTIOCPOS values
+were being defined in terms of host struct types, but
+these structures are such that their size might differ
+on different hosts. Switch to using a target struct
+definition instead.
 
-makes 'non' machine crash
- ppc64-softmmu/qemu-system-ppc64 -M none -device host-spapr-cpu-core
- ERROR:qom/object.c:217:object_type_get_instance_size: assertion failed: (type != NULL)
- Aborted
-
-before it qemu fails cleanly with
- ppc64-softmmu/qemu-system-ppc64 -M none -device host-spapr-cpu-core
- qemu-system-ppc64: -device host-spapr-cpu-core: 'host-spapr-cpu-core' is not a valid device model name
-
-spapr_cpu_core_realize() already has explicit check for pseries machine,
-so move access to host cpu type after it so 'none' machine would fail
-cleanly as expected.
-
-Reported-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/ppc/spapr_cpu_core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ linux-user/syscall_defs.h | 31 ++++++++++++++++++++++++++++---
+ 1 file changed, 28 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index b5bbb6a..7dbf9c3 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -151,7 +151,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-     sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
-     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
-     CPUCore *cc = CPU_CORE(OBJECT(dev));
--    size_t size = object_type_get_instance_size(scc->cpu_type);
-+    size_t size;
-     Error *local_err = NULL;
-     void *obj;
-     int i, j;
-@@ -162,6 +162,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-         return;
-     }
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index f7cc9f9..16d56fa 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -2706,9 +2706,34 @@ struct target_f_owner_ex {
+ #define TARGET_VFAT_IOCTL_READDIR_BOTH    TARGET_IORU('r', 1)
+ #define TARGET_VFAT_IOCTL_READDIR_SHORT   TARGET_IORU('r', 2)
  
-+    size = object_type_get_instance_size(scc->cpu_type);
-     sc->threads = g_malloc0(size * cc->nr_threads);
-     for (i = 0; i < cc->nr_threads; i++) {
-         char id[32];
+-#define TARGET_MTIOCTOP        TARGET_IOW('m', 1, struct mtop)
+-#define TARGET_MTIOCGET        TARGET_IOR('m', 2, struct mtget)
+-#define TARGET_MTIOCPOS        TARGET_IOR('m', 3, struct mtpos)
++struct target_mtop {
++    abi_short mt_op;
++    abi_int mt_count;
++};
++
++#if defined(TARGET_SPARC) || defined(TARGET_MIPS)
++typedef abi_long target_kernel_daddr_t;
++#else
++typedef abi_int target_kernel_daddr_t;
++#endif
++
++struct target_mtget {
++    abi_long mt_type;
++    abi_long mt_resid;
++    abi_long mt_dsreg;
++    abi_long mt_gstat;
++    abi_long mt_erreg;
++    target_kernel_daddr_t mt_fileno;
++    target_kernel_daddr_t mt_blkno;
++};
++
++struct target_mtpos {
++    abi_long mt_blkno;
++};
++
++#define TARGET_MTIOCTOP        TARGET_IOW('m', 1, struct target_mtop)
++#define TARGET_MTIOCGET        TARGET_IOR('m', 2, struct target_mtget)
++#define TARGET_MTIOCPOS        TARGET_IOR('m', 3, struct target_mtpos)
+ 
+ struct target_sysinfo {
+     abi_long uptime;                /* Seconds since boot */
 -- 
 2.7.4
