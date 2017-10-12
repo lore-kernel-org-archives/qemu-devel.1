@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1e2ZoG-0002PG-KZ
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:29:46 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e2Zp2-00035k-71
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:30:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1e2ZoD-0006Sh-7L
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:29:44 -0400
-Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:43082)
+	(envelope-from <kraxel@redhat.com>) id 1e2Zoz-000767-3v
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:30:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40788)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1e2ZoC-0006S1-US
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:29:41 -0400
-Received: from player796.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 93594B7345
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 11:29:39 +0200 (CEST)
-References: <20171009154930.29095-1-clg@kaod.org>
-	<20171009154930.29095-3-clg@kaod.org>
-	<20171011064558.GF10496@umbus.fritz.box>
-	<db641944-075c-64aa-74e7-d552f65644ec@kaod.org>
-	<20171011224623.GB28032@umbus.fritz.box>
-	<821e06fc-a1b6-104a-474c-31e95ad59dd2@kaod.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <95884cbe-49fe-9290-d27a-640083207e74@kaod.org>
-Date: Thu, 12 Oct 2017 11:29:35 +0200
-MIME-Version: 1.0
-In-Reply-To: <821e06fc-a1b6-104a-474c-31e95ad59dd2@kaod.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e2Zoy-00075j-Uf
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:30:29 -0400
+Message-ID: <1507800626.26812.13.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 12 Oct 2017 11:30:26 +0200
+In-Reply-To: <20171012082456.GB16125@redhat.com>
+References: <20171011083604.11820-1-kraxel@redhat.com>
+	<CAFEAcA9uXw7XYOBu9cKY+B=OWNbS=cRp7BKcXacLTaRLx9RWdA@mail.gmail.com>
+	<20171011154951.GA6163@redhat.com>
+	<CAFEAcA8OZALycKmsrC=MrftfF0YytXzRxGrzbetmSvddfTVf1g@mail.gmail.com>
+	<20171012082456.GB16125@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] spapr/rtas: disable the decrementer
- interrupt when a CPU is unplugged
+Subject: Re: [Qemu-devel] [PULL 00/10] Ui 20171011 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,223 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 10/12/2017 11:25 AM, C=E9dric Le Goater wrote:
-> On 10/12/2017 12:46 AM, David Gibson wrote:
->> On Wed, Oct 11, 2017 at 01:55:20PM +0200, C=E9dric Le Goater wrote:
->>> On 10/11/2017 08:45 AM, David Gibson wrote:
->>>> On Mon, Oct 09, 2017 at 05:49:28PM +0200, C=E9dric Le Goater wrote:
->>>>> When a CPU is stopped with the 'stop-self' RTAS call, its state
->>>>> 'halted' is switched to 1 and, in this case, the MSR is not taken i=
-nto
->>>>> account anymore in the cpu_has_work() routine. Only the pending
->>>>> hardware interrupts are checked with their LPCR:PECE* enablement bi=
-t.
->>>>>
->>>>> If the DECR timer fires after 'stop-self' is called and before the =
-CPU
->>>>> 'stop' state is reached, the nearly-dead CPU will have some work to=
- do
->>>>> and the guest will crash. This case happens very frequently with th=
-e
->>>>> not yet upstream P9 XIVE exploitation mode. In XICS mode, the DECR =
-is
->>>>> occasionally fired but after 'stop' state, so no work is to be done
->>>>> and the guest survives.
->>>>>
->>>>> I suspect there is a race between the QEMU mainloop triggering the
->>>>> timers and the TCG CPU thread but I could not quite identify the ro=
-ot
->>>>> cause. To be safe, let's disable the decrementer interrupt in the L=
-PCR
->>>>> when the CPU is halted and reenable it when the CPU is restarted.
->>>>>
->>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->>>>> ---
->>>>>
->>>>> Changes in v2:
->>>>>
->>>>>  - used a new routine ppc_cpu_pvr_match() to discriminate CPU versi=
-ons
->>>>>  - removed the LPCR:PECE* enablement bit when the CPU is initialize=
-d
->>>>>    if it is a secondary
->>>>>
->>>>>  hw/ppc/spapr_rtas.c         | 20 ++++++++++++++++++++
->>>>>  target/ppc/translate_init.c | 19 +++++++++++++++++--
->>>>>  2 files changed, 37 insertions(+), 2 deletions(-)
->>>>>
->>>>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
->>>>> index cdf0b607a0a0..dfdbf1e2c6f8 100644
->>>>> --- a/hw/ppc/spapr_rtas.c
->>>>> +++ b/hw/ppc/spapr_rtas.c
->>>>> @@ -46,6 +46,7 @@
->>>>>  #include "qemu/cutils.h"
->>>>>  #include "trace.h"
->>>>>  #include "hw/ppc/fdt.h"
->>>>> +#include "target/ppc/cpu-models.h"
->>>>> =20
->>>>>  static void rtas_display_character(PowerPCCPU *cpu, sPAPRMachineSt=
-ate *spapr,
->>>>>                                     uint32_t token, uint32_t nargs,
->>>>> @@ -174,6 +175,15 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, s=
-PAPRMachineState *spapr,
->>>>>          kvm_cpu_synchronize_state(cs);
->>>>> =20
->>>>>          env->msr =3D (1ULL << MSR_SF) | (1ULL << MSR_ME);
->>>>> +
->>>>> +        /* Enable DECR interrupt */
->>>>> +        if (ppc_cpu_pvr_match(cpu, CPU_POWERPC_LOGICAL_3_00)) {
->>>>
->>>> Sorry, I didn't reply to your earlier mail in time.  Going via the P=
-VR
->>>> in this way seems bonkers to me - I like it even less than checking
->>>> the mmu type.  After all, classifying a bunch of precise models (PVR=
-s)
->>>> together by behaviour is kind of exactly what the CPU classes are fo=
-r,
->>>> so using object_dynamic_case() (=3D=3Dinstance_of) is a better idea =
-here.
->>>
->>> hmm, and which type should I use ? we don't have any TYPE_POWER9* we=20
->>> could use for a object_dynamic_cast(). I don't think so ? I could use=
-=20
->>> the name and strcmp("power9") probably but it looks ugly.
->>
->> Actually there is, but, yeah, it's a lot less obvious than I thought.
->> It's constructed by the POWERPC_FAILY macro and will be
->> "POWER9-family-powerpc64-cpu"
->>
->>> The only thing we have is "CPU_POWERPC_POWER9_BASE" and it only=20
->>> applicates to PVR.
->>>
->>> May be I don't understand your idea.
->>
->> Urgh, sorry.  This got much muckier than I thought it would be.  I
->> think maybe it's best to go back to the mmu type test, and later on we
->> can fix up both the previously existing test like that, and the new
->> one to something better.
->=20
-> Given that the bits are the same on all processors, why not just use :
+  Hi,
 
-grummf, P7 reserves bits 47 and 48.
+> > $ ./scripts/git-submodule.sh update ui/keycodemapdb dtc
+> > Cloning into 'ui/keycodemapdb'...
+> > fatal: unable to access
+> > 'https://gitlab.com/keycodemap/keycodemapdb.git/': Problem with the
+> > SSL CA cert (path? access rights?)
+> > fatal: clone of 'https://gitlab.com/keycodemap/keycodemapdb.git'
+> > into
+> > submodule path 'ui/keycodemapdb' failed
+>=20
+> I'm not sure what I can do about this one=20
 
-C.
+does gitlab support git:// urls too?
 
+> - if GIT can't checkout
+> a normal git repo, this looks like a OS distro / setup bug on the
+> build host.=C2=A0
 
->     env->spr[SPR_LPCR] |=3D LPCR_PECE_L_MASK;
->=20
-> and
->=20
->     env->spr[SPR_LPCR] &=3D ~LPCR_PECE_L_MASK;
->=20
-> Thanks,
->=20
-> C.=20
->=20
->=20
->>>>> +            env->spr[SPR_LPCR] |=3D LPCR_DEE;
->>>>> +        } else {
->>>>> +            /* P7 and P8 both have same bit for DECR */
->>>>> +            env->spr[SPR_LPCR] |=3D LPCR_P8_PECE3;
->>>>> +        }
->>>>> +
->>>>>          env->nip =3D start;
->>>>>          env->gpr[3] =3D r3;
->>>>>          cs->halted =3D 0;
->>>>
->>>> The other option I'm wondering about here is to actually add a
->>>> "shutdown" (or something) method to the cpu class, which does whatev=
-er
->>>> is necessary to put the vcpu into a quiescent state that won't be
->>>> woken up unless it's specifically requested.
->>>
->>> yes. That is a good idea.=20
->>>
->>> Thanks,
->>>
->>> C.=20
->>>
->>>
->>>>> @@ -210,6 +220,16 @@ static void rtas_stop_self(PowerPCCPU *cpu, sP=
-APRMachineState *spapr,
->>>>>       * no need to bother with specific bits, we just clear it.
->>>>>       */
->>>>>      env->msr =3D 0;
->>>>> +
->>>>> +    /* Don't let the decremeter run on a CPU being stopped. This c=
-ould
->>>>> +     * deliver an interrupt on a dying CPU and crash the guest.
->>>>> +     */
->>>>> +    if (ppc_cpu_pvr_match(cpu, CPU_POWERPC_LOGICAL_3_00)) {
->>>>> +        env->spr[SPR_LPCR] &=3D ~LPCR_DEE;
->>>>> +    } else {
->>>>> +        /* P7 and P8 both have same bit for DECR */
->>>>> +        env->spr[SPR_LPCR] &=3D ~LPCR_P8_PECE3;
->>>>> +    }
->>>>>  }
->>>>> =20
->>>>>  static inline int sysparm_st(target_ulong addr, target_ulong len,
->>>>> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_ini=
-t.c
->>>>> index 0d6379fcc5b4..1a62159843e7 100644
->>>>> --- a/target/ppc/translate_init.c
->>>>> +++ b/target/ppc/translate_init.c
->>>>> @@ -8905,6 +8905,7 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVir=
-tualHypervisor *vhyp)
->>>>>      CPUPPCState *env =3D &cpu->env;
->>>>>      ppc_spr_t *lpcr =3D &env->spr_cb[SPR_LPCR];
->>>>>      ppc_spr_t *amor =3D &env->spr_cb[SPR_AMOR];
->>>>> +    CPUState *cs =3D CPU(cpu);
->>>>> =20
->>>>>      cpu->vhyp =3D vhyp;
->>>>> =20
->>>>> @@ -8946,8 +8947,15 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVi=
-rtualHypervisor *vhyp)
->>>>>          } else {
->>>>>              lpcr->default_value &=3D ~(LPCR_UPRT | LPCR_GTSE);
->>>>>          }
->>>>> -        lpcr->default_value |=3D LPCR_PDEE | LPCR_HDEE | LPCR_EEE =
-| LPCR_DEE |
->>>>> +        lpcr->default_value |=3D LPCR_PDEE | LPCR_HDEE | LPCR_EEE =
-|
->>>>>                                 LPCR_OEE;
->>>>
->>>> But I guess we'd also need a "set_papr" method to go with that.
->>>>
->>>>> +
->>>>> +        /* Only let the decremeter wake up the boot CPU. The RTAS
->>>>> +         * command start-cpu will enable it on secondaries.
->>>>> +         */
->>>>> +        if (cs =3D=3D first_cpu) {
->>>>> +            lpcr->default_value |=3D LPCR_DEE;
->>>>> +        }
->>>>>          break;
->>>>>      default:
->>>>>          /* P7 and P8 has slightly different PECE bits, mostly beca=
-use P8 adds
->>>>> @@ -8955,7 +8963,14 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVi=
-rtualHypervisor *vhyp)
->>>>>           * will work as expected for both implementations
->>>>>           */
->>>>>          lpcr->default_value |=3D LPCR_P8_PECE0 | LPCR_P8_PECE1 | L=
-PCR_P8_PECE2 |
->>>>> -                               LPCR_P8_PECE3 | LPCR_P8_PECE4;
->>>>> +                               LPCR_P8_PECE4;
->>>>> +
->>>>> +        /* Only let the decremeter wake up the boot CPU. The RTAS
->>>>> +         * command start-cpu will enable it on secondaries.
->>>>> +         */
->>>>> +        if (cs =3D=3D first_cpu) {
->>>>> +            lpcr->default_value |=3D LPCR_P8_PECE3;
->>>>> +        }
->>>>>      }
->>>>> =20
->>>>>      /* We should be followed by a CPU reset but update the active =
-value
->>>>
->>>
->>
->=20
+Indeed.  Is this openbsd?  They are a bit paranoid, possibly the usual
+ca bundle (from nss/mozilla IIRC) isn't installed by default.
+
+cheers,
+  Gerd
