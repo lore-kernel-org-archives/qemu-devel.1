@@ -1,44 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e2cRH-0002B5-1Y
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:18:12 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e2cT7-00038M-FX
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:20:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e2cRC-0000Yv-8l
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:18:11 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41846)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1e2cRB-0000YB-VQ
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:18:06 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9CCEYiH000743
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 08:18:01 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dj5e5g43b-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 08:18:01 -0400
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 12 Oct 2017 13:17:58 +0100
-References: <20171004154144.88995-1-pasic@linux.vnet.ibm.com>
-	<20171004154144.88995-4-pasic@linux.vnet.ibm.com>
-	<20171010150733.444aa2fe.cohuck@redhat.com>
-	<aed45050-fd0e-4a81-679c-c59c23d75a98@linux.vnet.ibm.com>
-	<3e560962-d748-ccfa-ccab-c54f1a30bab4@linux.vnet.ibm.com>
-	<20171012141137.07fb0391.cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu, 12 Oct 2017 14:17:55 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1e2cT3-0001RN-7T
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:20:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60128)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e2cT2-0001Qp-UW
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 08:20:01 -0400
+Date: Thu, 12 Oct 2017 13:19:52 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171012121952.GD2343@work-vm>
+References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
+	<1504081950-2528-11-git-send-email-peterx@redhat.com>
+	<20170921192903.GH3401@work-vm>
+	<20170927073441.GD25011@pxdev.xzpeter.org>
+	<20171009185812.GR2374@work-vm>
+	<20171010093801.GC20686@pxdev.xzpeter.org>
+	<20171010123017.GE2132@work-vm>
+	<20171011030058.GG20686@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <20171012141137.07fb0391.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <bce0530b-b54c-7cb3-8415-c7b0169465bb@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/8] s390x: improve error handling for
- SSCH and RSCH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20171011030058.GG20686@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC v2 10/33] migration: allow dst vm pause on
+ postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,79 +35,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
+* Peter Xu (peterx@redhat.com) wrote:
+> On Tue, Oct 10, 2017 at 01:30:18PM +0100, Dr. David Alan Gilbert wrote:
+> > * Peter Xu (peterx@redhat.com) wrote:
+> > > On Mon, Oct 09, 2017 at 07:58:13PM +0100, Dr. David Alan Gilbert wrot=
+e:
+>=20
+> [...]
+>=20
+> > > > We have to be careful about this; a network can fail in a way it
+> > > > gets stuck rather than fails - this can get stuck until a full TCP
+> > > > disconnection; and that takes about 30mins (from memory).
+> > > > The nice thing about using 'shutdown' is that you can kill the exis=
+ting
+> > > > connection if it's hung. (Which then makes an interesting question;
+> > > > the rules in your migrate-incoming command become different if you
+> > > > want to declare it's failed!).  Having said that, you're right that=
+ at
+> > > > this point stuff has already failed - so do we need the shutdown?
+> > > > (You might want to do the shutdown as part of the recovery earlier
+> > > > or as a separate command to force the failure)
+> > >=20
+> > > I assume if I call shutdown before the lock then we'll be good then.
+> >=20
+> > The question is what happens if you only allow recovery if we're already
+> > in postcopy-paused state; in the case of a hung socket, since no IO has
+> > actually failed yet, you will still be in postcopy-active.
+>=20
+> Hmm, but isn't that a problem of kernel rather than QEMU?  Since
+> sockets are after all managed by kernel.
 
+Kind of, but it comes down to what the right behaviour of a TCP socket
+is, and the kernel is probably doing the right thing.
 
-On 10/12/2017 02:11 PM, Cornelia Huck wrote:
-> On Thu, 12 Oct 2017 14:06:42 +0200
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> 
->> On 10/10/2017 04:36 PM, Halil Pasic wrote:
->>>
->>>
->>> On 10/10/2017 03:07 PM, Cornelia Huck wrote:  
->>>> On Wed,  4 Oct 2017 17:41:39 +0200
->>>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
->>>>  
->>>>> Simplify the error handling of the SSCH and RSCH handler avoiding
->>>>> arbitrary and cryptic error codes being used to tell how the instruction
->>>>> is supposed to end.  Let the code detecting the condition tell how it's
->>>>> to be handled in a less ambiguous way.  It's best to handle SSCH and RSCH
->>>>> in one go as the emulation of the two shares a lot of code.
->>>>>
->>>>> For passthrough this change isn't pure refactoring, but changes the
->>>>> way kernel reported EFAULT is handled. After clarifying the kernel
->>>>> interface we decided that EFAULT shall be mapped to unit exception.
->>>>> Same goes for unexpected error codes.
->>>>>
->>>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->>>>> ---
->>>>>
->>>>> AFAIR we decided in the previous round to rather do transformation
->>>>> and fixing in one patch than touch stuff twice. Hence this patch
->>>>> ain't pure transformation any more.
->>>>> ---
->>>>>  hw/s390x/css.c              | 83 +++++++++++++--------------------------------
->>>>>  hw/s390x/s390-ccw.c         | 11 +++---
->>>>>  hw/vfio/ccw.c               | 30 ++++++++++++----
->>>>>  include/hw/s390x/css.h      | 24 +++++++++----
->>>>>  include/hw/s390x/s390-ccw.h |  2 +-
->>>>>  target/s390x/ioinst.c       | 53 ++++-------------------------
->>>>>  6 files changed, 77 insertions(+), 126 deletions(-)  
->>>>
->>>> After browsing through this patch, I think the change will work just as
->>>> well if you use e.g. #defines instead of the structure, won't it?
->>>>  
->>>
->>> Sure. We just loose type safety. For example if someone ever should try to
->>> propagate a normal errno via return do_something() the compiler won't
->>> catch it we effectively use int for both.
->>>
->>>  
->>
->> @Connie: Discussion seems to have died down quite a bit, and besides
->> of the struct vs enum vs int and the point of Dong Jia I've seen no
->> complaints.
->>
->> I would like to do a re-spin to accommodate the complaints, but before
->> I abandon the IOInstEnding struct I would like to confirm, that this
->> patch, and it's behavioral changes are OK. I would hate to do the dance
->> backwards, because in the next iteration it turns out that we want to
->> keep the "program_interrupt(env, PGM_ADDRESSING, 4);". Could you please
->> pass your judgment on this patch (assuming I fix the issues found by
->> Dong Jia)?
-> 
-> I don't think I really have complaints. Currently quite busy with other
-> things, though.
-> 
+> I don't really know what is the best thing to do to detect whether a
+> socket is stuck.  Assume we can observed that (say, we see migration
+> transferred bytes keep static for 30 seconds), IIRC you mentioned
+> about iptable tricks to break an existing e.g. TCP connection, then we
+> can trigger the -EIO path.
 
-Thanks a lot! Unless told otherwise I intend to do a v3 beginning
-next week with the things we agreed on: use enum, fix the things
-by Dong Jia, and drop the last 'template approach' patch from the
-series. If somebody finds something else I'm gonna fix that too
-of course.
+=46rom the qemu level I'd prefer to make it a command;  if we start
+adding heuristics and timeouts etc then it's very difficult to actually
+get them right.
 
-Regards,
-Halil
+> Or do you think we should provide a way to manually trigger the paused
+> state?  Then it goes back to something we discussed with Dan in the
+> earlier post - I'd appreciate if we can postpone the manual trigger
+> support a bit (to make this series small, which is already not...).
+
+I think that manual trigger is probably necessary; it would just call a
+shutdown() on the sockets and let the things fail into the paused state.
+It'd be pretty simple.  It would be another OOB command; the tricky
+part is just making sure it's thread safe against hte migration
+finishing when you issue it.
+
+I think it can wait until after this series if you want, but it would
+be good if we can figure it out.
+
+Dave
+
+> Thanks,
+>=20
+> --=20
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
