@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e2baj-0006pe-Dv
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:23:55 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e2bsm-0000fz-GS
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:42:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e2bag-000146-3u
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:23:53 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:24780 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e2bsj-0007J3-Sa
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:42:32 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:13120 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1e2baf-000135-Iz
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:23:50 -0400
+	id 1e2bsj-0007Ii-Aa
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:42:29 -0400
 References: <20171002143919.207741-1-vsementsov@virtuozzo.com>
-	<20171002143919.207741-4-vsementsov@virtuozzo.com>
-	<9e5c8b0a-d2f9-e051-f8fb-b9618982e6ea@redhat.com>
+	<20171002143919.207741-5-vsementsov@virtuozzo.com>
+	<a7594875-cd6f-8195-4b86-d7f67ad9f208@redhat.com>
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <b3c404ca-54bd-7385-32eb-58addcf52714@virtuozzo.com>
-Date: Thu, 12 Oct 2017 14:23:33 +0300
+Message-ID: <2cb5ac95-e27c-2d13-b557-9dedc1f86473@virtuozzo.com>
+Date: Thu, 12 Oct 2017 14:42:13 +0300
 MIME-Version: 1.0
-In-Reply-To: <9e5c8b0a-d2f9-e051-f8fb-b9618982e6ea@redhat.com>
+In-Reply-To: <a7594875-cd6f-8195-4b86-d7f67ad9f208@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 3/5] backup: init copy_bitmap from
- sync_bitmap for incremental
+Subject: Re: [Qemu-devel] [PATCH 4/5] backup: simplify non-dirty bits
+ progress processing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,143 +34,151 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 
-10.10.2017 01:56, John Snow wrote:
+10.10.2017 02:44, John Snow wrote:
 >
 > On 10/02/2017 10:39 AM, Vladimir Sementsov-Ogievskiy wrote:
->> We should not copy non-dirty clusters in write notifiers. So,
->> initialize copy_bitmap from sync_bitmap.
+>> Set fake progress for non-dirty clusters in copy_bitmap initialization,
+>> to. It simplifies code and allows further refactoring.
 >>
-> ...! Duh, good find!!
->
-> So, previously we'd copy extra sectors if they just so happened to be
-> written to during the backup process. These would be totally redundant
-> compared to the previous backups in the chain, by definition.
->
-> Now, we allow the write to go through to the source image and let it
-> dirty the bdrv dirty bitmap we have on standby.
->
-> Good fix.
->
 >> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 >> ---
->>   block/backup.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
->>   1 file changed, 44 insertions(+), 1 deletion(-)
+>>
+>> Motivation (some of these paragraphs may be needed in commit message...)
+>>
+> lol! "pick and choose which paragraphs look good, stick some up there,
+> maybe?"
+>
+>> 1. Current behavior is not good: setting fake progress leads to progress
+>> hopping, so actually for sparse disk progress say nothing. We just move
+>> all these hops to the beginning.
+>>
+> To be fair, if it's sparse, the first update will be very soon.
+>
+>> 2. Big hop in the beginning is possible now too: if there is a hole at
+>> the beginning of virtual disk.
+>>
+>> 3. Now, there are some excuses for old behavior in comparison to new one:
+>> backup progress is linear, cluster by cluster. But in future cluster
+>> copying will be done by several coroutine-workers, several requests in
+>> parallel, so it will make no sense to publish fake progress by parts in
+>> parallel with non-sequential requests.
+>>
+> I agree.
+>
+>> 4. Actually it's just a point of view: when we are actually skip clusters?
+>> If go through disk sequentially, it's logical to say, that we skip clusters
+>> between copied portions to the left and to the right of them. But even know
+>> copying progress is not sequential because of write notifiers.
+>> If copying is async, non-sequential, we can say in the very beginning, that
+>> we skip these clusters and do not think about them later.
+>>
+> Good observation.
+>
+>> So, I don't want to maintain portions of fake progress in the new backup
+>> architecture. I understand, that this patch will change user's view
+>> of backup progress, but formally it doesn't change: progress hops are just
+>> moved to the beginning. Progress was meaningless for incremental backup and
+>> it remains meaningless.
+>>
+> Haha. Not meaningless, but it does carry less information than other
+> progress meters. It is effectively a % complete meter, with a really bad
+> estimate.
+>
+>> But what should we do with progress, really? It's obvious, that we need at
+>> least one more field for block job status, for example, "skipped", which
+>> would be amount of bytes which are not really processed but skipped by the
+>> block job. So, more real progress may be calculated (by management tool) like
+>>
+>> (job.offset - job.skipped) / (job.len - job.skipped)
+>>
+> I'm not sure we actually need a new field... let's just say that the job
+> length is the number of bytes described by the incremental backup. Every
+> time we copy some, move offset forward. This would give a more
+> appropriately linear/accurate sense of the progress.
+>
+> I think we are allowed to do this as I think we promise that these
+> progress numbers mean essentially nothing...
+
+I'm not sure, length is published field, it is available in libvirt. 
+IMHO, If we change it semantics it should
+firstly break our iotests but what it will break for users is 
+unpredictable..
+
+>
+> New fields that actually *do* report meaningful information, however,
+> could be added. bytesCopied would be a prime candidate.
+
+so you suggest to change semantics of one field and add another
+I suggest to just add one field, it's safer I think.
+
+>
+>> And this progress will be more precise if information about skipped bytes
+>> is provided earlier, and current patch is close to this idea.
+>>
+>> So, if you agree, I can make a patch for 'skipped' too, but it actually not
+>> related to the series, so I hope that current patch will be merged anyway.
+>> (I need it for backup refactoring, not for accurate progress)
+>>
+>>   block/backup.c | 18 +++---------------
+>>   1 file changed, 3 insertions(+), 15 deletions(-)
 >>
 >> diff --git a/block/backup.c b/block/backup.c
->> index 08efec639f..07f4ae846b 100644
+>> index 07f4ae846b..52df7bb19e 100644
 >> --- a/block/backup.c
 >> +++ b/block/backup.c
->> @@ -422,6 +422,43 @@ out:
->>       return ret;
+>> @@ -369,7 +369,6 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+>>       int64_t offset;
+>>       int64_t cluster;
+>>       int64_t end;
+>> -    int64_t last_cluster = -1;
+>>       BdrvDirtyBitmapIter *dbi;
+>>   
+>>       granularity = bdrv_dirty_bitmap_granularity(job->sync_bitmap);
+>> @@ -380,12 +379,6 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+>>       while ((offset = bdrv_dirty_iter_next(dbi)) >= 0) {
+>>           cluster = offset / job->cluster_size;
+>>   
+>> -        /* Fake progress updates for any clusters we skipped */
+>> -        if (cluster != last_cluster + 1) {
+>> -            job->common.offset += ((cluster - last_cluster - 1) *
+>> -                                   job->cluster_size);
+>> -        }
+>> -
+>>           for (end = cluster + clusters_per_iter; cluster < end; cluster++) {
+>>               do {
+>>                   if (yield_and_check(job)) {
+>> @@ -407,14 +400,6 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+>>           if (granularity < job->cluster_size) {
+>>               bdrv_set_dirty_iter(dbi, cluster * job->cluster_size);
+>>           }
+>> -
+>> -        last_cluster = cluster - 1;
+>> -    }
+>> -
+>> -    /* Play some final catchup with the progress meter */
+>> -    end = DIV_ROUND_UP(job->common.len, job->cluster_size);
+>> -    if (last_cluster + 1 < end) {
+>> -        job->common.offset += ((end - last_cluster - 1) * job->cluster_size);
+>>       }
+>>   
+>>   out:
+>> @@ -456,6 +441,9 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
+>>           bdrv_set_dirty_iter(dbi, next_cluster * job->cluster_size);
+>>       }
+>>   
+>> +    job->common.offset = job->common.len -
+>> +                         hbitmap_count(job->copy_bitmap) * job->cluster_size;
+>> +
+>>       bdrv_dirty_iter_free(dbi);
 >>   }
 >>   
->> +/* init copy_bitmap from sync_bitmap */
->> +static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
->> +{
->> +    BdrvDirtyBitmapIter *dbi;
->> +    int64_t offset;
->> +    int64_t end = DIV_ROUND_UP(bdrv_dirty_bitmap_size(job->sync_bitmap),
->> +                               job->cluster_size);
->> +
->> +    dbi = bdrv_dirty_iter_new(job->sync_bitmap);
->> +    while ((offset = bdrv_dirty_iter_next(dbi)) != -1) {
->> +        int64_t cluster = offset / job->cluster_size;
->> +        int64_t next_cluster;
->> +
->> +        offset += bdrv_dirty_bitmap_granularity(job->sync_bitmap);
->> +        if (offset >= bdrv_dirty_bitmap_size(job->sync_bitmap)) {
->> +            hbitmap_set(job->copy_bitmap, cluster, end - cluster);
->> +            break;
->> +        }
->> +
->> +        offset = bdrv_dirty_bitmap_next_zero(job->sync_bitmap, offset);
->> +        if (offset == -1) {
->> +            hbitmap_set(job->copy_bitmap, cluster, end - cluster);
->> +            break;
->> +        }
->> +
->> +        next_cluster = DIV_ROUND_UP(offset, job->cluster_size);
->> +        hbitmap_set(job->copy_bitmap, cluster, next_cluster - cluster);
->> +        if (next_cluster >= end) {
->> +            break;
->> +        }
->> +
-> Did you look into initializing this from a lower layer, e.g. a call to
-> initialize-an-hbitmap-from-another-hbitmap?
->
-> The loop might look a little cleaner that way and we might possibly get
-> more utility out of it than a custom coded loop here in the backup code.
-
-No, to be honest, I don't want to do it now, there are some difficulties:
-
-1. we init from bdrv bitmap, so we'll have to add a bit strange common 
-interface init-hbitmap-from-bdrv-bitmap
-2 (more hard). here copy_bitmap have other size: it's granularity is 
-zero, it corresponds to clusters, not to bytes, and I don't want to 
-change this.
-so, it's not a common case..
-
-
->
->> +        bdrv_set_dirty_iter(dbi, next_cluster * job->cluster_size);
->> +    }
->> +
->> +    bdrv_dirty_iter_free(dbi);
->> +}
->> +
->>   static void coroutine_fn backup_run(void *opaque)
->>   {
->>       BackupBlockJob *job = opaque;
->> @@ -435,20 +472,26 @@ static void coroutine_fn backup_run(void *opaque)
->>   
->>       nb_clusters = DIV_ROUND_UP(job->common.len, job->cluster_size);
->>       job->copy_bitmap = hbitmap_alloc(nb_clusters, 0);
->> -    hbitmap_set(job->copy_bitmap, 0, nb_clusters);
-> Alright, so the last patch introduced a blunt initialization, and you've
-> replaced it by more granular initializations.
->
->>   
->>       job->before_write.notify = backup_before_write_notify;
->>       bdrv_add_before_write_notifier(bs, &job->before_write);
->>   
->>       if (job->sync_mode == MIRROR_SYNC_MODE_NONE) {
->> +        /* Here we set all bits in job->copy_bitmap to allow copying clusters
->> +         * which are going to be changed (none-mode semantics). It doesn't mean
->> +         * that we want to copy _all_ clusters.
->> +         */
-> Right, this is more like ALLOWING all sectors to be copied.
->
-> Perhaps:
->
-> "All bits are set to allow any cluster to be copied. This does not
-> actually require them to be copied."
->
->> +        hbitmap_set(job->copy_bitmap, 0, nb_clusters);
->>           while (!block_job_is_cancelled(&job->common)) {
->>               /* Yield until the job is cancelled.  We just let our before_write
->>                * notify callback service CoW requests. */
->>               block_job_yield(&job->common);
->>           }
->>       } else if (job->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
->> +        backup_incremental_init_copy_bitmap(job);
->>           ret = backup_run_incremental(job);
->>       } else {
->> +        hbitmap_set(job->copy_bitmap, 0, nb_clusters);
-> Maybe you could just factor these things out entirely:
->
-> if (job->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
->    backup_incremental_init_copy_bitmap(job);
-> } else {
->    hbitmap_set(job->copy_bitmap, 0, nb_clusters);
-> }
->
-> prior to the big switch statement.
->
->>           /* Both FULL and TOP SYNC_MODE's require copying.. */
->>           for (offset = 0; offset < job->common.len;
->>                offset += job->cluster_size) {
 >>
+> Anything that makes less lines of code is nice, though, so if we cannot
+> reduce the length of the job:
+>
+> Reviewed-by: John Snow <jsnow@redhat.com>
 
+Thank you!
 
 -- 
 Best regards,
