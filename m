@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e2aBL-0001Gq-Ee
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:53:37 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e2aBI-0001Fd-8Q
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:53:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e2aBF-0000Hb-Eg
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:53:35 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:18428 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e2aBF-0000Hl-G8
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:53:32 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:21884 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1e2aBE-0000DY-Tt
+	id 1e2aBE-0000DU-Vf
 	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:53:29 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 12 Oct 2017 12:53:19 +0300
-Message-Id: <20171012095319.136610-14-vsementsov@virtuozzo.com>
+Date: Thu, 12 Oct 2017 12:53:15 +0300
+Message-Id: <20171012095319.136610-10-vsementsov@virtuozzo.com>
 In-Reply-To: <20171012095319.136610-1-vsementsov@virtuozzo.com>
 References: <20171012095319.136610-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 13/13] nbd: Minimal structured read for
- client
+Subject: [Qemu-devel] [PATCH v3 09/13] nbd: Minimal structured read for
+ server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,526 +28,244 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Minimal implementation: for structured error only error_report error
-message.
+Minimal implementation of structured read: one structured reply chunk,
+no segmentation.
+Minimal structured error implementation: no text message.
+Support DF flag, but just ignore it, as there is no segmentation any
+way.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/block/nbd.h |   6 +
- block/nbd-client.c  | 395 ++++++++++++++++++++++++++++++++++++++++++++++++----
- nbd/client.c        |   7 +
- 3 files changed, 379 insertions(+), 29 deletions(-)
+ include/block/nbd.h |  33 +++++++++++++++++
+ nbd/nbd-internal.h  |   1 +
+ nbd/server.c        | 100 ++++++++++++++++++++++++++++++++++++++++++++++++----
+ 3 files changed, 128 insertions(+), 6 deletions(-)
 
 diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 1ef8c8897f..e3350b67a4 100644
+index a6df5ce8b5..dd261f66f0 100644
 --- a/include/block/nbd.h
 +++ b/include/block/nbd.h
-@@ -203,6 +203,11 @@ enum {
- #define NBD_SREP_TYPE_ERROR         NBD_SREP_ERR(1)
- #define NBD_SREP_TYPE_ERROR_OFFSET  NBD_SREP_ERR(2)
+@@ -69,6 +69,25 @@ typedef struct NBDSimpleReply {
+     uint64_t handle;
+ } QEMU_PACKED NBDSimpleReply;
  
-+static inline bool nbd_srep_type_is_error(int type)
-+{
-+    return type & (1 << 15);
-+}
++typedef struct NBDStructuredReplyChunk {
++    uint32_t magic;  /* NBD_STRUCTURED_REPLY_MAGIC */
++    uint16_t flags;  /* combination of NBD_SREP_FLAG_* */
++    uint16_t type;   /* NBD_SREP_TYPE_* */
++    uint64_t handle; /* request handle */
++    uint32_t length; /* length of payload */
++} QEMU_PACKED NBDStructuredReplyChunk;
 +
- /* NBD errors are based on errno numbers, so there is a 1:1 mapping,
-  * but only a limited set of errno values is specified in the protocol.
-  * Everything else is squashed to EINVAL.
-@@ -241,6 +246,7 @@ static inline int nbd_errno_to_system_errno(int err)
++typedef struct NBDStructuredRead {
++    NBDStructuredReplyChunk h;
++    uint64_t offset;
++} QEMU_PACKED NBDStructuredRead;
++
++typedef struct NBDStructuredError {
++    NBDStructuredReplyChunk h;
++    uint32_t error;
++    uint16_t message_length;
++} QEMU_PACKED NBDStructuredError;
++
+ /* Transmission (export) flags: sent from server to client during handshake,
+    but describe what will happen during transmission */
+ #define NBD_FLAG_HAS_FLAGS         (1 << 0) /* Flags are there */
+@@ -79,6 +98,7 @@ typedef struct NBDSimpleReply {
+                                                rotational media */
+ #define NBD_FLAG_SEND_TRIM         (1 << 5) /* Send TRIM (discard) */
+ #define NBD_FLAG_SEND_WRITE_ZEROES (1 << 6) /* Send WRITE_ZEROES */
++#define NBD_FLAG_SEND_DF           (1 << 7) /* Send DF (Do not Fragment) */
+ 
+ /* New-style handshake (global) flags, sent from server to client, and
+    control what will happen during handshake phase. */
+@@ -125,6 +145,7 @@ typedef struct NBDSimpleReply {
+ /* Request flags, sent from client to server during transmission phase */
+ #define NBD_CMD_FLAG_FUA        (1 << 0) /* 'force unit access' during write */
+ #define NBD_CMD_FLAG_NO_HOLE    (1 << 1) /* don't punch hole on zero run */
++#define NBD_CMD_FLAG_DF         (1 << 2) /* don't fragment structured read */
+ 
+ /* Supported request types */
+ enum {
+@@ -149,6 +170,18 @@ enum {
+  * aren't overflowing some other buffer. */
+ #define NBD_MAX_NAME_SIZE 256
+ 
++/* Structured reply flags */
++#define NBD_SREP_FLAG_DONE          (1 << 0) /* This reply-chunk is last */
++
++/* Structured reply types */
++#define NBD_SREP_ERR(value)         ((1 << 15) | (value))
++
++#define NBD_SREP_TYPE_NONE          0
++#define NBD_SREP_TYPE_OFFSET_DATA   1
++#define NBD_SREP_TYPE_OFFSET_HOLE   2
++#define NBD_SREP_TYPE_ERROR         NBD_SREP_ERR(1)
++#define NBD_SREP_TYPE_ERROR_OFFSET  NBD_SREP_ERR(2)
++
+ /* Details collected by NBD_OPT_EXPORT_NAME and NBD_OPT_GO */
  struct NBDExportInfo {
      /* Set by client before nbd_receive_negotiate() */
-     bool request_sizes;
+diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
+index 11a130d050..beb30a7a3e 100644
+--- a/nbd/nbd-internal.h
++++ b/nbd/nbd-internal.h
+@@ -48,6 +48,7 @@
+ 
+ #define NBD_REQUEST_MAGIC           0x25609513
+ #define NBD_SIMPLE_REPLY_MAGIC      0x67446698
++#define NBD_STRUCTURED_REPLY_MAGIC  0x668e33ef
+ #define NBD_OPTS_MAGIC              0x49484156454F5054LL
+ #define NBD_CLIENT_MAGIC            0x0000420281861253LL
+ #define NBD_REP_MAGIC               0x0003e889045565a9LL
+diff --git a/nbd/server.c b/nbd/server.c
+index c1bbe8d2d1..502873b645 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -98,6 +98,8 @@ struct NBDClient {
+     QTAILQ_ENTRY(NBDClient) next;
+     int nb_requests;
+     bool closing;
++
 +    bool structured_reply;
-     /* Set by server results during nbd_receive_negotiate() */
-     uint64_t size;
-     uint16_t flags;
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index 58493b7ac4..4d08cf3fd3 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -29,6 +29,7 @@
+ };
  
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-+#include "qemu/error-report.h"
- #include "nbd-client.h"
- 
- #define HANDLE_TO_INDEX(bs, handle) ((handle) ^ (uint64_t)(intptr_t)(bs))
-@@ -93,7 +94,7 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
-         if (i >= MAX_NBD_REQUESTS ||
-             !s->requests[i].coroutine ||
-             !s->requests[i].receiving ||
--            nbd_reply_is_structured(&s->reply))
-+            (nbd_reply_is_structured(&s->reply) && !s->info.structured_reply))
-         {
-             break;
-         }
-@@ -181,75 +182,406 @@ err:
-     return rc;
+ /* That's all folks */
+@@ -760,6 +762,20 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
+                     return ret;
+                 }
+                 break;
++
++            case NBD_OPT_STRUCTURED_REPLY:
++                if (client->structured_reply) {
++                    error_setg(errp, "Double negotiation of structured reply");
++                    return -EINVAL;
++                }
++                ret = nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK, option,
++                                             errp);
++                if (ret < 0) {
++                    return ret;
++                }
++                client->structured_reply = true;
++                break;
++
+             default:
+                 if (nbd_drop(client->ioc, length, errp) < 0) {
+                     return -EIO;
+@@ -1233,6 +1249,61 @@ static int nbd_co_send_simple_reply(NBDClient *client,
+     return nbd_co_send_iov(client, iov, len ? 2 : 1, errp);
  }
  
--static int nbd_co_receive_reply(NBDClientSession *s,
--                                uint64_t handle,
--                                QEMUIOVector *qiov)
-+static inline void payload_advance16(uint8_t **payload, uint16_t **ptr)
++static inline void set_be_chunk(NBDStructuredReplyChunk *chunk, uint16_t flags,
++                                uint16_t type, uint64_t handle, uint32_t length)
 +{
-+    *ptr = (uint16_t *)*payload;
-+    be16_to_cpus(*ptr);
-+    *payload += sizeof(**ptr);
++    stl_be_p(&chunk->magic, NBD_STRUCTURED_REPLY_MAGIC);
++    stw_be_p(&chunk->flags, flags);
++    stw_be_p(&chunk->type, type);
++    stq_be_p(&chunk->handle, handle);
++    stl_be_p(&chunk->length, length);
 +}
 +
-+static inline void payload_advance32(uint8_t **payload, uint32_t **ptr)
++static inline int coroutine_fn nbd_co_send_buf(NBDClient *client, void *buf,
++                                               size_t size, Error **errp)
 +{
-+    *ptr = (uint32_t *)*payload;
-+    be32_to_cpus(*ptr);
-+    *payload += sizeof(**ptr);
++    struct iovec iov[] = {
++        {.iov_base = buf, .iov_len = size}
++    };
++
++    return nbd_co_send_iov(client, iov, 1, errp);
 +}
 +
-+static inline void payload_advance64(uint8_t **payload, uint64_t **ptr)
++static int coroutine_fn nbd_co_send_structured_read(NBDClient *client,
++                                                    uint64_t handle,
++                                                    uint64_t offset,
++                                                    void *data,
++                                                    size_t size,
++                                                    Error **errp)
 +{
-+    *ptr = (uint64_t *)*payload;
-+    be64_to_cpus(*ptr);
-+    *payload += sizeof(**ptr);
++    NBDStructuredRead chunk;
++    struct iovec iov[] = {
++        {.iov_base = &chunk, .iov_len = sizeof(chunk)},
++        {.iov_base = data, .iov_len = size}
++    };
++
++    set_be_chunk(&chunk.h, NBD_SREP_FLAG_DONE, NBD_SREP_TYPE_OFFSET_DATA,
++                 handle, sizeof(chunk) - sizeof(chunk.h) + size);
++    stq_be_p(&chunk.offset, offset);
++
++    return nbd_co_send_iov(client, iov, 2, errp);
 +}
 +
-+static int nbd_parse_offset_hole_payload(NBDStructuredReplyChunk *chunk,
-+                                         uint8_t *payload, QEMUIOVector *qiov)
++static int coroutine_fn nbd_co_send_structured_error(NBDClient *client,
++                                                     uint64_t handle,
++                                                     uint32_t error,
++                                                     Error **errp)
 +{
-+    uint64_t *offset;
-+    uint32_t *hole_size;
++    NBDStructuredError chunk;
 +
-+    if (chunk->length != sizeof(*offset) + sizeof(*hole_size)) {
-+        return -EINVAL;
-+    }
++    set_be_chunk(&chunk.h, NBD_SREP_FLAG_DONE, NBD_SREP_TYPE_ERROR, handle,
++                 sizeof(chunk) - sizeof(chunk.h));
++    stl_be_p(&chunk.error, error);
++    stw_be_p(&chunk.message_length, 0);
 +
-+    payload_advance64(&payload, &offset);
-+    payload_advance32(&payload, &hole_size);
-+
-+    if (*offset + *hole_size > qiov->size) {
-+        return -EINVAL;
-+    }
-+
-+    qemu_iovec_memset(qiov, *offset, 0, *hole_size);
-+
-+    return 0;
++    return nbd_co_send_buf(client, &chunk, sizeof(chunk), errp);
 +}
 +
-+static int nbd_parse_error_payload(NBDStructuredReplyChunk *chunk,
-+                                   uint8_t *payload, int *request_ret)
-+{
-+    uint32_t *error;
-+    uint16_t *message_size;
-+
-+    assert(chunk->type & (1 << 15));
-+
-+    if (chunk->length < sizeof(error) + sizeof(message_size)) {
-+        return -EINVAL;
-+    }
-+
-+    payload_advance32(&payload, &error);
-+    payload_advance16(&payload, &message_size);
-+
-+    error_report("%.*s", *message_size, payload);
-+
-+    /* TODO add special case for ERROR_OFFSET */
-+
-+    *request_ret = nbd_errno_to_system_errno(*error);
-+
-+    return 0;
-+}
-+
-+static int nbd_co_receive_offset_data_payload(NBDClientSession *s,
-+                                              QEMUIOVector *qiov)
-+{
-+    QEMUIOVector sub_qiov;
-+    uint64_t offset;
-+    size_t data_size;
-+    int ret;
-+    NBDStructuredReplyChunk *chunk = &s->reply.structured;
-+
-+    assert(nbd_reply_is_structured(&s->reply));
-+
-+    if (chunk->length < sizeof(offset)) {
-+        return -EINVAL;
-+    }
-+
-+    if (nbd_read(s->ioc, &offset, sizeof(offset), NULL) < 0) {
-+        return -EIO;
-+    }
-+    be64_to_cpus(&offset);
-+
-+    data_size = chunk->length - sizeof(offset);
-+    if (offset + data_size > qiov->size) {
-+        return -EINVAL;
-+    }
-+
-+    qemu_iovec_init(&sub_qiov, qiov->niov);
-+    qemu_iovec_concat(&sub_qiov, qiov, offset, data_size);
-+    ret = qio_channel_readv_all(s->ioc, sub_qiov.iov, sub_qiov.niov, NULL);
-+    qemu_iovec_destroy(&sub_qiov);
-+
-+    return ret < 0 ? -EIO : 0;
-+}
-+
-+#define NBD_MAX_MALLOC_PAYLOAD 1000
-+static int nbd_co_receive_structured_payload(NBDClientSession *s,
-+                                             void **payload)
-+{
-+    int ret;
-+    uint32_t len;
-+
-+    assert(nbd_reply_is_structured(&s->reply));
-+
-+    len = s->reply.structured.length;
-+
-+    if (len == 0) {
-+        return 0;
-+    }
-+
-+    if (payload == NULL) {
-+        return -EINVAL;
-+    }
-+
-+    if (len > NBD_MAX_MALLOC_PAYLOAD) {
-+        return -EINVAL;
-+    }
-+
-+    *payload = qemu_memalign(8, len);
-+    ret = nbd_read(s->ioc, *payload, len, NULL);
-+    if (ret < 0) {
-+        qemu_vfree(*payload);
-+        *payload = NULL;
-+        return ret;
-+    }
-+
-+    return 0;
-+}
-+
-+/* nbd_co_do_receive_one_chunk
-+ * for simple reply:
-+ *   set request_ret to received reply error
-+ *   if qiov is not NULL: read payload to @qiov
-+ * for structured reply chunk:
-+ *   if error chunk: read payload, set @request_ret, do not set @payload
-+ *   else if offset_data chunk: read payload data to @qiov, do not set @payload
-+ *   else: read payload to @payload
-+ */
-+static int nbd_co_do_receive_one_chunk(NBDClientSession *s, uint64_t handle,
-+                                       bool only_structured, int *request_ret,
-+                                       QEMUIOVector *qiov, void **payload)
- {
-     int ret;
-     int i = HANDLE_TO_INDEX(s, handle);
-+    void *local_payload = NULL;
-+
-+    if (payload) {
-+        *payload = NULL;
-+    }
-+    *request_ret = 0;
- 
-     /* Wait until we're woken up by nbd_read_reply_entry.  */
-     s->requests[i].receiving = true;
-     qemu_coroutine_yield();
-     s->requests[i].receiving = false;
-     if (!s->ioc || s->quit) {
--        ret = -EIO;
--    } else {
--        assert(s->reply.handle == handle);
--        ret = -nbd_errno_to_system_errno(s->reply.simple.error);
--        if (qiov && ret == 0) {
--            if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
--                                      NULL) < 0) {
--                ret = -EIO;
--                s->quit = true;
--            }
-+        return -EIO;
-+    }
-+
-+    assert(s->reply.handle == handle);
-+
-+    if (nbd_reply_is_simple(&s->reply)) {
-+        if (only_structured) {
-+            return -EINVAL;
-         }
- 
--        /* Tell the read handler to read another header.  */
--        s->reply.handle = 0;
-+        *request_ret = -nbd_errno_to_system_errno(s->reply.simple.error);
-+        if (*request_ret < 0 || !qiov) {
-+            return 0;
-+        }
-+
-+        return qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
-+                                     NULL) < 0 ? -EIO : 0;
-+    }
-+
-+    /* handle structured reply chunk */
-+    assert(s->info.structured_reply);
-+
-+    if (s->reply.structured.type == NBD_SREP_TYPE_NONE) {
-+        return 0;
-+    }
-+
-+    if (s->reply.structured.type == NBD_SREP_TYPE_OFFSET_DATA) {
-+        if (!qiov) {
-+            return -EINVAL;
-+        }
-+
-+        return nbd_co_receive_offset_data_payload(s, qiov);
-+    }
-+
-+    if (nbd_srep_type_is_error(s->reply.structured.type)) {
-+        payload = &local_payload;
-+    }
-+
-+    ret = nbd_co_receive_structured_payload(s, payload);
-+    if (ret < 0) {
-+        return ret;
+ /* nbd_co_receive_request
+  * Collect a client request. Return 0 if request looks valid, -EIO to drop
+  * connection right away, and any other negative value to report an error to
+@@ -1304,10 +1375,17 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
+                    (uint64_t)client->exp->size);
+         return request->type == NBD_CMD_WRITE ? -ENOSPC : -EINVAL;
      }
- 
--    s->requests[i].coroutine = NULL;
-+    if (nbd_srep_type_is_error(s->reply.structured.type)) {
-+        ret = nbd_parse_error_payload(&s->reply.structured, local_payload,
-+                                      request_ret);
-+        qemu_vfree(local_payload);
-+        return ret;
-+    }
-+
-+    return 0;
-+}
-+
-+/* nbd_co_receive_one_chunk
-+ * Read reply, wake up read_reply_co and set s->quit if needed.
-+ * Return value is a fatal error code or normal nbd reply error code
-+ */
-+static int nbd_co_receive_one_chunk(NBDClientSession *s, uint64_t handle,
-+                                    bool only_structured,
-+                                    QEMUIOVector *qiov, NBDReply *reply,
-+                                    void **payload)
-+{
-+    int request_ret;
-+    int ret = nbd_co_do_receive_one_chunk(s, handle, only_structured,
-+                                          &request_ret, qiov, payload);
-+
-+    if (ret < 0) {
-+        s->quit = true;
-+    } else {
-+        /* For assert at loop start in nbd_read_reply_entry */
-+        if (reply) {
-+            *reply = s->reply;
-+        }
-+        s->reply.handle = 0;
-+        ret = request_ret;
-+    }
- 
--    /* Kick the read_reply_co to get the next reply.  */
-     if (s->read_reply_co) {
-         aio_co_wake(s->read_reply_co);
-     }
- 
-+    return ret;
-+}
-+
-+typedef struct NBDReplyChunkIter {
-+    int ret;
-+    bool done, only_structured;
-+} NBDReplyChunkIter;
-+
-+#define NBD_FOREACH_REPLY_CHUNK(s, iter, handle, structured, \
-+                                qiov, reply, payload) \
-+    for (iter = (NBDReplyChunkIter) { .only_structured = structured }; \
-+         nbd_reply_chunk_iter_receive(s, &iter, handle, qiov, reply, payload);)
-+
-+static bool nbd_reply_chunk_iter_receive(NBDClientSession *s,
-+                                         NBDReplyChunkIter *iter,
-+                                         uint64_t handle,
-+                                         QEMUIOVector *qiov, NBDReply *reply,
-+                                         void **payload)
-+{
-+    int ret;
-+    NBDReply local_reply;
-+    NBDStructuredReplyChunk *chunk;
-+    if (s->quit) {
-+        if (iter->ret == 0) {
-+            iter->ret = -EIO;
-+        }
-+        goto break_loop;
-+    }
-+
-+    if (iter->done) {
-+        /* Previous iteration was last. */
-+        goto break_loop;
-+    }
-+
-+    if (reply == NULL) {
-+        reply = &local_reply;
-+    }
-+
-+    ret = nbd_co_receive_one_chunk(s, handle, iter->only_structured,
-+                                   qiov, reply, payload);
-+    if (ret < 0 && iter->ret == 0) {
-+        /* If it is a fatal error s->qiov is set by nbd_co_receive_one_chunk */
-+        iter->ret = ret;
-+    }
-+
-+    /* Do not execute the body of NBD_FOREACH_REPLY_CHUNK for simple reply. */
-+    if (nbd_reply_is_simple(&s->reply) || s->quit) {
-+        goto break_loop;
-+    }
-+
-+    chunk = &reply->structured;
-+    iter->only_structured = true;
-+
-+    if (chunk->type == NBD_SREP_TYPE_NONE) {
-+        if (!(chunk->flags & NBD_SREP_FLAG_DONE)) {
-+            /* protocol error */
-+            s->quit = true;
-+            if (iter->ret == 0) {
-+                iter->ret = -EIO;
-+            }
-+        }
-+        goto break_loop;
-+    }
-+
-+    if (chunk->flags & NBD_SREP_FLAG_DONE) {
-+        /* This iteration is last. */
-+        iter->done = true;
-+    }
-+
-+    /* Execute the loop body */
-+    return true;
-+
-+break_loop:
-+    s->requests[HANDLE_TO_INDEX(s, handle)].coroutine = NULL;
-+
-     qemu_co_mutex_lock(&s->send_mutex);
-     s->in_flight--;
-     qemu_co_queue_next(&s->free_sema);
-     qemu_co_mutex_unlock(&s->send_mutex);
- 
--    return ret;
-+    return false;
-+}
-+
-+static int nbd_co_receive_return_code(NBDClientSession *s, uint64_t handle)
-+{
-+    NBDReplyChunkIter iter;
-+
-+    NBD_FOREACH_REPLY_CHUNK(s, iter, handle, false, NULL, NULL, NULL) {
-+        /* nbd_reply_chunk_iter_receive does all the work */
-+        ;
-+    }
-+
-+    return iter.ret;
-+}
-+
-+static int nbd_co_receive_cmdread_reply(NBDClientSession *s, uint64_t handle,
-+                                        QEMUIOVector *qiov)
-+{
-+    NBDReplyChunkIter iter;
-+    NBDReply reply;
-+    void *payload = NULL;
-+
-+    NBD_FOREACH_REPLY_CHUNK(s, iter, handle, s->info.structured_reply,
-+                            qiov, &reply, &payload)
+-    if (request->flags & ~(NBD_CMD_FLAG_FUA | NBD_CMD_FLAG_NO_HOLE)) {
++    if (request->flags & ~(NBD_CMD_FLAG_FUA | NBD_CMD_FLAG_NO_HOLE |
++                           NBD_CMD_FLAG_DF))
 +    {
-+        int ret;
-+
-+        switch (reply.structured.type) {
-+        case NBD_SREP_TYPE_OFFSET_DATA:
-+            /* special cased in nbd_co_receive_one_chunk, data is already
-+             * in qiov */
-+            break;
-+        case NBD_SREP_TYPE_OFFSET_HOLE:
-+            ret = nbd_parse_offset_hole_payload(&reply.structured, payload,
-+                                                qiov);
-+            if (ret < 0) {
-+                s->quit = true;
-+            }
-+            break;
-+        default:
-+            /* not allowed reply type */
-+            s->quit = true;
+         error_setg(errp, "unsupported flags (got 0x%x)", request->flags);
+         return -EINVAL;
+     }
++    if (request->type != NBD_CMD_READ && (request->flags & NBD_CMD_FLAG_DF)) {
++        error_setg(errp, "DF flag used with command %d (%s) which is not READ",
++                   request->type, nbd_cmd_lookup(request->type));
++        return -EINVAL;
++    }
+     if (request->type != NBD_CMD_WRITE_ZEROES &&
+         (request->flags & NBD_CMD_FLAG_NO_HOLE)) {
+         error_setg(errp, "unexpected flags (got 0x%x)", request->flags);
+@@ -1374,7 +1452,6 @@ static coroutine_fn void nbd_trip(void *opaque)
+         }
+ 
+         reply_data_len = request.len;
+-
+         break;
+     case NBD_CMD_WRITE:
+         if (exp->nbdflags & NBD_FLAG_READ_ONLY) {
+@@ -1447,10 +1524,21 @@ reply:
+         local_err = NULL;
+     }
+ 
+-    if (nbd_co_send_simple_reply(req->client, request.handle,
+-                                 ret < 0 ? -ret : 0,
+-                                 req->data, reply_data_len, &local_err) < 0)
+-    {
++    if (client->structured_reply && request.type == NBD_CMD_READ) {
++        if (ret < 0) {
++            ret = nbd_co_send_structured_error(req->client, request.handle,
++                                               -ret, &local_err);
++        } else {
++            ret = nbd_co_send_structured_read(req->client, request.handle,
++                                              request.from, req->data,
++                                              reply_data_len, &local_err);
 +        }
-+
-+        qemu_vfree(payload);
-+        payload = NULL;
++    } else {
++        ret = nbd_co_send_simple_reply(req->client, request.handle,
++                                       ret < 0 ? -ret : 0,
++                                       req->data, reply_data_len, &local_err);
 +    }
-+
-+    return iter.ret;
- }
- 
- static int nbd_co_request(BlockDriverState *bs,
-                           NBDRequest *request,
--                          QEMUIOVector *qiov)
-+                          QEMUIOVector *write_qiov)
- {
-     NBDClientSession *client = nbd_get_client_session(bs);
-     int ret;
- 
--    if (qiov) {
--        assert(request->type == NBD_CMD_WRITE || request->type == NBD_CMD_READ);
--        assert(request->len == iov_size(qiov->iov, qiov->niov));
-+    assert(request->type != NBD_CMD_READ);
-+    if (write_qiov) {
-+        assert(request->type == NBD_CMD_WRITE);
-+        assert(request->len == iov_size(write_qiov->iov, write_qiov->niov));
-     } else {
--        assert(request->type != NBD_CMD_WRITE && request->type != NBD_CMD_READ);
-+        assert(request->type != NBD_CMD_WRITE);
-     }
--    ret = nbd_co_send_request(bs, request,
--                              request->type == NBD_CMD_WRITE ? qiov : NULL);
-+    ret = nbd_co_send_request(bs, request, write_qiov);
-     if (ret < 0) {
-         return ret;
-     }
- 
--    return nbd_co_receive_reply(client, request->handle,
--                                request->type == NBD_CMD_READ ? qiov : NULL);
-+    return nbd_co_receive_return_code(client, request->handle);
- }
- 
- int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
-                          uint64_t bytes, QEMUIOVector *qiov, int flags)
- {
-+    int ret;
-+    NBDClientSession *client = nbd_get_client_session(bs);
-     NBDRequest request = {
-         .type = NBD_CMD_READ,
-         .from = offset,
-@@ -259,7 +591,12 @@ int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
-     assert(bytes <= NBD_MAX_BUFFER_SIZE);
-     assert(!flags);
- 
--    return nbd_co_request(bs, &request, qiov);
-+    ret = nbd_co_send_request(bs, &request, NULL);
 +    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    return nbd_co_receive_cmdread_reply(client, request.handle, qiov);
- }
- 
- int nbd_client_co_pwritev(BlockDriverState *bs, uint64_t offset,
-diff --git a/nbd/client.c b/nbd/client.c
-index a38e1a7d8e..2f256ee771 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -687,6 +687,13 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-         if (fixedNewStyle) {
-             int result;
- 
-+            result = nbd_request_simple_option(ioc, NBD_OPT_STRUCTURED_REPLY,
-+                                               errp);
-+            if (result < 0) {
-+                goto fail;
-+            }
-+            info->structured_reply = result == 1;
-+
-             /* Try NBD_OPT_GO first - if it works, we are done (it
-              * also gives us a good message if the server requires
-              * TLS).  If it is not available, fall back to
+         error_prepend(&local_err, "Failed to send reply: ");
+         goto disconnect;
+     }
 -- 
 2.11.1
