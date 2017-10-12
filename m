@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e2dHv-0002YI-Ed
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:12:36 -0400
+	(envelope-from <berto@igalia.com>) id 1e2dI7-0002hW-Hs
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:12:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e2dHr-0004f7-8R
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:12:35 -0400
+	(envelope-from <berto@igalia.com>) id 1e2dI6-0004sf-I9
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:12:47 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Thu, 12 Oct 2017 16:05:22 +0300
-Message-Id: <070b0cebec08d8f7445a6d58e34075f64a239269.1507813391.git.berto@igalia.com>
+Date: Thu, 12 Oct 2017 16:05:24 +0300
+Message-Id: <cb0fd7a0aa76b107abe046293285041234a40a63.1507813391.git.berto@igalia.com>
 In-Reply-To: <cover.1507813391.git.berto@igalia.com>
 References: <cover.1507813391.git.berto@igalia.com>
 In-Reply-To: <cover.1507813391.git.berto@igalia.com>
 References: <cover.1507813391.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 08/31] qcow2: Remove BDS parameter from
- qcow2_cache_destroy()
+Subject: [Qemu-devel] [PATCH 10/31] qcow2: Remove BDS parameter from
+ qcow2_cache_discard()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,95 +25,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Alberto Garcia <berto@igalia.com>
 
-This function was never using the BlockDriverState parameter so it can
-be safely removed.
+This function was only using the BlockDriverState parameter to pass it
+to qcow2_cache_get_table_idx() and qcow2_cache_table_release(). This
+is no longer necessary so this parameter can be removed.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2-cache.c |  2 +-
- block/qcow2.c       | 16 ++++++++--------
- block/qcow2.h       |  2 +-
- 3 files changed, 10 insertions(+), 10 deletions(-)
+ block/qcow2-cache.c    | 2 +-
+ block/qcow2-refcount.c | 6 +++---
+ block/qcow2.h          | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
-index bd2bc7e063..a50a56bd8b 100644
+index cc7995c4bf..4775bec838 100644
 --- a/block/qcow2-cache.c
 +++ b/block/qcow2-cache.c
-@@ -130,7 +130,7 @@ Qcow2Cache *qcow2_cache_create(BlockDriverState *bs, int num_tables)
-     return c;
+@@ -420,7 +420,7 @@ void *qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
+     return NULL;
  }
  
--int qcow2_cache_destroy(BlockDriverState *bs, Qcow2Cache *c)
-+int qcow2_cache_destroy(Qcow2Cache *c)
+-void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table)
++void qcow2_cache_discard(Qcow2Cache *c, void *table)
  {
-     int i;
+     int i = qcow2_cache_get_table_idx(c, table);
  
-diff --git a/block/qcow2.c b/block/qcow2.c
-index dff903e05c..ba8139f82c 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1031,10 +1031,10 @@ static void qcow2_update_options_commit(BlockDriverState *bs,
-     int i;
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index e93c1acd79..6eb71a2a5f 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -868,12 +868,12 @@ static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
+                                                 offset);
+             if (table != NULL) {
+                 qcow2_cache_put(s->refcount_block_cache, &refcount_block);
+-                qcow2_cache_discard(bs, s->refcount_block_cache, table);
++                qcow2_cache_discard(s->refcount_block_cache, table);
+             }
  
-     if (s->l2_table_cache) {
--        qcow2_cache_destroy(bs, s->l2_table_cache);
-+        qcow2_cache_destroy(s->l2_table_cache);
-     }
-     if (s->refcount_block_cache) {
--        qcow2_cache_destroy(bs, s->refcount_block_cache);
-+        qcow2_cache_destroy(s->refcount_block_cache);
-     }
-     s->l2_table_cache = r->l2_table_cache;
-     s->refcount_block_cache = r->refcount_block_cache;
-@@ -1060,10 +1060,10 @@ static void qcow2_update_options_abort(BlockDriverState *bs,
-                                        Qcow2ReopenState *r)
- {
-     if (r->l2_table_cache) {
--        qcow2_cache_destroy(bs, r->l2_table_cache);
-+        qcow2_cache_destroy(r->l2_table_cache);
-     }
-     if (r->refcount_block_cache) {
--        qcow2_cache_destroy(bs, r->refcount_block_cache);
-+        qcow2_cache_destroy(r->refcount_block_cache);
-     }
-     qapi_free_QCryptoBlockOpenOptions(r->crypto_opts);
- }
-@@ -1492,10 +1492,10 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
-     s->l1_table = NULL;
-     cache_clean_timer_del(bs);
-     if (s->l2_table_cache) {
--        qcow2_cache_destroy(bs, s->l2_table_cache);
-+        qcow2_cache_destroy(s->l2_table_cache);
-     }
-     if (s->refcount_block_cache) {
--        qcow2_cache_destroy(bs, s->refcount_block_cache);
-+        qcow2_cache_destroy(s->refcount_block_cache);
-     }
-     qcrypto_block_free(s->crypto);
-     qapi_free_QCryptoBlockOpenOptions(s->crypto_opts);
-@@ -2078,8 +2078,8 @@ static void qcow2_close(BlockDriverState *bs)
-     }
+             table = qcow2_cache_is_table_offset(bs, s->l2_table_cache, offset);
+             if (table != NULL) {
+-                qcow2_cache_discard(bs, s->l2_table_cache, table);
++                qcow2_cache_discard(s->l2_table_cache, table);
+             }
  
-     cache_clean_timer_del(bs);
--    qcow2_cache_destroy(bs, s->l2_table_cache);
--    qcow2_cache_destroy(bs, s->refcount_block_cache);
-+    qcow2_cache_destroy(s->l2_table_cache);
-+    qcow2_cache_destroy(s->refcount_block_cache);
+             if (s->discard_passthrough[type]) {
+@@ -3106,7 +3106,7 @@ static int qcow2_discard_refcount_block(BlockDriverState *bs,
+                                            discard_block_offs);
+     if (refblock) {
+         /* discard refblock from the cache if refblock is cached */
+-        qcow2_cache_discard(bs, s->refcount_block_cache, refblock);
++        qcow2_cache_discard(s->refcount_block_cache, refblock);
+     }
+     update_refcount_discard(bs, discard_block_offs, s->cluster_size);
  
-     qcrypto_block_free(s->crypto);
-     s->crypto = NULL;
 diff --git a/block/qcow2.h b/block/qcow2.h
-index 7fa195bc22..ddf60fa290 100644
+index 9e6b5102f0..ec0225c016 100644
 --- a/block/qcow2.h
 +++ b/block/qcow2.h
-@@ -646,7 +646,7 @@ int qcow2_read_snapshots(BlockDriverState *bs);
+@@ -665,7 +665,7 @@ int qcow2_cache_get_empty(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset,
+ void qcow2_cache_put(Qcow2Cache *c, void **table);
+ void *qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
+                                   uint64_t offset);
+-void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table);
++void qcow2_cache_discard(Qcow2Cache *c, void *table);
  
- /* qcow2-cache.c functions */
- Qcow2Cache *qcow2_cache_create(BlockDriverState *bs, int num_tables);
--int qcow2_cache_destroy(BlockDriverState* bs, Qcow2Cache *c);
-+int qcow2_cache_destroy(Qcow2Cache *c);
- 
- void qcow2_cache_entry_mark_dirty(Qcow2Cache *c, void *table);
- int qcow2_cache_flush(BlockDriverState *bs, Qcow2Cache *c);
+ /* qcow2-bitmap.c functions */
+ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
 -- 
 2.11.0
