@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2dzB-0002SO-El
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:57:18 -0400
+	(envelope-from <jcody@redhat.com>) id 1e2e3x-0006Mg-JQ
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 10:02:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2dzA-0006to-IC
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:57:17 -0400
-References: <20171002143919.207741-1-vsementsov@virtuozzo.com>
-	<20171002143919.207741-5-vsementsov@virtuozzo.com>
-	<a7594875-cd6f-8195-4b86-d7f67ad9f208@redhat.com>
-	<2cb5ac95-e27c-2d13-b557-9dedc1f86473@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <28aa9488-8cf3-b71f-5c74-74c884fbe3be@redhat.com>
-Date: Thu, 12 Oct 2017 08:56:46 -0500
+	(envelope-from <jcody@redhat.com>) id 1e2e3u-0001Nj-Cd
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 10:02:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37040)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jcody@redhat.com>) id 1e2e3u-0001Mx-6p
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 10:02:10 -0400
+Date: Thu, 12 Oct 2017 10:01:59 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20171012140159.GA11619@localhost.localdomain>
+References: <CAFEAcA81AZBaGu6nrLK51_6vWApMSpMDhb9OsnkdApMGebYK8w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <2cb5ac95-e27c-2d13-b557-9dedc1f86473@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="g1cXWD6SHw1jKVXjV6R2bDONkgUN63Tej"
-Subject: Re: [Qemu-devel] [PATCH 4/5] backup: simplify non-dirty bits
- progress processing
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA81AZBaGu6nrLK51_6vWApMSpMDhb9OsnkdApMGebYK8w@mail.gmail.com>
+Subject: Re: [Qemu-devel] qemu.org: new git repos to be mirrored
+ (qemu-palcode, capstone, keycodemapdb)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +27,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---g1cXWD6SHw1jKVXjV6R2bDONkgUN63Tej
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, mreitz@redhat.com,
- stefanha@redhat.com, den@openvz.org
-Message-ID: <28aa9488-8cf3-b71f-5c74-74c884fbe3be@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/5] backup: simplify non-dirty bits progress
- processing
-References: <20171002143919.207741-1-vsementsov@virtuozzo.com>
- <20171002143919.207741-5-vsementsov@virtuozzo.com>
- <a7594875-cd6f-8195-4b86-d7f67ad9f208@redhat.com>
- <2cb5ac95-e27c-2d13-b557-9dedc1f86473@virtuozzo.com>
-In-Reply-To: <2cb5ac95-e27c-2d13-b557-9dedc1f86473@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Oct 12, 2017 at 01:42:54PM +0100, Peter Maydell wrote:
+> On 12 October 2017 at 11:14, Daniel P. Berrange <berrange@redhat.com> wrote:
+> > On Thu, Oct 12, 2017 at 12:13:23PM +0200, Gerd Hoffmann wrote:
+> >> On Thu, 2017-10-12 at 11:07 +0100, Daniel P. Berrange wrote:
+> >> > On Thu, Oct 12, 2017 at 12:04:47PM +0200, Gerd Hoffmann wrote:
+> >> > > Hmm, so maybe we should mirror the thing on git.qemu.org and use
+> >> > > that?
+> >> >
+> >> > Can that be made 100% automated - I don't want to have to push
+> >> > changes to
+> >> > two different git repos.
+> >>
+> >> Yes, seabios works that way for example.
+> >
+> > Ok, lets do that mirror then we can use git:// and we're consistent with
+> > other submodules we use
+> 
+> We also have RTH's capstone disassembler patchset which wants to
+> use capstone as a more-or-less-required dependency, and we have
+> the one loose end in our current submodules that the qemu-palcode
+> rom is using a non-qemu.org URL.
+> 
+> So can we set up these repos to be mirrored on qemu.org:
+>  * git://github.com/rth7680/qemu-palcode.git
+>  * https://github.com/aquynh/capstone.git
+>  * https://gitlab.com/keycodemap/keycodemapdb.git
+> 
+> please?
+> 
+> thanks
 
-On 10/12/2017 06:42 AM, Vladimir Sementsov-Ogievskiy wrote:
+Done.
 
->> I'm not sure we actually need a new field... let's just say that the j=
-ob
->> length is the number of bytes described by the incremental backup. Eve=
-ry
->> time we copy some, move offset forward. This would give a more
->> appropriately linear/accurate sense of the progress.
->>
->> I think we are allowed to do this as I think we promise that these
->> progress numbers mean essentially nothing...
->=20
-> I'm not sure, length is published field, it is available in libvirt.
-> IMHO, If we change it semantics it should
-> firstly break our iotests but what it will break for users is
-> unpredictable..
+The git.qemu.org URLs are:
 
-Libvirt already documents that progress numbers do NOT have any specific
-meaning other than a rough estimate of percentage complete, and that it
-IS acceptable for the numbers to jump around or move non-linearly during
-a job.  I see no problem with returning different numbers than
-previously if it makes our estimation of progress look smoother; it is
-not a semantics change by the definition we've given to the numbers, but
-merely a quality-of-implementation improvement.
+git://git.qemu.org/capstone.git
+https://git.qemu.org/git/capstone.git
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+git://git.qemu.org/keycodemapdb.git
+https://git.qemu.org/git/keycodemapdb.git
+
+git://git.qemu.org/qemu-palcode.git
+https://git.qemu.org/git/qemu-palcode.git
 
 
---g1cXWD6SHw1jKVXjV6R2bDONkgUN63Tej
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+And of course they can also be viewed via the gitweb interface:
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+https://git.qemu.org/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnfdJ4ACgkQp6FrSiUn
-Q2rt7ggAocRL8DmLrq04dOXCcQ9voJlsH3I9g7VMxiJ3/FepTHBfvUI9qp4NuPfr
-Xzu0WjmoARYmH9hV5C0yV564du2Caj8V6MxMnjuR3+5rrKWL0oTgMtUMewhYCFu3
-bEz6k8KAJhwpIm2EB7ZBy+C8zo5R687ZwMWGI9gb5fuyMGMg/GXxG0TGSlsleOYT
-HH93brBmZmVj95Z9hFUdmzhJTzPNpW+HsH8EulT9nAr8254mqkbMjBGBaeLLyIVL
-3izui1qX0isC8tjE4K2GBrwbrvHA6WfaakW1/VSRwuGtGvL4opPaPcqMvugRZjeS
-PD/JQYyDN9ntHEKbSP5w4YcSY9oujw==
-=rITL
------END PGP SIGNATURE-----
 
---g1cXWD6SHw1jKVXjV6R2bDONkgUN63Tej--
+I have NOT set these to push to our github mirror account, since I assume it
+is read-only.  Would you prefer I go ahead and mirror them there as well,
+anyway?
+
+
+-Jeff
