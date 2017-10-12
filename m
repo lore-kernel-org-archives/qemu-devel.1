@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2fKv-00020v-Vu
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:23:50 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1e2fRe-000437-L7
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:30:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2fKs-0000T7-FZ
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:23:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42130)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1e2fKs-0000Rd-7G
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:23:46 -0400
-References: <1507655662-28101-1-git-send-email-peter.maydell@linaro.org>
-	<d56cf809-5f37-2fff-bcb1-80296cf5f33a@linaro.org>
-	<2d38fb05-c496-1cc3-9253-cc01b2ba8a1b@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e1d53fc9-10fc-84a5-e796-1c801a07614e@redhat.com>
-Date: Thu, 12 Oct 2017 10:23:42 -0500
-MIME-Version: 1.0
-In-Reply-To: <2d38fb05-c496-1cc3-9253-cc01b2ba8a1b@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="MSxtjV7AVT6DSXL2xph1bGaEMvGqsUnug"
-Subject: Re: [Qemu-devel] [PATCH v3] docs/devel/loads-stores.rst: Document
- our various load and store APIs
+	(envelope-from <pm215@archaic.org.uk>) id 1e2fRd-00057h-M4
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:30:46 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37866)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1e2fRd-00057B-EY
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:30:45 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Oct 2017 16:30:44 +0100
+Message-Id: <1507822245-15748-2-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1507822245-15748-1-git-send-email-peter.maydell@linaro.org>
+References: <1507822245-15748-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 1/2] linux-user: Fix target FS_IOC_GETFLAGS and
+ FS_IOC_SETFLAGS numbers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,68 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, pgndev <pgnet.dev@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MSxtjV7AVT6DSXL2xph1bGaEMvGqsUnug
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
-Message-ID: <e1d53fc9-10fc-84a5-e796-1c801a07614e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] docs/devel/loads-stores.rst: Document our
- various load and store APIs
-References: <1507655662-28101-1-git-send-email-peter.maydell@linaro.org>
- <d56cf809-5f37-2fff-bcb1-80296cf5f33a@linaro.org>
- <2d38fb05-c496-1cc3-9253-cc01b2ba8a1b@redhat.com>
-In-Reply-To: <2d38fb05-c496-1cc3-9253-cc01b2ba8a1b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+We were defining TARGET_FS_IOC_GETFLAGS and TARGET_FS_IOC_SETFLAGS
+using the host 'long' type in the size field, which meant that
+they had the wrong values if the host and guest had different
+sized longs. Switch to abi_long instead.
 
-On 10/12/2017 10:13 AM, Paolo Bonzini wrote:
-> On 12/10/2017 17:10, Richard Henderson wrote:
->> On 10/10/2017 10:14 AM, Peter Maydell wrote:
->>> QEMU has a wide selection of different functions for doing
->>> loads and stores; provide some overview documentation of
->>> what they do and how to pick which one to use.
->>>
->>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+This fixes a bug where these ioctls don't work on 32-bit guests
+on 64-bit hosts (and makes the LTP test 'setxattr03' pass
+where it did not previously.)
 
->> Modulo the 2 typos that Eric found,
->>
->> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->>
->> What path should this patch take in?
->=20
-> I can take it.
+Reported-by: pgndev <pgnet.dev@gmail.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ linux-user/syscall_defs.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Be sure to take v4, though :)
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---MSxtjV7AVT6DSXL2xph1bGaEMvGqsUnug
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnfiP4ACgkQp6FrSiUn
-Q2r6EQf+PTiujk13DVXpE22WfGZOsImWiNlcgkXH+Qb/iPJ4NUWMfDjcCWDCW4X1
-Iiq/JAjWjXM3jhFiWZWcNiLRTvd5W0EgK9r8Udb5yx2ytnqNN/Yn5V5MXt1E7PB3
-W5zFaBH+mNOrvqe3of4WTsZxDYewmVOmfQ7HGXi2DUtngS+pdqTjADyg6p+egyR4
-vLAh/LDhYCWVeojz2ulShSJ0a5TvyaIHqpDZrZlQ4SkX75AViN06q+ZZGRfsTG+r
-uXzSi8pFmS3woVJ38NRNzRs4D6a+OddrM5Nzz48IoBKOQtXDIRpZNQWiV76UC60f
-DBET6hhnmkLLozUXQUYSCdJrpzmqNA==
-=nkAp
------END PGP SIGNATURE-----
-
---MSxtjV7AVT6DSXL2xph1bGaEMvGqsUnug--
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 40c5027..f7cc9f9 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -1101,8 +1101,8 @@ struct target_pollfd {
+ /* Note that the ioctl numbers claim type "long" but the actual type
+  * used by the kernel is "int".
+  */
+-#define TARGET_FS_IOC_GETFLAGS TARGET_IOR('f', 1, long)
+-#define TARGET_FS_IOC_SETFLAGS TARGET_IOW('f', 2, long)
++#define TARGET_FS_IOC_GETFLAGS TARGET_IOR('f', 1, abi_long)
++#define TARGET_FS_IOC_SETFLAGS TARGET_IOW('f', 2, abi_long)
+ 
+ #define TARGET_FS_IOC_FIEMAP TARGET_IOWR('f',11,struct fiemap)
+ 
+-- 
+2.7.4
