@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e2ZLx-0004z7-KU
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:00:30 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e2Zdb-0007E5-Cs
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:18:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e2ZLs-0002f9-09
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:00:29 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:43865)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e2ZLr-0002e0-H0
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:00:23 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id m72so23042681wmc.0
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 02:00:23 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1e2ZdY-0004ch-8Z
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:18:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42322)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1e2ZdY-0004Pf-2R
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:18:40 -0400
+Date: Thu, 12 Oct 2017 11:18:31 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171012091831.GA5624@localhost.localdomain>
+References: <20171011191317.24157-1-dgilbert@redhat.com>
+	<20171012082145.GA16125@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171012082456.GB16125@redhat.com>
-References: <20171011083604.11820-1-kraxel@redhat.com>
-	<CAFEAcA9uXw7XYOBu9cKY+B=OWNbS=cRp7BKcXacLTaRLx9RWdA@mail.gmail.com>
-	<20171011154951.GA6163@redhat.com>
-	<CAFEAcA8OZALycKmsrC=MrftfF0YytXzRxGrzbetmSvddfTVf1g@mail.gmail.com>
-	<20171012082456.GB16125@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Oct 2017 10:00:01 +0100
-Message-ID: <CAFEAcA_Nxw4totmmuJK814SBy8=1vxpXKQpA3GNtafpHXSAAtg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/10] Ui 20171011 patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171012082145.GA16125@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/7] migration: pause-before-device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,30 +28,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, jdenemar@redhat.com, wangjie88@huawei.com, quintela@redhat.com, peterx@redhat.com, mreitz@redhat.com, eblake@redhat.com, fuweiwei2@huawei.com
 
-On 12 October 2017 at 09:24, Daniel P. Berrange <berrange@redhat.com> wrote:
-> On Wed, Oct 11, 2017 at 05:45:04PM +0100, Peter Maydell wrote:
->> $ ./scripts/git-submodule.sh update ui/keycodemapdb dtc
->> Cloning into 'ui/keycodemapdb'...
->> fatal: unable to access
->> 'https://gitlab.com/keycodemap/keycodemapdb.git/': Problem with the
->> SSL CA cert (path? access rights?)
->> fatal: clone of 'https://gitlab.com/keycodemap/keycodemapdb.git' into
->> submodule path 'ui/keycodemapdb' failed
->
-> I'm not sure what I can do about this one - if GIT can't checkout
-> a normal git repo, this looks like a OS distro / setup bug on the
-> build host.
+Am 12.10.2017 um 10:21 hat Daniel P. Berrange geschrieben:
+> On Wed, Oct 11, 2017 at 08:13:10PM +0100, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > Hi,
+> >   This set attempts to make a race condition between migration and
+> > drive-mirror (and other block users) soluble by allowing the migration
+> > to be paused after the source qemu releases the block devices but
+> > before the serialisation of the device state.
+> > 
+> > The symptom of this failure, as reported by Wangjie, is a:
+> >    _co_do_pwritev: Assertion `!(bs->open_flags & 0x0800)' failed
+> > 
+> > and the source qemu dieing; so the problem is pretty nasty.
+> > This has only been seen on 2.9 onwards, but the theory is that
+> > prior to 2.9 it might have been happening anyway and we were
+> > perhaps getting unreported corruptions (lost writes); so this
+> > really needs fixing.
+> > 
+> > This flow came from discussions between Kevin and me, and we can't
+> > see a way of fixing it without exposing a new state to the management
+> > layer.
+> > 
+> > The flow is now:
+> > 
+> > (qemu) migrate_set_capability pause-before-device on
+> > (qemu) migrate -d ...
+> > (qemu) info migrate
+> > ...
+> > Migration status: pause-before-device
+> > ...
+> > << issue commands to clean up any block jobs>>
+> > 
+> > (qemu) migrate_continue pause-before-device
+> > (qemu) info migrate
+> > ...
+> > Migration status: completed
+> 
+> I'm curious why QEMU doesn't have enough info to clean up the block
+> jobs automatically ? What is the key thing that libvirt knows about
+> the block jobs, that QEMU is lacking ? If QEMU had the right info it
+> could do it automatically & avoid this extra lock-step synchronization
+> with libvirt.
 
-Build system (which is a chroot) didn't have openssl or ca-certificates
-packages installed. That hasn't been a problem so far because we
-haven't used https:// for git previously.
+The key point is that the block job needs to be completed while the
+source VM is stopped, but the source qemu is still in control of the
+image files (e.g. still holds the file locks), so that it can do the
+remaining writes.
 
-I've updated the packages on the build system, but it would be nice
-if we had a clearer error message when the problem is "we now
-depend on some packages that we didn't previously and so you
-should install them".
+Without the additional migration phase, the only state where both sides
+are stopped is when the destination is in control of the image files
+(migration has completed, but -S prevents it from automatically
+resuming), so the source can't write to the image any more.
 
-thanks
--- PMM
+Kevin
