@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1e2mZi-0007Dm-Rz
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 19:07:35 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e2mfp-00008G-6i
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 19:13:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1e2mZf-0002yx-Fn
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 19:07:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48182)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1e2mZf-0002ya-8w
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 19:07:31 -0400
-Date: Thu, 12 Oct 2017 19:07:27 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <1755911209.19947416.1507849647657.JavaMail.zimbra@redhat.com>
-In-Reply-To: <CAPcyv4jukEoKpH0OvZSNour+m5eQzuhiPAefAhYPqH2=f_ungA@mail.gmail.com>
-References: <20171012155027.3277-1-pagupta@redhat.com>
-	<CAPcyv4i7k6aYK_y4zZtL6p8sW-E_Ft58d2HuxO=dYciqQxaoLg@mail.gmail.com>
-	<1567317495.19940236.1507843517318.JavaMail.zimbra@redhat.com>
-	<CAPcyv4gkri7t+3Unf0sc9AHMnz-v9G_qV_bJppLjUUNAn7drrQ@mail.gmail.com>
-	<1363955128.19944709.1507846719987.JavaMail.zimbra@redhat.com>
-	<1507847249.21121.207.camel@redhat.com>
-	<1111804283.19946669.1507848765955.JavaMail.zimbra@redhat.com>
-	<CAPcyv4jukEoKpH0OvZSNour+m5eQzuhiPAefAhYPqH2=f_ungA@mail.gmail.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1e2mfo-0000zj-0F
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 19:13:53 -0400
+Date: Fri, 13 Oct 2017 09:24:09 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171012222409.GE28032@umbus.fritz.box>
+References: <1507578671-158758-19-git-send-email-imammedo@redhat.com>
+	<1507823408-270386-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 2/2] KVM: add virtio-pmem driver
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="bi5JUZtvcfApsciF"
+Content-Disposition: inline
+In-Reply-To: <1507823408-270386-1-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 18/24] fixup! ppc: spapr: use generic
+ cpu_model parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,24 +25,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: Rik van Riel <riel@redhat.com>, linux-kernel@vger.kernel.org, KVM list <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-nvdimm <linux-nvdimm@ml01.01.org>, Linux MM <linux-mm@kvack.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Nitesh Narayan Lal <nilal@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Ross Zwisler <ross.zwisler@intel.com>, David Hildenbrand <david@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, agraf@suse.de
 
 
-> > Dan,
-> >
-> > I have a query regarding below patch [*]. My assumption is its halted
-> > because of memory hotplug restructuring work? Anything I am missing
-> > here?
-> >
-> > [*] https://www.mail-archive.com/linux-nvdimm@lists.01.org/msg02978.html
-> 
-> It's fallen to the back of my queue since the original driving need of
-> platform firmware changing offsets from boot-to-boot is no longer an
-> issue. However, it does mean that you need to arrange for 128MB
-> aligned devm_memremap_pages() ranges for the foreseeable future.
+--bi5JUZtvcfApsciF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-o.k I will provide 128MB aligned pages to devm_memremap_pages() function.
+On Thu, Oct 12, 2017 at 05:50:08PM +0200, Igor Mammedov wrote:
+> inot sure how it managed to compile locally and on travis
 
-Thanks,
-Pankaj
+Because target/ppc/kvm.c is only compiled on a ppc _host_.
+
+> but build fails with type mismatch on PPC host, fixup it
+> by casting to expected type
+
+I already hit this one and fixed it up in place.
+
+>=20
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  target/ppc/kvm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 48dc3f7..9d57deb 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -2505,7 +2505,7 @@ static int kvm_ppc_register_host_cpu_type(MachineSt=
+ate *ms)
+>      }
+>      type_info.parent =3D object_class_get_name(OBJECT_CLASS(pvr_pcc));
+>      type_register(&type_info);
+> -    if (object_dynamic_cast(ms, TYPE_SPAPR_MACHINE)) {
+> +    if (object_dynamic_cast(OBJECT(ms), TYPE_SPAPR_MACHINE)) {
+>          /* override TCG default cpu type with 'host' cpu model */
+>          mc->default_cpu_type =3D TYPE_HOST_POWERPC_CPU;
+>      }
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--bi5JUZtvcfApsciF
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnf64gACgkQbDjKyiDZ
+s5Ln0xAAxpfhygwPDHd6lTq7ZbFWZY8HZhBsj5okk1O7zjv71m7JJktWfaoDzKFi
+tA9wRGxo9GMoY2jIGOBOD/9N8U9a4X05Ba3wgSgFoFJ9NDQJCl5KLs2rtC29qYWu
+rBhY8+5LzB10LC97l2e9ld679u97LvffJy8rMDqrAmFvCNVsIfcf4Va0wfoBm7g7
+aKqp0GpZXd1Y4NcdDaYosqVvvP2JcyotBzjjVCcRTd9cXr+6UTITvwcoNXi17cUw
+cMwP2ANDC/mYbf1hTDNCM3hohFxO+dC6EKRT7XqHpyI9AO986oGTgcJLcIKpXdhN
+/5c5Z7AtHO4z+K3B24yysQczOaHL3RB6G832cgc0IusAP4t8WCdPnEUsZc6REeTY
+37H0X0RaLdTxa/CF6klvFRcdCQyzXIyMoejfAN/+k/g6tpp7ILc3Xt6YvgLraP8O
+hQJo9/zoEzVv+ZTTFjod0zfqaR9my8PwicQFy8pLBAnwr7VJmdQp+xj+LY/F1cBU
+nl3fIP7q5eV1VF5wj/qH6ruSSPm8u9We5ciPzSvQ9vzkohVHxBYy8wGOkWw4CQgd
+QM8JthRmNV0HbPYIXlpRBtSS3qwFBp31oBVJ6fHH+NsyFsCi7EzCVdCKdcgcp4yS
+72VKEJwTmWEUDqyCoJkDqwZoqltMFO9sTNtO7K3Ek7ix+JA7+Cw=
+=JStO
+-----END PGP SIGNATURE-----
+
+--bi5JUZtvcfApsciF--
