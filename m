@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e2aBI-0001Fb-6K
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e2aBI-0001Fa-5u
 	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:53:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e2aBF-0000IG-LQ
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e2aBF-0000Hv-Gi
 	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:53:32 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:31073 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:23852 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1e2aBF-0000Db-8I
+	id 1e2aBF-0000Dd-4F
 	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 05:53:29 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 12 Oct 2017 12:53:12 +0300
-Message-Id: <20171012095319.136610-7-vsementsov@virtuozzo.com>
+Date: Thu, 12 Oct 2017 12:53:14 +0300
+Message-Id: <20171012095319.136610-9-vsementsov@virtuozzo.com>
 In-Reply-To: <20171012095319.136610-1-vsementsov@virtuozzo.com>
 References: <20171012095319.136610-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 06/13] nbd/server: refactor
- nbd_co_send_simple_reply parameters
+Subject: [Qemu-devel] [PATCH v3 08/13] nbd: header constants indenting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +27,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Pass client and buffer (*data) parameters directly, to make the function
-consistent with further structured reply sending functions.
+Prepare indenting for the following commit.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- nbd/server.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ include/block/nbd.h | 15 ++++++++-------
+ nbd/nbd-internal.h  | 34 +++++++++++++++++-----------------
+ 2 files changed, 25 insertions(+), 24 deletions(-)
 
-diff --git a/nbd/server.c b/nbd/server.c
-index 3878145f63..afc127bbd9 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1196,12 +1196,13 @@ static inline void set_be_simple_reply(NBDSimpleReply *reply, uint64_t error,
-     stq_be_p(&reply->handle, handle);
- }
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index 49008980f4..a6df5ce8b5 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -71,13 +71,14 @@ typedef struct NBDSimpleReply {
  
--static int nbd_co_send_simple_reply(NBDRequestData *req,
-+static int nbd_co_send_simple_reply(NBDClient *client,
-                                     uint64_t handle,
-                                     uint32_t error,
--                                    int len, Error **errp)
-+                                    void *data,
-+                                    size_t len,
-+                                    Error **errp)
- {
--    NBDClient *client = req->client;
-     NBDSimpleReply simple_reply;
-     int ret;
+ /* Transmission (export) flags: sent from server to client during handshake,
+    but describe what will happen during transmission */
+-#define NBD_FLAG_HAS_FLAGS      (1 << 0)        /* Flags are there */
+-#define NBD_FLAG_READ_ONLY      (1 << 1)        /* Device is read-only */
+-#define NBD_FLAG_SEND_FLUSH     (1 << 2)        /* Send FLUSH */
+-#define NBD_FLAG_SEND_FUA       (1 << 3)        /* Send FUA (Force Unit Access) */
+-#define NBD_FLAG_ROTATIONAL     (1 << 4)        /* Use elevator algorithm - rotational media */
+-#define NBD_FLAG_SEND_TRIM      (1 << 5)        /* Send TRIM (discard) */
+-#define NBD_FLAG_SEND_WRITE_ZEROES (1 << 6)     /* Send WRITE_ZEROES */
++#define NBD_FLAG_HAS_FLAGS         (1 << 0) /* Flags are there */
++#define NBD_FLAG_READ_ONLY         (1 << 1) /* Device is read-only */
++#define NBD_FLAG_SEND_FLUSH        (1 << 2) /* Send FLUSH */
++#define NBD_FLAG_SEND_FUA          (1 << 3) /* Send FUA (Force Unit Access) */
++#define NBD_FLAG_ROTATIONAL        (1 << 4) /* Use elevator algorithm -
++                                               rotational media */
++#define NBD_FLAG_SEND_TRIM         (1 << 5) /* Send TRIM (discard) */
++#define NBD_FLAG_SEND_WRITE_ZEROES (1 << 6) /* Send WRITE_ZEROES */
  
-@@ -1221,7 +1222,7 @@ static int nbd_co_send_simple_reply(NBDRequestData *req,
-         qio_channel_set_cork(client->ioc, true);
-         ret = nbd_write(client->ioc, &simple_reply, sizeof(simple_reply), NULL);
-         if (ret == 0) {
--            ret = nbd_write(client->ioc, req->data, len, errp);
-+            ret = nbd_write(client->ioc, data, len, errp);
-             if (ret < 0) {
-                 ret = -EIO;
-             }
-@@ -1448,9 +1449,9 @@ reply:
-         local_err = NULL;
-     }
+ /* New-style handshake (global) flags, sent from server to client, and
+    control what will happen during handshake phase. */
+diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
+index 2d6663de23..11a130d050 100644
+--- a/nbd/nbd-internal.h
++++ b/nbd/nbd-internal.h
+@@ -46,23 +46,23 @@
+ /* Size of oldstyle negotiation */
+ #define NBD_OLDSTYLE_NEGOTIATE_SIZE (8 + 8 + 8 + 4 + 124)
  
--    if (nbd_co_send_simple_reply(req, request.handle,
-+    if (nbd_co_send_simple_reply(req->client, request.handle,
-                                  ret < 0 ? -ret : 0,
--                                 reply_data_len, &local_err) < 0)
-+                                 req->data, reply_data_len, &local_err) < 0)
-     {
-         error_prepend(&local_err, "Failed to send reply: ");
-         goto disconnect;
+-#define NBD_REQUEST_MAGIC       0x25609513
+-#define NBD_SIMPLE_REPLY_MAGIC  0x67446698
+-#define NBD_OPTS_MAGIC          0x49484156454F5054LL
+-#define NBD_CLIENT_MAGIC        0x0000420281861253LL
+-#define NBD_REP_MAGIC           0x0003e889045565a9LL
+-
+-#define NBD_SET_SOCK            _IO(0xab, 0)
+-#define NBD_SET_BLKSIZE         _IO(0xab, 1)
+-#define NBD_SET_SIZE            _IO(0xab, 2)
+-#define NBD_DO_IT               _IO(0xab, 3)
+-#define NBD_CLEAR_SOCK          _IO(0xab, 4)
+-#define NBD_CLEAR_QUE           _IO(0xab, 5)
+-#define NBD_PRINT_DEBUG         _IO(0xab, 6)
+-#define NBD_SET_SIZE_BLOCKS     _IO(0xab, 7)
+-#define NBD_DISCONNECT          _IO(0xab, 8)
+-#define NBD_SET_TIMEOUT         _IO(0xab, 9)
+-#define NBD_SET_FLAGS           _IO(0xab, 10)
++#define NBD_REQUEST_MAGIC           0x25609513
++#define NBD_SIMPLE_REPLY_MAGIC      0x67446698
++#define NBD_OPTS_MAGIC              0x49484156454F5054LL
++#define NBD_CLIENT_MAGIC            0x0000420281861253LL
++#define NBD_REP_MAGIC               0x0003e889045565a9LL
++
++#define NBD_SET_SOCK                _IO(0xab, 0)
++#define NBD_SET_BLKSIZE             _IO(0xab, 1)
++#define NBD_SET_SIZE                _IO(0xab, 2)
++#define NBD_DO_IT                   _IO(0xab, 3)
++#define NBD_CLEAR_SOCK              _IO(0xab, 4)
++#define NBD_CLEAR_QUE               _IO(0xab, 5)
++#define NBD_PRINT_DEBUG             _IO(0xab, 6)
++#define NBD_SET_SIZE_BLOCKS         _IO(0xab, 7)
++#define NBD_DISCONNECT              _IO(0xab, 8)
++#define NBD_SET_TIMEOUT             _IO(0xab, 9)
++#define NBD_SET_FLAGS               _IO(0xab, 10)
+ 
+ /* NBD errors are based on errno numbers, so there is a 1:1 mapping,
+  * but only a limited set of errno values is specified in the protocol.
 -- 
 2.11.1
