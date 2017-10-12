@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2ilB-0005VI-Tc
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:03:13 -0400
+	(envelope-from <eblake@redhat.com>) id 1e2ilh-0005tS-DP
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:03:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2ilA-00015F-Jf
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:03:09 -0400
+	(envelope-from <eblake@redhat.com>) id 1e2ilg-0001i5-MB
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 15:03:41 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 12 Oct 2017 13:59:03 -0500
-Message-Id: <20171012185916.22776-8-eblake@redhat.com>
+Date: Thu, 12 Oct 2017 13:59:04 -0500
+Message-Id: <20171012185916.22776-9-eblake@redhat.com>
 In-Reply-To: <20171012185916.22776-1-eblake@redhat.com>
 References: <20171012185916.22776-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 07/20] iscsi: Switch to
+Subject: [Qemu-devel] [PATCH v4 08/20] null: Switch to
  .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,176 +21,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, Max Reitz <mreitz@redhat.com>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based.  Update the iscsi driver accordingly.  In this case,
-it is handy to teach iscsi_co_block_status() to handle a NULL map
-and file parameter, even though the block layer passes non-NULL
-values, because we also call the function directly.  For now, there
-are no optimizations done based on the want_zero flag.
+byte-based.  Update the null driver accordingly.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v4: rebase to interface tweaks
+v4: rebase to interface tweak
 v3: no change
 v2: rebase to mapping parameter
 ---
- block/iscsi.c | 64 +++++++++++++++++++++++++++++------------------------------
- 1 file changed, 32 insertions(+), 32 deletions(-)
+ block/null.c | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 4896d50d6e..cb30e9652c 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -647,28 +647,31 @@ out_unlock:
+diff --git a/block/null.c b/block/null.c
+index dd9c13f9ba..20c7eb0ee2 100644
+--- a/block/null.c
++++ b/block/null.c
+@@ -223,22 +223,23 @@ static int null_reopen_prepare(BDRVReopenState *reopen_state,
+     return 0;
+ }
 
-
-
--static int64_t coroutine_fn iscsi_co_get_block_status(BlockDriverState *bs,
--                                                  int64_t sector_num,
--                                                  int nb_sectors, int *pnum,
--                                                  BlockDriverState **file)
-+static int coroutine_fn iscsi_co_block_status(BlockDriverState *bs,
-+                                              bool want_zero, int64_t offset,
-+                                              int64_t bytes, int64_t *pnum,
-+                                              int64_t *map,
-+                                              BlockDriverState **file)
+-static int64_t coroutine_fn null_co_get_block_status(BlockDriverState *bs,
+-                                                     int64_t sector_num,
+-                                                     int nb_sectors, int *pnum,
+-                                                     BlockDriverState **file)
++static int coroutine_fn null_co_block_status(BlockDriverState *bs,
++                                             bool want_zero, int64_t offset,
++                                             int64_t bytes, int64_t *pnum,
++                                             int64_t *map,
++                                             BlockDriverState **file)
  {
-     IscsiLun *iscsilun = bs->opaque;
-     struct scsi_get_lba_status *lbas = NULL;
-     struct scsi_lba_status_descriptor *lbasd = NULL;
-     struct IscsiTask iTask;
--    int64_t ret;
-+    int ret;
+     BDRVNullState *s = bs->opaque;
+-    off_t start = sector_num * BDRV_SECTOR_SIZE;
++    int64_t ret = BDRV_BLOCK_OFFSET_VALID;
 
-     iscsi_co_init_iscsitask(iscsilun, &iTask);
-
--    if (!is_sector_request_lun_aligned(sector_num, nb_sectors, iscsilun)) {
-+    if (!is_byte_request_lun_aligned(offset, bytes, iscsilun)) {
-         ret = -EINVAL;
-         goto out;
-     }
-
-     /* default to all sectors allocated */
--    ret = BDRV_BLOCK_DATA;
--    ret |= (sector_num << BDRV_SECTOR_BITS) | BDRV_BLOCK_OFFSET_VALID;
 -    *pnum = nb_sectors;
-+    ret = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
-+    if (map) {
-+        *map = offset;
-+    }
 +    *pnum = bytes;
++    *map = offset;
+     *file = bs;
 
-     /* LUN does not support logical block provisioning */
-     if (!iscsilun->lbpme) {
-@@ -678,7 +681,7 @@ static int64_t coroutine_fn iscsi_co_get_block_status(BlockDriverState *bs,
-     qemu_mutex_lock(&iscsilun->mutex);
- retry:
-     if (iscsi_get_lba_status_task(iscsilun->iscsi, iscsilun->lun,
--                                  sector_qemu2lun(sector_num, iscsilun),
-+                                  offset / iscsilun->block_size,
-                                   8 + 16, iscsi_co_generic_cb,
-                                   &iTask) == NULL) {
-         ret = -ENOMEM;
-@@ -717,12 +720,12 @@ retry:
-
-     lbasd = &lbas->descriptors[0];
-
--    if (sector_qemu2lun(sector_num, iscsilun) != lbasd->lba) {
-+    if (offset / iscsilun->block_size != lbasd->lba) {
-         ret = -EIO;
-         goto out_unlock;
+     if (s->read_zeroes) {
+-        return BDRV_BLOCK_OFFSET_VALID | start | BDRV_BLOCK_ZERO;
+-    } else {
+-        return BDRV_BLOCK_OFFSET_VALID | start;
++        ret |= BDRV_BLOCK_ZERO;
      }
++    return ret;
+ }
 
--    *pnum = sector_lun2qemu(lbasd->num_blocks, iscsilun);
-+    *pnum = lbasd->num_blocks * iscsilun->block_size;
+ static void null_refresh_filename(BlockDriverState *bs, QDict *opts)
+@@ -270,7 +271,7 @@ static BlockDriver bdrv_null_co = {
+     .bdrv_co_flush_to_disk  = null_co_flush,
+     .bdrv_reopen_prepare    = null_reopen_prepare,
 
-     if (lbasd->provisioning == SCSI_PROVISIONING_TYPE_DEALLOCATED ||
-         lbasd->provisioning == SCSI_PROVISIONING_TYPE_ANCHORED) {
-@@ -733,15 +736,13 @@ retry:
-     }
+-    .bdrv_co_get_block_status   = null_co_get_block_status,
++    .bdrv_co_block_status   = null_co_block_status,
 
-     if (ret & BDRV_BLOCK_ZERO) {
--        iscsi_allocmap_set_unallocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
--                                       *pnum * BDRV_SECTOR_SIZE);
-+        iscsi_allocmap_set_unallocated(iscsilun, offset, *pnum);
-     } else {
--        iscsi_allocmap_set_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
--                                     *pnum * BDRV_SECTOR_SIZE);
-+        iscsi_allocmap_set_allocated(iscsilun, offset, *pnum);
-     }
+     .bdrv_refresh_filename  = null_refresh_filename,
+ };
+@@ -290,7 +291,7 @@ static BlockDriver bdrv_null_aio = {
+     .bdrv_aio_flush         = null_aio_flush,
+     .bdrv_reopen_prepare    = null_reopen_prepare,
 
--    if (*pnum > nb_sectors) {
--        *pnum = nb_sectors;
-+    if (*pnum > bytes) {
-+        *pnum = bytes;
-     }
- out_unlock:
-     qemu_mutex_unlock(&iscsilun->mutex);
-@@ -749,7 +750,7 @@ out:
-     if (iTask.task != NULL) {
-         scsi_free_scsi_task(iTask.task);
-     }
--    if (ret > 0 && ret & BDRV_BLOCK_OFFSET_VALID) {
-+    if (ret > 0 && ret & BDRV_BLOCK_OFFSET_VALID && file) {
-         *file = bs;
-     }
-     return ret;
-@@ -788,25 +789,24 @@ static int coroutine_fn iscsi_co_readv(BlockDriverState *bs,
-                                  nb_sectors * BDRV_SECTOR_SIZE) &&
-         !iscsi_allocmap_is_allocated(iscsilun, sector_num * BDRV_SECTOR_SIZE,
-                                      nb_sectors * BDRV_SECTOR_SIZE)) {
--        int pnum;
--        BlockDriverState *file;
-+        int64_t pnum;
-         /* check the block status from the beginning of the cluster
-          * containing the start sector */
--        int cluster_sectors = iscsilun->cluster_size >> BDRV_SECTOR_BITS;
--        int head;
--        int64_t ret;
-+        int64_t head;
-+        int ret;
+-    .bdrv_co_get_block_status   = null_co_get_block_status,
++    .bdrv_co_block_status   = null_co_block_status,
 
--        assert(cluster_sectors);
--        head = sector_num % cluster_sectors;
--        ret = iscsi_co_get_block_status(bs, sector_num - head,
--                                        BDRV_REQUEST_MAX_SECTORS, &pnum,
--                                        &file);
-+        assert(iscsilun->cluster_size);
-+        head = (sector_num * BDRV_SECTOR_SIZE) % iscsilun->cluster_size;
-+        ret = iscsi_co_block_status(bs, false,
-+                                    sector_num * BDRV_SECTOR_SIZE - head,
-+                                    BDRV_REQUEST_MAX_BYTES, &pnum, NULL, NULL);
-         if (ret < 0) {
-             return ret;
-         }
-         /* if the whole request falls into an unallocated area we can avoid
-          * reading and directly return zeroes instead */
--        if (ret & BDRV_BLOCK_ZERO && pnum >= nb_sectors + head) {
-+        if (ret & BDRV_BLOCK_ZERO &&
-+            pnum >= nb_sectors * BDRV_SECTOR_SIZE + head) {
-             qemu_iovec_memset(iov, 0, 0x00, iov->size);
-             return 0;
-         }
-@@ -2192,7 +2192,7 @@ static BlockDriver bdrv_iscsi = {
-     .bdrv_truncate   = iscsi_truncate,
-     .bdrv_refresh_limits = iscsi_refresh_limits,
-
--    .bdrv_co_get_block_status = iscsi_co_get_block_status,
-+    .bdrv_co_block_status  = iscsi_co_block_status,
-     .bdrv_co_pdiscard      = iscsi_co_pdiscard,
-     .bdrv_co_pwrite_zeroes = iscsi_co_pwrite_zeroes,
-     .bdrv_co_readv         = iscsi_co_readv,
-@@ -2227,7 +2227,7 @@ static BlockDriver bdrv_iser = {
-     .bdrv_truncate   = iscsi_truncate,
-     .bdrv_refresh_limits = iscsi_refresh_limits,
-
--    .bdrv_co_get_block_status = iscsi_co_get_block_status,
-+    .bdrv_co_block_status  = iscsi_co_block_status,
-     .bdrv_co_pdiscard      = iscsi_co_pdiscard,
-     .bdrv_co_pwrite_zeroes = iscsi_co_pwrite_zeroes,
-     .bdrv_co_readv         = iscsi_co_readv,
+     .bdrv_refresh_filename  = null_refresh_filename,
+ };
 -- 
 2.13.6
