@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anatol.pomozov@gmail.com>) id 1e2nJg-00046B-Qd
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 19:55:08 -0400
+	(envelope-from <eswierk@skyportsystems.com>) id 1e2nNl-00075p-Dv
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 19:59:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anatol.pomozov@gmail.com>) id 1e2nJe-0001gX-6m
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 19:55:04 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:55180)
+	(envelope-from <eswierk@skyportsystems.com>) id 1e2nNi-0004UG-9V
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 19:59:17 -0400
+Received: from mail-pf0-x22f.google.com ([2607:f8b0:400e:c00::22f]:54675)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <anatol.pomozov@gmail.com>)
-	id 1e2nJd-0001fp-RY
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 19:55:02 -0400
-Received: by mail-pf0-x243.google.com with SMTP id m28so7200143pfi.11
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 16:55:01 -0700 (PDT)
-From: Anatol Pomozov <anatol.pomozov@gmail.com>
-Date: Thu, 12 Oct 2017 16:54:38 -0700
-Message-Id: <20171012235439.19457-4-anatol.pomozov@gmail.com>
-In-Reply-To: <20171012235439.19457-1-anatol.pomozov@gmail.com>
-References: <20171012235439.19457-1-anatol.pomozov@gmail.com>
-Subject: [Qemu-devel] [PATCH 3/4] multiboot: load elf sections and section
- headers
+	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
+	id 1e2nNi-0004Ql-0P
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 19:59:14 -0400
+Received: by mail-pf0-x22f.google.com with SMTP id m28so7213452pfi.11
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 16:59:12 -0700 (PDT)
+From: Ed Swierk <eswierk@skyportsystems.com>
+Date: Thu, 12 Oct 2017 16:59:03 -0700
+Message-Id: <1507852743-51639-1-git-send-email-eswierk@skyportsystems.com>
+Subject: [Qemu-devel] [RFC] e1000: Faulty tx checksum offload corrupts
+ packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,601 +25,419 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, rth@twiddle.net, ehabkost@redhat.com, pbonzini@redhat.com, agraf@suse.de, Anatol Pomozov <anatol.pomozov@gmail.com>
+To: eswierk@skyportsystems.com, qemu-devel@nongnu.org
 
-Multiboot may load section headers and all sections (even those that are
-not part of any segment) to target memory.
+The transmit checksum offload implementation in QEMU's e1000 device is
+deficient and causes packet data corruption in some situations.
 
-Tested with an ELF application that uses data from strings table
-section.
+According to the Intel 8254x software developer's manual[1], the
+device maintains two separate contexts: the TCP segmentation offload
+context includes parameters for both segmentation offload and checksum
+offload, and the normal (checksum-offload-only) context includes only
+checksum offload parameters. These parameters specify over which
+packet data to compute the checksum, and where in the packet to store
+the computed checksum(s).
 
-Signed-off-by: Anatol Pomozov <anatol.pomozov@gmail.com>
+[1] https://www.intel.com/content/dam/doc/manual/pci-pci-x-family-gbe-controllers-software-dev-manual.pdf
+
+The e1000 driver can update either of these contexts by sending a
+transmit context descriptor. The TSE bit in the TUCMD field controls
+which context is modified by the descriptor. Crucially, a transmit
+context descriptor with TSE=1 changes only the TSO context, leaving
+the SUM context unchanged; with TSE=0 the opposite is true.
+
+Fields in the transmit data descriptor determine which (if either) of
+these two contexts the device uses when actually transmitting some
+data:
+
+- If the TSE bit in the DCMD field is set, then the device performs
+  TCP segmentation offload using the parameters previously set in the
+  TSO context. In addition, if TXSM and/or IXSM is set in the POPTS
+  field, the device performs the appropriate checksum offloads using
+  the parameters in the same (TSO) context.
+
+- Otherwise, if the TSE bit in the DCMD field is clear, then there is
+  no TCP segmentation offload. If TXSM and/or IXSM is set in the POPTS
+  field, the device performs the appropriate checksum offloads using
+  the parameters in the SUM context.
+
+The e1000 driver is free to set up the TSO and SUM contexts and then
+transmit a mixture of data, with each data descriptor using a
+different (or neither) context. This is what the e1000 driver for
+Windows (Intel(R) PRO/1000 MT Network Connection, aka E1G6023E.sys)
+does in certain cases. Sometimes with quite undesirable results, since
+the QEMU e1000 device doesn't work as described above.
+
+Instead, the QEMU e1000 device maintains only one context in its state
+structure. When it receives a transmit context descriptor from the
+driver, it overwrites the context parameters regardless of the TSE bit
+in the TUCMD field.
+
+To see why this is wrong, suppose the driver first sets up a SUM
+context with UDP checksum offload parameters (say, TUCSO pointing to
+the appropriate offset for a UDP checksum, 6 bytes into the header),
+and then sets up a TSO context with TCP checksum offload parameters
+(TUCSO pointing to the appropriate offset for a TCP checksum, 16 bytes
+into the header). The driver then sends a transmit data descriptor
+with TSO=0 and TXSM=1 along with a UDP datagram. The QEMU e1000 device
+computes the checksum using the last set of checksum offload
+parameters, and writes the checksum to offset 16, stomping on two
+bytes of UDP data, and leaving the wrong checksum in the UDP checksum
+field.
+
+To make matters worse, if the network stack on the host running QEMU
+treats data transmitted from a VM as locally originated, it may do its
+own UDP checksum computation, "correcting" it to match the corrupt
+data before sending it on the wire. Now the corrupt UDP packet makes
+its way all the way to the destination.
+
+(A separate layer of icing on the cake is that QEMU ignores the
+requirement that a UDP checksum computed as zero be sent as 0xffff,
+since zero is a special value meaning no checksum. So even when QEMU
+doesn't corrupt the packet data, the packet sometimes leaves the box
+with no checksum at all.)
+
+I have instrumented QEMU and reproduced this behavior with a Windows
+10 guest (rather easily with a TCP iperf and a UDPi iperf running in
+parallel). I have also attempted a fix, which is below in very rough
+form.
+
+Before I spend too much time refining a patch, I'd like to get
+feedback on my approach.
+
+One puzzle is what to do about e1000e: it shares shares some data
+structures and a bit of code with e1000, but little else, which is
+surprising given how similar they are (or should be). The e1000e's
+handling of TCP segmentation offload and checksum offload is totally
+different, and problematic for other reasons (it totally ignores most
+of the context parameters provided by the driver and basically does
+what it thinks is best by digging into the packet data). Is this
+divergence intentional? Is there a reason not to change e1000e as long
+as I'm trying to make e1000 more datasheet-conformant?
+
+--Ed
+
 ---
- hw/core/loader.c                         |   8 +--
- hw/i386/multiboot.c                      |  83 +++++++++++++-----------
- hw/s390x/ipl.c                           |   2 +-
- include/hw/elf_ops.h                     | 107 ++++++++++++++++++++++++++++++-
- include/hw/loader.h                      |  11 +++-
- tests/multiboot/Makefile                 |   8 ++-
- tests/multiboot/generate_sections_out.py |  33 ++++++++++
- tests/multiboot/modules.out              |  22 +++----
- tests/multiboot/run_test.sh              |   6 +-
- tests/multiboot/sections.c               |  55 ++++++++++++++++
- tests/multiboot/start.S                  |   2 +-
- 11 files changed, 276 insertions(+), 61 deletions(-)
- create mode 100755 tests/multiboot/generate_sections_out.py
- create mode 100644 tests/multiboot/sections.c
+ hw/net/e1000.c         | 176 ++++++++++++++++++++++++++++++++++---------------
+ hw/net/e1000x_common.h |   4 +-
+ 2 files changed, 126 insertions(+), 54 deletions(-)
 
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index 4593061445..a8787f7685 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -439,7 +439,7 @@ int load_elf_as(const char *filename,
- {
-     return load_elf_ram(filename, translate_fn, translate_opaque,
-                         pentry, lowaddr, highaddr, big_endian, elf_machine,
--                        clear_lsb, data_swab, as, true);
-+                        clear_lsb, data_swab, as, true, NULL);
+diff --git a/hw/net/e1000.c b/hw/net/e1000.c
+index 9324949..e45746f 100644
+--- a/hw/net/e1000.c
++++ b/hw/net/e1000.c
+@@ -98,7 +98,10 @@ typedef struct E1000State_st {
+         unsigned char data[0x10000];
+         uint16_t size;
+         unsigned char vlan_needed;
+-        e1000x_txd_props props;
++        unsigned char sum_needed;
++        bool cptse;
++        e1000x_txd_props sum_props;
++        e1000x_txd_props tso_props;
+         uint16_t tso_frames;
+     } tx;
+ 
+@@ -534,56 +537,91 @@ e1000_send_packet(E1000State *s, const uint8_t *buf, int size)
  }
  
- /* return < 0 if error, otherwise the number of bytes loaded in memory */
-@@ -448,7 +448,7 @@ int load_elf_ram(const char *filename,
-                  void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
-                  uint64_t *highaddr, int big_endian, int elf_machine,
-                  int clear_lsb, int data_swab, AddressSpace *as,
--                 bool load_rom)
-+                 bool load_rom, SectionsData *sections)
- {
-     int fd, data_order, target_data_order, must_swab, ret = ELF_LOAD_FAILED;
-     uint8_t e_ident[EI_NIDENT];
-@@ -488,11 +488,11 @@ int load_elf_ram(const char *filename,
-     if (e_ident[EI_CLASS] == ELFCLASS64) {
-         ret = load_elf64(filename, fd, translate_fn, translate_opaque, must_swab,
-                          pentry, lowaddr, highaddr, elf_machine, clear_lsb,
--                         data_swab, as, load_rom);
-+                         data_swab, as, load_rom, sections);
-     } else {
-         ret = load_elf32(filename, fd, translate_fn, translate_opaque, must_swab,
-                          pentry, lowaddr, highaddr, elf_machine, clear_lsb,
--                         data_swab, as, load_rom);
-+                         data_swab, as, load_rom, sections);
-     }
- 
-  fail:
-diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
-index 7dacd6d827..841d05160a 100644
---- a/hw/i386/multiboot.c
-+++ b/hw/i386/multiboot.c
-@@ -125,7 +125,7 @@ int load_multiboot(FWCfgState *fw_cfg,
- {
-     int i;
-     bool is_multiboot = false;
--    uint32_t flags = 0;
-+    uint32_t flags = 0, bootinfo_flags = 0;
-     uint32_t mh_entry_addr;
-     uint32_t mh_load_addr;
-     uint32_t mb_kernel_size;
-@@ -134,6 +134,7 @@ int load_multiboot(FWCfgState *fw_cfg,
-     uint8_t *mb_bootinfo_data;
-     uint32_t cmdline_len;
-     struct multiboot_header *multiboot_header;
-+    SectionsData sections;
- 
-     /* Ok, let's see if it is a multiboot image.
-        The header is 12x32bit long, so the latest entry may be 8192 - 48. */
-@@ -161,37 +162,8 @@ int load_multiboot(FWCfgState *fw_cfg,
-     if (flags & MULTIBOOT_VIDEO_MODE) {
-         fprintf(stderr, "qemu: multiboot knows VBE. we don't.\n");
-     }
--    if (!(flags & MULTIBOOT_AOUT_KLUDGE)) {
--        uint64_t elf_entry;
--        uint64_t elf_low, elf_high;
--        int kernel_size;
--        fclose(f);
- 
--        if (((struct elf64_hdr*)header)->e_machine == EM_X86_64) {
--            fprintf(stderr, "Cannot load x86-64 image, give a 32bit one.\n");
--            exit(1);
--        }
--
--        kernel_size = load_elf(kernel_filename, NULL, NULL, &elf_entry,
--                               &elf_low, &elf_high, 0, EM_NONE,
--                               0, 0);
--        if (kernel_size < 0) {
--            fprintf(stderr, "Error while loading elf kernel\n");
--            exit(1);
--        }
--        mh_load_addr = elf_low;
--        mb_kernel_size = elf_high - elf_low;
--        mh_entry_addr = elf_entry;
--
--        mbs.mb_buf = g_malloc(mb_kernel_size);
--        if (rom_copy(mbs.mb_buf, mh_load_addr, mb_kernel_size) != mb_kernel_size) {
--            fprintf(stderr, "Error while fetching elf kernel from rom\n");
--            exit(1);
--        }
--
--        mb_debug("qemu: loading multiboot-elf kernel (%#x bytes) with entry %#zx\n",
--                  mb_kernel_size, (size_t)mh_entry_addr);
--    } else {
-+    if (flags & MULTIBOOT_AOUT_KLUDGE) {
-         /* Valid if mh_flags sets MULTIBOOT_AOUT_KLUDGE. */
-         uint32_t mh_header_addr = ldl_p(&multiboot_header->header_addr);
-         uint32_t mh_load_end_addr = ldl_p(&multiboot_header->load_end_addr);
-@@ -228,12 +200,6 @@ int load_multiboot(FWCfgState *fw_cfg,
-             mb_load_size = mb_kernel_size;
-         }
- 
--        /* Valid if mh_flags sets MULTIBOOT_VIDEO_MODE.
--        uint32_t mh_mode_type = ldl_p(&multiboot_header->mode_type);
--        uint32_t mh_width = ldl_p(&multiboot_header->width);
--        uint32_t mh_height = ldl_p(&multiboot_header->height);
--        uint32_t mh_depth = ldl_p(&multiboot_header->depth); */
--
-         mb_debug("multiboot: mh_header_addr = %#x\n", mh_header_addr);
-         mb_debug("multiboot: mh_load_addr = %#x\n", mh_load_addr);
-         mb_debug("multiboot: mh_load_end_addr = %#x\n", mh_load_end_addr);
-@@ -248,9 +214,45 @@ int load_multiboot(FWCfgState *fw_cfg,
-             exit(1);
-         }
-         memset(mbs.mb_buf + mb_load_size, 0, mb_kernel_size - mb_load_size);
--        fclose(f);
-+    } else {
-+        uint64_t elf_entry;
-+        uint64_t elf_low, elf_high;
-+        int kernel_size;
-+
-+        kernel_size = load_elf_ram(kernel_filename, NULL, NULL, &elf_entry,
-+                               &elf_low, &elf_high, 0, I386_ELF_MACHINE,
-+                               0, 0, NULL, true, &sections);
-+        if (kernel_size < 0) {
-+            fprintf(stderr, "Error while loading elf kernel\n");
-+            exit(1);
-+        }
-+        mh_load_addr = elf_low;
-+        mb_kernel_size = elf_high - elf_low;
-+        mh_entry_addr = elf_entry;
-+
-+        mbs.mb_buf = g_malloc(mb_kernel_size);
-+        if (rom_copy(mbs.mb_buf, mh_load_addr, mb_kernel_size) != mb_kernel_size) {
-+            fprintf(stderr, "Error while fetching elf kernel from rom\n");
-+            exit(1);
-+        }
-+
-+        mb_debug("qemu: loading multiboot-elf kernel (%#x bytes) with entry %#zx\n",
-+                  mb_kernel_size, (size_t)mh_entry_addr);
-+
-+        stl_p(&bootinfo.u.elf_sec.num, sections.num);
-+        stl_p(&bootinfo.u.elf_sec.size, sections.size);
-+        stl_p(&bootinfo.u.elf_sec.addr, sections.addr);
-+        stl_p(&bootinfo.u.elf_sec.shndx, sections.shndx);
-+
-+        bootinfo_flags |= MULTIBOOT_INFO_ELF_SHDR;
-     }
- 
-+    /* Valid if mh_flags sets MULTIBOOT_VIDEO_MODE.
-+    uint32_t mh_mode_type = ldl_p(&multiboot_header->mode_type);
-+    uint32_t mh_width = ldl_p(&multiboot_header->width);
-+    uint32_t mh_height = ldl_p(&multiboot_header->height);
-+    uint32_t mh_depth = ldl_p(&multiboot_header->depth); */
-+
-     mbs.mb_buf_phys = mh_load_addr;
- 
-     mbs.mb_buf_size = TARGET_PAGE_ALIGN(mb_kernel_size);
-@@ -332,7 +334,8 @@ int load_multiboot(FWCfgState *fw_cfg,
-     stl_p(&bootinfo.mods_count, mbs.mb_mods_count); /* mods_count */
- 
-     /* the kernel is where we want it to be now */
--    stl_p(&bootinfo.flags, MULTIBOOT_INFO_MEMORY
-+    stl_p(&bootinfo.flags, bootinfo_flags
-+                           | MULTIBOOT_INFO_MEMORY
-                            | MULTIBOOT_INFO_BOOTDEV
-                            | MULTIBOOT_INFO_CMDLINE
-                            | MULTIBOOT_INFO_MODS
-@@ -365,5 +368,7 @@ int load_multiboot(FWCfgState *fw_cfg,
-     option_rom[nb_option_roms].bootindex = 0;
-     nb_option_roms++;
- 
-+    fclose(f);
-+
-     return 1; /* yes, we are multiboot */
- }
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index 0d06fc12b6..4d9cc6261a 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -327,7 +327,7 @@ static int load_netboot_image(Error **errp)
-     }
- 
-     img_size = load_elf_ram(netboot_filename, NULL, NULL, &ipl->start_addr,
--                            NULL, NULL, 1, EM_S390, 0, 0, NULL, false);
-+                            NULL, NULL, 1, EM_S390, 0, 0, NULL, false, NULL);
- 
-     if (img_size < 0) {
-         img_size = load_image_size(netboot_filename, ram_ptr, ram_size);
-diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
-index d192e7e2a3..7a7f7983a4 100644
---- a/include/hw/elf_ops.h
-+++ b/include/hw/elf_ops.h
-@@ -264,12 +264,13 @@ static int glue(load_elf, SZ)(const char *name, int fd,
-                               int must_swab, uint64_t *pentry,
-                               uint64_t *lowaddr, uint64_t *highaddr,
-                               int elf_machine, int clear_lsb, int data_swab,
--                              AddressSpace *as, bool load_rom)
-+                              AddressSpace *as, bool load_rom,
-+                              SectionsData *sections)
- {
-     struct elfhdr ehdr;
-     struct elf_phdr *phdr = NULL, *ph;
-     int size, i, total_size;
--    elf_word mem_size, file_size;
-+    elf_word mem_size, file_size, sec_size;
-     uint64_t addr, low = (uint64_t)-1, high = 0;
-     uint8_t *data = NULL;
-     char label[128];
-@@ -481,6 +482,108 @@ static int glue(load_elf, SZ)(const char *name, int fd,
-         }
-     }
-     g_free(phdr);
-+
-+    if (sections) {
-+        struct elf_shdr *shdr = NULL, *sh;
-+        int shsize;
-+
-+        // user requested loading all ELF sections
-+        shsize = ehdr.e_shnum * sizeof(shdr[0]);
-+        if (lseek(fd, ehdr.e_shoff, SEEK_SET) != ehdr.e_shoff) {
-+            goto fail;
-+        }
-+        shdr = g_malloc0(shsize);
-+        if (!shdr)
-+            goto fail;
-+        if (read(fd, shdr, shsize) != shsize)
-+            goto fail;
-+        if (must_swab) {
-+            for (i = 0; i < ehdr.e_shnum; i++) {
-+                sh = &shdr[i];
-+                glue(bswap_shdr, SZ)(sh);
-+            }
-+        }
-+
-+        for(i = 0; i < ehdr.e_shnum; i++) {
-+            sh = &shdr[i];
-+            if (sh->sh_type == SHT_NULL)
-+                continue;
-+            // if section has address then it is loaded (XXX: is it true?), no need to load it again
-+            if (sh->sh_addr)
-+                continue;
-+
-+            // append section data at the end of the loaded segments
-+            addr = ROUND_UP(high, sh->sh_addralign);
-+            sh->sh_addr = addr;
-+
-+            sec_size = sh->sh_size; /* Size of the section data */
-+            data = g_malloc0(sec_size);
-+            if (sec_size > 0) {
-+                if (lseek(fd, sh->sh_offset, SEEK_SET) < 0) {
-+                    goto fail;
-+                }
-+                if (read(fd, data, sec_size) != sec_size) {
-+                    goto fail;
-+                }
-+            }
-+
-+            // As these sections are not loadable no need to perform reloaction
-+            // using translate_fn()
-+
-+            if (data_swab) {
-+                int j;
-+                for (j = 0; j < sec_size; j += (1 << data_swab)) {
-+                    uint8_t *dp = data + j;
-+                    switch (data_swab) {
-+                    case (1):
-+                        *(uint16_t *)dp = bswap16(*(uint16_t *)dp);
-+                        break;
-+                    case (2):
-+                        *(uint32_t *)dp = bswap32(*(uint32_t *)dp);
-+                        break;
-+                    case (3):
-+                        *(uint64_t *)dp = bswap64(*(uint64_t *)dp);
-+                        break;
-+                    default:
-+                        g_assert_not_reached();
-+                    }
-+                }
-+            }
-+
-+            if (load_rom) {
-+                snprintf(label, sizeof(label), "shdr #%d: %s", i, name);
-+
-+                /* rom_add_elf_program() seize the ownership of 'data' */
-+                rom_add_elf_program(label, data, sec_size, sec_size, addr, as);
-+            } else {
-+                cpu_physical_memory_write(addr, data, sec_size);
-+                g_free(data);
-+            }
-+
-+            total_size += sec_size;
-+            high = addr + sec_size;
-+
-+            data = NULL;
-+        }
-+
-+        sections->num = ehdr.e_shnum;
-+        sections->size = ehdr.e_shentsize;
-+        sections->addr = high; // Address where we load the sections header
-+        sections->shndx = ehdr.e_shstrndx;
-+
-+        // Append section headers at the end of loaded segments/sections
-+        if (load_rom) {
-+            snprintf(label, sizeof(label), "shdrs");
-+
-+            /* rom_add_elf_program() seize the ownership of 'shdr' */
-+            rom_add_elf_program(label, shdr, shsize, shsize, high, as);
-+        } else {
-+            cpu_physical_memory_write(high, shdr, shsize);
-+            g_free(shdr);
-+        }
-+        high += shsize;
-+    }
-+
-     if (lowaddr)
-         *lowaddr = (uint64_t)(elf_sword)low;
-     if (highaddr)
-diff --git a/include/hw/loader.h b/include/hw/loader.h
-index 355fe0f5a2..3cf2d6da0f 100644
---- a/include/hw/loader.h
-+++ b/include/hw/loader.h
-@@ -65,6 +65,13 @@ int load_image_gzipped(const char *filename, hwaddr addr, uint64_t max_sz);
- #define ELF_LOAD_WRONG_ENDIAN -4
- const char *load_elf_strerror(int error);
- 
-+typedef struct {
-+    uint32_t num; // number of loaded sections
-+    uint32_t size; // size of entry in sections header list
-+    uint32_t addr; // address of loaded sections header
-+    uint32_t shndx; // number of section that contains string table
-+} SectionsData;
-+
- /** load_elf_ram:
-  * @filename: Path of ELF file
-  * @translate_fn: optional function to translate load addresses
-@@ -82,6 +89,8 @@ const char *load_elf_strerror(int error);
-  * @as: The AddressSpace to load the ELF to. The value of address_space_memory
-  *      is used if nothing is supplied here.
-  * @load_rom : Load ELF binary as ROM
-+ * @sections: If parameter is non-NULL then all ELF sections loaded into memory
-+ *      and this structure is populated.
-  *
-  * Load an ELF file's contents to the emulated system's address space.
-  * Clients may optionally specify a callback to perform address
-@@ -99,7 +108,7 @@ int load_elf_ram(const char *filename,
-                  void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
-                  uint64_t *highaddr, int big_endian, int elf_machine,
-                  int clear_lsb, int data_swab, AddressSpace *as,
--                 bool load_rom);
-+                 bool load_rom, SectionsData *sections);
- 
- /** load_elf_as:
-  * Same as load_elf_ram(), but always loads the elf as ROM
-diff --git a/tests/multiboot/Makefile b/tests/multiboot/Makefile
-index 36f01dc647..b6a5056347 100644
---- a/tests/multiboot/Makefile
-+++ b/tests/multiboot/Makefile
-@@ -6,7 +6,7 @@ LD=ld
- LDFLAGS=-melf_i386 -T link.ld
- LIBS=$(shell $(CC) $(CCFLAGS) -print-libgcc-file-name)
- 
--all: mmap.elf modules.elf
-+all: mmap.elf modules.elf sections.elf sections.out
- 
- mmap.elf: start.o mmap.o libc.o
- 	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
-@@ -14,6 +14,12 @@ mmap.elf: start.o mmap.o libc.o
- modules.elf: start.o modules.o libc.o
- 	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
- 
-+sections.elf: start.o sections.o libc.o
-+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
-+
-+sections.out: sections.elf generate_sections_out.py
-+	python2 generate_sections_out.py $^ > $@
-+
- %.o: %.c
- 	$(CC) $(CCFLAGS) -c -o $@ $^
- 
-diff --git a/tests/multiboot/generate_sections_out.py b/tests/multiboot/generate_sections_out.py
-new file mode 100755
-index 0000000000..8077856823
---- /dev/null
-+++ b/tests/multiboot/generate_sections_out.py
-@@ -0,0 +1,33 @@
-+#!/usr/bin/env python2
-+
-+import sys
-+
-+from elftools.elf.elffile import ELFFile
-+
-+def roundup(num, align):
-+  return (num + align - 1) / align * align
-+
-+def main(filename):
-+  print "\n\n\n=== Running test case: sections.elf  ===\n"
-+  print "Multiboot header at 9500, ELF section headers present\n"
-+
-+  with open(filename, 'rb') as f:
-+    elf = ELFFile(f)
-+    header = elf.header
-+    load_addr = 0x100000  # we load image starting from 1M
-+    sections = ""
-+    for s in elf.iter_sections():
-+      align = s.header.sh_addralign
-+      addr = 0
-+      if s.header.sh_type != 'SHT_NULL':
-+        addr = s.header.sh_addr
-+        if addr == 0:
-+          addr = roundup(load_addr, s.header.sh_addralign)
-+        load_addr = addr + s.header.sh_size
-+      sections += "Elf section name=%s addr=%x size=%d\n" % (s.name, addr, s.header.sh_size)
-+
-+    print "Sections list with %d entries of size %d at %x, string index %d" % (header.e_shnum, header.e_shentsize, load_addr, header.e_shstrndx)
-+    print sections,
-+
-+if __name__ == '__main__':
-+  main(sys.argv[1])
-diff --git a/tests/multiboot/modules.out b/tests/multiboot/modules.out
-index 0da7b39374..b6c1a01be1 100644
---- a/tests/multiboot/modules.out
-+++ b/tests/multiboot/modules.out
-@@ -5,15 +5,15 @@
- 
- Multiboot header at 9500
- 
--Module list with 0 entries at 102000
-+Module list with 0 entries at 104000
- 
- 
- === Running test case: modules.elf -initrd module.txt ===
- 
- Multiboot header at 9500
- 
--Module list with 1 entries at 102000
--[102000] Module: 103000 - 103038 (56 bytes) 'module.txt'
-+Module list with 1 entries at 104000
-+[104000] Module: 105000 - 105038 (56 bytes) 'module.txt'
-          Content: 'This is a test file that is used as a multiboot module.'
- 
- 
-@@ -21,8 +21,8 @@ Module list with 1 entries at 102000
- 
- Multiboot header at 9500
- 
--Module list with 1 entries at 102000
--[102000] Module: 103000 - 103038 (56 bytes) 'module.txt argument'
-+Module list with 1 entries at 104000
-+[104000] Module: 105000 - 105038 (56 bytes) 'module.txt argument'
-          Content: 'This is a test file that is used as a multiboot module.'
- 
- 
-@@ -30,8 +30,8 @@ Module list with 1 entries at 102000
- 
- Multiboot header at 9500
- 
--Module list with 1 entries at 102000
--[102000] Module: 103000 - 103038 (56 bytes) 'module.txt argument,with,commas'
-+Module list with 1 entries at 104000
-+[104000] Module: 105000 - 105038 (56 bytes) 'module.txt argument,with,commas'
-          Content: 'This is a test file that is used as a multiboot module.'
- 
- 
-@@ -39,10 +39,10 @@ Module list with 1 entries at 102000
- 
- Multiboot header at 9500
- 
--Module list with 3 entries at 102000
--[102000] Module: 103000 - 103038 (56 bytes) 'module.txt'
-+Module list with 3 entries at 104000
-+[104000] Module: 105000 - 105038 (56 bytes) 'module.txt'
-          Content: 'This is a test file that is used as a multiboot module.'
--[102010] Module: 104000 - 104038 (56 bytes) 'module.txt argument'
-+[104010] Module: 106000 - 106038 (56 bytes) 'module.txt argument'
-          Content: 'This is a test file that is used as a multiboot module.'
--[102020] Module: 105000 - 105038 (56 bytes) 'module.txt'
-+[104020] Module: 107000 - 107038 (56 bytes) 'module.txt'
-          Content: 'This is a test file that is used as a multiboot module.'
-diff --git a/tests/multiboot/run_test.sh b/tests/multiboot/run_test.sh
-index 0278148b43..f04e35cbf0 100755
---- a/tests/multiboot/run_test.sh
-+++ b/tests/multiboot/run_test.sh
-@@ -56,9 +56,13 @@ modules() {
-     run_qemu modules.elf -initrd "module.txt,module.txt argument,module.txt"
- }
- 
-+sections() {
-+    run_qemu sections.elf
-+}
-+
- make all
- 
--for t in mmap modules; do
-+for t in mmap modules sections; do
- 
-     echo > test.log
-     $t
-diff --git a/tests/multiboot/sections.c b/tests/multiboot/sections.c
-new file mode 100644
-index 0000000000..05a88f99ac
---- /dev/null
-+++ b/tests/multiboot/sections.c
-@@ -0,0 +1,55 @@
-+/*
-+ * Copyright (c) 2017 Anatol Pomozov <anatol.pomozov@gmail.com>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "libc.h"
-+#include "../../hw/i386/multiboot_header.h"
-+#include "../../include/elf.h"
-+
-+int test_main(uint32_t magic, struct multiboot_info *mbi)
+ static void
++debug_csum(struct e1000_tx *tp)
 +{
-+    void *p;
-+    unsigned int i;
++    e1000x_txd_props *props = tp->cptse ? &tp->tso_props : &tp->sum_props;
++    uint8_t proto = tp->data[14 + 9];
++    uint32_t sumoff = props->tucso - props->tucss;
++    uint16_t oldsum = lduw_be_p(tp->data + props->tucso);
 +
-+    (void) magic;
-+    multiboot_elf_section_header_table_t shdr;
-+
-+    printf("Multiboot header at %x, ELF section headers %s\n\n", mbi,
-+        mbi->flags & MULTIBOOT_INFO_ELF_SHDR ? "present" : "don't present");
-+
-+    shdr = mbi->u.elf_sec;
-+    printf("Sections list with %d entries of size %d at %x, string index %d\n",
-+        shdr.num, shdr.size, shdr.addr, shdr.shndx);
-+
-+    const char *string_table = (char *)((Elf32_Shdr *)(uintptr_t)(shdr.addr + shdr.shndx * shdr.size))->sh_addr;
-+
-+    for (i = 0, p = (void *)shdr.addr;
-+         i < shdr.num;
-+         i++, p += shdr.size)
-+    {
-+        Elf32_Shdr *sec;
-+
-+        sec = (Elf32_Shdr *)p;
-+        printf("Elf section name=%s addr=%lx size=%ld\n", string_table + sec->sh_name, sec->sh_addr, sec->sh_size);
++    if ((proto == 17 && sumoff != 6) ||
++        (proto == 6 && sumoff != 16)) {
++        DBGOUT(TXERR, "txsum bug! ver %d src %08x dst %08x len %d proto %d cptse %d sum_needed %x oldsum %x newsum %x realsum %x\n",
++               tp->data[14] >> 4,
++               ldl_be_p(tp->data + 14 + 12),
++               ldl_be_p(tp->data + 14 + 16),
++               lduw_be_p(tp->data + 14 + 2),
++               proto,
++               tp->cptse,
++               tp->sum_needed,
++               oldsum,
++               lduw_be_p(tp->data + props->tucso),
++               lduw_be_p(tp->data + props->tucss + (proto == 6 ? 16 : 6)));
 +    }
-+
-+    return 0;
 +}
-diff --git a/tests/multiboot/start.S b/tests/multiboot/start.S
-index 7d33959650..bd404100c2 100644
---- a/tests/multiboot/start.S
-+++ b/tests/multiboot/start.S
-@@ -23,7 +23,7 @@
- .section multiboot
++
++static void
+ xmit_seg(E1000State *s)
+ {
+     uint16_t len;
+     unsigned int frames = s->tx.tso_frames, css, sofar;
+     struct e1000_tx *tp = &s->tx;
  
- #define MB_MAGIC 0x1badb002
--#define MB_FLAGS 0x0
-+#define MB_FLAGS 0x2
- #define MB_CHECKSUM -(MB_MAGIC + MB_FLAGS)
+-    if (tp->props.tse && tp->props.cptse) {
+-        css = tp->props.ipcss;
++    if (tp->cptse) {
++        css = tp->tso_props.ipcss;
+         DBGOUT(TXSUM, "frames %d size %d ipcss %d\n",
+                frames, tp->size, css);
+-        if (tp->props.ip) {    /* IPv4 */
++        if (tp->tso_props.ip) {    /* IPv4 */
+             stw_be_p(tp->data+css+2, tp->size - css);
+             stw_be_p(tp->data+css+4,
+                      lduw_be_p(tp->data + css + 4) + frames);
+         } else {         /* IPv6 */
+             stw_be_p(tp->data+css+4, tp->size - css);
+         }
+-        css = tp->props.tucss;
++        css = tp->tso_props.tucss;
+         len = tp->size - css;
+-        DBGOUT(TXSUM, "tcp %d tucss %d len %d\n", tp->props.tcp, css, len);
+-        if (tp->props.tcp) {
+-            sofar = frames * tp->props.mss;
++        DBGOUT(TXSUM, "tcp %d tucss %d len %d\n", tp->tso_props.tcp, css, len);
++        if (tp->tso_props.tcp) {
++            sofar = frames * tp->tso_props.mss;
+             stl_be_p(tp->data+css+4, ldl_be_p(tp->data+css+4)+sofar); /* seq */
+-            if (tp->props.paylen - sofar > tp->props.mss) {
++            if (tp->tso_props.paylen - sofar > tp->tso_props.mss) {
+                 tp->data[css + 13] &= ~9;    /* PSH, FIN */
+             } else if (frames) {
+                 e1000x_inc_reg_if_not_full(s->mac_reg, TSCTC);
+             }
+         } else    /* UDP */
+             stw_be_p(tp->data+css+4, len);
+-        if (tp->props.sum_needed & E1000_TXD_POPTS_TXSM) {
++        if (tp->sum_needed & E1000_TXD_POPTS_TXSM) {
+             unsigned int phsum;
+             // add pseudo-header length before checksum calculation
+-            void *sp = tp->data + tp->props.tucso;
++            void *sp = tp->data + tp->tso_props.tucso;
  
- .align  4
+             phsum = lduw_be_p(sp) + len;
+             phsum = (phsum >> 16) + (phsum & 0xffff);
+             stw_be_p(sp, phsum);
+         }
+         tp->tso_frames++;
++        if (tp->sum_needed & E1000_TXD_POPTS_TXSM) {
++            putsum(tp->data, tp->size, tp->tso_props.tucso,
++                   tp->tso_props.tucss, tp->tso_props.tucse);
++            debug_csum(tp);
++        }
++        if (tp->sum_needed & E1000_TXD_POPTS_IXSM) {
++            putsum(tp->data, tp->size, tp->tso_props.ipcso,
++                   tp->tso_props.ipcss, tp->tso_props.ipcse);
++        }
++    } else {
++        if (tp->sum_needed & E1000_TXD_POPTS_TXSM) {
++            putsum(tp->data, tp->size, tp->sum_props.tucso,
++                   tp->sum_props.tucss, tp->sum_props.tucse);
++            debug_csum(tp);
++        }
++        if (tp->sum_needed & E1000_TXD_POPTS_IXSM) {
++            putsum(tp->data, tp->size, tp->sum_props.ipcso,
++                   tp->sum_props.ipcss, tp->sum_props.ipcse);
++        }
+     }
+ 
+-    if (tp->props.sum_needed & E1000_TXD_POPTS_TXSM) {
+-        putsum(tp->data, tp->size, tp->props.tucso,
+-               tp->props.tucss, tp->props.tucse);
+-    }
+-    if (tp->props.sum_needed & E1000_TXD_POPTS_IXSM) {
+-        putsum(tp->data, tp->size, tp->props.ipcso,
+-               tp->props.ipcss, tp->props.ipcse);
+-    }
+     if (tp->vlan_needed) {
+         memmove(tp->vlan, tp->data, 4);
+         memmove(tp->data, tp->data + 4, 8);
+@@ -601,6 +639,39 @@ xmit_seg(E1000State *s)
+ }
+ 
+ static void
++debug_ctx_desc(e1000x_txd_props *props)
++{
++    DBGOUT(TXERR, "context descriptor: tse %d ip %d tcp %d ipcss %d ipcso %d ipcse %d tucss %d tucso %d tucse %d\n",
++           props->tse,
++           props->ip,
++           props->tcp,
++           props->ipcss,
++           props->ipcso,
++           props->ipcse,
++           props->tucss,
++           props->tucso,
++           props->tucse);
++}
++
++static void
++debug_data_desc(struct e1000_tx *tp)
++{
++    DBGOUT(TXERR, "data descriptor: size %d sum_needed %d cptse %d\n",
++           tp->size,
++           tp->sum_needed,
++           tp->cptse);
++}
++
++static void
++debug_legacy_desc(struct e1000_tx *tp)
++{
++    DBGOUT(TXERR, "legacy descriptor: size %d sum_needed %d cptse %d\n",
++           tp->size,
++           tp->sum_needed,
++           tp->cptse);
++}
++
++static void
+ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
+ {
+     PCIDevice *d = PCI_DEVICE(s);
+@@ -614,27 +685,31 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
+ 
+     s->mit_ide |= (txd_lower & E1000_TXD_CMD_IDE);
+     if (dtype == E1000_TXD_CMD_DEXT) {    /* context descriptor */
+-        e1000x_read_tx_ctx_descr(xp, &tp->props);
+-        tp->tso_frames = 0;
+-        if (tp->props.tucso == 0) {    /* this is probably wrong */
+-            DBGOUT(TXSUM, "TCP/UDP: cso 0!\n");
+-            tp->props.tucso = tp->props.tucss + (tp->props.tcp ? 16 : 6);
++        if (le32_to_cpu(xp->cmd_and_length) & E1000_TXD_CMD_TSE) {
++            e1000x_read_tx_ctx_descr(xp, &tp->tso_props);
++            tp->tso_frames = 0;
++            debug_ctx_desc(&tp->tso_props);
++        } else {
++            e1000x_read_tx_ctx_descr(xp, &tp->sum_props);
++            debug_ctx_desc(&tp->sum_props);
+         }
+         return;
+     } else if (dtype == (E1000_TXD_CMD_DEXT | E1000_TXD_DTYP_D)) {
+         // data descriptor
+         if (tp->size == 0) {
+-            tp->props.sum_needed = le32_to_cpu(dp->upper.data) >> 8;
++            tp->sum_needed = le32_to_cpu(dp->upper.data) >> 8;
+         }
+-        tp->props.cptse = (txd_lower & E1000_TXD_CMD_TSE) ? 1 : 0;
++        tp->cptse = (txd_lower & E1000_TXD_CMD_TSE) ? 1 : 0;
++        debug_data_desc(tp);
+     } else {
+         // legacy descriptor
+-        tp->props.cptse = 0;
++        tp->cptse = 0;
++        debug_legacy_desc(tp);
+     }
+ 
+     if (e1000x_vlan_enabled(s->mac_reg) &&
+         e1000x_is_vlan_txd(txd_lower) &&
+-        (tp->props.cptse || txd_lower & E1000_TXD_CMD_EOP)) {
++        (tp->cptse || txd_lower & E1000_TXD_CMD_EOP)) {
+         tp->vlan_needed = 1;
+         stw_be_p(tp->vlan_header,
+                       le16_to_cpu(s->mac_reg[VET]));
+@@ -643,8 +718,8 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
+     }
+ 
+     addr = le64_to_cpu(dp->buffer_addr);
+-    if (tp->props.tse && tp->props.cptse) {
+-        msh = tp->props.hdr_len + tp->props.mss;
++    if (tp->cptse) {
++        msh = tp->tso_props.hdr_len + tp->tso_props.mss;
+         do {
+             bytes = split_size;
+             if (tp->size + bytes > msh)
+@@ -653,21 +728,18 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
+             bytes = MIN(sizeof(tp->data) - tp->size, bytes);
+             pci_dma_read(d, addr, tp->data + tp->size, bytes);
+             sz = tp->size + bytes;
+-            if (sz >= tp->props.hdr_len && tp->size < tp->props.hdr_len) {
+-                memmove(tp->header, tp->data, tp->props.hdr_len);
++            if (sz >= tp->tso_props.hdr_len && tp->size < tp->tso_props.hdr_len) {
++                memmove(tp->header, tp->data, tp->tso_props.hdr_len);
+             }
+             tp->size = sz;
+             addr += bytes;
+             if (sz == msh) {
+                 xmit_seg(s);
+-                memmove(tp->data, tp->header, tp->props.hdr_len);
+-                tp->size = tp->props.hdr_len;
++                memmove(tp->data, tp->header, tp->tso_props.hdr_len);
++                tp->size = tp->tso_props.hdr_len;
+             }
+             split_size -= bytes;
+         } while (bytes && split_size);
+-    } else if (!tp->props.tse && tp->props.cptse) {
+-        // context descriptor TSE is not set, while data descriptor TSE is set
+-        DBGOUT(TXERR, "TCP segmentation error\n");
+     } else {
+         split_size = MIN(sizeof(tp->data) - tp->size, split_size);
+         pci_dma_read(d, addr, tp->data + tp->size, split_size);
+@@ -676,14 +748,14 @@ process_tx_desc(E1000State *s, struct e1000_tx_desc *dp)
+ 
+     if (!(txd_lower & E1000_TXD_CMD_EOP))
+         return;
+-    if (!(tp->props.tse && tp->props.cptse && tp->size < tp->props.hdr_len)) {
++    if (!(tp->cptse && tp->size < tp->tso_props.hdr_len)) {
+         xmit_seg(s);
+     }
+     tp->tso_frames = 0;
+-    tp->props.sum_needed = 0;
++    tp->sum_needed = 0;
+     tp->vlan_needed = 0;
+     tp->size = 0;
+-    tp->props.cptse = 0;
++    tp->cptse = 0;
+ }
+ 
+ static uint32_t
+@@ -1448,20 +1520,20 @@ static const VMStateDescription vmstate_e1000 = {
+         VMSTATE_UINT16(eecd_state.bitnum_out, E1000State),
+         VMSTATE_UINT16(eecd_state.reading, E1000State),
+         VMSTATE_UINT32(eecd_state.old_eecd, E1000State),
+-        VMSTATE_UINT8(tx.props.ipcss, E1000State),
+-        VMSTATE_UINT8(tx.props.ipcso, E1000State),
+-        VMSTATE_UINT16(tx.props.ipcse, E1000State),
+-        VMSTATE_UINT8(tx.props.tucss, E1000State),
+-        VMSTATE_UINT8(tx.props.tucso, E1000State),
+-        VMSTATE_UINT16(tx.props.tucse, E1000State),
+-        VMSTATE_UINT32(tx.props.paylen, E1000State),
+-        VMSTATE_UINT8(tx.props.hdr_len, E1000State),
+-        VMSTATE_UINT16(tx.props.mss, E1000State),
++        VMSTATE_UINT8(tx.tso_props.ipcss, E1000State),
++        VMSTATE_UINT8(tx.tso_props.ipcso, E1000State),
++        VMSTATE_UINT16(tx.tso_props.ipcse, E1000State),
++        VMSTATE_UINT8(tx.tso_props.tucss, E1000State),
++        VMSTATE_UINT8(tx.tso_props.tucso, E1000State),
++        VMSTATE_UINT16(tx.tso_props.tucse, E1000State),
++        VMSTATE_UINT32(tx.tso_props.paylen, E1000State),
++        VMSTATE_UINT8(tx.tso_props.hdr_len, E1000State),
++        VMSTATE_UINT16(tx.tso_props.mss, E1000State),
+         VMSTATE_UINT16(tx.size, E1000State),
+         VMSTATE_UINT16(tx.tso_frames, E1000State),
+-        VMSTATE_UINT8(tx.props.sum_needed, E1000State),
+-        VMSTATE_INT8(tx.props.ip, E1000State),
+-        VMSTATE_INT8(tx.props.tcp, E1000State),
++        VMSTATE_UINT8(tx.tso_props.sum_needed, E1000State),
++        VMSTATE_INT8(tx.tso_props.ip, E1000State),
++        VMSTATE_INT8(tx.tso_props.tcp, E1000State),
+         VMSTATE_BUFFER(tx.header, E1000State),
+         VMSTATE_BUFFER(tx.data, E1000State),
+         VMSTATE_UINT16_ARRAY(eeprom_data, E1000State, 64),
+diff --git a/hw/net/e1000x_common.h b/hw/net/e1000x_common.h
+index 21bf28e..bd27d63 100644
+--- a/hw/net/e1000x_common.h
++++ b/hw/net/e1000x_common.h
+@@ -193,7 +193,7 @@ void e1000x_update_regs_on_autoneg_done(uint32_t *mac, uint16_t *phy);
+ void e1000x_increase_size_stats(uint32_t *mac, const int *size_regs, int size);
+ 
+ typedef struct e1000x_txd_props {
+-    unsigned char sum_needed;
++    unsigned char sum_needed; // doesn't belong here
+     uint8_t ipcss;
+     uint8_t ipcso;
+     uint16_t ipcse;
+@@ -206,7 +206,7 @@ typedef struct e1000x_txd_props {
+     int8_t ip;
+     int8_t tcp;
+     bool tse;
+-    bool cptse;
++    bool cptse; // doesn't belong here
+ } e1000x_txd_props;
+ 
+ void e1000x_read_tx_ctx_descr(struct e1000_context_desc *d,
 -- 
-2.15.0.rc0.271.g36b669edcc-goog
+1.9.1
