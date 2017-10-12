@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e2bTK-0004y2-UR
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:16:16 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e2bZT-0006BA-S5
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:22:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1e2bTG-0006xE-6Y
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:16:14 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:16695 helo=relay.sw.ru)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e2bZQ-0005Nl-JX
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:22:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40586)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1e2bTF-0006vg-Qb
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:16:10 -0400
-References: <150780535623.288.12272299760364683981@b58463cdfd5f>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <da4434ac-e912-172e-7d04-af09e11f813a@virtuozzo.com>
-Date: Thu, 12 Oct 2017 14:15:52 +0300
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1e2bZQ-0005Fs-BC
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 07:22:32 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 664E0C04AC4A
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 11:22:30 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu, 12 Oct 2017 13:21:57 +0200
+Message-Id: <20171012112157.15647-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <150780535623.288.12272299760364683981@b58463cdfd5f>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v3 00/13] nbd minimal structured read
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] usb-ccid: remove needless migration state code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,120 +32,86 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, pbonzini@redhat.com
+Cc: kraxel@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-This is a code movement, no changes.
+This code appears to be unused since its introduction. It should be
+safe to remove from VMState.
 
-12.10.2017 13:49, no-reply@patchew.org wrote:
-> Hi,
->
-> This series seems to have some coding style problems. See output below for
-> more information:
->
-> Type: series
-> Message-id: 20171012095319.136610-1-vsementsov@virtuozzo.com
-> Subject: [Qemu-devel] [PATCH v3 00/13] nbd minimal structured read
->
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
->
-> BASE=base
-> n=1
-> total=$(git log --oneline $BASE.. | wc -l)
-> failed=0
->
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
->
-> commits="$(git log --format=%H --reverse $BASE..)"
-> for c in $commits; do
->      echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
->      if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
->          failed=1
->          echo
->      fi
->      n=$((n+1))
-> done
->
-> exit $failed
-> === TEST SCRIPT END ===
->
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
->  From https://github.com/patchew-project/qemu
->   t [tag update]            patchew/20171005151313.32015-1-cohuck@redhat.com -> patchew/20171005151313.32015-1-cohuck@redhat.com
-> Switched to a new branch 'test'
-> 803c96aeca nbd: Minimal structured read for client
-> 55b2692ff6 nbd/client: prepare nbd_receive_reply for structured reply
-> 3155f99d3a nbd: share some nbd entities to be reused in block/nbd-client.c
-> cf17e2f26c nbd/client: refactor nbd_receive_starttls
-> 7934ecd6e3 nbd: Minimal structured read for server
-> abfc671d5e nbd: header constants indenting
-> 1c2944d9d1 nbd-server: simplify reply transmission
-> fe87c0f68c nbd/server: refactor nbd_co_send_simple_reply parameters
-> a9de77d411 nbd/server: do not use NBDReply structure
-> 691f470797 nbd/server: structurize simple reply header sending
-> 7f1652db0f nbd: rename some simple-request related objects to be _simple_
-> ab2e6ba2f6 block/nbd-client: refactor nbd_co_receive_reply
-> c5baea9e86 block/nbd-client: assert qiov len once in nbd_co_request
->
-> === OUTPUT BEGIN ===
-> Checking PATCH 1/13: block/nbd-client: assert qiov len once in nbd_co_request...
-> Checking PATCH 2/13: block/nbd-client: refactor nbd_co_receive_reply...
-> Checking PATCH 3/13: nbd: rename some simple-request related objects to be _simple_...
-> Checking PATCH 4/13: nbd/server: structurize simple reply header sending...
-> Checking PATCH 5/13: nbd/server: do not use NBDReply structure...
-> Checking PATCH 6/13: nbd/server: refactor nbd_co_send_simple_reply parameters...
-> Checking PATCH 7/13: nbd-server: simplify reply transmission...
-> Checking PATCH 8/13: nbd: header constants indenting...
-> Checking PATCH 9/13: nbd: Minimal structured read for server...
-> Checking PATCH 10/13: nbd/client: refactor nbd_receive_starttls...
-> Checking PATCH 11/13: nbd: share some nbd entities to be reused in block/nbd-client.c...
-> ERROR: return of an errno should typically be -ve (return -EPERM)
-> #46: FILE: include/block/nbd.h:206:
-> +        return EPERM;
->
-> ERROR: return of an errno should typically be -ve (return -EIO)
-> #48: FILE: include/block/nbd.h:208:
-> +        return EIO;
->
-> ERROR: return of an errno should typically be -ve (return -ENOMEM)
-> #50: FILE: include/block/nbd.h:210:
-> +        return ENOMEM;
->
-> ERROR: return of an errno should typically be -ve (return -ENOSPC)
-> #52: FILE: include/block/nbd.h:212:
-> +        return ENOSPC;
->
-> ERROR: return of an errno should typically be -ve (return -ESHUTDOWN)
-> #54: FILE: include/block/nbd.h:214:
-> +        return ESHUTDOWN;
->
-> ERROR: return of an errno should typically be -ve (return -EINVAL)
-> #56: FILE: include/block/nbd.h:216:
-> +        return EINVAL;
->
-> ERROR: return of an errno should typically be -ve (return -EINVAL)
-> #59: FILE: include/block/nbd.h:219:
-> +    return EINVAL;
->
-> total: 7 errors, 0 warnings, 149 lines checked
->
-> Your patch has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
->
-> Checking PATCH 12/13: nbd/client: prepare nbd_receive_reply for structured reply...
-> Checking PATCH 13/13: nbd: Minimal structured read for client...
-> === OUTPUT END ===
->
-> Test command exited with code: 1
->
->
-> ---
-> Email generated automatically by Patchew [http://patchew.org/].
-> Please send your feedback to patchew-devel@freelists.org
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ hw/usb/dev-smartcard-reader.c | 22 ----------------------
+ 1 file changed, 22 deletions(-)
 
-
--- 
-Best regards,
-Vladimir
+diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.=
+c
+index 0c77d2a41d..d23a4d7f7d 100644
+--- a/hw/usb/dev-smartcard-reader.c
++++ b/hw/usb/dev-smartcard-reader.c
+@@ -270,11 +270,6 @@ typedef struct BulkIn {
+     uint32_t pos;
+ } BulkIn;
+=20
+-enum {
+-    MIGRATION_NONE,
+-    MIGRATION_MIGRATED,
+-};
+-
+ typedef struct CCIDBus {
+     BusState qbus;
+ } CCIDBus;
+@@ -306,9 +301,6 @@ typedef struct USBCCIDState {
+     CCID_ProtocolDataStructure abProtocolDataStructure;
+     uint32_t ulProtocolDataStructureSize;
+     uint32_t state_vmstate;
+-    uint32_t migration_target_ip;
+-    uint16_t migration_target_port;
+-    uint8_t  migration_state;
+     uint8_t  bmSlotICCState;
+     uint8_t  powered;
+     uint8_t  notify_slot_change;
+@@ -1243,9 +1235,6 @@ int ccid_card_ccid_attach(CCIDCardState *card)
+     USBCCIDState *s =3D USB_CCID_DEV(dev);
+=20
+     DPRINTF(s, 1, "CCID Attach\n");
+-    if (s->migration_state =3D=3D MIGRATION_MIGRATED) {
+-        s->migration_state =3D MIGRATION_NONE;
+-    }
+     return 0;
+ }
+=20
+@@ -1341,9 +1330,6 @@ static void ccid_realize(USBDevice *dev, Error **er=
+rp)
+     s->intr =3D usb_ep_get(dev, USB_TOKEN_IN, CCID_INT_IN_EP);
+     s->bulk =3D usb_ep_get(dev, USB_TOKEN_IN, CCID_BULK_IN_EP);
+     s->card =3D NULL;
+-    s->migration_state =3D MIGRATION_NONE;
+-    s->migration_target_ip =3D 0;
+-    s->migration_target_port =3D 0;
+     s->dev.speed =3D USB_SPEED_FULL;
+     s->dev.speedmask =3D USB_SPEED_MASK_FULL;
+     s->notify_slot_change =3D false;
+@@ -1379,13 +1365,6 @@ static int ccid_pre_save(void *opaque)
+     USBCCIDState *s =3D opaque;
+=20
+     s->state_vmstate =3D s->dev.state;
+-    if (s->dev.attached) {
+-        /*
+-         * Migrating an open device, ignore reconnection CHR_EVENT to av=
+oid an
+-         * erroneous detach.
+-         */
+-        s->migration_state =3D MIGRATION_MIGRATED;
+-    }
+=20
+     return 0;
+ }
+@@ -1452,7 +1431,6 @@ static VMStateDescription ccid_vmstate =3D {
+         VMSTATE_STRUCT_ARRAY(pending_answers, USBCCIDState,
+                         PENDING_ANSWERS_NUM, 1, answer_vmstate, Answer),
+         VMSTATE_UINT32(pending_answers_num, USBCCIDState),
+-        VMSTATE_UINT8(migration_state, USBCCIDState),
+         VMSTATE_UINT32(state_vmstate, USBCCIDState),
+         VMSTATE_END_OF_LIST()
+     }
+--=20
+2.15.0.rc0.40.gaefcc5f6f
