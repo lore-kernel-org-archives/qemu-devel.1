@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e2kfF-0007SJ-2M
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 17:05:09 -0400
+	(envelope-from <eblake@redhat.com>) id 1e2kqZ-0001o6-TT
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 17:16:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e2kfB-00044e-3y
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 17:05:09 -0400
-Received: from mail-pf0-x230.google.com ([2607:f8b0:400e:c00::230]:54065)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e2kfA-00044T-Tu
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 17:05:05 -0400
-Received: by mail-pf0-x230.google.com with SMTP id t188so4130328pfd.10
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 14:05:04 -0700 (PDT)
-References: <20171010214540.30970-1-richard.henderson@linaro.org>
-	<87k200sw7c.fsf@frigg.lan>
-	<888cfe83-7c47-5673-7b1b-8280cc50d8ba@linaro.org>
-	<87vajkgl94.fsf@frigg.lan>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <4c72bbf8-f8d9-95ca-b3b2-48da2a6ef86a@linaro.org>
-Date: Thu, 12 Oct 2017 14:05:01 -0700
+	(envelope-from <eblake@redhat.com>) id 1e2kqY-0001Wx-Ug
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 17:16:51 -0400
+References: <20171012095319.136610-1-vsementsov@virtuozzo.com>
+	<20171012095319.136610-2-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9792ab45-82bd-d2ba-3786-ccfc0cc91de9@redhat.com>
+Date: Thu, 12 Oct 2017 16:16:41 -0500
 MIME-Version: 1.0
-In-Reply-To: <87vajkgl94.fsf@frigg.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tcg: Initialize cpu_env generically
+In-Reply-To: <20171012095319.136610-2-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="U42OiuAiTUXMmUwmJU3QVwIvVlnHJWuIr"
+Subject: Re: [Qemu-devel] [PATCH v3 01/13] block/nbd-client: assert qiov len
+ once in nbd_co_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,32 +25,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On 10/12/2017 01:32 PM, Lluís Vilanova wrote:
-> Richard Henderson writes:
-> 
->> On 10/11/2017 11:43 PM, Lluís Vilanova wrote:
->>>> /* Track which vCPU triggers events */
->>>> CPUState *cpu;                      /* *_trans */
->>>> -    TCGv_env tcg_env;                   /* *_exec  */
->>>
->>> I would rather keep it here instead of making a new global variable, since that
->>> should make it easier in the future to have multiple translation contexts.
-> 
->> Why do you believe this prevents it?  The variable is literally identical for
->> *all* targets.
-> 
-> If someone decides to make tcg_ctx thread-local or have one per target
-> architecture (supporting multiple target archs concurrently), having all that
-> info on the tcg_ctx object is easier to track and modify, compared to having
-> multiple global variables.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--U42OiuAiTUXMmUwmJU3QVwIvVlnHJWuIr
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+Message-ID: <9792ab45-82bd-d2ba-3786-ccfc0cc91de9@redhat.com>
+Subject: Re: [PATCH v3 01/13] block/nbd-client: assert qiov len once in
+ nbd_co_request
+References: <20171012095319.136610-1-vsementsov@virtuozzo.com>
+ <20171012095319.136610-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20171012095319.136610-2-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-We have patches on-list that do exactly this, from Emilio Cota.  I'm in the
-process of reviewing them now.
+On 10/12/2017 04:53 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Also improve the assertion: check that qiov is NULL for other commands
+> than CMD_READ and CMD_WRITE.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/nbd-client.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
 
-We've made sure that patch set works with the cpu_* global variables created
-once within target/*/translate.c.  This one is no different.
+Looks identical to v2, where I gave R-b:
+https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg01903.html
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-r~
+--U42OiuAiTUXMmUwmJU3QVwIvVlnHJWuIr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnf27oACgkQp6FrSiUn
+Q2osMQgAmuvn1ckMHvmUeB8pihXLhZN0AB8uqI6dVgOeajNgyPqePeFczqB6ywGj
+oIrRNk6GraAxQP+gKfveE6LmpV6dgGIn24Skn+1IpDNaVqCn8liG+84twrhTttj4
+pltXwxdZNBBGJxUV7+iECBVkdv4u2fqGIzA9bqY6cGwfZ0Srbx6wrSDOFzsJCo6o
+S8MiGmFW/k3EJVbYlHwQ0pOJ8W9bcDDlpUwqsQ1uV55ocTWyPZ3qp8POABnGPm1f
+yluKYt6FfPjA04JkJYifnfzzkJTKYOf53zJRsY5tiaam4gc/KP3IE1PXTpkgiAis
+/WKGJsfQ4Ho6uQWBXjmYn9++L/yvgQ==
+=UxpE
+-----END PGP SIGNATURE-----
+
+--U42OiuAiTUXMmUwmJU3QVwIvVlnHJWuIr--
