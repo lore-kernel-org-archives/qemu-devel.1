@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e2XSI-0000lr-Rb
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 02:58:56 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1e2Xpp-0004mB-4e
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 03:23:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e2XSE-0002ye-05
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 02:58:54 -0400
-References: <20171004154144.88995-1-pasic@linux.vnet.ibm.com>
-	<20171004154144.88995-3-pasic@linux.vnet.ibm.com>
-	<d6d2d73d-65c9-7ae1-fd37-cb8e304781e7@redhat.com>
-	<7f454872-fae3-35b0-eff4-227b2aa0f77d@linux.vnet.ibm.com>
-	<6c17b274-cd75-7864-94b9-fc8abff1a786@redhat.com>
-	<da4228cb-d32c-dc77-0a80-bac306f07c24@linux.vnet.ibm.com>
-	<0120aa4c-ffce-79c0-8c87-c7c1100232eb@redhat.com>
-	<9d77c8e9-f875-4e42-5306-b847904b4a47@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <39f9e450-d618-6c4d-9401-031c5374ed88@redhat.com>
-Date: Thu, 12 Oct 2017 08:58:45 +0200
+	(envelope-from <maxime.coquelin@redhat.com>) id 1e2Xpl-0006Zf-W0
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 03:23:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50356)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1e2Xpl-0006Yd-Mb
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 03:23:09 -0400
+References: <20170628190047.26159-1-dgilbert@redhat.com>
+	<20170628190047.26159-25-dgilbert@redhat.com>
+	<2f4c1067-14a4-d943-0dff-790d705778f1@redhat.com>
+	<20170707115353.GD2451@work-vm> <20171003132351.GA2935@work-vm>
+	<0c312c2e-2ef1-07cb-10cc-69e21d38077d@redhat.com>
+	<20171009121240.GK2374@work-vm>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <547c7c4a-2eed-3b83-2fac-f90c7dc07491@redhat.com>
+Date: Thu, 12 Oct 2017 09:22:56 +0200
 MIME-Version: 1.0
-In-Reply-To: <9d77c8e9-f875-4e42-5306-b847904b4a47@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20171009121240.GK2374@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/8] s390x/css: IO instr handler ending
- control
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 24/29] vhost+postcopy: Lock around
+ set_mem_table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,103 +34,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
 
-On 10.10.2017 13:41, Halil Pasic wrote:
-> [..]
->>>
->>> Yeah, the ABI is smart enough (where it matters) and this one is obvi=
-ously
->>> less that 8 bytes. I read this as you  assumed that the return won't =
-be
->>> passed via register (general purpose register 2 for a z host + ELF as=
-sumed),
->>> and that would have been ugly indeed.
->>>
->>> Btw I have seen putting an integral into a struct for type checking
->>> in the linux kernel too. For instance from:
->>> arch/s390/include/asm/page.h
->>>
->>> """
->>> /*
->>>  * These are used to make use of C type-checking..
->>>  */
->>>
->>> typedef struct { unsigned long pgprot; } pgprot_t;
->>> typedef struct { unsigned long pgste; } pgste_t;
->>> typedef struct { unsigned long pte; } pte_t;
->>> typedef struct { unsigned long pmd; } pmd_t;
->>> typedef struct { unsigned long pud; } pud_t;
->>> typedef struct { unsigned long pgd; } pgd_t;
->>> typedef pte_t *pgtable_t;
->>>
->>> #define pgprot_val(x)   ((x).pgprot)
->>> #define pgste_val(x)    ((x).pgste)
->>> #define pte_val(x)      ((x).pte)
->>> #define pmd_val(x)      ((x).pmd)
->>> #define pud_val(x)      ((x).pud)
->>> #define pgd_val(x)      ((x).pgd)
->>>
->>> #define __pgste(x)      ((pgste_t) { (x) } )
->>> #define __pte(x)        ((pte_t) { (x) } )
->>> #define __pmd(x)        ((pmd_t) { (x) } )
->>> #define __pud(x)        ((pud_t) { (x) } )
->>> #define __pgd(x)        ((pgd_t) { (x) } )
->>> #define __pgprot(x)     ((pgprot_t) { (x) } )
->>> """
->>>
->>> If you think, I could add a similar comment indicating that my
->>> struct is also just for type-checking.
+
+
+On 10/09/2017 02:12 PM, Dr. David Alan Gilbert wrote:
+> * Maxime Coquelin (maxime.coquelin@redhat.com) wrote:
 >>
->> No, I think you've got the reason here slightly wrong. The kernel only
->> uses this since the pte_t and friends need to be urgently portable
->> between the different architectures. Have a look at the kernel
->> Documentation/CodingStyle file, it explicitly mentions this in chapter=
- 5
->> ("Typedefs").
->=20
-> IMHO we don't talk about typedefs here but about type checking. Btw QEM=
-U
-> has the exact opposite policy regarding typedefs and structs than Linux=
-.
-> You want to say that the comment at the top of my quote is wrong, and
-> that it should be rather "These are used for hiding representation.."
-> that "These are used to make use of C type-checking.."?
+>>
+>> On 10/03/2017 03:23 PM, Dr. David Alan Gilbert wrote:
+>>> * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+>>>> * Maxime Coquelin (maxime.coquelin@redhat.com) wrote:
+>>>>>
+>>>>>
+>>>>> On 06/28/2017 09:00 PM, Dr. David Alan Gilbert (git) wrote:
+>>>>>> From: "Dr. David Alan Gilbert"<dgilbert@redhat.com>
+>>>>>>
+>>>>>> **HACK - better solution needed **
+>>>>>> We have the situation where:
+>>>>>>
+>>>>>>         qemu                      bridge
+>>>>>>
+>>>>>>         send set_mem_table
+>>>>>>                                  map memory
+>>>>>>      a)                          mark area with UFD
+>>>>>>                                  send reply with map addresses
+>>>>>>      b)                          start using
+>>>>>>      c) receive reply
+>>>>>>
+>>>>>>      As soon as (a) happens qemu might start seeing faults
+>>>>>> from memory accesses (but doesn't until b); but it can't
+>>>>>> process those faults until (c) when it's received the
+>>>>>> mmap addresses.
+>>>>>>
+>>>>>> Make the fault handler spin until it gets the reply in (c).
+>>>>>>
+>>>>>> At the very least this needs some proper locks, but preferably
+>>>>>> we need to split the message.
+>>>>>
+>>>>> Yes, maybe the slave channel could be used to send the ufds with
+>>>>> a dedicated request? The backend would set the reply-ack flag, so that
+>>>>> it starts accessing the guest memory only when Qemu is ready to handle
+>>>>> faults.
+>>>>
+>>>> Yes, that would make life a lot easier.
+>>>>
+>>>>> Note that the slave channel support has not been implemented in Qemu's
+>>>>> libvhost-user yet, but this is something I can do if we feel the need.
+>>>>
+>>>> Can you tell me a bit about how the slave channel works?
+>>>
+>>> I've looked at the slave-channel; and I'm worried that it's not suitable
+>>> for this case.
+>>> The problem is that 'slave_read' is wired to a fd_handler that I think
+>>> is serviced by the main thread,
+>> I confirm, this is serviced by the main thread.
+>>
+>>> and while postcopy is running I don't
+>>> want to rely on the operation of the main thread (since it could be
+>>> blocked by a page fault).
+>>
+>> IIUC, you mean QEMU being blocked by a page fault.
+> 
+> Yes.
+> 
+>> In this case, I don't think this is an issue, because QEMU doesn't rely
+>> on the backend to handle the page fault, so the slave request can be
+>> handled only once QEMU has handled the fault.
+>>
+>> Maybe I am missing something?
+> 
+> It feels delicate;  with the vhost client blocked waiting for the ack
+> from the qemu to the registration reply on the slave, and some other
+> part blocked by a page fault, it makes it sound likely to hit deadlocks
+> even if I can't put my finger on one.
 
-I certainly did not want to say that you should change the comment. I
-just wanted to point you to the fact that these typedefs in the kernel
-are likely rather used for hiding representation indeed, and not so much
-for type checking, so using them as an example for introducing something
-like type checking here in QEMU is quite a bad example.
+Right, it is hard to be sure there is no risk of deadlock.
 
-> I'm also curious which of the rules would your original suggestion of
-> doing "typedef unsigned int IOInstEnding" match (from chapter 5
-> "Typedefs")? ;)
+>>> I could still use an explicit ack at that point though over the main
+>>> channel I think (or use the slave synchronously?).
+>>
+>> Can you please elaborate, I'm not sure to understand what you mean.
+> 
+> In the world I'm currently working on I've got it just using the main
+> channel but:
+>     settable -> client
+>     settable-results -> qemu
+>     ack -> client
+> 
+> all over the main channel with each side waiting for the other.
 
-None, of course. That's the difference between the kernel and QEMU -
-though I have to say that I rather prefer the kernel philosophy nowadays.
+Ok, thanks for the clarification.
+Maxime
 
-So yes, please don't do a "typedef unsigned int IOInstEnding" either. I
-think the best match for QEMU would be a
-
-typedef enum IOInstEnding {
-    CC_...,
-    CC_...,
-    CC_...,
-    CC_...
-} IOInstEnding;
-
-You then also should at least get some compiler checking thanks to
--Wswitch and -Wenum-compare, shouldn't you?
-
-> I assume you have seen my reply to Connie about the benefit: among othe=
-rs
-> it prevents using something like -EFAULT as a cc by accident which neit=
-her
-> an enum nor a typedef does.
-
-A confused developer could still do something like "return
-(IOInstEnding){.cc =3D -EFAULT};", so this is also not completely safe.
-
- Thomas
+> Dave
+> 
+>>
+>> Thanks,
+>> Maxime
+>>
+>>> Dave
+>>>
+>>>> Dave
+>>>>
+>>>>> Maxime
+>>>> --
+>>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>> --
+>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
