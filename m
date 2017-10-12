@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e2fII-0000lg-Gk
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:21:09 -0400
+	(envelope-from <eblake@redhat.com>) id 1e2fKv-00020v-Vu
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:23:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e2fIF-00055t-8O
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:21:06 -0400
-Received: from 6.mo177.mail-out.ovh.net ([46.105.51.249]:55269)
+	(envelope-from <eblake@redhat.com>) id 1e2fKs-0000T7-FZ
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:23:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42130)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e2fIE-00053H-V3
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:21:03 -0400
-Received: from player688.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 6D121865C9
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 17:20:59 +0200 (CEST)
-Date: Thu, 12 Oct 2017 17:20:51 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171012172051.0c90ce58@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20171012165839.6af44578@nial.brq.redhat.com>
-References: <1507578671-158758-1-git-send-email-imammedo@redhat.com>
-	<1507578671-158758-14-git-send-email-imammedo@redhat.com>
-	<20171010092946.02beddd2@bahia.lan> <20171012143400.555ba3c0@bahia>
-	<20171012165839.6af44578@nial.brq.redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1e2fKs-0000Rd-7G
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 11:23:46 -0400
+References: <1507655662-28101-1-git-send-email-peter.maydell@linaro.org>
+	<d56cf809-5f37-2fff-bcb1-80296cf5f33a@linaro.org>
+	<2d38fb05-c496-1cc3-9253-cc01b2ba8a1b@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e1d53fc9-10fc-84a5-e796-1c801a07614e@redhat.com>
+Date: Thu, 12 Oct 2017 10:23:42 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 13/24] ppc: spapr: define
- core types statically
+In-Reply-To: <2d38fb05-c496-1cc3-9253-cc01b2ba8a1b@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="MSxtjV7AVT6DSXL2xph1bGaEMvGqsUnug"
+Subject: Re: [Qemu-devel] [PATCH v3] docs/devel/loads-stores.rst: Document
+ our various load and store APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,203 +30,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: =?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, "open
-	list:ppce500" <qemu-ppc@nongnu.org>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
 
-On Thu, 12 Oct 2017 16:58:39 +0200
-Igor Mammedov <imammedo@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--MSxtjV7AVT6DSXL2xph1bGaEMvGqsUnug
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
+Message-ID: <e1d53fc9-10fc-84a5-e796-1c801a07614e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] docs/devel/loads-stores.rst: Document our
+ various load and store APIs
+References: <1507655662-28101-1-git-send-email-peter.maydell@linaro.org>
+ <d56cf809-5f37-2fff-bcb1-80296cf5f33a@linaro.org>
+ <2d38fb05-c496-1cc3-9253-cc01b2ba8a1b@redhat.com>
+In-Reply-To: <2d38fb05-c496-1cc3-9253-cc01b2ba8a1b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Thu, 12 Oct 2017 15:10:30 +0200
-> Greg Kurz <groug@kaod.org> wrote:
-> 
-> > On Tue, 10 Oct 2017 09:29:46 +0200
-> > Greg Kurz <groug@kaod.org> wrote:
-> >   
-> > > On Mon,  9 Oct 2017 21:51:00 +0200
-> > > Igor Mammedov <imammedo@redhat.com> wrote:
-> > >     
-> > > > spapr core type definition doesn't have any fields that
-> > > > require it to be defined at runtime. So replace code
-> > > > that fills in TypeInfo at runtime with static TypeInfo
-> > > > array that does the same at complie time.
-> > > > 
-> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > > ---
-> > > > v2:
-> > > >   - fix rebase conflict: add newly added power9_v2 core
-> > > > ---      
-> > > 
-> > > Reviewed-by: Greg Kurz <groug@kaod.org>
-> > >     
-> > 
-> > Oops, this patch causes a regression when you try to pass a sPAPR core to
-> > a non-pseries machine.
-> > 
-> > Without this patch:
-> > 
-> > $ ppc64-softmmu/qemu-system-ppc64 -M none -device host-spapr-cpu-core 
-> > qemu-system-ppc64: -device host-spapr-cpu-core:
-> >  'host-spapr-cpu-core' is not a valid device model name
-> > 
-> > With this patch:
-> > 
-> > $ ppc64-softmmu/qemu-system-ppc64 -M none -device host-spapr-cpu-core 
-> > **
-> > ERROR:qom/object.c:217:object_type_get_instance_size:
-> >  assertion failed: (type != NULL)
-> > Aborted  
-> there shouldn't be type host-spapr-cpu-core with this patch since you don't have -enable-kvm on CLI
-> maybe you are talking about
->     [PATCH v2 15/24] ppc: spapr: register 'host' core type  along with the rest of core types
-> 
+On 10/12/2017 10:13 AM, Paolo Bonzini wrote:
+> On 12/10/2017 17:10, Richard Henderson wrote:
+>> On 10/10/2017 10:14 AM, Peter Maydell wrote:
+>>> QEMU has a wide selection of different functions for doing
+>>> loads and stores; provide some overview documentation of
+>>> what they do and how to pick which one to use.
+>>>
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Oops you're right, I replied to the wrong mail... of course, I meant the
-following commit in David's staging tree:
+>> Modulo the 2 typos that Eric found,
+>>
+>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>>
+>> What path should this patch take in?
+>=20
+> I can take it.
 
-https://github.com/dgibson/qemu/commit/c18165144076cef0c17206f5231cf9787c944037
+Be sure to take v4, though :)
 
-> 
-> [...]
-> 
->  
-> > I think that this patch should be reverted from David's staging tree for now, I'll
-> > repost it when I have a proposal for the host CPU.  
-> let me find ppc host and look into it before reverting,
-> maybe there is easier way around this 'very corner' case.
-> 
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Matter of personal opinion. It's not my call anyway :)
 
-> 
-> > 
-> > Cheers,
-> > 
-> > --
-> > Greg
-> >   
-> > > >  include/hw/ppc/spapr_cpu_core.h |  2 +
-> > > >  hw/ppc/spapr_cpu_core.c         | 87 +++++++++++++----------------------------
-> > > >  2 files changed, 30 insertions(+), 59 deletions(-)
-> > > > 
-> > > > diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
-> > > > index 93051e9..66dcf52 100644
-> > > > --- a/include/hw/ppc/spapr_cpu_core.h
-> > > > +++ b/include/hw/ppc/spapr_cpu_core.h
-> > > > @@ -21,6 +21,8 @@
-> > > >  #define SPAPR_CPU_CORE_GET_CLASS(obj) \
-> > > >       OBJECT_GET_CLASS(sPAPRCPUCoreClass, (obj), TYPE_SPAPR_CPU_CORE)
-> > > >  
-> > > > +#define SPAPR_CPU_CORE_TYPE_NAME(model) model "-" TYPE_SPAPR_CPU_CORE
-> > > > +
-> > > >  typedef struct sPAPRCPUCore {
-> > > >      /*< private >*/
-> > > >      CPUCore parent_obj;
-> > > > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> > > > index b6610dd..550d320 100644
-> > > > --- a/hw/ppc/spapr_cpu_core.c
-> > > > +++ b/hw/ppc/spapr_cpu_core.c
-> > > > @@ -217,37 +217,6 @@ err:
-> > > >      error_propagate(errp, local_err);
-> > > >  }
-> > > >  
-> > > > -static const char *spapr_core_models[] = {
-> > > > -    /* 970 */
-> > > > -    "970_v2.2",
-> > > > -
-> > > > -    /* 970MP variants */
-> > > > -    "970mp_v1.0",
-> > > > -    "970mp_v1.1",
-> > > > -
-> > > > -    /* POWER5+ */
-> > > > -    "power5+_v2.1",
-> > > > -
-> > > > -    /* POWER7 */
-> > > > -    "power7_v2.3",
-> > > > -
-> > > > -    /* POWER7+ */
-> > > > -    "power7+_v2.1",
-> > > > -
-> > > > -    /* POWER8 */
-> > > > -    "power8_v2.0",
-> > > > -
-> > > > -    /* POWER8E */
-> > > > -    "power8e_v2.1",
-> > > > -
-> > > > -    /* POWER8NVL */
-> > > > -    "power8nvl_v1.0",
-> > > > -
-> > > > -    /* POWER9 */
-> > > > -    "power9_v1.0",
-> > > > -    "power9_v2.0",
-> > > > -};
-> > > > -
-> > > >  static Property spapr_cpu_core_properties[] = {
-> > > >      DEFINE_PROP_INT32("node-id", sPAPRCPUCore, node_id, CPU_UNSET_NUMA_NODE_ID),
-> > > >      DEFINE_PROP_END_OF_LIST()
-> > > > @@ -265,33 +234,33 @@ void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
-> > > >      g_assert(scc->cpu_class);
-> > > >  }
-> > > >  
-> > > > -static const TypeInfo spapr_cpu_core_type_info = {
-> > > > -    .name = TYPE_SPAPR_CPU_CORE,
-> > > > -    .parent = TYPE_CPU_CORE,
-> > > > -    .abstract = true,
-> > > > -    .instance_size = sizeof(sPAPRCPUCore),
-> > > > -    .class_size = sizeof(sPAPRCPUCoreClass),
-> > > > -};
-> > > > -
-> > > > -static void spapr_cpu_core_register_types(void)
-> > > > -{
-> > > > -    int i;
-> > > > -
-> > > > -    type_register_static(&spapr_cpu_core_type_info);
-> > > > -
-> > > > -    for (i = 0; i < ARRAY_SIZE(spapr_core_models); i++) {
-> > > > -        TypeInfo type_info = {
-> > > > -            .parent = TYPE_SPAPR_CPU_CORE,
-> > > > -            .instance_size = sizeof(sPAPRCPUCore),
-> > > > -            .class_init = spapr_cpu_core_class_init,
-> > > > -            .class_data = (void *) spapr_core_models[i],
-> > > > -        };
-> > > > -
-> > > > -        type_info.name = g_strdup_printf("%s-" TYPE_SPAPR_CPU_CORE,
-> > > > -                                         spapr_core_models[i]);
-> > > > -        type_register(&type_info);
-> > > > -        g_free((void *)type_info.name);
-> > > > +#define DEFINE_SPAPR_CPU_CORE_TYPE(cpu_model) \
-> > > > +    {                                                   \
-> > > > +        .parent = TYPE_SPAPR_CPU_CORE,                  \587
-> > > > +        .class_data = (void *) cpu_model,               \
-> > > > +        .class_init = spapr_cpu_core_class_init,        \
-> > > > +        .name = SPAPR_CPU_CORE_TYPE_NAME(cpu_model),    \
-> > > >      }
-> > > > -}
-> > > >  
-> > > > -type_init(spapr_cpu_core_register_types)
-> > > > +static const TypeInfo spapr_cpu_core_type_infos[] = {
-> > > > +    {
-> > > > +        .name = TYPE_SPAPR_CPU_CORE,
-> > > > +        .parent = TYPE_CPU_CORE,
-> > > > +        .abstract = true,
-> > > > +        .instance_size = sizeof(sPAPRCPUCore),
-> > > > +        .class_size = sizeof(sPAPRCPUCoreClass),
-> > > > +    },
-> > > > +    DEFINE_SPAPR_CPU_CORE_TYPE("970_v2.2"),
-> > > > +    DEFINE_SPAPR_CPU_CORE_TYPE("970mp_v1.0"),
-> > > > +    DEFINE_SPAPR_CPU_CORE_TYPE("970mp_v1.1"),
-> > > > +    DEFINE_SPAPR_CPU_CORE_TYPE("power5+_v2.1"),
-> > > > +    DEFINE_SPAPR_CPU_CORE_TYPE("power7_v2.3"),
-> > > > +    DEFINE_SPAPR_CPU_CORE_TYPE("power7+_v2.1"),
-> > > > +    DEFINE_SPAPR_CPU_CORE_TYPE("power8_v2.0"),
-> > > > +    DEFINE_SPAPR_CPU_CORE_TYPE("power8e_v2.1"),
-> > > > +    DEFINE_SPAPR_CPU_CORE_TYPE("power8nvl_v1.0"),
-> > > > +    DEFINE_SPAPR_CPU_CORE_TYPE("power9_v1.0"),
-> > > > +    DEFINE_SPAPR_CPU_CORE_TYPE("power9_v2.0"),
-> > > > +};
-> > > > +
-> > > > +DEFINE_TYPES(spapr_cpu_core_type_infos)      
-> > > 
-> > >     
-> >   
-> 
+--MSxtjV7AVT6DSXL2xph1bGaEMvGqsUnug
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnfiP4ACgkQp6FrSiUn
+Q2r6EQf+PTiujk13DVXpE22WfGZOsImWiNlcgkXH+Qb/iPJ4NUWMfDjcCWDCW4X1
+Iiq/JAjWjXM3jhFiWZWcNiLRTvd5W0EgK9r8Udb5yx2ytnqNN/Yn5V5MXt1E7PB3
+W5zFaBH+mNOrvqe3of4WTsZxDYewmVOmfQ7HGXi2DUtngS+pdqTjADyg6p+egyR4
+vLAh/LDhYCWVeojz2ulShSJ0a5TvyaIHqpDZrZlQ4SkX75AViN06q+ZZGRfsTG+r
+uXzSi8pFmS3woVJ38NRNzRs4D6a+OddrM5Nzz48IoBKOQtXDIRpZNQWiV76UC60f
+DBET6hhnmkLLozUXQUYSCdJrpzmqNA==
+=nkAp
+-----END PGP SIGNATURE-----
+
+--MSxtjV7AVT6DSXL2xph1bGaEMvGqsUnug--
