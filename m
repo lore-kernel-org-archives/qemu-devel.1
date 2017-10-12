@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e2aMq-0002sO-6y
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:05:32 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e2aNm-0003Yg-6e
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:06:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e2aMk-00012J-Iw
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:05:28 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:48726)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e2aMk-00011G-8g
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:05:22 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id i124so11582630wmf.3
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 03:05:20 -0700 (PDT)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1e2aNh-0001kz-1h
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:06:26 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:9350 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1e2aNg-0001ja-Mg
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:06:20 -0400
+References: <20171002143919.207741-1-vsementsov@virtuozzo.com>
+	<20171002143919.207741-2-vsementsov@virtuozzo.com>
+	<72e73c18-7220-9c3a-967c-82171b16689c@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <5e30814f-bb1b-18f3-1a48-8030fe63e86f@virtuozzo.com>
+Date: Thu, 12 Oct 2017 13:05:57 +0300
 MIME-Version: 1.0
-In-Reply-To: <20171011185103.26259-1-ehabkost@redhat.com>
-References: <20171011185103.26259-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Oct 2017 11:04:59 +0100
-Message-ID: <CAFEAcA-SvJvhAsiK-7QRwQNaG-_QXP8ZV4p-3=0Fz_3NzZmueg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/5] Python queue, 2017-10-11
+In-Reply-To: <72e73c18-7220-9c3a-967c-82171b16689c@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 1/5] hbitmap: add next_zero function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +30,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 
-On 11 October 2017 at 19:50, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> The following changes since commit bac960832015bf4c4c1b873011612e2675e4464c:
+10.10.2017 00:51, John Snow wrote:
 >
->   Merge remote-tracking branch 'remotes/elmarco/tags/vus-pull-request' into staging (2017-10-11 13:10:36 +0100)
+> On 10/02/2017 10:39 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> The function searches for next zero bit.
+>> Also add interface for BdrvDirtyBitmap.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   include/block/dirty-bitmap.h |  1 +
+>>   include/qemu/hbitmap.h       |  8 ++++++++
+>>   block/dirty-bitmap.c         |  5 +++++
+>>   util/hbitmap.c               | 29 +++++++++++++++++++++++++++++
+>>   4 files changed, 43 insertions(+)
+>>
+>> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+>> index 3579a7597c..a591c27213 100644
+>> --- a/include/block/dirty-bitmap.h
+>> +++ b/include/block/dirty-bitmap.h
+>> @@ -91,5 +91,6 @@ bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
+>>   BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
+>>                                           BdrvDirtyBitmap *bitmap);
+>>   char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
+>> +int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t start);
+>>   
+>>   #endif
+>> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+>> index 81e78043d1..6b6490ecad 100644
+>> --- a/include/qemu/hbitmap.h
+>> +++ b/include/qemu/hbitmap.h
+>> @@ -292,6 +292,14 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first);
+>>    */
+>>   unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi);
+>>   
+>> +/* hbitmap_next_zero:
+>> + * @hb: The HBitmap to operate on
+>> + * @start: The bit to start from.
+>> + *
+>> + * Find next not dirty bit.
+>> + */
+>> +int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start);
+>> +
+>>   /* hbitmap_create_meta:
+>>    * Create a "meta" hbitmap to track dirtiness of the bits in this HBitmap.
+>>    * The caller owns the created bitmap and must call hbitmap_free_meta(hb) to
+>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+>> index bd04e991b1..7879d13ddb 100644
+>> --- a/block/dirty-bitmap.c
+>> +++ b/block/dirty-bitmap.c
+>> @@ -715,3 +715,8 @@ char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp)
+>>   {
+>>       return hbitmap_sha256(bitmap->bitmap, errp);
+>>   }
+>> +
+>> +int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset)
+>> +{
+>> +    return hbitmap_next_zero(bitmap->bitmap, offset);
+>> +}
+>> diff --git a/util/hbitmap.c b/util/hbitmap.c
+>> index 2f9d0fdbd0..ffcdbc5587 100644
+>> --- a/util/hbitmap.c
+>> +++ b/util/hbitmap.c
+>> @@ -188,6 +188,35 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first)
+>>       }
+>>   }
+>>   
+>> +int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start)
+>> +{
+>> +    size_t pos = (start >> hb->granularity) >> BITS_PER_LEVEL;
+>> +    unsigned long *last_lev = hb->levels[HBITMAP_LEVELS - 1];
+>> +    uint64_t sz = hb->sizes[HBITMAP_LEVELS - 1];
+>> +    unsigned long cur = last_lev[pos];
+>> +    unsigned start_bit_offset =
+>> +            (start >> hb->granularity) & (BITS_PER_LONG - 1);
+>> +    int64_t res;
+> Prefer a line separating declarations from statements.
 >
-> are available in the git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
->
-> for you to fetch changes up to 1a6d3757107181dc0b9baf3dd8ff40fb2a242b66:
->
->   scripts: Remove debug parameter from QEMUMachine (2017-10-11 15:15:17 -0300)
->
-> ----------------------------------------------------------------
-> Python queue, 2017-10-11
->
-> ----------------------------------------------------------------
->
-> Eduardo Habkost (5):
->   iotests: Set up Python logging
->   basevm: Call logging.basicConfig()
->   guestperf: Configure logging on all shell frontends
->   scripts: Remove debug parameter from QEMUMonitorProtocol
->   scripts: Remove debug parameter from QEMUMachine
->
->  scripts/qemu.py                     |  9 +++------
->  scripts/qmp/qmp.py                  | 16 +++++++---------
->  tests/migration/guestperf/engine.py |  6 ++----
->  tests/migration/guestperf/shell.py  | 13 +++++++++++++
->  tests/qemu-iotests/iotests.py       |  5 +++--
->  tests/vm/basevm.py                  |  4 ++--
->  6 files changed, 30 insertions(+), 23 deletions(-)
+>> +    cur |= (1UL << start_bit_offset) - 1;
+>> +    assert((start >> hb->granularity) < hb->size);
+>> +
+>> +    if (cur == (unsigned long)-1) {
+>> +        do {
+>> +            pos++;
+>> +        } while (pos < sz && last_lev[pos] == (unsigned long)-1);
+>> +
+>> +        if (pos >= sz) {
+>> +            return -1;
+>> +        }
+>> +
+>> +        cur = last_lev[pos];
+>> +    }
+>> +
+>> +    res = (pos << BITS_PER_LEVEL) + ctol(cur);
+>> +
+>> +    return res < hb->size ? (res << hb->granularity) : -1;
 
-Applied, thanks.
+here is a hidden mistake: we must consider case when start is not 
+aligned to granularity, and if start bit is considered zero we should 
+return start, not ((start >> gran) << gran)
 
--- PMM
+>> +}
+>> +
+>>   bool hbitmap_empty(const HBitmap *hb)
+>>   {
+>>       return hb->count == 0;
+>>
+> And a test would be nice.
+>
+> Reviewed-by: John Snow <jsnow@redhat.com>
+
+
+-- 
+Best regards,
+Vladimir
