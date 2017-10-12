@@ -1,44 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53810)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1e2aqD-0005fV-Jd
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:35:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e2arW-0006OW-MB
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:37:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1e2aqA-0006cM-En
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:35:49 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36550
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1e2aqA-0006c3-9E
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:35:46 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9CAYZGk031929
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 06:35:41 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dj5dckj6m-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 06:35:41 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 12 Oct 2017 11:35:40 +0100
-References: <20171005151313.32015-1-cohuck@redhat.com>
-	<20171005171619.28b48ed6.cohuck@redhat.com>
-	<d82d4e97-d8c0-916f-1fe6-26a2a0aa4482@redhat.com>
-	<20171012094006.03064151.cohuck@redhat.com>
-	<f1e9fb83-dae6-d5b4-50b7-3e499eb3b3b2@de.ibm.com>
-	<20171012123425.4f24c503.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 12 Oct 2017 12:35:35 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1e2arV-0007gz-KQ
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:37:10 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:46939)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e2arV-0007gc-DZ
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 06:37:09 -0400
+Received: by mail-wm0-x235.google.com with SMTP id m72so11942925wmc.1
+	for <qemu-devel@nongnu.org>; Thu, 12 Oct 2017 03:37:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20171012123425.4f24c503.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <ff42d38a-1d62-1d03-d038-df63989de104@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] s390x/MAINTAINERS: add mailing list
+In-Reply-To: <73b7916a-4bb3-3913-ed6f-23e5c3e4fa23@redhat.com>
+References: <1506524205-20763-1-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA_UfXaO-KEgXb+GSUT=XhQar_gxshUV_GWO_axcZ0R4sA@mail.gmail.com>
+	<73b7916a-4bb3-3913-ed6f-23e5c3e4fa23@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Oct 2017 11:36:47 +0100
+Message-ID: <CAFEAcA8OcaNJ3ZU=LFeCP0A_Kd__OTb-svZL7_dqjaBH=uRtog@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 0/3] vITS Reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,46 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Eric Farman <farman@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, david@redhat.com, qemu-devel@nongnu.org, Farhan Ali <alifm@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, agraf@suse.de, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Jason J Herne <jjherne@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, rth@twiddle.net
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Wei Huang <wei@redhat.com>, Andrew Jones <drjones@redhat.com>, Vijay Kilari <vijay.kilari@gmail.com>, Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, wu.wubin@huawei.com, wanghaibin.wang@huawei.com, Christoffer Dall <christoffer.dall@linaro.org>, eric.auger.pro@gmail.com
 
-
-
-On 10/12/2017 12:34 PM, Cornelia Huck wrote:
-> On Thu, 12 Oct 2017 12:20:47 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> On 10/12/2017 09:40 AM, Cornelia Huck wrote:
->>> On Thu, 12 Oct 2017 08:02:12 +0200
->>> Thomas Huth <thuth@redhat.com> wrote:
->>>   
->>>> On 05.10.2017 17:16, Cornelia Huck wrote:  
->>>>> On Thu,  5 Oct 2017 17:13:13 +0200
->>>>> Cornelia Huck <cohuck@redhat.com> wrote:
->>>>>     
->>>>>> There's a new qemu-s390x@nongnu.org mailing list: add it to the
->>>>>> s390 sections.
->>>>>>
->>>>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->>>>>> ---
->>>>>>  MAINTAINERS | 6 ++++++
->>>>>>  1 file changed, 6 insertions(+)    
->>>>>
->>>>> Hnm. Hold this, the mailing list does not seem to work yet(?).    
->>>>
->>>> FYI: It should be fixed now! (thanks to Ian Kelling from gnu.org)
->>>>
->>>>  Thomas  
->>>
->>> Yeah!
->>>
->>> I'll queue this. Any further acks from maintainers?  
+On 11 October 2017 at 17:06, Auger Eric <eric.auger@redhat.com> wrote:
+> On 09/10/2017 20:17, Peter Maydell wrote:
+>> It's not clear to me why we need a new KVM device attribute
+>> for doing ITS reset. The usual approach for this is:
+>>  * system reset causes QEMU's device model reset code
+>>    to reset state structure values to whatever their
+>>    reset value is
+>>  * we write those values up into the kernel, which is
+>>    sufficient to reset it
 >>
->> Do you have mine?
->>
-> 
-> At least not in my inbox...
+>> What goes wrong with that in the case of the ITS?
+>> In particular, if GITS_CTLR.Enabled is 0 then I think the
+>> kernel should not be trying to read guest memory tables.
+>
+> We discussed that on the kernel thread and Christoffer seemed to prefer
+> an IOTCL instead of individual register writes
+> (https://www.spinics.net/lists/kvm-arm/msg27211.html)
+>
+> The IOCTL empties the ITS cached data (list of collection, list of
+> devices and list of LPIs) while it is not obvious the reset of BASER<n>
+> would mandate that. Eventually in my kernel series I also voided the
+> list on BASER<n>.valid toggling from 1 to 0.
 
-No idea if I sent one.
+OK, I guess that makes sense -- in hardware, the device
+has extra internal state (the cached stuff) which isn't
+visible in its register interface. So we want to provide
+an API which is morally equivalent to the hardware reset line
+to tell the ITS to drop that internal state.
 
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Spec also says:
+> If a write to GITS.CTLR changes the Enabled field from 1 to 0, the
+> Interrupt Translation Space must ensure
+> that both:
+> =E2=80=A2 Any caches containing mapping data are made consistent with ext=
+ernal
+> memory.
+> =E2=80=A2 GITS_CTLR.Quiescent =3D=3D 0 until all caches are consistent wi=
+th external
+> memory.
+>
+> I aknowledge I don't really get at which moment we are supposed to void
+> the caches.
+
+This is the interface for a software controlled clean powerdown:
+ * OS writes 0 to Enabled
+ * ITS finishes anything it is currently in the middle of
+ * ITS updates any info that it currently has only in its internal
+   cache so that it is also reflected in the external memory
+   data structures
+ * ITS sets Quiescent to 1 to tell the OS it has finished this process
+   (and may no longer access guest RAM after this point)
+ * OS can now unmap the RAM that the ITS tables are in,
+   tell the h/w to power off the GIC/ITS, etc
+
+It's a multistep process where the ITS gets the opportunity to
+write memory in the middle. I think in theory there's no obligation
+to actually drop the cached data when you set Quiescent to 1,
+provided that you validate that when the OS sets Enabled back to
+1 all your cached data is still valid, because that's
+indistinguishable from dropping the cache and then repopulating it.
+
+For the unclean powerdown (yanking the cord out of the back of the
+machine), which is what qemu's reset is, we don't give the ITS
+the option to write memory, it just has to effectively drop
+any internal data structures it was using. So it needs a KVM
+API that's different from the register-access API.
+
+thanks
+-- PMM
