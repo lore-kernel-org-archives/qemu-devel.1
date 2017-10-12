@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2UTp-0002zz-AK
+	(envelope-from <eblake@redhat.com>) id 1e2UTp-0002zy-9z
 	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 23:48:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e2UTm-0007md-89
+	(envelope-from <eblake@redhat.com>) id 1e2UTm-0007mm-Bs
 	for qemu-devel@nongnu.org; Wed, 11 Oct 2017 23:48:17 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 11 Oct 2017 22:47:13 -0500
-Message-Id: <20171012034720.11947-18-eblake@redhat.com>
+Date: Wed, 11 Oct 2017 22:47:12 -0500
+Message-Id: <20171012034720.11947-17-eblake@redhat.com>
 In-Reply-To: <20171012034720.11947-1-eblake@redhat.com>
 References: <20171012034720.11947-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 17/24] qemu-img: Change
- check_empty_sectors() to byte-based
+Subject: [Qemu-devel] [PATCH v6 16/24] qemu-img: Drop redundant error
+ message in compare
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,87 +23,100 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, Max Reitz <mreitz@redhat.com>
 
-Continue on the quest to make more things byte-based instead of
-sector-based.
+If a read error is encountered during 'qemu-img compare', we
+were printing the "Error while reading offset ..." message twice;
+this was because our helper function was awkward, printing output
+on some but not all paths.  Fix it to consistently report errors
+on all paths, so that the callers do not risk a redundant message,
+and update the testsuite for the improved output.
+
+Further simplify the code by hoisting the conversion from an error
+message to an exit code into the helper function, rather than
+repeating that logic at all callers (yes, the helper function is
+now less generic, but it's a net win in lines of code).
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 
 ---
-v4-v5: no change
+v5: tweak commit message, but no code change
+v4: no change
 v3: new patch
 ---
- qemu-img.c | 27 +++++++++++++++------------
- 1 file changed, 15 insertions(+), 12 deletions(-)
+ qemu-img.c                 | 19 +++++--------------
+ tests/qemu-iotests/074.out |  2 --
+ 2 files changed, 5 insertions(+), 16 deletions(-)
 
 diff --git a/qemu-img.c b/qemu-img.c
-index 53cae6bb66..66d595be3d 100644
+index 89f1093d81..53cae6bb66 100644
 --- a/qemu-img.c
 +++ b/qemu-img.c
-@@ -1203,30 +1203,29 @@ static int64_t sectors_to_bytes(int64_t sectors)
-  * an error message.
+@@ -1197,8 +1197,10 @@ static int64_t sectors_to_bytes(int64_t sectors)
+ /*
+  * Check if passed sectors are empty (not allocated or contain only 0 bytes)
+  *
+- * Returns 0 in case sectors are filled with 0, 1 if sectors contain non-zero
+- * data and negative value on error.
++ * Intended for use by 'qemu-img compare': Returns 0 in case sectors are
++ * filled with 0, 1 if sectors contain non-zero data (this is a comparison
++ * failure), and 4 on error (the exit status for read errors), after emitting
++ * an error message.
   *
   * @param blk:  BlockBackend for the image
-- * @param sect_num: Number of first sector to check
-- * @param sect_count: Number of sectors to check
-+ * @param offset: Starting offset to check
-+ * @param bytes: Number of bytes to check
-  * @param filename: Name of disk file we are checking (logging purpose)
-  * @param buffer: Allocated buffer for storing read data
-  * @param quiet: Flag for quiet mode
-  */
--static int check_empty_sectors(BlockBackend *blk, int64_t sect_num,
--                               int sect_count, const char *filename,
-+static int check_empty_sectors(BlockBackend *blk, int64_t offset,
-+                               int64_t bytes, const char *filename,
-                                uint8_t *buffer, bool quiet)
- {
-     int ret = 0;
-     int64_t idx;
-
--    ret = blk_pread(blk, sect_num << BDRV_SECTOR_BITS, buffer,
--                    sect_count << BDRV_SECTOR_BITS);
-+    ret = blk_pread(blk, offset, buffer, bytes);
+  * @param sect_num: Number of first sector to check
+@@ -1219,7 +1221,7 @@ static int check_empty_sectors(BlockBackend *blk, int64_t sect_num,
      if (ret < 0) {
          error_report("Error while reading offset %" PRId64 " of %s: %s",
--                     sectors_to_bytes(sect_num), filename, strerror(-ret));
-+                     offset, filename, strerror(-ret));
-         return 4;
+                      sectors_to_bytes(sect_num), filename, strerror(-ret));
+-        return ret;
++        return 4;
      }
--    idx = find_nonzero(buffer, sect_count * BDRV_SECTOR_SIZE);
-+    idx = find_nonzero(buffer, bytes);
+     idx = find_nonzero(buffer, sect_count * BDRV_SECTOR_SIZE);
      if (idx >= 0) {
-         qprintf(quiet, "Content mismatch at offset %" PRId64 "!\n",
--                sectors_to_bytes(sect_num) + idx);
-+                offset + idx);
-         return 1;
-     }
-
-@@ -1471,10 +1470,12 @@ static int img_compare(int argc, char **argv)
-         } else {
-             nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
-             if (allocated1) {
--                ret = check_empty_sectors(blk1, sector_num, nb_sectors,
-+                ret = check_empty_sectors(blk1, sector_num * BDRV_SECTOR_SIZE,
-+                                          nb_sectors * BDRV_SECTOR_SIZE,
-                                           filename1, buf1, quiet);
-             } else {
--                ret = check_empty_sectors(blk2, sector_num, nb_sectors,
-+                ret = check_empty_sectors(blk2, sector_num * BDRV_SECTOR_SIZE,
-+                                          nb_sectors * BDRV_SECTOR_SIZE,
+@@ -1476,11 +1478,6 @@ static int img_compare(int argc, char **argv)
                                            filename2, buf1, quiet);
              }
              if (ret) {
-@@ -1519,7 +1520,9 @@ static int img_compare(int argc, char **argv)
-             nb_sectors = count >> BDRV_SECTOR_BITS;
-             if (ret & BDRV_BLOCK_ALLOCATED && !(ret & BDRV_BLOCK_ZERO)) {
-                 nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
--                ret = check_empty_sectors(blk_over, sector_num, nb_sectors,
-+                ret = check_empty_sectors(blk_over,
-+                                          sector_num * BDRV_SECTOR_SIZE,
-+                                          nb_sectors * BDRV_SECTOR_SIZE,
+-                if (ret < 0) {
+-                    error_report("Error while reading offset %" PRId64 ": %s",
+-                                 sectors_to_bytes(sector_num), strerror(-ret));
+-                    ret = 4;
+-                }
+                 goto out;
+             }
+         }
+@@ -1525,12 +1522,6 @@ static int img_compare(int argc, char **argv)
+                 ret = check_empty_sectors(blk_over, sector_num, nb_sectors,
                                            filename_over, buf1, quiet);
                  if (ret) {
+-                    if (ret < 0) {
+-                        error_report("Error while reading offset %" PRId64
+-                                     " of %s: %s", sectors_to_bytes(sector_num),
+-                                     filename_over, strerror(-ret));
+-                        ret = 4;
+-                    }
                      goto out;
+                 }
+             }
+diff --git a/tests/qemu-iotests/074.out b/tests/qemu-iotests/074.out
+index 8fba5aea9c..ede66c3f81 100644
+--- a/tests/qemu-iotests/074.out
++++ b/tests/qemu-iotests/074.out
+@@ -4,7 +4,6 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ wrote 512/512 bytes at offset 512
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ qemu-img: Error while reading offset 0 of blkdebug:TEST_DIR/blkdebug.conf:TEST_DIR/t.IMGFMT: Input/output error
+-qemu-img: Error while reading offset 0: Input/output error
+ 4
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
+ Formatting 'TEST_DIR/t.IMGFMT.2', fmt=IMGFMT size=0
+@@ -12,7 +11,6 @@ Formatting 'TEST_DIR/t.IMGFMT.2', fmt=IMGFMT size=0
+ wrote 512/512 bytes at offset 512
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ qemu-img: Error while reading offset 0 of blkdebug:TEST_DIR/blkdebug.conf:TEST_DIR/t.IMGFMT: Input/output error
+-qemu-img: Error while reading offset 0 of blkdebug:TEST_DIR/blkdebug.conf:TEST_DIR/t.IMGFMT: Input/output error
+ Warning: Image size mismatch!
+ 4
+ Cleanup
 -- 
 2.13.6
