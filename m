@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e2dHk-0002P7-Kg
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:12:25 -0400
+	(envelope-from <berto@igalia.com>) id 1e2dHv-0002YI-Ed
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:12:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e2dHh-0004Wy-62
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:12:24 -0400
+	(envelope-from <berto@igalia.com>) id 1e2dHr-0004f7-8R
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 09:12:35 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Thu, 12 Oct 2017 16:05:32 +0300
-Message-Id: <65c2b2b32a686d3084a1579583334a85b706edcb.1507813391.git.berto@igalia.com>
+Date: Thu, 12 Oct 2017 16:05:22 +0300
+Message-Id: <070b0cebec08d8f7445a6d58e34075f64a239269.1507813391.git.berto@igalia.com>
 In-Reply-To: <cover.1507813391.git.berto@igalia.com>
 References: <cover.1507813391.git.berto@igalia.com>
 In-Reply-To: <cover.1507813391.git.berto@igalia.com>
 References: <cover.1507813391.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 18/31] qcow2: Update qcow2_get_cluster_offset()
- to support L2 slices
+Subject: [Qemu-devel] [PATCH 08/31] qcow2: Remove BDS parameter from
+ qcow2_cache_destroy()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,111 +25,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Alberto Garcia <berto@igalia.com>
 
-qcow2_get_cluster_offset() checks how many contiguous bytes are
-available at a given offset. The returned number of bytes is limited
-by the amount that can be addressed without having to load more than
-one L2 table.
-
-Since we'll be loading L2 slices instead of full tables this patch
-changes the limit accordingly using the size of the L2 slice for the
-calculations instead of the full table size.
-
-The l2_table variable is also renamed to l2_slice to reflect this, and
-offset_to_l2_index() is replaced with offset_to_l2_slice_index().
+This function was never using the BlockDriverState parameter so it can
+be safely removed.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2-cluster.c | 29 ++++++++++++++---------------
- 1 file changed, 14 insertions(+), 15 deletions(-)
+ block/qcow2-cache.c |  2 +-
+ block/qcow2.c       | 16 ++++++++--------
+ block/qcow2.h       |  2 +-
+ 3 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 580fb50869..860e56ec7c 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -522,8 +522,8 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
- {
-     BDRVQcow2State *s = bs->opaque;
-     unsigned int l2_index;
--    uint64_t l1_index, l2_offset, *l2_table;
--    int l1_bits, c;
-+    uint64_t l1_index, l2_offset, *l2_slice;
-+    int c;
-     unsigned int offset_in_cluster;
-     uint64_t bytes_available, bytes_needed, nb_clusters;
-     QCow2ClusterType type;
-@@ -532,12 +532,11 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
-     offset_in_cluster = offset_into_cluster(s, offset);
-     bytes_needed = (uint64_t) *bytes + offset_in_cluster;
- 
--    l1_bits = s->l2_bits + s->cluster_bits;
--
-     /* compute how many bytes there are between the start of the cluster
--     * containing offset and the end of the l1 entry */
--    bytes_available = (1ULL << l1_bits) - (offset & ((1ULL << l1_bits) - 1))
--                    + offset_in_cluster;
-+     * containing offset and the end of the l2 slice that contains
-+     * the entry pointing to it */
-+    bytes_available = (s->l2_slice_size - offset_to_l2_slice_index(s, offset))
-+        << s->cluster_bits;
- 
-     if (bytes_needed > bytes_available) {
-         bytes_needed = bytes_available;
-@@ -566,17 +565,17 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
-         return -EIO;
-     }
- 
--    /* load the l2 table in memory */
-+    /* load the l2 slice in memory */
- 
--    ret = l2_load(bs, offset, l2_offset, &l2_table);
-+    ret = l2_load(bs, offset, l2_offset, &l2_slice);
-     if (ret < 0) {
-         return ret;
-     }
- 
-     /* find the cluster offset for the given disk offset */
- 
--    l2_index = offset_to_l2_index(s, offset);
--    *cluster_offset = be64_to_cpu(l2_table[l2_index]);
-+    l2_index = offset_to_l2_slice_index(s, offset);
-+    *cluster_offset = be64_to_cpu(l2_slice[l2_index]);
- 
-     nb_clusters = size_to_clusters(s, bytes_needed);
-     /* bytes_needed <= *bytes + offset_in_cluster, both of which are unsigned
-@@ -603,14 +602,14 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
-     case QCOW2_CLUSTER_UNALLOCATED:
-         /* how many empty clusters ? */
-         c = count_contiguous_clusters_unallocated(nb_clusters,
--                                                  &l2_table[l2_index], type);
-+                                                  &l2_slice[l2_index], type);
-         *cluster_offset = 0;
-         break;
-     case QCOW2_CLUSTER_ZERO_ALLOC:
-     case QCOW2_CLUSTER_NORMAL:
-         /* how many allocated clusters ? */
-         c = count_contiguous_clusters(nb_clusters, s->cluster_size,
--                                      &l2_table[l2_index], QCOW_OFLAG_ZERO);
-+                                      &l2_slice[l2_index], QCOW_OFLAG_ZERO);
-         *cluster_offset &= L2E_OFFSET_MASK;
-         if (offset_into_cluster(s, *cluster_offset)) {
-             qcow2_signal_corruption(bs, true, -1, -1,
-@@ -626,7 +625,7 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
-         abort();
-     }
- 
--    qcow2_cache_put(s->l2_table_cache, (void **) &l2_table);
-+    qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
- 
-     bytes_available = (int64_t)c * s->cluster_size;
- 
-@@ -644,7 +643,7 @@ out:
-     return type;
- 
- fail:
--    qcow2_cache_put(s->l2_table_cache, (void **)&l2_table);
-+    qcow2_cache_put(s->l2_table_cache, (void **)&l2_slice);
-     return ret;
+diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
+index bd2bc7e063..a50a56bd8b 100644
+--- a/block/qcow2-cache.c
++++ b/block/qcow2-cache.c
+@@ -130,7 +130,7 @@ Qcow2Cache *qcow2_cache_create(BlockDriverState *bs, int num_tables)
+     return c;
  }
  
+-int qcow2_cache_destroy(BlockDriverState *bs, Qcow2Cache *c)
++int qcow2_cache_destroy(Qcow2Cache *c)
+ {
+     int i;
+ 
+diff --git a/block/qcow2.c b/block/qcow2.c
+index dff903e05c..ba8139f82c 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1031,10 +1031,10 @@ static void qcow2_update_options_commit(BlockDriverState *bs,
+     int i;
+ 
+     if (s->l2_table_cache) {
+-        qcow2_cache_destroy(bs, s->l2_table_cache);
++        qcow2_cache_destroy(s->l2_table_cache);
+     }
+     if (s->refcount_block_cache) {
+-        qcow2_cache_destroy(bs, s->refcount_block_cache);
++        qcow2_cache_destroy(s->refcount_block_cache);
+     }
+     s->l2_table_cache = r->l2_table_cache;
+     s->refcount_block_cache = r->refcount_block_cache;
+@@ -1060,10 +1060,10 @@ static void qcow2_update_options_abort(BlockDriverState *bs,
+                                        Qcow2ReopenState *r)
+ {
+     if (r->l2_table_cache) {
+-        qcow2_cache_destroy(bs, r->l2_table_cache);
++        qcow2_cache_destroy(r->l2_table_cache);
+     }
+     if (r->refcount_block_cache) {
+-        qcow2_cache_destroy(bs, r->refcount_block_cache);
++        qcow2_cache_destroy(r->refcount_block_cache);
+     }
+     qapi_free_QCryptoBlockOpenOptions(r->crypto_opts);
+ }
+@@ -1492,10 +1492,10 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
+     s->l1_table = NULL;
+     cache_clean_timer_del(bs);
+     if (s->l2_table_cache) {
+-        qcow2_cache_destroy(bs, s->l2_table_cache);
++        qcow2_cache_destroy(s->l2_table_cache);
+     }
+     if (s->refcount_block_cache) {
+-        qcow2_cache_destroy(bs, s->refcount_block_cache);
++        qcow2_cache_destroy(s->refcount_block_cache);
+     }
+     qcrypto_block_free(s->crypto);
+     qapi_free_QCryptoBlockOpenOptions(s->crypto_opts);
+@@ -2078,8 +2078,8 @@ static void qcow2_close(BlockDriverState *bs)
+     }
+ 
+     cache_clean_timer_del(bs);
+-    qcow2_cache_destroy(bs, s->l2_table_cache);
+-    qcow2_cache_destroy(bs, s->refcount_block_cache);
++    qcow2_cache_destroy(s->l2_table_cache);
++    qcow2_cache_destroy(s->refcount_block_cache);
+ 
+     qcrypto_block_free(s->crypto);
+     s->crypto = NULL;
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 7fa195bc22..ddf60fa290 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -646,7 +646,7 @@ int qcow2_read_snapshots(BlockDriverState *bs);
+ 
+ /* qcow2-cache.c functions */
+ Qcow2Cache *qcow2_cache_create(BlockDriverState *bs, int num_tables);
+-int qcow2_cache_destroy(BlockDriverState* bs, Qcow2Cache *c);
++int qcow2_cache_destroy(Qcow2Cache *c);
+ 
+ void qcow2_cache_entry_mark_dirty(Qcow2Cache *c, void *table);
+ int qcow2_cache_flush(BlockDriverState *bs, Qcow2Cache *c);
 -- 
 2.11.0
