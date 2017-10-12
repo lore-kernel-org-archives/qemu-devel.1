@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e2Y6R-0007dK-JU
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 03:40:24 -0400
+	(envelope-from <prvs=451d893c3=Paul.Durrant@citrix.com>)
+	id 1e2YPi-0002H8-LQ
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 04:00:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e2Y6M-0000s6-Cx
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 03:40:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34078)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e2Y6L-0000rm-W3
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 03:40:18 -0400
-Date: Thu, 12 Oct 2017 09:40:06 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171012094006.03064151.cohuck@redhat.com>
-In-Reply-To: <d82d4e97-d8c0-916f-1fe6-26a2a0aa4482@redhat.com>
-References: <20171005151313.32015-1-cohuck@redhat.com>
-	<20171005171619.28b48ed6.cohuck@redhat.com>
-	<d82d4e97-d8c0-916f-1fe6-26a2a0aa4482@redhat.com>
+	(envelope-from <prvs=451d893c3=Paul.Durrant@citrix.com>)
+	id 1e2YPa-0005K5-Ev
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 04:00:18 -0400
+Received: from smtp.citrix.com.au ([103.14.252.240]:59569)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=451d893c3=Paul.Durrant@citrix.com>)
+	id 1e2YPZ-0005Ev-QC
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 04:00:10 -0400
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Thu, 12 Oct 2017 07:58:50 +0000
+Message-ID: <e25a3501923944fbad8e3a560c5cf8f3@AMSPEX02CL03.citrite.net>
+References: <1506437019-17946-1-git-send-email-owen.smith@citrix.com>
+	<1506437019-17946-4-git-send-email-owen.smith@citrix.com>
+	<20171002170132.GA2116@perard.uk.xensource.com>
+	<alpine.DEB.2.10.1710101651560.3105@sstabellini-ThinkPad-X260>
+	<20171011154718.GQ1771@perard.uk.xensource.com>
+	<alpine.DEB.2.10.1710111309400.3105@sstabellini-ThinkPad-X260>
+In-Reply-To: <alpine.DEB.2.10.1710111309400.3105@sstabellini-ThinkPad-X260>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390x/MAINTAINERS: add mailing list
+Subject: Re: [Qemu-devel] [Xen-devel] [PATCH 3/3 v4] xenfb:
+	Add	[feature|request]-raw-pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +36,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, david@redhat.com, agraf@suse.de, rth@twiddle.net, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Eric Farman <farman@linux.vnet.ibm.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Jason J Herne <jjherne@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>
+To: 'Stefano Stabellini' <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Owen Smith <owen.smith@citrix.com>, "kraxel@redhat.com" <kraxel@redhat.com>
 
-On Thu, 12 Oct 2017 08:02:12 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 05.10.2017 17:16, Cornelia Huck wrote:
-> > On Thu,  5 Oct 2017 17:13:13 +0200
-> > Cornelia Huck <cohuck@redhat.com> wrote:
-> >   
-> >> There's a new qemu-s390x@nongnu.org mailing list: add it to the
-> >> s390 sections.
-> >>
-> >> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> >> ---
-> >>  MAINTAINERS | 6 ++++++
-> >>  1 file changed, 6 insertions(+)  
-> > 
-> > Hnm. Hold this, the mailing list does not seem to work yet(?).  
-> 
-> FYI: It should be fixed now! (thanks to Ian Kelling from gnu.org)
-> 
->  Thomas
-
-Yeah!
-
-I'll queue this. Any further acks from maintainers?
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBYZW4tZGV2ZWwgW21haWx0bzp4
+ZW4tZGV2ZWwtYm91bmNlc0BsaXN0cy54ZW4ub3JnXSBPbiBCZWhhbGYgT2YNCj4gU3RlZmFubyBT
+dGFiZWxsaW5pDQo+IFNlbnQ6IDExIE9jdG9iZXIgMjAxNyAyMToxOQ0KPiBUbzogQW50aG9ueSBQ
+ZXJhcmQgPGFudGhvbnkucGVyYXJkQGNpdHJpeC5jb20+DQo+IENjOiBxZW11LWRldmVsQG5vbmdu
+dS5vcmc7IHhlbi1kZXZlbEBsaXN0cy54ZW5wcm9qZWN0Lm9yZzsgU3RlZmFubw0KPiBTdGFiZWxs
+aW5pIDxzc3RhYmVsbGluaUBrZXJuZWwub3JnPjsgT3dlbiBTbWl0aCA8b3dlbi5zbWl0aEBjaXRy
+aXguY29tPjsNCj4ga3JheGVsQHJlZGhhdC5jb20NCj4gU3ViamVjdDogUmU6IFtYZW4tZGV2ZWxd
+IFtQQVRDSCAzLzMgdjRdIHhlbmZiOiBBZGQgW2ZlYXR1cmV8cmVxdWVzdF0tcmF3LQ0KPiBwb2lu
+dGVyDQo+IA0KPiBPbiBXZWQsIDExIE9jdCAyMDE3LCBBbnRob255IFBFUkFSRCB3cm90ZToNCj4g
+PiBPbiBUdWUsIE9jdCAxMCwgMjAxNyBhdCAwNDo1Mjo0OFBNIC0wNzAwLCBTdGVmYW5vIFN0YWJl
+bGxpbmkgd3JvdGU6DQo+ID4gPiBPbiBNb24sIDIgT2N0IDIwMTcsIEFudGhvbnkgUEVSQVJEIHdy
+b3RlOg0KPiA+ID4gPiBPbiBUdWUsIFNlcCAyNiwgMjAxNyBhdCAwMjo0MzozOVBNICswMDAwLCBP
+d2VuIFNtaXRoIHdyb3RlOg0KPiA+ID4gPiA+IFdyaXRlcyAiZmVhdHVyZS1yYXctcG9pbnRlciIg
+ZHVyaW5nIGluaXQgdG8gaW5kaWNhdGUgdGhlIGJhY2tlbmQNCj4gPiA+ID4gPiBjYW4gcGFzcyBy
+YXcgdW5zY2FsZWQgdmFsdWVzIGZvciBhYnNvbHV0ZSBheGVzIHRvIHRoZSBmcm9udGVuZC4NCj4g
+PiA+ID4gPiBGcm9udGVuZHMgc2V0ICJyZXF1ZXN0LXJhdy1wb2ludGVyIiB0byBpbmRpY2F0ZSB0
+aGUgYmFja2VuZCBzaG91bGQNCj4gPiA+ID4gPiBub3QgYXR0ZW1wdCB0byBzY2FsZSBhYnNvbHV0
+ZSB2YWx1ZXMgdG8gY29uc29sZSBzaXplLg0KPiA+ID4gPiA+ICJyZXF1ZXN0LXJhdy1wb2ludGVy
+IiBpcyBvbmx5IHZhbGlkIGlmICJyZXF1ZXN0LWFicy1wb2ludGVyIiBpcw0KPiA+ID4gPiA+IGFs
+c28gc2V0LiBSYXcgdW5zY2FsZWQgcG9pbnRlciB2YWx1ZXMgYXJlIGluIHRoZSByYW5nZSBbMCwg
+MHg3ZmZmXQ0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gU2lnbmVkLW9mZi1ieTogT3dlbiBTbWl0aCA8
+b3dlbi5zbWl0aEBjaXRyaXguY29tPg0KPiA+ID4gPg0KPiA+ID4gPiBIaSBPd2VuLA0KPiA+ID4g
+Pg0KPiA+ID4gPiBXaHkgZGlkIHlvdSByZW1vdmUgdGhlIGZvbGxvd2luZyBmcm9tIHRoZSBjb21t
+aXQgZGVzY3JpcHRpb24/DQo+ID4gPiA+ID4gImZlYXR1cmUtcmF3LXBvaW50ZXIiIGFuZCAicmVx
+dWVzdC1yYXctcG9pbnRlciIgYWRkZWQgdG8gWGVuDQo+ID4gPiA+ID4gaGVhZGVyIGluIGNvbW1p
+dCA3ODY4NjU0ZmY3ZmU1ZTRhMmVlYWUyYjI3NzY0NGZhODg0YTUwMzFlDQo+ID4gPiA+DQo+ID4g
+PiA+IEkgdGhpbmsgdGhhdCB3aXRoIGl0LCB5b3UgY291bGQgaGF2ZSBrZXB0IHN0ZWZhbm8ncyBy
+ZXZpZXdlZC1ieSB0YWcuDQo+ID4gPg0KPiA+ID4gSGkgQW50aG9ueSwNCj4gPiA+DQo+ID4gPiBI
+YXZlIHlvdSB0ZXN0ZWQgdGhpcyBzZXJpZXMgd2l0aCBhIGZldyBvZiBkaWZmZXJlbnQgZ3Vlc3Rz
+PyBEbyB5b3UNCj4gPiA+IGNvbnNpZGVyIGl0IHNhZmUgdG8gbWVyZ2U/IElmIHNvLCB3ZSBjYW4g
+c2VuZCBpdCB1cHN0cmVhbSAoZWl0aGVyIHZpYQ0KPiA+ID4geGVuIG9yIHZpYSB1aSBhcyBHZXJk
+IGtpbmRseSBvZmZlcmVkKS4NCj4gPg0KPiA+IFllcywgSSB0aGluayBpdCdzIGZpbmUuDQo+ID4N
+Cj4gPiBUaGUgb25seSBvYnNlcnZhdGlvbiBJIGhhdmUgaXMgdGhhdCBvbiBhIExpbnV4IGd1ZXN0
+LCB3aGVuIEkgaGF2ZQ0KPiA+IHVzYmRldmljZT10YWJsZXQsIHdpdGggdGhpcyBzZXJpZXMgdGhl
+IHB2IG1vdXNlIHNlZW1zIHRvIGJlY29tZSB0aGUNCj4gPiBwcmltYXJ5IHdheSBvZiBndWV0aW5n
+IG1vdXNlIGV2ZW50cyAod2l0aG91dCwgdGhlIHRhYmxldCBpcyBwcmltYXJ5KS4NCj4gPiBTbywg
+b24gbXkgVk5DIGNsaWVudCBpbnN0ZWFkIG9mIGhhdmluZyBib3RoIG1vdXNlIGluIHRoZSBndWVz
+dCBhbmQgb24gbXkNCj4gPiBkZXNrdG9wIGJlaW5nIGF0IHRoZSBzYW1lIHBsYWNlLCB0aGVyZSBp
+cyBsaWtlIGEgem9vbSBvZiB0aGUgbW91c2UgKHRoZQ0KPiA+IHpvb20gY2VudGVyZWQgb24gdGhl
+IHRvcC1sZWZ0IGNvcm5lcikuIChUaGF0J3MgYmV0dGVyIHRoYW4gcmVsYXRpdmUNCj4gPiBtb3Vz
+ZSBldmVudCB0aGF0IHdlIGNhbiBnZXQgd2l0aCB0aGUgZW11bGF0aW9uLikNCj4gDQo+IFRoYW5r
+cyBmb3IgdGVzdGluZy4gSSBhbSBub3QgY29tcGxldGVseSBzdXJlIGFib3V0IHdoYXQgc2hvdWxk
+IGJlIHRoZQ0KPiByaWdodCBiZWhhdmlvciB3aGVuIGJvdGggdXNiZGV2aWNlPXRhYmxldCBhbmQg
+cHZtb3VzZSBhcmUgcHJlc2VudC4NCj4gVHlwaWNhbGx5LCBQViBkZXZpY2VzIHRha2UgcHJlY2Vk
+ZW5jZSBvdmVyIGVtdWxhdGVkIGRldmljZXMsIHNvIG1heWJlDQo+IGl0IGlzIE9LIHRoYXQgUFYg
+bW91c2UgaXMgdGhlIHByaW1hcnkgZGV2aWNlIGluIHRoaXMgY2FzZS4NCj4gDQo+IEJ1dCB3ZSB3
+b3VsZCBuZWVkIHRvIGRvY3VtZW50IHRoaXMgYmVoYXZpb3JhbCBjaGFuZ2UgaW4gdGhlIGNvbW1p
+dA0KPiBkZXNjcmlwdGlvbnMuDQo+IA0KDQpJdCdzIHByb2JhYmx5IE9TIHNwZWNpZmljIHRob3Vn
+aC4gSSBndWVzcyB0aGUgYmVoYXZpb3VyIGNoYW5nZWQgYmVjYXVzZSB0aGUgT1MgZmF2b3VycyBh
+YnNvbHV0ZSBwb2ludGluZyBkZXZpY2VzIG92ZXIgcmVsYXRpdmUgb25lcyBhbmQgaG93IGl0IGhh
+cyB0d28gYWJzb2x1dGUgb25lcyB0byBjaG9vc2UgZnJvbS4gSG93IGl0IHJlY29uY2lsZXMgdGhv
+c2UsIHdobyBrbm93cz8NCg0KICBQYXVsDQoNCj4gVGhlIG90aGVyIHF1ZXN0aW9uIGlzIHdoZXRo
+ZXIgdGhlICJ6b29tIG9mIHRoZSBtb3VzZSIgeW91IGFyZSBzZWVpbmcgaXMNCj4gbm9ybWFsIG9y
+IHdoZXRoZXIgd2UgY2FuICJmaXgiIGl0IHNvbWVob3cuIEkgZ3Vlc3MgaXQgaGFzIGFsd2F5cyBi
+ZWVuDQo+IHRoZSBjYXNlIGZvciBQViBtb3VzZT8gSXQgaXMgbm90IHNvbWV0aGluZyBuZXcsIGlz
+IGl0Pw0KPiANCj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X18NCj4gWGVuLWRldmVsIG1haWxpbmcgbGlzdA0KPiBYZW4tZGV2ZWxAbGlzdHMueGVuLm9yZw0K
+PiBodHRwczovL2xpc3RzLnhlbi5vcmcveGVuLWRldmVsDQo=
