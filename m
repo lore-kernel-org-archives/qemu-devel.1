@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e35MV-0006J0-Kn
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 15:11:12 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e35Od-00070Z-Lb
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 15:13:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e35MS-0002b5-FF
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 15:11:11 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57818)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e35MS-0002aR-8V
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 15:11:08 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e35MQ-0004Vu-KF
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 19:11:06 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 939FD2E80C8
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 19:11:06 +0000 (UTC)
+	(envelope-from <ehabkost@redhat.com>) id 1e35Oa-0004Co-Fv
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 15:13:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50908)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e35Oa-0004Bk-9i
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 15:13:20 -0400
+Date: Fri, 13 Oct 2017 16:13:16 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171013191316.GB4178@localhost.localdomain>
+References: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
+	<20171012182746.670939d0@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 13 Oct 2017 18:58:46 -0000
-From: Stefan Weil <1723488@bugs.launchpad.net>
-Reply-To: Bug 1723488 <1723488@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150791693020.21864.9239859411466983104.malonedeb@gac.canonical.com>
-Message-Id: <150792112694.8245.5869757469517180368.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1723488] Re: HAX on Windows, memory lease error
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171012182746.670939d0@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 00/40] generalize parsing of cpu_model
+ (part 2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,70 +28,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-See https://software.intel.com/en-us/android/articles/installation-
-instructions-for-intel-hardware-accelerated-execution-manager-windows:
+On Thu, Oct 12, 2017 at 06:27:46PM +0200, Igor Mammedov wrote:
+> On Thu,  5 Oct 2017 15:50:34 +0200
+> Igor Mammedov <imammedo@redhat.com> wrote:
+> 
+> Eduardo,
+> 
+> Could you merge series via machine tree, pls?
 
-"QEMU or Android Emulator will fail to launch if the guest RAM size
-(specified with the -m option for QEMU or -memory for Android Emulator)
-exceeds 4095MB."
+I just queued it on machine-next.  Pull request will be sent only
+next week, though.
 
-HAX is limited to a 32 bit memory size. There is no way to change that
-without breaking compatibility.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1723488
-
-Title:
-  HAX on Windows, memory lease error
-
-Status in QEMU:
-  New
-
-Bug description:
-  Today I tried to use QEMU on Windows 8.1 x64 with Intel HAX.
-
-  Command line: qemu-system-x86_64.exe -accel hax -m 8000 -hda
-  /opt/disk/ubuntu.img -cdrom /opt/iso/ubuntu-17.04-server-amd64.iso
-
-  Host machine has 32Gb physical memory, I got error:
-
-  HAX is working and emulator runs in fast virt mode.
-  **
-  ERROR:A:/msys64/home/admin/git/qemu/target/i386/hax-mem.c:210:hax_process=
-_section: assertion failed: (size <=3D UINT32_MAX)
-
-  When using -m 4000 (and below) everything is fine. But if I try use
-  >4000 and <8000 I get crash with errors:
-
-  HAX is working and emulator runs in fast virt mode.
-  hax_transaction_commit: Failed mapping @0x0000000100000000+0x78800000 fla=
-gs 00
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1723488/+subscriptions
+-- 
+Eduardo
