@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e2v7T-0003BF-TH
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 04:15:00 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e2v7T-0003BL-UR
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 04:15:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e2v7S-0004Ls-Q9
+	(envelope-from <kraxel@redhat.com>) id 1e2v7Q-0004KN-GL
 	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 04:14:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52024)
+Received: from mx1.redhat.com ([209.132.183.28]:44722)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e2v7S-0004LP-Jh
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 04:14:58 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e2v7Q-0004JS-Ar
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 04:14:56 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AB5A8C057FAF
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 08:14:57 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7E9734D4A4
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 08:14:55 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 13 Oct 2017 10:14:47 +0200
-Message-Id: <20171013081450.29647-9-kraxel@redhat.com>
+Date: Fri, 13 Oct 2017 10:14:45 +0200
+Message-Id: <20171013081450.29647-7-kraxel@redhat.com>
 In-Reply-To: <20171013081450.29647-1-kraxel@redhat.com>
 References: <20171013081450.29647-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 08/11] Add pc-bios/keymaps/Makefile
+Subject: [Qemu-devel] [PULL 06/11] ui: don't export qemu_input_event_new_key
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +30,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Update files where I think I've figured the correct xkb maps.
-TODO: nl-be sl sv
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
+All public code should use qemu_input_event_send_key* functions
+instead of creating an event directly.
+
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Message-id: 20170929101201.21039-7-berrange@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20171005153330.19210-3-kraxel@redhat.com
 ---
- pc-bios/keymaps/Makefile | 56 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
- create mode 100644 pc-bios/keymaps/Makefile
+ include/ui/input.h | 1 -
+ ui/input.c         | 2 +-
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/pc-bios/keymaps/Makefile b/pc-bios/keymaps/Makefile
-new file mode 100644
-index 0000000000..f0e44fd110
---- /dev/null
-+++ b/pc-bios/keymaps/Makefile
-@@ -0,0 +1,56 @@
-+
-+KEYMAP	:= $(shell which qemu-keymap 2>/dev/null)
-+
-+MAPS	:= ar bepo cz da de de-ch en-us en-gb es et fi fo \
-+	   fr fr-be fr-ca fr-ch \
-+	   hr hu is it ja lt lv mk nl no pl pt pt-br ru th tr
-+
-+ar	: MAP_FLAGS :=	-l ar
-+bepo	: MAP_FLAGS :=	-l fr -v dvorak
-+cz	: MAP_FLAGS :=	-l cz
-+da	: MAP_FLAGS :=	-l dk
-+de	: MAP_FLAGS :=	-l de
-+de-ch	: MAP_FLAGS :=	-l ch
-+en-us	: MAP_FLAGS :=	-l us
-+en-gb	: MAP_FLAGS :=	-l gb
-+es	: MAP_FLAGS :=	-l es
-+et	: MAP_FLAGS :=	-l et
-+fi	: MAP_FLAGS :=	-l fi
-+fo	: MAP_FLAGS :=	-l fo
-+fr	: MAP_FLAGS :=	-l fr
-+fr-be	: MAP_FLAGS :=	-l be
-+fr-ca	: MAP_FLAGS :=	-l ca -v fr
-+fr-ch	: MAP_FLAGS :=	-l ch -v fr
-+hr	: MAP_FLAGS :=	-l hr
-+hu	: MAP_FLAGS :=	-l hu
-+is	: MAP_FLAGS :=	-l is
-+it	: MAP_FLAGS :=	-l it
-+ja	: MAP_FLAGS :=	-l jp -m jp106
-+lt	: MAP_FLAGS :=	-l lt
-+lv	: MAP_FLAGS :=	-l lv
-+mk	: MAP_FLAGS :=	-l mk
-+nl	: MAP_FLAGS :=	-l nl
-+no	: MAP_FLAGS :=	-l no
-+pl	: MAP_FLAGS :=	-l pl
-+pt	: MAP_FLAGS :=	-l pt
-+pt-br	: MAP_FLAGS :=	-l br
-+ru	: MAP_FLAGS :=	-l ru
-+th	: MAP_FLAGS :=	-l th
-+tr	: MAP_FLAGS :=	-l tr
-+
-+ifeq ($(KEYMAP),)
-+
-+all:
-+	@echo "nothing to do (qemu-keymap not found)"
-+
-+else
-+
-+all: $(MAPS)
-+
-+clean:
-+	rm -f $(MAPS)
-+
-+$(MAPS): $(KEYMAP) Makefile
-+	$(KEYMAP) -f $@ $(MAP_FLAGS)
-+
-+endif
+diff --git a/include/ui/input.h b/include/ui/input.h
+index 479cc46cfc..f8cee43f65 100644
+--- a/include/ui/input.h
++++ b/include/ui/input.h
+@@ -38,7 +38,6 @@ void qemu_input_event_send_impl(QemuConsole *src, InputEvent *evt);
+ void qemu_input_event_sync(void);
+ void qemu_input_event_sync_impl(void);
+ 
+-InputEvent *qemu_input_event_new_key(KeyValue *key, bool down);
+ void qemu_input_event_send_key(QemuConsole *src, KeyValue *key, bool down);
+ void qemu_input_event_send_key_number(QemuConsole *src, int num, bool down);
+ void qemu_input_event_send_key_qcode(QemuConsole *src, QKeyCode q, bool down);
+diff --git a/ui/input.c b/ui/input.c
+index 4b241aa823..290b47354a 100644
+--- a/ui/input.c
++++ b/ui/input.c
+@@ -386,7 +386,7 @@ void qemu_input_event_sync(void)
+     replay_input_sync_event();
+ }
+ 
+-InputEvent *qemu_input_event_new_key(KeyValue *key, bool down)
++static InputEvent *qemu_input_event_new_key(KeyValue *key, bool down)
+ {
+     InputEvent *evt = g_new0(InputEvent, 1);
+     evt->u.key.data = g_new0(InputKeyEvent, 1);
 -- 
 2.9.3
