@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e35ap-0000wQ-6w
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 15:26:00 -0400
+	(envelope-from <lersek@redhat.com>) id 1e35pN-0003Oi-1b
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 15:41:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e35am-0001z6-3i
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 15:25:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39838)
+	(envelope-from <lersek@redhat.com>) id 1e35pI-0002qw-5t
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 15:41:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34278)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e35al-0001yO-Sz
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 15:25:56 -0400
-Date: Fri, 13 Oct 2017 16:25:50 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171013192550.GC3246@localhost.localdomain>
-References: <20171012235439.19457-1-anatol.pomozov@gmail.com>
-	<20171012235439.19457-3-anatol.pomozov@gmail.com>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1e35pH-0002qa-Vx
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 15:40:56 -0400
+References: <4cce2b8b-a411-bd5d-a06f-b0b80a5fb2f1@redhat.com>
+	<CAKv+Gu820vLCvNq2X_Fha2AW59HsNfTLk--J+wTt+fFdMu7FMw@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <7b84a76d-7708-7c8c-8fcf-7fe5549ed43f@redhat.com>
+Date: Fri, 13 Oct 2017 21:40:47 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171012235439.19457-3-anatol.pomozov@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 2/4] multiboot: load any machine type of ELF
+In-Reply-To: <CAKv+Gu820vLCvNq2X_Fha2AW59HsNfTLk--J+wTt+fFdMu7FMw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] dynamic DRAM base for ArmVirtQemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anatol Pomozov <anatol.pomozov@gmail.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, rth@twiddle.net, pbonzini@redhat.com, agraf@suse.de, "Michael S. Tsirkin" <mst@redhat.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: "Leif Lindholm (Linaro address)" <leif.lindholm@linaro.org>, edk2-devel-01 <edk2-devel@lists.01.org>, Drew Jones <drjones@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Andrea Bolognani <abologna@redhat.com>, libvirt devel <libvir-list@redhat.com>
 
-On Thu, Oct 12, 2017 at 04:54:37PM -0700, Anatol Pomozov wrote:
-> x86 is not the only architecture supported by multiboot.
-> For example GRUB supports MIPS architecture as well.
+On 10/13/17 15:21, Ard Biesheuvel wrote:
+> On 13 October 2017 at 13:51, Laszlo Ersek <lersek@redhat.com> wrote:
+>> Hi Ard, Leif,
+>>
+>> the current physical memory map of the "virt" machine type doesn't leave
+>> much room for ECAM / MMCONFIG, which limits the number of PCI Express
+>> root ports and downstream ports (each port takes a separate bus number,
+>> and each bus number eats up a chunk of the ECAM area). Also, each port
+>> can only accommodate a single PCI Express device. In practice this
+>> limits the number of (hot-pluggable) PCIe devices to approx. 16, which
+>> is deemed by some "not scaleable enough". (For devices that only need to
+>> be cold-plugged, they can be placed directly on the root complex, as
+>> integrated devices, possibly grouping them into multifunction devices
+>> even; so those don't need bus numbers.)
+>>
+>> In order to grow the MMCONFIG area (and for some other reasons
+>> possibly), the phys memmap of "virt" should be shuffled around a bit.
+>> This affects the "system" DRAM too.
+>>
 > 
-> Signed-off-by: Anatol Pomozov <anatol.pomozov@gmail.com>
-> ---
->  hw/i386/multiboot.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
-> index c9254f313e..7dacd6d827 100644
-> --- a/hw/i386/multiboot.c
-> +++ b/hw/i386/multiboot.c
-> @@ -173,7 +173,7 @@ int load_multiboot(FWCfgState *fw_cfg,
->          }
->  
->          kernel_size = load_elf(kernel_filename, NULL, NULL, &elf_entry,
-> -                               &elf_low, &elf_high, 0, I386_ELF_MACHINE,
-> +                               &elf_low, &elf_high, 0, EM_NONE,
->                                 0, 0);
+> Is it really necessary to put the ECAM area below 4 GB? For ARM, I
+> understand this would be an issue, but does the spec actually mandate
+> anything like this?
 
-I assume we still want PC to reject non-x86 ELF files.  Isn't it
-better to add a elf_machine argument to load_multiboot() so each
-load_multiboot() caller can specify what's the expected
-architecture?
+No, I don't think it's inherently necessary to put ECAM under 4GB.
 
+It's just that I approached the problem such that the firmware would be
+burdened with the lion's share of the complexity, in order to keep
+things "compatible" for the rest of the guest world.
 
->          if (kernel_size < 0) {
->              fprintf(stderr, "Error while loading elf kernel\n");
-> -- 
-> 2.15.0.rc0.271.g36b669edcc-goog
-> 
+(Speaking personally, I'd absolutely prefer to keep the DRAM base
+untouched, at 1GB, but I was invited to take a good hard look at what
+moving the DRAM base would take for the firmware, and I made an honest
+effort to determine the impact. It doesn't imply that I like the result
+in the least, or that I personally subscribe to the idea.)
 
--- 
-Eduardo
+Thanks!
+Laszlo
