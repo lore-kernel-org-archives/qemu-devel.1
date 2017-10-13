@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e2wP4-0004kp-4D
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:37:15 -0400
+	(envelope-from <groug@kaod.org>) id 1e2wUx-00066H-H8
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:43:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e2wP3-00018m-0W
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:37:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41852)
+	(envelope-from <groug@kaod.org>) id 1e2wUt-0006BX-AN
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:43:19 -0400
+Received: from 15.mo5.mail-out.ovh.net ([178.33.107.29]:52127)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e2wP2-000184-QX
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:37:12 -0400
-Date: Fri, 13 Oct 2017 11:37:08 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171013113708.2dd02a17.cohuck@redhat.com>
-In-Reply-To: <afc33ce4-c9ab-9b35-38ec-80b16642ef00@weilnetz.de>
-References: <afc33ce4-c9ab-9b35-38ec-80b16642ef00@weilnetz.de>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e2wUt-0006AA-19
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:43:15 -0400
+Received: from player773.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 90F001402BF
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 11:43:13 +0200 (CEST)
+Date: Fri, 13 Oct 2017 11:43:03 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171013114303.23002b34@bahia.lan>
+In-Reply-To: <20171013112120.4d817da7@nial.brq.redhat.com>
+References: <150788370618.25736.8030708425923435364.stgit@bahia>
+	<150788371922.25736.3447778326403865231.stgit@bahia>
+	<20171013112120.4d817da7@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] German BSI analysed security of KVM / QEMU
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] spapr_cpu_core: instantiate CPUs
+ separately
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +32,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: QEMU Developer <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Dr. David
+	Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Fri, 13 Oct 2017 11:10:05 +0200
-Stefan Weil <sw@weilnetz.de> wrote:
+On Fri, 13 Oct 2017 11:21:20 +0200
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-> Hi,
->=20
-> the German Bundesamt f=C3=BCr Sicherheit in der Informationstechnik
-> (Federal Office for Information Security) published a study on
-> the security of KVM and QEMU:
->=20
-> https://www.bsi.bund.de/DE/Publikationen/Studien/Sicherheitsanalyse_KVM/s=
-icherheitsanalyse_kvm.html
->=20
-> (article only available in German)
+> On Fri, 13 Oct 2017 10:35:19 +0200
+> Greg Kurz <groug@kaod.org> wrote:
+> 
+> > The current code assumes that only the CPU core object holds a
+> > reference on each individual CPU object, and happily frees their
+> > allocated memory when the core is unrealized. This is dangerous
+> > as some other code can legitimely keep a pointer to a CPU if it
+> > calls object_ref(), but it would end up with a dangling pointer.
+> > 
+> > Let's allocate all CPUs with object_new() and let QOM frees them
+> > when their reference count reaches zero.  
+> I agree with patch as it simplifies code and one doesn't have to
+> fiddle wit size anymore.
 
-Thanks for posting this!
+Yes, I'll mention that in the changelog as well.
 
-I only looked at the conclusion for now. Some interesting points:
+> See some comments below.
+> 
+> > 
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/ppc/spapr.c                  |   10 +++-------
+> >  hw/ppc/spapr_cpu_core.c         |   29 +++++++++--------------------
+> >  include/hw/ppc/spapr_cpu_core.h |    2 +-
+> >  3 files changed, 13 insertions(+), 28 deletions(-)
+> > 
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index fd9813bde82f..ba391c6ed5de 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -3153,12 +3153,10 @@ void spapr_core_release(DeviceState *dev)
+> >  
+> >      if (smc->pre_2_10_has_unused_icps) {
+> >          sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
+> > -        sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
+> > -        size_t size = object_type_get_instance_size(scc->cpu_type);
+> >          int i;
+> >  
+> >          for (i = 0; i < cc->nr_threads; i++) {
+> > -            CPUState *cs = CPU(sc->threads + i * size);
+> > +            CPUState *cs = CPU(sc->threads[i]);
+> >  
+> >              pre_2_10_vmstate_register_dummy_icp(cs->cpu_index);
+> >          }
+> > @@ -3204,7 +3202,7 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >      sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+> >      sPAPRCPUCore *core = SPAPR_CPU_CORE(OBJECT(dev));
+> >      CPUCore *cc = CPU_CORE(dev);
+> > -    CPUState *cs = CPU(core->threads);
+> > +    CPUState *cs = CPU(core->threads[0]);
+> >      sPAPRDRConnector *drc;
+> >      Error *local_err = NULL;
+> >      int smt = kvmppc_smt_threads();
+> > @@ -3249,13 +3247,11 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >      core_slot->cpu = OBJECT(dev);
+> >  
+> >      if (smc->pre_2_10_has_unused_icps) {
+> > -        sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
+> > -        size_t size = object_type_get_instance_size(scc->cpu_type);
+> >          int i;
+> >  
+> >          for (i = 0; i < cc->nr_threads; i++) {
+> >              sPAPRCPUCore *sc = SPAPR_CPU_CORE(dev);
+> > -            void *obj = sc->threads + i * size;
+> > +            void *obj = sc->threads[i];
+> >  
+> >              cs = CPU(obj);
+> >              pre_2_10_vmstate_unregister_dummy_icp(cs->cpu_index);
+> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> > index 3a4c17401226..47c408b52ca1 100644
+> > --- a/hw/ppc/spapr_cpu_core.c
+> > +++ b/hw/ppc/spapr_cpu_core.c
+> > @@ -79,21 +79,18 @@ const char *spapr_get_cpu_core_type(const char *cpu_type)
+> >  static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
+> >  {
+> >      sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
+> > -    sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
+> > -    size_t size = object_type_get_instance_size(scc->cpu_type);
+> >      CPUCore *cc = CPU_CORE(dev);
+> >      int i;
+> >  
+> >      for (i = 0; i < cc->nr_threads; i++) {
+> > -        void *obj = sc->threads + i * size;
+> > -        DeviceState *dev = DEVICE(obj);
+> > +        DeviceState *dev = DEVICE(sc->threads[i]);
+> >          CPUState *cs = CPU(dev);
+> >          PowerPCCPU *cpu = POWERPC_CPU(cs);
+> >  
+> >          spapr_cpu_destroy(cpu);
+> >          object_unparent(cpu->intc);
+> >          cpu_remove_sync(cs);
+> > -        object_unparent(obj);
+> > +        object_unparent(sc->threads[i]);
+> >      }
+> >      g_free(sc->threads);
+> >  }
+> > @@ -146,9 +143,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+> >      sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
+> >      sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
+> >      CPUCore *cc = CPU_CORE(OBJECT(dev));
+> > -    size_t size;
+> >      Error *local_err = NULL;
+> > -    void *obj;
+> >      int i, j;
+> >  
+> >      if (!spapr) {
+> > @@ -156,17 +151,14 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+> >          return;
+> >      }
+> >  
+> > -    size = object_type_get_instance_size(scc->cpu_type);
+> > -    sc->threads = g_malloc0(size * cc->nr_threads);
+> > +    sc->threads = g_new(void *, cc->nr_threads);  
+> 
+>                            ^^^ PowerPCCPU*
+> 
 
-- They state that QEMU's source code is well structured, readable and
-  maintainable. I wonder what kind of source code they usually deal
-  with ;)
-- Most problems noted seemed to be related to signed<->unsigned
-  conversions, but none were found to be exploitable.
-- They liked hardening via stack protection, NX, and ASLR, as well as
-  the mechanisms used by libvirt.
-- They generally seemed to be happy with QEMU being deployed via
-  libvirt.
-- Restrictions imposed via KVM (guest access to some CPU registers)
-  scored positive points. They did not like that Hyper-V and PMU were
-  not deconfigurable.
-- Lack of support for encryption/signing of network-based images was
-  criticized. They ended up using Ceph and GlusterFS, which they were
-  reasonably happy with.
+Right, I guess void * was appropriate to do the pointer arithmetics but we don't
+need that anymore.
 
-That's just from a quick browse.
+> and maybe g_new0() if incomplete cores are possible.
+> 
+
+Yes, older machine types (ie, that don't support CPU hotplug) can have
+incomplete cores, but cc->nr_threads is set to the actual number of
+threads in this case. See spapr_init_cpus() in hw/ppc/spapr.c.
+
+> >      for (i = 0; i < cc->nr_threads; i++) {
+> >          char id[32];
+> >          CPUState *cs;
+> >          PowerPCCPU *cpu;
+> >  
+> > -        obj = sc->threads + i * size;
+> > -
+> > -        object_initialize(obj, size, scc->cpu_type);
+> > -        cs = CPU(obj);
+> > +        sc->threads[i] = object_new(scc->cpu_type);
+> > +        cs = CPU(sc->threads[i]);
+> >          cpu = POWERPC_CPU(cs);
+> >          cs->cpu_index = cc->core_id + i;
+> >          cpu->vcpu_id = (cc->core_id * spapr->vsmt / smp_threads) + i;
+> > @@ -184,17 +176,15 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+> >          cpu->node_id = sc->node_id;
+> >  
+> >          snprintf(id, sizeof(id), "thread[%d]", i);
+> > -        object_property_add_child(OBJECT(sc), id, obj, &local_err);
+> > +        object_property_add_child(OBJECT(sc), id, sc->threads[i], &local_err);
+> >          if (local_err) {
+> >              goto err;
+> >          }
+> > -        object_unref(obj);
+> > +        object_unref(sc->threads[i]);
+> >      }
+> >  
+> >      for (j = 0; j < cc->nr_threads; j++) {
+> > -        obj = sc->threads + j * size;
+> > -
+> > -        spapr_cpu_core_realize_child(obj, spapr, &local_err);
+> > +        spapr_cpu_core_realize_child(sc->threads[j], spapr, &local_err);
+> >          if (local_err) {
+> >              goto err;
+> >          }
+> > @@ -203,8 +193,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+> >  
+> >  err:
+> >      while (--i >= 0) {
+> > -        obj = sc->threads + i * size;
+> > -        object_unparent(obj);
+> > +        object_unparent(sc->threads[i]);
+> >      }
+> >      g_free(sc->threads);
+> >      error_propagate(errp, local_err);
+> > diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
+> > index f2d48d6a6786..f5b943a6682c 100644
+> > --- a/include/hw/ppc/spapr_cpu_core.h
+> > +++ b/include/hw/ppc/spapr_cpu_core.h
+> > @@ -28,7 +28,7 @@ typedef struct sPAPRCPUCore {
+> >      CPUCore parent_obj;
+> >  
+> >      /*< public >*/
+> > -    void *threads;
+> > +    void **threads;  
+> ditto, should be PowerPCCPU
+> 
+
+Ok.
+
+Thanks for the feedback!
+
+> >      int node_id;
+> >  } sPAPRCPUCore;
+> >  
+> > 
+> >   
+> 
