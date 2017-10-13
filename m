@@ -1,22 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e38XM-0007b5-Jz
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 18:34:37 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1e38j8-0000YT-Hb
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 18:46:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e38XL-0002G0-JY
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 18:34:36 -0400
-References: <20171012095319.136610-1-vsementsov@virtuozzo.com>
-	<20171012095319.136610-12-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <190b8cd5-9efc-3a25-ab94-64281daed584@redhat.com>
-Date: Fri, 13 Oct 2017 17:34:26 -0500
+	(envelope-from <sstabellini@kernel.org>) id 1e38j5-0002P8-Et
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 18:46:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43680)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1e38j5-0002NV-8a
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 18:46:43 -0400
+Date: Fri, 13 Oct 2017 15:46:39 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <59E0C9F602000078001862C4@prv-mh.provo.novell.com>
+Message-ID: <alpine.DEB.2.10.1710131544350.2967@sstabellini-ThinkPad-X260>
+References: <20170911043820.14617-1-haozhong.zhang@intel.com>
+	<20170911044157.15403-1-haozhong.zhang@intel.com>
+	<20170911160818.1bd44a82@nial.brq.redhat.com>
+	<alpine.DEB.2.10.1709111119480.19719@sstabellini-ThinkPad-X260>
+	<20170912031509.vufszbju3s2v2bw3@hz-desktop>
+	<20171010160544.GA1772@char.us.oracle.com>
+	<20171012124544.dq3wyr65tefi3glk@hz-desktop>
+	<f6478644-0d4a-6531-9016-aee2a0e76417@redhat.com>
+	<20171013075326.77azyi4j2wo3b2fx@hz-desktop>
+	<20171013104453.50284426@nial.brq.redhat.com>
+	<20171013111341.feb2462nh2rcrjpp@hz-desktop>
+	<59E0C9F602000078001862C4@prv-mh.provo.novell.com>
 MIME-Version: 1.0
-In-Reply-To: <20171012095319.136610-12-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="rAETFm5rBQ459MWG25F5FScLC6jK8MQKl"
-Subject: Re: [Qemu-devel] [PATCH v3 11/13] nbd: share some nbd entities to
- be reused in block/nbd-client.c
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [RFC QEMU PATCH v3 00/10] Implement vNVDIMM for
+ Xen HVM guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,84 +38,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Jan Beulich <JBeulich@suse.com>
+Cc: Haozhong Zhang <haozhong.zhang@intel.com>, andrew.cooper3@citrix.com, Anthony Perard <anthony.perard@citrix.com>, george.dunlap@citrix.com, wei.liu2@citrix.com, ian.jackson@eu.citrix.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Stefano Stabellini <sstabellini@kernel.org>, Chao Peng <chao.p.peng@linux.intel.com>, xen-devel@lists.xen.org, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rAETFm5rBQ459MWG25F5FScLC6jK8MQKl
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
-Message-ID: <190b8cd5-9efc-3a25-ab94-64281daed584@redhat.com>
-Subject: Re: [PATCH v3 11/13] nbd: share some nbd entities to be reused in
- block/nbd-client.c
-References: <20171012095319.136610-1-vsementsov@virtuozzo.com>
- <20171012095319.136610-12-vsementsov@virtuozzo.com>
-In-Reply-To: <20171012095319.136610-12-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, 13 Oct 2017, Jan Beulich wrote:
+> >>> On 13.10.17 at 13:13, <haozhong.zhang@intel.com> wrote:
+> > To Jan, Andrew, Stefano and Anthony,
+> > 
+> > what do you think about allowing QEMU to build the entire guest ACPI
+> > and letting SeaBIOS to load it? ACPI builder code in hvmloader is
+> > still there and just bypassed in this case.
+> 
+> Well, if that can be made work in a non-quirky way and without
+> loss of functionality, I'd probably be fine. I do think, however,
+> that there's a reason this is being handled in hvmloader right now.
 
-On 10/12/2017 04:53 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/block/nbd.h | 48 +++++++++++++++++++++++++++++++++++++++++++++=
-+++
->  nbd/nbd-internal.h  | 25 -------------------------
->  nbd/client.c        | 32 --------------------------------
->  3 files changed, 48 insertions(+), 57 deletions(-)
->=20
-
-By the end of your series, I still don't see any use of
-
-> +++ b/include/block/nbd.h
-
-> @@ -235,4 +272,15 @@ void nbd_client_put(NBDClient *client);
->  void nbd_server_start(SocketAddress *addr, const char *tls_creds,
->                        Error **errp);
-> =20
-> +/* nbd_read
-> + * Reads @size bytes from @ioc. Returns 0 on success.
-> + */
-> +static inline int nbd_read(QIOChannel *ioc, void *buffer, size_t size,=
-
-> +                           Error **errp)
-> +{
-> +    return qio_channel_read_all(ioc, buffer, size, errp) < 0 ? -EIO : =
-0;
-> +}
-> +
-> +int nbd_drop(QIOChannel *ioc, size_t size, Error **errp);
-
-either of these functions in block/nbd-client.c.  I think that's a good
-thing (we refactored it so that nbd/client.c is doing ALL the reading
-from the wire, and block/nbd-client.c is relying on nbd/client.c to do
-the work), but it means this part of the patch is no longer necessary,
-unless I'm missing something.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---rAETFm5rBQ459MWG25F5FScLC6jK8MQKl
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnhP3IACgkQp6FrSiUn
-Q2oRcwf/ZWZgj+b++5seJ9C7MPUgzn5FjEH2A+U2YufSgOHuX8Onfs02zFB++8ez
-eeJwQu9D08Y9fAEmRR/PrUlJvVa+EZnGdiQMQcUfU0xlrFNZVs4zHYPDsRTI4nsH
-GbGzzcdhOwKnR0Ho6LKomYZ5iPgr14+WLLuEpjfakk+rZVrneKbyrHBbpGSEWSl1
-UkVHNncb5PLChtoBV8n/gW1uMPwINnBBAGwtIzhKavXHQ9wxDyRSjCjSfvZuANEb
-gMw/HSZ0aOmlIw6S2y43C5aUuyfURNomT0MId8EHW0EwnFepklNjMhETw40dw9iZ
-YJrgYCCnUH30Sq8y6H0DM02xGepfCQ==
-=aqD8
------END PGP SIGNATURE-----
-
---rAETFm5rBQ459MWG25F5FScLC6jK8MQKl--
+And not to discourage you, just as a clarification, you'll also need to
+consider backward compatibility: unless the tables are identical, I
+imagine we'll have to keep using the old tables for already installed
+virtual machines.
