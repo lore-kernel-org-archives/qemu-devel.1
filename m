@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e2sCs-0003YI-4r
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 01:08:23 -0400
+	(envelope-from <stefan@weilnetz.de>) id 1e2sq9-0000LR-28
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 01:48:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e2sCo-0007m6-VV
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 01:08:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34650)
+	(envelope-from <stefan@weilnetz.de>) id 1e2sq5-00033t-Ux
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 01:48:57 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:34688
+	helo=v2201612906741603.powersrv.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e2sCo-0007hk-Lk
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 01:08:18 -0400
-Date: Fri, 13 Oct 2017 13:08:09 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171013050809.GI30901@pxdev.xzpeter.org>
-References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
-	<1504081950-2528-11-git-send-email-peterx@redhat.com>
-	<20170921192903.GH3401@work-vm>
-	<20170927073441.GD25011@pxdev.xzpeter.org>
-	<20171009185812.GR2374@work-vm>
-	<20171010093801.GC20686@pxdev.xzpeter.org>
-	<20171010123017.GE2132@work-vm>
-	<20171011030058.GG20686@pxdev.xzpeter.org>
-	<20171012121952.GD2343@work-vm>
+	(Exim 4.71) (envelope-from <stefan@weilnetz.de>) id 1e2sq5-0002zC-L7
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 01:48:53 -0400
+From: Stefan Weil <sw@weilnetz.de>
+Date: Fri, 13 Oct 2017 07:48:42 +0200
+Message-Id: <20171013054842.32120-1-sw@weilnetz.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171012121952.GD2343@work-vm>
-Subject: Re: [Qemu-devel] [RFC v2 10/33] migration: allow dst vm pause on
- postcopy
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] oslib-posix: Fix compiler warning and some
+ data types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,66 +26,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Weil <sw@weilnetz.de>
 
-On Thu, Oct 12, 2017 at 01:19:52PM +0100, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > On Tue, Oct 10, 2017 at 01:30:18PM +0100, Dr. David Alan Gilbert wrote:
-> > > * Peter Xu (peterx@redhat.com) wrote:
-> > > > On Mon, Oct 09, 2017 at 07:58:13PM +0100, Dr. David Alan Gilbert wrote:
-> > 
-> > [...]
-> > 
-> > > > > We have to be careful about this; a network can fail in a way it
-> > > > > gets stuck rather than fails - this can get stuck until a full TCP
-> > > > > disconnection; and that takes about 30mins (from memory).
-> > > > > The nice thing about using 'shutdown' is that you can kill the existing
-> > > > > connection if it's hung. (Which then makes an interesting question;
-> > > > > the rules in your migrate-incoming command become different if you
-> > > > > want to declare it's failed!).  Having said that, you're right that at
-> > > > > this point stuff has already failed - so do we need the shutdown?
-> > > > > (You might want to do the shutdown as part of the recovery earlier
-> > > > > or as a separate command to force the failure)
-> > > > 
-> > > > I assume if I call shutdown before the lock then we'll be good then.
-> > > 
-> > > The question is what happens if you only allow recovery if we're already
-> > > in postcopy-paused state; in the case of a hung socket, since no IO has
-> > > actually failed yet, you will still be in postcopy-active.
-> > 
-> > Hmm, but isn't that a problem of kernel rather than QEMU?  Since
-> > sockets are after all managed by kernel.
-> 
-> Kind of, but it comes down to what the right behaviour of a TCP socket
-> is, and the kernel is probably doing the right thing.
-> 
-> > I don't really know what is the best thing to do to detect whether a
-> > socket is stuck.  Assume we can observed that (say, we see migration
-> > transferred bytes keep static for 30 seconds), IIRC you mentioned
-> > about iptable tricks to break an existing e.g. TCP connection, then we
-> > can trigger the -EIO path.
-> 
-> From the qemu level I'd prefer to make it a command;  if we start
-> adding heuristics and timeouts etc then it's very difficult to actually
-> get them right.
-> 
-> > Or do you think we should provide a way to manually trigger the paused
-> > state?  Then it goes back to something we discussed with Dan in the
-> > earlier post - I'd appreciate if we can postpone the manual trigger
-> > support a bit (to make this series small, which is already not...).
-> 
-> I think that manual trigger is probably necessary; it would just call a
-> shutdown() on the sockets and let the things fail into the paused state.
-> It'd be pretty simple.  It would be another OOB command; the tricky
-> part is just making sure it's thread safe against hte migration
-> finishing when you issue it.
-> 
-> I think it can wait until after this series if you want, but it would
-> be good if we can figure it out.
+gcc warning:
 
-OK.  Let me try it in my next post.  I hope it won't grow into
-something bigger (which does happens sometimes... :).
+/qemu/util/oslib-posix.c:304:11: error:
+ variable =E2=80=98addr=E2=80=99 might be clobbered by =E2=80=98longjmp=E2=
+=80=99 or =E2=80=98vfork=E2=80=99
+ [-Werror=3Dclobbered]
 
--- 
-Peter Xu
+Fix also some related data types:
+
+numpages, hpagesize are used as pointer offset.
+Always use size_t for them and for the derived numpages_per_thread.
+
+Avoid a type cast by declaring addr volatile.
+
+Signed-off-by: Stefan Weil <sw@weilnetz.de>
+---
+
+v2: Fix more data types (partially as discussed with Richard)
+
+Please note that checkpatch.pl raises an error:
+
+ERROR: Use of volatile is usually wrong: see Documentation/volatile-consi=
+dered-harmful.txt
+
+This error is wrong in the current context.
+It also refers to a file which exists in the Linux sources
+but not in the QEMU source.
+
+Regards
+Stefan
+
+ util/oslib-posix.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index 80086c549f..beef148c96 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -59,8 +59,8 @@
+=20
+ struct MemsetThread {
+     char *addr;
+-    uint64_t numpages;
+-    uint64_t hpagesize;
++    size_t numpages;
++    size_t hpagesize;
+     QemuThread pgthread;
+     sigjmp_buf env;
+ };
+@@ -301,11 +301,7 @@ static void sigbus_handler(int signal)
+ static void *do_touch_pages(void *arg)
+ {
+     MemsetThread *memset_args =3D (MemsetThread *)arg;
+-    char *addr =3D memset_args->addr;
+-    uint64_t numpages =3D memset_args->numpages;
+-    uint64_t hpagesize =3D memset_args->hpagesize;
+     sigset_t set, oldset;
+-    int i =3D 0;
+=20
+     /* unblock SIGBUS */
+     sigemptyset(&set);
+@@ -315,6 +311,10 @@ static void *do_touch_pages(void *arg)
+     if (sigsetjmp(memset_args->env, 1)) {
+         memset_thread_failed =3D true;
+     } else {
++        volatile char *addr =3D memset_args->addr;
++        size_t numpages =3D memset_args->numpages;
++        size_t hpagesize =3D memset_args->hpagesize;
++        size_t i;
+         for (i =3D 0; i < numpages; i++) {
+             /*
+              * Read & write back the same value, so we don't
+@@ -328,7 +328,7 @@ static void *do_touch_pages(void *arg)
+              * don't need to write at all so we don't cause
+              * wear on the storage backing the region...
+              */
+-            *(volatile char *)addr =3D *addr;
++            *addr =3D *addr;
+             addr +=3D hpagesize;
+         }
+     }
+@@ -351,7 +351,8 @@ static inline int get_memset_num_threads(int smp_cpus=
+)
+ static bool touch_all_pages(char *area, size_t hpagesize, size_t numpage=
+s,
+                             int smp_cpus)
+ {
+-    uint64_t numpages_per_thread, size_per_thread;
++    size_t numpages_per_thread;
++    size_t size_per_thread;
+     char *addr =3D area;
+     int i =3D 0;
+=20
+--=20
+2.11.0
