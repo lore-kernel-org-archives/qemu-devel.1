@@ -1,39 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2yPA-0007Ls-UL
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2yPA-0007Lr-H6
 	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:45:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2yP6-0002sV-LY
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2yP6-0002rw-4g
 	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:45:28 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46308
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40460
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e2yP6-0002s0-FH
+	id 1e2yP5-0002rB-Rm
 	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:45:24 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9DBhsNr087218
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 07:45:21 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2djrwm5ex7-1
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9DBii54088012
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 07:45:20 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2djsfxbw0y-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 07:45:21 -0400
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 07:45:20 -0400
 Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Fri, 13 Oct 2017 07:45:20 -0400
+	Fri, 13 Oct 2017 07:45:19 -0400
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Fri, 13 Oct 2017 07:44:50 -0400
+Date: Fri, 13 Oct 2017 07:44:57 -0400
 In-Reply-To: <1507895100-26457-1-git-send-email-stefanb@linux.vnet.ibm.com>
 References: <1507895100-26457-1-git-send-email-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <1507895100-26457-2-git-send-email-stefanb@linux.vnet.ibm.com>
+Message-Id: <1507895100-26457-9-git-send-email-stefanb@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v3 01/11] tpm: Use EMSGSIZE instead of EBADMSG
- to compile on OpenBSD
+Subject: [Qemu-devel] [PULL v3 08/11] tpm-passthrough: move reusable code to
+ utils
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,58 +45,193 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, amarnath.valluri@intel.com, marcandre.lureau@gmail.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-EBADMSG was only added to OpenBSD very recently. To make QEMU compilable
-on older OpenBSD versions use EMSGSIZE instead when a mismatch between
-number of received bytes and message size indicated in the header was
-found.
+From: Amarnath Valluri <amarnath.valluri@intel.com>
 
-Return -EMSGSIZE and convert all other errnos in the same functions to
-return the negative errno.
-
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 ---
- hw/tpm/tpm_util.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ hw/tpm/tpm_passthrough.c | 64 ++++--------------------------------------=
+------
+ hw/tpm/tpm_util.c        | 25 +++++++++++++++++++
+ hw/tpm/tpm_util.h        |  4 +++
+ 3 files changed, 34 insertions(+), 59 deletions(-)
 
+diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+index 22d3460..e6ace28 100644
+--- a/hw/tpm/tpm_passthrough.c
++++ b/hw/tpm/tpm_passthrough.c
+@@ -68,27 +68,6 @@ typedef struct TPMPassthruState TPMPassthruState;
+=20
+ static void tpm_passthrough_cancel_cmd(TPMBackend *tb);
+=20
+-static int tpm_passthrough_unix_write(int fd, const uint8_t *buf, uint32=
+_t len)
+-{
+-    int ret, remain;
+-
+-    remain =3D len;
+-    while (remain > 0) {
+-        ret =3D write(fd, buf, remain);
+-        if (ret < 0) {
+-            if (errno !=3D EINTR && errno !=3D EAGAIN) {
+-                return -1;
+-            }
+-        } else if (ret =3D=3D 0) {
+-            break;
+-        } else {
+-            buf +=3D ret;
+-            remain -=3D ret;
+-        }
+-    }
+-    return len - remain;
+-}
+-
+ static int tpm_passthrough_unix_read(int fd, uint8_t *buf, uint32_t len)
+ {
+     int ret;
+@@ -102,45 +81,12 @@ static int tpm_passthrough_unix_read(int fd, uint8_t=
+ *buf, uint32_t len)
+     }
+     return ret;
+ }
+-
+-static uint32_t tpm_passthrough_get_size_from_buffer(const uint8_t *buf)
+-{
+-    struct tpm_resp_hdr *resp =3D (struct tpm_resp_hdr *)buf;
+-
+-    return be32_to_cpu(resp->len);
+-}
+-
+-/*
+- * Write an error message in the given output buffer.
+- */
+-static void tpm_write_fatal_error_response(uint8_t *out, uint32_t out_le=
+n)
+-{
+-    if (out_len >=3D sizeof(struct tpm_resp_hdr)) {
+-        struct tpm_resp_hdr *resp =3D (struct tpm_resp_hdr *)out;
+-
+-        resp->tag =3D cpu_to_be16(TPM_TAG_RSP_COMMAND);
+-        resp->len =3D cpu_to_be32(sizeof(struct tpm_resp_hdr));
+-        resp->errcode =3D cpu_to_be32(TPM_FAIL);
+-    }
+-}
+-
+-static bool tpm_passthrough_is_selftest(const uint8_t *in, uint32_t in_l=
+en)
+-{
+-    struct tpm_req_hdr *hdr =3D (struct tpm_req_hdr *)in;
+-
+-    if (in_len >=3D sizeof(*hdr)) {
+-        return (be32_to_cpu(hdr->ordinal) =3D=3D TPM_ORD_ContinueSelfTes=
+t);
+-    }
+-
+-    return false;
+-}
+-
+ static int tpm_passthrough_unix_tx_bufs(TPMPassthruState *tpm_pt,
+                                         const uint8_t *in, uint32_t in_l=
+en,
+                                         uint8_t *out, uint32_t out_len,
+                                         bool *selftest_done)
+ {
+-    int ret;
++    ssize_t ret;
+     bool is_selftest;
+     const struct tpm_resp_hdr *hdr;
+=20
+@@ -148,9 +94,9 @@ static int tpm_passthrough_unix_tx_bufs(TPMPassthruSta=
+te *tpm_pt,
+     tpm_pt->tpm_executing =3D true;
+     *selftest_done =3D false;
+=20
+-    is_selftest =3D tpm_passthrough_is_selftest(in, in_len);
++    is_selftest =3D tpm_util_is_selftest(in, in_len);
+=20
+-    ret =3D tpm_passthrough_unix_write(tpm_pt->tpm_fd, in, in_len);
++    ret =3D qemu_write_full(tpm_pt->tpm_fd, (const void *)in, (size_t)in=
+_len);
+     if (ret !=3D in_len) {
+         if (!tpm_pt->tpm_op_canceled || errno !=3D ECANCELED) {
+             error_report("tpm_passthrough: error while transmitting data=
+ "
+@@ -170,7 +116,7 @@ static int tpm_passthrough_unix_tx_bufs(TPMPassthruSt=
+ate *tpm_pt,
+                          strerror(errno), errno);
+         }
+     } else if (ret < sizeof(struct tpm_resp_hdr) ||
+-               tpm_passthrough_get_size_from_buffer(out) !=3D ret) {
++               be32_to_cpu(((struct tpm_resp_hdr *)out)->len) !=3D ret) =
+{
+         ret =3D -1;
+         error_report("tpm_passthrough: received invalid response "
+                      "packet from TPM");
+@@ -183,7 +129,7 @@ static int tpm_passthrough_unix_tx_bufs(TPMPassthruSt=
+ate *tpm_pt,
+=20
+ err_exit:
+     if (ret < 0) {
+-        tpm_write_fatal_error_response(out, out_len);
++        tpm_util_write_fatal_error_response(out, out_len);
+     }
+=20
+     tpm_pt->tpm_executing =3D false;
 diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
-index 7b35429..4484207 100644
+index 4484207..73d7796 100644
 --- a/hw/tpm/tpm_util.c
 +++ b/hw/tpm/tpm_util.c
-@@ -43,10 +43,10 @@ static int tpm_util_test(int fd,
+@@ -24,6 +24,31 @@
+ #include "tpm_int.h"
 =20
-     n =3D write(fd, request, requestlen);
-     if (n < 0) {
--        return errno;
-+        return -errno;
-     }
-     if (n !=3D requestlen) {
--        return EFAULT;
-+        return -EFAULT;
-     }
+ /*
++ * Write an error message in the given output buffer.
++ */
++void tpm_util_write_fatal_error_response(uint8_t *out, uint32_t out_len)
++{
++    if (out_len >=3D sizeof(struct tpm_resp_hdr)) {
++        struct tpm_resp_hdr *resp =3D (struct tpm_resp_hdr *)out;
++
++        resp->tag =3D cpu_to_be16(TPM_TAG_RSP_COMMAND);
++        resp->len =3D cpu_to_be32(sizeof(struct tpm_resp_hdr));
++        resp->errcode =3D cpu_to_be32(TPM_FAIL);
++    }
++}
++
++bool tpm_util_is_selftest(const uint8_t *in, uint32_t in_len)
++{
++    struct tpm_req_hdr *hdr =3D (struct tpm_req_hdr *)in;
++
++    if (in_len >=3D sizeof(*hdr)) {
++        return (be32_to_cpu(hdr->ordinal) =3D=3D TPM_ORD_ContinueSelfTes=
+t);
++    }
++
++    return false;
++}
++
++/*
+  * A basic test of a TPM device. We expect a well formatted response hea=
+der
+  * (error response is fine) within one second.
+  */
+diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
+index df76245..2f7c961 100644
+--- a/hw/tpm/tpm_util.h
++++ b/hw/tpm/tpm_util.h
+@@ -24,6 +24,10 @@
 =20
-     FD_ZERO(&readfds);
-@@ -55,18 +55,18 @@ static int tpm_util_test(int fd,
-     /* wait for a second */
-     n =3D select(fd + 1, &readfds, NULL, NULL, &tv);
-     if (n !=3D 1) {
--        return errno;
-+        return -errno;
-     }
+ #include "sysemu/tpm_backend.h"
 =20
-     n =3D read(fd, &buf, sizeof(buf));
-     if (n < sizeof(struct tpm_resp_hdr)) {
--        return EFAULT;
-+        return -EFAULT;
-     }
++void tpm_util_write_fatal_error_response(uint8_t *out, uint32_t out_len)=
+;
++
++bool tpm_util_is_selftest(const uint8_t *in, uint32_t in_len);
++
+ int tpm_util_test_tpmdev(int tpm_fd, TPMVersion *tpm_version);
 =20
-     resp =3D (struct tpm_resp_hdr *)buf;
-     /* check the header */
-     if (be32_to_cpu(resp->len) !=3D n) {
--        return EBADMSG;
-+        return -EMSGSIZE;
-     }
-=20
-     *return_tag =3D be16_to_cpu(resp->tag);
+ #endif /* TPM_TPM_UTIL_H */
 --=20
 2.5.5
