@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e2o0C-0007eh-23
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 20:39:01 -0400
+	(envelope-from <famz@redhat.com>) id 1e2ody-0003Ww-GN
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 21:20:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e2o0A-0006MT-W1
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 20:39:00 -0400
-Date: Fri, 13 Oct 2017 10:53:38 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20171012235338.GF28032@umbus.fritz.box>
-References: <1507823114-270153-1-git-send-email-imammedo@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="/aVve/J9H4Wl5yVO"
-Content-Disposition: inline
-In-Reply-To: <1507823114-270153-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] fixup! ppc: spapr: use cpu type name
- directly
+	(envelope-from <famz@redhat.com>) id 1e2odv-0005ju-Bb
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 21:20:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44808)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1e2odv-0005jY-5n
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 21:20:03 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Fri, 13 Oct 2017 09:19:54 +0800
+Message-Id: <20171013011954.9975-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH] docker: Don't allocate tty unless DEBUG=1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,92 +21,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, agraf@suse.de, groug@kaod.org
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
+The existence of tty in the container seems to urge gcc into colorize
+the output, but the escape chars will clutter the report once turned
+into email replies on patchew. Move -t to debug mode.
 
---/aVve/J9H4Wl5yVO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reported-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ tests/docker/Makefile.include | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On Thu, Oct 12, 2017 at 05:45:14PM +0200, Igor Mammedov wrote:
-> follow up commit that registers host-spapr-cpu-core type unconditionally
->  "ppc: spapr: register 'host' core type  along with the rest of core type=
-s"
->=20
-> makes 'non' machine crash
->  ppc64-softmmu/qemu-system-ppc64 -M none -device host-spapr-cpu-core
->  ERROR:qom/object.c:217:object_type_get_instance_size: assertion failed: =
-(type !=3D NULL)
->  Aborted
->=20
-> before it qemu fails cleanly with
->  ppc64-softmmu/qemu-system-ppc64 -M none -device host-spapr-cpu-core
->  qemu-system-ppc64: -device host-spapr-cpu-core: 'host-spapr-cpu-core' is=
- not a valid device model name
->=20
-> spapr_cpu_core_realize() already has explicit check for pseries machine,
-> so move access to host cpu type after it so 'none' machine would fail
-> cleanly as expected.
->=20
-> Reported-by: Greg Kurz <groug@kaod.org>
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-
-Applied (folded into the original patch).
-
-> ---
->  hw/ppc/spapr_cpu_core.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index b5bbb6a..7dbf9c3 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -151,7 +151,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
-Error **errp)
->      sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
->      sPAPRCPUCoreClass *scc =3D SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
->      CPUCore *cc =3D CPU_CORE(OBJECT(dev));
-> -    size_t size =3D object_type_get_instance_size(scc->cpu_type);
-> +    size_t size;
->      Error *local_err =3D NULL;
->      void *obj;
->      int i, j;
-> @@ -162,6 +162,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
-Error **errp)
->          return;
->      }
-> =20
-> +    size =3D object_type_get_instance_size(scc->cpu_type);
->      sc->threads =3D g_malloc0(size * cc->nr_threads);
->      for (i =3D 0; i < cc->nr_threads; i++) {
->          char id[32];
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---/aVve/J9H4Wl5yVO
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlngAH8ACgkQbDjKyiDZ
-s5JDPA/+P6IW068Ehcy2SC3t/dhtsvT//pCbETmGz4QIA6EH45n8IN7VWoVOnJ/O
-lz9FzF4NF1UDT+vUSgna6KfAuyPzogtlVw+D30t6iSKzZ/s2Ly63/xa5Xf8LrPWp
-iuqqANBmLcl1MtM/HtIDrKFr+IqSd5aqzT05Smt+76C2f9/ZlKVRyz0Bn9UB84c1
-5oToV6dYDETVpOeBPLIYtJnulipxOaOssXnPvWngDdBYYURah89XTr8Jb8/75Mpf
-aS7cRMwqUqGBITdoalS/bBg3EGynMH/8AEOizKbMKgmWkUZM35n7RA+aP6IBmh5X
-L4+K3JrI+OukgnEi5gjvmkiRZOIeM8jXgxD7/MjIM8G5H0tPHgirKFG2G4RbVw34
-qHGJORH+IJohTwUGTdFq2sqECTOlnzHJxuRcEhFcEqqCZ7TUQcdhfJELnOdnnycD
-NEVtdI4f59ZRoyQD/oto32roCB54/zrX9WUU2Ziy7KoNQpK9A01OOORvum5PEDMc
-PTv4SoIJnY4A1Kztc1nuHRPTwgbHkQjR4KAgNgITRhfsmJhLMq7Qft/fMPu0iqbp
-IvFho5ul7xnhYS+pCH0XIILCacj4+Kxh3fQt/L1ACa4QVljFQqhQ4hmr8ZqRN7Kv
-hjjJmrukO7E0oNVexhGDaGxcN+nluEftKLoKjVZPulznUP34T3E=
-=bF87
------END PGP SIGNATURE-----
-
---/aVve/J9H4Wl5yVO--
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 6f9ea196a7..ab939f2bec 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -134,10 +134,10 @@ docker-run: docker-qemu-src
+ 			"  COPYING $(EXECUTABLE) to $(IMAGE)"))
+ 	$(call quiet-command,						\
+ 		$(SRC_PATH)/tests/docker/docker.py run 			\
+-			$(if $(NOUSER),,-u $(shell id -u)) -t 		\
++			$(if $(NOUSER),,-u $(shell id -u)) 		\
+ 			--security-opt seccomp=unconfined		\
+ 			$(if $V,,--rm) 					\
+-			$(if $(DEBUG),-i,)				\
++			$(if $(DEBUG),-ti,)				\
+ 			$(if $(NETWORK),$(if $(subst $(NETWORK),,1),--net=$(NETWORK)),--net=none) \
+ 			-e TARGET_LIST=$(TARGET_LIST) 			\
+ 			-e EXTRA_CONFIGURE_OPTS="$(EXTRA_CONFIGURE_OPTS)" \
+-- 
+2.13.5
