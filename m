@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1e38j8-0000YT-Hb
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 18:46:47 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e39Gg-0003hx-Bm
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 19:21:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1e38j5-0002P8-Et
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 18:46:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43680)
+	(envelope-from <ehabkost@redhat.com>) id 1e39Gb-000818-1h
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 19:21:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56064)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1e38j5-0002NV-8a
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 18:46:43 -0400
-Date: Fri, 13 Oct 2017 15:46:39 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <59E0C9F602000078001862C4@prv-mh.provo.novell.com>
-Message-ID: <alpine.DEB.2.10.1710131544350.2967@sstabellini-ThinkPad-X260>
-References: <20170911043820.14617-1-haozhong.zhang@intel.com>
-	<20170911044157.15403-1-haozhong.zhang@intel.com>
-	<20170911160818.1bd44a82@nial.brq.redhat.com>
-	<alpine.DEB.2.10.1709111119480.19719@sstabellini-ThinkPad-X260>
-	<20170912031509.vufszbju3s2v2bw3@hz-desktop>
-	<20171010160544.GA1772@char.us.oracle.com>
-	<20171012124544.dq3wyr65tefi3glk@hz-desktop>
-	<f6478644-0d4a-6531-9016-aee2a0e76417@redhat.com>
-	<20171013075326.77azyi4j2wo3b2fx@hz-desktop>
-	<20171013104453.50284426@nial.brq.redhat.com>
-	<20171013111341.feb2462nh2rcrjpp@hz-desktop>
-	<59E0C9F602000078001862C4@prv-mh.provo.novell.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e39Ga-00080X-SB
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 19:21:20 -0400
+Date: Fri, 13 Oct 2017 20:21:14 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171013232114.GD3246@localhost.localdomain>
+References: <20171012235439.19457-1-anatol.pomozov@gmail.com>
+	<20171012235439.19457-3-anatol.pomozov@gmail.com>
+	<20171013192550.GC3246@localhost.localdomain>
+	<CAOMFOmW+r86WHWPUMtG54BrAQXqSWZ67oF-6G697ox-7AKL4GA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [RFC QEMU PATCH v3 00/10] Implement vNVDIMM for
- Xen HVM guest
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOMFOmW+r86WHWPUMtG54BrAQXqSWZ67oF-6G697ox-7AKL4GA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] multiboot: load any machine type of ELF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,22 +29,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Beulich <JBeulich@suse.com>
-Cc: Haozhong Zhang <haozhong.zhang@intel.com>, andrew.cooper3@citrix.com, Anthony Perard <anthony.perard@citrix.com>, george.dunlap@citrix.com, wei.liu2@citrix.com, ian.jackson@eu.citrix.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Stefano Stabellini <sstabellini@kernel.org>, Chao Peng <chao.p.peng@linux.intel.com>, xen-devel@lists.xen.org, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Anatol Pomozov <anatol.pomozov@gmail.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Fri, 13 Oct 2017, Jan Beulich wrote:
-> >>> On 13.10.17 at 13:13, <haozhong.zhang@intel.com> wrote:
-> > To Jan, Andrew, Stefano and Anthony,
-> > 
-> > what do you think about allowing QEMU to build the entire guest ACPI
-> > and letting SeaBIOS to load it? ACPI builder code in hvmloader is
-> > still there and just bypassed in this case.
+On Fri, Oct 13, 2017 at 02:25:43PM -0700, Anatol Pomozov wrote:
+> Hi
 > 
-> Well, if that can be made work in a non-quirky way and without
-> loss of functionality, I'd probably be fine. I do think, however,
-> that there's a reason this is being handled in hvmloader right now.
+> On Fri, Oct 13, 2017 at 12:25 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > On Thu, Oct 12, 2017 at 04:54:37PM -0700, Anatol Pomozov wrote:
+> >> x86 is not the only architecture supported by multiboot.
+> >> For example GRUB supports MIPS architecture as well.
+> >>
+> >> Signed-off-by: Anatol Pomozov <anatol.pomozov@gmail.com>
+> >> ---
+> >>  hw/i386/multiboot.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
+> >> index c9254f313e..7dacd6d827 100644
+> >> --- a/hw/i386/multiboot.c
+> >> +++ b/hw/i386/multiboot.c
+> >> @@ -173,7 +173,7 @@ int load_multiboot(FWCfgState *fw_cfg,
+> >>          }
+> >>
+> >>          kernel_size = load_elf(kernel_filename, NULL, NULL, &elf_entry,
+> >> -                               &elf_low, &elf_high, 0, I386_ELF_MACHINE,
+> >> +                               &elf_low, &elf_high, 0, EM_NONE,
+> >>                                 0, 0);
+> >
+> > I assume we still want PC to reject non-x86 ELF files.
+> 
+> Does multiboot spec states this restriction? I've heard that there are
+> attempts to implement multiboot at ARM [1] [2]. Also multiboot2 spec
+> mentions MIPS as one of the target architectures.
+> 
+> [1] https://github.com/jncronin/rpi-boot/blob/master/MULTIBOOT-ARM
+> [2] https://wiki.linaro.org/AndrePrzywara/Multiboot
 
-And not to discourage you, just as a clarification, you'll also need to
-consider backward compatibility: unless the tables are identical, I
-imagine we'll have to keep using the old tables for already installed
-virtual machines.
+I don't believe the spec restricts that, but I don't see why it
+would be useful to load an ELF file that doesn't match the target
+architecture (e.g. loading non-x86 ELF files on a x86 machine
+like PC).
+
+> 
+> >  Isn't it
+> > better to add a elf_machine argument to load_multiboot() so each
+> > load_multiboot() caller can specify what's the expected
+> > architecture?
+> >
+> >
+> >>          if (kernel_size < 0) {
+> >>              fprintf(stderr, "Error while loading elf kernel\n");
+> >> --
+> >> 2.15.0.rc0.271.g36b669edcc-goog
+> >>
+> >
+> > --
+> > Eduardo
+
+-- 
+Eduardo
