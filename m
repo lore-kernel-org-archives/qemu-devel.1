@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e2vRY-000588-Oo
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 04:35:45 -0400
+	(envelope-from <prvs=452428aa2=ross.lagerwall@citrix.com>)
+	id 1e2vTC-0006S0-WB
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 04:37:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e2vRT-0003Ua-PU
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 04:35:44 -0400
-Received: from 6.mo5.mail-out.ovh.net ([178.32.119.138]:56336)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e2vRT-0003Tn-K4
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 04:35:39 -0400
-Received: from player773.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 26863140016
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 10:35:38 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Fri, 13 Oct 2017 10:35:31 +0200
-Message-ID: <150788373123.25736.7359515819699182906.stgit@bahia>
-In-Reply-To: <150788370618.25736.8030708425923435364.stgit@bahia>
-References: <150788370618.25736.8030708425923435364.stgit@bahia>
+	(envelope-from <prvs=452428aa2=ross.lagerwall@citrix.com>)
+	id 1e2vT8-0004Nj-34
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 04:37:27 -0400
+Received: from smtp.citrix.com ([66.165.176.89]:44749)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=452428aa2=ross.lagerwall@citrix.com>)
+	id 1e2vT7-0004MK-Qr
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 04:37:22 -0400
+References: <1507564902-9000-1-git-send-email-ian.jackson@eu.citrix.com>
+	<1507564902-9000-4-git-send-email-ian.jackson@eu.citrix.com>
+From: Ross Lagerwall <ross.lagerwall@citrix.com>
+Message-ID: <b749ee6c-591b-4f31-7fd3-b0fa03f5f98b@citrix.com>
+Date: Fri, 13 Oct 2017 09:37:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1507564902-9000-4-git-send-email-ian.jackson@eu.citrix.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 2/2] monitor: add proper reference counting of
- the current CPU
+Subject: Re: [Qemu-devel] [PATCH 3/8] xen: defer call to xen_restrict until
+ just before os_setup_post
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +32,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+To: Ian Jackson <ian.jackson@eu.citrix.com>, qemu-devel@nongnu.org
+Cc: Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org
 
-If a CPU selected with the "cpu" command is hot-unplugged then "info cpus"
-causes QEMU to exit:
+On 10/09/2017 05:01 PM, Ian Jackson wrote:
+> We need to restrict *all* the control fds that qemu opens.  Looking in
+> /proc/PID/fd shows there are many; their allocation seems scattered
+> throughout Xen support code in qemu.
+> 
+> We must postpone the restrict call until roughly the same time as qemu
+> changes its uid, chroots (if applicable), and so on.
+> 
+> There doesn't seem to be an appropriate hook already.  The RunState
+> change hook fires at different times depending on exactly what mode
+> qemu is operating in.
+> 
+> And it appears that no-one but the Xen code wants a hook at this phase
+> of execution.  So, introduce a bare call to a new function
+> xen_setup_post, just before os_setup_post.  Also provide the
+> appropriate stub for when Xen compilation is disabled.
+> 
+> We do the restriction before rather than after os_setup_post, because
+> xen_restrict may need to open /dev/null, and os_setup_post might have
+> called chroot.
+> 
+This works for normally starting a VM but doesn't seem to work when 
+resuming/migrating.
 
-(qemu) device_del cpu1
-(qemu) info cpus
-qemu:qemu_cpu_kick_thread: No such process
+Here is the order of selected operations when starting a VM normally:
+     VNC server running on 127.0.0.1:5901
+     xen_change_state_handler()
+     xenstore_record_dm_state: running
+     xen_setup_post()
+     xentoolcore_restrict_all: rc = 0
+     os_setup_post()
+     main_loop()
 
-This happens because "cpu" stores the pointer to the selected CPU into
-the monitor structure. When the CPU is hot-unplugged, we end up with a
-dangling pointer. The "info cpus" command then does:
+Here is the order of selected operations when starting QEMU with 
+-incoming fd:... :
+     VNC server running on 127.0.0.1:5902
+     migration_fd_incoming()
+     xen_setup_post()
+     xentoolcore_restrict_all: rc = 0
+     os_setup_post()
+     main_loop()
+     migration_set_incoming_channel()
+     migrate_set_state()
+     xen_change_state_handler()
+     xenstore_record_dm_state: running
+     error recording dm state
+     qemu exited with code 1
 
-hmp_info_cpus()
- monitor_get_cpu_index()
-  mon_get_cpu()
-   cpu_synchronize_state() <--- called with dangling pointer
+The issue is that QEMU needs xenstore access to write "running" but this 
+is after it has already been restricted. Moving xen_setup_post() into 
+xen_change_state_handler() works fine. The only issue is that in the 
+migration case, it executes after os_setup_post() so QEMU might be 
+chrooted in which case opening /dev/null to restrict fds doesn't work 
+(unless its new root has a /dev/null).
 
-This could cause a QEMU crash as well.
-
-This patch switches the monitor to use object_ref() to ensure the
-CPU object doesn't vanish unexpectedly. The reference is dropped
-either when "cpu" is used to switch to another CPU, or when the
-selected CPU is unrealized and cpu_list_remove() sets its cpu_index
-back to UNASSIGNED_CPU_INDEX.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- monitor.c |   12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/monitor.c b/monitor.c
-index fe0d1bdbb461..1c0b9a2c3ad3 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -579,6 +579,9 @@ static void monitor_data_init(Monitor *mon)
- 
- static void monitor_data_destroy(Monitor *mon)
- {
-+    if (mon->mon_cpu) {
-+        object_unref((Object *) mon->mon_cpu);
-+    }
-     qemu_chr_fe_deinit(&mon->chr, false);
-     if (monitor_is_qmp(mon)) {
-         json_message_parser_destroy(&mon->qmp.parser);
-@@ -1047,12 +1050,21 @@ int monitor_set_cpu(int cpu_index)
-     if (cpu == NULL) {
-         return -1;
-     }
-+    if (cur_mon->mon_cpu) {
-+        object_unref((Object *) cur_mon->mon_cpu);
-+    }
-     cur_mon->mon_cpu = cpu;
-+    object_ref((Object *) cpu);
-     return 0;
- }
- 
- CPUState *mon_get_cpu(void)
- {
-+    if (cur_mon->mon_cpu &&
-+        cur_mon->mon_cpu->cpu_index == UNASSIGNED_CPU_INDEX) {
-+        object_unref((Object *) cur_mon->mon_cpu);
-+        cur_mon->mon_cpu = NULL;
-+    }
-     if (!cur_mon->mon_cpu) {
-         if (!first_cpu) {
-             return NULL;
+-- 
+Ross Lagerwall
