@@ -1,35 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <JBeulich@suse.com>) id 1e2yq7-0001h2-5V
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 08:13:19 -0400
+	(envelope-from <stefanha@gmail.com>) id 1e2z3t-0004G8-1D
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 08:27:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <JBeulich@suse.com>) id 1e2yq2-00021J-7x
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 08:13:19 -0400
-Received: from prv-mh.provo.novell.com ([137.65.248.74]:39912)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <JBeulich@suse.com>) id 1e2yq1-000204-VK
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 08:13:14 -0400
-Message-Id: <59E0C9F602000078001862C4@prv-mh.provo.novell.com>
-Date: Fri, 13 Oct 2017 06:13:10 -0600
-From: "Jan Beulich" <JBeulich@suse.com>
-References: <20170911043820.14617-1-haozhong.zhang@intel.com>
-	<20170911044157.15403-1-haozhong.zhang@intel.com>
-	<20170911160818.1bd44a82@nial.brq.redhat.com>
-	<alpine.DEB.2.10.1709111119480.19719@sstabellini-ThinkPad-X260>
-	<20170912031509.vufszbju3s2v2bw3@hz-desktop>
-	<20171010160544.GA1772@char.us.oracle.com>
-	<20171012124544.dq3wyr65tefi3glk@hz-desktop>
-	<f6478644-0d4a-6531-9016-aee2a0e76417@redhat.com>
-	<20171013075326.77azyi4j2wo3b2fx@hz-desktop>
-	<20171013104453.50284426@nial.brq.redhat.com>
-	<20171013111341.feb2462nh2rcrjpp@hz-desktop>
-In-Reply-To: <20171013111341.feb2462nh2rcrjpp@hz-desktop>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <stefanha@gmail.com>) id 1e2z3o-00017V-W6
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 08:27:33 -0400
+Date: Fri, 13 Oct 2017 13:27:25 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20171013122725.GG27308@stefanha-x1.localdomain>
+References: <20170923111411.18626-1-el13635@mail.ntua.gr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Subject: Re: [Qemu-devel] [RFC QEMU PATCH v3 00/10] Implement vNVDIMM for
- Xen HVM guest
+In-Reply-To: <20170923111411.18626-1-el13635@mail.ntua.gr>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 0/3] add
+ bdrv_co_drain_begin/end BlockDriver callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,18 +23,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Haozhong Zhang <haozhong.zhang@intel.com>
-Cc: andrew.cooper3@citrix.com, Anthony Perard <anthony.perard@citrix.com>, george.dunlap@citrix.com, wei.liu2@citrix.com, ian.jackson@eu.citrix.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Stefano Stabellini <sstabellini@kernel.org>, Chao Peng <chao.p.peng@linux.intel.com>, xen-devel@lists.xen.org, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
->>> On 13.10.17 at 13:13, <haozhong.zhang@intel.com> wrote:
-> To Jan, Andrew, Stefano and Anthony,
->=20
-> what do you think about allowing QEMU to build the entire guest ACPI
-> and letting SeaBIOS to load it? ACPI builder code in hvmloader is
-> still there and just bypassed in this case.
+On Sat, Sep 23, 2017 at 02:14:08PM +0300, Manos Pitsidianakis wrote:
+> This patch series renames bdrv_co_drain to bdrv_co_drain_begin and adds a new 
+> bdrv_co_drain_end callback to match bdrv_drained_begin/end and 
+> drained_begin/end of BdrvChild. This is needed because the throttle driver 
+> (block/throttle.c) needs a way to mark the end of the drain in order to toggle 
+> io_limits_disabled correctly.
+> 
+> Based-on: <20170918202529.28379-1-el13635@mail.ntua.gr>
+>     "block/throttle-groups.c: allocate RestartData on the heap"
+>     Which fixes a coroutine crash in block/throttle-groups.c
+> 
+> v3:
+>   fixed commit message typo in first patch [Fam]
+>   rephrased doc comment based on mailing discussion
+> v2: 
+>   add doc for callbacks and change order of request polling for completion 
+>   [Stefan]
+> 
+> Manos Pitsidianakis (3):
+>   block: add bdrv_co_drain_end callback
+>   block: rename bdrv_co_drain to bdrv_co_drain_begin
+>   block/throttle.c: add bdrv_co_drain_begin/end callbacks
+> 
+>  include/block/block_int.h | 13 ++++++++++---
+>  block/io.c                | 48 +++++++++++++++++++++++++++++++++--------------
+>  block/qed.c               |  6 +++---
+>  block/throttle.c          | 18 ++++++++++++++++++
+>  4 files changed, 65 insertions(+), 20 deletions(-)
+> 
+> -- 
+> 2.11.0
+> 
+> 
 
-Well, if that can be made work in a non-quirky way and without
-loss of functionality, I'd probably be fine. I do think, however,
-that there's a reason this is being handled in hvmloader right now.
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
 
-Jan
+Stefan
