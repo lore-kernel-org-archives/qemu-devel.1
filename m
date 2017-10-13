@@ -1,26 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e2xd7-0006xw-A4
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 06:55:50 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2xqh-00005N-CC
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:09:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e2xd2-0004NB-BY
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 06:55:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56224)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1e2xd2-0004MT-5Q
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 06:55:44 -0400
-From: Thomas Huth <thuth@redhat.com>
-References: <20171013102812.29648-1-berrange@redhat.com>
-	<1c52fcd4-e8ce-51c1-a0c7-cf882fab6662@redhat.com>
-Message-ID: <a591ebd3-ae7f-cde6-1cd2-d4859c17494f@redhat.com>
-Date: Fri, 13 Oct 2017 12:55:40 +0200
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2xqe-00089v-5N
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:09:51 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59216)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1e2xqd-00088s-S1
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:09:48 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9DB9ehr031610
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 07:09:41 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2djtynd8m6-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 07:09:40 -0400
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Fri, 13 Oct 2017 05:09:35 -0600
+References: <1507751249-3035-1-git-send-email-stefanb@linux.vnet.ibm.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Fri, 13 Oct 2017 07:09:32 -0400
 MIME-Version: 1.0
-In-Reply-To: <1c52fcd4-e8ce-51c1-a0c7-cf882fab6662@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <1507751249-3035-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] configure: pick the right compiler for
- OpenBSD by default
+Message-Id: <b8b2952b-0416-ecc1-6fef-a4d118fab536@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3] tpm: Use EMSGSIZE instead of EBADMSG to
+ compile on OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +41,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, amarnath.valluri@intel.com, marcandre.lureau@gmail.com
 
-On 13.10.2017 12:52, Thomas Huth wrote:
-> On 13.10.2017 12:28, Daniel P. Berrange wrote:
->> The system compiler in OpenBSD is gcc 4.2.1 which is too
->> old for our needs. If doing 'pkg_add gcc' you can get a
->> much newer version (4.9.4 in OpenBSD 6.1) which works with
->> QEMU. This installs binaries with two naming schemes:
->>
->>   $ pkg_info  -L gcc | grep bin
->>   /usr/local/bin/ecpp
->>   /usr/local/bin/egcc
->>   /usr/local/bin/egcc-ar
->>   /usr/local/bin/egcc-nm
->>   /usr/local/bin/egcc-ranlib
->>   /usr/local/bin/egcov
->>   /usr/local/bin/x86_64-unknown-openbsd6.0-egcc
->>   /usr/local/bin/x86_64-unknown-openbsd6.0-egcc-ar
->>   /usr/local/bin/x86_64-unknown-openbsd6.0-egcc-nm
->>   /usr/local/bin/x86_64-unknown-openbsd6.0-egcc-ranlib
->>   /usr/local/bin/x86_64-unknown-openbsd6.0-gcc-4.9.3
->>
->> We pick the short name this it won't change across OpenBSD
->> releases.
->>
->> This means users don't need to manually pass custom --cc
->> and --cxx args to configure to avoid immediate failure.
->>
->> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->> ---
->>  configure | 18 ++++++++++++++++--
->>  1 file changed, 16 insertions(+), 2 deletions(-)
->>
->> diff --git a/configure b/configure
->> index 06f18ea9af..fcb7523933 100755
->> --- a/configure
->> +++ b/configure
->> @@ -255,7 +255,21 @@ cross_prefix=""
->>  audio_drv_list=""
->>  block_drv_rw_whitelist=""
->>  block_drv_ro_whitelist=""
->> -host_cc="cc"
->> +
->> +case `uname -s` in
->> +    OpenBSD)
->> +    # Default system cc in OpenBSD is unsufficient
-> 
-> s/unsufficient/insufficient/
-> 
->> +    # we need the 'gcc' pkg added, whch provides
-> 
-> s/whch/which/
-> 
->> +    # these modified binary names
->> +    host_cc="egcc"
->> +    host_cxx="eg++"
->> +    ;;
->> +         *)
->> +    host_cc="cc"
->> +    host_cxx="c++"
->> +    ;;
->> +esac
-> 
-> Do we really need such work-arounds in our configure script? GCC 4.2 is
-> really veeeery old nowadays, so if the OpenBSD folks refuse to update
-> the default in their distro, IMHO they should be punished by having to
-> select the C compiler manually everywhere.
+On 10/11/2017 03:47 PM, Stefan Berger wrote:
+> EBADMSG was only added to OpenBSD very recently. To make QEMU compilable
+> on older OpenBSD versions use EMSGSIZE instead when a mismatch between
+> number of received bytes and message size indicated in the header was
+> found.
+>
+> Return -EMSGSIZE and convert all other errnos in the same functions to
+> return the negative errno.
+>
+> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-By the way, looks like OpenBSD is also switching to clang by default soon:
+Can someone have a look at this, please?
 
-https://www.phoronix.com/scan.php?page=news_item&px=OpenBSD-Default-Clang
+    Stefan
 
- Thomas
+> ---
+>   hw/tpm/tpm_util.c | 10 +++++-----
+>   1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
+> index fb929f6..73d7796 100644
+> --- a/hw/tpm/tpm_util.c
+> +++ b/hw/tpm/tpm_util.c
+> @@ -68,10 +68,10 @@ static int tpm_util_test(int fd,
+>
+>       n = write(fd, request, requestlen);
+>       if (n < 0) {
+> -        return errno;
+> +        return -errno;
+>       }
+>       if (n != requestlen) {
+> -        return EFAULT;
+> +        return -EFAULT;
+>       }
+>
+>       FD_ZERO(&readfds);
+> @@ -80,18 +80,18 @@ static int tpm_util_test(int fd,
+>       /* wait for a second */
+>       n = select(fd + 1, &readfds, NULL, NULL, &tv);
+>       if (n != 1) {
+> -        return errno;
+> +        return -errno;
+>       }
+>
+>       n = read(fd, &buf, sizeof(buf));
+>       if (n < sizeof(struct tpm_resp_hdr)) {
+> -        return EFAULT;
+> +        return -EFAULT;
+>       }
+>
+>       resp = (struct tpm_resp_hdr *)buf;
+>       /* check the header */
+>       if (be32_to_cpu(resp->len) != n) {
+> -        return EBADMSG;
+> +        return -EMSGSIZE;
+>       }
+>
+>       *return_tag = be16_to_cpu(resp->tag);
