@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e2yQB-000865-Ii
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:46:32 -0400
+	(envelope-from <groug@kaod.org>) id 1e2yRe-0000ls-B2
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:48:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e2yQ7-0003VZ-L4
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:46:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37772)
+	(envelope-from <groug@kaod.org>) id 1e2yRa-00044I-EA
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:48:02 -0400
+Received: from 11.mo5.mail-out.ovh.net ([46.105.47.167]:53813)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1e2yQ7-0003VK-Ea
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:46:27 -0400
-References: <20171013102812.29648-1-berrange@redhat.com>
-	<1c52fcd4-e8ce-51c1-a0c7-cf882fab6662@redhat.com>
-	<a591ebd3-ae7f-cde6-1cd2-d4859c17494f@redhat.com>
-	<20171013113859.GG20515@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f43d6c1c-1112-bfcf-ae19-ed2a002b7873@redhat.com>
-Date: Fri, 13 Oct 2017 13:46:24 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e2yRa-00043j-7b
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:47:58 -0400
+Received: from player773.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id AE1391402E3
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 13:47:56 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Fri, 13 Oct 2017 13:47:51 +0200
+Message-ID: <150789527176.5487.14861721766357709655.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20171013113859.GG20515@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] configure: pick the right compiler for
- OpenBSD by default
+Subject: [Qemu-devel] [PATCH] monitor: fix dangling CPU pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,30 +27,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On 13.10.2017 13:38, Daniel P. Berrange wrote:
-> On Fri, Oct 13, 2017 at 12:55:40PM +0200, Thomas Huth wrote:
->> On 13.10.2017 12:52, Thomas Huth wrote:
-[...]
->> By the way, looks like OpenBSD is also switching to clang by default soon:
->>
->> https://www.phoronix.com/scan.php?page=news_item&px=OpenBSD-Default-Clang
-> 
-> In a few years time we could potentially revert this patch, but in the
-> meantime it is clearly beneficial for anyone using OpenBSD and has no
-> significant maint burden for us to carry it while there are widely
-> supported OpenBSD releases which need it.
+If a CPU selected with the "cpu" command is hot-unplugged then "info cpus"
+causes QEMU to exit:
 
-I disagree. If the next OpenBSD release uses Clang by default, we're not
-building QEMU there with the *working default* C compiler anymore.
-You're then rather forcing the OpenBSD users then to install an
-additional (likely unliked, since GPLv3) GCC package on their systems.
+(qemu) device_del cpu1
+(qemu) info cpus
+qemu:qemu_cpu_kick_thread: No such process
 
-So IMHO, just drop this patch and wait for the next OpenBSD release, and
-the problem will be solved automatically. (and the few users who still
-use an older release of OpenBSD will likely use the QEMU from their
-ports system anyway)
+This happens because "cpu" stores the pointer to the selected CPU into
+the monitor structure. When the CPU is hot-unplugged, we end up with a
+dangling pointer. The "info cpus" command then does:
 
- Thomas
+hmp_info_cpus()
+ monitor_get_cpu_index()
+  mon_get_cpu()
+   cpu_synchronize_state() <--- called with dangling pointer
+
+This could cause a QEMU crash as well.
+
+This patch switches the monitor to store the QOM path instead of a
+pointer to the current CPU. The path is then resolved when needed.
+If the resolution fails, we assume that the CPU was removed and the
+path is resetted to the default (ie, path of first_cpu).
+
+Note that the resolution should really return a CPU object, otherwise
+we have a bug. This is achieved by relying on object_resolve_path()
+and CPU() instead of calling object_resolve_path_type(path, TYPE_CPU).
+
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ monitor.c |   25 ++++++++++++++++++++-----
+ 1 file changed, 20 insertions(+), 5 deletions(-)
+
+diff --git a/monitor.c b/monitor.c
+index fe0d1bdbb461..8489b2ad99c0 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -200,7 +200,7 @@ struct Monitor {
+ 
+     ReadLineState *rs;
+     MonitorQMP qmp;
+-    CPUState *mon_cpu;
++    gchar *mon_cpu_path;
+     BlockCompletionFunc *password_completion_cb;
+     void *password_opaque;
+     mon_cmd_t *cmd_table;
+@@ -579,6 +579,7 @@ static void monitor_data_init(Monitor *mon)
+ 
+ static void monitor_data_destroy(Monitor *mon)
+ {
++    g_free(mon->mon_cpu_path);
+     qemu_chr_fe_deinit(&mon->chr, false);
+     if (monitor_is_qmp(mon)) {
+         json_message_parser_destroy(&mon->qmp.parser);
+@@ -1047,20 +1048,34 @@ int monitor_set_cpu(int cpu_index)
+     if (cpu == NULL) {
+         return -1;
+     }
+-    cur_mon->mon_cpu = cpu;
++    g_free(cur_mon->mon_cpu_path);
++    cur_mon->mon_cpu_path = object_get_canonical_path(OBJECT(cpu));
+     return 0;
+ }
+ 
+ CPUState *mon_get_cpu(void)
+ {
+-    if (!cur_mon->mon_cpu) {
++    CPUState *cpu;
++
++    if (cur_mon->mon_cpu_path) {
++        Object *obj = object_resolve_path(cur_mon->mon_cpu_path, NULL);
++
++        if (!obj) {
++            g_free(cur_mon->mon_cpu_path);
++            cur_mon->mon_cpu_path = NULL;
++        } else {
++            cpu = CPU(obj);
++        }
++    }
++    if (!cur_mon->mon_cpu_path) {
+         if (!first_cpu) {
+             return NULL;
+         }
+         monitor_set_cpu(first_cpu->cpu_index);
++        cpu = first_cpu;
+     }
+-    cpu_synchronize_state(cur_mon->mon_cpu);
+-    return cur_mon->mon_cpu;
++    cpu_synchronize_state(cpu);
++    return cpu;
+ }
+ 
+ CPUArchState *mon_get_cpu_env(void)
