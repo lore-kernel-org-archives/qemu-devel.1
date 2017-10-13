@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e34a2-0005ZN-I5
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 14:21:07 -0400
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1e34g4-0006op-NN
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 14:27:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e34Zx-00081f-Jc
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 14:21:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33322)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e34Zx-00080z-Cx
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 14:21:01 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e34Zs-0006bX-NW
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 18:20:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6F26A2E81A1
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 18:20:55 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1e34fz-0002wn-Q8
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 14:27:20 -0400
+Received: from mail-dm3nam03on0137.outbound.protection.outlook.com
+	([104.47.41.137]:15920
+	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Andrew.Baumann@microsoft.com>)
+	id 1e34fz-0002vc-Hn
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 14:27:15 -0400
+From: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Date: Fri, 13 Oct 2017 18:27:12 +0000
+Message-ID: <MWHPR21MB0159D916DDC23B9C44DE2CB19E480@MWHPR21MB0159.namprd21.prod.outlook.com>
+References: <20171013181913.7556-1-Andrew.Baumann@microsoft.com>
+In-Reply-To: <20171013181913.7556-1-Andrew.Baumann@microsoft.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 13 Oct 2017 18:06:54 -0000
-From: Widget <1723488@bugs.launchpad.net>
-Reply-To: Bug 1723488 <1723488@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150791693020.21864.9239859411466983104.malonedeb@gac.canonical.com>
-Message-Id: <150791801451.1539.1835671119507933489.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1723488] Re: HAX on Windows, memory lease error
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] notdirty_mem_write: implement 8-byte
+ accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,82 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>
 
-It seems that HAX not working at all:
+> From: Andrew Baumann
+> Sent: Friday, 13 October 2017 11:19
+>=20
+> Aligned 8-byte memory writes by a 64-bit target on a 64-bit host should
+> always turn into atomic 8-byte writes on the host, however if we missed
+> in the softmmu, and the TLB line was marked as not dirty, then we
+> would end up tearing the 8-byte write into two 4-byte writes in
+> access_with_adjusted_size().
+>=20
+> Signed-off-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
+> ---
+> This manifested as a race in lock-free synchronisation with an aarch64
+> Windows guest on an x86-64 host (with multithreaded TCG).
+>=20
+>  exec.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
 
-qemu-system-x86_64.exe -accel hax -fda /opt/iso/freedos.img
-(with image of boot floppy from official FreeDOS site)
+By the way, I noticed that watch_mem_ops are also 4-byte only. I suspect th=
+e same fix may be needed there?
 
-Crash on loading with:
-
-VCPU shutdown request
-VCPU shutdown request
-VCPU shutdown request
-VCPU shutdown request
-VCPU shutdown request
-VCPU shutdown request
-VCPU shutdown request
-
-qemu-system-x86_64.exe -accel hax -cdrom /opt/iso/ubuntu-17.04-server-
-amd64.iso, hang on:
-
-Booting from DVD/CD...
-
-ISOLINUX 6.03 20170128 ETCD
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1723488
-
-Title:
-  HAX on Windows, memory lease error
-
-Status in QEMU:
-  New
-
-Bug description:
-  Today I tried to use QEMU on Windows 8.1 x64 with Intel HAX.
-
-  Command line: qemu-system-x86_64.exe -accel hax -m 8000 -hda
-  /opt/disk/ubuntu.img -cdrom /opt/iso/ubuntu-17.04-server-amd64.iso
-
-  Host machine has 32Gb physical memory, I got error:
-
-  HAX is working and emulator runs in fast virt mode.
-  **
-  ERROR:A:/msys64/home/admin/git/qemu/target/i386/hax-mem.c:210:hax_process=
-_section: assertion failed: (size <=3D UINT32_MAX)
-
-  When using -m 4000 (and below) everything is fine. But if I try use
-  >4000 and <8000 I get crash with errors:
-
-  HAX is working and emulator runs in fast virt mode.
-  hax_transaction_commit: Failed mapping @0x0000000100000000+0x78800000 fla=
-gs 00
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1723488/+subscriptions
+Andrew
