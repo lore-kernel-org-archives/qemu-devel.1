@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e30Rq-0004SR-Fg
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 09:56:23 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e30Ts-00068I-6W
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 09:58:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e30Rn-0008BD-Dt
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 09:56:22 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:52780)
+	(envelope-from <richard.henderson@linaro.org>) id 1e30Tp-00024m-5W
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 09:58:28 -0400
+Received: from mail-pf0-x22b.google.com ([2607:f8b0:400e:c00::22b]:56230)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1e30Rn-000642-1D
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 09:56:19 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <1506954812-6552-7-git-send-email-pradeep.jagadeesh@huawei.com>
-References: <1506954812-6552-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1506954812-6552-7-git-send-email-pradeep.jagadeesh@huawei.com>
-Date: Fri, 13 Oct 2017 15:55:27 +0200
-Message-ID: <w51infjjgog.fsf@maestria.local.igalia.com>
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e30To-00021u-Ui
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 09:58:25 -0400
+Received: by mail-pf0-x22b.google.com with SMTP id 17so10320144pfn.12
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 06:58:24 -0700 (PDT)
+References: <20171013134930.32547-1-shorne@gmail.com>
+	<20171013134930.32547-3-shorne@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <068db9d2-2805-2dac-4c19-efc6d187db44@linaro.org>
+Date: Fri, 13 Oct 2017 06:58:21 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v13 6/6] fsdev: hmp interface for throttling
+In-Reply-To: <20171013134930.32547-3-shorne@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] target/openrisc: Make coreid and
+ numcores variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,23 +32,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: Stafford Horne <shorne@gmail.com>, QEMU Development <qemu-devel@nongnu.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Openrisc <openrisc@lists.librecores.org>
 
-On Mon 02 Oct 2017 04:33:32 PM CEST, Pradeep Jagadeesh wrote:
-> This patch introduces hmp interfaces for the fsdev
-> devices.
->
-> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
+On 10/13/2017 06:49 AM, Stafford Horne wrote:
+> Previously coreid and numcores were hard coded as 0 and 1 respectively
+> as OpenRISC QEMU did not have multicore support.
+> 
+> Multicore support is now being added so these registers need to have
+> configured values.
+> 
+> Signed-off-by: Stafford Horne <shorne@gmail.com>
+> ---
+>  target/openrisc/sys_helper.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 
-It seems that you changed this patch since the last time I reviewed it,
-so please when you modify a patch remove the Reviewed-by lines unless
-the changes are trivial.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-I have anyway just checked the new one so,
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-
-Berto
+r~
