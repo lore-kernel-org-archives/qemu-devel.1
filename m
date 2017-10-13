@@ -1,31 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=452b4736a=Paul.Durrant@citrix.com>)
-	id 1e2vvg-0003vs-D0
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:06:54 -0400
+	(envelope-from <sw@weilnetz.de>) id 1e2vyo-0004pI-TB
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:10:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=452b4736a=Paul.Durrant@citrix.com>)
-	id 1e2vvd-0008P5-3w
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:06:52 -0400
-Received: from smtp.citrix.com.au ([103.14.252.240]:25249)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=452b4736a=Paul.Durrant@citrix.com>)
-	id 1e2vvc-0008NM-6R
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:06:49 -0400
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Fri, 13 Oct 2017 09:06:36 +0000
-Message-ID: <39b31497824447119867e7fa7ed400cc@AMSPEX02CL03.citrite.net>
-References: <1507564902-9000-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1507564902-9000-4-git-send-email-ian.jackson@eu.citrix.com>
-	<b749ee6c-591b-4f31-7fd3-b0fa03f5f98b@citrix.com>
-	<c53296d6-d962-c786-d04d-053dfe35920c@citrix.com>
-In-Reply-To: <c53296d6-d962-c786-d04d-053dfe35920c@citrix.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <sw@weilnetz.de>) id 1e2vyk-00033i-Mq
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:10:06 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:36666
+	helo=v2201612906741603.powersrv.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1e2vyk-0002yx-Gb
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:10:02 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by v2201612906741603.powersrv.de (Postfix) with ESMTP id C6FE3DA8325
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 11:10:00 +0200 (CEST)
+Received: from v2201612906741603.powersrv.de ([127.0.0.1])
+	by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
+	port 10024) with ESMTP id OZOEPlurPGPh for <qemu-devel@nongnu.org>;
+	Fri, 13 Oct 2017 11:09:59 +0200 (CEST)
+Received: from [134.155.36.73] (edv13.bib.uni-mannheim.de [134.155.36.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id DBA07DA1F6B
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 11:09:59 +0200 (CEST)
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <afc33ce4-c9ab-9b35-38ec-80b16642ef00@weilnetz.de>
+Date: Fri, 13 Oct 2017 11:10:05 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH 3/8] xen: defer call to
- xen_restrict until just before os_setup_post
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] German BSI analysed security of KVM / QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,75 +38,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Cooper <Andrew.Cooper3@citrix.com>, Ross Lagerwall <ross.lagerwall@citrix.com>, Ian Jackson <Ian.Jackson@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+To: QEMU Developer <qemu-devel@nongnu.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBYZW4tZGV2ZWwgW21haWx0bzp4
-ZW4tZGV2ZWwtYm91bmNlc0BsaXN0cy54ZW4ub3JnXSBPbiBCZWhhbGYgT2YNCj4gQW5kcmV3IENv
-b3Blcg0KPiBTZW50OiAxMyBPY3RvYmVyIDIwMTcgMTA6MDANCj4gVG86IFJvc3MgTGFnZXJ3YWxs
-IDxyb3NzLmxhZ2Vyd2FsbEBjaXRyaXguY29tPjsgSWFuIEphY2tzb24NCj4gPElhbi5KYWNrc29u
-QGNpdHJpeC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gQ2M6IEFudGhvbnkgUGVyYXJk
-IDxhbnRob255LnBlcmFyZEBjaXRyaXguY29tPjsgSnVlcmdlbiBHcm9zcw0KPiA8amdyb3NzQHN1
-c2UuY29tPjsgU3RlZmFubyBTdGFiZWxsaW5pIDxzc3RhYmVsbGluaUBrZXJuZWwub3JnPjsgeGVu
-LQ0KPiBkZXZlbEBsaXN0cy54ZW5wcm9qZWN0Lm9yZw0KPiBTdWJqZWN0OiBSZTogW1hlbi1kZXZl
-bF0gW1BBVENIIDMvOF0geGVuOiBkZWZlciBjYWxsIHRvIHhlbl9yZXN0cmljdCB1bnRpbCBqdXN0
-DQo+IGJlZm9yZSBvc19zZXR1cF9wb3N0DQo+IA0KPiBPbiAxMy8xMC8yMDE3IDA5OjM3LCBSb3Nz
-IExhZ2Vyd2FsbCB3cm90ZToNCj4gPiBPbiAxMC8wOS8yMDE3IDA1OjAxIFBNLCBJYW4gSmFja3Nv
-biB3cm90ZToNCj4gPj4gV2UgbmVlZCB0byByZXN0cmljdCAqYWxsKiB0aGUgY29udHJvbCBmZHMg
-dGhhdCBxZW11IG9wZW5zLsKgIExvb2tpbmcgaW4NCj4gPj4gL3Byb2MvUElEL2ZkIHNob3dzIHRo
-ZXJlIGFyZSBtYW55OyB0aGVpciBhbGxvY2F0aW9uIHNlZW1zIHNjYXR0ZXJlZA0KPiA+PiB0aHJv
-dWdob3V0IFhlbiBzdXBwb3J0IGNvZGUgaW4gcWVtdS4NCj4gPj4NCj4gPj4gV2UgbXVzdCBwb3N0
-cG9uZSB0aGUgcmVzdHJpY3QgY2FsbCB1bnRpbCByb3VnaGx5IHRoZSBzYW1lIHRpbWUgYXMgcWVt
-dQ0KPiA+PiBjaGFuZ2VzIGl0cyB1aWQsIGNocm9vdHMgKGlmIGFwcGxpY2FibGUpLCBhbmQgc28g
-b24uDQo+ID4+DQo+ID4+IFRoZXJlIGRvZXNuJ3Qgc2VlbSB0byBiZSBhbiBhcHByb3ByaWF0ZSBo
-b29rIGFscmVhZHkuwqAgVGhlIFJ1blN0YXRlDQo+ID4+IGNoYW5nZSBob29rIGZpcmVzIGF0IGRp
-ZmZlcmVudCB0aW1lcyBkZXBlbmRpbmcgb24gZXhhY3RseSB3aGF0IG1vZGUNCj4gPj4gcWVtdSBp
-cyBvcGVyYXRpbmcgaW4uDQo+ID4+DQo+ID4+IEFuZCBpdCBhcHBlYXJzIHRoYXQgbm8tb25lIGJ1
-dCB0aGUgWGVuIGNvZGUgd2FudHMgYSBob29rIGF0IHRoaXMgcGhhc2UNCj4gPj4gb2YgZXhlY3V0
-aW9uLsKgIFNvLCBpbnRyb2R1Y2UgYSBiYXJlIGNhbGwgdG8gYSBuZXcgZnVuY3Rpb24NCj4gPj4g
-eGVuX3NldHVwX3Bvc3QsIGp1c3QgYmVmb3JlIG9zX3NldHVwX3Bvc3QuwqAgQWxzbyBwcm92aWRl
-IHRoZQ0KPiA+PiBhcHByb3ByaWF0ZSBzdHViIGZvciB3aGVuIFhlbiBjb21waWxhdGlvbiBpcyBk
-aXNhYmxlZC4NCj4gPj4NCj4gPj4gV2UgZG8gdGhlIHJlc3RyaWN0aW9uIGJlZm9yZSByYXRoZXIg
-dGhhbiBhZnRlciBvc19zZXR1cF9wb3N0LCBiZWNhdXNlDQo+ID4+IHhlbl9yZXN0cmljdCBtYXkg
-bmVlZCB0byBvcGVuIC9kZXYvbnVsbCwgYW5kIG9zX3NldHVwX3Bvc3QgbWlnaHQgaGF2ZQ0KPiA+
-PiBjYWxsZWQgY2hyb290Lg0KPiA+Pg0KPiA+IFRoaXMgd29ya3MgZm9yIG5vcm1hbGx5IHN0YXJ0
-aW5nIGEgVk0gYnV0IGRvZXNuJ3Qgc2VlbSB0byB3b3JrIHdoZW4NCj4gPiByZXN1bWluZy9taWdy
-YXRpbmcuDQo+ID4NCj4gPiBIZXJlIGlzIHRoZSBvcmRlciBvZiBzZWxlY3RlZCBvcGVyYXRpb25z
-IHdoZW4gc3RhcnRpbmcgYSBWTSBub3JtYWxseToNCj4gPiDCoMKgwqAgVk5DIHNlcnZlciBydW5u
-aW5nIG9uIDEyNy4wLjAuMTo1OTAxDQo+ID4gwqDCoMKgIHhlbl9jaGFuZ2Vfc3RhdGVfaGFuZGxl
-cigpDQo+ID4gwqDCoMKgIHhlbnN0b3JlX3JlY29yZF9kbV9zdGF0ZTogcnVubmluZw0KPiA+IMKg
-wqDCoCB4ZW5fc2V0dXBfcG9zdCgpDQo+ID4gwqDCoMKgIHhlbnRvb2xjb3JlX3Jlc3RyaWN0X2Fs
-bDogcmMgPSAwDQo+ID4gwqDCoMKgIG9zX3NldHVwX3Bvc3QoKQ0KPiA+IMKgwqDCoCBtYWluX2xv
-b3AoKQ0KPiA+DQo+ID4gSGVyZSBpcyB0aGUgb3JkZXIgb2Ygc2VsZWN0ZWQgb3BlcmF0aW9ucyB3
-aGVuIHN0YXJ0aW5nIFFFTVUgd2l0aA0KPiA+IC1pbmNvbWluZyBmZDouLi4gOg0KPiA+IMKgwqDC
-oCBWTkMgc2VydmVyIHJ1bm5pbmcgb24gMTI3LjAuMC4xOjU5MDINCj4gPiDCoMKgwqAgbWlncmF0
-aW9uX2ZkX2luY29taW5nKCkNCj4gPiDCoMKgwqAgeGVuX3NldHVwX3Bvc3QoKQ0KPiA+IMKgwqDC
-oCB4ZW50b29sY29yZV9yZXN0cmljdF9hbGw6IHJjID0gMA0KPiA+IMKgwqDCoCBvc19zZXR1cF9w
-b3N0KCkNCj4gPiDCoMKgwqAgbWFpbl9sb29wKCkNCj4gPiDCoMKgwqAgbWlncmF0aW9uX3NldF9p
-bmNvbWluZ19jaGFubmVsKCkNCj4gPiDCoMKgwqAgbWlncmF0ZV9zZXRfc3RhdGUoKQ0KPiA+IMKg
-wqDCoCB4ZW5fY2hhbmdlX3N0YXRlX2hhbmRsZXIoKQ0KPiA+IMKgwqDCoCB4ZW5zdG9yZV9yZWNv
-cmRfZG1fc3RhdGU6IHJ1bm5pbmcNCj4gPiDCoMKgwqAgZXJyb3IgcmVjb3JkaW5nIGRtIHN0YXRl
-DQo+ID4gwqDCoMKgIHFlbXUgZXhpdGVkIHdpdGggY29kZSAxDQo+ID4NCj4gPiBUaGUgaXNzdWUg
-aXMgdGhhdCBRRU1VIG5lZWRzIHhlbnN0b3JlIGFjY2VzcyB0byB3cml0ZSAicnVubmluZyIgYnV0
-DQo+ID4gdGhpcyBpcyBhZnRlciBpdCBoYXMgYWxyZWFkeSBiZWVuIHJlc3RyaWN0ZWQuIE1vdmlu
-ZyB4ZW5fc2V0dXBfcG9zdCgpDQo+ID4gaW50byB4ZW5fY2hhbmdlX3N0YXRlX2hhbmRsZXIoKSB3
-b3JrcyBmaW5lLiBUaGUgb25seSBpc3N1ZSBpcyB0aGF0IGluDQo+ID4gdGhlIG1pZ3JhdGlvbiBj
-YXNlLCBpdCBleGVjdXRlcyBhZnRlciBvc19zZXR1cF9wb3N0KCkgc28gUUVNVSBtaWdodCBiZQ0K
-PiA+IGNocm9vdGVkIGluIHdoaWNoIGNhc2Ugb3BlbmluZyAvZGV2L251bGwgdG8gcmVzdHJpY3Qg
-ZmRzIGRvZXNuJ3Qgd29yaw0KPiA+ICh1bmxlc3MgaXRzIG5ldyByb290IGhhcyBhIC9kZXYvbnVs
-bCkuDQo+ID4NCj4gDQo+IFdhc24ndCB0aGUgYWdyZWVtZW50IGluIHRoZSBlbmQgdG8gcmVtb3Zl
-IGFsbCB1c2Ugb2YgeGVuc3RvcmUgZnJvbSB0aGUNCj4gZGV2aWNlIG1vZGU/wqAgVGhpcyBydW5u
-aW5nIG5vdGlmaWNhdGlvbiBjYW4gYW5kIHNob3VsZCBiZSBRTVAsIGF0IHdoaWNoDQo+IHBvaW50
-IHdlIGJyZWFrIGEgY2F1c2FsIGRlcGVuZGVuY3kuDQo+IA0KDQpZZXMsIHRoYXQgd2FzIHRoZSBh
-Z3JlZW1lbnQuIE9uZSBwcm9ibGVtIGlzIHRoYXQgdGhlcmUgaXMgbm90IHlldCBhZGVxdWF0ZSBz
-ZXBhcmF0aW9uIGluIGVpdGhlciBRRU1VJ3MgY29tbW9uIGFuZCBwdi9odm0gaW5pdCByb3V0aW5l
-cyB0byBkbyB0aGlzIHlldC4gTm9yLCBJIGJlbGlldmUsIGlzIHRoZXJlIHN1cHBvcnQgaW4gbGli
-eGwgdG8gc3Bhd24gc2VwYXJhdGUgeGVucHYgYW5kIHhlbmZ2IGluc3RhbmNlcyBvZiBRRU1VIGZv
-ciB0aGUgc2FtZSBndWVzdC4NCg0KICBQYXVsDQoNCj4gRm9yIHNhZmV0eSByZWFzb25zLCBxZW11
-IG5lZWRzIHRvIGhhdmUgcmVzdHJpY3RlZC9kcm9wcGVkL2V0YyBhbGwNCj4gcGVybWlzc2lvbnMg
-YmVmb3JlIGl0IGxvb2tzIGF0IGEgc2luZ2xlIGJ5dGUgb2YgaW5jb21pbmcgbWlncmF0aW9uIGRh
-dGEsDQo+IHRvIHByb3RlY3QgYWdhaW5zdCBidWdneSBvciBtYWxpY2lvdXMgYWx0ZXJhdGlvbnMg
-dG8gdGhlIG1pZ3JhdGlvbiBzdHJlYW0uDQo+IA0KPiB+QW5kcmV3DQo+IA0KPiBfX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXw0KPiBYZW4tZGV2ZWwgbWFpbGlu
-ZyBsaXN0DQo+IFhlbi1kZXZlbEBsaXN0cy54ZW4ub3JnDQo+IGh0dHBzOi8vbGlzdHMueGVuLm9y
-Zy94ZW4tZGV2ZWwNCg==
+Hi,
+
+the German Bundesamt f=C3=BCr Sicherheit in der Informationstechnik
+(Federal Office for Information Security) published a study on
+the security of KVM and QEMU:
+
+https://www.bsi.bund.de/DE/Publikationen/Studien/Sicherheitsanalyse_KVM/s=
+icherheitsanalyse_kvm.html
+
+(article only available in German)
+
+Summary (Google translated to English):
+
+"In summary, it can be said that the investigated components - above all
+KVM, QEMU and libvirt - are suitable for realizing a technically mature
+and secure virtualization environment."
+
+Regards
+Stefan Weil
