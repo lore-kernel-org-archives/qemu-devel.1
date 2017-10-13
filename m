@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e2wDM-0002Rk-Te
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:25:09 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1e2wN5-0003uC-Uf
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:35:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e2wDH-0001X0-Si
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:25:08 -0400
-Date: Fri, 13 Oct 2017 11:24:59 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171013112459.0082e823@nial.brq.redhat.com>
-In-Reply-To: <150788373123.25736.7359515819699182906.stgit@bahia>
-References: <150788370618.25736.8030708425923435364.stgit@bahia>
-	<150788373123.25736.7359515819699182906.stgit@bahia>
+	(envelope-from <alex.bennee@linaro.org>) id 1e2wN1-0008Pa-Sl
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:35:11 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:52339)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1e2wN1-0008P8-MC
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:35:07 -0400
+Received: by mail-wm0-x229.google.com with SMTP id k4so20106940wmc.1
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 02:35:07 -0700 (PDT)
+References: <20171013011954.9975-1-famz@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20171013011954.9975-1-famz@redhat.com>
+Date: Fri, 13 Oct 2017 10:35:04 +0100
+Message-ID: <87mv4v9yrb.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] monitor: add proper reference counting
- of the current CPU
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] docker: Don't allocate tty unless DEBUG=1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,81 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Dr. David
-	Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
-
-On Fri, 13 Oct 2017 10:35:31 +0200
-Greg Kurz <groug@kaod.org> wrote:
-
-> If a CPU selected with the "cpu" command is hot-unplugged then "info cpus"
-> causes QEMU to exit:
-> 
-> (qemu) device_del cpu1
-> (qemu) info cpus
-> qemu:qemu_cpu_kick_thread: No such process
-> 
-> This happens because "cpu" stores the pointer to the selected CPU into
-> the monitor structure. When the CPU is hot-unplugged, we end up with a
-> dangling pointer. The "info cpus" command then does:
-> 
-> hmp_info_cpus()
->  monitor_get_cpu_index()
->   mon_get_cpu()
->    cpu_synchronize_state() <--- called with dangling pointer
-> 
-> This could cause a QEMU crash as well.
-> 
-> This patch switches the monitor to use object_ref() to ensure the
-> CPU object doesn't vanish unexpectedly. The reference is dropped
-> either when "cpu" is used to switch to another CPU, or when the
-> selected CPU is unrealized and cpu_list_remove() sets its cpu_index
-> back to UNASSIGNED_CPU_INDEX.
-I don't really like an idea of leaving dangling cpu around.
-Is it possible to store QOM path on set_cpu in monitor and
-resolving it each to instance each time it's needed?
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+Fam Zheng <famz@redhat.com> writes:
+
+> The existence of tty in the container seems to urge gcc into colorize
+> the output, but the escape chars will clutter the report once turned
+> into email replies on patchew. Move -t to debug mode.
+>
+> Reported-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+
+I certainly improves my Emacs compilation-mode buffer when applied:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->  monitor.c |   12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/monitor.c b/monitor.c
-> index fe0d1bdbb461..1c0b9a2c3ad3 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -579,6 +579,9 @@ static void monitor_data_init(Monitor *mon)
->  
->  static void monitor_data_destroy(Monitor *mon)
->  {
-> +    if (mon->mon_cpu) {
-> +        object_unref((Object *) mon->mon_cpu);
-> +    }
->      qemu_chr_fe_deinit(&mon->chr, false);
->      if (monitor_is_qmp(mon)) {
->          json_message_parser_destroy(&mon->qmp.parser);
-> @@ -1047,12 +1050,21 @@ int monitor_set_cpu(int cpu_index)
->      if (cpu == NULL) {
->          return -1;
->      }
-> +    if (cur_mon->mon_cpu) {
-> +        object_unref((Object *) cur_mon->mon_cpu);
-> +    }
->      cur_mon->mon_cpu = cpu;
-> +    object_ref((Object *) cpu);
->      return 0;
->  }
->  
->  CPUState *mon_get_cpu(void)
->  {
-> +    if (cur_mon->mon_cpu &&
-> +        cur_mon->mon_cpu->cpu_index == UNASSIGNED_CPU_INDEX) {
-> +        object_unref((Object *) cur_mon->mon_cpu);
-> +        cur_mon->mon_cpu = NULL;
-> +    }
->      if (!cur_mon->mon_cpu) {
->          if (!first_cpu) {
->              return NULL;
-> 
-> 
+>  tests/docker/Makefile.include | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+> index 6f9ea196a7..ab939f2bec 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -134,10 +134,10 @@ docker-run: docker-qemu-src
+>  			"  COPYING $(EXECUTABLE) to $(IMAGE)"))
+>  	$(call quiet-command,						\
+>  		$(SRC_PATH)/tests/docker/docker.py run 			\
+> -			$(if $(NOUSER),,-u $(shell id -u)) -t 		\
+> +			$(if $(NOUSER),,-u $(shell id -u)) 		\
+>  			--security-opt seccomp=3Dunconfined		\
+>  			$(if $V,,--rm) 					\
+> -			$(if $(DEBUG),-i,)				\
+> +			$(if $(DEBUG),-ti,)				\
+>  			$(if $(NETWORK),$(if $(subst $(NETWORK),,1),--net=3D$(NETWORK)),--net=
+=3Dnone) \
+>  			-e TARGET_LIST=3D$(TARGET_LIST) 			\
+>  			-e EXTRA_CONFIGURE_OPTS=3D"$(EXTRA_CONFIGURE_OPTS)" \
+
+
+--
+Alex Benn=C3=A9e
