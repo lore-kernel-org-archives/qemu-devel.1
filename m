@@ -1,38 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2xqh-00005N-CC
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:09:53 -0400
+	(envelope-from <haozhong.zhang@intel.com>) id 1e2xuY-00011l-OC
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:13:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2xqe-00089v-5N
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:09:51 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59216)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e2xqd-00088s-S1
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:09:48 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9DB9ehr031610
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 07:09:41 -0400
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2djtynd8m6-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 07:09:40 -0400
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Fri, 13 Oct 2017 05:09:35 -0600
-References: <1507751249-3035-1-git-send-email-stefanb@linux.vnet.ibm.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Fri, 13 Oct 2017 07:09:32 -0400
+	(envelope-from <haozhong.zhang@intel.com>) id 1e2xuV-0001I6-IY
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:13:50 -0400
+Received: from mga01.intel.com ([192.55.52.88]:23041)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1e2xuV-0001Hg-6U
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:13:47 -0400
+Date: Fri, 13 Oct 2017 19:13:41 +0800
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Message-ID: <20171013111341.feb2462nh2rcrjpp@hz-desktop>
+References: <20170911043820.14617-1-haozhong.zhang@intel.com>
+	<20170911044157.15403-1-haozhong.zhang@intel.com>
+	<20170911160818.1bd44a82@nial.brq.redhat.com>
+	<alpine.DEB.2.10.1709111119480.19719@sstabellini-ThinkPad-X260>
+	<20170912031509.vufszbju3s2v2bw3@hz-desktop>
+	<20171010160544.GA1772@char.us.oracle.com>
+	<20171012124544.dq3wyr65tefi3glk@hz-desktop>
+	<f6478644-0d4a-6531-9016-aee2a0e76417@redhat.com>
+	<20171013075326.77azyi4j2wo3b2fx@hz-desktop>
+	<20171013104453.50284426@nial.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1507751249-3035-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <b8b2952b-0416-ecc1-6fef-a4d118fab536@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3] tpm: Use EMSGSIZE instead of EBADMSG to
- compile on OpenBSD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171013104453.50284426@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [RFC QEMU PATCH v3 00/10] Implement vNVDIMM for
+ Xen HVM guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,64 +37,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, amarnath.valluri@intel.com, marcandre.lureau@gmail.com
+To: Igor Mammedov <imammedo@redhat.com>, JBeulich@suse.com, andrew.cooper3@citrix.com, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, qemu-devel@nongnu.org, xen-devel@lists.xen.org, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Richard Henderson <rth@twiddle.net>, xen-devel@lists.xenproject.org, ian.jackson@eu.citrix.com, wei.liu2@citrix.com, george.dunlap@citrix.com
 
-On 10/11/2017 03:47 PM, Stefan Berger wrote:
-> EBADMSG was only added to OpenBSD very recently. To make QEMU compilable
-> on older OpenBSD versions use EMSGSIZE instead when a mismatch between
-> number of received bytes and message size indicated in the header was
-> found.
->
-> Return -EMSGSIZE and convert all other errnos in the same functions to
-> return the negative errno.
->
-> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+On 10/13/17 10:44 +0200, Igor Mammedov wrote:
+> On Fri, 13 Oct 2017 15:53:26 +0800
+> Haozhong Zhang <haozhong.zhang@intel.com> wrote:
+> 
+> > On 10/12/17 17:45 +0200, Paolo Bonzini wrote:
+> > > On 12/10/2017 14:45, Haozhong Zhang wrote:  
+> > > > Basically, QEMU builds two ROMs for guest, /rom@etc/acpi/tables and
+> > > > /rom@etc/table-loader. The former is unstructured to guest, and
+> > > > contains all data of guest ACPI. The latter is a BIOSLinkerLoader
+> > > > organized as a set of commands, which direct the guest (e.g., SeaBIOS
+> > > > on KVM/QEMU) to relocate data in the former file, recalculate checksum
+> > > > of specified area, and fill guest address in specified ACPI field.
+> > > > 
+> > > > One part of my patches is to implement a mechanism to tell Xen which
+> > > > part of ACPI data is a table (NFIT), and which part defines a
+> > > > namespace device and what the device name is. I can add two new loader
+> > > > commands for them respectively.
+> > > > 
+> > > > Because they just provide information and SeaBIOS in non-xen
+> > > > environment ignores unrecognized commands, they will not break SeaBIOS
+> > > > in non-xen environment.
+> > > > 
+> > > > On QEMU side, most Xen-specific hacks in ACPI builder could be
+> > > > dropped, and replaced by adding the new loader commands (though they
+> > > > may be used only by Xen).
+> > > > 
+> > > > On Xen side, a fw_cfg driver and a BIOSLinkerLoader command executor
+> > > > are needed in, perhaps, hvmloader.  
+> > > 
+> > > If Xen has to parse BIOSLinkerLoader, it can use the existing commands
+> > > to process a reduced set of ACPI tables.  In other words,
+> > > etc/acpi/tables would only include the NFIT, the SSDT with namespace
+> > > devices, and the XSDT.  etc/acpi/rsdp would include the RSDP table as usual.
+> > >
+> > > hvmloader can then:
+> > > 
+> > > 1) allocate some memory for where the XSDT will go
+> > > 
+> > > 2) process the BIOSLinkerLoader like SeaBIOS would do
+> > > 
+> > > 3) find the RSDP in low memory, since the loader script must have placed
+> > > it there.  If it cannot find it, allocate some low memory, fill it with
+> > > the RSDP header and revision, and and jump to step 6
+> > > 
+> > > 4) If it found QEMU's RSDP, use it to find QEMU's XSDT
+> > > 
+> > > 5) Copy ACPI table pointers from QEMU to hvmloader's RSDT and/or XSDT.
+> > > 
+> > > 6) build hvmloader tables and link them into the RSDT and/or XSDT as usual.
+> > > 
+> > > 7) overwrite the RSDP in low memory with a pointer to hvmloader's own
+> > > RSDT and/or XSDT, and updated the checksums
+> > > 
+> > > QEMU's XSDT remains there somewhere in memory, unused but harmless.
+> > >   
+> +1 to Paolo's suggestion, i.e.
+>  1. add BIOSLinkerLoader into hvmloader
+>  2. load/process QEMU's tables with #1
+>  3. get pointers to QEMU generated NFIT and NVDIMM SSDT from QEMU's RSDT/XSDT
+>     and put them in hvmloader's RSDT
+> 
+> > It can work for plan tables which do not contain AML.
+> > 
+> > However, for a namespace device, Xen needs to know its name in order
+> > to detect the potential name conflict with those used in Xen built
+> > ACPI. Xen does not (and is not going to) introduce an AML parser, so
+> > it cannot get those device names from QEMU built ACPI by its own.
+> > 
+> > The idea of either this patch series or the new BIOSLinkerLoader
+> > command is to let QEMU tell Xen where the definition body of a
+> > namespace device (i.e. that part within the outmost "Device(NAME)") is
+> > and what the device name is. Xen, after the name conflict check, can
+> > re-package the definition body in a namespace device (w/ minimal AML
+> > builder code added in Xen) and then in SSDT.
+> 
+> I'd skip conflict check at runtime as hvmloader doesn't currently
+> have "\\_SB\NVDR" device so instead of doing runtime check it might
+> do primitive check at build time that ASL sources in hvmloader do
+> not contain reserved for QEMU "NVDR" keyword to avoid its addition
+> by accident in future. (it also might be reused in future if some
+> other tables from QEMU will be reused).
+> It's a bit hackinsh but at least it does the job and keeps
+> BIOSLinkerLoader interface the same for all supported firmwares
+> (I'd consider it as a temporary hack on the way to fully build
+> by QEMU ACPI tables for Xen).
+> 
+> Ideally it would be better for QEMU to build all ACPI tables for
+> hvmloader to avoid split brain issues and need to invent extra
+> interfaces every time a feature is added to pass configuration
+> data from QEMU to firmware.
+> But that's probably out of scope of this project, it could be
+> done on top of this if Xen folks would like to do it. Adding
+> BIOSLinkerLoader to hvmloader would be a good starting point
+> for that future effort.
 
-Can someone have a look at this, please?
+If we can let QEMU build the entire guest ACPI, we may even not need
+to introduce fw_cfg and BIOSLinkerLoader code to hvmloader.  SeaBIOS
+is currently loaded after hvmloader and can be used to load QEMU built
+ACPI.
 
-    Stefan
+To Jan, Andrew, Stefano and Anthony,
 
-> ---
->   hw/tpm/tpm_util.c | 10 +++++-----
->   1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
-> index fb929f6..73d7796 100644
-> --- a/hw/tpm/tpm_util.c
-> +++ b/hw/tpm/tpm_util.c
-> @@ -68,10 +68,10 @@ static int tpm_util_test(int fd,
->
->       n = write(fd, request, requestlen);
->       if (n < 0) {
-> -        return errno;
-> +        return -errno;
->       }
->       if (n != requestlen) {
-> -        return EFAULT;
-> +        return -EFAULT;
->       }
->
->       FD_ZERO(&readfds);
-> @@ -80,18 +80,18 @@ static int tpm_util_test(int fd,
->       /* wait for a second */
->       n = select(fd + 1, &readfds, NULL, NULL, &tv);
->       if (n != 1) {
-> -        return errno;
-> +        return -errno;
->       }
->
->       n = read(fd, &buf, sizeof(buf));
->       if (n < sizeof(struct tpm_resp_hdr)) {
-> -        return EFAULT;
-> +        return -EFAULT;
->       }
->
->       resp = (struct tpm_resp_hdr *)buf;
->       /* check the header */
->       if (be32_to_cpu(resp->len) != n) {
-> -        return EBADMSG;
-> +        return -EMSGSIZE;
->       }
->
->       *return_tag = be16_to_cpu(resp->tag);
+what do you think about allowing QEMU to build the entire guest ACPI
+and letting SeaBIOS to load it? ACPI builder code in hvmloader is
+still there and just bypassed in this case.
+
+
+Haozhong
