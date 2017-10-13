@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e2zz8-0000Ob-Dz
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 09:26:43 -0400
+	(envelope-from <mst@redhat.com>) id 1e30As-0005dH-9T
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 09:38:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e2zz5-0004Si-9E
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 09:26:42 -0400
-Received: from 6.mo5.mail-out.ovh.net ([178.32.119.138]:57452)
+	(envelope-from <mst@redhat.com>) id 1e30An-0005bK-DN
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 09:38:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44292)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e2zz5-0004SE-2P
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 09:26:39 -0400
-Received: from player773.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 973E71405E4
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 15:26:36 +0200 (CEST)
-Date: Fri, 13 Oct 2017 15:26:32 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171013152632.3bbbe956@bahia.lan>
-In-Reply-To: <150789527176.5487.14861721766357709655.stgit@bahia.lan>
-References: <150789527176.5487.14861721766357709655.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e30An-0005aX-3d
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 09:38:45 -0400
+Date: Fri, 13 Oct 2017 16:38:34 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171013163503-mutt-send-email-mst@kernel.org>
+References: <1506744354-20979-1-git-send-email-wei.w.wang@intel.com>
+	<1506744354-20979-6-git-send-email-wei.w.wang@intel.com>
+	<20171001060305-mutt-send-email-mst@kernel.org>
+	<286AC319A985734F985F78AFA26841F73932025A@shsmsx102.ccr.corp.intel.com>
+	<20171010180636-mutt-send-email-mst@kernel.org>
+	<59DDB428.4020208@intel.com>
+	<20171011161912-mutt-send-email-mst@kernel.org>
+	<59DEE790.5040809@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] monitor: fix dangling CPU pointer
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <59DEE790.5040809@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v16 5/5] virtio-balloon:
+ VIRTIO_BALLOON_F_CTRL_VQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,111 +34,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "mhocko@kernel.org" <mhocko@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mawilcox@microsoft.com" <mawilcox@microsoft.com>, "david@redhat.com" <david@redhat.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "willy@infradead.org" <willy@infradead.org>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "yang.zhang.wz@gmail.com" <yang.zhang.wz@gmail.com>, "quan.xu@aliyun.com" <quan.xu@aliyun.com>
 
-On Fri, 13 Oct 2017 13:47:51 +0200
-Greg Kurz <groug@kaod.org> wrote:
+On Thu, Oct 12, 2017 at 11:54:56AM +0800, Wei Wang wrote:
+> > But I think flushing is very fragile. You will easily run into races
+> > if one of the actors gets out of sync and keeps adding data.
+> > I think adding an ID in the free vq stream is a more robust
+> > approach.
+> > 
+> 
+> Adding ID to the free vq would need the device to distinguish whether it
+> receives an ID or a free page hint,
 
-> If a CPU selected with the "cpu" command is hot-unplugged then "info cpus"
-> causes QEMU to exit:
-> 
-> (qemu) device_del cpu1
-> (qemu) info cpus
-> qemu:qemu_cpu_kick_thread: No such process
-> 
-> This happens because "cpu" stores the pointer to the selected CPU into
-> the monitor structure. When the CPU is hot-unplugged, we end up with a
-> dangling pointer. The "info cpus" command then does:
-> 
-> hmp_info_cpus()
->  monitor_get_cpu_index()
->   mon_get_cpu()
->    cpu_synchronize_state() <--- called with dangling pointer
-> 
-> This could cause a QEMU crash as well.
-> 
-> This patch switches the monitor to store the QOM path instead of a
-> pointer to the current CPU. The path is then resolved when needed.
-> If the resolution fails, we assume that the CPU was removed and the
-> path is resetted to the default (ie, path of first_cpu).
-> 
-> Note that the resolution should really return a CPU object, otherwise
-> we have a bug. This is achieved by relying on object_resolve_path()
-> and CPU() instead of calling object_resolve_path_type(path, TYPE_CPU).
-> 
-> Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
+Not really.  It's pretty simple: a 64 bit buffer is an ID. A 4K and bigger one
+is a page.
 
-Whoever merges this patch, please add:
 
-Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+> so an extra protocol is needed for the two sides to talk. Currently, we
+> directly assign the free page
+> address to desc->addr. With ID support, we would need to first allocate
+> buffer for the protocol header,
+> and add the free page address to the header, then desc->addr = &header.
 
-Thanks!
 
->  monitor.c |   25 ++++++++++++++++++++-----
->  1 file changed, 20 insertions(+), 5 deletions(-)
+I do not think you should add ID on each page. What would be the point?
+Add it each time you detect a new start command.
+
+> How about putting the ID to the command path? This would avoid the above
+> trouble.
 > 
-> diff --git a/monitor.c b/monitor.c
-> index fe0d1bdbb461..8489b2ad99c0 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -200,7 +200,7 @@ struct Monitor {
->  
->      ReadLineState *rs;
->      MonitorQMP qmp;
-> -    CPUState *mon_cpu;
-> +    gchar *mon_cpu_path;
->      BlockCompletionFunc *password_completion_cb;
->      void *password_opaque;
->      mon_cmd_t *cmd_table;
-> @@ -579,6 +579,7 @@ static void monitor_data_init(Monitor *mon)
->  
->  static void monitor_data_destroy(Monitor *mon)
->  {
-> +    g_free(mon->mon_cpu_path);
->      qemu_chr_fe_deinit(&mon->chr, false);
->      if (monitor_is_qmp(mon)) {
->          json_message_parser_destroy(&mon->qmp.parser);
-> @@ -1047,20 +1048,34 @@ int monitor_set_cpu(int cpu_index)
->      if (cpu == NULL) {
->          return -1;
->      }
-> -    cur_mon->mon_cpu = cpu;
-> +    g_free(cur_mon->mon_cpu_path);
-> +    cur_mon->mon_cpu_path = object_get_canonical_path(OBJECT(cpu));
->      return 0;
->  }
->  
->  CPUState *mon_get_cpu(void)
->  {
-> -    if (!cur_mon->mon_cpu) {
-> +    CPUState *cpu;
-> +
-> +    if (cur_mon->mon_cpu_path) {
-> +        Object *obj = object_resolve_path(cur_mon->mon_cpu_path, NULL);
-> +
-> +        if (!obj) {
-> +            g_free(cur_mon->mon_cpu_path);
-> +            cur_mon->mon_cpu_path = NULL;
-> +        } else {
-> +            cpu = CPU(obj);
-> +        }
-> +    }
-> +    if (!cur_mon->mon_cpu_path) {
->          if (!first_cpu) {
->              return NULL;
->          }
->          monitor_set_cpu(first_cpu->cpu_index);
-> +        cpu = first_cpu;
->      }
-> -    cpu_synchronize_state(cur_mon->mon_cpu);
-> -    return cur_mon->mon_cpu;
-> +    cpu_synchronize_state(cpu);
-> +    return cpu;
->  }
->  
->  CPUArchState *mon_get_cpu_env(void)
+> For example, using the 32-bit config registers:
+> first 16-bit: Command field
+> send 16-bit: ID field
+> 
+> Then, the working flow would look like this:
+> 
+> 1) Host writes "Start, 1" to the Host2Guest register and notify;
+> 
+> 2) Guest reads Host2Guest register, and ACKs by writing "Start, 1" to
+> Guest2Host register;
+> 
+> 3) Guest starts report free pages;
+> 
+> 4) Each time when the host receives a free page hint from the free_page_vq,
+> it compares the ID fields of
+> the Host2Guest and Guest2Host register. If matching, then filter out the
+> free page from the migration dirty bitmap,
+> otherwise, simply push back without doing the filtering.
 > 
 > 
+> Best,
+> Wei
+
+
+All fine but config and vq ops are asynchronous. Host has no idea when
+were entries added to vq. So the ID sent to host needs to be through vq.
+And I would make it a 64 or at least 32 bit ID, not a 16 bit one,
+to avoid wrap-around.
+-- 
+MST
