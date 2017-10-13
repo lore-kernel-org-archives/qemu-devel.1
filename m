@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amc96@hermes.cam.ac.uk>) id 1e2vpE-0000Hx-H5
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:00:18 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e2vpL-0000OU-1Q
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:00:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amc96@hermes.cam.ac.uk>) id 1e2vpA-0004dB-Ji
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:00:12 -0400
-Received: from ppsw-43.csi.cam.ac.uk ([131.111.8.143]:58708)
+	(envelope-from <imammedo@redhat.com>) id 1e2vpH-0004oK-24
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:00:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35200)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amc96@hermes.cam.ac.uk>)
-	id 1e2vpA-0004bj-CO
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:00:08 -0400
-References: <1507564902-9000-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1507564902-9000-4-git-send-email-ian.jackson@eu.citrix.com>
-	<b749ee6c-591b-4f31-7fd3-b0fa03f5f98b@citrix.com>
-From: Andrew Cooper <andrew.cooper3@citrix.com>
-Message-ID: <c53296d6-d962-c786-d04d-053dfe35920c@citrix.com>
-Date: Fri, 13 Oct 2017 09:59:59 +0100
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e2vpG-0004nw-Pk
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:00:14 -0400
+Date: Fri, 13 Oct 2017 11:00:04 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171013110004.50db3472@nial.brq.redhat.com>
+In-Reply-To: <74abada799dfcfca81f7c582f2205abf7371ec14.1507852977.git.alistair.francis@xilinx.com>
+References: <cover.1507852977.git.alistair.francis@xilinx.com>
+	<74abada799dfcfca81f7c582f2205abf7371ec14.1507852977.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <b749ee6c-591b-4f31-7fd3-b0fa03f5f98b@citrix.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-Sender: Andrew Cooper <amc96@hermes.cam.ac.uk>
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH 3/8] xen: defer call to
- xen_restrict until just before os_setup_post
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/5] netduino2: Specify the valid CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,72 +27,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ross Lagerwall <ross.lagerwall@citrix.com>, Ian Jackson <ian.jackson@eu.citrix.com>, qemu-devel@nongnu.org
-Cc: Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, f4bug@amsat.org, marcel@redhat.com, alistair23@gmail.com
 
-On 13/10/2017 09:37, Ross Lagerwall wrote:
-> On 10/09/2017 05:01 PM, Ian Jackson wrote:
->> We need to restrict *all* the control fds that qemu opens.  Looking in
->> /proc/PID/fd shows there are many; their allocation seems scattered
->> throughout Xen support code in qemu.
->>
->> We must postpone the restrict call until roughly the same time as qemu
->> changes its uid, chroots (if applicable), and so on.
->>
->> There doesn't seem to be an appropriate hook already.  The RunState
->> change hook fires at different times depending on exactly what mode
->> qemu is operating in.
->>
->> And it appears that no-one but the Xen code wants a hook at this phase
->> of execution.  So, introduce a bare call to a new function
->> xen_setup_post, just before os_setup_post.  Also provide the
->> appropriate stub for when Xen compilation is disabled.
->>
->> We do the restriction before rather than after os_setup_post, because
->> xen_restrict may need to open /dev/null, and os_setup_post might have
->> called chroot.
->>
-> This works for normally starting a VM but doesn't seem to work when
-> resuming/migrating.
->
-> Here is the order of selected operations when starting a VM normally:
->     VNC server running on 127.0.0.1:5901
->     xen_change_state_handler()
->     xenstore_record_dm_state: running
->     xen_setup_post()
->     xentoolcore_restrict_all: rc = 0
->     os_setup_post()
->     main_loop()
->
-> Here is the order of selected operations when starting QEMU with
-> -incoming fd:... :
->     VNC server running on 127.0.0.1:5902
->     migration_fd_incoming()
->     xen_setup_post()
->     xentoolcore_restrict_all: rc = 0
->     os_setup_post()
->     main_loop()
->     migration_set_incoming_channel()
->     migrate_set_state()
->     xen_change_state_handler()
->     xenstore_record_dm_state: running
->     error recording dm state
->     qemu exited with code 1
->
-> The issue is that QEMU needs xenstore access to write "running" but
-> this is after it has already been restricted. Moving xen_setup_post()
-> into xen_change_state_handler() works fine. The only issue is that in
-> the migration case, it executes after os_setup_post() so QEMU might be
-> chrooted in which case opening /dev/null to restrict fds doesn't work
-> (unless its new root has a /dev/null).
->
+On Thu, 12 Oct 2017 17:07:25 -0700
+Alistair Francis <alistair.francis@xilinx.com> wrote:
 
-Wasn't the agreement in the end to remove all use of xenstore from the
-device mode?  This running notification can and should be QMP, at which
-point we break a causal dependency.
+> List all possible valid CPU options.
+>=20
+> Although the board only ever has a Cortex-M3 we mark the Cortex-M4 as
+> supported because the Netduino2 Plus supports the Cortex-M4 and the
+> Netduino2 Plus is similar to the Netduino2.
+>=20
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>=20
+> V2:
+>  - Fixup allignment
+> RFC v2:
+>  - Use a NULL terminated list
+>  - Add the Cortex-M4 for testing
+>=20
+>=20
+>  hw/arm/netduino2.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/arm/netduino2.c b/hw/arm/netduino2.c
+> index f936017d4a..6427552a72 100644
+> --- a/hw/arm/netduino2.c
+> +++ b/hw/arm/netduino2.c
+> @@ -34,18 +34,26 @@ static void netduino2_init(MachineState *machine)
+>      DeviceState *dev;
+> =20
+>      dev =3D qdev_create(NULL, TYPE_STM32F205_SOC);
+> -    qdev_prop_set_string(dev, "cpu-type", ARM_CPU_TYPE_NAME("cortex-m3")=
+);
+> +    qdev_prop_set_string(dev, "cpu-type", machine->cpu_type);
+>      object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal=
+);
+> =20
+>      armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
+>                         FLASH_SIZE);
+>  }
+> =20
+> +const char *netduino_valid_cpus[] =3D {
+may be add 'static' here and ditto in other patches
 
-For safety reasons, qemu needs to have restricted/dropped/etc all
-permissions before it looks at a single byte of incoming migration data,
-to protect against buggy or malicious alterations to the migration stream.
-
-~Andrew
+> +                                    ARM_CPU_TYPE_NAME("cortex-m3"),
+> +                                    ARM_CPU_TYPE_NAME("cortex-m4"),
+> +                                    NULL
+> +                                    };
+> +
+>  static void netduino2_machine_init(MachineClass *mc)
+>  {
+>      mc->desc =3D "Netduino 2 Machine";
+>      mc->init =3D netduino2_init;
+>      mc->ignore_memory_transaction_failures =3D true;
+> +    mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-m3");
+> +    mc->valid_cpu_types =3D netduino_valid_cpus;
+>  }
+> =20
+>  DEFINE_MACHINE("netduino2", netduino2_machine_init)
