@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1e2tz1-0005d5-M5
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 03:02:12 -0400
+	(envelope-from <groug@kaod.org>) id 1e2uMQ-0008Gp-7G
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 03:26:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1e2tyv-00007B-Rt
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 03:02:11 -0400
-From: "Tian, Kevin" <kevin.tian@intel.com>
-Date: Fri, 13 Oct 2017 07:01:54 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D190E139B0@SHSMSX151.ccr.corp.intel.com>
-References: <1505807208-9063-1-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA-0MK18DakmNPRXCNYbDpBvzE0h12nNjg7zr+F_m0EnDw@mail.gmail.com>
-	<f3a263b7-27e6-26df-592d-a34902bab6fe@redhat.com>
-	<CAFEAcA_2RaRsvm_=V4iDNk_vMOtiWUZs3-SdMh+DSYqGyPE0PQ@mail.gmail.com>
-	<08ce288c-610c-4dea-927d-262e7b75051f@redhat.com>
-In-Reply-To: <08ce288c-610c-4dea-927d-262e7b75051f@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <groug@kaod.org>) id 1e2uMN-0005Ar-2R
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 03:26:22 -0400
+Received: from 18.mo5.mail-out.ovh.net ([178.33.45.10]:37827)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e2uMM-000590-Rx
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 03:26:18 -0400
+Received: from player773.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 18B8513FE1C
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 09:26:16 +0200 (CEST)
+Date: Fri, 13 Oct 2017 09:26:07 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171013092607.69f2135d@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <1507823299-270245-1-git-send-email-imammedo@redhat.com>
+References: <1507578671-158758-15-git-send-email-imammedo@redhat.com>
+	<1507823299-270245-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC v4 00/16] VIRTIO-IOMMU device
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 14/24] fixup! ppc: spapr: use
+ cpu type name directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,68 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Wei Huang <wei@redhat.com>, Andrew Jones <drjones@redhat.com>, "Michael
-	S. Tsirkin" <mst@redhat.com>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Will
-	Deacon <will.deacon@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Alex
-	Williamson <alex.williamson@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, "linuc.decode@gmail.com" <linuc.decode@gmail.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Christoffer Dall <christoffer.dall@linaro.org>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-PiBGcm9tOiBBdWdlciBFcmljIFttYWlsdG86ZXJpYy5hdWdlckByZWRoYXQuY29tXQ0KPiBTZW50
-OiBUaHVyc2RheSwgT2N0b2JlciAxMiwgMjAxNyA2OjEwIFBNDQo+IA0KPiBIaSBQZXRlciwNCj4g
-DQo+IE9uIDEyLzEwLzIwMTcgMTE6NTQsIFBldGVyIE1heWRlbGwgd3JvdGU6DQo+ID4gT24gMTEg
-T2N0b2JlciAyMDE3IGF0IDE3OjA4LCBBdWdlciBFcmljIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+
-IHdyb3RlOg0KPiA+PiBIaSBQZXRlciwNCj4gPj4NCj4gPj4gT24gMTEvMTAvMjAxNyAxNjo1Niwg
-UGV0ZXIgTWF5ZGVsbCB3cm90ZToNCj4gPj4+IE9uIDE5IFNlcHRlbWJlciAyMDE3IGF0IDA4OjQ2
-LCBFcmljIEF1Z2VyIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+DQo+IHdyb3RlOg0KPiA+Pj4+IFRo
-aXMgc2VyaWVzIGltcGxlbWVudHMgdGhlIHZpcnRpby1pb21tdSBkZXZpY2UuDQo+ID4+Pj4NCj4g
-Pj4+PiBUaGlzIHY0IGlzIGFuIHVwZ3JhZGUgdG8gdjAuNCBzcGVjIFsxXSBhbmQgYXBwbGllcyBv
-biBRRU1VIHYyLjEwLjAuDQo+ID4+Pj4gLSBwcm9iZSByZXF1ZXN0IHN1cHBvcnQgYWx0aG91Z2gg
-bm8gcmVzZXJ2ZWQgcmVnaW9uIGlzIHJldHVybmVkIGF0DQo+ID4+Pj4gICB0aGUgbW9tZW50DQo+
-ID4+Pj4gLSB1bm1hcCBzZW1hbnRpY3MgbGVzcyBzdHJpY3QsIGFzIHNwZWNpZmllZCBpbiB2MC40
-DQo+ID4+Pj4gLSBkZXZpY2UgcmVnaXN0cmF0aW9uLCBhdHRhY2gvZGV0YWNoIHJldmlzaXRlZA0K
-PiA+Pj4+IC0gc3BsaXQgaW50byBzbWFsbGVyIHBhdGNoZXMgdG8gZWFzZSByZXZpZXcNCj4gPj4+
-PiAtIHByb3Bvc2UgYSB3YXkgdG8gaW5mb3JtIHRoZSBJT01NVSBtciBhYm91dCB0aGUgcGFnZV9z
-aXplX21hc2sNCj4gPj4+PiAgIG9mIHVuZGVybHlpbmcgSFcgSU9NTVUsIGlmIGFueQ0KPiA+Pj4+
-IC0gcmVtb3ZlIHdhcm5pbmcgYXNzb2NpYXRlZCB3aXRoIHRoZSB0cmFuc2xhdGlvbiBvZiB0aGUg
-TVNJIGRvb3JiZWxsDQo+ID4+Pj4NCj4gPj4+PiBUaGUgZGV2aWNlIGdldHMgaW5zdGFudGlhdGVk
-IHVzaW5nIHRoZSAiLWRldmljZSB2aXJ0aW8taW9tbXUtZGV2aWNlIg0KPiA+Pj4+IG9wdGlvbi4g
-SXQgY3VycmVudGx5IHdvcmtzIHdpdGggQVJNIHZpcnQgbWFjaGluZSBvbmx5LCBhcyB0aGUgbWFj
-aGluZQ0KPiA+Pj4+IG11c3QgaGFuZGxlIHRoZSBkdCBiaW5kaW5nIGJldHdlZW4gdGhlIHZpcnRp
-by1tbWlvICJpb21tdSIgbm9kZQ0KPiBhbmQNCj4gPj4+PiB0aGUgUENJIGhvc3QgYnJpZGdlIG5v
-ZGUuDQo+ID4+Pg0KPiA+Pj4gQ291bGQgdGhpcyB3b3JrIG9uIHg4Niwgb3IgaXMgaXQgaW5oZXJl
-bnRseSBhcm0tb25seT8NCj4gPj4NCj4gPj4gWWVzIHRoaXMgaXMgdGhlIGdvYWwuIEF0IHRoZSBt
-b21lbnQgdGhlIEFDUEkgcHJvYmluZyBpcyBub3QgeWV0IHByb3Blcmx5DQo+ID4+IHNwZWNpZmll
-ZCBidXQgYSBRMzUgcHJvdG90eXBlIHdhcyBkZXZlbG9wZWQgaW4gdGhlIFJlZCBIYXQgVmlydCB0
-ZWFtLg0KPiA+PiBUaGlzIHdpbGwgYmUgcHJlc2VudGVkIGF0IHRoZSBLVk0gZm9ydW0uDQo+ID4N
-Cj4gPiBTaW5jZSBJIGhhdmUgdmVyeSBsaXR0bGUgZmFtaWxpYXJpdHkgd2l0aCB2aXJ0aW8gb3Ig
-aW9tbXUgY29kZSwNCj4gPiBJJ2QgYmUgbXVjaCBoYXBwaWVyIGlmIHRoaXMgd2FzIHJldmlld2Vk
-IGFzIGEgZ2VuZXJpYyB2aXJ0aW8taW9tbXUNCj4gPiBieSB0aGUgeDg2L3ZpcnRpbyBkZXZzIGFu
-ZCB0aGVuIHRoZSBhcm0gc3BlY2lmaWMgcGFydHMgZG9uZSBzZWNvbmQuLi4NCj4gDQo+IFVuZGVy
-c3Rvb2QuIEkgd2FzIHJhdGhlciBleHBlY3RpbmcgeW91IHRvIHJldmlldyB0aGUgc21tdXYzIGVt
-dWxhdGlvbg0KPiBjb2RlIHdoaWNoIHlvdSBkaWQsIGluIGEgY29tcHJlaGVuc2l2ZSBtYW5uZXIg
-Oy0pLCBhbmQgbWFueSB0aGFua3MgZm9yDQo+IHRoYXQuDQo+IA0KPiBOb3RlIHN1cmUgdGhpcyBp
-cyB0aW1lIHlldCB0byBnZXQgdGhpcyBSRkMgcmV2aWV3ZWQgYXMNCj4gLSB0aGUgdjAuNCB2aXJ0
-aW8taW9tbXUgZHJpdmVyIGl0IHJlbGllcyBvbiB3YXMgbm90IG9mZmljaWFsbHkgc3VibWl0dGVk
-LA0KPiAtIHRoZSB2aXJ0aW8taW9tbXUgc3BlY2lmaWNhdGlvbiByZXZpZXcgaGFzIG5vdCByZWFs
-bHkgYmVlbiByZXZpZXdlZCwNCj4gLSB0aGUgQUNQSSBwcm9iaW5nIG1ldGhvZCBoYXMgbm90IGJl
-ZW4gZGlzY3Vzc2VkIHlldC4NCj4gDQo+IEplYW4tUGhpbGlwcGUsIHBsZWFzZSBjb3JyZWN0IG1l
-IGlmIEkgYW0gd3JvbmcuDQo+IA0KPiBTbyB0byBtZSwgdGhpcyBpcyBwdXJlIFJGQyBhdCB0aGUg
-bW9tZW50Lg0KPiA+DQo+ID4gSSdtIGFsc28gbm90IGNsZWFyIG9uIHdoYXQgd2UncmUgZXhwZWN0
-aW5nIHRoZSByZWNvbW1lbmRlZCBvciBub3JtYWwNCj4gPiB3YXkgdG8gZG8gZGV2aWNlIHBhc3N0
-aHJvdWdoIGlzIGdvaW5nIHRvIGJlIC0tIHRoaXMgdmlydGlvLW1taW8sDQo+ID4gb3IgcHJlc2Vu
-dGluZyB0aGUgZ3Vlc3Qgd2l0aCBhbiBTTU1VdjMgaW50ZXJmYWNlPyBEbyB3ZSByZWFsbHkNCj4g
-PiBuZWVkIHRvIGltcGxlbWVudCBib3RoID8NCj4gDQo+IEkgdGhpbmsgdGhlIEtWTSBmb3J1bSBp
-cyB0aGUgcmlnaHQgcGxhY2UgdG8gc3luYyBhcyBib3RoIGFwcHJvYWNoZXMgd2lsbA0KPiBiZSBw
-cmVzZW50ZWQgYW5kIHNvbWUgcHJvcy9jb25zICsgcGVyZm9ybWFuY2UgZmlndXJlcyB3aWxsIGJl
-IGdpdmVuLg0KPiANCj4gQXMgd2UgdGFsayBhYm91dCBjaG9vc2luZywgdGhlcmUgaXMgb25lIGFs
-dGVybmF0aXZlIHRoYXQgd2FzIHN1Z2dlc3RlZA0KPiBvbiB0aGUgTUwgYnkgQWxleCAmIE1pY2hh
-ZWwgYnV0IG5ldmVyIHJlYWxseSBnZXQgY29uc2lkZXJlZCB5ZXQgYW5kDQo+IG1heWJlIHNob3Vs
-ZCBiZTogdXNpbmcgaW50ZWwgaW9tbXUgZW11bGF0aW9uIGNvZGUgZm9yIEFSTS4gSQ0KPiBha25v
-d2xlZGdlDQo+IHRoaXMgZGVzZXJ2ZXMgYSB0aG9yb3VnaCBpbXBhY3Qgc3R1ZHkgb24ga2VybmVs
-IGFuZCBGVyBzaWRlIGJ1dCBJIHdvdWxkDQo+IGJlIGhhcHB5IHRvIGdldCB5b3VyIG9waW5pb24g
-YWJvdXQgdGhlIFFFTVUgc2lkZS4gV291bGQgeW91IGhhdmUgYSBieS0NCj4gcHJpbmNpcGxlIHJl
-amVjdGlvbiBvZiB0aGlzIGlkZWEgdG8gaW5zdGFudGlhdGUgc3VjaCBhbiBJbnRlbCBkZXZpY2Ug
-aW4NCj4gbWFjaCB2aXJ0IG9yIHdvdWxkIGl0IGJlIHNvbWV0aGluZyB5b3Ugd291bGQgYmUgcmVh
-ZHkgdG8gY29uc2lkZXI/DQo+IA0KDQpiZWFyIHBvc3RpbmcgYSBsaW5rIHRvIEFsZXgvTWljaGFl
-bCdzIGNvbW1lbnQ/IGludGVyZXN0aW5nIHRvIGtub3cNCnRoZSByYXRpb25hbGUuLi4NCg0KVGhh
-bmtzDQpLZXZpbg0K
+On Thu, 12 Oct 2017 17:48:19 +0200
+Igor Mammedov <imammedo@redhat.com> wrote:
+
+> follow up commit that registers host-spapr-cpu-core type unconditionally
+>  "ppc: spapr: register 'host' core type  along with the rest of core types"
+> 
+> makes 'non' machine crash
+>  ppc64-softmmu/qemu-system-ppc64 -M none -device host-spapr-cpu-core
+>  ERROR:qom/object.c:217:object_type_get_instance_size: assertion failed: (type != NULL)
+>  Aborted
+> 
+> before it qemu fails cleanly with
+>  ppc64-softmmu/qemu-system-ppc64 -M none -device host-spapr-cpu-core
+>  qemu-system-ppc64: -device host-spapr-cpu-core: 'host-spapr-cpu-core' is not a valid device model name
+> 
+> spapr_cpu_core_realize() already has explicit check for pseries machine,
+> so move access to host cpu type after it so 'none' machine would fail
+> cleanly as expected.
+> 
+> Reported-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+
+That's much simpler indeed than trying to register the host CPU type at
+QOM init... which turns out to be quite hairy compared to the gain :)
+
+>  hw/ppc/spapr_cpu_core.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index b5bbb6a..7dbf9c3 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -151,7 +151,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+>      sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
+>      sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
+>      CPUCore *cc = CPU_CORE(OBJECT(dev));
+> -    size_t size = object_type_get_instance_size(scc->cpu_type);
+> +    size_t size;
+>      Error *local_err = NULL;
+>      void *obj;
+>      int i, j;
+> @@ -162,6 +162,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+>          return;
+>      }
+>  
+> +    size = object_type_get_instance_size(scc->cpu_type);
+>      sc->threads = g_malloc0(size * cc->nr_threads);
+>      for (i = 0; i < cc->nr_threads; i++) {
+>          char id[32];
