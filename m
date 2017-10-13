@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e2v7T-0003BJ-TR
+	(envelope-from <kraxel@redhat.com>) id 1e2v7T-0003BI-Tn
 	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 04:15:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e2v7P-0004JV-PF
+	(envelope-from <kraxel@redhat.com>) id 1e2v7P-0004Jc-QM
 	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 04:14:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53524)
+Received: from mx1.redhat.com ([209.132.183.28]:51952)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e2v7P-0004Ir-GI
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e2v7P-0004Iq-Gt
 	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 04:14:55 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7CE1765878
+	by mx1.redhat.com (Postfix) with ESMTPS id 61F28C057FAF
 	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 08:14:54 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 13 Oct 2017 10:14:42 +0200
-Message-Id: <20171013081450.29647-4-kraxel@redhat.com>
+Date: Fri, 13 Oct 2017 10:14:41 +0200
+Message-Id: <20171013081450.29647-3-kraxel@redhat.com>
 In-Reply-To: <20171013081450.29647-1-kraxel@redhat.com>
 References: <20171013081450.29647-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 03/11] ui: add keycodemapdb repository as a GIT
- submodule
+Subject: [Qemu-devel] [PULL 02/11] docker: don't rely on submodules existing
+ in the main checkout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,138 +35,80 @@ Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-The https://gitlab.com/keycodemap/keycodemapdb/ repo contains a
-data file mapping between all the different scancode/keycode/keysym
-sets that are known, and a tool to auto-generate lookup tables for
-different combinations.
+When building the tarball to pass into the docker/vm test image,
+the code relies on the git submodules being checked out in the
+main checkout.
 
-It is used by GTK-VNC, SPICE-GTK and libvirt for mapping keys.
-Using it in QEMU will let us replace many hand written lookup
-tables with auto-generated tables from a master data source,
-reducing bugs. Adding new QKeyCodes will now only require the
-master table to be updated, all ~20 other tables will be
-automatically updated to follow.
+ie if the developer has not run 'git submodule update --init dtc'
+many of the docker tests will fail due to the libfdt package not
+being present in the test images. Patchew manually checks out the
+dtc submodule in the main git checkout, but this is a bad idea.
+
+When running tests we want to have a predictable set of submodules
+included in the source that's tested. The build environment is
+completely independent of the developers host OS, so the submodules
+the developer has checked out should not be considered relevant for
+the tests.
+
+This changes the archive-source.sh script so that it clones the
+current git checkout into a temporary directory, checks out a
+fixed set of submodules, builds the tarball and finally removes
+the temporary git clone.
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170929101201.21039-4-berrange@redhat.com
-
-[ kraxel: fix build ]
-[ kraxel: switch repo to qemu.git mirror ]
-
+Message-id: 20170929101201.21039-3-berrange@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- configure                 |  8 +++++++-
- Makefile                  | 24 +++++++++++++++++++++++-
- .gitignore                |  1 +
- .gitmodules               |  3 +++
- scripts/archive-source.sh |  2 +-
- ui/keycodemapdb           |  1 +
- 6 files changed, 36 insertions(+), 3 deletions(-)
- create mode 160000 ui/keycodemapdb
+ scripts/archive-source.sh | 34 ++++++++++++++++++++++++++++------
+ 1 file changed, 28 insertions(+), 6 deletions(-)
 
-diff --git a/configure b/configure
-index 38f1710c80..06f18ea9af 100755
---- a/configure
-+++ b/configure
-@@ -264,7 +264,13 @@ cc_i386=i386-pc-linux-gnu-gcc
- libs_qga=""
- debug_info="yes"
- stack_protector=""
--git_submodules=""
-+
-+if test -e "$source_path/.git"
-+then
-+    git_submodules="ui/keycodemapdb"
-+else
-+    git_submodules=""
-+fi
- 
- # Don't accept a target_list environment variable.
- unset target_list
-diff --git a/Makefile b/Makefile
-index f479e28afb..505d13bd31 100644
---- a/Makefile
-+++ b/Makefile
-@@ -33,7 +33,7 @@ git-submodule-update:
- endif
- endif
- 
--.git-submodule-status: git-submodule-update
-+.git-submodule-status: git-submodule-update config-host.mak
- 
- Makefile: .git-submodule-status
- 
-@@ -214,6 +214,28 @@ trace-dtrace-root.h: trace-dtrace-root.dtrace
- 
- trace-dtrace-root.o: trace-dtrace-root.dtrace
- 
-+KEYCODEMAP_GEN = $(SRC_PATH)/ui/keycodemapdb/tools/keymap-gen
-+KEYCODEMAP_CSV = $(SRC_PATH)/ui/keycodemapdb/data/keymaps.csv
-+
-+KEYCODEMAP_FILES = \
-+		 $(NULL)
-+
-+GENERATED_FILES += $(KEYCODEMAP_FILES)
-+
-+ui/input-keymap-%.c: $(KEYCODEMAP_GEN) $(KEYCODEMAP_CSV) $(SRC_PATH)/ui/Makefile.objs
-+	$(call quiet-command,\
-+	    src=$$(echo $@ | sed -E -e "s,^ui/input-keymap-(.+)-to-(.+)\.c$$,\1,") && \
-+	    dst=$$(echo $@ | sed -E -e "s,^ui/input-keymap-(.+)-to-(.+)\.c$$,\2,") && \
-+	    test -e $(KEYCODEMAP_GEN) && \
-+	    $(PYTHON) $(KEYCODEMAP_GEN) \
-+	          --lang glib2 \
-+	          --varname qemu_input_map_$${src}_to_$${dst} \
-+	          code-map $(KEYCODEMAP_CSV) $${src} $${dst} \
-+	        > $@ || rm -f $@, "GEN", "$@")
-+
-+$(KEYCODEMAP_GEN): .git-submodule-status
-+$(KEYCODEMAP_CSV): .git-submodule-status
-+
- # Don't try to regenerate Makefile or configure
- # We don't generate any of them
- Makefile: ;
-diff --git a/.gitignore b/.gitignore
-index b5e115d96b..620eec6b47 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -14,6 +14,7 @@
- /trace/generated-tcg-tracers.h
- /ui/shader/texture-blit-frag.h
- /ui/shader/texture-blit-vert.h
-+/ui/input-keymap-*.c
- *-timestamp
- /*-softmmu
- /*-darwin-user
-diff --git a/.gitmodules b/.gitmodules
-index 84c54cdc49..7c981a42b6 100644
---- a/.gitmodules
-+++ b/.gitmodules
-@@ -34,3 +34,6 @@
- [submodule "roms/QemuMacDrivers"]
- 	path = roms/QemuMacDrivers
- 	url = git://git.qemu.org/QemuMacDrivers.git
-+[submodule "ui/keycodemapdb"]
-+	path = ui/keycodemapdb
-+	url = git://git.qemu.org/keycodemapdb.git
 diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
-index 4029de7b20..4e63774f9a 100755
+index c4e7d98f4d..4029de7b20 100755
 --- a/scripts/archive-source.sh
 +++ b/scripts/archive-source.sh
-@@ -26,7 +26,7 @@ vroot_dir="${tar_file}.vroot"
- # independent of what the developer currently has initialized
- # in their checkout, because the build environment is completely
- # different to the host OS.
--submodules="dtc"
-+submodules="dtc ui/keycodemapdb"
+@@ -18,15 +18,37 @@ if test $# -lt 1; then
+     error "Usage: $0 <output tarball>"
+ fi
  
- trap "status=$?; rm -rf \"$list_file\" \"$vroot_dir\"; exit \$status" 0 1 2 3 15
+-tar_file="$1"
+-list_file="$1.list"
+-submodules=$(git submodule foreach --recursive --quiet 'echo $name')
++tar_file=`realpath "$1"`
++list_file="${tar_file}.list"
++vroot_dir="${tar_file}.vroot"
  
-diff --git a/ui/keycodemapdb b/ui/keycodemapdb
-new file mode 160000
-index 0000000000..56ce5650d2
---- /dev/null
-+++ b/ui/keycodemapdb
-@@ -0,0 +1 @@
-+Subproject commit 56ce5650d2c6ea216b4580df44b9a6dd3bc92c3b
+-if test $? -ne 0; then
+-    error "git submodule command failed"
++# We want a predictable list of submodules for builds, that is
++# independent of what the developer currently has initialized
++# in their checkout, because the build environment is completely
++# different to the host OS.
++submodules="dtc"
++
++trap "status=$?; rm -rf \"$list_file\" \"$vroot_dir\"; exit \$status" 0 1 2 3 15
++
++if git diff-index --quiet HEAD -- &>/dev/null
++then
++    HEAD=HEAD
++else
++    HEAD=`git stash create`
+ fi
++git clone --shared . "$vroot_dir"
++test $? -ne 0 && error "failed to clone into '$vroot_dir'"
+ 
+-trap "status=$?; rm -f \"$list_file\"; exit \$status" 0 1 2 3 15
++cd "$vroot_dir"
++test $? -ne 0 && error "failed to change into '$vroot_dir'"
++
++git checkout $HEAD
++test $? -ne 0 && error "failed to checkout $HEAD revision"
++
++for sm in $submodules; do
++    git submodule update --init $sm
++    test $? -ne 0 && error "failed to init submodule $sm"
++done
+ 
+ if test -n "$submodules"; then
+     {
 -- 
 2.9.3
