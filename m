@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1e2xEf-00028i-4i
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 06:30:34 -0400
+	(envelope-from <prvs=45279cac4=Ian.Jackson@citrix.com>)
+	id 1e2xRf-0003n8-OK
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 06:44:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1e2xEb-0004H3-2G
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 06:30:33 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:37390
-	helo=v2201612906741603.powersrv.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1e2xEa-0004FR-M7
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 06:30:28 -0400
-References: <afc33ce4-c9ab-9b35-38ec-80b16642ef00@weilnetz.de>
-	<20171013113708.2dd02a17.cohuck@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <a41c36b4-23a0-41cc-992e-e9b1eb5367b0@weilnetz.de>
-Date: Fri, 13 Oct 2017 12:30:32 +0200
+	(envelope-from <prvs=45279cac4=Ian.Jackson@citrix.com>)
+	id 1e2xRc-0002Cb-K5
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 06:43:59 -0400
+Received: from smtp.citrix.com ([66.165.176.89]:50227)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=45279cac4=Ian.Jackson@citrix.com>)
+	id 1e2xRc-000228-Cg
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 06:43:56 -0400
+From: Ian Jackson <ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <20171013113708.2dd02a17.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] German BSI analysed security of KVM / QEMU
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Message-ID: <23008.39143.424586.342064@mariner.uk.xensource.com>
+Date: Fri, 13 Oct 2017 11:43:51 +0100
+In-Reply-To: <b749ee6c-591b-4f31-7fd3-b0fa03f5f98b@citrix.com>
+References: <1507564902-9000-1-git-send-email-ian.jackson@eu.citrix.com>
+	<1507564902-9000-4-git-send-email-ian.jackson@eu.citrix.com>
+	<b749ee6c-591b-4f31-7fd3-b0fa03f5f98b@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH 3/8] xen: defer call to xen_restrict until
+ just before os_setup_post
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +32,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: QEMU Developer <qemu-devel@nongnu.org>
+To: Ross Lagerwall <ross.lagerwall@citrix.com>
+Cc: qemu-devel@nongnu.org, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org
 
-Am 13.10.2017 um 11:37 schrieb Cornelia Huck:
-> On Fri, 13 Oct 2017 11:10:05 +0200
-> Stefan Weil <sw@weilnetz.de> wrote:
->
->> Hi,
->>
->> the German Bundesamt f=C3=BCr Sicherheit in der Informationstechnik
->> (Federal Office for Information Security) published a study on
->> the security of KVM and QEMU:
->>
->> https://www.bsi.bund.de/DE/Publikationen/Studien/Sicherheitsanalyse_KV=
-M/sicherheitsanalyse_kvm.html
->>
->> (article only available in German)
-> Thanks for posting this!
->
-> I only looked at the conclusion for now. Some interesting points:
->
-> - They state that QEMU's source code is well structured, readable and
->   maintainable. I wonder what kind of source code they usually deal
->   with ;)
-> - Most problems noted seemed to be related to signed<->unsigned
->   conversions, but none were found to be exploitable.
-> - They liked hardening via stack protection, NX, and ASLR, as well as
->   the mechanisms used by libvirt.
-> - They generally seemed to be happy with QEMU being deployed via
->   libvirt.
-> - Restrictions imposed via KVM (guest access to some CPU registers)
->   scored positive points. They did not like that Hyper-V and PMU were
->   not deconfigurable.
-> - Lack of support for encryption/signing of network-based images was
->   criticized. They ended up using Ceph and GlusterFS, which they were
->   reasonably happy with.
->
-> That's just from a quick browse.
+Ross Lagerwall writes ("Re: [PATCH 3/8] xen: defer call to xen_restrict until just before os_setup_post"):
+> This works for normally starting a VM but doesn't seem to work when 
+> resuming/migrating.
+> 
+> Here is the order of selected operations when starting a VM normally:
+>      VNC server running on 127.0.0.1:5901
+>      xen_change_state_handler()
+>      xenstore_record_dm_state: running
+>      xen_setup_post()
+>      xentoolcore_restrict_all: rc = 0
+>      os_setup_post()
+>      main_loop()
+> 
+> Here is the order of selected operations when starting QEMU with 
+> -incoming fd:... :
+>      VNC server running on 127.0.0.1:5902
+>      migration_fd_incoming()
+>      xen_setup_post()
+>      xentoolcore_restrict_all: rc = 0
+>      os_setup_post()
+>      main_loop()
+>      migration_set_incoming_channel()
+>      migrate_set_state()
+>      xen_change_state_handler()
+>      xenstore_record_dm_state: running
+>      error recording dm state
+>      qemu exited with code 1
+> 
+> The issue is that QEMU needs xenstore access to write "running" but this 
+> is after it has already been restricted. Moving xen_setup_post() into 
+> xen_change_state_handler() works fine. The only issue is that in the 
+> migration case, it executes after os_setup_post() so QEMU might be 
+> chrooted in which case opening /dev/null to restrict fds doesn't work 
+> (unless its new root has a /dev/null).
 
+Thanks for the extensive diagnosis.
 
-I already found some weaknesses in the study:
+We do in fact want the restriction to occur before the migration
+stream is read.  This is because we are trying to defend against a
+guest which can exploit a bug in qemu.  That means that the sending
+qemu must be assumed to be compromised.  In this context I don't think
+qemu's migration stream receiver can be regarded as hardened against
+hostile input; it's far too complicated, even if efforts have been
+made in that direction (I haven't checked).  So to avoid the receiving
+qemu being compromised while still unrestricted, we should restrict
+before starting to read the migration stream.
 
-* It makes the wrong assumption that all maintainers have write access
-to the git repository. (chapter 5.3)
-* It does not mention important quality measures like Coverity Scan,
-Continuous Integration and automated tests.
+The correct fix is to use a different technique to notify the
+toolstack that qemu is up and running.  That obviously requires
+changes on the Xen tools side.  I will look into that for the Xen 4.11
+release cycle.
 
-So QEMU is even better than the BSI thinks. :-)
-
-Stefan
+Ian.
