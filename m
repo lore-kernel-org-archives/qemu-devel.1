@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1e32sW-0000Wq-55
+	(envelope-from <alex.bennee@linaro.org>) id 1e32sW-0000XU-LD
 	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 12:32:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1e32sU-0002Dh-SS
+	(envelope-from <alex.bennee@linaro.org>) id 1e32sV-0002Eo-S6
 	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 12:32:04 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:47265)
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:56887)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1e32sU-0002D9-LO
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 12:32:02 -0400
-Received: by mail-wm0-x236.google.com with SMTP id t69so22577268wmt.2
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 09:32:02 -0700 (PDT)
+	id 1e32sV-0002Ds-Ml
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 12:32:03 -0400
+Received: by mail-wm0-x236.google.com with SMTP id l68so22848263wmd.5
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 09:32:03 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 13 Oct 2017 17:24:30 +0100
-Message-Id: <20171013162438.32458-23-alex.bennee@linaro.org>
+Date: Fri, 13 Oct 2017 17:24:37 +0100
+Message-Id: <20171013162438.32458-30-alex.bennee@linaro.org>
 In-Reply-To: <20171013162438.32458-1-alex.bennee@linaro.org>
 References: <20171013162438.32458-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 22/30] target/arm/translate-a64.c: add FP16
- FAGCT to AdvSIMD 3 Same
+Subject: [Qemu-devel] [RFC PATCH 29/30] tests/test-softfloat: add
+ f16_to_int16 conversion test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,58 +35,51 @@ Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org, =?UTF-
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- target/arm/helper-a64.c    | 14 +++++++-------
- target/arm/helper-a64.h    |  1 -
- target/arm/translate-a64.c |  3 +++
- 3 files changed, 10 insertions(+), 8 deletions(-)
+ tests/test-softfloat.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
-index b62d77aec4..137866732d 100644
---- a/target/arm/helper-a64.c
-+++ b/target/arm/helper-a64.c
-@@ -609,10 +609,10 @@ uint32_t HELPER(advsimd_acge_f16)(float16 a, float16 b, void *fpstp)
-     return -float16_le(f1, f0, fpst);
- }
+diff --git a/tests/test-softfloat.c b/tests/test-softfloat.c
+index d7b740e1cb..e1f356572d 100644
+--- a/tests/test-softfloat.c
++++ b/tests/test-softfloat.c
+@@ -16,6 +16,31 @@ typedef struct {
+     uint8_t final_exception_flags;
+ } f16_test_data;
  
--/* uint32_t HELPER(advsimd_acgt_f16)(float16 a, float16 b, void *fpstp) */
--/* { */
--/*     float_status *fpst = fpstp; */
--/*     float16 f0 = float16_abs(a); */
--/*     float16 f1 = float16_abs(b); */
--/*     return -float16_lt(f1, f0, fpst); */
--/* } */
-+uint32_t HELPER(advsimd_acgt_f16)(float16 a, float16 b, void *fpstp)
++static void test_f16_convert_to_int(void)
 +{
-+    float_status *fpst = fpstp;
-+    float16 f0 = float16_abs(a);
-+    float16 f1 = float16_abs(b);
-+    return -float16_lt(f1, f0, fpst);
++    int i;
++    float16 out;
++    float_status flags, *fp = &flags;
++    f16_test_data test_data[] = {
++        /* from risu fcvtps  v23.4h, v16.4h */
++        { { .float_rounding_mode = float_round_up}, 0xa619, 0xb860, 0 },
++        { { .float_rounding_mode = float_round_up}, 0x83c0, 0xff91, 0 },
++        { { .float_rounding_mode = float_round_up}, 0x6966, 0x0001, 0 },
++        { { .float_rounding_mode = float_round_up}, 0x06b1, 0x0001, 0 },
++    };
++
++    for (i = 0; i < ARRAY_SIZE(test_data); ++i) {
++        flags = test_data[i].initial_status;
++        out = float16_to_int16(test_data[i].in, fp);
++
++        if (!(test_data[i].out == out)) {
++            fprintf(stderr, "%s[%d]: expected %#04x got %#04x\n",
++                    __func__, i, test_data[i].out, out);
++            g_test_fail();
++        }
++    }
 +}
-diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
-index 952869f43e..66c4062ea5 100644
---- a/target/arm/helper-a64.h
-+++ b/target/arm/helper-a64.h
-@@ -53,7 +53,6 @@ DEF_HELPER_3(advsimd_minh, f16, f16, f16, ptr)
- DEF_HELPER_3(advsimd_maxnumh, f16, f16, f16, ptr)
- DEF_HELPER_3(advsimd_minnumh, f16, f16, f16, ptr)
- DEF_HELPER_3(advsimd_mulxh, f16, f16, f16, ptr)
--
- DEF_HELPER_3(advsimd_ceq_f16, i32, f16, f16, ptr)
- DEF_HELPER_3(advsimd_cge_f16, i32, f16, f16, ptr)
- DEF_HELPER_3(advsimd_cgt_f16, i32, f16, f16, ptr)
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 623b0b3fab..4ad470d9e8 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -9819,6 +9819,9 @@ static void disas_simd_three_reg_same_fp16(DisasContext *s, uint32_t insn)
-         case 0x27: /* FDIV */
-             gen_helper_advsimd_divh(tcg_res, tcg_op1, tcg_op2, fpst);
-             break;
-+        case 0x35: /* FACGT */
-+            gen_helper_advsimd_acgt_f16(tcg_res, tcg_op1, tcg_op2, fpst);
-+            break;
-         default:
-             fprintf(stderr,"%s: insn %#04x, fpop %#2x @ %#" PRIx64 "\n",
-                     __func__, insn, fpopcode, s->pc);
++
+ static void test_f16_round_to_int(void)
+ {
+     int i;
+@@ -54,5 +79,6 @@ int main(int argc, char *argv[])
+ {
+     g_test_init(&argc, &argv, NULL);
+     g_test_add_func("/softfloat/f16/round_to_int", test_f16_round_to_int);
++    g_test_add_func("/softfloat/f16/convert_to_int", test_f16_convert_to_int);
+     return g_test_run();
+ }
 -- 
 2.14.1
