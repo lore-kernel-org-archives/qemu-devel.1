@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1e2xvK-0001PI-IE
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:14:39 -0400
+	(envelope-from <bounces@canonical.com>) id 1e2y1i-0002bo-CV
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:21:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1e2xvJ-0001ea-ON
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:14:38 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:36050)
+	(envelope-from <bounces@canonical.com>) id 1e2y1d-0005WT-Dx
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:21:14 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57778)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1e2xvJ-0001eH-Iq
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:14:37 -0400
-Received: by mail-oi0-x242.google.com with SMTP id s185so3628301oif.3
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 04:14:36 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e2y1d-0005W6-7I
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:21:09 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e2y1a-0003ev-AW
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 11:21:06 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7F3FE2E80CC
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 11:21:05 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1507751249-3035-1-git-send-email-stefanb@linux.vnet.ibm.com>
-References: <1507751249-3035-1-git-send-email-stefanb@linux.vnet.ibm.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 13 Oct 2017 13:14:35 +0200
-Message-ID: <CAJ+F1CK7MW5kY5eaiHGyk7hvxKyOBNJi7MHo9warfXbSp4LzPA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] tpm: Use EMSGSIZE instead of EBADMSG to
- compile on OpenBSD
+Date: Fri, 13 Oct 2017 11:09:20 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1723161 <1723161@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150782239801.1729.1327212510076491094.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150789296046.21823.4300561283933773366.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1723161] Re: Migration failing in qemu-2.10.1 but
+ working qemu-2.9.1 and earlier with same options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +37,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Amarnath Valluri <amarnath.valluri@intel.com>
+To: qemu-devel@nongnu.org
 
-Hi
+i added some debug, and I'm seeing:
 
-On Wed, Oct 11, 2017 at 9:47 PM, Stefan Berger
-<stefanb@linux.vnet.ibm.com> wrote:
-> EBADMSG was only added to OpenBSD very recently. To make QEMU compilable
-> on older OpenBSD versions use EMSGSIZE instead when a mismatch between
-> number of received bytes and message size indicated in the header was
-> found.
->
-> Return -EMSGSIZE and convert all other errnos in the same functions to
-> return the negative errno.
->
-> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+blk_pwrite failed for pflash1 0 @ 0 cluster_size=3D1048576 ret=3D-5
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+so that's an EIO.
 
+The EIO is coming from blk_check_byte_request  because it's trying to
+write a 1MB cluster size chunk, yet the var file is only ~128k
 
-Looks good to me,
-but given that the return value isn't used, perhaps you could have
-changed the function to return a bool success instead?
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1723161
 
-> ---
->  hw/tpm/tpm_util.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
-> index fb929f6..73d7796 100644
-> --- a/hw/tpm/tpm_util.c
-> +++ b/hw/tpm/tpm_util.c
-> @@ -68,10 +68,10 @@ static int tpm_util_test(int fd,
->
->      n =3D write(fd, request, requestlen);
->      if (n < 0) {
-> -        return errno;
-> +        return -errno;
->      }
->      if (n !=3D requestlen) {
-> -        return EFAULT;
-> +        return -EFAULT;
->      }
->
->      FD_ZERO(&readfds);
-> @@ -80,18 +80,18 @@ static int tpm_util_test(int fd,
->      /* wait for a second */
->      n =3D select(fd + 1, &readfds, NULL, NULL, &tv);
->      if (n !=3D 1) {
-> -        return errno;
-> +        return -errno;
->      }
->
->      n =3D read(fd, &buf, sizeof(buf));
->      if (n < sizeof(struct tpm_resp_hdr)) {
-> -        return EFAULT;
-> +        return -EFAULT;
->      }
->
->      resp =3D (struct tpm_resp_hdr *)buf;
->      /* check the header */
->      if (be32_to_cpu(resp->len) !=3D n) {
-> -        return EBADMSG;
-> +        return -EMSGSIZE;
->      }
->
->      *return_tag =3D be16_to_cpu(resp->tag);
-> --
-> 2.5.5
->
+Title:
+  Migration failing in qemu-2.10.1 but working qemu-2.9.1 and earlier
+  with same options
 
+Status in QEMU:
+  New
 
+Bug description:
+  =
 
---=20
-Marc-Andr=C3=A9 Lureau
+  Qemu-2.10.1 migration failing with the following error:
+  Receiving block device images
+  qemu-system-x86_64: error while loading section id 2(block)
+  qemu-system-x86_64: load of migration failed: Input/output error
+
+  Migration is setup on the destination system of the migration using:
+  -incoming tcp:0:4444
+
+  Migration is initiated from the source using the following commands in it=
+s qemu monitor:
+  migrate -b "tcp:localhost:4444"
+
+  The command-line used in both the source and destination is:
+  qemu-system-x86_64 \
+          -nodefaults \
+          -pidfile vm0.pid \
+          -enable-kvm \
+          -machine q35 \
+          -cpu host -smp 2 \
+          -m 4096M \
+          -drive if=3Dpflash,format=3Draw,unit=3D0,file=3DOVMF_CODE.fd,read=
+only \
+          -drive if=3Dpflash,format=3Draw,unit=3D1,file=3DOVMF_VARS.fd \
+          -drive file=3D${HDRIVE},format=3Dqcow2 \
+          -drive media=3Dcdrom \
+          -usb -device usb-tablet \
+          -vga std -vnc :0 \
+          -net nic,macaddr=3D${TAPMACADDR} -net user,net=3D192.168.2.0/24,d=
+hcpstart=3D192.168.2.10 \
+          -serial stdio \
+          -monitor unix:${MONITORSOCKET},server,nowait
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1723161/+subscriptions
