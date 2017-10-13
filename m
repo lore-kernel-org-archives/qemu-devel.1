@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e2txd-0004po-D9
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 03:00:46 -0400
+	(envelope-from <kevin.tian@intel.com>) id 1e2tz1-0005d5-M5
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 03:02:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e2txZ-00081p-QI
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 03:00:45 -0400
-Message-ID: <1507878038.21465.3.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 13 Oct 2017 09:00:38 +0200
-In-Reply-To: <CA+J4q6dO+V32yF11jFD2jAizigYoZS6eECyuDTgRVfe+a_JUJQ@mail.gmail.com>
-References: <CA+J4q6dO+V32yF11jFD2jAizigYoZS6eECyuDTgRVfe+a_JUJQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QEMU without X11 support
+	(envelope-from <kevin.tian@intel.com>) id 1e2tyv-00007B-Rt
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 03:02:11 -0400
+From: "Tian, Kevin" <kevin.tian@intel.com>
+Date: Fri, 13 Oct 2017 07:01:54 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D190E139B0@SHSMSX151.ccr.corp.intel.com>
+References: <1505807208-9063-1-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA-0MK18DakmNPRXCNYbDpBvzE0h12nNjg7zr+F_m0EnDw@mail.gmail.com>
+	<f3a263b7-27e6-26df-592d-a34902bab6fe@redhat.com>
+	<CAFEAcA_2RaRsvm_=V4iDNk_vMOtiWUZs3-SdMh+DSYqGyPE0PQ@mail.gmail.com>
+	<08ce288c-610c-4dea-927d-262e7b75051f@redhat.com>
+In-Reply-To: <08ce288c-610c-4dea-927d-262e7b75051f@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC v4 00/16] VIRTIO-IOMMU device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,13 +27,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: hanji unit <hanjiunit@gmail.com>, qemu-discuss@nongnu.org, qemu-devel@nongnu.org
+To: Auger Eric <eric.auger@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Wei Huang <wei@redhat.com>, Andrew Jones <drjones@redhat.com>, "Michael
+	S. Tsirkin" <mst@redhat.com>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>, Tomasz Nowicki <tn@semihalf.com>, Will
+	Deacon <will.deacon@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Alex
+	Williamson <alex.williamson@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, "linuc.decode@gmail.com" <linuc.decode@gmail.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Christoffer Dall <christoffer.dall@linaro.org>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
 
-On Thu, 2017-10-12 at 16:25 -0400, hanji unit wrote:
-> Hello, is it possible to run (or rebuild modifying build flags) QEMU
-> without support for X11 window system integration?
-
-./configure --disable-gtk --disable-sdl --disable-opengl
-
-cheers,
-  Gerd
+PiBGcm9tOiBBdWdlciBFcmljIFttYWlsdG86ZXJpYy5hdWdlckByZWRoYXQuY29tXQ0KPiBTZW50
+OiBUaHVyc2RheSwgT2N0b2JlciAxMiwgMjAxNyA2OjEwIFBNDQo+IA0KPiBIaSBQZXRlciwNCj4g
+DQo+IE9uIDEyLzEwLzIwMTcgMTE6NTQsIFBldGVyIE1heWRlbGwgd3JvdGU6DQo+ID4gT24gMTEg
+T2N0b2JlciAyMDE3IGF0IDE3OjA4LCBBdWdlciBFcmljIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+
+IHdyb3RlOg0KPiA+PiBIaSBQZXRlciwNCj4gPj4NCj4gPj4gT24gMTEvMTAvMjAxNyAxNjo1Niwg
+UGV0ZXIgTWF5ZGVsbCB3cm90ZToNCj4gPj4+IE9uIDE5IFNlcHRlbWJlciAyMDE3IGF0IDA4OjQ2
+LCBFcmljIEF1Z2VyIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+DQo+IHdyb3RlOg0KPiA+Pj4+IFRo
+aXMgc2VyaWVzIGltcGxlbWVudHMgdGhlIHZpcnRpby1pb21tdSBkZXZpY2UuDQo+ID4+Pj4NCj4g
+Pj4+PiBUaGlzIHY0IGlzIGFuIHVwZ3JhZGUgdG8gdjAuNCBzcGVjIFsxXSBhbmQgYXBwbGllcyBv
+biBRRU1VIHYyLjEwLjAuDQo+ID4+Pj4gLSBwcm9iZSByZXF1ZXN0IHN1cHBvcnQgYWx0aG91Z2gg
+bm8gcmVzZXJ2ZWQgcmVnaW9uIGlzIHJldHVybmVkIGF0DQo+ID4+Pj4gICB0aGUgbW9tZW50DQo+
+ID4+Pj4gLSB1bm1hcCBzZW1hbnRpY3MgbGVzcyBzdHJpY3QsIGFzIHNwZWNpZmllZCBpbiB2MC40
+DQo+ID4+Pj4gLSBkZXZpY2UgcmVnaXN0cmF0aW9uLCBhdHRhY2gvZGV0YWNoIHJldmlzaXRlZA0K
+PiA+Pj4+IC0gc3BsaXQgaW50byBzbWFsbGVyIHBhdGNoZXMgdG8gZWFzZSByZXZpZXcNCj4gPj4+
+PiAtIHByb3Bvc2UgYSB3YXkgdG8gaW5mb3JtIHRoZSBJT01NVSBtciBhYm91dCB0aGUgcGFnZV9z
+aXplX21hc2sNCj4gPj4+PiAgIG9mIHVuZGVybHlpbmcgSFcgSU9NTVUsIGlmIGFueQ0KPiA+Pj4+
+IC0gcmVtb3ZlIHdhcm5pbmcgYXNzb2NpYXRlZCB3aXRoIHRoZSB0cmFuc2xhdGlvbiBvZiB0aGUg
+TVNJIGRvb3JiZWxsDQo+ID4+Pj4NCj4gPj4+PiBUaGUgZGV2aWNlIGdldHMgaW5zdGFudGlhdGVk
+IHVzaW5nIHRoZSAiLWRldmljZSB2aXJ0aW8taW9tbXUtZGV2aWNlIg0KPiA+Pj4+IG9wdGlvbi4g
+SXQgY3VycmVudGx5IHdvcmtzIHdpdGggQVJNIHZpcnQgbWFjaGluZSBvbmx5LCBhcyB0aGUgbWFj
+aGluZQ0KPiA+Pj4+IG11c3QgaGFuZGxlIHRoZSBkdCBiaW5kaW5nIGJldHdlZW4gdGhlIHZpcnRp
+by1tbWlvICJpb21tdSIgbm9kZQ0KPiBhbmQNCj4gPj4+PiB0aGUgUENJIGhvc3QgYnJpZGdlIG5v
+ZGUuDQo+ID4+Pg0KPiA+Pj4gQ291bGQgdGhpcyB3b3JrIG9uIHg4Niwgb3IgaXMgaXQgaW5oZXJl
+bnRseSBhcm0tb25seT8NCj4gPj4NCj4gPj4gWWVzIHRoaXMgaXMgdGhlIGdvYWwuIEF0IHRoZSBt
+b21lbnQgdGhlIEFDUEkgcHJvYmluZyBpcyBub3QgeWV0IHByb3Blcmx5DQo+ID4+IHNwZWNpZmll
+ZCBidXQgYSBRMzUgcHJvdG90eXBlIHdhcyBkZXZlbG9wZWQgaW4gdGhlIFJlZCBIYXQgVmlydCB0
+ZWFtLg0KPiA+PiBUaGlzIHdpbGwgYmUgcHJlc2VudGVkIGF0IHRoZSBLVk0gZm9ydW0uDQo+ID4N
+Cj4gPiBTaW5jZSBJIGhhdmUgdmVyeSBsaXR0bGUgZmFtaWxpYXJpdHkgd2l0aCB2aXJ0aW8gb3Ig
+aW9tbXUgY29kZSwNCj4gPiBJJ2QgYmUgbXVjaCBoYXBwaWVyIGlmIHRoaXMgd2FzIHJldmlld2Vk
+IGFzIGEgZ2VuZXJpYyB2aXJ0aW8taW9tbXUNCj4gPiBieSB0aGUgeDg2L3ZpcnRpbyBkZXZzIGFu
+ZCB0aGVuIHRoZSBhcm0gc3BlY2lmaWMgcGFydHMgZG9uZSBzZWNvbmQuLi4NCj4gDQo+IFVuZGVy
+c3Rvb2QuIEkgd2FzIHJhdGhlciBleHBlY3RpbmcgeW91IHRvIHJldmlldyB0aGUgc21tdXYzIGVt
+dWxhdGlvbg0KPiBjb2RlIHdoaWNoIHlvdSBkaWQsIGluIGEgY29tcHJlaGVuc2l2ZSBtYW5uZXIg
+Oy0pLCBhbmQgbWFueSB0aGFua3MgZm9yDQo+IHRoYXQuDQo+IA0KPiBOb3RlIHN1cmUgdGhpcyBp
+cyB0aW1lIHlldCB0byBnZXQgdGhpcyBSRkMgcmV2aWV3ZWQgYXMNCj4gLSB0aGUgdjAuNCB2aXJ0
+aW8taW9tbXUgZHJpdmVyIGl0IHJlbGllcyBvbiB3YXMgbm90IG9mZmljaWFsbHkgc3VibWl0dGVk
+LA0KPiAtIHRoZSB2aXJ0aW8taW9tbXUgc3BlY2lmaWNhdGlvbiByZXZpZXcgaGFzIG5vdCByZWFs
+bHkgYmVlbiByZXZpZXdlZCwNCj4gLSB0aGUgQUNQSSBwcm9iaW5nIG1ldGhvZCBoYXMgbm90IGJl
+ZW4gZGlzY3Vzc2VkIHlldC4NCj4gDQo+IEplYW4tUGhpbGlwcGUsIHBsZWFzZSBjb3JyZWN0IG1l
+IGlmIEkgYW0gd3JvbmcuDQo+IA0KPiBTbyB0byBtZSwgdGhpcyBpcyBwdXJlIFJGQyBhdCB0aGUg
+bW9tZW50Lg0KPiA+DQo+ID4gSSdtIGFsc28gbm90IGNsZWFyIG9uIHdoYXQgd2UncmUgZXhwZWN0
+aW5nIHRoZSByZWNvbW1lbmRlZCBvciBub3JtYWwNCj4gPiB3YXkgdG8gZG8gZGV2aWNlIHBhc3N0
+aHJvdWdoIGlzIGdvaW5nIHRvIGJlIC0tIHRoaXMgdmlydGlvLW1taW8sDQo+ID4gb3IgcHJlc2Vu
+dGluZyB0aGUgZ3Vlc3Qgd2l0aCBhbiBTTU1VdjMgaW50ZXJmYWNlPyBEbyB3ZSByZWFsbHkNCj4g
+PiBuZWVkIHRvIGltcGxlbWVudCBib3RoID8NCj4gDQo+IEkgdGhpbmsgdGhlIEtWTSBmb3J1bSBp
+cyB0aGUgcmlnaHQgcGxhY2UgdG8gc3luYyBhcyBib3RoIGFwcHJvYWNoZXMgd2lsbA0KPiBiZSBw
+cmVzZW50ZWQgYW5kIHNvbWUgcHJvcy9jb25zICsgcGVyZm9ybWFuY2UgZmlndXJlcyB3aWxsIGJl
+IGdpdmVuLg0KPiANCj4gQXMgd2UgdGFsayBhYm91dCBjaG9vc2luZywgdGhlcmUgaXMgb25lIGFs
+dGVybmF0aXZlIHRoYXQgd2FzIHN1Z2dlc3RlZA0KPiBvbiB0aGUgTUwgYnkgQWxleCAmIE1pY2hh
+ZWwgYnV0IG5ldmVyIHJlYWxseSBnZXQgY29uc2lkZXJlZCB5ZXQgYW5kDQo+IG1heWJlIHNob3Vs
+ZCBiZTogdXNpbmcgaW50ZWwgaW9tbXUgZW11bGF0aW9uIGNvZGUgZm9yIEFSTS4gSQ0KPiBha25v
+d2xlZGdlDQo+IHRoaXMgZGVzZXJ2ZXMgYSB0aG9yb3VnaCBpbXBhY3Qgc3R1ZHkgb24ga2VybmVs
+IGFuZCBGVyBzaWRlIGJ1dCBJIHdvdWxkDQo+IGJlIGhhcHB5IHRvIGdldCB5b3VyIG9waW5pb24g
+YWJvdXQgdGhlIFFFTVUgc2lkZS4gV291bGQgeW91IGhhdmUgYSBieS0NCj4gcHJpbmNpcGxlIHJl
+amVjdGlvbiBvZiB0aGlzIGlkZWEgdG8gaW5zdGFudGlhdGUgc3VjaCBhbiBJbnRlbCBkZXZpY2Ug
+aW4NCj4gbWFjaCB2aXJ0IG9yIHdvdWxkIGl0IGJlIHNvbWV0aGluZyB5b3Ugd291bGQgYmUgcmVh
+ZHkgdG8gY29uc2lkZXI/DQo+IA0KDQpiZWFyIHBvc3RpbmcgYSBsaW5rIHRvIEFsZXgvTWljaGFl
+bCdzIGNvbW1lbnQ/IGludGVyZXN0aW5nIHRvIGtub3cNCnRoZSByYXRpb25hbGUuLi4NCg0KVGhh
+bmtzDQpLZXZpbg0K
