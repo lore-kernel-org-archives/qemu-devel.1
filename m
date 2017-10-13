@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1e2ujg-0003ww-Db
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 03:50:25 -0400
+	(envelope-from <haozhong.zhang@intel.com>) id 1e2umn-0004hq-Ph
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 03:53:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1e2uja-0004Td-28
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 03:50:23 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:56260)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1e2ujZ-0004SC-SS
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 03:50:18 -0400
-Received: by mail-wm0-x231.google.com with SMTP id u138so19410923wmu.4
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 00:50:16 -0700 (PDT)
-References: <20170928165414.7339-1-richard.henderson@linaro.org>
-	<20170928165414.7339-10-richard.henderson@linaro.org>
-	<87y3otzk34.fsf@linaro.org>
-	<f185d9b4-bd5d-0294-bcfa-76214caa3167@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <f185d9b4-bd5d-0294-bcfa-76214caa3167@linaro.org>
-Date: Fri, 13 Oct 2017 08:50:13 +0100
-Message-ID: <87shena3m2.fsf@linaro.org>
+	(envelope-from <haozhong.zhang@intel.com>) id 1e2umi-0005lq-MF
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 03:53:37 -0400
+Received: from mga11.intel.com ([192.55.52.93]:7439)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1e2umi-0005lN-Bp
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 03:53:32 -0400
+Date: Fri, 13 Oct 2017 15:53:26 +0800
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Message-ID: <20171013075326.77azyi4j2wo3b2fx@hz-desktop>
+References: <20170911043820.14617-1-haozhong.zhang@intel.com>
+	<20170911044157.15403-1-haozhong.zhang@intel.com>
+	<20170911160818.1bd44a82@nial.brq.redhat.com>
+	<alpine.DEB.2.10.1709111119480.19719@sstabellini-ThinkPad-X260>
+	<20170912031509.vufszbju3s2v2bw3@hz-desktop>
+	<20171010160544.GA1772@char.us.oracle.com>
+	<20171012124544.dq3wyr65tefi3glk@hz-desktop>
+	<f6478644-0d4a-6531-9016-aee2a0e76417@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 9/9] disas: Add capstone as submodule
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f6478644-0d4a-6531-9016-aee2a0e76417@redhat.com>
+Subject: Re: [Qemu-devel] [RFC QEMU PATCH v3 00/10] Implement vNVDIMM for
+ Xen HVM guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,28 +35,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Stefano Stabellini <sstabellini@kernel.org>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, xen-devel@lists.xen.org, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Richard Henderson <rth@twiddle.net>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, ian.jackson@eu.citrix.com, wei.liu2@citrix.com, george.dunlap@citrix.com, JBeulich@suse.com, andrew.cooper3@citrix.com
 
-
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> On 10/02/2017 10:43 AM, Alex Benn=C3=A9e wrote:
->>> +    mkdir -p capstone
->>
->> Having a mkdir -p here seems a little out of place. Shouldn't the build
->> directory creation be handled by the make recipe?
+On 10/12/17 17:45 +0200, Paolo Bonzini wrote:
+> On 12/10/2017 14:45, Haozhong Zhang wrote:
+> > Basically, QEMU builds two ROMs for guest, /rom@etc/acpi/tables and
+> > /rom@etc/table-loader. The former is unstructured to guest, and
+> > contains all data of guest ACPI. The latter is a BIOSLinkerLoader
+> > organized as a set of commands, which direct the guest (e.g., SeaBIOS
+> > on KVM/QEMU) to relocate data in the former file, recalculate checksum
+> > of specified area, and fill guest address in specified ACPI field.
+> > 
+> > One part of my patches is to implement a mechanism to tell Xen which
+> > part of ACPI data is a table (NFIT), and which part defines a
+> > namespace device and what the device name is. I can add two new loader
+> > commands for them respectively.
+> > 
+> > Because they just provide information and SeaBIOS in non-xen
+> > environment ignores unrecognized commands, they will not break SeaBIOS
+> > in non-xen environment.
+> > 
+> > On QEMU side, most Xen-specific hacks in ACPI builder could be
+> > dropped, and replaced by adding the new loader commands (though they
+> > may be used only by Xen).
+> > 
+> > On Xen side, a fw_cfg driver and a BIOSLinkerLoader command executor
+> > are needed in, perhaps, hvmloader.
+> 
+> If Xen has to parse BIOSLinkerLoader, it can use the existing commands
+> to process a reduced set of ACPI tables.  In other words,
+> etc/acpi/tables would only include the NFIT, the SSDT with namespace
+> devices, and the XSDT.  etc/acpi/rsdp would include the RSDP table as usual.
 >
-> *shrug* We do this for the other directories at configure time.
+> hvmloader can then:
+> 
+> 1) allocate some memory for where the XSDT will go
+> 
+> 2) process the BIOSLinkerLoader like SeaBIOS would do
+> 
+> 3) find the RSDP in low memory, since the loader script must have placed
+> it there.  If it cannot find it, allocate some low memory, fill it with
+> the RSDP header and revision, and and jump to step 6
+> 
+> 4) If it found QEMU's RSDP, use it to find QEMU's XSDT
+> 
+> 5) Copy ACPI table pointers from QEMU to hvmloader's RSDT and/or XSDT.
+> 
+> 6) build hvmloader tables and link them into the RSDT and/or XSDT as usual.
+> 
+> 7) overwrite the RSDP in low memory with a pointer to hvmloader's own
+> RSDT and/or XSDT, and updated the checksums
+> 
+> QEMU's XSDT remains there somewhere in memory, unused but harmless.
+> 
 
-fair enough.
+It can work for plan tables which do not contain AML.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+However, for a namespace device, Xen needs to know its name in order
+to detect the potential name conflict with those used in Xen built
+ACPI. Xen does not (and is not going to) introduce an AML parser, so
+it cannot get those device names from QEMU built ACPI by its own.
 
->
->
-> r~
+The idea of either this patch series or the new BIOSLinkerLoader
+command is to let QEMU tell Xen where the definition body of a
+namespace device (i.e. that part within the outmost "Device(NAME)") is
+and what the device name is. Xen, after the name conflict check, can
+re-package the definition body in a namespace device (w/ minimal AML
+builder code added in Xen) and then in SSDT.
 
 
---
-Alex Benn=C3=A9e
+Haozhong
