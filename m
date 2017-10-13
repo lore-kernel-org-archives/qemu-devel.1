@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1e35pN-0003Oi-1b
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 15:41:01 -0400
+	(envelope-from <lersek@redhat.com>) id 1e35yl-0005IB-Sk
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 15:50:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1e35pI-0002qw-5t
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 15:41:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34278)
+	(envelope-from <lersek@redhat.com>) id 1e35yi-0008Co-10
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 15:50:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50538)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1e35pH-0002qa-Vx
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 15:40:56 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1e35yh-0008CY-Qa
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 15:50:39 -0400
 References: <4cce2b8b-a411-bd5d-a06f-b0b80a5fb2f1@redhat.com>
-	<CAKv+Gu820vLCvNq2X_Fha2AW59HsNfTLk--J+wTt+fFdMu7FMw@mail.gmail.com>
+	<CAFEAcA8yvST1fKaLjauz3OV=gRTEKsuLfWvJ3NgCA_weFy2cOg@mail.gmail.com>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <7b84a76d-7708-7c8c-8fcf-7fe5549ed43f@redhat.com>
-Date: Fri, 13 Oct 2017 21:40:47 +0200
+Message-ID: <b32eabb5-165a-f57c-2ecd-dd2008db4ea0@redhat.com>
+Date: Fri, 13 Oct 2017 21:50:33 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAKv+Gu820vLCvNq2X_Fha2AW59HsNfTLk--J+wTt+fFdMu7FMw@mail.gmail.com>
+In-Reply-To: <CAFEAcA8yvST1fKaLjauz3OV=gRTEKsuLfWvJ3NgCA_weFy2cOg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -28,44 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: "Leif Lindholm (Linaro address)" <leif.lindholm@linaro.org>, edk2-devel-01 <edk2-devel@lists.01.org>, Drew Jones <drjones@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Andrea Bolognani <abologna@redhat.com>, libvirt devel <libvir-list@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Leif Lindholm (Linaro address)" <leif.lindholm@linaro.org>, edk2-devel-01 <edk2-devel@lists.01.org>, Drew Jones <drjones@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Andrea Bolognani <abologna@redhat.com>, libvirt devel <libvir-list@redhat.com>
 
-On 10/13/17 15:21, Ard Biesheuvel wrote:
+On 10/13/17 18:18, Peter Maydell wrote:
 > On 13 October 2017 at 13:51, Laszlo Ersek <lersek@redhat.com> wrote:
->> Hi Ard, Leif,
->>
->> the current physical memory map of the "virt" machine type doesn't leave
->> much room for ECAM / MMCONFIG, which limits the number of PCI Express
->> root ports and downstream ports (each port takes a separate bus number,
->> and each bus number eats up a chunk of the ECAM area). Also, each port
->> can only accommodate a single PCI Express device. In practice this
->> limits the number of (hot-pluggable) PCIe devices to approx. 16, which
->> is deemed by some "not scaleable enough". (For devices that only need to
->> be cold-plugged, they can be placed directly on the root complex, as
->> integrated devices, possibly grouping them into multifunction devices
->> even; so those don't need bus numbers.)
->>
->> In order to grow the MMCONFIG area (and for some other reasons
->> possibly), the phys memmap of "virt" should be shuffled around a bit.
->> This affects the "system" DRAM too.
->>
+>> Another idea is to move *the* system DRAM base to a different guest-phys
+>> address. (Likely using a different version of the "virt" machine type,
+>> or even a different machine type entirely.) This would not be compatible
+>> with current ArmVirtQemu, which hard-codes the system DRAM base in
+>> several, quite brittle / sensitive, locations. (More on this later --
+>> that's going to be the larger part of my email anyway.) In order to
+>> handle the new base in ArmVirtQemu, two approaches are possible: change
+>> the hard-coded address(es), or cope with the address dynamically.
 > 
-> Is it really necessary to put the ECAM area below 4 GB? For ARM, I
-> understand this would be an issue, but does the spec actually mandate
-> anything like this?
+> I strongly don't want to move the DRAM base in the "virt" board.
 
-No, I don't think it's inherently necessary to put ECAM under 4GB.
+You really cannot *not* want it more strongly than I :)
 
-It's just that I approached the problem such that the firmware would be
-burdened with the lion's share of the complexity, in order to keep
-things "compatible" for the rest of the guest world.
+(See my answer to Ard for why I went to such lengths nonetheless in
+mapping out the consequences for the firmware -- I knew and feared I'd
+find monsters there, but when I'm invited to look, it's only honest to
+look.)
 
-(Speaking personally, I'd absolutely prefer to keep the DRAM base
-untouched, at 1GB, but I was invited to take a good hard look at what
-moving the DRAM base would take for the firmware, and I made an honest
-effort to determine the impact. It doesn't imply that I like the result
-in the least, or that I personally subscribe to the idea.)
+> This is one of the few fixed things we've said that guest code
+> can rely on without having to fish the information out of the
+> device tree.
 
-Thanks!
+And, as one co-maintainer of one guest firmware, I'm immensely relieved
+to learn about, and benefit from, this guarantee.
+
+Thanks,
 Laszlo
