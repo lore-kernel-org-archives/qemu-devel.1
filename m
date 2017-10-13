@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e2zSL-000274-Oj
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 08:52:51 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e2zVZ-0003n9-SZ
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 08:56:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1e2zSJ-00082O-3G
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 08:52:49 -0400
-Date: Fri, 13 Oct 2017 14:52:43 +0200
-From: Alberto Garcia <berto@igalia.com>
-Message-ID: <20171013125243.GA15500@igalia.com>
-References: <cover.1507813391.git.berto@igalia.com>
-	<65c2b2b32a686d3084a1579583334a85b706edcb.1507813391.git.berto@igalia.com>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1e2zVX-0002mF-Aw
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 08:56:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47082)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1e2zVX-0002li-2L
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 08:56:07 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 609DC8046F
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 12:56:05 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri, 13 Oct 2017 14:55:33 +0200
+Message-Id: <20171013125533.9153-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65c2b2b32a686d3084a1579583334a85b706edcb.1507813391.git.berto@igalia.com>
-Subject: Re: [Qemu-devel] [PATCH 18/31] qcow2: Update
- qcow2_get_cluster_offset() to support L2 slices
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] usb-ccid: remove needless migration state
+ code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +33,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>
+Cc: kraxel@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On Thu, Oct 12, 2017 at 04:05:32PM +0300, Alberto Garcia wrote:
-> @@ -522,8 +522,8 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
->  {
->      BDRVQcow2State *s = bs->opaque;
->      unsigned int l2_index;
-> -    uint64_t l1_index, l2_offset, *l2_table;
-> -    int l1_bits, c;
-> +    uint64_t l1_index, l2_offset, *l2_slice;
-> +    int c;
->      unsigned int offset_in_cluster;
->      uint64_t bytes_available, bytes_needed, nb_clusters;
->      QCow2ClusterType type;
-> @@ -532,12 +532,11 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
->      offset_in_cluster = offset_into_cluster(s, offset);
->      bytes_needed = (uint64_t) *bytes + offset_in_cluster;
->  
-> -    l1_bits = s->l2_bits + s->cluster_bits;
-> -
->      /* compute how many bytes there are between the start of the cluster
-> -     * containing offset and the end of the l1 entry */
-> -    bytes_available = (1ULL << l1_bits) - (offset & ((1ULL << l1_bits) - 1))
-> -                    + offset_in_cluster;
-> +     * containing offset and the end of the l2 slice that contains
-> +     * the entry pointing to it */
-> +    bytes_available = (s->l2_slice_size - offset_to_l2_slice_index(s, offset))
-> +        << s->cluster_bits;
+This code appears to be unused since its introduction. We need to keep
+the state_vmstate field byte in VMState for compatibility reasons.
 
-There's a mistake here, this should be cast to uint64_t before doing
-the shift, else it overflows if the cluster size is large:
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ hw/usb/dev-smartcard-reader.c | 23 +----------------------
+ 1 file changed, 1 insertion(+), 22 deletions(-)
 
-    bytes_available =
-        ((uint64_t) (s->l2_slice_size - offset_to_l2_slice_index(s, offset)))
-        << s->cluster_bits;
-
-The next revision will have this correction, but I'm not sending it
-now, so if you want to test/review this one please go ahead.
-
-Berto
+diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.=
+c
+index 0c77d2a41d..e334d3be11 100644
+--- a/hw/usb/dev-smartcard-reader.c
++++ b/hw/usb/dev-smartcard-reader.c
+@@ -270,11 +270,6 @@ typedef struct BulkIn {
+     uint32_t pos;
+ } BulkIn;
+=20
+-enum {
+-    MIGRATION_NONE,
+-    MIGRATION_MIGRATED,
+-};
+-
+ typedef struct CCIDBus {
+     BusState qbus;
+ } CCIDBus;
+@@ -306,9 +301,6 @@ typedef struct USBCCIDState {
+     CCID_ProtocolDataStructure abProtocolDataStructure;
+     uint32_t ulProtocolDataStructureSize;
+     uint32_t state_vmstate;
+-    uint32_t migration_target_ip;
+-    uint16_t migration_target_port;
+-    uint8_t  migration_state;
+     uint8_t  bmSlotICCState;
+     uint8_t  powered;
+     uint8_t  notify_slot_change;
+@@ -1243,9 +1235,6 @@ int ccid_card_ccid_attach(CCIDCardState *card)
+     USBCCIDState *s =3D USB_CCID_DEV(dev);
+=20
+     DPRINTF(s, 1, "CCID Attach\n");
+-    if (s->migration_state =3D=3D MIGRATION_MIGRATED) {
+-        s->migration_state =3D MIGRATION_NONE;
+-    }
+     return 0;
+ }
+=20
+@@ -1341,9 +1330,6 @@ static void ccid_realize(USBDevice *dev, Error **er=
+rp)
+     s->intr =3D usb_ep_get(dev, USB_TOKEN_IN, CCID_INT_IN_EP);
+     s->bulk =3D usb_ep_get(dev, USB_TOKEN_IN, CCID_BULK_IN_EP);
+     s->card =3D NULL;
+-    s->migration_state =3D MIGRATION_NONE;
+-    s->migration_target_ip =3D 0;
+-    s->migration_target_port =3D 0;
+     s->dev.speed =3D USB_SPEED_FULL;
+     s->dev.speedmask =3D USB_SPEED_MASK_FULL;
+     s->notify_slot_change =3D false;
+@@ -1379,13 +1365,6 @@ static int ccid_pre_save(void *opaque)
+     USBCCIDState *s =3D opaque;
+=20
+     s->state_vmstate =3D s->dev.state;
+-    if (s->dev.attached) {
+-        /*
+-         * Migrating an open device, ignore reconnection CHR_EVENT to av=
+oid an
+-         * erroneous detach.
+-         */
+-        s->migration_state =3D MIGRATION_MIGRATED;
+-    }
+=20
+     return 0;
+ }
+@@ -1452,7 +1431,7 @@ static VMStateDescription ccid_vmstate =3D {
+         VMSTATE_STRUCT_ARRAY(pending_answers, USBCCIDState,
+                         PENDING_ANSWERS_NUM, 1, answer_vmstate, Answer),
+         VMSTATE_UINT32(pending_answers_num, USBCCIDState),
+-        VMSTATE_UINT8(migration_state, USBCCIDState),
++        VMSTATE_UNUSED(1), /* was migration_state */
+         VMSTATE_UINT32(state_vmstate, USBCCIDState),
+         VMSTATE_END_OF_LIST()
+     }
+--=20
+2.15.0.rc0.40.gaefcc5f6f
