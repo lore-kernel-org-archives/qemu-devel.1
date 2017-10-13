@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e2wqw-0005gu-Gm
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 06:06:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1e2xA4-0000gj-Ct
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 06:25:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e2wqr-0004iI-KK
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 06:06:02 -0400
-Received: from 7.mo5.mail-out.ovh.net ([178.32.124.100]:35090)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e2wqr-0004gD-EG
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 06:05:57 -0400
-Received: from player773.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id C959713F9FE
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 12:05:55 +0200 (CEST)
-Date: Fri, 13 Oct 2017 12:05:46 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171013120546.7a89eeaf@bahia.lan>
-In-Reply-To: <20171013112459.0082e823@nial.brq.redhat.com>
-References: <150788370618.25736.8030708425923435364.stgit@bahia>
-	<150788373123.25736.7359515819699182906.stgit@bahia>
-	<20171013112459.0082e823@nial.brq.redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1e2xA0-0000Wj-Dt
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 06:25:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45678)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e2xA0-0000WM-6z
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 06:25:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e2x9y-0001Si-6c
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 10:25:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2C2CC2E80CC
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 10:25:42 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] monitor: add proper reference counting
- of the current CPU
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 13 Oct 2017 10:18:05 -0000
+From: Fam Zheng <famz@redhat.com>
+Reply-To: Bug 1723161 <1723161@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150782239801.1729.1327212510076491094.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150788988536.22243.4791868464340279708.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1723161] Re: Migration failing in qemu-2.10.1 but
+ working qemu-2.9.1 and earlier with same options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,91 +37,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Dr. David
-	Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-On Fri, 13 Oct 2017 11:24:59 +0200
-Igor Mammedov <imammedo@redhat.com> wrote:
+Hi William,
 
-> On Fri, 13 Oct 2017 10:35:31 +0200
-> Greg Kurz <groug@kaod.org> wrote:
-> 
-> > If a CPU selected with the "cpu" command is hot-unplugged then "info cpus"
-> > causes QEMU to exit:
-> > 
-> > (qemu) device_del cpu1
-> > (qemu) info cpus
-> > qemu:qemu_cpu_kick_thread: No such process
-> > 
-> > This happens because "cpu" stores the pointer to the selected CPU into
-> > the monitor structure. When the CPU is hot-unplugged, we end up with a
-> > dangling pointer. The "info cpus" command then does:
-> > 
-> > hmp_info_cpus()
-> >  monitor_get_cpu_index()
-> >   mon_get_cpu()
-> >    cpu_synchronize_state() <--- called with dangling pointer
-> > 
-> > This could cause a QEMU crash as well.
-> > 
-> > This patch switches the monitor to use object_ref() to ensure the
-> > CPU object doesn't vanish unexpectedly. The reference is dropped
-> > either when "cpu" is used to switch to another CPU, or when the
-> > selected CPU is unrealized and cpu_list_remove() sets its cpu_index
-> > back to UNASSIGNED_CPU_INDEX.  
-> I don't really like an idea of leaving dangling cpu around.
-> Is it possible to store QOM path on set_cpu in monitor and
-> resolving it each to instance each time it's needed?
-> 
+Just to confirm: are both src and dest on the same host, using the same
+command line options? Then I'm confused why you need block migration
+because they share the same image files (for OVMF pflash and ${HDRIVE}).
 
-It sounds workable. Also it would allow the fix to not depend on patch 1
-for ppc.
+-- =
 
-Thanks for the suggestion!
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1723161
 
-> 
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  monitor.c |   12 ++++++++++++
-> >  1 file changed, 12 insertions(+)
-> > 
-> > diff --git a/monitor.c b/monitor.c
-> > index fe0d1bdbb461..1c0b9a2c3ad3 100644
-> > --- a/monitor.c
-> > +++ b/monitor.c
-> > @@ -579,6 +579,9 @@ static void monitor_data_init(Monitor *mon)
-> >  
-> >  static void monitor_data_destroy(Monitor *mon)
-> >  {
-> > +    if (mon->mon_cpu) {
-> > +        object_unref((Object *) mon->mon_cpu);
-> > +    }
-> >      qemu_chr_fe_deinit(&mon->chr, false);
-> >      if (monitor_is_qmp(mon)) {
-> >          json_message_parser_destroy(&mon->qmp.parser);
-> > @@ -1047,12 +1050,21 @@ int monitor_set_cpu(int cpu_index)
-> >      if (cpu == NULL) {
-> >          return -1;
-> >      }
-> > +    if (cur_mon->mon_cpu) {
-> > +        object_unref((Object *) cur_mon->mon_cpu);
-> > +    }
-> >      cur_mon->mon_cpu = cpu;
-> > +    object_ref((Object *) cpu);
-> >      return 0;
-> >  }
-> >  
-> >  CPUState *mon_get_cpu(void)
-> >  {
-> > +    if (cur_mon->mon_cpu &&
-> > +        cur_mon->mon_cpu->cpu_index == UNASSIGNED_CPU_INDEX) {
-> > +        object_unref((Object *) cur_mon->mon_cpu);
-> > +        cur_mon->mon_cpu = NULL;
-> > +    }
-> >      if (!cur_mon->mon_cpu) {
-> >          if (!first_cpu) {
-> >              return NULL;
-> > 
-> >   
-> 
+Title:
+  Migration failing in qemu-2.10.1 but working qemu-2.9.1 and earlier
+  with same options
+
+Status in QEMU:
+  New
+
+Bug description:
+  =
+
+  Qemu-2.10.1 migration failing with the following error:
+  Receiving block device images
+  qemu-system-x86_64: error while loading section id 2(block)
+  qemu-system-x86_64: load of migration failed: Input/output error
+
+  Migration is setup on the destination system of the migration using:
+  -incoming tcp:0:4444
+
+  Migration is initiated from the source using the following commands in it=
+s qemu monitor:
+  migrate -b "tcp:localhost:4444"
+
+  The command-line used in both the source and destination is:
+  qemu-system-x86_64 \
+          -nodefaults \
+          -pidfile vm0.pid \
+          -enable-kvm \
+          -machine q35 \
+          -cpu host -smp 2 \
+          -m 4096M \
+          -drive if=3Dpflash,format=3Draw,unit=3D0,file=3DOVMF_CODE.fd,read=
+only \
+          -drive if=3Dpflash,format=3Draw,unit=3D1,file=3DOVMF_VARS.fd \
+          -drive file=3D${HDRIVE},format=3Dqcow2 \
+          -drive media=3Dcdrom \
+          -usb -device usb-tablet \
+          -vga std -vnc :0 \
+          -net nic,macaddr=3D${TAPMACADDR} -net user,net=3D192.168.2.0/24,d=
+hcpstart=3D192.168.2.10 \
+          -serial stdio \
+          -monitor unix:${MONITORSOCKET},server,nowait
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1723161/+subscriptions
