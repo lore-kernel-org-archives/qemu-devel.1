@@ -1,39 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2yP9-0007Lo-Qn
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2yPB-0007Lz-Aq
 	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:45:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2yP5-0002rT-QV
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:45:27 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44782
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2yP8-0002ti-Dy
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:45:29 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37318)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e2yP5-0002r2-Ex
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:45:23 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	id 1e2yP8-0002t8-46
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:45:26 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9DBhtXn088100
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 07:45:20 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2djth60kgn-1
+	v9DBhm69080234
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 07:45:22 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2djtvbfjed-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 07:45:20 -0400
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 07:45:21 -0400
 Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Fri, 13 Oct 2017 07:45:19 -0400
+	Fri, 13 Oct 2017 07:45:20 -0400
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Fri, 13 Oct 2017 07:44:53 -0400
+Date: Fri, 13 Oct 2017 07:44:56 -0400
 In-Reply-To: <1507895100-26457-1-git-send-email-stefanb@linux.vnet.ibm.com>
 References: <1507895100-26457-1-git-send-email-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <1507895100-26457-5-git-send-email-stefanb@linux.vnet.ibm.com>
+Message-Id: <1507895100-26457-8-git-send-email-stefanb@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v3 04/11] tpm-backend: Initialize and free data
- members in it's own methods
+Subject: [Qemu-devel] [PULL v3 07/11] tpm-backend: Move realloc_buffer()
+ implementation to tpm-tis model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,186 +46,137 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, amarnath.valluri@intel.com, marcan
 
 From: Amarnath Valluri <amarnath.valluri@intel.com>
 
-Initialize and free TPMBackend data members in it's own instance_init() a=
-nd
-instance_finalize methods.
-
-Took the opportunity to remove unneeded destroy() method from TpmDriverOp=
-s
-interface as TPMBackend is a Qemu Object, we can use object_unref() inpla=
-ce of
-tpm_backend_destroy() to free the backend object, hence removed destroy()=
- from
-TPMDriverOps interface.
+buffer reallocation is very unlikely to be backend specific. Hence move i=
+nside
+the tis.
 
 Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 ---
- backends/tpm.c               | 16 ++++++----------
- hw/tpm/tpm_passthrough.c     | 31 ++++++++++++-------------------
- include/sysemu/tpm_backend.h |  7 -------
- tpm.c                        |  2 +-
- 4 files changed, 19 insertions(+), 37 deletions(-)
+ backends/tpm.c               |  9 ---------
+ hw/tpm/tpm_passthrough.c     | 12 ------------
+ hw/tpm/tpm_tis.c             | 14 ++++++++++++--
+ include/sysemu/tpm_backend.h | 12 ------------
+ 4 files changed, 12 insertions(+), 35 deletions(-)
 
 diff --git a/backends/tpm.c b/backends/tpm.c
-index ce56c3b..cf5abf1 100644
+index de313c9..37c84b7 100644
 --- a/backends/tpm.c
 +++ b/backends/tpm.c
-@@ -51,15 +51,6 @@ const char *tpm_backend_get_desc(TPMBackend *s)
-     return k->ops->desc();
+@@ -80,15 +80,6 @@ bool tpm_backend_had_startup_error(TPMBackend *s)
+     return s->had_startup_error;
  }
 =20
--void tpm_backend_destroy(TPMBackend *s)
+-size_t tpm_backend_realloc_buffer(TPMBackend *s, TPMSizedBuffer *sb)
 -{
 -    TPMBackendClass *k =3D TPM_BACKEND_GET_CLASS(s);
 -
--    k->ops->destroy(s);
+-    assert(k->ops->realloc_buffer);
 -
--    tpm_backend_thread_end(s);
+-    return k->ops->realloc_buffer(sb);
 -}
 -
- int tpm_backend_init(TPMBackend *s, TPMState *state,
-                      TPMRecvDataCB *datacb)
+ void tpm_backend_deliver_request(TPMBackend *s)
  {
-@@ -182,17 +173,22 @@ static void tpm_backend_prop_set_opened(Object *obj=
-, bool value, Error **errp)
-=20
- static void tpm_backend_instance_init(Object *obj)
- {
-+    TPMBackend *s =3D TPM_BACKEND(obj);
-+
-     object_property_add_bool(obj, "opened",
-                              tpm_backend_prop_get_opened,
-                              tpm_backend_prop_set_opened,
-                              NULL);
--
-+    s->fe_model =3D -1;
- }
-=20
- static void tpm_backend_instance_finalize(Object *obj)
- {
-     TPMBackend *s =3D TPM_BACKEND(obj);
-=20
-+    g_free(s->id);
-+    g_free(s->path);
-+    g_free(s->cancel_path);
-     tpm_backend_thread_end(s);
- }
-=20
+     g_thread_pool_push(s->thread_pool, (gpointer)TPM_BACKEND_CMD_PROCESS=
+_CMD,
 diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
-index f50d9cf..815a72e 100644
+index 84fc49a..22d3460 100644
 --- a/hw/tpm/tpm_passthrough.c
 +++ b/hw/tpm/tpm_passthrough.c
-@@ -417,8 +417,6 @@ static TPMBackend *tpm_passthrough_create(QemuOpts *o=
-pts, const char *id)
-     TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
-=20
-     tb->id =3D g_strdup(id);
--    /* let frontend set the fe_model to proper value */
--    tb->fe_model =3D -1;
-=20
-     if (tpm_passthrough_handle_device_opts(opts, tb)) {
-         goto err_exit;
-@@ -432,26 +430,11 @@ static TPMBackend *tpm_passthrough_create(QemuOpts =
-*opts, const char *id)
-     return tb;
-=20
- err_exit:
--    g_free(tb->id);
-+    object_unref(obj);
-=20
-     return NULL;
+@@ -247,17 +247,6 @@ static int tpm_passthrough_reset_tpm_established_fla=
+g(TPMBackend *tb,
+     return 0;
  }
 =20
--static void tpm_passthrough_destroy(TPMBackend *tb)
+-static size_t tpm_passthrough_realloc_buffer(TPMSizedBuffer *sb)
 -{
--    TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
+-    size_t wanted_size =3D 4096; /* Linux tpm.c buffer size */
 -
--    tpm_passthrough_cancel_cmd(tb);
--
--    qemu_close(tpm_pt->tpm_fd);
--    qemu_close(tpm_pt->cancel_fd);
--
--    g_free(tb->id);
--    g_free(tb->path);
--    g_free(tb->cancel_path);
--    g_free(tpm_pt->tpm_dev);
+-    if (sb->size !=3D wanted_size) {
+-        sb->buffer =3D g_realloc(sb->buffer, wanted_size);
+-        sb->size =3D wanted_size;
+-    }
+-    return sb->size;
 -}
 -
- static const QemuOptDesc tpm_passthrough_cmdline_opts[] =3D {
-     TPM_STANDARD_CMDLINE_OPTS,
-     {
-@@ -472,7 +455,6 @@ static const TPMDriverOps tpm_passthrough_driver =3D =
+ static void tpm_passthrough_cancel_cmd(TPMBackend *tb)
+ {
+     TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(tb);
+@@ -435,7 +424,6 @@ static const TPMDriverOps tpm_passthrough_driver =3D =
 {
      .opts                     =3D tpm_passthrough_cmdline_opts,
-     .desc                     =3D tpm_passthrough_create_desc,
+     .desc                     =3D "Passthrough TPM backend driver",
      .create                   =3D tpm_passthrough_create,
--    .destroy                  =3D tpm_passthrough_destroy,
-     .init                     =3D tpm_passthrough_init,
-     .startup_tpm              =3D tpm_passthrough_startup_tpm,
-     .realloc_buffer           =3D tpm_passthrough_realloc_buffer,
-@@ -486,10 +468,21 @@ static const TPMDriverOps tpm_passthrough_driver =3D=
- {
-=20
- static void tpm_passthrough_inst_init(Object *obj)
- {
-+    TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(obj);
-+
-+    tpm_pt->tpm_fd =3D -1;
-+    tpm_pt->cancel_fd =3D -1;
+-    .realloc_buffer           =3D tpm_passthrough_realloc_buffer,
+     .reset                    =3D tpm_passthrough_reset,
+     .cancel_cmd               =3D tpm_passthrough_cancel_cmd,
+     .get_tpm_established_flag =3D tpm_passthrough_get_tpm_established_fl=
+ag,
+diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+index a6440fe..d5118e7 100644
+--- a/hw/tpm/tpm_tis.c
++++ b/hw/tpm/tpm_tis.c
+@@ -963,6 +963,16 @@ static int tpm_tis_do_startup_tpm(TPMState *s)
+     return tpm_backend_startup_tpm(s->be_driver);
  }
 =20
- static void tpm_passthrough_inst_finalize(Object *obj)
- {
-+    TPMPassthruState *tpm_pt =3D TPM_PASSTHROUGH(obj);
++static void tpm_tis_realloc_buffer(TPMSizedBuffer *sb)
++{
++    size_t wanted_size =3D 4096; /* Linux tpm.c buffer size */
 +
-+    tpm_passthrough_cancel_cmd(TPM_BACKEND(obj));
++    if (sb->size !=3D wanted_size) {
++        sb->buffer =3D g_realloc(sb->buffer, wanted_size);
++        sb->size =3D wanted_size;
++    }
++}
 +
-+    qemu_close(tpm_pt->tpm_fd);
-+    qemu_close(tpm_pt->cancel_fd);
-+    g_free(tpm_pt->tpm_dev);
- }
+ /*
+  * Get the TPMVersion of the backend device being used
+  */
+@@ -1010,9 +1020,9 @@ static void tpm_tis_reset(DeviceState *dev)
+         tis->loc[c].state =3D TPM_TIS_STATE_IDLE;
 =20
- static void tpm_passthrough_class_init(ObjectClass *klass, void *data)
+         tis->loc[c].w_offset =3D 0;
+-        tpm_backend_realloc_buffer(s->be_driver, &tis->loc[c].w_buffer);
++        tpm_tis_realloc_buffer(&tis->loc[c].w_buffer);
+         tis->loc[c].r_offset =3D 0;
+-        tpm_backend_realloc_buffer(s->be_driver, &tis->loc[c].r_buffer);
++        tpm_tis_realloc_buffer(&tis->loc[c].r_buffer);
+     }
+=20
+     tpm_tis_do_startup_tpm(s);
 diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
-index 58308b3..202ec8d 100644
+index e96c191..2c798a1 100644
 --- a/include/sysemu/tpm_backend.h
 +++ b/include/sysemu/tpm_backend.h
-@@ -78,7 +78,6 @@ struct TPMDriverOps {
-     const char *(*desc)(void);
+@@ -84,8 +84,6 @@ struct TPMDriverOps {
+     /* start up the TPM on the backend */
+     int (*startup_tpm)(TPMBackend *t);
 =20
-     TPMBackend *(*create)(QemuOpts *opts, const char *id);
--    void (*destroy)(TPMBackend *t);
+-    size_t (*realloc_buffer)(TPMSizedBuffer *sb);
+-
+     void (*reset)(TPMBackend *t);
 =20
-     /* initialize the backend */
-     int (*init)(TPMBackend *t);
-@@ -118,12 +117,6 @@ enum TpmType tpm_backend_get_type(TPMBackend *s);
- const char *tpm_backend_get_desc(TPMBackend *s);
+     void (*cancel_cmd)(TPMBackend *t);
+@@ -140,16 +138,6 @@ int tpm_backend_startup_tpm(TPMBackend *s);
+ bool tpm_backend_had_startup_error(TPMBackend *s);
 =20
  /**
-- * tpm_backend_destroy:
-- * @s: the backend to destroy
+- * tpm_backend_realloc_buffer:
+- * @s: the backend
+- * @sb: the TPMSizedBuffer to re-allocated to the size suitable for the
+- *      backend.
+- *
+- * This function returns the size of the allocated buffer
 - */
--void tpm_backend_destroy(TPMBackend *s);
+-size_t tpm_backend_realloc_buffer(TPMBackend *s, TPMSizedBuffer *sb);
 -
 -/**
-  * tpm_backend_init:
-  * @s: the backend to initialized
-  * @state: TPMState
-diff --git a/tpm.c b/tpm.c
-index abedf3f..b19b1a3 100644
---- a/tpm.c
-+++ b/tpm.c
-@@ -157,7 +157,7 @@ void tpm_cleanup(void)
-=20
-     QLIST_FOREACH_SAFE(drv, &tpm_backends, list, next) {
-         QLIST_REMOVE(drv, list);
--        tpm_backend_destroy(drv);
-+        object_unref(OBJECT(drv));
-     }
- }
-=20
+  * tpm_backend_deliver_request:
+  * @s: the backend to send the request to
+  *
 --=20
 2.5.5
