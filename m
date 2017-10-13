@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1e2tZf-00080j-3V
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1e2tZf-00080m-5B
 	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 02:36:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1e2tZc-0004v4-8z
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1e2tZd-0004wL-Ly
 	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 02:35:59 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:54764
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:47186
 	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1e2tZb-0004sa-Ke
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 02:35:56 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1e2tZd-0004vF-BI
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 02:35:57 -0400
 From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Fri, 13 Oct 2017 14:32:06 +0800
-Message-ID: <20171013063209.15617-2-maozy.fnst@cn.fujitsu.com>
+Date: Fri, 13 Oct 2017 14:32:09 +0800
+Message-ID: <20171013063209.15617-5-maozy.fnst@cn.fujitsu.com>
 In-Reply-To: <20171013063209.15617-1-maozy.fnst@cn.fujitsu.com>
 References: <20171013063209.15617-1-maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 1/4] colo-compare: Insert packet into the
- suitable position of packet queue directly
+Subject: [Qemu-devel] [PATCH 4/4] colo: Consolidate the duplicate code chunk
+ into a routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,88 +29,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>
 
-Currently, a packet from pri_dev or sec_dev is fristly pushed at the
-tail of the primary or secondary packet queue then sorted by the tcp
-sequence number.
-
-Now, this patch use g_queue_insert_sorted to insert the packet directly
-into the suitable position to avoid ordering all packets each time when
-a new packet is comming, thereby increasing efficiency.
-
-In addition, consolidate the code that add a packet to the list of
-Connection (primary or secondary) into a separate routine colo_insert_packet()
-since the same chunk of code is called from two place.
+Consolidate the code that extract the ip address(src,dst) and
+port number(src,dst) of the packet into a separate routine
+extract_ip_and_port() since the same chunk of code is called
+from two place.
 
 Cc: Zhang Chen <zhangckid@gmail.com>
 Cc: Li Zhijian <lizhijian@cn.fujitsu.com>
 Cc: Jason Wang <jasowang@redhat.com>
 Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Signed-off-by: Zhang Chen <zhangckid@gmail.com>
 ---
- net/colo-compare.c | 40 ++++++++++++++++++++++------------------
- 1 file changed, 22 insertions(+), 18 deletions(-)
+ net/colo.c | 18 ++++++++++--------
+ net/colo.h |  1 +
+ 2 files changed, 11 insertions(+), 8 deletions(-)
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index b3f35d7..54b6347 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -113,6 +113,26 @@ static gint seq_sorter(Packet *a, Packet *b, gpointer data)
+diff --git a/net/colo.c b/net/colo.c
+index 28ce7c8..a39d600 100644
+--- a/net/colo.c
++++ b/net/colo.c
+@@ -82,6 +82,14 @@ int parse_packet_early(Packet *pkt)
+     return 0;
  }
  
- /*
-+ * Return 1 on success, if return 0 means the
-+ * packet will be dropped
-+ */
-+static int colo_insert_packet(GQueue *queue, Packet *pkt)
++void extract_ip_and_port(uint32_t tmp_ports, ConnectionKey *key, Packet *pkt)
 +{
-+    if (g_queue_get_length(queue) <= MAX_QUEUE_SIZE) {
-+        if (pkt->ip->ip_p == IPPROTO_TCP) {
-+            g_queue_insert_sorted(queue,
-+                                  pkt,
-+                                  (GCompareDataFunc)seq_sorter,
-+                                  NULL);
-+        } else {
-+            g_queue_push_tail(queue, pkt);
-+        }
-+        return 1;
-+    }
-+    return 0;
++        key->src = pkt->ip->ip_src;
++        key->dst = pkt->ip->ip_dst;
++        key->src_port = ntohs(tmp_ports >> 16);
++        key->dst_port = ntohs(tmp_ports & 0xffff);
 +}
 +
-+/*
-  * Return 0 on success, if return -1 means the pkt
-  * is unsupported(arp and ipv6) and will be sent later
-  */
-@@ -149,28 +169,12 @@ static int packet_enqueue(CompareState *s, int mode)
-     }
- 
-     if (mode == PRIMARY_IN) {
--        if (g_queue_get_length(&conn->primary_list) <=
--                               MAX_QUEUE_SIZE) {
--            g_queue_push_tail(&conn->primary_list, pkt);
--            if (conn->ip_proto == IPPROTO_TCP) {
--                g_queue_sort(&conn->primary_list,
--                             (GCompareDataFunc)seq_sorter,
--                             NULL);
--            }
--        } else {
-+        if (!colo_insert_packet(&conn->primary_list, pkt)) {
-             error_report("colo compare primary queue size too big,"
-                          "drop packet");
-         }
-     } else {
--        if (g_queue_get_length(&conn->secondary_list) <=
--                               MAX_QUEUE_SIZE) {
--            g_queue_push_tail(&conn->secondary_list, pkt);
--            if (conn->ip_proto == IPPROTO_TCP) {
--                g_queue_sort(&conn->secondary_list,
--                             (GCompareDataFunc)seq_sorter,
--                             NULL);
--            }
--        } else {
-+        if (!colo_insert_packet(&conn->secondary_list, pkt)) {
-             error_report("colo compare secondary queue size too big,"
-                          "drop packet");
-         }
+ void fill_connection_key(Packet *pkt, ConnectionKey *key)
+ {
+     uint32_t tmp_ports;
+@@ -97,17 +105,11 @@ void fill_connection_key(Packet *pkt, ConnectionKey *key)
+     case IPPROTO_SCTP:
+     case IPPROTO_UDPLITE:
+         tmp_ports = *(uint32_t *)(pkt->transport_header);
+-        key->src = pkt->ip->ip_src;
+-        key->dst = pkt->ip->ip_dst;
+-        key->src_port = ntohs(tmp_ports & 0xffff);
+-        key->dst_port = ntohs(tmp_ports >> 16);
++        extract_ip_and_port(tmp_ports, key, pkt);
+         break;
+     case IPPROTO_AH:
+         tmp_ports = *(uint32_t *)(pkt->transport_header + 4);
+-        key->src = pkt->ip->ip_src;
+-        key->dst = pkt->ip->ip_dst;
+-        key->src_port = ntohs(tmp_ports & 0xffff);
+-        key->dst_port = ntohs(tmp_ports >> 16);
++        extract_ip_and_port(tmp_ports, key, pkt);
+         break;
+     default:
+         break;
+diff --git a/net/colo.h b/net/colo.h
+index caedb0d..0658e86 100644
+--- a/net/colo.h
++++ b/net/colo.h
+@@ -76,6 +76,7 @@ typedef struct Connection {
+ uint32_t connection_key_hash(const void *opaque);
+ int connection_key_equal(const void *opaque1, const void *opaque2);
+ int parse_packet_early(Packet *pkt);
++void extract_ip_and_port(uint32_t tmp_ports, ConnectionKey *key, Packet *pkt);
+ void fill_connection_key(Packet *pkt, ConnectionKey *key);
+ void reverse_connection_key(ConnectionKey *key);
+ Connection *connection_new(ConnectionKey *key);
 -- 
 2.9.4
