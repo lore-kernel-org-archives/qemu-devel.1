@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e2nZd-0001lb-BR
+	(envelope-from <alistai@xilinx.com>) id 1e2nZd-0001ld-NK
 	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 20:11:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e2nZY-0006hB-Bd
+	(envelope-from <alistai@xilinx.com>) id 1e2nZZ-0006iM-3h
 	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 20:11:33 -0400
-Received: from mail-bl2nam02on0067.outbound.protection.outlook.com
-	([104.47.38.67]:18154
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+Received: from mail-co1nam03on0086.outbound.protection.outlook.com
+	([104.47.40.86]:2892
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1e2nZY-0006gE-5B
-	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 20:11:28 -0400
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1e2nZY-0006ga-PJ
+	for qemu-devel@nongnu.org; Thu, 12 Oct 2017 20:11:29 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 12 Oct 2017 17:07:31 -0700
-Message-ID: <5808c4332846892ece615a50558ed0279fd72840.1507852977.git.alistair.francis@xilinx.com>
-In-Reply-To: <cover.1507852977.git.alistair.francis@xilinx.com>
-References: <cover.1507852977.git.alistair.francis@xilinx.com>
+Date: Thu, 12 Oct 2017 17:07:23 -0700
+Message-ID: <cover.1507852977.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 3/5] raspi: Specify the valid CPUs
+Subject: [Qemu-devel] [PATCH v2 0/5]  Add a valid_cpu_types property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +29,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alistair.francis@xilinx.com, alistair23@gmail.com, ehabkost@redhat.com, marcel@redhat.com, imammedo@redhat.com, f4bug@amsat.org
 
-List all possible valid CPU options.
+There are numorous QEMU machines that only have a single or a handful of
+valid CPU options. To simplyfy the management of specificying which CPU
+is/isn't valid let's create a property that can be set in the machine
+init. We can then check to see if the user supplied CPU is in that list
+or not.
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
----
+I have added the valid_cpu_types for some ARM machines only at the
+moment.
+
+Here is what specifying the CPUs looks like now:
+
+$ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -no=
+graphic -cpu "cortex-m3" -S
+QEMU 2.10.50 monitor - type 'help' for more information
+(qemu) info cpus
+* CPU #0: thread_id=3D24175
+(qemu) q
+
+$ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -no=
+graphic -cpu "cortex-m4" -S
+QEMU 2.10.50 monitor - type 'help' for more information
+(qemu) q
+
+$ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -no=
+graphic -cpu "cortex-m5" -S
+qemu-system-aarch64: unable to find CPU model 'cortex-m5'
+
+$ aarch64-softmmu/qemu-system-aarch64 -M netduino2 -kernel ./u-boot.elf -no=
+graphic -cpu "cortex-a9" -S
+qemu-system-aarch64: Invalid CPU type: cortex-a9-arm-cpu
+The valid types are: cortex-m3-arm-cpu, cortex-m4-arm-cpu
+
 V2:
- - Fix the indentation
+ - Rebase
+ - Reorder patches
+ - Add a Raspberry Pi 2 CPU fix
+V1:
+ - Small fixes to prepare a series instead of RFC
+ - Add commit messages for the commits
+ - Expand the machine support to ARM machines
+RFC v2:
+ - Rebase on Igor's work
+ - Use more QEMUisms inside the code
+ - List the supported machines in a NULL terminated array
 
- hw/arm/raspi.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+Alistair Francis (5):
+  netduino2: Specify the valid CPUs
+  bcm2836: Use the Cortex-A7 instead of Cortex-A15
+  raspi: Specify the valid CPUs
+  xlnx-zcu102: Specify the valid CPUs
+  xilinx_zynq: : Specify the valid CPUs
 
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index 5941c9f751..2a7e6a40bb 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -158,6 +158,11 @@ static void raspi2_init(MachineState *machine)
-     setup_boot(machine, 2, machine->ram_size - vcram_size);
- }
-=20
-+const char *raspi2_valid_cpus[] =3D {
-+                                    ARM_CPU_TYPE_NAME("cortex-a7"),
-+                                    NULL
-+                                  };
-+
- static void raspi2_machine_init(MachineClass *mc)
- {
-     mc->desc =3D "Raspberry Pi 2";
-@@ -169,5 +174,7 @@ static void raspi2_machine_init(MachineClass *mc)
-     mc->max_cpus =3D BCM2836_NCPUS;
-     mc->default_ram_size =3D 1024 * 1024 * 1024;
-     mc->ignore_memory_transaction_failures =3D true;
-+    mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a7");
-+    mc->valid_cpu_types =3D raspi2_valid_cpus;
- };
- DEFINE_MACHINE("raspi2", raspi2_machine_init)
+ hw/arm/bcm2836.c     |  2 +-
+ hw/arm/netduino2.c   | 10 +++++++++-
+ hw/arm/raspi.c       |  7 +++++++
+ hw/arm/xilinx_zynq.c |  6 ++++++
+ hw/arm/xlnx-zcu102.c | 17 +++++++++++++++++
+ 5 files changed, 40 insertions(+), 2 deletions(-)
+
 --=20
 2.11.0
