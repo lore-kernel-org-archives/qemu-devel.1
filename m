@@ -1,36 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2yP9-0007Ln-QJ
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:45:29 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2yPB-0007Lx-8H
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:45:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2yP5-0002rX-QL
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:45:27 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51446
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e2yP7-0002sf-1r
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:45:29 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59670)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e2yP5-0002qj-BK
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:45:23 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9DBiiRw041532
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 07:45:20 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2djuk0cxnp-1
+	id 1e2yP6-0002rq-O4
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 07:45:24 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9DBjFmt135732
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 07:45:22 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2djvv7g2hu-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 07:45:19 -0400
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 07:45:21 -0400
 Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Fri, 13 Oct 2017 07:45:19 -0400
+	Fri, 13 Oct 2017 07:45:20 -0400
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Fri, 13 Oct 2017 07:44:49 -0400
+Date: Fri, 13 Oct 2017 07:44:51 -0400
+In-Reply-To: <1507895100-26457-1-git-send-email-stefanb@linux.vnet.ibm.com>
+References: <1507895100-26457-1-git-send-email-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Message-Id: <1507895100-26457-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PULL v3 00/11] Merge tpm 2017/10/04
+Message-Id: <1507895100-26457-3-git-send-email-stefanb@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v3 02/11] tpm-backend: Remove unneeded member
+ variable from backend class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,60 +44,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, amarnath.valluri@intel.com, marcandre.lureau@gmail.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-The following changes since commit f90ea7ba7c5ae7010ee0ce062207ae42530f57d6:
+From: Amarnath Valluri <amarnath.valluri@intel.com>
 
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20171012' into staging (2017-10-12 17:06:50 +0100)
+TPMDriverOps inside TPMBackend is not required, as it is supposed to be a=
+ class
+member. The only possible reason for keeping in TPMBackend was, to get th=
+e
+backend type in tpm.c where dedicated backend api, tpm_backend_get_type()=
+ is
+present.
 
-are available in the git repository at:
+Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+---
+ hw/tpm/tpm_passthrough.c     | 4 ----
+ include/sysemu/tpm_backend.h | 1 -
+ tpm.c                        | 2 +-
+ 3 files changed, 1 insertion(+), 6 deletions(-)
 
-  git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2017-10-04-3
-
-for you to fetch changes up to 8dc67017220109fd5bc9d2bffa73674595f62e08:
-
-  specs: Describe the TPM support in QEMU (2017-10-13 07:34:33 -0400)
-
-----------------------------------------------------------------
-Merge tpm 2017/10/04 v3
-
-----------------------------------------------------------------
-Amarnath Valluri (9):
-      tpm-backend: Remove unneeded member variable from backend class
-      tpm-backend: Move thread handling inside TPMBackend
-      tpm-backend: Initialize and free data members in it's own methods
-      tpm-backend: Made few interface methods optional
-      tpm-backend: Add new API to read backend TpmInfo
-      tpm-backend: Move realloc_buffer() implementation to tpm-tis model
-      tpm-passthrough: move reusable code to utils
-      tpm: Added support for TPM emulator
-      tpm: Move tpm_cleanup() to right place
-
-Stefan Berger (2):
-      tpm: Use EMSGSIZE instead of EBADMSG to compile on OpenBSD
-      specs: Describe the TPM support in QEMU
-
- backends/tpm.c                   | 115 ++++++++------
- configure                        |  13 +-
- docs/specs/tpm.txt               | 123 +++++++++++++++
- hmp.c                            |   5 +
- hw/tpm/Makefile.objs             |   1 +
- hw/tpm/tpm_emulator.c            | 587 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- hw/tpm/tpm_ioctl.h               | 246 ++++++++++++++++++++++++++++++
- hw/tpm/tpm_passthrough.c         | 242 +++++++-----------------------
- hw/tpm/tpm_tis.c                 |  14 +-
- hw/tpm/tpm_util.c                |  35 ++++-
- hw/tpm/tpm_util.h                |   4 +
- include/sysemu/tpm_backend.h     |  80 +++++-----
- include/sysemu/tpm_backend_int.h |  41 -----
- qapi/tpm.json                    |  21 ++-
- qemu-options.hx                  |  22 ++-
- tpm.c                            |  37 +----
- vl.c                             |   1 +
- 17 files changed, 1216 insertions(+), 371 deletions(-)
- create mode 100644 docs/specs/tpm.txt
- create mode 100644 hw/tpm/tpm_emulator.c
- create mode 100644 hw/tpm/tpm_ioctl.h
- delete mode 100644 include/sysemu/tpm_backend_int.h
-
-
--- 
+diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+index 9234eb3..a0baf5f 100644
+--- a/hw/tpm/tpm_passthrough.c
++++ b/hw/tpm/tpm_passthrough.c
+@@ -46,8 +46,6 @@
+ #define TPM_PASSTHROUGH(obj) \
+     OBJECT_CHECK(TPMPassthruState, (obj), TYPE_TPM_PASSTHROUGH)
+=20
+-static const TPMDriverOps tpm_passthrough_driver;
+-
+ /* data structures */
+ typedef struct TPMPassthruThreadParams {
+     TPMState *tpm_state;
+@@ -462,8 +460,6 @@ static TPMBackend *tpm_passthrough_create(QemuOpts *o=
+pts, const char *id)
+     /* let frontend set the fe_model to proper value */
+     tb->fe_model =3D -1;
+=20
+-    tb->ops =3D &tpm_passthrough_driver;
+-
+     if (tpm_passthrough_handle_device_opts(opts, tb)) {
+         goto err_exit;
+     }
+diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
+index b0a9731..3708413 100644
+--- a/include/sysemu/tpm_backend.h
++++ b/include/sysemu/tpm_backend.h
+@@ -50,7 +50,6 @@ struct TPMBackend {
+     enum TpmModel fe_model;
+     char *path;
+     char *cancel_path;
+-    const TPMDriverOps *ops;
+=20
+     QLIST_ENTRY(TPMBackend) list;
+ };
+diff --git a/tpm.c b/tpm.c
+index 2d830d0..abedf3f 100644
+--- a/tpm.c
++++ b/tpm.c
+@@ -211,7 +211,7 @@ static TPMInfo *qmp_query_tpm_inst(TPMBackend *drv)
+     res->model =3D drv->fe_model;
+     res->options =3D g_new0(TpmTypeOptions, 1);
+=20
+-    switch (drv->ops->type) {
++    switch (tpm_backend_get_type(drv)) {
+     case TPM_TYPE_PASSTHROUGH:
+         res->options->type =3D TPM_TYPE_OPTIONS_KIND_PASSTHROUGH;
+         tpo =3D g_new0(TPMPassthroughOptions, 1);
+--=20
 2.5.5
