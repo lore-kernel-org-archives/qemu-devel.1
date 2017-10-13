@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1e2vyo-0004pI-TB
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:10:07 -0400
+	(envelope-from <bounces@canonical.com>) id 1e2vzv-0005hd-PW
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:11:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1e2vyk-00033i-Mq
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:10:06 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:36666
-	helo=v2201612906741603.powersrv.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1e2vyk-0002yx-Gb
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:10:02 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by v2201612906741603.powersrv.de (Postfix) with ESMTP id C6FE3DA8325
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 11:10:00 +0200 (CEST)
-Received: from v2201612906741603.powersrv.de ([127.0.0.1])
-	by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
-	port 10024) with ESMTP id OZOEPlurPGPh for <qemu-devel@nongnu.org>;
-	Fri, 13 Oct 2017 11:09:59 +0200 (CEST)
-Received: from [134.155.36.73] (edv13.bib.uni-mannheim.de [134.155.36.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id DBA07DA1F6B
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 11:09:59 +0200 (CEST)
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <afc33ce4-c9ab-9b35-38ec-80b16642ef00@weilnetz.de>
-Date: Fri, 13 Oct 2017 11:10:05 +0200
+	(envelope-from <bounces@canonical.com>) id 1e2vzs-0004fz-J1
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:11:15 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45180)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e2vzs-0004ex-DS
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:11:12 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e2vzq-0006Kj-Tk
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 09:11:10 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DFA1B2E80C7
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 09:11:10 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] German BSI analysed security of KVM / QEMU
+Date: Fri, 13 Oct 2017 09:05:52 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1723161 <1723161@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150782239801.1729.1327212510076491094.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150788555262.15608.8532291359411631793.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1723161] Re: Migration failing in qemu-2.10.1 but
+ working qemu-2.9.1 and earlier with same options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,24 +37,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developer <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-Hi,
+Hi William,
+  David's fine (I'm from Red Hat)
 
-the German Bundesamt f=C3=BCr Sicherheit in der Informationstechnik
-(Federal Office for Information Security) published a study on
-the security of KVM and QEMU:
+OK, so it is the pflash;  if you get some debug, please add it to this
+bug, I'll ask some colleagues on the block side if they have any ideas.
 
-https://www.bsi.bund.de/DE/Publikationen/Studien/Sicherheitsanalyse_KVM/s=
-icherheitsanalyse_kvm.html
+Dave
 
-(article only available in German)
+-- =
 
-Summary (Google translated to English):
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1723161
 
-"In summary, it can be said that the investigated components - above all
-KVM, QEMU and libvirt - are suitable for realizing a technically mature
-and secure virtualization environment."
+Title:
+  Migration failing in qemu-2.10.1 but working qemu-2.9.1 and earlier
+  with same options
 
-Regards
-Stefan Weil
+Status in QEMU:
+  New
+
+Bug description:
+  =
+
+  Qemu-2.10.1 migration failing with the following error:
+  Receiving block device images
+  qemu-system-x86_64: error while loading section id 2(block)
+  qemu-system-x86_64: load of migration failed: Input/output error
+
+  Migration is setup on the destination system of the migration using:
+  -incoming tcp:0:4444
+
+  Migration is initiated from the source using the following commands in it=
+s qemu monitor:
+  migrate -b "tcp:localhost:4444"
+
+  The command-line used in both the source and destination is:
+  qemu-system-x86_64 \
+          -nodefaults \
+          -pidfile vm0.pid \
+          -enable-kvm \
+          -machine q35 \
+          -cpu host -smp 2 \
+          -m 4096M \
+          -drive if=3Dpflash,format=3Draw,unit=3D0,file=3DOVMF_CODE.fd,read=
+only \
+          -drive if=3Dpflash,format=3Draw,unit=3D1,file=3DOVMF_VARS.fd \
+          -drive file=3D${HDRIVE},format=3Dqcow2 \
+          -drive media=3Dcdrom \
+          -usb -device usb-tablet \
+          -vga std -vnc :0 \
+          -net nic,macaddr=3D${TAPMACADDR} -net user,net=3D192.168.2.0/24,d=
+hcpstart=3D192.168.2.10 \
+          -serial stdio \
+          -monitor unix:${MONITORSOCKET},server,nowait
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1723161/+subscriptions
