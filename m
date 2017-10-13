@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e2zVZ-0003n9-SZ
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 08:56:10 -0400
+	(envelope-from <eblake@redhat.com>) id 1e2zow-0006Nt-RP
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 09:16:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1e2zVX-0002mF-Aw
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 08:56:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47082)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1e2zVX-0002li-2L
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 08:56:07 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 609DC8046F
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 12:56:05 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri, 13 Oct 2017 14:55:33 +0200
-Message-Id: <20171013125533.9153-1-marcandre.lureau@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1e2zor-0006Qd-0w
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 09:16:10 -0400
+References: <150781866372.288.18433466623199909715@b58463cdfd5f>
+	<accd9d19-e2f8-6476-c31d-f382055a44b0@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b93ec59a-bcaa-2e21-702f-9d0111d9da98@redhat.com>
+Date: Fri, 13 Oct 2017 08:15:45 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] usb-ccid: remove needless migration state
- code
+In-Reply-To: <accd9d19-e2f8-6476-c31d-f382055a44b0@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="qpWMVLe61hlvFLWiItXv02cfSux5ajqOc"
+Subject: [Qemu-devel] iotest 77 failure [was: [PATCH v2 0/5] backup
+ improvements part 1]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,88 +25,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jcody@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, jsnow@redhat.comqemu block <qemu-block@nongnu.org>
 
-This code appears to be unused since its introduction. We need to keep
-the state_vmstate field byte in VMState for compatibility reasons.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--qpWMVLe61hlvFLWiItXv02cfSux5ajqOc
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org,
+ jcody@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org,
+ jsnow@redhat.com, qemu block <qemu-block@nongnu.org>
+Message-ID: <b93ec59a-bcaa-2e21-702f-9d0111d9da98@redhat.com>
+Subject: iotest 77 failure [was: [Qemu-devel] [PATCH v2 0/5] backup
+ improvements part 1]
+References: <150781866372.288.18433466623199909715@b58463cdfd5f>
+ <accd9d19-e2f8-6476-c31d-f382055a44b0@virtuozzo.com>
+In-Reply-To: <accd9d19-e2f8-6476-c31d-f382055a44b0@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- hw/usb/dev-smartcard-reader.c | 23 +----------------------
- 1 file changed, 1 insertion(+), 22 deletions(-)
+[adding qemu-block]
 
-diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.=
-c
-index 0c77d2a41d..e334d3be11 100644
---- a/hw/usb/dev-smartcard-reader.c
-+++ b/hw/usb/dev-smartcard-reader.c
-@@ -270,11 +270,6 @@ typedef struct BulkIn {
-     uint32_t pos;
- } BulkIn;
-=20
--enum {
--    MIGRATION_NONE,
--    MIGRATION_MIGRATED,
--};
--
- typedef struct CCIDBus {
-     BusState qbus;
- } CCIDBus;
-@@ -306,9 +301,6 @@ typedef struct USBCCIDState {
-     CCID_ProtocolDataStructure abProtocolDataStructure;
-     uint32_t ulProtocolDataStructureSize;
-     uint32_t state_vmstate;
--    uint32_t migration_target_ip;
--    uint16_t migration_target_port;
--    uint8_t  migration_state;
-     uint8_t  bmSlotICCState;
-     uint8_t  powered;
-     uint8_t  notify_slot_change;
-@@ -1243,9 +1235,6 @@ int ccid_card_ccid_attach(CCIDCardState *card)
-     USBCCIDState *s =3D USB_CCID_DEV(dev);
-=20
-     DPRINTF(s, 1, "CCID Attach\n");
--    if (s->migration_state =3D=3D MIGRATION_MIGRATED) {
--        s->migration_state =3D MIGRATION_NONE;
--    }
-     return 0;
- }
-=20
-@@ -1341,9 +1330,6 @@ static void ccid_realize(USBDevice *dev, Error **er=
-rp)
-     s->intr =3D usb_ep_get(dev, USB_TOKEN_IN, CCID_INT_IN_EP);
-     s->bulk =3D usb_ep_get(dev, USB_TOKEN_IN, CCID_BULK_IN_EP);
-     s->card =3D NULL;
--    s->migration_state =3D MIGRATION_NONE;
--    s->migration_target_ip =3D 0;
--    s->migration_target_port =3D 0;
-     s->dev.speed =3D USB_SPEED_FULL;
-     s->dev.speedmask =3D USB_SPEED_MASK_FULL;
-     s->notify_slot_change =3D false;
-@@ -1379,13 +1365,6 @@ static int ccid_pre_save(void *opaque)
-     USBCCIDState *s =3D opaque;
-=20
-     s->state_vmstate =3D s->dev.state;
--    if (s->dev.attached) {
--        /*
--         * Migrating an open device, ignore reconnection CHR_EVENT to av=
-oid an
--         * erroneous detach.
--         */
--        s->migration_state =3D MIGRATION_MIGRATED;
--    }
-=20
-     return 0;
- }
-@@ -1452,7 +1431,7 @@ static VMStateDescription ccid_vmstate =3D {
-         VMSTATE_STRUCT_ARRAY(pending_answers, USBCCIDState,
-                         PENDING_ANSWERS_NUM, 1, answer_vmstate, Answer),
-         VMSTATE_UINT32(pending_answers_num, USBCCIDState),
--        VMSTATE_UINT8(migration_state, USBCCIDState),
-+        VMSTATE_UNUSED(1), /* was migration_state */
-         VMSTATE_UINT32(state_vmstate, USBCCIDState),
-         VMSTATE_END_OF_LIST()
-     }
+On 10/13/2017 02:37 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 077 is unrelated to backup, it's already broken test:
+>=20
+> i=3D1; while check -nbd 077; do echo $((i++)) - OK; done; echo $i - FAI=
+L
+>=20
+> failed on 3rd try for me on master
+>=20
+
+>> 077=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - output mismatch =
+(see 077.out.bad)
+>> --- /tmp/qemu-test/src/tests/qemu-iotests/077.out=C2=A0=C2=A0=C2=A0 20=
+17-10-12
+>> 14:02:13.000000000 +0000
+>> +++ /tmp/qemu-test/build/tests/qemu-iotests/077.out.bad=C2=A0=C2=A0=C2=
+=A0 2017-10-12
+>> 14:29:25.909887675 +0000
+>> @@ -40,9 +40,9 @@
+>> =C2=A0 wrote XXX/XXX bytes at offset XXX
+>> =C2=A0 XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>> =C2=A0 blkdebug: Resuming request 'B'
+>> +blkdebug: Resuming request 'A'
+>> =C2=A0 wrote XXX/XXX bytes at offset XXX
+>> =C2=A0 XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>> -blkdebug: Resuming request 'A'
+>> =C2=A0 wrote XXX/XXX bytes at offset XXX
+>> =C2=A0 XXX bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>> =C2=A0 wrote XXX/XXX bytes at offset XXX
+
+Looks like we have a data race. Kevin, you wrote this test, any ideas on
+how we can make it more robust?
+
 --=20
-2.15.0.rc0.40.gaefcc5f6f
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--qpWMVLe61hlvFLWiItXv02cfSux5ajqOc
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlngvIIACgkQp6FrSiUn
+Q2qWOQf/aoVBVrMBCzhlK5Ns8xJHCMdlHNThxJiteYDsKXQGQFAi2WD3gbpn/Bo9
+lElQ81mmXVt2FbfAxRhys98KEit3CLlcpM6NDP30G52XG4nQaf6p/pasCTqrPB1T
+XSswrKrS3qPj8RGdoRflNicAWw8Z5FryQVW2kZNrv6talN5Xzf7sCTbkqp6d4tfQ
+Wl8asn5lPvjgcey0VhWYGM6VSBLcyKNsoo4viY2XkHLfwz/SKAvqpnbJqVt5IX/2
+n9tK5M5/6Qy9lxdnTfRD8wUvzmucyZDkCh/xwyGGERcOgQbU2RsWVtRywwOSkxOn
+O97vxvF2DA4YsNfwmLMlvXgWaDLqNw==
+=VAy2
+-----END PGP SIGNATURE-----
+
+--qpWMVLe61hlvFLWiItXv02cfSux5ajqOc--
