@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e2wij-0003mQ-CC
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:57:34 -0400
+	(envelope-from <groug@kaod.org>) id 1e2wqw-0005gu-Gm
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 06:06:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e2wig-0007ro-9N
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:57:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33028)
+	(envelope-from <groug@kaod.org>) id 1e2wqr-0004iI-KK
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 06:06:02 -0400
+Received: from 7.mo5.mail-out.ovh.net ([178.32.124.100]:35090)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e2wif-0007r6-Vl
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 05:57:30 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E82EC83F3E
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 09:57:28 +0000 (UTC)
-Date: Fri, 13 Oct 2017 10:57:24 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171013095724.GE20515@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171013081450.29647-1-kraxel@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e2wqr-0004gD-EG
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 06:05:57 -0400
+Received: from player773.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id C959713F9FE
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 12:05:55 +0200 (CEST)
+Date: Fri, 13 Oct 2017 12:05:46 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171013120546.7a89eeaf@bahia.lan>
+In-Reply-To: <20171013112459.0082e823@nial.brq.redhat.com>
+References: <150788370618.25736.8030708425923435364.stgit@bahia>
+	<150788373123.25736.7359515819699182906.stgit@bahia>
+	<20171013112459.0082e823@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171013081450.29647-1-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 00/11] Ui 20171013 patches
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] monitor: add proper reference counting
+ of the current CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,66 +32,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Dr. David
+	Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Fri, Oct 13, 2017 at 10:14:39AM +0200, Gerd Hoffmann wrote:
-> The following changes since commit bac960832015bf4c4c1b873011612e2675e4464c:
-> 
->   Merge remote-tracking branch 'remotes/elmarco/tags/vus-pull-request' into staging (2017-10-11 13:10:36 +0100)
-> 
-> are available in the git repository at:
-> 
->   git://git.kraxel.org/qemu tags/ui-20171013-pull-request
-> 
-> for you to fetch changes up to 942a35335b2efa2f2997d51eb5142fc9903efe43:
-> 
->   gtk: fix wrong id between texture and framebuffer (2017-10-13 10:10:36 +0200)
-> 
-> ----------------------------------------------------------------
-> ui: use keycodemapdb for key code mappings, part one (v2)
-> ui: add qemu-keymap, update reverse keymaps (for qemu -k $map)
-> ui: fix for vte 0.50
-> ui: gtk texture fix
-> 
-> ----------------------------------------------------------------
+On Fri, 13 Oct 2017 11:24:59 +0200
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-I'm afraid this is quite likely to fail build smoke test again. I've
-just tried a build on OpenBSD with the bash -> sh fix in it, and I
-found that it still tried to build the keycodemap files in parallel
-with checking out the GIT submodules. It also tried to run the
-mkdir -p dtc/libfdt in parallel and this caused git to refuse to
-checkout the dtc module due to that empty dir existing. So there's
-still some deps problems in here I think that let make build in
-the wrong order :-(
+> On Fri, 13 Oct 2017 10:35:31 +0200
+> Greg Kurz <groug@kaod.org> wrote:
+> 
+> > If a CPU selected with the "cpu" command is hot-unplugged then "info cpus"
+> > causes QEMU to exit:
+> > 
+> > (qemu) device_del cpu1
+> > (qemu) info cpus
+> > qemu:qemu_cpu_kick_thread: No such process
+> > 
+> > This happens because "cpu" stores the pointer to the selected CPU into
+> > the monitor structure. When the CPU is hot-unplugged, we end up with a
+> > dangling pointer. The "info cpus" command then does:
+> > 
+> > hmp_info_cpus()
+> >  monitor_get_cpu_index()
+> >   mon_get_cpu()
+> >    cpu_synchronize_state() <--- called with dangling pointer
+> > 
+> > This could cause a QEMU crash as well.
+> > 
+> > This patch switches the monitor to use object_ref() to ensure the
+> > CPU object doesn't vanish unexpectedly. The reference is dropped
+> > either when "cpu" is used to switch to another CPU, or when the
+> > selected CPU is unrealized and cpu_list_remove() sets its cpu_index
+> > back to UNASSIGNED_CPU_INDEX.  
+> I don't really like an idea of leaving dangling cpu around.
+> Is it possible to store QOM path on set_cpu in monitor and
+> resolving it each to instance each time it's needed?
+> 
 
-  GEN     config-host.h
-  GEN     module_block.h
-  GEN     ui/input-keymap-linux-to-qcode.c
-  GEN     ui/input-keymap-qcode-to-qnum.c
-  GEN     ui/input-keymap-qnum-to-qcode.c
-python: can't open file '/home/berrange/src/virt/qemu/ui/keycodemapdb/tools/keymap-gen': [Errno 2] No such file or directory
-python: can't open file '/home/berrange/src/virt/qemu/ui/keycodemapdb/tools/keymap-gen': [Errno 2] No such file or directory
-python: can't open file '/home/berrange/src/virt/qemu/ui/keycodemapdb/tools/keymap-gen': [Errno 2] No such file or directory
-mkdir -p dtc/libfdt
-  GIT     ui/keycodemapdb dtc
-mkdir -p dtc/tests
+It sounds workable. Also it would allow the fix to not depend on patch 1
+for ppc.
 
-This should be impossible because ui/input-keymap-* depends on the
-tools/keymap-gen, and that depends on the submodule status file,
-which in turn should trigger the checkout, but the build log
-showed that isn't working as we expect.
+Thanks for the suggestion!
 
-In all my debugging the one thing I've seen work correctly is the
-re-running of configure (via config.status), which always happens
-earlier and is serialized wrt everything else. So I wonder if we
-should change direction slightly, and have configure checkout the
-submodules. Then just make sure that config.status is triggered
-when submodules are out of date.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> 
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  monitor.c |   12 ++++++++++++
+> >  1 file changed, 12 insertions(+)
+> > 
+> > diff --git a/monitor.c b/monitor.c
+> > index fe0d1bdbb461..1c0b9a2c3ad3 100644
+> > --- a/monitor.c
+> > +++ b/monitor.c
+> > @@ -579,6 +579,9 @@ static void monitor_data_init(Monitor *mon)
+> >  
+> >  static void monitor_data_destroy(Monitor *mon)
+> >  {
+> > +    if (mon->mon_cpu) {
+> > +        object_unref((Object *) mon->mon_cpu);
+> > +    }
+> >      qemu_chr_fe_deinit(&mon->chr, false);
+> >      if (monitor_is_qmp(mon)) {
+> >          json_message_parser_destroy(&mon->qmp.parser);
+> > @@ -1047,12 +1050,21 @@ int monitor_set_cpu(int cpu_index)
+> >      if (cpu == NULL) {
+> >          return -1;
+> >      }
+> > +    if (cur_mon->mon_cpu) {
+> > +        object_unref((Object *) cur_mon->mon_cpu);
+> > +    }
+> >      cur_mon->mon_cpu = cpu;
+> > +    object_ref((Object *) cpu);
+> >      return 0;
+> >  }
+> >  
+> >  CPUState *mon_get_cpu(void)
+> >  {
+> > +    if (cur_mon->mon_cpu &&
+> > +        cur_mon->mon_cpu->cpu_index == UNASSIGNED_CPU_INDEX) {
+> > +        object_unref((Object *) cur_mon->mon_cpu);
+> > +        cur_mon->mon_cpu = NULL;
+> > +    }
+> >      if (!cur_mon->mon_cpu) {
+> >          if (!first_cpu) {
+> >              return NULL;
+> > 
+> >   
+> 
