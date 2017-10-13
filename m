@@ -1,41 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e32x4-0004Pw-JR
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 12:36:47 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1e332C-0000U6-VC
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 12:42:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1e32x0-0005LY-MP
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 12:36:46 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36744
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1e32x0-0005LM-GX
-	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 12:36:42 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9DGYEhk044131
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 12:36:38 -0400
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2djwejjthu-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 12:36:38 -0400
-Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Fri, 13 Oct 2017 10:36:37 -0600
-References: <1507751249-3035-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<CAJ+F1CK7MW5kY5eaiHGyk7hvxKyOBNJi7MHo9warfXbSp4LzPA@mail.gmail.com>
-	<CAFEAcA_V-ZS+O_BsEU6OJuT_hE-RXw0dTaJbZgY-BW8soRv3vA@mail.gmail.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Fri, 13 Oct 2017 12:36:33 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1e3329-0001hB-2Q
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 12:42:05 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:54073)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1e3328-0001gI-S5
+	for qemu-devel@nongnu.org; Fri, 13 Oct 2017 12:42:01 -0400
+Received: by mail-wr0-x229.google.com with SMTP id y44so1456830wry.10
+	for <qemu-devel@nongnu.org>; Fri, 13 Oct 2017 09:42:00 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri, 13 Oct 2017 17:24:24 +0100
+Message-Id: <20171013162438.32458-17-alex.bennee@linaro.org>
+In-Reply-To: <20171013162438.32458-1-alex.bennee@linaro.org>
+References: <20171013162438.32458-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_V-ZS+O_BsEU6OJuT_hE-RXw0dTaJbZgY-BW8soRv3vA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <d4676b57-0298-a0b4-a116-3d5cd9a38807@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] tpm: Use EMSGSIZE instead of EBADMSG to
- compile on OpenBSD
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC PATCH 16/30] target/arm/translate-a64.c: add FP16
+ FADD/FMUL/FDIV to AdvSIMD 3 Same (!sub)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,47 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: Amarnath Valluri <amarnath.valluri@intel.com>, QEMU <qemu-devel@nongnu.org>
+To: richard.henderson@linaro.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 10/13/2017 12:12 PM, Peter Maydell wrote:
-> On 13 October 2017 at 12:14, Marc-Andr=C3=A9 Lureau
-> <marcandre.lureau@gmail.com> wrote:
->> Hi
->>
->> On Wed, Oct 11, 2017 at 9:47 PM, Stefan Berger
->> <stefanb@linux.vnet.ibm.com> wrote:
->>> EBADMSG was only added to OpenBSD very recently. To make QEMU compila=
-ble
->>> on older OpenBSD versions use EMSGSIZE instead when a mismatch betwee=
-n
->>> number of received bytes and message size indicated in the header was
->>> found.
->>>
->>> Return -EMSGSIZE and convert all other errnos in the same functions t=
-o
->>> return the negative errno.
->>>
->>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
->> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>
->>
->> Looks good to me,
->> but given that the return value isn't used, perhaps you could have
->> changed the function to return a bool success instead?
-> AIUI this is just test code, so we probably don't gain too much
-> from extensively bikeshedding it. (Having said that, I can't
-> resist asking why it's not in tests/ :-))
+The fprintf is only there for debugging as the skeleton is added to,
+it will be removed once the skeleton is complete.
 
-This is NOT test code. It's determining whether the external TPM is a=20
-TPM 1.2 or TPM 2 emulation. This avoids having to start QEMU with a=20
-'--tpm2' parmeter equivalent as well as the external emulator. Passing=20
-this to the external emulator is enough.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ target/arm/helper-a64.c    |  4 ++++
+ target/arm/helper-a64.h    |  4 ++++
+ target/arm/translate-a64.c | 12 +++++++++++-
+ 3 files changed, 19 insertions(+), 1 deletion(-)
 
-    Stefan
-
-
->
-> thanks
-> -- PMM
->
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index a0c20faabc..8ef15c4c45 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -551,6 +551,10 @@ float16 ADVSIMD_HELPER(name, h)(float16 a, float16 b, void *fpstp) \
+     return float16_ ## name(a, b, fpst);    \
+ }
+ 
++ADVSIMD_HALFOP(add)
++ADVSIMD_HALFOP(sub)
++ADVSIMD_HALFOP(mul)
++ADVSIMD_HALFOP(div)
+ ADVSIMD_HALFOP(min)
+ ADVSIMD_HALFOP(max)
+ ADVSIMD_HALFOP(minnum)
+diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+index b774431f1f..a4ce87970e 100644
+--- a/target/arm/helper-a64.h
++++ b/target/arm/helper-a64.h
+@@ -44,6 +44,10 @@ DEF_HELPER_FLAGS_3(crc32_64, TCG_CALL_NO_RWG_SE, i64, i64, i64, i32)
+ DEF_HELPER_FLAGS_3(crc32c_64, TCG_CALL_NO_RWG_SE, i64, i64, i64, i32)
+ DEF_HELPER_FLAGS_4(paired_cmpxchg64_le, TCG_CALL_NO_WG, i64, env, i64, i64, i64)
+ DEF_HELPER_FLAGS_4(paired_cmpxchg64_be, TCG_CALL_NO_WG, i64, env, i64, i64, i64)
++DEF_HELPER_3(advsimd_addh, f16, f16, f16, ptr)
++DEF_HELPER_3(advsimd_subh, f16, f16, f16, ptr)
++DEF_HELPER_3(advsimd_mulh, f16, f16, f16, ptr)
++DEF_HELPER_3(advsimd_divh, f16, f16, f16, ptr)
+ DEF_HELPER_3(advsimd_maxh, f16, f16, f16, ptr)
+ DEF_HELPER_3(advsimd_minh, f16, f16, f16, ptr)
+ DEF_HELPER_3(advsimd_maxnumh, f16, f16, f16, ptr)
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 5e531b3ae4..f687bab214 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -9806,8 +9806,18 @@ static void disas_simd_three_reg_same_fp16(DisasContext *s, uint32_t insn)
+         read_vec_element_i32(s, tcg_op2, rm, pass, MO_16);
+ 
+         switch (fpopcode) {
++        case 0x2: /* FADD */
++            gen_helper_advsimd_addh(tcg_res, tcg_op1, tcg_op2, fpst);
++            break;
++        case 0x23: /* FMUL */
++            gen_helper_advsimd_mulh(tcg_res, tcg_op1, tcg_op2, fpst);
++            break;
++        case 0x27: /* FDIV */
++            gen_helper_advsimd_divh(tcg_res, tcg_op1, tcg_op2, fpst);
++            break;
+         default:
+-            fprintf(stderr,"%s: insn %#04x fpop %#2x\n", __func__, insn, fpopcode);
++            fprintf(stderr,"%s: insn %#04x, fpop %#2x @ %#" PRIx64 "\n",
++                    __func__, insn, fpopcode, s->pc);
+             g_assert_not_reached();
+         }
+ 
+-- 
+2.14.1
