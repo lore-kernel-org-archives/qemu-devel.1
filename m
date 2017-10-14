@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33047)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e3PL4-0001Xl-Ex
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 12:31:03 -0400
+	id 1e3PSO-00047N-Jb
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 12:38:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e3PL3-0008Dk-PT
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 12:31:02 -0400
+	id 1e3PSK-00040r-Mp
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 12:38:36 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1507930220-17461-1-git-send-email-cota@braap.org>
+References: <CA+J4q6dO+V32yF11jFD2jAizigYoZS6eECyuDTgRVfe+a_JUJQ@mail.gmail.com>
+	<1507878038.21465.3.camel@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6defdad1-35aa-2849-8483-e714132fc2b1@amsat.org>
-Date: Sat, 14 Oct 2017 13:30:50 -0300
+Message-ID: <fa3d7fbc-827f-a28b-0cf0-ff0c3f43a0fe@amsat.org>
+Date: Sat, 14 Oct 2017 13:38:28 -0300
 MIME-Version: 1.0
-In-Reply-To: <1507930220-17461-1-git-send-email-cota@braap.org>
+In-Reply-To: <1507878038.21465.3.camel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] futex: add missing header guards
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] QEMU without X11 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +28,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>, hanji unit <hanjiunit@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-discuss@nongnu.org, qemu-devel@nongnu.org
 
-Cc: trivial
-
-On 10/13/2017 06:30 PM, Emilio G. Cota wrote:
-> The header file was introduced by fbcc3e5 ("qemu-thread: optimize QemuLockCnt
-> with futexes on Linux", 2017-01-16) without header guards. Add them.
+>> Hello, is it possible to run (or rebuild modifying build flags) QEMU
+>> without support for X11 window system integration?
 > 
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ./configure --disable-gtk --disable-sdl --disable-opengl
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> ---
->  include/qemu/futex.h | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/include/qemu/futex.h b/include/qemu/futex.h
-> index bb7dc9e..91ae889 100644
-> --- a/include/qemu/futex.h
-> +++ b/include/qemu/futex.h
-> @@ -11,6 +11,9 @@
->   *
->   */
->  
-> +#ifndef QEMU_FUTEX_H
-> +#define QEMU_FUTEX_H
-> +
->  #include <sys/syscall.h>
->  #include <linux/futex.h>
->  
-> @@ -34,3 +37,5 @@ static inline void qemu_futex_wait(void *f, unsigned val)
->          }
->      }
->  }
-> +
-> +#endif /* QEMU_FUTEX_H */
-> 
+Is there some interest in adding a simpler --disable-x11 option?
