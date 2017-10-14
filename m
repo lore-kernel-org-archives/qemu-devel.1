@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e3Q5S-0001lF-Rt
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 13:18:59 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3QgO-00073B-1M
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 13:57:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e3Q5S-00026B-65
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 13:18:58 -0400
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:48029)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e3Q5R-00025M-VC
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 13:18:58 -0400
-Received: by mail-wr0-x236.google.com with SMTP id y39so1855679wrd.4
-	for <qemu-devel@nongnu.org>; Sat, 14 Oct 2017 10:18:56 -0700 (PDT)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3QgK-0004rk-UU
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 13:57:08 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:36772
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1e3QgK-0004qj-Nb
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 13:57:04 -0400
+References: <1507583223-14819-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<CACXAS8CO9K4967T_BdShaNGpznSDXWCYdsBa43mwdvBHh=KZng@mail.gmail.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <8fe7a20d-b525-9495-6f36-3f11764a43f3@ilande.co.uk>
+Date: Sat, 14 Oct 2017 18:56:42 +0100
 MIME-Version: 1.0
-In-Reply-To: <fa3d7fbc-827f-a28b-0cf0-ff0c3f43a0fe@amsat.org>
-References: <CA+J4q6dO+V32yF11jFD2jAizigYoZS6eECyuDTgRVfe+a_JUJQ@mail.gmail.com>
-	<1507878038.21465.3.camel@redhat.com>
-	<fa3d7fbc-827f-a28b-0cf0-ff0c3f43a0fe@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 14 Oct 2017 18:18:34 +0100
-Message-ID: <CAFEAcA9Je3GHesmrgejU9H209QF0vU7XGVRZ2Cu=Fuu+Mj0s6g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] QEMU without X11 support
+In-Reply-To: <CACXAS8CO9K4967T_BdShaNGpznSDXWCYdsBa43mwdvBHh=KZng@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 0/8] sun4m : sparc32_dma tidy-ups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,24 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, hanji unit <hanjiunit@gmail.com>, qemu-discuss <qemu-discuss@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On 14 October 2017 at 17:38, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
->>> Hello, is it possible to run (or rebuild modifying build flags) QEMU
->>> without support for X11 window system integration?
+On 10/10/17 09:21, Artyom Tarasenko wrote:
+
+> On Mon, Oct 9, 2017 at 11:06 PM, Mark Cave-Ayland
+> <mark.cave-ayland@ilande.co.uk> wrote:
+>> This patchset aims to tidy-up the sparc32_dma code by improving the
+>> modelling of the espdma/ledma devices using both QOM and the memory
+>> API which didn't exist when the code was first written.
 >>
->> ./configure --disable-gtk --disable-sdl --disable-opengl
->
-> Is there some interest in adding a simpler --disable-x11 option?
+>> The result is that it is now possible to remove both the iommu_opaque
+>> and is_ledma workarounds from the code.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> 
+> Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
 
-We don't directly link to X11, so it wouldn't fit with
-our other options.
-The --disable-foo options aren't very often necessary --
-only if your build environment has support for linking
-against foo but for some reason you don't want it
-linked in.
+With some further experimentation I've found that making the esp/le
+devices children of their respective espdma/ledma devices makes things a
+lot cleaner.
 
-thanks
--- PMM
+I've also got another related patch to update the espdma/ledma
+tracepoints to log the DMA transaction length, so I'll submit a v2 of
+this with the additional changes shortly.
+
+
+ATB,
+
+Mark.
