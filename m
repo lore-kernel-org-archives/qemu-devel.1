@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e3XJR-0005Mz-NZ
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 21:01:55 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e3Xe8-0004sr-2z
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 21:23:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e3XJQ-0001nT-2D
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 21:01:53 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Sat, 14 Oct 2017 20:01:30 -0500
-Message-Id: <20171015010131.12172-8-eblake@redhat.com>
-In-Reply-To: <20171015010131.12172-1-eblake@redhat.com>
-References: <20171015010131.12172-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 7/8] nbd/client: prepare nbd_receive_reply
- for structured reply
+	(envelope-from <dgibson@ozlabs.org>) id 1e3Xe4-0003Nj-N9
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 21:23:16 -0400
+Date: Sat, 14 Oct 2017 20:33:37 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171014093337.GG28032@umbus.fritz.box>
+References: <150789430473.4410.10317971414202753256.stgit@bahia.lan>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="fCcDWlUEdh43YKr8"
+Content-Disposition: inline
+In-Reply-To: <150789430473.4410.10317971414202753256.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH] spapr_cpu_core: instantiate CPUs separately
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,250 +23,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-In following patch nbd_receive_reply will be used both for simple
-and structured reply header receiving.
-NBDReply is altered into union of simple reply header and structured
-reply chunk header, simple error translation moved to block/nbd-client
-to be consistent with further structured reply error translation.
+--fCcDWlUEdh43YKr8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- include/block/nbd.h |  30 ++++++++++++---
- block/nbd-client.c  |   8 ++--
- nbd/client.c        | 104 +++++++++++++++++++++++++++++++++++++++++-----------
- nbd/trace-events    |   3 +-
- 4 files changed, 113 insertions(+), 32 deletions(-)
+On Fri, Oct 13, 2017 at 01:31:44PM +0200, Greg Kurz wrote:
+> The current code assumes that only the CPU core object holds a
+> reference on each individual CPU object, and happily frees their
+> allocated memory when the core is unrealized. This is dangerous
+> as some other code can legitimely keep a pointer to a CPU if it
+> calls object_ref(), but it would end up with a dangling pointer.
+>=20
+> Let's allocate all CPUs with object_new() and let QOM frees them
+> when their reference count reaches zero. This greatly simplify the
+> code as we don't have to fiddle with the instance size anymore.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 225e9575e4..2ee1578420 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -57,12 +57,6 @@ struct NBDRequest {
- };
- typedef struct NBDRequest NBDRequest;
+So, I'm pretty sure my first drafts of the core stuff did things this
+waym and it got nacked, for QOM lifetime reasons that I never really
+understood.
 
--struct NBDReply {
--    uint64_t handle;
--    uint32_t error;
--};
--typedef struct NBDReply NBDReply;
--
- typedef struct NBDSimpleReply {
-     uint32_t magic;  /* NBD_SIMPLE_REPLY_MAGIC */
-     uint32_t error;
-@@ -78,6 +72,20 @@ typedef struct NBDStructuredReplyChunk {
-     uint32_t length; /* length of payload */
- } QEMU_PACKED NBDStructuredReplyChunk;
+> ---
+> v2: - mention code simplification in changelog
+>     - use PowerPCCPU * and Object * instead of void *
+> ---
+>  hw/ppc/spapr.c                  |   11 +++--------
+>  hw/ppc/spapr_cpu_core.c         |   19 +++++++------------
+>  include/hw/ppc/spapr_cpu_core.h |    2 +-
+>  3 files changed, 11 insertions(+), 21 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index fd9813bde82f..d9555a3677be 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3153,12 +3153,10 @@ void spapr_core_release(DeviceState *dev)
+> =20
+>      if (smc->pre_2_10_has_unused_icps) {
+>          sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
+> -        sPAPRCPUCoreClass *scc =3D SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
+> -        size_t size =3D object_type_get_instance_size(scc->cpu_type);
+>          int i;
+> =20
+>          for (i =3D 0; i < cc->nr_threads; i++) {
+> -            CPUState *cs =3D CPU(sc->threads + i * size);
+> +            CPUState *cs =3D CPU(sc->threads[i]);
+> =20
+>              pre_2_10_vmstate_register_dummy_icp(cs->cpu_index);
+>          }
+> @@ -3204,7 +3202,7 @@ static void spapr_core_plug(HotplugHandler *hotplug=
+_dev, DeviceState *dev,
+>      sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+>      sPAPRCPUCore *core =3D SPAPR_CPU_CORE(OBJECT(dev));
+>      CPUCore *cc =3D CPU_CORE(dev);
+> -    CPUState *cs =3D CPU(core->threads);
+> +    CPUState *cs =3D CPU(core->threads[0]);
+>      sPAPRDRConnector *drc;
+>      Error *local_err =3D NULL;
+>      int smt =3D kvmppc_smt_threads();
+> @@ -3249,15 +3247,12 @@ static void spapr_core_plug(HotplugHandler *hotpl=
+ug_dev, DeviceState *dev,
+>      core_slot->cpu =3D OBJECT(dev);
+> =20
+>      if (smc->pre_2_10_has_unused_icps) {
+> -        sPAPRCPUCoreClass *scc =3D SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
+> -        size_t size =3D object_type_get_instance_size(scc->cpu_type);
+>          int i;
+> =20
+>          for (i =3D 0; i < cc->nr_threads; i++) {
+>              sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(dev);
+> -            void *obj =3D sc->threads + i * size;
+> =20
+> -            cs =3D CPU(obj);
+> +            cs =3D CPU(sc->threads[i]);
+>              pre_2_10_vmstate_unregister_dummy_icp(cs->cpu_index);
+>          }
+>      }
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 3a4c17401226..588f9b45714a 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -79,13 +79,11 @@ const char *spapr_get_cpu_core_type(const char *cpu_t=
+ype)
+>  static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
+>  {
+>      sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
+> -    sPAPRCPUCoreClass *scc =3D SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
+> -    size_t size =3D object_type_get_instance_size(scc->cpu_type);
+>      CPUCore *cc =3D CPU_CORE(dev);
+>      int i;
+> =20
+>      for (i =3D 0; i < cc->nr_threads; i++) {
+> -        void *obj =3D sc->threads + i * size;
+> +        Object *obj =3D OBJECT(sc->threads[i]);
+>          DeviceState *dev =3D DEVICE(obj);
+>          CPUState *cs =3D CPU(dev);
+>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> @@ -146,9 +144,8 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
+Error **errp)
+>      sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
+>      sPAPRCPUCoreClass *scc =3D SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
+>      CPUCore *cc =3D CPU_CORE(OBJECT(dev));
+> -    size_t size;
+>      Error *local_err =3D NULL;
+> -    void *obj;
+> +    Object *obj;
+>      int i, j;
+> =20
+>      if (!spapr) {
+> @@ -156,18 +153,16 @@ static void spapr_cpu_core_realize(DeviceState *dev=
+, Error **errp)
+>          return;
+>      }
+> =20
+> -    size =3D object_type_get_instance_size(scc->cpu_type);
+> -    sc->threads =3D g_malloc0(size * cc->nr_threads);
+> +    sc->threads =3D g_new(PowerPCCPU *, cc->nr_threads);
+>      for (i =3D 0; i < cc->nr_threads; i++) {
+>          char id[32];
+>          CPUState *cs;
+>          PowerPCCPU *cpu;
+> =20
+> -        obj =3D sc->threads + i * size;
+> +        obj =3D object_new(scc->cpu_type);
+> =20
+> -        object_initialize(obj, size, scc->cpu_type);
+>          cs =3D CPU(obj);
+> -        cpu =3D POWERPC_CPU(cs);
+> +        cpu =3D sc->threads[i] =3D POWERPC_CPU(obj);
+>          cs->cpu_index =3D cc->core_id + i;
+>          cpu->vcpu_id =3D (cc->core_id * spapr->vsmt / smp_threads) + i;
+>          if (kvm_enabled() && !kvm_vcpu_id_is_valid(cpu->vcpu_id)) {
+> @@ -192,7 +187,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
+Error **errp)
+>      }
+> =20
+>      for (j =3D 0; j < cc->nr_threads; j++) {
+> -        obj =3D sc->threads + j * size;
+> +        obj =3D OBJECT(sc->threads[j]);
+> =20
+>          spapr_cpu_core_realize_child(obj, spapr, &local_err);
+>          if (local_err) {
+> @@ -203,7 +198,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
+Error **errp)
+> =20
+>  err:
+>      while (--i >=3D 0) {
+> -        obj =3D sc->threads + i * size;
+> +        obj =3D OBJECT(sc->threads[i]);
+>          object_unparent(obj);
+>      }
+>      g_free(sc->threads);
+> diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_c=
+ore.h
+> index f2d48d6a6786..1129f344aa0c 100644
+> --- a/include/hw/ppc/spapr_cpu_core.h
+> +++ b/include/hw/ppc/spapr_cpu_core.h
+> @@ -28,7 +28,7 @@ typedef struct sPAPRCPUCore {
+>      CPUCore parent_obj;
+> =20
+>      /*< public >*/
+> -    void *threads;
+> +    PowerPCCPU **threads;
+>      int node_id;
+>  } sPAPRCPUCore;
+> =20
+>=20
 
-+typedef union NBDReply {
-+    NBDSimpleReply simple;
-+    NBDStructuredReplyChunk structured;
-+    struct {
-+        /* @magic and @handle fields have the same offset and size both in
-+         * simple reply and structured reply chunk, so let them be accessible
-+         * without ".simple." or ".structured." specification
-+         */
-+        uint32_t magic;
-+        uint32_t _skip;
-+        uint64_t handle;
-+    } QEMU_PACKED;
-+} NBDReply;
-+
- /* Header of NBD_REPLY_TYPE_OFFSET_DATA, complete NBD_REPLY_TYPE_OFFSET_HOLE */
- typedef struct NBDStructuredRead {
-     NBDStructuredReplyChunk h;
-@@ -256,4 +264,14 @@ void nbd_client_put(NBDClient *client);
- void nbd_server_start(SocketAddress *addr, const char *tls_creds,
-                       Error **errp);
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-+static inline bool nbd_reply_is_simple(NBDReply *reply)
-+{
-+    return reply->magic == NBD_SIMPLE_REPLY_MAGIC;
-+}
-+
-+static inline bool nbd_reply_is_structured(NBDReply *reply)
-+{
-+    return reply->magic == NBD_STRUCTURED_REPLY_MAGIC;
-+}
-+
- #endif
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index c0683c3c83..58493b7ac4 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -92,7 +92,9 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
-         i = HANDLE_TO_INDEX(s, s->reply.handle);
-         if (i >= MAX_NBD_REQUESTS ||
-             !s->requests[i].coroutine ||
--            !s->requests[i].receiving) {
-+            !s->requests[i].receiving ||
-+            nbd_reply_is_structured(&s->reply))
-+        {
-             break;
-         }
+--fCcDWlUEdh43YKr8
+Content-Type: application/pgp-signature; name="signature.asc"
 
-@@ -194,8 +196,8 @@ static int nbd_co_receive_reply(NBDClientSession *s,
-         ret = -EIO;
-     } else {
-         assert(s->reply.handle == handle);
--        ret = -s->reply.error;
--        if (qiov && s->reply.error == 0) {
-+        ret = -nbd_errno_to_system_errno(s->reply.simple.error);
-+        if (qiov && ret == 0) {
-             if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
-                                       NULL) < 0) {
-                 ret = -EIO;
-diff --git a/nbd/client.c b/nbd/client.c
-index 9d335fcaba..eeb23ae934 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -907,6 +907,57 @@ int nbd_send_request(QIOChannel *ioc, NBDRequest *request)
-     return nbd_write(ioc, buf, sizeof(buf), NULL);
- }
+-----BEGIN PGP SIGNATURE-----
 
-+/* nbd_receive_simple_reply
-+ * Read simple reply except magic field (which should be already read).
-+ * Payload is not read (payload is possible for CMD_READ, but here we even
-+ * don't know whether it take place or not).
-+ */
-+static int nbd_receive_simple_reply(QIOChannel *ioc, NBDSimpleReply *reply,
-+                                    Error **errp)
-+{
-+    int ret;
-+
-+    assert(reply->magic == NBD_SIMPLE_REPLY_MAGIC);
-+
-+    ret = nbd_read(ioc, (uint8_t *)reply + sizeof(reply->magic),
-+                   sizeof(*reply) - sizeof(reply->magic), errp);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    be32_to_cpus(&reply->error);
-+    be64_to_cpus(&reply->handle);
-+
-+    return 0;
-+}
-+
-+/* nbd_receive_structured_reply_chunk
-+ * Read structured reply chunk except magic field (which should be already
-+ * read).
-+ * Payload is not read.
-+ */
-+static int nbd_receive_structured_reply_chunk(QIOChannel *ioc,
-+                                              NBDStructuredReplyChunk *chunk,
-+                                              Error **errp)
-+{
-+    int ret;
-+
-+    assert(chunk->magic == NBD_STRUCTURED_REPLY_MAGIC);
-+
-+    ret = nbd_read(ioc, (uint8_t *)chunk + sizeof(chunk->magic),
-+                   sizeof(*chunk) - sizeof(chunk->magic), errp);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    be16_to_cpus(&chunk->flags);
-+    be16_to_cpus(&chunk->type);
-+    be64_to_cpus(&chunk->handle);
-+    be32_to_cpus(&chunk->length);
-+
-+    return 0;
-+}
-+
- /* nbd_receive_reply
-  * Returns 1 on success
-  *         0 on eof, when no data was read (errp is not set)
-@@ -914,38 +965,47 @@ int nbd_send_request(QIOChannel *ioc, NBDRequest *request)
-  */
- int nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
- {
--    uint8_t buf[NBD_REPLY_SIZE];
--    uint32_t magic;
-     int ret;
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnh2e4ACgkQbDjKyiDZ
+s5KNlQ/+NByOOD7eWLm7+B8Y39zjPkKLjiTQDQNH4ID0pMv00i/o/Yh8J3nqxtTO
+mmx3mtc5O+GHWnVdbfBKsHMy1velQGiHdx8Tla68WFcXOddamTAP38OQjlF0OQYf
+aHQp1mIPk5XJ9qbi66wXDWXR8tYu8qJMZoS3b/+c/QATExPJM5d65hKMAtK/gg/h
+56DbFXa2suB0m+Qvb1ZbOW4n/K+mSqOXczyIAHRrmK7IcA0DpIx5k39MWbH4goc6
+K6remi8sZYlqcwwV8duIvtsL5GNOgLKu5RS2ZAdpoAPUg8vR+5U9TxWtdNqcWCnW
+OhY+iPAtJ0leDyDc+4LvjQU0muwK+L0cPgeUpjknx948rW5L6PPYfZ5PBVeqGShk
+0i85N1D/jnF7hwJ+VbWXzGOAv+2QGfW0jTtq9k3BZwi2Y90znRHapkf5PWdCK33A
+KnPTlnTmwaKgfJoQwO+v84WNftPwDRStsLNUCPBAS/F+ZgrDV1XnfcY5f1n7HlMf
+aO4OrHrFtz7DUjM13QnHd5ldv64eU7EP2ZOHs75BlbpfbI21mn0wNO6f19P5dBVZ
+UA8piAX54ndIKalwa7FPhuoHmq2ca4bkMhgP/Tm34cSTmwz4PlRCcLp0YFMXS92b
+LDLLgruPYAd2OfvcmPpGVwCHi2EBfPI0RaL68vtYYYkN7EPQlLc=
+=Ac2b
+-----END PGP SIGNATURE-----
 
--    ret = nbd_read_eof(ioc, buf, sizeof(buf), errp);
-+    ret = nbd_read_eof(ioc, &reply->magic, sizeof(reply->magic), errp);
-     if (ret <= 0) {
-         return ret;
-     }
-
--    /* Reply
--       [ 0 ..  3]    magic   (NBD_SIMPLE_REPLY_MAGIC)
--       [ 4 ..  7]    error   (0 == no error)
--       [ 7 .. 15]    handle
--     */
-+    be32_to_cpus(&reply->magic);
-
--    magic = ldl_be_p(buf);
--    reply->error  = ldl_be_p(buf + 4);
--    reply->handle = ldq_be_p(buf + 8);
-+    switch (reply->magic) {
-+    case NBD_SIMPLE_REPLY_MAGIC:
-+        ret = nbd_receive_simple_reply(ioc, &reply->simple, errp);
-+        if (ret < 0) {
-+            break;
-+        }
-
--    trace_nbd_receive_reply(magic, reply->error, nbd_err_lookup(reply->error),
--                            reply->handle);
--    reply->error = nbd_errno_to_system_errno(reply->error);
--
--    if (reply->error == ESHUTDOWN) {
--        /* This works even on mingw which lacks a native ESHUTDOWN */
--        error_setg(errp, "server shutting down");
-+        trace_nbd_receive_simple_reply(reply->simple.error,
-+                                       nbd_err_lookup(reply->simple.error),
-+                                       reply->handle);
-+        if (reply->simple.error == NBD_ESHUTDOWN) {
-+            /* This works even on mingw which lacks a native ESHUTDOWN */
-+            error_setg(errp, "server shutting down");
-+            return -EINVAL;
-+        }
-+        break;
-+    case NBD_STRUCTURED_REPLY_MAGIC:
-+        ret = nbd_receive_structured_reply_chunk(ioc, &reply->structured, errp);
-+        if (ret < 0) {
-+            break;
-+        }
-+        trace_nbd_receive_structured_reply_chunk(reply->structured.flags,
-+                                                 reply->structured.type,
-+                                                 reply->structured.handle,
-+                                                 reply->structured.length);
-+        break;
-+    default:
-+        error_setg(errp, "invalid magic (got 0x%" PRIx32 ")", reply->magic);
-         return -EINVAL;
-     }
--
--    if (magic != NBD_SIMPLE_REPLY_MAGIC) {
--        error_setg(errp, "invalid magic (got 0x%" PRIx32 ")", magic);
--        return -EINVAL;
-+    if (ret < 0) {
-+        return ret;
-     }
-
-     return 1;
-diff --git a/nbd/trace-events b/nbd/trace-events
-index 39b723d1d8..8af453467b 100644
---- a/nbd/trace-events
-+++ b/nbd/trace-events
-@@ -26,7 +26,8 @@ nbd_client_loop_ret(int ret, const char *error) "NBD loop returned %d: %s"
- nbd_client_clear_queue(void) "Clearing NBD queue"
- nbd_client_clear_socket(void) "Clearing NBD socket"
- nbd_send_request(uint64_t from, uint32_t len, uint64_t handle, uint16_t flags, uint16_t type, const char *name) "Sending request to server: { .from = %" PRIu64", .len = %" PRIu32 ", .handle = %" PRIu64 ", .flags = 0x%" PRIx16 ", .type = %" PRIu16 " (%s) }"
--nbd_receive_reply(uint32_t magic, int32_t error, const char *errname, uint64_t handle) "Got reply: { magic = 0x%" PRIx32 ", .error = % " PRId32 " (%s), handle = %" PRIu64" }"
-+nbd_receive_simple_reply(int32_t error, const char *errname, uint64_t handle) "Got simple reply: { .error = % " PRId32 " (%s), handle = %" PRIu64" }"
-+nbd_receive_structured_reply_chunk(uint16_t flags, uint16_t type, uint64_t handle, uint32_t length) "Got structured reply chunk: { flags = 0x%" PRIx16 ", type = %d, handle = %" PRIu64 ", length = %" PRIu32 " }"
-
- # nbd/common.c
- nbd_unknown_error(int err) "Squashing unexpected error %d to EINVAL"
--- 
-2.13.6
+--fCcDWlUEdh43YKr8--
