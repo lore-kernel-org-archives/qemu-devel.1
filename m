@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3R7b-0001id-GN
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3R7b-0001ie-GY
 	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:25:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3R7Y-0002ZP-Lw
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3R7Y-0002ZE-CG
 	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:25:15 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:36882
+Received: from chuckie.co.uk ([82.165.15.123]:36880
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1e3R7Y-0002Yi-Fk
+	id 1e3R7Y-0002Yd-6q
 	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:25:12 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sat, 14 Oct 2017 19:24:57 +0100
-Message-Id: <1508005498-29037-3-git-send-email-mark.cave-ayland@ilande.co.uk>
+Date: Sat, 14 Oct 2017 19:24:56 +0100
+Message-Id: <1508005498-29037-2-git-send-email-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <1508005498-29037-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 References: <1508005498-29037-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 2/3] sparc32_dma: switch over to using IOMMU
- memory region and DMA API
+Subject: [Qemu-devel] [PATCH 1/3] sun4m: implement IOMMU translation using
+ IOMMU memory region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,88 +30,120 @@ To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/dma/sparc32_dma.c |   17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+ hw/dma/sun4m_iommu.c     |   62 ++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/sparc/sun4m.h |    5 ++++
+ 2 files changed, 67 insertions(+)
 
-diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
-index fbb072a..5438831 100644
---- a/hw/dma/sparc32_dma.c
-+++ b/hw/dma/sparc32_dma.c
-@@ -29,6 +29,7 @@
- #include "hw/hw.h"
- #include "hw/sparc/sparc32_dma.h"
- #include "hw/sysbus.h"
-+#include "sysemu/dma.h"
- #include "qapi/error.h"
- #include "trace.h"
- 
-@@ -70,16 +71,17 @@ void ledma_memory_read(void *opaque, hwaddr addr,
-                        uint8_t *buf, int len, int do_bswap)
- {
-     DMADeviceState *s = opaque;
-+    IOMMUState *is = (IOMMUState *)s->iommu;
-     int i;
- 
-     addr |= s->dmaregs[3];
-     trace_ledma_memory_read(addr, len);
-     if (do_bswap) {
--        sparc_iommu_memory_read(s->iommu, addr, buf, len);
-+        dma_memory_read(&is->iommu_as, addr, buf, len);
-     } else {
-         addr &= ~1;
-         len &= ~1;
--        sparc_iommu_memory_read(s->iommu, addr, buf, len);
-+        dma_memory_read(&is->iommu_as, addr, buf, len);
-         for(i = 0; i < len; i += 2) {
-             bswap16s((uint16_t *)(buf + i));
-         }
-@@ -90,13 +92,14 @@ void ledma_memory_write(void *opaque, hwaddr addr,
-                         uint8_t *buf, int len, int do_bswap)
- {
-     DMADeviceState *s = opaque;
-+    IOMMUState *is = (IOMMUState *)s->iommu;
-     int l, i;
-     uint16_t tmp_buf[32];
- 
-     addr |= s->dmaregs[3];
-     trace_ledma_memory_write(addr, len);
-     if (do_bswap) {
--        sparc_iommu_memory_write(s->iommu, addr, buf, len);
-+        dma_memory_write(&is->iommu_as, addr, buf, len);
-     } else {
-         addr &= ~1;
-         len &= ~1;
-@@ -107,7 +110,7 @@ void ledma_memory_write(void *opaque, hwaddr addr,
-             for(i = 0; i < l; i += 2) {
-                 tmp_buf[i >> 1] = bswap16(*(uint16_t *)(buf + i));
-             }
--            sparc_iommu_memory_write(s->iommu, addr, (uint8_t *)tmp_buf, l);
-+            dma_memory_write(&is->iommu_as, addr, tmp_buf, l);
-             len -= l;
-             buf += l;
-             addr += l;
-@@ -138,18 +141,20 @@ static void dma_set_irq(void *opaque, int irq, int level)
- void espdma_memory_read(void *opaque, uint8_t *buf, int len)
- {
-     DMADeviceState *s = opaque;
-+    IOMMUState *is = (IOMMUState *)s->iommu;
- 
-     trace_espdma_memory_read(s->dmaregs[1], len);
--    sparc_iommu_memory_read(s->iommu, s->dmaregs[1], buf, len);
-+    dma_memory_read(&is->iommu_as, s->dmaregs[1], buf, len);
-     s->dmaregs[1] += len;
+diff --git a/hw/dma/sun4m_iommu.c b/hw/dma/sun4m_iommu.c
+index 840064b..ce21a22 100644
+--- a/hw/dma/sun4m_iommu.c
++++ b/hw/dma/sun4m_iommu.c
+@@ -278,6 +278,49 @@ static void iommu_bad_addr(IOMMUState *s, hwaddr addr,
+     qemu_irq_raise(s->irq);
  }
  
- void espdma_memory_write(void *opaque, uint8_t *buf, int len)
++/* Called from RCU critical section */
++static IOMMUTLBEntry sun4m_translate_iommu(IOMMUMemoryRegion *iommu,
++                                           hwaddr addr,
++                                           IOMMUAccessFlags flags)
++{
++    IOMMUState *is = container_of(iommu, IOMMUState, iommu);
++    hwaddr page, pa;
++    int is_write = (flags & IOMMU_WO) ? 1 : 0;
++    uint32_t pte;
++    IOMMUTLBEntry ret = {
++        .target_as = &address_space_memory,
++        .iova = 0,
++        .translated_addr = 0,
++        .addr_mask = ~(hwaddr)0,
++        .perm = IOMMU_NONE,
++    };
++
++    page = addr & IOMMU_PAGE_MASK;
++    pte = iommu_page_get_flags(is, page);
++    if (!(pte & IOPTE_VALID)) {
++        iommu_bad_addr(is, page, is_write);
++        return ret;
++    }
++
++    pa = iommu_translate_pa(addr, pte);
++    if (is_write && !(pte & IOPTE_WRITE)) {
++        iommu_bad_addr(is, page, is_write);
++        return ret;
++    }
++
++    if (pte & IOPTE_WRITE) {
++        ret.perm = IOMMU_RW;
++    } else {
++        ret.perm = IOMMU_RO;
++    }
++
++    ret.iova = page;
++    ret.translated_addr = pa;
++    ret.addr_mask = ~IOMMU_PAGE_MASK;
++
++    return ret;
++}
++
+ void sparc_iommu_memory_rw(void *opaque, hwaddr addr,
+                            uint8_t *buf, int len, int is_write)
  {
-     DMADeviceState *s = opaque;
-+    IOMMUState *is = (IOMMUState *)s->iommu;
+@@ -340,6 +383,11 @@ static void iommu_init(Object *obj)
+     IOMMUState *s = SUN4M_IOMMU(obj);
+     SysBusDevice *dev = SYS_BUS_DEVICE(obj);
  
-     trace_espdma_memory_write(s->dmaregs[1], len);
--    sparc_iommu_memory_write(s->iommu, s->dmaregs[1], buf, len);
-+    dma_memory_write(&is->iommu_as, s->dmaregs[1], buf, len);
-     s->dmaregs[1] += len;
++    memory_region_init_iommu(&s->iommu, sizeof(s->iommu),
++                             TYPE_SUN4M_IOMMU_MEMORY_REGION, OBJECT(dev),
++                             "iommu-sun4m", UINT64_MAX);
++    address_space_init(&s->iommu_as, MEMORY_REGION(&s->iommu), "iommu-as");
++
+     sysbus_init_irq(dev, &s->irq);
+ 
+     memory_region_init_io(&s->iomem, obj, &iommu_mem_ops, s, "iommu",
+@@ -369,9 +417,23 @@ static const TypeInfo iommu_info = {
+     .class_init    = iommu_class_init,
+ };
+ 
++static void sun4m_iommu_memory_region_class_init(ObjectClass *klass, void *data)
++{
++    IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
++
++    imrc->translate = sun4m_translate_iommu;
++}
++
++static const TypeInfo sun4m_iommu_memory_region_info = {
++    .parent = TYPE_IOMMU_MEMORY_REGION,
++    .name = TYPE_SUN4M_IOMMU_MEMORY_REGION,
++    .class_init = sun4m_iommu_memory_region_class_init,
++};
++
+ static void iommu_register_types(void)
+ {
+     type_register_static(&iommu_info);
++    type_register_static(&sun4m_iommu_memory_region_info);
  }
  
+ type_init(iommu_register_types)
+diff --git a/include/hw/sparc/sun4m.h b/include/hw/sparc/sun4m.h
+index a4f5f09..0548bac 100644
+--- a/include/hw/sparc/sun4m.h
++++ b/include/hw/sparc/sun4m.h
+@@ -14,11 +14,16 @@
+ #define TYPE_SUN4M_IOMMU "iommu"
+ #define SUN4M_IOMMU(obj) OBJECT_CHECK(IOMMUState, (obj), TYPE_SUN4M_IOMMU)
+ 
++#define TYPE_SUN4M_IOMMU_MEMORY_REGION "sun4m-iommu-memory-region"
++
+ #define IOMMU_NREGS         (4 * 4096 / 4)
+ 
+ typedef struct IOMMUState {
+     SysBusDevice parent_obj;
+ 
++    AddressSpace iommu_as;
++    IOMMUMemoryRegion iommu;
++
+     MemoryRegion iomem;
+     uint32_t regs[IOMMU_NREGS];
+     hwaddr iostart;
 -- 
 1.7.10.4
