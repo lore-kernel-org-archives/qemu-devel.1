@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3RLb-0006Af-BK
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:45 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3RLZ-0006A9-BP
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3RLa-0001lo-9T
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:43 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:36932
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3RLY-0001kr-Em
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:41 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:36928
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1e3RLa-0001lN-30
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:42 -0400
+	id 1e3RLY-0001k1-8f
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:40 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sat, 14 Oct 2017 19:38:56 +0100
-Message-Id: <1508006342-5304-8-git-send-email-mark.cave-ayland@ilande.co.uk>
+Date: Sat, 14 Oct 2017 19:38:55 +0100
+Message-Id: <1508006342-5304-7-git-send-email-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <1508006342-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 References: <1508006342-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCHv3 07/13] esp: move TYPE_ESP and SysBusESPState
- from esp.c to esp.h
+Subject: [Qemu-devel] [PATCHv3 06/13] sparc32_dma: use object link instead
+ of qdev property to pass IOMMU reference
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +27,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, atar4qemu@gmail.com
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-This enables them to be used outside of esp.c.
+This enables us to remove the last remaining (opaque) qdev property. Whilst we
+are here, also update iommu_init() to use TYPE_SUN4M_IOMMU instead of a
+hardcoded string.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-CC: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/esp.c         |   13 -------------
- include/hw/scsi/esp.h |   14 ++++++++++++++
- 2 files changed, 14 insertions(+), 13 deletions(-)
+ hw/dma/sparc32_dma.c |   13 +++++--------
+ hw/sparc/sun4m.c     |    4 ++--
+ 2 files changed, 7 insertions(+), 10 deletions(-)
 
-diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
-index 22c2d91..ee586e7 100644
---- a/hw/scsi/esp.c
-+++ b/hw/scsi/esp.c
-@@ -592,19 +592,6 @@ const VMStateDescription vmstate_esp = {
-     }
- };
+diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
+index ae8fa06..c56a2ba 100644
+--- a/hw/dma/sparc32_dma.c
++++ b/hw/dma/sparc32_dma.c
+@@ -263,24 +263,21 @@ static void sparc32_dma_device_init(Object *obj)
  
--#define TYPE_ESP "esp"
--#define ESP_STATE(obj) OBJECT_CHECK(SysBusESPState, (obj), TYPE_ESP)
+     sysbus_init_mmio(sbd, &s->iomem);
+ 
++    object_property_add_link(OBJECT(dev), "iommu", TYPE_SUN4M_IOMMU,
++                             (Object **) &s->iommu,
++                             qdev_prop_allow_set_link_before_realize,
++                             0, NULL);
++
+     qdev_init_gpio_in(dev, dma_set_irq, 1);
+     qdev_init_gpio_out(dev, s->gpio, 2);
+ }
+ 
+-static Property sparc32_dma_device_properties[] = {
+-    DEFINE_PROP_PTR("iommu_opaque", DMADeviceState, iommu),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
 -
--typedef struct {
--    /*< private >*/
--    SysBusDevice parent_obj;
--    /*< public >*/
--
--    MemoryRegion iomem;
--    uint32_t it_shift;
--    ESPState esp;
--} SysBusESPState;
--
- static void sysbus_esp_mem_write(void *opaque, hwaddr addr,
-                                  uint64_t val, unsigned int size)
+ static void sparc32_dma_device_class_init(ObjectClass *klass, void *data)
  {
-diff --git a/include/hw/scsi/esp.h b/include/hw/scsi/esp.h
-index d2c4886..3b160f8 100644
---- a/include/hw/scsi/esp.h
-+++ b/include/hw/scsi/esp.h
-@@ -2,6 +2,7 @@
- #define QEMU_HW_ESP_H
+     DeviceClass *dc = DEVICE_CLASS(klass);
  
- #include "hw/scsi/scsi.h"
-+#include "hw/sysbus.h"
+     dc->reset = sparc32_dma_device_reset;
+     dc->vmsd = &vmstate_sparc32_dma_device;
+-    dc->props = sparc32_dma_device_properties;
+-    /* Reason: pointer property "iommu_opaque" */
+-    dc->user_creatable = false;
+ }
  
- /* esp.c */
- #define ESP_MAX_DEVS 7
-@@ -52,6 +53,19 @@ struct ESPState {
-     void (*dma_cb)(ESPState *s);
- };
+ static const TypeInfo sparc32_dma_device_info = {
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index 4f2ed4b..12d36b5 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -297,7 +297,7 @@ static void *iommu_init(hwaddr addr, uint32_t version, qemu_irq irq)
+     DeviceState *dev;
+     SysBusDevice *s;
  
-+#define TYPE_ESP "esp"
-+#define ESP_STATE(obj) OBJECT_CHECK(SysBusESPState, (obj), TYPE_ESP)
-+
-+typedef struct {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
-+
-+    MemoryRegion iomem;
-+    uint32_t it_shift;
-+    ESPState esp;
-+} SysBusESPState;
-+
- #define ESP_TCLO   0x0
- #define ESP_TCMID  0x1
- #define ESP_FIFO   0x2
+-    dev = qdev_create(NULL, "iommu");
++    dev = qdev_create(NULL, TYPE_SUN4M_IOMMU);
+     qdev_prop_set_uint32(dev, "version", version);
+     qdev_init_nofail(dev);
+     s = SYS_BUS_DEVICE(dev);
+@@ -313,7 +313,7 @@ static void *sparc32_dma_init(hwaddr daddr, void *iommu, int is_ledma)
+     SysBusDevice *s;
+ 
+     dev = qdev_create(NULL, is_ledma ? "sparc32-ledma" : "sparc32-espdma");
+-    qdev_prop_set_ptr(dev, "iommu_opaque", iommu);
++    object_property_set_link(OBJECT(dev), OBJECT(iommu), "iommu", &error_abort);
+     qdev_init_nofail(dev);
+     s = SYS_BUS_DEVICE(dev);
+     sysbus_mmio_map(s, 0, daddr);
 -- 
 1.7.10.4
