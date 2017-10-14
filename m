@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3RLd-0006Ah-Do
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:46 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3RLZ-0006A8-Af
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3RLb-0001mC-4w
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:44 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:36934
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3RLU-0001fE-9m
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:41 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:36914
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1e3RLa-0001lt-Uf
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:43 -0400
+	id 1e3RLU-0001du-2r
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:36 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sat, 14 Oct 2017 19:38:57 +0100
-Message-Id: <1508006342-5304-9-git-send-email-mark.cave-ayland@ilande.co.uk>
+Date: Sat, 14 Oct 2017 19:38:51 +0100
+Message-Id: <1508006342-5304-3-git-send-email-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <1508006342-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 References: <1508006342-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCHv3 08/13] sparc32_dma: make esp device child of
- espdma device
+Subject: [Qemu-devel] [PATCHv3 02/13] sparc32_dma: split esp and le into
+ separate DMA devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,125 +29,140 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-This makes it possible to reference the esp device from the espdma device as
-required, and by wiring up the device ourselves in sun4m.c we can drop use
-of the esp_init() function.
+Due to slight differences in behaviour accessing the registers for the
+esp and le devices, create two separate SPARC32_DMA_DEVICE types and
+update the sun4m machine to use.
+
+Note that by using different device types we already know the size of
+the register block and the value of is_ledma at init time, allowing us to
+drop the SPARC32_DMA_DEVICE realize function and the is_ledma device
+property.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/dma/sparc32_dma.c           |   26 ++++++++++++++++++++++++++
- hw/sparc/sun4m.c               |   19 ++++++++-----------
- include/hw/sparc/sparc32_dma.h |    3 +++
- 3 files changed, 37 insertions(+), 11 deletions(-)
+ hw/dma/sparc32_dma.c |   63 ++++++++++++++++++++++++++++++++++++++++----------
+ hw/sparc/sun4m.c     |    3 +--
+ 2 files changed, 52 insertions(+), 14 deletions(-)
 
 diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
-index c56a2ba..6009b94 100644
+index a8d31c1..e4ff4a8 100644
 --- a/hw/dma/sparc32_dma.c
 +++ b/hw/dma/sparc32_dma.c
-@@ -298,11 +298,37 @@ static void sparc32_espdma_device_init(Object *obj)
-     s->is_ledma = 0;
- }
- 
-+static void sparc32_espdma_device_realize(DeviceState *dev, Error **errp)
-+{
-+    DeviceState *d;
-+    SysBusESPState *sysbus;
-+    ESPState *esp;
-+
-+    d = qdev_create(NULL, TYPE_ESP);
-+    object_property_add_child(OBJECT(dev), "esp", OBJECT(d), errp);
-+    sysbus = ESP_STATE(d);
-+    esp = &sysbus->esp;
-+    esp->dma_memory_read = espdma_memory_read;
-+    esp->dma_memory_write = espdma_memory_write;
-+    esp->dma_opaque = SPARC32_DMA_DEVICE(dev);
-+    sysbus->it_shift = 2;
-+    esp->dma_enabled = 1;
-+    qdev_init_nofail(d);
-+}
-+
-+static void sparc32_espdma_device_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = sparc32_espdma_device_realize;
-+}
-+
- static const TypeInfo sparc32_espdma_device_info = {
-     .name          = TYPE_SPARC32_ESPDMA_DEVICE,
-     .parent        = TYPE_SPARC32_DMA_DEVICE,
-     .instance_size = sizeof(ESPDMADeviceState),
-     .instance_init = sparc32_espdma_device_init,
-+    .class_init    = sparc32_espdma_device_class_init,
+@@ -78,6 +78,22 @@ struct DMADeviceState {
+     uint32_t is_ledma;
  };
  
- static void sparc32_ledma_device_init(Object *obj)
++#define TYPE_SPARC32_ESPDMA_DEVICE "sparc32-espdma"
++#define SPARC32_ESPDMA_DEVICE(obj) OBJECT_CHECK(ESPDMADeviceState, (obj), \
++                                                TYPE_SPARC32_ESPDMA_DEVICE)
++
++typedef struct ESPDMADeviceState {
++    DMADeviceState parent_obj;
++} ESPDMADeviceState;
++
++#define TYPE_SPARC32_LEDMA_DEVICE "sparc32-ledma"
++#define SPARC32_LEDMA_DEVICE(obj) OBJECT_CHECK(LEDMADeviceState, (obj), \
++                                               TYPE_SPARC32_LEDMA_DEVICE)
++
++typedef struct LEDMADeviceState {
++    DMADeviceState parent_obj;
++} LEDMADeviceState;
++
+ enum {
+     GPIO_RESET = 0,
+     GPIO_DMA,
+@@ -285,19 +301,8 @@ static void sparc32_dma_device_init(Object *obj)
+     qdev_init_gpio_out(dev, s->gpio, 2);
+ }
+ 
+-static void sparc32_dma_device_realize(DeviceState *dev, Error **errp)
+-{
+-    DMADeviceState *s = SPARC32_DMA_DEVICE(dev);
+-    int reg_size;
+-
+-    reg_size = s->is_ledma ? DMA_ETH_SIZE : DMA_SIZE;
+-    memory_region_init_io(&s->iomem, OBJECT(dev), &dma_mem_ops, s,
+-                          "dma", reg_size);
+-}
+-
+ static Property sparc32_dma_device_properties[] = {
+     DEFINE_PROP_PTR("iommu_opaque", DMADeviceState, iommu),
+-    DEFINE_PROP_UINT32("is_ledma", DMADeviceState, is_ledma, 0),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+@@ -308,7 +313,6 @@ static void sparc32_dma_device_class_init(ObjectClass *klass, void *data)
+     dc->reset = sparc32_dma_device_reset;
+     dc->vmsd = &vmstate_sparc32_dma_device;
+     dc->props = sparc32_dma_device_properties;
+-    dc->realize = sparc32_dma_device_realize;
+     /* Reason: pointer property "iommu_opaque" */
+     dc->user_creatable = false;
+ }
+@@ -316,14 +320,49 @@ static void sparc32_dma_device_class_init(ObjectClass *klass, void *data)
+ static const TypeInfo sparc32_dma_device_info = {
+     .name          = TYPE_SPARC32_DMA_DEVICE,
+     .parent        = TYPE_SYS_BUS_DEVICE,
++    .abstract      = true,
+     .instance_size = sizeof(DMADeviceState),
+     .instance_init = sparc32_dma_device_init,
+     .class_init    = sparc32_dma_device_class_init,
+ };
+ 
++static void sparc32_espdma_device_init(Object *obj)
++{
++    DMADeviceState *s = SPARC32_DMA_DEVICE(obj);
++
++    memory_region_init_io(&s->iomem, OBJECT(s), &dma_mem_ops, s,
++                          "espdma-mmio", DMA_SIZE);
++    s->is_ledma = 0;
++}
++
++static const TypeInfo sparc32_espdma_device_info = {
++    .name          = TYPE_SPARC32_ESPDMA_DEVICE,
++    .parent        = TYPE_SPARC32_DMA_DEVICE,
++    .instance_size = sizeof(ESPDMADeviceState),
++    .instance_init = sparc32_espdma_device_init,
++};
++
++static void sparc32_ledma_device_init(Object *obj)
++{
++    DMADeviceState *s = SPARC32_DMA_DEVICE(obj);
++
++    memory_region_init_io(&s->iomem, OBJECT(s), &dma_mem_ops, s,
++                          "ledma-mmio", DMA_ETH_SIZE);
++    s->is_ledma = 1;
++}
++
++static const TypeInfo sparc32_ledma_device_info = {
++    .name          = TYPE_SPARC32_LEDMA_DEVICE,
++    .parent        = TYPE_SPARC32_DMA_DEVICE,
++    .instance_size = sizeof(LEDMADeviceState),
++    .instance_init = sparc32_ledma_device_init,
++};
++
+ static void sparc32_dma_register_types(void)
+ {
+     type_register_static(&sparc32_dma_device_info);
++    type_register_static(&sparc32_espdma_device_info);
++    type_register_static(&sparc32_ledma_device_info);
+ }
+ 
+ type_init(sparc32_dma_register_types)
 diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 12d36b5..4626c85 100644
+index 82c553c..88a9752 100644
 --- a/hw/sparc/sun4m.c
 +++ b/hw/sparc/sun4m.c
-@@ -819,10 +819,9 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
-     const char *cpu_model = machine->cpu_model;
-     unsigned int i;
-     void *iommu, *nvram;
--    DeviceState *espdma, *ledma;
-+    DeviceState *espdma, *esp, *ledma;
-     SysBusDevice *sbd;
-     qemu_irq *cpu_irqs[MAX_CPUS], slavio_irq[32], slavio_cpu_irq[MAX_CPUS];
--    qemu_irq esp_reset, dma_enable;
-     qemu_irq fdc_tc;
-     unsigned long kernel_size;
-     DriveInfo *fd[MAX_FD];
-@@ -884,6 +883,13 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
-     sbd = SYS_BUS_DEVICE(espdma);
-     sysbus_connect_irq(sbd, 0, slavio_irq[18]);
+@@ -313,9 +313,8 @@ static void *sparc32_dma_init(hwaddr daddr, qemu_irq parent_irq,
+     DeviceState *dev;
+     SysBusDevice *s;
  
-+    esp = DEVICE(object_resolve_path_component(OBJECT(espdma), "esp"));
-+    sbd = SYS_BUS_DEVICE(esp);
-+    sysbus_mmio_map(sbd, 0, hwdef->esp_base);
-+    sysbus_connect_irq(sbd, 0, qdev_get_gpio_in(espdma, 0));
-+    qdev_connect_gpio_out(espdma, 0, qdev_get_gpio_in(esp, 0));
-+    qdev_connect_gpio_out(espdma, 1, qdev_get_gpio_in(esp, 1));
-+
-     ledma = sparc32_dma_init(hwdef->dma_base + 16ULL, iommu, 1);
-     sbd = SYS_BUS_DEVICE(ledma);
-     sysbus_connect_irq(sbd, 0, slavio_irq[16]);
-@@ -970,15 +976,6 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
-     slavio_misc_init(hwdef->slavio_base, hwdef->aux1_base, hwdef->aux2_base,
-                      slavio_irq[30], fdc_tc);
- 
--    esp_init(hwdef->esp_base, 2,
--             espdma_memory_read, espdma_memory_write,
--             espdma,
--             qdev_get_gpio_in(espdma, 0),
--             &esp_reset, &dma_enable);
--
--    qdev_connect_gpio_out(espdma, 0, esp_reset);
--    qdev_connect_gpio_out(espdma, 1, dma_enable);
--
-     if (hwdef->cs_base) {
-         sysbus_create_simple("SUNW,CS4231", hwdef->cs_base,
-                              slavio_irq[5]);
-diff --git a/include/hw/sparc/sparc32_dma.h b/include/hw/sparc/sparc32_dma.h
-index df7491d..365160f 100644
---- a/include/hw/sparc/sparc32_dma.h
-+++ b/include/hw/sparc/sparc32_dma.h
-@@ -2,6 +2,7 @@
- #define SPARC32_DMA_H
- 
- #include "hw/sysbus.h"
-+#include "hw/scsi/esp.h"
- 
- #define DMA_REGS 4
- 
-@@ -28,6 +29,8 @@ struct DMADeviceState {
- 
- typedef struct ESPDMADeviceState {
-     DMADeviceState parent_obj;
-+
-+    SysBusESPState *esp;
- } ESPDMADeviceState;
- 
- #define TYPE_SPARC32_LEDMA_DEVICE "sparc32-ledma"
+-    dev = qdev_create(NULL, "sparc32-dma-device");
++    dev = qdev_create(NULL, is_ledma ? "sparc32-ledma" : "sparc32-espdma");
+     qdev_prop_set_ptr(dev, "iommu_opaque", iommu);
+-    qdev_prop_set_uint32(dev, "is_ledma", is_ledma);
+     qdev_init_nofail(dev);
+     s = SYS_BUS_DEVICE(dev);
+     sysbus_connect_irq(s, 0, parent_irq);
 -- 
 1.7.10.4
