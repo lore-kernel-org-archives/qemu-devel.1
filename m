@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3RQV-0001Ra-3d
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:44:48 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e3S2Z-0002G1-BS
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 15:24:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3RQT-000441-Ov
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:44:47 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:36961
-	helo=s16892447.onlinehome-server.info)
+	(envelope-from <no-reply@patchew.org>) id 1e3S2V-0006wc-Mm
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 15:24:07 -0400
+Resent-Message-Id: <E1e3S2V-0006wc-Mm@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21313)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1e3RQT-00043W-IP
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:44:45 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sat, 14 Oct 2017 19:38:59 +0100
-Message-Id: <1508006342-5304-11-git-send-email-mark.cave-ayland@ilande.co.uk>
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e3S2V-0006vo-Eb
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 15:24:03 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150800900348.320.15378863365157681326@b58463cdfd5f>
 In-Reply-To: <1508006342-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-References: <1508006342-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCHv3 10/13] sparc32_dma: make lance device child
- of ledma device
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 14 Oct 2017 12:23:23 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCHv3 00/13] sun4m: sparc32_dma tidy-ups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,148 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, atar4qemu@gmail.com
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: mark.cave-ayland@ilande.co.uk
+Cc: famz@redhat.com, qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-This makes it possible to reference the lance device from the ledma device as
-required.
-
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/dma/sparc32_dma.c           |   23 ++++++++++++++++++++++-
- hw/sparc/sun4m.c               |   31 +++++++------------------------
- include/hw/sparc/sparc32_dma.h |    3 +++
- 3 files changed, 32 insertions(+), 25 deletions(-)
-
-diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
-index 6009b94..d507ca3 100644
---- a/hw/dma/sparc32_dma.c
-+++ b/hw/dma/sparc32_dma.c
-@@ -28,7 +28,6 @@
- #include "qemu/osdep.h"
- #include "hw/hw.h"
- #include "hw/sparc/sparc32_dma.h"
--#include "hw/sparc/sun4m.h"
- #include "hw/sysbus.h"
- #include "trace.h"
- 
-@@ -340,11 +339,33 @@ static void sparc32_ledma_device_init(Object *obj)
-     s->is_ledma = 1;
- }
- 
-+static void sparc32_ledma_device_realize(DeviceState *dev, Error **errp)
-+{
-+    DeviceState *d;
-+    NICInfo *nd = &nd_table[0];
-+
-+    qemu_check_nic_model(nd, "lance");
-+
-+    d = qdev_create(NULL, "lance");
-+    object_property_add_child(OBJECT(dev), "lance", OBJECT(d), errp);
-+    qdev_set_nic_properties(d, nd);
-+    qdev_prop_set_ptr(d, "dma", dev);
-+    qdev_init_nofail(d);
-+}
-+
-+static void sparc32_ledma_device_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = sparc32_ledma_device_realize;
-+}
-+
- static const TypeInfo sparc32_ledma_device_info = {
-     .name          = TYPE_SPARC32_LEDMA_DEVICE,
-     .parent        = TYPE_SPARC32_DMA_DEVICE,
-     .instance_size = sizeof(LEDMADeviceState),
-     .instance_init = sparc32_ledma_device_init,
-+    .class_init    = sparc32_ledma_device_class_init,
- };
- 
- static void sparc32_dma_register_types(void)
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 4626c85..ae486a4 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -321,26 +321,6 @@ static void *sparc32_dma_init(hwaddr daddr, void *iommu, int is_ledma)
-     return s;
- }
- 
--static void lance_init(NICInfo *nd, hwaddr leaddr,
--                       void *dma_opaque, qemu_irq irq)
--{
--    DeviceState *dev;
--    SysBusDevice *s;
--    qemu_irq reset;
--
--    qemu_check_nic_model(&nd_table[0], "lance");
--
--    dev = qdev_create(NULL, "lance");
--    qdev_set_nic_properties(dev, nd);
--    qdev_prop_set_ptr(dev, "dma", dma_opaque);
--    qdev_init_nofail(dev);
--    s = SYS_BUS_DEVICE(dev);
--    sysbus_mmio_map(s, 0, leaddr);
--    sysbus_connect_irq(s, 0, irq);
--    reset = qdev_get_gpio_in(dev, 0);
--    qdev_connect_gpio_out(dma_opaque, 0, reset);
--}
--
- static DeviceState *slavio_intctl_init(hwaddr addr,
-                                        hwaddr addrg,
-                                        qemu_irq **parent_irq)
-@@ -819,7 +799,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
-     const char *cpu_model = machine->cpu_model;
-     unsigned int i;
-     void *iommu, *nvram;
--    DeviceState *espdma, *esp, *ledma;
-+    DeviceState *espdma, *esp, *ledma, *lance;
-     SysBusDevice *sbd;
-     qemu_irq *cpu_irqs[MAX_CPUS], slavio_irq[32], slavio_cpu_irq[MAX_CPUS];
-     qemu_irq fdc_tc;
-@@ -894,6 +874,12 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
-     sbd = SYS_BUS_DEVICE(ledma);
-     sysbus_connect_irq(sbd, 0, slavio_irq[16]);
- 
-+    lance = DEVICE(object_resolve_path_component(OBJECT(ledma), "lance"));
-+    sbd = SYS_BUS_DEVICE(lance);
-+    sysbus_mmio_map(sbd, 0, hwdef->le_base);
-+    sysbus_connect_irq(sbd, 0, qdev_get_gpio_in(ledma, 0));
-+    qdev_connect_gpio_out(ledma, 0, qdev_get_gpio_in(lance, 0));
-+
-     if (graphic_depth != 8 && graphic_depth != 24) {
-         error_report("Unsupported depth: %d", graphic_depth);
-         exit (1);
-@@ -945,9 +931,6 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
-         empty_slot_init(hwdef->sx_base, 0x2000);
-     }
- 
--    lance_init(&nd_table[0], hwdef->le_base, ledma,
--               qdev_get_gpio_in(ledma, 0));
--
-     nvram = m48t59_init(slavio_irq[0], hwdef->nvram_base, 0, 0x2000, 1968, 8);
- 
-     slavio_timer_init_all(hwdef->counter_base, slavio_irq[19], slavio_cpu_irq, smp_cpus);
-diff --git a/include/hw/sparc/sparc32_dma.h b/include/hw/sparc/sparc32_dma.h
-index 365160f..5f39c28 100644
---- a/include/hw/sparc/sparc32_dma.h
-+++ b/include/hw/sparc/sparc32_dma.h
-@@ -3,6 +3,7 @@
- 
- #include "hw/sysbus.h"
- #include "hw/scsi/esp.h"
-+#include "hw/sparc/sun4m.h"
- 
- #define DMA_REGS 4
- 
-@@ -39,6 +40,8 @@ typedef struct ESPDMADeviceState {
- 
- typedef struct LEDMADeviceState {
-     DMADeviceState parent_obj;
-+
-+    SysBusPCNetState *lance;
- } LEDMADeviceState;
- 
- /* sparc32_dma.c */
--- 
-1.7.10.4
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MDgwMDYzNDItNTMwNC0xLWdpdC1zZW5kLWVtYWlsLW1hcmsuY2F2ZS1heWxh
+bmRAaWxhbmRlLmNvLnVrClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0h2MyAwMC8xM10gc3Vu
+NG06IHNwYXJjMzJfZG1hIHRpZHktdXBzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
+bi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8
+IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAt
+LWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAg
+ZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0l
+cyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRz
+L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAg
+ICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1Qg
+U0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4
+ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo0OTM3NmYyMDk3IHNwYXJj
+MzJfZG1hOiBhZGQgbGVuIHRvIGVzcC9sZSBETUEgbWVtb3J5IHRyYWNpbmcKZDE3NDdiOTk0NiBz
+cGFyYzMyX2RtYTogcmVtb3ZlIGlzX2xlZG1hIGhhY2sgYW5kIHJlcGxhY2Ugd2l0aCBtZW1vcnkg
+cmVnaW9uIGFsaWFzCmFmZjcwOGI3OTQgc3BhcmMzMl9kbWE6IGludHJvZHVjZSBuZXcgU1BBUkMz
+Ml9ETUEgdHlwZSBjb250YWluZXIgb2JqZWN0CmMxZDhlMzI0ZTIgc3BhcmMzMl9kbWE6IG1ha2Ug
+bGFuY2UgZGV2aWNlIGNoaWxkIG9mIGxlZG1hIGRldmljZQo4OWY5MTExNmRkIGxhbmNlOiBtb3Zl
+IFRZUEVfTEFOQ0UgYW5kIFN5c0J1c1BDTmV0U3RhdGUgZnJvbSBsYW5jZS5jIHRvIHN1bjRtLmgK
+ZGVhZDY2NWQxZCBzcGFyYzMyX2RtYTogbWFrZSBlc3AgZGV2aWNlIGNoaWxkIG9mIGVzcGRtYSBk
+ZXZpY2UKMWFmYWE2M2JiZCBlc3A6IG1vdmUgVFlQRV9FU1AgYW5kIFN5c0J1c0VTUFN0YXRlIGZy
+b20gZXNwLmMgdG8gZXNwLmgKOWUwNTUyMzYzMiBzcGFyYzMyX2RtYTogdXNlIG9iamVjdCBsaW5r
+IGluc3RlYWQgb2YgcWRldiBwcm9wZXJ0eSB0byBwYXNzIElPTU1VIHJlZmVyZW5jZQo4MGI5ODM1
+ODk2IHN1bjRtX2lvbW11OiBtb3ZlIFRZUEVfU1VONE1fSU9NTVUgZGVjbGFyYXRpb24gdG8gc3Vu
+NG0uaAo2NmEzNmFhYTExIHN1bjRtOiBtb3ZlIERNQSBkZXZpY2Ugd2lyaW5nIGZyb20gc3BhcmMz
+Ml9kbWFfaW5pdCgpIHRvIHN1bjRtX2h3X2luaXQoKQpkMmZkOWNhM2ViIHNwYXJjMzJfZG1hOiBt
+b3ZlIHR5cGUgZGVjbGFyYXRpb25zIGZyb20gc3BhcmMzMl9kbWEuYyB0byBzcGFyYzMyX2RtYS5o
+Cjc0YzUxMzVlZGYgc3BhcmMzMl9kbWE6IHNwbGl0IGVzcCBhbmQgbGUgaW50byBzZXBhcmF0ZSBE
+TUEgZGV2aWNlcwpjYzA3YjcwMzVkIHNwYXJjMzJfZG1hOiByZW5hbWUgU1BBUkMzMl9ETUEgdHlw
+ZSB0byBTUEFSQzMyX0RNQV9ERVZJQ0UKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBB
+VENIIDEvMTM6IHNwYXJjMzJfZG1hOiByZW5hbWUgU1BBUkMzMl9ETUEgdHlwZSB0byBTUEFSQzMy
+X0RNQV9ERVZJQ0UuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMzogc3BhcmMzMl9kbWE6IHNwbGl0IGVz
+cCBhbmQgbGUgaW50byBzZXBhcmF0ZSBETUEgZGV2aWNlcy4uLgpDaGVja2luZyBQQVRDSCAzLzEz
+OiBzcGFyYzMyX2RtYTogbW92ZSB0eXBlIGRlY2xhcmF0aW9ucyBmcm9tIHNwYXJjMzJfZG1hLmMg
+dG8gc3BhcmMzMl9kbWEuaC4uLgpDaGVja2luZyBQQVRDSCA0LzEzOiBzdW40bTogbW92ZSBETUEg
+ZGV2aWNlIHdpcmluZyBmcm9tIHNwYXJjMzJfZG1hX2luaXQoKSB0byBzdW40bV9od19pbml0KCku
+Li4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiM1MTog
+RklMRTogaHcvc3BhcmMvc3VuNG0uYzo4MjQ6CisgICAgcWVtdV9pcnEgKmNwdV9pcnFzW01BWF9D
+UFVTXSwgc2xhdmlvX2lycVszMl0sIHNsYXZpb19jcHVfaXJxW01BWF9DUFVTXTsKICAgICAgICAg
+ICAgICBeCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDY2IGxpbmVzIGNoZWNrZWQKCllv
+dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvMTM6
+IHN1bjRtX2lvbW11OiBtb3ZlIFRZUEVfU1VONE1fSU9NTVUgZGVjbGFyYXRpb24gdG8gc3VuNG0u
+aC4uLgpDaGVja2luZyBQQVRDSCA2LzEzOiBzcGFyYzMyX2RtYTogdXNlIG9iamVjdCBsaW5rIGlu
+c3RlYWQgb2YgcWRldiBwcm9wZXJ0eSB0byBwYXNzIElPTU1VIHJlZmVyZW5jZS4uLgpDaGVja2lu
+ZyBQQVRDSCA3LzEzOiBlc3A6IG1vdmUgVFlQRV9FU1AgYW5kIFN5c0J1c0VTUFN0YXRlIGZyb20g
+ZXNwLmMgdG8gZXNwLmguLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xMzogc3BhcmMzMl9kbWE6IG1ha2Ug
+ZXNwIGRldmljZSBjaGlsZCBvZiBlc3BkbWEgZGV2aWNlLi4uCkNoZWNraW5nIFBBVENIIDkvMTM6
+IGxhbmNlOiBtb3ZlIFRZUEVfTEFOQ0UgYW5kIFN5c0J1c1BDTmV0U3RhdGUgZnJvbSBsYW5jZS5j
+IHRvIHN1bjRtLmguLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTM6IHNwYXJjMzJfZG1hOiBtYWtlIGxh
+bmNlIGRldmljZSBjaGlsZCBvZiBsZWRtYSBkZXZpY2UuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMTM6
+IHNwYXJjMzJfZG1hOiBpbnRyb2R1Y2UgbmV3IFNQQVJDMzJfRE1BIHR5cGUgY29udGFpbmVyIG9i
+amVjdC4uLgpDaGVja2luZyBQQVRDSCAxMi8xMzogc3BhcmMzMl9kbWE6IHJlbW92ZSBpc19sZWRt
+YSBoYWNrIGFuZCByZXBsYWNlIHdpdGggbWVtb3J5IHJlZ2lvbiBhbGlhcy4uLgpDaGVja2luZyBQ
+QVRDSCAxMy8xMzogc3BhcmMzMl9kbWE6IGFkZCBsZW4gdG8gZXNwL2xlIERNQSBtZW1vcnkgdHJh
+Y2luZy4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2Rl
+OiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6
+Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
+ZWxAZnJlZWxpc3RzLm9yZw==
