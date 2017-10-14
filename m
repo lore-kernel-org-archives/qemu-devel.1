@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3R7b-0001ie-GY
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:25:16 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e3R9Q-00033p-1z
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:27:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3R7Y-0002ZE-CG
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:25:15 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:36880
-	helo=s16892447.onlinehome-server.info)
+	(envelope-from <no-reply@patchew.org>) id 1e3R9M-00037X-TZ
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:27:08 -0400
+Resent-Message-Id: <E1e3R9M-00037X-TZ@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21367)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1e3R7Y-0002Yd-6q
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:25:12 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sat, 14 Oct 2017 19:24:56 +0100
-Message-Id: <1508005498-29037-2-git-send-email-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <1508005498-29037-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-References: <1508005498-29037-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 1/3] sun4m: implement IOMMU translation using
- IOMMU memory region
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e3R9M-000365-LA
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:27:04 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150800560577.320.11170780555708585805@b58463cdfd5f>
+In-Reply-To: <1508004545-28578-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 14 Oct 2017 11:26:46 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCHv2 00/13] sun4m: sparc32_dma tidy-ups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,124 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, atar4qemu@gmail.com
+To: mark.cave-ayland@ilande.co.uk
+Cc: famz@redhat.com, qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/dma/sun4m_iommu.c     |   62 ++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/sparc/sun4m.h |    5 ++++
- 2 files changed, 67 insertions(+)
-
-diff --git a/hw/dma/sun4m_iommu.c b/hw/dma/sun4m_iommu.c
-index 840064b..ce21a22 100644
---- a/hw/dma/sun4m_iommu.c
-+++ b/hw/dma/sun4m_iommu.c
-@@ -278,6 +278,49 @@ static void iommu_bad_addr(IOMMUState *s, hwaddr addr,
-     qemu_irq_raise(s->irq);
- }
- 
-+/* Called from RCU critical section */
-+static IOMMUTLBEntry sun4m_translate_iommu(IOMMUMemoryRegion *iommu,
-+                                           hwaddr addr,
-+                                           IOMMUAccessFlags flags)
-+{
-+    IOMMUState *is = container_of(iommu, IOMMUState, iommu);
-+    hwaddr page, pa;
-+    int is_write = (flags & IOMMU_WO) ? 1 : 0;
-+    uint32_t pte;
-+    IOMMUTLBEntry ret = {
-+        .target_as = &address_space_memory,
-+        .iova = 0,
-+        .translated_addr = 0,
-+        .addr_mask = ~(hwaddr)0,
-+        .perm = IOMMU_NONE,
-+    };
-+
-+    page = addr & IOMMU_PAGE_MASK;
-+    pte = iommu_page_get_flags(is, page);
-+    if (!(pte & IOPTE_VALID)) {
-+        iommu_bad_addr(is, page, is_write);
-+        return ret;
-+    }
-+
-+    pa = iommu_translate_pa(addr, pte);
-+    if (is_write && !(pte & IOPTE_WRITE)) {
-+        iommu_bad_addr(is, page, is_write);
-+        return ret;
-+    }
-+
-+    if (pte & IOPTE_WRITE) {
-+        ret.perm = IOMMU_RW;
-+    } else {
-+        ret.perm = IOMMU_RO;
-+    }
-+
-+    ret.iova = page;
-+    ret.translated_addr = pa;
-+    ret.addr_mask = ~IOMMU_PAGE_MASK;
-+
-+    return ret;
-+}
-+
- void sparc_iommu_memory_rw(void *opaque, hwaddr addr,
-                            uint8_t *buf, int len, int is_write)
- {
-@@ -340,6 +383,11 @@ static void iommu_init(Object *obj)
-     IOMMUState *s = SUN4M_IOMMU(obj);
-     SysBusDevice *dev = SYS_BUS_DEVICE(obj);
- 
-+    memory_region_init_iommu(&s->iommu, sizeof(s->iommu),
-+                             TYPE_SUN4M_IOMMU_MEMORY_REGION, OBJECT(dev),
-+                             "iommu-sun4m", UINT64_MAX);
-+    address_space_init(&s->iommu_as, MEMORY_REGION(&s->iommu), "iommu-as");
-+
-     sysbus_init_irq(dev, &s->irq);
- 
-     memory_region_init_io(&s->iomem, obj, &iommu_mem_ops, s, "iommu",
-@@ -369,9 +417,23 @@ static const TypeInfo iommu_info = {
-     .class_init    = iommu_class_init,
- };
- 
-+static void sun4m_iommu_memory_region_class_init(ObjectClass *klass, void *data)
-+{
-+    IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
-+
-+    imrc->translate = sun4m_translate_iommu;
-+}
-+
-+static const TypeInfo sun4m_iommu_memory_region_info = {
-+    .parent = TYPE_IOMMU_MEMORY_REGION,
-+    .name = TYPE_SUN4M_IOMMU_MEMORY_REGION,
-+    .class_init = sun4m_iommu_memory_region_class_init,
-+};
-+
- static void iommu_register_types(void)
- {
-     type_register_static(&iommu_info);
-+    type_register_static(&sun4m_iommu_memory_region_info);
- }
- 
- type_init(iommu_register_types)
-diff --git a/include/hw/sparc/sun4m.h b/include/hw/sparc/sun4m.h
-index a4f5f09..0548bac 100644
---- a/include/hw/sparc/sun4m.h
-+++ b/include/hw/sparc/sun4m.h
-@@ -14,11 +14,16 @@
- #define TYPE_SUN4M_IOMMU "iommu"
- #define SUN4M_IOMMU(obj) OBJECT_CHECK(IOMMUState, (obj), TYPE_SUN4M_IOMMU)
- 
-+#define TYPE_SUN4M_IOMMU_MEMORY_REGION "sun4m-iommu-memory-region"
-+
- #define IOMMU_NREGS         (4 * 4096 / 4)
- 
- typedef struct IOMMUState {
-     SysBusDevice parent_obj;
- 
-+    AddressSpace iommu_as;
-+    IOMMUMemoryRegion iommu;
-+
-     MemoryRegion iomem;
-     uint32_t regs[IOMMU_NREGS];
-     hwaddr iostart;
--- 
-1.7.10.4
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MDgwMDQ1NDUtMjg1NzgtMS1naXQtc2VuZC1lbWFpbC1tYXJrLmNhdmUtYXls
+YW5kQGlsYW5kZS5jby51awpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIdjIgMDAvMTNdIHN1
+bjRtOiBzcGFyYzMyX2RtYSB0aWR5LXVwcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4g
+fCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cg
+LS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAg
+IGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9
+JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0
+cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAg
+ICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNU
+IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
+ODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNzUwODQ0YzQyZCBzcGFy
+YzMyX2RtYTogYWRkIGxlbiB0byBlc3AvbGUgRE1BIG1lbW9yeSB0cmFjaW5nCmJhN2FiNjNmOGUg
+c3BhcmMzMl9kbWE6IHJlbW92ZSBpc19sZWRtYSBoYWNrIGFuZCByZXBsYWNlIHdpdGggbWVtb3J5
+IHJlZ2lvbiBhbGlhcwpjZjc0YmZiMmFhIHNwYXJjMzJfZG1hOiBpbnRyb2R1Y2UgbmV3IFNQQVJD
+MzJfRE1BIHR5cGUgY29udGFpbmVyIG9iamVjdAoxYTlmZWJhNzc4IHNwYXJjMzJfZG1hOiBtYWtl
+IGxhbmNlIGRldmljZSBjaGlsZCBvZiBsZWRtYSBkZXZpY2UKODZiMzMwNTg0OCBsYW5jZTogbW92
+ZSBUWVBFX0xBTkNFIGFuZCBTeXNCdXNQQ05ldFN0YXRlIGZyb20gbGFuY2UuYyB0byBzdW40bS5o
+CmM1YWUxYzYwMTEgc3BhcmMzMl9kbWE6IG1ha2UgZXNwIGRldmljZSBjaGlsZCBvZiBlc3BkbWEg
+ZGV2aWNlCjQyMDk5M2E2Y2UgZXNwOiBtb3ZlIFRZUEVfRVNQIGFuZCBTeXNCdXNFU1BTdGF0ZSBm
+cm9tIGVzcC5jIHRvIGVzcC5oCjIzNmRiZDQ1MTYgc3BhcmMzMl9kbWE6IHVzZSBvYmplY3QgbGlu
+ayBpbnN0ZWFkIG9mIHFkZXYgcHJvcGVydHkgdG8gcGFzcyBJT01NVSByZWZlcmVuY2UKNTE2NWY1
+NjY5YSBzdW40bV9pb21tdTogbW92ZSBUWVBFX1NVTjRNX0lPTU1VIGRlY2xhcmF0aW9uIHRvIHN1
+bjRtLmgKODUwYTE1MDk4MyBzdW40bTogbW92ZSBETUEgZGV2aWNlIHdpcmluZyBmcm9tIHNwYXJj
+MzJfZG1hX2luaXQoKSB0byBzdW40bV9od19pbml0KCkKNGJhMGM0YzlmMSBzcGFyYzMyX2RtYTog
+bW92ZSB0eXBlIGRlY2xhcmF0aW9ucyBmcm9tIHNwYXJjMzJfZG1hLmMgdG8gc3BhcmMzMl9kbWEu
+aAo1NTNiYmNlZTE3IHNwYXJjMzJfZG1hOiBzcGxpdCBlc3AgYW5kIGxlIGludG8gc2VwYXJhdGUg
+RE1BIGRldmljZXMKZGQ3NGE4MzI5NSBzcGFyYzMyX2RtYTogcmVuYW1lIFNQQVJDMzJfRE1BIHR5
+cGUgdG8gU1BBUkMzMl9ETUFfREVWSUNFCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQ
+QVRDSCAxLzEzOiBzcGFyYzMyX2RtYTogcmVuYW1lIFNQQVJDMzJfRE1BIHR5cGUgdG8gU1BBUkMz
+Ml9ETUFfREVWSUNFLi4uCkNoZWNraW5nIFBBVENIIDIvMTM6IHNwYXJjMzJfZG1hOiBzcGxpdCBl
+c3AgYW5kIGxlIGludG8gc2VwYXJhdGUgRE1BIGRldmljZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8x
+Mzogc3BhcmMzMl9kbWE6IG1vdmUgdHlwZSBkZWNsYXJhdGlvbnMgZnJvbSBzcGFyYzMyX2RtYS5j
+IHRvIHNwYXJjMzJfZG1hLmguLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xMzogc3VuNG06IG1vdmUgRE1B
+IGRldmljZSB3aXJpbmcgZnJvbSBzcGFyYzMyX2RtYV9pbml0KCkgdG8gc3VuNG1faHdfaW5pdCgp
+Li4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojNTE6
+IEZJTEU6IGh3L3NwYXJjL3N1bjRtLmM6ODI0OgorICAgIHFlbXVfaXJxICpjcHVfaXJxc1tNQVhf
+Q1BVU10sIHNsYXZpb19pcnFbMzJdLCBzbGF2aW9fY3B1X2lycVtNQVhfQ1BVU107CiAgICAgICAg
+ICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA2NiBsaW5lcyBjaGVja2VkCgpZ
+b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA1LzEz
+OiBzdW40bV9pb21tdTogbW92ZSBUWVBFX1NVTjRNX0lPTU1VIGRlY2xhcmF0aW9uIHRvIHN1bjRt
+LmguLi4KQ2hlY2tpbmcgUEFUQ0ggNi8xMzogc3BhcmMzMl9kbWE6IHVzZSBvYmplY3QgbGluayBp
+bnN0ZWFkIG9mIHFkZXYgcHJvcGVydHkgdG8gcGFzcyBJT01NVSByZWZlcmVuY2UuLi4KQ2hlY2tp
+bmcgUEFUQ0ggNy8xMzogZXNwOiBtb3ZlIFRZUEVfRVNQIGFuZCBTeXNCdXNFU1BTdGF0ZSBmcm9t
+IGVzcC5jIHRvIGVzcC5oLi4uCkNoZWNraW5nIFBBVENIIDgvMTM6IHNwYXJjMzJfZG1hOiBtYWtl
+IGVzcCBkZXZpY2UgY2hpbGQgb2YgZXNwZG1hIGRldmljZS4uLgpDaGVja2luZyBQQVRDSCA5LzEz
+OiBsYW5jZTogbW92ZSBUWVBFX0xBTkNFIGFuZCBTeXNCdXNQQ05ldFN0YXRlIGZyb20gbGFuY2Uu
+YyB0byBzdW40bS5oLi4uCkNoZWNraW5nIFBBVENIIDEwLzEzOiBzcGFyYzMyX2RtYTogbWFrZSBs
+YW5jZSBkZXZpY2UgY2hpbGQgb2YgbGVkbWEgZGV2aWNlLi4uCkNoZWNraW5nIFBBVENIIDExLzEz
+OiBzcGFyYzMyX2RtYTogaW50cm9kdWNlIG5ldyBTUEFSQzMyX0RNQSB0eXBlIGNvbnRhaW5lciBv
+YmplY3QuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMTM6IHNwYXJjMzJfZG1hOiByZW1vdmUgaXNfbGVk
+bWEgaGFjayBhbmQgcmVwbGFjZSB3aXRoIG1lbW9yeSByZWdpb24gYWxpYXMuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMTMvMTM6IHNwYXJjMzJfZG1hOiBhZGQgbGVuIHRvIGVzcC9sZSBETUEgbWVtb3J5IHRy
+YWNpbmcuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29k
+ZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRw
+Oi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRl
+dmVsQGZyZWVsaXN0cy5vcmc=
