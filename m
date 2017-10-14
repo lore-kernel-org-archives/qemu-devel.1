@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3RLZ-0006A9-BP
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3RLZ-0006A7-9A
 	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3RLY-0001kr-Em
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3RLX-0001j7-0V
 	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:41 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:36928
+Received: from chuckie.co.uk ([82.165.15.123]:36922
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1e3RLY-0001k1-8f
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:40 -0400
+	id 1e3RLW-0001iT-QL
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:38 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sat, 14 Oct 2017 19:38:55 +0100
-Message-Id: <1508006342-5304-7-git-send-email-mark.cave-ayland@ilande.co.uk>
+Date: Sat, 14 Oct 2017 19:38:54 +0100
+Message-Id: <1508006342-5304-6-git-send-email-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <1508006342-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 References: <1508006342-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCHv3 06/13] sparc32_dma: use object link instead
- of qdev property to pass IOMMU reference
+Subject: [Qemu-devel] [PATCHv3 05/13] sun4m_iommu: move TYPE_SUN4M_IOMMU
+ declaration to sun4m.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +29,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-This enables us to remove the last remaining (opaque) qdev property. Whilst we
-are here, also update iommu_init() to use TYPE_SUN4M_IOMMU instead of a
-hardcoded string.
+This is in preparation to allow the type to be used elsewhere.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/dma/sparc32_dma.c |   13 +++++--------
- hw/sparc/sun4m.c     |    4 ++--
- 2 files changed, 7 insertions(+), 10 deletions(-)
+ hw/dma/sun4m_iommu.c     |   14 --------------
+ include/hw/sparc/sun4m.h |   16 ++++++++++++++++
+ 2 files changed, 16 insertions(+), 14 deletions(-)
 
-diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
-index ae8fa06..c56a2ba 100644
---- a/hw/dma/sparc32_dma.c
-+++ b/hw/dma/sparc32_dma.c
-@@ -263,24 +263,21 @@ static void sparc32_dma_device_init(Object *obj)
+diff --git a/hw/dma/sun4m_iommu.c b/hw/dma/sun4m_iommu.c
+index 335ef63..840064b 100644
+--- a/hw/dma/sun4m_iommu.c
++++ b/hw/dma/sun4m_iommu.c
+@@ -36,7 +36,6 @@
+  * http://mediacast.sun.com/users/Barton808/media/Sun4M_SystemArchitecture_edited2.pdf
+  */
  
-     sysbus_init_mmio(sbd, &s->iomem);
+-#define IOMMU_NREGS         (4*4096/4)
+ #define IOMMU_CTRL          (0x0000 >> 2)
+ #define IOMMU_CTRL_IMPL     0xf0000000 /* Implementation */
+ #define IOMMU_CTRL_VERS     0x0f000000 /* Version */
+@@ -128,19 +127,6 @@
+ #define IOMMU_PAGE_SIZE     (1 << IOMMU_PAGE_SHIFT)
+ #define IOMMU_PAGE_MASK     ~(IOMMU_PAGE_SIZE - 1)
  
-+    object_property_add_link(OBJECT(dev), "iommu", TYPE_SUN4M_IOMMU,
-+                             (Object **) &s->iommu,
-+                             qdev_prop_allow_set_link_before_realize,
-+                             0, NULL);
-+
-     qdev_init_gpio_in(dev, dma_set_irq, 1);
-     qdev_init_gpio_out(dev, s->gpio, 2);
- }
- 
--static Property sparc32_dma_device_properties[] = {
--    DEFINE_PROP_PTR("iommu_opaque", DMADeviceState, iommu),
--    DEFINE_PROP_END_OF_LIST(),
--};
+-#define TYPE_SUN4M_IOMMU "iommu"
+-#define SUN4M_IOMMU(obj) OBJECT_CHECK(IOMMUState, (obj), TYPE_SUN4M_IOMMU)
 -
- static void sparc32_dma_device_class_init(ObjectClass *klass, void *data)
+-typedef struct IOMMUState {
+-    SysBusDevice parent_obj;
+-
+-    MemoryRegion iomem;
+-    uint32_t regs[IOMMU_NREGS];
+-    hwaddr iostart;
+-    qemu_irq irq;
+-    uint32_t version;
+-} IOMMUState;
+-
+ static uint64_t iommu_mem_read(void *opaque, hwaddr addr,
+                                unsigned size)
  {
-     DeviceClass *dc = DEVICE_CLASS(klass);
+diff --git a/include/hw/sparc/sun4m.h b/include/hw/sparc/sun4m.h
+index 580d87b..1f1cf91 100644
+--- a/include/hw/sparc/sun4m.h
++++ b/include/hw/sparc/sun4m.h
+@@ -4,10 +4,26 @@
+ #include "qemu-common.h"
+ #include "exec/hwaddr.h"
+ #include "qapi/qmp/types.h"
++#include "hw/sysbus.h"
  
-     dc->reset = sparc32_dma_device_reset;
-     dc->vmsd = &vmstate_sparc32_dma_device;
--    dc->props = sparc32_dma_device_properties;
--    /* Reason: pointer property "iommu_opaque" */
--    dc->user_creatable = false;
- }
+ /* Devices used by sparc32 system.  */
  
- static const TypeInfo sparc32_dma_device_info = {
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 4f2ed4b..12d36b5 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -297,7 +297,7 @@ static void *iommu_init(hwaddr addr, uint32_t version, qemu_irq irq)
-     DeviceState *dev;
-     SysBusDevice *s;
- 
--    dev = qdev_create(NULL, "iommu");
-+    dev = qdev_create(NULL, TYPE_SUN4M_IOMMU);
-     qdev_prop_set_uint32(dev, "version", version);
-     qdev_init_nofail(dev);
-     s = SYS_BUS_DEVICE(dev);
-@@ -313,7 +313,7 @@ static void *sparc32_dma_init(hwaddr daddr, void *iommu, int is_ledma)
-     SysBusDevice *s;
- 
-     dev = qdev_create(NULL, is_ledma ? "sparc32-ledma" : "sparc32-espdma");
--    qdev_prop_set_ptr(dev, "iommu_opaque", iommu);
-+    object_property_set_link(OBJECT(dev), OBJECT(iommu), "iommu", &error_abort);
-     qdev_init_nofail(dev);
-     s = SYS_BUS_DEVICE(dev);
-     sysbus_mmio_map(s, 0, daddr);
+ /* iommu.c */
++#define TYPE_SUN4M_IOMMU "iommu"
++#define SUN4M_IOMMU(obj) OBJECT_CHECK(IOMMUState, (obj), TYPE_SUN4M_IOMMU)
++
++#define IOMMU_NREGS         (4 * 4096 / 4)
++
++typedef struct IOMMUState {
++    SysBusDevice parent_obj;
++
++    MemoryRegion iomem;
++    uint32_t regs[IOMMU_NREGS];
++    hwaddr iostart;
++    qemu_irq irq;
++    uint32_t version;
++} IOMMUState;
++
+ void sparc_iommu_memory_rw(void *opaque, hwaddr addr,
+                                  uint8_t *buf, int len, int is_write);
+ static inline void sparc_iommu_memory_read(void *opaque,
 -- 
 1.7.10.4
