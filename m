@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3RLZ-0006A6-91
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:42 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3RLb-0006Af-BK
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3RLU-0001fi-HP
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:41 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:36918
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3RLa-0001lo-9T
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:43 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:36932
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1e3RLU-0001eD-AG
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:36 -0400
+	id 1e3RLa-0001lN-30
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:39:42 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sat, 14 Oct 2017 19:38:52 +0100
-Message-Id: <1508006342-5304-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+Date: Sat, 14 Oct 2017 19:38:56 +0100
+Message-Id: <1508006342-5304-8-git-send-email-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <1508006342-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 References: <1508006342-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCHv3 03/13] sparc32_dma: move type declarations
- from sparc32_dma.c to sparc32_dma.h
+Subject: [Qemu-devel] [PATCHv3 07/13] esp: move TYPE_ESP and SysBusESPState
+ from esp.c to esp.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,113 +27,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, atar4qemu@gmail.com
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Paolo Bonzini <pbonzini@redhat.com>
+
+This enables them to be used outside of esp.c.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+CC: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/dma/sparc32_dma.c           |   34 ----------------------------------
- include/hw/sparc/sparc32_dma.h |   37 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 37 insertions(+), 34 deletions(-)
+ hw/scsi/esp.c         |   13 -------------
+ include/hw/scsi/esp.h |   14 ++++++++++++++
+ 2 files changed, 14 insertions(+), 13 deletions(-)
 
-diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
-index e4ff4a8..ae8fa06 100644
---- a/hw/dma/sparc32_dma.c
-+++ b/hw/dma/sparc32_dma.c
-@@ -40,7 +40,6 @@
-  * http://www.ibiblio.org/pub/historic-linux/early-ports/Sparc/NCR/DMA2.txt
-  */
+diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
+index 22c2d91..ee586e7 100644
+--- a/hw/scsi/esp.c
++++ b/hw/scsi/esp.c
+@@ -592,19 +592,6 @@ const VMStateDescription vmstate_esp = {
+     }
+ };
  
--#define DMA_REGS 4
- #define DMA_SIZE (4 * sizeof(uint32_t))
- /* We need the mask, because one instance of the device is not page
-    aligned (ledma, start address 0x0010) */
-@@ -61,39 +60,6 @@
- /* XXX SCSI and ethernet should have different read-only bit masks */
- #define DMA_CSR_RO_MASK 0xfe000007
- 
--#define TYPE_SPARC32_DMA_DEVICE "sparc32-dma-device"
--#define SPARC32_DMA_DEVICE(obj) OBJECT_CHECK(DMADeviceState, (obj), \
--                                             TYPE_SPARC32_DMA_DEVICE)
+-#define TYPE_ESP "esp"
+-#define ESP_STATE(obj) OBJECT_CHECK(SysBusESPState, (obj), TYPE_ESP)
 -
--typedef struct DMADeviceState DMADeviceState;
--
--struct DMADeviceState {
+-typedef struct {
+-    /*< private >*/
 -    SysBusDevice parent_obj;
+-    /*< public >*/
 -
 -    MemoryRegion iomem;
--    uint32_t dmaregs[DMA_REGS];
--    qemu_irq irq;
--    void *iommu;
--    qemu_irq gpio[2];
--    uint32_t is_ledma;
--};
+-    uint32_t it_shift;
+-    ESPState esp;
+-} SysBusESPState;
 -
--#define TYPE_SPARC32_ESPDMA_DEVICE "sparc32-espdma"
--#define SPARC32_ESPDMA_DEVICE(obj) OBJECT_CHECK(ESPDMADeviceState, (obj), \
--                                                TYPE_SPARC32_ESPDMA_DEVICE)
--
--typedef struct ESPDMADeviceState {
--    DMADeviceState parent_obj;
--} ESPDMADeviceState;
--
--#define TYPE_SPARC32_LEDMA_DEVICE "sparc32-ledma"
--#define SPARC32_LEDMA_DEVICE(obj) OBJECT_CHECK(LEDMADeviceState, (obj), \
--                                               TYPE_SPARC32_LEDMA_DEVICE)
--
--typedef struct LEDMADeviceState {
--    DMADeviceState parent_obj;
--} LEDMADeviceState;
--
- enum {
-     GPIO_RESET = 0,
-     GPIO_DMA,
-diff --git a/include/hw/sparc/sparc32_dma.h b/include/hw/sparc/sparc32_dma.h
-index 9497b13..df7491d 100644
---- a/include/hw/sparc/sparc32_dma.h
-+++ b/include/hw/sparc/sparc32_dma.h
-@@ -1,6 +1,43 @@
- #ifndef SPARC32_DMA_H
- #define SPARC32_DMA_H
+ static void sysbus_esp_mem_write(void *opaque, hwaddr addr,
+                                  uint64_t val, unsigned int size)
+ {
+diff --git a/include/hw/scsi/esp.h b/include/hw/scsi/esp.h
+index d2c4886..3b160f8 100644
+--- a/include/hw/scsi/esp.h
++++ b/include/hw/scsi/esp.h
+@@ -2,6 +2,7 @@
+ #define QEMU_HW_ESP_H
  
+ #include "hw/scsi/scsi.h"
 +#include "hw/sysbus.h"
+ 
+ /* esp.c */
+ #define ESP_MAX_DEVS 7
+@@ -52,6 +53,19 @@ struct ESPState {
+     void (*dma_cb)(ESPState *s);
+ };
+ 
++#define TYPE_ESP "esp"
++#define ESP_STATE(obj) OBJECT_CHECK(SysBusESPState, (obj), TYPE_ESP)
 +
-+#define DMA_REGS 4
-+
-+#define TYPE_SPARC32_DMA_DEVICE "sparc32-dma-device"
-+#define SPARC32_DMA_DEVICE(obj) OBJECT_CHECK(DMADeviceState, (obj), \
-+                                             TYPE_SPARC32_DMA_DEVICE)
-+
-+typedef struct DMADeviceState DMADeviceState;
-+
-+struct DMADeviceState {
++typedef struct {
++    /*< private >*/
 +    SysBusDevice parent_obj;
++    /*< public >*/
 +
 +    MemoryRegion iomem;
-+    uint32_t dmaregs[DMA_REGS];
-+    qemu_irq irq;
-+    void *iommu;
-+    qemu_irq gpio[2];
-+    uint32_t is_ledma;
-+};
++    uint32_t it_shift;
++    ESPState esp;
++} SysBusESPState;
 +
-+#define TYPE_SPARC32_ESPDMA_DEVICE "sparc32-espdma"
-+#define SPARC32_ESPDMA_DEVICE(obj) OBJECT_CHECK(ESPDMADeviceState, (obj), \
-+                                                TYPE_SPARC32_ESPDMA_DEVICE)
-+
-+typedef struct ESPDMADeviceState {
-+    DMADeviceState parent_obj;
-+} ESPDMADeviceState;
-+
-+#define TYPE_SPARC32_LEDMA_DEVICE "sparc32-ledma"
-+#define SPARC32_LEDMA_DEVICE(obj) OBJECT_CHECK(LEDMADeviceState, (obj), \
-+                                               TYPE_SPARC32_LEDMA_DEVICE)
-+
-+typedef struct LEDMADeviceState {
-+    DMADeviceState parent_obj;
-+} LEDMADeviceState;
-+
- /* sparc32_dma.c */
- void ledma_memory_read(void *opaque, hwaddr addr,
-                        uint8_t *buf, int len, int do_bswap);
+ #define ESP_TCLO   0x0
+ #define ESP_TCMID  0x1
+ #define ESP_FIFO   0x2
 -- 
 1.7.10.4
