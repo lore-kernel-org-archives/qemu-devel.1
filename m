@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e3Mhp-0003YW-7g
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 09:42:22 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e3PL4-0001Xl-Ex
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 12:31:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e3Mho-0002ys-FE
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 09:42:21 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:55191)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e3Mho-0002yo-8A
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 09:42:20 -0400
-Received: by mail-wr0-x230.google.com with SMTP id o44so2668253wrf.11
-	for <qemu-devel@nongnu.org>; Sat, 14 Oct 2017 06:42:20 -0700 (PDT)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e3PL3-0008Dk-PT
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 12:31:02 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1507930220-17461-1-git-send-email-cota@braap.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <6defdad1-35aa-2849-8483-e714132fc2b1@amsat.org>
+Date: Sat, 14 Oct 2017 13:30:50 -0300
 MIME-Version: 1.0
-In-Reply-To: <20171013232114.GD3246@localhost.localdomain>
-References: <20171012235439.19457-1-anatol.pomozov@gmail.com>
-	<20171012235439.19457-3-anatol.pomozov@gmail.com>
-	<20171013192550.GC3246@localhost.localdomain>
-	<CAOMFOmW+r86WHWPUMtG54BrAQXqSWZ67oF-6G697ox-7AKL4GA@mail.gmail.com>
-	<20171013232114.GD3246@localhost.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 14 Oct 2017 14:41:58 +0100
-Message-ID: <CAFEAcA-zYJUOqH=WU_XnyxEfiZM7a2yqmzndTrf=pKkp=1wUGA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/4] multiboot: load any machine type of ELF
+In-Reply-To: <1507930220-17461-1-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] futex: add missing header guards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,17 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Anatol Pomozov <anatol.pomozov@gmail.com>, Kevin Wolf <kwolf@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org
 
-On 14 October 2017 at 00:21, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> I don't believe the spec restricts that, but I don't see why it
-> would be useful to load an ELF file that doesn't match the target
-> architecture (e.g. loading non-x86 ELF files on a x86 machine
-> like PC).
+Cc: trivial
 
-Agreed. If we have non i386 boards that want to use multiboot
-we should probably move the common code out of hw/i386...
+On 10/13/2017 06:30 PM, Emilio G. Cota wrote:
+> The header file was introduced by fbcc3e5 ("qemu-thread: optimize QemuLockCnt
+> with futexes on Linux", 2017-01-16) without header guards. Add them.
+> 
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
 
-thanks
--- PMM
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>  include/qemu/futex.h | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/include/qemu/futex.h b/include/qemu/futex.h
+> index bb7dc9e..91ae889 100644
+> --- a/include/qemu/futex.h
+> +++ b/include/qemu/futex.h
+> @@ -11,6 +11,9 @@
+>   *
+>   */
+>  
+> +#ifndef QEMU_FUTEX_H
+> +#define QEMU_FUTEX_H
+> +
+>  #include <sys/syscall.h>
+>  #include <linux/futex.h>
+>  
+> @@ -34,3 +37,5 @@ static inline void qemu_futex_wait(void *f, unsigned val)
+>          }
+>      }
+>  }
+> +
+> +#endif /* QEMU_FUTEX_H */
+> 
