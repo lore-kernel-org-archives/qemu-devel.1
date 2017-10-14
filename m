@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3QsO-0001WE-OI
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:09:33 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3QxN-0005DA-8W
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:14:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3QsL-00032D-KN
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:09:32 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:36831
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3QxM-0004nb-6E
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:14:41 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:36852
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1e3QsL-00031z-D8
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:09:29 -0400
+	id 1e3QxL-0004nN-Ux
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 14:14:40 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sat, 14 Oct 2017 19:09:01 +0100
-Message-Id: <1508004545-28578-10-git-send-email-mark.cave-ayland@ilande.co.uk>
+Date: Sat, 14 Oct 2017 19:09:02 +0100
+Message-Id: <1508004545-28578-11-git-send-email-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <1508004545-28578-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 References: <1508004545-28578-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCHv2 09/13] lance: move TYPE_LANCE and
- SysBusPCNetState from lance.c to sun4m.h
+Subject: [Qemu-devel] [PATCHv2 10/13] sparc32_dma: make lance device child
+ of ledma device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,65 +28,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-This enables them to be used outside of lance.c.
+This makes it possible to reference the lance device from the ledma device as
+required.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-CC: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/lance.c           |    9 ---------
- include/hw/sparc/sun4m.h |   13 +++++++++++++
- 2 files changed, 13 insertions(+), 9 deletions(-)
+ hw/dma/sparc32_dma.c           |   23 ++++++++++++++++++++++-
+ hw/sparc/sun4m.c               |   31 +++++++------------------------
+ include/hw/sparc/sparc32_dma.h |    3 +++
+ 3 files changed, 32 insertions(+), 25 deletions(-)
 
-diff --git a/hw/net/lance.c b/hw/net/lance.c
-index 92b0c68..ef7747d 100644
---- a/hw/net/lance.c
-+++ b/hw/net/lance.c
-@@ -45,15 +45,6 @@
- #include "trace.h"
- #include "sysemu/sysemu.h"
- 
--#define TYPE_LANCE "lance"
--#define SYSBUS_PCNET(obj) \
--    OBJECT_CHECK(SysBusPCNetState, (obj), TYPE_LANCE)
--
--typedef struct {
--    SysBusDevice parent_obj;
--
--    PCNetState state;
--} SysBusPCNetState;
- 
- static void parent_lance_reset(void *opaque, int irq, int level)
- {
-diff --git a/include/hw/sparc/sun4m.h b/include/hw/sparc/sun4m.h
-index 1f1cf91..a4f5f09 100644
---- a/include/hw/sparc/sun4m.h
-+++ b/include/hw/sparc/sun4m.h
-@@ -5,6 +5,8 @@
- #include "exec/hwaddr.h"
- #include "qapi/qmp/types.h"
+diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
+index 6009b94..d507ca3 100644
+--- a/hw/dma/sparc32_dma.c
++++ b/hw/dma/sparc32_dma.c
+@@ -28,7 +28,6 @@
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+ #include "hw/sparc/sparc32_dma.h"
+-#include "hw/sparc/sun4m.h"
  #include "hw/sysbus.h"
-+#include "net/net.h"
-+#include "hw/net/pcnet.h"
+ #include "trace.h"
  
- /* Devices used by sparc32 system.  */
- 
-@@ -40,6 +42,17 @@ static inline void sparc_iommu_memory_write(void *opaque,
-     sparc_iommu_memory_rw(opaque, addr, buf, len, 1);
+@@ -340,11 +339,33 @@ static void sparc32_ledma_device_init(Object *obj)
+     s->is_ledma = 1;
  }
  
-+/* lance.c */
-+#define TYPE_LANCE "lance"
-+#define SYSBUS_PCNET(obj) \
-+    OBJECT_CHECK(SysBusPCNetState, (obj), TYPE_LANCE)
++static void sparc32_ledma_device_realize(DeviceState *dev, Error **errp)
++{
++    DeviceState *d;
++    NICInfo *nd = &nd_table[0];
 +
-+typedef struct {
-+    SysBusDevice parent_obj;
++    qemu_check_nic_model(nd, "lance");
 +
-+    PCNetState state;
-+} SysBusPCNetState;
++    d = qdev_create(NULL, "lance");
++    object_property_add_child(OBJECT(dev), "lance", OBJECT(d), errp);
++    qdev_set_nic_properties(d, nd);
++    qdev_prop_set_ptr(d, "dma", dev);
++    qdev_init_nofail(d);
++}
 +
- /* sparc32_dma.c */
- #include "hw/sparc/sparc32_dma.h"
++static void sparc32_ledma_device_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = sparc32_ledma_device_realize;
++}
++
+ static const TypeInfo sparc32_ledma_device_info = {
+     .name          = TYPE_SPARC32_LEDMA_DEVICE,
+     .parent        = TYPE_SPARC32_DMA_DEVICE,
+     .instance_size = sizeof(LEDMADeviceState),
+     .instance_init = sparc32_ledma_device_init,
++    .class_init    = sparc32_ledma_device_class_init,
+ };
  
+ static void sparc32_dma_register_types(void)
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index 4626c85..ae486a4 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -321,26 +321,6 @@ static void *sparc32_dma_init(hwaddr daddr, void *iommu, int is_ledma)
+     return s;
+ }
+ 
+-static void lance_init(NICInfo *nd, hwaddr leaddr,
+-                       void *dma_opaque, qemu_irq irq)
+-{
+-    DeviceState *dev;
+-    SysBusDevice *s;
+-    qemu_irq reset;
+-
+-    qemu_check_nic_model(&nd_table[0], "lance");
+-
+-    dev = qdev_create(NULL, "lance");
+-    qdev_set_nic_properties(dev, nd);
+-    qdev_prop_set_ptr(dev, "dma", dma_opaque);
+-    qdev_init_nofail(dev);
+-    s = SYS_BUS_DEVICE(dev);
+-    sysbus_mmio_map(s, 0, leaddr);
+-    sysbus_connect_irq(s, 0, irq);
+-    reset = qdev_get_gpio_in(dev, 0);
+-    qdev_connect_gpio_out(dma_opaque, 0, reset);
+-}
+-
+ static DeviceState *slavio_intctl_init(hwaddr addr,
+                                        hwaddr addrg,
+                                        qemu_irq **parent_irq)
+@@ -819,7 +799,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+     const char *cpu_model = machine->cpu_model;
+     unsigned int i;
+     void *iommu, *nvram;
+-    DeviceState *espdma, *esp, *ledma;
++    DeviceState *espdma, *esp, *ledma, *lance;
+     SysBusDevice *sbd;
+     qemu_irq *cpu_irqs[MAX_CPUS], slavio_irq[32], slavio_cpu_irq[MAX_CPUS];
+     qemu_irq fdc_tc;
+@@ -894,6 +874,12 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+     sbd = SYS_BUS_DEVICE(ledma);
+     sysbus_connect_irq(sbd, 0, slavio_irq[16]);
+ 
++    lance = DEVICE(object_resolve_path_component(OBJECT(ledma), "lance"));
++    sbd = SYS_BUS_DEVICE(lance);
++    sysbus_mmio_map(sbd, 0, hwdef->le_base);
++    sysbus_connect_irq(sbd, 0, qdev_get_gpio_in(ledma, 0));
++    qdev_connect_gpio_out(ledma, 0, qdev_get_gpio_in(lance, 0));
++
+     if (graphic_depth != 8 && graphic_depth != 24) {
+         error_report("Unsupported depth: %d", graphic_depth);
+         exit (1);
+@@ -945,9 +931,6 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+         empty_slot_init(hwdef->sx_base, 0x2000);
+     }
+ 
+-    lance_init(&nd_table[0], hwdef->le_base, ledma,
+-               qdev_get_gpio_in(ledma, 0));
+-
+     nvram = m48t59_init(slavio_irq[0], hwdef->nvram_base, 0, 0x2000, 1968, 8);
+ 
+     slavio_timer_init_all(hwdef->counter_base, slavio_irq[19], slavio_cpu_irq, smp_cpus);
+diff --git a/include/hw/sparc/sparc32_dma.h b/include/hw/sparc/sparc32_dma.h
+index 365160f..5f39c28 100644
+--- a/include/hw/sparc/sparc32_dma.h
++++ b/include/hw/sparc/sparc32_dma.h
+@@ -3,6 +3,7 @@
+ 
+ #include "hw/sysbus.h"
+ #include "hw/scsi/esp.h"
++#include "hw/sparc/sun4m.h"
+ 
+ #define DMA_REGS 4
+ 
+@@ -39,6 +40,8 @@ typedef struct ESPDMADeviceState {
+ 
+ typedef struct LEDMADeviceState {
+     DMADeviceState parent_obj;
++
++    SysBusPCNetState *lance;
+ } LEDMADeviceState;
+ 
+ /* sparc32_dma.c */
 -- 
 1.7.10.4
