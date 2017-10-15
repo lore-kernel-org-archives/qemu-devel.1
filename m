@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <spheenik@zoidberg.machine.schrodt.org>)
-	id 1e3lnU-00059m-Ut
-	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 12:29:57 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1e3loG-0005kM-85
+	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 12:30:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <spheenik@zoidberg.machine.schrodt.org>)
-	id 1e3lnP-0000Lk-Ub
-	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 12:29:52 -0400
-Received: from hermes.schrodt.org ([2a01:488:66:1000:b24d:49f5:0:1]:40600)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <spheenik@zoidberg.machine.schrodt.org>)
-	id 1e3lnP-0000L9-Kj
-	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 12:29:47 -0400
-From: Martin Schrodt <martin@schrodt.org>
-Date: Sun, 15 Oct 2017 18:29:44 +0200
-Message-Id: <20171015162944.4538-3-martin@schrodt.org>
-In-Reply-To: <20171015162944.4538-1-martin@schrodt.org>
-References: <20171015162944.4538-1-martin@schrodt.org>
-Subject: [Qemu-devel] [PATCH v2 2/2] audio/hda: create millisecond timers
- that handle IO
+	(envelope-from <vilanova@ac.upc.edu>) id 1e3loB-0000lJ-9r
+	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 12:30:40 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:35069 helo=roura.ac.upc.es)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1e3loA-0000jp-Ra
+	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 12:30:35 -0400
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <87d16o53xr.fsf@frigg.lan>
+	<CAFEAcA9FhXKVKe1E_pVDWX3u0W7WuKQmO54Z1Jgj-iL980yPew@mail.gmail.com>
+	<87o9pywt8k.fsf@frigg.lan> <87shf5zlty.fsf@frigg.lan>
+	<20170929175943.GA25038@flamenco> <87vak1w53a.fsf@frigg.lan>
+	<20170930180941.GA22048@flamenco> <8760bu333n.fsf@frigg.lan>
+	<20171005005043.GA20425@flamenco> <87vajsl3h7.fsf@frigg.lan>
+	<20171006175929.GA28281@flamenco>
+Date: Sun, 15 Oct 2017 19:30:20 +0300
+In-Reply-To: <20171006175929.GA28281@flamenco> (Emilio G. Cota's message of
+	"Fri, 6 Oct 2017 13:59:29 -0400")
+Message-ID: <87tvz08jc3.fsf@frigg.lan>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 01/22] instrument: Add documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,328 +33,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Currently, the HDA device tries to sync itself with the QEMU audio
-backend by waiting for the guest driver to handle buffer completion
-interrupts. This causes the backend to often read too much data from the
-device, as well as running out of data whenever the guest takes too long
-to handle the interrupt.
+Emilio G Cota writes:
 
-According to the HDA specification, the guest is also not required to
-use interrupts, but can also sync itself by polling the LPIB registers.
+> On Fri, Oct 06, 2017 at 18:07:16 +0300, Llu=C3=ADs Vilanova wrote:
+>> Emilio G Cota writes:
+>> > On Thu, Oct 05, 2017 at 02:28:12 +0300, Llu=C3=ADs Vilanova wrote:
+>> >> The API takes care of telling you if the access could be performed
+>> >> successfully. If you access the instruction's memory representation at
+>> >> translation time, it should be able to perform the access, since QEMU=
+'s
+>> >> translation loop just had to do so in order to access that instructio=
+n (I should
+>> >> check what happens in the corner case where another guest CPU changes=
+ the page
+>> >> table, since I'm not sure if the address translation functions I'm us=
+ing in QEMU
+>> >> will use the per-vCPU TLB cache or always traverse the page table).
+>>=20
+>> > That was my concern, I'd rather just perform the read once, that is, t=
+he read(s)
+>> > done by ops->insn_translate.
+>>=20
+>> If your concern is on performance, that should not be an issue, since yo=
+u'd be
+>> using the memory peek functions at translation-time. Furthermore, since =
+others
+>> suggested having memory peek anyway, that's a nicer way (to me) to compo=
+se APIs
+>> (and is less complex to implement).
 
-This patch will introduce high frequency (1000Hz) timers that interface
-with the device and allow for much smoother emulation of the LPIB
-registers. Since the timing is now provided by these timers, the need
-to wait for buffer completion interrupts also ceases.
+> My concern was the same as yours, correctness -- what happens if something
+> changes between the two reads? Because the two reads should always return
+> the same thing.
 
-Together with change of the Pulse Audio Driver, this allows for
-crackle free, clean playback using the HDA device. I have not yet tested
-this, but this should also improve the output with other backends
-(for example Alsa).
+Thinking about it, shouldn't this always be the same given QEMU's TLB/page =
+table
+consistency assurances? Otherwise, QEMU could read bytes from different phy=
+sical
+pages while translating an instruction from the same virtual page.
 
-Signed-off-by: Martin Schrodt <martin@schrodt.org>
----
- hw/audio/hda-codec.c | 193 ++++++++++++++++++++++++++++++++++++++++-----------
- hw/audio/intel-hda.c |   7 --
- 2 files changed, 154 insertions(+), 46 deletions(-)
+Therefore, this leads me to believe it is safe to use the memory read opera=
+tions
+during translation to let instrumentation libraries know what exactly they =
+are
+dealing with.
 
-diff --git a/hw/audio/hda-codec.c b/hw/audio/hda-codec.c
-index 5402cd196c..ab89158bfc 100644
---- a/hw/audio/hda-codec.c
-+++ b/hw/audio/hda-codec.c
-@@ -18,6 +18,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/atomic.h"
- #include "hw/hw.h"
- #include "hw/pci/pci.h"
- #include "intel-hda.h"
-@@ -126,6 +127,11 @@ static void hda_codec_parse_fmt(uint32_t format, struct audsettings *as)
- #define   PARAM nomixemu
- #include  "hda-codec-common.h"
- 
-+#define HDA_TIMER_TICKS (SCALE_MS)
-+#define MAX_CORR (SCALE_US * 100)
-+#define B_SIZE sizeof(st->buf)
-+#define B_MASK (sizeof(st->buf) - 1)
-+
- /* -------------------------------------------------------------------------- */
- 
- static const char *fmt2name[] = {
-@@ -154,8 +160,13 @@ struct HDAAudioStream {
-         SWVoiceIn *in;
-         SWVoiceOut *out;
-     } voice;
--    uint8_t buf[HDA_BUFFER_SIZE];
--    uint32_t bpos;
-+    uint8_t compat_buf[HDA_BUFFER_SIZE];
-+    uint32_t compat_bpos;
-+    uint8_t buf[8192]; /* size must be power of two */
-+    int64_t rpos;
-+    int64_t wpos;
-+    QEMUTimer *buft;
-+    int64_t buft_start;
- };
- 
- #define TYPE_HDA_AUDIO "hda-audio"
-@@ -176,53 +187,146 @@ struct HDAAudioState {
-     bool     mixer;
- };
- 
-+static inline int64_t hda_bytes_per_second(HDAAudioStream *st)
-+{
-+    return 2 * st->as.nchannels * st->as.freq;
-+}
-+
-+static inline void hda_timer_sync_adjust(HDAAudioStream *st, int64_t target_pos)
-+{
-+    int64_t corr =
-+        NANOSECONDS_PER_SECOND * target_pos / hda_bytes_per_second(st);
-+    if (corr > MAX_CORR) {
-+        corr = MAX_CORR;
-+    } else if (corr < -MAX_CORR) {
-+        corr = -MAX_CORR;
-+    }
-+    atomic_fetch_add(&st->buft_start, corr);
-+}
-+
-+static void hda_audio_input_timer(void *opaque)
-+{
-+    HDAAudioStream *st = opaque;
-+
-+    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+
-+    int64_t buft_start = atomic_fetch_add(&st->buft_start, 0);
-+    int64_t wpos = atomic_fetch_add(&st->wpos, 0);
-+    int64_t rpos = atomic_fetch_add(&st->rpos, 0);
-+
-+    int64_t wanted_rpos = hda_bytes_per_second(st) * (now - buft_start)
-+                          / NANOSECONDS_PER_SECOND;
-+    wanted_rpos &= -4; /* IMPORTANT! clip to frames */
-+
-+    if (wanted_rpos <= rpos) {
-+        /* we already transmitted the data */
-+        goto out_timer;
-+    }
-+
-+    int64_t to_transfer = audio_MIN(wpos - rpos, wanted_rpos - rpos);
-+    while (to_transfer) {
-+        uint32_t start = (rpos & B_MASK);
-+        uint32_t chunk = audio_MIN(B_SIZE - start, to_transfer);
-+        int rc = hda_codec_xfer(
-+                &st->state->hda, st->stream, false, st->buf + start, chunk);
-+        if (!rc) {
-+            break;
-+        }
-+        rpos += chunk;
-+        to_transfer -= chunk;
-+        atomic_fetch_add(&st->rpos, chunk);
-+    }
-+
-+out_timer:
-+
-+    if (st->running) {
-+        timer_mod_anticipate_ns(st->buft, now + HDA_TIMER_TICKS);
-+    }
-+}
-+
- static void hda_audio_input_cb(void *opaque, int avail)
- {
-     HDAAudioStream *st = opaque;
--    int recv = 0;
--    int len;
--    bool rc;
--
--    while (avail - recv >= sizeof(st->buf)) {
--        if (st->bpos != sizeof(st->buf)) {
--            len = AUD_read(st->voice.in, st->buf + st->bpos,
--                           sizeof(st->buf) - st->bpos);
--            st->bpos += len;
--            recv += len;
--            if (st->bpos != sizeof(st->buf)) {
--                break;
--            }
-+
-+    int64_t wpos = atomic_fetch_add(&st->wpos, 0);
-+    int64_t rpos = atomic_fetch_add(&st->rpos, 0);
-+
-+    int64_t to_transfer = audio_MIN(B_SIZE - (wpos - rpos), avail);
-+
-+    hda_timer_sync_adjust(st, -((wpos - rpos) + to_transfer - (B_SIZE >> 1)));
-+
-+    while (to_transfer) {
-+        uint32_t start = (uint32_t) (wpos & B_MASK);
-+        uint32_t chunk = (uint32_t) audio_MIN(B_SIZE - start, to_transfer);
-+        uint32_t read = AUD_read(st->voice.in, st->buf + start, chunk);
-+        wpos += read;
-+        to_transfer -= read;
-+        atomic_fetch_add(&st->wpos, read);
-+        if (chunk != read) {
-+            break;
-         }
--        rc = hda_codec_xfer(&st->state->hda, st->stream, false,
--                            st->buf, sizeof(st->buf));
-+    }
-+}
-+
-+static void hda_audio_output_timer(void *opaque)
-+{
-+    HDAAudioStream *st = opaque;
-+
-+    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+
-+    int64_t buft_start = atomic_fetch_add(&st->buft_start, 0);
-+    int64_t wpos = atomic_fetch_add(&st->wpos, 0);
-+    int64_t rpos = atomic_fetch_add(&st->rpos, 0);
-+
-+    int64_t wanted_wpos = hda_bytes_per_second(st) * (now - buft_start)
-+                          / NANOSECONDS_PER_SECOND;
-+    wanted_wpos &= -4; /* IMPORTANT! clip to frames */
-+
-+    if (wanted_wpos <= wpos) {
-+        /* we already received the data */
-+        goto out_timer;
-+    }
-+
-+    int64_t to_transfer = audio_MIN(B_SIZE - (wpos - rpos), wanted_wpos - wpos);
-+    while (to_transfer) {
-+        uint32_t start = (wpos & B_MASK);
-+        uint32_t chunk = audio_MIN(B_SIZE - start, to_transfer);
-+        int rc = hda_codec_xfer(
-+                &st->state->hda, st->stream, true, st->buf + start, chunk);
-         if (!rc) {
-             break;
-         }
--        st->bpos = 0;
-+        wpos += chunk;
-+        to_transfer -= chunk;
-+        atomic_fetch_add(&st->wpos, chunk);
-+    }
-+
-+out_timer:
-+
-+    if (st->running) {
-+        timer_mod_anticipate_ns(st->buft, now + HDA_TIMER_TICKS);
-     }
- }
- 
- static void hda_audio_output_cb(void *opaque, int avail)
- {
-     HDAAudioStream *st = opaque;
--    int sent = 0;
--    int len;
--    bool rc;
--
--    while (avail - sent >= sizeof(st->buf)) {
--        if (st->bpos == sizeof(st->buf)) {
--            rc = hda_codec_xfer(&st->state->hda, st->stream, true,
--                                st->buf, sizeof(st->buf));
--            if (!rc) {
--                break;
--            }
--            st->bpos = 0;
--        }
--        len = AUD_write(st->voice.out, st->buf + st->bpos,
--                        sizeof(st->buf) - st->bpos);
--        st->bpos += len;
--        sent += len;
--        if (st->bpos != sizeof(st->buf)) {
-+
-+    int64_t wpos = atomic_fetch_add(&st->wpos, 0);
-+    int64_t rpos = atomic_fetch_add(&st->rpos, 0);
-+
-+    int64_t to_transfer = audio_MIN(wpos - rpos, avail);
-+
-+    hda_timer_sync_adjust(st, (wpos - rpos) - to_transfer - (B_SIZE >> 1));
-+
-+    while (to_transfer) {
-+        uint32_t start = (uint32_t) (rpos & B_MASK);
-+        uint32_t chunk = (uint32_t) audio_MIN(B_SIZE - start, to_transfer);
-+        uint32_t written = AUD_write(st->voice.out, st->buf + start, chunk);
-+        rpos += written;
-+        to_transfer -= written;
-+        atomic_fetch_add(&st->rpos, written);
-+        if (chunk != written) {
-             break;
-         }
-     }
-@@ -239,6 +343,15 @@ static void hda_audio_set_running(HDAAudioStream *st, bool running)
-     st->running = running;
-     dprint(st->state, 1, "%s: %s (stream %d)\n", st->node->name,
-            st->running ? "on" : "off", st->stream);
-+    if (running) {
-+        int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+        st->rpos = 0;
-+        st->wpos = 0;
-+        st->buft_start = now;
-+        timer_mod_anticipate_ns(st->buft, now + HDA_TIMER_TICKS);
-+    } else {
-+        timer_del(st->buft);
-+    }
-     if (st->output) {
-         AUD_set_active_out(st->voice.out, st->running);
-     } else {
-@@ -286,10 +399,12 @@ static void hda_audio_setup(HDAAudioStream *st)
-         st->voice.out = AUD_open_out(&st->state->card, st->voice.out,
-                                      st->node->name, st,
-                                      hda_audio_output_cb, &st->as);
-+        st->buft = timer_new_ns(QEMU_CLOCK_VIRTUAL, hda_audio_output_timer, st);
-     } else {
-         st->voice.in = AUD_open_in(&st->state->card, st->voice.in,
-                                    st->node->name, st,
-                                    hda_audio_input_cb, &st->as);
-+        st->buft = timer_new_ns(QEMU_CLOCK_VIRTUAL, hda_audio_input_timer, st);
-     }
- }
- 
-@@ -505,7 +620,6 @@ static int hda_audio_init(HDACodecDevice *hda, const struct desc_codec *desc)
-                 /* unmute output by default */
-                 st->gain_left = QEMU_HDA_AMP_STEPS;
-                 st->gain_right = QEMU_HDA_AMP_STEPS;
--                st->bpos = sizeof(st->buf);
-                 st->output = true;
-             } else {
-                 st->output = false;
-@@ -532,6 +646,7 @@ static void hda_audio_exit(HDACodecDevice *hda)
-         if (st->node == NULL) {
-             continue;
-         }
-+        timer_del(st->buft);
-         if (st->output) {
-             AUD_close_out(&a->card, st->voice.out);
-         } else {
-@@ -592,8 +707,8 @@ static const VMStateDescription vmstate_hda_audio_stream = {
-         VMSTATE_UINT32(gain_right, HDAAudioStream),
-         VMSTATE_BOOL(mute_left, HDAAudioStream),
-         VMSTATE_BOOL(mute_right, HDAAudioStream),
--        VMSTATE_UINT32(bpos, HDAAudioStream),
--        VMSTATE_BUFFER(buf, HDAAudioStream),
-+        VMSTATE_UINT32(compat_bpos, HDAAudioStream),
-+        VMSTATE_BUFFER(compat_buf, HDAAudioStream),
-         VMSTATE_END_OF_LIST()
-     }
- };
-diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
-index 18a50a8f83..721eba792d 100644
---- a/hw/audio/intel-hda.c
-+++ b/hw/audio/intel-hda.c
-@@ -407,13 +407,6 @@ static bool intel_hda_xfer(HDACodecDevice *dev, uint32_t stnr, bool output,
-     if (st->bpl == NULL) {
-         return false;
-     }
--    if (st->ctl & (1 << 26)) {
--        /*
--         * Wait with the next DMA xfer until the guest
--         * has acked the buffer completion interrupt
--         */
--        return false;
--    }
- 
-     left = len;
-     s = st->bentries;
--- 
-2.14.2
+
+
+>> > I see. I implemented what I suggested above, i.e. tb_trans_cb
+>> > (i.e. post_trans) passes an opaque descriptor of the TB (which can
+>> > be iterated over insn by insn) and the return value (void *) of this
+>> > cb will be passed by tb_exec_cb (i.e. pre_exec).  Perf-wise this
+>> > is pretty OK, turns out even if we don't end up caring about the
+>> > TB, the additional per-TB helper (which might not end up calling
+>> > a callback) does not introduce significant overhead at execution time.
+>>=20
+>> So you build this structure after translating the whole TB, and the user=
+ can
+>> iterate it to check the translated instructions. This is closer to other
+>> existing tools: you iterate the structure and then decide which/how to
+>> instrument instructions, memory accesses, etc within it.
+
+> Correct. I suspect they went with this design because it makes sense to
+> do this preprocessing once, instead of having each plugin do it
+> themselves. I'm not sure how much we should care about supporting multiple
+> plugins, but the impression I get from DynamoRIO is that it seems importa=
+nt
+> to users.
+
+If that can be built into a "helper" instrumentation library / header that
+others can use, I would rather keep this functionality outside QEMU.
+
+
+>> My only concern is that this is much more complex than the simpler API I=
+ propose
+>> (you must build the informational structures, generate calls to every po=
+ssible
+>> instrumentation call, which will be optimized-out by TCG if the user dec=
+ides not
+>> to use them, and overall pay in performance for any unused functionality=
+),
+>> whereas your approach can be implemented on top of it.
+
+> It's pretty simple; tr_ops->translate_insn has to copy each insn.
+> For instance, on aarch64 (disas_a64 is called from tr_translate_insn):
+
+> -static void disas_a64_insn(CPUARMState *env, DisasContext *s)
+> +static void disas_a64_insn(CPUARMState *env, DisasContext *s, struct qem=
+u_plugin_insn *q_insn)
+>  {
+>      uint32_t insn;
+
+>      insn =3D arm_ldl_code(env, s->pc, s->sctlr_b);
+> +    if (q_insn) {
+> +        qemu_plugin_insn_append(q_insn, &insn, sizeof(insn));
+> +    }
+
+> It takes some memory though (we duplicate the guest code), but perf-wise =
+this
+> isn't a big deal (an empty callback on every TB execution incurs only a 1=
+0-15%
+> perf slowdown).
+
+> I don't understand the part where you say that the instrumentation call c=
+an
+> be optimized out. Is there a special value of a "TCG promise" (at tb_tran=
+s_post
+> time) that removes the previously generated callback (at tb_trans_pre tim=
+e)?
+> Otherwise I don't see how selective TB instrumentation can work at tb_tra=
+ns_pre
+> time.
+
+With the approach you propose, the instrumentation library is only called at
+translation-time after the whole TB has been generated. If the instrumentor=
+ now
+decides to instrument each instruction, this means QEMU must inject an
+instrumentation call to every instruction while translating the TB *just in
+case* the instrumentor will need it later. In case the instrumentor decides=
+ some
+instructions don't need to be instrumented, now QEMU needs to eliminate them
+from the TB before generating the host code (in order to eliminate unnecess=
+ary
+overheads).
+
+Hope it's clearer now.
+
+
+Thanks!
+  Lluis
