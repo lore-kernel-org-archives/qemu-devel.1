@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e3Wpv-0004Fl-Cz
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 20:31:24 -0400
+	(envelope-from <mst@redhat.com>) id 1e3WuE-0005YS-BE
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 20:35:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e3Wps-0007km-9s
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 20:31:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35500)
+	(envelope-from <mst@redhat.com>) id 1e3WuB-0001QR-82
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 20:35:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36112)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e3Wps-0007iM-3D
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 20:31:20 -0400
-Date: Sun, 15 Oct 2017 03:31:15 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e3WuA-0001Pa-VC
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 20:35:47 -0400
+Date: Sun, 15 Oct 2017 03:35:43 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171015033021-mutt-send-email-mst@kernel.org>
-References: <alpine.DEB.2.10.1709111119480.19719@sstabellini-ThinkPad-X260>
+Message-ID: <20171015033133-mutt-send-email-mst@kernel.org>
+References: <20170911043820.14617-1-haozhong.zhang@intel.com>
+	<20170911044157.15403-1-haozhong.zhang@intel.com>
+	<20170911160818.1bd44a82@nial.brq.redhat.com>
+	<alpine.DEB.2.10.1709111119480.19719@sstabellini-ThinkPad-X260>
 	<20170912031509.vufszbju3s2v2bw3@hz-desktop>
 	<20171010160544.GA1772@char.us.oracle.com>
 	<20171012124544.dq3wyr65tefi3glk@hz-desktop>
 	<f6478644-0d4a-6531-9016-aee2a0e76417@redhat.com>
 	<20171013075326.77azyi4j2wo3b2fx@hz-desktop>
-	<20171013104453.50284426@nial.brq.redhat.com>
-	<20171013111341.feb2462nh2rcrjpp@hz-desktop>
-	<59E0C9F602000078001862C4@prv-mh.provo.novell.com>
-	<alpine.DEB.2.10.1710131544350.2967@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.10.1710131544350.2967@sstabellini-ThinkPad-X260>
+In-Reply-To: <20171013075326.77azyi4j2wo3b2fx@hz-desktop>
 Subject: Re: [Qemu-devel] [RFC QEMU PATCH v3 00/10] Implement vNVDIMM for
  Xen HVM guest
 List-Id: <qemu-devel.nongnu.org>
@@ -36,29 +35,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Jan Beulich <JBeulich@suse.com>, Haozhong Zhang <haozhong.zhang@intel.com>, andrew.cooper3@citrix.com, Anthony Perard <anthony.perard@citrix.com>, george.dunlap@citrix.com, wei.liu2@citrix.com, ian.jackson@eu.citrix.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, xen-devel@lists.xen.org, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Stefano Stabellini <sstabellini@kernel.org>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, xen-devel@lists.xen.org, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Richard Henderson <rth@twiddle.net>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, ian.jackson@eu.citrix.com, wei.liu2@citrix.com, george.dunlap@citrix.com, JBeulich@suse.com, andrew.cooper3@citrix.com
 
-On Fri, Oct 13, 2017 at 03:46:39PM -0700, Stefano Stabellini wrote:
-> On Fri, 13 Oct 2017, Jan Beulich wrote:
-> > >>> On 13.10.17 at 13:13, <haozhong.zhang@intel.com> wrote:
-> > > To Jan, Andrew, Stefano and Anthony,
+On Fri, Oct 13, 2017 at 03:53:26PM +0800, Haozhong Zhang wrote:
+> On 10/12/17 17:45 +0200, Paolo Bonzini wrote:
+> > On 12/10/2017 14:45, Haozhong Zhang wrote:
+> > > Basically, QEMU builds two ROMs for guest, /rom@etc/acpi/tables and
+> > > /rom@etc/table-loader. The former is unstructured to guest, and
+> > > contains all data of guest ACPI. The latter is a BIOSLinkerLoader
+> > > organized as a set of commands, which direct the guest (e.g., SeaBIOS
+> > > on KVM/QEMU) to relocate data in the former file, recalculate checksum
+> > > of specified area, and fill guest address in specified ACPI field.
 > > > 
-> > > what do you think about allowing QEMU to build the entire guest ACPI
-> > > and letting SeaBIOS to load it? ACPI builder code in hvmloader is
-> > > still there and just bypassed in this case.
+> > > One part of my patches is to implement a mechanism to tell Xen which
+> > > part of ACPI data is a table (NFIT), and which part defines a
+> > > namespace device and what the device name is. I can add two new loader
+> > > commands for them respectively.
+> > > 
+> > > Because they just provide information and SeaBIOS in non-xen
+> > > environment ignores unrecognized commands, they will not break SeaBIOS
+> > > in non-xen environment.
+> > > 
+> > > On QEMU side, most Xen-specific hacks in ACPI builder could be
+> > > dropped, and replaced by adding the new loader commands (though they
+> > > may be used only by Xen).
+> > > 
+> > > On Xen side, a fw_cfg driver and a BIOSLinkerLoader command executor
+> > > are needed in, perhaps, hvmloader.
 > > 
-> > Well, if that can be made work in a non-quirky way and without
-> > loss of functionality, I'd probably be fine. I do think, however,
-> > that there's a reason this is being handled in hvmloader right now.
+> > If Xen has to parse BIOSLinkerLoader, it can use the existing commands
+> > to process a reduced set of ACPI tables.  In other words,
+> > etc/acpi/tables would only include the NFIT, the SSDT with namespace
+> > devices, and the XSDT.  etc/acpi/rsdp would include the RSDP table as usual.
+> >
+> > hvmloader can then:
+> > 
+> > 1) allocate some memory for where the XSDT will go
+> > 
+> > 2) process the BIOSLinkerLoader like SeaBIOS would do
+> > 
+> > 3) find the RSDP in low memory, since the loader script must have placed
+> > it there.  If it cannot find it, allocate some low memory, fill it with
+> > the RSDP header and revision, and and jump to step 6
+> > 
+> > 4) If it found QEMU's RSDP, use it to find QEMU's XSDT
+> > 
+> > 5) Copy ACPI table pointers from QEMU to hvmloader's RSDT and/or XSDT.
+> > 
+> > 6) build hvmloader tables and link them into the RSDT and/or XSDT as usual.
+> > 
+> > 7) overwrite the RSDP in low memory with a pointer to hvmloader's own
+> > RSDT and/or XSDT, and updated the checksums
+> > 
+> > QEMU's XSDT remains there somewhere in memory, unused but harmless.
+> > 
 > 
-> And not to discourage you, just as a clarification, you'll also need to
-> consider backward compatibility: unless the tables are identical, I
-> imagine we'll have to keep using the old tables for already installed
-> virtual machines.
+> It can work for plan tables which do not contain AML.
+> 
+> However, for a namespace device, Xen needs to know its name in order
+> to detect the potential name conflict with those used in Xen built
+> ACPI. Xen does not (and is not going to) introduce an AML parser, so
+> it cannot get those device names from QEMU built ACPI by its own.
+> 
+> The idea of either this patch series or the new BIOSLinkerLoader
+> command is to let QEMU tell Xen where the definition body of a
+> namespace device (i.e. that part within the outmost "Device(NAME)") is
+> and what the device name is. Xen, after the name conflict check, can
+> re-package the definition body in a namespace device (w/ minimal AML
+> builder code added in Xen) and then in SSDT.
+> 
+> 
+> Haozhong
 
-Maybe you can handle this using machine type versioning.
-Installed guests would use the old type.
+You most likely can do this without a new command.
+You can use something similiar to build_append_named_dword
+in combination with BIOS_LINKER_LOADER_COMMAND_ADD_POINTER
+like vm gen id does.
 
 -- 
 MST
