@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e3ZW4-0002Dv-Mc
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 23:23:05 -0400
+	(envelope-from <mst@redhat.com>) id 1e3ZW5-0002FM-Le
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 23:23:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e3ZW3-0006J6-DA
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 23:23:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58120)
+	(envelope-from <mst@redhat.com>) id 1e3ZW4-0006L8-JA
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 23:23:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56878)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e3ZW3-0006Ht-6m
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 23:23:03 -0400
-Date: Sun, 15 Oct 2017 06:23:01 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e3ZW4-0006Jc-9c
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 23:23:04 -0400
+Date: Sun, 15 Oct 2017 06:23:02 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1508036858-13479-8-git-send-email-mst@redhat.com>
+Message-ID: <1508036858-13479-9-git-send-email-mst@redhat.com>
 References: <1508036858-13479-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1508036858-13479-1-git-send-email-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 07/26] kdump: set vmcoreinfo location
+Subject: [Qemu-devel] [PULL 08/26] scripts/dump-guest-memory.py: add
+ vmcoreinfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,70 +29,127 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-kdump header provides offset and size of the vmcoreinfo content,
-append it if available (skip the ELF note header).
-
-crash-7.1.9 was the first version that started looking in the
-vmcoreinfo data for phys_base instead of in the kdump_sub_header.
+Add a vmcoreinfo ELF note in the dump if vmcoreinfo device has the
+memory location details.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- dump.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ scripts/dump-guest-memory.py | 61 ++++++++++++++++++++++++++++++++++++++=
+++++++
+ 1 file changed, 61 insertions(+)
 
-diff --git a/dump.c b/dump.c
-index 5674512..d4a8c94 100644
---- a/dump.c
-+++ b/dump.c
-@@ -857,6 +857,18 @@ static void create_header32(DumpState *s, Error **er=
-rp)
-     kh->dump_level =3D cpu_to_dump32(s, DUMP_LEVEL);
+diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.py
+index f7c6635..69dd5ef 100644
+--- a/scripts/dump-guest-memory.py
++++ b/scripts/dump-guest-memory.py
+@@ -14,6 +14,7 @@ the COPYING file in the top-level directory.
+ """
 =20
-     offset_note =3D DISKDUMP_HEADER_BLOCKS * block_size + size;
-+    if (s->guest_note &&
-+        note_name_equal(s, s->guest_note, "VMCOREINFO")) {
-+        uint64_t hsize, name_size, size_vmcoreinfo_desc, offset_vmcorein=
-fo;
-+
-+        get_note_sizes(s, s->guest_note,
-+                       &hsize, &name_size, &size_vmcoreinfo_desc);
-+        offset_vmcoreinfo =3D offset_note + s->note_size - s->guest_note=
-_size +
-+            (DIV_ROUND_UP(hsize, 4) + DIV_ROUND_UP(name_size, 4)) * 4;
-+        kh->offset_vmcoreinfo =3D cpu_to_dump64(s, offset_vmcoreinfo);
-+        kh->size_vmcoreinfo =3D cpu_to_dump32(s, size_vmcoreinfo_desc);
-+    }
-+
-     kh->offset_note =3D cpu_to_dump64(s, offset_note);
-     kh->note_size =3D cpu_to_dump32(s, s->note_size);
+ import ctypes
++import struct
 =20
-@@ -957,6 +969,18 @@ static void create_header64(DumpState *s, Error **er=
-rp)
-     kh->dump_level =3D cpu_to_dump32(s, DUMP_LEVEL);
+ UINTPTR_T =3D gdb.lookup_type("uintptr_t")
 =20
-     offset_note =3D DISKDUMP_HEADER_BLOCKS * block_size + size;
-+    if (s->guest_note &&
-+        note_name_equal(s, s->guest_note, "VMCOREINFO")) {
-+        uint64_t hsize, name_size, size_vmcoreinfo_desc, offset_vmcorein=
-fo;
-+
-+        get_note_sizes(s, s->guest_note,
-+                       &hsize, &name_size, &size_vmcoreinfo_desc);
-+        offset_vmcoreinfo =3D offset_note + s->note_size - s->guest_note=
-_size +
-+            (DIV_ROUND_UP(hsize, 4) + DIV_ROUND_UP(name_size, 4)) * 4;
-+        kh->offset_vmcoreinfo =3D cpu_to_dump64(s, offset_vmcoreinfo);
-+        kh->size_vmcoreinfo =3D cpu_to_dump64(s, size_vmcoreinfo_desc);
-+    }
-+
-     kh->offset_note =3D cpu_to_dump64(s, offset_note);
-     kh->note_size =3D cpu_to_dump64(s, s->note_size);
+@@ -45,6 +46,17 @@ EM_S390 =3D 22
+ EM_AARCH =3D 183
+ EM_X86_64 =3D 62
 =20
++VMCOREINFO_FORMAT_ELF =3D 1
++
++def le16_to_cpu(val):
++    return struct.unpack("<H", struct.pack("=3DH", val))[0]
++
++def le32_to_cpu(val):
++    return struct.unpack("<I", struct.pack("=3DI", val))[0]
++
++def le64_to_cpu(val):
++    return struct.unpack("<Q", struct.pack("=3DQ", val))[0]
++
+ class ELF(object):
+     """Representation of a ELF file."""
+=20
+@@ -120,6 +132,25 @@ class ELF(object):
+         self.segments[0].p_filesz +=3D ctypes.sizeof(note)
+         self.segments[0].p_memsz +=3D ctypes.sizeof(note)
+=20
++
++    def add_vmcoreinfo_note(self, vmcoreinfo):
++        """Adds a vmcoreinfo note to the ELF dump."""
++        # compute the header size, and copy that many bytes from the not=
+e
++        header =3D get_arch_note(self.endianness, 0, 0)
++        ctypes.memmove(ctypes.pointer(header),
++                       vmcoreinfo, ctypes.sizeof(header))
++        if header.n_descsz > 1 << 20:
++            print('warning: invalid vmcoreinfo size')
++            return
++        # now get the full note
++        note =3D get_arch_note(self.endianness,
++                             header.n_namesz - 1, header.n_descsz)
++        ctypes.memmove(ctypes.pointer(note), vmcoreinfo, ctypes.sizeof(n=
+ote))
++
++        self.notes.append(note)
++        self.segments[0].p_filesz +=3D ctypes.sizeof(note)
++        self.segments[0].p_memsz +=3D ctypes.sizeof(note)
++
+     def add_segment(self, p_type, p_paddr, p_size):
+         """Adds a segment to the elf."""
+=20
+@@ -505,6 +536,35 @@ shape and this command should mostly work."""
+                 cur +=3D chunk_size
+                 left -=3D chunk_size
+=20
++    def phys_memory_read(self, addr, size):
++        qemu_core =3D gdb.inferiors()[0]
++        for block in self.guest_phys_blocks:
++            if block["target_start"] <=3D addr \
++               and addr + size <=3D block["target_end"]:
++                haddr =3D block["host_addr"] + (addr - block["target_sta=
+rt"])
++                return qemu_core.read_memory(haddr, size)
++        return None
++
++    def add_vmcoreinfo(self):
++        if not gdb.parse_and_eval("vmcoreinfo_find()") \
++           or not gdb.parse_and_eval("vmcoreinfo_find()->has_vmcoreinfo"=
+):
++            return
++
++        fmt =3D gdb.parse_and_eval("vmcoreinfo_find()->vmcoreinfo.guest_=
+format")
++        addr =3D gdb.parse_and_eval("vmcoreinfo_find()->vmcoreinfo.paddr=
+")
++        size =3D gdb.parse_and_eval("vmcoreinfo_find()->vmcoreinfo.size"=
+)
++
++        fmt =3D le16_to_cpu(fmt)
++        addr =3D le64_to_cpu(addr)
++        size =3D le32_to_cpu(size)
++
++        if fmt !=3D VMCOREINFO_FORMAT_ELF:
++            return
++
++        vmcoreinfo =3D self.phys_memory_read(addr, size)
++        if vmcoreinfo:
++            self.elf.add_vmcoreinfo_note(vmcoreinfo.tobytes())
++
+     def invoke(self, args, from_tty):
+         """Handles command invocation from gdb."""
+=20
+@@ -518,6 +578,7 @@ shape and this command should mostly work."""
+=20
+         self.elf =3D ELF(argv[1])
+         self.guest_phys_blocks =3D get_guest_phys_blocks()
++        self.add_vmcoreinfo()
+=20
+         with open(argv[0], "wb") as vmcore:
+             self.dump_init(vmcore)
 --=20
 MST
