@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e3ZX4-00037I-Mw
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 23:24:07 -0400
+	(envelope-from <mst@redhat.com>) id 1e3ZX5-00038c-Rd
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 23:24:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e3ZX3-0007Dz-Ql
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 23:24:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50842)
+	(envelope-from <mst@redhat.com>) id 1e3ZX4-0007EU-UM
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 23:24:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58850)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e3ZX3-0007DU-J8
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 23:24:05 -0400
-Date: Sun, 15 Oct 2017 06:24:03 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e3ZX4-0007E7-Lo
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 23:24:06 -0400
+Date: Sun, 15 Oct 2017 06:24:04 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1508036858-13479-26-git-send-email-mst@redhat.com>
+Message-ID: <1508036858-13479-27-git-send-email-mst@redhat.com>
 References: <1508036858-13479-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1508036858-13479-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 25/26] pc: remove useless hot_add_cpu
- initialisation
+Subject: [Qemu-devel] [PULL 26/26] tests/pxe: Test more NICs when running in
+ SPEED=slow mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +28,89 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Anthony PERARD <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Laurent Vivier <lvivier@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
 
-Since 4458fb3a79 (pc: Eliminate pc_default_machine_options()),
-hot_add_cpu is set in pc_machine_class_init(), so we don't
-need to set it in pc_q35_machine_options(), pc_i440fx_machine_options()
-and xenfv_machine_options(), except to clear it in
-pc_i440fx_1_4_machine_opt().
+The pxe-test is a very good test to excercise NICs, thus we should use
+it to test all NICs that can be used by the BIOS for booting via network.
+However, to avoid that the default testing time increases too much, the
+additional NICs are only tested in the "make check SPEED=slow" mode.
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+The virtio-net NIC on ppc64 is now also only tested in slow mode, since
+the test on ppc64 is really quite slow and we've got test coverage for
+virtio-net in big endian mode now on s390x, too.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/pc_piix.c | 2 --
- hw/i386/pc_q35.c  | 1 -
- 2 files changed, 3 deletions(-)
+ tests/pxe-test.c | 31 +++++++++++++++++++++----------
+ 1 file changed, 21 insertions(+), 10 deletions(-)
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 9dbcbcd..f79d5cb 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -426,7 +426,6 @@ static void pc_i440fx_machine_options(MachineClass *m)
- {
-     m->family = "pc_piix";
-     m->desc = "Standard PC (i440FX + PIIX, 1996)";
--    m->hot_add_cpu = pc_hot_add_cpu;
-     m->default_machine_opts = "firmware=bios-256k.bin";
-     m->default_display = "std";
- }
-@@ -1125,7 +1124,6 @@ static void xenfv_machine_options(MachineClass *m)
-     m->desc = "Xen Fully-virtualized PC";
-     m->max_cpus = HVM_MAX_VCPUS;
-     m->default_machine_opts = "accel=xen";
--    m->hot_add_cpu = pc_hot_add_cpu;
+diff --git a/tests/pxe-test.c b/tests/pxe-test.c
+index 0d70afc..937f29e 100644
+--- a/tests/pxe-test.c
++++ b/tests/pxe-test.c
+@@ -1,11 +1,12 @@
+ /*
+  * PXE test cases.
+  *
+- * Copyright (c) 2016 Red Hat Inc.
++ * Copyright (c) 2016, 2017 Red Hat Inc.
+  *
+  * Authors:
+  *  Michael S. Tsirkin <mst@redhat.com>,
+  *  Victor Kaplansky <victork@redhat.com>
++ *  Thomas Huth <thuth@redhat.com>
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or later.
+  * See the COPYING file in the top-level directory.
+@@ -36,14 +37,14 @@ static void test_pxe_one(const char *params, bool ipv6)
+     g_free(args);
  }
  
- DEFINE_PC_MACHINE(xenfv, "xenfv", pc_xen_hvm_init,
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 6c4ec4b..da3ea60 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -295,7 +295,6 @@ static void pc_q35_machine_options(MachineClass *m)
+-static void test_pxe_e1000(void)
++static void test_pxe_ipv4(gconstpointer data)
  {
-     m->family = "pc_q35";
-     m->desc = "Standard PC (Q35 + ICH9, 2009)";
--    m->hot_add_cpu = pc_hot_add_cpu;
-     m->units_per_default_bus = 1;
-     m->default_machine_opts = "firmware=bios-256k.bin";
-     m->default_display = "std";
+-    test_pxe_one("-device e1000,netdev=" NETNAME, false);
+-}
++    const char *model = data;
++    char *dev_arg;
+ 
+-static void test_pxe_virtio_pci(void)
+-{
+-    test_pxe_one("-device virtio-net-pci,netdev=" NETNAME, false);
++    dev_arg = g_strdup_printf("-device %s,netdev=" NETNAME, model);
++    test_pxe_one(dev_arg, false);
++    g_free(dev_arg);
+ }
+ 
+ static void test_pxe_spapr_vlan(void)
+@@ -68,11 +69,21 @@ int main(int argc, char *argv[])
+     g_test_init(&argc, &argv, NULL);
+ 
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+-        qtest_add_func("pxe/e1000", test_pxe_e1000);
+-        qtest_add_func("pxe/virtio", test_pxe_virtio_pci);
++        qtest_add_data_func("pxe/e1000", "e1000", test_pxe_ipv4);
++        qtest_add_data_func("pxe/virtio", "virtio-net-pci", test_pxe_ipv4);
++        if (g_test_slow()) {
++            qtest_add_data_func("pxe/ne2000", "ne2k_pci", test_pxe_ipv4);
++            qtest_add_data_func("pxe/eepro100", "i82550", test_pxe_ipv4);
++            qtest_add_data_func("pxe/pcnet", "pcnet", test_pxe_ipv4);
++            qtest_add_data_func("pxe/rtl8139", "rtl8139", test_pxe_ipv4);
++            qtest_add_data_func("pxe/vmxnet3", "vmxnet3", test_pxe_ipv4);
++        }
+     } else if (strcmp(arch, "ppc64") == 0) {
+-        qtest_add_func("pxe/virtio", test_pxe_virtio_pci);
+         qtest_add_func("pxe/spapr-vlan", test_pxe_spapr_vlan);
++        if (g_test_slow()) {
++            qtest_add_data_func("pxe/virtio", "virtio-net-pci", test_pxe_ipv4);
++            qtest_add_data_func("pxe/e1000", "e1000", test_pxe_ipv4);
++        }
+     } else if (g_str_equal(arch, "s390x")) {
+         qtest_add_func("pxe/virtio-ccw", test_pxe_virtio_ccw);
+     }
 -- 
 MST
