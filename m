@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e3YAQ-0000cf-0A
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 21:56:39 -0400
+	(envelope-from <mst@redhat.com>) id 1e3YGR-0001Yp-53
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 22:02:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e3YAL-0005GI-4F
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 21:56:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60134)
+	(envelope-from <mst@redhat.com>) id 1e3YGM-0000Ap-A6
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 22:02:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59076)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e3YAK-0005G3-QT
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 21:56:33 -0400
-Date: Sun, 15 Oct 2017 04:56:28 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e3YGM-000083-0V
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 22:02:46 -0400
+Date: Sun, 15 Oct 2017 05:02:43 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171015044800-mutt-send-email-mst@kernel.org>
+Message-ID: <20171015045801-mutt-send-email-mst@kernel.org>
 References: <20170911165929.2791-1-marcandre.lureau@redhat.com>
 	<20170911165929.2791-3-marcandre.lureau@redhat.com>
 	<20171009110336.GA17824@redhat.com>
@@ -120,13 +120,13 @@ ionally.
 >=20
 > It's still possible to add a -machine option that can
 > enable/disable automatic creation of the device.
->=20
+>
+>
 > But I also don't see why it needs to be implemented using -device
 > if it's not really a device.  A boolean machine or fw_cfg
 > property is good enough for that.
 
-It certainly feels like a device. It has state
-(that needs to be migrated), it has a host/guest interface.
+Device imho is a combination of guest/host interface and state.
 
 
 > >=20
@@ -139,19 +139,10 @@ state
 > Both "-global fw_cfg.vmcoreinfo=3Don|off" and
 > "-machine vmcoreinfo=3Don|off" sound good enough to me.
 
-
-Certainly not a fw cfg flag. Can be a machine flag I guess
-but then we'd have to open-code each such device.
-And don't forget auto - this is what Daniel asks for.
-
-I don't necessarily see this device as so special and think a generic
-interface to control what goes into the machine would be better (e.g.
-look how you use hacky -global to control fw cfg options, it only works
-if there's a single one), but if everyone thinks otherwise and agrees we
-should have it in there by default, and a property to disable, fine.
-
-Can be a patch on top though.
-
+I can live with the second option if people really want it.
+I'd like to see some way to add these things without
+adding to the mess that is the pc initialization
+but oh well.
 
 > --=20
 > Eduardo
