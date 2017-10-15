@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <msuchanek@suse.de>) id 1e3jUE-0005ak-D1
-	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 10:01:51 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1e3kuS-00026R-HD
+	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 11:33:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <msuchanek@suse.de>) id 1e3jUB-0005Es-CT
-	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 10:01:50 -0400
-Date: Sun, 15 Oct 2017 16:01:41 +0200
-From: Michal =?UTF-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
-Message-ID: <20171015160141.75690306@naga>
-In-Reply-To: <CAFEAcA9Vmrz3NTfJcSteyxvRvtb3VuCXZd=aOTL-GrWL3cm8bg@mail.gmail.com>
-References: <CA+J4q6dO+V32yF11jFD2jAizigYoZS6eECyuDTgRVfe+a_JUJQ@mail.gmail.com>
-	<1507878038.21465.3.camel@redhat.com>
-	<CAFEAcA9Vmrz3NTfJcSteyxvRvtb3VuCXZd=aOTL-GrWL3cm8bg@mail.gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1e3kuP-0004d2-DC
+	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 11:33:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54834)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e3kuP-0004cQ-8A
+	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 11:32:57 -0400
+References: <20171013054842.32120-1-sw@weilnetz.de>
+	<dacdf7e7-0b16-99a0-ab50-ea7a458e0ec6@amsat.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4028eece-c9ff-113a-3cab-1a95c9ce79cc@redhat.com>
+Date: Sun, 15 Oct 2017 17:32:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QEMU without X11 support
+In-Reply-To: <dacdf7e7-0b16-99a0-ab50-ea7a458e0ec6@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] oslib-posix: Fix compiler warning and
+ some data types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +29,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, hanji unit <hanjiunit@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-discuss <qemu-discuss@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Stefan Weil <sw@weilnetz.de>, Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Fri, 13 Oct 2017 17:08:49 +0100
-Peter Maydell <peter.maydell@linaro.org> wrote:
+On 14/10/2017 18:53, Philippe Mathieu-Daud=C3=A9 wrote:
+>> @@ -328,7 +328,7 @@ static void *do_touch_pages(void *arg)
+>>               * don't need to write at all so we don't cause
+>>               * wear on the storage backing the region...
+>>               */
+>> -            *(volatile char *)addr =3D *addr;
+>> +            *addr =3D *addr;
+> I personally prefer the other form which is mostly self-explicit when
+> reviewing this code.
+>=20
+> Declaring addr non volatile and using volatile cast here:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>=20
 
-> On 13 October 2017 at 08:00, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> > On Thu, 2017-10-12 at 16:25 -0400, hanji unit wrote:  
-> >> Hello, is it possible to run (or rebuild modifying build flags)
-> >> QEMU without support for X11 window system integration?  
-> >
-> > ./configure --disable-gtk --disable-sdl --disable-opengl  
-> 
-> You can also use the runtime -display options (assuming
-> your development environment has the libraries
-> and your runtime environment has them installed, there's
-> no harm in having a QEMU that was built with gtk support
-> and not using the gtk UI.)
-> 
-> There are a couple of parts to this:
->  (1) does your guest OS require a graphics device?
-> (eg typically Windows does, ARM Linux will happily use
-> a serial port)
->  (2) if you do need a graphics device, where does the
-> output go?
-> (eg you can tell QEMU to just not show graphics at
-> all with -display none, use -display vnc to for a VNC
-> server, etc. Some of the -display options will use
-> X11, and some won't.)
+I agree with Philippe; in genereal, volatile is more of a property of
+the access rather than the variable.
 
-iirc you also need to specify -nographic so qemu does not try to use the
-X11 GUI to display your serial output.
-
-HTH
-
-Michal
+Paolo
