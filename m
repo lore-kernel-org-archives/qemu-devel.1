@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e3S2Z-0002G1-BS
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 15:24:08 -0400
+	(envelope-from <mst@redhat.com>) id 1e3Wpv-0004Fl-Cz
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 20:31:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e3S2V-0006wc-Mm
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 15:24:07 -0400
-Resent-Message-Id: <E1e3S2V-0006wc-Mm@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21313)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1e3S2V-0006vo-Eb
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 15:24:03 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150800900348.320.15378863365157681326@b58463cdfd5f>
-In-Reply-To: <1508006342-5304-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	(envelope-from <mst@redhat.com>) id 1e3Wps-0007km-9s
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 20:31:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35500)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e3Wps-0007iM-3D
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 20:31:20 -0400
+Date: Sun, 15 Oct 2017 03:31:15 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171015033021-mutt-send-email-mst@kernel.org>
+References: <alpine.DEB.2.10.1709111119480.19719@sstabellini-ThinkPad-X260>
+	<20170912031509.vufszbju3s2v2bw3@hz-desktop>
+	<20171010160544.GA1772@char.us.oracle.com>
+	<20171012124544.dq3wyr65tefi3glk@hz-desktop>
+	<f6478644-0d4a-6531-9016-aee2a0e76417@redhat.com>
+	<20171013075326.77azyi4j2wo3b2fx@hz-desktop>
+	<20171013104453.50284426@nial.brq.redhat.com>
+	<20171013111341.feb2462nh2rcrjpp@hz-desktop>
+	<59E0C9F602000078001862C4@prv-mh.provo.novell.com>
+	<alpine.DEB.2.10.1710131544350.2967@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 14 Oct 2017 12:23:23 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCHv3 00/13] sun4m: sparc32_dma tidy-ups
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.DEB.2.10.1710131544350.2967@sstabellini-ThinkPad-X260>
+Subject: Re: [Qemu-devel] [RFC QEMU PATCH v3 00/10] Implement vNVDIMM for
+ Xen HVM guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +36,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mark.cave-ayland@ilande.co.uk
-Cc: famz@redhat.com, qemu-devel@nongnu.org, atar4qemu@gmail.com
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Jan Beulich <JBeulich@suse.com>, Haozhong Zhang <haozhong.zhang@intel.com>, andrew.cooper3@citrix.com, Anthony Perard <anthony.perard@citrix.com>, george.dunlap@citrix.com, wei.liu2@citrix.com, ian.jackson@eu.citrix.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, xen-devel@lists.xen.org, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MDgwMDYzNDItNTMwNC0xLWdpdC1zZW5kLWVtYWlsLW1hcmsuY2F2ZS1heWxh
-bmRAaWxhbmRlLmNvLnVrClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0h2MyAwMC8xM10gc3Vu
-NG06IHNwYXJjMzJfZG1hIHRpZHktdXBzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
-bi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8
-IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAt
-LWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAg
-ZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0l
-cyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRz
-L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAg
-ICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1Qg
-U0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4
-ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo0OTM3NmYyMDk3IHNwYXJj
-MzJfZG1hOiBhZGQgbGVuIHRvIGVzcC9sZSBETUEgbWVtb3J5IHRyYWNpbmcKZDE3NDdiOTk0NiBz
-cGFyYzMyX2RtYTogcmVtb3ZlIGlzX2xlZG1hIGhhY2sgYW5kIHJlcGxhY2Ugd2l0aCBtZW1vcnkg
-cmVnaW9uIGFsaWFzCmFmZjcwOGI3OTQgc3BhcmMzMl9kbWE6IGludHJvZHVjZSBuZXcgU1BBUkMz
-Ml9ETUEgdHlwZSBjb250YWluZXIgb2JqZWN0CmMxZDhlMzI0ZTIgc3BhcmMzMl9kbWE6IG1ha2Ug
-bGFuY2UgZGV2aWNlIGNoaWxkIG9mIGxlZG1hIGRldmljZQo4OWY5MTExNmRkIGxhbmNlOiBtb3Zl
-IFRZUEVfTEFOQ0UgYW5kIFN5c0J1c1BDTmV0U3RhdGUgZnJvbSBsYW5jZS5jIHRvIHN1bjRtLmgK
-ZGVhZDY2NWQxZCBzcGFyYzMyX2RtYTogbWFrZSBlc3AgZGV2aWNlIGNoaWxkIG9mIGVzcGRtYSBk
-ZXZpY2UKMWFmYWE2M2JiZCBlc3A6IG1vdmUgVFlQRV9FU1AgYW5kIFN5c0J1c0VTUFN0YXRlIGZy
-b20gZXNwLmMgdG8gZXNwLmgKOWUwNTUyMzYzMiBzcGFyYzMyX2RtYTogdXNlIG9iamVjdCBsaW5r
-IGluc3RlYWQgb2YgcWRldiBwcm9wZXJ0eSB0byBwYXNzIElPTU1VIHJlZmVyZW5jZQo4MGI5ODM1
-ODk2IHN1bjRtX2lvbW11OiBtb3ZlIFRZUEVfU1VONE1fSU9NTVUgZGVjbGFyYXRpb24gdG8gc3Vu
-NG0uaAo2NmEzNmFhYTExIHN1bjRtOiBtb3ZlIERNQSBkZXZpY2Ugd2lyaW5nIGZyb20gc3BhcmMz
-Ml9kbWFfaW5pdCgpIHRvIHN1bjRtX2h3X2luaXQoKQpkMmZkOWNhM2ViIHNwYXJjMzJfZG1hOiBt
-b3ZlIHR5cGUgZGVjbGFyYXRpb25zIGZyb20gc3BhcmMzMl9kbWEuYyB0byBzcGFyYzMyX2RtYS5o
-Cjc0YzUxMzVlZGYgc3BhcmMzMl9kbWE6IHNwbGl0IGVzcCBhbmQgbGUgaW50byBzZXBhcmF0ZSBE
-TUEgZGV2aWNlcwpjYzA3YjcwMzVkIHNwYXJjMzJfZG1hOiByZW5hbWUgU1BBUkMzMl9ETUEgdHlw
-ZSB0byBTUEFSQzMyX0RNQV9ERVZJQ0UKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBB
-VENIIDEvMTM6IHNwYXJjMzJfZG1hOiByZW5hbWUgU1BBUkMzMl9ETUEgdHlwZSB0byBTUEFSQzMy
-X0RNQV9ERVZJQ0UuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMzogc3BhcmMzMl9kbWE6IHNwbGl0IGVz
-cCBhbmQgbGUgaW50byBzZXBhcmF0ZSBETUEgZGV2aWNlcy4uLgpDaGVja2luZyBQQVRDSCAzLzEz
-OiBzcGFyYzMyX2RtYTogbW92ZSB0eXBlIGRlY2xhcmF0aW9ucyBmcm9tIHNwYXJjMzJfZG1hLmMg
-dG8gc3BhcmMzMl9kbWEuaC4uLgpDaGVja2luZyBQQVRDSCA0LzEzOiBzdW40bTogbW92ZSBETUEg
-ZGV2aWNlIHdpcmluZyBmcm9tIHNwYXJjMzJfZG1hX2luaXQoKSB0byBzdW40bV9od19pbml0KCku
-Li4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiM1MTog
-RklMRTogaHcvc3BhcmMvc3VuNG0uYzo4MjQ6CisgICAgcWVtdV9pcnEgKmNwdV9pcnFzW01BWF9D
-UFVTXSwgc2xhdmlvX2lycVszMl0sIHNsYXZpb19jcHVfaXJxW01BWF9DUFVTXTsKICAgICAgICAg
-ICAgICBeCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDY2IGxpbmVzIGNoZWNrZWQKCllv
-dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvMTM6
-IHN1bjRtX2lvbW11OiBtb3ZlIFRZUEVfU1VONE1fSU9NTVUgZGVjbGFyYXRpb24gdG8gc3VuNG0u
-aC4uLgpDaGVja2luZyBQQVRDSCA2LzEzOiBzcGFyYzMyX2RtYTogdXNlIG9iamVjdCBsaW5rIGlu
-c3RlYWQgb2YgcWRldiBwcm9wZXJ0eSB0byBwYXNzIElPTU1VIHJlZmVyZW5jZS4uLgpDaGVja2lu
-ZyBQQVRDSCA3LzEzOiBlc3A6IG1vdmUgVFlQRV9FU1AgYW5kIFN5c0J1c0VTUFN0YXRlIGZyb20g
-ZXNwLmMgdG8gZXNwLmguLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xMzogc3BhcmMzMl9kbWE6IG1ha2Ug
-ZXNwIGRldmljZSBjaGlsZCBvZiBlc3BkbWEgZGV2aWNlLi4uCkNoZWNraW5nIFBBVENIIDkvMTM6
-IGxhbmNlOiBtb3ZlIFRZUEVfTEFOQ0UgYW5kIFN5c0J1c1BDTmV0U3RhdGUgZnJvbSBsYW5jZS5j
-IHRvIHN1bjRtLmguLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTM6IHNwYXJjMzJfZG1hOiBtYWtlIGxh
-bmNlIGRldmljZSBjaGlsZCBvZiBsZWRtYSBkZXZpY2UuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMTM6
-IHNwYXJjMzJfZG1hOiBpbnRyb2R1Y2UgbmV3IFNQQVJDMzJfRE1BIHR5cGUgY29udGFpbmVyIG9i
-amVjdC4uLgpDaGVja2luZyBQQVRDSCAxMi8xMzogc3BhcmMzMl9kbWE6IHJlbW92ZSBpc19sZWRt
-YSBoYWNrIGFuZCByZXBsYWNlIHdpdGggbWVtb3J5IHJlZ2lvbiBhbGlhcy4uLgpDaGVja2luZyBQ
-QVRDSCAxMy8xMzogc3BhcmMzMl9kbWE6IGFkZCBsZW4gdG8gZXNwL2xlIERNQSBtZW1vcnkgdHJh
-Y2luZy4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2Rl
-OiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6
-Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
-ZWxAZnJlZWxpc3RzLm9yZw==
+On Fri, Oct 13, 2017 at 03:46:39PM -0700, Stefano Stabellini wrote:
+> On Fri, 13 Oct 2017, Jan Beulich wrote:
+> > >>> On 13.10.17 at 13:13, <haozhong.zhang@intel.com> wrote:
+> > > To Jan, Andrew, Stefano and Anthony,
+> > > 
+> > > what do you think about allowing QEMU to build the entire guest ACPI
+> > > and letting SeaBIOS to load it? ACPI builder code in hvmloader is
+> > > still there and just bypassed in this case.
+> > 
+> > Well, if that can be made work in a non-quirky way and without
+> > loss of functionality, I'd probably be fine. I do think, however,
+> > that there's a reason this is being handled in hvmloader right now.
+> 
+> And not to discourage you, just as a clarification, you'll also need to
+> consider backward compatibility: unless the tables are identical, I
+> imagine we'll have to keep using the old tables for already installed
+> virtual machines.
+
+Maybe you can handle this using machine type versioning.
+Installed guests would use the old type.
+
+-- 
+MST
