@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <geoff@hostfission.com>) id 1e3i33-0002kP-Vj
-	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 08:29:43 -0400
+	(envelope-from <msuchanek@suse.de>) id 1e3jUE-0005ak-D1
+	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 10:01:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <geoff@hostfission.com>) id 1e3i32-0007jA-QC
-	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 08:29:42 -0400
+	(envelope-from <msuchanek@suse.de>) id 1e3jUB-0005Es-CT
+	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 10:01:50 -0400
+Date: Sun, 15 Oct 2017 16:01:41 +0200
+From: Michal =?UTF-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
+Message-ID: <20171015160141.75690306@naga>
+In-Reply-To: <CAFEAcA9Vmrz3NTfJcSteyxvRvtb3VuCXZd=aOTL-GrWL3cm8bg@mail.gmail.com>
+References: <CA+J4q6dO+V32yF11jFD2jAizigYoZS6eECyuDTgRVfe+a_JUJQ@mail.gmail.com>
+	<1507878038.21465.3.camel@redhat.com>
+	<CAFEAcA9Vmrz3NTfJcSteyxvRvtb3VuCXZd=aOTL-GrWL3cm8bg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Sun, 15 Oct 2017 23:29:33 +1100
-From: geoff@hostfission.com
-In-Reply-To: <92FEAF6E-3002-4F0F-B845-4EC3D29381A4@redhat.com>
-References: <5548e41a5668ec0cba9543139327e035@hostfission.com>
-	<3A7697A0-1AF3-46E8-8BCC-45A8127A2638@redhat.com>
-	<286ea2bbfb5ec77d962300c9996c8688@hostfission.com>
-	<92FEAF6E-3002-4F0F-B845-4EC3D29381A4@redhat.com>
-Message-ID: <c0c5158aeb4e553ac55639e66d81c007@hostfission.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] ivshmem Windows Driver
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] QEMU without X11 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,93 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yan Vugenfirer <yvugenfi@redhat.com>
-Cc: Ladi Prosek <lprosek@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Qemu-devel <qemu-devel-bounces+geoff=hostfission.com@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, hanji unit <hanjiunit@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-discuss <qemu-discuss@nongnu.org>
 
-On 2017-10-15 23:24, Yan Vugenfirer wrote:
->> On 15 Oct 2017, at 15:21, geoff@hostfission.com wrote:
->>=20
->> Hi Yan,
->>=20
->> Thank you for the information. I am rather new to Windows Driver=20
->> development and learning as I go, so this may take some time, but=20
->> since the driver only needs to perform very basic functions I do not=20
->> see this as being too much of a challenge.
->=20
-> I think you can look into Windows virtio-balloon implementation as an
-> example of simple driver:
-> https://github.com/virtio-win/kvm-guest-drivers-windows/tree/master/Bal=
-loon
->=20
-> It relies on virtio library
-> (https://github.com/virtio-win/kvm-guest-drivers-windows/tree/master/Vi=
-rtIO)
-> and it is WDF driver (MS framework that simplifies the drivers
-> development) that makes it very simple.
->=20
+On Fri, 13 Oct 2017 17:08:49 +0100
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-Thanks again, I already have a prototype driver working using WDF, it's=20
-more learning the windows internals and how to best implement things.
+> On 13 October 2017 at 08:00, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> > On Thu, 2017-10-12 at 16:25 -0400, hanji unit wrote:  
+> >> Hello, is it possible to run (or rebuild modifying build flags)
+> >> QEMU without support for X11 window system integration?  
+> >
+> > ./configure --disable-gtk --disable-sdl --disable-opengl  
+> 
+> You can also use the runtime -display options (assuming
+> your development environment has the libraries
+> and your runtime environment has them installed, there's
+> no harm in having a QEMU that was built with gtk support
+> and not using the gtk UI.)
+> 
+> There are a couple of parts to this:
+>  (1) does your guest OS require a graphics device?
+> (eg typically Windows does, ARM Linux will happily use
+> a serial port)
+>  (2) if you do need a graphics device, where does the
+> output go?
+> (eg you can tell QEMU to just not show graphics at
+> all with -display none, use -display vnc to for a VNC
+> server, etc. Some of the -display options will use
+> X11, and some won't.)
 
->>=20
->> -Geoff
->>=20
->> On 2017-10-15 22:14, Yan Vugenfirer wrote:
->>> He Geoff,
->>> The official virtio-win drivers upstream repository is here:
->>> https://github.com/virtio-win/kvm-guest-drivers-windows
->>> 1. There is no ivshmem Windows Driver for now as far as I know
->>> 2. We are signing the drivers for community usage
->>> https://fedoraproject.org/wiki/Windows_Virtio_Drivers from the same
->>> repository.
->>> The process will be: submit the code for review with pull request
->>> (better use existing virtio library for virtio communication between
->>> the guest and the host), pass internal tests and at the least being
->>> able to pass MS HCK\HLK tests, later on the driver will be pulled=20
->>> into
->>> official build and release with rest of the drivers for community
->>> usage.
->>> 3. We are happy to cooperate on adding new functionality to current
->>> package of virtio drivers for Windows
->>> 4. As already mentioned:=20
->>> https://github.com/virtio-win/kvm-guest-drivers-windows
->>> Thanks a lot!
->>> If you have more questions, please don=E2=80=99t hesitate to talk to =
-me, Ladi
->>> or anyone else from Red Hat involved with virtio-win development.
->>> Best regards,
->>> Yan.
->>>> On 15 Oct 2017, at 12:32, geoff--- via Qemu-devel=20
->>>> <qemu-devel@nongnu.org> wrote:
->>>> Hi All,
->>>> I am writing some code that needs to share a block of ram between a=20
->>>> Windows guest and Linux host. For this I am using the ivshmem device=
-=20
->>>> and I have written a very primitive driver for windows that allows a=
-=20
->>>> single application to request to memory map the pci bar (shared=20
->>>> memory) into the program's context using DeviceIoControl.
->>>> This is all working fine, but the next problem is I need the driver=20
->>>> to be signed. In it's current state I would not even suggest it be=20
->>>> signed as it was just hacked together to test my concept, but now I=20
->>>> know it's viable I would be willing to invest whatever time is=20
->>>> required to write a driver that would be acceptable for signing.
->>>> The ideal driver would be general purpose and could be leveraged for=
-=20
->>>> any user mode application use, not just my specific case. It would=20
->>>> need to implement the IRQ/even features of ivshmem and possibly even=
-=20
->>>> some kind of security to prevent unauthorized use by rogue=20
->>>> applications (shared secret configured on the chardev?).
->>>> I have several qustions:
->>>> 1) Has someone done this? I can't find any reference to a windows=20
->>>> driver for this device anywhere.
->>>> 2) If I was to pursue writing this driver, how would be the best way=
-=20
->>>> to go about it so as to ensure that it is in a state that it could=20
->>>> be signed with the RedHat vendor key?
->>>> 3) What is the likelihood of having such a driver signed?
->>>> 4) Is there a preferred git host for such a driver?
->>>> Kind Regards
->>>> -Geoff
->>=20
+iirc you also need to specify -nographic so qemu does not try to use the
+X11 GUI to display your serial output.
+
+HTH
+
+Michal
