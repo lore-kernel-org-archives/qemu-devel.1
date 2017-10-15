@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e3drZ-0002BC-Qf
-	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 04:01:34 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3f7X-00020O-0F
+	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 05:22:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e3drW-0001fd-MS
-	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 04:01:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32936)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e3drW-0001fP-G0
-	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 04:01:30 -0400
-Date: Sun, 15 Oct 2017 16:01:23 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171015080123.GB22780@pxdev.xzpeter.org>
-References: <20171015042452.31714-1-aik@ozlabs.ru>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171015042452.31714-1-aik@ozlabs.ru>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH qemu v2 REPOST] pci: Initialize
- pci_dev->name before use
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1e3f7T-0008GT-RP
+	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 05:22:07 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:37888
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1e3f7T-0008GD-LP
+	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 05:22:03 -0400
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Sun, 15 Oct 2017 10:21:49 +0100
+Message-Id: <1508059309-28458-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH] sun4u: fix assert when adding NICs which
+ aren't the in-built model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +24,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-On Sun, Oct 15, 2017 at 03:24:52PM +1100, Alexey Kardashevskiy wrote:
-> This moves pci_dev->name initialization earlier so
-> pci_dev->bus_master_as could get a name instead of an empty string.
+Commit 8d93297 introduced a bug whereby non-inbuilt NICs are realized before
+setting the default MAC address causing an assert. Switch NIC creation
+over from pci_create_simple() to pci_create() which works exactly the
+same except omitting the realize as originally intended.
 
-Or use "name" instead of "pci_dev->name" when do address_space_init()?
-But I think this one works too.
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/sparc64/sun4u.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
->=20
-> Reviewed-by: Philippe Mathieu-Daud=C3=83=C2=A9 <f4bug@amsat.org>
-
-Maybe "Philippe Mathieu-Daud=C3=A9"?
-
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-
-Reviewed-by: Peter Xu <peterx@redhat.com>
-
-> ---
->=20
-> Changes:
-> v2:
-> * fixed mistype in the commit log
-> * added "rb"
-> ---
->  hw/pci/pci.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 1e6fb88eba..05c5f75ef0 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -1020,6 +1020,7 @@ static PCIDevice *do_pci_register_device(PCIDevic=
-e *pci_dev, PCIBus *bus,
-> =20
->      pci_dev->devfn =3D devfn;
->      pci_dev->requester_id_cache =3D pci_req_id_cache_get(pci_dev);
-> +    pstrcpy(pci_dev->name, sizeof(pci_dev->name), name);
-> =20
->      memory_region_init(&pci_dev->bus_master_container_region, OBJECT(p=
-ci_dev),
->                         "bus master container", UINT64_MAX);
-> @@ -1029,7 +1030,6 @@ static PCIDevice *do_pci_register_device(PCIDevic=
-e *pci_dev, PCIBus *bus,
->      if (qdev_hotplug) {
->          pci_init_bus_master(pci_dev);
->      }
-> -    pstrcpy(pci_dev->name, sizeof(pci_dev->name), name);
->      pci_dev->irq_state =3D 0;
->      pci_config_alloc(pci_dev);
-> =20
-> --=20
-> 2.11.0
->=20
->=20
-
---=20
-Peter Xu
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 2edd1cc..bf89252 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -490,10 +490,10 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+                 memcpy(&macaddr, &nd->macaddr.a, sizeof(MACAddr));
+                 onboard_nic = true;
+             } else {
+-                pci_dev = pci_create_simple(pci_busB, -1, "sunhme");
++                pci_dev = pci_create(pci_busB, -1, "sunhme");
+             }
+         } else {
+-            pci_dev = pci_create_simple(pci_busB, -1, nd->model);
++            pci_dev = pci_create(pci_busB, -1, nd->model);
+         }
+ 
+         dev = &pci_dev->qdev;
+-- 
+1.7.10.4
