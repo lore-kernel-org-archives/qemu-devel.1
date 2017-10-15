@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e3WzH-0006mD-TH
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 20:41:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1e3XJH-0005Bi-Dv
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 21:01:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e3WzG-0003yV-Iz
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 20:41:03 -0400
+	(envelope-from <eblake@redhat.com>) id 1e3XJG-00014z-KC
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 21:01:43 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Sat, 14 Oct 2017 19:40:33 -0500
-Message-Id: <20171015004033.3248-10-eblake@redhat.com>
-In-Reply-To: <20171015004033.3248-1-eblake@redhat.com>
-References: <20171015004033.3248-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 9/9] nbd: header constants indenting
+Date: Sat, 14 Oct 2017 20:01:23 -0500
+Message-Id: <20171015010131.12172-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/8] nbd mimimal structured read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,90 +18,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+As mentioned in my review of Vladimir's v3 of this series [1],
+I had enough tweaks during my review that it's easier to repost
+things for another round of discussion, adding some of my patches
+in between his.  I did not include his 13/13 "nbd: Minimal structured
+read for client", where I had a lot of comments, and suggest that
+Vladimir is in the best position to rebase that patch on top of
+this v4 series (post it as a 9/8, if desired).
 
-Prepare indenting for the following commit.
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg02755.html
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20171012095319.136610-9-vsementsov@virtuozzo.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- include/block/nbd.h | 15 ++++++++-------
- nbd/nbd-internal.h  | 32 ++++++++++++++++----------------
- 2 files changed, 24 insertions(+), 23 deletions(-)
+Based-on: <20171015004033.3248-1-eblake@redhat.com>
+([PULL 0/9] NBD patches through 14 Oct)
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 49008980f4..a6df5ce8b5 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -71,13 +71,14 @@ typedef struct NBDSimpleReply {
+Eric Blake (5):
+  nbd: Include error names in trace messages
+  nbd: Move nbd_errno_to_system_errno() to public header
+  nbd: Expose constants and structs for structured read
+  nbd/server: Include human-readable message in structured errors
+  nbd: Move nbd_read() to common header
 
- /* Transmission (export) flags: sent from server to client during handshake,
-    but describe what will happen during transmission */
--#define NBD_FLAG_HAS_FLAGS      (1 << 0)        /* Flags are there */
--#define NBD_FLAG_READ_ONLY      (1 << 1)        /* Device is read-only */
--#define NBD_FLAG_SEND_FLUSH     (1 << 2)        /* Send FLUSH */
--#define NBD_FLAG_SEND_FUA       (1 << 3)        /* Send FUA (Force Unit Access) */
--#define NBD_FLAG_ROTATIONAL     (1 << 4)        /* Use elevator algorithm - rotational media */
--#define NBD_FLAG_SEND_TRIM      (1 << 5)        /* Send TRIM (discard) */
--#define NBD_FLAG_SEND_WRITE_ZEROES (1 << 6)     /* Send WRITE_ZEROES */
-+#define NBD_FLAG_HAS_FLAGS         (1 << 0) /* Flags are there */
-+#define NBD_FLAG_READ_ONLY         (1 << 1) /* Device is read-only */
-+#define NBD_FLAG_SEND_FLUSH        (1 << 2) /* Send FLUSH */
-+#define NBD_FLAG_SEND_FUA          (1 << 3) /* Send FUA (Force Unit Access) */
-+#define NBD_FLAG_ROTATIONAL        (1 << 4) /* Use elevator algorithm -
-+                                               rotational media */
-+#define NBD_FLAG_SEND_TRIM         (1 << 5) /* Send TRIM (discard) */
-+#define NBD_FLAG_SEND_WRITE_ZEROES (1 << 6) /* Send WRITE_ZEROES */
+Vladimir Sementsov-Ogievskiy (3):
+  nbd: Minimal structured read for server
+  nbd/client: refactor nbd_receive_starttls
+  nbd/client: prepare nbd_receive_reply for structured reply
 
- /* New-style handshake (global) flags, sent from server to client, and
-    control what will happen during handshake phase. */
-diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
-index 2d6663de23..11a130d050 100644
---- a/nbd/nbd-internal.h
-+++ b/nbd/nbd-internal.h
-@@ -46,23 +46,23 @@
- /* Size of oldstyle negotiation */
- #define NBD_OLDSTYLE_NEGOTIATE_SIZE (8 + 8 + 8 + 4 + 124)
+ include/block/nbd.h |  94 ++++++++++++++++++++++--
+ nbd/nbd-internal.h  |  24 +------
+ block/nbd-client.c  |   8 ++-
+ nbd/client.c        | 204 +++++++++++++++++++++++++++++++++-------------------
+ nbd/common.c        |  84 ++++++++++++++++++++++
+ nbd/server.c        | 121 ++++++++++++++++++++++++++++---
+ nbd/trace-events    |  15 ++--
+ 7 files changed, 427 insertions(+), 123 deletions(-)
 
--#define NBD_REQUEST_MAGIC       0x25609513
--#define NBD_SIMPLE_REPLY_MAGIC  0x67446698
--#define NBD_OPTS_MAGIC          0x49484156454F5054LL
--#define NBD_CLIENT_MAGIC        0x0000420281861253LL
--#define NBD_REP_MAGIC           0x0003e889045565a9LL
-+#define NBD_REQUEST_MAGIC           0x25609513
-+#define NBD_SIMPLE_REPLY_MAGIC      0x67446698
-+#define NBD_OPTS_MAGIC              0x49484156454F5054LL
-+#define NBD_CLIENT_MAGIC            0x0000420281861253LL
-+#define NBD_REP_MAGIC               0x0003e889045565a9LL
-
--#define NBD_SET_SOCK            _IO(0xab, 0)
--#define NBD_SET_BLKSIZE         _IO(0xab, 1)
--#define NBD_SET_SIZE            _IO(0xab, 2)
--#define NBD_DO_IT               _IO(0xab, 3)
--#define NBD_CLEAR_SOCK          _IO(0xab, 4)
--#define NBD_CLEAR_QUE           _IO(0xab, 5)
--#define NBD_PRINT_DEBUG         _IO(0xab, 6)
--#define NBD_SET_SIZE_BLOCKS     _IO(0xab, 7)
--#define NBD_DISCONNECT          _IO(0xab, 8)
--#define NBD_SET_TIMEOUT         _IO(0xab, 9)
--#define NBD_SET_FLAGS           _IO(0xab, 10)
-+#define NBD_SET_SOCK                _IO(0xab, 0)
-+#define NBD_SET_BLKSIZE             _IO(0xab, 1)
-+#define NBD_SET_SIZE                _IO(0xab, 2)
-+#define NBD_DO_IT                   _IO(0xab, 3)
-+#define NBD_CLEAR_SOCK              _IO(0xab, 4)
-+#define NBD_CLEAR_QUE               _IO(0xab, 5)
-+#define NBD_PRINT_DEBUG             _IO(0xab, 6)
-+#define NBD_SET_SIZE_BLOCKS         _IO(0xab, 7)
-+#define NBD_DISCONNECT              _IO(0xab, 8)
-+#define NBD_SET_TIMEOUT             _IO(0xab, 9)
-+#define NBD_SET_FLAGS               _IO(0xab, 10)
-
- /* NBD errors are based on errno numbers, so there is a 1:1 mapping,
-  * but only a limited set of errno values is specified in the protocol.
 -- 
 2.13.6
