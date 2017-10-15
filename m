@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e3WuE-0005YS-BE
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 20:35:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1e3Wyw-0006SS-88
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 20:40:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e3WuB-0001QR-82
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 20:35:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36112)
+	(envelope-from <eblake@redhat.com>) id 1e3Wyt-0003cj-4H
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 20:40:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45880)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e3WuA-0001Pa-VC
-	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 20:35:47 -0400
-Date: Sun, 15 Oct 2017 03:35:43 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171015033133-mutt-send-email-mst@kernel.org>
-References: <20170911043820.14617-1-haozhong.zhang@intel.com>
-	<20170911044157.15403-1-haozhong.zhang@intel.com>
-	<20170911160818.1bd44a82@nial.brq.redhat.com>
-	<alpine.DEB.2.10.1709111119480.19719@sstabellini-ThinkPad-X260>
-	<20170912031509.vufszbju3s2v2bw3@hz-desktop>
-	<20171010160544.GA1772@char.us.oracle.com>
-	<20171012124544.dq3wyr65tefi3glk@hz-desktop>
-	<f6478644-0d4a-6531-9016-aee2a0e76417@redhat.com>
-	<20171013075326.77azyi4j2wo3b2fx@hz-desktop>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1e3Wys-0003c6-Vg
+	for qemu-devel@nongnu.org; Sat, 14 Oct 2017 20:40:39 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3EA1E85550
+	for <qemu-devel@nongnu.org>; Sun, 15 Oct 2017 00:40:37 +0000 (UTC)
+Received: from red.redhat.com (ovpn-122-223.rdu2.redhat.com [10.10.122.223])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C7AAD60BEE
+	for <qemu-devel@nongnu.org>; Sun, 15 Oct 2017 00:40:36 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Sat, 14 Oct 2017 19:40:24 -0500
+Message-Id: <20171015004033.3248-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171013075326.77azyi4j2wo3b2fx@hz-desktop>
-Subject: Re: [Qemu-devel] [RFC QEMU PATCH v3 00/10] Implement vNVDIMM for
- Xen HVM guest
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/9] NBD patches through 14 Oct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,82 +33,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Stefano Stabellini <sstabellini@kernel.org>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, xen-devel@lists.xen.org, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Richard Henderson <rth@twiddle.net>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, ian.jackson@eu.citrix.com, wei.liu2@citrix.com, george.dunlap@citrix.com, JBeulich@suse.com, andrew.cooper3@citrix.com
+To: qemu-devel@nongnu.org
 
-On Fri, Oct 13, 2017 at 03:53:26PM +0800, Haozhong Zhang wrote:
-> On 10/12/17 17:45 +0200, Paolo Bonzini wrote:
-> > On 12/10/2017 14:45, Haozhong Zhang wrote:
-> > > Basically, QEMU builds two ROMs for guest, /rom@etc/acpi/tables and
-> > > /rom@etc/table-loader. The former is unstructured to guest, and
-> > > contains all data of guest ACPI. The latter is a BIOSLinkerLoader
-> > > organized as a set of commands, which direct the guest (e.g., SeaBIOS
-> > > on KVM/QEMU) to relocate data in the former file, recalculate checksum
-> > > of specified area, and fill guest address in specified ACPI field.
-> > > 
-> > > One part of my patches is to implement a mechanism to tell Xen which
-> > > part of ACPI data is a table (NFIT), and which part defines a
-> > > namespace device and what the device name is. I can add two new loader
-> > > commands for them respectively.
-> > > 
-> > > Because they just provide information and SeaBIOS in non-xen
-> > > environment ignores unrecognized commands, they will not break SeaBIOS
-> > > in non-xen environment.
-> > > 
-> > > On QEMU side, most Xen-specific hacks in ACPI builder could be
-> > > dropped, and replaced by adding the new loader commands (though they
-> > > may be used only by Xen).
-> > > 
-> > > On Xen side, a fw_cfg driver and a BIOSLinkerLoader command executor
-> > > are needed in, perhaps, hvmloader.
-> > 
-> > If Xen has to parse BIOSLinkerLoader, it can use the existing commands
-> > to process a reduced set of ACPI tables.  In other words,
-> > etc/acpi/tables would only include the NFIT, the SSDT with namespace
-> > devices, and the XSDT.  etc/acpi/rsdp would include the RSDP table as usual.
-> >
-> > hvmloader can then:
-> > 
-> > 1) allocate some memory for where the XSDT will go
-> > 
-> > 2) process the BIOSLinkerLoader like SeaBIOS would do
-> > 
-> > 3) find the RSDP in low memory, since the loader script must have placed
-> > it there.  If it cannot find it, allocate some low memory, fill it with
-> > the RSDP header and revision, and and jump to step 6
-> > 
-> > 4) If it found QEMU's RSDP, use it to find QEMU's XSDT
-> > 
-> > 5) Copy ACPI table pointers from QEMU to hvmloader's RSDT and/or XSDT.
-> > 
-> > 6) build hvmloader tables and link them into the RSDT and/or XSDT as usual.
-> > 
-> > 7) overwrite the RSDP in low memory with a pointer to hvmloader's own
-> > RSDT and/or XSDT, and updated the checksums
-> > 
-> > QEMU's XSDT remains there somewhere in memory, unused but harmless.
-> > 
-> 
-> It can work for plan tables which do not contain AML.
-> 
-> However, for a namespace device, Xen needs to know its name in order
-> to detect the potential name conflict with those used in Xen built
-> ACPI. Xen does not (and is not going to) introduce an AML parser, so
-> it cannot get those device names from QEMU built ACPI by its own.
-> 
-> The idea of either this patch series or the new BIOSLinkerLoader
-> command is to let QEMU tell Xen where the definition body of a
-> namespace device (i.e. that part within the outmost "Device(NAME)") is
-> and what the device name is. Xen, after the name conflict check, can
-> re-package the definition body in a namespace device (w/ minimal AML
-> builder code added in Xen) and then in SSDT.
-> 
-> 
-> Haozhong
+The following changes since commit f90ea7ba7c5ae7010ee0ce062207ae42530f57=
+d6:
 
-You most likely can do this without a new command.
-You can use something similiar to build_append_named_dword
-in combination with BIOS_LINKER_LOADER_COMMAND_ADD_POINTER
-like vm gen id does.
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
+71012' into staging (2017-10-12 17:06:50 +0100)
 
--- 
-MST
+are available in the git repository at:
+
+  git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2017-10-14
+
+for you to fetch changes up to 92652b124336f5c08c7eb4616af202ea910dd3ea:
+
+  nbd: header constants indenting (2017-10-13 09:27:38 -0500)
+
+----------------------------------------------------------------
+nbd patches for 2017-10-14
+
+- Marc-Andr=C3=A9 Lureau - NBD: use g_new() family of functions
+- Vladimir Sementsov-Ogievskiy - first half of 00/13 nbd minimal structur=
+ed read
+
+----------------------------------------------------------------
+Marc-Andr=C3=A9 Lureau (1):
+      NBD: use g_new() family of functions
+
+Vladimir Sementsov-Ogievskiy (8):
+      block/nbd-client: assert qiov len once in nbd_co_request
+      block/nbd-client: refactor nbd_co_receive_reply
+      nbd: rename some simple-request related objects to be _simple_
+      nbd/server: structurize simple reply header sending
+      nbd/server: do not use NBDReply structure
+      nbd/server: refactor nbd_co_send_simple_reply parameters
+      nbd/server: simplify reply transmission
+      nbd: header constants indenting
+
+ include/block/nbd.h                      |  21 ++++---
+ nbd/nbd-internal.h                       |  32 +++++-----
+ block/nbd-client.c                       |  18 +++---
+ nbd/client.c                             |   4 +-
+ nbd/server.c                             | 101 +++++++++++++------------=
+------
+ nbd/trace-events                         |   3 +-
+ tests/qemu-iotests/nbd-fault-injector.py |   4 +-
+ 7 files changed, 88 insertions(+), 95 deletions(-)
+
+--=20
+2.13.6
