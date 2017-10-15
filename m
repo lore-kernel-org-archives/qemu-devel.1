@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e3m6p-000337-0E
-	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 12:49:51 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e3m80-0003iM-Cv
+	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 12:51:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e3m6o-0003k4-B8
-	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 12:49:51 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:53639)
+	(envelope-from <peter.maydell@linaro.org>) id 1e3m7z-0004IT-Po
+	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 12:51:04 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:48471)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e3m6o-0003jh-54
-	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 12:49:50 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id q132so29959943wmd.2
-	for <qemu-devel@nongnu.org>; Sun, 15 Oct 2017 09:49:49 -0700 (PDT)
+	id 1e3m7z-0004H9-JM
+	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 12:51:03 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id i124so29308818wmf.3
+	for <qemu-devel@nongnu.org>; Sun, 15 Oct 2017 09:51:03 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <d4676b57-0298-a0b4-a116-3d5cd9a38807@linux.vnet.ibm.com>
-References: <1507751249-3035-1-git-send-email-stefanb@linux.vnet.ibm.com>
-	<CAJ+F1CK7MW5kY5eaiHGyk7hvxKyOBNJi7MHo9warfXbSp4LzPA@mail.gmail.com>
-	<CAFEAcA_V-ZS+O_BsEU6OJuT_hE-RXw0dTaJbZgY-BW8soRv3vA@mail.gmail.com>
-	<d4676b57-0298-a0b4-a116-3d5cd9a38807@linux.vnet.ibm.com>
+In-Reply-To: <CAF6HrYzSiw+NzKBP1QGK794+tcyZTK21XVsDXEpjF2-bD-9z3Q@mail.gmail.com>
+References: <CAF6HrYzSiw+NzKBP1QGK794+tcyZTK21XVsDXEpjF2-bD-9z3Q@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 15 Oct 2017 17:49:28 +0100
-Message-ID: <CAFEAcA_y_LT-7-ghxSwwVf+3vJ4TFM7Y4GzM2PLW_ruW0RLVhQ@mail.gmail.com>
+Date: Sun, 15 Oct 2017 17:50:41 +0100
+Message-ID: <CAFEAcA-Um7zYLeSzFfSSL-nRsRKyRbKEwb2MEzcsGqoQDSuRqg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3] tpm: Use EMSGSIZE instead of EBADMSG to
- compile on OpenBSD
+Subject: Re: [Qemu-devel] Reading and writing functions for QEMU emulated
+ peripherals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,18 +29,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, Amarnath Valluri <amarnath.valluri@intel.com>, QEMU <qemu-devel@nongnu.org>
+To: Ramy Sameh <ramysameh26@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Mona Safar <Mona.Safar@eng.asu.edu.eg>, Ahmed Aly <ahmedaly50@gmail.com>, Watheq <watheq@gmail.com>
 
-On 13 October 2017 at 17:36, Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
-> This is NOT test code. It's determining whether the external TPM is a TPM
-> 1.2 or TPM 2 emulation. This avoids having to start QEMU with a '--tpm2'
-> parmeter equivalent as well as the external emulator. Passing this to the
-> external emulator is enough.
+On 15 October 2017 at 17:47, Ramy Sameh <ramysameh26@gmail.com> wrote:
+> I was tracking the calling of function pl011_read, and I noticed that it is
+> called from function *memory_region_read_accessor *in memory.c
+>
+> I also noticed that all peripherals reading functions (e.g. pl050_read,
+> pl190_read ... etc) in the emulated VersatilePB board, are called from the
+> same location in *memory_region_read_accessor.*
+>
+> *My question is*: Is this calling procedure done for the emulated
+> VersatilePB board *only*, or this is the case for the peripherals in all
+> emulated systems ?
 
-Sorry -- I was misled by the way the function is named
-"tpm_util_test()" and the comment in front of it says
-"A basic test of a TPM device".
+Broadly speaking, yes, all peripheral device read and write
+functions are invoked via the memory subsystem code (which
+is the part of QEMU that figures out what memory region
+covers whatever the physical address that the guest wrote
+to is).
 
 thanks
 -- PMM
