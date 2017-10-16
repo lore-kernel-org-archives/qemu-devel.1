@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1e40e3-0005P1-LO
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 04:21:12 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e40jX-0006ui-CX
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 04:26:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1e40dy-0003yW-Ne
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 04:21:07 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:56208)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1e40dy-0003xL-Ex
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 04:21:02 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id u138so502507wmu.4
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 01:21:01 -0700 (PDT)
-References: <20171013162438.32458-1-alex.bennee@linaro.org>
-	<20171013162438.32458-15-alex.bennee@linaro.org>
-	<b7afef46-1d05-6701-dce5-39f3070e4129@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <b7afef46-1d05-6701-dce5-39f3070e4129@linaro.org>
-Date: Mon, 16 Oct 2017 09:20:58 +0100
-Message-ID: <87k1zvcxlh.fsf@linaro.org>
+	(envelope-from <imammedo@redhat.com>) id 1e40jT-0006O8-2r
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 04:26:47 -0400
+Date: Mon, 16 Oct 2017 10:26:38 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171016102638.6977381f@nial.brq.redhat.com>
+In-Reply-To: <20171014093337.GG28032@umbus.fritz.box>
+References: <150789430473.4410.10317971414202753256.stgit@bahia.lan>
+	<20171014093337.GG28032@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 14/30] softfloat: 16 bit helpers for
- shr, clz and rounding and packing
+Subject: Re: [Qemu-devel] [PATCH] spapr_cpu_core: instantiate CPUs separately
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,155 +23,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+
+On Sat, 14 Oct 2017 20:33:37 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> On Fri, Oct 13, 2017 at 01:31:44PM +0200, Greg Kurz wrote:
+> > The current code assumes that only the CPU core object holds a
+> > reference on each individual CPU object, and happily frees their
+> > allocated memory when the core is unrealized. This is dangerous
+> > as some other code can legitimely keep a pointer to a CPU if it
+> > calls object_ref(), but it would end up with a dangling pointer.
+> >=20
+> > Let's allocate all CPUs with object_new() and let QOM frees them
+> > when their reference count reaches zero. This greatly simplify the
+> > code as we don't have to fiddle with the instance size anymore.
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org> =20
+>=20
+> So, I'm pretty sure my first drafts of the core stuff did things this
+> waym and it got nacked, for QOM lifetime reasons that I never really
+> understood.
+=46rom what I remember, Andreas would like to see composite CPU object
+allocated in one go and then its children initialized with object_initializ=
+e()
+so that no more allocation were needed.
+That potentially would benefit hotplug, since we could gracefully
+fail object creation early if there is not enough memory.
+But the way it's implemented currently doesn't really match that initial
+goal as array for threads is dynamically allocated later
+and then we need to dance around it with pointer arithmetic.
+
+BTW: almost any allocation failure in qemu currently
+is fatal so whether we fail on array alloc or on individual
+object_new() won't make any difference.
+
+I'd rather see this clean up merged as it simplifies code
+in these case.
 
 
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> On 10/13/2017 09:24 AM, Alex Benn=C3=A9e wrote:
->> Half-precision helpers for float16 maths. I didn't bother hand-coding
->> the count leading zeros as we could always fall-back to host-utils if
->> we needed to.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  fpu/softfloat-macros.h | 39 +++++++++++++++++++++++++++++++++++++++
->>  fpu/softfloat.c        | 21 +++++++++++++++++++++
->>  2 files changed, 60 insertions(+)
->>
->> diff --git a/fpu/softfloat-macros.h b/fpu/softfloat-macros.h
->> index 9cc6158cb4..73091a88a8 100644
->> --- a/fpu/softfloat-macros.h
->> +++ b/fpu/softfloat-macros.h
->> @@ -89,6 +89,31 @@ this code that are retained.
->>  # define SOFTFLOAT_GNUC_PREREQ(maj, min) 0
->>  #endif
->>
->> +/*---------------------------------------------------------------------=
--------
->> +| Shifts `a' right by the number of bits given in `count'.  If any nonz=
-ero
->> +| bits are shifted off, they are ``jammed'' into the least significant =
-bit of
->> +| the result by setting the least significant bit to 1.  The value of `=
-count'
->> +| can be arbitrarily large; in particular, if `count' is greater than 1=
-6, the
->> +| result will be either 0 or 1, depending on whether `a' is zero or non=
-zero.
->> +| The result is stored in the location pointed to by `zPtr'.
->> +*----------------------------------------------------------------------=
-------*/
->> +
->> +static inline void shift16RightJamming(uint16_t a, int count, uint16_t =
-*zPtr)
->> +{
->> +    uint16_t z;
->> +
->> +    if ( count =3D=3D 0 ) {
->> +        z =3D a;
->> +    }
->> +    else if ( count < 16 ) {
->> +        z =3D ( a>>count ) | ( ( a<<( ( - count ) & 16 ) ) !=3D 0 );
->> +    }
->> +    else {
->> +        z =3D ( a !=3D 0 );
->> +    }
->> +    *zPtr =3D z;
->> +
->> +}
->
-> When are you going to use a SRJ of a uint16_t?  Isn't most of your actual
-> arithmetic actually done on uint32_t?
-
-The add/sub stuff currently uses it. Arguably it could do what it needs
-with 32 bit as well but the spare exponent bits are enough for operating
-on the significand. That said I'm fairly sure it all ends up 32 bit in
-the generated code.
-
->
->> +/*---------------------------------------------------------------------=
--------
->> +| Returns the number of leading 0 bits before the most-significant 1 bi=
-t of
->> +| `a'.  If `a' is zero, 16 is returned.
->> +*----------------------------------------------------------------------=
-------*/
->> +
->> +static int8_t countLeadingZeros16( uint16_t a )
->> +{
->> +    if (a) {
->> +        return __builtin_clz(a);
->> +    } else {
->> +        return 16;
->> +    }
->> +}
->
-> __builtin_clz works on "int".  You need to use clz32(a) - 16.
-
-Ahh my mistake - I'd assumed it had the same smarts as the gcc atomics.
-Maybe I should just use our utils functions afterall.
-
->
->> +/*---------------------------------------------------------------------=
--------
->> +| Takes an abstract floating-point value having sign `zSign', exponent =
-`zExp',
->> +| and significand `zSig', and returns the proper single-precision float=
-ing-
->
-> s/single/half/
->
->> +| point value corresponding to the abstract input.  This routine is jus=
-t like
->> +| `roundAndPackFloat32' except that `zSig' does not have to be normaliz=
-ed.
->> +| Bit 15 of `zSig' must be zero, and `zExp' must be 1 less than the ``t=
-rue''
->> +| floating-point exponent.
->> +*----------------------------------------------------------------------=
-------*/
->> +
->> +static float16
->> + normalizeRoundAndPackFloat16(flag zSign, int zExp, uint16_t zSig,
->> +                              float_status *status)
->> +{
->> +    int8_t shiftCount;
->> +
->> +    shiftCount =3D countLeadingZeros16( zSig ) - 1;
->> +    return roundAndPackFloat16(zSign, zExp - shiftCount, zSig<<shiftCou=
-nt,
->> +                               true, status);
->
-> Do I recall correctly that your lsb is between bits 7:6, like
-> roundAndPackFloat32?  You've got 11 bits of sig.  Plus 7 bits of extra eq=
-uals
-> 18 bits.  Which doesn't fit in uint16_t.
-
-No it takes a 32 bit sig in and deals with it internally.
-
->
-> So, the reason that roundAndPackFloat32 uses 7 bits is that 7 + 24 =3D=3D=
- 31.
->
-> We can either use a split at (15 - 11 =3D) 4 bits, and still fit in a uin=
-t16_t,
-> or we can drop uint16_t and admit that the compiler is going to promote t=
-o int,
-> or uint32_t, anyway.  If we do that, we have options of a split between 4=
- and
-> (31 - 11 =3D) 20 bits.
->
-> We talked this week re fp->int conversion, it did seem Really Useful when=
- we
-> noted that sig << exp is representable in a uint32_t.  Which does suggest=
- a
-> choice at or below (32 - 11 - 14 =3D) 7.
->
->
-> r~
-
-
---
-Alex Benn=C3=A9e
+>=20
+> > ---
+> > v2: - mention code simplification in changelog
+> >     - use PowerPCCPU * and Object * instead of void *
+> > ---
+> >  hw/ppc/spapr.c                  |   11 +++--------
+> >  hw/ppc/spapr_cpu_core.c         |   19 +++++++------------
+> >  include/hw/ppc/spapr_cpu_core.h |    2 +-
+> >  3 files changed, 11 insertions(+), 21 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index fd9813bde82f..d9555a3677be 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -3153,12 +3153,10 @@ void spapr_core_release(DeviceState *dev)
+> > =20
+> >      if (smc->pre_2_10_has_unused_icps) {
+> >          sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
+> > -        sPAPRCPUCoreClass *scc =3D SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc)=
+);
+> > -        size_t size =3D object_type_get_instance_size(scc->cpu_type);
+> >          int i;
+> > =20
+> >          for (i =3D 0; i < cc->nr_threads; i++) {
+> > -            CPUState *cs =3D CPU(sc->threads + i * size);
+> > +            CPUState *cs =3D CPU(sc->threads[i]);
+> > =20
+> >              pre_2_10_vmstate_register_dummy_icp(cs->cpu_index);
+> >          }
+> > @@ -3204,7 +3202,7 @@ static void spapr_core_plug(HotplugHandler *hotpl=
+ug_dev, DeviceState *dev,
+> >      sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+> >      sPAPRCPUCore *core =3D SPAPR_CPU_CORE(OBJECT(dev));
+> >      CPUCore *cc =3D CPU_CORE(dev);
+> > -    CPUState *cs =3D CPU(core->threads);
+> > +    CPUState *cs =3D CPU(core->threads[0]);
+> >      sPAPRDRConnector *drc;
+> >      Error *local_err =3D NULL;
+> >      int smt =3D kvmppc_smt_threads();
+> > @@ -3249,15 +3247,12 @@ static void spapr_core_plug(HotplugHandler *hot=
+plug_dev, DeviceState *dev,
+> >      core_slot->cpu =3D OBJECT(dev);
+> > =20
+> >      if (smc->pre_2_10_has_unused_icps) {
+> > -        sPAPRCPUCoreClass *scc =3D SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc)=
+);
+> > -        size_t size =3D object_type_get_instance_size(scc->cpu_type);
+> >          int i;
+> > =20
+> >          for (i =3D 0; i < cc->nr_threads; i++) {
+> >              sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(dev);
+> > -            void *obj =3D sc->threads + i * size;
+> > =20
+> > -            cs =3D CPU(obj);
+> > +            cs =3D CPU(sc->threads[i]);
+> >              pre_2_10_vmstate_unregister_dummy_icp(cs->cpu_index);
+> >          }
+> >      }
+> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> > index 3a4c17401226..588f9b45714a 100644
+> > --- a/hw/ppc/spapr_cpu_core.c
+> > +++ b/hw/ppc/spapr_cpu_core.c
+> > @@ -79,13 +79,11 @@ const char *spapr_get_cpu_core_type(const char *cpu=
+_type)
+> >  static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
+> >  {
+> >      sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
+> > -    sPAPRCPUCoreClass *scc =3D SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
+> > -    size_t size =3D object_type_get_instance_size(scc->cpu_type);
+> >      CPUCore *cc =3D CPU_CORE(dev);
+> >      int i;
+> > =20
+> >      for (i =3D 0; i < cc->nr_threads; i++) {
+> > -        void *obj =3D sc->threads + i * size;
+> > +        Object *obj =3D OBJECT(sc->threads[i]);
+> >          DeviceState *dev =3D DEVICE(obj);
+> >          CPUState *cs =3D CPU(dev);
+> >          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> > @@ -146,9 +144,8 @@ static void spapr_cpu_core_realize(DeviceState *dev=
+, Error **errp)
+> >      sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
+> >      sPAPRCPUCoreClass *scc =3D SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
+> >      CPUCore *cc =3D CPU_CORE(OBJECT(dev));
+> > -    size_t size;
+> >      Error *local_err =3D NULL;
+> > -    void *obj;
+> > +    Object *obj;
+> >      int i, j;
+> > =20
+> >      if (!spapr) {
+> > @@ -156,18 +153,16 @@ static void spapr_cpu_core_realize(DeviceState *d=
+ev, Error **errp)
+> >          return;
+> >      }
+> > =20
+> > -    size =3D object_type_get_instance_size(scc->cpu_type);
+> > -    sc->threads =3D g_malloc0(size * cc->nr_threads);
+> > +    sc->threads =3D g_new(PowerPCCPU *, cc->nr_threads);
+> >      for (i =3D 0; i < cc->nr_threads; i++) {
+> >          char id[32];
+> >          CPUState *cs;
+> >          PowerPCCPU *cpu;
+> > =20
+> > -        obj =3D sc->threads + i * size;
+> > +        obj =3D object_new(scc->cpu_type);
+> > =20
+> > -        object_initialize(obj, size, scc->cpu_type);
+> >          cs =3D CPU(obj);
+> > -        cpu =3D POWERPC_CPU(cs);
+> > +        cpu =3D sc->threads[i] =3D POWERPC_CPU(obj);
+> >          cs->cpu_index =3D cc->core_id + i;
+> >          cpu->vcpu_id =3D (cc->core_id * spapr->vsmt / smp_threads) + i;
+> >          if (kvm_enabled() && !kvm_vcpu_id_is_valid(cpu->vcpu_id)) {
+> > @@ -192,7 +187,7 @@ static void spapr_cpu_core_realize(DeviceState *dev=
+, Error **errp)
+> >      }
+> > =20
+> >      for (j =3D 0; j < cc->nr_threads; j++) {
+> > -        obj =3D sc->threads + j * size;
+> > +        obj =3D OBJECT(sc->threads[j]);
+> > =20
+> >          spapr_cpu_core_realize_child(obj, spapr, &local_err);
+> >          if (local_err) {
+> > @@ -203,7 +198,7 @@ static void spapr_cpu_core_realize(DeviceState *dev=
+, Error **errp)
+> > =20
+> >  err:
+> >      while (--i >=3D 0) {
+> > -        obj =3D sc->threads + i * size;
+> > +        obj =3D OBJECT(sc->threads[i]);
+> >          object_unparent(obj);
+> >      }
+> >      g_free(sc->threads);
+> > diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu=
+_core.h
+> > index f2d48d6a6786..1129f344aa0c 100644
+> > --- a/include/hw/ppc/spapr_cpu_core.h
+> > +++ b/include/hw/ppc/spapr_cpu_core.h
+> > @@ -28,7 +28,7 @@ typedef struct sPAPRCPUCore {
+> >      CPUCore parent_obj;
+> > =20
+> >      /*< public >*/
+> > -    void *threads;
+> > +    PowerPCCPU **threads;
+> >      int node_id;
+> >  } sPAPRCPUCore;
+> > =20
+> >  =20
+>=20
