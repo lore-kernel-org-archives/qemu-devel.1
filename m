@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e3zI6-0001qk-NL
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:54:23 -0400
+	(envelope-from <peterx@redhat.com>) id 1e3zIF-0001yI-BF
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:54:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e3zI5-0003P9-Uu
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:54:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33626)
+	(envelope-from <peterx@redhat.com>) id 1e3zIC-0003bb-4O
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:54:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53734)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e3zI5-0003OA-OR
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:54:21 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e3zIB-0003Zp-To
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:54:28 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Mon, 16 Oct 2017 14:52:14 +0800
-Message-Id: <20171016065216.18162-31-peterx@redhat.com>
+Date: Mon, 16 Oct 2017 14:52:15 +0800
+Message-Id: <20171016065216.18162-32-peterx@redhat.com>
 In-Reply-To: <20171016065216.18162-1-peterx@redhat.com>
 References: <20171016065216.18162-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 30/32] migration: delay the postcopy-active
- state switch
+Subject: [Qemu-devel] [PATCH v3 31/32] migration,
+ qmp: new command "migrate-pause"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +27,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Switch the state until we try to start the VM on destination side.  The
-problem is that without doing this we may have a very small window that
-we'll be in such a state:
-
-- dst VM is in postcopy-active state,
-- main thread is handling MIG_CMD_PACKAGED message, which loads all the
-  device states,
-- ram load thread is reading memory data from source.
-
-Then if we failed at this point when reading the migration stream we'll
-also switch to postcopy-paused state, but that is not what we want.  If
-device states failed to load, we should fail the migration directly
-instead of pause.
-
-Postponing the state switch to the point when we have already loaded the
-devices' states and been ready to start running destination VM.
+It is used to manually trigger the postcopy pause state.  It works just
+like when we found the migration stream failed during postcopy, but
+provide an explicit way for user in case of misterious socket hangs.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/savevm.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ migration/migration.c | 18 ++++++++++++++++++
+ qapi/migration.json   | 22 ++++++++++++++++++++++
+ 2 files changed, 40 insertions(+)
 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index bc87b0e5b1..3bc792e320 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1584,8 +1584,6 @@ static void *postcopy_ram_listen_thread(void *opaque)
-     QEMUFile *f = mis->from_src_file;
-     int load_res;
+diff --git a/migration/migration.c b/migration/migration.c
+index 51e771685c..3d852d233f 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1426,6 +1426,24 @@ void qmp_migrate_incoming(const char *uri, Error **errp)
+     once = false;
+ }
  
--    migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
--                                   MIGRATION_STATUS_POSTCOPY_ACTIVE);
-     qemu_sem_post(&mis->listen_thread_sem);
-     trace_postcopy_ram_listen_thread_start();
- 
-@@ -1748,6 +1746,14 @@ static int loadvm_postcopy_handle_run(MigrationIncomingState *mis)
-         return -1;
-     }
- 
-+    /*
-+     * Declare that we are in postcopy now.  We should already have
-+     * all the device states loaded ready when reach here, and also
-+     * the ram load thread running.
-+     */
-+    migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
-+                                   MIGRATION_STATUS_POSTCOPY_ACTIVE);
++void qmp_migrate_pause(Error **errp)
++{
++    int ret;
++    MigrationState *ms = migrate_get_current();
 +
-     data = g_new(HandleRunBhData, 1);
-     data->bh = qemu_bh_new(loadvm_postcopy_handle_run_bh, data);
-     qemu_bh_schedule(data->bh);
++    if (ms->state != MIGRATION_STATUS_POSTCOPY_ACTIVE) {
++        error_setg(errp, "Migration pause is currently only allowed during"
++                   " an active postcopy phase.");
++        return;
++    }
++
++    ret = qemu_file_shutdown(ms->to_dst_file);
++
++    if (ret) {
++        error_setg(errp, "Failed to pause migration stream.");
++    }
++}
++
+ bool migration_is_blocked(Error **errp)
+ {
+     if (qemu_savevm_state_blocked(errp)) {
+diff --git a/qapi/migration.json b/qapi/migration.json
+index f8132e683a..095aeb4dd2 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -1028,6 +1028,28 @@
+ { 'command': 'migrate-incoming', 'data': {'uri': 'str' } }
+ 
+ ##
++# @migrate-pause:
++#
++# Pause an migration.  Currently it can only pause a postcopy
++# migration.  Pausing a precopy migration is not supported yet.
++#
++# It is mostly used as a manual way to trigger the postcopy paused
++# state when the network sockets hang due to some reason, so that we
++# can try a recovery afterward.
++#
++# Returns: nothing on success
++#
++# Since: 2.10
++#
++# Example:
++#
++# -> { "execute": "migrate-pause" }
++# <- { "return": {} }
++#
++##
++{ 'command': 'migrate-pause' }
++
++##
+ # @xen-save-devices-state:
+ #
+ # Save the state of all devices to file. The RAM and the block devices
 -- 
 2.13.5
