@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e493j-0007lk-6R
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:20:15 -0400
+	(envelope-from <lersek@redhat.com>) id 1e498w-0001PJ-DY
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:25:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e493i-0006t4-6p
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:20:11 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:53333)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e493h-0006sX-VC
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:20:10 -0400
-Received: by mail-wr0-x234.google.com with SMTP id y44so3667399wry.10
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 10:20:09 -0700 (PDT)
+	(envelope-from <lersek@redhat.com>) id 1e498t-0002XY-6Q
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:25:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59906)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1e498s-0002TV-TN
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:25:31 -0400
+References: <8ba7e693-4e32-7873-70bf-4efbf57f9cf5@huawei.com>
+	<20170928011407-mutt-send-email-mst@kernel.org>
+	<405bbc99-1a43-aa8b-37e9-9599480f4c06@huawei.com>
+	<20171001063010-mutt-send-email-mst@kernel.org>
+	<49d576f3-454f-05f4-7afd-9ca8b5fb0706@huawei.com>
+	<20171016113324.14e549c9@nial.brq.redhat.com>
+	<0184EA26B2509940AA629AE1405DD7F2016994E5@DGGEMA503-MBX.china.huawei.com>
+	<59E4E57D.4040304@arm.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <69f10790-f178-0383-3f74-0c7e5d0afce8@redhat.com>
+Date: Mon, 16 Oct 2017 19:25:18 +0200
 MIME-Version: 1.0
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Oct 2017 18:19:47 +0100
-Message-ID: <CAFEAcA_0S6T768-60MVkXP1Y0MpmOzTQr8p-N_W1PhbG_n2d-Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Key signing party at KVM Forum 2017
+In-Reply-To: <59E4E57D.4040304@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel]
+ =?utf-8?b?562U5aSNOiAgdXNpbmcgd2hpY2ggbm90aWZpY2F0?=
+ =?utf-8?q?ion_for_guest_about_GHES_error?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,37 +36,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: James Morse <james.morse@arm.com>, gengdongjiu <gengdongjiu@huawei.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Wuquanming <wuquanming@huawei.com>, QEMU Developers <qemu-devel@nongnu.org>, Huangshaoyu <huangshaoyu@huawei.com>, Andrew Jones <drjones@redhat.com>
 
-It looks like at least five people whose keys I'd like to sign
-are going to be at KVM Forum this year, so it seems worth having
-a proper key signing party rather than just me ad-hoc finding
-people and checking their ID. I am particularly interested
-in signing keys for people who are or expect they might be
-sending me pull requests.
+On 10/16/17 18:59, James Morse wrote:
+> Hi gengdongjiu, Igor,
+> 
+> On 16/10/17 15:33, gengdongjiu wrote:
+>>> On Mon, 16 Oct 2017 14:10:05 +0800
+>>> gengdongjiu <gengdongjiu@huawei.com> wrote:
+>>>> Now we use Qemu to create APEI table and record CPER for guest, After
+>>>> QEMU recorded a asynchronous CPER error, we needs to notify guest using interrupt or Polled notification.
+>>>> For the asynchronous error. I think using GPIO-signaled notification may be better in the Qemu, and also which is suggested by APEI spec.
+>>>> James worried that old guest OS may not support GPIO or GSIV notification for GHES, because GPIO or GSIV notification is supported in OS
+>>> since about kernel version 4.10.
+>>>
+>>> How APEI support is fairly new on ARM (kernel), isn't it still in state of development?
+> 
+> The NMI-like notifications, (SEA, SEI, SDEI) are still being worked on, but the
+> less exotic Polled and many-flavours-of-interrupt should have exactly the same
+> meaning/behaviour as on x86. (it should be possible to emulate/configure these
+> with common user-space code too)
+> 
+> 
+>>> Do we really care about old guests in this case?
+> 
+> I think the scenario here is the host kernel has some RAS support, Qemu has RAS
+> support and has advertised its CPER regions via the HEST, but the guest doesn't
+> doesn't support RAS. (booted via DT, wasn't configured for APEI, the kernel
+> pre-dates the support etc).
+> 
+> What should Qemu do in response to 'action optional' memory errors?
+> 
+> My suggestion is whatever action Qemu takes, it shouldn't kill a guest that
+> doesn't support RAS. Using NOTIFY_SEI for an action-optional memory error will
+> do this. A guest that doesn't know about NOTIFY_SEI will take this as a fatal
+> SError.
 
-How it works: if you want to take part:
+As far as I understand, this QEMU feature is not enabled by default; it
+takes at least one specific -device option (maybe some other options
+too). If that's the case, then adding the option, and then seeing a
+guest (without supporting the feature) hang itself, is okay.
 
- (1) you MUST EMAIL ME your key info, as produced by
-"gpg --fingerprint [your-key-ID-here]", by this Friday (Oct 20th)
-at the latest. (I will be printing this stuff out and won't have
-access to a printer after that. No late submissions please!)
+It is no different from the guest OS lacking drivers for other important
+-- such as boot -- devices, such as virtio drivers in general, or
+virtio-1.0 drivers for modern-only virtio devices.
 
- (2) you will need to BRING WITH YOU:
- a) positive (government-issued) photo ID, eg a passport
- b) a printed out copy of your key info
-    (independently of what you send me)
- c) a pen or pencil
- Don't attempt to bring or use a computer!
+Such knowledge (= what OS has built-in drivers or other kind of support
+for what devices) is maintained in libosinfo.
 
-https://wiki.qemu.org/KeySigningParty
-has the details of how this will work; there will be a lot of
-chanting of hex digits. It's a bit odd but by following the
-process we can get through a big group of people checking
-key IDs more quickly.
+> I think you shouldn't expect host kernel, guest kernel and Qemu version to all
+> pair up nicely.
 
-I plan to do this in the Thursday 17:30 BoF session slot,
-unless somebody wants to suggest a better timeslot.
+If I understand correctly, the things that are expected to match up are:
+- guest kernel (more generally, guest OS image),
+- and QEMU command line (more generally, virtual hardware
+  configuration).
 
-thanks
--- PMM
+
+Just my two cents anyway; I haven't been following this discussion closely.
+
+Thanks
+Laszlo
