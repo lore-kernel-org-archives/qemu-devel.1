@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e44Co-0008QJ-Le
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 08:09:15 -0400
+	(envelope-from <eblake@redhat.com>) id 1e44GO-00012W-F5
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 08:13:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e44Cl-0005ng-C6
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 08:09:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44438)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e44Cl-0005mA-5O
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 08:09:11 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 415214E34A
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 12:09:10 +0000 (UTC)
-Date: Mon, 16 Oct 2017 13:09:02 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171016120901.GD2252@work-vm>
-References: <20171004103933.7898-1-quintela@redhat.com>
-	<20171004103933.7898-3-quintela@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1e44GM-0007y9-65
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 08:12:56 -0400
+References: <20171015010131.12172-1-eblake@redhat.com>
+	<20171015010131.12172-3-eblake@redhat.com>
+	<58e026df-5e9d-2ba1-dd55-7b0d958fc3e3@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <469181a3-a171-188b-4c43-d406e5b340a2@redhat.com>
+Date: Mon, 16 Oct 2017 07:12:45 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171004103933.7898-3-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/6] tests: Add basic migration precopy tcp
- test
+In-Reply-To: <58e026df-5e9d-2ba1-dd55-7b0d958fc3e3@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="o0JkJf5TAWmLr2RAHfcNSx7Jae22nhCjK"
+Subject: Re: [Qemu-devel] [PATCH v4 2/8] nbd: Move
+ nbd_errno_to_system_errno() to public header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,50 +26,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  tests/migration-test.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index cd954caee4..8ef2b72459 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -466,6 +466,13 @@ static void test_precopy_unix(void)
->      g_free(uri);
->  }
->  
-> +static void test_precopy_tcp(void)
-> +{
-> +    const char *uri = "tcp:0:44444";
-> +
-> +    test_precopy(uri);
-> +}
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--o0JkJf5TAWmLr2RAHfcNSx7Jae22nhCjK
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Message-ID: <469181a3-a171-188b-4c43-d406e5b340a2@redhat.com>
+Subject: Re: [PATCH v4 2/8] nbd: Move nbd_errno_to_system_errno() to public
+ header
+References: <20171015010131.12172-1-eblake@redhat.com>
+ <20171015010131.12172-3-eblake@redhat.com>
+ <58e026df-5e9d-2ba1-dd55-7b0d958fc3e3@virtuozzo.com>
+In-Reply-To: <58e026df-5e9d-2ba1-dd55-7b0d958fc3e3@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The problem is that this will fail if you make check -j  and two
-tests use 4444 at the same time.
-That's pretty common especially when you've built multiple architectures
-as targets and all the same tests run at the same time.
+On 10/16/2017 03:33 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 15.10.2017 04:01, Eric Blake wrote:
+>> This is needed in preparation for structured reply handling,
+>> as we will be performing the translation from NBD error to
+>> system errno value higher in the stack at block/nbd-client.c.
+>=20
+> you've forget to sign-off.
 
-Dave
+D'oh. Bad patch split on my part.
 
->  int main(int argc, char **argv)
->  {
->      char template[] = "/tmp/migration-test-XXXXXX";
-> @@ -482,6 +489,7 @@ int main(int argc, char **argv)
->      module_call_init(MODULE_INIT_QOM);
->  
->      qtest_add_func("/migration/precopy/unix", test_precopy_unix);
-> +    qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
->  
->      ret = g_test_run();
->  
-> -- 
-> 2.13.5
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Signed-off-by: Eric Blake <eblake@redhat.com>
+
+>=20
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>=20
+>> ---
+>> =C2=A0 include/block/nbd.h | 13 +++++++++++++
+>> =C2=A0 nbd/nbd-internal.h=C2=A0 | 12 ------------
+>> =C2=A0 nbd/client.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 32 ---=
+-----------------------------
+>> =C2=A0 nbd/common.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 34 +++=
++++++++++++++++++++++++++++++++
+>> =C2=A0 nbd/trace-events=C2=A0=C2=A0=C2=A0 |=C2=A0 4 +++-
+>> =C2=A0 5 files changed, 50 insertions(+), 45 deletions(-)
+>>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--o0JkJf5TAWmLr2RAHfcNSx7Jae22nhCjK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnkoj0ACgkQp6FrSiUn
+Q2riZQf/fnR4721aDpybfpqDqli0XXm8ILc4tNScJ4Sy25YuH7XROmBIrQobSofw
+Qs3mrBGeO2pDFNm9qDk9LnpCRy/oUN6Q7R2hawoPEI3Yb9yG9WcpmtPR76wPOb7V
+ZT9NdnH5kh37RLl0ES7YykBlTWG0XF8nsHzErurGAR7Ys0cFUaIzuO2RQafh6SWW
+BLo71RtKyxmfdTNwJRiVqO6OV0axXrFSZzrYqKu1PBSdNyXt+bKdh3RswtGHHbzt
+ujx8lgPf1DPnqmUIylSVZmLApj+nEZVb4d9SB94//LMo43/RqYNH/V+AvqCOjjEM
++9kA9Gboepq9Sf114yxdinxQyYmw2g==
+=u3UE
+-----END PGP SIGNATURE-----
+
+--o0JkJf5TAWmLr2RAHfcNSx7Jae22nhCjK--
