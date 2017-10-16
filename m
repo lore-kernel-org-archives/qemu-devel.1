@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e45MC-0002aL-PI
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:23:01 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e45Pu-0005Ml-By
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:26:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1e45MB-0007aH-Nr
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:23:00 -0400
-Date: Mon, 16 Oct 2017 15:22:46 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20171016132246.GC5145@localhost.localdomain>
-References: <afc33ce4-c9ab-9b35-38ec-80b16642ef00@weilnetz.de>
-	<20171013113708.2dd02a17.cohuck@redhat.com>
-	<20171013094400.GD20515@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1e45Pt-0001bU-Iq
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:26:50 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:56192)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e45Pt-0001b7-Ae
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:26:49 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id u138so3309979wmu.4
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 06:26:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20171013094400.GD20515@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] German BSI analysed security of KVM / QEMU
+In-Reply-To: <4d8c3811-62a9-2391-e962-736c333d45c6@vivier.eu>
+References: <1507822245-15748-1-git-send-email-peter.maydell@linaro.org>
+	<1507822245-15748-3-git-send-email-peter.maydell@linaro.org>
+	<b5d3e2e6-31c0-0496-bfee-3baad5d571f9@vivier.eu>
+	<CAFEAcA8nyWgNDA23Cne8dpOMKXmZ98A0kR8K_MSkYt8bF3pZCg@mail.gmail.com>
+	<c9e56a17-3c75-cfcf-7709-ee27efc291af@vivier.eu>
+	<20171016130616.GF1918@kos.to>
+	<4d8c3811-62a9-2391-e962-736c333d45c6@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Oct 2017 14:26:27 +0100
+Message-ID: <CAFEAcA8z17CSarERraA2+QsakzPx-RioJNX=+e7_8pf_MUqVnA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 2/2] linux-user: Fix
+ TARGET_MTIOCTOP/MTIOCGET/MTIOCPOS values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +35,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Stefan Weil <sw@weilnetz.de>, QEMU Developer <qemu-devel@nongnu.org>, qemu-block@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>, pgndev <pgnet.dev@gmail.com>
 
-Am 13.10.2017 um 11:44 hat Daniel P. Berrange geschrieben:
-> On Fri, Oct 13, 2017 at 11:37:08AM +0200, Cornelia Huck wrote:
-> > - Lack of support for encryption/signing of network-based images was
-> >   criticized. They ended up using Ceph and GlusterFS, which they were
-> >   reasonably happy with.
->=20
-> Hopefully the 'luks' driver (which can be layered over any block backen=
-d
-> including network ones), and the TLS support for NBD would be considere=
-d
-> to address this last point to some degree. At least from the encryption
-> side.
+On 16 October 2017 at 14:09, Laurent Vivier <laurent@vivier.eu> wrote:
+> For this part, yes, but I think for the other comment, STRUCT(mtget,
+> ...) needs to be updated.
 
-They refer to a blog post of yours about the weakness of the AES
-encryption in qcow2, but it seems they didn't see that luks exists as a
-replacement. While the qcow2 integration of luks is new in 2.10, we've
-had the separate 'luks' driver for a while. Do we need to inform our
-users better about it?
+Looking more closely I don't think it is as simple as just
+adjusting the STRUCT() definition. For a basic type that can
+be different on host and guest, I think we'd need to handle
+it the way we do the TYPE_OLDDEVT, with special support
+in the thunk code for figuring out how large it is and so on.
+That seems like a lot of work for a magtape ioctl that I
+suspect nobody's using and which we can't test...
 
-The option of using LUKS on the host is mentioned, but also that libvirt
-doesn't support this, so it comes with manual work.
+Applying this patch as-is would at least fix the ioctl
+for everything except MIPS and SPARC hosts and guests.
 
-
-They saw the TLS support in NBD, but had the impression it's not mature:
-
-    nbd sieht zwar einen Schutz durch TLS vor, dieser wird jedoch als
-    experimentell bezeichnet und nicht f=FCr den produktiven Betrieb
-    empfohlen.
-
-("nbd provides protection by TLS; however, this is described as
-experimental and not recommended for production")
-
-> Signing of disk images is impractical as it would imply having to downl=
-oad
-> the entire image contents to validate signature, rather defeating the p=
-oint
-> of having a network based image. But perhaps this is lost in translatio=
-n
-> and they mean something else by "signing of images" ?
-
-I suppose they mean something on a per-block basis, like a checksum or
-hash that is included in the encryption and can be used to verify that
-nobody changed the encrypted data from outside.
-
-    Dar=FCber hinaus besitzt qcow2 keinerlei Integrit=E4tsschutz. Selbst =
-wenn
-    die Verschl=FCsselung als ausreichend sicher angesehen werden w=FCrde=
-, so
-    ist es dem Angreifer prinzipiell weiterhin m=F6glich, den Inhalt des
-    Blockger=E4ts zu modifizieren
-
-("In addition, qcow2 has no integrity protection. Even if the
-encryption were considered sufficiently secure, in priciple the attacker
-could still modify the content of the block device.")
-
-They mention dm-integrity as an option to implement this on the host
-kernel level.
-
-
-Another thing that made me a bit sad is that they mention qed as a
-better performing alternative for qcow2. Even in 2017, people keep
-spreading this nonsense. :-(
-
-Kevin
+thanks
+-- PMM
