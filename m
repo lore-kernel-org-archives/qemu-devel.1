@@ -1,32 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e49V8-0003zq-1C
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:48:31 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1e49bc-0001Ut-GJ
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:55:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e49V3-0002bt-2Q
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:48:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50439)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e49V2-0002bL-JP
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:48:24 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 66D8A4E34A
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 17:48:23 +0000 (UTC)
-Date: Mon, 16 Oct 2017 18:48:17 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171016174816.GD2876@work-vm>
-References: <20171004104636.7963-1-quintela@redhat.com>
-	<20171004104636.7963-3-quintela@redhat.com>
-	<20171016173456.GJ2252@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171016173456.GJ2252@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v9 02/12] migration: Improve migration
- thread error handling
+	(envelope-from <sundeep.lkml@gmail.com>) id 1e49bY-00076O-H6
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:55:12 -0400
+From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Date: Mon, 16 Oct 2017 23:24:49 +0530
+Message-Id: <1508176489-9002-1-git-send-email-sundeep.lkml@gmail.com>
+Subject: [Qemu-devel] [Qemu devel PATCH] msf2: Remove dead code reported by
+ Coverity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,128 +18,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, crosthwaite.peter@gmail.com, alistair23@gmail.com, f4bug@amsat.org, imammedo@redhat.com, pbonzini@redhat.com, Subbaraya Sundeep <sundeep.lkml@gmail.com>
 
-* Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
-> * Juan Quintela (quintela@redhat.com) wrote:
-> > We now report errors also when we finish migration, not only on info
-> > migrate.  We plan to use this error from several places, and we want
-> > the first error to happen to win, so we add an mutex to order it.
-> > 
-> > Signed-off-by: Juan Quintela <quintela@redhat.com>
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  migration/migration.c | 19 ++++++++++++++++---
-> >  migration/migration.h |  7 ++++++-
-> >  migration/tls.c       |  1 -
-> >  3 files changed, 22 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index 98429dc843..468f51cfa7 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -1071,19 +1071,30 @@ static void migrate_fd_cleanup(void *opaque)
-> >                            MIGRATION_STATUS_CANCELLED);
-> >      }
-> >  
-> > +    if (s->error) {
-> > +        /* It is used on info migrate.  We can't free it */
-> > +        error_report_err(error_copy(s->error));
-> > +    }
-> >      notifier_list_notify(&migration_state_notifiers, s);
-> >      block_cleanup_parameters(s);
-> >  }
-> >  
-> > +void migrate_set_error(MigrationState *s, const Error *error)
-> 
-> If you find you need to resend this, please add a comment on this
-> function saying it takes a copy and it's upto the caller to free
-> the error they pass in.
+Fixed incorrect frame size mask, validated maximum frame
+size in spi_write and removed dead code.
 
-Oops, ignore that, I see you change it in the next one.
+Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+---
+ hw/ssi/mss-spi.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-> Dave
-> 
-> > +{
-> > +    qemu_mutex_lock(&s->error_mutex);
-> > +    if (!s->error) {
-> > +        s->error = error_copy(error);
-> > +    }
-> > +    qemu_mutex_unlock(&s->error_mutex);
-> > +}
-> > +
-> >  void migrate_fd_error(MigrationState *s, const Error *error)
-> >  {
-> >      trace_migrate_fd_error(error_get_pretty(error));
-> >      assert(s->to_dst_file == NULL);
-> >      migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-> >                        MIGRATION_STATUS_FAILED);
-> > -    if (!s->error) {
-> > -        s->error = error_copy(error);
-> > -    }
-> > +    migrate_set_error(s, error);
-> >      notifier_list_notify(&migration_state_notifiers, s);
-> >      block_cleanup_parameters(s);
-> >  }
-> > @@ -2355,6 +2366,7 @@ static void migration_instance_finalize(Object *obj)
-> >      MigrationState *ms = MIGRATION_OBJ(obj);
-> >      MigrationParameters *params = &ms->parameters;
-> >  
-> > +    qemu_mutex_destroy(&ms->error_mutex);
-> >      g_free(params->tls_hostname);
-> >      g_free(params->tls_creds);
-> >  }
-> > @@ -2367,6 +2379,7 @@ static void migration_instance_init(Object *obj)
-> >      ms->state = MIGRATION_STATUS_NONE;
-> >      ms->xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE;
-> >      ms->mbps = -1;
-> > +    qemu_mutex_init(&ms->error_mutex);
-> >  
-> >      params->tls_hostname = g_strdup("");
-> >      params->tls_creds = g_strdup("");
-> > diff --git a/migration/migration.h b/migration/migration.h
-> > index b83cceadc4..51c0ac2e71 100644
-> > --- a/migration/migration.h
-> > +++ b/migration/migration.h
-> > @@ -129,8 +129,12 @@ struct MigrationState
-> >      int64_t colo_checkpoint_time;
-> >      QEMUTimer *colo_delay_timer;
-> >  
-> > -    /* The last error that occurred */
-> > +    /* The first error that has occurred.
-> > +       We used the mutex to be able to return the 1st error message */
-> >      Error *error;
-> > +    /* mutex to protect errp */
-> > +    QemuMutex error_mutex;
-> > +
-> >      /* Do we have to clean up -b/-i from old migrate parameters */
-> >      /* This feature is deprecated and will be removed */
-> >      bool must_remove_block_options;
-> > @@ -159,6 +163,7 @@ bool  migration_has_all_channels(void);
-> >  
-> >  uint64_t migrate_max_downtime(void);
-> >  
-> > +void migrate_set_error(MigrationState *s, const Error *error);
-> >  void migrate_fd_error(MigrationState *s, const Error *error);
-> >  
-> >  void migrate_fd_connect(MigrationState *s);
-> > diff --git a/migration/tls.c b/migration/tls.c
-> > index 596e8790bd..026a008667 100644
-> > --- a/migration/tls.c
-> > +++ b/migration/tls.c
-> > @@ -119,7 +119,6 @@ static void migration_tls_outgoing_handshake(QIOTask *task,
-> >      if (qio_task_propagate_error(task, &err)) {
-> >          trace_migration_tls_outgoing_handshake_error(error_get_pretty(err));
-> >          migrate_fd_error(s, err);
-> > -        error_free(err);
-> >      } else {
-> >          trace_migration_tls_outgoing_handshake_complete();
-> >          migration_channel_connect(s, ioc, NULL);
-> > -- 
-> > 2.13.5
-> > 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/hw/ssi/mss-spi.c b/hw/ssi/mss-spi.c
+index 5a8e308..1e49cbc 100644
+--- a/hw/ssi/mss-spi.c
++++ b/hw/ssi/mss-spi.c
+@@ -76,9 +76,10 @@
+ #define C_BIGFIFO            (1 << 29)
+ #define C_RESET              (1 << 31)
+ 
+-#define FRAMESZ_MASK         0x1F
++#define FRAMESZ_MASK         0x3F
+ #define FMCOUNT_MASK         0x00FFFF00
+ #define FMCOUNT_SHIFT        8
++#define FRAMESZ_MAX          32
+ 
+ static void txfifo_reset(MSSSpiState *s)
+ {
+@@ -106,8 +107,6 @@ static void set_fifodepth(MSSSpiState *s)
+         s->fifo_depth = 16;
+     } else if (size <= 32) {
+         s->fifo_depth = 8;
+-    } else {
+-        s->fifo_depth = 4;
+     }
+ }
+ 
+@@ -301,6 +300,9 @@ static void spi_write(void *opaque, hwaddr addr,
+         if (s->enabled) {
+             break;
+         }
++        if ((value & FRAMESZ_MASK) > FRAMESZ_MAX) {
++            break;
++        }
+         s->regs[R_SPI_DFSIZE] = value;
+         break;
+ 
+-- 
+2.5.0
