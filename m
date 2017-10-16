@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e47WJ-0007K5-Gz
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 11:41:36 -0400
+	(envelope-from <bounces@canonical.com>) id 1e47CL-00033P-HM
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 11:21:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e47WI-0003Np-EG
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 11:41:35 -0400
-References: <20171015010131.12172-1-eblake@redhat.com>
-	<20171015010131.12172-5-eblake@redhat.com>
-	<b96907fe-1b3d-8ab9-c4ab-761fe48f26aa@virtuozzo.com>
-	<5ec13265-60d3-aeb6-641b-9aaebfbe498e@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <bac1f011-2aa6-5b02-707b-bbb12b9a07fd@redhat.com>
-Date: Mon, 16 Oct 2017 10:41:25 -0500
+	(envelope-from <bounces@canonical.com>) id 1e47CG-0006N9-BQ
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 11:20:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51758)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e47CG-0006Lg-5r
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 11:20:52 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e47CD-0005dj-BC
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 15:20:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id F3D272E80DB
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 15:20:48 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <5ec13265-60d3-aeb6-641b-9aaebfbe498e@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="56DxiVbp0XDgMBuo3Rj0Xk1Q5FecGi723"
-Subject: Re: [Qemu-devel] [PATCH v4 4/8] nbd: Minimal structured read for
- server
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 16 Oct 2017 15:11:59 -0000
+From: Bug <kewlubuntu@mailinator.com>
+Reply-To: Bug 1723984 <1723984@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <150816671920.14146.15870333277151125380.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1723984] [NEW] ID_MMFR0 has an invalid value on
+ aarch64 cpu (A57, A53)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,87 +36,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---56DxiVbp0XDgMBuo3Rj0Xk1Q5FecGi723
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org
-Message-ID: <bac1f011-2aa6-5b02-707b-bbb12b9a07fd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 4/8] nbd: Minimal structured read for
- server
-References: <20171015010131.12172-1-eblake@redhat.com>
- <20171015010131.12172-5-eblake@redhat.com>
- <b96907fe-1b3d-8ab9-c4ab-761fe48f26aa@virtuozzo.com>
- <5ec13265-60d3-aeb6-641b-9aaebfbe498e@redhat.com>
-In-Reply-To: <5ec13265-60d3-aeb6-641b-9aaebfbe498e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Public bug reported:
 
-On 10/16/2017 07:18 AM, Eric Blake wrote:
-> On 10/16/2017 04:49 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 15.10.2017 04:01, Eric Blake wrote:
->>> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>
->>> Minimal implementation of structured read: one structured reply chunk=
-,
->>> no segmentation.
->>> Minimal structured error implementation: no text message.
->>> Support DF flag, but just ignore it, as there is no segmentation any
->>> way.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
->
->>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>>
->=20
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 c=
-ase NBD_OPT_STRUCTURED_REPLY:
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 if (client->structured_reply) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D nbd_negotiate_send_=
-rep_err(
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cli=
-ent->ioc, NBD_REP_ERR_INVALID, option, errp,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "st=
-ructured reply already negotiated");
->>
->> You were going to send a patch to spec for this..
->=20
-> Still am; it's on my queue for tasks to do today. :)
+The ID_MMFR0 register, accessed from aarch64 state as an invalid value:
+- ARM ARM v8 documentation (D7.2 General system control registers) describe=
+d bits AuxReg[23:20] to be
+  "In ARMv8-A the only permitted value is 0010"
+- Cortex A53 and Cortex A57 TRM describe the value to be 0x10201105, so Aux=
+Reg[23:20] is 0010 too
+- in QEMU target/arm/cpu64.c, the relevant value is
+  cpu->id_mmfr0 =3D 0x10101105;
 
-https://lists.debian.org/nbd/2017/nbd-201710/msg00013.html
+The 1 should be changed to 2.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Spotted & Tested on the following qemu revision:
 
+commit 48ae1f60d8c9a770e6da64407984d84e25253c69
+Merge: 78b62d3 b867eaa
+Author: Peter Maydell <peter.maydell@linaro.org>
+Date:   Mon Oct 16 14:28:13 2017 +0100
 
---56DxiVbp0XDgMBuo3Rj0Xk1Q5FecGi723
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+-- =
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnk0yUACgkQp6FrSiUn
-Q2rvXwgAht1wP+IqeIle+eIs6n+PMFP3r+QgU6W/K34VQqrunOJArTbEjXthScv/
-+Se+BmTxkH1jtQCfIRErNndhEcqE3XXy6CZzPnyVMOhXiLwDSACG8lvaZvPWdDqC
-03IgkfUgzIBf6Cl7vP+8KtxFRusLR2GtCcU4tT3/0nniaDppuUU+s45fX4ok3a5Y
-EPMCMx5w46EkXupHdCD/dL4StXDBiLqIdxdCCz1C4s/K2Bpd49CotUjyo1UZGA7K
-aWd75IK59f/EeEHxwHn7OPMHlWj1KzFM2UP38WKdvfvoeu567k9geiFAmXKx3Cnf
-EehS4NRXky8kb8Zd1w+WJ5TYHNXnig==
-=2y6E
------END PGP SIGNATURE-----
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1723984
 
---56DxiVbp0XDgMBuo3Rj0Xk1Q5FecGi723--
+Title:
+  ID_MMFR0 has an invalid value on aarch64 cpu (A57, A53)
+
+Status in QEMU:
+  New
+
+Bug description:
+  The ID_MMFR0 register, accessed from aarch64 state as an invalid value:
+  - ARM ARM v8 documentation (D7.2 General system control registers) descri=
+bed bits AuxReg[23:20] to be
+    "In ARMv8-A the only permitted value is 0010"
+  - Cortex A53 and Cortex A57 TRM describe the value to be 0x10201105, so A=
+uxReg[23:20] is 0010 too
+  - in QEMU target/arm/cpu64.c, the relevant value is
+    cpu->id_mmfr0 =3D 0x10101105;
+
+  The 1 should be changed to 2.
+
+  Spotted & Tested on the following qemu revision:
+
+  commit 48ae1f60d8c9a770e6da64407984d84e25253c69
+  Merge: 78b62d3 b867eaa
+  Author: Peter Maydell <peter.maydell@linaro.org>
+  Date:   Mon Oct 16 14:28:13 2017 +0100
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1723984/+subscriptions
