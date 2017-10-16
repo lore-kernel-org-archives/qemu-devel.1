@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1e3ud8-0006JU-1D
-	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 21:55:47 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1e3xp1-0003Ll-6t
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 01:20:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1e3ud6-0006qE-Rv
-	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 21:55:46 -0400
-Message-ID: <1508118927.24322.0.camel@aj.id.au>
-From: Andrew Jeffery <andrew@aj.id.au>
-Date: Mon, 16 Oct 2017 12:25:27 +1030
-In-Reply-To: <ca6255bb-64f8-10bf-1e1f-a693ae38f4c3@kaod.org>
-References: <20170920070135.31379-1-clg@kaod.org>
-	<20170920070135.31379-2-clg@kaod.org>
-	<1507507449.5452.147.camel@aj.id.au>
-	<48144f71-c876-0e89-f01e-cbfe87687aee@kaod.org>
-	<1507693785.5452.175.camel@aj.id.au>
-	<ca6255bb-64f8-10bf-1e1f-a693ae38f4c3@kaod.org>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-ZAn+KUcnrehn6Q1D5hz2"
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] aspeed: add support for the
- witherspoon-bmc board
+	(envelope-from <aik@ozlabs.ru>) id 1e3xox-0003l1-W2
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 01:20:15 -0400
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Mon, 16 Oct 2017 16:20:04 +1100
+Message-Id: <20171016052004.31397-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu v3] RFC: ppc/spapr: Receive and store
+ device tree blob from SLOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,144 +18,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Balbir Singh <bsingharora@gmail.com>, Greg Kurz <groug@kaod.org>, slof@lists.ozlabs.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>
 
+SLOF receives a device tree and updates it with various properties
+before switching to the guest kernel and QEMU is not aware of any changes
+made by SLOF. Since there is no real RTAS and QEMU implements it,
+it makes sense to pass the SLOF device tree to QEMU so the latter could
+implement RTAS related tasks better.
 
---=-ZAn+KUcnrehn6Q1D5hz2
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Specifially, now QEMU can find out the actual XICS phandle (for PHB
+hotplug) and the RTAS linux,rtas-entry/base properties (for firmware
+assisted NMI - FWNMI).
 
-On Wed, 2017-10-11 at 09:28 +0200, C=C3=A9dric Le Goater wrote:
-> On 10/11/2017 05:49 AM, Andrew Jeffery wrote:
-> > On Tue, 2017-10-10 at 15:30 +0200, C=C3=A9dric Le Goater wrote:
-> > > On 10/09/2017 02:04 AM, Andrew Jeffery wrote:
-> > > > On Wed, 2017-09-20 at 09:01 +0200, C=C3=A9dric Le Goater wrote:
-> > > > > The Witherspoon boards are OpenPOWER system hosting POWER9 Proces=
-sors.
-> > > > > Let's add support for their BMC including a couple of I2C devices=
- as
-> > > > > found on real HW.
-> > > > > =C2=A0
-> > > > > > > > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> > > > >=20
-> > > > > ---
-> > > > > =C2=A0hw/arm/aspeed.c | 49 ++++++++++++++++++++++++++++++++++++++=
-+++++++++++
-> > > > > =C2=A01 file changed, 49 insertions(+)
-> > > > > =C2=A0
-> > > > > diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-> > > > > index ab895ad490af..81f522f711ae 100644
-> > > > > --- a/hw/arm/aspeed.c
-> > > > > +++ b/hw/arm/aspeed.c
-> > > > > @@ -46,6 +46,7 @@ enum {
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0PALMETTO_BMC,
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0AST2500_EVB,
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ROMULUS_BMC,
-> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0WITHERSPOON_BMC,
-> > > > > =C2=A0};
-> > > > > =C2=A0
-> > > > > =C2=A0/* Palmetto hardware value: 0x120CE416 */
-> > > > > @@ -83,8 +84,12 @@ enum {
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0SCU_AST2500=
-_HW_STRAP_ACPI_ENABLE |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0\
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0SCU_HW_STRA=
-P_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
-> > > > > =C2=A0
-> > > > > +/* Witherspoon hardware value: 0xF10AD216 (but use romulus defin=
-ition) */
-> > > > > +#define WITHERSPOON_BMC_HW_STRAP1 ROMULUS_BMC_HW_STRAP1
-> > > > > +
-> > > > > =C2=A0static void palmetto_bmc_i2c_init(AspeedBoardState *bmc);
-> > > > > =C2=A0static void ast2500_evb_i2c_init(AspeedBoardState *bmc);
-> > > > > +static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc);
-> > > > > =C2=A0
-> > > > > =C2=A0static const AspeedBoardConfig aspeed_boards[] =3D {
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0[PALMETTO_BMC] =3D {
-> > > > > @@ -110,6 +115,14 @@ static const AspeedBoardConfig aspeed_boards=
-[] =3D {
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.spi_model =
-=3D "mx66l1g45g",
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.num_cs=C2=
-=A0=C2=A0=C2=A0=C2=A0=3D 2,
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0},
-> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0[WITHERSPOON_BMC]=C2=A0=C2=A0=3D {
-> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.soc_name=C2=A0=
-=C2=A0=3D "ast2500-a1",
-> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.hw_strap1 =3D W=
-ITHERSPOON_BMC_HW_STRAP1,
-> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.fmc_model =3D "=
-mx25l25635e",
-> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.spi_model =3D "=
-mx66l1g45g",
-> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.num_cs=C2=A0=C2=
-=A0=C2=A0=C2=A0=3D 2,
-> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.i2c_init=C2=A0=
-=C2=A0=3D witherspoon_bmc_i2c_init,
-> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0},
-> > > > > =C2=A0};
-> > > > > =C2=A0
-> > > > > =C2=A0#define FIRMWARE_ADDR 0x0
-> > > > > @@ -337,11 +350,47 @@ static const TypeInfo romulus_bmc_type =3D =
-{
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.class_init =3D romulus_bmc_class_i=
-nit,
-> > > > > =C2=A0};
-> > > > > =C2=A0
-> > > > > +static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
-> > > > > +{
-> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0AspeedSoCState *soc =3D &bmc->soc;
-> > > > > +
-> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0i2c_create_slave(aspeed_i2c_get_bus(DEVI=
-CE(&soc->i2c), 4), "tmp423", 0x4c);
-> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0i2c_create_slave(aspeed_i2c_get_bus(DEVI=
-CE(&soc->i2c), 5), "tmp423", 0x4c);
-> > > > > +
-> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0i2c_create_slave(aspeed_i2c_get_bus(DEVI=
-CE(&soc->i2c), 9), "tmp105", 0x4a);
-> > > >=20
-> > > > Looks like I need to track down newer versions of the schematics I =
-have.
-> > >=20
-> > > the device on the board is a tmp275 but the tmp105 model is compatibl=
-e.
-> >=20
-> > It neither device is listed in the version I have :)
->=20
-> Here is my source :
->=20
-> 	https://github.com/openbmc/linux/blob/dev-4.10/arch/arm/boot/dts/aspeed-=
-bmc-opp-witherspoon.dts#L504
->=20
+This stores the initial DT blob in the sPAPR machine and replaces it
+in the KVMPPC_H_UPDATE_DT (new private hypercall) handler.
 
-Yeah, I ended up jumping on a machine and verifying the device was on
-the bus.
+This implements a basic FDT header validity check of the new blob;
+the new blob size should not increase more than twice since the reset.
 
-Cheers,
+This adds a machine property - update_dt_enabled - to allow backward
+migration.
 
-Andrew
---=-ZAn+KUcnrehn6Q1D5hz2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
+This requires SLOF update: "fdt: Pass the resulting device tree to QEMU".
 
------BEGIN PGP SIGNATURE-----
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+Changes:
+v3:
+* store reset-time FDT blob size and compare the update size against it;
+this disallows more than 2x increase between resets
+* added some FDT header sanity checks
+* implemented migration
 
-iQIcBAABCgAGBQJZ5BGQAAoJEJ0dnzgO5LT5k2IQAK9f1PgBuIXxAzhL+yoYQ/8+
-TE8/Jhe/5/1LDPrM3qFz6h5ZX93ptYlCKX/TW/mByPZaE9sEFtXjx58i6hJ2EBGV
-xAOGV/lG866gQjPRa6c3WtbjhQCOoj9A/poH0znOFcLYD2wzLb4ylveILiMOxpXE
-tqZJCbTfqH/EgjUUK7O9b5A7n/sUmsA556GZoKxR34Acv6yUqvh5uRtHmLtcMDe/
-KhP4KdzL98jZWyXg/O16OyaxxKBVNkYQXua50Bocd7T2FV+oxRj+i3FfSBavDCJk
-+IBatULPtePXR9xUHkBpOLMecS4D5c1iqG1A4MQn5p/g3wNf0iTcNKMfA+PpIGk9
-Yt0w26W6LGKVUTntFyGYnRA5u3q+r9zZC1zUAD/9orRp3WsJ8FmUG+SnY9tXpvvr
-pB44UhONVjocKwRZNa2kURz3tAlo4on36/spSe7nvivVTl/57OJO83RD+i6fUKJX
-Pn6fCkwJMtMlZPo9Bq7UjJCMhwTnqpE+TenGMRB8FCdReL4XhP6zkIuyIwfYg5IJ
-/wz4UCj/cRycW+jEObuEOrKVRnV1bIUe3YuqEY0AAApcYdRbIKR2QkV3rhr4+qVv
-iJNOC1/u9Yd2uLEM2Cmt2oBfUhkxn3VOMlYv9ORHU//dCx3iKObzgeWo0xK32iht
-dJKLhnkFdpXWuTo4geAJ
-=PFRy
------END PGP SIGNATURE-----
+---
+I could store just a size of the QEMU's blob, or a tree, not sure
+which one makes more sense here.
 
---=-ZAn+KUcnrehn6Q1D5hz2--
+This allows up to 2 times blob increase. Not 1.5 just to avoid
+float/double, just looks a bit ugly imho.
+---
+ include/hw/ppc/spapr.h |  7 ++++++-
+ hw/ppc/spapr.c         | 31 ++++++++++++++++++++++++++++++-
+ hw/ppc/spapr_hcall.c   | 42 ++++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/trace-events    |  2 ++
+ 4 files changed, 80 insertions(+), 2 deletions(-)
+
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index c1b365f564..a9ccc14823 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -60,6 +60,7 @@ struct sPAPRMachineClass {
+     /*< public >*/
+     bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMBs */
+     bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
++    bool update_dt_enabled;    /* enable KVMPPC_H_UPDATE_DT */
+     const char *tcg_default_cpu; /* which (TCG) CPU to simulate by default */
+     bool pre_2_10_has_unused_icps;
+     void (*phb_placement)(sPAPRMachineState *spapr, uint32_t index,
+@@ -92,6 +93,9 @@ struct sPAPRMachineState {
+     int vrma_adjust;
+     ssize_t rtas_size;
+     void *rtas_blob;
++    uint32_t fdt_size;
++    uint32_t fdt_initial_size;
++    void *fdt_blob;
+     long kernel_size;
+     bool kernel_le;
+     uint32_t initrd_base;
+@@ -400,7 +404,8 @@ struct sPAPRMachineState {
+ #define KVMPPC_H_LOGICAL_MEMOP  (KVMPPC_HCALL_BASE + 0x1)
+ /* Client Architecture support */
+ #define KVMPPC_H_CAS            (KVMPPC_HCALL_BASE + 0x2)
+-#define KVMPPC_HCALL_MAX        KVMPPC_H_CAS
++#define KVMPPC_H_UPDATE_DT      (KVMPPC_HCALL_BASE + 0x3)
++#define KVMPPC_HCALL_MAX        KVMPPC_H_UPDATE_DT
+ 
+ typedef struct sPAPRDeviceTreeUpdateHeader {
+     uint32_t version_id;
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index ff87f155d5..cb7bcc851e 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1467,7 +1467,10 @@ static void ppc_spapr_reset(void)
+     /* Load the fdt */
+     qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
+     cpu_physical_memory_write(fdt_addr, fdt, fdt_totalsize(fdt));
+-    g_free(fdt);
++    g_free(spapr->fdt_blob);
++    spapr->fdt_size = fdt_totalsize(fdt);
++    spapr->fdt_initial_size = spapr->fdt_size;
++    spapr->fdt_blob = fdt;
+ 
+     /* Set up the entry state */
+     first_ppc_cpu = POWERPC_CPU(first_cpu);
+@@ -1675,6 +1678,27 @@ static const VMStateDescription vmstate_spapr_patb_entry = {
+     },
+ };
+ 
++static bool spapr_dtb_needed(void *opaque)
++{
++    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(opaque);
++
++    return smc->update_dt_enabled;
++}
++
++static const VMStateDescription vmstate_spapr_dtb = {
++    .name = "spapr_dtb",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = spapr_dtb_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(fdt_initial_size, sPAPRMachineState),
++        VMSTATE_UINT32(fdt_size, sPAPRMachineState),
++        VMSTATE_VBUFFER_ALLOC_UINT32(fdt_blob, sPAPRMachineState, 0, NULL,
++                                     fdt_size),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
+ static const VMStateDescription vmstate_spapr = {
+     .name = "spapr",
+     .version_id = 3,
+@@ -1694,6 +1718,7 @@ static const VMStateDescription vmstate_spapr = {
+         &vmstate_spapr_ov5_cas,
+         &vmstate_spapr_patb_entry,
+         &vmstate_spapr_pending_events,
++        &vmstate_spapr_dtb,
+         NULL
+     }
+ };
+@@ -3605,6 +3630,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+     hc->unplug_request = spapr_machine_device_unplug_request;
+ 
+     smc->dr_lmb_enabled = true;
++    smc->update_dt_enabled = true;
+     smc->tcg_default_cpu = "POWER8";
+     mc->has_hotpluggable_cpus = true;
+     smc->resize_hpt_default = SPAPR_RESIZE_HPT_ENABLED;
+@@ -3703,7 +3729,10 @@ static void spapr_machine_2_10_instance_options(MachineState *machine)
+ 
+ static void spapr_machine_2_10_class_options(MachineClass *mc)
+ {
++    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
++
+     spapr_machine_2_11_class_options(mc);
++    smc->update_dt_enabled = false;
+     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_10);
+ }
+ 
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 8d72bb7c1c..be3de41080 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1656,6 +1656,46 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+     return H_SUCCESS;
+ }
+ 
++static target_ulong h_update_dt(PowerPCCPU *cpu, sPAPRMachineState *spapr,
++                                target_ulong opcode, target_ulong *args)
++{
++    target_ulong dt = ppc64_phys_to_real(args[0]);
++    struct fdt_header hdr = { 0 };
++    unsigned cb;
++    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
++
++    cpu_physical_memory_read(dt, &hdr, sizeof(hdr));
++    cb = fdt32_to_cpu(hdr.totalsize);
++
++    if (fdt_check_header(&hdr) ||
++        fdt32_to_cpu(hdr.boot_cpuid_phys) ||
++        fdt32_to_cpu(hdr.off_dt_struct) >= cb ||
++        fdt32_to_cpu(hdr.off_dt_strings) >= cb ||
++        fdt32_to_cpu(hdr.off_mem_rsvmap) >= cb ||
++        fdt32_to_cpu(hdr.totalsize) != fdt32_to_cpu(hdr.size_dt_strings) +
++                fdt32_to_cpu(hdr.size_dt_struct) +
++                sizeof(struct fdt_reserve_entry) +
++                sizeof(hdr) ||
++        cb / spapr->fdt_initial_size > 2) {
++        trace_spapr_update_dt_failed(spapr->fdt_initial_size, cb,
++            fdt32_to_cpu(hdr.magic));
++        return H_PARAMETER;
++    }
++
++    if (!smc->update_dt_enabled) {
++        return H_SUCCESS;
++    }
++
++    g_free(spapr->fdt_blob);
++    spapr->fdt_size = cb;
++    spapr->fdt_blob = g_malloc0(cb);
++    cpu_physical_memory_read(dt, spapr->fdt_blob, cb);
++
++    trace_spapr_update_dt(cb);
++
++    return H_SUCCESS;
++}
++
+ static spapr_hcall_fn papr_hypercall_table[(MAX_HCALL_OPCODE / 4) + 1];
+ static spapr_hcall_fn kvmppc_hypercall_table[KVMPPC_HCALL_MAX - KVMPPC_HCALL_BASE + 1];
+ 
+@@ -1753,6 +1793,8 @@ static void hypercall_register_types(void)
+ 
+     /* ibm,client-architecture-support support */
+     spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support);
++
++    spapr_register_hypercall(KVMPPC_H_UPDATE_DT, h_update_dt);
+ }
+ 
+ type_init(hypercall_register_types)
+diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
+index 4a6a6490fa..60ee4e3a4b 100644
+--- a/hw/ppc/trace-events
++++ b/hw/ppc/trace-events
+@@ -18,6 +18,8 @@ spapr_cas_pvr_try(uint32_t pvr) "0x%x"
+ spapr_cas_pvr(uint32_t cur_pvr, bool explicit_match, uint32_t new_pvr) "current=0x%x, explicit_match=%u, new=0x%x"
+ spapr_h_resize_hpt_prepare(uint64_t flags, uint64_t shift) "flags=0x%"PRIx64", shift=%"PRIu64
+ spapr_h_resize_hpt_commit(uint64_t flags, uint64_t shift) "flags=0x%"PRIx64", shift=%"PRIu64
++spapr_update_dt(unsigned cb) "New blob %u bytes"
++spapr_update_dt_failed(unsigned cbold, unsigned cbnew, unsigned magic) "Old blob %u bytes, new blob %u bytes, magic 0x%x"
+ 
+ # hw/ppc/spapr_iommu.c
+ spapr_iommu_put(uint64_t liobn, uint64_t ioba, uint64_t tce, uint64_t ret) "liobn=0x%"PRIx64" ioba=0x%"PRIx64" tce=0x%"PRIx64" ret=%"PRId64
+-- 
+2.11.0
