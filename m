@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1e47mt-0003bq-9O
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 11:58:44 -0400
+	(envelope-from <groug@kaod.org>) id 1e47nl-00044w-Us
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 11:59:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1e47ms-00078V-Cl
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 11:58:43 -0400
-Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:48199)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1e47ms-00075c-4n
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 11:58:42 -0400
-Received: by mail-oi0-x231.google.com with SMTP id m198so25859289oig.5
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 08:58:39 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1e47nh-0007ka-21
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 11:59:38 -0400
+Received: from 13.mo4.mail-out.ovh.net ([178.33.251.8]:36870)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e47ng-0007jI-Og
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 11:59:32 -0400
+Received: from player159.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 47982E4201
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 17:59:30 +0200 (CEST)
+Date: Mon, 16 Oct 2017 17:59:25 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171016175925.6600180b@bahia.lan>
+In-Reply-To: <20171016163107.5d036fd0@nial.brq.redhat.com>
+References: <150789527176.5487.14861721766357709655.stgit@bahia.lan>
+	<20171016104139.5f7afa6c@nial.brq.redhat.com>
+	<20171016132420.3accb7b4@bahia.lan>
+	<20171016163107.5d036fd0@nial.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171016144753.GB14135@stefanha-x1.localdomain>
-References: <20171012155027.3277-1-pagupta@redhat.com>
-	<20171012155027.3277-3-pagupta@redhat.com>
-	<20171013094431.GA27308@stefanha-x1.localdomain>
-	<24301306.20068579.1507891695416.JavaMail.zimbra@redhat.com>
-	<20171016144753.GB14135@stefanha-x1.localdomain>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Mon, 16 Oct 2017 08:58:37 -0700
-Message-ID: <CAPcyv4hffSdoONfFohKZzfB2gywGYG9MmDxC0H9+5R53w+ROVQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC 2/2] KVM: add virtio-pmem driver
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] monitor: fix dangling CPU pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,53 +32,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Pankaj Gupta <pagupta@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, KVM list <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-nvdimm <linux-nvdimm@ml01.01.org>, Linux MM <linux-mm@kvack.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Rik van Riel <riel@redhat.com>, haozhong zhang <haozhong.zhang@intel.com>, Nitesh Narayan Lal <nilal@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, ross zwisler <ross.zwisler@intel.com>, David Hildenbrand <david@redhat.com>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Mon, Oct 16, 2017 at 7:47 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> On Fri, Oct 13, 2017 at 06:48:15AM -0400, Pankaj Gupta wrote:
->> > On Thu, Oct 12, 2017 at 09:20:26PM +0530, Pankaj Gupta wrote:
->> > > +static blk_qc_t virtio_pmem_make_request(struct request_queue *q,
->> > > +                 struct bio *bio)
->> > > +{
->> > > + blk_status_t rc = 0;
->> > > + struct bio_vec bvec;
->> > > + struct bvec_iter iter;
->> > > + struct virtio_pmem *pmem = q->queuedata;
->> > > +
->> > > + if (bio->bi_opf & REQ_FLUSH)
->> > > +         //todo host flush command
->> >
->> > This detail is critical to the device design.  What is the plan?
->>
->> yes, this is good point.
->>
->> was thinking of guest sending a flush command to Qemu which
->> will do a fsync on file fd.
->
-> Previously there was discussion about fsyncing a specific file range
-> instead of the whole file.  This could perform better in cases where
-> only a subset of dirty pages need to be flushed.
->
-> One possibility is to design the virtio interface to communicate ranges
-> but the emulation code simply fsyncs the fd for the time being.  Later
-> on, if the necessary kernel and userspace interfaces are added, we can
-> make use of the interface.
+On Mon, 16 Oct 2017 16:31:07 +0200
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-Range based is not a natural storage cache management mechanism. All
-that is it available typically is a full write-cache-flush mechanism
-and upper layers would need to customized for range-based flushing.
+> On Mon, 16 Oct 2017 13:24:20 +0200
+> Greg Kurz <groug@kaod.org> wrote:
+> 
+> > On Mon, 16 Oct 2017 10:41:39 +0200
+> > Igor Mammedov <imammedo@redhat.com> wrote:
+> >   
+> > > On Fri, 13 Oct 2017 13:47:51 +0200
+> > > Greg Kurz <groug@kaod.org> wrote:
+> > > 
+> > > [...]
+> > >     
+> > > > Note that the resolution should really return a CPU object, otherwise
+> > > > we have a bug. This is achieved by relying on object_resolve_path()
+> > > > and CPU() instead of calling object_resolve_path_type(path, TYPE_CPU).      
+> > > I'm not sure what you are trying to say here, could you explain
+> > > a bit more why CPU(object_resolve_path()) is chosen vs
+> > > object_resolve_path_type(path, TYPE_CPU)
+> > >     
+> > 
+> > IIUC, if we use object_resolve_path_type(path, TYPE_CPU) and path doesn't
+> > point to a CPU object, it will return NULL (see object_resolve_abs_path())
+> > just like if the CPU got hot-unplugged.
+> > 
+> > My point is that the path we got from object_get_canonical_path() did
+> > point to a CPU: if later on this path resolves to an object that isn't
+> > a CPU, then some code somewhere used the same QOM path for some unrelated
+> > object. I tend to think this is a bug in QEMU and we shouldn't silently
+> > ignore it.  
+> sometimes QOM path to a cpu object could be:
+>  1. arbitrary if set explicitly by board 
+>  2. /unattached/device[X] or /peripheral-anon/device[X]
+>        potentially might end-up with another device at the same path
+>        in case of hot-remove + migration
+>  3. /peripheral
+>        hot-remove named (i.e. non null 'id') cpu and then plug a non cpu device with the same 'id',
+>        which is legitimate thing to do
+> 
 
->> If we do a async flush and move the task to wait queue till we receive
->> flush complete reply from host we can allow other tasks to execute
->> in current cpu.
->>
->> Any suggestions you have or anything I am not foreseeing here?
->
-> My main thought about this patch series is whether pmem should be a
-> virtio-blk feature bit instead of a whole new device.  There is quite a
-> bit of overlap between the two.
+Ok, I didn't think of these cases...
 
-I'd be open to that... there's already provisions in the pmem driver
-for platforms where cpu caches are flushed on power-loss, a virtio
-mode for this shared-memory case seems reasonable.
+> I'd use object_resolve_path_type(path, TYPE_CPU) and
+> gracefully error out in case it returns NULL.
+> 
+
+I'll do that. Thanks for the detailed explanation.
+
+> > Makes sense ?
+> >   
+> > >     
+> > > > Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> > > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > > ---
+> > > >  monitor.c |   25 ++++++++++++++++++++-----
+> > > >  1 file changed, 20 insertions(+), 5 deletions(-)
+> > > > 
+> > > > diff --git a/monitor.c b/monitor.c
+> > > > index fe0d1bdbb461..8489b2ad99c0 100644
+> > > > --- a/monitor.c
+> > > > +++ b/monitor.c
+> > > > @@ -200,7 +200,7 @@ struct Monitor {
+> > > >  
+> > > >      ReadLineState *rs;
+> > > >      MonitorQMP qmp;
+> > > > -    CPUState *mon_cpu;
+> > > > +    gchar *mon_cpu_path;
+> > > >      BlockCompletionFunc *password_completion_cb;
+> > > >      void *password_opaque;
+> > > >      mon_cmd_t *cmd_table;
+> > > > @@ -579,6 +579,7 @@ static void monitor_data_init(Monitor *mon)
+> > > >  
+> > > >  static void monitor_data_destroy(Monitor *mon)
+> > > >  {
+> > > > +    g_free(mon->mon_cpu_path);
+> > > >      qemu_chr_fe_deinit(&mon->chr, false);
+> > > >      if (monitor_is_qmp(mon)) {
+> > > >          json_message_parser_destroy(&mon->qmp.parser);
+> > > > @@ -1047,20 +1048,34 @@ int monitor_set_cpu(int cpu_index)
+> > > >      if (cpu == NULL) {
+> > > >          return -1;
+> > > >      }
+> > > > -    cur_mon->mon_cpu = cpu;
+> > > > +    g_free(cur_mon->mon_cpu_path);
+> > > > +    cur_mon->mon_cpu_path = object_get_canonical_path(OBJECT(cpu));
+> > > >      return 0;
+> > > >  }
+> > > >  
+> > > >  CPUState *mon_get_cpu(void)
+> > > >  {
+> > > > -    if (!cur_mon->mon_cpu) {
+> > > > +    CPUState *cpu;
+> > > > +
+> > > > +    if (cur_mon->mon_cpu_path) {
+> > > > +        Object *obj = object_resolve_path(cur_mon->mon_cpu_path, NULL);
+> > > > +
+> > > > +        if (!obj) {
+> > > > +            g_free(cur_mon->mon_cpu_path);
+> > > > +            cur_mon->mon_cpu_path = NULL;
+> > > > +        } else {
+> > > > +            cpu = CPU(obj);      
+> > > this potentially might abort if obj couldn't be cast to TYPE_CPU
+> > >     
+> > 
+> > This is deliberate... is there a case where cur_mon->mon_cpu_path would
+> > legitimately point to something that isn't of type TYPE_CPU ?
+> >   
+> > >     
+> > > > +        }
+> > > > +    }
+> > > > +    if (!cur_mon->mon_cpu_path) {
+> > > >          if (!first_cpu) {
+> > > >              return NULL;
+> > > >          }
+> > > >          monitor_set_cpu(first_cpu->cpu_index);
+> > > > +        cpu = first_cpu;
+> > > >      }
+> > > > -    cpu_synchronize_state(cur_mon->mon_cpu);
+> > > > -    return cur_mon->mon_cpu;
+> > > > +    cpu_synchronize_state(cpu);
+> > > > +    return cpu;
+> > > >  }
+> > > >  
+> > > >  CPUArchState *mon_get_cpu_env(void)
+> > > > 
+> > > >       
+> > >     
+> > 
+> >   
+> 
