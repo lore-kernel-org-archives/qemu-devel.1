@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e3zHf-0001Tz-MN
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:53:56 -0400
+	(envelope-from <peterx@redhat.com>) id 1e3zHl-0001ZD-3D
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:54:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e3zHe-0002p5-Vd
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:53:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32948)
+	(envelope-from <peterx@redhat.com>) id 1e3zHi-0002s8-0i
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:54:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50978)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e3zHe-0002o4-PT
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:53:54 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e3zHh-0002rJ-Qw
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:53:57 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Mon, 16 Oct 2017 14:52:06 +0800
-Message-Id: <20171016065216.18162-23-peterx@redhat.com>
+Date: Mon, 16 Oct 2017 14:52:07 +0800
+Message-Id: <20171016065216.18162-24-peterx@redhat.com>
 In-Reply-To: <20171016065216.18162-1-peterx@redhat.com>
 References: <20171016065216.18162-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 22/32] migration: final handshake for the
- resume
+Subject: [Qemu-devel] [PATCH v3 23/32] migration: free SocketAddress where
+ allocated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,76 +27,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Finish the last step to do the final handshake for the recovery.
-
-First source sends one MIG_CMD_RESUME to dst, telling that source is
-ready to resume.
-
-Then, dest replies with MIG_RP_MSG_RESUME_ACK to source, telling that
-dest is ready to resume (after switch to postcopy-active state).
-
-When source received the RESUME_ACK, it switches its state to
-postcopy-active, and finally the recovery is completed.
+Freeing the SocketAddress struct in socket_start_incoming_migration is
+slightly confusing. Let's free the address in the same context where we
+allocated it.
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.c | 28 ++++++++++++++++++++++++----
- 1 file changed, 24 insertions(+), 4 deletions(-)
+ migration/socket.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 52f81c3add..edf7365b69 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1807,7 +1807,8 @@ static int migrate_handle_rp_resume_ack(MigrationState *s, uint32_t value)
-     migrate_set_state(&s->state, MIGRATION_STATUS_POSTCOPY_RECOVER,
-                       MIGRATION_STATUS_POSTCOPY_ACTIVE);
+diff --git a/migration/socket.c b/migration/socket.c
+index dee869044a..4879f11e0f 100644
+--- a/migration/socket.c
++++ b/migration/socket.c
+@@ -172,7 +172,6 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
  
--    /* TODO: notify send thread that time to continue send pages */
-+    /* Notify send thread that time to continue send pages */
-+    qemu_sem_post(&s->rp_state.rp_sem);
- 
-     return 0;
- }
-@@ -2290,6 +2291,21 @@ typedef enum MigThrError {
-     MIG_THR_ERR_FATAL = 2,
- } MigThrError;
- 
-+static int postcopy_resume_handshake(MigrationState *s)
-+{
-+    qemu_savevm_send_postcopy_resume(s->to_dst_file);
-+
-+    while (s->state == MIGRATION_STATUS_POSTCOPY_RECOVER) {
-+        qemu_sem_wait(&s->rp_state.rp_sem);
-+    }
-+
-+    if (s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-+        return 0;
-+    }
-+
-+    return -1;
-+}
-+
- /* Return zero if success, or <0 for error */
- static int postcopy_do_resume(MigrationState *s)
- {
-@@ -2307,10 +2323,14 @@ static int postcopy_do_resume(MigrationState *s)
+     if (qio_channel_socket_listen_sync(listen_ioc, saddr, errp) < 0) {
+         object_unref(OBJECT(listen_ioc));
+-        qapi_free_SocketAddress(saddr);
+         return;
      }
  
-     /*
--     * TODO: handshake with dest using MIG_CMD_RESUME,
--     * MIG_RP_MSG_RESUME_ACK, then switch source state to
--     * "postcopy-active"
-+     * Last handshake with destination on the resume (destination will
-+     * switch to postcopy-active afterwards)
-      */
-+    ret = postcopy_resume_handshake(s);
-+    if (ret) {
-+        error_report("%s: handshake failed: %d", __func__, ret);
-+        return ret;
-+    }
+@@ -181,7 +180,6 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
+                           socket_accept_incoming_migration,
+                           listen_ioc,
+                           (GDestroyNotify)object_unref);
+-    qapi_free_SocketAddress(saddr);
+ }
  
-     return 0;
+ void tcp_start_incoming_migration(const char *host_port, Error **errp)
+@@ -192,10 +190,12 @@ void tcp_start_incoming_migration(const char *host_port, Error **errp)
+         socket_start_incoming_migration(saddr, &err);
+     }
+     error_propagate(errp, err);
++    qapi_free_SocketAddress(saddr);
+ }
+ 
+ void unix_start_incoming_migration(const char *path, Error **errp)
+ {
+     SocketAddress *saddr = unix_build_address(path);
+     socket_start_incoming_migration(saddr, errp);
++    qapi_free_SocketAddress(saddr);
  }
 -- 
 2.13.5
