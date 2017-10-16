@@ -1,20 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e4BpA-0004mY-Vb
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 16:17:23 -0400
+	(envelope-from <david@redhat.com>) id 1e4Bvf-00024g-Mv
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 16:24:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e4BpA-0000NL-48
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 16:17:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:21459)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e4Bp9-0000Mx-UO
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 16:17:20 -0400
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 16 Oct 2017 21:16:50 +0100
-Message-Id: <20171016201650.18399-12-berrange@redhat.com>
-In-Reply-To: <20171016201650.18399-1-berrange@redhat.com>
-References: <20171016201650.18399-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v1 11/11] io: fix mem leak in websock error path
+	(envelope-from <david@redhat.com>) id 1e4Bve-0004Sv-GE
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 16:24:03 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Mon, 16 Oct 2017 22:23:56 +0200
+Message-Id: <20171016202358.3633-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 0/2] s390x/tcg: LAP support using immediate
+ TLB invalidation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +19,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, cohuck@redhat.com, Peter Maydell <peter.maydell@linaro.org>
 
-Coverity pointed out the 'date' is not free()d in the error
-path
+Details about Low-Address Protection can be found in description of
+patch 1 and 2. It is basically a subpage protection of the first two
+pages of every address space (for which it is enabled).
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- io/channel-websock.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+We can achieve this by simply directly invalidating the TLB entry and
+therefore forcing every write accesses onto these two pages into the slow
+path.
 
-diff --git a/io/channel-websock.c b/io/channel-websock.c
-index aa35ef3274..df2c3a9f99 100644
---- a/io/channel-websock.c
-+++ b/io/channel-websock.c
-@@ -341,7 +341,7 @@ static void qio_channel_websock_handshake_send_res_ok(QIOChannelWebsock *ioc,
-     char combined_key[QIO_CHANNEL_WEBSOCK_CLIENT_KEY_LEN +
-                       QIO_CHANNEL_WEBSOCK_GUID_LEN + 1];
-     char *accept = NULL;
--    char *date = qio_channel_websock_date_str();
-+    char *date = NULL;
- 
-     g_strlcpy(combined_key, key, QIO_CHANNEL_WEBSOCK_CLIENT_KEY_LEN + 1);
-     g_strlcat(combined_key, QIO_CHANNEL_WEBSOCK_GUID,
-@@ -360,6 +360,7 @@ static void qio_channel_websock_handshake_send_res_ok(QIOChannelWebsock *ioc,
-         return;
-     }
- 
-+    date = qio_channel_websock_date_str();
-     qio_channel_websock_handshake_send_res(
-         ioc, QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_OK, date, accept);
- 
+With this patch, I can boot Linux just fine (which uses LAP). This also
+makes all related kvm-unit-tests that we have pass.
+
+
+RFC -> v1:
+- fix LAP range check (Thomas)
+- SIGP fix got picked up
+
+Based on: https://github.com/cohuck/qemu.git s390-next
+Available on: https://github.com/dhildenb/qemu.git s390x_lap
+
+
+David Hildenbrand (2):
+  accel/tcg: allow to invalidate a write TLB entry immediately
+  s390x/tcg: low-address protection support
+
+ accel/tcg/cputlb.c           |  5 ++-
+ accel/tcg/softmmu_template.h |  4 +-
+ include/exec/cpu-all.h       |  3 ++
+ target/s390x/excp_helper.c   |  3 +-
+ target/s390x/mem_helper.c    |  8 ----
+ target/s390x/mmu_helper.c    | 94 +++++++++++++++++++++++++++-----------------
+ 6 files changed, 69 insertions(+), 48 deletions(-)
+
 -- 
 2.13.5
