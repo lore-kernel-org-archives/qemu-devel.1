@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1e4CDw-0006fC-7i
+	(envelope-from <mjt@tls.msk.ru>) id 1e4CDw-0006f9-77
 	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 16:42:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1e4CDt-0006Q2-3u
+	(envelope-from <mjt@tls.msk.ru>) id 1e4CDt-0006Q3-43
 	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 16:42:56 -0400
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Mon, 16 Oct 2017 23:33:40 +0300
-Message-Id: <aa1530dec499f7525d2ccaa0e3a876dc8089ed1e.1508185933.git.mjt@msgid.tls.msk.ru>
+Date: Mon, 16 Oct 2017 23:33:39 +0300
+Message-Id: <534fd8142fae81b621ff61524f319163d2bb1f7b.1508185933.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1508185933.git.mjt@msgid.tls.msk.ru>
 References: <cover.1508185933.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1508185933.git.mjt@msgid.tls.msk.ru>
 References: <cover.1508185933.git.mjt@msgid.tls.msk.ru>
-Subject: [Qemu-devel] [PULL 13/14] filter-mirror: segfault when specifying
- non existent device
+Subject: [Qemu-devel] [PULL 12/14] MAINTAINERS: Track default-configs/pci.mak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +22,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eduardo Otubo <otubo@redhat.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+Cc: Fam Zheng <famz@redhat.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
-From: Eduardo Otubo <otubo@redhat.com>
+From: Fam Zheng <famz@redhat.com>
 
-When using filter-mirror like the example below where the interface
-'ndev0' does not exist on the host, QEMU crashes into segmentation
-fault.
-
- $ qemu-system-x86_64 -S -machine pc -netdev user,id=ndev0 -object filter-mirror,id=test-object,netdev=ndev0
-
-This happens because the function filter_mirror_setup() does not check
-if the device actually exists and still keep on processing calling
-qemu_chr_find(). This patch fixes this issue.
-
-Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+Suggested-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
 ---
- net/filter-mirror.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/filter-mirror.c b/net/filter-mirror.c
-index 90e2c92337..ce0dc23c2a 100644
---- a/net/filter-mirror.c
-+++ b/net/filter-mirror.c
-@@ -213,6 +213,12 @@ static void filter_mirror_setup(NetFilterState *nf, Error **errp)
-     MirrorState *s = FILTER_MIRROR(nf);
-     Chardev *chr;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6ce393f50d..162e914a2d 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -934,6 +934,7 @@ F: hw/pci/*
+ F: hw/pci-bridge/*
+ F: docs/pci*
+ F: docs/specs/*pci*
++F: default-configs/pci.mak
  
-+    if (s->outdev == NULL) {
-+        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND, "filter-mirror parameter"\
-+                  " 'outdev' cannot be empty");
-+        return;
-+    }
-+
-     chr = qemu_chr_find(s->outdev);
-     if (chr == NULL) {
-         error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+ ACPI/SMBIOS
+ M: Michael S. Tsirkin <mst@redhat.com>
 -- 
 2.11.0
