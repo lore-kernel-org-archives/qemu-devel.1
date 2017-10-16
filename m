@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wlfightup@gmail.com>) id 1e44Mt-0004Eh-Em
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 08:19:44 -0400
+	(envelope-from <david@redhat.com>) id 1e44NY-0004nP-4i
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 08:20:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wlfightup@gmail.com>) id 1e44Ms-0003VJ-NL
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 08:19:39 -0400
-Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:45899)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <wlfightup@gmail.com>) id 1e44Ms-0003UT-JC
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 08:19:38 -0400
-Received: by mail-oi0-x232.google.com with SMTP id f66so24767052oib.2
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 05:19:37 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1e44NS-00042n-2G
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 08:20:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53600)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1e44NR-00041R-GD
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 08:20:13 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8378381DED
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 12:20:12 +0000 (UTC)
+References: <20171016091802.11532-1-david@redhat.com>
+	<ccae3743-2b8e-bca5-a124-10242f477836@redhat.com>
+	<994593b1-1115-46d2-e721-e436a6659cf8@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <49690f7c-7cd7-6930-7b02-be26962add5f@redhat.com>
+Date: Mon, 16 Oct 2017 14:20:10 +0200
 MIME-Version: 1.0
-From: Paul Schlacter <wlfightup@gmail.com>
-Date: Mon, 16 Oct 2017 20:19:36 +0800
-Message-ID: <CADak6y6tAEZoO544xK3A5EnJ_mL4hQNJOZA6-_WOYrio9_Krgg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] use qemu dataplane report '.x-data-plane' not found
+In-Reply-To: <994593b1-1115-46d2-e721-e436a6659cf8@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] memory: call log_start after region_add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,10 +35,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>
 
-qemu-kvm: -device
-virtio-blk-pci,scsi=off,bus=pci.0,addr=0x5,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1:
-Property '.x-data-plane' not found
+On 16.10.2017 14:19, Paolo Bonzini wrote:
+> On 16/10/2017 11:36, David Hildenbrand wrote:
+>>> -        if (fr->dirty_log_mask && listener->log_start) {
+>>> -            listener->log_start(listener, &section, 0, fr->dirty_log_mask);
+>>> -        }
+>>>          if (listener->region_add) {
+>>>              listener->region_add(listener, &section);
+>>>          }
+>>> +        if (fr->dirty_log_mask && listener->log_start) {
+>>> +            listener->log_start(listener, &section, 0, fr->dirty_log_mask);
+>>> +        }
+>>>      }
+>>>      if (listener->commit) {
+>>>          listener->commit(listener);
+>>>
+>> ... deciding to tolerate it in KVM instead (just as it used to be), so
+>> please ignore this patch.
+> 
+> Why?  It makes no sense to start logging on a non-existent region, and
+> this behavior is unique to listener_add_address_space.
 
-What is wrong with this report? is Compiler qemu lost parameters?
+As you requested, will add everything into one patch series and send out
+for review.
+
+Thanks!
+
+-- 
+
+Thanks,
+
+David
