@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e40An-00069t-QN
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 03:50:54 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e40N6-0008Be-Ul
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 04:03:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e40Ak-0004kq-N9
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 03:50:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54566)
+	(envelope-from <imammedo@redhat.com>) id 1e40N3-0002or-Ra
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 04:03:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48536)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e40Ak-0004kU-EV
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 03:50:50 -0400
-Date: Mon, 16 Oct 2017 15:50:39 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171016075039.GD4166@pxdev.xzpeter.org>
-References: <20170929033844.26935-1-peterx@redhat.com>
-	<20170929033844.26935-14-peterx@redhat.com>
-	<20171012125045.GF5957@stefanha-x1.localdomain>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e40N3-0002nu-M4
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 04:03:33 -0400
+Date: Mon, 16 Oct 2017 10:03:29 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171016100329.63e7e7c9@nial.brq.redhat.com>
+In-Reply-To: <20171013191316.GB4178@localhost.localdomain>
+References: <1507211474-188400-1-git-send-email-imammedo@redhat.com>
+	<20171012182746.670939d0@nial.brq.redhat.com>
+	<20171013191316.GB4178@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171012125045.GF5957@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [RFC v2 13/22] monitor: separate QMP parser and
- dispatcher
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 00/40] generalize parsing of cpu_model
+ (part 2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,113 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
 
-On Thu, Oct 12, 2017 at 01:50:45PM +0100, Stefan Hajnoczi wrote:
-> On Fri, Sep 29, 2017 at 11:38:35AM +0800, Peter Xu wrote:
-> > Originally QMP is going throw these steps:
-> 
-> s/is going throw/goes through/
+On Fri, 13 Oct 2017 16:13:16 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-Fixed.
-
-> 
+> On Thu, Oct 12, 2017 at 06:27:46PM +0200, Igor Mammedov wrote:
+> > On Thu,  5 Oct 2017 15:50:34 +0200
+> > Igor Mammedov <imammedo@redhat.com> wrote:
 > > 
-> >   JSON Parser --> QMP Dispatcher --> Respond
-> >       /|\    (2)                (3)     |
-> >    (1) |                               \|/ (4)
-> >        +---------  main thread  --------+
+> > Eduardo,
 > > 
-> > This patch does this:
-> > 
-> >   JSON Parser     QMP Dispatcher --> Respond
-> >       /|\ |           /|\       (4)     |
-> >        |  | (2)        | (3)            |  (5)
-> >    (1) |  +----->      |               \|/
-> >        +---------  main thread  <-------+
-> > 
-> > So the parsing job and the dispatching job is isolated now.  It gives us
-> > a chance in following up patches to totally move the parser outside.
-> > 
-> > The isloation is done using one QEMUBH. Only one dispatcher QEMUBH is
-> > used for all the monitors.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  monitor.c | 156 +++++++++++++++++++++++++++++++++++++++++++++++++++++---------
-> >  1 file changed, 133 insertions(+), 23 deletions(-)
-> > 
-> > diff --git a/monitor.c b/monitor.c
-> > index 7b76dff5ad..1e9a6cb6a5 100644
-> > --- a/monitor.c
-> > +++ b/monitor.c
-> > @@ -208,10 +208,14 @@ struct Monitor {
-> >      mon_cmd_t *cmd_table;
-> >      QLIST_HEAD(,mon_fd_t) fds;
-> >      QTAILQ_ENTRY(Monitor) entry;
-> > +    /* Input queue that hangs all the parsed QMP requests */
+> > Could you merge series via machine tree, pls?  
 > 
-> s/hangs/holds/
-
-Fixed.
-
+> I just queued it on machine-next.  Pull request will be sent only
+> next week, though.
 > 
-> > +static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens,
-> > +                               void *opaque)
-> > +{
-> > +    QObject *req, *id = NULL;
-> > +    QDict *qdict = NULL;
-> > +    Monitor *mon = opaque;
-> > +    Error *err = NULL;
-> > +    QMPRequest *req_obj;
-> > +
-> > +    req = json_parser_parse_err(tokens, NULL, &err);
-> > +    if (!req && !err) {
-> > +        /* json_parser_parse_err() sucks: can fail without setting @err */
-> > +        error_setg(&err, QERR_JSON_PARSING);
-> > +    }
-> > +    if (err) {
-> > +        monitor_qmp_respond(mon, NULL, err, NULL);
-> > +        qobject_decref(req);
-> 
-> Is there a return statement missing here?
 
-Hmm... Very possible!
-
-Fixed.
-
-> 
-> > +    }
-> > +
-> > +    qdict = qobject_to_qdict(req);
-> > +    if (qdict) {
-> > +        id = qdict_get(qdict, "id");
-> > +        qobject_incref(id);
-> > +        qdict_del(qdict, "id");
-> > +    } /* else will fail qmp_dispatch() */
-> > +
-> > +    req_obj = g_new0(QMPRequest, 1);
-> > +    req_obj->mon = mon;
-> > +    req_obj->id = id;
-> > +    req_obj->req = req;
-> > +
-> > +    /*
-> > +     * Put the request to the end of queue so that requests will be
-> > +     * handled in time order.  Ownership for req_obj, req, id,
-> > +     * etc. will be delivered to the handler side.
-> > +     */
-> > +    g_queue_push_tail(mon->qmp_requests, req_obj);
-> > +
-> > +    /* Kick the dispatcher routine */
-> > +    qemu_bh_schedule(mon_global.qmp_dispatcher_bh);
-> 
-> How is thread-safety ensured when accessing qmp_requests?
-
-It's a GQueue.  I assume GQueue is thread safe itself as long as
-g_thread_init() is called?
-
-Thanks,
-
--- 
-Peter Xu
+Thanks!
