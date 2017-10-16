@@ -1,42 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.vnet.ibm.com>) id 1e48vN-0003sK-9j
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:11:34 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e491c-0006co-Mr
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:18:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.vnet.ibm.com>) id 1e48vK-00085B-6M
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:11:33 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39728
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jjherne@linux.vnet.ibm.com>)
-	id 1e48vK-00084s-0q
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:11:30 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9GH983j019560
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 13:11:25 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dn01jjmvf-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 13:11:24 -0400
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <jjherne@linux.vnet.ibm.com>;
-	Mon, 16 Oct 2017 11:11:24 -0600
-Reply-To: jjherne@linux.vnet.ibm.com
-References: <1507729193-9747-1-git-send-email-jjherne@linux.vnet.ibm.com>
-	<20171016154433.246fb264.cohuck@redhat.com>
-From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
-Date: Mon, 16 Oct 2017 13:11:19 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e491Y-00051F-ND
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:18:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34220)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e491Y-00050m-Gf
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:17:56 -0400
+Date: Mon, 16 Oct 2017 15:17:52 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171016171752.GK3246@localhost.localdomain>
+References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
+	<1508170976-96869-5-git-send-email-imammedo@redhat.com>
+	<20171016165916.GI3246@localhost.localdomain>
+	<4c14ed02-1f1c-a093-52ac-632f61a68a6f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171016154433.246fb264.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <bc948ac4-6efd-63e2-35e3-e7be6c656536@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] s390x/event-facility: variable-length
- event masks
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4c14ed02-1f1c-a093-52ac-632f61a68a6f@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 4/6] CLI: add -paused option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,64 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com, pkrempa@redhat.com, david@gibson.dropbear.id.au, peter.maydell@linaro.org, cohuck@redhat.com
 
-On 10/16/2017 09:44 AM, Cornelia Huck wrote:
-> On Wed, 11 Oct 2017 09:39:53 -0400
-> "Jason J. Herne" <jjherne@linux.vnet.ibm.com> wrote:
->> ...
+On Mon, Oct 16, 2017 at 07:01:01PM +0200, Paolo Bonzini wrote:
+> On 16/10/2017 18:59, Eduardo Habkost wrote:
+> >> +DEF("paused", HAS_ARG, QEMU_OPTION_paused, \
+> >> +    "-paused [state=]postconf|preconf\n"
+> >> +    "                postconf: pause QEMU after machine is initialized\n"
+> >> +    "                preconf: pause QEMU before machine is initialized\n",
+> >> +    QEMU_ARCH_ALL)
+> > I would like to allow pausing before machine-type is selected, so
+> > management could run query-machines before choosing a
+> > machine-type.  Would that need a third "-pause" mode, or will we
+> > be able to change "preconf" to pause before select_machine() is
+> > called?
+> > 
+> > The same probably applies to other things initialized before
+> > machine_run_board_init() that could be configurable using QMP,
+> > including but not limited to:
+> > * Accelerator configuration
+> > * Registering global properties
+> > * RAM size
+> > * SMP/CPU configuration
 > 
-> Out of curiousity: Do you have a guest that can verify this for mask
-> lengths != 4? Given that the guest I wrote that one for back then is
-> not publicly available...
+> Should (or could) "-M none" be changed in a backwards-compatible way to
+> allow such preconfiguration?  For example
 > 
+>   qemu -M none -monitor stdio
+>   (qemu) machine-set-options pc,accel=kvm
+>   (qemu) c
 
-I do have a guest OS that exercises larger mask lengths. Nothing 
-publicly available however.
-
->> ...
->>   static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
->>   {
->>       WriteEventMask *we_mask = (WriteEventMask *) sccb;
->> +    uint16_t mask_length = be16_to_cpu(we_mask->mask_length);
->> +    uint32_t tmp_mask;
->>   
->> -    /* Attention: We assume that Linux uses 4-byte masks, what it actually
->> -       does. Architecture allows for masks of variable size, though */
->> -    if (be16_to_cpu(we_mask->mask_length) != 4) {
->> +    if (!mask_length || (mask_length > SCLP_EVENT_MASK_LEN_MAX)) {
->>           sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_MASK_LENGTH);
->>           goto out;
->>       }
->>   
->> +    /*
->> +     * Note: We currently only support masks up to 4 byte length;
->> +     *       the remainder is filled up with zeroes. Linux uses
->> +     *       a 4 byte mask length.
->> +     */
-> 
-> Do you have any plans for extending this? Or is there no need?
-> 
-> (I have to ask those questions, as the documentation is not publicly
-> available...)
-> 
-
-As of right now 4B is all that is actually needed for any of the masks. 
-The reason to allow for 32 byte requests is for guest operating systems 
-who are already planning for the future. Someday more than 4B may be 
-used but we have no way to know if or when.
-
->> ...
-> 
-> Patch looks reasonable as far as I can see (the documentation issue
-> again...)
-> 
-> Did you need to change much from the original patch?
-> 
-
-Very little. Just a quick forward fit and test and all is well :)
-Thanks for the original work. This saved me some time.
+Sounds like an interesting idea.  It would require ensuring it's
+really safe to destroy current_machine/accel (and other global
+state) and replace them with another object on the fly (which is
+probably a nice goal by itself).
 
 -- 
--- Jason J. Herne (jjherne@linux.vnet.ibm.com)
+Eduardo
