@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58810)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <michael@fritscher.net>) id 1e3y09-00054c-Oh
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 01:31:46 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1e3yc0-0002Jp-DO
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:10:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <michael@fritscher.net>) id 1e3y06-0002VW-KN
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 01:31:45 -0400
-Received: from mifritscher.de ([188.40.170.105]:58664
-	helo=mail.mifritscher.vserverkompetenz.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <michael@fritscher.net>)
-	id 1e3y06-0002Ul-E0
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 01:31:42 -0400
-Message-ID: <c5422d95248bbc83fb27c0b992f85aad.squirrel@mifritscher.de>
-In-Reply-To: <20171015215055.19dbecc1@bahia.lan>
-References: <20170929111323.6308-1-michael@fritscher.net>
-	<c6489dce-108d-e163-589d-11e6f2c227da@redhat.com>
-	<c507f03f377b2496da5e08af037a14ee.squirrel@mifritscher.de>
-	<497f0cbe-3441-ae6b-ad25-0ebc092318cc@redhat.com>
-	<693169b0c0e3904c935db314432bf671.squirrel@mifritscher.de>
-	<f43e0c376d23066ee08736c43f99100d.squirrel@mifritscher.de>
-	<20171015215055.19dbecc1@bahia.lan>
-Date: Mon, 16 Oct 2017 07:31:38 +0200
-From: "Michael Fritscher" <michael@fritscher.net>
+	(envelope-from <gengdongjiu@huawei.com>) id 1e3ybw-00086H-Dl
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:10:52 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2325)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <gengdongjiu@huawei.com>) id 1e3ybv-00082B-QG
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:10:48 -0400
+References: <8ba7e693-4e32-7873-70bf-4efbf57f9cf5@huawei.com>
+	<20170928011407-mutt-send-email-mst@kernel.org>
+	<405bbc99-1a43-aa8b-37e9-9599480f4c06@huawei.com>
+	<20171001063010-mutt-send-email-mst@kernel.org>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <49d576f3-454f-05f4-7afd-9ca8b5fb0706@huawei.com>
+Date: Mon, 16 Oct 2017 14:10:05 +0800
 MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Make 9pfs buildable for Windows
+In-Reply-To: <20171001063010-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] using which notification for guest about GHES error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,29 +30,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Michael Fritscher <michael@fritscher.net>, Paolo Bonzini <pbonzini@redhat.com>, sw@weilnetz.de, aneesh.kumar@linux.vnet.ibm.com, mst@redhat.com, qemu-devel@nongnu.org, gkurz@linux.vnet.ibm.com
+To: "Michael S. Tsirkin" <mst@redhat.com>, James Morse <james.morse@arm.com>
+Cc: imammedo@redhat.com, Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Wuquanming <wuquanming@huawei.com>, Huangshaoyu <huangshaoyu@huawei.com>
 
->> I see one thing: symlinks somewhere in the path (which seemed to be th=
-e
->> reason introducing the *at family). But I think that this can be handl=
-ed
->> by canonlizing the path, too. realpath should do the job quite well.
+Hi Igor/Michael,
+   I am very sorry to disturb you again.
+Now we use Qemu to create APEI table and record CPER for guest,
+After QEMU recorded a asynchronous CPER error, we needs to notify guest using interrupt or Polled notification.
+For the asynchronous error. I think using GPIO-signaled notification may be better in the Qemu, and also which is suggested by APEI spec.
+James worried that old guest OS may not support GPIO or GSIV notification for GHES, because GPIO or GSIV notification is supported in OS since about kernel version 4.10.
+and suggested using Polled notification. About above two notifications, do you think which is better? and could you give us some suggestion? thanks.
+
+
+Hi James,
+  Below is APEI spec, From the spec, it suggested using GPIO interrupt or GPIO-signaled events in ARM64 [1]. If using Polled notification for GHES, I do not sure whether it is reasonable.
+In the Qemu, X86 does not using Polled notification. it mainly use SCI. Until now, I do not found there is peopled using Polled notification in qemu. if implemented polled notification, I
+do not know how much work effort need to do. Now I have already implemented the GPIO-Signal notification using GPIO pin.
+
+
+[1]
+HW-reduced ACPI platforms signal the error using a GPIO interrupt or another interrupt declared under a generic event device (Section 5.6.9). In the case of GPIO-signaled events,
+an _AEI object lists the appropriate GPIO pin, while for Interrupt-signaled events a _CRS object is used to list the interrupt:
+	• The OSPM evaluates the control method associated with this event as indicated in Section 5.6.5.3 and Section 5.6.9.3.
+	• OSPM responds to this notification by checking the error status block of all generic error sources with the GPIO-Signal notification or Interrupt-signaled notification types to identify the
+	  source reporting the error.
+
+
+
+
+
+On 2017/10/1 11:30, Michael S. Tsirkin wrote:
+> On Thu, Sep 28, 2017 at 06:10:05PM +0800, gengdongjiu wrote:
 >>
->
-> Unfortunately now because we have TOCTOU condition here: some path elem=
-ent
-> could be replaced by a symlink after realpath() but before we actually
-> pass
-> the resulting path to a syscall.
->
-
-Hi,
-
-my mistake was that thinking that O_NOFOLLOW prevents following any
-symlink in the path, but it prevents only following if the pathname itsel=
-f
-is a symlink...
-
-Best regards,
-Michael Frischer
+>>
+>> On 2017/9/28 6:15, Michael S. Tsirkin wrote:
+>>> On Wed, Sep 27, 2017 at 07:32:35PM +0800, gengdongjiu wrote:
+>>>> Hi Igor/Laszlo
+>>>>
+>>>>    I am very sorry to disturb you. I have a question that want to consult with you.
+>>>> Now In ARM64 platform I need to send a IRQ notification to guest OS through Qemu, so that guest OS can receive a IRQ notification and parse the APEI table.
+>>>> but Now I do not find a proper API to send the IRQ notification to guest, seems X86 mainly uses the API "acpi_send_gpe_event"
+>>>> in the ARM64 platform, whether we have existed API that can send IRQ notification to guest? thank you very much in advance.
+>>>
+>>> ACPI events fundamentally go through the GPE mechanism. As the spec
+>>> says:
+>>>
+>>> 	ACPI Event Programming Model
+>>> 	The ACPI event programming model is based on the SCI interrupt and General-Purpose Event
+>>> 	(GPE) register.
+>>
+>> got it, thanks Michael
+> 
+> As Igor pointed out, the next spec sentence states that reduced HW
+> configurations use GPIO.
+> 
+>>>
+>>>
+>>>>
+>>>> [1]
+>>>> void acpi_send_gpe_event(ACPIREGS *ar, qemu_irq irq,
+>>>>                          AcpiEventStatusBits status)
+>>>> {
+>>>>     ar->gpe.sts[0] |= status;
+>>>>     acpi_update_sci(ar, irq);
+>>>> }
+>>>>
+>>>> void acpi_update_sci(ACPIREGS *regs, qemu_irq irq)
+>>>> {
+>>>>     int sci_level, pm1a_sts;
+>>>>
+>>>>     pm1a_sts = acpi_pm1_evt_get_sts(regs);
+>>>>
+>>>>     sci_level = ((pm1a_sts &
+>>>>                   regs->pm1.evt.en & ACPI_BITMASK_PM1_COMMON_ENABLED) != 0) ||
+>>>>                 ((regs->gpe.sts[0] & regs->gpe.en[0]) != 0);
+>>>>
+>>>>     qemu_set_irq(irq, sci_level);
+>>>>
+>>>>     /* schedule a timer interruption if needed */
+>>>>     acpi_pm_tmr_update(regs,
+>>>>                        (regs->pm1.evt.en & ACPI_BITMASK_TIMER_ENABLE) &&
+>>>>                        !(pm1a_sts & ACPI_BITMASK_TIMER_STATUS));
+>>>> }
+>>>
+>>> .
+>>>
+> 
+> .
+> 
