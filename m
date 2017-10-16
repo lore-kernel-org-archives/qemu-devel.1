@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e4DoL-00034X-Hp
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 18:24:38 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e4ECe-0001Pw-1g
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 18:49:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e4DoG-00030S-Je
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 18:24:37 -0400
-Received: from mail-pf0-x231.google.com ([2607:f8b0:400e:c00::231]:45037)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e4DoG-0002zi-CV
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 18:24:32 -0400
-Received: by mail-pf0-x231.google.com with SMTP id x7so16854473pfa.1
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 15:24:32 -0700 (PDT)
-References: <20171013162438.32458-1-alex.bennee@linaro.org>
-	<20171013162438.32458-18-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <60365412-0554-1a29-3331-a0de913a5443@linaro.org>
-Date: Mon, 16 Oct 2017 15:24:27 -0700
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e4ECa-0008NG-W4
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 18:49:44 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170922154014.29350-1-f4bug@amsat.org>
+	<f49c0fb8-5232-ff31-e18b-217c79afb7ee@msgid.tls.msk.ru>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <28251758-632c-97ba-9815-8d9d53a95c23@amsat.org>
+Date: Mon, 16 Oct 2017 19:49:32 -0300
 MIME-Version: 1.0
-In-Reply-To: <20171013162438.32458-18-alex.bennee@linaro.org>
+In-Reply-To: <f49c0fb8-5232-ff31-e18b-217c79afb7ee@msgid.tls.msk.ru>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 17/30] target/arm/translate-a64.c: add
- FP16 FMULX
+Subject: Re: [Qemu-devel] [PATCH 00/34] remove i386/pc dependency from
+ non-PC world (part 1)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +29,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+To: Michael Tokarev <mjt@tls.msk.ru>, Eduardo Habkost <ehabkost@redhat.com>, Eduardo Otubo <otubo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-On 10/13/2017 09:24 AM, Alex Bennée wrote:
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -10648,7 +10648,7 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
->          }
->          /* fall through */
->      case 0x9: /* FMUL, FMULX */
-> -        if (!extract32(size, 1, 1)) {
-> +        if (!extract32(size, 1, 1) && !arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
->              unallocated_encoding(s);
->              return;
->          }
+Hi Michael,
 
-This isn't quite right --
+Thanks for your comments!
 
-  00 = fp16
-  10 = fp32
-  11 = fp64
+>>   hw: remove "qemu/osdep.h" from header files
+> not applied, doing two things, suggested split-up
+> (I'm fine with it as it is)
 
-You still need to diagnose 01.
+split out MAINTAINERS entry
 
-> @@ -10805,10 +10817,23 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
->                  gen_helper_vfp_muladds(tcg_res, tcg_op, tcg_idx, tcg_res, fpst);
->                  break;
->              case 0x9: /* FMUL, FMULX */
-> -                if (u) {
-> -                    gen_helper_vfp_mulxs(tcg_res, tcg_op, tcg_idx, fpst);
-> -                } else {
-> -                    gen_helper_vfp_muls(tcg_res, tcg_op, tcg_idx, fpst);
-> +                switch (size) {
-> +                case 1:
+>>   i386/hax: remove duplicated includes
+> applied (note it can be trimmed more)
 
-MO_* here, since you converted to them above.
+done in another patch.
 
+>>   misc: avoid "include/" in include path
+> not applied, probably should be split, but I'm fine with it as it is
 
-r~
+split out numa.c
+
+>>   hw/timer/i8254: rename pit_init() -> i8254_pit_init()
+> not applied, split?
+
+split out MAINTAINERS entry
+
+>>   hw/display/vga: remove the old i386/pc dependency
+> somehow I can't find this patch, neither in my inbox nor in patchwork
+
+weird...
+
+>>   hw/input/i8042: extract API from hw/i386/pc.h
+> CHECK
+
+split out MAINTAINERS entry
+
+>>   hw/dma/i8257: rename DMA_init() to i8257_dma_init()
+> not applied, pending **errp addition
+
+attempt to fix it...
+
+>>   hw/timer/m48t59: use TYPE_M48T59_ISA, add entries to MAINTAINERS
+> not applied, it went out of context without i8257_dma_init rename
+> btw, why do we prefer these TYPE_XXX things instead of simple "xxx" stuff?
+
+split out MAINTAINERS entry, dropped out TYPE_M48T59_ISA use.
+
+>>   hw/pci: declare pci_nic_init_nofail() in "hw/net/pci.h"
+> not applied, it does more than mentioned
+
+dropped from this series.
+
+>>   hw/net/e1000: use TYPE_PCI_E1000
+>>   hw/net/e1000e: use TYPE_PCI_E1000E
+>>   hw/net/pcnet: use TYPE_PCI_PCNET
+>>   hw/net/rtl8139: use TYPE_PCI_RTL8139
+>>   hw/net/ne2000: use TYPE_PCI_NE2000
+> 
+> Not applied, at least not yet, why do we use these TYPE_XX stuff to
+> start with?
+
+TYPE_XX is the interface, having the devices using TYPE_XX instead of
+hardcoded name guarantee safe rename/refactor.
+
+anyway, dropped.
+
+> Applying these series is quite a bit boring task I'd say :)
+
+separating them from the whole branch too! but they are required for the
+final objective which I'll send in 3 or 4 parts.
+
+Regards,
+
+Phil.
