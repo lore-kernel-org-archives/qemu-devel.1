@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e45GD-00067T-VO
+	(envelope-from <kraxel@redhat.com>) id 1e45GE-00067m-Hk
 	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:16:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e45GA-0004qv-OE
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:16:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:22467)
+	(envelope-from <kraxel@redhat.com>) id 1e45GC-0004sS-Sj
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:16:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34934)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e45GA-0004qT-FK
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:16:46 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e45GC-0004ri-Kn
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:16:48 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8A4977E3A0
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 13:16:45 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C00CB641C2
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 13:16:47 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 16 Oct 2017 15:16:36 +0200
-Message-Id: <20171016131644.9565-4-kraxel@redhat.com>
-In-Reply-To: <20171016131644.9565-1-kraxel@redhat.com>
-References: <20171016131644.9565-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 03/11] ui: add keycodemapdb repository as a GIT
- submodule
+Date: Mon, 16 Oct 2017 15:16:33 +0200
+Message-Id: <20171016131644.9565-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 00/11] Ui 20171016 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,142 +28,99 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
+The following changes since commit f90ea7ba7c5ae7010ee0ce062207ae42530f57d6:
 
-The https://gitlab.com/keycodemap/keycodemapdb/ repo contains a
-data file mapping between all the different scancode/keycode/keysym
-sets that are known, and a tool to auto-generate lookup tables for
-different combinations.
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20171012' into staging (2017-10-12 17:06:50 +0100)
 
-It is used by GTK-VNC, SPICE-GTK and libvirt for mapping keys.
-Using it in QEMU will let us replace many hand written lookup
-tables with auto-generated tables from a master data source,
-reducing bugs. Adding new QKeyCodes will now only require the
-master table to be updated, all ~20 other tables will be
-automatically updated to follow.
+are available in the git repository at:
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170929101201.21039-4-berrange@redhat.com
+  git://git.kraxel.org/qemu tags/ui-20171016-pull-request
 
-[ kraxel: fix build ]
-[ kraxel: switch repo to qemu.git mirror ]
+for you to fetch changes up to 2ff408de9c080f2fb5a94ebf6a209c6180c64933:
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- configure                 |  8 +++++++-
- Makefile                  | 24 +++++++++++++++++++++++-
- .gitignore                |  1 +
- .gitmodules               |  3 +++
- scripts/archive-source.sh |  2 +-
- ui/keycodemapdb           |  1 +
- 6 files changed, 36 insertions(+), 3 deletions(-)
+  gtk: fix wrong id between texture and framebuffer (2017-10-16 14:50:54 +0200)
+
+----------------------------------------------------------------
+ui: use keycodemapdb for key code mappings, part one (v2)
+ui: add qemu-keymap, update reverse keymaps (for qemu -k $map)
+ui: fix for vte 0.50
+ui: gtk texture fix
+
+----------------------------------------------------------------
+
+Anthoine Bourgeois (1):
+  gtk: fix wrong id between texture and framebuffer
+
+Anthony PERARD (1):
+  ui/gtk: Fix deprecation of vte_terminal_copy_clipboard
+
+Daniel P. Berrange (6):
+  build: automatically handle GIT submodule checkout for dtc
+  docker: don't rely on submodules existing in the main checkout
+  ui: add keycodemapdb repository as a GIT submodule
+  ui: convert common input code to keycodemapdb
+  ui: convert key events to QKeyCodes immediately
+  ui: don't export qemu_input_event_new_key
+
+Gerd Hoffmann (3):
+  tools: add qemu-keymap
+  Add pc-bios/keymaps/Makefile
+  pc-bios/keymaps: keymaps update
+
+ configure                 |   75 ++-
+ Makefile                  |   54 ++-
+ include/ui/input.h        |   12 +-
+ qemu-keymap.c             |  258 +++++++++++
+ ui/gtk-gl-area.c          |    3 +-
+ ui/gtk.c                  |    5 +
+ ui/input-keymap.c         |  336 +-------------
+ ui/input.c                |   24 +-
+ .gitignore                |    2 +
+ .gitmodules               |    3 +
+ MAINTAINERS               |    6 +
+ pc-bios/keymaps/Makefile  |   56 +++
+ pc-bios/keymaps/ar        |  819 +++++++++++++++++++++++++++++----
+ pc-bios/keymaps/bepo      | 1108 +++++++++++++++++++++++++++++++--------------
+ pc-bios/keymaps/cz        |  861 ++++++++++++++++++++++++++++++++---
+ pc-bios/keymaps/da        |  732 +++++++++++++++++++++++++++++-
+ pc-bios/keymaps/de        |  767 ++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/de-ch     |  915 ++++++++++++++++++++++++++++++++-----
+ pc-bios/keymaps/en-gb     |  724 ++++++++++++++++++++++++++++-
+ pc-bios/keymaps/en-us     |  718 ++++++++++++++++++++++++++++-
+ pc-bios/keymaps/es        |  744 +++++++++++++++++++++++++++++-
+ pc-bios/keymaps/et        |  818 +++++++++++++++++++++++++++++----
+ pc-bios/keymaps/fi        |  814 ++++++++++++++++++++++++++++++---
+ pc-bios/keymaps/fo        |  881 ++++++++++++++++++++++++++++++++---
+ pc-bios/keymaps/fr        |  704 +++++++++++++++++++++++++++-
+ pc-bios/keymaps/fr-be     |  724 ++++++++++++++++++++++++++++-
+ pc-bios/keymaps/fr-ca     |  804 ++++++++++++++++++++++++++++++--
+ pc-bios/keymaps/fr-ch     |  800 ++++++++++++++++++++++++++++++--
+ pc-bios/keymaps/hr        |  752 +++++++++++++++++++++++++++++-
+ pc-bios/keymaps/hu        |  887 ++++++++++++++++++++++++++++++++----
+ pc-bios/keymaps/is        |  802 +++++++++++++++++++++++++++++---
+ pc-bios/keymaps/it        |  757 ++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/ja        |  792 +++++++++++++++++++++++++++++---
+ pc-bios/keymaps/lt        |  844 ++++++++++++++++++++++++++++++++--
+ pc-bios/keymaps/lv        |  766 +++++++++++++++++++++++++++++--
+ pc-bios/keymaps/mk        |  814 +++++++++++++++++++++++++++++----
+ pc-bios/keymaps/nl        |  794 +++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/no        |  758 ++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/pl        |  789 ++++++++++++++++++++++++++++++--
+ pc-bios/keymaps/pt        |  737 +++++++++++++++++++++++++++++-
+ pc-bios/keymaps/pt-br     |  775 ++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/ru        |  835 ++++++++++++++++++++++++++++++----
+ pc-bios/keymaps/th        |  878 +++++++++++++++++++++++++++++------
+ pc-bios/keymaps/tr        |  819 ++++++++++++++++++++++++++++++---
+ scripts/archive-source.sh |   34 +-
+ scripts/git-submodule.sh  |   38 ++
+ ui/keycodemapdb           |    1 +
+ 47 files changed, 24564 insertions(+), 2075 deletions(-)
+ create mode 100644 qemu-keymap.c
+ create mode 100644 pc-bios/keymaps/Makefile
+ create mode 100755 scripts/git-submodule.sh
  create mode 160000 ui/keycodemapdb
 
-diff --git a/configure b/configure
-index 38f1710c80..06f18ea9af 100755
---- a/configure
-+++ b/configure
-@@ -264,7 +264,13 @@ cc_i386=i386-pc-linux-gnu-gcc
- libs_qga=""
- debug_info="yes"
- stack_protector=""
--git_submodules=""
-+
-+if test -e "$source_path/.git"
-+then
-+    git_submodules="ui/keycodemapdb"
-+else
-+    git_submodules=""
-+fi
- 
- # Don't accept a target_list environment variable.
- unset target_list
-diff --git a/Makefile b/Makefile
-index 9866909e08..7b9b93c3dc 100644
---- a/Makefile
-+++ b/Makefile
-@@ -33,7 +33,7 @@ git-submodule-update:
- endif
- endif
- 
--.git-submodule-status: git-submodule-update
-+.git-submodule-status: git-submodule-update config-host.mak
- 
- # Check that we're not trying to do an out-of-tree build from
- # a tree that's been used for an in-tree build.
-@@ -213,6 +213,28 @@ trace-dtrace-root.h: trace-dtrace-root.dtrace
- 
- trace-dtrace-root.o: trace-dtrace-root.dtrace
- 
-+KEYCODEMAP_GEN = $(SRC_PATH)/ui/keycodemapdb/tools/keymap-gen
-+KEYCODEMAP_CSV = $(SRC_PATH)/ui/keycodemapdb/data/keymaps.csv
-+
-+KEYCODEMAP_FILES = \
-+		 $(NULL)
-+
-+GENERATED_FILES += $(KEYCODEMAP_FILES)
-+
-+ui/input-keymap-%.c: $(KEYCODEMAP_GEN) $(KEYCODEMAP_CSV) $(SRC_PATH)/ui/Makefile.objs
-+	$(call quiet-command,\
-+	    src=$$(echo $@ | sed -E -e "s,^ui/input-keymap-(.+)-to-(.+)\.c$$,\1,") && \
-+	    dst=$$(echo $@ | sed -E -e "s,^ui/input-keymap-(.+)-to-(.+)\.c$$,\2,") && \
-+	    test -e $(KEYCODEMAP_GEN) && \
-+	    $(PYTHON) $(KEYCODEMAP_GEN) \
-+	          --lang glib2 \
-+	          --varname qemu_input_map_$${src}_to_$${dst} \
-+	          code-map $(KEYCODEMAP_CSV) $${src} $${dst} \
-+	        > $@ || rm -f $@, "GEN", "$@")
-+
-+$(KEYCODEMAP_GEN): .git-submodule-status
-+$(KEYCODEMAP_CSV): .git-submodule-status
-+
- # Don't try to regenerate Makefile or configure
- # We don't generate any of them
- Makefile: ;
-diff --git a/.gitignore b/.gitignore
-index b5e115d96b..620eec6b47 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -14,6 +14,7 @@
- /trace/generated-tcg-tracers.h
- /ui/shader/texture-blit-frag.h
- /ui/shader/texture-blit-vert.h
-+/ui/input-keymap-*.c
- *-timestamp
- /*-softmmu
- /*-darwin-user
-diff --git a/.gitmodules b/.gitmodules
-index 84c54cdc49..7c981a42b6 100644
---- a/.gitmodules
-+++ b/.gitmodules
-@@ -34,3 +34,6 @@
- [submodule "roms/QemuMacDrivers"]
- 	path = roms/QemuMacDrivers
- 	url = git://git.qemu.org/QemuMacDrivers.git
-+[submodule "ui/keycodemapdb"]
-+	path = ui/keycodemapdb
-+	url = git://git.qemu.org/keycodemapdb.git
-diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
-index 4029de7b20..4e63774f9a 100755
---- a/scripts/archive-source.sh
-+++ b/scripts/archive-source.sh
-@@ -26,7 +26,7 @@ vroot_dir="${tar_file}.vroot"
- # independent of what the developer currently has initialized
- # in their checkout, because the build environment is completely
- # different to the host OS.
--submodules="dtc"
-+submodules="dtc ui/keycodemapdb"
- 
- trap "status=$?; rm -rf \"$list_file\" \"$vroot_dir\"; exit \$status" 0 1 2 3 15
- 
-diff --git a/ui/keycodemapdb b/ui/keycodemapdb
-new file mode 160000
-index 0000000000..56ce5650d2
---- /dev/null
-+++ b/ui/keycodemapdb
-@@ -0,0 +1 @@
-+Subproject commit 56ce5650d2c6ea216b4580df44b9a6dd3bc92c3b
 -- 
 2.9.3
