@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e4Bp1-0004cw-4i
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 16:17:12 -0400
+	(envelope-from <berrange@redhat.com>) id 1e4Bp3-0004ei-9Y
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 16:17:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e4Boz-0000F0-TN
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 16:17:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40074)
+	(envelope-from <berrange@redhat.com>) id 1e4Bp2-0000Gx-Dn
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 16:17:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49922)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e4Boz-0000ES-NI
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 16:17:09 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e4Bp2-0000GS-7U
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 16:17:12 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 16 Oct 2017 21:16:43 +0100
-Message-Id: <20171016201650.18399-5-berrange@redhat.com>
+Date: Mon, 16 Oct 2017 21:16:45 +0100
+Message-Id: <20171016201650.18399-7-berrange@redhat.com>
 In-Reply-To: <20171016201650.18399-1-berrange@redhat.com>
 References: <20171016201650.18399-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v1 04/11] io: monitor encoutput buffer size from
- websocket GSource
+Subject: [Qemu-devel] [PULL v1 06/11] io: get rid of
+ qio_channel_websock_encode helper method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +27,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-The websocket GSource is monitoring the size of the rawoutput
-buffer to determine if the channel can accepts more writes.
-The rawoutput buffer, however, is merely a temporary staging
-buffer before data is copied into the encoutput buffer. Thus
-its size will always be zero when the GSource runs.
-
-This flaw causes the encoutput buffer to grow without bound
-if the other end of the underlying data channel doesn't
-read data being sent. This can be seen with VNC if a client
-is on a slow WAN link and the guest OS is sending many screen
-updates. A malicious VNC client can act like it is on a slow
-link by playing a video in the guest and then reading data
-very slowly, causing QEMU host memory to expand arbitrarily.
-
-This issue is assigned CVE-2017-15268, publically reported in
-
-  https://bugs.launchpad.net/qemu/+bug/1718964
+The qio_channel_websock_encode method is only used in one place,
+everything else calls qio_channel_websock_encode_buffer directly.
+It can also be pushed up a level into the qio_channel_websock_writev
+method, since every other caller of qio_channel_websock_write_wire
+has already filled encoutput.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- io/channel-websock.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ io/channel-websock.c | 20 ++++++--------------
+ 1 file changed, 6 insertions(+), 14 deletions(-)
 
 diff --git a/io/channel-websock.c b/io/channel-websock.c
-index d1d471f86e..04bcc059cd 100644
+index 6083f74c9b..700f5bea22 100644
 --- a/io/channel-websock.c
 +++ b/io/channel-websock.c
-@@ -28,7 +28,7 @@
- #include <time.h>
+@@ -616,18 +616,6 @@ static void qio_channel_websock_encode_buffer(QIOChannelWebsock *ioc,
+ }
  
  
--/* Max amount to allow in rawinput/rawoutput buffers */
-+/* Max amount to allow in rawinput/encoutput buffers */
- #define QIO_CHANNEL_WEBSOCK_MAX_BUFFER 8192
+-static void qio_channel_websock_encode(QIOChannelWebsock *ioc)
+-{
+-    if (!ioc->rawoutput.offset) {
+-        return;
+-    }
+-    qio_channel_websock_encode_buffer(
+-        ioc, &ioc->encoutput, QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME,
+-        &ioc->rawoutput);
+-    buffer_reset(&ioc->rawoutput);
+-}
+-
+-
+ static ssize_t qio_channel_websock_write_wire(QIOChannelWebsock *, Error **);
  
- #define QIO_CHANNEL_WEBSOCK_CLIENT_KEY_LEN 24
-@@ -1208,7 +1208,7 @@ qio_channel_websock_source_check(GSource *source)
-     if (wsource->wioc->rawinput.offset || wsource->wioc->io_eof) {
-         cond |= G_IO_IN;
+ 
+@@ -948,8 +936,6 @@ static ssize_t qio_channel_websock_write_wire(QIOChannelWebsock *ioc,
+     ssize_t ret;
+     ssize_t done = 0;
+ 
+-    qio_channel_websock_encode(ioc);
+-
+     while (ioc->encoutput.offset > 0) {
+         ret = qio_channel_write(ioc->master,
+                                 (char *)ioc->encoutput.buffer,
+@@ -1134,6 +1120,12 @@ static ssize_t qio_channel_websock_writev(QIOChannel *ioc,
      }
--    if (wsource->wioc->rawoutput.offset < QIO_CHANNEL_WEBSOCK_MAX_BUFFER) {
-+    if (wsource->wioc->encoutput.offset < QIO_CHANNEL_WEBSOCK_MAX_BUFFER) {
-         cond |= G_IO_OUT;
-     }
  
+  done:
++    if (ioc->rawoutput.offset) {
++        qio_channel_websock_encode_buffer(
++            ioc, &ioc->encoutput, QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME,
++            &ioc->rawoutput);
++        buffer_reset(&ioc->rawoutput);
++    }
+     ret = qio_channel_websock_write_wire(wioc, errp);
+     if (ret < 0 &&
+         ret != QIO_CHANNEL_ERR_BLOCK) {
 -- 
 2.13.5
