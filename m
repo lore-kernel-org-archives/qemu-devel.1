@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e43zL-0002gy-EU
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 07:55:20 -0400
+	(envelope-from <thuth@redhat.com>) id 1e440t-0003d6-KZ
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 07:56:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e43zH-0006UH-Du
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 07:55:19 -0400
+	(envelope-from <thuth@redhat.com>) id 1e440p-0007Jg-L8
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 07:56:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45846)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1e440p-0007J5-Cn
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 07:56:51 -0400
 References: <cover.1506730372.git.alistair.francis@xilinx.com>
-	<43cc8b997ecfc0fcdc771f46f29999bc8ee27cbc.1506730372.git.alistair.francis@xilinx.com>
+	<5496a72654fb5c27793708e470ece06fe15ab423.1506730372.git.alistair.francis@xilinx.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <970ab8cf-7e59-a7b5-bbdc-6fb40c23f5a8@redhat.com>
-Date: Mon, 16 Oct 2017 13:55:11 +0200
+Message-ID: <32b63322-3a95-d677-91e2-91cde82cd9a4@redhat.com>
+Date: Mon, 16 Oct 2017 13:56:47 +0200
 MIME-Version: 1.0
-In-Reply-To: <43cc8b997ecfc0fcdc771f46f29999bc8ee27cbc.1506730372.git.alistair.francis@xilinx.com>
+In-Reply-To: <5496a72654fb5c27793708e470ece06fe15ab423.1506730372.git.alistair.francis@xilinx.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 33/47] hw/s390x: Replace fprintf(stderr,
+Subject: Re: [Qemu-devel] [PATCH v2 36/47] hw/sh4: Replace fprintf(stderr,
  "*\n" with error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -26,7 +30,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
-Cc: alistair23@gmail.com, armbru@redhat.com, qemu-s390x@nongnu.org
+Cc: alistair23@gmail.com, Magnus Damm <magnus.damm@gmail.com>, armbru@redhat.com, Aurelien Jarno <aurelien@aurel32.net>
 
 On 30.09.2017 02:16, Alistair Francis wrote:
 > Replace a large number of the fprintf(stderr, "*\n" calls with
@@ -70,28 +74,49 @@ On 30.09.2017 02:16, Alistair Francis wrote:
 > Some lines where then manually tweaked to pass checkpatch.
 > 
 > Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Cc: Magnus Damm <magnus.damm@gmail.com>
+> Cc: Aurelien Jarno <aurelien@aurel32.net>
 > ---
 > V2:
 >  - Split hw patch into individual directories
 > 
->  hw/s390x/virtio-ccw.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/sh4/r2d.c    |  9 ++++----
+>  hw/sh4/sh7750.c | 64 +++++++++++++++++++++++++++++----------------------------
+>  2 files changed, 38 insertions(+), 35 deletions(-)
 > 
-> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-> index 62d69aa30b..e5b3cc0005 100644
-> --- a/hw/s390x/virtio-ccw.c
-> +++ b/hw/s390x/virtio-ccw.c
-> @@ -468,7 +468,7 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
->                   * passes us zeroes for those we don't support.
->                   */
->                  if (features.features) {
-> -                    fprintf(stderr, "Guest bug: features[%i]=%x (expected 0)\n",
-> +                    error_report("Guest bug: features[%i]=%x (expected 0)",
->                              features.index, features.features);
->                      /* XXX: do a unit check here? */
->                  }
+> diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
+> index 16b9ed2db2..a010f559e2 100644
+> --- a/hw/sh4/r2d.c
+> +++ b/hw/sh4/r2d.c
+> @@ -24,6 +24,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+>  #include "qapi/error.h"
+>  #include "qemu-common.h"
+>  #include "cpu.h"
+> @@ -319,8 +320,8 @@ static void r2d_init(MachineState *machine)
+>                                            SDRAM_BASE + LINUX_LOAD_OFFSET,
+>                                            INITRD_LOAD_OFFSET - LINUX_LOAD_OFFSET);
+>          if (kernel_size < 0) {
+> -          fprintf(stderr, "qemu: could not load kernel '%s'\n", kernel_filename);
+> -          exit(1);
+> +            error_report("qemu: could not load kernel '%s'", kernel_filename);
+> +            exit(1);
+>          }
+>  
+>          /* initialization which should be done by firmware */
+> @@ -339,8 +340,8 @@ static void r2d_init(MachineState *machine)
+>                                            SDRAM_SIZE - INITRD_LOAD_OFFSET);
+>  
+>          if (initrd_size < 0) {
+> -          fprintf(stderr, "qemu: could not load initrd '%s'\n", initrd_filename);
+> -          exit(1);
+> +            error_report("qemu: could not load initrd '%s'", initrd_filename);
+> +            exit(1);
+>          }
 
-Sounds like this should rather be a qemu_log_mask(LOG_GUEST_ERROR, ...)
-instead?
+Please remove the "qemu:" prefix here as well.
 
  Thomas
