@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e3zGK-0000Lg-4y
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:52:34 -0400
+	(envelope-from <peterx@redhat.com>) id 1e3zGK-0000Lh-58
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:52:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e3zGH-00011i-0l
+	(envelope-from <peterx@redhat.com>) id 1e3zGI-00013l-R6
 	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:52:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59180)
+Received: from mx1.redhat.com ([209.132.183.28]:36722)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e3zGG-0000zG-Np
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:52:28 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e3zGI-00012c-Il
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:52:30 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Mon, 16 Oct 2017 14:51:44 +0800
-Message-Id: <20171016065216.18162-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 00/32] Migration: postcopy failure recovery
+Date: Mon, 16 Oct 2017 14:51:45 +0800
+Message-Id: <20171016065216.18162-2-peterx@redhat.com>
+In-Reply-To: <20171016065216.18162-1-peterx@redhat.com>
+References: <20171016065216.18162-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 01/32] migration: better error handling with
+ QEMUFile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,270 +27,196 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-This is 3rd version of postcopy recovery series.  It seems that until
-now there is no obvious NAK for the whole thing, I'll remove the RFC
-tag from this series.
+If the postcopy down due to some reason, we can always see this on dst:
 
-Based-on: <1507202000-22469-1-git-send-email-a.perevalov@samsung.com>
-  [PATCH v10 0/3] Add bitmap for received pages in postcopy migration
+  qemu-system-x86_64: RP: Received invalid message 0x0000 length 0x0000
 
-Tree is pushed here for better reference and testing:
-  github.com/xzpeter postcopy-recovery-support
+However in most cases that's not the real issue. The problem is that
+qemu_get_be16() has no way to show whether the returned data is valid or
+not, and we are _always_ assuming it is valid. That's possibly not wise.
 
-Please review, thanks.
+The best approach to solve this would be: refactoring QEMUFile interface
+to allow the APIs to return error if there is. However it needs quite a
+bit of work and testing. For now, let's explicitly check the validity
+first before using the data in all places for qemu_get_*().
 
-v3:
-- add r-bs correspondingly
-- in ram_load_postcopy() capture error if postcopy_place_page() failed
-  [Dave]
-- remove "break" if there is a "goto" before that [Dave]
-- ram_dirty_bitmap_reload(): use PRIx64 where needed, add some more
-  print sizes [Dave]
-- remove RAMState.ramblock_to_sync, instead use local counter [Dave]
-- init tag in tcp_start_incoming_migration() [Dave]
-- more traces when transmiting the recv bitmap [Dave]
-- postcopy_pause_incoming(): do shutdown before taking rp lock [Dave]
-- add one more patch to postpone the state switch of postcopy-active [Dave]
-- refactor the migrate_incoming handling according to the email
-  discussion [Dave]
-- add manual trigger to pause postcopy (two new patches added to
-  introduce "migrate-pause" command for QMP/HMP). [Dave]
+This patch tries to fix most of the cases I can see. Only if we are with
+this, can we make sure we are processing the valid data, and also can we
+make sure we can capture the channel down events correctly.
 
-v2 note (the coarse-grained changelog):
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ migration/migration.c |  5 +++++
+ migration/ram.c       | 26 ++++++++++++++++++++++----
+ migration/savevm.c    | 40 ++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 65 insertions(+), 6 deletions(-)
 
-- I appended the migrate-incoming re-use series into this one, since
-  that one depends on this one, and it's really for the recovery
-
-- I haven't yet added (actually I just added them but removed) the
-  per-monitor thread related patches into this one, basically to setup
-  "need-bql"="false" patches - the solution for the monitor hang issue
-  is still during discussion in the other thread.  I'll add them in
-  when settled.
-
-- Quite a lot of other changes and additions regarding to v1 review
-  comments.  I think I settled all the comments, but the God knows
-  better.
-
-Feel free to skip this ugly longer changelog (it's too long to be
-meaningful I'm afraid).
-
-Tree: github.com/xzpeter postcopy-recovery-support
-
-v2:
-- rebased to alexey's received bitmap v9
-- add Dave's r-bs for patches: 2/5/6/8/9/13/14/15/16/20/21
-- patch 1: use target page size to calc bitmap [Dave]
-- patch 3: move trace_*() after EINTR check [Dave]
-- patch 4: dropped since I can use bitmap_complement() [Dave]
-- patch 7: check file error right after data is read in both
-  qemu_loadvm_section_start_full() and qemu_loadvm_section_part_end(),
-  meanwhile also check in check_section_footer() [Dave]
-- patch 8/9: fix error_report/commit message in both patches [Dave]
-- patch 10: dropped (new parameter "x-postcopy-fast")
-- patch 11: split the "postcopy-paused" patch into two, one to
-  introduce the new state, the other to implement the logic. Also,
-  print something when paused [Dave]
-- patch 17: removed do_resume label, introduced migration_prepare()
-  [Dave]
-- patch 18: removed do_pause label using a new loop [Dave]
-- patch 20: removed incorrect comment [Dave]
-- patch 21: use 256B buffer in qemu_savevm_send_recv_bitmap(), add
-  trace in loadvm_handle_recv_bitmap() [Dave]
-- patch 22: fix MIG_RP_MSG_RECV_BITMAP for (1) endianess (2) 32/64bit
-  machines. More info in the commit message update.
-- patch 23: add one check on migration state [Dave]
-- patch 24: use macro instead of magic 1 [Dave]
-- patch 26: use more trace_*() instead of one, and use one sem to
-  replace mutex+cond. [Dave]
-- move sem init/destroy into migration_instance_init() and
-  migration_instance_finalize (new function after rebase).
-- patch 29: squashed this patch most into:
-  "migration: implement "postcopy-pause" src logic" [Dave]
-- split the two fix patches out of the series
-- fixed two places where I misused "wake/woke/woken". [Dave]
-- add new patch "bitmap: provide to_le/from_le helpers" to solve the
-  bitmap endianess issue [Dave]
-- appended migrate_incoming series to this series, since that one is
-  depending on the paused state.  Using explicit g_source_remove() for
-  listening ports [Dan]
-
-FUTURE TODO LIST
-- support migrate_cancel during PAUSED/RECOVER state
-- when anything wrong happens during PAUSED/RECOVER, switching back to
-  PAUSED state on both sides
-
-As we all know that postcopy migration has a potential risk to lost
-the VM if the network is broken during the migration. This series
-tries to solve the problem by allowing the migration to pause at the
-failure point, and do recovery after the link is reconnected.
-
-There was existing work on this issue from Md Haris Iqbal:
-
-https://lists.nongnu.org/archive/html/qemu-devel/2016-08/msg03468.html
-
-This series is a totally re-work of the issue, based on Alexey
-Perevalov's recved bitmap v8 series:
-
-https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg06401.html
-
-Two new status are added to support the migration (used on both
-sides):
-
-  MIGRATION_STATUS_POSTCOPY_PAUSED
-  MIGRATION_STATUS_POSTCOPY_RECOVER
-
-The MIGRATION_STATUS_POSTCOPY_PAUSED state will be set when the
-network failure is detected. It is a phase that we'll be in for a long
-time as long as the failure is detected, and we'll be there until a
-recovery is triggered.  In this state, all the threads (on source:
-send thread, return-path thread; destination: ram-load thread,
-page-fault thread) will be halted.
-
-The MIGRATION_STATUS_POSTCOPY_RECOVER state is short. If we triggered
-a recovery, both source/destination VM will jump into this stage, do
-whatever it needs to prepare the recovery (e.g., currently the most
-important thing is to synchronize the dirty bitmap, please see commit
-messages for more information). After the preparation is ready, the
-source will do the final handshake with destination, then both sides
-will switch back to MIGRATION_STATUS_POSTCOPY_ACTIVE again.
-
-New commands/messages are defined as well to satisfy the need:
-
-MIG_CMD_RECV_BITMAP & MIG_RP_MSG_RECV_BITMAP are introduced for
-delivering received bitmaps
-
-MIG_CMD_RESUME & MIG_RP_MSG_RESUME_ACK are introduced to do the final
-handshake of postcopy recovery.
-
-Here's some more details on how the whole failure/recovery routine is
-happened:
-
-- start migration
-- ... (switch from precopy to postcopy)
-- both sides are in "postcopy-active" state
-- ... (failure happened, e.g., network unplugged)
-- both sides switch to "postcopy-paused" state
-  - all the migration threads are stopped on both sides
-- ... (both VMs hanged)
-- ... (user triggers recovery using "migrate -r -d tcp:HOST:PORT" on
-  source side, "-r" means "recover")
-- both sides switch to "postcopy-recover" state
-  - on source: send-thread, return-path-thread will be waked up
-  - on dest: ram-load-thread waked up, fault-thread still paused
-- source calls new savevmhandler hook resume_prepare() (currently,
-  only ram is providing the hook):
-  - ram_resume_prepare(): for each ramblock, fetch recved bitmap by:
-    - src sends MIG_CMD_RECV_BITMAP to dst
-    - dst replies MIG_RP_MSG_RECV_BITMAP to src, with bitmap data
-      - src uses the recved bitmap to rebuild dirty bitmap
-- source do final handshake with destination
-  - src sends MIG_CMD_RESUME to dst, telling "src is ready"
-    - when dst receives the command, fault thread will be waked up,
-      meanwhile, dst switch back to "postcopy-active"
-  - dst sends MIG_RP_MSG_RESUME_ACK to src, telling "dst is ready"
-    - when src receives the ack, state switch to "postcopy-active"
-- postcopy migration continued
-
-Testing:
-
-As I said, it's still an extremely simple test. I used socat to create
-a socket bridge:
-
-  socat tcp-listen:6666 tcp-connect:localhost:5555 &
-
-Then do the migration via the bridge. I emulated the network failure
-by killing the socat process (bridge down), then tries to recover the
-migration using the other channel (default dst channel). It looks
-like:
-
-        port:6666    +------------------+
-        +----------> | socat bridge [1] |-------+
-        |            +------------------+       |
-        |         (Original channel)            |
-        |                                       | port: 5555
-     +---------+  (Recovery channel)            +--->+---------+
-     | src VM  |------------------------------------>| dst VM  |
-     +---------+                                     +---------+
-
-Known issues/notes:
-
-- currently destination listening port still cannot change. E.g., the
-  recovery should be using the same port on destination for
-  simplicity. (on source, we can specify new URL)
-
-- the patch: "migration: let dst listen on port always" is still
-  hacky, it just kept the incoming accept open forever for now...
-
-- some migration numbers might still be inaccurate, like total
-  migration time, etc. (But I don't really think that matters much
-  now)
-
-- the patches are very lightly tested.
-
-- Dave reported one problem that may hang destination main loop thread
-  (one vcpu thread holds the BQL) and the rest. I haven't encountered
-  it yet, but it does not mean this series can survive with it.
-
-- other potential issues that I may have forgotten or unnoticed...
-
-Anyway, the work is still in preliminary stage. Any suggestions and
-comments are greatly welcomed.  Thanks.
-
-Peter Xu (32):
-  migration: better error handling with QEMUFile
-  migration: reuse mis->userfault_quit_fd
-  migration: provide postcopy_fault_thread_notify()
-  migration: new postcopy-pause state
-  migration: implement "postcopy-pause" src logic
-  migration: allow dst vm pause on postcopy
-  migration: allow src return path to pause
-  migration: allow send_rq to fail
-  migration: allow fault thread to pause
-  qmp: hmp: add migrate "resume" option
-  migration: pass MigrationState to migrate_init()
-  migration: rebuild channel on source
-  migration: new state "postcopy-recover"
-  migration: wakeup dst ram-load-thread for recover
-  migration: new cmd MIG_CMD_RECV_BITMAP
-  migration: new message MIG_RP_MSG_RECV_BITMAP
-  migration: new cmd MIG_CMD_POSTCOPY_RESUME
-  migration: new message MIG_RP_MSG_RESUME_ACK
-  migration: introduce SaveVMHandlers.resume_prepare
-  migration: synchronize dirty bitmap for resume
-  migration: setup ramstate for resume
-  migration: final handshake for the resume
-  migration: free SocketAddress where allocated
-  migration: return incoming task tag for sockets
-  migration: return incoming task tag for exec
-  migration: return incoming task tag for fd
-  migration: store listen task tag
-  migration: allow migrate_incoming for paused VM
-  migration: init dst in migration_object_init too
-  migration: delay the postcopy-active state switch
-  migration, qmp: new command "migrate-pause"
-  migration, hmp: new command "migrate_pause"
-
- hmp-commands.hx              |  21 +-
- hmp.c                        |  13 +-
- hmp.h                        |   1 +
- include/migration/register.h |   2 +
- migration/exec.c             |  20 +-
- migration/exec.h             |   2 +-
- migration/fd.c               |  20 +-
- migration/fd.h               |   2 +-
- migration/migration.c        | 602 ++++++++++++++++++++++++++++++++++++++-----
- migration/migration.h        |  26 +-
- migration/postcopy-ram.c     | 107 ++++++--
- migration/postcopy-ram.h     |   2 +
- migration/ram.c              | 252 +++++++++++++++++-
- migration/ram.h              |   3 +
- migration/savevm.c           | 240 ++++++++++++++++-
- migration/savevm.h           |   3 +
- migration/socket.c           |  44 ++--
- migration/socket.h           |   4 +-
- migration/trace-events       |  23 ++
- qapi/migration.json          |  34 ++-
- 20 files changed, 1272 insertions(+), 149 deletions(-)
-
+diff --git a/migration/migration.c b/migration/migration.c
+index 157b4e4c7d..3366bdddcc 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1657,6 +1657,11 @@ static void *source_return_path_thread(void *opaque)
+         header_type = qemu_get_be16(rp);
+         header_len = qemu_get_be16(rp);
+ 
++        if (qemu_file_get_error(rp)) {
++            mark_source_rp_bad(ms);
++            goto out;
++        }
++
+         if (header_type >= MIG_RP_MSG_MAX ||
+             header_type == MIG_RP_MSG_INVALID) {
+             error_report("RP: Received invalid message 0x%04x length 0x%04x",
+diff --git a/migration/ram.c b/migration/ram.c
+index c30db15d4c..85cb965a14 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2622,7 +2622,7 @@ static int ram_load_postcopy(QEMUFile *f)
+     void *last_host = NULL;
+     bool all_zero = false;
+ 
+-    while (!ret && !(flags & RAM_SAVE_FLAG_EOS)) {
++    while (!(flags & RAM_SAVE_FLAG_EOS)) {
+         ram_addr_t addr;
+         void *host = NULL;
+         void *page_buffer = NULL;
+@@ -2631,6 +2631,16 @@ static int ram_load_postcopy(QEMUFile *f)
+         uint8_t ch;
+ 
+         addr = qemu_get_be64(f);
++
++        /*
++         * If qemu file error, we should stop here, and then "addr"
++         * may be invalid
++         */
++        ret = qemu_file_get_error(f);
++        if (ret) {
++            break;
++        }
++
+         flags = addr & ~TARGET_PAGE_MASK;
+         addr &= TARGET_PAGE_MASK;
+ 
+@@ -2711,6 +2721,13 @@ static int ram_load_postcopy(QEMUFile *f)
+             error_report("Unknown combination of migration flags: %#x"
+                          " (postcopy mode)", flags);
+             ret = -EINVAL;
++            break;
++        }
++
++        /* Detect for any possible file errors */
++        if (qemu_file_get_error(f)) {
++            ret = qemu_file_get_error(f);
++            break;
+         }
+ 
+         if (place_needed) {
+@@ -2724,9 +2741,10 @@ static int ram_load_postcopy(QEMUFile *f)
+                 ret = postcopy_place_page(mis, place_dest,
+                                           place_source, block);
+             }
+-        }
+-        if (!ret) {
+-            ret = qemu_file_get_error(f);
++
++            if (ret) {
++                break;
++            }
+         }
+     }
+ 
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 4a88228614..1da0255cd7 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1765,6 +1765,11 @@ static int loadvm_process_command(QEMUFile *f)
+     cmd = qemu_get_be16(f);
+     len = qemu_get_be16(f);
+ 
++    /* Check validity before continue processing of cmds */
++    if (qemu_file_get_error(f)) {
++        return qemu_file_get_error(f);
++    }
++
+     trace_loadvm_process_command(cmd, len);
+     if (cmd >= MIG_CMD_MAX || cmd == MIG_CMD_INVALID) {
+         error_report("MIG_CMD 0x%x unknown (len 0x%x)", cmd, len);
+@@ -1830,6 +1835,7 @@ static int loadvm_process_command(QEMUFile *f)
+  */
+ static bool check_section_footer(QEMUFile *f, SaveStateEntry *se)
+ {
++    int ret;
+     uint8_t read_mark;
+     uint32_t read_section_id;
+ 
+@@ -1840,6 +1846,13 @@ static bool check_section_footer(QEMUFile *f, SaveStateEntry *se)
+ 
+     read_mark = qemu_get_byte(f);
+ 
++    ret = qemu_file_get_error(f);
++    if (ret) {
++        error_report("%s: Read section footer failed: %d",
++                     __func__, ret);
++        return false;
++    }
++
+     if (read_mark != QEMU_VM_SECTION_FOOTER) {
+         error_report("Missing section footer for %s", se->idstr);
+         return false;
+@@ -1875,6 +1888,13 @@ qemu_loadvm_section_start_full(QEMUFile *f, MigrationIncomingState *mis)
+     instance_id = qemu_get_be32(f);
+     version_id = qemu_get_be32(f);
+ 
++    ret = qemu_file_get_error(f);
++    if (ret) {
++        error_report("%s: Failed to read instance/version ID: %d",
++                     __func__, ret);
++        return ret;
++    }
++
+     trace_qemu_loadvm_state_section_startfull(section_id, idstr,
+             instance_id, version_id);
+     /* Find savevm section */
+@@ -1922,6 +1942,13 @@ qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
+ 
+     section_id = qemu_get_be32(f);
+ 
++    ret = qemu_file_get_error(f);
++    if (ret) {
++        error_report("%s: Failed to read section ID: %d",
++                     __func__, ret);
++        return ret;
++    }
++
+     trace_qemu_loadvm_state_section_partend(section_id);
+     QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+         if (se->load_section_id == section_id) {
+@@ -1989,8 +2016,14 @@ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
+     uint8_t section_type;
+     int ret = 0;
+ 
+-    while ((section_type = qemu_get_byte(f)) != QEMU_VM_EOF) {
+-        ret = 0;
++    while (true) {
++        section_type = qemu_get_byte(f);
++
++        if (qemu_file_get_error(f)) {
++            ret = qemu_file_get_error(f);
++            break;
++        }
++
+         trace_qemu_loadvm_state_section(section_type);
+         switch (section_type) {
+         case QEMU_VM_SECTION_START:
+@@ -2014,6 +2047,9 @@ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
+                 goto out;
+             }
+             break;
++        case QEMU_VM_EOF:
++            /* This is the end of migration */
++            goto out;
+         default:
+             error_report("Unknown savevm section type %d", section_type);
+             ret = -EINVAL;
 -- 
 2.13.5
