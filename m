@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e492U-00070T-Lm
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:18:55 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e493j-0007lk-6R
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:20:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e492Q-0005qt-Lt
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:18:54 -0400
-Received: from 15.mo4.mail-out.ovh.net ([91.121.62.11]:52991)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e492Q-0005pz-Fi
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:18:50 -0400
-Received: from player159.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id F1A97E85D4
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 19:18:48 +0200 (CEST)
-Date: Mon, 16 Oct 2017 19:16:33 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171016191633.4f5082f8@bahia.lan>
-In-Reply-To: <20171016100718.1ec98df6@nial.brq.redhat.com>
-References: <150788370618.25736.8030708425923435364.stgit@bahia>
-	<150788373123.25736.7359515819699182906.stgit@bahia>
-	<20171013112459.0082e823@nial.brq.redhat.com>
-	<20171013120546.7a89eeaf@bahia.lan>
-	<20171016100718.1ec98df6@nial.brq.redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1e493i-0006t4-6p
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:20:11 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:53333)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e493h-0006sX-VC
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:20:10 -0400
+Received: by mail-wr0-x234.google.com with SMTP id y44so3667399wry.10
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 10:20:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] monitor: add proper reference counting
- of the current CPU
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Oct 2017 18:19:47 +0100
+Message-ID: <CAFEAcA_0S6T768-60MVkXP1Y0MpmOzTQr8p-N_W1PhbG_n2d-Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Key signing party at KVM Forum 2017
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,110 +26,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Dr. David
-	Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, 16 Oct 2017 10:07:18 +0200
-Igor Mammedov <imammedo@redhat.com> wrote:
+It looks like at least five people whose keys I'd like to sign
+are going to be at KVM Forum this year, so it seems worth having
+a proper key signing party rather than just me ad-hoc finding
+people and checking their ID. I am particularly interested
+in signing keys for people who are or expect they might be
+sending me pull requests.
 
-> On Fri, 13 Oct 2017 12:05:46 +0200
-> Greg Kurz <groug@kaod.org> wrote:
-> 
-> > On Fri, 13 Oct 2017 11:24:59 +0200
-> > Igor Mammedov <imammedo@redhat.com> wrote:
-> >   
-> > > On Fri, 13 Oct 2017 10:35:31 +0200
-> > > Greg Kurz <groug@kaod.org> wrote:
-> > >     
-> > > > If a CPU selected with the "cpu" command is hot-unplugged then "info cpus"
-> > > > causes QEMU to exit:
-> > > > 
-> > > > (qemu) device_del cpu1
-> > > > (qemu) info cpus
-> > > > qemu:qemu_cpu_kick_thread: No such process
-> > > > 
-> > > > This happens because "cpu" stores the pointer to the selected CPU into
-> > > > the monitor structure. When the CPU is hot-unplugged, we end up with a
-> > > > dangling pointer. The "info cpus" command then does:
-> > > > 
-> > > > hmp_info_cpus()
-> > > >  monitor_get_cpu_index()
-> > > >   mon_get_cpu()
-> > > >    cpu_synchronize_state() <--- called with dangling pointer
-> > > > 
-> > > > This could cause a QEMU crash as well.
-> > > > 
-> > > > This patch switches the monitor to use object_ref() to ensure the
-> > > > CPU object doesn't vanish unexpectedly. The reference is dropped
-> > > > either when "cpu" is used to switch to another CPU, or when the
-> > > > selected CPU is unrealized and cpu_list_remove() sets its cpu_index
-> > > > back to UNASSIGNED_CPU_INDEX.      
-> > > I don't really like an idea of leaving dangling cpu around.
-> > > Is it possible to store QOM path on set_cpu in monitor and
-> > > resolving it each to instance each time it's needed?
-> > >     
-> > 
-> > It sounds workable. Also it would allow the fix to not depend on patch 1
-> > for ppc.  
-> yep,
-> also if you'd touch these cpu_index based monitor commands,
-> it might make sense to convert them to use qmo path directly
-> instead if cpu_index (with command completion it would be
-> easy to use)
-> 
+How it works: if you want to take part:
 
-Ok, I'll look into that but I'm not sure I can work something out
-before soft freeze (2017-10-31 AFAIK).
+ (1) you MUST EMAIL ME your key info, as produced by
+"gpg --fingerprint [your-key-ID-here]", by this Friday (Oct 20th)
+at the latest. (I will be printing this stuff out and won't have
+access to a printer after that. No late submissions please!)
 
-> 
-> > 
-> > Thanks for the suggestion!
-> >   
-> > >     
-> > > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > > ---
-> > > >  monitor.c |   12 ++++++++++++
-> > > >  1 file changed, 12 insertions(+)
-> > > > 
-> > > > diff --git a/monitor.c b/monitor.c
-> > > > index fe0d1bdbb461..1c0b9a2c3ad3 100644
-> > > > --- a/monitor.c
-> > > > +++ b/monitor.c
-> > > > @@ -579,6 +579,9 @@ static void monitor_data_init(Monitor *mon)
-> > > >  
-> > > >  static void monitor_data_destroy(Monitor *mon)
-> > > >  {
-> > > > +    if (mon->mon_cpu) {
-> > > > +        object_unref((Object *) mon->mon_cpu);
-> > > > +    }
-> > > >      qemu_chr_fe_deinit(&mon->chr, false);
-> > > >      if (monitor_is_qmp(mon)) {
-> > > >          json_message_parser_destroy(&mon->qmp.parser);
-> > > > @@ -1047,12 +1050,21 @@ int monitor_set_cpu(int cpu_index)
-> > > >      if (cpu == NULL) {
-> > > >          return -1;
-> > > >      }
-> > > > +    if (cur_mon->mon_cpu) {
-> > > > +        object_unref((Object *) cur_mon->mon_cpu);
-> > > > +    }
-> > > >      cur_mon->mon_cpu = cpu;
-> > > > +    object_ref((Object *) cpu);
-> > > >      return 0;
-> > > >  }
-> > > >  
-> > > >  CPUState *mon_get_cpu(void)
-> > > >  {
-> > > > +    if (cur_mon->mon_cpu &&
-> > > > +        cur_mon->mon_cpu->cpu_index == UNASSIGNED_CPU_INDEX) {
-> > > > +        object_unref((Object *) cur_mon->mon_cpu);
-> > > > +        cur_mon->mon_cpu = NULL;
-> > > > +    }
-> > > >      if (!cur_mon->mon_cpu) {
-> > > >          if (!first_cpu) {
-> > > >              return NULL;
-> > > > 
-> > > >       
-> > >     
-> >   
-> 
+ (2) you will need to BRING WITH YOU:
+ a) positive (government-issued) photo ID, eg a passport
+ b) a printed out copy of your key info
+    (independently of what you send me)
+ c) a pen or pencil
+ Don't attempt to bring or use a computer!
+
+https://wiki.qemu.org/KeySigningParty
+has the details of how this will work; there will be a lot of
+chanting of hex digits. It's a bit odd but by following the
+process we can get through a big group of people checking
+key IDs more quickly.
+
+I plan to do this in the Thursday 17:30 BoF session slot,
+unless somebody wants to suggest a better timeslot.
+
+thanks
+-- PMM
