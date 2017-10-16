@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e491c-0006co-Mr
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:18:01 -0400
+	(envelope-from <groug@kaod.org>) id 1e492U-00070T-Lm
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:18:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1e491Y-00051F-ND
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:18:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34220)
+	(envelope-from <groug@kaod.org>) id 1e492Q-0005qt-Lt
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:18:54 -0400
+Received: from 15.mo4.mail-out.ovh.net ([91.121.62.11]:52991)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e491Y-00050m-Gf
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:17:56 -0400
-Date: Mon, 16 Oct 2017 15:17:52 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20171016171752.GK3246@localhost.localdomain>
-References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
-	<1508170976-96869-5-git-send-email-imammedo@redhat.com>
-	<20171016165916.GI3246@localhost.localdomain>
-	<4c14ed02-1f1c-a093-52ac-632f61a68a6f@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e492Q-0005pz-Fi
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:18:50 -0400
+Received: from player159.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id F1A97E85D4
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 19:18:48 +0200 (CEST)
+Date: Mon, 16 Oct 2017 19:16:33 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171016191633.4f5082f8@bahia.lan>
+In-Reply-To: <20171016100718.1ec98df6@nial.brq.redhat.com>
+References: <150788370618.25736.8030708425923435364.stgit@bahia>
+	<150788373123.25736.7359515819699182906.stgit@bahia>
+	<20171013112459.0082e823@nial.brq.redhat.com>
+	<20171013120546.7a89eeaf@bahia.lan>
+	<20171016100718.1ec98df6@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4c14ed02-1f1c-a093-52ac-632f61a68a6f@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 4/6] CLI: add -paused option
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] monitor: add proper reference counting
+ of the current CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +34,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com, pkrempa@redhat.com, david@gibson.dropbear.id.au, peter.maydell@linaro.org, cohuck@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Dr. David
+	Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Mon, Oct 16, 2017 at 07:01:01PM +0200, Paolo Bonzini wrote:
-> On 16/10/2017 18:59, Eduardo Habkost wrote:
-> >> +DEF("paused", HAS_ARG, QEMU_OPTION_paused, \
-> >> +    "-paused [state=]postconf|preconf\n"
-> >> +    "                postconf: pause QEMU after machine is initialized\n"
-> >> +    "                preconf: pause QEMU before machine is initialized\n",
-> >> +    QEMU_ARCH_ALL)
-> > I would like to allow pausing before machine-type is selected, so
-> > management could run query-machines before choosing a
-> > machine-type.  Would that need a third "-pause" mode, or will we
-> > be able to change "preconf" to pause before select_machine() is
-> > called?
+On Mon, 16 Oct 2017 10:07:18 +0200
+Igor Mammedov <imammedo@redhat.com> wrote:
+
+> On Fri, 13 Oct 2017 12:05:46 +0200
+> Greg Kurz <groug@kaod.org> wrote:
+> 
+> > On Fri, 13 Oct 2017 11:24:59 +0200
+> > Igor Mammedov <imammedo@redhat.com> wrote:
+> >   
+> > > On Fri, 13 Oct 2017 10:35:31 +0200
+> > > Greg Kurz <groug@kaod.org> wrote:
+> > >     
+> > > > If a CPU selected with the "cpu" command is hot-unplugged then "info cpus"
+> > > > causes QEMU to exit:
+> > > > 
+> > > > (qemu) device_del cpu1
+> > > > (qemu) info cpus
+> > > > qemu:qemu_cpu_kick_thread: No such process
+> > > > 
+> > > > This happens because "cpu" stores the pointer to the selected CPU into
+> > > > the monitor structure. When the CPU is hot-unplugged, we end up with a
+> > > > dangling pointer. The "info cpus" command then does:
+> > > > 
+> > > > hmp_info_cpus()
+> > > >  monitor_get_cpu_index()
+> > > >   mon_get_cpu()
+> > > >    cpu_synchronize_state() <--- called with dangling pointer
+> > > > 
+> > > > This could cause a QEMU crash as well.
+> > > > 
+> > > > This patch switches the monitor to use object_ref() to ensure the
+> > > > CPU object doesn't vanish unexpectedly. The reference is dropped
+> > > > either when "cpu" is used to switch to another CPU, or when the
+> > > > selected CPU is unrealized and cpu_list_remove() sets its cpu_index
+> > > > back to UNASSIGNED_CPU_INDEX.      
+> > > I don't really like an idea of leaving dangling cpu around.
+> > > Is it possible to store QOM path on set_cpu in monitor and
+> > > resolving it each to instance each time it's needed?
+> > >     
 > > 
-> > The same probably applies to other things initialized before
-> > machine_run_board_init() that could be configurable using QMP,
-> > including but not limited to:
-> > * Accelerator configuration
-> > * Registering global properties
-> > * RAM size
-> > * SMP/CPU configuration
+> > It sounds workable. Also it would allow the fix to not depend on patch 1
+> > for ppc.  
+> yep,
+> also if you'd touch these cpu_index based monitor commands,
+> it might make sense to convert them to use qmo path directly
+> instead if cpu_index (with command completion it would be
+> easy to use)
 > 
-> Should (or could) "-M none" be changed in a backwards-compatible way to
-> allow such preconfiguration?  For example
+
+Ok, I'll look into that but I'm not sure I can work something out
+before soft freeze (2017-10-31 AFAIK).
+
 > 
->   qemu -M none -monitor stdio
->   (qemu) machine-set-options pc,accel=kvm
->   (qemu) c
-
-Sounds like an interesting idea.  It would require ensuring it's
-really safe to destroy current_machine/accel (and other global
-state) and replace them with another object on the fly (which is
-probably a nice goal by itself).
-
--- 
-Eduardo
+> > 
+> > Thanks for the suggestion!
+> >   
+> > >     
+> > > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > > ---
+> > > >  monitor.c |   12 ++++++++++++
+> > > >  1 file changed, 12 insertions(+)
+> > > > 
+> > > > diff --git a/monitor.c b/monitor.c
+> > > > index fe0d1bdbb461..1c0b9a2c3ad3 100644
+> > > > --- a/monitor.c
+> > > > +++ b/monitor.c
+> > > > @@ -579,6 +579,9 @@ static void monitor_data_init(Monitor *mon)
+> > > >  
+> > > >  static void monitor_data_destroy(Monitor *mon)
+> > > >  {
+> > > > +    if (mon->mon_cpu) {
+> > > > +        object_unref((Object *) mon->mon_cpu);
+> > > > +    }
+> > > >      qemu_chr_fe_deinit(&mon->chr, false);
+> > > >      if (monitor_is_qmp(mon)) {
+> > > >          json_message_parser_destroy(&mon->qmp.parser);
+> > > > @@ -1047,12 +1050,21 @@ int monitor_set_cpu(int cpu_index)
+> > > >      if (cpu == NULL) {
+> > > >          return -1;
+> > > >      }
+> > > > +    if (cur_mon->mon_cpu) {
+> > > > +        object_unref((Object *) cur_mon->mon_cpu);
+> > > > +    }
+> > > >      cur_mon->mon_cpu = cpu;
+> > > > +    object_ref((Object *) cpu);
+> > > >      return 0;
+> > > >  }
+> > > >  
+> > > >  CPUState *mon_get_cpu(void)
+> > > >  {
+> > > > +    if (cur_mon->mon_cpu &&
+> > > > +        cur_mon->mon_cpu->cpu_index == UNASSIGNED_CPU_INDEX) {
+> > > > +        object_unref((Object *) cur_mon->mon_cpu);
+> > > > +        cur_mon->mon_cpu = NULL;
+> > > > +    }
+> > > >      if (!cur_mon->mon_cpu) {
+> > > >          if (!first_cpu) {
+> > > >              return NULL;
+> > > > 
+> > > >       
+> > >     
+> >   
+> 
