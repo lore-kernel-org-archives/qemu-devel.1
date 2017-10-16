@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1e48oo-0001Ok-0G
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:04:51 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1e48pL-0001oi-Ee
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:05:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1e48oj-0002o6-2j
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:04:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52668)
+	(envelope-from <ehabkost@redhat.com>) id 1e48pF-0003DH-6g
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:05:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53766)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1e48oi-0002n1-Qi
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:04:41 -0400
-Date: Mon, 16 Oct 2017 13:04:34 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <1080174355.20804941.1508173474622.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20171016144753.GB14135@stefanha-x1.localdomain>
-References: <20171012155027.3277-1-pagupta@redhat.com>
-	<20171012155027.3277-3-pagupta@redhat.com>
-	<20171013094431.GA27308@stefanha-x1.localdomain>
-	<24301306.20068579.1507891695416.JavaMail.zimbra@redhat.com>
-	<20171016144753.GB14135@stefanha-x1.localdomain>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1e48pE-0003CD-U2
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:05:13 -0400
+Date: Mon, 16 Oct 2017 15:05:01 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20171016170501.GJ3246@localhost.localdomain>
+References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
+	<20171016163636.GI11975@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 2/2] KVM: add virtio-pmem driver
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171016163636.GI11975@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 0/6] enable numa configuration before
+ machine_init() from HMP/QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,76 +28,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, linux-mm@kvack.org, jack@suse.cz, stefanha@redhat.com, dan j williams <dan.j.williams@intel.com>, riel@redhat.com, haozhong zhang <haozhong.zhang@intel.com>, nilal@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, ross zwisler <ross.zwisler@intel.com>, david@redhat.com, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au, Laine Stump <laine@redhat.com>
 
+On Mon, Oct 16, 2017 at 05:36:36PM +0100, Daniel P. Berrange wrote:
+> On Mon, Oct 16, 2017 at 06:22:50PM +0200, Igor Mammedov wrote:
+> > Series allows to configure NUMA mapping at runtime using QMP/HMP
+> > interface. For that to happen it introduces a new '-paused' CLI option
+> > which allows to pause QEMU before machine_init() is run and
+> > adds new set-numa-node HMP/QMP commands which in conjuction with
+> > info hotpluggable-cpus/query-hotpluggable-cpus allow to configure
+> > NUMA mapping for cpus.
+> 
+> What's the problem we're seeking solve here compared to what we currently
+> do for NUMA configuration ?
+
+I don't understand completely what exactly Igor is trying to
+solve, but this new mode would be very helpful to address the
+issues mentioned at:
+
+http://www.linux-kvm.org/images/4/46/03x06A-Eduardo_HabkostMachine-type_Introspection_and_Configuration_Where_Are_We_Going.pdf
+(starting on slide 12)
 
 > 
-> On Fri, Oct 13, 2017 at 06:48:15AM -0400, Pankaj Gupta wrote:
-> > > On Thu, Oct 12, 2017 at 09:20:26PM +0530, Pankaj Gupta wrote:
-> > > > +static blk_qc_t virtio_pmem_make_request(struct request_queue *q,
-> > > > +			struct bio *bio)
-> > > > +{
-> > > > +	blk_status_t rc = 0;
-> > > > +	struct bio_vec bvec;
-> > > > +	struct bvec_iter iter;
-> > > > +	struct virtio_pmem *pmem = q->queuedata;
-> > > > +
-> > > > +	if (bio->bi_opf & REQ_FLUSH)
-> > > > +		//todo host flush command
-> > > 
-> > > This detail is critical to the device design.  What is the plan?
 > > 
-> > yes, this is good point.
+> > HMP configuration session for CLI '-smp 1,maxcpus=2' would look like:
 > > 
-> > was thinking of guest sending a flush command to Qemu which
-> > will do a fsync on file fd.
-> 
-> Previously there was discussion about fsyncing a specific file range
-> instead of the whole file.  This could perform better in cases where
-> only a subset of dirty pages need to be flushed.
-
-yes, We had discussion about this and decided to do entire block flush
-then to range level flush.
-
-> 
-> One possibility is to design the virtio interface to communicate ranges
-> but the emulation code simply fsyncs the fd for the time being.  Later
-> on, if the necessary kernel and userspace interfaces are added, we can
-> make use of the interface.
-> 
-> > If we do a async flush and move the task to wait queue till we receive
-> > flush complete reply from host we can allow other tasks to execute
-> > in current cpu.
+> > (qemu) info hotpluggable-cpus 
+> > Hotpluggable CPUs:
+> >   type: "qemu64-x86_64-cpu"
+> >   vcpus_count: "1"
+> >   CPUInstance Properties:
+> >     socket-id: "1"
+> >     core-id: "0"
+> >     thread-id: "0"
+> >   type: "qemu64-x86_64-cpu"
+> >   vcpus_count: "1"
+> >   qom_path: "/machine/unattached/device[0]"
+> >   CPUInstance Properties:
+> >     socket-id: "0"
+> >     core-id: "0"
+> >     thread-id: "0"
+> > (qemu) set-numa-node node,nodeid=0
+> > (qemu) set-numa-node node,nodeid=1
+> > (qemu) set-numa-node cpu,socket-id=0,node-id=0
+> > (qemu) set-numa-node cpu,socket-id=1,node-id=1
+> > (qemu) info hotpluggable-cpus 
+> > Hotpluggable CPUs:
+> >   type: "qemu64-x86_64-cpu"
+> >   vcpus_count: "1"
+> >   CPUInstance Properties:
+> >     node-id: "1"
+> >     socket-id: "1"
+> >     core-id: "0"
+> >     thread-id: "0"
+> >   type: "qemu64-x86_64-cpu"
+> >   vcpus_count: "1"
+> >   CPUInstance Properties:
+> >     node-id: "0"
+> >     socket-id: "0"
+> >     core-id: "0"
+> >     thread-id: "0"
+> > (qemu) cont
 > > 
-> > Any suggestions you have or anything I am not foreseeing here?
+> > git tree for testing:
+> >   https://github.com/imammedo/qemu qmp_preconfig_rfc
+> > 
+> > 
+> > CC: eblake@redhat.com
+> > CC: armbru@redhat.com
+> > CC: ehabkost@redhat.com
+> > CC: pkrempa@redhat.com
+> > CC: david@gibson.dropbear.id.au
+> > CC: peter.maydell@linaro.org
+> > CC: pbonzini@redhat.com
+> > CC: cohuck@redhat.com
+> > 
+> > Igor Mammedov (6):
+> >   numa: postpone options post-processing till machine_run_board_init()
+> >   numa: split out NumaOptions parsing into parse_NumaOptions()
+> >   possible_cpus: add CPUArchId::type field
+> >   CLI: add -paused option
+> >   HMP: add set-numa-node command
+> >   QMP: add set-numa-node command
+> > 
+> >  hmp.h                      |  1 +
+> >  include/hw/boards.h        |  2 ++
+> >  include/sysemu/numa.h      |  2 ++
+> >  include/sysemu/sysemu.h    |  1 +
+> >  hmp-commands.hx            | 13 ++++++++
+> >  hmp.c                      | 23 ++++++++++++++
+> >  hw/arm/virt.c              |  3 +-
+> >  hw/core/machine.c          | 18 ++++++-----
+> >  hw/i386/pc.c               |  4 ++-
+> >  hw/ppc/spapr.c             | 13 +++++---
+> >  hw/s390x/s390-virtio-ccw.c |  1 +
+> >  numa.c                     | 79 ++++++++++++++++++++++++++++++++++------------
+> >  qapi-schema.json           | 13 ++++++++
+> >  qemu-options.hx            | 15 +++++++++
+> >  qmp.c                      |  5 +++
+> >  vl.c                       | 54 ++++++++++++++++++++++++++++++-
+> >  16 files changed, 210 insertions(+), 37 deletions(-)
+> > 
+> > -- 
+> > 2.7.4
+> > 
+> > 
 > 
-> My main thought about this patch series is whether pmem should be a
-> virtio-blk feature bit instead of a whole new device.  There is quite a
-> bit of overlap between the two.
+> Regards,
+> Daniel
+> -- 
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-Exposing options with existing virtio-blk device to be used as persistent memory
-range at high level would require additional below features:
-
-- Use a persistent memory range with an option to allocate memmap array in the device
-  itself for .
-
-- Block operations for DAX and persistent memory range.
-
-- Bifurcation at filesystem level based on type of virtio-blk device selected.
-
-- Bifurcation of flushing interface and communication channel between guest & host.
-
-But yes these features can be dynamically configured based on type of device
-added? What if we have virtio-blk:virtio-pmem (m:n) devices ratio?And scale involved? 
-
-If i understand correctly virtio-blk is high performance interface with multiqueue support 
-and additional features at host side like data-plane mode etc. If we bloat it with additional
-stuff(even when we need them) and provide locking with additional features both at guest as 
-well as host side we will get a hit in performance? Also as requirement of both the interfaces
-would grow it will be more difficult to maintain? I would prefer more simpler interfaces with
-defined functionality but yes common code can be shared and used using well defined wrappers. 
-
-> 
-> Stefan
-> 
+-- 
+Eduardo
