@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1e459F-0002Cq-1w
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:09:40 -0400
+	(envelope-from <thuth@redhat.com>) id 1e45CM-0003F5-Jm
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:12:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1e459B-00070p-Sd
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:09:37 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:51098)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1e459B-0006zc-If
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:09:33 -0400
-References: <1507822245-15748-1-git-send-email-peter.maydell@linaro.org>
-	<1507822245-15748-3-git-send-email-peter.maydell@linaro.org>
-	<b5d3e2e6-31c0-0496-bfee-3baad5d571f9@vivier.eu>
-	<CAFEAcA8nyWgNDA23Cne8dpOMKXmZ98A0kR8K_MSkYt8bF3pZCg@mail.gmail.com>
-	<c9e56a17-3c75-cfcf-7709-ee27efc291af@vivier.eu>
-	<20171016130616.GF1918@kos.to>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <4d8c3811-62a9-2391-e962-736c333d45c6@vivier.eu>
-Date: Mon, 16 Oct 2017 15:09:20 +0200
+	(envelope-from <thuth@redhat.com>) id 1e45CJ-00012t-DO
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:12:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54684)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1e45CJ-00012F-8G
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:12:47 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 16 Oct 2017 15:12:39 +0200
+Message-Id: <1508159564-30317-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171016130616.GF1918@kos.to>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] linux-user: Fix
- TARGET_MTIOCTOP/MTIOCGET/MTIOCPOS values
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/5] m68k, qtest and config patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,32 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Riku Voipio <riku.voipio@iki.fi>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, pgndev <pgnet.dev@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Dmitry Fleytman <dmitry@daynix.com>
 
-Le 16/10/2017 à 15:06, Riku Voipio a écrit :
-> On Thu, Oct 12, 2017 at 07:08:55PM +0200, Laurent Vivier wrote:
->> Le 12/10/2017 à 18:53, Peter Maydell a écrit :
->>> On 12 October 2017 at 17:49, Laurent Vivier <laurent@vivier.eu> wrote:
->>>> Le 12/10/2017 à 17:30, Peter Maydell a écrit :
->>>>> +#if defined(TARGET_SPARC) || defined(TARGET_MIPS)
->>>>> +typedef abi_long target_kernel_daddr_t;
->>>>> +#else
->>>>> +typedef abi_int target_kernel_daddr_t;
->>>>> +#endif
->>>>
->>>> Perhaps you can add these ones into include/exec/user/abitypes.h ?
->>>
->>> I don't think they belong there -- that file is for basic
->>> CPU ABI dependent types, not things which are just part of
->>> the kernel interface.
-> 
->> I agree
-> 
-> So we should go with the patch as-is?
+The following changes since commit f90ea7ba7c5ae7010ee0ce062207ae42530f57=
+d6:
 
-For this part, yes, but I think for the other comment, STRUCT(mtget,
-...) needs to be updated.
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
+71012' into staging (2017-10-12 17:06:50 +0100)
 
-Thanks,
-Laurent
+are available in the git repository at:
+
+  https://github.com/huth/qemu.git tags/pull-request-2017-10-16
+
+for you to fetch changes up to 03bf6b5c08c792f5c2b55d6038e9a6acbf43d9c3:
+
+  default-configs: Enable CONFIG_VMXNET3_PCI only on x86 (2017-10-16 13:2=
+9:49 +0200)
+
+----------------------------------------------------------------
+Some m68k, qtest and config improvements
+
+----------------------------------------------------------------
+Alistair Francis (1):
+      hw/m68k: Replace fprintf(stderr, "*\n" with error_report()
+
+Marc-Andr=C3=A9 Lureau (2):
+      M68K: use g_new() family of functions
+      tests: use g_new() family of functions
+
+Thomas Huth (2):
+      tests/prom-env: Bump the timeout, and test pseries only in slow mod=
+e
+      default-configs: Enable CONFIG_VMXNET3_PCI only on x86
+
+ default-configs/i386-softmmu.mak   |  1 +
+ default-configs/pci.mak            |  1 -
+ default-configs/x86_64-softmmu.mak |  1 +
+ hw/m68k/an5206.c                   |  4 ++--
+ hw/m68k/mcf5206.c                  |  7 ++++---
+ hw/m68k/mcf5208.c                  |  9 +++++----
+ tests/ahci-test.c                  |  4 ++--
+ tests/fw_cfg-test.c                |  4 ++--
+ tests/libqos/ahci.c                |  2 +-
+ tests/libqos/libqos.c              |  2 +-
+ tests/libqos/malloc.c              |  6 +++---
+ tests/libqtest.c                   |  2 +-
+ tests/pc-cpu-test.c                |  2 +-
+ tests/prom-env-test.c              | 14 ++++++++------
+ 14 files changed, 32 insertions(+), 27 deletions(-)
