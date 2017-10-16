@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e41YA-0005QW-7D
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:19:08 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e41YM-0005WY-Rj
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:19:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e41Y9-0005kc-16
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:19:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54776)
+	(envelope-from <kraxel@redhat.com>) id 1e41YJ-0005q4-Ln
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:19:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49574)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1e41Y8-0005jh-OF
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:19:04 -0400
-References: <20170911174933.20789-1-david@redhat.com>
-	<20170911174933.20789-6-david@redhat.com>
-	<7bf188b3-3c35-97ef-f67d-7ffabe45c4a1@redhat.com>
-	<f6eb7866-3df7-e420-5b84-6d3caf052413@redhat.com>
-	<bffd31bf-a3a1-8ecf-1ca0-afd3d891fd24@redhat.com>
-	<986d3c41-1b0e-6b0b-3096-916c90208b46@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <578fbf47-9106-0922-a185-a7f0da3760bd@redhat.com>
-Date: Mon, 16 Oct 2017 11:19:01 +0200
-MIME-Version: 1.0
-In-Reply-To: <986d3c41-1b0e-6b0b-3096-916c90208b46@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 5/6] kvm: kvm_log_start/stop are only
- called with known sections
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e41YJ-0005pZ-FW
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:19:15 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 931207F756
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 09:19:14 +0000 (UTC)
+Message-ID: <1508145553.15782.7.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 16 Oct 2017 11:19:13 +0200
+In-Reply-To: <20171013095724.GE20515@redhat.com>
+References: <20171013081450.29647-1-kraxel@redhat.com>
+	<20171013095724.GE20515@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/11] Ui 20171013 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,80 +33,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 16.10.2017 10:52, Thomas Huth wrote:
-> On 16.10.2017 09:16, David Hildenbrand wrote:
->> On 10.10.2017 15:29, Paolo Bonzini wrote:
->>> On 10/10/2017 11:06, Thomas Huth wrote:
->>>> On 11.09.2017 19:49, David Hildenbrand wrote:
->>>>> Let's properly align the sections first and bail out if we would ever
->>>>> get called with a memory section we don't know yet.
->>>>>
->>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>>> ---
->>>>>  accel/kvm/kvm-all.c | 18 ++++++++++++------
->>>>>  1 file changed, 12 insertions(+), 6 deletions(-)
->>>>>
->>>>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->>>>> index b677d1b13e..2ae459453d 100644
->>>>> --- a/accel/kvm/kvm-all.c
->>>>> +++ b/accel/kvm/kvm-all.c
->>>>> @@ -411,15 +411,21 @@ static int kvm_slot_update_flags(KVMMemoryListener *kml, KVMSlot *mem,
->>>>>  static int kvm_section_update_flags(KVMMemoryListener *kml,
->>>>>                                      MemoryRegionSection *section)
->>>>>  {
->>>>> -    hwaddr phys_addr = section->offset_within_address_space;
->>>>> -    ram_addr_t size = int128_get64(section->size);
->>>>> -    KVMSlot *mem = kvm_lookup_matching_slot(kml, phys_addr, size);
->>>>> +    hwaddr start_addr, size;
->>>>> +    KVMSlot *mem;
->>>>>  
->>>>> -    if (mem == NULL)  {
->>>>> +    size = kvm_align_section(section, &start_addr);
->>>>> +    if (!size) {
->>>>>          return 0;
->>>>> -    } else {
->>>>> -        return kvm_slot_update_flags(kml, mem, section->mr);
->>>>>      }
->>>>> +
->>>>> +    mem = kvm_lookup_matching_slot(kml, start_addr, size);
->>>>> +    if (!mem) {
->>>>> +        fprintf(stderr, "%s: error finding slot\n", __func__);
->>>>> +        abort();
->>>>> +    }
->>>>
->>>> FYI, this abort now triggers with the "isa-vga" device:
->>>>
->>>> $ x86_64-softmmu/qemu-system-x86_64 -S -accel kvm -device isa-vga
->>>> kvm_section_update_flags: error finding slot
->>>> Aborted (core dumped)
->>>>
->>>> Any ideas how to fix this?
->>>
->>> Reverting, unless David has some time to look into it.
->>>
->>> Paolo
->>>
->>
->> Just returned from vacation, I'll have a look this week.
->>
->> Thanks for that nice reproducer Thomas, that should help a lot!
-> 
-> FWIW, I've found the problem with the scripts/device-crash-test script,
-> so you might want to run that, too, before submitting a new version.
-> 
->  Thomas
-> 
+  Hi,
 
-This one was easy to fix, there was just one place where the asssumption
-"only called with known sections" was wrong.
+> I'm afraid this is quite likely to fail build smoke test again. I've
+> just tried a build on OpenBSD with the bash -> sh fix in it, and I
+> found that it still tried to build the keycodemap files in parallel
+> with checking out the GIT submodules. It also tried to run the
+> mkdir -p dtc/libfdt in parallel and this caused git to refuse to
+> checkout the dtc module due to that empty dir existing. So there's
+> still some deps problems in here I think that let make build in
+> the wrong order :-(
 
-See "memory: call log_start after region_add"
+> In all my debugging the one thing I've seen work correctly is the
+> re-running of configure (via config.status), which always happens
+> earlier and is serialized wrt everything else. So I wonder if we
+> should change direction slightly, and have configure checkout the
+> submodules. Then just make sure that config.status is triggered
+> when submodules are out of date.
 
--- 
+I've noticed configure running *in parallel* to other stuff.=20
+Reproducer:
 
-Thanks,
+  (1) Apply patch #1
+  (2) run normal build
+  (3) make -C dtc clean
+  (4) touch configure
+  (5) make
 
-David
+Watch configure and dtc build running in parallel.
+I think the added Makefile dependency breaks it.
+
+Incremental fix (also pushed to queue/ui):
+
+--- a/Makefile
++++ b/Makefile
+@@ -35,8 +35,6 @@ endif
+=C2=A0
+=C2=A0.git-submodule-status: git-submodule-update config-host.mak
+=C2=A0
+-Makefile: .git-submodule-status
+-
+=C2=A0# Check that we're not trying to do an out-of-tree build from
+=C2=A0# a tree that's been used for an in-tree build.
+=C2=A0ifneq ($(realpath $(SRC_PATH)),$(realpath .))
+@@ -107,6 +105,7 @@ endif
+=C2=A0GENERATED_FILES +=3D $(TRACE_HEADERS)
+=C2=A0GENERATED_FILES +=3D $(TRACE_SOURCES)
+=C2=A0GENERATED_FILES +=3D $(BUILD_DIR)/trace-events-all
++GENERATED_FILES +=3D .git-submodule-status
+=C2=A0
+=C2=A0trace-group-name =3D $(shell dirname $1 | sed -e 's/[^a-zA-Z0-9]/_/=
+g')
+
+cheers,
+  Gerd
