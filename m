@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e49mz-0003OP-Hu
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 14:06:59 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1e49nc-0003tx-81
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 14:07:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e49mw-0007ye-22
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 14:06:57 -0400
-Received: from mail-pg0-x22b.google.com ([2607:f8b0:400e:c05::22b]:55640)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e49mv-0007yF-Sx
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 14:06:53 -0400
-Received: by mail-pg0-x22b.google.com with SMTP id b11so7431997pgn.12
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 11:06:53 -0700 (PDT)
-References: <20170927170027.8539-1-david@redhat.com>
-	<20170927170027.8539-2-david@redhat.com>
-	<30b6f3a1-bfeb-6172-5233-2f7d444399fc@linaro.org>
-	<a1f27655-5a3b-0e1f-cca3-12c09b7cbe51@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <1d995492-dbcf-7466-0ebc-9e507d50d099@linaro.org>
-Date: Mon, 16 Oct 2017 11:06:49 -0700
+	(envelope-from <mjt@tls.msk.ru>) id 1e49nW-0008QH-Fh
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 14:07:36 -0400
+References: <1507630928-28307-1-git-send-email-Jim.Quigley@oracle.com>
+From: Michael Tokarev <mjt@tls.msk.ru>
+Message-ID: <78aed453-49b8-a9e4-ae7c-39c731158eaa@msgid.tls.msk.ru>
+Date: Mon, 16 Oct 2017 21:07:29 +0300
 MIME-Version: 1.0
-In-Reply-To: <a1f27655-5a3b-0e1f-cca3-12c09b7cbe51@redhat.com>
+In-Reply-To: <1507630928-28307-1-git-send-email-Jim.Quigley@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 1/3] accel/tcg: allow to invalidate a
- write TLB entry immediately
+Subject: Re: [Qemu-devel] [PATCH] hw/vfio: improve error message when cannot
+ init vfio event notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,38 +24,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>
+To: Jim Quigley <Jim.Quigley@oracle.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, alex.williamson@redhat.com, laurent@vivier.eu
 
-On 10/16/2017 12:24 AM, David Hildenbrand wrote:
-> On 27.09.2017 19:48, Richard Henderson wrote:
->> On 09/27/2017 10:00 AM, David Hildenbrand wrote:
->>> Background: s390x implements Low-Address Protection (LAP). If LAP is
->>> enabled, writing to effective addresses (before any transaltion)
->>> 0-511 and 4096-4607 triggers a protection exception.
->>>
->>> So we have subpage protection on the first two pages of every address
->>> space (where the lowcore - the CPU private data resides).
->>>
->>> By immediately invalidating the write entry but allowing the caller to
->>> continue, we force every write access onto these first two pages into
->>> the slow path. we will get a tlb fault with the specific accessed
->>> addresses and can then evaluate if protection applies or not.
->>>
->>> We have to make sure to ignore the invalid bit if tlb_fill() succeeds.
->>
->> This is similar to a scheme I proposed to PMM wrt handling ARM v8M translation.
->>  Reusing TLB_INVALID_MASK would appear to work, but I wonder if it wouldn't be
->> clearer to use another bit.  I believe I had proposed a TLB_FORCE_SLOW_MASK.
->>
->> Thoughts, Peter?
+10.10.2017 13:22, Jim Quigley wrote:
+> More information is required to assist trouble-shooting when
+> QEMU fails to initialise the event notifications for devices
+> assigned with VFIO-PCI. Instead of supplying the user with a cryptic
+> error number only, print out a proper error message with strerror()
+> so that the user has a better way to figure out what the problem is.
 > 
-> As two weeks have passed:
+> Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+> Signed-off-by: Jim Quigley <Jim.Quigley@oracle.com>
+> ---
+> Cc: qemu-trivial@nongnu.org
+> Cc: mjt@tls.msk.ru
+> Cc: laurent@vivier.eu
+> Cc: alex.williamson@redhat.com
+> ---
+>  hw/vfio/pci.c | 35 ++++++++++++++++++++++++-----------
+>  1 file changed, 24 insertions(+), 11 deletions(-)
 > 
-> Any further opinions? Richard, how do you want me to continue with this?
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 31e1edf..3bffb93 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -430,13 +430,16 @@ static int vfio_enable_vectors(VFIOPCIDevice *vdev, bool msix)
+>  static void vfio_add_kvm_msi_virq(VFIOPCIDevice *vdev, VFIOMSIVector *vector,
+>                                    int vector_n, bool msix)
+>  {
+> -    int virq;
+> +    int virq, ret;
+>  
+>      if ((msix && vdev->no_kvm_msix) || (!msix && vdev->no_kvm_msi)) {
+>          return;
+>      }
+>  
+> -    if (event_notifier_init(&vector->kvm_interrupt, 0)) {
+> +    ret = event_notifier_init(&vector->kvm_interrupt, 0);
+> +    if (ret) {
+> +        error_report("vfio (%s): Error: unable to init event notifier: %s (%d)",
+> +                     __func__, strerror(-ret), -ret);
 
-Let's just go ahead with TLB_INVALID_MASK; we'll revisit if it gets to be
-confusing.
+Since this pattern gets repeated again and again, maybe we can either
+use a common wrapper or move that eror reporting into event_notifier_init()?
+Note there are other users of this function, besides hw/vfio, and maybe
+these, too, can benefit from better error reporting?
 
+Thanks,
 
-r~
+/mjt
