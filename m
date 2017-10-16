@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e48B3-0004mT-Al
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 12:23:44 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e48GP-0000cz-2C
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 12:29:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e48B2-0007Jg-Dt
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 12:23:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:24998)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e48B2-0007Ir-6Y
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 12:23:40 -0400
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon, 16 Oct 2017 18:22:56 +0200
-Message-Id: <1508170976-96869-7-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
-References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [RFC 6/6] QMP: add set-numa-node command
+	(envelope-from <peter.maydell@linaro.org>) id 1e48GO-0002tt-4c
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 12:29:13 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:48647)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e48GN-0002rf-U8
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 12:29:12 -0400
+Received: by mail-wm0-x229.google.com with SMTP id i124so5073701wmf.3
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 09:29:11 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20171015004033.3248-1-eblake@redhat.com>
+References: <20171015004033.3248-1-eblake@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Oct 2017 17:28:50 +0100
+Message-ID: <CAFEAcA_ypGCq_xdrqyNsiriskxOf4a58oYaZAGfTQw9as2e_wg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/9] NBD patches through 14 Oct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,64 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: eblake@redhat.com, armbru@redhat.com, ehabkost@redhat.com, pkrempa@redhat.com, david@gibson.dropbear.id.au, peter.maydell@linaro.org, pbonzini@redhat.com, cohuck@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
- hw/core/machine.c |  1 +
- numa.c            |  5 +++++
- qapi-schema.json  | 13 +++++++++++++
- 3 files changed, 19 insertions(+)
+On 15 October 2017 at 01:40, Eric Blake <eblake@redhat.com> wrote:
+> The following changes since commit f90ea7ba7c5ae7010ee0ce062207ae42530f57=
+d6:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
+71012' into staging (2017-10-12 17:06:50 +0100)
+>
+> are available in the git repository at:
+>
+>   git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2017-10-14
+>
+> for you to fetch changes up to 92652b124336f5c08c7eb4616af202ea910dd3ea:
+>
+>   nbd: header constants indenting (2017-10-13 09:27:38 -0500)
+>
+> ----------------------------------------------------------------
+> nbd patches for 2017-10-14
+>
+> - Marc-Andr=C3=A9 Lureau - NBD: use g_new() family of functions
+> - Vladimir Sementsov-Ogievskiy - first half of 00/13 nbd minimal structur=
+ed read
+>
+> ----------------------------------------------------------------
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 1e1fca5..def9b9a 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -22,6 +22,7 @@
- #include "qemu/cutils.h"
- #include "sysemu/numa.h"
- #include "sysemu/qtest.h"
-+#include "qmp-commands.h"
- 
- static char *machine_get_accel(Object *obj, Error **errp)
- {
-diff --git a/numa.c b/numa.c
-index a530d9c..1c99fca 100644
---- a/numa.c
-+++ b/numa.c
-@@ -540,6 +540,11 @@ void parse_numa_opts(MachineState *ms)
-     }
- }
- 
-+void qmp_set_numa_node(NumaOptions *cmd, Error **errp)
-+{
-+    parse_NumaOptions(MACHINE(qdev_get_machine()), cmd, errp);
-+}
-+
- void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp)
- {
-     int node_id = object_property_get_int(OBJECT(dev), "node-id", &error_abort);
-diff --git a/qapi-schema.json b/qapi-schema.json
-index a9dd043..600f87b 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -3200,3 +3200,16 @@
- # Since: 2.11
- ##
- { 'command': 'watchdog-set-action', 'data' : {'action': 'WatchdogAction'} }
-+
-+##
-+# @set-numa-node:
-+#
-+# Runtime equivalent of '-numa' CLI option, available at
-+# preconfigure stage to configure numa mapping before initializing
-+# machine.
-+#
-+# Since 2.10
-+##
-+{ 'command': 'set-numa-node', 'boxed': true,
-+  'data': 'NumaOptions'
-+}
--- 
-2.7.4
+Applied, thanks.
+
+-- PMM
