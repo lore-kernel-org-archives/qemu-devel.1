@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prasad.singamsetty@oracle.com>) id 1e48mh-00085y-5v
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:02:36 -0400
+	(envelope-from <mst@redhat.com>) id 1e48mq-0008Dt-LM
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:02:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prasad.singamsetty@oracle.com>) id 1e48mc-00015z-9E
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:02:35 -0400
-Received: from userp1040.oracle.com ([156.151.31.81]:36523)
+	(envelope-from <mst@redhat.com>) id 1e48ml-0001Jb-QA
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:02:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50790)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prasad.singamsetty@oracle.com>)
-	id 1e48mb-00013M-Ve
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:02:30 -0400
-References: <a41b88a6-4882-1abc-b6e2-e42acf03c198@oracle.com>
-	<20171013170143.GB3370@work-vm> <20171013111403.293919fe@t450s.home>
-	<20171015035318.GA22780@pxdev.xzpeter.org>
-From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-Message-ID: <c4d07be9-7d9b-71fa-e84c-e393138f7a84@oracle.com>
-Date: Mon, 16 Oct 2017 10:02:25 -0700
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e48ml-0001If-KT
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:02:39 -0400
+Date: Mon, 16 Oct 2017 20:02:32 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171016200124-mutt-send-email-mst@kernel.org>
+References: <1508169816-5993-1-git-send-email-lukas.humbel@inf.ethz.ch>
 MIME-Version: 1.0
-In-Reply-To: <20171015035318.GA22780@pxdev.xzpeter.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] host physical address width issues/questions for
- x86_64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1508169816-5993-1-git-send-email-lukas.humbel@inf.ethz.ch>
+Subject: Re: [Qemu-devel] [PATCH] hw/pci: Add e1000e NIC as command line
+ argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,73 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, Sunit Jain <sunit.jain@oracle.com>, ehabkost@redhat.com, rth@twiddle.net
+To: lukas.humbel@inf.ethz.ch
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>
 
-
-
-On 10/14/2017 8:53 PM, Peter Xu wrote:
-> On Fri, Oct 13, 2017 at 11:14:03AM -0600, Alex Williamson wrote:
->> On Fri, 13 Oct 2017 18:01:44 +0100
->> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
->>
->>> * Prasad Singamsetty (prasad.singamsetty@oracle.com) wrote:
->>>> Hi,
->>>>
->>>> I am new to the alias. I have some questions on this subject
->>>> and seek some clarifications from the experts in the team.
->>>> I ran into a couple of issues when I tried with large configuration
->>>> ( >= 1TB memory, > 255 CPUs) for x86_64 guest machine.
->>>>
->>>> 1. QEMU uses the default value of 40 (TCG_PHYS_ADDR_BITS) for address
->>>>     width if user has not specified phys-bits or host-phys-bits=true
->>>>     property. The default value is obviously not sufficient and
->>>>     causing guest kernel to crash if configured with >= 1TB
->>>>     memory. Depending on the linux kernel version in the guest the
->>>>     panic was in different code paths. The workaround is for the
->>>>     user to specify the phys-bits property or set the property
->>>>     host-phys-bits=true.
->>>>
->>>>     QUESTIONS:
->> ...
->>>> 2. host_address_width in DMAR table structure
->>>>
->>>>     In this case, the default value is set to 39
->>>>     (VTD_HOST_ADDRESS_WIDTH - 1). With interrupt remapping
->>>>     enabled for the intel iommu and the guest is configured
->>>>     with > 255 cpus and >= 1TB memory, the guest kernel hangs
->>>>     during boot up. This need to be fixed.
->>>>
->>>>     QUESTION:
->>>>     The question here again is can we fix this to use the
->>>>     real address width from the host as the default?
->>>
->>> I don't know DMAR stuff; chatting to Alex (cc'd) it does sound
->>> like that's an ommission that should be fixed.
->>
->> [CC +Peter]
->>
->> On physical hardware VT-d supports either 39 or 48 bit address widths
->> and generally you'd expect a sufficiently capable IOMMU to be matched
->> with the CPU.  Seems QEMU has only implemented a lower bit width and
->> it should probably be forcing phys bits of the VM to 39 to match until
->> the extended width can be implemented.  Thanks,
->>
->> Alex
+On Mon, Oct 16, 2017 at 06:03:36PM +0200, lukas.humbel@inf.ethz.ch wrote:
+> From: Lukas Humbel <lukas.humbel@inf.ethz.ch>
 > 
-> There were patches that tried to enable 48 bits GAW but it was
-> not accepted somehow:
-> 
->    https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg01886.html
-> 
-> Would this help in any way?
-> 
+> Signed-off-by: Lukas Humbel <lukas.humbel@inf.ethz.ch>
 
-Thanks Alex for the patch info. Just curious why the patch was not
-accepted. Any way, I will try it.
+We keep these around for legacy reasons but I'm not sure we need to add
+to the list.  What's wrong with just creating them with -device e1000e?
 
-Thanks.
---Prasad
-
-> Thanks,
+> ---
+>  hw/pci/pci.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 1e6fb88..9d6cd04 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -1819,6 +1819,7 @@ static const char * const pci_nic_models[] = {
+>      "i82559er",
+>      "rtl8139",
+>      "e1000",
+> +    "e1000e",
+>      "pcnet",
+>      "virtio",
+>      "sungem",
+> @@ -1832,6 +1833,7 @@ static const char * const pci_nic_names[] = {
+>      "i82559er",
+>      "rtl8139",
+>      "e1000",
+> +    "e1000e",
+>      "pcnet",
+>      "virtio-net-pci",
+>      "sungem",
+> -- 
+> 2.7.4
