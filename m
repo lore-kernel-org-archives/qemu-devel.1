@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e3zdg-0004Pc-Es
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 03:16:41 -0400
+	(envelope-from <david@redhat.com>) id 1e3zhu-00077c-Ff
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 03:21:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e3zdd-0002sq-AL
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 03:16:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42428)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1e3zdd-0002sG-39
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 03:16:37 -0400
-References: <20170911174933.20789-1-david@redhat.com>
-	<20170911174933.20789-6-david@redhat.com>
-	<7bf188b3-3c35-97ef-f67d-7ffabe45c4a1@redhat.com>
-	<f6eb7866-3df7-e420-5b84-6d3caf052413@redhat.com>
+	(envelope-from <david@redhat.com>) id 1e3zhr-0005a9-BC
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 03:21:02 -0400
+References: <20170927170027.8539-1-david@redhat.com>
+	<20170927170027.8539-3-david@redhat.com>
+	<466fa6a0-ac91-66aa-aabb-a15a8ac62e0f@redhat.com>
+	<3d5ea6d8-b3bf-b1a5-b4a1-082ff49ae842@redhat.com>
+	<20170929132717.23ecf350.cohuck@redhat.com>
+	<469b7729-0e9a-1c20-6a68-b3b8e55bafb4@redhat.com>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <bffd31bf-a3a1-8ecf-1ca0-afd3d891fd24@redhat.com>
-Date: Mon, 16 Oct 2017 09:16:34 +0200
+Message-ID: <fdd66d43-6517-69b5-7f5a-9fa0b658ce4b@redhat.com>
+Date: Mon, 16 Oct 2017 09:20:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <f6eb7866-3df7-e420-5b84-6d3caf052413@redhat.com>
+In-Reply-To: <469b7729-0e9a-1c20-6a68-b3b8e55bafb4@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 5/6] kvm: kvm_log_start/stop are only
- called with known sections
+Subject: Re: [Qemu-devel] [PATCH RFC 2/3] s390x/tcg: low-address protection
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +29,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org
 
-On 10.10.2017 15:29, Paolo Bonzini wrote:
-> On 10/10/2017 11:06, Thomas Huth wrote:
->> On 11.09.2017 19:49, David Hildenbrand wrote:
->>> Let's properly align the sections first and bail out if we would ever
->>> get called with a memory section we don't know yet.
+On 12.10.2017 10:41, Thomas Huth wrote:
+> On 29.09.2017 13:27, Cornelia Huck wrote:
+>> On Thu, 28 Sep 2017 15:08:11 +0200
+>> David Hildenbrand <david@redhat.com> wrote:
+>>
+>>> On 28.09.2017 06:50, Thomas Huth wrote:
+>>>> On 27.09.2017 19:00, David Hildenbrand wrote:  
+>>>>> This is a neat way to implement low address protection, whereby
+>>>>> only the first 512 bytes of the first two pages (each 4096 bytes) of
+>>>>> every address space are protected.
+>>>>>
+>>>>> Store a tec of 0 for the access exception, this is what is defined by
+>>>>> Enhanced Suppression on Protection in case of a low address protection
+>>>>> (Bit 61 set to 0, rest undefined).
+>>>>>
+>>>>> We have to make sure to to pass the access address, not the masked page
+>>>>> address into mmu_translate*().
+>>>>>
+>>>>> Drop the check from testblock. So we can properly test this via
+>>>>> kvm-unit-tests.
+>>>>>
+>>>>> This will check every access going through one of the MMUs.
+>>>>>
+>>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>>> ---
+>>>>>  target/s390x/excp_helper.c |  3 +-
+>>>>>  target/s390x/mem_helper.c  |  8 ----
+>>>>>  target/s390x/mmu_helper.c  | 96 +++++++++++++++++++++++++++++-----------------
+>>>>>  3 files changed, 62 insertions(+), 45 deletions(-)  
+>>>> [...]  
+>>>>> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+>>>>> index 9daa0fd8e2..44a15449d2 100644
+>>>>> --- a/target/s390x/mmu_helper.c
+>>>>> +++ b/target/s390x/mmu_helper.c
+>>>>> @@ -106,6 +106,37 @@ static void trigger_page_fault(CPUS390XState *env, target_ulong vaddr,
+>>>>>      trigger_access_exception(env, type, ilen, tec);
+>>>>>  }
+>>>>>  
+>>>>> +/* check whether the address would be proteted by Low-Address Protection */
+>>>>> +static bool is_low_address(uint64_t addr)
+>>>>> +{
+>>>>> +    return addr < 512 || (addr >= 4096 && addr < 4607);
+>>>>> +}  
+>>>>
+>>>> I like the check from the kernel sources better:
+>>>>
+>>>> static inline int is_low_address(unsigned long ga)
+>>>> {
+>>>>     /* Check for address ranges 0..511 and 4096..4607 */
+>>>>     return (ga & ~0x11fful) == 0;
+>>>> }
+>>>>
+>>>> ... that might result in slightly faster code (depending on the
+>>>> compiler, of course).  
 >>>
->>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>> ---
->>>  accel/kvm/kvm-all.c | 18 ++++++++++++------
->>>  1 file changed, 12 insertions(+), 6 deletions(-)
+>>> I think that lim (readability) -> 0. Without that comment you're at
+>>> first sight really clueless what this is about.
 >>>
->>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->>> index b677d1b13e..2ae459453d 100644
->>> --- a/accel/kvm/kvm-all.c
->>> +++ b/accel/kvm/kvm-all.c
->>> @@ -411,15 +411,21 @@ static int kvm_slot_update_flags(KVMMemoryListener *kml, KVMSlot *mem,
->>>  static int kvm_section_update_flags(KVMMemoryListener *kml,
->>>                                      MemoryRegionSection *section)
->>>  {
->>> -    hwaddr phys_addr = section->offset_within_address_space;
->>> -    ram_addr_t size = int128_get64(section->size);
->>> -    KVMSlot *mem = kvm_lookup_matching_slot(kml, phys_addr, size);
->>> +    hwaddr start_addr, size;
->>> +    KVMSlot *mem;
->>>  
->>> -    if (mem == NULL)  {
->>> +    size = kvm_align_section(section, &start_addr);
->>> +    if (!size) {
->>>          return 0;
->>> -    } else {
->>> -        return kvm_slot_update_flags(kml, mem, section->mr);
->>>      }
->>> +
->>> +    mem = kvm_lookup_matching_slot(kml, start_addr, size);
->>> +    if (!mem) {
->>> +        fprintf(stderr, "%s: error finding slot\n", __func__);
->>> +        abort();
->>> +    }
+>>> My check exactly corresponds to the wording in the PoP (and smart
+>>> compilers should be able to optimize).
+>>>
+>>> But I don't have a strong opinion on this micro optimization.
 >>
->> FYI, this abort now triggers with the "isa-vga" device:
->>
->> $ x86_64-softmmu/qemu-system-x86_64 -S -accel kvm -device isa-vga
->> kvm_section_update_flags: error finding slot
->> Aborted (core dumped)
->>
->> Any ideas how to fix this?
+>> FWIW, I'd be happy with both, but has anyone actually looked at the
+>> generated code?
 > 
-> Reverting, unless David has some time to look into it.
+> This is what I get for David's original code:
 > 
-> Paolo
+>     80000510:   c4 18 00 00 0d a4       lgrl    %r1,80002058 <x1>
+>     80000516:   a7 29 01 ff             lghi    %r2,511
+>     8000051a:   ec 12 00 4f c0 65       clgrjnh %r1,%r2,800005b8 <main+0xd8>
+>     80000520:   a7 1b f0 00             aghi    %r1,-4096
+>     80000524:   c2 1e 00 00 01 fe       clgfi   %r1,510
+>     8000052a:   a7 18 00 00             lhi     %r1,0
+>     8000052e:   b9 99 00 11             slbr    %r1,%r1
+>     80000532:   13 11                   lcr     %r1,%r1
+>     80000534:   c4 1f 00 00 0d 96       strl    %r1,80002060 <b1>
+> 
+> And this is the optimized kernel version:
+> 
+>     8000054a:   c4 18 00 00 0d 7f       lgrl    %r1,80002048 <x2>
+>     80000550:   a5 17 ee 00             nill    %r1,60928
+>     80000554:   b9 00 00 11             lpgr    %r1,%r1
+>     80000558:   a7 1b ff ff             aghi    %r1,-1
+>     8000055c:   eb 11 00 3f 00 0c       srlg    %r1,%r1,63
+>     80000562:   c4 1f 00 00 0d 77       strl    %r1,80002050 <b2>
+> 
+> So that's indeed a little bit better :-)
+> (I was using GCC 4.8.5 from RHEL7, with -O2)
+> 
+> By the way, I think there's a bug in David's code: It should either be
+> "addr <= 4607" or "addr < 4608" instead of "addr < 4607".
+> 
+> With that bug fixed, David's version get's optimized even more:
+> 
+>     80000510:   c4 18 00 00 0d a4       lgrl    %r1,80002058 <x1>
+>     80000516:   a5 17 ef ff             nill    %r1,61439
+>     8000051a:   c2 1e 00 00 01 ff       clgfi   %r1,511
+>     80000520:   a7 18 00 00             lhi     %r1,0
+>     80000524:   b9 99 00 11             slbr    %r1,%r1
+>     80000528:   13 11                   lcr     %r1,%r1
+>     8000052a:   c4 1f 00 00 0d 9b       strl    %r1,80002060 <b1>
+> 
+> ... so the difference is really very minimal in that case --> We could
+> really use the more readable version, I think.
+> 
+>  Thomas
 > 
 
-Just returned from vacation, I'll have a look this week.
+Very right, I'll fix that.
 
-Thanks for that nice reproducer Thomas, that should help a lot!
+Nice way to find BUGs - comparing generated code :)
+
+Thanks!
 
 -- 
 
