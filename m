@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e43V6-0008TF-69
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 07:24:09 -0400
+	(envelope-from <groug@kaod.org>) id 1e43VY-0000Cd-1k
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 07:24:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e43V2-0007ij-Vn
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 07:24:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55546)
+	(envelope-from <groug@kaod.org>) id 1e43VU-0007vy-Qa
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 07:24:32 -0400
+Received: from 10.mo4.mail-out.ovh.net ([188.165.33.109]:42289)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1e43V2-0007iD-Mu
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 07:24:00 -0400
-References: <1505913885.24609.8.camel@redhat.com>
-	<2b739056-081b-593a-6344-50b60d04872b@redhat.com>
-	<1505917879.24609.11.camel@redhat.com>
-	<394d5515-c9a0-578d-1daf-8af1328f0b4b@redhat.com>
-	<3f8964dc-3fd4-1f0d-c6c6-46afe78a085d@redhat.com>
-	<54b31df5-8eff-2312-346e-3fd9a78cab8e@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <6b52b0f6-6e89-461c-8094-35214b67c628@redhat.com>
-Date: Mon, 16 Oct 2017 13:23:48 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e43VU-0007vB-K2
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 07:24:28 -0400
+Received: from player159.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 23B6CE509A
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 13:24:27 +0200 (CEST)
+Date: Mon, 16 Oct 2017 13:24:20 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171016132420.3accb7b4@bahia.lan>
+In-Reply-To: <20171016104139.5f7afa6c@nial.brq.redhat.com>
+References: <150789527176.5487.14861721766357709655.stgit@bahia.lan>
+	<20171016104139.5f7afa6c@nial.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <54b31df5-8eff-2312-346e-3fd9a78cab8e@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] kvm_set_phys_mem: assertion failed
+Subject: Re: [Qemu-devel] [PATCH] monitor: fix dangling CPU pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,85 +30,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Joe Clifford <joeclifford@gmail.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Auger Eric <eric.auger@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On 04.10.2017 17:48, Laszlo Ersek wrote:
-> Hi,
+On Mon, 16 Oct 2017 10:41:39 +0200
+Igor Mammedov <imammedo@redhat.com> wrote:
+
+> On Fri, 13 Oct 2017 13:47:51 +0200
+> Greg Kurz <groug@kaod.org> wrote:
 > 
-> On 09/21/17 16:28, Auger Eric wrote:
->> Hi David,
->> On 20/09/2017 16:34, David Hildenbrand wrote:
->>> On 20.09.2017 16:31, Gerd Hoffmann wrote:
->>>>   Hi,
->>>>
->>>>> Dropping from os section:
->>>>>
->>>>> <loader readonly="yes"
->>>>> type="pflash">/usr/share/edk2.git/ovmf-x64/OVMF_CODE-pure-
->>>>> efi.fd</loader>
->>>>> <nvram
->>>>> template="/usr/share/edk2.git/ovmf-x64/OVMF_VARS-pure-
->>>>> efi.fd">/var/lib/libvirt/qemu/nvram/fedora-org-drm-qxl-
->>>>> base_VARS.fd</nvram>
->>>>
->>>> Bad idea I guess.
->>>>
->>>>> 1) Does the assert trigger right at startup? Or how is it triggered?
->>>>
->>>> Yes, right at startup, before OVMF is done initializing.
->>>> So probably something in OVMF triggers it.
->>>
->>> I'll try to include ovmf to reproduce it.
->>>
->>>>
->>>>> 2) Does your setup work when dopping the assertion?
->>>>
->>>> Can try tomorrow.
->> I encounter the problem on ARM too. My setup works when dropping the
->> assertion.
->>
->> Thanks
->>
->> Eric
->>>
->>> I think that assertion might not be stable, because properties (romd
->>> mode) might not be stable and can change. So if it works without the
->>> assert, dropping it is the right thing to do.
+> [...]
 > 
-> There seems to be a new issue report on LaunchPad about the same
-> (f357f564be0b) commit, stating that the removal of the assertion does
-> not help:
-> 
-> https://bugs.launchpad.net/qemu/+bug/1721221
-> 
-> (Just trying to connect the dots here; I have no comments on the commit
-> otherwise. CC'ing Joe who has filed the LP report.)
-> 
-> Thanks
-> Laszlo
+> > Note that the resolution should really return a CPU object, otherwise
+> > we have a bug. This is achieved by relying on object_resolve_path()
+> > and CPU() instead of calling object_resolve_path_type(path, TYPE_CPU).  
+> I'm not sure what you are trying to say here, could you explain
+> a bit more why CPU(object_resolve_path()) is chosen vs
+> object_resolve_path_type(path, TYPE_CPU)
 > 
 
-Hi Joe,
+IIUC, if we use object_resolve_path_type(path, TYPE_CPU) and path doesn't
+point to a CPU object, it will return NULL (see object_resolve_abs_path())
+just like if the CPU got hot-unplugged.
 
-do you have some time to test with the following branch?
+My point is that the path we got from object_get_canonical_path() did
+point to a CPU: if later on this path resolves to an object that isn't
+a CPU, then some code somewhere used the same QOM path for some unrelated
+object. I tend to think this is a bug in QEMU and we shouldn't silently
+ignore it.
 
-https://github.com/davidhildenbrand/qemu/tree/kvm_slot
+Makes sense ?
 
-If it works - very good. If not, can you give me what QEMU prints (I
-added some debug output).
+> 
+> > Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  monitor.c |   25 ++++++++++++++++++++-----
+> >  1 file changed, 20 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/monitor.c b/monitor.c
+> > index fe0d1bdbb461..8489b2ad99c0 100644
+> > --- a/monitor.c
+> > +++ b/monitor.c
+> > @@ -200,7 +200,7 @@ struct Monitor {
+> >  
+> >      ReadLineState *rs;
+> >      MonitorQMP qmp;
+> > -    CPUState *mon_cpu;
+> > +    gchar *mon_cpu_path;
+> >      BlockCompletionFunc *password_completion_cb;
+> >      void *password_opaque;
+> >      mon_cmd_t *cmd_table;
+> > @@ -579,6 +579,7 @@ static void monitor_data_init(Monitor *mon)
+> >  
+> >  static void monitor_data_destroy(Monitor *mon)
+> >  {
+> > +    g_free(mon->mon_cpu_path);
+> >      qemu_chr_fe_deinit(&mon->chr, false);
+> >      if (monitor_is_qmp(mon)) {
+> >          json_message_parser_destroy(&mon->qmp.parser);
+> > @@ -1047,20 +1048,34 @@ int monitor_set_cpu(int cpu_index)
+> >      if (cpu == NULL) {
+> >          return -1;
+> >      }
+> > -    cur_mon->mon_cpu = cpu;
+> > +    g_free(cur_mon->mon_cpu_path);
+> > +    cur_mon->mon_cpu_path = object_get_canonical_path(OBJECT(cpu));
+> >      return 0;
+> >  }
+> >  
+> >  CPUState *mon_get_cpu(void)
+> >  {
+> > -    if (!cur_mon->mon_cpu) {
+> > +    CPUState *cpu;
+> > +
+> > +    if (cur_mon->mon_cpu_path) {
+> > +        Object *obj = object_resolve_path(cur_mon->mon_cpu_path, NULL);
+> > +
+> > +        if (!obj) {
+> > +            g_free(cur_mon->mon_cpu_path);
+> > +            cur_mon->mon_cpu_path = NULL;
+> > +        } else {
+> > +            cpu = CPU(obj);  
+> this potentially might abort if obj couldn't be cast to TYPE_CPU
+> 
 
-Looks something like this:
+This is deliberate... is there a case where cur_mon->mon_cpu_path would
+legitimately point to something that isn't of type TYPE_CPU ?
 
-set_phys_mem(0): start: 0x0, size: 0x8000000, add: 1
-Add(0): start: 0x0, size: 0x8000000, ram: 0x0x7f6697e00000
-set_phys_mem(0): start: 0xfffc0000, size: 0x40000, add: 1
-Add(0): start: 0xfffc0000, size: 0x40000, ram: 0x0x7f66a7200000
-set_phys_mem(0): start: 0x0, size: 0x8000000, add: 0
-...
-
--- 
-
-Thanks,
-
-David
+> 
+> > +        }
+> > +    }
+> > +    if (!cur_mon->mon_cpu_path) {
+> >          if (!first_cpu) {
+> >              return NULL;
+> >          }
+> >          monitor_set_cpu(first_cpu->cpu_index);
+> > +        cpu = first_cpu;
+> >      }
+> > -    cpu_synchronize_state(cur_mon->mon_cpu);
+> > -    return cur_mon->mon_cpu;
+> > +    cpu_synchronize_state(cpu);
+> > +    return cpu;
+> >  }
+> >  
+> >  CPUArchState *mon_get_cpu_env(void)
+> > 
+> >   
+> 
