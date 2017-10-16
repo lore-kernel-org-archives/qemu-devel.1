@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1e45ST-000773-TB
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:29:30 -0400
+	(envelope-from <bounces@canonical.com>) id 1e45UR-0000DM-6h
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:31:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1e45SO-0002s7-Vk
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:29:29 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:57456)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1e45SO-0002rJ-MK
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:29:24 -0400
-References: <1507822245-15748-1-git-send-email-peter.maydell@linaro.org>
-	<1507822245-15748-3-git-send-email-peter.maydell@linaro.org>
-	<b5d3e2e6-31c0-0496-bfee-3baad5d571f9@vivier.eu>
-	<CAFEAcA8nyWgNDA23Cne8dpOMKXmZ98A0kR8K_MSkYt8bF3pZCg@mail.gmail.com>
-	<c9e56a17-3c75-cfcf-7709-ee27efc291af@vivier.eu>
-	<20171016130616.GF1918@kos.to>
-	<4d8c3811-62a9-2391-e962-736c333d45c6@vivier.eu>
-	<CAFEAcA8z17CSarERraA2+QsakzPx-RioJNX=+e7_8pf_MUqVnA@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <3ec5701f-3515-2682-4884-484eb0f1503d@vivier.eu>
-Date: Mon, 16 Oct 2017 15:29:13 +0200
+	(envelope-from <bounces@canonical.com>) id 1e45UL-0003ww-0K
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:31:31 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40454)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e45UK-0003wD-Pa
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:31:24 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e45UI-0006HV-HI
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 13:31:22 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6D4532E80D7
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 13:31:21 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8z17CSarERraA2+QsakzPx-RioJNX=+e7_8pf_MUqVnA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] linux-user: Fix
- TARGET_MTIOCTOP/MTIOCGET/MTIOCPOS values
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 16 Oct 2017 13:16:22 -0000
+From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
+Reply-To: Bug 1721275 <1721275@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150712892432.28170.15132413345734525245.malonedeb@gac.canonical.com>
+Message-Id: <150815978220.15244.13378023945796441528.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1721275] Re: Support more ARM CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,28 +36,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>, pgndev <pgnet.dev@gmail.com>
+To: qemu-devel@nongnu.org
 
-Le 16/10/2017 à 15:26, Peter Maydell a écrit :
-> On 16 October 2017 at 14:09, Laurent Vivier <laurent@vivier.eu> wrote:
->> For this part, yes, but I think for the other comment, STRUCT(mtget,
->> ...) needs to be updated.
-> 
-> Looking more closely I don't think it is as simple as just
-> adjusting the STRUCT() definition. For a basic type that can
-> be different on host and guest, I think we'd need to handle
-> it the way we do the TYPE_OLDDEVT, with special support
-> in the thunk code for figuring out how large it is and so on.
-> That seems like a lot of work for a magtape ioctl that I
-> suspect nobody's using and which we can't test...
+Thanks for PS, I thought QEMU was stricter than that.
 
-I agree.
+Regarding M7 vs M$ or A35 vs A53/A57, even though there's no functional
+difference, it would be convenient in Makefiles to have CPU=3Dcortex-a53,
+and use $(CPU) to expand GCC and QEMU options, without having to guess
+which CPU I should use for QEMU that would match the one I pass to GCC.
 
-> Applying this patch as-is would at least fix the ioctl
-> for everything except MIPS and SPARC hosts and guests.
+Regarding v[68]M, are there any plans to add support for these variants
+to QEMU?
 
-Yes, so I think it can be applied as-is.
+-- =
 
-Thanks,
-Laurent
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1721275
+
+Title:
+  Support more ARM CPUs
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+
+  This is an enhancement request, rather than a bug report.
+
+  After some discussions/presentations during the last Linaro Connect
+  (SFO17), I understand that it may be easy to add support for more ARM
+  CPUs in QEMU. I am interested in user-mode, if that matters.
+
+  I'm primarily using QEMU for GCC validations, and I'd like to make
+  sure that GCC doesn't generate instructions not supported by the CPU
+  it's supposed to generate code for.
+
+  I'd like to have:
+  cortex-m0
+  cortex-m4
+  cortex-m7
+  cortex-m23
+  cortex-m33
+
+  cortex-a35
+  cortex-a53
+  cortex-a57
+
+  Is it possible?
+  Is it the right place to ask?
+  Should I file separate requests for each?
+
+  Thanks
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1721275/+subscriptions
