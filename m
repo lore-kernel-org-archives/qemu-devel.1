@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e3zGz-0000u3-Jq
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:53:14 -0400
+	(envelope-from <peterx@redhat.com>) id 1e3zH1-0000vY-Fs
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:53:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e3zGy-0001o4-09
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:53:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60426)
+	(envelope-from <peterx@redhat.com>) id 1e3zH0-0001vp-Mb
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:53:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50982)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e3zGx-0001n9-OV
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:53:11 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e3zH0-0001tD-H0
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:53:14 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Mon, 16 Oct 2017 14:51:54 +0800
-Message-Id: <20171016065216.18162-11-peterx@redhat.com>
+Date: Mon, 16 Oct 2017 14:51:55 +0800
+Message-Id: <20171016065216.18162-12-peterx@redhat.com>
 In-Reply-To: <20171016065216.18162-1-peterx@redhat.com>
 References: <20171016065216.18162-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 10/32] qmp: hmp: add migrate "resume" option
+Subject: [Qemu-devel] [PATCH v3 11/32] migration: pass MigrationState to
+ migrate_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,92 +27,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-It will be used when we want to resume one paused migration.
+Let the callers take the object, then pass it to migrate_init().
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- hmp-commands.hx       | 7 ++++---
- hmp.c                 | 4 +++-
- migration/migration.c | 2 +-
- qapi/migration.json   | 5 ++++-
- 4 files changed, 12 insertions(+), 6 deletions(-)
+ migration/migration.c | 7 ++-----
+ migration/migration.h | 2 +-
+ migration/savevm.c    | 5 ++++-
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 1941e19932..7adb029b34 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -928,13 +928,14 @@ ETEXI
- 
-     {
-         .name       = "migrate",
--        .args_type  = "detach:-d,blk:-b,inc:-i,uri:s",
--        .params     = "[-d] [-b] [-i] uri",
-+        .args_type  = "detach:-d,blk:-b,inc:-i,resume:-r,uri:s",
-+        .params     = "[-d] [-b] [-i] [-r] uri",
-         .help       = "migrate to URI (using -d to not wait for completion)"
- 		      "\n\t\t\t -b for migration without shared storage with"
- 		      " full copy of disk\n\t\t\t -i for migration without "
- 		      "shared storage with incremental copy of disk "
--		      "(base image shared between src and destination)",
-+		      "(base image shared between src and destination)"
-+                      "\n\t\t\t -r to resume a paused migration",
-         .cmd        = hmp_migrate,
-     },
- 
-diff --git a/hmp.c b/hmp.c
-index 739d330f4e..7b1abcd535 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1899,10 +1899,12 @@ void hmp_migrate(Monitor *mon, const QDict *qdict)
-     bool detach = qdict_get_try_bool(qdict, "detach", false);
-     bool blk = qdict_get_try_bool(qdict, "blk", false);
-     bool inc = qdict_get_try_bool(qdict, "inc", false);
-+    bool resume = qdict_get_try_bool(qdict, "resume", false);
-     const char *uri = qdict_get_str(qdict, "uri");
-     Error *err = NULL;
- 
--    qmp_migrate(uri, !!blk, blk, !!inc, inc, false, false, &err);
-+    qmp_migrate(uri, !!blk, blk, !!inc, inc,
-+                false, false, true, resume, &err);
-     if (err) {
-         error_report_err(err);
-         return;
 diff --git a/migration/migration.c b/migration/migration.c
-index cebd75c5ce..059c9cc334 100644
+index 059c9cc334..3a734e9dda 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -1320,7 +1320,7 @@ bool migration_is_blocked(Error **errp)
+@@ -1220,10 +1220,8 @@ bool migration_is_idle(void)
+     return false;
+ }
  
- void qmp_migrate(const char *uri, bool has_blk, bool blk,
-                  bool has_inc, bool inc, bool has_detach, bool detach,
--                 Error **errp)
-+                 bool has_resume, bool resume, Error **errp)
+-MigrationState *migrate_init(void)
++void migrate_init(MigrationState *s)
  {
-     Error *local_err = NULL;
-     MigrationState *s = migrate_get_current();
-diff --git a/qapi/migration.json b/qapi/migration.json
-index d5fd937c26..26df532f29 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -966,6 +966,8 @@
- # @detach: this argument exists only for compatibility reasons and
- #          is ignored by QEMU
- #
-+# @resume: resume one paused migration, default "off". (since 2.11)
-+#
- # Returns: nothing on success
- #
- # Since: 0.14.0
-@@ -987,7 +989,8 @@
- #
- ##
- { 'command': 'migrate',
--  'data': {'uri': 'str', '*blk': 'bool', '*inc': 'bool', '*detach': 'bool' } }
-+  'data': {'uri': 'str', '*blk': 'bool', '*inc': 'bool',
-+           '*detach': 'bool', '*resume': 'bool' } }
+-    MigrationState *s = migrate_get_current();
+-
+     /*
+      * Reinitialise all migration state, except
+      * parameters/capabilities that the user set, and
+@@ -1251,7 +1249,6 @@ MigrationState *migrate_init(void)
+     migrate_set_state(&s->state, MIGRATION_STATUS_NONE, MIGRATION_STATUS_SETUP);
  
- ##
- # @migrate-incoming:
+     s->total_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+-    return s;
+ }
+ 
+ static GSList *migration_blockers;
+@@ -1359,7 +1356,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+         migrate_set_block_incremental(s, true);
+     }
+ 
+-    s = migrate_init();
++    migrate_init(s);
+ 
+     if (strstart(uri, "tcp:", &p)) {
+         tcp_start_outgoing_migration(s, p, &local_err);
+diff --git a/migration/migration.h b/migration/migration.h
+index b9bc617175..9502b2aad6 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -173,7 +173,7 @@ void migrate_fd_error(MigrationState *s, const Error *error);
+ 
+ void migrate_fd_connect(MigrationState *s);
+ 
+-MigrationState *migrate_init(void);
++void migrate_init(MigrationState *s);
+ bool migration_is_blocked(Error **errp);
+ /* True if outgoing migration has entered postcopy phase */
+ bool migration_in_postcopy(void);
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 86ada6d0e7..6d6f8ee3e4 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1256,8 +1256,11 @@ void qemu_savevm_state_cleanup(void)
+ static int qemu_savevm_state(QEMUFile *f, Error **errp)
+ {
+     int ret;
+-    MigrationState *ms = migrate_init();
++    MigrationState *ms = migrate_get_current();
+     MigrationStatus status;
++
++    migrate_init(ms);
++
+     ms->to_dst_file = f;
+ 
+     if (migration_is_blocked(errp)) {
 -- 
 2.13.5
