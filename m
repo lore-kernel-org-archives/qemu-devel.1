@@ -1,50 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1e42Ki-0002g0-O7
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 06:09:17 -0400
+	(envelope-from <berrange@redhat.com>) id 1e42N2-0003Kz-TO
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 06:11:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1e42Ke-0005d7-Kf
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 06:09:16 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49672)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1e42Ke-0005ci-BY
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 06:09:12 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9GA8u0v146805
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 06:09:08 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dmqh4reyn-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 06:09:08 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Mon, 16 Oct 2017 11:09:06 +0100
-Received: from d23av04.au.ibm.com (d23av04.au.ibm.com [9.190.235.139])
-	by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id v9GA92rN27983988
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 10:09:03 GMT
-Received: from d23av04.au.ibm.com (localhost [127.0.0.1])
-	by d23av04.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v9GA96fr012401
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 21:09:06 +1100
-Date: Mon, 16 Oct 2017 15:38:56 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reply-To: bharata@linux.vnet.ibm.com
-References: <20170914070118.GA8181@in.ibm.com>
-	<20170914100011.296185d2@nial.brq.redhat.com>
-	<20170914081826.GA23373@in.ibm.com>
-	<20170914105905.7e509ef4@nial.brq.redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1e42Mz-0006aC-Op
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 06:11:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42248)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e42Mz-0006ZT-IA
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 06:11:37 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D392E356E8
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 10:11:34 +0000 (UTC)
+Date: Mon, 16 Oct 2017 11:11:28 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171016101128.GD17583@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20171013081450.29647-1-kraxel@redhat.com>
+	<20171013095724.GE20515@redhat.com>
+	<1508145553.15782.7.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170914105905.7e509ef4@nial.brq.redhat.com>
-Message-Id: <20171016100856.GA2413@in.ibm.com>
-Subject: Re: [Qemu-devel] QEMU terminates during reboot after memory unplug
- with vhost=on
+In-Reply-To: <1508145553.15782.7.camel@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/11] Ui 20171013 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -53,74 +36,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, groug@kaod.org, david@gibson.dropbear.id.au
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Thu, Sep 14, 2017 at 10:59:05AM +0200, Igor Mammedov wrote:
-> On Thu, 14 Sep 2017 13:48:26 +0530
-> Bharata B Rao <bharata@linux.vnet.ibm.com> wrote:
-> 
-> > On Thu, Sep 14, 2017 at 10:00:11AM +0200, Igor Mammedov wrote:
-> > > On Thu, 14 Sep 2017 12:31:18 +0530
-> > > Bharata B Rao <bharata@linux.vnet.ibm.com> wrote:
-> > >   
-> > > > Hi,
-> > > > 
-> > > > QEMU hits the below assert
-> > > > 
-> > > > qemu-system-ppc64: used ring relocated for ring 2
-> > > > qemu-system-ppc64: qemu/hw/virtio/vhost.c:649: vhost_commit: Assertion `r >= 0' failed.
-> > > > 
-> > > > in the following scenario:
-> > > > 
-> > > > 1. Boot guest with vhost=on
-> > > >   -netdev tap,id=mynet0,script=qemu-ifup,downscript=qemu-ifdown,vhost=on -device virtio-net-pci,netdev=mynet0
-> > > > 2. Hot add a DIMM device 
-> > > > 3. Reboot
-> > > >    When the guest reboots, we can see
-> > > >    vhost_virtqueue_start:vq->used_phys getting assigned an address that
-> > > >    falls in the hotplugged memory range.
-> > > > 4. Remove the DIMM device
-> > > >    Guest refuses the removal as the hotplugged memory is under use.
-> > > > 5. Reboot  
-> > >   
-> > > >    QEMU forces the removal of the DIMM device during reset and that's
-> > > >    when we hit the above assert.  
-> > > I don't recall implementing forced removal om DIMM,
-> > > could you point out to the related code, pls?  
-> > 
-> > This is ppc specific. We have DR Connector objects for each LMB (multiple
-> > LMBs make up one DIMM device) and during reset we invoke the
-> > release routine for these LMBs which will further invoke
-> > pc_dimm_memory_unplug().
-> > 
-> > See hw/ppc/spapr_drc.c: spapr_drc_reset()
-> > hw/ppc/spapr.c: spapr_lmb_release()
-> > 
-> > >   
-> > > > Any pointers on why we are hitting this assert ? Shouldn't vhost be
-> > > > done with using the hotplugged memory when we hit reset ?  
-> > >   
-> > > >From another point of view,  
-> > > DIMM shouldn't be removed unless guest explicitly ejects it
-> > > (at least that should be so in x86 case).  
-> > 
-> > While that is true for ppc also, shouldn't we start fresh from reset ?
-> we should.
-> 
-> when it aborts vhost should print out error from vhost_verify_ring_mappings()
-> 
->    if (r == -ENOMEM) {
->        error_report("Unable to map %s for ring %d", part_name[j], i);           
->    } else if (r == -EBUSY) {                                                    
->        error_report("%s relocated for ring %d", part_name[j], i);    
-> 
-> that might give a clue where that memory stuck in.
-> 
-> Michael might point out where to start look at, but he's on vacation
-> so ...
+On Mon, Oct 16, 2017 at 11:19:13AM +0200, Gerd Hoffmann wrote:
+>   Hi,
+>=20
+> > I'm afraid this is quite likely to fail build smoke test again. I've
+> > just tried a build on OpenBSD with the bash -> sh fix in it, and I
+> > found that it still tried to build the keycodemap files in parallel
+> > with checking out the GIT submodules. It also tried to run the
+> > mkdir -p dtc/libfdt in parallel and this caused git to refuse to
+> > checkout the dtc module due to that empty dir existing. So there's
+> > still some deps problems in here I think that let make build in
+> > the wrong order :-(
+>=20
+> > In all my debugging the one thing I've seen work correctly is the
+> > re-running of configure (via config.status), which always happens
+> > earlier and is serialized wrt everything else. So I wonder if we
+> > should change direction slightly, and have configure checkout the
+> > submodules. Then just make sure that config.status is triggered
+> > when submodules are out of date.
+>=20
+> I've noticed configure running *in parallel* to other stuff.=20
+> Reproducer:
+>=20
+>   (1) Apply patch #1
+>   (2) run normal build
+>   (3) make -C dtc clean
+>   (4) touch configure
+>   (5) make
+>=20
+> Watch configure and dtc build running in parallel.
+> I think the added Makefile dependency breaks it.
+>=20
+> Incremental fix (also pushed to queue/ui):
+>=20
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -35,8 +35,6 @@ endif
+> =C2=A0
+> =C2=A0.git-submodule-status: git-submodule-update config-host.mak
+> =C2=A0
+> -Makefile: .git-submodule-status
+> -
+> =C2=A0# Check that we're not trying to do an out-of-tree build from
+> =C2=A0# a tree that's been used for an in-tree build.
+> =C2=A0ifneq ($(realpath $(SRC_PATH)),$(realpath .))
+> @@ -107,6 +105,7 @@ endif
+> =C2=A0GENERATED_FILES +=3D $(TRACE_HEADERS)
+> =C2=A0GENERATED_FILES +=3D $(TRACE_SOURCES)
+> =C2=A0GENERATED_FILES +=3D $(BUILD_DIR)/trace-events-all
+> +GENERATED_FILES +=3D .git-submodule-status
+> =C2=A0
+> =C2=A0trace-group-name =3D $(shell dirname $1 | sed -e 's/[^a-zA-Z0-9]/=
+_/g')
 
-Michael (or anyone else) - Any pointers on this problem ?
+Yep, that looks to have fixed the races I was able to reproduce
+
 
 Regards,
-Bharata.
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
