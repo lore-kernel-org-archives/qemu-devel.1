@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <geoff@hostfission.com>) id 1e4ABE-0005aY-2c
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 14:32:01 -0400
+	(envelope-from <anatol.pomozov@gmail.com>) id 1e4AHN-00089Z-8r
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 14:38:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <geoff@hostfission.com>) id 1e4ABB-0006Ln-Fi
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 14:32:00 -0400
-Received: from mail1.hostfission.com ([139.99.139.48]:33224)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <geoff@hostfission.com>) id 1e4ABA-0006KG-St
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 14:31:57 -0400
+	(envelope-from <anatol.pomozov@gmail.com>) id 1e4AHM-0000fY-2w
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 14:38:21 -0400
+Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:46542)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <anatol.pomozov@gmail.com>)
+	id 1e4AHL-0000Xj-Tz
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 14:38:19 -0400
+Received: by mail-ua0-x241.google.com with SMTP id w45so10351266uac.3
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 11:38:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Tue, 17 Oct 2017 05:31:53 +1100
-From: geoff@hostfission.com
-In-Reply-To: <c0c5158aeb4e553ac55639e66d81c007@hostfission.com>
-References: <5548e41a5668ec0cba9543139327e035@hostfission.com>
-	<3A7697A0-1AF3-46E8-8BCC-45A8127A2638@redhat.com>
-	<286ea2bbfb5ec77d962300c9996c8688@hostfission.com>
-	<92FEAF6E-3002-4F0F-B845-4EC3D29381A4@redhat.com>
-	<c0c5158aeb4e553ac55639e66d81c007@hostfission.com>
-Message-ID: <34b4df5da848d69b213f538e5751c0d3@hostfission.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] ivshmem Windows Driver
+In-Reply-To: <20171016082755.GA5145@localhost.localdomain>
+References: <20171012235439.19457-1-anatol.pomozov@gmail.com>
+	<20171012235439.19457-3-anatol.pomozov@gmail.com>
+	<20171013192550.GC3246@localhost.localdomain>
+	<CAOMFOmW+r86WHWPUMtG54BrAQXqSWZ67oF-6G697ox-7AKL4GA@mail.gmail.com>
+	<20171013232114.GD3246@localhost.localdomain>
+	<CAFEAcA-zYJUOqH=WU_XnyxEfiZM7a2yqmzndTrf=pKkp=1wUGA@mail.gmail.com>
+	<20171016082755.GA5145@localhost.localdomain>
+From: Anatol Pomozov <anatol.pomozov@gmail.com>
+Date: Mon, 16 Oct 2017 11:38:17 -0700
+Message-ID: <CAOMFOmUM7Ct6kUdrB=y2vk6Fm+dFybQb=8hbcUmKNb2RrL2Lew@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 2/4] multiboot: load any machine type of ELF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,110 +34,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yan Vugenfirer <yvugenfi@redhat.com>
-Cc: Ladi Prosek <lprosek@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Hi Yan & Ladi.
+Hi
 
-I have written an initial implementation that supports just the shared=20
-memory
-mapping at this time. I plan to add events also but before I go further=20
-I would
-like some feedback if possible on what I have implemented thus far.
+On Mon, Oct 16, 2017 at 1:27 AM, Kevin Wolf <kwolf@redhat.com> wrote:
+> Am 14.10.2017 um 15:41 hat Peter Maydell geschrieben:
+>> On 14 October 2017 at 00:21, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>> > I don't believe the spec restricts that, but I don't see why it
+>> > would be useful to load an ELF file that doesn't match the target
+>> > architecture (e.g. loading non-x86 ELF files on a x86 machine
+>> > like PC).
 
-Please see:
+I see what do you mean Eduardo. Yes it makes sense to restrict ELF to
+the currently emulated platform.
 
-https://github.com/gnif/kvm-guest-drivers-windows/commit/8655cf12fbdd77b9=
-91f96d97bc20f967b5907c12
+On a second thought adding multiboot support for non x86 needs to go
+with other changes, e.g. multiboot.c should be moved out of hw/i386 to
+some platform-independent location. It probably worth to postpone this
+change until after Qemu gets multiboot2 support that explicitly states
+MIPS support, thus it will be easier to test this codepath on multiple
+platforms.
 
-Kind Regards,
-Geoff
+So if you don't mind I'll remove this patch from the current patch
+series and put it into later one.
 
-On 2017-10-15 23:29, geoff@hostfission.com wrote:
-> On 2017-10-15 23:24, Yan Vugenfirer wrote:
->>> On 15 Oct 2017, at 15:21, geoff@hostfission.com wrote:
->>>=20
->>> Hi Yan,
->>>=20
->>> Thank you for the information. I am rather new to Windows Driver=20
->>> development and learning as I go, so this may take some time, but=20
->>> since the driver only needs to perform very basic functions I do not=20
->>> see this as being too much of a challenge.
->>=20
->> I think you can look into Windows virtio-balloon implementation as an
->> example of simple driver:
->> https://github.com/virtio-win/kvm-guest-drivers-windows/tree/master/Ba=
-lloon
->>=20
->> It relies on virtio library
->> (https://github.com/virtio-win/kvm-guest-drivers-windows/tree/master/V=
-irtIO)
->> and it is WDF driver (MS framework that simplifies the drivers
->> development) that makes it very simple.
->>=20
->=20
-> Thanks again, I already have a prototype driver working using WDF,
-> it's more learning the windows internals and how to best implement
-> things.
->=20
->>>=20
->>> -Geoff
->>>=20
->>> On 2017-10-15 22:14, Yan Vugenfirer wrote:
->>>> He Geoff,
->>>> The official virtio-win drivers upstream repository is here:
->>>> https://github.com/virtio-win/kvm-guest-drivers-windows
->>>> 1. There is no ivshmem Windows Driver for now as far as I know
->>>> 2. We are signing the drivers for community usage
->>>> https://fedoraproject.org/wiki/Windows_Virtio_Drivers from the same
->>>> repository.
->>>> The process will be: submit the code for review with pull request
->>>> (better use existing virtio library for virtio communication between
->>>> the guest and the host), pass internal tests and at the least being
->>>> able to pass MS HCK\HLK tests, later on the driver will be pulled=20
->>>> into
->>>> official build and release with rest of the drivers for community
->>>> usage.
->>>> 3. We are happy to cooperate on adding new functionality to current
->>>> package of virtio drivers for Windows
->>>> 4. As already mentioned:=20
->>>> https://github.com/virtio-win/kvm-guest-drivers-windows
->>>> Thanks a lot!
->>>> If you have more questions, please don=E2=80=99t hesitate to talk to=
- me,=20
->>>> Ladi
->>>> or anyone else from Red Hat involved with virtio-win development.
->>>> Best regards,
->>>> Yan.
->>>>> On 15 Oct 2017, at 12:32, geoff--- via Qemu-devel=20
->>>>> <qemu-devel@nongnu.org> wrote:
->>>>> Hi All,
->>>>> I am writing some code that needs to share a block of ram between a=
-=20
->>>>> Windows guest and Linux host. For this I am using the ivshmem=20
->>>>> device and I have written a very primitive driver for windows that=20
->>>>> allows a single application to request to memory map the pci bar=20
->>>>> (shared memory) into the program's context using DeviceIoControl.
->>>>> This is all working fine, but the next problem is I need the driver=
-=20
->>>>> to be signed. In it's current state I would not even suggest it be=20
->>>>> signed as it was just hacked together to test my concept, but now I=
-=20
->>>>> know it's viable I would be willing to invest whatever time is=20
->>>>> required to write a driver that would be acceptable for signing.
->>>>> The ideal driver would be general purpose and could be leveraged=20
->>>>> for any user mode application use, not just my specific case. It=20
->>>>> would need to implement the IRQ/even features of ivshmem and=20
->>>>> possibly even some kind of security to prevent unauthorized use by=20
->>>>> rogue applications (shared secret configured on the chardev?).
->>>>> I have several qustions:
->>>>> 1) Has someone done this? I can't find any reference to a windows=20
->>>>> driver for this device anywhere.
->>>>> 2) If I was to pursue writing this driver, how would be the best=20
->>>>> way to go about it so as to ensure that it is in a state that it=20
->>>>> could be signed with the RedHat vendor key?
->>>>> 3) What is the likelihood of having such a driver signed?
->>>>> 4) Is there a preferred git host for such a driver?
->>>>> Kind Regards
->>>>> -Geoff
->>>=20
+>>
+>> Agreed. If we have non i386 boards that want to use multiboot
+>> we should probably move the common code out of hw/i386...
+>
+> Impossible with Multiboot 1, it's a spec that is really made for i386.
+>
+> The spec isn't really explicit about it being a requirement, but it does
+> say that its target are 32-bit OSes on PCs, and it defines the boot
+> state in terms of i386 registers, so it doesn't make sense for non-x86.
+>
+> From my interpretation of the spec, even support for 64-bit ELFs seems
+> to be (implicitly) out of spec (there is one place where it even says
+> "refer to the i386 ELF documentation for details"), but if GRUB
+> implements it...
+
+Yes GRUB has support for ELF64 multiboot loading and it successfully
+used by many projects in osdev community.
+
+This functionality has been added to GRUB 12 years ago
+https://github.com/coreos/grub/commit/ea4097134fbd834d2f688363f9a8208bf6a49ecd
