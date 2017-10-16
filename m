@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e49Cr-0005BD-Rx
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:29:38 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e49IG-0001TX-CS
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:35:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e49Cr-0005wK-5d
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:29:37 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:46371)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e49Cq-0005vN-VW
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:29:37 -0400
-Received: by mail-wm0-x232.google.com with SMTP id m72so5525097wmc.1
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 10:29:36 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1e49IA-0001Dg-Ey
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:35:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57732)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e49IA-0001D2-6i
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:35:06 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 020D381127
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 17:35:05 +0000 (UTC)
+Date: Mon, 16 Oct 2017 18:34:57 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171016173456.GJ2252@work-vm>
+References: <20171004104636.7963-1-quintela@redhat.com>
+	<20171004104636.7963-3-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1508036858-13479-1-git-send-email-mst@redhat.com>
-References: <1508036858-13479-1-git-send-email-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Oct 2017 18:29:15 +0100
-Message-ID: <CAFEAcA_ZHaPNaGqjsAuNES3t3Ytt+0Z30DoHRDRu8Fn-zFSfFA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/26] pc, pci, virtio: fixes, features
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171004104636.7963-3-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v9 02/12] migration: Improve migration
+ thread error handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +34,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On 15 October 2017 at 04:22, Michael S. Tsirkin <mst@redhat.com> wrote:
-> The following changes since commit f90ea7ba7c5ae7010ee0ce062207ae42530f57d6:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20171012' into staging (2017-10-12 17:06:50 +0100)
->
-> are available in the git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to ab06ec43577177a442e8e5ca28d0154efe4ff60f:
->
->   tests/pxe: Test more NICs when running in SPEED=slow mode (2017-10-15 05:54:44 +0300)
->
-> ----------------------------------------------------------------
-> pc, pci, virtio: fixes, features
->
-> A bunch of fixes all over the place.
-> A new vmcore device - the user interface around it is still somewhat
-> controversial, but I feel most of the code is fine, suggestions can be
-> addressed by adding patches on top.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
+* Juan Quintela (quintela@redhat.com) wrote:
+> We now report errors also when we finish migration, not only on info
+> migrate.  We plan to use this error from several places, and we want
+> the first error to happen to win, so we add an mutex to order it.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  migration/migration.c | 19 ++++++++++++++++---
+>  migration/migration.h |  7 ++++++-
+>  migration/tls.c       |  1 -
+>  3 files changed, 22 insertions(+), 5 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 98429dc843..468f51cfa7 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1071,19 +1071,30 @@ static void migrate_fd_cleanup(void *opaque)
+>                            MIGRATION_STATUS_CANCELLED);
+>      }
+>  
+> +    if (s->error) {
+> +        /* It is used on info migrate.  We can't free it */
+> +        error_report_err(error_copy(s->error));
+> +    }
+>      notifier_list_notify(&migration_state_notifiers, s);
+>      block_cleanup_parameters(s);
+>  }
+>  
+> +void migrate_set_error(MigrationState *s, const Error *error)
 
-Applied, thanks.
+If you find you need to resend this, please add a comment on this
+function saying it takes a copy and it's upto the caller to free
+the error they pass in.
 
--- PMM
+Dave
+
+> +{
+> +    qemu_mutex_lock(&s->error_mutex);
+> +    if (!s->error) {
+> +        s->error = error_copy(error);
+> +    }
+> +    qemu_mutex_unlock(&s->error_mutex);
+> +}
+> +
+>  void migrate_fd_error(MigrationState *s, const Error *error)
+>  {
+>      trace_migrate_fd_error(error_get_pretty(error));
+>      assert(s->to_dst_file == NULL);
+>      migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+>                        MIGRATION_STATUS_FAILED);
+> -    if (!s->error) {
+> -        s->error = error_copy(error);
+> -    }
+> +    migrate_set_error(s, error);
+>      notifier_list_notify(&migration_state_notifiers, s);
+>      block_cleanup_parameters(s);
+>  }
+> @@ -2355,6 +2366,7 @@ static void migration_instance_finalize(Object *obj)
+>      MigrationState *ms = MIGRATION_OBJ(obj);
+>      MigrationParameters *params = &ms->parameters;
+>  
+> +    qemu_mutex_destroy(&ms->error_mutex);
+>      g_free(params->tls_hostname);
+>      g_free(params->tls_creds);
+>  }
+> @@ -2367,6 +2379,7 @@ static void migration_instance_init(Object *obj)
+>      ms->state = MIGRATION_STATUS_NONE;
+>      ms->xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE;
+>      ms->mbps = -1;
+> +    qemu_mutex_init(&ms->error_mutex);
+>  
+>      params->tls_hostname = g_strdup("");
+>      params->tls_creds = g_strdup("");
+> diff --git a/migration/migration.h b/migration/migration.h
+> index b83cceadc4..51c0ac2e71 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -129,8 +129,12 @@ struct MigrationState
+>      int64_t colo_checkpoint_time;
+>      QEMUTimer *colo_delay_timer;
+>  
+> -    /* The last error that occurred */
+> +    /* The first error that has occurred.
+> +       We used the mutex to be able to return the 1st error message */
+>      Error *error;
+> +    /* mutex to protect errp */
+> +    QemuMutex error_mutex;
+> +
+>      /* Do we have to clean up -b/-i from old migrate parameters */
+>      /* This feature is deprecated and will be removed */
+>      bool must_remove_block_options;
+> @@ -159,6 +163,7 @@ bool  migration_has_all_channels(void);
+>  
+>  uint64_t migrate_max_downtime(void);
+>  
+> +void migrate_set_error(MigrationState *s, const Error *error);
+>  void migrate_fd_error(MigrationState *s, const Error *error);
+>  
+>  void migrate_fd_connect(MigrationState *s);
+> diff --git a/migration/tls.c b/migration/tls.c
+> index 596e8790bd..026a008667 100644
+> --- a/migration/tls.c
+> +++ b/migration/tls.c
+> @@ -119,7 +119,6 @@ static void migration_tls_outgoing_handshake(QIOTask *task,
+>      if (qio_task_propagate_error(task, &err)) {
+>          trace_migration_tls_outgoing_handshake_error(error_get_pretty(err));
+>          migrate_fd_error(s, err);
+> -        error_free(err);
+>      } else {
+>          trace_migration_tls_outgoing_handshake_complete();
+>          migration_channel_connect(s, ioc, NULL);
+> -- 
+> 2.13.5
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
