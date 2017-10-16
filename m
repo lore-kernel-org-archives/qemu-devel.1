@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e47nl-00044w-Us
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 11:59:39 -0400
+	(envelope-from <geoff@hostfission.com>) id 1e47tp-0008AT-DW
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 12:05:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e47nh-0007ka-21
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 11:59:38 -0400
-Received: from 13.mo4.mail-out.ovh.net ([178.33.251.8]:36870)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e47ng-0007jI-Og
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 11:59:32 -0400
-Received: from player159.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 47982E4201
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 17:59:30 +0200 (CEST)
-Date: Mon, 16 Oct 2017 17:59:25 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20171016175925.6600180b@bahia.lan>
-In-Reply-To: <20171016163107.5d036fd0@nial.brq.redhat.com>
-References: <150789527176.5487.14861721766357709655.stgit@bahia.lan>
-	<20171016104139.5f7afa6c@nial.brq.redhat.com>
-	<20171016132420.3accb7b4@bahia.lan>
-	<20171016163107.5d036fd0@nial.brq.redhat.com>
+	(envelope-from <geoff@hostfission.com>) id 1e47tj-0003Ro-JB
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 12:05:53 -0400
+Received: from mail1.hostfission.com ([139.99.139.48]:60026)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <geoff@hostfission.com>) id 1e47tj-0003QM-71
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 12:05:47 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] monitor: fix dangling CPU pointer
+Date: Tue, 17 Oct 2017 03:05:43 +1100
+From: geoff@hostfission.com
+In-Reply-To: <4d957ed9-0430-927c-ec78-672c39f11682@redhat.com>
+References: <5548e41a5668ec0cba9543139327e035@hostfission.com>
+	<4d957ed9-0430-927c-ec78-672c39f11682@redhat.com>
+Message-ID: <f943ff3537236d38b711a907cdb6aed4@hostfission.com>
+Subject: Re: [Qemu-devel] ivshmem Windows Driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,137 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Mon, 16 Oct 2017 16:31:07 +0200
-Igor Mammedov <imammedo@redhat.com> wrote:
-
-> On Mon, 16 Oct 2017 13:24:20 +0200
-> Greg Kurz <groug@kaod.org> wrote:
+On 2017-10-17 02:20, Eric Blake wrote:
+> On 10/15/2017 04:32 AM, geoff--- via Qemu-devel wrote:
+>> Hi All,
+>> 
+>> I am writing some code that needs to share a block of ram between a
+>> Windows guest and Linux host. For this I am using the ivshmem device 
+>> and
+>> I have written a very primitive driver for windows that allows a 
+>> single
+>> application to request to memory map the pci bar (shared memory) into
+>> the program's context using DeviceIoControl.
 > 
-> > On Mon, 16 Oct 2017 10:41:39 +0200
-> > Igor Mammedov <imammedo@redhat.com> wrote:
-> >   
-> > > On Fri, 13 Oct 2017 13:47:51 +0200
-> > > Greg Kurz <groug@kaod.org> wrote:
-> > > 
-> > > [...]
-> > >     
-> > > > Note that the resolution should really return a CPU object, otherwise
-> > > > we have a bug. This is achieved by relying on object_resolve_path()
-> > > > and CPU() instead of calling object_resolve_path_type(path, TYPE_CPU).      
-> > > I'm not sure what you are trying to say here, could you explain
-> > > a bit more why CPU(object_resolve_path()) is chosen vs
-> > > object_resolve_path_type(path, TYPE_CPU)
-> > >     
-> > 
-> > IIUC, if we use object_resolve_path_type(path, TYPE_CPU) and path doesn't
-> > point to a CPU object, it will return NULL (see object_resolve_abs_path())
-> > just like if the CPU got hot-unplugged.
-> > 
-> > My point is that the path we got from object_get_canonical_path() did
-> > point to a CPU: if later on this path resolves to an object that isn't
-> > a CPU, then some code somewhere used the same QOM path for some unrelated
-> > object. I tend to think this is a bug in QEMU and we shouldn't silently
-> > ignore it.  
-> sometimes QOM path to a cpu object could be:
->  1. arbitrary if set explicitly by board 
->  2. /unattached/device[X] or /peripheral-anon/device[X]
->        potentially might end-up with another device at the same path
->        in case of hot-remove + migration
->  3. /peripheral
->        hot-remove named (i.e. non null 'id') cpu and then plug a non cpu device with the same 'id',
->        which is legitimate thing to do
+> Note that upstream support of ivshmem is rather lackluster.  Very 
+> often,
+> the first question in response to someone saying "I need ivshmem", is
+> "Why? and can we accomplish the same task using a better device
+> instead?"  Without knowing the full use case, it's hard to argue that
+> ivshmem is the right device to fit the use case.
+
+Noted, but I believe that this is a very useful feature for even hacking
+about with VMs before going as far as to write an entire driver for some
+simple once use code.
+
+There are some future personal projects I can see this being very handy
+for into the future.
+
 > 
+> There have been efforts to propose a better specified and better
+> structured replacement for ivshmem, such as vhost-pci, but I'm not sure
+> what status those patches are in, or if it would be a better fit for
+> your needs.
 
-Ok, I didn't think of these cases...
+My needs are rather specific, I am capturing the desktop on a VM with
+passthrough VGA using nVidia NvFBC and mapping it to the host for
+extremely low latency high quality display. Unfortunately the use of
+NvFBC is limited to high end professional cards such as the GRID. As 
+such
+I don't see it warranting a specific driver for my niche use.
 
-> I'd use object_resolve_path_type(path, TYPE_CPU) and
-> gracefully error out in case it returns NULL.
-> 
+I also lack the time to learn how to write a virtual PCI device for QEMU
+that would be able to accommodate this exact feature. I would also need
+to acquire a signing certificate to sign the driver which is a cost I 
+can
+not justify.
 
-I'll do that. Thanks for the detailed explanation.
+In comparison writing a windows interface to the existing IVSHMEM device
+is not such a huge feat. In fact, I have already got a prototype driver
+as part of my local virtio-win fork.
 
-> > Makes sense ?
-> >   
-> > >     
-> > > > Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> > > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > > ---
-> > > >  monitor.c |   25 ++++++++++++++++++++-----
-> > > >  1 file changed, 20 insertions(+), 5 deletions(-)
-> > > > 
-> > > > diff --git a/monitor.c b/monitor.c
-> > > > index fe0d1bdbb461..8489b2ad99c0 100644
-> > > > --- a/monitor.c
-> > > > +++ b/monitor.c
-> > > > @@ -200,7 +200,7 @@ struct Monitor {
-> > > >  
-> > > >      ReadLineState *rs;
-> > > >      MonitorQMP qmp;
-> > > > -    CPUState *mon_cpu;
-> > > > +    gchar *mon_cpu_path;
-> > > >      BlockCompletionFunc *password_completion_cb;
-> > > >      void *password_opaque;
-> > > >      mon_cmd_t *cmd_table;
-> > > > @@ -579,6 +579,7 @@ static void monitor_data_init(Monitor *mon)
-> > > >  
-> > > >  static void monitor_data_destroy(Monitor *mon)
-> > > >  {
-> > > > +    g_free(mon->mon_cpu_path);
-> > > >      qemu_chr_fe_deinit(&mon->chr, false);
-> > > >      if (monitor_is_qmp(mon)) {
-> > > >          json_message_parser_destroy(&mon->qmp.parser);
-> > > > @@ -1047,20 +1048,34 @@ int monitor_set_cpu(int cpu_index)
-> > > >      if (cpu == NULL) {
-> > > >          return -1;
-> > > >      }
-> > > > -    cur_mon->mon_cpu = cpu;
-> > > > +    g_free(cur_mon->mon_cpu_path);
-> > > > +    cur_mon->mon_cpu_path = object_get_canonical_path(OBJECT(cpu));
-> > > >      return 0;
-> > > >  }
-> > > >  
-> > > >  CPUState *mon_get_cpu(void)
-> > > >  {
-> > > > -    if (!cur_mon->mon_cpu) {
-> > > > +    CPUState *cpu;
-> > > > +
-> > > > +    if (cur_mon->mon_cpu_path) {
-> > > > +        Object *obj = object_resolve_path(cur_mon->mon_cpu_path, NULL);
-> > > > +
-> > > > +        if (!obj) {
-> > > > +            g_free(cur_mon->mon_cpu_path);
-> > > > +            cur_mon->mon_cpu_path = NULL;
-> > > > +        } else {
-> > > > +            cpu = CPU(obj);      
-> > > this potentially might abort if obj couldn't be cast to TYPE_CPU
-> > >     
-> > 
-> > This is deliberate... is there a case where cur_mon->mon_cpu_path would
-> > legitimately point to something that isn't of type TYPE_CPU ?
-> >   
-> > >     
-> > > > +        }
-> > > > +    }
-> > > > +    if (!cur_mon->mon_cpu_path) {
-> > > >          if (!first_cpu) {
-> > > >              return NULL;
-> > > >          }
-> > > >          monitor_set_cpu(first_cpu->cpu_index);
-> > > > +        cpu = first_cpu;
-> > > >      }
-> > > > -    cpu_synchronize_state(cur_mon->mon_cpu);
-> > > > -    return cur_mon->mon_cpu;
-> > > > +    cpu_synchronize_state(cpu);
-> > > > +    return cpu;
-> > > >  }
-> > > >  
-> > > >  CPUArchState *mon_get_cpu_env(void)
-> > > > 
-> > > >       
-> > >     
-> > 
-> >   
-> 
+-Geoff
