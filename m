@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e49AG-0002WF-OZ
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:26:57 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e49AI-0002YE-Ks
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:26:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e49AF-0003hq-OM
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:26:56 -0400
-Received: from mail-pg0-x22b.google.com ([2607:f8b0:400e:c05::22b]:54130)
+	(envelope-from <richard.henderson@linaro.org>) id 1e49AE-0003h9-Jx
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:26:58 -0400
+Received: from mail-pf0-x229.google.com ([2607:f8b0:400e:c00::229]:49549)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e49AF-0003hR-Ic
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:26:55 -0400
-Received: by mail-pg0-x22b.google.com with SMTP id s2so7347008pge.10
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 10:26:55 -0700 (PDT)
+	id 1e49AE-0003gm-E1
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:26:54 -0400
+Received: by mail-pf0-x229.google.com with SMTP id i5so3202092pfe.6
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 10:26:54 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 16 Oct 2017 10:25:48 -0700
-Message-Id: <20171016172609.23422-30-richard.henderson@linaro.org>
+Date: Mon, 16 Oct 2017 10:25:47 -0700
+Message-Id: <20171016172609.23422-29-richard.henderson@linaro.org>
 In-Reply-To: <20171016172609.23422-1-richard.henderson@linaro.org>
 References: <20171016172609.23422-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 29/50] target/i386: check CF_PARALLEL
+Subject: [Qemu-devel] [PATCH v6 28/50] target/hppa: check CF_PARALLEL
  instead of parallel_cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -38,30 +38,118 @@ of the system.
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/i386/translate.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/hppa/helper.h    |  2 ++
+ target/hppa/op_helper.c | 32 ++++++++++++++++++++++++++++----
+ target/hppa/translate.c | 12 ++++++++++--
+ 3 files changed, 40 insertions(+), 6 deletions(-)
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index f60582082e..6663cd1db8 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -5265,7 +5265,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
-             if (!(s->cpuid_ext_features & CPUID_EXT_CX16))
-                 goto illegal_op;
-             gen_lea_modrm(env, s, modrm);
--            if ((s->prefix & PREFIX_LOCK) && parallel_cpus) {
-+            if ((s->prefix & PREFIX_LOCK) && (tb_cflags(s->base.tb) & CF_PARALLEL)) {
-                 gen_helper_cmpxchg16b(cpu_env, cpu_A0);
-             } else {
-                 gen_helper_cmpxchg16b_unlocked(cpu_env, cpu_A0);
-@@ -5276,7 +5276,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
-             if (!(s->cpuid_features & CPUID_CX8))
-                 goto illegal_op;
-             gen_lea_modrm(env, s, modrm);
--            if ((s->prefix & PREFIX_LOCK) && parallel_cpus) {
-+            if ((s->prefix & PREFIX_LOCK) && (tb_cflags(s->base.tb) & CF_PARALLEL)) {
-                 gen_helper_cmpxchg8b(cpu_env, cpu_A0);
-             } else {
-                 gen_helper_cmpxchg8b_unlocked(cpu_env, cpu_A0);
+diff --git a/target/hppa/helper.h b/target/hppa/helper.h
+index 789f07fc0a..0a6b900555 100644
+--- a/target/hppa/helper.h
++++ b/target/hppa/helper.h
+@@ -3,7 +3,9 @@ DEF_HELPER_FLAGS_2(tsv, TCG_CALL_NO_WG, void, env, tl)
+ DEF_HELPER_FLAGS_2(tcond, TCG_CALL_NO_WG, void, env, tl)
+ 
+ DEF_HELPER_FLAGS_3(stby_b, TCG_CALL_NO_WG, void, env, tl, tl)
++DEF_HELPER_FLAGS_3(stby_b_parallel, TCG_CALL_NO_WG, void, env, tl, tl)
+ DEF_HELPER_FLAGS_3(stby_e, TCG_CALL_NO_WG, void, env, tl, tl)
++DEF_HELPER_FLAGS_3(stby_e_parallel, TCG_CALL_NO_WG, void, env, tl, tl)
+ 
+ DEF_HELPER_FLAGS_1(probe_r, TCG_CALL_NO_RWG_SE, tl, tl)
+ DEF_HELPER_FLAGS_1(probe_w, TCG_CALL_NO_RWG_SE, tl, tl)
+diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
+index c05c0d5572..3104404e8d 100644
+--- a/target/hppa/op_helper.c
++++ b/target/hppa/op_helper.c
+@@ -76,7 +76,8 @@ static void atomic_store_3(CPUHPPAState *env, target_ulong addr, uint32_t val,
+ #endif
+ }
+ 
+-void HELPER(stby_b)(CPUHPPAState *env, target_ulong addr, target_ulong val)
++static void do_stby_b(CPUHPPAState *env, target_ulong addr, target_ulong val,
++                      bool parallel)
+ {
+     uintptr_t ra = GETPC();
+ 
+@@ -89,7 +90,7 @@ void HELPER(stby_b)(CPUHPPAState *env, target_ulong addr, target_ulong val)
+         break;
+     case 1:
+         /* The 3 byte store must appear atomic.  */
+-        if (parallel_cpus) {
++        if (parallel) {
+             atomic_store_3(env, addr, val, 0x00ffffffu, ra);
+         } else {
+             cpu_stb_data_ra(env, addr, val >> 16, ra);
+@@ -102,14 +103,26 @@ void HELPER(stby_b)(CPUHPPAState *env, target_ulong addr, target_ulong val)
+     }
+ }
+ 
+-void HELPER(stby_e)(CPUHPPAState *env, target_ulong addr, target_ulong val)
++void HELPER(stby_b)(CPUHPPAState *env, target_ulong addr, target_ulong val)
++{
++    do_stby_b(env, addr, val, false);
++}
++
++void HELPER(stby_b_parallel)(CPUHPPAState *env, target_ulong addr,
++                             target_ulong val)
++{
++    do_stby_b(env, addr, val, true);
++}
++
++static void do_stby_e(CPUHPPAState *env, target_ulong addr, target_ulong val,
++                      bool parallel)
+ {
+     uintptr_t ra = GETPC();
+ 
+     switch (addr & 3) {
+     case 3:
+         /* The 3 byte store must appear atomic.  */
+-        if (parallel_cpus) {
++        if (parallel) {
+             atomic_store_3(env, addr - 3, val, 0xffffff00u, ra);
+         } else {
+             cpu_stw_data_ra(env, addr - 3, val >> 16, ra);
+@@ -132,6 +145,17 @@ void HELPER(stby_e)(CPUHPPAState *env, target_ulong addr, target_ulong val)
+     }
+ }
+ 
++void HELPER(stby_e)(CPUHPPAState *env, target_ulong addr, target_ulong val)
++{
++    do_stby_e(env, addr, val, false);
++}
++
++void HELPER(stby_e_parallel)(CPUHPPAState *env, target_ulong addr,
++                             target_ulong val)
++{
++    do_stby_e(env, addr, val, true);
++}
++
+ target_ulong HELPER(probe_r)(target_ulong addr)
+ {
+     return page_check_range(addr, 1, PAGE_READ);
+diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+index 460b4d3154..08b2c73291 100644
+--- a/target/hppa/translate.c
++++ b/target/hppa/translate.c
+@@ -2291,9 +2291,17 @@ static DisasJumpType trans_stby(DisasContext *ctx, uint32_t insn,
+     val = load_gpr(ctx, rt);
+ 
+     if (a) {
+-        gen_helper_stby_e(cpu_env, addr, val);
++        if (tb_cflags(ctx->base.tb) & CF_PARALLEL) {
++            gen_helper_stby_e_parallel(cpu_env, addr, val);
++        } else {
++            gen_helper_stby_e(cpu_env, addr, val);
++        }
+     } else {
+-        gen_helper_stby_b(cpu_env, addr, val);
++        if (tb_cflags(ctx->base.tb) & CF_PARALLEL) {
++            gen_helper_stby_b_parallel(cpu_env, addr, val);
++        } else {
++            gen_helper_stby_b(cpu_env, addr, val);
++        }
+     }
+ 
+     if (m) {
 -- 
 2.13.6
