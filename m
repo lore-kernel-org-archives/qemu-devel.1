@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1e41wD-0005xo-TX
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:43:59 -0400
+	(envelope-from <peterx@redhat.com>) id 1e41wJ-0005zj-6o
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:44:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1e41wC-0001I7-Go
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:43:57 -0400
+	(envelope-from <peterx@redhat.com>) id 1e41wF-0001Iu-9K
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:44:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52287)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e41wF-0001Ie-2m
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:43:59 -0400
+Date: Mon, 16 Oct 2017 17:43:52 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171016094352.GI4166@pxdev.xzpeter.org>
+References: <20171016065216.18162-1-peterx@redhat.com>
+	<150814110349.320.16460633442467345552@b58463cdfd5f>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_wci=BT69jDM6uNa=JCM=b5GD4pO2vRQUNi6cX-B1QGA@mail.gmail.com>
-References: <20170920201737.25723-1-f4bug@amsat.org>
-	<20170920201737.25723-4-f4bug@amsat.org>
-	<CAFEAcA_wci=BT69jDM6uNa=JCM=b5GD4pO2vRQUNi6cX-B1QGA@mail.gmail.com>
-From: sundeep subbaraya <sundeep.lkml@gmail.com>
-Date: Mon, 16 Oct 2017 15:13:53 +0530
-Message-ID: <CALHRZuoc9ddSfcwSK+4Le+k8DP6B5nhBfbKuVK_D-hNXcmFzNQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v11 3/5] msf2: Add Smartfusion2 SPI
- controller
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <150814110349.320.16460633442467345552@b58463cdfd5f>
+Subject: Re: [Qemu-devel] [PATCH v3 00/32] Migration: postcopy failure
+ recovery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, aarcange@redhat.com, quintela@redhat.com, a.perevalov@samsung.com, dgilbert@redhat.com
 
-Hi Peter,
+On Mon, Oct 16, 2017 at 01:05:04AM -0700, no-reply@patchew.org wrote:
+> Hi,
+> 
+> This series failed automatic build test. Please find the testing commands and
+> their output below. If you have docker installed, you can probably reproduce it
+> locally.
+> 
+> Type: series
+> Message-id: 20171016065216.18162-1-peterx@redhat.com
+> Subject: [Qemu-devel] [PATCH v3 00/32] Migration: postcopy failure recovery
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> set -e
+> git submodule update --init dtc
+> # Let docker tests dump environment info
+> export SHOW_ENV=1
+> export J=8
+> time make docker-test-quick@centos6
+> time make docker-test-build@min-glib
+> time make docker-test-mingw@fedora
+> time make docker-test-block@fedora
+> === TEST SCRIPT END ===
 
-On Tue, Oct 10, 2017 at 6:24 PM, Peter Maydell <peter.maydell@linaro.org>
-wrote:
+[...]
 
-> On 20 September 2017 at 21:17, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg>
-> wrote:
-> > From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> >
-> > Modelled Microsemi's Smartfusion2 SPI controller.
-> >
-> > Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> > Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-> > Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
-> > +#define FRAMESZ_MASK         0x1F
->
-> > +static void set_fifodepth(MSSSpiState *s)
-> > +{
-> > +    unsigned int size =3D s->regs[R_SPI_DFSIZE] & FRAMESZ_MASK;
-> > +
-> > +    if (size <=3D 8) {
-> > +        s->fifo_depth =3D 32;
-> > +    } else if (size <=3D 16) {
-> > +        s->fifo_depth =3D 16;
-> > +    } else if (size <=3D 32) {
-> > +        s->fifo_depth =3D 8;
-> > +    } else {
-> > +        s->fifo_depth =3D 4;
-> > +    }
-> > +}
->
-> Hi. Coverity points out (CID 1381483) that the "else" case here
-> is dead code, because the FRAMESZ_MASK of 0x1F means that size
-> cannot be 32 or more.
->
-> Paolo kindly checked up with the spec at
-> https://www.eecs.umich.edu/courses/eecs373/readings/Actel_SmartFusion_MSS=
-_
-> UserGuide.pdf
-> which says that this register's field is bits [5:0] which
-> would imply an 0x3f mask is needed. On the other hand it also
-> says that "maximum value is 32", so what is the else clause
-> doing anyway?
->
+>   GEN     trace/generated-helpers.c
+>   CC      aarch64-softmmu/trace/control-target.o
+>   CC      aarch64-softmmu/gdbstub-xml.o
+>   CC      aarch64-softmmu/trace/generated-helpers.o
+>   LINK    aarch64-softmmu/qemu-system-aarch64.exe
+> ../migration/savevm.o: In function `postcopy_pause_incoming':
+> /tmp/qemu-test/src/migration/savevm.c:2174: undefined reference to `postcopy_fault_thread_notify'
 
-I will remove the else, change mask to 0x3F and add check for max 32 in
-spi_write:
-  case R_SPI_DFSIZE:
-        if (s->enabled || (value &  FRAMESZ_MASK) > 32) {
-            break;
-        }
-        s->regs[R_SPI_DFSIZE] =3D value;
-        break;
+I'm moving postcopy_fault_thread_notify() after the #endif of:
 
-Thanks for pointing out.
-Sundeep
+#if defined(__linux__) && defined(__NR_userfaultfd) && defined(CONFIG_EVENTFD)
 
+Then problem solved.
 
->
-> thanks
-> -- PMM
->
+Will hold before reposting until I got more comments.  Thanks,
+
+-- 
+Peter Xu
