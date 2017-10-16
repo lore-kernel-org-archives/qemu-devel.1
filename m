@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e3zHo-0001c8-S7
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:54:05 -0400
+	(envelope-from <peterx@redhat.com>) id 1e3zHx-0001i2-4x
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:54:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e3zHo-0002xS-4T
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:54:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33150)
+	(envelope-from <peterx@redhat.com>) id 1e3zHt-00037A-UD
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:54:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52296)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e3zHn-0002vt-Us
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:54:04 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e3zHt-000363-OE
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 02:54:09 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Mon, 16 Oct 2017 14:52:09 +0800
-Message-Id: <20171016065216.18162-26-peterx@redhat.com>
+Date: Mon, 16 Oct 2017 14:52:10 +0800
+Message-Id: <20171016065216.18162-27-peterx@redhat.com>
 In-Reply-To: <20171016065216.18162-1-peterx@redhat.com>
 References: <20171016065216.18162-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 25/32] migration: return incoming task tag
- for exec
+Subject: [Qemu-devel] [PATCH v3 26/32] migration: return incoming task tag
+ for fd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +27,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Andrea Arcangeli <aarcange@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Return the async task tag for exec typed incoming migration in
-exec_start_incoming_migration().
+Allow to return the task tag in fd_start_incoming_migration().
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/exec.c | 18 +++++++++++-------
- migration/exec.h |  2 +-
+ migration/fd.c | 18 +++++++++++-------
+ migration/fd.h |  2 +-
  2 files changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/migration/exec.c b/migration/exec.c
-index f3be1baf2e..a0796c2c70 100644
---- a/migration/exec.c
-+++ b/migration/exec.c
-@@ -52,7 +52,11 @@ static gboolean exec_accept_incoming_migration(QIOChannel *ioc,
+diff --git a/migration/fd.c b/migration/fd.c
+index 30de4b9847..7ead2f26cc 100644
+--- a/migration/fd.c
++++ b/migration/fd.c
+@@ -52,7 +52,11 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
      return G_SOURCE_REMOVE;
  }
  
--void exec_start_incoming_migration(const char *command, Error **errp)
+-void fd_start_incoming_migration(const char *infd, Error **errp)
 +/*
 + * Returns the tag ID of the watch that is attached to global main
 + * loop (>0), or zero if failure detected.
 + */
-+guint exec_start_incoming_migration(const char *command, Error **errp)
++guint fd_start_incoming_migration(const char *infd, Error **errp)
  {
      QIOChannel *ioc;
-     const char *argv[] = { "/bin/sh", "-c", command, NULL };
-@@ -62,13 +66,13 @@ void exec_start_incoming_migration(const char *command, Error **errp)
-                                                     O_RDWR,
-                                                     errp));
+     int fd;
+@@ -63,13 +67,13 @@ void fd_start_incoming_migration(const char *infd, Error **errp)
+     ioc = qio_channel_new_fd(fd, errp);
      if (!ioc) {
+         close(fd);
 -        return;
 +        return 0;
      }
  
-     qio_channel_set_name(ioc, "migration-exec-incoming");
+     qio_channel_set_name(QIO_CHANNEL(ioc), "migration-fd-incoming");
 -    qio_channel_add_watch(ioc,
 -                          G_IO_IN,
--                          exec_accept_incoming_migration,
+-                          fd_accept_incoming_migration,
 -                          NULL,
 -                          NULL);
 +    return qio_channel_add_watch(ioc,
 +                                 G_IO_IN,
-+                                 exec_accept_incoming_migration,
++                                 fd_accept_incoming_migration,
 +                                 NULL,
 +                                 NULL);
  }
-diff --git a/migration/exec.h b/migration/exec.h
-index b210ffde7a..0a7aadacd3 100644
---- a/migration/exec.h
-+++ b/migration/exec.h
-@@ -19,7 +19,7 @@
+diff --git a/migration/fd.h b/migration/fd.h
+index a14a63ce2e..94cdea87d8 100644
+--- a/migration/fd.h
++++ b/migration/fd.h
+@@ -16,7 +16,7 @@
  
- #ifndef QEMU_MIGRATION_EXEC_H
- #define QEMU_MIGRATION_EXEC_H
--void exec_start_incoming_migration(const char *host_port, Error **errp);
-+guint exec_start_incoming_migration(const char *host_port, Error **errp);
+ #ifndef QEMU_MIGRATION_FD_H
+ #define QEMU_MIGRATION_FD_H
+-void fd_start_incoming_migration(const char *path, Error **errp);
++guint fd_start_incoming_migration(const char *path, Error **errp);
  
- void exec_start_outgoing_migration(MigrationState *s, const char *host_port,
-                                    Error **errp);
+ void fd_start_outgoing_migration(MigrationState *s, const char *fdname,
+                                  Error **errp);
 -- 
 2.13.5
