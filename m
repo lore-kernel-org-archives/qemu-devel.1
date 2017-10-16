@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e440t-0003d6-KZ
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 07:56:56 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1e4434-00057R-5a
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 07:59:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e440p-0007Jg-L8
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 07:56:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45846)
+	(envelope-from <pbonzini@redhat.com>) id 1e4430-0000Sm-5L
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 07:59:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45080)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1e440p-0007J5-Cn
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 07:56:51 -0400
-References: <cover.1506730372.git.alistair.francis@xilinx.com>
-	<5496a72654fb5c27793708e470ece06fe15ab423.1506730372.git.alistair.francis@xilinx.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <32b63322-3a95-d677-91e2-91cde82cd9a4@redhat.com>
-Date: Mon, 16 Oct 2017 13:56:47 +0200
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e442z-0000SI-UL
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 07:59:06 -0400
+References: <1508144183-30844-1-git-send-email-yang.zhong@intel.com>
+	<ebb88add-3173-78b9-397e-53a364ca0d53@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0ea87d45-f1c9-21c5-ddc3-c1d5bd0c6df8@redhat.com>
+Date: Mon, 16 Oct 2017 13:58:59 +0200
 MIME-Version: 1.0
-In-Reply-To: <5496a72654fb5c27793708e470ece06fe15ab423.1506730372.git.alistair.francis@xilinx.com>
+In-Reply-To: <ebb88add-3173-78b9-397e-53a364ca0d53@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 36/47] hw/sh4: Replace fprintf(stderr,
- "*\n" with error_report()
+Subject: Re: [Qemu-devel] [PATCH 0/2] add "nopin" option in the
+ memory-backend-file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
-Cc: alistair23@gmail.com, Magnus Damm <magnus.damm@gmail.com>, armbru@redhat.com, Aurelien Jarno <aurelien@aurel32.net>
+To: Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, alex.williamson@redhat.com, anthony.xu@intel.com
 
-On 30.09.2017 02:16, Alistair Francis wrote:
-> Replace a large number of the fprintf(stderr, "*\n" calls with
-> error_report(). The functions were renamed with these commands and then
-> compiler issues where manually fixed.
+On 16/10/2017 12:20, Xiao Guangrong wrote:
 > 
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N;N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
-> find ./* -type f -exec sed -i \
->     'N; {s|fprintf(stderr, "\(.*\)\\n"\(.*\));|error_report("\1"\2);|Ig}' \
->     {} +
+>> Qemu does not need pin NVDIMM memory for VFIO device during VFIO
+>> hotplug, what's more, if there is no NVDIMM hw in the test machine,
+>> the VFIO hotplug operation will need at least 10 minutes to pin RAM
+>> as the NVDIMM, this time is not accepted. So we add "nopin=on" option
+>> in the memory-backed-file, which can avoid to pin RAM memory for NVDIMM.
 > 
-> Some lines where then manually tweaked to pass checkpatch.
+> No.
 > 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Cc: Magnus Damm <magnus.damm@gmail.com>
-> Cc: Aurelien Jarno <aurelien@aurel32.net>
-> ---
-> V2:
->  - Split hw patch into individual directories
-> 
->  hw/sh4/r2d.c    |  9 ++++----
->  hw/sh4/sh7750.c | 64 +++++++++++++++++++++++++++++----------------------------
->  2 files changed, 38 insertions(+), 35 deletions(-)
-> 
-> diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
-> index 16b9ed2db2..a010f559e2 100644
-> --- a/hw/sh4/r2d.c
-> +++ b/hw/sh4/r2d.c
-> @@ -24,6 +24,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
->  #include "qapi/error.h"
->  #include "qemu-common.h"
->  #include "cpu.h"
-> @@ -319,8 +320,8 @@ static void r2d_init(MachineState *machine)
->                                            SDRAM_BASE + LINUX_LOAD_OFFSET,
->                                            INITRD_LOAD_OFFSET - LINUX_LOAD_OFFSET);
->          if (kernel_size < 0) {
-> -          fprintf(stderr, "qemu: could not load kernel '%s'\n", kernel_filename);
-> -          exit(1);
-> +            error_report("qemu: could not load kernel '%s'", kernel_filename);
-> +            exit(1);
->          }
->  
->          /* initialization which should be done by firmware */
-> @@ -339,8 +340,8 @@ static void r2d_init(MachineState *machine)
->                                            SDRAM_SIZE - INITRD_LOAD_OFFSET);
->  
->          if (initrd_size < 0) {
-> -          fprintf(stderr, "qemu: could not load initrd '%s'\n", initrd_filename);
-> -          exit(1);
-> +            error_report("qemu: could not load initrd '%s'", initrd_filename);
-> +            exit(1);
->          }
+> memory-backed-file does not dedicate for nvdimm only, it can be mapped
+> as normal memory as well. Rather more, this is no way to stop guest to
+> use it as DMA.
 
-Please remove the "qemu:" prefix here as well.
+Right, so a better name for the object property could be "dma" rather
+than "nopin".  I'll let others comment on whether MemoryBackend (not
+just memory-backend-file) is the right place for the option.
 
- Thomas
+I am also not sure whether VFIO is not the right place for the "other
+side" of the hook.  If you add the memory region to the CPU address
+space and not the PCI address space, you can hide it from all PCI devices.
+
+Paolo
