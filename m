@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e49rF-00071p-Kg
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 14:11:22 -0400
+	(envelope-from <bounces@canonical.com>) id 1e4B6a-0005ba-Sl
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 15:31:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e49rC-0001yd-Ae
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 14:11:21 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38996)
+	(envelope-from <bounces@canonical.com>) id 1e4B6W-0004Ut-MZ
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 15:31:16 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43320)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e49rC-0001xt-4m
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 14:11:18 -0400
+	id 1e4B6W-0004Tc-Gt
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 15:31:12 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e49rA-0004xT-Ty
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 18:11:16 +0000
+	id 1e4B6T-0006CZ-4d
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 19:31:09 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DE6A12E80CC
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 18:11:16 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 2211C2E80D2
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 19:31:09 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 16 Oct 2017 18:04:16 -0000
+Date: Mon, 16 Oct 2017 19:23:12 -0000
 From: Dominique Belhachemi <domibel@debian.org>
 Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150817705649.21955.15030264397429405328.malone@wampee.canonical.com>
+Message-Id: <150818179251.22405.2937719550170053465.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1673976] Re: core dump
 List-Id: <qemu-devel.nongnu.org>
@@ -38,17 +38,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Looks like the __clone() call is failing for some reason:
+It is possible to reproduce the issue with a simple clone example taken
+from
 
-https://sourceware.org/git/?p=3Dglibc.git;a=3Dblob;f=3Dsysdeps/unix/sysv/li=
-nux/spawni.c;h=3Ddea1650d08ded5fd848f263aebebe8748e703697;hb=3DHEAD#l362
+   http://man7.org/linux/man-pages/man2/clone.2.html
 
 
-Here is a workaround:
+# qemu-aarch64-static -strace  ./a.out testname
+585 brk(NULL) =3D 0x0000004000013000
+585 uname(0x4000812d08) =3D 0
+585 faccessat(AT_FDCWD,"/etc/ld.so.nohwcap",F_OK,0x82e888) =3D -1 errno=3D2=
+ (No such file or directory)
+585 mmap(NULL,12288,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOUS,-1,0) =
+=3D 0x0000004000843000
+585 faccessat(AT_FDCWD,"/etc/ld.so.preload",R_OK,AT_SYMLINK_NOFOLLOW|0x82d8=
+48) =3D -1 errno=3D2 (No such file or directory)
+585 openat(AT_FDCWD,"/etc/ld.so.cache",O_RDONLY|O_CLOEXEC) =3D 3
+585 fstat(3,0x0000004000812680) =3D 0
+585 mmap(NULL,20645,PROT_READ,MAP_PRIVATE,3,0) =3D 0x0000004000846000
+585 close(3) =3D 0
+585 faccessat(AT_FDCWD,"/etc/ld.so.nohwcap",F_OK,0x82e888) =3D -1 errno=3D2=
+ (No such file or directory)
+585 openat(AT_FDCWD,"/lib/aarch64-linux-gnu/libc.so.6",O_RDONLY|O_CLOEXEC) =
+=3D 3
+585 read(3,0x812830,832) =3D 832
+585 fstat(3,0x00000040008126d0) =3D 0
+585 mmap(NULL,1393456,PROT_EXEC|PROT_READ,MAP_PRIVATE|MAP_DENYWRITE,3,0) =
+=3D 0x000000400084c000
+585 mprotect(0x0000004000987000,65536,PROT_NONE) =3D 0
+585 mmap(0x0000004000997000,24576,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_DENY=
+WRITE|MAP_FIXED,3,0x13b000) =3D 0x0000004000997000
+585 mmap(0x000000400099d000,13104,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANON=
+YMOUS|MAP_FIXED,-1,0) =3D 0x000000400099d000
+585 close(3) =3D 0
+585 mprotect(0x0000004000997000,16384,PROT_READ) =3D 0
+585 mprotect(0x0000004000011000,4096,PROT_READ) =3D 0
+585 mprotect(0x0000004000840000,4096,PROT_READ) =3D 0
+585 munmap(0x0000004000846000,20645) =3D 0
+585 brk(NULL) =3D 0x0000004000013000
+585 brk(0x0000004000034000) =3D 0x0000004000013000
+585 mmap(NULL,1048576,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOUS,-1,0) =
+=3D 0x00000040009a1000
+585 mmap(NULL,1052672,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOUS,-1,0) =
+=3D 0x0000004000aa1000
+585 clone(CLONE_NEWUTS|0x11,child_stack=3D0x0000004000ba1010,parent_tidptr=
+=3D0x0000004000aa1010,tls=3D0x0000000000000000,child_tidptr=3D0x00000000000=
+00000) =3D -1 errno=3D22 (Invalid argument)
+585 dup(2,4222427270,274886578000,22,0,0) =3D 3
+585 fcntl(3,F_GETFL) =3D 1026
+585 fstat(3,0x0000004000812628) =3D 0
+585 write(3,0x9a1490,24)clone: Invalid argument
+ =3D 24
+585 close(3) =3D 0
+585 exit_group(1)
 
-cd /usr/share/i18n/charmaps
-gunzip --keep UTF-8.gz
-locale-gen en_US.UTF-8
+
+# strace ./a.out testname
+qemu: Unsupported syscall: 117
+qemu: Unsupported syscall: 117
+/usr/bin/strace: ptrace(PTRACE_TRACEME, ...): Function not implemented
++++ exited with 1 +++
 
 -- =
 
