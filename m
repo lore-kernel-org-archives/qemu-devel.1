@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e41PE-0003GY-Pz
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:09:53 -0400
+	(envelope-from <david@redhat.com>) id 1e41XL-00051Q-KY
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:18:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e41PC-0001dX-4u
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:09:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38678)
+	(envelope-from <david@redhat.com>) id 1e41XF-0005Cy-Ue
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:18:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51966)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e41PB-0001d6-Ub
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:09:50 -0400
-Date: Mon, 16 Oct 2017 11:09:46 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171016110946.58d847ca@nial.brq.redhat.com>
-In-Reply-To: <1508137406-5222-1-git-send-email-bharata@linux.vnet.ibm.com>
-References: <1508137406-5222-1-git-send-email-bharata@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [FIX PATCH] monitor: Don't return CPU marked for
- unplug as monitor CPU
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1e41XF-0005CQ-OP
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:18:09 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A62F0356D9
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 09:18:07 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+Date: Mon, 16 Oct 2017 11:18:02 +0200
+Message-Id: <20171016091802.11532-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1] memory: call log_start after region_add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, sathnaga@linux.vnet.ibm.com, dgilbert@redhat.com, armbru@redhat.com, Greg Kurz <groug@kaod.org>
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>
 
-On Mon, 16 Oct 2017 12:33:26 +0530
-Bharata B Rao <bharata@linux.vnet.ibm.com> wrote:
+It might be confusing for some listener implementations that implement
+both, region_add and log_start (e.g. KVM) if we call log_start before an
+actual region was added using region_add.
 
-> The following sequence of steps kill the QEMU:
-> 
-> - Hotplug a CPU
-> - Change the default CPU to the newly hotplugged cpu using "cpu" HMP command.
-> - Hot unplug the CPU
-> - Run "info cpus"
-> 
-> Fix this by not letting monitor_get_cpu() to return a CPU which is marked
-> for unplug.
-> 
-> Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> ---
->  monitor.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/monitor.c b/monitor.c
-> index fe0d1bd..8d60e57 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -1053,7 +1053,7 @@ int monitor_set_cpu(int cpu_index)
->  
->  CPUState *mon_get_cpu(void)
->  {
-> -    if (!cur_mon->mon_cpu) {
-> +    if (!cur_mon->mon_cpu || cur_mon->mon_cpu->unplug) {
-mon_cpu could be freed so it would cause use after free,
-Greg was looking into the same issue see his patch:
-"PATCH] monitor: fix dangling CPU pointer"
+This makes current KVM code trigger an assertion
+("kvm_section_update_flags: error finding slot"). So let's just reverse
+the order instead of tolerating log_start on yet unknown regions.
 
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ memory.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-
->          if (!first_cpu) {
->              return NULL;
->          }
+diff --git a/memory.c b/memory.c
+index 5e6351a6c1..f39b8592bf 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2607,12 +2607,12 @@ static void listener_add_address_space(MemoryListener *listener,
+             .offset_within_address_space = int128_get64(fr->addr.start),
+             .readonly = fr->readonly,
+         };
+-        if (fr->dirty_log_mask && listener->log_start) {
+-            listener->log_start(listener, &section, 0, fr->dirty_log_mask);
+-        }
+         if (listener->region_add) {
+             listener->region_add(listener, &section);
+         }
++        if (fr->dirty_log_mask && listener->log_start) {
++            listener->log_start(listener, &section, 0, fr->dirty_log_mask);
++        }
+     }
+     if (listener->commit) {
+         listener->commit(listener);
+-- 
+2.13.5
