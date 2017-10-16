@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e49lS-000251-Ua
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 14:05:28 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e49m8-0002eO-5D
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 14:06:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1e49lR-00072x-GL
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 14:05:22 -0400
-References: <20171015010131.12172-1-eblake@redhat.com>
-	<20171015010131.12172-2-eblake@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <554765af-beca-0c77-5a73-e03dea123e52@redhat.com>
-Date: Mon, 16 Oct 2017 13:05:11 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1e49m4-0007NV-QJ
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 14:06:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47112)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e49m4-0007N3-H2
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 14:06:00 -0400
+Date: Mon, 16 Oct 2017 19:05:56 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171016180555.GE2876@work-vm>
+References: <002d01d34667$f8c9b1e0$ea5d15a0$@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20171015010131.12172-2-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="6dN3mdgjpl0Ui4uSs4QGeuoPWgjuPBNO1"
-Subject: Re: [Qemu-devel] [PATCH v4 1/8] nbd: Include error names in trace
- messages
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <002d01d34667$f8c9b1e0$ea5d15a0$@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Windows Server 2008 R2 network freezes after some
+ time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,80 +28,334 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, vsementsov@virtuozzo.com, qemu-block@nongnu.org
+To: Gediminas =?utf-8?Q?Jan=C4=8Dys?= <g.jancys@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6dN3mdgjpl0Ui4uSs4QGeuoPWgjuPBNO1
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org
-Message-ID: <554765af-beca-0c77-5a73-e03dea123e52@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/8] nbd: Include error names in trace
- messages
-References: <20171015010131.12172-1-eblake@redhat.com>
- <20171015010131.12172-2-eblake@redhat.com>
-In-Reply-To: <20171015010131.12172-2-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 10/14/2017 08:01 PM, Eric Blake wrote:
-> NBD errors were originally sent over the wire based on Linux errno
-> values; but not all the world is Linux, and not all platforms share
-> the same values.  Since a number isn't very easy to decipher on all
-> platforms, update the trace messages to include the name of NBD
-> errors being sent/received over the wire.  Tweak the trace messages
-> to be at the point where we are using the NBD error, not the
-> translation to the host errno values.
+* Gediminas Jan=C4=8Dys (g.jancys@gmail.com) wrote:
+> Hello guys,=20
 >=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
+> I have a problem and desperate with it, can't find a solution for it. I=
+ got
+> Windows Server 2008 R2 guest OS on CentOS Linux release 7.3.1611 (Core)=
+ with
+> libvirt and CloudStack. Problem is that after some time, about 2- 3 day=
+s
+> (should be based on amount of traffic) VM's network got stuck. No traff=
+ic in
+> or out. After restart network works fine until gets stuck again.  I'm
+> current using VirtIO drivers on guest version 61.74.104.14100. Also I h=
+ave
+> tried to use older drivers but same situation. From host and guest logs=
+ I
+> can't see any entries about drivers or something related to this proble=
+m,
+> only casual stuff. Can you help me or guide to find the problems source=
+?
+> After my investigation I would say that drivers are failing at some poi=
+nt.
 
-> +++ b/nbd/trace-events
-> @@ -29,7 +29,7 @@ nbd_client_loop_ret(int ret, const char *error) "NBD =
-loop returned %d: %s"
->  nbd_client_clear_queue(void) "Clearing NBD queue"
->  nbd_client_clear_socket(void) "Clearing NBD socket"
->  nbd_send_request(uint64_t from, uint32_t len, uint64_t handle, uint16_=
-t flags, uint16_t type, const char *name) "Sending request to server: { .=
-from =3D %" PRIu64", .len =3D %" PRIu32 ", .handle =3D %" PRIu64 ", .flag=
-s =3D 0x%" PRIx16 ", .type =3D %" PRIu16 " (%s) }"
-> -nbd_receive_reply(uint32_t magic, int32_t error, uint64_t handle) "Got=
- reply: { magic =3D 0x%" PRIx32 ", .error =3D % " PRId32 ", handle =3D %"=
- PRIu64" }"
+If you switch the NIC from virtio to another type (e1000 for example)
+does the problem go away?
 
-Pre-existing unusual spacing in '.error =3D % " PRId32',
-
-> +nbd_receive_reply(uint32_t magic, int32_t error, const char *errname, =
-uint64_t handle) "Got reply: { magic =3D 0x%" PRIx32 ", .error =3D % " PR=
-Id32 " (%s), handle =3D %" PRIu64" }"
-
-so I'll clean that up in the next revision.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---6dN3mdgjpl0Ui4uSs4QGeuoPWgjuPBNO1
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnk9NcACgkQp6FrSiUn
-Q2o7Vgf+PCtZk1MFNn6bXPjQ6LxL9B4e5Veg8q0dTbxWcR9H3hxzUuI8UrUBB8v1
-OGTW/9GYwWmDtIIzwLEuCXFQfdbWDaLPjEfB0Y19DUea/v4Dkos05uqahnKqoXeY
-uou/Mb71jxm2hRXBErwdU6FwLNs8YUOaIisM8OJt23nuYwxUxc+eUlbhVJrZdoC6
-8rcQFumunYfV28VPWY08Eg9C0s9mIC3l425YtW4nTEhkWrH79ItDV9pxK0SIFL0/
-Uxq9aPa4Atfez0zBxjm1TlCQq97PVB1Fq8XVGk7oHSagt0OnGKDLOADHJIGT2p1r
-4Qc9fHtdiAhoT5R1Y/ij9Y6iENgYiQ==
-=L4Xc
------END PGP SIGNATURE-----
-
---6dN3mdgjpl0Ui4uSs4QGeuoPWgjuPBNO1--
+Dave
+> =20
+>=20
+> Libvirts info:
+>=20
+> Using library: libvirt 2.0.0
+>=20
+> Using API: QEMU 2.0.0
+>=20
+> Running hypervisor: QEMU 2.6.0
+>=20
+> =20
+>=20
+> KVM XML:
+>=20
+> <domain type=3D'kvm' id=3D'206'>
+>=20
+>   <name>i-25-85-VM</name>
+>=20
+>   <uuid>2758a8ec-3e86-4132-9110-1051f0708367</uuid>
+>=20
+>   <description>Windows PV</description>
+>=20
+>   <maxMemory slots=3D'32' unit=3D'KiB'>197191680</maxMemory>
+>=20
+>   <memory unit=3D'KiB'>16777216</memory>
+>=20
+>   <currentMemory unit=3D'KiB'>16777216</currentMemory>
+>=20
+>   <vcpu placement=3D'auto' current=3D'2'>40</vcpu>
+>=20
+>   <cputune>
+>=20
+>     <shares>146</shares>
+>=20
+>   </cputune>
+>=20
+>   <numatune>
+>=20
+>     <memory mode=3D'strict' placement=3D'auto'/>
+>=20
+>   </numatune>
+>=20
+>   <resource>
+>=20
+>     <partition>/machine</partition>
+>=20
+>   </resource>
+>=20
+>   <sysinfo type=3D'smbios'>
+>=20
+>     <system>
+>=20
+>       <entry name=3D'manufacturer'>Apache Software Foundation</entry>
+>=20
+>       <entry name=3D'product'>CloudStack KVM Hypervisor</entry>
+>=20
+>       <entry name=3D'uuid'>2758a8ec-3e86-4132-9110-1051f0708367</entry>
+>=20
+>     </system>
+>=20
+>   </sysinfo>
+>=20
+>   <os>
+>=20
+>     <type arch=3D'x86_64' machine=3D'pc-i440fx-rhel7.3.0'>hvm</type>
+>=20
+>     <boot dev=3D'cdrom'/>
+>=20
+>     <boot dev=3D'hd'/>
+>=20
+>     <smbios mode=3D'sysinfo'/>
+>=20
+>   </os>
+>=20
+>   <features>
+>=20
+>     <acpi/>
+>=20
+>     <apic/>
+>=20
+>     <pae/>
+>=20
+>   </features>
+>=20
+>   <cpu mode=3D'host-passthrough'>
+>=20
+>     <numa>
+>=20
+>       <cell id=3D'0' cpus=3D'0-39' memory=3D'16777216' unit=3D'KiB'/>
+>=20
+>     </numa>
+>=20
+>   </cpu>
+>=20
+>   <clock offset=3D'localtime'>
+>=20
+>     <timer name=3D'rtc' tickpolicy=3D'catchup'/>
+>=20
+>   </clock>
+>=20
+>   <on_poweroff>destroy</on_poweroff>
+>=20
+>   <on_reboot>restart</on_reboot>
+>=20
+>   <on_crash>destroy</on_crash>
+>=20
+>   <devices>
+>=20
+>     <emulator>/usr/libexec/qemu-kvm</emulator>
+>=20
+>     <disk type=3D'network' device=3D'disk'>
+>=20
+>       <driver name=3D'qemu' type=3D'raw' cache=3D'writeback' discard=3D=
+'unmap'/>
+>=20
+>       <auth username=3D'kvm'>
+>=20
+>         <secret type=3D'ceph' uuid=3D'8321dbbc-8bab-301b-a89f-d558256dd=
+d8b'/>
+>=20
+>       </auth>
+>=20
+>       <source protocol=3D'rbd'
+> name=3D'kvm-pool/ec8e6467-7370-4cdc-bbda-01844e5f9c2c'>
+>=20
+>         <host name=3Dxxxxxx.xxxx.xx port=3D'6789'/>
+>=20
+>       </source>
+>=20
+>       <backingStore/>
+>=20
+>       <target dev=3D'sda' bus=3D'scsi'/>
+>=20
+>       <serial>ec8e646773704cdcbbda</serial>
+>=20
+>       <alias name=3D'scsi0-0-0-0'/>
+>=20
+>       <address type=3D'drive' controller=3D'0' bus=3D'0' target=3D'0' u=
+nit=3D'0'/>
+>=20
+>     </disk>
+>=20
+>     <disk type=3D'file' device=3D'cdrom'>
+>=20
+>       <driver name=3D'qemu' type=3D'raw' cache=3D'none'/>
+>=20
+>       <backingStore/>
+>=20
+>       <target dev=3D'hdc' bus=3D'ide'/>
+>=20
+>       <readonly/>
+>=20
+>       <alias name=3D'ide0-1-0'/>
+>=20
+>       <address type=3D'drive' controller=3D'0' bus=3D'1' target=3D'0' u=
+nit=3D'0'/>
+>=20
+>     </disk>
+>=20
+>     <controller type=3D'scsi' index=3D'0' model=3D'virtio-scsi'>
+>=20
+>       <driver queues=3D'2'/>
+>=20
+>       <alias name=3D'scsi0'/>
+>=20
+>       <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04=
+'
+> function=3D'0x0'/>
+>=20
+>     </controller>
+>=20
+>     <controller type=3D'usb' index=3D'0'>
+>=20
+>       <alias name=3D'usb'/>
+>=20
+>       <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01=
+'
+> function=3D'0x2'/>
+>=20
+>     </controller>
+>=20
+>     <controller type=3D'pci' index=3D'0' model=3D'pci-root'>
+>=20
+>       <alias name=3D'pci.0'/>
+>=20
+>     </controller>
+>=20
+>     <controller type=3D'ide' index=3D'0'>
+>=20
+>       <alias name=3D'ide'/>
+>=20
+>       <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01=
+'
+> function=3D'0x1'/>
+>=20
+>     </controller>
+>=20
+>     <interface type=3D'bridge'>
+>=20
+>       <mac address=3D'06:b2:ec:00:01:97'/>
+>=20
+>       <source bridge=3D'brbond0-500'/>
+>=20
+>       <target dev=3D'vnet14'/>
+>=20
+>       <model type=3D'virtio'/>
+>=20
+>       <alias name=3D'net0'/>
+>=20
+>       <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03=
+'
+> function=3D'0x0'/>
+>=20
+>     </interface>
+>=20
+>     <serial type=3D'pty'>
+>=20
+>       <source path=3D'/dev/pts/13'/>
+>=20
+>       <target port=3D'0'/>
+>=20
+>       <alias name=3D'serial0'/>
+>=20
+>     </serial>
+>=20
+>     <console type=3D'pty' tty=3D'/dev/pts/13'>
+>=20
+>       <source path=3D'/dev/pts/13'/>
+>=20
+>       <target type=3D'serial' port=3D'0'/>
+>=20
+>       <alias name=3D'serial0'/>
+>=20
+>     </console>
+>=20
+>     <input type=3D'tablet' bus=3D'usb'>
+>=20
+>       <alias name=3D'input0'/>
+>=20
+>       <address type=3D'usb' bus=3D'0' port=3D'1'/>
+>=20
+>     </input>
+>=20
+>     <input type=3D'mouse' bus=3D'ps2'>
+>=20
+>       <alias name=3D'input1'/>
+>=20
+>     </input>
+>=20
+>     <input type=3D'keyboard' bus=3D'ps2'>
+>=20
+>       <alias name=3D'input2'/>
+>=20
+>     </input>
+>=20
+>     <graphics type=3D'vnc' port=3D'5914' autoport=3D'yes' listen=3D'10.=
+24.99.29'>
+>=20
+>       <listen type=3D'address' address=3D'10.24.99.29'/>
+>=20
+>     </graphics>
+>=20
+>     <video>
+>=20
+>       <model type=3D'cirrus' vram=3D'16384' heads=3D'1' primary=3D'yes'=
+/>
+>=20
+>       <alias name=3D'video0'/>
+>=20
+>       <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02=
+'
+> function=3D'0x0'/>
+>=20
+>     </video>
+>=20
+>     <memballoon model=3D'none'/>
+>=20
+>   </devices>
+>=20
+>   <seclabel type=3D'none' model=3D'none'/>
+>=20
+>   <seclabel type=3D'dynamic' model=3D'dac' relabel=3D'yes'>
+>=20
+>     <label>+0:+0</label>
+>=20
+>     <imagelabel>+0:+0</imagelabel>
+>=20
+>   </seclabel>
+>=20
+> </domain>
+>=20
+> =20
+>=20
+> King regards
+>=20
+> Gediminas J.
+>=20
+> =20
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
