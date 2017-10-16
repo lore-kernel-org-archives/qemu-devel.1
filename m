@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e45CM-0003F5-Jm
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:12:51 -0400
+	(envelope-from <thuth@redhat.com>) id 1e45CP-0003Gz-JR
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:12:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e45CJ-00012t-DO
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:12:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54684)
+	(envelope-from <thuth@redhat.com>) id 1e45CO-00018N-JX
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:12:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45868)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1e45CJ-00012F-8G
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:12:47 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1e45CO-00017S-D4
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:12:52 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 16 Oct 2017 15:12:39 +0200
-Message-Id: <1508159564-30317-1-git-send-email-thuth@redhat.com>
+Date: Mon, 16 Oct 2017 15:12:41 +0200
+Message-Id: <1508159564-30317-3-git-send-email-thuth@redhat.com>
+In-Reply-To: <1508159564-30317-1-git-send-email-thuth@redhat.com>
+References: <1508159564-30317-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/5] m68k, qtest and config patches
+Subject: [Qemu-devel] [PULL 2/5] M68K: use g_new() family of functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +27,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Dmitry Fleytman <dmitry@daynix.com>
+Cc: peter.maydell@linaro.org, Dmitry Fleytman <dmitry@daynix.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-The following changes since commit f90ea7ba7c5ae7010ee0ce062207ae42530f57=
-d6:
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
-71012' into staging (2017-10-12 17:06:50 +0100)
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+[PMD: squashed commits]
+Reviewed-by: Thomas Huth <huth@tuxfamily.org>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/m68k/mcf5206.c | 4 ++--
+ hw/m68k/mcf5208.c | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-are available in the git repository at:
-
-  https://github.com/huth/qemu.git tags/pull-request-2017-10-16
-
-for you to fetch changes up to 03bf6b5c08c792f5c2b55d6038e9a6acbf43d9c3:
-
-  default-configs: Enable CONFIG_VMXNET3_PCI only on x86 (2017-10-16 13:2=
-9:49 +0200)
-
-----------------------------------------------------------------
-Some m68k, qtest and config improvements
-
-----------------------------------------------------------------
-Alistair Francis (1):
-      hw/m68k: Replace fprintf(stderr, "*\n" with error_report()
-
-Marc-Andr=C3=A9 Lureau (2):
-      M68K: use g_new() family of functions
-      tests: use g_new() family of functions
-
-Thomas Huth (2):
-      tests/prom-env: Bump the timeout, and test pseries only in slow mod=
-e
-      default-configs: Enable CONFIG_VMXNET3_PCI only on x86
-
- default-configs/i386-softmmu.mak   |  1 +
- default-configs/pci.mak            |  1 -
- default-configs/x86_64-softmmu.mak |  1 +
- hw/m68k/an5206.c                   |  4 ++--
- hw/m68k/mcf5206.c                  |  7 ++++---
- hw/m68k/mcf5208.c                  |  9 +++++----
- tests/ahci-test.c                  |  4 ++--
- tests/fw_cfg-test.c                |  4 ++--
- tests/libqos/ahci.c                |  2 +-
- tests/libqos/libqos.c              |  2 +-
- tests/libqos/malloc.c              |  6 +++---
- tests/libqtest.c                   |  2 +-
- tests/pc-cpu-test.c                |  2 +-
- tests/prom-env-test.c              | 14 ++++++++------
- 14 files changed, 32 insertions(+), 27 deletions(-)
+diff --git a/hw/m68k/mcf5206.c b/hw/m68k/mcf5206.c
+index fbf3f0f..bd8e993 100644
+--- a/hw/m68k/mcf5206.c
++++ b/hw/m68k/mcf5206.c
+@@ -138,7 +138,7 @@ static m5206_timer_state *m5206_timer_init(qemu_irq i=
+rq)
+     m5206_timer_state *s;
+     QEMUBH *bh;
+=20
+-    s =3D (m5206_timer_state *)g_malloc0(sizeof(m5206_timer_state));
++    s =3D g_new0(m5206_timer_state, 1);
+     bh =3D qemu_bh_new(m5206_timer_trigger, s);
+     s->timer =3D ptimer_init(bh, PTIMER_POLICY_DEFAULT);
+     s->irq =3D irq;
+@@ -534,7 +534,7 @@ qemu_irq *mcf5206_init(MemoryRegion *sysmem, uint32_t=
+ base, M68kCPU *cpu)
+     m5206_mbar_state *s;
+     qemu_irq *pic;
+=20
+-    s =3D (m5206_mbar_state *)g_malloc0(sizeof(m5206_mbar_state));
++    s =3D g_new0(m5206_mbar_state, 1);
+=20
+     memory_region_init_io(&s->iomem, NULL, &m5206_mbar_ops, s,
+                           "mbar", 0x00001000);
+diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
+index c9c5f5e..68589c3 100644
+--- a/hw/m68k/mcf5208.c
++++ b/hw/m68k/mcf5208.c
+@@ -184,7 +184,7 @@ static void mcf5208_sys_init(MemoryRegion *address_sp=
+ace, qemu_irq *pic)
+     memory_region_add_subregion(address_space, 0xfc0a8000, iomem);
+     /* Timers.  */
+     for (i =3D 0; i < 2; i++) {
+-        s =3D (m5208_timer_state *)g_malloc0(sizeof(m5208_timer_state));
++        s =3D g_new0(m5208_timer_state, 1);
+         bh =3D qemu_bh_new(m5208_timer_trigger, s);
+         s->timer =3D ptimer_init(bh, PTIMER_POLICY_DEFAULT);
+         memory_region_init_io(&s->iomem, NULL, &m5208_timer_ops, s,
+--=20
+1.8.3.1
