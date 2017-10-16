@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e44O9-0005GE-2O
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 08:21:00 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1e44Q4-0006nf-W1
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 08:22:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e44O6-0004kV-AS
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 08:20:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37912)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e44O6-0004jw-1v
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 08:20:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e44O3-0006z4-F7
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 12:20:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 47FB72E80CC
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 12:20:51 +0000 (UTC)
+	(envelope-from <pbonzini@redhat.com>) id 1e44Q2-0006Gk-46
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 08:22:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33794)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e44Q1-0006FQ-TE
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 08:22:54 -0400
+References: <20171013054842.32120-1-sw@weilnetz.de>
+	<dacdf7e7-0b16-99a0-ab50-ea7a458e0ec6@amsat.org>
+	<4028eece-c9ff-113a-3cab-1a95c9ce79cc@redhat.com>
+	<81efd75c-0716-c149-c483-6cf487748ab5@weilnetz.de>
+	<2be5f194-ccc4-d3cc-6001-feae580e77e1@weilnetz.de>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f1681f83-c337-1b40-a98d-d4d740f6f576@redhat.com>
+Date: Mon, 16 Oct 2017 14:22:48 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 16 Oct 2017 12:06:20 -0000
-From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
-Reply-To: Bug 1723927 <1723927@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150815318241.964.13154685786789289008.malonedeb@chaenomeles.canonical.com>
-Message-Id: <60b9f503-4f00-c9f1-70c4-4dd9970aa0e4@redhat.com>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1723927] [NEW] Linux or windows guest boot
- failed by uefi on CPU of Intel Xeon X5675
+In-Reply-To: <2be5f194-ccc4-d3cc-6001-feae580e77e1@weilnetz.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] oslib-posix: Fix compiler warning and
+ some data types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,180 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Weil <sw@weilnetz.de>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 10/16/17 13:26, chan wrote:
-> Public bug reported:
-> =
+On 15/10/2017 19:53, Stefan Weil wrote:
+>> I see your arguments. Maybe that part can be removed from my patch
+>> when it is applied, or should I send a v3 (cc'ing qemu-trivial)?
 
-> Hi,
-> =
+Sending v3 to trivial makes sense.
 
-> I started windows server 2012 DC or redhat7.0, but boot failed by UEFI, a=
-nd start process stop on
-> "TianoCore" image by looking at VNCviewer.
-> =
+> While thinking more about that line of code, I wonder whether
+> it would make sense to replace the byte r/w by a 32 bit r/w.
+> Would that be faster on architectures with a 32 bit memory bus?
 
-> VM using the command:(redhat7.0)
-> /usr/bin/kvm -name guest=3Dytest,debug-threads=3Don -S -object secret,id=
-=3DmasterKey0,format=3Draw,file=3D/run/lib/libvirt/qemu/domain-40-ytest/mas=
-ter-key.aes -machine pc-i440fx-2.7,accel=3Dkvm,usb=3Doff,system=3Dwindows,d=
-ump-guest-core=3Doff -bios /usr/share/qemu-kvm/OVMF_CODE.fd -m size=3D83886=
-08k,slots=3D10,maxmem=3D34359738368k -realtime mlock=3Doff -smp 1,maxcpus=
-=3D24,sockets=3D24,cores=3D1,threads=3D1 -numa node,nodeid=3D0,cpus=3D0-23,=
-mem=3D8192 -uuid 8cf40bd6-258a-4550-ba4e-b38230547a11 -no-user-config -node=
-faults -chardev socket,id=3Dcharmonitor,path=3D/run/lib/libvirt/qemu/domain=
--40-ytest/monitor.sock,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonito=
-r,mode=3Dcontrol -chardev socket,id=3Dcharmonitor_cas,path=3D/run/lib/libvi=
-rt/qemu/domain-40-ytest/monitor.sock.cas,server,nowait -mon chardev=3Dcharm=
-onitor_cas,id=3Dmonitor_cas,mode=3Dcontrol -rtc base=3Dutc -no-shutdown -gl=
-obal PIIX4_PM.disable_s3=3D1 -global PIIX4_PM.disable_s4=3D1 -boot strict=
-=3Don -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -device us=
-b-ehci,id=3Dusb1,bus=3Dpci.0,addr=3D0x3 -device nec-usb-xhci,id=3Dusb2,bus=
-=3Dpci.0,addr=3D0x4 -device virtio-scsi-pci,id=3Dscsi1,bus=3Dpci.0,addr=3D0=
-x6 -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x7 -de=
-vice usb-hub,id=3Dhub0,bus=3Dusb.0,port=3D1 -drive file=3D/vms/hw235/ytest,=
-format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cache=3Ddirectsync,aio=3Dn=
-ative -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x8,pci_hotplugg=
-able=3Don,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -drive=
- if=3Dnone,id=3Ddrive-fdc0-0-0,readonly=3Don -global isa-fdc.driveA=3Ddrive=
--fdc0-0-0 -global isa-fdc.bootindexA=3D2 -netdev tap,fd=3D48,id=3Dhostnet0,=
-vhost=3Don,vhostfd=3D50 -device virtio-net-pci,pci_hotpluggable=3Don,netdev=
-=3Dhostnet0,id=3Dnet0,mac=3D0c:da:41:1d:67:6f,bus=3Dpci.0,addr=3D0x5,bootin=
-dex=3D4 -chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharseri=
-al0,id=3Dserial0 -chardev socket,id=3Dcharchannel0,path=3D/var/lib/libvirt/=
-qemu/ytest.agent,server,nowait -device virtserialport,bus=3Dvirtio-serial0.=
-0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0=
- -vnc 0.0.0.0:9 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -devi=
-ce virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x9 -msg timestamp=
-=3Don
-> =
+In practice this goes to the cache, so it's not affected by the size of
+the write.
 
-> qemu version: 2.7.1
-> edk2 version: git://git.code.sf.net/p/tianocore/edk2.git, commit: cc0b456=
-a05f8dd1ebfb9be485465be37e96999e7
-> server: ProLiant BL460c G7, CPU: Intel(R) Xeon(R) CPU X5675  @ 3.07GHz
-> =
-
-> Another, last version of edk2(compiled by myself) start guest is failed,
-> too. But r15214 of edk2 start guest is ok(Download from
-> http://sourceforge.net/projects/edk2/files/OVMF/, OVMF-X64-r15214.zip)
-> =
-
-> Thanks in Advance
-> =
-
-> ** Affects: qemu
->      Importance: Undecided
->          Status: New
-> =
-
-
-Your command line is broken;
-
-  -bios /usr/share/qemu-kvm/OVMF_CODE.fd
-
-has never been a correct option to boot OVMF.
-
-Your cmdline seems to have been generated by libvirt; make sure your
-domain XML says
-
-<domain type=3D'kvm'>
-  <os>
-    <type arch=3D'x86_64' machine=3D'pc'>hvm</type>
-    <loader readonly=3D'yes' type=3D'pflash'>/usr/share/qemu-kvm/OVMF_CODE.=
-fd</loader>
-  </os>
-</domain>
-
-If your libvirt daemon is set up correctly, then libvirt will generate
-the <nvram> element automatically for the above. (See the "nvram" stanza
-in "/etc/libvirt/qemu.conf". If you modify that, don't forget to restart
-libvirt.)
-
-
-Also, you can capture the OVMF debug log with
-
-<domain type=3D'kvm' =
-
- xmlns:qemu=3D'http://libvirt.org/schemas/domain/qemu/1.0'>
- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ <------- don't for=
-get to add this too
-  <qemu:commandline>
-    <qemu:arg value=3D'-global'/>
-    <qemu:arg value=3D'isa-debugcon.iobase=3D0x402'/>
-    <qemu:arg value=3D'-debugcon'/>
-    <qemu:arg value=3D'file:/tmp/GUEST_NAME.log'/>
-  </qemu:commandline>
-</domain>
-
-Thanks,
-Laszlo
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1723927
-
-Title:
-  Linux or windows guest boot failed by uefi  on CPU of  Intel Xeon
-  X5675
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hi,
-
-  I started windows server 2012 DC or redhat7.0, but boot failed by UEFI, a=
-nd start process stop on
-  "TianoCore" image by looking at VNCviewer.
-
-  VM using the command:(redhat7.0)
-  /usr/bin/kvm -name guest=3Dytest,debug-threads=3Don -S -object secret,id=
-=3DmasterKey0,format=3Draw,file=3D/run/lib/libvirt/qemu/domain-40-ytest/mas=
-ter-key.aes -machine pc-i440fx-2.7,accel=3Dkvm,usb=3Doff,system=3Dwindows,d=
-ump-guest-core=3Doff -bios /usr/share/qemu-kvm/OVMF_CODE.fd -m size=3D83886=
-08k,slots=3D10,maxmem=3D34359738368k -realtime mlock=3Doff -smp 1,maxcpus=
-=3D24,sockets=3D24,cores=3D1,threads=3D1 -numa node,nodeid=3D0,cpus=3D0-23,=
-mem=3D8192 -uuid 8cf40bd6-258a-4550-ba4e-b38230547a11 -no-user-config -node=
-faults -chardev socket,id=3Dcharmonitor,path=3D/run/lib/libvirt/qemu/domain=
--40-ytest/monitor.sock,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonito=
-r,mode=3Dcontrol -chardev socket,id=3Dcharmonitor_cas,path=3D/run/lib/libvi=
-rt/qemu/domain-40-ytest/monitor.sock.cas,server,nowait -mon chardev=3Dcharm=
-onitor_cas,id=3Dmonitor_cas,mode=3Dcontrol -rtc base=3Dutc -no-shutdown -gl=
-obal PIIX4_PM.disable_s3=3D1 -global PIIX4_PM.disable_s4=3D1 -boot strict=
-=3Don -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -device us=
-b-ehci,id=3Dusb1,bus=3Dpci.0,addr=3D0x3 -device nec-usb-xhci,id=3Dusb2,bus=
-=3Dpci.0,addr=3D0x4 -device virtio-scsi-pci,id=3Dscsi1,bus=3Dpci.0,addr=3D0=
-x6 -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x7 -de=
-vice usb-hub,id=3Dhub0,bus=3Dusb.0,port=3D1 -drive file=3D/vms/hw235/ytest,=
-format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cache=3Ddirectsync,aio=3Dn=
-ative -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x8,pci_hotplugg=
-able=3Don,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -drive=
- if=3Dnone,id=3Ddrive-fdc0-0-0,readonly=3Don -global isa-fdc.driveA=3Ddrive=
--fdc0-0-0 -global isa-fdc.bootindexA=3D2 -netdev tap,fd=3D48,id=3Dhostnet0,=
-vhost=3Don,vhostfd=3D50 -device virtio-net-pci,pci_hotpluggable=3Don,netdev=
-=3Dhostnet0,id=3Dnet0,mac=3D0c:da:41:1d:67:6f,bus=3Dpci.0,addr=3D0x5,bootin=
-dex=3D4 -chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharseri=
-al0,id=3Dserial0 -chardev socket,id=3Dcharchannel0,path=3D/var/lib/libvirt/=
-qemu/ytest.agent,server,nowait -device virtserialport,bus=3Dvirtio-serial0.=
-0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0=
- -vnc 0.0.0.0:9 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -devi=
-ce virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x9 -msg timestamp=
-=3Don
-
-  qemu version: 2.7.1
-  edk2 version: git://git.code.sf.net/p/tianocore/edk2.git, commit: cc0b456=
-a05f8dd1ebfb9be485465be37e96999e7
-  server: ProLiant BL460c G7, CPU: Intel(R) Xeon(R) CPU X5675  @ 3.07GHz
-
-  Another, last version of edk2(compiled by myself) start guest is
-  failed, too. But r15214 of edk2 start guest is ok(Download from
-  http://sourceforge.net/projects/edk2/files/OVMF/, OVMF-X64-r15214.zip)
-
-  Thanks in Advance
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1723927/+subscriptions
+Paolo
