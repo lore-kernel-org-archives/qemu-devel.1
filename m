@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e45CV-0003Lv-LZ
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:13:00 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e45GE-00067e-9W
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:16:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e45CS-0001Bt-Gp
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:12:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39352)
+	(envelope-from <kraxel@redhat.com>) id 1e45GD-0004sm-7G
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:16:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45558)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1e45CS-0001BV-AO
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:12:56 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 16 Oct 2017 15:12:44 +0200
-Message-Id: <1508159564-30317-6-git-send-email-thuth@redhat.com>
-In-Reply-To: <1508159564-30317-1-git-send-email-thuth@redhat.com>
-References: <1508159564-30317-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PULL 5/5] default-configs: Enable CONFIG_VMXNET3_PCI
- only on x86
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e45GD-0004s9-1K
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:16:49 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 16 Oct 2017 15:16:44 +0200
+Message-Id: <20171016131644.9565-12-kraxel@redhat.com>
+In-Reply-To: <20171016131644.9565-1-kraxel@redhat.com>
+References: <20171016131644.9565-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 11/11] gtk: fix wrong id between texture and
+ framebuffer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,61 +25,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Dmitry Fleytman <dmitry@daynix.com>
+Cc: Anthoine Bourgeois <anthoine.bourgeois@blade-group.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-The device can not be instantiated on many non-x86 and just prints
-some error messages, e.g.:
+From: Anthoine Bourgeois <anthoine.bourgeois@blade-group.com>
 
-$ qemu-system-ppc64 -device vmxnet3 -M g3beige
-[vmxnet3][WR][vmxnet3_init_msix]: Failed to initialize MSI-X, error -95
-[vmxnet3][WR][vmxnet3_pci_realize]: Failed to initialize MSI-X, configuration is inconsistent.
+The gd_gl_area_scanout_texture must destroy framebuffer if there is
+no texture id instead of no framebuffer id.
+The effect was a black screen with "-vga virtio -display gtk,gl=on"
+options.
+The bug was introduce by a4f113fd "gtk: use framebuffer helper functions."
 
-Since vmxnet3 is a para-virtualized device that is only useful on x86,
-it should also only be enabled on the x86 targets.
-
-Reviewed-by: Dmitry Fleytman <dmitry@daynix.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Anthoine Bourgeois <anthoine.bourgeois@blade-group.com>
+Message-id: 20171002124052.13829-1-anthoine.bourgeois@gmail.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- default-configs/i386-softmmu.mak   | 1 +
- default-configs/pci.mak            | 1 -
- default-configs/x86_64-softmmu.mak | 1 +
- 3 files changed, 2 insertions(+), 1 deletion(-)
+ ui/gtk-gl-area.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index d2ab2f6..a685c43 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -7,6 +7,7 @@ CONFIG_QXL=$(CONFIG_SPICE)
- CONFIG_VGA_ISA=y
- CONFIG_VGA_CIRRUS=y
- CONFIG_VMWARE_VGA=y
-+CONFIG_VMXNET3_PCI=y
- CONFIG_VIRTIO_VGA=y
- CONFIG_VMMOUSE=y
- CONFIG_IPMI=y
-diff --git a/default-configs/pci.mak b/default-configs/pci.mak
-index 187e438..e514bde 100644
---- a/default-configs/pci.mak
-+++ b/default-configs/pci.mak
-@@ -22,7 +22,6 @@ CONFIG_MPTSAS_SCSI_PCI=y
- CONFIG_RTL8139_PCI=y
- CONFIG_E1000_PCI=y
- CONFIG_E1000E_PCI=y
--CONFIG_VMXNET3_PCI=y
- CONFIG_IDE_CORE=y
- CONFIG_IDE_QDEV=y
- CONFIG_IDE_PCI=y
-diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
-index 9bde2f1..ea69e82 100644
---- a/default-configs/x86_64-softmmu.mak
-+++ b/default-configs/x86_64-softmmu.mak
-@@ -7,6 +7,7 @@ CONFIG_QXL=$(CONFIG_SPICE)
- CONFIG_VGA_ISA=y
- CONFIG_VGA_CIRRUS=y
- CONFIG_VMWARE_VGA=y
-+CONFIG_VMXNET3_PCI=y
- CONFIG_VIRTIO_VGA=y
- CONFIG_VMMOUSE=y
- CONFIG_IPMI=y
+diff --git a/ui/gtk-gl-area.c b/ui/gtk-gl-area.c
+index 01ebf2c7de..7080f4e14f 100644
+--- a/ui/gtk-gl-area.c
++++ b/ui/gtk-gl-area.c
+@@ -178,8 +178,7 @@ void gd_gl_area_scanout_texture(DisplayChangeListener *dcl,
+ 
+     gtk_gl_area_make_current(GTK_GL_AREA(vc->gfx.drawing_area));
+ 
+-    if (vc->gfx.guest_fb.framebuffer  == 0 ||
+-        vc->gfx.w == 0 || vc->gfx.h == 0) {
++    if (backing_id == 0 || vc->gfx.w == 0 || vc->gfx.h == 0) {
+         gtk_gl_area_set_scanout_mode(vc, false);
+         return;
+     }
 -- 
-1.8.3.1
+2.9.3
