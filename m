@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e3qo7-00049v-JV
-	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 17:50:53 -0400
+	(envelope-from <andrew@aj.id.au>) id 1e3ud8-0006JU-1D
+	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 21:55:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e3qo1-0008M0-HY
-	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 17:50:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54536)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e3qo1-0008Lf-8O
-	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 17:50:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e3qnz-0004QD-5j
-	for <qemu-devel@nongnu.org>; Sun, 15 Oct 2017 21:50:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 262902E804E
-	for <qemu-devel@nongnu.org>; Sun, 15 Oct 2017 21:50:43 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 15 Oct 2017 21:40:38 -0000
-From: Alexander Kuzmin <1723731@bugs.launchpad.net>
-Reply-To: Bug 1723731 <1723731@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150806672066.15534.12058555571151449517.malonedeb@soybean.canonical.com>
-Message-Id: <150810363862.15354.17308882875159618773.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1723731] Re: Qemu turns to black screen while
- starting to copy installation files of Windows 7
+	(envelope-from <andrew@aj.id.au>) id 1e3ud6-0006qE-Rv
+	for qemu-devel@nongnu.org; Sun, 15 Oct 2017 21:55:46 -0400
+Message-ID: <1508118927.24322.0.camel@aj.id.au>
+From: Andrew Jeffery <andrew@aj.id.au>
+Date: Mon, 16 Oct 2017 12:25:27 +1030
+In-Reply-To: <ca6255bb-64f8-10bf-1e1f-a693ae38f4c3@kaod.org>
+References: <20170920070135.31379-1-clg@kaod.org>
+	<20170920070135.31379-2-clg@kaod.org>
+	<1507507449.5452.147.camel@aj.id.au>
+	<48144f71-c876-0e89-f01e-cbfe87687aee@kaod.org>
+	<1507693785.5452.175.camel@aj.id.au>
+	<ca6255bb-64f8-10bf-1e1f-a693ae38f4c3@kaod.org>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-ZAn+KUcnrehn6Q1D5hz2"
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] aspeed: add support for the
+ witherspoon-bmc board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,205 +28,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-** Description changed:
 
-  Distribution: Arch Linux, Kernel: linux-4.13.5, Qemu: 2.10.1, OVMF: git (=
-built 06.10.17).
-  Steps to reproduce: create Qemu VM with such config:
-  =
+--=-ZAn+KUcnrehn6Q1D5hz2
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  QEMU_VM_NAME=3D$(basename $(dirname "$0")) #Qemu virtual machine name (ta=
-ken from working directory)
-  QEMU_WORKING_DIR=3D"$(dirname "$0")" #Qemu current working directory
-  DIF=3D12 #set 2-digit number here
-  QEMU_MONITOR_PORT=3D370${DIF} #Qemu monitor port
-  QEMU_SERIAL_PORT=3D371${DIF} #Qemu serial port
-  QEMU_PARALLEL_PORT=3D372${DIF} #Qemu parallel port
-- =
+On Wed, 2017-10-11 at 09:28 +0200, C=C3=A9dric Le Goater wrote:
+> On 10/11/2017 05:49 AM, Andrew Jeffery wrote:
+> > On Tue, 2017-10-10 at 15:30 +0200, C=C3=A9dric Le Goater wrote:
+> > > On 10/09/2017 02:04 AM, Andrew Jeffery wrote:
+> > > > On Wed, 2017-09-20 at 09:01 +0200, C=C3=A9dric Le Goater wrote:
+> > > > > The Witherspoon boards are OpenPOWER system hosting POWER9 Proces=
+sors.
+> > > > > Let's add support for their BMC including a couple of I2C devices=
+ as
+> > > > > found on real HW.
+> > > > > =C2=A0
+> > > > > > > > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> > > > >=20
+> > > > > ---
+> > > > > =C2=A0hw/arm/aspeed.c | 49 ++++++++++++++++++++++++++++++++++++++=
++++++++++++
+> > > > > =C2=A01 file changed, 49 insertions(+)
+> > > > > =C2=A0
+> > > > > diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+> > > > > index ab895ad490af..81f522f711ae 100644
+> > > > > --- a/hw/arm/aspeed.c
+> > > > > +++ b/hw/arm/aspeed.c
+> > > > > @@ -46,6 +46,7 @@ enum {
+> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0PALMETTO_BMC,
+> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0AST2500_EVB,
+> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ROMULUS_BMC,
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0WITHERSPOON_BMC,
+> > > > > =C2=A0};
+> > > > > =C2=A0
+> > > > > =C2=A0/* Palmetto hardware value: 0x120CE416 */
+> > > > > @@ -83,8 +84,12 @@ enum {
+> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0SCU_AST2500=
+_HW_STRAP_ACPI_ENABLE |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0\
+> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0SCU_HW_STRA=
+P_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
+> > > > > =C2=A0
+> > > > > +/* Witherspoon hardware value: 0xF10AD216 (but use romulus defin=
+ition) */
+> > > > > +#define WITHERSPOON_BMC_HW_STRAP1 ROMULUS_BMC_HW_STRAP1
+> > > > > +
+> > > > > =C2=A0static void palmetto_bmc_i2c_init(AspeedBoardState *bmc);
+> > > > > =C2=A0static void ast2500_evb_i2c_init(AspeedBoardState *bmc);
+> > > > > +static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc);
+> > > > > =C2=A0
+> > > > > =C2=A0static const AspeedBoardConfig aspeed_boards[] =3D {
+> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0[PALMETTO_BMC] =3D {
+> > > > > @@ -110,6 +115,14 @@ static const AspeedBoardConfig aspeed_boards=
+[] =3D {
+> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.spi_model =
+=3D "mx66l1g45g",
+> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.num_cs=C2=
+=A0=C2=A0=C2=A0=C2=A0=3D 2,
+> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0},
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0[WITHERSPOON_BMC]=C2=A0=C2=A0=3D {
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.soc_name=C2=A0=
+=C2=A0=3D "ast2500-a1",
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.hw_strap1 =3D W=
+ITHERSPOON_BMC_HW_STRAP1,
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.fmc_model =3D "=
+mx25l25635e",
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.spi_model =3D "=
+mx66l1g45g",
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.num_cs=C2=A0=C2=
+=A0=C2=A0=C2=A0=3D 2,
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.i2c_init=C2=A0=
+=C2=A0=3D witherspoon_bmc_i2c_init,
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0},
+> > > > > =C2=A0};
+> > > > > =C2=A0
+> > > > > =C2=A0#define FIRMWARE_ADDR 0x0
+> > > > > @@ -337,11 +350,47 @@ static const TypeInfo romulus_bmc_type =3D =
+{
+> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.class_init =3D romulus_bmc_class_i=
+nit,
+> > > > > =C2=A0};
+> > > > > =C2=A0
+> > > > > +static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
+> > > > > +{
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0AspeedSoCState *soc =3D &bmc->soc;
+> > > > > +
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0i2c_create_slave(aspeed_i2c_get_bus(DEVI=
+CE(&soc->i2c), 4), "tmp423", 0x4c);
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0i2c_create_slave(aspeed_i2c_get_bus(DEVI=
+CE(&soc->i2c), 5), "tmp423", 0x4c);
+> > > > > +
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0i2c_create_slave(aspeed_i2c_get_bus(DEVI=
+CE(&soc->i2c), 9), "tmp105", 0x4a);
+> > > >=20
+> > > > Looks like I need to track down newer versions of the schematics I =
+have.
+> > >=20
+> > > the device on the board is a tmp275 but the tmp105 model is compatibl=
+e.
+> >=20
+> > It neither device is listed in the version I have :)
+>=20
+> Here is my source :
+>=20
+> 	https://github.com/openbmc/linux/blob/dev-4.10/arch/arm/boot/dts/aspeed-=
+bmc-opp-witherspoon.dts#L504
+>=20
 
-  =
+Yeah, I ended up jumping on a machine and verifying the device was on
+the bus.
 
-  qemu-system-x86_64 -daemonize -display gtk -boot menu=3Don -monitor telne=
-t:127.0.0.1:${QEMU_MONITOR_PORT},server,nowait -serial telnet:127.0.0.1:${Q=
-EMU_SERIAL_PORT},server,nowait -uuid fafafafa-1234-bcbc-5678-11112222ff${DI=
-F} -name ${QEMU_VM_NAME},process=3DQEMU-${QEMU_VM_NAME} -parallel none -net=
- none -nodefconfig -nodefaults -no-user-config -rtc base=3Dlocaltime,clock=
-=3Dvm,driftfix=3Dslew -realtime mlock=3Doff -machine type=3Dq35,accel=3Dkvm=
-,usb=3Doff,dump-guest-core=3Doff -smp 2,sockets=3D1,cores=3D2,threads=3D1 -=
-object iothread,id=3Diothread1 -object iothread,id=3Diothread2 -cpu Penryn,=
-kvm=3Doff,check,vendor=3DGenuineIntel,+vmx -m 2G -device qxl-vga,id=3Dvideo=
-0,ram_size=3D67108864,vram_size=3D67108864,vram64_size_mb=3D0,vgamem_mb=3D1=
-6,max_outputs=3D1,addr=3D0x1b.0x0 -global qxl-vga.revision=3D4 -device ich9=
--intel-hda,addr=3D0x11.0x0,id=3Dsound0 -device hda-duplex,id=3Dsound0-codec=
-0,bus=3Dsound0.0,cad=3D0 -device ich9-usb-ehci1,id=3Dehci1,addr=3D0x12.0x7 =
--device ich9-usb-uhci1,id=3Duhci1,masterbus=3Dehci1.0,firstport=3D0,multifu=
-nction=3Don,addr=3D0x12.0x0 -device ich9-usb-uhci2,id=3Duhci2,masterbus=3De=
-hci1.0,firstport=3D2,addr=3D0x12.0x1 -device ich9-usb-uhci3,id=3Duhci3,mast=
-erbus=3Dehci1.0,firstport=3D4,addr=3D0x12.0x2 -device ide-hd,bus=3Dide.0,dr=
-ive=3Ddrive-sata0-0-0,id=3Dsata0-0-0 -drive file=3D"${QEMU_WORKING_DIR}"/${=
-QEMU_VM_NAME}.qcow2,if=3Dnone,media=3Ddisk,id=3Ddrive-sata0-0-0,format=3Dqc=
-ow2 -device ide-cd,bus=3Dide.1,drive=3Ddrive-sata0-0-1,id=3Dsata0-0-1 -driv=
-e if=3Dnone,media=3Dcdrom,readonly=3Don,id=3Ddrive-sata0-0-1 -device usb-ta=
-blet,id=3Dtbl0,bus=3Dehci1.0,port=3D2,usb_version=3D2,serial=3D1123,display=
-=3Dtbl0
-  -device usb-kbd,id=3Dkbd0,bus=3Dehci1.0,port=3D1,usb_version=3D1,serial=
-=3D1122,display=3Dkbd0
-  =
+Cheers,
 
-  After that connect to Qemu console, insert Windows 7 installation media
-  and start installation. You can successfully choose language, keyboard
-  layout and partition your harddrive but after 2-3 seconds after
-  beginning of copying installation files the graphical console screen
-  turns to black and 1 CPU core on the host raises to 100% permanently and
-  nothing happens. But if you installed Windows 7 before - there is no
-  problems with VM. Tested on GTK, SDL types of screen.
-  =
+Andrew
+--=-ZAn+KUcnrehn6Q1D5hz2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
 
-  Qemu was installed from official repo and also I tried with built by
-  myself version. Other OSes: Windows 8, 8.1, 10, Arch Linux, Debian,
-  FreeBSD installed successfully.
-  =
+-----BEGIN PGP SIGNATURE-----
 
-- When you try to install Windows 7 in BIOS mode - you can pass all the
-- installations steps, but after first reboot after installing guest
-- agent, qxl and virtio-net drivers - OS freezes on Windows logo.
-+ It happens only in OVMF-mode. I've just tested BIOS mode with no
-+ problems.
+iQIcBAABCgAGBQJZ5BGQAAoJEJ0dnzgO5LT5k2IQAK9f1PgBuIXxAzhL+yoYQ/8+
+TE8/Jhe/5/1LDPrM3qFz6h5ZX93ptYlCKX/TW/mByPZaE9sEFtXjx58i6hJ2EBGV
+xAOGV/lG866gQjPRa6c3WtbjhQCOoj9A/poH0znOFcLYD2wzLb4ylveILiMOxpXE
+tqZJCbTfqH/EgjUUK7O9b5A7n/sUmsA556GZoKxR34Acv6yUqvh5uRtHmLtcMDe/
+KhP4KdzL98jZWyXg/O16OyaxxKBVNkYQXua50Bocd7T2FV+oxRj+i3FfSBavDCJk
++IBatULPtePXR9xUHkBpOLMecS4D5c1iqG1A4MQn5p/g3wNf0iTcNKMfA+PpIGk9
+Yt0w26W6LGKVUTntFyGYnRA5u3q+r9zZC1zUAD/9orRp3WsJ8FmUG+SnY9tXpvvr
+pB44UhONVjocKwRZNa2kURz3tAlo4on36/spSe7nvivVTl/57OJO83RD+i6fUKJX
+Pn6fCkwJMtMlZPo9Bq7UjJCMhwTnqpE+TenGMRB8FCdReL4XhP6zkIuyIwfYg5IJ
+/wz4UCj/cRycW+jEObuEOrKVRnV1bIUe3YuqEY0AAApcYdRbIKR2QkV3rhr4+qVv
+iJNOC1/u9Yd2uLEM2Cmt2oBfUhkxn3VOMlYv9ORHU//dCx3iKObzgeWo0xK32iht
+dJKLhnkFdpXWuTo4geAJ
+=PFRy
+-----END PGP SIGNATURE-----
 
-** Description changed:
-
-  Distribution: Arch Linux, Kernel: linux-4.13.5, Qemu: 2.10.1, OVMF: git (=
-built 06.10.17).
-  Steps to reproduce: create Qemu VM with such config:
-  =
-
-  QEMU_VM_NAME=3D$(basename $(dirname "$0")) #Qemu virtual machine name (ta=
-ken from working directory)
-  QEMU_WORKING_DIR=3D"$(dirname "$0")" #Qemu current working directory
-  DIF=3D12 #set 2-digit number here
-  QEMU_MONITOR_PORT=3D370${DIF} #Qemu monitor port
-  QEMU_SERIAL_PORT=3D371${DIF} #Qemu serial port
-  QEMU_PARALLEL_PORT=3D372${DIF} #Qemu parallel port
-  =
-
-  qemu-system-x86_64 -daemonize -display gtk -boot menu=3Don -monitor telne=
-t:127.0.0.1:${QEMU_MONITOR_PORT},server,nowait -serial telnet:127.0.0.1:${Q=
-EMU_SERIAL_PORT},server,nowait -uuid fafafafa-1234-bcbc-5678-11112222ff${DI=
-F} -name ${QEMU_VM_NAME},process=3DQEMU-${QEMU_VM_NAME} -parallel none -net=
- none -nodefconfig -nodefaults -no-user-config -rtc base=3Dlocaltime,clock=
-=3Dvm,driftfix=3Dslew -realtime mlock=3Doff -machine type=3Dq35,accel=3Dkvm=
-,usb=3Doff,dump-guest-core=3Doff -smp 2,sockets=3D1,cores=3D2,threads=3D1 -=
-object iothread,id=3Diothread1 -object iothread,id=3Diothread2 -cpu Penryn,=
-kvm=3Doff,check,vendor=3DGenuineIntel,+vmx -m 2G -device qxl-vga,id=3Dvideo=
-0,ram_size=3D67108864,vram_size=3D67108864,vram64_size_mb=3D0,vgamem_mb=3D1=
-6,max_outputs=3D1,addr=3D0x1b.0x0 -global qxl-vga.revision=3D4 -device ich9=
--intel-hda,addr=3D0x11.0x0,id=3Dsound0 -device hda-duplex,id=3Dsound0-codec=
-0,bus=3Dsound0.0,cad=3D0 -device ich9-usb-ehci1,id=3Dehci1,addr=3D0x12.0x7 =
--device ich9-usb-uhci1,id=3Duhci1,masterbus=3Dehci1.0,firstport=3D0,multifu=
-nction=3Don,addr=3D0x12.0x0 -device ich9-usb-uhci2,id=3Duhci2,masterbus=3De=
-hci1.0,firstport=3D2,addr=3D0x12.0x1 -device ich9-usb-uhci3,id=3Duhci3,mast=
-erbus=3Dehci1.0,firstport=3D4,addr=3D0x12.0x2 -device ide-hd,bus=3Dide.0,dr=
-ive=3Ddrive-sata0-0-0,id=3Dsata0-0-0 -drive file=3D"${QEMU_WORKING_DIR}"/${=
-QEMU_VM_NAME}.qcow2,if=3Dnone,media=3Ddisk,id=3Ddrive-sata0-0-0,format=3Dqc=
-ow2 -device ide-cd,bus=3Dide.1,drive=3Ddrive-sata0-0-1,id=3Dsata0-0-1 -driv=
-e if=3Dnone,media=3Dcdrom,readonly=3Don,id=3Ddrive-sata0-0-1 -device usb-ta=
-blet,id=3Dtbl0,bus=3Dehci1.0,port=3D2,usb_version=3D2,serial=3D1123,display=
-=3Dtbl0
-- -device usb-kbd,id=3Dkbd0,bus=3Dehci1.0,port=3D1,usb_version=3D1,serial=
-=3D1122,display=3Dkbd0
-+ -device usb-kbd,id=3Dkbd0,bus=3Dehci1.0,port=3D1,usb_version=3D1,serial=
-=3D1122,display=3Dkbd0 -drive if=3Dpflash,format=3Draw,unit=3D1,file=3D${QE=
-MU_WORKING_DIR}/ovmf_vars_x64.bin -drive if=3Dpflash,format=3Draw,unit=3D0,=
-readonly,file=3D${QEMU_WORKING_DIR}/ovmf_code_x64.bin
-  =
-
-  After that connect to Qemu console, insert Windows 7 installation media
-  and start installation. You can successfully choose language, keyboard
-  layout and partition your harddrive but after 2-3 seconds after
-  beginning of copying installation files the graphical console screen
-  turns to black and 1 CPU core on the host raises to 100% permanently and
-  nothing happens. But if you installed Windows 7 before - there is no
-  problems with VM. Tested on GTK, SDL types of screen.
-  =
-
-  Qemu was installed from official repo and also I tried with built by
-  myself version. Other OSes: Windows 8, 8.1, 10, Arch Linux, Debian,
-  FreeBSD installed successfully.
-  =
-
-  It happens only in OVMF-mode. I've just tested BIOS mode with no
-  problems.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1723731
-
-Title:
-  Qemu turns to black screen while starting to copy installation files
-  of Windows 7
-
-Status in QEMU:
-  New
-
-Bug description:
-  Distribution: Arch Linux, Kernel: linux-4.13.5, Qemu: 2.10.1, OVMF: git (=
-built 06.10.17).
-  Steps to reproduce: create Qemu VM with such config:
-
-  QEMU_VM_NAME=3D$(basename $(dirname "$0")) #Qemu virtual machine name (ta=
-ken from working directory)
-  QEMU_WORKING_DIR=3D"$(dirname "$0")" #Qemu current working directory
-  DIF=3D12 #set 2-digit number here
-  QEMU_MONITOR_PORT=3D370${DIF} #Qemu monitor port
-  QEMU_SERIAL_PORT=3D371${DIF} #Qemu serial port
-  QEMU_PARALLEL_PORT=3D372${DIF} #Qemu parallel port
-
-  qemu-system-x86_64 -daemonize -display gtk -boot menu=3Don -monitor telne=
-t:127.0.0.1:${QEMU_MONITOR_PORT},server,nowait -serial telnet:127.0.0.1:${Q=
-EMU_SERIAL_PORT},server,nowait -uuid fafafafa-1234-bcbc-5678-11112222ff${DI=
-F} -name ${QEMU_VM_NAME},process=3DQEMU-${QEMU_VM_NAME} -parallel none -net=
- none -nodefconfig -nodefaults -no-user-config -rtc base=3Dlocaltime,clock=
-=3Dvm,driftfix=3Dslew -realtime mlock=3Doff -machine type=3Dq35,accel=3Dkvm=
-,usb=3Doff,dump-guest-core=3Doff -smp 2,sockets=3D1,cores=3D2,threads=3D1 -=
-object iothread,id=3Diothread1 -object iothread,id=3Diothread2 -cpu Penryn,=
-kvm=3Doff,check,vendor=3DGenuineIntel,+vmx -m 2G -device qxl-vga,id=3Dvideo=
-0,ram_size=3D67108864,vram_size=3D67108864,vram64_size_mb=3D0,vgamem_mb=3D1=
-6,max_outputs=3D1,addr=3D0x1b.0x0 -global qxl-vga.revision=3D4 -device ich9=
--intel-hda,addr=3D0x11.0x0,id=3Dsound0 -device hda-duplex,id=3Dsound0-codec=
-0,bus=3Dsound0.0,cad=3D0 -device ich9-usb-ehci1,id=3Dehci1,addr=3D0x12.0x7 =
--device ich9-usb-uhci1,id=3Duhci1,masterbus=3Dehci1.0,firstport=3D0,multifu=
-nction=3Don,addr=3D0x12.0x0 -device ich9-usb-uhci2,id=3Duhci2,masterbus=3De=
-hci1.0,firstport=3D2,addr=3D0x12.0x1 -device ich9-usb-uhci3,id=3Duhci3,mast=
-erbus=3Dehci1.0,firstport=3D4,addr=3D0x12.0x2 -device ide-hd,bus=3Dide.0,dr=
-ive=3Ddrive-sata0-0-0,id=3Dsata0-0-0 -drive file=3D"${QEMU_WORKING_DIR}"/${=
-QEMU_VM_NAME}.qcow2,if=3Dnone,media=3Ddisk,id=3Ddrive-sata0-0-0,format=3Dqc=
-ow2 -device ide-cd,bus=3Dide.1,drive=3Ddrive-sata0-0-1,id=3Dsata0-0-1 -driv=
-e if=3Dnone,media=3Dcdrom,readonly=3Don,id=3Ddrive-sata0-0-1 -device usb-ta=
-blet,id=3Dtbl0,bus=3Dehci1.0,port=3D2,usb_version=3D2,serial=3D1123,display=
-=3Dtbl0
-  -device usb-kbd,id=3Dkbd0,bus=3Dehci1.0,port=3D1,usb_version=3D1,serial=
-=3D1122,display=3Dkbd0 -drive if=3Dpflash,format=3Draw,unit=3D1,file=3D${QE=
-MU_WORKING_DIR}/ovmf_vars_x64.bin -drive if=3Dpflash,format=3Draw,unit=3D0,=
-readonly,file=3D${QEMU_WORKING_DIR}/ovmf_code_x64.bin
-
-  After that connect to Qemu console, insert Windows 7 installation
-  media and start installation. You can successfully choose language,
-  keyboard layout and partition your harddrive but after 2-3 seconds
-  after beginning of copying installation files the graphical console
-  screen turns to black and 1 CPU core on the host raises to 100%
-  permanently and nothing happens. But if you installed Windows 7 before
-  - there is no problems with VM. Tested on GTK, SDL types of screen.
-
-  Qemu was installed from official repo and also I tried with built by
-  myself version. Other OSes: Windows 8, 8.1, 10, Arch Linux, Debian,
-  FreeBSD installed successfully.
-
-  It happens only in OVMF-mode. I've just tested BIOS mode with no
-  problems.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1723731/+subscriptions
+--=-ZAn+KUcnrehn6Q1D5hz2--
