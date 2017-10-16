@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e48MQ-0004QB-VB
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 12:35:28 -0400
+	(envelope-from <berrange@redhat.com>) id 1e48Ni-00055r-BI
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 12:36:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e48MM-0006YE-Tb
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 12:35:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56346)
+	(envelope-from <berrange@redhat.com>) id 1e48Nf-0007J9-85
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 12:36:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44050)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e48MM-0006Xb-L3
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 12:35:22 -0400
-Date: Mon, 16 Oct 2017 17:35:15 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e48Ne-0007IU-V6
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 12:36:43 -0400
+Date: Mon, 16 Oct 2017 17:36:36 +0100
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171016163515.GH11975@redhat.com>
+Message-ID: <20171016163636.GI11975@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
-	<1508170976-96869-5-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1508170976-96869-5-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 4/6] CLI: add -paused option
+In-Reply-To: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 0/6] enable numa configuration before
+ machine_init() from HMP/QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,193 +31,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Igor Mammedov <imammedo@redhat.com>
 Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, pkrempa@redhat.com, ehabkost@redhat.com, cohuck@redhat.com, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-On Mon, Oct 16, 2017 at 06:22:54PM +0200, Igor Mammedov wrote:
+On Mon, Oct 16, 2017 at 06:22:50PM +0200, Igor Mammedov wrote:
+> Series allows to configure NUMA mapping at runtime using QMP/HMP
+> interface. For that to happen it introduces a new '-paused' CLI option
+> which allows to pause QEMU before machine_init() is run and
+> adds new set-numa-node HMP/QMP commands which in conjuction with
+> info hotpluggable-cpus/query-hotpluggable-cpus allow to configure
+> NUMA mapping for cpus.
 
-This really needs to have a commit message that provides justification
-for why this option is needed when we already have -S that is used
-to allow configuration before the guest starts.
+What's the problem we're seeking solve here compared to what we currently
+do for NUMA configuration ?
 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  include/sysemu/sysemu.h |  1 +
->  qemu-options.hx         | 15 ++++++++++++++
->  qmp.c                   |  5 +++++
->  vl.c                    | 54 ++++++++++++++++++++++++++++++++++++++++++++++++-
->  4 files changed, 74 insertions(+), 1 deletion(-)
 > 
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index b213696..3feb94f 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -66,6 +66,7 @@ typedef enum WakeupReason {
->      QEMU_WAKEUP_REASON_OTHER,
->  } WakeupReason;
->  
-> +void qemu_exit_preconfig_request(void);
->  void qemu_system_reset_request(ShutdownCause reason);
->  void qemu_system_suspend_request(void);
->  void qemu_register_suspend_notifier(Notifier *notifier);
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 39225ae..bd44db8 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -3498,6 +3498,21 @@ STEXI
->  Run the emulation in single step mode.
->  ETEXI
->  
-> +DEF("paused", HAS_ARG, QEMU_OPTION_paused, \
-> +    "-paused [state=]postconf|preconf\n"
-> +    "                postconf: pause QEMU after machine is initialized\n"
-> +    "                preconf: pause QEMU before machine is initialized\n",
-> +    QEMU_ARCH_ALL)
-> +STEXI
-> +@item -paused
-> +@findex -paused
-> +if set enabled interactive configuration stages before machine emulation starts.
-> +'postconf' option value mimics -S option behaviour where machine is created
-> +but emulation isn't started. 'preconf' option value pauses QEMU before machine
-> +is created, which allows to query and configure properties affecting machine
-> +initialization. Use monitor/QMP command 'cont' to go to exit paused state.
-> +ETEXI
-
-To me it feels rather unpleasant to be exposing this kind of detailed knowledge
-about the steps QEMU goes through when consttructing the machine and expecting
-the mgmt application to synchronize certain monitor actions against this.
-
-> +
->  DEF("S", 0, QEMU_OPTION_S, \
->      "-S              freeze CPU at startup (use 'c' to start execution)\n",
->      QEMU_ARCH_ALL)
-> diff --git a/qmp.c b/qmp.c
-> index e8c3031..49e9a5c 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -167,6 +167,11 @@ void qmp_cont(Error **errp)
->      BlockBackend *blk;
->      Error *local_err = NULL;
->  
-> +    if (runstate_check(RUN_STATE_PRELAUNCH)) {
-> +        qemu_exit_preconfig_request();
-> +        return;
-> +    }
-> +
->      /* if there is a dump in background, we should wait until the dump
->       * finished */
->      if (dump_in_progress()) {
-> diff --git a/vl.c b/vl.c
-> index 3fed457..30631fd 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -555,6 +555,20 @@ static QemuOptsList qemu_fw_cfg_opts = {
->      },
->  };
->  
-> +static QemuOptsList qemu_paused_opts = {
-> +    .name = "paused",
-> +    .implied_opt_name = "state",
-> +    .head = QTAILQ_HEAD_INITIALIZER(qemu_paused_opts.head),
-> +    .desc = {
-> +        {
-> +            .name = "state",
-> +            .type = QEMU_OPT_STRING,
-> +            .help = "Pause state of QEMU on startup",
-> +        },
-> +        { /* end of list */ }
-> +    },
-> +};
-> +
->  /**
->   * Get machine options
->   *
-> @@ -1689,6 +1703,11 @@ static pid_t shutdown_pid;
->  static int powerdown_requested;
->  static int debug_requested;
->  static int suspend_requested;
-> +static enum {
-> +    PRECONFIG_CONT = 0,
-> +    PRECONFIG_PAUSE,
-> +    PRECONFIG_SKIP,
-> +} preconfig_requested;
->  static WakeupReason wakeup_reason;
->  static NotifierList powerdown_notifiers =
->      NOTIFIER_LIST_INITIALIZER(powerdown_notifiers);
-> @@ -1773,6 +1792,11 @@ static int qemu_debug_requested(void)
->      return r;
->  }
->  
-> +void qemu_exit_preconfig_request(void)
-> +{
-> +    preconfig_requested = PRECONFIG_CONT;
-> +}
-> +
->  /*
->   * Reset the VM. Issue an event unless @reason is SHUTDOWN_CAUSE_NONE.
->   */
-> @@ -1939,6 +1963,12 @@ static bool main_loop_should_exit(void)
->      RunState r;
->      ShutdownCause request;
->  
-> +    if (runstate_check(RUN_STATE_PRELAUNCH)) {
-> +        if (preconfig_requested == PRECONFIG_CONT) {
-> +            preconfig_requested = PRECONFIG_SKIP;
-> +            return true;
-> +        }
-> +    }
->      if (qemu_debug_requested()) {
->          vm_stop(RUN_STATE_DEBUG);
->      }
-> @@ -3177,6 +3207,7 @@ int main(int argc, char **argv, char **envp)
->      qemu_add_opts(&qemu_icount_opts);
->      qemu_add_opts(&qemu_semihosting_config_opts);
->      qemu_add_opts(&qemu_fw_cfg_opts);
-> +    qemu_add_opts(&qemu_paused_opts);
->      module_call_init(MODULE_INIT_OPTS);
->  
->      runstate_init();
-> @@ -3845,6 +3876,26 @@ int main(int argc, char **argv, char **envp)
->                      exit(1);
->                  }
->                  break;
-> +            case QEMU_OPTION_paused:
-> +                {
-> +                    const char *value;
-> +
-> +                    opts = qemu_opts_parse_noisily(qemu_find_opts("paused"),
-> +                                                   optarg, true);
-> +                    if (opts == NULL) {
-> +                        exit(1);
-> +                    }
-> +                    value = qemu_opt_get(opts, "state");
-> +                    if (!strcmp(value, "postconf")) {
-> +                        autostart = 0;
-> +                    } else if (!strcmp(value, "preconf")) {
-> +                        preconfig_requested = PRECONFIG_PAUSE;
-> +                    } else {
-> +                        error_report("incomplete '-paused' option\n");
-> +                        exit(1);
-> +                    }
-> +                    break;
-> +                }
->              case QEMU_OPTION_enable_kvm:
->                  olist = qemu_find_opts("machine");
->                  qemu_opts_parse_noisily(olist, "accel=kvm", false);
-> @@ -4731,7 +4782,6 @@ int main(int argc, char **argv, char **envp)
->      current_machine->boot_order = boot_order;
->      current_machine->cpu_model = cpu_model;
->  
-> -
->      /* parse features once if machine provides default cpu_type */
->      if (machine_class->default_cpu_type) {
->          current_machine->cpu_type = machine_class->default_cpu_type;
-> @@ -4741,6 +4791,8 @@ int main(int argc, char **argv, char **envp)
->          }
->      }
->  
-> +    main_loop(); /* do monitor/qmp handling at preconfig state if requested */
-> +
->      machine_run_board_init(current_machine);
->  
->      realtime_init();
+> HMP configuration session for CLI '-smp 1,maxcpus=2' would look like:
+> 
+> (qemu) info hotpluggable-cpus 
+> Hotpluggable CPUs:
+>   type: "qemu64-x86_64-cpu"
+>   vcpus_count: "1"
+>   CPUInstance Properties:
+>     socket-id: "1"
+>     core-id: "0"
+>     thread-id: "0"
+>   type: "qemu64-x86_64-cpu"
+>   vcpus_count: "1"
+>   qom_path: "/machine/unattached/device[0]"
+>   CPUInstance Properties:
+>     socket-id: "0"
+>     core-id: "0"
+>     thread-id: "0"
+> (qemu) set-numa-node node,nodeid=0
+> (qemu) set-numa-node node,nodeid=1
+> (qemu) set-numa-node cpu,socket-id=0,node-id=0
+> (qemu) set-numa-node cpu,socket-id=1,node-id=1
+> (qemu) info hotpluggable-cpus 
+> Hotpluggable CPUs:
+>   type: "qemu64-x86_64-cpu"
+>   vcpus_count: "1"
+>   CPUInstance Properties:
+>     node-id: "1"
+>     socket-id: "1"
+>     core-id: "0"
+>     thread-id: "0"
+>   type: "qemu64-x86_64-cpu"
+>   vcpus_count: "1"
+>   CPUInstance Properties:
+>     node-id: "0"
+>     socket-id: "0"
+>     core-id: "0"
+>     thread-id: "0"
+> (qemu) cont
+> 
+> git tree for testing:
+>   https://github.com/imammedo/qemu qmp_preconfig_rfc
+> 
+> 
+> CC: eblake@redhat.com
+> CC: armbru@redhat.com
+> CC: ehabkost@redhat.com
+> CC: pkrempa@redhat.com
+> CC: david@gibson.dropbear.id.au
+> CC: peter.maydell@linaro.org
+> CC: pbonzini@redhat.com
+> CC: cohuck@redhat.com
+> 
+> Igor Mammedov (6):
+>   numa: postpone options post-processing till machine_run_board_init()
+>   numa: split out NumaOptions parsing into parse_NumaOptions()
+>   possible_cpus: add CPUArchId::type field
+>   CLI: add -paused option
+>   HMP: add set-numa-node command
+>   QMP: add set-numa-node command
+> 
+>  hmp.h                      |  1 +
+>  include/hw/boards.h        |  2 ++
+>  include/sysemu/numa.h      |  2 ++
+>  include/sysemu/sysemu.h    |  1 +
+>  hmp-commands.hx            | 13 ++++++++
+>  hmp.c                      | 23 ++++++++++++++
+>  hw/arm/virt.c              |  3 +-
+>  hw/core/machine.c          | 18 ++++++-----
+>  hw/i386/pc.c               |  4 ++-
+>  hw/ppc/spapr.c             | 13 +++++---
+>  hw/s390x/s390-virtio-ccw.c |  1 +
+>  numa.c                     | 79 ++++++++++++++++++++++++++++++++++------------
+>  qapi-schema.json           | 13 ++++++++
+>  qemu-options.hx            | 15 +++++++++
+>  qmp.c                      |  5 +++
+>  vl.c                       | 54 ++++++++++++++++++++++++++++++-
+>  16 files changed, 210 insertions(+), 37 deletions(-)
+> 
 > -- 
 > 2.7.4
 > 
