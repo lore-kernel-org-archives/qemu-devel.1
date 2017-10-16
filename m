@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e4Bp9-0004kr-6e
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 16:17:20 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e4Bp4-0000IP-RU
+	(envelope-from <berrange@redhat.com>) id 1e4Bp5-0004gX-0j
 	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 16:17:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47934)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e4Bp4-0000Hy-Ih
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <berrange@redhat.com>) id 1e4Bp3-0000Hm-Lg
 	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 16:17:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32427)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e4Bp3-0000H7-DO
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 16:17:13 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 16 Oct 2017 21:16:47 +0100
-Message-Id: <20171016201650.18399-9-berrange@redhat.com>
+Date: Mon, 16 Oct 2017 21:16:46 +0100
+Message-Id: <20171016201650.18399-8-berrange@redhat.com>
 In-Reply-To: <20171016201650.18399-1-berrange@redhat.com>
 References: <20171016201650.18399-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v1 08/11] io: get rid of bounce buffering in
- websock write path
+Subject: [Qemu-devel] [PULL v1 07/11] io: pass a struct iovec into
+ qio_channel_websock_encode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,154 +27,150 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Currently most outbound I/O on the websock channel gets copied into the
-rawoutput buffer, and then immediately copied again into the encoutput
-buffer, with a header prepended. Now that qio_channel_websock_encode
-accepts a struct iovec, we can trivially remove this bounce buffering
-and write directly to encoutput.
-
-In doing so, we also now correctly validate the encoutput size against
-the QIO_CHANNEL_WEBSOCK_MAX_BUFFER limit.
+Instead of requiring use of another Buffer, pass a struct iovec
+into qio_channel_websock_encode, which gives callers more
+flexibility in how they process data.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- include/io/channel-websock.h |  1 -
- io/channel-websock.c         | 64 +++++++++++++++++++-------------------------
- 2 files changed, 28 insertions(+), 37 deletions(-)
+ io/channel-websock.c | 71 ++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 44 insertions(+), 27 deletions(-)
 
-diff --git a/include/io/channel-websock.h b/include/io/channel-websock.h
-index 3762707b9c..a7e5e92e61 100644
---- a/include/io/channel-websock.h
-+++ b/include/io/channel-websock.h
-@@ -59,7 +59,6 @@ struct QIOChannelWebsock {
-     Buffer encinput;
-     Buffer encoutput;
-     Buffer rawinput;
--    Buffer rawoutput;
-     size_t payload_remain;
-     size_t pong_remain;
-     QIOChannelWebsockMask mask;
 diff --git a/io/channel-websock.c b/io/channel-websock.c
-index 93c06f5b94..e82b1beab3 100644
+index 700f5bea22..93c06f5b94 100644
 --- a/io/channel-websock.c
 +++ b/io/channel-websock.c
-@@ -24,6 +24,7 @@
- #include "io/channel-websock.h"
- #include "crypto/hash.h"
- #include "trace.h"
-+#include "qemu/iov.h"
+@@ -582,37 +582,48 @@ static gboolean qio_channel_websock_handshake_io(QIOChannel *ioc,
+ }
  
- #include <time.h>
  
-@@ -633,19 +634,22 @@ static ssize_t qio_channel_websock_write_wire(QIOChannelWebsock *, Error **);
+-static void qio_channel_websock_encode_buffer(QIOChannelWebsock *ioc,
+-                                              Buffer *output,
+-                                              uint8_t opcode, Buffer *buffer)
++static void qio_channel_websock_encode(QIOChannelWebsock *ioc,
++                                       uint8_t opcode,
++                                       const struct iovec *iov,
++                                       size_t niov,
++                                       size_t size)
+ {
+     size_t header_size;
++    size_t i;
+     union {
+         char buf[QIO_CHANNEL_WEBSOCK_HEADER_LEN_64_BIT];
+         QIOChannelWebsockHeader ws;
+     } header;
+ 
++    assert(size <= iov_size(iov, niov));
++
+     header.ws.b0 = QIO_CHANNEL_WEBSOCK_HEADER_FIELD_FIN |
+         (opcode & QIO_CHANNEL_WEBSOCK_HEADER_FIELD_OPCODE);
+-    if (buffer->offset < QIO_CHANNEL_WEBSOCK_PAYLOAD_LEN_THRESHOLD_7_BIT) {
+-        header.ws.b1 = (uint8_t)buffer->offset;
++    if (size < QIO_CHANNEL_WEBSOCK_PAYLOAD_LEN_THRESHOLD_7_BIT) {
++        header.ws.b1 = (uint8_t)size;
+         header_size = QIO_CHANNEL_WEBSOCK_HEADER_LEN_7_BIT;
+-    } else if (buffer->offset <
+-               QIO_CHANNEL_WEBSOCK_PAYLOAD_LEN_THRESHOLD_16_BIT) {
++    } else if (size < QIO_CHANNEL_WEBSOCK_PAYLOAD_LEN_THRESHOLD_16_BIT) {
+         header.ws.b1 = QIO_CHANNEL_WEBSOCK_PAYLOAD_LEN_MAGIC_16_BIT;
+-        header.ws.u.s16.l16 = cpu_to_be16((uint16_t)buffer->offset);
++        header.ws.u.s16.l16 = cpu_to_be16((uint16_t)size);
+         header_size = QIO_CHANNEL_WEBSOCK_HEADER_LEN_16_BIT;
+     } else {
+         header.ws.b1 = QIO_CHANNEL_WEBSOCK_PAYLOAD_LEN_MAGIC_64_BIT;
+-        header.ws.u.s64.l64 = cpu_to_be64(buffer->offset);
++        header.ws.u.s64.l64 = cpu_to_be64(size);
+         header_size = QIO_CHANNEL_WEBSOCK_HEADER_LEN_64_BIT;
+     }
+     header_size -= QIO_CHANNEL_WEBSOCK_HEADER_LEN_MASK;
+ 
+-    trace_qio_channel_websock_encode(ioc, opcode, header_size, buffer->offset);
+-    buffer_reserve(output, header_size + buffer->offset);
+-    buffer_append(output, header.buf, header_size);
+-    buffer_append(output, buffer->buffer, buffer->offset);
++    trace_qio_channel_websock_encode(ioc, opcode, header_size, size);
++    buffer_reserve(&ioc->encoutput, header_size + size);
++    buffer_append(&ioc->encoutput, header.buf, header_size);
++    for (i = 0; i < niov && size != 0; i++) {
++        size_t want = iov[i].iov_len;
++        if (want > size) {
++            want = size;
++        }
++        buffer_append(&ioc->encoutput, iov[i].iov_base, want);
++        size -= want;
++    }
+ }
+ 
+ 
+@@ -622,6 +633,7 @@ static ssize_t qio_channel_websock_write_wire(QIOChannelWebsock *, Error **);
  static void qio_channel_websock_write_close(QIOChannelWebsock *ioc,
                                              uint16_t code, const char *reason)
  {
--    struct iovec iov;
--    buffer_reserve(&ioc->rawoutput, 2 + (reason ? strlen(reason) : 0));
--    *(uint16_t *)(ioc->rawoutput.buffer + ioc->rawoutput.offset) =
--        cpu_to_be16(code);
--    ioc->rawoutput.offset += 2;
-+    struct iovec iov[2] = {
-+        { .iov_base = &code, .iov_len = sizeof(code) },
-+    };
-+    size_t niov = 1;
-+    size_t size = iov[0].iov_len;
-+
-+    cpu_to_be16s(&code);
-+
++    struct iovec iov;
+     buffer_reserve(&ioc->rawoutput, 2 + (reason ? strlen(reason) : 0));
+     *(uint16_t *)(ioc->rawoutput.buffer + ioc->rawoutput.offset) =
+         cpu_to_be16(code);
+@@ -629,9 +641,10 @@ static void qio_channel_websock_write_close(QIOChannelWebsock *ioc,
      if (reason) {
--        buffer_append(&ioc->rawoutput, reason, strlen(reason));
-+        iov[1].iov_base = (void *)reason;
-+        iov[1].iov_len = strlen(reason);
-+        size += iov[1].iov_len;
-+        niov++;
+         buffer_append(&ioc->rawoutput, reason, strlen(reason));
      }
--    iov.iov_base = ioc->rawoutput.buffer;
--    iov.iov_len = ioc->rawoutput.offset;
-     qio_channel_websock_encode(ioc, QIO_CHANNEL_WEBSOCK_OPCODE_CLOSE,
--                               &iov, 1, iov.iov_len);
--    buffer_reset(&ioc->rawoutput);
-+                               iov, niov, size);
+-    qio_channel_websock_encode_buffer(
+-        ioc, &ioc->encoutput, QIO_CHANNEL_WEBSOCK_OPCODE_CLOSE,
+-        &ioc->rawoutput);
++    iov.iov_base = ioc->rawoutput.buffer;
++    iov.iov_len = ioc->rawoutput.offset;
++    qio_channel_websock_encode(ioc, QIO_CHANNEL_WEBSOCK_OPCODE_CLOSE,
++                               &iov, 1, iov.iov_len);
+     buffer_reset(&ioc->rawoutput);
      qio_channel_websock_write_wire(ioc, NULL);
      qio_channel_shutdown(ioc->master, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
- }
-@@ -893,7 +897,6 @@ static void qio_channel_websock_finalize(Object *obj)
-     buffer_free(&ioc->encinput);
-     buffer_free(&ioc->encoutput);
-     buffer_free(&ioc->rawinput);
--    buffer_free(&ioc->rawoutput);
-     object_unref(OBJECT(ioc->master));
-     if (ioc->io_tag) {
-         g_source_remove(ioc->io_tag);
-@@ -1103,8 +1106,8 @@ static ssize_t qio_channel_websock_writev(QIOChannel *ioc,
-                                           Error **errp)
- {
-     QIOChannelWebsock *wioc = QIO_CHANNEL_WEBSOCK(ioc);
--    size_t i;
--    ssize_t done = 0;
-+    ssize_t want = iov_size(iov, niov);
-+    ssize_t avail;
-     ssize_t ret;
- 
-     if (wioc->io_err) {
-@@ -1117,32 +1120,21 @@ static ssize_t qio_channel_websock_writev(QIOChannel *ioc,
-         return -1;
+@@ -801,9 +814,10 @@ static int qio_channel_websock_decode_payload(QIOChannelWebsock *ioc,
+         error_setg(errp, "websocket closed by peer");
+         if (payload_len) {
+             /* echo client status */
+-            qio_channel_websock_encode_buffer(
+-                ioc, &ioc->encoutput, QIO_CHANNEL_WEBSOCK_OPCODE_CLOSE,
+-                &ioc->encinput);
++            struct iovec iov = { .iov_base = ioc->encinput.buffer,
++                                 .iov_len = ioc->encinput.offset };
++            qio_channel_websock_encode(ioc, QIO_CHANNEL_WEBSOCK_OPCODE_CLOSE,
++                                       &iov, 1, iov.iov_len);
+             qio_channel_websock_write_wire(ioc, NULL);
+             qio_channel_shutdown(ioc->master, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
+         } else {
+@@ -816,9 +830,10 @@ static int qio_channel_websock_decode_payload(QIOChannelWebsock *ioc,
+         /* ping frames produce an immediate reply, as long as we've not still
+          * got a previous pong queued, in which case we drop the new pong */
+         if (ioc->pong_remain == 0) {
+-            qio_channel_websock_encode_buffer(
+-                ioc, &ioc->encoutput, QIO_CHANNEL_WEBSOCK_OPCODE_PONG,
+-                &ioc->encinput);
++            struct iovec iov = { .iov_base = ioc->encinput.buffer,
++                                 .iov_len = ioc->encinput.offset };
++            qio_channel_websock_encode(ioc, QIO_CHANNEL_WEBSOCK_OPCODE_PONG,
++                                       &iov, 1, iov.iov_len);
+             ioc->pong_remain = ioc->encoutput.offset;
+         }
+     }   /* pong frames are ignored */
+@@ -1120,11 +1135,13 @@ static ssize_t qio_channel_websock_writev(QIOChannel *ioc,
      }
  
--    for (i = 0; i < niov; i++) {
--        size_t want = iov[i].iov_len;
--        if ((want + wioc->rawoutput.offset) > QIO_CHANNEL_WEBSOCK_MAX_BUFFER) {
--            want = (QIO_CHANNEL_WEBSOCK_MAX_BUFFER - wioc->rawoutput.offset);
--        }
--        if (want == 0) {
--            goto done;
--        }
--
--        buffer_reserve(&wioc->rawoutput, want);
--        buffer_append(&wioc->rawoutput, iov[i].iov_base, want);
--        done += want;
--        if (want < iov[i].iov_len) {
--            break;
--        }
-+    avail = wioc->encoutput.offset >= QIO_CHANNEL_WEBSOCK_MAX_BUFFER ?
-+        0 : (QIO_CHANNEL_WEBSOCK_MAX_BUFFER - wioc->encoutput.offset);
-+    if (want > avail) {
-+        want = avail;
+  done:
+-    if (ioc->rawoutput.offset) {
+-        qio_channel_websock_encode_buffer(
+-            ioc, &ioc->encoutput, QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME,
+-            &ioc->rawoutput);
+-        buffer_reset(&ioc->rawoutput);
++    if (wioc->rawoutput.offset) {
++        struct iovec iov = { .iov_base = wioc->rawoutput.buffer,
++                             .iov_len = wioc->rawoutput.offset };
++        qio_channel_websock_encode(wioc,
++                                   QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME,
++                                   &iov, 1, iov.iov_len);
++        buffer_reset(&wioc->rawoutput);
      }
- 
-- done:
--    if (wioc->rawoutput.offset) {
--        struct iovec iov = { .iov_base = wioc->rawoutput.buffer,
--                             .iov_len = wioc->rawoutput.offset };
-+    if (want) {
-         qio_channel_websock_encode(wioc,
-                                    QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME,
--                                   &iov, 1, iov.iov_len);
--        buffer_reset(&wioc->rawoutput);
-+                                   iov, niov, want);
-     }
-+
-+    /* Even if want == 0, we'll try write_wire in case there's
-+     * pending data we could usefully flush out
-+     */
      ret = qio_channel_websock_write_wire(wioc, errp);
      if (ret < 0 &&
-         ret != QIO_CHANNEL_ERR_BLOCK) {
-@@ -1152,11 +1144,11 @@ static ssize_t qio_channel_websock_writev(QIOChannel *ioc,
- 
-     qio_channel_websock_set_watch(wioc);
- 
--    if (done == 0) {
-+    if (want == 0) {
-         return QIO_CHANNEL_ERR_BLOCK;
-     }
- 
--    return done;
-+    return want;
- }
- 
- static int qio_channel_websock_set_blocking(QIOChannel *ioc,
 -- 
 2.13.5
