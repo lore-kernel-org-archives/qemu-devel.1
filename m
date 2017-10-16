@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e42PU-00049X-EA
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 06:14:13 -0400
+	(envelope-from <xiaoguangrong.eric@gmail.com>) id 1e42VW-0005Ew-8j
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 06:20:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e42PR-00082O-9t
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 06:14:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48248)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e42PR-000829-3Q
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 06:14:09 -0400
-Date: Mon, 16 Oct 2017 11:14:02 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171016101402.GE17583@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20171013102812.29648-1-berrange@redhat.com>
-	<1c52fcd4-e8ce-51c1-a0c7-cf882fab6662@redhat.com>
-	<a591ebd3-ae7f-cde6-1cd2-d4859c17494f@redhat.com>
-	<1508139882.15782.2.camel@redhat.com>
+	(envelope-from <xiaoguangrong.eric@gmail.com>) id 1e42VT-0002L9-5T
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 06:20:26 -0400
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:47089)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <xiaoguangrong.eric@gmail.com>)
+	id 1e42VS-0002KY-R9
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 06:20:23 -0400
+Received: by mail-io0-x242.google.com with SMTP id 101so15491580ioj.3
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 03:20:21 -0700 (PDT)
+References: <1508144183-30844-1-git-send-email-yang.zhong@intel.com>
+From: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Message-ID: <ebb88add-3173-78b9-397e-53a364ca0d53@gmail.com>
+Date: Mon, 16 Oct 2017 18:20:32 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1508139882.15782.2.camel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] configure: pick the right compiler for
- OpenBSD by default
+In-Reply-To: <1508144183-30844-1-git-send-email-yang.zhong@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/2] add "nopin" option in the
+ memory-backend-file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +31,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, anthony.xu@intel.com
 
-On Mon, Oct 16, 2017 at 09:44:42AM +0200, Gerd Hoffmann wrote:
->   Hi,
-> 
-> > By the way, looks like OpenBSD is also switching to clang by default
-> > soon:
-> > 
-> > https://www.phoronix.com/scan.php?page=news_item&px=OpenBSD-Default-
-> > Clang
-> 
-> It did happen already.  On openbsd 6.2 (released a week ago) cc is
-> clang:
-> 
-> $ cc --version
-> OpenBSD clang version 4.0.0 (tags/RELEASE_400/final) (based on LLVM
-> 4.0.0)
 
-Oh, I didn't notice that was out already. Lets drop my patch and I'll
-update the BSD page on the wiki
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+On 10/16/2017 04:56 PM, Yang Zhong wrote:
+> Qemu does not need pin NVDIMM memory for VFIO device during VFIO
+> hotplug, what's more, if there is no NVDIMM hw in the test machine,
+> the VFIO hotplug operation will need at least 10 minutes to pin RAM
+> as the NVDIMM, this time is not accepted. So we add "nopin=on" option
+> in the memory-backed-file, which can avoid to pin RAM memory for NVDIMM.
+
+No.
+
+memory-backed-file does not dedicate for nvdimm only, it can be mapped
+as normal memory as well. Rather more, this is no way to stop guest to
+use it as DMA.
