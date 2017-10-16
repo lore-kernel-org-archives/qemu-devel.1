@@ -1,27 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prasad.singamsetty@oracle.com>) id 1e48vA-0003kM-Kz
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:11:21 -0400
+	(envelope-from <jjherne@linux.vnet.ibm.com>) id 1e48vN-0003sK-9j
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:11:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prasad.singamsetty@oracle.com>) id 1e48v4-0007tp-LA
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:11:20 -0400
-Received: from aserp1040.oracle.com ([141.146.126.69]:43486)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prasad.singamsetty@oracle.com>)
-	id 1e48v4-0007sH-Dw
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:11:14 -0400
-References: <a41b88a6-4882-1abc-b6e2-e42acf03c198@oracle.com>
-	<20171013170143.GB3370@work-vm> <20171013111403.293919fe@t450s.home>
-From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-Message-ID: <5d4783c9-eac4-b421-bd1f-1acbf8440458@oracle.com>
-Date: Mon, 16 Oct 2017 10:11:10 -0700
+	(envelope-from <jjherne@linux.vnet.ibm.com>) id 1e48vK-00085B-6M
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:11:33 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39728
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.vnet.ibm.com>)
+	id 1e48vK-00084s-0q
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:11:30 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9GH983j019560
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 13:11:25 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dn01jjmvf-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 13:11:24 -0400
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.vnet.ibm.com>;
+	Mon, 16 Oct 2017 11:11:24 -0600
+Reply-To: jjherne@linux.vnet.ibm.com
+References: <1507729193-9747-1-git-send-email-jjherne@linux.vnet.ibm.com>
+	<20171016154433.246fb264.cohuck@redhat.com>
+From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
+Date: Mon, 16 Oct 2017 13:11:19 -0400
 MIME-Version: 1.0
-In-Reply-To: <20171013111403.293919fe@t450s.home>
+In-Reply-To: <20171016154433.246fb264.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] host physical address width issues/questions for
- x86_64
+Message-Id: <bc948ac4-6efd-63e2-35e3-e7be6c656536@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] s390x/event-facility: variable-length
+ event masks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +45,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, Sunit Jain <sunit.jain@oracle.com>, ehabkost@redhat.com, rth@twiddle.net, Peter Xu <peterx@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-
-
-On 10/13/2017 10:14 AM, Alex Williamson wrote:
-> On Fri, 13 Oct 2017 18:01:44 +0100
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+On 10/16/2017 09:44 AM, Cornelia Huck wrote:
+> On Wed, 11 Oct 2017 09:39:53 -0400
+> "Jason J. Herne" <jjherne@linux.vnet.ibm.com> wrote:
+>> ...
 > 
->> * Prasad Singamsetty (prasad.singamsetty@oracle.com) wrote:
->>> Hi,
->>>
->>> I am new to the alias. I have some questions on this subject
->>> and seek some clarifications from the experts in the team.
->>> I ran into a couple of issues when I tried with large configuration
->>> ( >= 1TB memory, > 255 CPUs) for x86_64 guest machine.
->>>
->>> 1. QEMU uses the default value of 40 (TCG_PHYS_ADDR_BITS) for address
->>>     width if user has not specified phys-bits or host-phys-bits=true
->>>     property. The default value is obviously not sufficient and
->>>     causing guest kernel to crash if configured with >= 1TB
->>>     memory. Depending on the linux kernel version in the guest the
->>>     panic was in different code paths. The workaround is for the
->>>     user to specify the phys-bits property or set the property
->>>     host-phys-bits=true.
->>>
->>>     QUESTIONS:
-> ...
->>> 2. host_address_width in DMAR table structure
->>>
->>>     In this case, the default value is set to 39
->>>     (VTD_HOST_ADDRESS_WIDTH - 1). With interrupt remapping
->>>     enabled for the intel iommu and the guest is configured
->>>     with > 255 cpus and >= 1TB memory, the guest kernel hangs
->>>     during boot up. This need to be fixed.
->>>
->>>     QUESTION:
->>>     The question here again is can we fix this to use the
->>>     real address width from the host as the default?
->>
->> I don't know DMAR stuff; chatting to Alex (cc'd) it does sound
->> like that's an ommission that should be fixed.
+> Out of curiousity: Do you have a guest that can verify this for mask
+> lengths != 4? Given that the guest I wrote that one for back then is
+> not publicly available...
 > 
-> [CC +Peter]
-> 
-> On physical hardware VT-d supports either 39 or 48 bit address widths
-> and generally you'd expect a sufficiently capable IOMMU to be matched
-> with the CPU.  Seems QEMU has only implemented a lower bit width and
-> it should probably be forcing phys bits of the VM to 39 to match until
-> the extended width can be implemented.  Thanks,
 
-Thanks Alex. Are there specific incompatibilities with emulated
-IOMMU features presented by QEMU and CPU that can cause problems?
+I do have a guest OS that exercises larger mask lengths. Nothing 
+publicly available however.
 
-Thanks.
---Prasad
+>> ...
+>>   static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
+>>   {
+>>       WriteEventMask *we_mask = (WriteEventMask *) sccb;
+>> +    uint16_t mask_length = be16_to_cpu(we_mask->mask_length);
+>> +    uint32_t tmp_mask;
+>>   
+>> -    /* Attention: We assume that Linux uses 4-byte masks, what it actually
+>> -       does. Architecture allows for masks of variable size, though */
+>> -    if (be16_to_cpu(we_mask->mask_length) != 4) {
+>> +    if (!mask_length || (mask_length > SCLP_EVENT_MASK_LEN_MAX)) {
+>>           sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_MASK_LENGTH);
+>>           goto out;
+>>       }
+>>   
+>> +    /*
+>> +     * Note: We currently only support masks up to 4 byte length;
+>> +     *       the remainder is filled up with zeroes. Linux uses
+>> +     *       a 4 byte mask length.
+>> +     */
+> 
+> Do you have any plans for extending this? Or is there no need?
+> 
+> (I have to ask those questions, as the documentation is not publicly
+> available...)
+> 
 
+As of right now 4B is all that is actually needed for any of the masks. 
+The reason to allow for 32 byte requests is for guest operating systems 
+who are already planning for the future. Someday more than 4B may be 
+used but we have no way to know if or when.
+
+>> ...
 > 
-> Alex
+> Patch looks reasonable as far as I can see (the documentation issue
+> again...)
 > 
+> Did you need to change much from the original patch?
+> 
+
+Very little. Just a quick forward fit and test and all is well :)
+Thanks for the original work. This saved me some time.
+
+-- 
+-- Jason J. Herne (jjherne@linux.vnet.ibm.com)
