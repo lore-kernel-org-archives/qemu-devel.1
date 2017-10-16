@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e41bY-0007NJ-CI
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:22:37 -0400
+	(envelope-from <peterx@redhat.com>) id 1e41kK-00015r-61
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:31:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e41bX-0007Tf-JI
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:22:36 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:46591)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e41bX-0007Q4-Ak
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:22:35 -0400
-Received: by mail-wm0-x232.google.com with SMTP id m72so1049173wmc.1
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 02:22:33 -0700 (PDT)
+	(envelope-from <peterx@redhat.com>) id 1e41kF-0003NH-82
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:31:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47798)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e41kF-0003Mz-2C
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:31:35 -0400
+Date: Mon, 16 Oct 2017 17:31:25 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171016093125.GG4166@pxdev.xzpeter.org>
+References: <1508144783-18792-1-git-send-email-mgamal@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1507824216-29058-1-git-send-email-peter.maydell@linaro.org>
-References: <1507824216-29058-1-git-send-email-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Oct 2017 10:22:12 +0100
-Message-ID: <CAFEAcA-g7aGDCnQdspj=k+G4LTxe2BPNN_pfM_HVgTcz9WVgWQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/13] target-arm queue
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1508144783-18792-1-git-send-email-mgamal@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RESEND 0/2] x86_iommu: Fix segfault when
+ starting on non-PCI machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: Mohammed Gamal <mgamal@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, thuth@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com, mjt@tls.msk.ru
 
-On 12 October 2017 at 17:03, Peter Maydell <peter.maydell@linaro.org> wrote:
-> target-arm queue:
->  * mostly my latest v8M stuff, plus a couple of minor patches
->
-> The following changes since commit a0b261db8c030813e30a39eae47359ac2a37f7e2:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-request' into staging (2017-10-12 10:02:09 +0100)
->
-> are available in the git repository at:
->
->   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20171012
->
-> for you to fetch changes up to cf5f7937b05c84d5565134f058c00cd48304a117:
->
->   nvic: Fix miscalculation of offsets into ITNS array (2017-10-12 16:33:16 +0100)
->
-> ----------------------------------------------------------------
-> target-arm queue:
->  * v8M: SG, BLXNS, secure-return
->  * v8M: fixes for coverity issues in previous patches
->  * arm: fix armv7m_init() declaration to match definition
->  * watchdog/aspeed: fix variable type to store reload value
->
+On Mon, Oct 16, 2017 at 11:06:21AM +0200, Mohammed Gamal wrote:
+> Starting qemu with
+> qemu-system-x86_64 -S -M isapc -device {amd|intel}-iommu
+> leads to a segfault. The code assume PCI bus is present and
+> tries to access the bus structure without checking.
+> 
+> The patch series moves the error checks from vtd_realize()
+> and amdvi_realize() to the generic x86_iommu_realize() and
+> adds a check for PCI bus presence.
 
-Applied, thanks.
+Hi, Michael,
 
--- PMM
+Would you like to pick Mohammed's two patches in your next pull
+request?
+
+Each of the patches has got 2 acks, and it does fix a problem.
+
+Thanks,
+
+> 
+> 
+> Mohammed Gamal (2):
+>   x86_iommu: Move machine check to x86_iommu_realize()
+>   x86_iommu: check if machine has PCI bus
+> 
+>  hw/i386/amd_iommu.c   | 13 ++-----------
+>  hw/i386/intel_iommu.c | 13 ++-----------
+>  hw/i386/x86-iommu.c   | 13 +++++++++++++
+>  3 files changed, 17 insertions(+), 22 deletions(-)
+> 
+> -- 
+> 1.8.3.1
+> 
+
+-- 
+Peter Xu
