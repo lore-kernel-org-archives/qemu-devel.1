@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e49AY-0002mO-Bf
+	(envelope-from <richard.henderson@linaro.org>) id 1e49AY-0002mN-Bg
 	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:27:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e49AV-0003vd-14
+	(envelope-from <richard.henderson@linaro.org>) id 1e49AT-0003uI-CY
 	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:27:12 -0400
-Received: from mail-pg0-x22a.google.com ([2607:f8b0:400e:c05::22a]:49899)
+Received: from mail-pg0-x22f.google.com ([2607:f8b0:400e:c05::22f]:51122)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e49AU-0003v1-PB
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:27:10 -0400
-Received: by mail-pg0-x22a.google.com with SMTP id g6so5925014pgn.6
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 10:27:10 -0700 (PDT)
+	id 1e49AT-0003tg-88
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 13:27:09 -0400
+Received: by mail-pg0-x22f.google.com with SMTP id y7so7343538pgb.7
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 10:27:09 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 16 Oct 2017 10:25:59 -0700
-Message-Id: <20171016172609.23422-41-richard.henderson@linaro.org>
+Date: Mon, 16 Oct 2017 10:25:58 -0700
+Message-Id: <20171016172609.23422-40-richard.henderson@linaro.org>
 In-Reply-To: <20171016172609.23422-1-richard.henderson@linaro.org>
 References: <20171016172609.23422-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 40/50] translate-all: report correct avg
- host TB size
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v6 39/50] exec-all: rename tb_free to tb_remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,109 +34,74 @@ Cc: cota@braap.org
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Since commit 6e3b2bfd6 ("tcg: allocate TB structs before the
-corresponding translated code") we are not fully utilizing
-code_gen_buffer for translated code, and therefore are
-incorrectly reporting the amount of translated code as well as
-the average host TB size. Address this by:
+We don't really free anything in this function anymore; we just remove
+the TB from the binary search tree.
 
-- Making the conscious choice of misreporting the total translated code;
-  doing otherwise would mislead users into thinking "-tb-size" is not
-  honoured.
-
-- Expanding tb_tree_stats to accurately count the bytes of translated code on
-  the host, and using this for reporting the average tb host size,
-  as well as the expansion ratio.
-
-In the future we might want to consider reporting the accurate numbers for
-the total translated code, together with a "bookkeeping/overhead" field to
-account for the TB structs.
-
+Suggested-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/translate-all.c | 32 +++++++++++++++++++++++---------
- 1 file changed, 23 insertions(+), 9 deletions(-)
+ include/exec/exec-all.h   | 2 +-
+ accel/tcg/cpu-exec.c      | 2 +-
+ accel/tcg/translate-all.c | 6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 4c4242a1d8..746f4be71e 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -389,7 +389,7 @@ static inline uint32_t curr_cflags(void)
+          | (use_icount ? CF_USE_ICOUNT : 0);
+ }
+ 
+-void tb_free(TranslationBlock *tb);
++void tb_remove(TranslationBlock *tb);
+ void tb_flush(CPUState *cpu);
+ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr);
+ TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 59fd784436..6a4a33235b 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -220,7 +220,7 @@ static void cpu_exec_nocache(CPUState *cpu, int max_cycles,
+ 
+     tb_lock();
+     tb_phys_invalidate(tb, -1);
+-    tb_free(tb);
++    tb_remove(tb);
+     tb_unlock();
+ }
+ #endif
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 76db9c775a..b21671d6f4 100644
+index 083e1c7336..76db9c775a 100644
 --- a/accel/tcg/translate-all.c
 +++ b/accel/tcg/translate-all.c
-@@ -923,6 +923,15 @@ static void page_flush_tb(void)
+@@ -375,7 +375,7 @@ bool cpu_restore_state(CPUState *cpu, uintptr_t retaddr)
+         if (tb->cflags & CF_NOCACHE) {
+             /* one-shot translation, invalidate it immediately */
+             tb_phys_invalidate(tb, -1);
+-            tb_free(tb);
++            tb_remove(tb);
+         }
+         r = true;
      }
+@@ -874,7 +874,7 @@ static TranslationBlock *tb_alloc(target_ulong pc)
  }
  
-+static gboolean tb_host_size_iter(gpointer key, gpointer value, gpointer data)
-+{
-+    const TranslationBlock *tb = value;
-+    size_t *size = data;
-+
-+    *size += tb->tc.size;
-+    return false;
-+}
-+
- /* flush all the translation blocks */
- static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
+ /* Called with tb_lock held.  */
+-void tb_free(TranslationBlock *tb)
++void tb_remove(TranslationBlock *tb)
  {
-@@ -937,11 +946,12 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
+     assert_tb_locked();
  
-     if (DEBUG_TB_FLUSH_GATE) {
-         size_t nb_tbs = g_tree_nnodes(tcg_ctx.tb_ctx.tb_tree);
-+        size_t host_size = 0;
- 
--        printf("qemu: flush code_size=%td nb_tbs=%zu avg_tb_size=%td\n",
-+        g_tree_foreach(tcg_ctx.tb_ctx.tb_tree, tb_host_size_iter, &host_size);
-+        printf("qemu: flush code_size=%td nb_tbs=%zu avg_tb_size=%zu\n",
-                tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer, nb_tbs,
--               nb_tbs > 0 ?
--               (tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer) / nb_tbs : 0);
-+               nb_tbs > 0 ? host_size / nb_tbs : 0);
+@@ -1816,7 +1816,7 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+              * cpu_exec_nocache() */
+             tb_phys_invalidate(tb->orig_tb, -1);
+         }
+-        tb_free(tb);
++        tb_remove(tb);
      }
-     if ((unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer)
-         > tcg_ctx.code_gen_buffer_size) {
-@@ -1890,6 +1900,7 @@ static void print_qht_statistics(FILE *f, fprintf_function cpu_fprintf,
- }
- 
- struct tb_tree_stats {
-+    size_t host_size;
-     size_t target_size;
-     size_t max_target_size;
-     size_t direct_jmp_count;
-@@ -1902,6 +1913,7 @@ static gboolean tb_tree_stats_iter(gpointer key, gpointer value, gpointer data)
-     const TranslationBlock *tb = value;
-     struct tb_tree_stats *tst = data;
- 
-+    tst->host_size += tb->tc.size;
-     tst->target_size += tb->size;
-     if (tb->size > tst->max_target_size) {
-         tst->max_target_size = tb->size;
-@@ -1930,6 +1942,11 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
-     g_tree_foreach(tcg_ctx.tb_ctx.tb_tree, tb_tree_stats_iter, &tst);
-     /* XXX: avoid using doubles ? */
-     cpu_fprintf(f, "Translation buffer state:\n");
-+    /*
-+     * Report total code size including the padding and TB structs;
-+     * otherwise users might think "-tb-size" is not honoured.
-+     * For avg host size we use the precise numbers from tb_tree_stats though.
-+     */
-     cpu_fprintf(f, "gen code size       %td/%zd\n",
-                 tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer,
-                 tcg_ctx.code_gen_highwater - tcg_ctx.code_gen_buffer);
-@@ -1937,12 +1954,9 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
-     cpu_fprintf(f, "TB avg target size  %zu max=%zu bytes\n",
-                 nb_tbs ? tst.target_size / nb_tbs : 0,
-                 tst.max_target_size);
--    cpu_fprintf(f, "TB avg host size    %td bytes (expansion ratio: %0.1f)\n",
--                nb_tbs ? (tcg_ctx.code_gen_ptr -
--                          tcg_ctx.code_gen_buffer) / nb_tbs : 0,
--                tst.target_size ? (double) (tcg_ctx.code_gen_ptr -
--                                            tcg_ctx.code_gen_buffer) /
--                                            tst.target_size : 0);
-+    cpu_fprintf(f, "TB avg host size    %zu bytes (expansion ratio: %0.1f)\n",
-+                nb_tbs ? tst.host_size / nb_tbs : 0,
-+                tst.target_size ? (double)tst.host_size / tst.target_size : 0);
-     cpu_fprintf(f, "cross page TB count %zu (%zu%%)\n", tst.cross_page,
-             nb_tbs ? (tst.cross_page * 100) / nb_tbs : 0);
-     cpu_fprintf(f, "direct jump count   %zu (%zu%%) (2 jumps=%zu %zu%%)\n",
+     /* FIXME: In theory this could raise an exception.  In practice
+        we have already translated the block once so it's probably ok.  */
 -- 
 2.13.6
