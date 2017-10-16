@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1e46TI-0003Zg-PC
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 10:34:26 -0400
+	(envelope-from <david@redhat.com>) id 1e46bq-0004x9-5l
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 10:43:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1e46TF-0001GI-MJ
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 10:34:24 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:4496)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1e46TE-0001FG-S4
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 10:34:21 -0400
-From: gengdongjiu <gengdongjiu@huawei.com>
-Date: Mon, 16 Oct 2017 14:33:49 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F2016994E5@DGGEMA503-MBX.china.huawei.com>
-References: <8ba7e693-4e32-7873-70bf-4efbf57f9cf5@huawei.com>
-	<20170928011407-mutt-send-email-mst@kernel.org>
-	<405bbc99-1a43-aa8b-37e9-9599480f4c06@huawei.com>
-	<20171001063010-mutt-send-email-mst@kernel.org>
-	<49d576f3-454f-05f4-7afd-9ca8b5fb0706@huawei.com>
-	<20171016113324.14e549c9@nial.brq.redhat.com>
-In-Reply-To: <20171016113324.14e549c9@nial.brq.redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiAgdXNpbmcgd2hpY2ggbm90aWZpY2F0?=
- =?utf-8?q?ion_for_guest_about_GHES_error?=
+	(envelope-from <david@redhat.com>) id 1e46bi-0005G5-FB
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 10:43:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58266)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1e46bi-0005FE-93
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 10:43:06 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Mon, 16 Oct 2017 16:42:55 +0200
+Message-Id: <20171016144302.24284-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 0/7] kvm: slot handling fixes (and small
+ cleanups)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,67 +22,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, James Morse <james.morse@arm.com>, Wuquanming <wuquanming@huawei.com>, Laszlo Ersek <lersek@redhat.com>, QEMU
-	Developers <qemu-devel@nongnu.org>, Huangshaoyu <huangshaoyu@huawei.com>, Andrew Jones <drjones@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Joe Clifford <joeclifford@gmail.com>
 
-SGkgSWdvciwNCiAgVGhhbmtzIGZvciB5b3VyIHJlcGx5Lg0KDQo+IE9uIE1vbiwgMTYgT2N0IDIw
-MTcgMTQ6MTA6MDUgKzA4MDANCj4gZ2VuZ2RvbmdqaXUgPGdlbmdkb25naml1QGh1YXdlaS5jb20+
-IHdyb3RlOg0KPiANCj4gPiBIaSBJZ29yL01pY2hhZWwsDQo+ID4gICAgSSBhbSB2ZXJ5IHNvcnJ5
-IHRvIGRpc3R1cmIgeW91IGFnYWluLg0KPiA+IE5vdyB3ZSB1c2UgUWVtdSB0byBjcmVhdGUgQVBF
-SSB0YWJsZSBhbmQgcmVjb3JkIENQRVIgZm9yIGd1ZXN0LCBBZnRlcg0KPiA+IFFFTVUgcmVjb3Jk
-ZWQgYSBhc3luY2hyb25vdXMgQ1BFUiBlcnJvciwgd2UgbmVlZHMgdG8gbm90aWZ5IGd1ZXN0IHVz
-aW5nIGludGVycnVwdCBvciBQb2xsZWQgbm90aWZpY2F0aW9uLg0KPiA+IEZvciB0aGUgYXN5bmNo
-cm9ub3VzIGVycm9yLiBJIHRoaW5rIHVzaW5nIEdQSU8tc2lnbmFsZWQgbm90aWZpY2F0aW9uIG1h
-eSBiZSBiZXR0ZXIgaW4gdGhlIFFlbXUsIGFuZCBhbHNvIHdoaWNoIGlzIHN1Z2dlc3RlZCBieSBB
-UEVJIHNwZWMuDQo+ID4gSmFtZXMgd29ycmllZCB0aGF0IG9sZCBndWVzdCBPUyBtYXkgbm90IHN1
-cHBvcnQgR1BJTyBvciBHU0lWIG5vdGlmaWNhdGlvbiBmb3IgR0hFUywgYmVjYXVzZSBHUElPIG9y
-IEdTSVYgbm90aWZpY2F0aW9uIGlzIHN1cHBvcnRlZCBpbiBPUw0KPiBzaW5jZSBhYm91dCBrZXJu
-ZWwgdmVyc2lvbiA0LjEwLg0KPiANCj4gSG93IEFQRUkgc3VwcG9ydCBpcyBmYWlybHkgbmV3IG9u
-IEFSTSAoa2VybmVsKSwgaXNuJ3QgaXQgc3RpbGwgaW4gc3RhdGUgb2YgZGV2ZWxvcG1lbnQ/DQo+
-IERvIHdlIHJlYWxseSBjYXJlIGFib3V0IG9sZCBndWVzdHMgaW4gdGhpcyBjYXNlPw0KDQpIb3cg
-QVBFSSBzdXBwb3J0IGlzIG5ldyBmZWF0dXJlIG9uIEFSTTY0LCBiZWNhdXNlIGl0IG1haW5seSBl
-eGlzdHMgaW4gQVJNdjguMiBhcmNoaXRlY3R1cmUuDQpNYXkgYmUgd2UgY2Fubm90IHZlcnkgY2Fy
-ZSBhYm91dCBvbGQgZ3Vlc3QuDQpCZWNhdXNlIGV2ZW4gd2UgdXNlIHRoZSBvbGQgbm90aWZpY2F0
-aW9uKHN1Y2ggYXMgcG9sbGVkIG5vdGlmaWNhdGlvbiksIHRoZSBndWVzdCBPUyBtYXkgc3RpbGwg
-bm90IGhhdmUgQVBFSSBzdXBwb3J0LCBzbyBpdCBpcyBzdGlsbCBub3QgdXNlbGVzcy4NCkkgY2hl
-Y2tlZCB0aGUgcGF0Y2hlcyBoaXN0b3J5LCB0aGUgQVBFSSBzdXBwb3J0IGlzIG9ubHkgZW5hYmxl
-ZCByZWNlbnQuIA0KDQpBcyB3ZSBjYW4gc2VlIEFQRUkvR0hFUyBpcyBvbmx5IGVuYWJsZWQgaW4g
-IjIwMTctMDYtMjEgMTI6MzA6NDQgLTA1MDAiLCB0aGUgb2xkIHZlcnNpb24gT1MgZXZlbiBkb2Vz
-IG5vdCBoYXZlIEFQRUkgc3VwcG9ydC4NCmh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9s
-aW51eC9rZXJuZWwvZ2l0L3RvcnZhbGRzL2xpbnV4LmdpdC9jb21taXQvP2g9djQuMTQtcmM1Jmlk
-PWM3OTJlNWU2NDRmZDhjZDM4Yjk2M2ZkM2IzOGY2YmY1N2M1MzA5NjYNCg0KSmFtZXMsIHdoYXQg
-ZG8geW91IHRoaW5rIGFib3V0IGl0Pw0KDQo+IA0KPiBXZSdkIGxpa2UgdG8gc3RpY2sgdG8gQUNQ
-SSBzcGVjIGFzIG11Y2ggYXMgcG9zc2libGUgYW5kIGFsc28gdG8NCj4gaHR0cDovL2luZm9jZW50
-ZXIuYXJtLmNvbS9oZWxwL3RvcGljL2NvbS5hcm0uZG9jLmRlbjAwNDRiL0RFTjAwNDRCX1NlcnZl
-cl9CYXNlX0Jvb3RfUmVxdWlyZW1lbnRzLnBkZg0KPiB3aGljaCBtYW5kYXRlcyBHUElPIGluIHBs
-YXRmb3JtIChRRU1VKQ0KPiAiDQo+IDQuNSBIYXJkd2FyZSBSZXF1aXJlbWVudHMgSW1wb3NlZCBv
-biB0aGUgUGxhdGZvcm0gYnkgQUNQSSAuLi4NCj4gUGxhdGZvcm1zIGNvbXBsaWFudCB3aXRoIHRo
-aXMgc3BlY2lmaWNhdGlvbiBtdXN0IHByb3ZpZGUgdGhlIGZvbGxvd2luZyBHUElPLVNpZ25hbGVk
-IHBsYXRmb3JtIGV2ZW50czoNCj4gLi4uDQo+ICINCj4gDQo+ID4gYW5kIHN1Z2dlc3RlZCB1c2lu
-ZyBQb2xsZWQgbm90aWZpY2F0aW9uLiBBYm91dCBhYm92ZSB0d28gbm90aWZpY2F0aW9ucywgZG8g
-eW91IHRoaW5rIHdoaWNoIGlzIGJldHRlcj8gYW5kIGNvdWxkIHlvdSBnaXZlIHVzIHNvbWUNCj4g
-c3VnZ2VzdGlvbj8gdGhhbmtzLg0KPiBob3cgcG9sbGluZyBpcyBzdXBwb3NlZCB0byBiZSBpbXBs
-ZW1lbnRlZCBpbiBRRU1VPw0KPiANCj4gPg0KPiA+DQo+ID4gSGkgSmFtZXMsDQo+ID4gICBCZWxv
-dyBpcyBBUEVJIHNwZWMsIEZyb20gdGhlIHNwZWMsIGl0IHN1Z2dlc3RlZCB1c2luZyBHUElPIGlu
-dGVycnVwdCBvciBHUElPLXNpZ25hbGVkIGV2ZW50cyBpbiBBUk02NCBbMV0uIElmIHVzaW5nIFBv
-bGxlZCBub3RpZmljYXRpb24NCj4gZm9yIEdIRVMsIEkgZG8gbm90IHN1cmUgd2hldGhlciBpdCBp
-cyByZWFzb25hYmxlLg0KPiA+IEluIHRoZSBRZW11LCBYODYgZG9lcyBub3QgdXNpbmcgUG9sbGVk
-IG5vdGlmaWNhdGlvbi4gaXQgbWFpbmx5IHVzZQ0KPiA+IFNDSS4gVW50aWwgbm93LCBJIGRvIG5v
-dCBmb3VuZCB0aGVyZSBpcyBwZW9wbGVkIHVzaW5nIFBvbGxlZCBub3RpZmljYXRpb24gaW4gcWVt
-dS4gaWYgaW1wbGVtZW50ZWQgcG9sbGVkIG5vdGlmaWNhdGlvbiwgSSBkbyBub3Qga25vdyBob3cN
-Cj4gbXVjaCB3b3JrIGVmZm9ydCBuZWVkIHRvIGRvLiBOb3cgSSBoYXZlIGFscmVhZHkgaW1wbGVt
-ZW50ZWQgdGhlIEdQSU8tU2lnbmFsIG5vdGlmaWNhdGlvbiB1c2luZyBHUElPIHBpbi4NCj4gPg0K
-PiA+DQo+ID4gWzFdDQo+ID4gSFctcmVkdWNlZCBBQ1BJIHBsYXRmb3JtcyBzaWduYWwgdGhlIGVy
-cm9yIHVzaW5nIGEgR1BJTyBpbnRlcnJ1cHQgb3INCj4gPiBhbm90aGVyIGludGVycnVwdCBkZWNs
-YXJlZCB1bmRlciBhIGdlbmVyaWMgZXZlbnQgZGV2aWNlIChTZWN0aW9uIDUuNi45KS4gSW4gdGhl
-IGNhc2Ugb2YgR1BJTy1zaWduYWxlZCBldmVudHMsIGFuIF9BRUkgb2JqZWN0IGxpc3RzIHRoZQ0K
-PiBhcHByb3ByaWF0ZSBHUElPIHBpbiwgd2hpbGUgZm9yIEludGVycnVwdC1zaWduYWxlZCBldmVu
-dHMgYSBfQ1JTIG9iamVjdCBpcyB1c2VkIHRvIGxpc3QgdGhlIGludGVycnVwdDoNCj4gPiAJ4oCi
-IFRoZSBPU1BNIGV2YWx1YXRlcyB0aGUgY29udHJvbCBtZXRob2QgYXNzb2NpYXRlZCB3aXRoIHRo
-aXMgZXZlbnQgYXMgaW5kaWNhdGVkIGluIFNlY3Rpb24gNS42LjUuMyBhbmQgU2VjdGlvbiA1LjYu
-OS4zLg0KPiA+IAnigKIgT1NQTSByZXNwb25kcyB0byB0aGlzIG5vdGlmaWNhdGlvbiBieSBjaGVj
-a2luZyB0aGUgZXJyb3Igc3RhdHVzIGJsb2NrIG9mIGFsbCBnZW5lcmljIGVycm9yIHNvdXJjZXMg
-d2l0aCB0aGUgR1BJTy1TaWduYWwgbm90aWZpY2F0aW9uIG9yDQo+IEludGVycnVwdC1zaWduYWxl
-ZCBub3RpZmljYXRpb24gdHlwZXMgdG8gaWRlbnRpZnkgdGhlDQo+ID4gCSAgc291cmNlIHJlcG9y
-dGluZyB0aGUgZXJyb3IuDQo+ID4NCg==
+Hopefully this is the last bunch of fixes for the cleanup series.
+
+1. log_start() was called before region_add(), which is wrong.
+2. I messed up the calculation of the delta when aligning the ram address
+   (maybe we should simply also use ROUND_UP there ...).
+3. I think we could get log_start/log_stop/log_sync when we actually
+   haven't registered a slot (due to trapping).
+4. Some further cleanups
+
+Available on: https://github.com/davidhildenbrand/qemu/commits/kvm_slot
+
+@Joe, if you could retest, this would be great! I updated the branch.
+
+David Hildenbrand (7):
+  memory: call log_start after region_add
+  kvm: fix alignment of ram address
+  kvm: tolerate non-existing slot for log_start/log_stop/log_sync
+  kvm: fix error message when failing to unregister slot
+  kvm: region_add and region_del is not called on updates
+  kvm: simplify kvm_align_section()
+  memory: reuse section_from_flat_range()
+
+ accel/kvm/kvm-all.c | 39 ++++++++++++++-------------------------
+ memory.c            | 16 +++++-----------
+ 2 files changed, 19 insertions(+), 36 deletions(-)
+
+-- 
+2.13.5
