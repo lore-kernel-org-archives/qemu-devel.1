@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e41tq-0004af-3m
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:41:30 -0400
+	(envelope-from <peterx@redhat.com>) id 1e41uC-0004p0-DS
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:41:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e41tm-0008HR-7B
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:41:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35868)
+	(envelope-from <peterx@redhat.com>) id 1e41u8-0008Nq-Gf
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:41:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57976)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1e41tm-0008Gz-0b
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:41:26 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 14C02882FF
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 09:41:25 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-Date: Mon, 16 Oct 2017 11:41:21 +0200
-Message-Id: <20171016094121.16455-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1] kvm: tolerate non-existing slot for
- log_start and log_stop
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e41u8-0008NZ-7M
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 05:41:48 -0400
+Date: Mon, 16 Oct 2017 17:41:40 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20171016094140.GH4166@pxdev.xzpeter.org>
+References: <20171016065216.18162-1-peterx@redhat.com>
+	<150813912960.320.2215446747740356583@b58463cdfd5f>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <150813912960.320.2215446747740356583@b58463cdfd5f>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 00/32] Migration: postcopy failure
+ recovery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +30,84 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: famz@redhat.com, aarcange@redhat.com, quintela@redhat.com, a.perevalov@samsung.com, dgilbert@redhat.com
 
-log_start might be called by memory.c just before registering the
-section. So we can actually get a log_start without a region_add, which
-we can silently ignore.
+On Mon, Oct 16, 2017 at 12:32:10AM -0700, no-reply@patchew.org wrote:
+> Hi,
+>=20
+> This series failed build test on s390x host. Please find the details be=
+low.
+>=20
+> Type: series
+> Subject: [Qemu-devel] [PATCH v3 00/32] Migration: postcopy failure reco=
+very
+> Message-id: 20171016065216.18162-1-peterx@redhat.com
+>=20
+> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+> #!/bin/bash
+> # Testing script will be invoked under the git checkout with
+> # HEAD pointing to a commit that has the patches applied on top of "bas=
+e"
+> # branch
+> set -e
+> echo "=3D=3D=3D ENV =3D=3D=3D"
+> env
+> echo "=3D=3D=3D PACKAGES =3D=3D=3D"
+> rpm -qa
+> echo "=3D=3D=3D TEST BEGIN =3D=3D=3D"
+> CC=3D$HOME/bin/cc
+> INSTALL=3D$PWD/install
+> BUILD=3D$PWD/build
+> echo -n "Using CC: "
+> realpath $CC
+> mkdir -p $BUILD $INSTALL
+> SRC=3D$PWD
+> cd $BUILD
+> $SRC/configure --cc=3D$CC --prefix=3D$INSTALL
+> make -j4
+> # XXX: we need reliable clean up
+> # make check -j4 V=3D1
+> make install
+> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
 
-This makes current KVM code trigger an assertion
-("kvm_section_update_flags: error finding slot").
+[...]
 
-Also, if we want to trap every access to a section, we might not have a
-slot. So let's just tolerate if we don't have a slot.
+>   CC      migration/postcopy-ram.o
+>   CC      migration/qjson.o
+>   CC      migration/block.o
+>   CC      net/net.o
+>   CC      net/queue.o
+> /var/tmp/patchew-tester-tmp-nm4b3qpv/src/migration/postcopy-ram.c: In f=
+unction =E2=80=98postcopy_ram_fault_thread=E2=80=99:
+> /var/tmp/patchew-tester-tmp-nm4b3qpv/src/migration/postcopy-ram.c:553:1=
+3: error: ignoring return value of =E2=80=98read=E2=80=99, declared with =
+attribute warn_unused_result [-Werror=3Dunused-result]
+>              read(mis->userfault_event_fd, &tmp64, 8);
+>              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Fixes: 343562e8fa22 ("kvm: kvm_log_start/stop are only called with known sections")
-Reported-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- accel/kvm/kvm-all.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Need to capture read() return code.  Fixed.
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 90c88b517d..64de8461e0 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -394,8 +394,11 @@ static int kvm_section_update_flags(KVMMemoryListener *kml,
- 
-     mem = kvm_lookup_matching_slot(kml, start_addr, size);
-     if (!mem) {
--        fprintf(stderr, "%s: error finding slot\n", __func__);
--        abort();
-+        /*
-+         * log_start() might be called before region_add(), and sometimes
-+         * we don't have a slot as we want to trap every access.
-+         */
-+        return 0;
-     }
- 
-     return kvm_slot_update_flags(kml, mem, section->mr);
--- 
-2.13.5
+I captured this as well using "make docker-test-build@fedora". Anyone
+knows why I didn't encounter this on my Fedora 26 host?  My gcc
+version: 7.2.1 20170915 (Red Hat 7.2.1-2), which seems to be quite new
+as well.
+
+Would also appreciate if anyone can provide a minimum docker test
+subset (TEST & IMAGE) that I'd run before posting patches. TIA.
+
+> cc1: all warnings being treated as errors
+> /var/tmp/patchew-tester-tmp-nm4b3qpv/src/rules.mak:66: recipe for targe=
+t 'migration/postcopy-ram.o' failed
+> make: *** [migration/postcopy-ram.o] Error 1
+> make: *** Waiting for unfinished jobs....
+> =3D=3D=3D OUTPUT END =3D=3D=3D
+>=20
+> Test command exited with code: 2
+>=20
+>=20
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@freelists.org
+
+--=20
+Peter Xu
