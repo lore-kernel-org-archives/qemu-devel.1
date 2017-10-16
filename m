@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e45CS-0003J9-Fn
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:12:59 -0400
+	(envelope-from <thuth@redhat.com>) id 1e45CV-0003Lv-LZ
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:13:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e45CR-0001BF-H1
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:12:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39302)
+	(envelope-from <thuth@redhat.com>) id 1e45CS-0001Bt-Gp
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:12:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39352)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1e45CR-0001Al-B3
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:12:55 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1e45CS-0001BV-AO
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 09:12:56 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 16 Oct 2017 15:12:43 +0200
-Message-Id: <1508159564-30317-5-git-send-email-thuth@redhat.com>
+Date: Mon, 16 Oct 2017 15:12:44 +0200
+Message-Id: <1508159564-30317-6-git-send-email-thuth@redhat.com>
 In-Reply-To: <1508159564-30317-1-git-send-email-thuth@redhat.com>
 References: <1508159564-30317-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PULL 4/5] tests/prom-env: Bump the timeout,
- and test pseries only in slow mode
+Subject: [Qemu-devel] [PULL 5/5] default-configs: Enable CONFIG_VMXNET3_PCI
+ only on x86
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,66 +27,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, Dmitry Fleytman <dmitry@daynix.com>
 
-If QEMU has been compiled with the flags --enable-tcg-interpreter and
---enable-debug, the guest is running incredibly slow. The prom-env
-test is approximately 10 times slower than normal in this case, and
-it takes up to 500 seconds until the test with the pseries machine
-finishs. While we should still look for ways to speed up the test
-on the pseries machine here, let's bump the timeout to 600 seconds to
-allow the test to pass with this unusal configuration already now.
-Also move the pseries test into the "slow" category - since it is
-really a very slow test.
+The device can not be instantiated on many non-x86 and just prints
+some error messages, e.g.:
 
-Reviewed-by: Stefan Weil <sw@weilnetz.de>
+$ qemu-system-ppc64 -device vmxnet3 -M g3beige
+[vmxnet3][WR][vmxnet3_init_msix]: Failed to initialize MSI-X, error -95
+[vmxnet3][WR][vmxnet3_pci_realize]: Failed to initialize MSI-X, configuration is inconsistent.
+
+Since vmxnet3 is a para-virtualized device that is only useful on x86,
+it should also only be enabled on the x86 targets.
+
+Reviewed-by: Dmitry Fleytman <dmitry@daynix.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/prom-env-test.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ default-configs/i386-softmmu.mak   | 1 +
+ default-configs/pci.mak            | 1 -
+ default-configs/x86_64-softmmu.mak | 1 +
+ 3 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tests/prom-env-test.c b/tests/prom-env-test.c
-index eac207b..bc8b616 100644
---- a/tests/prom-env-test.c
-+++ b/tests/prom-env-test.c
-@@ -1,7 +1,7 @@
- /*
-- * Test OpenBIOS-based machines.
-+ * Test Open-Firmware-based machines.
-  *
-- * Copyright (c) 2016 Red Hat Inc.
-+ * Copyright (c) 2016, 2017 Red Hat Inc.
-  *
-  * Author:
-  *    Thomas Huth <thuth@redhat.com>
-@@ -30,8 +30,8 @@ static void check_guest_memory(void)
-     uint32_t signature;
-     int i;
- 
--    /* Poll until code has run and modified memory. Wait at most 120 seconds */
--    for (i = 0; i < 12000; ++i) {
-+    /* Poll until code has run and modified memory. Wait at most 600 seconds */
-+    for (i = 0; i < 60000; ++i) {
-         signature = readl(ADDRESS);
-         if (signature == MAGIC) {
-             break;
-@@ -78,7 +78,6 @@ int main(int argc, char *argv[])
-     const char *sparc_machines[] = { "SPARCbook", "Voyager", "SS-20", NULL };
-     const char *sparc64_machines[] = { "sun4u", NULL };
-     const char *ppc_machines[] = { "mac99", "g3beige", NULL };
--    const char *ppc64_machines[] = { "mac99", "g3beige", "pseries", NULL };
-     const char *arch = qtest_get_arch();
- 
-     g_test_init(&argc, &argv, NULL);
-@@ -86,7 +85,10 @@ int main(int argc, char *argv[])
-     if (!strcmp(arch, "ppc")) {
-         add_tests(ppc_machines);
-     } else if (!strcmp(arch, "ppc64")) {
--        add_tests(ppc64_machines);
-+        add_tests(ppc_machines);
-+        if (g_test_slow()) {
-+            qtest_add_data_func("prom-env/pseries", "pseries", test_machine);
-+        }
-     } else if (!strcmp(arch, "sparc")) {
-         add_tests(sparc_machines);
-     } else if (!strcmp(arch, "sparc64")) {
+diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+index d2ab2f6..a685c43 100644
+--- a/default-configs/i386-softmmu.mak
++++ b/default-configs/i386-softmmu.mak
+@@ -7,6 +7,7 @@ CONFIG_QXL=$(CONFIG_SPICE)
+ CONFIG_VGA_ISA=y
+ CONFIG_VGA_CIRRUS=y
+ CONFIG_VMWARE_VGA=y
++CONFIG_VMXNET3_PCI=y
+ CONFIG_VIRTIO_VGA=y
+ CONFIG_VMMOUSE=y
+ CONFIG_IPMI=y
+diff --git a/default-configs/pci.mak b/default-configs/pci.mak
+index 187e438..e514bde 100644
+--- a/default-configs/pci.mak
++++ b/default-configs/pci.mak
+@@ -22,7 +22,6 @@ CONFIG_MPTSAS_SCSI_PCI=y
+ CONFIG_RTL8139_PCI=y
+ CONFIG_E1000_PCI=y
+ CONFIG_E1000E_PCI=y
+-CONFIG_VMXNET3_PCI=y
+ CONFIG_IDE_CORE=y
+ CONFIG_IDE_QDEV=y
+ CONFIG_IDE_PCI=y
+diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
+index 9bde2f1..ea69e82 100644
+--- a/default-configs/x86_64-softmmu.mak
++++ b/default-configs/x86_64-softmmu.mak
+@@ -7,6 +7,7 @@ CONFIG_QXL=$(CONFIG_SPICE)
+ CONFIG_VGA_ISA=y
+ CONFIG_VGA_CIRRUS=y
+ CONFIG_VMWARE_VGA=y
++CONFIG_VMXNET3_PCI=y
+ CONFIG_VIRTIO_VGA=y
+ CONFIG_VMMOUSE=y
+ CONFIG_IPMI=y
 -- 
 1.8.3.1
