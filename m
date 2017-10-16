@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e4Bvn-0002Ag-21
+	(envelope-from <david@redhat.com>) id 1e4Bvn-0002B3-Fb
 	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 16:24:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e4Bvj-0004YH-J2
+	(envelope-from <david@redhat.com>) id 1e4Bvm-0004ZX-1z
 	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 16:24:11 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Mon, 16 Oct 2017 22:23:57 +0200
-Message-Id: <20171016202358.3633-2-david@redhat.com>
+Date: Mon, 16 Oct 2017 22:23:58 +0200
+Message-Id: <20171016202358.3633-3-david@redhat.com>
 In-Reply-To: <20171016202358.3633-1-david@redhat.com>
 References: <20171016202358.3633-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 1/2] accel/tcg: allow to invalidate a write
- TLB entry immediately
+Subject: [Qemu-devel] [PATCH v1 2/2] s390x/tcg: low-address protection
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,85 +23,211 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, cohuck@redhat.com, Peter Maydell <peter.maydell@linaro.org>, David Hildenbrand <david@redhat.com>
 
-Background: s390x implements Low-Address Protection (LAP). If LAP is
-enabled, writing to effective addresses (before any transaltion)
-0-511 and 4096-4607 triggers a protection exception.
+This is a neat way to implement low address protection, whereby
+only the first 512 bytes of the first two pages (each 4096 bytes) of
+every address space are protected.
 
-So we have subpage protection on the first two pages of every address
-space (where the lowcore - the CPU private data resides).
+Store a tec of 0 for the access exception, this is what is defined by
+Enhanced Suppression on Protection in case of a low address protection
+(Bit 61 set to 0, rest undefined).
 
-By immediately invalidating the write entry but allowing the caller to
-continue, we force every write access onto these first two pages into
-the slow path. we will get a tlb fault with the specific accessed
-addresses and can then evaluate if protection applies or not.
+We have to make sure to to pass the access address, not the masked page
+address into mmu_translate*().
 
-We have to make sure to ignore the invalid bit if tlb_fill() succeeds.
+Drop the check from testblock. So we can properly test this via
+kvm-unit-tests.
 
+This will check every access going through one of the MMUs.
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- accel/tcg/cputlb.c           | 5 ++++-
- accel/tcg/softmmu_template.h | 4 ++--
- include/exec/cpu-all.h       | 3 +++
- 3 files changed, 9 insertions(+), 3 deletions(-)
+ target/s390x/excp_helper.c |  3 +-
+ target/s390x/mem_helper.c  |  8 ----
+ target/s390x/mmu_helper.c  | 94 +++++++++++++++++++++++++++++-----------------
+ 3 files changed, 60 insertions(+), 45 deletions(-)
 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index 5b1ef1442c..a23919c3a8 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -694,6 +694,9 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
-         } else {
-             tn.addr_write = address;
-         }
-+        if (prot & PAGE_WRITE_INV) {
-+            tn.addr_write |= TLB_INVALID_MASK;
+diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+index cff308a18d..e04b670663 100644
+--- a/target/s390x/excp_helper.c
++++ b/target/s390x/excp_helper.c
+@@ -95,7 +95,6 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr orig_vaddr,
+     DPRINTF("%s: address 0x%" VADDR_PRIx " rw %d mmu_idx %d\n",
+             __func__, orig_vaddr, rw, mmu_idx);
+ 
+-    orig_vaddr &= TARGET_PAGE_MASK;
+     vaddr = orig_vaddr;
+ 
+     if (mmu_idx < MMU_REAL_IDX) {
+@@ -127,7 +126,7 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr orig_vaddr,
+     qemu_log_mask(CPU_LOG_MMU, "%s: set tlb %" PRIx64 " -> %" PRIx64 " (%x)\n",
+             __func__, (uint64_t)vaddr, (uint64_t)raddr, prot);
+ 
+-    tlb_set_page(cs, orig_vaddr, raddr, prot,
++    tlb_set_page(cs, orig_vaddr & TARGET_PAGE_MASK, raddr, prot,
+                  mmu_idx, TARGET_PAGE_SIZE);
+ 
+     return 0;
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index bbbe1c62b3..69a16867d4 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -1687,18 +1687,10 @@ void HELPER(stctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+ uint32_t HELPER(testblock)(CPUS390XState *env, uint64_t real_addr)
+ {
+     uintptr_t ra = GETPC();
+-    CPUState *cs = CPU(s390_env_get_cpu(env));
+     int i;
+ 
+     real_addr = wrap_address(env, real_addr) & TARGET_PAGE_MASK;
+ 
+-    /* Check low-address protection */
+-    if ((env->cregs[0] & CR0_LOWPROT) && real_addr < 0x2000) {
+-        cpu_restore_state(cs, ra);
+-        program_interrupt(env, PGM_PROTECTION, 4);
+-        return 1;
+-    }
+-
+     for (i = 0; i < TARGET_PAGE_SIZE; i += 8) {
+         cpu_stq_real_ra(env, real_addr + i, 0, ra);
+     }
+diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+index 9daa0fd8e2..9806685bee 100644
+--- a/target/s390x/mmu_helper.c
++++ b/target/s390x/mmu_helper.c
+@@ -106,6 +106,35 @@ static void trigger_page_fault(CPUS390XState *env, target_ulong vaddr,
+     trigger_access_exception(env, type, ilen, tec);
+ }
+ 
++/* check whether the address would be proteted by Low-Address Protection */
++static bool is_low_address(uint64_t addr)
++{
++    return addr < 512 || (addr >= 4096 && addr <= 4607);
++}
++
++/* check whether Low-Address Protection is enabled for mmu_translate() */
++static bool lowprot_enabled(const CPUS390XState *env, uint64_t asc)
++{
++    if (!(env->cregs[0] & CR0_LOWPROT)) {
++        return false;
++    }
++    if (!(env->psw.mask & PSW_MASK_DAT)) {
++        return true;
++    }
++
++    /* Check the private-space control bit */
++    switch (asc) {
++    case PSW_ASC_PRIMARY:
++        return !(env->cregs[1] & _ASCE_PRIVATE_SPACE);
++    case PSW_ASC_SECONDARY:
++        return !(env->cregs[7] & _ASCE_PRIVATE_SPACE);
++    case PSW_ASC_HOME:
++        return !(env->cregs[13] & _ASCE_PRIVATE_SPACE);
++    default:
++        g_assert_not_reached();
++    }
++}
++
+ /**
+  * Translate real address to absolute (= physical)
+  * address by taking care of the prefix mapping.
+@@ -323,6 +352,24 @@ int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
+     }
+ 
+     *flags = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
++    if (is_low_address(vaddr & TARGET_PAGE_MASK) && lowprot_enabled(env, asc)) {
++        /*
++         * If any part of this page is currently protected, make sure the
++         * TLB entry will not be reused.
++         *
++         * As the protected range is always the first 512 bytes of the
++         * two first pages, we are able to catch all writes to these areas
++         * just by looking at the start address (triggering the tlb miss).
++         */
++        *flags |= PAGE_WRITE_INV;
++        if (is_low_address(vaddr) && rw == MMU_DATA_STORE) {
++            if (exc) {
++                trigger_access_exception(env, PGM_PROTECTION, ILEN_AUTO, 0);
++            }
++            return -EACCES;
 +        }
-     }
++    }
++
+     vaddr &= TARGET_PAGE_MASK;
  
-     /* Pairs with flag setting in tlb_reset_dirty_range */
-@@ -978,7 +981,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
-         if (!VICTIM_TLB_HIT(addr_write, addr)) {
-             tlb_fill(ENV_GET_CPU(env), addr, MMU_DATA_STORE, mmu_idx, retaddr);
-         }
--        tlb_addr = tlbe->addr_write;
-+        tlb_addr = tlbe->addr_write & ~TLB_INVALID_MASK;
-     }
+     if (!(env->psw.mask & PSW_MASK_DAT)) {
+@@ -392,50 +439,17 @@ int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
+ }
  
-     /* Check notdirty */
-diff --git a/accel/tcg/softmmu_template.h b/accel/tcg/softmmu_template.h
-index d7563292a5..3fc5144316 100644
---- a/accel/tcg/softmmu_template.h
-+++ b/accel/tcg/softmmu_template.h
-@@ -285,7 +285,7 @@ void helper_le_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
-         if (!VICTIM_TLB_HIT(addr_write, addr)) {
-             tlb_fill(ENV_GET_CPU(env), addr, MMU_DATA_STORE, mmu_idx, retaddr);
-         }
--        tlb_addr = env->tlb_table[mmu_idx][index].addr_write;
-+        tlb_addr = env->tlb_table[mmu_idx][index].addr_write & ~TLB_INVALID_MASK;
-     }
+ /**
+- * lowprot_enabled: Check whether low-address protection is enabled
+- */
+-static bool lowprot_enabled(const CPUS390XState *env)
+-{
+-    if (!(env->cregs[0] & CR0_LOWPROT)) {
+-        return false;
+-    }
+-    if (!(env->psw.mask & PSW_MASK_DAT)) {
+-        return true;
+-    }
+-
+-    /* Check the private-space control bit */
+-    switch (env->psw.mask & PSW_MASK_ASC) {
+-    case PSW_ASC_PRIMARY:
+-        return !(env->cregs[1] & _ASCE_PRIVATE_SPACE);
+-    case PSW_ASC_SECONDARY:
+-        return !(env->cregs[7] & _ASCE_PRIVATE_SPACE);
+-    case PSW_ASC_HOME:
+-        return !(env->cregs[13] & _ASCE_PRIVATE_SPACE);
+-    default:
+-        /* We don't support access register mode */
+-        error_report("unsupported addressing mode");
+-        exit(1);
+-    }
+-}
+-
+-/**
+  * translate_pages: Translate a set of consecutive logical page addresses
+  * to absolute addresses
+  */
+ static int translate_pages(S390CPU *cpu, vaddr addr, int nr_pages,
+                            target_ulong *pages, bool is_write)
+ {
+-    bool lowprot = is_write && lowprot_enabled(&cpu->env);
+     uint64_t asc = cpu->env.psw.mask & PSW_MASK_ASC;
+     CPUS390XState *env = &cpu->env;
+     int ret, i, pflags;
  
-     /* Handle an IO access.  */
-@@ -361,7 +361,7 @@ void helper_be_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
-         if (!VICTIM_TLB_HIT(addr_write, addr)) {
-             tlb_fill(ENV_GET_CPU(env), addr, MMU_DATA_STORE, mmu_idx, retaddr);
-         }
--        tlb_addr = env->tlb_table[mmu_idx][index].addr_write;
-+        tlb_addr = env->tlb_table[mmu_idx][index].addr_write & ~TLB_INVALID_MASK;
-     }
+     for (i = 0; i < nr_pages; i++) {
+-        /* Low-address protection? */
+-        if (lowprot && (addr < 512 || (addr >= 4096 && addr < 4096 + 512))) {
+-            trigger_access_exception(env, PGM_PROTECTION, ILEN_AUTO, 0);
+-            return -EACCES;
+-        }
+         ret = mmu_translate(env, addr, is_write, asc, &pages[i], &pflags, true);
+         if (ret) {
+             return ret;
+@@ -509,9 +523,19 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
+ int mmu_translate_real(CPUS390XState *env, target_ulong raddr, int rw,
+                        target_ulong *addr, int *flags)
+ {
+-    /* TODO: low address protection once we flush the tlb on cr changes */
++    const bool lowprot_enabled = env->cregs[0] & CR0_LOWPROT;
++
+     *flags = PAGE_READ | PAGE_WRITE;
+-    *addr = mmu_real2abs(env, raddr);
++    if (is_low_address(raddr & TARGET_PAGE_MASK) && lowprot_enabled) {
++        /* see comment in mmu_translate() how this works */
++        *flags |= PAGE_WRITE_INV;
++        if (is_low_address(raddr) && rw == MMU_DATA_STORE) {
++            trigger_access_exception(env, PGM_PROTECTION, ILEN_AUTO, 0);
++            return -EACCES;
++        }
++    }
++
++    *addr = mmu_real2abs(env, raddr & TARGET_PAGE_MASK);
  
-     /* Handle an IO access.  */
-diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index 778031c3d7..0b141683f0 100644
---- a/include/exec/cpu-all.h
-+++ b/include/exec/cpu-all.h
-@@ -245,6 +245,9 @@ extern intptr_t qemu_host_page_mask;
- /* original state of the write flag (used when tracking self-modifying
-    code */
- #define PAGE_WRITE_ORG 0x0010
-+/* Invalidate the TLB entry immediately, helpful for s390x
-+ * Low-Address-Protection. Used with PAGE_WRITE in tlb_set_page_with_attrs() */
-+#define PAGE_WRITE_INV 0x0040
- #if defined(CONFIG_BSD) && defined(CONFIG_USER_ONLY)
- /* FIXME: Code that sets/uses this is broken and needs to go away.  */
- #define PAGE_RESERVED  0x0020
+     /* TODO: storage key handling */
+     return 0;
 -- 
 2.13.5
