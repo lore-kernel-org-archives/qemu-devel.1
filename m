@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e3zyQ-00032o-GD
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 03:38:12 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e404u-00051z-Ub
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 03:44:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e3zyN-00063B-DJ
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 03:38:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36380)
+	(envelope-from <kraxel@redhat.com>) id 1e404r-0001on-S5
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 03:44:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55232)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e3zyN-00062u-77
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 03:38:03 -0400
-Date: Mon, 16 Oct 2017 15:37:48 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171016073748.GC4166@pxdev.xzpeter.org>
-References: <20170929033844.26935-1-peterx@redhat.com>
-	<20170929033844.26935-11-peterx@redhat.com>
-	<20171012123508.GE5957@stefanha-x1.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171012123508.GE5957@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [RFC v2 10/22] monitor: allow to use IO thread for
- parsing
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e404r-0001o9-LL
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 03:44:45 -0400
+Message-ID: <1508139882.15782.2.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 16 Oct 2017 09:44:42 +0200
+In-Reply-To: <a591ebd3-ae7f-cde6-1cd2-d4859c17494f@redhat.com>
+References: <20171013102812.29648-1-berrange@redhat.com>
+	<1c52fcd4-e8ce-51c1-a0c7-cf882fab6662@redhat.com>
+	<a591ebd3-ae7f-cde6-1cd2-d4859c17494f@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] configure: pick the right compiler for
+ OpenBSD by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, Oct 12, 2017 at 01:35:08PM +0100, Stefan Hajnoczi wrote:
-> On Fri, Sep 29, 2017 at 11:38:32AM +0800, Peter Xu wrote:
-> > For each Monitor, add one field "use_io_thr" to show whether it will be
-> > using the dedicated monitor IO thread to handle input/output.  When set,
-> > monitor IO parsing work will be offloaded to dedicated monitor IO
-> > thread, rather than the original main loop thread.
+  Hi,
+
+> By the way, looks like OpenBSD is also switching to clang by default
+> soon:
 > 
-> Why make use_io_thr optional?  We'd have to maintain and test both code
-> paths.
+> https://www.phoronix.com/scan.php?page=news_item&px=OpenBSD-Default-
+> Clang
 
-Because of MUXed typed chardevs.  I will add the explanation into this
-patch's commit message, and also into the codes where we used it (in a
-follow-up patch).
+It did happen already.  On openbsd 6.2 (released a week ago) cc is
+clang:
 
-> 
-> > @@ -4135,19 +4139,37 @@ void monitor_init(Chardev *chr, int flags)
-> >          monitor_read_command(mon, 0);
-> >      }
-> >  
-> > +    if (mon->use_io_thr) {
-> > +        /*
-> > +         * When use_io_thr is set, we use the global shared dedicated
-> > +         * IO thread for this monitor to handle input/output.
-> > +         */
-> > +        context = monitor_io_context_get();
-> > +        /* We should have inited globals before reaching here. */
-> > +        assert(context);
-> > +    } else {
-> > +        /* The default main loop, which is the main thread */
-> > +        context = NULL;
-> > +    }
-> > +
-> > +    /*
-> > +     * Hang the monitor before running it (which is triggered by
-> 
-> s/Hang/Add/
-> 
-> "Hang" isn't used as a verb for adding items to collections.  People
-> would probably think about deadlocking the thread instead :-).
+$ cc --version
+OpenBSD clang version 4.0.0 (tags/RELEASE_400/final) (based on LLVM
+4.0.0)
 
-Thanks for explaining this!  Fixed.
-
-(I am always happy to improve my English, though in a slow way :-)
-
-> 
-> > +     * qemu_chr_fe_set_handlers).  Otherwise one monitor may run while
-> > +     * find itself not on the mon_list.
-> > +     */
-> > +    qemu_mutex_lock(&monitor_lock);
-> > +    QTAILQ_INSERT_HEAD(&mon_list, mon, entry);
-> > +    qemu_mutex_unlock(&monitor_lock);
-
--- 
-Peter Xu
+cheers,
+  Gerd
