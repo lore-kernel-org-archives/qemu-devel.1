@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e46c1-00053B-Ac
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 10:43:26 -0400
+	(envelope-from <david@redhat.com>) id 1e46c3-00054b-1F
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 10:43:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e46c0-0005li-H8
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 10:43:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:13288)
+	(envelope-from <david@redhat.com>) id 1e46c2-0005o5-8A
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 10:43:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36450)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1e46c0-0005jb-Bv
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 10:43:24 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1e46c2-0005mO-1s
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 10:43:26 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Mon, 16 Oct 2017 16:43:00 +0200
-Message-Id: <20171016144302.24284-6-david@redhat.com>
+Date: Mon, 16 Oct 2017 16:43:01 +0200
+Message-Id: <20171016144302.24284-7-david@redhat.com>
 In-Reply-To: <20171016144302.24284-1-david@redhat.com>
 References: <20171016144302.24284-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 5/7] kvm: region_add and region_del is not
- called on updates
+Subject: [Qemu-devel] [PATCH v1 6/7] kvm: simplify kvm_align_section()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,43 +26,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Joe Clifford <joeclifford@gmail.com>, David Hildenbrand <david@redhat.com>
 
-Attributes are not updated via region_add()/region_del(). Attribute changes
-lead to a delete first, followed by a new add.
-
-If this would ever not be the case, we would get an error when trying to
-register the new slot.
+Use ROUND_UP and simplify the code a bit.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- accel/kvm/kvm-all.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ accel/kvm/kvm-all.c | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
 
 diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 559c544501..2835bb3801 100644
+index 2835bb3801..f290f487a5 100644
 --- a/accel/kvm/kvm-all.c
 +++ b/accel/kvm/kvm-all.c
-@@ -721,8 +721,8 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
-     ram = memory_region_get_ram_ptr(mr) + section->offset_within_region +
-           (start_addr - section->offset_within_address_space);
- 
--    mem = kvm_lookup_matching_slot(kml, start_addr, size);
-     if (!add) {
-+        mem = kvm_lookup_matching_slot(kml, start_addr, size);
-         if (!mem) {
-             return;
-         }
-@@ -741,12 +741,6 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
-         return;
-     }
- 
--    if (mem) {
--        /* update the slot */
--        kvm_slot_update_flags(kml, mem, mr);
--        return;
--    }
+@@ -197,26 +197,20 @@ static hwaddr kvm_align_section(MemoryRegionSection *section,
+                                 hwaddr *start)
+ {
+     hwaddr size = int128_get64(section->size);
+-    hwaddr delta;
 -
-     /* register the new slot */
-     mem = kvm_alloc_slot(kml);
-     mem->memory_size = size;
+-    *start = section->offset_within_address_space;
++    hwaddr delta, aligned;
+ 
+     /* kvm works in page size chunks, but the function may be called
+        with sub-page size and unaligned start address. Pad the start
+        address to next and truncate size to previous page boundary. */
+-    delta = qemu_real_host_page_size - (*start & ~qemu_real_host_page_mask);
+-    delta &= ~qemu_real_host_page_mask;
+-    *start += delta;
++    aligned = ROUND_UP(section->offset_within_address_space,
++                       qemu_real_host_page_size);
++    delta = aligned - section->offset_within_address_space;
++    *start = aligned;
+     if (delta > size) {
+         return 0;
+     }
+-    size -= delta;
+-    size &= qemu_real_host_page_mask;
+-    if (*start & ~qemu_real_host_page_mask) {
+-        return 0;
+-    }
+ 
+-    return size;
++    return (size - delta) & qemu_real_host_page_mask;
+ }
+ 
+ int kvm_physical_memory_addr_from_host(KVMState *s, void *ram,
 -- 
 2.13.5
