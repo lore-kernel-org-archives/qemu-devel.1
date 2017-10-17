@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47674)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4V1I-0002z6-DR
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:47:09 -0400
+	id 1e4V1L-00032V-PW
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:47:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4V1H-0003s3-DN
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:47:08 -0400
+	id 1e4V1K-0003tS-TI
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:47:11 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 17 Oct 2017 13:44:23 -0300
-Message-Id: <20171017164426.25277-40-f4bug@amsat.org>
+Date: Tue, 17 Oct 2017 13:44:24 -0300
+Message-Id: <20171017164426.25277-41-f4bug@amsat.org>
 In-Reply-To: <20171017164426.25277-1-f4bug@amsat.org>
 References: <20171017164426.25277-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 39/42] hw/misc/pvpanic: extract public API
- from i386/pc to "hw/misc/pvpanic.h"
+Subject: [Qemu-devel] [PATCH v3 40/42] i386/pc: move vmport.c to hw/i386/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,115 +29,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-and remove the old i386/pc dependency.
+It's a x86-only device, so it does not make sense to keep it
+in the shared misc folder.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-no MAINTAINERS entry, does this belong to "PC Chipset"?
+ hw/{misc => i386}/vmport.c | 0
+ hw/i386/Makefile.objs      | 1 +
+ hw/misc/Makefile.objs      | 2 --
+ 3 files changed, 1 insertion(+), 2 deletions(-)
+ rename hw/{misc => i386}/vmport.c (100%)
 
- include/hw/i386/pc.h      |  3 ---
- include/hw/misc/pvpanic.h | 21 +++++++++++++++++++++
- hw/i386/acpi-build.c      |  2 +-
- hw/misc/pvpanic.c         |  9 ++++-----
- 4 files changed, 26 insertions(+), 9 deletions(-)
- create mode 100644 include/hw/misc/pvpanic.h
-
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 846d37b9fb..1a74ccd73b 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -306,9 +306,6 @@ int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn);
- void pc_system_firmware_init(MemoryRegion *rom_memory,
-                              bool isapc_ram_fw);
+diff --git a/hw/misc/vmport.c b/hw/i386/vmport.c
+similarity index 100%
+rename from hw/misc/vmport.c
+rename to hw/i386/vmport.c
+diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
+index 909ead6a77..64a461c929 100644
+--- a/hw/i386/Makefile.objs
++++ b/hw/i386/Makefile.objs
+@@ -5,6 +5,7 @@ obj-y += pc_sysfw.o
+ obj-y += x86-iommu.o intel_iommu.o
+ obj-y += amd_iommu.o
+ obj-$(CONFIG_XEN) += ../xenpv/ xen/
++obj-$(CONFIG_VMPORT) += vmport.o
  
--/* pvpanic.c */
--uint16_t pvpanic_port(void);
+ obj-y += kvmvapic.o
+ obj-y += acpi-build.o
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index 19202d90cf..03bc758592 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -11,8 +11,6 @@ common-obj-$(CONFIG_EDU) += edu.o
+ common-obj-y += unimp.o
+ common-obj-y += vmcoreinfo.o
+ 
+-obj-$(CONFIG_VMPORT) += vmport.o
 -
- /* acpi-build.c */
- void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
-                        const CPUArchIdList *apic_ids, GArray *entry);
-diff --git a/include/hw/misc/pvpanic.h b/include/hw/misc/pvpanic.h
-new file mode 100644
-index 0000000000..36a54e270c
---- /dev/null
-+++ b/include/hw/misc/pvpanic.h
-@@ -0,0 +1,21 @@
-+/*
-+ * QEMU simulated pvpanic device.
-+ *
-+ * Copyright Fujitsu, Corp. 2013
-+ *
-+ * Authors:
-+ *     Wen Congyang <wency@cn.fujitsu.com>
-+ *     Hu Tao <hutao@cn.fujitsu.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+#ifndef HW_MISC_PVPANIC_H
-+#define HW_MISC_PVPANIC_H
-+
-+#define TYPE_PVPANIC "pvpanic"
-+
-+uint16_t pvpanic_port(void);
-+
-+#endif
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 73519ab3ac..63bbc610eb 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -28,8 +28,8 @@
- #include "qemu/error-report.h"
- #include "hw/pci/pci.h"
- #include "qom/cpu.h"
--#include "hw/i386/pc.h"
- #include "target/i386/cpu.h"
-+#include "hw/misc/pvpanic.h"
- #include "hw/timer/hpet.h"
- #include "hw/acpi/acpi-defs.h"
- #include "hw/acpi/acpi.h"
-diff --git a/hw/misc/pvpanic.c b/hw/misc/pvpanic.c
-index 3a0e4ba828..b26250dec9 100644
---- a/hw/misc/pvpanic.c
-+++ b/hw/misc/pvpanic.c
-@@ -17,7 +17,7 @@
- #include "qemu/log.h"
- 
- #include "hw/nvram/fw_cfg.h"
--#include "hw/i386/pc.h"
-+#include "hw/misc/pvpanic.h"
- 
- /* The bit of supported pv event */
- #define PVPANIC_F_PANICKED      0
-@@ -25,9 +25,8 @@
- /* The pv event value */
- #define PVPANIC_PANICKED        (1 << PVPANIC_F_PANICKED)
- 
--#define TYPE_ISA_PVPANIC_DEVICE    "pvpanic"
- #define ISA_PVPANIC_DEVICE(obj)    \
--    OBJECT_CHECK(PVPanicState, (obj), TYPE_ISA_PVPANIC_DEVICE)
-+    OBJECT_CHECK(PVPanicState, (obj), TYPE_PVPANIC)
- 
- static void handle_event(int event)
- {
-@@ -104,7 +103,7 @@ static void pvpanic_isa_realizefn(DeviceState *dev, Error **errp)
- 
- uint16_t pvpanic_port(void)
- {
--    Object *o = object_resolve_path_type("", TYPE_ISA_PVPANIC_DEVICE, NULL);
-+    Object *o = object_resolve_path_type("", TYPE_PVPANIC, NULL);
-     if (!o) {
-         return 0;
-     }
-@@ -126,7 +125,7 @@ static void pvpanic_isa_class_init(ObjectClass *klass, void *data)
- }
- 
- static TypeInfo pvpanic_isa_info = {
--    .name          = TYPE_ISA_PVPANIC_DEVICE,
-+    .name          = TYPE_PVPANIC,
-     .parent        = TYPE_ISA_DEVICE,
-     .instance_size = sizeof(PVPanicState),
-     .instance_init = pvpanic_isa_initfn,
+ # ARM devices
+ common-obj-$(CONFIG_PL310) += arm_l2x0.o
+ common-obj-$(CONFIG_INTEGRATOR_DEBUG) += arm_integrator_debug.o
 -- 
 2.15.0.rc0
