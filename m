@@ -1,16 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e4VkS-0004w6-72
+	(envelope-from <alistai@xilinx.com>) id 1e4VkS-0004w4-6o
 	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 13:33:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e4VkN-0006HR-SP
+	(envelope-from <alistai@xilinx.com>) id 1e4VkO-0006Hq-2F
 	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 13:33:48 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 17 Oct 2017 10:29:41 -0700
-Message-ID: <cover.1508261326.git.alistair.francis@xilinx.com>
+Date: Tue, 17 Oct 2017 10:29:48 -0700
+Message-ID: <2c8b07b555fa6f97f4c741e3fa5b478ee80bc68f.1508261326.git.alistair.francis@xilinx.com>
+In-Reply-To: <cover.1508261326.git.alistair.francis@xilinx.com>
+References: <cover.1508261326.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 0/8]  Add the ZynqMP PMU and IPI
+Subject: [Qemu-devel] [PATCH v4 3/8] aarch64-softmmu.mak: Use an ARM
+ specific config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,62 +25,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
 Cc: alistair.francis@xilinx.com, alistair23@gmail.com, qemu-arm@nongnu.org
 
-This series adds the ZynqMP Power Management Unit (PMU) machine with basic
-functionality.
+In preperation for having an ARM and MicroBlaze ZynqMP machine let's
+split out the current ARM specific config options.
 
-The machine only has the
- - CPU
- - Memory
- - Interrupt controller
- - IPI device
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Acked-by: Peter Maydell <peter.maydell@linaro.org>
+---
 
-connected, but that is enough to run some of the ROM and firmware
-code on the machine
+ default-configs/aarch64-softmmu.mak | 1 +
+ hw/arm/Makefile.objs                | 2 +-
+ hw/display/Makefile.objs            | 2 +-
+ hw/dma/Makefile.objs                | 2 +-
+ 4 files changed, 4 insertions(+), 3 deletions(-)
 
-The series also adds the IPI device and connects it to the ZynqMP ARM
-side and the ZynqMP PMU. These IPI devices don't connect between the ARM
-and MicroBlaze instances though.
-
-V4:
- - Rename the ZCU102 machine to just ZynqMP
- - Rename the PMC SoC to "xlnx,zynqmp-pmu-soc"
- - Move the IPI device to the machine instead of the SoC
-V3:
- - Add the interrupt controller
- - Replace some of the error_fatals with errp
- - Fix the PMU CPU name
-
-
-Alistair Francis (8):
-  xlnx-zynqmp-pmu: Initial commit of the ZynqMP PMU
-  xlnx-zynqmp-pmu: Add the CPU and memory
-  aarch64-softmmu.mak: Use an ARM specific config
-  xlnx-pmu-iomod-intc: Add the PMU Interrupt controller
-  xlnx-zynqmp-pmu: Connect the PMU interrupt controller
-  xlnx-zynqmp-ipi: Initial version of the Xilinx IPI device
-  xlnx-zynqmp-pmu: Connect the IPI device to the PMU
-  xlnx-zynqmp: Connect the IPI device to the ZynqMP SoC
-
- default-configs/aarch64-softmmu.mak    |   1 +
- default-configs/microblaze-softmmu.mak |   1 +
- hw/arm/Makefile.objs                   |   2 +-
- hw/arm/xlnx-zynqmp.c                   |  14 +
- hw/display/Makefile.objs               |   2 +-
- hw/dma/Makefile.objs                   |   2 +-
- hw/intc/Makefile.objs                  |   2 +
- hw/intc/xlnx-pmu-iomod-intc.c          | 554 +++++++++++++++++++++++++++++++++
- hw/intc/xlnx-zynqmp-ipi.c              | 377 ++++++++++++++++++++++
- hw/microblaze/Makefile.objs            |   1 +
- hw/microblaze/xlnx-zynqmp-pmu.c        | 204 ++++++++++++
- include/hw/arm/xlnx-zynqmp.h           |   2 +
- include/hw/intc/xlnx-pmu-iomod-intc.h  |  58 ++++
- include/hw/intc/xlnx-zynqmp-ipi.h      |  57 ++++
- 14 files changed, 1274 insertions(+), 3 deletions(-)
- create mode 100644 hw/intc/xlnx-pmu-iomod-intc.c
- create mode 100644 hw/intc/xlnx-zynqmp-ipi.c
- create mode 100644 hw/microblaze/xlnx-zynqmp-pmu.c
- create mode 100644 include/hw/intc/xlnx-pmu-iomod-intc.h
- create mode 100644 include/hw/intc/xlnx-zynqmp-ipi.h
-
+diff --git a/default-configs/aarch64-softmmu.mak b/default-configs/aarch64-softmmu.mak
+index 24494832cf..9ddccf855e 100644
+--- a/default-configs/aarch64-softmmu.mak
++++ b/default-configs/aarch64-softmmu.mak
+@@ -7,3 +7,4 @@ CONFIG_AUX=y
+ CONFIG_DDC=y
+ CONFIG_DPCD=y
+ CONFIG_XLNX_ZYNQMP=y
++CONFIG_XLNX_ZYNQMP_ARM=y
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index 2794e086d6..1c896bafb4 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -13,7 +13,7 @@ obj-y += omap1.o omap2.o strongarm.o
+ obj-$(CONFIG_ALLWINNER_A10) += allwinner-a10.o cubieboard.o
+ obj-$(CONFIG_RASPI) += bcm2835_peripherals.o bcm2836.o raspi.o
+ obj-$(CONFIG_STM32F205_SOC) += stm32f205_soc.o
+-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp.o xlnx-zcu102.o
++obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx-zynqmp.o xlnx-zcu102.o
+ obj-$(CONFIG_FSL_IMX25) += fsl-imx25.o imx25_pdk.o
+ obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
+ obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
+diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+index 551c050a6a..d3a4cb396e 100644
+--- a/hw/display/Makefile.objs
++++ b/hw/display/Makefile.objs
+@@ -40,4 +40,4 @@ virtio-gpu.o-libs += $(VIRGL_LIBS)
+ virtio-gpu-3d.o-cflags := $(VIRGL_CFLAGS)
+ virtio-gpu-3d.o-libs += $(VIRGL_LIBS)
+ obj-$(CONFIG_DPCD) += dpcd.o
+-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx_dp.o
++obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx_dp.o
+diff --git a/hw/dma/Makefile.objs b/hw/dma/Makefile.objs
+index 087c8e6855..be98d5d3d8 100644
+--- a/hw/dma/Makefile.objs
++++ b/hw/dma/Makefile.objs
+@@ -9,7 +9,7 @@ common-obj-$(CONFIG_ZYNQ_DEVCFG) += xlnx-zynq-devcfg.o
+ common-obj-$(CONFIG_ETRAXFS) += etraxfs_dma.o
+ common-obj-$(CONFIG_STP2000) += sparc32_dma.o
+ common-obj-$(CONFIG_SUN4M) += sun4m_iommu.o
+-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx_dpdma.o
++obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx_dpdma.o
+ 
+ obj-$(CONFIG_OMAP) += omap_dma.o soc_dma.o
+ obj-$(CONFIG_PXA2XX) += pxa2xx_dma.o
 -- 
 2.11.0
