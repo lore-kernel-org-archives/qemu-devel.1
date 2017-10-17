@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e4RK7-0004Yn-Ul
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:50:23 -0400
+	(envelope-from <bounces@canonical.com>) id 1e4RKj-0004sh-Lq
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:50:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e4RK6-0000CG-PJ
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:50:19 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:45714)
+	(envelope-from <bounces@canonical.com>) id 1e4RKg-0000PE-KL
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:50:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36880)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e4RK6-0000BT-D7
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:50:18 -0400
-Received: by mail-wm0-x230.google.com with SMTP id q124so3675273wmb.0
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 05:50:18 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e4RKg-0000OQ-E9
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:50:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e4RKa-0004bZ-Vy
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 12:50:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D7E232E80DA
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 12:50:48 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1506737310-21880-3-git-send-email-alindsay@codeaurora.org>
-References: <1506737310-21880-1-git-send-email-alindsay@codeaurora.org>
-	<1506737310-21880-3-git-send-email-alindsay@codeaurora.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Oct 2017 13:49:56 +0100
-Message-ID: <CAFEAcA_zwAu4Zt0-2Qy9euBzYQgD19EnnoWwa+ZNzidWwkmEcA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 02/13] target/arm: Check PMCNTEN for
- whether PMCCNTR is enabled
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 17 Oct 2017 12:37:41 -0000
+From: Bug <kewlubuntu@mailinator.com>
+Reply-To: Bug 1723984 <1723984@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150816671920.14146.15870333277151125380.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150824386110.17282.14555588089617790554.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1723984] Re: ID_MMFR0 has an invalid value on
+ aarch64 cpu (A57, A53)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +37,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aaron Lindsay <alindsay@codeaurora.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Peter Crosthwaite <peter.crosthwaite@xilinx.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
+To: qemu-devel@nongnu.org
 
-On 30 September 2017 at 03:08, Aaron Lindsay <alindsay@codeaurora.org> wrote:
-> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
-> ---
->  target/arm/helper.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 8be78ea..40c9273 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -964,7 +964,7 @@ static inline bool arm_ccnt_enabled(CPUARMState *env)
->  {
->      /* This does not support checking PMCCFILTR_EL0 register */
->
-> -    if (!(env->cp15.c9_pmcr & PMCRE)) {
-> +    if (!(env->cp15.c9_pmcr & PMCRE) || !(env->cp15.c9_pmcnten & (1 << 31))) {
->          return false;
->      }
->
+Oh I see. I didn't check older TRM since the ARM ARM was quite strict on th=
+e value, sorry.
+I'll read the MIDR to have a more robust code then. Thank you.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+-- =
 
-I keep replying to your v1 patchset by mistake -- can you use
-the git format-patch options to put make the subject prefix
-be "[PATCH v3]" for the next round in all the patchmails to
-help keep the versions distinct, please?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1723984
 
-thanks
--- PMM
+Title:
+  ID_MMFR0 has an invalid value on aarch64 cpu (A57, A53)
+
+Status in QEMU:
+  New
+
+Bug description:
+  The ID_MMFR0 register, accessed from aarch64 state as an invalid value:
+  - ARM ARM v8 documentation (D7.2 General system control registers) descri=
+bed bits AuxReg[23:20] to be
+    "In ARMv8-A the only permitted value is 0010"
+  - Cortex A53 and Cortex A57 TRM describe the value to be 0x10201105, so A=
+uxReg[23:20] is 0010 too
+  - in QEMU target/arm/cpu64.c, the relevant value is
+    cpu->id_mmfr0 =3D 0x10101105;
+
+  The 1 should be changed to 2.
+
+  Spotted & Tested on the following qemu revision:
+
+  commit 48ae1f60d8c9a770e6da64407984d84e25253c69
+  Merge: 78b62d3 b867eaa
+  Author: Peter Maydell <peter.maydell@linaro.org>
+  Date:   Mon Oct 16 14:28:13 2017 +0100
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1723984/+subscriptions
