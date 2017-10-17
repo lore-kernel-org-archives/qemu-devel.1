@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33567)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4FVY-0006Kt-Mg
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:13:21 -0400
+	id 1e4FVa-0006NQ-QY
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:13:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4FVX-00048k-GJ
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:13:20 -0400
+	id 1e4FVZ-0004Cr-VE
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:13:22 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 16 Oct 2017 21:11:46 -0300
-Message-Id: <20171017001209.32276-17-f4bug@amsat.org>
+Date: Mon, 16 Oct 2017 21:11:47 -0300
+Message-Id: <20171017001209.32276-18-f4bug@amsat.org>
 In-Reply-To: <20171017001209.32276-1-f4bug@amsat.org>
 References: <20171017001209.32276-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 16/39] nios2: remove duplicated includes (in
- code commented out)
+Subject: [Qemu-devel] [PATCH v2 17/39] misc: avoid "include/" in include path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,105 +29,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Michael Tokarev <mjt@tls.msk.ru>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-applied using ./scripts/clean-includes
-
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/nios2/cpu.h       | 1 -
- disas/nios2.c            | 3 ---
- hw/nios2/boot.c          | 1 -
- target/nios2/helper.c    | 5 +----
- target/nios2/op_helper.c | 1 +
- target/nios2/translate.c | 1 +
- 6 files changed, 3 insertions(+), 9 deletions(-)
+ hw/input/adb.c      | 2 +-
+ hw/ssi/aspeed_smc.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
-index 50d803a217..fda02c39b9 100644
---- a/target/nios2/cpu.h
-+++ b/target/nios2/cpu.h
-@@ -20,7 +20,6 @@
- #ifndef CPU_NIOS2_H
- #define CPU_NIOS2_H
- 
--#include "qemu/osdep.h"
- #include "qemu-common.h"
- 
- #define TARGET_LONG_BITS 32
-diff --git a/disas/nios2.c b/disas/nios2.c
-index b342936d21..de11f04cc4 100644
---- a/disas/nios2.c
-+++ b/disas/nios2.c
-@@ -1756,7 +1756,6 @@ extern const int nios2_num_r2_reg_range_mappings;
- #endif /* _NIOS2_H */
- 
- /*#include "sysdep.h"
--#include <stdio.h>
- #include "opcode/nios2.h"
- */
- /* Register string table */
-@@ -2521,8 +2520,6 @@ const int nios2_num_r2_reg_range_mappings = 8;
- #include "dis-asm.h"
- #include "opcode/nios2.h"
- #include "libiberty.h"
--#include <string.h>
--#include <assert.h>
- */
- /* No symbol table is available when this code runs out in an embedded
-    system as when it is used for disassembler support in a monitor.  */
-diff --git a/hw/nios2/boot.c b/hw/nios2/boot.c
-index 2b31f5b844..94f436e7fb 100644
---- a/hw/nios2/boot.c
-+++ b/hw/nios2/boot.c
-@@ -34,7 +34,6 @@
- #include "qemu/option.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
--#include "qemu-common.h"
- #include "sysemu/device_tree.h"
+diff --git a/hw/input/adb.c b/hw/input/adb.c
+index fcca3a8eb9..924a3f9fd5 100644
+--- a/hw/input/adb.c
++++ b/hw/input/adb.c
+@@ -24,8 +24,8 @@
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+ #include "hw/input/adb.h"
++#include "hw/input/adb-keys.h"
+ #include "ui/console.h"
+-#include "include/hw/input/adb-keys.h"
+ #include "ui/input.h"
  #include "sysemu/sysemu.h"
- #include "hw/loader.h"
-diff --git a/target/nios2/helper.c b/target/nios2/helper.c
-index ef9ee05798..9f741a8f19 100644
---- a/target/nios2/helper.c
-+++ b/target/nios2/helper.c
-@@ -18,12 +18,9 @@
-  * <http://www.gnu.org/licenses/lgpl-2.1.html>
-  */
  
--#include <stdio.h>
--#include <string.h>
--#include <assert.h>
-+#include "qemu/osdep.h"
+diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+index cb515730c5..992617fd3a 100644
+--- a/hw/ssi/aspeed_smc.c
++++ b/hw/ssi/aspeed_smc.c
+@@ -26,7 +26,7 @@
+ #include "hw/sysbus.h"
+ #include "sysemu/sysemu.h"
+ #include "qemu/log.h"
+-#include "include/qemu/error-report.h"
++#include "qemu/error-report.h"
+ #include "exec/address-spaces.h"
  
- #include "cpu.h"
--#include "qemu/osdep.h"
- #include "qemu/host-utils.h"
- #include "qapi/error.h"
- #include "exec/exec-all.h"
-diff --git a/target/nios2/op_helper.c b/target/nios2/op_helper.c
-index efb1c489c9..c853aeae02 100644
---- a/target/nios2/op_helper.c
-+++ b/target/nios2/op_helper.c
-@@ -18,6 +18,7 @@
-  * <http://www.gnu.org/licenses/lgpl-2.1.html>
-  */
- 
-+#include "qemu/osdep.h"
- #include "cpu.h"
- #include "exec/helper-proto.h"
- #include "exec/cpu_ldst.h"
-diff --git a/target/nios2/translate.c b/target/nios2/translate.c
-index 6b0961837d..796d399bd1 100644
---- a/target/nios2/translate.c
-+++ b/target/nios2/translate.c
-@@ -21,6 +21,7 @@
-  * <http://www.gnu.org/licenses/lgpl-2.1.html>
-  */
- 
-+#include "qemu/osdep.h"
- #include "cpu.h"
- #include "tcg-op.h"
- #include "exec/exec-all.h"
+ #include "hw/ssi/aspeed_smc.h"
 -- 
 2.15.0.rc0
