@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e4OQC-0000FJ-CV
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:44:25 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e4Oiv-0002pe-8W
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:03:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e4OQB-0004Lb-M6
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:44:24 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:51683)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e4OQB-0004KN-Ej
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:44:23 -0400
-Received: by mail-wr0-x230.google.com with SMTP id j14so981206wre.8
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 02:44:21 -0700 (PDT)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e4Oip-0007TF-O6
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:03:45 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20171017001209.32276-1-f4bug@amsat.org>
+	<20171017001209.32276-38-f4bug@amsat.org>
+	<0f7d83c7-b814-0e07-a043-f4cd957136c6@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7f55b220-d80b-2f0d-b77d-be9bafea6734@amsat.org>
+Date: Tue, 17 Oct 2017 07:03:27 -0300
 MIME-Version: 1.0
-In-Reply-To: <20171016131644.9565-1-kraxel@redhat.com>
-References: <20171016131644.9565-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Oct 2017 10:44:00 +0100
-Message-ID: <CAFEAcA9oEUuiu+6K+FuR7TmKhQnPpNSfz5Cy2g8MqR-QEDECSQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/11] Ui 20171016 patches
+In-Reply-To: <0f7d83c7-b814-0e07-a043-f4cd957136c6@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 37/39] i386/pc: extract port92 from pc.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On 16 October 2017 at 14:16, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> The following changes since commit f90ea7ba7c5ae7010ee0ce062207ae42530f57d6:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20171012' into staging (2017-10-12 17:06:50 +0100)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/ui-20171016-pull-request
->
-> for you to fetch changes up to 2ff408de9c080f2fb5a94ebf6a209c6180c64933:
->
->   gtk: fix wrong id between texture and framebuffer (2017-10-16 14:50:54 +0200)
->
-> ----------------------------------------------------------------
-> ui: use keycodemapdb for key code mappings, part one (v2)
-> ui: add qemu-keymap, update reverse keymaps (for qemu -k $map)
-> ui: fix for vte 0.50
-> ui: gtk texture fix
->
+> Why are you doing this? I really fail to see the rationale here. Please
+> add proper patch descriptions!
 
-Applied, thanks.
+Oops sorry :/
 
--- PMM
+Mostly because while moving things around I read this comment laying
+around since commit 4b78a802ffa:
+
+    /* port 92 stuff: could be split off */
+
+No further rational (except it eases static analysis) so I won't change
+this code and drop this patch.
+
+Regards,
+
+Phil.
