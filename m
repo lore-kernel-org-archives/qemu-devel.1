@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <li.shanlue@zte.com.cn>) id 1e4Lyg-0004Ml-W1
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 03:07:51 -0400
+	(envelope-from <chen_han_xiao@126.com>) id 1e4M3W-0005ur-JN
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 03:12:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <li.shanlue@zte.com.cn>) id 1e4Lyd-0007Ge-9x
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 03:07:50 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:40922 helo=mxct.zte.com.cn)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <li.shanlue@zte.com.cn>)
-	id 1e4Lyc-00078w-UU
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 03:07:47 -0400
-Received: from mse01.zte.com.cn (unknown [10.30.3.20])
-	by Forcepoint Email with ESMTPS id 4C41F25B5837AA7A4C4D
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 15:07:42 +0800 (CST)
-Received: from kjyxapp04.zte.com.cn ([10.30.12.203])
-	by mse01.zte.com.cn with SMTP id v9H76GOU040525
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 15:06:16 +0800 (GMT-8)
-	(envelope-from li.shanlue@zte.com.cn)
-Date: Tue, 17 Oct 2017 15:06:17 +0800 (CST)
-Message-ID: <201710171506176770606@zte.com.cn>
-Mime-Version: 1.0
-From: <li.shanlue@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: [Qemu-devel] =?utf-8?q?test_mail?=
+	(envelope-from <chen_han_xiao@126.com>) id 1e4M3T-0001ah-EH
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 03:12:50 -0400
+Received: from m15-113.126.com ([220.181.15.113]:55235)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <chen_han_xiao@126.com>) id 1e4M3S-0001ZH-Mm
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 03:12:47 -0400
+From: Chen Hanxiao <chen_han_xiao@126.com>
+Date: Tue, 17 Oct 2017 14:41:42 +0800
+Message-Id: <20171017064142.4519-1-chen_han_xiao@126.com>
+Subject: [Qemu-devel] [Resend][PATCH] qga-win: don't hang if vss hold writes
+ timeout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,5 +23,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Chen Hanxiao <chen_han_xiao@126.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Tomoki Sekiyama <tomoki.sekiyama@gmail.com>
 
-aXQncyBhIHRlc3QgbWFpbCwgCmFub3RoZXIgbGluZS4=
+From: Chen Hanxiao <chenhanxiao@gmail.com>
+
+When VM is in a heavy IO, if the command "guest-fsfreeze-freeze"
+is executed, VSS may timeout when trying to hold writes.
+
+Inside guest, Event ID 12298(VSS_ERROR_HOLD_WRITES_TIMEOUT)
+is logged in the Event Viewer.
+
+At that time, if we call AbortBackup, qga may hang forever.
+
+This patch will solve this issue.
+
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Tomoki Sekiyama <tomoki.sekiyama@gmail.com>
+
+Reviewed-by: Tomoki Sekiyama <tomoki.sekiyama@gmail.com>
+Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
+---
+ qga/vss-win32/requester.cpp | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/qga/vss-win32/requester.cpp b/qga/vss-win32/requester.cpp
+index 301762d8b1..3d9c9716c0 100644
+--- a/qga/vss-win32/requester.cpp
++++ b/qga/vss-win32/requester.cpp
+@@ -419,6 +419,16 @@ void requester_freeze(int *num_vols, ErrorSet *errset)
+             break;
+         }
+     }
++
++    if (wait_status == WAIT_TIMEOUT) {
++        err_set(errset, E_FAIL,
++                "timeout when try to receive Frozen event from VSS provider");
++        /* If we are here, VSS had timeout.
++         * Don't call AbortBackup, just return directly.
++         */
++        goto out1;
++    }
++
+     if (wait_status != WAIT_OBJECT_0) {
+         err_set(errset, E_FAIL,
+                 "couldn't receive Frozen event from VSS provider");
+@@ -432,6 +442,8 @@ out:
+     if (vss_ctx.pVssbc) {
+         vss_ctx.pVssbc->AbortBackup();
+     }
++
++out1:
+     requester_cleanup();
+     CoUninitialize();
+ }
+-- 
+2.13.5
