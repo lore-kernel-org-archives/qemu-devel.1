@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1e4U14-0008MG-O6
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:42:51 -0400
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1e4Tfc-0006ig-7Y
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:20:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1e4U13-0000Bu-Lo
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:42:50 -0400
-Date: Tue, 17 Oct 2017 11:42:41 -0400
-From: Aaron Lindsay <alindsay@codeaurora.org>
-Message-ID: <20171017154240.GF3676@codeaurora.org>
-References: <1506737310-21880-1-git-send-email-alindsay@codeaurora.org>
-	<1506737310-21880-5-git-send-email-alindsay@codeaurora.org>
-	<CAFEAcA94pxKuPZZgKOMXyW8xteHTBWz-JM6mGOX-ot6OeBt-tw@mail.gmail.com>
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1e4TfY-0004xd-5k
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:20:40 -0400
+Received: from mailapp02.imgtec.com ([217.156.133.132]:19480
+	helo=mailapp01.imgtec.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1e4TfX-0004uz-WF
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:20:36 -0400
+Received: from HHMAIL03.hh.imgtec.org (unknown [10.44.0.21])
+	by Forcepoint Email with ESMTPS id ABA2437DFE734
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 16:20:26 +0100 (IST)
+From: Yongbok Kim <yongbok.kim@imgtec.com>
+Date: Tue, 17 Oct 2017 16:20:25 +0100
+Message-ID: <1508253625-5269-1-git-send-email-yongbok.kim@imgtec.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA94pxKuPZZgKOMXyW8xteHTBWz-JM6mGOX-ot6OeBt-tw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 04/13] target/arm: Mask PMU register writes
- based on PMCR_EL0.N
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] MAINTAINERS: update email address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,114 +26,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Peter Crosthwaite <peter.crosthwaite@xilinx.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
+To: qemu-devel@nongnu.org
 
-On Oct 17 14:41, Peter Maydell wrote:
-> On 30 September 2017 at 03:08, Aaron Lindsay <alindsay@codeaurora.org> wrote:
-> > This is in preparation for enabling counters other than PMCCNTR
-> >
-> > Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
-> > ---
-> >  target/arm/helper.c | 24 +++++++++++++++---------
-> >  1 file changed, 15 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/target/arm/helper.c b/target/arm/helper.c
-> > index ecf8c55..54070a3 100644
-> > --- a/target/arm/helper.c
-> > +++ b/target/arm/helper.c
-> > @@ -30,11 +30,6 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-> >                                 hwaddr *phys_ptr, MemTxAttrs *txattrs, int *prot,
-> >                                 target_ulong *page_size_ptr, uint32_t *fsr,
-> >                                 ARMMMUFaultInfo *fi);
-> > -
-> > -/* Definitions for the PMCCNTR and PMCR registers */
-> > -#define PMCRD   0x8
-> > -#define PMCRC   0x4
-> > -#define PMCRE   0x1
-> >  #endif
-> >
-> >  static int vfp_gdb_get_reg(CPUARMState *env, uint8_t *buf, int reg)
-> > @@ -876,6 +871,17 @@ static const ARMCPRegInfo v6_cp_reginfo[] = {
-> >      REGINFO_SENTINEL
-> >  };
-> >
-> > +/* Definitions for the PMU registers */
-> > +#define PMCRN   0xf800
-> 
-> We usually name this kind of whole-field mask value something like PMCRN_MASK.
-> 
-> (We also have a FIELD() macro in hw/registerfields.h for defining
-> mask/length/shift constants; though it can be a bit verbose in
-> the length of the names it uses, so I don't insist on its use
-> if you don't like the results. I'm on the fence myself about it.)
+Update my email address to mips.com
 
-Will do.
+Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
+---
+ MAINTAINERS |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
-> > +#define PMCRN_SHIFT 11
-> > +#define PMCRD   0x8
-> > +#define PMCRC   0x4
-> > +#define PMCRE   0x1
-> > +
-> > +#define PMU_NUM_COUNTERS(env) ((env->cp15.c9_pmcr & PMCRN) >> PMCRN_SHIFT)
-> > +/* Bits allowed to be set/cleared for PMCNTEN* and PMINTEN* */
-> > +#define PMU_COUNTER_MASK(env) ((1 << 31) | ((1 << PMU_NUM_COUNTERS(env)) - 1))
-> > +
-> >  static CPAccessResult pmreg_access(CPUARMState *env, const ARMCPRegInfo *ri,
-> >                                     bool isread)
-> >  {
-> > @@ -1060,14 +1066,14 @@ static void pmccfiltr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-> >  static void pmcntenset_write(CPUARMState *env, const ARMCPRegInfo *ri,
-> >                              uint64_t value)
-> >  {
-> > -    value &= (1 << 31);
-> > +    value &= (PMU_COUNTER_MASK(env) | (1 << 31));
-> 
-> PMU_COUNTER_MASK always contains bit 31, so why do we manually OR it in
-> again here?
-
-I forgot I'd also included the cycle counter in PMU_COUNTER_MASK... I'll
-remove the duplication here and in pmcntenclr_write below.
-
-> >      env->cp15.c9_pmcnten |= value;
-> >  }
-> >
-> >  static void pmcntenclr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-> >                               uint64_t value)
-> >  {
-> > -    value &= (1 << 31);
-> > +    value &= (PMU_COUNTER_MASK(env) | (1 << 31));
-> >      env->cp15.c9_pmcnten &= ~value;
-> >  }
-> >
-> > @@ -1115,14 +1121,14 @@ static void pmintenset_write(CPUARMState *env, const ARMCPRegInfo *ri,
-> >                               uint64_t value)
-> >  {
-> >      /* We have no event counters so only the C bit can be changed */
-> > -    value &= (1 << 31);
-> > +    value &= PMU_COUNTER_MASK(env);
-> >      env->cp15.c9_pminten |= value;
-> >  }
-> >
-> >  static void pmintenclr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-> >                               uint64_t value)
-> >  {
-> > -    value &= (1 << 31);
-> > +    value &= PMU_COUNTER_MASK(env);
-> >      env->cp15.c9_pminten &= ~value;
-> >  }
-> >
-> > --
-> > Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.\nQualcomm Technologies, Inc. is a member of the\nCode Aurora Forum, a Linux Foundation Collaborative Project.
-> 
-> Shouldn't these '\n' in your sig be literal line breaks? :-)
-
-Yes :( ...apparently `git config` doesn't interpret them as I expected.
-
-> thanks
-> -- PMM
-
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 9522d1b..726b151 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -162,7 +162,7 @@ F: disas/microblaze.c
+ 
+ MIPS
+ M: Aurelien Jarno <aurelien@aurel32.net>
+-M: Yongbok Kim <yongbok.kim@imgtec.com>
++M: Yongbok Kim <yongbok.kim@mips.com>
+ S: Maintained
+ F: target/mips/
+ F: hw/mips/
+@@ -623,7 +623,7 @@ S: Maintained
+ F: hw/mips/mips_malta.c
+ 
+ Mipssim
+-M: Yongbok Kim <yongbok.kim@imgtec.com>
++M: Yongbok Kim <yongbok.kim@mips.com>
+ S: Odd Fixes
+ F: hw/mips/mips_mipssim.c
+ F: hw/net/mipsnet.c
+@@ -634,7 +634,7 @@ S: Maintained
+ F: hw/mips/mips_r4k.c
+ 
+ Fulong 2E
+-M: Yongbok Kim <yongbok.kim@imgtec.com>
++M: Yongbok Kim <yongbok.kim@mips.com>
+ S: Odd Fixes
+ F: hw/mips/mips_fulong2e.c
+ 
 -- 
-Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the
-Code Aurora Forum, a Linux Foundation Collaborative Project.
+1.7.1
