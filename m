@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4FgX-00079g-BO
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:24:46 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e4Fru-0008Pz-L9
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:36:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4FgW-0002Mv-IH
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:24:41 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20170922154014.29350-1-f4bug@amsat.org>
-	<20170922160111.31885-5-f4bug@amsat.org>
-	<8a52b6be-ce55-307f-2bba-85858f739210@redhat.com>
-	<72e73fee-0e1e-6988-038d-a9823e7b6d19@amsat.org>
-Message-ID: <222c1152-fecb-f8ca-2714-43bf3678a34c@amsat.org>
-Date: Mon, 16 Oct 2017 21:24:23 -0300
+	(envelope-from <richard.henderson@linaro.org>) id 1e4Frp-0000rK-9T
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:36:26 -0400
+Received: from mail-pg0-x231.google.com ([2607:f8b0:400e:c05::231]:52841)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e4Frp-0000qo-3o
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:36:21 -0400
+Received: by mail-pg0-x231.google.com with SMTP id a192so50217pge.9
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 17:36:20 -0700 (PDT)
+References: <20171013162438.32458-1-alex.bennee@linaro.org>
+	<20171013162438.32458-22-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <4c2bca19-b11d-141f-4c9c-c02c673d3950@linaro.org>
+Date: Mon, 16 Oct 2017 17:36:17 -0700
 MIME-Version: 1.0
-In-Reply-To: <72e73fee-0e1e-6988-038d-a9823e7b6d19@amsat.org>
+In-Reply-To: <20171013162438.32458-22-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 27/34] hw/pci: declare
- pci_nic_init_nofail() in "hw/net/pci.h"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH 21/30] target/arm/translate-a64: add
+ FP16 2-reg misc compare (zero)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +32,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, Jason Wang <jasowang@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-trivial@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-Hi Marcel,
+On 10/13/2017 09:24 AM, Alex Bennée wrote:
+> @@ -7792,7 +7793,7 @@ static void handle_2misc_fcmp_zero(DisasContext *s, int opcode,
+>              swap = true;
+>              /* fall through */
+>          case 0x2c: /* FCMGT (zero) */
+> -            genfn = gen_helper_neon_cgt_f32;
+> +            genfn = hp ? gen_helper_advsimd_cgt_f16 : gen_helper_neon_cgt_f32;
+>              break;
+>          case 0x2d: /* FCMEQ (zero) */
+>              genfn = gen_helper_neon_ceq_f32;
+> @@ -7814,7 +7815,7 @@ static void handle_2misc_fcmp_zero(DisasContext *s, int opcode,
+>          }
+>  
+>          for (pass = 0; pass < maxpasses; pass++) {
+> -            read_vec_element_i32(s, tcg_op, rn, pass, MO_32);
+> +            read_vec_element_i32(s, tcg_op, rn, pass, hp ? MO_16 : MO_32);
+>              if (swap) {
+>                  genfn(tcg_res, tcg_zero, tcg_op, fpst);
+>              } else {
 
->> It seems the patch is doing much more than
->> what is mentioned in the subject.
->>
-[...]
->> Can you add a short explanation on how the split
->> helps removing i386/pc dependency from non-PC world?
->> - it is not straight forward, at least for me.
-> 
-> I thought there was an old dependency on "hw/pci/pci.h" to something
-> from i386/pc, so every machine using a PCI NIC would have this
-> dependency. Extracting the NIC part as "hw/net/pci.h" would solve this
-> issue. I didn't check attentively but it seems I was wrong, so I'll
-> either drop this patch or reword it.
+I don't see a change to maxpasses here.
 
-I finally opted to drop it for this series and include it reworded in
-part 2 which include more PCI-related patches.
 
-Regards,
+>          case 0x2: /* FADD */
+>              gen_helper_advsimd_addh(tcg_res, tcg_op1, tcg_op2, fpst);
+>              break;
+> +        case 0x6: /* FMAX */
+> +            gen_helper_advsimd_maxh(tcg_res, tcg_op1, tcg_op2, fpst);
+> +            break;
+>          case 0x23: /* FMUL */
+>              gen_helper_advsimd_mulh(tcg_res, tcg_op1, tcg_op2, fpst);
+>              break;
 
-Phil.
+Belongs in another patch?
+
+
+r~
