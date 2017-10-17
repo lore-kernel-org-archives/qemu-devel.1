@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e4Txx-0005dk-88
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:39:38 -0400
+	(envelope-from <lersek@redhat.com>) id 1e4U0g-000848-DM
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:42:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e4Txw-0007Hg-3U
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:39:37 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:48839)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e4Txv-0007HW-SZ
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:39:36 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id u5so2155446wrc.5
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 08:39:35 -0700 (PDT)
+	(envelope-from <lersek@redhat.com>) id 1e4U0d-0008GS-Q0
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:42:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44022)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1e4U0d-0008EY-GE
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:42:23 -0400
+References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
+	<1508170976-96869-5-git-send-email-imammedo@redhat.com>
+	<20171016165916.GI3246@localhost.localdomain>
+	<4c14ed02-1f1c-a093-52ac-632f61a68a6f@redhat.com>
+	<20171017144827.GA31897@redhat.com>
+	<1580a018-b395-cc34-5a89-db5872e61dee@redhat.com>
+	<20171017153515.GC31897@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <c9052767-c0c7-7564-db69-bff3470148ac@redhat.com>
+Date: Tue, 17 Oct 2017 17:42:19 +0200
 MIME-Version: 1.0
-In-Reply-To: <20171013142852.916-2-clg@kaod.org>
-References: <20171013142852.916-1-clg@kaod.org>
-	<20171013142852.916-2-clg@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Oct 2017 16:39:14 +0100
-Message-ID: <CAFEAcA-gYYbQu-Nuds3E0Aw7j0OdD5_ySm=EdMb1_FzxEoMTBQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 1/6] aspeed: add support for the
- witherspoon-bmc board
+In-Reply-To: <20171017153515.GC31897@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 4/6] CLI: add -paused option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +33,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, peter.maydell@linaro.org, pkrempa@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, Igor Mammedov <imammedo@redhat.com>, david@gibson.dropbear.id.au
 
-On 13 October 2017 at 15:28, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> The Witherspoon boards are OpenPOWER system hosting POWER9 Processors.
-> Let's add support for their BMC including a couple of I2C devices as
-> found on real HW.
->
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
-> ---
->
->  Changes since v2:
->
->  - removed 'ignore_memory_transaction_failures' flag on the machine.
->    Will require a couple of fixes in the legacy U-Boot accessing wrongly
->    the bss before the DRAM is initialized.
->
->    The HW drops the write access surely because the SMC controller is
->    configured in autoread mode by default. I don't know how to model
->    this behavior in QEMU. I think we would need suppport to boot from
->    a MMIO region.
+On 10/17/17 17:35, Daniel P. Berrange wrote:
+> On Tue, Oct 17, 2017 at 05:21:13PM +0200, Laszlo Ersek wrote:
+>> On 10/17/17 16:48, Daniel P. Berrange wrote:
+>>> On Mon, Oct 16, 2017 at 07:01:01PM +0200, Paolo Bonzini wrote:
+>>>> On 16/10/2017 18:59, Eduardo Habkost wrote:
+>>>>>> +DEF("paused", HAS_ARG, QEMU_OPTION_paused, \
+>>>>>> +    "-paused [state=]postconf|preconf\n"
+>>>>>> +    "                postconf: pause QEMU after machine is initialized\n"
+>>>>>> +    "                preconf: pause QEMU before machine is initialized\n",
+>>>>>> +    QEMU_ARCH_ALL)
+>>>>> I would like to allow pausing before machine-type is selected, so
+>>>>> management could run query-machines before choosing a
+>>>>> machine-type.  Would that need a third "-pause" mode, or will we
+>>>>> be able to change "preconf" to pause before select_machine() is
+>>>>> called?
+>>>>>
+>>>>> The same probably applies to other things initialized before
+>>>>> machine_run_board_init() that could be configurable using QMP,
+>>>>> including but not limited to:
+>>>>> * Accelerator configuration
+>>>>> * Registering global properties
+>>>>> * RAM size
+>>>>> * SMP/CPU configuration
+>>>>
+>>>> Should (or could) "-M none" be changed in a backwards-compatible way to
+>>>> allow such preconfiguration?  For example
+>>>>
+>>>>   qemu -M none -monitor stdio
+>>>>   (qemu) machine-set-options pc,accel=kvm
+>>>>   (qemu) c
+>>>
+>>> Going down this route has pretty major implications for the way libvirt
+>>> manages QEMU, and support / debugging of it. When you look at the QEMU
+>>> command line libvirt uses it will be almost devoid of any useful info.
+>>> So it will be more involved job to figure out just how QEMU is configured.
+>>> This also means it is difficult to replicate the config that libvirt has
+>>> used, outside of libvirt for sake of debugging.
+>>>
+>>> I also think it will have pretty significant performance implications
+>>> for QEMU startup. To configure a guest via the monitor is going to
+>>> require a huge number of monitor commands to be executed to replicate
+>>> what we traditionally configured via ARGV. While each monitor command
+>>> is not massively slow, the round-trip time of each command will quickly
+>>> add up to several 100 milliseconds, perhaps even seconds in the the
+>>> case of very large configs. 
+>>>
+>>> Maybe we ultimately have no choice and this is inevitable, but I am
+>>> pretty wary of going in the direction of launching bare QEMU and
+>>> configuring everything via a huge number of monitor calls.
+>>
+>> Where's the sweet spot between
+>> - configuring everything dynamically, over QMP,
+>> - and invoking QEMU separately, for querying capabilities etc?
+> 
+> The key with the way we currently invoke & query QEMU over QMP to detect
+> capabilities is that this is not tied to a specific VM launch process.
+> We can query capabilities and cache them until such time as we detect
+> a QEMU binary change. So this never impacts on the startup performance
+> of individual VMs. The caching is critical, because querying capabilities
+> is actually quite time intensive already, taking many seconds to query
+> capabilities on all the different target binaries we have.
 
-It is actually possible now -- see hw/ssi/xilinx_spips.c and the
-request_mmio_ptr code. It's a bit experimental at the moment
-though (in particular it breaks migration, a thing which we
-seem to have forgotten to fix for this release cycle :-( )
+(Sorry about hijacking the thread, but I can't stop asking :) )
 
-The other similar thing we have is the flash devices, which
-allow execution, but requires that the guest doesn't try to
-execute at the same time as it's put the flash into
-reads-like-a-device mode.
+This looks very smart -- for my own education, how does libvirtd detect
+a QEMU binary change? Based on executable mtime, size, checksum? Are
+perhaps the <emulator> elements of individual domains involved?
 
-How are you modelling this bit of the address space at the moment?
-A "reads like RAM but writes are ignored" lump of memory is easy...
-
-In any case we can deal with this as a later patchset.
-
-thanks
--- PMM
+Thanks!
+Laszlo
