@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e4Vkb-00055n-OA
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 13:33:59 -0400
+	(envelope-from <alistai@xilinx.com>) id 1e4Vkb-000563-Vo
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 13:34:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e4VkX-0006Ni-Ji
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 13:33:57 -0400
+	(envelope-from <alistai@xilinx.com>) id 1e4VkX-0006O2-Sh
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 13:33:58 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 17 Oct 2017 10:29:58 -0700
-Message-ID: <def1a1e662b4d7856a3e4cae0c291626c7515ff0.1508261326.git.alistair.francis@xilinx.com>
+Date: Tue, 17 Oct 2017 10:29:53 -0700
+Message-ID: <fdad64bee58c8c460542a0316a066daad38d9ae9.1508261326.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1508261326.git.alistair.francis@xilinx.com>
 References: <cover.1508261326.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 7/8] xlnx-zynqmp-pmu: Connect the IPI device
- to the PMU
+Subject: [Qemu-devel] [PATCH v4 5/8] xlnx-zynqmp-pmu: Connect the PMU
+ interrupt controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +27,73 @@ Cc: alistair.francis@xilinx.com, alistair23@gmail.com, qemu-arm@nongnu.org
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
-V4:
- - Move the IPI to the machine instead of the SoC
 
- hw/microblaze/xlnx-zynqmp-pmu.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ hw/microblaze/xlnx-zynqmp-pmu.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
 diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
-index 828eeedc9f..14b8ed4a43 100644
+index c6a0b3b8a1..828eeedc9f 100644
 --- a/hw/microblaze/xlnx-zynqmp-pmu.c
 +++ b/hw/microblaze/xlnx-zynqmp-pmu.c
-@@ -24,6 +24,7 @@
+@@ -24,6 +24,8 @@
  #include "cpu.h"
  #include "boot.h"
  
-+#include "hw/intc/xlnx-zynqmp-ipi.h"
- #include "hw/intc/xlnx-pmu-iomod-intc.h"
- 
- /* Define the PMU device */
-@@ -38,6 +39,15 @@
- 
- #define XLNX_ZYNQMP_PMU_INTC_ADDR   0xFFD40000
- 
-+#define XLNX_ZYNQMP_PMU_NUM_IPIS    4
++#include "hw/intc/xlnx-pmu-iomod-intc.h"
 +
-+static const uint64_t ipi_addr[XLNX_ZYNQMP_PMU_NUM_IPIS] = {
-+    0xFF340000, 0xFF350000, 0xFF360000, 0xFF370000,
-+};
-+static const uint64_t ipi_irq[XLNX_ZYNQMP_PMU_NUM_IPIS] = {
-+    19, 20, 21, 22,
-+};
+ /* Define the PMU device */
+ 
+ #define TYPE_XLNX_ZYNQMP_PMU_SOC "xlnx,zynqmp-pmu-soc"
+@@ -34,14 +36,18 @@
+ #define XLNX_ZYNQMP_PMU_ROM_ADDR    0xFFD00000
+ #define XLNX_ZYNQMP_PMU_RAM_ADDR    0xFFDC0000
+ 
++#define XLNX_ZYNQMP_PMU_INTC_ADDR   0xFFD40000
 +
  typedef struct XlnxZynqMPPMUSoCState {
      /*< private >*/
      DeviceState parent_obj;
-@@ -136,6 +146,9 @@ static void xlnx_zynqmp_pmu_init(MachineState *machine)
-     MemoryRegion *address_space_mem = get_system_memory();
-     MemoryRegion *pmu_rom = g_new(MemoryRegion, 1);
-     MemoryRegion *pmu_ram = g_new(MemoryRegion, 1);
-+    XlnxZynqMPIPI *ipi[XLNX_ZYNQMP_PMU_NUM_IPIS];
-+    qemu_irq irq[32];
-+    int i;
  
-     /* Create the ROM */
-     memory_region_init_rom(pmu_rom, NULL, "xlnx-zynqmp-pmu.rom",
-@@ -155,6 +168,24 @@ static void xlnx_zynqmp_pmu_init(MachineState *machine)
+     /*< public >*/
+     MicroBlazeCPU cpu;
++    XlnxPMUIOIntc intc;
+ }  XlnxZynqMPPMUSoCState;
+ 
++
+ static void xlnx_zynqmp_pmu_soc_init(Object *obj)
+ {
+     XlnxZynqMPPMUSoCState *s = XLNX_ZYNQMP_PMU_SOC(obj);
+@@ -50,6 +56,9 @@ static void xlnx_zynqmp_pmu_soc_init(Object *obj)
+                       TYPE_MICROBLAZE_CPU);
+     object_property_add_child(obj, "pmu-cpu", OBJECT(&s->cpu),
                                &error_abort);
-     object_property_set_bool(OBJECT(pmu), true, "realized", &error_fatal);
++
++    object_initialize(&s->intc, sizeof(s->intc), TYPE_XLNX_PMU_IO_INTC);
++    qdev_set_parent_bus(DEVICE(&s->intc), sysbus_get_default());
+ }
  
-+    for (i = 0; i < 32; i++) {
-+        irq[i] = qdev_get_gpio_in(DEVICE(&pmu->intc), i);
-+    }
+ static void xlnx_zynqmp_pmu_soc_realize(DeviceState *dev, Error **errp)
+@@ -80,6 +89,21 @@ static void xlnx_zynqmp_pmu_soc_realize(DeviceState *dev, Error **errp)
+         error_propagate(errp, err);
+         return;
+     }
 +
-+    /* Create and connect the IPI device */
-+    for (i = 0; i < XLNX_ZYNQMP_PMU_NUM_IPIS; i++) {
-+        ipi[i] = g_new0(XlnxZynqMPIPI, 1);
-+        object_initialize(ipi[i], sizeof(XlnxZynqMPIPI), TYPE_XLNX_ZYNQMP_IPI);
-+        qdev_set_parent_bus(DEVICE(ipi[i]), sysbus_get_default());
++    object_property_set_uint(OBJECT(&s->intc), 0x10, "intc-intr-size",
++                             &error_abort);
++    object_property_set_uint(OBJECT(&s->intc), 0x0, "intc-level-edge",
++                             &error_abort);
++    object_property_set_uint(OBJECT(&s->intc), 0xffff, "intc-positive",
++                             &error_abort);
++    object_property_set_bool(OBJECT(&s->intc), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
 +    }
-+
-+    for (i = 0; i < XLNX_ZYNQMP_PMU_NUM_IPIS; i++) {
-+        object_property_set_bool(OBJECT(ipi[i]), true, "realized",
-+                                 &error_abort);
-+        sysbus_mmio_map(SYS_BUS_DEVICE(ipi[i]), 0, ipi_addr[i]);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(ipi[i]), 0, irq[ipi_irq[i]]);
-+    }
-+
-     /* Load the kernel */
-     microblaze_load_kernel(&pmu->cpu, XLNX_ZYNQMP_PMU_RAM_ADDR,
-                            machine->ram_size,
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->intc), 0, XLNX_ZYNQMP_PMU_INTC_ADDR);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->intc), 0,
++                       qdev_get_gpio_in(DEVICE(&s->cpu), MB_CPU_IRQ));
+ }
+ 
+ static void xlnx_zynqmp_pmu_soc_class_init(ObjectClass *oc, void *data)
 -- 
 2.11.0
