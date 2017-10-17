@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4PwM-0002l4-6Z
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:21:43 -0400
+	(envelope-from <thuth@redhat.com>) id 1e4Q3U-000425-Iz
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:29:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4PwG-00070A-8R
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:21:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39746)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e4PwG-0006zi-1u
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:21:36 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e4PwE-0006IZ-1H
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 11:21:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 08B902E80D3
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 11:21:34 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1e4Q3R-0002uF-El
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:29:04 -0400
+References: <20171004154144.88995-1-pasic@linux.vnet.ibm.com>
+	<20171004154144.88995-3-pasic@linux.vnet.ibm.com>
+	<d6d2d73d-65c9-7ae1-fd37-cb8e304781e7@redhat.com>
+	<7f454872-fae3-35b0-eff4-227b2aa0f77d@linux.vnet.ibm.com>
+	<6c17b274-cd75-7864-94b9-fc8abff1a786@redhat.com>
+	<da4228cb-d32c-dc77-0a80-bac306f07c24@linux.vnet.ibm.com>
+	<0120aa4c-ffce-79c0-8c87-c7c1100232eb@redhat.com>
+	<9d77c8e9-f875-4e42-5306-b847904b4a47@linux.vnet.ibm.com>
+	<39f9e450-d618-6c4d-9401-031c5374ed88@redhat.com>
+	<2b90291e-62a8-964f-286a-d8f1594b2d94@linux.vnet.ibm.com>
+	<0ade56a2-046a-6525-f19d-8febebcfde03@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <eef3b6ca-5d4a-115e-3fad-1a76c00bc3be@redhat.com>
+Date: Tue, 17 Oct 2017 13:28:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 17 Oct 2017 11:13:55 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1723984 <1723984@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150816671920.14146.15870333277151125380.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150823883544.17064.10166905350554900215.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1723984] Re: ID_MMFR0 has an invalid value on
- aarch64 cpu (A57, A53)
+In-Reply-To: <0ade56a2-046a-6525-f19d-8febebcfde03@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 2/8] s390x/css: IO instr
+ handler ending control
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,48 +34,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-QEMU's behaviour in this case is matching the hardware. We claim to
-model an r1p0 (based on the MIDR value we report), and for the r1p0 the
-A53 and A57 reported the ID_MMFR0 as 0x10101105 -- this is documented in
-the TRMs for that rev of the CPUs. r1p3 reports the 0x10201105 you
-describe, but this isn't the rev of the CPU we claim to be.
+On 17.10.2017 13:10, Halil Pasic wrote:
+> 
+> 
+> On 10/12/2017 01:44 PM, Halil Pasic wrote:
+>>
+>>
+>> On 10/12/2017 08:58 AM, Thomas Huth wrote:
+>>> On 10.10.2017 13:41, Halil Pasic wrote:
+> [..]
+>>> So yes, please don't do a "typedef unsigned int IOInstEnding" either. I
+>>> think the best match for QEMU would be a
+>>>
+>>> typedef enum IOInstEnding {
+>>>     CC_...,
+>>>     CC_...,
+>>>     CC_...,
+>>>     CC_...
+>>> } IOInstEnding;
+>>>
+>>
+>> I also prefer this over #define NAME val.
+>>
+> 
+> @Conny @Thomas
+> 
+> I'm almost done with v3, but I've realized we did not agree on the
+> names for the enum constants, so before posting something to ugly
+> again, I would like to inquire your opinion.
+> 
+> My current version of the enum is the following (but I can easily change
+> to whatever you like with sed):
+> 
+> +/*
+> + * IO instructions conclude according this. Currently we have only
+> + * cc codes. Valid values are 0,1,2,3 and the generic semantic for IO instructions
+> + * is described briefly. For more details consult the PoP.
+> + */
+> +typedef enum IOInstEnding {
+> +    IOINST_CC_0 = 0, /* produced expected result */
+> +    IOINST_CC_1 = 1, /* status conditions were present, or alternate result */
+> +    IOINST_CC_2 = 2, /* ineffective, busy with previously initiated function */
+> +    IOINST_CC_3 = 3  /* ineffective, not operational */
+> +} IOInstEnding;
+> +
+> 
+> Alternatives I had in mind are IOINST_CC_0_EXPECTED, IOINST_CC_1_STATUS_PRESENT, 
+> IOINST_CC_2_BUSY, IOINST_CC_3_NOT_OPERATIONAL or the same without the numerical
+> code (e.g. just IONIST_CC_EXPECTED).
 
-In theory we could bump the rXpX but I'm not sure there's much point
-unless it's causing a real problem (we'd need to check what else might
-have changed between the two revisions).
+FWIW, I'd prefer your last suggestion (e.g. IOINST_CC_EXPECTED).
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1723984
-
-Title:
-  ID_MMFR0 has an invalid value on aarch64 cpu (A57, A53)
-
-Status in QEMU:
-  New
-
-Bug description:
-  The ID_MMFR0 register, accessed from aarch64 state as an invalid value:
-  - ARM ARM v8 documentation (D7.2 General system control registers) descri=
-bed bits AuxReg[23:20] to be
-    "In ARMv8-A the only permitted value is 0010"
-  - Cortex A53 and Cortex A57 TRM describe the value to be 0x10201105, so A=
-uxReg[23:20] is 0010 too
-  - in QEMU target/arm/cpu64.c, the relevant value is
-    cpu->id_mmfr0 =3D 0x10101105;
-
-  The 1 should be changed to 2.
-
-  Spotted & Tested on the following qemu revision:
-
-  commit 48ae1f60d8c9a770e6da64407984d84e25253c69
-  Merge: 78b62d3 b867eaa
-  Author: Peter Maydell <peter.maydell@linaro.org>
-  Date:   Mon Oct 16 14:28:13 2017 +0100
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1723984/+subscriptions
+ Thomas
