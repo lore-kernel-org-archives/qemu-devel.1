@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e4JOQ-0008GL-2E
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:15 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e4JOS-0008H0-Kb
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e4JOO-0006rj-Jq
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:14 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e4JOO-0006rS-JD
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:16 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 17 Oct 2017 15:21:21 +1100
-Message-Id: <20171017042152.29443-4-david@gibson.dropbear.id.au>
-In-Reply-To: <20171017042152.29443-1-david@gibson.dropbear.id.au>
-References: <20171017042152.29443-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 03/34] target/ppc: Remove unused PPC 460 and
- 460F definitions
+Date: Tue, 17 Oct 2017 15:21:18 +1100
+Message-Id: <20171017042152.29443-1-david@gibson.dropbear.id.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/34] ppc-for-2.11 queue 20171017
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,247 +21,119 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: ehabkost@redhat.com, agraf@suse.de, imammedo@redhat.com, groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: ehabkost@redhat.com, agraf@suse.de, imammedo@redhat.com, groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Thomas Huth <thuth@redhat.com>
+The following changes since commit c5bbcaa4b7c0f8a322bebe9ec563560178a68b=
+55:
 
-We don't have any 460 or 460F CPUs in QEMU, so the init functions
-are just dead code. Let's simply remove them (translate_init.c
-is already big enough without them).
+  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into stagi=
+ng (2017-10-16 17:29:16 +0100)
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- target/ppc/translate_init.c | 217 --------------------------------------------
- 1 file changed, 217 deletions(-)
+are available in the git repository at:
 
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index c6399a3a0d..0d6379fcc5 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -4176,223 +4176,6 @@ POWERPC_FAMILY(440x5wDFPU)(ObjectClass *oc, void *data)
-                  POWERPC_FLAG_DE | POWERPC_FLAG_BUS_CLK;
- }
- 
--static void init_proc_460 (CPUPPCState *env)
--{
--    /* Time base */
--    gen_tbl(env);
--    gen_spr_BookE(env, 0x000000000000FFFFULL);
--    gen_spr_440(env);
--    gen_spr_usprgh(env);
--    /* Processor identification */
--    spr_register(env, SPR_BOOKE_PIR, "PIR",
--                 SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_pir,
--                 0x00000000);
--    /* XXX : not implemented */
--    spr_register(env, SPR_BOOKE_IAC3, "IAC3",
--                 SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_generic,
--                 0x00000000);
--    /* XXX : not implemented */
--    spr_register(env, SPR_BOOKE_IAC4, "IAC4",
--                 SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_generic,
--                 0x00000000);
--    /* XXX : not implemented */
--    spr_register(env, SPR_BOOKE_DVC1, "DVC1",
--                 SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_generic,
--                 0x00000000);
--    /* XXX : not implemented */
--    spr_register(env, SPR_BOOKE_DVC2, "DVC2",
--                 SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_generic,
--                 0x00000000);
--    /* XXX : not implemented */
--    spr_register(env, SPR_BOOKE_MCSR, "MCSR",
--                 SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_generic,
--                 0x00000000);
--    spr_register(env, SPR_BOOKE_MCSRR0, "MCSRR0",
--                 SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_generic,
--                 0x00000000);
--    spr_register(env, SPR_BOOKE_MCSRR1, "MCSRR1",
--                 SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_generic,
--                 0x00000000);
--    /* XXX : not implemented */
--    spr_register(env, SPR_440_CCR1, "CCR1",
--                 SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_generic,
--                 0x00000000);
--    /* XXX : not implemented */
--    spr_register(env, SPR_DCRIPR, "SPR_DCRIPR",
--                 &spr_read_generic, &spr_write_generic,
--                 &spr_read_generic, &spr_write_generic,
--                 0x00000000);
--    /* Memory management */
--#if !defined(CONFIG_USER_ONLY)
--    env->nb_tlb = 64;
--    env->nb_ways = 1;
--    env->id_tlbs = 0;
--    env->tlb_type = TLB_EMB;
--#endif
--    init_excp_BookE(env);
--    env->dcache_line_size = 32;
--    env->icache_line_size = 32;
--    /* XXX: TODO: allocate internal IRQ controller */
--
--    SET_FIT_PERIOD(12, 16, 20, 24);
--    SET_WDT_PERIOD(20, 24, 28, 32);
--}
--
--POWERPC_FAMILY(460)(ObjectClass *oc, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(oc);
--    PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(oc);
--
--    dc->desc = "PowerPC 460 (guessed)";
--    pcc->init_proc = init_proc_460;
--    pcc->check_pow = check_pow_nocheck;
--    pcc->insns_flags = PPC_INSNS_BASE | PPC_STRING |
--                       PPC_DCR | PPC_DCRX  | PPC_DCRUX |
--                       PPC_WRTEE | PPC_MFAPIDI | PPC_MFTB |
--                       PPC_CACHE | PPC_CACHE_ICBI |
--                       PPC_CACHE_DCBZ | PPC_CACHE_DCBA |
--                       PPC_MEM_TLBSYNC | PPC_TLBIVA |
--                       PPC_BOOKE | PPC_4xx_COMMON | PPC_405_MAC |
--                       PPC_440_SPEC;
--    pcc->msr_mask = (1ull << MSR_POW) |
--                    (1ull << MSR_CE) |
--                    (1ull << MSR_EE) |
--                    (1ull << MSR_PR) |
--                    (1ull << MSR_FP) |
--                    (1ull << MSR_ME) |
--                    (1ull << MSR_FE0) |
--                    (1ull << MSR_DWE) |
--                    (1ull << MSR_DE) |
--                    (1ull << MSR_FE1) |
--                    (1ull << MSR_IR) |
--                    (1ull << MSR_DR);
--    pcc->mmu_model = POWERPC_MMU_BOOKE;
--    pcc->excp_model = POWERPC_EXCP_BOOKE;
--    pcc->bus_model = PPC_FLAGS_INPUT_BookE;
--    pcc->bfd_mach = bfd_mach_ppc_403;
--    pcc->flags = POWERPC_FLAG_CE | POWERPC_FLAG_DWE |
--                 POWERPC_FLAG_DE | POWERPC_FLAG_BUS_CLK;
--}
--
--static void init_proc_460F(CPUPPCState *env)
--{
--    /* Time base */
--    gen_tbl(env);
--    gen_spr_BookE(env, 0x000000000000FFFFULL);
--    gen_spr_440(env);
--    gen_spr_usprgh(env);
--    /* Processor identification */
--    spr_register(env, SPR_BOOKE_PIR, "PIR",
--                 SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_pir,
--                 0x00000000);
--    /* XXX : not implemented */
--    spr_register(env, SPR_BOOKE_IAC3, "IAC3",
--                 SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_generic,
--                 0x00000000);
--    /* XXX : not implemented */
--    spr_register(env, SPR_BOOKE_IAC4, "IAC4",
--                 SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_generic,
--                 0x00000000);
--    /* XXX : not implemented */
--    spr_register(env, SPR_BOOKE_DVC1, "DVC1",
--                 SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_generic,
--                 0x00000000);
--    /* XXX : not implemented */
--    spr_register(env, SPR_BOOKE_DVC2, "DVC2",
--                 SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_generic,
--                 0x00000000);
--    /* XXX : not implemented */
--    spr_register(env, SPR_BOOKE_MCSR, "MCSR",
--                 SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_generic,
--                 0x00000000);
--    spr_register(env, SPR_BOOKE_MCSRR0, "MCSRR0",
--                 SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_generic,
--                 0x00000000);
--    spr_register(env, SPR_BOOKE_MCSRR1, "MCSRR1",
--                 SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_generic,
--                 0x00000000);
--    /* XXX : not implemented */
--    spr_register(env, SPR_440_CCR1, "CCR1",
--                 SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_generic,
--                 0x00000000);
--    /* XXX : not implemented */
--    spr_register(env, SPR_DCRIPR, "SPR_DCRIPR",
--                 &spr_read_generic, &spr_write_generic,
--                 &spr_read_generic, &spr_write_generic,
--                 0x00000000);
--    /* Memory management */
--#if !defined(CONFIG_USER_ONLY)
--    env->nb_tlb = 64;
--    env->nb_ways = 1;
--    env->id_tlbs = 0;
--    env->tlb_type = TLB_EMB;
--#endif
--    init_excp_BookE(env);
--    env->dcache_line_size = 32;
--    env->icache_line_size = 32;
--    /* XXX: TODO: allocate internal IRQ controller */
--
--    SET_FIT_PERIOD(12, 16, 20, 24);
--    SET_WDT_PERIOD(20, 24, 28, 32);
--}
--
--POWERPC_FAMILY(460F)(ObjectClass *oc, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(oc);
--    PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(oc);
--
--    dc->desc = "PowerPC 460F (guessed)";
--    pcc->init_proc = init_proc_460F;
--    pcc->check_pow = check_pow_nocheck;
--    pcc->insns_flags = PPC_INSNS_BASE | PPC_STRING |
--                       PPC_FLOAT | PPC_FLOAT_FRES | PPC_FLOAT_FSEL |
--                       PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
--                       PPC_FLOAT_STFIWX | PPC_MFTB |
--                       PPC_DCR | PPC_DCRX | PPC_DCRUX |
--                       PPC_WRTEE | PPC_MFAPIDI |
--                       PPC_CACHE | PPC_CACHE_ICBI |
--                       PPC_CACHE_DCBZ | PPC_CACHE_DCBA |
--                       PPC_MEM_TLBSYNC | PPC_TLBIVA |
--                       PPC_BOOKE | PPC_4xx_COMMON | PPC_405_MAC |
--                       PPC_440_SPEC;
--    pcc->msr_mask = (1ull << MSR_POW) |
--                    (1ull << MSR_CE) |
--                    (1ull << MSR_EE) |
--                    (1ull << MSR_PR) |
--                    (1ull << MSR_FP) |
--                    (1ull << MSR_ME) |
--                    (1ull << MSR_FE0) |
--                    (1ull << MSR_DWE) |
--                    (1ull << MSR_DE) |
--                    (1ull << MSR_FE1) |
--                    (1ull << MSR_IR) |
--                    (1ull << MSR_DR);
--    pcc->mmu_model = POWERPC_MMU_BOOKE;
--    pcc->excp_model = POWERPC_EXCP_BOOKE;
--    pcc->bus_model = PPC_FLAGS_INPUT_BookE;
--    pcc->bfd_mach = bfd_mach_ppc_403;
--    pcc->flags = POWERPC_FLAG_CE | POWERPC_FLAG_DWE |
--                 POWERPC_FLAG_DE | POWERPC_FLAG_BUS_CLK;
--}
--
- static void init_proc_MPC5xx(CPUPPCState *env)
- {
-     /* Time base */
--- 
-2.13.6
+  git://github.com/dgibson/qemu.git tags/ppc-for-2.11-20171017
+
+for you to fetch changes up to e7cca3e94f7595b7b5a493a87146e782831611d7:
+
+  spapr_cpu_core: rewrite machine type sanity check (2017-10-17 10:34:01 =
++1100)
+
+----------------------------------------------------------------
+ppc patch queue 2017-10-17
+
+Here's the currently accumulated set of ppc patches for qemu.
+
+  * The biggest set here is the ppc parts of Igor Mammedov's cleanups
+    to cpu model handling
+  * The above also includes a generic patches which are required as
+    prerequisites for the ppc parts.  They don't seem to have been
+    merged by Eduardo yet, so I hope they're ok to include here.
+  * Apart from that it's basically just assorted bug fixes and cleanups
+
+----------------------------------------------------------------
+Daniel Henrique Barboza (1):
+      hw/ppc/spapr.c: abort unplug_request if previous unplug isn't done
+
+David Gibson (2):
+      target/ppc: Add POWER9 DD2.0 model information
+      spapr: Correct RAM size calculation for HPT resizing
+
+Greg Kurz (5):
+      hw/ppc: use 0 instead of fdt_path_offset(fdt, "/")
+      spapr: fix OF word name in comment
+      spapr: sanity check size of the CAS buffer
+      spapr_pci: fail gracefully with non-pseries machine types
+      spapr_cpu_core: rewrite machine type sanity check
+
+Igor Mammedov (23):
+      qom: introduce type_register_static_array()
+      qom: add helper macro DEFINE_TYPES()
+      ppc: mpc8544ds/e500plat: use generic cpu_model parsing
+      ppc: mac_newworld: use generic cpu_model parsing
+      ppc: mac_oldworld: use generic cpu_model parsing
+      ppc: bamboo: use generic cpu_model parsing
+      ppc: replace cpu_model with cpu_type on ref405ep,taihu boards
+      ppc: virtex-ml507: replace cpu_model with cpu_type
+      ppc: 40p/prep: replace cpu_model with cpu_type
+      ppc: spapr: replace ppc_cpu_parse_features() with cpu_parse_cpu_mod=
+el()
+      ppc: move '-cpu foo,compat=3Dxxx' parsing into ppc_cpu_parse_featur=
+estr()
+      ppc: spapr: define core types statically
+      ppc: spapr: use cpu type name directly
+      ppc: spapr: register 'host' core type along with the rest of core t=
+ypes
+      ppc: spapr: use cpu model names as tcg defaults instead of aliases
+      ppc: move ppc_cpu_lookup_alias() before its first user
+      ppc: spapr: use generic cpu_model parsing
+      ppc: pnv: use generic cpu_model parsing
+      ppc: pnv: normalize core/chip type names
+      ppc: pnv: drop PnvCoreClass::cpu_oc field
+      ppc: pnv: define core types statically
+      ppc: pnv: drop PnvChipClass::cpu_model field
+      ppc: pnv: consolidate type definitions and batch register them
+
+Mark Cave-Ayland (1):
+      macio: add missing registers to VMStateDescription
+
+Sandipan Das (1):
+      target/ppc: Fix carry flag setting for shift algebraic instructions
+
+Thomas Huth (1):
+      target/ppc: Remove unused PPC 460 and 460F definitions
+
+ hw/ide/macio.c                  |   4 +-
+ hw/ppc/e500.c                   |   8 +-
+ hw/ppc/e500plat.c               |   1 +
+ hw/ppc/mac_newworld.c           |  15 +--
+ hw/ppc/mac_oldworld.c           |   6 +-
+ hw/ppc/mpc8544ds.c              |   2 +
+ hw/ppc/pnv.c                    | 134 ++++++++-----------
+ hw/ppc/pnv_core.c               |  67 +++++-----
+ hw/ppc/ppc.c                    |  25 ----
+ hw/ppc/ppc405_uc.c              |   6 +-
+ hw/ppc/ppc440_bamboo.c          |   7 +-
+ hw/ppc/ppc4xx_devs.c            |   4 +-
+ hw/ppc/prep.c                   |  12 +-
+ hw/ppc/spapr.c                  |  51 ++++---
+ hw/ppc/spapr_cpu_core.c         | 196 ++++++++-------------------
+ hw/ppc/spapr_hcall.c            |   4 +-
+ hw/ppc/spapr_pci.c              |  12 +-
+ hw/ppc/virtex_ml507.c           |  11 +-
+ include/hw/ppc/pnv.h            |  12 +-
+ include/hw/ppc/pnv_core.h       |   4 +-
+ include/hw/ppc/ppc.h            |   2 -
+ include/hw/ppc/spapr.h          |   2 -
+ include/hw/ppc/spapr_cpu_core.h |   7 +-
+ include/qom/object.h            |  46 +++++++
+ qom/object.c                    |   9 ++
+ target/ppc/cpu-models.c         |   6 +-
+ target/ppc/cpu-models.h         |   1 +
+ target/ppc/cpu-qom.h            |   1 +
+ target/ppc/cpu.h                |   1 -
+ target/ppc/int_helper.c         |  16 +--
+ target/ppc/kvm.c                |  22 ++--
+ target/ppc/translate.c          |  12 ++
+ target/ppc/translate_init.c     | 286 +++++++++-------------------------=
+------
+ 33 files changed, 378 insertions(+), 614 deletions(-)
