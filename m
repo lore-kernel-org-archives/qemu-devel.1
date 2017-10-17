@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e4TUc-0007tC-Dc
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:09:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e4TUo-00080k-W8
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:09:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e4TUY-0005r2-9w
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:09:18 -0400
-Date: Tue, 17 Oct 2017 17:09:09 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171017170909.0816a4c7.cohuck@redhat.com>
-In-Reply-To: <20171017140453.51099-6-pasic@linux.vnet.ibm.com>
-References: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
-	<20171017140453.51099-6-pasic@linux.vnet.ibm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1e4TUi-00063z-W8
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:09:30 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:43685)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e4TUi-00063E-QK
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:09:24 -0400
+Received: by mail-wr0-x231.google.com with SMTP id p46so2047837wrb.0
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 08:09:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] s390x: refactor error handling for
- CSCH handler
+In-Reply-To: <1506737310-21880-1-git-send-email-alindsay@codeaurora.org>
+References: <1506737310-21880-1-git-send-email-alindsay@codeaurora.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Oct 2017 16:09:02 +0100
+Message-ID: <CAFEAcA_f=7XjUs7BNQksidnBKofc8SxYtfjMtmfYMuPeo8NXug@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 00/13] More fully implement ARM PMUv3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,106 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: Aaron Lindsay <alindsay@codeaurora.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Peter Crosthwaite <peter.crosthwaite@xilinx.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-On Tue, 17 Oct 2017 16:04:51 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+On 30 September 2017 at 03:08, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+> The ARM PMU implementation currently contains a basic cycle counter, but it is
+> often useful to gather counts of other events and filter them based on
+> execution mode. These patches flesh out the implementations of various PMU
+> registers including PM[X]EVCNTR and PM[X]EVTYPER, add a struct definition to
+> represent arbitrary counter types, implement mode filtering, and add
+> instruction, cycle, and software increment events.
+>
+> I am particularly interested in feedback on the following two patches because I
+> think I'm likely Doing It Wrong:
+>  [1] target/arm: Filter cycle counter based on PMCCFILTR_EL0
+>  [2] target/arm: PMU: Add instruction and cycle events
+>
+> In order to implement mode filtering in an event-driven way, [1] adds a pair of
+> calls to pmu_sync() surrounding every update to a register/variable which may
+> affect whether any counter is currently filtered. These pmu_sync() calls
+> ultimately call cpu_get_icount_raw() for enabled instruction and cycle counters
+> when using icount. Unfortunately, cpu->can_do_io may otherwise be zero for
+> these calls so the current implementation in [2] temporarily sets can_do_io to
+> 1. I haven't see any ill side effects from this in my testing, but it doesn't
+> seem like the right way to handle this.
 
-> Simplify the error handling of the cSCH.  Let the code detecting the
+I've now reviewed the early stuff and provided what I hope is
+a useful direction for the mode-filtering, so I'm not going to
+look at the patches at the tail end on this version of the series.
 
-s/cSCH/CSCH/
 
-> condition tell (in a less ambiguous way) how it's to be handled. No
-> changes in behavior.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> ---
->  hw/s390x/css.c         | 12 +++---------
->  include/hw/s390x/css.h |  2 +-
->  target/s390x/ioinst.c  | 14 ++++----------
->  3 files changed, 8 insertions(+), 20 deletions(-)
+> I would like to eventually add sending interrupts on counter overflow.
+> Suggestions for the best direction to handle this are most welcome.
 
-Looks sane (quoting the whole mail for the benefit of the qemu-s390x list).
+Check out how the helper.c timer interrupts are wired up
+(the CPU object exposes outbound irq lines, which then get
+wired up by the board to the GIC.)
 
-> 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 1b3be7729d..9935d48b72 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -1435,26 +1435,20 @@ IOInstEnding css_do_xsch(SubchDev *sch)
->      return IOINST_CC_EXPECTED;
->  }
->  
-> -int css_do_csch(SubchDev *sch)
-> +IOInstEnding css_do_csch(SubchDev *sch)
->  {
->      SCSW *s = &sch->curr_status.scsw;
->      PMCW *p = &sch->curr_status.pmcw;
-> -    int ret;
->  
->      if (~(p->flags) & (PMCW_FLAGS_MASK_DNV | PMCW_FLAGS_MASK_ENA)) {
-> -        ret = -ENODEV;
-> -        goto out;
-> +        return IOINST_CC_NOT_OPERATIONAL;
->      }
->  
->      /* Trigger the clear function. */
->      s->ctrl &= ~(SCSW_CTRL_MASK_FCTL | SCSW_CTRL_MASK_ACTL);
->      s->ctrl |= SCSW_FCTL_CLEAR_FUNC | SCSW_ACTL_CLEAR_PEND;
->  
-> -    do_subchannel_work(sch);
-> -    ret = 0;
-> -
-> -out:
-> -    return ret;
-> +    return do_subchannel_work(sch);
->  }
->  
->  int css_do_hsch(SubchDev *sch)
-> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-> index 3c319c9096..f38c59c9b7 100644
-> --- a/include/hw/s390x/css.h
-> +++ b/include/hw/s390x/css.h
-> @@ -241,7 +241,7 @@ int css_do_stsch(SubchDev *sch, SCHIB *schib);
->  bool css_schid_final(int m, uint8_t cssid, uint8_t ssid, uint16_t schid);
->  int css_do_msch(SubchDev *sch, const SCHIB *schib);
->  IOInstEnding css_do_xsch(SubchDev *sch);
-> -int css_do_csch(SubchDev *sch);
-> +IOInstEnding css_do_csch(SubchDev *sch);
->  int css_do_hsch(SubchDev *sch);
->  IOInstEnding css_do_ssch(SubchDev *sch, ORB *orb);
->  int css_do_tsch_get_irb(SubchDev *sch, IRB *irb, int *irb_len);
-> diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
-> index 4ad07e9181..fd659e77a5 100644
-> --- a/target/s390x/ioinst.c
-> +++ b/target/s390x/ioinst.c
-> @@ -60,8 +60,6 @@ void ioinst_handle_csch(S390CPU *cpu, uint64_t reg1)
->  {
->      int cssid, ssid, schid, m;
->      SubchDev *sch;
-> -    int ret = -ENODEV;
-> -    int cc;
->  
->      if (ioinst_disassemble_sch_ident(reg1, &m, &cssid, &ssid, &schid)) {
->          program_interrupt(&cpu->env, PGM_OPERAND, 4);
-> @@ -69,15 +67,11 @@ void ioinst_handle_csch(S390CPU *cpu, uint64_t reg1)
->      }
->      trace_ioinst_sch_id("csch", cssid, ssid, schid);
->      sch = css_find_subch(m, cssid, ssid, schid);
-> -    if (sch && css_subch_visible(sch)) {
-> -        ret = css_do_csch(sch);
-> -    }
-> -    if (ret == -ENODEV) {
-> -        cc = 3;
-> -    } else {
-> -        cc = 0;
-> +    if (!sch || !css_subch_visible(sch)) {
-> +        setcc(cpu, 3);
-> +        return;
->      }
-> -    setcc(cpu, cc);
-> +    setcc(cpu, css_do_csch(sch));
->  }
->  
->  void ioinst_handle_hsch(S390CPU *cpu, uint64_t reg1)
+thanks
+-- PMM
