@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e4O4y-0002gc-5P
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:22:29 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e4O8G-0003Vm-TR
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:25:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1e4O4u-0006Ne-UF
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:22:28 -0400
-References: <20171016202358.3633-1-david@redhat.com>
-	<20171017104725.14971395.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <07afc056-4a03-3644-d665-c165830776ba@redhat.com>
-Date: Tue, 17 Oct 2017 11:22:19 +0200
+	(envelope-from <imammedo@redhat.com>) id 1e4O8B-0007tX-SL
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:25:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48576)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e4O8B-0007tC-M4
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:25:47 -0400
+Date: Tue, 17 Oct 2017 11:25:43 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20171017112543.7acfdc6e@nial.brq.redhat.com>
+In-Reply-To: <32f5d2bc-cf8f-727b-67bc-9611e9b6f7d0@redhat.com>
+References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
+	<1508170976-96869-5-git-send-email-imammedo@redhat.com>
+	<20171016165916.GI3246@localhost.localdomain>
+	<4c14ed02-1f1c-a093-52ac-632f61a68a6f@redhat.com>
+	<20171016171752.GK3246@localhost.localdomain>
+	<32f5d2bc-cf8f-727b-67bc-9611e9b6f7d0@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171017104725.14971395.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 0/2] s390x/tcg: LAP support using
- immediate TLB invalidation
+Subject: Re: [Qemu-devel] [RFC 4/6] CLI: add -paused option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com, pkrempa@redhat.com, david@gibson.dropbear.id.au, peter.maydell@linaro.org, cohuck@redhat.com
 
-On 17.10.2017 10:47, Cornelia Huck wrote:
-> On Mon, 16 Oct 2017 22:23:56 +0200
-> David Hildenbrand <david@redhat.com> wrote:
+On Tue, 17 Oct 2017 10:47:40 +0200
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+
+> On 16/10/2017 19:17, Eduardo Habkost wrote:
+> >> Should (or could) "-M none" be changed in a backwards-compatible way to
+> >> allow such preconfiguration?  For example
+> >>
+> >>   qemu -M none -monitor stdio
+> >>   (qemu) machine-set-options pc,accel=kvm
+> >>   (qemu) c  
+> > Sounds like an interesting idea.  It would require ensuring it's
+> > really safe to destroy current_machine/accel (and other global
+> > state) and replace them with another object on the fly (which is
+> > probably a nice goal by itself).  
 > 
->> Details about Low-Address Protection can be found in description of
->> patch 1 and 2. It is basically a subpage protection of the first two
->> pages of every address space (for which it is enabled).
->>
->> We can achieve this by simply directly invalidating the TLB entry and
->> therefore forcing every write accesses onto these two pages into the slow
->> path.
->>
->> With this patch, I can boot Linux just fine (which uses LAP). This also
->> makes all related kvm-unit-tests that we have pass.
-> 
-> Tested with a kernel based on the s390/features branch (4.14-rc2 + s390
-> patches) and the initrd from the debian installer, had udevd shot down
-> by the oomkiller. That happened only once, so it was probably an
-> unrelated fluke, but that combination worked well before.
-> 
+> It is but, alternatively, you could delay creating the "none" machine
+> until the last second.  The important part, in my opinion, is having a
+> good command-line interface that we can freeze even if the
+> implementation below leaves something to be desired.
+I sort of don't get how '-M none' could be used to build usable
+machine (at least currently).
 
-Very unlikely, on invalid programming exceptions you would get a kernel
-panic, not run oom. (not saying it isn't possible, rather that it is
-very unlikely).
+Do we really need "-M none" for dynamic configuration?
+I'd imagine doing following instead:
+  qemu -monitor stdio -dynconfig
+  (qemu) query-machines
+  ...
+  (qemu) set-option machine pc,accel=kvm
+    # machine object is created
+  (qemu) set-option smp 1,maxcpus
+  (qemu) info hotpluggable-cpus
+  ...
+  (qemu) set-option numa node
+  (qemu) set-option numa cpu,node-id=0,socket=0
+  (qemu) set-option numa cpu,node-id=0,socket=1
+  (qemu) c
 
-Can you reproduce with more memory? Have you enabled SMP? (little higher
-memory consumption)
-
-I am running (almost) the same setup with 500M and haven't observed any
-such thing.
-
-> [More config data + logs available on request.]
-
-Can you send via (private) mail? I can have a look.
-
-Thanks for testing!
-
--- 
-
-Thanks,
-
-David
+I'd start to make it working from 'info hotpluggable-cpus'
+as it's close to my current project of making cpu-hotplug/numa
+working nice together and we can expand the same interface to work
+at earlier stages on top of that.
