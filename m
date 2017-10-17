@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1e4GlC-0002jG-24
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 21:33:34 -0400
+	(envelope-from <bounces@canonical.com>) id 1e4H1x-0005ZC-82
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 21:50:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1e4Gl8-0000Sn-4f
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 21:33:34 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2326)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1e4Gl7-0000Rw-Hu
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 21:33:30 -0400
-References: <8ba7e693-4e32-7873-70bf-4efbf57f9cf5@huawei.com>
-	<20170928011407-mutt-send-email-mst@kernel.org>
-	<405bbc99-1a43-aa8b-37e9-9599480f4c06@huawei.com>
-	<20171001063010-mutt-send-email-mst@kernel.org>
-	<49d576f3-454f-05f4-7afd-9ca8b5fb0706@huawei.com>
-	<20171016113324.14e549c9@nial.brq.redhat.com>
-	<0184EA26B2509940AA629AE1405DD7F2016994E5@DGGEMA503-MBX.china.huawei.com>
-	<59E4E57D.4040304@arm.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <496857a4-9333-02d1-1b31-b71b9332872e@huawei.com>
-Date: Tue, 17 Oct 2017 09:31:55 +0800
+	(envelope-from <bounces@canonical.com>) id 1e4H1u-0007Z7-5v
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 21:50:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51798)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e4H1t-0007YG-VI
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 21:50:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e4H1q-0000m5-Ii
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 01:50:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 774142E80D2
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 01:50:46 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <59E4E57D.4040304@arm.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] using which notification for guest about GHES error
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 17 Oct 2017 01:41:51 -0000
+From: chan <1723927@bugs.launchpad.net>
+Reply-To: Bug 1723927 <1723927@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150815318241.964.13154685786789289008.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150820451124.22560.1050810124037583805.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1723927] Re: Linux or windows guest boot failed
+ by uefi on CPU of Intel Xeon X5675
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,28 +37,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: James Morse <james.morse@arm.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Wuquanming <wuquanming@huawei.com>, Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Huangshaoyu <huangshaoyu@huawei.com>, Andrew Jones <drjones@redhat.com>
+To: qemu-devel@nongnu.org
 
-Hi James,
+Ersek, thank you very much!
 
-On 2017/10/17 0:59, James Morse wrote:
->>> Do we really care about old guests in this case?
-> I think the scenario here is the host kernel has some RAS support, Qemu has RAS
-> support and has advertised its CPER regions via the HEST, but the guest doesn't
-> doesn't support RAS. (booted via DT, wasn't configured for APEI, the kernel
-> pre-dates the support etc).
-> 
-> What should Qemu do in response to 'action optional' memory errors?
-> 
-> My suggestion is whatever action Qemu takes, it shouldn't kill a guest that
-> doesn't support RAS. Using NOTIFY_SEI for an action-optional memory error will
-> do this. A guest that doesn't know about NOTIFY_SEI will take this as a fatal
-> SError.
+I set up correctly in "/etc/libvirt/qemu.conf", so command
+-bios /usr/share/qemu-kvm/OVMF_CODE.fd
+also boot UEFI guest.
 
-In short, if for this purpose, I think NOTIFY_GPIO meets the requirement, which will not kill a guest which does not
-support RAS, and keep the ACPI the spec, so I suggestion using NOTIFY_GPIO to 'action
-optional' memory errors
+Current, my question only in the platform in server of ProLiant BL460c G7, =
 
-> 
-> 
+the same ovmf firmware.
+
+How can capture the OVMF debug log?
+I use your advise, open ovmf debug in guest xml:
+<qemu:commandline>
+    <qemu:arg value=3D'-global'/>
+    <qemu:arg value=3D'isa-debugcon.iobase=3D0x402'/>
+    <qemu:arg value=3D'-debugcon'/>
+    <qemu:arg value=3D'file:/tmp/GUEST_NAME.log'/>
+  </qemu:commandline>
+but nothing output in /tmp/GUEST_NAME.log.
+Another, I used debug version ovmf.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1723927
+
+Title:
+  Linux or windows guest boot failed by uefi  on CPU of  Intel Xeon
+  X5675
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+
+  I started windows server 2012 DC or redhat7.0, but boot failed by UEFI, a=
+nd start process stop on
+  "TianoCore" image by looking at VNCviewer.
+
+  VM using the command:(redhat7.0)
+  /usr/bin/kvm -name guest=3Dytest,debug-threads=3Don -S -object secret,id=
+=3DmasterKey0,format=3Draw,file=3D/run/lib/libvirt/qemu/domain-40-ytest/mas=
+ter-key.aes -machine pc-i440fx-2.7,accel=3Dkvm,usb=3Doff,system=3Dwindows,d=
+ump-guest-core=3Doff -bios /usr/share/qemu-kvm/OVMF_CODE.fd -m size=3D83886=
+08k,slots=3D10,maxmem=3D34359738368k -realtime mlock=3Doff -smp 1,maxcpus=
+=3D24,sockets=3D24,cores=3D1,threads=3D1 -numa node,nodeid=3D0,cpus=3D0-23,=
+mem=3D8192 -uuid 8cf40bd6-258a-4550-ba4e-b38230547a11 -no-user-config -node=
+faults -chardev socket,id=3Dcharmonitor,path=3D/run/lib/libvirt/qemu/domain=
+-40-ytest/monitor.sock,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonito=
+r,mode=3Dcontrol -chardev socket,id=3Dcharmonitor_cas,path=3D/run/lib/libvi=
+rt/qemu/domain-40-ytest/monitor.sock.cas,server,nowait -mon chardev=3Dcharm=
+onitor_cas,id=3Dmonitor_cas,mode=3Dcontrol -rtc base=3Dutc -no-shutdown -gl=
+obal PIIX4_PM.disable_s3=3D1 -global PIIX4_PM.disable_s4=3D1 -boot strict=
+=3Don -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -device us=
+b-ehci,id=3Dusb1,bus=3Dpci.0,addr=3D0x3 -device nec-usb-xhci,id=3Dusb2,bus=
+=3Dpci.0,addr=3D0x4 -device virtio-scsi-pci,id=3Dscsi1,bus=3Dpci.0,addr=3D0=
+x6 -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x7 -de=
+vice usb-hub,id=3Dhub0,bus=3Dusb.0,port=3D1 -drive file=3D/vms/hw235/ytest,=
+format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cache=3Ddirectsync,aio=3Dn=
+ative -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x8,pci_hotplugg=
+able=3Don,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -drive=
+ if=3Dnone,id=3Ddrive-fdc0-0-0,readonly=3Don -global isa-fdc.driveA=3Ddrive=
+-fdc0-0-0 -global isa-fdc.bootindexA=3D2 -netdev tap,fd=3D48,id=3Dhostnet0,=
+vhost=3Don,vhostfd=3D50 -device virtio-net-pci,pci_hotpluggable=3Don,netdev=
+=3Dhostnet0,id=3Dnet0,mac=3D0c:da:41:1d:67:6f,bus=3Dpci.0,addr=3D0x5,bootin=
+dex=3D4 -chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharseri=
+al0,id=3Dserial0 -chardev socket,id=3Dcharchannel0,path=3D/var/lib/libvirt/=
+qemu/ytest.agent,server,nowait -device virtserialport,bus=3Dvirtio-serial0.=
+0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0=
+ -vnc 0.0.0.0:9 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -devi=
+ce virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x9 -msg timestamp=
+=3Don
+
+  qemu version: 2.7.1
+  edk2 version: git://git.code.sf.net/p/tianocore/edk2.git, commit: cc0b456=
+a05f8dd1ebfb9be485465be37e96999e7
+  server: ProLiant BL460c G7, CPU: Intel(R) Xeon(R) CPU X5675  @ 3.07GHz
+
+  Another, last version of edk2(compiled by myself) start guest is
+  failed, too. But r15214 of edk2 start guest is ok(Download from
+  http://sourceforge.net/projects/edk2/files/OVMF/, OVMF-X64-r15214.zip)
+
+  Thanks in Advance
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1723927/+subscriptions
