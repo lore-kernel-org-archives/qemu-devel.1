@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linuc.decode@gmail.com>) id 1e4TSE-0006FT-AH
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:06:56 -0400
+	(envelope-from <cohuck@redhat.com>) id 1e4TTQ-0006yh-Jv
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:08:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linuc.decode@gmail.com>) id 1e4TS8-0004RN-4J
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:06:50 -0400
-Date: Tue, 17 Oct 2017 20:36:18 +0530
-From: Linu Cherian <linuc.decode@gmail.com>
-Message-ID: <20171017150618.GA6575@virtx40>
-References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
-	<1504286483-23327-20-git-send-email-eric.auger@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1e4TTP-0005H0-Gj
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:08:04 -0400
+Date: Tue, 17 Oct 2017 17:07:58 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20171017170758.498f72d2.cohuck@redhat.com>
+In-Reply-To: <20171017140453.51099-5-pasic@linux.vnet.ibm.com>
+References: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
+	<20171017140453.51099-5-pasic@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1504286483-23327-20-git-send-email-eric.auger@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v7 19/20] hw/arm/smmuv3: [not
- for upstream] add SMMU_CMD_TLBI_NH_VA_AM handling
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 4/7] s390x: refactor error handling for
+ XSCH handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,122 +24,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, prem.mallappa@gmail.com, alex.williamson@redhat.com, mohun106@gmail.com, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mst@redhat.com, jean-philippe.brucker@arm.com, tn@semihalf.com, will.deacon@arm.com, robin.murphy@arm.com, peterx@redhat.com, bharat.bhushan@nxp.com, christoffer.dall@linaro.org, wtownsen@redhat.com, linu.cherian@cavium.com
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-Hi Eric,
+On Tue, 17 Oct 2017 16:04:50 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-On Fri Sep 01, 2017 at 07:21:22PM +0200, Eric Auger wrote:
-> SMMUV3 does not support any IOVA range TLBI command:
-> SMMU_CMD_TLBI_NH_VA invalidates TLB entries by page.
-> That's an issue when running DPDK on guest. DPDK uses
-> hugepages but each time a hugepage is mapped on guest side,
-> a storm of SMMU_CMD_TLBI_NH_VA commands get sent by the
-> guest smmuv3 driver and trapped by QEMU for VFIO replay.
+> Simplify the error handling of the XSCH.  Let the code detecting the
+> condition tell (in a less ambiguous way) how it's to be handled. No
+> changes in behavior.
 > 
-> Let's get prepared to handle implementation defined commands,
-> SMMU_CMD_TLBI_NH_VA_VM, which invalidate a range of IOVAs.
-> 
-> Upon this command, we notify the whole range in one host.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 > ---
->  hw/arm/smmuv3-internal.h |  1 +
->  hw/arm/smmuv3.c          | 13 +++++++++++++
->  hw/arm/trace-events      |  1 +
->  3 files changed, 15 insertions(+)
+>  hw/s390x/css.c         | 17 +++++------------
+>  include/hw/s390x/css.h |  2 +-
+>  target/s390x/ioinst.c  | 23 ++++-------------------
+>  3 files changed, 10 insertions(+), 32 deletions(-)
+
+Looks sane (quoting the whole mail for the benefit of the qemu-s390x list).
+
 > 
-> diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
-> index f9f95ae..e70cf76 100644
-> --- a/hw/arm/smmuv3-internal.h
-> +++ b/hw/arm/smmuv3-internal.h
-> @@ -289,6 +289,7 @@ enum {
->      SMMU_CMD_RESUME          = 0x44,
->      SMMU_CMD_STALL_TERM,
->      SMMU_CMD_SYNC,          /* 0x46 */
-> +    SMMU_CMD_TLBI_NH_VA_AM   = 0x8F, /* VIOMMU Impl Defined */
->  };
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index ff5a05c34b..1b3be7729d 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -1402,20 +1402,17 @@ out:
+>      return ret;
+>  }
 >  
->  static const char *cmd_stringify[] = {
-> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-> index 9c8640f..55dc80b 100644
-> --- a/hw/arm/smmuv3.c
-> +++ b/hw/arm/smmuv3.c
-> @@ -880,6 +880,19 @@ static int smmuv3_cmdq_consume(SMMUV3State *s)
->              smmuv3_replay_iova_range(&s->smmu_state, addr, size);
->              break;
->          }
-> +        case SMMU_CMD_TLBI_NH_VA_AM:
-> +        {
-> +            int asid = extract32(cmd.word[1], 16, 16);
-> +            int am = extract32(cmd.word[1], 0, 16);
-> +            uint64_t low = extract32(cmd.word[2], 12, 20);
-> +            uint64_t high = cmd.word[3];
-> +            uint64_t addr = high << 32 | (low << 12);
-> +            size_t size = am << 12;
-> 
-
-
-While testing dpdk, observed that there are map requests coming to 
-arm smmuv3 driver with size greater than 256M. Since the current 
-code supports only 256M( 16 + 12 bits), had to abuse the asid field
-to pass the extra bits for address mask to get things working.
-
-diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-index 04e2d75..51b1d07 100644
---- a/drivers/iommu/arm-smmu-v3.c
-+++ b/drivers/iommu/arm-smmu-v3.c
-@@ -1418,7 +1418,10 @@ static void arm_smmu_tlb_inv_range_nosync(unsigned long iova, size_t size,
-                if (smmu->options & ARM_SMMU_OPT_TLBI_ON_MAP) {
-                        cmd.opcode      = CMDQ_OP_TLBI_NH_VA_AM;
-                        cmd.tlbi.am   = size >> 12;
-+                       cmd.tlbi.asid = size >> 28;
-                        granule = size;
-
-
-On Qemu side,
-
-  if (cfg.disabled || cfg.bypassed) {
-@@ -884,12 +899,15 @@ static int smmuv3_cmdq_consume(SMMUV3State *s)
-         case SMMU_CMD_TLBI_NH_VA_AM:
-         {
-             int asid = extract32(cmd.word[1], 16, 16);
-             int am = extract32(cmd.word[1], 0, 16);
-             uint64_t low = extract32(cmd.word[2], 12, 20);
-             uint64_t high = cmd.word[3];
-             uint64_t addr = high << 32 | (low << 12);
-             size_t size = am << 12;
- 
-+           am = am | asid << 16;
-+           size = am << 12;        
-+
-
-
-
-+
-> +            trace_smmuv3_cmdq_tlbi_nh_va_am(asid, am, addr, size);
-> +            smmuv3_replay_iova_range(&s->smmu_state, addr, size);
-> +            break;
-> +        }
->          case SMMU_CMD_TLBI_NH_VAA:
->          case SMMU_CMD_TLBI_EL3_ALL:
->          case SMMU_CMD_TLBI_EL3_VA:
-> diff --git a/hw/arm/trace-events b/hw/arm/trace-events
-> index 15f84d6..fba33ac 100644
-> --- a/hw/arm/trace-events
-> +++ b/hw/arm/trace-events
-> @@ -26,6 +26,7 @@ smmuv3_cmdq_opcode(const char *opcode) "<--- %s"
->  smmuv3_cmdq_cfgi_ste(int streamid) "     |_ streamid =%d"
->  smmuv3_cmdq_cfgi_ste_range(int start, int end) "     |_ start=0x%d - end=0x%d"
->  smmuv3_cmdq_tlbi_nh_va(int asid, int vmid, uint64_t addr) "     |_ asid =%d vmid =%d addr=0x%"PRIx64
-> +smmuv3_cmdq_tlbi_nh_va_am(int asid, int am, size_t size, uint64_t addr) "     |_ asid =%d am =%d size=0x%lx addr=0x%"PRIx64
->  smmuv3_cmdq_consume_out(uint8_t prod_wrap, uint32_t prod, uint8_t cons_wrap, uint32_t cons) "prod_wrap:%d, prod:0x%x cons_wrap:%d cons:0x%x"
->  smmuv3_update(bool is_empty, uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "q empty:%d prod:%d cons:%d p.wrap:%d p.cons:%d"
->  smmuv3_update_check_cmd(int error) "cmdq not enabled or error :0x%x"
-> -- 
-> 2.5.5
-> 
-> 
-
--- 
-Linu cherian
+> -int css_do_xsch(SubchDev *sch)
+> +IOInstEnding css_do_xsch(SubchDev *sch)
+>  {
+>      SCSW *s = &sch->curr_status.scsw;
+>      PMCW *p = &sch->curr_status.pmcw;
+> -    int ret;
+>  
+>      if (~(p->flags) & (PMCW_FLAGS_MASK_DNV | PMCW_FLAGS_MASK_ENA)) {
+> -        ret = -ENODEV;
+> -        goto out;
+> +        return IOINST_CC_NOT_OPERATIONAL;
+>      }
+>  
+>      if (s->ctrl & SCSW_CTRL_MASK_STCTL) {
+> -        ret = -EINPROGRESS;
+> -        goto out;
+> +        return IOINST_CC_STATUS_PRESENT;
+>      }
+>  
+>      if (!(s->ctrl & SCSW_CTRL_MASK_FCTL) ||
+> @@ -1423,8 +1420,7 @@ int css_do_xsch(SubchDev *sch)
+>          (!(s->ctrl &
+>             (SCSW_ACTL_RESUME_PEND | SCSW_ACTL_START_PEND | SCSW_ACTL_SUSP))) ||
+>          (s->ctrl & SCSW_ACTL_SUBCH_ACTIVE)) {
+> -        ret = -EBUSY;
+> -        goto out;
+> +        return IOINST_CC_BUSY;
+>      }
+>  
+>      /* Cancel the current operation. */
+> @@ -1436,10 +1432,7 @@ int css_do_xsch(SubchDev *sch)
+>      sch->last_cmd_valid = false;
+>      s->dstat = 0;
+>      s->cstat = 0;
+> -    ret = 0;
+> -
+> -out:
+> -    return ret;
+> +    return IOINST_CC_EXPECTED;
+>  }
+>  
+>  int css_do_csch(SubchDev *sch)
+> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+> index 10bde18452..3c319c9096 100644
+> --- a/include/hw/s390x/css.h
+> +++ b/include/hw/s390x/css.h
+> @@ -240,7 +240,7 @@ void css_conditional_io_interrupt(SubchDev *sch);
+>  int css_do_stsch(SubchDev *sch, SCHIB *schib);
+>  bool css_schid_final(int m, uint8_t cssid, uint8_t ssid, uint16_t schid);
+>  int css_do_msch(SubchDev *sch, const SCHIB *schib);
+> -int css_do_xsch(SubchDev *sch);
+> +IOInstEnding css_do_xsch(SubchDev *sch);
+>  int css_do_csch(SubchDev *sch);
+>  int css_do_hsch(SubchDev *sch);
+>  IOInstEnding css_do_ssch(SubchDev *sch, ORB *orb);
+> diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
+> index 16b5cf2fed..4ad07e9181 100644
+> --- a/target/s390x/ioinst.c
+> +++ b/target/s390x/ioinst.c
+> @@ -42,8 +42,6 @@ void ioinst_handle_xsch(S390CPU *cpu, uint64_t reg1)
+>  {
+>      int cssid, ssid, schid, m;
+>      SubchDev *sch;
+> -    int ret = -ENODEV;
+> -    int cc;
+>  
+>      if (ioinst_disassemble_sch_ident(reg1, &m, &cssid, &ssid, &schid)) {
+>          program_interrupt(&cpu->env, PGM_OPERAND, 4);
+> @@ -51,24 +49,11 @@ void ioinst_handle_xsch(S390CPU *cpu, uint64_t reg1)
+>      }
+>      trace_ioinst_sch_id("xsch", cssid, ssid, schid);
+>      sch = css_find_subch(m, cssid, ssid, schid);
+> -    if (sch && css_subch_visible(sch)) {
+> -        ret = css_do_xsch(sch);
+> -    }
+> -    switch (ret) {
+> -    case -ENODEV:
+> -        cc = 3;
+> -        break;
+> -    case -EBUSY:
+> -        cc = 2;
+> -        break;
+> -    case 0:
+> -        cc = 0;
+> -        break;
+> -    default:
+> -        cc = 1;
+> -        break;
+> +    if (!sch || !css_subch_visible(sch)) {
+> +        setcc(cpu, 3);
+> +        return;
+>      }
+> -    setcc(cpu, cc);
+> +    setcc(cpu, css_do_xsch(sch));
+>  }
+>  
+>  void ioinst_handle_csch(S390CPU *cpu, uint64_t reg1)
