@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4SUe-0006bT-L2
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:05:23 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4SUj-0006fg-7C
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:05:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4SUY-0004XM-L1
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:05:16 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33576)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4SUd-0004cP-5c
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:05:21 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54284
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1e4SUY-0004Wx-CY
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:05:10 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9HE4ngl050545
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 10:05:06 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dnen1ph12-1
+	id 1e4SUd-0004bF-0k
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:05:15 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9HE4kDo087133
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 10:05:10 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dnjcp3pat-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 10:05:06 -0400
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 10:05:09 -0400
 Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 17 Oct 2017 15:05:03 +0100
+	Tue, 17 Oct 2017 15:05:07 +0100
 From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue, 17 Oct 2017 16:04:50 +0200
+Date: Tue, 17 Oct 2017 16:04:53 +0200
 In-Reply-To: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
 References: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
-Message-Id: <20171017140453.51099-5-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 4/7] s390x: refactor error handling for XSCH
+Message-Id: <20171017140453.51099-8-pasic@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 7/7] s390x: refactor error handling for MSCH
  handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -41,59 +42,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 Cc: Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-Simplify the error handling of the XSCH.  Let the code detecting the
+Simplify the error handling of the MSCH.  Let the code detecting the
 condition tell (in a less ambiguous way) how it's to be handled. No
 changes in behavior.
 
 Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 ---
- hw/s390x/css.c         | 17 +++++------------
+ hw/s390x/css.c         | 18 +++++-------------
  include/hw/s390x/css.h |  2 +-
  target/s390x/ioinst.c  | 23 ++++-------------------
- 3 files changed, 10 insertions(+), 32 deletions(-)
+ 3 files changed, 10 insertions(+), 33 deletions(-)
 
 diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index ff5a05c34b..1b3be7729d 100644
+index b9e0329825..30fc236946 100644
 --- a/hw/s390x/css.c
 +++ b/hw/s390x/css.c
-@@ -1402,20 +1402,17 @@ out:
-     return ret;
+@@ -1347,28 +1347,24 @@ static void copy_schib_from_guest(SCHIB *dest, const SCHIB *src)
+     }
  }
  
--int css_do_xsch(SubchDev *sch)
-+IOInstEnding css_do_xsch(SubchDev *sch)
+-int css_do_msch(SubchDev *sch, const SCHIB *orig_schib)
++IOInstEnding css_do_msch(SubchDev *sch, const SCHIB *orig_schib)
  {
      SCSW *s = &sch->curr_status.scsw;
      PMCW *p = &sch->curr_status.pmcw;
+     uint16_t oldflags;
 -    int ret;
+     SCHIB schib;
  
-     if (~(p->flags) & (PMCW_FLAGS_MASK_DNV | PMCW_FLAGS_MASK_ENA)) {
--        ret = -ENODEV;
+     if (!(sch->curr_status.pmcw.flags & PMCW_FLAGS_MASK_DNV)) {
+-        ret = 0;
 -        goto out;
-+        return IOINST_CC_NOT_OPERATIONAL;
++        return IOINST_CC_EXPECTED;
      }
  
-     if (s->ctrl & SCSW_CTRL_MASK_STCTL) {
+     if (s->ctrl & SCSW_STCTL_STATUS_PEND) {
 -        ret = -EINPROGRESS;
 -        goto out;
 +        return IOINST_CC_STATUS_PRESENT;
      }
  
-     if (!(s->ctrl & SCSW_CTRL_MASK_FCTL) ||
-@@ -1423,8 +1420,7 @@ int css_do_xsch(SubchDev *sch)
-         (!(s->ctrl &
-            (SCSW_ACTL_RESUME_PEND | SCSW_ACTL_START_PEND | SCSW_ACTL_SUSP))) ||
-         (s->ctrl & SCSW_ACTL_SUBCH_ACTIVE)) {
+     if (s->ctrl &
+         (SCSW_FCTL_START_FUNC|SCSW_FCTL_HALT_FUNC|SCSW_FCTL_CLEAR_FUNC)) {
 -        ret = -EBUSY;
 -        goto out;
-+        return IOINST_CC_BUSY;
++        return IOINST_CC_STATUS_PRESENT;
      }
  
-     /* Cancel the current operation. */
-@@ -1436,10 +1432,7 @@ int css_do_xsch(SubchDev *sch)
-     sch->last_cmd_valid = false;
-     s->dstat = 0;
-     s->cstat = 0;
+     copy_schib_from_guest(&schib, orig_schib);
+@@ -1395,11 +1391,7 @@ int css_do_msch(SubchDev *sch, const SCHIB *orig_schib)
+         && (p->flags & PMCW_FLAGS_MASK_ENA) == 0) {
+         sch->disable_cb(sch);
+     }
+-
 -    ret = 0;
 -
 -out:
@@ -101,39 +102,39 @@ index ff5a05c34b..1b3be7729d 100644
 +    return IOINST_CC_EXPECTED;
  }
  
- int css_do_csch(SubchDev *sch)
+ IOInstEnding css_do_xsch(SubchDev *sch)
 diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-index 10bde18452..3c319c9096 100644
+index 0c1efbae39..a74f6cc274 100644
 --- a/include/hw/s390x/css.h
 +++ b/include/hw/s390x/css.h
-@@ -240,7 +240,7 @@ void css_conditional_io_interrupt(SubchDev *sch);
+@@ -239,7 +239,7 @@ bool css_subch_visible(SubchDev *sch);
+ void css_conditional_io_interrupt(SubchDev *sch);
  int css_do_stsch(SubchDev *sch, SCHIB *schib);
  bool css_schid_final(int m, uint8_t cssid, uint8_t ssid, uint16_t schid);
- int css_do_msch(SubchDev *sch, const SCHIB *schib);
--int css_do_xsch(SubchDev *sch);
-+IOInstEnding css_do_xsch(SubchDev *sch);
- int css_do_csch(SubchDev *sch);
- int css_do_hsch(SubchDev *sch);
- IOInstEnding css_do_ssch(SubchDev *sch, ORB *orb);
+-int css_do_msch(SubchDev *sch, const SCHIB *schib);
++IOInstEnding css_do_msch(SubchDev *sch, const SCHIB *schib);
+ IOInstEnding css_do_xsch(SubchDev *sch);
+ IOInstEnding css_do_csch(SubchDev *sch);
+ IOInstEnding css_do_hsch(SubchDev *sch);
 diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
-index 16b5cf2fed..4ad07e9181 100644
+index 8e4dacafd8..23962fbebc 100644
 --- a/target/s390x/ioinst.c
 +++ b/target/s390x/ioinst.c
-@@ -42,8 +42,6 @@ void ioinst_handle_xsch(S390CPU *cpu, uint64_t reg1)
- {
-     int cssid, ssid, schid, m;
+@@ -111,8 +111,6 @@ void ioinst_handle_msch(S390CPU *cpu, uint64_t reg1, uint32_t ipb)
      SubchDev *sch;
+     SCHIB schib;
+     uint64_t addr;
 -    int ret = -ENODEV;
 -    int cc;
+     CPUS390XState *env = &cpu->env;
+     uint8_t ar;
  
-     if (ioinst_disassemble_sch_ident(reg1, &m, &cssid, &ssid, &schid)) {
-         program_interrupt(&cpu->env, PGM_OPERAND, 4);
-@@ -51,24 +49,11 @@ void ioinst_handle_xsch(S390CPU *cpu, uint64_t reg1)
+@@ -131,24 +129,11 @@ void ioinst_handle_msch(S390CPU *cpu, uint64_t reg1, uint32_t ipb)
      }
-     trace_ioinst_sch_id("xsch", cssid, ssid, schid);
+     trace_ioinst_sch_id("msch", cssid, ssid, schid);
      sch = css_find_subch(m, cssid, ssid, schid);
 -    if (sch && css_subch_visible(sch)) {
--        ret = css_do_xsch(sch);
+-        ret = css_do_msch(sch, &schib);
 -    }
 -    switch (ret) {
 -    case -ENODEV:
@@ -153,9 +154,9 @@ index 16b5cf2fed..4ad07e9181 100644
 +        return;
      }
 -    setcc(cpu, cc);
-+    setcc(cpu, css_do_xsch(sch));
++    setcc(cpu, css_do_msch(sch, &schib));
  }
  
- void ioinst_handle_csch(S390CPU *cpu, uint64_t reg1)
+ static void copy_orb_from_guest(ORB *dest, const ORB *src)
 -- 
 2.13.5
