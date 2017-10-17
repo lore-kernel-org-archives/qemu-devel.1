@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joeclifford@gmail.com>) id 1e4FOd-000470-TO
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:06:12 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e4FOt-0004DQ-Mm
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:06:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joeclifford@gmail.com>) id 1e4FOc-0000Pn-So
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:06:11 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:49536)
+	(envelope-from <richard.henderson@linaro.org>) id 1e4FOo-0000Up-8j
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:06:27 -0400
+Received: from mail-pf0-x235.google.com ([2607:f8b0:400e:c00::235]:52600)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <joeclifford@gmail.com>)
-	id 1e4FOc-0000PX-MQ
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:06:10 -0400
-Received: by mail-pg0-x242.google.com with SMTP id g6so5641pgn.6
-	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 17:06:10 -0700 (PDT)
-References: <20171016144302.24284-1-david@redhat.com>
-	<3fea07b0-e3b6-c880-f7d2-ca152874ac7e@redhat.com>
-From: Joe Clifford <joeclifford@gmail.com>
-Message-ID: <aa684e24-d432-7cb9-3638-0ac802dffdda@gmail.com>
-Date: Tue, 17 Oct 2017 01:06:01 +0100
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1e4FOo-0000UO-1R
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:06:22 -0400
+Received: by mail-pf0-x235.google.com with SMTP id e64so1768pfk.9
+	for <qemu-devel@nongnu.org>; Mon, 16 Oct 2017 17:06:21 -0700 (PDT)
+References: <20171013162438.32458-1-alex.bennee@linaro.org>
+	<20171013162438.32458-21-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <1f63c357-6071-158b-f174-adafbffa704f@linaro.org>
+Date: Mon, 16 Oct 2017 17:06:18 -0700
 MIME-Version: 1.0
-In-Reply-To: <3fea07b0-e3b6-c880-f7d2-ca152874ac7e@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 0/7] kvm: slot handling fixes (and small
- cleanups)
+In-Reply-To: <20171013162438.32458-21-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH 20/30] softfloat: half-precision
+ compare functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,46 +32,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 
-On 16/10/17 17:20, Paolo Bonzini wrote:
-> On 16/10/2017 16:42, David Hildenbrand wrote:
->> Hopefully this is the last bunch of fixes for the cleanup series.
->>
->> 1. log_start() was called before region_add(), which is wrong.
->> 2. I messed up the calculation of the delta when aligning the ram address
->>     (maybe we should simply also use ROUND_UP there ...).
->> 3. I think we could get log_start/log_stop/log_sync when we actually
->>     haven't registered a slot (due to trapping).
->> 4. Some further cleanups
->>
->> Available on: https://github.com/davidhildenbrand/qemu/commits/kvm_slot
->>
->> @Joe, if you could retest, this would be great! I updated the branch.
->>
->> David Hildenbrand (7):
->>    memory: call log_start after region_add
->>    kvm: fix alignment of ram address
->>    kvm: tolerate non-existing slot for log_start/log_stop/log_sync
->>    kvm: fix error message when failing to unregister slot
->>    kvm: region_add and region_del is not called on updates
->>    kvm: simplify kvm_align_section()
->>    memory: reuse section_from_flat_range()
->>
->>   accel/kvm/kvm-all.c | 39 ++++++++++++++-------------------------
->>   memory.c            | 16 +++++-----------
->>   2 files changed, 19 insertions(+), 36 deletions(-)
->>
-> 
-> Looks good!  I'll wait for testing results if they come soon.
-> 
-> Paolo
-> 
+On 10/13/2017 09:24 AM, Alex Bennée wrote:
+> +int float16_eq(float16 a, float16 b, float_status *status)
+> +{
+> +    uint32_t av, bv;
+> +    a = float16_squash_input_denormal(a, status);
+> +    b = float16_squash_input_denormal(b, status);
+> +
+> +    if (    ( ( extractFloat16Exp( a ) == 0x1F ) && extractFloat16Frac( a ) )
+> +         || ( ( extractFloat16Exp( b ) == 0x1F ) && extractFloat16Frac( b ) )
 
-Hi,
+float16_is_any_nan
 
-I've pulled the updates from David's repo and tested the same branch 
-(kvm_slot) and they work beautifully for me. Thanks for fixing this David!
+> +       ) {
+> +        float_raise(float_flag_invalid, status);
+> +        return 0;
+> +    }
+> +    av = float16_val(a);
+> +    bv = float16_val(b);
+> +    return ( av == bv ) || ( (uint32_t) ( ( av | bv )<<1 ) == 0 );
 
-Joe
+For this trick to work you have to truncate to uint16_t not uint32_t.
+It might be easier to read as
+
+  a == b || float16_is_zero(a | b)
+
+That said, I wonder if it wouldn't be better to implement all of these in terms
+of float16_compare, rather than duplicating all of this code.
+
+
+r~
