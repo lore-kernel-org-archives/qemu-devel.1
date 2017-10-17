@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e4NBY-0002cu-QL
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 04:25:14 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e4NBa-0002dW-0W
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 04:25:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e4NBW-00061d-Fo
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 04:25:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37990)
+	(envelope-from <kraxel@redhat.com>) id 1e4NBV-00060P-GG
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 04:25:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36100)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e4NBW-00060X-7A
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 04:25:10 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 47A9D81127
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 08:25:09 +0000 (UTC)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e4NBV-0005yO-9r
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 04:25:09 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 17 Oct 2017 10:25:00 +0200
-Message-Id: <20171017082502.7885-3-kraxel@redhat.com>
+Date: Tue, 17 Oct 2017 10:25:02 +0200
+Message-Id: <20171017082502.7885-5-kraxel@redhat.com>
 In-Reply-To: <20171017082502.7885-1-kraxel@redhat.com>
 References: <20171017082502.7885-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 2/4] vga: handle cirrus vbe mode wraparounds.
+Subject: [Qemu-devel] [PULL 4/4] cirrus: fix oob access in mode4and5 write
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,102 +25,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, P J P <ppandit@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-Commit "3d90c62548 vga: stop passing pointers to vga_draw_line*
-functions" is incomplete.  It doesn't handle the case that the vga
-rendering code tries to create a shared surface, i.e. a pixman image
-backed by vga video memory.  That can not work in case the guest display
-wraps from end of video memory to the start.  So force shadowing in that
-case.  Also adjust the snapshot region calculation.
+Move dst calculation into the loop, so we apply the mask on each
+interation and will not overflow vga memory.
 
-Can trigger with cirrus only, when programming vbe modes using the bochs
-api (stdvga, also qxl and virtio-vga in vga compat mode) wrap arounds
-can't happen.
-
-Fixes: CVE-2017-13672
-Fixes: 3d90c6254863693a6b13d918d2b8682e08bbc681
-Cc: P J P <ppandit@redhat.com>
-Reported-by: David Buchanan <d@vidbuchanan.co.uk>
+Cc: Prasad J Pandit <pjp@fedoraproject.org>
+Reported-by: Niu Guoxiang <niuguoxiang@huawei.com>
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20171010141323.14049-3-kraxel@redhat.com
+Message-id: 20171011084314.21752-1-kraxel@redhat.com
 ---
- hw/display/vga.c | 28 +++++++++++++++++++++-------
- 1 file changed, 21 insertions(+), 7 deletions(-)
+ hw/display/cirrus_vga.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/hw/display/vga.c b/hw/display/vga.c
-index bf774e3402..1afceb6f16 100644
---- a/hw/display/vga.c
-+++ b/hw/display/vga.c
-@@ -1465,13 +1465,13 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
-     DisplaySurface *surface = qemu_console_surface(s->con);
-     int y1, y, update, linesize, y_start, double_scan, mask, depth;
-     int width, height, shift_control, bwidth, bits;
--    ram_addr_t page0, page1;
-+    ram_addr_t page0, page1, region_start, region_end;
-     DirtyBitmapSnapshot *snap = NULL;
-     int disp_width, multi_scan, multi_run;
-     uint8_t *d;
-     uint32_t v, addr1, addr;
-     vga_draw_line_func *vga_draw_line = NULL;
--    bool share_surface;
-+    bool share_surface, force_shadow = false;
-     pixman_format_code_t format;
- #ifdef HOST_WORDS_BIGENDIAN
-     bool byteswap = !s->big_endian_fb;
-@@ -1484,6 +1484,15 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
-     s->get_resolution(s, &width, &height);
-     disp_width = width;
+diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+index b4d579857a..bc32bf1e39 100644
+--- a/hw/display/cirrus_vga.c
++++ b/hw/display/cirrus_vga.c
+@@ -2038,15 +2038,14 @@ static void cirrus_mem_writeb_mode4and5_8bpp(CirrusVGAState * s,
+     unsigned val = mem_value;
+     uint8_t *dst;
  
-+    region_start = (s->start_addr * 4);
-+    region_end = region_start + s->line_offset * height;
-+    if (region_end > s->vbe_size) {
-+        /* wraps around (can happen with cirrus vbe modes) */
-+        region_start = 0;
-+        region_end = s->vbe_size;
-+        force_shadow = true;
-+    }
-+
-     shift_control = (s->gr[VGA_GFX_MODE] >> 5) & 3;
-     double_scan = (s->cr[VGA_CRTC_MAX_SCAN] >> 7);
-     if (shift_control != 1) {
-@@ -1523,7 +1532,7 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
-     format = qemu_default_pixman_format(depth, !byteswap);
-     if (format) {
-         share_surface = dpy_gfx_check_format(s->con, format)
--            && !s->force_shadow;
-+            && !s->force_shadow && !force_shadow;
-     } else {
-         share_surface = false;
+-    dst = s->vga.vram_ptr + (offset &= s->cirrus_addr_mask);
+     for (x = 0; x < 8; x++) {
++        dst = s->vga.vram_ptr + ((offset + x) & s->cirrus_addr_mask);
+ 	if (val & 0x80) {
+ 	    *dst = s->cirrus_shadow_gr1;
+ 	} else if (mode == 5) {
+ 	    *dst = s->cirrus_shadow_gr0;
+ 	}
+ 	val <<= 1;
+-	dst++;
      }
-@@ -1627,8 +1636,6 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
-     y1 = 0;
+     memory_region_set_dirty(&s->vga.vram, offset, 8);
+ }
+@@ -2060,8 +2059,8 @@ static void cirrus_mem_writeb_mode4and5_16bpp(CirrusVGAState * s,
+     unsigned val = mem_value;
+     uint8_t *dst;
  
-     if (!full_update) {
--        ram_addr_t region_start = addr1;
--        ram_addr_t region_end = addr1 + s->line_offset * height;
-         vga_sync_dirty_bitmap(s);
-         if (s->line_compare < height) {
-             /* split screen mode */
-@@ -1651,10 +1658,17 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
-             addr = (addr & ~0x8000) | ((y1 & 2) << 14);
-         }
-         update = full_update;
--        page0 = addr;
--        page1 = addr + bwidth - 1;
-+        page0 = addr & s->vbe_size_mask;
-+        page1 = (addr + bwidth - 1) & s->vbe_size_mask;
-         if (full_update) {
-             update = 1;
-+        } else if (page1 < page0) {
-+            /* scanline wraps from end of video memory to the start */
-+            assert(force_shadow);
-+            update = memory_region_snapshot_get_dirty(&s->vram, snap,
-+                                                      page0, 0);
-+            update |= memory_region_snapshot_get_dirty(&s->vram, snap,
-+                                                       page1, 0);
-         } else {
-             update = memory_region_snapshot_get_dirty(&s->vram, snap,
-                                                       page0, page1 - page0);
+-    dst = s->vga.vram_ptr + (offset &= s->cirrus_addr_mask);
+     for (x = 0; x < 8; x++) {
++        dst = s->vga.vram_ptr + ((offset + 2 * x) & s->cirrus_addr_mask & ~1);
+ 	if (val & 0x80) {
+ 	    *dst = s->cirrus_shadow_gr1;
+ 	    *(dst + 1) = s->vga.gr[0x11];
+@@ -2070,7 +2069,6 @@ static void cirrus_mem_writeb_mode4and5_16bpp(CirrusVGAState * s,
+ 	    *(dst + 1) = s->vga.gr[0x10];
+ 	}
+ 	val <<= 1;
+-	dst += 2;
+     }
+     memory_region_set_dirty(&s->vga.vram, offset, 16);
+ }
 -- 
 2.9.3
