@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60701)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1e4QN2-0007wm-G3
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:49:17 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37669)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peter.maydell@linaro.org>) id 1e4Qk7-00031j-3U
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:13:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1e4QMx-0008KP-KA
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:49:16 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:33094 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1e4QMx-0008JL-B1
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:49:11 -0400
-References: <8e2160db-338f-f1dc-7f5e-8faa3dce7090@kamp.de>
-	<20171017114625.GB7660@dhcp-200-186.str.redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <02ff8cd2-3061-ca10-8235-c2295de58562@kamp.de>
-Date: Tue, 17 Oct 2017 13:49:08 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1e4Qk1-0005hN-GV
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:13:07 -0400
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:43488)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e4Qk1-0005gk-AN
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:13:01 -0400
+Received: by mail-wr0-x230.google.com with SMTP id p46so1433562wrb.0
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 05:13:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20171017114625.GB7660@dhcp-200-186.str.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [Qemu-block] Clean Block Driver Shutdown
+In-Reply-To: <20171016201650.18399-1-berrange@redhat.com>
+References: <20171016201650.18399-1-berrange@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Oct 2017 13:12:39 +0100
+Message-ID: <CAFEAcA9-pihrL4+UfZsNvVxkSzm_bt2uEa7x=oh3ikRVKTDPUQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v1 00/11] Merge QIO 2017-10-16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, armbru@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Am 17.10.2017 um 13:46 schrieb Kevin Wolf:
-> Am 17.10.2017 um 12:33 hat Peter Lieven geschrieben:
->> I noticed that Qemu quits at several points with an exit() if the
->> supplied parameters in the commandline are incorrect. This at some
->> stages happens after there have already been connections to storage
->> backends established.
-> Maybe we need to come to the conclusion that exit() is always wrong,
-> even during the initialisation.
+On 16 October 2017 at 21:16, Daniel P. Berrange <berrange@redhat.com> wrote:
+> The following changes since commit 79b2a13aa81724228166c794f48eb75bfb696b88:
 >
->> These connections are not cleanly shut down in this case. For posix
->> file backends that doesn't matter, but for other backends this leads
->> to errors. E.g. iSCSI Targets log an aborted iSCSI connection due to
->> tcp reset.
->>
->> I wonder what is the best way to fix this. A simply call to
->> bdrv_close_all() in an atexit handler seems to work.  But is this a
->> good solution? Maybe register this handler only until the VM starts.
->> Or do we need an atexit handler in each block driver that requires a
->> clean shutdown?
-> No, definitely not code in every single block driver. We need to make
-> sure to properly clean up what has been started.
+>   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2017-10-14' into staging (2017-10-16 15:54:42 +0100)
 >
-> An atexit handler is probably relatively easy. I think it would be
-> cleaner to have proper error paths even in main(), like in every other
-> function. I'm not sure if this would be reasonably easy to achieve,
-> though.
+> are available in the git repository at:
+>
+>   git://github.com/berrange/qemu tags/pull-qio-2017-10-16-1
+>
+> for you to fetch changes up to 7fc3fcefe2fc5966c6aa1ef4f10e9740d8d73bf2:
+>
+>   io: fix mem leak in websock error path (2017-10-16 16:57:08 +0100)
+>
+> ----------------------------------------------------------------
+> Merge QIO 2017/10/16 v1
+>
+> ----------------------------------------------------------------
+>
 
-A clean error path would obviously be a good idea. However,
-the following seems to work:
+Applied, thanks.
 
-diff --git a/vl.c b/vl.c
-index 0723835..bed512c 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3197,6 +3197,7 @@ int main(int argc, char **argv, char **envp)
-      nb_nics = 0;
-
-      bdrv_init_with_whitelist();
-+    atexit(bdrv_close_all);
-
-      autostart = 1;
-
-Peter
+-- PMM
