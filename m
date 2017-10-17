@@ -1,51 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4RXH-0001CP-O0
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:04:10 -0400
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4RcQ-0002gx-TU
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:09:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4RX5-0007xK-2o
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:03:55 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60340)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1e4RX4-0007wd-P2
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:03:42 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9HD2Ehg100776
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 09:03:37 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dnen1jwsv-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 09:03:36 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 17 Oct 2017 14:03:34 +0100
-References: <20171004154144.88995-1-pasic@linux.vnet.ibm.com>
-	<20171004154144.88995-3-pasic@linux.vnet.ibm.com>
-	<d6d2d73d-65c9-7ae1-fd37-cb8e304781e7@redhat.com>
-	<7f454872-fae3-35b0-eff4-227b2aa0f77d@linux.vnet.ibm.com>
-	<6c17b274-cd75-7864-94b9-fc8abff1a786@redhat.com>
-	<da4228cb-d32c-dc77-0a80-bac306f07c24@linux.vnet.ibm.com>
-	<0120aa4c-ffce-79c0-8c87-c7c1100232eb@redhat.com>
-	<9d77c8e9-f875-4e42-5306-b847904b4a47@linux.vnet.ibm.com>
-	<39f9e450-d618-6c4d-9401-031c5374ed88@redhat.com>
-	<2b90291e-62a8-964f-286a-d8f1594b2d94@linux.vnet.ibm.com>
-	<0ade56a2-046a-6525-f19d-8febebcfde03@linux.vnet.ibm.com>
-	<eef3b6ca-5d4a-115e-3fad-1a76c00bc3be@redhat.com>
-	<20171017141352.3b2f7cd8.cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue, 17 Oct 2017 15:03:31 +0200
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4RcK-0004RY-5o
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:09:14 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:56386)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4RcJ-0004I2-Oz
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:09:08 -0400
+From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+Date: Tue, 17 Oct 2017 16:08:50 +0300
+Message-ID: <150824572545.6816.5099701189660002212.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
-In-Reply-To: <20171017141352.3b2f7cd8.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <7968a82e-fc9b-6b41-d8a9-86182c645904@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 2/8] s390x/css: IO instr
- handler ending control
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v2 00/43] Windbg supporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -54,68 +24,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
+
+An update of:
+
+	v1: https://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg07092.html
+
+We made the debugger module WinDbg (like GDB) for QEMU. This is the replacement of the remote stub in Windows kernel. Used for remote Windows kernel debugging without debugging mode.
+
+WinDbg is a multipurpose debugger for the Microsoft Windows computer operating system, distributed by Microsoft. Recent versions of WinDbg have been and are being distributed as part of the free Debugging Tools for Windows suite.
+
+How to start debugging QEMU using WinDbg:
+  Run QEMU with next option:
+    -windbg pipe:<name>
+  QEMU will start and pause for waiting WinDbg connection.
+  Run WinDbg with next options:
+    -b -k com:pipe,baud=115200,port=\\.\pipe\<name>,resets=0
+  Wait for debugger connect to kernel.
+
+Note: You can add Symbol Search Path in WinDbg such as srv*c:\tmp*http://msdl.microsoft.com/download/symbols.
+
+How it works:
+The WinDbg debugger has the possibility of connecting to a remote debug service (Kdsrv.exe) in the Windows kernel. Therefore, it is possible to connect to the guest system running in the QEMU emulator. Kernel debugging is possible only with the enabled debugging mode, may change at the same time. Our module of WinDbg debugger for QEMU is an alternative of the remote debugging service in the kernel. Thus, the debugger connects to the debugging module, not to the kernel of the operating system. The module obtains all the necessary information answering debugger requests from the QEMU emulator. At the same time for debugging there is no need to enable debugging mode in the kernel. This leads to hidden debugging. Our module supports all features of WinDbg regarding remote debugging, besides interception of events and exceptions. Only i386 is supported now.
+
+Changed in v2:
+
+ - Move target specific code in the 'target/' directory. (Alistair Francis)
+ - Change 'kd_api_fill_memory'. Made a fill of memory by line segments. Before that, a full array was immediately collected and written in RAM. (Ladi Prosek)
+ - Change 'kd_api_search_memory'. Made a search for memory by line segments. (Ladi Prosek)
+ - Change ld* to st* where it needs. (Ladi Prosek)
+ - Add a additional check of input arguments in 'windbg_read_context' and 'windbg_read_ks_regs'. (Ladi Prosek)
+ - Fix typos. (Ladi Prosek)
+ - Add a fliping back 'windbg_state->is_loaded' after reset VM.
+ - Add a check to disabled kvm. It is supported yet. (Ladi Prosek)
+ - Add a check to device in windbg option. Only pipe is supporting now. (Alistair Francis)
+ - Add a check to 'ifdef' WINDBG_DEBUG_ON before define it. (Alistair Francis)
+ - Replace printf to qemu_log. (Alistair Francis)
+ - Fix build on s390x host. (patchew)
+ - Fix code style error. (patchew)
+
+---
+
+Mihail Abakumov (43):
+      windbg: added empty windbgstub files
+      windbg: added windbg's KD header file
+      windbg: modified windbgkd.h
+      windbg: added '-windbg' option
+      windbg: added helper features
+      windbg: added WindbgState
+      windbg: added chardev
+      windbg: hook to wrmsr operation
+      windbg: handler of fs/gs register
+      windbg: structures for parsing data stream
+      windbg: parsing data stream
+      windbg: send data and control packets
+      windbg: handler of parsing context
+      windbg: init DBGKD_ANY_WAIT_STATE_CHANGE
+      windbg: sized data buffer
+      windbg: generate ExceptionStateChange
+      windbg: generate LoadSymbolsStateChange
+      windbg: windbg_vm_stop
+      windbg: implemented windbg_process_control_packet
+      windbg: implemented windbg_process_data_packet
+      windbg: implemented windbg_process_manipulate_packet
+      windbg: implemented kd_api_read_virtual_memory and kd_api_write_virtual_memory
+      windbg: kernel's structures
+      windbg: implemented kd_api_get_context and kd_api_set_context
+      windbg: implemented kd_api_read_control_space and kd_api_write_control_space
+      windbg: implemented windbg_read_context
+      windbg: implemented windbg_write_context
+      windbg: implemented windbg_read_ks_regs
+      windbg: implemented windbg_write_ks_regs
+      windbg: implemented windbg_set_sr
+      windbg: implemented windbg_set_dr
+      windbg: implemented windbg_set_dr7
+      windbg: implemented windbg_hw_breakpoint_insert and windbg_hw_breakpoint_remove
+      windbg: implemented kd_api_write_breakpoint and kd_api_restore_breakpoint
+      windbg: debug exception subscribing
+      windbg: implemented kd_api_continue
+      windbg: implemented kd_api_read_io_space and kd_api_write_io_space
+      windbg: implemented kd_api_read_physical_memory and kd_api_write_physical_memory
+      windbg: implemented kd_api_get_version
+      windbg: implemented kd_api_read_msr and kd_api_write_msr
+      windbg: implemented kd_api_search_memory
+      windbg: implemented kd_api_fill_memory
+      windbg: implemented kd_api_query_memory
 
 
+ Makefile.target                 |    5 
+ cpus.c                          |   18 
+ gdbstub.c                       |    4 
+ include/exec/windbgkd.h         |  948 ++++++++++++++++++++++++++
+ include/exec/windbgstub-utils.h |  122 +++
+ include/exec/windbgstub.h       |   24 +
+ include/sysemu/sysemu.h         |    2 
+ qemu-options.hx                 |    8 
+ stubs/Makefile.objs             |    1 
+ stubs/windbgstub.c              |   21 +
+ target/i386/Makefile.objs       |    2 
+ target/i386/misc_helper.c       |    3 
+ target/i386/windbgstub.c        | 1443 +++++++++++++++++++++++++++++++++++++++
+ vl.c                            |    8 
+ windbgstub-utils.c              |  358 ++++++++++
+ windbgstub.c                    |  490 +++++++++++++
+ 16 files changed, 3455 insertions(+), 2 deletions(-)
+ create mode 100755 include/exec/windbgkd.h
+ create mode 100755 include/exec/windbgstub-utils.h
+ create mode 100755 include/exec/windbgstub.h
+ create mode 100755 stubs/windbgstub.c
+ create mode 100755 target/i386/windbgstub.c
+ create mode 100755 windbgstub-utils.c
+ create mode 100755 windbgstub.c
 
-On 10/17/2017 02:13 PM, Cornelia Huck wrote:
-> On Tue, 17 Oct 2017 13:28:57 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
-> 
->> On 17.10.2017 13:10, Halil Pasic wrote:
->>>
->>>
->>> On 10/12/2017 01:44 PM, Halil Pasic wrote:  
->>>>
->>>>
->>>> On 10/12/2017 08:58 AM, Thomas Huth wrote:  
->>>>> On 10.10.2017 13:41, Halil Pasic wrote:  
->>> [..]  
->>>>> So yes, please don't do a "typedef unsigned int IOInstEnding" either. I
->>>>> think the best match for QEMU would be a
->>>>>
->>>>> typedef enum IOInstEnding {
->>>>>     CC_...,
->>>>>     CC_...,
->>>>>     CC_...,
->>>>>     CC_...
->>>>> } IOInstEnding;
->>>>>  
->>>>
->>>> I also prefer this over #define NAME val.
->>>>  
->>>
->>> @Conny @Thomas
->>>
->>> I'm almost done with v3, but I've realized we did not agree on the
->>> names for the enum constants, so before posting something to ugly
->>> again, I would like to inquire your opinion.
->>>
->>> My current version of the enum is the following (but I can easily change
->>> to whatever you like with sed):
->>>
->>> +/*
->>> + * IO instructions conclude according this. Currently we have only
->>> + * cc codes. Valid values are 0,1,2,3 and the generic semantic for IO instructions
->>> + * is described briefly. For more details consult the PoP.
->>> + */
->>> +typedef enum IOInstEnding {
->>> +    IOINST_CC_0 = 0, /* produced expected result */
->>> +    IOINST_CC_1 = 1, /* status conditions were present, or alternate result */
->>> +    IOINST_CC_2 = 2, /* ineffective, busy with previously initiated function */
->>> +    IOINST_CC_3 = 3  /* ineffective, not operational */
->>> +} IOInstEnding;
->>> +
->>>
->>> Alternatives I had in mind are IOINST_CC_0_EXPECTED, IOINST_CC_1_STATUS_PRESENT, 
->>> IOINST_CC_2_BUSY, IOINST_CC_3_NOT_OPERATIONAL or the same without the numerical
->>> code (e.g. just IONIST_CC_EXPECTED).  
->>
->> FWIW, I'd prefer your last suggestion (e.g. IOINST_CC_EXPECTED).
-> 
-> Either IOINST_CC_0 or IOINST_CC_EXPECTED, whatever you like best.
-> 
-
-Thanks, I will go with the non-numerical variant as preferred by
-Thomas (I've already changed my patches).
+--
+Thanks,
+Mihail Abakumov
