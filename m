@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34168)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4FWA-0006zo-VU
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:14:02 -0400
+	id 1e4FWE-00072M-T6
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:14:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4FW9-0004o0-Hn
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:13:58 -0400
+	id 1e4FWD-0004qN-38
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:14:02 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 16 Oct 2017 21:12:00 -0300
-Message-Id: <20171017001209.32276-31-f4bug@amsat.org>
+Date: Mon, 16 Oct 2017 21:12:01 -0300
+Message-Id: <20171017001209.32276-32-f4bug@amsat.org>
 In-Reply-To: <20171017001209.32276-1-f4bug@amsat.org>
 References: <20171017001209.32276-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 30/39] hw/display/vga: remove the old
- i386/pc dependency
+Subject: [Qemu-devel] [PATCH v2 31/39] hw/input/i8042: extract pckbd and
+ vmmouse API from hw/i386/pc.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,185 +27,338 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-
-move public API to "hw/display/vga.h" and private registers
-to "hw/display/vga_int_regs.h"
+To: Michael Tokarev <mjt@tls.msk.ru>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-trivial@nongnu.org
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/display/vga_int.h                 |  3 ++-
- hw/display/{vga.h => vga_int_regs.h} |  0
- include/hw/display/vga.h             | 25 +++++++++++++++++++++++++
- include/hw/i386/pc.h                 | 12 ------------
- hw/display/vga-isa-mm.c              |  4 +---
- hw/display/vga-isa.c                 |  2 +-
- hw/display/vga.c                     |  4 ++--
- hw/mips/mips_jazz.c                  |  1 +
- vl.c                                 |  2 +-
- MAINTAINERS                          |  1 +
- 10 files changed, 34 insertions(+), 20 deletions(-)
- rename hw/display/{vga.h => vga_int_regs.h} (100%)
- create mode 100644 include/hw/display/vga.h
+ include/hw/i386/pc.h     | 11 -----------
+ include/hw/input/i8042.h | 30 ++++++++++++++++++++++++++++++
+ hw/alpha/dp264.c         |  3 ++-
+ hw/i386/pc.c             |  5 +++--
+ hw/input/pckbd.c         |  2 +-
+ hw/input/vmmouse.c       |  3 +--
+ hw/mips/mips_fulong2e.c  |  3 ++-
+ hw/mips/mips_jazz.c      |  1 +
+ hw/mips/mips_malta.c     |  3 ++-
+ hw/mips/mips_r4k.c       |  3 ++-
+ hw/misc/vmport.c         |  1 +
+ hw/ppc/prep.c            |  5 +++--
+ hw/sparc64/sun4u.c       |  3 ++-
+ hw/unicore32/puv3.c      |  1 +
+ MAINTAINERS              |  1 +
+ 15 files changed, 52 insertions(+), 23 deletions(-)
+ create mode 100644 include/hw/input/i8042.h
 
-diff --git a/hw/display/vga_int.h b/hw/display/vga_int.h
-index ad34a1f048..fe23b81442 100644
---- a/hw/display/vga_int.h
-+++ b/hw/display/vga_int.h
-@@ -25,8 +25,9 @@
- #ifndef HW_VGA_INT_H
- #define HW_VGA_INT_H
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 25ba378bd8..6a2e947332 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -193,17 +193,6 @@ static inline void vmport_init(ISABus *bus)
+ }
  
--#include "hw/hw.h"
-+#include "exec/ioport.h"
- #include "exec/memory.h"
-+#include "ui/console.h"
+ void vmport_register(unsigned char command, VMPortReadFunc *func, void *opaque);
+-void vmmouse_get_data(uint32_t *data);
+-void vmmouse_set_data(const uint32_t *data);
+-
+-/* pckbd.c */
+-#define I8042_A20_LINE "a20"
+-
+-void i8042_mm_init(qemu_irq kbd_irq, qemu_irq mouse_irq,
+-                   MemoryRegion *region, ram_addr_t size,
+-                   hwaddr mask);
+-void i8042_isa_mouse_fake_event(void *opaque);
+-void i8042_setup_a20_line(ISADevice *dev, qemu_irq a20_out);
  
- #define ST01_V_RETRACE      0x08
- #define ST01_DISP_ENABLE    0x01
-diff --git a/hw/display/vga.h b/hw/display/vga_int_regs.h
-similarity index 100%
-rename from hw/display/vga.h
-rename to hw/display/vga_int_regs.h
-diff --git a/include/hw/display/vga.h b/include/hw/display/vga.h
+ /* pc.c */
+ extern int fd_bootchk;
+diff --git a/include/hw/input/i8042.h b/include/hw/input/i8042.h
 new file mode 100644
-index 0000000000..0401a3a292
+index 0000000000..836417304b
 --- /dev/null
-+++ b/include/hw/display/vga.h
-@@ -0,0 +1,25 @@
++++ b/include/hw/input/i8042.h
+@@ -0,0 +1,30 @@
 +/*
-+ * QEMU VGA Emulator.
++ * QEMU PS/2 Controller
 + *
 + * Copyright (c) 2003 Fabrice Bellard
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
 + */
-+#ifndef QEMU_HW_DISPLAY_VGA_H
-+#define QEMU_HW_DISPLAY_VGA_H
++#ifndef HW_INPUT_I8042_H
++#define HW_INPUT_I8042_H
 +
-+#include "exec/memory.h"
-+
-+enum vga_retrace_method {
-+    VGA_RETRACE_DUMB,
-+    VGA_RETRACE_PRECISE
-+};
-+
-+extern enum vga_retrace_method vga_retrace_method;
-+
-+int isa_vga_mm_init(hwaddr vram_base,
-+                    hwaddr ctrl_base, int it_shift,
-+                    MemoryRegion *address_space);
-+
-+#endif
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index b1b4c918af..25ba378bd8 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -302,18 +302,6 @@ PCIBus *find_i440fx(void);
- extern PCIDevice *piix4_dev;
- int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn);
- 
--/* vga.c */
--enum vga_retrace_method {
--    VGA_RETRACE_DUMB,
--    VGA_RETRACE_PRECISE
--};
--
--extern enum vga_retrace_method vga_retrace_method;
--
--int isa_vga_mm_init(hwaddr vram_base,
--                    hwaddr ctrl_base, int it_shift,
--                    MemoryRegion *address_space);
--
- /* ne2000.c */
- static inline bool isa_ne2000_init(ISABus *bus, int base, int irq, NICInfo *nd)
- {
-diff --git a/hw/display/vga-isa-mm.c b/hw/display/vga-isa-mm.c
-index 51ccbccc41..e887b45651 100644
---- a/hw/display/vga-isa-mm.c
-+++ b/hw/display/vga-isa-mm.c
-@@ -23,11 +23,9 @@
-  */
- #include "qemu/osdep.h"
- #include "hw/hw.h"
--#include "ui/console.h"
--#include "hw/i386/pc.h"
-+#include "hw/display/vga.h"
- #include "vga_int.h"
- #include "ui/pixel_ops.h"
--#include "qemu/timer.h"
- 
- #define VGA_RAM_SIZE (8192 * 1024)
- 
-diff --git a/hw/display/vga-isa.c b/hw/display/vga-isa.c
-index 1af95562f2..9af43abee8 100644
---- a/hw/display/vga-isa.c
-+++ b/hw/display/vga-isa.c
-@@ -26,7 +26,7 @@
- #include "qemu/osdep.h"
- #include "hw/hw.h"
- #include "ui/console.h"
--#include "hw/i386/pc.h"
++#include "hw/hw.h"
 +#include "hw/isa/isa.h"
- #include "vga_int.h"
- #include "ui/pixel_ops.h"
- #include "qemu/timer.h"
-diff --git a/hw/display/vga.c b/hw/display/vga.c
-index ed24ef7076..0da4942a09 100644
---- a/hw/display/vga.c
-+++ b/hw/display/vga.c
-@@ -24,9 +24,9 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "hw/hw.h"
--#include "vga.h"
-+#include "hw/display/vga.h"
- #include "ui/console.h"
--#include "hw/i386/pc.h"
-+#include "vga_int_regs.h"
- #include "hw/pci/pci.h"
- #include "vga_int.h"
- #include "ui/pixel_ops.h"
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index 5f37852499..25f0294236 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -39,6 +39,7 @@
- #include "hw/loader.h"
++
++#define TYPE_I8042 "i8042"
++
++#define I8042_A20_LINE "a20"
++
++void i8042_mm_init(qemu_irq kbd_irq, qemu_irq mouse_irq,
++                   MemoryRegion *region, ram_addr_t size,
++                   hwaddr mask);
++void i8042_isa_mouse_fake_event(void *opaque);
++void i8042_setup_a20_line(ISADevice *dev, qemu_irq a20_out);
++
++#define TYPE_VMMOUSE "vmmouse"
++
++void vmmouse_get_data(uint32_t *data);
++void vmmouse_set_data(const uint32_t *data);
++
++#endif /* HW_INPUT_I8042_H */
+diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
+index 1bd5243648..2253990654 100644
+--- a/hw/alpha/dp264.c
++++ b/hw/alpha/dp264.c
+@@ -19,6 +19,7 @@
+ #include "hw/timer/mc146818rtc.h"
+ #include "hw/ide.h"
+ #include "hw/timer/i8254.h"
++#include "hw/input/i8042.h"
+ #include "hw/char/serial.h"
+ #include "qemu/cutils.h"
+ 
+@@ -82,7 +83,7 @@ static void clipper_init(MachineState *machine)
+     rtc_init(isa_bus, 1900, rtc_irq);
+ 
+     i8254_pit_init(isa_bus, 0x40, 0, NULL);
+-    isa_create_simple(isa_bus, "i8042");
++    isa_create_simple(isa_bus, TYPE_I8042);
+ 
+     /* VGA setup.  Don't bother loading the bios.  */
+     pci_vga_init(pci_bus);
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index b565c6086c..6959a0a712 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -40,6 +40,7 @@
+ #include "multiboot.h"
  #include "hw/timer/mc146818rtc.h"
  #include "hw/timer/i8254.h"
-+#include "hw/display/vga.h"
++#include "hw/input/i8042.h"
  #include "hw/audio/pcspk.h"
+ #include "hw/pci/msi.h"
+ #include "hw/sysbus.h"
+@@ -1564,11 +1565,11 @@ void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
+     parallel_hds_isa_init(isa_bus, MAX_PARALLEL_PORTS);
+ 
+     a20_line = qemu_allocate_irqs(handle_a20_line_change, first_cpu, 2);
+-    i8042 = isa_create_simple(isa_bus, "i8042");
++    i8042 = isa_create_simple(isa_bus, TYPE_I8042);
+     i8042_setup_a20_line(i8042, a20_line[0]);
+     if (!no_vmport) {
+         vmport_init(isa_bus);
+-        vmmouse = isa_try_create(isa_bus, "vmmouse");
++        vmmouse = isa_try_create(isa_bus, TYPE_VMMOUSE);
+     } else {
+         vmmouse = NULL;
+     }
+diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
+index c479f827b6..f17f18e51b 100644
+--- a/hw/input/pckbd.c
++++ b/hw/input/pckbd.c
+@@ -26,6 +26,7 @@
+ #include "hw/isa/isa.h"
+ #include "hw/i386/pc.h"
+ #include "hw/input/ps2.h"
++#include "hw/input/i8042.h"
+ #include "sysemu/sysemu.h"
+ 
+ /* debug PC keyboard */
+@@ -480,7 +481,6 @@ void i8042_mm_init(qemu_irq kbd_irq, qemu_irq mouse_irq,
+     qemu_register_reset(kbd_reset, s);
+ }
+ 
+-#define TYPE_I8042 "i8042"
+ #define I8042(obj) OBJECT_CHECK(ISAKBDState, (obj), TYPE_I8042)
+ 
+ typedef struct ISAKBDState {
+diff --git a/hw/input/vmmouse.c b/hw/input/vmmouse.c
+index b6d22086f4..c48c07c564 100644
+--- a/hw/input/vmmouse.c
++++ b/hw/input/vmmouse.c
+@@ -24,7 +24,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+ #include "ui/console.h"
+-#include "hw/input/ps2.h"
++#include "hw/input/i8042.h"
+ #include "hw/i386/pc.h"
+ #include "hw/qdev.h"
+ 
+@@ -52,7 +52,6 @@
+ #define DPRINTF(fmt, ...) do { } while (0)
+ #endif
+ 
+-#define TYPE_VMMOUSE "vmmouse"
+ #define VMMOUSE(obj) OBJECT_CHECK(VMMouseState, (obj), TYPE_VMMOUSE)
+ 
+ typedef struct VMMouseState
+diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+index 22e6c05fb5..a35745a407 100644
+--- a/hw/mips/mips_fulong2e.c
++++ b/hw/mips/mips_fulong2e.c
+@@ -42,6 +42,7 @@
+ #include "hw/isa/vt82c686.h"
+ #include "hw/timer/mc146818rtc.h"
+ #include "hw/timer/i8254.h"
++#include "hw/input/i8042.h"
+ #include "sysemu/blockdev.h"
+ #include "exec/address-spaces.h"
+ #include "sysemu/qtest.h"
+@@ -367,7 +368,7 @@ static void mips_fulong2e_init(MachineState *machine)
+     DMA_init(isa_bus, 0);
+ 
+     /* Super I/O */
+-    isa_create_simple(isa_bus, "i8042");
++    isa_create_simple(isa_bus, TYPE_I8042);
+ 
+     rtc_init(isa_bus, 2000, NULL);
+ 
+diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
+index 25f0294236..1bbef7eeb5 100644
+--- a/hw/mips/mips_jazz.c
++++ b/hw/mips/mips_jazz.c
+@@ -41,6 +41,7 @@
+ #include "hw/timer/i8254.h"
+ #include "hw/display/vga.h"
+ #include "hw/audio/pcspk.h"
++#include "hw/input/i8042.h"
  #include "sysemu/block-backend.h"
  #include "hw/sysbus.h"
-diff --git a/vl.c b/vl.c
-index 0d1f612629..f0b7106feb 100644
---- a/vl.c
-+++ b/vl.c
-@@ -57,9 +57,9 @@ int main(int argc, char **argv)
- #include "hw/boards.h"
- #include "sysemu/accel.h"
- #include "hw/usb.h"
--#include "hw/i386/pc.h"
+ #include "exec/address-spaces.h"
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index de547d732f..45c7f589aa 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -45,6 +45,7 @@
+ #include "hw/loader.h"
+ #include "elf.h"
+ #include "hw/timer/mc146818rtc.h"
++#include "hw/input/i8042.h"
+ #include "hw/timer/i8254.h"
+ #include "sysemu/blockdev.h"
+ #include "exec/address-spaces.h"
+@@ -1221,7 +1222,7 @@ void mips_malta_init(MachineState *machine)
+     DMA_init(isa_bus, 0);
+ 
+     /* Super I/O */
+-    isa_create_simple(isa_bus, "i8042");
++    isa_create_simple(isa_bus, TYPE_I8042);
+ 
+     rtc_init(isa_bus, 2000, NULL);
+     serial_hds_isa_init(isa_bus, 0, 2);
+diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
+index 48fad52540..946097a31f 100644
+--- a/hw/mips/mips_r4k.c
++++ b/hw/mips/mips_r4k.c
+@@ -27,6 +27,7 @@
+ #include "hw/loader.h"
+ #include "elf.h"
+ #include "hw/timer/mc146818rtc.h"
++#include "hw/input/i8042.h"
+ #include "hw/timer/i8254.h"
+ #include "sysemu/block-backend.h"
+ #include "exec/address-spaces.h"
+@@ -295,7 +296,7 @@ void mips_r4k_init(MachineState *machine)
+                      hd[MAX_IDE_DEVS * i],
+ 		     hd[MAX_IDE_DEVS * i + 1]);
+ 
+-    isa_create_simple(isa_bus, "i8042");
++    isa_create_simple(isa_bus, TYPE_I8042);
+ }
+ 
+ static void mips_machine_init(MachineClass *mc)
+diff --git a/hw/misc/vmport.c b/hw/misc/vmport.c
+index 165500223f..bc078eb20a 100644
+--- a/hw/misc/vmport.c
++++ b/hw/misc/vmport.c
+@@ -25,6 +25,7 @@
+ #include "hw/hw.h"
  #include "hw/isa/isa.h"
- #include "hw/scsi/scsi.h"
-+#include "hw/display/vga.h"
- #include "hw/bt.h"
- #include "sysemu/watchdog.h"
- #include "hw/smbios/smbios.h"
+ #include "hw/i386/pc.h"
++#include "hw/input/i8042.h"
+ #include "sysemu/hw_accel.h"
+ #include "hw/qdev.h"
+ 
+diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+index 94138a4e8c..16f4537093 100644
+--- a/hw/ppc/prep.c
++++ b/hw/ppc/prep.c
+@@ -41,6 +41,7 @@
+ #include "hw/ide.h"
+ #include "hw/loader.h"
+ #include "hw/timer/mc146818rtc.h"
++#include "hw/input/i8042.h"
+ #include "hw/isa/pc87312.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/arch_init.h"
+@@ -643,7 +644,7 @@ static void ppc_prep_init(MachineState *machine)
+                      hd[2 * i],
+ 		     hd[2 * i + 1]);
+     }
+-    isa_create_simple(isa_bus, "i8042");
++    isa_create_simple(isa_bus, TYPE_I8042);
+ 
+     cpu = POWERPC_CPU(first_cpu);
+     sysctrl->reset_irq = cpu->env.irq_inputs[PPC6xx_INPUT_HRESET];
+@@ -775,7 +776,7 @@ static void ibm_40p_init(MachineState *machine)
+ 
+     /* add some more devices */
+     if (defaults_enabled()) {
+-        isa_create_simple(isa_bus, "i8042");
++        isa_create_simple(isa_bus, TYPE_I8042);
+         m48t59 = NVRAM(isa_create_simple(isa_bus, "isa-m48t59"));
+ 
+         dev = DEVICE(isa_create(isa_bus, "cs4231a"));
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 8282651aeb..1cd283063e 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -31,6 +31,7 @@
+ #include "hw/i386/pc.h"
+ #include "hw/char/serial.h"
+ #include "hw/timer/m48t59.h"
++#include "hw/input/i8042.h"
+ #include "hw/block/fdc.h"
+ #include "net/net.h"
+ #include "qemu/timer.h"
+@@ -492,7 +493,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+ 
+     pci_cmd646_ide_init(pci_bus, hd, 1);
+ 
+-    isa_create_simple(isa_bus, "i8042");
++    isa_create_simple(isa_bus, TYPE_I8042);
+ 
+     /* Floppy */
+     for(i = 0; i < MAX_FD; i++) {
+diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
+index 6849bac59c..cf79c89f12 100644
+--- a/hw/unicore32/puv3.c
++++ b/hw/unicore32/puv3.c
+@@ -19,6 +19,7 @@
+ 
+ #undef DEBUG_PUV3
+ #include "hw/unicore32/puv3.h"
++#include "hw/input/i8042.h"
+ 
+ #define KERNEL_LOAD_ADDR        0x03000000
+ #define KERNEL_MAX_SIZE         0x00800000 /* Just a guess */
 diff --git a/MAINTAINERS b/MAINTAINERS
-index ddaba2702c..9907b3dae2 100644
+index 9907b3dae2..632eb3f50e 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -860,6 +860,7 @@ F: hw/timer/hpet*
- F: hw/timer/i8254*
- F: hw/timer/mc146818rtc*
- F: hw/watchdog/wdt_ib700.c
-+F: include/hw/display/vga.h
+@@ -863,6 +863,7 @@ F: hw/watchdog/wdt_ib700.c
+ F: include/hw/display/vga.h
  F: include/hw/dma/i8257_dma.h
  F: include/hw/i2c/pm_smbus.h
++F: include/hw/input/i8042.h
  F: include/hw/timer/hpet.h
+ F: include/hw/timer/i8254*
+ F: include/hw/timer/mc146818rtc*
 -- 
 2.15.0.rc0
