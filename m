@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e4Phd-0008HX-Sk
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:06:35 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e4PiS-0000Ya-T5
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:07:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e4PhZ-0004Iz-Ut
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:06:29 -0400
-References: <20171017001209.32276-1-f4bug@amsat.org>
-	<20171017001209.32276-29-f4bug@amsat.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <53e262a3-deb1-7d63-f1bc-98a323928d4e@redhat.com>
-Date: Tue, 17 Oct 2017 13:06:18 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1e4PiK-0004uh-Hd
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:07:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54368)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e4PiK-0004u7-8C
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:07:12 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5FC8537E74
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 11:07:11 +0000 (UTC)
+Date: Tue, 17 Oct 2017 12:07:05 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171017110705.GA2326@work-vm>
+References: <20171004104636.7963-1-quintela@redhat.com>
+	<20171004104636.7963-8-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171017001209.32276-29-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 28/39] hw/acpi: ACPI_PM_* defines are
- not restricted to i386 arch
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171004104636.7963-8-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v9 07/12] migration: Create thread
+ infrastructure for multifd recv side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,82 +34,243 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Michael Tokarev <mjt@tls.msk.ru>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On 17/10/2017 02:11, Philippe Mathieu-Daud=C3=A9 wrote:
-> this allows to remove the old i386/pc dependency on acpi/core.
-
-enable_tco is specific to i386/pc.
-
-You can move it to include/hw/acpi/ich9.h.
-
-Paolo
-
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+* Juan Quintela (quintela@redhat.com) wrote:
+> We make the locking and the transfer of information specific, even if we
+> are still receiving things through the main thread.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> 
+> --
+> 
+> We split when we create the main channel and where we start the main
+> migration thread, so we wait for the creation of the other threads.
+> 
+> Use multifd_clear_pages().
+> Don't remove object_unref()
+> We use correctly the channel numbres
 > ---
->  include/hw/acpi/acpi.h | 12 ++++++++++++
->  include/hw/i386/pc.h   | 13 -------------
->  hw/acpi/core.c         |  1 -
->  3 files changed, 12 insertions(+), 14 deletions(-)
->=20
-> diff --git a/include/hw/acpi/acpi.h b/include/hw/acpi/acpi.h
-> index 7b3d93cf0d..30013b0464 100644
-> --- a/include/hw/acpi/acpi.h
-> +++ b/include/hw/acpi/acpi.h
-> @@ -39,6 +39,18 @@
->  #define ACPI_PM2_REGISTER_WIDTH         8
->  #define ACPI_PM_TIMER_WIDTH             32
-> =20
-> +/* PC-style peripherals (also used by other machines).  */
-> +#define ACPI_PM_PROP_S3_DISABLED "disable_s3"
-> +#define ACPI_PM_PROP_S4_DISABLED "disable_s4"
-> +#define ACPI_PM_PROP_S4_VAL "s4_val"
-> +#define ACPI_PM_PROP_SCI_INT "sci_int"
-> +#define ACPI_PM_PROP_ACPI_ENABLE_CMD "acpi_enable_cmd"
-> +#define ACPI_PM_PROP_ACPI_DISABLE_CMD "acpi_disable_cmd"
-> +#define ACPI_PM_PROP_PM_IO_BASE "pm_io_base"
-> +#define ACPI_PM_PROP_GPE0_BLK "gpe0_blk"
-> +#define ACPI_PM_PROP_GPE0_BLK_LEN "gpe0_blk_len"
-> +#define ACPI_PM_PROP_TCO_ENABLED "enable_tco"
+>  migration/migration.c |  7 +++---
+>  migration/migration.h |  1 +
+>  migration/ram.c       | 60 +++++++++++++++++++++++++++++++++++++++++++++++----
+>  migration/socket.c    |  3 +++
+>  4 files changed, 64 insertions(+), 7 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index ee98c50d8c..1e7c537954 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -388,7 +388,7 @@ static void migration_incoming_setup(QEMUFile *f)
+>      qemu_file_set_blocking(f, false);
+>  }
+>  
+> -static void migration_incoming_process(void)
+> +void migration_incoming_process(void)
+>  {
+>      Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, NULL);
+>      qemu_coroutine_enter(co);
+> @@ -406,9 +406,10 @@ void migration_ioc_process_incoming(QIOChannel *ioc)
+>  
+>      if (!mis->from_src_file) {
+>          QEMUFile *f = qemu_fopen_channel_input(ioc);
+> -        migration_fd_process_incoming(f);
+> +        migration_incoming_setup(f);
+> +        return;
+>      }
+> -    /* We still only have a single channel.  Nothing to do here yet */
+> +    multifd_new_channel(ioc);
+>  }
+>  
+>  /**
+> diff --git a/migration/migration.h b/migration/migration.h
+> index cc196cc87f..a3db60a2a1 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -158,6 +158,7 @@ void migrate_set_state(int *state, int old_state, int new_state);
+>  
+>  void migration_fd_process_incoming(QEMUFile *f);
+>  void migration_ioc_process_incoming(QIOChannel *ioc);
+> +void migration_incoming_process(void);
+>  
+>  bool  migration_has_all_channels(void);
+>  
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 288201e360..745da2971d 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -597,13 +597,18 @@ static uint16_t multifd_send_page(uint8_t *address, bool last_page)
+>  }
+>  
+>  struct MultiFDRecvParams {
+> +    /* not changed */
+>      uint8_t id;
+>      char *name;
+>      QemuThread thread;
+>      QIOChannel *c;
+> +    QemuSemaphore ready;
+>      QemuSemaphore sem;
+>      QemuMutex mutex;
+> +    /* proteced by param mutex */
+>      bool quit;
+> +    multifd_pages_t pages;
+> +    bool done;
+>  };
+>  typedef struct MultiFDRecvParams MultiFDRecvParams;
+>  
+> @@ -613,6 +618,7 @@ struct {
+>      int count;
+>      /* Should we finish */
+>      bool quit;
+> +    multifd_pages_t pages;
+>  } *multifd_recv_state;
+>  
+>  static void terminate_multifd_recv_threads(Error *errp)
+> @@ -634,6 +640,7 @@ static void terminate_multifd_recv_threads(Error *errp)
+>          p->quit = true;
+>          qemu_sem_post(&p->sem);
+>          qemu_mutex_unlock(&p->mutex);
+> +        multifd_clear_pages(&p->pages);
+>      }
+>  }
+>  
+> @@ -658,6 +665,7 @@ int multifd_load_cleanup(Error **errp)
+>      }
+>      g_free(multifd_recv_state->params);
+>      multifd_recv_state->params = NULL;
+> +    multifd_clear_pages(&multifd_recv_state->pages);
+>      g_free(multifd_recv_state);
+>      multifd_recv_state = NULL;
+>  
+> @@ -668,12 +676,20 @@ static void *multifd_recv_thread(void *opaque)
+>  {
+>      MultiFDRecvParams *p = opaque;
+>  
+> +    qemu_sem_post(&p->ready);
+>      while (true) {
+>          qemu_mutex_lock(&p->mutex);
+>          if (p->quit) {
+>              qemu_mutex_unlock(&p->mutex);
+>              break;
+>          }
+> +        if (p->pages.num) {
+> +            p->pages.num = 0;
+
+This could do with some TODO comments in - since this code
+doesn't do anything useful yet and is confusing, but gets clearer
+when you add the filling in the later patches.
+
+Dave
+
+> +            p->done = true;
+> +            qemu_mutex_unlock(&p->mutex);
+> +            qemu_sem_post(&p->ready);
+> +            continue;
+> +        }
+>          qemu_mutex_unlock(&p->mutex);
+>          qemu_sem_wait(&p->sem);
+>      }
+> @@ -714,13 +730,21 @@ void multifd_new_channel(QIOChannel *ioc)
+>      }
+>      qemu_mutex_init(&p->mutex);
+>      qemu_sem_init(&p->sem, 0);
+> +    qemu_sem_init(&p->ready, 0);
+>      p->quit = false;
+>      p->id = msg.id;
+> +    p->done = false;
+> +    multifd_init_pages(&p->pages);
+>      p->c = ioc;
+>      multifd_recv_state->count++;
+>      p->name = g_strdup_printf("multifdrecv_%d", msg.id);
+> +    object_ref(OBJECT(ioc));
+
+It would be good to comment to say where that gets unref'd.
+
+Dave
+
 > +
->  /* PM Timer ticks per second (HZ) */
->  #define PM_TIMER_FREQUENCY  3579545
-> =20
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 087d184ef5..b1b4c918af 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -151,19 +151,6 @@ struct PCMachineClass {
->  #define PC_MACHINE_CLASS(klass) \
->      OBJECT_CLASS_CHECK(PCMachineClass, (klass), TYPE_PC_MACHINE)
-> =20
-> -/* PC-style peripherals (also used by other machines).  */
-> -
-> -#define ACPI_PM_PROP_S3_DISABLED "disable_s3"
-> -#define ACPI_PM_PROP_S4_DISABLED "disable_s4"
-> -#define ACPI_PM_PROP_S4_VAL "s4_val"
-> -#define ACPI_PM_PROP_SCI_INT "sci_int"
-> -#define ACPI_PM_PROP_ACPI_ENABLE_CMD "acpi_enable_cmd"
-> -#define ACPI_PM_PROP_ACPI_DISABLE_CMD "acpi_disable_cmd"
-> -#define ACPI_PM_PROP_PM_IO_BASE "pm_io_base"
-> -#define ACPI_PM_PROP_GPE0_BLK "gpe0_blk"
-> -#define ACPI_PM_PROP_GPE0_BLK_LEN "gpe0_blk_len"
-> -#define ACPI_PM_PROP_TCO_ENABLED "enable_tco"
-> -
->  /* parallel.c */
-> =20
->  void parallel_hds_isa_init(ISABus *bus, int n);
-> diff --git a/hw/acpi/core.c b/hw/acpi/core.c
-> index cd0a1d357b..eb9b76f70b 100644
-> --- a/hw/acpi/core.c
-> +++ b/hw/acpi/core.c
-> @@ -21,7 +21,6 @@
->  #include "qemu/osdep.h"
->  #include "sysemu/sysemu.h"
->  #include "hw/hw.h"
-> -#include "hw/i386/pc.h"
->  #include "hw/acpi/acpi.h"
->  #include "hw/nvram/fw_cfg.h"
->  #include "qemu/config-file.h"
->=20
+>      qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
+>                         QEMU_THREAD_JOINABLE);
+> +    if (multifd_recv_state->count == migrate_multifd_channels()) {
+> +        migration_incoming_process();
+> +    }
+>  }
+>  
+>  int multifd_load_setup(void)
+> @@ -735,6 +759,7 @@ int multifd_load_setup(void)
+>      multifd_recv_state->params = g_new0(MultiFDRecvParams, thread_count);
+>      multifd_recv_state->count = 0;
+>      multifd_recv_state->quit = false;
+> +    multifd_init_pages(&multifd_recv_state->pages);
+>      return 0;
+>  }
+>  
+> @@ -743,6 +768,36 @@ int multifd_created_channels(void)
+>      return multifd_recv_state->count;
+>  }
+>  
+> +static void multifd_recv_page(uint8_t *address, uint16_t fd_num)
+> +{
+> +    int thread_count;
+> +    MultiFDRecvParams *p;
+> +    multifd_pages_t *pages = &multifd_recv_state->pages;
+> +
+> +    pages->iov[pages->num].iov_base = address;
+> +    pages->iov[pages->num].iov_len = TARGET_PAGE_SIZE;
+> +    pages->num++;
+> +
+> +    if (fd_num == MULTIFD_CONTINUE) {
+> +        return;
+> +    }
+> +
+> +    thread_count = migrate_multifd_channels();
+> +    assert(fd_num < thread_count);
+> +    p = &multifd_recv_state->params[fd_num];
+> +
+> +    qemu_sem_wait(&p->ready);
+> +
+> +    qemu_mutex_lock(&p->mutex);
+> +    p->done = false;
+> +    iov_copy(p->pages.iov, pages->num, pages->iov, pages->num, 0,
+> +             iov_size(pages->iov, pages->num));
+> +    p->pages.num = pages->num;
+> +    pages->num = 0;
+> +    qemu_mutex_unlock(&p->mutex);
+> +    qemu_sem_post(&p->sem);
+> +}
+> +
+>  /**
+>   * save_page_header: write page header to wire
+>   *
+> @@ -3060,10 +3115,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>  
+>          case RAM_SAVE_FLAG_MULTIFD_PAGE:
+>              fd_num = qemu_get_be16(f);
+> -            if (fd_num != 0) {
+> -                /* this is yet an unused variable, changed later */
+> -                fd_num = fd_num;
+> -            }
+> +            multifd_recv_page(host, fd_num);
+>              qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
+>              break;
+>  
+> diff --git a/migration/socket.c b/migration/socket.c
+> index 22fb05edc8..debe972ee8 100644
+> --- a/migration/socket.c
+> +++ b/migration/socket.c
+> @@ -186,6 +186,9 @@ out:
+>      if (migration_has_all_channels()) {
+>          /* Close listening socket as its no longer needed */
+>          qio_channel_close(ioc, NULL);
+> +        if (!migrate_use_multifd()) {
+> +            migration_incoming_process();
+> +        }
+>          return G_SOURCE_REMOVE;
+>      } else {
+>          return G_SOURCE_CONTINUE;
+> -- 
+> 2.13.5
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
