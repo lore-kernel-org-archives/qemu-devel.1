@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4H1x-0005ZC-82
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 21:50:54 -0400
+	(envelope-from <bounces@canonical.com>) id 1e4HBs-00077K-EH
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 22:01:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4H1u-0007Z7-5v
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 21:50:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51798)
+	(envelope-from <bounces@canonical.com>) id 1e4HBp-00048r-D6
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 22:01:08 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53036)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e4H1t-0007YG-VI
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 21:50:50 -0400
+	id 1e4HBp-00048S-6b
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 22:01:05 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e4H1q-0000m5-Ii
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 01:50:46 +0000
+	id 1e4HBn-0001Uu-Fk
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 02:01:03 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 774142E80D2
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 01:50:46 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 7510B2E80CB
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 02:01:03 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 17 Oct 2017 01:41:51 -0000
+Date: Tue, 17 Oct 2017 01:52:36 -0000
 From: chan <1723927@bugs.launchpad.net>
 Reply-To: Bug 1723927 <1723927@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150815318241.964.13154685786789289008.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150820451124.22560.1050810124037583805.malone@wampee.canonical.com>
+Message-Id: <150820515624.13723.5405240255159227862.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1723927] Re: Linux or windows guest boot failed
  by uefi on CPU of Intel Xeon X5675
@@ -39,26 +39,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Ersek, thank you very much!
-
-I set up correctly in "/etc/libvirt/qemu.conf", so command
--bios /usr/share/qemu-kvm/OVMF_CODE.fd
-also boot UEFI guest.
-
-Current, my question only in the platform in server of ProLiant BL460c G7, =
-
-the same ovmf firmware.
-
-How can capture the OVMF debug log?
-I use your advise, open ovmf debug in guest xml:
-<qemu:commandline>
-    <qemu:arg value=3D'-global'/>
-    <qemu:arg value=3D'isa-debugcon.iobase=3D0x402'/>
-    <qemu:arg value=3D'-debugcon'/>
-    <qemu:arg value=3D'file:/tmp/GUEST_NAME.log'/>
-  </qemu:commandline>
-but nothing output in /tmp/GUEST_NAME.log.
-Another, I used debug version ovmf.
+I success to capture the OVMF debug log.
 
 -- =
 
