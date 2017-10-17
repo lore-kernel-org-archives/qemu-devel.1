@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4Tq0-0002TZ-Nk
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:31:26 -0400
+	(envelope-from <berrange@redhat.com>) id 1e4Ttv-0003ZL-Nw
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:35:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4Tpx-0002yP-G9
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:31:24 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48732)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e4Tpx-0002xv-8X
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:31:21 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e4Tpu-0007kf-KC
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 15:31:18 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9641E2E807B
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 15:31:17 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1e4Ttr-0004o2-Ca
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:35:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54878)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e4Ttq-0004nI-UY
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:35:23 -0400
+Date: Tue, 17 Oct 2017 16:35:15 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20171017153515.GC31897@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
+	<1508170976-96869-5-git-send-email-imammedo@redhat.com>
+	<20171016165916.GI3246@localhost.localdomain>
+	<4c14ed02-1f1c-a093-52ac-632f61a68a6f@redhat.com>
+	<20171017144827.GA31897@redhat.com>
+	<1580a018-b395-cc34-5a89-db5872e61dee@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 17 Oct 2017 15:22:02 -0000
-From: Daniel Berrange <1718964@bugs.launchpad.net>
-Reply-To: Bug 1718964 <1718964@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150609439728.30760.16378952760062218203.malonedeb@wampee.canonical.com>
-Message-Id: <150825372346.14099.5365133286708591116.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1718964] Re: Memory leak when using websocket
- over a low speed network
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1580a018-b395-cc34-5a89-db5872e61dee@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 4/6] CLI: add -paused option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,128 +32,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, peter.maydell@linaro.org, pkrempa@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, Igor Mammedov <imammedo@redhat.com>, david@gibson.dropbear.id.au
 
-** Changed in: qemu
-       Status: New =3D> Fix Committed
+On Tue, Oct 17, 2017 at 05:21:13PM +0200, Laszlo Ersek wrote:
+> On 10/17/17 16:48, Daniel P. Berrange wrote:
+> > On Mon, Oct 16, 2017 at 07:01:01PM +0200, Paolo Bonzini wrote:
+> >> On 16/10/2017 18:59, Eduardo Habkost wrote:
+> >>>> +DEF("paused", HAS_ARG, QEMU_OPTION_paused, \
+> >>>> +    "-paused [state=]postconf|preconf\n"
+> >>>> +    "                postconf: pause QEMU after machine is initialized\n"
+> >>>> +    "                preconf: pause QEMU before machine is initialized\n",
+> >>>> +    QEMU_ARCH_ALL)
+> >>> I would like to allow pausing before machine-type is selected, so
+> >>> management could run query-machines before choosing a
+> >>> machine-type.  Would that need a third "-pause" mode, or will we
+> >>> be able to change "preconf" to pause before select_machine() is
+> >>> called?
+> >>>
+> >>> The same probably applies to other things initialized before
+> >>> machine_run_board_init() that could be configurable using QMP,
+> >>> including but not limited to:
+> >>> * Accelerator configuration
+> >>> * Registering global properties
+> >>> * RAM size
+> >>> * SMP/CPU configuration
+> >>
+> >> Should (or could) "-M none" be changed in a backwards-compatible way to
+> >> allow such preconfiguration?  For example
+> >>
+> >>   qemu -M none -monitor stdio
+> >>   (qemu) machine-set-options pc,accel=kvm
+> >>   (qemu) c
+> > 
+> > Going down this route has pretty major implications for the way libvirt
+> > manages QEMU, and support / debugging of it. When you look at the QEMU
+> > command line libvirt uses it will be almost devoid of any useful info.
+> > So it will be more involved job to figure out just how QEMU is configured.
+> > This also means it is difficult to replicate the config that libvirt has
+> > used, outside of libvirt for sake of debugging.
+> > 
+> > I also think it will have pretty significant performance implications
+> > for QEMU startup. To configure a guest via the monitor is going to
+> > require a huge number of monitor commands to be executed to replicate
+> > what we traditionally configured via ARGV. While each monitor command
+> > is not massively slow, the round-trip time of each command will quickly
+> > add up to several 100 milliseconds, perhaps even seconds in the the
+> > case of very large configs. 
+> > 
+> > Maybe we ultimately have no choice and this is inevitable, but I am
+> > pretty wary of going in the direction of launching bare QEMU and
+> > configuring everything via a huge number of monitor calls.
+> 
+> Where's the sweet spot between
+> - configuring everything dynamically, over QMP,
+> - and invoking QEMU separately, for querying capabilities etc?
 
--- =
+The key with the way we currently invoke & query QEMU over QMP to detect
+capabilities is that this is not tied to a specific VM launch process.
+We can query capabilities and cache them until such time as we detect
+a QEMU binary change. So this never impacts on the startup performance
+of individual VMs. The caching is critical, because querying capabilities
+is actually quite time intensive already, taking many seconds to query
+capabilities on all the different target binaries we have.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1718964
-
-Title:
-  Memory leak when using websocket over a low speed network
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  Description of problem
-  -------------------------
-
-  When VNC is connected to QEMU via websocket over a low speed network
-  (e.g. 300KB/S Wide Area Network), and there is a lot of frame buffer
-  update, the VNC Client will get stuck, the cursor is almost impossible
-  to move, which may result in accumulation of a large number of data in
-  the QEMU process (memory consumption will keep increasing).
-
-  =
-
-  Environment
-  -------------------------
-  All of the following versions have been tested:
-
-  QEMU: 2.5.1 / 2.6.0 / 2.8.1.1 / 2.9.0 / 2.10.0
-  Host OS: Ubuntu 16.04 Server LTS / CentOS 7 x86_64_1611
-  Guest OS: Windows 7 64bit / Ubuntu 16.04 Desktop LTS
-  Client OS: Windows 7 64bit / Windows 10 64bit
-  Client Browser: IE 11.0.9600 / Chrome 60.0.3112 / Firefox 55.0.2
-  VNC Client: TigerVNC Viewer 1.8 / UltraVNC Viewer 1.2.1.5 / TightVNC View=
-er 2.8.8 =
-
-  VNC Web Client: noVNC 0.5.1 / noVNC 0.61 / noVNC 0.62
-  VNC Server: TigerVNC 1.8 / x11vnc 0.9.13 / TightVNC 2.8.8
-  VNC Client: TigerVNC Viewer 1.8 / UltraVNC Viewer 1.2.1.5 / TightVNC View=
-er 2.8.8
-
-  =
-
-  Steps to reproduce:
-  -------------------------
-  100% reproducible.
-
-  1. Launch a QEMU instance with websocket option:
-  qemu-system-x86_64 -enable-kvm -m 6G ./win_x64.qcow2 -vnc :1,websocket=3D=
-5701
-
-  2. Open VNC Web Client (noVNC/vnc.html) in browser and connect to QEMU
-  VM via websocket
-
-  3. Play a video (e.g. Watch YouTube) on VM (To produce a lot of frame
-  buffer update)
-
-  4. Limit (e.g. Use NetLimiter) the client inbound bandwidth to 300KB/S
-  (To simulate a low speed WAN)
-
-  5. Then client's output gets stuck(less than 1 fps), the cursor is
-  almost impossible to move
-
-  6. Observe QEMU process on the host, more and more data are
-  accumulated in the process, the consumption of memory continues to
-  keep increasing
-
-  =
-
-  Current result:
-  -------------------------
-  [Top - Initial status]
-    PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMA=
-ND         =
-
-   2725 root      20   0 7229144 5.910g  23024 S  16.3 18.9   0:12.84 qemu-=
-system-x86_64
-
-  [Top - After an hour's playing w/o limit (6-8MB/S)]
-    PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMA=
-ND         =
-
-   2725 root      20   0 7370284 6.046g  23132 S  28.0 19.3  35:58.15 qemu-=
-system-x86_64
-
-  [Top - Limit the bandwidth and continue to playing for another an hour (3=
-00KB/S)]
-    PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMA=
-ND         =
-
-   2725 root      20   0 11.029g 8.853g  23132 S  20.0 28.2  72:14.17 qemu-=
-system-x86_64
-
-  Also test several other combinations in the same environment:
-
-  1. Client(VNC Viewer) - Server(QEMU)
-  2. Client(VNC Viewer) - Server(tigervnc/x11vnc/tightvnc)
-  3. Client(noVNC)      - Server(tigervnc/x11vnc/tightvnc)
-
-  Likewise, the client's inbound bandwidth is limited to 300KB/S, =
-
-  although a lot of frame are lost, all of they still works (at least the m=
-ouse is movable).
-
-  It's found that when connect to QEMU via websocket, it never drop any fra=
-mes.
-  QEMU still sends a lot of data to its websocket even when the network is =
-congested, =
-
-  the process is continually consuming more memory, then it gets stack.
-
-  =
-
-  Expected results:
-  -------------------------
-  When the network is poor (non-LAN), QEMU would reduce the VNC data send t=
-o its websocket correspondingly, and the memory usage remains stable.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1718964/+subscriptions
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
