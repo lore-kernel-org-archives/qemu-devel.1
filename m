@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e4OHf-0005iB-OL
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:35:37 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e4OQC-0000FJ-CV
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:44:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e4OHZ-000743-1Z
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:35:35 -0400
-Date: Tue, 17 Oct 2017 11:35:19 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171017113519.1eb78f7c.cohuck@redhat.com>
-In-Reply-To: <07afc056-4a03-3644-d665-c165830776ba@redhat.com>
-References: <20171016202358.3633-1-david@redhat.com>
-	<20171017104725.14971395.cohuck@redhat.com>
-	<07afc056-4a03-3644-d665-c165830776ba@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1e4OQB-0004Lb-M6
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:44:24 -0400
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:51683)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1e4OQB-0004KN-Ej
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:44:23 -0400
+Received: by mail-wr0-x230.google.com with SMTP id j14so981206wre.8
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 02:44:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 0/2] s390x/tcg: LAP support using
- immediate TLB invalidation
+In-Reply-To: <20171016131644.9565-1-kraxel@redhat.com>
+References: <20171016131644.9565-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Oct 2017 10:44:00 +0100
+Message-ID: <CAFEAcA9oEUuiu+6K+FuR7TmKhQnPpNSfz5Cy2g8MqR-QEDECSQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/11] Ui 20171016 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, 17 Oct 2017 11:22:19 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On 16 October 2017 at 14:16, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit f90ea7ba7c5ae7010ee0ce062207ae42530f57d6:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20171012' into staging (2017-10-12 17:06:50 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/ui-20171016-pull-request
+>
+> for you to fetch changes up to 2ff408de9c080f2fb5a94ebf6a209c6180c64933:
+>
+>   gtk: fix wrong id between texture and framebuffer (2017-10-16 14:50:54 +0200)
+>
+> ----------------------------------------------------------------
+> ui: use keycodemapdb for key code mappings, part one (v2)
+> ui: add qemu-keymap, update reverse keymaps (for qemu -k $map)
+> ui: fix for vte 0.50
+> ui: gtk texture fix
+>
 
-> On 17.10.2017 10:47, Cornelia Huck wrote:
-> > On Mon, 16 Oct 2017 22:23:56 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> Details about Low-Address Protection can be found in description of
-> >> patch 1 and 2. It is basically a subpage protection of the first two
-> >> pages of every address space (for which it is enabled).
-> >>
-> >> We can achieve this by simply directly invalidating the TLB entry and
-> >> therefore forcing every write accesses onto these two pages into the slow
-> >> path.
-> >>
-> >> With this patch, I can boot Linux just fine (which uses LAP). This also
-> >> makes all related kvm-unit-tests that we have pass.  
-> > 
-> > Tested with a kernel based on the s390/features branch (4.14-rc2 + s390
-> > patches) and the initrd from the debian installer, had udevd shot down
-> > by the oomkiller. That happened only once, so it was probably an
-> > unrelated fluke, but that combination worked well before.
-> >   
-> 
-> Very unlikely, on invalid programming exceptions you would get a kernel
-> panic, not run oom. (not saying it isn't possible, rather that it is
-> very unlikely).
+Applied, thanks.
 
-That's what I thought as well.
-
-> 
-> Can you reproduce with more memory? Have you enabled SMP? (little higher
-> memory consumption)
-
-SMP is on. I could not reproduce it again...
-
-> 
-> I am running (almost) the same setup with 500M and haven't observed any
-> such thing.
-
-...so I think it really is an unrelated fluke (and I'll simply make the
-machine a bit larger).
+-- PMM
