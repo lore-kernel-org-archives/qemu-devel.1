@@ -1,18 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e4QoD-0004l4-Co
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:17:27 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e4R2a-0008KE-Ch
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:32:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1e4Qo9-0007w2-Dx
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:17:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43022)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1e4Qo9-0007vn-8R
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:17:17 -0400
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 17 Oct 2017 14:17:14 +0200
-Message-Id: <20171017121714.24714-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] watch_mem_write: implement 8-byte accesses
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e4R2U-00066C-V2
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:32:12 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20171017001209.32276-1-f4bug@amsat.org>
+	<20171017001209.32276-37-f4bug@amsat.org>
+	<0e1e9d13-9b7f-ef72-757b-7b4262986a48@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7070309a-db76-b9ca-7f2c-0b0bbf5b509a@amsat.org>
+Date: Tue, 17 Oct 2017 09:31:46 -0300
+MIME-Version: 1.0
+In-Reply-To: <0e1e9d13-9b7f-ef72-757b-7b4262986a48@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 36/39] i386/pc: move pvpanic.c from
+ hw/misc/ to hw/i386/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,60 +30,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Andrew.Baumann@microsoft.com, rth@twiddle.net
+To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-Aligned 8-byte memory writes by a 64-bit target on a 64-bit host should
-always turn into atomic 8-byte writes on the host, however a write
-write watchpoint would end up tearing the 8-byte write into two 4-byte
-writes in access_with_adjusted_size().
+On 10/17/2017 08:04 AM, Paolo Bonzini wrote:> pvpanic does not _have_ to
+be i386-specific, and losing the
+> configurability with default-configs/ is a bit of a pity (there are
+> people who change the configurations), so I think it's better to leave
+> out this change.
 
-Reported-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- exec.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/exec.c b/exec.c
-index b58bc4eff7..db5ae23118 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2503,6 +2503,9 @@ static MemTxResult watch_mem_read(void *opaque, hwaddr addr, uint64_t *pdata,
-     case 4:
-         data = address_space_ldl(as, addr, attrs, &res);
-         break;
-+    case 8:
-+        data = address_space_ldq(as, addr, attrs, &res);
-+        break;
-     default: abort();
-     }
-     *pdata = data;
-@@ -2528,6 +2531,9 @@ static MemTxResult watch_mem_write(void *opaque, hwaddr addr,
-     case 4:
-         address_space_stl(as, addr, val, attrs, &res);
-         break;
-+    case 8:
-+        address_space_stq(as, addr, val, attrs, &res);
-+        break;
-     default: abort();
-     }
-     return res;
-@@ -2537,6 +2543,16 @@ static const MemoryRegionOps watch_mem_ops = {
-     .read_with_attrs = watch_mem_read,
-     .write_with_attrs = watch_mem_write,
-     .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 8,
-+        .unaligned = false,
-+    },
-+    .impl = {
-+        .min_access_size = 1,
-+        .max_access_size = 8,
-+        .unaligned = false,
-+    },
- };
- 
- static MemTxResult flatview_write(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
--- 
-2.14.2
+Good to know, OK! (patch dropped)
