@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e4RIp-0003j8-Bz
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:49:00 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1e4RK7-0004Yn-Ul
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:50:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e4RIo-0007nd-IB
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:48:59 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:57123)
+	(envelope-from <peter.maydell@linaro.org>) id 1e4RK6-0000CG-PJ
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:50:19 -0400
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:45714)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e4RIo-0007nB-Bp
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:48:58 -0400
-Received: by mail-wm0-x229.google.com with SMTP id l68so3703105wmd.5
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 05:48:58 -0700 (PDT)
+	id 1e4RK6-0000BT-D7
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:50:18 -0400
+Received: by mail-wm0-x230.google.com with SMTP id q124so3675273wmb.0
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 05:50:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1492623684-25799-3-git-send-email-alindsay@codeaurora.org>
-References: <1492623684-25799-1-git-send-email-alindsay@codeaurora.org>
-	<1492623684-25799-3-git-send-email-alindsay@codeaurora.org>
+In-Reply-To: <1506737310-21880-3-git-send-email-alindsay@codeaurora.org>
+References: <1506737310-21880-1-git-send-email-alindsay@codeaurora.org>
+	<1506737310-21880-3-git-send-email-alindsay@codeaurora.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Oct 2017 13:48:36 +0100
-Message-ID: <CAFEAcA8jQCtXtgYhR0W_rmyLSNmFHqgc-WEy-Anbcj_PF5-4WQ@mail.gmail.com>
+Date: Tue, 17 Oct 2017 13:49:56 +0100
+Message-ID: <CAFEAcA_zwAu4Zt0-2Qy9euBzYQgD19EnnoWwa+ZNzidWwkmEcA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PATCH 02/13] target/arm: Check PMCNTEN for
  whether PMCCNTR is enabled
@@ -31,16 +31,16 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Aaron Lindsay <alindsay@codeaurora.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Peter Crosthwaite <peter.crosthwaite@xilinx.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-On 19 April 2017 at 18:41, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+On 30 September 2017 at 03:08, Aaron Lindsay <alindsay@codeaurora.org> wrote:
 > Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
 > ---
 >  target/arm/helper.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 >
 > diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 8cb7a94..8888391 100644
+> index 8be78ea..40c9273 100644
 > --- a/target/arm/helper.c
 > +++ b/target/arm/helper.c
 > @@ -964,7 +964,7 @@ static inline bool arm_ccnt_enabled(CPUARMState *env)
@@ -51,8 +51,14 @@ On 19 April 2017 at 18:41, Aaron Lindsay <alindsay@codeaurora.org> wrote:
 > +    if (!(env->cp15.c9_pmcr & PMCRE) || !(env->cp15.c9_pmcnten & (1 << 31))) {
 >          return false;
 >      }
+>
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+I keep replying to your v1 patchset by mistake -- can you use
+the git format-patch options to put make the subject prefix
+be "[PATCH v3]" for the next round in all the patchmails to
+help keep the versions distinct, please?
 
 thanks
 -- PMM
