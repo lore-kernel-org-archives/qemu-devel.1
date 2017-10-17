@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e4Pou-0005KK-A5
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:14:01 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e4Pou-0005KS-Ck
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:14:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e4Pop-0001sY-LQ
+	(envelope-from <kraxel@redhat.com>) id 1e4Pos-0001v2-1z
 	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:14:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60718)
+Received: from mx1.redhat.com ([209.132.183.28]:45056)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e4Pop-0001q5-DI
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:13:55 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e4Por-0001uQ-PK
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:13:57 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7CF6A80484
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 11:13:54 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D8D35C04AC56
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 11:13:56 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 17 Oct 2017 13:13:45 +0200
-Message-Id: <20171017111350.8176-2-kraxel@redhat.com>
+Date: Tue, 17 Oct 2017 13:13:47 +0200
+Message-Id: <20171017111350.8176-4-kraxel@redhat.com>
 In-Reply-To: <20171017111350.8176-1-kraxel@redhat.com>
 References: <20171017111350.8176-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 1/6] console: add support for dmabufs
+Subject: [Qemu-devel] [PULL 3/6] opengl: add flipping vertex shader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,146 +32,118 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-This patch adds support for dma-bufs to the qemu console interfaces.
-It adds a new "struct QemuDmaBuf" to represent a dmabuf with accociated
-metatdata (size, format).  It adds three functions (and
-DisplayChangeListenerOps operations) to set a dma-buf as display
-scanout, as cursor and to release a dmabuf.
+Add vertex shader which flips the texture upside down while blitting it.
+Add argument to qemu_gl_run_texture_blit() to enable flipping.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20171010135453.6704-2-kraxel@redhat.com
+Message-id: 20171010135453.6704-4-kraxel@redhat.com
 ---
- include/qemu/typedefs.h |  1 +
- include/ui/console.h    | 25 +++++++++++++++++++++++++
- ui/console.c            | 33 +++++++++++++++++++++++++++++++++
- 3 files changed, 59 insertions(+)
+ Makefile                         |  4 +++-
+ include/ui/shader.h              |  2 +-
+ ui/console-gl.c                  |  2 +-
+ ui/shader.c                      | 12 +++++++++---
+ ui/shader/texture-blit-flip.vert | 10 ++++++++++
+ 5 files changed, 24 insertions(+), 6 deletions(-)
+ create mode 100644 ui/shader/texture-blit-flip.vert
 
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index 980d2b330e..3dbc69b1e9 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -83,6 +83,7 @@ typedef struct PropertyInfo PropertyInfo;
- typedef struct PS2State PS2State;
- typedef struct QEMUBH QEMUBH;
- typedef struct QemuConsole QemuConsole;
-+typedef struct QemuDmaBuf QemuDmaBuf;
- typedef struct QEMUFile QEMUFile;
- typedef struct QemuOpt QemuOpt;
- typedef struct QemuOpts QemuOpts;
-diff --git a/include/ui/console.h b/include/ui/console.h
-index 6966e4bd9d..158969f978 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -5,6 +5,7 @@
- #include "qom/object.h"
- #include "qapi/qmp/qdict.h"
- #include "qemu/notify.h"
-+#include "qemu/typedefs.h"
- #include "qapi-types.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
-@@ -180,6 +181,15 @@ struct QEMUGLParams {
-     int minor_ver;
+diff --git a/Makefile b/Makefile
+index e124f1c5a0..0d293ad294 100644
+--- a/Makefile
++++ b/Makefile
+@@ -673,7 +673,9 @@ ui/shader/%-frag.h: $(SRC_PATH)/ui/shader/%.frag $(SRC_PATH)/scripts/shaderinclu
+ 		"FRAG","$@")
+ 
+ ui/shader.o: $(SRC_PATH)/ui/shader.c \
+-	ui/shader/texture-blit-vert.h ui/shader/texture-blit-frag.h
++	ui/shader/texture-blit-vert.h \
++	ui/shader/texture-blit-flip-vert.h \
++	ui/shader/texture-blit-frag.h
+ 
+ # documentation
+ MAKEINFO=makeinfo
+diff --git a/include/ui/shader.h b/include/ui/shader.h
+index 369e49865f..4c5acb2ce8 100644
+--- a/include/ui/shader.h
++++ b/include/ui/shader.h
+@@ -5,7 +5,7 @@
+ 
+ typedef struct QemuGLShader QemuGLShader;
+ 
+-void qemu_gl_run_texture_blit(QemuGLShader *gls);
++void qemu_gl_run_texture_blit(QemuGLShader *gls, bool flip);
+ 
+ QemuGLShader *qemu_gl_init_shader(void);
+ void qemu_gl_fini_shader(QemuGLShader *gls);
+diff --git a/ui/console-gl.c b/ui/console-gl.c
+index 9b50daedbd..5b77e7aa88 100644
+--- a/ui/console-gl.c
++++ b/ui/console-gl.c
+@@ -109,7 +109,7 @@ void surface_gl_render_texture(QemuGLShader *gls,
+     glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
+     glClear(GL_COLOR_BUFFER_BIT);
+ 
+-    qemu_gl_run_texture_blit(gls);
++    qemu_gl_run_texture_blit(gls, false);
+ }
+ 
+ void surface_gl_destroy_texture(QemuGLShader *gls,
+diff --git a/ui/shader.c b/ui/shader.c
+index d36e7af232..008458bf94 100644
+--- a/ui/shader.c
++++ b/ui/shader.c
+@@ -29,10 +29,12 @@
+ #include "ui/shader.h"
+ 
+ #include "shader/texture-blit-vert.h"
++#include "shader/texture-blit-flip-vert.h"
+ #include "shader/texture-blit-frag.h"
+ 
+ struct QemuGLShader {
+     GLint texture_blit_prog;
++    GLint texture_blit_flip_prog;
+     GLint texture_blit_vao;
  };
  
-+struct QemuDmaBuf {
-+    int       fd;
-+    uint32_t  width;
-+    uint32_t  height;
-+    uint32_t  stride;
-+    uint32_t  fourcc;
-+    uint32_t  texture;
-+};
-+
- typedef struct DisplayChangeListenerOps {
-     const char *dpy_name;
- 
-@@ -220,6 +230,13 @@ typedef struct DisplayChangeListenerOps {
-                                    uint32_t backing_height,
-                                    uint32_t x, uint32_t y,
-                                    uint32_t w, uint32_t h);
-+    void (*dpy_gl_scanout_dmabuf)(DisplayChangeListener *dcl,
-+                                  QemuDmaBuf *dmabuf);
-+    void (*dpy_gl_cursor_dmabuf)(DisplayChangeListener *dcl,
-+                                 QemuDmaBuf *dmabuf,
-+                                 uint32_t pos_x, uint32_t pos_y);
-+    void (*dpy_gl_release_dmabuf)(DisplayChangeListener *dcl,
-+                                  QemuDmaBuf *dmabuf);
-     void (*dpy_gl_update)(DisplayChangeListener *dcl,
-                           uint32_t x, uint32_t y, uint32_t w, uint32_t h);
- 
-@@ -288,6 +305,13 @@ void dpy_gl_scanout_texture(QemuConsole *con,
-                             uint32_t backing_id, bool backing_y_0_top,
-                             uint32_t backing_width, uint32_t backing_height,
-                             uint32_t x, uint32_t y, uint32_t w, uint32_t h);
-+void dpy_gl_scanout_dmabuf(QemuConsole *con,
-+                           QemuDmaBuf *dmabuf);
-+void dpy_gl_cursor_dmabuf(QemuConsole *con,
-+                          QemuDmaBuf *dmabuf,
-+                          uint32_t pos_x, uint32_t pos_y);
-+void dpy_gl_release_dmabuf(QemuConsole *con,
-+                           QemuDmaBuf *dmabuf);
- void dpy_gl_update(QemuConsole *con,
-                    uint32_t x, uint32_t y, uint32_t w, uint32_t h);
- 
-@@ -298,6 +322,7 @@ int dpy_gl_ctx_make_current(QemuConsole *con, QEMUGLContext ctx);
- QEMUGLContext dpy_gl_ctx_get_current(QemuConsole *con);
- 
- bool console_has_gl(QemuConsole *con);
-+bool console_has_gl_dmabuf(QemuConsole *con);
- 
- static inline int surface_stride(DisplaySurface *s)
- {
-diff --git a/ui/console.c b/ui/console.c
-index b82c27960a..eca854cbd5 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -1404,6 +1404,11 @@ bool console_has_gl(QemuConsole *con)
-     return con->gl != NULL;
+@@ -68,9 +70,11 @@ static GLuint qemu_gl_init_texture_blit(GLint texture_blit_prog)
+     return vao;
  }
  
-+bool console_has_gl_dmabuf(QemuConsole *con)
-+{
-+    return con->gl != NULL && con->gl->ops->dpy_gl_scanout_dmabuf != NULL;
-+}
-+
- void register_displaychangelistener(DisplayChangeListener *dcl)
+-void qemu_gl_run_texture_blit(QemuGLShader *gls)
++void qemu_gl_run_texture_blit(QemuGLShader *gls, bool flip)
  {
-     static const char nodev[] =
-@@ -1745,6 +1750,34 @@ void dpy_gl_scanout_texture(QemuConsole *con,
-                                          x, y, width, height);
+-    glUseProgram(gls->texture_blit_prog);
++    glUseProgram(flip
++                 ? gls->texture_blit_flip_prog
++                 : gls->texture_blit_prog);
+     glBindVertexArray(gls->texture_blit_vao);
+     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
  }
+@@ -150,7 +154,9 @@ QemuGLShader *qemu_gl_init_shader(void)
  
-+void dpy_gl_scanout_dmabuf(QemuConsole *con,
-+                           QemuDmaBuf *dmabuf)
-+{
-+    assert(con->gl);
-+    con->gl->ops->dpy_gl_scanout_dmabuf(con->gl, dmabuf);
+     gls->texture_blit_prog = qemu_gl_create_compile_link_program
+         (texture_blit_vert_src, texture_blit_frag_src);
+-    if (!gls->texture_blit_prog) {
++    gls->texture_blit_flip_prog = qemu_gl_create_compile_link_program
++        (texture_blit_flip_vert_src, texture_blit_frag_src);
++    if (!gls->texture_blit_prog || !gls->texture_blit_flip_prog) {
+         exit(1);
+     }
+ 
+diff --git a/ui/shader/texture-blit-flip.vert b/ui/shader/texture-blit-flip.vert
+new file mode 100644
+index 0000000000..ba081fa5a6
+--- /dev/null
++++ b/ui/shader/texture-blit-flip.vert
+@@ -0,0 +1,10 @@
++
++#version 300 es
++
++in vec2  in_position;
++out vec2 ex_tex_coord;
++
++void main(void) {
++    gl_Position = vec4(in_position, 0.0, 1.0);
++    ex_tex_coord = vec2(1.0 + in_position.x, 1.0 + in_position.y) * 0.5;
 +}
-+
-+void dpy_gl_cursor_dmabuf(QemuConsole *con,
-+                          QemuDmaBuf *dmabuf,
-+                          uint32_t pos_x, uint32_t pos_y)
-+{
-+    assert(con->gl);
-+
-+    if (con->gl->ops->dpy_gl_cursor_dmabuf) {
-+        con->gl->ops->dpy_gl_cursor_dmabuf(con->gl, dmabuf, pos_x, pos_y);
-+    }
-+}
-+
-+void dpy_gl_release_dmabuf(QemuConsole *con,
-+                          QemuDmaBuf *dmabuf)
-+{
-+    assert(con->gl);
-+
-+    if (con->gl->ops->dpy_gl_release_dmabuf) {
-+        con->gl->ops->dpy_gl_release_dmabuf(con->gl, dmabuf);
-+    }
-+}
-+
- void dpy_gl_update(QemuConsole *con,
-                    uint32_t x, uint32_t y, uint32_t w, uint32_t h)
- {
 -- 
 2.9.3
