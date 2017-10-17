@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1e4XbV-0004po-Nv
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 15:32:42 -0400
+	(envelope-from <groug@kaod.org>) id 1e4Xrp-0007dB-GU
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 15:49:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1e4XbU-0004B6-Hu
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 15:32:41 -0400
-Date: Tue, 17 Oct 2017 15:32:31 -0400
-From: Aaron Lindsay <alindsay@codeaurora.org>
-Message-ID: <20171017193230.GB22177@codeaurora.org>
-References: <1506737310-21880-1-git-send-email-alindsay@codeaurora.org>
-	<1506737310-21880-7-git-send-email-alindsay@codeaurora.org>
-	<CAFEAcA8H-Zv0HRiMTSYFqkR0Wx7npB_N_ze9h0oovVa1tMHDRQ@mail.gmail.com>
+	(envelope-from <groug@kaod.org>) id 1e4Xrm-00064F-Ci
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 15:49:33 -0400
+Received: from 11.mo5.mail-out.ovh.net ([46.105.47.167]:36089)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e4Xrm-000633-76
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 15:49:30 -0400
+Received: from player773.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id BCC18135E67
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 21:49:27 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Tue, 17 Oct 2017 21:49:14 +0200
+Message-ID: <150826975484.20019.5107463804719679762.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8H-Zv0HRiMTSYFqkR0Wx7npB_N_ze9h0oovVa1tMHDRQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 06/13] target/arm: Filter cycle counter
- based on PMCCFILTR_EL0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] ppc: fix setting of compat mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +27,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Michael Roth <mdroth@linux.vnet.ibm.com>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-On Oct 17 15:57, Peter Maydell wrote:
-> On 30 September 2017 at 03:08, Aaron Lindsay <alindsay@codeaurora.org> wrote:
-> > The pmu_counter_filtered and pmu_sync functions are generic (as opposed
-> > to PMCCNTR-specific) to allow for the implementation of other events.
-> >
-> > RFC: I know that many of the locations of the calls to pmu_sync are
-> > problematic when icount is enabled because can_do_io will not be set.
-> > The documentation says that for deterministic execution, IO must only be
-> > performed by the last instruction of a thread block.
-> 
-> Yes. You need to arrange that gen_io_start() and gen_io_end()
-> are called around the generation of code for operations that might
-> do IO or care about the state of the clock, and that we end the TB
-> after gen_io_end().
-> 
-> > Because
-> > cpu_handle_interrupt() and cpu_handle_exception() are actually made
-> > outside of a thread block, is it safe to set can_do_io=1 for them to
-> > allow this to succeed? Is there a better mechanism for handling this?
-> 
-> From my reading of the code, can_do_io should already be 1
-> when these functions are called. It's only set to 0 just
-> before we call tcg_qemu_tb_exec() and then set back to 1
-> immediately after (see cpu_tb_exec()).
-> 
-> In general, the approach you have here looks like it's going to
-> be pretty invasive and also hard to keep working right. I think
-> we can come up with something a bit better.
+While trying to make KVM PR usable again, commit 5dfaa532ae introduced a
+regression: the current compat_pvr value is passed to KVM instead of the
+new one. This means that we always pass 0 instead of the max-cpu-compat
+PVR during the initial machine reset. And at CAS time, we either pass
+the PVR from the command line or even don't call kvmppc_set_compat() at
+all, ie, the PCR will not be set as expected.
 
-Yes, I am hoping so.
+For example if we start a big endian fedora26 guest in power7 compat
+mode on a POWER8 host, we get this in the guest:
 
-> Specifically, the filtering criteria effectively only change
-> when we change exception level, right? (since you can only
-> change security state as part of an exception level change).
-> We already have a mechanism for getting a callback when the EL
-> changes -- arm_register_el_change_hook(). (We would need to
-> upgrade it to support more than one hook function.)
-> 
-> You still need to get the io-count handling right, but there
-> are many fewer places that need to change (just the codegen
-> for calls to exception-return helpers, I think) and they already
-> end the TB, so you don't have the complexity of trying to end the
-> TB in places you didn't before, you just need the gen_io_start/end.
+$ cat /proc/cpuinfo
+processor       : 0
+cpu             : POWER7 (architected), altivec supported
+clock           : 4024.000000MHz
+revision        : 2.0 (pvr 004d 0200)
 
-Using hooks/callbacks is clearly a better solution. I shied away from
-using *el_change_hook in this patchset because A) it seemed to be marked
-explicitly for GICv3 emulation, B) the one-hook limitation you
-mentioned, and C) it doesn't currently provide you with which EL you're
-coming from.
+timebase        : 512000000
+platform        : pSeries
+model           : IBM pSeries (emulated by qemu)
+machine         : CHRP IBM pSeries (emulated by qemu)
+MMU             : Hash
 
-If everyone is amenable to changing how the hook is structured, I don't
-think any of those reasons stand. My initial thought is that the best
-way to fix C) is to add a pre_el_change_hook to be called at the top of
-the exception_return and cpsr_write_eret helpers in
-target/arm/op_helper.c to drive the first call to pmu_sync() (or
-whatever I rename the first half of that pair to based on your
-suggestions on that patch).
+but the guest can still execute POWER8 instructions, and the following
+program succeeds:
 
-If I don't receive any additional feedback before then, I'll do my best
-to adapt the existing hooks to allow for a cleaner approach to filtering
-for v3.
+int main()
+{
+        asm("vncipher 0,0,0"); // ISA 2.07 instruction
+}
 
--Aaron
+Let's pass the new compat_pvr to kvmppc_set_compat() and the program fails
+with SIGILL as expected.
 
--- 
-Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the
-Code Aurora Forum, a Linux Foundation Collaborative Project.
+Reported-by: Nageswara R Sastry <rnsastry@linux.vnet.ibm.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+
+Cc'ing qemu-stable because the regression is present in 2.10.1... :-\
+---
+ target/ppc/compat.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/target/ppc/compat.c b/target/ppc/compat.c
+index f8729fe46d61..ad8f93c0644e 100644
+--- a/target/ppc/compat.c
++++ b/target/ppc/compat.c
+@@ -141,7 +141,7 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp)
+     cpu_synchronize_state(CPU(cpu));
+ 
+     if (kvm_enabled() && cpu->compat_pvr != compat_pvr) {
+-        int ret = kvmppc_set_compat(cpu, cpu->compat_pvr);
++        int ret = kvmppc_set_compat(cpu, compat_pvr);
+         if (ret < 0) {
+             error_setg_errno(errp, -ret,
+                              "Unable to set CPU compatibility mode in KVM");
