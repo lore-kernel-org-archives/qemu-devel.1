@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e4Pou-0005KT-DF
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:14:06 -0400
+	(envelope-from <kraxel@redhat.com>) id 1e4Pp0-0005Q5-11
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:14:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1e4Poq-0001u5-Re
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:14:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32794)
+	(envelope-from <kraxel@redhat.com>) id 1e4Poq-0001tf-HE
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:14:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40584)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e4Poq-0001tG-K0
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1e4Poq-0001sl-BN
 	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:13:56 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BFD8CC0587E9
+	by mx1.redhat.com (Postfix) with ESMTPS id 7CB8737E7A
 	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 11:13:55 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 17 Oct 2017 13:13:50 +0200
-Message-Id: <20171017111350.8176-7-kraxel@redhat.com>
+Date: Tue, 17 Oct 2017 13:13:49 +0200
+Message-Id: <20171017111350.8176-6-kraxel@redhat.com>
 In-Reply-To: <20171017111350.8176-1-kraxel@redhat.com>
 References: <20171017111350.8176-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 6/6] egl-headless: add dmabuf support
+Subject: [Qemu-devel] [PULL 5/6] egl-helpers: add egl_texture_blit and
+ egl_texture_blend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,119 +33,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Add support for the new dmabuf interface.
+egl_texture_blit() blits a texture, simliar to egl_fb_blit() but by
+rendering the texture to the screen instead of using a framebuffer blit.
+
+egl_texture_blend() renders a texture with alpha blending, will be used
+to render the cursor to the screen.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20171010135453.6704-7-kraxel@redhat.com
+Message-id: 20171010135453.6704-6-kraxel@redhat.com
 ---
- ui/egl-headless.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 57 insertions(+), 2 deletions(-)
+ include/ui/egl-helpers.h |  4 ++++
+ ui/egl-helpers.c         | 27 +++++++++++++++++++++++++++
+ 2 files changed, 31 insertions(+)
 
-diff --git a/ui/egl-headless.c b/ui/egl-headless.c
-index 12ad64e995..5d50226869 100644
---- a/ui/egl-headless.c
-+++ b/ui/egl-headless.c
-@@ -4,13 +4,18 @@
- #include "ui/console.h"
- #include "ui/egl-helpers.h"
- #include "ui/egl-context.h"
-+#include "ui/shader.h"
+diff --git a/include/ui/egl-helpers.h b/include/ui/egl-helpers.h
+index 4924fe560d..747233ce58 100644
+--- a/include/ui/egl-helpers.h
++++ b/include/ui/egl-helpers.h
+@@ -24,6 +24,10 @@ void egl_fb_setup_new_tex(egl_fb *fb, int width, int height);
+ void egl_fb_blit(egl_fb *dst, egl_fb *src, bool flip);
+ void egl_fb_read(void *dst, egl_fb *src);
  
- typedef struct egl_dpy {
-     DisplayChangeListener dcl;
-     DisplaySurface *ds;
-+    QemuGLShader *gls;
-     egl_fb guest_fb;
-+    egl_fb cursor_fb;
-     egl_fb blit_fb;
-     bool y_0_top;
-+    uint32_t pos_x;
-+    uint32_t pos_y;
- } egl_dpy;
++void egl_texture_blit(QemuGLShader *gls, egl_fb *dst, egl_fb *src, bool flip);
++void egl_texture_blend(QemuGLShader *gls, egl_fb *dst, egl_fb *src, bool flip,
++                       int x, int y);
++
+ #ifdef CONFIG_OPENGL_DMABUF
  
- /* ------------------------------------------------------------------ */
-@@ -65,6 +70,43 @@ static void egl_scanout_texture(DisplayChangeListener *dcl,
-     }
+ extern int qemu_egl_rn_fd;
+diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
+index e7ee337d7e..5fa60ef4e8 100644
+--- a/ui/egl-helpers.c
++++ b/ui/egl-helpers.c
+@@ -111,6 +111,33 @@ void egl_fb_read(void *dst, egl_fb *src)
+                  GL_BGRA, GL_UNSIGNED_BYTE, dst);
  }
  
-+static void egl_scanout_dmabuf(DisplayChangeListener *dcl,
-+                               QemuDmaBuf *dmabuf)
++void egl_texture_blit(QemuGLShader *gls, egl_fb *dst, egl_fb *src, bool flip)
 +{
-+    egl_dmabuf_import_texture(dmabuf);
-+    if (!dmabuf->texture) {
-+        return;
-+    }
-+
-+    egl_scanout_texture(dcl, dmabuf->texture,
-+                        false, dmabuf->width, dmabuf->height,
-+                        0, 0, dmabuf->width, dmabuf->height);
++    glBindFramebuffer(GL_FRAMEBUFFER_EXT, dst->framebuffer);
++    glViewport(0, 0, dst->width, dst->height);
++    glEnable(GL_TEXTURE_2D);
++    glBindTexture(GL_TEXTURE_2D, src->texture);
++    qemu_gl_run_texture_blit(gls, flip);
 +}
 +
-+static void egl_cursor_dmabuf(DisplayChangeListener *dcl,
-+                              QemuDmaBuf *dmabuf,
-+                              uint32_t pos_x, uint32_t pos_y)
++void egl_texture_blend(QemuGLShader *gls, egl_fb *dst, egl_fb *src, bool flip,
++                       int x, int y)
 +{
-+    egl_dpy *edpy = container_of(dcl, egl_dpy, dcl);
-+
-+    edpy->pos_x = pos_x;
-+    edpy->pos_y = pos_y;
-+
-+    egl_dmabuf_import_texture(dmabuf);
-+    if (!dmabuf->texture) {
-+        return;
-+    }
-+
-+    egl_fb_setup_for_tex(&edpy->cursor_fb, dmabuf->width, dmabuf->height,
-+                         dmabuf->texture, false);
-+}
-+
-+static void egl_release_dmabuf(DisplayChangeListener *dcl,
-+                               QemuDmaBuf *dmabuf)
-+{
-+    egl_dmabuf_release_texture(dmabuf);
-+}
-+
- static void egl_scanout_flush(DisplayChangeListener *dcl,
-                               uint32_t x, uint32_t y,
-                               uint32_t w, uint32_t h)
-@@ -78,9 +120,18 @@ static void egl_scanout_flush(DisplayChangeListener *dcl,
-     assert(surface_height(edpy->ds) == edpy->guest_fb.height);
-     assert(surface_format(edpy->ds) == PIXMAN_x8r8g8b8);
- 
--    egl_fb_blit(&edpy->blit_fb, &edpy->guest_fb, edpy->y_0_top);
-+    if (edpy->cursor_fb.texture) {
-+        /* have cursor -> render using textures */
-+        egl_texture_blit(edpy->gls, &edpy->blit_fb, &edpy->guest_fb,
-+                         !edpy->y_0_top);
-+        egl_texture_blend(edpy->gls, &edpy->blit_fb, &edpy->cursor_fb,
-+                          !edpy->y_0_top, edpy->pos_x, edpy->pos_y);
++    glBindFramebuffer(GL_FRAMEBUFFER_EXT, dst->framebuffer);
++    if (flip) {
++        glViewport(x, y, src->width, src->height);
 +    } else {
-+        /* no cursor -> use simple framebuffer blit */
-+        egl_fb_blit(&edpy->blit_fb, &edpy->guest_fb, edpy->y_0_top);
++        glViewport(x, dst->height - src->height - y,
++                   src->width, src->height);
 +    }
++    glEnable(GL_TEXTURE_2D);
++    glBindTexture(GL_TEXTURE_2D, src->texture);
++    glEnable(GL_BLEND);
++    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
++    qemu_gl_run_texture_blit(gls, flip);
++    glDisable(GL_BLEND);
++}
 +
-     egl_fb_read(surface_data(edpy->ds), &edpy->blit_fb);
--
-     dpy_gfx_update(edpy->dcl.con, x, y, w, h);
- }
+ /* ---------------------------------------------------------------------- */
  
-@@ -97,6 +148,9 @@ static const DisplayChangeListenerOps egl_ops = {
- 
-     .dpy_gl_scanout_disable  = egl_scanout_disable,
-     .dpy_gl_scanout_texture  = egl_scanout_texture,
-+    .dpy_gl_scanout_dmabuf   = egl_scanout_dmabuf,
-+    .dpy_gl_cursor_dmabuf    = egl_cursor_dmabuf,
-+    .dpy_gl_release_dmabuf   = egl_release_dmabuf,
-     .dpy_gl_update           = egl_scanout_flush,
- };
- 
-@@ -120,6 +174,7 @@ void egl_headless_init(void)
-         edpy = g_new0(egl_dpy, 1);
-         edpy->dcl.con = con;
-         edpy->dcl.ops = &egl_ops;
-+        edpy->gls = qemu_gl_init_shader();
-         register_displaychangelistener(&edpy->dcl);
-     }
- }
+ #ifdef CONFIG_OPENGL_DMABUF
 -- 
 2.9.3
