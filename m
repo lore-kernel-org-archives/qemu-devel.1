@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e4Xrp-0007dB-GU
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 15:49:34 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1e4Xuy-0000ET-LF
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 15:52:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1e4Xrm-00064F-Ci
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 15:49:33 -0400
-Received: from 11.mo5.mail-out.ovh.net ([46.105.47.167]:36089)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e4Xrm-000633-76
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 15:49:30 -0400
-Received: from player773.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id BCC18135E67
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 21:49:27 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Tue, 17 Oct 2017 21:49:14 +0200
-Message-ID: <150826975484.20019.5107463804719679762.stgit@bahia.lan>
+	(envelope-from <alindsay@codeaurora.org>) id 1e4Xux-0000Ed-Gb
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 15:52:48 -0400
+Date: Tue, 17 Oct 2017 15:52:38 -0400
+From: Aaron Lindsay <alindsay@codeaurora.org>
+Message-ID: <20171017195238.GC22177@codeaurora.org>
+References: <1506737310-21880-1-git-send-email-alindsay@codeaurora.org>
+	<CAFEAcA_f=7XjUs7BNQksidnBKofc8SxYtfjMtmfYMuPeo8NXug@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] ppc: fix setting of compat mode
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_f=7XjUs7BNQksidnBKofc8SxYtfjMtmfYMuPeo8NXug@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 00/13] More fully implement ARM PMUv3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +23,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Michael Roth <mdroth@linux.vnet.ibm.com>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-While trying to make KVM PR usable again, commit 5dfaa532ae introduced a
-regression: the current compat_pvr value is passed to KVM instead of the
-new one. This means that we always pass 0 instead of the max-cpu-compat
-PVR during the initial machine reset. And at CAS time, we either pass
-the PVR from the command line or even don't call kvmppc_set_compat() at
-all, ie, the PCR will not be set as expected.
+On Oct 17 16:09, Peter Maydell wrote:
+> On 30 September 2017 at 03:08, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+> > The ARM PMU implementation currently contains a basic cycle counter, but it is
+> > often useful to gather counts of other events and filter them based on
+> > execution mode. These patches flesh out the implementations of various PMU
+> > registers including PM[X]EVCNTR and PM[X]EVTYPER, add a struct definition to
+> > represent arbitrary counter types, implement mode filtering, and add
+> > instruction, cycle, and software increment events.
+> >
+> > I am particularly interested in feedback on the following two patches because I
+> > think I'm likely Doing It Wrong:
+> >  [1] target/arm: Filter cycle counter based on PMCCFILTR_EL0
+> >  [2] target/arm: PMU: Add instruction and cycle events
+> >
+> > In order to implement mode filtering in an event-driven way, [1] adds a pair of
+> > calls to pmu_sync() surrounding every update to a register/variable which may
+> > affect whether any counter is currently filtered. These pmu_sync() calls
+> > ultimately call cpu_get_icount_raw() for enabled instruction and cycle counters
+> > when using icount. Unfortunately, cpu->can_do_io may otherwise be zero for
+> > these calls so the current implementation in [2] temporarily sets can_do_io to
+> > 1. I haven't see any ill side effects from this in my testing, but it doesn't
+> > seem like the right way to handle this.
+> 
+> I've now reviewed the early stuff and provided what I hope is
+> a useful direction for the mode-filtering, so I'm not going to
+> look at the patches at the tail end on this version of the series.
 
-For example if we start a big endian fedora26 guest in power7 compat
-mode on a POWER8 host, we get this in the guest:
+Thank you, your review has been very helpful - the next pass of the
+mode-filtering patch will be more maintainable.
 
-$ cat /proc/cpuinfo
-processor       : 0
-cpu             : POWER7 (architected), altivec supported
-clock           : 4024.000000MHz
-revision        : 2.0 (pvr 004d 0200)
+> > I would like to eventually add sending interrupts on counter overflow.
+> > Suggestions for the best direction to handle this are most welcome.
+> 
+> Check out how the helper.c timer interrupts are wired up
+> (the CPU object exposes outbound irq lines, which then get
+> wired up by the board to the GIC.)
 
-timebase        : 512000000
-platform        : pSeries
-model           : IBM pSeries (emulated by qemu)
-machine         : CHRP IBM pSeries (emulated by qemu)
-MMU             : Hash
+Thanks for the pointer - I'll take a look.
 
-but the guest can still execute POWER8 instructions, and the following
-program succeeds:
+-Aaron
 
-int main()
-{
-        asm("vncipher 0,0,0"); // ISA 2.07 instruction
-}
-
-Let's pass the new compat_pvr to kvmppc_set_compat() and the program fails
-with SIGILL as expected.
-
-Reported-by: Nageswara R Sastry <rnsastry@linux.vnet.ibm.com>
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
-
-Cc'ing qemu-stable because the regression is present in 2.10.1... :-\
----
- target/ppc/compat.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/target/ppc/compat.c b/target/ppc/compat.c
-index f8729fe46d61..ad8f93c0644e 100644
---- a/target/ppc/compat.c
-+++ b/target/ppc/compat.c
-@@ -141,7 +141,7 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp)
-     cpu_synchronize_state(CPU(cpu));
- 
-     if (kvm_enabled() && cpu->compat_pvr != compat_pvr) {
--        int ret = kvmppc_set_compat(cpu, cpu->compat_pvr);
-+        int ret = kvmppc_set_compat(cpu, compat_pvr);
-         if (ret < 0) {
-             error_setg_errno(errp, -ret,
-                              "Unable to set CPU compatibility mode in KVM");
+-- 
+Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the
+Code Aurora Forum, a Linux Foundation Collaborative Project.
