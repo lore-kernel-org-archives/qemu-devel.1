@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1e4Tlx-00006W-Pv
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:27:19 -0400
+	(envelope-from <lersek@redhat.com>) id 1e4TjP-0007nl-9X
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:24:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1e4Tlu-0000IW-Ex
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:27:13 -0400
-Date: Tue, 17 Oct 2017 11:26:55 -0400
-From: Aaron Lindsay <alindsay@codeaurora.org>
-Message-ID: <20171017152654.GE3676@codeaurora.org>
-References: <1506737310-21880-1-git-send-email-alindsay@codeaurora.org>
-	<1506737310-21880-4-git-send-email-alindsay@codeaurora.org>
-	<CAFEAcA-0_dD0aXM5kmDbhKC5zX2woeX4G_BJemr8EgbhGBbdFA@mail.gmail.com>
+	(envelope-from <lersek@redhat.com>) id 1e4TjL-0007R7-W4
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:24:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33936)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1e4TjL-0007Qg-NE
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:24:31 -0400
+References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
+	<20171016163636.GI11975@redhat.com>
+	<20171017092702.5b82103b@nial.brq.redhat.com>
+	<20171017150759.GB31897@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <74afc019-a586-075f-4115-9e85281eff7c@redhat.com>
+Date: Tue, 17 Oct 2017 17:24:26 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-0_dD0aXM5kmDbhKC5zX2woeX4G_BJemr8EgbhGBbdFA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 03/13] target/arm: Reorganize PMCCNTR read,
- write, sync
+In-Reply-To: <20171017150759.GB31897@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 0/6] enable numa configuration before
+ machine_init() from HMP/QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,171 +31,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Peter Crosthwaite <peter.crosthwaite@xilinx.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: peter.maydell@linaro.org, pkrempa@redhat.com, ehabkost@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-On Oct 17 14:25, Peter Maydell wrote:
-> On 30 September 2017 at 03:08, Aaron Lindsay <alindsay@codeaurora.org> wrote:
-> > pmccntr_read and pmccntr_write contained duplicate code that was already
-> > being handled by pmccntr_sync. This also moves the calls to get the
-> > clock inside the 'if' statement so they are not executed if not needed.
+On 10/17/17 17:07, Daniel P. Berrange wrote:
+> On Tue, Oct 17, 2017 at 09:27:02AM +0200, Igor Mammedov wrote:
+>> On Mon, 16 Oct 2017 17:36:36 +0100
+>> "Daniel P. Berrange" <berrange@redhat.com> wrote:
+>>
+>>> On Mon, Oct 16, 2017 at 06:22:50PM +0200, Igor Mammedov wrote:
+>>>> Series allows to configure NUMA mapping at runtime using QMP/HMP
+>>>> interface. For that to happen it introduces a new '-paused' CLI option
+>>>> which allows to pause QEMU before machine_init() is run and
+>>>> adds new set-numa-node HMP/QMP commands which in conjuction with
+>>>> info hotpluggable-cpus/query-hotpluggable-cpus allow to configure
+>>>> NUMA mapping for cpus.  
+>>>
+>>> What's the problem we're seeking solve here compared to what we currently
+>>> do for NUMA configuration ?
+>> From RHBZ1382425
+>> "
+>> Current -numa CLI interface is quite limited in terms that allow map
+>> CPUs to NUMA nodes as it requires to provide cpu_index values which 
+>> are non obvious and depend on machine/arch. As result libvirt has to
+>> assume/re-implement cpu_index allocation logic to provide valid 
+>> values for -numa cpus=... QEMU CLI option.
 > 
-> It is duplicate code, yes, but I also find it a bit confusing,
-> because it's the same code doing two different operations:
-> 
-> (1) if (as is usual when the counter is running) c15_ccnt
-> contains a delta between the clock ticks and the register
-> value, pmccntr_sync() sets c15_ccnt to the current
-> guest-visible register value
-> 
-> (2) if c15_ccnt contains a guest-visible register value
-> and the clock is running, pmccntr_sync() sets c15_ccnt
-> to the ticks-to-value delta
-> 
-> and we use this in a couple of places like:
->    pmccntr_sync();
->    do stuff that operates on the guest register values,
->      or maybe turns off the counter, etc;
->    pmccntr_sync();
-> 
-> But that's wrong really -- we'll slightly lose time because
-> the nanosecond clock advances between the two calls
-> to qemu_clock_get_ns(). (It only works at all because
-> it happens that f(x) = C - x  is a self-inverse function.)
-> It's also a confusing API because it looks like something
-> you only need to call once but actually in most cases
-> you need to call it twice, before and after whatever it
-> is you're doing with the counter.
+> In broad terms, this problem applies to every device / object libvirt
+> asks QEMU to create. For everything else libvirt is able to assign a
+> "id" string, which is can then use to identify the thing later. The
+> CPU stuff is different because libvirt isn't able to provide 'id'
+> strings for each CPU - QEMU generates a psuedo-id internally which
+> libvirt has to infer.
 
-Interesting, I hadn't thought about the loss of time issue.
+Oh. This is the critical bit I've been missing.
 
-> So I think we should refactor this so that we have a
-> pair of functions, something like:
->     uint64_t clocknow = pmccntr_op_start(env);
->     /* Now c15_ccnt is the guest visible value, and
->      * we can do things like change PMCRD, enable bits, etc
->      */
->     [...]
->     /* convert c15_ccnt back to the clock-to-value delta,
->      * passing it the tick count we used when we did the
->      * delta-to-value conversion earlier.
->      */
->     pmccntr_op_finish(env, clocknow);
+Sorry about the noise I've made!
+
+Thanks!
+Laszlo
+
+
+> The latter is the same problem we had with
+> devices before '-device' was introduced allowing 'id' naming.
 > 
-> (clocknow here should be the output of the muldiv64(),
-> not the divided-by-64 version.)
+> IMHO we should take the same approach with CPUs and start modelling 
+> the individual CPUs as something we can explicitly create with -object
+> or -device. That way libvirt can assign names and does not have to 
+> care about CPU index values, and it all works just the same way as
+> any other devices / object we create
 > 
-> Some more specific review comments below, though the
-> suggested refactoring above might render some of them moot.
-
-I agree that what you describe would be cleaner. I'll work towards that
-in v3.
-
-> > Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
-> > ---
-> >  target/arm/helper.c | 55 ++++++++++++++++-------------------------------------
-> >  1 file changed, 16 insertions(+), 39 deletions(-)
-> >
-> > diff --git a/target/arm/helper.c b/target/arm/helper.c
-> > index 40c9273..ecf8c55 100644
-> > --- a/target/arm/helper.c
-> > +++ b/target/arm/helper.c
-> > @@ -973,17 +973,18 @@ static inline bool arm_ccnt_enabled(CPUARMState *env)
-> >
-> >  void pmccntr_sync(CPUARMState *env)
-> >  {
-> > -    uint64_t temp_ticks;
-> > +    if (arm_ccnt_enabled(env) &&
-> > +          !pmu_counter_filtered(env, env->cp15.pmccfiltr_el0)) {
+> ie instead of:
 > 
-> This seems to be adding an extra condition that the commit
-> message doesn't mention.
-
-Eek. This slipped the cracks through during a rebase and belongs in
-'target/arm: Filter cycle counter based on PMCCFILTR_EL0'.
-
-> > +        uint64_t temp_ticks;
-> >
-> > -    temp_ticks = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-> > -                          ARM_CPU_FREQ, NANOSECONDS_PER_SECOND);
-> > +        temp_ticks = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-> > +                              ARM_CPU_FREQ, NANOSECONDS_PER_SECOND);
-> >
-> > -    if (env->cp15.c9_pmcr & PMCRD) {
-> > -        /* Increment once every 64 processor clock cycles */
-> > -        temp_ticks /= 64;
-> > -    }
-> > +        if (env->cp15.c9_pmcr & PMCRD) {
-> > +            /* Increment once every 64 processor clock cycles */
-> > +            temp_ticks /= 64;
-> > +        }
-> >
-> > -    if (arm_ccnt_enabled(env)) {
-> >          env->cp15.c15_ccnt = temp_ticks - env->cp15.c15_ccnt;
-> >      }
-> >  }
-> > @@ -1007,21 +1008,11 @@ static void pmcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-> >
-> >  static uint64_t pmccntr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-> >  {
-> > -    uint64_t total_ticks;
-> > -
-> > -    if (!arm_ccnt_enabled(env)) {
-> > -        /* Counter is disabled, do not change value */
-> > -        return env->cp15.c15_ccnt;
-> > -    }
-> > -
-> > -    total_ticks = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-> > -                           ARM_CPU_FREQ, NANOSECONDS_PER_SECOND);
-> > -
-> > -    if (env->cp15.c9_pmcr & PMCRD) {
-> > -        /* Increment once every 64 processor clock cycles */
-> > -        total_ticks /= 64;
-> > -    }
-> > -    return total_ticks - env->cp15.c15_ccnt;
-> > +    uint64_t ret;
-> > +    pmccntr_sync(env);
-> > +    ret = env->cp15.c15_ccnt;
-> > +    pmccntr_sync(env);
-> > +    return ret;
+>   -smp 8,sockets=4,cores=2,threads=1
+>   -numa node,nodeid=0,cpus=0-3
+>   -numa node,nodeid=1,cpus=4-7
 > 
-> This change means that as a result of this refactoring we
-> now do the 'sync' operations (muldiv etc) twice, whereas
-> previously we did them only once.
+> we could do:
 > 
-> >  }
-> >
-> >  static void pmselr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-> > @@ -1038,22 +1029,8 @@ static void pmselr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-> >  static void pmccntr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-> >                          uint64_t value)
-> >  {
-> > -    uint64_t total_ticks;
-> > -
-> > -    if (!arm_ccnt_enabled(env)) {
-> > -        /* Counter is disabled, set the absolute value */
-> > -        env->cp15.c15_ccnt = value;
-> > -        return;
-> > -    }
-> > -
-> > -    total_ticks = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-> > -                           ARM_CPU_FREQ, NANOSECONDS_PER_SECOND);
-> > -
-> > -    if (env->cp15.c9_pmcr & PMCRD) {
-> > -        /* Increment once every 64 processor clock cycles */
-> > -        total_ticks /= 64;
-> > -    }
-> > -    env->cp15.c15_ccnt = total_ticks - value;
-> > +    env->cp15.c15_ccnt = value;
-> > +    pmccntr_sync(env);
-> >  }
+>   -object numa-node,id=numa0
+>   -object numa-node,id=numa1
+>   -object cpu,id=cpu0,node=numa0,socket=0,core=0,thread=0
+>   -object cpu,id=cpu1,node=numa0,socket=0,core=1,thread=0
+>   -object cpu,id=cpu2,node=numa0,socket=1,core=0,thread=0
+>   -object cpu,id=cpu3,node=numa0,socket=1,core=1,thread=0
+>   -object cpu,id=cpu4,node=numa1,socket=2,core=0,thread=0
+>   -object cpu,id=cpu5,node=numa1,socket=2,core=1,thread=0
+>   -object cpu,id=cpu6,node=numa1,socket=3,core=0,thread=0
+>   -object cpu,id=cpu7,node=numa1,socket=3,core=1,thread=0
 > 
-> thanks
-> -- PMM
-
--Aaron
-
--- 
-Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the
-Code Aurora Forum, a Linux Foundation Collaborative Project.
+> (perhaps -device instead of -object above, but that's a minor detail)
+> 
+> Regards,
+> Daniel
+> 
