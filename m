@@ -1,32 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4SUW-0006RB-Mx
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:05:18 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4SUd-0006ag-OI
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:05:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4SUT-0004VE-Ic
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:05:08 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36766)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4SUX-0004Ww-OG
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:05:15 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35748
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1e4SUT-0004Uo-9s
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:05:05 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9HE4m1f066542
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 10:05:00 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dngcb1s09-1
+	id 1e4SUX-0004Wl-Ib
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:05:09 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9HE4jLS020996
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 10:05:06 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dnfuwj2jc-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 10:05:00 -0400
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 10:05:06 -0400
 Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 17 Oct 2017 15:04:58 +0100
+	Tue, 17 Oct 2017 15:05:04 +0100
 From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue, 17 Oct 2017 16:04:46 +0200
-Message-Id: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 0/7] improve error handling for IO instr
+Date: Tue, 17 Oct 2017 16:04:51 +0200
+In-Reply-To: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
+References: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
+Message-Id: <20171017140453.51099-6-pasic@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 5/7] s390x: refactor error handling for CSCH
+ handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,72 +42,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 Cc: Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-Abstract
-=======
+Simplify the error handling of the cSCH.  Let the code detecting the
+condition tell (in a less ambiguous way) how it's to be handled. No
+changes in behavior.
 
-The basic idea is: tell how to handle an unusual condition where it's
-identified, instead of mapping it to an errno (more or less arbitrarily),
-then possibly mapping these errnos around, to finally (mentally) map the
-errno back to the condition and take appropriate action.
+Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+---
+ hw/s390x/css.c         | 12 +++---------
+ include/hw/s390x/css.h |  2 +-
+ target/s390x/ioinst.c  | 14 ++++----------
+ 3 files changed, 8 insertions(+), 20 deletions(-)
 
-According to Dong Jia the patch-set also has a functional value: for ccw
-pass-through, he is planing to pass-through the instruction completion
-information (cc or interruption condition) from the kernel, and this
-patch set can pretty much be seen as a preparation for that.
-
-Changelog
-=========
-
-Patch 1 should be already applied to Conny's tree. I've included it
-nevertheless so guys working on top of current master have everything in
-place.
-
-v2 -> v3:
-* somewhat uwillingly traded the type safe struct to a somewhat
-  type safe enum (because considered ugly) (Thomas, Conny)
-* dropped 'template approach' patch which intended to further
-  consolidate IO inst. handlers having lot's of logic and code in
-  common (Conny)
-* added warning if vfio-ccw ORB does not have the flags required
-  by the vfio-ccw implementation as suggested (Dong Jia)
-* got rid of some unintentional changes (Dong Jia)
-* reworded some stuff (comments, commit messages) (Dong Jia)
-
-v1 -> v2:
-* use assert if do_subchannel_work without any functions being
-  accepted 
-* generate unit-exception if ccw-vfio can't handle an otherwise
-  good channel program (due to extra limitations) 
-* keep using return values opposed to recording into SubchDev
-* split out 'add infrastructure' from 'refactor first handler'
-* reworded some commit messanges and comments
-* rebased on top of current master
-* dropped r-b's and acks because of the magnitude of the
-  changes
-
-Testing
-=======
-
-Nothing happened since v2 except for a quick smoke test. Dong Jia gave v2
-a spin with a focus on vfio-ccw. @Dong Jia I would appreciate some proper
-testing, especially regarding the changes in vfio-ccw (patch #3).
-
-Halil Pasic (7):
-  s390x/css: be more consistent if broken beyond repair
-  s390x/css: IO instr handler ending control
-  s390x: improve error handling for SSCH and RSCH
-  s390x: refactor error handling for XSCH handler
-  s390x: refactor error handling for CSCH handler
-  s390x: refactor error handling for HSCH handler
-  s390x: refactor error handling for MSCH handler
-
- hw/s390x/css.c              | 163 ++++++++++++--------------------------------
- hw/s390x/s390-ccw.c         |  11 ++-
- hw/vfio/ccw.c               |  28 ++++++--
- include/hw/s390x/css.h      |  47 ++++++++++---
- include/hw/s390x/s390-ccw.h |   2 +-
- target/s390x/ioinst.c       | 136 +++++++-----------------------------
- 6 files changed, 132 insertions(+), 255 deletions(-)
-
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 1b3be7729d..9935d48b72 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -1435,26 +1435,20 @@ IOInstEnding css_do_xsch(SubchDev *sch)
+     return IOINST_CC_EXPECTED;
+ }
+ 
+-int css_do_csch(SubchDev *sch)
++IOInstEnding css_do_csch(SubchDev *sch)
+ {
+     SCSW *s = &sch->curr_status.scsw;
+     PMCW *p = &sch->curr_status.pmcw;
+-    int ret;
+ 
+     if (~(p->flags) & (PMCW_FLAGS_MASK_DNV | PMCW_FLAGS_MASK_ENA)) {
+-        ret = -ENODEV;
+-        goto out;
++        return IOINST_CC_NOT_OPERATIONAL;
+     }
+ 
+     /* Trigger the clear function. */
+     s->ctrl &= ~(SCSW_CTRL_MASK_FCTL | SCSW_CTRL_MASK_ACTL);
+     s->ctrl |= SCSW_FCTL_CLEAR_FUNC | SCSW_ACTL_CLEAR_PEND;
+ 
+-    do_subchannel_work(sch);
+-    ret = 0;
+-
+-out:
+-    return ret;
++    return do_subchannel_work(sch);
+ }
+ 
+ int css_do_hsch(SubchDev *sch)
+diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+index 3c319c9096..f38c59c9b7 100644
+--- a/include/hw/s390x/css.h
++++ b/include/hw/s390x/css.h
+@@ -241,7 +241,7 @@ int css_do_stsch(SubchDev *sch, SCHIB *schib);
+ bool css_schid_final(int m, uint8_t cssid, uint8_t ssid, uint16_t schid);
+ int css_do_msch(SubchDev *sch, const SCHIB *schib);
+ IOInstEnding css_do_xsch(SubchDev *sch);
+-int css_do_csch(SubchDev *sch);
++IOInstEnding css_do_csch(SubchDev *sch);
+ int css_do_hsch(SubchDev *sch);
+ IOInstEnding css_do_ssch(SubchDev *sch, ORB *orb);
+ int css_do_tsch_get_irb(SubchDev *sch, IRB *irb, int *irb_len);
+diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
+index 4ad07e9181..fd659e77a5 100644
+--- a/target/s390x/ioinst.c
++++ b/target/s390x/ioinst.c
+@@ -60,8 +60,6 @@ void ioinst_handle_csch(S390CPU *cpu, uint64_t reg1)
+ {
+     int cssid, ssid, schid, m;
+     SubchDev *sch;
+-    int ret = -ENODEV;
+-    int cc;
+ 
+     if (ioinst_disassemble_sch_ident(reg1, &m, &cssid, &ssid, &schid)) {
+         program_interrupt(&cpu->env, PGM_OPERAND, 4);
+@@ -69,15 +67,11 @@ void ioinst_handle_csch(S390CPU *cpu, uint64_t reg1)
+     }
+     trace_ioinst_sch_id("csch", cssid, ssid, schid);
+     sch = css_find_subch(m, cssid, ssid, schid);
+-    if (sch && css_subch_visible(sch)) {
+-        ret = css_do_csch(sch);
+-    }
+-    if (ret == -ENODEV) {
+-        cc = 3;
+-    } else {
+-        cc = 0;
++    if (!sch || !css_subch_visible(sch)) {
++        setcc(cpu, 3);
++        return;
+     }
+-    setcc(cpu, cc);
++    setcc(cpu, css_do_csch(sch));
+ }
+ 
+ void ioinst_handle_hsch(S390CPU *cpu, uint64_t reg1)
 -- 
 2.13.5
