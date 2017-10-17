@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4PRA-0002Yq-QU
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:49:29 -0400
+	(envelope-from <lersek@redhat.com>) id 1e4PY7-0005FL-5v
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:56:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4PRA-0000Tx-1Z
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:49:28 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20171017001209.32276-1-f4bug@amsat.org>
-	<20171017001209.32276-31-f4bug@amsat.org>
-	<44b57d76-6d10-84c8-3a13-cdac7331c5d9@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <47c7b41d-23ff-3dd1-9c07-69bd5df08685@amsat.org>
-Date: Tue, 17 Oct 2017 07:49:16 -0300
+	(envelope-from <lersek@redhat.com>) id 1e4PY1-0004rT-9H
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:56:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55808)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1e4PY1-0004r0-3v
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:56:33 -0400
+References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
+	<1508170976-96869-5-git-send-email-imammedo@redhat.com>
+	<20171016163515.GH11975@redhat.com>
+	<20171017101707.5ff95d1c@nial.brq.redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <71e77669-5498-78a0-88b6-f634dc3727f6@redhat.com>
+Date: Tue, 17 Oct 2017 12:56:28 +0200
 MIME-Version: 1.0
-In-Reply-To: <44b57d76-6d10-84c8-3a13-cdac7331c5d9@redhat.com>
+In-Reply-To: <20171017101707.5ff95d1c@nial.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 30/39] hw/display/vga: remove the old
- i386/pc dependency
+Subject: Re: [Qemu-devel] [RFC 4/6] CLI: add -paused option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,88 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: peter.maydell@linaro.org, pkrempa@redhat.com, ehabkost@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-Hi Thomas,
-
->> diff --git a/hw/display/vga_int.h b/hw/display/vga_int.h
->> index ad34a1f048..fe23b81442 100644
->> --- a/hw/display/vga_int.h
->> +++ b/hw/display/vga_int.h
->> @@ -25,8 +25,9 @@
->>  #ifndef HW_VGA_INT_H
->>  #define HW_VGA_INT_H
->>  
->> -#include "hw/hw.h"
->> +#include "exec/ioport.h"
->>  #include "exec/memory.h"
->> +#include "ui/console.h"
+On 10/17/17 10:17, Igor Mammedov wrote:
+> On Mon, 16 Oct 2017 17:35:15 +0100
+> "Daniel P. Berrange" <berrange@redhat.com> wrote:
 > 
-> So vga_int.h now includes console.h (is it really necessary?) ...
-
-The VGACommonState struct has a GraphicHwOps *hw_ops member.
-
+>> On Mon, Oct 16, 2017 at 06:22:54PM +0200, Igor Mammedov wrote:
+>>
+>> This really needs to have a commit message that provides justification
+>> for why this option is needed when we already have -S that is used
+>> to allow configuration before the guest starts.
+> Sorry, I've should have added here what I've tried to describe in cover letter.
 > 
-> [...]
->>  static inline bool isa_ne2000_init(ISABus *bus, int base, int irq, NICInfo *nd)
->>  {
->> diff --git a/hw/display/vga-isa-mm.c b/hw/display/vga-isa-mm.c
->> index 51ccbccc41..e887b45651 100644
->> --- a/hw/display/vga-isa-mm.c
->> +++ b/hw/display/vga-isa-mm.c
->> @@ -23,11 +23,9 @@
->>   */
->>  #include "qemu/osdep.h"
->>  #include "hw/hw.h"
->> -#include "ui/console.h"
+> -S pauses machine too late as machine is already created by the time
+> it's paused so trying to reconfigure it might require machine to be recreated.
+> In case of NUMA options it might be possible to hack x86 target to
+> rebuild/override acpi/fw_cfg so it would reflect the new settings set
+> this late but I wouldn't expect that it would work in general.
 > 
-> ... and here you also remove it from the .c file - OK ...
-> 
->> -#include "hw/i386/pc.h"
->> +#include "hw/display/vga.h"
->>  #include "vga_int.h"
->>  #include "ui/pixel_ops.h"
->> -#include "qemu/timer.h"
->>  
->>  #define VGA_RAM_SIZE (8192 * 1024)
->>  
->> diff --git a/hw/display/vga-isa.c b/hw/display/vga-isa.c
->> index 1af95562f2..9af43abee8 100644
->> --- a/hw/display/vga-isa.c
->> +++ b/hw/display/vga-isa.c
->> @@ -26,7 +26,7 @@
->>  #include "qemu/osdep.h"
->>  #include "hw/hw.h"
->>  #include "ui/console.h"
-> 
-> ... but here you keep it? I think you should either remove it here, too,
+> The cleanest way to configure it is pausing and configuring numa mapping
+> before machine is build.
 
-I missed this one.
+Asking from the sideline: if the NUMA mapping has to be configured so
+early, why can't it be done on the QEMU command line?
 
-> or not add the include in the header (which I'd prefer if the header
-> itself does not depend on console.h).
+(I asked myself the same question when I first saw your patches -- I
+couldn't find an explanation in the blurb --, so I assumed it was
+obvious and/or others would ask the same question.)
 
-Do you suggest me do declare GraphicHwOps opaque in "qemu/typedefs.h"?
+Again, I'm just curious.
 
-> 
->> -#include "hw/i386/pc.h"
->> +#include "hw/isa/isa.h"
->>  #include "vga_int.h"
->>  #include "ui/pixel_ops.h"
->>  #include "qemu/timer.h"
->> diff --git a/hw/display/vga.c b/hw/display/vga.c
->> index ed24ef7076..0da4942a09 100644
->> --- a/hw/display/vga.c
->> +++ b/hw/display/vga.c
->> @@ -24,9 +24,9 @@
->>  #include "qemu/osdep.h"
->>  #include "qapi/error.h"
->>  #include "hw/hw.h"
->> -#include "vga.h"
->> +#include "hw/display/vga.h"
->>  #include "ui/console.h"
-> 
-> Here's another one --^
-
-Oh this one too.
+Thanks!
+Laszlo
