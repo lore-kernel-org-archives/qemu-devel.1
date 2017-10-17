@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1e4U0g-000848-DM
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:42:27 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1e4U14-0008MG-O6
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:42:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1e4U0d-0008GS-Q0
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:42:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44022)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1e4U0d-0008EY-GE
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:42:23 -0400
-References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
-	<1508170976-96869-5-git-send-email-imammedo@redhat.com>
-	<20171016165916.GI3246@localhost.localdomain>
-	<4c14ed02-1f1c-a093-52ac-632f61a68a6f@redhat.com>
-	<20171017144827.GA31897@redhat.com>
-	<1580a018-b395-cc34-5a89-db5872e61dee@redhat.com>
-	<20171017153515.GC31897@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <c9052767-c0c7-7564-db69-bff3470148ac@redhat.com>
-Date: Tue, 17 Oct 2017 17:42:19 +0200
+	(envelope-from <alindsay@codeaurora.org>) id 1e4U13-0000Bu-Lo
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:42:50 -0400
+Date: Tue, 17 Oct 2017 11:42:41 -0400
+From: Aaron Lindsay <alindsay@codeaurora.org>
+Message-ID: <20171017154240.GF3676@codeaurora.org>
+References: <1506737310-21880-1-git-send-email-alindsay@codeaurora.org>
+	<1506737310-21880-5-git-send-email-alindsay@codeaurora.org>
+	<CAFEAcA94pxKuPZZgKOMXyW8xteHTBWz-JM6mGOX-ot6OeBt-tw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20171017153515.GC31897@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 4/6] CLI: add -paused option
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA94pxKuPZZgKOMXyW8xteHTBWz-JM6mGOX-ot6OeBt-tw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 04/13] target/arm: Mask PMU register writes
+ based on PMCR_EL0.N
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,76 +25,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, peter.maydell@linaro.org, pkrempa@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, Igor Mammedov <imammedo@redhat.com>, david@gibson.dropbear.id.au
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Peter Crosthwaite <peter.crosthwaite@xilinx.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-On 10/17/17 17:35, Daniel P. Berrange wrote:
-> On Tue, Oct 17, 2017 at 05:21:13PM +0200, Laszlo Ersek wrote:
->> On 10/17/17 16:48, Daniel P. Berrange wrote:
->>> On Mon, Oct 16, 2017 at 07:01:01PM +0200, Paolo Bonzini wrote:
->>>> On 16/10/2017 18:59, Eduardo Habkost wrote:
->>>>>> +DEF("paused", HAS_ARG, QEMU_OPTION_paused, \
->>>>>> +    "-paused [state=]postconf|preconf\n"
->>>>>> +    "                postconf: pause QEMU after machine is initialized\n"
->>>>>> +    "                preconf: pause QEMU before machine is initialized\n",
->>>>>> +    QEMU_ARCH_ALL)
->>>>> I would like to allow pausing before machine-type is selected, so
->>>>> management could run query-machines before choosing a
->>>>> machine-type.  Would that need a third "-pause" mode, or will we
->>>>> be able to change "preconf" to pause before select_machine() is
->>>>> called?
->>>>>
->>>>> The same probably applies to other things initialized before
->>>>> machine_run_board_init() that could be configurable using QMP,
->>>>> including but not limited to:
->>>>> * Accelerator configuration
->>>>> * Registering global properties
->>>>> * RAM size
->>>>> * SMP/CPU configuration
->>>>
->>>> Should (or could) "-M none" be changed in a backwards-compatible way to
->>>> allow such preconfiguration?  For example
->>>>
->>>>   qemu -M none -monitor stdio
->>>>   (qemu) machine-set-options pc,accel=kvm
->>>>   (qemu) c
->>>
->>> Going down this route has pretty major implications for the way libvirt
->>> manages QEMU, and support / debugging of it. When you look at the QEMU
->>> command line libvirt uses it will be almost devoid of any useful info.
->>> So it will be more involved job to figure out just how QEMU is configured.
->>> This also means it is difficult to replicate the config that libvirt has
->>> used, outside of libvirt for sake of debugging.
->>>
->>> I also think it will have pretty significant performance implications
->>> for QEMU startup. To configure a guest via the monitor is going to
->>> require a huge number of monitor commands to be executed to replicate
->>> what we traditionally configured via ARGV. While each monitor command
->>> is not massively slow, the round-trip time of each command will quickly
->>> add up to several 100 milliseconds, perhaps even seconds in the the
->>> case of very large configs. 
->>>
->>> Maybe we ultimately have no choice and this is inevitable, but I am
->>> pretty wary of going in the direction of launching bare QEMU and
->>> configuring everything via a huge number of monitor calls.
->>
->> Where's the sweet spot between
->> - configuring everything dynamically, over QMP,
->> - and invoking QEMU separately, for querying capabilities etc?
+On Oct 17 14:41, Peter Maydell wrote:
+> On 30 September 2017 at 03:08, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+> > This is in preparation for enabling counters other than PMCCNTR
+> >
+> > Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+> > ---
+> >  target/arm/helper.c | 24 +++++++++++++++---------
+> >  1 file changed, 15 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/target/arm/helper.c b/target/arm/helper.c
+> > index ecf8c55..54070a3 100644
+> > --- a/target/arm/helper.c
+> > +++ b/target/arm/helper.c
+> > @@ -30,11 +30,6 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+> >                                 hwaddr *phys_ptr, MemTxAttrs *txattrs, int *prot,
+> >                                 target_ulong *page_size_ptr, uint32_t *fsr,
+> >                                 ARMMMUFaultInfo *fi);
+> > -
+> > -/* Definitions for the PMCCNTR and PMCR registers */
+> > -#define PMCRD   0x8
+> > -#define PMCRC   0x4
+> > -#define PMCRE   0x1
+> >  #endif
+> >
+> >  static int vfp_gdb_get_reg(CPUARMState *env, uint8_t *buf, int reg)
+> > @@ -876,6 +871,17 @@ static const ARMCPRegInfo v6_cp_reginfo[] = {
+> >      REGINFO_SENTINEL
+> >  };
+> >
+> > +/* Definitions for the PMU registers */
+> > +#define PMCRN   0xf800
 > 
-> The key with the way we currently invoke & query QEMU over QMP to detect
-> capabilities is that this is not tied to a specific VM launch process.
-> We can query capabilities and cache them until such time as we detect
-> a QEMU binary change. So this never impacts on the startup performance
-> of individual VMs. The caching is critical, because querying capabilities
-> is actually quite time intensive already, taking many seconds to query
-> capabilities on all the different target binaries we have.
+> We usually name this kind of whole-field mask value something like PMCRN_MASK.
+> 
+> (We also have a FIELD() macro in hw/registerfields.h for defining
+> mask/length/shift constants; though it can be a bit verbose in
+> the length of the names it uses, so I don't insist on its use
+> if you don't like the results. I'm on the fence myself about it.)
 
-(Sorry about hijacking the thread, but I can't stop asking :) )
+Will do.
 
-This looks very smart -- for my own education, how does libvirtd detect
-a QEMU binary change? Based on executable mtime, size, checksum? Are
-perhaps the <emulator> elements of individual domains involved?
+> > +#define PMCRN_SHIFT 11
+> > +#define PMCRD   0x8
+> > +#define PMCRC   0x4
+> > +#define PMCRE   0x1
+> > +
+> > +#define PMU_NUM_COUNTERS(env) ((env->cp15.c9_pmcr & PMCRN) >> PMCRN_SHIFT)
+> > +/* Bits allowed to be set/cleared for PMCNTEN* and PMINTEN* */
+> > +#define PMU_COUNTER_MASK(env) ((1 << 31) | ((1 << PMU_NUM_COUNTERS(env)) - 1))
+> > +
+> >  static CPAccessResult pmreg_access(CPUARMState *env, const ARMCPRegInfo *ri,
+> >                                     bool isread)
+> >  {
+> > @@ -1060,14 +1066,14 @@ static void pmccfiltr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> >  static void pmcntenset_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> >                              uint64_t value)
+> >  {
+> > -    value &= (1 << 31);
+> > +    value &= (PMU_COUNTER_MASK(env) | (1 << 31));
+> 
+> PMU_COUNTER_MASK always contains bit 31, so why do we manually OR it in
+> again here?
 
-Thanks!
-Laszlo
+I forgot I'd also included the cycle counter in PMU_COUNTER_MASK... I'll
+remove the duplication here and in pmcntenclr_write below.
+
+> >      env->cp15.c9_pmcnten |= value;
+> >  }
+> >
+> >  static void pmcntenclr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> >                               uint64_t value)
+> >  {
+> > -    value &= (1 << 31);
+> > +    value &= (PMU_COUNTER_MASK(env) | (1 << 31));
+> >      env->cp15.c9_pmcnten &= ~value;
+> >  }
+> >
+> > @@ -1115,14 +1121,14 @@ static void pmintenset_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> >                               uint64_t value)
+> >  {
+> >      /* We have no event counters so only the C bit can be changed */
+> > -    value &= (1 << 31);
+> > +    value &= PMU_COUNTER_MASK(env);
+> >      env->cp15.c9_pminten |= value;
+> >  }
+> >
+> >  static void pmintenclr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> >                               uint64_t value)
+> >  {
+> > -    value &= (1 << 31);
+> > +    value &= PMU_COUNTER_MASK(env);
+> >      env->cp15.c9_pminten &= ~value;
+> >  }
+> >
+> > --
+> > Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.\nQualcomm Technologies, Inc. is a member of the\nCode Aurora Forum, a Linux Foundation Collaborative Project.
+> 
+> Shouldn't these '\n' in your sig be literal line breaks? :-)
+
+Yes :( ...apparently `git config` doesn't interpret them as I expected.
+
+> thanks
+> -- PMM
+
+-- 
+Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the
+Code Aurora Forum, a Linux Foundation Collaborative Project.
