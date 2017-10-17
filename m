@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53501)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e4Mkj-0000eO-Iw
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 03:57:30 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54499)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
+	<BATV+60eda6e2277543397899+5168+infradead.org+hch@bombadil.srs.infradead.org>)
+	id 1e4Mpu-0003D5-PD
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 04:02:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e4Mkg-0004h2-Fp
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 03:57:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59756)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1e4Mkg-0004f1-A0
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 03:57:26 -0400
-Date: Tue, 17 Oct 2017 09:57:21 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171017095721.564fbadc.cohuck@redhat.com>
-In-Reply-To: <1507729193-9747-1-git-send-email-jjherne@linux.vnet.ibm.com>
-References: <1507729193-9747-1-git-send-email-jjherne@linux.vnet.ibm.com>
+	(envelope-from
+	<BATV+60eda6e2277543397899+5168+infradead.org+hch@bombadil.srs.infradead.org>)
+	id 1e4Mpq-0007BG-Kg
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 04:02:50 -0400
+Received: from bombadil.infradead.org ([65.50.211.133]:58356)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from
+	<BATV+60eda6e2277543397899+5168+infradead.org+hch@bombadil.srs.infradead.org>)
+	id 1e4Mpq-00079y-B3
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 04:02:46 -0400
+Date: Tue, 17 Oct 2017 01:02:36 -0700
+From: Christoph Hellwig <hch@infradead.org>
+Message-ID: <20171017080236.GA27649@infradead.org>
+References: <20171012155027.3277-1-pagupta@redhat.com>
+	<20171012155027.3277-3-pagupta@redhat.com>
+	<20171017071633.GA9207@infradead.org>
+	<1441791227.21027037.1508226056893.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390x/event-facility: variable-length
- event masks
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1441791227.21027037.1508226056893.JavaMail.zimbra@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 2/2] KVM: add virtio-pmem driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +34,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>, kwolf@redhat.com, haozhong zhang <haozhong.zhang@intel.com>, jack@suse.cz, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, kvm@vger.kernel.org, david@redhat.com, linux-nvdimm@ml01.01.org, ross zwisler <ross.zwisler@intel.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, linux-mm@kvack.org, stefanha@redhat.com, pbonzini@redhat.com, dan j williams <dan.j.williams@intel.com>, nilal@redhat.com
 
-On Wed, 11 Oct 2017 09:39:53 -0400
-"Jason J. Herne" <jjherne@linux.vnet.ibm.com> wrote:
+On Tue, Oct 17, 2017 at 03:40:56AM -0400, Pankaj Gupta wrote:
+> Are you saying do it as existing i.e ACPI pmem like interface?
+> The reason we have created this new driver is exiting pmem driver
+> does not define proper semantics for guest flushing requests.
 
-> From: Cornelia Huck <cornelia.huck@de.ibm.com>
-> 
-> The architecture supports masks of variable length for sclp write
-> event mask. We currently only support 4 byte event masks, as that
-> is what Linux uses.
-> 
-> Let's extend this to the maximum mask length supported by the
-> architecture and return 0 to the guest for the mask bits we don't
-> support in core.
-> 
-> Initial patch by: Cornelia Huck <cornelia.huck@de.ibm.com>
-> 
-> Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-> Signed-off-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
-> ---
->  hw/s390x/event-facility.c         | 35 +++++++++++++++++++++++++++++------
->  include/hw/s390x/event-facility.h | 20 ++++++++++++++++----
->  2 files changed, 45 insertions(+), 10 deletions(-)
+At this point I'm caring about the Linux-internal interface, and
+for that it should be integrated into the nvdimm subsystem and not
+a block driver.  How the host <-> guest interface looks is a different
+idea.
 
-Thanks, applied.
+> 
+> Regarding block support of driver, we want to achieve DAX support
+> to bypass guest page cache. Also, we want to utilize existing DAX
+> capable file-system interfaces(e.g fsync) from userspace file API's
+> to trigger the host side flush request.
+
+Well, if you want to support XFS+DAX better don't make it a block
+devices, because I'll post patches soon to stop using the block device
+entirely for the DAX case.
