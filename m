@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e4sB2-0002d3-Bm
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:30:45 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e4sD9-0003jB-HY
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:32:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1e4sAy-0008Sh-Cx
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:30:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47774)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e4sAy-0008SN-3o
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:30:40 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 205907E44F
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 17:30:39 +0000 (UTC)
-Date: Wed, 18 Oct 2017 20:30:29 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20171018202948-mutt-send-email-mst@kernel.org>
-References: <20171018111612.112912-1-marcel@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1e4sD5-0001RL-JB
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:32:55 -0400
+Resent-Message-Id: <E1e4sD5-0001RL-JB@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21350)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e4sD5-0001P9-D6
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:32:51 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150821908613.362.714360778900206454@b58463cdfd5f>
+In-Reply-To: <cover.1508213452.git.jcody@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171018111612.112912-1-marcel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V2] hw/pci-host: Fix x86 Host Bridges 64bit
- PCI hole
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 16 Oct 2017 22:44:46 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v4 00/10] qemu-iotests improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,222 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, ehabkost@redhat.com, lersek@redhat.com, imammedo@redhat.com
+To: jcody@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
 
-On Wed, Oct 18, 2017 at 02:16:12PM +0300, Marcel Apfelbaum wrote:
-> Currently there is no MMIO range over 4G
-> reserved for PCI hotplug. Since the 32bit PCI hole
-> depends on the number of cold-plugged PCI devices
-> and other factors, it is very possible is too small
-> to hotplug PCI devices with large BARs.
-> 
-> Fix it by reserving all the address space after
-> RAM (and the reserved space for RAM hotplug),
-> but no more than 40bits. The later seems to be
-> QEMU's magic number for the Guest physical CPU addressable
-> bits and is safe with respect to migration.
-> 
-> Note this is a regression since prev QEMU versions had
-> some range reserved for 64bit PCI hotplug.
-> 
-> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
-> ---
-> 
-> V1 -> V2:
->  Addressed Igor's comments:
->     - aligned the hole64 start to 1Gb
->      (I think all the computations took care of it already,
->       but it can't hurt)
->     - Init compat props to "off" instead of "false"
-> 
-> Thanks,
-> Marcel
-
-Pls take a look at Laszlo's comments too.
-
->  hw/i386/pc.c              | 22 ++++++++++++++++++++++
->  hw/pci-host/piix.c        | 10 ++++++++++
->  hw/pci-host/q35.c         |  9 +++++++++
->  include/hw/i386/pc.h      | 10 ++++++++++
->  include/hw/pci-host/q35.h |  1 +
->  5 files changed, 52 insertions(+)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 05985d4927..d11eeacead 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1448,6 +1448,28 @@ void pc_memory_init(PCMachineState *pcms,
->      pcms->ioapic_as = &address_space_memory;
->  }
->  
-> +uint64_t pc_pci_hole64_start(void)
-> +{
-> +    PCMachineState *pcms = PC_MACHINE(qdev_get_machine());
-> +    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
-> +    uint64_t hole64_start = 0;
-> +
-> +    if (pcmc->has_reserved_memory && pcms->hotplug_memory.base) {
-> +        hole64_start = pcms->hotplug_memory.base;
-> +        if (!pcmc->broken_reserved_end) {
-> +            hole64_start += memory_region_size(&pcms->hotplug_memory.mr);
-> +        }
-> +    } else {
-> +        hole64_start = 0x100000000ULL + pcms->above_4g_mem_size;
-> +    }
-> +
-> +    if (hole64_start > PCI_HOST_PCI_HOLE64_END) {
-> +        hole64_start = PCI_HOST_PCI_HOLE64_END;
-> +    }
-> +
-> +    return ROUND_UP(hole64_start, 1ULL << 30);
-> +}
-> +
->  qemu_irq pc_allocate_cpu_irq(void)
->  {
->      return qemu_allocate_irq(pic_irq_request, NULL, 0);
-> diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-> index dec345fd24..317a232972 100644
-> --- a/hw/pci-host/piix.c
-> +++ b/hw/pci-host/piix.c
-> @@ -50,6 +50,7 @@ typedef struct I440FXState {
->      PCIHostState parent_obj;
->      Range pci_hole;
->      uint64_t pci_hole64_size;
-> +    bool pci_hole64_fix;
->      uint32_t short_root_bus;
->  } I440FXState;
->  
-> @@ -243,11 +244,15 @@ static void i440fx_pcihost_get_pci_hole64_start(Object *obj, Visitor *v,
->                                                  void *opaque, Error **errp)
->  {
->      PCIHostState *h = PCI_HOST_BRIDGE(obj);
-> +    I440FXState *s = I440FX_PCI_HOST_BRIDGE(obj);
->      Range w64;
->      uint64_t value;
->  
->      pci_bus_get_w64_range(h->bus, &w64);
->      value = range_is_empty(&w64) ? 0 : range_lob(&w64);
-> +    if (!value && s->pci_hole64_fix) {
-> +        value = pc_pci_hole64_start();
-> +    }
->      visit_type_uint64(v, name, &value, errp);
->  }
->  
-> @@ -256,11 +261,15 @@ static void i440fx_pcihost_get_pci_hole64_end(Object *obj, Visitor *v,
->                                                Error **errp)
->  {
->      PCIHostState *h = PCI_HOST_BRIDGE(obj);
-> +    I440FXState *s = I440FX_PCI_HOST_BRIDGE(obj);
->      Range w64;
->      uint64_t value;
->  
->      pci_bus_get_w64_range(h->bus, &w64);
->      value = range_is_empty(&w64) ? 0 : range_upb(&w64) + 1;
-> +    if (s->pci_hole64_fix && value < PCI_HOST_PCI_HOLE64_END) {
-> +        value = PCI_HOST_PCI_HOLE64_END;
-> +    }
->      visit_type_uint64(v, name, &value, errp);
->  }
->  
-> @@ -857,6 +866,7 @@ static Property i440fx_props[] = {
->      DEFINE_PROP_SIZE(PCI_HOST_PROP_PCI_HOLE64_SIZE, I440FXState,
->                       pci_hole64_size, DEFAULT_PCI_HOLE64_SIZE),
->      DEFINE_PROP_UINT32("short_root_bus", I440FXState, short_root_bus, 0),
-> +    DEFINE_PROP_BOOL("x-pci-hole64-fix", I440FXState, pci_hole64_fix, true),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-> index 1ff648e80c..641213f177 100644
-> --- a/hw/pci-host/q35.c
-> +++ b/hw/pci-host/q35.c
-> @@ -104,11 +104,15 @@ static void q35_host_get_pci_hole64_start(Object *obj, Visitor *v,
->                                            Error **errp)
->  {
->      PCIHostState *h = PCI_HOST_BRIDGE(obj);
-> +    Q35PCIHost *s = Q35_HOST_DEVICE(obj);
->      Range w64;
->      uint64_t value;
->  
->      pci_bus_get_w64_range(h->bus, &w64);
->      value = range_is_empty(&w64) ? 0 : range_lob(&w64);
-> +    if (!value && s->pci_hole64_fix) {
-> +        value = pc_pci_hole64_start();
-> +    }
->      visit_type_uint64(v, name, &value, errp);
->  }
->  
-> @@ -117,11 +121,15 @@ static void q35_host_get_pci_hole64_end(Object *obj, Visitor *v,
->                                          Error **errp)
->  {
->      PCIHostState *h = PCI_HOST_BRIDGE(obj);
-> +    Q35PCIHost *s = Q35_HOST_DEVICE(obj);
->      Range w64;
->      uint64_t value;
->  
->      pci_bus_get_w64_range(h->bus, &w64);
->      value = range_is_empty(&w64) ? 0 : range_upb(&w64) + 1;
-> +    if (s->pci_hole64_fix && value < PCI_HOST_PCI_HOLE64_END) {
-> +        value = PCI_HOST_PCI_HOLE64_END;
-> +    }
->      visit_type_uint64(v, name, &value, errp);
->  }
->  
-> @@ -143,6 +151,7 @@ static Property q35_host_props[] = {
->                       mch.below_4g_mem_size, 0),
->      DEFINE_PROP_SIZE(PCI_HOST_ABOVE_4G_MEM_SIZE, Q35PCIHost,
->                       mch.above_4g_mem_size, 0),
-> +    DEFINE_PROP_BOOL("x-pci-hole64-fix", Q35PCIHost, pci_hole64_fix, true),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 087d184ef5..82ea8f67f4 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -239,6 +239,7 @@ void pc_guest_info_init(PCMachineState *pcms);
->  #define PCI_HOST_BELOW_4G_MEM_SIZE     "below-4g-mem-size"
->  #define PCI_HOST_ABOVE_4G_MEM_SIZE     "above-4g-mem-size"
->  #define DEFAULT_PCI_HOLE64_SIZE (~0x0ULL)
-> +#define PCI_HOST_PCI_HOLE64_END (0x1ULL << 40)
->  
->  
->  void pc_pci_as_mapping_init(Object *owner, MemoryRegion *system_memory,
-> @@ -249,6 +250,7 @@ void pc_memory_init(PCMachineState *pcms,
->                      MemoryRegion *system_memory,
->                      MemoryRegion *rom_memory,
->                      MemoryRegion **ram_memory);
-> +uint64_t pc_pci_hole64_start(void);
->  qemu_irq pc_allocate_cpu_irq(void);
->  DeviceState *pc_vga_init(ISABus *isa_bus, PCIBus *pci_bus);
->  void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
-> @@ -375,6 +377,14 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
->          .driver   = TYPE_X86_CPU,\
->          .property = "x-hv-max-vps",\
->          .value    = "0x40",\
-> +    },{\
-> +        .driver   = "i440FX-pcihost",\
-> +        .property = "x-pci-hole64-fix",\
-> +        .value    = "off",\
-> +    },{\
-> +        .driver   = "q35-pcihost",\
-> +        .property = "x-pci-hole64-fix",\
-> +        .value    = "off",\
->      },
->  
->  #define PC_COMPAT_2_9 \
-> diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
-> index 58983c00b3..8f4ddde393 100644
-> --- a/include/hw/pci-host/q35.h
-> +++ b/include/hw/pci-host/q35.h
-> @@ -68,6 +68,7 @@ typedef struct Q35PCIHost {
->      PCIExpressHost parent_obj;
->      /*< public >*/
->  
-> +    bool pci_hole64_fix;
->      MCHPCIState mch;
->  } Q35PCIHost;
->  
-> -- 
-> 2.13.5
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IGNvdmVyLjE1MDgyMTM0NTIuZ2l0Lmpjb2R5QHJlZGhhdC5jb20KU3ViamVjdDog
+W1FlbXUtZGV2ZWxdIFtQQVRDSCB2NCAwMC8xMF0gcWVtdS1pb3Rlc3RzIGltcHJvdmVtZW50cwoK
+PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3Rh
+bD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNF
+Li4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0
+b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hv
+dyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sg
+LTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisx
+KSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAz
+YzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3
+IGJyYW5jaCAndGVzdCcKZmNmN2JiNTVjNiBxZW11LWlvdGVzdHM6IGFkZCBzdXBwb3J0IGZvciBy
+dW5uaW5nIG11bHRpLXRocmVhZGVkIGlvdGVzdHMKODg5YmQyYzNhZCBxZW11LWlvdGVzdHM6IGFk
+ZCBvcHRpb24gdG8gc2F2ZSB0ZW1wIGZpbGVzIG9uIGVycm9yCmY1ZTRjN2NiYjggcWVtdS1pb3Rl
+c3RzOiBtb2RpZnkgcHl0aG9uIHRlc3RzIHRvIHJ1biBmcm9tIHN1YmRpcgo5ODU2ZTM3YTk3IHFl
+bXUtaW90ZXN0czogcnVuIHB5dGhvbiB0ZXN0cyBpbiBvd24gc3ViZGlyZWN0b3JpZXMKMTlkM2Nh
+NDM3YiBxZW11LWlvdGVzdHM6IG1ha2UgLi9jaGVjayBhdXRvbWF0aWNhbGx5IHJlYXAgUUVNVSBw
+cm9jZXNzZXMKYmU4YTRiNGFkOSBxZW11LWlvdGVzdHM6IGNoYW5nZSBxZW11IHBpZCBhbmQgZmQg
+dHJhY2tpbmcgLyBjbGVhbnVwCmRjMzZhMmI4NmIgcWVtdS1pb3Rlc3RzOiByZW1vdmUgZmlsZSBj
+bGVhbnVwIGZyb20gYmFzaCB0ZXN0cwphOTEyODdhYjlmIHFlbXUtaW90ZXN0czogYXV0b21hdGlj
+YWxseSBjbGVhbiB1cCBiYXNoIHByb3RvY29sIHNlcnZlcnMKNGZlNTdmZDdiNyBxZW11LWlvdGVz
+dHM6IHNldCBURVNUX0RJUiB0byBhIHVuaXF1ZSBkaXIgZm9yIGVhY2ggdGVzdApiMjRjZjVlZGZk
+IHFlbXUtaW90ZXN0czogcmVmdXNlIHRvIHJ1biBpZiBURVNUX0RJUiBjb250YWlucyBzcGFjZXMK
+Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTA6IHFlbXUtaW90ZXN0czog
+cmVmdXNlIHRvIHJ1biBpZiBURVNUX0RJUiBjb250YWlucyBzcGFjZXMuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMi8xMDogcWVtdS1pb3Rlc3RzOiBzZXQgVEVTVF9ESVIgdG8gYSB1bmlxdWUgZGlyIGZvciBl
+YWNoIHRlc3QuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xMDogcWVtdS1pb3Rlc3RzOiBhdXRvbWF0aWNh
+bGx5IGNsZWFuIHVwIGJhc2ggcHJvdG9jb2wgc2VydmVycy4uLgpDaGVja2luZyBQQVRDSCA0LzEw
+OiBxZW11LWlvdGVzdHM6IHJlbW92ZSBmaWxlIGNsZWFudXAgZnJvbSBiYXNoIHRlc3RzLi4uCkNo
+ZWNraW5nIFBBVENIIDUvMTA6IHFlbXUtaW90ZXN0czogY2hhbmdlIHFlbXUgcGlkIGFuZCBmZCB0
+cmFja2luZyAvIGNsZWFudXAuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8xMDogcWVtdS1pb3Rlc3RzOiBt
+YWtlIC4vY2hlY2sgYXV0b21hdGljYWxseSByZWFwIFFFTVUgcHJvY2Vzc2VzLi4uCkNoZWNraW5n
+IFBBVENIIDcvMTA6IHFlbXUtaW90ZXN0czogcnVuIHB5dGhvbiB0ZXN0cyBpbiBvd24gc3ViZGly
+ZWN0b3JpZXMuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0NzogRklMRTogdGVz
+dHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHk6MjY3OgorICAgICAgICBzZWxmLndvcmtkaXIgPSBv
+cy5wYXRoLmpvaW4odGVzdF9kaXIsIHNlbGYuX19jbGFzc19fLl9fbmFtZV9fLCBzZWxmLl90ZXN0
+TWV0aG9kTmFtZSkKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTYgbGluZXMgY2hlY2tl
+ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0gg
+OC8xMDogcWVtdS1pb3Rlc3RzOiBtb2RpZnkgcHl0aG9uIHRlc3RzIHRvIHJ1biBmcm9tIHN1YmRp
+ci4uLgpDaGVja2luZyBQQVRDSCA5LzEwOiBxZW11LWlvdGVzdHM6IGFkZCBvcHRpb24gdG8gc2F2
+ZSB0ZW1wIGZpbGVzIG9uIGVycm9yLi4uCkNoZWNraW5nIFBBVENIIDEwLzEwOiBxZW11LWlvdGVz
+dHM6IGFkZCBzdXBwb3J0IGZvciBydW5uaW5nIG11bHRpLXRocmVhZGVkIGlvdGVzdHMuLi4KPT09
+IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpF
+bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
+cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0
+cy5vcmc=
