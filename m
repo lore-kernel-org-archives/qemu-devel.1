@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1e4Sci-0004b2-Is
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:13:37 -0400
+	(envelope-from <James.Hogan@mips.com>) id 1e4Sgw-0007D7-HZ
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:18:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1e4Sce-0000cN-Kb
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:13:36 -0400
-From: <james.hogan@imgtec.com>
-Date: Tue, 17 Oct 2017 15:13:11 +0100
-Message-ID: <20171017141311.22194-1-james.hogan@imgtec.com>
+	(envelope-from <James.Hogan@mips.com>) id 1e4Sgr-0002VH-TY
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:17:58 -0400
+Date: Tue, 17 Oct 2017 15:17:14 +0100
+From: James Hogan <james.hogan@mips.com>
+Message-ID: <20171017141713.GO15235@jhogan-linux>
+References: <20171017131708.1892-1-james.hogan@mips.com>
+	<d3216ad9-9dda-9658-2659-2311fb0c67ae@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] Update James Hogan's email address
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="wAI/bQb0EMvlZCHl"
+Content-Disposition: inline
+In-Reply-To: <d3216ad9-9dda-9658-2659-2311fb0c67ae@vivier.eu>
+Subject: Re: [Qemu-devel] [PATCH] Update James Hogan's email address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,52 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: James Hogan <james.hogan@imgtec.com>, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>, qemu-trivial@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, qemu-trivial@nongnu.org
 
-From: James Hogan <james.hogan@imgtec.com>
+--wAI/bQb0EMvlZCHl
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Update my imgtec.com email address to my kernel.org one in MAINTAINERS
-as MIPS will soon no longer be part of Imagination Technologies, and add
-a mapping in .mailcap so get_maintainer.pl reports the right address.
+On Tue, Oct 17, 2017 at 04:03:04PM +0200, Laurent Vivier wrote:
+> Le 17/10/2017 =C3=A0 15:17, James Hogan a =C3=A9crit=C2=A0:
+> > From: James Hogan <jhogan@kernel.org>
+> >=20
+> > Update my imgtec.com email address to my kernel.org one in MAINTAINERS
+> > as MIPS will soon no longer be part of Imagination Technologies, and add
+> > a mapping in .mailcap so get_maintainer.pl reports the right address.
+> >=20
+> > Signed-off-by: James Hogan <jhogan@kernel.org>
+>=20
+> I think it would be  better if you send the patch with your imgtec
+> address (if it is always available) as it identifies the current maintain=
+er.
 
-Signed-off-by: James Hogan <james.hogan@imgtec.com>
-Cc: Michael Tokarev <mjt@tls.msk.ru>
-Cc: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
----
-Changes in v2:
-- Use my imgtec address as the author / SoB (Laurent Vivier)
----
- .mailmap    | 1 +
- MAINTAINERS | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+Okay, resent from imgtec.
 
-diff --git a/.mailmap b/.mailmap
-index 28defa1b2c57..5aec1bdf9f7d 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -8,6 +8,7 @@ Aurelien Jarno <aurelien@aurel32.net> aurel32 <aurel32@c046a42c-6fe2-441c-8c8c-7
- Blue Swirl <blauwirbel@gmail.com> blueswir1 <blueswir1@c046a42c-6fe2-441c-8c8c-71466251a162>
- Edgar E. Iglesias <edgar.iglesias@gmail.com> edgar_igl <edgar_igl@c046a42c-6fe2-441c-8c8c-71466251a162>
- Fabrice Bellard <fabrice@bellard.org> bellard <bellard@c046a42c-6fe2-441c-8c8c-71466251a162>
-+James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
- Jocelyn Mayer <l_indien@magic.fr> j_mayer <j_mayer@c046a42c-6fe2-441c-8c8c-71466251a162>
- Paul Brook <paul@codesourcery.com> pbrook <pbrook@c046a42c-6fe2-441c-8c8c-71466251a162>
- Thiemo Seufer <ths@networkno.de> ths <ths@c046a42c-6fe2-441c-8c8c-71466251a162>
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 9522d1b621bd..b01f5c46ef83 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -284,7 +284,7 @@ S: Maintained
- F: target/arm/kvm.c
- 
- MIPS
--M: James Hogan <james.hogan@imgtec.com>
-+M: James Hogan <jhogan@kernel.org>
- S: Maintained
- F: target/mips/kvm.c
- 
--- 
-2.14.1
+Cheers
+James
+
+--wAI/bQb0EMvlZCHl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEd80NauSabkiESfLYbAtpk944dnoFAlnmEOEACgkQbAtpk944
+dnrTmhAAokzQlnB5LRj7zLr5hflliTJ4323gZYxo4A61zTdYfCxWvw2YQPSG+2XL
+k8PQ80egR+bGU1SMdySqEea0sBUyP8O5FYBS7yssPjMHUL0hURDan2PZOBl3HBtf
+uQQxAG1BHSbQEbw9NpbVErk/s2Hi2KRX/KZNgM7NbJcO2RSjOK36Azd3PO0Fd9AY
+AyMr+Qiw9sMPDGyeTLyjCEBNyeYb+wbRLFFW95IMLepan0DeJx98qFnW3QlV9cvR
+/davvhGHgZ/IjRy1qwS9RnUDP3AXu7Vc3XnqN0x96o7F4UzqVgagw2OH4LXB5Z9d
+u3dklNVrRH6LlzjGUxQKQRGqCy1jMNRjVQn3xja66YuUYjKLka17t3N9S0W5YOcH
+nPh0HqMvF4cjCb7ZWrDDioYW8dFOT+23bA/EY6/wSnhhmquRhJnsBJKRfUyKfFDq
+Iy+Po43BxrfupoV2HJn+kR1VUkbupjDXGjbKRbA5PRAPimBoULUp/tpCE5e2/VYM
+RuWg5rEDFV59mHJiqXLkf1+p19amqmQf7mjZdlhkeQJzRz9XB8oISwCtAEh/A+1Y
+XSqg4klL9iDDUHlLQjIPMm8n993DlzaO313z3QQpT2+WBYd4yr4z46aW0vTEuBbH
+6Tdptc+W4y20XHfDmepSD+MrrepkGi2WRCYswPfwprR7Aqlyets=
+=ic6n
+-----END PGP SIGNATURE-----
+
+--wAI/bQb0EMvlZCHl--
