@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55135)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e4TwG-0004DJ-MN
+	(envelope-from <richard.henderson@linaro.org>) id 1e4TwI-0004Ef-0y
 	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:37:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e4TwE-0005lK-Cx
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:37:52 -0400
-Received: from mail-pg0-x229.google.com ([2607:f8b0:400e:c05::229]:44374)
+	(envelope-from <richard.henderson@linaro.org>) id 1e4TwF-0005m5-Vn
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:37:54 -0400
+Received: from mail-pf0-x229.google.com ([2607:f8b0:400e:c00::229]:57257)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e4TwE-0005km-45
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:37:50 -0400
-Received: by mail-pg0-x229.google.com with SMTP id j3so1718567pga.1
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 08:37:50 -0700 (PDT)
+	id 1e4TwF-0005li-MT
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:37:51 -0400
+Received: by mail-pf0-x229.google.com with SMTP id b85so1601919pfj.13
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 08:37:51 -0700 (PDT)
 Received: from cloudburst.twiddle.net (97-126-104-76.tukw.qwest.net.
 	[97.126.104.76]) by smtp.gmail.com with ESMTPSA id
-	y84sm20094415pff.158.2017.10.17.08.37.47 for <qemu-devel@nongnu.org>
+	y84sm20094415pff.158.2017.10.17.08.37.48 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 17 Oct 2017 08:37:47 -0700 (PDT)
+	Tue, 17 Oct 2017 08:37:48 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 17 Oct 2017 08:37:36 -0700
-Message-Id: <20171017153742.10026-4-richard.henderson@linaro.org>
+Date: Tue, 17 Oct 2017 08:37:37 -0700
+Message-Id: <20171017153742.10026-5-richard.henderson@linaro.org>
 In-Reply-To: <20171017153742.10026-1-richard.henderson@linaro.org>
 References: <20171017153742.10026-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 3/9] disas: Remove unused flags arguments
+Subject: [Qemu-devel] [PATCH v5 4/9] disas: Support the Capstone
+ disassembler library
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,370 +34,438 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Now that every target is using the disas_set_info hook,
-the flags argument is unused.  Remove it.
+If configured, prefer this over our rather dated copy of the
+GPLv2-only binutils.  This will be especially apparent with
+the proposed vector extensions to TCG, as disas/i386.c does
+not handle AVX.
 
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/disas/disas.h         |  4 ++--
- include/exec/log.h            |  4 ++--
- disas.c                       | 15 ++++-----------
- monitor.c                     |  3 +--
- target/alpha/translate.c      |  2 +-
- target/arm/translate-a64.c    |  3 +--
- target/arm/translate.c        |  3 +--
- target/cris/translate.c       |  3 +--
- target/hppa/translate.c       |  2 +-
- target/i386/translate.c       |  2 +-
- target/lm32/translate.c       |  2 +-
- target/m68k/translate.c       |  2 +-
- target/microblaze/translate.c |  2 +-
- target/mips/translate.c       |  2 +-
- target/nios2/translate.c      |  2 +-
- target/openrisc/translate.c   |  2 +-
- target/ppc/translate.c        |  2 +-
- target/s390x/translate.c      |  2 +-
- target/sh4/translate.c        |  2 +-
- target/sparc/translate.c      |  2 +-
- target/tricore/translate.c    |  2 +-
- target/unicore32/translate.c  |  2 +-
- target/xtensa/translate.c     |  2 +-
- 23 files changed, 28 insertions(+), 39 deletions(-)
+ include/disas/bfd.h      |   4 +
+ include/disas/capstone.h |  38 ++++++++
+ disas.c                  | 219 ++++++++++++++++++++++++++++++++++++++++++++---
+ configure                |  26 ++++++
+ 4 files changed, 274 insertions(+), 13 deletions(-)
+ create mode 100644 include/disas/capstone.h
 
-diff --git a/include/disas/disas.h b/include/disas/disas.h
-index e549ca24a1..4d48c13c65 100644
---- a/include/disas/disas.h
-+++ b/include/disas/disas.h
-@@ -9,10 +9,10 @@
- /* Disassemble this for me please... (debugging). */
- void disas(FILE *out, void *code, unsigned long size);
- void target_disas(FILE *out, CPUState *cpu, target_ulong code,
--                  target_ulong size, int flags);
-+                  target_ulong size);
+diff --git a/include/disas/bfd.h b/include/disas/bfd.h
+index b01e002b4c..0f4ecdeb88 100644
+--- a/include/disas/bfd.h
++++ b/include/disas/bfd.h
+@@ -377,6 +377,10 @@ typedef struct disassemble_info {
+   /* Command line options specific to the target disassembler.  */
+   char * disassembler_options;
  
- void monitor_disas(Monitor *mon, CPUState *cpu,
--                   target_ulong pc, int nb_insn, int is_physical, int flags);
-+                   target_ulong pc, int nb_insn, int is_physical);
++  /* Options for Capstone disassembly.  */
++  int cap_arch;
++  int cap_mode;
++
+ } disassemble_info;
  
- /* Look up symbol for debugging purpose.  Returns "" if unknown. */
- const char *lookup_symbol(target_ulong orig_addr);
-diff --git a/include/exec/log.h b/include/exec/log.h
-index ba1c9b5682..c249307911 100644
---- a/include/exec/log.h
-+++ b/include/exec/log.h
-@@ -38,9 +38,9 @@ static inline void log_cpu_state_mask(int mask, CPUState *cpu, int flags)
- #ifdef NEED_CPU_H
- /* disas() and target_disas() to qemu_logfile: */
- static inline void log_target_disas(CPUState *cpu, target_ulong start,
--                                    target_ulong len, int flags)
-+                                    target_ulong len)
- {
--    target_disas(qemu_logfile, cpu, start, len, flags);
-+    target_disas(qemu_logfile, cpu, start, len);
- }
- 
- static inline void log_disas(void *code, unsigned long size)
+ 
+
+diff --git a/include/disas/capstone.h b/include/disas/capstone.h
+new file mode 100644
+index 0000000000..84e214956d
+--- /dev/null
++++ b/include/disas/capstone.h
+@@ -0,0 +1,38 @@
++#ifndef QEMU_CAPSTONE_H
++#define QEMU_CAPSTONE_H 1
++
++#ifdef CONFIG_CAPSTONE
++
++#include <capstone.h>
++
++#else
++
++/* Just enough to allow backends to init without ifdefs.  */
++
++#define CS_ARCH_ARM     -1
++#define CS_ARCH_ARM64   -1
++#define CS_ARCH_MIPS    -1
++#define CS_ARCH_X86     -1
++#define CS_ARCH_PPC     -1
++#define CS_ARCH_SPARC   -1
++#define CS_ARCH_SYSZ    -1
++
++#define CS_MODE_LITTLE_ENDIAN    0
++#define CS_MODE_BIG_ENDIAN       0
++#define CS_MODE_ARM              0
++#define CS_MODE_16               0
++#define CS_MODE_32               0
++#define CS_MODE_64               0
++#define CS_MODE_THUMB            0
++#define CS_MODE_MCLASS           0
++#define CS_MODE_V8               0
++#define CS_MODE_MICRO            0
++#define CS_MODE_MIPS3            0
++#define CS_MODE_MIPS32R6         0
++#define CS_MODE_MIPSGP64         0
++#define CS_MODE_V9               0
++#define CS_MODE_MIPS32           0
++#define CS_MODE_MIPS64           0
++
++#endif /* CONFIG_CAPSTONE */
++#endif /* QEMU_CAPSTONE_H */
 diff --git a/disas.c b/disas.c
-index 3a375a3b6c..ad675dc361 100644
+index ad675dc361..746d76c07d 100644
 --- a/disas.c
 +++ b/disas.c
-@@ -171,15 +171,9 @@ static int print_insn_od_target(bfd_vma pc, disassemble_info *info)
+@@ -6,6 +6,7 @@
+ 
+ #include "cpu.h"
+ #include "disas/disas.h"
++#include "disas/capstone.h"
+ 
+ typedef struct CPUDebug {
+     struct disassemble_info info;
+@@ -171,6 +172,192 @@ static int print_insn_od_target(bfd_vma pc, disassemble_info *info)
      return print_insn_objdump(pc, info, "OBJD-T");
  }
  
--/* Disassemble this for me please... (debugging). 'flags' has the following
--   values:
--    i386 - 1 means 16 bit code, 2 means 64 bit code
--    ppc  - bits 0:15 specify (optionally) the machine instruction set;
--           bit 16 indicates little endian.
--    other targets - unused
-- */
-+/* Disassemble this for me please... (debugging).  */
++#ifdef CONFIG_CAPSTONE
++/* Temporary storage for the capstone library.  This will be alloced via
++   malloc with a size private to the library; thus there's no reason not
++   to share this across calls and across host vs target disassembly.  */
++static __thread cs_insn *cap_insn;
++
++/* Initialize the Capstone library.  */
++/* ??? It would be nice to cache this.  We would need one handle for the
++   host and one for the target.  For most targets we can reset specific
++   parameters via cs_option(CS_OPT_MODE, new_mode), but we cannot change
++   CS_ARCH_* in this way.  Thus we would need to be able to close and
++   re-open the target handle with a different arch for the target in order
++   to handle AArch64 vs AArch32 mode switching.  */
++static cs_err cap_disas_start(disassemble_info *info, csh *handle)
++{
++    cs_mode cap_mode = info->cap_mode;
++    cs_err err;
++
++    cap_mode += (info->endian == BFD_ENDIAN_BIG ? CS_MODE_BIG_ENDIAN
++                 : CS_MODE_LITTLE_ENDIAN);
++
++    err = cs_open(info->cap_arch, cap_mode, handle);
++    if (err != CS_ERR_OK) {
++        return err;
++    }
++
++    /* ??? There probably ought to be a better place to put this.  */
++    if (info->cap_arch == CS_ARCH_X86) {
++        /* We don't care about errors (if for some reason the library
++           is compiled without AT&T syntax); the user will just have
++           to deal with the Intel syntax.  */
++        cs_option(*handle, CS_OPT_SYNTAX, CS_OPT_SYNTAX_ATT);
++    }
++
++    /* "Disassemble" unknown insns as ".byte W,X,Y,Z".  */
++    cs_option(*handle, CS_OPT_SKIPDATA, CS_OPT_ON);
++
++    /* Allocate temp space for cs_disasm_iter.  */
++    if (cap_insn == NULL) {
++        cap_insn = cs_malloc(*handle);
++        if (cap_insn == NULL) {
++            cs_close(handle);
++            return CS_ERR_MEM;
++        }
++    }
++    return CS_ERR_OK;
++}
++
++/* Disassemble SIZE bytes at PC for the target.  */
++static bool cap_disas_target(disassemble_info *info, uint64_t pc, size_t size)
++{
++    uint8_t cap_buf[1024];
++    csh handle;
++    cs_insn *insn;
++    size_t csize = 0;
++
++    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
++        return false;
++    }
++    insn = cap_insn;
++
++    while (1) {
++        size_t tsize = MIN(sizeof(cap_buf) - csize, size);
++        const uint8_t *cbuf = cap_buf;
++
++        target_read_memory(pc + csize, cap_buf + csize, tsize, info);
++        csize += tsize;
++        size -= tsize;
++
++        while (cs_disasm_iter(handle, &cbuf, &csize, &pc, insn)) {
++            (*info->fprintf_func)(info->stream,
++                                  "0x%08" PRIx64 ":  %-12s %s\n",
++                                  insn->address, insn->mnemonic,
++                                  insn->op_str);
++        }
++
++        /* If the target memory is not consumed, go back for more... */
++        if (size != 0) {
++            /* ... taking care to move any remaining fractional insn
++               to the beginning of the buffer.  */
++            if (csize != 0) {
++                memmove(cap_buf, cbuf, csize);
++            }
++            continue;
++        }
++
++        /* Since the target memory is consumed, we should not have
++           a remaining fractional insn.  */
++        if (csize != 0) {
++            (*info->fprintf_func)(info->stream,
++                "Disassembler disagrees with translator "
++                "over instruction decoding\n"
++                "Please report this to qemu-devel@nongnu.org\n");
++        }
++        break;
++    }
++
++    cs_close(&handle);
++    return true;
++}
++
++/* Disassemble SIZE bytes at CODE for the host.  */
++static bool cap_disas_host(disassemble_info *info, void *code, size_t size)
++{
++    csh handle;
++    const uint8_t *cbuf;
++    cs_insn *insn;
++    uint64_t pc;
++
++    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
++        return false;
++    }
++    insn = cap_insn;
++
++    cbuf = code;
++    pc = (uintptr_t)code;
++
++    while (cs_disasm_iter(handle, &cbuf, &size, &pc, insn)) {
++        (*info->fprintf_func)(info->stream,
++                              "0x%08" PRIx64 ":  %-12s %s\n",
++                              insn->address, insn->mnemonic,
++                              insn->op_str);
++    }
++    if (size != 0) {
++        (*info->fprintf_func)(info->stream,
++            "Disassembler disagrees with TCG over instruction encoding\n"
++            "Please report this to qemu-devel@nongnu.org\n");
++    }
++
++    cs_close(&handle);
++    return true;
++}
++
++#if !defined(CONFIG_USER_ONLY)
++/* Disassemble COUNT insns at PC for the target.  */
++static bool cap_disas_monitor(disassemble_info *info, uint64_t pc, int count)
++{
++    uint8_t cap_buf[32];
++    csh handle;
++    cs_insn *insn;
++    size_t csize = 0;
++
++    if (cap_disas_start(info, &handle) != CS_ERR_OK) {
++        return false;
++    }
++    insn = cap_insn;
++
++    while (1) {
++        /* We want to read memory for one insn, but generically we do not
++           know how much memory that is.  We have a small buffer which is
++           known to be sufficient for all supported targets.  Try to not
++           read beyond the page, Just In Case.  For even more simplicity,
++           ignore the actual target page size and use a 1k boundary.  If
++           that turns out to be insufficient, we'll come back around the
++           loop and read more.  */
++        uint64_t epc = QEMU_ALIGN_UP(pc + csize + 1, 1024);
++        size_t tsize = MIN(sizeof(cap_buf) - csize, epc - pc);
++        const uint8_t *cbuf = cap_buf;
++
++        /* Make certain that we can make progress.  */
++        assert(tsize != 0);
++        info->read_memory_func(pc, cap_buf + csize, tsize, info);
++        csize += tsize;
++
++        if (cs_disasm_iter(handle, &cbuf, &csize, &pc, insn)) {
++            (*info->fprintf_func)(info->stream,
++                                  "0x%08" PRIx64 ":  %-12s %s\n",
++                                  insn->address, insn->mnemonic,
++                                  insn->op_str);
++            if (--count <= 0) {
++                break;
++            }
++        }
++        memmove(cap_buf, cbuf, csize);
++    }
++
++    cs_close(&handle);
++    return true;
++}
++#endif /* !CONFIG_USER_ONLY */
++#else
++# define cap_disas_target(i, p, s)  false
++# define cap_disas_host(i, p, s)  false
++# define cap_disas_monitor(i, p, c)  false
++#endif /* CONFIG_CAPSTONE */
++
+ /* Disassemble this for me please... (debugging).  */
  void target_disas(FILE *out, CPUState *cpu, target_ulong code,
--                  target_ulong size, int flags)
-+                  target_ulong size)
- {
-     CPUClass *cc = CPU_GET_CLASS(cpu);
-     target_ulong pc;
-@@ -336,10 +330,9 @@ monitor_read_memory (bfd_vma memaddr, bfd_byte *myaddr, int length,
-     return 0;
- }
+                   target_ulong size)
+@@ -188,6 +375,8 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
+     s.info.buffer_vma = code;
+     s.info.buffer_length = size;
+     s.info.print_address_func = generic_print_address;
++    s.info.cap_arch = -1;
++    s.info.cap_mode = 0;
  
--/* Disassembler for the monitor.
--   See target_disas for a description of flags. */
-+/* Disassembler for the monitor.  */
- void monitor_disas(Monitor *mon, CPUState *cpu,
--                   target_ulong pc, int nb_insn, int is_physical, int flags)
-+                   target_ulong pc, int nb_insn, int is_physical)
- {
-     CPUClass *cc = CPU_GET_CLASS(cpu);
-     int count, i;
-diff --git a/monitor.c b/monitor.c
-index 2164dfcc3b..7a802a345e 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1309,8 +1309,7 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
+ #ifdef TARGET_WORDS_BIGENDIAN
+     s.info.endian = BFD_ENDIAN_BIG;
+@@ -199,6 +388,10 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
+         cc->disas_set_info(cpu, &s.info);
      }
  
-     if (format == 'i') {
--        int flags = 0;
--        monitor_disas(mon, cs, addr, count, is_physical, flags);
-+        monitor_disas(mon, cs, addr, count, is_physical);
-         return;
++    if (s.info.cap_arch >= 0 && cap_disas_target(&s.info, code, size)) {
++        return;
++    }
++
+     if (s.info.print_insn == NULL) {
+         s.info.print_insn = print_insn_od_target;
      }
+@@ -206,18 +399,6 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
+     for (pc = code; size > 0; pc += count, size -= count) {
+ 	fprintf(out, "0x" TARGET_FMT_lx ":  ", pc);
+ 	count = s.info.print_insn(pc, &s.info);
+-#if 0
+-        {
+-            int i;
+-            uint8_t b;
+-            fprintf(out, " {");
+-            for(i = 0; i < count; i++) {
+-                target_read_memory(pc + i, &b, 1, &s.info);
+-                fprintf(out, " %02x", b);
+-            }
+-            fprintf(out, " }");
+-        }
+-#endif
+ 	fprintf(out, "\n");
+ 	if (count < 0)
+ 	    break;
+@@ -245,6 +426,8 @@ void disas(FILE *out, void *code, unsigned long size)
+     s.info.buffer = code;
+     s.info.buffer_vma = (uintptr_t)code;
+     s.info.buffer_length = size;
++    s.info.cap_arch = -1;
++    s.info.cap_mode = 0;
  
-diff --git a/target/alpha/translate.c b/target/alpha/translate.c
-index f32c95b9a1..3de369b17e 100644
---- a/target/alpha/translate.c
-+++ b/target/alpha/translate.c
-@@ -3048,7 +3048,7 @@ static void alpha_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
- static void alpha_tr_disas_log(const DisasContextBase *dcbase, CPUState *cpu)
- {
-     qemu_log("IN: %s\n", lookup_symbol(dcbase->pc_first));
--    log_target_disas(cpu, dcbase->pc_first, dcbase->tb->size, 1);
-+    log_target_disas(cpu, dcbase->pc_first, dcbase->tb->size);
- }
- 
- static const TranslatorOps alpha_tr_ops = {
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index a39b9d3633..fc5419df7f 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -11403,8 +11403,7 @@ static void aarch64_tr_disas_log(const DisasContextBase *dcbase,
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
- 
-     qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
--    log_target_disas(cpu, dc->base.pc_first, dc->base.tb->size,
--                     4 | (bswap_code(dc->sctlr_b) ? 2 : 0));
-+    log_target_disas(cpu, dc->base.pc_first, dc->base.tb->size);
- }
- 
- const TranslatorOps aarch64_translator_ops = {
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 4da1a4cbc6..9d31769c8d 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -12371,8 +12371,7 @@ static void arm_tr_disas_log(const DisasContextBase *dcbase, CPUState *cpu)
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
- 
-     qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
--    log_target_disas(cpu, dc->base.pc_first, dc->base.tb->size,
--                     dc->thumb | (dc->sctlr_b << 1));
-+    log_target_disas(cpu, dc->base.pc_first, dc->base.tb->size);
- }
- 
- static const TranslatorOps arm_translator_ops = {
-diff --git a/target/cris/translate.c b/target/cris/translate.c
-index 38a999e6f1..b1fda57c74 100644
---- a/target/cris/translate.c
-+++ b/target/cris/translate.c
-@@ -3297,8 +3297,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-         qemu_log_lock();
-         qemu_log("--------------\n");
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, dc->pc - pc_start,
--                         env->pregs[PR_VR]);
-+        log_target_disas(cs, pc_start, dc->pc - pc_start);
-         qemu_log("\nisize=%d osize=%d\n",
-                  dc->pc - pc_start, tcg_op_buf_count());
-         qemu_log_unlock();
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 26242f4b3c..ca6a6d3372 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -3904,7 +3904,7 @@ static void hppa_tr_disas_log(const DisasContextBase *dcbase, CPUState *cs)
-         break;
-     default:
-         qemu_log("IN: %s\n", lookup_symbol(tb->pc));
--        log_target_disas(cs, tb->pc, tb->size, 1);
-+        log_target_disas(cs, tb->pc, tb->size);
-         break;
-     }
- }
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 046fc5dfe2..be0a1e9f05 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -8522,7 +8522,7 @@ static void i386_tr_disas_log(const DisasContextBase *dcbase,
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
- 
-     qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
--    log_target_disas(cpu, dc->base.pc_first, dc->base.tb->size, 0);
-+    log_target_disas(cpu, dc->base.pc_first, dc->base.tb->size);
- }
- 
- static const TranslatorOps i386_tr_ops = {
-diff --git a/target/lm32/translate.c b/target/lm32/translate.c
-index 65bc9c0bf6..a83cbdf729 100644
---- a/target/lm32/translate.c
-+++ b/target/lm32/translate.c
-@@ -1156,7 +1156,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-         && qemu_log_in_addr_range(pc_start)) {
-         qemu_log_lock();
-         qemu_log("\n");
--        log_target_disas(cs, pc_start, dc->pc - pc_start, 0);
-+        log_target_disas(cs, pc_start, dc->pc - pc_start);
-         qemu_log("\nisize=%d osize=%d\n",
-                  dc->pc - pc_start, tcg_op_buf_count());
-         qemu_log_unlock();
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index d738f32f9c..e1e31f622c 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -5620,7 +5620,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-         qemu_log_lock();
-         qemu_log("----------------\n");
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, dc->pc - pc_start, 0);
-+        log_target_disas(cs, pc_start, dc->pc - pc_start);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 067b0878d6..fecc61a1ec 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -1810,7 +1810,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-         qemu_log_lock();
-         qemu_log("--------------\n");
- #if DISAS_GNU
--        log_target_disas(cs, pc_start, dc->pc - pc_start, 0);
-+        log_target_disas(cs, pc_start, dc->pc - pc_start);
+ #ifdef HOST_WORDS_BIGENDIAN
+     s.info.endian = BFD_ENDIAN_BIG;
+@@ -282,6 +465,11 @@ void disas(FILE *out, void *code, unsigned long size)
+ #elif defined(__hppa__)
+     print_insn = print_insn_hppa;
  #endif
-         qemu_log("\nisize=%d osize=%d\n",
-                  dc->pc - pc_start, tcg_op_buf_count());
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index ac05f3aa09..7c96aff1a0 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -20370,7 +20370,7 @@ done_generating:
-         && qemu_log_in_addr_range(pc_start)) {
-         qemu_log_lock();
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, ctx.pc - pc_start, 0);
-+        log_target_disas(cs, pc_start, ctx.pc - pc_start);
-         qemu_log("\n");
-         qemu_log_unlock();
++
++    if (s.info.cap_arch >= 0 && cap_disas_host(&s.info, code, size)) {
++        return;
++    }
++
+     if (print_insn == NULL) {
+         print_insn = print_insn_od_host;
      }
-diff --git a/target/nios2/translate.c b/target/nios2/translate.c
-index 6b0961837d..7a0fa860da 100644
---- a/target/nios2/translate.c
-+++ b/target/nios2/translate.c
-@@ -907,7 +907,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-         && qemu_log_in_addr_range(tb->pc)) {
-         qemu_log_lock();
-         qemu_log("IN: %s\n", lookup_symbol(tb->pc));
--        log_target_disas(cs, tb->pc, dc->pc - tb->pc, 0);
-+        log_target_disas(cs, tb->pc, dc->pc - tb->pc);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
-diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index 112db1ad0f..99f2b463ce 100644
---- a/target/openrisc/translate.c
-+++ b/target/openrisc/translate.c
-@@ -1653,7 +1653,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
+@@ -344,8 +532,9 @@ void monitor_disas(Monitor *mon, CPUState *cpu,
+     monitor_disas_is_physical = is_physical;
+     s.info.read_memory_func = monitor_read_memory;
+     s.info.print_address_func = generic_print_address;
+-
+     s.info.buffer_vma = pc;
++    s.info.cap_arch = -1;
++    s.info.cap_mode = 0;
  
-     if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
-         && qemu_log_in_addr_range(pc_start)) {
--        log_target_disas(cs, pc_start, tb->size, 0);
-+        log_target_disas(cs, pc_start, tb->size);
-         qemu_log("\n");
-         qemu_log_unlock();
+ #ifdef TARGET_WORDS_BIGENDIAN
+     s.info.endian = BFD_ENDIAN_BIG;
+@@ -357,6 +546,10 @@ void monitor_disas(Monitor *mon, CPUState *cpu,
+         cc->disas_set_info(cpu, &s.info);
      }
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index bc155f1036..8e92e4579c 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -7397,7 +7397,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-         && qemu_log_in_addr_range(pc_start)) {
-         qemu_log_lock();
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, ctx.nip - pc_start, 0);
-+        log_target_disas(cs, pc_start, ctx.nip - pc_start);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 165d2cac3e..4fa7609c64 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -5970,7 +5970,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-             qemu_log("IN: EXECUTE %016" PRIx64 "\n", dc.ex_value);
-         } else {
-             qemu_log("IN: %s\n", lookup_symbol(pc_start));
--            log_target_disas(cs, pc_start, dc.pc - pc_start, 1);
-+            log_target_disas(cs, pc_start, dc.pc - pc_start);
-             qemu_log("\n");
-         }
-         qemu_log_unlock();
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 8db9fba26e..27067cbd30 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -2347,7 +2347,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-         && qemu_log_in_addr_range(pc_start)) {
-         qemu_log_lock();
- 	qemu_log("IN:\n");	/* , lookup_symbol(pc_start)); */
--        log_target_disas(cs, pc_start, ctx.pc - pc_start, 0);
-+        log_target_disas(cs, pc_start, ctx.pc - pc_start);
- 	qemu_log("\n");
-         qemu_log_unlock();
-     }
-diff --git a/target/sparc/translate.c b/target/sparc/translate.c
-index 6290705b11..e89b6227f2 100644
---- a/target/sparc/translate.c
-+++ b/target/sparc/translate.c
-@@ -5855,7 +5855,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock * tb)
-         qemu_log_lock();
-         qemu_log("--------------\n");
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, last_pc + 4 - pc_start, 0);
-+        log_target_disas(cs, pc_start, last_pc + 4 - pc_start);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
-diff --git a/target/tricore/translate.c b/target/tricore/translate.c
-index 4e4198e887..e807500e26 100644
---- a/target/tricore/translate.c
-+++ b/target/tricore/translate.c
-@@ -8839,7 +8839,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-         && qemu_log_in_addr_range(pc_start)) {
-         qemu_log_lock();
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, ctx.pc - pc_start, 0);
-+        log_target_disas(cs, pc_start, ctx.pc - pc_start);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
-diff --git a/target/unicore32/translate.c b/target/unicore32/translate.c
-index 6c094d59d7..f9aa248a80 100644
---- a/target/unicore32/translate.c
-+++ b/target/unicore32/translate.c
-@@ -2031,7 +2031,7 @@ done_generating:
-         qemu_log_lock();
-         qemu_log("----------------\n");
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, dc->pc - pc_start, 0);
-+        log_target_disas(cs, pc_start, dc->pc - pc_start);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index d7bf07e8e6..03719ce12b 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -3250,7 +3250,7 @@ done:
-         qemu_log_lock();
-         qemu_log("----------------\n");
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, dc.pc - pc_start, 0);
-+        log_target_disas(cs, pc_start, dc.pc - pc_start);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
+ 
++    if (s.info.cap_arch >= 0 && cap_disas_monitor(&s.info, pc, nb_insn)) {
++        return;
++    }
++
+     if (!s.info.print_insn) {
+         monitor_printf(mon, "0x" TARGET_FMT_lx
+                        ": Asm output not supported on this arch\n", pc);
+diff --git a/configure b/configure
+index 663e9081ea..11e3078936 100755
+--- a/configure
++++ b/configure
+@@ -375,6 +375,7 @@ opengl_dmabuf="no"
+ cpuid_h="no"
+ avx2_opt="no"
+ zlib="yes"
++capstone=""
+ lzo=""
+ snappy=""
+ bzip2=""
+@@ -1294,6 +1295,10 @@ for opt do
+           error_exit "vhost-user isn't available on win32"
+       fi
+   ;;
++  --disable-capstone) capstone="no"
++  ;;
++  --enable-capstone) capstone="yes"
++  ;;
+   *)
+       echo "ERROR: unknown option $opt"
+       echo "Try '$0 --help' for more information"
+@@ -1541,6 +1546,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   vxhs            Veritas HyperScale vDisk backend support
+   crypto-afalg    Linux AF_ALG crypto backend driver
+   vhost-user      vhost-user support
++  capstone        capstone disassembler support
+ 
+ NOTE: The object files are built at the place where configure is launched
+ EOF
+@@ -4403,6 +4409,22 @@ EOF
+ fi
+ 
+ ##########################################
++# capstone
++
++if test "$capstone" != no; then
++  if $pkg_config capstone; then
++    capstone=yes
++    QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags capstone)"
++    LIBS="$($pkg_config --libs capstone) $LIBS"
++  else
++    if test "$capstone" = yes; then
++      feature_not_found capstone
++    fi
++    capstone=no
++  fi
++fi
++
++##########################################
+ # check if we have fdatasync
+ 
+ fdatasync=no
+@@ -5460,6 +5482,7 @@ echo "jemalloc support  $jemalloc"
+ echo "avx2 optimization $avx2_opt"
+ echo "replication support $replication"
+ echo "VxHS block device $vxhs"
++echo "capstone          $capstone"
+ 
+ if test "$sdl_too_old" = "yes"; then
+ echo "-> Your SDL version is too old - please upgrade to have SDL support"
+@@ -6134,6 +6157,9 @@ fi
+ if test "$ivshmem" = "yes" ; then
+   echo "CONFIG_IVSHMEM=y" >> $config_host_mak
+ fi
++if test "$capstone" = "yes" ; then
++  echo "CONFIG_CAPSTONE=y" >> $config_host_mak
++fi
+ 
+ # Hold two types of flag:
+ #   CONFIG_THREAD_SETNAME_BYTHREAD  - we've got a way of setting the name on
 -- 
 2.13.6
