@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46187)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4V0L-0001vG-0W
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:46:12 -0400
+	id 1e4Uzb-0000wW-Ph
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:45:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4V0K-0003Mm-A8
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:46:09 -0400
+	id 1e4UzX-0002z2-TL
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:45:23 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 17 Oct 2017 13:44:02 -0300
-Message-Id: <20171017164426.25277-19-f4bug@amsat.org>
+Date: Tue, 17 Oct 2017 13:43:45 -0300
+Message-Id: <20171017164426.25277-2-f4bug@amsat.org>
 In-Reply-To: <20171017164426.25277-1-f4bug@amsat.org>
 References: <20171017164426.25277-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 18/42] misc: avoid "include/" in include path
+Subject: [Qemu-devel] [PATCH v3 01/42] MAINTAINERS: add entries for
+ i2c/ppc4xx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,42 +27,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Michael Tokarev <mjt@tls.msk.ru>, Alexander Graf <agraf@suse.de>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-trivial@nongnu.org
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Corey Minyard <cminyard@mvista.com>
 ---
- hw/input/adb.c      | 2 +-
- hw/ssi/aspeed_smc.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ MAINTAINERS | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/hw/input/adb.c b/hw/input/adb.c
-index fcca3a8eb9..924a3f9fd5 100644
---- a/hw/input/adb.c
-+++ b/hw/input/adb.c
-@@ -24,8 +24,8 @@
- #include "qemu/osdep.h"
- #include "hw/hw.h"
- #include "hw/input/adb.h"
-+#include "hw/input/adb-keys.h"
- #include "ui/console.h"
--#include "include/hw/input/adb-keys.h"
- #include "ui/input.h"
- #include "sysemu/sysemu.h"
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 9cff9737d3..6f56c1349b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -954,7 +954,9 @@ M: Alexander Graf <agraf@suse.de>
+ L: qemu-ppc@nongnu.org
+ S: Odd Fixes
+ F: hw/ppc/ppc4*.c
++F: hw/i2c/ppc4xx_i2c.c
+ F: include/hw/ppc/ppc4xx.h
++F: include/hw/i2c/ppc4xx_i2c.h
  
-diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-index cb515730c5..992617fd3a 100644
---- a/hw/ssi/aspeed_smc.c
-+++ b/hw/ssi/aspeed_smc.c
-@@ -26,7 +26,7 @@
- #include "hw/sysbus.h"
- #include "sysemu/sysemu.h"
- #include "qemu/log.h"
--#include "include/qemu/error-report.h"
-+#include "qemu/error-report.h"
- #include "exec/address-spaces.h"
- 
- #include "hw/ssi/aspeed_smc.h"
+ ppce500
+ M: Alexander Graf <agraf@suse.de>
 -- 
 2.15.0.rc0
