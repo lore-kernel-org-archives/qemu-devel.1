@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e4TYa-0002qx-Ax
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:13:28 -0400
+	(envelope-from <imammedo@redhat.com>) id 1e4TYh-0002wL-3Y
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:13:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e4TYW-0008Gj-6o
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:13:24 -0400
-Date: Tue, 17 Oct 2017 17:13:15 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171017171315.7afc5a59.cohuck@redhat.com>
-In-Reply-To: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
-References: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/7] improve error handling for IO instr
+	(envelope-from <imammedo@redhat.com>) id 1e4TYc-0008Lg-TI
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:13:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47918)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e4TYc-0008Kx-KM
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:13:26 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B9B5B806A2
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 15:13:25 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Tue, 17 Oct 2017 17:13:23 +0200
+Message-Id: <1508253203-119237-1-git-send-email-imammedo@redhat.com>
+In-Reply-To: <20171017162927.5ee8b9cd.cohuck@redhat.com>
+References: <20171017162927.5ee8b9cd.cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 2/2] s390x: move s390x_new_cpu() into board
+ code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,82 +30,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>
 
-On Tue, 17 Oct 2017 16:04:46 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+s390-virtio-ccw.c is the sole user of s390x_new_cpu(),
+so move this helper there.
 
-> Abstract
-> =======
-> 
-> The basic idea is: tell how to handle an unusual condition where it's
-> identified, instead of mapping it to an errno (more or less arbitrarily),
-> then possibly mapping these errnos around, to finally (mentally) map the
-> errno back to the condition and take appropriate action.
-> 
-> According to Dong Jia the patch-set also has a functional value: for ccw
-> pass-through, he is planing to pass-through the instruction completion
-> information (cc or interruption condition) from the kernel, and this
-> patch set can pretty much be seen as a preparation for that.
-> 
-> Changelog
-> =========
-> 
-> Patch 1 should be already applied to Conny's tree. I've included it
-> nevertheless so guys working on top of current master have everything in
-> place.
-> 
-> v2 -> v3:
-> * somewhat uwillingly traded the type safe struct to a somewhat
->   type safe enum (because considered ugly) (Thomas, Conny)
-> * dropped 'template approach' patch which intended to further
->   consolidate IO inst. handlers having lot's of logic and code in
->   common (Conny)
-> * added warning if vfio-ccw ORB does not have the flags required
->   by the vfio-ccw implementation as suggested (Dong Jia)
-> * got rid of some unintentional changes (Dong Jia)
-> * reworded some stuff (comments, commit messages) (Dong Jia)
-> 
-> v1 -> v2:
-> * use assert if do_subchannel_work without any functions being
->   accepted 
-> * generate unit-exception if ccw-vfio can't handle an otherwise
->   good channel program (due to extra limitations) 
-> * keep using return values opposed to recording into SubchDev
-> * split out 'add infrastructure' from 'refactor first handler'
-> * reworded some commit messanges and comments
-> * rebased on top of current master
-> * dropped r-b's and acks because of the magnitude of the
->   changes
-> 
-> Testing
-> =======
-> 
-> Nothing happened since v2 except for a quick smoke test. Dong Jia gave v2
-> a spin with a focus on vfio-ccw. @Dong Jia I would appreciate some proper
-> testing, especially regarding the changes in vfio-ccw (patch #3).
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+CC: Cornelia Huck <cohuck@redhat.com>
 
-Looks sane to me (if needed, I can fix up the minor things I found).
+v2:
+ - style fix: wrap the argument list
 
-In addition to some testing, I'd appreciate some review from others as
-well.
+---
+ target/s390x/cpu.h         |  1 -
+ hw/s390x/s390-virtio-ccw.c | 21 +++++++++++++++++++++
+ target/s390x/helper.c      | 20 --------------------
+ 3 files changed, 21 insertions(+), 21 deletions(-)
 
-> 
-> Halil Pasic (7):
->   s390x/css: be more consistent if broken beyond repair
->   s390x/css: IO instr handler ending control
->   s390x: improve error handling for SSCH and RSCH
->   s390x: refactor error handling for XSCH handler
->   s390x: refactor error handling for CSCH handler
->   s390x: refactor error handling for HSCH handler
->   s390x: refactor error handling for MSCH handler
-> 
->  hw/s390x/css.c              | 163 ++++++++++++--------------------------------
->  hw/s390x/s390-ccw.c         |  11 ++-
->  hw/vfio/ccw.c               |  28 ++++++--
->  include/hw/s390x/css.h      |  47 ++++++++++---
->  include/hw/s390x/s390-ccw.h |   2 +-
->  target/s390x/ioinst.c       | 136 +++++++-----------------------------
->  6 files changed, 132 insertions(+), 255 deletions(-)
-> 
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 7e864c8..b177be9 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -695,7 +695,6 @@ void s390_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+ 
+ /* helper.c */
+ #define cpu_init(cpu_model) cpu_generic_init(TYPE_S390_CPU, cpu_model)
+-S390CPU *s390x_new_cpu(const char *typename, uint32_t core_id, Error **errp);
+ 
+ #define S390_CPU_TYPE_SUFFIX "-" TYPE_S390_CPU
+ #define S390_CPU_TYPE_NAME(name) (name S390_CPU_TYPE_SUFFIX)
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 32d3f11..e593c71 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -52,6 +52,27 @@ S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
+     return S390_CPU(ms->possible_cpus->cpus[cpu_addr].cpu);
+ }
+ 
++static S390CPU *s390x_new_cpu(const char *typename, uint32_t core_id,
++                              Error **errp)
++{
++    S390CPU *cpu = S390_CPU(object_new(typename));
++    Error *err = NULL;
++
++    object_property_set_int(OBJECT(cpu), core_id, "core-id", &err);
++    if (err != NULL) {
++        goto out;
++    }
++    object_property_set_bool(OBJECT(cpu), true, "realized", &err);
++
++out:
++    object_unref(OBJECT(cpu));
++    if (err) {
++        error_propagate(errp, err);
++        cpu = NULL;
++    }
++    return cpu;
++}
++
+ static void s390_init_cpus(MachineState *machine)
+ {
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
+diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+index 64d4c48..52aa64b 100644
+--- a/target/s390x/helper.c
++++ b/target/s390x/helper.c
+@@ -68,26 +68,6 @@ void s390x_cpu_timer(void *opaque)
+ }
+ #endif
+ 
+-S390CPU *s390x_new_cpu(const char *typename, uint32_t core_id, Error **errp)
+-{
+-    S390CPU *cpu = S390_CPU(object_new(typename));
+-    Error *err = NULL;
+-
+-    object_property_set_int(OBJECT(cpu), core_id, "core-id", &err);
+-    if (err != NULL) {
+-        goto out;
+-    }
+-    object_property_set_bool(OBJECT(cpu), true, "realized", &err);
+-
+-out:
+-    object_unref(OBJECT(cpu));
+-    if (err) {
+-        error_propagate(errp, err);
+-        cpu = NULL;
+-    }
+-    return cpu;
+-}
+-
+ #ifndef CONFIG_USER_ONLY
+ 
+ hwaddr s390_cpu_get_phys_page_debug(CPUState *cs, vaddr vaddr)
+-- 
+2.7.4
