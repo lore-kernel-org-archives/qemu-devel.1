@@ -1,34 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4WLu-0001HR-1J
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 14:12:31 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e4WMu-0001nT-9y
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 14:13:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4WLp-0007FG-3i
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 14:12:30 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35920)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e4WLo-0007CH-TO
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 14:12:25 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e4WLj-0006Kg-Da
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 18:12:19 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C163C2E81B0
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 18:12:11 +0000 (UTC)
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e4WMp-0008Ee-Sm
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 14:13:32 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51614)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1e4WMp-0008E4-KV
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 14:13:27 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9HI99ti087687
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 14:13:22 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dnmaafx2s-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 14:13:21 -0400
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Tue, 17 Oct 2017 12:13:21 -0600
+References: <1508247148-25240-1-git-send-email-thuth@redhat.com>
+	<19010e69-6abe-0888-24a9-903ca4017355@linux.vnet.ibm.com>
+	<09194092-7fa7-e640-7208-49fa270fd497@redhat.com>
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Tue, 17 Oct 2017 16:13:12 -0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 17 Oct 2017 17:33:49 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1723984 <1723984@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150816671920.14146.15870333277151125380.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150826162961.22673.16375484585142744365.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1723984] Re: ID_MMFR0 has an invalid value on
- aarch64 cpu (A57, A53)
+In-Reply-To: <09194092-7fa7-e640-7208-49fa270fd497@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <043c322c-eb5f-4797-839c-bb68dde65466@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/4] Improve the CPU hot plug
+ tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,62 +44,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-s390x@nongnu.org, david@redhat.com, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-You shouldn't need to read the MIDR at all.
 
-There are two sensible strategies for software I think:
 
- (1) trust the architectural statement that v8 implies that the AIFSR
-and ADFSR both exist -- AIUI both QEMU and the hardware implementations
-that report 0001 in this MMFR0 field do actually implement those
-registers, so this is safe.
+On 10/17/2017 02:36 PM, Thomas Huth wrote:
+> On 17.10.2017 18:27, Daniel Henrique Barboza wrote:
+>>
+>> On 10/17/2017 11:32 AM, Thomas Huth wrote:
+>>> So far the CPU hot-plug qtest was only checking "cpu-add" on x86. With
+>>> these patches, we now test "device_add" for hot-plugging CPUs on x86,
+>>> and enable the test on ppc64 and s390x, too.
+>> Question: is there a reason other than "no one bothered" to not have a
+>> CPU hot
+>> unplug test, something around the lines of the now cpu-plug-test.c? I might
+>> give it a shot if there is no known roadblocks against it.
+> AFAIK on x86, you need some ACPI magic on the guest side to do this
+> (something similar to qpci_unplug_acpi_device_test() in
+> tests/libqos/pci-pc.c I guess). And on s390x, CPU unplug is not
+> supported at all. But it might work on ppc64 without guest intervention,
+> not sure - maybe Bharata can comment on this...
 
- (2) read and pay attention to the AuxReg field, by handling 0001 as
-"only Auxiliary Control Register is supported, AIFSR and ADFSR are not
-supported". This will work fine too -- on implementations that report
-0001 you may be not using the AIFSR/ADFSR but that's ok because on those
-implementations they only RAZ/WI anyhow so you couldn't do anything
-interesting with them anyway.
+Good point, it won't work in spapr machine without guest intervention too.
+Both CPU and LMB unplug relies on guest-side callbacks to complete the
+operation.
 
-If your code is genuinely v8 only then (1) is easiest. If you also need
-to support ARMv7 then (2) is best, because 0001 is a permitted value in
-ID_MMFR0 for an ARMv7 implementation, so you need to handle it
-regardless of the A53/A57 behaviour.
+I'll see how this ACPI magic you mentioned is done and see how hard it is to
+do it for ppc64.
 
-Neither approach requires detecting and special casing A53/A57 revisions
-via the MIDR.
 
--- =
+Daniel
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1723984
-
-Title:
-  ID_MMFR0 has an invalid value on aarch64 cpu (A57, A53)
-
-Status in QEMU:
-  New
-
-Bug description:
-  The ID_MMFR0 register, accessed from aarch64 state as an invalid value:
-  - ARM ARM v8 documentation (D7.2 General system control registers) descri=
-bed bits AuxReg[23:20] to be
-    "In ARMv8-A the only permitted value is 0010"
-  - Cortex A53 and Cortex A57 TRM describe the value to be 0x10201105, so A=
-uxReg[23:20] is 0010 too
-  - in QEMU target/arm/cpu64.c, the relevant value is
-    cpu->id_mmfr0 =3D 0x10101105;
-
-  The 1 should be changed to 2.
-
-  Spotted & Tested on the following qemu revision:
-
-  commit 48ae1f60d8c9a770e6da64407984d84e25253c69
-  Merge: 78b62d3 b867eaa
-  Author: Peter Maydell <peter.maydell@linaro.org>
-  Date:   Mon Oct 16 14:28:13 2017 +0100
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1723984/+subscriptions
+>
+>   Thomas
+>
