@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e4TSA-0006Cn-0W
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:06:48 -0400
+	(envelope-from <linuc.decode@gmail.com>) id 1e4TSE-0006FT-AH
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:06:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e4TS4-0004Pn-TF
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:06:45 -0400
-Date: Tue, 17 Oct 2017 17:06:34 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171017170634.10acd4f1.cohuck@redhat.com>
-In-Reply-To: <20171017140453.51099-4-pasic@linux.vnet.ibm.com>
-References: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
-	<20171017140453.51099-4-pasic@linux.vnet.ibm.com>
+	(envelope-from <linuc.decode@gmail.com>) id 1e4TS8-0004RN-4J
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:06:50 -0400
+Date: Tue, 17 Oct 2017 20:36:18 +0530
+From: Linu Cherian <linuc.decode@gmail.com>
+Message-ID: <20171017150618.GA6575@virtx40>
+References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
+	<1504286483-23327-20-git-send-email-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/7] s390x: improve error handling for
- SSCH and RSCH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1504286483-23327-20-git-send-email-eric.auger@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v7 19/20] hw/arm/smmuv3: [not
+ for upstream] add SMMU_CMD_TLBI_NH_VA_AM handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,468 +24,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, prem.mallappa@gmail.com, alex.williamson@redhat.com, mohun106@gmail.com, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mst@redhat.com, jean-philippe.brucker@arm.com, tn@semihalf.com, will.deacon@arm.com, robin.murphy@arm.com, peterx@redhat.com, bharat.bhushan@nxp.com, christoffer.dall@linaro.org, wtownsen@redhat.com, linu.cherian@cavium.com
 
-On Tue, 17 Oct 2017 16:04:49 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+Hi Eric,
 
-> Simplify the error handling of the SSCH and RSCH handler avoiding
-> arbitrary and cryptic error codes being used to tell how the instruction
-> is supposed to end.  Let the code detecting the condition tell how it's
-> to be handled in a less ambiguous way.  It's best to handle SSCH and RSCH
-> in one go as the emulation of the two shares a lot of code.
+On Fri Sep 01, 2017 at 07:21:22PM +0200, Eric Auger wrote:
+> SMMUV3 does not support any IOVA range TLBI command:
+> SMMU_CMD_TLBI_NH_VA invalidates TLB entries by page.
+> That's an issue when running DPDK on guest. DPDK uses
+> hugepages but each time a hugepage is mapped on guest side,
+> a storm of SMMU_CMD_TLBI_NH_VA commands get sent by the
+> guest smmuv3 driver and trapped by QEMU for VFIO replay.
 > 
-> For passthrough this change isn't pure refactoring, but changes the way
-> kernel reported EFAULT is handled. After clarifying the kernel interface
-> we decided that EFAULT shall be mapped to unit exception.  Same goes for
-> unexpected error codes and absence of required ORB flags.
+> Let's get prepared to handle implementation defined commands,
+> SMMU_CMD_TLBI_NH_VA_VM, which invalidate a range of IOVAs.
 > 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Upon this command, we notify the whole range in one host.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > ---
->  hw/s390x/css.c              | 84 +++++++++++++--------------------------------
->  hw/s390x/s390-ccw.c         | 11 +++---
->  hw/vfio/ccw.c               | 28 +++++++++++----
->  include/hw/s390x/css.h      | 23 +++++++++----
->  include/hw/s390x/s390-ccw.h |  2 +-
->  target/s390x/ioinst.c       | 53 ++++------------------------
->  6 files changed, 75 insertions(+), 126 deletions(-)
+>  hw/arm/smmuv3-internal.h |  1 +
+>  hw/arm/smmuv3.c          | 13 +++++++++++++
+>  hw/arm/trace-events      |  1 +
+>  3 files changed, 15 insertions(+)
 > 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index aa233d5f8a..ff5a05c34b 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -1181,12 +1181,11 @@ static void sch_handle_start_func_virtual(SubchDev *sch)
->  
->  }
->  
-> -static int sch_handle_start_func_passthrough(SubchDev *sch)
-> +static IOInstEnding sch_handle_start_func_passthrough(SubchDev *sch)
->  {
->  
->      PMCW *p = &sch->curr_status.pmcw;
->      SCSW *s = &sch->curr_status.scsw;
-> -    int ret;
->  
->      ORB *orb = &sch->orb;
->      if (!(s->ctrl & SCSW_ACTL_SUSP)) {
-> @@ -1200,31 +1199,12 @@ static int sch_handle_start_func_passthrough(SubchDev *sch)
->       */
->      if (!(orb->ctrl0 & ORB_CTRL0_MASK_PFCH) ||
->          !(orb->ctrl0 & ORB_CTRL0_MASK_C64)) {
-> -        return -EINVAL;
-> +        warn_report("vfio-ccw requires PFCH and C64 flags set...");
-
-Drop the trailing dots?
-
-> +        sch_gen_unit_exception(sch);
-> +        css_inject_io_interrupt(sch);
-> +        return IOINST_CC_EXPECTED;
->      }
-> -
-> -    ret = s390_ccw_cmd_request(orb, s, sch->driver_data);
-> -    switch (ret) {
-> -    /* Currently we don't update control block and just return the cc code. */
-> -    case 0:
-> -        break;
-> -    case -EBUSY:
-> -        break;
-> -    case -ENODEV:
-> -        break;
-> -    case -EACCES:
-> -        /* Let's reflect an inaccessible host device by cc 3. */
-> -        ret = -ENODEV;
-> -        break;
-> -    default:
-> -       /*
-> -        * All other return codes will trigger a program check,
-> -        * or set cc to 1.
-> -        */
-> -       break;
-> -    };
-> -
-> -    return ret;
-> +    return s390_ccw_cmd_request(sch);
->  }
->  
->  /*
-> @@ -1233,7 +1213,7 @@ static int sch_handle_start_func_passthrough(SubchDev *sch)
->   * read/writes) asynchronous later on if we start supporting more than
->   * our current very simple devices.
->   */
-> -int do_subchannel_work_virtual(SubchDev *sch)
-> +IOInstEnding do_subchannel_work_virtual(SubchDev *sch)
->  {
->  
->      SCSW *s = &sch->curr_status.scsw;
-> @@ -1247,12 +1227,12 @@ int do_subchannel_work_virtual(SubchDev *sch)
->          sch_handle_start_func_virtual(sch);
->      }
->      css_inject_io_interrupt(sch);
-> -    return 0;
-> +    /* inst must succeed if this func is called */
-> +    return IOINST_CC_EXPECTED;
->  }
->  
-> -int do_subchannel_work_passthrough(SubchDev *sch)
-> +IOInstEnding do_subchannel_work_passthrough(SubchDev *sch)
->  {
-> -    int ret = 0;
->      SCSW *s = &sch->curr_status.scsw;
->  
->      if (s->ctrl & SCSW_FCTL_CLEAR_FUNC) {
-> @@ -1262,16 +1242,15 @@ int do_subchannel_work_passthrough(SubchDev *sch)
->          /* TODO: Halt handling */
->          sch_handle_halt_func(sch);
->      } else if (s->ctrl & SCSW_FCTL_START_FUNC) {
-> -        ret = sch_handle_start_func_passthrough(sch);
-> +        return sch_handle_start_func_passthrough(sch);
->      }
-> -
-> -    return ret;
-> +    return IOINST_CC_EXPECTED;
->  }
->  
-> -static int do_subchannel_work(SubchDev *sch)
-> +static IOInstEnding do_subchannel_work(SubchDev *sch)
->  {
->      if (!sch->do_subchannel_work) {
-> -        return -EINVAL;
-> +        return IOINST_CC_STATUS_PRESENT;
->      }
->      g_assert(sch->curr_status.scsw.ctrl & SCSW_CTRL_MASK_FCTL);
->      return sch->do_subchannel_work(sch);
-> @@ -1561,27 +1540,23 @@ static void css_update_chnmon(SubchDev *sch)
->      }
->  }
->  
-> -int css_do_ssch(SubchDev *sch, ORB *orb)
-> +IOInstEnding css_do_ssch(SubchDev *sch, ORB *orb)
->  {
->      SCSW *s = &sch->curr_status.scsw;
->      PMCW *p = &sch->curr_status.pmcw;
-> -    int ret;
->  
->      if (~(p->flags) & (PMCW_FLAGS_MASK_DNV | PMCW_FLAGS_MASK_ENA)) {
-> -        ret = -ENODEV;
-> -        goto out;
-> +        return IOINST_CC_NOT_OPERATIONAL;
->      }
->  
->      if (s->ctrl & SCSW_STCTL_STATUS_PEND) {
-> -        ret = -EINPROGRESS;
-> -        goto out;
-> +        return IOINST_CC_STATUS_PRESENT;
->      }
->  
->      if (s->ctrl & (SCSW_FCTL_START_FUNC |
->                     SCSW_FCTL_HALT_FUNC |
->                     SCSW_FCTL_CLEAR_FUNC)) {
-> -        ret = -EBUSY;
-> -        goto out;
-> +        return IOINST_CC_BUSY;
->      }
->  
->      /* If monitoring is active, update counter. */
-> @@ -1594,10 +1569,7 @@ int css_do_ssch(SubchDev *sch, ORB *orb)
->      s->ctrl |= (SCSW_FCTL_START_FUNC | SCSW_ACTL_START_PEND);
->      s->flags &= ~SCSW_FLAGS_MASK_PNO;
->  
-> -    ret = do_subchannel_work(sch);
-> -
-> -out:
-> -    return ret;
-> +    return do_subchannel_work(sch);
->  }
->  
->  static void copy_irb_to_guest(IRB *dest, const IRB *src, PMCW *pmcw,
-> @@ -1844,27 +1816,23 @@ void css_do_schm(uint8_t mbk, int update, int dct, uint64_t mbo)
->      }
->  }
->  
-> -int css_do_rsch(SubchDev *sch)
-> +IOInstEnding css_do_rsch(SubchDev *sch)
->  {
->      SCSW *s = &sch->curr_status.scsw;
->      PMCW *p = &sch->curr_status.pmcw;
-> -    int ret;
->  
->      if (~(p->flags) & (PMCW_FLAGS_MASK_DNV | PMCW_FLAGS_MASK_ENA)) {
-> -        ret = -ENODEV;
-> -        goto out;
-> +        return IOINST_CC_NOT_OPERATIONAL;
->      }
->  
->      if (s->ctrl & SCSW_STCTL_STATUS_PEND) {
-> -        ret = -EINPROGRESS;
-> -        goto out;
-> +        return IOINST_CC_STATUS_PRESENT;
->      }
->  
->      if (((s->ctrl & SCSW_CTRL_MASK_FCTL) != SCSW_FCTL_START_FUNC) ||
->          (s->ctrl & SCSW_ACTL_RESUME_PEND) ||
->          (!(s->ctrl & SCSW_ACTL_SUSP))) {
-> -        ret = -EINVAL;
-> -        goto out;
-> +        return IOINST_CC_BUSY;
->      }
->  
->      /* If monitoring is active, update counter. */
-> @@ -1873,11 +1841,7 @@ int css_do_rsch(SubchDev *sch)
->      }
->  
->      s->ctrl |= SCSW_ACTL_RESUME_PEND;
-> -    do_subchannel_work(sch);
-> -    ret = 0;
-> -
-> -out:
-> -    return ret;
-> +    return do_subchannel_work(sch);
->  }
->  
->  int css_do_rchp(uint8_t cssid, uint8_t chpid)
-> diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
-> index 8614dda6f8..0ef232ec27 100644
-> --- a/hw/s390x/s390-ccw.c
-> +++ b/hw/s390x/s390-ccw.c
-> @@ -18,15 +18,14 @@
->  #include "hw/s390x/css-bridge.h"
->  #include "hw/s390x/s390-ccw.h"
->  
-> -int s390_ccw_cmd_request(ORB *orb, SCSW *scsw, void *data)
-> +IOInstEnding s390_ccw_cmd_request(SubchDev *sch)
->  {
-> -    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(data);
-> +    S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(sch->driver_data);
->  
-> -    if (cdc->handle_request) {
-> -        return cdc->handle_request(orb, scsw, data);
-> -    } else {
-> -        return -ENOSYS;
-> +    if (!cdc->handle_request) {
-> +        return IOINST_CC_STATUS_PRESENT;
->      }
-> +    return cdc->handle_request(sch);
->  }
->  
->  static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
-> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> index 76323c6bde..1cc2e5d873 100644
-> --- a/hw/vfio/ccw.c
-> +++ b/hw/vfio/ccw.c
-> @@ -47,9 +47,9 @@ struct VFIODeviceOps vfio_ccw_ops = {
->      .vfio_compute_needs_reset = vfio_ccw_compute_needs_reset,
+> diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
+> index f9f95ae..e70cf76 100644
+> --- a/hw/arm/smmuv3-internal.h
+> +++ b/hw/arm/smmuv3-internal.h
+> @@ -289,6 +289,7 @@ enum {
+>      SMMU_CMD_RESUME          = 0x44,
+>      SMMU_CMD_STALL_TERM,
+>      SMMU_CMD_SYNC,          /* 0x46 */
+> +    SMMU_CMD_TLBI_NH_VA_AM   = 0x8F, /* VIOMMU Impl Defined */
 >  };
 >  
-> -static int vfio_ccw_handle_request(ORB *orb, SCSW *scsw, void *data)
-> +static IOInstEnding vfio_ccw_handle_request(SubchDev *sch)
->  {
-> -    S390CCWDevice *cdev = data;
-> +    S390CCWDevice *cdev = sch->driver_data;
->      VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
->      struct ccw_io_region *region = vcdev->io_region;
->      int ret;
-> @@ -60,8 +60,8 @@ static int vfio_ccw_handle_request(ORB *orb, SCSW *scsw, void *data)
->  
->      memset(region, 0, sizeof(*region));
->  
-> -    memcpy(region->orb_area, orb, sizeof(ORB));
-> -    memcpy(region->scsw_area, scsw, sizeof(SCSW));
-> +    memcpy(region->orb_area, &sch->orb, sizeof(ORB));
-> +    memcpy(region->scsw_area, &sch->curr_status.scsw, sizeof(SCSW));
->  
->  again:
->      ret = pwrite(vcdev->vdev.fd, region,
-> @@ -71,10 +71,24 @@ again:
->              goto again;
+>  static const char *cmd_stringify[] = {
+> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+> index 9c8640f..55dc80b 100644
+> --- a/hw/arm/smmuv3.c
+> +++ b/hw/arm/smmuv3.c
+> @@ -880,6 +880,19 @@ static int smmuv3_cmdq_consume(SMMUV3State *s)
+>              smmuv3_replay_iova_range(&s->smmu_state, addr, size);
+>              break;
 >          }
->          error_report("vfio-ccw: wirte I/O region failed with errno=%d", errno);
-> -        return -errno;
-> +        ret = -errno;
-> +    } else {
-> +        ret = region->ret_code;
-> +    }
-> +    switch (-ret) {
-> +    case 0:
-> +        return IOINST_CC_EXPECTED;
-> +    case EBUSY:
-> +        return IOINST_CC_BUSY;
-> +    case ENODEV:
-> +    case EACCES:
-> +        return IOINST_CC_NOT_OPERATIONAL;
-> +    case EFAULT:
-> +    default:
-> +        sch_gen_unit_exception(sch);
-> +        css_inject_io_interrupt(sch);
-> +        return IOINST_CC_EXPECTED;
->      }
+> +        case SMMU_CMD_TLBI_NH_VA_AM:
+> +        {
+> +            int asid = extract32(cmd.word[1], 16, 16);
+> +            int am = extract32(cmd.word[1], 0, 16);
+> +            uint64_t low = extract32(cmd.word[2], 12, 20);
+> +            uint64_t high = cmd.word[3];
+> +            uint64_t addr = high << 32 | (low << 12);
+> +            size_t size = am << 12;
+> 
 
-Checking ret for the negative error values is more idiomatic.
 
-> -
-> -    return region->ret_code;
->  }
->  
->  static void vfio_ccw_reset(DeviceState *dev)
-> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-> index 7e0dbd162f..10bde18452 100644
-> --- a/include/hw/s390x/css.h
-> +++ b/include/hw/s390x/css.h
-> @@ -136,11 +136,22 @@ struct SubchDev {
->      /* transport-provided data: */
->      int (*ccw_cb) (SubchDev *, CCW1);
->      void (*disable_cb)(SubchDev *);
-> -    int (*do_subchannel_work) (SubchDev *);
-> +    IOInstEnding (*do_subchannel_work) (SubchDev *);
->      SenseId id;
->      void *driver_data;
->  };
->  
-> +static inline void sch_gen_unit_exception(SubchDev *sch)
-> +{
-> +    sch->curr_status.scsw.ctrl &= ~SCSW_ACTL_START_PEND;
-> +    sch->curr_status.scsw.ctrl |= SCSW_STCTL_PRIMARY |
-> +                                  SCSW_STCTL_SECONDARY |
-> +                                  SCSW_STCTL_ALERT |
-> +                                  SCSW_STCTL_STATUS_PEND;
-> +    sch->curr_status.scsw.cpa = sch->channel_prog + 8;
-> +    sch->curr_status.scsw.dstat =  SCSW_DSTAT_UNIT_EXCEP;
-> +}
-> +
->  extern const VMStateDescription vmstate_subch_dev;
->  
->  /*
-> @@ -199,9 +210,9 @@ void css_generate_sch_crws(uint8_t cssid, uint8_t ssid, uint16_t schid,
->  void css_generate_chp_crws(uint8_t cssid, uint8_t chpid);
->  void css_generate_css_crws(uint8_t cssid);
->  void css_clear_sei_pending(void);
-> -int s390_ccw_cmd_request(ORB *orb, SCSW *scsw, void *data);
-> -int do_subchannel_work_virtual(SubchDev *sub);
-> -int do_subchannel_work_passthrough(SubchDev *sub);
-> +IOInstEnding s390_ccw_cmd_request(SubchDev *sch);
-> +IOInstEnding do_subchannel_work_virtual(SubchDev *sub);
-> +IOInstEnding do_subchannel_work_passthrough(SubchDev *sub);
->  
->  typedef enum {
->      CSS_IO_ADAPTER_VIRTIO = 0,
-> @@ -232,7 +243,7 @@ int css_do_msch(SubchDev *sch, const SCHIB *schib);
->  int css_do_xsch(SubchDev *sch);
->  int css_do_csch(SubchDev *sch);
->  int css_do_hsch(SubchDev *sch);
-> -int css_do_ssch(SubchDev *sch, ORB *orb);
-> +IOInstEnding css_do_ssch(SubchDev *sch, ORB *orb);
->  int css_do_tsch_get_irb(SubchDev *sch, IRB *irb, int *irb_len);
->  void css_do_tsch_update_subch(SubchDev *sch);
->  int css_do_stcrw(CRW *crw);
-> @@ -243,7 +254,7 @@ int css_collect_chp_desc(int m, uint8_t cssid, uint8_t f_chpid, uint8_t l_chpid,
->  void css_do_schm(uint8_t mbk, int update, int dct, uint64_t mbo);
->  int css_enable_mcsse(void);
->  int css_enable_mss(void);
-> -int css_do_rsch(SubchDev *sch);
-> +IOInstEnding css_do_rsch(SubchDev *sch);
->  int css_do_rchp(uint8_t cssid, uint8_t chpid);
->  bool css_present(uint8_t cssid);
->  #endif
-> diff --git a/include/hw/s390x/s390-ccw.h b/include/hw/s390x/s390-ccw.h
-> index 9f45cf1347..7d15a1a5d4 100644
-> --- a/include/hw/s390x/s390-ccw.h
-> +++ b/include/hw/s390x/s390-ccw.h
-> @@ -33,7 +33,7 @@ typedef struct S390CCWDeviceClass {
->      CCWDeviceClass parent_class;
->      void (*realize)(S390CCWDevice *dev, char *sysfsdev, Error **errp);
->      void (*unrealize)(S390CCWDevice *dev, Error **errp);
-> -    int (*handle_request) (ORB *, SCSW *, void *);
-> +    IOInstEnding (*handle_request) (SubchDev *sch);
->  } S390CCWDeviceClass;
->  
->  #endif
-> diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
-> index 47490f838a..16b5cf2fed 100644
-> --- a/target/s390x/ioinst.c
-> +++ b/target/s390x/ioinst.c
-> @@ -218,8 +218,6 @@ void ioinst_handle_ssch(S390CPU *cpu, uint64_t reg1, uint32_t ipb)
->      SubchDev *sch;
->      ORB orig_orb, orb;
->      uint64_t addr;
-> -    int ret = -ENODEV;
-> -    int cc;
->      CPUS390XState *env = &cpu->env;
->      uint8_t ar;
->  
-> @@ -239,33 +237,11 @@ void ioinst_handle_ssch(S390CPU *cpu, uint64_t reg1, uint32_t ipb)
->      }
->      trace_ioinst_sch_id("ssch", cssid, ssid, schid);
->      sch = css_find_subch(m, cssid, ssid, schid);
-> -    if (sch && css_subch_visible(sch)) {
-> -        ret = css_do_ssch(sch, &orb);
-> -    }
-> -    switch (ret) {
-> -    case -ENODEV:
-> -        cc = 3;
-> -        break;
-> -    case -EBUSY:
-> -        cc = 2;
-> -        break;
-> -    case -EFAULT:
-> -        /*
-> -         * TODO:
-> -         * I'm wondering whether there is something better
-> -         * to do for us here (like setting some device or
-> -         * subchannel status).
-> -         */
-> -        program_interrupt(env, PGM_ADDRESSING, 4);
-> +    if (!sch || !css_subch_visible(sch)) {
-> +        setcc(cpu, 3);
->          return;
-> -    case 0:
-> -        cc = 0;
-> -        break;
-> -    default:
-> -        cc = 1;
-> -        break;
->      }
-> -    setcc(cpu, cc);
-> +    setcc(cpu, css_do_ssch(sch, &orb));
->  }
->  
->  void ioinst_handle_stcrw(S390CPU *cpu, uint32_t ipb)
-> @@ -784,8 +760,6 @@ void ioinst_handle_rsch(S390CPU *cpu, uint64_t reg1)
->  {
->      int cssid, ssid, schid, m;
->      SubchDev *sch;
-> -    int ret = -ENODEV;
-> -    int cc;
->  
->      if (ioinst_disassemble_sch_ident(reg1, &m, &cssid, &ssid, &schid)) {
->          program_interrupt(&cpu->env, PGM_OPERAND, 4);
-> @@ -793,24 +767,11 @@ void ioinst_handle_rsch(S390CPU *cpu, uint64_t reg1)
->      }
->      trace_ioinst_sch_id("rsch", cssid, ssid, schid);
->      sch = css_find_subch(m, cssid, ssid, schid);
-> -    if (sch && css_subch_visible(sch)) {
-> -        ret = css_do_rsch(sch);
-> -    }
-> -    switch (ret) {
-> -    case -ENODEV:
-> -        cc = 3;
-> -        break;
-> -    case -EINVAL:
-> -        cc = 2;
-> -        break;
-> -    case 0:
-> -        cc = 0;
-> -        break;
-> -    default:
-> -        cc = 1;
-> -        break;
-> +    if (!sch || !css_subch_visible(sch)) {
-> +        setcc(cpu, 3);
-> +        return;
->      }
-> -    setcc(cpu, cc);
-> +    setcc(cpu, css_do_rsch(sch));
->  }
->  
->  #define RCHP_REG1_RES(_reg) (_reg & 0x00000000ff00ff00)
+While testing dpdk, observed that there are map requests coming to 
+arm smmuv3 driver with size greater than 256M. Since the current 
+code supports only 256M( 16 + 12 bits), had to abuse the asid field
+to pass the extra bits for address mask to get things working.
 
-Looks sane.
+diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
+index 04e2d75..51b1d07 100644
+--- a/drivers/iommu/arm-smmu-v3.c
++++ b/drivers/iommu/arm-smmu-v3.c
+@@ -1418,7 +1418,10 @@ static void arm_smmu_tlb_inv_range_nosync(unsigned long iova, size_t size,
+                if (smmu->options & ARM_SMMU_OPT_TLBI_ON_MAP) {
+                        cmd.opcode      = CMDQ_OP_TLBI_NH_VA_AM;
+                        cmd.tlbi.am   = size >> 12;
++                       cmd.tlbi.asid = size >> 28;
+                        granule = size;
+
+
+On Qemu side,
+
+  if (cfg.disabled || cfg.bypassed) {
+@@ -884,12 +899,15 @@ static int smmuv3_cmdq_consume(SMMUV3State *s)
+         case SMMU_CMD_TLBI_NH_VA_AM:
+         {
+             int asid = extract32(cmd.word[1], 16, 16);
+             int am = extract32(cmd.word[1], 0, 16);
+             uint64_t low = extract32(cmd.word[2], 12, 20);
+             uint64_t high = cmd.word[3];
+             uint64_t addr = high << 32 | (low << 12);
+             size_t size = am << 12;
+ 
++           am = am | asid << 16;
++           size = am << 12;        
++
+
+
+
++
+> +            trace_smmuv3_cmdq_tlbi_nh_va_am(asid, am, addr, size);
+> +            smmuv3_replay_iova_range(&s->smmu_state, addr, size);
+> +            break;
+> +        }
+>          case SMMU_CMD_TLBI_NH_VAA:
+>          case SMMU_CMD_TLBI_EL3_ALL:
+>          case SMMU_CMD_TLBI_EL3_VA:
+> diff --git a/hw/arm/trace-events b/hw/arm/trace-events
+> index 15f84d6..fba33ac 100644
+> --- a/hw/arm/trace-events
+> +++ b/hw/arm/trace-events
+> @@ -26,6 +26,7 @@ smmuv3_cmdq_opcode(const char *opcode) "<--- %s"
+>  smmuv3_cmdq_cfgi_ste(int streamid) "     |_ streamid =%d"
+>  smmuv3_cmdq_cfgi_ste_range(int start, int end) "     |_ start=0x%d - end=0x%d"
+>  smmuv3_cmdq_tlbi_nh_va(int asid, int vmid, uint64_t addr) "     |_ asid =%d vmid =%d addr=0x%"PRIx64
+> +smmuv3_cmdq_tlbi_nh_va_am(int asid, int am, size_t size, uint64_t addr) "     |_ asid =%d am =%d size=0x%lx addr=0x%"PRIx64
+>  smmuv3_cmdq_consume_out(uint8_t prod_wrap, uint32_t prod, uint8_t cons_wrap, uint32_t cons) "prod_wrap:%d, prod:0x%x cons_wrap:%d cons:0x%x"
+>  smmuv3_update(bool is_empty, uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "q empty:%d prod:%d cons:%d p.wrap:%d p.cons:%d"
+>  smmuv3_update_check_cmd(int error) "cmdq not enabled or error :0x%x"
+> -- 
+> 2.5.5
+> 
+> 
+
+-- 
+Linu cherian
