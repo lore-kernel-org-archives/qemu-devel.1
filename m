@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e4O8G-0003Vm-TR
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:25:53 -0400
+	(envelope-from <yang.zhong@intel.com>) id 1e4OHO-0005Yj-E4
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:35:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e4O8B-0007tX-SL
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:25:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48576)
+	(envelope-from <yang.zhong@intel.com>) id 1e4OHJ-0006gl-AD
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:35:18 -0400
+Received: from mga07.intel.com ([134.134.136.100]:48127)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e4O8B-0007tC-M4
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:25:47 -0400
-Date: Tue, 17 Oct 2017 11:25:43 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171017112543.7acfdc6e@nial.brq.redhat.com>
-In-Reply-To: <32f5d2bc-cf8f-727b-67bc-9611e9b6f7d0@redhat.com>
-References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
-	<1508170976-96869-5-git-send-email-imammedo@redhat.com>
-	<20171016165916.GI3246@localhost.localdomain>
-	<4c14ed02-1f1c-a093-52ac-632f61a68a6f@redhat.com>
-	<20171016171752.GK3246@localhost.localdomain>
-	<32f5d2bc-cf8f-727b-67bc-9611e9b6f7d0@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 4/6] CLI: add -paused option
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1e4OHJ-0006fb-1E
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:35:13 -0400
+From: Yang Zhong <yang.zhong@intel.com>
+Date: Tue, 17 Oct 2017 17:34:43 +0800
+Message-Id: <1508232883-8790-1-git-send-email-yang.zhong@intel.com>
+Subject: [Qemu-devel] [PATCH] x86/cpufeatures: Enable new AVX512 cpu features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +22,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com, pkrempa@redhat.com, david@gibson.dropbear.id.au, peter.maydell@linaro.org, cohuck@redhat.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, yang.zhong@intel.com
 
-On Tue, 17 Oct 2017 10:47:40 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+Intel IceLake cpu has added new cpu features,AVX512VBMI2/GFNI/
+VAES/AVX512VNNI/AVX512BITALG/VPCLMULQDQ. Those new cpu features
+need expose to guest VM.
 
-> On 16/10/2017 19:17, Eduardo Habkost wrote:
-> >> Should (or could) "-M none" be changed in a backwards-compatible way to
-> >> allow such preconfiguration?  For example
-> >>
-> >>   qemu -M none -monitor stdio
-> >>   (qemu) machine-set-options pc,accel=kvm
-> >>   (qemu) c  
-> > Sounds like an interesting idea.  It would require ensuring it's
-> > really safe to destroy current_machine/accel (and other global
-> > state) and replace them with another object on the fly (which is
-> > probably a nice goal by itself).  
-> 
-> It is but, alternatively, you could delay creating the "none" machine
-> until the last second.  The important part, in my opinion, is having a
-> good command-line interface that we can freeze even if the
-> implementation below leaves something to be desired.
-I sort of don't get how '-M none' could be used to build usable
-machine (at least currently).
+The bit definition:
+CPUID.(EAX=7,ECX=0):ECX[bit 06] AVX512VBMI2
+CPUID.(EAX=7,ECX=0):ECX[bit 08] GFNI
+CPUID.(EAX=7,ECX=0):ECX[bit 09] VAES
+CPUID.(EAX=7,ECX=0):ECX[bit 10] VPCLMULQDQ
+CPUID.(EAX=7,ECX=0):ECX[bit 11] AVX512VNNI
+CPUID.(EAX=7,ECX=0):ECX[bit 12] AVX512_BITALG
 
-Do we really need "-M none" for dynamic configuration?
-I'd imagine doing following instead:
-  qemu -monitor stdio -dynconfig
-  (qemu) query-machines
-  ...
-  (qemu) set-option machine pc,accel=kvm
-    # machine object is created
-  (qemu) set-option smp 1,maxcpus
-  (qemu) info hotpluggable-cpus
-  ...
-  (qemu) set-option numa node
-  (qemu) set-option numa cpu,node-id=0,socket=0
-  (qemu) set-option numa cpu,node-id=0,socket=1
-  (qemu) c
+The release document ref below link:
+https://software.intel.com/sites/default/files/managed/c5/15/
+architecture-instruction-set-extensions-programming-reference.pdf
 
-I'd start to make it working from 'info hotpluggable-cpus'
-as it's close to my current project of making cpu-hotplug/numa
-working nice together and we can expand the same interface to work
-at earlier stages on top of that.
+Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+---
+ target/i386/cpu.c | 6 +++---
+ target/i386/cpu.h | 6 ++++++
+ 2 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 98732cd..03fb8ad 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -435,9 +435,9 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+     [FEAT_7_0_ECX] = {
+         .feat_names = {
+             NULL, "avx512vbmi", "umip", "pku",
+-            "ospke", NULL, NULL, NULL,
+-            NULL, NULL, NULL, NULL,
+-            NULL, NULL, "avx512-vpopcntdq", NULL,
++            "ospke", NULL, "avx512vbmi2", NULL,
++            "gfni", "vaes", "vpclmulqdq", "avx512vnni",
++            "avx512bitalg", NULL, "avx512-vpopcntdq", NULL,
+             "la57", NULL, NULL, NULL,
+             NULL, NULL, "rdpid", NULL,
+             NULL, NULL, NULL, NULL,
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index b086b15..cdbf8b0 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -635,6 +635,12 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_ECX_UMIP     (1U << 2)
+ #define CPUID_7_0_ECX_PKU      (1U << 3)
+ #define CPUID_7_0_ECX_OSPKE    (1U << 4)
++#define CPUID_7_0_ECX_VBMI2    (1U << 6) /* Additional VBMI Instrs */
++#define CPUID_7_0_ECX_GFNI     (1U << 8)
++#define CPUID_7_0_ECX_VAES     (1U << 9)
++#define CPUID_7_0_ECX_VPCLMULQDQ (1U << 10)
++#define CPUID_7_0_ECX_AVX512VNNI (1U << 11)
++#define CPUID_7_0_ECX_AVX512BITALG (1U << 12)
+ #define CPUID_7_0_ECX_AVX512_VPOPCNTDQ (1U << 14) /* POPCNT for vectors of DW/QW */
+ #define CPUID_7_0_ECX_LA57     (1U << 16)
+ #define CPUID_7_0_ECX_RDPID    (1U << 22)
+-- 
+1.9.1
