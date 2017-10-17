@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1e4Xuy-0000ET-LF
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 15:52:49 -0400
+	(envelope-from <cota@braap.org>) id 1e4Y6l-0003AF-MN
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 16:05:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1e4Xux-0000Ed-Gb
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 15:52:48 -0400
-Date: Tue, 17 Oct 2017 15:52:38 -0400
-From: Aaron Lindsay <alindsay@codeaurora.org>
-Message-ID: <20171017195238.GC22177@codeaurora.org>
-References: <1506737310-21880-1-git-send-email-alindsay@codeaurora.org>
-	<CAFEAcA_f=7XjUs7BNQksidnBKofc8SxYtfjMtmfYMuPeo8NXug@mail.gmail.com>
+	(envelope-from <cota@braap.org>) id 1e4Y6g-00015Z-Nb
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 16:04:59 -0400
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:45427)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1e4Y6g-00014E-GO
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 16:04:54 -0400
+Date: Tue, 17 Oct 2017 16:04:51 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20171017200451.GA1345@flamenco>
+References: <20171016172609.23422-1-richard.henderson@linaro.org>
+	<20171016172609.23422-2-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA_f=7XjUs7BNQksidnBKofc8SxYtfjMtmfYMuPeo8NXug@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 00/13] More fully implement ARM PMUv3
+In-Reply-To: <20171016172609.23422-2-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v6 01/50] tcg: Merge opcode arguments into
+ TCGOp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,51 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On Oct 17 16:09, Peter Maydell wrote:
-> On 30 September 2017 at 03:08, Aaron Lindsay <alindsay@codeaurora.org> wrote:
-> > The ARM PMU implementation currently contains a basic cycle counter, but it is
-> > often useful to gather counts of other events and filter them based on
-> > execution mode. These patches flesh out the implementations of various PMU
-> > registers including PM[X]EVCNTR and PM[X]EVTYPER, add a struct definition to
-> > represent arbitrary counter types, implement mode filtering, and add
-> > instruction, cycle, and software increment events.
-> >
-> > I am particularly interested in feedback on the following two patches because I
-> > think I'm likely Doing It Wrong:
-> >  [1] target/arm: Filter cycle counter based on PMCCFILTR_EL0
-> >  [2] target/arm: PMU: Add instruction and cycle events
-> >
-> > In order to implement mode filtering in an event-driven way, [1] adds a pair of
-> > calls to pmu_sync() surrounding every update to a register/variable which may
-> > affect whether any counter is currently filtered. These pmu_sync() calls
-> > ultimately call cpu_get_icount_raw() for enabled instruction and cycle counters
-> > when using icount. Unfortunately, cpu->can_do_io may otherwise be zero for
-> > these calls so the current implementation in [2] temporarily sets can_do_io to
-> > 1. I haven't see any ill side effects from this in my testing, but it doesn't
-> > seem like the right way to handle this.
+On Mon, Oct 16, 2017 at 10:25:20 -0700, Richard Henderson wrote:
+> From: Richard Henderson <rth@twiddle.net>
 > 
-> I've now reviewed the early stuff and provided what I hope is
-> a useful direction for the mode-filtering, so I'm not going to
-> look at the patches at the tail end on this version of the series.
-
-Thank you, your review has been very helpful - the next pass of the
-mode-filtering patch will be more maintainable.
-
-> > I would like to eventually add sending interrupts on counter overflow.
-> > Suggestions for the best direction to handle this are most welcome.
+> Rather than have a separate buffer of 10*max_ops entries,
+> give each opcode 10 entries.  The result is actually a bit
+> smaller and should have slightly more cache locality.
 > 
-> Check out how the helper.c timer interrupts are wired up
-> (the CPU object exposes outbound irq lines, which then get
-> wired up by the board to the GIC.)
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
 
-Thanks for the pointer - I'll take a look.
+Reviewed-by: Emilio G. Cota <cota@braap.org>
 
--Aaron
+This gives a small yet measurable perf advantage when booting linux:
 
--- 
-Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the
-Code Aurora Forum, a Linux Foundation Collaborative Project.
+ Performance counter stats for 'taskset -c 0 aarch64-softmmu/qemu-system-aarch64 \
+	-M virt,gic_version=3 -cpu cortex-a57 -nographic -m 4096 -netdev \
+	user,id=unet,hostfwd=tcp::2222-:22 -device virtio-net-device,netdev=unet \
+	-drive file=jessie-arm64-die-on-boot.qcow2,id=myblock,index=0,if=none \
+	-device virtio-blk-device,drive=myblock -kernel \
+	aarch64-current-linux-kernel-only.img \
+	-append console=ttyAMA0 root=/dev/vda1 -smp 1' (10 runs):
+
+Before:
+       7182.556704      task-clock (msec)         #    0.999 CPUs utilized            ( +-  0.11% )
+            21,710      context-switches          #    0.003 M/sec                    ( +-  0.12% )
+                 1      cpu-migrations            #    0.000 K/sec                    ( +- 11.11% )
+             7,929      page-faults               #    0.001 M/sec                    ( +-  1.75% )
+    30,280,536,799      cycles                    #    4.216 GHz                      ( +-  0.11% )
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+    54,481,515,301      instructions              #    1.80  insns per cycle          ( +-  0.09% )
+     9,655,822,880      branches                  # 1344.343 M/sec                    ( +-  0.10% )
+       170,594,899      branch-misses             #    1.77% of all branches          ( +-  0.10% )
+
+       7.190274755 seconds time elapsed                                          ( +-  0.11% )
+
+
+After:
+       7086.254881      task-clock (msec)         #    0.999 CPUs utilized            ( +-  0.13% )
+            21,598      context-switches          #    0.003 M/sec                    ( +-  0.07% )
+                 1      cpu-migrations            #    0.000 K/sec                  
+             8,099      page-faults               #    0.001 M/sec                    ( +-  0.97% )
+    29,856,727,544      cycles                    #    4.213 GHz                      ( +-  0.12% )
+   <not supported>      stalled-cycles-frontend  
+   <not supported>      stalled-cycles-backend   
+    53,585,205,542      instructions              #    1.79  insns per cycle          ( +-  0.10% )
+     9,638,601,205      branches                  # 1360.183 M/sec                    ( +-  0.10% )
+       169,785,181      branch-misses             #    1.76% of all branches          ( +-  0.08% )
+
+       7.094560954 seconds time elapsed
+
+That is, a 1.33% perf improvement.
+
+		Emilio
