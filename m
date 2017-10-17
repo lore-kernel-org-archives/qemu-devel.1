@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e4IzH-00059b-UT
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 23:56:17 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e4JOP-0008GJ-HD
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e4IzE-000165-Sf
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 23:56:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33878)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e4IzE-00015L-J8
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 23:56:12 -0400
-Date: Tue, 17 Oct 2017 11:56:04 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20171017035604.GJ4166@pxdev.xzpeter.org>
-References: <a41b88a6-4882-1abc-b6e2-e42acf03c198@oracle.com>
-	<20171013170143.GB3370@work-vm>
-	<20171013111403.293919fe@t450s.home>
-	<20171015035318.GA22780@pxdev.xzpeter.org>
-	<c4d07be9-7d9b-71fa-e84c-e393138f7a84@oracle.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1e4JOO-0006rU-Io
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:13 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Tue, 17 Oct 2017 15:21:20 +1100
+Message-Id: <20171017042152.29443-3-david@gibson.dropbear.id.au>
+In-Reply-To: <20171017042152.29443-1-david@gibson.dropbear.id.au>
+References: <20171017042152.29443-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <c4d07be9-7d9b-71fa-e84c-e393138f7a84@oracle.com>
-Subject: Re: [Qemu-devel] host physical address width issues/questions for
- x86_64
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 02/34] hw/ppc: use 0 instead of
+ fdt_path_offset(fdt, "/")
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,76 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, Sunit Jain <sunit.jain@oracle.com>, ehabkost@redhat.com, rth@twiddle.net
+To: peter.maydell@linaro.org
+Cc: ehabkost@redhat.com, agraf@suse.de, imammedo@redhat.com, groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Mon, Oct 16, 2017 at 10:02:25AM -0700, Prasad Singamsetty wrote:
-> 
-> 
-> On 10/14/2017 8:53 PM, Peter Xu wrote:
-> >On Fri, Oct 13, 2017 at 11:14:03AM -0600, Alex Williamson wrote:
-> >>On Fri, 13 Oct 2017 18:01:44 +0100
-> >>"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> >>
-> >>>* Prasad Singamsetty (prasad.singamsetty@oracle.com) wrote:
-> >>>>Hi,
-> >>>>
-> >>>>I am new to the alias. I have some questions on this subject
-> >>>>and seek some clarifications from the experts in the team.
-> >>>>I ran into a couple of issues when I tried with large configuration
-> >>>>( >= 1TB memory, > 255 CPUs) for x86_64 guest machine.
-> >>>>
-> >>>>1. QEMU uses the default value of 40 (TCG_PHYS_ADDR_BITS) for address
-> >>>>    width if user has not specified phys-bits or host-phys-bits=true
-> >>>>    property. The default value is obviously not sufficient and
-> >>>>    causing guest kernel to crash if configured with >= 1TB
-> >>>>    memory. Depending on the linux kernel version in the guest the
-> >>>>    panic was in different code paths. The workaround is for the
-> >>>>    user to specify the phys-bits property or set the property
-> >>>>    host-phys-bits=true.
-> >>>>
-> >>>>    QUESTIONS:
-> >>...
-> >>>>2. host_address_width in DMAR table structure
-> >>>>
-> >>>>    In this case, the default value is set to 39
-> >>>>    (VTD_HOST_ADDRESS_WIDTH - 1). With interrupt remapping
-> >>>>    enabled for the intel iommu and the guest is configured
-> >>>>    with > 255 cpus and >= 1TB memory, the guest kernel hangs
-> >>>>    during boot up. This need to be fixed.
-> >>>>
-> >>>>    QUESTION:
-> >>>>    The question here again is can we fix this to use the
-> >>>>    real address width from the host as the default?
-> >>>
-> >>>I don't know DMAR stuff; chatting to Alex (cc'd) it does sound
-> >>>like that's an ommission that should be fixed.
-> >>
-> >>[CC +Peter]
-> >>
-> >>On physical hardware VT-d supports either 39 or 48 bit address widths
-> >>and generally you'd expect a sufficiently capable IOMMU to be matched
-> >>with the CPU.  Seems QEMU has only implemented a lower bit width and
-> >>it should probably be forcing phys bits of the VM to 39 to match until
-> >>the extended width can be implemented.  Thanks,
-> >>
-> >>Alex
-> >
-> >There were patches that tried to enable 48 bits GAW but it was
-> >not accepted somehow:
-> >
-> >   https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg01886.html
-> >
-> >Would this help in any way?
-> >
-> 
-> Thanks Alex for the patch info. Just curious why the patch was not
-> accepted. Any way, I will try it.
+From: Greg Kurz <groug@kaod.org>
 
-I don't sure I know the reason.  Anyway, it originated from one of
-Fam's request for some NVMe tests.  If it can really help for your use
-case as well, please feel free to revive those patches, or let me know
-so that I can respin.  Thanks,
+The offset of the root node is guaranteed to be 0.
 
--- 
-Peter Xu
+This doesn't fix anything, it's just trivial cleanup of the two
+remaining places where this was done under hw/ppc.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/pnv.c   | 3 +--
+ hw/ppc/spapr.c | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index d46d91c76f..84b2389ea6 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -92,8 +92,7 @@ static int get_cpus_node(void *fdt)
+     int cpus_offset =3D fdt_path_offset(fdt, "/cpus");
+=20
+     if (cpus_offset < 0) {
+-        cpus_offset =3D fdt_add_subnode(fdt, fdt_path_offset(fdt, "/"),
+-                                      "cpus");
++        cpus_offset =3D fdt_add_subnode(fdt, 0, "cpus");
+         if (cpus_offset) {
+             _FDT((fdt_setprop_cell(fdt, cpus_offset, "#address-cells", 0=
+x1)));
+             _FDT((fdt_setprop_cell(fdt, cpus_offset, "#size-cells", 0x0)=
+));
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index ff87f155d5..352ff3d614 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -353,8 +353,7 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachine=
+State *spapr)
+=20
+         cpus_offset =3D fdt_path_offset(fdt, "/cpus");
+         if (cpus_offset < 0) {
+-            cpus_offset =3D fdt_add_subnode(fdt, fdt_path_offset(fdt, "/=
+"),
+-                                          "cpus");
++            cpus_offset =3D fdt_add_subnode(fdt, 0, "cpus");
+             if (cpus_offset < 0) {
+                 return cpus_offset;
+             }
+--=20
+2.13.6
