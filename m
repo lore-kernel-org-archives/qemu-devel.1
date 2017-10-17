@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e4TAe-000550-42
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:48:46 -0400
+	(envelope-from <lersek@redhat.com>) id 1e4TCz-0006g4-Df
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:51:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e4TAa-0003PY-W5
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:48:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56926)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e4TAa-0003Ox-O1
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:48:36 -0400
-Date: Tue, 17 Oct 2017 15:48:27 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171017144827.GA31897@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
-	<1508170976-96869-5-git-send-email-imammedo@redhat.com>
-	<20171016165916.GI3246@localhost.localdomain>
-	<4c14ed02-1f1c-a093-52ac-632f61a68a6f@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1e4TCw-0004Ps-9Y
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:51:05 -0400
+References: <20171017144051.8452-1-lprosek@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <3651bc50-e8f4-8aa3-fff4-462ac7a7ff05@redhat.com>
+Date: Tue, 17 Oct 2017 16:50:41 +0200
 MIME-Version: 1.0
+In-Reply-To: <20171017144051.8452-1-lprosek@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4c14ed02-1f1c-a093-52ac-632f61a68a6f@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 4/6] CLI: add -paused option
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH trivial] Remove empty statements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +23,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, david@gibson.dropbear.id.au
+To: Ladi Prosek <lprosek@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: Peter Chubb <peter.chubb@nicta.com.au>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Mon, Oct 16, 2017 at 07:01:01PM +0200, Paolo Bonzini wrote:
-> On 16/10/2017 18:59, Eduardo Habkost wrote:
-> >> +DEF("paused", HAS_ARG, QEMU_OPTION_paused, \
-> >> +    "-paused [state=]postconf|preconf\n"
-> >> +    "                postconf: pause QEMU after machine is initialized\n"
-> >> +    "                preconf: pause QEMU before machine is initialized\n",
-> >> +    QEMU_ARCH_ALL)
-> > I would like to allow pausing before machine-type is selected, so
-> > management could run query-machines before choosing a
-> > machine-type.  Would that need a third "-pause" mode, or will we
-> > be able to change "preconf" to pause before select_machine() is
-> > called?
-> > 
-> > The same probably applies to other things initialized before
-> > machine_run_board_init() that could be configurable using QMP,
-> > including but not limited to:
-> > * Accelerator configuration
-> > * Registering global properties
-> > * RAM size
-> > * SMP/CPU configuration
+On 10/17/17 16:40, Ladi Prosek wrote:
+> Thanks to Laszlo Ersek for spotting the double semicolon in target/i386/kvm.c
 > 
-> Should (or could) "-M none" be changed in a backwards-compatible way to
-> allow such preconfiguration?  For example
+> I have trivially grepped the tree for ';;' in C files.
 > 
->   qemu -M none -monitor stdio
->   (qemu) machine-set-options pc,accel=kvm
->   (qemu) c
+> Suggested-by: Laszlo Ersek <lersek@redhat.com>
+> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+> ---
+>  hw/misc/imx6_ccm.c     | 2 +-
+>  hw/s390x/virtio-ccw.c  | 2 +-
+>  linux-user/signal.c    | 2 +-
+>  migration/block.c      | 2 +-
+>  target/i386/cpu.c      | 2 +-
+>  target/i386/kvm.c      | 2 +-
+>  target/sh4/translate.c | 2 +-
+>  7 files changed, 7 insertions(+), 7 deletions(-)
 
-Going down this route has pretty major implications for the way libvirt
-manages QEMU, and support / debugging of it. When you look at the QEMU
-command line libvirt uses it will be almost devoid of any useful info.
-So it will be more involved job to figure out just how QEMU is configured.
-This also means it is difficult to replicate the config that libvirt has
-used, outside of libvirt for sake of debugging.
+I've run "get_maintainer.pl" on the above files, and added some CCs.
 
-I also think it will have pretty significant performance implications
-for QEMU startup. To configure a guest via the monitor is going to
-require a huge number of monitor commands to be executed to replicate
-what we traditionally configured via ARGV. While each monitor command
-is not massively slow, the round-trip time of each command will quickly
-add up to several 100 milliseconds, perhaps even seconds in the the
-case of very large configs. 
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
-Maybe we ultimately have no choice and this is inevitable, but I am
-pretty wary of going in the direction of launching bare QEMU and
-configuring everything via a huge number of monitor calls.
+Thanks!
+Laszlo
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> 
+> diff --git a/hw/misc/imx6_ccm.c b/hw/misc/imx6_ccm.c
+> index 1b421013a3..4fa94835fe 100644
+> --- a/hw/misc/imx6_ccm.c
+> +++ b/hw/misc/imx6_ccm.c
+> @@ -335,7 +335,7 @@ static uint64_t imx6_ccm_get_ipg_clk(IMX6CCMState *dev)
+>      uint64_t freq = 0;
+>  
+>      freq = imx6_ccm_get_ahb_clk(dev)
+> -           / (1 + EXTRACT(dev->ccm[CCM_CBCDR], IPG_PODF));;
+> +           / (1 + EXTRACT(dev->ccm[CCM_CBCDR], IPG_PODF));
+>  
+>      DPRINTF("freq = %d\n", (uint32_t)freq);
+>  
+> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+> index 085f17f871..429f10bc90 100644
+> --- a/hw/s390x/virtio-ccw.c
+> +++ b/hw/s390x/virtio-ccw.c
+> @@ -486,7 +486,7 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+>          } else {
+>              address_space_stb(&address_space_memory, ccw.cda, vdev->status,
+>                                          MEMTXATTRS_UNSPECIFIED, NULL);
+> -            sch->curr_status.scsw.count = ccw.count - sizeof(vdev->status);;
+> +            sch->curr_status.scsw.count = ccw.count - sizeof(vdev->status);
+>              ret = 0;
+>          }
+>          break;
+> diff --git a/linux-user/signal.c b/linux-user/signal.c
+> index cc0c3fcee9..09055e8920 100644
+> --- a/linux-user/signal.c
+> +++ b/linux-user/signal.c
+> @@ -6487,7 +6487,7 @@ static void setup_rt_frame(int sig, struct target_sigaction *ka,
+>          haddr = dest;
+>      }
+>      env->iaoq_f = haddr;
+> -    env->iaoq_b = haddr + 4;;
+> +    env->iaoq_b = haddr + 4;
+>      return;
+>  
+>   give_sigsegv:
+> diff --git a/migration/block.c b/migration/block.c
+> index 3282809583..565625b9b2 100644
+> --- a/migration/block.c
+> +++ b/migration/block.c
+> @@ -896,7 +896,7 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
+>      int len, flags;
+>      char device_name[256];
+>      int64_t addr;
+> -    BlockBackend *blk, *blk_prev = NULL;;
+> +    BlockBackend *blk, *blk_prev = NULL;
+>      Error *local_err = NULL;
+>      uint8_t *buf;
+>      int64_t total_sectors = 0;
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 98732cd65f..d44b0ed56c 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -2218,7 +2218,7 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
+>  
+>      if (xcc->kvm_required && !kvm_enabled()) {
+>          strList *new = g_new0(strList, 1);
+> -        new->value = g_strdup("kvm");;
+> +        new->value = g_strdup("kvm");
+>          *missing_feats = new;
+>          return;
+>      }
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index b1e32e95d3..d4b2ce2e94 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -1122,7 +1122,7 @@ static int kvm_get_supported_msrs(KVMState *s)
+>                      break;
+>                  case MSR_IA32_XSS:
+>                      has_msr_xss = true;
+> -                    break;;
+> +                    break;
+>                  case HV_X64_MSR_CRASH_CTL:
+>                      has_msr_hv_crash = true;
+>                      break;
+> diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+> index 8db9fba26e..2b00cd2f35 100644
+> --- a/target/sh4/translate.c
+> +++ b/target/sh4/translate.c
+> @@ -679,7 +679,7 @@ static void _decode_opc(DisasContext * ctx)
+>  	return;
+>      case 0x6008:		/* swap.b Rm,Rn */
+>  	{
+> -            TCGv low = tcg_temp_new();;
+> +            TCGv low = tcg_temp_new();
+>  	    tcg_gen_ext16u_i32(low, REG(B7_4));
+>  	    tcg_gen_bswap16_i32(low, low);
+>              tcg_gen_deposit_i32(REG(B11_8), REG(B7_4), low, 0, 16);
+> 
