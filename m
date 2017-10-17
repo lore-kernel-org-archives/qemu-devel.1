@@ -1,40 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e4UiK-0004PP-3o
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:27:32 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e4UlW-0005vA-6n
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:30:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1e4UiJ-0001Uq-DZ
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:27:32 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38542
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1e4UiJ-0001UI-8g
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:27:31 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9HGOfiO062561
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 12:27:26 -0400
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dnkudna4h-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 12:27:25 -0400
-Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Tue, 17 Oct 2017 12:27:25 -0400
-References: <1508247148-25240-1-git-send-email-thuth@redhat.com>
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Tue, 17 Oct 2017 14:27:17 -0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e4UlT-0004Y1-IN
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:30:50 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20171017001209.32276-1-f4bug@amsat.org>
+	<20171017001209.32276-3-f4bug@amsat.org>
+	<50725210-1e77-a987-b9fc-6185597b5c57@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <ff89ea97-0528-20d8-f6b2-595e015ec94e@amsat.org>
+Date: Tue, 17 Oct 2017 13:30:43 -0300
 MIME-Version: 1.0
-In-Reply-To: <1508247148-25240-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <50725210-1e77-a987-b9fc-6185597b5c57@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Message-Id: <19010e69-6abe-0888-24a9-903ca4017355@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/4] Improve the CPU hot plug
- tests
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 02/39] MAINTAINERS: add entries for
+ dma/i82374
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,37 +30,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-s390x@nongnu.org, david@redhat.com, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: Thomas Huth <thuth@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
 
+On 10/17/2017 03:59 AM, Thomas Huth wrote:
+> On 17.10.2017 02:11, Philippe Mathieu-Daudé wrote:
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  MAINTAINERS | 2 ++
+[...]
+>>  sPAPR
+>> @@ -854,6 +855,7 @@ F: hw/misc/pc-testdev.c
+>>  F: hw/timer/hpet*
+>>  F: hw/timer/i8254*
+>>  F: hw/timer/mc146818rtc*
+>> +F: include/hw/dma/i8257_dma.h
+> 
+> Does not match $subject. And the file does not exist yet (you just
+> create it in patch 39). And I think you should CC: the corresponding
+> maintainers so that they have a chance to say yes or no.
 
-
-On 10/17/2017 11:32 AM, Thomas Huth wrote:
-> So far the CPU hot-plug qtest was only checking "cpu-add" on x86. With
-> these patches, we now test "device_add" for hot-plugging CPUs on x86,
-> and enable the test on ppc64 and s390x, too.
-
-Question: is there a reason other than "no one bothered" to not have a 
-CPU hot
-unplug test, something around the lines of the now cpu-plug-test.c? I might
-give it a shot if there is no known roadblocks against it.
-
-
-Thanks,
-
-Daniel
-
->
-> Thomas Huth (4):
->    tests: Rename pc-cpu-test.c to cpu-plug-test.c
->    tests/cpu-plug-test: Check the CPU hot-plugging with device_add, too
->    tests/cpu-plug-test: Check CPU hot-plugging on ppc64, too
->    tests/cpu-plug-test: Test CPU hot-plugging on s390x
->
->   tests/Makefile.include |   6 +-
->   tests/cpu-plug-test.c  | 261 +++++++++++++++++++++++++++++++++++++++++++++++++
->   tests/pc-cpu-test.c    | 135 -------------------------
->   3 files changed, 265 insertions(+), 137 deletions(-)
->   create mode 100644 tests/cpu-plug-test.c
->   delete mode 100644 tests/pc-cpu-test.c
->
+Oops... fair enough ;)
