@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47331)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4V0s-0002ZF-SR
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:46:47 -0400
+	id 1e4V0x-0002eA-6G
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:46:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4V0r-0003eN-RI
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:46:42 -0400
+	id 1e4V0v-0003gb-1L
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:46:47 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 17 Oct 2017 13:44:16 -0300
-Message-Id: <20171017164426.25277-33-f4bug@amsat.org>
+Date: Tue, 17 Oct 2017 13:44:17 -0300
+Message-Id: <20171017164426.25277-34-f4bug@amsat.org>
 In-Reply-To: <20171017164426.25277-1-f4bug@amsat.org>
 References: <20171017164426.25277-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 32/42] hw/timer/mc146818: rename rtc_init()
- -> mc146818_rtc_init()
+Subject: [Qemu-devel] [PATCH v3 33/42] hw/acpi: ACPI_PM_* defines are not
+ restricted to i386 arch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,163 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-trivial@nongnu.org
+To: Michael Tokarev <mjt@tls.msk.ru>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+
+this allows to remove the old i386/pc dependency on acpi/core.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- include/hw/timer/mc146818rtc.h | 3 ++-
- hw/alpha/dp264.c               | 2 +-
- hw/i386/pc.c                   | 2 +-
- hw/isa/i82378.c                | 3 ++-
- hw/mips/mips_fulong2e.c        | 2 +-
- hw/mips/mips_jazz.c            | 2 +-
- hw/mips/mips_malta.c           | 2 +-
- hw/mips/mips_r4k.c             | 2 +-
- hw/ppc/pnv.c                   | 2 +-
- hw/timer/mc146818rtc.c         | 2 +-
- 10 files changed, 12 insertions(+), 10 deletions(-)
+ include/hw/acpi/acpi.h | 11 +++++++++++
+ include/hw/i386/pc.h   | 11 -----------
+ hw/acpi/core.c         |  1 -
+ 3 files changed, 11 insertions(+), 12 deletions(-)
 
-diff --git a/include/hw/timer/mc146818rtc.h b/include/hw/timer/mc146818rtc.h
-index 7c8e64b203..fe6ed63f71 100644
---- a/include/hw/timer/mc146818rtc.h
-+++ b/include/hw/timer/mc146818rtc.h
-@@ -6,7 +6,8 @@
+diff --git a/include/hw/acpi/acpi.h b/include/hw/acpi/acpi.h
+index 7b3d93cf0d..39ff512129 100644
+--- a/include/hw/acpi/acpi.h
++++ b/include/hw/acpi/acpi.h
+@@ -39,6 +39,17 @@
+ #define ACPI_PM2_REGISTER_WIDTH         8
+ #define ACPI_PM_TIMER_WIDTH             32
  
- #define TYPE_MC146818_RTC "mc146818rtc"
++/* PC-style peripherals (also used by other machines).  */
++#define ACPI_PM_PROP_S3_DISABLED "disable_s3"
++#define ACPI_PM_PROP_S4_DISABLED "disable_s4"
++#define ACPI_PM_PROP_S4_VAL "s4_val"
++#define ACPI_PM_PROP_SCI_INT "sci_int"
++#define ACPI_PM_PROP_ACPI_ENABLE_CMD "acpi_enable_cmd"
++#define ACPI_PM_PROP_ACPI_DISABLE_CMD "acpi_disable_cmd"
++#define ACPI_PM_PROP_PM_IO_BASE "pm_io_base"
++#define ACPI_PM_PROP_GPE0_BLK "gpe0_blk"
++#define ACPI_PM_PROP_GPE0_BLK_LEN "gpe0_blk_len"
++
+ /* PM Timer ticks per second (HZ) */
+ #define PM_TIMER_FREQUENCY  3579545
  
--ISADevice *rtc_init(ISABus *bus, int base_year, qemu_irq intercept_irq);
-+ISADevice *mc146818_rtc_init(ISABus *bus, int base_year,
-+                             qemu_irq intercept_irq);
- void rtc_set_memory(ISADevice *dev, int addr, int val);
- int rtc_get_memory(ISADevice *dev, int addr);
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 087d184ef5..6335e2bf47 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -151,17 +151,6 @@ struct PCMachineClass {
+ #define PC_MACHINE_CLASS(klass) \
+     OBJECT_CLASS_CHECK(PCMachineClass, (klass), TYPE_PC_MACHINE)
  
-diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-index 1bd5243648..f20f252e3c 100644
---- a/hw/alpha/dp264.c
-+++ b/hw/alpha/dp264.c
-@@ -79,7 +79,7 @@ static void clipper_init(MachineState *machine)
-                            clipper_pci_map_irq);
+-/* PC-style peripherals (also used by other machines).  */
+-
+-#define ACPI_PM_PROP_S3_DISABLED "disable_s3"
+-#define ACPI_PM_PROP_S4_DISABLED "disable_s4"
+-#define ACPI_PM_PROP_S4_VAL "s4_val"
+-#define ACPI_PM_PROP_SCI_INT "sci_int"
+-#define ACPI_PM_PROP_ACPI_ENABLE_CMD "acpi_enable_cmd"
+-#define ACPI_PM_PROP_ACPI_DISABLE_CMD "acpi_disable_cmd"
+-#define ACPI_PM_PROP_PM_IO_BASE "pm_io_base"
+-#define ACPI_PM_PROP_GPE0_BLK "gpe0_blk"
+-#define ACPI_PM_PROP_GPE0_BLK_LEN "gpe0_blk_len"
+ #define ACPI_PM_PROP_TCO_ENABLED "enable_tco"
  
-     /* Since we have an SRM-compatible PALcode, use the SRM epoch.  */
--    rtc_init(isa_bus, 1900, rtc_irq);
-+    mc146818_rtc_init(isa_bus, 1900, rtc_irq);
- 
-     i8254_pit_init(isa_bus, 0x40, 0, NULL);
-     isa_create_simple(isa_bus, "i8042");
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index b565c6086c..88e64d84c3 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1543,7 +1543,7 @@ void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
-             rtc_irq = qdev_get_gpio_in(hpet, HPET_LEGACY_RTC_INT);
-         }
-     }
--    *rtc_state = rtc_init(isa_bus, 2000, rtc_irq);
-+    *rtc_state = mc146818_rtc_init(isa_bus, 2000, rtc_irq);
- 
-     qemu_register_boot_set(pc_boot_set, *rtc_state);
- 
-diff --git a/hw/isa/i82378.c b/hw/isa/i82378.c
-index a9c15f858d..a5d67bc6d7 100644
---- a/hw/isa/i82378.c
-+++ b/hw/isa/i82378.c
-@@ -21,6 +21,7 @@
- #include "hw/pci/pci.h"
- #include "hw/i386/pc.h"
- #include "hw/timer/i8254.h"
-+#include "hw/timer/mc146818rtc.h"
- #include "hw/audio/pcspk.h"
- 
- #define TYPE_I82378 "i82378"
-@@ -106,7 +107,7 @@ static void i82378_realize(PCIDevice *pci, Error **errp)
-     isa = isa_create_simple(isabus, "i82374");
- 
-     /* timer */
--    isa_create_simple(isabus, "mc146818rtc");
-+    isa_create_simple(isabus, TYPE_MC146818_RTC);
- }
- 
- static void i82378_init(Object *obj)
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 22e6c05fb5..a8292305e8 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -369,7 +369,7 @@ static void mips_fulong2e_init(MachineState *machine)
-     /* Super I/O */
-     isa_create_simple(isa_bus, "i8042");
- 
--    rtc_init(isa_bus, 2000, NULL);
-+    mc146818_rtc_init(isa_bus, 2000, NULL);
- 
-     serial_hds_isa_init(isa_bus, 0, MAX_SERIAL_PORTS);
-     parallel_hds_isa_init(isa_bus, 1);
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index 5f37852499..b9ffb33b45 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -292,7 +292,7 @@ static void mips_jazz_init(MachineState *machine,
-     fdctrl_init_sysbus(qdev_get_gpio_in(rc4030, 1), -1, 0x80003000, fds);
- 
-     /* Real time clock */
--    rtc_init(isa_bus, 1980, NULL);
-+    mc146818_rtc_init(isa_bus, 1980, NULL);
-     memory_region_init_io(rtc, NULL, &rtc_ops, NULL, "rtc", 0x1000);
-     memory_region_add_subregion(address_space, 0x80004000, rtc);
- 
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index de547d732f..8e0e264cf8 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -1223,7 +1223,7 @@ void mips_malta_init(MachineState *machine)
-     /* Super I/O */
-     isa_create_simple(isa_bus, "i8042");
- 
--    rtc_init(isa_bus, 2000, NULL);
-+    mc146818_rtc_init(isa_bus, 2000, NULL);
-     serial_hds_isa_init(isa_bus, 0, 2);
-     parallel_hds_isa_init(isa_bus, 1);
- 
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index 48fad52540..cdb91e31c5 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -278,7 +278,7 @@ void mips_r4k_init(MachineState *machine)
-     i8259 = i8259_init(isa_bus, env->irq[2]);
-     isa_bus_irqs(isa_bus, i8259);
- 
--    rtc_init(isa_bus, 2000, NULL);
-+    mc146818_rtc_init(isa_bus, 2000, NULL);
- 
-     pit = i8254_pit_init(isa_bus, 0x40, 0, NULL);
- 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index d46d91c76f..0e47757bff 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -651,7 +651,7 @@ static void ppc_powernv_init(MachineState *machine)
-     serial_hds_isa_init(pnv->isa_bus, 0, MAX_SERIAL_PORTS);
- 
-     /* Create an RTC ISA device too */
--    rtc_init(pnv->isa_bus, 2000, NULL);
-+    mc146818_rtc_init(pnv->isa_bus, 2000, NULL);
- 
-     /* OpenPOWER systems use a IPMI SEL Event message to notify the
-      * host to powerdown */
-diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-index 7764be25ec..35a05a64cc 100644
---- a/hw/timer/mc146818rtc.c
-+++ b/hw/timer/mc146818rtc.c
-@@ -999,7 +999,7 @@ static void rtc_realizefn(DeviceState *dev, Error **errp)
-     qdev_init_gpio_out(dev, &s->irq, 1);
- }
- 
--ISADevice *rtc_init(ISABus *bus, int base_year, qemu_irq intercept_irq)
-+ISADevice *mc146818_rtc_init(ISABus *bus, int base_year, qemu_irq intercept_irq)
- {
-     DeviceState *dev;
-     ISADevice *isadev;
+ /* parallel.c */
+diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+index cd0a1d357b..eb9b76f70b 100644
+--- a/hw/acpi/core.c
++++ b/hw/acpi/core.c
+@@ -21,7 +21,6 @@
+ #include "qemu/osdep.h"
+ #include "sysemu/sysemu.h"
+ #include "hw/hw.h"
+-#include "hw/i386/pc.h"
+ #include "hw/acpi/acpi.h"
+ #include "hw/nvram/fw_cfg.h"
+ #include "qemu/config-file.h"
 -- 
 2.15.0.rc0
