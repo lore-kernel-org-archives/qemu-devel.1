@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4Rct-00032j-2q
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:09:44 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4Rcp-0004uQ-Ej
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4Rco-0002y6-29
 	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:09:43 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:56596)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4Rcj-0004r8-Nr
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:09:38 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:56560)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4Rcp-0004uA-2A
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:09:39 -0400
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4Rcj-0004qp-Eu
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:09:33 -0400
 From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Tue, 17 Oct 2017 16:09:35 +0300
-Message-ID: <150824577575.6816.902878105747508734.stgit@Misha-PC.lan02.inno>
+Date: Tue, 17 Oct 2017 16:09:30 +0300
+Message-ID: <150824577017.6816.18445123367944855125.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <150824572545.6816.5099701189660002212.stgit@Misha-PC.lan02.inno>
 References: <150824572545.6816.5099701189660002212.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v2 08/43] windbg: hook to wrmsr operation
+Subject: [Qemu-devel] [PATCH v2 07/43] windbg: added chardev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,126 +29,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
-Inserted hook to wrmsr operation. Windows Kernel put address on KPCR struct to fs/gs (x32/x64) register. Needs catch this moment and allow windbg server handle packets.
+Added chardev for listening to windbg. Target device is a parameter in the '-windbg' option.
 
 Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
+Acked-by: Alistair Francis <alistair.francis@xilinx.com>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
 ---
- include/exec/windbgstub-utils.h |    2 ++
- include/exec/windbgstub.h       |    1 +
- stubs/windbgstub.c              |    3 +++
- target/i386/misc_helper.c       |    3 +++
- target/i386/windbgstub.c        |    5 +++++
- windbgstub.c                    |   13 +++++++++++++
- 6 files changed, 27 insertions(+)
+ windbgstub.c |   30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
-diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-index 1c27ee4ce8..825d58b76b 100755
---- a/include/exec/windbgstub-utils.h
-+++ b/include/exec/windbgstub-utils.h
-@@ -50,4 +50,6 @@
-     _t;                                                       \
- })
- 
-+bool windbg_on_load(void);
-+
- #endif
-diff --git a/include/exec/windbgstub.h b/include/exec/windbgstub.h
-index 21bc552e58..309f692383 100755
---- a/include/exec/windbgstub.h
-+++ b/include/exec/windbgstub.h
-@@ -18,6 +18,7 @@
- #define WINDBG_DEBUG_ON false
- #endif
- 
-+void windbg_try_load(void);
- int windbg_server_start(const char *device);
- 
- #endif
-diff --git a/stubs/windbgstub.c b/stubs/windbgstub.c
-index 4951f59203..bd7e2dccd1 100755
---- a/stubs/windbgstub.c
-+++ b/stubs/windbgstub.c
-@@ -12,6 +12,9 @@
- #include "qemu/osdep.h"
- #include "exec/windbgstub.h"
- 
-+void windbg_try_load(void)
-+{}
-+
- int windbg_server_start(const char *device)
- {
-     return 0;
-diff --git a/target/i386/misc_helper.c b/target/i386/misc_helper.c
-index 628f64aad5..ec1fcd2899 100644
---- a/target/i386/misc_helper.c
-+++ b/target/i386/misc_helper.c
-@@ -24,6 +24,7 @@
- #include "exec/exec-all.h"
- #include "exec/cpu_ldst.h"
- #include "exec/address-spaces.h"
-+#include "exec/windbgstub.h"
- 
- void helper_outb(CPUX86State *env, uint32_t port, uint32_t data)
- {
-@@ -385,6 +386,8 @@ void helper_wrmsr(CPUX86State *env)
-         /* XXX: exception? */
-         break;
-     }
-+
-+    windbg_try_load();
- }
- 
- void helper_rdmsr(CPUX86State *env)
-diff --git a/target/i386/windbgstub.c b/target/i386/windbgstub.c
-index f54f5178fb..f2f83423a0 100755
---- a/target/i386/windbgstub.c
-+++ b/target/i386/windbgstub.c
-@@ -11,3 +11,8 @@
- 
- #include "qemu/osdep.h"
- #include "exec/windbgstub-utils.h"
-+
-+bool windbg_on_load(void)
-+{
-+    return false;
-+}
 diff --git a/windbgstub.c b/windbgstub.c
-index e30b8500e0..a2a6eb81b4 100755
+index 0863da73fd..e30b8500e0 100755
 --- a/windbgstub.c
 +++ b/windbgstub.c
-@@ -16,6 +16,7 @@
- #include "qemu/cutils.h"
- #include "exec/windbgstub.h"
- #include "exec/windbgstub-utils.h"
-+#include "sysemu/kvm.h"
- 
+@@ -20,12 +20,26 @@
  typedef struct WindbgState {
      bool is_loaded;
-@@ -45,6 +46,13 @@ static void windbg_exit(void)
-     g_free(windbg_state);
- }
  
-+void windbg_try_load(void)
++    CharBackend chr;
++
+     uint32_t ctrl_packet_id;
+     uint32_t data_packet_id;
+ } WindbgState;
+ 
+ static WindbgState *windbg_state;
+ 
++static int windbg_chr_can_receive(void *opaque)
 +{
-+    if (windbg_state && !windbg_state->is_loaded) {
-+        windbg_state->is_loaded = windbg_on_load();
++    return PACKET_MAX_SIZE;
++}
++
++static void windbg_chr_receive(void *opaque, const uint8_t *buf, int size)
++{
++    if (windbg_state->is_loaded) {
++        /* T0D0: parse data */
 +    }
 +}
 +
+ static void windbg_exit(void)
+ {
+     g_free(windbg_state);
+@@ -33,15 +47,31 @@ static void windbg_exit(void)
+ 
  int windbg_server_start(const char *device)
  {
-     Chardev *chr = NULL;
-@@ -54,6 +62,11 @@ int windbg_server_start(const char *device)
++    Chardev *chr = NULL;
++
+     if (windbg_state) {
+         WINDBG_ERROR("Multiple instances of windbg are not supported.");
          exit(1);
      }
  
-+    if (kvm_enabled()) {
-+        WINDBG_ERROR("KVM is not supported.");
++    if (!strstart(device, "pipe:", NULL)) {
++        WINDBG_ERROR("Unsupported device. Supported only pipe.");
 +        exit(1);
 +    }
 +
-     if (!strstart(device, "pipe:", NULL)) {
-         WINDBG_ERROR("Unsupported device. Supported only pipe.");
-         exit(1);
+     windbg_state = g_new0(WindbgState, 1);
+     windbg_state->ctrl_packet_id = RESET_PACKET_ID;
+     windbg_state->data_packet_id = INITIAL_PACKET_ID;
+ 
++    chr = qemu_chr_new_noreplay(WINDBG, device);
++    if (!chr) {
++        return -1;
++    }
++
++    qemu_chr_fe_init(&windbg_state->chr, chr, &error_abort);
++    qemu_chr_fe_set_handlers(&windbg_state->chr, windbg_chr_can_receive,
++                             windbg_chr_receive, NULL, NULL, NULL, NULL, true);
++
+     atexit(windbg_exit);
+     return 0;
+ }
