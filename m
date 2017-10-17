@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e4TcD-0005EG-Il
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:17:13 -0400
+	(envelope-from <kwolf@redhat.com>) id 1e4TcJ-0005FQ-Gr
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:17:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1e4Tc9-0002Xb-Fl
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:17:09 -0400
-Date: Tue, 17 Oct 2017 17:16:29 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20171017171629.1b2aa212.cohuck@redhat.com>
-In-Reply-To: <3651bc50-e8f4-8aa3-fff4-462ac7a7ff05@redhat.com>
-References: <20171017144051.8452-1-lprosek@redhat.com>
-	<3651bc50-e8f4-8aa3-fff4-462ac7a7ff05@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1e4TcI-0002cV-Jq
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:17:15 -0400
+Date: Tue, 17 Oct 2017 17:16:58 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20171017151658.GD7660@dhcp-200-186.str.redhat.com>
+References: <bdbb9d79839f3149db9cf2ff11a2cc04977e0a64.1507817548.git.pkrempa@redhat.com>
+	<20171017151149.28062-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH trivial] Remove empty statements
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171017151149.28062-1-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/1] qemu-iotests: Test backing_fmt with
+ backing node reference
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,33 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Ladi Prosek <lprosek@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Christian Borntraeger <borntraeger@de.ibm.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org
 
-On Tue, 17 Oct 2017 16:50:41 +0200
-Laszlo Ersek <lersek@redhat.com> wrote:
-
-> On 10/17/17 16:40, Ladi Prosek wrote:
-> > Thanks to Laszlo Ersek for spotting the double semicolon in target/i386/kvm.c
-> > 
-> > I have trivially grepped the tree for ';;' in C files.
-> > 
-> > Suggested-by: Laszlo Ersek <lersek@redhat.com>
-> > Signed-off-by: Ladi Prosek <lprosek@redhat.com>
-> > ---
-> >  hw/misc/imx6_ccm.c     | 2 +-
-> >  hw/s390x/virtio-ccw.c  | 2 +-
-> >  linux-user/signal.c    | 2 +-
-> >  migration/block.c      | 2 +-
-> >  target/i386/cpu.c      | 2 +-
-> >  target/i386/kvm.c      | 2 +-
-> >  target/sh4/translate.c | 2 +-
-> >  7 files changed, 7 insertions(+), 7 deletions(-)  
+Am 17.10.2017 um 17:11 hat Kevin Wolf geschrieben:
+> This changes test case 191 to include a backing image that has
+> backing_fmt set in the image file, but is referenced by node name in the
+> qemu command line.
 > 
-> I've run "get_maintainer.pl" on the above files, and added some CCs.
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  tests/qemu-iotests/191     | 5 +++--
+>  tests/qemu-iotests/191.out | 2 +-
+>  2 files changed, 4 insertions(+), 3 deletions(-)
 > 
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
+> index ac2b88fd78..00202efd47 100755
+> --- a/tests/qemu-iotests/191
+> +++ b/tests/qemu-iotests/191
+> @@ -56,9 +56,10 @@ echo === Preparing and starting VM ===
+>  echo
+>  
+>  TEST_IMG="${TEST_IMG}.base" _make_test_img $size
+> -TEST_IMG="${TEST_IMG}.mid" _make_test_img -b "${TEST_IMG}.base"
+> +IMGOPTS=$(_optstr_add "$IMGOPTS" "backing_fmt=$IMGFMT") \
+> +    TEST_IMG="${TEST_IMG}.mid" _make_test_img -b "${TEST_IMG}.base" $size
+>  _make_test_img -b "${TEST_IMG}.mid"
+> -TEST_IMG="${TEST_IMG}.ovl2" _make_test_img -b "${TEST_IMG}.mid"
+> +TEST_IMG="${TEST_IMG}.ovl2" _make_test_img -b "${TEST_IMG}.mid" $size
 
-Trivial ;) enough, but
+Please pretend you don't see the addition of " $size" here, it's
+unnecessary and I'll remove it again.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Kevin
