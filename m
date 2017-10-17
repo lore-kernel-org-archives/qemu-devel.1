@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e4UnB-0006ui-BC
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:32:35 -0400
+	(envelope-from <jcody@redhat.com>) id 1e4UnE-0006xI-8E
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:32:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e4Un9-0006SR-N4
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:32:33 -0400
+	(envelope-from <jcody@redhat.com>) id 1e4UnC-0006VM-1V
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:32:36 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 17 Oct 2017 12:31:51 -0400
-Message-Id: <24c7d85bd96b8cbf02bf60dabc0787724c19b18b.1508257445.git.jcody@redhat.com>
+Date: Tue, 17 Oct 2017 12:31:52 -0400
+Message-Id: <98b1ebe5189953527f93fa06bbdfa1bc1aaa0dff.1508257445.git.jcody@redhat.com>
 In-Reply-To: <cover.1508257445.git.jcody@redhat.com>
 References: <cover.1508257445.git.jcody@redhat.com>
 In-Reply-To: <cover.1508257445.git.jcody@redhat.com>
 References: <cover.1508257445.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 06/10] qemu-iotests: make ./check
- automatically reap QEMU processes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 07/10] qemu-iotests: run python tests in own
+ subdirectories
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,306 +28,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, jsnow@redhat.com, stefanha@redhat.com, kwolf@redhat.com, eblake@redhat.com
 
-Check will now take care of cleaning up all QEMU processes started
-from bash tests using the common.qemu framework.
+This adds the framework to iotests.py to run python iotests in a
+subdirectory structure, structured like so:
 
-This also paves the way to added another check option to keep QEMU
-processes around, in the case of a failed test.
+scratch/
+=E2=94=9C=E2=94=80=E2=94=80 TestNumber
+=E2=94=82=C2=A0=C2=A0 =E2=94=9C=E2=94=80=E2=94=80 TestClassName
+=E2=94=82=C2=A0=C2=A0 =E2=94=82=C2=A0=C2=A0 =E2=94=9C=E2=94=80=E2=94=80 t=
+est_method_name
 
+Prior to this patch, tests were run in a test subdirectory from
+previous patches in the series, like this:
+
+scratch/
+=E2=94=9C=E2=94=80=E2=94=80 TestNumber
+
+However, given the nature of python's unittest framework, additional
+subdirectories are needed, if we want to insure that we can save
+intermediate files in case of test failures (as we will do in a
+subsequent patch) without running the risk of tainting other test
+methods from the test file.
+
+In python tests using iiotests.QMPTestCase, any reference to
+'iotests.test_dir' should be replaced by 'self.workdir'.  This
+may also require changing the scope of path name variables.
+
+Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- tests/qemu-iotests/085   | 2 --
- tests/qemu-iotests/091   | 2 --
- tests/qemu-iotests/094   | 2 --
- tests/qemu-iotests/095   | 2 --
- tests/qemu-iotests/102   | 2 --
- tests/qemu-iotests/109   | 2 --
- tests/qemu-iotests/117   | 2 --
- tests/qemu-iotests/130   | 2 --
- tests/qemu-iotests/140   | 2 --
- tests/qemu-iotests/141   | 2 --
- tests/qemu-iotests/143   | 2 --
- tests/qemu-iotests/144   | 2 --
- tests/qemu-iotests/146   | 2 --
- tests/qemu-iotests/156   | 2 --
- tests/qemu-iotests/173   | 2 --
- tests/qemu-iotests/181   | 2 --
- tests/qemu-iotests/183   | 2 --
- tests/qemu-iotests/185   | 2 --
- tests/qemu-iotests/191   | 6 ------
- tests/qemu-iotests/check | 7 +++++--
- 20 files changed, 5 insertions(+), 44 deletions(-)
+ tests/qemu-iotests/iotests.py | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/tests/qemu-iotests/085 b/tests/qemu-iotests/085
-index 7b69f86..283f9a9 100755
---- a/tests/qemu-iotests/085
-+++ b/tests/qemu-iotests/085
-@@ -37,8 +37,6 @@ snapshot_virt1="snapshot-v1.qcow2"
- 
- SNAPSHOTS=10
- 
--trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/091 b/tests/qemu-iotests/091
-index c4df2fb..cc4c50c 100755
---- a/tests/qemu-iotests/091
-+++ b/tests/qemu-iotests/091
-@@ -31,8 +31,6 @@ status=1    # failure is the default!
- 
- MIG_FIFO="${TEST_DIR}/migrate"
- 
--trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/094 b/tests/qemu-iotests/094
-index 35e882c..1587550 100755
---- a/tests/qemu-iotests/094
-+++ b/tests/qemu-iotests/094
-@@ -27,8 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/095 b/tests/qemu-iotests/095
-index 75d60c4..2891014 100755
---- a/tests/qemu-iotests/095
-+++ b/tests/qemu-iotests/095
-@@ -30,8 +30,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
-index 201c520..2980638 100755
---- a/tests/qemu-iotests/102
-+++ b/tests/qemu-iotests/102
-@@ -27,8 +27,6 @@ echo "QA output created by $seq"
- here=$PWD
- status=1    # failure is the default!
- 
--trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and qemu instance handling
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/109 b/tests/qemu-iotests/109
-index d4fca99..2f6e456 100755
---- a/tests/qemu-iotests/109
-+++ b/tests/qemu-iotests/109
-@@ -27,8 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/117 b/tests/qemu-iotests/117
-index 579cecb..a427ee7 100755
---- a/tests/qemu-iotests/117
-+++ b/tests/qemu-iotests/117
-@@ -27,8 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/130 b/tests/qemu-iotests/130
-index 4aad4ea..3610738 100755
---- a/tests/qemu-iotests/130
-+++ b/tests/qemu-iotests/130
-@@ -29,8 +29,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/140 b/tests/qemu-iotests/140
-index c5e1a5b..ec79402 100755
---- a/tests/qemu-iotests/140
-+++ b/tests/qemu-iotests/140
-@@ -31,8 +31,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/141 b/tests/qemu-iotests/141
-index cff2319..39b75a4 100755
---- a/tests/qemu-iotests/141
-+++ b/tests/qemu-iotests/141
-@@ -27,8 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/143 b/tests/qemu-iotests/143
-index b4736aa..e107ae3 100755
---- a/tests/qemu-iotests/143
-+++ b/tests/qemu-iotests/143
-@@ -27,8 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/144 b/tests/qemu-iotests/144
-index b47c561..8b55d33 100755
---- a/tests/qemu-iotests/144
-+++ b/tests/qemu-iotests/144
-@@ -32,8 +32,6 @@ status=1	# failure is the default!
- TMP_SNAP1=${TEST_DIR}/tmp.qcow2
- TMP_SNAP2=${TEST_DIR}/tmp2.qcow2
- 
--trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/146 b/tests/qemu-iotests/146
-index 99b1e81..7dffe22 100755
---- a/tests/qemu-iotests/146
-+++ b/tests/qemu-iotests/146
-@@ -27,8 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1    # failure is the default!
- 
--trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/156 b/tests/qemu-iotests/156
-index 9dbc6d7..26ebd73 100755
---- a/tests/qemu-iotests/156
-+++ b/tests/qemu-iotests/156
-@@ -35,8 +35,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/173 b/tests/qemu-iotests/173
-index 0c2fde4..933cd96 100755
---- a/tests/qemu-iotests/173
-+++ b/tests/qemu-iotests/173
-@@ -27,8 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1    # failure is the default!
- 
--trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
-index 18fb133..e6f7908 100755
---- a/tests/qemu-iotests/181
-+++ b/tests/qemu-iotests/181
-@@ -29,8 +29,6 @@ status=1	# failure is the default!
- 
- MIG_SOCKET="${TEST_DIR}/migrate"
- 
--trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
-index 2e09679..cb82d3c 100755
---- a/tests/qemu-iotests/183
-+++ b/tests/qemu-iotests/183
-@@ -29,8 +29,6 @@ status=1 # failure is the default!
- 
- MIG_SOCKET="${TEST_DIR}/migrate"
- 
--trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
-index 7269d5e..ef4b1cd 100755
---- a/tests/qemu-iotests/185
-+++ b/tests/qemu-iotests/185
-@@ -29,8 +29,6 @@ status=1 # failure is the default!
- 
- MIG_SOCKET="${TEST_DIR}/migrate"
- 
--trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
-index f97e580..7fc1365 100755
---- a/tests/qemu-iotests/191
-+++ b/tests/qemu-iotests/191
-@@ -29,12 +29,6 @@ status=1 # failure is the default!
- 
- MIG_SOCKET="${TEST_DIR}/migrate"
- 
--_cleanup()
--{
--    _cleanup_qemu
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index b4ab646..057ea39 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -845,10 +845,13 @@ do
-         # TEST_DIR / QEMU_TEST_DIR
-         (
-         export TEST_DIR=$TEST_DIR_SEQ
--        . "$source_iotests/common.config"
--        . "$source_iotests/common.rc"
-+        cd "$source_iotests";
-+        . ./common.config
-+        . ./common.rc
-+        . ./common.qemu
- 
-         _cleanup_protocols
-+        _cleanup_qemu
-         )
-         rm -rf "$TEST_DIR_SEQ"
- 
--- 
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
+y
+index 6f05790..7ff400a 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -262,6 +262,17 @@ index_re =3D re.compile(r'([^\[]+)\[([^\]]+)\]')
+ class QMPTestCase(unittest.TestCase):
+     '''Abstract base class for QMP test cases'''
+=20
++    def __init__(self, *args):
++        super(QMPTestCase, self).__init__(*args)
++        self.workdir =3D os.path.join(test_dir, self.__class__.__name__,
++                                    self._testMethodName)
++        try:
++            os.makedirs(self.workdir)
++        except OSError, error:
++            if error.errno !=3D errno.EEXIST:
++                raise
++        os.chdir(self.workdir)
++
+     def dictpath(self, d, path):
+         '''Traverse a path in a nested dict'''
+         for component in path.split('/'):
+--=20
 2.9.5
