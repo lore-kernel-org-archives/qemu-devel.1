@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1e4TCz-0006g4-Df
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:51:06 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e4TDt-0007bQ-Sz
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:52:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1e4TCw-0004Ps-9Y
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:51:05 -0400
-References: <20171017144051.8452-1-lprosek@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <3651bc50-e8f4-8aa3-fff4-462ac7a7ff05@redhat.com>
-Date: Tue, 17 Oct 2017 16:50:41 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1e4TDs-0004jZ-Hd
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:52:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:63215)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e4TDs-0004jA-8b
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:52:00 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3F265883C5
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 14:51:59 +0000 (UTC)
+Date: Tue, 17 Oct 2017 15:51:52 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171017145151.GD2326@work-vm>
+References: <20171004104636.7963-1-quintela@redhat.com>
+	<20171004104636.7963-12-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171017144051.8452-1-lprosek@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH trivial] Remove empty statements
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171004104636.7963-12-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v9 11/12] migration: Flush receive queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,123 +33,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: Peter Chubb <peter.chubb@nicta.com.au>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On 10/17/17 16:40, Ladi Prosek wrote:
-> Thanks to Laszlo Ersek for spotting the double semicolon in target/i386/kvm.c
+* Juan Quintela (quintela@redhat.com) wrote:
+> Each time that we sync the bitmap, it is a possiblity that we receive
+> a page that is being processed by a different thread.  We fix this
+> problem just making sure that we wait for all receiving threads to
+> finish its work before we procedeed with the next stage.
 > 
-> I have trivially grepped the tree for ';;' in C files.
+> We are low on page flags, so we use a combination that is not valid to
+> emit that message:  MULTIFD_PAGE and COMPRESSED.
 > 
-> Suggested-by: Laszlo Ersek <lersek@redhat.com>
-> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+> I tried to make a migration command for it, but it don't work because
+> we sync the bitmap sometimes when we have already sent the beggining
+> of the section, so I just added a new page flag.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> 
+> --
+> Create RAM_SAVE_FLAG_MULTIFD_SYNC (dave suggestion)
+> Move the set of need_flush to inside the bitmap_sync code (peter suggestion)
 > ---
->  hw/misc/imx6_ccm.c     | 2 +-
->  hw/s390x/virtio-ccw.c  | 2 +-
->  linux-user/signal.c    | 2 +-
->  migration/block.c      | 2 +-
->  target/i386/cpu.c      | 2 +-
->  target/i386/kvm.c      | 2 +-
->  target/sh4/translate.c | 2 +-
->  7 files changed, 7 insertions(+), 7 deletions(-)
-
-I've run "get_maintainer.pl" on the above files, and added some CCs.
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-Thanks!
-Laszlo
-
+>  migration/ram.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 55 insertions(+)
 > 
-> diff --git a/hw/misc/imx6_ccm.c b/hw/misc/imx6_ccm.c
-> index 1b421013a3..4fa94835fe 100644
-> --- a/hw/misc/imx6_ccm.c
-> +++ b/hw/misc/imx6_ccm.c
-> @@ -335,7 +335,7 @@ static uint64_t imx6_ccm_get_ipg_clk(IMX6CCMState *dev)
->      uint64_t freq = 0;
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 981f345294..d717776f32 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -72,6 +72,14 @@
+>  #define RAM_SAVE_FLAG_COMPRESS_PAGE    0x100
+>  #define RAM_SAVE_FLAG_MULTIFD_PAGE     0x200
 >  
->      freq = imx6_ccm_get_ahb_clk(dev)
-> -           / (1 + EXTRACT(dev->ccm[CCM_CBCDR], IPG_PODF));;
-> +           / (1 + EXTRACT(dev->ccm[CCM_CBCDR], IPG_PODF));
+> +/* We are getting low on pages flags, so we start using combinations
+> +   When we need to flush a page, we sent it as
+> +   RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_COMPRESS_PAGE
+> +   We don't allow that combination
+> +*/
+> +#define RAM_SAVE_FLAG_MULTIFD_SYNC \
+> +    (RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_ZERO)
+
+Good that's better than last time; note you're using FLAG_ZERO where
+the comment says COMPRESS_PAGE and the commit message says COMPRESSED.
+
+> +
+>  static inline bool is_zero_range(uint8_t *p, uint64_t size)
+>  {
+>      return buffer_is_zero(p, size);
+> @@ -194,6 +202,9 @@ struct RAMState {
+>      uint64_t iterations_prev;
+>      /* Iterations since start */
+>      uint64_t iterations;
+> +    /* Indicates if we have synced the bitmap and we need to assure that
+> +       target has processeed all previous pages */
+> +    bool multifd_needs_flush;
+>      /* number of dirty bits in the bitmap */
+>      uint64_t migration_dirty_pages;
+>      /* protects modification of the bitmap */
+> @@ -614,9 +625,11 @@ struct MultiFDRecvParams {
+>      QIOChannel *c;
+>      QemuSemaphore ready;
+>      QemuSemaphore sem;
+> +    QemuCond cond_sync;
+>      QemuMutex mutex;
+>      /* proteced by param mutex */
+>      bool quit;
+> +    bool sync;
+>      multifd_pages_t pages;
+>      bool done;
+>  };
+> @@ -669,6 +682,7 @@ int multifd_load_cleanup(Error **errp)
+>          qemu_thread_join(&p->thread);
+>          qemu_mutex_destroy(&p->mutex);
+>          qemu_sem_destroy(&p->sem);
+> +        qemu_cond_destroy(&p->cond_sync);
+>          socket_recv_channel_destroy(p->c);
+>          g_free(p->name);
+>          p->name = NULL;
+> @@ -707,6 +721,10 @@ static void *multifd_recv_thread(void *opaque)
+>                  return NULL;
+>              }
+>              p->done = true;
+> +            if (p->sync) {
+> +                qemu_cond_signal(&p->cond_sync);
+> +                p->sync = false;
+> +            }
+>              qemu_mutex_unlock(&p->mutex);
+>              qemu_sem_post(&p->ready);
+>              continue;
+> @@ -752,9 +770,11 @@ void multifd_new_channel(QIOChannel *ioc)
+>      qemu_mutex_init(&p->mutex);
+>      qemu_sem_init(&p->sem, 0);
+>      qemu_sem_init(&p->ready, 0);
+> +    qemu_cond_init(&p->cond_sync);
+>      p->quit = false;
+>      p->id = msg.id;
+>      p->done = false;
+> +    p->sync = false;
+>      multifd_init_pages(&p->pages);
+>      p->c = ioc;
+>      multifd_recv_state->count++;
+> @@ -819,6 +839,27 @@ static void multifd_recv_page(uint8_t *address, uint16_t fd_num)
+>      qemu_sem_post(&p->sem);
+>  }
 >  
->      DPRINTF("freq = %d\n", (uint32_t)freq);
+> +static int multifd_flush(void)
+> +{
+> +    int i, thread_count;
+> +
+> +    if (!migrate_use_multifd()) {
+> +        return 0;
+> +    }
+> +    thread_count = migrate_multifd_channels();
+> +    for (i = 0; i < thread_count; i++) {
+> +        MultiFDRecvParams *p = &multifd_recv_state->params[i];
+> +
+> +        qemu_mutex_lock(&p->mutex);
+> +        while (!p->done) {
+> +            p->sync = true;
+> +            qemu_cond_wait(&p->cond_sync, &p->mutex);
+> +        }
+> +        qemu_mutex_unlock(&p->mutex);
+> +    }
+> +    return 0;
+> +}
+
+I wonder if we need some way of terminating this on error
+(e.g. if terminate_multifd_recev_threads is called for an error
+case).
+
+Dave
+
+>  /**
+>   * save_page_header: write page header to wire
+>   *
+> @@ -836,6 +877,12 @@ static size_t save_page_header(RAMState *rs, QEMUFile *f,  RAMBlock *block,
+>  {
+>      size_t size, len;
 >  
-> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-> index 085f17f871..429f10bc90 100644
-> --- a/hw/s390x/virtio-ccw.c
-> +++ b/hw/s390x/virtio-ccw.c
-> @@ -486,7 +486,7 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
->          } else {
->              address_space_stb(&address_space_memory, ccw.cda, vdev->status,
->                                          MEMTXATTRS_UNSPECIFIED, NULL);
-> -            sch->curr_status.scsw.count = ccw.count - sizeof(vdev->status);;
-> +            sch->curr_status.scsw.count = ccw.count - sizeof(vdev->status);
->              ret = 0;
+> +    if (rs->multifd_needs_flush &&
+> +        (offset & RAM_SAVE_FLAG_MULTIFD_PAGE)) {
+> +        offset |= RAM_SAVE_FLAG_ZERO;
+> +        rs->multifd_needs_flush = false;
+> +    }
+> +
+>      if (block == rs->last_sent_block) {
+>          offset |= RAM_SAVE_FLAG_CONTINUE;
+>      }
+> @@ -1124,6 +1171,9 @@ static void migration_bitmap_sync(RAMState *rs)
+>      if (migrate_use_events()) {
+>          qapi_event_send_migration_pass(ram_counters.dirty_sync_count, NULL);
+>      }
+> +    if (!rs->ram_bulk_stage && migrate_use_multifd()) {
+> +        rs->multifd_needs_flush = true;
+> +    }
+>  }
+>  
+>  /**
+> @@ -3045,6 +3095,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>              break;
 >          }
->          break;
-> diff --git a/linux-user/signal.c b/linux-user/signal.c
-> index cc0c3fcee9..09055e8920 100644
-> --- a/linux-user/signal.c
-> +++ b/linux-user/signal.c
-> @@ -6487,7 +6487,7 @@ static void setup_rt_frame(int sig, struct target_sigaction *ka,
->          haddr = dest;
->      }
->      env->iaoq_f = haddr;
-> -    env->iaoq_b = haddr + 4;;
-> +    env->iaoq_b = haddr + 4;
->      return;
 >  
->   give_sigsegv:
-> diff --git a/migration/block.c b/migration/block.c
-> index 3282809583..565625b9b2 100644
-> --- a/migration/block.c
-> +++ b/migration/block.c
-> @@ -896,7 +896,7 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
->      int len, flags;
->      char device_name[256];
->      int64_t addr;
-> -    BlockBackend *blk, *blk_prev = NULL;;
-> +    BlockBackend *blk, *blk_prev = NULL;
->      Error *local_err = NULL;
->      uint8_t *buf;
->      int64_t total_sectors = 0;
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 98732cd65f..d44b0ed56c 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -2218,7 +2218,7 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
->  
->      if (xcc->kvm_required && !kvm_enabled()) {
->          strList *new = g_new0(strList, 1);
-> -        new->value = g_strdup("kvm");;
-> +        new->value = g_strdup("kvm");
->          *missing_feats = new;
->          return;
->      }
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index b1e32e95d3..d4b2ce2e94 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -1122,7 +1122,7 @@ static int kvm_get_supported_msrs(KVMState *s)
->                      break;
->                  case MSR_IA32_XSS:
->                      has_msr_xss = true;
-> -                    break;;
-> +                    break;
->                  case HV_X64_MSR_CRASH_CTL:
->                      has_msr_hv_crash = true;
->                      break;
-> diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-> index 8db9fba26e..2b00cd2f35 100644
-> --- a/target/sh4/translate.c
-> +++ b/target/sh4/translate.c
-> @@ -679,7 +679,7 @@ static void _decode_opc(DisasContext * ctx)
->  	return;
->      case 0x6008:		/* swap.b Rm,Rn */
->  	{
-> -            TCGv low = tcg_temp_new();;
-> +            TCGv low = tcg_temp_new();
->  	    tcg_gen_ext16u_i32(low, REG(B7_4));
->  	    tcg_gen_bswap16_i32(low, low);
->              tcg_gen_deposit_i32(REG(B11_8), REG(B7_4), low, 0, 16);
+> +        if ((flags & RAM_SAVE_FLAG_MULTIFD_SYNC)
+> +            == RAM_SAVE_FLAG_MULTIFD_SYNC) {
+> +            multifd_flush();
+> +            flags = flags & ~RAM_SAVE_FLAG_ZERO;
+> +        }
+>          if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
+>                       RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE |
+>                       RAM_SAVE_FLAG_MULTIFD_PAGE)) {
+> -- 
+> 2.13.5
 > 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
