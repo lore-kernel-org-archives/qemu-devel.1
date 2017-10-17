@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e4UJT-0002jV-4Z
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:01:57 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1e4UK9-0003FY-Vl
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:02:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e4UJM-0002Ap-Ki
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:01:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:7162)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e4UJM-0002Af-C0
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:01:44 -0400
-Date: Tue, 17 Oct 2017 17:01:37 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171017160136.GF2326@work-vm>
-References: <1507202000-22469-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20171005111333eucas1p1c3c8d82ae9e35e6f4a6d610fbe375932@eucas1p1.samsung.com>
-	<1507202000-22469-4-git-send-email-a.perevalov@samsung.com>
+	(envelope-from <alindsay@codeaurora.org>) id 1e4UK4-0002Xe-1q
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:02:34 -0400
+Date: Tue, 17 Oct 2017 12:02:06 -0400
+From: Aaron Lindsay <alindsay@codeaurora.org>
+Message-ID: <20171017160206.GA22177@codeaurora.org>
+References: <1506737310-21880-1-git-send-email-alindsay@codeaurora.org>
+	<1506737310-21880-8-git-send-email-alindsay@codeaurora.org>
+	<CAFEAcA_1J2xZpnv9dNBeSH5ZvMvBujp3XHPK1SfypjFMU1OBSg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1507202000-22469-4-git-send-email-a.perevalov@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH v10 3/3] migration: add bitmap for received
- page
+In-Reply-To: <CAFEAcA_1J2xZpnv9dNBeSH5ZvMvBujp3XHPK1SfypjFMU1OBSg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 07/13] target/arm: Implement PMOVSSET
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,227 +24,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, i.maximets@samsung.com, heetae82.ahn@samsung.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Peter Crosthwaite <peter.crosthwaite@xilinx.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-* Alexey Perevalov (a.perevalov@samsung.com) wrote:
-> This patch adds ability to track down already received
-> pages, it's necessary for calculation vCPU block time in
-> postcopy migration feature, and for recovery after
-> postcopy migration failure.
+On Oct 17 15:19, Peter Maydell wrote:
+> On 30 September 2017 at 03:08, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+> > Also modify it to be stored as a uint64_t
+> >
+> > Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+> > ---
+> >  target/arm/cpu.h    |  2 +-
+> >  target/arm/helper.c | 27 ++++++++++++++++++++++++---
+> >  2 files changed, 25 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> > index 811b1fe..365a809 100644
+> > --- a/target/arm/cpu.h
+> > +++ b/target/arm/cpu.h
+> > @@ -325,7 +325,7 @@ typedef struct CPUARMState {
+> >          uint32_t c9_data;
+> >          uint64_t c9_pmcr; /* performance monitor control register */
+> >          uint64_t c9_pmcnten; /* perf monitor counter enables */
+> > -        uint32_t c9_pmovsr; /* perf monitor overflow status */
+> > +        uint64_t c9_pmovsr; /* perf monitor overflow status */
 > 
-> Also it's necessary to solve shared memory issue in
-> postcopy livemigration. Information about received pages
-> will be transferred to the software virtual bridge
-> (e.g. OVS-VSWITCHD), to avoid fallocate (unmap) for
-> already received pages. fallocate syscall is required for
-> remmaped shared memory, due to remmaping itself blocks
-> ioctl(UFFDIO_COPY, ioctl in this case will end with EEXIT
-> error (struct page is exists after remmap).
-> 
-> Bitmap is placed into RAMBlock as another postcopy/precopy
-> related bitmaps.
-> 
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> This is a bug fix, so it should go in its own patch. Specifically,
+> we already have an AArch64 sysreg PMOVSCLR_EL0 which has
+>       .fieldoffset = offsetof(CPUARMState, cp15.c9_pmovsr),
+> so we should have made the CPUARMState field 64 bits when we
+> added it. (I think without this bugfix reads of the AArch64
+> reg will return data from the adjoining field in the struct.)
 
-OK, I think we're finally there on this one!
+Okay, I'll split it off in v3.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> 
+> >          uint32_t c9_pmuserenr; /* perf monitor user enable */
+> >          uint64_t c9_pmselr; /* perf monitor counter selection register */
+> >          uint64_t c9_pminten; /* perf monitor interrupt enables */
+> > diff --git a/target/arm/helper.c b/target/arm/helper.c
+> > index 74e90c5..3932ac0 100644
+> > --- a/target/arm/helper.c
+> > +++ b/target/arm/helper.c
+> > @@ -1150,9 +1150,17 @@ static void pmcntenclr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> >  static void pmovsr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> >                           uint64_t value)
+> >  {
+> > +    value &= PMU_COUNTER_MASK(env);
+> >      env->cp15.c9_pmovsr &= ~value;
+> >  }
+> >
+> > +static void pmovsset_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> > +                         uint64_t value)
+> > +{
+> > +    value &= PMU_COUNTER_MASK(env);
+> > +    env->cp15.c9_pmovsr |= value;
+> > +}
+> > +
+> >  static void pmxevtyper_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> >                               uint64_t value)
+> >  {
+> > @@ -1317,10 +1325,10 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+> >        .fieldoffset = offsetof(CPUARMState, cp15.c9_pmcnten),
+> >        .writefn = pmcntenclr_write },
+> >      { .name = "PMOVSR", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 3,
+> > -      .access = PL0_RW, .fieldoffset = offsetof(CPUARMState, cp15.c9_pmovsr),
+> > -      .accessfn = pmreg_access,
+> > +      .access = PL0_RW, .accessfn = pmreg_access,
+> > +      .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pmovsr),
+> 
+> Is this just reshuffling the order of .field initializers?
 
-> ---
->  include/exec/ram_addr.h  | 10 ++++++++++
->  migration/postcopy-ram.c | 17 ++++++++++++-----
->  migration/ram.c          | 40 ++++++++++++++++++++++++++++++++++++++++
->  migration/ram.h          |  5 +++++
->  4 files changed, 67 insertions(+), 5 deletions(-)
+Also updated offsetof -> offsetoflow32. IIRC, I shuffled the order to
+match that of the surrounding registers and to appease my sense of
+order. Would you prefer that I don't shuffle them, or split that off as
+a separate patch?
+
+> >        .writefn = pmovsr_write,
+> > -      .raw_writefn = raw_write },
+> > +      .raw_writefn = raw_write, .resetvalue = 0 },
 > 
-> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-> index d017639..6cbc02a 100644
-> --- a/include/exec/ram_addr.h
-> +++ b/include/exec/ram_addr.h
-> @@ -47,6 +47,8 @@ struct RAMBlock {
->       * of the postcopy phase
->       */
->      unsigned long *unsentmap;
-> +    /* bitmap of already received pages in postcopy */
-> +    unsigned long *receivedmap;
->  };
->  
->  static inline bool offset_in_ramblock(RAMBlock *b, ram_addr_t offset)
-> @@ -60,6 +62,14 @@ static inline void *ramblock_ptr(RAMBlock *block, ram_addr_t offset)
->      return (char *)block->host + offset;
->  }
->  
-> +static inline unsigned long int ramblock_recv_bitmap_offset(void *host_addr,
-> +                                                            RAMBlock *rb)
-> +{
-> +    uint64_t host_addr_offset =
-> +            (uint64_t)(uintptr_t)(host_addr - (void *)rb->host);
-> +    return host_addr_offset >> TARGET_PAGE_BITS;
-> +}
-> +
->  long qemu_getrampagesize(void);
->  unsigned long last_ram_page(void);
->  RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index 8bf6432..bec6c2c 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -642,22 +642,28 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
->  }
->  
->  static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
-> -        void *from_addr, uint64_t pagesize)
-> +                               void *from_addr, uint64_t pagesize, RAMBlock *rb)
->  {
-> +    int ret;
->      if (from_addr) {
->          struct uffdio_copy copy_struct;
->          copy_struct.dst = (uint64_t)(uintptr_t)host_addr;
->          copy_struct.src = (uint64_t)(uintptr_t)from_addr;
->          copy_struct.len = pagesize;
->          copy_struct.mode = 0;
-> -        return ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
-> +        ret = ioctl(userfault_fd, UFFDIO_COPY, &copy_struct);
->      } else {
->          struct uffdio_zeropage zero_struct;
->          zero_struct.range.start = (uint64_t)(uintptr_t)host_addr;
->          zero_struct.range.len = pagesize;
->          zero_struct.mode = 0;
-> -        return ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
-> +        ret = ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
-> +    }
-> +    if (!ret) {
-> +        ramblock_recv_bitmap_set_range(rb, host_addr,
-> +                                       pagesize / qemu_target_page_size());
->      }
-> +    return ret;
->  }
->  
->  /*
-> @@ -674,7 +680,7 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
->       * which would be slightly cheaper, but we'd have to be careful
->       * of the order of updating our page state.
->       */
-> -    if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize)) {
-> +    if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize, rb)) {
->          int e = errno;
->          error_report("%s: %s copy host: %p from: %p (size: %zd)",
->                       __func__, strerror(e), host, from, pagesize);
-> @@ -696,7 +702,8 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
->      trace_postcopy_place_page_zero(host);
->  
->      if (qemu_ram_pagesize(rb) == getpagesize()) {
-> -        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, getpagesize())) {
-> +        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, getpagesize(),
-> +                                rb)) {
->              int e = errno;
->              error_report("%s: %s zero host: %p",
->                           __func__, strerror(e), host);
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 304ac59..c30db15 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -44,6 +44,7 @@
->  #include "qemu/error-report.h"
->  #include "trace.h"
->  #include "exec/ram_addr.h"
-> +#include "exec/target_page.h"
->  #include "qemu/rcu_queue.h"
->  #include "migration/colo.h"
->  #include "migration/block.h"
-> @@ -148,6 +149,35 @@ out:
->      return ret;
->  }
->  
-> +static void ramblock_recv_map_init(void)
-> +{
-> +    RAMBlock *rb;
-> +
-> +    RAMBLOCK_FOREACH(rb) {
-> +        assert(!rb->receivedmap);
-> +        rb->receivedmap = bitmap_new(rb->max_length >> qemu_target_page_bits());
-> +    }
-> +}
-> +
-> +int ramblock_recv_bitmap_test(RAMBlock *rb, void *host_addr)
-> +{
-> +    return test_bit(ramblock_recv_bitmap_offset(host_addr, rb),
-> +                    rb->receivedmap);
-> +}
-> +
-> +void ramblock_recv_bitmap_set(RAMBlock *rb, void *host_addr)
-> +{
-> +    set_bit_atomic(ramblock_recv_bitmap_offset(host_addr, rb), rb->receivedmap);
-> +}
-> +
-> +void ramblock_recv_bitmap_set_range(RAMBlock *rb, void *host_addr,
-> +                                    size_t nr)
-> +{
-> +    bitmap_set_atomic(rb->receivedmap,
-> +                      ramblock_recv_bitmap_offset(host_addr, rb),
-> +                      nr);
-> +}
-> +
->  /*
->   * An outstanding page request, on the source, having been received
->   * and queued
-> @@ -1999,6 +2029,8 @@ int ram_discard_range(const char *rbname, uint64_t start, size_t length)
->          goto err;
->      }
->  
-> +    bitmap_clear(rb->receivedmap, start >> qemu_target_page_bits(),
-> +                 length >> qemu_target_page_bits());
->      ret = ram_block_discard_range(rb, start, length);
->  
->  err:
-> @@ -2534,13 +2566,20 @@ static int ram_load_setup(QEMUFile *f, void *opaque)
->  {
->      xbzrle_load_setup();
->      compress_threads_load_setup();
-> +    ramblock_recv_map_init();
->      return 0;
->  }
->  
->  static int ram_load_cleanup(void *opaque)
->  {
-> +    RAMBlock *rb;
->      xbzrle_load_cleanup();
->      compress_threads_load_cleanup();
-> +
-> +    RAMBLOCK_FOREACH(rb) {
-> +        g_free(rb->receivedmap);
-> +        rb->receivedmap = NULL;
-> +    }
->      return 0;
->  }
->  
-> @@ -2755,6 +2794,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->                  ret = -EINVAL;
->                  break;
->              }
-> +            ramblock_recv_bitmap_set(block, host);
->              trace_ram_load_loop(block->idstr, (uint64_t)addr, flags, host);
->          }
->  
-> diff --git a/migration/ram.h b/migration/ram.h
-> index 4a72d66..3f5dd23 100644
-> --- a/migration/ram.h
-> +++ b/migration/ram.h
-> @@ -57,4 +57,9 @@ int ram_discard_range(const char *block_name, uint64_t start, size_t length);
->  int ram_postcopy_incoming_init(MigrationIncomingState *mis);
->  
->  void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
-> +
-> +int ramblock_recv_bitmap_test(RAMBlock *rb, void *host_addr);
-> +void ramblock_recv_bitmap_set(RAMBlock *rb, void *host_addr);
-> +void ramblock_recv_bitmap_set_range(RAMBlock *rb, void *host_addr, size_t nr);
-> +
->  #endif
-> -- 
-> 2.7.4
+> .resetvalue 0 is the default, but it doesn't hurt to specify it
+> explicitly I guess.
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >      { .name = "PMOVSCLR_EL0", .state = ARM_CP_STATE_AA64,
+> >        .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 12, .opc2 = 3,
+> >        .access = PL0_RW, .accessfn = pmreg_access,
+> > @@ -1328,6 +1336,19 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+> >        .fieldoffset = offsetof(CPUARMState, cp15.c9_pmovsr),
+> >        .writefn = pmovsr_write,
+> >        .raw_writefn = raw_write },
+> > +    { .name = "PMOVSSET", .cp = 15, .crn = 9, .crm = 14, .opc1 = 0, .opc2 = 3,
+> > +      .access = PL0_RW, .accessfn = pmreg_access,
+> > +      .type = ARM_CP_ALIAS,
+> > +      .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pmovsr),
+> > +      .writefn = pmovsset_write,
+> > +      .raw_writefn = raw_write },
+> > +    { .name = "PMOVSSET_EL0", .state = ARM_CP_STATE_AA64,
+> > +      .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 14, .opc2 = 3,
+> > +      .access = PL0_RW, .accessfn = pmreg_access,
+> > +      .type = ARM_CP_ALIAS,
+> > +      .fieldoffset = offsetof(CPUARMState, cp15.c9_pmovsr),
+> > +      .writefn = pmovsset_write,
+> > +      .raw_writefn = raw_write },
+> 
+> You can implement these using a single STATE_BOTH regdef, I think.
+> Also, there's a standard order for the fields which goes
+> .cp .opc0 .opc1 .crn .crm .opc2
+> (you can often omit the .cp as the default is 15).
+> 
+> We need to be a bit careful here, because the AArch32 PMMOVSET
+> register isn't implemented in ARMv7 until v7VE. So we need to
+> put the regdef somewhere else...
+
+Hmmm, what does it need to be protected by? I assume ARM_FEATURE_V8 ||
+(ARM_FEATURE_V7 && something), but I'm not familiar enough with v7 that
+it's immediately obvious from looking around what 'something' is.
+
+-Aaron
+
+> 
+> 
+> thanks
+> -- PMM
+
+-- 
+Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the
+Code Aurora Forum, a Linux Foundation Collaborative Project.
