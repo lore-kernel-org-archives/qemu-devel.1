@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4RKj-0004sh-Lq
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:50:58 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1e4ROO-0006pq-7y
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:54:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4RKg-0000PE-KL
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:50:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36880)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e4RKg-0000OQ-E9
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:50:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e4RKa-0004bZ-Vy
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 12:50:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D7E232E80DA
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 12:50:48 +0000 (UTC)
+	(envelope-from <eric.auger@redhat.com>) id 1e4ROK-00024S-3V
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 08:54:43 -0400
+References: <1506524205-20763-1-git-send-email-eric.auger@redhat.com>
+	<1506524205-20763-2-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA9P51hn60vYErotTBc9m4REq=fgfp0ZN18mFtoLLbS9ZQ@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <f2e21f58-f630-cbf4-904a-3d86d7c38d3f@redhat.com>
+Date: Tue, 17 Oct 2017 14:54:20 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 17 Oct 2017 12:37:41 -0000
-From: Bug <kewlubuntu@mailinator.com>
-Reply-To: Bug 1723984 <1723984@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150816671920.14146.15870333277151125380.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150824386110.17282.14555588089617790554.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1723984] Re: ID_MMFR0 has an invalid value on
- aarch64 cpu (A57, A53)
+In-Reply-To: <CAFEAcA9P51hn60vYErotTBc9m4REq=fgfp0ZN18mFtoLLbS9ZQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 1/3] hw/intc/arm_gicv3_its: Don't abort on
+ table save/restore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,42 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, wanghaibin.wang@huawei.com, Vijay Kilari <vijay.kilari@gmail.com>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, wu.wubin@huawei.com
 
-Oh I see. I didn't check older TRM since the ARM ARM was quite strict on th=
-e value, sorry.
-I'll read the MIDR to have a more robust code then. Thank you.
+Hi Peter,
+On 12/10/2017 13:54, Peter Maydell wrote:
+> On 27 September 2017 at 15:56, Eric Auger <eric.auger@redhat.com> wrote:
+>> The ITS is not properly reset at the moment. It is possible the
+>> GITS_BASER<n>.valid is set and the in-kernel ITS caches are not
+>> empty (list of devices, collections, LPIs) while data structures
+>> in guest RAM are invalid/inconsistent.
+>>
+>> For instance, this happens after a guest shutdown -r now or a
+>> system reset, if we save the state before the guest re-writes
+>> the ITS registers or map devices, the table save ioctl may
+>> produce a QEMU abort.
+>>
+>> Until there is a proper reset implemented, let's unplug the
+>> consistency error checking.
+>>
+>> The reset issue will be fixed in subsequent patches.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Reported-by: wanghaibin <wanghaibin.wang@huawei.com>
+> 
+> When in particular does this cause an abort -- when we're
+> trying to save the state in these edge cases, or when we're
+> trying to restore it?
+Both.
 
--- =
+After a guest reset, device GITS_BASER<n> may point to an L1 device
+table that is not valid anymore. In that case device table save IOTCL
+returned -EINVAL and we aborted.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1723984
+On restore we had a bug in case all data in the table is invalid. In
+that case as well we currently abort.
 
-Title:
-  ID_MMFR0 has an invalid value on aarch64 cpu (A57, A53)
+ What does the kernel do -- is it just
+> rejecting the attempt, or might it actually have done bad
+> things to guest memory ?
+On Save, in case the GITS_BASER points to an invalid linear device tree
+table but the page still corresponds to a visible gfn window, this
+memory could be overwritten by the kernel.
 
-Status in QEMU:
-  New
+Thanks
 
-Bug description:
-  The ID_MMFR0 register, accessed from aarch64 state as an invalid value:
-  - ARM ARM v8 documentation (D7.2 General system control registers) descri=
-bed bits AuxReg[23:20] to be
-    "In ARMv8-A the only permitted value is 0010"
-  - Cortex A53 and Cortex A57 TRM describe the value to be 0x10201105, so A=
-uxReg[23:20] is 0010 too
-  - in QEMU target/arm/cpu64.c, the relevant value is
-    cpu->id_mmfr0 =3D 0x10101105;
-
-  The 1 should be changed to 2.
-
-  Spotted & Tested on the following qemu revision:
-
-  commit 48ae1f60d8c9a770e6da64407984d84e25253c69
-  Merge: 78b62d3 b867eaa
-  Author: Peter Maydell <peter.maydell@linaro.org>
-  Date:   Mon Oct 16 14:28:13 2017 +0100
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1723984/+subscriptions
+Eric
+> 
+> thanks
+> -- PMM
+> 
