@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e4TwD-0004CB-Ns
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:37:50 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1e4TwE-0004CC-42
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:37:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1e4TwB-0005ja-HM
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:37:49 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:49723)
+	(envelope-from <richard.henderson@linaro.org>) id 1e4TwC-0005kI-UU
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:37:50 -0400
+Received: from mail-pf0-x22a.google.com ([2607:f8b0:400e:c00::22a]:44614)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1e4TwB-0005jJ-98
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:37:47 -0400
-Received: by mail-pf0-x243.google.com with SMTP id i5so1609315pfe.6
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 08:37:47 -0700 (PDT)
+	id 1e4TwC-0005k0-M2
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 11:37:48 -0400
+Received: by mail-pf0-x22a.google.com with SMTP id x7so1620398pfa.1
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 08:37:48 -0700 (PDT)
 Received: from cloudburst.twiddle.net (97-126-104-76.tukw.qwest.net.
 	[97.126.104.76]) by smtp.gmail.com with ESMTPSA id
-	y84sm20094415pff.158.2017.10.17.08.37.44 for <qemu-devel@nongnu.org>
+	y84sm20094415pff.158.2017.10.17.08.37.46 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 17 Oct 2017 08:37:45 -0700 (PDT)
+	Tue, 17 Oct 2017 08:37:46 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 17 Oct 2017 08:37:34 -0700
-Message-Id: <20171017153742.10026-2-richard.henderson@linaro.org>
+Date: Tue, 17 Oct 2017 08:37:35 -0700
+Message-Id: <20171017153742.10026-3-richard.henderson@linaro.org>
 In-Reply-To: <20171017153742.10026-1-richard.henderson@linaro.org>
 References: <20171017153742.10026-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 1/9] target/i386: Convert to disas_set_info
+Subject: [Qemu-devel] [PATCH v5 2/9] target/ppc: Convert to disas_set_info
  hook
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -42,134 +42,135 @@ Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- disas.c                 | 22 ++--------------------
- monitor.c               | 21 ---------------------
- target/i386/cpu.c       | 12 ++++++++++++
- target/i386/translate.c |  8 +-------
- 4 files changed, 15 insertions(+), 48 deletions(-)
+ disas.c                     | 33 ---------------------------------
+ monitor.c                   |  5 -----
+ target/ppc/translate.c      |  5 +----
+ target/ppc/translate_init.c | 21 +++++++++++++++++++++
+ 4 files changed, 22 insertions(+), 42 deletions(-)
 
 diff --git a/disas.c b/disas.c
-index d6a1eb9c8e..2be716fdb2 100644
+index 2be716fdb2..3a375a3b6c 100644
 --- a/disas.c
 +++ b/disas.c
-@@ -205,16 +205,7 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
+@@ -205,23 +205,6 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
          cc->disas_set_info(cpu, &s.info);
      }
  
--#if defined(TARGET_I386)
--    if (flags == 2) {
--        s.info.mach = bfd_mach_x86_64;
--    } else if (flags == 1) {
--        s.info.mach = bfd_mach_i386_i8086;
--    } else {
--        s.info.mach = bfd_mach_i386_i386;
+-#if defined(TARGET_PPC)
+-    if ((flags >> 16) & 1) {
+-        s.info.endian = BFD_ENDIAN_LITTLE;
 -    }
--    s.info.print_insn = print_insn_i386;
--#elif defined(TARGET_PPC)
-+#if defined(TARGET_PPC)
-     if ((flags >> 16) & 1) {
-         s.info.endian = BFD_ENDIAN_LITTLE;
+-    if (flags & 0xFFFF) {
+-        /* If we have a precise definition of the instruction set, use it. */
+-        s.info.mach = flags & 0xFFFF;
+-    } else {
+-#ifdef TARGET_PPC64
+-        s.info.mach = bfd_mach_ppc64;
+-#else
+-        s.info.mach = bfd_mach_ppc;
+-#endif
+-    }
+-    s.info.disassembler_options = (char *)"any";
+-    s.info.print_insn = print_insn_ppc;
+-#endif
+     if (s.info.print_insn == NULL) {
+         s.info.print_insn = print_insn_od_target;
      }
-@@ -390,16 +381,7 @@ void monitor_disas(Monitor *mon, CPUState *cpu,
+@@ -381,22 +364,6 @@ void monitor_disas(Monitor *mon, CPUState *cpu,
          cc->disas_set_info(cpu, &s.info);
      }
  
--#if defined(TARGET_I386)
--    if (flags == 2) {
--        s.info.mach = bfd_mach_x86_64;
--    } else if (flags == 1) {
--        s.info.mach = bfd_mach_i386_i8086;
+-#if defined(TARGET_PPC)
+-    if (flags & 0xFFFF) {
+-        /* If we have a precise definition of the instruction set, use it. */
+-        s.info.mach = flags & 0xFFFF;
 -    } else {
--        s.info.mach = bfd_mach_i386_i386;
+-#ifdef TARGET_PPC64
+-        s.info.mach = bfd_mach_ppc64;
+-#else
+-        s.info.mach = bfd_mach_ppc;
+-#endif
 -    }
--    s.info.print_insn = print_insn_i386;
--#elif defined(TARGET_PPC)
-+#if defined(TARGET_PPC)
-     if (flags & 0xFFFF) {
-         /* If we have a precise definition of the instruction set, use it. */
-         s.info.mach = flags & 0xFFFF;
+-    if ((flags >> 16) & 1) {
+-        s.info.endian = BFD_ENDIAN_LITTLE;
+-    }
+-    s.info.print_insn = print_insn_ppc;
+-#endif
+     if (!s.info.print_insn) {
+         monitor_printf(mon, "0x" TARGET_FMT_lx
+                        ": Asm output not supported on this arch\n", pc);
 diff --git a/monitor.c b/monitor.c
-index fe0d1bdbb4..a736ae9a81 100644
+index a736ae9a81..2164dfcc3b 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -1310,27 +1310,6 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
+@@ -1310,11 +1310,6 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
  
      if (format == 'i') {
          int flags = 0;
--#ifdef TARGET_I386
+-#ifdef TARGET_PPC
 -        CPUArchState *env = mon_get_cpu_env();
--        if (wsize == 2) {
--            flags = 1;
--        } else if (wsize == 4) {
--            flags = 0;
--        } else {
--            /* as default we use the current CS size */
--            flags = 0;
--            if (env) {
--#ifdef TARGET_X86_64
--                if ((env->efer & MSR_EFER_LMA) &&
--                    (env->segs[R_CS].flags & DESC_L_MASK))
--                    flags = 2;
--                else
+-        flags = msr_le << 16;
+-        flags |= env->bfd_mach;
 -#endif
--                if (!(env->segs[R_CS].flags & DESC_B_MASK))
--                    flags = 1;
--            }
--        }
--#endif
- #ifdef TARGET_PPC
-         CPUArchState *env = mon_get_cpu_env();
-         flags = msr_le << 16;
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 98732cd65f..13b2f8fbc5 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4097,6 +4097,17 @@ static bool x86_cpu_has_work(CPUState *cs)
-             !(env->hflags & HF_SMM_MASK));
+         monitor_disas(mon, cs, addr, count, is_physical, flags);
+         return;
+     }
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 606b605ba0..bc155f1036 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -7395,12 +7395,9 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
+ #if defined(DEBUG_DISAS)
+     if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
+         && qemu_log_in_addr_range(pc_start)) {
+-        int flags;
+-        flags = env->bfd_mach;
+-        flags |= ctx.le_mode << 16;
+         qemu_log_lock();
+         qemu_log("IN: %s\n", lookup_symbol(pc_start));
+-        log_target_disas(cs, pc_start, ctx.nip - pc_start, flags);
++        log_target_disas(cs, pc_start, ctx.nip - pc_start, 0);
+         qemu_log("\n");
+         qemu_log_unlock();
+     }
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index c6399a3a0d..2863e2c0b0 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -10681,6 +10681,26 @@ static gchar *ppc_gdb_arch_name(CPUState *cs)
+ #endif
  }
  
-+static void x86_disas_set_info(CPUState *cs, disassemble_info *info)
++static void ppc_disas_set_info(CPUState *cs, disassemble_info *info)
 +{
-+    X86CPU *cpu = X86_CPU(cs);
-+    CPUX86State *env = &cpu->env;
++    PowerPCCPU *cpu = POWERPC_CPU(cs);
++    CPUPPCState *env = &cpu->env;
 +
-+    info->mach = (env->hflags & HF_CS64_MASK ? bfd_mach_x86_64
-+                  : env->hflags & HF_CS32_MASK ? bfd_mach_i386_i386
-+                  : bfd_mach_i386_i8086);
-+    info->print_insn = print_insn_i386;
++    if ((env->hflags >> MSR_LE) & 1) {
++        info->endian = BFD_ENDIAN_LITTLE;
++    }
++    info->mach = env->bfd_mach;
++    if (!env->bfd_mach) {
++#ifdef TARGET_PPC64
++        info->mach = bfd_mach_ppc64;
++#else
++        info->mach = bfd_mach_ppc;
++#endif
++    }
++    info->disassembler_options = (char *)"any";
++    info->print_insn = print_insn_ppc;
 +}
 +
- static Property x86_cpu_properties[] = {
- #ifdef CONFIG_USER_ONLY
-     /* apic_id = 0 by default for *-user, see commit 9886e834 */
-@@ -4216,6 +4227,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
+ static Property ppc_cpu_properties[] = {
+     DEFINE_PROP_BOOL("pre-2.8-migration", PowerPCCPU, pre_2_8_migration, false),
+     DEFINE_PROP_BOOL("pre-2.10-migration", PowerPCCPU, pre_2_10_migration,
+@@ -10742,6 +10762,7 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
+ #ifndef CONFIG_USER_ONLY
+     cc->virtio_is_big_endian = ppc_cpu_is_big_endian;
  #endif
-     cc->cpu_exec_enter = x86_cpu_exec_enter;
-     cc->cpu_exec_exit = x86_cpu_exec_exit;
-+    cc->disas_set_info = x86_disas_set_info;
++    cc->disas_set_info = ppc_disas_set_info;
  
-     dc->user_creatable = true;
+     dc->fw_name = "PowerPC,UNKNOWN";
  }
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 5d61fa96ad..046fc5dfe2 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -8520,15 +8520,9 @@ static void i386_tr_disas_log(const DisasContextBase *dcbase,
-                               CPUState *cpu)
- {
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
--    int disas_flags = !dc->code32;
- 
-     qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
--#ifdef TARGET_X86_64
--    if (dc->code64) {
--        disas_flags = 2;
--    }
--#endif
--    log_target_disas(cpu, dc->base.pc_first, dc->base.tb->size, disas_flags);
-+    log_target_disas(cpu, dc->base.pc_first, dc->base.tb->size, 0);
- }
- 
- static const TranslatorOps i386_tr_ops = {
 -- 
 2.13.6
