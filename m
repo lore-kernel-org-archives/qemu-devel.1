@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39636)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e4P89-0006k6-Vb
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:29:50 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40625)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1e4PBu-00086h-4T
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:33:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e4P88-0005yj-W3
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:29:50 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:49417)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e4P88-0005yR-PX
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:29:48 -0400
-Received: by mail-wm0-x236.google.com with SMTP id b189so2850110wmd.4
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 03:29:48 -0700 (PDT)
+	(envelope-from <pl@kamp.de>) id 1e4PBp-0008Lq-8y
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:33:42 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:60023 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1e4PBo-0008KU-Vi
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:33:37 -0400
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <8e2160db-338f-f1dc-7f5e-8faa3dce7090@kamp.de>
+Date: Tue, 17 Oct 2017 12:33:33 +0200
 MIME-Version: 1.0
-In-Reply-To: <20171016151337.4121-1-groug@kaod.org>
-References: <20171016151337.4121-1-groug@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Oct 2017 11:29:27 +0100
-Message-ID: <CAFEAcA-zJufMH4WJFAoR0pTD75mR6n69wCH8SMQ39E65y5ubVA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/1] 9pfs patches for 2.11 20171016
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: [Qemu-devel] Clean Block Driver Shutdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +25,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 16 October 2017 at 16:13, Greg Kurz <groug@kaod.org> wrote:
-> The following changes since commit 40a1e8ac2e10155b5df13a2508ac080b00cd7e23:
->
->   Merge remote-tracking branch 'remotes/elmarco/tags/vu-pull-request' into staging (2017-10-16 10:22:39 +0100)
->
-> are available in the git repository at:
->
->   https://github.com/gkurz/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 7bd92756303f2158a68d5166264dc30139b813b6:
->
->   9pfs: use g_malloc0 to allocate space for xattr (2017-10-16 14:21:59 +0200)
->
-> ----------------------------------------------------------------
-> This fixes a potential data leak to the guest.
->
-> ----------------------------------------------------------------
-> Prasad J Pandit (1):
->       9pfs: use g_malloc0 to allocate space for xattr
+Hi,
 
-Applied, thanks.
+I noticed that Qemu quits at several points with an exit() if the supplied parameters in the commandline are incorrect.
+This at some stages happens after there have already been connections to storage backends established.
+These connections are not cleanly shut down in this case. For posix file backends that doesn't matter, but for other
+backends this leads to errors. E.g. iSCSI Targets log an aborted iSCSI connection due to tcp reset.
 
--- PMM
+I wonder what is the best way to fix this. A simply call to bdrv_close_all() in an atexit handler seems to work.
+But is this a good solution? Maybe register this handler only until the VM starts.
+Or do we need an atexit handler in each block driver that requires a clean shutdown?
+
+Thanks,
+Peter
