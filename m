@@ -1,19 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e4JOc-0008Rj-Te
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:29 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e4JOZ-0008MZ-4p
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e4JOY-00077J-Lm
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:26 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e4JOW-000732-LR
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:23 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 17 Oct 2017 15:21:46 +1100
-Message-Id: <20171017042152.29443-29-david@gibson.dropbear.id.au>
+Date: Tue, 17 Oct 2017 15:21:39 +1100
+Message-Id: <20171017042152.29443-22-david@gibson.dropbear.id.au>
 In-Reply-To: <20171017042152.29443-1-david@gibson.dropbear.id.au>
 References: <20171017042152.29443-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 28/34] ppc: pnv: drop PnvCoreClass::cpu_oc field
+Subject: [Qemu-devel] [PULL 21/34] ppc: spapr: use cpu type name directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,93 +24,128 @@ Cc: ehabkost@redhat.com, agraf@suse.de, imammedo@redhat.com, groug@kaod.org, qem
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-deduce cpu type directly from core type instead of
-maintaining type mapping in PnvCoreClass::cpu_oc and doing
-extra cpu_model parsing in pnv_core_class_init()
+replace sPAPRCPUCoreClass::cpu_class with cpu type name
+since it were needed just to get that at points it were
+accessed.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/pnv_core.c         | 18 ++++++++++++------
- include/hw/ppc/pnv_core.h |  1 -
- 2 files changed, 12 insertions(+), 7 deletions(-)
+ hw/ppc/spapr.c                  |  6 ++----
+ hw/ppc/spapr_cpu_core.c         | 14 ++++++--------
+ include/hw/ppc/spapr_cpu_core.h |  2 +-
+ target/ppc/kvm.c                |  2 +-
+ 4 files changed, 10 insertions(+), 14 deletions(-)
 
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index 85b39a5b5e..135d3fa29f 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -27,6 +27,16 @@
- #include "hw/ppc/pnv_xscom.h"
- #include "hw/ppc/xics.h"
-=20
-+static const char *pnv_core_cpu_typename(PnvCore *pc)
-+{
-+    const char *core_type =3D object_class_get_name(object_get_class(OBJ=
-ECT(pc)));
-+    int len =3D strlen(core_type) - strlen(PNV_CORE_TYPE_SUFFIX);
-+    char *s =3D g_strdup_printf(POWERPC_CPU_TYPE_NAME("%.*s"), len, core=
-_type);
-+    const char *cpu_type =3D object_class_get_name(object_class_by_name(=
-s));
-+    g_free(s);
-+    return cpu_type;
-+}
-+
- static void powernv_cpu_reset(void *opaque)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 112dd91348..2c32f33314 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3161,8 +3161,7 @@ void spapr_core_release(DeviceState *dev)
+     if (smc->pre_2_10_has_unused_icps) {
+         sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
+         sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
+-        const char *typename = object_class_get_name(scc->cpu_class);
+-        size_t size = object_type_get_instance_size(typename);
++        size_t size = object_type_get_instance_size(scc->cpu_type);
+         int i;
+ 
+         for (i = 0; i < cc->nr_threads; i++) {
+@@ -3258,8 +3257,7 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+ 
+     if (smc->pre_2_10_has_unused_icps) {
+         sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(cc));
+-        const char *typename = object_class_get_name(scc->cpu_class);
+-        size_t size = object_type_get_instance_size(typename);
++        size_t size = object_type_get_instance_size(scc->cpu_type);
+         int i;
+ 
+         for (i = 0; i < cc->nr_threads; i++) {
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 550d320b5b..9810697221 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -90,8 +90,7 @@ static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
  {
-     PowerPCCPU *cpu =3D opaque;
-@@ -148,8 +158,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
-**errp)
- {
-     PnvCore *pc =3D PNV_CORE(OBJECT(dev));
-     CPUCore *cc =3D CPU_CORE(OBJECT(dev));
--    PnvCoreClass *pcc =3D PNV_CORE_GET_CLASS(OBJECT(dev));
--    const char *typename =3D object_class_get_name(pcc->cpu_oc);
-+    const char *typename =3D pnv_core_cpu_typename(pc);
-     size_t size =3D object_type_get_instance_size(typename);
-     Error *local_err =3D NULL;
+     sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
+     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
+-    const char *typename = object_class_get_name(scc->cpu_class);
+-    size_t size = object_type_get_instance_size(typename);
++    size_t size = object_type_get_instance_size(scc->cpu_type);
+     CPUCore *cc = CPU_CORE(dev);
+     int i;
+ 
+@@ -152,8 +151,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+     sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
+     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
+     CPUCore *cc = CPU_CORE(OBJECT(dev));
+-    const char *typename = object_class_get_name(scc->cpu_class);
+-    size_t size = object_type_get_instance_size(typename);
++    size_t size;
+     Error *local_err = NULL;
      void *obj;
-@@ -211,11 +220,9 @@ static Property pnv_core_properties[] =3D {
- static void pnv_core_class_init(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(oc);
--    PnvCoreClass *pcc =3D PNV_CORE_CLASS(oc);
-=20
-     dc->realize =3D pnv_core_realize;
-     dc->props =3D pnv_core_properties;
--    pcc->cpu_oc =3D cpu_class_by_name(TYPE_POWERPC_CPU, data);
+     int i, j;
+@@ -164,6 +162,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
++    size = object_type_get_instance_size(scc->cpu_type);
+     sc->threads = g_malloc0(size * cc->nr_threads);
+     for (i = 0; i < cc->nr_threads; i++) {
+         char id[32];
+@@ -172,7 +171,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+ 
+         obj = sc->threads + i * size;
+ 
+-        object_initialize(obj, size, typename);
++        object_initialize(obj, size, scc->cpu_type);
+         cs = CPU(obj);
+         cpu = POWERPC_CPU(cs);
+         cs->cpu_index = cc->core_id + i;
+@@ -230,14 +229,13 @@ void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
+     dc->realize = spapr_cpu_core_realize;
+     dc->unrealize = spapr_cpu_core_unrealizefn;
+     dc->props = spapr_cpu_core_properties;
+-    scc->cpu_class = cpu_class_by_name(TYPE_POWERPC_CPU, data);
+-    g_assert(scc->cpu_class);
++    scc->cpu_type = data;
  }
-=20
- static const TypeInfo pnv_core_info =3D {
-@@ -223,6 +230,7 @@ static const TypeInfo pnv_core_info =3D {
-     .parent         =3D TYPE_CPU_CORE,
-     .instance_size  =3D sizeof(PnvCore),
-     .class_size     =3D sizeof(PnvCoreClass),
-+    .class_init =3D pnv_core_class_init,
-     .abstract       =3D true,
- };
-=20
-@@ -239,8 +247,6 @@ static void pnv_core_register_types(void)
-         TypeInfo ti =3D {
-             .parent =3D TYPE_PNV_CORE,
-             .instance_size =3D sizeof(PnvCore),
--            .class_init =3D pnv_core_class_init,
--            .class_data =3D (void *) pnv_core_models[i],
-         };
-         ti.name =3D pnv_core_typename(pnv_core_models[i]);
-         type_register(&ti);
-diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
-index 3360c4b12d..a336a1f18a 100644
---- a/include/hw/ppc/pnv_core.h
-+++ b/include/hw/ppc/pnv_core.h
-@@ -42,7 +42,6 @@ typedef struct PnvCore {
-=20
- typedef struct PnvCoreClass {
+ 
+ #define DEFINE_SPAPR_CPU_CORE_TYPE(cpu_model) \
+     {                                                   \
+         .parent = TYPE_SPAPR_CPU_CORE,                  \
+-        .class_data = (void *) cpu_model,               \
++        .class_data = (void *) POWERPC_CPU_TYPE_NAME(cpu_model), \
+         .class_init = spapr_cpu_core_class_init,        \
+         .name = SPAPR_CPU_CORE_TYPE_NAME(cpu_model),    \
+     }
+diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
+index 66dcf52587..264ce68785 100644
+--- a/include/hw/ppc/spapr_cpu_core.h
++++ b/include/hw/ppc/spapr_cpu_core.h
+@@ -34,7 +34,7 @@ typedef struct sPAPRCPUCore {
+ 
+ typedef struct sPAPRCPUCoreClass {
      DeviceClass parent_class;
--    ObjectClass *cpu_oc;
- } PnvCoreClass;
-=20
- #define PNV_CORE_TYPE_SUFFIX "-" TYPE_PNV_CORE
---=20
+-    ObjectClass *cpu_class;
++    const char *cpu_type;
+ } sPAPRCPUCoreClass;
+ 
+ char *spapr_get_cpu_core_type(const char *model);
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 171d3d8040..c2152ed52c 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2514,7 +2514,7 @@ static int kvm_ppc_register_host_cpu_type(void)
+     type_info.instance_size = sizeof(sPAPRCPUCore);
+     type_info.instance_init = NULL;
+     type_info.class_init = spapr_cpu_core_class_init;
+-    type_info.class_data = (void *) "host";
++    type_info.class_data = (void *) POWERPC_CPU_TYPE_NAME("host");
+     type_register(&type_info);
+     g_free((void *)type_info.name);
+ #endif
+-- 
 2.13.6
