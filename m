@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <carenas@gmail.com>) id 1e4VnF-0007IY-Tq
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 13:36:42 -0400
+	(envelope-from <bounces@canonical.com>) id 1e4WLu-0001HR-1J
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 14:12:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <carenas@gmail.com>) id 1e4VnE-0007y1-U2
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 13:36:41 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:51189)
+	(envelope-from <bounces@canonical.com>) id 1e4WLp-0007FG-3i
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 14:12:30 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35920)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <carenas@gmail.com>) id 1e4VnE-0007xm-Nc
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 13:36:40 -0400
-Received: by mail-wm0-x241.google.com with SMTP id u138so5370405wmu.5
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 10:36:40 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e4WLo-0007CH-TO
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 14:12:25 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e4WLj-0006Kg-Da
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 18:12:19 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C163C2E81B0
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 18:12:11 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <5496192f-4fef-ef16-2769-81a9d31775d7@vivier.eu>
-References: <20170925231924.31303-1-carenas@gmail.com>
-	<20170925231924.31303-2-carenas@gmail.com>
-	<20170925231924.31303-3-carenas@gmail.com>
-	<20170925231924.31303-4-carenas@gmail.com>
-	<20170925231924.31303-5-carenas@gmail.com>
-	<20170925231924.31303-6-carenas@gmail.com>
-	<20170925231924.31303-7-carenas@gmail.com>
-	<5496192f-4fef-ef16-2769-81a9d31775d7@vivier.eu>
-From: Carlo Arenas <carenas@gmail.com>
-Date: Tue, 17 Oct 2017 10:36:39 -0700
-Message-ID: <CAPUEspi9fL33R=mscXxYGfB55HWS9DqzYZN+Vdti2sccPsV16w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 6/6] linux_user: consolidate sock_type
+Date: Tue, 17 Oct 2017 17:33:49 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1723984 <1723984@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150816671920.14146.15870333277151125380.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150826162961.22673.16375484585142744365.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1723984] Re: ID_MMFR0 has an invalid value on
+ aarch64 cpu (A57, A53)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,42 +37,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, riku.voipio@iki.fi
+To: qemu-devel@nongnu.org
 
-On Wed, Oct 11, 2017 at 6:23 AM, Laurent Vivier <laurent@vivier.eu> wrote:
-> Le 26/09/2017 =C3=A0 01:19, Carlo Marcelo Arenas Bel=C3=B3n a =C3=A9crit =
-:
->> remove unnecessary sock_type enum and other unused surrounding code to
->> allow for per arch sockbits to mirror better linux headers for maintenan=
-ce
->>
->> Signed-off-by: Carlo Marcelo Arenas Bel=C3=B3n <carenas@gmail.com>
->> ---
->>  linux-user/alpha/sockbits.h | 36 ----------------------------
->>  linux-user/hppa/sockbits.h  | 30 -----------------------
->>  linux-user/mips/sockbits.h  | 35 ---------------------------
->>  linux-user/socket.h         | 58 ++++++++++++++++++++++----------------=
--------
->>  linux-user/sparc/sockbits.h | 35 ---------------------------
->>  5 files changed, 29 insertions(+), 165 deletions(-)
->
-> I think it's not a good idea to mix again what we have just unmixed.
+You shouldn't need to read the MIDR at all.
 
-do you object to the fact it was done in 2 steps (first moving out
-from socket.h and then added it back as a single block)?  it was done
-that way to reuse as much as possible the code that was already
-reviewed.
+There are two sensible strategies for software I think:
 
-the end result is the important part, though; and it is a sockbits.h
-for those 4 architectures (and a socket.h for the rest) that could be
-automatically generated or compared with the corresponding linux
-headers and therefore hopefully be easier to maintain going forward.
+ (1) trust the architectural statement that v8 implies that the AIFSR
+and ADFSR both exist -- AIUI both QEMU and the hardware implementations
+that report 0001 in this MMFR0 field do actually implement those
+registers, so this is safe.
 
-since we are going to redo the series anyway, could we get some
-discussion/agreement on the design of it?, have to admit I am a little
-surprised by all the patches flying by the list but not many
-conversations, and being new to qemu linux-user I think I could have
-benefited from it to avoid some of the mistakes made.
+ (2) read and pay attention to the AuxReg field, by handling 0001 as
+"only Auxiliary Control Register is supported, AIFSR and ADFSR are not
+supported". This will work fine too -- on implementations that report
+0001 you may be not using the AIFSR/ADFSR but that's ok because on those
+implementations they only RAZ/WI anyhow so you couldn't do anything
+interesting with them anyway.
 
-Carlo
+If your code is genuinely v8 only then (1) is easiest. If you also need
+to support ARMv7 then (2) is best, because 0001 is a permitted value in
+ID_MMFR0 for an ARMv7 implementation, so you need to handle it
+regardless of the A53/A57 behaviour.
+
+Neither approach requires detecting and special casing A53/A57 revisions
+via the MIDR.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1723984
+
+Title:
+  ID_MMFR0 has an invalid value on aarch64 cpu (A57, A53)
+
+Status in QEMU:
+  New
+
+Bug description:
+  The ID_MMFR0 register, accessed from aarch64 state as an invalid value:
+  - ARM ARM v8 documentation (D7.2 General system control registers) descri=
+bed bits AuxReg[23:20] to be
+    "In ARMv8-A the only permitted value is 0010"
+  - Cortex A53 and Cortex A57 TRM describe the value to be 0x10201105, so A=
+uxReg[23:20] is 0010 too
+  - in QEMU target/arm/cpu64.c, the relevant value is
+    cpu->id_mmfr0 =3D 0x10101105;
+
+  The 1 should be changed to 2.
+
+  Spotted & Tested on the following qemu revision:
+
+  commit 48ae1f60d8c9a770e6da64407984d84e25253c69
+  Merge: 78b62d3 b867eaa
+  Author: Peter Maydell <peter.maydell@linaro.org>
+  Date:   Mon Oct 16 14:28:13 2017 +0100
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1723984/+subscriptions
