@@ -1,36 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4SVT-0007I3-7c
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:06:13 -0400
+	(envelope-from <James.Hogan@imgtec.com>) id 1e4Sci-0004b2-Is
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:13:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4SVN-00053m-91
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:06:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53498
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1e4SVN-00053Z-2H
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:06:01 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9HE5dO9126713
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 10:05:56 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dnk890b2j-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 10:05:54 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 17 Oct 2017 15:05:05 +0100
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue, 17 Oct 2017 16:04:52 +0200
-In-Reply-To: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
-References: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
-Message-Id: <20171017140453.51099-7-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 6/7] s390x: refactor error handling for HSCH
- handler
+	(envelope-from <James.Hogan@imgtec.com>) id 1e4Sce-0000cN-Kb
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:13:36 -0400
+From: <james.hogan@imgtec.com>
+Date: Tue, 17 Oct 2017 15:13:11 +0100
+Message-ID: <20171017141311.22194-1-james.hogan@imgtec.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] Update James Hogan's email address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,124 +19,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: James Hogan <james.hogan@imgtec.com>, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>, qemu-trivial@nongnu.org
 
-Simplify the error handling of the HSCH.  Let the code detecting the
-condition tell (in a less ambiguous way) how it's to be handled. No
-changes in behavior.
+From: James Hogan <james.hogan@imgtec.com>
 
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Update my imgtec.com email address to my kernel.org one in MAINTAINERS
+as MIPS will soon no longer be part of Imagination Technologies, and add
+a mapping in .mailcap so get_maintainer.pl reports the right address.
+
+Signed-off-by: James Hogan <james.hogan@imgtec.com>
+Cc: Michael Tokarev <mjt@tls.msk.ru>
+Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 ---
- hw/s390x/css.c         | 18 +++++-------------
- include/hw/s390x/css.h |  2 +-
- target/s390x/ioinst.c  | 23 ++++-------------------
- 3 files changed, 10 insertions(+), 33 deletions(-)
+Changes in v2:
+- Use my imgtec address as the author / SoB (Laurent Vivier)
+---
+ .mailmap    | 1 +
+ MAINTAINERS | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 9935d48b72..b9e0329825 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -1451,28 +1451,24 @@ IOInstEnding css_do_csch(SubchDev *sch)
-     return do_subchannel_work(sch);
- }
+diff --git a/.mailmap b/.mailmap
+index 28defa1b2c57..5aec1bdf9f7d 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -8,6 +8,7 @@ Aurelien Jarno <aurelien@aurel32.net> aurel32 <aurel32@c046a42c-6fe2-441c-8c8c-7
+ Blue Swirl <blauwirbel@gmail.com> blueswir1 <blueswir1@c046a42c-6fe2-441c-8c8c-71466251a162>
+ Edgar E. Iglesias <edgar.iglesias@gmail.com> edgar_igl <edgar_igl@c046a42c-6fe2-441c-8c8c-71466251a162>
+ Fabrice Bellard <fabrice@bellard.org> bellard <bellard@c046a42c-6fe2-441c-8c8c-71466251a162>
++James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
+ Jocelyn Mayer <l_indien@magic.fr> j_mayer <j_mayer@c046a42c-6fe2-441c-8c8c-71466251a162>
+ Paul Brook <paul@codesourcery.com> pbrook <pbrook@c046a42c-6fe2-441c-8c8c-71466251a162>
+ Thiemo Seufer <ths@networkno.de> ths <ths@c046a42c-6fe2-441c-8c8c-71466251a162>
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 9522d1b621bd..b01f5c46ef83 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -284,7 +284,7 @@ S: Maintained
+ F: target/arm/kvm.c
  
--int css_do_hsch(SubchDev *sch)
-+IOInstEnding css_do_hsch(SubchDev *sch)
- {
-     SCSW *s = &sch->curr_status.scsw;
-     PMCW *p = &sch->curr_status.pmcw;
--    int ret;
+ MIPS
+-M: James Hogan <james.hogan@imgtec.com>
++M: James Hogan <jhogan@kernel.org>
+ S: Maintained
+ F: target/mips/kvm.c
  
-     if (~(p->flags) & (PMCW_FLAGS_MASK_DNV | PMCW_FLAGS_MASK_ENA)) {
--        ret = -ENODEV;
--        goto out;
-+        return IOINST_CC_NOT_OPERATIONAL;
-     }
- 
-     if (((s->ctrl & SCSW_CTRL_MASK_STCTL) == SCSW_STCTL_STATUS_PEND) ||
-         (s->ctrl & (SCSW_STCTL_PRIMARY |
-                     SCSW_STCTL_SECONDARY |
-                     SCSW_STCTL_ALERT))) {
--        ret = -EINPROGRESS;
--        goto out;
-+        return IOINST_CC_STATUS_PRESENT;
-     }
- 
-     if (s->ctrl & (SCSW_FCTL_HALT_FUNC | SCSW_FCTL_CLEAR_FUNC)) {
--        ret = -EBUSY;
--        goto out;
-+        return IOINST_CC_BUSY;
-     }
- 
-     /* Trigger the halt function. */
-@@ -1485,11 +1481,7 @@ int css_do_hsch(SubchDev *sch)
-     }
-     s->ctrl |= SCSW_ACTL_HALT_PEND;
- 
--    do_subchannel_work(sch);
--    ret = 0;
--
--out:
--    return ret;
-+    return do_subchannel_work(sch);
- }
- 
- static void css_update_chnmon(SubchDev *sch)
-diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-index f38c59c9b7..0c1efbae39 100644
---- a/include/hw/s390x/css.h
-+++ b/include/hw/s390x/css.h
-@@ -242,7 +242,7 @@ bool css_schid_final(int m, uint8_t cssid, uint8_t ssid, uint16_t schid);
- int css_do_msch(SubchDev *sch, const SCHIB *schib);
- IOInstEnding css_do_xsch(SubchDev *sch);
- IOInstEnding css_do_csch(SubchDev *sch);
--int css_do_hsch(SubchDev *sch);
-+IOInstEnding css_do_hsch(SubchDev *sch);
- IOInstEnding css_do_ssch(SubchDev *sch, ORB *orb);
- int css_do_tsch_get_irb(SubchDev *sch, IRB *irb, int *irb_len);
- void css_do_tsch_update_subch(SubchDev *sch);
-diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
-index fd659e77a5..8e4dacafd8 100644
---- a/target/s390x/ioinst.c
-+++ b/target/s390x/ioinst.c
-@@ -78,8 +78,6 @@ void ioinst_handle_hsch(S390CPU *cpu, uint64_t reg1)
- {
-     int cssid, ssid, schid, m;
-     SubchDev *sch;
--    int ret = -ENODEV;
--    int cc;
- 
-     if (ioinst_disassemble_sch_ident(reg1, &m, &cssid, &ssid, &schid)) {
-         program_interrupt(&cpu->env, PGM_OPERAND, 4);
-@@ -87,24 +85,11 @@ void ioinst_handle_hsch(S390CPU *cpu, uint64_t reg1)
-     }
-     trace_ioinst_sch_id("hsch", cssid, ssid, schid);
-     sch = css_find_subch(m, cssid, ssid, schid);
--    if (sch && css_subch_visible(sch)) {
--        ret = css_do_hsch(sch);
--    }
--    switch (ret) {
--    case -ENODEV:
--        cc = 3;
--        break;
--    case -EBUSY:
--        cc = 2;
--        break;
--    case 0:
--        cc = 0;
--        break;
--    default:
--        cc = 1;
--        break;
-+    if (!sch || !css_subch_visible(sch)) {
-+        setcc(cpu, 3);
-+        return;
-     }
--    setcc(cpu, cc);
-+    setcc(cpu, css_do_hsch(sch));
- }
- 
- static int ioinst_schib_valid(SCHIB *schib)
 -- 
-2.13.5
+2.14.1
