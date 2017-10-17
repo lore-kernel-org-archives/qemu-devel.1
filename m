@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47724)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4V1L-00032V-PW
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:47:12 -0400
+	id 1e4V1R-0003Eb-Ty
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:47:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4V1K-0003tS-TI
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:47:11 -0400
+	id 1e4V1O-0003us-DP
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:47:18 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 17 Oct 2017 13:44:24 -0300
-Message-Id: <20171017164426.25277-41-f4bug@amsat.org>
+Date: Tue, 17 Oct 2017 13:44:25 -0300
+Message-Id: <20171017164426.25277-42-f4bug@amsat.org>
 In-Reply-To: <20171017164426.25277-1-f4bug@amsat.org>
 References: <20171017164426.25277-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 40/42] i386/pc: move vmport.c to hw/i386/
+Subject: [Qemu-devel] [PATCH v3 41/42] i386/pc: move vmmouse.c to hw/i386/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,40 +34,39 @@ in the shared misc folder.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/{misc => i386}/vmport.c | 0
- hw/i386/Makefile.objs      | 1 +
- hw/misc/Makefile.objs      | 2 --
- 3 files changed, 1 insertion(+), 2 deletions(-)
- rename hw/{misc => i386}/vmport.c (100%)
+ hw/{input => i386}/vmmouse.c | 0
+ hw/i386/Makefile.objs        | 1 +
+ hw/input/Makefile.objs       | 1 -
+ 3 files changed, 1 insertion(+), 1 deletion(-)
+ rename hw/{input => i386}/vmmouse.c (100%)
 
-diff --git a/hw/misc/vmport.c b/hw/i386/vmport.c
+diff --git a/hw/input/vmmouse.c b/hw/i386/vmmouse.c
 similarity index 100%
-rename from hw/misc/vmport.c
-rename to hw/i386/vmport.c
+rename from hw/input/vmmouse.c
+rename to hw/i386/vmmouse.c
 diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
-index 909ead6a77..64a461c929 100644
+index 64a461c929..e15f26291e 100644
 --- a/hw/i386/Makefile.objs
 +++ b/hw/i386/Makefile.objs
-@@ -5,6 +5,7 @@ obj-y += pc_sysfw.o
- obj-y += x86-iommu.o intel_iommu.o
+@@ -6,6 +6,7 @@ obj-y += x86-iommu.o intel_iommu.o
  obj-y += amd_iommu.o
  obj-$(CONFIG_XEN) += ../xenpv/ xen/
-+obj-$(CONFIG_VMPORT) += vmport.o
+ obj-$(CONFIG_VMPORT) += vmport.o
++obj-$(CONFIG_VMMOUSE) += vmmouse.o
  
  obj-y += kvmvapic.o
  obj-y += acpi-build.o
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 19202d90cf..03bc758592 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -11,8 +11,6 @@ common-obj-$(CONFIG_EDU) += edu.o
- common-obj-y += unimp.o
- common-obj-y += vmcoreinfo.o
+diff --git a/hw/input/Makefile.objs b/hw/input/Makefile.objs
+index 7715d7230d..636f794b6b 100644
+--- a/hw/input/Makefile.objs
++++ b/hw/input/Makefile.objs
+@@ -6,7 +6,6 @@ common-obj-$(CONFIG_PL050) += pl050.o
+ common-obj-y += ps2.o
+ common-obj-$(CONFIG_STELLARIS_INPUT) += stellaris_input.o
+ common-obj-$(CONFIG_TSC2005) += tsc2005.o
+-common-obj-$(CONFIG_VMMOUSE) += vmmouse.o
  
--obj-$(CONFIG_VMPORT) += vmport.o
--
- # ARM devices
- common-obj-$(CONFIG_PL310) += arm_l2x0.o
- common-obj-$(CONFIG_INTEGRATOR_DEBUG) += arm_integrator_debug.o
+ common-obj-$(CONFIG_VIRTIO) += virtio-input.o
+ common-obj-$(CONFIG_VIRTIO) += virtio-input-hid.o
 -- 
 2.15.0.rc0
