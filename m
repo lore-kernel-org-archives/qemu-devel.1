@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4SVC-000738-Vc
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:05:51 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4SVT-0007I3-7c
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:06:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4SV7-0004xg-2u
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:05:50 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49876)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4SVN-00053m-91
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:06:07 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53498
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1e4SV6-0004xF-Qp
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:05:45 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	id 1e4SVN-00053Z-2H
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:06:01 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9HE5WdP039757
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 10:05:41 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2dnk4w0r83-1
+	v9HE5dO9126713
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 10:05:56 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2dnk890b2j-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 10:05:39 -0400
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 10:05:54 -0400
 Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 17 Oct 2017 15:05:00 +0100
+	Tue, 17 Oct 2017 15:05:05 +0100
 From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue, 17 Oct 2017 16:04:48 +0200
+Date: Tue, 17 Oct 2017 16:04:52 +0200
 In-Reply-To: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
 References: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
-Message-Id: <20171017140453.51099-3-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 2/7] s390x/css: IO instr handler ending
- control
+Message-Id: <20171017140453.51099-7-pasic@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 6/7] s390x: refactor error handling for HSCH
+ handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,47 +42,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 Cc: Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-CSS code needs to tell the IO instruction handlers located in how should
-the emulated instruction be ended. Currently this is done by returning
-generic (POSIX) error codes, and mapping them to outcomes like condition
-codes. This makes bugs easy to create and hard to recognise.
-
-As a preparation for moving a way form (mis)using generic error codes for
-flow control let us introduce a type which tells the instruction
-handler function how to end the instruction, in a more straight-forward
-and less ambiguous way.
+Simplify the error handling of the HSCH.  Let the code detecting the
+condition tell (in a less ambiguous way) how it's to be handled. No
+changes in behavior.
 
 Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 ---
- include/hw/s390x/css.h | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ hw/s390x/css.c         | 18 +++++-------------
+ include/hw/s390x/css.h |  2 +-
+ target/s390x/ioinst.c  | 23 ++++-------------------
+ 3 files changed, 10 insertions(+), 33 deletions(-)
 
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 9935d48b72..b9e0329825 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -1451,28 +1451,24 @@ IOInstEnding css_do_csch(SubchDev *sch)
+     return do_subchannel_work(sch);
+ }
+ 
+-int css_do_hsch(SubchDev *sch)
++IOInstEnding css_do_hsch(SubchDev *sch)
+ {
+     SCSW *s = &sch->curr_status.scsw;
+     PMCW *p = &sch->curr_status.pmcw;
+-    int ret;
+ 
+     if (~(p->flags) & (PMCW_FLAGS_MASK_DNV | PMCW_FLAGS_MASK_ENA)) {
+-        ret = -ENODEV;
+-        goto out;
++        return IOINST_CC_NOT_OPERATIONAL;
+     }
+ 
+     if (((s->ctrl & SCSW_CTRL_MASK_STCTL) == SCSW_STCTL_STATUS_PEND) ||
+         (s->ctrl & (SCSW_STCTL_PRIMARY |
+                     SCSW_STCTL_SECONDARY |
+                     SCSW_STCTL_ALERT))) {
+-        ret = -EINPROGRESS;
+-        goto out;
++        return IOINST_CC_STATUS_PRESENT;
+     }
+ 
+     if (s->ctrl & (SCSW_FCTL_HALT_FUNC | SCSW_FCTL_CLEAR_FUNC)) {
+-        ret = -EBUSY;
+-        goto out;
++        return IOINST_CC_BUSY;
+     }
+ 
+     /* Trigger the halt function. */
+@@ -1485,11 +1481,7 @@ int css_do_hsch(SubchDev *sch)
+     }
+     s->ctrl |= SCSW_ACTL_HALT_PEND;
+ 
+-    do_subchannel_work(sch);
+-    ret = 0;
+-
+-out:
+-    return ret;
++    return do_subchannel_work(sch);
+ }
+ 
+ static void css_update_chnmon(SubchDev *sch)
 diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-index 69b374730e..7e0dbd162f 100644
+index f38c59c9b7..0c1efbae39 100644
 --- a/include/hw/s390x/css.h
 +++ b/include/hw/s390x/css.h
-@@ -99,6 +99,22 @@ typedef struct CcwDataStream {
-     hwaddr cda;
- } CcwDataStream;
+@@ -242,7 +242,7 @@ bool css_schid_final(int m, uint8_t cssid, uint8_t ssid, uint16_t schid);
+ int css_do_msch(SubchDev *sch, const SCHIB *schib);
+ IOInstEnding css_do_xsch(SubchDev *sch);
+ IOInstEnding css_do_csch(SubchDev *sch);
+-int css_do_hsch(SubchDev *sch);
++IOInstEnding css_do_hsch(SubchDev *sch);
+ IOInstEnding css_do_ssch(SubchDev *sch, ORB *orb);
+ int css_do_tsch_get_irb(SubchDev *sch, IRB *irb, int *irb_len);
+ void css_do_tsch_update_subch(SubchDev *sch);
+diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
+index fd659e77a5..8e4dacafd8 100644
+--- a/target/s390x/ioinst.c
++++ b/target/s390x/ioinst.c
+@@ -78,8 +78,6 @@ void ioinst_handle_hsch(S390CPU *cpu, uint64_t reg1)
+ {
+     int cssid, ssid, schid, m;
+     SubchDev *sch;
+-    int ret = -ENODEV;
+-    int cc;
  
-+/*
-+ * IO instructions conclude according this. Currently we have only
-+ * cc codes. Valid values are 0,1,2,3 and the generic semantic for
-+ * IO instructions is described briefly. For more details consult the PoP.
-+ */
-+typedef enum IOInstEnding {
-+    /* produced expected result */
-+    IOINST_CC_EXPECTED = 0,
-+    /* status conditions were present or produced alternate result */
-+    IOINST_CC_STATUS_PRESENT = 1,
-+    /* inst. ineffective because busy with previously initiated function */
-+    IOINST_CC_BUSY = 2,
-+    /* inst. ineffective because not operational */
-+    IOINST_CC_NOT_OPERATIONAL = 3
-+} IOInstEnding;
-+
- typedef struct SubchDev SubchDev;
- struct SubchDev {
-     /* channel-subsystem related things: */
+     if (ioinst_disassemble_sch_ident(reg1, &m, &cssid, &ssid, &schid)) {
+         program_interrupt(&cpu->env, PGM_OPERAND, 4);
+@@ -87,24 +85,11 @@ void ioinst_handle_hsch(S390CPU *cpu, uint64_t reg1)
+     }
+     trace_ioinst_sch_id("hsch", cssid, ssid, schid);
+     sch = css_find_subch(m, cssid, ssid, schid);
+-    if (sch && css_subch_visible(sch)) {
+-        ret = css_do_hsch(sch);
+-    }
+-    switch (ret) {
+-    case -ENODEV:
+-        cc = 3;
+-        break;
+-    case -EBUSY:
+-        cc = 2;
+-        break;
+-    case 0:
+-        cc = 0;
+-        break;
+-    default:
+-        cc = 1;
+-        break;
++    if (!sch || !css_subch_visible(sch)) {
++        setcc(cpu, 3);
++        return;
+     }
+-    setcc(cpu, cc);
++    setcc(cpu, css_do_hsch(sch));
+ }
+ 
+ static int ioinst_schib_valid(SCHIB *schib)
 -- 
 2.13.5
