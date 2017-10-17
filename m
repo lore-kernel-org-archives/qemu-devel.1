@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e4SIR-00044G-9s
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:52:41 -0400
+	(envelope-from <vincent.siles@gmail.com>) id 1e4OfC-0002RQ-Ks
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:59:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1e4SIQ-0006p3-1K
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:52:39 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:54417)
+	(envelope-from <vincent.siles@gmail.com>) id 1e4OfB-0004pq-Gt
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:59:54 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:47060)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1e4SIP-0006mi-PZ
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:52:37 -0400
-Received: by mail-wm0-x230.google.com with SMTP id i124so4114398wmf.3
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 06:52:37 -0700 (PDT)
+	(Exim 4.71) (envelope-from <vincent.siles@gmail.com>)
+	id 1e4OfB-0004mw-7T
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:59:53 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id m72so2711983wmc.1
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 02:59:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1506737310-21880-6-git-send-email-alindsay@codeaurora.org>
-References: <1506737310-21880-1-git-send-email-alindsay@codeaurora.org>
-	<1506737310-21880-6-git-send-email-alindsay@codeaurora.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Oct 2017 14:52:15 +0100
-Message-ID: <CAFEAcA8iTXQC6JtimEwS1ZpU5TYc3XyfSnX=W2J2orJ25ugpZA@mail.gmail.com>
+From: Vincent <vincent.siles@gmail.com>
+Date: Tue, 17 Oct 2017 11:59:49 +0200
+Message-ID: <CADNVbF9yTBsJ_nxAXGsgY7UoMWvNb1LBOuPzetfZniMCHfBaRw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 05/13] target/arm: Allow AArch32 access for
- PMCCFILTR
+Subject: [Qemu-devel] Issue with qemu using EL3 aarch64 and EL1/0 secure in
+ aarch32 short descriptors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aaron Lindsay <alindsay@codeaurora.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Peter Crosthwaite <peter.crosthwaite@xilinx.com>, Wei Huang <wei@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
+To: qemu-devel@nongnu.org
 
-On 30 September 2017 at 03:08, Aaron Lindsay <alindsay@codeaurora.org> wrote:
-> Also fix the existing bitmask for writes.
+Hi !
+I'm porting a secure monitor & secure kernel from an ARMv7a context to
+ARMv8,
+using QEMU 'virt' configuration.
 
-"Also" in a commit message can often be translated as
-"This should really go in a separate commit, but" :-)
+My current working setup is the following:
 
-> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
-> ---
->  target/arm/helper.c | 23 ++++++++++++++++++++++-
->  1 file changed, 22 insertions(+), 1 deletion(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 54070a3..fcc2fcf 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -1059,10 +1059,25 @@ static void pmccfiltr_write(CPUARMState *env, const ARMCPRegInfo *ri,
->                              uint64_t value)
->  {
->      pmccntr_sync(env);
-> -    env->cp15.pmccfiltr_el0 = value & 0x7E000000;
-> +    env->cp15.pmccfiltr_el0 = value & 0xfc000000;
->      pmccntr_sync(env);
->  }
->
-> +static void pmccfiltr_write_a32(CPUARMState *env, const ARMCPRegInfo *ri,
-> +                            uint64_t value)
-> +{
-> +    pmccntr_sync(env);
-> +    env->cp15.pmccfiltr_el0 = (env->cp15.pmccfiltr_el0 & 0x04000000) |
-> +        (value & 0xf8000000); /* M is not visible in AArch32 */
 
-I think the comment would look better on its own line.
+- secure monitor at aarch64 EL3, without MMU enabled
+- secure kernel and applications at aarch32 EL1S/EL0S, with MMU enabled
+(LPAE or
+not)
 
-> +    pmccntr_sync(env);
-> +}
 
-I think we could probably benefit from defining constants for
-the bit names in this register.
+I'm working on activating the MMU for the secure monitor, and I'm facing
+the following issue: as soon as I update the TCR_EL3 register (even if I
+don't actually turn the MMU on by updating SCTLR_EL3), my secure kernel
+is OK, but my secure applications using short descriptors always trigger
+prefetch abort on the first instruction. LPAE seems to work fine.
 
-> +
-> +static uint64_t pmccfiltr_read_a32(CPUARMState *env, const ARMCPRegInfo *ri)
-> +{
-> +    /* M is not visible in AArch32 */
-> +    return env->cp15.pmccfiltr_el0 & 0xf8000000;
-> +}
-> +
->  static void pmcntenset_write(CPUARMState *env, const ARMCPRegInfo *ri,
->                              uint64_t value)
->  {
-> @@ -1280,6 +1295,12 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
->        .type = ARM_CP_IO,
->        .readfn = pmccntr_read, .writefn = pmccntr_write, },
->  #endif
-> +    { .name = "PMCCFILTR", .cp = 15, .opc1 = 0, .crn = 14, .crm = 15, .opc2 = 7,
-> +      .writefn = pmccfiltr_write_a32, .readfn = pmccfiltr_read_a32,
-> +      .access = PL0_RW, .accessfn = pmreg_access,
-> +      .type = ARM_CP_ALIAS,
-> +      .fieldoffset = offsetoflow32(CPUARMState, cp15.pmccfiltr_el0),
-> +      .resetvalue = 0, },
->      { .name = "PMCCFILTR_EL0", .state = ARM_CP_STATE_AA64,
->        .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 15, .opc2 = 7,
->        .writefn = pmccfiltr_write,
+I tested the exact same code on ARM's foundation simulator, and the
+short descriptor scenario is working fine, so I think there is an issue
+in the management of the TCR_EL3 register, when working with EL1/EL0
+aarch32 - short descriptor.
 
-If you're defining both a .readfn and a .writefn for a register
-you don't need to provide a .fieldoffset.
+The issue seems related to [1] and [2].
 
-thanks
--- PMM
+Unfortunately I can't provide you yet with a small reproducible example, as
+I can't advertise
+our secure monitor or secure kernel code. If that's absolutely necessary,
+I'll try to provide some
+minimal code, but it's going to take some time.
+
+For the record, I'm currently using qemu:
+
+url = https://github.com/qemu/qemu.git
+commit 48ae1f60d8c9a770e6da64407984d84e25253c69
+Merge: 78b62d3 b867eaa
+Author: Peter Maydell <peter.maydell@linaro.org>
+Date:   Mon Oct 16 14:28:13 2017 +0100
+
+Best,
+V.
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2016-06/msg02514.html
+[2] https://lists.gnu.org/archive/html/qemu-devel/2016-06/msg02506.html
