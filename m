@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e4RzR-0006DX-Cy
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:33:07 -0400
+	(envelope-from <thuth@redhat.com>) id 1e4RzT-0006FC-6o
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:33:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e4RzN-0003Ta-DT
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:33:01 -0400
+	(envelope-from <thuth@redhat.com>) id 1e4RzQ-0003V6-J7
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:33:03 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 17 Oct 2017 15:32:24 +0200
-Message-Id: <1508247148-25240-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/4] Improve the CPU hot plug tests
+Date: Tue, 17 Oct 2017 15:32:25 +0200
+Message-Id: <1508247148-25240-2-git-send-email-thuth@redhat.com>
+In-Reply-To: <1508247148-25240-1-git-send-email-thuth@redhat.com>
+References: <1508247148-25240-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/4] tests: Rename pc-cpu-test.c to
+ cpu-plug-test.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,22 +23,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, david@redhat.com
 
-So far the CPU hot-plug qtest was only checking "cpu-add" on x86. With
-these patches, we now test "device_add" for hot-plugging CPUs on x86,
-and enable the test on ppc64 and s390x, too.
+The test will be extended to work on other architectures, too, so let's
+use a more generic name for the file and the functions in here first.
 
-Thomas Huth (4):
-  tests: Rename pc-cpu-test.c to cpu-plug-test.c
-  tests/cpu-plug-test: Check the CPU hot-plugging with device_add, too
-  tests/cpu-plug-test: Check CPU hot-plugging on ppc64, too
-  tests/cpu-plug-test: Test CPU hot-plugging on s390x
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/Makefile.include                   |  4 ++--
+ tests/{pc-cpu-test.c => cpu-plug-test.c} | 24 ++++++++++++------------
+ 2 files changed, 14 insertions(+), 14 deletions(-)
+ rename tests/{pc-cpu-test.c => cpu-plug-test.c} (87%)
 
- tests/Makefile.include |   6 +-
- tests/cpu-plug-test.c  | 261 +++++++++++++++++++++++++++++++++++++++++++++++++
- tests/pc-cpu-test.c    | 135 -------------------------
- 3 files changed, 265 insertions(+), 137 deletions(-)
- create mode 100644 tests/cpu-plug-test.c
- delete mode 100644 tests/pc-cpu-test.c
-
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 4ca15e6..3d7e814 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -276,7 +276,7 @@ gcov-files-i386-y += hw/usb/dev-hid.c
+ gcov-files-i386-y += hw/usb/dev-storage.c
+ check-qtest-i386-y += tests/usb-hcd-xhci-test$(EXESUF)
+ gcov-files-i386-y += hw/usb/hcd-xhci.c
+-check-qtest-i386-y += tests/pc-cpu-test$(EXESUF)
++check-qtest-i386-y += tests/cpu-plug-test$(EXESUF)
+ check-qtest-i386-y += tests/q35-test$(EXESUF)
+ check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
+ gcov-files-i386-y += hw/pci-host/q35.c
+@@ -780,7 +780,7 @@ tests/usb-hcd-ohci-test$(EXESUF): tests/usb-hcd-ohci-test.o $(libqos-usb-obj-y)
+ tests/usb-hcd-uhci-test$(EXESUF): tests/usb-hcd-uhci-test.o $(libqos-usb-obj-y)
+ tests/usb-hcd-ehci-test$(EXESUF): tests/usb-hcd-ehci-test.o $(libqos-usb-obj-y)
+ tests/usb-hcd-xhci-test$(EXESUF): tests/usb-hcd-xhci-test.o $(libqos-usb-obj-y)
+-tests/pc-cpu-test$(EXESUF): tests/pc-cpu-test.o
++tests/cpu-plug-test$(EXESUF): tests/cpu-plug-test.o
+ tests/postcopy-test$(EXESUF): tests/postcopy-test.o
+ tests/vhost-user-test$(EXESUF): tests/vhost-user-test.o $(test-util-obj-y) \
+ 	$(qtest-obj-y) $(test-io-obj-y) $(libqos-virtio-obj-y) $(libqos-pc-obj-y) \
+diff --git a/tests/pc-cpu-test.c b/tests/cpu-plug-test.c
+similarity index 87%
+rename from tests/pc-cpu-test.c
+rename to tests/cpu-plug-test.c
+index 11d3e81..4579119 100644
+--- a/tests/pc-cpu-test.c
++++ b/tests/cpu-plug-test.c
+@@ -1,5 +1,5 @@
+ /*
+- * QTest testcase for PC CPUs
++ * QTest testcase for CPU plugging
+  *
+  * Copyright (c) 2015 SUSE Linux GmbH
+  *
+@@ -13,7 +13,7 @@
+ #include "libqtest.h"
+ #include "qapi/qmp/types.h"
+ 
+-struct PCTestData {
++struct PlugTestData {
+     char *machine;
+     const char *cpu_model;
+     unsigned sockets;
+@@ -21,11 +21,11 @@ struct PCTestData {
+     unsigned threads;
+     unsigned maxcpus;
+ };
+-typedef struct PCTestData PCTestData;
++typedef struct PlugTestData PlugTestData;
+ 
+-static void test_pc_with_cpu_add(gconstpointer data)
++static void test_plug_with_cpu_add(gconstpointer data)
+ {
+-    const PCTestData *s = data;
++    const PlugTestData *s = data;
+     char *args;
+     QDict *response;
+     unsigned int i;
+@@ -48,9 +48,9 @@ static void test_pc_with_cpu_add(gconstpointer data)
+     g_free(args);
+ }
+ 
+-static void test_pc_without_cpu_add(gconstpointer data)
++static void test_plug_without_cpu_add(gconstpointer data)
+ {
+-    const PCTestData *s = data;
++    const PlugTestData *s = data;
+     char *args;
+     QDict *response;
+ 
+@@ -73,7 +73,7 @@ static void test_pc_without_cpu_add(gconstpointer data)
+ 
+ static void test_data_free(gpointer data)
+ {
+-    PCTestData *pc = data;
++    PlugTestData *pc = data;
+ 
+     g_free(pc->machine);
+     g_free(pc);
+@@ -82,12 +82,12 @@ static void test_data_free(gpointer data)
+ static void add_pc_test_case(const char *mname)
+ {
+     char *path;
+-    PCTestData *data;
++    PlugTestData *data;
+ 
+     if (!g_str_has_prefix(mname, "pc-")) {
+         return;
+     }
+-    data = g_new(PCTestData, 1);
++    data = g_new(PlugTestData, 1);
+     data->machine = g_strdup(mname);
+     data->cpu_model = "Haswell"; /* 1.3+ theoretically */
+     data->sockets = 1;
+@@ -108,14 +108,14 @@ static void add_pc_test_case(const char *mname)
+         path = g_strdup_printf("cpu/%s/init/%ux%ux%u&maxcpus=%u",
+                                mname, data->sockets, data->cores,
+                                data->threads, data->maxcpus);
+-        qtest_add_data_func_full(path, data, test_pc_without_cpu_add,
++        qtest_add_data_func_full(path, data, test_plug_without_cpu_add,
+                                  test_data_free);
+         g_free(path);
+     } else {
+         path = g_strdup_printf("cpu/%s/add/%ux%ux%u&maxcpus=%u",
+                                mname, data->sockets, data->cores,
+                                data->threads, data->maxcpus);
+-        qtest_add_data_func_full(path, data, test_pc_with_cpu_add,
++        qtest_add_data_func_full(path, data, test_plug_with_cpu_add,
+                                  test_data_free);
+         g_free(path);
+     }
 -- 
 1.8.3.1
