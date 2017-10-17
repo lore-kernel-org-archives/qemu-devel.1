@@ -1,24 +1,49 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e4PlF-0002PY-Ua
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:10:17 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4PmF-0002wu-4H
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:11:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e4PlA-00071V-So
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:10:13 -0400
-References: <20171017001209.32276-1-f4bug@amsat.org>
-	<20171017001209.32276-31-f4bug@amsat.org>
-	<44b57d76-6d10-84c8-3a13-cdac7331c5d9@redhat.com>
-	<47c7b41d-23ff-3dd1-9c07-69bd5df08685@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d1f23a08-364b-b9c3-fec1-495ce9ce9e47@redhat.com>
-Date: Tue, 17 Oct 2017 13:09:54 +0200
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4PmA-0007ax-KW
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:11:15 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48988
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1e4PmA-0007aT-FU
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:11:10 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v9HBAh1V035258
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 07:11:06 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2dnfuwa9ax-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 07:10:58 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 17 Oct 2017 12:10:05 +0100
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+References: <20171004154144.88995-1-pasic@linux.vnet.ibm.com>
+	<20171004154144.88995-3-pasic@linux.vnet.ibm.com>
+	<d6d2d73d-65c9-7ae1-fd37-cb8e304781e7@redhat.com>
+	<7f454872-fae3-35b0-eff4-227b2aa0f77d@linux.vnet.ibm.com>
+	<6c17b274-cd75-7864-94b9-fc8abff1a786@redhat.com>
+	<da4228cb-d32c-dc77-0a80-bac306f07c24@linux.vnet.ibm.com>
+	<0120aa4c-ffce-79c0-8c87-c7c1100232eb@redhat.com>
+	<9d77c8e9-f875-4e42-5306-b847904b4a47@linux.vnet.ibm.com>
+	<39f9e450-d618-6c4d-9401-031c5374ed88@redhat.com>
+	<2b90291e-62a8-964f-286a-d8f1594b2d94@linux.vnet.ibm.com>
+Date: Tue, 17 Oct 2017 13:10:01 +0200
 MIME-Version: 1.0
-In-Reply-To: <47c7b41d-23ff-3dd1-9c07-69bd5df08685@amsat.org>
+In-Reply-To: <2b90291e-62a8-964f-286a-d8f1594b2d94@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 30/39] hw/display/vga: remove the old
- i386/pc dependency
+Content-Transfer-Encoding: 8bit
+Message-Id: <0ade56a2-046a-6525-f19d-8febebcfde03@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/8] s390x/css: IO instr handler ending
+ control
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,36 +52,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On 17.10.2017 12:49, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Thomas,
->=20
->>> diff --git a/hw/display/vga_int.h b/hw/display/vga_int.h
->>> index ad34a1f048..fe23b81442 100644
->>> --- a/hw/display/vga_int.h
->>> +++ b/hw/display/vga_int.h
->>> @@ -25,8 +25,9 @@
->>>  #ifndef HW_VGA_INT_H
->>>  #define HW_VGA_INT_H
->>> =20
->>> -#include "hw/hw.h"
->>> +#include "exec/ioport.h"
->>>  #include "exec/memory.h"
->>> +#include "ui/console.h"
+
+
+On 10/12/2017 01:44 PM, Halil Pasic wrote:
+> 
+> 
+> On 10/12/2017 08:58 AM, Thomas Huth wrote:
+>> On 10.10.2017 13:41, Halil Pasic wrote:
+[..]
+>> So yes, please don't do a "typedef unsigned int IOInstEnding" either. I
+>> think the best match for QEMU would be a
 >>
->> So vga_int.h now includes console.h (is it really necessary?) ...
->=20
-> The VGACommonState struct has a GraphicHwOps *hw_ops member.
+>> typedef enum IOInstEnding {
+>>     CC_...,
+>>     CC_...,
+>>     CC_...,
+>>     CC_...
+>> } IOInstEnding;
+>>
+> 
+> I also prefer this over #define NAME val.
+> 
 
-Ok, thanks, I just wanted to confirm that this is needed here.
+@Conny @Thomas
 
-[...]
-> Do you suggest me do declare GraphicHwOps opaque in "qemu/typedefs.h"?
+I'm almost done with v3, but I've realized we did not agree on the
+names for the enum constants, so before posting something to ugly
+again, I would like to inquire your opinion.
 
-No, I think it's fine if you keep the #include in vga_int.h, I just
-wanted to make sure that it is really needed there. So please just
-remove the #includes from the .c files instead.
+My current version of the enum is the following (but I can easily change
+to whatever you like with sed):
 
- Thomas
++/*
++ * IO instructions conclude according this. Currently we have only
++ * cc codes. Valid values are 0,1,2,3 and the generic semantic for IO instructions
++ * is described briefly. For more details consult the PoP.
++ */
++typedef enum IOInstEnding {
++    IOINST_CC_0 = 0, /* produced expected result */
++    IOINST_CC_1 = 1, /* status conditions were present, or alternate result */
++    IOINST_CC_2 = 2, /* ineffective, busy with previously initiated function */
++    IOINST_CC_3 = 3  /* ineffective, not operational */
++} IOInstEnding;
++
+
+Alternatives I had in mind are IOINST_CC_0_EXPECTED, IOINST_CC_1_STATUS_PRESENT, 
+IOINST_CC_2_BUSY, IOINST_CC_3_NOT_OPERATIONAL or the same without the numerical
+code (e.g. just IONIST_CC_EXPECTED).
+
+Regards,
+Halil
+
+
+
+[..]
