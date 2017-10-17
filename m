@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e4PmK-00030H-0N
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:11:20 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e4Pmo-0003Rq-7I
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:11:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1e4PmE-0007eK-Tj
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:11:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35330)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e4PmE-0007cq-Kg
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:11:14 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B705920277
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 11:11:13 +0000 (UTC)
-Date: Tue, 17 Oct 2017 12:11:07 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20171017111106.GB2326@work-vm>
-References: <20171004104636.7963-1-quintela@redhat.com>
-	<20171004104636.7963-9-quintela@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1e4Pmj-00083d-Le
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:11:50 -0400
+Resent-Message-Id: <E1e4Pmj-00083d-Le@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21381)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e4Pmj-00082p-DC
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:11:45 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150823868225.365.12379287365371609539@b58463cdfd5f>
+In-Reply-To: <20171017103514.5859-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20171004104636.7963-9-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v9 08/12] migration: Test new fd
- infrastructure
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 17 Oct 2017 04:11:22 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] linux-user/main: support dfilter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,98 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: alex.bennee@linaro.org
+Cc: famz@redhat.com, riku.voipio@iki.fi, qemu-devel@nongnu.org, laurent@vivier.eu
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We just send the address through the alternate channels and test that it
-> is ok.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-
-I remember questions on this patch from last time as well; this is just
-test isn't it, and all this gets changed in later patches.  So I'm
-not too sure of the point, especially since you could use
-qio_channel_writev_all  here and make the changes smaller.
-
-Dave
-
-> --
-> 
-> Use qio_channel_*all functions
-> ---
->  migration/ram.c | 39 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 39 insertions(+)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 745da2971d..4c16d0775b 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -492,8 +492,24 @@ static void *multifd_send_thread(void *opaque)
->              break;
->          }
->          if (p->pages.num) {
-> +            Error *local_err = NULL;
-> +            size_t ret;
-> +            int i;
-> +            int num;
-> +
-> +            num = p->pages.num;
->              p->pages.num = 0;
->              qemu_mutex_unlock(&p->mutex);
-> +
-> +            for (i = 0; i < num; i++) {
-> +                ret = qio_channel_write_all(p->c,
-> +                         (const char *)&p->pages.iov[i].iov_base,
-> +                         sizeof(uint8_t *), &local_err);
-> +                if (ret != 0) {
-> +                    terminate_multifd_send_threads(local_err);
-> +                    return NULL;
-> +                }
-> +            }
->              qemu_mutex_lock(&multifd_send_state->mutex);
->              p->done = true;
->              qemu_mutex_unlock(&multifd_send_state->mutex);
-> @@ -675,6 +691,7 @@ int multifd_load_cleanup(Error **errp)
->  static void *multifd_recv_thread(void *opaque)
->  {
->      MultiFDRecvParams *p = opaque;
-> +    uint8_t *recv_address;
->  
->      qemu_sem_post(&p->ready);
->      while (true) {
-> @@ -684,7 +701,29 @@ static void *multifd_recv_thread(void *opaque)
->              break;
->          }
->          if (p->pages.num) {
-> +            Error *local_err = NULL;
-> +            size_t ret;
-> +            int i;
-> +            int num;
-> +
-> +            num = p->pages.num;
->              p->pages.num = 0;
-> +
-> +            for (i = 0; i < num; i++) {
-> +                ret = qio_channel_read_all(p->c, (char *)&recv_address,
-> +                                           sizeof(uint8_t *), &local_err);
-> +                if (ret != 0) {
-> +                    terminate_multifd_recv_threads(local_err);
-> +                    return NULL;
-> +                }
-> +                if (recv_address != p->pages.iov[i].iov_base) {
-> +                    error_setg(&local_err, "received %p and expecting %p (%d)",
-> +                               recv_address, p->pages.iov[i].iov_base, i);
-> +                    terminate_multifd_recv_threads(local_err);
-> +                    return NULL;
-> +                }
-> +            }
-> +
->              p->done = true;
->              qemu_mutex_unlock(&p->mutex);
->              qemu_sem_post(&p->ready);
-> -- 
-> 2.13.5
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcxMDE3MTAzNTE0LjU4NTktMS1hbGV4LmJlbm5lZUBsaW5hcm8ub3JnClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGxpbnV4LXVzZXIvbWFpbjogc3VwcG9ydCBkZmls
+dGVyCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
+CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2Ug
+JEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0gg
+JG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdp
+dCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
+YmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0k
+KChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
+aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8g
+YSBuZXcgYnJhbmNoICd0ZXN0JwphOTJmNzM4YzY3IGxpbnV4LXVzZXIvbWFpbjogc3VwcG9ydCBk
+ZmlsdGVyCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IGxpbnV4LXVz
+ZXIvbWFpbjogc3VwcG9ydCBkZmlsdGVyLi4uCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0
+aGF0ICcsJyAoY3R4OlZ4VikKIzQwOiBGSUxFOiBsaW51eC11c2VyL21haW4uYzo0MDYzOgorICAg
+ICAicmFuZ2VbLC4uLl0iLCJmaWx0ZXIgbG9nZ2luZyBiYXNlZCBvbiBhZGRyZXNzIHJhbmdlIn0s
+CiAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE5IGxp
+bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBP
+VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1h
+aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMu
+b3Jn
