@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e4Un3-0006mf-8T
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:32:29 -0400
+	(envelope-from <jcody@redhat.com>) id 1e4UnB-0006ui-BC
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:32:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e4Un1-0006I9-Ss
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:32:25 -0400
+	(envelope-from <jcody@redhat.com>) id 1e4Un9-0006SR-N4
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:32:33 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 17 Oct 2017 12:31:50 -0400
-Message-Id: <85b170e6abd3f92bee7449d0970f6ba24e589c72.1508257445.git.jcody@redhat.com>
+Date: Tue, 17 Oct 2017 12:31:51 -0400
+Message-Id: <24c7d85bd96b8cbf02bf60dabc0787724c19b18b.1508257445.git.jcody@redhat.com>
 In-Reply-To: <cover.1508257445.git.jcody@redhat.com>
 References: <cover.1508257445.git.jcody@redhat.com>
 In-Reply-To: <cover.1508257445.git.jcody@redhat.com>
 References: <cover.1508257445.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 05/10] qemu-iotests: change qemu pid and fd
- tracking / cleanup
+Subject: [Qemu-devel] [PATCH v5 06/10] qemu-iotests: make ./check
+ automatically reap QEMU processes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,158 +25,306 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, jsnow@redhat.com, stefanha@redhat.com, kwolf@redhat.com, eblake@redhat.com
 
-So that later patches can cleanup running qemu processes called from
-different subshells, track resources to cleanup in pid and fd list
-files.
+Check will now take care of cleaning up all QEMU processes started
+from bash tests using the common.qemu framework.
 
-In subsquent patches, ./check will kill all QEMU processes launched with
-the common.qemu framework, and the tests will not need to cleanup
-manually (unless they want to do so as part of the test, e.g. wait for
-a process to end such as migration).
+This also paves the way to added another check option to keep QEMU
+processes around, in the case of a failed test.
 
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- tests/qemu-iotests/common.qemu | 82 ++++++++++++++++++++++++++++++++----------
- tests/qemu-iotests/common.rc   |  3 +-
- 2 files changed, 64 insertions(+), 21 deletions(-)
+ tests/qemu-iotests/085   | 2 --
+ tests/qemu-iotests/091   | 2 --
+ tests/qemu-iotests/094   | 2 --
+ tests/qemu-iotests/095   | 2 --
+ tests/qemu-iotests/102   | 2 --
+ tests/qemu-iotests/109   | 2 --
+ tests/qemu-iotests/117   | 2 --
+ tests/qemu-iotests/130   | 2 --
+ tests/qemu-iotests/140   | 2 --
+ tests/qemu-iotests/141   | 2 --
+ tests/qemu-iotests/143   | 2 --
+ tests/qemu-iotests/144   | 2 --
+ tests/qemu-iotests/146   | 2 --
+ tests/qemu-iotests/156   | 2 --
+ tests/qemu-iotests/173   | 2 --
+ tests/qemu-iotests/181   | 2 --
+ tests/qemu-iotests/183   | 2 --
+ tests/qemu-iotests/185   | 2 --
+ tests/qemu-iotests/191   | 6 ------
+ tests/qemu-iotests/check | 7 +++++--
+ 20 files changed, 5 insertions(+), 44 deletions(-)
 
-diff --git a/tests/qemu-iotests/common.qemu b/tests/qemu-iotests/common.qemu
-index 7b3052d..35a08a6 100644
---- a/tests/qemu-iotests/common.qemu
-+++ b/tests/qemu-iotests/common.qemu
-@@ -33,6 +33,10 @@ QEMU_FIFO_OUT="${QEMU_TEST_DIR}/qmp-out-$$"
- QEMU_HANDLE=0
- export _QEMU_HANDLE=0
+diff --git a/tests/qemu-iotests/085 b/tests/qemu-iotests/085
+index 7b69f86..283f9a9 100755
+--- a/tests/qemu-iotests/085
++++ b/tests/qemu-iotests/085
+@@ -37,8 +37,6 @@ snapshot_virt1="snapshot-v1.qcow2"
  
-+QEMU_PID_LIST="${QEMU_TEST_DIR}"/qemu-pid.lst
-+QEMU_OUT_FD_LIST="${QEMU_TEST_DIR}"/qemu-out-fd.lst
-+QEMU_IN_FD_LIST="${QEMU_TEST_DIR}"/qemu-in-fd.lst
-+QEMU_FIFO_LIST="${QEMU_TEST_DIR}"/qemu-fifo.lst
- # If bash version is >= 4.1, these will be overwritten and dynamic
- # file descriptor values assigned.
- _out_fd=3
-@@ -193,6 +197,10 @@ function _launch_qemu()
-     QEMU_OUT[${_QEMU_HANDLE}]=${_out_fd}
-     QEMU_IN[${_QEMU_HANDLE}]=${_in_fd}
-     QEMU_STATUS[${_QEMU_HANDLE}]=0
-+    echo ${_out_fd} >> "$QEMU_OUT_FD_LIST"
-+    echo ${_in_fd} >> "$QEMU_IN_FD_LIST"
-+    echo ${fifo_in} >> "$QEMU_FIFO_LIST"
-+    echo ${fifo_out} >> "$QEMU_FIFO_LIST"
+ SNAPSHOTS=10
  
-     if [ "${qemu_comm_method}" == "qmp" ]
-     then
-@@ -209,35 +217,71 @@ function _launch_qemu()
- 
- # Silenty kills the QEMU process
- #
-+# This is able to kill and clean up after QEMU processes without the
-+# need for any subshell-specific variables, so long as the qemu-pidlist
-+# and qemu-out-fd.list and qemu-in-fd.list files are properly maintained.
-+#
- # If $wait is set to anything other than the empty string, the process will not
- # be killed but only waited for, and any output will be forwarded to stdout. If
- # $wait is empty, the process will be killed and all output will be suppressed.
- function _cleanup_qemu()
- {
--    # QEMU_PID[], QEMU_IN[], QEMU_OUT[] all use same indices
--    for i in "${!QEMU_OUT[@]}"
-+    local fifo_path=
-+    local testdir_path=
-+
-+    if [ ! -e "${QEMU_PID_LIST}" ]; then
-+        return
-+    fi
-+
-+    # get line count, and therefore number of processes to kill
-+    numproc=$(wc -l "${QEMU_PID_LIST}" | sed 's/\s.*//')
-+
-+    for i in $(seq 1 $numproc)
-     do
-         local QEMU_PID
--        if [ -f "${QEMU_TEST_DIR}/qemu-${i}.pid" ]; then
--            read QEMU_PID < "${QEMU_TEST_DIR}/qemu-${i}.pid"
--            rm -f "${QEMU_TEST_DIR}/qemu-${i}.pid"
--            if [ -z "${wait}" ] && [ -n "${QEMU_PID}" ]; then
--                kill -KILL ${QEMU_PID} 2>/dev/null
--            fi
--            if [ -n "${QEMU_PID}" ]; then
--                wait ${QEMU_PID} 2>/dev/null # silent kill
--            fi
-+        local OUT_FD
-+        local IN_FD
-+        j=$(expr $i - 1)
-+
-+        QEMU_PID=$(tail -n+${i} "${QEMU_PID_LIST}" | head -n1)
-+        OUT_FD=$(tail -n+${i} "${QEMU_OUT_FD_LIST}" | head -n1)
-+        IN_FD=$(tail -n+${i} "${QEMU_IN_FD_LIST}" | head -n1)
-+
-+        if [ -z "${wait}" ] && [ -n "${QEMU_PID}" ]; then
-+            kill -KILL ${QEMU_PID} 2>/dev/null
-+        fi
-+        if [ -n "${QEMU_PID}" ]; then
-+            wait ${QEMU_PID} 2>/dev/null # silent kill
-         fi
- 
--        if [ -n "${wait}" ]; then
--            cat <&${QEMU_OUT[$i]} | _filter_testdir | _filter_qemu \
--                                  | _filter_qemu_io | _filter_qmp | _filter_hmp
-+        if [ -n "${wait}" ] && [ -n "${OUT_FD}" ]; then
-+            cat <&${OUT_FD} | _filter_testdir | _filter_qemu \
-+                            | _filter_qemu_io | _filter_qmp | _filter_hmp
-+        fi
-+
-+        if [ -n "${IN_FD}" ]; then
-+            eval "exec ${IN_FD}<&-"   # close file descriptors
-+        fi
-+        if [ -n "${OUT_FD}" ]; then
-+            eval "exec ${OUT_FD}<&-"
-         fi
--        rm -f "${QEMU_FIFO_IN}_${i}" "${QEMU_FIFO_OUT}_${i}"
--        eval "exec ${QEMU_IN[$i]}<&-"   # close file descriptors
--        eval "exec ${QEMU_OUT[$i]}<&-"
- 
--        unset QEMU_IN[$i]
--        unset QEMU_OUT[$i]
-+        unset QEMU_IN[$j]
-+        unset QEMU_OUT[$j]
-     done
-+
-+    # The FIFOs do not correspond to process entry in the pidlist, so
-+    # just clean them up afterwards
-+    while read fifo_name
-+    do
-+        # make sure entries are inside the $TEST_DIR
-+        fifo_path=$(dirname -z $(realpath "$fifo_name"))
-+        testdir_path=$(realpath "$QEMU_TEST_DIR")
-+        if [ "$fifo_path" == "$testdir_path" ]
-+        then
-+            rm -f "$fifo_name"
-+        fi
-+    done < "${QEMU_FIFO_LIST}"
-+
-+    rm -f "${QEMU_PID_LIST}" "${QEMU_OUT_FD_LIST}" "${QEMU_IN_FD_LIST}" "$QEMU_FIFO_LIST}"
- }
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index a345ffd..b26b02f 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -40,7 +40,6 @@ poke_file()
-     printf "$3" | dd "of=$1" bs=1 "seek=$2" conv=notrunc &>/dev/null
- }
- 
+-trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
 -
- if ! . ./common.config
-     then
-     echo "$0: failed to source common.config"
-@@ -51,7 +50,7 @@ _qemu_wrapper()
- {
-     (
-         if [ -n "${QEMU_NEED_PID}" ]; then
--            echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid"
-+            echo $BASHPID >> "${QEMU_TEST_DIR}/qemu-pid.lst"
-         fi
-         exec "$QEMU_PROG" $QEMU_OPTIONS "$@"
-     )
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/091 b/tests/qemu-iotests/091
+index c4df2fb..cc4c50c 100755
+--- a/tests/qemu-iotests/091
++++ b/tests/qemu-iotests/091
+@@ -31,8 +31,6 @@ status=1    # failure is the default!
+ 
+ MIG_FIFO="${TEST_DIR}/migrate"
+ 
+-trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/094 b/tests/qemu-iotests/094
+index 35e882c..1587550 100755
+--- a/tests/qemu-iotests/094
++++ b/tests/qemu-iotests/094
+@@ -27,8 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/095 b/tests/qemu-iotests/095
+index 75d60c4..2891014 100755
+--- a/tests/qemu-iotests/095
++++ b/tests/qemu-iotests/095
+@@ -30,8 +30,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
+index 201c520..2980638 100755
+--- a/tests/qemu-iotests/102
++++ b/tests/qemu-iotests/102
+@@ -27,8 +27,6 @@ echo "QA output created by $seq"
+ here=$PWD
+ status=1    # failure is the default!
+ 
+-trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and qemu instance handling
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/109 b/tests/qemu-iotests/109
+index d4fca99..2f6e456 100755
+--- a/tests/qemu-iotests/109
++++ b/tests/qemu-iotests/109
+@@ -27,8 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/117 b/tests/qemu-iotests/117
+index 579cecb..a427ee7 100755
+--- a/tests/qemu-iotests/117
++++ b/tests/qemu-iotests/117
+@@ -27,8 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/130 b/tests/qemu-iotests/130
+index 4aad4ea..3610738 100755
+--- a/tests/qemu-iotests/130
++++ b/tests/qemu-iotests/130
+@@ -29,8 +29,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/140 b/tests/qemu-iotests/140
+index c5e1a5b..ec79402 100755
+--- a/tests/qemu-iotests/140
++++ b/tests/qemu-iotests/140
+@@ -31,8 +31,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/141 b/tests/qemu-iotests/141
+index cff2319..39b75a4 100755
+--- a/tests/qemu-iotests/141
++++ b/tests/qemu-iotests/141
+@@ -27,8 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/143 b/tests/qemu-iotests/143
+index b4736aa..e107ae3 100755
+--- a/tests/qemu-iotests/143
++++ b/tests/qemu-iotests/143
+@@ -27,8 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/144 b/tests/qemu-iotests/144
+index b47c561..8b55d33 100755
+--- a/tests/qemu-iotests/144
++++ b/tests/qemu-iotests/144
+@@ -32,8 +32,6 @@ status=1	# failure is the default!
+ TMP_SNAP1=${TEST_DIR}/tmp.qcow2
+ TMP_SNAP2=${TEST_DIR}/tmp2.qcow2
+ 
+-trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/146 b/tests/qemu-iotests/146
+index 99b1e81..7dffe22 100755
+--- a/tests/qemu-iotests/146
++++ b/tests/qemu-iotests/146
+@@ -27,8 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1    # failure is the default!
+ 
+-trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/156 b/tests/qemu-iotests/156
+index 9dbc6d7..26ebd73 100755
+--- a/tests/qemu-iotests/156
++++ b/tests/qemu-iotests/156
+@@ -35,8 +35,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/173 b/tests/qemu-iotests/173
+index 0c2fde4..933cd96 100755
+--- a/tests/qemu-iotests/173
++++ b/tests/qemu-iotests/173
+@@ -27,8 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1    # failure is the default!
+ 
+-trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
+index 18fb133..e6f7908 100755
+--- a/tests/qemu-iotests/181
++++ b/tests/qemu-iotests/181
+@@ -29,8 +29,6 @@ status=1	# failure is the default!
+ 
+ MIG_SOCKET="${TEST_DIR}/migrate"
+ 
+-trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
+index 2e09679..cb82d3c 100755
+--- a/tests/qemu-iotests/183
++++ b/tests/qemu-iotests/183
+@@ -29,8 +29,6 @@ status=1 # failure is the default!
+ 
+ MIG_SOCKET="${TEST_DIR}/migrate"
+ 
+-trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
+index 7269d5e..ef4b1cd 100755
+--- a/tests/qemu-iotests/185
++++ b/tests/qemu-iotests/185
+@@ -29,8 +29,6 @@ status=1 # failure is the default!
+ 
+ MIG_SOCKET="${TEST_DIR}/migrate"
+ 
+-trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
+index f97e580..7fc1365 100755
+--- a/tests/qemu-iotests/191
++++ b/tests/qemu-iotests/191
+@@ -29,12 +29,6 @@ status=1 # failure is the default!
+ 
+ MIG_SOCKET="${TEST_DIR}/migrate"
+ 
+-_cleanup()
+-{
+-    _cleanup_qemu
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index b4ab646..057ea39 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -845,10 +845,13 @@ do
+         # TEST_DIR / QEMU_TEST_DIR
+         (
+         export TEST_DIR=$TEST_DIR_SEQ
+-        . "$source_iotests/common.config"
+-        . "$source_iotests/common.rc"
++        cd "$source_iotests";
++        . ./common.config
++        . ./common.rc
++        . ./common.qemu
+ 
+         _cleanup_protocols
++        _cleanup_qemu
+         )
+         rm -rf "$TEST_DIR_SEQ"
+ 
 -- 
 2.9.5
