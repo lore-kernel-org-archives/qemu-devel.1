@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e4JOT-0008I6-Pd
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:19 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e4JOZ-0008Ml-9v
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e4JOS-0006vo-D3
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:17 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e4JOW-00072e-FJ
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:23 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 17 Oct 2017 15:21:28 +1100
-Message-Id: <20171017042152.29443-11-david@gibson.dropbear.id.au>
+Date: Tue, 17 Oct 2017 15:21:33 +1100
+Message-Id: <20171017042152.29443-16-david@gibson.dropbear.id.au>
 In-Reply-To: <20171017042152.29443-1-david@gibson.dropbear.id.au>
 References: <20171017042152.29443-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 10/34] qom: add helper macro DEFINE_TYPES()
+Subject: [Qemu-devel] [PULL 15/34] ppc: replace cpu_model with cpu_type on
+ ref405ep, taihu boards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,112 +25,59 @@ Cc: ehabkost@redhat.com, agraf@suse.de, imammedo@redhat.com, groug@kaod.org, qem
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-DEFINE_TYPES() will help to simplify following routine patterns:
-
- static void foo_register_types(void)
- {
-    type_register_static(&foo1_type_info);
-    type_register_static(&foo2_type_info);
-    ...
- }
-
- type_init(foo_register_types)
-
-or
-
- static void foo_register_types(void)
- {
-    int i;
-
-    for (i =3D 0; i < ARRAY_SIZE(type_infos); i++) {
-        type_register_static(&type_infos[i]);
-    }
- }
-
- type_init(foo_register_types)
-
-with a single line
-
- DEFINE_TYPES(type_infos)
-
-where types have static definition which could be consolidated in
-a single array of TypeInfo structures.
-It saves us ~6-10LOC per use case and would help to replace
-imperative foo_register_types() there with declarative style of
-type registration.
-
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- include/qom/object.h | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ hw/ppc/ppc405_uc.c   | 6 ++++--
+ hw/ppc/ppc4xx_devs.c | 4 ++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 9a2369c67b..dc73d59660 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -79,6 +79,28 @@ typedef struct InterfaceInfo InterfaceInfo;
-  * #TypeInfo describes information about the type including what it inhe=
-rits
-  * from, the instance and class size, and constructor/destructor hooks.
-  *
-+ * Alternatively several static types could be registered using helper m=
-acro
-+ * DEFINE_TYPES()
-+ *
-+ * <example>
-+ *   <programlisting>
-+ * static const TypeInfo device_types_info[] =3D {
-+ *     {
-+ *         .name =3D TYPE_MY_DEVICE_A,
-+ *         .parent =3D TYPE_DEVICE,
-+ *         .instance_size =3D sizeof(MyDeviceA),
-+ *     },
-+ *     {
-+ *         .name =3D TYPE_MY_DEVICE_B,
-+ *         .parent =3D TYPE_DEVICE,
-+ *         .instance_size =3D sizeof(MyDeviceB),
-+ *     },
-+ * };
-+ *
-+ * DEFINE_TYPES(device_types_info)
-+ *   </programlisting>
-+ * </example>
-+ *
-  * Every type has an #ObjectClass associated with it.  #ObjectClass deri=
-vatives
-  * are instantiated dynamically but there is only ever one instance for =
-any
-  * given type.  The #ObjectClass typically holds a table of function poi=
-nters
-@@ -799,6 +821,20 @@ Type type_register(const TypeInfo *info);
- void type_register_static_array(const TypeInfo *infos, int nr_infos);
-=20
- /**
-+ * DEFINE_TYPES:
-+ * @type_array: The array containing #TypeInfo structures to register
-+ *
-+ * @type_array should be static constant that exists for the life time
-+ * that the type is registered.
-+ */
-+#define DEFINE_TYPES(type_array)                                        =
-    \
-+static void do_qemu_init_ ## type_array(void)                           =
-    \
-+{                                                                       =
-    \
-+    type_register_static_array(type_array, ARRAY_SIZE(type_array));     =
-    \
-+}                                                                       =
-    \
-+type_init(do_qemu_init_ ## type_array)
-+
-+/**
-  * object_class_dynamic_cast_assert:
-  * @klass: The #ObjectClass to attempt to cast.
-  * @typename: The QOM typename of the class to cast to.
---=20
+diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
+index 8e58065f5f..205ebcea93 100644
+--- a/hw/ppc/ppc405_uc.c
++++ b/hw/ppc/ppc405_uc.c
+@@ -1629,7 +1629,8 @@ CPUPPCState *ppc405cr_init(MemoryRegion *address_space_mem,
+     qemu_irq *pic, *irqs;
+ 
+     memset(clk_setup, 0, sizeof(clk_setup));
+-    cpu = ppc4xx_init("405cr", &clk_setup[PPC405CR_CPU_CLK],
++    cpu = ppc4xx_init(POWERPC_CPU_TYPE_NAME("405crc"),
++                      &clk_setup[PPC405CR_CPU_CLK],
+                       &clk_setup[PPC405CR_TMR_CLK], sysclk);
+     env = &cpu->env;
+     /* Memory mapped devices registers */
+@@ -1981,7 +1982,8 @@ CPUPPCState *ppc405ep_init(MemoryRegion *address_space_mem,
+ 
+     memset(clk_setup, 0, sizeof(clk_setup));
+     /* init CPUs */
+-    cpu = ppc4xx_init("405ep", &clk_setup[PPC405EP_CPU_CLK],
++    cpu = ppc4xx_init(POWERPC_CPU_TYPE_NAME("405ep"),
++                      &clk_setup[PPC405EP_CPU_CLK],
+                       &tlb_clk_setup, sysclk);
+     env = &cpu->env;
+     clk_setup[PPC405EP_CPU_CLK].cb = tlb_clk_setup.cb;
+diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
+index 6d7f7857fe..2e963894fe 100644
+--- a/hw/ppc/ppc4xx_devs.c
++++ b/hw/ppc/ppc4xx_devs.c
+@@ -48,7 +48,7 @@ static void ppc4xx_reset(void *opaque)
+ 
+ /*****************************************************************************/
+ /* Generic PowerPC 4xx processor instantiation */
+-PowerPCCPU *ppc4xx_init(const char *cpu_model,
++PowerPCCPU *ppc4xx_init(const char *cpu_type,
+                         clk_setup_t *cpu_clk, clk_setup_t *tb_clk,
+                         uint32_t sysclk)
+ {
+@@ -56,7 +56,7 @@ PowerPCCPU *ppc4xx_init(const char *cpu_model,
+     CPUPPCState *env;
+ 
+     /* init CPUs */
+-    cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, cpu_model));
++    cpu = POWERPC_CPU(cpu_create(cpu_type));
+     env = &cpu->env;
+ 
+     cpu_clk->cb = NULL; /* We don't care about CPU clock frequency changes */
+-- 
 2.13.6
