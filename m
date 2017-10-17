@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54499)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
-	<BATV+60eda6e2277543397899+5168+infradead.org+hch@bombadil.srs.infradead.org>)
-	id 1e4Mpu-0003D5-PD
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 04:02:56 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56636)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <groug@kaod.org>) id 1e4Myk-0005iE-DN
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 04:11:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from
-	<BATV+60eda6e2277543397899+5168+infradead.org+hch@bombadil.srs.infradead.org>)
-	id 1e4Mpq-0007BG-Kg
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 04:02:50 -0400
-Received: from bombadil.infradead.org ([65.50.211.133]:58356)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from
-	<BATV+60eda6e2277543397899+5168+infradead.org+hch@bombadil.srs.infradead.org>)
-	id 1e4Mpq-00079y-B3
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 04:02:46 -0400
-Date: Tue, 17 Oct 2017 01:02:36 -0700
-From: Christoph Hellwig <hch@infradead.org>
-Message-ID: <20171017080236.GA27649@infradead.org>
-References: <20171012155027.3277-1-pagupta@redhat.com>
-	<20171012155027.3277-3-pagupta@redhat.com>
-	<20171017071633.GA9207@infradead.org>
-	<1441791227.21027037.1508226056893.JavaMail.zimbra@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1e4Mye-0004DN-KK
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 04:11:58 -0400
+Received: from 10.mo4.mail-out.ovh.net ([188.165.33.109]:44854)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1e4Mye-0004Aj-Eg
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 04:11:52 -0400
+Received: from player159.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 4CE3DE8CF3
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 10:11:44 +0200 (CEST)
+Date: Tue, 17 Oct 2017 10:09:56 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20171017100956.3d5c8fbe@bahia.lan>
+In-Reply-To: <20171017095202.6d8a8df0@nial.brq.redhat.com>
+References: <150817967599.32385.13210015253120051927.stgit@bahia.lan>
+	<20171017095202.6d8a8df0@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1441791227.21027037.1508226056893.JavaMail.zimbra@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 2/2] KVM: add virtio-pmem driver
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] monitor: fix dangling CPU pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,25 +30,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>, kwolf@redhat.com, haozhong zhang <haozhong.zhang@intel.com>, jack@suse.cz, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, kvm@vger.kernel.org, david@redhat.com, linux-nvdimm@ml01.01.org, ross zwisler <ross.zwisler@intel.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, linux-mm@kvack.org, stefanha@redhat.com, pbonzini@redhat.com, dan j williams <dan.j.williams@intel.com>, nilal@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Tue, Oct 17, 2017 at 03:40:56AM -0400, Pankaj Gupta wrote:
-> Are you saying do it as existing i.e ACPI pmem like interface?
-> The reason we have created this new driver is exiting pmem driver
-> does not define proper semantics for guest flushing requests.
+On Tue, 17 Oct 2017 09:52:02 +0200
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-At this point I'm caring about the Linux-internal interface, and
-for that it should be integrated into the nvdimm subsystem and not
-a block driver.  How the host <-> guest interface looks is a different
-idea.
-
+> On Mon, 16 Oct 2017 20:47:56 +0200
+> Greg Kurz <groug@kaod.org> wrote:
 > 
-> Regarding block support of driver, we want to achieve DAX support
-> to bypass guest page cache. Also, we want to utilize existing DAX
-> capable file-system interfaces(e.g fsync) from userspace file API's
-> to trigger the host side flush request.
+> ...
+> > Note that the resolution should really return a CPU object, otherwise
+> > we have a bug. This is achieved by relying on object_resolve_path()
+> > and CPU() instead of calling object_resolve_path_type(path, TYPE_CPU).  
+> Did you forget to remove this part?
+> 
 
-Well, if you want to support XFS+DAX better don't make it a block
-devices, because I'll post patches soon to stop using the block device
-entirely for the DAX case.
+Argh yes I did... :-\ I'll send a v3 right away.
+
+> > 
+> > Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+> > Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> > v2: - use object_resolve_path_type()
+> >     - add Reported-by tag
+> > ---
+> >  monitor.c |   23 ++++++++++++++++++-----
+> >  1 file changed, 18 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/monitor.c b/monitor.c
+> > index fe0d1bdbb461..ce577e46e568 100644
+> > --- a/monitor.c
+> > +++ b/monitor.c
+> > @@ -200,7 +200,7 @@ struct Monitor {
+> >  
+> >      ReadLineState *rs;
+> >      MonitorQMP qmp;
+> > -    CPUState *mon_cpu;
+> > +    gchar *mon_cpu_path;
+> >      BlockCompletionFunc *password_completion_cb;
+> >      void *password_opaque;
+> >      mon_cmd_t *cmd_table;
+> > @@ -579,6 +579,7 @@ static void monitor_data_init(Monitor *mon)
+> >  
+> >  static void monitor_data_destroy(Monitor *mon)
+> >  {
+> > +    g_free(mon->mon_cpu_path);
+> >      qemu_chr_fe_deinit(&mon->chr, false);
+> >      if (monitor_is_qmp(mon)) {
+> >          json_message_parser_destroy(&mon->qmp.parser);
+> > @@ -1047,20 +1048,32 @@ int monitor_set_cpu(int cpu_index)
+> >      if (cpu == NULL) {
+> >          return -1;
+> >      }
+> > -    cur_mon->mon_cpu = cpu;
+> > +    g_free(cur_mon->mon_cpu_path);
+> > +    cur_mon->mon_cpu_path = object_get_canonical_path(OBJECT(cpu));
+> >      return 0;
+> >  }
+> >  
+> >  CPUState *mon_get_cpu(void)
+> >  {
+> > -    if (!cur_mon->mon_cpu) {
+> > +    CPUState *cpu;
+> > +
+> > +    if (cur_mon->mon_cpu_path) {
+> > +        cpu = (CPUState *) object_resolve_path_type(cur_mon->mon_cpu_path,
+> > +                                                    TYPE_CPU, NULL);
+> > +        if (!cpu) {
+> > +            g_free(cur_mon->mon_cpu_path);
+> > +            cur_mon->mon_cpu_path = NULL;
+> > +        }
+> > +    }
+> > +    if (!cur_mon->mon_cpu_path) {
+> >          if (!first_cpu) {
+> >              return NULL;
+> >          }
+> >          monitor_set_cpu(first_cpu->cpu_index);
+> > +        cpu = first_cpu;
+> >      }
+> > -    cpu_synchronize_state(cur_mon->mon_cpu);
+> > -    return cur_mon->mon_cpu;
+> > +    cpu_synchronize_state(cpu);
+> > +    return cpu;
+> >  }
+> >  
+> >  CPUArchState *mon_get_cpu_env(void)
+> >   
+> 
