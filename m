@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4RcY-0002md-Uf
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:09:28 -0400
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4Rcf-0002sd-9y
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:09:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4RcS-0004cL-Ro
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:09:22 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:56484)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4RcZ-0004jP-DE
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:09:29 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:56504)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4RcS-0004bZ-IQ
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:09:16 -0400
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4RcZ-0004im-5y
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:09:23 -0400
 From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Tue, 17 Oct 2017 16:09:13 +0300
-Message-ID: <150824575325.6816.580234093427015826.stgit@Misha-PC.lan02.inno>
+Date: Tue, 17 Oct 2017 16:09:19 +0300
+Message-ID: <150824575888.6816.8665703540737889367.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <150824572545.6816.5099701189660002212.stgit@Misha-PC.lan02.inno>
 References: <150824572545.6816.5099701189660002212.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v2 04/43] windbg: added '-windbg' option
+Subject: [Qemu-devel] [PATCH v2 05/43] windbg: added helper features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +29,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
-This option starts windbg server.
+Added some helper features for windbgstub.
 
 Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Acked-by: Alistair Francis <alistair.francis@xilinx.com>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
 ---
- qemu-options.hx |    8 ++++++++
- vl.c            |    8 ++++++++
- 2 files changed, 16 insertions(+)
+ include/exec/windbgstub-utils.h |   34 ++++++++++++++++++++++++++++++++++
+ include/exec/windbgstub.h       |    6 ++++++
+ 2 files changed, 40 insertions(+)
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 9f6e2adfff..1c84eb56d9 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3544,6 +3544,14 @@ Shorthand for -gdb tcp::1234, i.e. open a gdbserver on TCP port 1234
- (@pxref{gdb_usage}).
- ETEXI
+diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
+index 2390597f1f..1c27ee4ce8 100755
+--- a/include/exec/windbgstub-utils.h
++++ b/include/exec/windbgstub-utils.h
+@@ -13,7 +13,41 @@
+ #define WINDBGSTUB_UTILS_H
  
-+DEF("windbg", HAS_ARG, QEMU_OPTION_windbg, \
-+    "-windbg         wait for windbg connection\n", QEMU_ARCH_I386)
-+STEXI
-+@item -windbg
-+@findex -windbg
-+Wait for windbg connection.
-+ETEXI
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
++#include "log.h"
++#include "cpu.h"
+ #include "exec/windbgstub.h"
+ #include "exec/windbgkd.h"
+ 
++#ifndef TARGET_I386
++#error Unsupported Architecture
++#endif
++#ifdef TARGET_X86_64 /* Unimplemented yet */
++#error Unsupported Architecture
++#endif
 +
- DEF("d", HAS_ARG, QEMU_OPTION_d, \
-     "-d item1,...    enable logging of specified items (use '-d help' for a list of log items)\n",
-     QEMU_ARCH_ALL)
-diff --git a/vl.c b/vl.c
-index 8e247cc2a2..d6378cf03f 100644
---- a/vl.c
-+++ b/vl.c
-@@ -80,6 +80,7 @@ int main(int argc, char **argv)
- #include "sysemu/sysemu.h"
- #include "sysemu/numa.h"
- #include "exec/gdbstub.h"
-+#include "exec/windbgstub.h"
- #include "qemu/timer.h"
- #include "chardev/char.h"
- #include "qemu/bitmap.h"
-@@ -2436,6 +2437,7 @@ struct device_config {
-         DEV_VIRTCON,   /* -virtioconsole */
-         DEV_DEBUGCON,  /* -debugcon */
-         DEV_GDB,       /* -gdb, -s */
-+        DEV_WINDBG,    /* -windbg */
-         DEV_SCLP,      /* s390 sclp */
-     } type;
-     const char *cmdline;
-@@ -3445,6 +3447,9 @@ int main(int argc, char **argv, char **envp)
-             case QEMU_OPTION_gdb:
-                 add_device_config(DEV_GDB, optarg);
-                 break;
-+            case QEMU_OPTION_windbg:
-+                add_device_config(DEV_WINDBG, optarg);
-+                break;
-             case QEMU_OPTION_L:
-                 if (is_help_option(optarg)) {
-                     list_data_dirs = true;
-@@ -4586,6 +4591,9 @@ int main(int argc, char **argv, char **envp)
-         exit(1);
-     }
++# define WINDBG_DEBUG(...) do {            \
++    if (WINDBG_DEBUG_ON) {                 \
++        qemu_log(WINDBG ": " __VA_ARGS__); \
++        qemu_log("\n");                    \
++    }                                      \
++} while (false)
++
++#define WINDBG_ERROR(...) error_report(WINDBG ": " __VA_ARGS__)
++
++#define FMT_ADDR "addr:0x" TARGET_FMT_lx
++#define FMT_ERR  "Error:%d"
++
++#define UINT8_P(ptr) ((uint8_t *) (ptr))
++#define UINT32_P(ptr) ((uint32_t *) (ptr))
++#define PTR(var) UINT8_P(&var)
++
++#define sizeof_field(type, field) sizeof(((type *) NULL)->field)
++
++#define READ_VMEM(cpu, addr, type) ({                         \
++    type _t;                                                  \
++    cpu_memory_rw_debug(cpu, addr, PTR(_t), sizeof(type), 0); \
++    _t;                                                       \
++})
++
+ #endif
+diff --git a/include/exec/windbgstub.h b/include/exec/windbgstub.h
+index 1a6e1cc6e5..21bc552e58 100755
+--- a/include/exec/windbgstub.h
++++ b/include/exec/windbgstub.h
+@@ -12,6 +12,12 @@
+ #ifndef WINDBGSTUB_H
+ #define WINDBGSTUB_H
  
-+    if (foreach_device_config(DEV_WINDBG, windbg_server_start) < 0) {
-+        exit(1);
-+    }
-     if (foreach_device_config(DEV_SERIAL, serial_parse) < 0)
-         exit(1);
-     if (foreach_device_config(DEV_PARALLEL, parallel_parse) < 0)
++#define WINDBG "windbg"
++
++#ifndef WINDBG_DEBUG_ON
++#define WINDBG_DEBUG_ON false
++#endif
++
+ int windbg_server_start(const char *device);
+ 
+ #endif
