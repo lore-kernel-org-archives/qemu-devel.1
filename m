@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e4JOZ-0008MT-0c
+	(envelope-from <dgibson@ozlabs.org>) id 1e4JOZ-0008MU-0f
 	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e4JOW-00072I-CQ
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:21 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e4JOW-000720-6q
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:22 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 17 Oct 2017 15:21:34 +1100
-Message-Id: <20171017042152.29443-17-david@gibson.dropbear.id.au>
+Date: Tue, 17 Oct 2017 15:21:27 +1100
+Message-Id: <20171017042152.29443-10-david@gibson.dropbear.id.au>
 In-Reply-To: <20171017042152.29443-1-david@gibson.dropbear.id.au>
 References: <20171017042152.29443-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 16/34] ppc: virtex-ml507: replace cpu_model with
- cpu_type
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 09/34] qom: introduce
+ type_register_static_array()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +28,61 @@ Cc: ehabkost@redhat.com, agraf@suse.de, imammedo@redhat.com, groug@kaod.org, qem
 
 From: Igor Mammedov <imammedo@redhat.com>
 
+it will help to remove code duplication of registration
+static types in places that have open coded loop to
+perform batch type registering.
+
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/virtex_ml507.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+ include/qom/object.h | 10 ++++++++++
+ qom/object.c         |  9 +++++++++
+ 2 files changed, 19 insertions(+)
 
-diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
-index ed9b406fd3..5ac4f76613 100644
---- a/hw/ppc/virtex_ml507.c
-+++ b/hw/ppc/virtex_ml507.c
-@@ -89,14 +89,14 @@ static void mmubooke_create_initial_mapping(CPUPPCState *env,
- 
- static PowerPCCPU *ppc440_init_xilinx(ram_addr_t *ram_size,
-                                       int do_init,
--                                      const char *cpu_model,
-+                                      const char *cpu_type,
-                                       uint32_t sysclk)
- {
-     PowerPCCPU *cpu;
-     CPUPPCState *env;
-     qemu_irq *irqs;
- 
--    cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, cpu_model));
-+    cpu = POWERPC_CPU(cpu_create(cpu_type));
-     env = &cpu->env;
- 
-     ppc_booke_timers_init(cpu, sysclk, 0/* no flags */);
-@@ -211,11 +211,7 @@ static void virtex_init(MachineState *machine)
-     int i;
- 
-     /* init CPUs */
--    if (machine->cpu_model == NULL) {
--        machine->cpu_model = "440-Xilinx";
--    }
--
--    cpu = ppc440_init_xilinx(&ram_size, 1, machine->cpu_model, 400000000);
-+    cpu = ppc440_init_xilinx(&ram_size, 1, machine->cpu_type, 400000000);
-     env = &cpu->env;
- 
-     if (env->mmu_model != POWERPC_MMU_BOOKE) {
-@@ -307,6 +303,7 @@ static void virtex_machine_init(MachineClass *mc)
- {
-     mc->desc = "Xilinx Virtex ML507 reference design";
-     mc->init = virtex_init;
-+    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("440-xilinx");
+diff --git a/include/qom/object.h b/include/qom/object.h
+index a707b67781..9a2369c67b 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -789,6 +789,16 @@ Type type_register_static(const TypeInfo *info);
+ Type type_register(const TypeInfo *info);
+=20
+ /**
++ * type_register_static_array:
++ * @infos: The array of the new type #TypeInfo structures.
++ * @nr_infos: number of entries in @infos
++ *
++ * @infos and all of the strings it points to should exist for the life =
+time
++ * that the type is registered.
++ */
++void type_register_static_array(const TypeInfo *infos, int nr_infos);
++
++/**
+  * object_class_dynamic_cast_assert:
+  * @klass: The #ObjectClass to attempt to cast.
+  * @typename: The QOM typename of the class to cast to.
+diff --git a/qom/object.c b/qom/object.c
+index 6a7bd9257b..c58c52d518 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -151,6 +151,15 @@ TypeImpl *type_register_static(const TypeInfo *info)
+     return type_register(info);
  }
- 
- DEFINE_MACHINE("virtex-ml507", virtex_machine_init)
--- 
+=20
++void type_register_static_array(const TypeInfo *infos, int nr_infos)
++{
++    int i;
++
++    for (i =3D 0; i < nr_infos; i++) {
++        type_register_static(&infos[i]);
++    }
++}
++
+ static TypeImpl *type_get_by_name(const char *name)
+ {
+     if (name =3D=3D NULL) {
+--=20
 2.13.6
