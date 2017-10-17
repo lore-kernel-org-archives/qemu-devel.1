@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e4aSF-0003oC-6E
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 18:35:20 -0400
+	(envelope-from <alistai@xilinx.com>) id 1e4aSG-0003oz-Bt
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 18:35:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e4aSB-0000Nx-Tp
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 18:35:19 -0400
-Received: from mail-sn1nam02on0058.outbound.protection.outlook.com
-	([104.47.36.58]:16960
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	(envelope-from <alistai@xilinx.com>) id 1e4aSC-0000Pl-Vp
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 18:35:20 -0400
+Received: from mail-by2nam03on0067.outbound.protection.outlook.com
+	([104.47.42.67]:9824
+	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1e4aSB-0000Lj-N0
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 18:35:15 -0400
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1e4aSC-0000Nm-Km
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 18:35:16 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 17 Oct 2017 15:31:14 -0700
-Message-ID: <ef4e172df6cdf3d9ee8bb3aa896cacab5efdd1f1.1508279421.git.alistair.francis@xilinx.com>
+Date: Tue, 17 Oct 2017 15:31:21 -0700
+Message-ID: <1dd2d6d44d3850e7ee8be8b265dae0933561f129.1508279421.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1508279421.git.alistair.francis@xilinx.com>
 References: <cover.1508279421.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 2/5] bcm2836: Use the Cortex-A7 instead of
- Cortex-A15
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 5/5] xilinx_zynq: Specify the valid CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +31,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alistair.francis@xilinx.com, alistair23@gmail.com, ehabkost@redhat.com, marcel@redhat.com, imammedo@redhat.com, f4bug@amsat.org
 
-The BCM2836 uses a Cortex-A7 not a Cortex-A15. Update the device to use
-the correct CPU.
-https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2836/QA7_rev3.4.pdf
+List all possible valid CPU options.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
+
 V3:
- - Use ARM_CPU_TYPE_NAME() macro
+ - Make variable static
 V2:
- - Fix the BCM2836 CPU
+ - Fixup alignment
 
- hw/arm/bcm2836.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/arm/xilinx_zynq.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-index 8c43291112..c477772484 100644
---- a/hw/arm/bcm2836.c
-+++ b/hw/arm/bcm2836.c
-@@ -30,7 +30,7 @@ static void bcm2836_init(Object *obj)
- 
-     for (n = 0; n < BCM2836_NCPUS; n++) {
-         object_initialize(&s->cpus[n], sizeof(s->cpus[n]),
--                          "cortex-a15-" TYPE_ARM_CPU);
-+                          ARM_CPU_TYPE_NAME("cortex-a7"));
-         object_property_add_child(obj, "cpu[*]", OBJECT(&s->cpus[n]),
-                                   &error_abort);
-     }
--- 
+diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
+index 1836a4ed45..1f257b0ef9 100644
+--- a/hw/arm/xilinx_zynq.c
++++ b/hw/arm/xilinx_zynq.c
+@@ -313,6 +313,11 @@ static void zynq_init(MachineState *machine)
+     arm_load_kernel(ARM_CPU(first_cpu), &zynq_binfo);
+ }
+=20
++static const char *xlnx_zynq_7000_valid_cpus[] =3D {
++                                                ARM_CPU_TYPE_NAME("cortex-=
+a9"),
++                                                NULL
++                                                 };
++
+ static void zynq_machine_init(MachineClass *mc)
+ {
+     mc->desc =3D "Xilinx Zynq Platform Baseboard for Cortex-A9";
+@@ -321,6 +326,7 @@ static void zynq_machine_init(MachineClass *mc)
+     mc->no_sdcard =3D 1;
+     mc->ignore_memory_transaction_failures =3D true;
+     mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a9");
++    mc->valid_cpu_types =3D xlnx_zynq_7000_valid_cpus;
+ }
+=20
+ DEFINE_MACHINE("xilinx-zynq-a9", zynq_machine_init)
+--=20
 2.11.0
