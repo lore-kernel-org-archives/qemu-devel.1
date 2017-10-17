@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4ReO-0004OR-CI
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:11:21 -0400
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4ReV-0004VK-IJ
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:11:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4ReI-0005va-Jg
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:11:16 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:56974)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4ReP-00062y-9Z
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:11:23 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:56998)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4ReI-0005uz-Ai
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:11:10 -0400
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1e4ReO-00062D-S1
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 09:11:17 -0400
 From: Mihail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Tue, 17 Oct 2017 16:11:07 +0300
-Message-ID: <150824586699.6816.12521626029136655328.stgit@Misha-PC.lan02.inno>
+Date: Tue, 17 Oct 2017 16:11:12 +0300
+Message-ID: <150824587263.6816.10587533738326202158.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <150824572545.6816.5099701189660002212.stgit@Misha-PC.lan02.inno>
 References: <150824572545.6816.5099701189660002212.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v2 24/43] windbg: implemented
- kd_api_get_context and kd_api_set_context
+Subject: [Qemu-devel] [PATCH v2 25/43] windbg: implemented
+ kd_api_read_control_space and kd_api_write_control_space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,88 +34,145 @@ Signed-off-by: Mihail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 Signed-off-by: Dmitriy Koltunov <koltunov@ispras.ru>
 ---
- include/exec/windbgstub-utils.h |    2 ++
- target/i386/windbgstub.c        |   39 +++++++++++++++++++++++++++++++++++++++
- windbgstub.c                    |    8 ++++++++
- 3 files changed, 49 insertions(+)
+ include/exec/windbgstub-utils.h |    2 +
+ target/i386/windbgstub.c        |   89 +++++++++++++++++++++++++++++++++++++++
+ windbgstub.c                    |    8 ++++
+ 3 files changed, 99 insertions(+)
 
 diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-index 552318ad05..39fbfc8d3a 100755
+index 39fbfc8d3a..468a874ab7 100755
 --- a/include/exec/windbgstub-utils.h
 +++ b/include/exec/windbgstub-utils.h
-@@ -95,6 +95,8 @@ InitedAddr *windbg_get_version(void);
- 
- void kd_api_read_virtual_memory(CPUState *cpu, PacketData *pd);
+@@ -97,6 +97,8 @@ void kd_api_read_virtual_memory(CPUState *cpu, PacketData *pd);
  void kd_api_write_virtual_memory(CPUState *cpu, PacketData *pd);
-+void kd_api_get_context(CPUState *cpu, PacketData *pd);
-+void kd_api_set_context(CPUState *cpu, PacketData *pd);
+ void kd_api_get_context(CPUState *cpu, PacketData *pd);
+ void kd_api_set_context(CPUState *cpu, PacketData *pd);
++void kd_api_read_control_space(CPUState *cpu, PacketData *pd);
++void kd_api_write_control_space(CPUState *cpu, PacketData *pd);
  void kd_api_unsupported(CPUState *cpu, PacketData *pd);
  
  SizedBuf kd_gen_exception_sc(CPUState *cpu);
 diff --git a/target/i386/windbgstub.c b/target/i386/windbgstub.c
-index dcbb8313b5..175fa09f24 100755
+index 175fa09f24..3e238525da 100755
 --- a/target/i386/windbgstub.c
 +++ b/target/i386/windbgstub.c
-@@ -271,6 +271,45 @@ typedef struct _CPU_KPROCESSOR_STATE {
+@@ -283,6 +283,18 @@ static int windbg_write_context(CPUState *cpu, uint8_t *buf, int buf_size,
+     return 0;
+ }
  
- #endif
- 
-+static int windbg_read_context(CPUState *cpu, uint8_t *buf, int buf_size,
++static int windbg_read_ks_regs(CPUState *cpu, uint8_t *buf, int buf_size,
 +                               int offset, int len)
 +{
 +    return 0;
 +}
 +
-+static int windbg_write_context(CPUState *cpu, uint8_t *buf, int buf_size,
++static int windbg_write_ks_regs(CPUState *cpu, uint8_t *buf, int buf_size,
 +                                int offset, int len)
 +{
 +    return 0;
 +}
 +
-+void kd_api_get_context(CPUState *cpu, PacketData *pd)
+ void kd_api_get_context(CPUState *cpu, PacketData *pd)
+ {
+     int err;
+@@ -310,6 +322,83 @@ void kd_api_set_context(CPUState *cpu, PacketData *pd)
+     }
+ }
+ 
++void kd_api_read_control_space(CPUState *cpu, PacketData *pd)
 +{
-+    int err;
++    DBGKD_READ_MEMORY64 *mem = &pd->m64.u.ReadMemory;
++    uint32_t len;
++    uint32_t context_len;
++    uint32_t ks_regs_len;
++    target_ulong addr;
++    int err = -1;
 +
-+    pd->extra_size = sizeof(CPU_CONTEXT);
-+    err = windbg_read_context(cpu, pd->extra, pd->extra_size, 0,
-+                              pd->extra_size);
++    len = MIN(ldl_p(&mem->TransferCount),
++              PACKET_MAX_SIZE - sizeof(DBGKD_MANIPULATE_STATE64));
++    addr = ldtul_p(&mem->TargetBaseAddress);
++
++    if (addr < sizeof(CPU_KPROCESSOR_STATE)) {
++        len = MIN(len, sizeof(CPU_KPROCESSOR_STATE) - addr);
++
++        context_len = MAX(0, (int) (sizeof(CPU_CONTEXT) - addr));
++        ks_regs_len = len - context_len;
++
++        if (context_len > 0) {
++            err = windbg_read_context(cpu, pd->extra, context_len, addr,
++                                      context_len);
++        }
++        if (ks_regs_len > 0) {
++            addr = addr - sizeof(CPU_CONTEXT) + context_len;
++            err = windbg_read_ks_regs(cpu, pd->extra + context_len,
++                                      ks_regs_len, addr, ks_regs_len);
++        }
++    }
 +
 +    if (err) {
-+        pd->extra_size = 0;
++        len = 0;
 +        pd->m64.ReturnStatus = STATUS_UNSUCCESSFUL;
 +    }
++
++    pd->extra_size = len;
++    stl_p(&mem->ActualBytesRead, len);
 +}
 +
-+void kd_api_set_context(CPUState *cpu, PacketData *pd)
++void kd_api_write_control_space(CPUState *cpu, PacketData *pd)
 +{
-+    int err;
++    DBGKD_WRITE_MEMORY64 *mem = &pd->m64.u.WriteMemory;
++    uint32_t len;
++    uint32_t context_len;
++    uint32_t ks_regs_len;
++    target_ulong addr;
++    int err = -1;
 +
-+    err = windbg_write_context(cpu, pd->extra, pd->extra_size, 0,
-+                               sizeof(CPU_CONTEXT));
-+    pd->extra_size = 0;
++    len = MIN(ldl_p(&mem->TransferCount), pd->extra_size);
++    addr = ldtul_p(&mem->TargetBaseAddress);
++
++    if (addr < sizeof(CPU_KPROCESSOR_STATE)) {
++        len = MIN(len, sizeof(CPU_KPROCESSOR_STATE) - addr);
++
++        context_len = MAX(0, (int) (sizeof(CPU_CONTEXT) - addr));
++        ks_regs_len = len - context_len;
++
++        if (context_len > 0) {
++            err = windbg_write_context(cpu, pd->extra, context_len, addr,
++                                       context_len);
++        }
++        if (ks_regs_len > 0) {
++            addr = addr - sizeof(CPU_CONTEXT) + context_len;
++            err = windbg_write_ks_regs(cpu, pd->extra + context_len,
++                                       ks_regs_len, addr, ks_regs_len);
++        }
++    }
 +
 +    if (err) {
++        mem->ActualBytesWritten = 0;
 +        pd->m64.ReturnStatus = STATUS_UNSUCCESSFUL;
 +    }
++
++    pd->extra_size = 0;
++    stl_p(&mem->ActualBytesWritten, len);
 +}
 +
  bool windbg_on_load(void)
  {
      CPUState *cpu = qemu_get_cpu(0);
 diff --git a/windbgstub.c b/windbgstub.c
-index 1725107722..ad8638b793 100755
+index ad8638b793..5b0a15ea4e 100755
 --- a/windbgstub.c
 +++ b/windbgstub.c
-@@ -148,6 +148,14 @@ static void windbg_process_manipulate_packet(ParsingContext *ctx)
-         kd_api_write_virtual_memory(cpu, &ctx->data);
+@@ -156,6 +156,14 @@ static void windbg_process_manipulate_packet(ParsingContext *ctx)
+         kd_api_set_context(cpu, &ctx->data);
          break;
  
-+    case DbgKdGetContextApi:
-+        kd_api_get_context(cpu, &ctx->data);
++    case DbgKdReadControlSpaceApi:
++        kd_api_read_control_space(cpu, &ctx->data);
 +        break;
 +
-+    case DbgKdSetContextApi:
-+        kd_api_set_context(cpu, &ctx->data);
++    case DbgKdWriteControlSpaceApi:
++        kd_api_write_control_space(cpu, &ctx->data);
 +        break;
 +
      default:
