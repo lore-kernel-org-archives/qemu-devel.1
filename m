@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1e4PY7-0005FL-5v
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:56:39 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1e4PgF-0007NS-Tf
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:05:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1e4PY1-0004rT-9H
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:56:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55808)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1e4PY1-0004r0-3v
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:56:33 -0400
-References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
-	<1508170976-96869-5-git-send-email-imammedo@redhat.com>
-	<20171016163515.GH11975@redhat.com>
-	<20171017101707.5ff95d1c@nial.brq.redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <71e77669-5498-78a0-88b6-f634dc3727f6@redhat.com>
-Date: Tue, 17 Oct 2017 12:56:28 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1e4Pg8-0002yA-Li
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:05:03 -0400
+References: <20171017001209.32276-1-f4bug@amsat.org>
+	<20171017001209.32276-37-f4bug@amsat.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0e1e9d13-9b7f-ef72-757b-7b4262986a48@redhat.com>
+Date: Tue, 17 Oct 2017 13:04:47 +0200
 MIME-Version: 1.0
-In-Reply-To: <20171017101707.5ff95d1c@nial.brq.redhat.com>
+In-Reply-To: <20171017001209.32276-37-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 4/6] CLI: add -paused option
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 36/39] i386/pc: move pvpanic.c from
+ hw/misc/ to hw/i386/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +25,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: peter.maydell@linaro.org, pkrempa@redhat.com, ehabkost@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On 10/17/17 10:17, Igor Mammedov wrote:
-> On Mon, 16 Oct 2017 17:35:15 +0100
-> "Daniel P. Berrange" <berrange@redhat.com> wrote:
-> 
->> On Mon, Oct 16, 2017 at 06:22:54PM +0200, Igor Mammedov wrote:
->>
->> This really needs to have a commit message that provides justification
->> for why this option is needed when we already have -S that is used
->> to allow configuration before the guest starts.
-> Sorry, I've should have added here what I've tried to describe in cover letter.
-> 
-> -S pauses machine too late as machine is already created by the time
-> it's paused so trying to reconfigure it might require machine to be recreated.
-> In case of NUMA options it might be possible to hack x86 target to
-> rebuild/override acpi/fw_cfg so it would reflect the new settings set
-> this late but I wouldn't expect that it would work in general.
-> 
-> The cleanest way to configure it is pausing and configuring numa mapping
-> before machine is build.
+On 17/10/2017 02:12, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Asking from the sideline: if the NUMA mapping has to be configured so
-early, why can't it be done on the QEMU command line?
+pvpanic does not _have_ to be i386-specific, and losing the
+configurability with default-configs/ is a bit of a pity (there are
+people who change the configurations), so I think it's better to leave
+out this change.
 
-(I asked myself the same question when I first saw your patches -- I
-couldn't find an explanation in the blurb --, so I assumed it was
-obvious and/or others would ask the same question.)
+Paolo
 
-Again, I'm just curious.
-
-Thanks!
-Laszlo
+> ---
+>  default-configs/i386-softmmu.mak   | 1 -
+>  default-configs/x86_64-softmmu.mak | 1 -
+>  hw/{misc =3D> i386}/pvpanic.c        | 0
+>  hw/i386/Makefile.objs              | 2 +-
+>  hw/misc/Makefile.objs              | 1 -
+>  5 files changed, 1 insertion(+), 4 deletions(-)
+>  rename hw/{misc =3D> i386}/pvpanic.c (100%)
+>=20
+> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-so=
+ftmmu.mak
+> index dbc4e65652..541ec8604d 100644
+> --- a/default-configs/i386-softmmu.mak
+> +++ b/default-configs/i386-softmmu.mak
+> @@ -46,7 +46,6 @@ CONFIG_LPC_ICH9=3Dy
+>  CONFIG_PCI_Q35=3Dy
+>  CONFIG_APIC=3Dy
+>  CONFIG_IOAPIC=3Dy
+> -CONFIG_PVPANIC=3Dy
+>  CONFIG_MEM_HOTPLUG=3Dy
+>  CONFIG_NVDIMM=3Dy
+>  CONFIG_ACPI_NVDIMM=3Dy
+> diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_6=
+4-softmmu.mak
+> index f1fe508ff4..23488d324f 100644
+> --- a/default-configs/x86_64-softmmu.mak
+> +++ b/default-configs/x86_64-softmmu.mak
+> @@ -46,7 +46,6 @@ CONFIG_LPC_ICH9=3Dy
+>  CONFIG_PCI_Q35=3Dy
+>  CONFIG_APIC=3Dy
+>  CONFIG_IOAPIC=3Dy
+> -CONFIG_PVPANIC=3Dy
+>  CONFIG_MEM_HOTPLUG=3Dy
+>  CONFIG_NVDIMM=3Dy
+>  CONFIG_ACPI_NVDIMM=3Dy
+> diff --git a/hw/misc/pvpanic.c b/hw/i386/pvpanic.c
+> similarity index 100%
+> rename from hw/misc/pvpanic.c
+> rename to hw/i386/pvpanic.c
+> diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
+> index feff56a9b7..41574096f1 100644
+> --- a/hw/i386/Makefile.objs
+> +++ b/hw/i386/Makefile.objs
+> @@ -7,6 +7,6 @@ obj-y +=3D amd_iommu.o
+>  obj-$(CONFIG_XEN) +=3D ../xenpv/ xen/
+> =20
+>  obj-y +=3D kvmvapic.o
+> -obj-y +=3D acpi-build.o
+> +obj-y +=3D acpi-build.o pvpanic.o
+>  obj-y +=3D pci-assign-load-rom.o
+>  obj-y +=3D vmport.o
+> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+> index 03bc758592..182f9a7d54 100644
+> --- a/hw/misc/Makefile.objs
+> +++ b/hw/misc/Makefile.objs
+> @@ -53,7 +53,6 @@ obj-$(CONFIG_MIPS_CPS) +=3D mips_cpc.o
+>  obj-$(CONFIG_MIPS_ITU) +=3D mips_itu.o
+>  obj-$(CONFIG_MPS2_SCC) +=3D mps2-scc.o
+> =20
+> -obj-$(CONFIG_PVPANIC) +=3D pvpanic.o
+>  obj-$(CONFIG_HYPERV_TESTDEV) +=3D hyperv_testdev.o
+>  obj-$(CONFIG_AUX) +=3D auxbus.o
+>  obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_scu.o aspeed_sdmc.o
+>=20
