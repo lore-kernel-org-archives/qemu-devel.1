@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e4JOd-0008TE-QD
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:29 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e4JOe-0008U2-5Z
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e4JOZ-00077s-0c
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:27 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e4JOa-0007BN-Oz
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:28 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 17 Oct 2017 15:21:35 +1100
-Message-Id: <20171017042152.29443-18-david@gibson.dropbear.id.au>
+Date: Tue, 17 Oct 2017 15:21:50 +1100
+Message-Id: <20171017042152.29443-33-david@gibson.dropbear.id.au>
 In-Reply-To: <20171017042152.29443-1-david@gibson.dropbear.id.au>
 References: <20171017042152.29443-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 17/34] ppc: 40p/prep: replace cpu_model with
- cpu_type
+Subject: [Qemu-devel] [PULL 32/34] spapr: Correct RAM size calculation for
+ HPT resizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,59 +23,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: ehabkost@redhat.com, agraf@suse.de, imammedo@redhat.com, groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Igor Mammedov <imammedo@redhat.com>
+In order to prevent the guest from forcing the allocation of large amounts
+of qemu memory (or host kernel memory, in the case of KVM HV), we limit
+the size of Hashed Page Table (HPT) it is allowed to allocated, based on
+its RAM size.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+However, the current calculation is not correct: it only adds up the size
+of plugged memory, ignoring the base memory size.  This patch corrects it.
+
+While we're there, use get_plugged_memory_size() instead of directly
+calling pc_existing_dimms_capacity().  The only difference is that it
+will abort on failure, which is right: a failure here indicates something
+wrong within qemu.
+
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 ---
- hw/ppc/prep.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ hw/ppc/spapr_hcall.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-index 94138a4e8c..6f8accc397 100644
---- a/hw/ppc/prep.c
-+++ b/hw/ppc/prep.c
-@@ -517,11 +517,8 @@ static void ppc_prep_init(MachineState *machine)
-     linux_boot = (kernel_filename != NULL);
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 8d72bb7c1c..0d59d1534d 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -472,7 +472,7 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
+     target_ulong flags = args[0];
+     int shift = args[1];
+     sPAPRPendingHPT *pending = spapr->pending_hpt;
+-    uint64_t current_ram_size = MACHINE(spapr)->ram_size;
++    uint64_t current_ram_size;
+     int rc;
  
-     /* init CPUs */
--    if (machine->cpu_model == NULL)
--        machine->cpu_model = "602";
-     for (i = 0; i < smp_cpus; i++) {
--        cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
--                                           machine->cpu_model));
-+        cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
-         env = &cpu->env;
+     if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED) {
+@@ -494,7 +494,7 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
+         return H_PARAMETER;
+     }
  
-         if (env->flags & POWERPC_FLAG_RTC_CLK) {
-@@ -684,6 +681,7 @@ static void prep_machine_init(MachineClass *mc)
-     mc->block_default_type = IF_IDE;
-     mc->max_cpus = MAX_CPUS;
-     mc->default_boot_order = "cad";
-+    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("602");
- }
+-    current_ram_size = pc_existing_dimms_capacity(&error_fatal);
++    current_ram_size = MACHINE(spapr)->ram_size + get_plugged_memory_size();
  
- static int prep_set_cmos_checksum(DeviceState *dev, void *opaque)
-@@ -718,10 +716,7 @@ static void ibm_40p_init(MachineState *machine)
-     char boot_device;
- 
-     /* init CPU */
--    if (!machine->cpu_model) {
--        machine->cpu_model = "604";
--    }
--    cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, machine->cpu_model));
-+    cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
-     env = &cpu->env;
-     if (PPC_INPUT(env) != PPC_FLAGS_INPUT_6xx) {
-         error_report("only 6xx bus is supported on this machine");
-@@ -894,6 +889,7 @@ static void ibm_40p_machine_init(MachineClass *mc)
-     mc->default_ram_size = 128 * M_BYTE;
-     mc->block_default_type = IF_SCSI;
-     mc->default_boot_order = "c";
-+    mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("604");
- }
- 
- DEFINE_MACHINE("40p", ibm_40p_machine_init)
+     /* We only allow the guest to allocate an HPT one order above what
+      * we'd normally give them (to stop a small guest claiming a huge
 -- 
 2.13.6
