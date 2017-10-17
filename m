@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47439)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4V0y-0002g9-Qh
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:46:49 -0400
+	id 1e4V13-0002l6-2V
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:46:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4V0y-0003hw-1I
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:46:48 -0400
+	id 1e4V12-0003kD-D0
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:46:53 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 17 Oct 2017 13:44:18 -0300
-Message-Id: <20171017164426.25277-35-f4bug@amsat.org>
+Date: Tue, 17 Oct 2017 13:44:19 -0300
+Message-Id: <20171017164426.25277-36-f4bug@amsat.org>
 In-Reply-To: <20171017164426.25277-1-f4bug@amsat.org>
 References: <20171017164426.25277-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 34/42] hw/acpi/ich9: extract
- ACPI_PM_PROP_TCO_ENABLED from i386/pc
+Subject: [Qemu-devel] [PATCH v3 35/42] hw/display/vga: "vga.h" only contains
+ registers defs, rename it "vga_regs.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,43 +27,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-enable_tco is specific to i386/pc.
-
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/acpi/ich9.h | 2 ++
- include/hw/i386/pc.h   | 2 --
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ hw/display/{vga.h => vga_regs.h} | 0
+ hw/display/vga.c                 | 2 +-
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+ rename hw/display/{vga.h => vga_regs.h} (100%)
 
-diff --git a/include/hw/acpi/ich9.h b/include/hw/acpi/ich9.h
-index a352c94fde..59aeb06393 100644
---- a/include/hw/acpi/ich9.h
-+++ b/include/hw/acpi/ich9.h
-@@ -63,6 +63,8 @@ typedef struct ICH9LPCPMRegs {
-     TCOIORegs tco_regs;
- } ICH9LPCPMRegs;
- 
-+#define ACPI_PM_PROP_TCO_ENABLED "enable_tco"
-+
- void ich9_pm_init(PCIDevice *lpc_pci, ICH9LPCPMRegs *pm,
-                   bool smm_enabled,
-                   qemu_irq sci_irq);
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 6335e2bf47..b1b4c918af 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -151,8 +151,6 @@ struct PCMachineClass {
- #define PC_MACHINE_CLASS(klass) \
-     OBJECT_CLASS_CHECK(PCMachineClass, (klass), TYPE_PC_MACHINE)
- 
--#define ACPI_PM_PROP_TCO_ENABLED "enable_tco"
--
- /* parallel.c */
- 
- void parallel_hds_isa_init(ISABus *bus, int n);
+diff --git a/hw/display/vga.h b/hw/display/vga_regs.h
+similarity index 100%
+rename from hw/display/vga.h
+rename to hw/display/vga_regs.h
+diff --git a/hw/display/vga.c b/hw/display/vga.c
+index ed24ef7076..35696b6fdd 100644
+--- a/hw/display/vga.c
++++ b/hw/display/vga.c
+@@ -24,11 +24,11 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "hw/hw.h"
+-#include "vga.h"
+ #include "ui/console.h"
+ #include "hw/i386/pc.h"
+ #include "hw/pci/pci.h"
+ #include "vga_int.h"
++#include "vga_regs.h"
+ #include "ui/pixel_ops.h"
+ #include "qemu/timer.h"
+ #include "hw/xen/xen.h"
 -- 
 2.15.0.rc0
