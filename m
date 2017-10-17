@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e4UnM-00074P-Dx
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:32:52 -0400
+	(envelope-from <jcody@redhat.com>) id 1e4UnX-0007Ey-NV
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:32:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e4UnE-0006Z5-Ld
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:32:44 -0400
+	(envelope-from <jcody@redhat.com>) id 1e4UnV-0006xh-Gh
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:32:55 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 17 Oct 2017 12:31:49 -0400
-Message-Id: <4b9a7c197c0ed492d1efa4950c8221a1ca7652c9.1508257445.git.jcody@redhat.com>
+Date: Tue, 17 Oct 2017 12:31:55 -0400
+Message-Id: <f2da69a9931eb356c7fbc9e91a72af03210d72a5.1508257445.git.jcody@redhat.com>
 In-Reply-To: <cover.1508257445.git.jcody@redhat.com>
 References: <cover.1508257445.git.jcody@redhat.com>
 In-Reply-To: <cover.1508257445.git.jcody@redhat.com>
 References: <cover.1508257445.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 04/10] qemu-iotests: remove file cleanup
- from bash tests
+Subject: [Qemu-devel] [PATCH v5 10/10] qemu-iotests: add support for running
+ multi-threaded iotests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,2959 +25,586 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, jsnow@redhat.com, stefanha@redhat.com, kwolf@redhat.com, eblake@redhat.com
 
-All files for a given test are now self-contained in a subdirectory,
-and therefore the "./check" script can do all file-related cleanup
-without any help.
+This adds support for running qemu-iotests in an arbitrary number
+of sub-processes, so that tests can be run in parallel.
 
-This removes file cleanups from the bash tests.  The only cleanup left
-is whatever is needed to kill any spawned processes; e.g. _cleanup_qemu.
+This necessarily changes the output format, although it should still
+be familiar.  If you run in a single thread, the output format will
+largely be the same as before this patch.
+
+To run in more than one process, use the '-j num' option, e.g.:
+  ./check -qcow2 -j 5
+
+Some caveats:
+
+    * Some output format options, such as timestamps, are currently
+      not compatible with multiple jobs.  If you select multiple
+      jobs, timestamps will be disabled.
+
+    * Some tests may be more prone to failure with multiple jobs.
+      This isn't a flaw of multiple jobs per se, but rather of
+      fragile tests.  Some tests (181, 183) are very sensitive in
+      timing, and high cpu loads can cause them to fail.  It may be
+      worth adding support for 'single-thread only' tests in subsequent
+      patches, that complete designated single-thread jobs at the end.
+
+    * Running protocol tests multi-threaded may fail, as multiple
+      tests may try to bind the same address.
+
+If '-j' is not specified, the default is a single iotest being run
+at a time.
 
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- tests/qemu-iotests/001     |  6 ------
- tests/qemu-iotests/002     |  6 ------
- tests/qemu-iotests/003     |  6 ------
- tests/qemu-iotests/004     |  6 ------
- tests/qemu-iotests/005     |  6 ------
- tests/qemu-iotests/007     |  7 -------
- tests/qemu-iotests/008     |  6 ------
- tests/qemu-iotests/009     |  6 ------
- tests/qemu-iotests/010     |  6 ------
- tests/qemu-iotests/011     |  6 ------
- tests/qemu-iotests/012     |  6 ------
- tests/qemu-iotests/013     |  6 ------
- tests/qemu-iotests/014     |  6 ------
- tests/qemu-iotests/015     |  7 -------
- tests/qemu-iotests/017     |  6 ------
- tests/qemu-iotests/018     |  6 ------
- tests/qemu-iotests/019     |  8 --------
- tests/qemu-iotests/020     |  8 --------
- tests/qemu-iotests/021     |  6 ------
- tests/qemu-iotests/022     |  6 ------
- tests/qemu-iotests/023     |  6 ------
- tests/qemu-iotests/024     |  8 --------
- tests/qemu-iotests/025     |  6 ------
- tests/qemu-iotests/026     |  7 -------
- tests/qemu-iotests/027     |  6 ------
- tests/qemu-iotests/028     |  8 --------
- tests/qemu-iotests/029     |  7 -------
- tests/qemu-iotests/031     |  6 ------
- tests/qemu-iotests/032     |  6 ------
- tests/qemu-iotests/033     |  6 ------
- tests/qemu-iotests/034     |  6 ------
- tests/qemu-iotests/035     |  6 ------
- tests/qemu-iotests/036     |  6 ------
- tests/qemu-iotests/037     |  6 ------
- tests/qemu-iotests/038     |  6 ------
- tests/qemu-iotests/039     |  6 ------
- tests/qemu-iotests/042     |  6 ------
- tests/qemu-iotests/043     |  7 -------
- tests/qemu-iotests/046     |  6 ------
- tests/qemu-iotests/047     |  6 ------
- tests/qemu-iotests/048     |  8 --------
- tests/qemu-iotests/048.out |  1 -
- tests/qemu-iotests/049     |  6 ------
- tests/qemu-iotests/050     |  8 --------
- tests/qemu-iotests/051     |  6 ------
- tests/qemu-iotests/052     |  6 ------
- tests/qemu-iotests/053     |  7 -------
- tests/qemu-iotests/054     |  6 ------
- tests/qemu-iotests/058     | 47 ++++++++++++++--------------------------------
- tests/qemu-iotests/059     |  7 -------
- tests/qemu-iotests/060     |  6 ------
- tests/qemu-iotests/061     |  6 ------
- tests/qemu-iotests/062     |  6 ------
- tests/qemu-iotests/063     |  7 -------
- tests/qemu-iotests/064     |  6 ------
- tests/qemu-iotests/066     |  6 ------
- tests/qemu-iotests/068     |  6 ------
- tests/qemu-iotests/069     |  6 ------
- tests/qemu-iotests/070     |  6 ------
- tests/qemu-iotests/071     |  6 ------
- tests/qemu-iotests/072     |  6 ------
- tests/qemu-iotests/073     |  6 ------
- tests/qemu-iotests/074     |  9 ---------
- tests/qemu-iotests/074.out |  1 -
- tests/qemu-iotests/075     |  6 ------
- tests/qemu-iotests/076     |  6 ------
- tests/qemu-iotests/077     |  6 ------
- tests/qemu-iotests/078     |  6 ------
- tests/qemu-iotests/079     |  6 ------
- tests/qemu-iotests/080     |  7 -------
- tests/qemu-iotests/081     |  8 --------
- tests/qemu-iotests/082     |  6 ------
- tests/qemu-iotests/083     |  8 --------
- tests/qemu-iotests/084     |  6 ------
- tests/qemu-iotests/085     | 13 +------------
- tests/qemu-iotests/086     |  6 ------
- tests/qemu-iotests/088     |  7 -------
- tests/qemu-iotests/089     |  6 ------
- tests/qemu-iotests/090     |  6 ------
- tests/qemu-iotests/091     |  8 +-------
- tests/qemu-iotests/092     |  7 -------
- tests/qemu-iotests/094     |  9 +--------
- tests/qemu-iotests/095     |  8 +-------
- tests/qemu-iotests/097     |  7 -------
- tests/qemu-iotests/098     |  7 -------
- tests/qemu-iotests/099     |  6 ------
- tests/qemu-iotests/101     |  6 ------
- tests/qemu-iotests/102     |  7 +------
- tests/qemu-iotests/103     |  6 ------
- tests/qemu-iotests/104     |  2 --
- tests/qemu-iotests/105     |  6 ------
- tests/qemu-iotests/106     |  6 ------
- tests/qemu-iotests/107     |  6 ------
- tests/qemu-iotests/108     |  6 ------
- tests/qemu-iotests/109     |  8 +-------
- tests/qemu-iotests/110     |  6 ------
- tests/qemu-iotests/111     |  6 ------
- tests/qemu-iotests/112     |  6 ------
- tests/qemu-iotests/113     |  6 ------
- tests/qemu-iotests/114     |  6 ------
- tests/qemu-iotests/115     |  6 ------
- tests/qemu-iotests/116     |  6 ------
- tests/qemu-iotests/117     |  7 +------
- tests/qemu-iotests/119     |  6 ------
- tests/qemu-iotests/120     |  6 ------
- tests/qemu-iotests/121     |  6 ------
- tests/qemu-iotests/122     |  7 -------
- tests/qemu-iotests/123     |  7 -------
- tests/qemu-iotests/125     |  6 ------
- tests/qemu-iotests/130     |  7 +------
- tests/qemu-iotests/131     |  6 ------
- tests/qemu-iotests/133     |  6 ------
- tests/qemu-iotests/134     |  6 ------
- tests/qemu-iotests/135     |  6 ------
- tests/qemu-iotests/137     |  6 ------
- tests/qemu-iotests/138     |  6 ------
- tests/qemu-iotests/140     |  8 +-------
- tests/qemu-iotests/141     |  8 +-------
- tests/qemu-iotests/142     |  7 -------
- tests/qemu-iotests/143     |  7 +------
- tests/qemu-iotests/144     |  8 +-------
- tests/qemu-iotests/145     |  7 -------
- tests/qemu-iotests/146     |  7 +------
- tests/qemu-iotests/150     |  6 ------
- tests/qemu-iotests/153     | 12 ------------
- tests/qemu-iotests/154     |  6 ------
- tests/qemu-iotests/156     |  7 +------
- tests/qemu-iotests/157     |  6 ------
- tests/qemu-iotests/158     |  6 ------
- tests/qemu-iotests/159     |  7 -------
- tests/qemu-iotests/160     |  7 -------
- tests/qemu-iotests/162     |  7 -------
- tests/qemu-iotests/170     |  7 -------
- tests/qemu-iotests/171     |  6 ------
- tests/qemu-iotests/172     |  8 --------
- tests/qemu-iotests/173     |  8 +-------
- tests/qemu-iotests/174     |  6 ------
- tests/qemu-iotests/175     |  6 ------
- tests/qemu-iotests/176     |  7 -------
- tests/qemu-iotests/177     |  6 ------
- tests/qemu-iotests/178     |  7 -------
- tests/qemu-iotests/179     |  7 -------
- tests/qemu-iotests/181     |  8 +-------
- tests/qemu-iotests/182     |  6 ------
- tests/qemu-iotests/183     |  9 +--------
- tests/qemu-iotests/184     |  6 ------
- tests/qemu-iotests/185     |  9 +--------
- tests/qemu-iotests/186     |  6 ------
- tests/qemu-iotests/187     |  8 --------
- tests/qemu-iotests/188     |  6 ------
- tests/qemu-iotests/189     |  6 ------
- tests/qemu-iotests/190     |  7 -------
- tests/qemu-iotests/191     |  4 ----
- tests/qemu-iotests/192     |  6 ------
- tests/qemu-iotests/195     |  7 -------
- tests/qemu-iotests/197     |  7 -------
- 156 files changed, 32 insertions(+), 1023 deletions(-)
+ tests/qemu-iotests/check      | 427 +++++++++++++++++++++++++++++-------------
+ tests/qemu-iotests/common.rc  |   2 +-
+ tests/qemu-iotests/iotests.py |   4 +-
+ 3 files changed, 297 insertions(+), 136 deletions(-)
 
-diff --git a/tests/qemu-iotests/001 b/tests/qemu-iotests/001
-index ffd14e2..6f71879 100755
---- a/tests/qemu-iotests/001
-+++ b/tests/qemu-iotests/001
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index a66f7b0..363617e 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -26,6 +26,8 @@ n_bad=0
+ bad=""
+ notrun=""
+ interrupt=true
++TEST_DIR_SEQ="$TEST_DIR"
++MAX_JOBS=1
  
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/002 b/tests/qemu-iotests/002
-index d4f8e91..4c9ff23 100755
---- a/tests/qemu-iotests/002
-+++ b/tests/qemu-iotests/002
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
+ # by default don't output timestamps
+ timestamp=${TIMESTAMP:=false}
+@@ -125,6 +127,7 @@ sortme=false
+ expunge=true
+ have_test_arg=false
+ cachemode=false
++multijob=false
+ save_on_err=false
  
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/003 b/tests/qemu-iotests/003
-index 19889b9..2648d03 100755
---- a/tests/qemu-iotests/003
-+++ b/tests/qemu-iotests/003
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
+ tmp="${TEST_DIR}"/$$
+@@ -220,6 +223,11 @@ s/ .*//p
+         CACHEMODE_IS_DEFAULT=false
+         cachemode=false
+         continue
++    elif $multijob
++    then
++        MAX_JOBS="$r"
++        multijob=false
++        continue
+     fi
  
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/004 b/tests/qemu-iotests/004
-index 6f2aa3d..99743b4 100755
---- a/tests/qemu-iotests/004
-+++ b/tests/qemu-iotests/004
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
+     xpand=true
+@@ -262,9 +270,10 @@ other options
+     -misalign           misalign memory allocations
+     -n                  show me, do not run tests
+     -o options          -o options to pass to qemu-img create/convert
+-    -T                  output timestamps
++    -T                  output timestamps, disabled if using '-j'
+     -c mode             cache mode
+     -s                  save test scratch directory on test failure
++    -j num              run tests in 'num' processes
  
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/005 b/tests/qemu-iotests/005
-index 4447377..23a77e0 100755
---- a/tests/qemu-iotests/005
-+++ b/tests/qemu-iotests/005
-@@ -30,12 +30,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
  
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/007 b/tests/qemu-iotests/007
-index fa543ee..c8068e5 100755
---- a/tests/qemu-iotests/007
-+++ b/tests/qemu-iotests/007
-@@ -27,13 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
+ testlist options
+@@ -442,6 +451,10 @@ testlist options
+             save_on_err=true
+             xpand=false
+             ;;
++        -j)
++            multijob=true
++            xpand=false
++            ;;
+         '[0-9][0-9][0-9] [0-9][0-9][0-9][0-9]')
+             echo "No tests?"
+             status=1
+@@ -506,6 +519,20 @@ BEGIN        { for (t='$start'; t<='$end'; t++) printf "%03d\n",t }' \
  
--_cleanup()
--{
--	_cleanup_test_img
--	true
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/008 b/tests/qemu-iotests/008
-index 8e89d74..7f7f8ae 100755
---- a/tests/qemu-iotests/008
-+++ b/tests/qemu-iotests/008
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
+ done
  
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/009 b/tests/qemu-iotests/009
-index 16e4475..e03412a 100755
---- a/tests/qemu-iotests/009
-+++ b/tests/qemu-iotests/009
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/010 b/tests/qemu-iotests/010
-index 151dac2..8608848 100755
---- a/tests/qemu-iotests/010
-+++ b/tests/qemu-iotests/010
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/011 b/tests/qemu-iotests/011
-index f8d044e..0c0d15f 100755
---- a/tests/qemu-iotests/011
-+++ b/tests/qemu-iotests/011
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/012 b/tests/qemu-iotests/012
-index 01a770d..aa9cfb4 100755
---- a/tests/qemu-iotests/012
-+++ b/tests/qemu-iotests/012
-@@ -29,12 +29,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/013 b/tests/qemu-iotests/013
-index d013f87..0ff9c4d 100755
---- a/tests/qemu-iotests/013
-+++ b/tests/qemu-iotests/013
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/014 b/tests/qemu-iotests/014
-index 2ea79e8..3dee9f7 100755
---- a/tests/qemu-iotests/014
-+++ b/tests/qemu-iotests/014
-@@ -29,12 +29,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/015 b/tests/qemu-iotests/015
-index aaf9c3f..d29a778 100755
---- a/tests/qemu-iotests/015
-+++ b/tests/qemu-iotests/015
-@@ -27,13 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--	true
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/017 b/tests/qemu-iotests/017
-index 4f9302d..994ea0e 100755
---- a/tests/qemu-iotests/017
-+++ b/tests/qemu-iotests/017
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/018 b/tests/qemu-iotests/018
-index 1d39d35..11ad2b1 100755
---- a/tests/qemu-iotests/018
-+++ b/tests/qemu-iotests/018
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/019 b/tests/qemu-iotests/019
-index 24a789a..3728193 100755
---- a/tests/qemu-iotests/019
-+++ b/tests/qemu-iotests/019
-@@ -29,14 +29,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--    rm -f "$TEST_IMG.base"
--    rm -f "$TEST_IMG.orig"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/020 b/tests/qemu-iotests/020
-index 7a11110..37cd5d1 100755
---- a/tests/qemu-iotests/020
-+++ b/tests/qemu-iotests/020
-@@ -27,14 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--    rm -f "$TEST_IMG.base"
--    rm -f "$TEST_IMG.orig"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/021 b/tests/qemu-iotests/021
-index 11e8ed7..5ab2acb 100755
---- a/tests/qemu-iotests/021
-+++ b/tests/qemu-iotests/021
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/022 b/tests/qemu-iotests/022
-index 2452a9f..4870b17 100755
---- a/tests/qemu-iotests/022
-+++ b/tests/qemu-iotests/022
-@@ -29,12 +29,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/023 b/tests/qemu-iotests/023
-index 497ae1e..5a2bf4e 100755
---- a/tests/qemu-iotests/023
-+++ b/tests/qemu-iotests/023
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/024 b/tests/qemu-iotests/024
-index e0d77ce..3e638d9 100755
---- a/tests/qemu-iotests/024
-+++ b/tests/qemu-iotests/024
-@@ -27,14 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--	rm -f "$TEST_DIR/t.$IMGFMT.base_old"
--	rm -f "$TEST_DIR/t.$IMGFMT.base_new"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/025 b/tests/qemu-iotests/025
-index f5e672e..93634c1 100755
---- a/tests/qemu-iotests/025
-+++ b/tests/qemu-iotests/025
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/026 b/tests/qemu-iotests/026
-index 7fadfba..dc4ff9f 100755
---- a/tests/qemu-iotests/026
-+++ b/tests/qemu-iotests/026
-@@ -27,13 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--    rm "$TEST_DIR/blkdebug.conf"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/027 b/tests/qemu-iotests/027
-index 08593da..c3f9146 100755
---- a/tests/qemu-iotests/027
-+++ b/tests/qemu-iotests/027
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/028 b/tests/qemu-iotests/028
-index 97a8869..3176789 100755
---- a/tests/qemu-iotests/028
-+++ b/tests/qemu-iotests/028
-@@ -30,14 +30,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_qemu
--    rm -f "${TEST_IMG}.copy"
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/029 b/tests/qemu-iotests/029
-index 30bab24..981a864 100755
---- a/tests/qemu-iotests/029
-+++ b/tests/qemu-iotests/029
-@@ -27,13 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    rm -f $TEST_IMG.snap
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/031 b/tests/qemu-iotests/031
-index 1e08abc..6805c2c 100755
---- a/tests/qemu-iotests/031
-+++ b/tests/qemu-iotests/031
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/032 b/tests/qemu-iotests/032
-index 24bcb52..dafcfb8 100755
---- a/tests/qemu-iotests/032
-+++ b/tests/qemu-iotests/032
-@@ -29,12 +29,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/033 b/tests/qemu-iotests/033
-index 2cdfd13..bf3c59c 100755
---- a/tests/qemu-iotests/033
-+++ b/tests/qemu-iotests/033
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/034 b/tests/qemu-iotests/034
-index 1b28bda..830b0db 100755
---- a/tests/qemu-iotests/034
-+++ b/tests/qemu-iotests/034
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/035 b/tests/qemu-iotests/035
-index efc38e4..a79a4fd 100755
---- a/tests/qemu-iotests/035
-+++ b/tests/qemu-iotests/035
-@@ -28,12 +28,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/036 b/tests/qemu-iotests/036
-index ce638d6..841f347 100755
---- a/tests/qemu-iotests/036
-+++ b/tests/qemu-iotests/036
-@@ -30,12 +30,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/037 b/tests/qemu-iotests/037
-index c476b82..756fc2c 100755
---- a/tests/qemu-iotests/037
-+++ b/tests/qemu-iotests/037
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/038 b/tests/qemu-iotests/038
-index d99a150..cf730ae 100755
---- a/tests/qemu-iotests/038
-+++ b/tests/qemu-iotests/038
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/039 b/tests/qemu-iotests/039
-index 1f48339..dd483c4 100755
---- a/tests/qemu-iotests/039
-+++ b/tests/qemu-iotests/039
-@@ -30,12 +30,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/042 b/tests/qemu-iotests/042
-index a53e7cb..0efeec6 100755
---- a/tests/qemu-iotests/042
-+++ b/tests/qemu-iotests/042
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/043 b/tests/qemu-iotests/043
-index 1c6c22d..48b71fe 100755
---- a/tests/qemu-iotests/043
-+++ b/tests/qemu-iotests/043
-@@ -27,13 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--    rm -f "$TEST_IMG".[123].base
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/046 b/tests/qemu-iotests/046
-index f2ebecf..362ed94 100755
---- a/tests/qemu-iotests/046
-+++ b/tests/qemu-iotests/046
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/047 b/tests/qemu-iotests/047
-index 1b8f3d4..1850035 100755
---- a/tests/qemu-iotests/047
-+++ b/tests/qemu-iotests/047
-@@ -28,12 +28,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/048 b/tests/qemu-iotests/048
-index 9ed04a0..c95bd2f 100755
---- a/tests/qemu-iotests/048
-+++ b/tests/qemu-iotests/048
-@@ -27,14 +27,6 @@ echo "QA output created by $seq"
- 
- status=1        # failure is the default!
- 
--_cleanup()
--{
--    echo "Cleanup"
--    _cleanup_test_img
--    rm "${TEST_IMG_FILE2}"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- _compare()
- {
-     $QEMU_IMG compare $QEMU_IMG_EXTRA_ARGS "$@" "$TEST_IMG" "${TEST_IMG2}"
-diff --git a/tests/qemu-iotests/048.out b/tests/qemu-iotests/048.out
-index 0bcf663..3318eed 100644
---- a/tests/qemu-iotests/048.out
-+++ b/tests/qemu-iotests/048.out
-@@ -39,4 +39,3 @@ wrote 512/512 bytes at offset 512
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Content mismatch at offset 512!
- 1
--Cleanup
-diff --git a/tests/qemu-iotests/049 b/tests/qemu-iotests/049
-index df35b6d..00733a6 100755
---- a/tests/qemu-iotests/049
-+++ b/tests/qemu-iotests/049
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/050 b/tests/qemu-iotests/050
-index 03b4a5d..e3b6d8c 100755
---- a/tests/qemu-iotests/050
-+++ b/tests/qemu-iotests/050
-@@ -27,14 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--    rm -f "$TEST_IMG.old"
--    rm -f "$TEST_IMG.new"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
-index dba8816..24da3c5 100755
---- a/tests/qemu-iotests/051
-+++ b/tests/qemu-iotests/051
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/052 b/tests/qemu-iotests/052
-index 842eace..fc23fad 100755
---- a/tests/qemu-iotests/052
-+++ b/tests/qemu-iotests/052
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/053 b/tests/qemu-iotests/053
-index 2a04f5f..e8b9037 100755
---- a/tests/qemu-iotests/053
-+++ b/tests/qemu-iotests/053
-@@ -27,13 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	rm -f "$TEST_IMG.orig"
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/054 b/tests/qemu-iotests/054
-index bf47ef9..e2de997 100755
---- a/tests/qemu-iotests/054
-+++ b/tests/qemu-iotests/054
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/058 b/tests/qemu-iotests/058
-index 2253c6a..9ff07aa 100755
---- a/tests/qemu-iotests/058
-+++ b/tests/qemu-iotests/058
-@@ -29,23 +29,22 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.pattern
++# No need for multi-process support, and this keeps output simpler
++if $showme
++then
++    MAX_JOBS=1
++fi
 +
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+_require_command QEMU_NBD
-+# Internal snapshots are (currently) impossible with refcount_bits=1
-+_unsupported_imgopts 'refcount_bits=1[^0-9]'
++# TODO: Change test output format so that this can be useful
++#       with multi-process jobs
++if $timestamp && [ $MAX_JOBS -gt 1 ]
++then
++    echo "Not showing timestamps with multi-job test"
++    timestamp=false
++fi
 +
- nbd_unix_socket=$TEST_DIR/test_qemu_nbd_socket
- nbd_snapshot_img="nbd:unix:$nbd_unix_socket"
- rm -f "${TEST_DIR}/qemu-nbd.pid"
+ # Set qemu-io cache mode with $CACHEMODE we have
+ QEMU_IO_OPTIONS="$QEMU_IO_OPTIONS --cache $CACHEMODE"
  
--_cleanup_nbd()
--{
--    local NBD_SNAPSHOT_PID
--    if [ -f "${TEST_DIR}/qemu-nbd.pid" ]; then
--        read NBD_SNAPSHOT_PID < "${TEST_DIR}/qemu-nbd.pid"
--        rm -f "${TEST_DIR}/qemu-nbd.pid"
--        if [ -n "$NBD_SNAPSHOT_PID" ]; then
--            kill "$NBD_SNAPSHOT_PID"
+@@ -670,8 +697,11 @@ END        { if (NR > 0) {
+ 
+         if [ ! -z "$notrun" ]
+         then
+-            echo "Not run:$notrun"
+-            echo "Not run:$notrun" >>check.log
++            # if run with $MAX_JOBS > 1, this will likely be
++            # out of order
++            notrun=$(echo $notrun|tr " " "\n"|sort|tr "\n" " ")
++            echo "Not run: $notrun"
++            echo "Not run: $notrun" >>check.log
+         fi
+         if [ ! -z "$n_bad" -a $n_bad != 0 ]
+         then
+@@ -694,7 +724,7 @@ END        { if (NR > 0) {
+     rm -f $tmp.*
+ }
+ 
+-trap "_wrapup; exit \$status" 0 1 2 3 15
++trap "_wait_to_finish; _wrapup; exit \$status" 0 1 2 3 15
+ 
+ [ -f $TIMESTAMP_FILE ] || touch $TIMESTAMP_FILE
+ 
+@@ -718,11 +748,235 @@ seq="check"
+ 
+ [ -n "$TESTS_REMAINING_LOG" ] && echo $list > $TESTS_REMAINING_LOG
+ 
++# Execute actual test.  This will be run in a background process.
++_do_test()
++{
++    local seq=$1
++    local err=false
++    local tmp="${TEST_DIR}/$seq/$seq"
++    local TEST_DIR_SEQ=$TEST_DIR/$seq
++
++    _wallclock > "${TEST_DIR}/$seq.start.clock"
++    $timestamp && printf %s "        [$(date "+%T")]"
++
++    if [ "$(head -n 1 "$source_iotests/$seq")" == "#!/usr/bin/env python" ]; then
++        run_command="$PYTHON $seq"
++    else
++        run_command="./$seq"
++    fi
++    export OUTPUT_DIR=$PWD
++    if $debug; then
++        # Do this in a sub-shell, so we are operating on the right
++        # TEST_DIR / QEMU_TEST_DIR
++        (
++        export TEST_DIR=$TEST_DIR_SEQ
++        cd "$source_iotests";
++        . ./common.config
++        . ./common.rc
++            MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(($RANDOM % 255 + 1))} \
++            $run_command -d 2>&1 | tee $tmp.out
++        )
++    else
++        # Do this in a sub-shell, so we are operating on the right
++        # TEST_DIR / QEMU_TEST_DIR
++        (
++        export TEST_DIR=$TEST_DIR_SEQ
++        cd "$source_iotests";
++        . ./common.config
++        . ./common.rc
++            MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(($RANDOM % 255 + 1))} \
++            $run_command >$tmp.out 2>&1
++        )
++    fi
++    sts=$?
++    $timestamp && _timestamp
++    _wallclock > "${TEST_DIR}/$seq.stop.clock"
++
++    if [ -f core ]
++    then
++        printf " [dumped core]"
++        mv core $seq.core
++        err=true
++    fi
++
++    if [ ! -f $seq.notrun ]
++    then
++        if [ $sts -ne 0 ]
++        then
++            printf %s " [failed, exit status $sts]" > "$TEST_DIR/$seq.err"
++            err=true
++        fi
++    fi
++
++
++    # Do this in a sub-shell, so we are operating on the right
++    # TEST_DIR / QEMU_TEST_DIR
++    (
++    export TEST_DIR=$TEST_DIR_SEQ
++    cd "$source_iotests";
++    . ./common.config
++    . ./common.rc
++    . ./common.qemu
++
++    _cleanup_protocols
++    _cleanup_qemu
++    )
++
++    if [ "$err" == "true" ]
++    then
++        touch "$TEST_DIR/$seq.err"
++    fi
++}
++
++# Runs after we detect a test has completed
++function _check_results()
++{
++    local seq=$1
++    local err=false
++    local localtmp="${TEST_DIR}/$seq/$seq"
++    local TEST_DIR_SEQ=$TEST_DIR/$seq
++    local success=true
++
++    if [ -f $seq.notrun ]
++    then
++        if [ $MAX_JOBS -gt 1 ]
++        then
++            printf "$seq   "
++        fi
++        $timestamp || printf " [not run] "
++        $timestamp && printf " [not run]" && printf %s "        $seq -- "
++        cat $seq.notrun
++        notrun="$notrun $seq"
++        success=false
++    else
++        reference="$source_iotests/$seq.out"
++        reference_machine="$source_iotests/$seq.$QEMU_DEFAULT_MACHINE.out"
++        if [ -f "$reference_machine" ]; then
++            reference="$reference_machine"
++        fi
++
++        reference_format="$source_iotests/$seq.out.$IMGFMT"
++        if [ -f "$reference_format" ]; then
++            reference="$reference_format"
++        fi
++
++        if [ "$CACHEMODE" = "none" ]; then
++            [ -f "$source_iotests/$seq.out.nocache" ] && reference="$source_iotests/$seq.out.nocache"
++        fi
++
++        if [ ! -f "$reference" ]
++        then
++            echo " - no qualified output"
++        else
++            if diff -w "$reference" $localtmp.out >/dev/null 2>&1
++            then
++                if $err
++                then
++                    :
++                else
++                    stop=$(cat "$TEST_DIR/$seq.stop.clock")
++                    start=$(cat "$TEST_DIR/$seq.start.clock")
++                    echo "$seq `expr $stop - $start`" >>$tmp.time
++                fi
++            else
++                printf " - output mismatch (see $seq.out.bad)"
++                mv $localtmp.out $seq.out.bad
++                $diff -w "$reference" $(realpath $seq.out.bad)
++                err=true
++            fi
++        fi
++    fi
++
++    if [ "$err" == "true" ] || [ -f "$TEST_DIR/$seq.err" ]
++    then
++        if [ $MAX_JOBS -gt 1 ]
++        then
++            printf "\n$seq    [  fail ] "
++        fi
++        if [ -f "$TEST_DIR/$seq.err" ]
++        then
++            cat "$TEST_DIR/$seq.err"
++        fi
++        success=false
++        err=true
++        bad="$bad $seq"
++        n_bad=`expr $n_bad + 1`
++        quick=false
++    fi
++
++
++    if [ "$save_on_err" != "true" ] || [ "$err" != "true" ]
++    then
++        rm -rf "$TEST_DIR_SEQ"
++    fi
++
++    [ -f $seq.notrun ] || try=`expr $try + 1`
++
++    rm -f "$TEST_DIR/$seq.stop.clock" "$TEST_DIR/$seq.start.clock"
++
++    if [ $MAX_JOBS -eq 1 ] || [ "$success" == "false" ]
++    then
++        printf "\n"
++    fi
++}
++
++# Even if interrupted, we want to wait until
++# all tests have completed, so we can properly clean
++# up after them via _check_results
++function _wait_to_finish()
++{
++    while [ $jobs_running -gt 0 ]
++    do
++        i=0
++        while [ $jobs_running -gt 0 ]
++        do
++            job=${job_slots[$i]}
++            if [ $job -gt 0 ]
++            then
++                if [ -z "$(ps -o pid -h -p $job)" ]
++                then
++                    _check_results ${job_seq[$i]}
++                    job_slots[$i]=0
++                    job_seq[$i]=-1
++                    let jobs_running--
++                fi
++            fi
++            let i++
++            let i=`expr $i % $MAX_JOBS`
++            sleep 0.1
++        done
++    done
++}
++
++job_slots=
++
++jobs_running=0
++
++for i in `seq 0 $MAX_JOBS`
++do
++    job_slots[$i]=0
++done
++
++
++# Now iterate of the list of tests
+ for seq in $list
+ do
+-    TEST_DIR_SEQ=$TEST_DIR/$seq
+-    err=false
++
++    rm -f $seq.out.bad
++    lasttime=`sed -n -e "/^$seq /s/.* //p" <$TIMESTAMP_FILE`
+     printf %s "$seq"
++    if [ "X$lasttime" != X ]; then
++        printf %s " ${lasttime}s ..."
++    else
++        printf "        "        # prettier output with timestamps.
++    fi
++    rm -f core $seq.notrun
++    if [ $MAX_JOBS -gt 1 ]
++    then
++        printf "\n"
++    fi
++
++    err=false
+     if [ -n "$TESTS_REMAINING_LOG" ] ; then
+         sed -e "s/$seq//" -e 's/  / /' -e 's/^ *//' $TESTS_REMAINING_LOG > $TESTS_REMAINING_LOG.tmp
+         mv $TESTS_REMAINING_LOG.tmp $TESTS_REMAINING_LOG
+@@ -743,144 +997,51 @@ do
+         echo " - no such test?"
+         echo "/^$seq\$/d" >>$tmp.expunged
+     else
+-        # really going to try and run this one
+-        #
+-        rm -f $seq.out.bad
+-        lasttime=`sed -n -e "/^$seq /s/.* //p" <$TIMESTAMP_FILE`
+-        if [ "X$lasttime" != X ]; then
+-                printf %s " ${lasttime}s ..."
+-        else
+-                printf "        "        # prettier output with timestamps.
 -        fi
+-        rm -f core $seq.notrun
+ 
+-        start=`_wallclock`
+-        $timestamp && printf %s "        [$(date "+%T")]"
+-
+-        if [ "$(head -n 1 "$source_iotests/$seq")" == "#!/usr/bin/env python" ]; then
+-            run_command="$PYTHON $seq"
+-        else
+-            run_command="./$seq"
+-        fi
+-        export OUTPUT_DIR=$PWD
+-        if $debug; then
+-            # Do this in a sub-shell, so we are operating on the right
+-            # TEST_DIR / QEMU_TEST_DIR
+-            (
+-            export TEST_DIR=$TEST_DIR_SEQ
+-            cd "$source_iotests";
+-            . ./common.config
+-            . ./common.rc
+-            MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(($RANDOM % 255 + 1))} \
+-                    $run_command -d 2>&1 | tee $tmp.out
+-            )
+-        else
+-            # Do this in a sub-shell, so we are operating on the right
+-            # TEST_DIR / QEMU_TEST_DIR
+-            (
+-            export TEST_DIR=$TEST_DIR_SEQ
+-            cd "$source_iotests";
+-            . ./common.config
+-            . ./common.rc
+-            MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(($RANDOM % 255 + 1))} \
+-                    $run_command >$tmp.out 2>&1
+-            )
+-        fi
+-        sts=$?
+-        $timestamp && _timestamp
+-        stop=`_wallclock`
+-
+-        if [ -f core ]
+-        then
+-            printf " [dumped core]"
+-            mv core $seq.core
+-            err=true
+-        fi
+-
+-        if [ -f $seq.notrun ]
++        if [ $MAX_JOBS -eq 1 ]
+         then
+-            $timestamp || printf " [not run] "
+-            $timestamp && echo " [not run]" && printf %s "        $seq -- "
+-            cat $seq.notrun
+-            notrun="$notrun $seq"
++            # This way we can mimic the same output format before multi-process test
++            # support was added, if we are running one test at a time
++            _do_test $seq
++            _check_results $seq
+         else
+-            if [ $sts -ne 0 ]
+-            then
+-                printf %s " [failed, exit status $sts]"
+-                err=true
+-            fi
+-
+-            reference="$source_iotests/$seq.out"
+-            reference_machine="$source_iotests/$seq.$QEMU_DEFAULT_MACHINE.out"
+-            if [ -f "$reference_machine" ]; then
+-                reference="$reference_machine"
+-            fi
+-
+-            reference_format="$source_iotests/$seq.out.$IMGFMT"
+-            if [ -f "$reference_format" ]; then
+-                reference="$reference_format"
+-            fi
+-
+-            if [ "$CACHEMODE" = "none" ]; then
+-                [ -f "$source_iotests/$seq.out.nocache" ] && reference="$source_iotests/$seq.out.nocache"
+-            fi
+-
+-            if [ ! -f "$reference" ]
+-            then
+-                echo " - no qualified output"
+-                err=true
+-            else
+-                if diff -w "$reference" $tmp.out >/dev/null 2>&1
++            # loop until a job slot becomes free
++            i=0
++            while true
++            do
++                job=${job_slots[$i]}
++                if [ $job -le 0 ]
++                then
++                    let jobs_running++
++                    job_seq[$i]=$seq
++                    # Execute the test in the background
++                    _do_test $seq &
++                    job_slots[$i]=$!
++                    break
++                elif [ -z "$(ps -o pid -h -p $job)" ]
+                 then
+-                    echo ""
+-                    if $err
+-                    then
+-                        :
+-                    else
+-                        echo "$seq `expr $stop - $start`" >>$tmp.time
+-                    fi
+-                else
+-                    echo " - output mismatch (see $seq.out.bad)"
+-                    mv $tmp.out $seq.out.bad
+-                    $diff -w "$reference" $(realpath $seq.out.bad)
+-                    err=true
++                    # job has completed
++                    _check_results ${job_seq[$i]}
++                    job_slots[$i]=0
++                    job_seq[$i]=-1
++                    let jobs_running--
++                    continue
+                 fi
+-            fi
+-        fi
+-
+-        # Do this in a sub-shell, so we are operating on the right
+-        # TEST_DIR / QEMU_TEST_DIR
+-        (
+-        export TEST_DIR=$TEST_DIR_SEQ
+-        cd "$source_iotests";
+-        . ./common.config
+-        . ./common.rc
+-        . ./common.qemu
+ 
+-        _cleanup_protocols
+-        _cleanup_qemu
+-        )
++                let i++
++                let i=`expr $i % $MAX_JOBS`
+ 
+-        if [ "$save_on_err" != "true" ] || [ "$err" != "true" ]
+-        then
+-            rm -rf "$TEST_DIR_SEQ"
++                if [ $i -eq 0 ]
++                then
++                    sleep 0.25
++                fi
++            done
+         fi
+-
+     fi
+-
+-    # come here for each test, except when $showme is true
+-    #
+-    if $err
+-    then
+-        bad="$bad $seq"
+-        n_bad=`expr $n_bad + 1`
+-        quick=false
 -    fi
--    rm -f "$nbd_unix_socket"
--}
+-    [ -f $seq.notrun ] || try=`expr $try + 1`
 -
- _wait_for_nbd()
+-    seq="after_$seq"
+ done
+ 
++_wait_to_finish
++
+ interrupt=false
+ status=`expr $n_bad`
+ exit
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index b26b02f..273a815 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -392,7 +392,7 @@ _img_info()
+ #
+ _notrun()
  {
-     for ((i = 0; i < 300; i++))
-@@ -64,6 +63,7 @@ converted_image=$TEST_IMG.converted
- _export_nbd_snapshot()
- {
-     _cleanup_nbd
-+    rm -f "$nbd_unix_socket"
-     $QEMU_NBD -v -t -k "$nbd_unix_socket" "$TEST_IMG" -l $1 &
-     _wait_for_nbd
- }
-@@ -71,30 +71,11 @@ _export_nbd_snapshot()
- _export_nbd_snapshot1()
- {
-     _cleanup_nbd
-+    rm -f "$nbd_unix_socket"
-     $QEMU_NBD -v -t -k "$nbd_unix_socket" "$TEST_IMG" -l snapshot.name=$1 &
-     _wait_for_nbd
- }
- 
--_cleanup()
--{
--    _cleanup_nbd
--    _cleanup_test_img
--    rm -f "$converted_image"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
--# get standard environment, filters and checks
--. ./common.rc
--. ./common.filter
--. ./common.pattern
--
--_supported_fmt qcow2
--_supported_proto file
--_supported_os Linux
--_require_command QEMU_NBD
--# Internal snapshots are (currently) impossible with refcount_bits=1
--_unsupported_imgopts 'refcount_bits=1[^0-9]'
--
- # Use -f raw instead of -f $IMGFMT for the NBD connection
- QEMU_IO_NBD="$QEMU_IO -f raw --cache=$CACHEMODE"
- 
-diff --git a/tests/qemu-iotests/059 b/tests/qemu-iotests/059
-index a1c34ee..6ccd250 100755
---- a/tests/qemu-iotests/059
-+++ b/tests/qemu-iotests/059
-@@ -27,13 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--    rm -f "$TEST_IMG.qcow2"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
-index 8e95c45..6532837 100755
---- a/tests/qemu-iotests/060
-+++ b/tests/qemu-iotests/060
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/061 b/tests/qemu-iotests/061
-index f5678b1..1346dd9 100755
---- a/tests/qemu-iotests/061
-+++ b/tests/qemu-iotests/061
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/062 b/tests/qemu-iotests/062
-index 051fb9f..3a1df0d 100755
---- a/tests/qemu-iotests/062
-+++ b/tests/qemu-iotests/062
-@@ -28,12 +28,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/063 b/tests/qemu-iotests/063
-index e4f6ea9..4a9fc44 100755
---- a/tests/qemu-iotests/063
-+++ b/tests/qemu-iotests/063
-@@ -28,13 +28,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--	rm -f "$TEST_IMG.orig" "$TEST_IMG.raw1" "$TEST_IMG.raw2"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/064 b/tests/qemu-iotests/064
-index 5792fbb..211c541 100755
---- a/tests/qemu-iotests/064
-+++ b/tests/qemu-iotests/064
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/066 b/tests/qemu-iotests/066
-index 8638217..e811f48 100755
---- a/tests/qemu-iotests/066
-+++ b/tests/qemu-iotests/066
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/068 b/tests/qemu-iotests/068
-index e7fca6a..d117ff3 100755
---- a/tests/qemu-iotests/068
-+++ b/tests/qemu-iotests/068
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/069 b/tests/qemu-iotests/069
-index 96e55ef..03d5a3c 100755
---- a/tests/qemu-iotests/069
-+++ b/tests/qemu-iotests/069
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/070 b/tests/qemu-iotests/070
-index 8d08d74..1220cc1 100755
---- a/tests/qemu-iotests/070
-+++ b/tests/qemu-iotests/070
-@@ -28,12 +28,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/071 b/tests/qemu-iotests/071
-index 48b4955..1a8d6e7 100755
---- a/tests/qemu-iotests/071
-+++ b/tests/qemu-iotests/071
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/072 b/tests/qemu-iotests/072
-index aa027c7..8aaf3fd 100755
---- a/tests/qemu-iotests/072
-+++ b/tests/qemu-iotests/072
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/073 b/tests/qemu-iotests/073
-index 40f85b1..c19ad0d 100755
---- a/tests/qemu-iotests/073
-+++ b/tests/qemu-iotests/073
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/074 b/tests/qemu-iotests/074
-index b17866b..d7888ab 100755
---- a/tests/qemu-iotests/074
-+++ b/tests/qemu-iotests/074
-@@ -27,15 +27,6 @@ echo "QA output created by $seq"
- 
- status=1        # failure is the default!
- 
--_cleanup()
--{
--    echo "Cleanup"
--    _cleanup_test_img
--    rm "${TEST_IMG2}"
--    rm -f "$TEST_DIR/blkdebug.conf"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- _compare()
- {
-     $QEMU_IMG compare "$@" "$TEST_IMG" "${TEST_IMG2}"
-diff --git a/tests/qemu-iotests/074.out b/tests/qemu-iotests/074.out
-index 8fba5ae..fb93965 100644
---- a/tests/qemu-iotests/074.out
-+++ b/tests/qemu-iotests/074.out
-@@ -15,4 +15,3 @@ qemu-img: Error while reading offset 0 of blkdebug:TEST_DIR/blkdebug.conf:TEST_D
- qemu-img: Error while reading offset 0 of blkdebug:TEST_DIR/blkdebug.conf:TEST_DIR/t.IMGFMT: Input/output error
- Warning: Image size mismatch!
- 4
--Cleanup
-diff --git a/tests/qemu-iotests/075 b/tests/qemu-iotests/075
-index 770d51c..c2509d1 100755
---- a/tests/qemu-iotests/075
-+++ b/tests/qemu-iotests/075
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/076 b/tests/qemu-iotests/076
-index ef9e6a4..69bccad 100755
---- a/tests/qemu-iotests/076
-+++ b/tests/qemu-iotests/076
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/077 b/tests/qemu-iotests/077
-index d2d2a2d..4a458e1 100755
---- a/tests/qemu-iotests/077
-+++ b/tests/qemu-iotests/077
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/078 b/tests/qemu-iotests/078
-index f333e9a..22d078e 100755
---- a/tests/qemu-iotests/078
-+++ b/tests/qemu-iotests/078
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/079 b/tests/qemu-iotests/079
-index b2e3f74..fba6ec6 100755
---- a/tests/qemu-iotests/079
-+++ b/tests/qemu-iotests/079
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/080 b/tests/qemu-iotests/080
-index 55044c7..be548a9 100755
---- a/tests/qemu-iotests/080
-+++ b/tests/qemu-iotests/080
-@@ -27,13 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    rm -f $TEST_IMG.snap
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/081 b/tests/qemu-iotests/081
-index da3fb09..2dadc16 100755
---- a/tests/qemu-iotests/081
-+++ b/tests/qemu-iotests/081
-@@ -27,14 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    rm -rf $TEST_DIR/1.raw
--    rm -rf $TEST_DIR/2.raw
--    rm -rf $TEST_DIR/3.raw
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/082 b/tests/qemu-iotests/082
-index d5c83d4..aa585db 100755
---- a/tests/qemu-iotests/082
-+++ b/tests/qemu-iotests/082
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/083 b/tests/qemu-iotests/083
-index 0306f11..b2d0ce1 100755
---- a/tests/qemu-iotests/083
-+++ b/tests/qemu-iotests/083
-@@ -27,14 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	rm -f nbd.sock
--	rm -f nbd-fault-injector.out
--	rm -f nbd-fault-injector.conf
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/084 b/tests/qemu-iotests/084
-index 04f2aa9..b0d42a0 100755
---- a/tests/qemu-iotests/084
-+++ b/tests/qemu-iotests/084
-@@ -28,12 +28,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/085 b/tests/qemu-iotests/085
-index 5c7668c..7b69f86 100755
---- a/tests/qemu-iotests/085
-+++ b/tests/qemu-iotests/085
-@@ -37,18 +37,7 @@ snapshot_virt1="snapshot-v1.qcow2"
- 
- SNAPSHOTS=10
- 
--_cleanup()
--{
--    _cleanup_qemu
--    for i in $(seq 1 ${SNAPSHOTS})
--    do
--        rm -f "${TEST_DIR}/${i}-${snapshot_virt0}"
--        rm -f "${TEST_DIR}/${i}-${snapshot_virt1}"
--    done
--    rm -f "${TEST_IMG}" "${TEST_IMG}.1" "${TEST_IMG}.2" "${TEST_IMG}.base"
--
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
-+trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-diff --git a/tests/qemu-iotests/086 b/tests/qemu-iotests/086
-index cd4494a..4d5f7db 100755
---- a/tests/qemu-iotests/086
-+++ b/tests/qemu-iotests/086
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/088 b/tests/qemu-iotests/088
-index b8076f2..72e7c68 100755
---- a/tests/qemu-iotests/088
-+++ b/tests/qemu-iotests/088
-@@ -27,13 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    rm -f $TEST_IMG.snap
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/089 b/tests/qemu-iotests/089
-index 9bfe230..75151f1 100755
---- a/tests/qemu-iotests/089
-+++ b/tests/qemu-iotests/089
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/090 b/tests/qemu-iotests/090
-index 7380503..c3be13c 100755
---- a/tests/qemu-iotests/090
-+++ b/tests/qemu-iotests/090
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/091 b/tests/qemu-iotests/091
-index 10ac4a8..c4df2fb 100755
---- a/tests/qemu-iotests/091
-+++ b/tests/qemu-iotests/091
-@@ -31,13 +31,7 @@ status=1    # failure is the default!
- 
- MIG_FIFO="${TEST_DIR}/migrate"
- 
--_cleanup()
--{
--    rm -f "${MIG_FIFO}"
--    _cleanup_qemu
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
-+trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-diff --git a/tests/qemu-iotests/092 b/tests/qemu-iotests/092
-index 5bbdd07..3b8cf8f 100755
---- a/tests/qemu-iotests/092
-+++ b/tests/qemu-iotests/092
-@@ -27,13 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    rm -f $TEST_IMG.snap
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/094 b/tests/qemu-iotests/094
-index 9aa01e3..35e882c 100755
---- a/tests/qemu-iotests/094
-+++ b/tests/qemu-iotests/094
-@@ -27,14 +27,7 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_qemu
--    _cleanup_test_img
--    rm -f "$TEST_DIR/source.$IMGFMT"
--}
--
--trap "_cleanup; exit \$status" 0 1 2 3 15
-+trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-diff --git a/tests/qemu-iotests/095 b/tests/qemu-iotests/095
-index 030adb2..75d60c4 100755
---- a/tests/qemu-iotests/095
-+++ b/tests/qemu-iotests/095
-@@ -30,13 +30,7 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_qemu
--    rm  -f "${TEST_IMG}.base" "${TEST_IMG}.snp1"
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
-+trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-diff --git a/tests/qemu-iotests/097 b/tests/qemu-iotests/097
-index e22670c..81e6729 100755
---- a/tests/qemu-iotests/097
-+++ b/tests/qemu-iotests/097
-@@ -28,13 +28,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--    _rm_test_img "$TEST_IMG.itmd"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/098 b/tests/qemu-iotests/098
-index b002e96..24d8510 100755
---- a/tests/qemu-iotests/098
-+++ b/tests/qemu-iotests/098
-@@ -27,13 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--    rm -f "$TEST_DIR/blkdebug.conf"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/099 b/tests/qemu-iotests/099
-index caaf58e..d811b34 100755
---- a/tests/qemu-iotests/099
-+++ b/tests/qemu-iotests/099
-@@ -28,12 +28,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/101 b/tests/qemu-iotests/101
-index ea53f8b..62faf99 100755
---- a/tests/qemu-iotests/101
-+++ b/tests/qemu-iotests/101
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
-index d7ad8d9..201c520 100755
---- a/tests/qemu-iotests/102
-+++ b/tests/qemu-iotests/102
-@@ -27,12 +27,7 @@ echo "QA output created by $seq"
- here=$PWD
- status=1    # failure is the default!
- 
--_cleanup()
--{
--    _cleanup_qemu
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
-+trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and qemu instance handling
- . ./common.rc
-diff --git a/tests/qemu-iotests/103 b/tests/qemu-iotests/103
-index ecbd8eb..df86d4f 100755
---- a/tests/qemu-iotests/103
-+++ b/tests/qemu-iotests/103
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=$PWD
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/104 b/tests/qemu-iotests/104
-index 726d467..f10d311 100755
---- a/tests/qemu-iotests/104
-+++ b/tests/qemu-iotests/104
-@@ -27,8 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--trap "exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/105 b/tests/qemu-iotests/105
-index 3db4ce3..b469b1b 100755
---- a/tests/qemu-iotests/105
-+++ b/tests/qemu-iotests/105
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/106 b/tests/qemu-iotests/106
-index bfe71f4..e4db5a1 100755
---- a/tests/qemu-iotests/106
-+++ b/tests/qemu-iotests/106
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=$PWD
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment and filters
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/107 b/tests/qemu-iotests/107
-index d7222dc..d513120 100755
---- a/tests/qemu-iotests/107
-+++ b/tests/qemu-iotests/107
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/108 b/tests/qemu-iotests/108
-index 2355d98..8371db4 100755
---- a/tests/qemu-iotests/108
-+++ b/tests/qemu-iotests/108
-@@ -28,12 +28,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/109 b/tests/qemu-iotests/109
-index d70b574..d4fca99 100755
---- a/tests/qemu-iotests/109
-+++ b/tests/qemu-iotests/109
-@@ -27,13 +27,7 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_qemu
--    rm -f $TEST_IMG.src
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
-+trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
-index 9de7369..93dd09f 100755
---- a/tests/qemu-iotests/110
-+++ b/tests/qemu-iotests/110
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/111 b/tests/qemu-iotests/111
-index a1c152d..f590d82 100755
---- a/tests/qemu-iotests/111
-+++ b/tests/qemu-iotests/111
-@@ -28,12 +28,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/112 b/tests/qemu-iotests/112
-index 28eb9aa..ee3679e 100755
---- a/tests/qemu-iotests/112
-+++ b/tests/qemu-iotests/112
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/113 b/tests/qemu-iotests/113
-index 19b68b2..07437ea 100755
---- a/tests/qemu-iotests/113
-+++ b/tests/qemu-iotests/113
-@@ -28,12 +28,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/114 b/tests/qemu-iotests/114
-index 5b7dc54..5bfd473 100755
---- a/tests/qemu-iotests/114
-+++ b/tests/qemu-iotests/114
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/115 b/tests/qemu-iotests/115
-index 665c2ea..0c9aaad 100755
---- a/tests/qemu-iotests/115
-+++ b/tests/qemu-iotests/115
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/116 b/tests/qemu-iotests/116
-index df0172f..e687601 100755
---- a/tests/qemu-iotests/116
-+++ b/tests/qemu-iotests/116
-@@ -30,12 +30,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/117 b/tests/qemu-iotests/117
-index 6c83461..579cecb 100755
---- a/tests/qemu-iotests/117
-+++ b/tests/qemu-iotests/117
-@@ -27,12 +27,7 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_qemu
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
-+trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-diff --git a/tests/qemu-iotests/119 b/tests/qemu-iotests/119
-index 4f34fb4..8cdb404 100755
---- a/tests/qemu-iotests/119
-+++ b/tests/qemu-iotests/119
-@@ -28,12 +28,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/120 b/tests/qemu-iotests/120
-index f40b97d..bb0e2dd 100755
---- a/tests/qemu-iotests/120
-+++ b/tests/qemu-iotests/120
-@@ -28,12 +28,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/121 b/tests/qemu-iotests/121
-index 1307b4e..d75fce1 100755
---- a/tests/qemu-iotests/121
-+++ b/tests/qemu-iotests/121
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/122 b/tests/qemu-iotests/122
-index 45b359c..3942604 100755
---- a/tests/qemu-iotests/122
-+++ b/tests/qemu-iotests/122
-@@ -27,13 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    rm -f "$TEST_IMG".[123]
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/123 b/tests/qemu-iotests/123
-index b18e3fc..98fd3ce 100755
---- a/tests/qemu-iotests/123
-+++ b/tests/qemu-iotests/123
-@@ -27,13 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--    rm -f "$SRC_IMG"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/125 b/tests/qemu-iotests/125
-index 9424313..bca5fb5 100755
---- a/tests/qemu-iotests/125
-+++ b/tests/qemu-iotests/125
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=$PWD
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- get_image_size_on_host()
- {
-     $QEMU_IMG info -f "$IMGFMT" "$TEST_IMG" | grep "disk size" \
-diff --git a/tests/qemu-iotests/130 b/tests/qemu-iotests/130
-index e7e43de..4aad4ea 100755
---- a/tests/qemu-iotests/130
-+++ b/tests/qemu-iotests/130
-@@ -29,12 +29,7 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_qemu
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
-+trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-diff --git a/tests/qemu-iotests/131 b/tests/qemu-iotests/131
-index 94a9ae7..52588ef 100755
---- a/tests/qemu-iotests/131
-+++ b/tests/qemu-iotests/131
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/133 b/tests/qemu-iotests/133
-index 9d35a6a..2d0aae9 100755
---- a/tests/qemu-iotests/133
-+++ b/tests/qemu-iotests/133
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/134 b/tests/qemu-iotests/134
-index 9914415..147ea2c 100755
---- a/tests/qemu-iotests/134
-+++ b/tests/qemu-iotests/134
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/135 b/tests/qemu-iotests/135
-index ce60831..75c160d 100755
---- a/tests/qemu-iotests/135
-+++ b/tests/qemu-iotests/135
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
-index eb91e51..6068a13 100755
---- a/tests/qemu-iotests/137
-+++ b/tests/qemu-iotests/137
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/138 b/tests/qemu-iotests/138
-index 21650d8..9682560 100755
---- a/tests/qemu-iotests/138
-+++ b/tests/qemu-iotests/138
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/140 b/tests/qemu-iotests/140
-index f89d0d6..c5e1a5b 100755
---- a/tests/qemu-iotests/140
-+++ b/tests/qemu-iotests/140
-@@ -31,13 +31,7 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_qemu
--    _cleanup_test_img
--    rm -f "$TEST_DIR/nbd"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
-+trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-diff --git a/tests/qemu-iotests/141 b/tests/qemu-iotests/141
-index 2f9d7b9..cff2319 100755
---- a/tests/qemu-iotests/141
-+++ b/tests/qemu-iotests/141
-@@ -27,13 +27,7 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_qemu
--    _cleanup_test_img
--    rm -f "$TEST_DIR"/{b,m,o}.$IMGFMT
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
-+trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-diff --git a/tests/qemu-iotests/142 b/tests/qemu-iotests/142
-index 1639c83..65775be 100755
---- a/tests/qemu-iotests/142
-+++ b/tests/qemu-iotests/142
-@@ -27,13 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--    rm -f $TEST_IMG.snap
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/143 b/tests/qemu-iotests/143
-index 5ff1944..b4736aa 100755
---- a/tests/qemu-iotests/143
-+++ b/tests/qemu-iotests/143
-@@ -27,12 +27,7 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_qemu
--    rm -f "$TEST_DIR/nbd"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
-+trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-diff --git a/tests/qemu-iotests/144 b/tests/qemu-iotests/144
-index 00de3c3..b47c561 100755
---- a/tests/qemu-iotests/144
-+++ b/tests/qemu-iotests/144
-@@ -32,13 +32,7 @@ status=1	# failure is the default!
- TMP_SNAP1=${TEST_DIR}/tmp.qcow2
- TMP_SNAP2=${TEST_DIR}/tmp2.qcow2
- 
--_cleanup()
--{
--    _cleanup_qemu
--    rm -f "${TEST_IMG}" "${TMP_SNAP1}" "${TMP_SNAP2}"
--}
--
--trap "_cleanup; exit \$status" 0 1 2 3 15
-+trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-diff --git a/tests/qemu-iotests/145 b/tests/qemu-iotests/145
-index c371b3c..930628e 100755
---- a/tests/qemu-iotests/145
-+++ b/tests/qemu-iotests/145
-@@ -27,13 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--	true
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/146 b/tests/qemu-iotests/146
-index 043711b..99b1e81 100755
---- a/tests/qemu-iotests/146
-+++ b/tests/qemu-iotests/146
-@@ -27,12 +27,7 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1    # failure is the default!
- 
--_cleanup()
--{
--    _cleanup_qemu
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
-+trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-diff --git a/tests/qemu-iotests/150 b/tests/qemu-iotests/150
-index ee8f637..120920e 100755
---- a/tests/qemu-iotests/150
-+++ b/tests/qemu-iotests/150
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
-index fa25eb2..42882eb 100755
---- a/tests/qemu-iotests/153
-+++ b/tests/qemu-iotests/153
-@@ -28,18 +28,6 @@ here="$PWD"
- tmp=/tmp/$$
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--    rm -f "${TEST_IMG}.base"
--    rm -f "${TEST_IMG}.convert"
--    rm -f "${TEST_IMG}.a"
--    rm -f "${TEST_IMG}.b"
--    rm -f "${TEST_IMG}.c"
--    rm -f "${TEST_IMG}.lnk"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/154 b/tests/qemu-iotests/154
-index fde03b0..90e7e65 100755
---- a/tests/qemu-iotests/154
-+++ b/tests/qemu-iotests/154
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/156 b/tests/qemu-iotests/156
-index e75dc4d..9dbc6d7 100755
---- a/tests/qemu-iotests/156
-+++ b/tests/qemu-iotests/156
-@@ -35,12 +35,7 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_qemu
--    rm -f "$TEST_IMG"{,.target}{,.backing,.overlay}
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
-+trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-diff --git a/tests/qemu-iotests/157 b/tests/qemu-iotests/157
-index 2bf02be..bda53c8 100755
---- a/tests/qemu-iotests/157
-+++ b/tests/qemu-iotests/157
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/158 b/tests/qemu-iotests/158
-index 24ac600..a07708e 100755
---- a/tests/qemu-iotests/158
-+++ b/tests/qemu-iotests/158
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/159 b/tests/qemu-iotests/159
-index 9b0e1ec..7fcccde 100755
---- a/tests/qemu-iotests/159
-+++ b/tests/qemu-iotests/159
-@@ -26,13 +26,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1
- 
--_cleanup()
--{
--    _cleanup_test_img
--    rm -f "$TEST_IMG.out"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- . ./common.rc
- . ./common.filter
- . ./common.pattern
-diff --git a/tests/qemu-iotests/160 b/tests/qemu-iotests/160
-index 5c910e5..48dd25d 100755
---- a/tests/qemu-iotests/160
-+++ b/tests/qemu-iotests/160
-@@ -26,13 +26,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1
- 
--_cleanup()
--{
--    _cleanup_test_img
--    rm -f "$TEST_IMG.out" "$TEST_IMG.out.dd"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- . ./common.rc
- . ./common.filter
- . ./common.pattern
-diff --git a/tests/qemu-iotests/162 b/tests/qemu-iotests/162
-index 477a806..cad2bd7 100755
---- a/tests/qemu-iotests/162
-+++ b/tests/qemu-iotests/162
-@@ -28,13 +28,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    rm -f "${TEST_DIR}/qemu-nbd.pid"
--    rm -f 42
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/170 b/tests/qemu-iotests/170
-index b79359f..5288a2d 100755
---- a/tests/qemu-iotests/170
-+++ b/tests/qemu-iotests/170
-@@ -26,13 +26,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1
- 
--_cleanup()
--{
--    _cleanup_test_img
--    rm -f "$TEST_IMG.out"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- . ./common.rc
- . ./common.filter
- . ./common.pattern
-diff --git a/tests/qemu-iotests/171 b/tests/qemu-iotests/171
-index bcfaaf1..2798d2f 100755
---- a/tests/qemu-iotests/171
-+++ b/tests/qemu-iotests/171
-@@ -28,12 +28,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/172 b/tests/qemu-iotests/172
-index 02c5f79..d9efd4b 100755
---- a/tests/qemu-iotests/172
-+++ b/tests/qemu-iotests/172
-@@ -27,14 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--    rm -f "$TEST_IMG.2"
--    rm -f "$TEST_IMG.3"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/173 b/tests/qemu-iotests/173
-index bdaa092..0c2fde4 100755
---- a/tests/qemu-iotests/173
-+++ b/tests/qemu-iotests/173
-@@ -27,13 +27,7 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1    # failure is the default!
- 
--_cleanup()
--{
--    _cleanup_qemu
--    rm  -f "${QEMU_TEST_DIR}/image.base" "${QEMU_TEST_DIR}/image.snp1"
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
-+trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-diff --git a/tests/qemu-iotests/174 b/tests/qemu-iotests/174
-index 552879d..67cd785 100755
---- a/tests/qemu-iotests/174
-+++ b/tests/qemu-iotests/174
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
-index ca56e82..1407597 100755
---- a/tests/qemu-iotests/175
-+++ b/tests/qemu-iotests/175
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/176 b/tests/qemu-iotests/176
-index 950b287..56cd490 100755
---- a/tests/qemu-iotests/176
-+++ b/tests/qemu-iotests/176
-@@ -31,13 +31,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--    _rm_test_img "$TEST_IMG.itmd"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/177 b/tests/qemu-iotests/177
-index f8ed8fb..ed2e8b2 100755
---- a/tests/qemu-iotests/177
-+++ b/tests/qemu-iotests/177
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/178 b/tests/qemu-iotests/178
-index 6af52c6..fd583d1 100755
---- a/tests/qemu-iotests/178
-+++ b/tests/qemu-iotests/178
-@@ -27,13 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1    # failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--    rm -f "$TEST_IMG.converted"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/179 b/tests/qemu-iotests/179
-index 115944a..f7cf129 100755
---- a/tests/qemu-iotests/179
-+++ b/tests/qemu-iotests/179
-@@ -27,13 +27,6 @@ echo "QA output created by $seq"
- here="$PWD"
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--    rm -f "$TEST_DIR/blkdebug.conf"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
-index 0c91e8f..18fb133 100755
---- a/tests/qemu-iotests/181
-+++ b/tests/qemu-iotests/181
-@@ -29,13 +29,7 @@ status=1	# failure is the default!
- 
- MIG_SOCKET="${TEST_DIR}/migrate"
- 
--_cleanup()
--{
--    rm -f "${MIG_SOCKET}"
--	_cleanup_test_img
--    _cleanup_qemu
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
-+trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-diff --git a/tests/qemu-iotests/182 b/tests/qemu-iotests/182
-index 2e078ce..a842f9f 100755
---- a/tests/qemu-iotests/182
-+++ b/tests/qemu-iotests/182
-@@ -28,12 +28,6 @@ here="$PWD"
- tmp=/tmp/$$
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
-index 20268ff..2e09679 100755
---- a/tests/qemu-iotests/183
-+++ b/tests/qemu-iotests/183
-@@ -29,14 +29,7 @@ status=1 # failure is the default!
- 
- MIG_SOCKET="${TEST_DIR}/migrate"
- 
--_cleanup()
--{
--    rm -f "${MIG_SOCKET}"
--    rm -f "${TEST_IMG}.dest"
--    _cleanup_test_img
--    _cleanup_qemu
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
-+trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-diff --git a/tests/qemu-iotests/184 b/tests/qemu-iotests/184
-index 704f38f..2130e64 100755
---- a/tests/qemu-iotests/184
-+++ b/tests/qemu-iotests/184
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
-index f5b47e4..7269d5e 100755
---- a/tests/qemu-iotests/185
-+++ b/tests/qemu-iotests/185
-@@ -29,14 +29,7 @@ status=1 # failure is the default!
- 
- MIG_SOCKET="${TEST_DIR}/migrate"
- 
--_cleanup()
--{
--    rm -f "${TEST_IMG}.mid"
--    rm -f "${TEST_IMG}.copy"
--    _cleanup_test_img
--    _cleanup_qemu
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
-+trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
- 
- # get standard environment, filters and checks
- . ./common.rc
-diff --git a/tests/qemu-iotests/186 b/tests/qemu-iotests/186
-index 44cc01e..27d6530 100755
---- a/tests/qemu-iotests/186
-+++ b/tests/qemu-iotests/186
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/187 b/tests/qemu-iotests/187
-index 7bb7833..8b29df3 100755
---- a/tests/qemu-iotests/187
-+++ b/tests/qemu-iotests/187
-@@ -27,14 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--    rm -f "$TEST_IMG.2"
--    rm -f "$TEST_IMG.3"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/188 b/tests/qemu-iotests/188
-index 83ed03e..48f855d 100755
---- a/tests/qemu-iotests/188
-+++ b/tests/qemu-iotests/188
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/189 b/tests/qemu-iotests/189
-index e695475..c5d516d 100755
---- a/tests/qemu-iotests/189
-+++ b/tests/qemu-iotests/189
-@@ -27,12 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/190 b/tests/qemu-iotests/190
-index 8f808fe..84d20c6 100755
---- a/tests/qemu-iotests/190
-+++ b/tests/qemu-iotests/190
-@@ -27,13 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1    # failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--    rm -f "$TEST_IMG.converted"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
-index ac2b88f..f97e580 100755
---- a/tests/qemu-iotests/191
-+++ b/tests/qemu-iotests/191
-@@ -31,10 +31,6 @@ MIG_SOCKET="${TEST_DIR}/migrate"
- 
- _cleanup()
- {
--    rm -f "${TEST_IMG}.mid"
--    rm -f "${TEST_IMG}.ovl2"
--    rm -f "${TEST_IMG}.ovl3"
--    _cleanup_test_img
-     _cleanup_qemu
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
-diff --git a/tests/qemu-iotests/192 b/tests/qemu-iotests/192
-index 595f0d7..be24bfb 100755
---- a/tests/qemu-iotests/192
-+++ b/tests/qemu-iotests/192
-@@ -28,12 +28,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
--_cleanup()
--{
--	_cleanup_test_img
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/195 b/tests/qemu-iotests/195
-index e7a403d..b826152 100755
---- a/tests/qemu-iotests/195
-+++ b/tests/qemu-iotests/195
-@@ -27,13 +27,6 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1 # failure is the default!
- 
--_cleanup()
--{
--    _cleanup_test_img
--    rm -f "$TEST_IMG.mid"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-diff --git a/tests/qemu-iotests/197 b/tests/qemu-iotests/197
-index 887eb4f..df09870 100755
---- a/tests/qemu-iotests/197
-+++ b/tests/qemu-iotests/197
-@@ -41,13 +41,6 @@ case "$TEST_DIR" in
-         _notrun "Suspicious TEST_DIR='$TEST_DIR', cowardly refusing to run" ;;
- esac
- 
--_cleanup()
--{
--    _cleanup_test_img
--    rm -f "$BLKDBG_CONF"
--}
--trap "_cleanup; exit \$status" 0 1 2 3 15
--
- # Test is supported for any backing file; but we force qcow2 for our wrapper.
- _supported_fmt generic
- _supported_proto generic
+-    echo "$*" >"$OUTPUT_DIR/$seq.notrun"
++    printf "$*" >"$OUTPUT_DIR/$seq.notrun"
+     echo "$seq not run: $*"
+     status=0
+     exit
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 7ff400a..11dfcf5 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -427,8 +427,8 @@ def notrun(reason):
+     # Each test in qemu-iotests has a number ("seq")
+     seq = os.path.basename(sys.argv[0])
+ 
+-    open('%s/%s.notrun' % (output_dir, seq), 'wb').write(reason + '\n')
+-    print '%s not run: %s' % (seq, reason)
++    open('%s/%s.notrun' % (output_dir, seq), 'wb').write(reason)
++    print '%s not run: %s\n' % (seq, reason)
+     sys.exit(0)
+ 
+ def verify_image_format(supported_fmts=[], unsupported_fmts=[]):
 -- 
 2.9.5
