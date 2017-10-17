@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33658)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4FVf-0006Ro-IP
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:13:28 -0400
+	id 1e4FVh-0006Th-V4
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:13:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4FVe-0004Nb-Pu
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:13:27 -0400
+	id 1e4FVh-0004QZ-56
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:13:29 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 16 Oct 2017 21:11:49 -0300
-Message-Id: <20171017001209.32276-20-f4bug@amsat.org>
+Date: Mon, 16 Oct 2017 21:11:50 -0300
+Message-Id: <20171017001209.32276-21-f4bug@amsat.org>
 In-Reply-To: <20171017001209.32276-1-f4bug@amsat.org>
 References: <20171017001209.32276-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 19/39] hw/ssi/aspeed_smc: remove unused
- #include
+Subject: [Qemu-devel] [PATCH v2 20/39] amd_iommu: avoid needless includes in
+ header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,23 +30,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Michael Tokarev <mjt@tls.msk.ru>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/ssi/aspeed_smc.c | 1 -
- 1 file changed, 1 deletion(-)
+instead move them to the source file
 
-diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-index 992617fd3a..5059396bc6 100644
---- a/hw/ssi/aspeed_smc.c
-+++ b/hw/ssi/aspeed_smc.c
-@@ -27,7 +27,6 @@
- #include "sysemu/sysemu.h"
- #include "qemu/log.h"
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/i386/amd_iommu.h | 5 -----
+ hw/i386/amd_iommu.c | 5 ++++-
+ 2 files changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
+index d370ae3549..aeef802364 100644
+--- a/hw/i386/amd_iommu.h
++++ b/hw/i386/amd_iommu.h
+@@ -23,11 +23,6 @@
+ 
+ #include "hw/hw.h"
+ #include "hw/pci/pci.h"
+-#include "hw/pci/msi.h"
+-#include "hw/sysbus.h"
+-#include "sysemu/dma.h"
+-#include "hw/i386/pc.h"
+-#include "hw/pci/pci_bus.h"
+ #include "hw/i386/x86-iommu.h"
+ 
+ /* Capability registers */
+diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+index ad8155ca4c..eeaf0e0aa8 100644
+--- a/hw/i386/amd_iommu.c
++++ b/hw/i386/amd_iommu.c
+@@ -20,7 +20,10 @@
+  * Cache implementation inspired by hw/i386/intel_iommu.c
+  */
+ #include "qemu/osdep.h"
+-#include "hw/i386/amd_iommu.h"
++#include "hw/i386/pc.h"
++#include "hw/pci/msi.h"
++#include "hw/pci/pci_bus.h"
++#include "amd_iommu.h"
+ #include "qapi/error.h"
  #include "qemu/error-report.h"
--#include "exec/address-spaces.h"
- 
- #include "hw/ssi/aspeed_smc.h"
- 
+ #include "trace.h"
 -- 
 2.15.0.rc0
