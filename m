@@ -1,29 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <g.jancys@gmail.com>) id 1e4T0h-0000ij-Ji
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:38:28 -0400
+	(envelope-from <lprosek@redhat.com>) id 1e4T3B-00021h-Jq
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:40:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <g.jancys@gmail.com>) id 1e4T0g-00057l-9g
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:38:23 -0400
-Received: from mail-lf0-x22e.google.com ([2a00:1450:4010:c07::22e]:54391)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <g.jancys@gmail.com>) id 1e4T0f-00057C-Ub
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:38:22 -0400
-Received: by mail-lf0-x22e.google.com with SMTP id d10so2270339lfg.11
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 07:38:20 -0700 (PDT)
-From: =?utf-8?Q?Gediminas_Jan=C4=8Dys?= <g.jancys@gmail.com>
-References: <002d01d34667$f8c9b1e0$ea5d15a0$@gmail.com>
-	<20171016180555.GE2876@work-vm>
-In-Reply-To: <20171016180555.GE2876@work-vm>
-Date: Tue, 17 Oct 2017 17:38:16 +0300
-Message-ID: <00af01d34755$924ba6a0$b6e2f3e0$@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Language: lt
-Subject: Re: [Qemu-devel] Windows Server 2008 R2 network freezes after some
- time
+	(envelope-from <lprosek@redhat.com>) id 1e4T39-0006mE-DQ
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:40:57 -0400
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Tue, 17 Oct 2017 16:40:51 +0200
+Message-Id: <20171017144051.8452-1-lprosek@redhat.com>
+Subject: [Qemu-devel] [PATCH trivial] Remove empty statements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,341 +17,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "'Dr. David Alan Gilbert'" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: lersek@redhat.com
 
-Sorry guys, but I can't change network type right now. There are another =
-investigation... I will update you ASAP
+Thanks to Laszlo Ersek for spotting the double semicolon in target/i386/kvm.c
 
------Original Message-----
-From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]=20
-Sent: 2017 m. spalio 16 d., pirmadienis 21:06
-To: Gediminas Jan=C4=8Dys <g.jancys@gmail.com>
-Cc: qemu-devel@nongnu.org
-Subject: Re: [Qemu-devel] Windows Server 2008 R2 network freezes after =
-some time
+I have trivially grepped the tree for ';;' in C files.
 
-* Gediminas Jan=C4=8Dys (g.jancys@gmail.com) wrote:
-> Hello guys,
->=20
-> I have a problem and desperate with it, can't find a solution for it.=20
-> I got Windows Server 2008 R2 guest OS on CentOS Linux release 7.3.1611 =
+Suggested-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+---
+ hw/misc/imx6_ccm.c     | 2 +-
+ hw/s390x/virtio-ccw.c  | 2 +-
+ linux-user/signal.c    | 2 +-
+ migration/block.c      | 2 +-
+ target/i386/cpu.c      | 2 +-
+ target/i386/kvm.c      | 2 +-
+ target/sh4/translate.c | 2 +-
+ 7 files changed, 7 insertions(+), 7 deletions(-)
 
-> (Core) with libvirt and CloudStack. Problem is that after some time,=20
-> about 2- 3 days (should be based on amount of traffic) VM's network=20
-> got stuck. No traffic in or out. After restart network works fine=20
-> until gets stuck again.  I'm current using VirtIO drivers on guest=20
-> version 61.74.104.14100. Also I have tried to use older drivers but=20
-> same situation. From host and guest logs I can't see any entries about =
-
-> drivers or something related to this problem, only casual stuff. Can =
-you help me or guide to find the problems source?
-> After my investigation I would say that drivers are failing at some =
-point.
-
-If you switch the NIC from virtio to another type (e1000 for example) =
-does the problem go away?
-
-Dave
-> =20
->=20
-> Libvirts info:
->=20
-> Using library: libvirt 2.0.0
->=20
-> Using API: QEMU 2.0.0
->=20
-> Running hypervisor: QEMU 2.6.0
->=20
-> =20
->=20
-> KVM XML:
->=20
-> <domain type=3D'kvm' id=3D'206'>
->=20
->   <name>i-25-85-VM</name>
->=20
->   <uuid>2758a8ec-3e86-4132-9110-1051f0708367</uuid>
->=20
->   <description>Windows PV</description>
->=20
->   <maxMemory slots=3D'32' unit=3D'KiB'>197191680</maxMemory>
->=20
->   <memory unit=3D'KiB'>16777216</memory>
->=20
->   <currentMemory unit=3D'KiB'>16777216</currentMemory>
->=20
->   <vcpu placement=3D'auto' current=3D'2'>40</vcpu>
->=20
->   <cputune>
->=20
->     <shares>146</shares>
->=20
->   </cputune>
->=20
->   <numatune>
->=20
->     <memory mode=3D'strict' placement=3D'auto'/>
->=20
->   </numatune>
->=20
->   <resource>
->=20
->     <partition>/machine</partition>
->=20
->   </resource>
->=20
->   <sysinfo type=3D'smbios'>
->=20
->     <system>
->=20
->       <entry name=3D'manufacturer'>Apache Software Foundation</entry>
->=20
->       <entry name=3D'product'>CloudStack KVM Hypervisor</entry>
->=20
->       <entry =
-name=3D'uuid'>2758a8ec-3e86-4132-9110-1051f0708367</entry>
->=20
->     </system>
->=20
->   </sysinfo>
->=20
->   <os>
->=20
->     <type arch=3D'x86_64' machine=3D'pc-i440fx-rhel7.3.0'>hvm</type>
->=20
->     <boot dev=3D'cdrom'/>
->=20
->     <boot dev=3D'hd'/>
->=20
->     <smbios mode=3D'sysinfo'/>
->=20
->   </os>
->=20
->   <features>
->=20
->     <acpi/>
->=20
->     <apic/>
->=20
->     <pae/>
->=20
->   </features>
->=20
->   <cpu mode=3D'host-passthrough'>
->=20
->     <numa>
->=20
->       <cell id=3D'0' cpus=3D'0-39' memory=3D'16777216' unit=3D'KiB'/>
->=20
->     </numa>
->=20
->   </cpu>
->=20
->   <clock offset=3D'localtime'>
->=20
->     <timer name=3D'rtc' tickpolicy=3D'catchup'/>
->=20
->   </clock>
->=20
->   <on_poweroff>destroy</on_poweroff>
->=20
->   <on_reboot>restart</on_reboot>
->=20
->   <on_crash>destroy</on_crash>
->=20
->   <devices>
->=20
->     <emulator>/usr/libexec/qemu-kvm</emulator>
->=20
->     <disk type=3D'network' device=3D'disk'>
->=20
->       <driver name=3D'qemu' type=3D'raw' cache=3D'writeback'=20
-> discard=3D'unmap'/>
->=20
->       <auth username=3D'kvm'>
->=20
->         <secret type=3D'ceph'=20
-> uuid=3D'8321dbbc-8bab-301b-a89f-d558256ddd8b'/>
->=20
->       </auth>
->=20
->       <source protocol=3D'rbd'
-> name=3D'kvm-pool/ec8e6467-7370-4cdc-bbda-01844e5f9c2c'>
->=20
->         <host name=3Dxxxxxx.xxxx.xx port=3D'6789'/>
->=20
->       </source>
->=20
->       <backingStore/>
->=20
->       <target dev=3D'sda' bus=3D'scsi'/>
->=20
->       <serial>ec8e646773704cdcbbda</serial>
->=20
->       <alias name=3D'scsi0-0-0-0'/>
->=20
->       <address type=3D'drive' controller=3D'0' bus=3D'0' target=3D'0'=20
-> unit=3D'0'/>
->=20
->     </disk>
->=20
->     <disk type=3D'file' device=3D'cdrom'>
->=20
->       <driver name=3D'qemu' type=3D'raw' cache=3D'none'/>
->=20
->       <backingStore/>
->=20
->       <target dev=3D'hdc' bus=3D'ide'/>
->=20
->       <readonly/>
->=20
->       <alias name=3D'ide0-1-0'/>
->=20
->       <address type=3D'drive' controller=3D'0' bus=3D'1' target=3D'0'=20
-> unit=3D'0'/>
->=20
->     </disk>
->=20
->     <controller type=3D'scsi' index=3D'0' model=3D'virtio-scsi'>
->=20
->       <driver queues=3D'2'/>
->=20
->       <alias name=3D'scsi0'/>
->=20
->       <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' =
-slot=3D'0x04'
-> function=3D'0x0'/>
->=20
->     </controller>
->=20
->     <controller type=3D'usb' index=3D'0'>
->=20
->       <alias name=3D'usb'/>
->=20
->       <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' =
-slot=3D'0x01'
-> function=3D'0x2'/>
->=20
->     </controller>
->=20
->     <controller type=3D'pci' index=3D'0' model=3D'pci-root'>
->=20
->       <alias name=3D'pci.0'/>
->=20
->     </controller>
->=20
->     <controller type=3D'ide' index=3D'0'>
->=20
->       <alias name=3D'ide'/>
->=20
->       <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' =
-slot=3D'0x01'
-> function=3D'0x1'/>
->=20
->     </controller>
->=20
->     <interface type=3D'bridge'>
->=20
->       <mac address=3D'06:b2:ec:00:01:97'/>
->=20
->       <source bridge=3D'brbond0-500'/>
->=20
->       <target dev=3D'vnet14'/>
->=20
->       <model type=3D'virtio'/>
->=20
->       <alias name=3D'net0'/>
->=20
->       <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' =
-slot=3D'0x03'
-> function=3D'0x0'/>
->=20
->     </interface>
->=20
->     <serial type=3D'pty'>
->=20
->       <source path=3D'/dev/pts/13'/>
->=20
->       <target port=3D'0'/>
->=20
->       <alias name=3D'serial0'/>
->=20
->     </serial>
->=20
->     <console type=3D'pty' tty=3D'/dev/pts/13'>
->=20
->       <source path=3D'/dev/pts/13'/>
->=20
->       <target type=3D'serial' port=3D'0'/>
->=20
->       <alias name=3D'serial0'/>
->=20
->     </console>
->=20
->     <input type=3D'tablet' bus=3D'usb'>
->=20
->       <alias name=3D'input0'/>
->=20
->       <address type=3D'usb' bus=3D'0' port=3D'1'/>
->=20
->     </input>
->=20
->     <input type=3D'mouse' bus=3D'ps2'>
->=20
->       <alias name=3D'input1'/>
->=20
->     </input>
->=20
->     <input type=3D'keyboard' bus=3D'ps2'>
->=20
->       <alias name=3D'input2'/>
->=20
->     </input>
->=20
->     <graphics type=3D'vnc' port=3D'5914' autoport=3D'yes'=20
-> listen=3D'10.24.99.29'>
->=20
->       <listen type=3D'address' address=3D'10.24.99.29'/>
->=20
->     </graphics>
->=20
->     <video>
->=20
->       <model type=3D'cirrus' vram=3D'16384' heads=3D'1' =
-primary=3D'yes'/>
->=20
->       <alias name=3D'video0'/>
->=20
->       <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' =
-slot=3D'0x02'
-> function=3D'0x0'/>
->=20
->     </video>
->=20
->     <memballoon model=3D'none'/>
->=20
->   </devices>
->=20
->   <seclabel type=3D'none' model=3D'none'/>
->=20
->   <seclabel type=3D'dynamic' model=3D'dac' relabel=3D'yes'>
->=20
->     <label>+0:+0</label>
->=20
->     <imagelabel>+0:+0</imagelabel>
->=20
->   </seclabel>
->=20
-> </domain>
->=20
-> =20
->=20
-> King regards
->=20
-> Gediminas J.
->=20
-> =20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/hw/misc/imx6_ccm.c b/hw/misc/imx6_ccm.c
+index 1b421013a3..4fa94835fe 100644
+--- a/hw/misc/imx6_ccm.c
++++ b/hw/misc/imx6_ccm.c
+@@ -335,7 +335,7 @@ static uint64_t imx6_ccm_get_ipg_clk(IMX6CCMState *dev)
+     uint64_t freq = 0;
+ 
+     freq = imx6_ccm_get_ahb_clk(dev)
+-           / (1 + EXTRACT(dev->ccm[CCM_CBCDR], IPG_PODF));;
++           / (1 + EXTRACT(dev->ccm[CCM_CBCDR], IPG_PODF));
+ 
+     DPRINTF("freq = %d\n", (uint32_t)freq);
+ 
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index 085f17f871..429f10bc90 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -486,7 +486,7 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+         } else {
+             address_space_stb(&address_space_memory, ccw.cda, vdev->status,
+                                         MEMTXATTRS_UNSPECIFIED, NULL);
+-            sch->curr_status.scsw.count = ccw.count - sizeof(vdev->status);;
++            sch->curr_status.scsw.count = ccw.count - sizeof(vdev->status);
+             ret = 0;
+         }
+         break;
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index cc0c3fcee9..09055e8920 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -6487,7 +6487,7 @@ static void setup_rt_frame(int sig, struct target_sigaction *ka,
+         haddr = dest;
+     }
+     env->iaoq_f = haddr;
+-    env->iaoq_b = haddr + 4;;
++    env->iaoq_b = haddr + 4;
+     return;
+ 
+  give_sigsegv:
+diff --git a/migration/block.c b/migration/block.c
+index 3282809583..565625b9b2 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -896,7 +896,7 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
+     int len, flags;
+     char device_name[256];
+     int64_t addr;
+-    BlockBackend *blk, *blk_prev = NULL;;
++    BlockBackend *blk, *blk_prev = NULL;
+     Error *local_err = NULL;
+     uint8_t *buf;
+     int64_t total_sectors = 0;
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 98732cd65f..d44b0ed56c 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -2218,7 +2218,7 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
+ 
+     if (xcc->kvm_required && !kvm_enabled()) {
+         strList *new = g_new0(strList, 1);
+-        new->value = g_strdup("kvm");;
++        new->value = g_strdup("kvm");
+         *missing_feats = new;
+         return;
+     }
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index b1e32e95d3..d4b2ce2e94 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1122,7 +1122,7 @@ static int kvm_get_supported_msrs(KVMState *s)
+                     break;
+                 case MSR_IA32_XSS:
+                     has_msr_xss = true;
+-                    break;;
++                    break;
+                 case HV_X64_MSR_CRASH_CTL:
+                     has_msr_hv_crash = true;
+                     break;
+diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+index 8db9fba26e..2b00cd2f35 100644
+--- a/target/sh4/translate.c
++++ b/target/sh4/translate.c
+@@ -679,7 +679,7 @@ static void _decode_opc(DisasContext * ctx)
+ 	return;
+     case 0x6008:		/* swap.b Rm,Rn */
+ 	{
+-            TCGv low = tcg_temp_new();;
++            TCGv low = tcg_temp_new();
+ 	    tcg_gen_ext16u_i32(low, REG(B7_4));
+ 	    tcg_gen_bswap16_i32(low, low);
+             tcg_gen_deposit_i32(REG(B11_8), REG(B7_4), low, 0, 16);
+-- 
+2.13.5
