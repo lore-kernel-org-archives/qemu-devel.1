@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47562)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47622)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4V1C-0002ta-6d
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:47:03 -0400
+	id 1e4V1H-0002yf-T3
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:47:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4V1B-0003p2-5a
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:47:02 -0400
+	id 1e4V1D-0003qt-P3
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:47:07 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 17 Oct 2017 13:44:21 -0300
-Message-Id: <20171017164426.25277-38-f4bug@amsat.org>
+Date: Tue, 17 Oct 2017 13:44:22 -0300
+Message-Id: <20171017164426.25277-39-f4bug@amsat.org>
 In-Reply-To: <20171017164426.25277-1-f4bug@amsat.org>
 References: <20171017164426.25277-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 37/42] hw/display/vga: extract public API
- from i386/pc to "hw/display/vga.h"
+Subject: [Qemu-devel] [PATCH v3 38/42] hw/net/ne2000: extract ne2k-isa code
+ from i386/pc to ne2000-isa.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,158 +27,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Michael Tokarev <mjt@tls.msk.ru>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-trivial@nongnu.org
 
-and remove the old i386/pc dependency.
+- add "hw/net/ne2000-isa.h"
+- remove the old i386 dependency
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- include/hw/display/vga.h | 25 +++++++++++++++++++++++++
- include/hw/i386/pc.h     | 12 ------------
- hw/display/vga-isa-mm.c  |  3 +--
- hw/display/vga-isa.c     |  2 +-
- hw/display/vga.c         |  2 +-
- hw/mips/mips_jazz.c      |  1 +
- vl.c                     |  2 +-
- MAINTAINERS              |  1 +
- 8 files changed, 31 insertions(+), 17 deletions(-)
- create mode 100644 include/hw/display/vga.h
+ hw/net/ne2000.h             |  3 +++
+ include/hw/i386/pc.h        | 20 --------------------
+ include/hw/net/ne2000-isa.h | 33 +++++++++++++++++++++++++++++++++
+ hw/i386/pc.c                |  1 +
+ hw/mips/mips_r4k.c          |  1 +
+ hw/net/ne2000-isa.c         |  6 ++----
+ hw/net/ne2000.c             |  2 --
+ hw/ppc/prep.c               |  1 +
+ 8 files changed, 41 insertions(+), 26 deletions(-)
+ create mode 100644 include/hw/net/ne2000-isa.h
 
-diff --git a/include/hw/display/vga.h b/include/hw/display/vga.h
+diff --git a/hw/net/ne2000.h b/hw/net/ne2000.h
+index d213dccae3..adb8021bd1 100644
+--- a/hw/net/ne2000.h
++++ b/hw/net/ne2000.h
+@@ -1,6 +1,9 @@
+ #ifndef HW_NE2000_H
+ #define HW_NE2000_H
+ 
++#include "hw/hw.h"
++#include "net/net.h"
++
+ #define NE2000_PMEM_SIZE    (32*1024)
+ #define NE2000_PMEM_START   (16*1024)
+ #define NE2000_PMEM_END     (NE2000_PMEM_SIZE+NE2000_PMEM_START)
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 25ba378bd8..846d37b9fb 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -302,26 +302,6 @@ PCIBus *find_i440fx(void);
+ extern PCIDevice *piix4_dev;
+ int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn);
+ 
+-/* ne2000.c */
+-static inline bool isa_ne2000_init(ISABus *bus, int base, int irq, NICInfo *nd)
+-{
+-    DeviceState *dev;
+-    ISADevice *isadev;
+-
+-    qemu_check_nic_model(nd, "ne2k_isa");
+-
+-    isadev = isa_try_create(bus, "ne2k_isa");
+-    if (!isadev) {
+-        return false;
+-    }
+-    dev = DEVICE(isadev);
+-    qdev_prop_set_uint32(dev, "iobase", base);
+-    qdev_prop_set_uint32(dev, "irq",    irq);
+-    qdev_set_nic_properties(dev, nd);
+-    qdev_init_nofail(dev);
+-    return true;
+-}
+-
+ /* pc_sysfw.c */
+ void pc_system_firmware_init(MemoryRegion *rom_memory,
+                              bool isapc_ram_fw);
+diff --git a/include/hw/net/ne2000-isa.h b/include/hw/net/ne2000-isa.h
 new file mode 100644
-index 0000000000..0401a3a292
+index 0000000000..ff2bed9c95
 --- /dev/null
-+++ b/include/hw/display/vga.h
-@@ -0,0 +1,25 @@
++++ b/include/hw/net/ne2000-isa.h
+@@ -0,0 +1,33 @@
 +/*
-+ * QEMU VGA Emulator.
++ * QEMU NE2000 emulation -- isa bus windup
 + *
-+ * Copyright (c) 2003 Fabrice Bellard
++ * Copyright (c) 2003-2004 Fabrice Bellard
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
 + */
-+#ifndef QEMU_HW_DISPLAY_VGA_H
-+#define QEMU_HW_DISPLAY_VGA_H
-+
-+#include "exec/memory.h"
-+
-+enum vga_retrace_method {
-+    VGA_RETRACE_DUMB,
-+    VGA_RETRACE_PRECISE
-+};
-+
-+extern enum vga_retrace_method vga_retrace_method;
-+
-+int isa_vga_mm_init(hwaddr vram_base,
-+                    hwaddr ctrl_base, int it_shift,
-+                    MemoryRegion *address_space);
-+
-+#endif
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index b1b4c918af..25ba378bd8 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -302,18 +302,6 @@ PCIBus *find_i440fx(void);
- extern PCIDevice *piix4_dev;
- int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn);
- 
--/* vga.c */
--enum vga_retrace_method {
--    VGA_RETRACE_DUMB,
--    VGA_RETRACE_PRECISE
--};
--
--extern enum vga_retrace_method vga_retrace_method;
--
--int isa_vga_mm_init(hwaddr vram_base,
--                    hwaddr ctrl_base, int it_shift,
--                    MemoryRegion *address_space);
--
- /* ne2000.c */
- static inline bool isa_ne2000_init(ISABus *bus, int base, int irq, NICInfo *nd)
- {
-diff --git a/hw/display/vga-isa-mm.c b/hw/display/vga-isa-mm.c
-index 68c4d6e23e..e887b45651 100644
---- a/hw/display/vga-isa-mm.c
-+++ b/hw/display/vga-isa-mm.c
-@@ -23,10 +23,9 @@
-  */
- #include "qemu/osdep.h"
- #include "hw/hw.h"
--#include "hw/i386/pc.h"
-+#include "hw/display/vga.h"
- #include "vga_int.h"
- #include "ui/pixel_ops.h"
--#include "qemu/timer.h"
- 
- #define VGA_RAM_SIZE (8192 * 1024)
- 
-diff --git a/hw/display/vga-isa.c b/hw/display/vga-isa.c
-index 26f69fd40a..469834add5 100644
---- a/hw/display/vga-isa.c
-+++ b/hw/display/vga-isa.c
-@@ -25,7 +25,7 @@
-  */
- #include "qemu/osdep.h"
- #include "hw/hw.h"
--#include "hw/i386/pc.h"
++#include "hw/hw.h"
++#include "hw/qdev.h"
 +#include "hw/isa/isa.h"
- #include "vga_int.h"
- #include "ui/pixel_ops.h"
- #include "qemu/timer.h"
-diff --git a/hw/display/vga.c b/hw/display/vga.c
-index 22fd069ad2..59729f7031 100644
---- a/hw/display/vga.c
-+++ b/hw/display/vga.c
-@@ -24,7 +24,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "hw/hw.h"
--#include "hw/i386/pc.h"
-+#include "hw/display/vga.h"
- #include "hw/pci/pci.h"
- #include "vga_int.h"
- #include "vga_regs.h"
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index b9ffb33b45..ece4a153b2 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -39,6 +39,7 @@
- #include "hw/loader.h"
- #include "hw/timer/mc146818rtc.h"
- #include "hw/timer/i8254.h"
-+#include "hw/display/vga.h"
- #include "hw/audio/pcspk.h"
- #include "sysemu/block-backend.h"
- #include "hw/sysbus.h"
-diff --git a/vl.c b/vl.c
-index 0d1f612629..f0b7106feb 100644
---- a/vl.c
-+++ b/vl.c
-@@ -57,9 +57,9 @@ int main(int argc, char **argv)
++#include "net/net.h"
++
++#define TYPE_ISA_NE2000 "ne2k_isa"
++
++static inline ISADevice *isa_ne2000_init(ISABus *bus, int base, int irq,
++                                         NICInfo *nd)
++{
++    ISADevice *d;
++
++    qemu_check_nic_model(nd, "ne2k_isa");
++
++    d = isa_try_create(bus, TYPE_ISA_NE2000);
++    if (d) {
++        DeviceState *dev = DEVICE(d);
++
++        qdev_prop_set_uint32(dev, "iobase", base);
++        qdev_prop_set_uint32(dev, "irq",    irq);
++        qdev_set_nic_properties(dev, nd);
++        qdev_init_nofail(dev);
++    }
++    return d;
++}
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 88e64d84c3..48c92e64ae 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -69,6 +69,7 @@
+ #include "qom/cpu.h"
+ #include "hw/nmi.h"
+ #include "hw/i386/intel_iommu.h"
++#include "hw/net/ne2000-isa.h"
+ 
+ /* debug PC/ISA interrupts */
+ //#define DEBUG_IRQ
+diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
+index cdb91e31c5..b40168fa08 100644
+--- a/hw/mips/mips_r4k.c
++++ b/hw/mips/mips_r4k.c
+@@ -18,6 +18,7 @@
+ #include "hw/char/serial.h"
+ #include "hw/isa/isa.h"
+ #include "net/net.h"
++#include "hw/net/ne2000-isa.h"
+ #include "sysemu/sysemu.h"
  #include "hw/boards.h"
- #include "sysemu/accel.h"
- #include "hw/usb.h"
+ #include "hw/block/flash.h"
+diff --git a/hw/net/ne2000-isa.c b/hw/net/ne2000-isa.c
+index f3455339ee..70e5c1d3d4 100644
+--- a/hw/net/ne2000-isa.c
++++ b/hw/net/ne2000-isa.c
+@@ -22,17 +22,15 @@
+  * THE SOFTWARE.
+  */
+ #include "qemu/osdep.h"
+-#include "hw/hw.h"
 -#include "hw/i386/pc.h"
  #include "hw/isa/isa.h"
- #include "hw/scsi/scsi.h"
-+#include "hw/display/vga.h"
- #include "hw/bt.h"
- #include "sysemu/watchdog.h"
- #include "hw/smbios/smbios.h"
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0e926a942b..81b67e4685 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -860,6 +860,7 @@ F: hw/timer/hpet*
- F: hw/timer/i8254*
- F: hw/timer/mc146818rtc*
- F: hw/watchdog/wdt_ib700.c
-+F: include/hw/display/vga.h
- F: include/hw/i2c/pm_smbus.h
- F: include/hw/isa/i8257.h
- F: include/hw/timer/hpet.h
++#include "hw/net/ne2000-isa.h"
+ #include "hw/qdev.h"
+-#include "net/net.h"
+ #include "ne2000.h"
++#include "sysemu/sysemu.h"
+ #include "exec/address-spaces.h"
+ #include "qapi/error.h"
+ #include "qapi/visitor.h"
+ 
+-#define TYPE_ISA_NE2000 "ne2k_isa"
+ #define ISA_NE2000(obj) OBJECT_CHECK(ISANE2000State, (obj), TYPE_ISA_NE2000)
+ 
+ typedef struct ISANE2000State {
+diff --git a/hw/net/ne2000.c b/hw/net/ne2000.c
+index 3938e6ddd8..6874c8c6b9 100644
+--- a/hw/net/ne2000.c
++++ b/hw/net/ne2000.c
+@@ -22,9 +22,7 @@
+  * THE SOFTWARE.
+  */
+ #include "qemu/osdep.h"
+-#include "hw/hw.h"
+ #include "hw/pci/pci.h"
+-#include "net/net.h"
+ #include "ne2000.h"
+ #include "hw/loader.h"
+ #include "sysemu/sysemu.h"
+diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+index 94138a4e8c..f9c958b785 100644
+--- a/hw/ppc/prep.c
++++ b/hw/ppc/prep.c
+@@ -42,6 +42,7 @@
+ #include "hw/loader.h"
+ #include "hw/timer/mc146818rtc.h"
+ #include "hw/isa/pc87312.h"
++#include "hw/net/ne2000-isa.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/arch_init.h"
+ #include "sysemu/kvm.h"
 -- 
 2.15.0.rc0
