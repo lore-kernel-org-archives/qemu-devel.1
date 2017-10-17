@@ -1,49 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4PmF-0002wu-4H
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:11:15 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e4PmK-00030H-0N
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:11:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4PmA-0007ax-KW
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:11:15 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48988
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1e4PmA-0007aT-FU
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:11:10 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9HBAh1V035258
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 07:11:06 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dnfuwa9ax-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 07:10:58 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 17 Oct 2017 12:10:05 +0100
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-References: <20171004154144.88995-1-pasic@linux.vnet.ibm.com>
-	<20171004154144.88995-3-pasic@linux.vnet.ibm.com>
-	<d6d2d73d-65c9-7ae1-fd37-cb8e304781e7@redhat.com>
-	<7f454872-fae3-35b0-eff4-227b2aa0f77d@linux.vnet.ibm.com>
-	<6c17b274-cd75-7864-94b9-fc8abff1a786@redhat.com>
-	<da4228cb-d32c-dc77-0a80-bac306f07c24@linux.vnet.ibm.com>
-	<0120aa4c-ffce-79c0-8c87-c7c1100232eb@redhat.com>
-	<9d77c8e9-f875-4e42-5306-b847904b4a47@linux.vnet.ibm.com>
-	<39f9e450-d618-6c4d-9401-031c5374ed88@redhat.com>
-	<2b90291e-62a8-964f-286a-d8f1594b2d94@linux.vnet.ibm.com>
-Date: Tue, 17 Oct 2017 13:10:01 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1e4PmE-0007eK-Tj
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:11:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35330)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e4PmE-0007cq-Kg
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 07:11:14 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B705920277
+	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 11:11:13 +0000 (UTC)
+Date: Tue, 17 Oct 2017 12:11:07 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171017111106.GB2326@work-vm>
+References: <20171004104636.7963-1-quintela@redhat.com>
+	<20171004104636.7963-9-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <2b90291e-62a8-964f-286a-d8f1594b2d94@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <0ade56a2-046a-6525-f19d-8febebcfde03@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/8] s390x/css: IO instr handler ending
- control
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171004104636.7963-9-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v9 08/12] migration: Test new fd
+ infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -52,60 +34,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-
-
-On 10/12/2017 01:44 PM, Halil Pasic wrote:
+* Juan Quintela (quintela@redhat.com) wrote:
+> We just send the address through the alternate channels and test that it
+> is ok.
 > 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+
+I remember questions on this patch from last time as well; this is just
+test isn't it, and all this gets changed in later patches.  So I'm
+not too sure of the point, especially since you could use
+qio_channel_writev_all  here and make the changes smaller.
+
+Dave
+
+> --
 > 
-> On 10/12/2017 08:58 AM, Thomas Huth wrote:
->> On 10.10.2017 13:41, Halil Pasic wrote:
-[..]
->> So yes, please don't do a "typedef unsigned int IOInstEnding" either. I
->> think the best match for QEMU would be a
->>
->> typedef enum IOInstEnding {
->>     CC_...,
->>     CC_...,
->>     CC_...,
->>     CC_...
->> } IOInstEnding;
->>
+> Use qio_channel_*all functions
+> ---
+>  migration/ram.c | 39 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 39 insertions(+)
 > 
-> I also prefer this over #define NAME val.
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 745da2971d..4c16d0775b 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -492,8 +492,24 @@ static void *multifd_send_thread(void *opaque)
+>              break;
+>          }
+>          if (p->pages.num) {
+> +            Error *local_err = NULL;
+> +            size_t ret;
+> +            int i;
+> +            int num;
+> +
+> +            num = p->pages.num;
+>              p->pages.num = 0;
+>              qemu_mutex_unlock(&p->mutex);
+> +
+> +            for (i = 0; i < num; i++) {
+> +                ret = qio_channel_write_all(p->c,
+> +                         (const char *)&p->pages.iov[i].iov_base,
+> +                         sizeof(uint8_t *), &local_err);
+> +                if (ret != 0) {
+> +                    terminate_multifd_send_threads(local_err);
+> +                    return NULL;
+> +                }
+> +            }
+>              qemu_mutex_lock(&multifd_send_state->mutex);
+>              p->done = true;
+>              qemu_mutex_unlock(&multifd_send_state->mutex);
+> @@ -675,6 +691,7 @@ int multifd_load_cleanup(Error **errp)
+>  static void *multifd_recv_thread(void *opaque)
+>  {
+>      MultiFDRecvParams *p = opaque;
+> +    uint8_t *recv_address;
+>  
+>      qemu_sem_post(&p->ready);
+>      while (true) {
+> @@ -684,7 +701,29 @@ static void *multifd_recv_thread(void *opaque)
+>              break;
+>          }
+>          if (p->pages.num) {
+> +            Error *local_err = NULL;
+> +            size_t ret;
+> +            int i;
+> +            int num;
+> +
+> +            num = p->pages.num;
+>              p->pages.num = 0;
+> +
+> +            for (i = 0; i < num; i++) {
+> +                ret = qio_channel_read_all(p->c, (char *)&recv_address,
+> +                                           sizeof(uint8_t *), &local_err);
+> +                if (ret != 0) {
+> +                    terminate_multifd_recv_threads(local_err);
+> +                    return NULL;
+> +                }
+> +                if (recv_address != p->pages.iov[i].iov_base) {
+> +                    error_setg(&local_err, "received %p and expecting %p (%d)",
+> +                               recv_address, p->pages.iov[i].iov_base, i);
+> +                    terminate_multifd_recv_threads(local_err);
+> +                    return NULL;
+> +                }
+> +            }
+> +
+>              p->done = true;
+>              qemu_mutex_unlock(&p->mutex);
+>              qemu_sem_post(&p->ready);
+> -- 
+> 2.13.5
 > 
-
-@Conny @Thomas
-
-I'm almost done with v3, but I've realized we did not agree on the
-names for the enum constants, so before posting something to ugly
-again, I would like to inquire your opinion.
-
-My current version of the enum is the following (but I can easily change
-to whatever you like with sed):
-
-+/*
-+ * IO instructions conclude according this. Currently we have only
-+ * cc codes. Valid values are 0,1,2,3 and the generic semantic for IO instructions
-+ * is described briefly. For more details consult the PoP.
-+ */
-+typedef enum IOInstEnding {
-+    IOINST_CC_0 = 0, /* produced expected result */
-+    IOINST_CC_1 = 1, /* status conditions were present, or alternate result */
-+    IOINST_CC_2 = 2, /* ineffective, busy with previously initiated function */
-+    IOINST_CC_3 = 3  /* ineffective, not operational */
-+} IOInstEnding;
-+
-
-Alternatives I had in mind are IOINST_CC_0_EXPECTED, IOINST_CC_1_STATUS_PRESENT, 
-IOINST_CC_2_BUSY, IOINST_CC_3_NOT_OPERATIONAL or the same without the numerical
-code (e.g. just IONIST_CC_EXPECTED).
-
-Regards,
-Halil
-
-
-
-[..]
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
