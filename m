@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e4Ntp-0008HH-3b
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:11:03 -0400
+	(envelope-from <no-reply@patchew.org>) id 1e4NvI-0000im-Sz
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:12:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e4Ntl-0002EF-Q7
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:10:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46274)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e4Ntl-0002DF-Go
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:10:53 -0400
-Date: Tue, 17 Oct 2017 11:10:47 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171017111047.1ae8e518@nial.brq.redhat.com>
-In-Reply-To: <20171016165916.GI3246@localhost.localdomain>
-References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
-	<1508170976-96869-5-git-send-email-imammedo@redhat.com>
-	<20171016165916.GI3246@localhost.localdomain>
+	(envelope-from <no-reply@patchew.org>) id 1e4NvF-0003DH-Jm
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:12:28 -0400
+Resent-Message-Id: <E1e4NvF-0003DH-Jm@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21373)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1e4NvF-000347-Da
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 05:12:25 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150820345940.362.5312503530020632345@b58463cdfd5f>
+In-Reply-To: <20171017001209.32276-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 4/6] CLI: add -paused option
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 16 Oct 2017 18:24:20 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 00/39] remove i386/pc dependency from
+ non-PC world (part 1)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,261 +29,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com, pkrempa@redhat.com, david@gibson.dropbear.id.au, peter.maydell@linaro.org, pbonzini@redhat.com, cohuck@redhat.com
+To: f4bug@amsat.org
+Cc: famz@redhat.com, peter.maydell@linaro.org, thuth@redhat.com, armbru@redhat.com, pbonzini@redhat.com, mst@redhat.com, aurelien@aurel32.net, yongbok.kim@imgtec.com, rth@twiddle.net, hpoussin@reactos.org, david@gibson.dropbear.id.au, agraf@suse.de, kraxel@redhat.com, mark.cave-ayland@ilande.co.uk, atar4qemu@gmail.com, mjt@tls.msk.ru, otubo@redhat.com, ehabkost@redhat.com, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-On Mon, 16 Oct 2017 14:59:16 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
-
-> On Mon, Oct 16, 2017 at 06:22:54PM +0200, Igor Mammedov wrote:
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> >  include/sysemu/sysemu.h |  1 +
-> >  qemu-options.hx         | 15 ++++++++++++++
-> >  qmp.c                   |  5 +++++
-> >  vl.c                    | 54 ++++++++++++++++++++++++++++++++++++++++++++++++-
-> >  4 files changed, 74 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> > index b213696..3feb94f 100644
-> > --- a/include/sysemu/sysemu.h
-> > +++ b/include/sysemu/sysemu.h
-> > @@ -66,6 +66,7 @@ typedef enum WakeupReason {
-> >      QEMU_WAKEUP_REASON_OTHER,
-> >  } WakeupReason;
-> >  
-> > +void qemu_exit_preconfig_request(void);
-> >  void qemu_system_reset_request(ShutdownCause reason);
-> >  void qemu_system_suspend_request(void);
-> >  void qemu_register_suspend_notifier(Notifier *notifier);
-> > diff --git a/qemu-options.hx b/qemu-options.hx
-> > index 39225ae..bd44db8 100644
-> > --- a/qemu-options.hx
-> > +++ b/qemu-options.hx
-> > @@ -3498,6 +3498,21 @@ STEXI
-> >  Run the emulation in single step mode.
-> >  ETEXI
-> >  
-> > +DEF("paused", HAS_ARG, QEMU_OPTION_paused, \
-> > +    "-paused [state=]postconf|preconf\n"
-> > +    "                postconf: pause QEMU after machine is initialized\n"
-> > +    "                preconf: pause QEMU before machine is initialized\n",
-> > +    QEMU_ARCH_ALL)  
-> 
-> I would like to allow pausing before machine-type is selected, so
-> management could run query-machines before choosing a
-> machine-type.  Would that need a third "-pause" mode, or will we
-> be able to change "preconf" to pause before select_machine() is
-> called?
-> The same probably applies to other things initialized before
-> machine_run_board_init() that could be configurable using QMP,
-> including but not limited to:
-> * Accelerator configuration
-> * Registering global properties
-> * RAM size
-> * SMP/CPU configuration
-My goal is/were much more narrow and reachable without rewriting whole
-qemu again (well I had to do a bit of necessary preparatory refactoring
-for that to happen default_cpu+generilizing cpu_model parsing).
-
-This series is focused on allowing to query cpu layout defined by f("-M foo -smp ...")
-and configiring numa mapping for resulted layout. So it needs machine
-object to exist by the time it's paused, which means that -M and -smp
-options have to be parsed by that time.
-
-Allowing pause basically before machine is created I'd guess, would be
-a lot of additional re-factoring (beyond this series scope), I can't
-say for sure if new pause mode is need for it or 'preconf' could be
-moved to earlier stage later.
-I'd speculate that for generic handling we would need
-  - CLI options dependency tree
-  - add new QMP/HMP command (process-cli-option)
-       make it actionable, i.e. "process-cli-option -M foo" would create
-       machine and user would be allowed to use other options
-       that have machine dependency (for example -smp and after that -numa)
-I woudn't like to go down that bottomless pit yet right now,
-but probably we could add "process-cli-option" right now and allow only
--numa command for now so we would have external interface in place
-and could extend it later.
-
-> > +STEXI
-> > +@item -paused
-> > +@findex -paused
-> > +if set enabled interactive configuration stages before machine emulation starts.
-> > +'postconf' option value mimics -S option behaviour where machine is created
-> > +but emulation isn't started. 'preconf' option value pauses QEMU before machine
-> > +is created, which allows to query and configure properties affecting machine
-> > +initialization. Use monitor/QMP command 'cont' to go to exit paused state.  
-> 
-> What if "-S" is used at the same time"?  Will "cont" only
-> initialize the machine and wait for another "cont" command to
-> start the VCPUs, or will it unpause everything?
-in current impl. first 'cont' will exit preconfig loop and continue to
-work as it used to be, i.e. -S will cause second pause right before
-vcpus started and the second 'cont' will be needed to run machine.
-
-> 
-> > +ETEXI
-> > +
-> >  DEF("S", 0, QEMU_OPTION_S, \
-> >      "-S              freeze CPU at startup (use 'c' to start execution)\n",
-> >      QEMU_ARCH_ALL)
-> > diff --git a/qmp.c b/qmp.c
-> > index e8c3031..49e9a5c 100644
-> > --- a/qmp.c
-> > +++ b/qmp.c
-> > @@ -167,6 +167,11 @@ void qmp_cont(Error **errp)
-> >      BlockBackend *blk;
-> >      Error *local_err = NULL;
-> >  
-> > +    if (runstate_check(RUN_STATE_PRELAUNCH)) {
-> > +        qemu_exit_preconfig_request();
-> > +        return;
-> > +    }
-> > +
-> >      /* if there is a dump in background, we should wait until the dump
-> >       * finished */
-> >      if (dump_in_progress()) {
-> > diff --git a/vl.c b/vl.c
-> > index 3fed457..30631fd 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -555,6 +555,20 @@ static QemuOptsList qemu_fw_cfg_opts = {
-> >      },
-> >  };
-> >  
-> > +static QemuOptsList qemu_paused_opts = {
-> > +    .name = "paused",
-> > +    .implied_opt_name = "state",
-> > +    .head = QTAILQ_HEAD_INITIALIZER(qemu_paused_opts.head),
-> > +    .desc = {
-> > +        {
-> > +            .name = "state",
-> > +            .type = QEMU_OPT_STRING,
-> > +            .help = "Pause state of QEMU on startup",
-> > +        },
-> > +        { /* end of list */ }
-> > +    },
-> > +};
-> > +
-> >  /**
-> >   * Get machine options
-> >   *
-> > @@ -1689,6 +1703,11 @@ static pid_t shutdown_pid;
-> >  static int powerdown_requested;
-> >  static int debug_requested;
-> >  static int suspend_requested;
-> > +static enum {
-> > +    PRECONFIG_CONT = 0,
-> > +    PRECONFIG_PAUSE,
-> > +    PRECONFIG_SKIP,
-> > +} preconfig_requested;
-> >  static WakeupReason wakeup_reason;
-> >  static NotifierList powerdown_notifiers =
-> >      NOTIFIER_LIST_INITIALIZER(powerdown_notifiers);
-> > @@ -1773,6 +1792,11 @@ static int qemu_debug_requested(void)
-> >      return r;
-> >  }
-> >  
-> > +void qemu_exit_preconfig_request(void)
-> > +{
-> > +    preconfig_requested = PRECONFIG_CONT;
-> > +}
-> > +
-> >  /*
-> >   * Reset the VM. Issue an event unless @reason is SHUTDOWN_CAUSE_NONE.
-> >   */
-> > @@ -1939,6 +1963,12 @@ static bool main_loop_should_exit(void)
-> >      RunState r;
-> >      ShutdownCause request;
-> >  
-> > +    if (runstate_check(RUN_STATE_PRELAUNCH)) {
-> > +        if (preconfig_requested == PRECONFIG_CONT) {
-> > +            preconfig_requested = PRECONFIG_SKIP;
-> > +            return true;
-> > +        }
-> > +    }
-> >      if (qemu_debug_requested()) {
-> >          vm_stop(RUN_STATE_DEBUG);
-> >      }
-> > @@ -3177,6 +3207,7 @@ int main(int argc, char **argv, char **envp)
-> >      qemu_add_opts(&qemu_icount_opts);
-> >      qemu_add_opts(&qemu_semihosting_config_opts);
-> >      qemu_add_opts(&qemu_fw_cfg_opts);
-> > +    qemu_add_opts(&qemu_paused_opts);
-> >      module_call_init(MODULE_INIT_OPTS);
-> >  
-> >      runstate_init();
-> > @@ -3845,6 +3876,26 @@ int main(int argc, char **argv, char **envp)
-> >                      exit(1);
-> >                  }
-> >                  break;
-> > +            case QEMU_OPTION_paused:
-> > +                {
-> > +                    const char *value;
-> > +
-> > +                    opts = qemu_opts_parse_noisily(qemu_find_opts("paused"),
-> > +                                                   optarg, true);
-> > +                    if (opts == NULL) {
-> > +                        exit(1);
-> > +                    }
-> > +                    value = qemu_opt_get(opts, "state");
-> > +                    if (!strcmp(value, "postconf")) {
-> > +                        autostart = 0;
-> > +                    } else if (!strcmp(value, "preconf")) {
-> > +                        preconfig_requested = PRECONFIG_PAUSE;
-> > +                    } else {
-> > +                        error_report("incomplete '-paused' option\n");
-> > +                        exit(1);
-> > +                    }
-> > +                    break;
-> > +                }
-> >              case QEMU_OPTION_enable_kvm:
-> >                  olist = qemu_find_opts("machine");
-> >                  qemu_opts_parse_noisily(olist, "accel=kvm", false);
-> > @@ -4731,7 +4782,6 @@ int main(int argc, char **argv, char **envp)
-> >      current_machine->boot_order = boot_order;
-> >      current_machine->cpu_model = cpu_model;
-> >  
-> > -
-> >      /* parse features once if machine provides default cpu_type */
-> >      if (machine_class->default_cpu_type) {
-> >          current_machine->cpu_type = machine_class->default_cpu_type;
-> > @@ -4741,6 +4791,8 @@ int main(int argc, char **argv, char **envp)
-> >          }
-> >      }
-> >  
-> > +    main_loop(); /* do monitor/qmp handling at preconfig state if requested */
-> > +  
-> 
-> I'm impressed by the simplicity of the implementation.  I though
-> this would involve moving everything between this line and the
-> next main_loop() call outside main(), so they would be called by
-> qmp_cont().
-> 
-> Any expert on GLib's Event Loop sees any gotcha in this method?
-> 
-> I would like to do a careful review of main_loop_wait() and
-> main_loop_should_exit(), to ensure those functions don't depend
-> on anything that's initialized after this line.  Probably a few
-> existing QMP commands can crash if machine is not initialized
-> yet?
-some HMP/QMP commands will crash for sure, any idea on how to
-handle issue (i.e. prevent not allowed commands to run) is welcome.
-
-> The rules and expectations on initialization ordering are very
-> subtle, I suggest including test code for the new feature to
-> ensure nothing crashes or breaks in the future.
-that's only RFC, I've omitted testing part as approach
-to be used isn't certain yet, but yep I plan on adding tests
-for features that are expected to work with this.
-
-
-> 
-> >      machine_run_board_init(current_machine);
-> >  
-> >      realtime_init();
-> > -- 
-> > 2.7.4
-> >   
-> 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcxMDE3MDAxMjA5LjMyMjc2LTEtZjRidWdAYW1zYXQub3JnClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMDAvMzldIHJlbW92ZSBpMzg2L3BjIGRlcGVuZGVuY3kg
+ZnJvbSBub24tUEMgd29ybGQgKHBhcnQgMSkKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
+YmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4u
+IHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9n
+IC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAg
+ICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0
+PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Njcmlw
+dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAg
+ICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVT
+VCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
+ZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmY5YjVhZGJjOTggaHcv
+ZG1hL2k4MjU3OiByZW5hbWUgRE1BX2luaXQoKSB0byBpODI1N19kbWFfaW5pdCgpCmY3MWUzOWNh
+ZWYgaHcvZG1hL2k4MjM3NDogYXZvaWQgbXVsdGlwbGUgY3JlYXRpb25zIG9uIHRoZSBzYW1lIElT
+QSBidXMKOTU4NWZmMjdlZSBpMzg2L3BjOiBleHRyYWN0IHBvcnQ5MiBmcm9tIHBjLmMKOTBhNjY1
+MGNjMiBpMzg2L3BjOiBtb3ZlIHB2cGFuaWMuYyBmcm9tIGh3L21pc2MvIHRvIGh3L2kzODYvCjM2
+OTM1OWQwYTMgaTM4Ni9wYzogbW92ZSB2bXBvcnQuYyBmcm9tIGh3L21pc2MvIHRvIGh3L2kzODYv
+CmQxYmEwNTJlNDAgbWlzYzogZHJvcCBvbGQgaTM4NiBkZXBlbmRlbmN5CmUzN2VjZTBlNjYgaHcv
+bmV0L25lMjAwMDogZXh0cmFjdCBuZTJrLWlzYSBjb2RlIGZyb20gaTM4Ni9wYyB0byBuZTIwMDAt
+aXNhLmMKNjFlNTQzMmRmYiBody90aW1lci9tYzE0NjgxODogcmVuYW1lIHJ0Y19pbml0KCkgLT4g
+bWMxNDY4MThfcnRjX2luaXQoKQoyNTI3YWRiZDk0IGh3L2lucHV0L2k4MDQyOiBleHRyYWN0IHBj
+a2JkIGFuZCB2bW1vdXNlIEFQSSBmcm9tIGh3L2kzODYvcGMuaAplNGFlYTY5YzU3IGh3L2Rpc3Bs
+YXkvdmdhOiByZW1vdmUgdGhlIG9sZCBpMzg2L3BjIGRlcGVuZGVuY3kKMDBjMmI1MTI4MiBody90
+aW1lci9pODI1NDogcmVuYW1lIHBpdF9pbml0KCkgLT4gaTgyNTRfcGl0X2luaXQoKQo1YTJkYTMw
+OTExIGh3L2FjcGk6IEFDUElfUE1fKiBkZWZpbmVzIGFyZSBub3QgcmVzdHJpY3RlZCB0byBpMzg2
+IGFyY2gKZDk4Zjg2ZGRjZSBody91bmljb3JlMzI6IHJlc3RyaWN0IGh3IGFkZHIgZGVmaW5lcyB0
+byBzb3VyY2UgZmlsZQpiYTU4N2RmOWM2IGh3L3ZpcnRpby1iYWxsb29uOiByZW1vdmUgb2xkIGkz
+ODYgZGVwZW5kZW5jeQo4NGUwMjQ5MzFjIGh3L3RwbTogcmVtb3ZlIG9sZCBpMzg2IGRlcGVuZGVu
+Y3kKZDMxZTJmMmY5NyBody9pMmM6IHJlbW92ZSBvbGQgaTM4NiBkZXBlbmRlbmN5CmYyYWFmOWJj
+MmEgaHcvaXBtaTogcmVtb3ZlIG9sZCBpMzg2IGRlcGVuZGVuY3kKM2QwMzIzZWNmNSBody9pZGU6
+IHJlbW92ZSBvbGQgaTM4NiBkZXBlbmRlbmN5CmI2MzcyN2ZiMDcgbWlzYzogcmVtb3ZlIG9sZCBp
+Mzg2IGRlcGVuZGVuY3kKMzk5NGQwN2FiMSBhbWRfaW9tbXU6IGF2b2lkIG5lZWRsZXNzIGluY2x1
+ZGVzIGluIGhlYWRlciBmaWxlCjcwNzhmZWZjMGQgaHcvc3NpL2FzcGVlZF9zbWM6IHJlbW92ZSB1
+bnVzZWQgI2luY2x1ZGUKYmYzNmY1Y2UxYyBudW1hOiByZW1vdmUgdW51c2VkICNpbmNsdWRlCjVk
+ZDNlODExNjEgbWlzYzogYXZvaWQgImluY2x1ZGUvIiBpbiBpbmNsdWRlIHBhdGgKZDUwNDZiZTMw
+OCBuaW9zMjogcmVtb3ZlIGR1cGxpY2F0ZWQgaW5jbHVkZXMgKGluIGNvZGUgY29tbWVudGVkIG91
+dCkKOTk5OTAwYzE4YyBpMzg2L2hheDogcmVtb3ZlIGR1cGxpY2F0ZWQgaW5jbHVkZQoxODgyZDUx
+NjM1IGkzODYvaGF4OiByZW1vdmUgZHVwbGljYXRlZCBpbmNsdWRlcwozMWQ0Mjg2NzM1IHBwYzog
+cmVtb3ZlIGR1cGxpY2F0ZWQgaW5jbHVkZXMKOWU0ZmY1ZDZhZCBtaXNjOiByZW1vdmUgZHVwbGlj
+YXRlZCBpbmNsdWRlcwo0ZmI5NDFkNWU0IG1pc2M6IHJlbW92ZSBoZWFkZXJzIGltcGxpY2l0bHkg
+aW5jbHVkZWQKOWYyYWNiZjhkYiBibG9jazogcmVtb3ZlICJxZW11L29zZGVwLmgiIGZyb20gaGVh
+ZGVyIGZpbGUKYWIzNTQxZDE0NSBodzogcmVtb3ZlICJxZW11L29zZGVwLmgiIGZyb20gaGVhZGVy
+IGZpbGVzCjI4ZWEwMzZiOWQgaHc6IHVzZSAicWVtdS9vc2RlcC5oIiBhcyBmaXJzdCAjaW5jbHVk
+ZSBpbiBzb3VyY2UgZmlsZXMKYjY0YWJlZmNjYSBNQUlOVEFJTkVSUzogYWRkIG1pc3NpbmcgZW50
+cnkgZm9yIGluY2x1ZGUvaHcvbmV0LwpmYTk4Njc2ODZhIE1BSU5UQUlORVJTOiBhZGQgZW50cmll
+cyBmb3IgdGltZXIvbTQ4dDU5CmEyYTU1NGNmODQgTUFJTlRBSU5FUlM6IGFkZCBhbiBlbnRyeSBm
+b3IgaW5wdXQvcGNrYmQuYwpiOTY4NmEwNDY5IE1BSU5UQUlORVJTOiBhZGQgYW4gZW50cnkgZm9y
+IHdhdGNoZG9nL3dkdF9pYjcwMApiYzRhYjIzYWE1IE1BSU5UQUlORVJTOiBhZGQgYW4gZW50cnkg
+Zm9yIHRoZSBpODIzNzggKHN1cGVyaW8pCmZmNjM1NjUxZTYgTUFJTlRBSU5FUlM6IGFkZCBlbnRy
+aWVzIGZvciBkbWEvaTgyMzc0CmQ0NjI0ZWEzN2UgTUFJTlRBSU5FUlM6IGFkZCBlbnRyaWVzIGZv
+ciBpMmMvcHBjNHh4X2kyYwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8z
+OTogTUFJTlRBSU5FUlM6IGFkZCBlbnRyaWVzIGZvciBpMmMvcHBjNHh4X2kyYy4uLgpDaGVja2lu
+ZyBQQVRDSCAyLzM5OiBNQUlOVEFJTkVSUzogYWRkIGVudHJpZXMgZm9yIGRtYS9pODIzNzQuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMy8zOTogTUFJTlRBSU5FUlM6IGFkZCBhbiBlbnRyeSBmb3IgdGhlIGk4
+MjM3OCAoc3VwZXJpbykuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8zOTogTUFJTlRBSU5FUlM6IGFkZCBh
+biBlbnRyeSBmb3Igd2F0Y2hkb2cvd2R0X2liNzAwLi4uCkNoZWNraW5nIFBBVENIIDUvMzk6IE1B
+SU5UQUlORVJTOiBhZGQgYW4gZW50cnkgZm9yIGlucHV0L3Bja2JkLmMuLi4KQ2hlY2tpbmcgUEFU
+Q0ggNi8zOTogTUFJTlRBSU5FUlM6IGFkZCBlbnRyaWVzIGZvciB0aW1lci9tNDh0NTkuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggNy8zOTogTUFJTlRBSU5FUlM6IGFkZCBtaXNzaW5nIGVudHJ5IGZvciBpbmNs
+dWRlL2h3L25ldC8uLi4KQ2hlY2tpbmcgUEFUQ0ggOC8zOTogaHc6IHVzZSAicWVtdS9vc2RlcC5o
+IiBhcyBmaXJzdCAjaW5jbHVkZSBpbiBzb3VyY2UgZmlsZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8z
+OTogaHc6IHJlbW92ZSAicWVtdS9vc2RlcC5oIiBmcm9tIGhlYWRlciBmaWxlcy4uLgpDaGVja2lu
+ZyBQQVRDSCAxMC8zOTogYmxvY2s6IHJlbW92ZSAicWVtdS9vc2RlcC5oIiBmcm9tIGhlYWRlciBm
+aWxlLi4uCkNoZWNraW5nIFBBVENIIDExLzM5OiBtaXNjOiByZW1vdmUgaGVhZGVycyBpbXBsaWNp
+dGx5IGluY2x1ZGVkLi4uCkNoZWNraW5nIFBBVENIIDEyLzM5OiBtaXNjOiByZW1vdmUgZHVwbGlj
+YXRlZCBpbmNsdWRlcy4uLgpDaGVja2luZyBQQVRDSCAxMy8zOTogcHBjOiByZW1vdmUgZHVwbGlj
+YXRlZCBpbmNsdWRlcy4uLgpDaGVja2luZyBQQVRDSCAxNC8zOTogaTM4Ni9oYXg6IHJlbW92ZSBk
+dXBsaWNhdGVkIGluY2x1ZGVzLi4uCkNoZWNraW5nIFBBVENIIDE1LzM5OiBpMzg2L2hheDogcmVt
+b3ZlIGR1cGxpY2F0ZWQgaW5jbHVkZS4uLgpDaGVja2luZyBQQVRDSCAxNi8zOTogbmlvczI6IHJl
+bW92ZSBkdXBsaWNhdGVkIGluY2x1ZGVzIChpbiBjb2RlIGNvbW1lbnRlZCBvdXQpLi4uCkNoZWNr
+aW5nIFBBVENIIDE3LzM5OiBtaXNjOiBhdm9pZCAiaW5jbHVkZS8iIGluIGluY2x1ZGUgcGF0aC4u
+LgpDaGVja2luZyBQQVRDSCAxOC8zOTogbnVtYTogcmVtb3ZlIHVudXNlZCAjaW5jbHVkZS4uLgpD
+aGVja2luZyBQQVRDSCAxOS8zOTogaHcvc3NpL2FzcGVlZF9zbWM6IHJlbW92ZSB1bnVzZWQgI2lu
+Y2x1ZGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvMzk6IGFtZF9pb21tdTogYXZvaWQgbmVlZGxlc3Mg
+aW5jbHVkZXMgaW4gaGVhZGVyIGZpbGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMjEvMzk6IG1pc2M6IHJl
+bW92ZSBvbGQgaTM4NiBkZXBlbmRlbmN5Li4uCkNoZWNraW5nIFBBVENIIDIyLzM5OiBody9pZGU6
+IHJlbW92ZSBvbGQgaTM4NiBkZXBlbmRlbmN5Li4uCkNoZWNraW5nIFBBVENIIDIzLzM5OiBody9p
+cG1pOiByZW1vdmUgb2xkIGkzODYgZGVwZW5kZW5jeS4uLgpDaGVja2luZyBQQVRDSCAyNC8zOTog
+aHcvaTJjOiByZW1vdmUgb2xkIGkzODYgZGVwZW5kZW5jeS4uLgpDaGVja2luZyBQQVRDSCAyNS8z
+OTogaHcvdHBtOiByZW1vdmUgb2xkIGkzODYgZGVwZW5kZW5jeS4uLgpDaGVja2luZyBQQVRDSCAy
+Ni8zOTogaHcvdmlydGlvLWJhbGxvb246IHJlbW92ZSBvbGQgaTM4NiBkZXBlbmRlbmN5Li4uCkNo
+ZWNraW5nIFBBVENIIDI3LzM5OiBody91bmljb3JlMzI6IHJlc3RyaWN0IGh3IGFkZHIgZGVmaW5l
+cyB0byBzb3VyY2UgZmlsZS4uLgpDaGVja2luZyBQQVRDSCAyOC8zOTogaHcvYWNwaTogQUNQSV9Q
+TV8qIGRlZmluZXMgYXJlIG5vdCByZXN0cmljdGVkIHRvIGkzODYgYXJjaC4uLgpDaGVja2luZyBQ
+QVRDSCAyOS8zOTogaHcvdGltZXIvaTgyNTQ6IHJlbmFtZSBwaXRfaW5pdCgpIC0+IGk4MjU0X3Bp
+dF9pbml0KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMzAvMzk6IGh3L2Rpc3BsYXkvdmdhOiByZW1vdmUg
+dGhlIG9sZCBpMzg2L3BjIGRlcGVuZGVuY3kuLi4KQ2hlY2tpbmcgUEFUQ0ggMzEvMzk6IGh3L2lu
+cHV0L2k4MDQyOiBleHRyYWN0IHBja2JkIGFuZCB2bW1vdXNlIEFQSSBmcm9tIGh3L2kzODYvcGMu
+aC4uLgpDaGVja2luZyBQQVRDSCAzMi8zOTogaHcvdGltZXIvbWMxNDY4MTg6IHJlbmFtZSBydGNf
+aW5pdCgpIC0+IG1jMTQ2ODE4X3J0Y19pbml0KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMzMvMzk6IGh3
+L25ldC9uZTIwMDA6IGV4dHJhY3QgbmUyay1pc2EgY29kZSBmcm9tIGkzODYvcGMgdG8gbmUyMDAw
+LWlzYS5jLi4uCkNoZWNraW5nIFBBVENIIDM0LzM5OiBtaXNjOiBkcm9wIG9sZCBpMzg2IGRlcGVu
+ZGVuY3kuLi4KQ2hlY2tpbmcgUEFUQ0ggMzUvMzk6IGkzODYvcGM6IG1vdmUgdm1wb3J0LmMgZnJv
+bSBody9taXNjLyB0byBody9pMzg2Ly4uLgpDaGVja2luZyBQQVRDSCAzNi8zOTogaTM4Ni9wYzog
+bW92ZSBwdnBhbmljLmMgZnJvbSBody9taXNjLyB0byBody9pMzg2Ly4uLgpDaGVja2luZyBQQVRD
+SCAzNy8zOTogaTM4Ni9wYzogZXh0cmFjdCBwb3J0OTIgZnJvbSBwYy5jLi4uCkVSUk9SOiBkbyBu
+b3QgdXNlIEM5OSAvLyBjb21tZW50cwojMjAyOiBGSUxFOiBody9pMzg2L3BvcnQ5Mi5jOjI0Ogor
+ICAgIC8vRFBSSU5URigicG9ydDkyOiB3cml0ZSAweCUwMiIgUFJJeDY0ICJcbiIsIHZhbCk7CgpF
+UlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzIxNzogRklMRTogaHcvaTM4Ni9wb3J0
+OTIuYzozOToKKyAgICAvL0RQUklOVEYoInBvcnQ5MjogcmVhZCAweCUwMnhcbiIsIHJldCk7Cgp0
+b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDI4MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzOC8zOTogaHcvZG1h
+L2k4MjM3NDogYXZvaWQgbXVsdGlwbGUgY3JlYXRpb25zIG9uIHRoZSBzYW1lIElTQSBidXMuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMzkvMzk6IGh3L2RtYS9pODI1NzogcmVuYW1lIERNQV9pbml0KCkgdG8g
+aTgyNTdfZG1hX2luaXQoKS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
+ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
+dGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
