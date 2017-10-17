@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e4JOe-0008U3-5b
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:30 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e4JOe-0008UF-8z
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1e4JOb-0007Co-Pc
+	(envelope-from <dgibson@ozlabs.org>) id 1e4JOb-0007CO-Gz
 	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 00:22:28 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 17 Oct 2017 15:21:47 +1100
-Message-Id: <20171017042152.29443-30-david@gibson.dropbear.id.au>
+Date: Tue, 17 Oct 2017 15:21:51 +1100
+Message-Id: <20171017042152.29443-34-david@gibson.dropbear.id.au>
 In-Reply-To: <20171017042152.29443-1-david@gibson.dropbear.id.au>
 References: <20171017042152.29443-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 29/34] ppc: pnv: define core types statically
+Subject: [Qemu-devel] [PULL 33/34] spapr_pci: fail gracefully with
+ non-pseries machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,84 +23,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: ehabkost@redhat.com, agraf@suse.de, imammedo@redhat.com, groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Igor Mammedov <imammedo@redhat.com>
+From: Greg Kurz <groug@kaod.org>
 
-pnv core type definition doesn't have any fields that
-require it to be defined at runtime. So replace code
-that fills in TypeInfo at runtime with static TypeInfo
-array that does the same at complie time.
+QEMU currently crashes when the user tries to add an spapr-pci-host-bridge
+on a non-pseries machine:
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+$ qemu-system-ppc64 -M ppce500 -device spapr-pci-host-bridge,index=1
+hw/ppc/spapr_pci.c:1535:spapr_phb_realize:
+Object 0x1003dacae60 is not an instance of type spapr-machine
+Aborted (core dumped)
+
+The same thing happens with the deprecated but still available child type
+spapr-pci-vfio-host-bridge.
+
+Fix both by checking the machine type with object_dynamic_cast().
+
+Reviewed-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/pnv_core.c | 48 ++++++++++++++++++++----------------------------
- 1 file changed, 20 insertions(+), 28 deletions(-)
+ hw/ppc/spapr_pci.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index 135d3fa29f..350394fdb5 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -225,38 +225,30 @@ static void pnv_core_class_init(ObjectClass *oc, vo=
-id *data)
-     dc->props =3D pnv_core_properties;
- }
-=20
--static const TypeInfo pnv_core_info =3D {
--    .name           =3D TYPE_PNV_CORE,
--    .parent         =3D TYPE_CPU_CORE,
--    .instance_size  =3D sizeof(PnvCore),
--    .class_size     =3D sizeof(PnvCoreClass),
--    .class_init =3D pnv_core_class_init,
--    .abstract       =3D true,
--};
--
--static const char *pnv_core_models[] =3D {
--    "power8e_v2.1", "power8_v2.0", "power8nvl_v1.0", "power9_v2.0"
--};
--
--static void pnv_core_register_types(void)
--{
--    int i ;
--
--    type_register_static(&pnv_core_info);
--    for (i =3D 0; i < ARRAY_SIZE(pnv_core_models); ++i) {
--        TypeInfo ti =3D {
--            .parent =3D TYPE_PNV_CORE,
--            .instance_size =3D sizeof(PnvCore),
--        };
--        ti.name =3D pnv_core_typename(pnv_core_models[i]);
--        type_register(&ti);
--        g_free((void *)ti.name);
-+#define DEFINE_PNV_CORE_TYPE(cpu_model)         \
-+    {                                           \
-+        .parent =3D TYPE_PNV_CORE,                \
-+        .name =3D PNV_CORE_TYPE_NAME(cpu_model),  \
-     }
--}
-=20
--type_init(pnv_core_register_types)
-+static const TypeInfo pnv_core_infos[] =3D {
-+    {
-+        .name           =3D TYPE_PNV_CORE,
-+        .parent         =3D TYPE_CPU_CORE,
-+        .instance_size  =3D sizeof(PnvCore),
-+        .class_size     =3D sizeof(PnvCoreClass),
-+        .class_init =3D pnv_core_class_init,
-+        .abstract       =3D true,
-+    },
-+    DEFINE_PNV_CORE_TYPE("power8e_v2.1"),
-+    DEFINE_PNV_CORE_TYPE("power8_v2.0"),
-+    DEFINE_PNV_CORE_TYPE("power8nvl_v1.0"),
-+    DEFINE_PNV_CORE_TYPE("power9_v2.0"),
-+};
-=20
- char *pnv_core_typename(const char *model)
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 5049ced4e8..5a3122a9f9 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1507,7 +1507,12 @@ static void spapr_pci_unplug_request(HotplugHandler *plug_handler,
+ 
+ static void spapr_phb_realize(DeviceState *dev, Error **errp)
  {
-     return g_strdup_printf(PNV_CORE_TYPE_NAME("%s"), model);
- }
+-    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
++    /* We don't use SPAPR_MACHINE() in order to exit gracefully if the user
++     * tries to add a sPAPR PHB to a non-pseries machine.
++     */
++    sPAPRMachineState *spapr =
++        (sPAPRMachineState *) object_dynamic_cast(qdev_get_machine(),
++                                                  TYPE_SPAPR_MACHINE);
+     SysBusDevice *s = SYS_BUS_DEVICE(dev);
+     sPAPRPHBState *sphb = SPAPR_PCI_HOST_BRIDGE(s);
+     PCIHostState *phb = PCI_HOST_BRIDGE(s);
+@@ -1519,6 +1524,11 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+     const unsigned windows_supported =
+         sphb->ddw_enabled ? SPAPR_PCI_DMA_MAX_WINDOWS : 1;
+ 
++    if (!spapr) {
++        error_setg(errp, TYPE_SPAPR_PCI_HOST_BRIDGE " needs a pseries machine");
++        return;
++    }
 +
-+DEFINE_TYPES(pnv_core_infos)
---=20
+     if (sphb->index != (uint32_t)-1) {
+         sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+         Error *local_err = NULL;
+-- 
 2.13.6
