@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e4Vkc-00056L-7s
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 13:34:01 -0400
+	(envelope-from <alistai@xilinx.com>) id 1e4Vkd-00057l-PO
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 13:34:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1e4VkX-0006Nx-SA
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 13:33:58 -0400
+	(envelope-from <alistai@xilinx.com>) id 1e4VkZ-0006Op-DL
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 13:33:59 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 17 Oct 2017 10:29:56 -0700
-Message-ID: <2d15ee794016babca409bc65f1662337aea54e48.1508261326.git.alistair.francis@xilinx.com>
+Date: Tue, 17 Oct 2017 10:29:51 -0700
+Message-ID: <12d01491de4612b533f6525efbf2be189635fd07.1508261326.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1508261326.git.alistair.francis@xilinx.com>
 References: <cover.1508261326.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 6/8] xlnx-zynqmp-ipi: Initial version of the
- Xilinx IPI device
+Subject: [Qemu-devel] [PATCH v4 4/8] xlnx-pmu-iomod-intc: Add the PMU
+ Interrupt controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +25,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
 Cc: alistair.francis@xilinx.com, alistair23@gmail.com, qemu-arm@nongnu.org
 
-This is the initial version of the Inter Processor Interrupt device.
+Add the PMU IO Module Interrupt controller device.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
 
- hw/intc/Makefile.objs             |   1 +
- hw/intc/xlnx-zynqmp-ipi.c         | 377 ++++++++++++++++++++++++++++++++++++++
- include/hw/intc/xlnx-zynqmp-ipi.h |  57 ++++++
- 3 files changed, 435 insertions(+)
- create mode 100644 hw/intc/xlnx-zynqmp-ipi.c
- create mode 100644 include/hw/intc/xlnx-zynqmp-ipi.h
+ default-configs/microblaze-softmmu.mak |   1 +
+ hw/intc/Makefile.objs                  |   1 +
+ hw/intc/xlnx-pmu-iomod-intc.c          | 554 +++++++++++++++++++++++++++++++++
+ include/hw/intc/xlnx-pmu-iomod-intc.h  |  58 ++++
+ 4 files changed, 614 insertions(+)
+ create mode 100644 hw/intc/xlnx-pmu-iomod-intc.c
+ create mode 100644 include/hw/intc/xlnx-pmu-iomod-intc.h
 
+diff --git a/default-configs/microblaze-softmmu.mak b/default-configs/microblaze-softmmu.mak
+index ce2630818a..7fca8e4c99 100644
+--- a/default-configs/microblaze-softmmu.mak
++++ b/default-configs/microblaze-softmmu.mak
+@@ -9,3 +9,4 @@ CONFIG_XILINX_SPI=y
+ CONFIG_XILINX_ETHLITE=y
+ CONFIG_SSI=y
+ CONFIG_SSI_M25P80=y
++CONFIG_XLNX_ZYNQMP=y
 diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-index 0fce61e2ce..8497d05695 100644
+index 78426a7daf..0fce61e2ce 100644
 --- a/hw/intc/Makefile.objs
 +++ b/hw/intc/Makefile.objs
-@@ -4,6 +4,7 @@ common-obj-$(CONFIG_PL190) += pl190.o
+@@ -3,6 +3,7 @@ common-obj-$(CONFIG_I8259) += i8259_common.o i8259.o
+ common-obj-$(CONFIG_PL190) += pl190.o
  common-obj-$(CONFIG_PUV3) += puv3_intc.o
  common-obj-$(CONFIG_XILINX) += xilinx_intc.o
- common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-pmu-iomod-intc.o
-+common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp-ipi.o
++common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-pmu-iomod-intc.o
  common-obj-$(CONFIG_ETRAXFS) += etraxfs_pic.o
  common-obj-$(CONFIG_IMX) += imx_avic.o
  common-obj-$(CONFIG_LM32) += lm32_pic.o
-diff --git a/hw/intc/xlnx-zynqmp-ipi.c b/hw/intc/xlnx-zynqmp-ipi.c
+diff --git a/hw/intc/xlnx-pmu-iomod-intc.c b/hw/intc/xlnx-pmu-iomod-intc.c
 new file mode 100644
-index 0000000000..6203b27e56
+index 0000000000..4ec7991f4f
 --- /dev/null
-+++ b/hw/intc/xlnx-zynqmp-ipi.c
-@@ -0,0 +1,377 @@
++++ b/hw/intc/xlnx-pmu-iomod-intc.c
+@@ -0,0 +1,554 @@
 +/*
-+ * QEMU model of the IPI Inter Processor Interrupt block
++ * QEMU model of Xilinx I/O Module Interrupt Controller
 + *
-+ * Copyright (c) 2014 Xilinx Inc.
-+ *
++ * Copyright (c) 2013 Xilinx Inc
 + * Written by Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 + * Written by Alistair Francis <alistair.francis@xilinx.com>
 + *
@@ -87,268 +96,438 @@ index 0000000000..6203b27e56
 +#include "hw/register.h"
 +#include "qemu/bitops.h"
 +#include "qemu/log.h"
-+#include "hw/intc/xlnx-zynqmp-ipi.h"
++#include "hw/intc/xlnx-pmu-iomod-intc.h"
 +
-+#ifndef XLNX_ZYNQMP_IPI_ERR_DEBUG
-+#define XLNX_ZYNQMP_IPI_ERR_DEBUG 0
++#ifndef XLNX_PMU_IO_INTC_ERR_DEBUG
++#define XLNX_PMU_IO_INTC_ERR_DEBUG 0
 +#endif
 +
 +#define DB_PRINT_L(lvl, fmt, args...) do {\
-+    if (XLNX_ZYNQMP_IPI_ERR_DEBUG >= lvl) {\
-+        qemu_log(TYPE_XLNX_ZYNQMP_IPI ": %s:" fmt, __func__, ## args);\
++    if (XLNX_PMU_IO_INTC_ERR_DEBUG >= lvl) {\
++        qemu_log(TYPE_XLNX_PMU_IO_INTC ": %s:" fmt, __func__, ## args);\
 +    } \
 +} while (0);
 +
 +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
 +
-+REG32(IPI_TRIG, 0x0)
-+    FIELD(IPI_TRIG, PL_3, 27, 1)
-+    FIELD(IPI_TRIG, PL_2, 26, 1)
-+    FIELD(IPI_TRIG, PL_1, 25, 1)
-+    FIELD(IPI_TRIG, PL_0, 24, 1)
-+    FIELD(IPI_TRIG, PMU_3, 19, 1)
-+    FIELD(IPI_TRIG, PMU_2, 18, 1)
-+    FIELD(IPI_TRIG, PMU_1, 17, 1)
-+    FIELD(IPI_TRIG, PMU_0, 16, 1)
-+    FIELD(IPI_TRIG, RPU_1, 9, 1)
-+    FIELD(IPI_TRIG, RPU_0, 8, 1)
-+    FIELD(IPI_TRIG, APU, 0, 1)
-+REG32(IPI_OBS, 0x4)
-+    FIELD(IPI_OBS, PL_3, 27, 1)
-+    FIELD(IPI_OBS, PL_2, 26, 1)
-+    FIELD(IPI_OBS, PL_1, 25, 1)
-+    FIELD(IPI_OBS, PL_0, 24, 1)
-+    FIELD(IPI_OBS, PMU_3, 19, 1)
-+    FIELD(IPI_OBS, PMU_2, 18, 1)
-+    FIELD(IPI_OBS, PMU_1, 17, 1)
-+    FIELD(IPI_OBS, PMU_0, 16, 1)
-+    FIELD(IPI_OBS, RPU_1, 9, 1)
-+    FIELD(IPI_OBS, RPU_0, 8, 1)
-+    FIELD(IPI_OBS, APU, 0, 1)
-+REG32(IPI_ISR, 0x10)
-+    FIELD(IPI_ISR, PL_3, 27, 1)
-+    FIELD(IPI_ISR, PL_2, 26, 1)
-+    FIELD(IPI_ISR, PL_1, 25, 1)
-+    FIELD(IPI_ISR, PL_0, 24, 1)
-+    FIELD(IPI_ISR, PMU_3, 19, 1)
-+    FIELD(IPI_ISR, PMU_2, 18, 1)
-+    FIELD(IPI_ISR, PMU_1, 17, 1)
-+    FIELD(IPI_ISR, PMU_0, 16, 1)
-+    FIELD(IPI_ISR, RPU_1, 9, 1)
-+    FIELD(IPI_ISR, RPU_0, 8, 1)
-+    FIELD(IPI_ISR, APU, 0, 1)
-+REG32(IPI_IMR, 0x14)
-+    FIELD(IPI_IMR, PL_3, 27, 1)
-+    FIELD(IPI_IMR, PL_2, 26, 1)
-+    FIELD(IPI_IMR, PL_1, 25, 1)
-+    FIELD(IPI_IMR, PL_0, 24, 1)
-+    FIELD(IPI_IMR, PMU_3, 19, 1)
-+    FIELD(IPI_IMR, PMU_2, 18, 1)
-+    FIELD(IPI_IMR, PMU_1, 17, 1)
-+    FIELD(IPI_IMR, PMU_0, 16, 1)
-+    FIELD(IPI_IMR, RPU_1, 9, 1)
-+    FIELD(IPI_IMR, RPU_0, 8, 1)
-+    FIELD(IPI_IMR, APU, 0, 1)
-+REG32(IPI_IER, 0x18)
-+    FIELD(IPI_IER, PL_3, 27, 1)
-+    FIELD(IPI_IER, PL_2, 26, 1)
-+    FIELD(IPI_IER, PL_1, 25, 1)
-+    FIELD(IPI_IER, PL_0, 24, 1)
-+    FIELD(IPI_IER, PMU_3, 19, 1)
-+    FIELD(IPI_IER, PMU_2, 18, 1)
-+    FIELD(IPI_IER, PMU_1, 17, 1)
-+    FIELD(IPI_IER, PMU_0, 16, 1)
-+    FIELD(IPI_IER, RPU_1, 9, 1)
-+    FIELD(IPI_IER, RPU_0, 8, 1)
-+    FIELD(IPI_IER, APU, 0, 1)
-+REG32(IPI_IDR, 0x1c)
-+    FIELD(IPI_IDR, PL_3, 27, 1)
-+    FIELD(IPI_IDR, PL_2, 26, 1)
-+    FIELD(IPI_IDR, PL_1, 25, 1)
-+    FIELD(IPI_IDR, PL_0, 24, 1)
-+    FIELD(IPI_IDR, PMU_3, 19, 1)
-+    FIELD(IPI_IDR, PMU_2, 18, 1)
-+    FIELD(IPI_IDR, PMU_1, 17, 1)
-+    FIELD(IPI_IDR, PMU_0, 16, 1)
-+    FIELD(IPI_IDR, RPU_1, 9, 1)
-+    FIELD(IPI_IDR, RPU_0, 8, 1)
-+    FIELD(IPI_IDR, APU, 0, 1)
++REG32(IRQ_MODE, 0xc)
++REG32(GPO0, 0x10)
++    FIELD(GPO0, MAGIC_WORD_1, 24, 8)
++    FIELD(GPO0, MAGIC_WORD_2, 16, 8)
++    FIELD(GPO0, FT_INJECT_FAILURE, 13, 3)
++    FIELD(GPO0, DISABLE_RST_FTSM, 12, 1)
++    FIELD(GPO0, RST_FTSM, 11, 1)
++    FIELD(GPO0, CLR_FTSTS, 10, 1)
++    FIELD(GPO0, RST_ON_SLEEP, 9, 1)
++    FIELD(GPO0, DISABLE_TRACE_COMP, 8, 1)
++    FIELD(GPO0, PIT3_PRESCALE, 7, 1)
++    FIELD(GPO0, PIT2_PRESCALE, 5, 2)
++    FIELD(GPO0, PIT1_PRESCALE, 3, 2)
++    FIELD(GPO0, PIT0_PRESCALE, 1, 2)
++    FIELD(GPO0, DEBUG_REMAP, 0, 1)
++REG32(GPO1, 0x14)
++    FIELD(GPO1, MIO_5, 5, 1)
++    FIELD(GPO1, MIO_4, 4, 1)
++    FIELD(GPO1, MIO_3, 3, 1)
++    FIELD(GPO1, MIO_2, 2, 1)
++    FIELD(GPO1, MIO_1, 1, 1)
++    FIELD(GPO1, MIO_0, 0, 1)
++REG32(GPO2, 0x18)
++    FIELD(GPO2, DAP_RPU_WAKE_ACK, 9, 1)
++    FIELD(GPO2, DAP_FP_WAKE_ACK, 8, 1)
++    FIELD(GPO2, PS_STATUS, 7, 1)
++    FIELD(GPO2, PCAP_EN, 6, 1)
++REG32(GPO3, 0x1c)
++    FIELD(GPO3, PL_GPO_31, 31, 1)
++    FIELD(GPO3, PL_GPO_30, 30, 1)
++    FIELD(GPO3, PL_GPO_29, 29, 1)
++    FIELD(GPO3, PL_GPO_28, 28, 1)
++    FIELD(GPO3, PL_GPO_27, 27, 1)
++    FIELD(GPO3, PL_GPO_26, 26, 1)
++    FIELD(GPO3, PL_GPO_25, 25, 1)
++    FIELD(GPO3, PL_GPO_24, 24, 1)
++    FIELD(GPO3, PL_GPO_23, 23, 1)
++    FIELD(GPO3, PL_GPO_22, 22, 1)
++    FIELD(GPO3, PL_GPO_21, 21, 1)
++    FIELD(GPO3, PL_GPO_20, 20, 1)
++    FIELD(GPO3, PL_GPO_19, 19, 1)
++    FIELD(GPO3, PL_GPO_18, 18, 1)
++    FIELD(GPO3, PL_GPO_17, 17, 1)
++    FIELD(GPO3, PL_GPO_16, 16, 1)
++    FIELD(GPO3, PL_GPO_15, 15, 1)
++    FIELD(GPO3, PL_GPO_14, 14, 1)
++    FIELD(GPO3, PL_GPO_13, 13, 1)
++    FIELD(GPO3, PL_GPO_12, 12, 1)
++    FIELD(GPO3, PL_GPO_11, 11, 1)
++    FIELD(GPO3, PL_GPO_10, 10, 1)
++    FIELD(GPO3, PL_GPO_9, 9, 1)
++    FIELD(GPO3, PL_GPO_8, 8, 1)
++    FIELD(GPO3, PL_GPO_7, 7, 1)
++    FIELD(GPO3, PL_GPO_6, 6, 1)
++    FIELD(GPO3, PL_GPO_5, 5, 1)
++    FIELD(GPO3, PL_GPO_4, 4, 1)
++    FIELD(GPO3, PL_GPO_3, 3, 1)
++    FIELD(GPO3, PL_GPO_2, 2, 1)
++    FIELD(GPO3, PL_GPO_1, 1, 1)
++    FIELD(GPO3, PL_GPO_0, 0, 1)
++REG32(GPI0, 0x20)
++    FIELD(GPI0, RFT_ECC_FATAL_ERR, 31, 1)
++    FIELD(GPI0, RFT_VOTER_ERR, 30, 1)
++    FIELD(GPI0, RFT_COMPARE_ERR_23, 29, 1)
++    FIELD(GPI0, RFT_COMPARE_ERR_13, 28, 1)
++    FIELD(GPI0, RFT_COMPARE_ERR_12, 27, 1)
++    FIELD(GPI0, RFT_LS_MISMATCH_23_B, 26, 1)
++    FIELD(GPI0, RFT_LS_MISMATCH_13_B, 25, 1)
++    FIELD(GPI0, RFT_LS_MISMATCH_12_B, 24, 1)
++    FIELD(GPI0, RFT_MISMATCH_STATE, 23, 1)
++    FIELD(GPI0, RFT_MISMATCH_CPU, 22, 1)
++    FIELD(GPI0, RFT_SLEEP_RESET, 19, 1)
++    FIELD(GPI0, RFT_LS_MISMATCH_23_A, 18, 1)
++    FIELD(GPI0, RFT_LS_MISMATCH_13_A, 17, 1)
++    FIELD(GPI0, RFT_LS_MISMATCH_12_A, 16, 1)
++    FIELD(GPI0, NFT_ECC_FATAL_ERR, 15, 1)
++    FIELD(GPI0, NFT_VOTER_ERR, 14, 1)
++    FIELD(GPI0, NFT_COMPARE_ERR_23, 13, 1)
++    FIELD(GPI0, NFT_COMPARE_ERR_13, 12, 1)
++    FIELD(GPI0, NFT_COMPARE_ERR_12, 11, 1)
++    FIELD(GPI0, NFT_LS_MISMATCH_23_B, 10, 1)
++    FIELD(GPI0, NFT_LS_MISMATCH_13_B, 9, 1)
++    FIELD(GPI0, NFT_LS_MISMATCH_12_B, 8, 1)
++    FIELD(GPI0, NFT_MISMATCH_STATE, 7, 1)
++    FIELD(GPI0, NFT_MISMATCH_CPU, 6, 1)
++    FIELD(GPI0, NFT_SLEEP_RESET, 3, 1)
++    FIELD(GPI0, NFT_LS_MISMATCH_23_A, 2, 1)
++    FIELD(GPI0, NFT_LS_MISMATCH_13_A, 1, 1)
++    FIELD(GPI0, NFT_LS_MISMATCH_12_A, 0, 1)
++REG32(GPI1, 0x24)
++    FIELD(GPI1, APB_AIB_ERROR, 31, 1)
++    FIELD(GPI1, AXI_AIB_ERROR, 30, 1)
++    FIELD(GPI1, ERROR_2, 29, 1)
++    FIELD(GPI1, ERROR_1, 28, 1)
++    FIELD(GPI1, ACPU_3_DBG_PWRUP, 23, 1)
++    FIELD(GPI1, ACPU_2_DBG_PWRUP, 22, 1)
++    FIELD(GPI1, ACPU_1_DBG_PWRUP, 21, 1)
++    FIELD(GPI1, ACPU_0_DBG_PWRUP, 20, 1)
++    FIELD(GPI1, FPD_WAKE_GIC_PROXY, 16, 1)
++    FIELD(GPI1, MIO_WAKE_5, 15, 1)
++    FIELD(GPI1, MIO_WAKE_4, 14, 1)
++    FIELD(GPI1, MIO_WAKE_3, 13, 1)
++    FIELD(GPI1, MIO_WAKE_2, 12, 1)
++    FIELD(GPI1, MIO_WAKE_1, 11, 1)
++    FIELD(GPI1, MIO_WAKE_0, 10, 1)
++    FIELD(GPI1, DAP_RPU_WAKE, 9, 1)
++    FIELD(GPI1, DAP_FPD_WAKE, 8, 1)
++    FIELD(GPI1, USB_1_WAKE, 7, 1)
++    FIELD(GPI1, USB_0_WAKE, 6, 1)
++    FIELD(GPI1, R5_1_WAKE, 5, 1)
++    FIELD(GPI1, R5_0_WAKE, 4, 1)
++    FIELD(GPI1, ACPU_3_WAKE, 3, 1)
++    FIELD(GPI1, ACPU_2_WAKE, 2, 1)
++    FIELD(GPI1, ACPU_1_WAKE, 1, 1)
++    FIELD(GPI1, ACPU_0_WAKE, 0, 1)
++REG32(GPI2, 0x28)
++    FIELD(GPI2, VCC_INT_FP_DISCONNECT, 31, 1)
++    FIELD(GPI2, VCC_INT_DISCONNECT, 30, 1)
++    FIELD(GPI2, VCC_AUX_DISCONNECT, 29, 1)
++    FIELD(GPI2, DBG_ACPU3_RST_REQ, 23, 1)
++    FIELD(GPI2, DBG_ACPU2_RST_REQ, 22, 1)
++    FIELD(GPI2, DBG_ACPU1_RST_REQ, 21, 1)
++    FIELD(GPI2, DBG_ACPU0_RST_REQ, 20, 1)
++    FIELD(GPI2, CP_ACPU3_RST_REQ, 19, 1)
++    FIELD(GPI2, CP_ACPU2_RST_REQ, 18, 1)
++    FIELD(GPI2, CP_ACPU1_RST_REQ, 17, 1)
++    FIELD(GPI2, CP_ACPU0_RST_REQ, 16, 1)
++    FIELD(GPI2, DBG_RCPU1_RST_REQ, 9, 1)
++    FIELD(GPI2, DBG_RCPU0_RST_REQ, 8, 1)
++    FIELD(GPI2, R5_1_SLEEP, 5, 1)
++    FIELD(GPI2, R5_0_SLEEP, 4, 1)
++    FIELD(GPI2, ACPU_3_SLEEP, 3, 1)
++    FIELD(GPI2, ACPU_2_SLEEP, 2, 1)
++    FIELD(GPI2, ACPU_1_SLEEP, 1, 1)
++    FIELD(GPI2, ACPU_0_SLEEP, 0, 1)
++REG32(GPI3, 0x2c)
++    FIELD(GPI3, PL_GPI_31, 31, 1)
++    FIELD(GPI3, PL_GPI_30, 30, 1)
++    FIELD(GPI3, PL_GPI_29, 29, 1)
++    FIELD(GPI3, PL_GPI_28, 28, 1)
++    FIELD(GPI3, PL_GPI_27, 27, 1)
++    FIELD(GPI3, PL_GPI_26, 26, 1)
++    FIELD(GPI3, PL_GPI_25, 25, 1)
++    FIELD(GPI3, PL_GPI_24, 24, 1)
++    FIELD(GPI3, PL_GPI_23, 23, 1)
++    FIELD(GPI3, PL_GPI_22, 22, 1)
++    FIELD(GPI3, PL_GPI_21, 21, 1)
++    FIELD(GPI3, PL_GPI_20, 20, 1)
++    FIELD(GPI3, PL_GPI_19, 19, 1)
++    FIELD(GPI3, PL_GPI_18, 18, 1)
++    FIELD(GPI3, PL_GPI_17, 17, 1)
++    FIELD(GPI3, PL_GPI_16, 16, 1)
++    FIELD(GPI3, PL_GPI_15, 15, 1)
++    FIELD(GPI3, PL_GPI_14, 14, 1)
++    FIELD(GPI3, PL_GPI_13, 13, 1)
++    FIELD(GPI3, PL_GPI_12, 12, 1)
++    FIELD(GPI3, PL_GPI_11, 11, 1)
++    FIELD(GPI3, PL_GPI_10, 10, 1)
++    FIELD(GPI3, PL_GPI_9, 9, 1)
++    FIELD(GPI3, PL_GPI_8, 8, 1)
++    FIELD(GPI3, PL_GPI_7, 7, 1)
++    FIELD(GPI3, PL_GPI_6, 6, 1)
++    FIELD(GPI3, PL_GPI_5, 5, 1)
++    FIELD(GPI3, PL_GPI_4, 4, 1)
++    FIELD(GPI3, PL_GPI_3, 3, 1)
++    FIELD(GPI3, PL_GPI_2, 2, 1)
++    FIELD(GPI3, PL_GPI_1, 1, 1)
++    FIELD(GPI3, PL_GPI_0, 0, 1)
++REG32(IRQ_STATUS, 0x30)
++    FIELD(IRQ_STATUS, CSU_PMU_SEC_LOCK, 31, 1)
++    FIELD(IRQ_STATUS, INV_ADDR, 29, 1)
++    FIELD(IRQ_STATUS, PWR_DN_REQ, 28, 1)
++    FIELD(IRQ_STATUS, PWR_UP_REQ, 27, 1)
++    FIELD(IRQ_STATUS, SW_RST_REQ, 26, 1)
++    FIELD(IRQ_STATUS, HW_RST_REQ, 25, 1)
++    FIELD(IRQ_STATUS, ISO_REQ, 24, 1)
++    FIELD(IRQ_STATUS, FW_REQ, 23, 1)
++    FIELD(IRQ_STATUS, IPI3, 22, 1)
++    FIELD(IRQ_STATUS, IPI2, 21, 1)
++    FIELD(IRQ_STATUS, IPI1, 20, 1)
++    FIELD(IRQ_STATUS, IPI0, 19, 1)
++    FIELD(IRQ_STATUS, RTC_ALARM, 18, 1)
++    FIELD(IRQ_STATUS, RTC_EVERY_SECOND, 17, 1)
++    FIELD(IRQ_STATUS, CORRECTABLE_ECC, 16, 1)
++    FIELD(IRQ_STATUS, GPI3, 14, 1)
++    FIELD(IRQ_STATUS, GPI2, 13, 1)
++    FIELD(IRQ_STATUS, GPI1, 12, 1)
++    FIELD(IRQ_STATUS, GPI0, 11, 1)
++    FIELD(IRQ_STATUS, PIT3, 6, 1)
++    FIELD(IRQ_STATUS, PIT2, 5, 1)
++    FIELD(IRQ_STATUS, PIT1, 4, 1)
++    FIELD(IRQ_STATUS, PIT0, 3, 1)
++REG32(IRQ_PENDING, 0x34)
++    FIELD(IRQ_PENDING, CSU_PMU_SEC_LOCK, 31, 1)
++    FIELD(IRQ_PENDING, INV_ADDR, 29, 1)
++    FIELD(IRQ_PENDING, PWR_DN_REQ, 28, 1)
++    FIELD(IRQ_PENDING, PWR_UP_REQ, 27, 1)
++    FIELD(IRQ_PENDING, SW_RST_REQ, 26, 1)
++    FIELD(IRQ_PENDING, HW_RST_REQ, 25, 1)
++    FIELD(IRQ_PENDING, ISO_REQ, 24, 1)
++    FIELD(IRQ_PENDING, FW_REQ, 23, 1)
++    FIELD(IRQ_PENDING, IPI3, 22, 1)
++    FIELD(IRQ_PENDING, IPI2, 21, 1)
++    FIELD(IRQ_PENDING, IPI1, 20, 1)
++    FIELD(IRQ_PENDING, IPI0, 19, 1)
++    FIELD(IRQ_PENDING, RTC_ALARM, 18, 1)
++    FIELD(IRQ_PENDING, RTC_EVERY_SECOND, 17, 1)
++    FIELD(IRQ_PENDING, CORRECTABLE_ECC, 16, 1)
++    FIELD(IRQ_PENDING, GPI3, 14, 1)
++    FIELD(IRQ_PENDING, GPI2, 13, 1)
++    FIELD(IRQ_PENDING, GPI1, 12, 1)
++    FIELD(IRQ_PENDING, GPI0, 11, 1)
++    FIELD(IRQ_PENDING, PIT3, 6, 1)
++    FIELD(IRQ_PENDING, PIT2, 5, 1)
++    FIELD(IRQ_PENDING, PIT1, 4, 1)
++    FIELD(IRQ_PENDING, PIT0, 3, 1)
++REG32(IRQ_ENABLE, 0x38)
++    FIELD(IRQ_ENABLE, CSU_PMU_SEC_LOCK, 31, 1)
++    FIELD(IRQ_ENABLE, INV_ADDR, 29, 1)
++    FIELD(IRQ_ENABLE, PWR_DN_REQ, 28, 1)
++    FIELD(IRQ_ENABLE, PWR_UP_REQ, 27, 1)
++    FIELD(IRQ_ENABLE, SW_RST_REQ, 26, 1)
++    FIELD(IRQ_ENABLE, HW_RST_REQ, 25, 1)
++    FIELD(IRQ_ENABLE, ISO_REQ, 24, 1)
++    FIELD(IRQ_ENABLE, FW_REQ, 23, 1)
++    FIELD(IRQ_ENABLE, IPI3, 22, 1)
++    FIELD(IRQ_ENABLE, IPI2, 21, 1)
++    FIELD(IRQ_ENABLE, IPI1, 20, 1)
++    FIELD(IRQ_ENABLE, IPI0, 19, 1)
++    FIELD(IRQ_ENABLE, RTC_ALARM, 18, 1)
++    FIELD(IRQ_ENABLE, RTC_EVERY_SECOND, 17, 1)
++    FIELD(IRQ_ENABLE, CORRECTABLE_ECC, 16, 1)
++    FIELD(IRQ_ENABLE, GPI3, 14, 1)
++    FIELD(IRQ_ENABLE, GPI2, 13, 1)
++    FIELD(IRQ_ENABLE, GPI1, 12, 1)
++    FIELD(IRQ_ENABLE, GPI0, 11, 1)
++    FIELD(IRQ_ENABLE, PIT3, 6, 1)
++    FIELD(IRQ_ENABLE, PIT2, 5, 1)
++    FIELD(IRQ_ENABLE, PIT1, 4, 1)
++    FIELD(IRQ_ENABLE, PIT0, 3, 1)
++REG32(IRQ_ACK, 0x3c)
++    FIELD(IRQ_ACK, CSU_PMU_SEC_LOCK, 31, 1)
++    FIELD(IRQ_ACK, INV_ADDR, 29, 1)
++    FIELD(IRQ_ACK, PWR_DN_REQ, 28, 1)
++    FIELD(IRQ_ACK, PWR_UP_REQ, 27, 1)
++    FIELD(IRQ_ACK, SW_RST_REQ, 26, 1)
++    FIELD(IRQ_ACK, HW_RST_REQ, 25, 1)
++    FIELD(IRQ_ACK, ISO_REQ, 24, 1)
++    FIELD(IRQ_ACK, FW_REQ, 23, 1)
++    FIELD(IRQ_ACK, IPI3, 22, 1)
++    FIELD(IRQ_ACK, IPI2, 21, 1)
++    FIELD(IRQ_ACK, IPI1, 20, 1)
++    FIELD(IRQ_ACK, IPI0, 19, 1)
++    FIELD(IRQ_ACK, RTC_ALARM, 18, 1)
++    FIELD(IRQ_ACK, RTC_EVERY_SECOND, 17, 1)
++    FIELD(IRQ_ACK, CORRECTABLE_ECC, 16, 1)
++    FIELD(IRQ_ACK, GPI3, 14, 1)
++    FIELD(IRQ_ACK, GPI2, 13, 1)
++    FIELD(IRQ_ACK, GPI1, 12, 1)
++    FIELD(IRQ_ACK, GPI0, 11, 1)
++    FIELD(IRQ_ACK, PIT3, 6, 1)
++    FIELD(IRQ_ACK, PIT2, 5, 1)
++    FIELD(IRQ_ACK, PIT1, 4, 1)
++    FIELD(IRQ_ACK, PIT0, 3, 1)
++REG32(PIT0_PRELOAD, 0x40)
++REG32(PIT0_COUNTER, 0x44)
++REG32(PIT0_CONTROL, 0x48)
++    FIELD(PIT0_CONTROL, PRELOAD, 1, 1)
++    FIELD(PIT0_CONTROL, EN, 0, 1)
++REG32(PIT1_PRELOAD, 0x50)
++REG32(PIT1_COUNTER, 0x54)
++REG32(PIT1_CONTROL, 0x58)
++    FIELD(PIT1_CONTROL, PRELOAD, 1, 1)
++    FIELD(PIT1_CONTROL, EN, 0, 1)
++REG32(PIT2_PRELOAD, 0x60)
++REG32(PIT2_COUNTER, 0x64)
++REG32(PIT2_CONTROL, 0x68)
++    FIELD(PIT2_CONTROL, PRELOAD, 1, 1)
++    FIELD(PIT2_CONTROL, EN, 0, 1)
++REG32(PIT3_PRELOAD, 0x70)
++REG32(PIT3_COUNTER, 0x74)
++REG32(PIT3_CONTROL, 0x78)
++    FIELD(PIT3_CONTROL, PRELOAD, 1, 1)
++    FIELD(PIT3_CONTROL, EN, 0, 1)
 +
-+/* APU
-+ * RPU_0
-+ * RPU_1
-+ * PMU_0
-+ * PMU_1
-+ * PMU_2
-+ * PMU_3
-+ * PL_0
-+ * PL_1
-+ * PL_2
-+ * PL_3
-+ */
-+int index_array[NUM_IPIS] = {0, 8, 9, 16, 17, 18, 19, 24, 25, 26, 27};
-+static const char *index_array_names[NUM_IPIS] = {"APU", "RPU_0", "RPU_1",
-+                                                  "PMU_0", "PMU_1", "PMU_2",
-+                                                  "PMU_3", "PL_0", "PL_1",
-+                                                  "PL_2", "PL_3"};
-+
-+static void xlnx_zynqmp_ipi_set_trig(XlnxZynqMPIPI *s, uint32_t val)
++static void xlnx_pmu_io_irq_update(XlnxPMUIOIntc *s)
 +{
-+    int i, ipi_index, ipi_mask;
++    bool irq_out;
 +
-+    for (i = 0; i < NUM_IPIS; i++) {
-+        ipi_index = index_array[i];
-+        ipi_mask = (1 << ipi_index);
-+        DB_PRINT("Setting %s=%d\n", index_array_names[i],
-+                 !!(val & ipi_mask));
-+        qemu_set_irq(s->irq_trig_out[i], !!(val & ipi_mask));
-+    }
++    s->regs[R_IRQ_PENDING] = s->regs[R_IRQ_STATUS] & s->regs[R_IRQ_ENABLE];
++    irq_out = !!s->regs[R_IRQ_PENDING];
++
++    DB_PRINT("Setting IRQ output = %d\n", irq_out);
++
++    qemu_set_irq(s->parent_irq, irq_out);
 +}
 +
-+static void xlnx_zynqmp_ipi_set_obs(XlnxZynqMPIPI *s, uint32_t val)
++static void xlnx_pmu_io_irq_enable_postw(RegisterInfo *reg, uint64_t val64)
 +{
-+    int i, ipi_index, ipi_mask;
++    XlnxPMUIOIntc *s = XLNX_PMU_IO_INTC(reg->opaque);
 +
-+    for (i = 0; i < NUM_IPIS; i++) {
-+        ipi_index = index_array[i];
-+        ipi_mask = (1 << ipi_index);
-+        DB_PRINT("Setting %s=%d\n", index_array_names[i],
-+                 !!(val & ipi_mask));
-+        qemu_set_irq(s->irq_obs_out[i], !!(val & ipi_mask));
-+    }
++    xlnx_pmu_io_irq_update(s);
 +}
 +
-+static void xlnx_zynqmp_ipi_update_irq(XlnxZynqMPIPI *s)
++static void xlnx_pmu_io_irq_ack_postw(RegisterInfo *reg, uint64_t val64)
 +{
-+    bool pending = s->regs[R_IPI_ISR] & ~s->regs[R_IPI_IMR];
-+
-+    DB_PRINT("irq=%d isr=%x mask=%x\n",
-+             pending, s->regs[R_IPI_ISR], s->regs[R_IPI_IMR]);
-+    qemu_set_irq(s->irq, pending);
-+}
-+
-+static uint64_t xlnx_zynqmp_ipi_trig_prew(RegisterInfo *reg, uint64_t val64)
-+{
-+    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(reg->opaque);
-+
-+    xlnx_zynqmp_ipi_set_trig(s, val64);
-+
-+    return val64;
-+}
-+
-+static void xlnx_zynqmp_ipi_trig_postw(RegisterInfo *reg, uint64_t val64)
-+{
-+    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(reg->opaque);
-+
-+    /* TRIG generates a pulse on the outbound signals. We use the
-+     * post-write callback to bring the signal back-down.
-+     */
-+    s->regs[R_IPI_TRIG] = 0;
-+
-+    xlnx_zynqmp_ipi_set_trig(s, 0);
-+}
-+
-+static uint64_t xlnx_zynqmp_ipi_isr_prew(RegisterInfo *reg, uint64_t val64)
-+{
-+    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(reg->opaque);
-+
-+    xlnx_zynqmp_ipi_set_obs(s, val64);
-+
-+    return val64;
-+}
-+
-+static void xlnx_zynqmp_ipi_isr_postw(RegisterInfo *reg, uint64_t val64)
-+{
-+    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(reg->opaque);
-+
-+    xlnx_zynqmp_ipi_update_irq(s);
-+}
-+
-+static uint64_t xlnx_zynqmp_ipi_ier_prew(RegisterInfo *reg, uint64_t val64)
-+{
-+    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(reg->opaque);
++    XlnxPMUIOIntc *s = XLNX_PMU_IO_INTC(reg->opaque);
 +    uint32_t val = val64;
 +
-+    s->regs[R_IPI_IMR] &= ~val;
-+    xlnx_zynqmp_ipi_update_irq(s);
-+    return 0;
++    /* Only clear */
++    val &= s->regs[R_IRQ_STATUS];
++    s->regs[R_IRQ_STATUS] ^= val;
++
++    /* Active level triggered interrupts stay high.  */
++    s->regs[R_IRQ_STATUS] |= s->irq_raw & ~s->cfg.level_edge;
++
++    xlnx_pmu_io_irq_update(s);
 +}
 +
-+static uint64_t xlnx_zynqmp_ipi_idr_prew(RegisterInfo *reg, uint64_t val64)
-+{
-+    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(reg->opaque);
-+    uint32_t val = val64;
-+
-+    s->regs[R_IPI_IMR] |= val;
-+    xlnx_zynqmp_ipi_update_irq(s);
-+    return 0;
-+}
-+
-+static const RegisterAccessInfo xlnx_zynqmp_ipi_regs_info[] = {
-+    {   .name = "IPI_TRIG",  .addr = A_IPI_TRIG,
-+        .rsvd = 0xf0f0fcfe,
-+        .ro = 0xf0f0fcfe,
-+        .pre_write = xlnx_zynqmp_ipi_trig_prew,
-+        .post_write = xlnx_zynqmp_ipi_trig_postw,
-+    },{ .name = "IPI_OBS",  .addr = A_IPI_OBS,
-+        .rsvd = 0xf0f0fcfe,
++static const RegisterAccessInfo xlnx_pmu_io_intc_regs_info[] = {
++    {   .name = "IRQ_MODE",  .addr = A_IRQ_MODE,
++        .rsvd = 0xffffffff,
++    },{ .name = "GPO0",  .addr = A_GPO0,
++    },{ .name = "GPO1",  .addr = A_GPO1,
++        .rsvd = 0xffffffc0,
++    },{ .name = "GPO2",  .addr = A_GPO2,
++        .rsvd = 0xfffffc3f,
++    },{ .name = "GPO3",  .addr = A_GPO3,
++    },{ .name = "GPI0",  .addr = A_GPI0,
++        .rsvd = 0x300030,
++        .ro = 0xffcfffcf,
++    },{ .name = "GPI1",  .addr = A_GPI1,
++        .rsvd = 0xf0e0000,
++        .ro = 0xf0f1ffff,
++    },{ .name = "GPI2",  .addr = A_GPI2,
++        .rsvd = 0x1f00fcc0,
++        .ro = 0xe0ff033f,
++    },{ .name = "GPI3",  .addr = A_GPI3,
 +        .ro = 0xffffffff,
-+    },{ .name = "IPI_ISR",  .addr = A_IPI_ISR,
-+        .rsvd = 0xf0f0fcfe,
-+        .ro = 0xf0f0fcfe,
-+        .w1c = 0xf0f0301,
-+        .pre_write = xlnx_zynqmp_ipi_isr_prew,
-+        .post_write = xlnx_zynqmp_ipi_isr_postw,
-+    },{ .name = "IPI_IMR",  .addr = A_IPI_IMR,
-+        .reset = 0xf0f0301,
-+        .rsvd = 0xf0f0fcfe,
++    },{ .name = "IRQ_STATUS",  .addr = A_IRQ_STATUS,
++        .rsvd = 0x40008787,
++        .ro = 0xbfff7878,
++    },{ .name = "IRQ_PENDING",  .addr = A_IRQ_PENDING,
++        .rsvd = 0x40008787,
++        .ro = 0xdfff7ff8,
++    },{ .name = "IRQ_ENABLE",  .addr = A_IRQ_ENABLE,
++        .rsvd = 0x40008787,
++        .ro = 0x7800,
++        .post_write = xlnx_pmu_io_irq_enable_postw,
++    },{ .name = "IRQ_ACK",  .addr = A_IRQ_ACK,
++        .rsvd = 0x40008787,
++        .post_write = xlnx_pmu_io_irq_ack_postw,
++    },{ .name = "PIT0_PRELOAD",  .addr = A_PIT0_PRELOAD,
 +        .ro = 0xffffffff,
-+    },{ .name = "IPI_IER",  .addr = A_IPI_IER,
-+        .rsvd = 0xf0f0fcfe,
-+        .ro = 0xf0f0fcfe,
-+        .pre_write = xlnx_zynqmp_ipi_ier_prew,
-+    },{ .name = "IPI_IDR",  .addr = A_IPI_IDR,
-+        .rsvd = 0xf0f0fcfe,
-+        .ro = 0xf0f0fcfe,
-+        .pre_write = xlnx_zynqmp_ipi_idr_prew,
++    },{ .name = "PIT0_COUNTER",  .addr = A_PIT0_COUNTER,
++        .ro = 0xffffffff,
++    },{ .name = "PIT0_CONTROL",  .addr = A_PIT0_CONTROL,
++        .rsvd = 0xfffffffc,
++    },{ .name = "PIT1_PRELOAD",  .addr = A_PIT1_PRELOAD,
++        .ro = 0xffffffff,
++    },{ .name = "PIT1_COUNTER",  .addr = A_PIT1_COUNTER,
++        .ro = 0xffffffff,
++    },{ .name = "PIT1_CONTROL",  .addr = A_PIT1_CONTROL,
++        .rsvd = 0xfffffffc,
++    },{ .name = "PIT2_PRELOAD",  .addr = A_PIT2_PRELOAD,
++        .ro = 0xffffffff,
++    },{ .name = "PIT2_COUNTER",  .addr = A_PIT2_COUNTER,
++        .ro = 0xffffffff,
++    },{ .name = "PIT2_CONTROL",  .addr = A_PIT2_CONTROL,
++        .rsvd = 0xfffffffc,
++    },{ .name = "PIT3_PRELOAD",  .addr = A_PIT3_PRELOAD,
++        .ro = 0xffffffff,
++    },{ .name = "PIT3_COUNTER",  .addr = A_PIT3_COUNTER,
++        .ro = 0xffffffff,
++    },{ .name = "PIT3_CONTROL",  .addr = A_PIT3_CONTROL,
++        .rsvd = 0xfffffffc,
 +    }
 +};
 +
-+static void xlnx_zynqmp_ipi_reset(DeviceState *dev)
++static void irq_handler(void *opaque, int irq, int level)
 +{
-+    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(dev);
-+    int i;
++    XlnxPMUIOIntc *s = XLNX_PMU_IO_INTC(opaque);
++    uint32_t mask = 1 << irq;
++    uint32_t prev = s->irq_raw;
++    uint32_t temp;
++
++    s->irq_raw &= ~mask;
++    s->irq_raw |= (!!level) << irq;
++
++    /* Turn active-low into active-high.  */
++    s->irq_raw ^= (~s->cfg.positive);
++    s->irq_raw &= mask;
++
++    if (s->cfg.level_edge & mask) {
++        /* Edge triggered.  */
++        temp = (prev ^ s->irq_raw) & s->irq_raw;
++    } else {
++        /* Level triggered.  */
++        temp = s->irq_raw;
++    }
++    s->regs[R_IRQ_STATUS] |= temp;
++
++    xlnx_pmu_io_irq_update(s);
++}
++
++static void xlnx_pmu_io_intc_reset(DeviceState *dev)
++{
++    XlnxPMUIOIntc *s = XLNX_PMU_IO_INTC(dev);
++    unsigned int i;
 +
 +    for (i = 0; i < ARRAY_SIZE(s->regs_info); ++i) {
 +        register_reset(&s->regs_info[i]);
 +    }
 +
-+    xlnx_zynqmp_ipi_update_irq(s);
++    xlnx_pmu_io_irq_update(s);
 +}
 +
-+static void xlnx_zynqmp_ipi_handler(void *opaque, int n, int level)
-+{
-+    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(opaque);
-+    uint32_t val = (!!level) << n;
-+
-+    DB_PRINT("IPI input irq[%d]=%d\n", n, level);
-+
-+    s->regs[R_IPI_ISR] |= val;
-+    xlnx_zynqmp_ipi_set_obs(s, s->regs[R_IPI_ISR]);
-+    xlnx_zynqmp_ipi_update_irq(s);
-+}
-+
-+static void xlnx_zynqmp_obs_handler(void *opaque, int n, int level)
-+{
-+    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(opaque);
-+
-+    DB_PRINT("OBS input irq[%d]=%d\n", n, level);
-+
-+    s->regs[R_IPI_OBS] &= ~(1ULL << n);
-+    s->regs[R_IPI_OBS] |= (level << n);
-+}
-+
-+static const MemoryRegionOps xlnx_zynqmp_ipi_ops = {
++static const MemoryRegionOps xlnx_pmu_io_intc_ops = {
 +    .read = register_read_memory,
 +    .write = register_write_memory,
 +    .endianness = DEVICE_LITTLE_ENDIAN,
@@ -358,88 +537,96 @@ index 0000000000..6203b27e56
 +    },
 +};
 +
-+static void xlnx_zynqmp_ipi_realize(DeviceState *dev, Error **errp)
++static Property xlnx_pmu_io_intc_properties[] = {
++    DEFINE_PROP_UINT32("intc-intr-size", XlnxPMUIOIntc, cfg.intr_size, 0),
++    DEFINE_PROP_UINT32("intc-level-edge", XlnxPMUIOIntc, cfg.level_edge, 0),
++    DEFINE_PROP_UINT32("intc-positive", XlnxPMUIOIntc, cfg.positive, 0),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void xlnx_pmu_io_intc_realize(DeviceState *dev, Error **errp)
 +{
-+    qdev_init_gpio_in_named(dev, xlnx_zynqmp_ipi_handler, "IPI_INPUTS", 32);
-+    qdev_init_gpio_in_named(dev, xlnx_zynqmp_obs_handler, "OBS_INPUTS", 32);
++    XlnxPMUIOIntc *s = XLNX_PMU_IO_INTC(dev);
++
++    /* Internal interrupts are edge triggered?  */
++    s->cfg.level_edge <<= 16;
++    s->cfg.level_edge |= 0xffff;
++
++    /* Internal interrupts are postitive.  */
++    s->cfg.positive <<= 16;
++    s->cfg.positive |= 0xffff;
++
++    /* Max 16 external interrupts.  */
++    assert(s->cfg.intr_size <= 16);
++
++    qdev_init_gpio_in(dev, irq_handler, 16 + s->cfg.intr_size);
 +}
 +
-+static void xlnx_zynqmp_ipi_init(Object *obj)
++static void xlnx_pmu_io_intc_init(Object *obj)
 +{
-+    XlnxZynqMPIPI *s = XLNX_ZYNQMP_IPI(obj);
-+    DeviceState *dev = DEVICE(obj);
++    XlnxPMUIOIntc *s = XLNX_PMU_IO_INTC(obj);
 +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
 +    RegisterInfoArray *reg_array;
-+    char *irq_name;
-+    int i;
 +
-+    memory_region_init(&s->iomem, obj, TYPE_XLNX_ZYNQMP_IPI,
-+                       R_XLNX_ZYNQMP_IPI_MAX * 4);
++    memory_region_init(&s->iomem, obj, TYPE_XLNX_PMU_IO_INTC,
++                       XlnxPMUIOIntc_R_MAX * 4);
 +    reg_array =
-+        register_init_block32(DEVICE(obj), xlnx_zynqmp_ipi_regs_info,
-+                              ARRAY_SIZE(xlnx_zynqmp_ipi_regs_info),
++        register_init_block32(DEVICE(obj), xlnx_pmu_io_intc_regs_info,
++                              ARRAY_SIZE(xlnx_pmu_io_intc_regs_info),
 +                              s->regs_info, s->regs,
-+                              &xlnx_zynqmp_ipi_ops,
-+                              XLNX_ZYNQMP_IPI_ERR_DEBUG,
-+                              R_XLNX_ZYNQMP_IPI_MAX * 4);
++                              &xlnx_pmu_io_intc_ops,
++                              XLNX_PMU_IO_INTC_ERR_DEBUG,
++                              XlnxPMUIOIntc_R_MAX * 4);
 +    memory_region_add_subregion(&s->iomem,
 +                                0x0,
 +                                &reg_array->mem);
 +    sysbus_init_mmio(sbd, &s->iomem);
-+    sysbus_init_irq(sbd, &s->irq);
 +
-+    for (i = 0; i < NUM_IPIS; i++) {
-+        qdev_init_gpio_out_named(dev, &s->irq_trig_out[i],
-+                                 index_array_names[i], 1);
-+
-+        irq_name = g_strdup_printf("OBS_%s", index_array_names[i]);
-+        qdev_init_gpio_out_named(dev, &s->irq_obs_out[i],
-+                                 irq_name, 1);
-+        g_free(irq_name);
-+    }
++    sysbus_init_irq(sbd, &s->parent_irq);
 +}
 +
-+static const VMStateDescription vmstate_zynqmp_pmu_ipi = {
-+    .name = TYPE_XLNX_ZYNQMP_IPI,
++static const VMStateDescription vmstate_xlnx_pmu_io_intc = {
++    .name = TYPE_XLNX_PMU_IO_INTC,
 +    .version_id = 1,
 +    .minimum_version_id = 1,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(regs, XlnxZynqMPIPI, R_XLNX_ZYNQMP_IPI_MAX),
++        VMSTATE_UINT32_ARRAY(regs, XlnxPMUIOIntc, XlnxPMUIOIntc_R_MAX),
 +        VMSTATE_END_OF_LIST(),
 +    }
 +};
 +
-+static void xlnx_zynqmp_ipi_class_init(ObjectClass *klass, void *data)
++static void xlnx_pmu_io_intc_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->reset = xlnx_zynqmp_ipi_reset;
-+    dc->realize = xlnx_zynqmp_ipi_realize;
-+    dc->vmsd = &vmstate_zynqmp_pmu_ipi;
++    dc->reset = xlnx_pmu_io_intc_reset;
++    dc->realize = xlnx_pmu_io_intc_realize;
++    dc->vmsd = &vmstate_xlnx_pmu_io_intc;
++    dc->props = xlnx_pmu_io_intc_properties;
 +}
 +
-+static const TypeInfo xlnx_zynqmp_ipi_info = {
-+    .name          = TYPE_XLNX_ZYNQMP_IPI,
++static const TypeInfo xlnx_pmu_io_intc_info = {
++    .name          = TYPE_XLNX_PMU_IO_INTC,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(XlnxZynqMPIPI),
-+    .class_init    = xlnx_zynqmp_ipi_class_init,
-+    .instance_init = xlnx_zynqmp_ipi_init,
++    .instance_size = sizeof(XlnxPMUIOIntc),
++    .class_init    = xlnx_pmu_io_intc_class_init,
++    .instance_init = xlnx_pmu_io_intc_init,
 +};
 +
-+static void xlnx_zynqmp_ipi_register_types(void)
++static void xlnx_pmu_io_intc_register_types(void)
 +{
-+    type_register_static(&xlnx_zynqmp_ipi_info);
++    type_register_static(&xlnx_pmu_io_intc_info);
 +}
 +
-+type_init(xlnx_zynqmp_ipi_register_types)
-diff --git a/include/hw/intc/xlnx-zynqmp-ipi.h b/include/hw/intc/xlnx-zynqmp-ipi.h
++type_init(xlnx_pmu_io_intc_register_types)
+diff --git a/include/hw/intc/xlnx-pmu-iomod-intc.h b/include/hw/intc/xlnx-pmu-iomod-intc.h
 new file mode 100644
-index 0000000000..4afa4ff313
+index 0000000000..3478d8cf6c
 --- /dev/null
-+++ b/include/hw/intc/xlnx-zynqmp-ipi.h
-@@ -0,0 +1,57 @@
++++ b/include/hw/intc/xlnx-pmu-iomod-intc.h
+@@ -0,0 +1,58 @@
 +/*
-+ * QEMU model of the IPI Inter Processor Interrupt block
++ * QEMU model of Xilinx I/O Module Interrupt Controller
 + *
 + * Copyright (c) 2014 Xilinx Inc.
 + *
@@ -462,38 +649,39 @@ index 0000000000..4afa4ff313
 + * THE SOFTWARE.
 + */
 +
-+#ifndef XLNX_ZYNQMP_IPI_H
-+#define XLNX_ZYNQMP_IPI_H
++#ifndef XLNX_PMU_IO_INTC_H
++#define XLNX_PMU_IO_INTC_H
 +
 +#include "qemu/osdep.h"
 +#include "hw/sysbus.h"
 +#include "hw/register.h"
 +
-+#define TYPE_XLNX_ZYNQMP_IPI "xlnx.zynqmp_ipi"
++#define TYPE_XLNX_PMU_IO_INTC "xlnx.pmu_io_intc"
 +
-+#define XLNX_ZYNQMP_IPI(obj) \
-+     OBJECT_CHECK(XlnxZynqMPIPI, (obj), TYPE_XLNX_ZYNQMP_IPI)
++#define XLNX_PMU_IO_INTC(obj) \
++     OBJECT_CHECK(XlnxPMUIOIntc, (obj), TYPE_XLNX_PMU_IO_INTC)
 +
-+/* This is R_IPI_IDR + 1 */
-+#define R_XLNX_ZYNQMP_IPI_MAX ((0x1c / 4) + 1)
++/* This is R_PIT3_CONTROL + 1 */
++#define XlnxPMUIOIntc_R_MAX (0x78 + 1)
 +
-+#define NUM_IPIS 11
-+
-+typedef struct XlnxZynqMPIPI {
-+    /* Private */
++typedef struct XlnxPMUIOIntc {
 +    SysBusDevice parent_obj;
-+
-+    /* Public */
 +    MemoryRegion iomem;
-+    qemu_irq irq;
 +
-+    qemu_irq irq_trig_out[NUM_IPIS];
-+    qemu_irq irq_obs_out[NUM_IPIS];
++    qemu_irq parent_irq;
 +
-+    uint32_t regs[R_XLNX_ZYNQMP_IPI_MAX];
-+    RegisterInfo regs_info[R_XLNX_ZYNQMP_IPI_MAX];
-+} XlnxZynqMPIPI;
++    struct {
++        uint32_t intr_size;
++        uint32_t level_edge;
++        uint32_t positive;
++    } cfg;
 +
-+#endif /* XLNX_ZYNQMP_IPI_H */
++    uint32_t irq_raw;
++
++    uint32_t regs[XlnxPMUIOIntc_R_MAX];
++    RegisterInfo regs_info[XlnxPMUIOIntc_R_MAX];
++} XlnxPMUIOIntc;
++
++#endif /* XLNX_PMU_IO_INTC_H */
 -- 
 2.11.0
