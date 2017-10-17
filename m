@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1e4PDd-0000P3-Og
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:35:30 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e4PRA-0002Yq-QU
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:49:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1e4PDZ-0000gs-3b
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:35:29 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:55523)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1e4PDY-0000fm-LF
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:35:24 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id 22so1120001wrb.12
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 03:35:23 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 17 Oct 2017 11:35:14 +0100
-Message-Id: <20171017103514.5859-1-alex.bennee@linaro.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e4PRA-0000Tx-1Z
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 06:49:28 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20171017001209.32276-1-f4bug@amsat.org>
+	<20171017001209.32276-31-f4bug@amsat.org>
+	<44b57d76-6d10-84c8-3a13-cdac7331c5d9@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <47c7b41d-23ff-3dd1-9c07-69bd5df08685@amsat.org>
+Date: Tue, 17 Oct 2017 07:49:16 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] linux-user/main: support dfilter
+In-Reply-To: <44b57d76-6d10-84c8-3a13-cdac7331c5d9@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 30/39] hw/display/vga: remove the old
+ i386/pc dependency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +30,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: riku.voipio@iki.fi
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Laurent Vivier <laurent@vivier.eu>
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-This adds the -dfilter support to linux-user. There is a minor
-checkpatch complaint about formatting which I've ignored for aesthetic
-reasons.
+Hi Thomas,
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>> diff --git a/hw/display/vga_int.h b/hw/display/vga_int.h
+>> index ad34a1f048..fe23b81442 100644
+>> --- a/hw/display/vga_int.h
+>> +++ b/hw/display/vga_int.h
+>> @@ -25,8 +25,9 @@
+>>  #ifndef HW_VGA_INT_H
+>>  #define HW_VGA_INT_H
+>>  
+>> -#include "hw/hw.h"
+>> +#include "exec/ioport.h"
+>>  #include "exec/memory.h"
+>> +#include "ui/console.h"
+> 
+> So vga_int.h now includes console.h (is it really necessary?) ...
 
----
-v2
-  - add r-b tags
-  - expand comment to mention checkpatch failure
----
- linux-user/main.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+The VGACommonState struct has a GraphicHwOps *hw_ops member.
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 829f974662..5072aa855b 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -3854,6 +3854,11 @@ static void handle_arg_log(const char *arg)
-     qemu_set_log(mask);
- }
- 
-+static void handle_arg_dfilter(const char *arg)
-+{
-+    qemu_set_dfilter_ranges(arg, NULL);
-+}
-+
- static void handle_arg_log_filename(const char *arg)
- {
-     qemu_set_log_filename(arg, &error_fatal);
-@@ -4054,6 +4059,8 @@ static const struct qemu_argument arg_table[] = {
-     {"d",          "QEMU_LOG",         true,  handle_arg_log,
-      "item[,...]", "enable logging of specified items "
-      "(use '-d help' for a list of items)"},
-+    {"dfilter",    "QEMU_DFILTER",     true,  handle_arg_dfilter,
-+     "range[,...]","filter logging based on address range"},
-     {"D",          "QEMU_LOG_FILENAME", true, handle_arg_log_filename,
-      "logfile",     "write logs to 'logfile' (default stderr)"},
-     {"p",          "QEMU_PAGESIZE",    true,  handle_arg_pagesize,
--- 
-2.14.1
+> 
+> [...]
+>>  static inline bool isa_ne2000_init(ISABus *bus, int base, int irq, NICInfo *nd)
+>>  {
+>> diff --git a/hw/display/vga-isa-mm.c b/hw/display/vga-isa-mm.c
+>> index 51ccbccc41..e887b45651 100644
+>> --- a/hw/display/vga-isa-mm.c
+>> +++ b/hw/display/vga-isa-mm.c
+>> @@ -23,11 +23,9 @@
+>>   */
+>>  #include "qemu/osdep.h"
+>>  #include "hw/hw.h"
+>> -#include "ui/console.h"
+> 
+> ... and here you also remove it from the .c file - OK ...
+> 
+>> -#include "hw/i386/pc.h"
+>> +#include "hw/display/vga.h"
+>>  #include "vga_int.h"
+>>  #include "ui/pixel_ops.h"
+>> -#include "qemu/timer.h"
+>>  
+>>  #define VGA_RAM_SIZE (8192 * 1024)
+>>  
+>> diff --git a/hw/display/vga-isa.c b/hw/display/vga-isa.c
+>> index 1af95562f2..9af43abee8 100644
+>> --- a/hw/display/vga-isa.c
+>> +++ b/hw/display/vga-isa.c
+>> @@ -26,7 +26,7 @@
+>>  #include "qemu/osdep.h"
+>>  #include "hw/hw.h"
+>>  #include "ui/console.h"
+> 
+> ... but here you keep it? I think you should either remove it here, too,
+
+I missed this one.
+
+> or not add the include in the header (which I'd prefer if the header
+> itself does not depend on console.h).
+
+Do you suggest me do declare GraphicHwOps opaque in "qemu/typedefs.h"?
+
+> 
+>> -#include "hw/i386/pc.h"
+>> +#include "hw/isa/isa.h"
+>>  #include "vga_int.h"
+>>  #include "ui/pixel_ops.h"
+>>  #include "qemu/timer.h"
+>> diff --git a/hw/display/vga.c b/hw/display/vga.c
+>> index ed24ef7076..0da4942a09 100644
+>> --- a/hw/display/vga.c
+>> +++ b/hw/display/vga.c
+>> @@ -24,9 +24,9 @@
+>>  #include "qemu/osdep.h"
+>>  #include "qapi/error.h"
+>>  #include "hw/hw.h"
+>> -#include "vga.h"
+>> +#include "hw/display/vga.h"
+>>  #include "ui/console.h"
+> 
+> Here's another one --^
+
+Oh this one too.
