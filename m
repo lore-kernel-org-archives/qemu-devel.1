@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46727)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4V06-0001fC-Lx
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:45:55 -0400
+	id 1e4V0C-0001m8-Jd
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:46:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4V02-0003EE-QK
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:45:54 -0400
+	id 1e4V0B-0003JA-Rg
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 12:46:00 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 17 Oct 2017 13:43:56 -0300
-Message-Id: <20171017164426.25277-13-f4bug@amsat.org>
+Date: Tue, 17 Oct 2017 13:43:59 -0300
+Message-Id: <20171017164426.25277-16-f4bug@amsat.org>
 In-Reply-To: <20171017164426.25277-1-f4bug@amsat.org>
 References: <20171017164426.25277-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 12/42] misc: remove headers implicitly
- included
+Subject: [Qemu-devel] [PATCH v3 15/42] i386/hax: remove duplicated includes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,138 +26,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>
+To: Michael Tokarev <mjt@tls.msk.ru>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Yu Ning <yu.ning@linux.intel.com>, Vincent Palatin <vpalatin@chromium.org>, Corey Minyard <cminyard@mvista.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
 applied using ./scripts/clean-includes
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/audio/fmopl.h             | 1 -
- bsd-user/main.c              | 1 -
- chardev/wctablet.c           | 4 ----
- hw/scsi/vhost-user-scsi.c    | 1 -
- linux-user/main.c            | 1 -
- net/colo-compare.c           | 1 -
- tests/test-aio-multithread.c | 1 -
- tests/test-clone-visitor.c   | 1 -
- tests/vmgenid-test.c         | 3 ---
- 9 files changed, 14 deletions(-)
+ include/sysemu/hax.h      | 1 -
+ target/i386/hax-darwin.h  | 3 ---
+ target/i386/hax-windows.h | 2 --
+ target/i386/hax-darwin.c  | 6 +-----
+ 4 files changed, 1 insertion(+), 11 deletions(-)
 
-diff --git a/hw/audio/fmopl.h b/hw/audio/fmopl.h
-index f4065f425c..e7e578a48e 100644
---- a/hw/audio/fmopl.h
-+++ b/hw/audio/fmopl.h
-@@ -1,7 +1,6 @@
- #ifndef FMOPL_H
- #define FMOPL_H
+diff --git a/include/sysemu/hax.h b/include/sysemu/hax.h
+index 232a68ab1b..f252399623 100644
+--- a/include/sysemu/hax.h
++++ b/include/sysemu/hax.h
+@@ -22,7 +22,6 @@
+ #ifndef QEMU_HAX_H
+ #define QEMU_HAX_H
  
--#include <stdint.h>
- 
- typedef void (*OPL_TIMERHANDLER)(void *param, int channel, double interval_Sec);
- 
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index 836daac15c..bf27a5b44f 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -32,7 +32,6 @@
- #include "qemu/envlist.h"
- #include "exec/log.h"
- #include "trace/control.h"
--#include "glib-compat.h"
- 
- int singlestep;
- unsigned long mmap_min_addr;
-diff --git a/chardev/wctablet.c b/chardev/wctablet.c
-index 6c13c2c58a..969d014574 100644
---- a/chardev/wctablet.c
-+++ b/chardev/wctablet.c
-@@ -25,10 +25,6 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-  * THE SOFTWARE.
-  */
--#include <stdlib.h>
--#include <string.h>
--#include <sys/time.h>
--#include <time.h>
- 
- #include "qemu/osdep.h"
+-#include "config-host.h"
  #include "qemu-common.h"
-diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-index 500fa6a067..9efa26da7d 100644
---- a/hw/scsi/vhost-user-scsi.c
-+++ b/hw/scsi/vhost-user-scsi.c
-@@ -18,7 +18,6 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
--#include "qemu/typedefs.h"
- #include "qom/object.h"
- #include "hw/fw-path-provider.h"
- #include "hw/qdev-core.h"
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 829f974662..85d7f6d3f7 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -35,7 +35,6 @@
- #include "elf.h"
- #include "exec/log.h"
- #include "trace/control.h"
--#include "glib-compat.h"
  
- char *exec_path;
+ int hax_sync_vcpus(void);
+diff --git a/target/i386/hax-darwin.h b/target/i386/hax-darwin.h
+index 0c0968b77d..fb8e25a096 100644
+--- a/target/i386/hax-darwin.h
++++ b/target/i386/hax-darwin.h
+@@ -15,10 +15,7 @@
+ #ifndef TARGET_I386_HAX_DARWIN_H
+ #define TARGET_I386_HAX_DARWIN_H
  
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index b3f35d729a..27ea7d4de9 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -23,7 +23,6 @@
- #include "qom/object_interfaces.h"
- #include "qemu/iov.h"
- #include "qom/object.h"
--#include "qemu/typedefs.h"
- #include "net/queue.h"
- #include "chardev/char-fe.h"
- #include "qemu/sockets.h"
-diff --git a/tests/test-aio-multithread.c b/tests/test-aio-multithread.c
-index 549d784915..ad78c6b28b 100644
---- a/tests/test-aio-multithread.c
-+++ b/tests/test-aio-multithread.c
-@@ -11,7 +11,6 @@
-  */
+-#include <sys/types.h>
+ #include <sys/ioctl.h>
+-#include <sys/mman.h>
+-#include <stdarg.h>
  
- #include "qemu/osdep.h"
--#include <glib.h>
- #include "block/aio.h"
- #include "qapi/error.h"
- #include "qemu/coroutine.h"
-diff --git a/tests/test-clone-visitor.c b/tests/test-clone-visitor.c
-index 96982163e4..ac6afc562e 100644
---- a/tests/test-clone-visitor.c
-+++ b/tests/test-clone-visitor.c
-@@ -8,7 +8,6 @@
-  */
- 
- #include "qemu/osdep.h"
--#include <glib.h>
- 
- #include "qemu-common.h"
- #include "qapi/clone-visitor.h"
-diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-index 918c82c82a..2f96ad453e 100644
---- a/tests/vmgenid-test.c
-+++ b/tests/vmgenid-test.c
-@@ -8,9 +8,6 @@
-  * See the COPYING file in the top-level directory.
-  */
- 
--#include <glib.h>
+ #define HAX_INVALID_FD  (-1)
+ static inline int hax_invalid_fd(hax_fd fd)
+diff --git a/target/i386/hax-windows.h b/target/i386/hax-windows.h
+index 1d8f68de91..f7c3e99246 100644
+--- a/target/i386/hax-windows.h
++++ b/target/i386/hax-windows.h
+@@ -24,8 +24,6 @@
+ #include <memory.h>
+ #include <malloc.h>
+ #include <winioctl.h>
 -#include <string.h>
--#include <unistd.h>
- #include "qemu/osdep.h"
- #include "qemu/bitmap.h"
- #include "qemu/uuid.h"
+-#include <stdio.h>
+ #include <windef.h>
+ 
+ #define HAX_INVALID_FD INVALID_HANDLE_VALUE
+diff --git a/target/i386/hax-darwin.c b/target/i386/hax-darwin.c
+index 1c5bbd0a2d..ee9417454c 100644
+--- a/target/i386/hax-darwin.c
++++ b/target/i386/hax-darwin.c
+@@ -11,13 +11,9 @@
+  */
+ 
+ /* HAX module interface - darwin version */
+-#include <sys/types.h>
+-#include <sys/stat.h>
+-#include <fcntl.h>
+-#include <errno.h>
++#include "qemu/osdep.h"
+ #include <sys/ioctl.h>
+ 
+-#include "qemu/osdep.h"
+ #include "target/i386/hax-i386.h"
+ 
+ hax_fd hax_mod_open(void)
 -- 
 2.15.0.rc0
