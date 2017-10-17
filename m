@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <carenas@gmail.com>) id 1e4SxY-0007nN-14
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:35:09 -0400
+	(envelope-from <berrange@redhat.com>) id 1e4SzY-0008Sh-UB
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:37:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <carenas@gmail.com>) id 1e4SxW-0003Sf-Nz
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:35:08 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:45600)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <carenas@gmail.com>) id 1e4SxW-0003SE-Ib
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:35:06 -0400
-Received: by mail-wm0-x243.google.com with SMTP id q124so4338775wmb.0
-	for <qemu-devel@nongnu.org>; Tue, 17 Oct 2017 07:35:05 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20171016123250.GB1918@kos.to>
-References: <20170925231924.31303-1-carenas@gmail.com>
-	<CAPUEspg5AO_XzLa1n3cCTrz+22WYk5BZrE28ufDjPP7Y3KN2+Q@mail.gmail.com>
-	<20171016123250.GB1918@kos.to>
-From: Carlo Arenas <carenas@gmail.com>
-Date: Tue, 17 Oct 2017 07:35:03 -0700
-Message-ID: <CAPUEspi530ypdV0ZrKJ5b8ZbZEm-LJCwvbFAUMOmcn_FFcRHSQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] linux-user: refactor socket.h into architecture
- specific sockbits
+	(envelope-from <berrange@redhat.com>) id 1e4SzQ-0004Oo-It
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 10:37:08 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Tue, 17 Oct 2017 15:36:55 +0100
+Message-Id: <20171017143655.31277-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH for 2.10] io: monitor encoutput buffer size
+ from websocket GSource
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +18,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Riku Voipio <riku.voipio@iki.fi>
-Cc: qemu-devel@nongnu.org, laurent@vivier.eu
+To: qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Mon, Oct 16, 2017 at 5:32 AM, Riku Voipio <riku.voipio@iki.fi> wrote:
-> On Wed, Oct 11, 2017 at 12:10:04AM -0700, Carlo Arenas wrote:
->> some of the patches already have a Reviewed-by as shown by :
->>
->>   http://patchwork.ozlabs.org/patch/818378/
->
-> Can you send the series without the whitespace-only changes?
+The websocket GSource is monitoring the size of the rawoutput
+buffer to determine if the channel can accepts more writes.
+The rawoutput buffer, however, is merely a temporary staging
+buffer before data is copied into the encoutput buffer. Thus
+its size will always be zero when the GSource runs.
 
-sure, but how would you suggest then to do the other changes which are
-the overall objective for this?
+This flaw causes the encoutput buffer to grow without bound
+if the other end of the underlying data channel doesn't
+read data being sent. This can be seen with VNC if a client
+is on a slow WAN link and the guest OS is sending many screen
+updates. A malicious VNC client can act like it is on a slow
+link by playing a video in the guest and then reading data
+very slowly, causing QEMU host memory to expand arbitrarily.
 
-* fix any incorrect values (mostly sparc, but there are also in all
-other archs incorrect names)
-* make sure that the arch specific file mirrors as much as possible
-linux headers, so it will be straightforward to update them (even
-possible through a script)
-* update the arch specific files with latest bits from 4.14
+This issue is assigned CVE-2017-15268, publically reported in
 
-should I send those as independent series?, or just as additional
-patches in the series, so it is obvious what the dependency is.
+  https://bugs.launchpad.net/qemu/+bug/1718964
 
-there is also the problem with the enum and related defines which was
-custom made and probably copy & pasted around
+(cherry picked from commit a7b20a8efa28e5f22c26c06cd06c2f12bc863493)
 
-Carlo
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+[Dan: Added extra checks to deal with code refactored in master but
+ not stable 2.10]
+
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ io/channel-websock.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/io/channel-websock.c b/io/channel-websock.c
+index 5a3badbec2..19116dc148 100644
+--- a/io/channel-websock.c
++++ b/io/channel-websock.c
+@@ -26,7 +26,7 @@
+ #include "trace.h"
+ 
+ 
+-/* Max amount to allow in rawinput/rawoutput buffers */
++/* Max amount to allow in rawinput/encoutput buffers */
+ #define QIO_CHANNEL_WEBSOCK_MAX_BUFFER 8192
+ 
+ #define QIO_CHANNEL_WEBSOCK_CLIENT_KEY_LEN 24
+@@ -1006,7 +1006,7 @@ qio_channel_websock_source_prepare(GSource *source,
+     if (wsource->wioc->rawinput.offset) {
+         cond |= G_IO_IN;
+     }
+-    if (wsource->wioc->rawoutput.offset < QIO_CHANNEL_WEBSOCK_MAX_BUFFER) {
++    if (wsource->wioc->encoutput.offset < QIO_CHANNEL_WEBSOCK_MAX_BUFFER) {
+         cond |= G_IO_OUT;
+     }
+ 
+@@ -1022,7 +1022,7 @@ qio_channel_websock_source_check(GSource *source)
+     if (wsource->wioc->rawinput.offset) {
+         cond |= G_IO_IN;
+     }
+-    if (wsource->wioc->rawoutput.offset < QIO_CHANNEL_WEBSOCK_MAX_BUFFER) {
++    if (wsource->wioc->encoutput.offset < QIO_CHANNEL_WEBSOCK_MAX_BUFFER) {
+         cond |= G_IO_OUT;
+     }
+ 
+@@ -1041,7 +1041,7 @@ qio_channel_websock_source_dispatch(GSource *source,
+     if (wsource->wioc->rawinput.offset) {
+         cond |= G_IO_IN;
+     }
+-    if (wsource->wioc->rawoutput.offset < QIO_CHANNEL_WEBSOCK_MAX_BUFFER) {
++    if (wsource->wioc->encoutput.offset < QIO_CHANNEL_WEBSOCK_MAX_BUFFER) {
+         cond |= G_IO_OUT;
+     }
+ 
+-- 
+2.13.6
