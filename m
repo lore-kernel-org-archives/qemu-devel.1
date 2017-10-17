@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33727)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4FVk-0006WY-QZ
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:13:36 -0400
+	id 1e4FVo-0006Zq-04
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:13:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1e4FVj-0004U7-P8
-	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:13:32 -0400
+	id 1e4FVm-0004VC-3t
+	for qemu-devel@nongnu.org; Mon, 16 Oct 2017 20:13:35 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 16 Oct 2017 21:11:51 -0300
-Message-Id: <20171017001209.32276-22-f4bug@amsat.org>
+Date: Mon, 16 Oct 2017 21:11:52 -0300
+Message-Id: <20171017001209.32276-23-f4bug@amsat.org>
 In-Reply-To: <20171017001209.32276-1-f4bug@amsat.org>
 References: <20171017001209.32276-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 21/39] misc: remove old i386 dependency
+Subject: [Qemu-devel] [PATCH v2 22/39] hw/ide: remove old i386 dependency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,128 +29,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Michael Tokarev <mjt@tls.msk.ru>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
----
- hw/audio/pcspk.c                    | 1 -
- hw/i386/kvm/pci-assign.c            | 1 -
- hw/i386/pci-assign-load-rom.c       | 1 -
- hw/i386/xen/xen_platform.c          | 1 -
- hw/isa/vt82c686.c                   | 1 -
- hw/misc/ivshmem.c                   | 1 -
- hw/misc/sga.c                       | 1 -
- hw/pci-bridge/pci_expander_bridge.c | 1 -
- monitor.c                           | 1 -
- 9 files changed, 9 deletions(-)
+and remove a duplicated include
 
-diff --git a/hw/audio/pcspk.c b/hw/audio/pcspk.c
-index 0206f7399b..908696d483 100644
---- a/hw/audio/pcspk.c
-+++ b/hw/audio/pcspk.c
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Acked-by: John Snow <jsnow@redhat.com>
+---
+ hw/ide/ahci.c       | 1 -
+ hw/ide/cmd646.c     | 1 -
+ hw/ide/core.c       | 3 +--
+ hw/ide/ich.c        | 1 -
+ hw/ide/isa.c        | 1 -
+ hw/ide/microdrive.c | 1 -
+ hw/ide/pci.c        | 1 -
+ hw/ide/piix.c       | 2 +-
+ hw/ide/via.c        | 1 -
+ 9 files changed, 2 insertions(+), 10 deletions(-)
+
+diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+index 32d1296a64..2634f8db3d 100644
+--- a/hw/ide/ahci.c
++++ b/hw/ide/ahci.c
 @@ -24,7 +24,6 @@
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+ #include "hw/pci/msi.h"
+-#include "hw/i386/pc.h"
+ #include "hw/pci/pci.h"
  
+ #include "qemu/error-report.h"
+diff --git a/hw/ide/cmd646.c b/hw/ide/cmd646.c
+index 86b2a8f504..65aff518ec 100644
+--- a/hw/ide/cmd646.c
++++ b/hw/ide/cmd646.c
+@@ -24,7 +24,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+-#include "hw/i386/pc.h"
+ #include "hw/pci/pci.h"
+ #include "hw/isa/isa.h"
+ #include "sysemu/block-backend.h"
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index 5f1cd3b91f..ceb1e32a32 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -24,17 +24,16 @@
+  */
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+-#include "hw/i386/pc.h"
+ #include "hw/pci/pci.h"
+ #include "hw/isa/isa.h"
+ #include "qemu/error-report.h"
+ #include "qemu/timer.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/blockdev.h"
+ #include "sysemu/dma.h"
+ #include "hw/block/block.h"
+ #include "sysemu/block-backend.h"
+ #include "qemu/cutils.h"
+-#include "qemu/error-report.h"
+ 
+ #include "hw/ide/internal.h"
+ #include "trace.h"
+diff --git a/hw/ide/ich.c b/hw/ide/ich.c
+index 8dd0ced6b3..c01b24ecbe 100644
+--- a/hw/ide/ich.c
++++ b/hw/ide/ich.c
+@@ -63,7 +63,6 @@
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+ #include "hw/pci/msi.h"
+-#include "hw/i386/pc.h"
+ #include "hw/pci/pci.h"
+ #include "hw/isa/isa.h"
+ #include "sysemu/block-backend.h"
+diff --git a/hw/ide/isa.c b/hw/ide/isa.c
+index 40213d662c..9fb24fc92b 100644
+--- a/hw/ide/isa.c
++++ b/hw/ide/isa.c
+@@ -24,7 +24,6 @@
+  */
  #include "qemu/osdep.h"
  #include "hw/hw.h"
 -#include "hw/i386/pc.h"
  #include "hw/isa/isa.h"
- #include "hw/audio/soundhw.h"
- #include "audio/audio.h"
-diff --git a/hw/i386/kvm/pci-assign.c b/hw/i386/kvm/pci-assign.c
-index d8559d8342..da954d504c 100644
---- a/hw/i386/kvm/pci-assign.c
-+++ b/hw/i386/kvm/pci-assign.c
-@@ -25,7 +25,6 @@
- #include <linux/kvm.h>
- #include "qapi/error.h"
- #include "hw/hw.h"
--#include "hw/i386/pc.h"
- #include "qemu/error-report.h"
- #include "ui/console.h"
- #include "hw/loader.h"
-diff --git a/hw/i386/pci-assign-load-rom.c b/hw/i386/pci-assign-load-rom.c
-index 43429b66be..2c3a60392e 100644
---- a/hw/i386/pci-assign-load-rom.c
-+++ b/hw/i386/pci-assign-load-rom.c
-@@ -4,7 +4,6 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "hw/hw.h"
--#include "hw/i386/pc.h"
- #include "qemu/error-report.h"
- #include "ui/console.h"
- #include "hw/loader.h"
-diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
-index 056b87de0b..fc8623c90b 100644
---- a/hw/i386/xen/xen_platform.c
-+++ b/hw/i386/xen/xen_platform.c
-@@ -26,7 +26,6 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "hw/hw.h"
--#include "hw/i386/pc.h"
- #include "hw/ide.h"
- #include "hw/pci/pci.h"
- #include "hw/irq.h"
-diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
-index c129985e2a..4084b32be9 100644
---- a/hw/isa/vt82c686.c
-+++ b/hw/isa/vt82c686.c
-@@ -12,7 +12,6 @@
- 
- #include "qemu/osdep.h"
- #include "hw/hw.h"
--#include "hw/i386/pc.h"
- #include "hw/isa/vt82c686.h"
- #include "hw/i2c/i2c.h"
- #include "hw/i2c/smbus.h"
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index a5a46827fe..4919011f38 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -20,7 +20,6 @@
- #include "qapi/error.h"
- #include "qemu/cutils.h"
- #include "hw/hw.h"
--#include "hw/i386/pc.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/msi.h"
- #include "hw/pci/msix.h"
-diff --git a/hw/misc/sga.c b/hw/misc/sga.c
-index 03b006d6f0..97fd63f176 100644
---- a/hw/misc/sga.c
-+++ b/hw/misc/sga.c
-@@ -26,7 +26,6 @@
+ #include "sysemu/block-backend.h"
+ #include "sysemu/dma.h"
+diff --git a/hw/ide/microdrive.c b/hw/ide/microdrive.c
+index 17917c0b30..fde4d4645e 100644
+--- a/hw/ide/microdrive.c
++++ b/hw/ide/microdrive.c
+@@ -24,7 +24,6 @@
   */
  #include "qemu/osdep.h"
- #include "hw/pci/pci.h"
--#include "hw/i386/pc.h"
- #include "hw/loader.h"
- #include "sysemu/sysemu.h"
- 
-diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expander_bridge.c
-index 8c8ac737ad..9e799dc10f 100644
---- a/hw/pci-bridge/pci_expander_bridge.c
-+++ b/hw/pci-bridge/pci_expander_bridge.c
-@@ -16,7 +16,6 @@
- #include "hw/pci/pci_bus.h"
- #include "hw/pci/pci_host.h"
- #include "hw/pci/pci_bridge.h"
--#include "hw/i386/pc.h"
- #include "qemu/range.h"
- #include "qemu/error-report.h"
- #include "sysemu/numa.h"
-diff --git a/monitor.c b/monitor.c
-index fe0d1bdbb4..54737d20e7 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -28,7 +28,6 @@
  #include "hw/hw.h"
- #include "monitor/qdev.h"
- #include "hw/usb.h"
+-#include "hw/i386/pc.h"
+ #include "hw/pcmcia.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/dma.h"
+diff --git a/hw/ide/pci.c b/hw/ide/pci.c
+index 25f1d36f3a..1ab0a892d0 100644
+--- a/hw/ide/pci.c
++++ b/hw/ide/pci.c
+@@ -24,7 +24,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
 -#include "hw/i386/pc.h"
  #include "hw/pci/pci.h"
- #include "sysemu/watchdog.h"
- #include "hw/loader.h"
+ #include "hw/isa/isa.h"
+ #include "sysemu/block-backend.h"
+diff --git a/hw/ide/piix.c b/hw/ide/piix.c
+index dfb21f65fa..a3afe1fd29 100644
+--- a/hw/ide/piix.c
++++ b/hw/ide/piix.c
+@@ -25,11 +25,11 @@
+ 
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+-#include "hw/i386/pc.h"
+ #include "hw/pci/pci.h"
+ #include "hw/isa/isa.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/blockdev.h"
+ #include "sysemu/dma.h"
+ 
+ #include "hw/ide/pci.h"
+diff --git a/hw/ide/via.c b/hw/ide/via.c
+index 35c3059325..117ac4d95e 100644
+--- a/hw/ide/via.c
++++ b/hw/ide/via.c
+@@ -25,7 +25,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+-#include "hw/i386/pc.h"
+ #include "hw/pci/pci.h"
+ #include "hw/isa/isa.h"
+ #include "sysemu/block-backend.h"
 -- 
 2.15.0.rc0
