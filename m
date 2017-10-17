@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35196)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e4M3o-00063h-M4
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 03:13:09 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43607)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
+	<BATV+60eda6e2277543397899+5168+infradead.org+hch@bombadil.srs.infradead.org>)
+	id 1e4M80-0007qC-Vq
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 03:17:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1e4M3l-0001g5-Gl
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 03:13:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45754)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1e4M3l-0001fd-B9
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 03:13:05 -0400
-From: Peter Xu <peterx@redhat.com>
-Date: Tue, 17 Oct 2017 15:12:46 +0800
-Message-Id: <20171017071247.32355-1-peterx@redhat.com>
+	(envelope-from
+	<BATV+60eda6e2277543397899+5168+infradead.org+hch@bombadil.srs.infradead.org>)
+	id 1e4M7Y-0006Mz-3J
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 03:17:28 -0400
+Received: from bombadil.infradead.org ([65.50.211.133]:60541)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from
+	<BATV+60eda6e2277543397899+5168+infradead.org+hch@bombadil.srs.infradead.org>)
+	id 1e4M7X-0005vt-Pj
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 03:16:59 -0400
+Date: Tue, 17 Oct 2017 00:16:33 -0700
+From: Christoph Hellwig <hch@infradead.org>
+Message-ID: <20171017071633.GA9207@infradead.org>
+References: <20171012155027.3277-1-pagupta@redhat.com>
+	<20171012155027.3277-3-pagupta@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] docker: cleanup temp directory after test
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171012155027.3277-3-pagupta@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 2/2] KVM: add virtio-pmem driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,35 +32,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peterx@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, linux-mm@kvack.org, jack@suse.cz, stefanha@redhat.com, dan.j.williams@intel.com, riel@redhat.com, haozhong.zhang@intel.com, nilal@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, ross.zwisler@intel.com, david@redhat.com, xiaoguangrong.eric@gmail.com
 
-There are temp directories named "docker-src.*" after doing docker
-tests.  I don't see much point in keeping that (it only contains the
-qemu.tar which is exactly current tree, and the copied "run" file).
-Let's remove it after test finished.
+I think this driver is at entirely the wrong level.
 
-CC: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>
-CC: Fam Zheng <famz@redhat.com>
-CC: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- tests/docker/Makefile.include | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.includ=
-e
-index 6f9ea196a7..c8fbd37127 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -151,6 +151,8 @@ docker-run: docker-qemu-src
- 			$(IMAGE) 					\
- 			/var/tmp/qemu/run 				\
- 			$(TEST), "  RUN $(TEST) in ${IMAGE}")
-+	$(call quiet-command, rm -r $(DOCKER_SRC_COPY), \
-+		"  CLEANUP $(DOCKER_SRC_COPY)")
-=20
- # Run targets:
- #
---=20
-2.13.5
+If you want to expose pmem to a guest with flushing assist do it
+as pmem, and not a block driver.
