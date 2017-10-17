@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e4L1T-000719-Uv
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 02:06:40 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1e4LAt-0000G5-9a
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 02:16:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1e4L1Q-0007q8-Pm
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 02:06:39 -0400
-References: <20171017001209.32276-1-f4bug@amsat.org>
-	<20171017001209.32276-31-f4bug@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <44b57d76-6d10-84c8-3a13-cdac7331c5d9@redhat.com>
-Date: Tue, 17 Oct 2017 08:06:22 +0200
+	(envelope-from <dgibson@ozlabs.org>) id 1e4LAs-0004Ti-7Q
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 02:16:23 -0400
+Date: Tue, 17 Oct 2017 17:16:09 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20171017061609.GL2776@umbus.fritz.box>
+References: <150789430473.4410.10317971414202753256.stgit@bahia.lan>
+	<20171014093337.GG28032@umbus.fritz.box>
+	<20171016102638.6977381f@nial.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171017001209.32276-31-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 30/39] hw/display/vga: remove the old
- i386/pc dependency
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="2+jOUFLb7N+7fooZ"
+Content-Disposition: inline
+In-Reply-To: <20171016102638.6977381f@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] spapr_cpu_core: instantiate CPUs separately
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,98 +25,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On 17.10.2017 02:12, Philippe Mathieu-Daud=C3=A9 wrote:
-> move public API to "hw/display/vga.h" and private registers
-> to "hw/display/vga_int_regs.h"
+
+--2+jOUFLb7N+7fooZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Oct 16, 2017 at 10:26:38AM +0200, Igor Mammedov wrote:
+> On Sat, 14 Oct 2017 20:33:37 +1100
+> David Gibson <david@gibson.dropbear.id.au> wrote:
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/display/vga_int.h                 |  3 ++-
->  hw/display/{vga.h =3D> vga_int_regs.h} |  0
->  include/hw/display/vga.h             | 25 +++++++++++++++++++++++++
->  include/hw/i386/pc.h                 | 12 ------------
->  hw/display/vga-isa-mm.c              |  4 +---
->  hw/display/vga-isa.c                 |  2 +-
->  hw/display/vga.c                     |  4 ++--
->  hw/mips/mips_jazz.c                  |  1 +
->  vl.c                                 |  2 +-
->  MAINTAINERS                          |  1 +
->  10 files changed, 34 insertions(+), 20 deletions(-)
->  rename hw/display/{vga.h =3D> vga_int_regs.h} (100%)
->  create mode 100644 include/hw/display/vga.h
+> > On Fri, Oct 13, 2017 at 01:31:44PM +0200, Greg Kurz wrote:
+> > > The current code assumes that only the CPU core object holds a
+> > > reference on each individual CPU object, and happily frees their
+> > > allocated memory when the core is unrealized. This is dangerous
+> > > as some other code can legitimely keep a pointer to a CPU if it
+> > > calls object_ref(), but it would end up with a dangling pointer.
+> > >=20
+> > > Let's allocate all CPUs with object_new() and let QOM frees them
+> > > when their reference count reaches zero. This greatly simplify the
+> > > code as we don't have to fiddle with the instance size anymore.
+> > >=20
+> > > Signed-off-by: Greg Kurz <groug@kaod.org> =20
+> >=20
+> > So, I'm pretty sure my first drafts of the core stuff did things this
+> > waym and it got nacked, for QOM lifetime reasons that I never really
+> > understood.
+> From what I remember, Andreas would like to see composite CPU object
+> allocated in one go and then its children initialized with object_initial=
+ize()
+> so that no more allocation were needed.
+
+Ah, ok.
+
+> That potentially would benefit hotplug, since we could gracefully
+> fail object creation early if there is not enough memory.
+
+Yeah, it sounds nice, but I don't see how we can do it.  In order to
+do that the core object has to have enough space for all the threads,
+which means we need both the size of each thread object and the number
+of them.  The size we have (and will be easier to handle after Igor's
+cleanups).  The number, we don't.
+
+> But the way it's implemented currently doesn't really match that initial
+> goal as array for threads is dynamically allocated later
+> and then we need to dance around it with pointer arithmetic.
 >=20
-> diff --git a/hw/display/vga_int.h b/hw/display/vga_int.h
-> index ad34a1f048..fe23b81442 100644
-> --- a/hw/display/vga_int.h
-> +++ b/hw/display/vga_int.h
-> @@ -25,8 +25,9 @@
->  #ifndef HW_VGA_INT_H
->  #define HW_VGA_INT_H
-> =20
-> -#include "hw/hw.h"
-> +#include "exec/ioport.h"
->  #include "exec/memory.h"
-> +#include "ui/console.h"
+> BTW: almost any allocation failure in qemu currently
+> is fatal so whether we fail on array alloc or on individual
+> object_new() won't make any difference.
+>=20
+> I'd rather see this clean up merged as it simplifies code
+> in these case.
 
-So vga_int.h now includes console.h (is it really necessary?) ...
+Ok, works for me.
 
-[...]
->  static inline bool isa_ne2000_init(ISABus *bus, int base, int irq, NIC=
-Info *nd)
->  {
-> diff --git a/hw/display/vga-isa-mm.c b/hw/display/vga-isa-mm.c
-> index 51ccbccc41..e887b45651 100644
-> --- a/hw/display/vga-isa-mm.c
-> +++ b/hw/display/vga-isa-mm.c
-> @@ -23,11 +23,9 @@
->   */
->  #include "qemu/osdep.h"
->  #include "hw/hw.h"
-> -#include "ui/console.h"
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-... and here you also remove it from the .c file - OK ...
+--2+jOUFLb7N+7fooZ
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> -#include "hw/i386/pc.h"
-> +#include "hw/display/vga.h"
->  #include "vga_int.h"
->  #include "ui/pixel_ops.h"
-> -#include "qemu/timer.h"
-> =20
->  #define VGA_RAM_SIZE (8192 * 1024)
-> =20
-> diff --git a/hw/display/vga-isa.c b/hw/display/vga-isa.c
-> index 1af95562f2..9af43abee8 100644
-> --- a/hw/display/vga-isa.c
-> +++ b/hw/display/vga-isa.c
-> @@ -26,7 +26,7 @@
->  #include "qemu/osdep.h"
->  #include "hw/hw.h"
->  #include "ui/console.h"
+-----BEGIN PGP SIGNATURE-----
 
-... but here you keep it? I think you should either remove it here, too,
-or not add the include in the header (which I'd prefer if the header
-itself does not depend on console.h).
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnloCYACgkQbDjKyiDZ
+s5LkdhAAsS8aUQ3dB2keTO/B8mj1DmIahiJuuaLfLw4vPKRhTXHI2XiMOIGwI67V
+4H2tbwT8LpnhYo2R1yYscbDP8jGC0DwAekuKnjnyYPsS5lXRYoXjb3LZkPjgODUr
+hPtoMAU83sbhLTfKiMsm/NhkqYyN44YBPli0aLMXbrNXiANTdpq/ySkxKnX0hovw
+WXF6zQXoCWBT4V+fWdMtJCGCliu3CyVbC/+Ayx/JoabxGenYGb4x15Cdw0Kh4sqm
+Dy0udW4Zu4n0TKsgT93QvWQ3varisnb4GbQhWHkg54O8l/eVbl09JL9vBGPBP/0I
+wvoxejvcsuuJK7yY9/0PGh1kX2vtJArwDYTY0VtMGbea8ttAoRuAur0nqoQU5ux0
+6utTs1ql/aLoQ/nOe8vDNx764ez06Xyr+rbT74rN8N5m3PUIRlvzaubUMeTgsWmg
+ZgS45h/eNGrn0XMnXN190xu7OCfmQ1dXjq2T+R6OZDjJvR+lnbzWgQucaLuJunSV
+hW8nubcohP01/gF0bnItVsd4ksrLbQbE1e4rgGrMDcl2QCaOflb8Kdm1CLsCM5P2
+w4LCGmXGRZ/cwWEJk3F8Gt8celMrhYYD9UMkzetZ7VSsqm8nkd9p8F9hLR7iiVG6
+UoBz5ecKEPBN5v0QLFMomWZVFIBpQwAaNS7Xl6KV64wKeHL3JU8=
+=cCC3
+-----END PGP SIGNATURE-----
 
-> -#include "hw/i386/pc.h"
-> +#include "hw/isa/isa.h"
->  #include "vga_int.h"
->  #include "ui/pixel_ops.h"
->  #include "qemu/timer.h"
-> diff --git a/hw/display/vga.c b/hw/display/vga.c
-> index ed24ef7076..0da4942a09 100644
-> --- a/hw/display/vga.c
-> +++ b/hw/display/vga.c
-> @@ -24,9 +24,9 @@
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
->  #include "hw/hw.h"
-> -#include "vga.h"
-> +#include "hw/display/vga.h"
->  #include "ui/console.h"
-
-Here's another one --^
-
- Thomas
+--2+jOUFLb7N+7fooZ--
