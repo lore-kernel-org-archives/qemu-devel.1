@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1e4bfu-000594-RA
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 19:53:31 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e4bnr-0007er-R0
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 20:01:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1e4bfr-00085w-Nf
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 19:53:30 -0400
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:36901)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1e4bfr-00085N-HF
-	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 19:53:27 -0400
-Date: Tue, 17 Oct 2017 19:53:25 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20171017235325.GA18359@flamenco>
-References: <20171016172609.23422-1-richard.henderson@linaro.org>
-	<20171016172609.23422-21-richard.henderson@linaro.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1e4bnm-0005zk-Vh
+	for qemu-devel@nongnu.org; Tue, 17 Oct 2017 20:01:43 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Tue, 17 Oct 2017 21:00:53 -0300
+Message-Id: <20171018000053.27348-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20171016172609.23422-21-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v6 20/50] qom: Introduce
- CPUClass.tcg_initialize
+Subject: [Qemu-devel] [PATCH v2] hw/alpha/typhoon: simplify using the
+ "unimplemented" sysbus device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +25,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>
+To: Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On Mon, Oct 16, 2017 at 10:25:39 -0700, Richard Henderson wrote:
-> Move target cpu tcg initialization to common code,
-> called from cpu_exec_realizefn.
-> 
-> Cc: Andreas F‰rber <afaerber@suse.de>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Philippe Mathieu-Daud√© <f4bug@amsat.org>
+---
+v2: add spaces for checkpatch...
 
-Much cleaner!
+ERROR: spaces required around that '*' (ctx:VxV)
+#82: FILE: hw/alpha/typhoon.c:880:
++    create_unimplemented_device("pci0-io", 0x801fc000000ULL, 32*MB);
+                                                                ^
+total: 1 errors, 0 warnings, 57 lines checked
 
-Reviewed-by: Emilio G. Cota <cota@braap.org>
+ hw/alpha/alpha_sys.h |  1 -
+ hw/alpha/pci.c       | 26 --------------------------
+ hw/alpha/typhoon.c   |  6 ++----
+ 3 files changed, 2 insertions(+), 31 deletions(-)
 
-		E.
+diff --git a/hw/alpha/alpha_sys.h b/hw/alpha/alpha_sys.h
+index b6d8369ed7..9e67f78c60 100644
+--- a/hw/alpha/alpha_sys.h
++++ b/hw/alpha/alpha_sys.h
+@@ -15,7 +15,6 @@ PCIBus *typhoon_init(ram_addr_t, ISABus **, qemu_irq *, AlphaCPU *[4],
+                      pci_map_irq_fn);
+ 
+ /* alpha_pci.c.  */
+-extern const MemoryRegionOps alpha_pci_ignore_ops;
+ extern const MemoryRegionOps alpha_pci_conf1_ops;
+ extern const MemoryRegionOps alpha_pci_iack_ops;
+ 
+diff --git a/hw/alpha/pci.c b/hw/alpha/pci.c
+index 8dde637bfe..e0bcde9f70 100644
+--- a/hw/alpha/pci.c
++++ b/hw/alpha/pci.c
+@@ -14,32 +14,6 @@
+ #include "trace.h"
+ 
+ 
+-/* Fallback for unassigned PCI I/O operations.  Avoids MCHK.  */
+-
+-static uint64_t ignore_read(void *opaque, hwaddr addr, unsigned size)
+-{
+-    return 0;
+-}
+-
+-static void ignore_write(void *opaque, hwaddr addr, uint64_t v, unsigned size)
+-{
+-}
+-
+-const MemoryRegionOps alpha_pci_ignore_ops = {
+-    .read = ignore_read,
+-    .write = ignore_write,
+-    .endianness = DEVICE_LITTLE_ENDIAN,
+-    .valid = {
+-        .min_access_size = 1,
+-        .max_access_size = 8,
+-    },
+-    .impl = {
+-        .min_access_size = 1,
+-        .max_access_size = 8,
+-    },
+-};
+-
+-
+ /* PCI config space reads/writes, to byte-word addressable memory.  */
+ static uint64_t bw_conf1_read(void *opaque, hwaddr addr,
+                               unsigned size)
+diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
+index ae11e012c7..d8e2cac3f3 100644
+--- a/hw/alpha/typhoon.c
++++ b/hw/alpha/typhoon.c
+@@ -11,6 +11,7 @@
+ #include "cpu.h"
+ #include "hw/hw.h"
+ #include "hw/devices.h"
++#include "hw/misc/unimp.h"
+ #include "sysemu/sysemu.h"
+ #include "alpha_sys.h"
+ #include "exec/address-spaces.h"
+@@ -876,10 +877,7 @@ PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **isa_bus,
+                                 &s->pchip.reg_mem);
+ 
+     /* Pchip0 PCI I/O, 0x801.FC00.0000, 32MB.  */
+-    memory_region_init_io(&s->pchip.reg_io, OBJECT(s), &alpha_pci_ignore_ops,
+-                          NULL, "pci0-io", 32*MB);
+-    memory_region_add_subregion(addr_space, 0x801fc000000ULL,
+-                                &s->pchip.reg_io);
++    create_unimplemented_device("pci0-io", 0x801fc000000ULL, 32 * MB);
+ 
+     b = pci_register_bus(dev, "pci",
+                          typhoon_set_irq, sys_map_irq, s,
+-- 
+2.15.0.rc0
