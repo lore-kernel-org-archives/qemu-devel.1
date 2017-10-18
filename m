@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qxs-0003Id-2g
+	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qxv-0003Jt-AH
 	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qxo-0001vk-SK
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:04 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:52605)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qxu-00021J-5S
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:07 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:52862)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1e4qxo-0001uV-IS
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:00 -0400
-Received: by mail-wr0-x229.google.com with SMTP id k62so5589808wrc.9
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 09:12:59 -0700 (PDT)
-Received: from 640k.lan (94-39-155-245.adsl-ull.clienti.tiscali.it.
-	[94.39.155.245])
-	by smtp.gmail.com with ESMTPSA id 69sm13436794wmm.2.2017.10.18.09.12.54
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 18 Oct 2017 09:12:54 -0700 (PDT)
+	id 1e4qxt-00020v-Rr
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:06 -0400
+Received: by mail-wm0-x241.google.com with SMTP id k4so11169200wmc.1
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 09:13:05 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 18 Oct 2017 18:11:52 +0200
-Message-Id: <1508343141-31835-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/29] Misc patches for 2017-10-18
+Date: Wed, 18 Oct 2017 18:11:57 +0200
+Message-Id: <1508343141-31835-6-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1508343141-31835-1-git-send-email-pbonzini@redhat.com>
+References: <1508343141-31835-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 05/29] exec: add page_mask for
+ flatview_do_translate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,115 +29,151 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Peter Xu <peterx@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-The following changes since commit a0b261db8c030813e30a39eae47359ac2a37f7e2:
+From: Peter Xu <peterx@redhat.com>
 
-  Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-request' into staging (2017-10-12 10:02:09 +0100)
+The function is originally used for flatview_space_translate() and what
+we care about most is (xlat, plen) range. However for iotlb requests, we
+don't really care about "plen", but the size of the page that "xlat" is
+located on. While, plen cannot really contain this information.
 
-are available in the git repository at:
+A simple example to show why "plen" is not good for IOTLB translations:
 
+E.g., for huge pages, it is possible that guest mapped 1G huge page on
+device side that used this GPA range:
 
-  git://github.com/bonzini/qemu.git tags/for-upstream
+  0x100000000 - 0x13fffffff
 
-for you to fetch changes up to 3da023b5827543ee4c022986ea2ad9d1274410b2:
+Then let's say we want to translate one IOVA that finally mapped to GPA
+0x13ffffe00 (which is located on this 1G huge page). Then here we'll
+get:
 
-  scsi: reject configurations with logical block size > physical block size (2017-10-18 11:56:14 +0200)
+  (xlat, plen) = (0x13fffe00, 0x200)
 
-----------------------------------------------------------------
-* TCG 8-byte atomic accesses bugfix (Andrew)
-* Report disk rotation rate (Daniel)
-* Report invalid scsi-disk block size configuration (Mark)
-* KVM and memory API MemoryListener fixes (David, Maxime, Peter Xu)
-* x86 CPU hotplug crash fix (Igor)
-* Load/store API documentation (Peter Maydell)
-* Small fixes by myself and Thomas
-* qdev DEVICE_DELETED deferral (Michael)
+So the IOTLB would be only covering a very small range since from
+"plen" (which is 0x200 bytes) we cannot tell the size of the page.
 
-----------------------------------------------------------------
-Andrew Baumann (1):
-      notdirty_mem_write: implement 8-byte accesses
+Actually we can really know that this is a huge page - we just throw the
+information away in flatview_do_translate().
 
-Daniel P. Berrange (3):
-      scsi-disk: support reporting of rotation rate
-      ide: support reporting of rotation rate
-      char: don't skip client cleanup if 'connected' flag is unset
+This patch introduced "page_mask" optional parameter to capture that
+page mask info. Also, I made "plen" an optional parameter as well, with
+some comments for the whole function.
 
-David Hildenbrand (7):
-      memory: call log_start after region_add
-      kvm: fix alignment of ram address
-      kvm: tolerate non-existing slot for log_start/log_stop/log_sync
-      kvm: fix error message when failing to unregister slot
-      kvm: region_add and region_del is not called on updates
-      kvm: simplify kvm_align_section()
-      memory: reuse section_from_flat_range()
+No functional change yet.
 
-Igor Mammedov (1):
-      pc: make sure that plugged CPUs are of the same type
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-Id: <20171010094247.10173-2-maxime.coquelin@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ exec.c | 51 +++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 45 insertions(+), 6 deletions(-)
 
-Mark Kanda (1):
-      scsi: reject configurations with logical block size > physical block size
-
-Maxime Coquelin (1):
-      memory: fix off-by-one error in memory_region_notify_one()
-
-Michael Roth (3):
-      qdev: store DeviceState's canonical path to use when unparenting
-      Revert "qdev: Free QemuOpts when the QOM path goes away"
-      qdev: defer DEVICE_DEL event until instance_finalize()
-
-Paolo Bonzini (8):
-      checkpatch: refine mode selection
-      build: remove CONFIG_LIBDECNUMBER
-      nios2: define tcg_env
-      tco: add trace events
-      target/i386: introduce x86_ld*_code
-      target/i386: trap on instructions longer than >15 bytes
-      watch_mem_write: implement 8-byte accesses
-      qemu-pr-helper: use new libmultipath API
-
-Peter Maydell (1):
-      docs/devel/loads-stores.rst: Document our various load and store APIs
-
-Peter Xu (2):
-      exec: add page_mask for flatview_do_translate
-      exec: simplify address_space_get_iotlb_entry
-
-Thomas Huth (1):
-      disas: Always initialize read_memory_inner_func properly
-
- Makefile.target                           |   6 -
- accel/kvm/kvm-all.c                       |  39 ++-
- chardev/char-socket.c                     |  19 +-
- configure                                 |  12 +-
- default-configs/ppc-linux-user.mak        |   1 -
- default-configs/ppc-softmmu.mak           |   1 -
- default-configs/ppc64-linux-user.mak      |   1 -
- default-configs/ppc64-softmmu.mak         |   1 -
- default-configs/ppc64abi32-linux-user.mak |   1 -
- default-configs/ppc64le-linux-user.mak    |   1 -
- default-configs/ppcemb-softmmu.mak        |   1 -
- disas.c                                   |   1 -
- docs/devel/loads-stores.rst               | 396 ++++++++++++++++++++++++++++++
- exec.c                                    | 109 ++++++--
- hw/acpi/tco.c                             |  11 +-
- hw/acpi/trace-events                      |   4 +
- hw/core/qdev.c                            |  32 ++-
- hw/i386/pc.c                              |   7 +
- hw/ide/core.c                             |   1 +
- hw/ide/qdev.c                             |   1 +
- hw/scsi/scsi-disk.c                       |  28 +++
- include/disas/bfd.h                       |   1 +
- include/hw/ide/internal.h                 |   8 +
- include/hw/qdev-core.h                    |   1 +
- libdecnumber/Makefile.objs                |   5 +
- memory.c                                  |  18 +-
- scripts/checkpatch.pl                     |  19 +-
- scsi/qemu-pr-helper.c                     |  17 +-
- target/i386/translate.c                   | 257 ++++++++++---------
- target/nios2/translate.c                  |   1 +
- target/ppc/Makefile.objs                  |   1 +
- 31 files changed, 777 insertions(+), 224 deletions(-)
- create mode 100644 docs/devel/loads-stores.rst
- create mode 100644 libdecnumber/Makefile.objs
+diff --git a/exec.c b/exec.c
+index 6378714..ca520ac 100644
+--- a/exec.c
++++ b/exec.c
+@@ -465,11 +465,29 @@ address_space_translate_internal(AddressSpaceDispatch *d, hwaddr addr, hwaddr *x
+     return section;
+ }
+ 
+-/* Called from RCU critical section */
++/**
++ * flatview_do_translate - translate an address in FlatView
++ *
++ * @fv: the flat view that we want to translate on
++ * @addr: the address to be translated in above address space
++ * @xlat: the translated address offset within memory region. It
++ *        cannot be @NULL.
++ * @plen_out: valid read/write length of the translated address. It
++ *            can be @NULL when we don't care about it.
++ * @page_mask_out: page mask for the translated address. This
++ *            should only be meaningful for IOMMU translated
++ *            addresses, since there may be huge pages that this bit
++ *            would tell. It can be @NULL if we don't care about it.
++ * @is_write: whether the translation operation is for write
++ * @is_mmio: whether this can be MMIO, set true if it can
++ *
++ * This function is called from RCU critical section
++ */
+ static MemoryRegionSection flatview_do_translate(FlatView *fv,
+                                                  hwaddr addr,
+                                                  hwaddr *xlat,
+-                                                 hwaddr *plen,
++                                                 hwaddr *plen_out,
++                                                 hwaddr *page_mask_out,
+                                                  bool is_write,
+                                                  bool is_mmio,
+                                                  AddressSpace **target_as)
+@@ -478,11 +496,17 @@ static MemoryRegionSection flatview_do_translate(FlatView *fv,
+     MemoryRegionSection *section;
+     IOMMUMemoryRegion *iommu_mr;
+     IOMMUMemoryRegionClass *imrc;
++    hwaddr page_mask = (hwaddr)(-1);
++    hwaddr plen = (hwaddr)(-1);
++
++    if (plen_out) {
++        plen = *plen_out;
++    }
+ 
+     for (;;) {
+         section = address_space_translate_internal(
+                 flatview_to_dispatch(fv), addr, &addr,
+-                plen, is_mmio);
++                &plen, is_mmio);
+ 
+         iommu_mr = memory_region_get_iommu(section->mr);
+         if (!iommu_mr) {
+@@ -494,7 +518,8 @@ static MemoryRegionSection flatview_do_translate(FlatView *fv,
+                                 IOMMU_WO : IOMMU_RO);
+         addr = ((iotlb.translated_addr & ~iotlb.addr_mask)
+                 | (addr & iotlb.addr_mask));
+-        *plen = MIN(*plen, (addr | iotlb.addr_mask) - addr + 1);
++        page_mask &= iotlb.addr_mask;
++        plen = MIN(plen, (addr | iotlb.addr_mask) - addr + 1);
+         if (!(iotlb.perm & (1 << is_write))) {
+             goto translate_fail;
+         }
+@@ -505,6 +530,19 @@ static MemoryRegionSection flatview_do_translate(FlatView *fv,
+ 
+     *xlat = addr;
+ 
++    if (page_mask == (hwaddr)(-1)) {
++        /* Not behind an IOMMU, use default page size. */
++        page_mask = ~TARGET_PAGE_MASK;
++    }
++
++    if (page_mask_out) {
++        *page_mask_out = page_mask;
++    }
++
++    if (plen_out) {
++        *plen_out = plen;
++    }
++
+     return *section;
+ 
+ translate_fail:
+@@ -523,7 +561,7 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
+ 
+     /* This can never be MMIO. */
+     section = flatview_do_translate(address_space_to_flatview(as), addr,
+-                                    &xlat, &plen, is_write, false, &as);
++                                    &xlat, &plen, NULL, is_write, false, &as);
+ 
+     /* Illegal translation */
+     if (section.mr == &io_mem_unassigned) {
+@@ -567,7 +605,8 @@ MemoryRegion *flatview_translate(FlatView *fv, hwaddr addr, hwaddr *xlat,
+     AddressSpace *as = NULL;
+ 
+     /* This can be MMIO, so setup MMIO bit. */
+-    section = flatview_do_translate(fv, addr, xlat, plen, is_write, true, &as);
++    section = flatview_do_translate(fv, addr, xlat, plen, NULL,
++                                    is_write, true, &as);
+     mr = section.mr;
+ 
+     if (xen_enabled() && memory_access_is_direct(mr, is_write)) {
 -- 
 1.8.3.1
