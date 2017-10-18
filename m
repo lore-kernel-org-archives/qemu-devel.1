@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4iVW-00040i-P9
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 03:11:15 -0400
+	(envelope-from <famz@redhat.com>) id 1e4ip5-0007EJ-5M
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 03:31:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1e4iVT-0007a9-K1
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 03:11:14 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54842)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1e4iVT-0007ZD-DG
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 03:11:11 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1e4iVS-0007Kr-0R
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 07:11:10 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E66CC2E80CB
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 07:11:09 +0000 (UTC)
+	(envelope-from <famz@redhat.com>) id 1e4ip1-0000Lv-7J
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 03:31:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58504)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1e4ip0-0000IH-SQ
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 03:31:23 -0400
+Date: Wed, 18 Oct 2017 15:31:15 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20171018073115.GA9443@lemon>
+References: <20171017071247.32355-1-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20171017071247.32355-1-peterx@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 18 Oct 2017 07:05:04 -0000
-From: Bug <kewlubuntu@mailinator.com>
-Reply-To: Bug 1723984 <1723984@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150816671920.14146.15870333277151125380.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150831030476.16886.7030297420113802450.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1723984] Re: ID_MMFR0 has an invalid value on
- aarch64 cpu (A57, A53)
+Subject: Re: [Qemu-devel] [PATCH] docker: cleanup temp directory after test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,44 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-I see your point. Thank you for the advice. I'm doing some low-level
-check to be sure to be on a known platform, so this midr based code is
-very localized. For the "core" of the kernel, I'm mostly using (1) as
-access to MMU registers are localized in armv7/armv8 specialized sub-
-directories.
+On Tue, 10/17 15:12, Peter Xu wrote:
+> There are temp directories named "docker-src.*" after doing docker
+> tests.  I don't see much point in keeping that (it only contains the
+> qemu.tar which is exactly current tree, and the copied "run" file).
+> Let's remove it after test finished.
+>=20
+> CC: "Alex Benn=E9e" <alex.bennee@linaro.org>
+> CC: Fam Zheng <famz@redhat.com>
+> CC: "Philippe Mathieu-Daud=E9" <f4bug@amsat.org>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  tests/docker/Makefile.include | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.incl=
+ude
+> index 6f9ea196a7..c8fbd37127 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -151,6 +151,8 @@ docker-run: docker-qemu-src
+>  			$(IMAGE) 					\
+>  			/var/tmp/qemu/run 				\
+>  			$(TEST), "  RUN $(TEST) in ${IMAGE}")
+> +	$(call quiet-command, rm -r $(DOCKER_SRC_COPY), \
+> +		"  CLEANUP $(DOCKER_SRC_COPY)")
+> =20
+>  # Run targets:
+>  #
+> --=20
+> 2.13.5
+>=20
+>=20
 
--- =
+Applied, thanks!
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1723984
-
-Title:
-  ID_MMFR0 has an invalid value on aarch64 cpu (A57, A53)
-
-Status in QEMU:
-  New
-
-Bug description:
-  The ID_MMFR0 register, accessed from aarch64 state as an invalid value:
-  - ARM ARM v8 documentation (D7.2 General system control registers) descri=
-bed bits AuxReg[23:20] to be
-    "In ARMv8-A the only permitted value is 0010"
-  - Cortex A53 and Cortex A57 TRM describe the value to be 0x10201105, so A=
-uxReg[23:20] is 0010 too
-  - in QEMU target/arm/cpu64.c, the relevant value is
-    cpu->id_mmfr0 =3D 0x10101105;
-
-  The 1 should be changed to 2.
-
-  Spotted & Tested on the following qemu revision:
-
-  commit 48ae1f60d8c9a770e6da64407984d84e25253c69
-  Merge: 78b62d3 b867eaa
-  Author: Peter Maydell <peter.maydell@linaro.org>
-  Date:   Mon Oct 16 14:28:13 2017 +0100
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1723984/+subscriptions
+Fam
