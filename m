@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e4s8P-0001sJ-Ve
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:28:02 -0400
+	(envelope-from <mst@redhat.com>) id 1e4sB2-0002d3-Bm
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:30:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1e4s8O-0006le-T6
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:28:01 -0400
-Date: Wed, 18 Oct 2017 13:27:44 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20171018172744.GI17962@localhost.localdomain>
-References: <503559b438cd67b865d32d7d0577afc7ee15f32c.1508257445.git.jcody@redhat.com>
-	<2de32e52-2c2a-5738-4624-d84bf7379c5f@redhat.com>
-	<20171018150352.GE17962@localhost.localdomain>
-	<d3682b70-64c6-1284-77c4-8df561a61098@redhat.com>
-	<20171018153416.GF17962@localhost.localdomain>
-	<07a69c86-aae3-9174-b646-dee04bf191de@redhat.com>
-	<20171018155038.GG17962@localhost.localdomain>
-	<f5da8290-096d-36b5-28c5-ecfeb66199af@redhat.com>
-	<20171018161935.GH17962@localhost.localdomain>
-	<d6b6250f-4215-adfa-f09a-e35360f04597@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1e4sAy-0008Sh-Cx
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:30:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47774)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e4sAy-0008SN-3o
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:30:40 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 205907E44F
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 17:30:39 +0000 (UTC)
+Date: Wed, 18 Oct 2017 20:30:29 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171018202948-mutt-send-email-mst@kernel.org>
+References: <20171018111612.112912-1-marcel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d6b6250f-4215-adfa-f09a-e35360f04597@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 03/10] qemu-iotests: automatically clean
- up bash protocol servers
+In-Reply-To: <20171018111612.112912-1-marcel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V2] hw/pci-host: Fix x86 Host Bridges 64bit
+ PCI hole
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,62 +33,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, ehabkost@redhat.com, lersek@redhat.com, imammedo@redhat.com
 
-On Wed, Oct 18, 2017 at 06:39:26PM +0200, Paolo Bonzini wrote:
-> On 18/10/2017 18:19, Jeff Cody wrote:
-> >>> Here is what we need from common.rc for this series:
-> >>>
-> >>> _rm_test_img
-> >>> _cleanup_nbd
-> >>> _cleanup_vxhs
-> >>> _cleanup_rbd
-> >>> _cleanup_sheepdog
-> >>> _cleanup_protocols
-> >>> _cleanup_test_img
-> >>>
-> >>> They all have a common theme (cleanup), so I could move them all to a
-> >>> common.cleanup (naming suggestion?) file (which would need to be included by
-> >>> common.rc, as well).
-> >>>
-> >>> Would this be a strong enough delineation to overcome your concerns?
-> >>
-> >> A great start.  Which of these are actually needed by the tests (and
-> >> hence by common.rc) and why?
-> >
-> >  Some tests are written such that they do intermediate cleanups between
-> >  multiple internal sub-tests for varying reasons, and so use those cleanup
-> >  functions as part of their testing.  The function _cleanup_test_img
-> >  effectively calls all the other functions I listed, so they are really all
-> >  required for the tests, if they choose to call _cleanup_test_img.
-> > 
-> > And for 'check' to tear everything down to a clean state, it also needs to
-> > use the cleanup functions for everything that is not just a file/directory.
+On Wed, Oct 18, 2017 at 02:16:12PM +0300, Marcel Apfelbaum wrote:
+> Currently there is no MMIO range over 4G
+> reserved for PCI hotplug. Since the 32bit PCI hole
+> depends on the number of cold-plugged PCI devices
+> and other factors, it is very possible is too small
+> to hotplug PCI devices with large BARs.
 > 
-> Do these tests really need the "cleanup protocols" part, because the few
-> that have more than one _cleanup_test_img (059, 066, 070, 084, 146, 171)
-> are either file-only or non-raw, so they should be able to just rebuild
-> the format on top of the same image.
+> Fix it by reserving all the address space after
+> RAM (and the reserved space for RAM hotplug),
+> but no more than 40bits. The later seems to be
+> QEMU's magic number for the Guest physical CPU addressable
+> bits and is safe with respect to migration.
 > 
+> Note this is a regression since prev QEMU versions had
+> some range reserved for 64bit PCI hotplug.
+> 
+> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+> ---
+> 
+> V1 -> V2:
+>  Addressed Igor's comments:
+>     - aligned the hole64 start to 1Gb
+>      (I think all the computations took care of it already,
+>       but it can't hurt)
+>     - Init compat props to "off" instead of "false"
+> 
+> Thanks,
+> Marcel
 
-Maybe not, but that could just be the nature of what bugs we are testing for
-at this time.  These specific tests may not need to, but it is not
-inconceivable to have a test that involves bringing up and tearing down
-a protocol based server some arbitrary number times, to test that specific
-behavior.
+Pls take a look at Laszlo's comments too.
 
-> Maybe that's where the separation lies---protocol vs. format, where
-> cleaning up the "file" protocol need not do anything because it's done
-> when removing the test directory.  If that's the case, it'd be nice
-> because it might also make it much easier to tackle the issue with
-> parallel tests.
->
-
-On final exit, yes, a test needs not remember to remove all of its mouse
-droppings.  But as far as not needing to remove images in intermediate
-stages of a given test, I think that assumes too much. For instance,
-qemu-img _should_ be able to rebuild a format on top of the same image.  But
-maybe a test wants to see if that specific functionality actually works as
-intended, and compares removing and creating an image to rebuilding on top
-of an image, etc.
+>  hw/i386/pc.c              | 22 ++++++++++++++++++++++
+>  hw/pci-host/piix.c        | 10 ++++++++++
+>  hw/pci-host/q35.c         |  9 +++++++++
+>  include/hw/i386/pc.h      | 10 ++++++++++
+>  include/hw/pci-host/q35.h |  1 +
+>  5 files changed, 52 insertions(+)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 05985d4927..d11eeacead 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1448,6 +1448,28 @@ void pc_memory_init(PCMachineState *pcms,
+>      pcms->ioapic_as = &address_space_memory;
+>  }
+>  
+> +uint64_t pc_pci_hole64_start(void)
+> +{
+> +    PCMachineState *pcms = PC_MACHINE(qdev_get_machine());
+> +    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+> +    uint64_t hole64_start = 0;
+> +
+> +    if (pcmc->has_reserved_memory && pcms->hotplug_memory.base) {
+> +        hole64_start = pcms->hotplug_memory.base;
+> +        if (!pcmc->broken_reserved_end) {
+> +            hole64_start += memory_region_size(&pcms->hotplug_memory.mr);
+> +        }
+> +    } else {
+> +        hole64_start = 0x100000000ULL + pcms->above_4g_mem_size;
+> +    }
+> +
+> +    if (hole64_start > PCI_HOST_PCI_HOLE64_END) {
+> +        hole64_start = PCI_HOST_PCI_HOLE64_END;
+> +    }
+> +
+> +    return ROUND_UP(hole64_start, 1ULL << 30);
+> +}
+> +
+>  qemu_irq pc_allocate_cpu_irq(void)
+>  {
+>      return qemu_allocate_irq(pic_irq_request, NULL, 0);
+> diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+> index dec345fd24..317a232972 100644
+> --- a/hw/pci-host/piix.c
+> +++ b/hw/pci-host/piix.c
+> @@ -50,6 +50,7 @@ typedef struct I440FXState {
+>      PCIHostState parent_obj;
+>      Range pci_hole;
+>      uint64_t pci_hole64_size;
+> +    bool pci_hole64_fix;
+>      uint32_t short_root_bus;
+>  } I440FXState;
+>  
+> @@ -243,11 +244,15 @@ static void i440fx_pcihost_get_pci_hole64_start(Object *obj, Visitor *v,
+>                                                  void *opaque, Error **errp)
+>  {
+>      PCIHostState *h = PCI_HOST_BRIDGE(obj);
+> +    I440FXState *s = I440FX_PCI_HOST_BRIDGE(obj);
+>      Range w64;
+>      uint64_t value;
+>  
+>      pci_bus_get_w64_range(h->bus, &w64);
+>      value = range_is_empty(&w64) ? 0 : range_lob(&w64);
+> +    if (!value && s->pci_hole64_fix) {
+> +        value = pc_pci_hole64_start();
+> +    }
+>      visit_type_uint64(v, name, &value, errp);
+>  }
+>  
+> @@ -256,11 +261,15 @@ static void i440fx_pcihost_get_pci_hole64_end(Object *obj, Visitor *v,
+>                                                Error **errp)
+>  {
+>      PCIHostState *h = PCI_HOST_BRIDGE(obj);
+> +    I440FXState *s = I440FX_PCI_HOST_BRIDGE(obj);
+>      Range w64;
+>      uint64_t value;
+>  
+>      pci_bus_get_w64_range(h->bus, &w64);
+>      value = range_is_empty(&w64) ? 0 : range_upb(&w64) + 1;
+> +    if (s->pci_hole64_fix && value < PCI_HOST_PCI_HOLE64_END) {
+> +        value = PCI_HOST_PCI_HOLE64_END;
+> +    }
+>      visit_type_uint64(v, name, &value, errp);
+>  }
+>  
+> @@ -857,6 +866,7 @@ static Property i440fx_props[] = {
+>      DEFINE_PROP_SIZE(PCI_HOST_PROP_PCI_HOLE64_SIZE, I440FXState,
+>                       pci_hole64_size, DEFAULT_PCI_HOLE64_SIZE),
+>      DEFINE_PROP_UINT32("short_root_bus", I440FXState, short_root_bus, 0),
+> +    DEFINE_PROP_BOOL("x-pci-hole64-fix", I440FXState, pci_hole64_fix, true),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+> index 1ff648e80c..641213f177 100644
+> --- a/hw/pci-host/q35.c
+> +++ b/hw/pci-host/q35.c
+> @@ -104,11 +104,15 @@ static void q35_host_get_pci_hole64_start(Object *obj, Visitor *v,
+>                                            Error **errp)
+>  {
+>      PCIHostState *h = PCI_HOST_BRIDGE(obj);
+> +    Q35PCIHost *s = Q35_HOST_DEVICE(obj);
+>      Range w64;
+>      uint64_t value;
+>  
+>      pci_bus_get_w64_range(h->bus, &w64);
+>      value = range_is_empty(&w64) ? 0 : range_lob(&w64);
+> +    if (!value && s->pci_hole64_fix) {
+> +        value = pc_pci_hole64_start();
+> +    }
+>      visit_type_uint64(v, name, &value, errp);
+>  }
+>  
+> @@ -117,11 +121,15 @@ static void q35_host_get_pci_hole64_end(Object *obj, Visitor *v,
+>                                          Error **errp)
+>  {
+>      PCIHostState *h = PCI_HOST_BRIDGE(obj);
+> +    Q35PCIHost *s = Q35_HOST_DEVICE(obj);
+>      Range w64;
+>      uint64_t value;
+>  
+>      pci_bus_get_w64_range(h->bus, &w64);
+>      value = range_is_empty(&w64) ? 0 : range_upb(&w64) + 1;
+> +    if (s->pci_hole64_fix && value < PCI_HOST_PCI_HOLE64_END) {
+> +        value = PCI_HOST_PCI_HOLE64_END;
+> +    }
+>      visit_type_uint64(v, name, &value, errp);
+>  }
+>  
+> @@ -143,6 +151,7 @@ static Property q35_host_props[] = {
+>                       mch.below_4g_mem_size, 0),
+>      DEFINE_PROP_SIZE(PCI_HOST_ABOVE_4G_MEM_SIZE, Q35PCIHost,
+>                       mch.above_4g_mem_size, 0),
+> +    DEFINE_PROP_BOOL("x-pci-hole64-fix", Q35PCIHost, pci_hole64_fix, true),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 087d184ef5..82ea8f67f4 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -239,6 +239,7 @@ void pc_guest_info_init(PCMachineState *pcms);
+>  #define PCI_HOST_BELOW_4G_MEM_SIZE     "below-4g-mem-size"
+>  #define PCI_HOST_ABOVE_4G_MEM_SIZE     "above-4g-mem-size"
+>  #define DEFAULT_PCI_HOLE64_SIZE (~0x0ULL)
+> +#define PCI_HOST_PCI_HOLE64_END (0x1ULL << 40)
+>  
+>  
+>  void pc_pci_as_mapping_init(Object *owner, MemoryRegion *system_memory,
+> @@ -249,6 +250,7 @@ void pc_memory_init(PCMachineState *pcms,
+>                      MemoryRegion *system_memory,
+>                      MemoryRegion *rom_memory,
+>                      MemoryRegion **ram_memory);
+> +uint64_t pc_pci_hole64_start(void);
+>  qemu_irq pc_allocate_cpu_irq(void);
+>  DeviceState *pc_vga_init(ISABus *isa_bus, PCIBus *pci_bus);
+>  void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
+> @@ -375,6 +377,14 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+>          .driver   = TYPE_X86_CPU,\
+>          .property = "x-hv-max-vps",\
+>          .value    = "0x40",\
+> +    },{\
+> +        .driver   = "i440FX-pcihost",\
+> +        .property = "x-pci-hole64-fix",\
+> +        .value    = "off",\
+> +    },{\
+> +        .driver   = "q35-pcihost",\
+> +        .property = "x-pci-hole64-fix",\
+> +        .value    = "off",\
+>      },
+>  
+>  #define PC_COMPAT_2_9 \
+> diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
+> index 58983c00b3..8f4ddde393 100644
+> --- a/include/hw/pci-host/q35.h
+> +++ b/include/hw/pci-host/q35.h
+> @@ -68,6 +68,7 @@ typedef struct Q35PCIHost {
+>      PCIExpressHost parent_obj;
+>      /*< public >*/
+>  
+> +    bool pci_hole64_fix;
+>      MCHPCIState mch;
+>  } Q35PCIHost;
+>  
+> -- 
+> 2.13.5
