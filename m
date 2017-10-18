@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e4pfK-0008HQ-Bg
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 10:49:52 -0400
+	(envelope-from <bounces@canonical.com>) id 1e4pgz-0000ki-6N
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 10:51:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1e4pfH-0006CX-7G
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 10:49:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33224)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1e4pfG-00069d-Re
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 10:49:47 -0400
-Date: Wed, 18 Oct 2017 15:49:36 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20171018144936.GJ9719@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
-	<20171016163636.GI11975@redhat.com>
-	<20171017092702.5b82103b@nial.brq.redhat.com>
-	<20171017150759.GB31897@redhat.com>
-	<20171017180635.6a900616@nial.brq.redhat.com>
-	<20171017160926.GJ31897@redhat.com>
-	<20171017181859.666cd9d0@nial.brq.redhat.com>
-	<20171018125911.GB2942@localhost.localdomain>
-	<20171018164435.5290db6a@nial.brq.redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1e4pgw-0008PW-0e
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 10:51:33 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55784)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1e4pgv-0008Ox-Mk
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 10:51:29 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1e4pgt-00059k-LG
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 14:51:27 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C527E2E81ED
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 14:51:23 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20171018164435.5290db6a@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [RFC 0/6] enable numa configuration before
- machine_init() from HMP/QMP
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 18 Oct 2017 14:44:08 -0000
+From: Ryan Beisner <1719196@bugs.launchpad.net>
+Reply-To: Bug 1719196 <1719196@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150626680089.6094.17724106932405637799.malonedeb@soybean.canonical.com>
+Message-Id: <150833784902.1005.7913306251728228468.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1719196] Re: [arm64 ocata] newly created
+ instances are unable to raise network interfaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,137 +37,282 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
 
-On Wed, Oct 18, 2017 at 04:44:35PM +0200, Igor Mammedov wrote:
-> On Wed, 18 Oct 2017 10:59:11 -0200
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
-> > On Tue, Oct 17, 2017 at 06:18:59PM +0200, Igor Mammedov wrote:
-> > > On Tue, 17 Oct 2017 17:09:26 +0100
-> > > "Daniel P. Berrange" <berrange@redhat.com> wrote:
-> > >   
-> > > > On Tue, Oct 17, 2017 at 06:06:35PM +0200, Igor Mammedov wrote:  
-> > > > > On Tue, 17 Oct 2017 16:07:59 +0100
-> > > > > "Daniel P. Berrange" <berrange@redhat.com> wrote:
-> > > > >     
-> > > > > > On Tue, Oct 17, 2017 at 09:27:02AM +0200, Igor Mammedov wrote:    
-> > > > > > > On Mon, 16 Oct 2017 17:36:36 +0100
-> > > > > > > "Daniel P. Berrange" <berrange@redhat.com> wrote:
-> > > > > > >       
-> > > > > > > > On Mon, Oct 16, 2017 at 06:22:50PM +0200, Igor Mammedov wrote:      
-> > > > > > > > > Series allows to configure NUMA mapping at runtime using QMP/HMP
-> > > > > > > > > interface. For that to happen it introduces a new '-paused' CLI option
-> > > > > > > > > which allows to pause QEMU before machine_init() is run and
-> > > > > > > > > adds new set-numa-node HMP/QMP commands which in conjuction with
-> > > > > > > > > info hotpluggable-cpus/query-hotpluggable-cpus allow to configure
-> > > > > > > > > NUMA mapping for cpus.        
-> > > > > > > > 
-> > > > > > > > What's the problem we're seeking solve here compared to what we currently
-> > > > > > > > do for NUMA configuration ?      
-> > > > > > > From RHBZ1382425
-> > > > > > > "
-> > > > > > > Current -numa CLI interface is quite limited in terms that allow map
-> > > > > > > CPUs to NUMA nodes as it requires to provide cpu_index values which 
-> > > > > > > are non obvious and depend on machine/arch. As result libvirt has to
-> > > > > > > assume/re-implement cpu_index allocation logic to provide valid 
-> > > > > > > values for -numa cpus=... QEMU CLI option.      
-> > > > > > 
-> > > > > > In broad terms, this problem applies to every device / object libvirt
-> > > > > > asks QEMU to create. For everything else libvirt is able to assign a
-> > > > > > "id" string, which is can then use to identify the thing later. The
-> > > > > > CPU stuff is different because libvirt isn't able to provide 'id'
-> > > > > > strings for each CPU - QEMU generates a psuedo-id internally which
-> > > > > > libvirt has to infer. The latter is the same problem we had with
-> > > > > > devices before '-device' was introduced allowing 'id' naming.
-> > > > > > 
-> > > > > > IMHO we should take the same approach with CPUs and start modelling 
-> > > > > > the individual CPUs as something we can explicitly create with -object
-> > > > > > or -device. That way libvirt can assign names and does not have to 
-> > > > > > care about CPU index values, and it all works just the same way as
-> > > > > > any other devices / object we create
-> > > > > > 
-> > > > > > ie instead of:
-> > > > > > 
-> > > > > >   -smp 8,sockets=4,cores=2,threads=1
-> > > > > >   -numa node,nodeid=0,cpus=0-3
-> > > > > >   -numa node,nodeid=1,cpus=4-7
-> > > > > > 
-> > > > > > we could do:
-> > > > > > 
-> > > > > >   -object numa-node,id=numa0
-> > > > > >   -object numa-node,id=numa1
-> > > > > >   -object cpu,id=cpu0,node=numa0,socket=0,core=0,thread=0
-> > > > > >   -object cpu,id=cpu1,node=numa0,socket=0,core=1,thread=0
-> > > > > >   -object cpu,id=cpu2,node=numa0,socket=1,core=0,thread=0
-> > > > > >   -object cpu,id=cpu3,node=numa0,socket=1,core=1,thread=0
-> > > > > >   -object cpu,id=cpu4,node=numa1,socket=2,core=0,thread=0
-> > > > > >   -object cpu,id=cpu5,node=numa1,socket=2,core=1,thread=0
-> > > > > >   -object cpu,id=cpu6,node=numa1,socket=3,core=0,thread=0
-> > > > > >   -object cpu,id=cpu7,node=numa1,socket=3,core=1,thread=0    
-> > > > > the follow up question would be where do "socket=3,core=1,thread=0"
-> > > > > come from, currently these options are the function of
-> > > > > (-M foo -smp ...) and can be queried vi query-hotpluggble-cpus at
-> > > > > runtime after qemu parses -M and -smp options.    
-> > > >   
-> > 
-> > Also, note that in the case of NUMA, having identifiers for CPU
-> > objects themselves won't be enough. NUMA settings need
-> > identifiers for CPU slots (even if they are still empty), and
-> > those slots are provided by the machine, not created by the user.
-> > 
-> > 
-> > > > The sockets/cores/threads topology of CPUs is something that comes from
-> > > > the libvirt guest XML config  
-> > > in this case things for libvirt to implement would be to know following details:
-> > >    1: which machine/machine version support which set of attributes
-> > >    2: valid values for these properties depending on machine/machine version/cpu type  
-> > 
-> > The big assumption in this series is that libvirt doesn't know in
-> > advance how the possible slots for CPUs will look like on each
-> > machine-type, and need to query them using
-> > query-hotpluggable-cpus.
-> yep, that's true and it started with introduction of 'device_add cpu'
-> where libvirt didn't new what to specify as options for new cpu,
-> hence query-hotpluggable-cpus were added to provide that information.
-> 
-> 
-> > But if this assumption was really true, it would be impossible
-> > for the user to even decide how the NUMA topology will look like,
-> > wouldn't it?
-> > 
-> > Igor, are you able to give one example of how the user input
-> > (libvirt XML) for configuring NUMA CPU binding could look like if
-> > the user didn't know yet what the available sockets/cores/threads
-> > are?
-> not sure I parse question but looking at libvirt's domain docs
-> it mentions
->   <numa>
->     <cell id='0' cpus='0-3' memory='512000' unit='KiB'/>
->     <cell id='1' cpus='4-7' memory='512000' unit='KiB' memAccess='shared'/>
->   </numa>
-> 
-> here libvirt assumes that there are cpus with cpu-index in range 0-7
-> /and probably duplicates logic that calculates cpu-index/
-> If libvirt would continue to duplicate logic we could skip on
-> implementing early runtime QMP in QEMU and also drop support for
-> query-hotpluggable-cpus as libvirt would be able to compute
-> properties/values on it's own.
+This appears to be:  https://bugzilla.redhat.com/show_bug.cgi?id=3D1422413
 
->From the POV of the XML, these CPU numbers are *not* required to be
-the same as any QEMU CPU index. This is just saying that we've got
-a <vcpus>8</vcpu> element, and we want the first 4 CPUs in one node
-and the second 4 in the second node. 
+-- =
 
-If QEMU assigns CPU indexes 70-77 internally, that's not relevant to
-the XML POV, which uses 0-7 regardless. If there ever was such a
-disjoint representation of CPU indexes libvirt would have to remap
-whats in the XML to match whats in QEMU
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1719196
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Title:
+  [arm64 ocata] newly created instances are unable to raise network
+  interfaces
+
+Status in libvirt:
+  New
+Status in QEMU:
+  New
+Status in libvirt package in Ubuntu:
+  Incomplete
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Zesty:
+  In Progress
+
+Bug description:
+  arm64 Ocata ,
+
+  I'm testing to see I can get Ocata running on arm64 and using the
+  openstack-base bundle to deploy it.  I have added the bundle to the
+  log file attached to this bug.
+
+  When I create a new instance via nova, the VM comes up and runs,
+  however fails to raise its eth0 interface. This occurs on both
+  internal and external networks.
+
+  ubuntu@openstackaw:~$ nova list
+  +--------------------------------------+---------+--------+------------+-=
+------------+--------------------+
+  | ID                                   | Name    | Status | Task State | =
+Power State | Networks           |
+  +--------------------------------------+---------+--------+------------+-=
+------------+--------------------+
+  | dcaf6d51-f81e-4cbd-ac77-0c5d21bde57c | sfeole1 | ACTIVE | -          | =
+Running     | internal=3D10.5.5.3  |
+  | aa0b8aee-5650-41f4-8fa0-aeccdc763425 | sfeole2 | ACTIVE | -          | =
+Running     | internal=3D10.5.5.13 |
+  +--------------------------------------+---------+--------+------------+-=
+------------+--------------------+
+  ubuntu@openstackaw:~$ nova show aa0b8aee-5650-41f4-8fa0-aeccdc763425
+  +--------------------------------------+---------------------------------=
+-------------------------+
+  | Property                             | Value                           =
+                         |
+  +--------------------------------------+---------------------------------=
+-------------------------+
+  | OS-DCF:diskConfig                    | MANUAL                          =
+                         |
+  | OS-EXT-AZ:availability_zone          | nova                            =
+                         |
+  | OS-EXT-SRV-ATTR:host                 | awrep3                          =
+                         |
+  | OS-EXT-SRV-ATTR:hypervisor_hostname  | awrep3.maas                     =
+                         |
+  | OS-EXT-SRV-ATTR:instance_name        | instance-00000003               =
+                         |
+  | OS-EXT-STS:power_state               | 1                               =
+                         |
+  | OS-EXT-STS:task_state                | -                               =
+                         |
+  | OS-EXT-STS:vm_state                  | active                          =
+                         |
+  | OS-SRV-USG:launched_at               | 2017-09-24T14:23:08.000000      =
+                         |
+  | OS-SRV-USG:terminated_at             | -                               =
+                         |
+  | accessIPv4                           |                                 =
+                         |
+  | accessIPv6                           |                                 =
+                         |
+  | config_drive                         |                                 =
+                         |
+  | created                              | 2017-09-24T14:22:41Z            =
+                         |
+  | flavor                               | m1.small (717660ae-0440-4b19-a76=
+2-ffeb32a0575c)          |
+  | hostId                               | 5612a00671c47255d2ebd6737a64ec9b=
+d3a5866d1233ecf3e988b025 |
+  | id                                   | aa0b8aee-5650-41f4-8fa0-aeccdc76=
+3425                     |
+  | image                                | zestynosplash (e88fd1bd-f040-44d=
+8-9e7c-c462ccf4b945)     |
+  | internal network                     | 10.5.5.13                       =
+                         |
+  | key_name                             | mykey                           =
+                         |
+  | metadata                             | {}                              =
+                         |
+  | name                                 | sfeole2                         =
+                         |
+  | os-extended-volumes:volumes_attached | []                              =
+                         |
+  | progress                             | 0                               =
+                         |
+  | security_groups                      | default                         =
+                         |
+  | status                               | ACTIVE                          =
+                         |
+  | tenant_id                            | 9f7a21c1ad264fec81abc09f3960ad1d=
+                         |
+  | updated                              | 2017-09-24T14:23:09Z            =
+                         |
+  | user_id                              | e6bb6f5178a248c1b5ae66ed388f9040=
+                         |
+  +--------------------------------------+---------------------------------=
+-------------------------+
+
+
+  As seen above the instances boot an run.  Full Console output is
+  attached to this bug.
+
+  =
+
+  [  OK  ] Started Initial cloud-init job (pre-networking).
+  [  OK  ] Reached target Network (Pre).
+  [  OK  ] Started AppArmor initialization.
+           Starting Raise network interfaces...
+  [FAILED] Failed to start Raise network interfaces.
+  See 'systemctl status networking.service' for details.
+           Starting Initial cloud-init job (metadata service crawler)...
+  [  OK  ] Reached target Network.
+  [  315.051902] cloud-init[881]: Cloud-init v. 0.7.9 running 'init' at Fri=
+, 22 Sep 2017 18:29:15 +0000. Up 314.70 seconds.
+  [  315.057291] cloud-init[881]: ci-info: +++++++++++++++++++++++++++Net d=
+evice info+++++++++++++++++++++++++++
+  [  315.060338] cloud-init[881]: ci-info: +--------+------+-----------+---=
+--------+-------+-------------------+
+  [  315.063308] cloud-init[881]: ci-info: | Device |  Up  |  Address  |   =
+ Mask   | Scope |     Hw-Address    |
+  [  315.066304] cloud-init[881]: ci-info: +--------+------+-----------+---=
+--------+-------+-------------------+
+  [  315.069303] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
+  .     |   .   | fa:16:3e:39:4c:48 |
+  [  315.072308] cloud-init[881]: ci-info: | eth0:  | True |     .     |   =
+  .     |   d   | fa:16:3e:39:4c:48 |
+  [  315.075260] cloud-init[881]: ci-info: |  lo:   | True | 127.0.0.1 | 25=
+5.0.0.0 |   .   |         .         |
+  [  315.078258] cloud-init[881]: ci-info: |  lo:   | True |     .     |   =
+  .     |   d   |         .         |
+  [  315.081249] cloud-init[881]: ci-info: +--------+------+-----------+---=
+--------+-------+-------------------+
+  [  315.084240] cloud-init[881]: 2017-09-22 18:29:15,393 - url_helper.py[W=
+ARNING]: Calling 'http://169.254.169.254/2009-04-04/meta-data/instance-id' =
+failed [0/120s]: request error [HTTPConnectionPool(host=3D'169.254.169.254'=
+, port=3D80): Max retries exceeded with url: /2009-04-04/meta-data/instance=
+-id (Caused by NewConnectionError('<requests.packages.urllib3.connection.HT=
+TPConnection object at 0xffffb10794e0>: Failed to establish a new connectio=
+n: [Errno 101] Network is unreachable',))]
+
+
+  =
+
+  ----------------
+
+
+  I have checked all services in neutron and made sure that they are
+  running and restarted in neutron-gateway
+
+  =
+
+   [ + ]  neutron-dhcp-agent
+   [ + ]  neutron-l3-agent
+   [ + ]  neutron-lbaasv2-agent
+   [ + ]  neutron-metadata-agent
+   [ + ]  neutron-metering-agent
+   [ + ]  neutron-openvswitch-agent
+   [ + ]  neutron-ovs-cleanup
+
+  and have also restarted and checked the nova-compute logs for their
+  neutron counterparts.
+
+  =
+
+   [ + ]  neutron-openvswitch-agent
+   [ + ]  neutron-ovs-cleanup
+
+
+   There are some warnings/errors in the neutron-gateway logs which I
+  have attached the full tarball in a separate attachment to this bug:
+
+  2017-09-24 14:39:33.152 10322 INFO ryu.base.app_manager [-] instantiating=
+ app ryu.controller.ofp_handler of OFPHandler
+  2017-09-24 14:39:33.153 10322 INFO ryu.base.app_manager [-] instantiating=
+ app ryu.app.ofctl.service of OfctlService
+  2017-09-24 14:39:39.577 10322 ERROR neutron.agent.ovsdb.impl_vsctl [req-2=
+f084ae8-13dc-47dc-b351-24c8f3c57067 - - - - -] Unable to execute ['ovs-vsct=
+l', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manage=
+r', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'Op=
+en_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1; =
+Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Transa=
+ction causes multiple rows in \"Manager\" table to have identical values (\=
+"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with UU=
+ID e02a5f7f-bfd2-4a1d-ae3c-0321db4bd3fb, existed in the database before thi=
+s transaction and was not modified by the transaction.  Second row, with UU=
+ID 6e9aba3a-471a-4976-bffd-b7131bbe5377, was inserted by this transaction."=
+,"error":"constraint violation"}
+
+
+  These warnings/errors also occur on the nova-compute hosts in
+  /var/log/neutron/
+
+
+  =
+
+  2017-09-22 18:54:52.130 387556 INFO ryu.base.app_manager [-] instantiatin=
+g app ryu.app.ofctl.service of OfctlService
+  2017-09-22 18:54:56.124 387556 ERROR neutron.agent.ovsdb.impl_vsctl [req-=
+e291c2f9-a123-422c-be7c-fadaeb5decfa - - - - -] Unable to execute ['ovs-vsc=
+tl', '--timeout=3D10', '--oneline', '--format=3Djson', '--', '--id=3D@manag=
+er', 'create', 'Manager', 'target=3D"ptcp:6640:127.0.0.1"', '--', 'add', 'O=
+pen_vSwitch', '.', 'manager_options', '@manager']. Exception: Exit code: 1;=
+ Stdin: ; Stdout: ; Stderr: ovs-vsctl: transaction error: {"details":"Trans=
+action causes multiple rows in \"Manager\" table to have identical values (=
+\"ptcp:6640:127.0.0.1\") for index on column \"target\".  First row, with U=
+UID 9f27ddee-9881-4cbc-9777-2f42fee735e9, was inserted by this transaction.=
+  Second row, with UUID ccf0e097-09d5-449c-b353-6b69781dc3f7, existed in th=
+e database before this transaction and was not modified by the transaction.=
+","error":"constraint violation"}
+
+
+  I'm not sure if the above error could be pertaining to the failure, I
+  have also attached those logs to this bug as well...
+
+  =
+
+  .
+  (neutron) agent-list
+  +--------------------------------------+----------------------+--------+-=
+------------------+-------+----------------+---------------------------+
+  | id                                   | agent_type           | host   | =
+availability_zone | alive | admin_state_up | binary                    |
+  +--------------------------------------+----------------------+--------+-=
+------------------+-------+----------------+---------------------------+
+  | 0cca03fb-abb2-4704-8b0b-e7d3e117d882 | DHCP agent           | awrep1 | =
+nova              | :-)   | True           | neutron-dhcp-agent        |
+  | 14a5fd52-fbc3-450c-96d5-4e9a65776dad | L3 agent             | awrep1 | =
+nova              | :-)   | True           | neutron-l3-agent          |
+  | 2ebc7238-5e61-41f8-bc60-df14ec6b226b | Loadbalancerv2 agent | awrep1 | =
+                  | :-)   | True           | neutron-lbaasv2-agent     |
+  | 4f6275be-fc8b-4994-bdac-13a4b76f6a83 | Metering agent       | awrep1 | =
+                  | :-)   | True           | neutron-metering-agent    |
+  | 86ecc6b0-c100-4298-b861-40c17516cc08 | Open vSwitch agent   | awrep1 | =
+                  | :-)   | True           | neutron-openvswitch-agent |
+  | 947ad3ab-650b-4b96-a520-00441ecb33e7 | Open vSwitch agent   | awrep4 | =
+                  | :-)   | True           | neutron-openvswitch-agent |
+  | 996b0692-7d19-4641-bec3-e057f4a856f6 | Open vSwitch agent   | awrep3 | =
+                  | :-)   | True           | neutron-openvswitch-agent |
+  | ab6b1065-0b98-4cf3-9f46-6bddba0c5e75 | Metadata agent       | awrep1 | =
+                  | :-)   | True           | neutron-metadata-agent    |
+  | fe24f622-b77c-4eed-ae22-18e4195cf763 | Open vSwitch agent   | awrep2 | =
+                  | :-)   | True           | neutron-openvswitch-agent |
+  +--------------------------------------+----------------------+--------+-=
+------------------+-------+----------------+---------------------------+
+
+  =
+
+  Should neutron-openvswitch be assigned to the 'nova' availability zone? =
+
+
+  I have also attached the ovs-vsctl show from a nova-compute host and
+  the neutron-gateway host to ensure that the open v switch routes are
+  correct.
+
+  =
+
+  I can supply more logs if required.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/libvirt/+bug/1719196/+subscriptions
