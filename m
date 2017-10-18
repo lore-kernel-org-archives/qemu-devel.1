@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e4mi1-0004v1-Rr
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:40:28 -0400
+	(envelope-from <lersek@redhat.com>) id 1e4miV-0005A5-8m
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:40:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e4mhv-00044Q-Ej
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:40:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47346)
+	(envelope-from <lersek@redhat.com>) id 1e4miO-0004SA-Oi
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:40:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54294)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e4mhv-00043Z-4b
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:40:19 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1e4miO-0004QX-F0
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:40:48 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C93097C849
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 11:40:17 +0000 (UTC)
-Date: Wed, 18 Oct 2017 13:40:14 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171018134014.6bd6c146@nial.brq.redhat.com>
-In-Reply-To: <20171018111612.112912-1-marcel@redhat.com>
-References: <20171018111612.112912-1-marcel@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id F0D014900C
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 11:40:45 +0000 (UTC)
+References: <20171018095807.101406-1-marcel@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <69cefa98-5681-5b12-719c-e13fcba969c4@redhat.com>
+Date: Wed, 18 Oct 2017 13:40:41 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20171018095807.101406-1-marcel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V2] hw/pci-host: Fix x86 Host Bridges 64bit
+Subject: Re: [Qemu-devel] [PATCH] hw/pci-host: Fix x86 Host Bridges 64bit
  PCI hole
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,12 +34,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, lersek@redhat.com
+To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Wed, 18 Oct 2017 14:16:12 +0300
-Marcel Apfelbaum <marcel@redhat.com> wrote:
+Hi Marcel,
 
+On 10/18/17 11:58, Marcel Apfelbaum wrote:
 > Currently there is no MMIO range over 4G
 > reserved for PCI hotplug. Since the 32bit PCI hole
 > depends on the number of cold-plugged PCI devices
@@ -56,31 +57,98 @@ Marcel Apfelbaum <marcel@redhat.com> wrote:
 > 
 > Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
 > ---
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> V1 -> V2:
->  Addressed Igor's comments:
->     - aligned the hole64 start to 1Gb
->      (I think all the computations took care of it already,
->       but it can't hurt)
-see
-        *val = cpu_to_le64(ROUND_UP(res_mem_end, 0x1ULL << 30));                 
-        fw_cfg_add_file(fw_cfg, "etc/reserved-memory-end", val, sizeof(*val));
-
->     - Init compat props to "off" instead of "false"
->
-> Thanks,
-> Marcel
-> 
 >  hw/i386/pc.c              | 22 ++++++++++++++++++++++
 >  hw/pci-host/piix.c        | 10 ++++++++++
 >  hw/pci-host/q35.c         |  9 +++++++++
 >  include/hw/i386/pc.h      | 10 ++++++++++
 >  include/hw/pci-host/q35.h |  1 +
 >  5 files changed, 52 insertions(+)
+
+- What are the symptoms of the problem?
+
+- What QEMU commit regressed the previous functionality?
+
+- How exactly is the regression (and this fix) exposed to the guest?
+
+I'm confused because semi-recently I've done multiple successful
+hotplugs, with OVMF, Q35, PCIe root ports, and PCI Express devices
+having large (64-bit) MMIO BARs. The examples include ivshmem / Linux
+guest (based on your hints) and vfio-pci (XL710 NIC) / Windows Server
+2016 guest.
+
+By default, OVMF marks a 32GB area as 64-bit MMIO aperture, for BAR
+allocation. This area is above the normal memory (plus reservation for
+hotplug memory, if any). It is also GB-aligned. The aperture size can be
+changed (currently) with an experimental -fw_cfg switch (the fw_cfg file
+is called "opt/ovmf/X-PciMmio64Mb", it states the size of the 64-bit
+MMIO aperture as a decimal number of megabytes).
+
+The OVMF logic is described in the message of the following commit:
+
+  https://github.com/tianocore/edk2/commit/7e5b1b670c382
+
+If the new resource reservation hints are used for PCI Express root
+ports, then the 64-bit reservations are satisfied (i.e., programmed into
+the root ports) from the above-mentioned 64-bit aperture. Then -- as I
+understand it -- QEMU will generate the ACPI payload honoring those
+reservations too. This means the OS will be aware, and will have room
+for accepting hotplug.
+
+So... I'm not sure what the regression is, and how this patch fixes it.
+
+Is this about exposing a 64-bit MMIO aperture for hotplug purposes
+*without* the reservation hints?
+
+
+Either way, if QEMU now starts (or starts *again* -- I don't know)
+dictating the base and size of the 64-bit MMIO aperture, then it
+shouldn't just be exposed to the OS, via ACPI; it should also be exposed
+to the firmware, via fw_cfg. The "etc/reserved-memory-end" file is
+exposed already, so that's good. Two more fw_cfg files look necessary,
+for exposing the 64-bit hole's base and size. The base should be equal
+to or larger than "etc/reserved-memory-end". The size should replace the
+current (experimental) "opt/ovmf/X-PciMmio64Mb" fw_cfg file.
+
+
+A separate note about sizing the 64-bit PCI hole. In OVMF, the end of
+the 64-bit PCI hole determines the highest guest-physical address that
+the DXE phase might want to access (so that a UEFI driver for a PCI
+device can read/write a 64-bit BAR placed there). In turn this dictates
+how the identity-mapping page tables are built for the DXE phase -- the
+higher the max expected guest-phys address, the more RAM is needed for
+the page tables.
+
+Assuming QEMU exposes a fixed (1ULL << 40) value for the highest
+(exclusive) address, *and* OVMF is expected to follow QEMU's directions
+in the placement of the 64-bit PCI hole (via the new fw_cfg files), then
+OVMF will need the following RAM amount for building the page tables:
+
+* with 1GB page support: 3 pages (12 KB)
+* without 1GB page support: 1027 pages (4108 KB)
+
+This doesn't look overly bad -- but I don't think (1ULL << 40) is good
+enough. (1ULL << 40) corresponds to 1TB, and we want to have more *RAM*
+than that. The hotplug memory range comes on top, and then we should
+still have a 64-bit MMIO aperture.
+
+Let's say we want to go up to 4TB (1ULL << 42). DXE page table memory
+needs in OVMF:
+
+* with 1GB page support: 9 pages (36 KB)
+* without 1GB page support: 4105 pages (16420 KB)
+
+I don't expect these memory needs to be a problem, but we should be
+aware of them.
+
+
+Also, how do you plan to integrate this feature with SeaBIOS?
+
+Thanks
+Laszlo
+
 > 
 > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 05985d4927..d11eeacead 100644
+> index 05985d4927..4df20d2b99 100644
 > --- a/hw/i386/pc.c
 > +++ b/hw/i386/pc.c
 > @@ -1448,6 +1448,28 @@ void pc_memory_init(PCMachineState *pcms,
@@ -106,7 +174,7 @@ see
 > +        hole64_start = PCI_HOST_PCI_HOLE64_END;
 > +    }
 > +
-> +    return ROUND_UP(hole64_start, 1ULL << 30);
+> +    return hole64_start;
 > +}
 > +
 >  qemu_irq pc_allocate_cpu_irq(void)
@@ -209,7 +277,7 @@ see
 >  };
 >  
 > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 087d184ef5..82ea8f67f4 100644
+> index 087d184ef5..2e98e8c943 100644
 > --- a/include/hw/i386/pc.h
 > +++ b/include/hw/i386/pc.h
 > @@ -239,6 +239,7 @@ void pc_guest_info_init(PCMachineState *pcms);
@@ -235,11 +303,11 @@ see
 > +    },{\
 > +        .driver   = "i440FX-pcihost",\
 > +        .property = "x-pci-hole64-fix",\
-> +        .value    = "off",\
+> +        .value    = "false",\
 > +    },{\
 > +        .driver   = "q35-pcihost",\
 > +        .property = "x-pci-hole64-fix",\
-> +        .value    = "off",\
+> +        .value    = "false",\
 >      },
 >  
 >  #define PC_COMPAT_2_9 \
@@ -255,3 +323,4 @@ see
 >      MCHPCIState mch;
 >  } Q35PCIHost;
 >  
+> 
