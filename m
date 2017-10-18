@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qy4-0003Ug-UT
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:23 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qy9-0003Zi-O6
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qy2-00027P-M5
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:16 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:47834)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1e4qy6-0002BG-Hg
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:21 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:44681)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1e4qy2-00026l-AS
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:14 -0400
-Received: by mail-wm0-x241.google.com with SMTP id t69so10985818wmt.2
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 09:13:14 -0700 (PDT)
+	id 1e4qy6-0002AO-49
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 12:13:18 -0400
+Received: by mail-wm0-x234.google.com with SMTP id 196so13113047wma.1
+	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 09:13:18 -0700 (PDT)
+Received: from 640k.lan (94-39-155-245.adsl-ull.clienti.tiscali.it.
+	[94.39.155.245])
+	by smtp.gmail.com with ESMTPSA id 69sm13436794wmm.2.2017.10.18.09.13.14
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 18 Oct 2017 09:13:15 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 18 Oct 2017 18:12:04 +0200
-Message-Id: <1508343141-31835-13-git-send-email-pbonzini@redhat.com>
+Date: Wed, 18 Oct 2017 18:12:06 +0200
+Message-Id: <1508343141-31835-15-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1508343141-31835-1-git-send-email-pbonzini@redhat.com>
 References: <1508343141-31835-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 12/29] docs/devel/loads-stores.rst: Document our
- various load and store APIs
+Subject: [Qemu-devel] [PULL 14/29] target/i386: introduce x86_ld*_code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,424 +34,841 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+These take care of advancing s->pc, and will provide a unified point
+where to check for the 15-byte instruction length limit.
 
-QEMU has a wide selection of different functions for doing
-loads and stores; provide some overview documentation of
-what they do and how to pick which one to use.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1507813181-11860-1-git-send-email-peter.maydell@linaro.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- docs/devel/loads-stores.rst | 396 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 396 insertions(+)
- create mode 100644 docs/devel/loads-stores.rst
+ target/i386/translate.c | 228 ++++++++++++++++++++++++++----------------------
+ 1 file changed, 125 insertions(+), 103 deletions(-)
 
-diff --git a/docs/devel/loads-stores.rst b/docs/devel/loads-stores.rst
-new file mode 100644
-index 0000000..6a990cc
---- /dev/null
-+++ b/docs/devel/loads-stores.rst
-@@ -0,0 +1,396 @@
-+..
-+   Copyright (c) 2017 Linaro Limited
-+   Written by Peter Maydell
-+
-+===================
-+Load and Store APIs
-+===================
-+
-+QEMU internally has multiple families of functions for performing
-+loads and stores. This document attempts to enumerate them all
-+and indicate when to use them. It does not provide detailed
-+documentation of each API -- for that you should look at the
-+documentation comments in the relevant header files.
-+
-+
-+``ld*_p and st*_p``
-+~~~~~~~~~~~~~~~~~~~
-+
-+These functions operate on a host pointer, and should be used
-+when you already have a pointer into host memory (corresponding
-+to guest ram or a local buffer). They deal with doing accesses
-+with the desired endianness and with correctly handling
-+potentially unaligned pointer values.
-+
-+Function names follow the pattern:
-+
-+load: ``ld{type}{sign}{size}_{endian}_p(ptr)``
-+
-+store: ``st{type}{size}_{endian}_p(ptr, val)``
-+
-+``type``
-+ - (empty) : integer access
-+ - ``f`` : float access
-+
-+``sign``
-+ - (empty) : for 32 or 64 bit sizes (including floats and doubles)
-+ - ``u`` : unsigned
-+ - ``s`` : signed
-+
-+``size``
-+ - ``b`` : 8 bits
-+ - ``w`` : 16 bits
-+ - ``l`` : 32 bits
-+ - ``q`` : 64 bits
-+
-+``endian``
-+ - ``he`` : host endian
-+ - ``be`` : big endian
-+ - ``le`` : little endian
-+
-+The ``_{endian}`` infix is omitted for target-endian accesses.
-+
-+The target endian accessors are only available to source
-+files which are built per-target.
-+
-+Regexes for git grep
-+ - ``\<ldf\?[us]\?[bwlq]\(_[hbl]e\)\?_p\>``
-+ - ``\<stf\?[bwlq]\(_[hbl]e\)\?_p\>``
-+
-+``cpu_{ld,st}_*``
-+~~~~~~~~~~~~~~~~~
-+
-+These functions operate on a guest virtual address. Be aware
-+that these functions may cause a guest CPU exception to be
-+taken (e.g. for an alignment fault or MMU fault) which will
-+result in guest CPU state being updated and control longjumping
-+out of the function call. They should therefore only be used
-+in code that is implementing emulation of the target CPU.
-+
-+These functions may throw an exception (longjmp() back out
-+to the top level TCG loop). This means they must only be used
-+from helper functions where the translator has saved all
-+necessary CPU state before generating the helper function call.
-+It's usually better to use the ``_ra`` variants described below
-+from helper functions, but these functions are the right choice
-+for calls made from hooks like the CPU do_interrupt hook or
-+when you know for certain that the translator had to save all
-+the CPU state that ``cpu_restore_state()`` would restore anyway.
-+
-+Function names follow the pattern:
-+
-+load: ``cpu_ld{sign}{size}_{mmusuffix}(env, ptr)``
-+
-+store: ``cpu_st{size}_{mmusuffix}(env, ptr, val)``
-+
-+``sign``
-+ - (empty) : for 32 or 64 bit sizes
-+ - ``u`` : unsigned
-+ - ``s`` : signed
-+
-+``size``
-+ - ``b`` : 8 bits
-+ - ``w`` : 16 bits
-+ - ``l`` : 32 bits
-+ - ``q`` : 64 bits
-+
-+``mmusuffix`` is one of the generic suffixes ``data`` or ``code``, or
-+(for softmmu configs) a target-specific MMU mode suffix as defined
-+in the target's ``cpu.h``.
-+
-+Regexes for git grep
-+ - ``\<cpu_ld[us]\?[bwlq]_[a-zA-Z0-9]\+\>``
-+ - ``\<cpu_st[bwlq]_[a-zA-Z0-9]\+\>``
-+
-+``cpu_{ld,st}_*_ra``
-+~~~~~~~~~~~~~~~~~~~~
-+
-+These functions work like the ``cpu_{ld,st}_*`` functions except
-+that they also take a ``retaddr`` argument. This extra argument
-+allows for correct unwinding of any exception that is taken,
-+and should generally be the result of GETPC() called directly
-+from the top level HELPER(foo) function (i.e. the return address
-+in the generated code).
-+
-+These are generally the preferred way to do accesses by guest
-+virtual address from helper functions; see the documentation
-+of the non-``_ra`` variants for when those would be better.
-+
-+Calling these functions with a ``retaddr`` argument of 0 is
-+equivalent to calling the non-``_ra`` version of the function.
-+
-+Function names follow the pattern:
-+
-+load: ``cpu_ld{sign}{size}_{mmusuffix}_ra(env, ptr, retaddr)``
-+
-+store: ``cpu_st{sign}{size}_{mmusuffix}_ra(env, ptr, val, retaddr)``
-+
-+Regexes for git grep
-+ - ``\<cpu_ld[us]\?[bwlq]_[a-zA-Z0-9]\+_ra\>``
-+ - ``\<cpu_st[bwlq]_[a-zA-Z0-9]\+_ra\>``
-+
-+``helper_*_{ld,st}*mmu``
-+~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+These functions are intended primarily to be called by the code
-+generated by the TCG backend. They may also be called by target
-+CPU helper function code. Like the ``cpu_{ld,st}_*_ra`` functions
-+they perform accesses by guest virtual address; the difference is
-+that these functions allow you to specify an ``opindex`` parameter
-+which encodes (among other things) the mmu index to use for the
-+access. This is necessary if your helper needs to make an access
-+via a specific mmu index (for instance, an "always as non-privileged"
-+access) rather than using the default mmu index for the current state
-+of the guest CPU.
-+
-+The ``opindex`` parameter should be created by calling ``make_memop_idx()``.
-+
-+The ``retaddr`` parameter should be the result of GETPC() called directly
-+from the top level HELPER(foo) function (or 0 if no guest CPU state
-+unwinding is required).
-+
-+**TODO** The names of these functions are a bit odd for historical
-+reasons because they were originally expected to be called only from
-+within generated code. We should rename them to bring them
-+more in line with the other memory access functions.
-+
-+load: ``helper_{endian}_ld{sign}{size}_mmu(env, addr, opindex, retaddr)``
-+
-+load (code): ``helper_{endian}_ld{sign}{size}_cmmu(env, addr, opindex, retaddr)``
-+
-+store: ``helper_{endian}_st{size}_mmu(env, addr, val, opindex, retaddr)``
-+
-+``sign``
-+ - (empty) : for 32 or 64 bit sizes
-+ - ``u`` : unsigned
-+ - ``s`` : signed
-+
-+``size``
-+ - ``b`` : 8 bits
-+ - ``w`` : 16 bits
-+ - ``l`` : 32 bits
-+ - ``q`` : 64 bits
-+
-+``endian``
-+ - ``le`` : little endian
-+ - ``be`` : big endian
-+ - ``ret`` : target endianness
-+
-+Regexes for git grep
-+ - ``\<helper_\(le\|be\|ret\)_ld[us]\?[bwlq]_c\?mmu\>``
-+ - ``\<helper_\(le\|be\|ret\)_st[bwlq]_mmu\>``
-+
-+``address_space_*``
-+~~~~~~~~~~~~~~~~~~~
-+
-+These functions are the primary ones to use when emulating CPU
-+or device memory accesses. They take an AddressSpace, which is the
-+way QEMU defines the view of memory that a device or CPU has.
-+(They generally correspond to being the "master" end of a hardware bus
-+or bus fabric.)
-+
-+Each CPU has an AddressSpace. Some kinds of CPU have more than
-+one AddressSpace (for instance ARM guest CPUs have an AddressSpace
-+for the Secure world and one for NonSecure if they implement TrustZone).
-+Devices which can do DMA-type operations should generally have an
-+AddressSpace. There is also a "system address space" which typically
-+has all the devices and memory that all CPUs can see. (Some older
-+device models use the "system address space" rather than properly
-+modelling that they have an AddressSpace of their own.)
-+
-+Functions are provided for doing byte-buffer reads and writes,
-+and also for doing one-data-item loads and stores.
-+
-+In all cases the caller provides a MemTxAttrs to specify bus
-+transaction attributes, and can check whether the memory transaction
-+succeeded using a MemTxResult return code.
-+
-+``address_space_read(address_space, addr, attrs, buf, len)``
-+
-+``address_space_write(address_space, addr, attrs, buf, len)``
-+
-+``address_space_rw(address_space, addr, attrs, buf, len, is_write)``
-+
-+``address_space_ld{sign}{size}_{endian}(address_space, addr, attrs, txresult)``
-+
-+``address_space_st{size}_{endian}(address_space, addr, val, attrs, txresult)``
-+
-+``sign``
-+ - (empty) : for 32 or 64 bit sizes
-+ - ``u`` : unsigned
-+
-+(No signed load operations are provided.)
-+
-+``size``
-+ - ``b`` : 8 bits
-+ - ``w`` : 16 bits
-+ - ``l`` : 32 bits
-+ - ``q`` : 64 bits
-+
-+``endian``
-+ - ``le`` : little endian
-+ - ``be`` : big endian
-+
-+The ``_{endian}`` suffix is omitted for byte accesses.
-+
-+Regexes for git grep
-+ - ``\<address_space_\(read\|write\|rw\)\>``
-+ - ``\<address_space_ldu\?[bwql]\(_[lb]e\)\?\>``
-+ - ``\<address_space_st[bwql]\(_[lb]e\)\?\>``
-+
-+``{ld,st}*_phys``
-+~~~~~~~~~~~~~~~~~
-+
-+These are functions which are identical to
-+``address_space_{ld,st}*``, except that they always pass
-+``MEMTXATTRS_UNSPECIFIED`` for the transaction attributes, and ignore
-+whether the transaction succeeded or failed.
-+
-+The fact that they ignore whether the transaction succeeded means
-+they should not be used in new code, unless you know for certain
-+that your code will only be used in a context where the CPU or
-+device doing the access has no way to report such an error.
-+
-+``load: ld{sign}{size}_{endian}_phys``
-+
-+``store: st{size}_{endian}_phys``
-+
-+``sign``
-+ - (empty) : for 32 or 64 bit sizes
-+ - ``u`` : unsigned
-+
-+(No signed load operations are provided.)
-+
-+``size``
-+ - ``b`` : 8 bits
-+ - ``w`` : 16 bits
-+ - ``l`` : 32 bits
-+ - ``q`` : 64 bits
-+
-+``endian``
-+ - ``le`` : little endian
-+ - ``be`` : big endian
-+
-+The ``_{endian}_`` infix is omitted for byte accesses.
-+
-+Regexes for git grep
-+ - ``\<ldu\?[bwlq]\(_[bl]e\)\?_phys\>``
-+ - ``\<st[bwlq]\(_[bl]e\)\?_phys\>``
-+
-+``cpu_physical_memory_*``
-+~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+These are convenience functions which are identical to
-+``address_space_*`` but operate specifically on the system address space,
-+always pass a ``MEMTXATTRS_UNSPECIFIED`` set of memory attributes and
-+ignore whether the memory transaction succeeded or failed.
-+For new code they are better avoided:
-+
-+* there is likely to be behaviour you need to model correctly for a
-+  failed read or write operation
-+* a device should usually perform operations on its own AddressSpace
-+  rather than using the system address space
-+
-+``cpu_physical_memory_read``
-+
-+``cpu_physical_memory_write``
-+
-+``cpu_physical_memory_rw``
-+
-+Regexes for git grep
-+ - ``\<cpu_physical_memory_\(read\|write\|rw\)\>``
-+
-+``cpu_physical_memory_write_rom``
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+This function performs a write by physical address like
-+``address_space_write``, except that if the write is to a ROM then
-+the ROM contents will be modified, even though a write by the guest
-+CPU to the ROM would be ignored.
-+
-+Note that unlike ``cpu_physical_memory_write()`` this function takes
-+an AddressSpace argument, but unlike ``address_space_write()`` this
-+function does not take a ``MemTxAttrs`` or return a ``MemTxResult``.
-+
-+**TODO**: we should probably clean up this inconsistency and
-+turn the function into ``address_space_write_rom`` with an API
-+matching ``address_space_write``.
-+
-+``cpu_physical_memory_write_rom``
-+
-+
-+``cpu_memory_rw_debug``
-+~~~~~~~~~~~~~~~~~~~~~~~
-+
-+Access CPU memory by virtual address for debug purposes.
-+
-+This function is intended for use by the GDB stub and similar code.
-+It takes a virtual address, converts it to a physical address via
-+an MMU lookup using the current settings of the specified CPU,
-+and then performs the access (using ``address_space_rw`` for
-+reads or ``cpu_physical_memory_write_rom`` for writes).
-+This means that if the access is a write to a ROM then this
-+function will modify the contents (whereas a normal guest CPU access
-+would ignore the write attempt).
-+
-+``cpu_memory_rw_debug``
-+
-+``dma_memory_*``
-+~~~~~~~~~~~~~~~~
-+
-+These behave like ``address_space_*``, except that they perform a DMA
-+barrier operation first.
-+
-+**TODO**: We should provide guidance on when you need the DMA
-+barrier operation and when it's OK to use ``address_space_*``, and
-+make sure our existing code is doing things correctly.
-+
-+``dma_memory_read``
-+
-+``dma_memory_write``
-+
-+``dma_memory_rw``
-+
-+Regexes for git grep
-+ - ``\<dma_memory_\(read\|write\|rw\)\>``
-+
-+``pci_dma_*`` and ``{ld,st}*_pci_dma``
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+These functions are specifically for PCI device models which need to
-+perform accesses where the PCI device is a bus master. You pass them a
-+``PCIDevice *`` and they will do ``dma_memory_*`` operations on the
-+correct address space for that device.
-+
-+``pci_dma_read``
-+
-+``pci_dma_write``
-+
-+``pci_dma_rw``
-+
-+``load: ld{sign}{size}_{endian}_pci_dma``
-+
-+``store: st{size}_{endian}_pci_dma``
-+
-+``sign``
-+ - (empty) : for 32 or 64 bit sizes
-+ - ``u`` : unsigned
-+
-+(No signed load operations are provided.)
-+
-+``size``
-+ - ``b`` : 8 bits
-+ - ``w`` : 16 bits
-+ - ``l`` : 32 bits
-+ - ``q`` : 64 bits
-+
-+``endian``
-+ - ``le`` : little endian
-+ - ``be`` : big endian
-+
-+The ``_{endian}_`` infix is omitted for byte accesses.
-+
-+Regexes for git grep
-+ - ``\<pci_dma_\(read\|write\|rw\)\>``
-+ - ``\<ldu\?[bwlq]\(_[bl]e\)\?_pci_dma\>``
-+ - ``\<st[bwlq]\(_[bl]e\)\?_pci_dma\>``
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 5d61fa9..4a938c2 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -1863,6 +1863,41 @@ static void gen_shifti(DisasContext *s1, int op, TCGMemOp ot, int d, int c)
+     }
+ }
+ 
++static uint64_t advance_pc(CPUX86State *env, DisasContext *s, int num_bytes)
++{
++    uint64_t pc = s->pc;
++
++    s->pc += num_bytes;
++    return pc;
++}
++
++static inline uint8_t x86_ldub_code(CPUX86State *env, DisasContext *s)
++{
++    return cpu_ldub_code(env, advance_pc(env, s, 1));
++}
++
++static inline int16_t x86_ldsw_code(CPUX86State *env, DisasContext *s)
++{
++    return cpu_ldsw_code(env, advance_pc(env, s, 2));
++}
++
++static inline uint16_t x86_lduw_code(CPUX86State *env, DisasContext *s)
++{
++    return cpu_lduw_code(env, advance_pc(env, s, 2));
++}
++
++static inline uint32_t x86_ldl_code(CPUX86State *env, DisasContext *s)
++{
++    return cpu_ldl_code(env, advance_pc(env, s, 4));
++}
++
++#ifdef TARGET_X86_64
++static inline uint64_t x86_ldq_code(CPUX86State *env, DisasContext *s)
++{
++    return cpu_ldq_code(env, advance_pc(env, s, 8));
++}
++#endif
++
+ /* Decompose an address.  */
+ 
+ typedef struct AddressParts {
+@@ -1900,7 +1935,7 @@ static AddressParts gen_lea_modrm_0(CPUX86State *env, DisasContext *s,
+     case MO_32:
+         havesib = 0;
+         if (rm == 4) {
+-            int code = cpu_ldub_code(env, s->pc++);
++            int code = x86_ldub_code(env, s);
+             scale = (code >> 6) & 3;
+             index = ((code >> 3) & 7) | REX_X(s);
+             if (index == 4) {
+@@ -1914,8 +1949,7 @@ static AddressParts gen_lea_modrm_0(CPUX86State *env, DisasContext *s,
+         case 0:
+             if ((base & 7) == 5) {
+                 base = -1;
+-                disp = (int32_t)cpu_ldl_code(env, s->pc);
+-                s->pc += 4;
++                disp = (int32_t)x86_ldl_code(env, s);
+                 if (CODE64(s) && !havesib) {
+                     base = -2;
+                     disp += s->pc + s->rip_offset;
+@@ -1923,12 +1957,11 @@ static AddressParts gen_lea_modrm_0(CPUX86State *env, DisasContext *s,
+             }
+             break;
+         case 1:
+-            disp = (int8_t)cpu_ldub_code(env, s->pc++);
++            disp = (int8_t)x86_ldub_code(env, s);
+             break;
+         default:
+         case 2:
+-            disp = (int32_t)cpu_ldl_code(env, s->pc);
+-            s->pc += 4;
++            disp = (int32_t)x86_ldl_code(env, s);
+             break;
+         }
+ 
+@@ -1945,15 +1978,13 @@ static AddressParts gen_lea_modrm_0(CPUX86State *env, DisasContext *s,
+         if (mod == 0) {
+             if (rm == 6) {
+                 base = -1;
+-                disp = cpu_lduw_code(env, s->pc);
+-                s->pc += 2;
++                disp = x86_lduw_code(env, s);
+                 break;
+             }
+         } else if (mod == 1) {
+-            disp = (int8_t)cpu_ldub_code(env, s->pc++);
++            disp = (int8_t)x86_ldub_code(env, s);
+         } else {
+-            disp = (int16_t)cpu_lduw_code(env, s->pc);
+-            s->pc += 2;
++            disp = (int16_t)x86_lduw_code(env, s);
+         }
+ 
+         switch (rm) {
+@@ -2103,19 +2134,16 @@ static inline uint32_t insn_get(CPUX86State *env, DisasContext *s, TCGMemOp ot)
+ 
+     switch (ot) {
+     case MO_8:
+-        ret = cpu_ldub_code(env, s->pc);
+-        s->pc++;
++        ret = x86_ldub_code(env, s);
+         break;
+     case MO_16:
+-        ret = cpu_lduw_code(env, s->pc);
+-        s->pc += 2;
++        ret = x86_lduw_code(env, s);
+         break;
+     case MO_32:
+ #ifdef TARGET_X86_64
+     case MO_64:
+ #endif
+-        ret = cpu_ldl_code(env, s->pc);
+-        s->pc += 4;
++        ret = x86_ldl_code(env, s);
+         break;
+     default:
+         tcg_abort();
+@@ -3041,7 +3069,7 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+         gen_helper_enter_mmx(cpu_env);
+     }
+ 
+-    modrm = cpu_ldub_code(env, s->pc++);
++    modrm = x86_ldub_code(env, s);
+     reg = ((modrm >> 3) & 7);
+     if (is_xmm)
+         reg |= rex_r;
+@@ -3250,8 +3278,8 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+ 
+                 if (b1 == 1 && reg != 0)
+                     goto illegal_op;
+-                field_length = cpu_ldub_code(env, s->pc++) & 0x3F;
+-                bit_index = cpu_ldub_code(env, s->pc++) & 0x3F;
++                field_length = x86_ldub_code(env, s) & 0x3F;
++                bit_index = x86_ldub_code(env, s) & 0x3F;
+                 tcg_gen_addi_ptr(cpu_ptr0, cpu_env,
+                     offsetof(CPUX86State,xmm_regs[reg]));
+                 if (b1 == 1)
+@@ -3380,7 +3408,7 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+             if (b1 >= 2) {
+ 	        goto unknown_op;
+             }
+-            val = cpu_ldub_code(env, s->pc++);
++            val = x86_ldub_code(env, s);
+             if (is_xmm) {
+                 tcg_gen_movi_tl(cpu_T0, val);
+                 tcg_gen_st32_tl(cpu_T0, cpu_env, offsetof(CPUX86State,xmm_t0.ZMM_L(0)));
+@@ -3537,7 +3565,7 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+         case 0x1c4:
+             s->rip_offset = 1;
+             gen_ldst_modrm(env, s, modrm, MO_16, OR_TMP0, 0);
+-            val = cpu_ldub_code(env, s->pc++);
++            val = x86_ldub_code(env, s);
+             if (b1) {
+                 val &= 7;
+                 tcg_gen_st16_tl(cpu_T0, cpu_env,
+@@ -3553,7 +3581,7 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+             if (mod != 3)
+                 goto illegal_op;
+             ot = mo_64_32(s->dflag);
+-            val = cpu_ldub_code(env, s->pc++);
++            val = x86_ldub_code(env, s);
+             if (b1) {
+                 val &= 7;
+                 rm = (modrm & 7) | REX_B(s);
+@@ -3616,7 +3644,7 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+             if ((b & 0xf0) == 0xf0) {
+                 goto do_0f_38_fx;
+             }
+-            modrm = cpu_ldub_code(env, s->pc++);
++            modrm = x86_ldub_code(env, s);
+             rm = modrm & 7;
+             reg = ((modrm >> 3) & 7) | rex_r;
+             mod = (modrm >> 6) & 3;
+@@ -3693,7 +3721,7 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+         do_0f_38_fx:
+             /* Various integer extensions at 0f 38 f[0-f].  */
+             b = modrm | (b1 << 8);
+-            modrm = cpu_ldub_code(env, s->pc++);
++            modrm = x86_ldub_code(env, s);
+             reg = ((modrm >> 3) & 7) | rex_r;
+ 
+             switch (b) {
+@@ -4054,7 +4082,7 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+         case 0x03a:
+         case 0x13a:
+             b = modrm;
+-            modrm = cpu_ldub_code(env, s->pc++);
++            modrm = x86_ldub_code(env, s);
+             rm = modrm & 7;
+             reg = ((modrm >> 3) & 7) | rex_r;
+             mod = (modrm >> 6) & 3;
+@@ -4077,7 +4105,7 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+                 if (mod != 3)
+                     gen_lea_modrm(env, s, modrm);
+                 reg = ((modrm >> 3) & 7) | rex_r;
+-                val = cpu_ldub_code(env, s->pc++);
++                val = x86_ldub_code(env, s);
+                 switch (b) {
+                 case 0x14: /* pextrb */
+                     tcg_gen_ld8u_tl(cpu_T0, cpu_env, offsetof(CPUX86State,
+@@ -4225,7 +4253,7 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+                     gen_ldq_env_A0(s, op2_offset);
+                 }
+             }
+-            val = cpu_ldub_code(env, s->pc++);
++            val = x86_ldub_code(env, s);
+ 
+             if ((b & 0xfc) == 0x60) { /* pcmpXstrX */
+                 set_cc_op(s, CC_OP_EFLAGS);
+@@ -4244,7 +4272,7 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+         case 0x33a:
+             /* Various integer extensions at 0f 3a f[0-f].  */
+             b = modrm | (b1 << 8);
+-            modrm = cpu_ldub_code(env, s->pc++);
++            modrm = x86_ldub_code(env, s);
+             reg = ((modrm >> 3) & 7) | rex_r;
+ 
+             switch (b) {
+@@ -4256,7 +4284,7 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+                 }
+                 ot = mo_64_32(s->dflag);
+                 gen_ldst_modrm(env, s, modrm, ot, OR_TMP0, 0);
+-                b = cpu_ldub_code(env, s->pc++);
++                b = x86_ldub_code(env, s);
+                 if (ot == MO_64) {
+                     tcg_gen_rotri_tl(cpu_T0, cpu_T0, b & 63);
+                 } else {
+@@ -4351,7 +4379,7 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+         }
+         switch(b) {
+         case 0x0f: /* 3DNow! data insns */
+-            val = cpu_ldub_code(env, s->pc++);
++            val = x86_ldub_code(env, s);
+             sse_fn_epp = sse_op_table5[val];
+             if (!sse_fn_epp) {
+                 goto unknown_op;
+@@ -4365,7 +4393,7 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+             break;
+         case 0x70: /* pshufx insn */
+         case 0xc6: /* pshufx insn */
+-            val = cpu_ldub_code(env, s->pc++);
++            val = x86_ldub_code(env, s);
+             tcg_gen_addi_ptr(cpu_ptr0, cpu_env, op1_offset);
+             tcg_gen_addi_ptr(cpu_ptr1, cpu_env, op2_offset);
+             /* XXX: introduce a new table? */
+@@ -4374,7 +4402,7 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+             break;
+         case 0xc2:
+             /* compare insns */
+-            val = cpu_ldub_code(env, s->pc++);
++            val = x86_ldub_code(env, s);
+             if (val >= 8)
+                 goto unknown_op;
+             sse_fn_epp = sse_op_table4[val][b1];
+@@ -4443,8 +4471,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+     if (s->pc - pc_start > 14) {
+         goto illegal_op;
+     }
+-    b = cpu_ldub_code(env, s->pc);
+-    s->pc++;
++    b = x86_ldub_code(env, s);
+     /* Collect prefixes.  */
+     switch (b) {
+     case 0xf3:
+@@ -4501,7 +4528,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+             static const int pp_prefix[4] = {
+                 0, PREFIX_DATA, PREFIX_REPZ, PREFIX_REPNZ
+             };
+-            int vex3, vex2 = cpu_ldub_code(env, s->pc);
++            int vex3, vex2 = x86_ldub_code(env, s);
+ 
+             if (!CODE64(s) && (vex2 & 0xc0) != 0xc0) {
+                 /* 4.1.4.6: In 32-bit mode, bits [7:6] must be 11b,
+@@ -4523,17 +4550,17 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+             rex_r = (~vex2 >> 4) & 8;
+             if (b == 0xc5) {
+                 vex3 = vex2;
+-                b = cpu_ldub_code(env, s->pc++);
++                b = x86_ldub_code(env, s);
+             } else {
+ #ifdef TARGET_X86_64
+                 s->rex_x = (~vex2 >> 3) & 8;
+                 s->rex_b = (~vex2 >> 2) & 8;
+ #endif
+-                vex3 = cpu_ldub_code(env, s->pc++);
++                vex3 = x86_ldub_code(env, s);
+                 rex_w = (vex3 >> 7) & 1;
+                 switch (vex2 & 0x1f) {
+                 case 0x01: /* Implied 0f leading opcode bytes.  */
+-                    b = cpu_ldub_code(env, s->pc++) | 0x100;
++                    b = x86_ldub_code(env, s) | 0x100;
+                     break;
+                 case 0x02: /* Implied 0f 38 leading opcode bytes.  */
+                     b = 0x138;
+@@ -4585,7 +4612,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+     case 0x0f:
+         /**************************/
+         /* extended op code */
+-        b = cpu_ldub_code(env, s->pc++) | 0x100;
++        b = x86_ldub_code(env, s) | 0x100;
+         goto reswitch;
+ 
+         /**************************/
+@@ -4607,7 +4634,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+ 
+             switch(f) {
+             case 0: /* OP Ev, Gv */
+-                modrm = cpu_ldub_code(env, s->pc++);
++                modrm = x86_ldub_code(env, s);
+                 reg = ((modrm >> 3) & 7) | rex_r;
+                 mod = (modrm >> 6) & 3;
+                 rm = (modrm & 7) | REX_B(s);
+@@ -4628,7 +4655,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+                 gen_op(s, op, ot, opreg);
+                 break;
+             case 1: /* OP Gv, Ev */
+-                modrm = cpu_ldub_code(env, s->pc++);
++                modrm = x86_ldub_code(env, s);
+                 mod = (modrm >> 6) & 3;
+                 reg = ((modrm >> 3) & 7) | rex_r;
+                 rm = (modrm & 7) | REX_B(s);
+@@ -4662,7 +4689,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+ 
+             ot = mo_b_d(b, dflag);
+ 
+-            modrm = cpu_ldub_code(env, s->pc++);
++            modrm = x86_ldub_code(env, s);
+             mod = (modrm >> 6) & 3;
+             rm = (modrm & 7) | REX_B(s);
+             op = (modrm >> 3) & 7;
+@@ -4708,7 +4735,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+     case 0xf7:
+         ot = mo_b_d(b, dflag);
+ 
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         mod = (modrm >> 6) & 3;
+         rm = (modrm & 7) | REX_B(s);
+         op = (modrm >> 3) & 7;
+@@ -4940,7 +4967,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+     case 0xff: /* GRP5 */
+         ot = mo_b_d(b, dflag);
+ 
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         mod = (modrm >> 6) & 3;
+         rm = (modrm & 7) | REX_B(s);
+         op = (modrm >> 3) & 7;
+@@ -5048,7 +5075,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+     case 0x85:
+         ot = mo_b_d(b, dflag);
+ 
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         reg = ((modrm >> 3) & 7) | rex_r;
+ 
+         gen_ldst_modrm(env, s, modrm, ot, OR_TMP0, 0);
+@@ -5120,7 +5147,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+     case 0x69: /* imul Gv, Ev, I */
+     case 0x6b:
+         ot = dflag;
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         reg = ((modrm >> 3) & 7) | rex_r;
+         if (b == 0x69)
+             s->rip_offset = insn_const_size(ot);
+@@ -5172,7 +5199,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+     case 0x1c0:
+     case 0x1c1: /* xadd Ev, Gv */
+         ot = mo_b_d(b, dflag);
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         reg = ((modrm >> 3) & 7) | rex_r;
+         mod = (modrm >> 6) & 3;
+         gen_op_mov_v_reg(ot, cpu_T0, reg);
+@@ -5204,7 +5231,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+             TCGv oldv, newv, cmpv;
+ 
+             ot = mo_b_d(b, dflag);
+-            modrm = cpu_ldub_code(env, s->pc++);
++            modrm = x86_ldub_code(env, s);
+             reg = ((modrm >> 3) & 7) | rex_r;
+             mod = (modrm >> 6) & 3;
+             oldv = tcg_temp_new();
+@@ -5256,7 +5283,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         }
+         break;
+     case 0x1c7: /* cmpxchg8b */
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         mod = (modrm >> 6) & 3;
+         if ((mod == 3) || ((modrm & 0x38) != 0x8))
+             goto illegal_op;
+@@ -5318,7 +5345,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         gen_push_v(s, cpu_T0);
+         break;
+     case 0x8f: /* pop Ev */
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         mod = (modrm >> 6) & 3;
+         ot = gen_pop_T0(s);
+         if (mod == 3) {
+@@ -5337,9 +5364,8 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+     case 0xc8: /* enter */
+         {
+             int level;
+-            val = cpu_lduw_code(env, s->pc);
+-            s->pc += 2;
+-            level = cpu_ldub_code(env, s->pc++);
++            val = x86_lduw_code(env, s);
++            level = x86_ldub_code(env, s);
+             gen_enter(s, val, level);
+         }
+         break;
+@@ -5396,7 +5422,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+     case 0x88:
+     case 0x89: /* mov Gv, Ev */
+         ot = mo_b_d(b, dflag);
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         reg = ((modrm >> 3) & 7) | rex_r;
+ 
+         /* generate a generic store */
+@@ -5405,7 +5431,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+     case 0xc6:
+     case 0xc7: /* mov Ev, Iv */
+         ot = mo_b_d(b, dflag);
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         mod = (modrm >> 6) & 3;
+         if (mod != 3) {
+             s->rip_offset = insn_const_size(ot);
+@@ -5422,14 +5448,14 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+     case 0x8a:
+     case 0x8b: /* mov Ev, Gv */
+         ot = mo_b_d(b, dflag);
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         reg = ((modrm >> 3) & 7) | rex_r;
+ 
+         gen_ldst_modrm(env, s, modrm, ot, OR_TMP0, 0);
+         gen_op_mov_reg_v(ot, reg, cpu_T0);
+         break;
+     case 0x8e: /* mov seg, Gv */
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         reg = (modrm >> 3) & 7;
+         if (reg >= 6 || reg == R_CS)
+             goto illegal_op;
+@@ -5447,7 +5473,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         }
+         break;
+     case 0x8c: /* mov Gv, seg */
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         reg = (modrm >> 3) & 7;
+         mod = (modrm >> 6) & 3;
+         if (reg >= 6)
+@@ -5472,7 +5498,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+             /* s_ot is the sign+size of source */
+             s_ot = b & 8 ? MO_SIGN | ot : ot;
+ 
+-            modrm = cpu_ldub_code(env, s->pc++);
++            modrm = x86_ldub_code(env, s);
+             reg = ((modrm >> 3) & 7) | rex_r;
+             mod = (modrm >> 6) & 3;
+             rm = (modrm & 7) | REX_B(s);
+@@ -5508,7 +5534,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         break;
+ 
+     case 0x8d: /* lea */
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         mod = (modrm >> 6) & 3;
+         if (mod == 3)
+             goto illegal_op;
+@@ -5532,8 +5558,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+             switch (s->aflag) {
+ #ifdef TARGET_X86_64
+             case MO_64:
+-                offset_addr = cpu_ldq_code(env, s->pc);
+-                s->pc += 8;
++                offset_addr = x86_ldq_code(env, s);
+                 break;
+ #endif
+             default:
+@@ -5570,8 +5595,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         if (dflag == MO_64) {
+             uint64_t tmp;
+             /* 64 bit case */
+-            tmp = cpu_ldq_code(env, s->pc);
+-            s->pc += 8;
++            tmp = x86_ldq_code(env, s);
+             reg = (b & 7) | REX_B(s);
+             tcg_gen_movi_tl(cpu_T0, tmp);
+             gen_op_mov_reg_v(MO_64, reg, cpu_T0);
+@@ -5595,7 +5619,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+     case 0x86:
+     case 0x87: /* xchg Ev, Gv */
+         ot = mo_b_d(b, dflag);
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         reg = ((modrm >> 3) & 7) | rex_r;
+         mod = (modrm >> 6) & 3;
+         if (mod == 3) {
+@@ -5632,7 +5656,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         op = R_GS;
+     do_lxx:
+         ot = dflag != MO_16 ? MO_32 : MO_16;
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         reg = ((modrm >> 3) & 7) | rex_r;
+         mod = (modrm >> 6) & 3;
+         if (mod == 3)
+@@ -5660,7 +5684,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+     grp2:
+         {
+             ot = mo_b_d(b, dflag);
+-            modrm = cpu_ldub_code(env, s->pc++);
++            modrm = x86_ldub_code(env, s);
+             mod = (modrm >> 6) & 3;
+             op = (modrm >> 3) & 7;
+ 
+@@ -5679,7 +5703,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+                 gen_shift(s, op, ot, opreg, OR_ECX);
+             } else {
+                 if (shift == 2) {
+-                    shift = cpu_ldub_code(env, s->pc++);
++                    shift = x86_ldub_code(env, s);
+                 }
+                 gen_shifti(s, op, ot, opreg, shift);
+             }
+@@ -5713,7 +5737,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         shift = 0;
+     do_shiftd:
+         ot = dflag;
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         mod = (modrm >> 6) & 3;
+         rm = (modrm & 7) | REX_B(s);
+         reg = ((modrm >> 3) & 7) | rex_r;
+@@ -5726,7 +5750,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         gen_op_mov_v_reg(ot, cpu_T1, reg);
+ 
+         if (shift) {
+-            TCGv imm = tcg_const_tl(cpu_ldub_code(env, s->pc++));
++            TCGv imm = tcg_const_tl(x86_ldub_code(env, s));
+             gen_shiftd_rm_T1(s, ot, opreg, op, imm);
+             tcg_temp_free(imm);
+         } else {
+@@ -5743,7 +5767,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+             gen_exception(s, EXCP07_PREX, pc_start - s->cs_base);
+             break;
+         }
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         mod = (modrm >> 6) & 3;
+         rm = modrm & 7;
+         op = ((b & 7) << 3) | ((modrm >> 3) & 7);
+@@ -6328,7 +6352,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+     case 0xe4:
+     case 0xe5:
+         ot = mo_b_d32(b, dflag);
+-        val = cpu_ldub_code(env, s->pc++);
++        val = x86_ldub_code(env, s);
+         tcg_gen_movi_tl(cpu_T0, val);
+         gen_check_io(s, ot, pc_start - s->cs_base,
+                      SVM_IOIO_TYPE_MASK | svm_is_rep(prefixes));
+@@ -6347,7 +6371,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+     case 0xe6:
+     case 0xe7:
+         ot = mo_b_d32(b, dflag);
+-        val = cpu_ldub_code(env, s->pc++);
++        val = x86_ldub_code(env, s);
+         tcg_gen_movi_tl(cpu_T0, val);
+         gen_check_io(s, ot, pc_start - s->cs_base,
+                      svm_is_rep(prefixes));
+@@ -6407,8 +6431,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         /************************/
+         /* control */
+     case 0xc2: /* ret im */
+-        val = cpu_ldsw_code(env, s->pc);
+-        s->pc += 2;
++        val = x86_ldsw_code(env, s);
+         ot = gen_pop_T0(s);
+         gen_stack_update(s, val + (1 << ot));
+         /* Note that gen_pop_T0 uses a zero-extending load.  */
+@@ -6425,8 +6448,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         gen_jr(s, cpu_T0);
+         break;
+     case 0xca: /* lret im */
+-        val = cpu_ldsw_code(env, s->pc);
+-        s->pc += 2;
++        val = x86_ldsw_code(env, s);
+     do_lret:
+         if (s->pe && !s->vm86) {
+             gen_update_cc_op(s);
+@@ -6563,7 +6585,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         break;
+ 
+     case 0x190 ... 0x19f: /* setcc Gv */
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         gen_setcc1(s, b, cpu_T0);
+         gen_ldst_modrm(env, s, modrm, MO_8, OR_TMP0, 1);
+         break;
+@@ -6572,7 +6594,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+             goto illegal_op;
+         }
+         ot = dflag;
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         reg = ((modrm >> 3) & 7) | rex_r;
+         gen_cmovcc1(env, s, ot, b, modrm, reg);
+         break;
+@@ -6689,7 +6711,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         /* bit operations */
+     case 0x1ba: /* bt/bts/btr/btc Gv, im */
+         ot = dflag;
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         op = (modrm >> 3) & 7;
+         mod = (modrm >> 6) & 3;
+         rm = (modrm & 7) | REX_B(s);
+@@ -6703,7 +6725,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+             gen_op_mov_v_reg(ot, cpu_T0, rm);
+         }
+         /* load shift */
+-        val = cpu_ldub_code(env, s->pc++);
++        val = x86_ldub_code(env, s);
+         tcg_gen_movi_tl(cpu_T1, val);
+         if (op < 4)
+             goto unknown_op;
+@@ -6722,7 +6744,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         op = 3;
+     do_btx:
+         ot = dflag;
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         reg = ((modrm >> 3) & 7) | rex_r;
+         mod = (modrm >> 6) & 3;
+         rm = (modrm & 7) | REX_B(s);
+@@ -6827,7 +6849,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+     case 0x1bc: /* bsf / tzcnt */
+     case 0x1bd: /* bsr / lzcnt */
+         ot = dflag;
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         reg = ((modrm >> 3) & 7) | rex_r;
+         gen_ldst_modrm(env, s, modrm, ot, OR_TMP0, 0);
+         gen_extu(ot, cpu_T0);
+@@ -6907,7 +6929,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+     case 0xd4: /* aam */
+         if (CODE64(s))
+             goto illegal_op;
+-        val = cpu_ldub_code(env, s->pc++);
++        val = x86_ldub_code(env, s);
+         if (val == 0) {
+             gen_exception(s, EXCP00_DIVZ, pc_start - s->cs_base);
+         } else {
+@@ -6918,7 +6940,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+     case 0xd5: /* aad */
+         if (CODE64(s))
+             goto illegal_op;
+-        val = cpu_ldub_code(env, s->pc++);
++        val = x86_ldub_code(env, s);
+         gen_helper_aad(cpu_env, tcg_const_i32(val));
+         set_cc_op(s, CC_OP_LOGICB);
+         break;
+@@ -6952,7 +6974,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         gen_interrupt(s, EXCP03_INT3, pc_start - s->cs_base, s->pc - s->cs_base);
+         break;
+     case 0xcd: /* int N */
+-        val = cpu_ldub_code(env, s->pc++);
++        val = x86_ldub_code(env, s);
+         if (s->vm86 && s->iopl != 3) {
+             gen_exception(s, EXCP0D_GPF, pc_start - s->cs_base);
+         } else {
+@@ -7007,7 +7029,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         if (CODE64(s))
+             goto illegal_op;
+         ot = dflag;
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         reg = (modrm >> 3) & 7;
+         mod = (modrm >> 6) & 3;
+         if (mod == 3)
+@@ -7186,7 +7208,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         }
+         break;
+     case 0x100:
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         mod = (modrm >> 6) & 3;
+         op = (modrm >> 3) & 7;
+         switch(op) {
+@@ -7251,7 +7273,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         break;
+ 
+     case 0x101:
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         switch (modrm) {
+         CASE_MODRM_MEM_OP(0): /* sgdt */
+             gen_svm_check_intercept(s, pc_start, SVM_EXIT_GDTR_READ);
+@@ -7596,7 +7618,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+             /* d_ot is the size of destination */
+             d_ot = dflag;
+ 
+-            modrm = cpu_ldub_code(env, s->pc++);
++            modrm = x86_ldub_code(env, s);
+             reg = ((modrm >> 3) & 7) | rex_r;
+             mod = (modrm >> 6) & 3;
+             rm = (modrm & 7) | REX_B(s);
+@@ -7625,7 +7647,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+             t1 = tcg_temp_local_new();
+             t2 = tcg_temp_local_new();
+             ot = MO_16;
+-            modrm = cpu_ldub_code(env, s->pc++);
++            modrm = x86_ldub_code(env, s);
+             reg = (modrm >> 3) & 7;
+             mod = (modrm >> 6) & 3;
+             rm = modrm & 7;
+@@ -7670,7 +7692,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+             if (!s->pe || s->vm86)
+                 goto illegal_op;
+             ot = dflag != MO_16 ? MO_32 : MO_16;
+-            modrm = cpu_ldub_code(env, s->pc++);
++            modrm = x86_ldub_code(env, s);
+             reg = ((modrm >> 3) & 7) | rex_r;
+             gen_ldst_modrm(env, s, modrm, MO_16, OR_TMP0, 0);
+             t0 = tcg_temp_local_new();
+@@ -7690,7 +7712,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         }
+         break;
+     case 0x118:
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         mod = (modrm >> 6) & 3;
+         op = (modrm >> 3) & 7;
+         switch(op) {
+@@ -7709,7 +7731,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         }
+         break;
+     case 0x11a:
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         if (s->flags & HF_MPX_EN_MASK) {
+             mod = (modrm >> 6) & 3;
+             reg = ((modrm >> 3) & 7) | rex_r;
+@@ -7799,7 +7821,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         gen_nop_modrm(env, s, modrm);
+         break;
+     case 0x11b:
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         if (s->flags & HF_MPX_EN_MASK) {
+             mod = (modrm >> 6) & 3;
+             reg = ((modrm >> 3) & 7) | rex_r;
+@@ -7901,7 +7923,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         gen_nop_modrm(env, s, modrm);
+         break;
+     case 0x119: case 0x11c ... 0x11f: /* nop (multi byte) */
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         gen_nop_modrm(env, s, modrm);
+         break;
+     case 0x120: /* mov reg, crN */
+@@ -7909,7 +7931,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         if (s->cpl != 0) {
+             gen_exception(s, EXCP0D_GPF, pc_start - s->cs_base);
+         } else {
+-            modrm = cpu_ldub_code(env, s->pc++);
++            modrm = x86_ldub_code(env, s);
+             /* Ignore the mod bits (assume (modrm&0xc0)==0xc0).
+              * AMD documentation (24594.pdf) and testing of
+              * intel 386 and 486 processors all show that the mod bits
+@@ -7966,7 +7988,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         if (s->cpl != 0) {
+             gen_exception(s, EXCP0D_GPF, pc_start - s->cs_base);
+         } else {
+-            modrm = cpu_ldub_code(env, s->pc++);
++            modrm = x86_ldub_code(env, s);
+             /* Ignore the mod bits (assume (modrm&0xc0)==0xc0).
+              * AMD documentation (24594.pdf) and testing of
+              * intel 386 and 486 processors all show that the mod bits
+@@ -8012,7 +8034,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         if (!(s->cpuid_features & CPUID_SSE2))
+             goto illegal_op;
+         ot = mo_64_32(dflag);
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         mod = (modrm >> 6) & 3;
+         if (mod == 3)
+             goto illegal_op;
+@@ -8021,7 +8043,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         gen_ldst_modrm(env, s, modrm, ot, reg, 1);
+         break;
+     case 0x1ae:
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         switch (modrm) {
+         CASE_MODRM_MEM_OP(0): /* fxsave */
+             if (!(s->cpuid_features & CPUID_FXSR)
+@@ -8219,7 +8241,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         break;
+ 
+     case 0x10d: /* 3DNow! prefetch(w) */
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         mod = (modrm >> 6) & 3;
+         if (mod == 3)
+             goto illegal_op;
+@@ -8241,7 +8263,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+         if (!(s->cpuid_ext_features & CPUID_EXT_POPCNT))
+             goto illegal_op;
+ 
+-        modrm = cpu_ldub_code(env, s->pc++);
++        modrm = x86_ldub_code(env, s);
+         reg = ((modrm >> 3) & 7) | rex_r;
+ 
+         if (s->prefix & PREFIX_DATA) {
 -- 
 1.8.3.1
