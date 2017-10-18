@@ -1,46 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4mLv-0006dY-0j
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:17:42 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1e4mPz-0007Xy-TI
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:21:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1e4mLr-00055k-Mb
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:17:35 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33046
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1e4mLr-000556-GZ
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:17:31 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v9IBE65E021163
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 07:17:28 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2dp1agnwsw-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 18 Oct 2017 07:17:27 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 18 Oct 2017 12:17:26 +0100
-References: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
-	<20171017140453.51099-4-pasic@linux.vnet.ibm.com>
-	<0a29771b-da12-76eb-ead8-34d1a8d24ce7@redhat.com>
-	<20171018115219.2dafd05c.cohuck@redhat.com>
-	<efc6c522-e359-0f10-2ddc-6a434da4557a@redhat.com>
-	<9dd53d1b-9242-d0bc-5e0f-3c0997eb5988@linux.vnet.ibm.com>
-	<8bc221e3-3fa5-ce36-0ce2-6c6cef586a32@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 18 Oct 2017 13:17:24 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1e4mPw-0008Fe-Ij
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:21:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40860)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1e4mPw-0008FQ-8l
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 07:21:44 -0400
+Date: Wed, 18 Oct 2017 12:21:37 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20171018112136.GA3225@work-vm>
+References: <1507202170-22619-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20171005111623eucas1p272597c60842087cac3ade92b88212eff@eucas1p2.samsung.com>
+	<1507202170-22619-3-git-send-email-a.perevalov@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <8bc221e3-3fa5-ce36-0ce2-6c6cef586a32@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <c57830f0-c7ab-33ef-63a6-eaaef40fa5ca@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/7] s390x: improve error handling for
- SSCH and RSCH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1507202170-22619-3-git-send-email-a.perevalov@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH v11 2/6] migration: add postcopy blocktime
+ ctx into MigrationIncomingState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,87 +29,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, i.maximets@samsung.com, heetae82.ahn@samsung.com
 
-
-
-On 10/18/2017 01:12 PM, Thomas Huth wrote:
-> On 18.10.2017 13:07, Halil Pasic wrote:
->>
->>
->> On 10/18/2017 12:07 PM, Thomas Huth wrote:
->>> On 18.10.2017 11:52, Cornelia Huck wrote:
->>>> On Wed, 18 Oct 2017 11:30:47 +0200
->>>> Thomas Huth <thuth@redhat.com> wrote:
->>>>
->>>>> On 17.10.2017 16:04, Halil Pasic wrote:
->>>>>> Simplify the error handling of the SSCH and RSCH handler avoiding
->>>>>> arbitrary and cryptic error codes being used to tell how the instruction
->>>>>> is supposed to end.  Let the code detecting the condition tell how it's
->>>>>> to be handled in a less ambiguous way.  It's best to handle SSCH and RSCH
->>>>>> in one go as the emulation of the two shares a lot of code.
->>>>>>
->>>>>> For passthrough this change isn't pure refactoring, but changes the way
->>>>>> kernel reported EFAULT is handled. After clarifying the kernel interface
->>>>>> we decided that EFAULT shall be mapped to unit exception.  Same goes for
->>>>>> unexpected error codes and absence of required ORB flags.
->>>>>>
->>>>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> [...]
->>>>>> @@ -1844,27 +1816,23 @@ void css_do_schm(uint8_t mbk, int update, int dct, uint64_t mbo)
->>>>>>      }
->>>>>>  }
->>>>>>  
->>>>>> -int css_do_rsch(SubchDev *sch)
->>>>>> +IOInstEnding css_do_rsch(SubchDev *sch)
->>>>>>  {
->>>>>>      SCSW *s = &sch->curr_status.scsw;
->>>>>>      PMCW *p = &sch->curr_status.pmcw;
->>>>>> -    int ret;
->>>>>>  
->>>>>>      if (~(p->flags) & (PMCW_FLAGS_MASK_DNV | PMCW_FLAGS_MASK_ENA)) {
->>>>>> -        ret = -ENODEV;
->>>>>> -        goto out;
->>>>>> +        return IOINST_CC_NOT_OPERATIONAL;
->>>>>>      }
->>>>>>  
->>>>>>      if (s->ctrl & SCSW_STCTL_STATUS_PEND) {
->>>>>> -        ret = -EINPROGRESS;
->>>>>> -        goto out;
->>>>>> +        return IOINST_CC_STATUS_PRESENT;
->>>>>>      }
->>>>>>  
->>>>>>      if (((s->ctrl & SCSW_CTRL_MASK_FCTL) != SCSW_FCTL_START_FUNC) ||
->>>>>>          (s->ctrl & SCSW_ACTL_RESUME_PEND) ||
->>>>>>          (!(s->ctrl & SCSW_ACTL_SUSP))) {
->>>>>> -        ret = -EINVAL;
->>>>>> -        goto out;
->>>>>> +        return IOINST_CC_BUSY;  
->>>>>
->>>>> Why is EINVAL now mapped to IOINST_CC_BUSY? Shouldn't that be
->>>>> IOINST_CC_STATUS_PRESENT instead?
->>>>
->>>> No, that is correct (see the PoP for when cc 2 is supposed to be set by
->>>> rsch).
->>>
->>> So if this is on purpose, this change in behavior should also be
->>> mentioned in the patch description, I think.
->>
->> No. have a look at the function ioinst_handle_rsch. It used
->> to map -EINVAL to cc 2 (and was an oddball in this respect) so we
->> keep the old behavior, it's just more obvious whats happening.
+* Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> This patch adds request to kernel space for UFFD_FEATURE_THREAD_ID,
+> in case when this feature is provided by kernel.
 > 
-> Oh, you're right, I missed that different mapping of the error codes!
-> ... so I see, the previous behavior was really confusing and error
-> prone, it's really good that you're cleaning this up now!
+> PostcopyBlocktimeContext is incapsulated inside postcopy-ram.c,
+> due to it's postcopy only feature.
+> Also it defines PostcopyBlocktimeContext's instance live time.
+> Information from PostcopyBlocktimeContext instance will be provided
+> much after postcopy migration end, instance of PostcopyBlocktimeContext
+> will live till QEMU exit, but part of it (vcpu_addr,
+> page_fault_vcpu_time) used only during calculation, will be released
+> when postcopy ended or failed.
 > 
->  Thomas
+> To enable postcopy blocktime calculation on destination, need to request
+> proper capabiltiy (Patch for documentation will be at the tail of the patch
+> set).
 > 
+> As an example following command enable that capability, assume QEMU was
+> started with
+> -chardev socket,id=charmonitor,path=/var/lib/migrate-vm-monitor.sock
+> option to control it
+> 
+> [root@host]#printf "{\"execute\" : \"qmp_capabilities\"}\r\n \
+> {\"execute\": \"migrate-set-capabilities\" , \"arguments\":   {
+> \"capabilities\": [ { \"capability\": \"postcopy-blocktime\", \"state\":
+> true } ] } }" | nc -U /var/lib/migrate-vm-monitor.sock
+> 
+> Or just with HMP
+> (qemu) migrate_set_capability postcopy-blocktime on
+> 
+> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
 
-Many thanks for the watchful eyes! In the end I did manage to sneak
-in a bug (for MSCH). I prefer a lots of false positives that than a
-couple of false negatives (for review).
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Regards,
-Halil
+> ---
+>  migration/migration.h    |  8 +++++++
+>  migration/postcopy-ram.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 67 insertions(+)
+> 
+> diff --git a/migration/migration.h b/migration/migration.h
+> index c12ceba..2bae992 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -22,6 +22,8 @@
+>  #include "hw/qdev.h"
+>  #include "io/channel.h"
+>  
+> +struct PostcopyBlocktimeContext;
+> +
+>  /* State for the incoming migration */
+>  struct MigrationIncomingState {
+>      QEMUFile *from_src_file;
+> @@ -59,6 +61,12 @@ struct MigrationIncomingState {
+>      /* The coroutine we should enter (back) after failover */
+>      Coroutine *migration_incoming_co;
+>      QemuSemaphore colo_incoming_sem;
+> +
+> +    /*
+> +     * PostcopyBlocktimeContext to keep information for postcopy
+> +     * live migration, to calculate vCPU block time
+> +     * */
+> +    struct PostcopyBlocktimeContext *blocktime_ctx;
+>  };
+>  
+>  MigrationIncomingState *migration_incoming_get_current(void);
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index bec6c2c..c18ec5a 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -61,6 +61,52 @@ struct PostcopyDiscardState {
+>  #include <sys/eventfd.h>
+>  #include <linux/userfaultfd.h>
+>  
+> +typedef struct PostcopyBlocktimeContext {
+> +    /* time when page fault initiated per vCPU */
+> +    int64_t *page_fault_vcpu_time;
+> +    /* page address per vCPU */
+> +    uint64_t *vcpu_addr;
+> +    int64_t total_blocktime;
+> +    /* blocktime per vCPU */
+> +    int64_t *vcpu_blocktime;
+> +    /* point in time when last page fault was initiated */
+> +    int64_t last_begin;
+> +    /* number of vCPU are suspended */
+> +    int smp_cpus_down;
+> +
+> +    /*
+> +     * Handler for exit event, necessary for
+> +     * releasing whole blocktime_ctx
+> +     */
+> +    Notifier exit_notifier;
+> +} PostcopyBlocktimeContext;
+> +
+> +static void destroy_blocktime_context(struct PostcopyBlocktimeContext *ctx)
+> +{
+> +    g_free(ctx->page_fault_vcpu_time);
+> +    g_free(ctx->vcpu_addr);
+> +    g_free(ctx->vcpu_blocktime);
+> +    g_free(ctx);
+> +}
+> +
+> +static void migration_exit_cb(Notifier *n, void *data)
+> +{
+> +    PostcopyBlocktimeContext *ctx = container_of(n, PostcopyBlocktimeContext,
+> +                                                 exit_notifier);
+> +    destroy_blocktime_context(ctx);
+> +}
+> +
+> +static struct PostcopyBlocktimeContext *blocktime_context_new(void)
+> +{
+> +    PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
+> +    ctx->page_fault_vcpu_time = g_new0(int64_t, smp_cpus);
+> +    ctx->vcpu_addr = g_new0(uint64_t, smp_cpus);
+> +    ctx->vcpu_blocktime = g_new0(int64_t, smp_cpus);
+> +
+> +    ctx->exit_notifier.notify = migration_exit_cb;
+> +    qemu_add_exit_notifier(&ctx->exit_notifier);
+> +    return ctx;
+> +}
+>  
+>  /**
+>   * receive_ufd_features: check userfault fd features, to request only supported
+> @@ -153,6 +199,19 @@ static bool ufd_check_and_apply(int ufd, MigrationIncomingState *mis)
+>          }
+>      }
+>  
+> +#ifdef UFFD_FEATURE_THREAD_ID
+> +    if (migrate_postcopy_blocktime() && mis &&
+> +        UFFD_FEATURE_THREAD_ID & supported_features) {
+> +        /* kernel supports that feature */
+> +        /* don't create blocktime_context if it exists */
+> +        if (!mis->blocktime_ctx) {
+> +            mis->blocktime_ctx = blocktime_context_new();
+> +        }
+> +
+> +        asked_features |= UFFD_FEATURE_THREAD_ID;
+> +    }
+> +#endif
+> +
+>      /*
+>       * request features, even if asked_features is 0, due to
+>       * kernel expects UFFD_API before UFFDIO_REGISTER, per
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
