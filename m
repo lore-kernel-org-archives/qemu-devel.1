@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e4sD9-0003jB-HY
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:32:59 -0400
+	(envelope-from <mst@redhat.com>) id 1e4sEg-0004Le-Oa
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:34:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1e4sD5-0001RL-JB
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:32:55 -0400
-Resent-Message-Id: <E1e4sD5-0001RL-JB@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21350)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1e4sD5-0001P9-D6
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:32:51 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150821908613.362.714360778900206454@b58463cdfd5f>
-In-Reply-To: <cover.1508213452.git.jcody@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1e4sEc-00033x-R4
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:34:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33796)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1e4sEc-00031q-L5
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 13:34:26 -0400
+Date: Wed, 18 Oct 2017 20:34:17 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20171018203350-mutt-send-email-mst@kernel.org>
+References: <1508144783-18792-1-git-send-email-mgamal@redhat.com>
+	<20171016093125.GG4166@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 16 Oct 2017 22:44:46 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v4 00/10] qemu-iotests improvements
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20171016093125.GG4166@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH RESEND 0/2] x86_iommu: Fix segfault when
+ starting on non-PCI machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jcody@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: Mohammed Gamal <mgamal@redhat.com>, qemu-devel@nongnu.org, thuth@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com, mjt@tls.msk.ru
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IGNvdmVyLjE1MDgyMTM0NTIuZ2l0Lmpjb2R5QHJlZGhhdC5jb20KU3ViamVjdDog
-W1FlbXUtZGV2ZWxdIFtQQVRDSCB2NCAwMC8xMF0gcWVtdS1pb3Rlc3RzIGltcHJvdmVtZW50cwoK
-PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3Rh
-bD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNF
-Li4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0
-b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hv
-dyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sg
-LTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisx
-KSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAz
-YzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3
-IGJyYW5jaCAndGVzdCcKZmNmN2JiNTVjNiBxZW11LWlvdGVzdHM6IGFkZCBzdXBwb3J0IGZvciBy
-dW5uaW5nIG11bHRpLXRocmVhZGVkIGlvdGVzdHMKODg5YmQyYzNhZCBxZW11LWlvdGVzdHM6IGFk
-ZCBvcHRpb24gdG8gc2F2ZSB0ZW1wIGZpbGVzIG9uIGVycm9yCmY1ZTRjN2NiYjggcWVtdS1pb3Rl
-c3RzOiBtb2RpZnkgcHl0aG9uIHRlc3RzIHRvIHJ1biBmcm9tIHN1YmRpcgo5ODU2ZTM3YTk3IHFl
-bXUtaW90ZXN0czogcnVuIHB5dGhvbiB0ZXN0cyBpbiBvd24gc3ViZGlyZWN0b3JpZXMKMTlkM2Nh
-NDM3YiBxZW11LWlvdGVzdHM6IG1ha2UgLi9jaGVjayBhdXRvbWF0aWNhbGx5IHJlYXAgUUVNVSBw
-cm9jZXNzZXMKYmU4YTRiNGFkOSBxZW11LWlvdGVzdHM6IGNoYW5nZSBxZW11IHBpZCBhbmQgZmQg
-dHJhY2tpbmcgLyBjbGVhbnVwCmRjMzZhMmI4NmIgcWVtdS1pb3Rlc3RzOiByZW1vdmUgZmlsZSBj
-bGVhbnVwIGZyb20gYmFzaCB0ZXN0cwphOTEyODdhYjlmIHFlbXUtaW90ZXN0czogYXV0b21hdGlj
-YWxseSBjbGVhbiB1cCBiYXNoIHByb3RvY29sIHNlcnZlcnMKNGZlNTdmZDdiNyBxZW11LWlvdGVz
-dHM6IHNldCBURVNUX0RJUiB0byBhIHVuaXF1ZSBkaXIgZm9yIGVhY2ggdGVzdApiMjRjZjVlZGZk
-IHFlbXUtaW90ZXN0czogcmVmdXNlIHRvIHJ1biBpZiBURVNUX0RJUiBjb250YWlucyBzcGFjZXMK
-Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTA6IHFlbXUtaW90ZXN0czog
-cmVmdXNlIHRvIHJ1biBpZiBURVNUX0RJUiBjb250YWlucyBzcGFjZXMuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMi8xMDogcWVtdS1pb3Rlc3RzOiBzZXQgVEVTVF9ESVIgdG8gYSB1bmlxdWUgZGlyIGZvciBl
-YWNoIHRlc3QuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xMDogcWVtdS1pb3Rlc3RzOiBhdXRvbWF0aWNh
-bGx5IGNsZWFuIHVwIGJhc2ggcHJvdG9jb2wgc2VydmVycy4uLgpDaGVja2luZyBQQVRDSCA0LzEw
-OiBxZW11LWlvdGVzdHM6IHJlbW92ZSBmaWxlIGNsZWFudXAgZnJvbSBiYXNoIHRlc3RzLi4uCkNo
-ZWNraW5nIFBBVENIIDUvMTA6IHFlbXUtaW90ZXN0czogY2hhbmdlIHFlbXUgcGlkIGFuZCBmZCB0
-cmFja2luZyAvIGNsZWFudXAuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8xMDogcWVtdS1pb3Rlc3RzOiBt
-YWtlIC4vY2hlY2sgYXV0b21hdGljYWxseSByZWFwIFFFTVUgcHJvY2Vzc2VzLi4uCkNoZWNraW5n
-IFBBVENIIDcvMTA6IHFlbXUtaW90ZXN0czogcnVuIHB5dGhvbiB0ZXN0cyBpbiBvd24gc3ViZGly
-ZWN0b3JpZXMuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0NzogRklMRTogdGVz
-dHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHk6MjY3OgorICAgICAgICBzZWxmLndvcmtkaXIgPSBv
-cy5wYXRoLmpvaW4odGVzdF9kaXIsIHNlbGYuX19jbGFzc19fLl9fbmFtZV9fLCBzZWxmLl90ZXN0
-TWV0aG9kTmFtZSkKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTYgbGluZXMgY2hlY2tl
-ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0gg
-OC8xMDogcWVtdS1pb3Rlc3RzOiBtb2RpZnkgcHl0aG9uIHRlc3RzIHRvIHJ1biBmcm9tIHN1YmRp
-ci4uLgpDaGVja2luZyBQQVRDSCA5LzEwOiBxZW11LWlvdGVzdHM6IGFkZCBvcHRpb24gdG8gc2F2
-ZSB0ZW1wIGZpbGVzIG9uIGVycm9yLi4uCkNoZWNraW5nIFBBVENIIDEwLzEwOiBxZW11LWlvdGVz
-dHM6IGFkZCBzdXBwb3J0IGZvciBydW5uaW5nIG11bHRpLXRocmVhZGVkIGlvdGVzdHMuLi4KPT09
-IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpF
-bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
-cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0
-cy5vcmc=
+On Mon, Oct 16, 2017 at 05:31:25PM +0800, Peter Xu wrote:
+> On Mon, Oct 16, 2017 at 11:06:21AM +0200, Mohammed Gamal wrote:
+> > Starting qemu with
+> > qemu-system-x86_64 -S -M isapc -device {amd|intel}-iommu
+> > leads to a segfault. The code assume PCI bus is present and
+> > tries to access the bus structure without checking.
+> > 
+> > The patch series moves the error checks from vtd_realize()
+> > and amdvi_realize() to the generic x86_iommu_realize() and
+> > adds a check for PCI bus presence.
+> 
+> Hi, Michael,
+> 
+> Would you like to pick Mohammed's two patches in your next pull
+> request?
+> 
+> Each of the patches has got 2 acks, and it does fix a problem.
+> 
+> Thanks,
+
+Yes, thank you.
+
+> > 
+> > 
+> > Mohammed Gamal (2):
+> >   x86_iommu: Move machine check to x86_iommu_realize()
+> >   x86_iommu: check if machine has PCI bus
+> > 
+> >  hw/i386/amd_iommu.c   | 13 ++-----------
+> >  hw/i386/intel_iommu.c | 13 ++-----------
+> >  hw/i386/x86-iommu.c   | 13 +++++++++++++
+> >  3 files changed, 17 insertions(+), 22 deletions(-)
+> > 
+> > -- 
+> > 1.8.3.1
+> > 
+> 
+> -- 
+> Peter Xu
