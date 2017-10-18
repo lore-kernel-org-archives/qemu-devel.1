@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e4pkM-0002OW-Ka
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 10:55:08 -0400
+	(envelope-from <eblake@redhat.com>) id 1e4prP-00050E-7k
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 11:02:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1e4pkJ-0004Ww-By
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 10:55:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48830)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1e4pkI-0004VI-RK
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 10:54:59 -0400
-Date: Wed, 18 Oct 2017 16:54:54 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20171018165454.3ce3a99f@nial.brq.redhat.com>
-In-Reply-To: <3039cb1b-cef6-781b-964c-143ab225a88f@redhat.com>
-References: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
-	<20171016163636.GI11975@redhat.com>
-	<20171017092702.5b82103b@nial.brq.redhat.com>
-	<20171017150759.GB31897@redhat.com>
-	<32e47d96-0292-4511-adb2-24a4766b3027@redhat.com>
-	<20171018122715.GF9719@redhat.com>
-	<f281298d-f9b3-7ffe-e223-ccd596bb0545@redhat.com>
-	<20171018162625.094cd3e1@nial.brq.redhat.com>
-	<3039cb1b-cef6-781b-964c-143ab225a88f@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1e4prA-0002Oh-Ay
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 11:02:13 -0400
+References: <1508336428-20511-1-git-send-email-thuth@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9d7d4163-1752-64a1-e5e1-d0b45bd3eb46@redhat.com>
+Date: Wed, 18 Oct 2017 10:01:57 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 0/6] enable numa configuration before
- machine_init() from HMP/QMP
+In-Reply-To: <1508336428-20511-1-git-send-email-thuth@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="DOqkwRbVgpop33BotLd5WXqkHk5f7oEGh"
+Subject: Re: [Qemu-devel] [PATCH 0/2] Enable the simple virtio tests on
+ s390x, too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,43 +24,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, peter.maydell@linaro.org, pkrempa@redhat.com, ehabkost@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, david@gibson.dropbear.id.au
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, Michael S Tsirkin <mst@redhat.com>, Amit Shah <amit@kernel.org>
 
-On Wed, 18 Oct 2017 16:29:38 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--DOqkwRbVgpop33BotLd5WXqkHk5f7oEGh
+From: Eric Blake <eblake@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, cohuck@redhat.com,
+ Michael S Tsirkin <mst@redhat.com>, Amit Shah <amit@kernel.org>
+Message-ID: <9d7d4163-1752-64a1-e5e1-d0b45bd3eb46@redhat.com>
+Subject: Re: [PATCH 0/2] Enable the simple virtio tests on s390x, too
+References: <1508336428-20511-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <1508336428-20511-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 18/10/2017 16:26, Igor Mammedov wrote:
-> >> I guess query-hotpluggable-cpus could also grow a first-cpu-index in the
-> >> returned data.  
-> > 
-> > I guess query-cpus can/does provide cpu-index already,
-> > for query-hotpluggable-cpus it would depend in what's shown there
-> > (would work fro x86/arm/s390 as they publish there CPUState based objects,
-> > but spapr puts cores there which themselves do not have cpu-index,
-> > their children do though)  
-> 
-> Yeah, that's why I put "first-cpu-index".  The idea is that indices go
-> from first-cpu-index to first-cpu-index + vcpus-count - 1.
-yep, so far it's so.
+On 10/18/2017 09:20 AM, Thomas Huth wrote:
+> First patch introduces the qtest_startf() function that can be used
+> to start tests with a printf-like string. This patch was originally
+> part of Eric's bigger qtest refactoring series, and I originally wanted=
 
-we can also add optional extra entries there for each
-thread like this:
-  
-Hotpluggable CPUs:
-  type: "power8_v2.0-spapr-cpu-core"
-  vcpus_count: "1"
-  qom_path: "/machine/unattached/device[0]"
-  children threads:
-           /machine/unattached/device[0]/thread[0]
-           /machine/unattached/device[0]/thread[1]
-  CPUInstance Properties:
-    core-id: "0"
+> to wait 'til it's included in the master branch. But since this did
+> not happen yet and QEMU soft-freeze is approaching soon, I decided
+> to rather included a slightly simplified version of that patch here
+> instead.
 
-or ignore high level query-hotpluggable-cpus and use existing
-query-cpus which already provides qom path to threads
+Fair enough.  I'm also trying to focus on getting features in before
+soft freeze, hence my lack of rebasing the qtest refactoring series in
+the meantime.  Arguably (although it is a bit weak) we can claim
+testsuite fixes as material that is still relevant after soft freeze as
+it does not affect the final installed binaries, as long as they still
+go in before hard freeze, but it's hard to say at this point if any of
+my qtest refactoring will make 2.11.
 
-and replace of cpu-index based monitor commands with qom path
-based ones. (though it won't change fact that both are owned by QEMU)
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-> Paolo
+
+--DOqkwRbVgpop33BotLd5WXqkHk5f7oEGh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnnbOUACgkQp6FrSiUn
+Q2p4QQf7Bzf8qlBKh/N/R1CKm5boTL7a6kpHmstl2wNTR+ZaHuQyABOgunm0bUbN
+NSjkTNErJtkWO9G7etKNl21mzKSmTrFSvMEjIEehtL9tUTCkzR0uhhBVaYxDiRHI
+V9nyzrKLyBxec4oUlnpPyj6wjKwIj1u++81RTf33qGDlevaf9W0pVNYxsvLzKb6y
+vn2zYUM7Tc4oYopu6q/d/KyAe2Mb8q/+dd+xW15eC07HBPeE6d2tB3wQMfJK0O41
+ZuIZA1fHDmGdJZhWBJ5aiHCGPsWIU06GnF03N+Fs3GFpVU0jAiUkihJIkDdomAKQ
+ZdwB2JOd67WBUv4SIikgbi98/Hl7nw==
+=nkro
+-----END PGP SIGNATURE-----
+
+--DOqkwRbVgpop33BotLd5WXqkHk5f7oEGh--
