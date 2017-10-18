@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e4kdD-00036Q-K6
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:27:25 -0400
+	(envelope-from <thuth@redhat.com>) id 1e4kgh-0003ws-Ln
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:30:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1e4kd9-0001RO-NU
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:27:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33564)
+	(envelope-from <thuth@redhat.com>) id 1e4kgd-0005Ko-Io
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:30:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47304)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1e4kd9-0001Px-HC
-	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:27:15 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <cfb8e3d0-7c4e-f83f-3887-18e6af8b0418@redhat.com> (Laurent
-	Vivier's message of "Wed, 18 Oct 2017 11:09:19 +0200")
-References: <20171018083305.5246-1-quintela@redhat.com>
-	<cfb8e3d0-7c4e-f83f-3887-18e6af8b0418@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 18 Oct 2017 11:27:09 +0200
-Message-ID: <874lqwolg2.fsf@secure.laptop>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1e4kgd-0005K0-9t
+	for qemu-devel@nongnu.org; Wed, 18 Oct 2017 05:30:51 -0400
+References: <20171017140453.51099-1-pasic@linux.vnet.ibm.com>
+	<20171017140453.51099-4-pasic@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0a29771b-da12-76eb-ead8-34d1a8d24ce7@redhat.com>
+Date: Wed, 18 Oct 2017 11:30:47 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] tpm: Fix compilation with --disable-tpm
+In-Reply-To: <20171017140453.51099-4-pasic@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 3/7] s390x: improve error handling for
+ SSCH and RSCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,82 +29,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, peterx@redhat.com, Amarnath Valluri <amarnath.valluri@intel.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-Laurent Vivier <lvivier@redhat.com> wrote:
-> On 18/10/2017 10:33, Juan Quintela wrote:
->> Commit
->>    c37cacabf2285b0731b44c1f667781fdd4f2b658
->> 
->> broke compilation without tpm.  Just add an empty tpm_cleanup() stub.
->
-> tpm_init() and tpm_config_parse() are managed in a different way: they
-> are included in a "#ifdef CONFIG_TPM .. #endif" in vl.c
->
-> I think you should follow the same way.
+On 17.10.2017 16:04, Halil Pasic wrote:
+> Simplify the error handling of the SSCH and RSCH handler avoiding
+> arbitrary and cryptic error codes being used to tell how the instructio=
+n
+> is supposed to end.  Let the code detecting the condition tell how it's
+> to be handled in a less ambiguous way.  It's best to handle SSCH and RS=
+CH
+> in one go as the emulation of the two shares a lot of code.
+>=20
+> For passthrough this change isn't pure refactoring, but changes the way
+> kernel reported EFAULT is handled. After clarifying the kernel interfac=
+e
+> we decided that EFAULT shall be mapped to unit exception.  Same goes fo=
+r
+> unexpected error codes and absence of required ORB flags.
+>=20
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> ---
+>  hw/s390x/css.c              | 84 +++++++++++++------------------------=
+--------
+>  hw/s390x/s390-ccw.c         | 11 +++---
+>  hw/vfio/ccw.c               | 28 +++++++++++----
+>  include/hw/s390x/css.h      | 23 +++++++++----
+>  include/hw/s390x/s390-ccw.h |  2 +-
+>  target/s390x/ioinst.c       | 53 ++++------------------------
+>  6 files changed, 75 insertions(+), 126 deletions(-)
+>=20
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index aa233d5f8a..ff5a05c34b 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -1181,12 +1181,11 @@ static void sch_handle_start_func_virtual(Subch=
+Dev *sch)
+> =20
+>  }
+> =20
+> -static int sch_handle_start_func_passthrough(SubchDev *sch)
+> +static IOInstEnding sch_handle_start_func_passthrough(SubchDev *sch)
+>  {
+> =20
+>      PMCW *p =3D &sch->curr_status.pmcw;
+>      SCSW *s =3D &sch->curr_status.scsw;
+> -    int ret;
+> =20
+>      ORB *orb =3D &sch->orb;
+>      if (!(s->ctrl & SCSW_ACTL_SUSP)) {
+> @@ -1200,31 +1199,12 @@ static int sch_handle_start_func_passthrough(Su=
+bchDev *sch)
+>       */
+>      if (!(orb->ctrl0 & ORB_CTRL0_MASK_PFCH) ||
+>          !(orb->ctrl0 & ORB_CTRL0_MASK_C64)) {
+> -        return -EINVAL;
+> +        warn_report("vfio-ccw requires PFCH and C64 flags set...");
 
-tpm is weird (TM):
+Not sure, but should this maybe rather be a
+"qemu_log_mask(LOG_GUEST_ERROR, ...)" instead?
+Anyway, as Cornelia already mentioned it: Please drop the trailing dots.
 
-in include/sysemu/tpm.h we do that in an incline function
+> +        sch_gen_unit_exception(sch);
+> +        css_inject_io_interrupt(sch);
+> +        return IOINST_CC_EXPECTED;
+>      }
+[...]
+> @@ -1844,27 +1816,23 @@ void css_do_schm(uint8_t mbk, int update, int d=
+ct, uint64_t mbo)
+>      }
+>  }
+> =20
+> -int css_do_rsch(SubchDev *sch)
+> +IOInstEnding css_do_rsch(SubchDev *sch)
+>  {
+>      SCSW *s =3D &sch->curr_status.scsw;
+>      PMCW *p =3D &sch->curr_status.pmcw;
+> -    int ret;
+> =20
+>      if (~(p->flags) & (PMCW_FLAGS_MASK_DNV | PMCW_FLAGS_MASK_ENA)) {
+> -        ret =3D -ENODEV;
+> -        goto out;
+> +        return IOINST_CC_NOT_OPERATIONAL;
+>      }
+> =20
+>      if (s->ctrl & SCSW_STCTL_STATUS_PEND) {
+> -        ret =3D -EINPROGRESS;
+> -        goto out;
+> +        return IOINST_CC_STATUS_PRESENT;
+>      }
+> =20
+>      if (((s->ctrl & SCSW_CTRL_MASK_FCTL) !=3D SCSW_FCTL_START_FUNC) ||
+>          (s->ctrl & SCSW_ACTL_RESUME_PEND) ||
+>          (!(s->ctrl & SCSW_ACTL_SUSP))) {
+> -        ret =3D -EINVAL;
+> -        goto out;
+> +        return IOINST_CC_BUSY;
 
-static inline TPMVersion tpm_get_version(void)
-{
-#ifdef CONFIG_TPM
-    Object *obj = object_resolve_path_type("", TYPE_TPM_TIS, NULL);
+Why is EINVAL now mapped to IOINST_CC_BUSY? Shouldn't that be
+IOINST_CC_STATUS_PRESENT instead?
 
-    if (obj) {
-        return tpm_tis_get_tpm_version(obj);
-    }
-#endif
-    return TPM_VERSION_UNSPEC;
-}
+>      }
+[...]
+> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+> index 76323c6bde..1cc2e5d873 100644
+> --- a/hw/vfio/ccw.c
+> +++ b/hw/vfio/ccw.c
+> @@ -47,9 +47,9 @@ struct VFIODeviceOps vfio_ccw_ops =3D {
+>      .vfio_compute_needs_reset =3D vfio_ccw_compute_needs_reset,
+>  };
+> =20
+> -static int vfio_ccw_handle_request(ORB *orb, SCSW *scsw, void *data)
+> +static IOInstEnding vfio_ccw_handle_request(SubchDev *sch)
+>  {
+> -    S390CCWDevice *cdev =3D data;
+> +    S390CCWDevice *cdev =3D sch->driver_data;
+>      VFIOCCWDevice *vcdev =3D DO_UPCAST(VFIOCCWDevice, cdev, cdev);
+>      struct ccw_io_region *region =3D vcdev->io_region;
+>      int ret;
+> @@ -60,8 +60,8 @@ static int vfio_ccw_handle_request(ORB *orb, SCSW *sc=
+sw, void *data)
+> =20
+>      memset(region, 0, sizeof(*region));
+> =20
+> -    memcpy(region->orb_area, orb, sizeof(ORB));
+> -    memcpy(region->scsw_area, scsw, sizeof(SCSW));
+> +    memcpy(region->orb_area, &sch->orb, sizeof(ORB));
+> +    memcpy(region->scsw_area, &sch->curr_status.scsw, sizeof(SCSW));
+> =20
+>  again:
+>      ret =3D pwrite(vcdev->vdev.fd, region,
+> @@ -71,10 +71,24 @@ again:
+>              goto again;
+>          }
+>          error_report("vfio-ccw: wirte I/O region failed with errno=3D%=
+d", errno);
+> -        return -errno;
+> +        ret =3D -errno;
+> +    } else {
+> +        ret =3D region->ret_code;
+> +    }
+> +    switch (-ret) {
+> +    case 0:
+> +        return IOINST_CC_EXPECTED;
+> +    case EBUSY:
+> +        return IOINST_CC_BUSY;
+> +    case ENODEV:
+> +    case EACCES:
+> +        return IOINST_CC_NOT_OPERATIONAL;
+> +    case EFAULT:
+> +    default:
+> +        sch_gen_unit_exception(sch);
+> +        css_inject_io_interrupt(sch);
+> +        return IOINST_CC_EXPECTED;
 
+Do we feel really confident that it is OK to do the setcc() in case of
+an exception here later? ... otherwise it might be necessery to
+introduce something like IOINST_EXCEPTION to the enum to signal the
+ioinst_handle_xxx() callers that they should not do the setcc() anymore..=
+.
 
-tpm.c, we have an ifdef in the middle of the file
-
-#ifdef CONFIG_TPM
-
-#endif
-
-
-vl.c, we protect tpm_* calls with CONFIG_TPM
-
-#ifdef CONFIG_TPM
-            case QEMU_OPTION_tpmdev:
-                if (tpm_config_parse(qemu_find_opts("tpmdev"), optarg) < 0) {
-                    exit(1);
-                }
-                break;
-#endif
-
-
-but we almost never do:
-
-#ifdef CONFIG_TPM
-   tpm_cleanup()
-#endif
-
-We normally create an stub function.
-
-So ......
-
-We are going to be inconsistent whatever we did.
-
-I would have vote for
-
-#ifdef CONFIG_TPM
-void tpm_cleanup(void);
-#else
-static inline void tpm_cleanup(void) {}
-#endif
-
-On the header file (it was my first solution), but having CONFIG_TPM on
-tpm.c sounded gross.
-
-So ....
-
-I think that now that the problem is spotted, I will left the choose of
-the solution to the maintaner O:-)
-
-Later, Juan.
+ Thomas
